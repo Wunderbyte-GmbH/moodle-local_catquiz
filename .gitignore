@@ -1,0 +1,12 @@
+.project
+.settings
+/nbproject/private/
+project.xml
+project.properties
+.DS_Store
+.idea
+amd/Gruntfile.js
+amd/package.json
+amd/package-lock.json
+amd/node_modules
+.vscode/launch.json
