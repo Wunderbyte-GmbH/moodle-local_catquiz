@@ -26,12 +26,10 @@
 namespace local_catquiz;
 
 use moodle_exception;
-use moodleform;
+use MoodleQuickForm;
 use stdClass;
 
 defined('MOODLE_INTERNAL') || die();
-
-require_once(__DIR__ . '/../lib.php');
 
 /**
  * Class catquiz
@@ -40,7 +38,7 @@ require_once(__DIR__ . '/../lib.php');
  * @copyright 2022 Wunderbyte GmbH
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class catquiz {
+class catquiz_handler {
 
     /**
      * entities constructor.
@@ -52,10 +50,30 @@ class catquiz {
     /**
      * Create the form fields relevant to this plugin.
      *
-     * @param moodleform $mform
+     * @param MoodleQuickForm $mform
      * @return void
      */
-    public static function instance_form_definition(moodleform $mform) {
+    public static function instance_form_definition(MoodleQuickForm $mform) {
+
+        $modelarray = [
+            1 => get_string('model', 'local_catquiz') . ' 1',
+            1 => get_string('model', 'local_catquiz') . ' 2',
+            1 => get_string('model', 'local_catquiz') . ' 3',
+            1 => get_string('model', 'local_catquiz') . ' 4',
+        ];
+
+        // Add a special header for catquiz.
+        $mform->addElement('header', 'catquiz_header',
+                get_string('catquizsettings', 'local_catquiz'));
+
+        // Turn the catquiz engine on and off for this particular instance.
+        $mform->addElement('advcheckbox', 'catquiz_usecatquiz',
+                get_string('usecatquiz', 'local_catquiz'), null, null, [0, 1]);
+
+        // Choose a model for this instance.
+        $mform->addElement('select', 'catquiz_model_select',
+                get_string('selectmodel', 'local_catquiz'), $modelarray);
+        $mform->disabledIf('catquiz_model_select', 'catquiz_usecatquiz', 'neq', 1);
 
     }
 
@@ -102,5 +120,21 @@ class catquiz {
         }
 
         // Do the saving.
+    }
+
+    /**
+     * Check if this instance is setup to actually use catquiz.
+     * When called by an external plugin, this must specify its signature.
+     * Like "mod_adaptivequiz" and use its own id (not cmid, but instance id).
+     *
+     * @param integer $quizid
+     * @param string $component
+     * @return bool
+     */
+    public static function use_catquiz(int $quizid, string $component) {
+
+        // TODO: Implement fuctionality.
+
+        return true;
     }
 }

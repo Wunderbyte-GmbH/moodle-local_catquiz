@@ -28,7 +28,7 @@ defined('MOODLE_INTERNAL') || die();
 $string['pluginname'] = 'ALiSe CAT Quiz';
 
 // Catquiz handler.
-$string['catquizsettings'] = 'Cat quiz settings';
-$string['selectmodel'] = 'Choose a model';
-$string['model'] = 'Model';
-$string['usecatquiz'] = 'Use the catquiz engine for this test instance.';
+$string['catquizsettings'] = 'Cat Quiz Einstellungen';
+$string['selectmodel'] = 'Wähle ein Modell';
+$string['model'] = 'Modell';
+$string['usecatquiz'] = 'Verwende die Catquiz Engine für dieses Quiz.';
