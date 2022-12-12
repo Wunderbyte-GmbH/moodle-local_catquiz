@@ -25,11 +25,17 @@
 
 defined('MOODLE_INTERNAL') || die();
 
+$componentname = 'local_catquiz';
+
 if ($hassiteconfig) {
-    $settings = new admin_settingpage('local_catquiz_settings', new lang_string('pluginname', 'local_catquiz'));
+    $settings = new admin_settingpage($componentname . '_settings', '');
+    $ADMIN->add('localplugins', new admin_category($componentname, get_string('pluginname', $componentname)));
+    $ADMIN->add($componentname, $settings);
 
     // phpcs:ignore Generic.CodeAnalysis.EmptyStatement.DetectedIf
     if ($ADMIN->fulltree) {
         // TODO: Define actual plugin settings page and add it to the tree - {@link https://docs.moodle.org/dev/Admin_settings}.
+
+
     }
 }
