@@ -100,7 +100,9 @@ class catquiz_handler {
      */
     public static function instance_form_before_set_data(stdClass &$data) {
         global $DB;
-        $settings = $DB->get_record('local_catquiz', ['componentname' => 'mod_' . $data->modulename, 'componentid' => $data->id]);
+        if (!$settings = $DB->get_record('local_catquiz', ['componentname' => 'mod_' . $data->modulename, 'componentid' => $data->id])) {
+            return;
+        }
         $data->catquiz_usecatquiz = 1;
         $data->catquiz_model_select = $settings->adaptivemodel;
         $data->catquestionpool = json_decode($settings->questioncategoryids);
