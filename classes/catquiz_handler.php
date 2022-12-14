@@ -39,6 +39,10 @@ defined('MOODLE_INTERNAL') || die();
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class catquiz_handler {
+    /** @var int Rasch model to select next question to be displayed to user */
+    public const RASCH_MODEL = 1;
+    /** @var int Artificial intelligence model to select next question to be displayed to user */
+    public const ARTIFICIAL_INTELLIGENCE = 2;
 
     /**
      * entities constructor.
@@ -51,15 +55,16 @@ class catquiz_handler {
      * Create the form fields relevant to this plugin.
      *
      * @param MoodleQuickForm $mform
+     * @param \context $context
      * @return void
      */
-    public static function instance_form_definition(MoodleQuickForm $mform) {
+    public static function instance_form_definition(MoodleQuickForm $mform, \context $context) {
 
         $modelarray = [
-            1 => get_string('model', 'local_catquiz') . ' 1',
-            1 => get_string('model', 'local_catquiz') . ' 2',
-            1 => get_string('model', 'local_catquiz') . ' 3',
-            1 => get_string('model', 'local_catquiz') . ' 4',
+            self::RASCH_MODEL => get_string('model', 'local_catquiz') . ' Rasch',
+            self::ARTIFICIAL_INTELLIGENCE => get_string('model', 'local_catquiz') . ' AI',
+            3 => get_string('model', 'local_catquiz') . ' not used yet',
+            4 => get_string('model', 'local_catquiz') . ' not used yet',
         ];
 
         // Add a special header for catquiz.
@@ -75,6 +80,16 @@ class catquiz_handler {
                 get_string('selectmodel', 'local_catquiz'), $modelarray);
         $mform->disabledIf('catquiz_model_select', 'catquiz_usecatquiz', 'neq', 1);
 
+        // Question categories or tags to use for this quiz.
+
+        $areas = adaptivequiz_get_question_categories($context);
+        $options = array(
+            'multiple' => true,
+            'noselectionstring' => get_string('allareas', 'search'),
+        );
+        $mform->addElement('autocomplete', 'catquestionpool', get_string('questionpool', 'adaptivequiz'), $areas, $options);
+        $mform->addHelpButton('catquestionpool', 'questionpool', 'adaptivequiz');
+        $mform->addRule('catquestionpool', null, 'required', null, 'client');
     }
 
     /**
@@ -84,7 +99,11 @@ class catquiz_handler {
      * @return void
      */
     public static function instance_form_before_set_data(stdClass &$data) {
-
+        global $DB;
+        $settings = $DB->get_record('local_catquiz', ['componentname' => 'mod_' . $data->modulename, 'componentid' => $data->id]);
+        $data->catquiz_usecatquiz = 1;
+        $data->catquiz_model_select = $settings->adaptivemodel;
+        $data->catquestionpool = json_decode($settings->questioncategoryids);
     }
 
     /**
@@ -111,15 +130,36 @@ class catquiz_handler {
      * Save submitted data relevant to this plugin.
      *
      * @param stdClass $data
+     * @param int $instanceid
+     * @param string $componentname
      * @return void
      */
-    public static function instance_form_save(stdClass &$data) {
-
-        if (!isset($data->id)) {
-            throw new moodle_exception('noidindataobject', 'lcoal_catquiz');
+    public static function instance_form_save(stdClass &$data, int $instanceid, string $componentname) {
+        global $DB;
+        $catdata = new stdClass;
+        $catdata->componentname = $componentname;
+        $catdata->componentid = $instanceid;
+        $catdata->adaptivemodel = $data->catquiz_model_select;
+        $catdata->questioncategoryids = json_encode($data->catquestionpool);
+        if ($DB->record_exists('local_catquiz', ['componentname' => $componentname, 'componentid' => $instanceid])) {
+            $catdata->id = $DB->get_field('local_catquiz', 'id', ['componentname' => $componentname,
+                'componentid' => $instanceid]);
+            $DB->update_record('local_catquiz', $catdata);
+        } else {
+            $DB->insert_record('local_catquiz', $catdata);
         }
+    }
 
-        // Do the saving.
+    /**
+     * Delete settings related to
+     *
+     * @param int $id
+     * @param string $componentname
+     * @return void
+     */
+    public static function delete_settings(string $componentname, int $id) {
+        global $DB;
+        $DB->delete_records('local_catquiz', ['componentname' => $componentname, 'componentid' => $id]);
     }
 
     /**

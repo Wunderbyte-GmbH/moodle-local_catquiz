@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<XMLDB PATH="local/catquiz/db" VERSION="20221200" COMMENT="XMLDB file for Moodle local/catquiz"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:noNamespaceSchemaLocation="../../../lib/xmldb/xmldb.xsd"
+>
+  <TABLES>
+    <TABLE NAME="local_catquiz" COMMENT="Catquiz settings table" NEXT="categories">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
+        <FIELD NAME="componentname" TYPE="char" LENGTH="255" NOTNULL="true" SEQUENCE="false" COMMENT="Component name settings are applicable"/>
+        <FIELD NAME="componentid" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="Id of the instance of the component"/>
+        <FIELD NAME="adaptivemodel" TYPE="int" LENGTH="2" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="Algorithm type used to calculate the next question displayed to user"/>
+        <FIELD NAME="questioncategoryids" TYPE="char" LENGTH="255" NOTNULL="true" SEQUENCE="false" COMMENT="Comma separated ids of question categories to be used"/>
+     </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+      </KEYS>
+    </TABLE>
+  </TABLES>
+</XMLDB>
