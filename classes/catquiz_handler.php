@@ -39,13 +39,16 @@ defined('MOODLE_INTERNAL') || die();
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class catquiz_handler {
+
+    /** @var int If this is selected, the catquiz engine is deactivated. */
+    public const DEACTIVATED_MODEL = 0;
     /** @var int Rasch model to select next question to be displayed to user */
     public const RASCH_MODEL = 1;
     /** @var int Artificial intelligence model to select next question to be displayed to user */
-    public const ARTIFICIAL_INTELLIGENCE = 2;
+    public const AI_MODEL = 2;
 
     /**
-     * entities constructor.
+     * Constructor for catquiz.
      */
     public function __construct() {
 
@@ -61,9 +64,9 @@ class catquiz_handler {
     public static function instance_form_definition(MoodleQuickForm $mform, \context $context) {
 
         $modelarray = [
+            self::DEACTIVATED_MODEL => get_string('modeldeactivated', 'local_catquiz'),
             self::RASCH_MODEL => get_string('model', 'local_catquiz') . ' Rasch',
-            self::ARTIFICIAL_INTELLIGENCE => get_string('model', 'local_catquiz') . ' AI',
-            3 => get_string('model', 'local_catquiz') . ' not used yet',
+            self::AI_MODEL => get_string('model', 'local_catquiz') . ' AI',
             4 => get_string('model', 'local_catquiz') . ' not used yet',
         ];
 

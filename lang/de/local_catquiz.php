@@ -31,4 +31,5 @@ $string['pluginname'] = 'ALiSe CAT Quiz';
 $string['catquizsettings'] = 'Cat Quiz Einstellungen';
 $string['selectmodel'] = 'Wähle ein Modell';
 $string['model'] = 'Modell';
+$string['modeldeactivated'] = 'Deaktiviere CAT engine';
 $string['usecatquiz'] = 'Verwende die Catquiz Engine für dieses Quiz.';

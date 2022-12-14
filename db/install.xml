@@ -9,9 +9,10 @@
         <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
         <FIELD NAME="componentname" TYPE="char" LENGTH="255" NOTNULL="true" SEQUENCE="false" COMMENT="Component name settings are applicable"/>
         <FIELD NAME="componentid" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="Id of the instance of the component"/>
-        <FIELD NAME="adaptivemodel" TYPE="int" LENGTH="2" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="Algorithm type used to calculate the next question displayed to user"/>
+        <FIELD NAME="adaptivemodel" TYPE="int" LENGTH="2" NOTNULL="true" DEFAULT="0" SEQUENCE="false"
+               COMMENT="Algorithm type used to calculate the next question displayed to user. If 0 the engine is inactive."/>
         <FIELD NAME="questioncategoryids" TYPE="char" LENGTH="255" NOTNULL="true" SEQUENCE="false" COMMENT="Comma separated ids of question categories to be used"/>
-     </FIELDS>
+      </FIELDS>
       <KEYS>
         <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
       </KEYS>
