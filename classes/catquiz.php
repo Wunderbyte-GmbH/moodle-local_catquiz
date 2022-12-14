@@ -79,8 +79,16 @@ class catquiz {
      * @return array
      */
     public static function get_next_question(int $attemptid, int $quizid, string $component) {
+
+        global $DB;
+
+        $sql = "SELECT max(id)
+                FROM {question}";
+
+        $questionid = $DB->get_field_sql($sql);
+
         return [
-            'questionid' => 0
+            'questionid' => $questionid
         ];
     }
 }
