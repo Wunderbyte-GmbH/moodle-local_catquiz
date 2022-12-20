@@ -29,8 +29,6 @@ use moodle_exception;
 use MoodleQuickForm;
 use stdClass;
 
-defined('MOODLE_INTERNAL') || die();
-
 /**
  * Class catquiz
  *
@@ -103,7 +101,8 @@ class catquiz_handler {
      */
     public static function instance_form_before_set_data(stdClass &$data) {
         global $DB;
-        if (!$settings = $DB->get_record('local_catquiz', ['componentname' => 'mod_' . $data->modulename, 'componentid' => $data->id])) {
+        if (!$settings = $DB->get_record('local_catquiz',
+            ['componentname' => 'mod_' . $data->modulename, 'componentid' => $data->id])) {
             return;
         }
         $data->catquiz_usecatquiz = 1;
