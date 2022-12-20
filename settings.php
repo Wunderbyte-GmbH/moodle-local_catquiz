@@ -36,6 +36,12 @@ if ($hassiteconfig) {
     if ($ADMIN->fulltree) {
         // TODO: Define actual plugin settings page and add it to the tree - {@link https://docs.moodle.org/dev/Admin_settings}.
 
+        $models = core_plugin_manager::instance()->get_plugins_of_type('model');
+        if (!empty($models)) {
+            foreach ($models as $plugin) {
+                $plugin->load_settings($ADMIN, 'local_catquiz', $hassiteconfig);
+            }
+        }
 
     }
 }
