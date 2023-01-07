@@ -19,9 +19,9 @@
  *
  * @package local_catquiz
  * @category external
- * @copyright 2020 Wunderbyte GmbH (info@wunderbyte.at)
+ * @copyright 2023 Wunderbyte GmbH (info@wunderbyte.at)
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- * @since Moodle 3.1
+ * @since Moodle 4.0
  */
 
 defined('MOODLE_INTERNAL') || die();
@@ -43,6 +43,14 @@ $services = array(
 
 
 $functions = array(
+        'local_catquiz_create_dimension' => array(
+                'classname' => 'local_catquiz\external\create_dimension',
+                'classpath' => '',
+                'description' => 'Create a new dimension',
+                'type' => 'write',
+                'capabilities' => '',
+                'ajax' => 1,
+        ),
         'local_catquiz_start_new_attempt' => array(
                 'classname' => 'local_catquiz\external\start_new_attempt',
                 'classpath' => '',

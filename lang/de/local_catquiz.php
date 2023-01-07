@@ -33,3 +33,7 @@ $string['selectmodel'] = 'Wähle ein Modell';
 $string['model'] = 'Modell';
 $string['modeldeactivated'] = 'Deaktiviere CAT engine';
 $string['usecatquiz'] = 'Verwende die Catquiz Engine für dieses Quiz.';
+$string['dimensions'] = 'CAT quiz Dimnensionen verwalten';
+$string['dimensions:information'] = 'Verwalte CAT Test Dimensionen: {$a->link}';
+$string['cachedef_dimensions'] = 'Caches the dimensions of catquiz';
+$string['catdimensions'] = 'Dimensionen für den Test';

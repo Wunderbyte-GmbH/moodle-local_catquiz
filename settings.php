@@ -27,21 +27,19 @@ defined('MOODLE_INTERNAL') || die();
 
 $componentname = 'local_catquiz';
 
+// Default for users that have site config.
 if ($hassiteconfig) {
-    $settings = new admin_settingpage($componentname . '_settings', '');
-    $ADMIN->add('localplugins', new admin_category($componentname, get_string('pluginname', $componentname)));
-    $ADMIN->add($componentname, $settings);
+    $settings = new admin_settingpage($componentname . '_settings',  get_string('pluginname', 'local_catquiz'));
+    $ADMIN->add('localplugins', $settings);
 
-    // phpcs:ignore Generic.CodeAnalysis.EmptyStatement.DetectedIf
-    if ($ADMIN->fulltree) {
-        // TODO: Define actual plugin settings page and add it to the tree - {@link https://docs.moodle.org/dev/Admin_settings}.
-
-        $models = core_plugin_manager::instance()->get_plugins_of_type('model');
-        if (!empty($models)) {
-            foreach ($models as $plugin) {
-                $plugin->load_settings($ADMIN, 'local_catquiz', $hassiteconfig);
-            }
-        }
-
-    }
+    $dimensionlink = new moodle_url('/local/catquiz/manage_dimensions.php');
+    $actionlink = new action_link($dimensionlink, get_string('catquizsettings', 'local_catquiz'));
+    $settingsling = ['link' => $OUTPUT->render($actionlink)];
+    $settings->add(
+            new admin_setting_heading(
+                    'local_catquiz/dimensions',
+                    get_string('dimensions', 'local_catquiz'),
+                    get_string('dimensions:information', 'local_catquiz', $settingsling),
+            )
+    );
 }

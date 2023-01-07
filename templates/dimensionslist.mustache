@@ -1,0 +1,64 @@
+{{!
+    This file is part of Moodle - http://moodle.org/
+    Moodle is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+    Moodle is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+    You should have received a copy of the GNU General Public License
+    along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+}}
+{{!
+    @template local_catquiz
+    Template which defines a dimensions view page.
+    Classes required for JS:
+    * none
+    Data attributes required for JS:
+    * none
+    Context variables required for this template:
+    Example context (json):
+    {
+
+    }
+}}
+<div id="local-dimensions-container" class="row">
+    <ul class="list-group">
+        {{#itemtree}}
+            <li class="list-group-item">
+                <span class="h4">{{name}}</span>
+                <span>{{description}}</span>
+                <div class="pull-right">
+                    <a href="#" class="view-dimension btn btn--plain btn--smaller btn-dimensions">
+                    <i class="fa fa-edit"></i>
+                    {{#str}} view, moodle {{/str}}</a>
+                    <a href="#" class="btn btn--plain btn--smaller btn-dimensions">
+                    <i class="fa fa-edit"></i>
+                    {{#str}} edit, moodle {{/str}}</a>
+                    <a href="#" class="delete-dimension btn btn--plain btn--smaller btn-dimensions">
+                    <i class="fa fa fa-trash"></i>
+                    {{#str}} delete, moodle {{/str}}</a></div>
+                    <a href="#" class="create-dimension btn btn--plain btn--smaller btn-dimensions">
+                    <i class="fa fa fa-plus"></i>
+                    {{#str}} create, moodle {{/str}}</a>
+                </div>
+                {{#children}}
+                    {{>local_catquiz/children}}
+                {{/children}}
+            </li>
+        {{/itemtree}}
+        {{^itemtree}}
+            <li class="list-group-item">
+                <span class="h4">Create your first catquiz dimension!</span>
+                <div>
+                    <a href="#" class="create-dimension btn btn--plain btn--smaller btn-dimensions">
+                        <i class="fa fa fa-plus"></i>
+                        {{#str}} create, moodle {{/str}}
+                    </a>
+                </div>
+            </li>
+        {{/itemtree}}
+    </ul>
+</div>
