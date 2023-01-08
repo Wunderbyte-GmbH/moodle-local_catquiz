@@ -33,7 +33,24 @@ $string['selectmodel'] = 'Choose a model';
 $string['model'] = 'Model';
 $string['modeldeactivated'] = 'Deactivate CAT engine';
 $string['usecatquiz'] = 'Use the catquiz engine for this test instance.';
+
 $string['dimensions'] = 'Define catquiz dimensions';
 $string['dimensions:information'] = 'Define dimensions: {$a->link}';
 $string['cachedef_dimensions'] = 'Caches the dimensions of catquiz';
 $string['catdimensions'] = 'Dimensions to be tested';
+
+// Buttons.
+$string['subscribe'] = 'Subscribe';
+$string['subscribed'] = 'Subscribed';
+
+// Events.
+$string['userupdateddimension'] = 'User with id {$a->userid} updated dimension with id {$a->objectid}';
+
+// Message.
+$string['messageprovider:dimensionupdate'] = 'Notification of dimension update';
+$string['dimensionupdatedtitle'] = 'A dimension was updated';
+$string['dimensionupdatedbody'] = 'A dimension was updated. TODO: more description.';
+
+// access.php.
+$string['local/catquiz:canmanage'] = 'Is allowed to manage Catquiz plugin';
+$string['local/catquiz:subscribedimensions'] = 'Is allowed to subscribe to Catquiz dimensions';

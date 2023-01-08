@@ -33,7 +33,24 @@ $string['selectmodel'] = 'Wähle ein Modell';
 $string['model'] = 'Modell';
 $string['modeldeactivated'] = 'Deaktiviere CAT engine';
 $string['usecatquiz'] = 'Verwende die Catquiz Engine für dieses Quiz.';
+
 $string['dimensions'] = 'CAT quiz Dimnensionen verwalten';
 $string['dimensions:information'] = 'Verwalte CAT Test Dimensionen: {$a->link}';
 $string['cachedef_dimensions'] = 'Caches the dimensions of catquiz';
 $string['catdimensions'] = 'Dimensionen für den Test';
+
+// Buttons.
+$string['subscribe'] = 'Abonniere';
+$string['subscribed'] = 'Abonniert';
+
+// Events.
+$string['userupdateddimension'] = 'Nutzerin mit der Id {$a->userid} hat die Dimension mit der Id {$a->objectid} aktualisiert.';
+
+// Message.
+$string['messageprovider:dimensionupdate'] = 'Benachrichtung über eine Aktualisierung einer Dimension.';
+$string['dimensionupdatedtitle'] = 'Eine Dimension wurde aktualisiert';
+$string['dimensionupdatedbody'] = 'Eine Dimension wurde aktualisiert. TODO: Mehr Details.';
+
+// Access.
+$string['local/catquiz:canmanage'] = 'Darf Catquiz Plugin verwalten';
+$string['local/catquiz:subscribedimensions'] = 'Darf Catquiz Dimensionen abonnieren';

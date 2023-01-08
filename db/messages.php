@@ -18,34 +18,15 @@
  * Plugin capabilities are defined here.
  *
  * @package     local_catquiz
- * @category    access
- * @copyright   2022 Wunderbyte Gmbh <info@wunderbyte.at>
+ * @category    messages
+ * @copyright   2023 Wunderbyte Gmbh <info@wunderbyte.at>
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-defined('MOODLE_INTERNAL') || die();
-
-$capabilities = [
-
-        'local/catquiz:canmanage' => [
-            'captype' => 'write',
-            'contextlevel' => CONTEXT_SYSTEM,
-            'archetypes' => [
-                'manager' => CAP_ALLOW
-            ]
-        ],
-        'local/catquiz:subscribedimensions' => [
-            'captype' => 'read',
-            'contextlevel' => CONTEXT_SYSTEM,
-            'archetypes' => [
-                'manager' => CAP_ALLOW
-            ]
-        ],
-        'local/catquiz:manage_dimensions' => [
-                'captype' => 'write',
-                'contextlevel' => CONTEXT_SYSTEM,
-                'archetypes' => [
-                        'manager' => CAP_ALLOW
-                ]
-        ],
-];
+ defined('MOODLE_INTERNAL') || die();
+ $messageproviders = array (
+     // Notify subscribers of dimensions.
+     'updatedimension' => array (
+         'capability'  => 'local/catquiz:subscribedimensions'
+     ),
+ );

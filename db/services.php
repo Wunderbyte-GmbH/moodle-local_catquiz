@@ -75,4 +75,12 @@ $functions = array(
                 'capabilities' => '',
                 'ajax' => 1,
         ),
+        'local_catquiz_subscribe' => array(
+                'classname' => 'local_catquiz\external\subscribe',
+                'classpath' => '',
+                'description' => 'Subscribe to some listener.',
+                'type' => 'write',
+                'capabilities' => '',
+                'ajax' => 1,
+        ),
 );
