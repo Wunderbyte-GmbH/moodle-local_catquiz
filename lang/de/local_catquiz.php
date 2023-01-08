@@ -52,5 +52,9 @@ $string['dimensionupdatedtitle'] = 'Eine Dimension wurde aktualisiert';
 $string['dimensionupdatedbody'] = 'Eine Dimension wurde aktualisiert. TODO: Mehr Details.';
 
 // Access.
-$string['local/catquiz:canmanage'] = 'Darf Catquiz Plugin verwalten';
-$string['local/catquiz:subscribedimensions'] = 'Darf Catquiz Dimensionen abonnieren';
+$string['catquiz:canmanage'] = 'Darf Catquiz Plugin verwalten';
+$string['catquiz:subscribedimensions'] = 'Darf Catquiz Dimensionen abonnieren';
+$string['catquiz:manage_dimensions'] = 'Darf Catquiz Dimensionen verwalten';
+
+// Role.
+$string['catquizroledescription'] = 'Catquiz VerwalterIn';
