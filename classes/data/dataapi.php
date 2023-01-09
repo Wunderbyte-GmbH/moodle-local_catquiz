@@ -36,7 +36,7 @@ class dataapi {
             $records = $DB->get_records('local_catquiz_dimensions');
             if (!empty($records)) {
                 foreach ($records as $record) {
-                    $alldimensions[$record->id] = new dimension_structure($record);
+                    $alldimensions[$record->id] = (array) $record;
                 }
             } else {
                 $alldimensions = [];
@@ -44,6 +44,10 @@ class dataapi {
             $result = $cache->set('alldimensions', $alldimensions);
         }
         return $alldimensions;
+    }
+
+    static public function get_dimension_parentids() {
+
     }
 
     /**
@@ -54,7 +58,7 @@ class dataapi {
      */
     static public function create_dimension(dimension_structure $dimension): int {
         global $DB;
-        if($DB->record_exists('local_catquiz_dimensions', ['name' => $dimension->name])){
+        if(self::name_exists($dimension->name)){
             return 0;
         }
         $id = $DB->insert_record('local_catquiz_dimensions', $dimension);
@@ -95,5 +99,19 @@ class dataapi {
         $cache = cache::make('local_catquiz', 'dimensions');
         $cache->delete('alldimensions');
         return $result;
+    }
+
+    /**
+     * Check if name of dimension already exsists - must be unique
+     * @param string $name dimension name
+     * @return bool true if name already exists, false if not
+     */
+    static public function name_exists(string $name): bool {
+        global $DB;
+        if($DB->record_exists('local_catquiz_dimensions', ['name' => $name])){
+            return true;
+        } else {
+            return false;
+        }
     }
 }

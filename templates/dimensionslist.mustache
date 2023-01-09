@@ -24,44 +24,50 @@
 
     }
 }}
-<div id="local-dimensions-container" class="row">
-    <ul class="list-group">
-        {{#itemtree}}
-            <li class="list-group-item">
-                <span class="h4">{{name}}</span>
-                <span>{{description}}</span>
-                <div class="pull-right">
-                    <a href="#" class="view-dimension btn btn--plain btn--smaller btn-dimensions">
-                    <i class="fa fa-edit"></i>
-                    {{#str}} view, moodle {{/str}}</a>
-                    <a href="#" class="btn btn--plain btn--smaller btn-dimensions">
-                    <i class="fa fa-edit"></i>
-                    {{#str}} edit, moodle {{/str}}</a>
-                    <a href="#" class="delete-dimension btn btn--plain btn--smaller btn-dimensions">
-                    <i class="fa fa fa-trash"></i>
-                    {{#str}} delete, moodle {{/str}}</a></div>
-                    <a href="#" class="create-dimension btn btn--plain btn--smaller btn-dimensions">
-                    <i class="fa fa fa-plus"></i>
-                    {{#str}} create, moodle {{/str}}</a>
-                    <a href="#" class="subscribe-dimension btn btn--plain btn--smaller btn-dimensions">
-                    <i class="fa fa fa-flag-o"></i>
-                    {{#str}} subscribe, moodle {{/str}}</a>
-                </div>
-                {{#children}}
-                    {{>local_catquiz/children}}
-                {{/children}}
-            </li>
-        {{/itemtree}}
-        {{^itemtree}}
-            <li class="list-group-item">
-                <span class="h4">Create your first catquiz dimension!</span>
-                <div>
-                    <a href="#" class="create-dimension btn btn--plain btn--smaller btn-dimensions">
-                        <i class="fa fa fa-plus"></i>
-                        {{#str}} create, moodle {{/str}}
-                    </a>
-                </div>
-            </li>
-        {{/itemtree}}
-    </ul>
+<div>
+{{#itemtree}}
+        <div id="local-dimensions-container-{{id}}" class="">
+            <ul class="list-group w-100 mt-2">
+                <li class="list-group-item" data-id="{{id}}">
+                    <div class="pull-right">
+                        <a href="#" class="view-dimension btn btn--plain btn--smaller btn-dimensions">
+                            <i class="fa fa-edit"></i>
+                            {{#str}} view, moodle {{/str}}</a>
+                        <a href="#" class="manage-dimension btn btn--plain btn--smaller btn-dimensions">
+                            <i class="fa fa-edit"></i>
+                            {{#str}} edit, moodle {{/str}}</a>
+                        <a href="#" class="delete-dimension btn btn--plain btn--smaller btn-dimensions">
+                            <i class="fa fa fa-trash"></i>
+                            {{#str}} delete, moodle {{/str}}</a>
+                        <a href="#" class="manage-dimension btn btn--plain btn--smaller btn-dimensions">
+                            <i class="fa fa fa-plus"></i>
+                            {{#str}} create, moodle {{/str}}</a>
+                    </div>
+                    <h4 class="h4">{{name}}</h4>
+                    <div>{{description}}</div>
+                </li>
+        </ul>
+        </div>
+    {{#children}}
+        {{>local_catquiz/dimensionchildren}}
+    {{/children}}
+{{/itemtree}}
+{{^itemtree}}
+<ul class="list-group w-100">
+    <li class="list-group-item">
+        <span class="h4">{{#str}} createdimension, local_catquiz {{/str}}</span>
+        <div>
+            <a href="#" class="manage-dimension btn-primary btn btn--plain btn--smaller btn-dimensions">
+                <i class="fa fa fa-plus px-2"></i>
+                {{#str}} create, moodle {{/str}}
+            </a>
+        </div>
+    </li>
+</ul>
+{{/itemtree}}
 </div>
+{{#js}}
+    require(['local_catquiz/manage_dimension'], function(managedimension) {
+    managedimension.init();
+    });
+{{/js}}

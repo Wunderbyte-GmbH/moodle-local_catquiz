@@ -25,8 +25,7 @@
     }
 
 }}
-<ul class="pt-4">
-    {{#.}}
+<ul class="pt-2 mt-0 mb-0">
         <li class="list-group-item pr-0">
             <a href="/local/entities/view.php?id={{id}}" class="">
                 {{name}}</a>
@@ -36,11 +35,8 @@
                 <a href="/local/entities/entities.php?del={{id}}" class="btn btn--plain btn--smaller btn--primary btn-entities btn_edit">
                 <i class="fa fa fa-trash"></i></a>
             </div>
-            {{#childs}}
-                <ul class="grandchilds mt-2 ml-2">
-                    {{> local_catquiz/children}}
-                </ul>
-            {{/childs}}
         </li>
-    {{/.}}
+        {{#children}}
+            {{>local_catquiz/dimensionchildren}}
+        {{/children}}
 </ul>

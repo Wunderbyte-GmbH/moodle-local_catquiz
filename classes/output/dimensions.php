@@ -44,11 +44,13 @@ use renderable;
  */
 class dimensions implements renderable, templatable {
 
-    /** @var array all items */
+    /** @var array of objects including all items */
     public array $items;
 
-    /** @var array $fullitemtree hierarchical item tree */
+    /** @var array $fullitemtree associative array item tree */
     public array $itemtree;
+
+    public array $branchitems;
 
     /**
      * Either returns one tree or treearray for every parentnode
@@ -59,21 +61,34 @@ class dimensions implements renderable, templatable {
      */
     public function __construct(bool $allowedit = true) {
         $this->items = dataapi::get_all_dimensions();
-        $children = [];
-        foreach ($this->items as $item) {
-            $item->parentid = $item->parentid ? : 0;
-            $item->allowedit = $allowedit;
-            $children[$item->parentid][] = $item;
-        }
-        foreach ($this->items as $item) {
-            if (isset($children[$item->id])) {
-                $item->childs = $children[$item->id];
-            } else {
-                $item->children = false;
-                $item->leaf = true;
+        $this->build_tree($this->items);
+        $this->itemtree = $this->branchitems[0];
+    }
+
+    /**
+     * Build full item tree. All children are marked as 'children' in the parent item.
+     *
+     * @param array $items
+     * @param int $parentid
+     * @return
+     *
+     */
+    public function build_tree(array $elements, int $parentid = 0) {
+        $branch = array();
+
+        foreach ($elements as $element) {
+            if ($element['parentid'] == $parentid) {
+                $children = $this->build_tree($elements, $element['id']);
+                if ($children) {
+                    $element['children'] = $children;
+                } else {
+                    $element['children'] = [];
+                }
+                $branch[] = $element;
             }
         }
-        $this->itemtree = $children;
+        $this->branchitems[$parentid] = $branch;
+        return $branch;
     }
 
     /**

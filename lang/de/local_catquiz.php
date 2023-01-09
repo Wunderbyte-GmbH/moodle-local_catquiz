@@ -33,12 +33,15 @@ $string['selectmodel'] = 'Wähle ein Modell';
 $string['model'] = 'Modell';
 $string['modeldeactivated'] = 'Deaktiviere CAT engine';
 $string['usecatquiz'] = 'Verwende die Catquiz Engine für dieses Quiz.';
-
 $string['dimensions'] = 'CAT quiz Dimnensionen verwalten';
 $string['dimensions:information'] = 'Verwalte CAT Test Dimensionen: {$a->link}';
 $string['cachedef_dimensions'] = 'Caches the dimensions of catquiz';
 $string['catdimensions'] = 'Dimensionen für den Test';
-
+$string['nameexists'] = 'Der Name der Dimension wurde bereits verwendet';
+$string['createnewdimension'] = 'Neue Dimension erstellen';
+$string['parent'] = 'Übergeordnete Dimension - keine Auswahl falls Top-Level Dimension';
+$string['managedimension'] = 'Dimension verwalten';
+$string['createdimension'] = 'Erstellen Sie die erste CAT-Quiz Dimension';
 // Buttons.
 $string['subscribe'] = 'Abonniere';
 $string['subscribed'] = 'Abonniert';

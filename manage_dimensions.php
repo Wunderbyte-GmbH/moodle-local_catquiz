@@ -39,6 +39,6 @@ echo $OUTPUT->header();
 
 $data = new local_catquiz\output\dimensions();
 
-echo $OUTPUT->render_from_template('local_catquiz/dimensionsdashboard', $data->itemtree);
+echo $OUTPUT->render_from_template('local_catquiz/dimensionsdashboard', ['itemtree' => $data->itemtree]);
 
 echo $OUTPUT->footer();

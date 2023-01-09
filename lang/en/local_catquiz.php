@@ -33,12 +33,15 @@ $string['selectmodel'] = 'Choose a model';
 $string['model'] = 'Model';
 $string['modeldeactivated'] = 'Deactivate CAT engine';
 $string['usecatquiz'] = 'Use the catquiz engine for this test instance.';
-
 $string['dimensions'] = 'Define catquiz dimensions';
 $string['dimensions:information'] = 'Define dimensions: {$a->link}';
 $string['cachedef_dimensions'] = 'Caches the dimensions of catquiz';
 $string['catdimensions'] = 'Dimensions to be tested';
-
+$string['nameexists'] = 'The name of the dimension already exists';
+$string['createnewdimension'] = 'Create new dimension';
+$string['parent'] = 'Parent dimension - None if top level dimension';
+$string['managedimension'] = 'Manage dimension';
+$string['createdimension'] = 'Create your first catquiz dimension!';
 // Buttons.
 $string['subscribe'] = 'Subscribe';
 $string['subscribed'] = 'Subscribed';
