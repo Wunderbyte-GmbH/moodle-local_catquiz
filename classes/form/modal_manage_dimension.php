@@ -172,7 +172,7 @@ class modal_manage_dimension extends dynamic_form {
      * {@inheritDoc}
      * @see moodleform::get_data()
      */
-    public function get_data(): object|null {
+    public function get_data() {
         return parent::get_data();
     }
 }
