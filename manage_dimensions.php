@@ -22,6 +22,8 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+use local_catquiz\output\dimensionmanagers;
+
 require_once('../../config.php');
 
 $context = \context_system::instance();
@@ -38,7 +40,11 @@ $PAGE->set_heading($title);
 echo $OUTPUT->header();
 
 $data = new local_catquiz\output\dimensions();
+$dimensionmanagers = new local_catquiz\output\dimensionmanagers();
 
-echo $OUTPUT->render_from_template('local_catquiz/dimensionsdashboard', ['itemtree' => $data->itemtree]);
+echo $OUTPUT->render_from_template('local_catquiz/dimensionsdashboard', [
+    'itemtree' => $data->itemtree,
+    'dimensionmanagers' => $dimensionmanagers->return_as_array(),
+]);
 
 echo $OUTPUT->footer();

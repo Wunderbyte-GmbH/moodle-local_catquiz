@@ -30,29 +30,22 @@
 
 namespace local_catquiz\output;
 
-use local_catquiz\data\dataapi;
-use local_catquiz\subscription;
+use context_system;
 use templatable;
 use renderable;
 
 /**
- * Renderable class for the dimensions page
+ * Renderable class for the dimensionmanagers
  *
  * @package    local_catquiz
  * @copyright  2023 Wunderbyte GmbH
  * @author     David Bogner
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class dimensions implements renderable, templatable {
+class dimensionmanagers implements renderable, templatable {
 
-    /** @var array of objects including all items */
-    public array $items;
-
-    /** @var array $fullitemtree associative array item tree */
-    public array $itemtree;
-
-    /** @var array $branchitems */
-    public array $branchitems;
+    /** @var array of dimensionmanagers */
+    public array $dimensionmanagers;
 
     /**
      * Either returns one tree or treearray for every parentnode
@@ -61,47 +54,27 @@ class dimensions implements renderable, templatable {
      * @param boolean $allowedit
      * @return array
      */
-    public function __construct(bool $allowedit = true) {
-        $this->items = dataapi::get_all_dimensions();
-        $this->build_tree($this->items);
-        $this->itemtree = $this->branchitems[0];
+    public function __construct() {
+
+        $context = context_system::instance();
+        $users = get_users_by_capability($context, 'local/catquiz:manage_dimensions');
+
+        foreach ($users as $user) {
+            $this->dimensionmanagers[] = [
+                'firstname' => $user->firstname,
+                'lastname' => $user->lastname,
+                'email' => $user->email,
+            ];
+        }
     }
 
     /**
-     * Build full item tree. All children are marked as 'children' in the parent item.
+     * Return as array, if not used with template.
      *
-     * @param array $items
-     * @param int $parentid
-     * @return array
-     *
+     * @return void
      */
-    public function build_tree(array $elements, int $parentid = 0): array {
-
-        global $USER;
-
-        $branch = array();
-
-        foreach ($elements as $dimensionitem) {
-            // Transform object dimension_structur into array, which is needed here.
-            $element = get_object_vars($dimensionitem);
-
-            if ($subscribed = subscription::return_subscription_state($USER->id, 'dimension', $element['id'])) {
-                $element['subscribed'] = true;
-            }
-
-            if ($element['parentid'] == $parentid) {
-                $children = $this->build_tree($elements, $element['id']);
-                if ($children) {
-                    $element['children'] = $children;
-                } else {
-                    // Add empty array. That is needed for mustache templated in order to avoid infinit loop.
-                    $element['children'] = [];
-                }
-                $branch[] = $element;
-            }
-        }
-        $this->branchitems[$parentid] = $branch;
-        return $branch;
+    public function return_as_array() {
+        return $this->dimensionmanagers;
     }
 
     /**
@@ -109,6 +82,6 @@ class dimensions implements renderable, templatable {
      * @return array
      */
     public function export_for_template(\renderer_base $output): array {
-        return $this->itemtree;
+        return $this->dimensionmanagers;
     }
 }
