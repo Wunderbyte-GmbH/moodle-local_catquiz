@@ -49,11 +49,6 @@ function manageDimension(button) {
     // eslint-disable-next-line no-console
     console.log(formvalues);
     switch (action) {
-        case 'edit':
-            break;
-        case 'delete':
-            formclass = "";
-            break;
         case 'create':
             formvalues = {};
             break;

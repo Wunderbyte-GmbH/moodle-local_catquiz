@@ -43,12 +43,20 @@ $services = array(
 
 
 $functions = array(
-        'local_catquiz_create_dimension' => array(
-                'classname' => 'local_catquiz\external\create_dimension',
+        'local_catquiz_delete_dimension' => array(
+                'classname' => 'local_catquiz\external\delete_dimension',
                 'classpath' => '',
-                'description' => 'Create a new dimension',
+                'description' => 'Delete a dimension',
                 'type' => 'write',
-                'capabilities' => '',
+                'capabilities' => 'local/catquiz:manage_dimensions',
+                'ajax' => 1,
+        ),
+        'local_catquiz_create_dimension' => array(
+                'classname' => 'local_catquiz\external\manage_dimension',
+                'classpath' => '',
+                'description' => 'Manage or create a dimension',
+                'type' => 'write',
+                'capabilities' => 'local/catquiz:manage_dimensions',
                 'ajax' => 1,
         ),
         'local_catquiz_start_new_attempt' => array(

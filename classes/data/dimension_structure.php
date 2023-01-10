@@ -22,7 +22,7 @@ namespace local_catquiz\data;
  */
 class dimension_structure {
 
-    /** @var int $id null means object is not yet initialised */
+    /** @var ?int $id null means object is not yet initialised */
     public ?int $id = null;
 
     /** @var string $name */
@@ -37,7 +37,7 @@ class dimension_structure {
     /** @var int $timemodified */
     public int $timemodified;
 
-    /** @var int $parentid */
+    /** @var ?int $parentid */
     public ?int $parentid = null;
 
     /**

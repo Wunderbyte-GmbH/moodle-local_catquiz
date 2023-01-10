@@ -71,7 +71,7 @@ class dataapi {
      * Delete a dimension and invalidate cache.
      *
      * @param dimension_structure $dimension
-     * @return bool
+     * @return bool true
      */
     public static function delete_dimension(int $dimensionid): bool {
         global $DB;
