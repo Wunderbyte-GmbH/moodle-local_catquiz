@@ -17,6 +17,8 @@
 namespace local_catquiz\data;
 
 use cache;
+use context_system;
+use local_catquiz\event\dimension_updated;
 
 /**
  * Get and store data from db.
@@ -28,7 +30,7 @@ class dataapi {
      *
      * @return array
      */
-    static public function get_all_dimensions(): array {
+    public static function get_all_dimensions(): array {
         global $DB;
         $cache = cache::make('local_catquiz', 'dimensions');
         $alldimensions = $cache->get('alldimensions');
@@ -52,9 +54,9 @@ class dataapi {
      * @param dimension_structure $dimension
      * @return int 0 if name already exists
      */
-    static public function create_dimension(dimension_structure $dimension): int {
+    public static function create_dimension(dimension_structure $dimension): int {
         global $DB;
-        if(self::name_exists($dimension->name)){
+        if (self::name_exists($dimension->name)) {
             return 0;
         }
         $id = $DB->insert_record('local_catquiz_dimensions', $dimension);
@@ -71,7 +73,7 @@ class dataapi {
      * @param dimension_structure $dimension
      * @return bool
      */
-    static public function delete_dimension(int $dimensionid): bool {
+    public static function delete_dimension(int $dimensionid): bool {
         global $DB;
         $result = $DB->delete_records('local_catquiz_dimensions', ['id' => $dimensionid]);
 
@@ -87,9 +89,18 @@ class dataapi {
      * @param dimension_structure $dimension
      * @return bool
      */
-    static public function update_dimension(dimension_structure $dimension): bool {
-        global $DB;
+    public static function update_dimension(dimension_structure $dimension): bool {
+        global $DB, $USER;
         $result = $DB->update_record('local_catquiz_dimensions', $dimension);
+
+        $context = context_system::instance();
+
+        $event = dimension_updated::create([
+            'objectid' => $dimension->id,
+            'context' => $context,
+            'userid' => $USER->id, // The user who did cancel.
+        ]);
+        $event->trigger();
 
         // Invalidate cache. TODO: Instead of invalidating cache, delete and add the item from the cache.
         $cache = cache::make('local_catquiz', 'dimensions');
@@ -102,9 +113,9 @@ class dataapi {
      * @param string $name dimension name
      * @return bool true if name already exists, false if not
      */
-    static public function name_exists(string $name): bool {
+    public static function name_exists(string $name): bool {
         global $DB;
-        if($DB->record_exists('local_catquiz_dimensions', ['name' => $name])){
+        if ($DB->record_exists('local_catquiz_dimensions', ['name' => $name])) {
             return true;
         } else {
             return false;
