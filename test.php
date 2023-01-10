@@ -33,7 +33,9 @@ $context = \context_system::instance();
 
 $PAGE->set_context($context);
 require_login();
-require_admin();
+
+require_capability('local/catquiz:manage_dimensions', $context);
+
 $PAGE->set_url(new moodle_url('/local/catquiz/test.php', array()));
 
 $title = "Test cases";
