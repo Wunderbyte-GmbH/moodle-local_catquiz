@@ -56,6 +56,10 @@ class modal_manage_dimension extends dynamic_form {
         $mform->addElement('textarea', 'description', get_string('description'), 'wrap="virtual" rows="5" cols="50"');
         $mform->setType('description', PARAM_CLEANHTML);
 
+        // Add a textarea field for the dimension description
+        $mform->addElement('hidden', 'action', '');
+        $mform->setType('action', PARAM_ALPHA);
+
         // Add a select field for the parent ID
         $options = array('' => get_string('none'));
         $dimensions = dataapi::get_all_dimensions();
@@ -86,14 +90,25 @@ class modal_manage_dimension extends dynamic_form {
      */
     public function process_dynamic_submission(): object {
         $data = $this->get_data();
+        $action = $data->action;
+        unset($data->action);
         $data->timecreated = time();
         $data->timemodified = time();
         $dimension = new dimension_structure((array) $data);
-        $dimensionid = dataapi::create_dimension($dimension);
+        switch ($action) {
+            case 'create':
+                $dimensionid = dataapi::create_dimension($dimension);
+                break;
+            case 'update':
+                dataapi::update_dimension($dimension);
+                $dimensionid = $data->id;
+                break;
+            default:
+                $dimensionid = 0;
+        }
         $data->id = $dimensionid;
         return $data;
     }
-
 
     /**
      * Load in existing data as form defaults
@@ -105,7 +120,7 @@ class modal_manage_dimension extends dynamic_form {
      *     $this->set_data(get_entity($this->_ajaxformdata['cmid']));
      */
     public function set_data_for_dynamic_submission(): void {
-        $data = new stdClass();
+        $data = (object) $this->_ajaxformdata;
         $this->set_data($data);
     }
 

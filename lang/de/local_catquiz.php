@@ -36,6 +36,7 @@ $string['modeldeactivated'] = 'Deaktiviere CAT engine';
 $string['usecatquiz'] = 'Verwende die Catquiz Engine für dieses Quiz.';
 $string['dimensions'] = 'CAT quiz Dimnensionen verwalten';
 $string['dimensions:information'] = 'Verwalte CAT Test Dimensionen: {$a->link}';
+$string['dimensionsname_exists'] = 'Der Name wird bereits verwendet';
 $string['cachedef_dimensions'] = 'Caches the dimensions of catquiz';
 $string['catdimensions'] = 'Dimensionen für den Test';
 $string['nameexists'] = 'Der Name der Dimension wurde bereits verwendet';

@@ -36,6 +36,7 @@ $string['modeldeactivated'] = 'Deactivate CAT engine';
 $string['usecatquiz'] = 'Use the catquiz engine for this test instance.';
 $string['dimensions'] = 'Define catquiz dimensions';
 $string['dimensions:information'] = 'Define dimensions: {$a->link}';
+$string['dimensionsname_exists'] = 'The name is already being used';
 $string['cachedef_dimensions'] = 'Caches the dimensions of catquiz';
 $string['catdimensions'] = 'Dimensions to be tested';
 $string['nameexists'] = 'The name of the dimension already exists';

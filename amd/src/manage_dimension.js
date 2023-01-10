@@ -31,7 +31,7 @@ export const init = () => {
         button.addEventListener('click', e => {
             e.preventDefault();
             const element = e.target;
-            createDimension(element);
+            manageDimension(element);
         });
     });
 };
@@ -40,19 +40,35 @@ export const init = () => {
  *
  * @param {*} button
  */
-function createDimension(button) {
-
-    const modalForm = new ModalForm({
-
+function manageDimension(button) {
+    const parentelement = button.closest('.list-group-item');
+    const action = button.dataset.action;
+    let formclass = "local_catquiz\\form\\modal_manage_dimension";
+    let formvalues = { id: parentelement.dataset.id, description: parentelement.dataset.description,
+        name: parentelement.dataset.name, parentid: parentelement.dataset.parentid };
+    // eslint-disable-next-line no-console
+    console.log(formvalues);
+    switch (action) {
+        case 'edit':
+            break;
+        case 'delete':
+            formclass = "";
+            break;
+        case 'create':
+            formvalues = {};
+            break;
+    }
+    let modalForm = new ModalForm({
         // Name of the class where form is defined (must extend \core_form\dynamic_form):
-        formClass: "local_catquiz\\form\\modal_manage_dimension",
+        formClass: formclass,
         // Add as many arguments as you need, they will be passed to the form:
-        // args: {'itemid': itemid, 'componentname': componentname},
+        args: formvalues,
         // Pass any configuration settings to the modal dialogue, for example, the title:
         modalConfig: {title: getString('managedimension', 'local_catquiz')},
         // DOM element that should get the focus after the modal dialogue is closed:
         returnFocus: button,
     });
+
     // Listen to events if you want to execute something on form submit.
     // Event detail will contain everything the process() function returned:
     modalForm.addEventListener(modalForm.events.FORM_SUBMITTED, (e) => {

@@ -70,18 +70,22 @@ class dimensions implements renderable, templatable {
      *
      * @param array $items
      * @param int $parentid
-     * @return
+     * @return array
      *
      */
-    public function build_tree(array $elements, int $parentid = 0) {
+    public function build_tree(array $elements, int $parentid = 0): array {
         $branch = array();
 
-        foreach ($elements as $element) {
+        foreach ($elements as $dimensionitem) {
+            // Transform object dimension_structur into array, which is needed here.
+            $element = get_object_vars($dimensionitem);
+
             if ($element['parentid'] == $parentid) {
                 $children = $this->build_tree($elements, $element['id']);
                 if ($children) {
                     $element['children'] = $children;
                 } else {
+                    // Add empty array. That is needed for mustache templated in order to avoid infinit loop.
                     $element['children'] = [];
                 }
                 $branch[] = $element;

@@ -26,20 +26,20 @@
 }}
 <div>
 {{#itemtree}}
-        <div id="local-dimensions-container-{{id}}" class="">
+        <div id="local-dimensions-container-{{id}}">
             <ul class="list-group w-100 mt-2">
-                <li class="list-group-item" data-id="{{id}}">
+                <li class="list-group-item" data-id="{{id}}" data-description="{{description}}" data-parentid="{{parentid}}" data-name="{{name}}">
                     <div class="pull-right">
-                        <a href="#" class="view-dimension btn btn--plain btn--smaller btn-dimensions">
+                        <a href="#" class="view-dimension btn btn--plain btn--smaller btn-dimensions" data-action="view">
                             <i class="fa fa-edit"></i>
                             {{#str}} view, moodle {{/str}}</a>
-                        <a href="#" class="manage-dimension btn btn--plain btn--smaller btn-dimensions">
+                        <a href="#" class="manage-dimension btn btn--plain btn--smaller btn-dimensions" data-action="edit">
                             <i class="fa fa-edit"></i>
                             {{#str}} edit, moodle {{/str}}</a>
-                        <a href="#" class="delete-dimension btn btn--plain btn--smaller btn-dimensions">
+                        <a href="#" class="delete-dimension btn btn--plain btn--smaller btn-dimensions"  data-action="delete">
                             <i class="fa fa fa-trash"></i>
                             {{#str}} delete, moodle {{/str}}</a>
-                        <a href="#" class="manage-dimension btn btn--plain btn--smaller btn-dimensions">
+                        <a href="#" class="manage-dimension btn btn--plain btn--smaller btn-dimensions" data-action="create">
                             <i class="fa fa fa-plus"></i>
                             {{#str}} create, moodle {{/str}}</a>
                     </div>
@@ -57,7 +57,7 @@
     <li class="list-group-item">
         <span class="h4">{{#str}} createdimension, local_catquiz {{/str}}</span>
         <div>
-            <a href="#" class="manage-dimension btn-primary btn btn--plain btn--smaller btn-dimensions">
+            <a href="#" class="manage-dimension btn-primary btn btn--plain btn--smaller btn-dimensions" data-action="create">
                 <i class="fa fa fa-plus px-2"></i>
                 {{#str}} create, moodle {{/str}}
             </a>

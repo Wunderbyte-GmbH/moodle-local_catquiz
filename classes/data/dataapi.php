@@ -36,18 +36,14 @@ class dataapi {
             $records = $DB->get_records('local_catquiz_dimensions');
             if (!empty($records)) {
                 foreach ($records as $record) {
-                    $alldimensions[$record->id] = (array) $record;
+                    $alldimensions[$record->id] = new dimension_structure((array) $record);
                 }
             } else {
                 $alldimensions = [];
             }
-            $result = $cache->set('alldimensions', $alldimensions);
+            $cache->set('alldimensions', $alldimensions);
         }
         return $alldimensions;
-    }
-
-    static public function get_dimension_parentids() {
-
     }
 
     /**
@@ -93,7 +89,7 @@ class dataapi {
      */
     static public function update_dimension(dimension_structure $dimension): bool {
         global $DB;
-        $result = $DB->update_record('local_catquiz_dimensions', $record);
+        $result = $DB->update_record('local_catquiz_dimensions', $dimension);
 
         // Invalidate cache. TODO: Instead of invalidating cache, delete and add the item from the cache.
         $cache = cache::make('local_catquiz', 'dimensions');

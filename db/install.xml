@@ -40,6 +40,7 @@
         <FIELD NAME="difficulty" TYPE="int" LENGTH="3" NOTNULL="false" DEFAULT="0" SEQUENCE="false" />
         <FIELD NAME="discrimination" TYPE="int" LENGTH="3" NOTNULL="false" DEFAULT="0" SEQUENCE="false" />
         <FIELD NAME="testmodel" TYPE="int" LENGTH="2" NOTNULL="false" SEQUENCE="false" COMMENT="id of the parent dimension, null if this is a top-level dimension"/>
+        <FIELD NAME="lastupdated" TYPE="int" LENGTH="2" NOTNULL="false" SEQUENCE="false" COMMENT="The last time difficulty, etc. have been updated."/>
       </FIELDS>
       <KEYS>
         <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
