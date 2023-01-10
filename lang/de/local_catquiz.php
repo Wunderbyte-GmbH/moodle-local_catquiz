@@ -26,6 +26,7 @@
 defined('MOODLE_INTERNAL') || die();
 
 $string['pluginname'] = 'ALiSe CAT Quiz';
+$string['catquiz'] = 'Catquiz';
 
 // Catquiz handler.
 $string['catquizsettings'] = 'Cat Quiz Einstellungen';
@@ -61,3 +62,7 @@ $string['catquiz:manage_dimensions'] = 'Darf Catquiz Dimensionen verwalten';
 
 // Role.
 $string['catquizroledescription'] = 'Catquiz VerwalterIn';
+
+// Navbar.
+$string['managedimensions'] = 'Verwalte Dimensionen';
+$string['test'] = 'Teste Abos';

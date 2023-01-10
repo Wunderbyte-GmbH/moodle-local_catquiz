@@ -24,3 +24,35 @@
 // Define constants.
 define('STATUS_SUBSCRIPTION_BOOKED', 1);
 define('STATUS_SUBSCRIPTION_DELETED', 0);
+
+/**
+ * Renders the popup Link.
+ *
+ * @param renderer_base $renderer
+ * @return string The HTML
+ */
+function local_catquiz_render_navbar_output(\renderer_base $renderer) {
+    global $CFG;
+
+    // Early bail out conditions.
+    if (!isloggedin() || isguestuser() || !has_capability('local/catquiz:canmanage', context_system::instance())) {
+        return;
+    }
+
+    $output = '<div class="popover-region nav-link icon-no-margin dropdown">
+        <button class="btn btn-secondary dropdown-toggle" type="button"
+        id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+        '. get_string('catquiz', 'local_catquiz') .'
+        </button>
+        <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+            <a class="dropdown-item" href="'
+                . $CFG->wwwroot . '/local/catquiz/manage_dimensions.php"">'
+                . get_string('managedimensions', 'local_catquiz') . '</a>
+            <a class="dropdown-item" href="'
+                . $CFG->wwwroot . '/local/catquiz/test.php">'
+                . get_string('test', 'local_catquiz') . '</a>
+        </div>
+    </div>';
+
+    return $output;
+}
