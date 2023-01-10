@@ -30,19 +30,22 @@
     }
 }}
 
-<div class="btn btn-primary catquiz-button-subscribe"
+<a data-action="create" href="#" class="catquiz-button-subscribe btn btn--plain btn--smaller btn-dimensions"
     data-id="{{id}}"
-    data-area="{{area}}">
+    data-area="dimension">
     {{#subscribed}}
+        <i class="fa fa fa-bell" aria-label="{{#str}} subscribed, local_catquiz {{/str}}"></i>
         {{#str}} subscribed, local_catquiz {{/str}}
     {{/subscribed}}
     {{^subscribed}}
+        <i class="fa fa fa-bell-o" aria-label="{{#str}} subscribe, local_catquiz {{/str}}"></i>
         {{#str}} subscribe, local_catquiz {{/str}}
     {{/subscribed}}
-</div>
+</a>
+
 
 {{#js}}
     require(['local_catquiz/subscribe'], function(init) {
-        init.init('{{id}}', '{{area}}');
+        init.init('{{id}}', 'dimension');
         });
 {{/js}}

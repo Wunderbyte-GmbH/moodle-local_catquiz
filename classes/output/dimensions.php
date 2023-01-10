@@ -31,6 +31,7 @@
 namespace local_catquiz\output;
 
 use local_catquiz\data\dataapi;
+use local_catquiz\subscription;
 use templatable;
 use renderable;
 
@@ -74,11 +75,18 @@ class dimensions implements renderable, templatable {
      *
      */
     public function build_tree(array $elements, int $parentid = 0): array {
+
+        global $USER;
+
         $branch = array();
 
         foreach ($elements as $dimensionitem) {
             // Transform object dimension_structur into array, which is needed here.
             $element = get_object_vars($dimensionitem);
+
+            if ($subscribed = subscription::return_subscription_state($USER->id, 'dimension', $element['id'])) {
+                $element['subscribed'] = true;
+            }
 
             if ($element['parentid'] == $parentid) {
                 $children = $this->build_tree($elements, $element['id']);

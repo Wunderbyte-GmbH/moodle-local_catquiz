@@ -23,7 +23,7 @@ import Ajax from 'core/ajax';
 import Templates from 'core/templates';
 
 var SELECTORS = {
-    SUBSCRIBEBUTTON: 'div.catquiz-button-subscribe',
+    SUBSCRIBEBUTTON: 'a.catquiz-button-subscribe',
 };
 
 export const init = (itemid, area) => {
