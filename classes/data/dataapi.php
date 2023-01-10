@@ -75,7 +75,16 @@ class dataapi {
      */
     public static function delete_dimension(int $dimensionid): bool {
         global $DB;
-        $result = $DB->delete_records('local_catquiz_dimensions', ['id' => $dimensionid]);
+        $alldimensions = self::get_all_dimensions();
+        $dimensionids = [];
+        foreach ($alldimensions as $dimension) {
+            $dimensionids[] = $dimension->parentid;
+        }
+        if (!in_array($dimensionid, $dimensionids)) {
+            $result = $DB->delete_records('local_catquiz_dimensions', ['id' => $dimensionid]);
+        } else {
+            throw new moodle_exception('can not delete dimension which has children', 'local_catquiz');
+        }
 
         // Invalidate cache. TODO: Instead of invalidating cache, delete the item from the cache.
         $cache = cache::make('local_catquiz', 'dimensions');

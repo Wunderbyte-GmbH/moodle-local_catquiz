@@ -21,6 +21,7 @@
 
 import ModalForm from 'core_form/modalform';
 import {get_string as getString} from 'core/str';
+import {call as fetchMany} from 'core/ajax';
 
 /**
  * Add event listener to buttons.
@@ -31,7 +32,11 @@ export const init = () => {
         button.addEventListener('click', e => {
             e.preventDefault();
             const element = e.target;
-            manageDimension(element);
+            if (element.dataset.action === "delete") {
+                performDeletion(element);
+            } else {
+                manageDimension(element);
+            }
         });
     });
 };
@@ -50,7 +55,7 @@ function manageDimension(button) {
     console.log(formvalues);
     switch (action) {
         case 'create':
-            formvalues = {};
+            formvalues = {parentid: parentelement.dataset.id};
             break;
     }
     let modalForm = new ModalForm({
@@ -79,3 +84,19 @@ function manageDimension(button) {
     // Show the form.
     modalForm.show();
 }
+
+const deleteDimension = (id) => ({
+    methodname: 'local_catquiz_delete_dimension',
+    args: { id: id },
+});
+
+export const performDeletion = async(element) => {
+    const parentelement = element.closest('.list-group-item');
+    const id = parentelement.dataset.id;
+    const response = fetchMany([
+        deleteDimension(id),
+    ]);
+    window.console.log(response);
+    // Reload window after deleting.
+    window.location.reload();
+};

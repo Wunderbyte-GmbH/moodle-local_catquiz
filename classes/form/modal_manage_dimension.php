@@ -57,11 +57,11 @@ class modal_manage_dimension extends dynamic_form {
         $mform->setType('description', PARAM_CLEANHTML);
 
         // Add a textarea field for the dimension description
-        $mform->addElement('hidden', 'action', '');
-        $mform->setType('action', PARAM_ALPHA);
+        $mform->addElement('hidden', 'id', '');
+        $mform->setType('id', PARAM_INT);
 
         // Add a select field for the parent ID
-        $options = array('' => get_string('none'));
+        $options = array('0' => get_string('none'));
         $dimensions = dataapi::get_all_dimensions();
         foreach ($dimensions as $dimension) {
             $options[$dimension->id] = $dimension->name;
@@ -90,21 +90,14 @@ class modal_manage_dimension extends dynamic_form {
      */
     public function process_dynamic_submission(): object {
         $data = $this->get_data();
-        $action = $data->action;
-        unset($data->action);
         $data->timecreated = time();
         $data->timemodified = time();
         $dimension = new dimension_structure((array) $data);
-        switch ($action) {
-            case 'create':
-                $dimensionid = dataapi::create_dimension($dimension);
-                break;
-            case 'update':
-                dataapi::update_dimension($dimension);
-                $dimensionid = $data->id;
-                break;
-            default:
-                $dimensionid = 0;
+        if ($data->id > 0) {
+            dataapi::update_dimension($dimension);
+            $dimensionid = $data->id;
+        } else {
+            $dimensionid = dataapi::create_dimension($dimension);
         }
         $data->id = $dimensionid;
         return $data;
@@ -162,7 +155,7 @@ class modal_manage_dimension extends dynamic_form {
      */
     public function validation($data, $files): array {
         $errors = array();
-        if (dataapi::name_exists($data['name'])) {
+        if (dataapi::name_exists($data['name']) && $data['id'] === 0) {
             $errors['name'] = get_string('dimensionsname_exists', 'local_catquiz');
         }
         return $errors;

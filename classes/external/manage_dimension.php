@@ -37,7 +37,7 @@ use external_single_structure;
 use local_catquiz\data\dataapi;
 use local_catquiz\data\dimension_structure;
 
-class create_dimension extends external_api {
+class manage_dimension extends external_api {
     /**
      * @return external_function_parameters
      * @see external_function_parameters
@@ -47,7 +47,9 @@ class create_dimension extends external_api {
                 array(
                         'name' => new external_value(PARAM_TEXT, 'The name of the dimension', VALUE_REQUIRED),
                         'description' => new external_value(PARAM_RAW, 'The description of the dimension', VALUE_REQUIRED),
-                        'parentid' => new external_value(PARAM_INT, 'The parent ID of the dimension', VALUE_OPTIONAL, null)
+                        'parentid' => new external_value(PARAM_INT, 'The parent ID of the dimension', VALUE_OPTIONAL, null),
+                        'id' => new external_value(PARAM_INT, 'The id of the dimension', VALUE_OPTIONAL, null),
+                        'action' => new external_value(PARAM_ALPHA, 'update or create', VALUE_REQUIRED),
                 )
         );
     }
@@ -57,15 +59,18 @@ class create_dimension extends external_api {
      *
      * @param $name
      * @param $description
+     * @param $id
+     * @param $action
      * @param $parentid
      * @return array
      */
-    public static function execute($name, $description, $parentid = null): array {
+    public static function execute($name, $description, $id, $action, $parentid = null): array {
 
         $params = self::validate_parameters(self::execute_parameters(), [
                 'name' => $name,
                 'description' => $description,
                 'parentid' => $parentid,
+                'action' => $action,
         ]);
         $params['timecreated'] = time();
         $params['timemodified'] = time();
@@ -73,7 +78,11 @@ class create_dimension extends external_api {
         $record = new dimension_structure($params);
 
         // Insert the record into the database.
-        $id = dataapi::create_dimension($record);
+        if ($action === 'create') {
+            $id = dataapi::create_dimension($record);
+        } else if ($action === 'update') {
+            $id = dataapi::update_dimension($record);
+        }
 
         // Return the ID of the newly created record.
         return array('id' => $id);
