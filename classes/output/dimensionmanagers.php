@@ -45,7 +45,7 @@ use renderable;
 class dimensionmanagers implements renderable, templatable {
 
     /** @var array of dimensionmanagers */
-    public array $dimensionmanagers;
+    public array $dimensionmanagers = [];
 
     /**
      * Either returns one tree or treearray for every parentnode
