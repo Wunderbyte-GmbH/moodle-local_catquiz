@@ -87,6 +87,8 @@ class dimensions implements renderable, templatable {
 
             if ($subscribed = subscription::return_subscription_state($USER->id, 'dimension', $element['id'])) {
                 $element['subscribed'] = true;
+            } else {
+                $element['subscribed'] = false;
             }
 
             if ($element['parentid'] == $parentid) {
