@@ -32,14 +32,14 @@ if ($hassiteconfig) {
     $settings = new admin_settingpage($componentname . '_settings',  get_string('pluginname', 'local_catquiz'));
     $ADMIN->add('localplugins', $settings);
 
-    $dimensionlink = new moodle_url('/local/catquiz/manage_dimensions.php');
-    $actionlink = new action_link($dimensionlink, get_string('catquizsettings', 'local_catquiz'));
+    $catscalelink = new moodle_url('/local/catquiz/manage_catscales.php');
+    $actionlink = new action_link($catscalelink, get_string('catquizsettings', 'local_catquiz'));
     $settingsling = ['link' => $OUTPUT->render($actionlink)];
     $settings->add(
             new admin_setting_heading(
-                    'local_catquiz/dimensions',
-                    get_string('dimensions', 'local_catquiz'),
-                    get_string('dimensions:information', 'local_catquiz', $settingsling),
+                    'local_catquiz/catscales',
+                    get_string('catscales', 'local_catquiz'),
+                    get_string('catscales:information', 'local_catquiz', $settingsling),
             )
     );
 }

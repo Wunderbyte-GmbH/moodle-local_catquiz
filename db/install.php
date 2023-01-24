@@ -54,8 +54,8 @@ function xmldb_local_catquiz_install() {
     $ctx = \context_system::instance();
     $caps = array(
         'local/catquiz:canmanage',
-        'local/catquiz:manage_dimensions',
-        'local/catquiz:subscribedimensions',
+        'local/catquiz:manage_catscales',
+        'local/catquiz:subscribecatscales',
     );
     foreach ($caps as $cap) {
         $chk = $DB->get_record('role_capabilities', array('contextid' => $ctx->id, 'roleid' => $role->id, 'capability' => $cap, 'permission' => 1));

@@ -18,7 +18,7 @@ namespace local_catquiz\data;
 
 use cache;
 use context_system;
-use local_catquiz\event\dimension_updated;
+use local_catquiz\event\catscale_updated;
 
 /**
  * Get and store data from db.
@@ -26,105 +26,105 @@ use local_catquiz\event\dimension_updated;
 class dataapi {
 
     /**
-     * Get all dimensions either from cache or db
+     * Get all catscales either from cache or db
      *
      * @return array
      */
-    public static function get_all_dimensions(): array {
+    public static function get_all_catscales(): array {
         global $DB;
-        $cache = cache::make('local_catquiz', 'dimensions');
-        $alldimensions = $cache->get('alldimensions');
-        if (!$alldimensions) {
-            $records = $DB->get_records('local_catquiz_dimensions');
+        $cache = cache::make('local_catquiz', 'catscales');
+        $allcatscales = $cache->get('allcatscales');
+        if (!$allcatscales) {
+            $records = $DB->get_records('local_catquiz_catscales');
             if (!empty($records)) {
                 foreach ($records as $record) {
-                    $alldimensions[$record->id] = new dimension_structure((array) $record);
+                    $allcatscales[$record->id] = new catscale_structure((array) $record);
                 }
             } else {
-                $alldimensions = [];
+                $allcatscales = [];
             }
-            $cache->set('alldimensions', $alldimensions);
+            $cache->set('allcatscales', $allcatscales);
         }
-        return $alldimensions;
+        return $allcatscales;
     }
 
     /**
-     * Save a new dimension and invalidate cache. Checks if name is unique
+     * Save a new catscale and invalidate cache. Checks if name is unique
      *
-     * @param dimension_structure $dimension
+     * @param catscale_structure $catscale
      * @return int 0 if name already exists
      */
-    public static function create_dimension(dimension_structure $dimension): int {
+    public static function create_catscale(catscale_structure $catscale): int {
         global $DB;
-        if (self::name_exists($dimension->name)) {
+        if (self::name_exists($catscale->name)) {
             return 0;
         }
-        $id = $DB->insert_record('local_catquiz_dimensions', $dimension);
+        $id = $DB->insert_record('local_catquiz_catscales', $catscale);
 
         // Invalidate cache. TODO: Instead of invalidating cache, add the item to the cache.
-        $cache = cache::make('local_catquiz', 'dimensions');
-        $cache->delete('alldimensions');
+        $cache = cache::make('local_catquiz', 'catscales');
+        $cache->delete('allcatscales');
         return $id;
     }
 
     /**
-     * Delete a dimension and invalidate cache.
+     * Delete a catscale and invalidate cache.
      *
-     * @param dimension_structure $dimension
+     * @param catscale_structure $catscale
      * @return bool true
      */
-    public static function delete_dimension(int $dimensionid): bool {
+    public static function delete_catscale(int $catscaleid): bool {
         global $DB;
-        $alldimensions = self::get_all_dimensions();
-        $dimensionids = [];
-        foreach ($alldimensions as $dimension) {
-            $dimensionids[] = $dimension->parentid;
+        $allcatscales = self::get_all_catscales();
+        $catscaleids = [];
+        foreach ($allcatscales as $catscale) {
+            $catscaleids[] = $catscale->parentid;
         }
-        if (!in_array($dimensionid, $dimensionids)) {
-            $result = $DB->delete_records('local_catquiz_dimensions', ['id' => $dimensionid]);
+        if (!in_array($catscaleid, $catscaleids)) {
+            $result = $DB->delete_records('local_catquiz_catscales', ['id' => $catscaleid]);
         } else {
-            throw new moodle_exception('can not delete dimension which has children', 'local_catquiz');
+            throw new moodle_exception('can not delete catscale which has children', 'local_catquiz');
         }
 
         // Invalidate cache. TODO: Instead of invalidating cache, delete the item from the cache.
-        $cache = cache::make('local_catquiz', 'dimensions');
-        $cache->delete('alldimensions');
+        $cache = cache::make('local_catquiz', 'catscales');
+        $cache->delete('allcatscales');
         return $result;
     }
 
     /**
-     * Update a dimension and invalidate cache.
+     * Update a catscale and invalidate cache.
      *
-     * @param dimension_structure $dimension
+     * @param catscale_structure $catscale
      * @return bool
      */
-    public static function update_dimension(dimension_structure $dimension): bool {
+    public static function update_catscale(catscale_structure $catscale): bool {
         global $DB, $USER;
-        $result = $DB->update_record('local_catquiz_dimensions', $dimension);
+        $result = $DB->update_record('local_catquiz_catscales', $catscale);
 
         $context = context_system::instance();
 
-        $event = dimension_updated::create([
-            'objectid' => $dimension->id,
+        $event = catscale_updated::create([
+            'objectid' => $catscale->id,
             'context' => $context,
             'userid' => $USER->id, // The user who did cancel.
         ]);
         $event->trigger();
 
         // Invalidate cache. TODO: Instead of invalidating cache, delete and add the item from the cache.
-        $cache = cache::make('local_catquiz', 'dimensions');
-        $cache->delete('alldimensions');
+        $cache = cache::make('local_catquiz', 'catscales');
+        $cache->delete('allcatscales');
         return $result;
     }
 
     /**
-     * Check if name of dimension already exsists - must be unique
-     * @param string $name dimension name
+     * Check if name of catscale already exsists - must be unique
+     * @param string $name catscale name
      * @return bool true if name already exists, false if not
      */
     public static function name_exists(string $name): bool {
         global $DB;
-        if ($DB->record_exists('local_catquiz_dimensions', ['name' => $name])) {
+        if ($DB->record_exists('local_catquiz_catscales', ['name' => $name])) {
             return true;
         } else {
             return false;

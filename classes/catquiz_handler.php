@@ -83,12 +83,12 @@ class catquiz_handler {
 
         // Question categories or tags to use for this quiz.
 
-        $areas = \local_catquiz\data\dataapi::get_all_dimensions();
+        $areas = \local_catquiz\data\dataapi::get_all_catscales();
         $options = array(
             'multiple' => true,
             'noselectionstring' => get_string('allareas', 'search'),
         );
-        $mform->addElement('autocomplete', 'catdimensions', get_string('catdimensions', 'local_catquiz'), $areas, $options);
+        $mform->addElement('autocomplete', 'catcatscales', get_string('catcatscales', 'local_catquiz'), $areas, $options);
         $mform->addHelpButton('catquestionpool', 'questionpool', 'adaptivequiz');
         $mform->addRule('catquestionpool', null, 'required', null, 'client');
     }
@@ -107,7 +107,7 @@ class catquiz_handler {
         }
         $data->catquiz_usecatquiz = 1;
         $data->catquiz_model_select = $settings->adaptivemodel;
-        $data->dimensionids = json_decode($settings->dimensionids);
+        $data->catscaleids = json_decode($settings->catscaleids);
     }
 
     /**
@@ -144,7 +144,7 @@ class catquiz_handler {
         $catdata->componentname = $componentname;
         $catdata->componentid = $instanceid;
         $catdata->adaptivemodel = $data->catquiz_model_select;
-        $catdata->dimensionids = json_encode($data->dimensionids);
+        $catdata->catscaleids = json_encode($data->catscaleids);
         if ($DB->record_exists('local_catquiz', ['componentname' => $componentname, 'componentid' => $instanceid])) {
             $catdata->id = $DB->get_field('local_catquiz', 'id', ['componentname' => $componentname,
                 'componentid' => $instanceid]);

@@ -25,30 +25,30 @@
 namespace local_catquiz\event;
 
 /**
- * The dimension_updated event class.
+ * The catscale_updated event class.
  *
  * @property-read array $other { Extra information about event. Acesss an instance of the booking module }
  * @copyright 2023 Georg Maißer
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class dimension_updated extends \core\event\base {
+class catscale_updated extends \core\event\base {
 
     protected function init() {
         $this->data['crud'] = 'u'; // Meaning: u = update.
         $this->data['edulevel'] = self::LEVEL_OTHER;
-        $this->data['objecttable'] = 'local_catquiz_dimensions';
+        $this->data['objecttable'] = 'local_catquiz_catscales';
     }
 
     public static function get_name() {
-        return get_string('dimension_updated', 'booking');
+        return get_string('catscale_updated', 'booking');
     }
 
     public function get_description() {
 
-        return get_string('userupdateddimension', 'local_catquiz', $this);
+        return get_string('userupdatedcatscale', 'local_catquiz', $this);
     }
 
     public function get_url() {
-        return new \moodle_url('/local/catquiz/report.php', array('id' => $this->contextinstanceid, 'dimensionid' => $this->objectid));
+        return new \moodle_url('/local/catquiz/report.php', array('id' => $this->contextinstanceid, 'catscaleid' => $this->objectid));
     }
 }

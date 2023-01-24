@@ -15,23 +15,23 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * catquiz dimensions view page
- * @package    local_catquiz dimensions
+ * catquiz catscales view page
+ * @package    local_catquiz catscales
  * @copyright  2023 Wunderbyte GmbH
  * @author     David Bogner
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-use local_catquiz\output\dimensionmanagers;
+use local_catquiz\output\catscalemanagers;
 
 require_once('../../config.php');
 
 $context = \context_system::instance();
 $PAGE->set_context($context);
 require_login();
-require_capability('local/catquiz:manage_dimensions', $context);
+require_capability('local/catquiz:manage_catscales', $context);
 
-$PAGE->set_url(new moodle_url('/local/catquiz/manage_dimensions.php', array()));
+$PAGE->set_url(new moodle_url('/local/catquiz/manage_catscales.php', array()));
 
 $title = get_string('pluginname', 'local_catquiz');
 $PAGE->set_title($title);
@@ -39,12 +39,12 @@ $PAGE->set_heading($title);
 
 echo $OUTPUT->header();
 
-$data = new local_catquiz\output\dimensions();
-$dimensionmanagers = new local_catquiz\output\dimensionmanagers();
+$data = new local_catquiz\output\catscales();
+$catscalemanagers = new local_catquiz\output\catscalemanagers();
 
-echo $OUTPUT->render_from_template('local_catquiz/dimensionsdashboard', [
+echo $OUTPUT->render_from_template('local_catquiz/catscalesdashboard', [
     'itemtree' => $data->itemtree,
-    'dimensionmanagers' => $dimensionmanagers->return_as_array(),
+    'catscalemanagers' => $catscalemanagers->return_as_array(),
 ]);
 
 echo $OUTPUT->footer();

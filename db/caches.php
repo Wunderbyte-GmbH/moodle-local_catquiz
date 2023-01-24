@@ -1,6 +1,6 @@
 <?php
 $definitions = [
-        'dimensions' => [
+        'catscales' => [
                 'mode' => cache_store::MODE_APPLICATION,
         ]
 ];

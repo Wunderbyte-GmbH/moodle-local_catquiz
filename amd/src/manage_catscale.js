@@ -27,7 +27,7 @@ import {call as fetchMany} from 'core/ajax';
  * Add event listener to buttons.
  */
 export const init = () => {
-    let buttons = document.querySelectorAll('.manage-dimension');
+    let buttons = document.querySelectorAll('.manage-catscale');
     buttons.forEach(button => {
         button.addEventListener('click', e => {
             e.preventDefault();
@@ -35,7 +35,7 @@ export const init = () => {
             if (element.dataset.action === "delete") {
                 performDeletion(element);
             } else {
-                manageDimension(element);
+                manageCatscale(element);
             }
         });
     });
@@ -45,10 +45,10 @@ export const init = () => {
  *
  * @param {*} button
  */
-function manageDimension(button) {
+function manageCatscale(button) {
     const parentelement = button.closest('.list-group-item');
     const action = button.dataset.action;
-    let formclass = "local_catquiz\\form\\modal_manage_dimension";
+    let formclass = "local_catquiz\\form\\modal_manage_catscale";
     let formvalues = { id: parentelement.dataset.id, description: parentelement.dataset.description,
         name: parentelement.dataset.name, parentid: parentelement.dataset.parentid };
     // eslint-disable-next-line no-console
@@ -64,7 +64,7 @@ function manageDimension(button) {
         // Add as many arguments as you need, they will be passed to the form:
         args: formvalues,
         // Pass any configuration settings to the modal dialogue, for example, the title:
-        modalConfig: {title: getString('managedimension', 'local_catquiz')},
+        modalConfig: {title: getString('managecatscale', 'local_catquiz')},
         // DOM element that should get the focus after the modal dialogue is closed:
         returnFocus: button,
     });
@@ -78,15 +78,15 @@ function manageDimension(button) {
         window.location.reload();
 
         // eslint-disable-next-line no-console
-        console.log('createDimension: form submitted');
+        console.log('createCatscale: form submitted');
     });
 
     // Show the form.
     modalForm.show();
 }
 
-const deleteDimension = (id) => ({
-    methodname: 'local_catquiz_delete_dimension',
+const deleteCatscale = (id) => ({
+    methodname: 'local_catquiz_delete_catscale',
     args: { id: id },
 });
 
@@ -94,7 +94,7 @@ export const performDeletion = async(element) => {
     const parentelement = element.closest('.list-group-item');
     const id = parentelement.dataset.id;
     const response = fetchMany([
-        deleteDimension(id),
+        deleteCatscale(id),
     ]);
     window.console.log(response);
     // Reload window after deleting.

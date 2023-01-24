@@ -28,16 +28,16 @@
 <ul class="pt-2 mt-0 mb-0">
         <li class="list-group-item pr-0" data-id="{{id}}" data-description="{{description}}" data-parentid="{{parentid}}" data-name="{{name}}">
             <div class="pull-right">
-                <a data-action="view" href="#" class="view-dimension btn btn--plain btn--smaller btn-dimensions">
+                <a data-action="view" href="#" class="view-catscale btn btn--plain btn--smaller btn-catscales">
                     <i class="fa fa-edit"></i>
                     {{#str}} view, moodle {{/str}}</a>
-                <a data-action="edit" href="#" class="manage-dimension btn btn--plain btn--smaller btn-dimensions">
+                <a data-action="edit" href="#" class="manage-catscale btn btn--plain btn--smaller btn-catscales">
                     <i class="fa fa-edit"></i>
                     {{#str}} edit, moodle {{/str}}</a>
-                <a data-action="delete" href="#" class="delete-dimension btn btn--plain btn--smaller btn-dimensions">
+                <a data-action="delete" href="#" class="delete-catscale btn btn--plain btn--smaller btn-catscales">
                     <i class="fa fa fa-trash"></i>
                     {{#str}} delete, moodle {{/str}}</a>
-                <a data-action="create" href="#" class="manage-dimension btn btn--plain btn--smaller btn-dimensions">
+                <a data-action="create" href="#" class="manage-catscale btn btn--plain btn--smaller btn-catscales">
                     <i class="fa fa fa-plus"></i>
                     {{#str}} create, moodle {{/str}}</a>
                 {{>local_catquiz/button_subscribe}}
@@ -46,6 +46,6 @@
             <div>{{description}}</div>
         </li>
         {{#children}}
-            {{>local_catquiz/dimensionchildren}}
+            {{>local_catquiz/catscalechildren}}
         {{/children}}
 </ul>

@@ -13,7 +13,7 @@
 }}
 {{!
     @template local_catquiz
-    Template which defines a dimensions view page.
+    Template which defines a catscales view page.
     Classes required for JS:
     * none
     Data attributes required for JS:
@@ -21,7 +21,7 @@
     Context variables required for this template:
     Example context (json):
     {
-        'dimensionmanagers': [
+        'catscalemanagers': [
             'firstname': 'Maxima',
             'firstname': 'Yoga',
             'email': 'maxima@yoga.at',
@@ -30,7 +30,7 @@
 }}
 
 <ul class="list-group">
-{{#dimensionmanagers}}
+{{#catscalemanagers}}
      <li class="list-group-item list-group-item-action">
         <div>
             <a href="{{link}}">
@@ -41,6 +41,6 @@
         </div>
         <p class="mb-1">{{email}}</p>
     </li>
-{{/dimensionmanagers}}
+{{/catscalemanagers}}
 </ul>
 

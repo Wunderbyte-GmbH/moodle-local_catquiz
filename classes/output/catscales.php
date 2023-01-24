@@ -36,14 +36,14 @@ use templatable;
 use renderable;
 
 /**
- * Renderable class for the dimensions page
+ * Renderable class for the catscales page
  *
  * @package    local_catquiz
  * @copyright  2023 Wunderbyte GmbH
  * @author     David Bogner
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class dimensions implements renderable, templatable {
+class catscales implements renderable, templatable {
 
     /** @var array of objects including all items */
     public array $items;
@@ -62,7 +62,7 @@ class dimensions implements renderable, templatable {
      * @return array
      */
     public function __construct(bool $allowedit = true) {
-        $this->items = dataapi::get_all_dimensions();
+        $this->items = dataapi::get_all_catscales();
         $this->build_tree($this->items);
         $this->itemtree = $this->branchitems[0];
     }
@@ -81,11 +81,11 @@ class dimensions implements renderable, templatable {
 
         $branch = array();
 
-        foreach ($elements as $dimensionitem) {
-            // Transform object dimension_structur into array, which is needed here.
-            $element = get_object_vars($dimensionitem);
+        foreach ($elements as $catscaleitem) {
+            // Transform object catscale_structur into array, which is needed here.
+            $element = get_object_vars($catscaleitem);
 
-            if ($subscribed = subscription::return_subscription_state($USER->id, 'dimension', $element['id'])) {
+            if ($subscribed = subscription::return_subscription_state($USER->id, 'catscale', $element['id'])) {
                 $element['subscribed'] = true;
             } else {
                 $element['subscribed'] = false;
@@ -107,7 +107,7 @@ class dimensions implements renderable, templatable {
     }
 
     /**
-     * Return the item tree of all dimensions.
+     * Return the item tree of all catscales.
      * @return array
      */
     public function export_for_template(\renderer_base $output): array {

@@ -13,7 +13,7 @@
 }}
 {{!
     @template local_catquiz
-    Template which defines a dimensions view page.
+    Template which defines a catscales view page.
     Classes required for JS:
     * none
     Data attributes required for JS:
@@ -26,20 +26,20 @@
 }}
 <div>
 {{#itemtree}}
-        <div id="local-dimensions-container-{{id}}">
+        <div id="local-catscales-container-{{id}}">
             <ul class="list-group w-100 mt-2">
                 <li class="list-group-item" data-id="{{id}}" data-description="{{description}}" data-parentid="{{parentid}}" data-name="{{name}}">
                     <div class="pull-right">
-                        <a href="#" class="view-dimension btn btn--plain btn--smaller btn-dimensions" data-action="view">
+                        <a href="#" class="view-catscale btn btn--plain btn--smaller btn-catscales" data-action="view">
                             <i class="fa fa-edit"></i>
                             {{#str}} view, moodle {{/str}}</a>
-                        <a href="#" class="manage-dimension btn btn--plain btn--smaller btn-dimensions" data-action="edit">
+                        <a href="#" class="manage-catscale btn btn--plain btn--smaller btn-catscales" data-action="edit">
                             <i class="fa fa-edit"></i>
                             {{#str}} edit, moodle {{/str}}</a>
-                        <a href="#" class="manage-dimension btn btn--plain btn--smaller btn-dimensions" data-action="delete">
+                        <a href="#" class="manage-catscale btn btn--plain btn--smaller btn-catscales" data-action="delete">
                             <i class="fa fa fa-trash"></i>
                             {{#str}} delete, moodle {{/str}}</a>
-                        <a href="#" class="manage-dimension btn btn--plain btn--smaller btn-dimensions" data-action="create">
+                        <a href="#" class="manage-catscale btn btn--plain btn--smaller btn-catscales" data-action="create">
                             <i class="fa fa fa-plus"></i>
                             {{#str}} create, moodle {{/str}}</a>
                         {{>local_catquiz/button_subscribe}}
@@ -50,15 +50,15 @@
         </ul>
         </div>
     {{#children}}
-        {{>local_catquiz/dimensionchildren}}
+        {{>local_catquiz/catscalechildren}}
     {{/children}}
 {{/itemtree}}
 {{^itemtree}}
 <ul class="list-group w-100">
     <li class="list-group-item">
-        <span class="h4">{{#str}} createdimension, local_catquiz {{/str}}</span>
+        <span class="h4">{{#str}} createcatscale, local_catquiz {{/str}}</span>
         <div>
-            <a href="#" class="manage-dimension btn-primary btn btn--plain btn--smaller btn-dimensions" data-action="create">
+            <a href="#" class="manage-catscale btn-primary btn btn--plain btn--smaller btn-catscales" data-action="create">
                 <i class="fa fa fa-plus px-2"></i>
                 {{#str}} create, moodle {{/str}}
             </a>
@@ -68,7 +68,7 @@
 {{/itemtree}}
 </div>
 {{#js}}
-    require(['local_catquiz/manage_dimension'], function(managedimension) {
-    managedimension.init();
+    require(['local_catquiz/manage_catscale'], function(managecatscale) {
+    managecatscale.init();
     });
 {{/js}}

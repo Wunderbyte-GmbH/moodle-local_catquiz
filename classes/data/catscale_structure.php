@@ -20,7 +20,7 @@ namespace local_catquiz\data;
  *
  * Simple data structure reflecting the db table scheme. Should be same as in install.xml.
  */
-class dimension_structure {
+class catscale_structure {
 
     /** @var ?int $id null means object is not yet initialised */
     public ?int $id = null;
@@ -41,7 +41,7 @@ class dimension_structure {
     public ?int $parentid = null;
 
     /**
-     * Constructor for a single dimension data object.
+     * Constructor for a single catscale data object.
      *
      * @param array $data
      */

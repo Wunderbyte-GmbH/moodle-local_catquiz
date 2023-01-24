@@ -27,7 +27,7 @@
 
  $observers = array(
      array(
-         'eventname' => '\local_catquiz\event\dimension_updated',
-         'callback' => 'local_catquiz_observer::dimension_updated'
+         'eventname' => '\local_catquiz\event\catscale_updated',
+         'callback' => 'local_catquiz_observer::catscale_updated'
      ),
  );

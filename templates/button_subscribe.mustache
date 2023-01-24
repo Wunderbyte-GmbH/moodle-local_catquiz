@@ -30,9 +30,9 @@
     }
 }}
 
-<a data-action="create" href="#" class="catquiz-button-subscribe btn btn--plain btn--smaller btn-dimensions"
+<a data-action="create" href="#" class="catquiz-button-subscribe btn btn--plain btn--smaller btn-catscales"
     data-id="{{id}}"
-    data-area="dimension">
+    data-area="catscale">
     {{#subscribed}}
         <i class="fa fa fa-bell" aria-label="{{#str}} subscribed, local_catquiz {{/str}}"></i>
         {{#str}} subscribed, local_catquiz {{/str}}
@@ -46,6 +46,6 @@
 
 {{#js}}
     require(['local_catquiz/subscribe'], function(init) {
-        init.init('{{id}}', 'dimension');
+        init.init('{{id}}', 'catscale');
         });
 {{/js}}

@@ -22,7 +22,7 @@
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-use local_catquiz\event\dimension_updated;
+use local_catquiz\event\catscale_updated;
 use local_catquiz\messages;
 
 /**
@@ -31,16 +31,16 @@ use local_catquiz\messages;
 class local_catquiz_observer {
 
     /**
-     * Observer for the update_dimension event
+     * Observer for the update_catscale event
      *
-     * @param dimension_updated $event
+     * @param catscale_updated $event
      */
-    public static function dimension_updated(dimension_updated $event) {
+    public static function catscale_updated(catscale_updated $event) {
 
-        $dimensionid = $event->objectid;
+        $catscaleid = $event->objectid;
 
         // See which users need to actually be notified.
 
-        messages::dimension_updated($dimensionid);
+        messages::catscale_updated($catscaleid);
     }
 }

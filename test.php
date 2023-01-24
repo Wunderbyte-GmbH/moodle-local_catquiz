@@ -22,7 +22,7 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-use local_catquiz\event\dimension_updated;
+use local_catquiz\event\catscale_updated;
 use local_catquiz\subscription;
 
 require_once('../../config.php');
@@ -34,7 +34,7 @@ $context = \context_system::instance();
 $PAGE->set_context($context);
 require_login();
 
-require_capability('local/catquiz:manage_dimensions', $context);
+require_capability('local/catquiz:manage_catscales', $context);
 
 $PAGE->set_url(new moodle_url('/local/catquiz/test.php', array()));
 
@@ -48,18 +48,18 @@ echo 'my test';
 
 $userid = $USER->id;
 
-$event = dimension_updated::create([
+$event = catscale_updated::create([
     'objectid' => 79,
     'context' => $context,
     'userid' => $userid, // The user who did cancel.
 ]);
 $event->trigger();
 
-$subscribed = subscription::return_subscription_state($userid, 'dimension', 79);
+$subscribed = subscription::return_subscription_state($userid, 'catscale', 79);
 
 $data = [
     'id' => 79,
-    'area' => 'dimension'];
+    'area' => 'catscale'];
 
 if ($subscribed) {
     $data['subscribed'] = 'true';

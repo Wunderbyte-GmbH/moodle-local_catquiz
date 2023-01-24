@@ -4,31 +4,31 @@
     xsi:noNamespaceSchemaLocation="../../../lib/xmldb/xmldb.xsd"
 >
   <TABLES>
-    <TABLE NAME="local_catquiz" COMMENT="Catquiz settings table" NEXT="local_catquiz_dimensions">
+    <TABLE NAME="local_catquiz" COMMENT="Catquiz settings table" NEXT="local_catquiz_catscales">
       <FIELDS>
         <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
         <FIELD NAME="componentname" TYPE="char" LENGTH="255" NOTNULL="true" SEQUENCE="false" COMMENT="Component name settings are applicable"/>
         <FIELD NAME="componentid" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="Id of the instance of the component"/>
         <FIELD NAME="adaptivemodel" TYPE="int" LENGTH="2" NOTNULL="true" DEFAULT="0" SEQUENCE="false"
                COMMENT="Algorithm type used to calculate the next question displayed to user. If 0 the engine is inactive."/>
-        <FIELD NAME="dimensionids" TYPE="char" LENGTH="255" NOTNULL="true" SEQUENCE="false" COMMENT="Comma separated ids of dimensions to be used"/>
+        <FIELD NAME="catscaleids" TYPE="char" LENGTH="255" NOTNULL="true" SEQUENCE="false" COMMENT="Comma separated ids of catscales to be used"/>
       </FIELDS>
       <KEYS>
         <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
       </KEYS>
     </TABLE>
-    <TABLE NAME="local_catquiz_dimensions" COMMENT="Catquiz dimensions table" NEXT="local_catquiz_items">
+    <TABLE NAME="local_catquiz_catscales" COMMENT="Catquiz catscales table" NEXT="local_catquiz_items">
       <FIELDS>
         <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
-        <FIELD NAME="name" TYPE="char" LENGTH="255" NOTNULL="true" SEQUENCE="false" COMMENT="Unique dimension name link MATHEMATIC"/>
-        <FIELD NAME="description" TYPE="text" NOTNULL="false" SEQUENCE="false" COMMENT="Description of the dimension to be tested"/>
+        <FIELD NAME="name" TYPE="char" LENGTH="255" NOTNULL="true" SEQUENCE="false" COMMENT="Unique catscale name link MATHEMATIC"/>
+        <FIELD NAME="description" TYPE="text" NOTNULL="false" SEQUENCE="false" COMMENT="Description of the catscale to be tested"/>
         <FIELD NAME="timecreated" TYPE="int" LENGTH="10" NOTNULL="false" DEFAULT="0" SEQUENCE="false" />
         <FIELD NAME="timemodified" TYPE="int" LENGTH="10" NOTNULL="false" DEFAULT="0" SEQUENCE="false" />
-        <FIELD NAME="parentid" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="id of the parent dimension, 0 if this is a top-level dimension"/>
+        <FIELD NAME="parentid" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="id of the parent catscale, 0 if this is a top-level catscale"/>
       </FIELDS>
       <KEYS>
         <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
-        <KEY NAME="parentid" TYPE="foreign" FIELDS="parentid" REFTABLE="local_catquiz_dimensions" REFFIELDS="id"/>
+        <KEY NAME="parentid" TYPE="foreign" FIELDS="parentid" REFTABLE="local_catquiz_catscales" REFFIELDS="id"/>
       </KEYS>
     </TABLE>
     <TABLE NAME="local_catquiz_items" COMMENT="Catquiz items" NEXT="local_catquiz_subscriptions">
@@ -36,10 +36,10 @@
         <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
         <FIELD NAME="componentname" TYPE="char" LENGTH="255" NOTNULL="true" SEQUENCE="false" COMMENT="Name of the component the item belongs to. Usually this is qtype"/>
         <FIELD NAME="componentid" TYPE="int" LENGTH="10" NOTNULL="false" DEFAULT="0" SEQUENCE="false" />
-        <FIELD NAME="dimensionid" TYPE="int" LENGTH="10" NOTNULL="false" DEFAULT="0" SEQUENCE="false" />
+        <FIELD NAME="catscaleid" TYPE="int" LENGTH="10" NOTNULL="false" DEFAULT="0" SEQUENCE="false" />
         <FIELD NAME="difficulty" TYPE="int" LENGTH="3" NOTNULL="false" DEFAULT="0" SEQUENCE="false" />
         <FIELD NAME="discrimination" TYPE="int" LENGTH="3" NOTNULL="false" DEFAULT="0" SEQUENCE="false" />
-        <FIELD NAME="testmodel" TYPE="int" LENGTH="2" NOTNULL="false" SEQUENCE="false" COMMENT="id of the parent dimension, null if this is a top-level dimension"/>
+        <FIELD NAME="testmodel" TYPE="int" LENGTH="2" NOTNULL="false" SEQUENCE="false" COMMENT="id of the parent catscale, null if this is a top-level catscale"/>
         <FIELD NAME="lastupdated" TYPE="int" LENGTH="2" NOTNULL="false" SEQUENCE="false" COMMENT="The last time difficulty, etc. have been updated."/>
       </FIELDS>
       <KEYS>

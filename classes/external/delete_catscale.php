@@ -47,7 +47,7 @@ require_once($CFG->libdir . '/externallib.php');
  * @author    Georg Maißer
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class delete_dimension extends external_api {
+class delete_catscale extends external_api {
 
     /**
      * Describes the parameters for get_next_question webservice.
@@ -62,7 +62,7 @@ class delete_dimension extends external_api {
     }
 
     /**
-     * Webservice for deleting a dimension
+     * Webservice for deleting a catscale
      *
      * @param int $id
      *
@@ -74,12 +74,12 @@ class delete_dimension extends external_api {
         ]);
         require_login();
         $context = context_system::instance();
-        if (!has_capability('local/catquiz:manage_dimensions', $context)) {
+        if (!has_capability('local/catquiz:manage_catscales', $context)) {
             throw new moodle_exception('norighttoaccess', 'local_catquiz');
         }
 
-        // Delete dimension.
-        return data\dataapi::delete_dimension($params['id']);
+        // Delete catscale.
+        return data\dataapi::delete_catscale($params['id']);
     }
 
     /**

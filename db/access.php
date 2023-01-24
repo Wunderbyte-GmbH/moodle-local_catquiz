@@ -34,14 +34,14 @@ $capabilities = [
                 'manager' => CAP_ALLOW
             ]
         ],
-        'local/catquiz:subscribedimensions' => [
+        'local/catquiz:subscribecatscales' => [
             'captype' => 'read',
             'contextlevel' => CONTEXT_SYSTEM,
             'archetypes' => [
                 'manager' => CAP_ALLOW
             ]
         ],
-        'local/catquiz:manage_dimensions' => [
+        'local/catquiz:manage_catscales' => [
                 'captype' => 'write',
                 'contextlevel' => CONTEXT_SYSTEM,
                 'archetypes' => [

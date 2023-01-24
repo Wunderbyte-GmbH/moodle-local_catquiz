@@ -25,8 +25,8 @@
 
  defined('MOODLE_INTERNAL') || die();
  $messageproviders = array (
-     // Notify subscribers of dimensions.
-     'updatedimension' => array (
-         'capability'  => 'local/catquiz:subscribedimensions'
+     // Notify subscribers of catscales.
+     'updatecatscale' => array (
+         'capability'  => 'local/catquiz:subscribecatscales'
      ),
  );

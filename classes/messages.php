@@ -54,7 +54,7 @@ class messages {
 
         $message = new \core\message\message();
         $message->component = 'local_catquiz'; // Your plugin's name.
-        $message->name = 'updatedimension'; // Your notification name from message.php.
+        $message->name = 'updatecatscale'; // Your notification name from message.php.
         $message->userfrom = core_user::get_noreply_user(); // If the message is 'from' a specific user you can set them here.
         $message->userto = $user;
         $message->subject = $messagesubject;
@@ -67,20 +67,20 @@ class messages {
     }
 
     /**
-     * Notifiy all subscribed users of an update of a dimension.
+     * Notifiy all subscribed users of an update of a catscale.
      *
-     * @param integer $dimensionid
+     * @param integer $catscaleid
      * @return void
      */
-    public static function dimension_updated(int $dimensionid) {
+    public static function catscale_updated(int $catscaleid) {
 
-        $userids = subscription::get_subscribed_user_ids($dimensionid, 'dimension');
+        $userids = subscription::get_subscribed_user_ids($catscaleid, 'catscale');
 
         foreach ($userids as $userid) {
             self::send_message(
                 $userid,
-                get_string('dimensionupdatedtitle', 'local_catquiz'),
-                get_string('dimensionupdatedbody', 'local_catquiz'));
+                get_string('catscaleupdatedtitle', 'local_catquiz'),
+                get_string('catscaleupdatedbody', 'local_catquiz'));
         }
     }
 

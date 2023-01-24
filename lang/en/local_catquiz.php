@@ -34,36 +34,36 @@ $string['selectmodel'] = 'Choose a model';
 $string['model'] = 'Model';
 $string['modeldeactivated'] = 'Deactivate CAT engine';
 $string['usecatquiz'] = 'Use the catquiz engine for this test instance.';
-$string['dimensions'] = 'Define catquiz dimensions';
-$string['dimensions:information'] = 'Define dimensions: {$a->link}';
-$string['dimensionsname_exists'] = 'The name is already being used';
-$string['cachedef_dimensions'] = 'Caches the dimensions of catquiz';
-$string['catdimensions'] = 'Dimensions to be tested';
-$string['nameexists'] = 'The name of the dimension already exists';
-$string['createnewdimension'] = 'Create new dimension';
-$string['parent'] = 'Parent dimension - None if top level dimension';
-$string['managedimension'] = 'Manage dimension';
-$string['createdimension'] = 'Create your first catquiz dimension!';
+$string['catscales'] = 'Define catquiz catscales';
+$string['catscales:information'] = 'Define catscales: {$a->link}';
+$string['catscalesname_exists'] = 'The name is already being used';
+$string['cachedef_catscales'] = 'Caches the catscales of catquiz';
+$string['catcatscales'] = 'Catscales to be tested';
+$string['nameexists'] = 'The name of the catscale already exists';
+$string['createnewcatscale'] = 'Create new catscale';
+$string['parent'] = 'Parent catscale - None if top level catscale';
+$string['managecatscale'] = 'Manage catscale';
+$string['createcatscale'] = 'Create your first catquiz catscale!';
 // Buttons.
 $string['subscribe'] = 'Subscribe';
 $string['subscribed'] = 'Subscribed';
 
 // Events.
-$string['userupdateddimension'] = 'User with id {$a->userid} updated dimension with id {$a->objectid}';
+$string['userupdatedcatscale'] = 'User with id {$a->userid} updated catscale with id {$a->objectid}';
 
 // Message.
-$string['messageprovider:dimensionupdate'] = 'Notification of dimension update';
-$string['dimensionupdatedtitle'] = 'A dimension was updated';
-$string['dimensionupdatedbody'] = 'A dimension was updated. TODO: more description.';
+$string['messageprovider:catscaleupdate'] = 'Notification of catscale update';
+$string['catscaleupdatedtitle'] = 'A catscale was updated';
+$string['catscaleupdatedbody'] = 'A catscale was updated. TODO: more description.';
 
 // access.php.
 $string['catquiz:canmanage'] = 'Is allowed to manage Catquiz plugin';
-$string['catquiz:subscribedimensions'] = 'Is allowed to subscribe to Catquiz dimensions';
-$string['catquiz:manage_dimensions'] = 'Is allowed to maange Catquiz dimensions';
+$string['catquiz:subscribecatscales'] = 'Is allowed to subscribe to Catquiz catscales';
+$string['catquiz:manage_catscales'] = 'Is allowed to maange Catquiz catscales';
 
 // Role.
 $string['catquizroledescription'] = 'Catquiz Manager';
 
 // Navbar.
-$string['managedimensions'] = 'Manage Dimensions';
+$string['managecatscales'] = 'Manage CAT Scales';
 $string['test'] = 'Test Subscription';

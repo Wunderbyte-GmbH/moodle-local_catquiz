@@ -43,20 +43,20 @@ $services = array(
 
 
 $functions = array(
-        'local_catquiz_delete_dimension' => array(
-                'classname' => 'local_catquiz\external\delete_dimension',
+        'local_catquiz_delete_catscale' => array(
+                'classname' => 'local_catquiz\external\delete_catscale',
                 'classpath' => '',
-                'description' => 'Delete a dimension',
+                'description' => 'Delete a catscale',
                 'type' => 'write',
-                'capabilities' => 'local/catquiz:manage_dimensions',
+                'capabilities' => 'local/catquiz:manage_catscales',
                 'ajax' => 1,
         ),
-        'local_catquiz_create_dimension' => array(
-                'classname' => 'local_catquiz\external\manage_dimension',
+        'local_catquiz_create_catscale' => array(
+                'classname' => 'local_catquiz\external\manage_catscale',
                 'classpath' => '',
-                'description' => 'Manage or create a dimension',
+                'description' => 'Manage or create a catscale',
                 'type' => 'write',
-                'capabilities' => 'local/catquiz:manage_dimensions',
+                'capabilities' => 'local/catquiz:manage_catscales',
                 'ajax' => 1,
         ),
         'local_catquiz_start_new_attempt' => array(

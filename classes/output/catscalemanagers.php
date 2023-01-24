@@ -35,17 +35,17 @@ use templatable;
 use renderable;
 
 /**
- * Renderable class for the dimensionmanagers
+ * Renderable class for the catscalemanagers
  *
  * @package    local_catquiz
  * @copyright  2023 Wunderbyte GmbH
  * @author     David Bogner
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class dimensionmanagers implements renderable, templatable {
+class catscalemanagers implements renderable, templatable {
 
-    /** @var array of dimensionmanagers */
-    public array $dimensionmanagers = [];
+    /** @var array of catscalemanagers */
+    public array $catscalemanagers = [];
 
     /**
      * Either returns one tree or treearray for every parentnode
@@ -57,10 +57,10 @@ class dimensionmanagers implements renderable, templatable {
     public function __construct() {
 
         $context = context_system::instance();
-        $users = get_users_by_capability($context, 'local/catquiz:manage_dimensions');
+        $users = get_users_by_capability($context, 'local/catquiz:manage_catscales');
 
         foreach ($users as $user) {
-            $this->dimensionmanagers[] = [
+            $this->catscalemanagers[] = [
                 'firstname' => $user->firstname,
                 'lastname' => $user->lastname,
                 'email' => $user->email,
@@ -74,14 +74,14 @@ class dimensionmanagers implements renderable, templatable {
      * @return void
      */
     public function return_as_array() {
-        return $this->dimensionmanagers;
+        return $this->catscalemanagers;
     }
 
     /**
-     * Return the item tree of all dimensions.
+     * Return the item tree of all catscales.
      * @return array
      */
     public function export_for_template(\renderer_base $output): array {
-        return $this->dimensionmanagers;
+        return $this->catscalemanagers;
     }
 }

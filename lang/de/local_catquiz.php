@@ -34,36 +34,36 @@ $string['selectmodel'] = 'Wähle ein Modell';
 $string['model'] = 'Modell';
 $string['modeldeactivated'] = 'Deaktiviere CAT engine';
 $string['usecatquiz'] = 'Verwende die Catquiz Engine für dieses Quiz.';
-$string['dimensions'] = 'CAT quiz Dimnensionen verwalten';
-$string['dimensions:information'] = 'Verwalte CAT Test Dimensionen: {$a->link}';
-$string['dimensionsname_exists'] = 'Der Name wird bereits verwendet';
-$string['cachedef_dimensions'] = 'Caches the dimensions of catquiz';
-$string['catdimensions'] = 'Dimensionen für den Test';
-$string['nameexists'] = 'Der Name der Dimension wurde bereits verwendet';
-$string['createnewdimension'] = 'Neue Dimension erstellen';
-$string['parent'] = 'Übergeordnete Dimension - keine Auswahl falls Top-Level Dimension';
-$string['managedimension'] = 'Dimension verwalten';
-$string['createdimension'] = 'Erstellen Sie die erste CAT-Quiz Dimension';
+$string['catscales'] = 'CAT quiz Dimnensionen verwalten';
+$string['catscales:information'] = 'Verwalte CAT Test Skalen: {$a->link}';
+$string['catscalesname_exists'] = 'Der Name wird bereits verwendet';
+$string['cachedef_catscales'] = 'Caches the catscales of catquiz';
+$string['catcatscales'] = 'CAT Skalen für den Test';
+$string['nameexists'] = 'Der Name der CAT Skala wurde bereits verwendet';
+$string['createnewcatscale'] = 'Neue CAT Skala erstellen';
+$string['parent'] = 'Übergeordnete CAT Skala - keine Auswahl falls Top-Level CAT Skala';
+$string['managecatscale'] = 'CAT Skalen verwalten';
+$string['createcatscale'] = 'Erstellen Sie die erste CAT Skala';
 // Buttons.
 $string['subscribe'] = 'Abonniere';
 $string['subscribed'] = 'Abonniert';
 
 // Events.
-$string['userupdateddimension'] = 'Nutzerin mit der Id {$a->userid} hat die Dimension mit der Id {$a->objectid} aktualisiert.';
+$string['userupdatedcatscale'] = 'Nutzerin mit der Id {$a->userid} hat die CAT Skala mit der Id {$a->objectid} aktualisiert.';
 
 // Message.
-$string['messageprovider:dimensionupdate'] = 'Benachrichtung über eine Aktualisierung einer Dimension.';
-$string['dimensionupdatedtitle'] = 'Eine Dimension wurde aktualisiert';
-$string['dimensionupdatedbody'] = 'Eine Dimension wurde aktualisiert. TODO: Mehr Details.';
+$string['messageprovider:catscaleupdate'] = 'Benachrichtung über eine Aktualisierung einer CAT Skala.';
+$string['catscaleupdatedtitle'] = 'Eine CAT Skala wurde aktualisiert';
+$string['catscaleupdatedbody'] = 'Eine CAT Skala wurde aktualisiert. TODO: Mehr Details.';
 
 // Access.
 $string['catquiz:canmanage'] = 'Darf Catquiz Plugin verwalten';
-$string['catquiz:subscribedimensions'] = 'Darf Catquiz Dimensionen abonnieren';
-$string['catquiz:manage_dimensions'] = 'Darf Catquiz Dimensionen verwalten';
+$string['catquiz:subscribecatscales'] = 'Darf CAT Skalen abonnieren';
+$string['catquiz:manage_catscales'] = 'Darf CAT Skalen verwalten';
 
 // Role.
 $string['catquizroledescription'] = 'Catquiz VerwalterIn';
 
 // Navbar.
-$string['managedimensions'] = 'Verwalte Dimensionen';
+$string['managecatscales'] = 'Verwalte Skalen';
 $string['test'] = 'Teste Abos';

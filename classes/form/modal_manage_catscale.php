@@ -25,7 +25,7 @@ use context;
 use context_system;
 use core_form\dynamic_form;
 use local_catquiz\data\dataapi;
-use local_catquiz\data\dimension_structure;
+use local_catquiz\data\catscale_structure;
 use moodle_url;
 use stdClass;
 
@@ -36,7 +36,7 @@ use stdClass;
  * @author    David Bogner
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class modal_manage_dimension extends dynamic_form {
+class modal_manage_catscale extends dynamic_form {
 
     /**
      * {@inheritdoc}
@@ -45,26 +45,26 @@ class modal_manage_dimension extends dynamic_form {
     public function definition() {
         $mform = $this->_form;
 
-        $mform->addElement('header', 'create_dimension', get_string('createnewdimension', 'local_catquiz'));
+        $mform->addElement('header', 'create_catscale', get_string('createnewcatscale', 'local_catquiz'));
 
-        // Add a text field for the dimension name
+        // Add a text field for the catscale name
         $mform->addElement('text', 'name', get_string('name'));
         $mform->setType('name', PARAM_TEXT);
         $mform->addRule('name', get_string('required'), 'required', null, 'client');
 
-        // Add a textarea field for the dimension description
+        // Add a textarea field for the catscale description
         $mform->addElement('textarea', 'description', get_string('description'), 'wrap="virtual" rows="5" cols="50"');
         $mform->setType('description', PARAM_CLEANHTML);
 
-        // Add a textarea field for the dimension description
+        // Add a textarea field for the catscale description
         $mform->addElement('hidden', 'id', '');
         $mform->setType('id', PARAM_INT);
 
         // Add a select field for the parent ID
         $options = array('0' => get_string('none'));
-        $dimensions = dataapi::get_all_dimensions();
-        foreach ($dimensions as $dimension) {
-            $options[$dimension->id] = $dimension->name;
+        $catscales = dataapi::get_all_catscales();
+        foreach ($catscales as $catscale) {
+            $options[$catscale->id] = $catscale->name;
         }
         $mform->addElement('autocomplete', 'parentid', get_string('parent', 'local_catquiz'), $options);
         $mform->setType('parentid', PARAM_INT);
@@ -76,7 +76,7 @@ class modal_manage_dimension extends dynamic_form {
      * @return void
      */
     protected function check_access_for_dynamic_submission(): void {
-        require_capability('local/catquiz:manage_dimensions', $this->get_context_for_dynamic_submission());
+        require_capability('local/catquiz:manage_catscales', $this->get_context_for_dynamic_submission());
     }
 
     /**
@@ -92,14 +92,14 @@ class modal_manage_dimension extends dynamic_form {
         $data = $this->get_data();
         $data->timecreated = time();
         $data->timemodified = time();
-        $dimension = new dimension_structure((array) $data);
+        $catscale = new catscale_structure((array) $data);
         if ($data->id > 0) {
-            dataapi::update_dimension($dimension);
-            $dimensionid = $data->id;
+            dataapi::update_catscale($catscale);
+            $catscaleid = $data->id;
         } else {
-            $dimensionid = dataapi::create_dimension($dimension);
+            $catscaleid = dataapi::create_catscale($catscale);
         }
-        $data->id = $dimensionid;
+        $data->id = $catscaleid;
         return $data;
     }
 
@@ -156,7 +156,7 @@ class modal_manage_dimension extends dynamic_form {
     public function validation($data, $files): array {
         $errors = array();
         if (dataapi::name_exists($data['name']) && $data['id'] === 0) {
-            $errors['name'] = get_string('dimensionsname_exists', 'local_catquiz');
+            $errors['name'] = get_string('catscalesname_exists', 'local_catquiz');
         }
         return $errors;
     }
