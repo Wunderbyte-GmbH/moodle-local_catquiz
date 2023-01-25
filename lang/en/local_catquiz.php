@@ -57,7 +57,7 @@ $string['messageprovider:catscaleupdate'] = 'Notification of catscale update';
 $string['catscaleupdatedtitle'] = 'A catscale was updated';
 $string['catscaleupdatedbody'] = 'A catscale was updated. TODO: more description.';
 
-// access.php.
+// Access.php.
 $string['catquiz:canmanage'] = 'Is allowed to manage Catquiz plugin';
 $string['catquiz:subscribecatscales'] = 'Is allowed to subscribe to Catquiz catscales';
 $string['catquiz:manage_catscales'] = 'Is allowed to maange Catquiz catscales';
@@ -68,3 +68,16 @@ $string['catquizroledescription'] = 'Catquiz Manager';
 // Navbar.
 $string['managecatscales'] = 'Manage CAT Scales';
 $string['test'] = 'Test Subscription';
+
+// Assign testitems to catscale page.
+$string['assigntestitemstocatscales'] = "Assign testitem to CAT scale";
+$string['assign'] = "Assign";
+$string['questioncategories'] = 'Question category';
+$string['questiontype'] = 'Question type';
+
+// Email Templates.
+$string['notificationcatscalechange'] = 'Hello {$a->firstname} {$a->lastname},
+CAT scales have been changed on the Moodle platform {$a->instancename}.
+This email informs you as the CAT Manager* responsible for those CAT scales of these changes . {$a->editorname} made the following changes to the CAT scale "{$a->catscalename}":
+    {$a->changedescription}
+You can review the current state here: {$a->linkonscale}';

@@ -21,20 +21,31 @@
     Context variables required for this template:
     Example context (json):
     {
-
+        'id': 1,
+        'parentid': 0,
+        'description': 'xyz',
+        'name': 'Mathematics'
+        'viewlink': 'http://localhost:8000/local/catquiz/edit_catscale.php?id=1',
+        'children': [
+            'id': 1,
+            'description': 'xyz',
+            'name': 'Mathematics'
+            'viewlink': 'http://localhost:8000/local/catquiz/edit_catscale.php?id=1',
+            children: []
+        ]
     }
 
 }}
 <ul class="pt-2 mt-0 mb-0">
         <li class="list-group-item pr-0" data-id="{{id}}" data-description="{{description}}" data-parentid="{{parentid}}" data-name="{{name}}">
             <div class="pull-right">
-                <a data-action="view" href="#" class="view-catscale btn btn--plain btn--smaller btn-catscales">
+                <a data-action="view" href="{{{viewlink}}}" class="view-catscale btn btn--plain btn--smaller btn-catscales">
                     <i class="fa fa-edit"></i>
                     {{#str}} view, moodle {{/str}}</a>
                 <a data-action="edit" href="#" class="manage-catscale btn btn--plain btn--smaller btn-catscales">
                     <i class="fa fa-edit"></i>
                     {{#str}} edit, moodle {{/str}}</a>
-                <a data-action="delete" href="#" class="delete-catscale btn btn--plain btn--smaller btn-catscales">
+                <a data-action="delete" href="#" class="manage-catscale btn btn--plain btn--smaller btn-catscales">
                     <i class="fa fa fa-trash"></i>
                     {{#str}} delete, moodle {{/str}}</a>
                 <a data-action="create" href="#" class="manage-catscale btn btn--plain btn--smaller btn-catscales">

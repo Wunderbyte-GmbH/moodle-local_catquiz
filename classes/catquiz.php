@@ -25,8 +25,6 @@
 
 namespace local_catquiz;
 
-defined('MOODLE_INTERNAL') || die();
-
 /**
  * Class catquiz
  *
@@ -90,5 +88,25 @@ class catquiz {
         return [
             'questionid' => $questionid
         ];
+    }
+
+    /**
+     * Returns the sql to get all the questions wanted.
+     * @param array $where
+     * @param array $filter
+     * @return void
+     */
+    public static function return_sql_for_questions(array $where = [], array $filter = []) {
+        $select = '*';
+        $from = "( SELECT q.id, q.name, q.questiontext, q.qtype, qc.name as categoryname
+            FROM {question} q
+                JOIN {question_versions} qv ON q.id=qv.questionid
+                JOIN {question_bank_entries} qbe ON qv.questionbankentryid=qbe.id
+                JOIN {question_categories} qc ON qc.id=qbe.questioncategoryid
+            ) as s1";
+        $where = '1=1';
+        $filter = '';
+
+        return [$select, $from, $where, $filter];
     }
 }

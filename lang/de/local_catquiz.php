@@ -68,3 +68,16 @@ $string['catquizroledescription'] = 'Catquiz VerwalterIn';
 // Navbar.
 $string['managecatscales'] = 'Verwalte Skalen';
 $string['test'] = 'Teste Abos';
+
+// Assign testitems to catscale page.
+$string['assigntestitemstocatscales'] = "Weise den CAT Skalen Fragen zu";
+$string['assign'] = "Ordne zu";
+$string['questioncategories'] = 'Fragekategorien';
+$string['questiontype'] = 'Fragentyp';
+
+// Email Templates.
+$string['notificationcatscalechange'] = 'Hallo {$a->firstname} {$a->lastname},
+CAT Skalen wurden verändert auf der Moolde Plattform {$a->instancename}.
+Dieses e-Mail informiert Sie als CAT Manager* verantwortlich für dieses Skala. {$a->editorname} hat die folgenden Änderungen an der Skala "{$a->catscalename}" vorgenommen.":
+    {$a->changedescription}
+Sie können den aktuellen Stand hier überprüfen. {$a->linkonscale}';
