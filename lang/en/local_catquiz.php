@@ -44,6 +44,7 @@ $string['createnewcatscale'] = 'Create new catscale';
 $string['parent'] = 'Parent catscale - None if top level catscale';
 $string['managecatscale'] = 'Manage catscale';
 $string['createcatscale'] = 'Create your first catquiz catscale!';
+$string['cannotdeletescalewithchildren'] = 'Cannot delete CAT scale with children';
 // Buttons.
 $string['subscribe'] = 'Subscribe';
 $string['subscribed'] = 'Subscribed';

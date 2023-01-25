@@ -66,9 +66,9 @@ class delete_catscale extends external_api {
      *
      * @param int $id
      *
-     * @return bool true
+     * @return array
      */
-    public static function execute(int $id): bool {
+    public static function execute(int $id) {
         $params = self::validate_parameters(self::execute_parameters(), [
             'id' => $id,
         ]);
@@ -90,6 +90,7 @@ class delete_catscale extends external_api {
     public static function execute_returns(): external_single_structure {
         return new external_single_structure(array(
             'success' => new external_value(PARAM_BOOL, 'Successful deletion', VALUE_REQUIRED),
+            'message' => new external_value(PARAM_RAW, 'message if necessary', VALUE_OPTIONAL, ''),
             )
         );
     }

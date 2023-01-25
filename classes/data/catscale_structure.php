@@ -16,6 +16,8 @@
 
 namespace local_catquiz\data;
 
+use moodle_url;
+
 /**
  *
  * Simple data structure reflecting the db table scheme. Should be same as in install.xml.
@@ -40,6 +42,9 @@ class catscale_structure {
     /** @var ?int $parentid */
     public ?int $parentid = null;
 
+    /** @var ?string $viewlink */
+    public ?string $viewlink = null;
+
     /**
      * Constructor for a single catscale data object.
      *
@@ -56,6 +61,13 @@ class catscale_structure {
             $this->timecreated = $data['timecreated'];
             $this->name = $data['name'];
             $this->description = $data['description'];
+
+            $url = new moodle_url('/local/catquiz/edit_catscale.php', [
+                'id' => $data['id']
+            ]);
+
+            // Add the link to the view php.
+            $this->viewlink = $url->out();
         }
     }
 }

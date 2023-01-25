@@ -44,6 +44,7 @@ $string['createnewcatscale'] = 'Neue CAT Skala erstellen';
 $string['parent'] = 'Übergeordnete CAT Skala - keine Auswahl falls Top-Level CAT Skala';
 $string['managecatscale'] = 'CAT Skalen verwalten';
 $string['createcatscale'] = 'Erstellen Sie die erste CAT Skala';
+$string['cannotdeletescalewithchildren'] = 'CAT Skalen mit Unterskalen können nicht gelöscht werden.';
 // Buttons.
 $string['subscribe'] = 'Abonniere';
 $string['subscribed'] = 'Abonniert';

@@ -19,6 +19,7 @@ namespace local_catquiz\data;
 use cache;
 use context_system;
 use local_catquiz\event\catscale_updated;
+use moodle_exception;
 
 /**
  * Get and store data from db.
@@ -71,9 +72,9 @@ class dataapi {
      * Delete a catscale and invalidate cache.
      *
      * @param catscale_structure $catscale
-     * @return bool true
+     * @return array true
      */
-    public static function delete_catscale(int $catscaleid): bool {
+    public static function delete_catscale(int $catscaleid):array {
         global $DB;
         $allcatscales = self::get_all_catscales();
         $catscaleids = [];
@@ -83,13 +84,26 @@ class dataapi {
         if (!in_array($catscaleid, $catscaleids)) {
             $result = $DB->delete_records('local_catquiz_catscales', ['id' => $catscaleid]);
         } else {
-            throw new moodle_exception('can not delete catscale which has children', 'local_catquiz');
+            // throw new moodle_exception('', 'local_catquiz');
+            // Cannot delete catscale which has children.
+            $result = false;
+            $message = get_string('cannotdeletescalewithchildren', 'local_catquiz');
         }
 
         // Invalidate cache. TODO: Instead of invalidating cache, delete the item from the cache.
         $cache = cache::make('local_catquiz', 'catscales');
         $cache->delete('allcatscales');
-        return $result;
+
+        if ($result) {
+            return [
+                'success' => true
+            ];
+        } else {
+            return [
+                'success' => false,
+                'message' => $message,
+            ];
+        }
     }
 
     /**

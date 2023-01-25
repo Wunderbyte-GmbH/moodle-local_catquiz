@@ -21,12 +21,17 @@
 
 import ModalForm from 'core_form/modalform';
 import {get_string as getString} from 'core/str';
-import {call as fetchMany} from 'core/ajax';
+import Ajax from 'core/ajax';
+import {showNotification} from 'local_catquiz/notifications';
 
 /**
  * Add event listener to buttons.
  */
 export const init = () => {
+
+    // eslint-disable-next-line no-console
+    console.log('manage catscale init');
+
     let buttons = document.querySelectorAll('.manage-catscale');
     buttons.forEach(button => {
         button.addEventListener('click', e => {
@@ -85,18 +90,34 @@ function manageCatscale(button) {
     modalForm.show();
 }
 
-const deleteCatscale = (id) => ({
-    methodname: 'local_catquiz_delete_catscale',
-    args: { id: id },
-});
-
+/**
+ *
+ * @param {*} element
+ */
 export const performDeletion = async(element) => {
+
+    // eslint-disable-next-line no-console
+    console.log('performDeletion');
+
     const parentelement = element.closest('.list-group-item');
     const id = parentelement.dataset.id;
-    const response = fetchMany([
-        deleteCatscale(id),
-    ]);
-    window.console.log(response);
-    // Reload window after deleting.
-    window.location.reload();
+    Ajax.call([{
+        methodname: 'local_catquiz_delete_catscale',
+        args: {id: id}
+        ,
+        done: function(res) {
+            // eslint-disable-next-line no-console
+            console.log(res);
+
+            if (res.success) {
+                window.reload();
+            } else {
+                showNotification(res.message, 'danger');
+            }
+        },
+        fail: ex => {
+            // eslint-disable-next-line no-console
+            console.log("ex:" + ex);
+        },
+    }]);
 };
