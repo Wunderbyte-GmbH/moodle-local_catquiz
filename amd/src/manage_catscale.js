@@ -110,7 +110,7 @@ export const performDeletion = async(element) => {
             console.log(res);
 
             if (res.success) {
-                window.reload();
+                window.location.reload();
             } else {
                 showNotification(res.message, 'danger');
             }
