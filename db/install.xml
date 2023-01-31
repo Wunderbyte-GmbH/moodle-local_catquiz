@@ -37,9 +37,6 @@
         <FIELD NAME="componentname" TYPE="char" LENGTH="255" NOTNULL="true" SEQUENCE="false" COMMENT="Name of the component the item belongs to. Usually this is qtype"/>
         <FIELD NAME="componentid" TYPE="int" LENGTH="10" NOTNULL="false" DEFAULT="0" SEQUENCE="false" />
         <FIELD NAME="catscaleid" TYPE="int" LENGTH="10" NOTNULL="false" DEFAULT="0" SEQUENCE="false" />
-        <FIELD NAME="difficulty" TYPE="int" LENGTH="3" NOTNULL="false" DEFAULT="0" SEQUENCE="false" />
-        <FIELD NAME="discrimination" TYPE="int" LENGTH="3" NOTNULL="false" DEFAULT="0" SEQUENCE="false" />
-        <FIELD NAME="testmodel" TYPE="int" LENGTH="2" NOTNULL="false" SEQUENCE="false" COMMENT="id of the parent catscale, null if this is a top-level catscale"/>
         <FIELD NAME="lastupdated" TYPE="int" LENGTH="2" NOTNULL="false" SEQUENCE="false" COMMENT="The last time difficulty, etc. have been updated."/>
       </FIELDS>
       <KEYS>
