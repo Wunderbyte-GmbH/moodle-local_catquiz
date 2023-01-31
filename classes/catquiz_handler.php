@@ -83,14 +83,19 @@ class catquiz_handler {
 
         // Question categories or tags to use for this quiz.
 
-        $areas = \local_catquiz\data\dataapi::get_all_catscales();
+        $catscales = \local_catquiz\data\dataapi::get_all_catscales();
         $options = array(
             'multiple' => true,
             'noselectionstring' => get_string('allareas', 'search'),
         );
-        $mform->addElement('autocomplete', 'catcatscales', get_string('catcatscales', 'local_catquiz'), $areas, $options);
-        $mform->addHelpButton('catquestionpool', 'questionpool', 'adaptivequiz');
-        $mform->addRule('catquestionpool', null, 'required', null, 'client');
+
+        $select = [];
+        foreach ($catscales as $catscale) {
+            $select[$catscale->id] = $catscale->name;
+        }
+        $mform->addElement('autocomplete', 'catcatscales', get_string('catcatscales', 'local_catquiz'), $select, $options);
+        // $mform->addHelpButton('catquestionpool', 'questionpool', 'adaptivequiz');
+        // $mform->addRule('catquestionpool', null, 'required', null, 'client');
     }
 
     /**
