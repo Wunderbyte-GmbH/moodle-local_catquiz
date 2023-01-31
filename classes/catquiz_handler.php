@@ -25,6 +25,7 @@
 
 namespace local_catquiz;
 
+use core_plugin_manager;
 use moodle_exception;
 use MoodleQuickForm;
 use stdClass;
@@ -61,12 +62,12 @@ class catquiz_handler {
      */
     public static function instance_form_definition(MoodleQuickForm $mform, \context $context) {
 
-        $modelarray = [
-            self::DEACTIVATED_MODEL => get_string('modeldeactivated', 'local_catquiz'),
-            self::RASCH_MODEL => get_string('model', 'local_catquiz') . ' Rasch',
-            self::AI_MODEL => get_string('model', 'local_catquiz') . ' AI',
-            4 => get_string('model', 'local_catquiz') . ' not used yet',
-        ];
+        $pm = core_plugin_manager::instance();
+        $models = $pm->get_plugins_of_type('catmodel');
+        $modelarray = [];
+        foreach ($models as $model) {
+            $modelarray[$model->name] = $model->displayname;
+        }
 
         // Add a special header for catquiz.
         $mform->addElement('header', 'catquiz_header',
@@ -79,7 +80,7 @@ class catquiz_handler {
         // Choose a model for this instance.
         $mform->addElement('select', 'catquiz_model_select',
                 get_string('selectmodel', 'local_catquiz'), $modelarray);
-        $mform->disabledIf('catquiz_model_select', 'catquiz_usecatquiz', 'neq', 1);
+        $mform->hideIf('catquiz_model_select', 'catquiz_usecatquiz', 'neq', 1);
 
         // Question categories or tags to use for this quiz.
 
@@ -93,9 +94,43 @@ class catquiz_handler {
         foreach ($catscales as $catscale) {
             $select[$catscale->id] = $catscale->name;
         }
-        $mform->addElement('autocomplete', 'catcatscales', get_string('catcatscales', 'local_catquiz'), $select, $options);
-        // $mform->addHelpButton('catquestionpool', 'questionpool', 'adaptivequiz');
-        // $mform->addRule('catquestionpool', null, 'required', null, 'client');
+        $mform->addElement('autocomplete', 'catquiz_catcatscales', get_string('catcatscales', 'local_catquiz'), $select, $options);
+        $mform->addHelpButton('catquiz_catcatscales', 'catcatscales', 'local_catquiz');
+        $mform->hideIf('catquiz_catcatscales', 'catquiz_usecatquiz', 'neq', 1);
+
+        $mform->addElement('text', 'catquiz_passinglevel', get_string('passinglevel', 'local_catquiz'));
+        $mform->addHelpButton('catquiz_passinglevel', 'passinglevel', 'local_catquiz');
+        $mform->setType('catquiz_passinglevel', PARAM_INT);
+        $mform->hideIf('catquiz_passinglevel', 'catquiz_usecatquiz', 'neq', 1);
+
+        // Is it a time paced test?
+        $mform->addElement('advcheckbox', 'catquiz_timepacedtest',
+                get_string('timepacedtest', 'local_catquiz'), null, null, [0, 1]);
+        $mform->hideIf('catquiz_timepacedtest', 'catquiz_usecatquiz', 'neq', 1);
+
+        $mform->addElement('text', 'catquiz_maxtimeperitem', get_string('maxtimeperitem', 'local_catquiz'));
+        // $mform->addHelpButton('catquiz_maxtimeperitem', 'maxtimeperitem', 'local_catquiz');
+        $mform->setType('catquiz_maxtimeperitem', PARAM_INT);
+        $mform->hideIf('catquiz_maxtimeperitem', 'catquiz_timepacedtest', 'neq', 1);
+        $mform->hideIf('catquiz_maxtimeperitem', 'catquiz_usecatquiz', 'neq', 1);
+
+        $mform->addElement('text', 'catquiz_mintimeperitem', get_string('mintimeperitem', 'local_catquiz'));
+        // $mform->addHelpButton('catquiz_mintimeperitem', 'mintimeperitem', 'local_catquiz');
+        $mform->setType('catquiz_mintimeperitem', PARAM_INT);
+        $mform->hideIf('catquiz_mintimeperitem', 'catquiz_timepacedtest', 'neq', 1);
+        $mform->hideIf('catquiz_mintimeperitem', 'catquiz_usecatquiz', 'neq', 1);
+
+        $timeoutoptions = [
+            1 => get_string('timeoutfinishwithresult', 'local_catquiz'),
+            2 => get_string('timeoutabortresult', 'local_catquiz'),
+            3 => get_string('timeoutabortnoresult', 'local_catquiz'),
+        ];
+         // Choose a model for this instance.
+         $mform->addElement('select', 'catquiz_actontimeout',
+            get_string('actontimeout', 'local_catquiz'), $timeoutoptions);
+        $mform->hideIf('catquiz_actontimeout', 'catquiz_timepacedtest', 'neq', 1);
+        $mform->hideIf('catquiz_actontimeout', 'catquiz_usecatquiz', 'neq', 1);
+
     }
 
     /**
