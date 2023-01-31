@@ -22,6 +22,7 @@
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+use local_catquiz\catscale;
 use local_catquiz\event\catscale_updated;
 use local_catquiz\messages;
 
@@ -38,9 +39,12 @@ class local_catquiz_observer {
     public static function catscale_updated(catscale_updated $event) {
 
         $catscaleid = $event->objectid;
+        $userid = $event->userid;
 
         // See which users need to actually be notified.
 
-        messages::catscale_updated($catscaleid);
+        $catscale = catscale::return_catscale_object($catscaleid);
+
+        messages::catscale_updated($catscale, $userid);
     }
 }

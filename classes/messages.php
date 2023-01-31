@@ -26,6 +26,8 @@
 namespace local_catquiz;
 
 use core_user;
+use moodle_url;
+use stdClass;
 
 defined('MOODLE_INTERNAL') || die();
 
@@ -48,6 +50,9 @@ class messages {
      */
     public static function send_message(int $recepientid, string $messagesubject, string $messagetext) {
 
+        global $CFG;
+        require_once($CFG->dirroot . '/user/lib.php');
+
         $users = user_get_users_by_id([$recepientid]);
 
         $user = reset($users);
@@ -69,18 +74,41 @@ class messages {
     /**
      * Notifiy all subscribed users of an update of a catscale.
      *
-     * @param integer $catscaleid
+     * @param stdClass $catscale
      * @return void
      */
-    public static function catscale_updated(int $catscaleid) {
+    public static function catscale_updated(stdClass $catscale, int $usermodified) {
 
-        $userids = subscription::get_subscribed_user_ids($catscaleid, 'catscale');
+        global $DB, $CFG;
 
-        foreach ($userids as $userid) {
+        require_once($CFG->dirroot . '/user/lib.php');
+
+        $userids = subscription::get_subscribed_user_ids($catscale->id, 'catscale');
+
+        $urltoscale = new moodle_url('/local/catquiz/edit_catscale.php',
+            ['id' => $catscale->id]);
+        $urltoscale = $urltoscale->out();
+
+        $usermodified = $DB->get_record('user', ['id' => $usermodified]);
+
+        $users = user_get_users_by_id($userids);
+
+        foreach ($users as $user) {
+
+            $data = (object)[
+                'firstname' => $user->firstname,
+                'lastname' => $user->lastname,
+                'editorname' => $usermodified->firstname . ' ' . $usermodified->lastname,
+                'instancename' => '<a href="' . $CFG->wwwroot . '">' . $CFG->wwwroot . '</a>',
+                'catscalename' => $catscale->name,
+                'linkonscale' => '<a href="' . $urltoscale . '">' . $urltoscale . '</a>',
+                'changedescription' => '',
+            ];
+
             self::send_message(
-                $userid,
+                $user->id,
                 get_string('catscaleupdatedtitle', 'local_catquiz'),
-                get_string('catscaleupdatedbody', 'local_catquiz'));
+                get_string('notificationcatscalechange', 'local_catquiz', $data));
         }
     }
 
