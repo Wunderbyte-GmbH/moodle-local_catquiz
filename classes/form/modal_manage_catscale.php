@@ -68,6 +68,18 @@ class modal_manage_catscale extends dynamic_form {
         }
         $mform->addElement('autocomplete', 'parentid', get_string('parent', 'local_catquiz'), $options);
         $mform->setType('parentid', PARAM_INT);
+
+        $group[] = $mform->createElement('text', 'catquiz_minscalevalue', get_string('minscalevalue', 'local_catquiz'));
+        // $mform->addHelpButton('catquiz_mintimeperitem', 'mintimeperitem', 'local_catquiz');
+
+        $group[] = $mform->createElement('text', 'catquiz_maxscalevalue', get_string('maxscalevalue', 'local_catquiz'));
+        // $mform->addHelpButton('catquiz_mintimeperitem', 'mintimeperitem', 'local_catquiz');
+
+        $mform->addGroup($group, 'minmaxgroup', get_string('minmaxgroup', 'local_catquiz'));
+        $mform->setDefault('catquiz_maxscalevalue', 3);
+        $mform->setType('catquiz_maxscalevalue', PARAM_FLOAT);
+        $mform->setDefault('catquiz_minscalevalue', -3);
+        $mform->setType('catquiz_minscalevalue', PARAM_FLOAT);
     }
 
     /**
@@ -158,6 +170,18 @@ class modal_manage_catscale extends dynamic_form {
         if (dataapi::name_exists($data['name']) && $data['id'] === 0) {
             $errors['name'] = get_string('catscalesname_exists', 'local_catquiz');
         }
+        if (isset($data["minmaxgroup"]["catquiz_minscalevalue"])) {
+            if ($data["minmaxgroup"]["catquiz_minscalevalue"] > $data["minmaxgroup"]["catquiz_maxscalevalue"]) {
+                $errors['minmaxgroup'] = get_string('errorminscalevalue', 'local_catquiz');
+            }
+            if (!is_numeric($data["minmaxgroup"]["catquiz_minscalevalue"])) {
+                $errors["minmaxgroup"] = get_string('errorhastobefloat', 'local_catquiz');
+            }
+            if (!is_numeric($data["minmaxgroup"]["catquiz_maxscalevalue"])) {
+                $errors["minmaxgroup"] = get_string('errorhastobefloat', 'local_catquiz');
+            }
+        }
+
         return $errors;
     }
 
