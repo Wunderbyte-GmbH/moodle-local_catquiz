@@ -39,12 +39,32 @@ $string['catscales:information'] = 'Define catscales: {$a->link}';
 $string['catscalesname_exists'] = 'The name is already being used';
 $string['cachedef_catscales'] = 'Caches the catscales of catquiz';
 $string['catcatscales'] = 'Catscales to be tested';
+$string['catcatscales_help'] = 'Every catscales has testitems (questions) which will be used in the test.';
 $string['nameexists'] = 'The name of the catscale already exists';
 $string['createnewcatscale'] = 'Create new catscale';
 $string['parent'] = 'Parent catscale - None if top level catscale';
 $string['managecatscale'] = 'Manage catscale';
 $string['createcatscale'] = 'Create your first catquiz catscale!';
 $string['cannotdeletescalewithchildren'] = 'Cannot delete CAT scale with children';
+$string['passinglevel'] = 'Passing level in %';
+$string['passinglevel_help'] = 'There is a level of personal competency that can be set for the test.';
+
+$string['timepacedtest'] = 'Timepaced test';
+$string['maxtime'] = 'Max time for test';
+$string['maxtimeperitem'] = 'Max time per question in seconds';
+$string['mintimeperitem'] = 'Min time per question in seconds';
+$string['actontimeout'] = 'Action on timeout';
+
+$string['timeoutabortnoresult'] = 'Test aborted without result.';
+$string['timeoutabortresult'] = 'Test aborted with result.';
+$string['timeoutfinishwithresult'] = 'Test aborted after finished current question.';
+
+$string['minmaxgroup'] = 'Add min and max value as decimal';
+$string['minscalevalue'] = 'Min value';
+$string['maxscalevalue'] = 'Max value';
+$string['errorminscalevalue'] = 'Min value has to be smaller than max value';
+$string['errorhastobefloat'] = 'Has to be a deciamal';
+
 // Buttons.
 $string['subscribe'] = 'Subscribe';
 $string['subscribed'] = 'Subscribed';
@@ -74,6 +94,17 @@ $string['assigntestitemstocatscales'] = "Assign testitem to CAT scale";
 $string['assign'] = "Assign";
 $string['questioncategories'] = 'Question category';
 $string['questiontype'] = 'Question type';
+$string['addtestitemtitle'] = 'Add test items to CAT scales';
+$string['addtestitembody'] = 'Do you want to add the following test items to the current CAT scale? <br> {$a->data}';
+$string['addtestitemsubmit'] = 'Add';
+$string['addtestitem'] = 'Add test items';
+
+$string['removetestitemtitle'] = 'Remove test item from CAT scale';
+$string['removetestitembody'] = 'Do you want to remove the following test items from the current CAT scale? <br> {$a->data}';
+$string['removetestitemsubmit'] = 'Remove';
+$string['removetestitem'] = 'Remove test items';
+
+$string['testitems'] = 'Test items';
 
 // Email Templates.
 $string['notificationcatscalechange'] = 'Hello {$a->firstname} {$a->lastname},

@@ -24,6 +24,7 @@
 
 use local_catquiz\catquiz;
 use local_catquiz\event\catscale_updated;
+use local_catquiz\output\catscaledashboard;
 use local_catquiz\subscription;
 use local_catquiz\table\testitems_table;
 
@@ -40,53 +41,16 @@ require_capability('local/catquiz:manage_catscales', $context);
 
 $PAGE->set_url(new moodle_url('/local/catquiz/test.php', array()));
 
+$catscaleid = required_param('id', PARAM_INT);
+
 $title = get_string('assigntestitemstocatscales', 'local_catquiz');
 $PAGE->set_title($title);
 $PAGE->set_heading($title);
 
 echo $OUTPUT->header();
 
-
-$data = [
-    'catscaleid' => 1,
-    'containerselector' => 'wunderbyte_table_container_catscaleedit',
-    'inputclass' => 'testitem-checkbox',
-];
-echo $OUTPUT->render_from_template('local_catquiz/button_assign', $data);
-
-$table = new testitems_table('catscaleedit');
-
-list($select, $from, $where, $filter) = catquiz::return_sql_for_questions();
-
-$table->set_filter_sql($select, $from, $where, $filter);
-
-$table->define_columns(['action', 'id', 'name', 'questiontext', 'qtype', 'categoryname']);
-
-$table->define_filtercolumns(['id', 'categoryname' => [
-    'localizedname' => get_string('questioncategories', 'local_catquiz')
-], 'qtype' => [
-    'localizedname' => get_string('questiontype', 'local_catquiz'),
-    'ddimageortext' => get_string('pluginname', 'qtype_ddimageortext'),
-    'essay' => get_string('pluginname', 'qtype_essay'),
-    'gapselect' => get_string('pluginname', 'qtype_gapselect'),
-    'multianswer' => get_string('pluginname', 'qtype_multianswer'),
-    'multichoice' => get_string('pluginname', 'qtype_multichoice'),
-    'numerical' => get_string('pluginname', 'qtype_numerical'),
-    'shortanswer' => get_string('pluginname', 'qtype_shortanswer'),
-    'truefalse' => get_string('pluginname', 'qtype_truefalse'),
-]]);
-$table->define_fulltextsearchcolumns(['id', 'name', 'questiontext', 'qtype']);
-$table->define_sortablecolumns(['id', 'name', 'questiontext', 'qtype']);
-
-$table->tabletemplate = 'local_wunderbyte_table/twtable_list';
-
-$table->pageable(true);
-
-$table->stickyheader = false;
-$table->showcountlabel = true;
-$table->showdownloadbutton = true;
-$table->showreloadbutton = true;
-
-$table->out(20, true);
+$data = new catscaledashboard($catscaleid);
+$output = $PAGE->get_renderer('local_catquiz');
+echo $output->render_catscaledashboard($data);
 
 echo $OUTPUT->footer();

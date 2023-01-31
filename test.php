@@ -49,7 +49,7 @@ echo 'my test';
 $userid = $USER->id;
 
 $event = catscale_updated::create([
-    'objectid' => 79,
+    'objectid' => 1,
     'context' => $context,
     'userid' => $userid, // The user who did cancel.
 ]);
@@ -58,7 +58,7 @@ $event->trigger();
 $subscribed = subscription::return_subscription_state($userid, 'catscale', 79);
 
 $data = [
-    'id' => 79,
+    'id' => 1,
     'area' => 'catscale'];
 
 if ($subscribed) {

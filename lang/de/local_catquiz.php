@@ -39,12 +39,32 @@ $string['catscales:information'] = 'Verwalte CAT Test Skalen: {$a->link}';
 $string['catscalesname_exists'] = 'Der Name wird bereits verwendet';
 $string['cachedef_catscales'] = 'Caches the catscales of catquiz';
 $string['catcatscales'] = 'CAT Skalen für den Test';
+$string['catcatscales_help'] = 'Jede CAT Skala hat Testitems (Fragen) die im Test verwendet werden.';
 $string['nameexists'] = 'Der Name der CAT Skala wurde bereits verwendet';
 $string['createnewcatscale'] = 'Neue CAT Skala erstellen';
 $string['parent'] = 'Übergeordnete CAT Skala - keine Auswahl falls Top-Level CAT Skala';
 $string['managecatscale'] = 'CAT Skalen verwalten';
 $string['createcatscale'] = 'Erstellen Sie die erste CAT Skala';
 $string['cannotdeletescalewithchildren'] = 'CAT Skalen mit Unterskalen können nicht gelöscht werden.';
+$string['passinglevel'] = 'Bestehensgrenze in %';
+$string['passinglevel_help'] = 'Die Bestehensgenze bezieht sich auf die Personenkompetenz und kann für jeden Test individuell gesetzt werden.';
+
+$string['timepacedtest'] = 'Zeitbeschränkungen für den Test aktivieren';
+$string['maxtime'] = 'Maximale Dauer des Tests';
+$string['maxtimeperitem'] = 'Höchstzeit pro Frage in Sekunden';
+$string['mintimeperitem'] = 'Mindestzeit pro Frage in Sekunden';
+$string['actontimeout'] = 'Aktion nach Ablauf der Zeit';
+
+$string['timeoutabortnoresult'] = 'Test wird sofort beendet und nicht abschließend bewertet';
+$string['timeoutabortresult'] = 'Test wird sofort beendet und abschließend bewertet';
+$string['timeoutfinishwithresult'] = 'Nachfrist: angezeigte Items können beendet werden';
+
+$string['minmaxgroup'] = 'Geben Sie Minimal und Maximal als Dezimalwert ein';
+$string['minscalevalue'] = 'Minimalwert';
+$string['maxscalevalue'] = 'Maximalwert';
+$string['errorminscalevalue'] = 'Der Minimalwert muss kleiner sein als der Maximalwert der Skala';
+$string['errorhastobefloat'] = 'Muss ein Dezimalwert sein';
+
 // Buttons.
 $string['subscribe'] = 'Abonniere';
 $string['subscribed'] = 'Abonniert';
@@ -74,6 +94,17 @@ $string['assigntestitemstocatscales'] = "Weise den CAT Skalen Fragen zu";
 $string['assign'] = "Ordne zu";
 $string['questioncategories'] = 'Fragekategorien';
 $string['questiontype'] = 'Fragentyp';
+$string['addtestitemtitle'] = 'Testitems zu CAT-Skalen hinzufügen';
+$string['addtestitembody'] = 'Wollen Sie folgende Testitems der aktuellen Skale zuorden? <br> {$a->data}';
+$string['addtestitemsubmit'] = 'Hinzufügen';
+$string['addtestitem'] = 'Testitems hinzufügen';
+
+$string['removetestitemtitle'] = 'Testitems von CAT-Skalen entfernen';
+$string['removetestitembody'] = 'Wollen Sie folgende Testitems aus aktuellen Skale entfernen? <br> {$a->data}';
+$string['removetestitemsubmit'] = 'Entfernen';
+$string['removetestitem'] = 'Testitems entfernen';
+
+$string['testitems'] = 'Testitems';
 
 // Email Templates.
 $string['notificationcatscalechange'] = 'Hallo {$a->firstname} {$a->lastname},

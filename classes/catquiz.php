@@ -92,11 +92,14 @@ class catquiz {
 
     /**
      * Returns the sql to get all the questions wanted.
-     * @param array $where
-     * @param array $filter
+     * @param array $wherearray
+     * @param array $filterarray
      * @return void
      */
-    public static function return_sql_for_questions(array $where = [], array $filter = []) {
+    public static function return_sql_for_questions(array $wherearray = [], array $filterarray = []) {
+
+        global $DB;
+
         $select = '*';
         $from = "( SELECT q.id, q.name, q.questiontext, q.qtype, qc.name as categoryname
             FROM {question} q
@@ -104,9 +107,46 @@ class catquiz {
                 JOIN {question_bank_entries} qbe ON qv.questionbankentryid=qbe.id
                 JOIN {question_categories} qc ON qc.id=qbe.questioncategoryid
             ) as s1";
+
         $where = '1=1';
         $filter = '';
 
+        foreach ($wherearray as $key => $value) {
+            $where .= ' AND ' . $DB->sql_equal($key, $value, false, false);
+        }
+
         return [$select, $from, $where, $filter];
+    }
+
+    /**
+     * Returns the sql to get all the questions wanted.
+     * @param int $catscaleid
+     * @param array $wherearray
+     * @param array $filterarray
+     * @return void
+     */
+    public static function return_sql_for_catscalequestions(int $catscaleid, array $wherearray = [], array $filterarray = []) {
+
+        global $DB;
+
+        $params = [];
+        $select = '*';
+        $from = "( SELECT q.id, q.name, q.questiontext, q.qtype, qc.name as categoryname, lci.catscaleid catscaleid
+            FROM {question} q
+                JOIN {question_versions} qv ON q.id=qv.questionid
+                JOIN {question_bank_entries} qbe ON qv.questionbankentryid=qbe.id
+                JOIN {question_categories} qc ON qc.id=qbe.questioncategoryid
+                JOIN {local_catquiz_items} lci ON lci.componentid=q.id AND lci.componentname='question'
+            ) as s1";
+
+        $where = $DB->sql_equal('catscaleid', ':catscaleid', false);;
+        $params['catscaleid'] = $catscaleid;
+        $filter = '';
+
+        foreach ($wherearray as $key => $value) {
+            $where .= ' AND ' . $DB->sql_equal($key, $value, false, false);
+        }
+
+        return [$select, $from, $where, $filter, $params];
     }
 }

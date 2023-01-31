@@ -26,6 +26,7 @@ use coding_exception;
 use context_module;
 use dml_exception;
 use html_writer;
+use local_catquiz\catscale;
 use local_wunderbyte_table\wunderbyte_table;
 use mod_booking\bo_availability\bo_info;
 use mod_booking\booking;
@@ -60,22 +61,64 @@ class testitems_table extends wunderbyte_table {
 
     }
 
+    public function col_questiontext($values) {
+
+        return format_text($values->questiontext, FORMAT_HTML);
+    }
+
     /**
-     * This function is called for each data row to return a checkbox.
-     *
-     * @param object $values Contains object with all the values of record.
-     * @return string $string Return name of the booking option.
-     * @throws dml_exception
+     * Function to handle the action buttons.
+     * @param integer $testitemid
+     * @param string $data
+     * @return array
      */
-    public function col_action($values) {
+    public function addtestitem(int $testitemid, string $data) {
 
-        global $OUTPUT;
+        $jsonobject = json_decode($data);
 
-        $data = [
-            'id' => $values->id,
-            'label' => '',
-            'checkboxclass' => 'testitem-checkbox',
+        $catscaleid = $jsonobject->catscaleid;
+
+        if ($testitemid == -1) {
+            $idarray = explode(',', $jsonobject->checkedids);
+        } else if ($testitemid > 0) {
+            $idarray = [$testitemid];
+        }
+
+        foreach ($idarray as $id) {
+            catscale::add_or_update_testitem_to_scale($catscaleid, $id);
+        }
+
+        return [
+            'success' => 1,
+            'message' => 'Did work',
         ];
-        return $OUTPUT->render_from_template('local_catquiz/checkbox', $data);
+    }
+
+    /**
+     * Function to handle the action buttons.
+     * @param integer $testitemid
+     * @param string $data
+     * @return array
+     */
+    public function removetestitem(int $testitemid, string $data) {
+
+        $jsonobject = json_decode($data);
+
+        $catscaleid = $jsonobject->catscaleid;
+
+        if ($testitemid == -1) {
+            $idarray = explode(',', $jsonobject->checkedids);
+        } else if ($testitemid > 0) {
+            $idarray = [$testitemid];
+        }
+
+        foreach ($idarray as $id) {
+            catscale::remove_testitem_from_scale($catscaleid, $id);
+        }
+
+        return [
+            'success' => 1,
+            'message' => 'Did work',
+        ];
     }
 }
