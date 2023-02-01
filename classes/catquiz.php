@@ -96,7 +96,7 @@ class catquiz {
      * @param array $filterarray
      * @return void
      */
-    public static function return_sql_for_questions(array $wherearray = [], array $filterarray = []) {
+    public static function return_sql_for_addquestions(array $wherearray = [], array $filterarray = []) {
 
         global $DB;
 
@@ -145,6 +145,38 @@ class catquiz {
 
         foreach ($wherearray as $key => $value) {
             $where .= ' AND ' . $DB->sql_equal($key, $value, false, false);
+        }
+
+        return [$select, $from, $where, $filter, $params];
+    }
+
+    /**
+     * Returns the sql to get all the questions wanted.
+     * @param int $catscaleid
+     * @param array $wherearray
+     * @param array $filterarray
+     * @return void
+     */
+    public static function return_sql_for_addcatscalequestions(int $catscaleid, array $wherearray = [], array $filterarray = []) {
+
+        global $DB;
+
+        $params = [];
+        $select = '*';
+        $from = "( SELECT q.id, q.name, q.questiontext, q.qtype, qc.name as categoryname, lci.catscaleid catscaleid
+            FROM {question} q
+                JOIN {question_versions} qv ON q.id=qv.questionid
+                JOIN {question_bank_entries} qbe ON qv.questionbankentryid=qbe.id
+                JOIN {question_categories} qc ON qc.id=qbe.questioncategoryid
+                JOIN {local_catquiz_items} lci ON lci.componentid=q.id AND lci.componentname='question'
+            ) as s1";
+
+        $where = $DB->sql_equal('catscaleid', ':catscaleid', false);;
+        $params['catscaleid'] = $catscaleid;
+        $filter = '';
+
+        foreach ($wherearray as $key => $value) {
+            $where .= ' AND ' . $DB->sql_equal($key, $value, false, false, true);
         }
 
         return [$select, $from, $where, $filter, $params];
