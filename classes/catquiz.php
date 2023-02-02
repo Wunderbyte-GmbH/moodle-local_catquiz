@@ -130,13 +130,13 @@ class catquiz {
         global $DB;
 
         $params = [];
-        $select = '*';
+        $select = ' DISTINCT *';
         $from = "( SELECT q.id, q.name, q.questiontext, q.qtype, qc.name as categoryname, lci.catscaleid catscaleid
             FROM {question} q
                 JOIN {question_versions} qv ON q.id=qv.questionid
                 JOIN {question_bank_entries} qbe ON qv.questionbankentryid=qbe.id
                 JOIN {question_categories} qc ON qc.id=qbe.questioncategoryid
-                JOIN {local_catquiz_items} lci ON lci.componentid=q.id AND lci.componentname='question'
+                LEFT JOIN {local_catquiz_items} lci ON lci.componentid=q.id AND lci.componentname='question'
             ) as s1";
 
         $where = $DB->sql_equal('catscaleid', ':catscaleid', false);;
@@ -162,21 +162,23 @@ class catquiz {
         global $DB;
 
         $params = [];
-        $select = '*';
-        $from = "( SELECT q.id, q.name, q.questiontext, q.qtype, qc.name as categoryname, lci.catscaleid catscaleid
+        $select = 'DISTINCT id, name, questiontext, qtype, categoryname';
+        $from = "( SELECT q.id, q.name, q.questiontext, q.qtype, qc.name as categoryname, " .
+             $DB->sql_group_concat($DB->sql_concat("'-'", 'lci.catscaleid', "'-'")) ." as catscaleids
             FROM {question} q
                 JOIN {question_versions} qv ON q.id=qv.questionid
                 JOIN {question_bank_entries} qbe ON qv.questionbankentryid=qbe.id
                 JOIN {question_categories} qc ON qc.id=qbe.questioncategoryid
-                JOIN {local_catquiz_items} lci ON lci.componentid=q.id AND lci.componentname='question'
+                LEFT JOIN {local_catquiz_items} lci ON lci.componentid=q.id AND lci.componentname='question'
+                GROUP BY q.id
             ) as s1";
 
-        $where = $DB->sql_equal('catscaleid', ':catscaleid', false);;
-        $params['catscaleid'] = $catscaleid;
+        $where = $DB->sql_like('catscaleids', ':catscaleid', false, false, true) . ' OR catscaleids IS NULL ';
+        $params['catscaleid'] = "%-$catscaleid-%";
         $filter = '';
 
         foreach ($wherearray as $key => $value) {
-            $where .= ' AND ' . $DB->sql_equal($key, $value, false, false, true);
+            $where .= ' AND ' . $DB->sql_equal($key, $value, false, false);
         }
 
         return [$select, $from, $where, $filter, $params];

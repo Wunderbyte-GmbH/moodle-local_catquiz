@@ -29,9 +29,9 @@ use core_user;
 use moodle_url;
 use stdClass;
 
-require_once($CFG->dirroot.'/user/lib.php');
-
 defined('MOODLE_INTERNAL') || die();
+
+require_once($CFG->dirroot.'/user/lib.php');
 
 /**
  * Class catquiz

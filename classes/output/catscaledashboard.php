@@ -65,9 +65,9 @@ class catscaledashboard implements renderable, templatable {
 
         $table = new testitems_table('addtestitems');
 
-        list($select, $from, $where, $filter) = catquiz::return_sql_for_addquestions();
+        list($select, $from, $where, $filter, $params) = catquiz::return_sql_for_addcatscalequestions($catscaleid);
 
-        $table->set_filter_sql($select, $from, $where, $filter);
+        $table->set_filter_sql($select, $from, $where, $filter, $params);
 
         $table->define_columns(['id', 'name', 'questiontext', 'qtype', 'categoryname']);
 
