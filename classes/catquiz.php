@@ -170,7 +170,7 @@ class catquiz {
                 JOIN {question_bank_entries} qbe ON qv.questionbankentryid=qbe.id
                 JOIN {question_categories} qc ON qc.id=qbe.questioncategoryid
                 LEFT JOIN {local_catquiz_items} lci ON lci.componentid=q.id AND lci.componentname='question'
-                GROUP BY q.id
+                GROUP BY q.id, q.name, q.questiontext, q.qtype, qc.name
             ) as s1";
 
         $where = $DB->sql_like('catscaleids', ':catscaleid', false, false, true) . ' OR catscaleids IS NULL ';
