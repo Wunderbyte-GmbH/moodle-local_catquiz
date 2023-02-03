@@ -24,26 +24,25 @@ Feature: As an admin I perform basic catquiz actions - create, update, delete, s
     And I press "Catquiz"
     And I follow "Manage CAT Scales"
     And I follow "Create"
-    ## And I set the field "Name" to "Math"
     And I set the following fields to these values:
-      | Name                               | Math |
-      | minmaxgroup[catquiz_minscalevalue] | 5    |
-      | minmaxgroup[catquiz_maxscalevalue] | 15   |
+      | Name                               | Math              |
+      | Description                        | Description: Math |
+      | minmaxgroup[catquiz_minscalevalue] | 5                 |
+      | minmaxgroup[catquiz_maxscalevalue] | 15                |
     And I press "Save changes"
-    ## Then I should see "Math" in the ".grid .list-group-item" "css_element"
     Then I should see "Math" in the "[data-name=\"Math\"]" "css_element"
     And I follow "Subscribe"
     Then I should see "Subscribed" in the ".grid .list-group-item" "css_element"
     And I follow "Edit"
     And the following fields match these values:
-      | Name                               | Math |
-      | minmaxgroup[catquiz_minscalevalue] | 5    |
-      | minmaxgroup[catquiz_maxscalevalue] | 15   |
-    ## And I set the field "Name" to "Mathematics"
+      | Name                               | Math              |
+      | Description                        | Description: Math |
+      | minmaxgroup[catquiz_minscalevalue] | 5                 |
+      | minmaxgroup[catquiz_maxscalevalue] | 15                |
     And I set the following fields to these values:
       | Name                               | Mathematics |
       | minmaxgroup[catquiz_minscalevalue] | 6           |
-      | minmaxgroup[catquiz_maxscalevalue] | 16          |
+      | minmaxgroup[catquiz_maxscalevalue] | 16.5        |
     And I press "Save changes"
     Then I should see "Mathematics" in the "[data-name=\"Mathematics\"]" "css_element"
     And I follow "Subscribed"
@@ -60,7 +59,7 @@ Feature: As an admin I perform basic catquiz actions - create, update, delete, s
     ## And I set the field "Name" to "Mathematics"
     And I set the following fields to these values:
       | Name                               | Mathematics |
-      | minmaxgroup[catquiz_minscalevalue] | 5           |
+      | minmaxgroup[catquiz_minscalevalue] | 5.5         |
       | minmaxgroup[catquiz_maxscalevalue] | 20          |
     And I press "Save changes"
     Then I should see "Mathematics" in the "[data-name=\"Mathematics\"]" "css_element"
@@ -68,7 +67,7 @@ Feature: As an admin I perform basic catquiz actions - create, update, delete, s
     ## And I set the field "Name" to "Arithmetics"
     And I set the following fields to these values:
       | Name                               | Arithmetics |
-      | minmaxgroup[catquiz_minscalevalue] | 6           |
+      | minmaxgroup[catquiz_minscalevalue] | 6.5         |
       | minmaxgroup[catquiz_maxscalevalue] | 10          |
     And I set the field "Parent catscale - None if top level catscale" to "Mathematics"
     And I press "Save changes"
@@ -77,7 +76,7 @@ Feature: As an admin I perform basic catquiz actions - create, update, delete, s
     ## And I set the field "Name" to "Multiplication"
     And I set the following fields to these values:
       | Name                               | Multiplication |
-      | minmaxgroup[catquiz_minscalevalue] | 7              |
+      | minmaxgroup[catquiz_minscalevalue] | 7.5            |
       | minmaxgroup[catquiz_maxscalevalue] | 11             |
     And I set the field "Parent catscale - None if top level catscale" to "Mathematics"
     And I press "Save changes"
@@ -86,7 +85,7 @@ Feature: As an admin I perform basic catquiz actions - create, update, delete, s
     ## And I set the field "Name" to "Geometrie"
     And I set the following fields to these values:
       | Name                               | Geometrie |
-      | minmaxgroup[catquiz_minscalevalue] | 8         |
+      | minmaxgroup[catquiz_minscalevalue] | 8.5       |
       | minmaxgroup[catquiz_maxscalevalue] | 12        |
     And I set the field "Parent catscale - None if top level catscale" to "Mathematics"
     And I press "Save changes"
@@ -96,7 +95,7 @@ Feature: As an admin I perform basic catquiz actions - create, update, delete, s
     And I click on "Edit" "link" in the "[data-name=\"Geometrie\"]" "css_element"
     And the following fields match these values:
       | Name                               | Geometrie |
-      | minmaxgroup[catquiz_minscalevalue] | 8         |
+      | minmaxgroup[catquiz_minscalevalue] | 8.5       |
       | minmaxgroup[catquiz_maxscalevalue] | 12        |
     And I set the field "Name" to "Geometry"
     And I set the field "Parent catscale - None if top level catscale" to "Mathematics"
@@ -107,6 +106,3 @@ Feature: As an admin I perform basic catquiz actions - create, update, delete, s
     And I click on "Delete" "link" in the "[data-name=\"Geometry\"]" "css_element"
     And I wait "1" seconds
     Then I should not see "Geometry"
-    ## And I follow "Delete"
-    ## And I wait "1" seconds
-    ## Then I should see "Create" in the ".grid .list-group-item" "css_element"
