@@ -33,6 +33,12 @@ class catscale_structure {
     /** @var string $description */
     public string $description;
 
+    /** @var float $minscalevalue */
+    public float $minscalevalue = 0;
+
+    /** @var float $maxscalevalue */
+    public float $maxscalevalue = 0;
+
     /** @var int $timecreated */
     public int $timecreated;
 
@@ -61,6 +67,8 @@ class catscale_structure {
             $this->timecreated = $data['timecreated'];
             $this->name = $data['name'];
             $this->description = $data['description'];
+            $this->minscalevalue = empty($data["minscalevalue"]) ? 0 : $data["minscalevalue"];
+            $this->maxscalevalue = empty($data["maxscalevalue"]) ? 0 : $data["maxscalevalue"];
 
             $url = new moodle_url('/local/catquiz/edit_catscale.php', [
                 'id' => $data['id']

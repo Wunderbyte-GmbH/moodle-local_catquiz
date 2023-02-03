@@ -43,5 +43,26 @@ function xmldb_local_catquiz_upgrade($oldversion) {
     // You will also have to create the db/install.xml file by using the XMLDB Editor.
     // Documentation for the XMLDB Editor can be found at {@link https://docs.moodle.org/dev/XMLDB_editor}.
 
+        if ($oldversion < 2023012504) {
+
+            // Define field min / max scalevalue to be added to local_catquiz_catscales.
+            $table = new xmldb_table('local_catquiz_catscales');
+
+            $field = new xmldb_field('minscalevalue', XMLDB_TYPE_NUMBER, '10, 2', null, null, null, 0, null);
+            // Conditionally launch add fields min scale value.
+            if (!$dbman->field_exists($table, $field)) {
+                $dbman->add_field($table, $field);
+            }
+
+            $field = new xmldb_field('maxscalevalue', XMLDB_TYPE_NUMBER, '10, 2', null, null, null, 0, null);
+            // Conditionally launch add fields max scale value.
+            if (!$dbman->field_exists($table, $field)) {
+                $dbman->add_field($table, $field);
+            }
+    
+            // Catquiz savepoint reached.
+            upgrade_plugin_savepoint(true, 2023012504, 'local', 'catquiz');
+        }
+
     return true;
 }

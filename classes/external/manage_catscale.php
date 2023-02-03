@@ -47,6 +47,8 @@ class manage_catscale extends external_api {
                 array(
                         'name' => new external_value(PARAM_TEXT, 'The name of the catscale', VALUE_REQUIRED),
                         'description' => new external_value(PARAM_RAW, 'The description of the catscale', VALUE_REQUIRED),
+                        'minscalevalue' => new external_value(PARAM_FLOAT, 'Min scale value', VALUE_REQUIRED),
+                        'maxscalevalue' => new external_value(PARAM_FLOAT, 'Max scale value', VALUE_REQUIRED),
                         'parentid' => new external_value(PARAM_INT, 'The parent ID of the catscale', VALUE_OPTIONAL, null),
                         'id' => new external_value(PARAM_INT, 'The id of the catscale', VALUE_OPTIONAL, null),
                         'action' => new external_value(PARAM_ALPHA, 'update or create', VALUE_REQUIRED),
@@ -64,11 +66,13 @@ class manage_catscale extends external_api {
      * @param $parentid
      * @return array
      */
-    public static function execute($name, $description, $id, $action, $parentid = null): array {
+    public static function execute($name, $description, $minscalevalue, $maxscalevalue, $id, $action, $parentid = null): array {
 
         $params = self::validate_parameters(self::execute_parameters(), [
                 'name' => $name,
                 'description' => $description,
+                'minscalevalue' => $minscalevalue,
+                'maxscalevalue' => $minscalevalue,
                 'parentid' => $parentid,
                 'action' => $action,
         ]);

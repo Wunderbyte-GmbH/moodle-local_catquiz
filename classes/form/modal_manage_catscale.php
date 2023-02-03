@@ -126,6 +126,13 @@ class modal_manage_catscale extends dynamic_form {
      */
     public function set_data_for_dynamic_submission(): void {
         $data = (object) $this->_ajaxformdata;
+        if (!empty($data->id)) {
+            if (!empty($rec = dataapi::get_catscale_by_id($data->id))) {
+                $data = $rec;
+                $data->minmaxgroup["catquiz_minscalevalue"] = $rec->minscalevalue;
+                $data->minmaxgroup["catquiz_maxscalevalue"] = $rec->maxscalevalue;
+            }
+        }
         $this->set_data($data);
     }
 
@@ -190,6 +197,11 @@ class modal_manage_catscale extends dynamic_form {
      * @see moodleform::get_data()
      */
     public function get_data() {
-        return parent::get_data();
+        //return parent::get_data();
+
+        $data = parent::get_data();
+        $data->minscalevalue = $data->minmaxgroup["catquiz_minscalevalue"];
+        $data->maxscalevalue = $data->minmaxgroup["catquiz_maxscalevalue"];
+        return $data;
     }
 }

@@ -144,4 +144,18 @@ class dataapi {
             return false;
         }
     }
+
+    /**
+     * Get catscale by ID
+     * @param int $id catscale id
+     * @return ?object
+     */
+    public static function get_catscale_by_id(int $id): ?object{
+        global $DB;
+        if ($DB->record_exists('local_catquiz_catscales', ['id' => $id])) {
+            return $DB->get_record('local_catquiz_catscales', ['id' => $id], '*', MUST_EXIST);
+        } else {
+            return null;
+        }
+    }
 }
