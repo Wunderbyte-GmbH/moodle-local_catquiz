@@ -141,6 +141,11 @@ class catquiz_handler {
      */
     public static function instance_form_before_set_data(stdClass &$data) {
         global $DB;
+
+        if (empty($data->id)) {
+            return;
+        }
+
         if (!$settings = $DB->get_record('local_catquiz',
             ['componentname' => 'mod_' . $data->modulename, 'componentid' => $data->id])) {
             return;
