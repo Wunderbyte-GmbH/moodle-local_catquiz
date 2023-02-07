@@ -139,7 +139,7 @@ class catquiz {
                 LEFT JOIN {local_catquiz_items} lci ON lci.componentid=q.id AND lci.componentname='question'
             ) as s1";
 
-        $where = $DB->sql_equal('catscaleid', ':catscaleid', false);;
+        $where = ' catscaleid = :catscaleid ';
         $params['catscaleid'] = $catscaleid;
         $filter = '';
 
