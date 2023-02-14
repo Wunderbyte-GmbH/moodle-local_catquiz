@@ -24,6 +24,7 @@ require_once($CFG->libdir.'/tablelib.php');
 
 use coding_exception;
 use context_module;
+use context_system;
 use dml_exception;
 use html_writer;
 use local_catquiz\catscale;
@@ -38,9 +39,12 @@ use mod_booking\price;
 use mod_booking\singleton_service;
 use moodle_exception;
 use moodle_url;
+use question_bank;
 use stdClass;
 
 defined('MOODLE_INTERNAL') || die();
+
+require_once($CFG->dirroot . '/question/engine/lib.php');
 
 /**
  * Search results for managers are shown in a table (student search results use the template searchresults_student).
@@ -62,8 +66,26 @@ class testitems_table extends wunderbyte_table {
     }
 
     public function col_questiontext($values) {
+        global $CFG;
 
-        return format_text($values->questiontext, FORMAT_HTML);
+        $question = question_bank::load_question($values->id);
+
+        $context = context_system::instance();
+
+        $questiontext = question_rewrite_question_urls(
+            $values->questiontext,
+            'pluginfile.php',
+            $context->id,
+            'question',
+            'questiontext',
+            [],
+            $values->id);
+
+        $questiontext = format_text($questiontext);
+        $questiontext = strip_tags($questiontext);
+        $returntext = substr($questiontext, 0, 30);
+        $returntext .= strlen($returntext) < strlen($questiontext) ? '...' : '';
+        return $returntext;
     }
 
     /**
