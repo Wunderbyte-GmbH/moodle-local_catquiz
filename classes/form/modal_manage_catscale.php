@@ -50,7 +50,7 @@ class modal_manage_catscale extends dynamic_form {
         // Add a text field for the catscale name
         $mform->addElement('text', 'name', get_string('name'));
         $mform->setType('name', PARAM_TEXT);
-        $mform->addRule('name', get_string('required'), 'required', null, 'client');
+        $mform->addRule('name', get_string('required'), 'required', PARAM_ALPHAEXT, 'client');
 
         // Add a textarea field for the catscale description
         $mform->addElement('textarea', 'description', get_string('description'), 'wrap="virtual" rows="5" cols="50"');
@@ -66,7 +66,18 @@ class modal_manage_catscale extends dynamic_form {
         foreach ($catscales as $catscale) {
             $options[$catscale->id] = $catscale->name;
         }
-        $mform->addElement('autocomplete', 'parentid', get_string('parent', 'local_catquiz'), $options);
+
+        $mform->registerNoSubmitButton('btn_changeparentid');
+        $buttonargs = []; // array('style' => 'visibility:hidden;');
+        $categoryselect = [
+            $mform->createElement('autocomplete', 'parentid', get_string('parent', 'local_catquiz'), $options),
+            $mform->createElement('submit',
+                'btn_changeparentid',
+                get_string('bookingsubbooking', 'mod_booking'),
+                $buttonargs)
+        ];
+        $mform->addGroup($categoryselect, 'subbooking_type', get_string('bookingsubbooking', 'mod_booking'), [' '], false);
+        // $mform->setType('btn_subbookingtype', PARAM_NOTAGS);
         $mform->setType('parentid', PARAM_INT);
 
         $group[] = $mform->createElement('text', 'catquiz_minscalevalue', get_string('minscalevalue', 'local_catquiz'));
@@ -76,6 +87,7 @@ class modal_manage_catscale extends dynamic_form {
         // $mform->addHelpButton('catquiz_mintimeperitem', 'mintimeperitem', 'local_catquiz');
 
         $mform->addGroup($group, 'minmaxgroup', get_string('minmaxgroup', 'local_catquiz'));
+        $mform->hideIf('minmaxgroup', 'parentid', 'neq', '0'); // Hide group when not parent.
         $mform->setDefault('catquiz_maxscalevalue', 3);
         $mform->setType('catquiz_maxscalevalue', PARAM_FLOAT);
         $mform->setDefault('catquiz_minscalevalue', -3);
