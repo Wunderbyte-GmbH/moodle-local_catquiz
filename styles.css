@@ -1,0 +1,8 @@
+.catscales-dashboard.grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    grid-template-rows: 1fr;
+    grid-gap: 10px;
+    margin-bottom: 50px;
+    margin-top: 50px;
+}

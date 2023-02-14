@@ -23,16 +23,14 @@
     {
     }
 }}
+<div class="grid">
+    {{> local_catquiz/catscaleslist}}
+</div>
 
-<div class="grid" style="display: grid;
-grid-template-columns: 1fr 1fr 1fr;
-grid-template-rows: 1fr 1fr;
-grid-gap: 20px;
-margin-bottom: 20px;
-">
+<div class="catscales-dashboard grid">
     <div class="card">
         <div class="card-header">
-            Show list of catscale-Managers
+            {{#str}} showlistofcatscalemanagers, local_catquiz {{/str}}
         </div>
         <div class="card-body">
             {{> local_catquiz/catscalemanagers}}
@@ -40,21 +38,18 @@ margin-bottom: 20px;
     </div>
     <div class="card">
         <div class="card-header">
-            add Category
+            {{#str}} addcategory, local_catquiz {{/str}}
         </div>
         <div class="card-body">
-            <a class="btn btn-primary" href="#"><i class="fa fa-plus px-2" aria-hidden="true"></i>Add catscale</a>
+            <a class="btn btn-primary" href="#"><i class="fa fa-plus px-2" aria-hidden="true"></i>{{#str}} addcategory, local_catquiz {{/str}}</a>
         </div>
     </div>
     <div class="card">
         <div class="card-header">
-            Documentation
+            {{#str}} documentation, local_catquiz {{/str}}
         </div>
         <div class="card-body">
-            <a class="btn btn-primary" href="#"><i class="fa fa-plus px-2" aria-hidden="true"></i>Documentation</a>
+            <a class="btn btn-primary" href="#"><i class="fa fa-plus px-2" aria-hidden="true"></i>{{#str}} documentation, local_catquiz {{/str}}</a>
         </div>
     </div>
-</div>
-<div class="grid">
-    {{> local_catquiz/catscaleslist}}
 </div>
