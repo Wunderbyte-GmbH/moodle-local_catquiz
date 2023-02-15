@@ -21,30 +21,14 @@ defined('MOODLE_INTERNAL') || die();
 global $CFG;
 require_once(__DIR__ . '/../../lib.php');
 require_once($CFG->libdir.'/tablelib.php');
+require_once($CFG->dirroot . '/question/engine/lib.php');
 
-use coding_exception;
 use context_module;
 use context_system;
-use dml_exception;
 use html_writer;
 use local_catquiz\catscale;
 use local_wunderbyte_table\wunderbyte_table;
-use mod_booking\bo_availability\bo_info;
 use mod_booking\booking;
-use mod_booking\booking_bookit;
-use mod_booking\dates_handler;
-use mod_booking\output\col_availableplaces;
-use mod_booking\output\col_teacher;
-use mod_booking\price;
-use mod_booking\singleton_service;
-use moodle_exception;
-use moodle_url;
-use question_bank;
-use stdClass;
-
-defined('MOODLE_INTERNAL') || die();
-
-require_once($CFG->dirroot . '/question/engine/lib.php');
 
 /**
  * Search results for managers are shown in a table (student search results use the template searchresults_student).
@@ -65,10 +49,21 @@ class testitems_table extends wunderbyte_table {
 
     }
 
-    public function col_questiontext($values) {
-        global $CFG;
+    /**
+     * Overrides the output for this column.
+     * @param object $values
+     */
+    public function col_idnumber($values) {
+        return html_writer::tag('span', $values->idnumber, ['class' => 'badge badge-primary']);
+    }
 
-        $question = question_bank::load_question($values->id);
+    /**
+     * Overrides the output for this column.
+     * @param object $values
+     */
+    public function col_questiontext($values) {
+
+        global $OUTPUT;
 
         $context = context_system::instance();
 
@@ -81,11 +76,26 @@ class testitems_table extends wunderbyte_table {
             [],
             $values->id);
 
-        $questiontext = format_text($questiontext);
-        $questiontext = strip_tags($questiontext);
-        $returntext = substr($questiontext, 0, 30);
-        $returntext .= strlen($returntext) < strlen($questiontext) ? '...' : '';
-        return $returntext;
+        $fulltext = format_text($questiontext);
+        $questiontext = strip_tags($fulltext);
+        $shorttext = substr($questiontext, 0, 30);
+        $shorttext .= strlen($shorttext) < strlen($questiontext) ? '...' : '';
+
+        $data = [
+            'shorttext' => $shorttext,
+            'fulltext' => $fulltext,
+            'id' => $values->id,
+        ];
+
+        return $OUTPUT->render_from_template('local_catquiz/modal_questionpreview', $data);
+    }
+
+    /**
+     * Overrides the output for this column.
+     * @param object $values
+     */
+    public function col_qtype($values) {
+        return get_string('pluginname', 'qtype_' . $values->qtype);
     }
 
     /**
@@ -112,7 +122,7 @@ class testitems_table extends wunderbyte_table {
 
         return [
             'success' => 1,
-            'message' => 'Did work',
+            'message' => get_string('success'),
         ];
     }
 
@@ -140,7 +150,7 @@ class testitems_table extends wunderbyte_table {
 
         return [
             'success' => 1,
-            'message' => 'Did work',
+            'message' => get_string('success'),
         ];
     }
 }

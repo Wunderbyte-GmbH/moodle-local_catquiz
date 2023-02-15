@@ -23,17 +23,25 @@
     {
     }
 }}
-
+<p>
+  <a class="btn btn-primary" href="{{{returnurl}}}">{{#str}} managecatscales, local_catquiz {{/str}}</a>
+</p>
 <ul class="nav nav-tabs" id="myTab" role="tablist">
   <li class="nav-item">
-    <a class="nav-link active" id="testitems-tab" data-toggle="tab" href="#testitems" role="tab" aria-controls="testitems" aria-selected="true">{{#str}} testitems, local_catquiz{{/str}}</a>
+    <a class="nav-link active" id="statistics-tab" data-toggle="tab" href="#statistics" role="tab" aria-controls="{{#str}} statistics, local_catquiz {{/str}}" aria-selected="true">{{#str}} statistics, local_catquiz{{/str}}</a>
+  </li>
+  <li class="nav-item">
+    <a class="nav-link" id="testitems-tab" data-toggle="tab" href="#testitems" role="tab" aria-controls="testitems" aria-selected="false">{{#str}} testitems, local_catquiz{{/str}}</a>
   </li>
   <li class="nav-item">
     <a class="nav-link" id="addtestitems-tab" data-toggle="tab" href="#addtestitems" role="tab" aria-controls="addtestitems" aria-selected="false">{{#str}} addtestitem, local_catquiz{{/str}}</a>
   </li>
 </ul>
 <div class="tab-content" id="myTabContent">
-  <div class="tab-pane fade show active" id="testitems" role="tabpanel" aria-labelledby="testitems-tab">
+  <div class="tab-pane fade show active" id="statistics" role="tabpanel" aria-labelledby="statistics-tab">
+    {{>local_catquiz/tab_statistics}}
+  </div>
+  <div class="tab-pane fade" id="testitems" role="tabpanel" aria-labelledby="testitems-tab">
     {{{testitemstable}}}
   </div>
   <div class="tab-pane fade" id="addtestitems" role="tabpanel" aria-labelledby="addtestitems-tab">

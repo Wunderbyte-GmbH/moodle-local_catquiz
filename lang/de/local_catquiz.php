@@ -115,3 +115,15 @@ CAT Skalen wurden verändert auf der Moolde Plattform {$a->instancename}.
 Dieses e-Mail informiert Sie als CAT Manager* verantwortlich für dieses Skala. {$a->editorname} hat die folgenden Änderungen an der Skala "{$a->catscalename}" vorgenommen.":
     {$a->changedescription}
 Sie können den aktuellen Stand hier überprüfen. {$a->linkonscale}';
+
+// Catscale Dashboard.
+$string['statistics'] = "Statistik";
+$string['statindependence'] = "Statistische Unabhängigkeit";
+$string['loglikelihood'] = "Log-Likelihood";
+$string['differentialitem'] = "Gruppenabhängiger Indikator";
+$string['previewquestion'] = "Fragen Vorschau";
+
+// Table.
+$string['label'] = "Kennzeichen";
+$string['name'] = "Name";
+$string['questiontext'] = "Fragentext";

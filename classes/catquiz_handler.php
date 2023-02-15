@@ -185,6 +185,11 @@ class catquiz_handler {
      */
     public static function instance_form_save(stdClass &$data, int $instanceid, string $componentname) {
         global $DB;
+
+        if (empty($data->catquiz_usecatquiz)) {
+            return;
+        }
+
         $catdata = new stdClass;
         $catdata->componentname = $componentname;
         $catdata->componentid = $instanceid;

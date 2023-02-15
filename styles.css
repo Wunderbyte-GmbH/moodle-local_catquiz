@@ -6,3 +6,11 @@
     margin-bottom: 50px;
     margin-top: 50px;
 }
+
+canvas {
+    max-width: 60%;
+}
+
+.modal-content.preview-question .text_to_html {
+    margin: 40px;
+}

@@ -131,7 +131,7 @@ class catquiz {
 
         $params = [];
         $select = ' DISTINCT *';
-        $from = "( SELECT q.id, q.name, q.questiontext, q.qtype, qc.name as categoryname, lci.catscaleid catscaleid
+        $from = "( SELECT q.id, qbe.idnumber, q.name, q.questiontext, q.qtype, qc.name as categoryname, lci.catscaleid catscaleid
             FROM {question} q
                 JOIN {question_versions} qv ON q.id=qv.questionid
                 JOIN {question_bank_entries} qbe ON qv.questionbankentryid=qbe.id
@@ -162,15 +162,15 @@ class catquiz {
         global $DB;
 
         $params = [];
-        $select = 'DISTINCT id, name, questiontext, qtype, categoryname';
-        $from = "( SELECT q.id, q.name, q.questiontext, q.qtype, qc.name as categoryname, " .
+        $select = 'DISTINCT id, idnumber, name, questiontext, qtype, categoryname';
+        $from = "( SELECT q.id, qbe.idnumber, q.name, q.questiontext, q.qtype, qc.name as categoryname, " .
              $DB->sql_group_concat($DB->sql_concat("'-'", 'lci.catscaleid', "'-'")) ." as catscaleids
             FROM {question} q
                 JOIN {question_versions} qv ON q.id=qv.questionid
                 JOIN {question_bank_entries} qbe ON qv.questionbankentryid=qbe.id
                 JOIN {question_categories} qc ON qc.id=qbe.questioncategoryid
                 LEFT JOIN {local_catquiz_items} lci ON lci.componentid=q.id AND lci.componentname='question'
-                GROUP BY q.id, q.name, q.questiontext, q.qtype, qc.name
+                GROUP BY q.id, qbe.idnumber, q.name, q.questiontext, q.qtype, qc.name
             ) as s1";
 
         $where = $DB->sql_like('catscaleids', ':catscaleid', false, false, true) . ' OR catscaleids IS NULL ';

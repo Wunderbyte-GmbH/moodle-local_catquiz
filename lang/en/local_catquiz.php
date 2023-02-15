@@ -115,3 +115,15 @@ CAT scales have been changed on the Moodle platform {$a->instancename}.
 This email informs you as the CAT Manager* responsible for those CAT scales of these changes . {$a->editorname} made the following changes to the CAT scale "{$a->catscalename}":
     {$a->changedescription}
 You can review the current state here: {$a->linkonscale}';
+
+// Catscale Dashboard.
+$string['statistics'] = "Stats";
+$string['statindependence'] = "Statistical Independence";
+$string['loglikelihood'] = "Loglikelihood";
+$string['differentialitem'] = "Differential Item Functioning";
+$string['previewquestion'] = "Preview question";
+
+// Table.
+$string['label'] = "Label";
+$string['name'] = "Name";
+$string['questiontext'] = "Question text";
