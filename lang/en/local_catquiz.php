@@ -65,6 +65,7 @@ $string['timeoutfinishwithresult'] = 'Test aborted after finished current questi
 $string['minmaxgroup'] = 'Add min and max value as decimal';
 $string['minscalevalue'] = 'Min value';
 $string['maxscalevalue'] = 'Max value';
+$string['chooseparent'] = 'Choose parent scale';
 $string['errorminscalevalue'] = 'Min value has to be smaller than max value';
 $string['errorhastobefloat'] = 'Has to be a deciamal';
 

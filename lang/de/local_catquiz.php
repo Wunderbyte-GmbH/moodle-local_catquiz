@@ -65,6 +65,7 @@ $string['timeoutfinishwithresult'] = 'Nachfrist: angezeigte Items können beende
 $string['minmaxgroup'] = 'Geben Sie Minimal und Maximal als Dezimalwert ein';
 $string['minscalevalue'] = 'Minimalwert';
 $string['maxscalevalue'] = 'Maximalwert';
+$string['chooseparent'] = 'Wähle übergeordnete Scala';
 $string['errorminscalevalue'] = 'Der Minimalwert muss kleiner sein als der Maximalwert der Skala';
 $string['errorhastobefloat'] = 'Muss ein Dezimalwert sein';
 

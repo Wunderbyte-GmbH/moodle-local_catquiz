@@ -68,16 +68,16 @@ class modal_manage_catscale extends dynamic_form {
         }
 
         $mform->registerNoSubmitButton('btn_changeparentid');
-        $buttonargs = []; // array('style' => 'visibility:hidden;');
+        $buttonargs = array('style' => 'visibility:hidden;');
         $categoryselect = [
             $mform->createElement('autocomplete', 'parentid', get_string('parent', 'local_catquiz'), $options),
             $mform->createElement('submit',
                 'btn_changeparentid',
-                get_string('bookingsubbooking', 'mod_booking'),
+                get_string('chooseparent', 'local_catquiz'),
                 $buttonargs)
         ];
-        $mform->addGroup($categoryselect, 'subbooking_type', get_string('bookingsubbooking', 'mod_booking'), [' '], false);
-        // $mform->setType('btn_subbookingtype', PARAM_NOTAGS);
+        $mform->addGroup($categoryselect, 'chooseparent', get_string('chooseparent', 'local_catquiz'), [' '], false);
+        $mform->setType('chooseparent', PARAM_NOTAGS);
         $mform->setType('parentid', PARAM_INT);
 
         $group[] = $mform->createElement('text', 'catquiz_minscalevalue', get_string('minscalevalue', 'local_catquiz'));
