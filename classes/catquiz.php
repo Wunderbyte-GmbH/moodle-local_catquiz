@@ -173,7 +173,7 @@ class catquiz {
                 GROUP BY q.id, qbe.idnumber, q.name, q.questiontext, q.qtype, qc.name
             ) as s1";
 
-        $where = $DB->sql_like('catscaleids', ':catscaleid', false, false, true) . ' OR catscaleids IS NULL ';
+        $where = " ( " . $DB->sql_like('catscaleids', ':catscaleid', false, false, true) . ' OR catscaleids IS NULL ) ';
         $params['catscaleid'] = "%-$catscaleid-%";
         $filter = '';
 
