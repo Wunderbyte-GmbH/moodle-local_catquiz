@@ -48,9 +48,6 @@ function local_catquiz_render_navbar_output(\renderer_base $renderer) {
             <a class="dropdown-item" href="'
                 . $CFG->wwwroot . '/local/catquiz/manage_catscales.php"">'
                 . get_string('managecatscales', 'local_catquiz') . '</a>
-            <a class="dropdown-item" href="'
-                . $CFG->wwwroot . '/local/catquiz/test.php">'
-                . get_string('test', 'local_catquiz') . '</a>
         </div>
     </div>';
 
