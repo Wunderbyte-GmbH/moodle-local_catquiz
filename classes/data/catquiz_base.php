@@ -50,7 +50,7 @@ class catquiz_base {
 
         // Only provide data for a given user.
         if ($userid > 0) {
-            $sql .= " AND qa.userid = :userid ";
+            $sql .= " AND qas.userid = :userid ";
             $params['userid'] = $userid;
         }
 
