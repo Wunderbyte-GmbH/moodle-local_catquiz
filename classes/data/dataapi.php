@@ -50,6 +50,34 @@ class dataapi {
     }
 
     /**
+     * We'll get an array of catscales where every catscale is followed by its children.
+     *
+     * @param integer $parentid
+     * @param bool $getchildren
+     * @return array
+     */
+    public static function get_catscale_and_children($parentid = 0, bool $getchildren = false) {
+
+        $catscales = self::get_all_catscales();
+        $returnarray = [];
+
+        foreach ($catscales as $catscale) {
+
+            if ($catscale->parentid == $parentid) {
+                $returnarray[] = $catscale;
+
+                if ($getchildren) {
+                    // Now get all children.
+                    $children = self::get_catscale_and_children($catscale->id, $getchildren);
+
+                    $returnarray = array_merge($returnarray, $children);
+                }
+            }
+        }
+        return $returnarray;
+    }
+
+    /**
      * Save a new catscale and invalidate cache. Checks if name is unique
      *
      * @param catscale_structure $catscale
