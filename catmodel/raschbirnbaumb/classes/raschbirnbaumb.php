@@ -103,6 +103,10 @@ class raschbirnbaumb implements model_calc {
             }
             $p_yes = $num_yes / $numpersons;
             $p_no = $num_no / $numpersons;
+
+            // Make sure $p_yes is never 0, to avoid infinity.
+            $p_yes = $p_yes === 0 ? 0.00001 : $p_yes;
+
             $itemdifficulties[$i] = log($p_no / $p_yes);
             $itemdiscriminations[$i] = 1;
         }
@@ -148,6 +152,9 @@ class raschbirnbaumb implements model_calc {
                 $numcorrect += $response['answers'][$i];
                 }
             }
+
+            // Make sure $p_yes is never 0, to avoid infinity.
+            $totalresponses = $totalresponses === 0 ? 0.00001 : $totalresponses;
 
             $p = $numcorrect / $totalresponses;
             $q = 1 - $p;

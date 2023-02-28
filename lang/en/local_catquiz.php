@@ -132,3 +132,14 @@ $string['questiontext'] = "Question text";
 
 // Testitem Dashboard.
 $string['testitemdashboard'] = "Testitem Dashboard";
+
+$string['difficulty'] = "Difficulty";
+$string['discrimination'] = "Discrimination";
+
+$string['numberofanswers'] = "Answers total";
+$string['numberofusagesintests'] = "In tests";
+$string['numberofpersonsanswered'] = "By different persons";
+$string['numberofanswerscorrect'] = "Correct";
+$string['numberofanswersincorrect'] = "Wrong";
+$string['numberofanswerspartlycorrect'] = "Partly correct";
+$string['averageofallanswers'] = "Average";

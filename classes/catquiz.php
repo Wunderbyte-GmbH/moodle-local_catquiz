@@ -183,4 +183,193 @@ class catquiz {
 
         return [$select, $from, $where, $filter, $params];
     }
+
+    /**
+     * Return the sql for all questions answered.
+     *
+     * @param integer $testitemid
+     * @return void
+     */
+    public static function get_sql_for_questions_answered(int $testitemid = 0) {
+
+        $and = "";
+        $params = [];
+
+        if (!empty($testitemid)) {
+            $and = " AND qa.questionid=:questionid ";
+            $params = ['questionid' => $testitemid];
+        }
+
+        $sql = "SELECT COUNT(qas.id)
+        FROM {question_attempt_steps} qas
+        JOIN {question_attempts} qa ON qas.questionattemptid=qa.id
+        WHERE qas.fraction IS NOT NULL"
+        . $and;
+        $params = ['questionid' => $testitemid];
+
+        return [$sql, $params];
+    }
+
+    /**
+     * Return the sql for all questions answered.
+     *
+     * @param integer $testitemid
+     * @return void
+     */
+    public static function get_sql_for_questions_average(int $testitemid = 0) {
+
+        $and = "";
+        $params = [];
+
+        if (!empty($testitemid)) {
+            $and = " AND qa.questionid=:questionid ";
+            $params = ['questionid' => $testitemid];
+        }
+
+        $sql = "SELECT AVG(qas.fraction)
+        FROM {question_attempt_steps} qas
+        JOIN {question_attempts} qa ON qas.questionattemptid=qa.id"
+        . $and;
+        $params = ['questionid' => $testitemid];
+
+        return [$sql, $params];
+    }
+
+    /**
+     * Return the sql for all questions answered.
+     *
+     * @param integer $testitemid
+     * @return void
+     */
+    public static function get_sql_for_questions_answered_correct(int $testitemid = 0) {
+
+        $and = "";
+        $params = [];
+
+        if (!empty($testitemid)) {
+            $and = " AND qa.questionid=:questionid ";
+            $params = ['questionid' => $testitemid];
+        }
+
+        $sql = "SELECT COUNT(qas.id)
+        FROM {question_attempt_steps} qas
+        JOIN {question_attempts} qa ON qas.questionattemptid=qa.id
+        WHERE qas.fraction = qa.maxfraction"
+        . $and;
+        $params = ['questionid' => $testitemid];
+
+        return [$sql, $params];
+    }
+
+    /**
+     * Return the sql for all questions answered.
+     *
+     * @param integer $testitemid
+     * @return void
+     */
+    public static function get_sql_for_questions_answered_incorrect(int $testitemid = 0) {
+
+        $and = "";
+        $params = [];
+
+        if (!empty($testitemid)) {
+            $and = " AND qa.questionid=:questionid ";
+            $params = ['questionid' => $testitemid];
+        }
+
+        $sql = "SELECT COUNT(qas.id)
+        FROM {question_attempt_steps} qas
+        JOIN {question_attempts} qa ON qas.questionattemptid=qa.id
+        WHERE qas.fraction = qa.minfraction"
+        . $and;
+        $params = ['questionid' => $testitemid];
+
+        return [$sql, $params];
+    }
+
+    /**
+     * Return the sql for all questions answered.
+     *
+     * @param integer $testitemid
+     * @return void
+     */
+    public static function get_sql_for_questions_answered_partlycorrect(int $testitemid = 0) {
+
+        $and = "";
+        $params = [];
+
+        if (!empty($testitemid)) {
+            $and = " AND qa.questionid=:questionid ";
+            $params = ['questionid' => $testitemid];
+        }
+
+        $sql = "SELECT COUNT(qas.id)
+        FROM {question_attempt_steps} qas
+        JOIN {question_attempts} qa ON qas.questionattemptid=qa.id
+        WHERE qas.fraction <> qa.minfraction
+        AND qas.fraction <> qa.maxfraction "
+        . $and;
+        $params = ['questionid' => $testitemid];
+
+        return [$sql, $params];
+    }
+
+    /**
+     * Return the sql for all questions answered.
+     *
+     * @param integer $testitemid
+     * @return void
+     */
+    public static function get_sql_for_questions_answered_by_distinct_persons(int $testitemid = 0) {
+
+        $and = "";
+        $params = [];
+
+        if (!empty($testitemid)) {
+            $and = " AND qa.questionid=:questionid ";
+            $params = ['questionid' => $testitemid];
+        }
+
+        $sql = "SELECT COUNT(s1.questionid)
+        FROM (
+            SELECT qas.userid, qa.questionid
+            FROM {question_attempt_steps} qas
+            JOIN {question_attempts} qa ON qas.questionattemptid=qa.id
+            WHERE qas.fraction IS NOT NULL"
+            . $and .
+            "GROUP BY qa.questionid, qas.userid)
+        as s1";
+
+        return [$sql, $params];
+    }
+
+    /**
+     * Return the sql for all questions answered.
+     *
+     * @param integer $testitemid
+     * @return void
+     */
+    public static function get_sql_for_questions_usages_in_tests(int $testitemid = 0) {
+
+        $and = "";
+        $params = [];
+
+        if (!empty($testitemid)) {
+            $and = " AND qa.questionid=:questionid ";
+            $params = ['questionid' => $testitemid];
+        }
+
+        $sql = "SELECT COUNT(s1.questionid)
+        FROM (
+            SELECT qa.questionid, qu.contextid
+            FROM {question_attempt_steps} qas
+            JOIN {question_attempts} qa ON qas.questionattemptid=qa.id
+            JOIN {question_usages} qu ON qa.questionusageid=qu.id
+            WHERE qas.fraction IS NOT NULL"
+            . $and .
+            "GROUP BY qa.questionid, qu.contextid)
+        as s1";
+
+        return [$sql, $params];
+    }
 }

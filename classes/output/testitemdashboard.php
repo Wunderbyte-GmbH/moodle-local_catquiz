@@ -77,30 +77,45 @@ class testitemdashboard implements renderable, templatable {
 
         $modelitemparams = catmodel_info::get_item_parameters(0, $this->testitemid);
 
+        // Example item parameters
+
+        $difficulty = -1.0;
+        $discrimination = 1.0;
+
+        // Example person abilities
+        $abilities = [-3.0, -2.0, -1.0, 0.0, 1.0, 2.0, 3.0, 4.0, 5.0, 6.0];
+
+        // Calculate the probability correct for each person ability
+        $probabilities = [];
+        foreach ($abilities as $ability) {
+            $logit = $discrimination * ($ability - $difficulty);
+            $probability = 1 / (1 + exp(-$logit));
+            $probabilities[] = $probability;
+        }
+
+        // Output the datapoints
+        $datapoints = [];
+        for ($i = 0; $i < count($abilities); $i++) {
+            $datapoints[] = $probabilities[$i];
+        }
+
         foreach ($modelitemparams as $item) {
 
             $chart = new \core\chart_line();
             $chart->set_smooth(true); // Calling set_smooth() passing true as parameter, will display smooth lines.
 
             // Create the graph for difficulty.
-            $series1 = new \core\chart_series('Difficulty 1 (Line)', $item['itemparameters']['difficulty']);
-            $series2 = new \core\chart_series('Discrimination 1 (Line)', $item['itemparameters']['discrimination']);
+            $series1 = new \core\chart_series(get_string('difficulty', 'local_catquiz'), $datapoints);
 
             $chart->add_series($series1);
-            $chart->add_series($series2);
+            $label = ["-3.0", "-2.0", "-1.0", "0.0", "1.0", "2.0", "3.0", "4.0", "5.0", "6.0"];
 
-            $count = 1;
-            $label = [];
-            while ($count <= count($item['itemparameters']['difficulty'])) {
-                $label[] = "$count";
-                $count++;
-            }
             $chart->set_labels($label);
 
             $body = html_writer::tag('div', $OUTPUT->render($chart), ['dir' => 'ltr']);
 
             $returnarray[]= [
-                'title' => $item['modelname'],
+                'title' => get_string('pluginname', "catmodel_" . $item['modelname']),
                 'body' => $body,
             ];
         }
@@ -113,15 +128,53 @@ class testitemdashboard implements renderable, templatable {
      *
      * @return void
      */
-    private static function render_testitemstats() {
+    private function render_testitemstats() {
+
+        global $DB;
+
+        list ($sql, $params) = catquiz::get_sql_for_questions_answered($this->testitemid);
+        $numberofanswers = $DB->count_records_sql($sql, $params);
+        list ($sql, $params) = catquiz::get_sql_for_questions_usages_in_tests($this->testitemid);
+        $numberofusagesintests = $DB->count_records_sql($sql, $params);
+        list ($sql, $params) = catquiz::get_sql_for_questions_answered_by_distinct_persons($this->testitemid);
+        $numberofpersonsanswered = $DB->count_records_sql($sql, $params);
+        list ($sql, $params) = catquiz::get_sql_for_questions_answered_correct($this->testitemid);
+        $numberofanswerscorrect = $DB->count_records_sql($sql, $params);
+        list ($sql, $params) = catquiz::get_sql_for_questions_answered_incorrect($this->testitemid);
+        $numberofanswersincorrect = $DB->count_records_sql($sql, $params);
+        list ($sql, $params) = catquiz::get_sql_for_questions_answered_partlycorrect($this->testitemid);
+        $numberofanswerspartlycorrect = $DB->count_records_sql($sql, $params);
+        list ($sql, $params) = catquiz::get_sql_for_questions_average($this->testitemid);
+        $averageofallanswers = $DB->get_field_sql($sql, $params);
+
         return [
             [
-                'title' => 'stat a',
-                'body' => 'xyz',
+                'title' => get_string('numberofanswers', 'local_catquiz'),
+                'body' => $numberofanswers,
             ],
             [
-                'title' => 'stat b',
-                'body' => 'xyz',
+                'title' => get_string('numberofusagesintests', 'local_catquiz'),
+                'body' => $numberofusagesintests,
+            ],
+            [
+                'title' => get_string('numberofpersonsanswered', 'local_catquiz'),
+                'body' => $numberofpersonsanswered,
+            ],
+            [
+                'title' => get_string('numberofanswerscorrect', 'local_catquiz'),
+                'body' => $numberofanswerscorrect,
+            ],
+            [
+                'title' => get_string('numberofanswersincorrect', 'local_catquiz'),
+                'body' => $numberofanswersincorrect,
+            ],
+            [
+                'title' => get_string('numberofanswerspartlycorrect', 'local_catquiz'),
+                'body' => $numberofanswerspartlycorrect,
+            ],
+            [
+                'title' => get_string('averageofallanswers', 'local_catquiz'),
+                'body' => $averageofallanswers,
             ]
         ];
     }
