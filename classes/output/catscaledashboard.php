@@ -103,6 +103,7 @@ class catscaledashboard implements renderable, templatable {
         $table->actionbuttons[] = [
             'label' => get_string('addtestitem', 'local_catquiz'), // Name of your action button.
             'class' => 'btn btn-success',
+            'href' => '#',
             'methodname' => 'addtestitem', // The method needs to be added to your child of wunderbyte_table class.
             'id' => -1, // This makes one Ajax call for all selected item, not one for each.
             'data' => [ // Will be added eg as data-id = $values->id, so values can be transmitted to the method above.
@@ -139,7 +140,7 @@ class catscaledashboard implements renderable, templatable {
 
         $table->set_filter_sql($select, $from, $where, $filter, $params);
 
-        $table->define_columns(['idnumber', 'questiontext', 'qtype', 'categoryname']);
+        $table->define_columns(['idnumber', 'questiontext', 'qtype', 'categoryname', 'action']);
         $table->define_headers([
             get_string('label', 'local_catquiz'),
             get_string('questiontext', 'local_catquiz'),
@@ -171,6 +172,7 @@ class catscaledashboard implements renderable, templatable {
         $table->actionbuttons[] = [
             'label' => get_string('removetestitem', 'local_catquiz'), // Name of your action button.
             'class' => 'btn btn-danger',
+            'href' => '#',
             'methodname' => 'removetestitem', // The method needs to be added to your child of wunderbyte_table class.
             'id' => -1, // This makes one Ajax call for all selected item, not one for each.
             'data' => [ // Will be added eg as data-id = $values->id, so values can be transmitted to the method above.
