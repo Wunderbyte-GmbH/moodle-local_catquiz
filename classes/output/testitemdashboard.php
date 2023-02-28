@@ -137,7 +137,7 @@ class testitemdashboard implements renderable, templatable {
         return [
             'returnurl' => $url->out(),
             'models' => $this->render_modelcards(),
-            'testitemstats' => $this->render_testitemstats(),
+            'statcards' => $this->render_testitemstats(),
         ];
     }
 }
