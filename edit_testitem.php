@@ -22,10 +22,8 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-use core\dataformat\base;
-use local_catquiz\data\catquiz_base;
-use local_catquiz\event\catscale_updated;
-use local_catquiz\subscription;
+use local_catquiz\catmodel_info;
+use local_catquiz\output\testitemdashboard;
 
 require_once('../../config.php');
 
@@ -40,33 +38,19 @@ require_capability('local/catquiz:manage_catscales', $context);
 
 $PAGE->set_url(new moodle_url('/local/catquiz/test.php', array()));
 
-$title = "Test cases";
+$testitemid = required_param('id', PARAM_INT);
+$catscaleid = required_param('catscaleid', PARAM_INT);
+
+$title = get_string('testitemdashboard', 'local_catquiz');
 $PAGE->set_title($title);
 $PAGE->set_heading($title);
 
 echo $OUTPUT->header();
 
-$questions = catquiz_base::get_question_results();
+// $response = catmodel_info::get_item_parameters(0, 126);
 
-$userid = $USER->id;
-
-$event = catscale_updated::create([
-    'objectid' => 1,
-    'context' => $context,
-    'userid' => $userid, // The user who did cancel.
-]);
-$event->trigger();
-
-$subscribed = subscription::return_subscription_state($userid, 'catscale', 79);
-
-$data = [
-    'id' => 1,
-    'area' => 'catscale'];
-
-if ($subscribed) {
-    $data['subscribed'] = 'true';
-}
-
-echo $OUTPUT->render_from_template('local_catquiz/button_subscribe', $data);
+$data = new testitemdashboard($testitemid);
+$output = $PAGE->get_renderer('local_catquiz');
+echo $output->render_testitemdashboard($data);
 
 echo $OUTPUT->footer();

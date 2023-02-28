@@ -25,7 +25,6 @@
 
 require_once('../../config.php');
 
-use local_catquiz\catengine;
 use local_catquiz\data;
 
 

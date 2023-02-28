@@ -53,7 +53,7 @@ export const init = () => {
 function manageCatscale(button) {
     const parentelement = button.closest('.list-group-item');
     const action = button.dataset.action;
-    let formclass = "local_catquiz\\form\\modal_manage_catscale";
+    let formclass = "local_catquiz\\form\\modals\\modal_manage_catscale";
     let formvalues = { id: parentelement.dataset.id, description: parentelement.dataset.description,
         name: parentelement.dataset.name, parentid: parentelement.dataset.parentid };
     // eslint-disable-next-line no-console

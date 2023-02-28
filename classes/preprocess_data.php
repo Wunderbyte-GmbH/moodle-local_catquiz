@@ -31,7 +31,7 @@ class preprocess_data{
      * @param $array: ouput of data\catquiz_base::get_question_results()
      * @return array:
      */
-    static function get_fractions_by_question($array) {
+    public static function get_fractions_by_question($array) {
         $result = array();
         foreach ($array as $obj) {
             $question_id = $obj->questionid;

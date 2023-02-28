@@ -131,7 +131,7 @@ class catquiz {
 
         $params = [];
         $select = ' DISTINCT *';
-        $from = "( SELECT q.id, qbe.idnumber, q.name, q.questiontext, q.qtype, qc.name as categoryname, lci.catscaleid catscaleid
+        $from = "( SELECT q.id, qbe.idnumber, q.name, q.questiontext, q.qtype, qc.name as categoryname, lci.catscaleid catscaleid, lci.componentname component
             FROM {question} q
                 JOIN {question_versions} qv ON q.id=qv.questionid
                 JOIN {question_bank_entries} qbe ON qv.questionbankentryid=qbe.id
@@ -162,7 +162,7 @@ class catquiz {
         global $DB;
 
         $params = [];
-        $select = 'DISTINCT id, idnumber, name, questiontext, qtype, categoryname';
+        $select = 'DISTINCT id, idnumber, name, questiontext, qtype, categoryname, \'question\' as component';
         $from = "( SELECT q.id, qbe.idnumber, q.name, q.questiontext, q.qtype, qc.name as categoryname, " .
              $DB->sql_group_concat($DB->sql_concat("'-'", 'lci.catscaleid', "'-'")) ." as catscaleids
             FROM {question} q

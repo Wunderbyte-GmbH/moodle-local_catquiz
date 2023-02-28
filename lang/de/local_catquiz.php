@@ -119,6 +119,7 @@ Sie können den aktuellen Stand hier überprüfen. {$a->linkonscale}';
 
 // Catscale Dashboard.
 $string['statistics'] = "Statistik";
+$string['models'] = "Modelle";
 $string['statindependence'] = "Statistische Unabhängigkeit";
 $string['loglikelihood'] = "Log-Likelihood";
 $string['differentialitem'] = "Gruppenabhängiger Indikator";
@@ -128,3 +129,6 @@ $string['previewquestion'] = "Fragen Vorschau";
 $string['label'] = "Kennzeichen";
 $string['name'] = "Name";
 $string['questiontext'] = "Fragentext";
+
+// Testitem Dashboard.
+$string['testitemdashboard'] = "Testitem Dashboard";

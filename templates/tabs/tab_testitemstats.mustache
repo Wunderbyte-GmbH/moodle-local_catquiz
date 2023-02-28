@@ -1,41 +1,42 @@
 {{!
     This file is part of Moodle - http://moodle.org/
-
     Moodle is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation, either version 3 of the License, or
     (at your option) any later version.
-
     Moodle is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
     GNU General Public License for more details.
-
     You should have received a copy of the GNU General Public License
     along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 }}
 {{!
-    @template local_catquiz/button_assign
-
+    @template local_catquiz
+    Template which defines a catquiz view page.
     Classes required for JS:
     * none
-
     Data attributes required for JS:
-    * data-region
-
-     Example context (json):
+    * none
+    Context variables required for this template:
+    Example context (json):
     {
-        'catscaleid' : '1',
+      'models': [
+        'title': 'model name',
+        'body': '<div>rendered model stats</div>'
+      ]
     }
 }}
-<a class="btn btn-primary assign-testitems-to-catscale"
-    data-itemid="{{catscaleid}}">
-    {{#str}} assign, local_catquiz {{/str}}
-</a>
 
-
-{{#js}}
-    require(['local_catquiz/actions'], function(init) {
-        init.initassignbutton('{{catscaleidid}}', 'input.testitem-checkbox');
-        });
-{{/js}}
+<div class="catscales-dashboard grid">
+  {{#models}}
+    <div class="card">
+        <div class="card-header">
+            {{title}}
+        </div>
+        <div class="card-body">
+          {{{body}}}
+        </div>
+    </div>
+  {{/models}}
+</div>

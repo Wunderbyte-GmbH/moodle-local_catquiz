@@ -64,4 +64,50 @@ class catquiz_base {
 
         return $records;
     }
+
+    /**
+     * This Function returns the answered questions in an array...
+     * ... where the userid is the key and every user has an array where the key is the questionid.
+     * ... and value is fraction.
+     * Attention: This will always only return one answer per user and question, even when its answered multiple times.
+     *
+     * @param integer $testid
+     * @param integer $userid
+     * @param integer $questionid
+     * @return array
+     */
+    public static function get_question_results_by_person(int $testid = 0, int $userid = 0, int $questionid = 0):array {
+
+        $records = self::get_question_results($testid, $userid, $questionid);
+
+        $returnarray = [];
+        foreach ($records as $record) {
+            $returnarray[$record->userid][$record->questionid] = $record->fraction;
+        }
+
+        return $returnarray;
+    }
+
+    /**
+     * This Function returns the answered questions in an array...
+     * ... where the userid is the key and every user has an array where the key is the questionid.
+     * ... and value is fraction.
+     * Attention: This will always only return one answer per user and question, even when its answered multiple times.
+     *
+     * @param integer $testid
+     * @param integer $userid
+     * @param integer $questionid
+     * @return array
+     */
+    public static function get_question_results_by_person_withoutid(int $testid = 0, int $userid = 0, int $questionid = 0):array {
+
+        $records = self::get_question_results($testid, $userid, $questionid);
+
+        $returnarray = [];
+        foreach ($records as $record) {
+            $returnarray[] = [$record->fraction];
+        }
+
+        return $returnarray;
+    }
 }

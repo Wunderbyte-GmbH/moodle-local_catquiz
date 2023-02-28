@@ -15,7 +15,7 @@
     along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 }}
 {{!
-    @template local_catquiz/button_subscribe
+    @template local_catquiz/buttons/button_assign
 
     Classes required for JS:
     * none
@@ -25,16 +25,17 @@
 
      Example context (json):
     {
-        'id' : '1',
-        'area' : 'area',
+        'catscaleid' : '1',
     }
 }}
+<a class="btn btn-primary assign-testitems-to-catscale"
+    data-itemid="{{catscaleid}}">
+    {{#str}} assign, local_catquiz {{/str}}
+</a>
 
-<div class="modal fade bd-example-modal-sm" tabindex="-1" role="dialog" aria-labelledby="confirmDeletion" aria-hidden="true">
-    <div class="modal-dialog modal-sm">
-        <div class="modal-content">
-            <button type="button" class="btn btn-primary" data-toggle="modal" data-target=".bd-example-modal-sm">Cancel</button>
-            <button type="button" class="btn btn-secondary" data-id="{{id}}" data-action="delete" data-toggle="modal" data-target=".bd-example-modal-sm">Confirm</button>
-        </div>
-    </div>
-</div>
+
+{{#js}}
+    require(['local_catquiz/actions'], function(init) {
+        init.initassignbutton('{{catscaleidid}}', 'input.testitem-checkbox');
+        });
+{{/js}}

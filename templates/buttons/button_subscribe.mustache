@@ -15,7 +15,7 @@
     along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 }}
 {{!
-    @template local_catquiz/button_subscribe
+    @template local_catquiz/buttons/button_subscribe
 
     Classes required for JS:
     * none
@@ -25,17 +25,27 @@
 
      Example context (json):
     {
-        'shorttext' : 'Short ...',
-        'fulltext' : 'Fulltext',
+        'id' : '1',
+        'area' : 'area',
     }
 }}
 
-<div type="button" class="" data-toggle="modal" data-target=".preview-question-{{id}}">{{shorttext}}</div>
+<a data-action="create" href="#" class="catquiz-button-subscribe btn btn--plain btn--smaller btn-catscales"
+    data-id="{{id}}"
+    data-area="catscale">
+    {{#subscribed}}
+        <i class="fa fa fa-bell" aria-label="{{#str}} subscribed, local_catquiz {{/str}}"></i>
+        {{#str}} subscribed, local_catquiz {{/str}}
+    {{/subscribed}}
+    {{^subscribed}}
+        <i class="fa fa fa-bell-o" aria-label="{{#str}} subscribe, local_catquiz {{/str}}"></i>
+        {{#str}} subscribe, local_catquiz {{/str}}
+    {{/subscribed}}
+</a>
 
-<div class="modal fade preview-question-{{id}}" tabindex="-1" role="dialog" aria-labelledby="{{#str}} previewquestion, local_catquiz {{/str}}" aria-hidden="true">
-  <div class="modal-dialog modal-lg">
-    <div class="modal-content preview-question">
-      {{{fulltext}}}
-    </div>
-  </div>
-</div>
+
+{{#js}}
+    require(['local_catquiz/subscribe'], function(init) {
+        init.init('{{id}}', 'catscale');
+        });
+{{/js}}

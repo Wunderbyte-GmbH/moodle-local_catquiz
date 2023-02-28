@@ -29,6 +29,8 @@ use html_writer;
 use local_catquiz\catscale;
 use local_wunderbyte_table\wunderbyte_table;
 use mod_booking\booking;
+use moodle_url;
+use question_bank;
 
 /**
  * Search results for managers are shown in a table (student search results use the template searchresults_student).
@@ -38,13 +40,19 @@ class testitems_table extends wunderbyte_table {
     /** @var context_module $buyforuser */
     private $context = null;
 
+    /** @var integer $catscaleid */
+    private $catscaleid = 0;
+
     /**
      * Constructor
      * @param string $uniqueid all tables have to have a unique id, this is used
      *      as a key when storing table properties like sort order in the session.
-     * @param booking $booking the booking instance
+     * @param integer $catscaleid
      */
-    public function __construct(string $uniqueid) {
+    public function __construct(string $uniqueid, int $catscaleid = 0) {
+
+        $this->catscaleid = $catscaleid;
+
         parent::__construct($uniqueid);
 
     }
@@ -64,6 +72,8 @@ class testitems_table extends wunderbyte_table {
     public function col_questiontext($values) {
 
         global $OUTPUT;
+
+        $question = question_bank::load_question($values->id);
 
         $context = context_system::instance();
 
@@ -87,7 +97,7 @@ class testitems_table extends wunderbyte_table {
             'id' => $values->id,
         ];
 
-        return $OUTPUT->render_from_template('local_catquiz/modal_questionpreview', $data);
+        return $OUTPUT->render_from_template('local_catquiz/modals/modal_questionpreview', $data);
     }
 
     /**
@@ -96,6 +106,32 @@ class testitems_table extends wunderbyte_table {
      */
     public function col_qtype($values) {
         return get_string('pluginname', 'qtype_' . $values->qtype);
+    }
+
+    public function col_action($values) {
+
+        global $OUTPUT;
+
+        $url = new moodle_url('/local/catquiz/edit_testitem.php', [
+            'id' => $values->id,
+            'catscaleid' => $this->catscaleid ?? 0,
+            'component' => $values->component,
+        ]);
+
+        $data['showactionbuttons'][] = [
+            'label' => get_string('view', 'core'), // Name of your action button.
+            'class' => 'btn btn-plain btn-smaller',
+            'iclass' => 'fa fa-edit',
+            'href' => $url->out(false),
+            'id' => $values->id,
+            'methodname' => '', // The method needs to be added to your child of wunderbyte_table class.
+            'data' => [ // Will be added eg as data-id = $values->id, so values can be transmitted to the method above.
+                'key' => 'id',
+                'value' => $values->id,
+            ]
+        ];
+
+        return $OUTPUT->render_from_template('local_wunderbyte_table/component_actionbutton', $data);;
     }
 
     /**
