@@ -57,10 +57,11 @@ class catquiz_handler {
      * Create the form fields relevant to this plugin.
      *
      * @param MoodleQuickForm $mform
-     * @param \context $context
-     * @return void
+     * @return array
      */
-    public static function instance_form_definition(MoodleQuickForm $mform, \context $context) {
+    public static function instance_form_definition(MoodleQuickForm $mform) {
+
+        $elements = [];
 
         $pm = core_plugin_manager::instance();
         $models = $pm->get_plugins_of_type('catmodel');
@@ -70,15 +71,15 @@ class catquiz_handler {
         }
 
         // Add a special header for catquiz.
-        $mform->addElement('header', 'catquiz_header',
+        $elements[] = $mform->addElement('header', 'catquiz_header',
                 get_string('catquizsettings', 'local_catquiz'));
 
         // Turn the catquiz engine on and off for this particular instance.
-        $mform->addElement('advcheckbox', 'catquiz_usecatquiz',
+        $elements[] = $mform->addElement('advcheckbox', 'catquiz_usecatquiz',
                 get_string('usecatquiz', 'local_catquiz'), null, null, [0, 1]);
 
         // Choose a model for this instance.
-        $mform->addElement('select', 'catquiz_model_select',
+        $elements[] = $mform->addElement('select', 'catquiz_model_select',
                 get_string('selectmodel', 'local_catquiz'), $modelarray);
         $mform->hideIf('catquiz_model_select', 'catquiz_usecatquiz', 'neq', 1);
 
@@ -94,27 +95,27 @@ class catquiz_handler {
         foreach ($catscales as $catscale) {
             $select[$catscale->id] = $catscale->name;
         }
-        $mform->addElement('autocomplete', 'catquiz_catcatscales', get_string('catcatscales', 'local_catquiz'), $select, $options);
+        $elements[] = $mform->addElement('autocomplete', 'catquiz_catcatscales', get_string('catcatscales', 'local_catquiz'), $select, $options);
         $mform->addHelpButton('catquiz_catcatscales', 'catcatscales', 'local_catquiz');
         $mform->hideIf('catquiz_catcatscales', 'catquiz_usecatquiz', 'neq', 1);
 
-        $mform->addElement('text', 'catquiz_passinglevel', get_string('passinglevel', 'local_catquiz'));
+        $elements[] = $mform->addElement('text', 'catquiz_passinglevel', get_string('passinglevel', 'local_catquiz'));
         $mform->addHelpButton('catquiz_passinglevel', 'passinglevel', 'local_catquiz');
         $mform->setType('catquiz_passinglevel', PARAM_INT);
         $mform->hideIf('catquiz_passinglevel', 'catquiz_usecatquiz', 'neq', 1);
 
         // Is it a time paced test?
-        $mform->addElement('advcheckbox', 'catquiz_timepacedtest',
+        $elements[] = $mform->addElement('advcheckbox', 'catquiz_timepacedtest',
                 get_string('timepacedtest', 'local_catquiz'), null, null, [0, 1]);
         $mform->hideIf('catquiz_timepacedtest', 'catquiz_usecatquiz', 'neq', 1);
 
-        $mform->addElement('text', 'catquiz_maxtimeperitem', get_string('maxtimeperitem', 'local_catquiz'));
+        $elements[] = $mform->addElement('text', 'catquiz_maxtimeperitem', get_string('maxtimeperitem', 'local_catquiz'));
         // $mform->addHelpButton('catquiz_maxtimeperitem', 'maxtimeperitem', 'local_catquiz');
         $mform->setType('catquiz_maxtimeperitem', PARAM_INT);
         $mform->hideIf('catquiz_maxtimeperitem', 'catquiz_timepacedtest', 'neq', 1);
         $mform->hideIf('catquiz_maxtimeperitem', 'catquiz_usecatquiz', 'neq', 1);
 
-        $mform->addElement('text', 'catquiz_mintimeperitem', get_string('mintimeperitem', 'local_catquiz'));
+        $elements[] = $mform->addElement('text', 'catquiz_mintimeperitem', get_string('mintimeperitem', 'local_catquiz'));
         // $mform->addHelpButton('catquiz_mintimeperitem', 'mintimeperitem', 'local_catquiz');
         $mform->setType('catquiz_mintimeperitem', PARAM_INT);
         $mform->hideIf('catquiz_mintimeperitem', 'catquiz_timepacedtest', 'neq', 1);
@@ -126,11 +127,12 @@ class catquiz_handler {
             3 => get_string('timeoutabortnoresult', 'local_catquiz'),
         ];
          // Choose a model for this instance.
-         $mform->addElement('select', 'catquiz_actontimeout',
+         $elements[] =  $mform->addElement('select', 'catquiz_actontimeout',
             get_string('actontimeout', 'local_catquiz'), $timeoutoptions);
         $mform->hideIf('catquiz_actontimeout', 'catquiz_timepacedtest', 'neq', 1);
         $mform->hideIf('catquiz_actontimeout', 'catquiz_usecatquiz', 'neq', 1);
 
+        return $elements;
     }
 
     /**
@@ -142,17 +144,28 @@ class catquiz_handler {
     public static function instance_form_before_set_data(stdClass &$data) {
         global $DB;
 
-        if (empty($data->id)) {
+        // Todo: We might rather use data_preprocessing.
+    }
+
+    public static function data_preprocessing(array $formdefaultvalues) {
+
+        global $DB;
+
+        if (!isset($formdefaultvalues['instance'])) {
+            return;
+        }
+        $componentid = $formdefaultvalues['instance'];
+
+        // We can hardcode this at this moment.
+        $component = 'mod_adaptivequiz';
+
+        if (!$catquiz = $DB->get_record('local_catquiz_tests',
+            ['componentname' => $component, 'componentid' => $componentid])) {
             return;
         }
 
-        if (!$settings = $DB->get_record('local_catquiz',
-            ['componentname' => 'mod_' . $data->modulename, 'componentid' => $data->id])) {
-            return;
-        }
-        $data->catquiz_usecatquiz = 1;
-        $data->catquiz_model_select = $settings->adaptivemodel;
-        $data->catscaleids = json_decode($settings->catscaleids);
+        // Todo: Read json and set all the values.
+
     }
 
     /**
@@ -169,10 +182,15 @@ class catquiz_handler {
      * Validate the submitted fields relevant to this plugin.
      *
      * @param stdClass $data
-     * @return void
+     * @return array
      */
-    public static function instance_form_validation(stdClass &$data, array $errors) {
+    public static function instance_form_validation(stdClass &$data) {
 
+        $errors = [];
+
+        // Todo: Make a real validation of necessary fields.
+
+        return $errors;
     }
 
     /**
