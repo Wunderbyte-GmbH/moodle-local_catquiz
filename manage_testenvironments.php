@@ -18,13 +18,12 @@
  * catquiz catscales view page
  * @package    local_catquiz catscales
  * @copyright  2023 Wunderbyte GmbH
- * @author     David Bogner
+ * @author     Georg Maißer
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-use local_catquiz\output\catscalemanagers;
-use local_catquiz\output\catscales;
-use local_catquiz\testenvironments;
+use local_catquiz;
+use local_catquiz\testenvironment;
 
 require_once('../../config.php');
 
@@ -41,10 +40,9 @@ $PAGE->set_heading($title);
 
 echo $OUTPUT->header();
 
-$data = new testenvironments();
+// Get an array to display all the test environments.
+$data = testenvironment::get_all_environments_as_array();
 
-echo $OUTPUT->render_from_template('local_catquiz/catscalesdashboard', [
-    'itemtree' => $data->itemtree,
-]);
+echo $OUTPUT->render_from_template('local_catquiz/catscalesdashboard', $data);
 
 echo $OUTPUT->footer();

@@ -74,14 +74,9 @@ class catquiz_handler {
         $elements[] = $mform->addElement('header', 'catquiz_header',
                 get_string('catquizsettings', 'local_catquiz'));
 
-        // Turn the catquiz engine on and off for this particular instance.
-        $elements[] = $mform->addElement('advcheckbox', 'catquiz_usecatquiz',
-                get_string('usecatquiz', 'local_catquiz'), null, null, [0, 1]);
-
         // Choose a model for this instance.
         $elements[] = $mform->addElement('select', 'catquiz_model_select',
                 get_string('selectmodel', 'local_catquiz'), $modelarray);
-        $mform->hideIf('catquiz_model_select', 'catquiz_usecatquiz', 'neq', 1);
 
         // Question categories or tags to use for this quiz.
 
@@ -97,29 +92,24 @@ class catquiz_handler {
         }
         $elements[] = $mform->addElement('autocomplete', 'catquiz_catcatscales', get_string('catcatscales', 'local_catquiz'), $select, $options);
         $mform->addHelpButton('catquiz_catcatscales', 'catcatscales', 'local_catquiz');
-        $mform->hideIf('catquiz_catcatscales', 'catquiz_usecatquiz', 'neq', 1);
 
         $elements[] = $mform->addElement('text', 'catquiz_passinglevel', get_string('passinglevel', 'local_catquiz'));
         $mform->addHelpButton('catquiz_passinglevel', 'passinglevel', 'local_catquiz');
         $mform->setType('catquiz_passinglevel', PARAM_INT);
-        $mform->hideIf('catquiz_passinglevel', 'catquiz_usecatquiz', 'neq', 1);
 
         // Is it a time paced test?
         $elements[] = $mform->addElement('advcheckbox', 'catquiz_timepacedtest',
                 get_string('timepacedtest', 'local_catquiz'), null, null, [0, 1]);
-        $mform->hideIf('catquiz_timepacedtest', 'catquiz_usecatquiz', 'neq', 1);
 
         $elements[] = $mform->addElement('text', 'catquiz_maxtimeperitem', get_string('maxtimeperitem', 'local_catquiz'));
         // $mform->addHelpButton('catquiz_maxtimeperitem', 'maxtimeperitem', 'local_catquiz');
         $mform->setType('catquiz_maxtimeperitem', PARAM_INT);
         $mform->hideIf('catquiz_maxtimeperitem', 'catquiz_timepacedtest', 'neq', 1);
-        $mform->hideIf('catquiz_maxtimeperitem', 'catquiz_usecatquiz', 'neq', 1);
 
         $elements[] = $mform->addElement('text', 'catquiz_mintimeperitem', get_string('mintimeperitem', 'local_catquiz'));
         // $mform->addHelpButton('catquiz_mintimeperitem', 'mintimeperitem', 'local_catquiz');
         $mform->setType('catquiz_mintimeperitem', PARAM_INT);
         $mform->hideIf('catquiz_mintimeperitem', 'catquiz_timepacedtest', 'neq', 1);
-        $mform->hideIf('catquiz_mintimeperitem', 'catquiz_usecatquiz', 'neq', 1);
 
         $timeoutoptions = [
             1 => get_string('timeoutfinishwithresult', 'local_catquiz'),
@@ -130,7 +120,6 @@ class catquiz_handler {
          $elements[] =  $mform->addElement('select', 'catquiz_actontimeout',
             get_string('actontimeout', 'local_catquiz'), $timeoutoptions);
         $mform->hideIf('catquiz_actontimeout', 'catquiz_timepacedtest', 'neq', 1);
-        $mform->hideIf('catquiz_actontimeout', 'catquiz_usecatquiz', 'neq', 1);
 
         return $elements;
     }
@@ -147,7 +136,7 @@ class catquiz_handler {
         // Todo: We might rather use data_preprocessing.
     }
 
-    public static function data_preprocessing(array $formdefaultvalues) {
+    public static function data_preprocessing(array &$formdefaultvalues) {
 
         global $DB;
 
@@ -159,10 +148,15 @@ class catquiz_handler {
         // We can hardcode this at this moment.
         $component = 'mod_adaptivequiz';
 
-        if (!$catquiz = $DB->get_record('local_catquiz_tests',
-            ['componentname' => $component, 'componentid' => $componentid])) {
-            return;
-        }
+        // Create stdClass with all the values.
+        $cattest = (object)[
+            'componentid' => $componentid,
+            'component' => $component,
+        ];
+
+        // Pass on the values as stdClas.
+        $test = new testenvironment($cattest);
+        $test->apply_jsonsaved_values($formdefaultvalues);
 
         // Todo: Read json and set all the values.
 
@@ -181,10 +175,11 @@ class catquiz_handler {
     /**
      * Validate the submitted fields relevant to this plugin.
      *
-     * @param stdClass $data
+     * @param array $data
+     * @param array $files
      * @return array
      */
-    public static function instance_form_validation(stdClass &$data) {
+    public static function instance_form_validation(array $data, array $files) {
 
         $errors = [];
 
@@ -204,21 +199,14 @@ class catquiz_handler {
     public static function instance_form_save(stdClass &$data, int $instanceid, string $componentname) {
         global $DB;
 
-        if (empty($data->catquiz_usecatquiz)) {
-            return;
-        }
+        $componentid = $data->instance;
 
-        $catdata = new stdClass;
-        $catdata->componentname = $componentname;
-        $catdata->componentid = $instanceid;
-        $catdata->adaptivemodel = $data->catquiz_model_select;
-        $catdata->catscaleids = json_encode($data->catscaleids);
-        if ($DB->record_exists('local_catquiz', ['componentname' => $componentname, 'componentid' => $instanceid])) {
-            $catdata->id = $DB->get_field('local_catquiz', 'id', ['componentname' => $componentname,
-                'componentid' => $instanceid]);
-            $DB->update_record('local_catquiz', $catdata);
-        } else {
-            $DB->insert_record('local_catquiz', $catdata);
+        // We can hardcode this at this moment.
+        $component = 'mod_adaptivequiz';
+
+        if (!$catquiz = $DB->get_record('local_catquiz_tests',
+            ['component' => $component, 'componentid' => $componentid])) {
+            return;
         }
     }
 

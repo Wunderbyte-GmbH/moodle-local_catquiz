@@ -70,6 +70,9 @@ $string['chooseparent'] = 'Choose parent scale';
 $string['errorminscalevalue'] = 'Min value has to be smaller than max value';
 $string['errorhastobefloat'] = 'Has to be a deciamal';
 
+// Tests environment.
+$string['newcustomtest'] = 'Custom test';
+
 // Buttons.
 $string['subscribe'] = 'Subscribe';
 $string['subscribed'] = 'Subscribed';
