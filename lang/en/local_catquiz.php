@@ -44,6 +44,7 @@ $string['nameexists'] = 'The name of the catscale already exists';
 $string['createnewcatscale'] = 'Create new catscale';
 $string['parent'] = 'Parent catscale - None if top level catscale';
 $string['managecatscale'] = 'Manage catscale';
+$string['managetestenvironments'] = 'Manage testenvironments';
 $string['showlistofcatscalemanagers'] = "Show list of catscale-Managers";
 $string['addcategory'] = "Add category";
 $string['documentation'] = "Documentation";

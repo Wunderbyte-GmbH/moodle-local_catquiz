@@ -44,6 +44,7 @@ $string['nameexists'] = 'Der Name der CAT Skala wurde bereits verwendet';
 $string['createnewcatscale'] = 'Neue CAT Skala erstellen';
 $string['parent'] = 'Übergeordnete CAT Skala - keine Auswahl falls Top-Level CAT Skala';
 $string['managecatscale'] = 'CAT Skalen verwalten';
+$string['managetestenvironments'] = 'Testumgebungen verwalten';
 $string['showlistofcatscalemanagers'] = "Catscale Managers";
 $string['addcategory'] = "Kategorie hinzufügen";
 $string['documentation'] = "Dokumentation";
