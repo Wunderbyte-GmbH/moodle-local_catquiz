@@ -23,6 +23,7 @@
  */
 
 use local_catquiz\output\catscalemanagers;
+use local_catquiz\output\catscales;
 
 require_once('../../config.php');
 
@@ -39,8 +40,8 @@ $PAGE->set_heading($title);
 
 echo $OUTPUT->header();
 
-$data = new local_catquiz\output\catscales();
-$catscalemanagers = new local_catquiz\output\catscalemanagers();
+$data = new catscales();
+$catscalemanagers = new catscalemanagers();
 
 echo $OUTPUT->render_from_template('local_catquiz/catscalesdashboard', [
     'itemtree' => $data->itemtree,
