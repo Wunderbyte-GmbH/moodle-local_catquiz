@@ -34,7 +34,7 @@ class catquiz_base {
         global $DB;
 
         $params = [];
-        $sql = "SELECT qas.id, qa.questionid, qas.userid, qas.fraction, q.qtype, qas.state, qa.maxmark, qa.maxfraction, qa.minfraction, qas.state
+        $sql = "SELECT qas.id, qa.questionid, qas.userid, qas.fraction, q.qtype, qas.state, qa.maxmark, qa.maxfraction, qa.minfraction, qas.state, qas.timecreated
                 FROM {question_attempts} qa
                 JOIN {question_attempt_steps} qas
                 ON qas.questionattemptid = qa.id
@@ -91,8 +91,6 @@ class catquiz_base {
     /**
      * This Function returns the answered questions in an array...
      * ... where the userid is the key and every user has an array where the key is the questionid.
-     * ... and value is fraction.
-     * Attention: This will always only return one answer per user and question, even when its answered multiple times.
      *
      * @param integer $testid
      * @param integer $userid
@@ -105,7 +103,26 @@ class catquiz_base {
 
         $returnarray = [];
         foreach ($records as $record) {
-            $returnarray[] = [$record->fraction];
+
+            if (!isset($returnarray[$record->userid])) {
+                $returnarray[$record->userid] = [];
+            }
+            if (!isset($returnarray[$record->userid]['question'])) { // This is the component.
+                $returnarray[$record->userid]['question'] = [];
+            }
+            if (!isset($returnarray[$record->userid]['question'][$record->questionid])) { // This is the component.
+                $returnarray[$record->userid]['question'][$record->questionid] = [];
+            }
+
+            $response = [
+                'fraction' => $record->fraction,
+                'maxfraction' => $record->maxfraction,
+                'minfraction' => $record->minfraction,
+                'qtype' => $record->qtype,
+                'timestamp' => $record->timecreated,
+            ];
+
+            $returnarray[$record->userid]['question'][$record->questionid][] = $response;
         }
 
         return $returnarray;
