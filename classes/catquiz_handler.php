@@ -25,6 +25,7 @@
 
 namespace local_catquiz;
 
+use context_system;
 use core_plugin_manager;
 use moodle_exception;
 use MoodleQuickForm;
@@ -61,6 +62,8 @@ class catquiz_handler {
      */
     public static function instance_form_definition(MoodleQuickForm $mform) {
 
+        global $PAGE;
+
         $elements = [];
 
         $pm = core_plugin_manager::instance();
@@ -69,6 +72,38 @@ class catquiz_handler {
         foreach ($models as $model) {
             $modelarray[$model->name] = $model->displayname;
         }
+
+        $testtemplates = testenvironment::get_environments_as_array();
+
+        // We introduce the option of a custom test environment.
+        $testtemplates[0] = get_string('newcustomtest', 'local_catquiz');
+
+        ksort($testtemplates);
+
+        $elements[] = $mform->addElement(
+            'select',
+            'choosetest',
+            get_string('choosetest',
+            'local_catquiz'),
+            $testtemplates,
+            ['data-on-change-action' => 'reloadTestForm']);
+
+        $mform->setType('choosetest', PARAM_INT);
+
+        $context = context_system::instance();
+
+        if (has_capability('local/catquiz:manage_testenvironments', $context)) {
+            // If you have the right, you can define this setting as template.
+            $elements[] = $mform->addElement('text', 'testenvironment_name', get_string('name', 'core'));
+        }
+
+        // We have require JS to click no submit button on change of test environment.
+        $PAGE->requires->js_call_amd('local_catquiz/catquizTestChooser', 'init');
+
+         // Button to attach JavaScript to to reload the form.
+         $mform->registerNoSubmitButton('submitcattestoption');
+         $elements[] = $mform->addElement('submit', 'submitcattestoption', 'cattestsubmit',
+             ['class' => 'd-none', 'data-action' => 'submitCatTest']);
 
         // Add a special header for catquiz.
         $elements[] = $mform->addElement('header', 'catquiz_header',
@@ -136,30 +171,56 @@ class catquiz_handler {
         // Todo: We might rather use data_preprocessing.
     }
 
-    public static function data_preprocessing(array &$formdefaultvalues) {
+    /**
+     * Undocumented function
+     *
+     * @param array $formdefaultvalues
+     * @param MoodleQuickForm|null $mform
+     * @return void
+     */
+    public static function data_preprocessing(array &$formdefaultvalues, ?MoodleQuickForm $mform = null) {
 
         global $DB;
 
         if (!isset($formdefaultvalues['instance'])) {
             return;
         }
+
         $componentid = $formdefaultvalues['instance'];
 
         // We can hardcode this at this moment.
         $component = 'mod_adaptivequiz';
 
-        // Create stdClass with all the values.
-        $cattest = (object)[
-            'componentid' => $componentid,
-            'component' => $component,
-        ];
+        if ($mform) {
+            $data = $mform->getSubmitValues();
+        }
 
-        // Pass on the values as stdClas.
-        $test = new testenvironment($cattest);
-        $test->apply_jsonsaved_values($formdefaultvalues);
+        // The test environment is always on custom to start with.
+        if (empty($data['choosetest'])) {
+
+            // Create stdClass with all the values.
+            $cattest = (object)[
+                'componentid' => $componentid,
+                'component' => $component,
+            ];
+
+            // Pass on the values as stdClas.
+            $test = new testenvironment($cattest);
+            $test->apply_jsonsaved_values($formdefaultvalues);
+            $formdefaultvalues['choosetest'] = 0;
+        } else {
+            // Create stdClass with all the values.
+            $cattest = (object)[
+                'id' => $data['choosetest'],
+            ];
+            // Pass on the values as stdClas.
+            $test = new testenvironment($cattest);
+            $test->apply_jsonsaved_values($formdefaultvalues);
+        }
+
+        unset($formdefaultvalues['testenvironment_name']);
 
         // Todo: Read json and set all the values.
-
     }
 
     /**
@@ -236,5 +297,39 @@ class catquiz_handler {
         // TODO: Implement fuctionality.
 
         return true;
+    }
+
+    /**
+     * Class to be called from external plugin to save quiz data.
+     *
+     * @param stdClass $quizdata
+     * @return void
+     */
+    public static function add_or_update_instance_callback(stdClass $quizdata) {
+
+        $clone = clone($quizdata);
+
+        // We unset id & instance. We don't want to introduce confuction because of it.
+        unset($clone->id);
+        unset($clone->instance);
+
+        // Create stdClass with all the values.
+        $cattest = (object)[
+            'componentid' => $quizdata->id,
+            'component' => 'mod_adaptivequiz',
+            'json' => json_encode($clone),
+        ];
+
+        // Pass on the values as stdClas.
+        $test = new testenvironment($cattest);
+
+        // We check to see if we want to save it as template.
+        if (!empty($quizdata->testenvironment_name)) {
+            $test->save_as_template($quizdata->testenvironment_name);
+        }
+
+        // Save the values in the DB.
+        $test->save_or_update();
+
     }
 }

@@ -72,6 +72,13 @@ $string['errorhastobefloat'] = 'Muss ein Dezimalwert sein';
 
 // Tests environment.
 $string['newcustomtest'] = 'Benutzerdefinierter Test';
+$string['lang'] = 'Sprache';
+$string['component'] = 'Plugin';
+$string['timemodified'] = 'Modifiziert';
+$string['invisible'] = 'Unsichtbar';
+$string['edittestenvironment'] = 'Bearbeite Testumgebung';
+$string['choosetest'] = 'Wähle Testumgebung';
+$string['parentid'] = 'Eltern id';
 
 // Buttons.
 $string['subscribe'] = 'Abonniere';

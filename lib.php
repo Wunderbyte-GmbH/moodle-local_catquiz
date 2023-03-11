@@ -25,6 +25,12 @@
 define('STATUS_SUBSCRIPTION_BOOKED', 1);
 define('STATUS_SUBSCRIPTION_DELETED', 0);
 
+define('STATUS_TEST_ACTIVE', 1);
+define('STATUS_TEST_INACTIVE', 0);
+
+define('STATUS_TEST_VISIBLE', 1);
+define('STATUS_TEST_INVISIBLE', 0);
+
 /**
  * Renders the popup Link.
  *

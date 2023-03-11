@@ -22,8 +22,7 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-use local_catquiz;
-use local_catquiz\testenvironment;
+use local_catquiz\output\testenvironmentdashboard;
 
 require_once('../../config.php');
 
@@ -38,11 +37,10 @@ $title = get_string('pluginname', 'local_catquiz');
 $PAGE->set_title($title);
 $PAGE->set_heading($title);
 
+$data = new testenvironmentdashboard();
+
 echo $OUTPUT->header();
 
-// Get an array to display all the test environments.
-$data = testenvironment::get_all_environments_as_array();
-
-echo $OUTPUT->render_from_template('local_catquiz/catscalesdashboard', $data);
+echo $OUTPUT->render_from_template('local_catquiz/testenvironmentdashboard', $data->return_array());
 
 echo $OUTPUT->footer();

@@ -72,10 +72,17 @@ $string['errorhastobefloat'] = 'Has to be a deciamal';
 
 // Tests environment.
 $string['newcustomtest'] = 'Custom test';
+$string['lang'] = 'Language';
+$string['component'] = 'Plugin';
+$string['invisible'] = 'Invisible';
+$string['edittestenvironment'] = 'Edit testenvironment';
+$string['choosetest'] = 'Choose a test environment';
+$string['parentid'] = 'Parent id';
 
 // Buttons.
 $string['subscribe'] = 'Subscribe';
 $string['subscribed'] = 'Subscribed';
+$string['timemodified'] = 'Time modified';
 
 // Events.
 $string['userupdatedcatscale'] = 'User with id {$a->userid} updated catscale with id {$a->objectid}';

@@ -115,6 +115,13 @@ class testenvironment {
     private int $status;
 
     /**
+     * $parentid
+     *
+     * @var integer
+     */
+    private int $parentid;
+
+    /**
      * Testenvironment constructor.
      * @param stdClass $newrecord
      */
@@ -145,16 +152,17 @@ class testenvironment {
         $this->description = $record->description ?? '';
         $this->descriptionformat = $record->descriptionformat ?? 1;
         $this->json = $record->json ?? '';
-        $this->visible = $record->visible ?? 1;
+        $this->visible = $record->visible ?? STATUS_TEST_INVISIBLE;
         $this->availability = $record->availability ?? '';
         $this->lang = $record->lang ?? '';
-        $this->status = $record->status ?? 1;
+        $this->status = $record->status ?? STATUS_TEST_ACTIVE;
+        $this->parentid = $record->parentid ?? 0;
     }
 
     /**
      * Function to update DB record with values from instantiated class.
      *
-     * @return void
+     * @return int
      */
     public function save_or_update() {
         global $DB;
@@ -176,8 +184,36 @@ class testenvironment {
             } else {
                 throw new moodle_exception('updatetestfailed', 'local_catquiz');
             }
-        }
 
+            return $id;
+        }
+    }
+
+    /**
+     * Function to save current instance as template.
+     *
+     * @param string $templatename
+     * @return void
+     */
+    public function save_as_template(string $templatename) {
+
+        // We use negative componentids for templates.
+        // Therefore, we need to retrieve them.
+
+        // Store for later.
+        $name = $this->name;
+        $componentid = $this->componentid;
+
+        $this->name = $templatename;
+        $this->componentid = 0;
+        $this->id = 0;
+
+        $parentid = $this->save_or_update();
+
+        $this->id = 0;
+        $this->name = $name;
+        $this->componentid = $componentid;
+        $this->parentid = $parentid;
     }
 
     /**
@@ -204,6 +240,21 @@ class testenvironment {
     }
 
     /**
+     * Return class properties as array.
+     *
+     * @return array
+     */
+    public function return_as_array() {
+
+        $returnarray = [];
+        foreach ($this as $key => $value) {
+            $returnarray[$key] = $value;
+        }
+
+        return $returnarray;
+    }
+
+    /**
      * Function to update a $record by the properties of the instantiated class.
      *
      * @param stdClass $recordtoupdate
@@ -222,6 +273,7 @@ class testenvironment {
         $record->availability = $this->availability ?? $record->availability;
         $record->lang = $this->lang ?? $record->lang;
         $record->status = $this->status ?? $record->status;
+        $record->parentid = $this->parentid ?? $record->parentid ?? 0;
 
         $now = time();
 
@@ -263,16 +315,50 @@ class testenvironment {
 
     /**
      * Returns an array of all or filtered test environments.
-     *
+     * @param string $component
      * @return array
      */
-    public static function get_all_environments_as_array() {
+    public static function get_environments_as_array(
+            string $component = 'mod_adaptivequiz',
+            bool $onlytemplates = true) {
         global $DB;
 
-        if (!$records = $DB->get_records('local_catquiz_tests')) {
-            return [];
+        $returnarray = [];
+
+        $params = [
+            'component' => $component,
+        ];
+
+        if ($onlytemplates) {
+            $params['componentid'] = 0;
         }
 
-        return (array)$records;
+        if (!$records = $DB->get_records('local_catquiz_tests', $params)) {
+            return $returnarray;
+        }
+
+        foreach ($records as $record) {
+            $returnarray[$record->id] = $record->name;
+        }
+
+        return $returnarray;
+    }
+
+    /**
+     * Delete Testenvironment.
+     *
+     * @param integer $id
+     * @return bool
+     */
+    public static function delete_testenvironment(int $id) {
+        global $DB;
+
+        $returnvalue = false;
+
+        if ($DB->delete_records('local_catquiz_tests', ['id' => $id])) {
+            $returnvalue = true;
+        }
+
+        return $returnvalue;
     }
 }

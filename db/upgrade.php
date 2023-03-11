@@ -81,6 +81,7 @@ function xmldb_local_catquiz_upgrade($oldversion) {
             $table->add_field('availability', XMLDB_TYPE_CHAR, '255', null, null, null, '');
             $table->add_field('lang', XMLDB_TYPE_CHAR, '30', null, null, null, '');
             $table->add_field('status', XMLDB_TYPE_INTEGER, '2', null, XMLDB_NOTNULL, null, '1');
+            $table->add_field('parentid', XMLDB_TYPE_INTEGER, '10', null, null, null, '0');
             $table->add_field('timecreated', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0');
             $table->add_field('timemodified', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0');
 
