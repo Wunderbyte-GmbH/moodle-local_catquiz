@@ -53,7 +53,7 @@ class catmodel_info {
         $returnarray = [];
 
         // Retrieve all the responses in the given context.
-        $responses = catquiz_base::get_question_results_by_person_withoutid(0, 0, $testitemid);
+        $responses = catquiz_base::get_question_results_by_person(0, 0, $testitemid);
 
         // Right now, we need different responses.
         $responses = [
