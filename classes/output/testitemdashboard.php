@@ -50,14 +50,13 @@ use renderable;
 class testitemdashboard implements renderable, templatable {
 
     /** @var integer of testitemid */
-    public int $testitemid = 0;
+    public $testitemid = 0;
 
     /**
-     * Either returns one tree or treearray for every parentnode
+     * Constructor of class.
      *
-     * @param int $fulltree
-     * @param boolean $allowedit
-     * @return array
+     * @param int $testitemid
+     * @return void
      */
     public function __construct(int $testitemid) {
 
@@ -67,7 +66,7 @@ class testitemdashboard implements renderable, templatable {
     /**
      * Render the moodle charts.
      *
-     * @return void
+     * @return array
      */
     private function render_modelcards() {
 
@@ -126,7 +125,7 @@ class testitemdashboard implements renderable, templatable {
     /**
      * Render the moodle charts.
      *
-     * @return void
+     * @return array
      */
     private function render_testitemstats() {
 
@@ -174,7 +173,7 @@ class testitemdashboard implements renderable, templatable {
             ],
             [
                 'title' => get_string('averageofallanswers', 'local_catquiz'),
-                'body' => $averageofallanswers,
+                'body' => round($averageofallanswers,2),
             ]
         ];
     }

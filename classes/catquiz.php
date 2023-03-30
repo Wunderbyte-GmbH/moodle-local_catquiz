@@ -94,7 +94,7 @@ class catquiz {
      * Returns the sql to get all the questions wanted.
      * @param array $wherearray
      * @param array $filterarray
-     * @return void
+     * @return array
      */
     public static function return_sql_for_addquestions(array $wherearray = [], array $filterarray = []) {
 
@@ -123,7 +123,7 @@ class catquiz {
      * @param int $catscaleid
      * @param array $wherearray
      * @param array $filterarray
-     * @return void
+     * @return array
      */
     public static function return_sql_for_catscalequestions(int $catscaleid, array $wherearray = [], array $filterarray = []) {
 
@@ -155,7 +155,7 @@ class catquiz {
      * @param int $catscaleid
      * @param array $wherearray
      * @param array $filterarray
-     * @return void
+     * @return array
      */
     public static function return_sql_for_addcatscalequestions(int $catscaleid, array $wherearray = [], array $filterarray = []) {
 
@@ -188,7 +188,7 @@ class catquiz {
      * Return the sql for all questions answered.
      *
      * @param integer $testitemid
-     * @return void
+     * @return array
      */
     public static function get_sql_for_questions_answered(int $testitemid = 0) {
 
@@ -214,7 +214,7 @@ class catquiz {
      * Return the sql for all questions answered.
      *
      * @param integer $testitemid
-     * @return void
+     * @return array
      */
     public static function get_sql_for_questions_average(int $testitemid = 0) {
 
@@ -226,7 +226,7 @@ class catquiz {
             $params = ['questionid' => $testitemid];
         }
 
-        $sql = "SELECT AVG(qas.fraction)
+        $sql = "SELECT AVG((qas.fraction - qa.minfraction) / (qa.maxfraction - qa.minfraction))
         FROM {question_attempt_steps} qas
         JOIN {question_attempts} qa ON qas.questionattemptid=qa.id"
         . $and;
@@ -239,7 +239,7 @@ class catquiz {
      * Return the sql for all questions answered.
      *
      * @param integer $testitemid
-     * @return void
+     * @return array
      */
     public static function get_sql_for_questions_answered_correct(int $testitemid = 0) {
 
@@ -265,7 +265,7 @@ class catquiz {
      * Return the sql for all questions answered.
      *
      * @param integer $testitemid
-     * @return void
+     * @return array
      */
     public static function get_sql_for_questions_answered_incorrect(int $testitemid = 0) {
 
@@ -291,7 +291,7 @@ class catquiz {
      * Return the sql for all questions answered.
      *
      * @param integer $testitemid
-     * @return void
+     * @return array
      */
     public static function get_sql_for_questions_answered_partlycorrect(int $testitemid = 0) {
 
@@ -318,7 +318,7 @@ class catquiz {
      * Return the sql for all questions answered.
      *
      * @param integer $testitemid
-     * @return void
+     * @return array
      */
     public static function get_sql_for_questions_answered_by_distinct_persons(int $testitemid = 0) {
 
@@ -347,7 +347,7 @@ class catquiz {
      * Return the sql for all questions answered.
      *
      * @param integer $testitemid
-     * @return void
+     * @return array
      */
     public static function get_sql_for_questions_usages_in_tests(int $testitemid = 0) {
 
