@@ -160,11 +160,30 @@ class testenvironment {
     }
 
     /**
+     * Public function to set the name of the curent testenvironment.
+     *
+     * @return void
+     */
+    public function set_name_in_json() {
+
+        // We get the current json.
+        $object = json_decode($this->json);
+
+        // Change the current name
+        $object->name = $this->name;
+
+        // And set it back as json.
+        $this->json = json_encode($object);
+
+    }
+
+    /**
      * Function to update DB record with values from instantiated class.
      *
+     * @param string $templatename
      * @return int
      */
-    public function save_or_update() {
+    public function save_or_update($templatename = '') {
         global $DB;
 
         if ($record = $this->get_record($this->id, $this->componentid, $this->component)) {

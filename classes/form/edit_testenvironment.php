@@ -111,13 +111,11 @@ class edit_testenvironment extends dynamic_form {
 
         if (isset($data->id)) {
 
-            $record = (object)[
-                'id' => $data->id,
-            ];
             $data->descriptionformat = $data->description['format'];
             $data->description = $data->description['text'];
 
             $test = new testenvironment($data);
+            $test->set_name_in_json();
             $test->save_or_update();
         }
 
