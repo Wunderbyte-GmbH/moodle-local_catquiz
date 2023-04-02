@@ -70,6 +70,8 @@ $string['chooseparent'] = 'Wähle übergeordnete Scala';
 $string['errorminscalevalue'] = 'Der Minimalwert muss kleiner sein als der Maximalwert der Skala';
 $string['errorhastobefloat'] = 'Muss ein Dezimalwert sein';
 
+$string['addoredittemplate'] = "Bearbeite Vorlage";
+
 // Tests environment.
 $string['newcustomtest'] = 'Benutzerdefinierter Test';
 $string['lang'] = 'Sprache';

@@ -28,6 +28,8 @@ namespace local_catquiz;
 use moodle_exception;
 use stdClass;
 
+require_once($CFG->dirroot . '/local/catquiz/lib.php');
+
 /**
  * Class testenvironment
  *
@@ -42,7 +44,7 @@ class testenvironment {
      *
      * @var integer
      */
-    private string $id;
+    public string $id;
 
     /**
      * $name
@@ -170,7 +172,7 @@ class testenvironment {
         $object = json_decode($this->json);
 
         // Change the current name
-        $object->name = $this->name;
+        $object->testenvironment_name = $this->name;
 
         // And set it back as json.
         $this->json = json_encode($object);
@@ -186,50 +188,66 @@ class testenvironment {
     public function save_or_update($templatename = '') {
         global $DB;
 
+        // If we find the exact record, it might still be the case that we want to save a copy of a template.
         if ($record = $this->get_record($this->id, $this->componentid, $this->component)) {
 
-            $this->update_object($record);
+            if (empty($templatename) || ($record->name == $templatename)) {
+                $this->update_object($record);
+                $DB->update_record('local_catquiz_tests', $record);
 
-            $DB->update_record('local_catquiz_tests', $record);
+                return $this->id;
+            }
+            // If the name of the record is different, we want to insert a new record.
+            unset($record->id);
 
         } else {
             // Create a new entry in DB.
-
             $record = new stdClass();
-            $this->update_object($record);
-
-            if ($id = $DB->insert_record('local_catquiz_tests', $record)) {
-                $this->id = $id;
-            } else {
-                throw new moodle_exception('updatetestfailed', 'local_catquiz');
-            }
-
-            return $id;
         }
+
+        $this->update_object($record);
+
+        // In case of a templatename, we pass this on.
+        if (!empty($templatename)) {
+            $record->name = $templatename;
+        }
+
+        if ($id = $DB->insert_record('local_catquiz_tests', $record)) {
+            $this->id = $id;
+        } else {
+            throw new moodle_exception('updatetestfailed', 'local_catquiz');
+        }
+
+        return $this->id;
+
     }
 
     /**
      * Function to save current instance as template.
      *
+     * @param int $templateid
      * @param string $templatename
      * @return void
      */
-    public function save_as_template(string $templatename) {
+    public function save_as_template(int $templateidid, string $templatename) {
 
         // We use negative componentids for templates.
         // Therefore, we need to retrieve them.
 
-        // Store for later.
+        // We make this template as a copy of an actual test.
+        // So we just change the test for the durartion of the template saving.
         $name = $this->name;
         $componentid = $this->componentid;
+        $id = $this->id;
 
         $this->name = $templatename;
         $this->componentid = 0;
-        $this->id = 0;
+        $this->id = $templateidid;
 
-        $parentid = $this->save_or_update();
+        $parentid = $this->save_or_update($templatename);
 
-        $this->id = 0;
+        // After Saving as template, we revert to the original name.
+        $this->id = $id;
         $this->name = $name;
         $this->componentid = $componentid;
         $this->parentid = $parentid;
@@ -250,7 +268,33 @@ class testenvironment {
         foreach($jsonobject as $key => $value) {
 
             // Never overwrite a few values.
-            if (in_array($key, ['id', 'instance'])) {
+            if (in_array($key, [
+                'id',
+                'instance',
+                'coursemodule',
+                'module',
+                'course',
+                'cmidnumber',
+                'groupingid',
+                'availabilityconditionsjson',
+                'completion',
+                'completionexpected',
+                'add', // Check value.
+                'update', // Check value.
+                'return', // Check value.
+                'sr', // Check value.
+                'competencies',
+                'competency_rule',
+                'override_grade',
+                'submitbutton2',
+                'completionpassgrade',
+                'completiongradeitemnumber',
+                'conditiongradegroup',
+                'conditionfieldgroup',
+                'downloadcontent',
+                'timemodified',
+
+                ])) {
                 continue;
             }
 

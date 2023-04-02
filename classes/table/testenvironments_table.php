@@ -143,14 +143,8 @@ class testenvironments_table extends wunderbyte_table {
             'id' => $values->id,
             'formname' => 'local_catquiz\\form\\edit_testenvironment', // The method needs to be added to your child of wunderbyte_table class.
             'data' => [
-                [ // Will be added eg as data-id = $values->id, so values can be transmitted to the method above.
-                    'key' => 'id',
-                    'value' => $values->id,
-                ],
-                [
-                    'key' => 'labelcolumn',
-                    'value' => 'name',
-                ],
+                'id' => $values->id,
+                'labelcolumn' => 'name'
                 ]
         ];
 

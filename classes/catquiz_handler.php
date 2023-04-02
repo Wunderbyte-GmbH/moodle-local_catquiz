@@ -60,7 +60,7 @@ class catquiz_handler {
      * @param MoodleQuickForm $mform
      * @return array
      */
-    public static function instance_form_definition(MoodleQuickForm $mform) {
+    public static function instance_form_definition(MoodleQuickForm &$mform) {
 
         global $PAGE;
 
@@ -94,11 +94,16 @@ class catquiz_handler {
 
         if (has_capability('local/catquiz:manage_testenvironments', $context)) {
             // If you have the right, you can define this setting as template.
+            $elements[] = $mform->addElement('advcheckbox', 'testenvironment_addoredittemplate', get_string('addoredittemplate', 'local_catquiz'));
             $elements[] = $mform->addElement('text', 'testenvironment_name', get_string('name', 'core'));
+            $mform->hideIf('testenvironment_name', 'testenvironment_addoredittemplate', 'eq', 0);
         }
 
         // We have require JS to click no submit button on change of test environment.
         $PAGE->requires->js_call_amd('local_catquiz/catquizTestChooser', 'init');
+
+        // We want to make sure the cat model section is always expanded.
+        $mform->setExpanded('catmodelheading');
 
          // Button to attach JavaScript to to reload the form.
          $mform->registerNoSubmitButton('submitcattestoption');
@@ -108,6 +113,7 @@ class catquiz_handler {
         // Add a special header for catquiz.
         $elements[] = $mform->addElement('header', 'catquiz_header',
                 get_string('catquizsettings', 'local_catquiz'));
+        $mform->setExpanded('catquiz_header');
 
         // Choose a model for this instance.
         $elements[] = $mform->addElement('select', 'catquiz_model_select',
@@ -178,7 +184,7 @@ class catquiz_handler {
      * @param MoodleQuickForm|null $mform
      * @return void
      */
-    public static function data_preprocessing(array &$formdefaultvalues, ?MoodleQuickForm $mform = null) {
+    public static function data_preprocessing(array &$formdefaultvalues, MoodleQuickForm &$mform = null) {
 
         global $DB;
 
@@ -218,6 +224,7 @@ class catquiz_handler {
             $test->apply_jsonsaved_values($formdefaultvalues);
         }
 
+        $formdefaultvalues['testenvironment_addoredittemplate'] = 0;
         unset($formdefaultvalues['testenvironment_name']);
 
         // Todo: Read json and set all the values.
@@ -309,27 +316,79 @@ class catquiz_handler {
 
         $clone = clone($quizdata);
 
-        // We unset id & instance. We don't want to introduce confuction because of it.
+        // We unset id & instance. We don't want to introduce confusion because of it.
         unset($clone->id);
         unset($clone->instance);
+        unset($clone->course);
+        unset($clone->section);
+
+        // If there is a new template name.
+        if (!empty($quizdata->testenvironment_name && !empty($quizdata->testenvironment_addoredittemplate))) {
+
+            // If we have a template name, we first check if we come from an existing template.
+            // Create stdClass with all the values.
+            $cattest = (object)[
+                'id' => $quizdata->choosetest, // When a template is selected, we might want to update it.
+                'json' => json_encode($clone),
+                'component' => 'mod_adaptivequiz',
+            ];
+
+            $test = new testenvironment($cattest);
+            // In this case, we want to add or update the template.
+            $parentid = $test->save_or_update($quizdata->testenvironment_name);
+        }
 
         // Create stdClass with all the values.
         $cattest = (object)[
             'componentid' => $quizdata->id,
             'component' => 'mod_adaptivequiz',
             'json' => json_encode($clone),
+            'parentid' => $parentid ?? 0,
         ];
 
-        // Pass on the values as stdClas.
+         // Pass on the values as stdClas.
         $test = new testenvironment($cattest);
-
-        // We check to see if we want to save it as template.
-        if (!empty($quizdata->testenvironment_name)) {
-            $test->save_as_template($quizdata->testenvironment_name);
-        }
-
         // Save the values in the DB.
         $test->save_or_update();
-
     }
+
+    /**
+     * We use this function to apply eg template data.
+     *
+     * @param MoodleQuickForm $mform
+     * @return void
+     */
+    public static function set_data_after_definition(MoodleQuickForm &$mform) {
+
+        $values = $mform->getSubmitValues();
+
+        if (empty($values['choosetest'])) {
+            return;
+        }
+
+        $cattest = (object)[
+            'id' => $values['choosetest'],
+        ];
+        // Pass on the values as stdClas.
+        $test = new testenvironment($cattest);
+        $test->apply_jsonsaved_values($values);
+
+        $overridevalues = [
+            'testenvironment_addoredittemplate' => '0',
+        ];
+
+        foreach ($values as $k => $v) {
+
+            if (isset($overridevalues[$k])) {
+                $v = $overridevalues[$k];
+            }
+
+            if ($mform->elementExists($k)) {
+                $element = $mform->getElement($k);
+                $element->setValue($v);
+                // $element->freeze();
+            }
+        }
+    }
+
 }
