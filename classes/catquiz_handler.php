@@ -25,6 +25,7 @@
 
 namespace local_catquiz;
 
+use cache_helper;
 use context_system;
 use core_plugin_manager;
 use moodle_exception;
@@ -336,6 +337,8 @@ class catquiz_handler {
             $test = new testenvironment($cattest);
             // In this case, we want to add or update the template.
             $parentid = $test->save_or_update($quizdata->testenvironment_name);
+
+            cache_helper::purge_by_event('changesintestenvironments');
         }
 
         // Create stdClass with all the values.
@@ -350,6 +353,8 @@ class catquiz_handler {
         $test = new testenvironment($cattest);
         // Save the values in the DB.
         $test->save_or_update();
+
+        cache_helper::purge_by_event('changesintestenvironments');
     }
 
     /**
@@ -386,7 +391,9 @@ class catquiz_handler {
             if ($mform->elementExists($k)) {
                 $element = $mform->getElement($k);
                 $element->setValue($v);
-                // $element->freeze();
+                if ($test->status_force()) {
+                    $element->freeze();
+                }
             }
         }
     }
