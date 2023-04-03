@@ -20,6 +20,7 @@ defined('MOODLE_INTERNAL') || die();
 
 global $CFG;
 require_once("$CFG->libdir/formslib.php");
+require_once($CFG->dirroot . "/local/catquiz/lib.php");
 
 use Behat\Testwork\Translator\Cli\LanguageController;
 use cache_helper;
@@ -79,8 +80,9 @@ class edit_testenvironment extends dynamic_form {
         $mform->setDefault('lang', $CFG->lang);
 
         $statusarray = [
-            0 => get_string('inactive', 'core'),
-            1 => get_string('active', 'core'),
+            STATUS_TEST_INACTIVE => get_string('inactive', 'core'),
+            STATUS_TEST_ACTIVE => get_string('active', 'core'),
+            STATUS_TEST_FORCE => get_string('force', 'local_catquiz'),
         ];
 
         $mform->addElement('select', 'status', get_string('status', 'core'), $statusarray);

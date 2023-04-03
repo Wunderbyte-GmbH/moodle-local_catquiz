@@ -271,6 +271,7 @@ class testenvironment {
             if (in_array($key, [
                 'id',
                 'instance',
+                'name',
                 'coursemodule',
                 'module',
                 'course',
@@ -374,6 +375,16 @@ class testenvironment {
             return null;
         }
         return $record;
+    }
+
+    /**
+     * Returns true if test is in force mode
+     *
+     * @return boolean
+     */
+    public function status_force():bool {
+
+        return $this->status === STATUS_TEST_FORCE ? true : false;
     }
 
     /**

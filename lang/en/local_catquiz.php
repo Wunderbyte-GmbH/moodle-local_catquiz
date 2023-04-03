@@ -80,6 +80,7 @@ $string['invisible'] = 'Invisible';
 $string['edittestenvironment'] = 'Edit testenvironment';
 $string['choosetest'] = 'Choose a test environment';
 $string['parentid'] = 'Parent id';
+$string['force'] = 'Force values';
 
 // Buttons.
 $string['subscribe'] = 'Subscribe';

@@ -100,6 +100,7 @@ class testenvironmentdashboard implements renderable, templatable {
                 '0' => get_string('invisible', 'local_catquiz'),
             ], 'status' => [
                 'localizedname' => get_string('status'),
+                '2' => get_string('force', 'local_catquiz'),
                 '1' => get_string('active', 'core'),
                 '0' => get_string('inactive', 'core'),
             ], 'lang' => [

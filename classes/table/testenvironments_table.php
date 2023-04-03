@@ -79,6 +79,8 @@ class testenvironments_table extends wunderbyte_table {
     public function col_status(stdClass $values) {
 
         switch ($values->status) {
+            case '2':
+                return get_string('force', 'local_catquiz');
             case '1':
                 return get_string('active', 'core');
             case '0':

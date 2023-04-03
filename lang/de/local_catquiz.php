@@ -81,6 +81,7 @@ $string['invisible'] = 'Unsichtbar';
 $string['edittestenvironment'] = 'Bearbeite Testumgebung';
 $string['choosetest'] = 'Wähle Testumgebung';
 $string['parentid'] = 'Eltern id';
+$string['force'] = 'Erzwinge Werte';
 
 // Buttons.
 $string['subscribe'] = 'Abonniere';
