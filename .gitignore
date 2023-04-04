@@ -10,3 +10,5 @@ amd/package.json
 amd/package-lock.json
 amd/node_modules
 .vscode/launch.json
+workspace.php
+workspace2.php
