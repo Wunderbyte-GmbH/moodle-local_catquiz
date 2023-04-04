@@ -90,6 +90,7 @@ $string['starttimestamp'] = 'Context start time';
 $string['endtimestamp'] = 'Context end time';
 $string['timemodified'] = 'Time modified';
 $string['notimelimit'] = 'Kein Zeitlimit';
+$string['attempts'] = 'Attempts';
 $string['action'] = 'Aktion';
 
 $string['starttimestamp'] = 'Starttime';

@@ -405,9 +405,17 @@ class catquiz {
         $params = [];
         $where = [];
         $filter = '';
-
-        $select = "*";
-        $from = "{local_catquiz_catcontext}";
+        $select = "ccc.*, s1.attempts";
+        $from = "{local_catquiz_catcontext} ccc
+                 LEFT JOIN (
+                        SELECT ccc1.id, COUNT(*) AS attempts
+                          FROM {local_catquiz_catcontext} ccc1
+                          JOIN {question_attempt_steps} qas
+                            ON ccc1.starttimestamp < qas.timecreated AND ccc1.endtimestamp > qas.timecreated
+                           AND qas.fraction IS NOT NULL
+                      GROUP BY ccc1.id
+                 ) s1
+                 ON s1.id = ccc.id";
         $where = "1=1";
 
         return [$select, $from, $where, $filter, $params];

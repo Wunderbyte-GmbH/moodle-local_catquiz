@@ -69,7 +69,7 @@ class catcontextdashboard implements renderable, templatable {
             'endtimestamp' => get_string('endtimestamp', 'local_catquiz'),
             'timecreated' => get_string('timecreated'),
             'timemodified' => get_string('timemodified', 'local_catquiz'),
-            'numberofquestions' => get_string('numberofquestions', 'local_catquiz'),
+            'attempts' => get_string('attempts', 'local_catquiz'),
             'action' => get_string('action', 'local_catquiz'),
         ];
 

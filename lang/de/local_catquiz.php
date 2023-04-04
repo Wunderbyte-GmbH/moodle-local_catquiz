@@ -91,6 +91,7 @@ $string['starttimestamp'] = 'Kontext Startzeit';
 $string['endtimestamp'] = 'Kontext Endzeit';
 $string['timemodified'] = 'Zuletzt geändert';
 $string['notimelimit'] = 'No time limit';
+$string['attempts'] = 'Versuche';
 $string['action'] = 'Action';
 $string['starttimestamp'] = 'Zeitraum Anfang';
 $string['endtimestamp'] = 'Zeitraum Ende';

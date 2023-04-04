@@ -105,9 +105,11 @@ class catcontext_table extends wunderbyte_table {
         return $values->testitems;
     }
 
-    public function col_numberofquestions($values) {
-
-        return 'xy';
+    public function col_attempts($values) {
+        if  (!empty($values->attempts)) {
+            return $values->attempts;
+        }
+        return '0';
     }
 
     /**
