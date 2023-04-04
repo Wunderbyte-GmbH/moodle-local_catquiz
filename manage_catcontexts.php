@@ -15,14 +15,14 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * catquiz testenvironments view page
+ * catquiz catscales view page
  * @package    local_catquiz catscales
  * @copyright  2023 Wunderbyte GmbH
  * @author     Georg Maißer
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-use local_catquiz\output\testenvironmentdashboard;
+use local_catquiz\output\catcontextdashboard;
 
 require_once('../../config.php');
 
@@ -37,10 +37,10 @@ $title = get_string('pluginname', 'local_catquiz');
 $PAGE->set_title($title);
 $PAGE->set_heading($title);
 
-$data = new testenvironmentdashboard();
+$data = new catcontextdashboard();
 
 echo $OUTPUT->header();
 
-echo $OUTPUT->render_from_template('local_catquiz/testenvironmentdashboard', $data->return_array());
+echo $OUTPUT->render_from_template('local_catquiz/catcontextdashboard', $data->return_array());
 
 echo $OUTPUT->footer();

@@ -83,6 +83,18 @@ $string['choosetest'] = 'Wähle Testumgebung';
 $string['parentid'] = 'Eltern id';
 $string['force'] = 'Erzwinge Werte';
 
+// Cat contexts.
+$string['addcontext'] = 'Cat Kontext hinzufügen';
+$string['managecatcontexts'] = 'Cat Kontexte verwalten';
+$string['manage_catcontexts'] = 'Cat Kontexte verwalten';
+$string['starttimestamp'] = 'Kontext Startzeit';
+$string['endtimestamp'] = 'Kontext Endzeit';
+$string['timemodified'] = 'Zuletzt geändert';
+$string['notimelimit'] = 'No time limit';
+$string['action'] = 'Action';
+$string['starttimestamp'] = 'Zeitraum Anfang';
+$string['endtimestamp'] = 'Zeitraum Ende';
+
 // Buttons.
 $string['subscribe'] = 'Abonniere';
 $string['subscribed'] = 'Abonniert';

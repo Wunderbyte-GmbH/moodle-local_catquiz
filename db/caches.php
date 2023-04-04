@@ -45,5 +45,12 @@ $definitions = array(
         'staticacceleration' => true,
         'staticaccelerationsize' => 1,
         'invalidationevents' => ['changesintestenvironments']
+    ),
+    'catcontexts' => array(
+        'mode' => cache_store::MODE_APPLICATION,
+        'simplekeys' => true,
+        'staticacceleration' => true,
+        'staticaccelerationsize' => 1,
+        'invalidationevents' => ['changesincatcontexts']
     )
 );

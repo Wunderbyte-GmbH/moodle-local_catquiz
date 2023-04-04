@@ -76,7 +76,8 @@ class catscaledashboard implements renderable, templatable {
             get_string('label', 'local_catquiz'),
             get_string('questiontext', 'local_catquiz'),
             get_string('questiontype', 'local_catquiz'),
-            get_string('questioncategories', 'local_catquiz')
+            get_string('questioncategories', 'local_catquiz'),
+            get_string('action', 'local_catquiz'),
         ]);
 
         $table->define_filtercolumns(['categoryname' => [
@@ -145,13 +146,15 @@ class catscaledashboard implements renderable, templatable {
             get_string('label', 'local_catquiz'),
             get_string('questiontext', 'local_catquiz'),
             get_string('questiontype', 'local_catquiz'),
-            get_string('questioncategories', 'local_catquiz')
+            get_string('questioncategories', 'local_catquiz'),
+            get_string('action', 'local_catquiz'),
         ]);
 
         $table->define_filtercolumns(['categoryname' => [
-            'localizedname' => get_string('questioncategories', 'local_catquiz')
+            'localizedname' => get_string('questioncategories', 'local_catquiz'),
         ], 'qtype' => [
             'localizedname' => get_string('questiontype', 'local_catquiz'),
+            'truefalse' => get_string('pluginname', 'qtype_truefalse'),
             'ddimageortext' => get_string('pluginname', 'qtype_ddimageortext'),
             'essay' => get_string('pluginname', 'qtype_essay'),
             'gapselect' => get_string('pluginname', 'qtype_gapselect'),
@@ -159,7 +162,6 @@ class catscaledashboard implements renderable, templatable {
             'multichoice' => get_string('pluginname', 'qtype_multichoice'),
             'numerical' => get_string('pluginname', 'qtype_numerical'),
             'shortanswer' => get_string('pluginname', 'qtype_shortanswer'),
-            'truefalse' => get_string('pluginname', 'qtype_truefalse'),
         ]]);
         $table->define_fulltextsearchcolumns(['idnumber', 'name', 'questiontext', 'qtype']);
         $table->define_sortablecolumns(['idnumber', 'name', 'questiontext', 'qtype']);

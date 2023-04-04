@@ -82,6 +82,19 @@ $string['choosetest'] = 'Choose a test environment';
 $string['parentid'] = 'Parent id';
 $string['force'] = 'Force values';
 
+// Cat contexts.
+$string['addcontext'] = 'Add Cat context';
+$string['managecatcontexts'] = 'Mange Cat contexts';
+$string['manage_catcontexts'] = 'Mange Cat contexts';
+$string['starttimestamp'] = 'Context start time';
+$string['endtimestamp'] = 'Context end time';
+$string['timemodified'] = 'Time modified';
+$string['notimelimit'] = 'Kein Zeitlimit';
+$string['action'] = 'Aktion';
+
+$string['starttimestamp'] = 'Starttime';
+$string['endtimestamp'] = 'Endtime';
+
 // Buttons.
 $string['subscribe'] = 'Subscribe';
 $string['subscribed'] = 'Subscribed';

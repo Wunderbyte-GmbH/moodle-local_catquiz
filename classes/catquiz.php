@@ -392,4 +392,24 @@ class catquiz {
 
         return [$select, $from, $where, $filter, $params];
     }
+
+    /**
+     * Return sql to render all or a subset of testenvironments
+     *
+     * @return array
+     */
+    public static function return_sql_for_catcontexts(
+        array $wherearray = [],
+        array $filterarray = []) {
+
+        $params = [];
+        $where = [];
+        $filter = '';
+
+        $select = "*";
+        $from = "{local_catquiz_catcontext}";
+        $where = "1=1";
+
+        return [$select, $from, $where, $filter, $params];
+    }
 }
