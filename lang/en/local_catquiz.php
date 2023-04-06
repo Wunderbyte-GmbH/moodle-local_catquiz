@@ -92,6 +92,8 @@ $string['timemodified'] = 'Time modified';
 $string['notimelimit'] = 'Kein Zeitlimit';
 $string['attempts'] = 'Attempts';
 $string['action'] = 'Aktion';
+$string['searchcatcontext'] = 'Search Cat contexts';
+$string['selectcatcontext'] = 'Select a Cat context';
 
 $string['starttimestamp'] = 'Starttime';
 $string['endtimestamp'] = 'Endtime';

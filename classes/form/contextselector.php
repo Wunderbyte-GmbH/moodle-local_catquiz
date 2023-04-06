@@ -22,11 +22,9 @@ global $CFG;
 require_once("$CFG->libdir/formslib.php");
 require_once($CFG->dirroot . "/local/catquiz/lib.php");
 
-use cache_helper;
 use context;
 use context_system;
 use core_form\dynamic_form;
-use local_catquiz\catcontext;
 use moodle_url;
 use stdClass;
 
@@ -37,7 +35,7 @@ use stdClass;
  * @author    Georg Maißer
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class edit_catcontext extends dynamic_form {
+class contextselector extends dynamic_form {
 
     /**
      * {@inheritdoc}
@@ -46,32 +44,30 @@ class edit_catcontext extends dynamic_form {
     public function definition() {
 
         global $CFG;
+        global $DB;
+
 
         $mform = $this->_form;
         $data = (object) $this->_ajaxformdata;
 
         if (isset($data->id)) {
             $mform->addElement('hidden', 'id', $data->id);
+            $mform->setType('id', PARAM_INT);
         }
 
         $mform->addElement('header', 'edit_catquiz', get_string('managecatcontexts', 'local_catquiz'));
 
-        // Add a text field for the catcontext name
-        $mform->addElement('text', 'name', get_string('name'));
-        $mform->setType('name', PARAM_TEXT);
-
-        // Add a textarea field for the catscale description
-        $mform->addElement('editor', 'description', get_string('description'), 'wrap="virtual" rows="5" cols="50"');
-        $mform->setType('description', PARAM_CLEANHTML);
-
-        $mform->addElement('date_time_selector', 'starttimestamp',
-                get_string("starttimestamp", "local_catquiz"));
-        $mform->setType('starttimestamp', PARAM_INT);
-
-        $mform->addElement('date_time_selector', 'endtimestamp',
-                get_string("endtimestamp", "local_catquiz"));
-        $mform->setType('endtimestamp', PARAM_INT);
-
+        $contextsdb = $DB->get_records('local_catquiz_catcontext');
+        $contexts = [];
+        foreach ($contextsdb as $contextid => $context) {
+            $contexts[$contextid] = $context->name;
+        }
+        $options = array(
+            'multiple' => false,
+            'noselectionstring' => get_string('searchcatcontext', 'local_catquiz'),
+        );
+        $mform->addElement('autocomplete', 'contextid', get_string('selectcatcontext', 'local_catquiz'), $contexts, $options);
+        $mform->addElement('submit', 'submitbutton', 'submit', ['class' => 'd-none']);
     }
 
     /**
@@ -95,19 +91,6 @@ class edit_catcontext extends dynamic_form {
     public function process_dynamic_submission(): object {
         $data = $this->get_data();
 
-        if (isset($data->id)) {
-
-            $data->descriptionformat = $data->description['format'];
-            $data->description = $data->description['text'];
-
-            $catcontext = new catcontext($data);
-
-            $catcontext->save_or_update();
-
-        }
-
-        cache_helper::purge_by_event('changesincatcontexts');
-
         return $data;
     }
 
@@ -122,24 +105,6 @@ class edit_catcontext extends dynamic_form {
      */
     public function set_data_for_dynamic_submission(): void {
         $data = (object) $this->_ajaxformdata;
-        if (!empty($data->id)) {
-
-            $record = (object)[
-                'id' => $data->id,
-            ];
-            $catcontext = new catcontext($record);
-            $storeddata = (array)$catcontext->return_as_class();
-
-            $storeddata['description'] = [
-                'format' => $storeddata['descriptionformat'],
-                'text' => $storeddata['description'],
-            ];
-
-            foreach ($storeddata as $key => $value) {
-                $data->$key = $value;
-            }
-
-        }
 
         $this->set_data($data);
     }

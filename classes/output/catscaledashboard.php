@@ -50,6 +50,8 @@ class catscaledashboard implements renderable, templatable {
 
     /** @var integer of catscaleid */
     public int $catscaleid = 0;
+    /** @var integer of catcontextid */
+    private int $catcontextid = 0;
 
     /**
      * Either returns one tree or treearray for every parentnode
@@ -58,9 +60,10 @@ class catscaledashboard implements renderable, templatable {
      * @param boolean $allowedit
      * @return array
      */
-    public function __construct(int $catscaleid) {
+    public function __construct(int $catscaleid, int $catcontextid = 0) {
 
         $this->catscaleid = $catscaleid;
+        $this->catcontextid = $catcontextid;
     }
 
     private function render_addtestitems_table(int $catscaleid) {
@@ -240,6 +243,14 @@ class catscaledashboard implements renderable, templatable {
         return html_writer::tag('div', $OUTPUT->render($chart), ['dir' => 'ltr']);
     }
 
+    private function render_contextselector() {
+    $form = new \local_catquiz\form\contextselector(null, null, 'post', '', [], true, ['contextid' => $this->catcontextid]);
+    // Set the form data with the same method that is called when loaded from JS. It should correctly set the data for the supplied arguments.
+    $form->set_data_for_dynamic_submission(); 
+    // Render the form in a specific container, there should be nothing else in the same container.
+    return html_writer::div($form->render(), '', ['id' => 'formcontainer']); 
+    }
+
     /**
      * Return the item tree of all catscales.
      * @return array
@@ -255,7 +266,7 @@ class catscaledashboard implements renderable, templatable {
             'statindependence' => $this->render_statindependence(),
             'loglikelihood' => $this->render_loglikelihood(),
             'differentialitem' => $this->render_differentialitem(),
-            'contextselector' => 'XXX',
+            'contextselector' => $this->render_contextselector(),
         ];
     }
 }

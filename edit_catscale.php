@@ -42,6 +42,7 @@ require_capability('local/catquiz:manage_catscales', $context);
 $PAGE->set_url(new moodle_url('/local/catquiz/test.php', array()));
 
 $catscaleid = required_param('id', PARAM_INT);
+$contextid = optional_param('contextid', 0, PARAM_INT);
 
 $title = get_string('assigntestitemstocatscales', 'local_catquiz');
 $PAGE->set_title($title);
@@ -49,7 +50,7 @@ $PAGE->set_heading($title);
 
 echo $OUTPUT->header();
 
-$data = new catscaledashboard($catscaleid);
+$data = new catscaledashboard($catscaleid, $contextid);
 $output = $PAGE->get_renderer('local_catquiz');
 echo $output->render_catscaledashboard($data);
 
