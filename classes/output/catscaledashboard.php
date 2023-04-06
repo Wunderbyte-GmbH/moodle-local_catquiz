@@ -255,6 +255,7 @@ class catscaledashboard implements renderable, templatable {
             'statindependence' => $this->render_statindependence(),
             'loglikelihood' => $this->render_loglikelihood(),
             'differentialitem' => $this->render_differentialitem(),
+            'contextselector' => 'XXX',
         ];
     }
 }
