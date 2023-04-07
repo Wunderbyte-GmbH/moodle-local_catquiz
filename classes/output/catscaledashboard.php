@@ -35,6 +35,7 @@ use html_writer;
 use local_catquiz\catquiz;
 use local_catquiz\table\testitems_table;
 use moodle_url;
+use stdClass;
 use templatable;
 use renderable;
 
@@ -50,8 +51,12 @@ class catscaledashboard implements renderable, templatable {
 
     /** @var integer of catscaleid */
     public int $catscaleid = 0;
+
     /** @var integer of catcontextid */
     private int $catcontextid = 0;
+
+    /** @var stdClass|bool */
+    private $catscale;
 
     /**
      * Either returns one tree or treearray for every parentnode
@@ -61,11 +66,23 @@ class catscaledashboard implements renderable, templatable {
      * @return array
      */
     public function __construct(int $catscaleid, int $catcontextid = 0) {
+        global $DB;
 
         $this->catscaleid = $catscaleid;
         $this->catcontextid = $catcontextid;
+        $this->catscale = $DB->get_record(
+            'local_catquiz_catscales',
+            ['id' => $catscaleid]
+        );
     }
 
+    private function render_title() {
+        global $OUTPUT;
+        global $PAGE;
+
+        $PAGE->set_heading($this->catscale->name);
+        echo $OUTPUT->header();
+    }
     private function render_addtestitems_table(int $catscaleid) {
 
         $table = new testitems_table('addtestitems', $catscaleid);
@@ -260,6 +277,7 @@ class catscaledashboard implements renderable, templatable {
         $url = new moodle_url('/local/catquiz/manage_catscales.php');
 
         return [
+            'title' => $this->render_title(),
             'returnurl' => $url->out(),
             'testitemstable' => $this->render_testitems_table($this->catscaleid),
             'addtestitemstable' => $this->render_addtestitems_table($this->catscaleid),

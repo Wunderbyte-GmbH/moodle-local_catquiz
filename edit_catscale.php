@@ -46,9 +46,6 @@ $contextid = optional_param('contextid', 0, PARAM_INT);
 
 $title = get_string('assigntestitemstocatscales', 'local_catquiz');
 $PAGE->set_title($title);
-$PAGE->set_heading($title);
-
-echo $OUTPUT->header();
 
 $data = new catscaledashboard($catscaleid, $contextid);
 $output = $PAGE->get_renderer('local_catquiz');
