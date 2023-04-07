@@ -124,7 +124,7 @@ class catquiz_handler {
 
         $catscales = \local_catquiz\data\dataapi::get_all_catscales();
         $options = array(
-            'multiple' => true,
+            'multiple' => false,
             'noselectionstring' => get_string('allareas', 'search'),
         );
 
