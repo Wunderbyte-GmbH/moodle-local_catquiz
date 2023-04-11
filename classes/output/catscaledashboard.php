@@ -275,6 +275,7 @@ class catscaledashboard implements renderable, templatable {
     public function export_for_template(\renderer_base $output): array {
 
         $url = new moodle_url('/local/catquiz/manage_catscales.php');
+        $testenvironmentdashboard = new testenvironmentdashboard();
 
         return [
             'title' => $this->render_title(),
@@ -285,6 +286,7 @@ class catscaledashboard implements renderable, templatable {
             'loglikelihood' => $this->render_loglikelihood(),
             'differentialitem' => $this->render_differentialitem(),
             'contextselector' => $this->render_contextselector(),
+            'table' => $testenvironmentdashboard->testenvironmenttable($this->catscaleid),
         ];
     }
 }

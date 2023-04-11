@@ -379,16 +379,14 @@ class catquiz {
      * @return array
      */
     public static function return_sql_for_testenvironments(
-        array $wherearray = [],
+        string $where = "1=1",
         array $filterarray = []) {
 
         $params = [];
-        $where = [];
         $filter = '';
 
         $select = "*";
         $from = "{local_catquiz_tests}";
-        $where = "1=1";
 
         return [$select, $from, $where, $filter, $params];
     }
