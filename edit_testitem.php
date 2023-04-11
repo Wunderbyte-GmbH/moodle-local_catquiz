@@ -40,6 +40,7 @@ $PAGE->set_url(new moodle_url('/local/catquiz/test.php', array()));
 
 $testitemid = required_param('id', PARAM_INT);
 $catscaleid = required_param('catscaleid', PARAM_INT);
+$contextid = optional_param('contextid', 0, PARAM_INT);
 
 $title = get_string('testitemdashboard', 'local_catquiz');
 $PAGE->set_title($title);
@@ -49,7 +50,7 @@ echo $OUTPUT->header();
 
 // $response = catmodel_info::get_item_parameters(0, 126);
 
-$data = new testitemdashboard($testitemid);
+$data = new testitemdashboard($testitemid, $contextid);
 $output = $PAGE->get_renderer('local_catquiz');
 echo $output->render_testitemdashboard($data);
 

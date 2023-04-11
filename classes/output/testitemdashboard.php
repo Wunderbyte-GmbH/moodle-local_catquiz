@@ -53,15 +53,22 @@ class testitemdashboard implements renderable, templatable {
     public int $testitemid = 0;
 
     /**
+     * @var integer
+     */
+    private int $contextid = 0;
+
+    /**
      * Either returns one tree or treearray for every parentnode
      *
      * @param int $fulltree
      * @param boolean $allowedit
+     * @param int $contextid
      * @return array
      */
-    public function __construct(int $testitemid) {
+    public function __construct(int $testitemid, int $contextid) {
 
         $this->testitemid = $testitemid;
+        $this->contextid = $contextid;
     }
 
     /**
