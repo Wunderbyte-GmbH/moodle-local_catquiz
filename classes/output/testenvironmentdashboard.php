@@ -57,11 +57,16 @@ class testenvironmentdashboard implements renderable, templatable {
 
     }
 
-    public function testenvironmenttable() {
+    /**
+     * @param int? catscaleid If given, only return test environments that use the given cat scale
+     */
+    public function testenvironmenttable($catscaleid = null) {
 
         $table = new testenvironments_table('testenvironmentstable');
 
-        list($select, $from, $where, $filter, $params) = catquiz::return_sql_for_testenvironments();
+        list($select, $from, $where, $filter, $params) = $catscaleid
+        ? catquiz::return_sql_for_testenvironments("catscaleid=$catscaleid")
+        : catquiz::return_sql_for_testenvironments();
 
         $table->set_filter_sql($select, $from, $where, $filter, $params);
 
