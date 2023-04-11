@@ -21,13 +21,16 @@
 
 import DynamicForm from 'core_form/dynamicform';
 
+const SELECTORS = {
+    FORMCONTAINER: '#select_context_form',
+};
 /**
  * Add event listener to buttons.
  */
 export const init = () => {
     // Initialize the form - pass the container element and the form class name.
     const dynamicForm = new DynamicForm(document.querySelector(
-        '#formcontainer'),
+        SELECTORS.FORMCONTAINER),
         'local_catquiz\\form\\contextselector'
     );
 
