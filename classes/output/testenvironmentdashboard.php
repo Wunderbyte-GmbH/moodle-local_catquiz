@@ -76,6 +76,7 @@ class testenvironmentdashboard implements renderable, templatable {
             'timemodified',
             'timecreated',
             'action',
+            'catscaleid'
         ]);
         $table->define_headers([
             get_string('name', 'core'),

@@ -82,6 +82,11 @@ class testenvironment {
     private string $component;
 
     /**
+     * @var integer
+     */
+    private int $catscaleid;
+
+    /**
      * $componentid
      *
      * @var integer
@@ -150,6 +155,7 @@ class testenvironment {
 
         $this->componentid = $record->componentid ?? 0;
         $this->component = $record->component ?? '';
+        $this->catscaleid = $record->catscaleid ?? null;
         $this->name = $record->name ?? get_string('newcustomtest', 'local_catquiz');
         $this->description = $record->description ?? '';
         $this->descriptionformat = $record->descriptionformat ?? 1;
@@ -329,6 +335,7 @@ class testenvironment {
         // If we have the record, we update everything, if there are new values. if not, we leave the old ones.
         $record->componentid = $this->componentid ?? $record->componentid;
         $record->component = $this->component ?? $record->component;
+        $record->catscaleid = $this->catscaleid ?? $record->catscaleid;
         $record->name = $this->name ?? $record->name;
         $record->description = $this->description ?? $record->description;
         $record->descriptionformat = $this->descriptionformat ?? $record->descriptionformat;

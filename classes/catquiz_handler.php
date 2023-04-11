@@ -324,7 +324,7 @@ class catquiz_handler {
         unset($clone->section);
 
         // If there is a new template name.
-        if (!empty($quizdata->testenvironment_name && !empty($quizdata->testenvironment_addoredittemplate))) {
+        if (!empty($quizdata->testenvironment_addoredittemplate) && !empty($quizdata->testenvironment_name)) {
 
             // If we have a template name, we first check if we come from an existing template.
             // Create stdClass with all the values.
@@ -332,6 +332,7 @@ class catquiz_handler {
                 'id' => $quizdata->choosetest, // When a template is selected, we might want to update it.
                 'json' => json_encode($clone),
                 'component' => 'mod_adaptivequiz',
+                'catscaleid' => $clone->catquiz_catcatscales,
             ];
 
             $test = new testenvironment($cattest);
@@ -347,6 +348,7 @@ class catquiz_handler {
             'component' => 'mod_adaptivequiz',
             'json' => json_encode($clone),
             'parentid' => $parentid ?? 0,
+            'catscaleid' => $quizdata->catquiz_catcatscales,
         ];
 
          // Pass on the values as stdClas.
