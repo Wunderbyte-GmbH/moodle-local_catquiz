@@ -129,6 +129,7 @@ $string['addtestitemtitle'] = 'Testitems zu CAT-Skalen hinzufügen';
 $string['addtestitembody'] = 'Wollen Sie folgende Testitems der aktuellen Skale zuorden? <br> {$a->data}';
 $string['addtestitemsubmit'] = 'Hinzufügen';
 $string['addtestitem'] = 'Testitems hinzufügen';
+$string['usage'] = 'Übersicht';
 
 $string['removetestitemtitle'] = 'Testitems von CAT-Skalen entfernen';
 $string['removetestitembody'] = 'Wollen Sie folgende Testitems aus aktuellen Skale entfernen? <br> {$a->data}';
