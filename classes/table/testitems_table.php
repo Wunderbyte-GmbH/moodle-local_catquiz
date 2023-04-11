@@ -37,21 +37,23 @@ use question_bank;
  */
 class testitems_table extends wunderbyte_table {
 
-    /** @var context_module $buyforuser */
-    private $context = null;
-
     /** @var integer $catscaleid */
     private $catscaleid = 0;
+
+    /** @var integer */
+    private $contextid = 0;
 
     /**
      * Constructor
      * @param string $uniqueid all tables have to have a unique id, this is used
      *      as a key when storing table properties like sort order in the session.
      * @param integer $catscaleid
+     * @param integer $contextid
      */
-    public function __construct(string $uniqueid, int $catscaleid = 0) {
+    public function __construct(string $uniqueid, int $catscaleid = 0, int $contextid = 0) {
 
         $this->catscaleid = $catscaleid;
+        $this->contextid = $contextid;
 
         parent::__construct($uniqueid);
 
@@ -116,6 +118,7 @@ class testitems_table extends wunderbyte_table {
             'id' => $values->id,
             'catscaleid' => $this->catscaleid ?? 0,
             'component' => $values->component,
+            'contextid' => $this->contextid,
         ]);
 
         $data['showactionbuttons'][] = [
