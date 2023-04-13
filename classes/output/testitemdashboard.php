@@ -185,6 +185,13 @@ class testitemdashboard implements renderable, templatable {
             ]
         ];
     }
+    private function render_contextselector() {
+        $form = new \local_catquiz\form\contextselector(null, null, 'post', '', [], true, ['contextid' => $this->contextid]);
+        // Set the form data with the same method that is called when loaded from JS. It should correctly set the data for the supplied arguments.
+        $form->set_data_for_dynamic_submission();
+        // Render the form in a specific container, there should be nothing else in the same container.
+        return html_writer::div($form->render(), '', ['id' => 'select_context_form']);
+    }
 
     /**
      * Return the item tree of all catscales.
@@ -198,6 +205,7 @@ class testitemdashboard implements renderable, templatable {
             'returnurl' => $url->out(),
             'models' => $this->render_modelcards(),
             'statcards' => $this->render_testitemstats(),
+            'contextselector' => $this->render_contextselector(),
         ];
     }
 }
