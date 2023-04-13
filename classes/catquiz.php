@@ -188,24 +188,15 @@ class catquiz {
      * Return the sql for all questions answered.
      *
      * @param integer $testitemid
-     * @return void
+     * @return array
      */
     public static function get_sql_for_questions_answered(int $testitemid = 0) {
-
-        $and = "";
-        $params = [];
-
-        if (!empty($testitemid)) {
-            $and = " AND qa.questionid=:questionid ";
-            $params = ['questionid' => $testitemid];
-        }
+        $param = empty($testitemid) ? [] : [$testitemid];
+        list ($select, $from, $where, $params) = self::get_sql_for_stat_base_request($param);
 
         $sql = "SELECT COUNT(qas.id)
-        FROM {question_attempt_steps} qas
-        JOIN {question_attempts} qa ON qas.questionattemptid=qa.id
-        WHERE qas.fraction IS NOT NULL"
-        . $and;
-        $params = ['questionid' => $testitemid];
+        $from
+        WHERE $where";
 
         return [$sql, $params];
     }
@@ -214,23 +205,15 @@ class catquiz {
      * Return the sql for all questions answered.
      *
      * @param integer $testitemid
-     * @return void
+     * @return array
      */
     public static function get_sql_for_questions_average(int $testitemid = 0) {
-
-        $and = "";
-        $params = [];
-
-        if (!empty($testitemid)) {
-            $and = " AND qa.questionid=:questionid ";
-            $params = ['questionid' => $testitemid];
-        }
+        $param = empty($testitemid) ? [] : [$testitemid];
+        list ($select, $from, $where, $params) = self::get_sql_for_stat_base_request($param);
 
         $sql = "SELECT AVG(qas.fraction)
-        FROM {question_attempt_steps} qas
-        JOIN {question_attempts} qa ON qas.questionattemptid=qa.id"
-        . $and;
-        $params = ['questionid' => $testitemid];
+        $from
+        WHERE $where";
 
         return [$sql, $params];
     }
@@ -239,24 +222,16 @@ class catquiz {
      * Return the sql for all questions answered.
      *
      * @param integer $testitemid
-     * @return void
+     * @return array
      */
     public static function get_sql_for_questions_answered_correct(int $testitemid = 0) {
-
-        $and = "";
-        $params = [];
-
-        if (!empty($testitemid)) {
-            $and = " AND qa.questionid=:questionid ";
-            $params = ['questionid' => $testitemid];
-        }
+        $param = empty($testitemid) ? [] : [$testitemid];
+        list ($select, $from, $where, $params) = self::get_sql_for_stat_base_request($param);
 
         $sql = "SELECT COUNT(qas.id)
-        FROM {question_attempt_steps} qas
-        JOIN {question_attempts} qa ON qas.questionattemptid=qa.id
-        WHERE qas.fraction = qa.maxfraction"
-        . $and;
-        $params = ['questionid' => $testitemid];
+        $from
+        WHERE $where
+        AND qas.fraction = qa.maxfraction";
 
         return [$sql, $params];
     }
@@ -265,24 +240,16 @@ class catquiz {
      * Return the sql for all questions answered.
      *
      * @param integer $testitemid
-     * @return void
+     * @return array
      */
     public static function get_sql_for_questions_answered_incorrect(int $testitemid = 0) {
-
-        $and = "";
-        $params = [];
-
-        if (!empty($testitemid)) {
-            $and = " AND qa.questionid=:questionid ";
-            $params = ['questionid' => $testitemid];
-        }
+        $param = empty($testitemid) ? [] : [$testitemid];
+        list ($select, $from, $where, $params) = self::get_sql_for_stat_base_request($param);
 
         $sql = "SELECT COUNT(qas.id)
-        FROM {question_attempt_steps} qas
-        JOIN {question_attempts} qa ON qas.questionattemptid=qa.id
-        WHERE qas.fraction = qa.minfraction"
-        . $and;
-        $params = ['questionid' => $testitemid];
+        $from
+        WHERE $where
+        AND qas.fraction = qa.minfraction";
 
         return [$sql, $params];
     }
@@ -291,25 +258,17 @@ class catquiz {
      * Return the sql for all questions answered.
      *
      * @param integer $testitemid
-     * @return void
+     * @return array
      */
     public static function get_sql_for_questions_answered_partlycorrect(int $testitemid = 0) {
-
-        $and = "";
-        $params = [];
-
-        if (!empty($testitemid)) {
-            $and = " AND qa.questionid=:questionid ";
-            $params = ['questionid' => $testitemid];
-        }
+        $param = empty($testitemid) ? [] : [$testitemid];
+        list ($select, $from, $where, $params) = self::get_sql_for_stat_base_request($param);
 
         $sql = "SELECT COUNT(qas.id)
-        FROM {question_attempt_steps} qas
-        JOIN {question_attempts} qa ON qas.questionattemptid=qa.id
-        WHERE qas.fraction <> qa.minfraction
-        AND qas.fraction <> qa.maxfraction "
-        . $and;
-        $params = ['questionid' => $testitemid];
+        $from
+        WHERE $where
+        AND qas.fraction <> qa.minfraction
+        AND qas.fraction <> qa.maxfraction";
 
         return [$sql, $params];
     }
@@ -318,26 +277,19 @@ class catquiz {
      * Return the sql for all questions answered.
      *
      * @param integer $testitemid
-     * @return void
+     * @return array
      */
     public static function get_sql_for_questions_answered_by_distinct_persons(int $testitemid = 0) {
 
-        $and = "";
-        $params = [];
-
-        if (!empty($testitemid)) {
-            $and = " AND qa.questionid=:questionid ";
-            $params = ['questionid' => $testitemid];
-        }
+        $param = empty($testitemid) ? [] : [$testitemid];
+        list ($select, $from, $where, $params) = self::get_sql_for_stat_base_request($param);
 
         $sql = "SELECT COUNT(s1.questionid)
         FROM (
             SELECT qas.userid, qa.questionid
-            FROM {question_attempt_steps} qas
-            JOIN {question_attempts} qa ON qas.questionattemptid=qa.id
-            WHERE qas.fraction IS NOT NULL"
-            . $and .
-            "GROUP BY qa.questionid, qas.userid)
+            $from
+            WHERE $where
+            GROUP BY qa.questionid, qas.userid)
         as s1";
 
         return [$sql, $params];
@@ -347,30 +299,48 @@ class catquiz {
      * Return the sql for all questions answered.
      *
      * @param integer $testitemid
-     * @return void
+     * @return array
      */
     public static function get_sql_for_questions_usages_in_tests(int $testitemid = 0) {
-
-        $and = "";
-        $params = [];
-
-        if (!empty($testitemid)) {
-            $and = " AND qa.questionid=:questionid ";
-            $params = ['questionid' => $testitemid];
-        }
+        $param = empty($testitemid) ? [] : [$testitemid];
+        list ($select, $from, $where, $params) = self::get_sql_for_stat_base_request($param);
 
         $sql = "SELECT COUNT(s1.questionid)
         FROM (
             SELECT qa.questionid, qu.contextid
-            FROM {question_attempt_steps} qas
-            JOIN {question_attempts} qa ON qas.questionattemptid=qa.id
+            $from
             JOIN {question_usages} qu ON qa.questionusageid=qu.id
-            WHERE qas.fraction IS NOT NULL"
-            . $and .
-            "GROUP BY qa.questionid, qu.contextid)
+            WHERE $where
+            AND qas.fraction IS NOT NULL
+            GROUP BY qa.questionid, qu.contextid)
         as s1";
 
         return [$sql, $params];
+    }
+
+    /**
+     * Basefunction to fetch all questions in context.
+     *
+     * @param array $testitemids
+     * @return array
+     */
+    private static function get_sql_for_stat_base_request(array $testitemids = []):array {
+
+        $select = '*';
+        $from = 'FROM m_local_catquiz_catcontext ccc1
+                JOIN m_question_attempt_steps qas
+                    ON ccc1.starttimestamp < qas.timecreated 
+                    AND ccc1.endtimestamp > qas.timecreated
+                    AND qas.fraction IS NOT NULL
+                JOIN m_question_attempts qa
+                    ON qas.questionattemptid = qa.id';
+        $where = !empty($testitemids) ? 'qa.questionid IN (:testitemids)' : '';
+
+        $testitemidstring = sprintf("%s", implode(',', $testitemids));
+
+        $params = !empty($testitemids) ? ['testitemids' => $testitemidstring] : [];
+
+        return [$select, $from, $where, $params];
     }
 
     /**
