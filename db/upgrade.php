@@ -167,5 +167,20 @@ function xmldb_local_catquiz_upgrade($oldversion) {
             upgrade_plugin_savepoint(true, 2023040701, 'local', 'catquiz');
         }
 
+        if ($oldversion < 2023041400) {
+
+            // Define field model to be added to local_catquiz_personparams.
+            $table = new xmldb_table('local_catquiz_personparams');
+            $field = new xmldb_field('model', XMLDB_TYPE_CHAR, '255', null, null, null, null, 'contextid');
+
+            // Conditionally launch add field model.
+            if (!$dbman->field_exists($table, $field)) {
+                $dbman->add_field($table, $field);
+            }
+
+            // Catquiz savepoint reached.
+            upgrade_plugin_savepoint(true, 2023041400, 'local', 'catquiz');
+        }
+
     return true;
 }
