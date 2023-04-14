@@ -133,26 +133,26 @@ class testitemdashboard implements renderable, templatable {
     /**
      * Render the moodle charts.
      *
-     * @return void
+     * @return array
      */
     private function render_testitemstats() {
 
         global $DB;
 
-        list ($sql, $params) = catquiz::get_sql_for_questions_answered($this->testitemid);
+        list ($sql, $params) = catquiz::get_sql_for_questions_answered([$this->testitemid], [$this->contextid]);
         $numberofanswers = $DB->count_records_sql($sql, $params);
-        list ($sql, $params) = catquiz::get_sql_for_questions_usages_in_tests($this->testitemid);
+        list ($sql, $params) = catquiz::get_sql_for_questions_usages_in_tests([$this->testitemid], [$this->contextid]);
         $numberofusagesintests = $DB->count_records_sql($sql, $params);
-        list ($sql, $params) = catquiz::get_sql_for_questions_answered_by_distinct_persons($this->testitemid);
+        list ($sql, $params) = catquiz::get_sql_for_questions_answered_by_distinct_persons([$this->testitemid], [$this->contextid]);
         $numberofpersonsanswered = $DB->count_records_sql($sql, $params);
-        list ($sql, $params) = catquiz::get_sql_for_questions_answered_correct($this->testitemid);
+        list ($sql, $params) = catquiz::get_sql_for_questions_answered_correct([$this->testitemid], [$this->contextid]);
         $numberofanswerscorrect = $DB->count_records_sql($sql, $params);
-        list ($sql, $params) = catquiz::get_sql_for_questions_answered_incorrect($this->testitemid);
+        list ($sql, $params) = catquiz::get_sql_for_questions_answered_incorrect([$this->testitemid], [$this->contextid]);
         $numberofanswersincorrect = $DB->count_records_sql($sql, $params);
-        list ($sql, $params) = catquiz::get_sql_for_questions_answered_partlycorrect($this->testitemid);
+        list ($sql, $params) = catquiz::get_sql_for_questions_answered_partlycorrect([$this->testitemid], [$this->contextid]);
         $numberofanswerspartlycorrect = $DB->count_records_sql($sql, $params);
-        list ($sql, $params) = catquiz::get_sql_for_questions_average($this->testitemid);
-        $averageofallanswers = $DB->get_field_sql($sql, $params);
+        list ($sql, $params) = catquiz::get_sql_for_questions_average([$this->testitemid], [$this->contextid]);
+        $averageofallanswers = $DB->get_field_sql($sql, $params) ?? get_string('notavailable', 'core');
 
         return [
             [

@@ -187,12 +187,12 @@ class catquiz {
     /**
      * Return the sql for all questions answered.
      *
-     * @param integer $testitemid
+     * @param array<integer> $testitemids
+     * @param array<integer> $contextids
      * @return array
      */
-    public static function get_sql_for_questions_answered(int $testitemid = 0) {
-        $param = empty($testitemid) ? [] : [$testitemid];
-        list ($select, $from, $where, $params) = self::get_sql_for_stat_base_request($param);
+    public static function get_sql_for_questions_answered(array $testitemids = [], array $contextids = []) {
+        list ($select, $from, $where, $params) = self::get_sql_for_stat_base_request($testitemids, $contextids);
 
         $sql = "SELECT COUNT(qas.id)
         $from
@@ -204,12 +204,12 @@ class catquiz {
     /**
      * Return the sql for all questions answered.
      *
-     * @param integer $testitemid
+     * @param array<integer> $testitemids
+     * @param integer $contextid
      * @return array
      */
-    public static function get_sql_for_questions_average(int $testitemid = 0) {
-        $param = empty($testitemid) ? [] : [$testitemid];
-        list ($select, $from, $where, $params) = self::get_sql_for_stat_base_request($param);
+    public static function get_sql_for_questions_average(array $testitemids = [], array $contextids = []) {
+        list ($select, $from, $where, $params) = self::get_sql_for_stat_base_request($testitemids, $contextids);
 
         $sql = "SELECT AVG(qas.fraction)
         $from
@@ -221,12 +221,11 @@ class catquiz {
     /**
      * Return the sql for all questions answered.
      *
-     * @param integer $testitemid
+     * @param array<integer> $testitemids
      * @return array
      */
-    public static function get_sql_for_questions_answered_correct(int $testitemid = 0) {
-        $param = empty($testitemid) ? [] : [$testitemid];
-        list ($select, $from, $where, $params) = self::get_sql_for_stat_base_request($param);
+    public static function get_sql_for_questions_answered_correct(array $testitemids = [], array $contextids = []) {
+        list ($select, $from, $where, $params) = self::get_sql_for_stat_base_request($testitemids, $contextids);
 
         $sql = "SELECT COUNT(qas.id)
         $from
@@ -239,12 +238,11 @@ class catquiz {
     /**
      * Return the sql for all questions answered.
      *
-     * @param integer $testitemid
+     * @param array<integer> $testitemids
      * @return array
      */
-    public static function get_sql_for_questions_answered_incorrect(int $testitemid = 0) {
-        $param = empty($testitemid) ? [] : [$testitemid];
-        list ($select, $from, $where, $params) = self::get_sql_for_stat_base_request($param);
+    public static function get_sql_for_questions_answered_incorrect(array $testitemids = [], array $contextids = []) {
+        list ($select, $from, $where, $params) = self::get_sql_for_stat_base_request($testitemids, $contextids);
 
         $sql = "SELECT COUNT(qas.id)
         $from
@@ -257,12 +255,11 @@ class catquiz {
     /**
      * Return the sql for all questions answered.
      *
-     * @param integer $testitemid
+     * @param array<integer> $testitemids
      * @return array
      */
-    public static function get_sql_for_questions_answered_partlycorrect(int $testitemid = 0) {
-        $param = empty($testitemid) ? [] : [$testitemid];
-        list ($select, $from, $where, $params) = self::get_sql_for_stat_base_request($param);
+    public static function get_sql_for_questions_answered_partlycorrect(array $testitemids = [], array $contextids = []) {
+        list ($select, $from, $where, $params) = self::get_sql_for_stat_base_request($testitemids, $contextids);
 
         $sql = "SELECT COUNT(qas.id)
         $from
@@ -276,13 +273,13 @@ class catquiz {
     /**
      * Return the sql for all questions answered.
      *
-     * @param integer $testitemid
+     * @param array<integer> $testitemids
      * @return array
      */
-    public static function get_sql_for_questions_answered_by_distinct_persons(int $testitemid = 0) {
+    public static function get_sql_for_questions_answered_by_distinct_persons(array $testitemids = [], array $contextids = []) {
 
         $param = empty($testitemid) ? [] : [$testitemid];
-        list ($select, $from, $where, $params) = self::get_sql_for_stat_base_request($param);
+        list ($select, $from, $where, $params) = self::get_sql_for_stat_base_request($testitemids, $contextids);
 
         $sql = "SELECT COUNT(s1.questionid)
         FROM (
@@ -298,12 +295,12 @@ class catquiz {
     /**
      * Return the sql for all questions answered.
      *
-     * @param integer $testitemid
+     * @param array<integer> $testitemids
+     * @param array<integer> $contextids
      * @return array
      */
-    public static function get_sql_for_questions_usages_in_tests(int $testitemid = 0) {
-        $param = empty($testitemid) ? [] : [$testitemid];
-        list ($select, $from, $where, $params) = self::get_sql_for_stat_base_request($param);
+    public static function get_sql_for_questions_usages_in_tests(array $testitemids = [], array $contextids = []) {
+        list ($select, $from, $where, $params) = self::get_sql_for_stat_base_request($testitemids, $contextids);
 
         $sql = "SELECT COUNT(s1.questionid)
         FROM (
@@ -322,10 +319,10 @@ class catquiz {
      * Basefunction to fetch all questions in context.
      *
      * @param array $testitemids
+     * @param array $contextid
      * @return array
      */
-    private static function get_sql_for_stat_base_request(array $testitemids = []):array {
-
+    private static function get_sql_for_stat_base_request(array $testitemids = [], array $contextids = []):array {
         $select = '*';
         $from = 'FROM m_local_catquiz_catcontext ccc1
                 JOIN m_question_attempt_steps qas
@@ -335,13 +332,22 @@ class catquiz {
                 JOIN m_question_attempts qa
                     ON qas.questionattemptid = qa.id';
         $where = !empty($testitemids) ? 'qa.questionid IN (:testitemids)' : '';
+        $where .= !empty($contextids) ? ' AND ccc1.id IN (:contextids)' : '';
 
         $testitemidstring = sprintf("%s", implode(',', $testitemids));
+        $contextidstring = sprintf("%s", implode(',', $contextids));
 
-        $params = !empty($testitemids) ? ['testitemids' => $testitemidstring] : [];
+        $params = self::set_optional_param([], 'testitemids', $testitemids, $testitemidstring);
+        $params = self::set_optional_param($params, 'contextids', $contextids, $contextidstring);
 
         return [$select, $from, $where, $params];
     }
+     private static function set_optional_param($params, $name, $originalvalue, $sqlstringval) {
+        if (!empty($originalvalue)) {
+            $params[$name] = $sqlstringval;
+        }
+        return $params;
+     }
 
     /**
      * Return sql to render all or a subset of testenvironments
