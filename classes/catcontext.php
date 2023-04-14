@@ -204,4 +204,25 @@ class catcontext {
         $this->timemodified = $record->timemodified ?? $this->timemodified ?? time();
     }
 
+    // Add a default context that contains all test items
+    public function create_default_context() {
+        global $DB;
+        $context = $DB->get_record_sql(
+            "SELECT * FROM {local_catquiz_catcontext} WHERE json LIKE :default",
+            [
+                'default' => 'default',
+            ]
+        );
+        if (!$context) {
+            $context = (object) array(
+                'name' => get_string('defaultcontextname', 'local_catquiz'),
+                'description' => get_string('defaultcontextdescription', 'local_catquiz'),
+                'descriptionformat' => 1,
+                'starttimestamp' => 0,
+                'endtimestamp' => 0,
+                'json' => 'default',
+            );
+            $this->save_or_update($context);
+        }
+    }
 }

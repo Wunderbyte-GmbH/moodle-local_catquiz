@@ -95,6 +95,8 @@ $string['attempts'] = 'Versuche';
 $string['action'] = 'Action';
 $string['starttimestamp'] = 'Zeitraum Anfang';
 $string['endtimestamp'] = 'Zeitraum Ende';
+$string['defaultcontextname'] = 'Standard Cat Kontext';
+$string['defaultcontextdescription'] = 'Beinhaltet alle Testitems';
 
 // Buttons.
 $string['subscribe'] = 'Abonniere';
