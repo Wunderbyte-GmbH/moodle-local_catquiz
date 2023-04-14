@@ -36,7 +36,7 @@ require_login();
 
 require_capability('local/catquiz:manage_catscales', $context);
 
-$PAGE->set_url(new moodle_url('/local/catquiz/test.php', array()));
+$PAGE->set_url('/local/catquiz/edit_testitem.php');
 
 $testitemid = required_param('id', PARAM_INT);
 $catscaleid = required_param('catscaleid', PARAM_INT);
