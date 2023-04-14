@@ -43,9 +43,7 @@ class contextselector extends dynamic_form {
      */
     public function definition() {
 
-        global $CFG;
-        global $DB;
-
+        global $CFG, $DB, $PAGE;
 
         $mform = $this->_form;
         $data = (object) $this->_ajaxformdata;
@@ -55,8 +53,6 @@ class contextselector extends dynamic_form {
             $mform->setType('id', PARAM_INT);
         }
 
-        $mform->addElement('header', 'edit_catquiz', get_string('managecatcontexts', 'local_catquiz'));
-
         $contextsdb = $DB->get_records('local_catquiz_catcontext');
         $contexts = [];
         foreach ($contextsdb as $contextid => $context) {
@@ -65,8 +61,16 @@ class contextselector extends dynamic_form {
         $options = array(
             'multiple' => false,
             'noselectionstring' => get_string('searchcatcontext', 'local_catquiz'),
+            'class' => 'justify-content-end',
         );
-        $mform->addElement('autocomplete', 'contextid', get_string('selectcatcontext', 'local_catquiz'), $contexts, $options);
+
+        $label = '';
+        if ($PAGE->url->get_path() !== '/local/catquiz/edit_testitem.php') {
+            $mform->addElement('header', 'edit_catquiz', get_string('managecatcontexts', 'local_catquiz')) ;
+            $label = get_string('selectcatcontext', 'local_catquiz');
+        }
+
+        $mform->addElement('autocomplete', 'contextid', $label, $contexts, $options);
         $mform->addElement('submit', 'submitbutton', 'submit', ['class' => 'd-none']);
     }
 
