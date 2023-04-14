@@ -14,3 +14,8 @@ canvas {
 .modal-content.preview-question .text_to_html {
     margin: 40px;
 }
+
+#page-local-catquiz-edit_testitem #testitemdashboard_contextselector .felement {
+    flex: inherit;
+    width: inherit;
+}
