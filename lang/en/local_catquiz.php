@@ -84,8 +84,8 @@ $string['force'] = 'Force values';
 
 // Cat contexts.
 $string['addcontext'] = 'Add Cat context';
-$string['managecatcontexts'] = 'Mange Cat contexts';
-$string['manage_catcontexts'] = 'Mange Cat contexts';
+$string['managecatcontexts'] = 'Manage Cat contexts';
+$string['manage_catcontexts'] = 'Manage Cat contexts';
 $string['starttimestamp'] = 'Context start time';
 $string['endtimestamp'] = 'Context end time';
 $string['timemodified'] = 'Time modified';
@@ -94,6 +94,8 @@ $string['attempts'] = 'Attempts';
 $string['action'] = 'Aktion';
 $string['searchcatcontext'] = 'Search Cat contexts';
 $string['selectcatcontext'] = 'Select a Cat context';
+$string['defaultcontextname'] = 'Default Cat context';
+$string['defaultcontextdescription'] = 'Includes all test items';
 
 $string['starttimestamp'] = 'Starttime';
 $string['endtimestamp'] = 'Endtime';

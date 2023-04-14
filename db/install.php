@@ -23,6 +23,8 @@
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+use local_catquiz\catcontext;
+
 /**
  * Custom code to be run on installing the plugin.
  */
@@ -69,6 +71,10 @@ function xmldb_local_catquiz_install() {
                 'modifierid' => 2));
         }
     }
+
+    // Make sure the database contains a default context
+    $defaultcontext = new catcontext();
+    $defaultcontext->create_default_context();
 
     return true;
 }
