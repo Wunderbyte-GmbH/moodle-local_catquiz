@@ -150,7 +150,7 @@ class testitems_table extends wunderbyte_table {
         $catscaleid = $jsonobject->catscaleid;
 
         if ($testitemid == -1) {
-            $idarray = explode(',', $jsonobject->checkedids);
+            $idarray = $jsonobject->checkedids;
         } else if ($testitemid > 0) {
             $idarray = [$testitemid];
         }
