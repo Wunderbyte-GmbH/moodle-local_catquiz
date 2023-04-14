@@ -95,7 +95,7 @@ function toggleSubscription(itemid, area, userid) {
             }
 
             // We render for promice for all the containers.
-            Templates.renderForPromise('local_catquiz/button_subscribe', data).then(({html, js}) => {
+            Templates.renderForPromise('local_catquiz/buttons/button_subscribe', data).then(({html, js}) => {
 
                 const selector = SELECTORS.SUBSCRIBEBUTTON +
                 '[data-id="' + itemid + '"]' +
