@@ -143,6 +143,7 @@ class catscaledashboard implements renderable, templatable {
         $table->showcountlabel = true;
         $table->showdownloadbutton = true;
         $table->showreloadbutton = true;
+        $table->showrowcountselect = true;
 
         return $table->outhtml(10, true);
     }
@@ -213,6 +214,7 @@ class catscaledashboard implements renderable, templatable {
         $table->showcountlabel = true;
         $table->showdownloadbutton = true;
         $table->showreloadbutton = true;
+        $table->showrowcountselect = true;
 
         return $table->outhtml(10, true);
     }
