@@ -30,16 +30,15 @@ use local_catquiz\table\testitems_table;
 
 require_once('../../config.php');
 
-global $USER;
+global $USER, $PAGE;
 
 $context = \context_system::instance();
+$PAGE->set_url('/local/catquiz/edit_catscale.php');
 
 $PAGE->set_context($context);
 require_login();
 
 require_capability('local/catquiz:manage_catscales', $context);
-
-$PAGE->set_url(new moodle_url('/local/catquiz/test.php', array()));
 
 $catscaleid = required_param('id', PARAM_INT);
 $contextid = optional_param('contextid', 0, PARAM_INT);
