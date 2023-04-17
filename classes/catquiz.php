@@ -343,12 +343,12 @@ class catquiz {
      */
     private static function get_sql_for_stat_base_request(array $testitemids = [], array $contextids = []):array {
         $select = '*';
-        $from = 'FROM m_local_catquiz_catcontext ccc1
-                JOIN m_question_attempt_steps qas
+        $from = 'FROM {local_catquiz_catcontext} ccc1
+                JOIN {question_attempt_steps} qas
                     ON ccc1.starttimestamp < qas.timecreated 
                     AND ccc1.endtimestamp > qas.timecreated
                     AND qas.fraction IS NOT NULL
-                JOIN m_question_attempts qa
+                JOIN {question_attempts} qa
                     ON qas.questionattemptid = qa.id';
         $where = !empty($testitemids) ? 'qa.questionid IN (:testitemids)' : '';
         $where .= !empty($contextids) ? ' AND ccc1.id IN (:contextids)' : '';
