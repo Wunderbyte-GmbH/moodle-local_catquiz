@@ -123,13 +123,13 @@ class catquiz {
      * @param int $catscaleid
      * @param array $wherearray
      * @param array $filterarray
+     * @param int $catcontextid
      * @return array
      */
-    public static function return_sql_for_catscalequestions(int $catscaleid, array $wherearray = [], array $filterarray = []) {
+    public static function return_sql_for_catscalequestions(int $catscaleid, array $wherearray = [], array $filterarray = [], int $contextid) {
 
         global $DB;
 
-        $params = [];
         $select = ' DISTINCT *';
         $from = "(SELECT
                     q.id,
@@ -158,12 +158,22 @@ class catquiz {
                                 AND qas.fraction IS NOT NULL
                         JOIN m_question_attempts qa
                             ON qas.questionattemptid = qa.id
+                    WHERE
+                        CASE :contextid1
+                            WHEN '0' THEN ccc1.json = :default
+                            ELSE ccc1.id = :contextid
+                        END
                     GROUP BY ccc1.id, qa.questionid
                 ) s2 ON q.id = s2.questionid
             ) as s1";
 
         $where = ' catscaleid = :catscaleid ';
-        $params['catscaleid'] = $catscaleid;
+        $params = [
+            'catscaleid' => $catscaleid,
+            'contextid' => $contextid,
+            'contextid1' => $contextid,
+            'default' => 'default',
+        ];
         $filter = '';
 
         foreach ($wherearray as $key => $value) {

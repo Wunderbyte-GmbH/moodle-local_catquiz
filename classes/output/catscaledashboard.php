@@ -158,16 +158,17 @@ class catscaledashboard implements renderable, templatable {
 
         $table = new testitems_table('testitems', $this->catscaleid, $this->catcontextid);
 
-        list($select, $from, $where, $filter, $params) = catquiz::return_sql_for_catscalequestions($catscaleid);
+        list($select, $from, $where, $filter, $params) = catquiz::return_sql_for_catscalequestions($catscaleid, [], [], $this->catcontextid);
 
         $table->set_filter_sql($select, $from, $where, $filter, $params);
 
-        $table->define_columns(['idnumber', 'questiontext', 'qtype', 'categoryname', 'action']);
+        $table->define_columns(['idnumber', 'questiontext', 'qtype', 'categoryname', 'questioncontextattempts', 'action']);
         $table->define_headers([
             get_string('label', 'local_catquiz'),
             get_string('questiontext', 'local_catquiz'),
             get_string('questiontype', 'local_catquiz'),
             get_string('questioncategories', 'local_catquiz'),
+            get_string('questioncontextattempts', 'local_catquiz'),
             get_string('action', 'local_catquiz'),
         ]);
 
@@ -185,7 +186,7 @@ class catscaledashboard implements renderable, templatable {
             'shortanswer' => get_string('pluginname', 'qtype_shortanswer'),
         ]]);
         $table->define_fulltextsearchcolumns(['idnumber', 'name', 'questiontext', 'qtype']);
-        $table->define_sortablecolumns(['idnumber', 'name', 'questiontext', 'qtype']);
+        $table->define_sortablecolumns(['idnumber', 'name', 'questiontext', 'qtype', 'questioncontextattempts']);
 
         $table->tabletemplate = 'local_wunderbyte_table/twtable_list';
         $table->define_cache('local_catquiz', 'testitemstable');
@@ -282,7 +283,7 @@ class catscaledashboard implements renderable, templatable {
         return [
             'title' => $this->render_title(),
             'returnurl' => $url->out(),
-            'testitemstable' => $this->render_testitems_table($this->catscaleid),
+            'testitemstable' => $this->render_testitems_table($this->catscaleid, $this->catcontextid),
             'addtestitemstable' => $this->render_addtestitems_table($this->catscaleid),
             'statindependence' => $this->render_statindependence(),
             'loglikelihood' => $this->render_loglikelihood(),
