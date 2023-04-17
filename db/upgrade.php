@@ -182,5 +182,33 @@ function xmldb_local_catquiz_upgrade($oldversion) {
             upgrade_plugin_savepoint(true, 2023041400, 'local', 'catquiz');
         }
 
+        // Add the itemparams table
+        $SAVEPOINT_ADD_ITEM_PARAMS = 2023041703;
+        if ($oldversion < $SAVEPOINT_ADD_ITEM_PARAMS) {
+
+            // Define table local_catquiz_itemparams to be created.
+            $table = new xmldb_table('local_catquiz_itemparams');
+    
+            // Adding fields to table local_catquiz_itemparams.
+            $table->add_field('id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, XMLDB_SEQUENCE, null);
+            $table->add_field('componentid', XMLDB_TYPE_INTEGER, '10', null, null, null, '0');
+            $table->add_field('componentname', XMLDB_TYPE_CHAR, '255', null, null, null, null);
+            $table->add_field('contextid', XMLDB_TYPE_INTEGER, '10', null, null, null, '0');
+            $table->add_field('model', XMLDB_TYPE_CHAR, '255', null, null, null, null);
+            $table->add_field('difficulty', XMLDB_TYPE_NUMBER, '10', null, null, null, '0');
+            $table->add_field('discrimination', XMLDB_TYPE_NUMBER, '10', null, null, null, '0');
+    
+            // Adding keys to table local_catquiz_itemparams.
+            $table->add_key('primary', XMLDB_KEY_PRIMARY, ['id']);
+    
+            // Conditionally launch create table for local_catquiz_itemparams.
+            if (!$dbman->table_exists($table)) {
+                $dbman->create_table($table);
+            }
+    
+            // Catquiz savepoint reached.
+            upgrade_plugin_savepoint(true, $SAVEPOINT_ADD_ITEM_PARAMS, 'local', 'catquiz');
+        }
+
     return true;
 }
