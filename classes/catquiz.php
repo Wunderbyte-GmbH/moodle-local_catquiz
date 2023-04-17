@@ -123,7 +123,7 @@ class catquiz {
      * @param int $catscaleid
      * @param array $wherearray
      * @param array $filterarray
-     * @return void
+     * @return array
      */
     public static function return_sql_for_catscalequestions(int $catscaleid, array $wherearray = [], array $filterarray = []) {
 
@@ -131,12 +131,24 @@ class catquiz {
 
         $params = [];
         $select = ' DISTINCT *';
-        $from = "( SELECT q.id, qbe.idnumber, q.name, q.questiontext, q.qtype, qc.name as categoryname, lci.catscaleid catscaleid, lci.componentname component
-            FROM {question} q
-                JOIN {question_versions} qv ON q.id=qv.questionid
-                JOIN {question_bank_entries} qbe ON qv.questionbankentryid=qbe.id
-                JOIN {question_categories} qc ON qc.id=qbe.questioncategoryid
-                LEFT JOIN {local_catquiz_items} lci ON lci.componentid=q.id AND lci.componentname='question'
+        $from = "(SELECT
+                    q.id,
+                    qbe.idnumber,
+                    q.name,
+                    q.questiontext,
+                    q.qtype,
+                    qc.name as categoryname,
+                    lci.catscaleid catscaleid,
+                    lci.componentname component
+                FROM {question} q
+                JOIN {question_versions} qv
+                    ON q.id=qv.questionid
+                JOIN {question_bank_entries} qbe
+                    ON qv.questionbankentryid=qbe.id
+                JOIN {question_categories} qc
+                    ON qc.id=qbe.questioncategoryid
+                LEFT JOIN {local_catquiz_items} lci
+                    ON lci.componentid=q.id AND lci.componentname='question'
             ) as s1";
 
         $where = ' catscaleid = :catscaleid ';
