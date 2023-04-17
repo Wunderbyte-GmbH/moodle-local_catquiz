@@ -139,7 +139,8 @@ class catquiz {
                     q.qtype,
                     qc.name as categoryname,
                     lci.catscaleid catscaleid,
-                    lci.componentname component
+                    lci.componentname component,
+                    attempts as questioncontextattempts
                 FROM {question} q
                 JOIN {question_versions} qv
                     ON q.id=qv.questionid
@@ -149,6 +150,16 @@ class catquiz {
                     ON qc.id=qbe.questioncategoryid
                 LEFT JOIN {local_catquiz_items} lci
                     ON lci.componentid=q.id AND lci.componentname='question'
+                LEFT JOIN (
+                    SELECT ccc1.id, qa.questionid, COUNT(*) AS attempts
+                    FROM m_local_catquiz_catcontext ccc1
+                        JOIN m_question_attempt_steps qas
+                            ON ccc1.starttimestamp < qas.timecreated AND ccc1.endtimestamp > qas.timecreated
+                                AND qas.fraction IS NOT NULL
+                        JOIN m_question_attempts qa
+                            ON qas.questionattemptid = qa.id
+                    GROUP BY ccc1.id, qa.questionid
+                ) s2 ON q.id = s2.questionid
             ) as s1";
 
         $where = ' catscaleid = :catscaleid ';
