@@ -142,6 +142,7 @@ $string['removetestitemsubmit'] = 'Remove';
 $string['removetestitem'] = 'Remove test items';
 
 $string['testitems'] = 'Test items';
+$string['questioncontextattempts'] = '# Attempts in selected context';
 
 // Email Templates.
 $string['notificationcatscalechange'] = 'Hello {$a->firstname} {$a->lastname},
