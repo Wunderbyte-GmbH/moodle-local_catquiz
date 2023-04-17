@@ -292,6 +292,25 @@ class catquiz {
         return [$sql, $params];
     }
 
+
+    /**
+     * Returns the sql that can be used to get input data for the
+     * helpercat::get_item_list($data) function
+     */
+    public static function get_sql_for_model_input() {
+
+        list (, $from, , $params) = self::get_sql_for_stat_base_request([], []);
+
+        $sql = "
+        SELECT qas.id, qas.userid, qa.questionid, qas.fraction, qa.minfraction, qa.maxfraction, q.qtype
+       $from
+        JOIN {question} q
+            ON qa.questionid = q.id
+        ";
+
+        return [$sql, $params];
+    }
+
     /**
      * Return the sql for all questions answered.
      *
