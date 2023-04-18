@@ -397,7 +397,7 @@ class catquiz {
                     AND qas.fraction IS NOT NULL
                 JOIN {question_attempts} qa
                     ON qas.questionattemptid = qa.id';
-        $where = !empty($testitemids) ? 'qa.questionid IN (:testitemids)' : '';
+        $where = !empty($testitemids) ? 'qa.questionid IN (:testitemids)' : '1=1';
         $where .= !empty($contextids) ? ' AND ccc1.id IN (:contextids)' : '';
 
         $testitemidstring = sprintf("%s", implode(',', $testitemids));
