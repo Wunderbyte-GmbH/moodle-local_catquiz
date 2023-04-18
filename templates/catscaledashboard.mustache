@@ -42,6 +42,9 @@
   <li class="nav-item">
     <a class="nav-link" id="usage-tab" data-toggle="tab" href="#usage" role="tab" aria-controls="usage" aria-selected="false">{{#str}} usage, local_catquiz{{/str}}</a>
   </li>
+  <li class="nav-item">
+    <a class="nav-link" id="students-tab" data-toggle="tab" href="#studentstats" role="tab" aria-controls="studentstats" aria-selected="false">{{#str}} studentstats, local_catquiz{{/str}}</a>
+  </li>
 </ul>
 <div class="tab-content" id="myTabContent">
   <div class="tab-pane fade show active" id="statistics" role="tabpanel" aria-labelledby="statistics-tab">
@@ -55,6 +58,9 @@
   </div>
   <div class="tab-pane fade" id="usage" role="tabpanel" aria-labelledby="usage-tab">
     {{{table}}}
+  </div>
+  <div class="tab-pane fade" id="studentstats" role="tabpanel" aria-labelledby="students-tab">
+    {{{studentstable}}}
   </div>
 </div>
 

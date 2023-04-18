@@ -34,6 +34,7 @@ use context_system;
 use html_writer;
 use local_catquiz\catquiz;
 use local_catquiz\table\testitems_table;
+use local_catquiz\table\student_stats_table;
 use moodle_url;
 use stdClass;
 use templatable;
@@ -271,6 +272,37 @@ class catscaledashboard implements renderable, templatable {
     return html_writer::div($form->render(), '', ['id' => 'select_context_form']); 
     }
 
+    private function render_student_stats_table(int $catscaleid, int $catcontextid) {
+        $table = new student_stats_table('students', $this->catscaleid, $this->catcontextid);
+
+        list($select, $from, $where, $filter, $params) = catquiz::return_sql_for_student_stats($catcontextid);
+
+        $table->set_filter_sql($select, $from, $where, $filter, $params);
+
+        $table->define_columns(['firstname', 'lastname', 'studentattempts',]);
+        $table->define_headers([
+            get_string('firstname', 'core'),
+            get_string('lastname', 'core'),
+            get_string('questioncontextattempts', 'local_catquiz'),
+        ]);
+
+        $table->define_fulltextsearchcolumns(['firstname', 'lastname']);
+        $table->define_sortablecolumns(['firstname', 'lastname', 'studentattempts']);
+
+        $table->tabletemplate = 'local_wunderbyte_table/twtable_list';
+        $table->define_cache('local_catquiz', 'studentstatstable');
+
+        $table->pageable(true);
+
+        $table->stickyheader = false;
+        $table->showcountlabel = true;
+        $table->showdownloadbutton = true;
+        $table->showreloadbutton = true;
+        $table->showrowcountselect = true;
+
+        return $table->outhtml(10, true);
+    }
+
     /**
      * Return the item tree of all catscales.
      * @return array
@@ -290,6 +322,7 @@ class catscaledashboard implements renderable, templatable {
             'differentialitem' => $this->render_differentialitem(),
             'contextselector' => $this->render_contextselector(),
             'table' => $testenvironmentdashboard->testenvironmenttable($this->catscaleid),
+            'studentstable' => $this->render_student_stats_table($this->catscaleid, $this->catcontextid),
         ];
     }
 }
