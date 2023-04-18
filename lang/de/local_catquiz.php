@@ -141,6 +141,8 @@ $string['removetestitem'] = 'Testitems entfernen';
 $string['testitems'] = 'Testitems';
 $string['questioncontextattempts'] = '# Versuche im ausgewählten Kontext';
 
+$string['studentstats'] = 'Studierende';
+
 // Email Templates.
 $string['notificationcatscalechange'] = 'Hallo {$a->firstname} {$a->lastname},
 CAT Skalen wurden verändert auf der Moolde Plattform {$a->instancename}.

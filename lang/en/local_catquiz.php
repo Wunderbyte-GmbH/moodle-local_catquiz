@@ -144,6 +144,9 @@ $string['removetestitem'] = 'Remove test items';
 $string['testitems'] = 'Test items';
 $string['questioncontextattempts'] = '# Attempts in selected context';
 
+// Students table
+$string['studentstats'] = 'Students';
+
 // Email Templates.
 $string['notificationcatscalechange'] = 'Hello {$a->firstname} {$a->lastname},
 CAT scales have been changed on the Moodle platform {$a->instancename}.

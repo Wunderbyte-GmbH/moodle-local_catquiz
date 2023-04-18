@@ -364,6 +364,22 @@ class catquiz {
 
         return [$sql, $params];
     }
+    public static function return_sql_for_student_stats(int $contextid) {
+        
+        list ($select, $from, $where, $params) = self::get_sql_for_stat_base_request([], [$contextid]);
+
+        $select = "*";
+        $from .= " JOIN {user} u ON qas.userid = u.id";
+
+        if ($where == "") {
+            $where .= "1=1";
+        }
+        $where .= " GROUP BY u.id, u.firstname, u.lastname";
+        
+        $from = " (SELECT u.id, u.firstname, u.lastname, COUNT(*) as studentattempts FROM $from WHERE $where) s1 ";
+
+        return [$select, $from, "1=1", "", $params];
+    }
 
     /**
      * Basefunction to fetch all questions in context.
