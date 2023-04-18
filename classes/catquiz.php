@@ -226,7 +226,7 @@ class catquiz {
         list ($select, $from, $where, $params) = self::get_sql_for_stat_base_request($testitemids, $contextids);
 
         $sql = "SELECT COUNT(qas.id)
-        $from
+        FROM $from
         WHERE $where";
 
         return [$sql, $params];
@@ -243,7 +243,7 @@ class catquiz {
         list ($select, $from, $where, $params) = self::get_sql_for_stat_base_request($testitemids, $contextids);
 
         $sql = "SELECT AVG(qas.fraction)
-        $from
+        FROM $from
         WHERE $where";
 
         return [$sql, $params];
@@ -259,7 +259,7 @@ class catquiz {
         list ($select, $from, $where, $params) = self::get_sql_for_stat_base_request($testitemids, $contextids);
 
         $sql = "SELECT COUNT(qas.id)
-        $from
+        FROM $from
         WHERE $where
         AND qas.fraction = qa.maxfraction";
 
@@ -276,7 +276,7 @@ class catquiz {
         list ($select, $from, $where, $params) = self::get_sql_for_stat_base_request($testitemids, $contextids);
 
         $sql = "SELECT COUNT(qas.id)
-        $from
+        FROM $from
         WHERE $where
         AND qas.fraction = qa.minfraction";
 
@@ -293,7 +293,7 @@ class catquiz {
         list ($select, $from, $where, $params) = self::get_sql_for_stat_base_request($testitemids, $contextids);
 
         $sql = "SELECT COUNT(qas.id)
-        $from
+        FROM $from
         WHERE $where
         AND qas.fraction <> qa.minfraction
         AND qas.fraction <> qa.maxfraction";
@@ -315,7 +315,7 @@ class catquiz {
         $sql = "SELECT COUNT(s1.questionid)
         FROM (
             SELECT qas.userid, qa.questionid
-            $from
+            FROM $from
             WHERE $where
             GROUP BY qa.questionid, qas.userid)
         as s1";
@@ -334,7 +334,7 @@ class catquiz {
 
         $sql = "
         SELECT qas.id, qas.userid, qa.questionid, qas.fraction, qa.minfraction, qa.maxfraction, q.qtype
-       $from
+        FROM $from
         JOIN {question} q
             ON qa.questionid = q.id
         ";
@@ -355,7 +355,7 @@ class catquiz {
         $sql = "SELECT COUNT(s1.questionid)
         FROM (
             SELECT qa.questionid, qu.contextid
-            $from
+            FROM $from
             JOIN {question_usages} qu ON qa.questionusageid=qu.id
             WHERE $where
             AND qas.fraction IS NOT NULL
@@ -374,7 +374,7 @@ class catquiz {
      */
     private static function get_sql_for_stat_base_request(array $testitemids = [], array $contextids = []):array {
         $select = '*';
-        $from = 'FROM {local_catquiz_catcontext} ccc1
+        $from = '{local_catquiz_catcontext} ccc1
                 JOIN {question_attempt_steps} qas
                     ON ccc1.starttimestamp < qas.timecreated 
                     AND ccc1.endtimestamp > qas.timecreated
