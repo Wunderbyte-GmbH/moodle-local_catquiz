@@ -193,7 +193,7 @@ class catquiz {
         global $DB;
 
         $params = [];
-        $select = 'DISTINCT id, idnumber, name, questiontext, qtype, categoryname, \'question\' as component';
+        $select = 'DISTINCT id, idnumber, name, questiontext, qtype, categoryname, \'question\' as component, catscaleids';
         $from = "( SELECT q.id, qbe.idnumber, q.name, q.questiontext, q.qtype, qc.name as categoryname, " .
              $DB->sql_group_concat($DB->sql_concat("'-'", 'lci.catscaleid', "'-'")) ." as catscaleids
             FROM {question} q
