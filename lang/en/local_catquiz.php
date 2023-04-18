@@ -161,6 +161,7 @@ $string['statindependence'] = "Statistical Independence";
 $string['loglikelihood'] = "Loglikelihood";
 $string['differentialitem'] = "Differential Item Functioning";
 $string['previewquestion'] = "Preview question";
+$string['personabilities'] = "Person abilities";
 
 // Table.
 $string['label'] = "Label";

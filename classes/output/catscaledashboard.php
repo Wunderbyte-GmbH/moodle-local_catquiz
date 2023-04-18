@@ -33,6 +33,7 @@ namespace local_catquiz\output;
 use context_system;
 use html_writer;
 use local_catquiz\catquiz;
+use local_catquiz\synthcat;
 use local_catquiz\table\testitems_table;
 use local_catquiz\table\student_stats_table;
 use moodle_url;
@@ -263,6 +264,22 @@ class catscaledashboard implements renderable, templatable {
 
         return html_writer::tag('div', $OUTPUT->render($chart), ['dir' => 'ltr']);
     }
+    private function render_personability($contextid) {
+
+        global $OUTPUT;
+
+        $data = $this->render_modeloutput($contextid);
+        sort($data);
+        $data = array_filter($data, function($a) { return is_finite($a);});
+
+        $chart = new \core\chart_line();
+        $series = new \core\chart_series('Series 1 (Line)', array_values($data));
+        $chart->set_smooth(true); // Calling set_smooth() passing true as parameter, will display smooth lines.
+        $chart->add_series($series);
+        $chart->set_labels(array_keys($data));
+
+        return html_writer::tag('div', $OUTPUT->render($chart), ['dir' => 'ltr']);
+    }
 
     private function render_contextselector() {
     $form = new \local_catquiz\form\contextselector(null, null, 'post', '', [], true, ['contextid' => $this->catcontextid]);
@@ -302,6 +319,101 @@ class catscaledashboard implements renderable, templatable {
 
         return $table->outhtml(10, true);
     }
+    private function render_modelbutton($contextid) {
+        return '<button class="btn btn-primary" type="button" data-contextid="1" id="model_button">Calculate</button>';
+    }
+
+    private function render_modeloutput($contextid) {
+        global $DB;
+
+        list ($sql, $params) = catquiz::get_sql_for_model_input($contextid);
+        $data = $DB->get_records_sql($sql, $params);
+        $inputdata = $this->db_to_modelinput($data);
+        $estimated_parameters = $this->run_estimation($inputdata);
+        return $estimated_parameters;
+    }
+
+    private function run_estimation($inputdata) {
+        $demo_persons = array_map(
+            function($id) {
+                return ['id' => $id, 'ability' => 0];
+            },
+            array_keys($inputdata)
+        );
+
+        $item_list = \local_catquiz\helpercat::get_item_list($inputdata);
+        $estimated_item_difficulty = \local_catquiz\catcalc::estimate_initial_item_difficulties($item_list);
+
+        $estimated_person_abilities = [];
+        foreach($demo_persons as $person){
+
+            $person_id = $person['id'];
+            $item_difficulties = $estimated_item_difficulty; // replace by something better
+            $person_response = \local_catquiz\helpercat::get_person_response($inputdata, $person_id);
+            $person_ability = \local_catquiz\catcalc::estimate_person_ability($person_response, $item_difficulties);
+
+            $estimated_person_abilities[$person_id] = $person_ability;
+        }
+
+
+        $demo_item_responses = \local_catquiz\helpercat::get_item_response($inputdata, $estimated_person_abilities);
+
+        $estimated_item_difficulty_next = [];
+
+        foreach($demo_item_responses as $item_id => $item_response){
+            $item_difficulty = \local_catquiz\catcalc::estimate_item_difficulty($item_response);
+
+            $estimated_item_difficulty_next[$item_id] = $item_difficulty;
+        }
+
+        return $estimated_item_difficulty;
+    }
+
+    /**
+     * Returns data in the following format
+     * 
+     * "1" => Array( //userid
+     *     "comp1" => Array( // component
+     *         "1" => Array( //questionid
+     *             "fraction" => 0,
+     *             "max_fraction" => 1,
+     *             "min_fraction" => 0,
+     *             "qtype" => "truefalse",
+     *             "timestamp" => 1646955326
+     *         ),
+     *         "2" => Array(
+     *             "fraction" => 0,
+     *             "max_fraction" => 1,
+     *             "min_fraction" => 0,
+     *             "qtype" => "truefalse",
+     *             "timestamp" => 1646955332
+     *         ),
+     *         "3" => Array(
+     *             "fraction" => 1,
+     *             "max_fraction" => 1,
+     *             "min_fraction" => 0,
+     *             "qtype" => "truefalse",
+     *             "timestamp" => 1646955338
+     */
+    private function db_to_modelinput($data) {
+        $modelinput = [];
+        foreach ($data as $row) {
+            $entry = [
+                'fraction' => $row->fraction,
+                'max_fraction' =>  $row->maxfraction,
+                'min_fraction' => $row->minfraction,
+                'qtype' => $row->qtype,
+                'timestamp' => $row->timecreated,
+            ];
+
+            if (!array_key_exists($row->userid, $modelinput)) {
+                $modelinput[$row->userid] = ["component" => []];
+            }
+
+            $modelinput[$row->userid]['component'][$row->questionid] = $entry;
+        }
+        return $modelinput;
+    }
 
     /**
      * Return the item tree of all catscales.
@@ -319,10 +431,13 @@ class catscaledashboard implements renderable, templatable {
             'addtestitemstable' => $this->render_addtestitems_table($this->catscaleid),
             'statindependence' => $this->render_statindependence(),
             'loglikelihood' => $this->render_loglikelihood(),
+            'personability' => $this->render_personability($this->catcontextid),
             'differentialitem' => $this->render_differentialitem(),
             'contextselector' => $this->render_contextselector(),
             'table' => $testenvironmentdashboard->testenvironmenttable($this->catscaleid),
             'studentstable' => $this->render_student_stats_table($this->catscaleid, $this->catcontextid),
+            'modelbutton' => $this->render_modelbutton($this->catcontextid),
+//            'modeloutput' => $this->render_modeloutput($this->catcontextid),
         ];
     }
 }
