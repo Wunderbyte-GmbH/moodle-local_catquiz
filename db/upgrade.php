@@ -195,8 +195,8 @@ function xmldb_local_catquiz_upgrade($oldversion) {
             $table->add_field('componentname', XMLDB_TYPE_CHAR, '255', null, null, null, null);
             $table->add_field('contextid', XMLDB_TYPE_INTEGER, '10', null, null, null, '0');
             $table->add_field('model', XMLDB_TYPE_CHAR, '255', null, null, null, null);
-            $table->add_field('difficulty', XMLDB_TYPE_NUMBER, '10', null, null, null, '0');
-            $table->add_field('discrimination', XMLDB_TYPE_NUMBER, '10', null, null, null, '0');
+            $table->add_field('difficulty', XMLDB_TYPE_NUMBER, '10, 4', null, null, null, '0');
+            $table->add_field('discrimination', XMLDB_TYPE_NUMBER, '10, 4', null, null, null, '0');
     
             // Adding keys to table local_catquiz_itemparams.
             $table->add_key('primary', XMLDB_KEY_PRIMARY, ['id']);
