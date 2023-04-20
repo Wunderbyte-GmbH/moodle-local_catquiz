@@ -42,6 +42,8 @@ require_capability('local/catquiz:manage_catscales', $context);
 
 $catscaleid = required_param('id', PARAM_INT);
 $contextid = optional_param('contextid', 0, PARAM_INT);
+$triggercalculation = optional_param('calculate', false, PARAM_BOOL);
+
 if (empty($contextid)) {
     $contextid = $DB->get_field_sql("SELECT id FROM {local_catquiz_catcontext} WHERE " . $DB->sql_like(
         'json',
@@ -52,7 +54,7 @@ if (empty($contextid)) {
 $title = get_string('assigntestitemstocatscales', 'local_catquiz');
 $PAGE->set_title($title);
 
-$data = new catscaledashboard($catscaleid, $contextid);
+$data = new catscaledashboard($catscaleid, $contextid, $triggercalculation);
 $output = $PAGE->get_renderer('local_catquiz');
 echo $output->render_catscaledashboard($data);
 
