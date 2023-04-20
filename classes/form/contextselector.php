@@ -57,6 +57,9 @@ class contextselector extends dynamic_form {
         $contexts = [];
         foreach ($contextsdb as $contextid => $context) {
             $contexts[$contextid] = $context->name;
+            if ($context->json === 'default') {
+                $default = $contextid;
+            }
         }
         $options = array(
             'multiple' => false,
@@ -70,7 +73,8 @@ class contextselector extends dynamic_form {
             $label = get_string('selectcatcontext', 'local_catquiz');
         }
 
-        $mform->addElement('select', 'contextid', $label, $contexts, ['class' => 'justify-content-end']);
+        $mform->addElement('select', 'contextid', $label, $contexts, $options);
+        $mform->setDefault('contextid', $default);
         $mform->addElement('submit', 'submitbutton', 'submit', ['class' => 'd-none']);
         $mform->disable_form_change_checker();
     }

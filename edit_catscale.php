@@ -30,7 +30,7 @@ use local_catquiz\table\testitems_table;
 
 require_once('../../config.php');
 
-global $USER, $PAGE;
+global $USER, $PAGE, $DB;
 
 $context = \context_system::instance();
 $PAGE->set_url('/local/catquiz/edit_catscale.php');
@@ -42,6 +42,12 @@ require_capability('local/catquiz:manage_catscales', $context);
 
 $catscaleid = required_param('id', PARAM_INT);
 $contextid = optional_param('contextid', 0, PARAM_INT);
+if (empty($contextid)) {
+    $contextid = $DB->get_field_sql("SELECT id FROM {local_catquiz_catcontext} WHERE " . $DB->sql_like(
+        'json',
+        "'default'"
+    ));
+}
 
 $title = get_string('assigntestitemstocatscales', 'local_catquiz');
 $PAGE->set_title($title);
