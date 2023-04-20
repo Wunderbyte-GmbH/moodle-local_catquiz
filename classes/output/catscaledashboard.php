@@ -57,6 +57,13 @@ class catscaledashboard implements renderable, templatable {
     /** @var integer of catcontextid */
     private int $catcontextid = 0;
 
+    /**
+     * If set to true, we execute the CAT parameter estimation algorithm.
+     *
+     * @var boolean
+     */
+    private bool $triggercalculation;
+
     /** @var stdClass|bool */
     private $catscale;
 
@@ -67,11 +74,12 @@ class catscaledashboard implements renderable, templatable {
      * @param boolean $allowedit
      * @return array
      */
-    public function __construct(int $catscaleid, int $catcontextid = 0) {
+    public function __construct(int $catscaleid, int $catcontextid = 0, bool $triggercalculation = false) {
         global $DB;
 
         $this->catscaleid = $catscaleid;
         $this->catcontextid = $catcontextid;
+        $this->triggercalculation = $triggercalculation;
         $this->catscale = $DB->get_record(
             'local_catquiz_catscales',
             ['id' => $catscaleid]
@@ -268,7 +276,7 @@ class catscaledashboard implements renderable, templatable {
 
         global $OUTPUT;
 
-        $data = $this->render_modeloutput($contextid);
+        $data = $this->render_modeloutput($contextid, $this->triggercalculation);
         sort($data);
         $data = array_filter($data, function($a) { return is_finite($a);});
 
@@ -324,7 +332,11 @@ class catscaledashboard implements renderable, templatable {
         return '<button class="btn btn-primary" type="button" data-contextid="1" id="model_button">Calculate</button>';
     }
 
-    private function render_modeloutput($contextid) {
+    private function render_modeloutput($contextid, $calculate) {
+        if (!$calculate) {
+            // TODO: Implement getting the parameters from the DB
+            return $this->get_estimated_parameters_from_db($contextid);
+        }
         global $DB;
 
         list ($sql, $params) = catquiz::get_sql_for_model_input($contextid);
@@ -332,6 +344,11 @@ class catscaledashboard implements renderable, templatable {
         $inputdata = $this->db_to_modelinput($data);
         $estimated_parameters = $this->run_estimation($inputdata);
         return $estimated_parameters;
+    }
+
+    private function get_estimated_parameters_from_db(int $contextid) {
+        // TODO: Implement getting data from the DB
+        return [1, 2, 3, 4, 5, 6, 7];
     }
 
     private function run_estimation($inputdata) {
@@ -438,7 +455,6 @@ class catscaledashboard implements renderable, templatable {
             'table' => $testenvironmentdashboard->testenvironmenttable($this->catscaleid),
             'studentstable' => $this->render_student_stats_table($this->catscaleid, $this->catcontextid),
             'modelbutton' => $this->render_modelbutton($this->catcontextid),
-//            'modeloutput' => $this->render_modeloutput($this->catcontextid),
         ];
     }
 }
