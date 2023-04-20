@@ -51,6 +51,12 @@ use renderable;
  */
 class catscaledashboard implements renderable, templatable {
 
+    // For some items, the model returns -INF or INF as difficulty.
+    // However, we expect it to be numeric, so we encode those
+    // values as -1000 and 1000
+    const MODEL_NEG_INF = -1000;
+    const MODEL_POS_INF = 1000;
+
     /** @var integer of catscaleid */
     public int $catscaleid = 0;
 
@@ -276,9 +282,11 @@ class catscaledashboard implements renderable, templatable {
 
         global $OUTPUT;
 
-        $data = $this->render_modeloutput($contextid, $this->triggercalculation);
+        $data = $this->render_modeloutput($contextid, $this->triggercalculation, 'raschbirnbauma');
         sort($data);
-        $data = array_filter($data, function($a) { return is_finite($a);});
+        $data = array_filter($data, function($a) {
+            return is_finite($a) && abs($a) != self::MODEL_POS_INF;
+        });
 
         $chart = new \core\chart_line();
         $series = new \core\chart_series('Series 1 (Line)', array_values($data));
@@ -332,10 +340,9 @@ class catscaledashboard implements renderable, templatable {
         return '<button class="btn btn-primary" type="button" data-contextid="1" id="model_button">Calculate</button>';
     }
 
-    private function render_modeloutput($contextid, $calculate) {
+    private function render_modeloutput($contextid, $calculate, string $model) {
         if (!$calculate) {
-            // TODO: Implement getting the parameters from the DB
-            return $this->get_estimated_parameters_from_db($contextid);
+            return $this->get_estimated_parameters_from_db($contextid, $model);
         }
         global $DB;
 
@@ -343,12 +350,78 @@ class catscaledashboard implements renderable, templatable {
         $data = $DB->get_records_sql($sql, $params);
         $inputdata = $this->db_to_modelinput($data);
         $estimated_parameters = $this->run_estimation($inputdata);
+        $this->save_estimated_parameters_to_db($contextid, $estimated_parameters, $model);
         return $estimated_parameters;
     }
 
-    private function get_estimated_parameters_from_db(int $contextid) {
-        // TODO: Implement getting data from the DB
-        return [1, 2, 3, 4, 5, 6, 7];
+    private function save_estimated_parameters_to_db(int $contextid, array $estimated_parameters, string $model) {
+        global $DB;
+        // Get existing records for the given contextid and model.
+        $existing_params_rows = $DB->get_records('local_catquiz_itemparams', ['model' => $model, 'contextid' => $contextid,]);
+        $existing_params = [];
+        foreach ($existing_params_rows as $r) {
+            $existing_params[$r->componentid] = $r;
+        };
+
+        $records = array_map(
+            function ($componentid, $param) use ($contextid, $model) {
+                if (!is_finite($param)) {
+                    $param = $param < 0 ? self::MODEL_NEG_INF : self::MODEL_POS_INF;
+                }
+                return [
+                    'componentid' => $componentid,
+                    'componentname' => 'question',
+                    'difficulty' => $param,
+                    'model' => $model,
+                    'contextid' => $contextid,
+                ];
+            },
+            array_keys($estimated_parameters),
+            array_values($estimated_parameters)
+        );
+
+        $updated_records = [];
+        $new_records = [];
+        $now = time();
+        foreach ($records as $record) {
+            $is_existing_param = array_key_exists($record['componentid'], $existing_params);
+            // If record already exists, update it. Otherwise, insert a new record to the DB
+            if ($is_existing_param) {
+                $record['id'] = $existing_params[$record['componentid']]->id;
+                $record['timemodified'] = $now;
+                $updated_records[] = $record;
+            } else {
+                $record['timecreated'] = $now;
+                $record['timemodified'] = $now;
+                $new_records[] = $record;
+            }
+        }
+
+        if (!empty($new_records)) {
+            $DB->insert_records('local_catquiz_itemparams', $new_records);
+            
+        }
+        // Maybe change to bulk update later
+        foreach ($updated_records as $r) {
+            $DB->update_record('local_catquiz_itemparams', $r, true);
+        }
+    }
+
+    private function get_estimated_parameters_from_db(int $contextid, string $model) {
+        global $DB;
+
+        $rows = $DB->get_records('local_catquiz_itemparams',
+            [
+                'contextid' => $contextid,
+                'model' => $model,
+            ],
+            'difficulty ASC'
+        );
+        $result = [];
+        foreach ($rows as $r) {
+            $result[$r->componentid] = $r->difficulty;
+        }
+        return $result;
     }
 
     private function run_estimation($inputdata) {
