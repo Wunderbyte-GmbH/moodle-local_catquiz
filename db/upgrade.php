@@ -210,5 +210,32 @@ function xmldb_local_catquiz_upgrade($oldversion) {
             upgrade_plugin_savepoint(true, $SAVEPOINT_ADD_ITEM_PARAMS, 'local', 'catquiz');
         }
 
+        $SAVEPOINT_ADD_TIME_FIELDS = 2023042001;
+        if ($oldversion < $SAVEPOINT_ADD_TIME_FIELDS) {
+
+            // Add timecreated field
+            // Define field timecreated to be added to local_catquiz_itemparams.
+            $table = new xmldb_table('local_catquiz_itemparams');
+            $field = new xmldb_field('timecreated', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0', 'discrimination');
+    
+            // Conditionally launch add field timecreated.
+            if (!$dbman->field_exists($table, $field)) {
+                $dbman->add_field($table, $field);
+            }
+
+            // Add timemodified field
+            // Define field timemodified to be added to local_catquiz_itemparams.
+            $table = new xmldb_table('local_catquiz_itemparams');
+            $field = new xmldb_field('timemodified', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0', 'timecreated');
+    
+            // Conditionally launch add field timemodified.
+            if (!$dbman->field_exists($table, $field)) {
+                $dbman->add_field($table, $field);
+            }
+
+            // Catquiz savepoint reached.
+            upgrade_plugin_savepoint(true, $SAVEPOINT_ADD_TIME_FIELDS, 'local', 'catquiz');
+        }
+
     return true;
 }
