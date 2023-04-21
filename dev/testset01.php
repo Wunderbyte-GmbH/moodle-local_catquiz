@@ -1,4 +1,5 @@
 <?php
+use local_catquiz\catmodel_item_list;
 // This file is part of Moodle - http://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
@@ -47,9 +48,9 @@ $demo_response = local_catquiz\synthcat::generate_response($demo_persons,$demo_i
 // estimate parameter
 
 
-$demo_item_list = \local_catquiz\helpercat::get_item_list($demo_response);
+$cil = catmodel_item_list::create_from_response($demo_response);
 //$demo_person_response = \local_catquiz\helpercat::get_person_response($demo_response,3);
-$estimated_item_difficulty = \local_catquiz\catcalc::estimate_initial_item_difficulties($demo_item_list);
+$estimated_item_difficulty = $cil->estimate_initial_item_difficulties();
 
 
 
