@@ -302,8 +302,8 @@ class catmodel_info {
             array_keys($inputdata)
         );
 
-        $item_list = \local_catquiz\helpercat::get_item_list($inputdata);
-        $estimated_item_difficulty = \local_catquiz\catcalc::estimate_initial_item_difficulties($item_list);
+        $cil = catmodel_item_list::create_from_response($inputdata);
+        $estimated_item_difficulty = $cil->estimate_initial_item_difficulties();
 
         $estimated_person_abilities = [];
         foreach($demo_persons as $person){

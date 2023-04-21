@@ -27,25 +27,6 @@ namespace local_catquiz;
 
 class helpercat{
 
-    static function get_item_list($response) {
-        $questions = Array();
-        $user_ids = array_keys($response);
-
-        //$components = Array();
-
-        foreach ($user_ids as $user_id) {
-            $components = array();
-            $components = array_merge($components, array_keys($response[$user_id]));
-            foreach ($components as $component) {
-                $question_ids = array_keys($response[$user_id][$component]);
-                foreach ($question_ids as $question_id) {
-                    $questions[$question_id][] = $response[$user_id][$component][$question_id]['fraction'];
-                }
-            }
-        }
-        return $questions;
-    }
-
     static function get_item_response($response, $person_abilities){
 
         $item_response = [];
