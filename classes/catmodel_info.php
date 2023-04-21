@@ -200,30 +200,20 @@ class catmodel_info {
         );
 
         $cil = catmodel_item_list::create_from_response($inputdata);
-        $estimated_item_difficulty = $cil->estimate_initial_item_difficulties();
+        $cil->estimate_initial_item_difficulties();
 
-        $estimated_person_abilities = [];
-        foreach($demo_persons as $person){
+        $cpl = new catmodel_person_list($demo_persons);
+        $cpl->estimate_person_abilities($inputdata, $cil->get_item_difficulties());
 
-            $person_id = $person['id'];
-            $item_difficulties = $estimated_item_difficulty; // replace by something better
-            $person_response = \local_catquiz\helpercat::get_person_response($inputdata, $person_id);
-            $person_ability = \local_catquiz\catcalc::estimate_person_ability($person_response, $item_difficulties);
-
-            $estimated_person_abilities[$person_id] = $person_ability;
-        }
-
-
-        $demo_item_responses = \local_catquiz\helpercat::get_item_response($inputdata, $estimated_person_abilities);
+        $demo_item_responses = \local_catquiz\helpercat::get_item_response($inputdata, $cpl->get_estimated_person_abilities());
 
         $estimated_item_difficulty_next = [];
-
         foreach($demo_item_responses as $item_id => $item_response){
             $item_difficulty = \local_catquiz\catcalc::estimate_item_difficulty($item_response);
 
             $estimated_item_difficulty_next[$item_id] = $item_difficulty;
         }
 
-        return [$estimated_item_difficulty, $estimated_person_abilities];
+        return [$estimated_item_difficulty_next, $cpl->get_estimated_person_abilities()];
     }
 };
