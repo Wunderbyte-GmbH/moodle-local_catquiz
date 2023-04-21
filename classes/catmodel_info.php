@@ -105,12 +105,7 @@ class catmodel_info {
         if (!$calculate) {
             return $this->get_estimated_parameters_from_db($contextid, $model);
         }
-        global $DB;
-
-        list ($sql, $params) = catquiz::get_sql_for_model_input($contextid);
-        $data = $DB->get_records_sql($sql, $params);
-        $inputdata = $this->db_to_modelinput($data);
-        list ($estimated_item_difficulties, $estimated_person_abilities) = $this->run_estimation($inputdata);
+        list ($estimated_item_difficulties, $estimated_person_abilities) = $this->run_estimation($contextid);
         $cm_params->save_estimated_item_parameters_to_db($estimated_item_difficulties);
         $cm_params->save_estimated_person_parameters_to_db($estimated_person_abilities);
         return [$estimated_item_difficulties, $estimated_person_abilities];
@@ -145,67 +140,22 @@ class catmodel_info {
         return [$items, $persons];
     }
 
-    /**
-     * Returns data in the following format
-     * 
-     * "1" => Array( //userid
-     *     "comp1" => Array( // component
-     *         "1" => Array( //questionid
-     *             "fraction" => 0,
-     *             "max_fraction" => 1,
-     *             "min_fraction" => 0,
-     *             "qtype" => "truefalse",
-     *             "timestamp" => 1646955326
-     *         ),
-     *         "2" => Array(
-     *             "fraction" => 0,
-     *             "max_fraction" => 1,
-     *             "min_fraction" => 0,
-     *             "qtype" => "truefalse",
-     *             "timestamp" => 1646955332
-     *         ),
-     *         "3" => Array(
-     *             "fraction" => 1,
-     *             "max_fraction" => 1,
-     *             "min_fraction" => 0,
-     *             "qtype" => "truefalse",
-     *             "timestamp" => 1646955338
-     */
-    private function db_to_modelinput($data) {
-        $modelinput = [];
-        foreach ($data as $row) {
-            $entry = [
-                'fraction' => $row->fraction,
-                'max_fraction' =>  $row->maxfraction,
-                'min_fraction' => $row->minfraction,
-                'qtype' => $row->qtype,
-                'timestamp' => $row->timecreated,
-            ];
-
-            if (!array_key_exists($row->userid, $modelinput)) {
-                $modelinput[$row->userid] = ["component" => []];
-            }
-
-            $modelinput[$row->userid]['component'][$row->questionid] = $entry;
-        }
-        return $modelinput;
-    }
-
-    private function run_estimation($inputdata) {
+    private function run_estimation(int $contextid) {
+        $response = catmodel_response::create_from_db($contextid);
         $demo_persons = array_map(
             function($id) {
                 return ['id' => $id, 'ability' => 0];
             },
-            array_keys($inputdata)
+            array_keys($response->getData())
         );
 
-        $cil = catmodel_item_list::create_from_response($inputdata);
+        $cil = $response->to_item_list();
         $cil->estimate_initial_item_difficulties();
 
         $cpl = new catmodel_person_list($demo_persons);
-        $cpl->estimate_person_abilities($inputdata, $cil->get_item_difficulties());
+        $cpl->estimate_person_abilities($response, $cil->get_item_difficulties());
 
-        $demo_item_responses = \local_catquiz\helpercat::get_item_response($inputdata, $cpl->get_estimated_person_abilities());
+        $demo_item_responses = $response->get_item_response($cpl->get_estimated_person_abilities());
 
         $estimated_item_difficulty_next = [];
         foreach($demo_item_responses as $item_id => $item_response){
