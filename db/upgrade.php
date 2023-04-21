@@ -237,5 +237,20 @@ function xmldb_local_catquiz_upgrade($oldversion) {
             upgrade_plugin_savepoint(true, $SAVEPOINT_ADD_TIME_FIELDS, 'local', 'catquiz');
         }
 
+        $SAVEPOINT_UPDATE_ABILITY_PRECISION = 2023042101;
+        if ($oldversion < $SAVEPOINT_UPDATE_ABILITY_PRECISION) {
+
+            // Changing precision of field ability on table local_catquiz_personparams to (10, 4).
+            $table = new xmldb_table('local_catquiz_personparams');
+            $field = new xmldb_field('ability', XMLDB_TYPE_NUMBER, '10, 4', null, null, null, null, 'model');
+    
+            // Launch change of precision for field ability.
+            $dbman->change_field_precision($table, $field);
+    
+            // Catquiz savepoint reached.
+            upgrade_plugin_savepoint(true, $SAVEPOINT_UPDATE_ABILITY_PRECISION, 'local', 'catquiz');
+        }
+
+
     return true;
 }
