@@ -34,8 +34,16 @@ use local_catquiz\data\catquiz_base;
 class catmodel_item_list {
 
     private array $items;
+
+    /**
+     * @var array<float>
+     *
+     * The array keys correspond to the item IDs.
+     */
+    private array $item_difficulties;
     public function __construct(array $items) {
         $this->items = $items;
+        $this->item_difficulties = [];
     }
 
     /**
@@ -63,11 +71,11 @@ class catmodel_item_list {
 
 
     /**
-     * @return array<float>
+     * @return void
      */
-    public function estimate_initial_item_difficulties(): array {
+    public function estimate_initial_item_difficulties(): void {
 
-        $item_difficulties = Array();
+        $this->item_difficulties = [];
         $item_ids = array_keys($this->items);
 
         foreach($item_ids as $id){
@@ -91,6 +99,13 @@ class catmodel_item_list {
 
         }
 
-        return $item_difficulties;
+        $this->item_difficulties = $item_difficulties;
+    }
+
+    /**
+     * @return array<float>
+     */
+    public function get_item_difficulties(): array {
+        return $this->item_difficulties;
     }
 };

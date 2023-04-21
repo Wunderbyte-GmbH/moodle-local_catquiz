@@ -1,5 +1,6 @@
 <?php
 use local_catquiz\catmodel_item_list;
+use local_catquiz\catmodel_person_list;
 // This file is part of Moodle - http://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
@@ -50,33 +51,14 @@ $demo_response = local_catquiz\synthcat::generate_response($demo_persons,$demo_i
 
 $cil = catmodel_item_list::create_from_response($demo_response);
 //$demo_person_response = \local_catquiz\helpercat::get_person_response($demo_response,3);
-$estimated_item_difficulty = $cil->estimate_initial_item_difficulties();
+$cil->estimate_initial_item_difficulties();
 
+$cpl = new catmodel_person_list($demo_persons);
+$cpl->estimate_person_abilities($demo_response, $cil->get_item_difficulties());
 
-
-$estimated_person_abilities = [];
-foreach($demo_persons as $person){
-
-    $person_id = $person['id'];
-    $item_difficulties = $estimated_item_difficulty; // replace by something better
-    $person_response = \local_catquiz\helpercat::get_person_response($demo_response,$person_id);
-    $person_ability = \local_catquiz\catcalc::estimate_person_ability($person_response, $item_difficulties);
-
-    //$out = [
-    //        'id'=>$person_id,
-    //        'ability'=>$person_ability,
-    //];
-
-    $estimated_person_abilities[$person_id] = $person_ability;
-    //array_push($estimated_person_abilities, $out);
-}
-
-
-$demo_item_responses = local_catquiz\helpercat::get_item_response($demo_response,$estimated_person_abilities);
+$demo_item_responses = local_catquiz\helpercat::get_item_response($demo_response, $cpl->get_estimated_person_abilities());
 
 $estimated_item_difficulty_next = [];
-
-
 foreach($demo_item_responses as $item_id => $item_response){
     $item_difficulty = \local_catquiz\catcalc::estimate_item_difficulty($item_response);
 
