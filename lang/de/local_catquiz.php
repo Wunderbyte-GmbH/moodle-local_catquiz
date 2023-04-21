@@ -158,6 +158,7 @@ $string['loglikelihood'] = "Log-Likelihood";
 $string['differentialitem'] = "Gruppenabhängiger Indikator";
 $string['previewquestion'] = "Fragen Vorschau";
 $string['personabilities'] = "Person abilities";
+$string['itemdifficulties'] = "Item difficulties";
 
 // Table.
 $string['label'] = "Kennzeichen";

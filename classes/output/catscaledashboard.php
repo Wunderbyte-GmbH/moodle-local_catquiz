@@ -278,15 +278,14 @@ class catscaledashboard implements renderable, templatable {
 
         return html_writer::tag('div', $OUTPUT->render($chart), ['dir' => 'ltr']);
     }
-    private function render_personability($contextid) {
+    private function render_estimatedparams($data) {
 
         global $OUTPUT;
 
-        $data = $this->render_modeloutput($contextid, $this->triggercalculation, 'raschbirnbauma');
-        sort($data);
         $data = array_filter($data, function($a) {
             return is_finite($a) && abs($a) != self::MODEL_POS_INF;
         });
+        sort($data);
 
         $chart = new \core\chart_line();
         $series = new \core\chart_series('Series 1 (Line)', array_values($data));
@@ -296,7 +295,6 @@ class catscaledashboard implements renderable, templatable {
 
         return html_writer::tag('div', $OUTPUT->render($chart), ['dir' => 'ltr']);
     }
-
     private function render_contextselector() {
     $ajaxformdata = empty($this->catcontextid) ? [] : ['contextid' => $this->catcontextid];
     $form = new \local_catquiz\form\contextselector(null, null, 'post', '', [], true, $ajaxformdata);
@@ -349,12 +347,13 @@ class catscaledashboard implements renderable, templatable {
         list ($sql, $params) = catquiz::get_sql_for_model_input($contextid);
         $data = $DB->get_records_sql($sql, $params);
         $inputdata = $this->db_to_modelinput($data);
-        $estimated_parameters = $this->run_estimation($inputdata);
-        $this->save_estimated_parameters_to_db($contextid, $estimated_parameters, $model);
-        return $estimated_parameters;
+        list ($estimated_item_difficulties, $estimated_person_abilities) = $this->run_estimation($inputdata);
+        $this->save_estimated_item_parameters_to_db($contextid, $estimated_item_difficulties, $model);
+        $this->save_estimated_person_parameters_to_db($contextid, $estimated_person_abilities, $model);
+        return [$estimated_item_difficulties, $estimated_person_abilities];
     }
 
-    private function save_estimated_parameters_to_db(int $contextid, array $estimated_parameters, string $model) {
+    private function save_estimated_item_parameters_to_db(int $contextid, array $estimated_parameters, string $model) {
         global $DB;
         // Get existing records for the given contextid and model.
         $existing_params_rows = $DB->get_records('local_catquiz_itemparams', ['model' => $model, 'contextid' => $contextid,]);
@@ -407,21 +406,85 @@ class catscaledashboard implements renderable, templatable {
         }
     }
 
+    private function save_estimated_person_parameters_to_db(int $contextid, array $estimated_parameters, string $model) {
+        global $DB;
+        // Get existing records for the given contextid and model.
+        $existing_params_rows = $DB->get_records('local_catquiz_personparams', ['model' => $model, 'contextid' => $contextid,]);
+        $existing_params = [];
+        foreach ($existing_params_rows as $r) {
+            $existing_params[$r->userid] = $r;
+        };
+
+        $records = array_map(
+            function ($userid, $param) use ($contextid, $model) {
+                if (!is_finite($param)) {
+                    $param = $param < 0 ? self::MODEL_NEG_INF : self::MODEL_POS_INF;
+                }
+                return [
+                    'userid' => $userid,
+                    'ability' => $param,
+                    'model' => $model,
+                    'contextid' => $contextid,
+                ];
+            },
+            array_keys($estimated_parameters),
+            array_values($estimated_parameters)
+        );
+
+        $updated_records = [];
+        $new_records = [];
+        $now = time();
+        foreach ($records as $record) {
+            $is_existing_param = array_key_exists($record['userid'], $existing_params);
+            // If record already exists, update it. Otherwise, insert a new record to the DB
+            if ($is_existing_param) {
+                $record['id'] = $existing_params[$record['userid']]->id;
+                $record['timemodified'] = $now;
+                $updated_records[] = $record;
+            } else {
+                $record['timecreated'] = $now;
+                $record['timemodified'] = $now;
+                $new_records[] = $record;
+            }
+        }
+
+        if (!empty($new_records)) {
+            $DB->insert_records('local_catquiz_personparams', $new_records);
+        }
+        // Maybe change to bulk update later
+        foreach ($updated_records as $r) {
+            $DB->update_record('local_catquiz_personparams', $r, true);
+        }
+    }
+
     private function get_estimated_parameters_from_db(int $contextid, string $model) {
         global $DB;
 
-        $rows = $DB->get_records('local_catquiz_itemparams',
+        $item_rows = $DB->get_records('local_catquiz_itemparams',
             [
                 'contextid' => $contextid,
                 'model' => $model,
             ],
             'difficulty ASC'
         );
-        $result = [];
-        foreach ($rows as $r) {
-            $result[$r->componentid] = $r->difficulty;
+        $items = [];
+        foreach ($item_rows as $r) {
+            $items[$r->componentid] = $r->difficulty;
         }
-        return $result;
+
+        $person_rows = $DB->get_records('local_catquiz_personparams',
+            [
+                'contextid' => $contextid,
+                'model' => $model,
+            ],
+            'ability ASC'
+        );
+        $persons = [];
+        foreach ($person_rows as $r) {
+            $persons[$r->userid] = $r->ability;
+        }
+
+        return [$items, $persons];
     }
 
     private function run_estimation($inputdata) {
@@ -457,7 +520,7 @@ class catscaledashboard implements renderable, templatable {
             $estimated_item_difficulty_next[$item_id] = $item_difficulty;
         }
 
-        return $estimated_item_difficulty;
+        return [$estimated_item_difficulty, $estimated_person_abilities];
     }
 
     /**
@@ -514,15 +577,21 @@ class catscaledashboard implements renderable, templatable {
 
         $url = new moodle_url('/local/catquiz/manage_catscales.php');
         $testenvironmentdashboard = new testenvironmentdashboard();
+        list ($estimated_item_difficulties, $estimated_person_abilities) = $this->render_modeloutput(
+            $this->catcontextid,
+            $this->triggercalculation,
+            'raschbirnbauma'
+        );
 
         return [
             'title' => $this->render_title(),
             'returnurl' => $url->out(),
-            'testitemstable' => $this->render_testitems_table($this->catscaleid, $this->catcontextid),
+            'testitemstable' => $this->render_testitems_table($this->catscaleid),
             'addtestitemstable' => $this->render_addtestitems_table($this->catscaleid),
             'statindependence' => $this->render_statindependence(),
             'loglikelihood' => $this->render_loglikelihood(),
-            'personability' => $this->render_personability($this->catcontextid),
+            'itemdifficulties' => $this->render_estimatedparams($estimated_item_difficulties),
+            'personabilities' => $this->render_estimatedparams($estimated_person_abilities),
             'differentialitem' => $this->render_differentialitem(),
             'contextselector' => $this->render_contextselector(),
             'table' => $testenvironmentdashboard->testenvironmenttable($this->catscaleid),
