@@ -100,7 +100,7 @@ class catmodel_info {
     }
 
     public function get_context_parameters( int $contextid = 0, bool $calculate = false) {
-        $model = 'raschbirnbauma'; // TODO: make dynamic
+        $cm_params = new catmodel_params('raschbirnbauma');
 
         if (!$calculate) {
             return $this->get_estimated_parameters_from_db($contextid, $model);
@@ -111,8 +111,8 @@ class catmodel_info {
         $data = $DB->get_records_sql($sql, $params);
         $inputdata = $this->db_to_modelinput($data);
         list ($estimated_item_difficulties, $estimated_person_abilities) = $this->run_estimation($inputdata);
-        $this->save_estimated_item_parameters_to_db($contextid, $estimated_item_difficulties, $model);
-        $this->save_estimated_person_parameters_to_db($contextid, $estimated_person_abilities, $model);
+        $cm_params->save_estimated_item_parameters_to_db($estimated_item_difficulties);
+        $cm_params->save_estimated_person_parameters_to_db($estimated_person_abilities);
         return [$estimated_item_difficulties, $estimated_person_abilities];
     }
     private function get_estimated_parameters_from_db(int $contextid, string $model) {
@@ -143,109 +143,6 @@ class catmodel_info {
         }
 
         return [$items, $persons];
-    }
-    private function save_estimated_item_parameters_to_db(int $contextid, array $estimated_parameters, string $model) {
-        global $DB;
-        // Get existing records for the given contextid and model.
-        $existing_params_rows = $DB->get_records('local_catquiz_itemparams', ['model' => $model, 'contextid' => $contextid,]);
-        $existing_params = [];
-        foreach ($existing_params_rows as $r) {
-            $existing_params[$r->componentid] = $r;
-        };
-
-        $records = array_map(
-            function ($componentid, $param) use ($contextid, $model) {
-                if (!is_finite($param)) {
-                    $param = $param < 0 ? self::MODEL_NEG_INF : self::MODEL_POS_INF;
-                }
-                return [
-                    'componentid' => $componentid,
-                    'componentname' => 'question',
-                    'difficulty' => $param,
-                    'model' => $model,
-                    'contextid' => $contextid,
-                ];
-            },
-            array_keys($estimated_parameters),
-            array_values($estimated_parameters)
-        );
-
-        $updated_records = [];
-        $new_records = [];
-        $now = time();
-        foreach ($records as $record) {
-            $is_existing_param = array_key_exists($record['componentid'], $existing_params);
-            // If record already exists, update it. Otherwise, insert a new record to the DB
-            if ($is_existing_param) {
-                $record['id'] = $existing_params[$record['componentid']]->id;
-                $record['timemodified'] = $now;
-                $updated_records[] = $record;
-            } else {
-                $record['timecreated'] = $now;
-                $record['timemodified'] = $now;
-                $new_records[] = $record;
-            }
-        }
-
-        if (!empty($new_records)) {
-            $DB->insert_records('local_catquiz_itemparams', $new_records);
-            
-        }
-        // Maybe change to bulk update later
-        foreach ($updated_records as $r) {
-            $DB->update_record('local_catquiz_itemparams', $r, true);
-        }
-    }
-
-    private function save_estimated_person_parameters_to_db(int $contextid, array $estimated_parameters, string $model) {
-        global $DB;
-        // Get existing records for the given contextid and model.
-        $existing_params_rows = $DB->get_records('local_catquiz_personparams', ['model' => $model, 'contextid' => $contextid,]);
-        $existing_params = [];
-        foreach ($existing_params_rows as $r) {
-            $existing_params[$r->userid] = $r;
-        };
-
-        $records = array_map(
-            function ($userid, $param) use ($contextid, $model) {
-                if (!is_finite($param)) {
-                    $param = $param < 0 ? self::MODEL_NEG_INF : self::MODEL_POS_INF;
-                }
-                return [
-                    'userid' => $userid,
-                    'ability' => $param,
-                    'model' => $model,
-                    'contextid' => $contextid,
-                ];
-            },
-            array_keys($estimated_parameters),
-            array_values($estimated_parameters)
-        );
-
-        $updated_records = [];
-        $new_records = [];
-        $now = time();
-        foreach ($records as $record) {
-            $is_existing_param = array_key_exists($record['userid'], $existing_params);
-            // If record already exists, update it. Otherwise, insert a new record to the DB
-            if ($is_existing_param) {
-                $record['id'] = $existing_params[$record['userid']]->id;
-                $record['timemodified'] = $now;
-                $updated_records[] = $record;
-            } else {
-                $record['timecreated'] = $now;
-                $record['timemodified'] = $now;
-                $new_records[] = $record;
-            }
-        }
-
-        if (!empty($new_records)) {
-            $DB->insert_records('local_catquiz_personparams', $new_records);
-        }
-        // Maybe change to bulk update later
-        foreach ($updated_records as $r) {
-            $DB->update_record('local_catquiz_personparams', $r, true);
-        }
     }
 
     /**
