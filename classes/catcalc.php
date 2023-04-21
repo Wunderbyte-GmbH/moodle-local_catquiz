@@ -148,7 +148,10 @@ class catcalc{
         return $estimated_value;
     }
 
-    static function estimate_item_difficulty($item_response){
+    /**
+     * @var array<catmodel_item_response> $item_response
+     */
+    static function estimate_item_difficulty(array $item_response){
 
         #$item_response = $demo_item_response[$item_id];
         $dbg_trace4 = [];
@@ -157,12 +160,11 @@ class catcalc{
 
         $num_passed = 0;
         $num_failed = 0;
-        $len = count($item_response['responses']);
-        for ($i=0;$i < $len;$i++) {
+        foreach ($item_response as $r) {
 
             // compose likelihood
-            $tmp_response = $item_response['responses'][$i];
-            $tmp_ability = $item_response['abilities'][$i];
+            $tmp_response = $r->get_response();
+            $tmp_ability = $r->get_ability();
 
             //$tmp_ability = 0.1; // dev override
 

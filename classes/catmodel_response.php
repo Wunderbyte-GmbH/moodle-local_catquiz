@@ -57,18 +57,23 @@ class catmodel_response {
 
         return new catmodel_item_list($questions);
     }
-    public function get_item_response($person_abilities){
+    /**
+     * Returns an array of arrays of item responses indexed by question id.
+     * So for each question ID, there is an array of catmodel_item_response entries
+     *
+     * @return array<array<catmodel_item_response>>
+     */
+    public function get_item_response($person_abilities): array {
         $item_response = [];
         $user_ids = array_keys($this->data);
-        //$components = Array();
         foreach ($user_ids as $user_id) {
             $components = array();
             $components = array_merge($components, array_keys($this->data[$user_id]));
             foreach ($components as $component) {
                 $question_ids = array_keys($this->data[$user_id][$component]);
                 foreach ($question_ids as $question_id) {
-                    $item_response[$question_id]['responses'][] = $this->data[$user_id][$component][$question_id]['fraction'];
-                    $item_response[$question_id]['abilities'][] = $person_abilities[$user_id];
+                    $fraction = $this->data[$user_id][$component][$question_id]['fraction'];
+                    $item_response[$question_id][] = new catmodel_item_response($fraction, $person_abilities[$user_id]);
                 }
             }
         }
