@@ -47,30 +47,6 @@ class catmodel_item_list {
     }
 
     /**
-     * Summary of create_from_response
-     * @param mixed $response
-     * @return catmodel_item_list
-     */
-    public static function create_from_response($response): self {
-        $questions = Array();
-        $user_ids = array_keys($response);
-
-        foreach ($user_ids as $user_id) {
-            $components = array();
-            $components = array_merge($components, array_keys($response[$user_id]));
-            foreach ($components as $component) {
-                $question_ids = array_keys($response[$user_id][$component]);
-                foreach ($question_ids as $question_id) {
-                    $questions[$question_id][] = $response[$user_id][$component][$question_id]['fraction'];
-                }
-            }
-        }
-
-        return new self($questions);
-    }
-
-
-    /**
      * @return void
      */
     public function estimate_initial_item_difficulties(): void {

@@ -42,11 +42,11 @@ class catmodel_person_list {
     public function __construct(array $persons) { // TODO: use class instead of array?
         $this->persons = $persons;
     }
-    public function estimate_person_abilities($response, $item_difficulties) {
+    public function estimate_person_abilities(catmodel_response $response, $item_difficulties) {
         foreach($this->persons as $person){
 
             $person_id = $person['id'];
-            $person_response = \local_catquiz\helpercat::get_person_response($response, $person_id);
+            $person_response = \local_catquiz\helpercat::get_person_response($response->getData(), $person_id);
             $person_ability = \local_catquiz\catcalc::estimate_person_ability($person_response, $item_difficulties);
             $this->estimated_person_abilities[$person_id] = $person_ability;
         }
