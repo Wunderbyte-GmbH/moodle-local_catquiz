@@ -109,6 +109,7 @@ class catmodel_info {
 
         $response = catcontext::create_response_from_db($contextid);
         $models = self::create_installed_models($response);
+        
         foreach ($models as $name => $model) {
             list($estimated_item_difficulties, $estimated_person_abilities) = $model->run_estimation($response);
             $estimated_item_difficulties->save_to_db($contextid, $name);

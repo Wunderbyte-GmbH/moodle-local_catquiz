@@ -55,6 +55,10 @@ class model_response {
         return new model_item_list($questions);
     }
 
+    public static function create_from_array(array $data) {
+        return (new self)->setData($data);
+    }
+
     /**
      * Returns an array of arrays of item responses indexed by question id.
      * So for each question ID, there is an array of model_item_response entries
