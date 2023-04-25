@@ -40,28 +40,11 @@ abstract class model_model {
     abstract public function __construct(model_response $response);
 
     /**
-     * Get Item Parameters by feedbing responses.
-     *
-     * @param model_response $responses
-     * @return model_item_param_list
-     */
-    abstract public function get_item_parameters(model_response $responses): model_item_param_list;
-
-
-    /**
-     * Get the Persons ability based on their responses.
-     *
-     * @param model_response $responses
-     * @return model_person_param_list
-     */
-    abstract public function get_person_abilities(model_response $responses): model_person_param_list;
-
-    /**
      * Executes the model-specific code to estimate item- and person-parameters based
      * on the given response object.
      * 
      * @param model_response $response
      * @return array<model_item_param_list, model_person_param_list>
      */
-    abstract public function run_estimation(model_response $response): array;
+    abstract public function run_estimation(): array;
 }

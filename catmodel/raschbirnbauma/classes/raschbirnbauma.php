@@ -74,18 +74,11 @@ class raschbirnbauma extends model_model {
      *
      * @param model_response $responses
      */
-    public function __construct(model_response $response) {
+    public function __construct(model_response $responses) {
+        $this->responses = $responses->as_array();
 
-        $responses = $response->get_data();
-
-        if (empty($responses)) {
-            $responses = $this->responses;
-        } else {
-            $this->responses = $responses;
-        }
-
-        $numitems = count(current($responses));
-        $numpersons = count($responses);
+        $numitems = count(current($this->responses));
+        $numpersons = count($this->responses);
 
         // Initialize item difficulties and discriminations
         $itemdifficulties = array_fill(0, $numitems, 0);
@@ -119,7 +112,7 @@ class raschbirnbauma extends model_model {
         for ($j = 0; $j < $numpersons; $j++) {
             $ability = 0;
             for ($i = 0; $i < $numitems; $i++) {
-                $ability += ($responses[$j][$i] - $p_yes) * $itemdifficulties[$i];
+                $ability += ($this->responses[$j][$i] - $p_yes) * $itemdifficulties[$i];
             }
             $personabilities[$j] = $ability;
         }
@@ -129,12 +122,12 @@ class raschbirnbauma extends model_model {
         $this->personabilities = $personabilities;
     }
 
-    public function get_item_parameters(model_response $responses): model_item_param_list {
+    public function get_item_parameters(): model_item_param_list {
 
         $item_params = array();
 
         $numitems = count($this->itemdifficulties);
-        $numresponses = count($responses);
+        $numresponses = count($this->responses);
 
         for ($i = 0; $i < $numitems; $i++) {
             $itemdifficulty = $this->itemdifficulties[$i];
@@ -143,7 +136,7 @@ class raschbirnbauma extends model_model {
             $numcorrect = 0;
             $totalresponses = 0;
 
-            foreach ($responses as $response) {
+            foreach ($this->responses as $response) {
                 if (isset($response['answers'][$i])) {
                 $totalresponses++;
                 $numcorrect += $response['answers'][$i];
@@ -174,17 +167,17 @@ class raschbirnbauma extends model_model {
         return $itemparams;
     }
 
-    public function get_person_abilities(model_response $responses): model_person_param_list {
+    public function get_person_abilities(): model_person_param_list {
 
         $person_abilities = array();
 
         $numitems = count($this->itemdifficulties);
-        $num_responses = count($responses);
+        $num_responses = count($this->responses);
 
         for ($i = 0; $i < $num_responses; $i++) {
         $personability = 0;
 
-        foreach ($responses[$i]['answers'] as $j => $answer) {
+        foreach ($this->responses[$i]['answers'] as $j => $answer) {
             $itemdifficulty = $this->itemdifficulties[$j];
             $itemdiscrimination = $this->itemdiscriminations[$j];
 
@@ -201,7 +194,7 @@ class raschbirnbauma extends model_model {
         return $person_abilities;
     }
     
-    public function run_estimation(model_response $response): array {
+    public function run_estimation(): array {
         // TODO: Do the real calculation. See dev/testset01.php or catmodel_info.php for how this might be done.
         $item_param_list = new model_item_param_list();
         $person_param_list = new model_person_param_list();
