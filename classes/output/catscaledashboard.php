@@ -34,6 +34,8 @@ use context_system;
 use html_writer;
 use local_catquiz\catmodel_info;
 use local_catquiz\catquiz;
+use local_catquiz\local\model\model_item_param_list;
+use local_catquiz\local\model\model_person_param_list;
 use local_catquiz\synthcat;
 use local_catquiz\table\testitems_table;
 use local_catquiz\table\student_stats_table;
@@ -273,14 +275,25 @@ class catscaledashboard implements renderable, templatable {
 
         return html_writer::tag('div', $OUTPUT->render($chart), ['dir' => 'ltr']);
     }
-    private function render_estimatedparams($data) {
+    private function render_itemdifficulties(model_item_param_list $item_list) {
 
         global $OUTPUT;
 
-        $data = array_filter($data, function($a) {
-            return is_finite($a) && abs($a) != catmodel_info::MODEL_POS_INF;
-        });
-        sort($data);
+        $data = $item_list->get_values(true);
+
+        $chart = new \core\chart_line();
+        $series = new \core\chart_series('Series 1 (Line)', array_values($data));
+        $chart->set_smooth(true); // Calling set_smooth() passing true as parameter, will display smooth lines.
+        $chart->add_series($series);
+        $chart->set_labels(array_keys($data));
+
+        return html_writer::tag('div', $OUTPUT->render($chart), ['dir' => 'ltr']);
+    }
+    private function render_personabilities(model_person_param_list $person_list) {
+
+        global $OUTPUT;
+
+        $data = $person_list->get_values(true);
 
         $chart = new \core\chart_line();
         $series = new \core\chart_series('Series 1 (Line)', array_values($data));
@@ -350,8 +363,8 @@ class catscaledashboard implements renderable, templatable {
             'addtestitemstable' => $this->render_addtestitems_table($this->catscaleid),
             'statindependence' => $this->render_statindependence(),
             'loglikelihood' => $this->render_loglikelihood(),
-            'itemdifficulties' => $this->render_estimatedparams($item_difficulties),
-            'personabilities' => $this->render_estimatedparams($person_abilities),
+            'itemdifficulties' => $this->render_itemdifficulties($item_difficulties),
+            'personabilities' => $this->render_personabilities($person_abilities),
             'differentialitem' => $this->render_differentialitem(),
             'contextselector' => $this->render_contextselector(),
             'table' => $testenvironmentdashboard->testenvironmenttable($this->catscaleid),

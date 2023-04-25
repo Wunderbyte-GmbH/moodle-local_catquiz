@@ -26,20 +26,18 @@
 namespace local_catquiz;
 
 use core_plugin_manager;
-use Exception;
 use local_catquiz\data\catquiz_base;
+use local_catquiz\local\model\model_item_param;
+use local_catquiz\local\model\model_item_param_list;
+use local_catquiz\local\model\model_person_param;
+use local_catquiz\local\model\model_person_param_list;
+use local_catquiz\local\model\model_response;
 
 /**
  * This class
  */
 class catmodel_info {
 
-
-    // For some items, the model returns -INF or INF as difficulty.
-    // However, we expect it to be numeric, so we encode those
-    // values as -1000 and 1000
-    const MODEL_NEG_INF = -1000;
-    const MODEL_POS_INF = 1000;
 
     /**
      * Undocumented function
@@ -99,15 +97,15 @@ class catmodel_info {
         return $pm->get_plugins_of_type('catmodel');
     }
 
-    public function get_context_parameters( int $contextid = 0, bool $calculate = false) {
-        $cm_params = new catmodel_params('raschbirnbauma');
-
+    public function get_context_parameters( int $contextid = 0, bool $calculate = false, string $model = 'raschbirnbauma') {
         if (!$calculate) {
             return $this->get_estimated_parameters_from_db($contextid, $model);
         }
-        list ($estimated_item_difficulties, $estimated_person_abilities) = $this->run_estimation($contextid);
-        $cm_params->save_estimated_item_parameters_to_db($estimated_item_difficulties);
-        $cm_params->save_estimated_person_parameters_to_db($estimated_person_abilities);
+
+        $response = catcontext::create_response_from_db($contextid);
+        list ($estimated_item_difficulties, $estimated_person_abilities) = $this->run_estimation($response);
+        $estimated_item_difficulties->save_to_db($contextid, $model);
+        $estimated_person_abilities->save_to_db($contextid, $model);
         return [$estimated_item_difficulties, $estimated_person_abilities];
     }
     private function get_estimated_parameters_from_db(int $contextid, string $model) {
@@ -140,30 +138,36 @@ class catmodel_info {
         return [$items, $persons];
     }
 
-    private function run_estimation(int $contextid) {
-        $response = catmodel_response::create_from_db($contextid);
-        $demo_persons = array_map(
-            function($id) {
-                return ['id' => $id, 'ability' => 0];
-            },
-            array_keys($response->getData())
-        );
-
+    private function run_estimation(model_response $response) {
         $cil = $response->to_item_list();
         $cil->estimate_initial_item_difficulties();
 
-        $cpl = new catmodel_person_list($demo_persons);
-        $cpl->estimate_person_abilities($response, $cil->get_item_difficulties());
-
-        $demo_item_responses = $response->get_item_response($cpl->get_estimated_person_abilities());
-
-        $estimated_item_difficulty_next = [];
-        foreach($demo_item_responses as $item_id => $item_response){
-            $item_difficulty = \local_catquiz\catcalc::estimate_item_difficulty($item_response);
-
-            $estimated_item_difficulty_next[$item_id] = $item_difficulty;
+        $estimated_person_params = new model_person_param_list();
+        foreach($response->get_initial_person_abilities() as $person){
+            $person_response = \local_catquiz\helpercat::get_person_response(
+                $response->getData(),
+                $person['id']
+            );
+            $person_ability = \local_catquiz\catcalc::estimate_person_ability(
+                $person_response,
+                $cil->get_item_difficulties()
+            );
+            $param = new model_person_param($person['id']);
+            $param->set_ability($person_ability);
+            $estimated_person_params->add($param);
         }
 
-        return [$estimated_item_difficulty_next, $cpl->get_estimated_person_abilities()];
+        $estimated_item_params = new model_item_param_list();
+        $demo_item_responses = $response->get_item_response(
+            $estimated_person_params
+        );
+        foreach($demo_item_responses as $item_id => $item_response){
+            $item_difficulty = \local_catquiz\catcalc::estimate_item_difficulty($item_response);
+            $param = new model_item_param($item_id);
+            $param->set_difficulty($item_difficulty);
+            $estimated_item_params->add($param);
+        }
+
+        return [$estimated_item_params, $estimated_person_params];
     }
 };

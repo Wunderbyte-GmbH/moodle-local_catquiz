@@ -1,6 +1,9 @@
 <?php
-use local_catquiz\catmodel_item_list;
-use local_catquiz\catmodel_person_list;
+use local_catquiz\catcontext;
+use local_catquiz\local\model\model_item_param;
+use local_catquiz\local\model\model_item_param_list;
+use local_catquiz\local\model\model_person_param;
+use local_catquiz\local\model\model_person_param_list;
 // This file is part of Moodle - http://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
@@ -49,20 +52,35 @@ $demo_response = local_catquiz\synthcat::generate_response($demo_persons,$demo_i
 // estimate parameter
 
 
-$cil = catmodel_item_list::create_from_response($demo_response);
+$response = catcontext::create_response_from_db(1);
+$cil = $response->to_item_list();
 //$demo_person_response = \local_catquiz\helpercat::get_person_response($demo_response,3);
 $cil->estimate_initial_item_difficulties();
 
-$cpl = new catmodel_person_list($demo_persons);
-$cpl->estimate_person_abilities($demo_response, $cil->get_item_difficulties());
+$estimated_person_params = new model_person_param_list();
+foreach ($response->get_initial_person_abilities() as $person) {
+    $person_response = \local_catquiz\helpercat::get_person_response(
+        $response->getData(),
+        $person['id']
+    );
+    $person_ability = \local_catquiz\catcalc::estimate_person_ability(
+        $person_response,
+        $cil->get_item_difficulties()
+    );
+    $param = new model_person_param($person['id']);
+    $param->set_ability($person_ability);
+    $estimated_person_params->add($param);
+}
 
-$demo_item_responses = local_catquiz\helpercat::get_item_response($demo_response, $cpl->get_estimated_person_abilities());
-
-$estimated_item_difficulty_next = [];
-foreach($demo_item_responses as $item_id => $item_response){
+$estimated_item_params = new model_item_param_list();
+$demo_item_responses = $response->get_item_response(
+    $estimated_person_params
+);
+foreach ($demo_item_responses as $item_id => $item_response) {
     $item_difficulty = \local_catquiz\catcalc::estimate_item_difficulty($item_response);
-
-    $estimated_item_difficulty_next[$item_id] = $item_difficulty;
+    $param = new model_item_param($item_id);
+    $param->set_difficulty($item_difficulty);
+    $estimated_item_params->add($param);
 }
 
 echo "finished";

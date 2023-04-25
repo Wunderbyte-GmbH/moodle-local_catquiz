@@ -22,16 +22,12 @@
 * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
 */
 
-namespace local_catquiz;
-
-use core_plugin_manager;
-use Exception;
-use local_catquiz\data\catquiz_base;
+namespace local_catquiz\local\model;
 
 /**
- * This class
+ * This class holds a list of item param objects
  */
-class catmodel_item_list {
+class model_item_list {
 
     private array $items;
 
@@ -54,7 +50,11 @@ class catmodel_item_list {
         $this->item_difficulties = [];
         $item_ids = array_keys($this->items);
 
-        foreach($item_ids as $id){
+        if (count($this->items) === 0) {
+            return;
+        }
+
+        foreach($item_ids as $id) {
 
             $item_fractions = $this->items[$id];
             $num_passed = 0;

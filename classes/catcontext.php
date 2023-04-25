@@ -25,14 +25,17 @@
 
 namespace local_catquiz;
 
-use moodle_exception;
+use local_catquiz\local\model\model_response;
 use stdClass;
 
 require_once($CFG->dirroot . '/local/catquiz/lib.php');
 
 /**
  * Class catcontext
- *
+ * 
+ * Defines a set items and persons defined by different criteria such as:
+ *  - Time (start date and end date)
+ * 
  * @author Georg Maißer
  * @copyright 2023 Wunderbyte GmbH
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
@@ -132,6 +135,60 @@ class catcontext {
 
             $this->apply_values($newrecord);
         }
+    }
+    public static function create_response_from_db($contextid = 0): model_response {
+        global $DB;
+
+        list ($sql, $params) = catquiz::get_sql_for_model_input($contextid);
+        $data = $DB->get_records_sql($sql, $params);
+        $inputdata = self::db_to_modelinput($data);
+        return (new model_response)->setData($inputdata);
+    }
+
+    /**
+     * Returns data in the following format
+     * 
+     * "1" => Array( //userid
+     *     "comp1" => Array( // component
+     *         "1" => Array( //questionid
+     *             "fraction" => 0,
+     *             "max_fraction" => 1,
+     *             "min_fraction" => 0,
+     *             "qtype" => "truefalse",
+     *             "timestamp" => 1646955326
+     *         ),
+     *         "2" => Array(
+     *             "fraction" => 0,
+     *             "max_fraction" => 1,
+     *             "min_fraction" => 0,
+     *             "qtype" => "truefalse",
+     *             "timestamp" => 1646955332
+     *         ),
+     *         "3" => Array(
+     *             "fraction" => 1,
+     *             "max_fraction" => 1,
+     *             "min_fraction" => 0,
+     *             "qtype" => "truefalse",
+     *             "timestamp" => 1646955338
+     */
+    private static function db_to_modelinput($data) {
+        $modelinput = [];
+        foreach ($data as $row) {
+            $entry = [
+                'fraction' => $row->fraction,
+                'max_fraction' =>  $row->maxfraction,
+                'min_fraction' => $row->minfraction,
+                'qtype' => $row->qtype,
+                'timestamp' => $row->timecreated,
+            ];
+
+            if (!array_key_exists($row->userid, $modelinput)) {
+                $modelinput[$row->userid] = ["component" => []];
+            }
+
+            $modelinput[$row->userid]['component'][$row->questionid] = $entry;
+        }
+        return $modelinput;
     }
 
     /**

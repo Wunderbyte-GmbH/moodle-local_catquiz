@@ -24,6 +24,7 @@
  */
 
 namespace local_catquiz;
+use local_catquiz\local\model\model_item_response;
 
 class catcalc{
 
@@ -149,9 +150,9 @@ class catcalc{
     }
 
     /**
-     * @var array<catmodel_item_response> $item_response
+     * @var array<model_item_response> $item_response
      */
-    static function estimate_item_difficulty(array $item_response){
+    static function estimate_item_difficulty(array $item_response): float {
 
         #$item_response = $demo_item_response[$item_id];
         $dbg_trace4 = [];

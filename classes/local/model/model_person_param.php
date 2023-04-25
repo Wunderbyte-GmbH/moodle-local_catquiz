@@ -22,25 +22,46 @@
 * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
 */
 
-namespace local_catquiz;
+namespace local_catquiz\local\model;
 
 /**
- * Provides data required for parameter estimation
+ * This class holds a single item param object
+ *  
+ * This is one of the return values from a model param estimation.
  */
-class catmodel_item_response {
+class model_person_param {
 
-    private float $response;
-    private float $ability;
-    public function __construct(float $response, float $ability) {
-        $this->response = $response;
+    // For some items, the model returns -INF or INF as difficulty.
+    // However, we expect it to be numeric, so we encode those
+    // values as -1000 and 1000
+    const MODEL_NEG_INF = -1000;
+    const MODEL_POS_INF = 1000;
+
+    /**
+     * The ID of the user
+     */
+    private int $id;
+
+    public function __construct(int $id) {
+        $this->id = $id;
+    }
+
+    /**
+     * @return int
+     */
+    public function get_id(): int {
+        return $this->id;
+    }
+ 
+    /**
+     * @var float
+     */
+    private float $ability = 0;
+
+    public function get_ability(): float { return $this->ability; }
+
+    public function set_ability(float $ability): self {
         $this->ability = $ability;
-    }
-
-    public function get_response() : float {
-        return $this->response;
-    }
-
-    public function get_ability() : float {
-        return $this->ability;
+        return $this;
     }
 };
