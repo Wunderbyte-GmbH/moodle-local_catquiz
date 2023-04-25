@@ -39,6 +39,10 @@ class model_person_param_list {
      */
     private array $person_params;
 
+    public function __construct() {
+        $this->person_params = [];
+    }
+
     public function add(model_person_param $person_param) {
         $this->person_params[] = $person_param;
     }
