@@ -60,7 +60,7 @@ $cil->estimate_initial_item_difficulties();
 $estimated_person_params = new model_person_param_list();
 foreach ($response->get_initial_person_abilities() as $person) {
     $person_response = \local_catquiz\helpercat::get_person_response(
-        $response->getData(),
+        $response->as_array(),
         $person['id']
     );
     $person_ability = \local_catquiz\catcalc::estimate_person_ability(

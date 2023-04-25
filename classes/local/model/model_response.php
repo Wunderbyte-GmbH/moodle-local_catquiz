@@ -88,7 +88,7 @@ class model_response {
     /**
      * @return array
      */
-    public function get_data() {
+    public function as_array() {
         return $this->data;
     }
 
@@ -97,7 +97,7 @@ class model_response {
             function($id) {
                 return ['id' => $id, 'ability' => 0];
             },
-            array_keys($this->get_data())
+            array_keys($this->as_array())
         );
     }
 };
