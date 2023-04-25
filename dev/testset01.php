@@ -4,6 +4,8 @@ use local_catquiz\local\model\model_item_param;
 use local_catquiz\local\model\model_item_param_list;
 use local_catquiz\local\model\model_person_param;
 use local_catquiz\local\model\model_person_param_list;
+use local_catquiz\local\model\model_response;
+
 // This file is part of Moodle - http://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
@@ -52,7 +54,7 @@ $demo_response = local_catquiz\synthcat::generate_response($demo_persons,$demo_i
 // estimate parameter
 
 
-$response = catcontext::create_response_from_db(1);
+$response = model_response::create_from_array($demo_response);
 $cil = $response->to_item_list();
 //$demo_person_response = \local_catquiz\helpercat::get_person_response($demo_response,3);
 $cil->estimate_initial_item_difficulties();
