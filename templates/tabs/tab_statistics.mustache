@@ -49,20 +49,25 @@
         {{{differentialitem}}}
       </div>
   </div>
+  {{{#personabilities}}}
+  <div class="card">
+      <div class="card-header">
+         {{name}}
+      </div>
+      <div class="card-body">
+        {{{chart}}}
+      </div>
+  </div>
+  {{{/personabilities}}}
+  {{^personabilities}}
+    No person abilities were estimated
+  {{/personabilities}}
   <div class="card">
       <div class="card-header">
           {{#str}} itemdifficulties, local_catquiz {{/str}}
       </div>
       <div class="card-body">
         {{{itemdifficulties}}}
-      </div>
-  </div>
-  <div class="card">
-      <div class="card-header">
-          {{#str}} personabilities, local_catquiz {{/str}}
-      </div>
-      <div class="card-body">
-        {{{personabilities}}}
       </div>
   </div>
 </div>
