@@ -275,34 +275,57 @@ class catscaledashboard implements renderable, templatable {
 
         return html_writer::tag('div', $OUTPUT->render($chart), ['dir' => 'ltr']);
     }
-    private function render_itemdifficulties(model_item_param_list $item_list) {
+    /**
+     * @param array<model_item_param_list> $item_lists
+     */
+    private function render_itemdifficulties(array $item_lists) {
 
         global $OUTPUT;
 
-        $data = $item_list->get_values(true);
+        $charts = [];
+        foreach ($item_lists as $model_name => $item_list) {
+            $data = $item_list->get_values(true);
+            // Skip empty charts
+            if (empty($data)) {
+                continue;
+            }
 
-        $chart = new \core\chart_line();
-        $series = new \core\chart_series('Series 1 (Line)', array_values($data));
-        $chart->set_smooth(true); // Calling set_smooth() passing true as parameter, will display smooth lines.
-        $chart->add_series($series);
-        $chart->set_labels(array_keys($data));
+            $chart = new \core\chart_line();
+            $series = new \core\chart_series('Series 1 (Line)', array_values($data));
+            $chart->set_smooth(true); // Calling set_smooth() passing true as parameter, will display smooth lines.
+            $chart->add_series($series);
+            $chart->set_labels(array_keys($data));
+            $charts[$model_name] = html_writer::tag('div', $OUTPUT->render($chart), ['dir' => 'ltr']);
+        }
 
-        return html_writer::tag('div', $OUTPUT->render($chart), ['dir' => 'ltr']);
+        return $charts;
     }
-    private function render_personabilities(model_person_param_list $person_list) {
+
+    /**
+     * @param array<model_person_param_list> $person_lists
+     */
+    private function render_personabilities(array $person_lists)
+    {
 
         global $OUTPUT;
 
-        $data = $person_list->get_values(true);
+        $charts = [];
+        foreach ($person_lists as $model_name => $person_list) {
+            $data = $person_list->get_values(true);
+            if (empty($data)) {
+                continue;
+            }
 
-        $chart = new \core\chart_line();
-        $series = new \core\chart_series('Series 1 (Line)', array_values($data));
-        $chart->set_smooth(true); // Calling set_smooth() passing true as parameter, will display smooth lines.
-        $chart->add_series($series);
-        $chart->set_labels(array_keys($data));
-
-        return html_writer::tag('div', $OUTPUT->render($chart), ['dir' => 'ltr']);
+            $chart = new \core\chart_line();
+            $series = new \core\chart_series('Series 1 (Line)', array_values($data));
+            $chart->set_smooth(true); // Calling set_smooth() passing true as parameter, will display smooth lines.
+            $chart->add_series($series);
+            $chart->set_labels(array_keys($data));
+            $charts[] = ['name' => $model_name, 'chart' => html_writer::tag('div', $OUTPUT->render($chart), ['dir' => 'ltr'])];
+        }
+        return $charts;
     }
+
     private function render_contextselector() {
     $ajaxformdata = empty($this->catcontextid) ? [] : ['contextid' => $this->catcontextid];
     $form = new \local_catquiz\form\contextselector(null, null, 'post', '', [], true, $ajaxformdata);

@@ -109,13 +109,17 @@ class catmodel_info {
 
         $response = catcontext::create_response_from_db($contextid);
         $models = self::create_installed_models($response);
-        
+
+        $item_difficulties = [];
+        $person_abilities = [];
         foreach ($models as $name => $model) {
             list($estimated_item_difficulties, $estimated_person_abilities) = $model->run_estimation($response);
             $estimated_item_difficulties->save_to_db($contextid, $name);
             $estimated_person_abilities->save_to_db($contextid, $name);
+            $item_difficulties[$name] = $estimated_item_difficulties;
+            $person_abilities[$name] = $estimated_person_abilities;
         }
-        return [$estimated_item_difficulties, $estimated_person_abilities];
+        return [$item_difficulties, $person_abilities];
     }
     private function get_estimated_parameters_from_db(int $contextid, string $model) {
         global $DB;
