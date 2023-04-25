@@ -25,16 +25,20 @@
 namespace catmodel_raschbirnbauma;
 
 use local_catquiz\local\model\model_calc;
+use local_catquiz\local\model\model_item_param_list;
+use local_catquiz\local\model\model_model;
+use local_catquiz\local\model\model_person_param_list;
+use local_catquiz\local\model\model_response;
 
 defined('MOODLE_INTERNAL') || die();
 
 /**
- * Interface for model calc item classes.
+ * @inheritDoc
  *
  * @copyright  2023 Wunderbyte GmbH <georg.maisser@wunderbyte.at>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class raschbirnbauma implements model_calc {
+class raschbirnbauma extends model_model {
 
     /**
      * Responses.
@@ -68,9 +72,11 @@ class raschbirnbauma implements model_calc {
      * The constructur of the class makes an inital calculation based only on the responses.
      *
      *
-     * @param array $responses
+     * @param model_response $responses
      */
-    public function __construct(array $responses = []) {
+    public function __construct(model_response $response) {
+
+        $responses = $response->get_data();
 
         if (empty($responses)) {
             $responses = $this->responses;
@@ -123,14 +129,7 @@ class raschbirnbauma implements model_calc {
         $this->personabilities = $personabilities;
     }
 
-
-    /**
-     * Get Item Parameters by feedbing responses.
-     *
-     * @param array $responses
-     * @return void
-     */
-    public function get_item_parameters(array $responses):array {
+    public function get_item_parameters(model_response $responses): model_item_param_list {
 
         $item_params = array();
 
@@ -175,14 +174,7 @@ class raschbirnbauma implements model_calc {
         return $itemparams;
     }
 
-
-    /**
-     * Get the Persons ability based on their responses.
-     *
-     * @param array $responses
-     * @return array
-     */
-    public function get_person_abilities(array $responses):array {
+    public function get_person_abilities(model_response $responses): model_person_param_list {
 
         $person_abilities = array();
 
@@ -207,5 +199,12 @@ class raschbirnbauma implements model_calc {
         }
 
         return $person_abilities;
+    }
+    
+    public function run_estimation(model_response $response): array {
+        // TODO: Do the real calculation. See dev/testset01.php or catmodel_info.php for how this might be done.
+        $item_param_list = new model_item_param_list();
+        $person_param_list = new model_person_param_list();
+        return [$item_param_list, $person_param_list];
     }
 }

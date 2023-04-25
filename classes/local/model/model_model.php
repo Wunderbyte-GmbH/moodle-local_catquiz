@@ -15,7 +15,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Event factory interface.
+ * 
  *
  * @package    local_catquiz
  * @copyright  2023 Wunderbyte GmbH <georg.maisser@wunderbyte.at>
@@ -27,35 +27,41 @@ namespace local_catquiz\local\model;
 defined('MOODLE_INTERNAL') || die();
 
 /**
- * Interface for model calc item classes.
+ * Abstract class for model classes.
  *
  * @copyright  2023 Wunderbyte GmbH <georg.maisser@wunderbyte.at>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-interface model_calc {
+abstract class model_model {
+
+    /**
+     * Model-specific instantiation can go here.
+     */
+    abstract public function __construct(model_response $response);
 
     /**
      * Get Item Parameters by feedbing responses.
      *
-     * @param array $responses
-     * @return void
+     * @param model_response $responses
+     * @return model_item_param_list
      */
-    public function get_item_parameters(array $responses):array;
+    abstract public function get_item_parameters(model_response $responses): model_item_param_list;
 
 
     /**
      * Get the Persons ability based on their responses.
      *
-     * @param array $responses
-     * @return array
+     * @param model_response $responses
+     * @return model_person_param_list
      */
-    public function get_person_abilities(array $responses):array;
+    abstract public function get_person_abilities(model_response $responses): model_person_param_list;
 
     /**
-     * Run the estimation algorithm and return an array with the estimated parameters
+     * Executes the model-specific code to estimate item- and person-parameters based
+     * on the given response object.
      * 
      * @param model_response $response
      * @return array<model_item_param_list, model_person_param_list>
      */
-    public function run_estimation(model_response $response): array;
+    abstract public function run_estimation(model_response $response): array;
 }

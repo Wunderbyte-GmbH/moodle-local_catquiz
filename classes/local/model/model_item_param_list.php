@@ -35,6 +35,10 @@ class model_item_param_list {
      */
     private array $item_params;
 
+    public function __construct() {
+        $this->item_params = [];
+    }
+
     public function add(model_item_param $item_param) {
         $this->item_params[] = $item_param;
     }

@@ -27,6 +27,7 @@ namespace local_catquiz;
 
 use core_plugin_manager;
 use local_catquiz\data\catquiz_base;
+use local_catquiz\local\model\model_calc;
 use local_catquiz\local\model\model_item_param;
 use local_catquiz\local\model\model_item_param_list;
 use local_catquiz\local\model\model_person_param;
@@ -64,48 +65,55 @@ class catmodel_info {
             [0, 1, 1, 0, 1]];
 
         // Get all Models.
-        $models = self::get_installed_models();
+        $models = self::create_installed_models($responses);
 
-        // We run through all the models.
-        $classes = [];
-
-        foreach ($models as $model) {
-            $classname = 'catmodel_' . $model->name . '\\' . $model->name;
-
-            if (class_exists($classname)) {
-                $modelclass = new $classname($responses); // The constructure takes our array of responses.
-                $classes[] = $modelclass;
-                $itemparams = $modelclass->get_item_parameters([]);
+        foreach ($models as $name => $model) {
+                $itemparams = $model->get_item_parameters([]);
                 $returnarray[] = [
-                    'modelname' => $model->name,
+                    'modelname' => $name,
                     'itemparameters' => $itemparams,
                 ];
             }
-        }
 
         return $returnarray;
     }
 
     /**
-     * Returns an array of installed models.
+     * Returns an array of model instances indexed by their name.
      *
-     * @return array
+     * @return array<model_calc>
      */
-    public static function get_installed_models():array {
-
+    private static function create_installed_models($response): array {
         $pm = core_plugin_manager::instance();
-        return $pm->get_plugins_of_type('catmodel');
+        /**
+         * @var array<model_calc>
+         */
+        $instances = [];
+        foreach ($pm->get_plugins_of_type('catmodel') as $name => $info) {
+            $classname = sprintf('catmodel_%s\%s', $name, $name);
+            if (!class_exists($classname)) {
+                continue;
+            }
+
+            $modelclass = new $classname($response); // The constructure takes our array of responses.
+            $instances[$name] = $modelclass;
+        }
+        return $instances;
     }
 
-    public function get_context_parameters( int $contextid = 0, bool $calculate = false, string $model = 'raschbirnbauma') {
+    public function get_context_parameters( int $contextid = 0, bool $calculate = false) {
         if (!$calculate) {
-            return $this->get_estimated_parameters_from_db($contextid, $model);
+            // TODO: replace hardcoded modelname. Instead get params of ALL models
+            return $this->get_estimated_parameters_from_db($contextid, 'raschbirnbauma');
         }
 
         $response = catcontext::create_response_from_db($contextid);
-        list ($estimated_item_difficulties, $estimated_person_abilities) = $this->run_estimation($response);
-        $estimated_item_difficulties->save_to_db($contextid, $model);
-        $estimated_person_abilities->save_to_db($contextid, $model);
+        $models = self::create_installed_models($response);
+        foreach ($models as $name => $model) {
+            list($estimated_item_difficulties, $estimated_person_abilities) = $model->run_estimation($response);
+            $estimated_item_difficulties->save_to_db($contextid, $name);
+            $estimated_person_abilities->save_to_db($contextid, $name);
+        }
         return [$estimated_item_difficulties, $estimated_person_abilities];
     }
     private function get_estimated_parameters_from_db(int $contextid, string $model) {
@@ -145,7 +153,7 @@ class catmodel_info {
         $estimated_person_params = new model_person_param_list();
         foreach($response->get_initial_person_abilities() as $person){
             $person_response = \local_catquiz\helpercat::get_person_response(
-                $response->getData(),
+                $response->get_data(),
                 $person['id']
             );
             $person_ability = \local_catquiz\catcalc::estimate_person_ability(
