@@ -50,4 +50,12 @@ interface model_calc {
      * @return array
      */
     public function get_person_abilities(array $responses):array;
+
+    /**
+     * Run the estimation algorithm and return an array with the estimated parameters
+     * 
+     * @param model_response $response
+     * @return array<model_item_param_list, model_person_param_list>
+     */
+    public function run_estimation(model_response $response): array;
 }

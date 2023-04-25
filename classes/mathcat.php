@@ -27,7 +27,7 @@ namespace local_catquiz;
 
 class mathcat{
 
-    static function newtonraphson($func, $derivative, $start = 0, $min_inc = 0.0001, $max_iter=150){
+    static function newtonraphson($func, $derivative, $start = 0, $min_inc = 0.0001, $max_iter=150): float {
 
         $return_val = 0.0;
         $x_0 = $start;
