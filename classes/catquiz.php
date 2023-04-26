@@ -155,7 +155,7 @@ class catquiz {
                     ON lci.componentid=q.id AND lci.componentname='question'
                 LEFT JOIN (
                     SELECT ccc1.id, qa.questionid, COUNT(*) AS attempts
-                    FROM m_local_catquiz_catcontext ccc1
+                    FROM {local_catquiz_catcontext} ccc1
                         JOIN m_question_attempt_steps qas
                             ON ccc1.starttimestamp < qas.timecreated AND ccc1.endtimestamp > qas.timecreated
                                 AND qas.fraction IS NOT NULL
