@@ -156,10 +156,10 @@ class catquiz {
                 LEFT JOIN (
                     SELECT ccc1.id, qa.questionid, COUNT(*) AS attempts
                     FROM {local_catquiz_catcontext} ccc1
-                        JOIN m_question_attempt_steps qas
+                        JOIN {question_attempt_steps} qas
                             ON ccc1.starttimestamp < qas.timecreated AND ccc1.endtimestamp > qas.timecreated
                                 AND qas.fraction IS NOT NULL
-                        JOIN m_question_attempts qa
+                        JOIN {question_attempts} qa
                             ON qas.questionattemptid = qa.id
                     WHERE $contextfilter
                     GROUP BY ccc1.id, qa.questionid
