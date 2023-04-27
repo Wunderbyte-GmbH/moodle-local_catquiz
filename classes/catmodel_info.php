@@ -32,7 +32,7 @@ use local_catquiz\local\model\model_item_param;
 use local_catquiz\local\model\model_item_param_list;
 use local_catquiz\local\model\model_person_param;
 use local_catquiz\local\model\model_person_param_list;
-use local_catquiz\local\model\model_response;
+use local_catquiz\local\model\model_responses;
 
 /**
  * This class

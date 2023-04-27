@@ -30,11 +30,11 @@ use local_catquiz\local\model\model_person_param_list;
 
 /**
  * Contains information about a performed quiz or test
- * 
+ *
  * For example: a list of users performed a test. Objects of this class show how the users performed on this test.
  * E.g.: which users took part, how did they answer the questions, etc.
  */
-class model_response {
+class model_responses {
     private $data;
 
     public function to_item_list(): model_item_list {

@@ -25,7 +25,7 @@
 
 namespace local_catquiz;
 
-use local_catquiz\local\model\model_response;
+use local_catquiz\local\model\model_responses;
 use stdClass;
 
 require_once($CFG->dirroot . '/local/catquiz/lib.php');
@@ -136,13 +136,13 @@ class catcontext {
             $this->apply_values($newrecord);
         }
     }
-    public static function create_response_from_db($contextid = 0): model_response {
+    public static function create_response_from_db($contextid = 0): model_responses {
         global $DB;
 
         list ($sql, $params) = catquiz::get_sql_for_model_input($contextid);
         $data = $DB->get_records_sql($sql, $params);
         $inputdata = self::db_to_modelinput($data);
-        return (new model_response)->setData($inputdata);
+        return (new model_responses)->setData($inputdata);
     }
 
     /**
