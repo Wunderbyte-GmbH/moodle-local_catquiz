@@ -4,7 +4,7 @@ use local_catquiz\local\model\model_item_param;
 use local_catquiz\local\model\model_item_param_list;
 use local_catquiz\local\model\model_person_param;
 use local_catquiz\local\model\model_person_param_list;
-use local_catquiz\local\model\model_response;
+use local_catquiz\local\model\model_responses;
 
 // This file is part of Moodle - http://moodle.org/
 //
@@ -54,15 +54,15 @@ $demo_response = local_catquiz\synthcat::generate_response($demo_persons,$demo_i
 // estimate parameter
 
 
-$response = model_response::create_from_array($demo_response);
-$cil = $response->to_item_list();
+$responses = model_responses::create_from_array($demo_response);
+$cil = $responses->to_item_list();
 //$demo_person_response = \local_catquiz\helpercat::get_person_response($demo_response,3);
 $cil->estimate_initial_item_difficulties();
 
 $estimated_person_params = new model_person_param_list();
-foreach ($response->get_initial_person_abilities() as $person) {
+foreach ($responses->get_initial_person_abilities() as $person) {
     $person_response = \local_catquiz\helpercat::get_person_response(
-        $response->as_array(),
+        $responses->as_array(),
         $person['id']
     );
     $person_ability = \local_catquiz\catcalc::estimate_person_ability(
@@ -75,7 +75,7 @@ foreach ($response->get_initial_person_abilities() as $person) {
 }
 
 $estimated_item_params = new model_item_param_list();
-$demo_item_responses = $response->get_item_response(
+$demo_item_responses = $responses->get_item_response(
     $estimated_person_params
 );
 foreach ($demo_item_responses as $item_id => $item_response) {
