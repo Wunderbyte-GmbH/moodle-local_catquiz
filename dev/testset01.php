@@ -63,7 +63,7 @@ $estimated_person_params = new model_person_param_list();
 foreach ($responses->get_initial_person_abilities() as $person) {
     $person_response = \local_catquiz\helpercat::get_person_response(
         $responses->as_array(),
-        $person['id']
+        $person->get_id()
     );
     $person_ability = \local_catquiz\catcalc::estimate_person_ability(
         $person_response,

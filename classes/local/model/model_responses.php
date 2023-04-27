@@ -96,10 +96,16 @@ class model_responses {
         return $this->data;
     }
 
+    /**
+     * Returns the person params from all persons that are found in this responses object.
+     * The ability is initialized to 0.
+     * 
+     * @return array<model_person_param>
+     */
     public function get_initial_person_abilities() {
         return array_map(
             function($id) {
-                return ['id' => $id, 'ability' => 0];
+                return new model_person_param($id);
             },
             array_keys($this->as_array())
         );
