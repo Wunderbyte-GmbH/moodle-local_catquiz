@@ -19,17 +19,11 @@ class demo extends model_model
         $cil->estimate_initial_item_difficulties();
 
         $estimated_person_params = new model_person_param_list();
-        foreach($this->responses->get_initial_person_abilities() as $person){
-            $person_responses = \local_catquiz\helpercat::get_person_response(
-                $this->responses->as_array(),
-                $person['id']
-            );
-            $person_ability = \local_catquiz\catcalc::estimate_person_ability(
-                $person_responses,
-                $cil->get_item_difficulties()
-            );
-            $param = new model_person_param($person['id']);
-            $param->set_ability($person_ability);
+        $initial_person_params = $this->responses->get_initial_person_abilities();
+        for($i = 0; $i < count($initial_person_params); $i++) {
+            $person = $this->responses->get_initial_person_abilities()[$i];
+            $param = new model_person_param($person->get_id());
+            $param->set_ability(4*$i/count($this->responses->get_initial_person_abilities()));
             $estimated_person_params->add($param);
         }
 
@@ -38,7 +32,7 @@ class demo extends model_model
             $estimated_person_params
         );
         foreach($demo_item_responses as $item_id => $item_response){
-            $item_difficulty = \local_catquiz\catcalc::estimate_item_difficulty($item_response);
+            $item_difficulty = 0.5;
             $param = new model_item_param($item_id);
             $param->set_difficulty($item_difficulty);
             $estimated_item_params->add($param);
