@@ -14,11 +14,6 @@ use local_catquiz\local\model\model_responses;
  */
 class demo extends model_model
 {
-    private model_responses $responses;
-    public function __construct(model_responses $responses) {
-        $this->responses = $responses;
-    }
-
     public function run_estimation(): array {
         $cil = $this->responses->to_item_list();
         $cil->estimate_initial_item_difficulties();

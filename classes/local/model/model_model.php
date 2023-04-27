@@ -37,7 +37,7 @@ abstract class model_model {
     /**
      * @var model_responses Contains necessary data for estimation
      */
-    private model_responses $responses;
+    protected model_responses $responses;
 
     /**
      * Model-specific instantiation can go here.
