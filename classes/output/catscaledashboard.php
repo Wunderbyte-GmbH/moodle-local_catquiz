@@ -295,7 +295,7 @@ class catscaledashboard implements renderable, templatable {
             $chart->set_smooth(true); // Calling set_smooth() passing true as parameter, will display smooth lines.
             $chart->add_series($series);
             $chart->set_labels(array_keys($data));
-            $charts[$model_name] = html_writer::tag('div', $OUTPUT->render($chart), ['dir' => 'ltr']);
+            $charts[] = ['modelname' => $model_name, 'chart' => html_writer::tag('div', $OUTPUT->render($chart), ['dir' => 'ltr'])];
         }
 
         return $charts;
@@ -321,7 +321,7 @@ class catscaledashboard implements renderable, templatable {
             $chart->set_smooth(true); // Calling set_smooth() passing true as parameter, will display smooth lines.
             $chart->add_series($series);
             $chart->set_labels(array_keys($data));
-            $charts[] = ['name' => $model_name, 'chart' => html_writer::tag('div', $OUTPUT->render($chart), ['dir' => 'ltr'])];
+            $charts[] = ['modelname' => $model_name, 'chart' => html_writer::tag('div', $OUTPUT->render($chart), ['dir' => 'ltr'])];
         }
         return $charts;
     }
