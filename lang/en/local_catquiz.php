@@ -162,7 +162,9 @@ $string['loglikelihood'] = "Loglikelihood";
 $string['differentialitem'] = "Differential Item Functioning";
 $string['previewquestion'] = "Preview question";
 $string['personabilities'] = "Person abilities";
+$string['personabilitiesnodata'] = "No person abilities were calucalted";
 $string['itemdifficulties'] = "Item difficulties";
+$string['itemdifficultiesnodata'] = "No item difficulties were calculated";
 
 // Table.
 $string['label'] = "Label";
