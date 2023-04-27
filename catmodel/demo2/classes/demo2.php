@@ -22,13 +22,13 @@ class demo2 extends model_model
         foreach($this->responses->get_initial_person_abilities() as $person){
             $person_responses = \local_catquiz\helpercat::get_person_response(
                 $this->responses->as_array(),
-                $person['id']
+                $person->get_id()
             );
             $person_ability = \local_catquiz\catcalc::estimate_person_ability(
                 $person_responses,
                 $cil->get_item_difficulties()
             );
-            $param = new model_person_param($person['id']);
+            $param = new model_person_param($person->get_id());
             $param->set_ability($person_ability);
             $estimated_person_params->add($param);
         }
