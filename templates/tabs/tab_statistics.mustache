@@ -60,12 +60,18 @@
   </div>
   {{/personabilities}}
   {{^personabilities}}
-    No person abilities were estimated
+  <div class="card">
+      <div class="card-header">
+        {{#str}} personabilitiesnodata, local_catquiz {{/str}}
+      </div>
+      <div class="card-body">
+      </div>
+  </div>
   {{/personabilities}}
   {{#itemdifficulties}}
   <div class="card">
       <div class="card-header">
-        Itemdifficulties ({{modelname}})
+        {{#str}} itemdifficulties, local_catquiz {{/str}} ({{modelname}})
       </div>
       <div class="card-body">
         {{{chart}}}
@@ -73,6 +79,13 @@
   </div>
   {{/itemdifficulties}}
   {{^itemdifficulties}}
-    No item difficulties were estimated
+  <div class="card">
+      <div class="card-header">
+        {{#str}} itemdifficultiesnodata, local_catquiz {{/str}}
+      </div>
+      <div class="card-body">
+        {{{chart}}}
+      </div>
+  </div>
   {{/itemdifficulties}}
 </div>
