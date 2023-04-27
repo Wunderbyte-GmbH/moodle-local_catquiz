@@ -35,15 +35,22 @@ defined('MOODLE_INTERNAL') || die();
 abstract class model_model {
 
     /**
+     * @var model_response Contains necessary data for estimation
+     */
+    private model_response $responses;
+
+    /**
      * Model-specific instantiation can go here.
      */
-    abstract public function __construct(model_response $response);
+    public function __construct(model_response $responses) {
+        $this->responses = $responses;
+    }
 
     /**
      * Executes the model-specific code to estimate item- and person-parameters based
      * on the given response object.
      * 
-     * @param model_response $response
+     * @param model_response $responses
      * @return array<model_item_param_list, model_person_param_list>
      */
     abstract public function run_estimation(): array;
