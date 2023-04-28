@@ -159,6 +159,7 @@ $string['differentialitem'] = "Gruppenabhängiger Indikator";
 $string['previewquestion'] = "Fragen Vorschau";
 $string['personabilities'] = "Person abilities";
 $string['itemdifficulties'] = "Item difficulties";
+$string['itemdifficultiesnodata'] = "No item difficulties were calculated";
 
 // Table.
 $string['label'] = "Kennzeichen";
