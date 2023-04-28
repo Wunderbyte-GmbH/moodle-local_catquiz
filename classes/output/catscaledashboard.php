@@ -342,11 +342,12 @@ class catscaledashboard implements renderable, templatable {
 
         $table->set_filter_sql($select, $from, $where, $filter, $params);
 
-        $table->define_columns(['firstname', 'lastname', 'studentattempts',]);
+        $table->define_columns(['firstname', 'lastname', 'studentattempts', 'personabilities']);
         $table->define_headers([
             get_string('firstname', 'core'),
             get_string('lastname', 'core'),
             get_string('questioncontextattempts', 'local_catquiz'),
+            get_string('personabilities', 'local_catquiz'). " (max from all models)",
         ]);
 
         $table->define_fulltextsearchcolumns(['firstname', 'lastname']);

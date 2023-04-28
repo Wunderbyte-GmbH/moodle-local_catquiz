@@ -85,4 +85,8 @@ class student_stats_table extends wunderbyte_table {
     public function col_studentattempts($values) {
         return $values->studentattempts;
     }
+
+    public function col_personabilities($values) {
+        return $values->max;
+    }
 }

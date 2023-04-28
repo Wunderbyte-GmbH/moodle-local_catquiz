@@ -375,9 +375,15 @@ class catquiz {
         if ($where == "") {
             $where .= "1=1";
         }
-        $where .= " GROUP BY u.id, u.firstname, u.lastname";
+        $where .= " GROUP BY u.id, u.firstname, u.lastname, ccc1.id";
         
-        $from = " (SELECT u.id, u.firstname, u.lastname, COUNT(*) as studentattempts FROM $from WHERE $where) s1 ";
+        $from = " (SELECT u.id, u.firstname, u.lastname, ccc1.id AS contextid, COUNT(*) as studentattempts FROM $from WHERE $where) s1 
+                    LEFT JOIN (
+                        SELECT userid, contextid, MAX(ability)
+                        FROM m_local_catquiz_personparams
+                        GROUP BY (userid, contextid)
+                    ) s2 ON s1.id = s2.userid AND s1.contextid = s2.contextid
+            ";
 
         return [$select, $from, "1=1", "", $params];
     }
