@@ -161,6 +161,7 @@ $string['statindependence'] = "Statistical Independence";
 $string['loglikelihood'] = "Loglikelihood";
 $string['differentialitem'] = "Differential Item Functioning";
 $string['previewquestion'] = "Preview question";
+$string['personability'] = "Person ability";
 $string['personabilities'] = "Person abilities";
 $string['personabilitiesnodata'] = "No person abilities were calucalted";
 $string['itemdifficulties'] = "Item difficulties";
@@ -185,3 +186,6 @@ $string['numberofanswerscorrect'] = "Correct";
 $string['numberofanswersincorrect'] = "Wrong";
 $string['numberofanswerspartlycorrect'] = "Partly correct";
 $string['averageofallanswers'] = "Average";
+
+// Student Details
+$string['studentdetails'] = "Student details";

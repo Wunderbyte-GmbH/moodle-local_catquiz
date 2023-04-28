@@ -222,8 +222,12 @@ class catquiz {
      * @param array<integer> $contextids
      * @return array
      */
-    public static function get_sql_for_questions_answered(array $testitemids = [], array $contextids = []) {
-        list ($select, $from, $where, $params) = self::get_sql_for_stat_base_request($testitemids, $contextids);
+    public static function get_sql_for_questions_answered(
+        array $testitemids = [],
+        array $contextids = [],
+        array $studentids = []
+        ) {
+        list ($select, $from, $where, $params) = self::get_sql_for_stat_base_request($testitemids, $contextids, $studentids);
 
         $sql = "SELECT COUNT(qas.id)
         FROM $from
@@ -255,8 +259,12 @@ class catquiz {
      * @param array<integer> $testitemids
      * @return array
      */
-    public static function get_sql_for_questions_answered_correct(array $testitemids = [], array $contextids = []) {
-        list ($select, $from, $where, $params) = self::get_sql_for_stat_base_request($testitemids, $contextids);
+    public static function get_sql_for_questions_answered_correct(
+        array $testitemids = [],
+        array $contextids = [],
+        array $studentids = []
+    ) {
+        list($select, $from, $where, $params) = self::get_sql_for_stat_base_request($testitemids, $contextids, $studentids);
 
         $sql = "SELECT COUNT(qas.id)
         FROM $from
@@ -272,8 +280,12 @@ class catquiz {
      * @param array<integer> $testitemids
      * @return array
      */
-    public static function get_sql_for_questions_answered_incorrect(array $testitemids = [], array $contextids = []) {
-        list ($select, $from, $where, $params) = self::get_sql_for_stat_base_request($testitemids, $contextids);
+    public static function get_sql_for_questions_answered_incorrect(
+        array $testitemids = [],
+        array $contextids = [],
+        array $studentids = []
+    ) {
+        list($select, $from, $where, $params) = self::get_sql_for_stat_base_request($testitemids, $contextids, $studentids);
 
         $sql = "SELECT COUNT(qas.id)
         FROM $from
@@ -350,8 +362,12 @@ class catquiz {
      * @param array<integer> $contextids
      * @return array
      */
-    public static function get_sql_for_questions_usages_in_tests(array $testitemids = [], array $contextids = []) {
-        list ($select, $from, $where, $params) = self::get_sql_for_stat_base_request($testitemids, $contextids);
+    public static function get_sql_for_questions_usages_in_tests(
+        array $testitemids = [],
+        array $contextids = [],
+        array $studentids = []
+    ) {
+        list($select, $from, $where, $params) = self::get_sql_for_stat_base_request($testitemids, $contextids, $studentids);
 
         $sql = "SELECT COUNT(s1.questionid)
         FROM (
@@ -395,7 +411,11 @@ class catquiz {
      * @param array $contextid
      * @return array
      */
-    private static function get_sql_for_stat_base_request(array $testitemids = [], array $contextids = []):array {
+    private static function get_sql_for_stat_base_request(
+        array $testitemids = [],
+        array $contextids = [],
+        array $studentids = []
+    ): array {
         $select = '*';
         $from = '{local_catquiz_catcontext} ccc1
                 JOIN {question_attempt_steps} qas
@@ -406,12 +426,15 @@ class catquiz {
                     ON qas.questionattemptid = qa.id';
         $where = !empty($testitemids) ? 'qa.questionid IN (:testitemids)' : '1=1';
         $where .= !empty($contextids) ? ' AND ccc1.id IN (:contextids)' : '';
+        $where .= !empty($studentids) ? ' AND userid IN (:studentids)' : '';
 
         $testitemidstring = sprintf("%s", implode(',', $testitemids));
         $contextidstring = sprintf("%s", implode(',', $contextids));
+        $studentidstring = sprintf("%s", implode(',', $studentids));
 
         $params = self::set_optional_param([], 'testitemids', $testitemids, $testitemidstring);
         $params = self::set_optional_param($params, 'contextids', $contextids, $contextidstring);
+        $params = self::set_optional_param($params, 'studentids', $studentids, $studentidstring);
 
         return [$select, $from, $where, $params];
     }

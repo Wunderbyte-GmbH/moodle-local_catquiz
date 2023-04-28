@@ -157,6 +157,7 @@ $string['statindependence'] = "Statistische Unabhängigkeit";
 $string['loglikelihood'] = "Log-Likelihood";
 $string['differentialitem'] = "Gruppenabhängiger Indikator";
 $string['previewquestion'] = "Fragen Vorschau";
+$string['personability'] = "Person ability";
 $string['personabilities'] = "Person abilities";
 $string['itemdifficulties'] = "Item difficulties";
 $string['itemdifficultiesnodata'] = "No item difficulties were calculated";
@@ -180,3 +181,6 @@ $string['numberofanswerscorrect'] = "Richtig";
 $string['numberofanswersincorrect'] = "Falsch";
 $string['numberofanswerspartlycorrect'] = "Teilweise richtig";
 $string['averageofallanswers'] = "Durchschnitt";
+
+// Student Details
+$string['studentdetails'] = "Student details";

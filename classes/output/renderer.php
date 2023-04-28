@@ -55,4 +55,9 @@ class renderer extends plugin_renderer_base {
         $data = $data->export_for_template($this);
         return $this->render_from_template('local_catquiz/testitemdashboard', $data);
     }
+
+    public function render_studentdetails(templatable $data) {
+        $data = $data->export_for_template($this);
+        return $this->render_from_template('local_catquiz/studentdetails', $data);
+    }
 }
