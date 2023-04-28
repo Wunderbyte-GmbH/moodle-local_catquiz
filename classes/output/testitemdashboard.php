@@ -82,48 +82,41 @@ class testitemdashboard implements renderable, templatable {
 
         $returnarray = [];
 
-        $modelitemparams = catmodel_info::get_item_parameters(0, $this->testitemid);
+        $catmodel_info = new catmodel_info();
+        list($modelitemparams, $modelpersonparams) = $catmodel_info->get_context_parameters($this->contextid);
 
-        // Example item parameters
+        foreach ($modelitemparams as $modelname => $itemparamlist) {
 
-        $difficulty = -1.0;
-        $discrimination = 1.0;
+            $item = $itemparamlist[$this->testitemid];
+            if (! $item) {
+                continue;
+            }
 
-        // Example person abilities
-        $abilities = [-3.0, -2.0, -1.0, 0.0, 1.0, 2.0, 3.0, 4.0, 5.0, 6.0];
+            $discrimination = 1.0;
 
-        // Calculate the probability correct for each person ability
-        $probabilities = [];
-        foreach ($abilities as $ability) {
-            $logit = $discrimination * ($ability - $difficulty);
-            $probability = 1 / (1 + exp(-$logit));
-            $probabilities[] = $probability;
-        }
-
-        // Output the datapoints
-        $datapoints = [];
-        for ($i = 0; $i < count($abilities); $i++) {
-            $datapoints[] = $probabilities[$i];
-        }
-
-        foreach ($modelitemparams as $item) {
+            // Calculate the probability correct for each person ability
+            $probabilities = [];
+            foreach ($modelpersonparams[$modelname] as $p) {
+                $logit = $discrimination * ($p->get_ability() - $item->get_difficulty());
+                $probability = 1 / (1 + exp(-$logit));
+                $probabilities[$p->get_id()] = $probability;
+            }
 
             $chart = new \core\chart_line();
             $chart->set_smooth(true); // Calling set_smooth() passing true as parameter, will display smooth lines.
 
             // Create the graph for difficulty.
-            $series1 = new \core\chart_series(get_string('difficulty', 'local_catquiz'), $datapoints);
-
+            $series1 = new \core\chart_series(get_string('difficulty', 'local_catquiz'), array_values($probabilities));
+            $labels = array_keys($probabilities);
             $chart->add_series($series1);
-            $label = ["-3.0", "-2.0", "-1.0", "0.0", "1.0", "2.0", "3.0", "4.0", "5.0", "6.0"];
-
-            $chart->set_labels($label);
+            $chart->set_labels($labels);
 
             $body = html_writer::tag('div', $OUTPUT->render($chart), ['dir' => 'ltr']);
 
             $returnarray[]= [
-                'title' => get_string('pluginname', "catmodel_" . $item['modelname']),
+                'title' => get_string('pluginname', "catmodel_" . $modelname),
                 'body' => $body,
+                'difficulty' => $item->get_difficulty(),
             ];
         }
 

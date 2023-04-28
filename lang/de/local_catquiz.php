@@ -167,6 +167,7 @@ $string['questiontext'] = "Fragentext";
 
 // Testitem Dashboard.
 $string['testitemdashboard'] = "Testitem Dashboard";
+$string['itemdifficulty'] = "Item difficulty";
 
 $string['difficulty'] = "Schwierigkeit";
 $string['discrimination'] = "Diskriminierung";

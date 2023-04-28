@@ -51,31 +51,17 @@ class catmodel_info {
      * @param string $model
      * @return array
      */
-    public static function get_item_parameters(
-        int $catcontext = 0,
-        int $testitemid = 0,
-        string $component = '',
-        string $model = ''):array {
-
+    public function get_item_parameters(int $catcontext = 0):array {
         $returnarray = [];
 
         // Retrieve all the responses in the given context.
-        $responses = catquiz_base::get_question_results_by_person(0, 0, $testitemid);
-
-        // Right now, we need different responses.
-        $responses = [
-            [0, 1, 1, 0, 1]];
-
-        // Get all Models.
-        $models = self::create_installed_models($responses);
-
-        foreach ($models as $name => $model) {
-                $itemparams = $model->get_item_parameters([]);
-                $returnarray[] = [
-                    'modelname' => $name,
-                    'itemparameters' => $itemparams,
-                ];
-            }
+        list($itemparamsbymodel, $personparamsbymodel) = $this->get_context_parameters($catcontext);
+        foreach ($itemparamsbymodel as $model => $itemparams) {
+            $returnarray[$model] = [
+                'itemparams' => $itemparams,
+                'personparams' => $personparamsbymodel
+            ];
+        }
 
         return $returnarray;
     }
