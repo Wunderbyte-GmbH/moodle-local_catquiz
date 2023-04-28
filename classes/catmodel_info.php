@@ -177,5 +177,4 @@ class catmodel_info {
 
         return [$item_difficulties, $person_abilities];
     }
-
 };
