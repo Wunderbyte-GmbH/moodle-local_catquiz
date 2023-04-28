@@ -26,6 +26,7 @@ require_once($CFG->dirroot . '/question/engine/lib.php');
 use html_writer;
 use local_catquiz\catscale;
 use local_wunderbyte_table\wunderbyte_table;
+use moodle_url;
 
 /**
  * Search results for managers are shown in a table (student search results use the template searchresults_student).
@@ -88,5 +89,30 @@ class student_stats_table extends wunderbyte_table {
 
     public function col_personabilities($values) {
         return $values->max;
+    }
+
+    public function col_action($values) {
+        global $OUTPUT;
+
+        $url = new moodle_url('/local/catquiz/show_student.php', [
+            'id' => $values->id,
+            'catscaleid' => $this->catscaleid ?? 0,
+            'contextid' => $this->contextid,
+        ]);
+
+        $data['showactionbuttons'][] = [
+            'label' => get_string('view', 'core'), // Name of your action button.
+            'class' => 'btn btn-plain btn-smaller',
+            'iclass' => 'fa fa-eye',
+            'href' => $url->out(false),
+            'id' => $values->id,
+            'methodname' => '', // The method needs to be added to your child of wunderbyte_table class.
+            'data' => [ // Will be added eg as data-id = $values->id, so values can be transmitted to the method above.
+                'key' => 'id',
+                'value' => $values->id,
+            ]
+        ];
+
+        return $OUTPUT->render_from_template('local_wunderbyte_table/component_actionbutton', $data);;
     }
 }
