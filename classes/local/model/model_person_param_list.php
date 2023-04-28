@@ -23,7 +23,11 @@
 */
 
 namespace local_catquiz\local\model;
+use ArrayAccess;
+use ArrayIterator;
+use IteratorAggregate;
 use local_catquiz\local\model\model_person_param;
+use Traversable;
 
 /**
  * This class holds a list of person param objects
@@ -32,7 +36,7 @@ use local_catquiz\local\model\model_person_param;
  *  
  * This is one of the return values from a model param estimation.
  */
-class model_person_param_list {
+class model_person_param_list implements ArrayAccess, IteratorAggregate {
 
     /**
      * @var array<model_person_param>
@@ -43,8 +47,31 @@ class model_person_param_list {
         $this->person_params = [];
     }
 
+    public function getIterator(): Traversable {
+        return new ArrayIterator($this->person_params);
+    }
+
     public function add(model_person_param $person_param) {
-        $this->person_params[] = $person_param;
+        $this->person_params[$person_param->get_id()] = $person_param;
+    }
+    public function offsetSet($offset, $value): void {
+        if (is_null($offset)) {
+            $this->person_params[] = $value;
+        } else {
+            $this->person_params[$offset] = $value;
+        }
+    }
+
+    public function offsetExists($offset): bool {
+        return isset($this->person_params[$offset]);
+    }
+
+    public function offsetUnset($offset): void {
+        unset($this->person_params[$offset]);
+    }
+
+    public function offsetGet($offset) {
+        return isset($this->person_params[$offset]) ? $this->person_params[$offset] : null;
     }
 
     /**

@@ -23,13 +23,17 @@
 */
 
 namespace local_catquiz\local\model;
+use ArrayAccess;
+use ArrayIterator;
+use IteratorAggregate;
+use Traversable;
 
 /**
  * This class holds a list of item param objects
  *  
  * This is one of the return values from a model param estimation.
  */
-class model_item_param_list {
+class model_item_param_list implements ArrayAccess, IteratorAggregate {
     /**
      * @var array<model_item_param>
      */
@@ -39,10 +43,33 @@ class model_item_param_list {
         $this->item_params = [];
     }
 
-    public function add(model_item_param $item_param) {
-        $this->item_params[] = $item_param;
+    public function getIterator(): Traversable {
+        return new ArrayIterator($this->item_params);
     }
 
+    public function add(model_item_param $item_param) {
+        $this->item_params[$item_param->get_id()] = $item_param;
+    }
+
+    public function offsetSet($offset, $value): void {
+        if (is_null($offset)) {
+            $this->item_params[] = $value;
+        } else {
+            $this->item_params[$offset] = $value;
+        }
+    }
+
+    public function offsetExists($offset): bool {
+        return isset($this->item_params[$offset]);
+    }
+
+    public function offsetUnset($offset): void {
+        unset($this->item_params[$offset]);
+    }
+
+    public function offsetGet($offset) {
+        return isset($this->item_params[$offset]) ? $this->item_params[$offset] : null;
+    }
 
     /**
      * Returns the item difficulties as a float array
