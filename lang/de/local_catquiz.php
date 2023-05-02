@@ -184,3 +184,6 @@ $string['averageofallanswers'] = "Durchschnitt";
 
 // Student Details
 $string['studentdetails'] = "Student details";
+
+// Tasks
+$string['task_recalculate_cat_model_params'] = "CAT Parameter neu berechnen";

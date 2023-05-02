@@ -147,6 +147,42 @@ class catmodel_info {
 
         return [$item_difficulties, $person_abilities];
     }
+
+    /**
+     * Recalculates the CAT model params for all contexts and saves the updated params to the DB.
+     * 
+     * It returns the new values in the following format:
+     * [
+     *    '1' => [ // CAT context id
+     *              [
+     *                  model1, // model_item_param_list
+     *                  model2, // model_item_param_list
+     *              ],
+     *              [
+     *                  model1, // model_person_param_list
+     *                  model2, // model_person_param_list
+     *              ]
+     *    ],
+     *    '2' => [ ... ]
+     * ] 
+     * @return array<<array<array<model_item_param_list>>, array<array<model_person_param_list>>>
+     */
+    public function recalculate_for_all_contexts() {
+        global $DB;
+        // Get all contexts
+        $result = $DB->get_records_sql(
+            'SELECT * FROM {local_catquiz_catcontext} cc;',
+            []
+        );
+
+        $updated_params = [];
+        foreach ($result as $obj) {
+            $updated_params[$obj->id] = $this->update_context($obj->id);
+        }
+
+        return $updated_params;
+    }
+
     private function get_estimated_parameters_from_db(int $contextid, string $model) {
         global $DB;
 
