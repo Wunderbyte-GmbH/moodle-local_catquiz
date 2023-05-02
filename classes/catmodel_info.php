@@ -175,8 +175,14 @@ class catmodel_info {
             []
         );
 
+        // Filter contexts: only trigger calculation for active contexts
+        $now = time();
+        $filtered = array_filter($result, function($obj) use ($now) {
+            return $obj->starttimestamp <= $now && $obj->endtimestamp >= $now;
+        });
+
         $updated_params = [];
-        foreach ($result as $obj) {
+        foreach ($filtered as $obj) {
             $updated_params[$obj->id] = $this->update_context($obj->id);
         }
 
