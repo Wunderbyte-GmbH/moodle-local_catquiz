@@ -102,23 +102,19 @@ class catmodel_info {
         return $instances;
     }
 
+    /**
+     * 
+     * @param int $contextid 
+     * @param bool $calculate 
+     * @return array<model_item_param_list, model_person_param_list>
+     */
     public function get_context_parameters( int $contextid = 0, bool $calculate = false) {
-        $item_difficulties = [];
-        $person_abilities = [];
-
         if ($calculate) {
-            $response = catcontext::create_response_from_db($contextid);
-            $models = self::create_installed_models($response);
-            foreach ($models as $name => $model) {
-                list($estimated_item_difficulties, $estimated_person_abilities) = $model->run_estimation();
-                $estimated_item_difficulties->save_to_db($contextid, $name);
-                $estimated_person_abilities->save_to_db($contextid, $name);
-                $item_difficulties[$name] = $estimated_item_difficulties;
-                $person_abilities[$name] = $estimated_person_abilities;
-            }
-            return [$item_difficulties, $person_abilities];
+            return $this->update_context($contextid);
         }
 
+        $item_difficulties = [];
+        $person_abilities = [];
         $models = $this->get_installed_models();
         foreach ($models as $name => $model) {
                 list($item_difficulties, $person_abilities) = $this->get_estimated_parameters_from_db($contextid, $name);
@@ -130,6 +126,27 @@ class catmodel_info {
         return [$estimated_item_difficulties, $estimated_person_abilities];
     }
 
+    /**
+     * Recalculates the value for the given contextid, saves them to the DB and returns the new values.
+     * @param int $contextid 
+     * @return array<array<model_item_param_list>, array<model_person_param_list>>
+     */
+    private function update_context($contextid)
+    {
+        $item_difficulties = [];
+        $person_abilities = [];
+        $response = catcontext::create_response_from_db($contextid);
+        $models = self::create_installed_models($response);
+        foreach ($models as $name => $model) {
+            list($estimated_item_difficulties, $estimated_person_abilities) = $model->run_estimation();
+            $estimated_item_difficulties->save_to_db($contextid, $name);
+            $estimated_person_abilities->save_to_db($contextid, $name);
+            $item_difficulties[$name] = $estimated_item_difficulties;
+            $person_abilities[$name] = $estimated_person_abilities;
+        }
+
+        return [$item_difficulties, $person_abilities];
+    }
     private function get_estimated_parameters_from_db(int $contextid, string $model) {
         global $DB;
 
