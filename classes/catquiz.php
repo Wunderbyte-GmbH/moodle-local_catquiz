@@ -382,7 +382,7 @@ class catquiz {
         return [$sql, $params];
     }
     public static function return_sql_for_student_stats(int $contextid) {
-        
+
         list ($select, $from, $where, $params) = self::get_sql_for_stat_base_request([], [$contextid]);
 
         $select = "*";
@@ -392,11 +392,11 @@ class catquiz {
             $where .= "1=1";
         }
         $where .= " GROUP BY u.id, u.firstname, u.lastname, ccc1.id";
-        
-        $from = " (SELECT u.id, u.firstname, u.lastname, ccc1.id AS contextid, COUNT(*) as studentattempts FROM $from WHERE $where) s1 
+
+        $from = " (SELECT u.id, u.firstname, u.lastname, ccc1.id AS contextid, COUNT(*) as studentattempts FROM $from WHERE $where) s1
                     LEFT JOIN (
                         SELECT userid, contextid, MAX(ability)
-                        FROM m_local_catquiz_personparams
+                        FROM {local_catquiz_personparams}
                         GROUP BY (userid, contextid)
                     ) s2 ON s1.id = s2.userid AND s1.contextid = s2.contextid
             ";
@@ -419,7 +419,7 @@ class catquiz {
         $select = '*';
         $from = '{local_catquiz_catcontext} ccc1
                 JOIN {question_attempt_steps} qas
-                    ON ccc1.starttimestamp < qas.timecreated 
+                    ON ccc1.starttimestamp < qas.timecreated
                     AND ccc1.endtimestamp > qas.timecreated
                     AND qas.fraction IS NOT NULL
                 JOIN {question_attempts} qa
