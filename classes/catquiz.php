@@ -392,12 +392,12 @@ class catquiz {
             $where .= "1=1";
         }
         $where .= " GROUP BY u.id, u.firstname, u.lastname, ccc1.id";
-
-        $from = " (SELECT u.id, u.firstname, u.lastname, ccc1.id AS contextid, COUNT(*) as studentattempts FROM $from WHERE $where) s1
-                    LEFT JOIN (
+        
+        $from = " (SELECT u.id, u.firstname, u.lastname, ccc1.id AS contextid, COUNT(*) as studentattempts FROM $from WHERE $where) s1 
+                    JOIN (
                         SELECT userid, contextid, MAX(ability)
-                        FROM {local_catquiz_personparams}
-                        GROUP BY (userid, contextid)
+                        FROM {local_catquiz_personparams} cpp
+                        GROUP BY userid, contextid
                     ) s2 ON s1.id = s2.userid AND s1.contextid = s2.contextid
             ";
 
