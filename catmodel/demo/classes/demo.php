@@ -7,7 +7,6 @@ use local_catquiz\local\model\model_item_param_list;
 use local_catquiz\local\model\model_model;
 use local_catquiz\local\model\model_person_param;
 use local_catquiz\local\model\model_person_param_list;
-use local_catquiz\local\model\model_responses;
 
 /**
  * Just for demonstration purposes
@@ -21,9 +20,9 @@ class demo extends model_model
         $estimated_person_params = new model_person_param_list();
         $initial_person_params = $this->responses->get_initial_person_abilities();
         for($i = 0; $i < count($initial_person_params); $i++) {
-            $person = $this->responses->get_initial_person_abilities()[$i];
+            $person = $initial_person_params[$i];
             $param = new model_person_param($person->get_id());
-            $param->set_ability(4*$i/count($this->responses->get_initial_person_abilities()));
+            $param->set_ability(4*$i/count($initial_person_params));
             $estimated_person_params->add($param);
         }
 
