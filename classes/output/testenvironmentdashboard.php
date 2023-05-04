@@ -81,7 +81,8 @@ class testenvironmentdashboard implements renderable, templatable {
             'timemodified',
             'timecreated',
             'action',
-            'catscaleid'
+            'catscaleid',
+            'course',
         ]);
         $table->define_headers([
             get_string('name', 'core'),
@@ -92,7 +93,10 @@ class testenvironmentdashboard implements renderable, templatable {
             get_string('status'),
             get_string('parentid', 'local_catquiz'),
             get_string('timemodified', 'local_catquiz'),
-            get_string('timecreated')
+            get_string('timecreated'),
+            get_string('action', 'core'),
+            get_string('catscaleid', 'local_catquiz'),
+            get_string('course', 'core'),
         ]);
 
         $table->define_filtercolumns(
@@ -125,6 +129,7 @@ class testenvironmentdashboard implements renderable, templatable {
             'timemodified',
             'timecreated',
             'action',
+            'course',
         ]);
 
         // $table->tabletemplate = 'local_wunderbyte_table/twtable_list';
