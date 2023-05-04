@@ -491,7 +491,13 @@ class catquiz {
         $filter = '';
 
         $select = "*";
-        $from = "{local_catquiz_tests}";
+        $from = "
+        {local_catquiz_tests} ct
+        JOIN {course} c ON c.id = ct.courseid
+        JOIN (SELECT catscaleid, COUNT(*) AS numberofitems
+           FROM m_local_catquiz_items
+           GROUP BY catscaleid
+        ) s1 ON ct.catscaleid = s1.catscaleid";
 
         return [$select, $from, $where, $filter, $params];
     }
