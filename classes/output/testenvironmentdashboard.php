@@ -83,6 +83,8 @@ class testenvironmentdashboard implements renderable, templatable {
             'action',
             'catscaleid',
             'course',
+            'numberofitems',
+            'numberofusers',
         ]);
         $table->define_headers([
             get_string('name', 'core'),
@@ -97,6 +99,8 @@ class testenvironmentdashboard implements renderable, templatable {
             get_string('action', 'core'),
             get_string('catscaleid', 'local_catquiz'),
             get_string('course', 'core'),
+            get_string('numberofquestions', 'local_catquiz'),
+            get_string('numberofusers', 'local_catquiz'),
         ]);
 
         $table->define_filtercolumns(
