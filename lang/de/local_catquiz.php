@@ -82,6 +82,9 @@ $string['edittestenvironment'] = 'Bearbeite Testumgebung';
 $string['choosetest'] = 'Wähle Testumgebung';
 $string['parentid'] = 'Eltern id';
 $string['force'] = 'Erzwinge Werte';
+$string['catscaleid'] = 'CAT Skala ID';
+$string['numberofquestions'] = '# Fragen';
+$string['numberofusers'] = '# Studierende';
 
 // Cat contexts.
 $string['addcontext'] = 'Cat Kontext hinzufügen';
