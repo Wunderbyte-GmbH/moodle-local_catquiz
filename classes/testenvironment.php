@@ -128,6 +128,8 @@ class testenvironment {
      */
     private int $parentid;
 
+    private int $courseid;
+
     /**
      * Testenvironment constructor.
      * @param stdClass $newrecord
@@ -165,6 +167,7 @@ class testenvironment {
         $this->lang = $record->lang ?? '';
         $this->status = $record->status ?? STATUS_TEST_ACTIVE;
         $this->parentid = $record->parentid ?? 0;
+        $this->courseid = $record->courseid ?? 0;
     }
 
     /**
@@ -345,6 +348,7 @@ class testenvironment {
         $record->lang = $this->lang ?? $record->lang;
         $record->status = $this->status ?? $record->status;
         $record->parentid = $this->parentid ?? $record->parentid ?? 0;
+        $record->courseid = $this->courseid ?? $record->courseid;
 
         $now = time();
 
