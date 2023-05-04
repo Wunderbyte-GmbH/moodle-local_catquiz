@@ -251,37 +251,53 @@ function xmldb_local_catquiz_upgrade($oldversion) {
             upgrade_plugin_savepoint(true, $SAVEPOINT_UPDATE_ABILITY_PRECISION, 'local', 'catquiz');
         }
 
-    $SAVEPOINT_REMOVE_PERSONPARAMS_MODEL = 2023050501;
-    if ($oldversion < $SAVEPOINT_REMOVE_PERSONPARAMS_MODEL) {
+        $SAVEPOINT_ADD_COURSEID_FIELD = 2023050203;
+        if ($oldversion < $SAVEPOINT_ADD_COURSEID_FIELD) {
 
-        // Define field model to be dropped from local_catquiz_personparams.
-        $table = new xmldb_table('local_catquiz_personparams');
-        $field = new xmldb_field('model');
-
-        // Conditionally launch drop field model.
-        if ($dbman->field_exists($table, $field)) {
-            $dbman->drop_field($table, $field);
+            // Define field courseid to be added to local_catquiz_tests.
+            $table = new xmldb_table('local_catquiz_tests');
+            $field = new xmldb_field('courseid', XMLDB_TYPE_INTEGER, '10', null, null, null, null, 'catscaleid');
+    
+            // Conditionally launch add field courseid.
+            if (!$dbman->field_exists($table, $field)) {
+                $dbman->add_field($table, $field);
+            }
+    
+            // Catquiz savepoint reached.
+            upgrade_plugin_savepoint(true, $SAVEPOINT_ADD_COURSEID_FIELD, 'local', 'catquiz');
         }
 
-        // Catquiz savepoint reached.
-        upgrade_plugin_savepoint(true, $SAVEPOINT_REMOVE_PERSONPARAMS_MODEL, 'local', 'catquiz');
-    }
+        $SAVEPOINT_REMOVE_PERSONPARAMS_MODEL = 2023050501;
+        if ($oldversion < $SAVEPOINT_REMOVE_PERSONPARAMS_MODEL) {
 
-    $SAVEPOINT_ADD_ITEMPARAMS_STATUS_FIELD = 2023050503;
-    if ($oldversion < $SAVEPOINT_ADD_ITEMPARAMS_STATUS_FIELD) {
+            // Define field model to be dropped from local_catquiz_personparams.
+            $table = new xmldb_table('local_catquiz_personparams');
+            $field = new xmldb_field('model');
 
-        // Define field status to be added to local_catquiz_itemparams.
-        $table = new xmldb_table('local_catquiz_itemparams');
-        $field = new xmldb_field('status', XMLDB_TYPE_INTEGER, '2', null, XMLDB_NOTNULL, null, 0, 'difficulty');
+            // Conditionally launch drop field model.
+            if ($dbman->field_exists($table, $field)) {
+                $dbman->drop_field($table, $field);
+            }
 
-        // Conditionally launch add field status.
-        if (!$dbman->field_exists($table, $field)) {
-            $dbman->add_field($table, $field);
+            // Catquiz savepoint reached.
+            upgrade_plugin_savepoint(true, $SAVEPOINT_REMOVE_PERSONPARAMS_MODEL, 'local', 'catquiz');
         }
 
-        // Catquiz savepoint reached.
-        upgrade_plugin_savepoint(true, $SAVEPOINT_ADD_ITEMPARAMS_STATUS_FIELD, 'local', 'catquiz');
-    }
+        $SAVEPOINT_ADD_ITEMPARAMS_STATUS_FIELD = 2023050503;
+        if ($oldversion < $SAVEPOINT_ADD_ITEMPARAMS_STATUS_FIELD) {
+
+            // Define field status to be added to local_catquiz_itemparams.
+            $table = new xmldb_table('local_catquiz_itemparams');
+            $field = new xmldb_field('status', XMLDB_TYPE_INTEGER, '2', null, XMLDB_NOTNULL, null, 0, 'difficulty');
+
+            // Conditionally launch add field status.
+            if (!$dbman->field_exists($table, $field)) {
+                $dbman->add_field($table, $field);
+            }
+
+            // Catquiz savepoint reached.
+            upgrade_plugin_savepoint(true, $SAVEPOINT_ADD_ITEMPARAMS_STATUS_FIELD, 'local', 'catquiz');
+        }
 
     return true;
 }
