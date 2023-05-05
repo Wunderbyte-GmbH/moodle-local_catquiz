@@ -251,6 +251,21 @@ function xmldb_local_catquiz_upgrade($oldversion) {
             upgrade_plugin_savepoint(true, $SAVEPOINT_UPDATE_ABILITY_PRECISION, 'local', 'catquiz');
         }
 
+    $SAVEPOINT_REMOVE_PERSONPARAMS_MODEL = 2023050501;
+    if ($oldversion < $SAVEPOINT_REMOVE_PERSONPARAMS_MODEL) {
+
+        // Define field model to be dropped from local_catquiz_personparams.
+        $table = new xmldb_table('local_catquiz_personparams');
+        $field = new xmldb_field('model');
+
+        // Conditionally launch drop field model.
+        if ($dbman->field_exists($table, $field)) {
+            $dbman->drop_field($table, $field);
+        }
+
+        // Catquiz savepoint reached.
+        upgrade_plugin_savepoint(true, $SAVEPOINT_REMOVE_PERSONPARAMS_MODEL, 'local', 'catquiz');
+    }
 
     return true;
 }
