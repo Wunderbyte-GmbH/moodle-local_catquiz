@@ -115,8 +115,8 @@ class model_strategy {
             $this->iterations++;
         }
 
-        foreach ($item_difficulties as $model_name => $item_param_list) {
-            $item_param_list->save_to_db($this->contextid, $model_name);
+        foreach ($item_difficulties as $item_param_list) {
+            $item_param_list->save_to_db($this->contextid);
         }
         $person_abilities->save_to_db($this->contextid);
 
