@@ -92,12 +92,12 @@ class model_item_param {
         return $this;
     }
 
-    public function set_metadata(mixed $metadata) {
+    public function set_metadata(array $metadata): self {
         $this->metadata = $metadata;
         return $this;
     }
 
-    public function get_metadata(): mixed {
+    public function get_metadata(): array {
         return $this->metadata;
     }
 
