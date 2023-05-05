@@ -32,9 +32,11 @@ use local_catquiz\local\model\model_calc;
 use local_catquiz\local\model\model_item_param;
 use local_catquiz\local\model\model_item_param_list;
 use local_catquiz\local\model\model_model;
+use local_catquiz\local\model\model_person_ability_estimator_demo;
 use local_catquiz\local\model\model_person_param;
 use local_catquiz\local\model\model_person_param_list;
 use local_catquiz\local\model\model_responses;
+use local_catquiz\local\model\model_strategy;
 
 /**
  * This class
@@ -96,7 +98,7 @@ class catmodel_info {
         $instances = [];
 
         foreach (self::get_installed_models() as $name => $classname) {
-            $modelclass = new $classname($response); // The constructure takes our array of responses.
+            $modelclass = new $classname($response, $name); // The constructure takes our array of responses.
             $instances[$name] = $modelclass;
         }
         return $instances;
@@ -110,7 +112,19 @@ class catmodel_info {
      */
     public function get_context_parameters( int $contextid = 0, bool $calculate = false) {
         if ($calculate) {
-            return $this->update_context($contextid);
+            $response = catcontext::create_response_from_db($contextid);
+            $models = self::create_installed_models($response);
+            $ability_estimator = new model_person_ability_estimator_demo($response);
+            $strategy = new model_strategy($response, $models, $ability_estimator);
+            list( $item_difficulties, $person_abilities) = $strategy->run_estimation();
+            //foreach ($models as $name => $model) {
+            //    $estimated_item_difficulties = $model->estimate_item_params();
+            //    $estimated_item_difficulties->save_to_db($contextid, $name);
+            //    $estimated_person_abilities->save_to_db($contextid, $name);
+            //    $item_difficulties[$name] = $estimated_item_difficulties;
+            //    $person_abilities[$name] = $estimated_person_abilities;
+            //}
+            return [$item_difficulties, $person_abilities];
         }
 
         $item_difficulties = [];
@@ -120,10 +134,9 @@ class catmodel_info {
                 list($item_difficulties, $person_abilities) = $this->get_estimated_parameters_from_db($contextid, $name);
                 $estimated_item_difficulties[$name] = $item_difficulties;
                 $estimated_person_abilities[$name] = $person_abilities;
-                continue;
-
         }
-        return [$estimated_item_difficulties, $estimated_person_abilities];
+        $person_abilities = reset($estimated_person_abilities); // TODO: there should be only one list per context
+        return [$estimated_item_difficulties, $person_abilities];
     }
 
     /**
@@ -201,7 +214,7 @@ class catmodel_info {
         );
         $item_difficulties = new model_item_param_list();
         foreach ($item_rows as $r) {
-            $i = new model_item_param($r->componentid);
+            $i = new model_item_param($r->componentid, 'ZZZ');
             $i->set_difficulty($r->difficulty);
             $item_difficulties->add($i);
         }

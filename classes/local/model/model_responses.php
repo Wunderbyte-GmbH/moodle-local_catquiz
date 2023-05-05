@@ -108,14 +108,14 @@ class model_responses {
      * Returns the person params from all persons that are found in this responses object.
      * The ability is initialized to 0.
      * 
-     * @return array<model_person_param>
+     * @return model_person_param_list
      */
     public function get_initial_person_abilities() {
-        return array_map(
-            function($id) {
-                return new model_person_param($id);
-            },
-            array_keys($this->as_array())
-        );
+        $person_param_list = new model_person_param_list();
+        foreach (array_keys($this->as_array()) as $userid) {
+            $p = new model_person_param($userid);
+            $person_param_list->add($p);
+        }
+        return $person_param_list;
     }
 };
