@@ -115,7 +115,7 @@ class catmodel_info {
             $response = catcontext::create_response_from_db($contextid);
             $models = self::create_installed_models($response);
             $ability_estimator = new model_person_ability_estimator_demo($response);
-            $strategy = new model_strategy($response, $models, $ability_estimator);
+            $strategy = new model_strategy($response, $models, $ability_estimator, $contextid);
             list( $item_difficulties, $person_abilities) = $strategy->run_estimation();
             //foreach ($models as $name => $model) {
             //    $estimated_item_difficulties = $model->estimate_item_params();
@@ -219,20 +219,7 @@ class catmodel_info {
             $item_difficulties->add($i);
         }
 
-        $person_rows = $DB->get_records('local_catquiz_personparams',
-            [
-                'contextid' => $contextid,
-                'model' => $model,
-            ],
-            'ability ASC'
-        );
-        $person_abilities = new model_person_param_list();
-        foreach ($person_rows as $r) {
-            $p = new model_person_param($r->userid);
-            $p->set_ability($r->ability);
-            $person_abilities->add($p);
-        }
-
+        $person_abilities = model_person_param_list::load_from_db($contextid);
         return [$item_difficulties, $person_abilities];
     }
 };

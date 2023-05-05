@@ -26,6 +26,7 @@ namespace local_catquiz\local\model;
 use ArrayAccess;
 use ArrayIterator;
 use Countable;
+use dml_exception;
 use IteratorAggregate;
 use local_catquiz\local\model\model_person_param;
 use Traversable;
@@ -46,6 +47,31 @@ class model_person_param_list implements ArrayAccess, IteratorAggregate, Countab
 
     public function __construct() {
         $this->person_params = [];
+    }
+
+    /**
+     * Try to load existing person params from the DB.
+     * If none are found, it returns an empty list.
+     * 
+     * @param int $contextid 
+     * @return model_person_param_list 
+     * @throws dml_exception 
+     */
+    public static function load_from_db(int $contextid): self {
+        global $DB;
+        $person_rows = $DB->get_records(
+            'local_catquiz_personparams',
+            ['contextid' => $contextid,]
+        );
+
+        $person_abilities = new model_person_param_list();
+        foreach ($person_rows as $r) {
+            $p = new model_person_param($r->userid);
+            $p->set_ability($r->ability);
+            $person_abilities->add($p);
+        }
+
+        return $person_abilities;
     }
 
     public function count(): int {

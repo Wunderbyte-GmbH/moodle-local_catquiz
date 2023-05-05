@@ -24,6 +24,8 @@
 
 namespace local_catquiz\local\model;
 
+use dml_exception;
+
 defined('MOODLE_INTERNAL') || die();
 
 /**
@@ -73,17 +75,21 @@ class model_strategy {
     
     private int $iterations = 0;
 
+    private int $contextid;
+
     /**
      * Model-specific instantiation can go here.
      */
     public function __construct(
         model_responses $responses,
         array $models,
-        model_person_ability_estimator $ability_estimator
+        model_person_ability_estimator $ability_estimator,
+        int $contextid
     ) {
         $this->responses = $responses;
         $this->models = $models;
         $this->ability_estimator = $ability_estimator;
+        $this->contextid = $contextid;
     }
 
     /**
@@ -92,10 +98,9 @@ class model_strategy {
      * @return array<model_item_param_list, model_person_param_list>
      */
     public function run_estimation(): array {
-        // TODO: only if not in DB yet. Otherwise, get it from the DB
-        $person_abilities = $this->responses->get_initial_person_abilities();
+        $person_abilities = $this->get_initial_person_abilities();
 
-        // Re-calculate until the parameters are good enough
+        // Re-calculate until the stop condition is triggered
         while (!$this->should_stop()) {
             /**
              * @var array<model_item_param_list>
@@ -118,5 +123,20 @@ class model_strategy {
 
     private function should_stop(): bool {
         return $this->iterations >= self::MAX_ITERATIONS;
+    }
+
+    /**
+     * If there are already person params for the given context in the DB, then use them.
+     * Otherwise, create a new list
+     * 
+     * @return model_person_param_list 
+     * @throws dml_exception 
+     */
+    private function get_initial_person_abilities(): model_person_param_list {
+        $saved_person_abilities = model_person_param_list::load_from_db($this->contextid);
+        if (!empty($saved_person_abilities)) {
+            return $saved_person_abilities;
+        }
+        return $this->responses->get_initial_person_abilities();
     }
 }
