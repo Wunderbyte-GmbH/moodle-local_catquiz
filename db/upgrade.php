@@ -267,5 +267,33 @@ function xmldb_local_catquiz_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, $SAVEPOINT_REMOVE_PERSONPARAMS_MODEL, 'local', 'catquiz');
     }
 
+    $SAVEPOINT_ADD_STRATEGY_TABLE = 2023050502;
+    if ($oldversion < $SAVEPOINT_ADD_STRATEGY_TABLE) {
+
+        // Define table local_catquiz_strategy to be created.
+        $table = new xmldb_table('local_catquiz_strategy');
+
+        // Adding fields to table local_catquiz_strategy.
+        $table->add_field('id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, XMLDB_SEQUENCE, null);
+        $table->add_field('name', XMLDB_TYPE_CHAR, '255', null, null, null, null);
+        $table->add_field('contextid', XMLDB_TYPE_INTEGER, '10', null, null, null, null);
+        $table->add_field('json', XMLDB_TYPE_TEXT, null, null, null, null, null);
+        $table->add_field('description', XMLDB_TYPE_TEXT, null, null, null, null, null);
+        $table->add_field('descriptionformat', XMLDB_TYPE_INTEGER, '2', null, null, null, null);
+        $table->add_field('timecreated', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0');
+        $table->add_field('timemodified', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0');
+
+        // Adding keys to table local_catquiz_strategy.
+        $table->add_key('primary', XMLDB_KEY_PRIMARY, ['id']);
+
+        // Conditionally launch create table for local_catquiz_strategy.
+        if (!$dbman->table_exists($table)) {
+            $dbman->create_table($table);
+        }
+
+        // Catquiz savepoint reached.
+        upgrade_plugin_savepoint(true, $SAVEPOINT_ADD_STRATEGY_TABLE, 'local', 'catquiz');
+    }
+
     return true;
 }
