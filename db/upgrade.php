@@ -295,5 +295,21 @@ function xmldb_local_catquiz_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, $SAVEPOINT_ADD_STRATEGY_TABLE, 'local', 'catquiz');
     }
 
+    $SAVEPOINT_ADD_ITEMPARAMS_STATUS_FIELD = 2023050503;
+    if ($oldversion < $SAVEPOINT_ADD_ITEMPARAMS_STATUS_FIELD) {
+
+        // Define field status to be added to local_catquiz_itemparams.
+        $table = new xmldb_table('local_catquiz_itemparams');
+        $field = new xmldb_field('status', XMLDB_TYPE_INTEGER, '2', null, XMLDB_NOTNULL, null, 0, 'difficulty');
+
+        // Conditionally launch add field status.
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        // Catquiz savepoint reached.
+        upgrade_plugin_savepoint(true, $SAVEPOINT_ADD_ITEMPARAMS_STATUS_FIELD, 'local', 'catquiz');
+    }
+
     return true;
 }
