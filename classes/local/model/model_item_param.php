@@ -42,13 +42,17 @@ class model_item_param {
      */
     private float $difficulty = 0;
 
+    private string $model_name;
+
     /**
      * @var integer $id The item id, e.g. question id
      */
     private int $id;
 
-    public function __construct(int $id) {
+    public function __construct(int $id, string $model_name)
+    {
         $this->id = $id;
+        $this->model_name = $model_name;
     }
 
     /**
@@ -59,6 +63,11 @@ class model_item_param {
     public function get_id(): int {
         return $this->id;
     }
+
+    public function get_model_name(): string {
+        return $this->model_name;
+    }
+
     public function get_difficulty(): float {
         return $this->difficulty;
     }

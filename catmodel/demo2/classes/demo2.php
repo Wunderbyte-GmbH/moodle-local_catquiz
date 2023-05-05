@@ -14,7 +14,8 @@ use local_catquiz\local\model\model_responses;
  */
 class demo2 extends model_model
 {
-    public function run_estimation(): array {
+
+    public function estimate_item_params(model_person_param_list $person_params): model_item_param_list {
         $cil = $this->responses->to_item_list();
         $cil->estimate_initial_item_difficulties();
 
@@ -39,11 +40,12 @@ class demo2 extends model_model
         );
         foreach($demo_item_responses as $item_id => $item_response){
             $item_difficulty = \local_catquiz\catcalc::estimate_item_difficulty($item_response);
-            $param = new model_item_param($item_id);
-            $param->set_difficulty($item_difficulty);
+            $param = $this
+                ->create_item_param($item_id)
+                ->set_difficulty($item_difficulty);
             $estimated_item_params->add($param);
         }
 
-        return [$estimated_item_params, $estimated_person_params];
+        return $estimated_item_params;
     }
 }

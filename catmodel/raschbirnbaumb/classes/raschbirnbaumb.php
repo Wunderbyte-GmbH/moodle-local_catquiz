@@ -44,10 +44,10 @@ class raschbirnbaumb extends model_model {
         return new model_person_param_list();
     }
     
-    public function run_estimation(): array {
+    public function estimate_item_params(model_person_param_list $person_params): model_item_param_list {
+
         // TODO: Do the real calculation. See dev/testset01.php or catmodel_info.php for how this might be done.
         $item_param_list = $this->get_item_parameters();
-        $person_param_list = $this->get_person_abilities();
-        return [$item_param_list, $person_param_list];
+        return $item_param_list;
     }
 }
