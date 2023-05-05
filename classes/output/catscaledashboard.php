@@ -302,28 +302,19 @@ class catscaledashboard implements renderable, templatable {
     }
 
     /**
-     * @param array<model_person_param_list> $person_lists
+     * @param model_person_param_list $person_params
      */
-    private function render_personabilities(array $person_lists)
+    private function render_personabilities(model_person_param_list $person_params)
     {
-
         global $OUTPUT;
 
-        $charts = [];
-        foreach ($person_lists as $model_name => $person_list) {
-            $data = $person_list->get_values(true);
-            if (empty($data)) {
-                continue;
-            }
-
-            $chart = new \core\chart_line();
-            $series = new \core\chart_series('Series 1 (Line)', array_values($data));
-            $chart->set_smooth(true); // Calling set_smooth() passing true as parameter, will display smooth lines.
-            $chart->add_series($series);
-            $chart->set_labels(array_keys($data));
-            $charts[] = ['modelname' => $model_name, 'chart' => html_writer::tag('div', $OUTPUT->render($chart), ['dir' => 'ltr'])];
-        }
-        return $charts;
+        $data = $person_params->get_values(true);
+        $chart = new \core\chart_line();
+        $series = new \core\chart_series('Series 1 (Line)', array_values($data));
+        $chart->set_smooth(true); // Calling set_smooth() passing true as parameter, will display smooth lines.
+        $chart->add_series($series);
+        $chart->set_labels(array_keys($data));
+        return html_writer::tag('div', $OUTPUT->render($chart), ['dir' => 'ltr']);
     }
 
     private function render_contextselector() {

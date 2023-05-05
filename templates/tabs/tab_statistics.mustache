@@ -49,25 +49,14 @@
         {{{differentialitem}}}
       </div>
   </div>
-  {{#personabilities}}
   <div class="card">
       <div class="card-header">
-         Person abilities ({{modelname}})
+         Person abilities
       </div>
       <div class="card-body">
-        {{{chart}}}
+        {{{personabilities}}}
       </div>
   </div>
-  {{/personabilities}}
-  {{^personabilities}}
-  <div class="card">
-      <div class="card-header">
-        {{#str}} personabilitiesnodata, local_catquiz {{/str}}
-      </div>
-      <div class="card-body">
-      </div>
-  </div>
-  {{/personabilities}}
   {{#itemdifficulties}}
   <div class="card">
       <div class="card-header">
