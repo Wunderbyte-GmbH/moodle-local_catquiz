@@ -43,6 +43,34 @@ class model_item_param_list implements ArrayAccess, IteratorAggregate {
         $this->item_params = [];
     }
 
+    /**
+     * Try to load existing item params from the DB.
+     * If none are found, it returns an empty list.
+     *
+     * @param int $contextid
+     * @param string $model_name
+     * @return model_item_param_list
+     */
+    public static function load_from_db(int $contextid, string $model_name): self {
+        global $DB;
+
+        $item_rows = $DB->get_records(
+            'local_catquiz_itemparams',
+            [
+                'contextid' => $contextid,
+                'model' => $model_name,
+            ],
+        );
+        $item_difficulties = new model_item_param_list();
+        foreach ($item_rows as $r) {
+            $i = new model_item_param($r->componentid, $model_name);
+            $i->set_difficulty($r->difficulty);
+            $item_difficulties->add($i);
+        }
+
+        return $item_difficulties;
+    }
+
     public function getIterator(): Traversable {
         return new ArrayIterator($this->item_params);
     }

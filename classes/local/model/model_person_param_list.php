@@ -135,12 +135,12 @@ class model_person_param_list implements ArrayAccess, IteratorAggregate, Countab
         return $data;
     }
 
-    public function save_to_db(int $contextid, string $model) {
+    public function save_to_db(int $contextid) {
         global $DB;
         // Get existing records for the given contextid and model.
         $existing_params_rows = $DB->get_records(
             'local_catquiz_personparams',
-            ['model' => $model, 'contextid' => $contextid,]
+            ['contextid' => $contextid,]
         );
         $existing_params = [];
         foreach ($existing_params_rows as $r) {
@@ -148,7 +148,7 @@ class model_person_param_list implements ArrayAccess, IteratorAggregate, Countab
         };
 
         $records = array_map(
-            function ($param) use ($contextid, $model) {
+            function ($param) use ($contextid) {
                 if (!is_finite($param->get_ability())) {
                     $ability = $param->get_ability() < 0
                         ? model_person_param::MODEL_NEG_INF
@@ -158,7 +158,6 @@ class model_person_param_list implements ArrayAccess, IteratorAggregate, Countab
                 return [
                     'userid' => $param->get_id(),
                     'ability' => $param->get_ability(),
-                    'model' => $model,
                     'contextid' => $contextid,
                 ];
             },

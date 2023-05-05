@@ -24,7 +24,9 @@
 
 namespace local_catquiz\local\model;
 
+use core_plugin_manager;
 use dml_exception;
+use local_catquiz\catcontext;
 
 defined('MOODLE_INTERNAL') || die();
 
@@ -80,16 +82,11 @@ class model_strategy {
     /**
      * Model-specific instantiation can go here.
      */
-    public function __construct(
-        model_responses $responses,
-        array $models,
-        model_person_ability_estimator $ability_estimator,
-        int $contextid
-    ) {
-        $this->responses = $responses;
-        $this->models = $models;
-        $this->ability_estimator = $ability_estimator;
+    public function __construct(int $contextid) {
         $this->contextid = $contextid;
+        $this->responses = catcontext::create_response_from_db($contextid);
+        $this->models = $this->create_installed_models();
+        $this->ability_estimator = new model_person_ability_estimator_demo($this->responses);
     }
 
     /**
@@ -118,7 +115,27 @@ class model_strategy {
             $this->iterations++;
         }
 
+        foreach ($item_difficulties as $model_name => $item_param_list) {
+            $item_param_list->save_to_db($this->contextid, $model_name);
+        }
+        $person_abilities->save_to_db($this->contextid);
+
         return [$item_difficulties, $person_abilities];
+    }
+
+    /**
+     * @return array<model_item_param_list, model_person_param_list>
+     */
+    public function get_params_from_db(): array {
+        $models = $this->get_installed_models();
+        foreach (array_keys($models) as $model_name) {
+            $estimated_item_difficulties[$model_name] = model_item_param_list::load_from_db(
+                $this->contextid,
+                $model_name
+            );
+        }
+        $person_abilities = model_person_param_list::load_from_db($this->contextid);
+        return [$estimated_item_difficulties, $person_abilities];
     }
 
     private function should_stop(): bool {
@@ -138,5 +155,41 @@ class model_strategy {
             return $saved_person_abilities;
         }
         return $this->responses->get_initial_person_abilities();
+    }
+
+    /**
+     * Returns classes of installed models, indexed by the model name
+     *
+     * @return array<string>
+     */
+    private static function get_installed_models(): array {
+        $pm = core_plugin_manager::instance();
+        $models = [];
+        foreach($pm->get_plugins_of_type('catmodel') as $name => $info) {
+                $classname = sprintf('catmodel_%s\%s', $name, $name);
+                if (!class_exists($classname)) {
+                    continue;
+                }
+                $models[$name] = $classname;
+        }
+        return $models;
+    }
+
+    /**
+     * Returns an array of model instances indexed by their name.
+     *
+     * @return array<model_model>
+     */
+    private function create_installed_models(): array {
+        /**
+         * @var array<model_model>
+         */
+        $instances = [];
+
+        foreach (self::get_installed_models() as $name => $classname) {
+            $modelclass = new $classname($this->responses, $name);
+            $instances[$name] = $modelclass;
+        }
+        return $instances;
     }
 }
