@@ -44,14 +44,23 @@ abstract class model_model {
      */
     public function __construct(model_responses $responses) {
         $this->responses = $responses;
+
+    /**
+     * Helper to create a new item param
+     * 
+     * @param int $itemid 
+     * @return model_item_param 
+     */
+    protected function create_item_param(int $itemid): model_item_param {
+        return new model_item_param($itemid, $this->model_name);
     }
 
     /**
-     * Executes the model-specific code to estimate item- and person-parameters based
-     * on the given response object.
+     * Executes the model-specific code to estimate item-parameters based
+     * on the given person abilities.
      * 
-     * @param model_responses $responses
-     * @return array<model_item_param_list, model_person_param_list>
+     * @param model_person_param_list $person_params
+     * @return model_item_param_list
      */
-    abstract public function run_estimation(): array;
+    abstract public function estimate_item_params(model_person_param_list $person_params): model_item_param_list;
 }

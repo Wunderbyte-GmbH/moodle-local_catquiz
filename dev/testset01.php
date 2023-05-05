@@ -80,7 +80,7 @@ $demo_item_responses = $responses->get_item_response(
 );
 foreach ($demo_item_responses as $item_id => $item_response) {
     $item_difficulty = \local_catquiz\catcalc::estimate_item_difficulty($item_response);
-    $param = new model_item_param($item_id);
+    $param = new model_item_param($item_id, 'unknown');
     $param->set_difficulty($item_difficulty);
     $estimated_item_params->add($param);
 }
