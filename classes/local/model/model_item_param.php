@@ -37,10 +37,17 @@ class model_item_param {
     const MODEL_NEG_INF = -1000;
     const MODEL_POS_INF = 1000;
 
+    const STATUS_NOT_SET = 0;
+    const STATUS_SET_BY_STRATEGY = 1;
+    const STATUS_PROBLEMATIC = 2;
+    const STATUS_SET_MANUALLY = 3;
+
     /**
      * @var float
      */
     private float $difficulty = 0;
+
+    private int $status = 0;
 
     private string $model_name;
 
@@ -55,11 +62,12 @@ class model_item_param {
      */
     private int $id;
 
-    public function __construct(int $id, string $model_name, array $metadata = [])
+    public function __construct(int $id, string $model_name, array $metadata = [], int $status = self::STATUS_NOT_SET)
     {
         $this->id = $id;
         $this->model_name = $model_name;
         $this->metadata = $metadata;
+        $this->status = $status;
     }
 
     /**
@@ -91,5 +99,14 @@ class model_item_param {
 
     public function get_metadata(): mixed {
         return $this->metadata;
+    }
+
+    public function set_status(int $status): self {
+        $this->status = $status;
+        return $this;
+    }
+
+    public function get_status(): int {
+        return $this->status;
     }
 };
