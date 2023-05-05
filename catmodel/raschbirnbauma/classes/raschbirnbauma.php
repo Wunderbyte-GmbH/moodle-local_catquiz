@@ -24,6 +24,7 @@
 
 namespace catmodel_raschbirnbauma;
 
+use local_catquiz\local\model\model_item_param;
 use local_catquiz\local\model\model_item_param_list;
 use local_catquiz\local\model\model_model;
 use local_catquiz\local\model\model_person_param_list;
@@ -47,8 +48,14 @@ class raschbirnbauma extends model_model {
     }
     
     public function estimate_item_params(model_person_param_list $person_params): model_item_param_list {
-        // TODO: Do the real calculation. See dev/testset01.php or catmodel_info.php for how this might be done.
-        $item_param_list = $this->get_item_parameters();
-        return $item_param_list;
+        $estimated_item_params = new model_item_param_list();
+        foreach ($this->responses->get_item_response($person_params) as $item_id => $item_response) {
+            $item_difficulty = \local_catquiz\catcalc::estimate_item_difficulty($item_response);
+            $param = $this
+                ->create_item_param($item_id)
+                ->set_difficulty($item_difficulty);
+            $estimated_item_params->add($param);
+        }
+        return $estimated_item_params;
     }
 }
