@@ -60,6 +60,14 @@ class model_responses {
     }
 
     /**
+     * Helper function to get the person IDs from the response.
+     *
+     * @return array<int>  */
+    public function get_user_ids(): array {
+        return array_keys($this->data);
+    }
+
+    /**
      * Returns an array of arrays of item responses indexed by question id.
      * So for each question ID, there is an array of model_item_response entries
      *
