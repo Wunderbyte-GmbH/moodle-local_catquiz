@@ -39,11 +39,15 @@ abstract class model_model {
      */
     protected model_responses $responses;
 
+    protected string $model_name;
+
     /**
      * Model-specific instantiation can go here.
      */
-    public function __construct(model_responses $responses) {
+    public function __construct(model_responses $responses, string $model_name) {
         $this->responses = $responses;
+        $this->model_name = $model_name;
+    }
 
     /**
      * Helper to create a new item param

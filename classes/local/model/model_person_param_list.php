@@ -25,6 +25,7 @@
 namespace local_catquiz\local\model;
 use ArrayAccess;
 use ArrayIterator;
+use Countable;
 use IteratorAggregate;
 use local_catquiz\local\model\model_person_param;
 use Traversable;
@@ -36,7 +37,7 @@ use Traversable;
  *  
  * This is one of the return values from a model param estimation.
  */
-class model_person_param_list implements ArrayAccess, IteratorAggregate {
+class model_person_param_list implements ArrayAccess, IteratorAggregate, Countable {
 
     /**
      * @var array<model_person_param>
@@ -45,6 +46,10 @@ class model_person_param_list implements ArrayAccess, IteratorAggregate {
 
     public function __construct() {
         $this->person_params = [];
+    }
+
+    public function count(): int {
+        return count($this->person_params);
     }
 
     public function getIterator(): Traversable {
