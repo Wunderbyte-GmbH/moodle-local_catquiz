@@ -57,7 +57,7 @@ abstract class model_model {
      * @return model_item_param 
      */
     protected function create_item_param(int $itemid, array $metadata = []): model_item_param {
-        return new model_item_param($itemid, $this->model_name, $metadata);
+        return new model_item_param($itemid, $this->model_name, $metadata, model_item_param::STATUS_SET_BY_STRATEGY);
     }
 
     /**
