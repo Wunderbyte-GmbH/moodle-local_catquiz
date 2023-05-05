@@ -45,14 +45,21 @@ class model_item_param {
     private string $model_name;
 
     /**
+     * Models that create items are free to use this field to store some metadata
+     * @var array
+     */
+    private array $metadata;
+
+    /**
      * @var integer $id The item id, e.g. question id
      */
     private int $id;
 
-    public function __construct(int $id, string $model_name)
+    public function __construct(int $id, string $model_name, array $metadata = [])
     {
         $this->id = $id;
         $this->model_name = $model_name;
+        $this->metadata = $metadata;
     }
 
     /**
@@ -75,5 +82,14 @@ class model_item_param {
     public function set_difficulty(float $difficulty): self {
         $this->difficulty = $difficulty;
         return $this;
+    }
+
+    public function set_metadata(mixed $metadata) {
+        $this->metadata = $metadata;
+        return $this;
+    }
+
+    public function get_metadata(): mixed {
+        return $this->metadata;
     }
 };

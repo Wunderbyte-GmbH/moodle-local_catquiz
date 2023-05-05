@@ -52,11 +52,12 @@ abstract class model_model {
     /**
      * Helper to create a new item param
      * 
-     * @param int $itemid 
+     * @param int   $itemid
+     * @param array $metadata Optional metadata
      * @return model_item_param 
      */
-    protected function create_item_param(int $itemid): model_item_param {
-        return new model_item_param($itemid, $this->model_name);
+    protected function create_item_param(int $itemid, array $metadata = []): model_item_param {
+        return new model_item_param($itemid, $this->model_name, $metadata);
     }
 
     /**

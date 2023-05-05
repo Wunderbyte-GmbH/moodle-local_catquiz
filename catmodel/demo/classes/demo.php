@@ -17,10 +17,17 @@ class demo extends model_model
             $person_params
         );
         $estimated_item_params = new model_item_param_list();
-        foreach($demo_item_responses as $item_id => $item_response){
+        foreach($demo_item_responses as $item_id => $item_responses){
             $item_difficulty = 0.5; // Just for demonstration. Set something meaningful here.
             $param = $this
-                ->create_item_param($item_id)
+                ->create_item_param(
+                    $item_id,
+                    [ // Add some metadata
+                        'mymetadata' => [
+                            'number_responses' => count($item_responses)
+                        ]
+                    ]
+                )
                 ->set_difficulty($item_difficulty);
             $estimated_item_params->add($param);
         }
