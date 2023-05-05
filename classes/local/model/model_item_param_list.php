@@ -121,22 +121,23 @@ class model_item_param_list implements ArrayAccess, IteratorAggregate {
         }
         return $data;
     }
-    public function save_to_db(int $contextid, string $model) {
+    public function save_to_db(int $contextid) {
 
         global $DB;
 
-        // Get existing records for the given contextid and model.
+        // Get existing records for the given contextid from the DB, so that we know
+        // whether we should create a new item param or update an existing one.
         $existing_params_rows = $DB->get_records(
             'local_catquiz_itemparams',
-            ['model' => $model, 'contextid' => $contextid,]
+            ['contextid' => $contextid,]
         );
         $existing_params = [];
         foreach ($existing_params_rows as $r) {
-            $existing_params[$r->componentid] = $r;
+            $existing_params[$r->componentid][$r->model] = $r;
         };
 
         $records = array_map(
-            function ($param) use ($contextid, $model) {
+            function ($param) use ($contextid) {
                 if (is_infinite($param->get_difficulty())) {
                     $difficulty = $param < 0 ? model_item_param::MODEL_NEG_INF : model_item_param::MODEL_POS_INF;
                 } else {
@@ -147,8 +148,9 @@ class model_item_param_list implements ArrayAccess, IteratorAggregate {
                     'componentid' => $param->get_id(),
                     'componentname' => 'question',
                     'difficulty' => $difficulty,
-                    'model' => $model,
+                    'model' => $param->get_model_name(),
                     'contextid' => $contextid,
+                    'status' => $param->get_status(),
                 ];
             },
             $this->item_params
@@ -158,10 +160,11 @@ class model_item_param_list implements ArrayAccess, IteratorAggregate {
         $new_records = [];
         $now = time();
         foreach ($records as $record) {
-            $is_existing_param = array_key_exists($record['componentid'], $existing_params);
+            $is_existing_param = array_key_exists($record['componentid'], $existing_params)
+                && array_key_exists($record['model'], $existing_params[$record['componentid']]);
             // If record already exists, update it. Otherwise, insert a new record to the DB
             if ($is_existing_param) {
-                $record['id'] = $existing_params[$record['componentid']]->id;
+                $record['id'] = $existing_params[$record['componentid']][$record['model']]->id;
                 $record['timemodified'] = $now;
                 $updated_records[] = $record;
             } else {
