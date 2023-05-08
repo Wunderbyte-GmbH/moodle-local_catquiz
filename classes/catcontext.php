@@ -267,17 +267,19 @@ class catcontext {
         $context = $DB->get_record_sql(
             "SELECT * FROM {local_catquiz_catcontext} WHERE json LIKE :default",
             [
-                'default' => 'default',
+                'default' => '%"default":true%',
             ]
         );
         if (!$context) {
+            $json = new stdClass();
+            $json->default = true;
             $context = (object) array(
                 'name' => get_string('defaultcontextname', 'local_catquiz'),
                 'description' => get_string('defaultcontextdescription', 'local_catquiz'),
                 'descriptionformat' => 1,
                 'starttimestamp' => 0,
                 'endtimestamp' => 0,
-                'json' => 'default',
+                'json' => json_encode($json),
             );
             $this->save_or_update($context);
         }
