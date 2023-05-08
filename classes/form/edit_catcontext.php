@@ -27,6 +27,7 @@ use context;
 use context_system;
 use core_form\dynamic_form;
 use local_catquiz\catcontext;
+use local_catquiz\local\model\model_strategy;
 use moodle_url;
 use stdClass;
 
@@ -54,6 +55,8 @@ class edit_catcontext extends dynamic_form {
             $mform->addElement('hidden', 'id', $data->id);
         }
 
+        $mform->addElement('hidden', 'default', $data->default);
+
         $mform->addElement('header', 'edit_catquiz', get_string('managecatcontexts', 'local_catquiz'));
 
         // Add a text field for the catcontext name
@@ -72,6 +75,7 @@ class edit_catcontext extends dynamic_form {
                 get_string("endtimestamp", "local_catquiz"));
         $mform->setType('endtimestamp', PARAM_INT);
 
+        model_strategy::handle_mform($mform);
     }
 
     /**
@@ -99,6 +103,11 @@ class edit_catcontext extends dynamic_form {
 
             $data->descriptionformat = $data->description['format'];
             $data->description = $data->description['text'];
+            $data->json = json_encode(
+                [
+                    'max_iterations' => $data->max_iterations,
+                    'default' => $data->default ? true : false,
+                ]);
 
             $catcontext = new catcontext($data);
 
@@ -134,6 +143,10 @@ class edit_catcontext extends dynamic_form {
                 'format' => $storeddata['descriptionformat'],
                 'text' => $storeddata['description'],
             ];
+
+            $jsonObj = json_decode($storeddata['json']);
+            $storeddata['max_iterations'] = $jsonObj->max_iterations; 
+            $storeddata['default'] = $jsonObj->default;
 
             foreach ($storeddata as $key => $value) {
                 $data->$key = $value;
@@ -176,13 +189,13 @@ class edit_catcontext extends dynamic_form {
     /**
      * Validate form.
      *
-     * @param stdClass $data
+     * @param array $data
      * @param array $files
      * @return array $errors
      */
     public function validation($data, $files): array {
         $errors = array();
-
+        model_strategy::validation($data, $files, $errors);
         return $errors;
     }
 }
