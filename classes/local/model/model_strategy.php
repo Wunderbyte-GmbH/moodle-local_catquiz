@@ -97,12 +97,12 @@ class model_strategy {
     public function run_estimation(): array {
         $person_abilities = $this->get_initial_person_abilities();
 
+        /**
+         * @var array<model_item_param_list>
+         */
+        $item_difficulties = [];
         // Re-calculate until the stop condition is triggered
         while (!$this->should_stop()) {
-            /**
-             * @var array<model_item_param_list>
-             */
-            $item_difficulties = [];
             foreach ($this->models as $name => $model) {
                 $item_difficulties[$name] = $model
                     ->estimate_item_params($person_abilities);

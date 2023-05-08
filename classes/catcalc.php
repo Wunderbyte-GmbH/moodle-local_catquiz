@@ -24,6 +24,8 @@
  */
 
 namespace local_catquiz;
+
+use local_catquiz\local\model\model_item_param_list;
 use local_catquiz\local\model\model_item_response;
 
 class catcalc{
@@ -77,7 +79,7 @@ class catcalc{
         return $item_difficulty;
     }
 
-    static function estimate_person_ability($demo_person_response, $item_difficulties){
+    static function estimate_person_ability($demo_person_response, model_item_param_list $item_difficulties){
 
         $likelihood_parts = [];
         $dbg_trace1 = [];
@@ -91,7 +93,8 @@ class catcalc{
 
         foreach($demo_person_response as $qid=>$qresponse){
 
-            $item_difficulty = 0.5;
+            //$item_difficulty = 0.5;
+            $item_difficulty = $item_difficulties[$qid]->get_difficulty();
 
             if($qresponse['fraction'] == 1){
                 $likelihood_part = function($x) use ($item_difficulty) {return \catmodel_raschbirnbauma\raschmodel::likelihood($x,$item_difficulty);};
