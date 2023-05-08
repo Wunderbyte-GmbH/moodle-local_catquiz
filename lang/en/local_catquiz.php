@@ -96,6 +96,10 @@ $string['searchcatcontext'] = 'Search Cat contexts';
 $string['selectcatcontext'] = 'Select a Cat context';
 $string['defaultcontextname'] = 'Default Cat context';
 $string['defaultcontextdescription'] = 'Includes all test items';
+$string['noint'] = 'Please enter an integer number';
+$string['notpositive'] = 'Please enter a positive number';
+$string['strategy'] = 'Strategy';
+$string['max_iterations'] = 'Maximum number of iterations';
 
 $string['starttimestamp'] = 'Starttime';
 $string['endtimestamp'] = 'Endtime';

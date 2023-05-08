@@ -27,6 +27,7 @@ namespace local_catquiz\local\model;
 use core_plugin_manager;
 use dml_exception;
 use local_catquiz\catcontext;
+use MoodleQuickForm;
 
 defined('MOODLE_INTERNAL') || die();
 
@@ -90,6 +91,27 @@ class model_strategy {
         $this->models = $this->create_installed_models();
         $this->ability_estimator = new model_person_ability_estimator_demo($this->responses);
         $this->max_iterations = $max_iterations;
+    }
+    
+    public static function handle_mform(MoodleQuickForm &$mform) {
+        $mform->addElement('header', 'strategy', get_string('strategy', 'local_catquiz'));
+        $mform->addElement('text', 'max_iterations', get_string('max_iterations', 'local_catquiz'), PARAM_INT);
+    }
+
+    /**
+     * Updates the $errors via reference
+     * 
+     * @param array $data
+     * @param array $files
+     * @return void
+     */
+    public static function validation($data, $files, &$errors) {
+        $max_iterations = intval($data['max_iterations']);
+        if ($max_iterations === 0) {
+            $errors['max_iterations'] = get_string('noint', 'local_catquiz');
+        } else if ($max_iterations <= 0) {
+            $errors['max_iterations'] = get_string('notpositive', 'local_catquiz');
+        }
     }
 
     /**
