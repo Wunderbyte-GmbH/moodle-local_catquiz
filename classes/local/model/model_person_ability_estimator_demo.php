@@ -24,6 +24,8 @@
 
 namespace local_catquiz\local\model;
 
+use local_catquiz\catcalc;
+
 defined('MOODLE_INTERNAL') || die();
 
 /**
@@ -36,10 +38,12 @@ class model_person_ability_estimator_demo extends model_person_ability_estimator
 
     public function get_person_abilities(array $item_param_lists): model_person_param_list
     {
+        // Select one set of item params to calculate the person abilities
+        $item_param_list = $item_param_lists['raschbirnbauma'];
         $person_param_list = new model_person_param_list();
-        foreach ($this->responses->get_user_ids() as $userid) {
+        foreach ($this->responses->as_array() as $userid => $item_response) {
+            $ability = catcalc::estimate_person_ability($item_response['component'], $item_param_list);
             $p = new model_person_param($userid);
-            $ability = 0.5; // Setting to 0.5 ust for demonstration. Here you could calcualte the ability.
             $p->set_ability($ability);
             $person_param_list->add($p);
         }
