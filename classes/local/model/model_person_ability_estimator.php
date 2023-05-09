@@ -46,8 +46,8 @@ abstract class model_person_ability_estimator {
     /**
      * Estimates person abilities
      * 
-     * @param array<model_item_param_list> $item_param_lists An array of item difficulty lists, one for each model
+     * @param model_item_param_list $item_param_list List of item parameters
      * @return model_person_param_list
      */
-    abstract public function get_person_abilities(array $item_param_lists): model_person_param_list;
+    abstract public function get_person_abilities(model_item_param_list $item_param_list): model_person_param_list;
 }

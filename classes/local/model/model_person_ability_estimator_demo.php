@@ -25,6 +25,7 @@
 namespace local_catquiz\local\model;
 
 use local_catquiz\catcalc;
+use local_catquiz\local\model\model_item_param_list;
 
 defined('MOODLE_INTERNAL') || die();
 
@@ -36,10 +37,8 @@ defined('MOODLE_INTERNAL') || die();
  */
 class model_person_ability_estimator_demo extends model_person_ability_estimator {
 
-    public function get_person_abilities(array $item_param_lists): model_person_param_list
+    public function get_person_abilities(model_item_param_list $item_param_list): model_person_param_list
     {
-        // Select one set of item params to calculate the person abilities
-        $item_param_list = $item_param_lists['raschbirnbauma'];
         $person_param_list = new model_person_param_list();
         $responses = $this->responses->as_array();
         foreach ($responses as $userid => $item_response) {
