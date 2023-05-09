@@ -80,17 +80,25 @@ class model_strategy {
     
     private int $iterations = 0;
 
-    private int $contextid;
+    private model_person_param_list $initial_person_abilities;
 
     /**
      * Model-specific instantiation can go here.
      */
-    public function __construct(model_responses $responses, int $contextid, int $max_iterations = self::MAX_ITERATIONS) {
-        $this->contextid = $contextid;
+    public function __construct(
+        model_responses $responses,
+        int $max_iterations = self::MAX_ITERATIONS,
+        ?model_person_param_list $saved_person_abilities = NULL
+    ) {
         $this->responses = $responses;
         $this->models = $this->create_installed_models();
         $this->ability_estimator = new model_person_ability_estimator_demo($this->responses);
         $this->max_iterations = $max_iterations;
+
+        if (empty($saved_person_abilities)) {
+            $saved_person_abilities = $responses->get_initial_person_abilities();
+        }
+        $this->initial_person_abilities = $saved_person_abilities;
     }
     
     public static function handle_mform(MoodleQuickForm &$mform) {
@@ -120,7 +128,7 @@ class model_strategy {
      * @return array<model_item_param_list, model_person_param_list>
      */
     public function run_estimation(): array {
-        $person_abilities = $this->get_initial_person_abilities();
+        $person_abilities = $this->initial_person_abilities;
 
         /**
          * @var array<model_item_param_list>
@@ -140,46 +148,26 @@ class model_strategy {
             $this->iterations++;
         }
 
-        foreach ($item_difficulties as $item_param_list) {
-            $item_param_list->save_to_db($this->contextid);
-        }
-        $person_abilities->save_to_db($this->contextid);
-
         return [$item_difficulties, $person_abilities];
     }
 
     /**
      * @return array<model_item_param_list, model_person_param_list>
      */
-    public function get_params_from_db(): array {
+    public function get_params_from_db(int $contextid): array {
         $models = $this->get_installed_models();
         foreach (array_keys($models) as $model_name) {
             $estimated_item_difficulties[$model_name] = model_item_param_list::load_from_db(
-                $this->contextid,
+                $contextid,
                 $model_name
             );
         }
-        $person_abilities = model_person_param_list::load_from_db($this->contextid);
+        $person_abilities = model_person_param_list::load_from_db($contextid);
         return [$estimated_item_difficulties, $person_abilities];
     }
 
     private function should_stop(): bool {
         return $this->iterations >= $this->max_iterations;
-    }
-
-    /**
-     * If there are already person params for the given context in the DB, then use them.
-     * Otherwise, create a new list
-     * 
-     * @return model_person_param_list 
-     * @throws dml_exception 
-     */
-    private function get_initial_person_abilities(): model_person_param_list {
-        $saved_person_abilities = model_person_param_list::load_from_db($this->contextid);
-        if (!empty($saved_person_abilities)) {
-            return $saved_person_abilities;
-        }
-        return $this->responses->get_initial_person_abilities();
     }
 
     /**

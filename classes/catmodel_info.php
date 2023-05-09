@@ -81,9 +81,14 @@ class catmodel_info {
         $strategy = $context->get_strategy();
 
         if ($calculate) {
-            return $strategy->run_estimation();
+            list($item_difficulties, $person_abilities) =  $strategy->run_estimation();
+            foreach ($item_difficulties as $item_param_list) {
+                $item_param_list->save_to_db($contextid);
+            }
+            $person_abilities->save_to_db($contextid);
+            return [$item_difficulties, $person_abilities];
         }
 
-        return $strategy->get_params_from_db();
+        return $strategy->get_params_from_db($contextid);
     }
 }
