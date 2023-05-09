@@ -25,6 +25,7 @@
 
 namespace local_catquiz;
 
+use local_catquiz\local\model\model_person_param_list;
 use local_catquiz\local\model\model_responses;
 use local_catquiz\local\model\model_strategy;
 use stdClass;
@@ -272,7 +273,8 @@ class catcontext {
     public function get_strategy(): model_strategy {
         $responses = self::create_response_from_db($this->id);
         $max_iterations = json_decode($this->json)->max_iterations;
-        return new model_strategy($responses, $this->id, $max_iterations);
+        $saved_abilities = model_person_param_list::load_from_db($this->id);
+        return new model_strategy($responses, $max_iterations, $saved_abilities);
     }
 
     // Add a default context that contains all test items
