@@ -57,7 +57,8 @@ class contextselector extends dynamic_form {
         $contexts = [];
         foreach ($contextsdb as $contextid => $context) {
             $contexts[$contextid] = $context->name;
-            if ($context->json === 'default') {
+            $jsonObj = json_decode($context->json);
+            if ($jsonObj && $jsonObj->default === true) {
                 $default = $contextid;
             }
         }
