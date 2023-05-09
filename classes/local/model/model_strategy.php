@@ -85,9 +85,9 @@ class model_strategy {
     /**
      * Model-specific instantiation can go here.
      */
-    public function __construct(int $contextid, int $max_iterations = self::MAX_ITERATIONS) {
+    public function __construct(model_responses $responses, int $contextid, int $max_iterations = self::MAX_ITERATIONS) {
         $this->contextid = $contextid;
-        $this->responses = catcontext::create_response_from_db($contextid);
+        $this->responses = $responses;
         $this->models = $this->create_installed_models();
         $this->ability_estimator = new model_person_ability_estimator_demo($this->responses);
         $this->max_iterations = $max_iterations;

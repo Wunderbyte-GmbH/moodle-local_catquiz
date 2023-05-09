@@ -26,6 +26,7 @@
 namespace local_catquiz;
 
 use local_catquiz\local\model\model_responses;
+use local_catquiz\local\model\model_strategy;
 use stdClass;
 
 require_once($CFG->dirroot . '/local/catquiz/lib.php');
@@ -136,6 +137,13 @@ class catcontext {
             $this->apply_values($newrecord);
         }
     }
+
+    public static function load_from_db(int $contextid): self {
+        global $DB;
+        $record = $DB->get_record('local_catquiz_catcontext', ['id' => $contextid]);
+        return new self($record);
+    }
+
     public static function create_response_from_db($contextid = 0): model_responses {
         global $DB;
 
@@ -259,6 +267,12 @@ class catcontext {
         $this->usermodified = $record->usermodified ?? $this->usermodified ?? 0;
         $this->timecreated = $record->timecreated ?? $this->timecreated ?? time();
         $this->timemodified = $record->timemodified ?? $this->timemodified ?? time();
+    }
+
+    public function get_strategy(): model_strategy {
+        $responses = self::create_response_from_db($this->id);
+        $max_iterations = json_decode($this->json)->max_iterations;
+        return new model_strategy($responses, $this->id, $max_iterations);
     }
 
     // Add a default context that contains all test items

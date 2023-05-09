@@ -27,6 +27,7 @@ namespace local_catquiz;
 
 use coding_exception;
 use core_plugin_manager;
+use local_catquiz\catcontext;
 use local_catquiz\data\catquiz_base;
 use local_catquiz\local\model\model_calc;
 use local_catquiz\local\model\model_item_param;
@@ -76,7 +77,8 @@ class catmodel_info {
      * @return array<model_item_param_list, model_person_param_list>
      */
     public function get_context_parameters( int $contextid = 0, bool $calculate = false) {
-        $strategy = new model_strategy($contextid);
+        $context = catcontext::load_from_db($contextid);
+        $strategy = $context->get_strategy();
 
         if ($calculate) {
             return $strategy->run_estimation();
