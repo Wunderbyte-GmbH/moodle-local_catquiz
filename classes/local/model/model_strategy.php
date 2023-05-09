@@ -74,6 +74,8 @@ class model_strategy {
      * @var model_person_ability_estimator
      */
     private model_person_ability_estimator $ability_estimator;
+
+    private int $max_iterations;
     
     private int $iterations = 0;
 
@@ -82,11 +84,12 @@ class model_strategy {
     /**
      * Model-specific instantiation can go here.
      */
-    public function __construct(int $contextid) {
+    public function __construct(int $contextid, int $max_iterations = self::MAX_ITERATIONS) {
         $this->contextid = $contextid;
         $this->responses = catcontext::create_response_from_db($contextid);
         $this->models = $this->create_installed_models();
         $this->ability_estimator = new model_person_ability_estimator_demo($this->responses);
+        $this->max_iterations = $max_iterations;
     }
 
     /**
@@ -139,7 +142,7 @@ class model_strategy {
     }
 
     private function should_stop(): bool {
-        return $this->iterations >= self::MAX_ITERATIONS;
+        return $this->iterations >= $this->max_iterations;
     }
 
     /**
