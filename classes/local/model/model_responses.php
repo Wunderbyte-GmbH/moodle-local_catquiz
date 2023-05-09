@@ -37,22 +37,25 @@ use local_catquiz\local\model\model_person_param_list;
 class model_responses {
     private $data;
 
-    public function to_item_list(): model_item_list {
+    /**
+     * @return array<int>
+     */
+    public function get_item_ids(): array {
         $questions = Array();
         $user_ids = array_keys($this->data);
+        $question_ids = [];
 
         foreach ($user_ids as $user_id) {
             $components = array();
             $components = array_merge($components, array_keys($this->data[$user_id]));
             foreach ($components as $component) {
-                $question_ids = array_keys($this->data[$user_id][$component]);
-                foreach ($question_ids as $question_id) {
-                    $questions[$question_id][] = $this->data[$user_id][$component][$question_id]['fraction'];
-                }
+                $question_ids = array_merge(
+                    $question_ids, array_keys($this->data[$user_id][$component])
+                );
             }
         }
 
-        return new model_item_list($questions);
+        return $question_ids;
     }
 
     public static function create_from_array(array $data) {
