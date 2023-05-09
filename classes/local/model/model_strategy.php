@@ -27,6 +27,7 @@ namespace local_catquiz\local\model;
 use core_plugin_manager;
 use dml_exception;
 use local_catquiz\catcontext;
+use local_catquiz\local\model\model_item_param_list;
 use MoodleQuickForm;
 
 defined('MOODLE_INTERNAL') || die();
@@ -51,6 +52,7 @@ defined('MOODLE_INTERNAL') || die();
 class model_strategy {
 
     const MAX_ITERATIONS = 5; // TODO: get value from DB?
+    const DEFAULT_MODEL = 'raschbirnbauma';
 
     /**
      * @var model_responses Contains necessary data for estimation
@@ -80,6 +82,8 @@ class model_strategy {
     
     private int $iterations = 0;
 
+    private ?string $model_override;
+
     private model_person_param_list $initial_person_abilities;
 
     /**
@@ -87,23 +91,37 @@ class model_strategy {
      */
     public function __construct(
         model_responses $responses,
-        int $max_iterations = self::MAX_ITERATIONS,
+        array $options = [],
         ?model_person_param_list $saved_person_abilities = NULL
     ) {
         $this->responses = $responses;
         $this->models = $this->create_installed_models();
         $this->ability_estimator = new model_person_ability_estimator_demo($this->responses);
-        $this->max_iterations = $max_iterations;
+        $this->set_options($options);
 
         if (empty($saved_person_abilities)) {
             $saved_person_abilities = $responses->get_initial_person_abilities();
         }
         $this->initial_person_abilities = $saved_person_abilities;
     }
+
+    private function set_options(array $options): self {
+        $this->max_iterations = array_key_exists('max_iterations', $options)
+            ? $options['max_iterations']
+            : self::MAX_ITERATIONS;
+        $strategy_options = array_key_exists('strategy', $options)
+            ? $options['strategy']
+            : [];
+
+        $this->model_override = $strategy_options['model_override'];
+
+        return $this;
+    }
     
     public static function handle_mform(MoodleQuickForm &$mform) {
         $mform->addElement('header', 'strategy', get_string('strategy', 'local_catquiz'));
         $mform->addElement('text', 'max_iterations', get_string('max_iterations', 'local_catquiz'), PARAM_INT);
+        $mform->addElement('text', 'model_override', get_string('model_override', 'local_catquiz'), PARAM_TEXT);
     }
 
     /**
@@ -140,15 +158,71 @@ class model_strategy {
                 $item_difficulties[$name] = $model
                     ->estimate_item_params($person_abilities);
             }
-            // The person ability estimator decides which items to use
+
+            $filtered_item_difficulties = $this->select_items($item_difficulties);
             $person_abilities = $this
                 ->ability_estimator
-                ->get_person_abilities($item_difficulties);
+                ->get_person_abilities($filtered_item_difficulties);
 
             $this->iterations++;
         }
 
         return [$item_difficulties, $person_abilities];
+    }
+
+    /**
+     * Merges the given item param lists into a single list
+     * 
+     * @param array<model_item_param_list> $item_difficulties_lists List of calculated item difficulties, one for each model
+     * @return model_item_param_list A single list of item difficulties that is a combination of the input lists
+     */
+    private function select_items(array $item_difficulties_lists): model_item_param_list {
+        $new_item_difficulties = new model_item_param_list();
+        $item_ids = $this->responses->get_item_ids();
+
+        /**
+         * Select items according to the following rules:
+         * 1. If there is an item-level model override, select the item from that model
+         * 2. If there is a strategy-level override, select the item from that model
+         * 3. Otherwise, select the item from the default model
+         * 
+         * TODO: Remove, just for illustration:
+         * This could be defined at the DB level with the following data in the `json` field:
+         * {
+         *      "default": true, // this is the default context
+         *      "max_iterations": 10,
+         *      "overrides": {
+         *          "model": "demo",
+         *          "item": [
+         *              {"id": 1, "model": "demo2",},
+         *              {"id": 35, "model": "raschbirnbauma"}
+         *          ]
+         *      }
+         * }
+         */
+        foreach ($item_ids as $item_id) {
+            if ($model = $this->get_item_override($item_id)) {
+                $new_item_difficulties->add($item_difficulties_lists[$model][$item_id]);
+            } else if ($model = $this->get_model_override()) {
+                $new_item_difficulties->add($item_difficulties_lists[$model][$item_id]);
+            } else {
+                $new_item_difficulties->add($item_difficulties_lists[$this->get_default_model()][$item_id]);
+            }
+        }
+
+        return $new_item_difficulties;
+    }
+
+    private function get_item_override(int $item_id): ?string {
+        return NULL; // TODO implement
+    }
+
+    private function get_model_override(): ?string {
+        return $this->model_override; // TODO implement
+    }
+
+    private function get_default_model(): string {
+        return self::DEFAULT_MODEL;
     }
 
     /**

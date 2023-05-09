@@ -272,9 +272,9 @@ class catcontext {
 
     public function get_strategy(): model_strategy {
         $responses = self::create_response_from_db($this->id);
-        $max_iterations = json_decode($this->json)->max_iterations;
+        $options = json_decode($this->json, true);
         $saved_abilities = model_person_param_list::load_from_db($this->id);
-        return new model_strategy($responses, $max_iterations, $saved_abilities);
+        return new model_strategy($responses, $options, $saved_abilities);
     }
 
     // Add a default context that contains all test items
