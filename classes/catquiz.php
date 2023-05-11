@@ -130,7 +130,7 @@ class catquiz {
 
         global $DB;
         $contextfilter = $contextid === 0
-            ? "ccc1.json = :default"
+            ? $DB->sql_like('ccc1.json',':default')
             : "ccc1.id = :contextid";
 
         $select = ' DISTINCT *';
@@ -170,7 +170,7 @@ class catquiz {
         $params = [
             'catscaleid' => $catscaleid,
             'contextid' => $contextid,
-            'default' => 'default',
+            'default' => '%"default":true%',
         ];
         $filter = '';
 
