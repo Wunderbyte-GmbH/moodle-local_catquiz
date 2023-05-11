@@ -23,6 +23,7 @@ import DynamicForm from 'core_form/dynamicform';
 
 const SELECTORS = {
     FORMCONTAINER: '#select_context_form',
+    CALCULATEBUTTON: '#model_button'
 };
 /**
  * Add event listener to buttons.
@@ -33,6 +34,12 @@ export const init = () => {
         SELECTORS.FORMCONTAINER),
         'local_catquiz\\form\\contextselector'
     );
+
+    document.querySelector(SELECTORS.CALCULATEBUTTON).onclick = function() {
+        let searchParams = new URLSearchParams(window.location.search);
+        searchParams.set("calculate", true);
+        window.location.search = searchParams.toString();
+    };
 
     // If a user selects a context, redirect to a URL that includes the selected
     // context as `contextid` query parameter
