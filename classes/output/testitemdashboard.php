@@ -30,6 +30,7 @@
 
 namespace local_catquiz\output;
 
+use catmodel_raschbirnbauma\raschmodel;
 use context_system;
 use html_writer;
 use local_catquiz\catmodel_info;
@@ -92,24 +93,23 @@ class testitemdashboard implements renderable, templatable {
                 continue;
             }
 
-            $discrimination = 1.0;
-
-            // Calculate the probability correct for each person ability
-            $probabilities = [];
-            foreach ($modelpersonparams as $p) {
-                $logit = $discrimination * ($p->get_ability() - $item->get_difficulty());
-                $probability = 1 / (1 + exp(-$logit));
-                $probabilities[$p->get_id()] = $probability;
+            $difficulty = $item->get_difficulty();
+            $likelihoods = [];
+            for ($ability=-5; $ability<=5 ; $ability += 0.5) {
+                $likelihoods[] = raschmodel::likelihood($ability, $difficulty);
             }
 
             $chart = new \core\chart_line();
             $chart->set_smooth(true); // Calling set_smooth() passing true as parameter, will display smooth lines.
 
             // Create the graph for difficulty.
-            $series1 = new \core\chart_series(get_string('difficulty', 'local_catquiz'), array_values($probabilities));
-            $labels = array_keys($probabilities);
+            $series1 = new \core\chart_series(
+                get_string('difficulty', 'local_catquiz'),
+                array_values($likelihoods));
+            $labels = range(-5, 5, 0.5);
             $chart->add_series($series1);
             $chart->set_labels($labels);
+            $chart->get_xaxis(0, true)->set_label(get_string('personability', 'local_catquiz'));
 
             $body = html_writer::tag('div', $OUTPUT->render($chart), ['dir' => 'ltr']);
 
