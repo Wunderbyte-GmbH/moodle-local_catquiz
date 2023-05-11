@@ -175,13 +175,15 @@ class catscaledashboard implements renderable, templatable {
 
         $table->set_filter_sql($select, $from, $where, $filter, $params);
 
-        $table->define_columns(['idnumber', 'questiontext', 'qtype', 'categoryname', 'questioncontextattempts', 'action']);
+        $table->define_columns(['idnumber', 'questiontext', 'qtype', 'categoryname', 'questioncontextattempts', 'model', 'itemdifficulty', 'action']);
         $table->define_headers([
             get_string('label', 'local_catquiz'),
             get_string('questiontext', 'local_catquiz'),
             get_string('questiontype', 'local_catquiz'),
             get_string('questioncategories', 'local_catquiz'),
             get_string('questioncontextattempts', 'local_catquiz'),
+            get_string('model', 'local_catquiz'),
+            get_string('itemdifficulty', 'local_catquiz'),
             get_string('action', 'local_catquiz'),
         ]);
 
