@@ -99,7 +99,7 @@ class model_strategy {
         $this->ability_estimator = new model_person_ability_estimator_demo($this->responses);
         $this->set_options($options);
 
-        if (empty($saved_person_abilities)) {
+        if (count($saved_person_abilities) === 0) {
             $saved_person_abilities = $responses->get_initial_person_abilities();
         }
         $this->initial_person_abilities = $saved_person_abilities;
