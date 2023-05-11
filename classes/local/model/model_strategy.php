@@ -167,7 +167,34 @@ class model_strategy {
             $this->iterations++;
         }
 
-        return [$item_difficulties, $person_abilities];
+        $item_difficulties_with_status = $this->set_status(
+            $item_difficulties,
+            $filtered_item_difficulties
+        );
+
+        return [$item_difficulties_with_status, $person_abilities];
+    }
+
+    /**
+     * Set the status field in the caluclated item params
+     *
+     * In the filtered items, the status is set to "SET_BY_STRATEGY". Here, this
+     * status is copied back to the corresponding calculated items.
+     *
+     * @param model_item_param_list[] $calculated_item_difficulties
+     * @param model_item_param_list $selected_item_difficulties
+     * @return model_item_param_list[]
+     */
+    private function set_status(
+        array $calculated_item_difficulties,
+        model_item_param_list $selected_item_difficulties
+    ) {
+        foreach ($selected_item_difficulties as $selected_item) {
+            $model = $selected_item->get_model_name();
+            $id = $selected_item->get_id();
+            $calculated_item_difficulties[$model][$id]->set_status($selected_item->get_status());
+        }
+        return $calculated_item_difficulties;
     }
 
     /**
@@ -202,12 +229,14 @@ class model_strategy {
          */
         foreach ($item_ids as $item_id) {
             if ($model = $this->get_item_override($item_id)) {
-                $new_item_difficulties->add($item_difficulties_lists[$model][$item_id]);
+                $item = $item_difficulties_lists[$model][$item_id];
             } else if ($model = $this->get_model_override()) {
-                $new_item_difficulties->add($item_difficulties_lists[$model][$item_id]);
+                $item = $item_difficulties_lists[$model][$item_id];
             } else {
-                $new_item_difficulties->add($item_difficulties_lists[$this->get_default_model()][$item_id]);
+                $item = $item_difficulties_lists[$this->get_default_model()][$item_id];
             }
+            $item->set_status(model_item_param::STATUS_SET_BY_STRATEGY);
+            $new_item_difficulties->add($item);
         }
 
         return $new_item_difficulties;
