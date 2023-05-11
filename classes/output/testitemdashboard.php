@@ -96,7 +96,7 @@ class testitemdashboard implements renderable, templatable {
 
             // Calculate the probability correct for each person ability
             $probabilities = [];
-            foreach ($modelpersonparams[$modelname] as $p) {
+            foreach ($modelpersonparams as $p) {
                 $logit = $discrimination * ($p->get_ability() - $item->get_difficulty());
                 $probability = 1 / (1 + exp(-$logit));
                 $probabilities[$p->get_id()] = $probability;
