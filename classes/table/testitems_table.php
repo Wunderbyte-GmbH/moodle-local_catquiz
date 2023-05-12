@@ -28,6 +28,7 @@ use context_system;
 use Exception;
 use html_writer;
 use local_catquiz\catscale;
+use local_wunderbyte_table\output\table;
 use local_wunderbyte_table\wunderbyte_table;
 use mod_booking\booking;
 use moodle_url;
@@ -144,12 +145,15 @@ class testitems_table extends wunderbyte_table {
             'id' => $values->id,
             'methodname' => '', // The method needs to be added to your child of wunderbyte_table class.
             'data' => [ // Will be added eg as data-id = $values->id, so values can be transmitted to the method above.
-                'key' => 'id',
-                'value' => $values->id,
+                'id' => $values->id,
             ]
         ];
 
-        return $OUTPUT->render_from_template('local_wunderbyte_table/component_actionbutton', $data);;
+
+        // This transforms the array to make it easier to use in mustache template.
+        table::transform_actionbuttons_array($data['showactionbuttons']);
+
+        return $OUTPUT->render_from_template('local_wunderbyte_table/component_actionbutton', $data);
     }
 
     /**
