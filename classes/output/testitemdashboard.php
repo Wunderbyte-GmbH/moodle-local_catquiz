@@ -86,6 +86,9 @@ class testitemdashboard implements renderable, templatable {
         $catmodel_info = new catmodel_info();
         list($modelitemparams, $modelpersonparams) = $catmodel_info->get_context_parameters($this->contextid);
 
+        $chart = new \core\chart_line();
+        $chart->set_smooth(true); // Calling set_smooth() passing true as parameter, will display smooth lines.
+
         foreach ($modelitemparams as $modelname => $itemparamlist) {
 
             $item = $itemparamlist[$this->testitemid];
@@ -99,26 +102,26 @@ class testitemdashboard implements renderable, templatable {
                 $likelihoods[] = raschmodel::likelihood($ability, $difficulty);
             }
 
-            $chart = new \core\chart_line();
-            $chart->set_smooth(true); // Calling set_smooth() passing true as parameter, will display smooth lines.
-
             // Create the graph for difficulty.
             $series1 = new \core\chart_series(
-                get_string('difficulty', 'local_catquiz'),
+                sprintf(
+                    '%s: %s',
+                    get_string('pluginname', sprintf('catmodel_%s', $modelname)),
+                    $difficulty
+                ),
                 array_values($likelihoods));
             $labels = range(-5, 5, 0.5);
             $chart->add_series($series1);
             $chart->set_labels($labels);
             $chart->get_xaxis(0, true)->set_label(get_string('personability', 'local_catquiz'));
 
-            $body = html_writer::tag('div', $OUTPUT->render($chart), ['dir' => 'ltr']);
-
-            $returnarray[]= [
-                'title' => get_string('pluginname', "catmodel_" . $modelname),
-                'body' => $body,
-                'difficulty' => $item->get_difficulty(),
-            ];
         }
+        $body = html_writer::tag('div', $OUTPUT->render($chart), ['dir' => 'ltr']);
+
+        $returnarray[] = [
+            'title' => get_string('likelihood', 'local_catquiz'),
+            'body' => $body,
+        ];
 
         return $returnarray;
     }
