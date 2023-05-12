@@ -340,7 +340,7 @@ class catscaledashboard implements renderable, templatable {
             get_string('firstname', 'core'),
             get_string('lastname', 'core'),
             get_string('questioncontextattempts', 'local_catquiz'),
-            get_string('personabilities', 'local_catquiz'). " (max from all models)",
+            get_string('personabilities', 'local_catquiz'),
             get_string('action', 'local_catquiz'),
         ]);
 
