@@ -25,6 +25,7 @@ require_once($CFG->dirroot . '/question/engine/lib.php');
 
 use context_module;
 use context_system;
+use Exception;
 use html_writer;
 use local_catquiz\catscale;
 use local_wunderbyte_table\wunderbyte_table;
@@ -75,7 +76,11 @@ class testitems_table extends wunderbyte_table {
 
         global $OUTPUT;
 
-        $question = question_bank::load_question($values->id);
+        //try {
+        //    $question = question_bank::load_question($values->id);
+        //} catch (Exception $e) {
+        //    return $values->questiontext;
+        //}
 
         $context = context_system::instance();
 
