@@ -122,6 +122,9 @@ class testitems_table extends wunderbyte_table {
         return get_string('pluginname', 'qtype_' . $values->qtype);
     }
 
+    public function col_questioncontextattempts($values) {
+        return $values->questioncontextattempts;
+    }
     public function col_action($values) {
 
         global $OUTPUT;

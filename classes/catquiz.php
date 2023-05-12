@@ -195,24 +195,51 @@ class catquiz {
      * @param array $filterarray
      * @return void
      */
-    public static function return_sql_for_addcatscalequestions(int $catscaleid, array $wherearray = [], array $filterarray = []) {
-
+    public static function return_sql_for_addcatscalequestions(
+        int $catscaleid,
+        int $contextid,
+        array $wherearray = [],
+        array $filterarray = []
+    ) {
         global $DB;
+        $contextfilter = $contextid === 0
+            ? $DB->sql_like('ccc1.json',':default')
+            : "ccc1.id = :contextid";
 
+        list(,$context_from, $context_where, $context_params) = self::get_sql_for_stat_base_request();
         $params = [];
-        $select = 'DISTINCT id, idnumber, name, questiontext, qtype, categoryname, \'question\' as component, catscaleids';
-        $from = "( SELECT q.id, qbe.idnumber, q.name, q.questiontext, q.qtype, qc.name as categoryname, " .
+        $select = '
+            DISTINCT
+                id,
+                idnumber,
+                name,
+                questiontext,
+                qtype,
+                categoryname,
+                \'question\' as component,
+                contextattempts as questioncontextattempts,
+                catscaleids
+            ';
+        $from = "( SELECT q.id, qbe.idnumber, q.name, q.questiontext, q.qtype, qc.name as categoryname, s2.contextattempts," .
              $DB->sql_group_concat($DB->sql_concat("'-'", 'lci.catscaleid', "'-'")) ." as catscaleids
             FROM {question} q
                 JOIN {question_versions} qv ON q.id=qv.questionid
                 JOIN {question_bank_entries} qbe ON qv.questionbankentryid=qbe.id
                 JOIN {question_categories} qc ON qc.id=qbe.questioncategoryid
                 LEFT JOIN {local_catquiz_items} lci ON lci.componentid=q.id AND lci.componentname='question'
-                GROUP BY q.id, qbe.idnumber, q.name, q.questiontext, q.qtype, qc.name
+                LEFT JOIN (
+                    SELECT ccc1.id AS contextid, qa.questionid, COUNT(*) AS contextattempts
+                    FROM $context_from
+                    WHERE $contextfilter
+                    GROUP BY ccc1.id, qa.questionid
+                ) s2 ON q.id = s2.questionid
+                GROUP BY q.id, qbe.idnumber, q.name, q.questiontext, q.qtype, qc.name, s2.contextattempts
             ) as s1";
 
         $where = " ( " . $DB->sql_like('catscaleids', ':catscaleid', false, false, true) . ' OR catscaleids IS NULL ) ';
         $params['catscaleid'] = "%-$catscaleid-%";
+        $params['contextid'] = $contextid;
+        $params['default'] = '%"default":true%';
         $filter = '';
 
         foreach ($wherearray as $key => $value) {
