@@ -129,9 +129,15 @@ class catquiz {
     public static function return_sql_for_catscalequestions(int $catscaleid, array $wherearray = [], array $filterarray = [], int $contextid) {
 
         global $DB;
-        $contextfilter = $contextid === 0
-            ? $DB->sql_like('ccc1.json',':default')
-            : "ccc1.id = :contextid";
+        if ($contextid === 0) {
+            $default_context = $DB->get_record_sql(
+                'SELECT id FROM {local_catquiz_catcontext} WHERE '.$DB->sql_like('json', ':default'),
+                [
+                    'default' => '%"default":true%',
+                ]
+            );
+            $contextid = $default_context->id;
+        }
 
         $select = ' DISTINCT *';
         $from = "(SELECT
@@ -144,8 +150,9 @@ class catquiz {
                     lci.catscaleid catscaleid,
                     lci.componentname component,
                     attempts as questioncontextattempts,
-                    lcip.model,
-                    lcip.difficulty
+                    s3.model,
+                    s3.difficulty,
+                    s3.status
                 FROM {question} q
                 JOIN {question_versions} qv
                     ON q.id=qv.questionid
@@ -163,21 +170,28 @@ class catquiz {
                                 AND qas.fraction IS NOT NULL
                         JOIN {question_attempts} qa
                             ON qas.questionattemptid = qa.id
-                    WHERE $contextfilter
+                    WHERE ccc1.id = :contextid
                     GROUP BY ccc1.id, qa.questionid
                 ) s2 ON q.id = s2.questionid
-                LEFT JOIN {local_catquiz_itemparams} lcip
-                    ON lcip.componentid = q.id
-                        AND lcip.componentname = 'question'
-                        AND lcip.status = 1
-                        AND lcip.contextid = s2.contextid
+                LEFT JOIN (
+                    SELECT lcip.contextid, lcip.componentid, lcip.model, lcip.difficulty, lcip.status
+                    FROM {local_catquiz_itemparams} lcip
+                    JOIN (
+                        SELECT contextid, componentid, componentname, max(status) AS status
+                        FROM {local_catquiz_itemparams}
+                        WHERE contextid = :contextid2
+                        GROUP BY componentid, componentname, contextid
+                    ) s3 ON s3.componentid = lcip.componentid AND  lcip.status = s3.status AND s3.componentname = lcip.componentname AND s3.contextid = lcip.contextid
+                    WHERE lcip.contextid = :contextid3
+                ) s3 ON q.id = s3.componentid
             ) as s1";
 
         $where = ' catscaleid = :catscaleid ';
         $params = [
             'catscaleid' => $catscaleid,
             'contextid' => $contextid,
-            'default' => '%"default":true%',
+            'contextid2' => $contextid,
+            'contextid3' => $contextid,
         ];
         $filter = '';
 
