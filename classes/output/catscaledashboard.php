@@ -189,8 +189,20 @@ class catscaledashboard implements renderable, templatable {
 
         $table->set_filter_sql($select, $from, $where, $filter, $params);
 
-        $table->define_columns(['idnumber', 'questiontext', 'qtype', 'categoryname', 'questioncontextattempts', 'model', 'itemdifficulty', 'action']);
+        $table->define_columns([
+            'qid',
+            'idnumber',
+            'questiontext',
+            'qtype',
+            'categoryname',
+            'attempts',
+            'model',
+            'itemdifficulty',
+            'status',
+            'action'
+        ]);
         $table->define_headers([
+            get_string('questionid', 'local_catquiz'),
             get_string('label', 'local_catquiz'),
             get_string('questiontext', 'local_catquiz'),
             get_string('questiontype', 'local_catquiz'),
@@ -198,6 +210,7 @@ class catscaledashboard implements renderable, templatable {
             get_string('questioncontextattempts', 'local_catquiz'),
             get_string('model', 'local_catquiz'),
             get_string('itemdifficulty', 'local_catquiz'),
+            get_string('status', 'local_catquiz'),
             get_string('action', 'local_catquiz'),
         ]);
 
@@ -215,7 +228,7 @@ class catscaledashboard implements renderable, templatable {
             'shortanswer' => get_string('pluginname', 'qtype_shortanswer'),
         ]]);
         $table->define_fulltextsearchcolumns(['idnumber', 'name', 'questiontext', 'qtype']);
-        $table->define_sortablecolumns(['idnumber', 'name', 'questiontext', 'qtype', 'questioncontextattempts']);
+        $table->define_sortablecolumns(['qid', 'idnumber', 'name', 'questiontext', 'qtype', 'attempts']);
 
         $table->tabletemplate = 'local_wunderbyte_table/twtable_list';
         $table->define_cache('local_catquiz', 'testitemstable');

@@ -28,6 +28,7 @@ use context_system;
 use Exception;
 use html_writer;
 use local_catquiz\catscale;
+use local_catquiz\local\model\model_item_param;
 use local_wunderbyte_table\output\table;
 use local_wunderbyte_table\wunderbyte_table;
 use mod_booking\booking;
@@ -126,6 +127,55 @@ class testitems_table extends wunderbyte_table {
     public function col_questioncontextattempts($values) {
         return $values->questioncontextattempts;
     }
+
+    public function col_status($values) {
+        global $OUTPUT;
+
+        // No need to display checkboxes if there are no item params for this
+        // item
+        if (!$values->model) {
+            return;
+        }
+
+        $data['showactionbuttons'][] = [
+            'label' => get_string('excluded', 'local_catquiz'), // Name of your action button.
+            'id' => $values->id,
+            'name' => $this->uniqueid.'-'.$values->id,
+            'methodname' => 'update_item_status', // The method needs to be added to your child of wunderbyte_table class.
+            'ischeckbox' => true,
+            'checked' => $values->status == model_item_param::STATUS_EXCLUDE,
+            'data' => [ // Will be added eg as data-id = $values->id, so values can be transmitted to the method above.
+                'id' => $values->id,
+                'componentid' => $values->qid,
+                'status' => model_item_param::STATUS_EXCLUDE,
+                'model' => $values->model,
+                'labelcolumn' => 'username',
+            ]
+        ];
+
+        $data['showactionbuttons'][] = [
+            'label' => get_string('included', 'local_catquiz'), // Name of your action button.
+            'id' => $values->id,
+            'name' => $this->uniqueid.'-'.$values->id,
+            'methodname' => 'update_item_status', // The method needs to be added to your child of wunderbyte_table class.
+            'ischeckbox' => true,
+            'checked' => $values->status == model_item_param::STATUS_SET_MANUALLY,
+            'data' => [ // Will be added eg as data-id = $values->id, so values can be transmitted to the method above.
+                'id' => $values->id,
+                'componentid' => $values->qid,
+                'status' => model_item_param::STATUS_SET_MANUALLY,
+                'model' => $values->model,
+                'labelcolumn' => 'username',
+            ]
+        ];
+
+        // This transforms the array to make it easier to use in mustache template.
+        table::transform_actionbuttons_array($data['showactionbuttons']);
+
+        return $OUTPUT->render_from_template('local_wunderbyte_table/component_actionbutton', $data);
+
+
+    }
     public function col_action($values) {
 
         global $OUTPUT;
@@ -209,6 +259,42 @@ class testitems_table extends wunderbyte_table {
         return [
             'success' => 1,
             'message' => get_string('success'),
+        ];
+    }
+
+    /**
+     * Toggle Checkbox
+     *
+     * @param integer $id
+     * @param string $data
+     * @return array
+     */
+    public function update_item_status(int $id, string $data): array {
+        $dataobject = json_decode($data);
+
+        // If the checkbox is unchecked, set the status to "not set".
+        // Otherwise, keep the selected status.
+        $dataobject->status = $dataobject->state == 'false'
+            ? model_item_param::STATUS_NOT_SET
+            : $dataobject->status;
+
+        try {
+            model_item_param::update_in_db(
+                $dataobject->id,
+                $dataobject->componentid,
+                $dataobject->model,
+                $this->contextid,
+                $dataobject
+            );
+        } catch (Exception $e) {
+            return [
+                'success' => false,
+                'message' => 'Could not update item in the DB',
+            ];
+        }
+
+        return [
+            'success' => 1,
         ];
     }
 }
