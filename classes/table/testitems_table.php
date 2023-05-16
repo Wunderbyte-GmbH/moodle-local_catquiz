@@ -109,13 +109,6 @@ class testitems_table extends wunderbyte_table {
         return $OUTPUT->render_from_template('local_catquiz/modals/modal_questionpreview', $data);
     }
 
-    public function col_model($values) {
-        return $values->model;
-    }
-
-    public function col_itemdifficulty($values) {
-        return $values->difficulty;
-    }
     /**
      * Overrides the output for this column.
      * @param object $values

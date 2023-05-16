@@ -197,7 +197,7 @@ class catscaledashboard implements renderable, templatable {
             'categoryname',
             'attempts',
             'model',
-            'itemdifficulty',
+            'difficulty',
             'status',
             'action'
         ]);
@@ -228,7 +228,16 @@ class catscaledashboard implements renderable, templatable {
             'shortanswer' => get_string('pluginname', 'qtype_shortanswer'),
         ]]);
         $table->define_fulltextsearchcolumns(['idnumber', 'name', 'questiontext', 'qtype']);
-        $table->define_sortablecolumns(['qid', 'idnumber', 'name', 'questiontext', 'qtype', 'attempts']);
+        $table->define_sortablecolumns([
+            'qid',
+            'idnumber',
+            'name',
+            'questiontext',
+            'qtype',
+            'attempts',
+            'model',
+            'difficulty'
+        ]);
 
         $table->tabletemplate = 'local_wunderbyte_table/twtable_list';
         $table->define_cache('local_catquiz', 'testitemstable');
@@ -350,9 +359,9 @@ class catscaledashboard implements renderable, templatable {
     $ajaxformdata = empty($this->catcontextid) ? [] : ['contextid' => $this->catcontextid];
     $form = new \local_catquiz\form\contextselector(null, null, 'post', '', [], true, $ajaxformdata);
     // Set the form data with the same method that is called when loaded from JS. It should correctly set the data for the supplied arguments.
-    $form->set_data_for_dynamic_submission(); 
+    $form->set_data_for_dynamic_submission();
     // Render the form in a specific container, there should be nothing else in the same container.
-    return html_writer::div($form->render(), '', ['id' => 'select_context_form']); 
+    return html_writer::div($form->render(), '', ['id' => 'select_context_form']);
     }
 
     private function render_student_stats_table(int $catscaleid, int $catcontextid) {
