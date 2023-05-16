@@ -63,34 +63,6 @@ class student_stats_table extends wunderbyte_table {
         return $values->id;
     }
 
-    /**
-     * Overrides the output for this column.
-     * @param object $values
-     */
-    public function col_firstname($values) {
-        return $values->firstname;
-    }
-
-    /**
-     * Overrides the output for this column.
-     * @param object $values
-     */
-    public function col_lastname($values) {
-        return $values->lastname;
-    }
-
-    /**
-     * Overrides the output for this column.
-     * @param object $values
-     */
-    public function col_studentattempts($values) {
-        return $values->studentattempts;
-    }
-
-    public function col_personabilities($values) {
-        return $values->max;
-    }
-
     public function col_action($values) {
         global $OUTPUT;
 
