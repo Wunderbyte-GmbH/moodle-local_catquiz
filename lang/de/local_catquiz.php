@@ -191,6 +191,12 @@ $string['numberofanswersincorrect'] = "Falsch";
 $string['numberofanswerspartlycorrect'] = "Teilweise richtig";
 $string['averageofallanswers'] = "Durchschnitt";
 
+$string['problematic'] = 'Problematisch';
+$string['notselected'] = 'Ungesetzt';
+$string['selected'] = 'Automatisch gesetzt';
+$string['manuallyselected'] = 'Manuell gesetzt';
+$string['manuallyexcluded'] = 'Manuell ausgeschlossen';
+
 // Student Details
 $string['studentdetails'] = "Student details";
 

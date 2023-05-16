@@ -314,7 +314,7 @@ class catscaledashboard implements renderable, templatable {
         return html_writer::tag('div', $OUTPUT->render($chart), ['dir' => 'ltr']);
     }
     /**
-     * @param array<model_item_param_list> $item_lists
+     * @param array
      */
     private function render_itemdifficulties(array $item_lists) {
 

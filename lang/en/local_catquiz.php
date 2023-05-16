@@ -196,6 +196,12 @@ $string['numberofanswersincorrect'] = "Wrong";
 $string['numberofanswerspartlycorrect'] = "Partly correct";
 $string['averageofallanswers'] = "Average";
 
+$string['problematic'] = 'Problematic';
+$string['notselected'] = 'Not chosen';
+$string['selected'] = 'Automatically chosen';
+$string['manuallyselected'] = 'Manually chosen';
+$string['manuallyexcluded'] = 'Manually excluded';
+
 // Student Details
 $string['studentdetails'] = "Student details";
 

@@ -71,10 +71,10 @@ class catmodel_info {
 
 
     /**
-     * 
-     * @param int $contextid 
-     * @param bool $calculate 
-     * @return array<model_item_param_list, model_person_param_list>
+     *
+     * @param int $contextid
+     * @param bool $calculate
+     * @return array
      */
     public function get_context_parameters( int $contextid = 0, bool $calculate = false) {
         $context = catcontext::load_from_db($contextid);

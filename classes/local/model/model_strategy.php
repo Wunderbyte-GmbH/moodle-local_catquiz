@@ -15,7 +15,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * 
+ *
  *
  * @package    local_catquiz
  * @copyright  2023 Wunderbyte GmbH <georg.maisser@wunderbyte.at>
@@ -35,7 +35,7 @@ defined('MOODLE_INTERNAL') || die();
 /**
  * Objects of this class are responsible for running the estimation process and
  * returning as result the new person abilities and item difficulties.
- * 
+ *
  * A strategy does the following:
  *   1. Create an inital list of person abilities PA
  *   2. Calls "estimate_item_difficulties(PA)" on each CAT model -> gets a list of item difficulties
@@ -43,7 +43,7 @@ defined('MOODLE_INTERNAL') || die();
  *
  * Steps 2. and 3. are repeated until some stop condition is met: this could be a maximum number of
  * iterations or if the change of item difficulties between two iterations is below a certain threshold.
- * 
+ *
  * If the process is finished, a list of person abilities and item difficulties is returned.
  *
  * @copyright  2023 Wunderbyte GmbH <georg.maisser@wunderbyte.at>
@@ -79,7 +79,7 @@ class model_strategy {
     private model_person_ability_estimator $ability_estimator;
 
     private int $max_iterations;
-    
+
     private int $iterations = 0;
 
     private ?string $model_override;
@@ -117,7 +117,7 @@ class model_strategy {
 
         return $this;
     }
-    
+
     public static function handle_mform(MoodleQuickForm &$mform) {
         $mform->addElement('header', 'strategy', get_string('strategy', 'local_catquiz'));
         $mform->addElement('text', 'max_iterations', get_string('max_iterations', 'local_catquiz'), PARAM_INT);
@@ -126,7 +126,7 @@ class model_strategy {
 
     /**
      * Updates the $errors via reference
-     * 
+     *
      * @param array $data
      * @param array $files
      * @return void
@@ -142,7 +142,7 @@ class model_strategy {
 
     /**
      * Starts the estimation process
-     * 
+     *
      * @return array<model_item_param_list, model_person_param_list>
      */
     public function run_estimation(): array {
@@ -199,7 +199,7 @@ class model_strategy {
 
     /**
      * Merges the given item param lists into a single list
-     * 
+     *
      * @param array<model_item_param_list> $item_difficulties_lists List of calculated item difficulties, one for each model
      * @return model_item_param_list A single list of item difficulties that is a combination of the input lists
      */
@@ -212,7 +212,7 @@ class model_strategy {
          * 1. If there is an item-level model override, select the item from that model
          * 2. If there is a strategy-level override, select the item from that model
          * 3. Otherwise, select the item from the default model
-         * 
+         *
          * TODO: Remove, just for illustration:
          * This could be defined at the DB level with the following data in the `json` field:
          * {
@@ -255,7 +255,7 @@ class model_strategy {
     }
 
     /**
-     * @return array<model_item_param_list, model_person_param_list>
+     * @return array
      */
     public function get_params_from_db(int $contextid): array {
         $models = $this->get_installed_models();

@@ -126,8 +126,28 @@ class testitems_table extends wunderbyte_table {
 
         // No need to display checkboxes if there are no item params for this
         // item
-        if (!$values->model) {
+        if (empty($values->model)) {
             return;
+        }
+
+        $outputstring = '';
+
+        switch ($values->status) {
+            case 0:
+                $outputstring = get_string('notselected', 'local_catquiz');
+                break;
+            case 1:
+                $outputstring = get_string('selected', 'local_catquiz');
+                break;
+            case 5:
+                $outputstring = get_string('manuallyselected', 'local_catquiz');
+                break;
+            case -1:
+                $outputstring = get_string('problematic', 'local_catquiz');
+                break;
+            case -5:
+                $outputstring = get_string('manuallyexcluded', 'local_catquiz');
+                break;
         }
 
         $data['showactionbuttons'][] = [
@@ -165,7 +185,7 @@ class testitems_table extends wunderbyte_table {
         // This transforms the array to make it easier to use in mustache template.
         table::transform_actionbuttons_array($data['showactionbuttons']);
 
-        return $OUTPUT->render_from_template('local_wunderbyte_table/component_actionbutton', $data);
+        return $outputstring . $OUTPUT->render_from_template('local_wunderbyte_table/component_actionbutton', $data);
 
 
     }
