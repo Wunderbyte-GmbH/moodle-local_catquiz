@@ -177,11 +177,14 @@ class testitems_table extends wunderbyte_table {
 
     }
     public function col_action($values) {
+        if (!property_exists($values, 'qid')) {
+            return;
+        }
 
         global $OUTPUT;
 
         $url = new moodle_url('/local/catquiz/edit_testitem.php', [
-            'id' => $values->id,
+            'id' => $values->qid,
             'catscaleid' => $this->catscaleid ?? 0,
             'component' => $values->component,
             'contextid' => $this->contextid,
