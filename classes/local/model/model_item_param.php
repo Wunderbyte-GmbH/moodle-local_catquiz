@@ -24,6 +24,10 @@
 
 namespace local_catquiz\local\model;
 
+use cache_helper;
+use Exception;
+use stdClass;
+
 /**
  * This class holds a single item param object
  *  
@@ -37,10 +41,11 @@ class model_item_param {
     const MODEL_NEG_INF = -1000;
     const MODEL_POS_INF = 1000;
 
+    const STATUS_EXCLUDE = -5;
     const STATUS_NOT_SET = 0;
     const STATUS_SET_BY_STRATEGY = 1;
     const STATUS_PROBLEMATIC = 2;
-    const STATUS_SET_MANUALLY = 3;
+    const STATUS_SET_MANUALLY = 5;
 
     /**
      * @var float
@@ -108,5 +113,69 @@ class model_item_param {
 
     public function get_status(): int {
         return $this->status;
+    }
+
+    /**
+     * @param int $componentid 
+     * @param string $model 
+     * @param int $contextid 
+     * @param stdClass $new_record 
+     * @return void 
+     * @throws Exception 
+     */
+    public static function update_in_db(
+        int $id,
+        int $componentid,
+        string $model,
+        int $contextid,
+        stdClass $new_record
+    ) {
+        global $DB;
+
+        if (intval($new_record->status) === self::STATUS_SET_MANUALLY) {
+            // Only one model can be the selected one. Set the status of all
+            //other models back to 0
+            $existing_items = $DB->get_record(
+                'local_catquiz_itemparams',
+                [
+                    'componentid' => $componentid,
+                    'contextid' => $contextid,
+                    'status' => self::STATUS_SET_MANUALLY,
+                ]
+            );
+            // Get item params for other models
+            $other_items = array_filter(
+                $existing_items,
+                function($i) use ($model) {
+                    return $i->model !== $model;
+                }
+            );
+            foreach ($other_items as $other_item) {
+                $other_item->status = self::STATUS_NOT_SET;
+                $DB->update_record('local_catquiz_itemparams', $other_item, true);
+            }
+        }
+
+        $db_record = $DB->get_record(
+            'local_catquiz_itemparams',
+            [
+                'id' => $id,
+            ]
+        );
+        if (!$db_record) {
+            throw new Exception('Can not update record because it does not exist');
+        }
+        foreach ($new_record as $property => $value) {
+            // Some properties should not be updated
+            if (in_array($property, ['id', 'componentid'])) {
+                continue;
+            }
+            $db_record->$property = $value;
+        }
+        $DB->update_record(
+            'local_catquiz_itemparams',
+            $db_record
+        );
+        cache_helper::purge_by_event('changesintestitems');
     }
 };
