@@ -371,7 +371,7 @@ class catscaledashboard implements renderable, templatable {
 
         $table->set_filter_sql($select, $from, $where, $filter, $params);
 
-        $table->define_columns(['firstname', 'lastname', 'studentattempts', 'personabilities', 'action']);
+        $table->define_columns(['firstname', 'lastname', 'studentattempts', 'ability', 'action']);
         $table->define_headers([
             get_string('firstname', 'core'),
             get_string('lastname', 'core'),
@@ -381,7 +381,7 @@ class catscaledashboard implements renderable, templatable {
         ]);
 
         $table->define_fulltextsearchcolumns(['firstname', 'lastname']);
-        $table->define_sortablecolumns(['firstname', 'lastname', 'studentattempts']);
+        $table->define_sortablecolumns(['firstname', 'lastname', 'studentattempts', 'ability']);
 
         $table->tabletemplate = 'local_wunderbyte_table/twtable_list';
         $table->define_cache('local_catquiz', 'studentstatstable');

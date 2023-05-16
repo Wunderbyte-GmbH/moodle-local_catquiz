@@ -149,7 +149,7 @@ class catquiz {
                     qc.name as categoryname,
                     lci.catscaleid catscaleid,
                     lci.componentname component,
-                    attempts,
+                    s2.attempts,
                     s3.model,
                     s3.difficulty,
                     s3.status
@@ -177,7 +177,7 @@ class catquiz {
                     SELECT lcip.id, lcip.componentid, lcip.componentname, lcip.model, lcip.difficulty, lcip.status
                     FROM {local_catquiz_itemparams} lcip
                     WHERE lcip.contextid = :contextid2
-                ) s3 ON s3.componentid = q.id AND s3.componentname='question' 
+                ) s3 ON s3.componentid = q.id AND s3.componentname='question'
             ) as s1";
 
         $where = ' catscaleid = :catscaleid ';
@@ -433,10 +433,10 @@ class catquiz {
             $where .= "1=1";
         }
         $where .= " GROUP BY u.id, u.firstname, u.lastname, ccc1.id";
-        
-        $from = " (SELECT u.id, u.firstname, u.lastname, ccc1.id AS contextid, COUNT(*) as studentattempts FROM $from WHERE $where) s1 
+
+        $from = " (SELECT u.id, u.firstname, u.lastname, ccc1.id AS contextid, COUNT(*) as studentattempts FROM $from WHERE $where) s1
                     JOIN (
-                        SELECT userid, contextid, MAX(ability)
+                        SELECT userid, contextid, MAX(ability) as ability
                         FROM {local_catquiz_personparams} cpp
                         GROUP BY userid, contextid
                     ) s2 ON s1.id = s2.userid AND s1.contextid = s2.contextid
