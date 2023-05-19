@@ -175,10 +175,6 @@ $string['questiontext'] = "Fragentext";
 $string['testitemdashboard'] = "Testitem Dashboard";
 $string['itemdifficulty'] = "Item difficulty";
 $string['likelihood'] = "Likelihood";
-$string['status'] = 'Status';
-$string['included'] = "Included";
-$string['excluded'] = "Excluded";
-$string['questionid'] = "Frage ID";
 
 $string['difficulty'] = "Schwierigkeit";
 $string['discrimination'] = "Diskriminierung";
