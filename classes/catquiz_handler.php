@@ -97,6 +97,7 @@ class catquiz_handler {
             // If you have the right, you can define this setting as template.
             $elements[] = $mform->addElement('advcheckbox', 'testenvironment_addoredittemplate', get_string('addoredittemplate', 'local_catquiz'));
             $elements[] = $mform->addElement('text', 'testenvironment_name', get_string('name', 'core'));
+            $mform->setType('testenvironment_name', PARAM_TEXT);
             $mform->hideIf('testenvironment_name', 'testenvironment_addoredittemplate', 'eq', 0);
         }
 
