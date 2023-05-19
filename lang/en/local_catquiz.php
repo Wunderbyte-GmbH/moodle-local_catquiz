@@ -180,10 +180,6 @@ $string['questiontext'] = "Question text";
 $string['testitemdashboard'] = "Testitem Dashboard";
 $string['itemdifficulty'] = "Item difficulty";
 $string['likelihood'] = "Likelihood";
-$string['status'] = 'Status';
-$string['included'] = "Included";
-$string['excluded'] = "Excluded";
-$string['questionid'] = "Question ID";
 
 $string['difficulty'] = "Difficulty";
 $string['discrimination'] = "Discrimination";

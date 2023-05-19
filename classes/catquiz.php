@@ -140,8 +140,8 @@ class catquiz {
         }
 
         $select = ' DISTINCT *';
-        $from = "(SELECT COALESCE(s3.id, q.id) as id,
-                    q.id as qid,
+        $from = "(SELECT
+                    q.id,
                     qbe.idnumber,
                     q.name,
                     q.questiontext,
@@ -149,10 +149,7 @@ class catquiz {
                     qc.name as categoryname,
                     lci.catscaleid catscaleid,
                     lci.componentname component,
-                    s2.attempts,
-                    s3.model,
-                    s3.difficulty,
-                    s3.status
+                    s2.attempts
                 FROM {question} q
                 JOIN {question_versions} qv
                     ON q.id=qv.questionid
@@ -173,11 +170,6 @@ class catquiz {
                     WHERE ccc1.id = :contextid
                     GROUP BY ccc1.id, qa.questionid
                 ) s2 ON q.id = s2.questionid
-                LEFT JOIN (
-                    SELECT lcip.id, lcip.componentid, lcip.componentname, lcip.model, lcip.difficulty, lcip.status
-                    FROM {local_catquiz_itemparams} lcip
-                    WHERE lcip.contextid = :contextid2
-                ) s3 ON s3.componentid = q.id AND s3.componentname='question'
             ) as s1";
 
         $where = ' catscaleid = :catscaleid ';
