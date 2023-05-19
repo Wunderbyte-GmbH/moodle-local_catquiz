@@ -523,4 +523,25 @@ class catquiz {
 
         return [$select, $from, $where, $filter, $params];
     }
+
+    /**
+     * Return the sql for all item params for an item in a given context
+     *
+     * @param integer $testitemids
+     * @param integer $contextid
+     * @return array
+     */
+    public static function get_sql_for_item_params(int $testitemid, int $contextid) {
+        $sql = "SELECT *
+        FROM {local_catquiz_itemparams}
+        WHERE componentid = :itemid
+          AND contextid = :contextid";
+
+        $params = [
+            'itemid' => $testitemid,
+            'contextid' => $contextid,
+        ];
+
+        return [$sql, $params];
+    }
 }

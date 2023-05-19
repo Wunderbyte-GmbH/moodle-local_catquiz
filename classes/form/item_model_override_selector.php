@@ -25,6 +25,7 @@ require_once($CFG->dirroot . "/local/catquiz/lib.php");
 use context;
 use context_system;
 use core_form\dynamic_form;
+use local_catquiz\local\model\model_item_param;
 use moodle_url;
 use stdClass;
 
@@ -48,21 +49,38 @@ class item_model_override_selector extends dynamic_form {
         $mform = $this->_form;
         $data = (object) $this->_ajaxformdata;
 
-        // TODO: this is required
-        if (!isset($data->models)) {
+        if (!isset($data->models) || !isset($data->itemparams)) {
             return; //TODO should we throw an error?
         }
 
-        $options = array(
-            'multiple' => false,
-            'class' => 'justify-content-end',
-        );
-
+        $options = [
+            model_item_param::STATUS_NOT_SET => get_string('statusnotset', 'local_catquiz'),
+            model_item_param::STATUS_SET_BY_STRATEGY => get_string('statussetautomatically', 'local_catquiz'),
+            model_item_param::STATUS_SET_MANUALLY => get_string('statussetmanually', 'local_catquiz'),
+            model_item_param::STATUS_NOT_CALCULATED => get_string('statusnotcalculated', 'local_catquiz'),
+        ];
         foreach (array_keys($data->models) as $model) {
+            $group = [];
             $id = sprintf('override_%s', $model);
-            $mform->addElement('select', $id, $model, ['set by strategy', 'include', 'exclude'], $options);
-            $mform->setDefault($id, 0);
-            //$mform->addGroup($modelgroup, $id, $id);
+            $select = $mform->createElement('select', $id, $model, $options, ['multiple' => false]);
+            if (array_key_exists($model, $data->itemparams)) {
+                $modelparams = $data->itemparams[$model];
+                $model_status = $modelparams->status;
+                $model_difficulty = $modelparams->difficulty;
+            } else { // Set default data if there are no calculated data for the given model
+                $model_status = model_item_param::STATUS_NOT_CALCULATED;
+                $model_difficulty = '-';
+            }
+            $select->setSelected(intval($model_status));
+            $difficulty_text = sprintf(
+                '<div>%s: %s</div>',
+                get_string('itemdifficulty', 'local_catquiz'),
+                $model_difficulty
+            );
+            $difficulty = $mform->createElement('html', $difficulty_text);
+            $group[] = $select;
+            $group[] = $difficulty;
+            $mform->addGroup($group, $id, $model);
         }
 
         $mform->disable_form_change_checker();

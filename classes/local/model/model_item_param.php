@@ -41,10 +41,9 @@ class model_item_param {
     const MODEL_NEG_INF = -1000;
     const MODEL_POS_INF = 1000;
 
-    const STATUS_EXCLUDE = -5;
-    const STATUS_NOT_SET = 0;
+    const STATUS_NOT_SET = -5;
+    const STATUS_NOT_CALCULATED = 0;
     const STATUS_SET_BY_STRATEGY = 1;
-    const STATUS_PROBLEMATIC = 2;
     const STATUS_SET_MANUALLY = 5;
 
     /**
@@ -67,7 +66,7 @@ class model_item_param {
      */
     private int $id;
 
-    public function __construct(int $id, string $model_name, array $metadata = [], int $status = self::STATUS_NOT_SET)
+    public function __construct(int $id, string $model_name, array $metadata = [], int $status = self::STATUS_NOT_CALCULATED)
     {
         $this->id = $id;
         $this->model_name = $model_name;
@@ -151,7 +150,7 @@ class model_item_param {
                 }
             );
             foreach ($other_items as $other_item) {
-                $other_item->status = self::STATUS_NOT_SET;
+                $other_item->status = self::STATUS_NOT_CALCULATED;
                 $DB->update_record('local_catquiz_itemparams', $other_item, true);
             }
         }

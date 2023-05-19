@@ -175,6 +175,10 @@ $string['questiontext'] = "Fragentext";
 $string['testitemdashboard'] = "Testitem Dashboard";
 $string['itemdifficulty'] = "Item difficulty";
 $string['likelihood'] = "Likelihood";
+$string['statusnotset'] = "ungesetzt";
+$string['statussetautomatically'] = "automatisch gesetzt";
+$string['statussetmanually'] = "manuell bestätigt";
+$string['statusnotcalculated'] = "unberechnet (Pilotierung)";
 
 $string['difficulty'] = "Schwierigkeit";
 $string['discrimination'] = "Diskriminierung";

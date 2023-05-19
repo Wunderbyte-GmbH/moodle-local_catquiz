@@ -187,8 +187,30 @@ class testitemdashboard implements renderable, templatable {
     }
 
     private function render_overrides_form() {
+        global $DB;
         $models = model_strategy::get_installed_models();
-        $form = new item_model_override_selector(null, null, 'post', '', [], true, ['models' => $models]);
+        list($sql, $params) = catquiz::get_sql_for_item_params(
+            $this->testitemid,
+            $this->contextid
+        );
+        $itemparams = $DB->get_records_sql($sql, $params);
+        $itemparamsbymodel = [];
+        foreach ($itemparams as $itemparam) {
+            $itemparamsbymodel[$itemparam->model] = $itemparam;
+            reset($itemparams[$itemparam->id]);
+        }
+        $form = new item_model_override_selector(
+            null,
+            null,
+            'post',
+            '',
+            [],
+            true,
+            [
+                'models' => $models,
+                'itemparams' => $itemparamsbymodel,
+            ]
+        );
         $form->set_data_for_dynamic_submission();
         return html_writer::div($form->render(), '', ['id' => 'model_override_form']);
     }
