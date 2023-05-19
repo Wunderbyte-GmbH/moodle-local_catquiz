@@ -25,19 +25,7 @@
 
 namespace local_catquiz;
 
-use coding_exception;
-use core_plugin_manager;
 use local_catquiz\catcontext;
-use local_catquiz\data\catquiz_base;
-use local_catquiz\local\model\model_calc;
-use local_catquiz\local\model\model_item_param;
-use local_catquiz\local\model\model_item_param_list;
-use local_catquiz\local\model\model_model;
-use local_catquiz\local\model\model_person_ability_estimator_demo;
-use local_catquiz\local\model\model_person_param;
-use local_catquiz\local\model\model_person_param_list;
-use local_catquiz\local\model\model_responses;
-use local_catquiz\local\model\model_strategy;
 
 /**
  * This class

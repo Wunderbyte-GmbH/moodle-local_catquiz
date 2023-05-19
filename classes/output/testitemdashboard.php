@@ -35,6 +35,8 @@ use context_system;
 use html_writer;
 use local_catquiz\catmodel_info;
 use local_catquiz\catquiz;
+use local_catquiz\form\item_model_override_selector;
+use local_catquiz\local\model\model_strategy;
 use local_catquiz\table\testitems_table;
 use moodle_url;
 use templatable;
@@ -58,6 +60,8 @@ class testitemdashboard implements renderable, templatable {
      */
     private int $contextid = 0;
 
+    private catmodel_info $catmodel_info;
+
     /**
      * Either returns one tree or treearray for every parentnode
      *
@@ -70,6 +74,7 @@ class testitemdashboard implements renderable, templatable {
 
         $this->testitemid = $testitemid;
         $this->contextid = $contextid;
+        $this->catmodel_info = new catmodel_info();
     }
 
     /**
@@ -83,8 +88,7 @@ class testitemdashboard implements renderable, templatable {
 
         $returnarray = [];
 
-        $catmodel_info = new catmodel_info();
-        list($modelitemparams, $modelpersonparams) = $catmodel_info->get_context_parameters($this->contextid);
+        list($modelitemparams, $modelpersonparams) = $this->catmodel_info->get_context_parameters($this->contextid);
 
         $chart = new \core\chart_line();
         $chart->set_smooth(true); // Calling set_smooth() passing true as parameter, will display smooth lines.
@@ -181,6 +185,13 @@ class testitemdashboard implements renderable, templatable {
             ]
         ];
     }
+
+    private function render_overrides_form() {
+        $models = model_strategy::get_installed_models();
+        $form = new item_model_override_selector(null, null, 'post', '', [], true, ['models' => $models]);
+        $form->set_data_for_dynamic_submission();
+        return html_writer::div($form->render(), '', ['id' => 'model_override_form']);
+    }
     private function render_contextselector() {
         $form = new \local_catquiz\form\contextselector(null, null, 'post', '', [], true, ['contextid' => $this->contextid]);
         // Set the form data with the same method that is called when loaded from JS. It should correctly set the data for the supplied arguments.
@@ -197,11 +208,13 @@ class testitemdashboard implements renderable, templatable {
 
         $url = new moodle_url('/local/catquiz/manage_catscales.php');
 
-        return [
+        $data = [
             'returnurl' => $url->out(),
             'models' => $this->render_modelcards(),
             'statcards' => $this->render_testitemstats(),
             'contextselector' => $this->render_contextselector(),
+            'overridesforms' => $this->render_overrides_form(),
         ];
+        return $data;
     }
 }

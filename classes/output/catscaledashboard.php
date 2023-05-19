@@ -52,7 +52,8 @@ use renderable;
  * @author     Georg Maißer
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class catscaledashboard implements renderable, templatable {
+class catscaledashboard implements renderable, templatable
+{
 
     /** @var integer of catscaleid */
     public int $catscaleid = 0;
@@ -77,7 +78,8 @@ class catscaledashboard implements renderable, templatable {
      * @param boolean $allowedit
      * @return array
      */
-    public function __construct(int $catscaleid, int $catcontextid = 0, bool $triggercalculation = false) {
+    public function __construct(int $catscaleid, int $catcontextid = 0, bool $triggercalculation = false)
+    {
         global $DB;
 
         $this->catscaleid = $catscaleid;
@@ -89,14 +91,16 @@ class catscaledashboard implements renderable, templatable {
         );
     }
 
-    private function render_title() {
+    private function render_title()
+    {
         global $OUTPUT;
         global $PAGE;
 
         $PAGE->set_heading($this->catscale->name);
         echo $OUTPUT->header();
     }
-    private function render_addtestitems_table(int $catscaleid) {
+    private function render_addtestitems_table(int $catscaleid)
+    {
 
         $table = new testitems_table('addtestitems', $catscaleid);
 
@@ -181,7 +185,8 @@ class catscaledashboard implements renderable, templatable {
      * @param integer $catscaleid
      * @return string
      */
-    private function render_testitems_table(int $catscaleid) {
+    private function render_testitems_table(int $catscaleid)
+    {
 
         $table = new testitems_table('testitems', $this->catscaleid, $this->catcontextid);
 
@@ -261,7 +266,8 @@ class catscaledashboard implements renderable, templatable {
         return $table->outhtml(10, true);
     }
 
-    private function render_differentialitem() {
+    private function render_differentialitem()
+    {
 
         global $OUTPUT;
 
@@ -276,7 +282,8 @@ class catscaledashboard implements renderable, templatable {
         return html_writer::tag('div', $OUTPUT->render($chart), ['dir' => 'ltr']);
     }
 
-    private function render_statindependence() {
+    private function render_statindependence()
+    {
 
         global $OUTPUT;
 
@@ -291,7 +298,8 @@ class catscaledashboard implements renderable, templatable {
         return html_writer::tag('div', $OUTPUT->render($chart), ['dir' => 'ltr']);
     }
 
-    private function render_loglikelihood() {
+    private function render_loglikelihood()
+    {
 
         global $OUTPUT;
 
@@ -304,9 +312,10 @@ class catscaledashboard implements renderable, templatable {
         return html_writer::tag('div', $OUTPUT->render($chart), ['dir' => 'ltr']);
     }
     /**
-     * @param array
+     * @param array<model_item_param_list> $item_lists
      */
-    private function render_itemdifficulties(array $item_lists) {
+    private function render_itemdifficulties(array $item_lists)
+    {
 
         global $OUTPUT;
 
@@ -345,23 +354,25 @@ class catscaledashboard implements renderable, templatable {
         return html_writer::tag('div', $OUTPUT->render($chart), ['dir' => 'ltr']);
     }
 
-    private function render_contextselector() {
-    $ajaxformdata = empty($this->catcontextid) ? [] : ['contextid' => $this->catcontextid];
-    $form = new \local_catquiz\form\contextselector(null, null, 'post', '', [], true, $ajaxformdata);
-    // Set the form data with the same method that is called when loaded from JS. It should correctly set the data for the supplied arguments.
-    $form->set_data_for_dynamic_submission();
-    // Render the form in a specific container, there should be nothing else in the same container.
-    return html_writer::div($form->render(), '', ['id' => 'select_context_form']);
+    private function render_contextselector()
+    {
+        $ajaxformdata = empty($this->catcontextid) ? [] : ['contextid' => $this->catcontextid];
+        $form = new \local_catquiz\form\contextselector(null, null, 'post', '', [], true, $ajaxformdata);
+        // Set the form data with the same method that is called when loaded from JS. It should correctly set the data for the supplied arguments.
+        $form->set_data_for_dynamic_submission();
+        // Render the form in a specific container, there should be nothing else in the same container.
+        return html_writer::div($form->render(), '', ['id' => 'select_context_form']);
     }
 
-    private function render_student_stats_table(int $catscaleid, int $catcontextid) {
+    private function render_student_stats_table(int $catscaleid, int $catcontextid)
+    {
         $table = new student_stats_table('students', $this->catscaleid, $this->catcontextid);
 
         list($select, $from, $where, $filter, $params) = catquiz::return_sql_for_student_stats($catcontextid);
 
         $table->set_filter_sql($select, $from, $where, $filter, $params);
 
-        $table->define_columns(['firstname', 'lastname', 'studentattempts', 'ability', 'action']);
+        $table->define_columns(['firstname', 'lastname', 'studentattempts', 'personabilities', 'action']);
         $table->define_headers([
             get_string('firstname', 'core'),
             get_string('lastname', 'core'),
@@ -371,7 +382,7 @@ class catscaledashboard implements renderable, templatable {
         ]);
 
         $table->define_fulltextsearchcolumns(['firstname', 'lastname']);
-        $table->define_sortablecolumns(['firstname', 'lastname', 'studentattempts', 'ability']);
+        $table->define_sortablecolumns(['firstname', 'lastname', 'studentattempts']);
 
         $table->tabletemplate = 'local_wunderbyte_table/twtable_list';
         $table->define_cache('local_catquiz', 'studentstatstable');
@@ -386,16 +397,18 @@ class catscaledashboard implements renderable, templatable {
 
         return $table->outhtml(10, true);
     }
-    private function render_modelbutton($contextid) {
+    private function render_modelbutton($contextid)
+    {
         return '<button class="btn btn-primary" type="button" data-contextid="1" id="model_button">Calculate</button>';
     }
 
-    public function export_for_template(\renderer_base $output): array {
+    public function export_for_template(\renderer_base $output): array
+    {
 
         $url = new moodle_url('/local/catquiz/manage_catscales.php');
         $testenvironmentdashboard = new testenvironmentdashboard();
         $cm = new catmodel_info;
-        list ($item_difficulties, $person_abilities) = $cm->get_context_parameters(
+        list($item_difficulties, $person_abilities) = $cm->get_context_parameters(
             $this->catcontextid,
             $this->triggercalculation
         );

@@ -280,7 +280,7 @@ class model_strategy {
      *
      * @return array<string>
      */
-    private static function get_installed_models(): array {
+    public static function get_installed_models(): array {
         $pm = core_plugin_manager::instance();
         $models = [];
         foreach($pm->get_plugins_of_type('catmodel') as $name => $info) {
