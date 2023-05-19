@@ -23,15 +23,64 @@
     {
     }
 }}
+
 <div class="catscales-dashboard grid">
-  {{#statcards}}
+  {{#user}}
     <div class="card">
-        <div class="card-header">
-            {{title}}
-        </div>
-        <div class="card-body">
-          {{{body}}}
-        </div>
+      <div class="card-header">
+        {{userdetails}}
+      </div>
+      <div class="card-body">
+        <div><h6>{{name}}</h6> {{firstname}} {{lastname}}</div>
+        <div><h6>{{emailtitle}}</h6>{{email}}</div>
+      </div>
+    </div>  
+  {{/user}}
+  {{#stats}}
+  <div class="card">
+    <div class="card-header">
+      {{statstitle}}
     </div>
-  {{/statcards}}
+    <div class="card-body">
+      <div class="table-responsive">
+        <table class="table">
+          <tr>
+            <th>{{numberofanswerstitle}}</th>
+            <th>{{numberofanswerscorrecttitle}}</th>
+            <th>{{numberofanswersincorrecttitle}}</th>
+          </tr>
+          <tr>
+            <td class="table-info">{{numberofanswers}}</td>
+            <td class="table-success">{{numberofanswerscorrect}}</td>
+            <td class="table-danger">{{numberofanswersincorrect}}</td>
+          </tr>
+        </table>
+      </div> 
+    </div>
+  </div>
+  {{/stats}}
+  {{#cards}}
+  <div class="card">
+      <div class="card-header">
+          {{title}}
+      </div>
+      <div class="card-body">
+        {{{body}}}
+      </div>
+  </div>
+  {{/cards}}
+  {{#courses}}
+    <div class="card">
+      <div class="card-header">
+        {{enroledcoursestitle}}
+      </div>
+      <div class="card-body">
+        <ul>
+          <li>
+            {{fullname}}
+          </li>
+        </ul>
+      </div>
+    </div>
+  {{/courses}}
 </div>

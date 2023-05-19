@@ -77,6 +77,16 @@ class studentdetails implements renderable, templatable {
 
         global $DB;
 
+        $users = user_get_users_by_id([$this->studentid]);
+        $user = reset($users);
+
+
+        $courses = enrol_get_all_users_courses($user->id);
+        $displaycourses = [];
+        foreach ($courses as $course) {
+            $displaycourses = (array)$course;
+        }
+
         list ($sql, $params) = catquiz::get_sql_for_questions_answered([], [], [$this->studentid]);
         $numberofanswers = $DB->count_records_sql($sql, $params);
         list ($sql, $params) = catquiz::get_sql_for_questions_answered_correct([], [], [$this->studentid]);
@@ -84,23 +94,47 @@ class studentdetails implements renderable, templatable {
         list ($sql, $params) = catquiz::get_sql_for_questions_answered_incorrect([], [], [$this->studentid]);
         $numberofanswersincorrect = $DB->count_records_sql($sql, $params);
 
+        // Getting the values for the last access and comparing to now
+        if (isset($user->lastaccess)) {
+            $datedifference = floor((usertime(time()) - $user->lastaccess)/60/60/24);
+            if($datedifference >= 1) {
+                $differencestring = get_string('daysago', 'local_catquiz', $datedifference);
+            } else {
+                $differencestring = get_string('hoursago', 'local_catquiz',floor((usertime(time()) - $user->lastaccess)/60/60));
+            }
+            $datestring = date('D, j F Y, g:i a', $user->lastaccess) . ' ('. $differencestring . ')';
+        } else {
+            $datestring = get_string('noaccessyet', 'local_catquiz');
+        }
+
         return [
-            [
-                'title' => get_string('numberofanswers', 'local_catquiz'),
-                'body' => $numberofanswers,
+            'user' => (array)$user,
+            'name' => get_string('name'),
+            'emailtitle' => get_string('email'),
+            'userdetails' => get_string('userdetails'),
+            'enroledcoursestitle' => get_string('enroled_courses', 'local_catquiz'),
+            'courses' => $displaycourses,
+            'cards' => [
+                [
+                    'title' => get_string('personability', 'local_catquiz'),
+                    'body' => $ability,
+                ],
+                [
+                    'title' => get_string('lastaccess'),
+                    'body' => $datestring,
+                ],
             ],
-            [
-                'title' => get_string('personability', 'local_catquiz'),
-                'body' => $ability,
-            ],
-            [
-                'title' => get_string('numberofanswerscorrect', 'local_catquiz'),
-                'body' => $numberofanswerscorrect,
-            ],
-            [
-                'title' => get_string('numberofanswersincorrect', 'local_catquiz'),
-                'body' => $numberofanswersincorrect,
-            ],
+            'statstitle' => get_string('questionresults', 'local_catquiz'),
+            'stats' => [
+                [
+                    'numberofanswerstitle' => get_string('numberofanswers', 'local_catquiz'),
+                    'numberofanswerscorrecttitle' => get_string('numberofanswerscorrect', 'local_catquiz'),
+                    'numberofanswersincorrecttitle' => get_string('numberofanswersincorrect', 'local_catquiz'),
+                    'numberofanswers' => $numberofanswers,
+                    'numberofanswerscorrect' => $numberofanswerscorrect,
+                    'numberofanswersincorrect' => $numberofanswersincorrect,
+                ],
+            ]
         ];
     }
 
@@ -109,8 +143,6 @@ class studentdetails implements renderable, templatable {
      */
     public function export_for_template(\renderer_base $output): array {
 
-        return [
-            'statcards' => $this->render_studentstats(),
-        ];
+        return $this->render_studentstats();
     }
 }

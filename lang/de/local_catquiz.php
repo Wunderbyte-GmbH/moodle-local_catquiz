@@ -230,6 +230,11 @@ $string['manuallyexcluded'] = 'Manuell ausgeschlossen';
 
 // Student Details
 $string['studentdetails'] = "Student details";
+$string['enroled_courses'] = "Eingeschriebene Kurse";
+$string['questionresults'] = "Fragen Auswertung";
+$string['daysago'] = 'Vor {$a} Tagen';
+$string['hoursago'] = 'Vor {$a} Stunden';
+$string['noaccessyet'] = 'Bisher kein Zugriff.';
 
 // Tasks
 $string['task_recalculate_cat_model_params'] = "CAT Parameter neu berechnen";
