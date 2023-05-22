@@ -317,7 +317,7 @@ class catscaledashboard implements renderable, templatable
         // Set the form data with the same method that is called when loaded from JS. It should correctly set the data for the supplied arguments.
         $inputform->set_data_for_dynamic_submission();
         // Render the form in a specific container, there should be nothing else in the same container.
-        return html_writer::div($inputform->render(), '', ['id' => 'select_context_form']);
+        return html_writer::div($inputform->render(), '', ['id' => 'csv_import_form']);
     }
 
     private function render_student_stats_table(int $catscaleid, int $catcontextid)

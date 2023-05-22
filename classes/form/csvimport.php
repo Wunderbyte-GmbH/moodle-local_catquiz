@@ -69,7 +69,7 @@ class csvimport extends dynamic_form {
 
         $buttonarray = array();
         $buttonarray[] = $mform->createElement('submit', 'submitbutton', get_string('submit'));
-        $buttonarray[] = $mform->createElement('cancel', 'cancel', get_string('cancel'));
+        $buttonarray[] = $mform->createElement('cancel');
         $mform->addGroup($buttonarray, 'buttonar', '', ' ', false);
     }
 
