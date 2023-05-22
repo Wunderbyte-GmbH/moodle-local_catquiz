@@ -69,9 +69,9 @@ class studentdetails implements renderable, templatable {
         $catmodel_info = new catmodel_info();
         list(,$person_params) = $catmodel_info->get_context_parameters(1); //TODO dynamic context?
         $selected_model = reset($person_params);
-        $student_param = $selected_model[$this->studentid];
         $ability = get_string('personabilitiesnodata', 'local_catquiz');
-        if ($student_param) {
+        if (isset($selected_model[$this->studentid])) {
+            $student_param = $selected_model[$this->studentid];
             $ability = $student_param->get_ability();
         }
 
