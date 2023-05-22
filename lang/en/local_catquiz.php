@@ -293,3 +293,6 @@ $string['emptyfirstquestionlist'] = "Can't select a start question because the l
 // Quiz Feedback
 $string['catquizfeedback'] = "Shows a summary of the last quiz attempt";
 $string['attemptfeedbacknotavailable'] = "No feedback available";
+
+//CSV Import Form
+$string['importcsv'] = 'Import CSV';

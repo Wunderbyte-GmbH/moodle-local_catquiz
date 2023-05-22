@@ -312,6 +312,14 @@ class catscaledashboard implements renderable, templatable
         return html_writer::div($form->render(), '', ['id' => 'select_context_form']);
     }
 
+    private function render_filepicker() {
+        $inputform = new \local_catquiz\form\csvimport();
+        // Set the form data with the same method that is called when loaded from JS. It should correctly set the data for the supplied arguments.
+        $inputform->set_data_for_dynamic_submission();
+        // Render the form in a specific container, there should be nothing else in the same container.
+        return html_writer::div($inputform->render(), '', ['id' => 'select_context_form']);
+    }
+
     private function render_student_stats_table(int $catscaleid, int $catcontextid)
     {
         $table = new student_stats_table('catscaleid_' . $this->catscaleid . ' students', $this->catscaleid, $this->catcontextid);
@@ -370,6 +378,7 @@ class catscaledashboard implements renderable, templatable
             'itemdifficulties' => $this->render_itemdifficulties($item_difficulties),
             'personabilities' => $this->render_personabilities($person_abilities),
             'contextselector' => $this->render_contextselector(),
+            'filepicker' => $this->render_filepicker(),
             'table' => $testenvironmentdashboard->testenvironmenttable($this->catscaleid),
             'studentstable' => $this->render_student_stats_table($this->catscaleid, $this->catcontextid),
             'modelbutton' => $this->render_modelbutton($this->catcontextid),
