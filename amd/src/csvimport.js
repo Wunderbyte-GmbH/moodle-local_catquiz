@@ -47,32 +47,13 @@ export const init = () => {
 
                 // eslint-disable-next-line no-console
                 console.log(response);
-
-        dynamicForm.container.innerHTML = '';
         dynamicForm.load({arg1: 'val1'});
     });
 
+    // Cancel button triggers reload of empty form.
     dynamicForm.addEventListener(dynamicForm.events.FORM_CANCELLED, (e) => {
         e.preventDefault();
-        dynamicForm.container.innerHTML = '';
-
-        // eslint-disable-next-line no-console
-        console.log(e);
-
+        dynamicForm.load({});
     });
-
-    // If a user selects a cat context, submit the form without waiting for the
-    // user to click the submit button
-    /*
-    dynamicForm.addEventListener('change', (e) => {
-        e.preventDefault();
-
-        // We have to wait a little bit so that the data are included in the submit
-        // request
-        setTimeout(() => {
-            dynamicForm.submitFormAjax();
-        }, 500);
-    });
-    */
 
 };
