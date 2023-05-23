@@ -67,5 +67,25 @@ abstract class model_model {
      * @param model_person_param_list $person_params
      * @return model_item_param_list
      */
-    abstract public function estimate_item_params(model_person_param_list $person_params): model_item_param_list;
+    public function estimate_item_params(model_person_param_list $person_params): model_item_param_list
+    {
+        $estimated_item_params = new model_item_param_list();
+        foreach ($this->responses->get_item_response($person_params) as $item_id => $item_response) {
+            // Calculate the difficulty -> returns a float value
+            $item_difficulty = $this->calculate_difficulty($item_response);
+            // Now create a new item difficulty object (param)
+            $param = $this
+                ->create_item_param($item_id, ['from_raschbirnbauma' => 'hello hello'])
+                ->set_difficulty($item_difficulty);
+            // ... and append it to the list of calculated item difficulties
+            $estimated_item_params->add($param);
+        }
+        return $estimated_item_params;
+    }
+
+    abstract protected function calculate_difficulty($item_response);
+
+    public function get_gradient() {
+        return [];
+    }
 }
