@@ -51,6 +51,8 @@ class model_item_param {
      */
     private float $difficulty = 0;
 
+    private float $param2 = 0;
+    private float $param3 = 0;
     private int $status = 0;
 
     private string $model_name;
@@ -72,6 +74,17 @@ class model_item_param {
         $this->model_name = $model_name;
         $this->metadata = $metadata;
         $this->status = $status;
+    }
+    public function get_params_array(): array {
+        switch ($this->model_name) {
+            case 'raschbirnbauma':
+                return [$this->difficulty];
+                break;
+            
+            default:
+                return [$this->get_difficulty()];
+                break;
+            }
     }
 
     /**
