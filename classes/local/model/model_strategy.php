@@ -113,7 +113,9 @@ class model_strategy {
             ? $options['strategy']
             : [];
 
-        $this->model_override = $options['model_override'];
+        $this->model_override = array_key_exists('model_override', $options)
+            ? $options['model_override']
+            : self::DEFAULT_MODEL;
 
         return $this;
     }
