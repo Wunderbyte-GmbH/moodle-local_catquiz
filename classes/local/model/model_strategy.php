@@ -99,7 +99,7 @@ class model_strategy {
         $this->ability_estimator = new model_person_ability_estimator_demo($this->responses);
         $this->set_options($options);
 
-        if (count($saved_person_abilities) === 0) {
+        if ($saved_person_abilities === NULL || count($saved_person_abilities) === 0) {
             $saved_person_abilities = $responses->get_initial_person_abilities();
         }
         $this->initial_person_abilities = $saved_person_abilities;
@@ -113,7 +113,7 @@ class model_strategy {
             ? $options['strategy']
             : [];
 
-        $this->model_override = $strategy_options['model_override'];
+        $this->model_override = $options['model_override'];
 
         return $this;
     }

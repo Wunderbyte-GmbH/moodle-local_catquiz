@@ -57,7 +57,7 @@ $demo_response = local_catquiz\synthcat::generate_response($demo_persons,$demo_i
 
 $responses = model_responses::create_from_array($demo_response);
 $max_iterations = 3;
-$strategy = new model_strategy($responses, $max_iterations);
+$strategy = new model_strategy($responses, ['max_iterations' => 4, 'model_override' => 'raschbirnbauma']);
 list($item_difficulties, $person_abilities) = $strategy->run_estimation();
 
 echo "finished";
