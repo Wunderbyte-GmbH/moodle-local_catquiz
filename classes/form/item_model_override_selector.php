@@ -25,7 +25,9 @@ require_once($CFG->dirroot . "/local/catquiz/lib.php");
 use context;
 use context_system;
 use core_form\dynamic_form;
+use local_catquiz\catquiz;
 use local_catquiz\local\model\model_item_param;
+use local_catquiz\local\model\model_strategy;
 use moodle_url;
 use stdClass;
 
@@ -48,10 +50,12 @@ class item_model_override_selector extends dynamic_form {
 
         $mform = $this->_form;
         $data = (object) $this->_ajaxformdata;
+        $mform->addElement('hidden', 'testitemid');
+        $mform->setType('testitemid', PARAM_INT);
+        $mform->addElement('hidden', 'contextid');
+        $mform->setType('contextid', PARAM_INT);
 
-        if (!isset($data->models) || !isset($data->itemparams)) {
-            return; //TODO should we throw an error?
-        }
+        $models = model_strategy::get_installed_models();
 
         $options = [
             model_item_param::STATUS_NOT_SET => get_string('statusnotset', 'local_catquiz'),
@@ -59,30 +63,15 @@ class item_model_override_selector extends dynamic_form {
             model_item_param::STATUS_SET_MANUALLY => get_string('statussetmanually', 'local_catquiz'),
             model_item_param::STATUS_NOT_CALCULATED => get_string('statusnotcalculated', 'local_catquiz'),
         ];
-        foreach (array_keys($data->models) as $model) {
+        foreach (array_keys($models) as $model) {
             $group = [];
             $id = sprintf('override_%s', $model);
-            $select = $mform->createElement('select', $id, $model, $options, ['multiple' => false]);
-            if (array_key_exists($model, $data->itemparams)) {
-                $modelparams = $data->itemparams[$model];
-                $model_status = $modelparams->status;
-                $model_difficulty = $modelparams->difficulty;
-            } else { // Set default data if there are no calculated data for the given model
-                $model_status = model_item_param::STATUS_NOT_CALCULATED;
-                $model_difficulty = '-';
-            }
-            $select->setSelected(intval($model_status));
-            $difficulty_text = sprintf(
-                '<div>%s: %s</div>',
-                get_string('itemdifficulty', 'local_catquiz'),
-                $model_difficulty
-            );
-            $difficulty = $mform->createElement('html', $difficulty_text);
+            $select = $mform->createElement('select', sprintf('%s_select', $id), $model, $options, ['multiple' => false]);
+            $difficulty = $mform->createElement('static', sprintf('%s_difficulty', $id), 'mylabel', 'static text');
             $group[] = $select;
             $group[] = $difficulty;
             $mform->addGroup($group, $id, $model);
         }
-
         $mform->disable_form_change_checker();
     }
 
@@ -105,7 +94,74 @@ class item_model_override_selector extends dynamic_form {
      * @return object
      */
     public function process_dynamic_submission(): object {
+        global $DB;
         $data = $this->get_data();
+
+        $form_itemparams = [];
+        $models = model_strategy::get_installed_models();
+        foreach (array_keys($models) as $model) {
+            $fieldname = sprintf('override_%s', $model);
+            $obj = new stdClass;
+            $obj->status = $data->$fieldname[sprintf('%s_select', $fieldname)];
+            $form_itemparams[$model] = $obj;
+        }
+
+        $saved_itemparams = $this->get_item_params(
+            $data->testitemid,
+            $data->contextid
+        );
+
+        $to_update = [];
+        $to_insert = [];
+        foreach (array_keys($models) as $model) {
+            if ($form_itemparams[$model]->status === $saved_itemparams[$model]->status) {
+                // Status did not change: nothing to do
+                continue;
+            }
+
+            if (array_key_exists($model, $saved_itemparams)) {
+                $to_update[] = [
+                    'status' => $form_itemparams[$model]->status,
+                    'id' => $saved_itemparams[$model]->id,
+                ];
+            } else {
+                $to_insert[] = [
+                    'status' => $form_itemparams[$model]->status,
+                ];
+            }
+
+            // There can only be one model with this status, so we have to make
+            // sure all other models that have this status are set back to 0
+            if (intval($form_itemparams[$model]->status) === model_item_param::STATUS_SET_MANUALLY) {
+                foreach (array_keys($models) as $m) {
+                    if ($m === $model) {
+                        // Do not check our current model
+                        continue;
+                    }
+                    if (intval($form_itemparams[$m]->status) !== model_item_param::STATUS_SET_MANUALLY) {
+                        // Ignore models with other status
+                        continue;
+                    }
+                    // Reset back to 0
+                    $default_status = strval(model_item_param::STATUS_NOT_CALCULATED);
+                    $form_itemparams[$m]->status = $default_status;
+                    $fieldname = sprintf('override_%s', $m);
+                    $data->$fieldname[sprintf('%s_select', $fieldname)] = $default_status;
+                    $this->set_data($data);
+                    $to_update[] = [
+                        'status' => $form_itemparams[$m]->status,
+                        'id' => $saved_itemparams[$m]->id,
+                    ];
+                }
+            }
+        }
+
+        foreach ($to_update as $updated) {
+            $DB->update_record(
+                'local_catquiz_itemparams',
+                (object) $updated
+            );
+        }
 
         return $data;
     }
@@ -121,6 +177,33 @@ class item_model_override_selector extends dynamic_form {
      */
     public function set_data_for_dynamic_submission(): void {
         $data = (object) $this->_ajaxformdata;
+        $models = model_strategy::get_installed_models();
+
+        if(empty($data->contextid)) {
+            $data->contextid = required_param('contextid', PARAM_INT);
+        }
+        if (empty($data->testitemid)) {
+            $data->testitemid = required_param('id', PARAM_INT);
+        }
+
+        foreach (array_keys($models) as $model) {
+            $field = sprintf('override_%s', $model);
+            $itemparamsbymodel = $this->get_item_params($data->testitemid, $data->contextid);
+            if (array_key_exists($model, $itemparamsbymodel)) {
+                $modelparams = $itemparamsbymodel[$model];
+                $model_status = $modelparams->status;
+                $model_difficulty = $modelparams->difficulty;
+            } else { // Set default data if there are no calculated data for the given model
+                $model_status = model_item_param::STATUS_NOT_CALCULATED;
+                $model_difficulty = '-';
+            }
+            $difficulty_text = sprintf(
+                '%s: %s',
+                get_string('itemdifficulty', 'local_catquiz'),
+                $model_difficulty
+            );
+            $data->$field = [sprintf('%s_select', $field) => $model_status, sprintf('%s_difficulty', $field) => $difficulty_text];
+        }
 
         $this->set_data($data);
     }
@@ -165,5 +248,21 @@ class item_model_override_selector extends dynamic_form {
         $errors = array();
 
         return $errors;
+    }
+
+    private function get_item_params($testitemid, $contextid) {
+        global $DB;
+
+        list($sql, $params) = catquiz::get_sql_for_item_params(
+            $testitemid,
+            $contextid
+        );
+        $itemparams = $DB->get_records_sql($sql, $params);
+        $itemparamsbymodel = [];
+        foreach ($itemparams as $itemparam) {
+            $itemparamsbymodel[$itemparam->model] = $itemparam;
+            reset($itemparams[$itemparam->id]);
+        }
+        return $itemparamsbymodel;
     }
 }
