@@ -94,7 +94,7 @@ class catcalc{
         foreach($demo_person_response as $qid=>$qresponse){
 
             //$item_difficulty = 0.5;
-            $item_difficulty = $item_difficulties[$qid]->get_difficulty();
+            $item_difficulty = $item_difficulties[$qid]->get_params_array()[0];
 
             if($qresponse['fraction'] == 1){
                 $likelihood_part = function($x) use ($item_difficulty) {return \catmodel_raschbirnbauma\raschmodel::likelihood($x,$item_difficulty);};

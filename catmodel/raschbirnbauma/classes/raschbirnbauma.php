@@ -47,15 +47,15 @@ class raschbirnbauma extends model_model {
         return new model_person_param_list();
     }
     
-    public function estimate_item_params(model_person_param_list $person_params): model_item_param_list {
-        $estimated_item_params = new model_item_param_list();
-        foreach ($this->responses->get_item_response($person_params) as $item_id => $item_response) {
-            $item_difficulty = \local_catquiz\catcalc::estimate_item_difficulty($item_response);
-            $param = $this
-                ->create_item_param($item_id)
-                ->set_difficulty($item_difficulty);
-            $estimated_item_params->add($param);
-        }
-        return $estimated_item_params;
+    /**
+     * @param mixed $item_response 
+     * @return float 
+     */
+    protected function calculate_difficulty($item_response) {
+       return \local_catquiz\catcalc::estimate_item_difficulty($item_response);
+    }
+
+    public function get_gradient() {
+        return [1,2];
     }
 }
