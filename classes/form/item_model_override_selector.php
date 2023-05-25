@@ -54,6 +54,8 @@ class item_model_override_selector extends dynamic_form {
         $mform->setType('testitemid', PARAM_INT);
         $mform->addElement('hidden', 'contextid');
         $mform->setType('contextid', PARAM_INT);
+        $mform->addElement('hidden', 'componentname');
+        $mform->setType('componentname', PARAM_TEXT);
 
         $models = model_strategy::get_installed_models();
 
@@ -125,8 +127,15 @@ class item_model_override_selector extends dynamic_form {
                     'id' => $saved_itemparams[$model]->id,
                 ];
             } else {
+                // If this item did not exist in the first place and the item status is set to "not calculated", don't do anything.
+                if (
+                    !array_key_exists($model, $saved_itemparams)
+                    && intval($form_itemparams[$model]->status) === model_item_param::STATUS_NOT_CALCULATED) {
+                    continue;
+                }
                 $to_insert[] = [
                     'status' => $form_itemparams[$model]->status,
+                    'model' => $model,
                 ];
             }
 
@@ -163,6 +172,17 @@ class item_model_override_selector extends dynamic_form {
             );
         }
 
+        foreach ($to_insert as $new) {
+            $new['componentid'] = $data->testitemid;
+            $new['contextid'] = $data->contextid;
+            $new['componentname'] = $data->componentname;
+            $new['timecreated'] = time();
+            $DB->insert_record(
+                'local_catquiz_itemparams',
+                (object) $new            
+            );
+        }
+
         return $data;
     }
 
@@ -193,6 +213,9 @@ class item_model_override_selector extends dynamic_form {
                 $modelparams = $itemparamsbymodel[$model];
                 $model_status = $modelparams->status;
                 $model_difficulty = $modelparams->difficulty;
+                if (empty($data->componentname)) {
+                    $data->componentname = $modelparams->componentname;
+                }
             } else { // Set default data if there are no calculated data for the given model
                 $model_status = model_item_param::STATUS_NOT_CALCULATED;
                 $model_difficulty = '-';
