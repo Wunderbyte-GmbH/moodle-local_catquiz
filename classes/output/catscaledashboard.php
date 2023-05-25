@@ -372,7 +372,7 @@ class catscaledashboard implements renderable, templatable
 
         $table->set_filter_sql($select, $from, $where, $filter, $params);
 
-        $table->define_columns(['firstname', 'lastname', 'studentattempts', 'personabilities', 'action']);
+        $table->define_columns(['firstname', 'lastname', 'studentattempts', 'ability', 'action']);
         $table->define_headers([
             get_string('firstname', 'core'),
             get_string('lastname', 'core'),
