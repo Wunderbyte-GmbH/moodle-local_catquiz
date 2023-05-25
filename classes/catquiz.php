@@ -544,4 +544,26 @@ class catquiz {
 
         return [$sql, $params];
     }
+
+    /**
+     * Returns the highest status for the given item in the given context
+     * @param int $testitemid
+     * @param int $contextid
+     * @return array
+     */
+    public static function get_sql_for_max_status_for_item(int $testitemid, int $contextid) {
+        $sql = "
+            SELECT max(status)
+            FROM {local_catquiz_itemparams}
+            WHERE componentid = :itemid
+              AND contextid = :contextid
+              GROUP BY componentid, contextid
+        ";
+        $params = [
+            'itemid' => $testitemid,
+            'contextid' => $contextid,
+        ];
+
+        return [$sql, $params];
+    }
 }

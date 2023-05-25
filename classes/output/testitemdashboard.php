@@ -31,11 +31,13 @@
 namespace local_catquiz\output;
 
 use catmodel_raschbirnbauma\raschmodel;
+use coding_exception;
 use context_system;
 use html_writer;
 use local_catquiz\catmodel_info;
 use local_catquiz\catquiz;
 use local_catquiz\form\item_model_override_selector;
+use local_catquiz\local\model\model_item_param;
 use local_catquiz\local\model\model_strategy;
 use local_catquiz\table\testitems_table;
 use moodle_url;
@@ -200,6 +202,29 @@ class testitemdashboard implements renderable, templatable {
     }
 
     /**
+     * @return string
+     * @throws coding_exception
+     */
+    private function get_itemstatus() {
+        global $DB;
+        list ($sql, $params) = catquiz::get_sql_for_max_status_for_item($this->testitemid, $this->contextid);
+        $max_status = intval($DB->get_field_sql($sql, $params));
+        switch ($max_status) {
+            case model_item_param::STATUS_NOT_SET:
+                return get_string('statusnotset', 'local_catquiz');
+            case model_item_param::STATUS_NOT_CALCULATED:
+                return get_string('statusnotcalculated', 'local_catquiz');
+            case model_item_param::STATUS_SET_BY_STRATEGY:
+                return get_string('statussetautomatically', 'local_catquiz');
+            case model_item_param::STATUS_SET_MANUALLY:
+                return get_string('statussetmanually', 'local_catquiz');
+
+            default:
+                return get_string('notavailable', 'core');
+        }
+    }
+
+    /**
      * Return the item tree of all catscales.
      * @return array
      */
@@ -213,6 +238,7 @@ class testitemdashboard implements renderable, templatable {
             'statcards' => $this->render_testitemstats(),
             'contextselector' => $this->render_contextselector(),
             'overridesforms' => $this->render_overrides_form(),
+            'itemstatus' => $this->get_itemstatus(),
         ];
         return $data;
     }
