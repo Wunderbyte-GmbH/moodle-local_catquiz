@@ -84,7 +84,7 @@ class testenvironment {
     /**
      * @var integer
      */
-    private int $catscaleid;
+    private ?int $catscaleid;
 
     /**
      * $componentid
