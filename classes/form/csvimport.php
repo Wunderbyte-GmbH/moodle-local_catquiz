@@ -15,6 +15,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 namespace local_catquiz\form;
+use local_catquiz\import\fileparser;
 
 defined('MOODLE_INTERNAL') || die();
 
@@ -25,8 +26,13 @@ require_once($CFG->dirroot . "/local/catquiz/lib.php");
 use context;
 use context_system;
 use core_form\dynamic_form;
+use moodleform;
+use local_catquiz\local\csvparser;
 use moodle_url;
 use stdClass;
+use core_text;
+use csv_import_reader;
+use local_catquiz\import\csvsettings;
 
 /**
  * Dynamic form.
@@ -52,25 +58,92 @@ class csvimport extends dynamic_form {
             $mform->addElement('hidden', 'id', $data->id);
             $mform->setType('id', PARAM_INT);
         }
-
-
-        $maxbytes = 2147483648; // 2 GB
         $mform->addElement(
             'filepicker', 
             'csvfile', 
             get_string('importcsv', 'local_catquiz'), 
             null, 
             [
-                'maxbytes' => $maxbytes,
-                'accepted_types' => '*',
-
+                'maxbytes' => $CFG->maxbytes,
+                'accepted_types' => 'csv',
             ]
-        ) ;
+        );
+        $mform->addRule('csvfile', null, 'required', null, 'client');
+        $choices = $this->get_delimiter_list();
+        $mform->addElement('select', 'delimiter_name', get_string('csvdelimiter', 'tool_uploaduser'), $choices);
+        if (array_key_exists('cfg', $choices)) {
+            $mform->setDefault('delimiter_name', 'cfg');
+        } else if (get_string('listsep', 'langconfig') == ';') {
+            $mform->setDefault('delimiter_name', 'semicolon');
+        } else {
+            $mform->setDefault('delimiter_name', 'comma');
+        }
+
+        $choices = core_text::get_encodings();
+        $mform->addElement('select', 'encoding', get_string('encoding', 'tool_uploaduser'), $choices);
+        $mform->setDefault('encoding', 'UTF-8');
+
+        $mform->addElement('text', 'dateparseformat', get_string('dateparseformat', 'booking'));
+        $mform->setType('dateparseformat', PARAM_NOTAGS);
+        $mform->setDefault('dateparseformat', get_string('defaultdateformat', 'booking'));
+        $mform->addRule('dateparseformat', null, 'required', null, 'client');
+        $mform->addHelpButton('dateparseformat', 'dateparseformat', 'mod_booking');
 
         $buttonarray = array();
         $buttonarray[] = $mform->createElement('submit', 'submitbutton', get_string('submit'));
         $buttonarray[] = $mform->createElement('cancel');
         $mform->addGroup($buttonarray, 'buttonar', '', ' ', false);
+    }
+
+    public static function call_settings_class() {
+
+        $columnsassociative = array(
+            'userid' => array(
+                'columnname' => get_string('id'),
+                'mandatory' => true,
+                'format' => PARAM_INT,
+                'default' => false,
+                
+            ),
+            'starttime' => array(
+                'mandatory' => false,
+                'format' => 'int',
+                'type' => 'date',
+            ),
+        );
+
+        $columnssequential = [
+            array(
+            'name' => 'userid',
+            'columnname' => get_string('id'),
+            'mandatory' => true,
+            'format' => 'string',
+            'transform' => fn($x) => get_string($x, 'local_catquiz'), 
+            ), 
+            array (
+            'name' => 'starttime',
+            'mandatory' => false,
+            'format' => 'int',
+            'type' => 'date',
+            'defaultvalue' => 1685015874,
+            )
+            ];
+        $settings = new csvsettings($columnssequential);
+        return $settings;
+    }
+    
+    /**
+     * Get list of cvs delimiters
+     *
+     * @return array suitable for selection box
+     */
+    public static function get_delimiter_list() {
+        global $CFG;
+        $delimiters = array('comma'=>',', 'semicolon'=>';', 'colon'=>':', 'tab'=>'\\t');
+        if (isset($CFG->CSV_DELIMITER) and strlen($CFG->CSV_DELIMITER) === 1 and !in_array($CFG->CSV_DELIMITER, $delimiters)) {
+            $delimiters['cfg'] = $CFG->CSV_DELIMITER;
+        }
+        return $delimiters;
     }
 
     /**
@@ -93,8 +166,21 @@ class csvimport extends dynamic_form {
      */
     public function process_dynamic_submission(): object {
         $data = $this->get_data();
+        $content = $this->get_file_content('csvfile');
+        $settings = $this->call_settings_class(); // todo transfer real $content to parser
+        
+        if(!empty($data->delimiter_name)) {
+            $settings->set_delimiter($data->delimiter_name);
+        }
+        if(!empty($data->encoding)) {
+            $settings->set_encoding($data->encoding);
+        }
+        if(!empty($data->dateparseformat)) {
+            $settings->set_dateformat($data->dateparseformat);
+        }
 
-        return $data;
+        $parser = new fileparser($content, $settings);
+        return $settings;
     }
 
     /**
