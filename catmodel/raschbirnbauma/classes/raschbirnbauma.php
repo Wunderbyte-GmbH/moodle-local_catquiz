@@ -55,7 +55,7 @@ class raschbirnbauma extends model_model {
        return \local_catquiz\catcalc::estimate_item_difficulty($item_response);
     }
 
-    public function get_gradient() {
+    public function get_jacobian() {
         return [1,2];
     }
 }

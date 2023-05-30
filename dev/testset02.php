@@ -78,7 +78,7 @@ $demo_response = local_catquiz\synthcat::generate_response_multi($demo_persons,$
 //$myraschbirnbaum = new \catmodel_raschbirnbaumb\raschbirnbaumb($response,"RaschBB_2PL");
 
 
-//$testfn = $myraschbirnbaum->get_log_gradient(0.3);
+//$testfn = $myraschbirnbaum->get_log_jacobian(0.3);
 
 
 
