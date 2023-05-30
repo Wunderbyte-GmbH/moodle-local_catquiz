@@ -486,18 +486,44 @@ class catquiz {
     public static function return_sql_for_testenvironments(
         string $where = "1=1",
         array $filterarray = []) {
-
+        global $DB;
         $params = [];
         $filter = '';
 
-        $select = "*";
+        $select = "
+            c.id,
+            name,
+            component,
+            c.visible,
+            availability,
+            c.lang,
+            status,
+            parentid,
+            fullname,
+            c.timemodified,
+            c.timecreated,
+            ct.catscaleid,
+            numberofitems,
+            teachers";
+
         $from = "
         {local_catquiz_tests} ct
         JOIN {course} c ON c.id = ct.courseid
         JOIN (SELECT catscaleid, COUNT(*) AS numberofitems
            FROM m_local_catquiz_items
            GROUP BY catscaleid
-        ) s1 ON ct.catscaleid = s1.catscaleid";
+        ) s1 ON ct.catscaleid = s1.catscaleid
+        JOIN (
+            SELECT c.id AS courseid, " . $DB->sql_group_concat($DB->sql_concat_join("' '", ['u.firstname', 'u.lastname']), ', ') . " AS teachers
+            FROM {user} u
+            JOIN {role_assignments} ra ON ra.userid = u.id
+            JOIN {context} ct ON ct.id = ra.contextid
+            JOIN {course} c ON c.id = ct.instanceid
+            JOIN {role} r ON r.id = ra.roleid
+            WHERE r.shortname IN ('teacher', 'editingteacher')
+            GROUP BY c.id
+            ) s2 ON s2.courseid = ct.courseid"
+        ;
 
         return [$select, $from, $where, $filter, $params];
     }

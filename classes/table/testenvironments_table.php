@@ -173,10 +173,6 @@ class testenvironments_table extends wunderbyte_table {
 
     }
 
-    public function col_course($values) {
-        return $values->fullname;
-    }
-
     /**
      * Delete item.
      *
