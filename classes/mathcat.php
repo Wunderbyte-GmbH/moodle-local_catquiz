@@ -25,36 +25,40 @@
 
 namespace local_catquiz;
 
-class mathcat{
+class mathcat
+{
 
-    static function newtonraphson($func, $derivative, $start = 0, $min_inc = 0.0001, $max_iter=150): float {
+    static function newtonraphson($func, $derivative, $start = 0, $min_inc = 0.0001, $max_iter = 150): float
+    {
 
         $return_val = 0.0;
         $x_0 = $start;
 
-        for ($n = 1; $n < $max_iter; $n++){
+        for ($n = 1; $n < $max_iter; $n++) {
 
             #$diff  = - $func($x_0) / ($derivative($x_0)+0.001);
-            $diff  = - $func($x_0) / ($derivative($x_0)+0.00000001);
+            $diff = -$func($x_0) / ($derivative($x_0) + 0.00000001);
             //echo "Iteration:" . $n . "and diff: " . $diff . " x_0=" . $x_0 . " value: ". $func($x_0)  . "<br>";
             $x_0 += $diff;
 
             # workarround for numerical stability -> TODO: replace with gauß
-            if ($diff > 10){
+            if ($diff > 10) {
                 //echo "warning - drift: " . abs($diff) . "<br>";
                 return 5;
-            }elseif($diff < -10){
+            } elseif ($diff < -10) {
                 //echo "warning - drift: " . abs($diff) .  "<br>";
                 return -5;
             }
 
-            if (abs($diff) < $min_inc){
+            if (abs($diff) < $min_inc) {
                 break;
             }
         }
         return $x_0;
     }
-    static function newtonraphson_numeric($f, $x0, $tolerance, $max_iterations=150, $h=0.001) {
+
+    static function newtonraphson_numeric($f, $x0, $tolerance, $max_iterations = 150, $h = 0.001)
+    {
 
         for ($i = 0; $i < $max_iterations; $i++) {
             $fx0 = $f($x0);
@@ -76,33 +80,49 @@ class mathcat{
         return $x0;
     }
 
-    static function get_numerical_derivative(callable $func, float $h = 1e-5) {
-        $returnfn = function ($x) use ($func,$h) { return ($func($x + $h) - $func($x)) / $h;};
+    static function get_numerical_derivative(callable $func, float $h = 1e-5)
+    {
+        $returnfn = function ($x) use ($func, $h) {
+            return ($func($x + $h) - $func($x)) / $h;
+        };
         return $returnfn;
     }
 
-    static function get_numerical_derivative2(callable $func, float $h = 1e-6) {
-        $returnfn = function ($x) use ($func,$h) { return ($func($x + $h) - $func($x-$h)) / (2*$h);};
+    static function get_numerical_derivative2(callable $func, float $h = 1e-6)
+    {
+        $returnfn = function ($x) use ($func, $h) {
+            return ($func($x + $h) - $func($x - $h)) / (2 * $h);
+        };
         return $returnfn;
     }
 
-    static function compose_plus($function1, $function2){
-        $returnfn = function ($x) use ($function1, $function2) {return $function1($x) + $function2($x);};
+    static function compose_plus($function1, $function2)
+    {
+        $returnfn = function ($x) use ($function1, $function2) {
+            return $function1($x) + $function2($x);
+        };
         return $returnfn;
     }
 
-    static function compose_multiply($function1, $function2){
-        $returnfn = function ($x) use ($function1, $function2) {return $function1($x) * $function2($x);};
+    static function compose_multiply($function1, $function2)
+    {
+        $returnfn = function ($x) use ($function1, $function2) {
+            return $function1($x) * $function2($x);
+        };
         return $returnfn;
     }
 
-    static function compose_chain($function1, $function2){
-        $returnfn = function ($x) use ($function1, $function2) {return $function1($function2);};
+    static function compose_chain($function1, $function2)
+    {
+        $returnfn = function ($x) use ($function1, $function2) {
+            return $function1($function2);
+        };
         return $returnfn;
     }
 
 
-    static function gradient(callable $func, $point, $delta = 1e-5) {
+    static function gradient(callable $func, $point, $delta = 1e-5)
+    {
         $grad = [];
         for ($i = 0; $i < count($point); $i++) {
             $point_plus_delta = $point;
@@ -114,7 +134,8 @@ class mathcat{
         return $grad;
     }
 
-    static function matrix_vector_product($matrix, $vector) {
+    static function matrix_vector_product($matrix, $vector)
+    {
         $result = [];
         for ($i = 0; $i < count($matrix); $i++) {
             $result[$i] = 0;
@@ -125,7 +146,8 @@ class mathcat{
         return $result;
     }
 
-    static function bfgs(callable $func, $start_point, $step_size = 0.01, $tolerance = 1e-6, $max_iterations = 1000) {
+    static function bfgs(callable $func, $start_point, $step_size = 0.01, $tolerance = 1e-6, $max_iterations = 1000)
+    {
         $n = count($start_point);
         $current_point = $start_point;
         $iteration = 0;
@@ -162,8 +184,8 @@ class mathcat{
             }
 
             $rho = 1 / array_sum(array_map(function ($yi, $si) {
-                        return $yi * $si;
-                    }, $y, $s));
+                    return $yi * $si;
+                }, $y, $s));
 
             $I = [];
             for ($i = 0; $i < $n; $i++) {
@@ -216,9 +238,42 @@ class mathcat{
         return $current_point;
     }
 
+    static function newton_raphson_multi($func, $derivative, $start, $min_inc = 0.0001, $max_iter = 20)
+    {
+
+        $model_dim = count($func);
+
+        $ml = new matrixcat();
+        // get real jacobian/hessian
+
+        $z_0 = $start;
+
+
+        // jacobian, hessian, model_dim, start_value
+
+
+        for ($i = 0; $i < $max_iter; $i++) {
+
+            for ($k = 0; $k <= $model_dim-1; $k++) {
+
+                $real_func[$k] = [$func[$k]($z_0)];
+
+                for ($j = 0; $j <= $model_dim-1; $j++) {
+                    $real_derivative[$k][$j] = $derivative[$k][$j]($z_0);
+                }
+            }
+
+
+            $G = $real_func;
+            $J = $real_derivative;
+
+            $j_inv = $ml->inverseMatrix($J);
+            $z_0 = $ml->subtractVectors($z_0, $ml->flattenArray($ml->multiplyMatrices($j_inv, $G)));
 
 
 
-
+        }
+        return $z_0;
+    }
 }
 
