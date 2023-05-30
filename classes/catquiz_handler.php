@@ -216,6 +216,7 @@ class catquiz_handler {
             $test = new testenvironment($cattest);
             $test->apply_jsonsaved_values($formdefaultvalues);
             $formdefaultvalues['choosetest'] = 0;
+            $formdefaultvalues['catquiz_passinglevel'] = '123';
         } else {
             // Create stdClass with all the values.
             $cattest = (object)[
@@ -394,7 +395,7 @@ class catquiz_handler {
             if ($mform->elementExists($k)) {
                 $element = $mform->getElement($k);
                 $element->setValue($v);
-                if ($test->status_force()) {
+                if ($test->status_force() && $k !== 'choosetest') {
                     $element->freeze();
                 }
             }
