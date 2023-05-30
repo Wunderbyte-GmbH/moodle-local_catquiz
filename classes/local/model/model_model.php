@@ -72,7 +72,7 @@ abstract class model_model {
         $estimated_item_params = new model_item_param_list();
         foreach ($this->responses->get_item_response($person_params) as $item_id => $item_response) {
             // Calculate the difficulty -> returns a float value
-            $item_difficulty = $this->calculate_difficulty($item_response);
+            $item_difficulty = $this->calculate_params($item_response);
             // Now create a new item difficulty object (param)
             $param = $this
                 ->create_item_param($item_id, ['from_raschbirnbauma' => 'hello hello'])
@@ -83,7 +83,7 @@ abstract class model_model {
         return $estimated_item_params;
     }
 
-    abstract protected function calculate_difficulty($item_response);
+    abstract protected function calculate_params($item_response);
 
     public function get_jacobian() {
         return [];

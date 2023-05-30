@@ -12,7 +12,7 @@ use local_catquiz\local\model\model_person_param_list;
  */
 class demo extends model_model
 {
-    public function calculate_difficulty($item_response) {
+    public function calculate_params($item_response) {
         return 0.5;
     }
 }

@@ -15,7 +15,7 @@ use local_catquiz\local\model\model_responses;
 class demo2 extends model_model
 {
 
-    public function calculate_difficulty($item_response) {
+    public function calculate_params($item_response) {
         return 0.1;
     }
 }
