@@ -24,6 +24,8 @@
  */
 
 namespace local_catquiz;
+use local_catquiz\local\model\model_item_response;
+
 class synthcat{
 
     static function generate_persons($randomvec) {
@@ -102,4 +104,191 @@ class synthcat{
         }
         return $response;
     }
+
+    static function generate_test_items_multi ($param_vec) {
+
+        $result = array();
+
+        $test_items = array();
+
+        // Get the number of subarrays
+        $numSubarrays = count($param_vec);
+
+        // Get the length of each subarray
+        $subarrayLength = count($param_vec[0]);
+
+        // Iterate over the elements of the subarrays
+        for ($i = 0; $i < $subarrayLength; $i++) {
+            $temp = array();
+
+            // Iterate over the subarrays
+            for ($j = 0; $j < $numSubarrays; $j++) {
+                $temp[] = $param_vec[$j][$i];
+            }
+
+            $item = array(
+                    'id' => $i + 1,
+                    'params' => $temp
+            );
+
+            array_push($test_items, $item);
+
+        }
+
+        return $test_items;
+    }
+
+    static function get_probability_for_passing_mutli($person_ability, $item_params, $model){
+
+        return $model->likelihood_multi($person_ability,$item_params);
+
+    }
+
+    static function generate_response_multi($demo_persons, $demoitems, $model){
+
+
+        $component_name = 'comp1';
+        $response = array();
+
+        foreach ($demo_persons as $person) {
+
+            $person_id = $person['id'];
+            $response[$person_id] = array();
+            $response[$person_id][$component_name] = array();
+
+            $person_ability = $person['ability']; // set the person's ability parameter
+            foreach ($demoitems as $item) {
+
+                $item_id = $item['id'];
+                $item_params = $item['params'];
+
+                $p = self::get_probability_for_passing_mutli($person_ability, $item_params, $model);
+
+                //if ($person_ability >= $item_difficulty){  // non-probabilistic workaround
+                //    $passed = 1;
+                //} else {
+                //    $passed = 0;
+                //}
+
+                if ($p >= 0.5) {  // non-probabilistic workaround
+                    $passed = 1;
+                } else {
+                    $passed = 0;
+                }
+
+                $item_response = array(
+                        'fraction' => $passed,
+                        'max_fraction' => 1,
+                        'min_fraction' => 0,
+                        'qtype' => 'truefalse',
+                        'timestamp' => 12345678
+                );
+                $response[$person_id][$component_name][$item_id] = $item_response;
+            }
+        }
+        return $response;
+
+    }
+
+
+    static function get_person_abilities($num){
+
+
+    }
+
+
+    static function get_item_response2($num_pos,$num_neg,$person_ability){
+
+        $list = [];
+
+
+
+        for($i=1;$i<=$num_pos;$i++){
+
+            $tmp_item_response = new model_item_response(1,$person_ability);
+            array_push($list,$tmp_item_response);
+
+        }
+
+        for($i=1;$i<=$num_neg;$i++){
+
+            $tmp_item_response = new model_item_response(0,$person_ability);
+            array_push($list,$tmp_item_response);
+
+        }
+
+
+
+
+        return $list;
+
+    }
+
+}
+
+
+
+
+
+
+
+
+class mytestclass{
+    static function testtest(){
+        return "test";
+    }
+}
+
+
+class synthcat2{
+
+    static function generate_persons($randomvec) {
+        $persons = array();
+        for ($i = 1; $i <= count($randomvec); $i++) {
+            $person = array(
+                    'id' => $i,
+                    'ability' => $randomvec[$i-1] // generate a random ability parameter between 0 and 1
+            );
+            array_push($persons, $person);
+        }
+        return $persons;
+    }
+
+    static function generate_test_items ($param_vec) {
+
+        $result = array();
+
+        $test_items = array();
+
+        // Get the number of subarrays
+        $numSubarrays = count($param_vec);
+
+        // Get the length of each subarray
+        $subarrayLength = count($param_vec[0]);
+
+        // Iterate over the elements of the subarrays
+        for ($i = 0; $i < $subarrayLength; $i++) {
+            $temp = array();
+
+            // Iterate over the subarrays
+            for ($j = 0; $j < $numSubarrays; $j++) {
+                $temp[] = $param_vec[$j][$i];
+            }
+
+            $item = array(
+                    'id' => $i,
+                    'params' => $temp
+            );
+
+            array_push($test_items, $item);
+
+        }
+
+        return $test_items;
+    }
+
+
+
+
+
 }
