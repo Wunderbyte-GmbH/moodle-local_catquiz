@@ -104,6 +104,9 @@ class catquiz_handler {
         // We have require JS to click no submit button on change of test environment.
         $PAGE->requires->js_call_amd('local_catquiz/catquizTestChooser', 'init');
 
+        // We want to make sure the cat model section is always expanded.
+        $mform->setExpanded('catmodelheading');
+
          // Button to attach JavaScript to to reload the form.
          $mform->registerNoSubmitButton('submitcattestoption');
          $elements[] = $mform->addElement('submit', 'submitcattestoption', 'cattestsubmit',
@@ -117,7 +120,6 @@ class catquiz_handler {
         // Choose a model for this instance.
         $elements[] = $mform->addElement('select', 'catquiz_model_select',
                 get_string('selectmodel', 'local_catquiz'), $modelarray);
-        $mform->hideIf('catquiz_model_select', 'catmodel', 'neq', 'catquiz');
 
         // Question categories or tags to use for this quiz.
 
@@ -133,17 +135,14 @@ class catquiz_handler {
         }
         $elements[] = $mform->addElement('autocomplete', 'catquiz_catcatscales', get_string('catcatscales', 'local_catquiz'), $select, $options);
         $mform->addHelpButton('catquiz_catcatscales', 'catcatscales', 'local_catquiz');
-        $mform->hideIf('catquiz_catcatscales', 'catmodel', 'neq', 'catquiz');
 
         $elements[] = $mform->addElement('text', 'catquiz_passinglevel', get_string('passinglevel', 'local_catquiz'));
         $mform->addHelpButton('catquiz_passinglevel', 'passinglevel', 'local_catquiz');
         $mform->setType('catquiz_passinglevel', PARAM_INT);
-        $mform->hideIf('catquiz_passinglevel', 'catmodel', 'neq', 'catquiz');
 
         // Is it a time paced test?
         $elements[] = $mform->addElement('advcheckbox', 'catquiz_timepacedtest',
                 get_string('timepacedtest', 'local_catquiz'), null, null, [0, 1]);
-        $mform->hideIf('catquiz_timepacedtest', 'catmodel', 'neq', 'catquiz');
 
         $elements[] = $mform->addElement('text', 'catquiz_maxtimeperitem', get_string('maxtimeperitem', 'local_catquiz'));
         // $mform->addHelpButton('catquiz_maxtimeperitem', 'maxtimeperitem', 'local_catquiz');
