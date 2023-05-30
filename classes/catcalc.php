@@ -264,11 +264,11 @@ class catcalc {
 
         $model_dim = $model->get_model_dim();
 
-        // loglikelihood
+        // empty callable structures for composition
 
         $loglikelihood = function($x) {
             return 0;
-        }; //initial
+        };
 
         $jacobian = [];
         $hessian = [];
@@ -283,7 +283,6 @@ class catcalc {
                 };
             }
         }
-
 
         foreach ($item_response as $r) {
 
@@ -312,125 +311,55 @@ class catcalc {
             $loglikelihood = mathcat::compose_plus($loglikelihood, $likelihood_part);
 
             for ($i=0; $i <= $model_dim-2; $i++){
-
                 $jacobian[$i] = mathcat::compose_plus($jacobian[$i], $jacobian_part[$i]);
 
-                for ($j=0; $j <= $model_dim-2; $j++){
+                for ($j=0; $j <= $model_dim-2; $j++) {
                     $hessian[$i][$j] = mathcat::compose_plus($hessian[$i][$j], $hessian_part[$i][$j]);
                 }
-
             }
-
         }
 
-
-
-        $ml = new matrixcat();
-
-
+//        $ml = new matrixcat();
         // get real jacobian/hessian
 
-
-        $z_0 = [1,2];
-
+//        $z_0 = [1,2];
 
 
 
 
-
-        //
-        //
-        //echo "stop";
-        //
+        // jacobian, hessian, model_dim, start_value
 
 
 
-
-        for ($i = 0; $i < 70; $i++) {
-
-            for ($k=0; $k <= $model_dim-2; $k++) {
-
-                $real_jacobian[$k] = [$jacobian[$k]($z_0)];
-
-                for ($j = 0; $j <= $model_dim - 2; $j++) {
-                    $real_hessian[$k][$j] = $hessian[$k][$j]($z_0);
-                }
-            }
-
-
-            $G = $real_jacobian;
-            $J = $real_hessian;
-
-            $j_inv = $ml->inverseMatrix($J);
-
-
-            $test = $ml->multiplyMatrices($j_inv,$G);
-
-            $z_0 =  $ml->subtractVectors($z_0, $ml->flattenArray($ml->multiplyMatrices($j_inv,$G)));
-            //$x0 = $ml->multiplyMatrices($j_inv,$g);
-
+//
+//        for ($i = 0; $i < 70; $i++) {
+//
+//            for ($k=0; $k <= $model_dim-2; $k++) {
+//
+//                $real_jacobian[$k] = [$jacobian[$k]($z_0)];
+//
+//                for ($j = 0; $j <= $model_dim - 2; $j++) {
+//                    $real_hessian[$k][$j] = $hessian[$k][$j]($z_0);
+//                }
+//            }
+//
+//
+//            $G = $real_jacobian;
+//            $J = $real_hessian;
+//
+//            $j_inv = $ml->inverseMatrix($J);
+//            $test = $ml->multiplyMatrices($j_inv,$G)
+//            $z_0 =  $ml->subtractVectors($z_0, $ml->flattenArray($ml->multiplyMatrices($j_inv,$G)));
+//            $x0 = $ml->multiplyMatrices($j_inv,$g);
+//
 //            print_r($z_0);
+//        }
 
+        $z_0 = [1,1];
 
+        $params = \local_catquiz\mathcat::newton_raphson_multi($jacobian,$hessian,$z_0);
 
-        }
-
-
-
-
-
-        echo "test";
-
-
-
-
-
-
-
-        // get ingredients from model
-        //
-        //$get_log_likelihood =
-        //$get_log_counter_likelihood =
-        //
-        //$get_log_jacobian =
-        //$get_log_counter_jacobian =
-
-
-
-        //
-        //foreach ($item_response as $r) {
-        //
-        //    // compose likelihood
-        //    $tmp_response = $r->get_response();
-        //    $tmp_ability = $r->get_ability();
-        //
-        //    if ($tmp_response == 1){
-        //
-        //
-        //
-        //        $num_passed +=1;
-        //
-        //        $loglikelihood_1st_derivative = \local_catquiz\mathcat::compose_plus($loglikelihood_1st_derivative,$loglikelihood_1st_derivative_part);
-        //        $loglikelihood_2nd_derivative = \local_catquiz\mathcat::compose_plus($loglikelihood_2nd_derivative,$loglikelihood_2nd_derivative_part);
-        //
-        //    }elseif($tmp_response == 0) {
-        //        $loglikelihood_1st_derivative_part = function($x) use ($tmp_ability) {
-        //            return (\catmodel_raschbirnbauma\raschmodel::log_likelihood_counter_1st_derivative_item($tmp_ability, $x));
-        //        };
-        //        $loglikelihood_2nd_derivative_part = function($x) use ($tmp_ability) {
-        //            return (\catmodel_raschbirnbauma\raschmodel::log_likelihood_counter_2nd_derivative_item($tmp_ability, $x));
-        //        };
-        //        $num_failed += 1;
-        //
-        //        $loglikelihood_1st_derivative =
-        //                \local_catquiz\mathcat::compose_plus($loglikelihood_1st_derivative, $loglikelihood_1st_derivative_part);
-        //        $loglikelihood_2nd_derivative =
-        //                \local_catquiz\mathcat::compose_plus($loglikelihood_2nd_derivative, $loglikelihood_2nd_derivative_part);
-        //    }
-        //}
-        //
-
-    return [0,0];
+        echo "finished";
 
     }
 }
