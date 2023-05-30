@@ -216,7 +216,6 @@ class catquiz_handler {
             $test = new testenvironment($cattest);
             $test->apply_jsonsaved_values($formdefaultvalues);
             $formdefaultvalues['choosetest'] = 0;
-            $formdefaultvalues['catquiz_passinglevel'] = '123';
         } else {
             // Create stdClass with all the values.
             $cattest = (object)[
