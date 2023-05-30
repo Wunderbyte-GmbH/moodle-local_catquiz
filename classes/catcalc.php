@@ -270,15 +270,15 @@ class catcalc {
             return 0;
         }; //initial
 
-        $gradient = [];
         $jacobian = [];
+        $hessian = [];
         for ($i = 0; $i <= $model_dim - 2; $i++) {
-            $gradient[$i] = function($x) {
+            $jacobian[$i] = function($x) {
                 return 0;
             };
-            $jacobian[$i] = [];
+            $hessian[$i] = [];
             for ($j = 0; $j <= $model_dim - 2; $j++) {
-                $jacobian[$i][$j] = function($x) {
+                $hessian[$i][$j] = function($x) {
                     return 0;
                 };
             }
@@ -295,15 +295,15 @@ class catcalc {
                 $num_passed += 1;
 
                 $likelihood_part = $model->get_log_likelihood($tmp_ability);
-                $gradient_part = $model->get_log_gradient($tmp_ability);
-                $jacobian_part = $model->get_log_jacobi($tmp_ability);
+                $jacobian_part = $model->get_log_jacobian($tmp_ability);
+                $hessian_part = $model->get_log_jacobi($tmp_ability);
 
             } else if ($tmp_response == 0) {
                 $num_failed += 1;
 
                 $likelihood_part = $model->get_log_counter_likelihood($tmp_ability);
-                $gradient_part = $model->get_log_counter_gradient($tmp_ability);
-                $jacobian_part = $model->get_log_counter_jacobi($tmp_ability);
+                $jacobian_part = $model->get_log_counter_jacobian($tmp_ability);
+                $hessian_part = $model->get_log_counter_jacobi($tmp_ability);
 
             }
 
@@ -313,10 +313,10 @@ class catcalc {
 
             for ($i=0; $i <= $model_dim-2; $i++){
 
-                $gradient[$i] = mathcat::compose_plus($gradient[$i], $gradient_part[$i]);
+                $jacobian[$i] = mathcat::compose_plus($jacobian[$i], $jacobian_part[$i]);
 
                 for ($j=0; $j <= $model_dim-2; $j++){
-                    $jacobian[$i][$j] = mathcat::compose_plus($jacobian[$i][$j], $jacobian_part[$i][$j]);
+                    $hessian[$i][$j] = mathcat::compose_plus($hessian[$i][$j], $hessian_part[$i][$j]);
                 }
 
             }
@@ -328,7 +328,7 @@ class catcalc {
         $ml = new matrixcat();
 
 
-        // get real gradient/jacobian
+        // get real jacobian/hessian
 
 
         $z_0 = [1,2];
@@ -350,16 +350,16 @@ class catcalc {
 
             for ($k=0; $k <= $model_dim-2; $k++) {
 
-                $real_gradient[$k] = [$gradient[$k]($z_0)];
+                $real_jacobian[$k] = [$jacobian[$k]($z_0)];
 
                 for ($j = 0; $j <= $model_dim - 2; $j++) {
-                    $real_jacobian[$k][$j] = $jacobian[$k][$j]($z_0);
+                    $real_hessian[$k][$j] = $hessian[$k][$j]($z_0);
                 }
             }
 
 
-            $G = $real_gradient;
-            $J = $real_jacobian;
+            $G = $real_jacobian;
+            $J = $real_hessian;
 
             $j_inv = $ml->inverseMatrix($J);
 
@@ -392,8 +392,8 @@ class catcalc {
         //$get_log_likelihood =
         //$get_log_counter_likelihood =
         //
-        //$get_log_gradient =
-        //$get_log_counter_gradient =
+        //$get_log_jacobian =
+        //$get_log_counter_jacobian =
 
 
 

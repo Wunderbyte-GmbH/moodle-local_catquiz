@@ -46,7 +46,7 @@ class model_person_ability_estimator_demo extends model_person_ability_estimator
         foreach ($responses as $userid => $item_response) {
             // Just a demo
             foreach ($item_param_list as $item) {
-                $gradient = $models[$item->get_model_name()]->get_gradient();
+                $jacobian = $models[$item->get_model_name()]->get_jacobian();
             }
             foreach(array_keys($item_response) as $component) {
                 $ability = catcalc::estimate_person_ability(
