@@ -22,6 +22,7 @@
 
 namespace catmodel_raschbirnbaumb;
 
+use Closure;
 use local_catquiz\local\model\model_item_param_list;
 use local_catquiz\local\model\model_model;
 use local_catquiz\local\model\model_person_param_list;
@@ -54,7 +55,7 @@ class raschbirnbaumb extends model_model
         return new model_person_param_list();
     }
 
-    public function calculate_difficulty($item_response)
+    public function calculate_params($item_response)
     {
         return 0.0;
     }
@@ -68,6 +69,13 @@ class raschbirnbaumb extends model_model
         return (1 / (1 + exp($a * ($b - $p))));
     }
 
+    /**
+     * Generalisierung von `likelihood`: params $a und $b werden im array/vector als $x[0] und $x[1] angesprochen
+     * Kann in likelihood umbenannt werden
+     * @param mixed $p 
+     * @param mixed $x 
+     * @return int|float 
+     */
     public function likelihood_multi($p, $x)
     {
         return (1 / (1 + exp($x[0] * ($x[1] - $p))));
@@ -166,6 +174,11 @@ class raschbirnbaumb extends model_model
     }
 
 
+    /**
+     * Used to estimate the item difficulty
+     * @param mixed $p 
+     * @return Closure(mixed $x): float 
+     */
     public function get_log_likelihood($p)
     {
 
@@ -175,6 +188,11 @@ class raschbirnbaumb extends model_model
         return $fun;
     }
 
+    /**
+     * Used to estimate the item difficulty
+     * @param mixed $p 
+     * @return Closure(mixed $x): float 
+     */
     public function get_log_counter_likelihood($p)
     {
 
@@ -185,8 +203,9 @@ class raschbirnbaumb extends model_model
     }
 
 
-    // get elementary matrix function for being composed
-
+    /**
+     * Get elementary matrix function for being composed
+     */
     public function get_log_jacobian($p)
     {
 
@@ -205,7 +224,7 @@ class raschbirnbaumb extends model_model
 
     }
 
-    function get_log_counter_jacobian($p)
+    public function get_log_counter_jacobian($p)
     {
 
         $fun1 = function ($x) use ($p) {
@@ -220,7 +239,7 @@ class raschbirnbaumb extends model_model
     }
 
 
-    function get_log_jacobi($p)
+    public function get_log_hessian($p)
     {
 
         $fun11 = function ($x) use ($p) {
@@ -240,7 +259,7 @@ class raschbirnbaumb extends model_model
 
     }
 
-    function get_log_counter_jacobi($p)
+    public function get_log_counter_jacobi($p)
     {
 
         $fun11 = function ($x) use ($p) {
