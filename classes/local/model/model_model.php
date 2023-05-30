@@ -85,7 +85,7 @@ abstract class model_model {
 
     abstract protected function calculate_difficulty($item_response);
 
-    public function get_gradient() {
+    public function get_jacobian() {
         return [];
     }
 }
