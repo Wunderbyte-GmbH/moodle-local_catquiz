@@ -295,7 +295,7 @@ class catcalc {
 
                 $likelihood_part = $model->get_log_likelihood($tmp_ability);
                 $jacobian_part = $model->get_log_jacobian($tmp_ability);
-                $hessian_part = $model->get_log_jacobi($tmp_ability);
+                $hessian_part = $model->get_log_hessian($tmp_ability);
 
             } else if ($tmp_response == 0) {
                 $num_failed += 1;

@@ -51,7 +51,7 @@ class raschbirnbauma extends model_model {
      * @param mixed $item_response
      * @return float
      */
-    protected function calculate_difficulty($item_response) {
+    protected function calculate_params($item_response) {
        return \local_catquiz\catcalc::estimate_item_difficulty($item_response);
     }
 
