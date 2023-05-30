@@ -84,7 +84,7 @@ class testenvironmentdashboard implements renderable, templatable {
             'catscaleid',
             'fullname',
             'numberofitems',
-            'numberofusers',
+            //'numberofusers',
             'teachers',
         ]);
         $table->define_headers([
