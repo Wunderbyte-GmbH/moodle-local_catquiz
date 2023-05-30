@@ -215,5 +215,10 @@ class mathcat{
 
         return $current_point;
     }
+
+
+
+
+
 }
 

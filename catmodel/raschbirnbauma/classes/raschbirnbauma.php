@@ -46,10 +46,10 @@ class raschbirnbauma extends model_model {
         // TODO implement
         return new model_person_param_list();
     }
-    
+
     /**
-     * @param mixed $item_response 
-     * @return float 
+     * @param mixed $item_response
+     * @return float
      */
     protected function calculate_difficulty($item_response) {
        return \local_catquiz\catcalc::estimate_item_difficulty($item_response);
