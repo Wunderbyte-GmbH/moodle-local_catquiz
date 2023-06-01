@@ -417,4 +417,14 @@ class catquiz_handler {
         }
     }
 
+    /**
+     * Returns the ID of the next question
+     *
+     * This is called by adaptive quiz
+     * @return int
+     */
+    public static function fetch_question_id() {
+        return 5;
+    }
+
 }
