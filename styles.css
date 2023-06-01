@@ -7,6 +7,18 @@
     margin-top: 50px;
 }
 
+#page-local-catquiz-manage_catscales .tab-content {
+    margin-top: 50px;
+}
+
+.catmanager-summary.grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-gap: 10px;
+    margin-bottom: 50px;
+    margin-top: 50px;
+}
+
 canvas {
     max-width: 60%;
 }

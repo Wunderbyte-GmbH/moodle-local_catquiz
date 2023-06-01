@@ -44,8 +44,8 @@ $data = new catscales();
 $catscalemanagers = new catscalemanagers();
 
 echo $OUTPUT->render_from_template('local_catquiz/catscalesdashboard', [
-    'itemtree' => $data->itemtree,
-    'catscalemanagers' => $catscalemanagers->return_as_array(),
+    'itemtree' => $data->export_for_template($OUTPUT),
+    'catscalemanagers' => $catscalemanagers->export_for_template($OUTPUT),
 ]);
 
 echo $OUTPUT->footer();
