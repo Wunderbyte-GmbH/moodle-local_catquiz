@@ -28,6 +28,7 @@ namespace local_catquiz;
 use cache_helper;
 use context_system;
 use core_plugin_manager;
+use Exception;
 use moodle_exception;
 use MoodleQuickForm;
 use stdClass;
@@ -66,6 +67,12 @@ class catquiz_handler {
         global $PAGE;
 
         $elements = [];
+
+        // This function is for some architectural reason executed twice.
+        // In order to avoid adding elements twice, we need this exit.
+        if ($mform->elementExists('choosetest')) {
+            return [];
+        }
 
         $pm = core_plugin_manager::instance();
         $models = $pm->get_plugins_of_type('catmodel');
@@ -386,10 +393,18 @@ class catquiz_handler {
             'testenvironment_addoredittemplate' => '0',
         ];
 
+        $igonorevalues = [
+            'choosetest'
+        ];
+
         foreach ($values as $k => $v) {
 
             if (isset($overridevalues[$k])) {
                 $v = $overridevalues[$k];
+            }
+
+            if (in_array($k, $igonorevalues)) {
+                continue;
             }
 
             if ($mform->elementExists($k)) {
