@@ -599,6 +599,12 @@ class catquiz {
         return [$sql, $params];
     }
 
+    /**
+     * For a CAT-Scale manager, returns the number of assigned CAT-Scales.
+     * 
+     * @param int $userid
+     * @return array
+     */
     public static function get_sql_for_number_of_assigned_catscales(int $userid) {
         $sql = "
             SELECT COUNT(*)
@@ -616,6 +622,13 @@ class catquiz {
         return [$sql, $params];
     }
 
+    /**
+     * For a CAT-Scale manager, returns the number of tests that are connected
+     * to the managed CAT scales.
+     * 
+     * @param int $userid
+     * @return array
+     */
     public static function get_sql_for_number_of_assigned_tests(int $userid) {
         $sql = "
             SELECT COUNT(*)
