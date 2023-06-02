@@ -52,12 +52,15 @@ list($sql, $params) = catquiz::get_sql_for_number_of_assigned_catscales($USER->i
 $num_assigned_catscales = $DB->count_records_sql($sql, $params);
 list($sql, $params) = catquiz::get_sql_for_number_of_assigned_tests($USER->id);
 $num_assigned_tests = $DB->count_records_sql($sql, $params);
+list($sql, $params) = catquiz::get_sql_for_number_of_assigned_questions($USER->id);
+$num_assigned_questions = $DB->count_records_sql($sql, $params);
 
 echo $OUTPUT->render_from_template('local_catquiz/catscalesdashboard', [
     'itemtree' => $data->export_for_template($OUTPUT),
     'catscalemanagers' => $catscalemanagers->export_for_template($OUTPUT),
     'num_assigned_catscales' => $num_assigned_catscales,
     'num_assigned_tests' => $num_assigned_tests,
+    'num_assigned_questions' => $num_assigned_questions,
 ]);
 
 echo $OUTPUT->footer();

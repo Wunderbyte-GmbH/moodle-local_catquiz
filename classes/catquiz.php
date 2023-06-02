@@ -634,4 +634,29 @@ class catquiz {
 
         return [$sql, $params];
     }
+
+    /**
+     * For a CAT-Scale manager, returns the number of questions that are
+     * assigned to the managed scales
+     * 
+     * @param int $userid
+     * @return array
+     */
+    public static function get_sql_for_number_of_assigned_questions(int $userid) {
+        $sql = "
+            SELECT COUNT(*)
+            FROM {local_catquiz_subscriptions} lcs
+                    JOIN {local_catquiz_items} lci ON lcs.itemid=lci.catscaleid
+            WHERE userid = :userid
+            AND area = :area
+            AND lcs.status = :status
+        ";
+        $params = [
+            'userid' => $userid,
+            'area' => 'catscale',
+            'status' => 1,
+        ];
+
+        return [$sql, $params];   
+    }
 }
