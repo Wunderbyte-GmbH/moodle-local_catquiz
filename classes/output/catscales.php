@@ -30,6 +30,7 @@
 
 namespace local_catquiz\output;
 
+use local_catquiz\catquiz;
 use local_catquiz\data\dataapi;
 use local_catquiz\subscription;
 use templatable;
@@ -111,9 +112,12 @@ class catscales implements renderable, templatable {
      * @return array
      */
     public function export_for_template(\renderer_base $output): array {
+        global $DB;
         $out = $this->itemtree;
         foreach ($out as &$item) {
             $item['image'] = $output->get_generated_image_for_id($item['id']);
+            list($sql, $params) = catquiz::get_sql_for_number_of_questions_in_scale($item['id']);
+            $item['numberofquestions'] = $DB->count_records_sql($sql, $params);
         }
         return $out;
     }

@@ -682,4 +682,22 @@ class catquiz {
 
         return [$sql, $params];
     }
+
+    /**
+     * Returns the number of test items in a CAT scale
+     * 
+     * @param int $catscaleid 
+     * @return array
+     */
+    public static function get_sql_for_number_of_questions_in_scale(int $catscaleid) {
+        $sql = "
+            SELECT COUNT(*)
+            FROM {local_catquiz_items}
+            WHERE catscaleid = :catscaleid
+        ";
+        $params = [
+            'catscaleid' => $catscaleid
+        ];
+        return [$sql, $params];
+    }
 }
