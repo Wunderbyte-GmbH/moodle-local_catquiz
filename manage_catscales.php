@@ -22,11 +22,13 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+use local_catquiz\catquiz;
 use local_catquiz\output\catscalemanagers;
 use local_catquiz\output\catscales;
 
 require_once('../../config.php');
 
+global $USER;
 $context = \context_system::instance();
 $PAGE->set_context($context);
 require_login();
@@ -42,10 +44,13 @@ echo $OUTPUT->header();
 
 $data = new catscales();
 $catscalemanagers = new catscalemanagers();
+list($sql, $params) = catquiz::get_sql_for_number_of_assigned_catscales($USER->id);
+$num_assigned_catscales = $DB->count_records_sql($sql, $params);
 
 echo $OUTPUT->render_from_template('local_catquiz/catscalesdashboard', [
     'itemtree' => $data->export_for_template($OUTPUT),
     'catscalemanagers' => $catscalemanagers->export_for_template($OUTPUT),
+    'num_assigned_catscales' => $num_assigned_catscales,
 ]);
 
 echo $OUTPUT->footer();

@@ -598,4 +598,21 @@ class catquiz {
 
         return [$sql, $params];
     }
+
+    public static function get_sql_for_number_of_assigned_catscales(int $userid) {
+        $sql = "
+            SELECT COUNT(*)
+            FROM {local_catquiz_subscriptions}
+            WHERE userid = :userid
+                AND area = :area
+                AND status = :status
+        ";
+        $params = [
+            'userid' => $userid,
+            'area' => 'catscale',
+            'status' => 1,
+        ];
+
+        return [$sql, $params];
+    }
 }
