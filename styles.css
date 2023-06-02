@@ -11,6 +11,10 @@
     margin-top: 50px;
 }
 
+#page-local-catquiz-manage_catscales .last-edits {
+    margin-top: 50px;
+}
+
 .catmanager-summary.grid {
     display: grid;
     grid-template-columns: 1fr 1fr;
