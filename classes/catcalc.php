@@ -356,7 +356,7 @@ class catcalc {
 //            print_r($z_0);
 //        }
 
-        $z_0 = [1,1];
+        $z_0 = [1,2,0.5];
 
         $params = \local_catquiz\mathcat::newton_raphson_multi($jacobian,$hessian,$z_0);
 
