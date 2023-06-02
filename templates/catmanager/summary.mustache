@@ -37,6 +37,7 @@
   <h3>{{#str}} catscalesheading, local_catquiz {{/str}}</h3>
   <div class="card-deck dashboard-card-deck">
   {{#itemtree}}
+    {{#subscribed}}
     <div class="card dashboard-card">
         <div class="card-img dashboard-card-img" style='background-image: url("{{{image}}}");'>
             <span class="sr-only">{{#str}}aria:catscaleimage, local_catquiz{{/str}}</span>
@@ -48,6 +49,7 @@
           <div>{{#str}}catmanagernumberofquestions, local_catquiz{{/str}}: {{numberofquestions}}</div>
         </div>
     </div>
+    {{/subscribed}}
   {{/itemtree}}
   </div>
 </div>
