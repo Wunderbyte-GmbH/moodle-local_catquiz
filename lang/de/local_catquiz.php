@@ -207,7 +207,7 @@ $string['studentdetails'] = "Student details";
 $string['task_recalculate_cat_model_params'] = "CAT Parameter neu berechnen";
 
 // CAT Manager
-$string['catmanager'] = "CAT Manager";
+$string['catmanager'] = "CAT-Manager";
 $string['summary'] = "Zusammenfassung";
 $string['questions'] = "Fragen";
 $string['testsandtemplates'] = "Tests & Templates";
@@ -219,3 +219,4 @@ $string['summarynumberofassignedcatscales'] = "Assigned CAT scales";
 $string['summarynumberoftests'] = "Associated tests";
 $string['summarytotalnumberofquestions'] = "Anzahl der Fragen (insgesamt)";
 $string['summarylastcalculation'] = "Letzte (vollständige) Berechnung";
+$string['lasteditincatscales'] = "Letzte Bearbeitung in den CAT-Skalen";
