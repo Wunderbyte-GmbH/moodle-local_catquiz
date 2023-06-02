@@ -670,6 +670,16 @@ class catquiz {
             'status' => 1,
         ];
 
-        return [$sql, $params];   
+        return [$sql, $params];
+    }
+
+    public static function get_sql_for_last_calculation_time(int $userid) {
+        $sql = "
+            SELECT max(timecalculated)
+            FROM {local_catquiz_catcontext}
+        ";
+        $params = [];
+
+        return [$sql, $params];
     }
 }

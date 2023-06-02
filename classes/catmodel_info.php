@@ -74,6 +74,7 @@ class catmodel_info {
                 $item_param_list->save_to_db($contextid);
             }
             $person_abilities->save_to_db($contextid);
+            $context->save_or_update((object)['timecalculated' => time()]);
             return [$item_difficulties, $person_abilities];
         }
 

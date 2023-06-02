@@ -115,6 +115,16 @@ class catcontext {
     private int $timemodified = 0;
 
     /**
+     * $timecalculated
+     *
+     * The last time that item parameters and person abilities were calculated
+     * for this context
+     *
+     * @var integer
+     */
+    private int $timecalculated = 0;
+
+    /**
      * Catcontext constructor.
      * @param stdClass $newrecord
      */
@@ -241,6 +251,7 @@ class catcontext {
             'usermodified' => $this->usermodified,
             'timecreated' => $this->timecreated,
             'timemodified' => $this->timemodified,
+            'timecalculated' => $this->timecalculated,
         ];
 
         // Only if the id is not empty, we add the id key.
@@ -268,6 +279,7 @@ class catcontext {
         $this->usermodified = $record->usermodified ?? $this->usermodified ?? 0;
         $this->timecreated = $record->timecreated ?? $this->timecreated ?? time();
         $this->timemodified = $record->timemodified ?? $this->timemodified ?? time();
+        $this->timecalculated = $record->timecalculated ?? $this->timecalculated ?? 0;
     }
 
     public function get_strategy(): model_strategy {
