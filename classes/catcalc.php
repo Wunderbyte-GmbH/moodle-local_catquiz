@@ -264,6 +264,7 @@ class catcalc {
 
         $model_dim = $model->get_model_dim();
 
+
         // empty callable structures for composition
 
         $loglikelihood = function($x) {
