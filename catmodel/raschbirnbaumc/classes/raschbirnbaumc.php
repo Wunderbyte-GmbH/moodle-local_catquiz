@@ -74,9 +74,9 @@ class raschbirnbaumc extends model_model
     /**
      * Generalisierung von `likelihood`: params $a und $b werden im array/vector als $x[0] und $x[1] angesprochen
      * Kann in likelihood umbenannt werden
-     * @param mixed $p 
-     * @param mixed $x 
-     * @return int|float 
+     * @param mixed $p
+     * @param mixed $x
+     * @return int|float
      */
     public function likelihood_multi($p, $x)
     {
@@ -108,7 +108,7 @@ class raschbirnbaumc extends model_model
     public function log_likelihood_a($p, $a, $b, $c)
     {
 
-        return ((-1 + c) * exp($a*($b-$p)))/((exp($a*$b)+exp($a*$p)*($c * exp($a * $b)+exp($a*$p))));
+        return ((-1 + $c) * exp($a*($b-$p)))/((exp($a*$b)+exp($a*$p)*($c * exp($a * $b)+exp($a*$p))));
     }
 
     public function log_likelihood_b($p, $a, $b, $c)
@@ -150,32 +150,32 @@ class raschbirnbaumc extends model_model
 
     public function log_likelihood_a_a($p, $a, $b, $c)
     {
-        return ((-1 + $c) * exp($a * (-$b + $p)) (-$c + exp(2 * $a * (-$b + $p))) ($b - $p)**2)/((1 + exp($a (-$b + $p)))**2 * ($c + exp($a (-$b + $p)))**2);
+        return ((-1 + $c) * exp($a * (-$b + $p)) * (-$c + exp(2 * $a * (-$b + $p))) * ($b - $p)**2)/((1 + exp($a * (-$b + $p)))**2 * ($c + exp($a * (-$b + $p)))**2);
     }
 
     public function log_likelihood_b_b($p, $a, $b, $c)
     {
-        return ($a**2 * (-1 + $c) * exp($a (-$b + $p)) (-$c + exp(2 * $a (-$b + $p))))/((1 + exp($a (-$b + $p)))**2 * ($c + exp($a (-$b + $p)))**2) ;
+        return ($a**2 * (-1 + $c) * exp($a * (-$b + $p)) * (-$c + exp(2 * $a * (-$b + $p))))/((1 + exp($a * (-$b + $p)))**2 * ($c + exp($a * (-$b + $p)))**2) ;
     }
 
     public function log_likelihood_c_c($p, $a, $b, $c)
     {
-        return -(1/($c + exp($a (-$b + $p)))**2);
+        return -(1/($c + exp($a * (-$b + $p)))**2);
     }
 
     public function log_likelihood_a_b($p, $a, $b, $c)
     {
-        return ((-1 + $c) * exp($a ($b + $p)) (exp($a ($b + $p)) + exp(2 * $a * $p) (1 + $a * $b - $a * $p) + $c (exp($a ($b + $p)) + exp(2 * $a * $b) (1 - $a * $b + $a * $p))))/((exp($a * $b) + exp($a * $p))**2 * ($c * exp($a * $b) + exp($a * $p))**2);
+        return ((-1 + $c) * exp($a * ($b + $p)) * (exp($a * ($b + $p)) + exp(2 * $a * $p) * (1 + $a * $b - $a * $p) + $c * (exp($a * ($b + $p)) + exp(2 * $a * $b) * (1 - $a * $b + $a * $p))))/((exp($a * $b) + exp($a * $p))**2 * ($c * exp($a * $b) + exp($a * $p))**2);
     }
 
     public function log_likelihood_a_c($p, $a, $b, $c)
     {
-        return (exp($a ($b + $p)) ($b - $p))/($c * exp($a * $b) + exp($a *$p))**2 ;
+        return (exp($a * ($b + $p)) * ($b - $p))/($c * exp($a * $b) + exp($a *$p))**2 ;
     }
 
     public function log_likelihood_b_c($p, $a, $b, $c)
     {
-        return ($a * exp($a ($b + $p)))/($c * exp($a * $b) + exp($a * $p))**2 ;
+        return ($a * exp($a * ($b + $p)))/($c * exp($a * $b) + exp($a * $p))**2;
     }
 
 
@@ -184,23 +184,24 @@ class raschbirnbaumc extends model_model
 
     public function log_counter_likelihood_a_a($p, $a, $b, $c)
     {
-        return -((exp($a ($b + $p)) ($b - $p)**2)/(exp($a * $b) + exp($a * $p))**2) ;
+        return -((exp($a * ($b + $p)) * ($b - $p)**2)/(exp($a * $b) + exp($a * $p))**2);
     }
 
     public function log_counter_likelihood_b_b($p, $a, $b, $c)
     {
-        return -(($a**2 * exp($a ($b + $p)))/(exp($a * $b) + exp($a * $p))**2) ;
+        return -(($a**2 * exp($a * ($b + $p)))/(exp($a * $b) + exp($a * $p))**2);
     }
 
     public function log_counter_likelihood_c_c($p, $a, $b, $c)
     {
-        return -(1/(-1 + $c)**2) ;
+        return -1/(-1 + $c)**2;
+        #return 1;
     }
 
 
     public function log_counter_likelihood_a_b($p, $a, $b, $c)
     {
-        return (exp(2 * $a * $p) + exp($a ($b + $p)) (1 + $a (-$b + $p)))/(exp($a * $b) + exp($a * $p))**2 ;
+        return (exp(2 * $a * $p) + exp($a * ($b + $p)) * (1 + $a * (-$b + $p)))/(exp($a * $b) + exp($a * $p))**2 ;
     }
 
 
@@ -220,8 +221,8 @@ class raschbirnbaumc extends model_model
 
     /**
      * Used to estimate the item difficulty
-     * @param mixed $p 
-     * @return Closure(mixed $x): float 
+     * @param mixed $p
+     * @return Closure(mixed $x): float
      */
     public function get_log_likelihood($p)
     {
@@ -234,8 +235,8 @@ class raschbirnbaumc extends model_model
 
     /**
      * Used to estimate the item difficulty
-     * @param mixed $p 
-     * @return Closure(mixed $x): float 
+     * @param mixed $p
+     * @return Closure(mixed $x): float
      */
     public function get_log_counter_likelihood($p)
     {
