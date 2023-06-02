@@ -299,5 +299,21 @@ function xmldb_local_catquiz_upgrade($oldversion) {
             upgrade_plugin_savepoint(true, $SAVEPOINT_ADD_ITEMPARAMS_STATUS_FIELD, 'local', 'catquiz');
         }
 
+        $SAVEPOINT_ADD_TIMECALCULATED_FIELD = 2023060200;
+        if ($oldversion < $SAVEPOINT_ADD_TIMECALCULATED_FIELD) {
+
+            // Define field timecalculated to be added to local_catquiz_catscales.
+            $table = new xmldb_table('local_catquiz_catscales');
+            $field = new xmldb_field('timecalculated', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0', 'timemodified');
+    
+            // Conditionally launch add field timecalculated.
+            if (!$dbman->field_exists($table, $field)) {
+                $dbman->add_field($table, $field);
+            }
+    
+            // Catquiz savepoint reached.
+            upgrade_plugin_savepoint(true, $SAVEPOINT_ADD_TIMECALCULATED_FIELD, 'local', 'catquiz');
+        }
+
     return true;
 }
