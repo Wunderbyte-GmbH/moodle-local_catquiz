@@ -299,11 +299,11 @@ function xmldb_local_catquiz_upgrade($oldversion) {
             upgrade_plugin_savepoint(true, $SAVEPOINT_ADD_ITEMPARAMS_STATUS_FIELD, 'local', 'catquiz');
         }
 
-        $SAVEPOINT_ADD_TIMECALCULATED_FIELD = 2023060200;
+        $SAVEPOINT_ADD_TIMECALCULATED_FIELD = 2023060201;
         if ($oldversion < $SAVEPOINT_ADD_TIMECALCULATED_FIELD) {
 
-            // Define field timecalculated to be added to local_catquiz_catscales.
-            $table = new xmldb_table('local_catquiz_catscales');
+            // Define field timecalculated to be added to local_catquiz_catcontext.
+            $table = new xmldb_table('local_catquiz_catcontext');
             $field = new xmldb_field('timecalculated', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0', 'timemodified');
     
             // Conditionally launch add field timecalculated.
