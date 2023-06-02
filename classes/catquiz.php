@@ -615,4 +615,23 @@ class catquiz {
 
         return [$sql, $params];
     }
+
+    public static function get_sql_for_number_of_assigned_tests(int $userid) {
+        $sql = "
+            SELECT COUNT(*)
+            FROM {local_catquiz_subscriptions} lcs
+                JOIN {local_catquiz_tests} lct
+                    ON lcs.itemid=lct.catscaleid
+            WHERE userid = :userid
+                AND area = :area
+                AND lcs.status = :status
+        ";
+        $params = [
+            'userid' => $userid,
+            'area' => 'catscale',
+            'status' => 1,
+        ];
+
+        return [$sql, $params];
+    }
 }
