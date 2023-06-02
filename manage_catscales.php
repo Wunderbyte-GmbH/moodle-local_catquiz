@@ -54,6 +54,8 @@ list($sql, $params) = catquiz::get_sql_for_number_of_assigned_tests($USER->id);
 $num_assigned_tests = $DB->count_records_sql($sql, $params);
 list($sql, $params) = catquiz::get_sql_for_number_of_assigned_questions($USER->id);
 $num_assigned_questions = $DB->count_records_sql($sql, $params);
+list($sql, $params) = catquiz::get_sql_for_last_calculation_time($USER->id);
+$last_calculated = userdate($DB->get_field_sql($sql, $params), get_string('strftimedatetime', 'core_langconfig'));
 
 echo $OUTPUT->render_from_template('local_catquiz/catscalesdashboard', [
     'itemtree' => $data->export_for_template($OUTPUT),
@@ -61,6 +63,7 @@ echo $OUTPUT->render_from_template('local_catquiz/catscalesdashboard', [
     'num_assigned_catscales' => $num_assigned_catscales,
     'num_assigned_tests' => $num_assigned_tests,
     'num_assigned_questions' => $num_assigned_questions,
+    'last_calculated' => $last_calculated,
 ]);
 
 echo $OUTPUT->footer();
