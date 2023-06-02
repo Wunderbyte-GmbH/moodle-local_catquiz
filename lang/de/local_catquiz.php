@@ -220,3 +220,7 @@ $string['summarynumberoftests'] = "Associated tests";
 $string['summarytotalnumberofquestions'] = "Anzahl der Fragen (insgesamt)";
 $string['summarylastcalculation'] = "Letzte (vollständige) Berechnung";
 $string['lasteditincatscales'] = "Letzte Bearbeitung in den CAT-Skalen";
+$string['aria:catscaleimage'] = "Hintergrundmuster für die CAT Skala";
+$string['healthstatus'] = "Health-Status";
+$string['catmanagernumberofsubscales'] = "Anzahl Subskalen";
+$string['catmanagernumberofquestions'] = "Anzahl Fragen";

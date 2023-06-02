@@ -57,6 +57,7 @@ $num_assigned_questions = $DB->count_records_sql($sql, $params);
 list($sql, $params) = catquiz::get_sql_for_last_calculation_time($USER->id);
 $last_calculated = userdate($DB->get_field_sql($sql, $params), get_string('strftimedatetime', 'core_langconfig'));
 
+
 echo $OUTPUT->render_from_template('local_catquiz/catscalesdashboard', [
     'itemtree' => $data->export_for_template($OUTPUT),
     'catscalemanagers' => $catscalemanagers->export_for_template($OUTPUT),

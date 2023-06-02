@@ -111,6 +111,10 @@ class catscales implements renderable, templatable {
      * @return array
      */
     public function export_for_template(\renderer_base $output): array {
-        return $this->itemtree;
+        $out = $this->itemtree;
+        foreach ($out as &$item) {
+            $item['image'] = $output->get_generated_image_for_id($item['id']);
+        }
+        return $out;
     }
 }

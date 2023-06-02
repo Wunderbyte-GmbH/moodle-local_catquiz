@@ -225,3 +225,7 @@ $string['summarynumberoftests'] = "Number of assigned tests";
 $string['summarytotalnumberofquestions'] = "Number of questions (total)";
 $string['summarylastcalculation'] = "Last complete calculation";
 $string['lasteditincatscales'] = "Last edit in CAT scales";
+$string['aria:catscaleimage'] = "Background pattern for this CAT scale";
+$string['healthstatus'] = "Health status";
+$string['catmanagernumberofsubscales'] = "Number of subscales";
+$string['catmanagernumberofquestions'] = "Number of questions";
