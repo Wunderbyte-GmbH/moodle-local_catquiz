@@ -673,6 +673,12 @@ class catquiz {
         return [$sql, $params];
     }
 
+    /**
+     * Returns the timestamp of the most recent calculation across all contexts
+     * 
+     * @param int $userid 
+     * @return array
+     */
     public static function get_sql_for_last_calculation_time(int $userid) {
         $sql = "
             SELECT max(timecalculated)
