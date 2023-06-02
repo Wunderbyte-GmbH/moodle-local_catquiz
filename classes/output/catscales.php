@@ -116,6 +116,7 @@ class catscales implements renderable, templatable {
         $out = $this->itemtree;
         foreach ($out as &$item) {
             $item['image'] = $output->get_generated_image_for_id($item['id']);
+            $item['numberofchildren'] = count($item['children']);
             list($sql, $params) = catquiz::get_sql_for_number_of_questions_in_scale($item['id']);
             $item['numberofquestions'] = $DB->count_records_sql($sql, $params);
         }
