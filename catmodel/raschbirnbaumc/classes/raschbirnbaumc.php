@@ -107,8 +107,10 @@ class raschbirnbaumc extends model_model
 
     public function log_likelihood_a($p, $a, $b, $c)
     {
+        ini_set('precision', 200);
+        #return ((-1 + $c) * exp($a*($b+$p))*($b-$p))/((exp($a*$b)+exp($a*$p)*($c * exp($a * $b)+exp($a*$p))));
+        return ((-1 + $c) * exp($a*($b+$p))*($b-$p))/(exp($a*$b)+exp($a*$p)*($c * exp($a * $b) + exp($a*$p))) ;
 
-        return ((-1 + $c) * exp($a*($b-$p)))/((exp($a*$b)+exp($a*$p)*($c * exp($a * $b)+exp($a*$p))));
     }
 
     public function log_likelihood_b($p, $a, $b, $c)
