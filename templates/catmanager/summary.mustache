@@ -35,14 +35,17 @@
 </div>
 <div>
   <h3>{{#str}} catscalesheading, local_catquiz {{/str}}</h3>
-  <div class="catscales-dashboard grid">
+  <div class="card-deck dashboard-card-deck">
   {{#itemtree}}
-    <div class="card">
-        <div class="card-header">
-            {{name}}
+    <div class="card dashboard-card">
+        <div class="card-img dashboard-card-img" style='background-image: url("{{{image}}}");'>
+            <span class="sr-only">{{#str}}aria:catscaleimage, local_catquiz{{/str}}</span>
         </div>
         <div class="card-body">
-          {{name}} Wert
+          <h3>{{name}}</h3>
+          <div>{{#str}}healthstatus, local_catquiz{{/str}}: </div>
+          <div>{{#str}}catmanagernumberofsubscales, local_catquiz{{/str}}: </div>
+          <div>{{#str}}catmanagernumberofquestions, local_catquiz{{/str}}: </div>
         </div>
     </div>
   {{/itemtree}}
