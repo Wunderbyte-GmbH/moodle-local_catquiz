@@ -101,6 +101,11 @@ class model_strategy {
 
         if ($saved_person_abilities === NULL || count($saved_person_abilities) === 0) {
             $saved_person_abilities = $responses->get_initial_person_abilities();
+        } else if(count($saved_person_abilities) < count($initial = $responses->get_initial_person_abilities())) {
+            $new_users = array_diff(array_keys($initial->get_person_params()), array_keys($saved_person_abilities->get_person_params()));
+            foreach ($new_users as $userid) {
+                $saved_person_abilities->add(new model_person_param($userid));
+            }
         }
         $this->initial_person_abilities = $saved_person_abilities;
     }
