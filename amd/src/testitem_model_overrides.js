@@ -36,6 +36,7 @@ export const init = () => {
 
     dynamicForm.addEventListener(dynamicForm.events.FORM_SUBMITTED, (e) => {
         e.preventDefault();
+        window.location.reload();
     });
 
     // If a user changes a model status, submit the form without waiting for the
