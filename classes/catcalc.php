@@ -256,7 +256,13 @@ class catcalc {
     //}
     //
 
-    static function estimate_item_params_new(array $item_response, $model){
+    static function estimate_item_params(array $item_response, $model){
+        // The current function should be changed to work with all models, but
+        // for now we just forward the calculation of the item difficulty for
+        // the 'raschbirnbauma' model to a different function
+        if ($model->get_model_name() === 'raschbirnbauma') {
+            return self::estimate_item_difficulty($item_response);
+        }
         // compose likelihood matrices based on actual result
 
         //$response = new model_responses(); // dev override
