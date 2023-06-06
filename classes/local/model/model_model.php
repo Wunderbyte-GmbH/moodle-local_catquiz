@@ -50,6 +50,15 @@ abstract class model_model {
     }
 
     /**
+     * Return the name of the current model
+     *
+     * @return string
+     */
+    public function get_model_name() {
+        return $this->model_name;
+    }
+
+    /**
      * Helper to create a new item param
      * 
      * @param int   $itemid

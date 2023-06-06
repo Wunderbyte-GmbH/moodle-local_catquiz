@@ -52,7 +52,7 @@ class raschbirnbauma extends model_model {
      * @return float
      */
     protected function calculate_params($item_response) {
-       return \local_catquiz\catcalc::estimate_item_difficulty($item_response);
+       return \local_catquiz\catcalc::estimate_item_params($item_response, $this);
     }
 
     public function get_jacobian() {
