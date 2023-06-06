@@ -41,7 +41,6 @@ class model_responses {
      * @return array<int>
      */
     public function get_item_ids(): array {
-        $questions = Array();
         $user_ids = array_keys($this->data);
         $question_ids = [];
 
@@ -55,7 +54,7 @@ class model_responses {
             }
         }
 
-        return $question_ids;
+        return array_unique($question_ids);
     }
 
     public static function create_from_array(array $data) {
