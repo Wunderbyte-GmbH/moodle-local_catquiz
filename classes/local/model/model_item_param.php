@@ -79,11 +79,9 @@ class model_item_param {
         switch ($this->model_name) {
             case 'raschbirnbauma':
                 return [$this->difficulty];
-                break;
             
             default:
                 return [$this->get_difficulty()];
-                break;
             }
     }
 

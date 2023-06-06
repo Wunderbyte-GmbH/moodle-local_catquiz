@@ -93,8 +93,4 @@ abstract class model_model {
     }
 
     abstract protected function calculate_params($item_response);
-
-    public function get_jacobian() {
-        return [];
-    }
 }
