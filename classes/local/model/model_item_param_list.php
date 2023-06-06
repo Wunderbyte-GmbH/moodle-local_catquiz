@@ -68,6 +68,10 @@ class model_item_param_list implements ArrayAccess, IteratorAggregate, Countable
         );
         $item_difficulties = new model_item_param_list();
         foreach ($item_rows as $r) {
+            // Skip NaN values here
+            if ($r->difficulty === "NaN") {
+                continue;
+            }
             $i = new model_item_param($r->componentid, $model_name);
             $i->set_difficulty($r->difficulty);
             $item_difficulties->add($i);
