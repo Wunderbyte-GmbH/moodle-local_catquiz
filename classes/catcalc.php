@@ -256,17 +256,20 @@ class catcalc {
     //}
     //
 
-    static function estimate_item_params(array $item_response, $model){
+    /**
+     * @param array $item_response
+     * @param model_model $model
+     * @return array<float>
+     */
+    static function estimate_item_params(array $item_response, $model) {
         // The current function should be changed to work with all models, but
         // for now we just forward the calculation of the item difficulty for
         // the 'raschbirnbauma' model to a different function
         if ($model->get_model_name() === 'raschbirnbauma') {
             return self::estimate_item_difficulty($item_response);
         }
-        // compose likelihood matrices based on actual result
 
-        //$response = new model_responses(); // dev override
-        //$model = new \catmodel_raschbirnbaumb\raschbirnbaumb($response, "model"); //dev override
+        // compose likelihood matrices based on actual result
 
         $model_dim = $model->get_model_dim();
 
@@ -312,11 +315,9 @@ class catcalc {
                 $likelihood_part = $model->get_log_counter_likelihood($tmp_ability);
                 $jacobian_part = $model->get_log_counter_jacobian($tmp_ability);
                 $hessian_part = $model->get_log_counter_jacobi($tmp_ability);
-
             }
 
             // chain with functions
-
             $loglikelihood = mathcat::compose_plus($loglikelihood, $likelihood_part);
 
             for ($i=0; $i <= $model_dim-2; $i++){
@@ -328,48 +329,11 @@ class catcalc {
             }
         }
 
-//        $ml = new matrixcat();
-        // get real jacobian/hessian
-
-//        $z_0 = [1,2];
-
-
-
-
-        // jacobian, hessian, model_dim, start_value
-
-
-
-//
-//        for ($i = 0; $i < 70; $i++) {
-//
-//            for ($k=0; $k <= $model_dim-2; $k++) {
-//
-//                $real_jacobian[$k] = [$jacobian[$k]($z_0)];
-//
-//                for ($j = 0; $j <= $model_dim - 2; $j++) {
-//                    $real_hessian[$k][$j] = $hessian[$k][$j]($z_0);
-//                }
-//            }
-//
-//
-//            $G = $real_jacobian;
-//            $J = $real_hessian;
-//
-//            $j_inv = $ml->inverseMatrix($J);
-//            $test = $ml->multiplyMatrices($j_inv,$G)
-//            $z_0 =  $ml->subtractVectors($z_0, $ml->flattenArray($ml->multiplyMatrices($j_inv,$G)));
-//            $x0 = $ml->multiplyMatrices($j_inv,$g);
-//
-//            print_r($z_0);
-//        }
-
-        $z_0 = [1,2,3];
+        // Defines the starting point
+        $z_0 = [10,10,1];
 
         $params = \local_catquiz\mathcat::newton_raphson_multi($jacobian,$hessian,$z_0);
-
-        echo "finished";
-
+        return $params;
     }
 }
 
