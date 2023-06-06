@@ -42,7 +42,8 @@
       Status
     </div>
     <div class="card-body" style="display: flex; justify-content: center; align-items: center;">
-      <h3>{{itemstatus}}</h3>
+      <div><h3>{{#str}} status, local_catquiz {{/str}}: {{itemstatus}}</h3></div>,
+      <div><h3>{{#str}} difficulty, local_catquiz {{/str}}: {{difficulty}}</h3></div>
     </div>
   </div>
   {{#models}}

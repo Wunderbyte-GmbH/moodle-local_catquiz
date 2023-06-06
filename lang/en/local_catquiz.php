@@ -187,6 +187,7 @@ $string['statusnotset'] = "not set";
 $string['statussetautomatically'] = "set automatically";
 $string['statussetmanually'] = "manually confirmed";
 $string['statusnotcalculated'] = "not calculated";
+$string['status'] = 'State';
 
 $string['difficulty'] = "Difficulty";
 $string['discrimination'] = "Discrimination";

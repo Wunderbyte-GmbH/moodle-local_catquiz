@@ -205,23 +205,36 @@ class testitemdashboard implements renderable, templatable {
      * @return string
      * @throws coding_exception
      */
-    private function get_itemstatus() {
+    private function get_itemdata() {
         global $DB;
-        list ($sql, $params) = catquiz::get_sql_for_max_status_for_item($this->testitemid, $this->contextid);
-        $max_status = intval($DB->get_field_sql($sql, $params));
+        list ($sql, $params) = catquiz::get_sql_for_item_with_max_status($this->testitemid, $this->contextid);
+        $records = $DB->get_records_sql($sql, $params);
+        $max_status = intval($records[array_keys($records)[0]]->status);
+        if (count($records) > 1) {
+            $difficulties = array_map(function($r) { return floatval($r->difficulty);}, $records);
+            // More than one item has the max status
+            $difficulty = max($difficulties);
+        } else {
+            $difficulty = $records[array_keys($records)[0]]->difficulty;
+        }
         switch ($max_status) {
             case model_item_param::STATUS_NOT_SET:
-                return get_string('statusnotset', 'local_catquiz');
+                $status = get_string('statusnotset', 'local_catquiz');
+                break;
             case model_item_param::STATUS_NOT_CALCULATED:
-                return get_string('statusnotcalculated', 'local_catquiz');
+                $status = get_string('statusnotcalculated', 'local_catquiz');
+                break;
             case model_item_param::STATUS_SET_BY_STRATEGY:
-                return get_string('statussetautomatically', 'local_catquiz');
+                $status = get_string('statussetautomatically', 'local_catquiz');
+                break;
             case model_item_param::STATUS_SET_MANUALLY:
-                return get_string('statussetmanually', 'local_catquiz');
+                $status = get_string('statussetmanually', 'local_catquiz');
+                break;
 
             default:
-                return get_string('notavailable', 'core');
+                $status = get_string('notavailable', 'core');
         }
+        return [$status, $difficulty];
     }
 
     /**
@@ -232,13 +245,15 @@ class testitemdashboard implements renderable, templatable {
 
         $url = new moodle_url('/local/catquiz/manage_catscales.php');
 
+        list($itemstatus, $difficulty) = $this->get_itemdata();
         $data = [
             'returnurl' => $url->out(),
             'models' => $this->render_modelcards(),
             'statcards' => $this->render_testitemstats(),
             'contextselector' => $this->render_contextselector(),
             'overridesforms' => $this->render_overrides_form(),
-            'itemstatus' => $this->get_itemstatus(),
+            'itemstatus' => $itemstatus,
+            'difficulty' => $difficulty,
         ];
         return $data;
     }

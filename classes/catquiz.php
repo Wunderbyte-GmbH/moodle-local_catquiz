@@ -583,17 +583,26 @@ class catquiz {
      * @param int $contextid
      * @return array
      */
-    public static function get_sql_for_max_status_for_item(int $testitemid, int $contextid) {
-        $sql = "
-            SELECT max(status)
-            FROM {local_catquiz_itemparams}
-            WHERE componentid = :itemid
-              AND contextid = :contextid
-              GROUP BY componentid, contextid
-        ";
+    public static function get_sql_for_item_with_max_status(int $testitemid, int $contextid) {
+        $sql = <<<SQL
+            SELECT *
+            FROM m_local_catquiz_itemparams lci
+            WHERE lci.componentid = :itemid
+                AND lci.contextid = :contextid
+                AND lci.status = 
+                    (
+                        SELECT max(status)
+                        FROM m_local_catquiz_itemparams
+                        WHERE componentid = :itemid2
+                            AND contextid = :contextid2
+                        GROUP BY componentid, contextid
+                    )
+        SQL;
         $params = [
             'itemid' => $testitemid,
+            'itemid2' => $testitemid,
             'contextid' => $contextid,
+            'contextid2' => $contextid,
         ];
 
         return [$sql, $params];
