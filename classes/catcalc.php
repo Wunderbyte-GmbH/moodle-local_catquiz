@@ -285,6 +285,8 @@ class catcalc {
             }
         }
 
+        $num_passed = 0;
+        $num_failed = 0;
         foreach ($item_response as $r) {
 
             // compose likelihood
