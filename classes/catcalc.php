@@ -221,7 +221,7 @@ class catcalc {
                 $loglikelihood_2nd_derivative =
                         \local_catquiz\mathcat::compose_plus($loglikelihood_2nd_derivative, $loglikelihood_2nd_derivative_part);
 
-            } else if ($tmp_response == 0) {
+            } else {
                 $loglikelihood_1st_derivative_part = function($x) use ($tmp_ability) {
                     return (\catmodel_raschbirnbauma\raschmodel::log_likelihood_counter_1st_derivative_item($tmp_ability, $x));
                 };
@@ -306,7 +306,7 @@ class catcalc {
                 $jacobian_part = $model->get_log_jacobian($tmp_ability);
                 $hessian_part = $model->get_log_hessian($tmp_ability);
 
-            } else if ($tmp_response == 0) {
+            } else {
                 $num_failed += 1;
 
                 $likelihood_part = $model->get_log_counter_likelihood($tmp_ability);
