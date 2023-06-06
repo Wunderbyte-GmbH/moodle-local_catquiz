@@ -122,6 +122,10 @@ class item_model_override_selector extends dynamic_form {
                 continue;
             }
 
+            if (intval($form_itemparams[$model]->status) === model_item_param::STATUS_SET_BY_STRATEGY) {
+                continue;
+            }
+
             if (array_key_exists($model, $saved_itemparams)) {
                 $to_update[] = [
                     'status' => $form_itemparams[$model]->status,
