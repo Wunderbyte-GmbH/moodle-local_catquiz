@@ -72,7 +72,8 @@ class item_model_override_selector extends dynamic_form {
             $difficulty = $mform->createElement('static', sprintf('%s_difficulty', $id), 'mylabel', 'static text');
             $group[] = $select;
             $group[] = $difficulty;
-            $mform->addGroup($group, $id, $model);
+            $mform->addGroup($group, $id, get_string('pluginname', sprintf('catmodel_%s', $model)),
+);
         }
         $mform->disable_form_change_checker();
     }
