@@ -102,7 +102,7 @@ class catscaledashboard implements renderable, templatable
     private function render_addtestitems_table(int $catscaleid)
     {
 
-        $table = new testitems_table('addtestitems', $catscaleid);
+        $table = new testitems_table('addtestitems', $catscaleid, $this->catcontextid);
 
         list($select, $from, $where, $filter, $params) = catquiz::return_sql_for_addcatscalequestions($catscaleid, $this->catcontextid);
 
