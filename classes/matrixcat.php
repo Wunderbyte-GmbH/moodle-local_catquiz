@@ -48,7 +48,7 @@ class matrixcat
 
         for($i=0; $i<$numberOfRows; $i++)
         {
-            $matrix = $this->oneOperation($matrix, $i, $i);
+            $matrix = @$this->oneOperation($matrix, $i, $i);
 
             for($j=0; $j<$numberOfRows; $j++)
             {

@@ -361,7 +361,7 @@ class raschbirnbaumc extends model_model
         $fun32 = $fun23; # theorem of Schwarz
 
         $fun33 = function ($x) use ($p) {
-            return $this->log_counter_likelihood_c_c($p, $x[0], $x[1], $x[2]);
+            return @$this->log_counter_likelihood_c_c($p, $x[0], $x[1], $x[2]);
         };
 
         return [[$fun11, $fun12, $fun13], [$fun21, $fun22, $fun23], [$fun31, $fun32, $fun33]];
