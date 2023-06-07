@@ -44,6 +44,11 @@ public $localizedname = '';
 public $mandatory = true;
 
 /**
+ * @var boolean
+ */
+public $unique = false;
+
+/**
  * @var string
  */
 public $format = 'string';
@@ -67,6 +72,7 @@ public function __construct(
     $columnname = '', 
     $localizedname = '', 
     $mandatory = true,
+    $unique = false,
     $type = 'default',
     $format = PARAM_TEXT,
     $defaultvalue = null,
@@ -75,6 +81,7 @@ public function __construct(
     $this->columnname = $columnname;
     $this->localizedname = $localizedname;
     $this->mandatory = $mandatory;
+    $this->unique = $unique;
     $this->format = $format;
     $this->type = $type;
     $this->defaultvalue = $defaultvalue;

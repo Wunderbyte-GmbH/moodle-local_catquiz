@@ -100,15 +100,19 @@ class csvimport extends dynamic_form {
         $columnsassociative = array(
             'userid' => array(
                 'columnname' => get_string('id'),
-                'mandatory' => true,
-                'format' => PARAM_INT,
+                'mandatory' => true, // If mandatory and unique are set in first column, columnname will be used as key in records array.
+                'unique' => true,
+                'format' => 'string', 
                 'default' => false,
-                
             ),
             'starttime' => array(
-                'mandatory' => false,
-                'format' => 'int',
+                'mandatory' => true,
+                'format' => PARAM_INT,// If format is set to PARAM_INT parser will cast given string to integer.
                 'type' => 'date',
+            ),
+            'price' => array(
+                'mandatory' => false,
+                'format' => PARAM_INT,
             ),
         );
 
@@ -123,12 +127,12 @@ class csvimport extends dynamic_form {
             array (
             'name' => 'starttime',
             'mandatory' => false,
-            'format' => 'int',
+            'format' => PARAM_INT,
             'type' => 'date',
             'defaultvalue' => 1685015874,
             )
             ];
-        $settings = new csvsettings($columnssequential);
+        $settings = new csvsettings($columnsassociative);
         return $settings;
     }
     
@@ -167,7 +171,7 @@ class csvimport extends dynamic_form {
     public function process_dynamic_submission(): object {
         $data = $this->get_data();
         $content = $this->get_file_content('csvfile');
-        $settings = $this->call_settings_class(); // todo transfer real $content to parser
+        $settings = $this->call_settings_class();
         
         if(!empty($data->delimiter_name)) {
             $settings->set_delimiter($data->delimiter_name);
@@ -179,8 +183,9 @@ class csvimport extends dynamic_form {
             $settings->set_dateformat($data->dateparseformat);
         }
 
-        $parser = new fileparser($content, $settings);
-        return $settings;
+        $parser = new fileparser($settings);
+        $data = $parser->process_csv_data($content);
+        return $parser;
     }
 
     /**

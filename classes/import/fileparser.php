@@ -94,21 +94,22 @@ class fileparser {
      */
     protected $requirements;
 
-    public function __construct($content, $settings) {
-        // optional: switch on type of settings object -> process data according to type (csv, ...)
-        $process = $this->process_csv_data($content, $settings);
-    }
-                                                                   
     /**
-     * Imports data and settings for parsing of csv data
-     *
-     * @param $content
-     * @param object $settings
-     * @return bool false when import failed, true when import worked. Line errors might have happend
-     * @throws \coding_exception
-     * @throws \dml_exception
+     * @var string columnname
      */
-    private function process_csv_data($content, $settings) {
+    public $uniquekey; 
+
+    public function __construct ($settings) {
+        // optional: switch on type of settings object -> process data according to type (csv, ...)
+
+        $this->apply_settings($settings);
+    }
+        
+    /**
+     * Validate and apply settings
+     * @param object $settings
+     */
+    private function apply_settings($settings) {
         global $DB;
         $this->error = '';
         $this->settings = $settings;
@@ -120,67 +121,151 @@ class fileparser {
             return false;
         }
 
+        $this->delimiter = !empty($this->settings->delimiter) ? $this->settings->delimiter : 'comma';
+        $this->enclosure = !empty($this->settings->enclosure) ? $this->settings->enclosure : '"';
+        $this->encoding = !empty($this->settings->encoding) ? $this->settings->encoding : 'utf-8';
+        //$updateexisting = !empty($this->settings->updateexisting) ? $this->settings->updateexisting : false; //is this needed?
+    }
+
+    /**
+     * Imports content and compares to settings.
+     *
+     * @param $content
+     * @return array false when import failed, true when import worked. Line errors might have happend
+     * @throws \coding_exception
+     * @throws \dml_exception
+     */
+    public function process_csv_data($content) {
+        $data = [];
         $iid = csv_import_reader::get_new_iid($this->pluginname);
         $cir = new csv_import_reader($iid, $this->pluginname);
 
-        $delimiter = !empty($this->settings->delimiter) ? $this->settings->delimiter : 'comma';
-        $enclosure = !empty($this->settings->enclosure) ? $this->settings->enclosure : '"';
-        $encoding = !empty($this->settings->encoding) ? $this->settings->encoding : 'utf-8';
-        //$updateexisting = !empty($this->settings->updateexisting) ? $this->settings->updateexisting : false; //is this needed?
-        $readcount = $cir->load_csv_content($content, $encoding, $delimiter, null, $enclosure);
+        $readcount = $cir->load_csv_content($content, $this->encoding, $this->delimiter, null, $this->enclosure);
 
         if (empty($readcount)) {
             $this->error .= $cir->get_error();
-            return false;
+            return $data;
         }
 
         // Csv column headers.
         if (!$fieldnames = $cir->get_columns()) {
             $this->error .= $cir->get_error();
-            return false;
+            return $data;
         }
         $this->fieldnames = $fieldnames;
         if (!empty($this->validate_fieldnames())) {
             $this->error .= $this->validate_fieldnames();
-            return false;
+            return $data;
+        }
+
+        // Check if first column is set mandatory and unique
+        $firstcolumn = $this->fieldnames[0];
+        if ($this->get_param_value($firstcolumn, 'mandatory') == true 
+        && $this->get_param_value($firstcolumn, 'unique') == true) {
+            $this->uniquekey = $firstcolumn;
         }
 
         $cir->init();
         while ($line = $cir->next()) {
-            // Import option data (not user data). Do not update booking option if it exists.
             $csvrecord = array_combine($fieldnames, $line);
+            // fieldnames hat das array der keys
+            // line hat alle values der reihe nach in einem array
+            $this->validate_data($csvrecord, $line);
 
-            // Validate data
-            foreach ($csvrecord as $column => $value) {
+            if (isset($this->uniquekey)) {
+                $record = array(
+                    $firstcolumn[$csvrecord[$firstcolumn]]);
 
-                $valueisset = (null !== $value) ? true : false;
+// Hier mit klarem Kopf das Array bauen!
+
+                                     /*         
+                $record = array(
+                    $firstcolumn => array(
+                        $csvrecord[$firstcolumn] => $recorddata[$columname] = $value)
+                )*/
                 
-                // Check if empty fields are mandatory
-                if (!$valueisset) {
-                    if ($this->field_is_mandatory($column)) {
-                        $this->add_csverror("The field $column is mandatory but contains no value.", $line[0]);
-                        break;
-                    }
-                    // If no value is set, use defaultvalue
-                    if (isset($this->settings->columns->$column->defaultvalue)) {
-                        $value = $this->settings->columns->$column->defaultvalue;
-                    }
-                }
-                // Validate fields of type date.
-                if (!$this->validate_datefields($column, $value)) {
-                    $format = $this->settings->dateformat;
-                    $this->add_csverror("$value is not a valid date format in $column. Format should be like: $format", $line[0]);
-                    break;
-                }
-                // Should we additionally check, if value is of given type? or cast to type according to settings?
-                // Other validations?
-            };
+               // foreach ($csvrecord as $columnname => $value) {
+               //  $values = array($recorddata[$columname] =>  $value);}
+            } else {
+
+                // wir haben keinen unique key, also wird data ein sequentielles array
+
+            }
+
+            // ziel ist jetzt 
         }
         $cir->cleanup(true);
         $cir->close();
-        return true;
+        return $data;
     }
+    
+    /**
+     * Validate each record by comparing to settings.
+     *
+     * @param array $csvrecord
+     * @param array $line
+     */
+    private function validate_data($csvrecord, $line) {  
+        // Validate data
+        foreach ($csvrecord as $column => $value) {
 
+            $valueisset = (null !== $value) ? true : false;
+            
+            // Check if empty fields are mandatory
+            if (!$valueisset) {
+                if ($this->field_is_mandatory($column)) {
+                    $this->add_csverror("The field $column is mandatory but contains no value.", $line[0]);
+                    break;
+                }
+                // If no value is set, use defaultvalue
+                if (isset($this->settings->columns->$column->defaultvalue)) {
+                    $value = $this->settings->columns->$column->defaultvalue;
+                }
+            }
+            // Validation of field type
+            switch($this->get_param_value($column, "type")) {
+                case "date":
+                    if (!$this->validate_datefields($value)) {
+                        $format = $this->settings->dateformat;
+                        $this->add_csverror("$value is not a valid date format in $column. Format should be like: $format", $line[0]);
+                        break;
+                    }
+                    break;
+                default:
+                    break;
+            }
+            // Validation of field format
+            switch($this->get_param_value($column, "format")) {
+                case "int":
+                    $value = $this->cast_string_to_int($value);
+                    if (is_string($value)) {
+                        $this->add_csverror("$value is not a valid integer in $column", $line[0]);
+                    }
+                    break;
+                default:
+                    break;
+            }
+
+        };
+    }
+    /**
+     * Check if the given string is a valid int and if possible, cast to int.
+     *
+     * @param string $value
+     * @return * either int or the given value (string)
+     */
+    protected function cast_string_to_int($value) {
+
+        $validation = filter_var($value, FILTER_VALIDATE_INT);
+        
+        if ($validation !== false) {
+            // The string is a valid integer
+            $int = (int)$value; // Casting to integer
+            return $int;
+        } else {
+            return $value;
+        }        
+    }
     /**
      * Comparing labels of content to required labels.
      * @return string empty if ok, errormsg if fieldname not correct in csv file.
@@ -214,28 +299,50 @@ class fileparser {
     /**
      * Check if date fields format is valid. Adds error and returns false in case of fail.
      * @param string $columnname
-     * @param $value
      * @return bool true on validation false on error
      */
-    protected function validate_datefields($columnname, $value) {
-        $foo = $this->settings->columns[$columnname];
-        $foo1 = $this->settings->columns[$columnname]->type;
-        //$foo2 = $this->settings->columns[$columnname]['type'];
+    protected function validate_datefields($value) {
 
-        if ($foo1 = $this->settings->columns[$columnname]->type == "date") {
-            $dateformat = !empty($this->settings->dateformat) ? $this->settings->dateformat : "j.n.Y H:i:s";
-            //Check if we have a numeric unix timestamp.
-            if (is_numeric($value)) {
-                $timestamp = (int) $value;
-                $value = date($dateformat, $timestamp);
-            }
-            //Check if we have a readable string.
-            if (!date_create_from_format($dateformat, $value) &&
-                    !strtotime($value)) {
-                        return false;
-                }
+        $dateformat = !empty($this->settings->dateformat) ? $this->settings->dateformat : "j.n.Y H:i:s";
+        //Check if we have a numeric unix timestamp.
+        if (is_numeric($value)) {
+            $timestamp = (int) $value;
+            $value = date($dateformat, $timestamp);
         }
+        //Check if we have a readable string.
+        if (!date_create_from_format($dateformat, $value) &&
+                !strtotime($value)) {
+                    return false;
+            }
         return true;
+    }
+
+    /**
+     * Checks the value of a given param of the column.
+     * @param string $columnname
+     * @param string $param
+     * @return string true on validation false on error
+     */
+    protected function get_param_value($columnname, $param) {
+        if (isset($this->settings->columns[$columnname]->$param)) {
+            return $this->settings->columns[$columnname]->$param;
+        } else {
+            return "";
+        }
+    }
+
+    /**
+     * Checks the value of a given param of the column.
+     * @param string $columnname
+     * @param string $param
+     * @param $value
+     * @return string true on validation false on error
+     */
+    protected function set_param_value($columnname, $param, $value) {
+        if (isset($this->settings->columns[$columnname]->$param)) {
+            $this->settings->columns[$columnname]->$param = $value;
+        }
+ 
     }
 
     /**
