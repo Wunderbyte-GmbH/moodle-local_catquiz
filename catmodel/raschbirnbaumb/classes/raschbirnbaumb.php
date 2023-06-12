@@ -23,6 +23,7 @@
 namespace catmodel_raschbirnbaumb;
 
 use Closure;
+use local_catquiz\catcalc;
 use local_catquiz\local\model\model_item_param_list;
 use local_catquiz\local\model\model_model;
 use local_catquiz\local\model\model_person_param_list;
@@ -57,7 +58,8 @@ class raschbirnbaumb extends model_model
 
     public function calculate_params($item_response)
     {
-        return 0.0;
+        list ($difficulty, $distrimination) = catcalc::estimate_item_params($item_response, $this);
+        return $difficulty;
     }
 
     // # elementary model functions

@@ -330,7 +330,8 @@ class catcalc {
         }
 
         // Defines the starting point
-        $z_0 = [10,10,1];
+        $start_arr = [10, 10, 1,];
+        $z_0 = array_slice($start_arr, 0, $model_dim-1);
 
         $params = \local_catquiz\mathcat::newton_raphson_multi($jacobian,$hessian,$z_0);
         return $params;
