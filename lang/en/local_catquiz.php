@@ -164,9 +164,6 @@ You can review the current state here: {$a->linkonscale}';
 // Catscale Dashboard.
 $string['statistics'] = "Stats";
 $string['models'] = "Models";
-$string['statindependence'] = "Statistical Independence";
-$string['loglikelihood'] = "Loglikelihood";
-$string['differentialitem'] = "Differential Item Functioning";
 $string['previewquestion'] = "Preview question";
 $string['personability'] = "Person ability";
 $string['personabilities'] = "Person abilities";

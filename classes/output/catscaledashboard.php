@@ -266,51 +266,6 @@ class catscaledashboard implements renderable, templatable
         return $table->outhtml(10, true);
     }
 
-    private function render_differentialitem()
-    {
-
-        global $OUTPUT;
-
-        $chart = new \core\chart_line();
-        $series1 = new \core\chart_series('Series 1 (Line)', [0.2, 0.3, 0.1, 0.4, 0.5, 0.2, 0.1, 0.3, 0.1, 0.4]);
-        $series2 = new \core\chart_series('Series 2 (Line)', [0.22, 0.35, 0.09, 0.38, 0.4, 0.24, 0.18, 0.31, 0.09, 0.4]);
-        $chart->set_smooth(true); // Calling set_smooth() passing true as parameter, will display smooth lines.
-        $chart->add_series($series1);
-        $chart->add_series($series2);
-        $chart->set_labels(['1', '2', '3', '4', '5', '6', '7', '8', '9', '10']);
-
-        return html_writer::tag('div', $OUTPUT->render($chart), ['dir' => 'ltr']);
-    }
-
-    private function render_statindependence()
-    {
-
-        global $OUTPUT;
-
-        $chart = new \core\chart_line(); // Create a bar chart instance.
-        $series1 = new \core\chart_series('Series 1 (Line)', [1.26, -0.87, 0.39, 2.31, 1.47, -0.53, 0.02, -1.14, 1.29, -0.04]);
-        $series2 = new \core\chart_series('Series 2 (Line)', [0.63, -0.04, -0.42, 1.98, -1.23, 0.53, 0.87, -0.35, -0.64, 0.18]);
-        $series2->set_type(\core\chart_series::TYPE_LINE); // Set the series type to line chart.
-        $chart->add_series($series2);
-        $chart->add_series($series1);
-        $chart->set_labels(['1', '2', '3', '4', '5', '6', '7', '8', '9', '10']);
-
-        return html_writer::tag('div', $OUTPUT->render($chart), ['dir' => 'ltr']);
-    }
-
-    private function render_loglikelihood()
-    {
-
-        global $OUTPUT;
-
-        $chart = new \core\chart_line();
-        $series = new \core\chart_series('Series 1 (Line)', [-1.53, 0.34, 1.21, 2.64, -0.35, -0.02, -0.56, 1.28, 1.26, 0.09, -0.5]);
-        $chart->set_smooth(true); // Calling set_smooth() passing true as parameter, will display smooth lines.
-        $chart->add_series($series);
-        $chart->set_labels(["-5", "-4", "-3", "-2", "-1", "0", "1", "2", "3", "4", "5"]);
-
-        return html_writer::tag('div', $OUTPUT->render($chart), ['dir' => 'ltr']);
-    }
     /**
      * @param array<model_item_param_list> $item_lists
      */
@@ -418,11 +373,8 @@ class catscaledashboard implements renderable, templatable
             'returnurl' => $url->out(),
             'testitemstable' => $this->render_testitems_table($this->catscaleid),
             'addtestitemstable' => $this->render_addtestitems_table($this->catscaleid),
-            'statindependence' => $this->render_statindependence(),
-            'loglikelihood' => $this->render_loglikelihood(),
             'itemdifficulties' => $this->render_itemdifficulties($item_difficulties),
             'personabilities' => $this->render_personabilities($person_abilities),
-            'differentialitem' => $this->render_differentialitem(),
             'contextselector' => $this->render_contextselector(),
             'table' => $testenvironmentdashboard->testenvironmenttable($this->catscaleid),
             'studentstable' => $this->render_student_stats_table($this->catscaleid, $this->catcontextid),

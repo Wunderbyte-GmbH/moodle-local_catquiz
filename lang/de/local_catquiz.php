@@ -160,9 +160,6 @@ Sie können den aktuellen Stand hier überprüfen. {$a->linkonscale}';
 // Catscale Dashboard.
 $string['statistics'] = "Statistik";
 $string['models'] = "Modelle";
-$string['statindependence'] = "Statistische Unabhängigkeit";
-$string['loglikelihood'] = "Log-Likelihood";
-$string['differentialitem'] = "Gruppenabhängiger Indikator";
 $string['previewquestion'] = "Fragen Vorschau";
 $string['personability'] = "Person ability";
 $string['personabilities'] = "Person abilities";
