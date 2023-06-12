@@ -199,10 +199,16 @@ class matrixcat
         return $result;
     }
 
+    /**
+     * Substracts two vectors
+     * @param mixed $vector1
+     * @param mixed $vector2
+     * @throws \InvalidArgumentException
+     * @return array
+     */
     public function subtractVectors($vector1, $vector2) {
         if (count($vector1) != count($vector2)) {
-            // Vectors should have the same length for subtraction
-            return null;
+            throw new \InvalidArgumentException("Vectors should have the same length for subtraction");
         }
 
         $result = array();
