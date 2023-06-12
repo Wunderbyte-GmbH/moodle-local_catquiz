@@ -265,6 +265,7 @@ class catcalc {
         $model_dim = $model->get_model_dim();
 
 
+
         // empty callable structures for composition
 
         $loglikelihood = function($x) {
@@ -320,48 +321,12 @@ class catcalc {
             }
         }
 
-//        $ml = new matrixcat();
-        // get real jacobian/hessian
-
-//        $z_0 = [1,2];
-
-
-
-
-        // jacobian, hessian, model_dim, start_value
-
-
-
-//
-//        for ($i = 0; $i < 70; $i++) {
-//
-//            for ($k=0; $k <= $model_dim-2; $k++) {
-//
-//                $real_jacobian[$k] = [$jacobian[$k]($z_0)];
-//
-//                for ($j = 0; $j <= $model_dim - 2; $j++) {
-//                    $real_hessian[$k][$j] = $hessian[$k][$j]($z_0);
-//                }
-//            }
-//
-//
-//            $G = $real_jacobian;
-//            $J = $real_hessian;
-//
-//            $j_inv = $ml->inverseMatrix($J);
-//            $test = $ml->multiplyMatrices($j_inv,$G)
-//            $z_0 =  $ml->subtractVectors($z_0, $ml->flattenArray($ml->multiplyMatrices($j_inv,$G)));
-//            $x0 = $ml->multiplyMatrices($j_inv,$g);
-//
-//            print_r($z_0);
-//        }
-
         $z_0 = [1,2,3];
 
         $params = \local_catquiz\mathcat::newton_raphson_multi($jacobian,$hessian,$z_0);
 
         echo "finished";
-
     }
+
 }
 
