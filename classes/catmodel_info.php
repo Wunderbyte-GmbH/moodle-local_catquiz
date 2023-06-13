@@ -32,32 +32,6 @@ use local_catquiz\catcontext;
  */
 class catmodel_info {
 
-
-    /**
-     * Undocumented function
-     *
-     * @param integer $catcontext
-     * @param integer $testitemid
-     * @param string $component
-     * @param string $model
-     * @return array
-     */
-    public function get_item_parameters(int $catcontext = 0):array {
-        $returnarray = [];
-
-        // Retrieve all the responses in the given context.
-        list($itemparamsbymodel, $personparamsbymodel) = $this->get_context_parameters($catcontext);
-        foreach ($itemparamsbymodel as $model => $itemparams) {
-            $returnarray[$model] = [
-                'itemparams' => $itemparams,
-                'personparams' => $personparamsbymodel
-            ];
-        }
-
-        return $returnarray;
-    }
-
-
     /**
      *
      * @param int $contextid

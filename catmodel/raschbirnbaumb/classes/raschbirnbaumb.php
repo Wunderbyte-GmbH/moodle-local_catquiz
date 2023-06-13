@@ -46,13 +46,6 @@ class raschbirnbaumb extends model_model
         return 3;  // we have 3 params ( ability, difficulty, discrimination)
     }
 
-
-    public function get_item_parameters(): model_item_param_list
-    {
-        // TODO implement
-        return new model_item_param_list();
-    }
-
     public function get_person_abilities(): model_person_param_list
     {
         // TODO implement

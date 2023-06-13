@@ -48,8 +48,6 @@ $PAGE->set_heading($title);
 
 echo $OUTPUT->header();
 
-// $response = catmodel_info::get_item_parameters(0, 126);
-
 $data = new testitemdashboard($testitemid, $contextid);
 $output = $PAGE->get_renderer('local_catquiz');
 echo $output->render_testitemdashboard($data);
