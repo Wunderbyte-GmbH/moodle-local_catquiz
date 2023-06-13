@@ -25,6 +25,7 @@
 namespace local_catquiz\import;
 
 use csv_import_reader;
+use DateTime;
 use html_writer;
 use stdClass;
 
@@ -227,7 +228,7 @@ class fileparser {
                 case "date":
                     if (!$this->validate_datefields($value)) {
                         $format = $this->settings->dateformat;
-                        $this->add_csverror("$value is not a valid date format in $column. Format should be like: $format", $line[0]);
+                        $this->add_csverror("$value is not a valid date format in $column. Format should be Unix timestamp or like: $format", $line[0]);
                         break;
                     }
                     break;
@@ -302,19 +303,21 @@ class fileparser {
      * @return bool true on validation false on error
      */
     protected function validate_datefields($value) {
-
+        //Check if we have a readable string in correct format.
+        $readablestring = false;
         $dateformat = !empty($this->settings->dateformat) ? $this->settings->dateformat : "j.n.Y H:i:s";
-        //Check if we have a numeric unix timestamp.
-        if (is_numeric($value)) {
-            $timestamp = (int) $value;
-            $value = date($dateformat, $timestamp);
-        }
-        //Check if we have a readable string.
-        if (!date_create_from_format($dateformat, $value) &&
-                !strtotime($value)) {
-                    return false;
+        if (date_create_from_format($dateformat, $value) &&
+                strtotime($value)) {
+                    $readablestring = true;
             }
-        return true;
+        // Check accepts all ints.
+        $date = DateTime::createFromFormat('U', $value);
+
+        if (($date && $date->format('U') == $value) || $readablestring) {
+            return true;
+        } else {
+            return false;
+        }
     }
 
     /**
