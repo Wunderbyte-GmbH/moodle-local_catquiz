@@ -238,7 +238,7 @@ class mathcat
         return $current_point;
     }
 
-    static function newton_raphson_multi($func, $derivative, $start, $min_inc = 0.0001, $max_iter = 20)
+    static function newton_raphson_multi($func, $derivative, $start, $min_inc = 0.0001, $max_iter = 2000)
     {
 
         $model_dim = count($func);
@@ -268,11 +268,19 @@ class mathcat
             $J = $real_derivative;
 
             $j_inv = $ml->inverseMatrix($J);
-            $z_0 = $ml->subtractVectors($z_0, $ml->flattenArray($ml->multiplyMatrices($j_inv, $G)));
+
+            $z_1 = $ml->subtractVectors($z_0, $ml->flattenArray($ml->multiplyMatrices($j_inv, $G)));
 
 
+            $dist = $ml->dist($z_0,$z_1);
 
+            if ($dist < $min_inc){
+                $z_0 = $z_1;
+                break;
+            }
+            $z_0 = $z_1;
         }
+
         return $z_0;
     }
 }
