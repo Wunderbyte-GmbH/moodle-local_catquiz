@@ -275,7 +275,7 @@ class raschbirnbaumc extends model_model
             return $this->log_counter_likelihood_b($p, $x[0], $x[1], $x[2]);
         };
         $fun3 = function ($x) use ($p) {
-            return $this->log_counter_likelihood_b($p, $x[0], $x[1], $x[2]);
+            return $this->log_counter_likelihood_c($p, $x[0], $x[1], $x[2]);
         };
 
         return [$fun1, $fun2, $fun3];
@@ -319,7 +319,7 @@ class raschbirnbaumc extends model_model
 
     }
 
-    public function get_log_counter_jacobi($p)
+    public function get_log_counter_hessian($p)
     {
 
         $fun11 = function ($x) use ($p) {

@@ -314,7 +314,7 @@ class catcalc {
 
                 $likelihood_part = $model->get_log_counter_likelihood($tmp_ability);
                 $jacobian_part = $model->get_log_counter_jacobian($tmp_ability);
-                $hessian_part = $model->get_log_counter_jacobi($tmp_ability);
+                $hessian_part = $model->get_log_counter_hessian($tmp_ability);
             }
 
             // chain with functions
@@ -330,7 +330,7 @@ class catcalc {
         }
 
         // Defines the starting point
-        $start_arr = [10, 10, 1,];
+        $start_arr = [0.5, 0.5, 0.5];
         $z_0 = array_slice($start_arr, 0, $model_dim-1);
 
         $params = \local_catquiz\mathcat::newton_raphson_multi($jacobian,$hessian,$z_0);
