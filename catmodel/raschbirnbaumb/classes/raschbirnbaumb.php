@@ -120,14 +120,14 @@ class raschbirnbaumb extends model_model
     public function log_counter_likelihood_a($p, $a, $b)
     {
 
-        return (exp($a * $p) * ($b - $p)) / max((exp($a * $b) + exp($a * $p)), PHP_FLOAT_MIN);
+        return (exp($a * $p) * ($b - $p)) / (exp($a * $b) + exp($a * $p));
 
     }
 
     public function log_counter_likelihood_b($p, $a, $b)
     {
 
-        return ($a * exp($a * $p)) / max((exp($a * $b) + exp($a * $p)), PHP_FLOAT_MIN);
+        return ($a * exp($a * $p)) / (exp($a * $b) + exp($a * $p));
 
     }
 
@@ -136,7 +136,7 @@ class raschbirnbaumb extends model_model
     public function log_likelihood_a_a($p, $a, $b)
     {
 
-        return -(exp($a * ($b + $p)) * ($b - $p) ** 2) / max((exp($a * $b) + exp($a * $p)) ** 2, PHP_FLOAT_MIN);
+        return -(exp($a * ($b + $p)) * ($b - $p) ** 2) / (exp($a * $b) + exp($a * $p)) ** 2;
     }
 
     public function log_likelihood_a_b($p, $a, $b)
@@ -149,7 +149,7 @@ class raschbirnbaumb extends model_model
     public function log_likelihood_b_b($p, $a, $b)
     {
 
-        return -($a ** 2 * exp($a * ($b + $p))) / max((exp($a * $b) + exp($a * $p)) ** 2, PHP_FLOAT_MIN);
+        return -($a ** 2 * exp($a * ($b + $p))) / (exp($a * $b) + exp($a * $p)) ** 2;
 
     }
 
@@ -158,20 +158,20 @@ class raschbirnbaumb extends model_model
     public function log_counter_likelihood_a_a($p, $a, $b)
     {
 
-        return -(exp($a * ($b + $p)) * ($b - $p) ** 2) / max((exp($a * $b) + exp($a * $p)) ** 2, PHP_FLOAT_MIN);
+        return -(exp($a * ($b + $p)) * ($b - $p) ** 2) / (exp($a * $b) + exp($a * $p)) ** 2;
     }
 
     public function log_counter_likelihood_a_b($p, $a, $b)
     {
 
-        return (exp(2 * $a * $p) + exp($a * ($b + $p)) * (1 + $a * (-$b + $p))) / max((exp($a * $b) + exp($a * $p)) ** 2, PHP_FLOAT_MIN);
+        return (exp(2 * $a * $p) + exp($a * ($b + $p)) * (1 + $a * (-$b + $p))) / (exp($a * $b) + exp($a * $p)) ** 2;
 
     }
 
     public function log_counter_likelihood_b_b($p, $a, $b)
     {
 
-        return -($a ** 2 * exp($a * ($b + $p))) / max((exp($a * $b) + exp($a * $p)) ** 2, PHP_FLOAT_MIN);
+        return -($a ** 2 * exp($a * ($b + $p))) / (exp($a * $b) + exp($a * $p)) ** 2;
 
     }
 

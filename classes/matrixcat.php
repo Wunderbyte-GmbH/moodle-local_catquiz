@@ -48,7 +48,7 @@ class matrixcat
 
         for($i=0; $i<$numberOfRows; $i++)
         {
-            $matrix = $this->oneOperation($matrix, $i, $i);
+            $matrix = @$this->oneOperation($matrix, $i, $i);
 
             for($j=0; $j<$numberOfRows; $j++)
             {
@@ -79,16 +79,9 @@ class matrixcat
                 $divisor = $matrix[$rowPosition][$zeroPosition];
             }
 
-            for($i=0; $i<$numberOfCols; $i++) {
-                if ($divisor === 0.0) {
-                    if ($matrix[$rowPosition][$i] === 0.0) {
-                        $matrix[$rowPosition][$i] = 0.0;
-                    } else {
-                        $matrix[$rowPosition][$i] = INF;
-                    }
-                } else {
-                    $matrix[$rowPosition][$i] = $matrix[$rowPosition][$i] / $divisor;
-                }
+            for($i=0; $i<$numberOfCols; $i++)
+            {
+                $matrix[$rowPosition][$i] = $matrix[$rowPosition][$i] / $divisor;
             }
         }
 
