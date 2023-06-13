@@ -170,6 +170,8 @@ $string['personabilities'] = "Person abilities";
 $string['personabilitiesnodata'] = "No person abilities were calucalted";
 $string['itemdifficulties'] = "Item difficulties";
 $string['itemdifficultiesnodata'] = "No item difficulties were calculated";
+$string['somethingwentwrong'] = 'Something went wrong. Please contact your admin.';
+$string['recalculationscheduled'] = 'Recalculation of the context parameters has been scheduled';
 
 // Table.
 $string['label'] = "Label";

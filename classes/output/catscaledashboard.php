@@ -354,7 +354,7 @@ class catscaledashboard implements renderable, templatable
     }
     private function render_modelbutton($contextid)
     {
-        return '<button class="btn btn-primary" type="button" data-contextid="1" id="model_button">Calculate</button>';
+        return sprintf('<button class="btn btn-primary" type="button" data-contextid="%s" id="model_button">Calculate</button>', $contextid);
     }
 
     public function export_for_template(\renderer_base $output): array
