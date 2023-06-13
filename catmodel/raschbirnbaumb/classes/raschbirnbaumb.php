@@ -261,7 +261,7 @@ class raschbirnbaumb extends model_model
 
     }
 
-    public function get_log_counter_jacobi($p)
+    public function get_log_counter_hessian($p)
     {
 
         $fun11 = function ($x) use ($p) {
