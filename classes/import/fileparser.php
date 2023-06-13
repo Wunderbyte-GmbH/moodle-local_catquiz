@@ -210,7 +210,7 @@ class fileparser {
         // Validate data
         foreach ($csvrecord as $column => $value) {
 
-            $valueisset = (null !== $value) ? true : false;
+            $valueisset = (("" !== $value) && (null !== $value)) ? true : false;
             
             // Check if empty fields are mandatory
             if (!$valueisset) {
@@ -299,7 +299,7 @@ class fileparser {
 
     /**
      * Check if date fields format is valid. Adds error and returns false in case of fail.
-     * @param string $columnname
+     * @param string $value
      * @return bool true on validation false on error
      */
     protected function validate_datefields($value) {
