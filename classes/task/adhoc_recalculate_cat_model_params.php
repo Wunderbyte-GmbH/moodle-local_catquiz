@@ -19,37 +19,16 @@ namespace local_catquiz\task;
 use local_catquiz\catmodel_info;
 
 /**
- * Runs through all contexts and recalculates values for all CAT models
+ * Recalculates item params for the given context
  */
-class recalculate_cat_model_params extends \core\task\scheduled_task {
-
-    public function get_name() {
-        return get_string('task_recalculate_cat_model_params', 'local_catquiz');
-    }
-
+class adhoc_recalculate_cat_model_params extends \core\task\adhoc_task {
     /**
-     * Update all model params of all contexts
+     * Update all model params of the given context
      * @return void
      */
     public function execute() {
-        global $DB;
-
-        $now = time();
-        // Get all contexts
-        $contexts = $DB->get_records_sql(
-            <<<SQL
-                SELECT * FROM {local_catquiz_catcontext} cc
-                WHERE starttimestamp <= :now1 AND endtimestamp >= :now2
-                ;
-            SQL,
-            [
-                'now1' => $now,
-                'now2' => $now,
-            ]
-        );
+        $contextid = $this->get_custom_data();
         $cm = new catmodel_info();
-        foreach ($contexts as $context) {
-            $cm->update_params($context->id);
-        }
+        $cm->update_params($contextid);
     }
 }

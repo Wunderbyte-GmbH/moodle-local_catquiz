@@ -25,7 +25,12 @@
 
 namespace local_catquiz;
 
+use core\task\manager;
 use local_catquiz\catcontext;
+use local_catquiz\task\adhoc_recalculate_cat_model_params;
+use local_catquiz\task\recalculate_cat_model_params;
+use moodle_exception;
+use moodle_url;
 
 /**
  * This class
@@ -39,19 +44,31 @@ class catmodel_info {
      * @return array
      */
     public function get_context_parameters( int $contextid = 0, bool $calculate = false) {
-        $context = catcontext::load_from_db($contextid);
-        $strategy = $context->get_strategy();
-
+        // Trigger calculation in the background but do not wait for it to finish
         if ($calculate) {
-            list($item_difficulties, $person_abilities) =  $strategy->run_estimation();
-            foreach ($item_difficulties as $item_param_list) {
-                $item_param_list->save_to_db($contextid);
-            }
-            $person_abilities->save_to_db($contextid);
-            $context->save_or_update((object)['timecalculated' => time()]);
-            return [$item_difficulties, $person_abilities];
+            $this->trigger_parameter_calculation($contextid);
         }
 
+        // Return the data that are currently saved in the DB
+        $context = catcontext::load_from_db($contextid);
+        $strategy = $context->get_strategy();
         return $strategy->get_params_from_db($contextid);
+    }
+
+    public function trigger_parameter_calculation($contextid) {
+        $adhoc_recalculate_cat_model_params = new adhoc_recalculate_cat_model_params();
+        $adhoc_recalculate_cat_model_params->set_custom_data($contextid);
+        manager::queue_adhoc_task($adhoc_recalculate_cat_model_params);
+    }
+
+    public function update_params($contextid) {
+        $context = catcontext::load_from_db($contextid);
+        $strategy = $context->get_strategy();
+        list($item_difficulties, $person_abilities) =  $strategy->run_estimation();
+        foreach ($item_difficulties as $item_param_list) {
+            $item_param_list->save_to_db($contextid);
+        }
+        $person_abilities->save_to_db($contextid);
+        $context->save_or_update((object)['timecalculated' => time()]);
     }
 }

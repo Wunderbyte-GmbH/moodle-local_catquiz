@@ -19,7 +19,10 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+import {get_string as getString} from 'core/str';
+import Ajax from 'core/ajax';
 import DynamicForm from 'core_form/dynamicform';
+import Notification from 'core/notification';
 
 const SELECTORS = {
     FORMCONTAINER: '#select_context_form',
@@ -35,10 +38,10 @@ export const init = () => {
         'local_catquiz\\form\\contextselector'
     );
 
-    document.querySelector(SELECTORS.CALCULATEBUTTON).onclick = function() {
-        let searchParams = new URLSearchParams(window.location.search);
-        searchParams.set("calculate", true);
-        window.location.search = searchParams.toString();
+    const calculateButton = document.querySelector(SELECTORS.CALCULATEBUTTON);
+    const contextId = parseInt(calculateButton.dataset.contextid);
+    calculateButton.onclick = () => {
+        updateParameters(contextId);
     };
 
     // If a user selects a context, redirect to a URL that includes the selected
@@ -67,4 +70,52 @@ export const init = () => {
             dynamicForm.submitFormAjax();
         }, 500);
     });
+
+    const updateParameters = async (contextid) => {
+        // Fallback if the translation can not be loaded
+        let errorMessage = 'Something went wrong';
+        try {
+            errorMessage = await getString('somethingwentwrong', 'local_catquiz');
+        } catch (error) {
+            // We already have a fallback message, nothing to do here.
+        }
+        Ajax.call([{
+            methodname: 'local_catquiz_update_parameters',
+            args: {contextid},
+            done: async function(res) {
+                if (res.success) {
+                    disableButton();
+                    // Fallback if the translation can not be loaded
+                    let successMessage = 'Recalculation was scheduled';
+                    try {
+                        successMessage = await getString('recalculationscheduled', 'local_catquiz');
+                    } catch (error) {
+                        // We already have a fallback message, nothing to do here.
+                    }
+
+                    Notification.addNotification({
+                        message: successMessage,
+                        type: 'success'
+                    });
+                } else {
+                    disableButton();
+                    Notification.addNotification({
+                        message: errorMessage,
+                        type: 'danger'
+                    });
+                }
+            },
+            fail: () => {
+                    disableButton();
+                    Notification.addNotification({
+                        message: errorMessage,
+                        type: 'danger'
+                    });
+            },
+        }]);
+    };
+
+    const disableButton = () => {
+        document.querySelector(SELECTORS.CALCULATEBUTTON).setAttribute('disabled', true);
+    };
 };

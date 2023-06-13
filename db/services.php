@@ -91,4 +91,10 @@ $functions = array(
                 'capabilities' => '',
                 'ajax' => 1,
         ),
+        'local_catquiz_update_parameters' => array(
+                'classname' => 'local_catquiz\external\update_parameters',
+                'description' => 'Updates the item parameters',
+                'type' => 'write',
+                'ajax' => 1,
+        ),
 );
