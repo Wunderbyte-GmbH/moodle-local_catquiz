@@ -74,9 +74,9 @@ class raschbirnbaumb extends model_model
     /**
      * Generalisierung von `likelihood`: params $a und $b werden im array/vector als $x[0] und $x[1] angesprochen
      * Kann in likelihood umbenannt werden
-     * @param mixed $p 
-     * @param mixed $x 
-     * @return int|float 
+     * @param mixed $p
+     * @param mixed $x
+     * @return int|float
      */
     public function likelihood_multi($p, $x)
     {
@@ -178,8 +178,8 @@ class raschbirnbaumb extends model_model
 
     /**
      * Used to estimate the item difficulty
-     * @param mixed $p 
-     * @return Closure(mixed $x): float 
+     * @param mixed $p
+     * @return Closure(mixed $x): float
      */
     public function get_log_likelihood($p)
     {
@@ -192,8 +192,8 @@ class raschbirnbaumb extends model_model
 
     /**
      * Used to estimate the item difficulty
-     * @param mixed $p 
-     * @return Closure(mixed $x): float 
+     * @param mixed $p
+     * @return Closure(mixed $x): float
      */
     public function get_log_counter_likelihood($p)
     {
@@ -278,6 +278,11 @@ class raschbirnbaumb extends model_model
         };
 
         return [[$fun11, $fun12], [$fun21, $fun22]];
+
+    }
+    public function fisher_info($p,$x){
+
+        return $x[0]**2 * $this->likelihood_multi($p,$x) * (1-$this->likelihood_multi($p,$x));
 
     }
 }

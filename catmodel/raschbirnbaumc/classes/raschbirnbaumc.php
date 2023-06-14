@@ -352,7 +352,11 @@ class raschbirnbaumc extends model_model
         };
 
         return [[$fun11, $fun12, $fun13], [$fun21, $fun22, $fun23], [$fun31, $fun32, $fun33]];
+    }
 
+    public function fisher_info($p,$x){
+
+        return $x[0]**2 * (1 - $x[2]) * $this->likelihood_multi($p,$x) * (1-$this->likelihood_multi($p,$x));
 
     }
 }
