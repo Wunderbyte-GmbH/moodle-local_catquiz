@@ -349,4 +349,18 @@ class fileparser {
         $this->csverrors .= "Error in line $i: ";
         $this->csverrors .= $errorstring;
     }
+
+    /**
+     * @return string line errors
+     */
+    public function get_line_errors() {
+        return $this->csverrors;
+    }
+
+    /**
+     * @return string errors
+     */
+    public function get_error() {
+        return $this->error;
+    }
 }

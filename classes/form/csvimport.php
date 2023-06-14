@@ -190,7 +190,9 @@ class csvimport extends dynamic_form {
 
         $parser = new fileparser($settings);
         $data = $parser->process_csv_data($content);
-        return $parser;
+        $errors = $parser->get_error();
+        $lineerrors = $parser->get_line_errors();
+        return $data;
     }
 
     /**
