@@ -39,6 +39,9 @@ defined('MOODLE_INTERNAL') || die();
 class raschbirnbaumc extends model_model
 {
 
+    // info: x[0] <- "discrimination"
+    // info: x[1] <- "difficulty"
+    // info: x[2] <- "guessing"
 
     public function get_model_dim()
     {

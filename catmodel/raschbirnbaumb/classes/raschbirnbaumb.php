@@ -37,6 +37,9 @@ defined('MOODLE_INTERNAL') || die();
 class raschbirnbaumb extends model_model
 {
 
+    // info: x[0] <- "discrimination"
+    // info: x[1] <- "difficulty"
+
 
     public function get_model_dim()
     {
