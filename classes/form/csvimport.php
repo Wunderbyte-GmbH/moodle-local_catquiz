@@ -130,9 +130,14 @@ class csvimport extends dynamic_form {
             'format' => PARAM_INT,
             'type' => 'date',
             'defaultvalue' => 1685015874,
+            ), 
+            array (
+            'name' => 'price',
+            'mandatory' => false,
+            'format' => PARAM_INT,
             )
             ];
-        $settings = new csvsettings($columnsassociative);
+        $settings = new csvsettings($columnssequential);
         return $settings;
     }
     
@@ -166,9 +171,9 @@ class csvimport extends dynamic_form {
      *
      * Submission data can be accessed as: $this->get_data()
      *
-     * @return object
+     * @return array
      */
-    public function process_dynamic_submission(): object {
+    public function process_dynamic_submission(): array {
         $data = $this->get_data();
         $content = $this->get_file_content('csvfile');
         $settings = $this->call_settings_class();

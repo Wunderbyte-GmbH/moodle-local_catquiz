@@ -132,7 +132,7 @@ class fileparser {
      * Imports content and compares to settings.
      *
      * @param $content
-     * @return array false when import failed, true when import worked. Line errors might have happend
+     * @return array Array of records, associative if first column is defined mandatory and unique, otherwise sequential. Line errors might have happend
      * @throws \coding_exception
      * @throws \dml_exception
      */
@@ -167,37 +167,28 @@ class fileparser {
         }
 
         $cir->init();
+        $record = [];
         while ($line = $cir->next()) {
             $csvrecord = array_combine($fieldnames, $line);
-            // fieldnames hat das array der keys
-            // line hat alle values der reihe nach in einem array
             $this->validate_data($csvrecord, $line);
 
-            if (isset($this->uniquekey)) {
-                $record = array(
-                    $firstcolumn[$csvrecord[$firstcolumn]]);
-
-// Hier mit klarem Kopf das Array bauen!
-
-                                     /*         
-                $record = array(
-                    $firstcolumn => array(
-                        $csvrecord[$firstcolumn] => $recorddata[$columname] = $value)
-                )*/
-                
-               // foreach ($csvrecord as $columnname => $value) {
-               //  $values = array($recorddata[$columname] =>  $value);}
-            } else {
-
-                // wir haben keinen unique key, also wird data ein sequentielles array
-
+            $data = array();
+            foreach ($csvrecord as $columnname => $value) {
+                $data[$columnname] = $value;
             }
+            if (isset($this->uniquekey)) { // With unique key set, we build an associative array.
+                if (!isset($record[$firstcolumn])) {
+                    $record[$firstcolumn] = array();
+                }
+                $record[$firstcolumn][$csvrecord[$firstcolumn]] = $data;
 
-            // ziel ist jetzt 
+            } else { // Without unique key, we build a sequential array.
+                array_push($record, $data);
+            }
         }
         $cir->cleanup(true);
         $cir->close();
-        return $data;
+        return $record;
     }
     
     /**
