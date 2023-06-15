@@ -333,7 +333,7 @@ class catcalc {
         $start_arr = [0.5, 0.5, 0.5];
         $z_0 = array_slice($start_arr, 0, $model_dim-1);
 
-        $params = \local_catquiz\mathcat::newton_raphson_multi($jacobian,$hessian,$z_0);
+        $params = \local_catquiz\mathcat::newton_raphson_multi($jacobian,$hessian,$z_0, 0.001, 50);
         return $params;
     }
 }
