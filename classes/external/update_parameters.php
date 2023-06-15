@@ -42,13 +42,13 @@ require_once($CFG->libdir . '/externallib.php');
  *
  * @package   local_catquiz
  * @copyright 2022 Wunderbyte GmbH {@link http://www.wunderbyte.at}
- * @author    Georg Maißer
+ * @author    David Szkiba
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class update_parameters extends external_api {
 
     /**
-     * Describes the parameters for get_next_question webservice.
+     * Describes the parameters for update_parameters webservice.
      *
      * @return external_function_parameters
      */
