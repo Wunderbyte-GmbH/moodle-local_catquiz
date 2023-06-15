@@ -38,9 +38,14 @@ use moodle_url;
 class catmodel_info {
 
     /**
-     *
+     * Returns the saved item parameters for the given context.
+     * 
+     * The first element constains an associative array of model_item_param_lists,
+     * indexed by the respective model name. The second element is a
+     * model_person_param_list.
+     * 
      * @param int $contextid
-     * @param bool $calculate
+     * @param bool $calculate Trigger a re-calculation of the item parameters
      * @return array
      */
     public function get_context_parameters( int $contextid = 0, bool $calculate = false) {

@@ -48,12 +48,6 @@ class raschbirnbaumc extends model_model
         return 4;  // we have 4 params ( ability, difficulty, discrimination, guessing)
     }
 
-    public function get_person_abilities(): model_person_param_list
-    {
-        // TODO implement
-        return new model_person_param_list();
-    }
-
     public function calculate_params($item_response)
     {
         list ($difficulty, $distrimination, $guessing) = catcalc::estimate_item_params($item_response, $this);

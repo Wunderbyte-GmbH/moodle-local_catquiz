@@ -46,23 +46,19 @@ class raschbirnbaumb extends model_model
         return 3;  // we have 3 params ( ability, difficulty, discrimination)
     }
 
-    public function get_person_abilities(): model_person_param_list
-    {
-        // TODO implement
-        return new model_person_param_list();
-    }
-
     public function calculate_params($item_response)
     {
-        list ($difficulty, $distrimination) = catcalc::estimate_item_params($item_response, $this);
+        list($difficulty, $distrimination) = catcalc::estimate_item_params($item_response, $this);
         return $difficulty;
     }
 
     // # elementary model functions
 
 
-    public function likelihood($p, $a, $b)
-    {
+    public function likelihood($p,
+        $a,
+        $b
+    ) {
 
         return (1 / (1 + exp($a * ($b - $p))));
     }
@@ -89,7 +85,6 @@ class raschbirnbaumb extends model_model
     {
 
         return log((exp($a * (-$b + $p))) / (1 + exp($a * (-$b + $p))));
-
     }
 
     public function log_counter_likelihood($p, $a, $b)
@@ -110,21 +105,19 @@ class raschbirnbaumb extends model_model
     public function log_likelihood_b($p, $a, $b)
     {
 
-        return -($a) / (1 + exp($a * (-$b + $p)));
+        return - ($a) / (1 + exp($a * (-$b + $p)));
     }
 
     public function log_counter_likelihood_a($p, $a, $b)
     {
 
         return (exp($a * $p) * ($b - $p)) / (exp($a * $b) + exp($a * $p));
-
     }
 
     public function log_counter_likelihood_b($p, $a, $b)
     {
 
         return ($a * exp($a * $p)) / (exp($a * $b) + exp($a * $p));
-
     }
 
     // hessian
@@ -132,21 +125,19 @@ class raschbirnbaumb extends model_model
     public function log_likelihood_a_a($p, $a, $b)
     {
 
-        return -(exp($a * ($b + $p)) * ($b - $p) ** 2) / (exp($a * $b) + exp($a * $p)) ** 2;
+        return - (exp($a * ($b + $p)) * ($b - $p) ** 2) / (exp($a * $b) + exp($a * $p)) ** 2;
     }
 
     public function log_likelihood_a_b($p, $a, $b)
     {
 
         return (-1 + exp($a * (-$b + $p)) * (-1 + $a * (-$b + $p))) / (1 + exp($a * (-$b + $p))) ** 2;
-
     }
 
     public function log_likelihood_b_b($p, $a, $b)
     {
 
-        return -($a ** 2 * exp($a * ($b + $p))) / (exp($a * $b) + exp($a * $p)) ** 2;
-
+        return - ($a ** 2 * exp($a * ($b + $p))) / (exp($a * $b) + exp($a * $p)) ** 2;
     }
 
 
@@ -154,20 +145,19 @@ class raschbirnbaumb extends model_model
     public function log_counter_likelihood_a_a($p, $a, $b)
     {
 
-        return -(exp($a * ($b + $p)) * ($b - $p) ** 2) / (exp($a * $b) + exp($a * $p)) ** 2;
+        return - (exp($a * ($b + $p)) * ($b - $p) ** 2) / (exp($a * $b) + exp($a * $p)) ** 2;
     }
 
     public function log_counter_likelihood_a_b($p, $a, $b)
     {
 
         return (exp(2 * $a * $p) + exp($a * ($b + $p)) * (1 + $a * (-$b + $p))) / (exp($a * $b) + exp($a * $p)) ** 2;
-
     }
 
     public function log_counter_likelihood_b_b($p, $a, $b)
     {
 
-        return -($a ** 2 * exp($a * ($b + $p))) / (exp($a * $b) + exp($a * $p)) ** 2;
+        return - ($a ** 2 * exp($a * ($b + $p))) / (exp($a * $b) + exp($a * $p)) ** 2;
 
     }
 

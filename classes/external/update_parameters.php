@@ -18,7 +18,7 @@
  * This class contains a list of webservice functions related to the catquiz Module by Wunderbyte.
  *
  * @package    local_catquiz
- * @copyright  2022 Georg Maißer <info@wunderbyte.at>
+ * @copyright  2023 Georg Maißer <info@wunderbyte.at>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
