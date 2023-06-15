@@ -149,7 +149,18 @@ class catquiz {
                     qc.name as categoryname,
                     lci.catscaleid catscaleid,
                     lci.componentname component,
-                    s2.attempts
+                    s2.attempts,
+
+                    maxlcip.difficulty,
+                    maxlcip.discrimination,
+                    maxlcip.model,
+
+                    ( SELECT MAX(lcip.status)
+                    	FROM m_local_catquiz_itemparams lcip
+                    	WHERE lcip.componentname=lci.componentname AND lcip.componentid=lci.componentid) as maxstatus,
+                    maxlcip.itemstatus
+
+
                 FROM {question} q
                 JOIN {question_versions} qv
                     ON q.id=qv.questionid
@@ -159,6 +170,14 @@ class catquiz {
                     ON qc.id=qbe.questioncategoryid
                 LEFT JOIN {local_catquiz_items} lci
                     ON lci.componentid=q.id AND lci.componentname='question'
+
+                JOIN (
+                    SELECT lcip.difficulty, lcip.discrimination, lcip.componentid, lcip.componentname, lcip.model, lcip.status as itemstatus
+                    FROM m_local_catquiz_itemparams lcip
+                    GROUP BY lcip.difficulty, lcip.discrimination, lcip.componentid, lcip.componentname, lcip.model, lcip.status
+                    ) as maxlcip
+                ON maxlcip.componentid=q.id AND maxlcip.componentname=lci.componentname
+
                 LEFT JOIN (
                     SELECT ccc1.id AS contextid, qa.questionid, COUNT(*) AS attempts
                     FROM {local_catquiz_catcontext} ccc1
@@ -172,7 +191,7 @@ class catquiz {
                 ) s2 ON q.id = s2.questionid
             ) as s1";
 
-        $where = ' catscaleid = :catscaleid ';
+        $where = ' catscaleid = :catscaleid AND itemstatus = maxstatus';
         $params = [
             'catscaleid' => $catscaleid,
             'contextid' => $contextid,
@@ -601,7 +620,7 @@ class catquiz {
 
     /**
      * For a CAT-Scale manager, returns the number of assigned CAT-Scales.
-     * 
+     *
      * @param int $userid
      * @return array
      */
@@ -625,7 +644,7 @@ class catquiz {
     /**
      * For a CAT-Scale manager, returns the number of tests that are connected
      * to the managed CAT scales.
-     * 
+     *
      * @param int $userid
      * @return array
      */
@@ -651,7 +670,7 @@ class catquiz {
     /**
      * For a CAT-Scale manager, returns the number of questions that are
      * assigned to the managed scales
-     * 
+     *
      * @param int $userid
      * @return array
      */
@@ -675,8 +694,8 @@ class catquiz {
 
     /**
      * Returns the timestamp of the most recent calculation across all contexts
-     * 
-     * @param int $userid 
+     *
+     * @param int $userid
      * @return array
      */
     public static function get_sql_for_last_calculation_time(int $userid) {
@@ -691,8 +710,8 @@ class catquiz {
 
     /**
      * Returns the number of test items in a CAT scale
-     * 
-     * @param int $catscaleid 
+     *
+     * @param int $catscaleid
      * @return array
      */
     public static function get_sql_for_number_of_questions_in_scale(int $catscaleid) {

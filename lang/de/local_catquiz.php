@@ -72,6 +72,14 @@ $string['errorhastobefloat'] = 'Muss ein Dezimalwert sein';
 
 $string['addoredittemplate'] = "Bearbeite Vorlage";
 
+// Test Strategy
+$string['catquiz_teststrategyheader'] = 'Teststrategie';
+$string['catquiz_selectteststrategy'] = 'Wähle Teststrategie';
+
+$string['teststrategy_base'] = 'Basisklase der Teststrategien';
+$string['teststrategy_info'] = 'Info Klasse für Teststrategien';
+$string['teststrategy_fastest'] = 'Strategie schnellstes Ergebnis';
+
 // Tests environment.
 $string['newcustomtest'] = 'Benutzerdefinierter Test';
 $string['lang'] = 'Sprache';
@@ -104,6 +112,7 @@ $string['noint'] = 'Bitte geben Sie eine Zahl ein';
 $string['notpositive'] = 'Bitte geben Sie eine positive Zahl ein';
 $string['strategy'] = 'Strategie';
 $string['max_iterations'] = 'Maximale Anzahl an Iterationen';
+$string['modal_override'] = 'Nur dieses Modell verwenden';
 
 // Buttons.
 $string['subscribe'] = 'Abonniere';

@@ -150,6 +150,48 @@ class testitems_table extends wunderbyte_table {
     }
 
     /**
+     * Override  model value with get_string.
+     *
+     * @param stdClass $values
+     * @return void
+     */
+    public function col_model($values) {
+
+        return get_string('pluginname', 'catmodel_' . $values->model);
+    }
+
+
+    /**
+     * Override  model value with get_string.
+     *
+     * @param stdClass $values
+     * @return void
+     */
+    public function col_status($values) {
+
+        switch ($values->status) {
+            case -5:
+
+                break;
+            case -1:
+
+                break;
+            case 0:
+
+                break;
+            case 1:
+
+                break;
+            case 5:
+
+                break;
+    }
+
+        return get_string('pluginname', 'catmodel_' . $values->model);
+    }
+
+
+    /**
      * Function to handle the action buttons.
      * @param integer $testitemid
      * @param string $data

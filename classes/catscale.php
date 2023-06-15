@@ -119,4 +119,23 @@ class catscale {
         $DB->delete_records('local_catquiz_items', $data);
         cache_helper::purge_by_event('changesintestitems');
     }
+
+    /**
+     * Returns the testitems for this scale and all the subscales.
+     *
+     * @param $contextid
+     * @return array
+     */
+    public function get_testitems(int $contextid):array {
+
+        global $DB;
+
+        list($select, $from, $where, $filter, $params) = catquiz::return_sql_for_catscalequestions($this->catscale->id, [], [], $contextid);
+
+        $sql = "SELECT $select FROM $from WHERE $where";
+
+        $records = $DB->get_records_sql($sql, $params);
+
+        return $records ?? [];
+    }
 }

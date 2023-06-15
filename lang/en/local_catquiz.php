@@ -72,6 +72,14 @@ $string['errorhastobefloat'] = 'Has to be a deciamal';
 
 $string['addoredittemplate'] = "Add or edit template";
 
+// Test Strategy
+$string['catquiz_teststrategyheader'] = 'Test strategy';
+$string['catquiz_selectteststrategy'] = 'Select test strategy';
+
+$string['teststrategy_base'] = 'Base class for test strategies';
+$string['teststrategy_info'] = 'Info class for test strategies';
+$string['teststrategy_fastest'] = 'Strategy for fastest result (least questions possible)';
+
 // Tests environment.
 $string['newcustomtest'] = 'Custom test';
 $string['lang'] = 'Language';
@@ -103,6 +111,7 @@ $string['noint'] = 'Please enter an integer number';
 $string['notpositive'] = 'Please enter a positive number';
 $string['strategy'] = 'Strategy';
 $string['max_iterations'] = 'Maximum number of iterations';
+$string['modal_override'] = 'Only use this model';
 
 $string['starttimestamp'] = 'Starttime';
 $string['endtimestamp'] = 'Endtime';

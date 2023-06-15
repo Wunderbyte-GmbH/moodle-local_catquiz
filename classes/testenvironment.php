@@ -399,6 +399,15 @@ class testenvironment {
     }
 
     /**
+     * Returns settings saved as JSON.
+     *
+     * @return stdClass
+     */
+    public function return_settings():stdClass {
+        return json_decode($this->json);
+    }
+
+    /**
      * Returns an array of all or filtered test environments.
      * @param string $component
      * @return array

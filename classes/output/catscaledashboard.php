@@ -176,6 +176,8 @@ class catscaledashboard implements renderable, templatable
         $table->showreloadbutton = true;
         $table->showrowcountselect = true;
 
+        $table->filteronloadinactive = true;
+
         return $table->outhtml(10, true);
     }
 
@@ -194,22 +196,19 @@ class catscaledashboard implements renderable, templatable
 
         $table->set_filter_sql($select, $from, $where, $filter, $params);
 
-        $table->define_columns([
-            'idnumber',
-            'questiontext',
-            'qtype',
-            'categoryname',
-            'attempts',
-            'action'
-        ]);
-        $table->define_headers([
-            get_string('label', 'local_catquiz'),
-            get_string('questiontext', 'local_catquiz'),
-            get_string('questiontype', 'local_catquiz'),
-            get_string('questioncategories', 'local_catquiz'),
-            get_string('questioncontextattempts', 'local_catquiz'),
-            get_string('action', 'local_catquiz'),
-        ]);
+        $columnsarray = [
+            'idnumber' => get_string('label', 'local_catquiz'),
+            'questiontext' => get_string('questiontext', 'local_catquiz'),
+            'qtype' => get_string('questiontype', 'local_catquiz'),
+            'categoryname' => get_string('questioncategories', 'local_catquiz'),
+            'model' => get_string('model', 'local_catquiz'),
+            'difficulty' => get_string('difficulty', 'local_catquiz'),
+            'attempts' => get_string('questioncontextattempts', 'local_catquiz'),
+            'action' => get_string('action', 'local_catquiz'),
+        ];
+
+        $table->define_columns(array_keys($columnsarray));
+        $table->define_headers(array_values($columnsarray));
 
         $table->define_filtercolumns(['categoryname' => [
             'localizedname' => get_string('questioncategories', 'local_catquiz'),
@@ -224,15 +223,8 @@ class catscaledashboard implements renderable, templatable
             'numerical' => get_string('pluginname', 'qtype_numerical'),
             'shortanswer' => get_string('pluginname', 'qtype_shortanswer'),
         ]]);
-        $table->define_fulltextsearchcolumns(['idnumber', 'name', 'questiontext', 'qtype']);
-        $table->define_sortablecolumns([
-            'id',
-            'idnumber',
-            'name',
-            'questiontext',
-            'qtype',
-            'attempts',
-        ]);
+        $table->define_fulltextsearchcolumns(['idnumber', 'name', 'questiontext', 'qtype', 'model']);
+        $table->define_sortablecolumns(array_keys($columnsarray));
 
         $table->tabletemplate = 'local_wunderbyte_table/twtable_list';
         $table->define_cache('local_catquiz', 'testitemstable');
@@ -262,6 +254,8 @@ class catscaledashboard implements renderable, templatable
         $table->showdownloadbutton = true;
         $table->showreloadbutton = true;
         $table->showrowcountselect = true;
+
+        $table->filteronloadinactive = true;
 
         return $table->outhtml(10, true);
     }
@@ -337,7 +331,7 @@ class catscaledashboard implements renderable, templatable
         ]);
 
         $table->define_fulltextsearchcolumns(['firstname', 'lastname']);
-        $table->define_sortablecolumns(['firstname', 'lastname', 'studentattempts']);
+        $table->define_sortablecolumns(['firstname', 'lastname', 'studentattempts', 'ability']);
 
         $table->tabletemplate = 'local_wunderbyte_table/twtable_list';
         $table->define_cache('local_catquiz', 'studentstatstable');

@@ -29,6 +29,7 @@ use cache_helper;
 use context_system;
 use core_plugin_manager;
 use Exception;
+use local_catquiz\teststrategy\info;
 use moodle_exception;
 use MoodleQuickForm;
 use stdClass;
@@ -170,6 +171,8 @@ class catquiz_handler {
          $elements[] =  $mform->addElement('select', 'catquiz_actontimeout',
             get_string('actontimeout', 'local_catquiz'), $timeoutoptions);
         $mform->hideIf('catquiz_actontimeout', 'catquiz_timepacedtest', 'neq', 1);
+
+        info::instance_form_definition($mform, $elements);
 
         return $elements;
     }
@@ -421,10 +424,25 @@ class catquiz_handler {
      * Returns the ID of the next question
      *
      * This is called by adaptive quiz
+     * @param int $cmid // Cmid of quiz instance.
+     * @param string $component // like mod_adaptivequiz
      * @return int
      */
-    public static function fetch_question_id() {
-        return 5;
+    public static function fetch_question_id(int $cmid, string $component) {
+
+        $data = (object)['componentid' => $cmid, 'component' => $component];
+
+        $testenvironment = new testenvironment($data);
+
+        $quizsettings = $testenvironment->return_settings();
+
+        $tsinfo = new info();
+        $teststrategy = $tsinfo->return_active_strategy($quizsettings->catquiz_selectteststrategy);
+        $teststrategy->set_scale($quizsettings->catquiz_catcatscales);
+
+        $question = $teststrategy->return_next_testitem();
+
+        return $question->id;
     }
 
 }

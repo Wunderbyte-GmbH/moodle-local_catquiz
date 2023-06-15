@@ -32,6 +32,15 @@ define('STATUS_TEST_INACTIVE', 0);
 define('STATUS_TEST_VISIBLE', 1);
 define('STATUS_TEST_INVISIBLE', 0);
 
+// Teststrategies
+
+define('STRATEGY_FASTEST', 1);
+define('STRATEGY_BALANCED', 2);
+define('STRATEGY_ALLSUBS', 3);
+define('STRATEGY_LOWESTSUB', 4);
+define('STRATEGY_HIGHESTSUB', 5);
+
+
 /**
  * Renders the popup Link.
  *
@@ -65,4 +74,15 @@ function local_catquiz_render_navbar_output(\renderer_base $renderer) {
     </div>';
 
     return $output;
+}
+
+/**
+ * Validate the data in the new field when the form is submitted
+ *
+ * @param moodleform_mod $fromform
+ * @param array $fields
+ * @return void
+ */
+function local_catquiz_coursemodule_standard_elements($fromform, $fields) {
+
 }
