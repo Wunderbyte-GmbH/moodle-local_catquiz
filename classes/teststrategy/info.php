@@ -56,6 +56,9 @@ class info {
                 return $strategy;
             }
         }
+
+        // If we come here, we will just return the first strategy.
+        return reset($strategies);
     }
 
     /**
@@ -103,7 +106,10 @@ class info {
         // TODO: get them dynamically.
         $teststrategies = self::return_available_strategies();
 
-        $teststrategiesoptions = array_map(fn($x) => [$x->id, $x->get_description()], $teststrategies);
+        $teststrategiesoptions = [];
+        foreach($teststrategies as $ts) {
+            $teststrategiesoptions[$ts->id] = $ts->get_description();
+        }
 
         // Choose a test strategy for this instance.
         $elements[] =  $mform->addElement('select', 'catquiz_selectteststrategy',
