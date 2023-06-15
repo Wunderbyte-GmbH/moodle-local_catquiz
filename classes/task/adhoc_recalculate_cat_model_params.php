@@ -20,6 +20,7 @@ use local_catquiz\catmodel_info;
 
 /**
  * Recalculates item params for the given context
+ * @author David Szkiba <david.szkiba@wunderbyte.at>
  */
 class adhoc_recalculate_cat_model_params extends \core\task\adhoc_task {
     /**
