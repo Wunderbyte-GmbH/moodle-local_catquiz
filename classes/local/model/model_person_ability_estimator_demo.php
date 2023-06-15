@@ -44,10 +44,6 @@ class model_person_ability_estimator_demo extends model_person_ability_estimator
         $person_param_list = new model_person_param_list();
         $responses = $this->responses->as_array();
         foreach ($responses as $userid => $item_response) {
-            // Just a demo
-            foreach ($item_param_list as $item) {
-                $jacobian = $models[$item->get_model_name()]->get_jacobian();
-            }
             foreach(array_keys($item_response) as $component) {
                 $ability = catcalc::estimate_person_ability(
                     $item_response[$component],
