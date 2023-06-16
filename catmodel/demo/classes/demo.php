@@ -22,4 +22,8 @@ class demo extends model_model
     public static function get_parameter_names(): array {
         return ['difficulty',];
     }
+
+    public static function fisher_info($person_ability, $params) {
+        return 1;
+    }
 }

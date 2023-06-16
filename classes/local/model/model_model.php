@@ -106,4 +106,11 @@ abstract class model_model {
      * @return string[]
      */
     abstract protected static function get_parameter_names(): array;
+
+    /**
+     * @param float $person_ability 
+     * @param array<float> $params 
+     * @return mixed 
+     */
+    abstract public static function fisher_info(float $person_ability, array $params);
 }

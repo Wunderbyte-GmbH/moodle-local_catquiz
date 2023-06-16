@@ -80,7 +80,7 @@ class raschbirnbaumb extends model_model
      * @param mixed $x
      * @return int|float
      */
-    public function likelihood_multi($p, $x)
+    public static function likelihood_multi($p, $x)
     {
         return (1 / (1 + exp($x[0] * ($x[1] - $p))));
     }
@@ -276,9 +276,9 @@ class raschbirnbaumb extends model_model
         return [[$fun11, $fun12], [$fun21, $fun22]];
 
     }
-    public function fisher_info($p,$x){
+    public static function fisher_info($p,$x){
 
-        return $x[0]**2 * $this->likelihood_multi($p,$x) * (1-$this->likelihood_multi($p,$x));
+        return $x[0]**2 * self::likelihood_multi($p,$x) * (1-self::likelihood_multi($p,$x));
 
     }
 }
