@@ -28,11 +28,13 @@ use context_system;
 use Exception;
 use html_writer;
 use local_catquiz\catscale;
+use local_catquiz\local\model\model_item_param;
 use local_wunderbyte_table\output\table;
 use local_wunderbyte_table\wunderbyte_table;
 use mod_booking\booking;
 use moodle_url;
 use question_bank;
+use stdClass;
 
 /**
  * Search results for managers are shown in a table (student search results use the template searchresults_student).
@@ -190,6 +192,16 @@ class testitems_table extends wunderbyte_table {
         return get_string('pluginname', 'catmodel_' . $values->model);
     }
 
+    /**
+     * Return value for lastattempttime column.
+     *
+     * @param stdClass $values
+     * @return void
+     */
+    public function col_lastattempttime(stdClass $values) {
+
+        return userdate($values->lastattempttime);
+    }
 
     /**
      * Function to handle the action buttons.

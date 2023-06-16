@@ -150,6 +150,7 @@ class catquiz {
                     lci.catscaleid catscaleid,
                     lci.componentname component,
                     s2.attempts,
+                    COALESCE(s2.lastattempttime,0) as lastattempttime,
 
                     maxlcip.difficulty,
                     maxlcip.discrimination,
@@ -179,7 +180,7 @@ class catquiz {
                 ON maxlcip.componentid=q.id AND maxlcip.componentname=lci.componentname
 
                 LEFT JOIN (
-                    SELECT ccc1.id AS contextid, qa.questionid, COUNT(*) AS attempts
+                    SELECT ccc1.id AS contextid, qa.questionid, COUNT(*) AS attempts, MAX(qas.timecreated) as lastattempttime
                     FROM {local_catquiz_catcontext} ccc1
                         JOIN {question_attempt_steps} qas
                             ON ccc1.starttimestamp < qas.timecreated AND ccc1.endtimestamp > qas.timecreated
