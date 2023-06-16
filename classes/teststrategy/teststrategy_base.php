@@ -83,14 +83,16 @@ class teststrategy {
     /**
      * Retrieves all the available testitems from the current scale.
      *
+     * @param int  $catscaleid
+     * @param bool $includesubscales
      * @return array
      */
-    public function get_all_available_testitems(int $catscaleid):array {
+    public function get_all_available_testitems(int $catscaleid, bool $includesubscales = false):array {
 
         $catscale = new catscale($catscaleid);
 
         // Todo: Not hardcode context.
-        return $catscale->get_testitems(1);
+        return $catscale->get_testitems(1, $includesubscales);
 
     }
 

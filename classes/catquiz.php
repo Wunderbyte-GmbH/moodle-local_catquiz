@@ -120,13 +120,13 @@ class catquiz {
 
     /**
      * Returns the sql to get all the questions wanted.
-     * @param int $catscaleid
+     * @param array $catscaleids
      * @param array $wherearray
      * @param array $filterarray
      * @param int $catcontextid
      * @return array
      */
-    public static function return_sql_for_catscalequestions(int $catscaleid, array $wherearray = [], array $filterarray = [], int $contextid) {
+    public static function return_sql_for_catscalequestions(array $catscaleids, array $wherearray = [], array $filterarray = [], int $contextid) {
 
         global $DB;
         if ($contextid === 0) {
@@ -191,9 +191,10 @@ class catquiz {
                 ) s2 ON q.id = s2.questionid
             ) as s1";
 
-        $where = ' catscaleid = :catscaleid AND itemstatus = maxstatus';
+        $where = ' catscaleid IN (:catscaleids) AND itemstatus = maxstatus';
+        $catscaleidsstring = sprintf("%s", implode(',', $catscaleids));
         $params = [
-            'catscaleid' => $catscaleid,
+            'catscaleids' => $catscaleidsstring,
             'contextid' => $contextid,
             'contextid2' => $contextid,
         ];
