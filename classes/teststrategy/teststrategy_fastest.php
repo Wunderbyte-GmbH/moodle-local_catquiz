@@ -45,7 +45,7 @@ class teststrategy_fastest extends teststrategy {
         }
 
         // Retrieve all questions for scale.
-        $questions = array_values(parent::get_all_available_testitems($this->scaleid));
+        $questions = array_values(parent::get_all_available_testitems($this->scaleid, true));
 
         if (empty($questions)) {
             throw new moodle_exception('nowquestionsincatscale', 'local_catquiz');

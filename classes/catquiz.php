@@ -190,14 +190,13 @@ class catquiz {
                     GROUP BY ccc1.id, qa.questionid
                 ) s2 ON q.id = s2.questionid
             ) as s1";
-
-        $where = ' catscaleid IN (:catscaleids) AND itemstatus = maxstatus';
-        $catscaleidsstring = sprintf("%s", implode(',', $catscaleids));
+        [$insql, $inparams] = $DB->get_in_or_equal($catscaleids, SQL_PARAMS_NAMED);
+        $where = ' catscaleid '. $insql .' AND itemstatus = maxstatus';
         $params = [
-            'catscaleids' => $catscaleidsstring,
             'contextid' => $contextid,
             'contextid2' => $contextid,
         ];
+        $params = array_merge($params, $inparams);
         $filter = '';
 
         foreach ($wherearray as $key => $value) {

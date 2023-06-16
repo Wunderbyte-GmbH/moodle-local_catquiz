@@ -134,7 +134,7 @@ class catscale {
         $scaleids = [$this->catscale->id];
         if ($includesubscales) {
             $subscaleids = $this->get_subscale_ids();
-            $scaleids[] = $subscaleids;
+            $scaleids = array_merge($scaleids, $subscaleids);
         }
 
         list($select, $from, $where, $filter, $params) = catquiz::return_sql_for_catscalequestions(
@@ -151,8 +151,26 @@ class catscale {
         return $records ?? [];
     }
 
+    /**
+     * Get all subscale IDs
+     * 
+     * TODO: cache values to make it more performant
+     * @return array 
+     */
     private function get_subscale_ids(): array {
-        // TODO: implement
-        return [];
+        global $DB;
+
+        $all = $DB->get_records("local_catquiz_catscales", null, "", "id, parentid");
+        return $this->add_subscales($this->catscale->id, $all);
+    }
+
+    private function add_subscales($parentid, $all): ?array {
+        $new = [];
+        foreach ($all as $scale) {
+            if ($scale->parentid === $parentid) {
+                array_push($new, $scale->id, $this->add_subscales($scale->id, $all));
+            }
+        }
+        return array_filter($new);
     }
 }
