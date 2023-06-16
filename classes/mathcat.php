@@ -303,9 +303,7 @@ class mathcat
             $j_inv = $ml->inverseMatrix($J);
 
             if (is_array($z_0)){
-                // The math functions expect a simple unnamed array. We convert back later
-                $z_1 = $ml->subtractVectors(array_values($z_0), $ml->flattenArray($ml->multiplyMatrices($j_inv, $G)));
-                $dist = $ml->dist(array_values($z_0), $z_1);
+
             } else {
                 $z_1 = $z_0 - $ml->flattenArray($ml->multiplyMatrices($j_inv, $G))[0];
                 $dist = abs($z_0 - $z_1);
