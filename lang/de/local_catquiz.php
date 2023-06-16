@@ -193,6 +193,7 @@ $string['statusnotcalculated'] = "unberechnet (Pilotierung)";
 
 $string['difficulty'] = "Schwierigkeit";
 $string['discrimination'] = "Diskriminierung";
+$string['lastattempttime'] = "Letzter Versuch";
 
 $string['numberofanswers'] = "Antworten";
 $string['numberofusagesintests'] = "In verschiedenen Tests";

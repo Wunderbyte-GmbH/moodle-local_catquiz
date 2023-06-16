@@ -198,6 +198,7 @@ $string['statusnotcalculated'] = "not calculated";
 
 $string['difficulty'] = "Difficulty";
 $string['discrimination'] = "Discrimination";
+$string['lastattempttime'] = "Last attempt";
 
 $string['numberofanswers'] = "Answers total";
 $string['numberofusagesintests'] = "In tests";

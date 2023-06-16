@@ -187,8 +187,9 @@ class catscaledashboard implements renderable, templatable
      * @param integer $catscaleid
      * @return string
      */
-    private function render_testitems_table(int $catscaleid)
-    {
+    private function render_testitems_table(int $catscaleid) {
+
+
 
         $table = new testitems_table('testitems', $this->catscaleid, $this->catcontextid);
 
@@ -203,6 +204,7 @@ class catscaledashboard implements renderable, templatable
             'categoryname' => get_string('questioncategories', 'local_catquiz'),
             'model' => get_string('model', 'local_catquiz'),
             'difficulty' => get_string('difficulty', 'local_catquiz'),
+            'lastattempttime' => get_string('lastattempttime', 'local_catquiz'),
             'attempts' => get_string('questioncontextattempts', 'local_catquiz'),
             'action' => get_string('action', 'local_catquiz'),
         ];
