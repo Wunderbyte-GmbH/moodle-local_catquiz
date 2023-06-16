@@ -124,9 +124,15 @@ class catquiz {
      * @param array $wherearray
      * @param array $filterarray
      * @param int $catcontextid
+     * @param int $userid
      * @return array
      */
-    public static function return_sql_for_catscalequestions(array $catscaleids, array $wherearray = [], array $filterarray = [], int $contextid) {
+    public static function return_sql_for_catscalequestions(
+        array $catscaleids,
+        array $wherearray = [],
+        array $filterarray = [],
+        int $contextid,
+        int $userid = 0) {
 
         global $DB;
         if ($contextid === 0) {
@@ -137,6 +143,19 @@ class catquiz {
                 ]
             );
             $contextid = $default_context->id;
+        }
+
+        // Start the params array.
+        $params = [
+            'contextid' => $contextid,
+            'contextid2' => $contextid,
+        ];
+
+        // If we fetch only for a given user, we need to add this to the sql.
+        if (!empty($userid)) {
+
+            $restrictforuser = " AND qas.userid = :userid ";
+            $params['userid'] = $userid;
         }
 
         $select = ' DISTINCT *';
@@ -185,6 +204,7 @@ class catquiz {
                         JOIN {question_attempt_steps} qas
                             ON ccc1.starttimestamp < qas.timecreated AND ccc1.endtimestamp > qas.timecreated
                                 AND qas.fraction IS NOT NULL
+                                $restrictforuser
                         JOIN {question_attempts} qa
                             ON qas.questionattemptid = qa.id
                     WHERE ccc1.id = :contextid
@@ -193,10 +213,6 @@ class catquiz {
             ) as s1";
         [$insql, $inparams] = $DB->get_in_or_equal($catscaleids, SQL_PARAMS_NAMED);
         $where = ' catscaleid '. $insql .' AND itemstatus = maxstatus';
-        $params = [
-            'contextid' => $contextid,
-            'contextid2' => $contextid,
-        ];
         $params = array_merge($params, $inparams);
         $filter = '';
 
