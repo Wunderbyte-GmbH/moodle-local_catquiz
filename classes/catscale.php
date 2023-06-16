@@ -25,6 +25,7 @@
 
 namespace local_catquiz;
 
+use cache;
 use cache_helper;
 use stdClass;
 
@@ -129,8 +130,13 @@ class catscale {
      */
     public function get_testitems(int $contextid, bool $includesubscales = false):array {
 
-        global $DB;
+        $cache = cache::make('local_catquiz', 'attemptquestions');
+        $cachekey = sprintf('testitems_%s_%s', $contextid, $includesubscales);
+        if ($testitems = $cache->get($cachekey)) {
+            return $testitems;
+        }
 
+        global $DB;
         $scaleids = [$this->catscale->id];
         if ($includesubscales) {
             $subscaleids = $this->get_subscale_ids();
@@ -146,9 +152,15 @@ class catscale {
 
         $sql = "SELECT $select FROM $from WHERE $where";
 
-        $records = $DB->get_records_sql($sql, $params);
+        $testitems = $DB->get_records_sql($sql, $params) ?? [];
+        $cache->set($cachekey, $testitems);
+        return $testitems;
+    }
 
-        return $records ?? [];
+    public static function update_testitems(int $contextid, $includesubscales, array $questions) {
+        $cache = cache::make('local_catquiz', 'attemptquestions');
+        $cachekey = sprintf('testitems_%s_%s', $contextid, $includesubscales);
+        $cache->set($cachekey, $questions);
     }
 
     /**

@@ -16,6 +16,8 @@
 
 namespace local_catquiz\teststrategy;
 
+use cache;
+use local_catquiz\catscale;
 use local_catquiz\local\model\model_strategy;
 use moodle_exception;
 
@@ -50,9 +52,15 @@ class teststrategy_fastest extends teststrategy {
 
         // Retrieve all questions for scale.
         $questions = array_values(parent::get_all_available_testitems($this->scaleid, true));
+        $questions = array_filter($questions, function($q) {
+            return (
+                !property_exists($q, 'used')
+                || $q->used !== true
+            );
+        });
 
         if (empty($questions)) {
-            throw new moodle_exception('nowquestionsincatscale', 'local_catquiz');
+            throw new moodle_exception('noquestionsincatscale', 'local_catquiz');
         }
 
         // TODO: Not hardcoded context
@@ -69,10 +77,9 @@ class teststrategy_fastest extends teststrategy {
             return $q2->fisher_information <=> $q1->fisher_information;
         });
         // now $questions[0] is the one with the maximum fisher information
-
-        $index = rand(0, count($questions)-1);
-
-        return $questions[$index];
+        $questions[0]->used = true;
+        catscale::update_testitems($contextid, true, $questions);
+        return $questions[0];
     }
 
     /**
@@ -82,9 +89,14 @@ class teststrategy_fastest extends teststrategy {
      * @return float 
      */
     private function get_user_ability(int $contextid): float {
-        global $DB, $USER;
+        $cache = cache::make('local_catquiz', 'personparams');
+        $cachekey = 'personparams';
+        if ($person_params = $cache->get($cachekey)) {
+            return $person_params->ability;
+        }
 
-        $person_param = $DB->get_record(
+        global $DB, $USER;
+        $person_params = $DB->get_record(
             'local_catquiz_personparams',
             [
                 'userid' => $USER->id,
@@ -93,11 +105,12 @@ class teststrategy_fastest extends teststrategy {
         );
 
         // Use default ability of 0 if we have no ability for that user
-        if (empty($person_param)) {
+        if (empty($person_params)) {
             return 0.0;
         }
 
-        return $person_param->ability;
+        $cache->set($cachekey, $person_params);
+        return $person_params->ability;
     }
 
     /**
