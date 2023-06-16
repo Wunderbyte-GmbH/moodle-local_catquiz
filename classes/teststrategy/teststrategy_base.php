@@ -46,9 +46,9 @@ class teststrategy {
     /**
      * Undocumented function
      *
-     * @return void
+     * @return string
      */
-    public function get_description() {
+    public function get_description(): string {
 
         $classname = get_class($this);
 

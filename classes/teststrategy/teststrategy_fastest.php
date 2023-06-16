@@ -62,9 +62,9 @@ class teststrategy_fastest extends teststrategy {
     /**
      * Return Description.
      *
-     * @return void
+     * @return string
      */
-    public function get_description() {
+    public function get_description(): string {
 
         return parent::get_description();
     }
