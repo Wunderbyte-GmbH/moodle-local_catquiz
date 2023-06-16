@@ -217,12 +217,48 @@ class synthcat{
 
         }
 
+        return $list;
+
+    }
 
 
+    static function get_person_response($num_pos,$num_neg){
+
+        $list = [];
+
+        for($i=1;$i<=$num_pos;$i++){
+
+            $list[$i] = ['fraction'=>1];
+            #array_push($list,$tmp_item_response);
+
+        }
+
+        for($i=$num_pos+1;$i<=$num_pos + $num_neg;$i++){
+
+            $list[$i] = ['fraction'=>0];
+            //array_push($list,$tmp_item_response);
+
+        }
 
         return $list;
 
     }
+
+
+    static function get_model_item_param_list($item_difficulty,$num){
+        $list = [];
+
+        for($i=1;$i<=$num;$i++){
+
+           $list[$i] = $item_difficulty;
+
+        }
+
+        return $list;
+
+
+    }
+
 
 }
 

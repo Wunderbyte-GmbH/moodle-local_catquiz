@@ -181,6 +181,122 @@ class catcalc {
         return $estimated_value;
     }
 
+    static function estimate_person_ability2($person_response, $item_difficulties){
+
+        $likelihood_parts = [];
+        $dbg_trace1 = [];
+        $dbg_trace2 = [];
+        $dbg_trace3 = [];
+
+        $likelihood = function($x) {
+            return 1;
+        };
+        $loglikelihood = function($x) {
+            return 0;
+        };
+        $loglikelihood_1st_derivative = function($x) {
+            return 0;
+        };
+        $loglikelihood_2nd_derivative = function($x) {
+            return 0;
+        };
+
+        $num_pos = 0;
+        $num_neg = 0;
+
+
+        foreach ($person_response as $qid => $qresponse) {
+
+            //$item_difficulty = 0.5;
+            $item_difficulty = $item_difficulties[$qid];
+
+            if ($qresponse['fraction'] == 1) {
+
+                $num_pos += 1;
+
+                $likelihood_part = function($x) use ($item_difficulty) {
+                    return \catmodel_raschbirnbauma\raschmodel::likelihood($x, $item_difficulty);
+                };
+                $loglikelihood_part = function($x) use ($item_difficulty) {
+                    return \catmodel_raschbirnbauma\raschmodel::log_likelihood($x, $item_difficulty);
+                };
+                $loglikelihood_1st_derivative_part = function($x) use ($item_difficulty) {
+                    return \catmodel_raschbirnbauma\raschmodel::log_likelihood_1st_derivative($x, $item_difficulty);
+                };
+                $loglikelihood_2nd_derivative_part = function($x) use ($item_difficulty) {
+                    return \catmodel_raschbirnbauma\raschmodel::log_likelihood_2nd_derivative($x, $item_difficulty);
+                };
+
+                array_push($likelihood_parts, $likelihood_part);
+                array_push($dbg_trace1, $qresponse['fraction']);
+                array_push($dbg_trace2, $likelihood_part(0.3));
+
+                $likelihood = \local_catquiz\mathcat::compose_multiply($likelihood, $likelihood_part);
+                $loglikelihood = \local_catquiz\mathcat::compose_plus($loglikelihood, $loglikelihood_part);
+                $loglikelihood_1st_derivative =
+                        \local_catquiz\mathcat::compose_plus($loglikelihood_1st_derivative, $loglikelihood_1st_derivative_part);
+                $loglikelihood_2nd_derivative =
+                        \local_catquiz\mathcat::compose_plus($loglikelihood_2nd_derivative, $loglikelihood_2nd_derivative_part);
+
+                array_push($dbg_trace3, $likelihood(0.3));
+
+            } else if ($qresponse['fraction'] == 0) {
+
+                $num_neg += 1;
+
+                $likelihood_part = function($x) use ($item_difficulty) {
+                    return \catmodel_raschbirnbauma\raschmodel::likelihood_counter($x, $item_difficulty);
+                };
+
+                $loglikelihood_part = function($x) use ($item_difficulty) {
+                    return (\catmodel_raschbirnbauma\raschmodel::log_likelihood_counter($x, $item_difficulty));
+                };
+                $loglikelihood_1st_derivative_part = function($x) use ($item_difficulty) {
+                    return (\catmodel_raschbirnbauma\raschmodel::log_likelihood_counter_1st_derivative($x, $item_difficulty));
+                };
+                $loglikelihood_2nd_derivative_part = function($x) use ($item_difficulty) {
+                    return (\catmodel_raschbirnbauma\raschmodel::log_likelihood_counter_2nd_derivative($x, $item_difficulty));
+                };
+
+                array_push($likelihood_parts, $likelihood_part);
+                array_push($dbg_trace1, $qresponse['fraction']);
+
+                $likelihood = \local_catquiz\mathcat::compose_multiply($likelihood, $likelihood_part);
+
+                $loglikelihood = \local_catquiz\mathcat::compose_plus($loglikelihood, $loglikelihood_part);
+                $loglikelihood_1st_derivative =
+                        \local_catquiz\mathcat::compose_plus($loglikelihood_1st_derivative, $loglikelihood_1st_derivative_part);
+                $loglikelihood_2nd_derivative =
+                        \local_catquiz\mathcat::compose_plus($loglikelihood_2nd_derivative, $loglikelihood_2nd_derivative_part);
+
+                array_push($dbg_trace2, $likelihood_part(0.3));
+                array_push($dbg_trace3, $likelihood(0.3));
+
+            };
+        }
+
+        $likelihood_1st_derivative = \local_catquiz\mathcat::get_numerical_derivative2($likelihood);
+        $likelihood_2nd_derivative = \local_catquiz\mathcat::get_numerical_derivative2($likelihood_1st_derivative);
+
+        $loglike2nd_complete = \local_catquiz\mathcat::get_numerical_derivative($loglikelihood_1st_derivative);
+
+        $num_log_like_1st_der = \local_catquiz\mathcat::get_numerical_derivative($loglikelihood);
+        $num_log_like_2nd_der = \local_catquiz\mathcat::get_numerical_derivative($num_log_like_1st_der);
+
+        $estimated_value =
+                \local_catquiz\mathcat::newtonraphson_stable($loglikelihood_1st_derivative, $loglikelihood_2nd_derivative, 0, 0.001, 3000);
+        //$estimated_value2 = mathcat::newton_raphson_multi([$loglikelihood_1st_derivative], [[$loglikelihood_2nd_derivative]], 0, 0.001, 1500);
+        //$estimated_value2 = \local_catquiz\mathcat::newtonraphson($likelihood_1st_derivative, $likelihood_2nd_derivative,0.7,0.001,1500);
+        //$estimated_value3 = \local_catquiz\mathcat::newtonraphson($num_log_like_1st_der, $num_log_like_2nd_der,0,0.001,1500);
+        //$estimated_value4 = \local_catquiz\mathcat::newtonraphson_numeric($likelihood_1st_derivative,0,0.001,1500);
+
+        return $estimated_value;
+
+
+
+    }
+
+
     /**
      * @var array<model_item_response> $item_response
      */
