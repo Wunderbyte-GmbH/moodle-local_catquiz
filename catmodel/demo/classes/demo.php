@@ -12,7 +12,14 @@ use local_catquiz\local\model\model_person_param_list;
  */
 class demo extends model_model
 {
-    public function calculate_params($item_response) {
-        return 0.5;
+    public function calculate_params($item_response): array {
+        return ['difficulty' => 0.5];
+    }
+
+    /**
+     * @return string[] 
+     */
+    public static function get_parameter_names(): array {
+        return ['difficulty',];
     }
 }

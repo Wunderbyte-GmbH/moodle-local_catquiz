@@ -58,6 +58,7 @@ class model_item_param_list implements ArrayAccess, IteratorAggregate, Countable
      */
     public static function load_from_db(int $contextid, string $model_name): self {
         global $DB;
+        $models = model_strategy::get_installed_models();
 
         $item_rows = $DB->get_records(
             'local_catquiz_itemparams',
@@ -66,18 +67,23 @@ class model_item_param_list implements ArrayAccess, IteratorAggregate, Countable
                 'model' => $model_name,
             ],
         );
-        $item_difficulties = new model_item_param_list();
+        $item_parameters = new model_item_param_list();
         foreach ($item_rows as $r) {
             // Skip NaN values here
             if ($r->difficulty === "NaN") {
                 continue;
             }
             $i = new model_item_param($r->componentid, $model_name);
-            $i->set_difficulty($r->difficulty);
-            $item_difficulties->add($i);
+            $parameter_names = $models[$model_name]::get_parameter_names();
+            $params = [];
+            foreach ($parameter_names as $param_name) {
+                $params[$param_name] = $r->$param_name;
+            }
+            $i->set_parameters($params);
+            $item_parameters->add($i);
         }
 
-        return $item_difficulties;
+        return $item_parameters;
     }
 
     public function getIterator(): Traversable {
@@ -123,7 +129,7 @@ class model_item_param_list implements ArrayAccess, IteratorAggregate, Countable
         );
 
         $data = array_filter($data, function ($a) {
-            return is_finite($a) && abs($a) != model_item_param::MODEL_POS_INF;
+            return is_finite($a) && abs($a) != model_item_param::MAX;
         });
         if ($sorted) {
             sort($data);
@@ -147,20 +153,21 @@ class model_item_param_list implements ArrayAccess, IteratorAggregate, Countable
 
         $records = array_map(
             function ($param) use ($contextid) {
-                if (is_infinite($param->get_difficulty())) {
-                    $difficulty = $param < 0 ? model_item_param::MODEL_NEG_INF : model_item_param::MODEL_POS_INF;
-                } else {
-                    $difficulty = $param->get_difficulty();
-                }
-
-                return [
+                $record = [
                     'componentid' => $param->get_id(),
                     'componentname' => 'question',
-                    'difficulty' => $difficulty,
                     'model' => $param->get_model_name(),
                     'contextid' => $contextid,
                     'status' => $param->get_status(),
                 ];
+                foreach ($param->get_params_array() as $param_name => $value) {
+                    if (abs($value) > model_item_param::MAX) {
+                        $value = $value < 0 ? model_item_param::MIN : model_item_param::MAX;
+                    }
+                    $record[$param_name] = $value;
+                }
+
+                return $record;
             },
             $this->item_params
         );
@@ -168,10 +175,17 @@ class model_item_param_list implements ArrayAccess, IteratorAggregate, Countable
         $updated_records = [];
         $new_records = [];
         $now = time();
+        $models = model_strategy::get_installed_models();
         foreach ($records as $record) {
-            if (is_nan($record['difficulty'])) {
-                continue;
+            // Do not save or update items that have a NAN as one of their
+            // parameter's values
+            $parameter_names = $models[$record['model']]::get_parameter_names();
+            foreach ($parameter_names as $parameter_name) {
+                if (is_nan($record[$parameter_name])) {
+                    continue;
+                }
             }
+
             $is_existing_param = array_key_exists($record['componentid'], $existing_params)
                 && array_key_exists($record['model'], $existing_params[$record['componentid']]);
             // If record already exists, update it. Otherwise, insert a new record to the DB
