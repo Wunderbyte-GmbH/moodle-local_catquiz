@@ -123,19 +123,36 @@ class catscale {
     /**
      * Returns the testitems for this scale and all the subscales.
      *
-     * @param $contextid
+     * @param int $contextid
+     * @param bool $includesubscales
      * @return array
      */
-    public function get_testitems(int $contextid):array {
+    public function get_testitems(int $contextid, bool $includesubscales = false):array {
 
         global $DB;
 
-        list($select, $from, $where, $filter, $params) = catquiz::return_sql_for_catscalequestions($this->catscale->id, [], [], $contextid);
+        $scaleids = [$this->catscale->id];
+        if ($includesubscales) {
+            $subscaleids = $this->get_subscale_ids();
+            $scaleids[] = $subscaleids;
+        }
+
+        list($select, $from, $where, $filter, $params) = catquiz::return_sql_for_catscalequestions(
+            $scaleids,
+            [],
+            [],
+            $contextid
+        );
 
         $sql = "SELECT $select FROM $from WHERE $where";
 
         $records = $DB->get_records_sql($sql, $params);
 
         return $records ?? [];
+    }
+
+    private function get_subscale_ids(): array {
+        // TODO: implement
+        return [];
     }
 }
