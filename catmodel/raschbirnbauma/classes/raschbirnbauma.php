@@ -63,10 +63,17 @@ class raschbirnbauma extends model_model
         return new model_person_param_list();
     }
 
-    public function calculate_params($item_response)
+    public function calculate_params($item_response): array
     {
         $difficulty = catcalc::estimate_item_params($item_response, $this);
-        return $difficulty;
+        return ['difficulty' => $difficulty];
+    }
+
+    /**
+     * @return string[] 
+     */
+    public static function get_parameter_names(): array {
+        return ['difficulty',];
     }
 
     // # elementary model functions

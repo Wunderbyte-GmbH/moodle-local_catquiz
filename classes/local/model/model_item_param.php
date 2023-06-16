@@ -38,8 +38,8 @@ class model_item_param {
     // For some items, the model returns -INF or INF as difficulty.
     // However, we expect it to be numeric, so we encode those
     // values as -1000 and 1000
-    const MODEL_NEG_INF = -1000;
-    const MODEL_POS_INF = 1000;
+    const MIN = -1000;
+    const MAX = 1000;
 
     const STATUS_NOT_SET = -5;
     const STATUS_NOT_CALCULATED = 0;
@@ -47,12 +47,10 @@ class model_item_param {
     const STATUS_SET_MANUALLY = 5;
 
     /**
-     * @var float
+     * @var array<float>
      */
-    private float $difficulty = 0;
+    private array $parameters;
 
-    private float $param2 = 0;
-    private float $param3 = 0;
     private int $status = 0;
 
     private string $model_name;
@@ -76,13 +74,7 @@ class model_item_param {
         $this->status = $status;
     }
     public function get_params_array(): array {
-        switch ($this->model_name) {
-            case 'raschbirnbauma':
-                return [$this->difficulty];
-            
-            default:
-                return [$this->get_difficulty()];
-            }
+        return $this->parameters;
     }
 
     /**
@@ -99,11 +91,16 @@ class model_item_param {
     }
 
     public function get_difficulty(): float {
-        return $this->difficulty;
+        return $this->parameters['difficulty'];
+    }
+
+    public function set_parameters(array $parameters): self {
+        $this->parameters = $parameters;
+        return $this;
     }
 
     public function set_difficulty(float $difficulty): self {
-        $this->difficulty = $difficulty;
+        $this->parameters['difficulty'] = $difficulty;
         return $this;
     }
 

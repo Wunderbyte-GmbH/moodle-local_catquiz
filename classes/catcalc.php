@@ -103,7 +103,7 @@ class catcalc {
         foreach ($demo_person_response as $qid => $qresponse) {
 
             //$item_difficulty = 0.5;
-            $item_difficulty = $item_difficulties[$qid]->get_params_array()[0];
+            $item_difficulty = $item_difficulties[$qid]->get_difficulty();
 
             if ($qresponse['fraction'] == 1) {
                 $likelihood_part = function($x) use ($item_difficulty) {
