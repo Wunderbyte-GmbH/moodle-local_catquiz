@@ -54,7 +54,7 @@ class teststrategy_fastest extends teststrategy {
         //
 
 
-        $index = rand(0, count($questions));
+        $index = rand(0, count($questions)-1);
 
         return $questions[$index];
     }
