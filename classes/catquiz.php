@@ -151,9 +151,9 @@ class catquiz {
             'contextid2' => $contextid,
         ];
 
+        $restrictforuser = "";
         // If we fetch only for a given user, we need to add this to the sql.
         if (!empty($userid)) {
-
             $restrictforuser = " AND qas.userid = :userid ";
             $params['userid'] = $userid;
         }
