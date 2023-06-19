@@ -83,7 +83,7 @@ class raschbirnbaumc extends model_model
      */
     public static function likelihood_multi($p, $x)
     {
-        return $x[2] + (1- $x[2]) * (exp($x[0]*($p - $x[1])))/(1 + exp($x[0]*($p-$x[1])));
+        return $x['guessing'] + (1- $x['guessing']) * (exp($x['difficulty']*($p - $x['discrimination'])))/(1 + exp($x['difficulty']*($p-$x['discrimination'])));
     }
 
     public function counter_likelihood($p, $a, $b, $c)
@@ -357,7 +357,7 @@ class raschbirnbaumc extends model_model
 
     public static function fisher_info($p,$x){
 
-        return $x[0]**2 * (1 - $x[2]) * self::likelihood_multi($p,$x) * (1-self::likelihood_multi($p,$x));
+        return $x['difficulty']**2 * (1 - $x['guessing']) * self::likelihood_multi($p,$x) * (1-self::likelihood_multi($p,$x));
 
     }
 }
