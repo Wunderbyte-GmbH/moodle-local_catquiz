@@ -19,6 +19,8 @@ namespace local_catquiz\teststrategy;
 use cache;
 use local_catquiz\catscale;
 use local_catquiz\local\model\model_strategy;
+use local_catquiz\local\result;
+use local_catquiz\local\status;
 use moodle_exception;
 
 /**
@@ -26,6 +28,15 @@ use moodle_exception;
  */
 class teststrategy_fastest extends teststrategy {
 
+    /**
+     * After this time, the penalty for a question goes back to 0
+     * Currently, it is set to 30 days
+     */
+    const PENALTY_TIME_RANGE = 60*60*24*30;
+    /**
+     * Exclude questions that were attempted within the last 60 seconds
+     */
+    const PENALTY_THRESHOLD = 60*60*24*30-60;
     /**
      *
      * @var int $id // strategy id defined in lib.
@@ -39,10 +50,12 @@ class teststrategy_fastest extends teststrategy {
         $this->installed_models = model_strategy::get_installed_models();
     }
 
-        /**
+    /**
      * Strategy specific way of returning the next testitem.
+     * 
+     * Returns an array with a 
      *
-     * @return object
+     * @return result
      */
     public function return_next_testitem() {
 
@@ -51,16 +64,21 @@ class teststrategy_fastest extends teststrategy {
         }
 
         // Retrieve all questions for scale.
-        $questions = array_values(parent::get_all_available_testitems($this->scaleid, true));
-        $questions = array_filter($questions, function($q) {
+        $questions = parent::get_all_available_testitems($this->scaleid);
+        $now = time();
+        $questions = array_map(function($q) use ($now) {
+            $q->penalty = $this->get_penalty($q, $now);
+            return $q;
+        }, $questions);
+        $questions = array_filter($questions, function ($q) {
             return (
-                !property_exists($q, 'used')
-                || $q->used !== true
+                !property_exists($q, 'penalty')
+                || $q->penalty < self::PENALTY_THRESHOLD
             );
         });
 
         if (empty($questions)) {
-            throw new moodle_exception('noquestionsincatscale', 'local_catquiz');
+            return result::err(status::ERROR_NO_REMAINING_QUESTIONS);
         }
 
         // TODO: Not hardcoded context
@@ -71,15 +89,21 @@ class teststrategy_fastest extends teststrategy {
                 throw new moodle_exception('missingmodel', 'local_catquiz');
             }
             $model = $this->installed_models[$question->model];
-            $question->fisher_information = $model::fisher_info($person_ability, [floatval($question->difficulty)]);
+            $params = [];
+            foreach ($model::get_parameter_names() as $param_name) {
+                $params[$param_name] = floatval($question->$param_name);
+            }
+            $question->fisher_information = $model::fisher_info($person_ability, $params);
+            $question->score = (1 - ($question->penalty/self::PENALTY_THRESHOLD)) * $question->fisher_information;
         }
-        usort($questions, function($q1, $q2) {
-            return $q2->fisher_information <=> $q1->fisher_information;
+        uasort($questions, function($q1, $q2) {
+            return $q2->score <=> $q1->score;
         });
         // now $questions[0] is the one with the maximum fisher information
-        $questions[0]->used = true;
-        catscale::update_testitems($contextid, true, $questions);
-        return $questions[0];
+        $selected_question = $questions[array_keys($questions)[0]];
+        $selected_question->lastattempttime = $now;
+        catscale::update_testitem($contextid, $selected_question);
+        return result::ok($selected_question);
     }
 
     /**
@@ -123,4 +147,19 @@ class teststrategy_fastest extends teststrategy {
         return parent::get_description();
     }
 
+    /**
+     * Calculates the penalty for the given question according to the time it was played
+     * 
+     * The penalty should decline linearly with the time that passed since the last attempt.
+     * After 30 days, the penalty should be 0 again.
+     * 
+     * For performance reasons, $now is passed as parameter
+     * @param mixed $question 
+     * @param int $now 
+     * @return int 
+     */
+    private function get_penalty($question, $now): int {
+        $seconds_passed = $now - $question->lastattempttime;
+        return max(0, self::PENALTY_TIME_RANGE - $seconds_passed);
+    }
 }
