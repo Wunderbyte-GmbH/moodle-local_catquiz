@@ -128,7 +128,7 @@ $item_response = $responses->get_item_response($initial_person_abilities);
 
 
 
-$synth_item_resonse = \local_catquiz\synthcat::get_item_response2(80,120,0.2);
+$synth_item_resonse = \local_catquiz\synthcat::get_item_response2(120,80,0.2);
 
 
 $x = \local_catquiz\catcalc::estimate_item_params($synth_item_resonse,$raschbb);
