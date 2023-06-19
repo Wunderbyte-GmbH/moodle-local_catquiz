@@ -292,3 +292,5 @@ $string['attemptfeedbacknotavailable'] = "Kein Feedback verfügbar";
 
 //CSV Import Form
 $string['importcsv'] = 'Import CSV';
+$string['importsuccess'] = 'Import war erfolgreich.';
+$string['importfailed'] = 'Import fehlgeschlagen.';

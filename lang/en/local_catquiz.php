@@ -296,3 +296,5 @@ $string['attemptfeedbacknotavailable'] = "No feedback available";
 
 //CSV Import Form
 $string['importcsv'] = 'Import CSV';
+$string['importsuccess'] = 'Import was successful';
+$string['importfailed'] = 'Import failed';

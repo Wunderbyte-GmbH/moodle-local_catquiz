@@ -20,6 +20,8 @@
  */
 
 import DynamicForm from 'core_form/dynamicform';
+import {showNotification} from 'local_catquiz/notifications';
+import {get_string as getString} from 'core/str';
 
 const SELECTORS = {
     FORMCONTAINER: '#csv_import_form',
@@ -29,7 +31,6 @@ const SELECTORS = {
  * Add event listener to form.
  */
 export const init = () => {
-
 
     const formContainer = document.querySelector(SELECTORS.FORMCONTAINER);
 
@@ -44,10 +45,42 @@ export const init = () => {
     dynamicForm.addEventListener(dynamicForm.events.FORM_SUBMITTED, (e) => {
 
         const response = e.detail;
+        const errors = response.errors;
 
-                // eslint-disable-next-line no-console
-                console.log(response);
+        // eslint-disable-next-line no-console
+        console.log(response);
+
         dynamicForm.load({arg1: 'val1'});
+
+        // Display errors notifications if defined.
+        if (errors !== [] && errors !== undefined) {
+            if (errors.lineerrors !== undefined) {
+                errors.lineerrors.forEach(showNotification, "error");
+            }
+            if (errors.generalerrors !== undefined) {
+                errors.generalerrors.forEach(showNotification, "error");
+            }
+        }
+
+        // Display general success status.
+        if (response.success == 1) {
+            getString('importsuccess', 'local_catquiz').then(message => {
+                showNotification(message, 'success');
+                return;
+            }).catch(e => {
+                // eslint-disable-next-line no-console
+                console.error(e);
+            });
+        } else {
+            getString('importfailed', 'local_catquiz').then(message => {
+                showNotification(message, 'danger');
+                return;
+            }).catch(e => {
+                // eslint-disable-next-line no-console
+                console.error(e);
+            });
+        }
+
     });
 
     // Cancel button triggers reload of empty form.

@@ -66,9 +66,9 @@ class fileparser {
     protected $fieldnames = [];
 
     /**
-     * @var string with errors one per line
+     * @var array with errors one per line
      */
-    protected $csverrors = '';
+    protected $csverrors = [];
 
     /**
      * @var object
@@ -76,9 +76,9 @@ class fileparser {
     protected $settings = null;
 
     /**
-     * @var string error message
+     * @var array error message
      */
-    protected $error = '';
+    protected $error = [];
 
     /**
      * @var array of fieldnames from other db tables
@@ -100,6 +100,11 @@ class fileparser {
      */
     public $uniquekey; 
 
+    /**
+     * @var array of objects
+     */
+    protected $record = [];
+
     public function __construct ($settings) {
         // optional: switch on type of settings object -> process data according to type (csv, ...)
 
@@ -112,13 +117,12 @@ class fileparser {
      */
     private function apply_settings($settings) {
         global $DB;
-        $this->error = '';
         $this->settings = $settings;
 
         if (!empty($this->settings->columns)) {
             $this->columns = $this->settings->columns;
         } else {
-            $this->error .= "No column labels defined in settings object.";
+            $this->error[] = "No column labels defined in settings object.";
             return false;
         }
 
@@ -132,7 +136,7 @@ class fileparser {
      * Imports content and compares to settings.
      *
      * @param $content
-     * @return array Array of records, associative if first column is defined mandatory and unique, otherwise sequential. Line errors might have happend
+     * @return array Array of records, associative if first column is defined mandatory and unique, otherwise sequential. Line errors might have happend.
      * @throws \coding_exception
      * @throws \dml_exception
      */
@@ -167,7 +171,7 @@ class fileparser {
         }
 
         $cir->init();
-        $record = [];
+        $this->record = [];
         while ($line = $cir->next()) {
             $csvrecord = array_combine($fieldnames, $line);
             $this->validate_data($csvrecord, $line);
@@ -177,18 +181,45 @@ class fileparser {
                 $data[$columnname] = $value;
             }
             if (isset($this->uniquekey)) { // With unique key set, we build an associative array.
-                if (!isset($record[$firstcolumn])) {
-                    $record[$firstcolumn] = array();
+                if (!isset($this->record[$firstcolumn])) {
+                    $this->record[$firstcolumn] = array();
                 }
-                $record[$firstcolumn][$csvrecord[$firstcolumn]] = $data;
+                $this->record[$firstcolumn][$csvrecord[$firstcolumn]] = $data;
 
             } else { // Without unique key, we build a sequential array.
-                array_push($record, $data);
+                array_push($this->record, $data);
             }
         }
+        // Collecting errors, warnings and general successinformation for $this->record.
+        $this->checksuccess();
+
         $cir->cleanup(true);
         $cir->close();
-        return $record;
+        return $this->record;
+    }
+
+    /**
+     * Collecting errors, warnings and general successinformation.
+     * 
+     */
+    private function checksuccess() {  
+        if ($this->record !== []) {
+            // If data was parsed successfully, return 1, else return 0.
+            $this->record['success'] = 1;
+        } else {
+            $this->record['success'] = 0;
+        }
+
+        $this->record['errors'] = array();
+
+        if ($this->error !== []) {
+            $this->record['errors']['generalerrors'] = $this->error;
+        }
+        if ($this->csverrors !== []) {
+            $this->record['errors']['lineerrors'] = $this->csverrors;
+        }
+        
+        // Add warnings if needed.
     }
     
     /**
@@ -315,7 +346,7 @@ class fileparser {
      * Checks the value of a given param of the column.
      * @param string $columnname
      * @param string $param
-     * @return string true on validation false on error
+     * @return string param value on success, empty string if not found.
      */
     protected function get_param_value($columnname, $param) {
         if (isset($this->settings->columns[$columnname]->$param)) {
@@ -326,17 +357,19 @@ class fileparser {
     }
 
     /**
-     * Checks the value of a given param of the column.
+     * Sets the value of a given param of the column.
      * @param string $columnname
      * @param string $param
      * @param $value
-     * @return string true on validation false on error
+     * @return boolean true if successful false on error
      */
     protected function set_param_value($columnname, $param, $value) {
         if (isset($this->settings->columns[$columnname]->$param)) {
             $this->settings->columns[$columnname]->$param = $value;
+            return true;
+        } else {
+            return false;
         }
- 
     }
 
     /**
@@ -345,20 +378,19 @@ class fileparser {
      * @param $errorstring
      */
     protected function add_csverror($errorstring, $i) {
-        $this->csverrors .= html_writer::empty_tag('br');
-        $this->csverrors .= "Error in line $i: ";
-        $this->csverrors .= $errorstring;
+        $this->csverrors[] = "Error in line $i: ". $errorstring;
+   
     }
 
     /**
-     * @return string line errors
+     * @return array line errors
      */
     public function get_line_errors() {
         return $this->csverrors;
     }
 
     /**
-     * @return string errors
+     * @return array errors
      */
     public function get_error() {
         return $this->error;

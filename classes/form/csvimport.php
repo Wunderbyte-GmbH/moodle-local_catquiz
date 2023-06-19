@@ -22,6 +22,7 @@ defined('MOODLE_INTERNAL') || die();
 global $CFG;
 require_once("$CFG->libdir/formslib.php");
 require_once($CFG->dirroot . "/local/catquiz/lib.php");
+require_once($CFG->libdir . "/csvlib.class.php");
 
 use context;
 use context_system;
@@ -190,8 +191,7 @@ class csvimport extends dynamic_form {
 
         $parser = new fileparser($settings);
         $data = $parser->process_csv_data($content);
-        $errors = $parser->get_error();
-        $lineerrors = $parser->get_line_errors();
+        
         return $data;
     }
 
