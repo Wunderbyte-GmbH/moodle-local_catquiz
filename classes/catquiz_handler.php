@@ -25,7 +25,10 @@
 
 namespace local_catquiz;
 
+use cache;
+use cache_exception;
 use cache_helper;
+use coding_exception;
 use context_system;
 use core_plugin_manager;
 use Exception;
@@ -426,9 +429,9 @@ class catquiz_handler {
      * This is called by adaptive quiz
      * @param int $cmid // Cmid of quiz instance.
      * @param string $component // like mod_adaptivequiz
-     * @return int
+     * @return array
      */
-    public static function fetch_question_id(int $cmid, string $component) {
+    public static function fetch_question_id(int $cmid, string $component): array {
 
         $data = (object)['componentid' => $cmid, 'component' => $component];
 
@@ -440,9 +443,27 @@ class catquiz_handler {
         $teststrategy = $tsinfo->return_active_strategy($quizsettings->catquiz_selectteststrategy);
         $teststrategy->set_scale($quizsettings->catquiz_catcatscales);
 
-        $question = $teststrategy->return_next_testitem();
+        $result = $teststrategy->return_next_testitem();
+        if (!$result->isOk()) {
+            return [0, $result->getErrorMessage()];
+        }
 
-        return $question->id;
+        $question = $result->unwrap();
+        return [$question->id, ""];
     }
 
+    /**
+     * Purges the questions cache
+     * 
+     * @param int $contextid 
+     * @param bool $includesubscales 
+     * @return bool Indicates whether the operation was successful 
+     * @throws coding_exception 
+     * @throws cache_exception 
+     */
+    public static function purge_attemptquestions_cache(int $contextid, bool $includesubscales = false): bool {
+        $cache = cache::make('local_catquiz', 'attemptquestions');
+        $cachekey = sprintf('testitems_%s_%s', $contextid, $includesubscales);
+        return $cache->delete($cachekey);
+    }
 }

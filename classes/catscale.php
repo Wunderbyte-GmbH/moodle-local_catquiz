@@ -27,6 +27,7 @@ namespace local_catquiz;
 
 use cache;
 use cache_helper;
+use moodle_exception;
 use stdClass;
 
 /**
@@ -136,7 +137,7 @@ class catscale {
             return $testitems;
         }
 
-        global $DB;
+        global $DB, $USER;
         $scaleids = [$this->catscale->id];
         if ($includesubscales) {
             $subscaleids = $this->get_subscale_ids();
@@ -147,7 +148,8 @@ class catscale {
             $scaleids,
             [],
             [],
-            $contextid
+            $contextid,
+            $USER->id
         );
 
         $sql = "SELECT $select FROM $from WHERE $where";
@@ -157,10 +159,20 @@ class catscale {
         return $testitems;
     }
 
-    public static function update_testitems(int $contextid, $includesubscales, array $questions) {
+    public static function update_testitem(int $contextid, $question, $includesubscales = false) {
         $cache = cache::make('local_catquiz', 'attemptquestions');
         $cachekey = sprintf('testitems_%s_%s', $contextid, $includesubscales);
-        $cache->set($cachekey, $questions);
+        // This should never happen...
+        if (!$testitems = $cache->get($cachekey)) {
+            throw new moodle_exception(
+                sprintf(
+                    "Can not update question in questions cache: cache with key %s is empty",
+                    $cachekey
+                )
+            );
+        }
+        $testitems[$question->id] = $question;
+        $cache->set($cachekey, $testitems);
     }
 
     /**
