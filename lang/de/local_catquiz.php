@@ -233,3 +233,6 @@ $string['aria:catscaleimage'] = "Hintergrundmuster für die CAT Skala";
 $string['healthstatus'] = "Health-Status";
 $string['catmanagernumberofsubscales'] = "Anzahl Subskalen";
 $string['catmanagernumberofquestions'] = "Anzahl Fragen";
+
+// CAT Quiz handler
+$string['noremainingquestions'] = "Keine weiteren Fragen";
