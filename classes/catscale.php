@@ -178,7 +178,6 @@ class catscale {
     /**
      * Get all subscale IDs
      * 
-     * TODO: cache values to make it more performant
      * @return array 
      */
     private function get_subscale_ids(): array {
