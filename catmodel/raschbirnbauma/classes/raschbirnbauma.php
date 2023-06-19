@@ -99,7 +99,7 @@ class raschbirnbauma extends model_model
     {
         $a = 1;
         $c = 0;
-        $b = $x[0];
+        $b = $x['difficulty'];
 
         return $c + (1- $c) * (exp($a*($p - $b)))/(1 + exp($a*($p-$b)));
     }
