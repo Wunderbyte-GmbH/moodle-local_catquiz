@@ -44,7 +44,7 @@ class teststrategy {
     }
 
     /**
-     * Undocumented function
+     * Returns the translated description of this strategy
      *
      * @return string
      */
