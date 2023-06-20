@@ -99,7 +99,7 @@ class teststrategy_fastest extends teststrategy {
         uasort($questions, function($q1, $q2) {
             return $q2->score <=> $q1->score;
         });
-        // now $questions[0] is the one with the maximum fisher information
+        // Select the question with the maximum score
         $selected_question = $questions[array_keys($questions)[0]];
         $selected_question->lastattempttime = $now;
         catscale::update_testitem($contextid, $selected_question);
