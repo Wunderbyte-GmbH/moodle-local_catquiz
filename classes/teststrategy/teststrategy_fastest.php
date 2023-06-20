@@ -129,16 +129,6 @@ class teststrategy_fastest extends teststrategy {
     }
 
     /**
-     * Return Description.
-     *
-     * @return string
-     */
-    public function get_description(): string {
-
-        return parent::get_description();
-    }
-
-    /**
      * Calculates the penalty for the given question according to the time it was played
      * 
      * The penalty should decline linearly with the time that passed since the last attempt.
