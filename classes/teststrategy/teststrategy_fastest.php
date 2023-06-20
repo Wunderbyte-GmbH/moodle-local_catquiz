@@ -107,18 +107,10 @@ class teststrategy_fastest extends teststrategy {
     }
 
     /**
-     * TODO: Use caching for better performance
-     * 
      * @param int $contextid
      * @return float 
      */
     private function get_user_ability(int $contextid): float {
-        $cache = cache::make('local_catquiz', 'personparams');
-        $cachekey = 'personparams';
-        if ($person_params = $cache->get($cachekey)) {
-            return $person_params->ability;
-        }
-
         global $DB, $USER;
         $person_params = $DB->get_record(
             'local_catquiz_personparams',
@@ -133,8 +125,7 @@ class teststrategy_fastest extends teststrategy {
             return 0.0;
         }
 
-        $cache->set($cachekey, $person_params);
-        return $person_params->ability;
+        return floatval($person_params->ability);
     }
 
     /**
