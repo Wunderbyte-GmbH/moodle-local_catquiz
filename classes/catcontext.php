@@ -312,4 +312,11 @@ class catcontext {
             $this->save_or_update($context);
         }
     }
+
+    /**
+     * @return string
+     */
+    public function getName() {
+        return $this->name;
+    }
 }

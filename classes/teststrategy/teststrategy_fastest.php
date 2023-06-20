@@ -81,9 +81,7 @@ class teststrategy_fastest extends teststrategy {
             return result::err(status::ERROR_NO_REMAINING_QUESTIONS);
         }
 
-        // TODO: Not hardcoded context
-        $contextid = 1;
-        $person_ability = $this->get_user_ability($contextid);
+        $person_ability = $this->get_user_ability($this->catcontextid);
         foreach ($questions as $question) {
             if (!array_key_exists($question->model, $this->installed_models)) {
                 throw new moodle_exception('missingmodel', 'local_catquiz');
@@ -102,7 +100,7 @@ class teststrategy_fastest extends teststrategy {
         // Select the question with the maximum score
         $selected_question = $questions[array_keys($questions)[0]];
         $selected_question->lastattempttime = $now;
-        catscale::update_testitem($contextid, $selected_question);
+        catscale::update_testitem($this->catcontextid, $selected_question);
         return result::ok($selected_question);
     }
 

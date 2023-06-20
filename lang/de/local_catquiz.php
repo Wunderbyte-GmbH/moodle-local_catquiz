@@ -104,6 +104,8 @@ $string['timemodified'] = 'Zuletzt geändert';
 $string['notimelimit'] = 'No time limit';
 $string['attempts'] = 'Versuche';
 $string['action'] = 'Action';
+$string['searchcatcontext'] = 'Cat Kontexte durchsuchen';
+$string['selectcatcontext'] = 'Cat Kontext auswählen';
 $string['starttimestamp'] = 'Zeitraum Anfang';
 $string['endtimestamp'] = 'Zeitraum Ende';
 $string['defaultcontextname'] = 'Standard Cat Kontext';
@@ -113,7 +115,6 @@ $string['notpositive'] = 'Bitte geben Sie eine positive Zahl ein';
 $string['strategy'] = 'Strategie';
 $string['max_iterations'] = 'Maximale Anzahl an Iterationen';
 $string['modal_override'] = 'Nur dieses Modell verwenden';
-
 // Buttons.
 $string['subscribe'] = 'Abonniere';
 $string['subscribed'] = 'Abonniert';
