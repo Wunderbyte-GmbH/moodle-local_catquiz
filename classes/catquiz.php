@@ -176,7 +176,7 @@ class catquiz {
                     maxlcip.model,
 
                     ( SELECT MAX(lcip.status)
-                    	FROM m_local_catquiz_itemparams lcip
+                    	FROM {local_catquiz_itemparams} lcip
                     	WHERE lcip.componentname=lci.componentname AND lcip.componentid=lci.componentid) as maxstatus,
                     maxlcip.itemstatus
 
@@ -193,7 +193,7 @@ class catquiz {
 
                 JOIN (
                     SELECT lcip.difficulty, lcip.discrimination, lcip.componentid, lcip.componentname, lcip.model, lcip.status as itemstatus
-                    FROM m_local_catquiz_itemparams lcip
+                    FROM {local_catquiz_itemparams} lcip
                     GROUP BY lcip.difficulty, lcip.discrimination, lcip.componentid, lcip.componentname, lcip.model, lcip.status
                     ) as maxlcip
                 ON maxlcip.componentid=q.id AND maxlcip.componentname=lci.componentname
