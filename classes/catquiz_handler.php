@@ -147,6 +147,25 @@ class catquiz_handler {
         $elements[] = $mform->addElement('autocomplete', 'catquiz_catcatscales', get_string('catcatscales', 'local_catquiz'), $select, $options);
         $mform->addHelpButton('catquiz_catcatscales', 'catcatscales', 'local_catquiz');
 
+        $catcontexts = \local_catquiz\data\dataapi::get_all_catcontexts();
+        $options = array(
+            'multiple' => false,
+            'noselectionstring' => get_string('defaultcontextname', 'local_catquiz'),
+        );
+
+        $select = [];
+        foreach ($catcontexts as $catcontext) {
+            $select[$catcontext->id] = $catcontext->getName();
+        }
+        $elements[] = $mform->addElement(
+            'autocomplete',
+            'catquiz_catcontext',
+            get_string('selectcatcontext', 'local_catquiz'),
+            $select,
+            $options
+        );
+        $mform->setDefault('catquiz_catcontext',  1);
+
         $elements[] = $mform->addElement('text', 'catquiz_passinglevel', get_string('passinglevel', 'local_catquiz'));
         $mform->addHelpButton('catquiz_passinglevel', 'passinglevel', 'local_catquiz');
         $mform->setType('catquiz_passinglevel', PARAM_INT);
@@ -440,8 +459,11 @@ class catquiz_handler {
         $quizsettings = $testenvironment->return_settings();
 
         $tsinfo = new info();
-        $teststrategy = $tsinfo->return_active_strategy($quizsettings->catquiz_selectteststrategy);
-        $teststrategy->set_scale($quizsettings->catquiz_catcatscales);
+        $teststrategy = $tsinfo
+            ->return_active_strategy($quizsettings->catquiz_selectteststrategy)
+            ->set_scale($quizsettings->catquiz_catcatscales)
+            ->set_catcontextid($quizsettings->catquiz_catcontext)
+            ;
 
         $result = $teststrategy->return_next_testitem();
         if (!$result->isOk()) {

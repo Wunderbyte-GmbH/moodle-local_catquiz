@@ -38,6 +38,11 @@ class teststrategy {
      */
     public int $scaleid;
 
+    /**
+     *
+     * @var int $catcontextid
+     */
+    public int $catcontextid;
 
     public function __construct() {
 
@@ -68,7 +73,6 @@ class teststrategy {
             throw new moodle_exception('noscaleid', 'local_catquiz');
         }
 
-        // Todo: Not hardcode context.
         $questions = array_values($this->get_all_available_testitems($this->scaleid));
 
         if (empty($questions)) {
@@ -91,17 +95,27 @@ class teststrategy {
 
         $catscale = new catscale($catscaleid);
 
-        // Todo: Not hardcode context.
-        return $catscale->get_testitems(1, $includesubscales);
+        return $catscale->get_testitems($this->catcontextid, $includesubscales);
 
     }
 
     /**
      * Set catscale id.
      * @param int $scaleid
-     * @return void
+     * @return self
      */
     public function set_scale(int $scaleid) {
         $this->scaleid = $scaleid;
+        return $this;
+    }
+
+    /**
+     * Set the CAT context id
+     * @param int $catcontextid
+     * @return $this
+     */
+    public function set_catcontextid(int $catcontextid) {
+        $this->catcontextid = $catcontextid;
+        return $this;
     }
 }

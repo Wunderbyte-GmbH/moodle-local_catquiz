@@ -18,6 +18,7 @@ namespace local_catquiz\data;
 
 use cache;
 use context_system;
+use local_catquiz\catcontext;
 use local_catquiz\event\catscale_updated;
 use moodle_exception;
 
@@ -47,6 +48,26 @@ class dataapi {
             $cache->set('allcatscales', $allcatscales);
         }
         return $allcatscales;
+    }
+
+    public static function get_all_catcontexts(): array {
+        global $DB;
+        $cache = cache::make('local_catquiz', 'catcontexts');
+        $allcatcontexts = $cache->get('allcatcontexts');
+        if ($allcatcontexts) {
+            return $allcatcontexts;
+        }
+
+        $records = $DB->get_records('local_catquiz_catcontext');
+        if (!empty($records)) {
+            foreach ($records as $record) {
+                $allcatcontexts[$record->id] = new catcontext($record);
+            }
+        } else {
+            $allcatcontexts = [];
+        }
+        $cache->set('allcatcontexts', $allcatcontexts);
+        return $allcatcontexts;
     }
 
     /**
