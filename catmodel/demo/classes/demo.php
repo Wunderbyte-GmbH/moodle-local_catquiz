@@ -12,8 +12,7 @@ use local_catquiz\local\model\model_person_param_list;
  */
 class demo extends model_model
 {
-
-    public function get_model_dim(): int {
+    public static function get_model_dim(): int {
         return 1;
     }
 

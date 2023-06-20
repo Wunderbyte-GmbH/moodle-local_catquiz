@@ -41,7 +41,7 @@ class raschbirnbaumc extends model_model implements catcalc_interface
     // info: x[1] <- "difficulty"
     // info: x[2] <- "guessing"
 
-    public function get_model_dim(): int
+    public static function get_model_dim(): int
     {
         return 4;  // we have 4 params ( ability, difficulty, discrimination, guessing)
     }
@@ -84,20 +84,20 @@ class raschbirnbaumc extends model_model implements catcalc_interface
         return $x['guessing'] + (1- $x['guessing']) * (exp($x['difficulty']*($p - $x['discrimination'])))/(1 + exp($x['difficulty']*($p-$x['discrimination'])));
     }
 
-    public function counter_likelihood($p, $a, $b, $c)
+    public static function counter_likelihood($p, $a, $b, $c)
     {
 
-        return 1 - $this->likelihood($p,$a,$b,$c);
+        return 1 - self::likelihood($p,$a,$b,$c);
     }
 
-    public function log_likelihood($p, $a, $b, $c)
+    public static function log_likelihood($p, $a, $b, $c)
     {
 
         return log($c + ((1-$c)*exp($a*(-$b+$p)))/(1+exp($a*(-$b+$p))));
 
     }
 
-    public function log_counter_likelihood($p, $a, $b, $c)
+    public static function log_counter_likelihood($p, $a, $b, $c)
     {
 
         return log(1-$c-((1-$c)*exp($a*(-$b+$p)))/(1+exp($a*(-$b+$p))));
@@ -106,64 +106,64 @@ class raschbirnbaumc extends model_model implements catcalc_interface
     // jacobian
 
 
-    public function log_likelihood_a($p, $a, $b, $c)
+    public static function log_likelihood_a($p, $a, $b, $c)
     {
         return ((-1 + $c) * exp($a*($b+$p))*($b-$p))/((exp($a*$b)+exp($a*$p))*($c * exp($a * $b) + exp($a*$p))) ;
     }
 
-    public function log_likelihood_b($p, $a, $b, $c)
+    public static function log_likelihood_b($p, $a, $b, $c)
     {
         return ($a*(-1+$c)*exp($a*($b+$p)))/((exp($a * $b)+exp($a*$p))*($c*exp($a*$b)+exp($a*$p)));
     }
 
-    public function log_likelihood_c($p, $a, $b, $c)
+    public static function log_likelihood_c($p, $a, $b, $c)
     {
         return 1 / ($c + exp($a * (-$b + $p)));
     }
 
-    public function log_counter_likelihood_a($p, $a, $b, $c)
+    public static function log_counter_likelihood_a($p, $a, $b, $c)
     {
         return (exp($a * $p)*($b-$p))/(exp($a*$b)+exp($a*$p));
     }
 
-    public function log_counter_likelihood_b($p, $a, $b, $c)
+    public static function log_counter_likelihood_b($p, $a, $b, $c)
     {
         return ($a*exp($a*$p))/(exp($a*$b)+exp($a*$p));
     }
 
-    public function log_counter_likelihood_c($p, $a, $b, $c)
+    public static function log_counter_likelihood_c($p, $a, $b, $c)
     {
         return 1 / (-1 + $c);
     }
 
     // hessian
 
-    public function log_likelihood_a_a($p, $a, $b, $c)
+    public static function log_likelihood_a_a($p, $a, $b, $c)
     {
         return ((-1 + $c) * exp($a * (-$b + $p)) * (-$c + exp(2 * $a * (-$b + $p))) * ($b - $p)**2)/((1 + exp($a * (-$b + $p)))**2 * ($c + exp($a * (-$b + $p)))**2);
     }
 
-    public function log_likelihood_b_b($p, $a, $b, $c)
+    public static function log_likelihood_b_b($p, $a, $b, $c)
     {
         return ($a**2 * (-1 + $c) * exp($a * (-$b + $p)) * (-$c + exp(2 * $a * (-$b + $p))))/((1 + exp($a * (-$b + $p)))**2 * ($c + exp($a * (-$b + $p)))**2) ;
     }
 
-    public function log_likelihood_c_c($p, $a, $b, $c)
+    public static function log_likelihood_c_c($p, $a, $b, $c)
     {
         return -(1/($c + exp($a * (-$b + $p)))**2);
     }
 
-    public function log_likelihood_a_b($p, $a, $b, $c)
+    public static function log_likelihood_a_b($p, $a, $b, $c)
     {
         return ((-1 + $c) * exp($a * ($b + $p)) * (exp($a * ($b + $p)) + exp(2 * $a * $p) * (1 + $a * $b - $a * $p) + $c * (exp($a * ($b + $p)) + exp(2 * $a * $b) * (1 - $a * $b + $a * $p))))/((exp($a * $b) + exp($a * $p))**2 * ($c * exp($a * $b) + exp($a * $p))**2);
     }
 
-    public function log_likelihood_a_c($p, $a, $b, $c)
+    public static function log_likelihood_a_c($p, $a, $b, $c)
     {
         return (exp($a * ($b + $p)) * ($b - $p))/($c * exp($a * $b) + exp($a *$p))**2 ;
     }
 
-    public function log_likelihood_b_c($p, $a, $b, $c)
+    public static function log_likelihood_b_c($p, $a, $b, $c)
     {
         return ($a * exp($a * ($b + $p)))/($c * exp($a * $b) + exp($a * $p))**2;
     }
@@ -172,35 +172,35 @@ class raschbirnbaumc extends model_model implements catcalc_interface
     // counter
 
 
-    public function log_counter_likelihood_a_a($p, $a, $b, $c)
+    public static function log_counter_likelihood_a_a($p, $a, $b, $c)
     {
         return -((exp($a * ($b + $p)) * ($b - $p)**2)/(exp($a * $b) + exp($a * $p))**2);
     }
 
-    public function log_counter_likelihood_b_b($p, $a, $b, $c)
+    public static function log_counter_likelihood_b_b($p, $a, $b, $c)
     {
         return -(($a**2 * exp($a * ($b + $p)))/(exp($a * $b) + exp($a * $p))**2);
     }
 
-    public function log_counter_likelihood_c_c($p, $a, $b, $c)
+    public static function log_counter_likelihood_c_c($p, $a, $b, $c)
     {
         return -1/(-1 + $c)**2;
         #return 1;
     }
 
 
-    public function log_counter_likelihood_a_b($p, $a, $b, $c)
+    public static function log_counter_likelihood_a_b($p, $a, $b, $c)
     {
         return (exp(2 * $a * $p) + exp($a * ($b + $p)) * (1 + $a * (-$b + $p)))/(exp($a * $b) + exp($a * $p))**2 ;
     }
 
 
-    public function log_counter_likelihood_a_c($p, $a, $b, $c)
+    public static function log_counter_likelihood_a_c($p, $a, $b, $c)
     {
         return  0;
     }
 
-    public function log_counter_likelihood_b_c($p, $a, $b, $c)
+    public static function log_counter_likelihood_b_c($p, $a, $b, $c)
     {
         return  0;
     }
@@ -214,11 +214,11 @@ class raschbirnbaumc extends model_model implements catcalc_interface
      * @param mixed $p
      * @return Closure(mixed $x): float
      */
-    public function get_log_likelihood($p)
+    public static function get_log_likelihood($p)
     {
 
         $fun = function ($x) use ($p) {
-            return $this->log_likelihood($p, $x[0], $x[1],$x[2]);
+            return self::log_likelihood($p, $x[0], $x[1],$x[2]);
         };
         return $fun;
     }
@@ -228,11 +228,11 @@ class raschbirnbaumc extends model_model implements catcalc_interface
      * @param mixed $p
      * @return Closure(mixed $x): float
      */
-    public function get_log_counter_likelihood($p)
+    public static function get_log_counter_likelihood($p)
     {
 
         $fun = function ($x) use ($p) {
-            return $this->log_counter_likelihood($p, $x[0], $x[1], $x[2]);
+            return self::log_counter_likelihood($p, $x[0], $x[1], $x[2]);
         };
         return $fun;
     }
@@ -241,7 +241,7 @@ class raschbirnbaumc extends model_model implements catcalc_interface
     /**
      * Get elementary matrix function for being composed
      */
-    public function get_log_jacobian($p)
+    public static function get_log_jacobian($p)
     {
 
         // $ip ....Array of item parameter
@@ -249,13 +249,13 @@ class raschbirnbaumc extends model_model implements catcalc_interface
         // return: Array [ df / d ip1 , df / d ip2]
 
         $fun1 = function ($x) use ($p) {
-            return $this->log_likelihood_a($p, $x[0], $x[1],$x[2]);
+            return self::log_likelihood_a($p, $x[0], $x[1],$x[2]);
         };
         $fun2 = function ($x) use ($p) {
-            return $this->log_likelihood_b($p, $x[0], $x[1],$x[2]);
+            return self::log_likelihood_b($p, $x[0], $x[1],$x[2]);
         };
         $fun3 = function ($x) use ($p) {
-            return $this->log_likelihood_c($p, $x[0], $x[1],$x[2]);
+            return self::log_likelihood_c($p, $x[0], $x[1],$x[2]);
         };
 
 
@@ -264,17 +264,17 @@ class raschbirnbaumc extends model_model implements catcalc_interface
 
     }
 
-    public function get_log_counter_jacobian($p)
+    public static function get_log_counter_jacobian($p)
     {
 
         $fun1 = function ($x) use ($p) {
-            return $this->log_counter_likelihood_a($p, $x[0], $x[1], $x[2]);
+            return self::log_counter_likelihood_a($p, $x[0], $x[1], $x[2]);
         };
         $fun2 = function ($x) use ($p) {
-            return $this->log_counter_likelihood_b($p, $x[0], $x[1], $x[2]);
+            return self::log_counter_likelihood_b($p, $x[0], $x[1], $x[2]);
         };
         $fun3 = function ($x) use ($p) {
-            return $this->log_counter_likelihood_c($p, $x[0], $x[1], $x[2]);
+            return self::log_counter_likelihood_c($p, $x[0], $x[1], $x[2]);
         };
 
         return [$fun1, $fun2, $fun3];
@@ -282,28 +282,28 @@ class raschbirnbaumc extends model_model implements catcalc_interface
     }
 
 
-    public function get_log_hessian($p)
+    public static function get_log_hessian($p)
     {
 
         $fun11 = function ($x) use ($p) {
-            return $this->log_likelihood_a_a($p, $x[0], $x[1], $x[2]);
+            return self::log_likelihood_a_a($p, $x[0], $x[1], $x[2]);
         };
         $fun12 = function ($x) use ($p) {
-            return $this->log_likelihood_a_b($p, $x[0], $x[1], $x[2]);
+            return self::log_likelihood_a_b($p, $x[0], $x[1], $x[2]);
         };
 
         $fun13 = function ($x) use ($p) {
-            return $this->log_likelihood_a_c($p, $x[0], $x[1], $x[2]);
+            return self::log_likelihood_a_c($p, $x[0], $x[1], $x[2]);
         };
 
         $fun21 = $fun12; # theorem of Schwarz
 
         $fun22 = function ($x) use ($p) {
-            return $this->log_likelihood_b_b($p, $x[0], $x[1], $x[2]);
+            return self::log_likelihood_b_b($p, $x[0], $x[1], $x[2]);
         };
 
         $fun23 = function ($x) use ($p) {
-            return $this->log_likelihood_b_c($p, $x[0], $x[1], $x[2]);
+            return self::log_likelihood_b_c($p, $x[0], $x[1], $x[2]);
         };
 
         $fun31 = $fun13; # theorem of Schwarz
@@ -311,35 +311,35 @@ class raschbirnbaumc extends model_model implements catcalc_interface
         $fun32 = $fun23; # theorem of Schwarz
 
         $fun33 = function ($x) use ($p) {
-            return $this->log_likelihood_c_c($p, $x[0], $x[1], $x[2]);
+            return self::log_likelihood_c_c($p, $x[0], $x[1], $x[2]);
         };
 
         return [[$fun11, $fun12, $fun13], [$fun21, $fun22, $fun23], [$fun31, $fun32, $fun33]];
 
     }
 
-    public function get_log_counter_hessian($p)
+    public static function get_log_counter_hessian($p)
     {
 
         $fun11 = function ($x) use ($p) {
-            return $this->log_counter_likelihood_a_a($p, $x[0], $x[1], $x[2]);
+            return self::log_counter_likelihood_a_a($p, $x[0], $x[1], $x[2]);
         };
         $fun12 = function ($x) use ($p) {
-            return $this->log_counter_likelihood_a_b($p, $x[0], $x[1], $x[2]);
+            return self::log_counter_likelihood_a_b($p, $x[0], $x[1], $x[2]);
         };
 
         $fun13 = function ($x) use ($p) {
-            return $this->log_counter_likelihood_a_c($p, $x[0], $x[1], $x[2]);
+            return self::log_counter_likelihood_a_c($p, $x[0], $x[1], $x[2]);
         };
 
         $fun21 = $fun12; # theorem of Schwarz
 
         $fun22 = function ($x) use ($p) {
-            return $this->log_counter_likelihood_b_b($p, $x[0], $x[1], $x[2]);
+            return self::log_counter_likelihood_b_b($p, $x[0], $x[1], $x[2]);
         };
 
         $fun23 = function ($x) use ($p) {
-            return $this->log_counter_likelihood_b_c($p, $x[0], $x[1], $x[2]);
+            return self::log_counter_likelihood_b_c($p, $x[0], $x[1], $x[2]);
         };
 
         $fun31 = $fun13; # theorem of Schwarz
@@ -347,7 +347,7 @@ class raschbirnbaumc extends model_model implements catcalc_interface
         $fun32 = $fun23; # theorem of Schwarz
 
         $fun33 = function ($x) use ($p) {
-            return @$this->log_counter_likelihood_c_c($p, $x[0], $x[1], $x[2]);
+            return @self::log_counter_likelihood_c_c($p, $x[0], $x[1], $x[2]);
         };
 
         return [[$fun11, $fun12, $fun13], [$fun21, $fun22, $fun23], [$fun31, $fun32, $fun33]];

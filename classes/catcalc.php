@@ -113,7 +113,7 @@ class catcalc {
 
         // compose likelihood matrices based on actual result
 
-        $model_dim = $model->get_model_dim();
+        $model_dim = $model::get_model_dim();
 
 
         // empty callable structures for composition
@@ -144,16 +144,16 @@ class catcalc {
             if ($r->get_response() == 1) { // if answer is correct
                 $num_passed += 1;
 
-                $likelihood_part = $model->get_log_likelihood($r->get_ability());
-                $jacobian_part = $model->get_log_jacobian($r->get_ability());
-                $hessian_part = $model->get_log_hessian($r->get_ability());
+                $likelihood_part = $model::get_log_likelihood($tmp_ability);
+                $jacobian_part = $model::get_log_jacobian($tmp_ability);
+                $hessian_part = $model::get_log_hessian($tmp_ability);
 
             } else {
                 $num_failed += 1;
 
-                $likelihood_part = $model->get_log_counter_likelihood($r->get_ability());
-                $jacobian_part = $model->get_log_counter_jacobian($r->get_ability());
-                $hessian_part = $model->get_log_counter_hessian($r->get_ability());
+                $likelihood_part = $model::get_log_counter_likelihood($tmp_ability);
+                $jacobian_part = $model::get_log_counter_jacobian($tmp_ability);
+                $hessian_part = $model::get_log_counter_hessian($tmp_ability);
             }
 
             // chain with functions
