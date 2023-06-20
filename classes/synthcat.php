@@ -140,7 +140,7 @@ class synthcat{
 
     static function get_probability_for_passing_mutli($person_ability, $item_params, $model){
 
-        return $model->likelihood_multi($person_ability,$item_params);
+        return $model::likelihood_multi($person_ability,$item_params);
 
     }
 
