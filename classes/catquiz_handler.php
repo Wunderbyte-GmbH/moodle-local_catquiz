@@ -483,9 +483,13 @@ class catquiz_handler {
      * @throws coding_exception 
      * @throws cache_exception 
      */
-    public static function purge_attemptquestions_cache(int $contextid, bool $includesubscales = false): bool {
+    public static function purge_attemptquestions_cache(int $componentid, string $componentname, bool $includesubscales = false): bool {
+        $testenvironment = new testenvironment(
+            (object)['componentid' => $componentid, 'component' => $componentname]
+        );
+        $quizsettings = $testenvironment->return_settings();
         $cache = cache::make('local_catquiz', 'attemptquestions');
-        $cachekey = sprintf('testitems_%s_%s', $contextid, $includesubscales);
+        $cachekey = sprintf('testitems_%s_%s', $quizsettings->catquiz_catcontext, $includesubscales);
         return $cache->delete($cachekey);
     }
 }
