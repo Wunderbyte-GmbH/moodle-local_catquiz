@@ -377,7 +377,7 @@ class catcalc {
      * @param model_model $model
      * @return array<float>
      */
-    static function estimate_item_params(array $item_response, $model) {
+    static function estimate_item_params(array $item_response, $model, $start = [0.5,0.5,0.2]) {
         // The current function should be changed to work with all models, but
         // for now we just forward the calculation of the item difficulty for
         // the 'raschbirnbauma' model to a different function
@@ -446,11 +446,11 @@ class catcalc {
         }
 
         // Defines the starting point
-        $start_arr = [0.5, 0.5, 0.5];
-        $z_0 = array_slice($start_arr, 0, $model_dim-1);
+        //$start_arr = [0.5, 0.5, 0.5];
+        $z_0 = array_slice($start, 0, $model_dim-1);
 
         $params = \local_catquiz\mathcat::newton_raphson_multi_stable($jacobian,$hessian,$z_0);
-        $params2 = mathcat::bfgs($loglikelihood,$start_arr);
+        //$params2 = mathcat::bfgs($loglikelihood,$start_arr);
         return $params;
     }
 }

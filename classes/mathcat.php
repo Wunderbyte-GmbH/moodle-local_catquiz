@@ -426,7 +426,13 @@ class mathcat
             $G = $real_func;
             $J = $real_derivative;
 
-            $j_inv = $ml->inverseMatrix($J);
+            //$j_inv = $ml->inverseMatrix($J);
+            $matrix = new matrix($J);
+            $j_inv = $matrix->inverse();
+
+
+
+
 
             if (is_array($z_0)){
                 $diff = $ml->flattenArray($ml->multiplyMatrices($j_inv, $G));
