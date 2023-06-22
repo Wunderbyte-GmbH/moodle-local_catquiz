@@ -27,6 +27,8 @@ namespace local_catquiz;
 
 use cache;
 use cache_helper;
+use local_catquiz\local\result;
+use local_catquiz\local\status;
 use moodle_exception;
 use stdClass;
 
@@ -71,16 +73,16 @@ class catscale {
      * Adds or updates attribution of question to scale.
      *
      * @param integer $catscaleid
-     * @param integer $testidemid
+     * @param integer $testitemid
      * @param string $component
-     * @return integer
+     * @return result
      */
-    public static function add_or_update_testitem_to_scale(int $catscaleid, int $testidemid, string $component = 'question') {
+    public static function add_or_update_testitem_to_scale(int $catscaleid, int $testitemid, string $component = 'question') {
 
         global $DB;
 
         $data = [
-            'componentid' => $testidemid,
+            'componentid' => $testitemid,
             'componentname' => 'question',
             'catscaleid' => $catscaleid,
         ];
@@ -91,13 +93,55 @@ class catscale {
             // $DB->update_record('local_catquiz_items', (object)$data);
             $id = $record->id;
         } else {
+            // We won't allow an item to be assigned to both a scale and its sub- or parent-scale
+            if (self::is_assigned_to_parent_scale($catscaleid, $testitemid)
+                || self::is_assigned_to_subscale($catscaleid, $testitemid)) {
+                    return result::err(status::ERROR_TESTITEM_ALREADY_IN_RELATED_SCALE, $testitemid);
+                }
+
             $now = time();
             $data['timemodified'] = $now;
             $data['timecreated'] = $now;
             $id = $DB->insert_record('local_catquiz_items', (object)$data);
         }
         cache_helper::purge_by_event('changesintestitems');
-        return $id;
+        return result::ok($id);
+    }
+
+    public static function is_assigned_to_parent_scale($catscaleid, int $testitemid): bool {
+        $ancestorids = self::get_ancestors($catscaleid);
+        if (empty($ancestorids)) {
+            return false;
+        }
+
+        global $DB;
+        [$insql, $inparams] = $DB->get_in_or_equal($ancestorids, SQL_PARAMS_NAMED, 'ctx');
+        $records = $DB->get_records_sql(
+            <<<SQL
+                SELECT *
+                FROM {local_catquiz_items}
+                WHERE componentid = :testitemid AND catscaleid $insql
+            SQL,
+            array_merge($inparams, ['testitemid' => $testitemid]));
+        return !empty($records);
+    }
+
+    public static function is_assigned_to_subscale($catscaleid, int $testitemid): bool {
+        $childids = self::get_subscale_ids($catscaleid);
+        if (empty($childids)) {
+            return false;
+        }
+
+        global $DB;
+        [$insql, $inparams] = $DB->get_in_or_equal($childids, SQL_PARAMS_NAMED, 'ctx');
+        $records = $DB->get_records_sql(
+            <<<SQL
+                SELECT *
+                FROM {local_catquiz_items}
+                WHERE componentid = :testitemid AND catscaleid $insql
+            SQL,
+            array_merge($inparams, ['testitemid' => $testitemid]));
+        return !empty($records);
     }
 
     /**
@@ -140,7 +184,7 @@ class catscale {
         global $DB, $USER;
         $scaleids = [$this->catscale->id];
         if ($includesubscales) {
-            $subscaleids = $this->get_subscale_ids();
+            $subscaleids = self::get_subscale_ids($this->catscale->id);
             $scaleids = array_merge($scaleids, $subscaleids);
         }
 
@@ -180,20 +224,35 @@ class catscale {
      * 
      * @return array 
      */
-    private function get_subscale_ids(): array {
+    private static function get_subscale_ids(int $catscaleid = null): array {
         global $DB;
 
         $all = $DB->get_records("local_catquiz_catscales", null, "", "id, parentid");
-        return $this->add_subscales($this->catscale->id, $all);
+
+        return self::add_subscales($catscaleid, $all);
     }
 
-    private function add_subscales($parentid, $all): ?array {
-        $new = [];
+    private static function add_subscales(int $parentid, $all): ?array {
         foreach ($all as $scale) {
-            if ($scale->parentid === $parentid) {
-                array_push($new, $scale->id, $this->add_subscales($scale->id, $all));
+            if (intval($scale->parentid) === $parentid) {
+                return [$scale->id, ...self::add_subscales(intval($scale->id), $all)];
             }
         }
-        return array_filter($new);
+        return [];
+    }
+
+    private static function get_ancestors(int $catscaleid) {
+        global $DB;
+        $all = $DB->get_records("local_catquiz_catscales", null, "", "id, parentid");
+        return self::add_parentscales($catscaleid, $all);
+    }
+
+    private static function add_parentscales(int $scaleid, array $all): ?array {
+        foreach ($all as $scale) {
+            if (intval($scale->id) === $scaleid && intval($scale->parentid) !== 0) {
+                return [$scale->parentid, ...self::add_parentscales(intval($scale->parentid), $all)];
+            }
+        }
+        return [];
     }
 }

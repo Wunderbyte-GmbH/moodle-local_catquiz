@@ -40,7 +40,6 @@ class model_person_ability_estimator_demo extends model_person_ability_estimator
 
     public function get_person_abilities(model_item_param_list $item_param_list): model_person_param_list
     {
-        $models = $this->create_installed_models();
         $person_param_list = new model_person_param_list();
         $responses = $this->responses->as_array();
         foreach ($responses as $userid => $item_response) {

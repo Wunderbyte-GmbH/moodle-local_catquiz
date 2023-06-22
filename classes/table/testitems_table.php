@@ -222,13 +222,42 @@ class testitems_table extends wunderbyte_table {
         }
 
         foreach ($idarray as $id) {
-            catscale::add_or_update_testitem_to_scale($catscaleid, $id);
+            $result[] = catscale::add_or_update_testitem_to_scale($catscaleid, $id);
+        }
+        $failed = array_filter($result, fn($r) => $r->isErr());
+
+        // All items were added successfully
+        if (empty($failed)) {
+            return [
+                'success' => 1,
+                'message' => get_string('success'),
+            ];
         }
 
+        // If a single item could not be added, show a specific error message
+        if (count($idarray) === 1 && count($failed) === 1) {
+            return [
+                'success' => 0,
+                'message' => $failed[0]->getErrorMessage(),
+            ];
+        }
+
+        // Multiple items could not be added.
+        $numadded = count($result) - count($failed);
+        $failedids = array_map(fn($f) => $f->unwrap(), $failed);
         return [
-            'success' => 1,
-            'message' => get_string('success'),
+            'success' => 0,
+            'message' => get_string(
+                'failedtoaddmultipleitems',
+                'local_catquiz',
+                [
+                    'numadded' => $numadded,
+                    'numfailed' => count($failed),
+                    'failedids' => implode(',', $failedids),
+                ]
+            )
         ];
+
     }
 
     /**

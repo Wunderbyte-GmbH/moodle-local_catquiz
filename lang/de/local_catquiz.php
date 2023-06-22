@@ -149,6 +149,8 @@ $string['addtestitembody'] = 'Wollen Sie folgende Testitems der aktuellen Skale 
 $string['addtestitemsubmit'] = 'Hinzufügen';
 $string['addtestitem'] = 'Testitems hinzufügen';
 $string['usage'] = 'Übersicht';
+$string['failedtoaddmultipleitems'] = '{$a->numadded} Fragen wurden erfolgreich hinzugefügt, bei folgenden {$a->numfailed} Fragen traten Probleme auf: {$a->failedids}';
+$string['testiteminrelatedscale'] = 'Testitem ist bereits einer Kind- oder Eltern-Skala zugeordnet';
 
 $string['removetestitemtitle'] = 'Testitems von CAT-Skalen entfernen';
 $string['removetestitembody'] = 'Wollen Sie folgende Testitems aus aktuellen Skale entfernen? <br> {$a->data}';
