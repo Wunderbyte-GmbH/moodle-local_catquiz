@@ -18,6 +18,7 @@ namespace local_catquiz\teststrategy;
 
 use core_component;
 use local_catquiz\catscale;
+use local_catquiz\teststrategy\context\contextcreator;
 use MoodleQuickForm;
 
 /**
@@ -75,7 +76,7 @@ class info {
 
         $strategies = core_component::get_component_classes_in_namespace(
             "local_catquiz",
-            'teststrategy'
+            'teststrategy\strategy'
         );
 
         $classnames = array_keys($strategies);
@@ -115,5 +116,33 @@ class info {
         $elements[] =  $mform->addElement('select', 'catquiz_selectteststrategy',
         get_string('catquiz_selectteststrategy', 'local_catquiz'), $teststrategiesoptions);
 
+    }
+
+    /**
+     * Returns score modifier functions
+     *
+     * @return contextcreator
+     */
+    public static function get_contextcreator(): contextcreator {
+        $contextloaders = core_component::get_component_classes_in_namespace(
+            "local_catquiz",
+            'teststrategy\context\loader'
+        );
+        $classnames = array_keys($contextloaders);
+
+        $contextloaders = array_map(fn($x) => new $x(), $classnames);
+
+        return new contextcreator($contextloaders);
+    }
+
+    public static function get_score_modifiers(): array {
+        $score_modifiers = core_component::get_component_classes_in_namespace(
+            "local_catquiz",
+            'teststrategy\item_score_modifier'
+        );
+        foreach ($score_modifiers as $classname => $namespace) {
+            $instances[str_replace($namespace[0], "", $classname)] = new $classname();
+        }
+        return $instances;
     }
 }
