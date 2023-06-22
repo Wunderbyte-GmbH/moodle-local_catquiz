@@ -32,6 +32,7 @@ use coding_exception;
 use context_system;
 use core_plugin_manager;
 use Exception;
+use local_catquiz\local\model\model_strategy;
 use local_catquiz\teststrategy\info;
 use moodle_exception;
 use MoodleQuickForm;
@@ -459,13 +460,33 @@ class catquiz_handler {
         $quizsettings = $testenvironment->return_settings();
 
         $tsinfo = new info();
+        $contextcreator = $tsinfo::get_contextcreator();
+        $context = $contextcreator->load(
+            [
+                'person_ability',
+                'contextid',
+                'questions',
+            ],
+            [
+                'contextid' => intval($quizsettings->catquiz_catcontext),
+                'catscaleid' => $quizsettings->catquiz_catcatscales,
+                'installed_models' => model_strategy::get_installed_models(),
+                'includesubscales' => true, // TODO: make dynamic
+                'penalty_threshold'=> 60*60*24*30-90, // TODO: make dynamic
+                /*
+                 * After this time, the penalty for a question goes back to 0
+                 * Currently, it is set to 30 days
+                 */
+                'penalty_time_range' => 60 * 60 * 24 * 30,
+            ]
+        );
         $teststrategy = $tsinfo
             ->return_active_strategy($quizsettings->catquiz_selectteststrategy)
             ->set_scale($quizsettings->catquiz_catcatscales)
             ->set_catcontextid($quizsettings->catquiz_catcontext)
             ;
 
-        $result = $teststrategy->return_next_testitem();
+        $result = $teststrategy->return_next_testitem($context);
         if (!$result->isOk()) {
             return [0, $result->getErrorMessage()];
         }

@@ -14,15 +14,18 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
-namespace local_catquiz\teststrategy;
+namespace local_catquiz\teststrategy\strategy;
 
 use local_catquiz\catscale;
+use local_catquiz\local\result;
+use local_catquiz\teststrategy\info;
+use local_catquiz\teststrategy\item_score_modifier;
 use moodle_exception;
 
 /**
  * Base class for test strategies.
  */
-class teststrategy {
+abstract class teststrategy {
 
 
     /**
@@ -44,9 +47,23 @@ class teststrategy {
      */
     public int $catcontextid;
 
-    public function __construct() {
+    /**
+     * @var array<item_score_modifier>
+     */
+    public array $score_modifiers;
 
+    public function __construct() {
+        $this->score_modifiers = info::get_score_modifiers();
     }
+
+    /**
+     * Returns an array of score modifier classes
+     * 
+     * The classes will be called in the given order to calculate the score of a question
+     * 
+     * @return array 
+     */
+    abstract public function requires_score_modifiers(): array;
 
     /**
      * Returns the translated description of this strategy
@@ -67,21 +84,41 @@ class teststrategy {
      *
      * @return object
      */
-    public function return_next_testitem() {
+    public function return_next_testitem(array $context) {
+        $now = time();
 
-        if (empty($this->scaleid)) {
-            throw new moodle_exception('noscaleid', 'local_catquiz');
+        foreach ($this->requires_score_modifiers() as $modifier) {
+            // if is in array
+            if (!array_key_exists($modifier, $this->score_modifiers)) {
+                throw new moodle_exception(
+                    sprintf(
+                        'Strategy requires a score modifier that is not available: %s'
+                    )
+                );
+            }
+            if (! $this->score_modifiers[$modifier] instanceof item_score_modifier) {
+                throw new moodle_exception(
+                    sprintf('Class %s does not implement the item_score_modifier interface', $modifier)
+                );
+            }
+            $result = $this->score_modifiers[$modifier]->update_score($context);
+
+            if ($result->isErr()) {
+                return $result;
+            }
+
+            $context = $result->unwrap();
         }
 
-        $questions = array_values($this->get_all_available_testitems($this->scaleid));
-
-        if (empty($questions)) {
-            throw new moodle_exception('nowquestionsincatscale', 'local_catquiz');
-        }
-
-        $index = rand(0, count($questions));
-
-        return $questions[$index];
+        // Select the question with the maximum score
+        $selected_question = $context['questions'][array_keys($context['questions'])[0]];
+        $selected_question->lastattempttime = $now;
+        catscale::update_testitem(
+            $this->catcontextid,
+            $selected_question,
+            $context['includesubscales']
+        );
+        return result::ok($selected_question);
     }
 
     /**
