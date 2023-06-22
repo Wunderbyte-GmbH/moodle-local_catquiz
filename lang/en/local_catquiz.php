@@ -151,6 +151,8 @@ $string['addtestitembody'] = 'Do you want to add the following test items to the
 $string['addtestitemsubmit'] = 'Add';
 $string['addtestitem'] = 'Add test items';
 $string['usage'] = 'Usage';
+$string['failedtoaddmultipleitems'] = '{$a->numadded} questions successfully added, failed with {$a->numfailed} questions: {$a->failedids}';
+$string['testiteminrelatedscale'] = 'Test item is already assigned to a parent- or subscale';
 
 $string['removetestitemtitle'] = 'Remove test item from CAT scale';
 $string['removetestitembody'] = 'Do you want to remove the following test items from the current CAT scale? <br> {$a->data}';
