@@ -37,7 +37,7 @@ abstract class item_score_modifier implements wb_middleware
     public function process(array $context, callable $next): result {
         foreach ($this->get_required_context_keys() as $key) {
             if (!array_key_exists($key, $context)) {
-                return result::err(status::ERROR_MISSING_CONTEXT_KEY);
+                return result::err(status::ERROR_FETCH_NEXT_QUESTION);
             }
         }
 
