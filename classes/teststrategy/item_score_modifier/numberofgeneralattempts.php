@@ -17,6 +17,7 @@ use local_catquiz\wb_middleware;
  */
 final class numberofgeneralattempts extends item_score_modifier implements wb_middleware
 {
+    const PROPERTYNAME = 'numberofgeneralattempts';
     public function run(array $context, callable $next): result {
         global $DB;
 
@@ -31,7 +32,7 @@ final class numberofgeneralattempts extends item_score_modifier implements wb_mi
 
         foreach ($context['questions'] as $id => &$question) {
             $attempts = array_key_exists($id, $records) ? intval($records[$id]->count) : null;
-            $question->numberofgeneralattempts = $attempts;
+            $question->{self::PROPERTYNAME} = $attempts;
         }
 
         return $next($context);

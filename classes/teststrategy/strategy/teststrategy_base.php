@@ -20,7 +20,6 @@ use local_catquiz\catscale;
 use local_catquiz\local\result;
 use local_catquiz\teststrategy\info;
 use local_catquiz\teststrategy\item_score_modifier;
-use local_catquiz\wb_middleware;
 use local_catquiz\wb_middleware_runner;
 use moodle_exception;
 

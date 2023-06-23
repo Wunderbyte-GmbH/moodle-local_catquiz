@@ -4,6 +4,8 @@ namespace local_catquiz\teststrategy\item_score_modifier;
 
 use local_catquiz\local\result;
 use local_catquiz\teststrategy\item_score_modifier;
+use local_catquiz\teststrategy\item_score_modifier\fisherinformation;
+use local_catquiz\teststrategy\item_score_modifier\lasttimeplayedpenalty;
 use local_catquiz\wb_middleware;
 
 /**
@@ -11,11 +13,12 @@ use local_catquiz\wb_middleware;
  * 
  * @package local_catquiz\teststrategy\item_score_modifier
  */
-final class add_weighted_score extends item_score_modifier implements wb_middleware
+final class strategyfastestscore extends item_score_modifier implements wb_middleware
 {
     public function run(array $context, callable $next): result {
         foreach ($context['questions'] as $question) {
-            $question->score = (1 - ($question->penalty/$context['penalty_threshold'])) * $question->fisher_information;
+            $question->score = (1 - (
+                $question->{lasttimeplayedpenalty::PROPERTYNAME}/$context['penalty_threshold'])) * $question->{fisherinformation::PROPERTYNAME};
         }
 
         uasort($context['questions'], function($q1, $q2) {

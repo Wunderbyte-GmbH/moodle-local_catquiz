@@ -7,8 +7,10 @@ use local_catquiz\teststrategy\item_score_modifier;
 use local_catquiz\wb_middleware;
 use moodle_exception;
 
-final class add_fisher_info extends item_score_modifier implements wb_middleware
+final class fisherinformation extends item_score_modifier implements wb_middleware
 {
+    const PROPERTYNAME = 'fisherinformation';
+
     public function run(array $context, callable $next): result {
         foreach ($context['questions'] as $item) {
             if (!array_key_exists($item->model, $context['installed_models'])) {
@@ -20,7 +22,7 @@ final class add_fisher_info extends item_score_modifier implements wb_middleware
                 $params[$param_name] = floatval($item->$param_name);
             }
 
-            $item->fisher_information = $model::fisher_info(
+            $item->{self::PROPERTYNAME} = $model::fisher_info(
                 $context['person_ability'],
                 $params
             );
