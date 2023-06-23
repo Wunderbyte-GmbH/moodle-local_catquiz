@@ -523,6 +523,7 @@ class catquiz_handler {
                 'person_ability',
                 'contextid',
                 'questions',
+                'pilot_questions',
             ],
             $initialcontext
         );
