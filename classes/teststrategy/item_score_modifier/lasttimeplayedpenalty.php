@@ -21,9 +21,8 @@ final class lasttimeplayedpenalty extends item_score_modifier implements wb_midd
         $context['questions'] = array_filter(
             $context['questions'],
             function ($q) use ($context) {
-                return (!property_exists($q, self::PROPERTYNAME)
-                    || $q->{self::PROPERTYNAME} < $context['penalty_threshold']
-                );
+                return $q->{self::PROPERTYNAME} < $context['penalty_threshold']
+                ;
             }
         );
 
