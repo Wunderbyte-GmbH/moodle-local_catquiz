@@ -239,3 +239,4 @@ $string['catmanagernumberofquestions'] = "Anzahl Fragen";
 
 // CAT Quiz handler
 $string['noremainingquestions'] = "Keine weiteren Fragen";
+$string['missingcontextkey'] = "Es trat ein Fehler beim Berechnen der nächsten Frage auf.";

@@ -243,3 +243,4 @@ $string['catmanagernumberofquestions'] = "Number of questions";
 
 // CAT Quiz handler
 $string['noremainingquestions'] = "You ran out of questions";
+$string['missingcontextkey'] = "There was an error while calculating the score of the next question";

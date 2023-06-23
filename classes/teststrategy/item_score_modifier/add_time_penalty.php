@@ -5,13 +5,11 @@ namespace local_catquiz\teststrategy\item_score_modifier;
 use local_catquiz\local\result;
 use local_catquiz\local\status;
 use local_catquiz\teststrategy\item_score_modifier;
-use moodle_exception;
-use stdClass;
+use local_catquiz\wb_middleware;
 
-final class add_time_penalty implements item_score_modifier
+final class add_time_penalty extends item_score_modifier implements wb_middleware
 {
-    public function update_score(array $context): result {
-        // Time penalty --- snip ---
+    public function run(array $context, callable $next): result {
         $now = time();
         $context['questions'] = array_map(function($q) use ($now, $context) {
             $q->penalty = $this->get_penalty($q, $now, $context['penalty_time_range']);
@@ -31,7 +29,7 @@ final class add_time_penalty implements item_score_modifier
             return result::err(status::ERROR_NO_REMAINING_QUESTIONS);
         }
 
-        return result::ok($context);
+        return $next($context);
     }
 
     public function get_required_context_keys(): array {
