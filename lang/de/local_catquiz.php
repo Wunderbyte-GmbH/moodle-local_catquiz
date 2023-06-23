@@ -79,6 +79,7 @@ $string['catquiz_selectteststrategy'] = 'Wähle Teststrategie';
 $string['teststrategy_base'] = 'Basisklase der Teststrategien';
 $string['teststrategy_info'] = 'Info Klasse für Teststrategien';
 $string['teststrategy_fastest'] = 'Strategie schnellstes Ergebnis';
+$string['teststrategy_balanced'] = 'Strategie ausgeglichene Fragenauswahl';
 
 // Tests environment.
 $string['newcustomtest'] = 'Benutzerdefinierter Test';

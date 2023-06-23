@@ -30,10 +30,15 @@ final class numberofgeneralattempts extends item_score_modifier implements wb_mi
             SQL
         );
 
+        $max_attempts = 0;
         foreach ($context['questions'] as $id => &$question) {
             $attempts = array_key_exists($id, $records) ? intval($records[$id]->count) : null;
+            if ($attempts > $max_attempts) {
+                $max_attempts = $attempts;
+            }
             $question->{self::PROPERTYNAME} = $attempts;
         }
+        $context['generalnumberofattempts_max'] = $max_attempts;
 
         return $next($context);
     }
