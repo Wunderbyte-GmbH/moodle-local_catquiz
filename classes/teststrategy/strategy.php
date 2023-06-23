@@ -14,7 +14,7 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
-namespace local_catquiz\teststrategy\strategy;
+namespace local_catquiz\teststrategy;
 
 use local_catquiz\catscale;
 use local_catquiz\local\result;
@@ -26,7 +26,7 @@ use moodle_exception;
 /**
  * Base class for test strategies.
  */
-abstract class teststrategy {
+abstract class strategy {
 
 
     /**
