@@ -16,10 +16,12 @@
 
 namespace local_catquiz\teststrategy\strategy;
 
+use local_catquiz\teststrategy\strategy;
+
 /**
  * Base class for test strategies.
  */
-class teststrategy_fastest extends teststrategy {
+class teststrategy_fastest extends strategy {
 
     /**
      *
