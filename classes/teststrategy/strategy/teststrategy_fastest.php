@@ -29,10 +29,10 @@ class teststrategy_fastest extends teststrategy {
 
     public function requires_score_modifiers(): array {
         return [
-            'add_time_penalty',
+            'lasttimeplayedpenalty',
             'numberofgeneralattempts',
-            'add_fisher_info',
-            'add_weighted_score',
+            'fisherinformation',
+            'strategyfastestscore',
         ];
     }
 }

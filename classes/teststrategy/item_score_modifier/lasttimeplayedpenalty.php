@@ -7,20 +7,22 @@ use local_catquiz\local\status;
 use local_catquiz\teststrategy\item_score_modifier;
 use local_catquiz\wb_middleware;
 
-final class add_time_penalty extends item_score_modifier implements wb_middleware
+final class lasttimeplayedpenalty extends item_score_modifier implements wb_middleware
 {
+    const PROPERTYNAME = 'lasttimeplayedpenalty';
+
     public function run(array $context, callable $next): result {
         $now = time();
         $context['questions'] = array_map(function($q) use ($now, $context) {
-            $q->penalty = $this->get_penalty($q, $now, $context['penalty_time_range']);
+            $q->{self::PROPERTYNAME} = $this->get_penalty($q, $now, $context['penalty_time_range']);
             return $q;
         }, $context['questions']);
 
         $context['questions'] = array_filter(
             $context['questions'],
             function ($q) use ($context) {
-                return (!property_exists($q, 'penalty')
-                    || $q->penalty < $context['penalty_threshold']
+                return (!property_exists($q, self::PROPERTYNAME)
+                    || $q->{self::PROPERTYNAME} < $context['penalty_threshold']
                 );
             }
         );
@@ -34,8 +36,6 @@ final class add_time_penalty extends item_score_modifier implements wb_middlewar
 
     public function get_required_context_keys(): array {
         return [
-            'installed_models',
-            'person_ability',
             'questions',
             'penalty_threshold',
             'penalty_time_range',
