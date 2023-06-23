@@ -13,4 +13,5 @@ class status
     const ERROR_GENERAL = 'error';
     const ERROR_NO_REMAINING_QUESTIONS = 'noremainingquestions';
     const ERROR_TESTITEM_ALREADY_IN_RELATED_SCALE = 'testiteminrelatedscale';
+    const ERROR_MISSING_CONTEXT_KEY = 'missingcontextkey';
 }

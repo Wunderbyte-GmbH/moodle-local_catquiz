@@ -20,6 +20,8 @@ use local_catquiz\catscale;
 use local_catquiz\local\result;
 use local_catquiz\teststrategy\info;
 use local_catquiz\teststrategy\item_score_modifier;
+use local_catquiz\wb_middleware;
+use local_catquiz\wb_middleware_runner;
 use moodle_exception;
 
 /**
@@ -88,7 +90,6 @@ abstract class teststrategy {
         $now = time();
 
         foreach ($this->requires_score_modifiers() as $modifier) {
-            // if is in array
             if (!array_key_exists($modifier, $this->score_modifiers)) {
                 throw new moodle_exception(
                     sprintf(
@@ -96,19 +97,16 @@ abstract class teststrategy {
                     )
                 );
             }
-            if (! $this->score_modifiers[$modifier] instanceof item_score_modifier) {
-                throw new moodle_exception(
-                    sprintf('Class %s does not implement the item_score_modifier interface', $modifier)
-                );
-            }
-            $result = $this->score_modifiers[$modifier]->update_score($context);
-
-            if ($result->isErr()) {
-                return $result;
-            }
-
-            $context = $result->unwrap();
+            $middlewares[] = $this->score_modifiers[$modifier];
         }
+
+        $result = wb_middleware_runner::run($middlewares, $context);
+
+        if ($result->isErr()) {
+            return $result;
+        }
+
+        $context = $result->unwrap();
 
         // Select the question with the maximum score
         $selected_question = $context['questions'][array_keys($context['questions'])[0]];

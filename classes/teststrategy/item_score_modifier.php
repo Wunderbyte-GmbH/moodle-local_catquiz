@@ -15,10 +15,6 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Base class for a single booking option availability condition.
- *
- * All bo condition types must extend this class.
- *
  * @package local_catquiz
  * @copyright 2023 Wunderbyte GmbH
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
@@ -27,27 +23,44 @@
 namespace local_catquiz\teststrategy;
 
 use local_catquiz\local\result;
+use local_catquiz\local\status;
+use local_catquiz\wb_middleware;
 
 /**
- * Interface for item_score_modifiers
- *
- * Classes that implement this interface can update the item score that is used
- * to rank test items when a user plays a quiz
- *
- * @package local_catquiz
- * @copyright 2023 Wunderbyte GmbH
- * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * Base class for a test item score modifier.
+ * 
+ * Classes that extend this class can update the item score that is used
+ * to rank test items when a user plays a quiz.
  */
-interface item_score_modifier {
-    /**
-     * @param array $context Contains related data that might be needed by item score modifiers
-     * @return result
-     */
-    public function update_score(array $context): result;
+abstract class item_score_modifier implements wb_middleware
+{
+    public function process(array $context, callable $next): result {
+        foreach ($this->get_required_context_keys() as $key) {
+            if (!array_key_exists($key, $context)) {
+                return result::err(status::ERROR_MISSING_CONTEXT_KEY);
+            }
+        }
+
+        return $this->run($context, $next);
+    }
 
     /**
-     * Returns an array of required parameters, like e.g. 'model' or 'person_ability'
-     * @return array
+ * This is the function in which the $context can be modified.
+ * 
+ * To return early and skip the rest of the middleware chain, return a result directly.
+ * Otherwise, call $next($context) to let the next middleware do its work.
+ *
+ * @param array $context The input that can be modified
+ * @param callable $next Callable that calls the next middleware
+ * @return result
+ */
+    abstract public function run(array $context, callable $next): result;
+    
+    /**
+     * If a middleware requires a specific key to be available in the $context
+     * input array, it can be specified here.
+     * 
+     * @return array 
      */
-    public function get_required_context_keys(): array;
+    abstract public function get_required_context_keys(): array;
 }

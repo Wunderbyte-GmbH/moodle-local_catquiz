@@ -4,11 +4,12 @@ namespace local_catquiz\teststrategy\item_score_modifier;
 
 use local_catquiz\local\result;
 use local_catquiz\teststrategy\item_score_modifier;
+use local_catquiz\wb_middleware;
 use moodle_exception;
 
-final class add_fisher_info implements item_score_modifier
+final class add_fisher_info extends item_score_modifier implements wb_middleware
 {
-    public function update_score(array $context): result {
+    public function run(array $context, callable $next): result {
         foreach ($context['questions'] as $item) {
             if (!array_key_exists($item->model, $context['installed_models'])) {
                 throw new moodle_exception('missingmodel', 'local_catquiz');
@@ -24,7 +25,7 @@ final class add_fisher_info implements item_score_modifier
                 $params
             );
         }
-        return result::ok($context);
+        return $next($context);
     }
 
     public function get_required_context_keys(): array {
