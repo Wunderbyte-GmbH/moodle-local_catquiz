@@ -105,10 +105,7 @@ abstract class strategy {
             return $result;
         }
 
-        $context = $result->unwrap();
-
-        // Select the question with the maximum score
-        $selected_question = $context['questions'][array_keys($context['questions'])[0]];
+        $selected_question = $result->unwrap();
         $selected_question->lastattempttime = $now;
         catscale::update_testitem(
             $this->catcontextid,

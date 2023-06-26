@@ -28,7 +28,7 @@ final class strategybalancedscore extends item_score_modifier implements wb_midd
             return $q2->score <=> $q1->score;
         });
 
-        return $next($context);
+        return result::ok(reset($context['questions']));
     }
 
     public function get_required_context_keys(): array {
