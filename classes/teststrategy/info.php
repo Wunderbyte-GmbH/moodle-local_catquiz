@@ -106,6 +106,10 @@ class info {
         $elements[] =  $mform->addElement('select', 'catquiz_selectteststrategy',
         get_string('catquiz_selectteststrategy', 'local_catquiz'), $teststrategiesoptions);
 
+        // Add ratio of pilot questions
+        $elements[] = $mform->addElement('text', 'catquiz_pilotratio', get_string('pilotratio', 'local_catquiz'));
+        $mform->setType('catquiz_pilotratio', PARAM_FLOAT);
+        $mform->addHelpButton('catquiz_pilotratio', 'pilotratio', 'local_catquiz');
     }
 
     /**

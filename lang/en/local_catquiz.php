@@ -52,6 +52,8 @@ $string['createcatscale'] = 'Create your first catquiz catscale!';
 $string['cannotdeletescalewithchildren'] = 'Cannot delete CAT scale with children';
 $string['passinglevel'] = 'Passing level in %';
 $string['passinglevel_help'] = 'There is a level of personal competency that can be set for the test.';
+$string['pilotratio'] = 'Rate of pilot questions';
+$string['pilotratio_help'] = 'Floating point number that specifies how often pilot questions should be displayed. When a value of 0.5 is specified, then on average every second attempt will display a pilot question.';
 
 $string['timepacedtest'] = 'Timepaced test';
 $string['maxtime'] = 'Max time for test';
