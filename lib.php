@@ -39,6 +39,7 @@ define('STRATEGY_BALANCED', 2);
 define('STRATEGY_ALLSUBS', 3);
 define('STRATEGY_LOWESTSUB', 4);
 define('STRATEGY_HIGHESTSUB', 5);
+define('STRATEGY_PILOT', 6);
 
 
 /**

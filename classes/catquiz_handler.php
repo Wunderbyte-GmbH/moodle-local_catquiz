@@ -517,6 +517,7 @@ class catquiz_handler {
                  * Currently, it is set to 30 days
                  */
             'penalty_time_range' => 60 * 60 * 24 * 30,
+            'pilot_ratio' => floatval($quizsettings->catquiz_pilotratio),
         ];
         return $contextcreator->load(
             [
