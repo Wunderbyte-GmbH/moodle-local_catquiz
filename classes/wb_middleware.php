@@ -25,7 +25,7 @@ namespace local_catquiz;
 use local_catquiz\local\result;
 
 /**
- * Interface for middlewares
+ * Interface for middleware classes
  *
  * @package local_catquiz
  * @copyright 2023 Wunderbyte GmbH
@@ -33,7 +33,7 @@ use local_catquiz\local\result;
  */
 interface wb_middleware {
     /**
-     * @param array $context Contains related data that might be needed by middlewares
+     * @param array $context Contains related data that might be needed by middleware instances
      * @return result
      */
     public function process(array $context, callable $next): result;

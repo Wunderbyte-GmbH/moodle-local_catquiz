@@ -17,7 +17,6 @@
 namespace local_catquiz\teststrategy;
 
 use core_component;
-use local_catquiz\catscale;
 use local_catquiz\teststrategy\context\contextcreator;
 use MoodleQuickForm;
 
@@ -41,7 +40,7 @@ class info {
      * Returns the active test strategy
      *
      * @param int $id
-     * @return teststrategy
+     * @return strategy
      */
     public function return_active_strategy(int $id) {
 
@@ -63,12 +62,11 @@ class info {
     }
 
     /**
-     * Undocumented function
+     * Returns all test strategies
      *
-     * @param $includingadminstrativ
-     * @return teststrategy[]
+     * @return strategy[]
      */
-    public static function return_available_strategies(bool $includingadminstrativ = false) {
+    public static function return_available_strategies() {
 
         global $CFG;
 
@@ -81,13 +79,7 @@ class info {
 
         $classnames = array_keys($strategies);
 
-        $strategies = array_map(fn($x) => new $x(), $classnames);
-
-        if ($includingadminstrativ) {
-            return $strategies;
-        } else {
-            return array_filter($strategies, fn($x) => !empty($x->id));
-        }
+        return array_map(fn($x) => new $x(), $classnames);
     }
 
     /**
@@ -98,13 +90,11 @@ class info {
      * @return void
      */
     public static function instance_form_definition(MoodleQuickForm &$mform, array &$elements) {
-
         // Add a special header for catquiz.
         $elements[] = $mform->addElement('header', 'catquiz_teststrategy',
                 get_string('catquiz_teststrategyheader', 'local_catquiz'));
         $mform->setExpanded('catquiz_teststrategy');
 
-        // TODO: get them dynamically.
         $teststrategies = self::return_available_strategies();
 
         $teststrategiesoptions = [];
@@ -135,6 +125,11 @@ class info {
         return new contextcreator($contextloaders);
     }
 
+    /**
+     * Returns score modifier functions
+     *
+     * @return array<item_score_modifier>
+     */
     public static function get_score_modifiers(): array {
         $score_modifiers = core_component::get_component_classes_in_namespace(
             "local_catquiz",
