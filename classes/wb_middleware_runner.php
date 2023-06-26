@@ -25,7 +25,7 @@ namespace local_catquiz;
 use local_catquiz\local\result;
 
 /**
- * Runs the given middlewares on the given input
+ * Runs the given middleware instances on the given input
  *
  * @package local_catquiz
  * @copyright 2023 Wunderbyte GmbH

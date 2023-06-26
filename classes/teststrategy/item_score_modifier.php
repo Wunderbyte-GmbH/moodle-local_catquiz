@@ -31,6 +31,14 @@ use local_catquiz\wb_middleware;
  * 
  * Classes that extend this class can update the item score that is used
  * to rank test items when a user plays a quiz.
+ * 
+ * To select the next question, we execute a number of item_score_modifier
+ * middleware instances. Each of those middleware instances will be passed a
+ * $context object with required data, such as the list of questions, person
+ * ability, etc.
+ * Usually the last middleware will calculate a final score for each question
+ * based on the data added by the previous middleware instances and return a
+ * sorted questions array.
  */
 abstract class item_score_modifier implements wb_middleware
 {
@@ -45,15 +53,15 @@ abstract class item_score_modifier implements wb_middleware
     }
 
     /**
- * This is the function in which the $context can be modified.
- * 
- * To return early and skip the rest of the middleware chain, return a result directly.
- * Otherwise, call $next($context) to let the next middleware do its work.
- *
- * @param array $context The input that can be modified
- * @param callable $next Callable that calls the next middleware
- * @return result
- */
+     * This is the function in which the $context can be modified.
+     * 
+     * To return early and skip the rest of the middleware chain, return a result directly.
+     * Otherwise, call $next($context) to let the next middleware do its work.
+     *
+     * @param array $context The input that can be modified
+     * @param callable $next Callable that calls the next middleware
+     * @return result
+     */
     abstract public function run(array $context, callable $next): result;
     
     /**

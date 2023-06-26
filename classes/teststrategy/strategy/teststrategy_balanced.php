@@ -31,6 +31,7 @@ class teststrategy_balanced extends strategy {
 
     public function requires_score_modifiers(): array {
         return [
+            'lasttimeplayedpenalty',
             'numberofgeneralattempts',
             'strategybalancedscore',
         ];

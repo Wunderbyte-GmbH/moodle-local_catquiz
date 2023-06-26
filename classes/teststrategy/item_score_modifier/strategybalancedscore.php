@@ -17,11 +17,11 @@ final class strategybalancedscore extends item_score_modifier implements wb_midd
 {
     public function run(array $context, callable $next): result {
         foreach ($context['questions'] as $question) {
-            //$lasttimeplayedpenalty_weighted = (1 - (
-               // $question->{lasttimeplayedpenalty::PROPERTYNAME}/$context['penalty_threshold']));
+            $lasttimeplayedpenalty_weighted = (1 - (
+               $question->{lasttimeplayedpenalty::PROPERTYNAME}/$context['penalty_threshold']));
             $numberofgeneralattemptspenalty_weighted = (1 - (
                 $question->{numberofgeneralattempts::PROPERTYNAME}/$context['generalnumberofattempts_max']));
-            $question->score = $numberofgeneralattemptspenalty_weighted; // * $lasttimeplayedpenalty_weighted;
+            $question->score = $numberofgeneralattemptspenalty_weighted * $lasttimeplayedpenalty_weighted;
         }
 
         uasort($context['questions'], function($q1, $q2) {
@@ -33,7 +33,7 @@ final class strategybalancedscore extends item_score_modifier implements wb_midd
 
     public function get_required_context_keys(): array {
         return [
-            //'penalty_threshold',
+            'penalty_threshold',
             'questions',
             'generalnumberofattempts_max'
         ];

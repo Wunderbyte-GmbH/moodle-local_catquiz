@@ -460,33 +460,14 @@ class catquiz_handler {
         $quizsettings = $testenvironment->return_settings();
 
         $tsinfo = new info();
-        $contextcreator = $tsinfo::get_contextcreator();
-        $context = $contextcreator->load(
-            [
-                'person_ability',
-                'contextid',
-                'questions',
-            ],
-            [
-                'contextid' => intval($quizsettings->catquiz_catcontext),
-                'catscaleid' => $quizsettings->catquiz_catcatscales,
-                'installed_models' => model_strategy::get_installed_models(),
-                'includesubscales' => true, // TODO: make dynamic
-                'penalty_threshold'=> 60*60*24*30-90, // TODO: make dynamic
-                /*
-                 * After this time, the penalty for a question goes back to 0
-                 * Currently, it is set to 30 days
-                 */
-                'penalty_time_range' => 60 * 60 * 24 * 30,
-            ]
-        );
         $teststrategy = $tsinfo
             ->return_active_strategy($quizsettings->catquiz_selectteststrategy)
             ->set_scale($quizsettings->catquiz_catcatscales)
             ->set_catcontextid($quizsettings->catquiz_catcontext)
             ;
 
-        $result = $teststrategy->return_next_testitem($context);
+        $selectioncontext = self::get_strategy_selectcontext($quizsettings);
+        $result = $teststrategy->return_next_testitem($selectioncontext);
         if (!$result->isOk()) {
             return [0, $result->getErrorMessage()];
         }
@@ -512,5 +493,38 @@ class catquiz_handler {
         $cache = cache::make('local_catquiz', 'attemptquestions');
         $cachekey = sprintf('testitems_%s_%s', $quizsettings->catquiz_catcontext, $includesubscales);
         return $cache->delete($cachekey);
+    }
+
+    /**
+     * Gets data required by the item_score_modifier middleware classes.
+     * 
+     * Don't confuse with the context from local_catquiz_catcontext table.
+     * This context contains data that are required by the item_score_modifier
+     * middleware classes.
+     */
+    private static function get_strategy_selectcontext($quizsettings) {
+        $contextcreator = info::get_contextcreator();
+        $initialcontext = [
+            'contextid' => intval($quizsettings->catquiz_catcontext),
+            'catscaleid' => $quizsettings->catquiz_catcatscales,
+            'installed_models' => model_strategy::get_installed_models(),
+            // When selecting questions from a scale, also include questions from its subscales.
+            // This option is required by the questions_loader context loader.
+            'includesubscales' => true,
+            'penalty_threshold' => 60 * 60 * 24 * 30 - 90, // TODO: make dynamic
+            /*
+                 * After this time, the penalty for a question goes back to 0
+                 * Currently, it is set to 30 days
+                 */
+            'penalty_time_range' => 60 * 60 * 24 * 30,
+        ];
+        return $contextcreator->load(
+            [
+                'person_ability',
+                'contextid',
+                'questions',
+            ],
+            $initialcontext
+        );
     }
 }
