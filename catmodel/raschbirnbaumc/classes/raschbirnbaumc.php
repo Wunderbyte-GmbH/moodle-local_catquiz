@@ -22,11 +22,9 @@
 
 namespace catmodel_raschbirnbaumc;
 
-use Closure;
 use local_catquiz\catcalc;
-use local_catquiz\local\model\model_item_param_list;
+use local_catquiz\catcalc_interface;
 use local_catquiz\local\model\model_model;
-use local_catquiz\local\model\model_person_param_list;
 
 defined('MOODLE_INTERNAL') || die();
 
@@ -36,14 +34,14 @@ defined('MOODLE_INTERNAL') || die();
  * @copyright  2023 Wunderbyte GmbH <georg.maisser@wunderbyte.at>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class raschbirnbaumc extends model_model
+class raschbirnbaumc extends model_model implements catcalc_interface
 {
 
     // info: x[0] <- "discrimination"
     // info: x[1] <- "difficulty"
     // info: x[2] <- "guessing"
 
-    public function get_model_dim()
+    public function get_model_dim(): int
     {
         return 4;  // we have 4 params ( ability, difficulty, discrimination, guessing)
     }

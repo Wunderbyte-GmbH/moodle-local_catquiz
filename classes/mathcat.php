@@ -96,31 +96,6 @@ class mathcat
         return $returnfn;
     }
 
-    static function compose_plus($function1, $function2)
-    {
-        $returnfn = function ($x) use ($function1, $function2) {
-            return $function1($x) + $function2($x);
-        };
-        return $returnfn;
-    }
-
-    static function compose_multiply($function1, $function2)
-    {
-        $returnfn = function ($x) use ($function1, $function2) {
-            return $function1($x) * $function2($x);
-        };
-        return $returnfn;
-    }
-
-    static function compose_chain($function1, $function2)
-    {
-        $returnfn = function ($x) use ($function1, $function2) {
-            return $function1($function2);
-        };
-        return $returnfn;
-    }
-
-
     static function gradient(callable $func, $point, $delta = 1e-5)
     {
         $grad = [];

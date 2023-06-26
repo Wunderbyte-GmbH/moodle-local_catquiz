@@ -65,7 +65,7 @@ for ($i=1; $i<=100;$i++){
 
     $sum = $sum + $funpart($my_x);
 
-    $mycallable = \local_catquiz\mathcat::compose_plus($mycallable, $funpart);
+    $mycallable = fn($x) => $mycallable($x) + $funpart($x);
     array_push($callables,$mycallable);
 
 
