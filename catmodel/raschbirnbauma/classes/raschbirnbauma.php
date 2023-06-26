@@ -24,9 +24,8 @@
 
 namespace catmodel_raschbirnbauma;
 
-
-use Closure;
 use local_catquiz\catcalc;
+use local_catquiz\catcalc_interface;
 use local_catquiz\local\model\model_item_param_list;
 use local_catquiz\local\model\model_model;
 use local_catquiz\local\model\model_person_param_list;
@@ -39,15 +38,15 @@ defined('MOODLE_INTERNAL') || die();
  * @copyright  2023 Wunderbyte GmbH <georg.maisser@wunderbyte.at>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class raschbirnbauma extends model_model
+class raschbirnbauma extends model_model implements catcalc_interface
 {
 
     // info: x[0] <- "difficulty"
 
 
-    public function get_model_dim()
+    public function get_model_dim(): int
     {
-        return 2;  // we have 4 params ( ability, difficulty)
+        return 2;  // we have 2 params ( ability, difficulty)
     }
 
 
@@ -65,7 +64,7 @@ class raschbirnbauma extends model_model
 
     public function calculate_params($item_response): array
     {
-        $difficulty = catcalc::estimate_item_params($item_response, $this);
+        list($difficulty) = catcalc::estimate_item_params($item_response, $this);
         return ['difficulty' => $difficulty];
     }
 
@@ -108,7 +107,7 @@ class raschbirnbauma extends model_model
     {
         $a = 1;
         $c = 0;
-        return 1 - $this->likelihood($p,$a,$b,$c);
+        return 1 - $this->likelihood($p,$b);
     }
 
     public function log_likelihood($p, $b)

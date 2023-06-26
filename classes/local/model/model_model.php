@@ -113,4 +113,6 @@ abstract class model_model {
      * @return mixed 
      */
     abstract public static function fisher_info(float $person_ability, array $params);
+
+    abstract public function get_model_dim(): int;
 }

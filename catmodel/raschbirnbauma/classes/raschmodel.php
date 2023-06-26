@@ -26,8 +26,6 @@
 
 namespace catmodel_raschbirnbauma;
 
-use local_catquiz\local\model\model_calc;
-
 defined('MOODLE_INTERNAL') || die();
 
 class raschmodel {   //TODO: Interface Implementation
