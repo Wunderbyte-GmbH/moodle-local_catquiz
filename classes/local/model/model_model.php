@@ -41,6 +41,17 @@ abstract class model_model {
 
     protected string $model_name;
 
+    protected static $methods = [
+        'get_callable_likelihood' => 'likelihood',
+        'get_callable_likelihood_counter' => 'counter_likelihood',
+        'get_callable_log_likelihood' => 'log_likelihood',
+        'get_callable_log_likelihood_counter' => 'log_counter_likelihood',
+    ];
+
+    public static function __callStatic(string $method, array $parameters) {
+        return call_user_func_array(self::$methods[$method], ...$parameters);
+    }
+
     /**
      * Model-specific instantiation can go here.
      */
@@ -114,5 +125,11 @@ abstract class model_model {
      */
     abstract public static function fisher_info(float $person_ability, array $params);
 
-    abstract public function get_model_dim(): int;
+    abstract static public function get_model_dim(): int;
+
+
+    abstract public static function log_likelihood_p($p, array $params): float;
+    abstract public static function counter_log_likelihood_p($p, array $params): float;
+    abstract public static function log_likelihood_p_p($p, array $params): float;
+    abstract public static function counter_log_likelihood_p_p($p, array $params): float;
 }

@@ -211,11 +211,9 @@ class matrixcat
             throw new \InvalidArgumentException("Vectors should have the same length for subtraction");
         }
 
-        $result = array();
-        $length = count($vector1);
-
-        for ($i = 0; $i < $length; $i++) {
-            $result[] = $vector1[$i] - $vector2[$i];
+        $result = [];
+        foreach (array_keys($vector1) as $param) {
+            $result[$param] = $vector1[$param] - $vector2[$param];
         }
 
         return $result;
@@ -224,14 +222,13 @@ class matrixcat
 
     public function dist($vector1, $vector2){
         if (count($vector1) !== count($vector2)) {
-            throw new Exception('Vectors must have the same number of elements');
+            throw new \InvalidArgumentException('Vectors must have the same number of elements');
         }
 
         $distance = 0;
-        $length = count($vector1);
 
-        for ($i = 0; $i < $length; $i++) {
-            $distance += abs($vector1[$i] - $vector2[$i]);
+        foreach (array_keys($vector1) as $param) {
+            $distance += abs($vector1[$param] - $vector2[$param]);
         }
 
         return $distance;

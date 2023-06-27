@@ -27,10 +27,10 @@ namespace local_catquiz;
 
 interface catcalc_interface
 {
-    public function get_log_likelihood($ability);
-    public function get_log_jacobian($ability);
-    public function get_log_hessian($ability);
-    public function get_log_counter_likelihood($ability);
-    public function get_log_counter_jacobian($ability);
-    public function get_log_counter_hessian($ability);
+    public static function get_log_likelihood($ability);
+    public static function get_log_jacobian($ability);
+    public static function get_log_hessian($ability);
+    public static function get_log_counter_likelihood($ability);
+    public static function get_log_counter_jacobian($ability);
+    public static function get_log_counter_hessian($ability);
 }
