@@ -106,9 +106,8 @@ class raschbirnbauma extends model_model implements catcalc_interface
     // # elementary model functions
 
 
-    public static function likelihood($p, array $params)
+    public static function likelihood($p,$b)
     {
-        $b = $params['difficulty'];
 
         $a = 1;
         $c = 0;
@@ -132,36 +131,28 @@ class raschbirnbauma extends model_model implements catcalc_interface
         return $c + (1- $c) * (exp($a*($p - $b)))/(1 + exp($a*($p-$b)));
     }
 
-    public static function counter_likelihood($p, array $params)
+    public static function counter_likelihood($p, $b)
     {
-        $b = $params['difficulty'];
-
         return 1 - self::likelihood($p, $b);
     }
 
-    public static function log_likelihood($p, array $params)
+    public static function log_likelihood($p, $b)
     {
-        $b = $params['difficulty'];
-
         $a = 1;
         $c = 0;
         return log($c + ((1-$c)*exp($a*(-$b+$p)))/(1+exp($a*(-$b+$p))));
 
     }
 
-    public static function log_counter_likelihood($p, array $params)
+    public static function log_counter_likelihood($p, $b)
     {
-        $b = $params['difficulty'];
-
         $a = 1;
         $c = 0;
         return log(1-$c-((1-$c)*exp($a*(-$b+$p)))/(1+exp($a*(-$b+$p))));
     }
 
-    public static function log_likelihood_b($p, array $params)
+    public static function log_likelihood_b($p, $b)
     {
-        $b = $params['difficulty'];
-
         $a = 1;
         $c = 0;
         return ($a*(-1+$c)*exp($a*($b+$p)))/((exp($a * $b)+exp($a*$p))*($c*exp($a*$b)+exp($a*$p)));
@@ -171,11 +162,10 @@ class raschbirnbauma extends model_model implements catcalc_interface
 
     // jacobian
 
-    public static function log_counter_likelihood_b($p, array $params)
+    public static function log_counter_likelihood_b($p, $b)
     {
-        $b = $params['difficulty'];
         $a = 1;
-
+        $c = 0;
         return ($a*exp($a*$p))/(exp($a*$b)+exp($a*$p));
     }
 
@@ -184,10 +174,8 @@ class raschbirnbauma extends model_model implements catcalc_interface
     // hessian
 
 
-    public static function log_likelihood_b_b($p, array $params)
+    public static function log_likelihood_b_b($p, $b)
     {
-        $b = $params['difficulty'];
-
         $a = 1;
         $c = 0;
 
@@ -196,13 +184,15 @@ class raschbirnbauma extends model_model implements catcalc_interface
 
     // counter
 
-    public static function log_counter_likelihood_b_b($p, array $params)
+    public static function log_counter_likelihood_b_b($p, $b)
     {
-        $b = $params['difficulty'];
 
         $a = 1;
+        $c = 0;
         return -(($a**2 * exp($a * ($b + $p)))/(exp($a * $b) + exp($a * $p))**2);
     }
+
+
 
     /**
      * Used to estimate the item difficulty
@@ -213,7 +203,7 @@ class raschbirnbauma extends model_model implements catcalc_interface
     {
 
         $fun = function ($x) use ($p) {
-            return self::log_likelihood($p, $x);
+            return self::log_likelihood($p, $x[0]);
         };
         return $fun;
     }
@@ -227,7 +217,7 @@ class raschbirnbauma extends model_model implements catcalc_interface
     {
 
         $fun = function ($x) use ($p) {
-            return self::log_counter_likelihood($p, $x);
+            return self::log_counter_likelihood($p, $x[0]);
         };
         return $fun;
     }
@@ -244,7 +234,7 @@ class raschbirnbauma extends model_model implements catcalc_interface
         // return: Array [ df / d ip1 , df / d ip2]
 
         $fun1 = function ($x) use ($p) {
-            return self::log_likelihood_b($p, $x);
+            return self::log_likelihood_b($p, $x[0]);
         };
 
         return [$fun1];
@@ -256,7 +246,7 @@ class raschbirnbauma extends model_model implements catcalc_interface
 
 
         $fun1 = function ($x) use ($p) {
-            return self::log_counter_likelihood_b($p, $x);
+            return self::log_counter_likelihood_b($p, $x[0]);
         };
         return [$fun1];
 
@@ -267,7 +257,7 @@ class raschbirnbauma extends model_model implements catcalc_interface
     {
 
         $fun22 = function ($x) use ($p) {
-            return self::log_likelihood_b_b($p, $x);
+            return self::log_likelihood_b_b($p, $x[0]);
         };
 
         return [[$fun22]];
@@ -278,7 +268,7 @@ class raschbirnbauma extends model_model implements catcalc_interface
     {
 
         $fun22 = function ($x) use ($p) {
-            return self::log_counter_likelihood_b_b($p, $x);
+            return self::log_counter_likelihood_b_b($p, $x[0]);
         };
 
         return [[$fun22]];

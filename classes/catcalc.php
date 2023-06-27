@@ -177,7 +177,7 @@ class catcalc {
         }
 
         // Defines the starting point
-        $start_arr = ['difficulty' => 0.5, 'discrimination' => 0.5, 'guessing' => 0.5];
+        $start_arr = [0.5, 0.5, 0.5];
         $z_0 = array_slice($start_arr, 0, $model_dim-1);
 
         return mathcat::newton_raphson_multi($jacobian,$hessian,$z_0, 0.001, 50);
