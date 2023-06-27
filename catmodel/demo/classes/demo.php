@@ -12,6 +12,14 @@ use local_catquiz\local\model\model_person_param_list;
  */
 class demo extends model_model
 {
+
+    public static function log_likelihood_p($p, array $params): float { return 0.0; }
+
+    public static function counter_log_likelihood_p($p, array $params): float { return 0.0; } 
+
+    public static function log_likelihood_p_p($p, array $params): float { return 0.0; }
+
+    public static function counter_log_likelihood_p_p($p, array $params): float { return 0.0; }
     public static function get_model_dim(): int {
         return 1;
     }

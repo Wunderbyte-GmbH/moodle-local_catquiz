@@ -28,6 +28,7 @@ namespace local_catquiz;
 use catmodel_raschbirnbauma\raschmodel;
 use local_catquiz\local\model\model_item_param_list;
 use local_catquiz\local\model\model_model;
+use local_catquiz\local\model\model_strategy;
 use local_catquiz\mathcat;
 
 class catcalc {
@@ -60,30 +61,37 @@ class catcalc {
         return $item_difficulties;
     }
 
-    static function estimate_person_ability($demo_person_response, model_item_param_list $item_difficulties): float {
+    static function estimate_person_ability($demo_person_response, model_item_param_list $items): float {
+        //if (! $model instanceof catcalc_interface) {
+        //    throw new \InvalidArgumentException("Model does not implement the catcalc_interface");
+        //}
+
+       $all_models = model_strategy::get_installed_models(); 
+
         $likelihood = fn($x) => 1;
         $loglikelihood = fn($x) => 0;
         $loglikelihood_1st_derivative = fn($x) => 0;
         $loglikelihood_2nd_derivative = fn($x) => 0;
 
         foreach ($demo_person_response as $qid => $qresponse) {
-            $item_difficulty = $item_difficulties[$qid]->get_difficulty();
+            $item_params = $items[$qid]->get_params_array();
+            $model = $all_models[$items[$qid]->get_model_name()];
 
             if ($qresponse['fraction'] == 1) {
-                $likelihood_part = fn($x) => raschmodel::likelihood($x, $item_difficulty);
-                $loglikelihood_part = fn($x) => raschmodel::log_likelihood($x, $item_difficulty);
-                $loglikelihood_1st_derivative_part = fn($x) => raschmodel::log_likelihood_1st_derivative($x, $item_difficulty);
-                $loglikelihood_2nd_derivative_part = fn($x) => raschmodel::log_likelihood_2nd_derivative($x, $item_difficulty);
+                $likelihood_part = fn($x) => $model::get_callable_likelihood($x, $item_params);
+                $loglikelihood_part = fn($x) => $model::get_callable_log_likelihood($x, $item_params);
+                $loglikelihood_1st_derivative_part = fn($x) => $model::log_likelihood_p($x, $item_params);
+                $loglikelihood_2nd_derivative_part = fn($x) => $model::log_likelihood_pp($x, $item_params);
 
                 $likelihood = fn($x) => $likelihood($x) * $likelihood_part($x);
                 $loglikelihood = fn($x) => $loglikelihood($x) + $loglikelihood_part($x);
                 $loglikelihood_1st_derivative = fn($x) => $loglikelihood_1st_derivative($x) + $loglikelihood_1st_derivative_part($x);
                 $loglikelihood_2nd_derivative = fn($x) => $loglikelihood_2nd_derivative($x) + $loglikelihood_2nd_derivative_part($x);
             } else if ($qresponse['fraction'] == 0) {
-                $likelihood_part = fn($x) => raschmodel::likelihood_counter($x, $item_difficulty);
-                $loglikelihood_part = fn($x) => raschmodel::log_likelihood_counter($x, $item_difficulty);
-                $loglikelihood_1st_derivative_part = fn($x) => raschmodel::log_likelihood_counter_1st_derivative($x, $item_difficulty);
-                $loglikelihood_2nd_derivative_part = fn($x) => raschmodel::log_likelihood_counter_2nd_derivative($x, $item_difficulty);
+                $likelihood_part = fn($x) => $model::get_callable_likelihood_counter($x, $item_params);
+                $loglikelihood_part = fn($x) => $model::get_callable_log_likelihood_counter($x, $item_params);
+                $loglikelihood_1st_derivative_part = fn($x) => $model::counter_log_likelihood_p($x, $item_params);
+                $loglikelihood_2nd_derivative_part = fn($x) => $model::counter_log_likelihood_p_p($x, $item_params);
 
                 $likelihood = fn($x) => $likelihood($x) * $likelihood_part($x);
                 $loglikelihood = fn($x) => $loglikelihood($x) + $loglikelihood_part($x);
@@ -144,16 +152,16 @@ class catcalc {
             if ($r->get_response() == 1) { // if answer is correct
                 $num_passed += 1;
 
-                $likelihood_part = $model::get_log_likelihood($tmp_ability);
-                $jacobian_part = $model::get_log_jacobian($tmp_ability);
-                $hessian_part = $model::get_log_hessian($tmp_ability);
+                $likelihood_part = $model::get_log_likelihood($r->get_ability());
+                $jacobian_part = $model::get_log_jacobian($r->get_ability());
+                $hessian_part = $model::get_log_hessian($r->get_ability());
 
             } else {
                 $num_failed += 1;
 
-                $likelihood_part = $model::get_log_counter_likelihood($tmp_ability);
-                $jacobian_part = $model::get_log_counter_jacobian($tmp_ability);
-                $hessian_part = $model::get_log_counter_hessian($tmp_ability);
+                $likelihood_part = $model::get_log_counter_likelihood($r->get_ability());
+                $jacobian_part = $model::get_log_counter_jacobian($r->get_ability());
+                $hessian_part = $model::get_log_counter_hessian($r->get_ability());
             }
 
             // chain with functions
@@ -169,7 +177,7 @@ class catcalc {
         }
 
         // Defines the starting point
-        $start_arr = [0.5, 0.5, 0.5];
+        $start_arr = ['difficulty' => 0.5, 'discrimination' => 0.5, 'guessing' => 0.5];
         $z_0 = array_slice($start_arr, 0, $model_dim-1);
 
         return mathcat::newton_raphson_multi($jacobian,$hessian,$z_0, 0.001, 50);
