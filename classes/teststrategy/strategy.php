@@ -16,6 +16,7 @@
 
 namespace local_catquiz\teststrategy;
 
+use cache;
 use local_catquiz\catscale;
 use local_catquiz\local\result;
 use local_catquiz\teststrategy\info;
@@ -108,6 +109,11 @@ abstract class strategy {
         $selected_question = $result->unwrap();
         $selected_question->lastattempttime = $now;
         $selected_question->userlastattempttime = $now;
+
+        // Keep track of which question was selected
+        $cache = cache::make('local_catquiz', 'lastquestion');
+        $cache->set('lastquestion', $selected_question);
+
         catscale::update_testitem(
             $this->catcontextid,
             $selected_question,
