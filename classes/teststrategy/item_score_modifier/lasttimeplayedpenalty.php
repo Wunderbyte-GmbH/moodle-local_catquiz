@@ -53,7 +53,7 @@ final class lasttimeplayedpenalty extends item_score_modifier implements wb_midd
      * @return int 
      */
     private function get_penalty($question, $now, $penalty_time_range): int {
-        $seconds_passed = $now - $question->lastattempttime;
+        $seconds_passed = $now - $question->userlastattempttime;
         return max(0, $penalty_time_range - $seconds_passed);
     }
 }
