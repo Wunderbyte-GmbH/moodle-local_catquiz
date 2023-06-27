@@ -120,7 +120,15 @@ class catcalc {
 
         $loglikelihood = fn($x) => 0;
 
+        // Vector that contains the first derivatives for each parameter as functions
+        // [Df/Da, Df,/Db, Df,Dc]
         $jacobian = [];
+        // Matrix that contains the second derivatives
+        // [
+        //  [Df/Daa, Df/Dab, Df/Dac]
+        //  [Df/Dba, Df/Dbb, Df/Dbc]
+        //  [Df/Dca, Df/Dcb, Df/Dcc]
+        // ]
         $hessian = [];
         for ($i = 0; $i <= $model_dim - 2; $i++) {
             $jacobian[$i] = fn($x) => 0;
