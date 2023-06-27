@@ -42,28 +42,28 @@ class raschbirnbauma extends model_model implements catcalc_interface
 {
 
     public static function log_likelihood_p($p, array $params): float {
-        $a = $params['discrimination'];
+        $b = $params['difficulty'];
 
         // TODO: implement here
         return 0.0;
     }
 
     public static function counter_log_likelihood_p($p, array $params): float {
-        $a = $params['discrimination'];
+        $b = $params['difficulty'];
 
         // TODO: implement here
         return 0.0;
     }
 
     public static function log_likelihood_p_p($p, array $params): float { 
-        $a = $params['discrimination'];
+        $b = $params['difficulty'];
 
         // TODO: implement here
         return 0.0;
     }
 
     public static function counter_log_likelihood_p_p($p, array $params): float {
-        $a = $params['discrimination'];
+        $b = $params['difficulty'];
 
         // TODO: implement here
         return 0.0;
