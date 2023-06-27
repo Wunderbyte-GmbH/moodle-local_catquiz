@@ -81,7 +81,7 @@ class catcalc {
                 $likelihood_part = fn($x) => $model::get_callable_likelihood($x, $item_params);
                 $loglikelihood_part = fn($x) => $model::get_callable_log_likelihood($x, $item_params);
                 $loglikelihood_1st_derivative_part = fn($x) => $model::log_likelihood_p($x, $item_params);
-                $loglikelihood_2nd_derivative_part = fn($x) => $model::log_likelihood_pp($x, $item_params);
+                $loglikelihood_2nd_derivative_part = fn($x) => $model::log_likelihood_p_p($x, $item_params);
 
                 $likelihood = fn($x) => $likelihood($x) * $likelihood_part($x);
                 $loglikelihood = fn($x) => $loglikelihood($x) + $loglikelihood_part($x);
