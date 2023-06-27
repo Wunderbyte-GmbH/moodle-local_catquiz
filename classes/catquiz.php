@@ -170,6 +170,8 @@ class catquiz {
                     lci.componentname component,
                     s2.attempts,
                     COALESCE(s2.lastattempttime,0) as lastattempttime,
+                    s3.userattempts,
+                    COALESCE(s3.userlastattempttime,0) as userlastattempttime,
 
                     maxlcip.difficulty,
                     maxlcip.discrimination,
@@ -204,12 +206,23 @@ class catquiz {
                         JOIN {question_attempt_steps} qas
                             ON ccc1.starttimestamp < qas.timecreated AND ccc1.endtimestamp > qas.timecreated
                                 AND qas.fraction IS NOT NULL
-                                $restrictforuser
                         JOIN {question_attempts} qa
                             ON qas.questionattemptid = qa.id
                     WHERE ccc1.id = :contextid
                     GROUP BY ccc1.id, qa.questionid
                 ) s2 ON q.id = s2.questionid
+                LEFT JOIN (
+                    SELECT ccc1.id AS contextid, qa.questionid, COUNT(*) AS userattempts, MAX(qas.timecreated) as userlastattempttime
+                    FROM m_local_catquiz_catcontext ccc1
+                             JOIN m_question_attempt_steps qas
+                                  ON ccc1.starttimestamp < qas.timecreated AND ccc1.endtimestamp > qas.timecreated
+                                      AND qas.fraction IS NOT NULL
+                                      $restrictforuser
+                             JOIN m_question_attempts qa
+                                  ON qas.questionattemptid = qa.id
+                    WHERE ccc1.id = 1
+                    GROUP BY ccc1.id, qa.questionid
+                ) s3 ON q.id = s3.questionid
             ) as s1";
         [$insql, $inparams] = $DB->get_in_or_equal($catscaleids, SQL_PARAMS_NAMED);
         $where = ' catscaleid '. $insql .' AND itemstatus = maxstatus';

@@ -107,6 +107,7 @@ abstract class strategy {
 
         $selected_question = $result->unwrap();
         $selected_question->lastattempttime = $now;
+        $selected_question->userlastattempttime = $now;
         catscale::update_testitem(
             $this->catcontextid,
             $selected_question,
