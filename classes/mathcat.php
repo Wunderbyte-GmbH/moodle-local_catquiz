@@ -363,8 +363,8 @@ class mathcat
 
         $z_0 = $start;
 
-        $use_gauss= array_fill(0, 3, false);
-        $gauss_iter = array_fill(0, 3, 0);
+        $use_gauss= array_fill(0, $model_dim, false);
+        $gauss_iter = array_fill(0, $model_dim, 0);
 
 
         // jacobian, hessian, model_dim, start_value
@@ -373,20 +373,20 @@ class mathcat
         for ($i = 0; $i < $max_iter; $i++) {
 
             // gauß noise treatment
-            //for ($k = 0; $k <= $model_dim; $k++ ){
-            //
-            //    if ($use_gauss[$k] == true){
-            //
-            //        $gauss_iter[$k] += 1;
-            //        if ($gauss_iter[$k] % 10 == 0){
-            //
-            //            $func[$k] = self::add_gauss_der1($func[$k],0,0.5);
-            //            for ($kk = 0;$kk <= $model_dim;$kk++){
-            //                $derivative[$k][$kk] = self::add_gauss_der2($derivative[$k][$kk],0,0.5);
-            //            }
-            //        }
-            //    }
-            //}
+            for ($k = 0; $k <= $model_dim - 1; $k++ ){
+
+                if ($use_gauss[$k] == true){
+
+                    $gauss_iter[$k] += 1;
+                    if ($gauss_iter[$k] % 10 == 0){
+
+                        $func[$k] = self::add_gauss_der1($func[$k],0,0.5);
+                        for ($kk = 0;$kk <= $model_dim;$kk++){
+                            $derivative[$k][$kk] = self::add_gauss_der2($derivative[$k][$kk],0,0.5);
+                        }
+                    }
+                }
+            }
 
             for ($k = 0; $k <= $model_dim-1; $k++) {
 
@@ -440,7 +440,7 @@ class mathcat
     }
 
 
-    private function add_gauss_der1(callable $func, $mean, $std){
+    private static function add_gauss_der1(callable $func, $mean, $std){
 
         $gaussian = function($x) use ($mean,$std)  {
             return 1 * self::gaussian_density_derivative1($x,$mean,$std);
@@ -449,7 +449,7 @@ class mathcat
         return $new_func;
     }
 
-    private function add_gauss_der2(callable $func, $mean, $std){
+    private static function add_gauss_der2(callable $func, $mean, $std){
 
         $gaussian = function($x) use ($mean,$std)  {
             return 1 * self::gaussian_density_derivative2($x,$mean,$std);
@@ -458,7 +458,28 @@ class mathcat
         return $new_func;
     }
 
+    static function compose_plus($function1, $function2)
+    {
+        $returnfn = function ($x) use ($function1, $function2) {
+            return $function1($x) + $function2($x);
+        };
+        return $returnfn;
+    }
 
+    static function compose_multiply($function1, $function2)
+    {
+        $returnfn = function ($x) use ($function1, $function2) {
+            return $function1($x) * $function2($x);
+        };
+        return $returnfn;
+    }
 
+    static function compose_chain($function1, $function2)
+    {
+        $returnfn = function ($x) use ($function1, $function2) {
+            return $function1($function2);
+        };
+        return $returnfn;
+    }
 }
 
