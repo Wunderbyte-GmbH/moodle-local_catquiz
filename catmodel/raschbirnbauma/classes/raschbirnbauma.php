@@ -42,31 +42,24 @@ class raschbirnbauma extends model_model implements catcalc_interface
 {
 
     public static function log_likelihood_p($p, array $params): float {
-        $b = $params['difficulty'];
+        $b = $params[0];
 
-        // TODO: implement here
-        return 0.0;
+        return exp($b)/(exp($b) + exp($p));
     }
 
     public static function counter_log_likelihood_p($p, array $params): float {
-        $b = $params['difficulty'];
-
-        // TODO: implement here
-        return 0.0;
+        $b = $params[0];
+        return -(exp($p)/(exp($b) + exp($p)));
     }
 
-    public static function log_likelihood_p_p($p, array $params): float { 
-        $b = $params['difficulty'];
-
-        // TODO: implement here
-        return 0.0;
+    public static function log_likelihood_p_p($p, array $params): float {
+        $b = $params[0];
+        return -(exp($b + $p)/(exp($b) + exp($p))**2);
     }
 
     public static function counter_log_likelihood_p_p($p, array $params): float {
-        $b = $params['difficulty'];
-
-        // TODO: implement here
-        return 0.0;
+        $b = $params[0];
+        return -(exp($b + $p)/(exp($b) + exp($p))**2);
     }
 
     // info: x[0] <- "difficulty"
@@ -97,7 +90,7 @@ class raschbirnbauma extends model_model implements catcalc_interface
     }
 
     /**
-     * @return string[] 
+     * @return string[]
      */
     public static function get_parameter_names(): array {
         return ['difficulty',];
@@ -277,10 +270,10 @@ class raschbirnbauma extends model_model implements catcalc_interface
 
 
     /**
-     * 
-     * @param float $p 
-     * @param array<float> $x 
-     * @return int|float 
+     *
+     * @param float $p
+     * @param array<float> $x
+     * @return int|float
      */
     public static function fisher_info(float $p,array $x){
 

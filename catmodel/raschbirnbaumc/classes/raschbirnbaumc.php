@@ -38,39 +38,36 @@ class raschbirnbaumc extends model_model implements catcalc_interface
 {
 
     public static function log_likelihood_p($p, array $params): float {
-        $a = $params['difficulty'];
-        $b = $params['discrimination'];
-        $c = $params['guessing'];
-
-        // TODO: implement here
-        return 0.0;
+        //$a = $params['difficulty'];
+        //$b = $params['discrimination'];
+        //$c = $params['guessing'];
+        $a = $params[0];
+        $b = $params[1];
+        $c = $params[2];
+        return -(($a * (-1 + $c) * exp($a * ($b + $p)))/((exp($a * $b) + exp($a * $p)) * ($c * exp($a * $b) + exp($a * $p))));
     }
 
     public static function counter_log_likelihood_p($p, array $params): float {
-        $a = $params['discrimination'];
-        $b = $params['difficulty'];
-        $c = $params['guessing'];
+        $a = $params[0];
+        $b = $params[1];
+        $c = $params[2];
 
         // TODO: implement here
-        return 0.0;
+        return -(($a * exp($a * $p))/(exp($a * $b) + exp($a * $p)));
     }
 
-    public static function log_likelihood_p_p($p, array $params): float { 
-        $a = $params['discrimination'];
-        $b = $params['difficulty'];
-        $c = $params['guessing'];
-
-        // TODO: implement here
-        return 0.0;
+    public static function log_likelihood_p_p($p, array $params): float {
+        $a = $params[0];
+        $b = $params[1];
+        $c = $params[2];
+        return ($a**2 * (-1 + $c) * exp( $a * (-$b + $p)) * (-$c + exp(2 * $a (-$b + $p))))/((1 + exp($a (-$b + $p)))**2 * ($c + exp(   $a * (-$b + $p)))**2);
     }
 
     public static function counter_log_likelihood_p_p($p, array $params): float {
-        $a = $params['discrimination'];
-        $b = $params['difficulty'];
-        $c = $params['guessing'];
-
-        // TODO: implement here
-        return 0.0;
+        $a = $params[0];
+        $b = $params[1];
+        $c = $params[2];
+        return -(($a**2 * exp($a * ($b + $p)))/(exp($a * $b) + exp($a * $p))**2);
     }
 
     public static function get_model_dim(): int
@@ -89,7 +86,7 @@ class raschbirnbaumc extends model_model implements catcalc_interface
     }
 
     /**
-     * @return string[] 
+     * @return string[]
      */
     public static function get_parameter_names(): array {
         return ['difficulty', 'discrimination', 'guessing'];
