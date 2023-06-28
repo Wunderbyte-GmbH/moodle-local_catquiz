@@ -398,20 +398,20 @@ class mathcat
         for ($i = 0; $i < $max_iter; $i++) {
 
             // gauß noise treatment
-            for ($k = 0; $k <= $model_dim; $k++ ){
-
-                if ($use_gauss[$k] == true){
-
-                    $gauss_iter[$k] += 1;
-                    if ($gauss_iter[$k] % 10 == 0){
-
-                        $func[$k] = self::add_gauss_der1($func[$k],0,0.5);
-                        for ($kk = 0;$kk <= $model_dim;$kk++){
-                            $derivative[$k][$kk] = self::add_gauss_der2($derivative[$k][$kk],0,0.5);
-                        }
-                    }
-                }
-            }
+            //for ($k = 0; $k <= $model_dim; $k++ ){
+            //
+            //    if ($use_gauss[$k] == true){
+            //
+            //        $gauss_iter[$k] += 1;
+            //        if ($gauss_iter[$k] % 10 == 0){
+            //
+            //            $func[$k] = self::add_gauss_der1($func[$k],0,0.5);
+            //            for ($kk = 0;$kk <= $model_dim;$kk++){
+            //                $derivative[$k][$kk] = self::add_gauss_der2($derivative[$k][$kk],0,0.5);
+            //            }
+            //        }
+            //    }
+            //}
 
             for ($k = 0; $k <= $model_dim-1; $k++) {
 
