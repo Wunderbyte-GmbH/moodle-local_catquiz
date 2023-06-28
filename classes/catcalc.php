@@ -66,7 +66,7 @@ class catcalc {
         //    throw new \InvalidArgumentException("Model does not implement the catcalc_interface");
         //}
 
-       $all_models = model_strategy::get_installed_models(); 
+       $all_models = model_strategy::get_installed_models();
 
         $likelihood = fn($x) => 1;
         $loglikelihood = fn($x) => 0;
@@ -100,13 +100,15 @@ class catcalc {
             };
         }
 
-        return mathcat::newtonraphson(
+        $retval = mathcat::newtonraphson(
             $loglikelihood_1st_derivative,
             $loglikelihood_2nd_derivative,
             0,
             0.001,
             1500
         );
+
+        return $retval;
     }
 
     /**
