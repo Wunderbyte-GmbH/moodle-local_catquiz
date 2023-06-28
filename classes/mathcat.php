@@ -57,6 +57,93 @@ class mathcat
         return $x_0;
     }
 
+    static function newtonraphson_stable($func, $derivative, $start = 0, $min_inc = 0.0001, $max_iter = 150): float
+    {
+
+        $return_val = 0.0;
+        $x_0 = $start;
+        $use_gauss = false;
+        $gauss_iter = 0;
+
+        $m = 0;
+        $std = 0.5;
+
+
+        for ($n = 1; $n < $max_iter; $n++) {
+
+            if ($use_gauss == true){
+
+                $gauss_iter += 1;
+                if ($gauss_iter % 10 == 0){
+                    $func = mathcat::compose_plus($func, function($x) use ($n,$m,$std)  {
+                        return 1 * mathcat::gaussian_density_derivative1($x,$m,$std);
+                    });
+
+                    $derivative = mathcat::compose_plus($derivative, function($x) use ($n,$m,$std){
+                        return 1 * mathcat::gaussian_density_derivative2($x,$m,$std);
+                    });
+                    //$z_0 = $m;
+                    //$use_gauss = false;
+                }
+            }
+
+            if ($derivative($x_0) != 0) {
+                $diff = -$func($x_0) / ($derivative($x_0));
+            } else {
+                $use_gauss = true;
+                $x_0 = 0;
+            }
+
+            #$diff  = - $func($x_0) / ($derivative($x_0)+0.001);
+            # $diff = -$func($x_0) / ($derivative($x_0) + 0.00000001);
+            //echo "Iteration:" . $n . "and diff: " . $diff . " x_0=" . $x_0 . " value: ". $func($x_0)  . "<br>";
+            $x_0 += $diff;
+
+
+            if (abs($diff) > 10) {
+                $use_gauss = true;
+                $x_0 = 0;
+            }
+
+            if ($n == $max_iter){  //debug!
+                echo "not converging!";
+            }
+
+            if (abs($diff) < $min_inc) {
+                break;
+            }
+        }
+        return $x_0;
+    }
+
+
+    static function gaussian_density($x, $mean, $stdDeviation) {
+        $factor1 = 1 / sqrt(2 * M_PI * pow($stdDeviation, 2));
+        $factor2 = exp(-pow($x - $mean, 2) / (2 * pow($stdDeviation, 2)));
+        return $factor1 * $factor2;
+    }
+
+    static function gaussian_density_derivative1($x, $m, $std) {
+        //$factor1 = -($x - $mean) / pow($stdDeviation, 2);
+        //$factor2 = exp(-pow($x - $mean, 2) / (2 * pow($stdDeviation, 2)));
+        //return $factor1 * $factor2;
+
+        return (exp(-(($m - $x)**2 / (2 * $std**2))) * ($m - $x))/(sqrt(2 * M_PI) * $std**3);
+
+
+    }
+
+    static function gaussian_density_derivative2($x, $m, $std) {
+        return (exp(-(($m - $x)**2/ (2 * $std **2))) * ($m**2 - $std**2 - 2 * $m * $x + $x**2))/(sqrt(2 * M_PI)*$std**5);
+    }
+
+
+
+
+
+
+
+
     static function newtonraphson_numeric($f, $x0, $tolerance, $max_iterations = 150, $h = 0.001)
     {
 
@@ -244,10 +331,17 @@ class mathcat
 
             $j_inv = $ml->inverseMatrix($J);
 
-            $z_1 = $ml->subtractVectors($z_0, $ml->flattenArray($ml->multiplyMatrices($j_inv, $G)));
+            if (is_array($z_0)){
+                $z_1 = $ml->subtractVectors($z_0, $ml->flattenArray($ml->multiplyMatrices($j_inv, $G)));
+                $dist = $ml->dist($z_0,$z_1);
+            } else {
+                $z_1 = $z_0 - $ml->flattenArray($ml->multiplyMatrices($j_inv, $G))[0];
+                $dist = abs($z_0 - $z_1);
+            }
 
 
-            $dist = $ml->dist($z_0,$z_1);
+
+
 
             if ($dist < $min_inc){
                 $z_0 = $z_1;
@@ -258,5 +352,113 @@ class mathcat
 
         return $z_0;
     }
+
+    static function newton_raphson_multi_stable($func, $derivative, $start, $min_inc = 0.0001, $max_iter = 2000)
+    {
+
+        $model_dim = count($func);
+
+        $ml = new matrixcat();
+        // get real jacobian/hessian
+
+        $z_0 = $start;
+
+        $use_gauss= array_fill(0, 3, false);
+        $gauss_iter = array_fill(0, 3, 0);
+
+
+        // jacobian, hessian, model_dim, start_value
+
+
+        for ($i = 0; $i < $max_iter; $i++) {
+
+            // gauß noise treatment
+            //for ($k = 0; $k <= $model_dim; $k++ ){
+            //
+            //    if ($use_gauss[$k] == true){
+            //
+            //        $gauss_iter[$k] += 1;
+            //        if ($gauss_iter[$k] % 10 == 0){
+            //
+            //            $func[$k] = self::add_gauss_der1($func[$k],0,0.5);
+            //            for ($kk = 0;$kk <= $model_dim;$kk++){
+            //                $derivative[$k][$kk] = self::add_gauss_der2($derivative[$k][$kk],0,0.5);
+            //            }
+            //        }
+            //    }
+            //}
+
+            for ($k = 0; $k <= $model_dim-1; $k++) {
+
+                $real_func[$k] = [$func[$k]($z_0)];
+
+                for ($j = 0; $j <= $model_dim-1; $j++) {
+                    $real_derivative[$k][$j] = $derivative[$k][$j]($z_0);
+                }
+            }
+
+
+            $G = $real_func;
+            $J = $real_derivative;
+
+            //$j_inv = $ml->inverseMatrix($J);
+            $matrix = new matrix($J);
+            $j_inv = $matrix->inverse();
+
+
+
+
+
+            if (is_array($z_0)){
+                $diff = $ml->flattenArray($ml->multiplyMatrices($j_inv, $G));
+
+                $z_1 = $ml->subtractVectors($z_0, $diff);
+                $dist = $ml->dist($z_0,$z_1);
+
+
+                //for ($ii = 0; $ii <= count($z_0);$ii++){
+                //
+                //    if (abs($z_0[$ii]) > 10){
+                //        $use_gauss[$ii] = true;
+                //        $z_1[$ii] = 0; // todo: reset to some new starting point
+                //    }
+                //}
+
+            } else {
+                $z_1 = $z_0 - $ml->flattenArray($ml->multiplyMatrices($j_inv, $G))[0];
+                $dist = abs($z_0 - $z_1);
+            }
+
+            if ($dist < $min_inc){
+                $z_0 = $z_1;
+                break;
+            }
+            $z_0 = $z_1;
+        }
+
+        return $z_0;
+    }
+
+
+    private function add_gauss_der1(callable $func, $mean, $std){
+
+        $gaussian = function($x) use ($mean,$std)  {
+            return 1 * self::gaussian_density_derivative1($x,$mean,$std);
+        };
+        $new_func = self::compose_plus($func, $gaussian);
+        return $new_func;
+    }
+
+    private function add_gauss_der2(callable $func, $mean, $std){
+
+        $gaussian = function($x) use ($mean,$std)  {
+            return 1 * self::gaussian_density_derivative2($x,$mean,$std);
+        };
+        $new_func = self::compose_plus($func,$gaussian);
+        return $new_func;
+    }
+
+
+
 }
 

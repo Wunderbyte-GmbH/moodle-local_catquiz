@@ -52,96 +52,38 @@ $demo_persons = local_catquiz\synthcat::generate_persons($demo_person_abilities)
 $demo_items = local_catquiz\synthcat::generate_test_items_multi([$demo_item_discriminations, $demo_item_difficulties, $demo_item_guessing]);
 
 $response = new model_responses();
-$raschbb = new \catmodel_raschbirnbaumc\raschbirnbaumc($response,"RaschBB_3PL");
+$raschbb = new \catmodel_raschbirnbauma\raschbirnbauma($response,"RaschBB_1PL");
 
 $demo_response = local_catquiz\synthcat::generate_response_multi($demo_persons,$demo_items,$raschbb);
 
 
+
+$synth_item_response = \local_catquiz\synthcat::get_item_response2(80,120,0.2);
+
+
+
+
+$synth_person_response = \local_catquiz\synthcat::get_person_response(50,0);
+$synth_item_difficulty = \local_catquiz\synthcat::get_model_item_param_list(2,50);
+
+
+
+
+$x = \local_catquiz\catcalc::estimate_person_ability2($synth_person_response, $synth_item_difficulty);
+
+
+
+
 echo "pause";
 
-//generate_test_items
 
 
-// generate items and persons based on constant parameter
-
-
-//$demo_items = local_catquiz\synthcat::generate_test_items($demo_item_difficulties);
+// problematic function:
 
 
 
-
-//
-//
-//$something = \local_catquiz\mytestclass::testtest();
-//
-//$response = new model_responses();
-//
-////$myraschbirnbaum = \catmodel_raschbirnbaumb\raschbirnbaumb::get_stuff();
-//$myraschbirnbaum = new \catmodel_raschbirnbaumb\raschbirnbaumb($response,"RaschBB_2PL");
-
-
-//$testfn = $myraschbirnbaum->get_log_jacobian(0.3);
-
-
-
-
-//
-//
-//$a = \local_catquiz\catcalc::estimate_item_params_new();
-//
-
-
-
-//
-//$stuff = $myraschbirnbaum->get_stuff();
-//
-
-
-
-
-// estimate parameter
-
-
-
-//
-////
-////
-$responses = model_responses::create_from_array($demo_response);
-
-$raschbb = new \catmodel_raschbirnbaumc\raschbirnbaumc($responses,"RaschBB_3PL");
-
-
-
-
-// brauchen datenstrukturen für den Algo:
-
-
-// responses
-
-//$strategie = new model_strategy($responses, ['max_iterations' => 4, 'model_override' => 'raschbirnbauma']);
-
-$initial_person_abilities = $responses->get_initial_person_abilities();
-
-
-$item_response = $responses->get_item_response($initial_person_abilities);
-
-
-
-
-$synth_item_resonse = \local_catquiz\synthcat::get_item_response2(120,80,0.2);
-
-
-$x = \local_catquiz\catcalc::estimate_item_params($synth_item_resonse,$raschbb);
-
-
-
-//$my_item_response =
-
-
-//$max_iterations = 1;
-//$strategy = new model_strategy($responses, ['max_iterations' => 4, 'model_override' => 'raschbirnbauma']);
-//list($item_difficulties, $person_abilities) = $strategy->run_estimation();
 
 echo "finished";
 
 echo $OUTPUT->footer();
+
