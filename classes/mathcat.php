@@ -316,13 +316,12 @@ class mathcat
 
 
             if ($dist < $min_inc){
-                $z_0 = $z_1;
-                break;
+                return array_combine($parameter_names, $z_1);
             }
             $z_0 = array_combine($parameter_names, $z_1);
         }
 
-        return array_combine($parameter_names, $z_0);
+        return $z_0;
     }
 
     static function newton_raphson_multi_stable($func, $derivative, $start, $min_inc = 0.0001, $max_iter = 2000)
@@ -334,6 +333,7 @@ class mathcat
         // get real jacobian/hessian
 
         $z_0 = $start;
+        $parameter_names = array_keys($z_0);
 
         $use_gauss= array_fill(0, $model_dim, false);
         $gauss_iter = array_fill(0, $model_dim, 0);
@@ -384,8 +384,8 @@ class mathcat
             if (is_array($z_0)){
                 $diff = $ml->flattenArray($ml->multiplyMatrices($j_inv, $G));
 
-                $z_1 = $ml->subtractVectors($z_0, $diff);
-                $dist = $ml->dist($z_0,$z_1);
+                $z_1 = $ml->subtractVectors(array_values($z_0), $diff);
+                $dist = $ml->dist(array_values($z_0),$z_1);
 
 
                 //for ($ii = 0; $ii <= count($z_0);$ii++){
@@ -397,15 +397,14 @@ class mathcat
                 //}
 
             } else {
-                $z_1 = $z_0 - $ml->flattenArray($ml->multiplyMatrices($j_inv, $G))[0];
-                $dist = abs($z_0 - $z_1);
+                $z_1 = array_values($z_0) - $ml->flattenArray($ml->multiplyMatrices($j_inv, $G))[0];
+                $dist = abs(array_values($z_0) - $z_1);
             }
 
             if ($dist < $min_inc){
-                $z_0 = $z_1;
-                break;
+                return array_combine($parameter_names, $z_1);
             }
-            $z_0 = $z_1;
+            $z_0 = array_combine($parameter_names, $z_1);
         }
 
         return $z_0;
