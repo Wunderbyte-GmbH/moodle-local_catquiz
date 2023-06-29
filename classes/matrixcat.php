@@ -224,7 +224,7 @@ class matrixcat
 
     public function dist($vector1, $vector2){
         if (count($vector1) !== count($vector2)) {
-            throw new Exception('Vectors must have the same number of elements');
+            throw new \InvalidArgumentException('Vectors must have the same number of elements');
         }
 
         $distance = 0;
