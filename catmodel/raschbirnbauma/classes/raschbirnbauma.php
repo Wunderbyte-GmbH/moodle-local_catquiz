@@ -42,23 +42,23 @@ class raschbirnbauma extends model_model implements catcalc_interface
 {
 
     public static function log_likelihood_p($p, array $params): float {
-        $b = $params[0];
+        $b = $params['difficulty'];
 
         return exp($b)/(exp($b) + exp($p));
     }
 
     public static function counter_log_likelihood_p($p, array $params): float {
-        $b = $params[0];
+        $b = $params['difficulty'];
         return -(exp($p)/(exp($b) + exp($p)));
     }
 
     public static function log_likelihood_p_p($p, array $params): float {
-        $b = $params[0];
+        $b = $params['difficulty'];
         return -(exp($b + $p)/(exp($b) + exp($p))**2);
     }
 
     public static function counter_log_likelihood_p_p($p, array $params): float {
-        $b = $params[0];
+        $b = $params['difficulty'];
         return -(exp($b + $p)/(exp($b) + exp($p))**2);
     }
 
