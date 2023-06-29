@@ -36,31 +36,28 @@ class raschbirnbaumb extends model_model implements catcalc_interface
 {
 
     public static function log_likelihood_p($p, array $params): float {
-        //$a = $params['discrimination'];
-        //$b = $params['difficulty'];
-        $a = $params[0];
-        $b = $params[1];
+        $a = $params['discrimination'];
+        $b = $params['difficulty'];
 
         return $a/(1 + exp($a * (-$b + $p)));
     }
 
     public static function counter_log_likelihood_p($p, array $params): float {
-        $a = $params[0];
-        $b = $params[1];
+        $a = $params['discrimination'];
+        $b = $params['difficulty'];
         return -(($a * exp($a * $p))/(exp($a * $b) + exp($a * $p)));
     }
 
     public static function log_likelihood_p_p($p, array $params): float {
-        $a = $params[0];
-        $b = $params[1];
+        $a = $params['discrimination'];
+        $b = $params['difficulty'];
 
-        // TODO: implement here
         return -(($a**2 * exp($a * ($b + $p)))/(exp($a * $b) + exp($a * $p))**2);
     }
 
     public static function counter_log_likelihood_p_p($p, array $params): float {
-        $a = $params[0];
-        $b = $params[1];
+        $a = $params['discrimination'];
+        $b = $params['difficulty'];
         return -(($a**2 * exp($a * ($b + $p)))/(exp($a * $b) + exp($a * $p))**2);
     }
 
@@ -84,11 +81,9 @@ class raschbirnbaumb extends model_model implements catcalc_interface
     // # elementary model functions
 
 
-    public static function likelihood($p,
-        $a,
-        $b
-    ) {
-
+    public static function likelihood($p, array $params) {
+        $a = $params['discrimination'];
+        $b = $params['difficulty'];
         return (1 / (1 + exp($a * ($b - $p))));
     }
 
@@ -104,10 +99,9 @@ class raschbirnbaumb extends model_model implements catcalc_interface
         return (1 / (1 + exp($x['difficulty'] * ($x['discrimination'] - $p))));
     }
 
-    public static function counter_likelihood($p, $a, $b)
+    public static function counter_likelihood($p, array $params)
     {
-
-        return (1 / (1 + exp($a * ($b - $p))));
+        return 1 - self::likelihood($p, $params);
     }
 
     public static function log_likelihood($p, array $params)

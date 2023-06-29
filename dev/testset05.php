@@ -48,7 +48,7 @@ $response = new model_responses();
 
 
 
-$synth_item_response = \local_catquiz\synthcat::get_item_response2(40,60,0.0);
+$synth_item_response = \local_catquiz\synthcat::get_item_response2(40,65,0.0);
 
 
 # estimate item parameter with 1 PL

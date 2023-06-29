@@ -241,11 +241,6 @@ class catcalc {
 
         $model_dim = $model::get_model_dim();
 
-
-        // empty callable structures for composition
-
-        $loglikelihood = fn($x) => 0;
-
         // Vector that contains the first derivatives for each parameter as functions
         // [Df/Da, Df,/Db, Df,Dc]
         $jacobian = [];
@@ -282,9 +277,6 @@ class catcalc {
                 $hessian_part = $model::get_log_counter_hessian($r->get_ability());
             }
 
-            // chain with functions
-            $loglikelihood = fn($x) => $loglikelihood($x) + $likelihood_part($x);
-
             for ($i=0; $i <= $model_dim-2; $i++){
                 $jacobian[$i] = fn($x) => $jacobian[$i]($x) + $jacobian_part[$i]($x);
 
@@ -298,6 +290,6 @@ class catcalc {
         $start_arr = ['difficulty' => 0.5, 'discrimination' => 0.5, 'guessing' => 0.5];
         $z_0 = array_slice($start_arr, 0, $model_dim-1);
 
-        return mathcat::newton_raphson_multi($jacobian,$hessian,$z_0, 0.001, 50);
+        return mathcat::newton_raphson_multi_stable($jacobian,$hessian,$z_0, 0.001, 50);
     }
 }

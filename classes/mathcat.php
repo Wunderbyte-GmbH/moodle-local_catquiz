@@ -375,7 +375,7 @@ class mathcat
 
             //$j_inv = $ml->inverseMatrix($J);
             $matrix = new matrix($J);
-            $j_inv = $matrix->inverse();
+            $j_inv = ($matrix->getRows() === 1 && $matrix->isSquare()) ? [[1/$J[0][0]]] : $matrix->inverse();
 
 
 
