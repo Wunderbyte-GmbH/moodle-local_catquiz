@@ -272,13 +272,14 @@ class mathcat
 
     static function newton_raphson_multi($func, $derivative, $start, $min_inc = 0.0001, $max_iter = 2000)
     {
-
         $model_dim = count($func);
 
         $ml = new matrixcat();
         // get real jacobian/hessian
 
         $z_0 = $start;
+        $parameter_names = array_keys($z_0);
+
 
 
         // jacobian, hessian, model_dim, start_value
@@ -302,8 +303,9 @@ class mathcat
             $j_inv = $ml->inverseMatrix($J);
 
             if (is_array($z_0)){
-                $z_1 = $ml->subtractVectors($z_0, $ml->flattenArray($ml->multiplyMatrices($j_inv, $G)));
-                $dist = $ml->dist($z_0,$z_1);
+                // The math functions expect a simple unnamed array. We convert back later
+                $z_1 = $ml->subtractVectors(array_values($z_0), $ml->flattenArray($ml->multiplyMatrices($j_inv, $G)));
+                $dist = $ml->dist(array_values($z_0), $z_1);
             } else {
                 $z_1 = $z_0 - $ml->flattenArray($ml->multiplyMatrices($j_inv, $G))[0];
                 $dist = abs($z_0 - $z_1);
@@ -317,10 +319,10 @@ class mathcat
                 $z_0 = $z_1;
                 break;
             }
-            $z_0 = $z_1;
+            $z_0 = array_combine($parameter_names, $z_1);
         }
 
-        return $z_0;
+        return array_combine($parameter_names, $z_0);
     }
 
     static function newton_raphson_multi_stable($func, $derivative, $start, $min_inc = 0.0001, $max_iter = 2000)

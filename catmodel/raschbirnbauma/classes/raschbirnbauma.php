@@ -85,8 +85,7 @@ class raschbirnbauma extends model_model implements catcalc_interface
 
     public function calculate_params($item_response): array
     {
-        list($difficulty) = catcalc::estimate_item_params($item_response, $this);
-        return ['difficulty' => $difficulty];
+        return catcalc::estimate_item_params($item_response, $this);
     }
 
     /**

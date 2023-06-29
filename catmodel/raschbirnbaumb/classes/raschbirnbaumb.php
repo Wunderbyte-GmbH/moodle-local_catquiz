@@ -71,11 +71,7 @@ class raschbirnbaumb extends model_model implements catcalc_interface
 
     public function calculate_params($item_response): array
     {
-        list($difficulty, $discrimination) = catcalc::estimate_item_params($item_response, $this);
-        return [
-            'difficulty' => $difficulty,
-            'discrimination' => $discrimination,
-        ];
+        return catcalc::estimate_item_params($item_response, $this);
     }
 
     /**
@@ -161,7 +157,6 @@ class raschbirnbaumb extends model_model implements catcalc_interface
     {
         $a = $params['discrimination'];
         $b = $params['difficulty'];
-        $c = $params['guessing'];
 
         return ($a * exp($a * $p)) / (exp($a * $b) + exp($a * $p));
     }
