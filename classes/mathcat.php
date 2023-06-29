@@ -27,36 +27,6 @@ namespace local_catquiz;
 
 class mathcat
 {
-
-    static function newtonraphson($func, $derivative, $start = 0, $min_inc = 0.0001, $max_iter = 150): float
-    {
-
-        $return_val = 0.0;
-        $x_0 = $start;
-
-        for ($n = 1; $n < $max_iter; $n++) {
-
-            #$diff  = - $func($x_0) / ($derivative($x_0)+0.001);
-            $diff = -$func($x_0) / ($derivative($x_0) + 0.00000001);
-            //echo "Iteration:" . $n . "and diff: " . $diff . " x_0=" . $x_0 . " value: ". $func($x_0)  . "<br>";
-            $x_0 += $diff;
-
-            # workarround for numerical stability -> TODO: replace with gauß
-            if ($diff > 10) {
-                //echo "warning - drift: " . abs($diff) . "<br>";
-                return 5;
-            } elseif ($diff < -10) {
-                //echo "warning - drift: " . abs($diff) .  "<br>";
-                return -5;
-            }
-
-            if (abs($diff) < $min_inc) {
-                break;
-            }
-        }
-        return $x_0;
-    }
-
     static function newtonraphson_stable($func, $derivative, $start = 0, $min_inc = 0.0001, $max_iter = 150): float
     {
 

@@ -100,7 +100,7 @@ class catcalc {
             };
         }
 
-        $retval = mathcat::newtonraphson(
+        $retval = mathcat::newtonraphson_stable(
             $loglikelihood_1st_derivative,
             $loglikelihood_2nd_derivative,
             0,
