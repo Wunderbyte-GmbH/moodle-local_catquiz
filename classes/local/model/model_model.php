@@ -124,12 +124,4 @@ abstract class model_model {
      * @return mixed 
      */
     abstract public static function fisher_info(float $person_ability, array $params);
-
-    abstract static public function get_model_dim(): int;
-
-
-    abstract public static function log_likelihood_p($p, array $params): float;
-    abstract public static function counter_log_likelihood_p($p, array $params): float;
-    abstract public static function log_likelihood_p_p($p, array $params): float;
-    abstract public static function counter_log_likelihood_p_p($p, array $params): float;
 }

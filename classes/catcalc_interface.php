@@ -33,4 +33,10 @@ interface catcalc_interface
     public static function get_log_counter_likelihood($ability);
     public static function get_log_counter_jacobian($ability);
     public static function get_log_counter_hessian($ability);
+    public static function log_likelihood_p($p, array $params): float;
+    public static function counter_log_likelihood_p($p, array $params): float;
+    public static function log_likelihood_p_p($p, array $params): float;
+    public static function counter_log_likelihood_p_p($p, array $params): float;
+
+    public static function get_model_dim(): int;
 }
