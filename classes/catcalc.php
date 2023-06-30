@@ -265,14 +265,12 @@ class catcalc {
             if ($r->get_response() == 1) { // if answer is correct
                 $num_passed += 1;
 
-                $likelihood_part = $model::get_log_likelihood($r->get_ability());
                 $jacobian_part = $model::get_log_jacobian($r->get_ability());
                 $hessian_part = $model::get_log_hessian($r->get_ability());
 
             } else {
                 $num_failed += 1;
 
-                $likelihood_part = $model::get_log_counter_likelihood($r->get_ability());
                 $jacobian_part = $model::get_log_counter_jacobian($r->get_ability());
                 $hessian_part = $model::get_log_counter_hessian($r->get_ability());
             }
