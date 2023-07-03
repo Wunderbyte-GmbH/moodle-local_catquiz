@@ -64,7 +64,11 @@ class web_raschbirnbauma extends model_model
             }
             $data[] = $dataobj;
         }
-        $ch = curl_init('http://10.0.2.2:9090/RM');
+        $host = get_config('catmodel_web_raschbirnbauma', 'hostname');
+        $port = get_config('catmodel_web_raschbirnbauma', 'port');
+        $path = '/RM';
+        $url = sprintf('%s:%s%s', $host, $port, $path);
+        $ch = curl_init($url);
         # Setup request to send json via POST.
         $payload = json_encode(["m" => $data]);
         curl_setopt($ch, CURLOPT_POSTFIELDS, $payload);
