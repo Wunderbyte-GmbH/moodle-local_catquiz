@@ -27,12 +27,12 @@ namespace local_catquiz\local\model;
 defined('MOODLE_INTERNAL') || die();
 
 /**
- * Abstract class for model classes.
+ * TODO: add description
  *
  * @copyright  2023 Wunderbyte GmbH <georg.maisser@wunderbyte.at>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-abstract class model_model {
+abstract class model_raschmodel extends model_model {
 
     /**
      * @var model_responses Contains necessary data for estimation
@@ -87,7 +87,29 @@ abstract class model_model {
      * @param model_person_param_list $person_params
      * @return model_item_param_list
      */
-    abstract public function estimate_item_params(model_person_param_list $person_params): model_item_param_list;
+    public function estimate_item_params(model_person_param_list $person_params): model_item_param_list
+    {
+        $estimated_item_params = new model_item_param_list();
+        foreach ($this->responses->get_item_response($person_params) as $item_id => $item_response) {
+            // Calculate the difficulty -> returns a float value
+            $parameters = $this->calculate_params($item_response);
+            // Now create a new item difficulty object (param)
+            $param = $this
+                ->create_item_param($item_id, ['from_raschbirnbauma' => 'hello hello'])
+                ->set_parameters($parameters);
+            // ... and append it to the list of calculated item difficulties
+            $estimated_item_params->add($param);
+        }
+        return $estimated_item_params;
+    }
+
+    /**
+     * Returns the item parameters as associative array, with the parameter name as key.
+     *
+     * @param mixed $item_response
+     * @return array
+     */
+    abstract protected function calculate_params($item_response): array;
 
     /**
      * Returns the paramter names of the model as strings

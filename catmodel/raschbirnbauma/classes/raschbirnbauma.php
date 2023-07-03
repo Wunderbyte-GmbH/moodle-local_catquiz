@@ -27,8 +27,8 @@ namespace catmodel_raschbirnbauma;
 use local_catquiz\catcalc;
 use local_catquiz\catcalc_interface;
 use local_catquiz\local\model\model_item_param_list;
-use local_catquiz\local\model\model_model;
 use local_catquiz\local\model\model_person_param_list;
+use local_catquiz\local\model\model_raschmodel;
 
 defined('MOODLE_INTERNAL') || die();
 
@@ -38,7 +38,7 @@ defined('MOODLE_INTERNAL') || die();
  * @copyright  2023 Wunderbyte GmbH <georg.maisser@wunderbyte.at>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class raschbirnbauma extends model_model implements catcalc_interface
+class raschbirnbauma extends model_raschmodel implements catcalc_interface
 {
 
     public static function log_likelihood_p($p, array $params): float {
