@@ -190,9 +190,9 @@ class catscale {
 
         list($select, $from, $where, $filter, $params) = catquiz::return_sql_for_catscalequestions(
             $scaleids,
-            [],
-            [],
             $contextid,
+            [],
+            [],
             $USER->id
         );
 
@@ -221,8 +221,8 @@ class catscale {
 
     /**
      * Get all subscale IDs
-     * 
-     * @return array 
+     *
+     * @return array
      */
     private static function get_subscale_ids(int $catscaleid = null): array {
         global $DB;
