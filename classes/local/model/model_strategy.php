@@ -52,7 +52,7 @@ defined('MOODLE_INTERNAL') || die();
 class model_strategy {
 
     const MAX_ITERATIONS = 5; // TODO: get value from DB?
-    const DEFAULT_MODEL = 'raschbirnbauma';
+    const DEFAULT_MODEL = 'web_raschbirnbauma';
 
     /**
      * @var model_responses Contains necessary data for estimation
