@@ -3,17 +3,24 @@
 namespace local_catquiz\teststrategy\item_score_modifier;
 
 use local_catquiz\local\result;
+use local_catquiz\local\status;
 use local_catquiz\teststrategy\item_score_modifier;
 use local_catquiz\wb_middleware;
-use moodle_exception;
 
 final class ispilot extends item_score_modifier implements wb_middleware
 {
     public function run(array $context, callable $next): result {
+        // If there are no pilot questions available, then this class can not
+        // perform its task.
+        if (count($context['pilot_questions']) === 0) {
+            return result::err(status::ERROR_FETCH_NEXT_QUESTION);
+        }
+
         $rand = rand(0, 100);
         if ($rand <= $context['pilot_ratio'] * 100) {
-            //TODO: Keep track of which question was selected
-            return result::ok(reset($context['pilot_questions']));
+            $selectedquestion = reset($context['pilot_questions']);
+            $selectedquestion->is_pilot = true;
+            return result::ok($selectedquestion);
         }
         return $next($context);
     }
