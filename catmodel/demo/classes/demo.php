@@ -2,7 +2,6 @@
 
 namespace catmodel_demo;
 
-use local_catquiz\local\model\model_item_param;
 use local_catquiz\local\model\model_item_param_list;
 use local_catquiz\local\model\model_model;
 use local_catquiz\local\model\model_person_param_list;
@@ -12,10 +11,10 @@ use local_catquiz\local\model\model_person_param_list;
  */
 class demo extends model_model
 {
-    public function calculate_params($item_response): array {
-        return ['difficulty' => 0.5];
-    }
 
+    public function estimate_item_params(model_person_param_list $person_params): model_item_param_list {
+        return new model_item_param_list();
+    }
     /**
      * @return string[] 
      */
