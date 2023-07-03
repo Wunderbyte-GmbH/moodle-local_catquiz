@@ -242,6 +242,11 @@ class model_strategy {
             } else {
                 $item = $item_difficulties_lists[$this->get_default_model()][$item_id];
             }
+
+            // If the item was filtered out by the selected model, do not add it to the list of items for the next round
+            if ($item === null) {
+                continue;
+            }
             $item->set_status(model_item_param::STATUS_SET_BY_STRATEGY);
             $new_item_difficulties->add($item);
         }

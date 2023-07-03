@@ -74,8 +74,13 @@ class catcalc {
         $loglikelihood_2nd_derivative = fn($x) => 0;
 
         foreach ($demo_person_response as $qid => $qresponse) {
-            $item_params = $items[$qid]->get_params_array();
-            $model = $all_models[$items[$qid]->get_model_name()];
+            $item = $items[$qid];
+            // The item parameter for this response was filtered out
+            if ($item === null) {
+                continue;
+            }
+            $item_params = $item->get_params_array();
+            $model = $all_models[$item->get_model_name()];
 
             if ($qresponse['fraction'] == 1) {
                 $likelihood_part = fn($x) => $model::get_callable_likelihood($x, $item_params);
