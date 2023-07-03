@@ -129,9 +129,9 @@ class catquiz {
      */
     public static function return_sql_for_catscalequestions(
         array $catscaleids,
+        int $contextid,
         array $wherearray = [],
         array $filterarray = [],
-        int $contextid,
         int $userid = 0) {
 
         global $DB;
