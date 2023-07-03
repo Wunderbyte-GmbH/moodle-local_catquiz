@@ -32,6 +32,10 @@ if ($hassiteconfig) {
     $settings = new admin_settingpage($componentname . '_settings',  get_string('pluginname', 'local_catquiz'));
     $ADMIN->add('localplugins', $settings);
 
+    foreach (core_plugin_manager::instance()->get_plugins_of_type('catmodel') as $plugin) {
+            $plugin->load_settings($ADMIN, 'localplugins', $hassiteconfig);
+    }
+
     $catscalelink = new moodle_url('/local/catquiz/manage_catscales.php');
     $actionlink = new action_link($catscalelink, get_string('catquizsettings', 'local_catquiz'));
     $settingsling = ['link' => $OUTPUT->render($actionlink)];

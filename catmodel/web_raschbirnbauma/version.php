@@ -24,7 +24,7 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-$plugin->version   = 2023062900;
+$plugin->version   = 2023062901;
 $plugin->requires  = 2022041900;
 $plugin->component = 'catmodel_web_raschbirnbauma';
 

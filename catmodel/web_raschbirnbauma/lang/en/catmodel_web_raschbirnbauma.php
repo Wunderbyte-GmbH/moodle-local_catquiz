@@ -22,4 +22,8 @@
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-$string['pluginname'] = 'Web-Raschbirnbaum A';
+$string['pluginname'] = 'Web-Rasch-Birnbaum 1PL';
+$string['hostname'] = 'Hostname/IP';
+$string['hostname_desc'] = 'The hostname or IP address of the server exposing the web API';
+$string['port'] = 'Port';
+$string['port_desc'] = 'Port';
