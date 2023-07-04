@@ -33,9 +33,9 @@ use Traversable;
 
 /**
  * This class holds a list of person param objects
- * 
+ *
  * Can also be used to set values specific to the parameter estimation (e.g. model).
- *  
+ *
  * This is one of the return values from a model param estimation.
  */
 class model_person_param_list implements ArrayAccess, IteratorAggregate, Countable {
@@ -52,10 +52,10 @@ class model_person_param_list implements ArrayAccess, IteratorAggregate, Countab
     /**
      * Try to load existing person params from the DB.
      * If none are found, it returns an empty list.
-     * 
-     * @param int $contextid 
-     * @return model_person_param_list 
-     * @throws dml_exception 
+     *
+     * @param int $contextid
+     * @return model_person_param_list
+     * @throws dml_exception
      */
     public static function load_from_db(int $contextid): self {
         global $DB;
@@ -114,7 +114,7 @@ class model_person_param_list implements ArrayAccess, IteratorAggregate, Countab
 
     /**
      * Returns the person abilities as a float array
-     * 
+     *
      * @return array<float>
      */
     public function get_values($sorted = false): array
