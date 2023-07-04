@@ -193,7 +193,7 @@ class catquiz {
                 LEFT JOIN {local_catquiz_items} lci
                     ON lci.componentid=q.id AND lci.componentname='question'
 
-                JOIN (
+                LEFT JOIN (
                     SELECT lcip.difficulty, lcip.discrimination, lcip.componentid, lcip.componentname, lcip.model, lcip.status as itemstatus
                     FROM {local_catquiz_itemparams} lcip
                     GROUP BY lcip.difficulty, lcip.discrimination, lcip.componentid, lcip.componentname, lcip.model, lcip.status
@@ -225,7 +225,7 @@ class catquiz {
                 ) s3 ON q.id = s3.questionid
             ) as s1";
         [$insql, $inparams] = $DB->get_in_or_equal($catscaleids, SQL_PARAMS_NAMED);
-        $where = ' catscaleid '. $insql .' AND itemstatus = maxstatus';
+        $where = ' catscaleid '. $insql .' AND COALESCE(itemstatus,0) = COALESCE(maxstatus, 0)';
         $params = array_merge($params, $inparams);
         $filter = '';
 
