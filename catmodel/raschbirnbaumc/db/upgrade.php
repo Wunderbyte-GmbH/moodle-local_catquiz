@@ -55,7 +55,7 @@ function xmldb_catmodel_raschbirnbaumc_upgrade($oldversion) {
         }
 
         // Catquiz savepoint reached.
-        upgrade_plugin_savepoint(true, 2023061500, 'local', 'catquiz');
+        upgrade_plugin_savepoint(true, 2023061500, 'local', 'catmodel_raschbirnbaumc');
     }
 
     return true;
