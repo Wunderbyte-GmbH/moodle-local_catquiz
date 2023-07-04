@@ -163,7 +163,7 @@ class catscaledashboard implements renderable, templatable
                 'bodystring' => 'addtestitembody',
                 'submitbuttonstring' => 'addtestitemsubmit',
                 'component' => 'local_catquiz',
-                'labelcolumn' => 'idnumber',
+                'labelcolumn' => 'questiontext',
                 'catscaleid' => $catscaleid,
             ]
         ];
@@ -244,7 +244,7 @@ class catscaledashboard implements renderable, templatable
                 'bodystring' => 'removetestitembody',
                 'submitbuttonstring' => 'removetestitemsubmit',
                 'component' => 'local_catquiz',
-                'labelcolumn' => 'idnumber',
+                'labelcolumn' => 'questiontext',
                 'catscaleid' => $catscaleid,
             ]
         ];
