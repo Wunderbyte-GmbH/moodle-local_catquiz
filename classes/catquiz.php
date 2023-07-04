@@ -213,14 +213,14 @@ class catquiz {
                 ) s2 ON q.id = s2.questionid
                 LEFT JOIN (
                     SELECT ccc1.id AS contextid, qa.questionid, COUNT(*) AS userattempts, MAX(qas.timecreated) as userlastattempttime
-                    FROM m_local_catquiz_catcontext ccc1
-                             JOIN m_question_attempt_steps qas
+                    FROM {local_catquiz_catcontext} ccc1
+                             JOIN {question_attempt_steps} qas
                                   ON ccc1.starttimestamp < qas.timecreated AND ccc1.endtimestamp > qas.timecreated
                                       AND qas.fraction IS NOT NULL
                                       $restrictforuser
-                             JOIN m_question_attempts qa
+                             JOIN {question_attempts} qa
                                   ON qas.questionattemptid = qa.id
-                    WHERE ccc1.id = 1
+                    WHERE ccc1.id = :contextid2
                     GROUP BY ccc1.id, qa.questionid
                 ) s3 ON q.id = s3.questionid
             ) as s1";

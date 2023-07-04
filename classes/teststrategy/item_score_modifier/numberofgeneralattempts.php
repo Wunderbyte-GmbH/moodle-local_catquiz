@@ -9,10 +9,10 @@ use local_catquiz\wb_middleware;
 
 /**
  * Adds a `numberofgeneralattempts` property to each question
- * 
+ *
  * This information can be used to update the score, so that eventually all
  * questions will have a similar number of attempts.
- * 
+ *
  * @package local_catquiz\teststrategy\item_score_modifier
  */
 final class numberofgeneralattempts extends item_score_modifier implements wb_middleware
@@ -21,14 +21,11 @@ final class numberofgeneralattempts extends item_score_modifier implements wb_mi
     public function run(array $context, callable $next): result {
         global $DB;
 
-        $records = $DB->get_records_sql(
-            <<<SQL
-                SELECT questionid, COUNT(*)
-                FROM m_question_attempts
-                GROUP BY questionid
-                ;
-            SQL
-        );
+        $sql = "SELECT questionid, COUNT(*)
+                FROM {question_attempts}
+                GROUP BY questionid";
+
+        $records = $DB->get_records_sql($sql);
 
         $max_attempts = 0;
         foreach ($context['questions'] as $id => &$question) {
