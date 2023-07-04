@@ -25,6 +25,7 @@
 use local_catquiz\catquiz;
 use local_catquiz\output\catscalemanagers;
 use local_catquiz\output\catscales;
+use local_catquiz\output\questionsdisplay;
 
 require_once('../../config.php');
 
@@ -48,6 +49,8 @@ echo $OUTPUT->header();
 
 $data = new catscales();
 $catscalemanagers = new catscalemanagers();
+$questions = new questionsdisplay();
+
 list($sql, $params) = catquiz::get_sql_for_number_of_assigned_catscales($USER->id);
 $num_assigned_catscales = $DB->count_records_sql($sql, $params);
 list($sql, $params) = catquiz::get_sql_for_number_of_assigned_tests($USER->id);
@@ -61,6 +64,7 @@ $last_calculated = userdate($DB->get_field_sql($sql, $params), get_string('strft
 echo $OUTPUT->render_from_template('local_catquiz/catscalesdashboard', [
     'itemtree' => $data->export_for_template($OUTPUT),
     'catscalemanagers' => $catscalemanagers->export_for_template($OUTPUT),
+    'questiontab' => $questions->export_for_template($OUTPUT),
     'num_assigned_catscales' => $num_assigned_catscales,
     'num_assigned_tests' => $num_assigned_tests,
     'num_assigned_questions' => $num_assigned_questions,
