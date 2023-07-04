@@ -19,10 +19,13 @@ Feature: As an admin I perform basic catquiz actions - create, update, delete, s
       | teacher  | C1     | editingteacher |
 
   @javascript
-  Scenario: Admin create a catscale, edit it, subscribe, unsubscribe, delete
+  Scenario: CatQuiz Management: admin create a catscale, edit it, subscribe, unsubscribe, delete
     Given I log in as "admin"
     And I press "Catquiz"
     And I follow "Manage CAT Scales"
+    And I wait until the page is ready
+    ## And I follow "#catscales-tab"
+    And I click on "CAT scales" "link" in the "#region-main" "css_element"
     And I follow "Create"
     And I set the following fields to these values:
       | Name                               | Math              |
@@ -30,6 +33,8 @@ Feature: As an admin I perform basic catquiz actions - create, update, delete, s
       | minmaxgroup[catquiz_minscalevalue] | 5                 |
       | minmaxgroup[catquiz_maxscalevalue] | 15                |
     And I press "Save changes"
+    ## And I wait "1" seconds
+    And I wait until the page is ready
     Then I should see "Math" in the "[data-name=\"Math\"]" "css_element"
     And I follow "Subscribe"
     Then I should see "Subscribed" in the ".grid .list-group-item" "css_element"
@@ -44,24 +49,34 @@ Feature: As an admin I perform basic catquiz actions - create, update, delete, s
       | minmaxgroup[catquiz_minscalevalue] | 6           |
       | minmaxgroup[catquiz_maxscalevalue] | 16.5        |
     And I press "Save changes"
+    ## And I wait "1" seconds
+    And I wait until the page is ready
+    ## TODO: should return to the same tab?
+    And I click on "CAT scales" "link" in the "#region-main" "css_element"
     Then I should see "Mathematics" in the "[data-name=\"Mathematics\"]" "css_element"
     And I follow "Subscribed"
     Then I should see "Subscribe" in the ".grid .list-group-item" "css_element"
     And I follow "Delete"
+    ## TODO: should return to the same tab?
+    And I click on "CAT scales" "link" in the "#region-main" "css_element"
     Then I should see "Create" in the ".grid .list-group-item" "css_element"
 
   @javascript
-  Scenario: Admin create a catscale wiht subitems than edit, subscribe, unsubscribe, delete subitem
+  Scenario: CatQuiz Management: admin create a catscale wiht subitems than edit, subscribe, unsubscribe, delete subitem
     Given I log in as "admin"
     And I press "Catquiz"
     And I follow "Manage CAT Scales"
+    And I wait until the page is ready
+    ## And I follow "#catscales-tab"
+    And I click on "CAT scales" "link" in the "#region-main" "css_element"
     And I follow "Create"
-    ## And I set the field "Name" to "Mathematics"
     And I set the following fields to these values:
       | Name                               | Mathematics |
       | minmaxgroup[catquiz_minscalevalue] | 5.5         |
       | minmaxgroup[catquiz_maxscalevalue] | 20          |
     And I press "Save changes"
+    And I wait "1" seconds
+    ## And I wait until the page is ready
     Then I should see "Mathematics" in the "[data-name=\"Mathematics\"]" "css_element"
     And I follow "Create"
     ## And I set the field "Name" to "Arithmetics"
@@ -82,7 +97,6 @@ Feature: As an admin I perform basic catquiz actions - create, update, delete, s
     And I press "Save changes"
     Then I should see "Multiplication" in the "[data-name=\"Multiplication\"]" "css_element"
     And I follow "Create"
-    ## And I set the field "Name" to "Geometrie"
     And I set the following fields to these values:
       | Name                               | Geometrie |
       | minmaxgroup[catquiz_minscalevalue] | 8.5       |
