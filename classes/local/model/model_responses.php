@@ -37,6 +37,8 @@ use local_catquiz\local\model\model_person_param_list;
 class model_responses {
     private $data;
 
+    private array $has_correct_answer = [];
+
     /**
      * @return array<int>
      */
@@ -77,7 +79,12 @@ class model_responses {
      */
     public function get_item_response(model_person_param_list $person_param_list): array {
         $item_response = [];
-        $user_ids = array_keys($this->data);
+        
+        // Restructure the data
+        // From:
+        // $data[PERSONID] -> [All responses to different items by this user]
+        // To:
+        // $data[QUESTIONID] -> [All responses to this question by different users]
         foreach ($person_param_list->get_person_params() as $pp) {
             $components = array();
             $components = array_merge($components, array_keys($this->data[$pp->get_id()]));
@@ -95,7 +102,39 @@ class model_responses {
     }
 
     public function setData($data) {
+        $has_correct_answer = [];
+        foreach ($data as $userid => $components) {
+            foreach($components as $component) {
+                foreach($component as $componentid => $results)
+                    if (floatval($results['fraction']) > 0.0) {
+                        $has_correct_answer[] = $componentid;
+                    }
+            }
+        }
+
+        // Filter out items that do not have a single correct answer
+        $this->has_correct_answer = array_unique($has_correct_answer);
+        foreach($data as $userid => $components) {
+            foreach($components as $componentname => $component) {
+                foreach (array_keys($component) as $componentid) {
+                    if (!in_array($componentid, $this->has_correct_answer)) {
+                        unset($data[$userid][$componentname][$componentid]);
+
+                        // If that was the only question in that component, remove the component
+                        if (count($data[$userid][$componentname]) === 0) {
+                            unset($data[$userid][$componentname]);
+
+                            // If there are no data left for this user, remove that entry
+                            if (count($data[$userid]) === 0) {
+                                unset($data[$userid]);
+                            }
+                        }
+                    }
+                }
+            }
+        }
         $this->data = $data;
+
         return $this;
     }
 

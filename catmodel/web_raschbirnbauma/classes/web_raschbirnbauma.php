@@ -36,26 +36,11 @@ class web_raschbirnbauma extends model_model
         $estimated_item_params = new model_item_param_list();
         $item_responses = $this->responses->get_item_response($person_params);
 
-        // Find items that have only wrong answers and remove them
-        $has_correct_answer = [];
-        foreach ($item_responses as $itemid => $responses) {
-            foreach ($responses as $response) {
-                if ($response->get_response() > 0.0) {
-                    $has_correct_answer[] = $itemid;
-                    continue;
-                }
-            }
-        }
-        $has_correct_answer = array_unique($has_correct_answer);
         $data = [];
         foreach ($this->responses->as_array() as $components) {
             $dataobj = (object) [];
             foreach ($components as $component) {
                 foreach ($component as $itemid => $itemdata) {
-                    // Exclude items that do not have at least one correct answer
-                    if (!in_array($itemid, $has_correct_answer)) {
-                        continue;
-                    }
                     // We have to prepend the itemid with a letter so that the
                     // result returned by the API contains item names
                     $itemname = sprintf('I%s', $itemid);
@@ -79,7 +64,7 @@ class web_raschbirnbauma extends model_model
         $result = curl_exec($ch);
         // TODO: Should we tell if the request did not work?
         foreach (json_decode($result) as $itemdata) {
-            $itemid = ltrim($itemdata->_row, 'I');
+            $itemid = intval(ltrim($itemdata->_row, 'I'));
             $param = $this
                 ->create_item_param($itemid)
                 ->set_parameters(['difficulty' => $itemdata->xsi])
