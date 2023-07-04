@@ -82,6 +82,22 @@ class web_raschbirnbauma extends model_model
         return ['difficulty',];
     }
 
+    /**
+     * Generalisierung von `likelihood`: params $a und $b werden im array/vector als $x[0] und $x[1] angesprochen
+     * Kann in likelihood umbenannt werden
+     * @param float $p
+     * @param array<float> $x
+     * @return int|float
+     */
+    public static function likelihood_multi(float $p, array $x)
+    {
+        $a = 1;
+        $c = 0;
+        $b = $x['difficulty'];
+
+        return $c + (1- $c) * (exp($a*($p - $b)))/(1 + exp($a*($p-$b)));
+    }
+
     public static function fisher_info(float $person_ability, array $params) {
         return self::likelihood_multi($person_ability,$params) * (1-self::likelihood_multi($person_ability,$params));
     }
