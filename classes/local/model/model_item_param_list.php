@@ -110,7 +110,7 @@ class model_item_param_list implements ArrayAccess, IteratorAggregate, Countable
         unset($this->item_params[$offset]);
     }
 
-    public function offsetGet($offset): mixed {
+    public function offsetGet($offset): ?model_item_param {
         return isset($this->item_params[$offset]) ? $this->item_params[$offset] : null;
     }
 

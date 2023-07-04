@@ -101,7 +101,7 @@ class model_person_param_list implements ArrayAccess, IteratorAggregate, Countab
         unset($this->person_params[$offset]);
     }
 
-    public function offsetGet($offset): mixed {
+    public function offsetGet($offset): ?model_person_param {
         return isset($this->person_params[$offset]) ? $this->person_params[$offset] : null;
     }
 
