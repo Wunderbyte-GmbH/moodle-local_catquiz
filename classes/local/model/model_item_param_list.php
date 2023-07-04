@@ -31,7 +31,7 @@ use Traversable;
 
 /**
  * This class holds a list of item param objects
- *  
+ *
  * This is one of the return values from a model param estimation.
  */
 class model_item_param_list implements ArrayAccess, IteratorAggregate, Countable {
@@ -116,7 +116,7 @@ class model_item_param_list implements ArrayAccess, IteratorAggregate, Countable
 
     /**
      * Returns the item difficulties as a float array
-     * 
+     *
      * @return array<float>
      */
     public function get_values($sorted = false): array
@@ -202,7 +202,7 @@ class model_item_param_list implements ArrayAccess, IteratorAggregate, Countable
 
         if (!empty($new_records)) {
             $DB->insert_records('local_catquiz_itemparams', $new_records);
-            
+
         }
 
         foreach ($updated_records as $r) {
