@@ -64,7 +64,12 @@ class questionsdisplay implements renderable, templatable {
     private function render_contextselector()
     {
         $ajaxformdata = empty($this->catcontextid) ? [] : ['contextid' => $this->catcontextid];
-        $form = new \local_catquiz\form\contextselector(null, null, 'post', '', [], true, $ajaxformdata);
+
+        $customdata = [
+            "showheader" => false,
+        ];
+
+        $form = new \local_catquiz\form\contextselector(null, $customdata, 'post', '', [], true, $ajaxformdata);
         // Set the form data with the same method that is called when loaded from JS. It should correctly set the data for the supplied arguments.
         $form->set_data_for_dynamic_submission();
         // Render the form in a specific container, there should be nothing else in the same container.

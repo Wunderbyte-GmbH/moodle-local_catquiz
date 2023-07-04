@@ -47,6 +47,7 @@ class contextselector extends dynamic_form {
 
         $mform = $this->_form;
         $data = (object) $this->_ajaxformdata;
+        $customdata = $this->_customdata;
 
         if (isset($data->id)) {
             $mform->addElement('hidden', 'id', $data->id);
@@ -70,7 +71,9 @@ class contextselector extends dynamic_form {
 
         $label = '';
         if ($PAGE->url->get_path() !== '/local/catquiz/edit_testitem.php') {
-            $mform->addElement('header', 'edit_catquiz', get_string('managecatcontexts', 'local_catquiz')) ;
+            if (!empty($customdata['showheader'])) {
+                $mform->addElement('header', 'edit_catquiz', get_string('managecatcontexts', 'local_catquiz')) ;
+            }
             $label = get_string('selectcatcontext', 'local_catquiz');
         }
 
