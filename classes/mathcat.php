@@ -40,6 +40,7 @@ class mathcat
 
 
         for ($n = 1; $n < $max_iter; $n++) {
+            $diff = 0;
 
             if ($use_gauss == true){
 
