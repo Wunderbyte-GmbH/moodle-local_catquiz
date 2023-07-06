@@ -34,7 +34,6 @@ class web_raschbirnbauma extends model_model
      */
     public function estimate_item_params(model_person_param_list $person_params): model_item_param_list {
         $estimated_item_params = new model_item_param_list();
-        $item_responses = $this->responses->get_item_response($person_params);
 
         $data = [];
         foreach ($this->responses->as_array() as $components) {
@@ -61,9 +60,14 @@ class web_raschbirnbauma extends model_model
         # Return response instead of printing.
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
         # Send request.
-        $result = curl_exec($ch);
+        $response = curl_exec($ch);
+        curl_close($ch);
+        $result = json_decode($response);
+        if (is_object($result) && property_exists($result, 'error')) {
+            return $estimated_item_params;
+        }
         // TODO: Should we tell if the request did not work?
-        foreach (json_decode($result) as $itemdata) {
+        foreach ($result as $itemdata) {
             $itemid = intval(ltrim($itemdata->_row, 'I'));
             $param = $this
                 ->create_item_param($itemid)
@@ -71,7 +75,6 @@ class web_raschbirnbauma extends model_model
                 ;
             $estimated_item_params->add($param);
         }
-        curl_close($ch);
         return $estimated_item_params;
     }
 

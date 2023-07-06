@@ -79,7 +79,7 @@ class model_responses {
      */
     public function get_item_response(model_person_param_list $person_param_list): array {
         $item_response = [];
-        
+
         // Restructure the data
         // From:
         // $data[PERSONID] -> [All responses to different items by this user]
@@ -106,7 +106,7 @@ class model_responses {
         foreach ($data as $userid => $components) {
             foreach($components as $component) {
                 foreach($component as $componentid => $results)
-                    if (floatval($results['fraction']) > 0.0) {
+                    if (floatval($results['fraction']) === 1.0) { // TODO might need to be updated
                         $has_correct_answer[] = $componentid;
                     }
             }
