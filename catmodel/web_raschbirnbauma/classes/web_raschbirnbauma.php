@@ -63,10 +63,10 @@ class web_raschbirnbauma extends model_model
         $response = curl_exec($ch);
         curl_close($ch);
         $result = json_decode($response);
-        if (is_object($result) && property_exists($result, 'error')) {
+        if (!is_array($result)) {
+            // TODO: Should we tell if the request did not work?
             return $estimated_item_params;
         }
-        // TODO: Should we tell if the request did not work?
         foreach ($result as $itemdata) {
             $itemid = intval(ltrim($itemdata->_row, 'I'));
             $param = $this
