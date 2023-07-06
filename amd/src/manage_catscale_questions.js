@@ -23,13 +23,45 @@ import DynamicForm from 'core_form/dynamicform';
 
 const SELECTORS = {
     FORMCONTAINER: '#select_context_form',
+    CHECKBOX: 'input.integrate-subscales-checkbox',
 };
 /**
- * Add event listener to select.
+ * Initialize the form with event listeners.
  */
 export const init = () => {
+    initDynamicForm();
+    initCheckbox();
+
+};
+
+/**
+ * Initialize the checkbox.
+ */
+function initCheckbox() {
+
+    const checkbox = document.querySelector(SELECTORS.CHECKBOX);
+
     // eslint-disable-next-line no-console
-    console.log("init manage_catscale_questions");
+    console.log('checkbox init', checkbox);
+
+    checkbox.addEventListener('click', e => {
+
+        if (checkbox.checked === true) {
+            // eslint-disable-next-line no-console
+            console.log("checkbox checked ", e);
+        } else {
+            // eslint-disable-next-line no-console
+            console.log("checkbox unchecked");
+        }
+
+    });
+}
+
+/**
+ * Add event listener to select and set URL params.
+ *
+ */
+function initDynamicForm() {
     // Initialize the form - pass the container element and the form class name.
     const dynamicForm = new DynamicForm(document.querySelector(
         SELECTORS.FORMCONTAINER),
