@@ -31,6 +31,7 @@ class teststrategy_fastest extends strategy {
 
     public function requires_score_modifiers(): array {
         return [
+            'noremainingquestions',
             'lasttimeplayedpenalty',
             'numberofgeneralattempts',
             'fisherinformation',
