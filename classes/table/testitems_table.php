@@ -155,10 +155,12 @@ class testitems_table extends wunderbyte_table {
      * Override  model value with get_string.
      *
      * @param stdClass $values
-     * @return void
+     * @return string
      */
-    public function col_model($values) {
-
+    public function col_model($values): string {
+        if (is_null($values->model)) {
+            return get_string('notyetattempted', 'local_catquiz');
+        }
         return get_string('pluginname', 'catmodel_' . $values->model);
     }
 
@@ -196,10 +198,13 @@ class testitems_table extends wunderbyte_table {
      * Return value for lastattempttime column.
      *
      * @param stdClass $values
-     * @return void
+     * @return string
      */
     public function col_lastattempttime(stdClass $values) {
 
+        if (intval($values->lastattempttime) === 0) {
+            return get_string('notyetcalculated', 'local_catquiz');
+        }
         return userdate($values->lastattempttime);
     }
 

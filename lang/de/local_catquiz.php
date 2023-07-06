@@ -165,6 +165,8 @@ $string['testitems'] = 'Testitems';
 $string['questioncontextattempts'] = '# Versuche im ausgewählten Kontext';
 
 $string['studentstats'] = 'Studierende';
+$string['notyetcalculated'] = 'Noch nicht berechnet';
+$string['notyetattempted'] = 'Noch keine Versuche';
 
 // Email Templates.
 $string['notificationcatscalechange'] = 'Hallo {$a->firstname} {$a->lastname},

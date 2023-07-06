@@ -157,6 +157,8 @@ $string['addtestitem'] = 'Add test items';
 $string['usage'] = 'Usage';
 $string['failedtoaddmultipleitems'] = '{$a->numadded} questions successfully added, failed with {$a->numfailed} questions: {$a->failedids}';
 $string['testiteminrelatedscale'] = 'Test item is already assigned to a parent- or subscale';
+$string['notyetcalculated'] = 'Not yet calculated';
+$string['notyetattempted'] = 'No attempts';
 
 $string['removetestitemtitle'] = 'Remove test item from CAT scale';
 $string['removetestitembody'] = 'Do you want to remove the following test items from the current CAT scale? <br> {$a->data}';
