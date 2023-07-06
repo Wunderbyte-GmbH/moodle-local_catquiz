@@ -10,10 +10,15 @@ use local_catquiz\wb_middleware;
 final class ispilot extends item_score_modifier implements wb_middleware
 {
     public function run(array $context, callable $next): result {
-        // If there are no pilot questions available, then this class can not
-        // perform its task.
+        // If there are no pilot questions available, then return a random normal question
         if (count($context['pilot_questions']) === 0) {
-            return result::err(status::ERROR_FETCH_NEXT_QUESTION);
+            return $next($context);
+        }
+
+        // If there are no more normal questions, return a random pilot question
+        if (count($context['questions']) === 0) {
+            $context['questions'] = $context['pilot_questions'];
+            return $next($context);
         }
 
         $rand = rand(0, 100);

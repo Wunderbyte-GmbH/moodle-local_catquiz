@@ -67,11 +67,11 @@ $definitions = array(
         'staticaccelerationsize' => 1,
         'invalidationevents' => ['changesinattemptquestions']
     ),
-    'lastquestion' => array(
+    'playedquestions' => array(
         'mode' => cache_store::MODE_SESSION,
         'simplekeys' => true,
         'staticacceleration' => true,
         'staticaccelerationsize' => 1,
-        'invalidationevents' => ['changesinlastquestion']
+        'invalidationevents' => ['changesinplayedquestions']
     ),
 );
