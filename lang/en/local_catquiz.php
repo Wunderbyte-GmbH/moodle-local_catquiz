@@ -246,6 +246,7 @@ $string['aria:catscaleimage'] = "Background pattern for this CAT scale";
 $string['healthstatus'] = "Health status";
 $string['catmanagernumberofsubscales'] = "Number of subscales";
 $string['catmanagernumberofquestions'] = "Number of questions";
+$string['integratequestions'] = "Integrate questions from subscales";
 
 // CAT Quiz handler
 $string['noremainingquestions'] = "You ran out of questions";

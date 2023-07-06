@@ -26,9 +26,13 @@
 
 <div class="catscales-dashboard grid">
 {{#questiontab}}
-    <div id="catmanagerquestions contextselector">{{{contextselector}}}</div>
-    {{string1}}
-    {{string2}}
+    <div id="catmanagerquestions contextselector">
+        {{{contextselector}}}
+    </div>
+    <div class="form-check">
+        <input type="checkbox" class="integrate-subscales-checkbox" id="integrateSubscaleQuestionsCheckbox">
+        <label class="integrate-subscales-checkbox" for="integrateSubscaleQuestionsCheckbox">{{questioncheckboxlabel}}</label>
+    </div>
 {{/questiontab}}
 </div>
 

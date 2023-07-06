@@ -198,7 +198,7 @@ class questionsdisplay implements renderable, templatable {
             //'models' => $this->render_modelcards(),
             //'statcards' => $this->render_testitemstats(),
             'contextselector' => $this->render_contextselector(),
-            'string1' => "string 1",
+            'questioncheckboxlabel' => get_string('integratequestions', 'local_catquiz'),
             'string2' => "string 2",
             'table' => $this->testenvironmenttable(),
             //'overridesforms' => $this->render_overrides_form(),
