@@ -247,6 +247,7 @@ $string['healthstatus'] = "Health status";
 $string['catmanagernumberofsubscales'] = "Number of subscales";
 $string['catmanagernumberofquestions'] = "Number of questions";
 $string['integratequestions'] = "Integrate questions from subscales";
+$string['nocatscale'] = "No CAT scale selected";
 
 // CAT Quiz handler
 $string['noremainingquestions'] = "You ran out of questions";
