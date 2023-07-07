@@ -243,6 +243,7 @@ $string['healthstatus'] = "Health-Status";
 $string['catmanagernumberofsubscales'] = "Anzahl Subskalen";
 $string['catmanagernumberofquestions'] = "Anzahl Fragen";
 $string['integratequestions'] = "Fragen aus untergeordneten Skalen einbeziehen";
+$string['nocatscale'] = "Keine CAT Skala gewählt";
 
 // CAT Quiz handler
 $string['noremainingquestions'] = "Keine weiteren Fragen";
