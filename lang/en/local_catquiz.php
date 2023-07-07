@@ -29,26 +29,26 @@ $string['pluginname'] = 'ALiSe CAT Quiz';
 $string['catquiz'] = 'Catquiz';
 
 // Catquiz handler.
-$string['catquizsettings'] = 'Cat quiz settings';
+$string['catquizsettings'] = 'CAT quiz settings';
 $string['selectmodel'] = 'Choose a model';
 $string['model'] = 'Model';
 $string['modeldeactivated'] = 'Deactivate CAT engine';
 $string['usecatquiz'] = 'Use the catquiz engine for this test instance.';
-$string['catscales'] = 'Define catquiz catscales';
-$string['catscales:information'] = 'Define catscales: {$a->link}';
+$string['catscales'] = 'Define catquiz CAT scales';
+$string['catscales:information'] = 'Define CAT scales: {$a->link}';
 $string['catscalesname_exists'] = 'The name is already being used';
-$string['cachedef_catscales'] = 'Caches the catscales of catquiz';
-$string['catcatscales'] = 'Catscales to be tested';
-$string['catcatscales_help'] = 'Every catscales has testitems (questions) which will be used in the test.';
-$string['nameexists'] = 'The name of the catscale already exists';
-$string['createnewcatscale'] = 'Create new catscale';
-$string['parent'] = 'Parent catscale - None if top level catscale';
-$string['managecatscale'] = 'Manage catscale';
+$string['cachedef_catscales'] = 'Caches the CAT scales of catquiz';
+$string['catcatscales'] = 'CAT scales to be tested';
+$string['catcatscales_help'] = 'Every CAT scales has testitems (questions) which will be used in the test.';
+$string['nameexists'] = 'The name of the CAT scale already exists';
+$string['createnewcatscale'] = 'Create new CAT scale';
+$string['parent'] = 'Parent CAT scale - None if top level CAT scale';
+$string['managecatscale'] = 'Manage CAT scale';
 $string['managetestenvironments'] = 'Manage testenvironments';
-$string['showlistofcatscalemanagers'] = "Show list of catscale-Managers";
+$string['showlistofcatscalemanagers'] = "Show list of CAT scale managers";
 $string['addcategory'] = "Add category";
 $string['documentation'] = "Documentation";
-$string['createcatscale'] = 'Create your first catquiz catscale!';
+$string['createcatscale'] = 'Create your first catquiz CAT scale!';
 $string['cannotdeletescalewithchildren'] = 'Cannot delete CAT scale with children';
 $string['passinglevel'] = 'Passing level in %';
 $string['passinglevel_help'] = 'There is a level of personal competency that can be set for the test.';
@@ -98,18 +98,18 @@ $string['numberofquestions'] = '# questions';
 $string['numberofusers'] = '# users';
 
 // Cat contexts.
-$string['addcontext'] = 'Add Cat context';
-$string['managecatcontexts'] = 'Manage Cat contexts';
-$string['manage_catcontexts'] = 'Manage Cat contexts';
+$string['addcontext'] = 'Add CAT context';
+$string['managecatcontexts'] = 'Manage CAT contexts';
+$string['manage_catcontexts'] = 'Manage CAT contexts';
 $string['starttimestamp'] = 'Context start time';
 $string['endtimestamp'] = 'Context end time';
 $string['timemodified'] = 'Time modified';
 $string['notimelimit'] = 'Kein Zeitlimit';
 $string['attempts'] = 'Attempts';
 $string['action'] = 'Aktion';
-$string['searchcatcontext'] = 'Search Cat contexts';
-$string['selectcatcontext'] = 'Select a Cat context';
-$string['defaultcontextname'] = 'Default Cat context';
+$string['searchcatcontext'] = 'Search CAT contexts';
+$string['selectcatcontext'] = 'Select a CAT context';
+$string['defaultcontextname'] = 'Default CAT context';
 $string['defaultcontextdescription'] = 'Includes all test items';
 $string['noint'] = 'Please enter an integer number';
 $string['notpositive'] = 'Please enter a positive number';
@@ -126,23 +126,23 @@ $string['subscribed'] = 'Subscribed';
 $string['timemodified'] = 'Time modified';
 
 // Events.
-$string['userupdatedcatscale'] = 'User with id {$a->userid} updated catscale with id {$a->objectid}';
+$string['userupdatedcatscale'] = 'User with id {$a->userid} updated CAT scale with id {$a->objectid}';
 
 // Message.
-$string['messageprovider:catscaleupdate'] = 'Notification of catscale update';
-$string['catscaleupdatedtitle'] = 'A catscale was updated';
-$string['catscaleupdatedbody'] = 'A catscale was updated. TODO: more description.';
+$string['messageprovider:catscaleupdate'] = 'Notification of CAT scale update';
+$string['catscaleupdatedtitle'] = 'A CAT scale was updated';
+$string['catscaleupdatedbody'] = 'A CAT scale was updated. TODO: more description.';
 
 // Access.php.
 $string['catquiz:canmanage'] = 'Is allowed to manage Catquiz plugin';
-$string['catquiz:subscribecatscales'] = 'Is allowed to subscribe to Catquiz catscales';
-$string['catquiz:manage_catscales'] = 'Is allowed to maange Catquiz catscales';
+$string['catquiz:subscribecatscales'] = 'Is allowed to subscribe to Catquiz CAT scales';
+$string['catquiz:manage_catscales'] = 'Is allowed to manage Catquiz CAT scales';
 
 // Role.
 $string['catquizroledescription'] = 'Catquiz Manager';
 
 // Navbar.
-$string['managecatscales'] = 'Manage CAT Scales';
+$string['managecatscales'] = 'Manage CAT scales';
 $string['test'] = 'Test Subscription';
 
 // Assign testitems to catscale page.
