@@ -24,25 +24,28 @@
     }
 }}
 
-<div class="catscales-dashboard grid">
 {{#questiontab}}
-    <div id="catmanagerquestions contextselector">
-        {{{contextselector}}}
-    </div>
-    {{#checkbox}}
-        <div class="form-check">
-            <input type="checkbox" class="integrate-subscales-checkbox" id="integrateSubscaleQuestionsCheckbox" {{checked}}>
-            <label class="integrate-subscales-checkbox" for="integrateSubscaleQuestionsCheckbox">{{label}}</label>
+    <div class="catscales-dashboard grid">
+        <div id="catmanagerquestions contextselector">
+            {{{contextselector}}}
         </div>
-    {{/checkbox}}
-    {{#table}}
-        <div>Table soon to be displayed</div>
-    {{/table}}
-    {{^table}}
-        {{#str}} nocatscale, local_catquiz {{/str}}
-    {{/table}}
+        {{#checkbox}}
+            <div class="form-check">
+                <input type="checkbox" class="integrate-subscales-checkbox" id="integrateSubscaleQuestionsCheckbox" {{checked}}>
+                <label class="integrate-subscales-checkbox" for="integrateSubscaleQuestionsCheckbox">{{label}}</label>
+            </div>
+        {{/checkbox}}
+    </div>
+    <div>
+        {{#table}}
+            {{table}}
+            <div>Table soon to be displayed</div>
+        {{/table}}
+        {{^table}}
+            <h5>{{#str}} nocatscale, local_catquiz {{/str}}</h5>
+        {{/table}}
+    </div>
 {{/questiontab}}
-</div>
 
 {{#js}}
     require(['local_catquiz/manage_catscale_questions'], function(init) {
