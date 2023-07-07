@@ -86,6 +86,26 @@ class questionsdisplay implements renderable, templatable {
     }
 
     /**
+     * Renders the context selector.
+     * @return string
+     */
+    private function render_subscaleselector()
+    {
+        if ($this->subscales !== 1) {
+            return "";
+        }
+        $ajaxformdata = empty($this->catcontextid) ? [] : ['contextid' => $this->catcontextid];
+
+        $customdata = []; // For the moment we don't need customdata.
+
+        $form = new \local_catquiz\form\subscaleselector(null, $customdata, 'post', '', [], true, $ajaxformdata);
+        // Set the form data with the same method that is called when loaded from JS. It should correctly set the data for the supplied arguments.
+        $form->set_data_for_dynamic_submission();
+        // Render the form in a specific container, there should be nothing else in the same container.
+        return html_writer::div($form->render(), '', ['id' => 'select_context_form']);
+    }
+
+    /**
      * Renders the subscale checkbox.
      * @return array
      */
@@ -221,15 +241,9 @@ class questionsdisplay implements renderable, templatable {
     public function export_for_template(\renderer_base $output): array {
 
         $data = [
-            //'returnurl' => $url->out(),
-            //'models' => $this->render_modelcards(),
-            //'statcards' => $this->render_testitemstats(),
             'contextselector' => $this->render_contextselector(),
+            'subscaleselector' => empty($this->render_subscaleselector()) ? "" : $this->render_subscaleselector(),
             'checkbox' => $this->render_subscale_checkbox(),
-            'string2' => "string 2",
-            'table' => $this->testenvironmenttable(),
-            //'overridesforms' => $this->render_overrides_form(),
-            //'itemstatus' => $this->get_itemstatus(),
         ];
 
         return $data;
