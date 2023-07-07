@@ -248,6 +248,8 @@ $string['catmanagernumberofsubscales'] = "Number of subscales";
 $string['catmanagernumberofquestions'] = "Number of questions";
 $string['integratequestions'] = "Integrate questions from subscales";
 $string['nocatscale'] = "No CAT scale selected";
+$string['selectsubscale'] = "Select a subscale";
+$string['selectcatscale'] = "Scale:";
 
 // CAT Quiz handler
 $string['noremainingquestions'] = "You ran out of questions";

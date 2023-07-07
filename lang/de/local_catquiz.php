@@ -244,6 +244,8 @@ $string['catmanagernumberofsubscales'] = "Anzahl Subskalen";
 $string['catmanagernumberofquestions'] = "Anzahl Fragen";
 $string['integratequestions'] = "Fragen aus untergeordneten Skalen einbeziehen";
 $string['nocatscale'] = "Keine CAT Skala gewählt";
+$string['selectsubscale'] = "Subskala auswählen";
+$string['selectcatscale'] = "Skala:";
 
 // CAT Quiz handler
 $string['noremainingquestions'] = "Keine weiteren Fragen";

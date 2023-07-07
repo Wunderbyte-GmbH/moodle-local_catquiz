@@ -62,9 +62,8 @@ class questionsdisplay implements renderable, templatable {
      */
     public function __construct() {
         $this->catcontextid = optional_param('contextid', 0, PARAM_INT);
-        $this->scale = optional_param('scale', 0, PARAM_INT);
+        $this->scale = optional_param('scale', -1, PARAM_INT);
         $this->usesubs = optional_param('usesubs', 0, PARAM_INT);
-
     }
 
     /**
@@ -76,7 +75,8 @@ class questionsdisplay implements renderable, templatable {
         $ajaxformdata = empty($this->catcontextid) ? [] : ['contextid' => $this->catcontextid];
 
         $customdata = [
-            "showheader" => false,
+            "hideheader" => true,
+            "hidelabel" => true,
         ];
 
         $form = new \local_catquiz\form\contextselector(null, $customdata, 'post', '', [], true, $ajaxformdata);
@@ -87,7 +87,27 @@ class questionsdisplay implements renderable, templatable {
     }
 
     /**
-     * Renders the context selector.
+     * Renders the scale selector.
+     * @return string
+     */
+    private function render_scaleselector()
+    {
+        $scaleid = empty($this->scale) ? -1 : $this->scale;
+
+        $customdata = [
+            'type' => 'scale',
+            'label' => get_string('selectcatscale', 'local_catquiz'),
+        ];
+
+        $form = new \local_catquiz\form\scaleselector(null, $customdata, 'post', '', [], true, []);
+        // Set the form data with the same method that is called when loaded from JS. It should correctly set the data for the supplied arguments.
+        $form->set_data_for_dynamic_submission();
+        // Render the form in a specific container, there should be nothing else in the same container.
+        return html_writer::div($form->render(), '', ['id' => 'select_context_form']);
+    }
+
+    /**
+     * Renders the subscale selector.
      * @return string
      */
     private function render_subscaleselector()
@@ -95,11 +115,15 @@ class questionsdisplay implements renderable, templatable {
         if ($this->usesubs !== 1) {
             return "";
         }
-        $ajaxformdata = empty($this->catcontextid) ? [] : ['contextid' => $this->catcontextid];
+        //$ajaxformdata = empty($this->catcontextid) ? [] : ['contextid' => $this->catcontextid];
+        $scaleid = empty($this->scale) ? -1 : $this->scale;
 
-        $customdata = []; // For the moment we don't need customdata.
+        $customdata = [
+            'type' => 'subscale',
+            'parentscaleid' => ["$scaleid"],
+        ];
 
-        $form = new \local_catquiz\form\subscaleselector(null, $customdata, 'post', '', [], true, $ajaxformdata);
+        $form = new \local_catquiz\form\scaleselector(null, $customdata, 'post', '', [], true, []);
         // Set the form data with the same method that is called when loaded from JS. It should correctly set the data for the supplied arguments.
         $form->set_data_for_dynamic_submission();
         // Render the form in a specific container, there should be nothing else in the same container.
@@ -132,8 +156,8 @@ class questionsdisplay implements renderable, templatable {
 
         $table = new testenvironments_table('testenvironmentstable');
 
-        list($select, $from, $where, $filter, $params) = $catscaleid
-        ? catquiz::return_sql_for_testenvironments("catscaleid=$catscaleid")
+        list($select, $from, $where, $filter, $params) = $this->catcontextid
+        ? catquiz::return_sql_for_testenvironments("catscaleid=$this->catcontextid")
         : catquiz::return_sql_for_testenvironments();
 
         $table->set_filter_sql($select, $from, $where, $filter, $params);
@@ -243,6 +267,7 @@ class questionsdisplay implements renderable, templatable {
 
         $data = [
             'contextselector' => $this->render_contextselector(),
+            'scaleselector' => empty($this->render_scaleselector()) ? "" : $this->render_scaleselector(),
             'subscaleselector' => empty($this->render_subscaleselector()) ? "" : $this->render_subscaleselector(),
             'checkbox' => $this->render_subscale_checkbox(),
         ];

@@ -71,10 +71,12 @@ class contextselector extends dynamic_form {
 
         $label = '';
         if ($PAGE->url->get_path() !== '/local/catquiz/edit_testitem.php') {
-            if (!empty($customdata['showheader'])) {
+            if (empty($customdata['hideheader'])) {
                 $mform->addElement('header', 'edit_catquiz', get_string('managecatcontexts', 'local_catquiz')) ;
             }
-            $label = get_string('selectcatcontext', 'local_catquiz');
+            if (empty($customdata['hidelabel'])) {
+                $label = get_string('selectcatcontext', 'local_catquiz');
+            }
         }
 
         $mform->addElement('select', 'contextid', $label, $contexts, $options);

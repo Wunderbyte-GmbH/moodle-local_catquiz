@@ -25,6 +25,7 @@ require_once($CFG->dirroot . "/local/catquiz/lib.php");
 use context;
 use context_system;
 use core_form\dynamic_form;
+use local_catquiz\catquiz;
 use moodle_url;
 use stdClass;
 
@@ -32,10 +33,10 @@ use stdClass;
  * Dynamic form.
  * @copyright Wunderbyte GmbH <info@wunderbyte.at>
  * @package   local_catquiz
- * @author    Georg Maißer
+ * @author    Magdalena Holczik, Georg Maißer
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class subscaleselector extends dynamic_form {
+class scaleselector extends dynamic_form {
 
     /**
      * {@inheritdoc}
@@ -47,28 +48,47 @@ class subscaleselector extends dynamic_form {
 
         $mform = $this->_form;
         $data = (object) $this->_ajaxformdata;
-        //$customdata = $this->_customdata;
+        $customdata = $this->_customdata;
 
+        $type = isset($customdata['type'])? $customdata['type'] : "scale"; //Type i.e. 'subscale'.
+
+
+        // $default = get_string('searchcatcontext', 'local_catquiz'); TODO default value
         if (isset($data->id)) {
             $mform->addElement('hidden', 'id', $data->id);
             $mform->setType('id', PARAM_INT);
         }
 
-        $contextsdb = $DB->get_records('local_catquiz_catscales');
+        $id = ["0"]; // Scales go with ID 0.
+        if ($type == "subscale" && isset($customdata['parentscaleid'])) { // If it's a subscale, we have to get the parentscaleid.
+            $id = $customdata['parentscaleid'];
+        }
+
+        list($select, $from, $where, $filter, $params) = catquiz::get_sql_for_scales_and_subscales(
+            $id
+        );
+
+        $sql = "SELECT $select FROM $from WHERE $where";
+
+        $contextsdb = $DB->get_records_sql($sql, $params);
         $contexts = [];
         foreach ($contextsdb as $contextid => $context) {
             $contexts[$contextid] = $context->name;
         }
         $options = array(
             'multiple' => false,
-            'noselectionstring' => get_string('searchcatcontext', 'local_catquiz'),
+            //'noselectionstring' => $default,
             'class' => 'justify-content-end',
         );
 
         $label = '';
 
-        $mform->addElement('select', 'subscale', $label, $contexts, $options);
-        $mform->addElement('submit', 'submitbutton', 'submit', ['class' => 'd-none']);
+        if(isset($customdata['label'])) {
+            $label = $customdata['label'];
+        }
+
+        $mform->addElement('select', $type, $label, $contexts, $options);
+        //$mform->setDefault('subscale', $default);
         $mform->disable_form_change_checker();
     }
 
