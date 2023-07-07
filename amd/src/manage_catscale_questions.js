@@ -25,61 +25,41 @@ const SELECTORS = {
     FORMCONTAINER: '#select_context_form',
     CHECKBOX: 'input.integrate-subscales-checkbox',
 };
+
+
 /**
- * Initialize the form with event listeners.
+ * Initialize the form with event listener that update url params.
  */
 export const init = () => {
-    initDynamicForm();
-    initCheckbox();
 
-};
-
-/**
- * Initialize the checkbox.
- */
-function initCheckbox() {
-
+    // Initialize the checkbox.
     const checkbox = document.querySelector(SELECTORS.CHECKBOX);
-
-    // eslint-disable-next-line no-console
-    console.log('checkbox init', checkbox);
-
+    // eslint-disable-next-line no-unused-vars
     checkbox.addEventListener('click', e => {
-
+        let searchParams = new URLSearchParams(window.location.search);
         if (checkbox.checked === true) {
-            // eslint-disable-next-line no-console
-            console.log("checkbox checked ", e);
+            searchParams.set("usesubs", 1);
+            window.location.search = searchParams.toString();
         } else {
-            // eslint-disable-next-line no-console
-            console.log("checkbox unchecked");
+            searchParams.set("usesubs", 0);
+            window.location.search = searchParams.toString();
         }
-
     });
-}
 
-/**
- * Add event listener to select and set URL params.
- *
- */
-function initDynamicForm() {
+    // Add event listener to select and set URL params.
     // Initialize the form - pass the container element and the form class name.
     const dynamicForm = new DynamicForm(document.querySelector(
         SELECTORS.FORMCONTAINER),
         'local_catquiz\\form\\contextselector'
     );
-
-    // eslint-disable-next-line no-console
-    console.log("dynamicForm", dynamicForm);
     // If a user selects a context, redirect to a URL that includes the selected
     // context as `contextid` query parameter
     dynamicForm.addEventListener(dynamicForm.events.FORM_SUBMITTED, (e) => {
         e.preventDefault();
         const response = e.detail;
-
         if (!response.contextid) {
             return;
         }
-
         let searchParams = new URLSearchParams(window.location.search);
         searchParams.set("contextid", response.contextid);
         window.location.search = searchParams.toString();
@@ -96,4 +76,5 @@ function initDynamicForm() {
             dynamicForm.submitFormAjax();
         }, 500);
     });
+
 };
