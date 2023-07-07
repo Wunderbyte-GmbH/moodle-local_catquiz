@@ -52,15 +52,24 @@ class questionsdisplay implements renderable, templatable {
     private int $catcontextid = 0;
 
     /**
+     * @var integer
+     */
+    private int $subscales = 0; // If subscales should be integrated in question display, value is 1.
+
+    /**
      *
-     * @param int $catcontextid
      * @return void
      */
-    public function __construct($catcontextid = 0) {
-        $this->catcontextid = $catcontextid;
+    public function __construct() {
+        $this->catcontextid = optional_param('contextid', 0, PARAM_INT);
+        $this->subscales = optional_param('subscales', 0, PARAM_INT);
 
     }
 
+    /**
+     * Renders the context selector.
+     * @return string
+     */
     private function render_contextselector()
     {
         $ajaxformdata = empty($this->catcontextid) ? [] : ['contextid' => $this->catcontextid];
@@ -74,6 +83,24 @@ class questionsdisplay implements renderable, templatable {
         $form->set_data_for_dynamic_submission();
         // Render the form in a specific container, there should be nothing else in the same container.
         return html_writer::div($form->render(), '', ['id' => 'select_context_form']);
+    }
+
+    /**
+     * Renders the subscale checkbox.
+     * @return array
+     */
+    private function render_subscale_checkbox()
+    {
+        $checked = "";
+        if ($this->subscales == 1) {
+            $checked = "checked";
+        }
+        $checkboxarray = [
+            'label' => get_string('integratequestions', 'local_catquiz'),
+            'checked' => $checked,
+        ];
+
+        return $checkboxarray;
     }
 
 
@@ -198,7 +225,7 @@ class questionsdisplay implements renderable, templatable {
             //'models' => $this->render_modelcards(),
             //'statcards' => $this->render_testitemstats(),
             'contextselector' => $this->render_contextselector(),
-            'questioncheckboxlabel' => get_string('integratequestions', 'local_catquiz'),
+            'checkbox' => $this->render_subscale_checkbox(),
             'string2' => "string 2",
             'table' => $this->testenvironmenttable(),
             //'overridesforms' => $this->render_overrides_form(),
