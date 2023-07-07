@@ -62,7 +62,8 @@ class questionsdisplay implements renderable, templatable {
      */
     public function __construct() {
         $this->catcontextid = optional_param('contextid', 0, PARAM_INT);
-        $this->subscales = optional_param('subscales', 0, PARAM_INT);
+        $this->scale = optional_param('scale', 0, PARAM_INT);
+        $this->usesubs = optional_param('usesubs', 0, PARAM_INT);
 
     }
 
@@ -91,7 +92,7 @@ class questionsdisplay implements renderable, templatable {
      */
     private function render_subscaleselector()
     {
-        if ($this->subscales !== 1) {
+        if ($this->usesubs !== 1) {
             return "";
         }
         $ajaxformdata = empty($this->catcontextid) ? [] : ['contextid' => $this->catcontextid];
@@ -112,7 +113,7 @@ class questionsdisplay implements renderable, templatable {
     private function render_subscale_checkbox()
     {
         $checked = "";
-        if ($this->subscales == 1) {
+        if ($this->usesubs == 1) {
             $checked = "checked";
         }
         $checkboxarray = [
