@@ -755,4 +755,27 @@ class catquiz {
         ];
         return [$sql, $params];
     }
+    /** Returns the number of test items in a CAT scale
+     *
+     * @param array $catscaleids
+     * @return array
+     *
+     */
+
+    public static function get_sql_for_scales_and_subscales(array $catscaleids) {
+        global $DB;
+        $select = "*";
+        $from = "{local_catquiz_catscales}";
+
+        $params = [];
+
+        [$insql, $inparams] = $DB->get_in_or_equal($catscaleids, SQL_PARAMS_NAMED);
+
+        $where = ' parentid '. $insql;
+        $params = array_merge($params, $inparams);
+        $filter = '';
+
+        return [$select, $from, $where, $filter, $params];
+
+    }
 }
