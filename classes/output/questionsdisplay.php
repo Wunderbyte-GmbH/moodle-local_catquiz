@@ -49,12 +49,17 @@ class questionsdisplay implements renderable, templatable {
     /**
      * @var integer
      */
-    private int $catcontextid = 0;
+    private int $catcontextid = 0; // Selected context.
 
     /**
      * @var integer
      */
-    private int $subscales = 0; // If subscales should be integrated in question display, value is 1.
+    private int $scale = 0; // The selected scale.
+
+    /**
+     * @var integer
+     */
+    private int $usesubs = 0; // If subscales should be integrated in question display, value is 1.
 
     /**
      *
@@ -92,14 +97,14 @@ class questionsdisplay implements renderable, templatable {
      */
     private function render_scaleselector()
     {
-        $scaleid = empty($this->scale) ? -1 : $this->scale;
+        $scaleid = empty($this->scale) ? -1 : ['scale' => $this->scale];
 
         $customdata = [
             'type' => 'scale',
             'label' => get_string('selectcatscale', 'local_catquiz'),
         ];
 
-        $form = new \local_catquiz\form\scaleselector(null, $customdata, 'post', '', [], true, []);
+        $form = new \local_catquiz\form\scaleselector(null, $customdata, 'post', '', [], true, $scaleid);
         // Set the form data with the same method that is called when loaded from JS. It should correctly set the data for the supplied arguments.
         $form->set_data_for_dynamic_submission();
         // Render the form in a specific container, there should be nothing else in the same container.
