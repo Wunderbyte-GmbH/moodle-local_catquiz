@@ -32,7 +32,7 @@ namespace local_catquiz\output;
 
 use html_writer;
 use local_catquiz\catquiz;
-use local_catquiz\table\testenvironments_table;
+use local_catquiz\table\testitems_table;
 use moodle_url;
 use templatable;
 use renderable;
@@ -59,6 +59,11 @@ class questionsdisplay implements renderable, templatable {
     /**
      * @var integer
      */
+    private int $tablescale = 0; // Scale used for tabledisplay. Can be scale or subscale.
+
+    /**
+     * @var integer
+     */
     private int $usesubs = 0; // If subscales should be integrated in question display, value is 1.
 
     /**
@@ -69,6 +74,8 @@ class questionsdisplay implements renderable, templatable {
         $this->catcontextid = optional_param('contextid', 0, PARAM_INT);
         $this->scale = optional_param('scale', -1, PARAM_INT);
         $this->usesubs = optional_param('usesubs', 0, PARAM_INT);
+
+        $this->tablescale = $this->scale; // TODO check if subscales are selected an write into tablescale.
     }
 
     /**
@@ -155,90 +162,52 @@ class questionsdisplay implements renderable, templatable {
 
 
     /**
-     * @param int? catscaleid If given, only return test environments that use the given cat scale
+     *
      */
-    public function testenvironmenttable($catscaleid = null) {
+    public function renderquestionstable() {
+        $this->tablescale = 1;
 
-        $table = new testenvironments_table('testenvironmentstable');
+        $table = new testitems_table('questionstable', $this->tablescale, $this->catcontextid);
 
-        list($select, $from, $where, $filter, $params) = $this->catcontextid
-        ? catquiz::return_sql_for_testenvironments("catscaleid=$this->catcontextid")
-        : catquiz::return_sql_for_testenvironments();
+        list($select, $from, $where, $filter, $params) = catquiz::return_sql_for_catscalequestions([$this->tablescale], $this->catcontextid, [], []);
 
         $table->set_filter_sql($select, $from, $where, $filter, $params);
 
-        $table->define_columns([
-            'name',
-            'component',
-            'visible',
-            'availability',
-            'lang',
-            'status',
-            'parentid',
-            'timemodified',
-            'timecreated',
-            'action',
-            'catscaleid',
-            'fullname',
-            'numberofitems',
-            //'numberofusers',
-            'teachers',
-        ]);
-        $table->define_headers([
-            get_string('name', 'core'),
-            get_string('component', 'local_catquiz'),
-            get_string('visible', 'core'),
-            get_string('availability', 'core'),
-            get_string('lang', 'local_catquiz'),
-            get_string('status'),
-            get_string('parentid', 'local_catquiz'),
-            get_string('timemodified', 'local_catquiz'),
-            get_string('timecreated'),
-            get_string('action', 'core'),
-            get_string('catscaleid', 'local_catquiz'),
-            get_string('course', 'core'),
-            get_string('numberofquestions', 'local_catquiz'),
-            get_string('numberofusers', 'local_catquiz'),
-            get_string('teachers', 'core'),
-        ]);
+        $columnsarray = [
+            'idnumber' => get_string('label', 'local_catquiz'),
+            'questiontext' => get_string('questiontext', 'local_catquiz'),
+            'qtype' => get_string('questiontype', 'local_catquiz'),
+            'categoryname' => get_string('questioncategories', 'local_catquiz'),
+            'model' => get_string('model', 'local_catquiz'),
+            'difficulty' => get_string('difficulty', 'local_catquiz'),
+            'lastattempttime' => get_string('lastattempttime', 'local_catquiz'),
+            'attempts' => get_string('questioncontextattempts', 'local_catquiz'),
+            'action' => get_string('action', 'local_catquiz'),
+        ];
 
-        $table->define_filtercolumns(
-            ['name' => [
-                'localizedname' => get_string('name', 'core')
-            ], 'component' => [
-                'localizedname' => get_string('component', 'local_catquiz'),
-            ], 'visible' => [
-                'localizedname' => get_string('visible', 'core'),
-                '1' => get_string('visible', 'core'),
-                '0' => get_string('invisible', 'local_catquiz'),
-            ], 'status' => [
-                'localizedname' => get_string('status'),
-                '2' => get_string('force', 'local_catquiz'),
-                '1' => get_string('active', 'core'),
-                '0' => get_string('inactive', 'core'),
-            ], 'lang' => [
-                'localizedname' => get_string('lang', 'local_catquiz'),
-            ]
-        ]);
-        $table->define_fulltextsearchcolumns(['name', 'component', 'description']);
-        $table->define_sortablecolumns([
-            'name',
-            'component',
-            'visible',
-            'availability',
-            'lang',
-            'status',
-            'parentid',
-            'timemodified',
-            'timecreated',
-            'action',
-            'course',
-        ]);
+        $table->define_columns(array_keys($columnsarray));
+        $table->define_headers(array_values($columnsarray));
 
-        // $table->tabletemplate = 'local_wunderbyte_table/twtable_list';
-        $table->define_cache('local_catquiz', 'testenvironments');
+        /*
+        $table->define_filtercolumns(['categoryname' => [
+            'localizedname' => get_string('questioncategories', 'local_catquiz'),
+        ], 'qtype' => [
+            'localizedname' => get_string('questiontype', 'local_catquiz'),
+            'truefalse' => get_string('pluginname', 'qtype_truefalse'),
+            'ddimageortext' => get_string('pluginname', 'qtype_ddimageortext'),
+            'essay' => get_string('pluginname', 'qtype_essay'),
+            'gapselect' => get_string('pluginname', 'qtype_gapselect'),
+            'multianswer' => get_string('pluginname', 'qtype_multianswer'),
+            'multichoice' => get_string('pluginname', 'qtype_multichoice'),
+            'numerical' => get_string('pluginname', 'qtype_numerical'),
+            'shortanswer' => get_string('pluginname', 'qtype_shortanswer'),
+        ]]);
+        $table->define_fulltextsearchcolumns(['idnumber', 'name', 'questiontext', 'qtype', 'model']);
+        $table->define_sortablecolumns(array_keys($columnsarray));
+        */
 
-        // $table->addcheckboxes = true;
+        $table->tabletemplate = 'local_wunderbyte_table/twtable_list';
+        $table->define_cache('local_catquiz', 'testitemstable');
 
         $table->pageable(true);
 
@@ -246,22 +215,11 @@ class questionsdisplay implements renderable, templatable {
         $table->showcountlabel = true;
         $table->showdownloadbutton = true;
         $table->showreloadbutton = true;
+        $table->showrowcountselect = true;
+
+        $table->filteronloadinactive = true;
 
         return $table->outhtml(10, true);
-    }
-
-    /**
-     * We use this function to get only the array, without having to pass on the render base.
-     *
-     * @return array
-     */
-    public function return_array() {
-        $url = new moodle_url('/local/catquiz/manage_catscales.php');
-
-        return [
-            'returnurl' => $url->out(),
-            'table' => $this->testenvironmenttable(),
-        ];
     }
 
     /**
@@ -275,6 +233,7 @@ class questionsdisplay implements renderable, templatable {
             'scaleselector' => empty($this->render_scaleselector()) ? "" : $this->render_scaleselector(),
             'subscaleselector' => empty($this->render_subscaleselector()) ? "" : $this->render_subscaleselector(),
             'checkbox' => $this->render_subscale_checkbox(),
+            'table' => empty($this->renderquestionstable()) ? "" : $this->renderquestionstable(),
         ];
 
         return $data;
