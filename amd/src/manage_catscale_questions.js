@@ -22,8 +22,9 @@
 import DynamicForm from 'core_form/dynamicform';
 
 const SELECTORS = {
-    FORMCONTAINER: '#select_context_form',
+    CONTEXTFORM: '#select_context_form',
     CHECKBOX: 'input.integrate-subscales-checkbox',
+    SCALEFORM: '#select_scale_form',
 };
 
 
@@ -46,35 +47,54 @@ export const init = () => {
         }
     });
 
-    // Add event listener to select and set URL params.
-    // Initialize the form - pass the container element and the form class name.
-    const dynamicForm = new DynamicForm(document.querySelector(
-        SELECTORS.FORMCONTAINER),
-        'local_catquiz\\form\\contextselector'
-    );
-    // If a user selects a context, redirect to a URL that includes the selected
-    // context as `contextid` query parameter
-    dynamicForm.addEventListener(dynamicForm.events.FORM_SUBMITTED, (e) => {
-        e.preventDefault();
-        const response = e.detail;
-        if (!response.contextid) {
-            return;
-        }
-        let searchParams = new URLSearchParams(window.location.search);
-        searchParams.set("contextid", response.contextid);
-        window.location.search = searchParams.toString();
-    });
+    // Context: Add event listener to select and set URL params.
+    listenToSelect(SELECTORS.CONTEXTFORM, 'local_catquiz\\form\\contextselector', "contextid");
+    listenToSelect(SELECTORS.SCALEFORM, 'local_catquiz\\form\\scaleselector', "scale");
 
-    // If a user selects a cat context, submit the form without waiting for the
-    // user to click the submit button
-    dynamicForm.addEventListener('change', (e) => {
-        e.preventDefault();
-
-        // We have to wait a little bit so that the data are included in the submit
-        // request
-        setTimeout(() => {
-            dynamicForm.submitFormAjax();
-        }, 500);
-    });
 
 };
+/**
+ * Set an eventlistener for a select.
+ *  @param {string} id
+ *  @param {string} location
+ *  @param {string} paramname
+ *
+ */
+function listenToSelect(id, location, paramname) {
+        // Initialize the form - pass the container element and the form class name.
+        const dynamicForm = new DynamicForm(document.querySelector(
+            id),
+            location
+        );
+        // If a user selects a context, redirect to a URL that includes the selected
+        // context as `contextid` query parameter
+        dynamicForm.addEventListener(dynamicForm.events.FORM_SUBMITTED, (e) => {
+            e.preventDefault();
+
+            const response = e.detail;
+
+            let searchParams = new URLSearchParams(window.location.search);
+            if (typeof response === 'object' && response !== null) {
+                searchParams.set(Object.keys(response)[0], Object.values(response)[0]);
+            } else {
+                if (!response.contextid) {
+                    return;
+                }
+                searchParams.set(paramname, response.contextid);
+            }
+            window.location.search = searchParams.toString();
+        });
+
+        // If a user selects a cat context, submit the form without waiting for the
+        // user to click the submit button
+        dynamicForm.addEventListener('change', (e) => {
+            e.preventDefault();
+
+            // We have to wait a little bit so that the data are included in the submit
+            // request
+            setTimeout(() => {
+                dynamicForm.submitFormAjax();
+            }, 500);
+        });
+
+}
