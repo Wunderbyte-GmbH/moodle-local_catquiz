@@ -32,7 +32,7 @@ namespace local_catquiz\output;
 
 use html_writer;
 use local_catquiz\catquiz;
-use local_catquiz\table\testitems_table;
+use local_catquiz\table\catscalequestions_table;
 use moodle_url;
 use templatable;
 use renderable;
@@ -165,9 +165,8 @@ class questionsdisplay implements renderable, templatable {
      *
      */
     public function renderquestionstable() {
-        $this->tablescale = 1;
 
-        $table = new testitems_table('questionstable', $this->tablescale, $this->catcontextid);
+        $table = new catscalequestions_table('questionstable', $this->tablescale, $this->catcontextid);
 
         list($select, $from, $where, $filter, $params) = catquiz::return_sql_for_catscalequestions([$this->tablescale], $this->catcontextid, [], []);
 
