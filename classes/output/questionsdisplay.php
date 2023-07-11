@@ -67,6 +67,11 @@ class questionsdisplay implements renderable, templatable {
     private int $usesubs = 0; // If subscales should be integrated in question display, value is 1.
 
     /**
+     * @var integer
+     */
+    private int $numberofrecords = 0; // Records found in table query.
+
+    /**
      *
      * @return void
      */
@@ -88,7 +93,8 @@ class questionsdisplay implements renderable, templatable {
 
         $customdata = [
             "hideheader" => true,
-            "hidelabel" => true,
+            "hidelabel" => false,
+            "labeltext" => get_string('versionchosen', 'local_catquiz'),
         ];
 
         $form = new \local_catquiz\form\contextselector(null, $customdata, 'post', '', [], true, $ajaxformdata);
@@ -187,38 +193,41 @@ class questionsdisplay implements renderable, templatable {
         $table->define_columns(array_keys($columnsarray));
         $table->define_headers(array_values($columnsarray));
 
-        /*
-        $table->define_filtercolumns(['categoryname' => [
-            'localizedname' => get_string('questioncategories', 'local_catquiz'),
-        ], 'qtype' => [
-            'localizedname' => get_string('questiontype', 'local_catquiz'),
-            'truefalse' => get_string('pluginname', 'qtype_truefalse'),
-            'ddimageortext' => get_string('pluginname', 'qtype_ddimageortext'),
-            'essay' => get_string('pluginname', 'qtype_essay'),
-            'gapselect' => get_string('pluginname', 'qtype_gapselect'),
-            'multianswer' => get_string('pluginname', 'qtype_multianswer'),
-            'multichoice' => get_string('pluginname', 'qtype_multichoice'),
-            'numerical' => get_string('pluginname', 'qtype_numerical'),
-            'shortanswer' => get_string('pluginname', 'qtype_shortanswer'),
-        ]]);
-        $table->define_fulltextsearchcolumns(['idnumber', 'name', 'questiontext', 'qtype', 'model']);
-        $table->define_sortablecolumns(array_keys($columnsarray));
-        */
-
         $table->tabletemplate = 'local_wunderbyte_table/twtable_list';
         $table->define_cache('local_catquiz', 'testitemstable');
 
         $table->pageable(true);
 
-        $table->stickyheader = false;
+        $table->infinitescroll = 7;
+        $table->stickyheader = true;
         $table->showcountlabel = true;
-        $table->showdownloadbutton = true;
-        $table->showreloadbutton = true;
+        $table->showdownloadbutton = false;
+        $table->showreloadbutton = false;
         $table->showrowcountselect = true;
 
         $table->filteronloadinactive = true;
 
-        return $table->outhtml(10, true);
+        $output = $table->outhtml(10, true);
+        $this->numberofrecords = $table->return_records_count()[0];
+        if ($this->numberofrecords > 0) { //Only if the table contains records, we will return it.
+            return $output;
+        } else {
+            return null;
+        }
+    }
+    /**
+     * When there is no table to display, return the right message.
+     * @return string
+     */
+    private function get_no_table_string() {
+        if ($this->scale == 0) {
+            return get_string('noscaleselected', 'local_catquiz');
+        } else if ($this->numberofrecords == 0) {
+            return get_string('norecordsfound', 'local_catquiz');
+        } else {
+            return "";
+        }
+
     }
 
     /**
@@ -232,7 +241,7 @@ class questionsdisplay implements renderable, templatable {
             'scaleselector' => empty($this->render_scaleselector()) ? "" : $this->render_scaleselector(),
             'subscaleselector' => empty($this->render_subscaleselector()) ? "" : $this->render_subscaleselector(),
             'checkbox' => $this->render_subscale_checkbox(),
-            'table' => empty($this->renderquestionstable()) ? "" : $this->renderquestionstable(),
+            'table' => empty($this->renderquestionstable()) ? $this->get_no_table_string() : $this->renderquestionstable(),
         ];
 
         return $data;
