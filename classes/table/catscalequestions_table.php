@@ -140,23 +140,23 @@ class catscalequestions_table extends wunderbyte_table {
     public function col_maxstatus($values) {
         global $OUTPUT;
 
-        $icon = "";
+        $color = "";
 
         switch ($values->maxstatus) {
             case 5:
-                $icon = '<i class="fa fa-circle" style="color:green;"></i>';
+                $color = 'green';
                 break;
             case 1:
-                $icon = '<i class="fa fa-circle" style="color:orange;"></i>';
+                $color = 'orange';
                 break;
             case 0:
-                $icon = '<i class="fa fa-circle" style="color:red;"></i>';
+                $color = 'red';
                 break;
             case -5:
                 // This applies when status is not set.
                 break;
         }
-        return $icon;
+        return sprintf('<i class="fa fa-circle" style="color:%s;"></i>', $color);
     }
 
 
