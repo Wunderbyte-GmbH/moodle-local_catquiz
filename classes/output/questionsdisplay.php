@@ -171,10 +171,11 @@ class questionsdisplay implements renderable, templatable {
      *
      */
     public function renderquestionstable() {
+        $catcontext = empty($this->catcontextid) ? catquiz::get_default_context_id() : $this->catcontextid; // If no context is set, get default context from DB.
 
-        $table = new catscalequestions_table('questionstable', $this->tablescale, $this->catcontextid);
+        $table = new catscalequestions_table('questionstable', $this->tablescale, $catcontext);
 
-        list($select, $from, $where, $filter, $params) = catquiz::return_sql_for_catscalequestions([$this->tablescale], $this->catcontextid, [], []);
+        list($select, $from, $where, $filter, $params) = catquiz::return_sql_for_catscalequestions([$this->tablescale], $catcontext, [], []);
 
         $table->set_filter_sql($select, $from, $where, $filter, $params);
 
