@@ -136,13 +136,7 @@ class catquiz {
 
         global $DB;
         if ($contextid === 0) {
-            $default_context = $DB->get_record_sql(
-                'SELECT id FROM {local_catquiz_catcontext} WHERE '.$DB->sql_like('json', ':default'),
-                [
-                    'default' => '%"default":true%',
-                ]
-            );
-            $contextid = $default_context->id;
+            $contextid = self::get_default_context_id();;
         }
 
         // Start the params array.
@@ -778,4 +772,27 @@ class catquiz {
         return [$select, $from, $where, $filter, $params];
 
     }
+
+    /**
+     * Returns the default context id from DB.
+     *
+     * @return int
+     */
+
+     public static function get_default_context_id() {
+        global $DB;
+        $contextid = $DB->get_field_sql(
+            "SELECT id FROM {local_catquiz_catcontext} WHERE " . $DB->sql_like(
+                'json',
+                ":default"
+            ),
+            [
+                'default' => '%"default":true%',
+            ],
+            MUST_EXIST
+        );
+
+        return intval($contextid);
+    }
+
 }
