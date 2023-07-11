@@ -18,18 +18,6 @@ final class lasttimeplayedpenalty extends item_score_modifier implements wb_midd
             return $q;
         }, $context['questions']);
 
-        $context['questions'] = array_filter(
-            $context['questions'],
-            function ($q) use ($context) {
-                return $q->{self::PROPERTYNAME} < $context['penalty_threshold']
-                ;
-            }
-        );
-
-        if (empty($context['questions'])) {
-            return result::err(status::ERROR_NO_REMAINING_QUESTIONS);
-        }
-
         return $next($context);
     }
 
