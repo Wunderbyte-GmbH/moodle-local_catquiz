@@ -26,6 +26,7 @@ require_once($CFG->dirroot . '/question/engine/lib.php');
 use html_writer;
 use local_catquiz\catscale;
 use local_wunderbyte_table\wunderbyte_table;
+use context_system;
 use moodle_url;
 
 /**
@@ -112,7 +113,23 @@ class catscalequestions_table extends wunderbyte_table {
                 ],
             ];
 
-        return $OUTPUT->render_from_template('local_wunderbyte_table/component_actionbutton', $data);;
+        return $OUTPUT->render_from_template('local_wunderbyte_table/component_actionbutton', $data);
+    }
+
+    /**
+     * Return value for lastattempttime column.
+     *
+     * @param stdClass $values
+     * @return string
+     */
+    public function col_lastattempttime($values) {
+
+        if (intval($values->lastattempttime) === 0) {
+            return get_string('notyetcalculated', 'local_catquiz');
+        }
+        return userdate($values->lastattempttime);
+    }
+
     /**
      * Return symbols for status column.
      *
@@ -141,5 +158,43 @@ class catscalequestions_table extends wunderbyte_table {
         return $icon;
     }
 
+
+    /**
+     * Overrides the output for this column.
+     * @param object $values
+     */
+    public function col_questiontext($values) {
+
+        global $OUTPUT;
+
+        //try {
+        //    $question = question_bank::load_question($values->id);
+        //} catch (Exception $e) {
+        //    return $values->questiontext;
+        //}
+
+        $context = context_system::instance();
+
+        $questiontext = question_rewrite_question_urls(
+            $values->questiontext,
+            'pluginfile.php',
+            $context->id,
+            'question',
+            'questiontext',
+            [],
+            $values->id);
+
+        $fulltext = format_text($questiontext);
+        $questiontext = strip_tags($fulltext);
+        $shorttext = substr($questiontext, 0, 30);
+        $shorttext .= strlen($shorttext) < strlen($questiontext) ? '...' : '';
+
+        $data = [
+            'shorttext' => $shorttext,
+            'fulltext' => $fulltext,
+            'id' => $values->id,
+        ];
+
+        return $OUTPUT->render_from_template('local_catquiz/modals/modal_questionpreview', $data);
     }
 }
