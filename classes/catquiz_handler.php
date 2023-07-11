@@ -449,9 +449,10 @@ class catquiz_handler {
      * This is called by adaptive quiz
      * @param int $cmid // Cmid of quiz instance.
      * @param string $component // like mod_adaptivequiz
+     * @param stdClass $attemptdata
      * @return array
      */
-    public static function fetch_question_id(int $cmid, string $component): array {
+    public static function fetch_question_id(int $cmid, string $component, stdClass $attemptdata): array {
 
         $data = (object)['componentid' => $cmid, 'component' => $component];
 
@@ -466,7 +467,7 @@ class catquiz_handler {
             ->set_catcontextid($quizsettings->catquiz_catcontext)
             ;
 
-        $selectioncontext = self::get_strategy_selectcontext($quizsettings);
+        $selectioncontext = self::get_strategy_selectcontext($quizsettings, $attemptdata);
         $result = $teststrategy->return_next_testitem($selectioncontext);
         if (!$result->isOk()) {
             return [0, $result->getErrorMessage()];
@@ -478,12 +479,12 @@ class catquiz_handler {
 
     /**
      * Purges the questions cache
-     * 
-     * @param int $contextid 
-     * @param bool $includesubscales 
-     * @return bool Indicates whether the operation was successful 
-     * @throws coding_exception 
-     * @throws cache_exception 
+     *
+     * @param int $contextid
+     * @param bool $includesubscales
+     * @return bool Indicates whether the operation was successful
+     * @throws coding_exception
+     * @throws cache_exception
      */
     public static function purge_attemptquestions_cache(int $componentid, string $componentname, bool $includesubscales = false): bool {
         $testenvironment = new testenvironment(
@@ -496,13 +497,29 @@ class catquiz_handler {
     }
 
     /**
+     * Purges the played-questions cache that keeps track of questions played during active attempt
+     *
+     * @param int $contextid
+     * @return bool Indicates whether the operation was successful
+     * @throws coding_exception
+     * @throws cache_exception
+     */
+    public static function purge_playedquestions_cache(): bool {
+        $cache = cache::make('local_catquiz', 'playedquestions');
+        return $cache->delete('playedquestions');
+    }
+
+    /**
      * Gets data required by the item_score_modifier middleware classes.
-     * 
+     *
      * Don't confuse with the context from local_catquiz_catcontext table.
      * This context contains data that are required by the item_score_modifier
      * middleware classes.
+     *
+     * @param stdClass $quizsettings
+     * @param stdClass $attemptdata
      */
-    private static function get_strategy_selectcontext($quizsettings) {
+    private static function get_strategy_selectcontext(stdClass $quizsettings, stdClass $attemptdata) {
         $contextcreator = info::get_contextcreator();
         $initialcontext = [
             'contextid' => intval($quizsettings->catquiz_catcontext),
@@ -511,6 +528,7 @@ class catquiz_handler {
             // When selecting questions from a scale, also include questions from its subscales.
             // This option is required by the questions_loader context loader.
             'includesubscales' => true,
+            'maximumquestions' => intval($quizsettings->maximumquestions),
             'penalty_threshold' => 60 * 60 * 24 * 30 - 90, // TODO: make dynamic
             /*
                  * After this time, the penalty for a question goes back to 0
@@ -518,6 +536,7 @@ class catquiz_handler {
                  */
             'penalty_time_range' => 60 * 60 * 24 * 30,
             'pilot_ratio' => floatval($quizsettings->catquiz_pilotratio),
+            'questionsattempted' => intval($attemptdata->questionsattempted),
         ];
         return $contextcreator->load(
             [

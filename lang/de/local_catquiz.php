@@ -260,3 +260,4 @@ $string['checklinking'] = 'Linking prüfen';
 // CAT Quiz handler
 $string['noremainingquestions'] = "Keine weiteren Fragen";
 $string['errorfetchnextquestion'] = "Es trat ein Fehler bei der Auswahl der nächsten Frage auf.";
+$string['reachedmaximumquestions'] = "Die Maximalanzahl an Testfragen wurde erreicht";

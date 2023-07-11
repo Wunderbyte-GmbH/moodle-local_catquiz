@@ -113,7 +113,7 @@ abstract class strategy {
         // Keep track of which question was selected
         $cache = cache::make('local_catquiz', 'playedquestions');
         $playedquestions = $cache->get('playedquestions') ?? [];
-        $playedquestions[] = $selected_question;
+        $playedquestions[$selected_question->id] = $selected_question;
         $cache->set('playedquestions', $playedquestions);
 
         catscale::update_testitem(

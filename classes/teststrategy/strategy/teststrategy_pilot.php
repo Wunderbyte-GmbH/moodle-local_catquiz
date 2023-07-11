@@ -28,6 +28,7 @@ class teststrategy_pilot extends strategy {
 
     public function requires_score_modifiers(): array {
         return [
+            'maximumquestionscheck',
             'noremainingquestions',
             'ispilot',
             'strategyrandom',

@@ -14,4 +14,5 @@ class status
     const ERROR_NO_REMAINING_QUESTIONS = 'noremainingquestions';
     const ERROR_TESTITEM_ALREADY_IN_RELATED_SCALE = 'testiteminrelatedscale';
     const ERROR_FETCH_NEXT_QUESTION = 'errorfetchnextquestion';
+    const ERROR_REACHED_MAXIMUM_QUESTIONS = 'reachedmaximumquestions';
 }
