@@ -66,9 +66,10 @@ class catscalequestions_table extends wunderbyte_table {
     public function col_action($values) {
         global $OUTPUT;
 
-        $url = new moodle_url('/local/catquiz/show_student.php', [ // TODO set link here
+        $url = new moodle_url('edit_testitem.php', [
             'id' => $values->id,
             'catscaleid' => $this->catscaleid ?? 0,
+            'component' => $values->component, // Set fallback to "question"?
             'contextid' => $this->contextid,
         ]);
 
