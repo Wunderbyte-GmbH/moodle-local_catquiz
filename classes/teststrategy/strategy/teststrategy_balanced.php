@@ -35,6 +35,7 @@ class teststrategy_balanced extends strategy {
             'noremainingquestions',
             'lasttimeplayedpenalty',
             'numberofgeneralattempts',
+            'playedincurrentattempt',
             'strategybalancedscore',
         ];
     }

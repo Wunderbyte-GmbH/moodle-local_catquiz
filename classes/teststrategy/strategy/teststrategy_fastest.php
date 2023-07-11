@@ -36,6 +36,7 @@ class teststrategy_fastest extends strategy {
             'lasttimeplayedpenalty',
             'numberofgeneralattempts',
             'fisherinformation',
+            'playedincurrentattempt',
             'strategyfastestscore',
         ];
     }
