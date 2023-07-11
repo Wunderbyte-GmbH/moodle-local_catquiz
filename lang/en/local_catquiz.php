@@ -247,9 +247,11 @@ $string['healthstatus'] = "Health status";
 $string['catmanagernumberofsubscales'] = "Number of subscales";
 $string['catmanagernumberofquestions'] = "Number of questions";
 $string['integratequestions'] = "Integrate questions from subscales";
-$string['nocatscale'] = "No CAT scale selected";
+$string['noscaleselected'] = "No scale selected";
+$string['norecordsfound'] = "There are no questions in this scale";
 $string['selectsubscale'] = "Select a subscale";
 $string['selectcatscale'] = "Scale:";
+$string['versionchosen'] = 'Version chosen:';
 
 // CAT Quiz handler
 $string['noremainingquestions'] = "You ran out of questions";
