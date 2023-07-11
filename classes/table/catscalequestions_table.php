@@ -113,5 +113,33 @@ class catscalequestions_table extends wunderbyte_table {
             ];
 
         return $OUTPUT->render_from_template('local_wunderbyte_table/component_actionbutton', $data);;
+    /**
+     * Return symbols for status column.
+     *
+     * @param stdClass $values
+     * @return string
+     */
+    public function col_maxstatus($values) {
+        global $OUTPUT;
+
+        $icon = "";
+
+        switch ($values->maxstatus) {
+            case 5:
+                $icon = '<i class="fa fa-circle" style="color:green;"></i>';
+                break;
+            case 1:
+                $icon = '<i class="fa fa-circle" style="color:orange;"></i>';
+                break;
+            case 0:
+                $icon = '<i class="fa fa-circle" style="color:red;"></i>';
+                break;
+            case -5:
+                // This applies when status is not set.
+                break;
+        }
+        return $icon;
+    }
+
     }
 }
