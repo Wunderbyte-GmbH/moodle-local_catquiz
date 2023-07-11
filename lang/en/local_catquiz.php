@@ -265,3 +265,4 @@ $string['checklinking'] = 'Check linking';
 $string['noremainingquestions'] = "You ran out of questions";
 $string['errorfetchnextquestion'] = "There was an error while selecting the next question";
 $string['reachedmaximumquestions'] = "Reached maximum number of questions";
+$string['error'] = "An error occured";

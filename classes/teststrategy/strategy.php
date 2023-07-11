@@ -107,6 +107,10 @@ abstract class strategy {
         }
 
         $selected_question = $result->unwrap();
+        if (!$selected_question) {
+            return result::err();
+        }
+
         $selected_question->lastattempttime = $now;
         $selected_question->userlastattempttime = $now;
 
