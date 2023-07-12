@@ -159,12 +159,54 @@ class catscalequestions_table extends wunderbyte_table {
         return sprintf('<i class="fa fa-circle" style="color:%s;"></i>', $color);
     }
 
+    /**
+     * Return strings for column type.
+     *
+     * @param stdClass $values
+     * @return string
+     */
+    public function col_qtype($values) {
+        global $OUTPUT;
+
+        $type = $values->qtype;
+
+        switch ($values->qtype) {
+            case "multichoice":
+                $type = 'MC';
+                break;
+            case "pmatch":
+                $type = 'PMTC';
+                break;
+            case "match":
+                $type = 'MTC';
+                break;
+            case "truefalse":
+                $type = 'TF';
+                break;
+            case "ddwtos":
+                $type = 'DDWT';
+                break;
+            case "ordering":
+                $type = 'ORD';
+                break;
+            case "ddimageortext":
+                $type = 'IOT';
+                break;
+            case "numerical":
+                $type = 'NUM';
+                break;
+            default:
+                break;
+        }
+        return $type;
+    }
+
 
     /**
      * Overrides the output for this column.
      * @param object $values
      */
-    public function col_questiontext($values) {
+    public function col_name($values) {
 
         global $OUTPUT;
 

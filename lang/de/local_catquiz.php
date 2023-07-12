@@ -248,6 +248,11 @@ $string['norecordsfound'] = "Keine Fragen in dieser Skala gefunden.";
 $string['selectsubscale'] = "Subskala auswählen";
 $string['selectcatscale'] = "Skala:";
 $string['versionchosen'] = 'ausgewählte Versionierung:';
+$string['pleasechoose'] = 'bitte auswählen';
+
+// CAT Manager Questions Table
+$string['type'] = 'Typ';
+$string['attempts'] = 'Versuche';
 
 // CAT Quiz handler
 $string['noremainingquestions'] = "Keine weiteren Fragen";
