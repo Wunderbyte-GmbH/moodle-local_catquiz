@@ -253,6 +253,9 @@ $string['pleasechoose'] = 'bitte auswählen';
 // CAT Manager Questions Table
 $string['type'] = 'Typ';
 $string['attempts'] = 'Versuche';
+$string['addquestion'] = 'Frage aus Fragenkatalog hinzufügen';
+$string['addtest'] = 'Bestehenden Test hinzufügen';
+$string['checklinking'] = 'Linking prüfen';
 
 // CAT Quiz handler
 $string['noremainingquestions'] = "Keine weiteren Fragen";

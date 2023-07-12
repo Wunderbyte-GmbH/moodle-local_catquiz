@@ -257,6 +257,9 @@ $string['pleasechoose'] = 'please choose';
 // CAT Manager Questions Table
 $string['type'] = 'Type';
 $string['attempts'] = 'Attempts';
+$string['addquestion'] = 'Add question from catalogue';
+$string['addtest'] = 'Add existing test';
+$string['checklinking'] = 'Check linking';
 
 // CAT Quiz handler
 $string['noremainingquestions'] = "You ran out of questions";
