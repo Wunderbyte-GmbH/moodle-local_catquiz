@@ -180,28 +180,31 @@ class questionsdisplay implements renderable, templatable {
         $table->set_filter_sql($select, $from, $where, $filter, $params);
 
         $columnsarray = [
-            'idnumber' => get_string('label', 'local_catquiz'),
+            //'id' => get_string('id', 'core'), // TODO what is label?
             'maxstatus' => get_string('status', 'core'),
-            'questiontext' => get_string('questiontext', 'local_catquiz'),
-            'qtype' => get_string('questiontype', 'local_catquiz'),
-            'categoryname' => get_string('questioncategories', 'local_catquiz'),
+            'qtype' => get_string('type', 'local_catquiz'),
+            'name' => get_string('name', 'core'),
             'model' => get_string('model', 'local_catquiz'),
-            'difficulty' => get_string('difficulty', 'local_catquiz'),
+            'attempts' => get_string('attempts', 'local_catquiz'),
             'lastattempttime' => get_string('lastattempttime', 'local_catquiz'),
-            'attempts' => get_string('questioncontextattempts', 'local_catquiz'),
+            'difficulty' => get_string('difficulty', 'local_catquiz'),
             'action' => get_string('action', 'local_catquiz'),
         ];
 
         $table->define_columns(array_keys($columnsarray));
         $table->define_headers(array_values($columnsarray));
 
+        $sortcolumns = $columnsarray;
+        unset($sortcolumns['action']);
+        $table->define_sortablecolumns(array_keys($sortcolumns));
+
         $table->tabletemplate = 'local_wunderbyte_table/twtable_list';
         $table->define_cache('local_catquiz', 'testitemstable');
 
         $table->pageable(true);
 
-        $table->infinitescroll = 7;
-        $table->stickyheader = true;
+        //$table->infinitescroll = 7;
+        //$table->stickyheader = true;
         $table->showcountlabel = true;
         $table->showdownloadbutton = false;
         $table->showreloadbutton = false;
@@ -229,7 +232,6 @@ class questionsdisplay implements renderable, templatable {
         } else {
             return "";
         }
-
     }
 
     /**

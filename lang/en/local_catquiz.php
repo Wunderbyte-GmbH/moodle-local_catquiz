@@ -252,6 +252,11 @@ $string['norecordsfound'] = "There are no questions in this scale";
 $string['selectsubscale'] = "Select a subscale";
 $string['selectcatscale'] = "Scale:";
 $string['versionchosen'] = 'Version chosen:';
+$string['pleasechoose'] = 'please choose';
+
+// CAT Manager Questions Table
+$string['type'] = 'Type';
+$string['attempts'] = 'Attempts';
 
 // CAT Quiz handler
 $string['noremainingquestions'] = "You ran out of questions";
