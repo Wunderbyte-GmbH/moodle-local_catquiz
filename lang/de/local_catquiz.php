@@ -118,7 +118,7 @@ $string['noint'] = 'Bitte geben Sie eine Zahl ein';
 $string['notpositive'] = 'Bitte geben Sie eine positive Zahl ein';
 $string['strategy'] = 'Strategie';
 $string['max_iterations'] = 'Maximale Anzahl an Iterationen';
-$string['modal_override'] = 'Nur dieses Modell verwenden';
+$string['model_override'] = 'Nur dieses Modell verwenden';
 // Buttons.
 $string['subscribe'] = 'Abonniere';
 $string['subscribed'] = 'Abonniert';

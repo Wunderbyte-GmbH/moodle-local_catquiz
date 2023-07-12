@@ -115,7 +115,7 @@ $string['noint'] = 'Please enter an integer number';
 $string['notpositive'] = 'Please enter a positive number';
 $string['strategy'] = 'Strategy';
 $string['max_iterations'] = 'Maximum number of iterations';
-$string['modal_override'] = 'Only use this model';
+$string['model_override'] = 'Only use this model';
 
 $string['starttimestamp'] = 'Starttime';
 $string['endtimestamp'] = 'Endtime';
