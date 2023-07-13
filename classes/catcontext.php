@@ -306,7 +306,7 @@ class catcontext {
                 'description' => get_string('defaultcontextdescription', 'local_catquiz'),
                 'descriptionformat' => 1,
                 'starttimestamp' => 0,
-                'endtimestamp' => strtotime('+5 years'),
+                'endtimestamp' => PHP_INT_MAX,
                 'json' => json_encode($json),
             );
             $this->save_or_update($context);
