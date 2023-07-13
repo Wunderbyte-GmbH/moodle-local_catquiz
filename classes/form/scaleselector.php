@@ -70,6 +70,7 @@ class scaleselector extends dynamic_form {
 
         $contextsdb = $DB->get_records_sql($sql, $params);
         $contexts = [];
+        $contexts[-1] = get_string('pleasechoose', 'local_catquiz');
         foreach ($contextsdb as $contextid => $context) {
             $contexts[$contextid] = $context->name;
         }
