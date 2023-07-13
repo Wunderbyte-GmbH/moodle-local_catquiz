@@ -20,10 +20,9 @@ final class maybe_return_pilot extends item_score_modifier implements wb_middlew
             return $next($context);
         }
 
-        $rand = rand(0, 100);
-        if ($rand <= $context['pilot_ratio'] * 100) {
-            $selectedquestion = reset($pilot_questions);
-            return result::ok($selectedquestion);
+        $should_return_pilot = rand(0, 100) <= $context['pilot_ratio'] * 100;
+        if ($should_return_pilot) {
+            $context['questions'] = $pilot_questions;
         }
         return $next($context);
     }
