@@ -45,13 +45,15 @@ $contextid = optional_param('contextid', 0, PARAM_INT);
 $triggercalculation = optional_param('calculate', false, PARAM_BOOL);
 
 if (empty($contextid)) {
-    $contextid = $DB->get_field_sql("SELECT id FROM {local_catquiz_catcontext} WHERE " . $DB->sql_like(
-        'json',
-        ":default"
-    ),
-            [
-                'default' => '%"default":true%',
-            ]
+    $contextid = $DB->get_field_sql(
+        "SELECT id FROM {local_catquiz_catcontext} WHERE " . $DB->sql_like(
+            'json',
+            ":default"
+        ),
+        [
+            'default' => '%"default":true%',
+        ],
+        MUST_EXIST
     );
 }
 
