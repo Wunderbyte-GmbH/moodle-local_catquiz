@@ -3,11 +3,15 @@
 namespace local_catquiz\teststrategy\item_score_modifier;
 
 use local_catquiz\local\result;
-use local_catquiz\local\status;
 use local_catquiz\teststrategy\item_score_modifier;
 use local_catquiz\wb_middleware;
 
-final class ispilot extends item_score_modifier implements wb_middleware
+/**
+ * Randomly returns a pilot question according to the `pilot_ratio` parameter
+ * 
+ * @package local_catquiz\teststrategy\item_score_modifier
+ */
+final class maybe_return_pilot extends item_score_modifier implements wb_middleware
 {
     public function run(array $context, callable $next): result {
         $pilot_questions = array_filter($context['questions'], fn($q) => $q->is_pilot);
