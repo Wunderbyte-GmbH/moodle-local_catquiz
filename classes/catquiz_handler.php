@@ -480,7 +480,8 @@ class catquiz_handler {
     /**
      * Purges the questions cache
      *
-     * @param int $contextid
+     * @param int $componentid
+     * @param string $componentname
      * @param bool $includesubscales
      * @return bool Indicates whether the operation was successful
      * @throws coding_exception
@@ -499,7 +500,6 @@ class catquiz_handler {
     /**
      * Purges the played-questions cache that keeps track of questions played during active attempt
      *
-     * @param int $contextid
      * @return bool Indicates whether the operation was successful
      * @throws coding_exception
      * @throws cache_exception
