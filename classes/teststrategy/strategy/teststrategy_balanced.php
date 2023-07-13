@@ -16,6 +16,12 @@
 
 namespace local_catquiz\teststrategy\strategy;
 
+use local_catquiz\teststrategy\item_score_modifier\lasttimeplayedpenalty;
+use local_catquiz\teststrategy\item_score_modifier\maximumquestionscheck;
+use local_catquiz\teststrategy\item_score_modifier\noremainingquestions;
+use local_catquiz\teststrategy\item_score_modifier\numberofgeneralattempts;
+use local_catquiz\teststrategy\item_score_modifier\playedincurrentattempt;
+use local_catquiz\teststrategy\item_score_modifier\strategybalancedscore;
 use local_catquiz\teststrategy\strategy;
 
 /**
@@ -31,12 +37,12 @@ class teststrategy_balanced extends strategy {
 
     public function requires_score_modifiers(): array {
         return [
-            'maximumquestionscheck',
-            'noremainingquestions',
-            'lasttimeplayedpenalty',
-            'numberofgeneralattempts',
-            'playedincurrentattempt',
-            'strategybalancedscore',
+            maximumquestionscheck::class,
+            noremainingquestions::class,
+            lasttimeplayedpenalty::class,
+            numberofgeneralattempts::class,
+            playedincurrentattempt::class,
+            strategybalancedscore::class,
         ];
     }
 }

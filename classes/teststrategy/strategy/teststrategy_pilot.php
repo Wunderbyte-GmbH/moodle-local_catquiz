@@ -16,6 +16,10 @@
 
 namespace local_catquiz\teststrategy\strategy;
 
+use local_catquiz\teststrategy\item_score_modifier\ispilot;
+use local_catquiz\teststrategy\item_score_modifier\maximumquestionscheck;
+use local_catquiz\teststrategy\item_score_modifier\noremainingquestions;
+use local_catquiz\teststrategy\item_score_modifier\strategyrandom;
 use local_catquiz\teststrategy\strategy;
 
 class teststrategy_pilot extends strategy {
@@ -28,10 +32,10 @@ class teststrategy_pilot extends strategy {
 
     public function requires_score_modifiers(): array {
         return [
-            'maximumquestionscheck',
-            'noremainingquestions',
-            'ispilot',
-            'strategyrandom',
+            maximumquestionscheck::class,
+            noremainingquestions::class,
+            ispilot::class,
+            strategyrandom::class,
         ];
     }
 }

@@ -16,6 +16,13 @@
 
 namespace local_catquiz\teststrategy\strategy;
 
+use local_catquiz\teststrategy\item_score_modifier\fisherinformation;
+use local_catquiz\teststrategy\item_score_modifier\lasttimeplayedpenalty;
+use local_catquiz\teststrategy\item_score_modifier\maximumquestionscheck;
+use local_catquiz\teststrategy\item_score_modifier\noremainingquestions;
+use local_catquiz\teststrategy\item_score_modifier\numberofgeneralattempts;
+use local_catquiz\teststrategy\item_score_modifier\playedincurrentattempt;
+use local_catquiz\teststrategy\item_score_modifier\strategyfastestscore;
 use local_catquiz\teststrategy\strategy;
 
 /**
@@ -31,13 +38,13 @@ class teststrategy_fastest extends strategy {
 
     public function requires_score_modifiers(): array {
         return [
-            'maximumquestionscheck',
-            'noremainingquestions',
-            'lasttimeplayedpenalty',
-            'numberofgeneralattempts',
-            'fisherinformation',
-            'playedincurrentattempt',
-            'strategyfastestscore',
+            maximumquestionscheck::class,
+            noremainingquestions::class,
+            lasttimeplayedpenalty::class,
+            numberofgeneralattempts::class,
+            fisherinformation::class,
+            playedincurrentattempt::class,
+            strategyfastestscore::class,
         ];
     }
 }

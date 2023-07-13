@@ -139,8 +139,8 @@ class info {
             "local_catquiz",
             'teststrategy\item_score_modifier'
         );
-        foreach ($score_modifiers as $classname => $namespace) {
-            $instances[str_replace($namespace[0], "", $classname)] = new $classname();
+        foreach (array_keys($score_modifiers) as $classname) {
+            $instances[$classname] = new $classname();
         }
         return $instances;
     }
