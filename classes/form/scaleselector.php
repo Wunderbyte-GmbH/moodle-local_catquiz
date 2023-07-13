@@ -52,8 +52,6 @@ class scaleselector extends dynamic_form {
 
         $type = isset($customdata['type'])? $customdata['type'] : "scale"; //Type i.e. 'subscale'.
 
-
-        // $default = get_string('searchcatcontext', 'local_catquiz'); TODO default value
         if (isset($data->id)) {
             $mform->addElement('hidden', 'id', $data->id);
             $mform->setType('id', PARAM_INT);
@@ -77,7 +75,6 @@ class scaleselector extends dynamic_form {
         }
         $options = array(
             'multiple' => false,
-            //'noselectionstring' => $default,
             'class' => 'justify-content-end',
         );
 
@@ -88,7 +85,6 @@ class scaleselector extends dynamic_form {
         }
 
         $mform->addElement('select', $type, $label, $contexts, $options);
-        //$mform->setDefault('subscale', $default);
         $mform->disable_form_change_checker();
     }
 

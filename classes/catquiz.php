@@ -136,7 +136,7 @@ class catquiz {
 
         global $DB;
         if ($contextid === 0) {
-            $contextid = self::get_default_context_id();;
+            $contextid = self::get_default_context_id();
         }
 
         // Start the params array.

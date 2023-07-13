@@ -147,13 +147,13 @@ class catscalequestions_table extends wunderbyte_table {
                 $color = 'green';
                 break;
             case 1:
-                $color = 'orange';
+                $color = 'yellow';
                 break;
             case 0:
-                $color = 'red';
+                $color = 'orange';
                 break;
             case -5:
-                // This applies when status is not set.
+                $color = 'red';
                 break;
         }
         return sprintf('<i class="fa fa-circle" style="color:%s;"></i>', $color);
@@ -209,12 +209,6 @@ class catscalequestions_table extends wunderbyte_table {
     public function col_name($values) {
 
         global $OUTPUT;
-
-        //try {
-        //    $question = question_bank::load_question($values->id);
-        //} catch (Exception $e) {
-        //    return $values->questiontext;
-        //}
 
         $context = context_system::instance();
 
