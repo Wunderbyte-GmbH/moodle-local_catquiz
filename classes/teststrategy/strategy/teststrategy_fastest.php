@@ -21,7 +21,6 @@ use local_catquiz\teststrategy\item_score_modifier\lasttimeplayedpenalty;
 use local_catquiz\teststrategy\item_score_modifier\maximumquestionscheck;
 use local_catquiz\teststrategy\item_score_modifier\noremainingquestions;
 use local_catquiz\teststrategy\item_score_modifier\numberofgeneralattempts;
-use local_catquiz\teststrategy\item_score_modifier\playedincurrentattempt;
 use local_catquiz\teststrategy\item_score_modifier\strategyfastestscore;
 use local_catquiz\teststrategy\strategy;
 
@@ -43,7 +42,6 @@ class teststrategy_fastest extends strategy {
             lasttimeplayedpenalty::class,
             numberofgeneralattempts::class,
             fisherinformation::class,
-            playedincurrentattempt::class,
             strategyfastestscore::class,
         ];
     }

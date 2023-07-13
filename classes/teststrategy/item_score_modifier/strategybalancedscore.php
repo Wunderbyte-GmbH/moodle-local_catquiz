@@ -22,7 +22,6 @@ final class strategybalancedscore extends item_score_modifier implements wb_midd
             $numberofgeneralattemptspenalty_weighted = (1 - (
                 $question->{numberofgeneralattempts::PROPERTYNAME}/$context['generalnumberofattempts_max']));
             $question->score = $numberofgeneralattemptspenalty_weighted * $lasttimeplayedpenalty_weighted;
-            $question->score -= $question->{playedincurrentattempt::PROPERTYNAME};
         }
 
         uasort($context['questions'], function($q1, $q2) {

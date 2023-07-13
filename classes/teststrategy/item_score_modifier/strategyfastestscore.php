@@ -19,7 +19,6 @@ final class strategyfastestscore extends item_score_modifier implements wb_middl
         foreach ($context['questions'] as $question) {
             $question->score = (1 - (
                 $question->{lasttimeplayedpenalty::PROPERTYNAME}/$context['penalty_threshold'])) * $question->{fisherinformation::PROPERTYNAME};
-            $question->score -= $question->{playedincurrentattempt::PROPERTYNAME};
         }
 
         uasort($context['questions'], function($q1, $q2) {
