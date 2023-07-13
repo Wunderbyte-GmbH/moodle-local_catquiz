@@ -180,7 +180,7 @@ class questionsdisplay implements renderable, templatable {
         $table->set_filter_sql($select, $from, $where, $filter, $params);
 
         $columnsarray = [
-            //'id' => get_string('id', 'core'), // TODO what is label?
+            // TODO get Label
             'maxstatus' => get_string('status', 'core'),
             'qtype' => get_string('type', 'local_catquiz'),
             'name' => get_string('name', 'core'),
@@ -243,8 +243,6 @@ class questionsdisplay implements renderable, templatable {
 
         $table->pageable(true);
 
-        //$table->infinitescroll = 7;
-        //$table->stickyheader = true;
         $table->showcountlabel = true;
         $table->showdownloadbutton = false;
         $table->showreloadbutton = false;
