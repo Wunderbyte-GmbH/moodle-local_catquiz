@@ -27,6 +27,7 @@ use html_writer;
 use local_catquiz\catscale;
 use local_wunderbyte_table\wunderbyte_table;
 use context_system;
+use local_catquiz\catquiz;
 use moodle_url;
 
 /**
@@ -50,6 +51,10 @@ class catscalequestions_table extends wunderbyte_table {
     public function __construct(string $uniqueid, int $catscaleid = 0, int $contextid = 0) {
 
         $this->catscaleid = $catscaleid;
+
+        if (empty($contextid)) {
+            $contextid = catquiz::get_default_context_id();
+        }
         $this->contextid = $contextid;
 
         parent::__construct($uniqueid);
@@ -66,18 +71,17 @@ class catscalequestions_table extends wunderbyte_table {
     public function col_action($values) {
         global $OUTPUT;
 
-        $url = new moodle_url('edit_testitem.php', [
-            'id' => $values->id,
-            'catscaleid' => $this->catscaleid ?? 0,
-            'component' => $values->component, // Set fallback to "question"?
+        $url = new moodle_url('manage_catscales.php', [
+            'detail' => $values->id,
+            'scale' => $this->catscaleid ?? 0,
             'contextid' => $this->contextid,
-        ]);
+        ], 'questions');
 
         $data['showactionbuttons'][] = [
             //'label' => get_string('view', 'core'), // Name of your action button.
             'class' => 'btn btn-plain btn-smaller',
             'iclass' => 'fa fa-eye',
-            'href' => $url->out(false),
+            'href' => '#',
             'id' => $values->id,
             'methodname' => '', // The method needs to be added to your child of wunderbyte_table class.
             'data' => [ // Will be added eg as data-id = $values->id, so values can be transmitted to the method above.
@@ -89,7 +93,7 @@ class catscalequestions_table extends wunderbyte_table {
                 //'label' => get_string('delete', 'core'), // 'NoModal, SingleCall, NoSelection'
                 'class' => 'btn btn-plain btn-smaller',
                 'iclass' => 'fa fa-cog',
-                'href' => '#',
+                'href' => $url->out(false),
                 'id' => -1, // This forces single call execution.
                 //'formclass' => '', // To open dynamic form, instead of just confirmation modal.
                 'methodname' => 'edititem',

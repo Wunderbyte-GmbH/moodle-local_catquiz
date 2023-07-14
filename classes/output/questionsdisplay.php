@@ -37,6 +37,7 @@ use moodle_url;
 use templatable;
 use renderable;
 
+
 /**
  * Renderable class for the catscalemanagers
  *
@@ -72,6 +73,11 @@ class questionsdisplay implements renderable, templatable {
     private int $numberofrecords = 0; // Records found in table query.
 
     /**
+     * @var integer
+     */
+    private ?int $detailid = null; // Records found in table query.
+
+    /**
      *
      * @return void
      */
@@ -79,6 +85,7 @@ class questionsdisplay implements renderable, templatable {
         $this->catcontextid = optional_param('contextid', 0, PARAM_INT);
         $this->scale = optional_param('scale', -1, PARAM_INT);
         $this->usesubs = optional_param('usesubs', 0, PARAM_INT);
+        $this->detailid = optional_param('detail', null, PARAM_INT); // ID of record to be displayed in detail instead of table.
 
         $this->tablescale = $this->scale; // TODO check if subscales are selected an write into tablescale.
     }
@@ -168,7 +175,7 @@ class questionsdisplay implements renderable, templatable {
 
 
     /**
-     *
+     * Render table.
      */
     public function renderquestionstable() {
         $catcontext = empty($this->catcontextid) ? catquiz::get_default_context_id() : $this->catcontextid; // If no context is set, get default context from DB.
@@ -271,6 +278,47 @@ class questionsdisplay implements renderable, templatable {
             return "";
         }
     }
+    /**
+     * Check if we display a table or a detailview of a specific item.
+     */
+    private function check_tabledisplay() {
+        $output = "";
+        if (empty($this->detailid)) {
+            $output = empty($this->renderquestionstable()) ? $this->get_no_table_string() : $this->renderquestionstable();
+        }
+        return $output;
+    }
+
+    /**
+     * Check if we display a table or a detailview of a specific item.
+     */
+    private function render_detailview() {
+        global $DB;
+        if (empty($this->detailid)) {
+            return;
+        }
+        $catcontext = empty($this->catcontextid) ? catquiz::get_default_context_id() : $this->catcontextid; // If no context is set, get default context from DB.
+
+        // Get the record for the specific userid (fetched from optional param).
+        list($select, $from, $where, $filter, $params) = catquiz::return_sql_for_catscalequestions([$this->tablescale], $catcontext, [], [], $this->detailid);
+        $sql = "SELECT $select FROM $from WHERE $where"; // TODO All records are returned here - SQL needs to be fixed!
+        $records = $DB->get_records_sql($sql, $params, IGNORE_MISSING);
+        $record = $records[$this->detailid]; // Only a fix until the SQL is fixed fetching only one record.
+
+        $title = get_string('general', 'core');
+
+        $body['id'] = $record->id;
+        $body['type'] = $record->qtype;
+        $body['status'] = $record->maxstatus;
+        $body['model'] = $record->model;
+        $body['attempts'] = $record->attempts;
+
+        return [
+            'title' => $title,
+            'body' => $body,
+        ];
+    }
+
 
     /**
      * Return the item tree of all catscales.
@@ -283,7 +331,8 @@ class questionsdisplay implements renderable, templatable {
             'scaleselector' => empty($this->render_scaleselector()) ? "" : $this->render_scaleselector(),
             'subscaleselector' => empty($this->render_subscaleselector()) ? "" : $this->render_subscaleselector(),
             'checkbox' => $this->render_subscale_checkbox(),
-            'table' => empty($this->renderquestionstable()) ? $this->get_no_table_string() : $this->renderquestionstable(),
+            'table' => $this->check_tabledisplay(),
+            'detailview' => $this->render_detailview(),
         ];
 
         return $data;
