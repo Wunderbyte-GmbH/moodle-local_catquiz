@@ -154,7 +154,7 @@ class testitemdashboard implements renderable, templatable {
         list ($sql, $params) = catquiz::get_sql_for_questions_answered_partlycorrect([$this->testitemid], [$this->contextid]);
         $numberofanswerspartlycorrect = $DB->count_records_sql($sql, $params);
         list ($sql, $params) = catquiz::get_sql_for_questions_average([$this->testitemid], [$this->contextid]);
-        $averageofallanswers = $DB->get_field_sql($sql, $params) ?? get_string('notavailable', 'core');
+        $averageofallanswers = $DB->get_field_sql($sql, $params) ?: get_string('notavailable', 'core');
 
         return [
             [
