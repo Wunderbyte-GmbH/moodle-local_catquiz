@@ -276,6 +276,7 @@ $string['noremainingquestions'] = "You ran out of questions";
 $string['errorfetchnextquestion'] = "There was an error while selecting the next question";
 $string['reachedmaximumquestions'] = "Reached maximum number of questions";
 $string['error'] = "An error occured";
+$string['id'] = "ID";
 $string['abortpersonabilitynotchanged'] = "Person parameter did not change";
 $string['emptyfirstquestionlist'] = "Can't select a start question because the list is empty";
 

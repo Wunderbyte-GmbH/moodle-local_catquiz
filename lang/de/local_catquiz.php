@@ -272,6 +272,7 @@ $string['noremainingquestions'] = "Keine weiteren Fragen";
 $string['errorfetchnextquestion'] = "Es trat ein Fehler bei der Auswahl der nächsten Frage auf.";
 $string['reachedmaximumquestions'] = "Die Maximalanzahl an Testfragen wurde erreicht";
 $string['error'] = "Es ist ein Fehler aufgetreten";
+$string['id'] = "ID";
 $string['abortpersonabilitynotchanged'] = "Personenparameter unverändert";
 $string['emptyfirstquestionlist'] = "Kann keine Startfrage wählen da die Liste leer ist";
 
