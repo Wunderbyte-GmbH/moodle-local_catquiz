@@ -136,6 +136,16 @@ class model_item_param_list implements ArrayAccess, IteratorAggregate, Countable
         }
         return $data;
     }
+
+    public function as_array(): array
+    {
+        $data = [];
+        foreach ($this->item_params as $i) {
+            $data[$i->get_id()] = $i;
+        }
+        return $data;
+    }
+
     public function save_to_db(int $contextid) {
 
         global $DB;

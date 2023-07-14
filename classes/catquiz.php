@@ -795,4 +795,45 @@ class catquiz {
         return intval($contextid);
     }
 
+    /**
+     * Updates the person ability for the given user in the given context
+     *
+     * @param int $userid
+     * @param int $contextid
+     * @param float $ability
+     * @return void
+     */
+    public static function update_person_param(
+        int $userid,
+        int $contextid,
+        float $ability
+    ) {
+        global $DB;
+
+        $existing_record = $DB->get_record(
+            'local_catquiz_personparams',
+            [
+                'userid' => $userid,
+                'contextid' => $contextid,
+            ]
+        );
+
+        $record = (object)[
+            'userid' => $userid,
+            'contextid' => $contextid,
+            'ability' => $ability,
+            'timemodified' => time(),
+        ];
+
+        if (!$existing_record) {
+            $DB->insert_record(
+                'local_catquiz_personparams',
+                $record
+            );
+            return;
+        }
+
+        $record->id = $existing_record->id;
+        $DB->update_record('local_catquiz_personparams', $record);
+    }
 }

@@ -15,4 +15,5 @@ class status
     const ERROR_TESTITEM_ALREADY_IN_RELATED_SCALE = 'testiteminrelatedscale';
     const ERROR_FETCH_NEXT_QUESTION = 'errorfetchnextquestion';
     const ERROR_REACHED_MAXIMUM_QUESTIONS = 'reachedmaximumquestions';
+    const ABORT_PERSONABILITY_NOT_CHANGED = 'abortpersonabilitynotchanged';
 }

@@ -529,6 +529,7 @@ class catquiz_handler {
             // This option is required by the questions_loader context loader.
             'includesubscales' => true,
             'maximumquestions' => intval($quizsettings->maximumquestions),
+            'minimumquestions' => intval($quizsettings->minimumquestions),
             'penalty_threshold' => 60 * 60 * 24 * 30 - 90, // TODO: make dynamic
             /*
                  * After this time, the penalty for a question goes back to 0

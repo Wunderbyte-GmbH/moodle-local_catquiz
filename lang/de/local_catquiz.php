@@ -263,3 +263,4 @@ $string['noremainingquestions'] = "Keine weiteren Fragen";
 $string['errorfetchnextquestion'] = "Es trat ein Fehler bei der Auswahl der nächsten Frage auf.";
 $string['reachedmaximumquestions'] = "Die Maximalanzahl an Testfragen wurde erreicht";
 $string['error'] = "Es ist ein Fehler aufgetreten";
+$string['abortpersonabilitynotchanged'] = "Personenparameter unverändert";
