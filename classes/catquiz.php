@@ -836,4 +836,57 @@ class catquiz {
         $record->id = $existing_record->id;
         $DB->update_record('local_catquiz_personparams', $record);
     }
+
+    /**
+     * Return the attempt with the given attemptid
+     *
+     * @param int $attemptid
+     * @return array<\stdClass>
+     */
+    public static function get_attempt_statistics(int $attemptid) {
+        global $DB;
+        return $DB->get_records_sql(
+            "SELECT state, COUNT(*)
+            FROM {adaptivequiz_attempt} aa
+            JOIN {question_attempts} qa ON aa.uniqueid = qa.questionusageid
+            JOIN {question_attempt_steps} qas ON qa.id = qas.questionattemptid AND fraction IS NOT NULL
+            WHERE aa.id = :attemptid
+            GROUP BY state;",
+            ['attemptid' => $attemptid]
+        );
+    }
+
+    /**
+     * Return the person ability for the given user in the given context
+     *
+     * @param int $userid,
+     * @param int $contextid
+     *
+     * @return \stdClass
+     */
+    public static function get_person_ability(int $userid, int $contextid) {
+        global $DB;
+        return $DB->get_record_select(
+            'local_catquiz_personparams',
+           "userid = :userid AND contextid = :contextid",
+          [
+            'userid' => $userid,
+            'contextid' => $contextid,
+        ]);
+    }
+
+    public static function get_last_user_attemptid(int $userid) {
+        global $DB;
+        return $DB->get_record_sql(
+            "SELECT id FROM {adaptivequiz_attempt}
+            WHERE userid = :userid
+                AND attemptstate = :attemptstate
+            ORDER BY id DESC
+            LIMIT 1",
+            [
+                'userid' => $userid,
+                'attemptstate' => 'complete',
+            ]
+        );
+    }
 }
