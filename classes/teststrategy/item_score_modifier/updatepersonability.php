@@ -41,7 +41,7 @@ final class updatepersonability extends item_score_modifier implements wb_middle
         $cache->set('userresponses', $userresponses);
         $responses_changed = $this->has_changed($userresponses, $cachedresponses);
 
-        if ($responses_changed) {
+        if (!$responses_changed) {
             // Nothing changed since the last question, so we do not need to
             // update the person ability
             return $next($context);
