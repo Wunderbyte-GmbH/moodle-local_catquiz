@@ -24,6 +24,14 @@ final class updatepersonability extends item_score_modifier implements wb_middle
     const UPDATE_THRESHOLD = 0.001;
 
     public function run(array $context, callable $next): result {
+        $lastquestion = $context['lastquestion'];
+        if ($lastquestion === NULL || $lastquestion->is_pilot) {
+            return $next($context);
+        }
+
+        $cache = cache::make('local_catquiz', 'userresponses');
+        $cachedresponses = $cache->get('userresponses') ?: [];
+
         global $USER;
         $responses = catcontext::create_response_from_db($context['contextid']);
         $components = ($responses->as_array())[$USER->id];
@@ -31,13 +39,11 @@ final class updatepersonability extends item_score_modifier implements wb_middle
             throw new moodle_exception('User has answers to more than one component.');
         }
         $userresponses = reset($components);
+        $cache->set('userresponses', $userresponses);
 
         // If the last answer was incorrect and the question was excluded due to
         // having only incorrect answers, the response object is the same as in
         // the previous run and we don't have to update the person ability.
-        $cache = cache::make('local_catquiz', 'userresponses');
-        $cachedresponses = $cache->get('userresponses') ?: [];
-        $cache->set('userresponses', $userresponses);
         $responses_changed = $this->has_changed($userresponses, $cachedresponses);
 
         if (!$responses_changed) {
@@ -69,7 +75,8 @@ final class updatepersonability extends item_score_modifier implements wb_middle
 
     public function get_required_context_keys(): array {
         return [
-            'contextid'
+            'contextid',
+            'lastquestion'
         ];
     }
 

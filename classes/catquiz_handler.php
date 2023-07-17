@@ -487,13 +487,16 @@ class catquiz_handler {
      * @throws coding_exception
      * @throws cache_exception
      */
-    public static function purge_attemptquestions_cache(int $componentid, string $componentname, bool $includesubscales = false): bool {
+    public static function purge_attempt_caches(int $componentid, string $componentname, bool $includesubscales = false): bool {
         $testenvironment = new testenvironment(
             (object)['componentid' => $componentid, 'component' => $componentname]
         );
         $quizsettings = $testenvironment->return_settings();
         $cache = cache::make('local_catquiz', 'attemptquestions');
         $cachekey = sprintf('testitems_%s_%s', $quizsettings->catquiz_catcontext, $includesubscales);
+
+        self::purge_playedquestions_cache();
+        self::purge_lastquestion_cache();
         return $cache->delete($cachekey);
     }
 
@@ -504,9 +507,20 @@ class catquiz_handler {
      * @throws coding_exception
      * @throws cache_exception
      */
-    public static function purge_playedquestions_cache(): bool {
+    private static function purge_playedquestions_cache(): bool {
         $cache = cache::make('local_catquiz', 'playedquestions');
         return $cache->delete('playedquestions');
+    }
+
+    /**
+     * Purge the cache that keeps track of the previous question that was played
+     * @return bool 
+     * @throws coding_exception 
+     * @throws cache_exception 
+     */
+    private static function purge_lastquestion_cache(): bool {
+        $cache = cache::make('local_catquiz', 'lastquestion');
+        return $cache->delete('lastquestion');
     }
 
     /**
@@ -541,6 +555,7 @@ class catquiz_handler {
         ];
         return $contextcreator->load(
             [
+                'lastquestion',
                 'person_ability',
                 'contextid',
                 'questions',

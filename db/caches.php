@@ -80,5 +80,12 @@ $definitions = array(
         'staticacceleration' => true,
         'staticaccelerationsize' => 1,
         'invalidationevents' => ['changesinuserresponses']
-    )
+    ),
+    'lastquestion' => array(
+        'mode' => cache_store::MODE_SESSION,
+        'simplekeys' => true,
+        'staticacceleration' => true,
+        'staticaccelerationsize' => 1,
+        'invalidationevents' => ['changesinlastquestion']
+    ),
 );
