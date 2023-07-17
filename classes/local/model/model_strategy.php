@@ -166,7 +166,7 @@ class model_strategy {
                     ->estimate_item_params($person_abilities);
             }
 
-            $filtered_item_difficulties = $this->select_items($item_difficulties);
+            $filtered_item_difficulties = $this->select_item_model($item_difficulties);
             $person_abilities = $this
                 ->ability_estimator
                 ->get_person_abilities($filtered_item_difficulties);
@@ -205,12 +205,14 @@ class model_strategy {
     }
 
     /**
+     * For each item, selects the model that should be used
+     * 
      * Merges the given item param lists into a single list
      *
      * @param array<model_item_param_list> $item_difficulties_lists List of calculated item difficulties, one for each model
      * @return model_item_param_list A single list of item difficulties that is a combination of the input lists
      */
-    private function select_items(array $item_difficulties_lists): model_item_param_list {
+    public function select_item_model(array $item_difficulties_lists): model_item_param_list {
         $new_item_difficulties = new model_item_param_list();
         $item_ids = $this->responses->get_item_ids();
 
