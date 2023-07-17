@@ -26,20 +26,10 @@ final class updatepersonability extends item_score_modifier implements wb_middle
     public function run(array $context, callable $next): result {
         global $USER;
         $responses = catcontext::create_response_from_db($context['contextid']);
-
-        // Select the correct model for each item
-        $model_strategy = new model_strategy($responses);
-        $item_param_lists = [];
-        foreach (array_keys($model_strategy->get_installed_models()) as $model) {
-            $item_param_lists[$model] = model_item_param_list::load_from_db($context['contextid'], $model);
-        }
-        $item_param_list = $model_strategy->select_item_model($item_param_lists);
-
         $components = ($responses->as_array())[$USER->id];
         if (count($components) > 1) {
             throw new moodle_exception('User has answers to more than one component.');
         }
-
         $userresponses = reset($components);
 
         // If the last answer was incorrect and the question was excluded due to
@@ -55,6 +45,14 @@ final class updatepersonability extends item_score_modifier implements wb_middle
             // update the person ability
             return $next($context);
         }
+
+        // We will update the person ability. Select the correct model for each item:
+        $model_strategy = new model_strategy($responses);
+        $item_param_lists = [];
+        foreach (array_keys($model_strategy->get_installed_models()) as $model) {
+            $item_param_lists[$model] = model_item_param_list::load_from_db($context['contextid'], $model);
+        }
+        $item_param_list = $model_strategy->select_item_model($item_param_lists);
 
         $updated_ability = catcalc::estimate_person_ability($userresponses, $item_param_list);
         catquiz::update_person_param($USER->id, $context['contextid'], $updated_ability);
