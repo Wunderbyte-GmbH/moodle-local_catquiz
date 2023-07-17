@@ -130,6 +130,7 @@ $string['userupdatedcatscale'] = 'Nutzerin mit der Id {$a->userid} hat die CAT S
 $string['messageprovider:catscaleupdate'] = 'Benachrichtung über eine Aktualisierung einer CAT Skala.';
 $string['catscaleupdatedtitle'] = 'Eine CAT Skala wurde aktualisiert';
 $string['catscaleupdatedbody'] = 'Eine CAT Skala wurde aktualisiert. TODO: Mehr Details.';
+$string['messageprovider:updatecatscale'] = 'Hat Berechtigung zum updaten der CAT Skala';
 
 // Access.
 $string['catquiz:canmanage'] = 'Darf Catquiz Plugin verwalten';

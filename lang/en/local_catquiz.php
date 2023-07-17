@@ -132,6 +132,7 @@ $string['userupdatedcatscale'] = 'User with id {$a->userid} updated CAT scale wi
 $string['messageprovider:catscaleupdate'] = 'Notification of CAT scale update';
 $string['catscaleupdatedtitle'] = 'A CAT scale was updated';
 $string['catscaleupdatedbody'] = 'A CAT scale was updated. TODO: more description.';
+$string['messageprovider:updatecatscale'] = 'Is allowed to update catscale';
 
 // Access.php.
 $string['catquiz:canmanage'] = 'Is allowed to manage Catquiz plugin';
