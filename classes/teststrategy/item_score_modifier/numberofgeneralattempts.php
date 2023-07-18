@@ -21,7 +21,7 @@ final class numberofgeneralattempts extends item_score_modifier implements wb_mi
     public function run(array $context, callable $next): result {
         global $DB;
 
-        $sql = "SELECT questionid, COUNT(*)
+        $sql = "SELECT questionid, COUNT(*) AS count
                 FROM {question_attempts}
                 GROUP BY questionid";
 
