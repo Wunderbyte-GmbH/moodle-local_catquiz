@@ -153,73 +153,85 @@ class catquiz {
         }
 
         $select = ' DISTINCT *';
-        $from = "(SELECT
-                    q.id,
-                    qbe.idnumber,
-                    q.name,
-                    q.questiontext,
-                    q.qtype,
-                    qc.name as categoryname,
-                    lci.catscaleid catscaleid,
-                    lci.componentname component,
-                    s2.attempts,
-                    COALESCE(s2.lastattempttime,0) as lastattempttime,
-                    s3.userattempts,
-                    COALESCE(s3.userlastattempttime,0) as userlastattempttime,
+        $from = "(
+            SELECT DISTINCT
+              q.id,
+              qbe.idnumber,
+              q.name,
+              q.questiontext,
+              q.qtype,
+              qc.name as categoryname,
+              lci.catscaleid catscaleid,
+              lci.componentname component,
+              s2.attempts,
+              COALESCE(s2.lastattempttime,0) as lastattempttime,
+              s3.userattempts,
+              COALESCE(s3.userlastattempttime,0) as userlastattempttime
+            FROM {question} q
 
-                    maxlcip.difficulty,
-                    maxlcip.discrimination,
-                    maxlcip.model,
+            JOIN {question_versions} qv
+            ON q.id=qv.questionid
 
-                    ( SELECT MAX(lcip.status)
-                    	FROM {local_catquiz_itemparams} lcip
-                    	WHERE lcip.componentname=lci.componentname AND lcip.componentid=lci.componentid) as maxstatus,
-                    maxlcip.itemstatus
+            JOIN {question_bank_entries} qbe
+            ON qv.questionbankentryid=qbe.id
 
+            JOIN {question_categories} qc
+            ON qc.id=qbe.questioncategoryid
 
-                FROM {question} q
-                JOIN {question_versions} qv
-                    ON q.id=qv.questionid
-                JOIN {question_bank_entries} qbe
-                    ON qv.questionbankentryid=qbe.id
-                JOIN {question_categories} qc
-                    ON qc.id=qbe.questioncategoryid
-                LEFT JOIN {local_catquiz_items} lci
-                    ON lci.componentid=q.id AND lci.componentname='question'
+            LEFT JOIN {local_catquiz_items} lci
+            ON lci.componentid=q.id AND lci.componentname='question'
 
-                LEFT JOIN (
-                    SELECT lcip.difficulty, lcip.discrimination, lcip.componentid, lcip.componentname, lcip.model, lcip.status as itemstatus
-                    FROM {local_catquiz_itemparams} lcip
-                    GROUP BY lcip.difficulty, lcip.discrimination, lcip.componentid, lcip.componentname, lcip.model, lcip.status
-                    ) as maxlcip
-                ON maxlcip.componentid=q.id AND maxlcip.componentname=lci.componentname
+            LEFT JOIN (
+              SELECT ccc1.id AS contextid, qa.questionid, COUNT(*) AS attempts, MAX(qas.timecreated) as lastattempttime
+              FROM {local_catquiz_catcontext} ccc1
 
-                LEFT JOIN (
-                    SELECT ccc1.id AS contextid, qa.questionid, COUNT(*) AS attempts, MAX(qas.timecreated) as lastattempttime
-                    FROM {local_catquiz_catcontext} ccc1
-                        JOIN {question_attempt_steps} qas
-                            ON ccc1.starttimestamp < qas.timecreated AND ccc1.endtimestamp > qas.timecreated
-                                AND qas.fraction IS NOT NULL
-                        JOIN {question_attempts} qa
-                            ON qas.questionattemptid = qa.id
-                    WHERE ccc1.id = :contextid
-                    GROUP BY ccc1.id, qa.questionid
-                ) s2 ON q.id = s2.questionid
-                LEFT JOIN (
-                    SELECT ccc1.id AS contextid, qa.questionid, COUNT(*) AS userattempts, MAX(qas.timecreated) as userlastattempttime
-                    FROM {local_catquiz_catcontext} ccc1
-                             JOIN {question_attempt_steps} qas
-                                  ON ccc1.starttimestamp < qas.timecreated AND ccc1.endtimestamp > qas.timecreated
-                                      AND qas.fraction IS NOT NULL
-                                      $restrictforuser
-                             JOIN {question_attempts} qa
-                                  ON qas.questionattemptid = qa.id
-                    WHERE ccc1.id = :contextid2
-                    GROUP BY ccc1.id, qa.questionid
-                ) s3 ON q.id = s3.questionid
-            ) as s1";
+              JOIN {question_attempt_steps} qas
+              ON ccc1.starttimestamp < qas.timecreated
+                AND ccc1.endtimestamp > qas.timecreated
+                AND qas.fraction IS NOT NULL
+
+              JOIN {question_attempts} qa
+              ON qas.questionattemptid = qa.id
+
+              WHERE ccc1.id = :contextid
+              GROUP BY ccc1.id, qa.questionid
+            ) s2
+            ON q.id = s2.questionid
+
+            LEFT JOIN (
+                              SELECT ccc1.id AS contextid, qa.questionid, COUNT(*) AS userattempts, MAX(qas.timecreated) as userlastattempttime
+                              FROM {local_catquiz_catcontext} ccc1
+                                       JOIN {question_attempt_steps} qas
+                                            ON ccc1.starttimestamp < qas.timecreated AND ccc1.endtimestamp > qas.timecreated
+                                                AND qas.fraction IS NOT NULL
+
+                                       JOIN {question_attempts} qa
+                                            ON qas.questionattemptid = qa.id
+                              WHERE ccc1.id = :contextid2
+                              GROUP BY ccc1.id, qa.questionid
+            ) s3
+            ON q.id = s3.questionid
+
+          ) as s1
+          JOIN (
+            SELECT
+                s4.id, s4.timecreated, s4.status,
+                maxlcip.componentid, maxlcip.componentname, maxlcip.contextid,
+                maxlcip.model, maxlcip.difficulty, maxlcip.discrimination, maxlcip.guessing,
+                maxlcip.timemodified
+            FROM (
+                SELECT lcip.*, ROW_NUMBER() OVER (PARTITION BY componentid, componentname ORDER BY lcip.status DESC, lcip.timecreated DESC) AS n
+                FROM {local_catquiz_itemparams} lcip
+            ) AS s4
+            JOIN {local_catquiz_itemparams} maxlcip
+            ON s4.id = maxlcip.id
+            WHERE n = 1
+          ) AS s5
+          ON s5.componentid = s1.id
+          AND s5.componentname = s1.component";
+
         [$insql, $inparams] = $DB->get_in_or_equal($catscaleids, SQL_PARAMS_NAMED);
-        $where = ' catscaleid '. $insql .' AND COALESCE(itemstatus,0) = COALESCE(maxstatus, 0)';
+        $where = ' catscaleid '. $insql;
         $params = array_merge($params, $inparams);
         $filter = '';
 
