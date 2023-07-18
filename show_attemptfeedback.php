@@ -44,6 +44,6 @@ echo $OUTPUT->header();
 
 $data = $attemptfeedback->export_for_template($OUTPUT);
 
-echo $OUTPUT->render_from_template('local_catquiz/attemptfeedback', $attemptfeedback->export_for_template($OUTPUT));
+echo $OUTPUT->render_from_template('local_catquiz/attemptfeedback', $data);
 
 echo $OUTPUT->footer();
