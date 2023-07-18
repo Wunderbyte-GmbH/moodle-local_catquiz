@@ -26,6 +26,8 @@
 
 namespace local_catquiz;
 
+use local_catquiz\output\attemptfeedback;
+
 /**
  * Deals with local_shortcodes regarding booking.
  */
@@ -44,8 +46,15 @@ class shortcodes {
      * @return string
      */
     public static function catquizfeedback($shortcode, $args, $content, $env, $next) {
+        global $OUTPUT;
 
+        $attemptid = optional_param('attempt', 0, PARAM_INT);
+        $contextid = optional_param('context', 0, PARAM_INT);
 
-        return 'works';
+        $attemptfeedback = new attemptfeedback($attemptid, $contextid);
+
+        $data = $attemptfeedback->export_for_template($OUTPUT);
+
+        return $OUTPUT->render_from_template('local_catquiz/attemptfeedback', $data);
     }
 }
