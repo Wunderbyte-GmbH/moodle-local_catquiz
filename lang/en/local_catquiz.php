@@ -270,4 +270,5 @@ $string['error'] = "An error occured";
 $string['abortpersonabilitynotchanged'] = "Person parameter did not change";
 
 // Quiz Feedback
+$string['shortcode:catquizfeedback'] = "Shows a summary of the last quiz attempt";
 $string['attemptfeedbacknotavailable'] = "No feedback available";
