@@ -137,12 +137,12 @@ class catscalequestions_table extends wunderbyte_table {
      * @param stdClass $values
      * @return string
      */
-    public function col_maxstatus($values) {
+    public function col_status($values) {
         global $OUTPUT;
 
         $color = "";
 
-        switch ($values->maxstatus) {
+        switch ($values->status) {
             case 5:
                 $color = 'green';
                 break;

@@ -181,7 +181,7 @@ class questionsdisplay implements renderable, templatable {
 
         $columnsarray = [
             // TODO get Label
-            'maxstatus' => get_string('status', 'core'),
+            'status' => get_string('status', 'core'),
             'qtype' => get_string('type', 'local_catquiz'),
             'name' => get_string('name', 'core'),
             'model' => get_string('model', 'local_catquiz'),
