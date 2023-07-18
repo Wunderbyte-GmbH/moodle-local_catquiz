@@ -888,5 +888,22 @@ class catquiz {
                 'attemptstate' => 'complete',
             ]
         );
+
+    public static function get_testenvironment_by_attemptid(int $attemptid) {
+        global $DB;
+
+        return $DB->get_record_sql(
+            "SELECT lct.*
+             FROM {adaptivequiz_attempt} aa
+             JOIN {local_catquiz_tests} lct
+                ON aa.instance = lct.componentid
+                AND component = :component
+             WHERE aa.id = :id
+            ",
+            [
+                'component' => 'mod_adaptivequiz',
+                'id' => $attemptid,
+            ]
+            );
     }
 }

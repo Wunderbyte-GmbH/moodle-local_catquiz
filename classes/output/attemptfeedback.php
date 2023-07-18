@@ -45,12 +45,12 @@ class attemptfeedback implements renderable, templatable
 {
 
     /**
-     * @var int
+     * @var ?int
      */
     public int $attemptid;
 
     /**
-     * @var int
+     * @var ?int
      */
     public int $contextid;
 
@@ -65,13 +65,18 @@ class attemptfeedback implements renderable, templatable
             // This can still return nothing. In that case, we show a message that the user has no attempts yet
             $attemptid = catquiz::get_last_user_attemptid($USER->id);
         }
+        $this->attemptid = $attemptid;
 
-        if ($contextid === 0) {
-            // TODO: Get the context of the last attempt.
-            // attemptid -> 
+        if ($this->attemptid && $contextid === 0) {
+            // Get the contextid from the attempt
+            $testenvironment = catquiz::get_testenvironment_by_attemptid($attemptid);
+            if (!$testenvironment) {
+                return;
+            }
+            $settings = json_decode($testenvironment->json);
+            $contextid = intval($settings->catquiz_catcontext);
         }
 
-        $this->attemptid = $attemptid;
         $this->contextid = $contextid;
     }
 
@@ -95,6 +100,9 @@ class attemptfeedback implements renderable, templatable
 
     private function render_person_ability(int $contextid) {
         global $USER;
+        if (!$contextid) {
+            return '-'; //TODO string that indicates we cant return a person ability
+        }
         $ability = catquiz::get_person_ability($USER->id, $contextid);
         return $ability->ability;
     }
