@@ -848,8 +848,8 @@ class catquiz {
         return $DB->get_records_sql(
             "SELECT state, COUNT(*)
             FROM {adaptivequiz_attempt} aa
-            JOIN {question_attempts} qa ON aa.uniqueid = qa.questionusageid
-            JOIN {question_attempt_steps} qas ON qa.id = qas.questionattemptid AND fraction IS NOT NULL
+            LEFT JOIN {question_attempts} qa ON aa.uniqueid = qa.questionusageid
+            LEFT JOIN {question_attempt_steps} qas ON qa.id = qas.questionattemptid AND fraction IS NOT NULL
             WHERE aa.id = :attemptid
             GROUP BY state;",
             ['attemptid' => $attemptid]
