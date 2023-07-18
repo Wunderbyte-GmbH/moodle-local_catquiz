@@ -268,3 +268,6 @@ $string['errorfetchnextquestion'] = "There was an error while selecting the next
 $string['reachedmaximumquestions'] = "Reached maximum number of questions";
 $string['error'] = "An error occured";
 $string['abortpersonabilitynotchanged'] = "Person parameter did not change";
+
+// Quiz Feedback
+$string['attemptfeedbacknotavailable'] = "No feedback available";

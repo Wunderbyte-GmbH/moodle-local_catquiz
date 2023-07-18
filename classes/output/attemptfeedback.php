@@ -86,22 +86,19 @@ class attemptfeedback implements renderable, templatable
         $attempt = catquiz::get_attempt_statistics($attemptid);
         if ($attempt) {
             return [
-                'gradedright' => $attempt['gradedright']->count ?? '-',
-                'gradedwrong' => $attempt['gradedwrong']->count ?? '-',
-                'gradedpartial' => $attempt['gradedpartial']->count ?? '-',
+                'gradedright' => $attempt['gradedright']->count ?? 0,
+                'gradedwrong' => $attempt['gradedwrong']->count ?? 0,
+                'gradedpartial' => $attempt['gradedpartial']->count ?? 0,
             ];
         }
 
-        // 4. If there is not a single attempt, display a message with that information
-        // TODO implement
-
-        return get_string('attemptfeedback', 'local_catquiz');
+        return get_string('attemptfeedbacknotavailable', 'local_catquiz');
     }
 
     private function render_person_ability(int $contextid) {
         global $USER;
         if (!$contextid) {
-            return '-'; //TODO string that indicates we cant return a person ability
+            return get_string('notavailable', 'core');
         }
         $ability = catquiz::get_person_ability($USER->id, $contextid);
         return $ability->ability;

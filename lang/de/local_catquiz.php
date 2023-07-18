@@ -264,3 +264,6 @@ $string['errorfetchnextquestion'] = "Es trat ein Fehler bei der Auswahl der näc
 $string['reachedmaximumquestions'] = "Die Maximalanzahl an Testfragen wurde erreicht";
 $string['error'] = "Es ist ein Fehler aufgetreten";
 $string['abortpersonabilitynotchanged'] = "Personenparameter unverändert";
+
+// Quiz Feedback
+$string['attemptfeedbacknotavailable'] = "Kein Feedback verfügbar";
