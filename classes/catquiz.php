@@ -846,7 +846,7 @@ class catquiz {
     public static function get_attempt_statistics(int $attemptid) {
         global $DB;
         return $DB->get_records_sql(
-            "SELECT state, COUNT(*)
+            "SELECT state, COUNT(*) as count
             FROM {adaptivequiz_attempt} aa
             LEFT JOIN {question_attempts} qa ON aa.uniqueid = qa.questionusageid
             LEFT JOIN {question_attempt_steps} qas ON qa.id = qas.questionattemptid AND fraction IS NOT NULL
