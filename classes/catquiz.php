@@ -877,7 +877,7 @@ class catquiz {
 
     public static function get_last_user_attemptid(int $userid) {
         global $DB;
-        return $DB->get_record_sql(
+        $record = $DB->get_record_sql(
             "SELECT id FROM {adaptivequiz_attempt}
             WHERE userid = :userid
                 AND attemptstate = :attemptstate
@@ -888,6 +888,8 @@ class catquiz {
                 'attemptstate' => 'complete',
             ]
         );
+        return $record->id;
+    }
 
     public static function get_testenvironment_by_attemptid(int $attemptid) {
         global $DB;
