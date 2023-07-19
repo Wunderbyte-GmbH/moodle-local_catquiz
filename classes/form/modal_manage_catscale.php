@@ -212,8 +212,10 @@ class modal_manage_catscale extends dynamic_form {
         //return parent::get_data();
 
         $data = parent::get_data();
-        $data->minscalevalue = $data->minmaxgroup["catquiz_minscalevalue"];
-        $data->maxscalevalue = $data->minmaxgroup["catquiz_maxscalevalue"];
+        if (!empty($data->minmaxgroup["catquiz_minscalevalue"])) {
+            $data->minscalevalue = $data->minmaxgroup["catquiz_minscalevalue"];
+            $data->maxscalevalue = $data->minmaxgroup["catquiz_maxscalevalue"];
+        }
         return $data;
     }
 }
