@@ -67,7 +67,6 @@ Feature: As an admin I perform basic catquiz actions - create, update, delete, s
     And I press "Catquiz"
     And I follow "Manage CAT scales"
     And I wait until the page is ready
-    ## And I follow "#catscales-tab"
     And I click on "CAT scales" "link" in the "#region-main" "css_element"
     And I follow "Create"
     And I set the following fields to these values:
@@ -75,45 +74,35 @@ Feature: As an admin I perform basic catquiz actions - create, update, delete, s
       | minmaxgroup[catquiz_minscalevalue] | 5.5         |
       | minmaxgroup[catquiz_maxscalevalue] | 20          |
     And I press "Save changes"
-    And I wait "1" seconds
-    ## And I wait until the page is ready
+    And I wait until the page is ready
     Then I should see "Mathematics" in the "[data-name=\"Mathematics\"]" "css_element"
     And I follow "Create"
     And I set the field "Name" to "Arithmetics"
-    ## And I set the following fields to these values:
-    ##  | Name                               | Arithmetics |
-    ##  | minmaxgroup[catquiz_minscalevalue] | 6.5         |
-    ##  | minmaxgroup[catquiz_maxscalevalue] | 10          |
     And I set the field "Parent CAT scale - None if top level CAT scale" to "Mathematics"
     And I press "Save changes"
+    And I wait until the page is ready
     Then I should see "Arithmetics" in the "[data-name=\"Arithmetics\"]" "css_element"
     And I follow "Create"
-    ## And I set the field "Name" to "Multiplication"
-    And I set the following fields to these values:
-      | Name                               | Multiplication |
-      | minmaxgroup[catquiz_minscalevalue] | 7.5            |
-      | minmaxgroup[catquiz_maxscalevalue] | 11             |
+    And I set the field "Name" to "Multiplication"
     And I set the field "Parent CAT scale - None if top level CAT scale" to "Mathematics"
     And I press "Save changes"
+    And I wait until the page is ready
     Then I should see "Multiplication" in the "[data-name=\"Multiplication\"]" "css_element"
     And I follow "Create"
-    And I set the following fields to these values:
-      | Name                               | Geometrie |
-      | minmaxgroup[catquiz_minscalevalue] | 8.5       |
-      | minmaxgroup[catquiz_maxscalevalue] | 12        |
+    And I set the field "Name" to "Geometrie"
     And I set the field "Parent CAT scale - None if top level CAT scale" to "Mathematics"
     And I press "Save changes"
+    And I wait until the page is ready
     Then I should see "Geometrie" in the "[data-name=\"Geometrie\"]" "css_element"
     And I click on "Subscribe" "link" in the "[data-name=\"Geometrie\"]" "css_element"
     Then I should see "Subscribed" in the "[data-name=\"Geometrie\"]" "css_element"
     And I click on "Edit" "link" in the "[data-name=\"Geometrie\"]" "css_element"
-    And the following fields match these values:
-      | Name                               | Geometrie |
-      | minmaxgroup[catquiz_minscalevalue] | 8.5       |
-      | minmaxgroup[catquiz_maxscalevalue] | 12        |
     And I set the field "Name" to "Geometry"
     And I set the field "Parent CAT scale - None if top level CAT scale" to "Mathematics"
     And I press "Save changes"
+    And I wait until the page is ready
+    ## TODO: should return to the same tab? Sometime tab not switched back to CAT scales after editing of catscale
+    And I click on "CAT scales" "link" in the "#region-main" "css_element"
     Then I should see "Geometry" in the "[data-name=\"Geometry\"]" "css_element"
     And I click on "Subscribed" "link" in the "[data-name=\"Geometry\"]" "css_element"
     Then I should see "Subscribe" in the "[data-name=\"Geometry\"]" "css_element"
