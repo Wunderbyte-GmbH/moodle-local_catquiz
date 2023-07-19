@@ -266,5 +266,5 @@ $string['error'] = "Es ist ein Fehler aufgetreten";
 $string['abortpersonabilitynotchanged'] = "Personenparameter unverändert";
 
 // Quiz Feedback
-$string['shortcode:catquizfeedback'] = "Zusammenfassung des letzten Versuchs";
+$string['catquizfeedback'] = "Zusammenfassung des letzten Versuchs";
 $string['attemptfeedbacknotavailable'] = "Kein Feedback verfügbar";

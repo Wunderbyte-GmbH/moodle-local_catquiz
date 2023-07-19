@@ -15,7 +15,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Shortcodes for mod booking
+ * Shortcodes.
  *
  * @package local_catquiz
  * @subpackage db
@@ -29,6 +29,6 @@ defined('MOODLE_INTERNAL') || die();
 $shortcodes = [
     'catquizfeedback' => [
         'callback' => 'local_catquiz\shortcodes::catquizfeedback',
-        'description' => get_string('shortcode:catquizfeedback', 'local_catquiz'),
+        'description' => 'catquizfeedback',
     ],
 ];
