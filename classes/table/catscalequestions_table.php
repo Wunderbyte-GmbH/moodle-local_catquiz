@@ -84,35 +84,37 @@ class catscalequestions_table extends wunderbyte_table {
                 'key' => 'id',
                 'value' => $values->id,
             ]
-            ];
+        ];
+
         $data['showactionbuttons'][] = [
-                //'label' => get_string('delete', 'core'), // 'NoModal, SingleCall, NoSelection'
-                'class' => 'btn btn-plain btn-smaller',
-                'iclass' => 'fa fa-cog',
-                'href' => '#',
-                'id' => -1, // This forces single call execution.
-                //'formclass' => '', // To open dynamic form, instead of just confirmation modal.
-                'methodname' => 'edititem',
-                'nomodal' => true,
-                'selectionmandatory' => false,
-                'data' => [ // Will be added eg as data-id = $values->id, so values can be transmitted to the method above.
-                    'id' => 'id',
-                ],
-            ];
-            $data['showactionbuttons'][] = [
-                //'label' => get_string('delete', 'core'), // 'NoModal, SingleCall, NoSelection'
-                'class' => 'btn btn-plain btn-smaller',
-                'iclass' => 'fa fa-trash',
-                'href' => '#',
-                'id' => -1, // This forces single call execution.
-                //'formclass' => '', // To open dynamic form, instead of just confirmation modal.
-                'methodname' => 'deleteitem',
-                'nomodal' => true,
-                'selectionmandatory' => false,
-                'data' => [ // Will be added eg as data-id = $values->id, so values can be transmitted to the method above.
-                    'id' => 'id',
-                ],
-            ];
+            //'label' => get_string('delete', 'core'), // 'NoModal, SingleCall, NoSelection'
+            'class' => 'btn btn-plain btn-smaller',
+            'iclass' => 'fa fa-cog',
+            'href' => '#',
+            'id' => -1, // This forces single call execution.
+            //'formclass' => '', // To open dynamic form, instead of just confirmation modal.
+            'methodname' => 'edititem',
+            'nomodal' => true,
+            'selectionmandatory' => false,
+            'data' => [ // Will be added eg as data-id = $values->id, so values can be transmitted to the method above.
+                'id' => 'id',
+            ],
+        ];
+
+        $data['showactionbuttons'][] = [
+            //'label' => get_string('delete', 'core'), // 'NoModal, SingleCall, NoSelection'
+            'class' => 'btn btn-plain btn-smaller',
+            'iclass' => 'fa fa-trash',
+            'href' => '#',
+            'id' => -1, // This forces single call execution.
+            //'formclass' => '', // To open dynamic form, instead of just confirmation modal.
+            'methodname' => 'deleteitem',
+            'nomodal' => true,
+            'selectionmandatory' => false,
+            'data' => [ // Will be added eg as data-id = $values->id, so values can be transmitted to the method above.
+                'id' => 'id',
+            ],
+        ];
 
         return $OUTPUT->render_from_template('local_wunderbyte_table/component_actionbutton', $data);
     }
