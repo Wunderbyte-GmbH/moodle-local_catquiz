@@ -152,73 +152,81 @@ class catquiz {
             $params['userid'] = $userid;
         }
 
-        $select = ' DISTINCT *';
-        $from = "(
-            SELECT DISTINCT
-              q.id,
-              qbe.idnumber,
-              q.name,
-              q.questiontext,
-              q.qtype,
-              qc.name as categoryname,
-              lci.catscaleid catscaleid,
-              lci.componentname component,
-              s2.attempts,
-              COALESCE(s2.lastattempttime,0) as lastattempttime,
-              s3.userattempts,
-              COALESCE(s3.userlastattempttime,0) as userlastattempttime
+        $insql = '';
+        if (!empty($catscaleids) && $catscaleids[0] > 0) {
+            [$insql, $inparams] = $DB->get_in_or_equal($catscaleids, SQL_PARAMS_NAMED, 'incatscales');
+            $params = array_merge($params, $inparams);
+            $insql = " WHERE catscaleid $insql ";
+        }
+
+        $select = 'DISTINCT *';
+        $from = "( SELECT s1.*, s5.model, s5.difficulty, s5.discrimination, s5.guessing,
+                    s5.timecreated, s5.timemodified, s5.status
+            FROM (
+            SELECT
+                q.id,
+                lci.componentid,
+                qbe.idnumber,
+                q.name,
+                q.questiontext,
+                q.qtype,
+                qc.name as categoryname,
+                lci.catscaleid catscaleid,
+                lci.componentname component,
+                s2.attempts,
+                COALESCE(s2.lastattempttime,0) as lastattempttime,
+                s3.userattempts,
+                COALESCE(s3.userlastattempttime,0) as userlastattempttime
             FROM {question} q
 
-            JOIN {question_versions} qv
+            LEFT JOIN {question_versions} qv
             ON q.id=qv.questionid
 
-            JOIN {question_bank_entries} qbe
+            LEFT JOIN {question_bank_entries} qbe
             ON qv.questionbankentryid=qbe.id
 
-            JOIN {question_categories} qc
+            LEFT JOIN {question_categories} qc
             ON qc.id=qbe.questioncategoryid
 
-            LEFT JOIN {local_catquiz_items} lci
+            RIGHT JOIN {local_catquiz_items} lci
             ON lci.componentid=q.id AND lci.componentname='question'
 
             LEFT JOIN (
-              SELECT ccc1.id AS contextid, qa.questionid, COUNT(*) AS attempts, MAX(qas.timecreated) as lastattempttime
-              FROM {local_catquiz_catcontext} ccc1
+                SELECT ccc1.id AS contextid, qa.questionid, COUNT(*) AS attempts, MAX(qas.timecreated) as lastattempttime
+                FROM {local_catquiz_catcontext} ccc1
 
-              JOIN {question_attempt_steps} qas
-              ON ccc1.starttimestamp < qas.timecreated
+                JOIN {question_attempt_steps} qas
+                ON ccc1.starttimestamp < qas.timecreated
                 AND ccc1.endtimestamp > qas.timecreated
                 AND qas.fraction IS NOT NULL
 
-              JOIN {question_attempts} qa
-              ON qas.questionattemptid = qa.id
+                JOIN {question_attempts} qa
+                ON qas.questionattemptid = qa.id
 
-              WHERE ccc1.id = :contextid
-              GROUP BY ccc1.id, qa.questionid
+                WHERE ccc1.id = :contextid
+                GROUP BY ccc1.id, qa.questionid
             ) s2
             ON q.id = s2.questionid
 
             LEFT JOIN (
-                              SELECT ccc1.id AS contextid, qa.questionid, COUNT(*) AS userattempts, MAX(qas.timecreated) as userlastattempttime
-                              FROM {local_catquiz_catcontext} ccc1
-                                       JOIN {question_attempt_steps} qas
-                                            ON ccc1.starttimestamp < qas.timecreated AND ccc1.endtimestamp > qas.timecreated
-                                                AND qas.fraction IS NOT NULL
+                SELECT ccc1.id AS contextid, qa.questionid, COUNT(*) AS userattempts, MAX(qas.timecreated) as userlastattempttime
+                FROM {local_catquiz_catcontext} ccc1
+                        JOIN {question_attempt_steps} qas
+                            ON ccc1.starttimestamp < qas.timecreated AND ccc1.endtimestamp > qas.timecreated
+                                AND qas.fraction IS NOT NULL
 
-                                       JOIN {question_attempts} qa
-                                            ON qas.questionattemptid = qa.id
-                              WHERE ccc1.id = :contextid2
-                              GROUP BY ccc1.id, qa.questionid
+                        JOIN {question_attempts} qa
+                            ON qas.questionattemptid = qa.id
+                WHERE ccc1.id = :contextid2
+                GROUP BY ccc1.id, qa.questionid
             ) s3
             ON q.id = s3.questionid
 
-          ) as s1
-          JOIN (
+            ) as s1
+            LEFT JOIN (
             SELECT
-                s4.id, s4.timecreated, s4.status,
-                maxlcip.componentid, maxlcip.componentname, maxlcip.contextid,
-                maxlcip.model, maxlcip.difficulty, maxlcip.discrimination, maxlcip.guessing,
-                maxlcip.timemodified
+                maxlcip.componentid, maxlcip.componentname, maxlcip.model, maxlcip.difficulty, maxlcip.discrimination, maxlcip.guessing,
+                s4.timecreated, maxlcip.timemodified, s4.status
             FROM (
                 SELECT lcip.*, ROW_NUMBER() OVER (PARTITION BY componentid, componentname ORDER BY lcip.status DESC, lcip.timecreated DESC) AS n
                 FROM {local_catquiz_itemparams} lcip
@@ -226,13 +234,14 @@ class catquiz {
             JOIN {local_catquiz_itemparams} maxlcip
             ON s4.id = maxlcip.id
             WHERE n = 1
-          ) AS s5
-          ON s5.componentid = s1.id
-          AND s5.componentname = s1.component";
+            ) AS s5
+            ON s5.componentid = s1.id
+            AND s5.componentname = s1.component
+            $insql
+        ) AS s6";
 
-        [$insql, $inparams] = $DB->get_in_or_equal($catscaleids, SQL_PARAMS_NAMED);
-        $where = ' catscaleid '. $insql;
-        $params = array_merge($params, $inparams);
+        $where = '1=1';
+
         $filter = '';
 
         foreach ($wherearray as $key => $value) {
