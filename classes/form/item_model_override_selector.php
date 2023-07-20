@@ -40,6 +40,8 @@ use stdClass;
  */
 class item_model_override_selector extends dynamic_form {
 
+    const DEFAULT_COMPONENT_NAME = 'question';
+
     /**
      * {@inheritdoc}
      * @see moodleform::definition()
@@ -180,7 +182,7 @@ class item_model_override_selector extends dynamic_form {
         foreach ($to_insert as $new) {
             $new['componentid'] = $data->testitemid;
             $new['contextid'] = $data->contextid;
-            $new['componentname'] = $data->componentname;
+            $new['componentname'] = $data->componentname ?: self::DEFAULT_COMPONENT_NAME;
             $new['timecreated'] = time();
             $DB->insert_record(
                 'local_catquiz_itemparams',
