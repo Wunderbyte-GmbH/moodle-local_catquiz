@@ -27,6 +27,7 @@ use html_writer;
 use local_catquiz\catscale;
 use local_wunderbyte_table\wunderbyte_table;
 use context_system;
+use local_catquiz\local\model\model_item_param;
 use moodle_url;
 
 /**
@@ -140,21 +141,19 @@ class catscalequestions_table extends wunderbyte_table {
      * @return string
      */
     public function col_status($values) {
-        global $OUTPUT;
-
         $color = "";
 
         switch ($values->status) {
-            case 5:
+            case model_item_param::STATUS_SET_MANUALLY:
                 $color = 'green';
                 break;
-            case 1:
+            case model_item_param::STATUS_SET_BY_STRATEGY:
                 $color = 'yellow';
                 break;
-            case 0:
+            case model_item_param::STATUS_NOT_CALCULATED:
                 $color = 'orange';
                 break;
-            case -5:
+            case model_item_param::STATUS_NOT_SET:
                 $color = 'red';
                 break;
         }
