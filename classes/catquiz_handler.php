@@ -535,6 +535,11 @@ class catquiz_handler {
      */
     private static function get_strategy_selectcontext(stdClass $quizsettings, stdClass $attemptdata) {
         $contextcreator = info::get_contextcreator();
+
+        if ($quizsettings->catquiz_includepilotquestions) {
+            $pilot_ratio = floatval($quizsettings->catquiz_pilotratio);
+        }
+
         $initialcontext = [
             'contextid' => intval($quizsettings->catquiz_catcontext),
             'catscaleid' => $quizsettings->catquiz_catcatscales,
@@ -550,7 +555,7 @@ class catquiz_handler {
                  * Currently, it is set to 30 days
                  */
             'penalty_time_range' => 60 * 60 * 24 * 30,
-            'pilot_ratio' => floatval($quizsettings->catquiz_pilotratio),
+            'pilot_ratio' => $pilot_ratio ?? 0,
             'questionsattempted' => intval($attemptdata->questionsattempted),
         ];
         return $contextcreator->load(

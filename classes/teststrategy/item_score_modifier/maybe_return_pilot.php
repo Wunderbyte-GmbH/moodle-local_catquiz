@@ -14,6 +14,10 @@ use local_catquiz\wb_middleware;
 final class maybe_return_pilot extends item_score_modifier implements wb_middleware
 {
     public function run(array $context, callable $next): result {
+        if ($context['pilot_ratio'] === 0) {
+            return $next($context);
+        }
+
         $pilot_questions = array_filter($context['questions'], fn($q) => $q->is_pilot);
         $nonpilot_questions = array_udiff($context['questions'], $pilot_questions, fn($a, $b) => $a->id - $b->id);
         // If there are no pilot or non-pilot questions available, then return a random question

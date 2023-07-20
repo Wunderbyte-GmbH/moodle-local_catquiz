@@ -19,12 +19,17 @@ class pilotquestions_loader implements contextloaderinterface {
 
     public function requires(): array {
         return [
-            'questions'
+            'questions',
+            'pilot_ratio',
         ];
     }
 
     public function load(array $context): array {
         $context['pilot_questions'] = [];
+        if ($context['pilot_ratio'] === 0) {
+            return $context;
+        }
+
         foreach ($context['questions'] as $id => $question) {
             $question->is_pilot = intval($question->attempts) < self::ATTEMPTS_THRESHOLD;
             $context['questions'][$id] = $question;

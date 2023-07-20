@@ -25,7 +25,10 @@ final class updatepersonability extends item_score_modifier implements wb_middle
 
     public function run(array $context, callable $next): result {
         $lastquestion = $context['lastquestion'];
-        if ($lastquestion === NULL || $lastquestion->is_pilot) {
+        // If we do not know the answer to the last question, we do not have to
+        // update the person ability. Also, pilot questions should not be used
+        // to update a student's ability.
+        if ($lastquestion === NULL || !empty($lastquestion->is_pilot)) {
             return $next($context);
         }
 
