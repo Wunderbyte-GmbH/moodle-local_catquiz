@@ -141,12 +141,12 @@ class info {
     /**
      * Returns score modifier functions
      *
-     * @return array<item_score_modifier>
+     * @return array<preselect_task>
      */
     public static function get_score_modifiers(): array {
         $score_modifiers = core_component::get_component_classes_in_namespace(
             "local_catquiz",
-            'teststrategy\item_score_modifier'
+            'teststrategy\preselect_task'
         );
         foreach (array_keys($score_modifiers) as $classname) {
             $instances[$classname] = new $classname();

@@ -20,7 +20,7 @@ use cache;
 use local_catquiz\catscale;
 use local_catquiz\local\result;
 use local_catquiz\teststrategy\info;
-use local_catquiz\teststrategy\item_score_modifier;
+use local_catquiz\teststrategy\preselect_task;
 use local_catquiz\wb_middleware_runner;
 use moodle_exception;
 
@@ -50,7 +50,7 @@ abstract class strategy {
     public int $catcontextid;
 
     /**
-     * @var array<item_score_modifier>
+     * @var array<preselect_task>
      */
     public array $score_modifiers;
 

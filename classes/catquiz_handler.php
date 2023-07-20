@@ -524,10 +524,10 @@ class catquiz_handler {
     }
 
     /**
-     * Gets data required by the item_score_modifier middleware classes.
+     * Gets data required by the preselect_task middleware classes.
      *
      * Don't confuse with the context from local_catquiz_catcontext table.
-     * This context contains data that are required by the item_score_modifier
+     * This context contains data that are required by the preselect_task
      * middleware classes.
      *
      * @param stdClass $quizsettings

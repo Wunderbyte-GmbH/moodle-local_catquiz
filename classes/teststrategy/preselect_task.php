@@ -27,20 +27,17 @@ use local_catquiz\local\status;
 use local_catquiz\wb_middleware;
 
 /**
- * Base class for a test item score modifier.
+ * Base class for a pre-select task.
  * 
- * Classes that extend this class can update the item score that is used
- * to rank test items when a user plays a quiz.
+ * Classes that extend this class are executed in order to select a question.
  * 
- * To select the next question, we execute a number of item_score_modifier
- * middleware instances. Each of those middleware instances will be passed a
- * $context object with required data, such as the list of questions, person
- * ability, etc.
- * Usually the last middleware will calculate a final score for each question
- * based on the data added by the previous middleware instances and return a
- * sorted questions array.
+ * To select the next question, we execute a number of pre-select tasks. Each of
+ * those tasks will be passed a $context object with required data, such as the
+ * list of questions, person ability, etc. Usually the last task will calculate
+ * a final score for each question based on the data added by the previous tasks
+ * and return a question inside a `result` with status `ok`.
  */
-abstract class item_score_modifier implements wb_middleware
+abstract class preselect_task implements wb_middleware
 {
     public function process(array $context, callable $next): result {
         foreach ($this->get_required_context_keys() as $key) {

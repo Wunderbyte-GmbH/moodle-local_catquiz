@@ -16,13 +16,13 @@
 
 namespace local_catquiz\teststrategy\strategy;
 
-use local_catquiz\teststrategy\item_score_modifier\lasttimeplayedpenalty;
-use local_catquiz\teststrategy\item_score_modifier\maximumquestionscheck;
-use local_catquiz\teststrategy\item_score_modifier\maybe_return_pilot;
-use local_catquiz\teststrategy\item_score_modifier\noremainingquestions;
-use local_catquiz\teststrategy\item_score_modifier\numberofgeneralattempts;
-use local_catquiz\teststrategy\item_score_modifier\strategybalancedscore;
-use local_catquiz\teststrategy\item_score_modifier\updatepersonability;
+use local_catquiz\teststrategy\preselect_task\lasttimeplayedpenalty;
+use local_catquiz\teststrategy\preselect_task\maximumquestionscheck;
+use local_catquiz\teststrategy\preselect_task\maybe_return_pilot;
+use local_catquiz\teststrategy\preselect_task\noremainingquestions;
+use local_catquiz\teststrategy\preselect_task\numberofgeneralattempts;
+use local_catquiz\teststrategy\preselect_task\strategybalancedscore;
+use local_catquiz\teststrategy\preselect_task\updatepersonability;
 use local_catquiz\teststrategy\strategy;
 
 /**

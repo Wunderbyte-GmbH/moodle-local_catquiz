@@ -1,17 +1,17 @@
 <?php
 
-namespace local_catquiz\teststrategy\item_score_modifier;
+namespace local_catquiz\teststrategy\preselect_task;
 
 use local_catquiz\local\result;
-use local_catquiz\teststrategy\item_score_modifier;
+use local_catquiz\teststrategy\preselect_task;
 use local_catquiz\wb_middleware;
 
 /**
  * Shuffles the array of questions so that a random one will be selected
  *
- * @package local_catquiz\teststrategy\item_score_modifier
+ * @package local_catquiz\teststrategy\preselect_task
  */
-final class strategyrandom extends item_score_modifier implements wb_middleware
+final class strategyrandom extends preselect_task implements wb_middleware
 {
     public function run(array $context, callable $next): result {
         shuffle($context['questions']);

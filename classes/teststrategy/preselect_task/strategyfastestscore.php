@@ -1,19 +1,19 @@
 <?php
 
-namespace local_catquiz\teststrategy\item_score_modifier;
+namespace local_catquiz\teststrategy\preselect_task;
 
 use local_catquiz\local\result;
-use local_catquiz\teststrategy\item_score_modifier;
-use local_catquiz\teststrategy\item_score_modifier\fisherinformation;
-use local_catquiz\teststrategy\item_score_modifier\lasttimeplayedpenalty;
+use local_catquiz\teststrategy\preselect_task;
+use local_catquiz\teststrategy\preselect_task\fisherinformation;
+use local_catquiz\teststrategy\preselect_task\lasttimeplayedpenalty;
 use local_catquiz\wb_middleware;
 
 /**
  * Add a score to each question and sort questions descending by score
  * 
- * @package local_catquiz\teststrategy\item_score_modifier
+ * @package local_catquiz\teststrategy\preselect_task
  */
-final class strategyfastestscore extends item_score_modifier implements wb_middleware
+final class strategyfastestscore extends preselect_task implements wb_middleware
 {
     public function run(array $context, callable $next): result {
         foreach ($context['questions'] as $question) {

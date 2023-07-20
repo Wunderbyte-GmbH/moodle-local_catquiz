@@ -1,17 +1,17 @@
 <?php
 
-namespace local_catquiz\teststrategy\item_score_modifier;
+namespace local_catquiz\teststrategy\preselect_task;
 
 use local_catquiz\local\result;
-use local_catquiz\teststrategy\item_score_modifier;
+use local_catquiz\teststrategy\preselect_task;
 use local_catquiz\wb_middleware;
 
 /**
  * Randomly returns a pilot question according to the `pilot_ratio` parameter
  * 
- * @package local_catquiz\teststrategy\item_score_modifier
+ * @package local_catquiz\teststrategy\preselect_task
  */
-final class maybe_return_pilot extends item_score_modifier implements wb_middleware
+final class maybe_return_pilot extends preselect_task implements wb_middleware
 {
     public function run(array $context, callable $next): result {
         if ($context['pilot_ratio'] === 0) {

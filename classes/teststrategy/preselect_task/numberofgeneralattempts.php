@@ -1,10 +1,10 @@
 <?php
 
-namespace local_catquiz\teststrategy\item_score_modifier;
+namespace local_catquiz\teststrategy\preselect_task;
 
 use local_catquiz\local\result;
 use local_catquiz\local\status;
-use local_catquiz\teststrategy\item_score_modifier;
+use local_catquiz\teststrategy\preselect_task;
 use local_catquiz\wb_middleware;
 
 /**
@@ -13,9 +13,9 @@ use local_catquiz\wb_middleware;
  * This information can be used to update the score, so that eventually all
  * questions will have a similar number of attempts.
  *
- * @package local_catquiz\teststrategy\item_score_modifier
+ * @package local_catquiz\teststrategy\preselect_task
  */
-final class numberofgeneralattempts extends item_score_modifier implements wb_middleware
+final class numberofgeneralattempts extends preselect_task implements wb_middleware
 {
     const PROPERTYNAME = 'numberofgeneralattempts';
     public function run(array $context, callable $next): result {

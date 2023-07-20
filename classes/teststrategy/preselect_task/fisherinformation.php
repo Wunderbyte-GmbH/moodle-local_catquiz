@@ -1,13 +1,13 @@
 <?php
 
-namespace local_catquiz\teststrategy\item_score_modifier;
+namespace local_catquiz\teststrategy\preselect_task;
 
 use local_catquiz\local\result;
-use local_catquiz\teststrategy\item_score_modifier;
+use local_catquiz\teststrategy\preselect_task;
 use local_catquiz\wb_middleware;
 use moodle_exception;
 
-final class fisherinformation extends item_score_modifier implements wb_middleware
+final class fisherinformation extends preselect_task implements wb_middleware
 {
     const PROPERTYNAME = 'fisherinformation';
 

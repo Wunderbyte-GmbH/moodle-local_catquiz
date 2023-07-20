@@ -1,6 +1,6 @@
 <?php
 
-namespace local_catquiz\teststrategy\item_score_modifier;
+namespace local_catquiz\teststrategy\preselect_task;
 
 use cache;
 use local_catquiz\catcalc;
@@ -10,16 +10,16 @@ use local_catquiz\local\model\model_item_param_list;
 use local_catquiz\local\model\model_strategy;
 use local_catquiz\local\result;
 use local_catquiz\local\status;
-use local_catquiz\teststrategy\item_score_modifier;
+use local_catquiz\teststrategy\preselect_task;
 use local_catquiz\wb_middleware;
 use moodle_exception;
 
 /**
  * Update the person ability based on the result of the previous question
  *
- * @package local_catquiz\teststrategy\item_score_modifier
+ * @package local_catquiz\teststrategy\preselect_task
  */
-final class updatepersonability extends item_score_modifier implements wb_middleware
+final class updatepersonability extends preselect_task implements wb_middleware
 {
     const UPDATE_THRESHOLD = 0.001;
 
