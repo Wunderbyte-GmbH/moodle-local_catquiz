@@ -27,7 +27,7 @@ use local_catquiz\teststrategy\item_score_modifier\updatepersonability;
 use local_catquiz\teststrategy\strategy;
 
 /**
- * Base class for test strategies.
+ * Will select questions with the highest fisher information first
  */
 class teststrategy_fastest extends strategy {
 
