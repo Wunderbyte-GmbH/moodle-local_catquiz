@@ -98,8 +98,12 @@ class info {
         $teststrategies = self::return_available_strategies();
 
         $teststrategiesoptions = [];
+        $strategies_without_pilotquestions = [];
         foreach($teststrategies as $ts) {
             $teststrategiesoptions[$ts->id] = $ts->get_description();
+            if ($ts->get_description() === get_string('teststrategy_fastest', 'local_catquiz')) {
+                $strategies_without_pilotquestions[] = $ts->id;
+            }
         }
 
         // Choose a test strategy for this instance.
@@ -108,9 +112,11 @@ class info {
 
         
         $elements[] = $mform->addElement('advcheckbox', 'catquiz_includepilotquestions', get_string('includepilotquestions', 'local_catquiz'));
+        $mform->hideIf('catquiz_includepilotquestions', 'catquiz_selectteststrategy', 'eq', $strategies_without_pilotquestions);
         // Add ratio of pilot questions
         $elements[] = $mform->addElement('text', 'catquiz_pilotratio', get_string('pilotratio', 'local_catquiz'));
         $mform->hideIf('catquiz_pilotratio', 'catquiz_includepilotquestions', 'neq', 1);
+        $mform->hideIf('catquiz_pilotratio', 'catquiz_selectteststrategy', 'eq', $strategies_without_pilotquestions);
         $mform->setType('catquiz_pilotratio', PARAM_FLOAT);
         $mform->addHelpButton('catquiz_pilotratio', 'pilotratio', 'local_catquiz');
     }
