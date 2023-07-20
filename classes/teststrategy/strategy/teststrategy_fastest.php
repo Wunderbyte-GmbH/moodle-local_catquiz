@@ -21,6 +21,7 @@ use local_catquiz\teststrategy\item_score_modifier\lasttimeplayedpenalty;
 use local_catquiz\teststrategy\item_score_modifier\maximumquestionscheck;
 use local_catquiz\teststrategy\item_score_modifier\noremainingquestions;
 use local_catquiz\teststrategy\item_score_modifier\numberofgeneralattempts;
+use local_catquiz\teststrategy\item_score_modifier\remove_uncalculated;
 use local_catquiz\teststrategy\item_score_modifier\strategyfastestscore;
 use local_catquiz\teststrategy\item_score_modifier\updatepersonability;
 use local_catquiz\teststrategy\strategy;
@@ -41,6 +42,7 @@ class teststrategy_fastest extends strategy {
             maximumquestionscheck::class,
             updatepersonability::class,
             noremainingquestions::class,
+            remove_uncalculated::class,
             lasttimeplayedpenalty::class,
             numberofgeneralattempts::class,
             fisherinformation::class,
