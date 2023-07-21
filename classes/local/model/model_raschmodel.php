@@ -24,6 +24,7 @@
 
 namespace local_catquiz\local\model;
 
+use local_catquiz\catcalc_interface;
 defined('MOODLE_INTERNAL') || die();
 
 /**
@@ -32,7 +33,6 @@ defined('MOODLE_INTERNAL') || die();
  * @copyright  2023 Wunderbyte GmbH <georg.maisser@wunderbyte.at>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-abstract class model_raschmodel extends model_model {
 
     /**
      * @var model_responses Contains necessary data for estimation
@@ -68,6 +68,7 @@ abstract class model_raschmodel extends model_model {
     protected function create_item_param(int $itemid, array $metadata = []): model_item_param {
         return new model_item_param($itemid, $this->model_name, $metadata);
     }
+abstract class model_raschmodel extends model_model implements catcalc_interface {
 
     /**
      * Executes the model-specific code to estimate item-parameters based
