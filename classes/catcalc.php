@@ -28,6 +28,7 @@ namespace local_catquiz;
 use catmodel_raschbirnbauma\raschmodel;
 use local_catquiz\local\model\model_item_param_list;
 use local_catquiz\local\model\model_model;
+use local_catquiz\local\model\model_raschmodel;
 use local_catquiz\local\model\model_strategy;
 use local_catquiz\mathcat;
 
@@ -62,10 +63,6 @@ class catcalc {
     }
 
     static function estimate_person_ability($demo_person_response, model_item_param_list $items): float {
-        //if (! $model instanceof catcalc_interface) {
-        //    throw new \InvalidArgumentException("Model does not implement the catcalc_interface");
-        //}
-
        $all_models = model_strategy::get_installed_models();
 
         $likelihood = fn($x) => 1;
@@ -80,29 +77,20 @@ class catcalc {
                 continue;
             }
             $item_params = $item->get_params_array();
+            /**
+             * @var model_raschmodel
+             */
             $model = $all_models[$item->get_model_name()];
 
-            if ($qresponse['fraction'] == 1) {
-                $likelihood_part = fn($x) => $model::get_callable_likelihood($x, $item_params);
-                $loglikelihood_part = fn($x) => $model::get_callable_log_likelihood($x, $item_params);
-                $loglikelihood_1st_derivative_part = fn($x) => $model::log_likelihood_p($x, $item_params);
-                $loglikelihood_2nd_derivative_part = fn($x) => $model::log_likelihood_p_p($x, $item_params);
+            $likelihood_part = fn ($x) => $model::likelihood($x, $item_params, $qresponse['fraction']);
+            $loglikelihood_part = fn ($x) => $model::log_likelihood($x, $item_params, $qresponse['fraction']);
+            $loglikelihood_1st_derivative_part = fn ($x) => $model::log_likelihood_p($x, $item_params, $qresponse['fraction']);
+            $loglikelihood_2nd_derivative_part = fn ($x) => $model::log_likelihood_p_p($x, $item_params, $qresponse['fraction']);
 
-                $likelihood = fn($x) => $likelihood($x) * $likelihood_part($x);
-                $loglikelihood = fn($x) => $loglikelihood($x) + $loglikelihood_part($x);
-                $loglikelihood_1st_derivative = fn($x) => $loglikelihood_1st_derivative($x) + $loglikelihood_1st_derivative_part($x);
-                $loglikelihood_2nd_derivative = fn($x) => $loglikelihood_2nd_derivative($x) + $loglikelihood_2nd_derivative_part($x);
-            } else if ($qresponse['fraction'] == 0) {
-                $likelihood_part = fn($x) => $model::get_callable_likelihood_counter($x, $item_params);
-                $loglikelihood_part = fn($x) => $model::get_callable_log_likelihood_counter($x, $item_params);
-                $loglikelihood_1st_derivative_part = fn($x) => $model::counter_log_likelihood_p($x, $item_params);
-                $loglikelihood_2nd_derivative_part = fn($x) => $model::counter_log_likelihood_p_p($x, $item_params);
-
-                $likelihood = fn($x) => $likelihood($x) * $likelihood_part($x);
-                $loglikelihood = fn($x) => $loglikelihood($x) + $loglikelihood_part($x);
-                $loglikelihood_1st_derivative = fn($x) => $loglikelihood_1st_derivative($x) + $loglikelihood_1st_derivative_part($x);
-                $loglikelihood_2nd_derivative = fn($x) => $loglikelihood_2nd_derivative($x) + $loglikelihood_2nd_derivative_part($x);
-            };
+            $likelihood = fn ($x) => $likelihood($x) * $likelihood_part($x);
+            $loglikelihood = fn ($x) => $loglikelihood($x) + $loglikelihood_part($x);
+            $loglikelihood_1st_derivative = fn ($x) => $loglikelihood_1st_derivative($x) + $loglikelihood_1st_derivative_part($x);
+            $loglikelihood_2nd_derivative = fn ($x) => $loglikelihood_2nd_derivative($x) + $loglikelihood_2nd_derivative_part($x);
         }
 
         $retval = mathcat::newtonraphson_stable(

@@ -41,17 +41,6 @@ abstract class model_model {
 
     protected string $model_name;
 
-    protected static $methods = [
-        'get_callable_likelihood' => 'likelihood',
-        'get_callable_likelihood_counter' => 'counter_likelihood',
-        'get_callable_log_likelihood' => 'log_likelihood',
-        'get_callable_log_likelihood_counter' => 'log_counter_likelihood',
-    ];
-
-    public static function __callStatic(string $method, array $parameters) {
-        return call_user_func_array(self::$methods[$method], ...$parameters);
-    }
-
     /**
      * Model-specific instantiation can go here.
      */

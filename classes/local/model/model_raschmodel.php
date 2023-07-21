@@ -41,17 +41,6 @@ abstract class model_raschmodel extends model_model {
 
     protected string $model_name;
 
-    protected static $methods = [
-        'get_callable_likelihood' => 'likelihood',
-        'get_callable_likelihood_counter' => 'counter_likelihood',
-        'get_callable_log_likelihood' => 'log_likelihood',
-        'get_callable_log_likelihood_counter' => 'log_counter_likelihood',
-    ];
-
-    public static function __callStatic(string $method, array $parameters) {
-        return call_user_func_array(self::$methods[$method], ...$parameters);
-    }
-
     /**
      * Model-specific instantiation can go here.
      */
@@ -124,4 +113,12 @@ abstract class model_raschmodel extends model_model {
      * @return mixed 
      */
     abstract public static function fisher_info(float $person_ability, array $params);
+
+    /**
+     * 
+     */
+    abstract public static function likelihood($x, array $item_params, float $item_response);
+    abstract public static function log_likelihood($x, array $item_params, float $item_response);
+    abstract public static function log_likelihood_p($x, array $item_params, float $item_response);
+    abstract public static function log_likelihood_p_p($x, array $item_params, float $item_response);
 }
