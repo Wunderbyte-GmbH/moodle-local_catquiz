@@ -24,7 +24,7 @@ class result
         $this->status = $status;
     }
     
-    public function getStatus()
+    public function get_status()
     {
         return $this->status;
     }
@@ -50,6 +50,6 @@ class result
             throw new \moodle_exception("Trying to get the error message for a result that has no error.");
         }
 
-        return get_string($this->getStatus(), 'local_catquiz');
+        return get_string($this->get_status(), 'local_catquiz');
     }
 }

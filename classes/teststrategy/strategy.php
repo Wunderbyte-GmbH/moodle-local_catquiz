@@ -102,7 +102,9 @@ abstract class strategy {
 
         $result = wb_middleware_runner::run($middlewares, $context);
 
+        $cache = cache::make('local_catquiz', 'adaptivequizattempt');
         if ($result->isErr()) {
+            $cache->set('stopreason', $result->get_status());
             return $result;
         }
 
@@ -115,7 +117,6 @@ abstract class strategy {
         $selected_question->userlastattempttime = $now;
 
         // Keep track of which question was selected
-        $cache = cache::make('local_catquiz', 'adaptivequizattempt');
         $playedquestions = $cache->get('playedquestions') ?: [];
         $playedquestions[$selected_question->id] = $selected_question;
         $cache->set('playedquestions', $playedquestions);
@@ -168,9 +169,18 @@ abstract class strategy {
     /**
      * Provide feedback about the last quiz attempt
      *
-     * @return string
+     * @return array<string>
      */
-    public static function attempt_feedback(): string {
-        return '';
+    public static function attempt_feedback(): array {
+        $cache = cache::make('local_catquiz', 'adaptivequizattempt');
+
+        if ($stopreason = $cache->get('stopreason')) {
+            return [sprintf(
+                "%s: %s",
+                get_string('attemptstopcriteria', 'mod_adaptivequiz'),
+                get_string($stopreason, 'local_catquiz')
+            )];
+        }
+        return [];
     }
 }

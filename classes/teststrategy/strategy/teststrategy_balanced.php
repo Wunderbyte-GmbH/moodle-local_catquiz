@@ -49,12 +49,16 @@ class teststrategy_balanced extends strategy {
         ];
     }
 
-    public static function attempt_feedback(): string {
+    public static function attempt_feedback(): array {
         $cache = cache::make('local_catquiz', 'adaptivequizattempt');
-        return sprintf(
+        $feedback = sprintf(
             '%s: %d',
             get_string('pilot_questions', 'local_catquiz'),
             $cache->get('num_pilot_questions')
         );
+        if (!$parent_feedback = parent::attempt_feedback()) {
+            return [$feedback];
+        }
+        return [...$parent_feedback, $feedback];
     }
 }
