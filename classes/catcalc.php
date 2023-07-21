@@ -77,8 +77,9 @@ class catcalc {
                 continue;
             }
             $item_params = $item->get_params_array();
+
             /**
-             * @var model_raschmodel
+             * @var catcalc_interface
              */
             $model = $all_models[$item->get_model_name()];
 
