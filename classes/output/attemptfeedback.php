@@ -31,6 +31,7 @@
 namespace local_catquiz\output;
 
 use local_catquiz\catquiz;
+use local_catquiz\teststrategy\info;
 use templatable;
 use renderable;
 
@@ -54,6 +55,8 @@ class attemptfeedback implements renderable, templatable
      */
     public int $contextid;
 
+    public int $teststrategy;
+
     /**
      * @param int $attemptid
      * @param int $contextid
@@ -63,20 +66,24 @@ class attemptfeedback implements renderable, templatable
         global $USER;
         if ($attemptid === 0) {
             // This can still return nothing. In that case, we show a message that the user has no attempts yet
-            $attemptid = catquiz::get_last_user_attemptid($USER->id);
+            if (!$attemptid = catquiz::get_last_user_attemptid($USER->id)) {
+                return;
+            }
         }
         $this->attemptid = $attemptid;
 
-        if ($this->attemptid && $contextid === 0) {
-            // Get the contextid from the attempt
-            $testenvironment = catquiz::get_testenvironment_by_attemptid($attemptid);
-            if (!$testenvironment) {
-                return;
-            }
-            $settings = json_decode($testenvironment->json);
-            $contextid = intval($settings->catquiz_catcontext);
+
+        if (!$testenvironment = catquiz::get_testenvironment_by_attemptid($attemptid)) {
+            return;
         }
 
+        $settings = json_decode($testenvironment->json);
+        $this->teststrategy = intval($settings->catquiz_selectteststrategy);
+
+        if ($contextid === 0) {
+            // Get the contextid from the attempt
+            $contextid = intval($settings->catquiz_catcontext);
+        }
         $this->contextid = $contextid;
     }
 
@@ -104,11 +111,30 @@ class attemptfeedback implements renderable, templatable
         return $ability->ability;
     }
 
+    private function render_strategy_feedback() {
+        if (!$this->teststrategy) {
+            return '';
+        }
+
+        $available_teststrategies = info::return_available_strategies();
+        $filtered_strategies = array_filter(
+            $available_teststrategies,
+            fn ($strategy) => $strategy->id === $this->teststrategy
+        );
+
+        if (!$attempt_strategy = reset($filtered_strategies)) {
+            return '';
+        }
+
+        return $attempt_strategy::attempt_feedback();
+    }
+
     public function export_for_template(\renderer_base $output): array
     {
         return [
             'stats' => $this->render_question_stats($this->attemptid),
             'ability' => $this->render_person_ability($this->contextid),
+            'strategy_feedback' => $this->render_strategy_feedback(),
         ];
     }
 }

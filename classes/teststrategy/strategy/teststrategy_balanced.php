@@ -16,6 +16,7 @@
 
 namespace local_catquiz\teststrategy\strategy;
 
+use cache;
 use local_catquiz\teststrategy\preselect_task\lasttimeplayedpenalty;
 use local_catquiz\teststrategy\preselect_task\maximumquestionscheck;
 use local_catquiz\teststrategy\preselect_task\maybe_return_pilot;
@@ -46,5 +47,14 @@ class teststrategy_balanced extends strategy {
             maybe_return_pilot::class,
             strategybalancedscore::class,
         ];
+    }
+
+    public static function attempt_feedback(): string {
+        $cache = cache::make('local_catquiz', 'adaptivequizattempt');
+        return sprintf(
+            '%s: %d',
+            get_string('pilot_questions', 'local_catquiz'),
+            $cache->get('num_pilot_questions')
+        );
     }
 }

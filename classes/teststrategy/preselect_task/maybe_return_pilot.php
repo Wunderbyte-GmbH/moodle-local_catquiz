@@ -2,6 +2,7 @@
 
 namespace local_catquiz\teststrategy\preselect_task;
 
+use cache;
 use local_catquiz\local\result;
 use local_catquiz\teststrategy\preselect_task;
 use local_catquiz\wb_middleware;
@@ -27,6 +28,10 @@ final class maybe_return_pilot extends preselect_task implements wb_middleware
 
         $should_return_pilot = rand(0, 100) <= $context['pilot_ratio'] * 100;
         if ($should_return_pilot) {
+            $cache = cache::make('local_catquiz', 'adaptivequizattempt');
+            $num_pilot_questions = $cache->get('num_pilot_questions') ?: 0;
+            $cache->set('num_pilot_questions', ++$num_pilot_questions);
+
             $context['questions'] = $pilot_questions;
         } else {
             $context['questions'] = $nonpilot_questions;

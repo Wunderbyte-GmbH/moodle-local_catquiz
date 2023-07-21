@@ -60,10 +60,10 @@ abstract class strategy {
 
     /**
      * Returns an array of score modifier classes
-     * 
+     *
      * The classes will be called in the given order to calculate the score of a question
-     * 
-     * @return array 
+     *
+     * @return array
      */
     abstract public function requires_score_modifiers(): array;
 
@@ -163,5 +163,14 @@ abstract class strategy {
     public function set_catcontextid(int $catcontextid) {
         $this->catcontextid = $catcontextid;
         return $this;
+    }
+
+    /**
+     * Provide feedback about the last quiz attempt
+     *
+     * @return string
+     */
+    public static function attempt_feedback(): string {
+        return '';
     }
 }
