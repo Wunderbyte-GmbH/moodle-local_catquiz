@@ -37,10 +37,10 @@ defined('MOODLE_INTERNAL') || die();
 class raschbirnbaumc extends model_raschmodel implements catcalc_interface
 {
 
-    public static function log_likelihood_p($p, array $params): float {
-        //$a = $params['difficulty'];
-        //$b = $params['discrimination'];
-        //$c = $params['guessing'];
+    public static function log_likelihood_p($p, array $params, float $item_response): float {
+        if ($item_response < 1.0) {
+            return self::counter_log_likelihood_p($p, $params);
+        }
         $a = $params[0];
         $b = $params[1];
         $c = $params[2];
@@ -56,7 +56,10 @@ class raschbirnbaumc extends model_raschmodel implements catcalc_interface
         return -(($a * exp($a * $p))/(exp($a * $b) + exp($a * $p)));
     }
 
-    public static function log_likelihood_p_p($p, array $params): float {
+    public static function log_likelihood_p_p($p, array $params, float $item_response): float {
+        if ($item_response < 1.0) {
+            return self::counter_log_likelihood_p_p($p, $params);
+        }
         $a = $params[0];
         $b = $params[1];
         $c = $params[2];
@@ -90,13 +93,18 @@ class raschbirnbaumc extends model_raschmodel implements catcalc_interface
     // # elementary model functions
 
 
-    public function likelihood($p, array $params)
+    public static function likelihood($p, array $params, float $item_response)
     {
         $a = $params['discrimination'];
         $b = $params['difficulty'];
         $c = $params['guessing'];
 
-        return $c + (1- $c) * (exp($a*($p - $b)))/(1 + exp($a*($p-$b)));
+        $value = $c + (1- $c) * (exp($a*($p - $b)))/(1 + exp($a*($p-$b)));
+
+        if ($item_response < 1.0) {
+            return 1 - $value;
+        }
+        return $value;
     }
 
     /**
@@ -111,17 +119,12 @@ class raschbirnbaumc extends model_raschmodel implements catcalc_interface
         return $x['guessing'] + (1- $x['guessing']) * (exp($x['difficulty']*($p - $x['discrimination'])))/(1 + exp($x['difficulty']*($p-$x['discrimination'])));
     }
 
-    public static function counter_likelihood($p, array $params)
+    public static function log_likelihood($p, array $params, float $item_response)
     {
-        $a = $params['discrimination'];
-        $b = $params['difficulty'];
-        $c = $params['guessing'];
+        if ($item_response < 1.0) {
+            return self::log_counter_likelihood($p, $params);
+        }
 
-        return 1 - self::likelihood($p,$params);
-    }
-
-    public static function log_likelihood($p, array $params)
-    {
         $a = $params['discrimination'];
         $b = $params['difficulty'];
         $c = $params['guessing'];
@@ -300,20 +303,6 @@ class raschbirnbaumc extends model_raschmodel implements catcalc_interface
     public static function log_counter_likelihood_b_c($p, array $params)
     {
         return  0;
-    }
-
-    /**
-     * Used to estimate the item difficulty
-     * @param mixed $p
-     * @return Closure(mixed $x): float
-     */
-    public static function get_log_likelihood($p)
-    {
-
-        $fun = function ($x) use ($p) {
-            return self::log_likelihood($p, $x);
-        };
-        return $fun;
     }
 
     /**
