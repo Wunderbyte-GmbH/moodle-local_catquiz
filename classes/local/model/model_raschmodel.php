@@ -15,8 +15,6 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * 
- *
  * @package    local_catquiz
  * @copyright  2023 Wunderbyte GmbH <georg.maisser@wunderbyte.at>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
@@ -25,6 +23,7 @@
 namespace local_catquiz\local\model;
 
 use local_catquiz\catcalc_interface;
+
 defined('MOODLE_INTERNAL') || die();
 
 /**
@@ -33,47 +32,12 @@ defined('MOODLE_INTERNAL') || die();
  * @copyright  2023 Wunderbyte GmbH <georg.maisser@wunderbyte.at>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-
-    /**
-     * @var model_responses Contains necessary data for estimation
-     */
-    protected model_responses $responses;
-
-    protected string $model_name;
-
-    /**
-     * Model-specific instantiation can go here.
-     */
-    public function __construct(model_responses $responses, string $model_name) {
-        $this->responses = $responses;
-        $this->model_name = $model_name;
-    }
-
-    /**
-     * Return the name of the current model
-     *
-     * @return string
-     */
-    public function get_model_name() {
-        return $this->model_name;
-    }
-
-    /**
-     * Helper to create a new item param
-     * 
-     * @param int   $itemid
-     * @param array $metadata Optional metadata
-     * @return model_item_param 
-     */
-    protected function create_item_param(int $itemid, array $metadata = []): model_item_param {
-        return new model_item_param($itemid, $this->model_name, $metadata);
-    }
 abstract class model_raschmodel extends model_model implements catcalc_interface {
 
     /**
      * Executes the model-specific code to estimate item-parameters based
      * on the given person abilities.
-     * 
+     *
      * @param model_person_param_list $person_params
      * @return model_item_param_list
      */
@@ -85,7 +49,7 @@ abstract class model_raschmodel extends model_model implements catcalc_interface
             $parameters = $this->calculate_params($item_response);
             // Now create a new item difficulty object (param)
             $param = $this
-                ->create_item_param($item_id, ['from_raschbirnbauma' => 'hello hello'])
+                ->create_item_param($item_id)
                 ->set_parameters($parameters);
             // ... and append it to the list of calculated item difficulties
             $estimated_item_params->add($param);
@@ -101,23 +65,6 @@ abstract class model_raschmodel extends model_model implements catcalc_interface
      */
     abstract protected function calculate_params($item_response): array;
 
-    /**
-     * Returns the paramter names of the model as strings
-     * 
-     * @return string[]
-     */
-    abstract protected static function get_parameter_names(): array;
-
-    /**
-     * @param float $person_ability 
-     * @param array<float> $params 
-     * @return mixed 
-     */
-    abstract public static function fisher_info(float $person_ability, array $params);
-
-    /**
-     * 
-     */
     abstract public static function likelihood($x, array $item_params, float $item_response);
     abstract public static function log_likelihood($x, array $item_params, float $item_response);
     abstract public static function log_likelihood_p($x, array $item_params, float $item_response);
