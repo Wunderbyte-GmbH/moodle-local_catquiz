@@ -30,7 +30,6 @@
 
 namespace local_catquiz\output;
 
-use catmodel_raschbirnbauma\raschmodel;
 use coding_exception;
 use context_system;
 use html_writer;
@@ -38,6 +37,7 @@ use local_catquiz\catmodel_info;
 use local_catquiz\catquiz;
 use local_catquiz\form\item_model_override_selector;
 use local_catquiz\local\model\model_item_param;
+use local_catquiz\local\model\model_raschmodel;
 use local_catquiz\local\model\model_strategy;
 use local_catquiz\table\testitems_table;
 use moodle_url;
@@ -105,7 +105,7 @@ class testitemdashboard implements renderable, templatable {
             $difficulty = $item->get_difficulty();
             $likelihoods = [];
             for ($ability=-5; $ability<=5 ; $ability += 0.5) {
-                $likelihoods[] = raschmodel::likelihood($ability, $difficulty);
+                $likelihoods[] = model_raschmodel::likelihood_1pl($ability, $difficulty);
             }
 
             // Create the graph for difficulty.

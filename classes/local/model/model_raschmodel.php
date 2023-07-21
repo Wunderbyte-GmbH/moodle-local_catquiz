@@ -33,6 +33,11 @@ defined('MOODLE_INTERNAL') || die();
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 abstract class model_raschmodel extends model_model implements catcalc_interface {
+    static function likelihood_1pl($person_ability, $item_difficulty ){
+
+        $discrimination = 1; // hardcode override because of 1pl
+        return (1 / (1 + exp($discrimination * ($item_difficulty - $person_ability))));
+    }
 
     /**
      * Executes the model-specific code to estimate item-parameters based
