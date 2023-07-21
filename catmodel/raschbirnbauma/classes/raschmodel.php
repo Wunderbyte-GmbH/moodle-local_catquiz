@@ -124,4 +124,33 @@ class raschmodel {   //TODO: Interface Implementation
         $discrimination = 1;
         return -($discrimination**2 * exp($discrimination * ($item_difficulty + $person_ability)))/(exp($discrimination * $item_difficulty) + exp($discrimination * $person_ability))**2;
     }
+
+    // Calculate Akaike Information Criterion
+    // Input:
+    //   $person_ability - array of person abilities which the model has been optimised for
+    //   $k - array of answer categories in the same order like $person_ability(e.g. 0 or 1)
+    public function calc_AIC($person_ability, $k){
+        $number_of_parameters = 1; // get_dim -1 ... ist in der Elternklasse aber nicht definiert.
+        $result = 0;
+
+        foreach $person_ability as $pp{
+            $result += log_likelihood($pp, $item_difficulty); // hier sollte dann $k mit übergeben werden, anstatt zwischen likelihood und likelihood_counter hinundherschalten zu müssen; außerdem sollte $item_difficulty eine private Variable der instanziierten Klasse sein, nicht übergeben werden müssen.
+        }
+        return 2 * $number_of_parameters - 2 * $result;
+    }
+
+    // Calculate Bayesian Information Criterion
+    // Input:
+    //   $person_ability - array of person abilities which the model has been optimised for
+    //   $k - array of answer categories in the same order like $person_ability(e.g. 0 or 1)
+    public function calc_BIC($person_ability, $k){
+        $number_of_parameters = 1; // get_dim -1 ... ist in der Elternklasse aber nicht definiert.
+        $number_of_cases = count($person_ability);
+        $result = 0;
+
+        foreach $person_ability as $pp{
+            $result += log_likelihood($pp, $item_difficulty); // hier sollte dann $k mit übergeben werden, anstatt zwischen likelihood und likelihood_counter hinundherschalten zu müssen; außerdem sollte $item_difficulty eine private Variable der instanziierten Klasse sein, nicht übergeben werden müssen.
+        }
+        return $number_of_parameters * log($number_of_cases) - 2 * $result;
+    }
 }
