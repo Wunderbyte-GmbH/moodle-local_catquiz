@@ -175,7 +175,7 @@ class catscale {
      */
     public function get_testitems(int $contextid, bool $includesubscales = false):array {
 
-        $cache = cache::make('local_catquiz', 'attemptquestions');
+        $cache = cache::make('local_catquiz', 'adaptivequizattempt');
         $cachekey = sprintf('testitems_%s_%s', $contextid, $includesubscales);
         if ($testitems = $cache->get($cachekey)) {
             return $testitems;
@@ -204,7 +204,7 @@ class catscale {
     }
 
     public static function update_testitem(int $contextid, $question, $includesubscales = false) {
-        $cache = cache::make('local_catquiz', 'attemptquestions');
+        $cache = cache::make('local_catquiz', 'adaptivequizattempt');
         $cachekey = sprintf('testitems_%s_%s', $contextid, $includesubscales);
         // This should never happen...
         if (!$testitems = $cache->get($cachekey)) {

@@ -115,13 +115,12 @@ abstract class strategy {
         $selected_question->userlastattempttime = $now;
 
         // Keep track of which question was selected
-        $playedquestionscache = cache::make('local_catquiz', 'playedquestions');
-        $playedquestions = $playedquestionscache->get('playedquestions') ?: [];
+        $cache = cache::make('local_catquiz', 'adaptivequizattempt');
+        $playedquestions = $cache->get('playedquestions') ?: [];
         $playedquestions[$selected_question->id] = $selected_question;
-        $playedquestionscache->set('playedquestions', $playedquestions);
+        $cache->set('playedquestions', $playedquestions);
 
-        $lastquestioncache = cache::make('local_catquiz', 'lastquestion');
-        $lastquestioncache->set('lastquestion', $selected_question);
+        $cache->set('lastquestion', $selected_question);
 
         catscale::update_testitem(
             $this->catcontextid,

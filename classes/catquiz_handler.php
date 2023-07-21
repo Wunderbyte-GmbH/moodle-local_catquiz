@@ -488,39 +488,8 @@ class catquiz_handler {
      * @throws cache_exception
      */
     public static function purge_attempt_caches(int $componentid, string $componentname, bool $includesubscales = false): bool {
-        $testenvironment = new testenvironment(
-            (object)['componentid' => $componentid, 'component' => $componentname]
-        );
-        $quizsettings = $testenvironment->return_settings();
-        $cache = cache::make('local_catquiz', 'attemptquestions');
-        $cachekey = sprintf('testitems_%s_%s', $quizsettings->catquiz_catcontext, $includesubscales);
-
-        self::purge_playedquestions_cache();
-        self::purge_lastquestion_cache();
-        return $cache->delete($cachekey);
-    }
-
-    /**
-     * Purges the played-questions cache that keeps track of questions played during active attempt
-     *
-     * @return bool Indicates whether the operation was successful
-     * @throws coding_exception
-     * @throws cache_exception
-     */
-    private static function purge_playedquestions_cache(): bool {
-        $cache = cache::make('local_catquiz', 'playedquestions');
-        return $cache->delete('playedquestions');
-    }
-
-    /**
-     * Purge the cache that keeps track of the previous question that was played
-     * @return bool 
-     * @throws coding_exception 
-     * @throws cache_exception 
-     */
-    private static function purge_lastquestion_cache(): bool {
-        $cache = cache::make('local_catquiz', 'lastquestion');
-        return $cache->delete('lastquestion');
+        $cache = cache::make('local_catquiz', 'adaptivequizattempt');
+        return $cache->purge();
     }
 
     /**

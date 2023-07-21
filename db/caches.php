@@ -60,19 +60,12 @@ $definitions = array(
         'staticaccelerationsize' => 1,
         'invalidationevents' => ['changesincatcontexts']
     ),
-    'attemptquestions' => array(
+    'adaptivequizattempt' => array(
         'mode' => cache_store::MODE_SESSION,
         'simplekeys' => true,
         'staticacceleration' => true,
         'staticaccelerationsize' => 1,
-        'invalidationevents' => ['changesinattemptquestions']
-    ),
-    'playedquestions' => array(
-        'mode' => cache_store::MODE_SESSION,
-        'simplekeys' => true,
-        'staticacceleration' => true,
-        'staticaccelerationsize' => 1,
-        'invalidationevents' => ['changesinplayedquestions']
+        'invalidationevents' => ['changesinadaptivequizattempt']
     ),
     'userresponses' => array(
         'mode' => cache_store::MODE_SESSION,
@@ -80,12 +73,5 @@ $definitions = array(
         'staticacceleration' => true,
         'staticaccelerationsize' => 1,
         'invalidationevents' => ['changesinuserresponses']
-    ),
-    'lastquestion' => array(
-        'mode' => cache_store::MODE_SESSION,
-        'simplekeys' => true,
-        'staticacceleration' => true,
-        'staticaccelerationsize' => 1,
-        'invalidationevents' => ['changesinlastquestion']
     ),
 );

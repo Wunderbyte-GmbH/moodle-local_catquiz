@@ -13,7 +13,7 @@ final class playedincurrentattempt extends preselect_task implements wb_middlewa
     const PENALTY = 100;
 
     public function run(array $context, callable $next): result {
-        $cache = cache::make('local_catquiz', 'playedquestions');
+        $cache = cache::make('local_catquiz', 'adaptivequizattempt');
         $playedquestions = $cache->get('playedquestions') ?: [];
         foreach ($context['questions'] as $q) {
                     if (array_key_exists($q->id, $playedquestions)) {
