@@ -77,9 +77,12 @@ class catcalc {
             $item_params = $item->get_params_array();
 
             /**
-             * @var catcalc_interface
+             * @var catcalc_ability_estimator
              */
             $model = $all_models[$item->get_model_name()];
+            if (!in_array(catcalc_ability_estimator::class, class_implements($model))) {
+                throw new \Exception(sprintf("The given model %s can not be used with the catcalc class", $item->get_model_name()));
+            }
 
             $likelihood_part = fn ($x) => $model::likelihood($x, $item_params, $qresponse['fraction']);
             $loglikelihood_part = fn ($x) => $model::log_likelihood($x, $item_params, $qresponse['fraction']);
@@ -109,8 +112,8 @@ class catcalc {
      * @return array<float>
      */
     static function estimate_item_params(array $item_response, model_model $model) {
-        if (! $model instanceof catcalc_interface) {
-            throw new \InvalidArgumentException("Model does not implement the catcalc_interface");
+        if (! $model instanceof catcalc_item_estimator) {
+            throw new \InvalidArgumentException("Model does not implement the catcalc_item_estimator interface");
         }
 
         // compose likelihood matrices based on actual result

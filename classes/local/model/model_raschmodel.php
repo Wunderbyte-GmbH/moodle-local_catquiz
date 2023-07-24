@@ -22,7 +22,8 @@
 
 namespace local_catquiz\local\model;
 
-use local_catquiz\catcalc_interface;
+use local_catquiz\catcalc_ability_estimator;
+use local_catquiz\catcalc_item_estimator;
 
 defined('MOODLE_INTERNAL') || die();
 
@@ -32,7 +33,7 @@ defined('MOODLE_INTERNAL') || die();
  * @copyright  2023 Wunderbyte GmbH <georg.maisser@wunderbyte.at>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-abstract class model_raschmodel extends model_model implements catcalc_interface {
+abstract class model_raschmodel extends model_model implements catcalc_item_estimator, catcalc_ability_estimator {
     static function likelihood_1pl($person_ability, $item_difficulty ){
 
         $discrimination = 1; // hardcode override because of 1pl

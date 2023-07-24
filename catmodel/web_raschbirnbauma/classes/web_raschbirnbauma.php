@@ -2,6 +2,7 @@
 
 namespace catmodel_web_raschbirnbauma;
 
+use local_catquiz\catcalc_ability_estimator;
 use local_catquiz\local\model\model_item_param_list;
 use local_catquiz\local\model\model_model;
 use local_catquiz\local\model\model_person_param_list;
@@ -9,7 +10,7 @@ use local_catquiz\local\model\model_person_param_list;
 /**
  * Uses a webservice to calculate the parameters
  */
-class web_raschbirnbauma extends model_model
+class web_raschbirnbauma extends model_model implements catcalc_ability_estimator
 {
 
     /**
@@ -105,7 +106,11 @@ class web_raschbirnbauma extends model_model
         return self::likelihood_multi($person_ability,$params) * (1-self::likelihood_multi($person_ability,$params));
     }
 
-    public static function log_likelihood_p($p, array $params): float {
+    public static function log_likelihood_p($p, array $params, float $item_response): float {
+        if ($item_response < 1.0) {
+            return self::counter_log_likelihood_p($p, $params);
+        }
+
         $b = $params['difficulty'];
 
         return exp($b)/(exp($b) + exp($p));
@@ -116,13 +121,49 @@ class web_raschbirnbauma extends model_model
         return -(exp($p)/(exp($b) + exp($p)));
     }
 
-    public static function log_likelihood_p_p($p, array $params): float {
+    public static function likelihood($p, array $params, float $item_response)
+    {
         $b = $params['difficulty'];
-        return -(exp($b + $p)/(exp($b) + exp($p))**2);
+
+        $a = 1;
+        $c = 0;
+
+        $value = $c + (1- $c) * (exp($a*($p - $b)))/(1 + exp($a*($p-$b)));
+
+        if ($item_response < 1.0) {
+            return 1 - $value;
+        }
+        return $value;
     }
 
-    public static function counter_log_likelihood_p_p($p, array $params): float {
+    public static function log_likelihood($p, array $params, float $item_response)
+    {
+        if ($item_response < 1.0) {
+            return self::log_counter_likelihood($p, $params);
+        }
+
         $b = $params['difficulty'];
-        return -(exp($b + $p)/(exp($b) + exp($p))**2);
+
+        $a = 1;
+        $c = 0;
+        return log($c + ((1-$c)*exp($a*(-$b+$p)))/(1+exp($a*(-$b+$p))));
+
+    }
+    public static function log_counter_likelihood($p, array $params)
+    {
+        $b = $params['difficulty'];
+
+        $a = 1;
+        $c = 0;
+        return log(1-$c-((1-$c)*exp($a*(-$b+$p)))/(1+exp($a*(-$b+$p))));
+    }
+
+    public static function log_likelihood_p_p($p, array $params, float $item_response): float {
+        $b = $params['difficulty'];
+        $value = -(exp($b + $p)/(exp($b) + exp($p))**2);
+        if ($item_response < 1.0) {
+            return 1 - $value;
+        }
+        return $value;
     }
 }
