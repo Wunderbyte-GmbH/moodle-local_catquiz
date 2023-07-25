@@ -57,11 +57,14 @@ class model_person_param_list implements ArrayAccess, IteratorAggregate, Countab
      * @return model_person_param_list
      * @throws dml_exception
      */
-    public static function load_from_db(int $contextid): self {
+    public static function load_from_db(int $contextid, int $catscaleid): self {
         global $DB;
         $person_rows = $DB->get_records(
             'local_catquiz_personparams',
-            ['contextid' => $contextid,]
+            [
+                'contextid' => $contextid,
+                'catscaleid' => $catscaleid,
+            ]
         );
 
         $person_abilities = new model_person_param_list();
@@ -135,12 +138,15 @@ class model_person_param_list implements ArrayAccess, IteratorAggregate, Countab
         return $data;
     }
 
-    public function save_to_db(int $contextid) {
+    public function save_to_db(int $contextid, int $catscaleid) {
         global $DB;
         // Get existing records for the given contextid and model.
         $existing_params_rows = $DB->get_records(
             'local_catquiz_personparams',
-            ['contextid' => $contextid,]
+            [
+                'contextid' => $contextid,
+                'catscaleid' => $catscaleid,
+            ]
         );
         $existing_params = [];
         foreach ($existing_params_rows as $r) {
@@ -148,7 +154,7 @@ class model_person_param_list implements ArrayAccess, IteratorAggregate, Countab
         };
 
         $records = array_map(
-            function ($param) use ($contextid) {
+            function ($param) use ($contextid, $catscaleid) {
                 if (!is_finite($param->get_ability())) {
                     $ability = $param->get_ability() < 0
                         ? model_person_param::MODEL_NEG_INF
@@ -159,6 +165,7 @@ class model_person_param_list implements ArrayAccess, IteratorAggregate, Countab
                     'userid' => $param->get_id(),
                     'ability' => $param->get_ability(),
                     'contextid' => $contextid,
+                    'catscaleid' => $catscaleid,
                 ];
             },
             $this->person_params

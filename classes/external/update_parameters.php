@@ -54,7 +54,8 @@ class update_parameters extends external_api {
      */
     public static function execute_parameters(): external_function_parameters {
         return new external_function_parameters(array(
-            'contextid'  => new external_value(PARAM_INT, 'context ID', VALUE_REQUIRED),
+            'contextid'  => new external_value(PARAM_INT, 'context ID'),
+            'catscaleid' => new external_value(PARAM_INT, 'CAT scale ID'),
             )
         );
     }
@@ -66,14 +67,15 @@ class update_parameters extends external_api {
      *
      * @return array
      */
-    public static function execute(int $contextid): array {
+    public static function execute(int $contextid, int $catscaleid): array {
         self::validate_parameters(self::execute_parameters(), [
             'contextid' => $contextid,
+            'catscaleid' => $catscaleid,
         ]);
 
         $cm = new catmodel_info();
         try {
-            $cm->trigger_parameter_calculation($contextid);
+            $cm->trigger_parameter_calculation($contextid, $catscaleid);
         } catch (Exception $e) {
             return ['success' => false,];
         }

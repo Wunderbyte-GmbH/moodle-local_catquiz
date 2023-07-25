@@ -48,32 +48,32 @@ class catmodel_info {
      * @param bool $calculate Trigger a re-calculation of the item parameters
      * @return array
      */
-    public function get_context_parameters( int $contextid = 0, bool $calculate = false) {
+    public function get_context_parameters( int $contextid = 0, int $catscaleid, bool $calculate = false) {
         // Trigger calculation in the background but do not wait for it to finish
         if ($calculate) {
-            $this->trigger_parameter_calculation($contextid);
+            $this->trigger_parameter_calculation($contextid, $catscaleid);
         }
 
         // Return the data that are currently saved in the DB
         $context = catcontext::load_from_db($contextid);
-        $strategy = $context->get_strategy();
-        return $strategy->get_params_from_db($contextid);
+        $strategy = $context->get_strategy($catscaleid);
+        return $strategy->get_params_from_db($contextid, $catscaleid);
     }
 
-    public function trigger_parameter_calculation($contextid) {
+    public function trigger_parameter_calculation($contextid, $catscaleid) {
         $adhoc_recalculate_cat_model_params = new adhoc_recalculate_cat_model_params();
-        $adhoc_recalculate_cat_model_params->set_custom_data($contextid);
+        $adhoc_recalculate_cat_model_params->set_custom_data([$contextid, $catscaleid]);
         manager::queue_adhoc_task($adhoc_recalculate_cat_model_params);
     }
 
-    public function update_params($contextid) {
+    public function update_params($contextid, $catscaleid) {
         $context = catcontext::load_from_db($contextid);
-        $strategy = $context->get_strategy();
+        $strategy = $context->get_strategy($catscaleid);
         list($item_difficulties, $person_abilities) =  $strategy->run_estimation();
         foreach ($item_difficulties as $item_param_list) {
             $item_param_list->save_to_db($contextid);
         }
-        $person_abilities->save_to_db($contextid);
+        $person_abilities->save_to_db($contextid, $catscaleid);
         $context->save_or_update((object)['timecalculated' => time()]);
     }
 }

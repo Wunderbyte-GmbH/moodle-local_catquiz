@@ -72,6 +72,9 @@ export const init = () => {
     });
 
     const updateParameters = async (contextid) => {
+        const urlParams = new URLSearchParams(window.location.search);
+        const catscaleid = urlParams.get('id');
+
         // Fallback if the translation can not be loaded
         let errorMessage = 'Something went wrong';
         try {
@@ -81,7 +84,7 @@ export const init = () => {
         }
         Ajax.call([{
             methodname: 'local_catquiz_update_parameters',
-            args: {contextid},
+            args: {contextid, catscaleid},
             done: async function(res) {
                 if (res.success) {
                     disableButton();

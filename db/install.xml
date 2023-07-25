@@ -91,6 +91,7 @@
         <FIELD NAME="contextid" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false" COMMENT="Cat context"/>
         <FIELD NAME="ability" TYPE="number" LENGTH="10" NOTNULL="false" SEQUENCE="false" DECIMALS="4" COMMENT="Ability"/>
         <FIELD NAME="status" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false" COMMENT="Status"/>
+        <FIELD NAME="catscaleid" TYPE="int" LENGTH="10" NOTNULL="false" DEFAULT="0" SEQUENCE="false"/>
         <FIELD NAME="timecreated" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
         <FIELD NAME="timemodified" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
       </FIELDS>

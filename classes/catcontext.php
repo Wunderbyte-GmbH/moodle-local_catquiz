@@ -155,10 +155,10 @@ class catcontext {
         return new self($record);
     }
 
-    public static function create_response_from_db($contextid = 0): model_responses {
+    public static function create_response_from_db($contextid = 0, int $catscaleid): model_responses {
         global $DB;
 
-        list ($sql, $params) = catquiz::get_sql_for_model_input($contextid);
+        list ($sql, $params) = catquiz::get_sql_for_model_input($contextid, $catscaleid);
         $data = $DB->get_records_sql($sql, $params);
         $inputdata = self::db_to_modelinput($data);
         return (new model_responses)->setData($inputdata);
@@ -282,10 +282,10 @@ class catcontext {
         $this->timecalculated = $record->timecalculated ?? $this->timecalculated ?? 0;
     }
 
-    public function get_strategy(): model_strategy {
-        $responses = self::create_response_from_db($this->id);
+    public function get_strategy(int $catscaleid): model_strategy {
+        $responses = self::create_response_from_db($this->id, $catscaleid);
         $options = json_decode($this->json, true) ?? [];
-        $saved_abilities = model_person_param_list::load_from_db($this->id);
+        $saved_abilities = model_person_param_list::load_from_db($this->id, $catscaleid);
         return new model_strategy($responses, $options, $saved_abilities);
     }
 

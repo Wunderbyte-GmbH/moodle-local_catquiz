@@ -271,7 +271,7 @@ class model_strategy {
     /**
      * @return array
      */
-    public function get_params_from_db(int $contextid): array {
+    public function get_params_from_db(int $contextid, int $catscaleid): array {
         $models = $this->get_installed_models();
         foreach (array_keys($models) as $model_name) {
             $estimated_item_difficulties[$model_name] = model_item_param_list::load_from_db(
@@ -279,7 +279,7 @@ class model_strategy {
                 $model_name
             );
         }
-        $person_abilities = model_person_param_list::load_from_db($contextid);
+        $person_abilities = model_person_param_list::load_from_db($contextid, $catscaleid);
         return [$estimated_item_difficulties, $person_abilities];
     }
 

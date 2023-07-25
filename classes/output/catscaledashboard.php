@@ -359,6 +359,7 @@ class catscaledashboard implements renderable, templatable
         $cm = new catmodel_info;
         list($item_difficulties, $person_abilities) = $cm->get_context_parameters(
             $this->catcontextid,
+            $this->catscaleid,
             $this->triggercalculation
         );
 

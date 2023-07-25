@@ -87,8 +87,12 @@ class model_responses {
         // $data[QUESTIONID] -> [All responses to this question by different users]
         foreach ($person_param_list->get_person_params() as $pp) {
             $components = array();
-            $components = array_merge($components, array_keys($this->data[$pp->get_id()]));
-            foreach ($components as $component) {
+            if (!array_key_exists($pp->get_id(), $this->data)) {
+                continue;
+            }
+            $responsesByUser = $this->data[$pp->get_id()];
+            $components = array_merge($components, $responsesByUser);
+            foreach (array_keys($components) as $component) {
                 $question_ids = array_keys($this->data[$pp->get_id()][$component]);
                 foreach ($question_ids as $question_id) {
                     $fraction = $this->data[$pp->get_id()][$component][$question_id]['fraction'];

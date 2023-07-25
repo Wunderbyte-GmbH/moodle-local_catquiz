@@ -36,7 +36,7 @@ final class updatepersonability extends preselect_task implements wb_middleware
         $cachedresponses = $cache->get('userresponses') ?: [];
 
         global $USER;
-        $responses = catcontext::create_response_from_db($context['contextid']);
+        $responses = catcontext::create_response_from_db($context['contextid'], $context['catscaleid']);
         $components = ($responses->as_array())[$USER->id];
         if (count($components) > 1) {
             throw new moodle_exception('User has answers to more than one component.');
@@ -79,7 +79,8 @@ final class updatepersonability extends preselect_task implements wb_middleware
     public function get_required_context_keys(): array {
         return [
             'contextid',
-            'lastquestion'
+            'catscaleid',
+            'lastquestion',
         ];
     }
 

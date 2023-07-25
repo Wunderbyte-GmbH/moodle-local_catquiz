@@ -17,6 +17,7 @@
 namespace local_catquiz\task;
 
 use local_catquiz\catmodel_info;
+use local_catquiz\catquiz;
 
 /**
  * Runs through all contexts and recalculates values for all CAT models
@@ -47,9 +48,12 @@ class recalculate_cat_model_params extends \core\task\scheduled_task {
                 'now2' => $now,
             ]
         );
+        $catscales = catquiz::get_all_catscales();
         $cm = new catmodel_info();
         foreach ($contexts as $context) {
-            $cm->update_params($context->id);
+            foreach ($catscales as $catscale) {
+                $cm->update_params($context->id, $catscale->id);
+            }
         }
     }
 }

@@ -11,7 +11,10 @@ class personability_loader implements contextloaderinterface {
     }
 
     public function requires(): array {
-        return ['contextid'];
+        return [
+            'contextid',
+            'catscaleid'
+        ];
     }
 
     public function load(array $context): array {
@@ -21,6 +24,7 @@ class personability_loader implements contextloaderinterface {
             [
                 'userid' => $USER->id,
                 'contextid' => $context['contextid'],
+                'catscaleid' => $context['catscaleid'],
             ]
         );
 
