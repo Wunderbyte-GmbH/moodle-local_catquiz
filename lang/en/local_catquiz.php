@@ -86,6 +86,14 @@ $string['teststrategy_balanced'] = 'Strategy balanced';
 $string['teststrategy_pilot'] = 'Strategy for pilot questions';
 $string['pilot_questions'] = 'Pilot questions';
 
+$string['catquiz_selectfirstquestion'] = "Selection of first question";
+$string['startwitheasiestquestion']= "Start with the easiest question";
+$string['startwithfirstofsecondquintil'] = "Start with the first question of the second quintil";
+$string['startwithfirstofsecondquartil'] = "Start with the first question of the second quartil";
+$string['startwithmostdifficultsecondquartil'] = "Start with the most difficult question of the second quartil";
+$string['startwithaverageabilityoftest'] = "Use the average person ability of the current test";
+$string['startwithcurrentability'] = "Use the person's current ability to determine the first question";
+
 // Tests environment.
 $string['newcustomtest'] = 'Custom test';
 $string['lang'] = 'Language';

@@ -119,6 +119,18 @@ class info {
         $mform->hideIf('catquiz_pilotratio', 'catquiz_selectteststrategy', 'eq', $strategies_without_pilotquestions);
         $mform->setType('catquiz_pilotratio', PARAM_FLOAT);
         $mform->addHelpButton('catquiz_pilotratio', 'pilotratio', 'local_catquiz');
+
+        $elements[] = $mform->addElement('select', 'catquiz_selectfirstquestion',
+            get_string('catquiz_selectfirstquestion', 'local_catquiz'),
+            [
+                'startwitheasiestquestion' => get_string('startwitheasiestquestion', 'local_catquiz'),
+                'startwithfirstofsecondquintil' => get_string('startwithfirstofsecondquintil', 'local_catquiz'),
+                'startwithfirstofsecondquartil' => get_string('startwithfirstofsecondquartil', 'local_catquiz'),
+                'startwithmostdifficultsecondquartil' => get_string('startwithmostdifficultsecondquartil', 'local_catquiz'),
+                'startwithaverageabilityoftest' => get_string('startwithaverageabilityoftest', 'local_catquiz'),
+                'startwithcurrentability' => get_string('startwithcurrentability', 'local_catquiz'),
+            ]
+        );
     }
 
     /**

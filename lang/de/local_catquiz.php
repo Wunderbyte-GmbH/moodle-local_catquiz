@@ -86,6 +86,14 @@ $string['teststrategy_balanced'] = 'Strategie ausgeglichene Fragenauswahl';
 $string['teststrategy_pilot'] = 'Strategie für Pilotfragen';
 $string['pilot_questions'] = 'Pilotfragen';
 
+$string['catquiz_selectfirstquestion'] = "Auswahl der ersten Quizfrage";
+$string['startwitheasiestquestion']= "Starte mit der leichtesten Frage an";
+$string['startwithfirstofsecondquintil'] = "Starte mit der leichtesten Frage aus dem zweiten Quintil";
+$string['startwithfirstofsecondquartil'] = "Starte mit der leichtesten Frage aus dem zweiten Quartil";
+$string['startwithmostdifficultsecondquartil'] = "Starte mit der schwierigsten Frage aus dem zweiten Quartil";
+$string['startwithaverageabilityoftest'] = "Personenparamter entspricht Mittelwert der bisher im Test gemessenen Population";
+$string['startwithcurrentability'] = "Personenparameter aus vorherigem Testlauf nutzen";
+
 // Tests environment.
 $string['newcustomtest'] = 'Benutzerdefinierter Test';
 $string['lang'] = 'Sprache';
