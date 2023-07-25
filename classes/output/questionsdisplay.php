@@ -171,6 +171,10 @@ class questionsdisplay implements renderable, templatable {
      *
      */
     public function renderquestionstable() {
+        if ($this->tablescale === -1) {
+            return $this->get_no_table_string();
+        }
+
         $catcontext = empty($this->catcontextid) ? catquiz::get_default_context_id() : $this->catcontextid; // If no context is set, get default context from DB.
 
         $table = new catscalequestions_table('questionstable', $this->tablescale, $catcontext);
@@ -283,7 +287,7 @@ class questionsdisplay implements renderable, templatable {
             'scaleselector' => empty($this->render_scaleselector()) ? "" : $this->render_scaleselector(),
             'subscaleselector' => empty($this->render_subscaleselector()) ? "" : $this->render_subscaleselector(),
             'checkbox' => $this->render_subscale_checkbox(),
-            'table' => empty($this->renderquestionstable()) ? $this->get_no_table_string() : $this->renderquestionstable(),
+            'table' => $this->renderquestionstable(),
         ];
 
         return $data;
