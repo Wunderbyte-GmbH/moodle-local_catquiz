@@ -108,7 +108,9 @@ class info {
 
         // Choose a test strategy for this instance.
         $elements[] =  $mform->addElement('select', 'catquiz_selectteststrategy',
-        get_string('catquiz_selectteststrategy', 'local_catquiz'), $teststrategiesoptions);
+            get_string('catquiz_selectteststrategy', 'local_catquiz'),
+            $teststrategiesoptions
+        );
 
         
         $elements[] = $mform->addElement('advcheckbox', 'catquiz_includepilotquestions', get_string('includepilotquestions', 'local_catquiz'));
