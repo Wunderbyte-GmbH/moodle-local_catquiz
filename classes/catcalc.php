@@ -60,7 +60,7 @@ class catcalc {
         return $item_difficulties;
     }
 
-    static function estimate_person_ability($demo_person_response, model_item_param_list $items): float {
+    static function estimate_person_ability($person_responses, model_item_param_list $items): float {
        $all_models = model_strategy::get_installed_models();
 
         $likelihood = fn($x) => 1;
@@ -68,7 +68,7 @@ class catcalc {
         $loglikelihood_1st_derivative = fn($x) => 0;
         $loglikelihood_2nd_derivative = fn($x) => 0;
 
-        foreach ($demo_person_response as $qid => $qresponse) {
+        foreach ($person_responses as $qid => $qresponse) {
             $item = $items[$qid];
             // The item parameter for this response was filtered out
             if ($item === null) {
