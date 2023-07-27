@@ -155,11 +155,15 @@ class model_person_param_list implements ArrayAccess, IteratorAggregate, Countab
 
         $records = array_map(
             function ($param) use ($contextid, $catscaleid) {
-                if (!is_finite($param->get_ability())) {
-                    $ability = $param->get_ability() < 0
+                $ability = $param->get_ability();
+                if (
+                    !is_finite($ability)
+                    || abs($ability) >= model_person_param::MODEL_POS_INF
+                ) {
+                    $updated_ability = $ability < 0
                         ? model_person_param::MODEL_NEG_INF
                         : model_person_param::MODEL_POS_INF;
-                    $param->set_ability($ability);
+                    $param->set_ability($updated_ability);
                 }
                 return [
                     'userid' => $param->get_id(),
