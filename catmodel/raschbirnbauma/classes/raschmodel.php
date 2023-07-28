@@ -130,7 +130,7 @@ class raschmodel {   //TODO: Interface Implementation
     //   $person_ability - array of person abilities which the model has been optimised for
     //   $k - array of answer categories in the same order like $person_ability(e.g. 0 or 1)
     public function calc_AIC($person_ability, $k){
-        $number_of_parameters = 1;
+        $number_of_parameters = $model::get_model_dim() - 1;
         $result = 0;
 
         foreach ($person_ability as $pp) {
@@ -143,7 +143,7 @@ class raschmodel {   //TODO: Interface Implementation
     //   $person_ability - array of person abilities which the model has been optimised for
     //   $k - array of answer categories in the same order like $person_ability(e.g. 0 or 1)
     public function calc_BIC($person_ability, $k){
-        $number_of_parameters = 1;
+        $number_of_parameters = $model::get_model_dim() - 1;
         $number_of_cases = count($person_ability); // array_filter nutzen!
         $result = 0;
 
