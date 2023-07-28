@@ -489,7 +489,8 @@ class catquiz_handler {
      */
     public static function purge_attempt_caches(int $componentid, string $componentname, bool $includesubscales = false): bool {
         $cache = cache::make('local_catquiz', 'adaptivequizattempt');
-        return $cache->purge();
+        $cache->purge();
+        return $cache->set('isfirstquestionofattempt', true);
     }
 
     /**
@@ -526,6 +527,7 @@ class catquiz_handler {
             'penalty_time_range' => 60 * 60 * 24 * 30,
             'pilot_ratio' => $pilot_ratio ?? 0,
             'questionsattempted' => intval($attemptdata->questionsattempted),
+            'selectfirstquestion' => $quizsettings->catquiz_selectfirstquestion,
         ];
         return $contextcreator->load(
             [

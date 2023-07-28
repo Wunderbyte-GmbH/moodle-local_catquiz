@@ -24,8 +24,10 @@ class questions_loader implements contextloaderinterface {
         $catscale = new catscale($context['catscaleid']);
         $context['questions'] = $catscale->get_testitems(
             $context['contextid'],
-            $context['includesubscales']
+            $context['includesubscales'],
+            'difficulty'
         );
+        $context['questions_ordered_by'] = 'difficulty';
 
         return $context;
     }

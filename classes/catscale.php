@@ -171,9 +171,10 @@ class catscale {
      *
      * @param int $contextid
      * @param bool $includesubscales
+     * @param ?string $orderby If given, sort items by that field
      * @return array
      */
-    public function get_testitems(int $contextid, bool $includesubscales = false):array {
+    public function get_testitems(int $contextid, bool $includesubscales = false, ?string $orderby = NULL):array {
 
         $cache = cache::make('local_catquiz', 'adaptivequizattempt');
         $cachekey = sprintf('testitems_%s_%s', $contextid, $includesubscales);
@@ -193,7 +194,8 @@ class catscale {
             $contextid,
             [],
             [],
-            $USER->id
+            $USER->id,
+            $orderby
         );
 
         $sql = "SELECT $select FROM $from WHERE $where";

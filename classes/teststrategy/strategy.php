@@ -120,6 +120,7 @@ abstract class strategy {
         $playedquestions = $cache->get('playedquestions') ?: [];
         $playedquestions[$selected_question->id] = $selected_question;
         $cache->set('playedquestions', $playedquestions);
+        $cache->set('isfirstquestionofattempt', false);
 
         $cache->set('lastquestion', $selected_question);
 

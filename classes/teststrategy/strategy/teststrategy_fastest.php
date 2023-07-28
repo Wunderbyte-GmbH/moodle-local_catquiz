@@ -16,6 +16,7 @@
 
 namespace local_catquiz\teststrategy\strategy;
 
+use local_catquiz\teststrategy\preselect_task\firstquestionselector;
 use local_catquiz\teststrategy\preselect_task\fisherinformation;
 use local_catquiz\teststrategy\preselect_task\lasttimeplayedpenalty;
 use local_catquiz\teststrategy\preselect_task\maximumquestionscheck;
@@ -40,6 +41,7 @@ class teststrategy_fastest extends strategy {
     public function requires_score_modifiers(): array {
         return [
             maximumquestionscheck::class,
+            firstquestionselector::class,
             updatepersonability::class,
             noremainingquestions::class,
             remove_uncalculated::class,

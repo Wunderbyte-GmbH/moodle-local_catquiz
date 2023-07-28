@@ -125,6 +125,7 @@ class catquiz {
      * @param array $filterarray
      * @param int $catcontextid
      * @param int $userid
+     * @param ?string $orderby If given, order by the given field in ascending order
      * @return array
      */
     public static function return_sql_for_catscalequestions(
@@ -132,7 +133,9 @@ class catquiz {
         int $contextid,
         array $wherearray = [],
         array $filterarray = [],
-        int $userid = 0) {
+        int $userid = 0,
+        ?string $orderby = NULL
+    ) {
 
         global $DB;
         if ($contextid === 0) {
@@ -246,6 +249,10 @@ class catquiz {
 
         foreach ($wherearray as $key => $value) {
             $where .= ' AND ' . $DB->sql_equal($key, $value, false, false);
+        }
+
+        if ($orderby) {
+            $where .= " ORDER BY $orderby ASC";
         }
 
         return [$select, $from, $where, $filter, $params];
@@ -939,5 +946,57 @@ class catquiz {
         global $DB;
 
         return $DB->get_records('local_catquiz_catscales');
+    }
+
+    /**
+     * Returns all person params for the given testid
+     * @param int $componentid The id of the adaptivequiz component
+     * @return array
+     */
+    public static function get_personparams_for_adaptivequiz_test(int $componentid) {
+        global $DB;
+
+        $test = $DB->get_record_sql(
+            "
+                SELECT *
+                FROM {local_catquiz_tests}
+                WHERE componentid = :componentid
+                    AND component = :component
+            ",
+            [
+                'componentid' => $componentid,
+                'component' => 'mod_adaptivequiz',
+            ],
+            MUST_EXIST
+        );
+        if (!$testsettings = json_decode($test->json)) {
+            throw new moodle_exception("Can not read test settings");
+        }
+
+        $contextid = intval($testsettings->catquiz_catcontext);
+        $catscaleids = explode(",", $testsettings->catquiz_catcatscales);
+        [$insql, $inparams] = $DB->get_in_or_equal($catscaleids, SQL_PARAMS_NAMED, 'incatscales');
+
+        $sql = "
+            SELECT lcp.*
+            FROM
+                (
+                    SELECT DISTINCT userid
+                    FROM {adaptivequiz_attempt}
+                    WHERE instance = :componentid
+                ) AS s1
+            JOIN {local_catquiz_personparams} lcp ON s1.userid = lcp.userid
+            WHERE lcp.contextid = :contextid
+            AND lcp.catscaleid $insql
+            ORDER BY ability ASC";
+
+        $params = [
+            'componentid' => $componentid,
+            'contextid' => $contextid,
+        ];
+
+        $params = array_merge($params, $inparams);
+        $records = $DB->get_records_sql($sql, $params);
+        return $records;
     }
 }
