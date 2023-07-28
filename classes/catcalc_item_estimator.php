@@ -27,11 +27,7 @@ namespace local_catquiz;
 
 interface catcalc_item_estimator
 {
-    public static function get_log_jacobian($ability);
-    public static function get_log_hessian($ability);
-    public static function get_log_counter_likelihood($ability);
-    public static function get_log_counter_jacobian($ability);
-    public static function get_log_counter_hessian($ability);
-
+    public static function get_log_jacobian($ability, float $item_response);
+    public static function get_log_hessian($ability, float $item_response);
     public static function get_model_dim(): int;
 }

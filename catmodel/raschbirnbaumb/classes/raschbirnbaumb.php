@@ -235,8 +235,11 @@ class raschbirnbaumb extends model_raschmodel
     /**
      * Get elementary matrix function for being composed
      */
-    public static function get_log_jacobian($p)
+    public static function get_log_jacobian($p, float $item_response)
     {
+        if ($item_response < 1.0) {
+            return self::get_log_counter_jacobian($p);
+        }
 
         // $ip ....Array of item parameter
 
@@ -268,8 +271,11 @@ class raschbirnbaumb extends model_raschmodel
     }
 
 
-    public static function get_log_hessian($p)
+    public static function get_log_hessian($p, float $item_response)
     {
+        if ($item_response < 1.0) {
+            return self::get_log_counter_hessian($p);
+        }
 
         $fun11 = function ($x) use ($p) {
             return self::log_likelihood_a_a($p, $x);

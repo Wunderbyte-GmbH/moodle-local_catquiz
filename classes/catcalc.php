@@ -138,21 +138,9 @@ class catcalc {
             }
         }
 
-        $num_passed = 0;
-        $num_failed = 0;
         foreach ($item_response as $r) {
-            if ($r->get_response() == 1) { // if answer is correct
-                $num_passed += 1;
-
-                $jacobian_part = $model::get_log_jacobian($r->get_ability());
-                $hessian_part = $model::get_log_hessian($r->get_ability());
-
-            } else {
-                $num_failed += 1;
-
-                $jacobian_part = $model::get_log_counter_jacobian($r->get_ability());
-                $hessian_part = $model::get_log_counter_hessian($r->get_ability());
-            }
+            $jacobian_part = $model::get_log_jacobian($r->get_ability(), $r->get_response());
+            $hessian_part = $model::get_log_hessian($r->get_ability(), $r->get_response());
 
             for ($i=0; $i <= $model_dim-2; $i++){
                 $jacobian[$i] = fn($x) => $jacobian[$i]($x) + $jacobian_part[$i]($x);
