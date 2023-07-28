@@ -24,6 +24,7 @@
  */
 
 namespace local_catquiz;
+use moodle_exception;
 
 /**
  * Class catquiz

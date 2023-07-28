@@ -511,6 +511,7 @@ class catquiz_handler {
         }
 
         $initialcontext = [
+            'testid' => intval($attemptdata->instance),
             'contextid' => intval($quizsettings->catquiz_catcontext),
             'catscaleid' => $quizsettings->catquiz_catcatscales,
             'installed_models' => model_strategy::get_installed_models(),

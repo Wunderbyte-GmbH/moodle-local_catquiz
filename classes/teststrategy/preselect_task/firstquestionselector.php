@@ -28,8 +28,16 @@ final class firstquestionselector extends preselect_task implements wb_middlewar
         }
 
         if ($context['questions_ordered_by'] !== 'difficulty') {
-            return result::err();
+            return result::err(status::ERROR_FETCH_NEXT_QUESTION);
         }
+
+        // If we select the first question based on its difficulty, then it can
+        // never be a pilot question.
+        $questions_with_difficulty = array_filter($context['questions'], fn($q) => !$q->is_pilot);
+        if (count($questions_with_difficulty) === 0) {
+            return result::err(status::ERROR_FETCH_NEXT_QUESTION);
+        }
+        $context['questions'] = $questions_with_difficulty;
 
         switch ($context['selectfirstquestion']) {
             case self::STARTWITHEASIESTQUESTION:
@@ -49,7 +57,9 @@ final class firstquestionselector extends preselect_task implements wb_middlewar
                 $question = $this->get_last_question_of_second_quartile($context['questions']);
                 return result::ok($question);
             case self::STARTWITHAVERAGEABILITYOFTEST:
-                throw new \Exception("TODO implement");
+                $ability = $this->get_average_ability_of_test($context['testid']);
+                $context['person_ability'] = $ability;
+                return $next($context);
             case self::STARTWITHCURRENTABILITY:
                 return $next($context);
 
@@ -63,6 +73,7 @@ final class firstquestionselector extends preselect_task implements wb_middlewar
         return [
             'selectfirstquestion',
             'questions_ordered_by',
+            'testid',
         ];
     }
 
@@ -96,5 +107,16 @@ final class firstquestionselector extends preselect_task implements wb_middlewar
             return $index;
         }
         return ceil($index);
+    }
+    private function get_average_ability_of_test(int $testid) {
+        $personparams = catquiz::get_personparams_for_adaptivequiz_test($testid);
+        $abilities = array_map(fn ($param) => floatval($param->ability), $personparams);
+        sort($abilities);
+        $index = 0.5 * count($abilities);
+        $index -= 1; // Because we use zero-based indexing
+        if ((int) $index == $index) {
+            return ($abilities[array_keys($abilities)[$index]] + $abilities[array_keys($abilities)[$index + 1]])/2;
+        }
+        return $abilities[array_keys($abilities)[$index]];
     }
 }
