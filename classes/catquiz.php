@@ -905,7 +905,9 @@ class catquiz {
         global $DB;
         return $DB->get_record_select(
             'local_catquiz_personparams',
-            "userid = :userid AND contextid = :contextid",
+            "userid = :userid
+                 AND contextid = :contextid
+                 AND catscaleid = :catscaleid",
           [
             'userid' => $userid,
             'contextid' => $contextid,
