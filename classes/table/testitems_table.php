@@ -279,6 +279,9 @@ class testitems_table extends wunderbyte_table {
 
         if ($testitemid == -1) {
             $idarray = explode(',', $jsonobject->checkedids);
+            if (empty($idarray)) {
+                $idarray = [$jsonobject->checkedids[0]];
+            }
         } else if ($testitemid > 0) {
             $idarray = [$testitemid];
         }
