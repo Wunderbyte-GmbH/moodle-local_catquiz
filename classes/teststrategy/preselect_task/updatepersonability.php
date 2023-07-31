@@ -24,6 +24,7 @@ final class updatepersonability extends preselect_task implements wb_middleware
     const UPDATE_THRESHOLD = 0.001;
 
     public function run(array $context, callable $next): result {
+        global $CFG, $USER;
         $lastquestion = $context['lastquestion'];
         // If we do not know the answer to the last question, we do not have to
         // update the person ability. Also, pilot questions should not be used
@@ -35,7 +36,6 @@ final class updatepersonability extends preselect_task implements wb_middleware
         $cache = cache::make('local_catquiz', 'userresponses');
         $cachedresponses = $cache->get('userresponses') ?: [];
 
-        global $USER;
         $responses = catcontext::create_response_from_db($context['contextid'], $context['catscaleid']);
         $components = ($responses->as_array())[$USER->id];
         if (count($components) > 1) {
@@ -64,7 +64,28 @@ final class updatepersonability extends preselect_task implements wb_middleware
         $item_param_list = $model_strategy->select_item_model($item_param_lists);
 
         $updated_ability = catcalc::estimate_person_ability($userresponses, $item_param_list);
-        catquiz::update_person_param($USER->id, $context['contextid'], $updated_ability);
+        if (is_nan($updated_ability)) {
+            // In a production environment, we can use fallback values. However,
+            // during development we want to see when we get unexpected values
+            if ($CFG->debug > 0) {
+                throw new moodle_exception('error', 'local_catquiz');
+            }
+            // If we already have an ability, just continue with that one and do not update it.
+            // Otherwise, use 0 as default value
+            if (!is_nan($context['person_ability'])) {
+                return $next($context);
+            } else {
+                $context['person_ability'] = 0;
+                return $next($context);
+            }
+        }
+
+        catquiz::update_person_param(
+            $USER->id,
+            $context['contextid'],
+            $context['catscaleid'],
+            $updated_ability
+        );
         if (abs($context['person_ability'] - $updated_ability) < self::UPDATE_THRESHOLD) {
             // If we do have more than the minimum questions, we should return
             if ($context['questionsattempted'] >= $context['minimumquestions']) {
