@@ -101,8 +101,7 @@ class catscaledashboard implements renderable, templatable
     }
     private function render_addtestitems_table(int $catscaleid)
     {
-
-        $table = new testitems_table('addtestitems', $catscaleid, $this->catcontextid);
+        $table = new testitems_table('catscaleid_' . $catscaleid . ' addtestitems', $catscaleid, $this->catcontextid);
 
         list($select, $from, $where, $filter, $params) = catquiz::return_sql_for_addcatscalequestions($catscaleid, $this->catcontextid);
 
@@ -189,7 +188,7 @@ class catscaledashboard implements renderable, templatable
      */
     private function render_testitems_table(int $catscaleid) {
 
-        $table = new testitems_table('testitems', $this->catscaleid, $this->catcontextid);
+        $table = new testitems_table('catscaleid_' . $this->catscaleid . ' testitems', $this->catscaleid, $this->catcontextid);
 
         list($select, $from, $where, $filter, $params) = catquiz::return_sql_for_catscalequestions([$catscaleid], $this->catcontextid, [], []);
 
@@ -315,7 +314,7 @@ class catscaledashboard implements renderable, templatable
 
     private function render_student_stats_table(int $catscaleid, int $catcontextid)
     {
-        $table = new student_stats_table('students', $this->catscaleid, $this->catcontextid);
+        $table = new student_stats_table('catscaleid_' . $this->catscaleid . ' students', $this->catscaleid, $this->catcontextid);
 
         list($select, $from, $where, $filter, $params) = catquiz::return_sql_for_student_stats($catcontextid);
 
