@@ -318,4 +318,11 @@ class raschbirnbaumb extends model_raschmodel
         return $x['difficulty']**2 * self::likelihood_multi($p,$x) * (1-self::likelihood_multi($p,$x));
 
     }
+
+    public function restrict_to_trusted_region(array $parameters): array {
+        // TODO replace with something useful, this is just a demo
+        $a = $parameters['difficulty'];
+        $b = $parameters['discrimination'];
+        return $parameters;
+    }
 }

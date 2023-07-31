@@ -51,8 +51,9 @@ abstract class model_raschmodel extends model_model implements catcalc_item_esti
     {
         $estimated_item_params = new model_item_param_list();
         foreach ($this->responses->get_item_response($person_params) as $item_id => $item_response) {
-            // Calculate the difficulty -> returns a float value
-            $parameters = $this->calculate_params($item_response);
+            $parameters = $this->restrict_to_trusted_region(
+                $this->calculate_params($item_response)
+            );
             // Now create a new item difficulty object (param)
             $param = $this
                 ->create_item_param($item_id)
@@ -70,6 +71,13 @@ abstract class model_raschmodel extends model_model implements catcalc_item_esti
      * @return array
      */
     abstract protected function calculate_params($item_response): array;
+
+    /**
+     * Update parameters so that they are located in a trusted region
+     * @param array $parameters
+     * @return array
+     */
+    abstract protected function restrict_to_trusted_region(array $parameters): array;
 
     abstract public static function likelihood($x, array $item_params, float $item_response);
     abstract public static function log_likelihood($x, array $item_params, float $item_response);
