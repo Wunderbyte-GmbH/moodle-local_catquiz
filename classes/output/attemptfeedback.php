@@ -55,13 +55,18 @@ class attemptfeedback implements renderable, templatable
      */
     public int $contextid;
 
+    /**
+     * @var ?int
+     */
+    public int $catscaleid;
+
     public int $teststrategy;
 
     /**
      * @param int $attemptid
      * @param int $contextid
      */
-    public function __construct(int $attemptid, int $contextid)
+    public function __construct(int $attemptid, int $contextid = 0, int $catscaleid = 0)
     {
         global $USER;
         if ($attemptid === 0) {
@@ -85,6 +90,11 @@ class attemptfeedback implements renderable, templatable
             $contextid = intval($settings->catquiz_catcontext);
         }
         $this->contextid = $contextid;
+
+        if ($catscaleid === 0) {
+            $catscaleid = intval($settings->catquiz_catscaleid);
+        }
+        $this->catscaleid = $catscaleid;
     }
 
     private function render_question_stats(int $attemptid)
@@ -102,12 +112,12 @@ class attemptfeedback implements renderable, templatable
         return get_string('attemptfeedbacknotavailable', 'local_catquiz');
     }
 
-    private function render_person_ability(int $contextid) {
+    private function render_person_ability() {
         global $USER;
-        if (!$contextid) {
+        if (!$this->contextid || !$this->catscaleid) {
             return get_string('notavailable', 'core');
         }
-        $ability = catquiz::get_person_ability($USER->id, $contextid);
+        $ability = catquiz::get_person_ability($USER->id, $this->contextid, $this->catscaleid);
         return $ability->ability;
     }
 
@@ -133,7 +143,7 @@ class attemptfeedback implements renderable, templatable
     {
         return [
             'stats' => $this->render_question_stats($this->attemptid),
-            'ability' => $this->render_person_ability($this->contextid),
+            'ability' => $this->render_person_ability(),
             'strategy_feedback' => $this->render_strategy_feedback(),
         ];
     }

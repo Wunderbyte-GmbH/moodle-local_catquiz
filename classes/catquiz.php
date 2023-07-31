@@ -901,7 +901,7 @@ class catquiz {
      *
      * @return \stdClass
      */
-    public static function get_person_ability(int $userid, int $contextid) {
+    public static function get_person_ability(int $userid, int $contextid, int $catscaleid) {
         global $DB;
         return $DB->get_record_select(
             'local_catquiz_personparams',
@@ -909,6 +909,7 @@ class catquiz {
           [
             'userid' => $userid,
             'contextid' => $contextid,
+            'catscaleid' => $catscaleid,
         ]);
     }
 
