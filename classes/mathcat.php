@@ -27,9 +27,14 @@ namespace local_catquiz;
 
 class mathcat
 {
-    static function newtonraphson_stable($func, $derivative, $start = 0, $min_inc = 0.0001, $max_iter = 150): float
-    {
-
+    static function newtonraphson_stable(
+        $func,
+        $derivative,
+        $start = 0,
+        $min_inc = 0.0001,
+        $max_iter = 150,
+        $max = 50
+    ): float {
         $return_val = 0.0;
         $x_0 = $start;
         $use_gauss = false;
@@ -70,6 +75,13 @@ class mathcat
             //echo "Iteration:" . $n . "and diff: " . $diff . " x_0=" . $x_0 . " value: ". $func($x_0)  . "<br>";
             $x_0 += $diff;
 
+            // Restrict values to [-$max, $max] and stop if we get outside that interval
+            if (abs($x_0) > $max) {
+                if ($x_0 > 0) {
+                    return $max;
+                }
+                return -$max;
+            }
 
             if (abs($diff) > 10) {
                 $use_gauss = true;
