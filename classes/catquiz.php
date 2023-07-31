@@ -840,6 +840,7 @@ class catquiz {
     public static function update_person_param(
         int $userid,
         int $contextid,
+        int $catscaleid,
         float $ability
     ) {
         global $DB;
@@ -849,12 +850,14 @@ class catquiz {
             [
                 'userid' => $userid,
                 'contextid' => $contextid,
+                'catscaleid' => $catscaleid
             ]
         );
 
         $record = (object)[
             'userid' => $userid,
             'contextid' => $contextid,
+            'catscaleid' => $catscaleid,
             'ability' => $ability,
             'timemodified' => time(),
         ];
