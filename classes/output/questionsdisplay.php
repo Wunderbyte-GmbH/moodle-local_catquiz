@@ -84,7 +84,7 @@ class questionsdisplay implements renderable, templatable {
     public function __construct() {
         $this->catcontextid = optional_param('contextid', 0, PARAM_INT);
         $this->scale = optional_param('scale', -1, PARAM_INT);
-        $this->subscale = optional_param('subscale', -1, PARAM_INT);
+        $this->subscale = optional_param('subscale', 0, PARAM_INT);
         $this->detailid = optional_param('detail', null, PARAM_INT); // ID of record to be displayed in detail instead of table.
 
         // If a subscale is selected, we assign it for further use (i.e. to fetch the records for the table).
@@ -168,9 +168,9 @@ class questionsdisplay implements renderable, templatable {
      */
     private function render_subscale_checkbox()
     {
-        $checked = "";
-        if ($this->subscale > -1) {
-            $checked = "checked";
+        $checked = "checked";
+        if ($this->subscale < 0) {
+            $checked = "";
         }
         $checkboxarray = [
             'label' => get_string('integratequestions', 'local_catquiz'),
