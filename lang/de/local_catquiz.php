@@ -81,9 +81,8 @@ $string['catquiz_selectteststrategy'] = 'Wähle Teststrategie';
 
 $string['teststrategy_base'] = 'Basisklase der Teststrategien';
 $string['teststrategy_info'] = 'Info Klasse für Teststrategien';
-$string['teststrategy_fastest'] = 'Strategie schnellstes Ergebnis';
-$string['teststrategy_balanced'] = 'Strategie ausgeglichene Fragenauswahl';
-$string['teststrategy_pilot'] = 'Strategie für Pilotfragen';
+$string['teststrategy_fastest'] = 'Radikaler CAT';
+$string['teststrategy_balanced'] = 'Moderater CAT';
 $string['pilot_questions'] = 'Pilotfragen';
 
 $string['catquiz_selectfirstquestion'] = "Auswahl der ersten Quizfrage";
