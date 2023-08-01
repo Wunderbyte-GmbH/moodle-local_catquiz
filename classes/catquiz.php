@@ -801,8 +801,10 @@ class catquiz {
         $where = ' parentid '. $insql;
         $params = array_merge($params, $inparams);
         $filter = '';
+        $sql = "SELECT $select FROM $from WHERE $where";
+        $subscaleids = $DB->get_records_sql($sql, $params);
 
-        return [$select, $from, $where, $filter, $params];
+        return $subscaleids;
 
     }
 

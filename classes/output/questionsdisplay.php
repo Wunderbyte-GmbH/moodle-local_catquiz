@@ -201,11 +201,9 @@ class questionsdisplay implements renderable, templatable {
 
         // If we integrate questions from subscales, we add different ids.
         if ($this->usesubs > 0) {
-            list($select, $from, $where, $filter, $params) = catquiz::get_subscale_ids_from_parent(
+            $subscaleids = catquiz::get_subscale_ids_from_parent(
                 [$this->tablescale]
             );
-            $sql = "SELECT $select FROM $from WHERE $where";
-            $subscaleids = $DB->get_records_sql($sql, $params);
             $idsforquery = array_keys($subscaleids);
             array_push($idsforquery, $this->tablescale);
         } else {

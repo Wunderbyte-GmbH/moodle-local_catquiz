@@ -72,13 +72,7 @@ class scaleselector extends dynamic_form {
             $id = [$parentid];
         }
 
-        list($select, $from, $where, $filter, $params) = catquiz::get_subscale_ids_from_parent(
-            $id
-        );
-
-        $sql = "SELECT $select FROM $from WHERE $where";
-
-        $contextsdb = $DB->get_records_sql($sql, $params);
+        $contextsdb = catquiz::get_subscale_ids_from_parent($id);
         $contexts = [];
         $contexts[-1] = get_string('pleasechoose', 'local_catquiz');
         foreach ($contextsdb as $contextid => $context) {
