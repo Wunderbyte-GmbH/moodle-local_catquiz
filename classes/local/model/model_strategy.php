@@ -276,7 +276,8 @@ class model_strategy {
         foreach (array_keys($models) as $model_name) {
             $estimated_item_difficulties[$model_name] = model_item_param_list::load_from_db(
                 $contextid,
-                $model_name
+                $model_name,
+                $catscaleid
             );
         }
         $person_abilities = model_person_param_list::load_from_db($contextid, $catscaleid);

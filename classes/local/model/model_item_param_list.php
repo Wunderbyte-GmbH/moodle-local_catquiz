@@ -27,6 +27,7 @@ use ArrayAccess;
 use ArrayIterator;
 use Countable;
 use IteratorAggregate;
+use local_catquiz\catquiz;
 use Traversable;
 
 /**
@@ -54,19 +55,24 @@ class model_item_param_list implements ArrayAccess, IteratorAggregate, Countable
      *
      * @param int $contextid
      * @param string $model_name
+     * @param ?int $catscaleid
      * @return model_item_param_list
      */
-    public static function load_from_db(int $contextid, string $model_name): self {
+    public static function load_from_db(int $contextid, string $model_name, ?int $catscaleid = NULL): self {
         global $DB;
         $models = model_strategy::get_installed_models();
 
-        $item_rows = $DB->get_records(
-            'local_catquiz_itemparams',
-            [
-                'contextid' => $contextid,
-                'model' => $model_name,
-            ],
-        );
+        if ($catscaleid) {
+            $item_rows = catquiz::get_itemparams($contextid, $catscaleid, $model_name);
+        } else {
+            $item_rows = $DB->get_records(
+                'local_catquiz_itemparams',
+                [
+                    'contextid' => $contextid,
+                    'model' => $model_name,
+                ],
+            );
+        }
         $item_parameters = new model_item_param_list();
         foreach ($item_rows as $r) {
             // Skip NaN values here

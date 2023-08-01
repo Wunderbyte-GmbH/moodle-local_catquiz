@@ -1006,4 +1006,34 @@ class catquiz {
         $records = $DB->get_records_sql($sql, $params);
         return $records;
     }
+
+    /**
+     * Returns all item parameters in the given context that are assigned to the
+     * given catscaleid and were calculated with the given modem
+     * 
+     * @param int $contextid
+     * @param int $catscaleid
+     * @param string $model
+     * @return array
+     */
+    public static function get_itemparams(int $contextid, int $catscaleid, string $model) {
+        global $DB;
+
+        return $DB->get_records_sql(
+            "SELECT lcip.*
+             FROM {local_catquiz_items} lci
+             JOIN {local_catquiz_itemparams} lcip
+                ON lci.componentname = lcip.componentname
+                    AND lci.componentid = lcip.componentid
+                    AND lcip.contextid = :contextid
+                    AND lcip.model = :model
+            WHERE lci.catscaleid = :catscaleid
+            ",
+            [
+                'contextid' => $contextid,
+                'catscaleid' => $catscaleid,
+                'model' => $model,
+            ]
+        );
+    }
 }

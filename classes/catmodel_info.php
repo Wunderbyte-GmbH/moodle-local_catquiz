@@ -45,10 +45,11 @@ class catmodel_info {
      * model_person_param_list.
      * 
      * @param int $contextid
+     * @param int $catscaleid
      * @param bool $calculate Trigger a re-calculation of the item parameters
      * @return array
      */
-    public function get_context_parameters( int $contextid = 0, int $catscaleid, bool $calculate = false) {
+    public function get_context_parameters(int $contextid = 0, int $catscaleid, bool $calculate = false) {
         // Trigger calculation in the background but do not wait for it to finish
         if ($calculate) {
             $this->trigger_parameter_calculation($contextid, $catscaleid);
