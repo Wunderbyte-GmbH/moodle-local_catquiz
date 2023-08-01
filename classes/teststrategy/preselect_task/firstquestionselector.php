@@ -36,6 +36,8 @@ final class firstquestionselector extends preselect_task implements wb_middlewar
         $questions_with_difficulty = array_filter($context['questions'], fn($q) => !$q->is_pilot);
         if (count($questions_with_difficulty) === 0) {
             return result::err(status::ERROR_FETCH_NEXT_QUESTION);
+        } elseif (count($questions_with_difficulty) === 1) {
+            return result::ok($questions_with_difficulty[array_keys($questions_with_difficulty)[0]]);
         }
         $context['questions'] = $questions_with_difficulty;
 
