@@ -55,15 +55,15 @@ export const init = () => {
 };
 /**
  * Set an eventlistener for a select.
- *  @param {string} id
+ *  @param {string} selector
  *  @param {string} location
  *  @param {string} paramname
  *
  */
-function listenToSelect(id, location, paramname) {
+function listenToSelect(selector, location, paramname) {
         // Initialize the form - pass the container element and the form class name.
         const dynamicForm = new DynamicForm(document.querySelector(
-            id),
+            selector),
             location
         );
         // If a user selects a context, redirect to a URL that includes the selected
