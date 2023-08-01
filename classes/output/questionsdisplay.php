@@ -70,6 +70,11 @@ class questionsdisplay implements renderable, templatable {
     /**
      * @var integer
      */
+    private int $usesubs = 1; // If subscales should be integrated in question display, value is 1.
+
+    /**
+     * @var integer
+     */
     private int $numberofrecords = 0; // Records found in table query.
 
     /**
@@ -85,6 +90,7 @@ class questionsdisplay implements renderable, templatable {
         $this->catcontextid = optional_param('contextid', 0, PARAM_INT);
         $this->scale = optional_param('scale', -1, PARAM_INT);
         $this->subscale = optional_param('subscale', 0, PARAM_INT);
+        $this->usesubs = optional_param('usesubs', 1, PARAM_INT);
         $this->detailid = optional_param('detail', null, PARAM_INT); // ID of record to be displayed in detail instead of table.
 
         // If a subscale is selected, we assign it for further use (i.e. to fetch the records for the table).
@@ -142,10 +148,9 @@ class questionsdisplay implements renderable, templatable {
      */
     private function render_subscaleselector()
     {
-        if ($this->subscale < 0) {
+        if ($this->scale < 0) {
             return "";
         }
-        //$ajaxformdata = empty($this->catcontextid) ? [] : ['contextid' => $this->catcontextid];
         $scaleid = empty($this->scale) ? -1 : $this->scale;
 
         $customdata = [
@@ -169,7 +174,7 @@ class questionsdisplay implements renderable, templatable {
     private function render_subscale_checkbox()
     {
         $checked = "checked";
-        if ($this->subscale < 0) {
+        if ($this->usesubs < 1) {
             $checked = "";
         }
         $checkboxarray = [
@@ -185,15 +190,29 @@ class questionsdisplay implements renderable, templatable {
      * Render table.
      */
     public function renderquestionstable() {
+        global $DB;
         if ($this->tablescale === -1) {
             return $this->get_no_table_string();
         }
-
-        $catcontext = empty($this->catcontextid) ? catquiz::get_default_context_id() : $this->catcontextid; // If no context is set, get default context from DB.
+        // If no context is set, get default context from DB.
+        $catcontext = empty($this->catcontextid) ? catquiz::get_default_context_id() : $this->catcontextid;
 
         $table = new catscalequestions_table('catscale_' . $this->tablescale . ' questionstable', $this->tablescale, $catcontext);
 
-        list($select, $from, $where, $filter, $params) = catquiz::return_sql_for_catscalequestions([$this->tablescale], $catcontext, [], []);
+        // If we integrate questions from subscales, we add different ids.
+        if ($this->usesubs > 0) {
+            list($select, $from, $where, $filter, $params) = catquiz::get_subscale_ids_from_parent(
+                [$this->tablescale]
+            );
+            $sql = "SELECT $select FROM $from WHERE $where";
+            $subscaleids = $DB->get_records_sql($sql, $params);
+            $idsforquery = array_keys($subscaleids);
+            array_push($idsforquery, $this->tablescale);
+        } else {
+            $idsforquery = [$this->tablescale];
+        }
+
+        list($select, $from, $where, $filter, $params) = catquiz::return_sql_for_catscalequestions($idsforquery, $catcontext, [], []);
 
         $table->set_filter_sql($select, $from, $where, $filter, $params);
 

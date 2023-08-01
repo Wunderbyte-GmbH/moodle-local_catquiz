@@ -40,10 +40,10 @@ export const init = () => {
     checkbox.addEventListener('click', e => {
         let searchParams = new URLSearchParams(window.location.search);
         if (checkbox.checked === true) {
-            searchParams.set("subscale", 0);
+            searchParams.set("usesubs", 1);
             window.location.search = searchParams.toString();
         } else {
-            searchParams.set("subscale", -1);
+            searchParams.set("usesubs", 0);
             window.location.search = searchParams.toString();
         }
     });
