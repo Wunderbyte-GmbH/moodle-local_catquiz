@@ -783,14 +783,13 @@ class catquiz {
         ];
         return [$sql, $params];
     }
-    /** Returns the number of test items in a CAT scale
+    /** Returns an array with the ids of the subscales of the given scale.
      *
      * @param array $catscaleids
      * @return array
      *
      */
-
-    public static function get_sql_for_scales_and_subscales(array $catscaleids) {
+    public static function get_subscale_ids_from_parent(array $catscaleids) {
         global $DB;
         $select = "*";
         $from = "{local_catquiz_catscales}";

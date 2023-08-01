@@ -72,7 +72,7 @@ class scaleselector extends dynamic_form {
             $id = [$parentid];
         }
 
-        list($select, $from, $where, $filter, $params) = catquiz::get_sql_for_scales_and_subscales(
+        list($select, $from, $where, $filter, $params) = catquiz::get_subscale_ids_from_parent(
             $id
         );
 
