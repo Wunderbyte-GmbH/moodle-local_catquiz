@@ -62,6 +62,8 @@ class testitemdashboard implements renderable, templatable {
      */
     private int $contextid = 0;
 
+    public int $catscaleid;
+
     private catmodel_info $catmodel_info;
 
     /**
@@ -72,11 +74,12 @@ class testitemdashboard implements renderable, templatable {
      * @param int $contextid
      * @return array
      */
-    public function __construct(int $testitemid, int $contextid) {
+    public function __construct(int $testitemid, int $contextid, int $catscaleid) {
 
         $this->testitemid = $testitemid;
         $this->contextid = $contextid;
         $this->catmodel_info = new catmodel_info();
+        $this->catscaleid = $catscaleid;
     }
 
     /**
@@ -90,7 +93,9 @@ class testitemdashboard implements renderable, templatable {
 
         $returnarray = [];
 
-        list($modelitemparams, $modelpersonparams) = $this->catmodel_info->get_context_parameters($this->contextid);
+        list($modelitemparams) = $this
+            ->catmodel_info
+            ->get_context_parameters($this->contextid, $this->catscaleid);
 
         $chart = new \core\chart_line();
         $chart->set_smooth(true); // Calling set_smooth() passing true as parameter, will display smooth lines.
