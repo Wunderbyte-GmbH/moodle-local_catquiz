@@ -74,6 +74,10 @@ function listenToSelect(selector, location, paramname) {
             const response = e.detail;
 
             let searchParams = new URLSearchParams(window.location.search);
+            // If we change the scale, we delete the selected subscales.
+            if (paramname === "scale") {
+                searchParams.delete("subscale");
+            }
             if (typeof response === 'object' && response !== null) {
                 searchParams.set(Object.keys(response)[0], Object.values(response)[0]);
             } else {
