@@ -1,8 +1,25 @@
 # ALiSe CAT Quiz #
 
-TODO Describe the plugin shortly here.
+## Short description ##
+The plugin local_catquiz implements Computer Adaptive Testing (CAT) in Moodle. Using static Item Response Theory (IRT) models, test takers are presented only with questions that fall within their identified ability range, based on the answers they give.
+The plugin is a central part of the CATQuiz plugin family.
 
-TODO Provide more detailed description here.
+## Detailed description ##
+
+The plugin local_catquiz implements Computer Adaptive Testing (CAT) in Moodle. Using static Item Response Theory (IRT) models, test takers are presented only with questions that fall within their identified ability range, based on the answers they give. This shortens the required test length and increases test accuracy.
+The plugin can be used with all question types in Moodle that allow automatic scoring (e.g. multiple choice or cloze text). Depending on the question format, the plugin provides different IRT models:
+* Rasch-Model (1 parametric logistic model)
+* 2PL-Rasch-Birnbaum
+* 3PL-Mixed-Rasch-Birnbaum
+* Graded Response Model
+* Generalized Partial Credit Model
+
+In addition, the plug-in enables the creation, administration and modification of different scales on which measurements are taken. For this purpose, the plug-in creates a new role "Test Administrator", which is authorized to perform these administrative tasks for defined course areas.
+ 
+The plugin is a central part of the CATQuiz plugin family. It is recommended to install the following plugins as well:
+* mod_adaptive - the activity from which a CAT test can be started
+* mod_catquizfeedbackgrouping - a text block that gives detailed feedback on a CAT test and optionally assigns users to groups according to this feedback
+* task_catquizparamest - a background task for calculating item parameters of deployed CAT test questions
 
 ## Installing via uploaded ZIP file ##
 
