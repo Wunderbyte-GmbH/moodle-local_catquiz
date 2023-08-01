@@ -65,7 +65,7 @@ class questionsdisplay implements renderable, templatable {
     /**
      * @var integer
      */
-    private int $usesubs = 0; // If subscales should be integrated in question display, value is 1.
+    private int $subscale = -1; // If subscales should be integrated in question display, value is 1.
 
     /**
      * @var integer
@@ -84,12 +84,17 @@ class questionsdisplay implements renderable, templatable {
     public function __construct() {
         $this->catcontextid = optional_param('contextid', 0, PARAM_INT);
         $this->scale = optional_param('scale', -1, PARAM_INT);
-        $this->usesubs = optional_param('usesubs', 0, PARAM_INT);
+        $this->subscale = optional_param('subscale', -1, PARAM_INT);
         $this->detailid = optional_param('detail', null, PARAM_INT); // ID of record to be displayed in detail instead of table.
 
-        $this->tablescale = $this->scale; // TODO check if subscales are selected an write into tablescale.
+        // If a subscale is selected, we assign it for further use (i.e. to fetch the records for the table).
+        // Otherwise we are using the parentscale variable.
+        if ($this->subscale > 0) {
+            $this->tablescale = $this->subscale;
+        } else {
+            $this->tablescale = $this->scale;
+        }
     }
-
     /**
      * Renders the context selector.
      * @return string
@@ -137,7 +142,7 @@ class questionsdisplay implements renderable, templatable {
      */
     private function render_subscaleselector()
     {
-        if ($this->usesubs !== 1) {
+        if ($this->subscale < 0) {
             return "";
         }
         //$ajaxformdata = empty($this->catcontextid) ? [] : ['contextid' => $this->catcontextid];
@@ -148,7 +153,9 @@ class questionsdisplay implements renderable, templatable {
             'parentscaleid' => ["$scaleid"],
         ];
 
-        $form = new \local_catquiz\form\scaleselector(null, $customdata, 'post', '', [], true, []);
+        $subscaleid = empty($this->subscale) ? [-1] : ['subscale' => $this->subscale];
+
+        $form = new \local_catquiz\form\scaleselector(null, $customdata, 'post', '', [], true, $subscaleid);
         // Set the form data with the same method that is called when loaded from JS. It should correctly set the data for the supplied arguments.
         $form->set_data_for_dynamic_submission();
         // Render the form in a specific container, there should be nothing else in the same container.
@@ -162,7 +169,7 @@ class questionsdisplay implements renderable, templatable {
     private function render_subscale_checkbox()
     {
         $checked = "";
-        if ($this->usesubs == 1) {
+        if ($this->subscale > -1) {
             $checked = "checked";
         }
         $checkboxarray = [

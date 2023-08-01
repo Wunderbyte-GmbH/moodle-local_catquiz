@@ -33,7 +33,7 @@ use stdClass;
  * Dynamic form.
  * @copyright Wunderbyte GmbH <info@wunderbyte.at>
  * @package   local_catquiz
- * @author    Magdalena Holczik, Georg Maißer
+ * @author    Wunderbyte GmbH
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class scaleselector extends dynamic_form {
@@ -47,13 +47,18 @@ class scaleselector extends dynamic_form {
         global $CFG, $DB, $PAGE;
 
         $mform = $this->_form;
-        $data = (object) $this->_ajaxformdata;
+        $ajaxdata = (object) $this->_ajaxformdata;
         $customdata = $this->_customdata;
 
-        $type = isset($customdata['type'])? $customdata['type'] : "scale"; //Type i.e. 'subscale'.
+        $formdata = $customdata ?? $ajaxdata ?? [];
 
-        if (isset($data->id)) {
-            $mform->addElement('hidden', 'id', $data->id);
+        $type = $customdata['type'] ?? "scale"; //Type i.e. 'subscale'.
+        if (isset($formdata->subscale)) {
+            $type = "subscale";
+        }
+
+        if (isset($formdata->id)) {
+            $mform->addElement('hidden', 'id', $formdata->id);
             $mform->setType('id', PARAM_INT);
         }
 
@@ -63,7 +68,8 @@ class scaleselector extends dynamic_form {
             $id = $customdata['parentscaleid'];
         } else if ($type == "subscale" && isset($ajaxdata->subscale)) {
             $subscaleid = intval($ajaxdata->subscale);
-            $id = catquiz::get_parent_scale($subscaleid);
+            $parentid = catquiz::get_parent_scale($subscaleid);
+            $id = [$parentid];
         }
 
         list($select, $from, $where, $filter, $params) = catquiz::get_sql_for_scales_and_subscales(

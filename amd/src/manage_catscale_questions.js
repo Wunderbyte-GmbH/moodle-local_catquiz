@@ -25,6 +25,7 @@ const SELECTORS = {
     CONTEXTFORM: '#select_context_form',
     CHECKBOX: 'input.integrate-subscales-checkbox',
     SCALEFORM: '#select_scale_form',
+    SUBSCALEFORM: '#select_subscale_form',
 };
 
 
@@ -39,10 +40,10 @@ export const init = () => {
     checkbox.addEventListener('click', e => {
         let searchParams = new URLSearchParams(window.location.search);
         if (checkbox.checked === true) {
-            searchParams.set("usesubs", 1);
+            searchParams.set("subscale", 0);
             window.location.search = searchParams.toString();
         } else {
-            searchParams.set("usesubs", 0);
+            searchParams.set("subscale", -1);
             window.location.search = searchParams.toString();
         }
     });
@@ -50,8 +51,7 @@ export const init = () => {
     // Context: Add event listener to select and set URL params.
     listenToSelect(SELECTORS.CONTEXTFORM, 'local_catquiz\\form\\contextselector', "contextid");
     listenToSelect(SELECTORS.SCALEFORM, 'local_catquiz\\form\\scaleselector', "scale");
-
-
+    listenToSelect(SELECTORS.SUBSCALEFORM, 'local_catquiz\\form\\scaleselector', "subscale");
 };
 /**
  * Set an eventlistener for a select.
