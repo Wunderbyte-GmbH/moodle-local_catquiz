@@ -323,6 +323,8 @@ class raschbirnbaumb extends model_raschmodel
         // TODO replace with something useful, this is just a demo
         $a = $parameters['difficulty'];
         $b = $parameters['discrimination'];
+        $trusted_region_min = get_config('catmodel_raschbirnbauma', 'trusted_region_min');
+        $trusted_region_max = get_config('catmodel_raschbirnbauma', 'trusted_region_max');
         return $parameters;
     }
 }

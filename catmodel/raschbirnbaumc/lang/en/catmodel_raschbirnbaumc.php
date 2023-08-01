@@ -23,3 +23,7 @@
  */
 
 $string['pluginname'] = '3PL mixed Rasch-Birnbaum model';
+$string['trusted_region_min'] = 'Trusted Region Minimum';
+$string['trusted_region_min_desc'] = 'Trusted Region Minimum';
+$string['trusted_region_max'] = 'Trusted Region Maximum';
+$string['trusted_region_max_desc'] = 'Trusted Region Maximum';

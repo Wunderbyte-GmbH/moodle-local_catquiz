@@ -451,6 +451,8 @@ class raschbirnbaumc extends model_raschmodel
         $a = $parameters['difficulty'];
         $b = $parameters['discrimination'];
         $c = $parameters['guessing'];
+        $trusted_region_min = get_config('catmodel_raschbirnbauma', 'trusted_region_min');
+        $trusted_region_max = get_config('catmodel_raschbirnbauma', 'trusted_region_max');
         return $parameters;
     }
 }
