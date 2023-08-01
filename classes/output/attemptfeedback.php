@@ -118,6 +118,9 @@ class attemptfeedback implements renderable, templatable
             return get_string('notavailable', 'core');
         }
         $ability = catquiz::get_person_ability($USER->id, $this->contextid, $this->catscaleid);
+        if (!$ability) {
+            return get_string('notavailable', 'core');
+        }
         return $ability->ability;
     }
 
