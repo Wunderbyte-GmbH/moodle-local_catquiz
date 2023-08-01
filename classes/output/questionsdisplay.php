@@ -148,7 +148,12 @@ class questionsdisplay implements renderable, templatable {
      */
     private function render_subscaleselector()
     {
+        // If we have no scale selected or the selected scale doesn't have any subscales, subscale select isn't displayed.
         if ($this->scale < 0) {
+            return "";
+        }
+        $subscaleresult = catquiz::get_subscale_ids_from_parent([$this->scale]);
+        if (empty($subscaleresult)) {
             return "";
         }
         $scaleid = empty($this->scale) ? -1 : $this->scale;
