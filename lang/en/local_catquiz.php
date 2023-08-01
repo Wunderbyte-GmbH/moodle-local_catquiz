@@ -278,6 +278,7 @@ $string['errorfetchnextquestion'] = "There was an error while selecting the next
 $string['reachedmaximumquestions'] = "Reached maximum number of questions";
 $string['error'] = "An error occured";
 $string['abortpersonabilitynotchanged'] = "Person parameter did not change";
+$string['emptyfirstquestionlist'] = "Can't select a start question because the list is empty";
 
 // Quiz Feedback
 $string['catquizfeedback'] = "Shows a summary of the last quiz attempt";

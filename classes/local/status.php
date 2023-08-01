@@ -16,4 +16,5 @@ class status
     const ERROR_FETCH_NEXT_QUESTION = 'errorfetchnextquestion';
     const ERROR_REACHED_MAXIMUM_QUESTIONS = 'reachedmaximumquestions';
     const ABORT_PERSONABILITY_NOT_CHANGED = 'abortpersonabilitynotchanged';
+    const ERROR_EMPTY_FIRST_QUESTION_LIST = 'emptyfirstquestionlist';
 }

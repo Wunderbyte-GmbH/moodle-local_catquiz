@@ -274,6 +274,7 @@ $string['errorfetchnextquestion'] = "Es trat ein Fehler bei der Auswahl der näc
 $string['reachedmaximumquestions'] = "Die Maximalanzahl an Testfragen wurde erreicht";
 $string['error'] = "Es ist ein Fehler aufgetreten";
 $string['abortpersonabilitynotchanged'] = "Personenparameter unverändert";
+$string['emptyfirstquestionlist'] = "Kann keine Startfrage wählen da die Liste leer ist";
 
 // Quiz Feedback
 $string['catquizfeedback'] = "Zusammenfassung des letzten Versuchs";
