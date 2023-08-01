@@ -24,11 +24,11 @@
     }
 }}
 {{#stats}}
-<p>Correct: {{gradedright}}</p>
-<p>Incorrect: {{gradedwrong}}</p>
-<p>Graded partial: {{gradedpartial}}</p>
+<p>{{#str}}numberofanswerscorrect, local_catquiz{{/str}}: {{gradedright}}</p>
+<p>{{#str}}numberofanswersincorrect, local_catquiz{{/str}}: {{gradedwrong}}</p>
+<p>{{#str}}numberofanswerspartlycorrect, local_catquiz{{/str}}: {{gradedpartial}}</p>
 {{/stats}}
-Ability: {{ability}}</br>
+{{#str}} personability, local_catquiz {{/str}}: {{ability}}</br>
 {{#strategy_feedback}}
     {{.}}</br>
 {{/strategy_feedback}}
