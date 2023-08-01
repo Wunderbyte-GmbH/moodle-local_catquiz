@@ -58,8 +58,12 @@ class scaleselector extends dynamic_form {
         }
 
         $id = ["0"]; // Scales go with ID 0.
-        if ($type == "subscale" && isset($customdata['parentscaleid'])) { // If it's a subscale, we have to get the parentscaleid.
+        // If it's a subscale, we have to get the parentscaleid to display the subscales in the select.
+        if ($type == "subscale" && isset($customdata['parentscaleid'])) {
             $id = $customdata['parentscaleid'];
+        } else if ($type == "subscale" && isset($ajaxdata->subscale)) {
+            $subscaleid = intval($ajaxdata->subscale);
+            $id = catquiz::get_parent_scale($subscaleid);
         }
 
         list($select, $from, $where, $filter, $params) = catquiz::get_sql_for_scales_and_subscales(

@@ -949,6 +949,18 @@ class catquiz {
             );
     }
 
+    public static function get_parent_scale(int $subscaleid) {
+        global $DB;
+        $record = $DB->get_record_sql(
+            "SELECT parentid FROM {local_catquiz_catscales}
+            WHERE id = :subscaleid
+            LIMIT 1",
+            [
+                'subscaleid' => $subscaleid,
+                'attemptstate' => 'complete',
+            ]
+        );
+        return $record->parentid;
     public static function get_all_catscales() {
         global $DB;
 
