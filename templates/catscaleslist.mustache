@@ -25,6 +25,17 @@
     }
 }}
 <div>
+<ul class="list-group w-100">
+    <li class="list-group-item">
+        <span class="h4">{{#str}} createcatscale, local_catquiz {{/str}}</span>
+        <div>
+            <a href="#" class="mt-3 manage-catscale btn-primary btn btn--plain btn--smaller btn-catscales" data-action="create">
+                <i class="fa fa fa-plus px-2"></i>
+                {{#str}} create, moodle {{/str}}
+            </a>
+        </div>
+    </li>
+</ul>
 {{#itemtree}}
         <div id="local-catscales-container-{{id}}">
             <ul class="list-group w-100 mt-2">
@@ -52,19 +63,6 @@
     {{#children}}
         {{>local_catquiz/catscalechildren}}
     {{/children}}
-{{/itemtree}}
-{{^itemtree}}
-<ul class="list-group w-100">
-    <li class="list-group-item">
-        <span class="h4">{{#str}} createcatscale, local_catquiz {{/str}}</span>
-        <div>
-            <a href="#" class="manage-catscale btn-primary btn btn--plain btn--smaller btn-catscales" data-action="create">
-                <i class="fa fa fa-plus px-2"></i>
-                {{#str}} create, moodle {{/str}}
-            </a>
-        </div>
-    </li>
-</ul>
 {{/itemtree}}
 </div>
 {{#js}}
