@@ -29,6 +29,7 @@ use local_wunderbyte_table\wunderbyte_table;
 use context_system;
 use local_catquiz\catquiz;
 use local_catquiz\local\model\model_item_param;
+use local_wunderbyte_table\output\table;
 use moodle_url;
 
 /**
@@ -112,14 +113,16 @@ class catscalequestions_table extends wunderbyte_table {
                 'href' => '#',
                 'id' => -1, // This forces single call execution.
                 //'formclass' => '', // To open dynamic form, instead of just confirmation modal.
-                'methodname' => 'deleteitem',
+                'methodname' => 'deletequestionfromscale',
                 'nomodal' => true,
                 'selectionmandatory' => false,
                 'data' => [ // Will be added eg as data-id = $values->id, so values can be transmitted to the method above.
-                    'id' => 'id',
+                    'questionid' => $values->id,
+                    'catscaleid' => $values->catscaleid,
                 ],
             ];
 
+        table::transform_actionbuttons_array($data['showactionbuttons']);
         return $OUTPUT->render_from_template('local_wunderbyte_table/component_actionbutton', $data);
     }
 
@@ -238,4 +241,28 @@ class catscalequestions_table extends wunderbyte_table {
 
         return $OUTPUT->render_from_template('local_catquiz/modals/modal_questionpreview', $data);
     }
+
+    /**
+     * Function to delete selected question.
+    * @param int $id
+    * @param string $data
+    * @return array
+    */
+   public function deletequestionfromscale(int $id, string $data) {
+
+       $jsonobject = json_decode($data);
+       $showmodal = $id;
+
+       $catscaleid = $jsonobject->catscaleid;
+       $questionid = $jsonobject->questionid;
+
+       // TODO call modal
+
+        catscale::remove_testitem_from_scale($catscaleid, $questionid);
+
+       return [
+           'success' => 1,
+           'message' => get_string('success'),
+       ];
+   }
 }
