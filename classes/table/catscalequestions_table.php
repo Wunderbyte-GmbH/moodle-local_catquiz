@@ -110,6 +110,7 @@ class catscalequestions_table extends wunderbyte_table {
                 'class' => 'btn btn-plain btn-smaller',
                 'iclass' => 'fa fa-trash',
                 'id' => $values->id,
+                'href' => '#',
                 'methodname' => 'deletequestionfromscale',
                 'nomodal' => false,
                 'data' => [ // Will be added eg as data-id = $values->id, so values can be transmitted to the method above.
