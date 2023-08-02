@@ -950,6 +950,11 @@ class catquiz {
             );
     }
 
+    /**
+     * Get the id of the parentscale with id of subscale.
+     * @param int $subscaleid
+     * @return mixed
+     */
     public static function get_parent_scale(int $subscaleid) {
         global $DB;
         $record = $DB->get_record_sql(
