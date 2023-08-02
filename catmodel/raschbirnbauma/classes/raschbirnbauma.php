@@ -39,7 +39,7 @@ defined('MOODLE_INTERNAL') || die();
  */
 class raschbirnbauma extends model_raschmodel
 {
-
+    
     public static function log_likelihood_p($p, array $params, float $item_response): float {
         if ($item_response < 1.0) {
             return self::counter_log_likelihood_p($p, $params);
@@ -221,59 +221,44 @@ class raschbirnbauma extends model_raschmodel
     /**
      * Get elementary matrix function for being composed
      */
-    public static function get_log_jacobian($p, float $item_response)
+    public static function get_log_jacobian($p, float $item_response):array
     {
+        // We can do this better, yet it works
         if ($item_response < 1.0) {
-            return self::get_log_counter_jacobian($p);
+            $fun1 = function ($x) use ($p) {
+                return self::log_counter_likelihood_b($p, $x);
+            }
+        } else {
+            $fun1 = function ($x) use ($p) {
+                return self::log_likelihood_b($p, $x);
+            }
         }
-
-        // $ip ....Array of item parameter
-
-        // return: Array [ df / d ip1 , df / d ip2]
-
-        $fun1 = function ($x) use ($p) {
-            return self::log_likelihood_b($p, $x);
-        };
-
         return [$fun1];
-
     }
 
+    // deprecated, please remove
     public static function get_log_counter_jacobian($p)
     {
-
-
-        $fun1 = function ($x) use ($p) {
-            return self::log_counter_likelihood_b($p, $x);
-        };
-        return [$fun1];
-
     }
 
-
-    public static function get_log_hessian($p, float $item_response)
+    public static function get_log_hessian($p, float $item_response):array
     {
+        // We can do this better, yet it works
         if ($item_response < 1.0) {
-            return self::get_log_counter_hessian($p);
+            $fun22 = function ($x) use ($p) {
+                return self::log_counter_likelihood_b_b($p, $x);
+            }
+        } else {
+            $fun22 = function ($x) use ($p) {
+                return self::log_likelihood_b_b($p, $x);
+            }
         }
-
-        $fun22 = function ($x) use ($p) {
-            return self::log_likelihood_b_b($p, $x);
-        };
-
         return [[$fun22]];
-
     }
 
+    // deprecated, please remove
     public static function get_log_counter_hessian($p)
-    {
-
-        $fun22 = function ($x) use ($p) {
-            return self::log_counter_likelihood_b_b($p, $x);
-        };
-
-        return [[$fun22]];
-
+    { 
     }
 
 
@@ -292,8 +277,54 @@ class raschbirnbauma extends model_raschmodel
     public function restrict_to_trusted_region(array $parameters): array {
         // TODO replace with something useful, this is just a demo
         $a = $parameters['difficulty'];
-        $trusted_region_min = get_config('catmodel_raschbirnbauma', 'trusted_region_min');
-        $trusted_region_max = get_config('catmodel_raschbirnbauma', 'trusted_region_max');
+        
+        $a_m = 0; // Mean of difficulty
+        $a_s = 2; // Standard derivation of difficulty
+        
+        $a_tr = 3; // Use 3 times of SD as range of trusted regions
+        // $a_tr = get_config('catmodel_raschbirnbauma', 'trusted_region_factor_sd_a'); // Use x times of SD as range of trusted regions
+        $a_min = get_config('catmodel_raschbirnbauma', 'trusted_region_min_a');
+        $a_max = get_config('catmodel_raschbirnbauma', 'trusted_region_max_a');
+
+        if (($a - $a_m) < max(-($a_tr * $a_s), $a_min)) {$a = max(-($a_tr * $a_s), $a_min); }
+        if (($a - $a_m) > min(($a_tr * $a_s), $a_max)) {$a = min(($a_tr * $a_s), $a_max); }
+
+        $parameters['difficulty'] = $a;
+        
         return $parameters;
+    }
+
+    /**
+     * Calculates the 1st derivative trusted regions for item parameters
+     *
+     * @param float $p
+     * @return array
+     */
+    public static function get_log_tr_jacobian(float $p): array {
+        $a_m = 0; // Mean of difficulty
+        $a_s = 2; // Standard derivation of difficulty
+
+        $a_tr = 3; // Use 3 times of SD as range of trusted regions
+        // $a_tr = get_config('catmodel_raschbirnbauma', 'trusted_region_factor_sd_a');
+
+        return [
+            function ($x) use ($p) { return (($a_m - $a) / $a_s ** 2) } // d/da
+        ]};
+    }
+
+    /**
+     * Calculates the 2nd derivative trusted regions for item parameters
+     *
+     * @param float $p
+     * @return array
+     */
+    public static function get_log_tr_hessian(float $p): array {
+        $a_m = 0; // Mean of difficulty
+        $a_s = 2; // Standard derivation of difficulty
+        $a_tr = 3; // Use 3 times of SD as range of trusted regions
+
+        return [[
+            function ($x) use ($p) { return (-1/$a_s ** 2) } // d/da d/da
+        ]]};
     }
 }
