@@ -275,8 +275,8 @@ class raschbirnbauma extends model_raschmodel
     }
 
     public function restrict_to_trusted_region(array $parameters): array {
-        // TODO replace with something useful, this is just a demo
-        $a = $parameters['difficulty'];
+        // Set values for difficulty parameter
+        $a = $parameters[0]; // Difficulty
         
         $a_m = 0; // Mean of difficulty
         $a_s = 2; // Standard derivation of difficulty
@@ -286,10 +286,11 @@ class raschbirnbauma extends model_raschmodel
         $a_min = get_config('catmodel_raschbirnbauma', 'trusted_region_min_a');
         $a_max = get_config('catmodel_raschbirnbauma', 'trusted_region_max_a');
 
+        // Test TR for difficulty
         if (($a - $a_m) < max(-($a_tr * $a_s), $a_min)) {$a = max(-($a_tr * $a_s), $a_min); }
         if (($a - $a_m) > min(($a_tr * $a_s), $a_max)) {$a = min(($a_tr * $a_s), $a_max); }
 
-        $parameters['difficulty'] = $a;
+        $parameters[0] = $a;
         
         return $parameters;
     }
@@ -300,7 +301,8 @@ class raschbirnbauma extends model_raschmodel
      * @param float $p
      * @return array
      */
-    public static function get_log_tr_jacobian(float $p): array {
+    public static function get_log_tr_jacobian(): array {
+        // Set values for difficulty parameter
         $a_m = 0; // Mean of difficulty
         $a_s = 2; // Standard derivation of difficulty
 
@@ -308,7 +310,7 @@ class raschbirnbauma extends model_raschmodel
         // $a_tr = get_config('catmodel_raschbirnbauma', 'trusted_region_factor_sd_a');
 
         return [
-            function ($x) use ($p) { return (($a_m - $a) / $a_s ** 2) } // d/da
+            function ($x) use ($p) { return (($a_m - $x[0]) / ($a_s ** 2)) } // d/da
         ]};
     }
 
@@ -318,13 +320,13 @@ class raschbirnbauma extends model_raschmodel
      * @param float $p
      * @return array
      */
-    public static function get_log_tr_hessian(float $p): array {
+    public static function get_log_tr_hessian(): array {
+        // Set values for difficulty parameter
         $a_m = 0; // Mean of difficulty
         $a_s = 2; // Standard derivation of difficulty
-        $a_tr = 3; // Use 3 times of SD as range of trusted regions
 
         return [[
-            function ($x) use ($p) { return (-1/$a_s ** 2) } // d/da d/da
+            function ($x) use ($p) { return (-1/ ($a_s ** 2)) } // d/da d/da
         ]]};
     }
 }
