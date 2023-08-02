@@ -253,12 +253,9 @@ class catscalequestions_table extends wunderbyte_table {
    public function deletequestionfromscale(int $id, string $data) {
 
        $jsonobject = json_decode($data);
-       $showmodal = $id;
 
        $catscaleid = $jsonobject->catscaleid;
        $questionid = $jsonobject->questionid;
-
-       // TODO call modal
 
         catscale::remove_testitem_from_scale($catscaleid, $questionid);
 
