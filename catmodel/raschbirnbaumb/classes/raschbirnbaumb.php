@@ -365,7 +365,7 @@ class raschbirnbaumb extends model_raschmodel
 
         return [
             function ($x) { return (($a_m - $x[0]) / ($a_s ** 2)) }, // d/da
-            function ($x) { return (-($b_s * exp($b_s * $x[1])) / (exp($b_s * $b_p) + exp($b_s * $[1]))) } // d/db
+            function ($x) { return (-($b_s * exp($b_s * $x[1])) / (exp($b_s * $b_p) + exp($b_s * $x[1]))) } // d/db
         ];    
     }
 
@@ -392,7 +392,7 @@ class raschbirnbaumb extends model_raschmodel
             function ($x) { return (0) } //d/da d/db
 ],[
             function ($x) { return (0) }, //d/db d/da
-            function ($x) { return (-($b_s ** 2 * exp($b_s * ($b_p + $b))) / (exp($b_s * $b_p) + exp($b_s * $x[1])) ** 2) } // d/db d/db
+            function ($x) { return (-($b_s ** 2 * exp($b_s * ($b_p + $x[1]))) / (exp($b_s * $b_p) + exp($b_s * $x[1])) ** 2) } // d/db d/db
 ]];
     }
 }
