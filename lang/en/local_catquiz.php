@@ -270,6 +270,9 @@ $string['attempts'] = 'Attempts';
 $string['addquestion'] = 'Add question from catalogue';
 $string['addtest'] = 'Add existing test';
 $string['checklinking'] = 'Check linking';
+$string['confirmdeletion'] = 'You are about to delete the following item: <br> "{$a->data}"';
+$string['genericsubmit'] = 'Confirm';
+$string['deletedatatitle'] = 'Delete';
 
 // CAT Quiz handler
 $string['noremainingquestions'] = "You ran out of questions";

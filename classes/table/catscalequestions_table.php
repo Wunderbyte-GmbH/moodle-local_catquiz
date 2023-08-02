@@ -107,19 +107,20 @@ class catscalequestions_table extends wunderbyte_table {
                 ],
             ];
             $data['showactionbuttons'][] = [
-                //'label' => get_string('delete', 'core'), // 'NoModal, SingleCall, NoSelection'
                 'class' => 'btn btn-plain btn-smaller',
                 'iclass' => 'fa fa-trash',
-                'href' => '#',
-                'id' => -1, // This forces single call execution.
-                //'formclass' => '', // To open dynamic form, instead of just confirmation modal.
+                'id' => $values->id,
                 'methodname' => 'deletequestionfromscale',
-                'nomodal' => true,
-                'selectionmandatory' => false,
+                'nomodal' => false,
                 'data' => [ // Will be added eg as data-id = $values->id, so values can be transmitted to the method above.
                     'questionid' => $values->id,
+                    'id' => $values->id,
                     'catscaleid' => $values->catscaleid,
-                ],
+                    'titlestring' => 'deletedatatitle', // Will be shown in modal title
+                    'bodystring' => 'confirmdeletion', // Will be shown in modal body in case elements are selected
+                    'component' => 'local_catquiz',
+                    'labelcolumn' => 'name', // Verify value of record that will be deleted.
+                ]
             ];
 
         table::transform_actionbuttons_array($data['showactionbuttons']);

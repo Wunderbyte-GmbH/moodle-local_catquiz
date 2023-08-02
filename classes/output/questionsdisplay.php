@@ -229,8 +229,9 @@ class questionsdisplay implements renderable, templatable {
             'lastattempttime' => get_string('lastattempttime', 'local_catquiz'),
             'difficulty' => get_string('difficulty', 'local_catquiz'),
             'action' => get_string('action', 'local_catquiz'),
-        ];
 
+        ];
+        $table->define_filtercolumns(['id' => 'id']);
         $table->define_columns(array_keys($columnsarray));
         $table->define_headers(array_values($columnsarray));
 

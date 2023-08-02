@@ -266,6 +266,9 @@ $string['attempts'] = 'Versuche';
 $string['addquestion'] = 'Frage aus Fragenkatalog hinzufügen';
 $string['addtest'] = 'Bestehenden Test hinzufügen';
 $string['checklinking'] = 'Linking prüfen';
+$string['confirmdeletion'] = 'Sie sind dabei das folgende Element zu löschen: <br> "{$a->data}"';
+$string['deletedatatitle'] = 'Löschen';
+$string['genericsubmit'] = 'Bestätigen';
 
 // CAT Quiz handler
 $string['noremainingquestions'] = "Keine weiteren Fragen";
