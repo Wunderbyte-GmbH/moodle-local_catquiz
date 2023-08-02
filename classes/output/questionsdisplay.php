@@ -334,15 +334,16 @@ class questionsdisplay implements renderable, templatable {
 
         // Get the record for the specific userid (fetched from optional param).
         list($select, $from, $where, $filter, $params) = catquiz::return_sql_for_catscalequestions([$this->tablescale], $catcontext, [], [], $this->detailid);
-        $sql = "SELECT $select FROM $from WHERE $where"; // TODO All records are returned here - SQL needs to be fixed!
-        $records = $DB->get_records_sql($sql, $params, IGNORE_MISSING);
-        $record = $records[$this->detailid]; // Only a fix until the SQL is fixed fetching only one record.
+        $idcheck = "id=:userid";
+        $sql = "SELECT $select FROM $from WHERE $where AND $idcheck";
+        $recordinarray = $DB->get_records_sql($sql, $params, IGNORE_MISSING);
+        $record = $recordinarray[$this->detailid];
 
         $title = get_string('general', 'core');
 
         $body['id'] = $record->id;
         $body['type'] = $record->qtype;
-        $body['status'] = $record->maxstatus;
+        $body['status'] = $record->status;
         $body['model'] = $record->model;
         $body['attempts'] = $record->attempts;
 
