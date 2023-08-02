@@ -231,7 +231,6 @@ class questionsdisplay implements renderable, templatable {
             'action' => get_string('action', 'local_catquiz'),
 
         ];
-        $table->define_filtercolumns(['id' => 'id']);
         $table->define_columns(array_keys($columnsarray));
         $table->define_headers(array_values($columnsarray));
 
