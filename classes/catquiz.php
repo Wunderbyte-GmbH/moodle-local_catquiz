@@ -962,6 +962,8 @@ class catquiz {
             ]
         );
         return $record->parentid;
+    }
+
     public static function get_all_catscales() {
         global $DB;
 
@@ -1023,7 +1025,7 @@ class catquiz {
     /**
      * Returns all item parameters in the given context that are assigned to the
      * given catscaleid and were calculated with the given modem
-     * 
+     *
      * @param int $contextid
      * @param int $catscaleid
      * @param string $model
