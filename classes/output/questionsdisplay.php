@@ -196,7 +196,6 @@ class questionsdisplay implements renderable, templatable {
         return $checkboxarray;
     }
 
-
     /**
      * Render table.
      */
@@ -226,7 +225,6 @@ class questionsdisplay implements renderable, templatable {
         $table->set_filter_sql($select, $from, $where, $filter, $params);
 
         $columnsarray = [
-            // TODO get Label
             'status' => get_string('status', 'core'),
             'qtype' => get_string('type', 'local_catquiz'),
             'name' => get_string('name', 'core'),
@@ -235,7 +233,6 @@ class questionsdisplay implements renderable, templatable {
             'lastattempttime' => get_string('lastattempttime', 'local_catquiz'),
             'difficulty' => get_string('difficulty', 'local_catquiz'),
             'action' => get_string('action', 'local_catquiz'),
-
         ];
         $table->define_columns(array_keys($columnsarray));
         $table->define_headers(array_values($columnsarray));

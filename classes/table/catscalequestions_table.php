@@ -101,15 +101,11 @@ class catscalequestions_table extends wunderbyte_table {
         ];
 
         $data['showactionbuttons'][] = [
-                //'label' => get_string('delete', 'core'), // 'NoModal, SingleCall, NoSelection'
                 'class' => 'btn btn-plain btn-smaller',
                 'iclass' => 'fa fa-cog',
                 'href' => $url->out(false),
-                'id' => -1, // This forces single call execution.
-                //'formclass' => '', // To open dynamic form, instead of just confirmation modal.
-                'methodname' => 'edititem',
+                'methodname' => '',
                 'nomodal' => true,
-                'selectionmandatory' => false,
                 'data' => [ // Will be added eg as data-id = $values->id, so values can be transmitted to the method above.
                     'id' => 'id',
                 ],
