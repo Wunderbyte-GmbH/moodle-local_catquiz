@@ -21,17 +21,22 @@ final class maybe_return_pilot extends preselect_task implements wb_middleware
 
         $pilot_questions = array_filter($context['questions'], fn($q) => $q->is_pilot);
         $nonpilot_questions = array_udiff($context['questions'], $pilot_questions, fn($a, $b) => $a->id - $b->id);
-        // If there are no pilot or non-pilot questions available, then return a random question
-        if (count($pilot_questions) === 0 || count($nonpilot_questions) === 0) {
+        // If there are no pilot questions, then return a random productive question
+        if (count($pilot_questions) === 0) {
+            return $next($context);
+        }
+
+        $cache = cache::make('local_catquiz', 'adaptivequizattempt');
+        $num_pilot_questions = $cache->get('num_pilot_questions') ?: 0;
+        // If there are only pilot questions, then return a random pilot question
+        if (count($nonpilot_questions) === 0) {
+            $cache->set('num_pilot_questions', ++$num_pilot_questions);
             return $next($context);
         }
 
         $should_return_pilot = rand(0, 100) <= $context['pilot_ratio'] * 100;
         if ($should_return_pilot) {
-            $cache = cache::make('local_catquiz', 'adaptivequizattempt');
-            $num_pilot_questions = $cache->get('num_pilot_questions') ?: 0;
             $cache->set('num_pilot_questions', ++$num_pilot_questions);
-
             $context['questions'] = $pilot_questions;
         } else {
             $context['questions'] = $nonpilot_questions;
