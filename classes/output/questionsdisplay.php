@@ -65,7 +65,7 @@ class questionsdisplay implements renderable, templatable {
     /**
      * @var integer
      */
-    private int $subscale = -1; // If subscales should be integrated in question display, value is 1.
+    private int $subscale = -1; // ID of selected subscale.
 
     /**
      * @var integer
@@ -80,7 +80,12 @@ class questionsdisplay implements renderable, templatable {
     /**
      * @var integer
      */
-    private ?int $detailid = null; // Records found in table query.
+    private ?int $testitemid = null; // ID of testitem.
+
+    /**
+     * @var string
+     */
+    private ?string $componentname= null; // Componentname of the testitem.
 
     /**
      *
@@ -91,7 +96,8 @@ class questionsdisplay implements renderable, templatable {
         $this->scale = optional_param('scale', -1, PARAM_INT);
         $this->subscale = optional_param('subscale', 0, PARAM_INT);
         $this->usesubs = optional_param('usesubs', 1, PARAM_INT);
-        $this->detailid = optional_param('detail', null, PARAM_INT); // ID of record to be displayed in detail instead of table.
+        $this->testitemid = optional_param('tiid', null, PARAM_INT); // ID of record to be displayed in detail instead of table.
+        $this->componentname = optional_param('component', null, PARAM_TEXT); // ID of record to be displayed in detail instead of table.
 
         // If a subscale is selected, we assign it for further use (i.e. to fetch the records for the table).
         // Otherwise we are using the parentscale variable.
@@ -202,7 +208,7 @@ class questionsdisplay implements renderable, templatable {
         // If no context is set, get default context from DB.
         $catcontext = empty($this->catcontextid) ? catquiz::get_default_context_id() : $this->catcontextid;
 
-        $table = new catscalequestions_table('catscale_' . $this->tablescale . ' questionstable', $this->tablescale, $catcontext);
+        $table = new catscalequestions_table('catscale_' . $this->tablescale . ' questionstable', $this->scale, $this->subscale, $catcontext);
 
         // If we integrate questions from subscales, we add different ids.
         if ($this->usesubs > 0) {
@@ -316,7 +322,7 @@ class questionsdisplay implements renderable, templatable {
      */
     private function check_tabledisplay() {
         $output = "";
-        if (empty($this->detailid)) {
+        if (empty($this->testitemid)) {
             $output = empty($this->renderquestionstable()) ? $this->get_no_table_string() : $this->renderquestionstable();
         }
         return $output;
@@ -327,17 +333,30 @@ class questionsdisplay implements renderable, templatable {
      */
     private function render_detailview() {
         global $DB;
-        if (empty($this->detailid)) {
+        if (empty($this->testitemid)) {
             return;
         }
         $catcontext = empty($this->catcontextid) ? catquiz::get_default_context_id() : $this->catcontextid; // If no context is set, get default context from DB.
 
         // Get the record for the specific userid (fetched from optional param).
-        list($select, $from, $where, $filter, $params) = catquiz::return_sql_for_catscalequestions([$this->tablescale], $catcontext, [], [], $this->detailid);
+        list($select, $from, $where, $filter, $params) = catquiz::return_sql_for_catscalequestions([$this->tablescale], $catcontext, [], [], $this->testitemid);
         $idcheck = "id=:userid";
         $sql = "SELECT $select FROM $from WHERE $where AND $idcheck";
         $recordinarray = $DB->get_records_sql($sql, $params, IGNORE_MISSING);
-        $record = $recordinarray[$this->detailid];
+        $record = $recordinarray[$this->testitemid];
+
+        // Output for testitem details card.
+        $detailcardoutput = $this->render_detailcard_of_testitem($record); // return array
+
+
+
+        return [
+            'detailcardoutput' => $detailcardoutput,
+        ];
+    }
+
+    private function render_detailcard_of_testitem(object $record) {
+        global $DB;
 
         $title = get_string('general', 'core');
 
