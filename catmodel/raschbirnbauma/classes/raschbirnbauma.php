@@ -225,42 +225,23 @@ class raschbirnbauma extends model_raschmodel
     {
         // We can do this better, yet it works
         if ($item_response < 1.0) {
-            $fun1 = function ($x) use ($p) {
-                return self::log_counter_likelihood_b($p, $x);
-            }
+            $fun1 = fn ($x) => self::log_counter_likelihood_b($p, $x);
         } else {
-            $fun1 = function ($x) use ($p) {
-                return self::log_likelihood_b($p, $x);
-            }
+            $fun1 = fn ($x) => self::log_likelihood_b($p, $x);
         }
         return [$fun1];
     }
 
-    // deprecated, please remove
-    public static function get_log_counter_jacobian($p)
-    {
-    }
-
-    public static function get_log_hessian($p, float $item_response):array
+    public static function get_log_hessian($p, float $item_response): array
     {
         // We can do this better, yet it works
         if ($item_response < 1.0) {
-            $fun22 = function ($x) use ($p) {
-                return self::log_counter_likelihood_b_b($p, $x);
-            }
+            $fun22 = fn ($x) => self::log_counter_likelihood_b_b($p, $x);
         } else {
-            $fun22 = function ($x) use ($p) {
-                return self::log_likelihood_b_b($p, $x);
-            }
+            $fun22 = fn ($x) => self::log_likelihood_b_b($p, $x);
         }
         return [[$fun22]];
     }
-
-    // deprecated, please remove
-    public static function get_log_counter_hessian($p)
-    { 
-    }
-
 
     /**
      *
@@ -276,7 +257,7 @@ class raschbirnbauma extends model_raschmodel
 
     public function restrict_to_trusted_region(array $parameters): array {
         // Set values for difficulty parameter
-        $a = $parameters[0]; // Difficulty
+        $a = $parameters['difficulty'];
         
         $a_m = 0; // Mean of difficulty
         $a_s = 2; // Standard derivation of difficulty
@@ -290,7 +271,7 @@ class raschbirnbauma extends model_raschmodel
         if (($a - $a_m) < max(-($a_tr * $a_s), $a_min)) {$a = max(-($a_tr * $a_s), $a_min); }
         if (($a - $a_m) > min(($a_tr * $a_s), $a_max)) {$a = min(($a_tr * $a_s), $a_max); }
 
-        $parameters[0] = $a;
+        $parameters['difficulty'] = $a;
         
         return $parameters;
     }
@@ -310,8 +291,8 @@ class raschbirnbauma extends model_raschmodel
         // $a_tr = get_config('catmodel_raschbirnbauma', 'trusted_region_factor_sd_a');
 
         return [
-            function ($x) use ($p) { return (($a_m - $x[0]) / ($a_s ** 2)) } // d/da
-        ]};
+            fn ($x) => (($a_m - $x[0]) / ($a_s ** 2)) // d/da
+        ];
     }
 
     /**
@@ -326,7 +307,7 @@ class raschbirnbauma extends model_raschmodel
         $a_s = 2; // Standard derivation of difficulty
 
         return [[
-            function ($x) use ($p) { return (-1/ ($a_s ** 2)) } // d/da d/da
-        ]]};
+            fn ($x) => (-1/ ($a_s ** 2)) // d/da d/da
+        ]];
     }
 }
