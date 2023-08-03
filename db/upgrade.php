@@ -157,12 +157,12 @@ function xmldb_local_catquiz_upgrade($oldversion) {
             // Define field catscaleid to be added to local_catquiz_tests.
             $table = new xmldb_table('local_catquiz_tests');
             $field = new xmldb_field('catscaleid', XMLDB_TYPE_INTEGER, '10', null, null, null, null, 'component');
-    
+
             // Conditionally launch add field catscaleid.
             if (!$dbman->field_exists($table, $field)) {
                 $dbman->add_field($table, $field);
             }
-    
+
             // Catquiz savepoint reached.
             upgrade_plugin_savepoint(true, 2023040701, 'local', 'catquiz');
         }
@@ -188,7 +188,7 @@ function xmldb_local_catquiz_upgrade($oldversion) {
 
             // Define table local_catquiz_itemparams to be created.
             $table = new xmldb_table('local_catquiz_itemparams');
-    
+
             // Adding fields to table local_catquiz_itemparams.
             $table->add_field('id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, XMLDB_SEQUENCE, null);
             $table->add_field('componentid', XMLDB_TYPE_INTEGER, '10', null, null, null, '0');
@@ -197,15 +197,15 @@ function xmldb_local_catquiz_upgrade($oldversion) {
             $table->add_field('model', XMLDB_TYPE_CHAR, '255', null, null, null, null);
             $table->add_field('difficulty', XMLDB_TYPE_NUMBER, '10, 4', null, null, null, '0');
             $table->add_field('discrimination', XMLDB_TYPE_NUMBER, '10, 4', null, null, null, '0');
-    
+
             // Adding keys to table local_catquiz_itemparams.
             $table->add_key('primary', XMLDB_KEY_PRIMARY, ['id']);
-    
+
             // Conditionally launch create table for local_catquiz_itemparams.
             if (!$dbman->table_exists($table)) {
                 $dbman->create_table($table);
             }
-    
+
             // Catquiz savepoint reached.
             upgrade_plugin_savepoint(true, $SAVEPOINT_ADD_ITEM_PARAMS, 'local', 'catquiz');
         }
@@ -217,7 +217,7 @@ function xmldb_local_catquiz_upgrade($oldversion) {
             // Define field timecreated to be added to local_catquiz_itemparams.
             $table = new xmldb_table('local_catquiz_itemparams');
             $field = new xmldb_field('timecreated', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0', 'discrimination');
-    
+
             // Conditionally launch add field timecreated.
             if (!$dbman->field_exists($table, $field)) {
                 $dbman->add_field($table, $field);
@@ -227,7 +227,7 @@ function xmldb_local_catquiz_upgrade($oldversion) {
             // Define field timemodified to be added to local_catquiz_itemparams.
             $table = new xmldb_table('local_catquiz_itemparams');
             $field = new xmldb_field('timemodified', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0', 'timecreated');
-    
+
             // Conditionally launch add field timemodified.
             if (!$dbman->field_exists($table, $field)) {
                 $dbman->add_field($table, $field);
@@ -243,10 +243,10 @@ function xmldb_local_catquiz_upgrade($oldversion) {
             // Changing precision of field ability on table local_catquiz_personparams to (10, 4).
             $table = new xmldb_table('local_catquiz_personparams');
             $field = new xmldb_field('ability', XMLDB_TYPE_NUMBER, '10, 4', null, null, null, null, 'model');
-    
+
             // Launch change of precision for field ability.
             $dbman->change_field_precision($table, $field);
-    
+
             // Catquiz savepoint reached.
             upgrade_plugin_savepoint(true, $SAVEPOINT_UPDATE_ABILITY_PRECISION, 'local', 'catquiz');
         }
@@ -257,12 +257,12 @@ function xmldb_local_catquiz_upgrade($oldversion) {
             // Define field courseid to be added to local_catquiz_tests.
             $table = new xmldb_table('local_catquiz_tests');
             $field = new xmldb_field('courseid', XMLDB_TYPE_INTEGER, '10', null, null, null, null, 'catscaleid');
-    
+
             // Conditionally launch add field courseid.
             if (!$dbman->field_exists($table, $field)) {
                 $dbman->add_field($table, $field);
             }
-    
+
             // Catquiz savepoint reached.
             upgrade_plugin_savepoint(true, $SAVEPOINT_ADD_COURSEID_FIELD, 'local', 'catquiz');
         }
@@ -305,12 +305,12 @@ function xmldb_local_catquiz_upgrade($oldversion) {
             // Define field timecalculated to be added to local_catquiz_catcontext.
             $table = new xmldb_table('local_catquiz_catcontext');
             $field = new xmldb_field('timecalculated', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0', 'timemodified');
-    
+
             // Conditionally launch add field timecalculated.
             if (!$dbman->field_exists($table, $field)) {
                 $dbman->add_field($table, $field);
             }
-    
+
             // Catquiz savepoint reached.
             upgrade_plugin_savepoint(true, $SAVEPOINT_ADD_TIMECALCULATED_FIELD, 'local', 'catquiz');
         }
@@ -329,6 +329,22 @@ function xmldb_local_catquiz_upgrade($oldversion) {
             // Catquiz savepoint reached.
             upgrade_plugin_savepoint(true, 2023072400, 'local', 'catquiz');
         }
+
+        if ($oldversion < 2023080300) {
+
+            // Define field status to be added to local_catquiz_items.
+            $table = new xmldb_table('local_catquiz_items');
+            $field = new xmldb_field('status', XMLDB_TYPE_INTEGER, '2', null, null, null, '0', 'lastupdated');
+
+            // Conditionally launch add field status.
+            if (!$dbman->field_exists($table, $field)) {
+                $dbman->add_field($table, $field);
+            }
+
+            // Catquiz savepoint reached.
+            upgrade_plugin_savepoint(true, 2023080300, 'local', 'catquiz');
+        }
+
 
     return true;
 }
