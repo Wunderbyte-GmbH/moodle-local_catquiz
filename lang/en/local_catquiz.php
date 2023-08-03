@@ -271,8 +271,10 @@ $string['addquestion'] = 'Add question from catalogue';
 $string['addtest'] = 'Add existing test';
 $string['checklinking'] = 'Check linking';
 $string['confirmdeletion'] = 'You are about to delete the following item: <br> "{$a->data}"';
+$string['confirmactivitychange'] = 'You are about to change the activity status of the following item: <br> "{$a->data}"';
 $string['genericsubmit'] = 'Confirm';
 $string['deletedatatitle'] = 'Delete';
+$string['toggleactivity'] = 'Activity status';
 
 // CAT Quiz handler
 $string['noremainingquestions'] = "You ran out of questions";

@@ -41,6 +41,10 @@ define('STRATEGY_LOWESTSUB', 4);
 define('STRATEGY_HIGHESTSUB', 5);
 define('STRATEGY_PILOT', 6);
 
+// Testiem Status in Scale
+define('TESTITEM_STATUS_ACTIVE', 0);
+define('TESTITEM_STATUS_INACTIVE', 1);
+
 
 /**
  * Renders the popup Link.

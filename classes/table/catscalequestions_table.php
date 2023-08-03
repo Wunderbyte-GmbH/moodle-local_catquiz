@@ -19,7 +19,6 @@ namespace local_catquiz\table;
 defined('MOODLE_INTERNAL') || die();
 
 global $CFG;
-require_once(__DIR__ . '/../../lib.php');
 require_once($CFG->libdir.'/tablelib.php');
 require_once($CFG->dirroot . '/question/engine/lib.php');
 
@@ -80,15 +79,18 @@ class catscalequestions_table extends wunderbyte_table {
         ], 'questions');
 
         $data['showactionbuttons'][] = [
-            //'label' => get_string('view', 'core'), // Name of your action button.
             'class' => 'btn btn-plain btn-smaller',
-            'iclass' => 'fa fa-eye',
+            'iclass' => empty($values->testitemstatus) ? 'fa fa-eye' : 'fa fa-eye-slash',
             'href' => '#',
             'id' => $values->id,
-            'methodname' => '', // The method needs to be added to your child of wunderbyte_table class.
+            'methodname' => 'togglestatus', // The method needs to be added to your child of wunderbyte_table class.
             'data' => [ // Will be added eg as data-id = $values->id, so values can be transmitted to the method above.
-                'key' => 'id',
-                'value' => $values->id,
+                'testitemstatus' => $values->testitemstatus,
+                'catscaleid' => $values->catscaleid,
+                'titlestring' => 'toggleactivity', // Will be shown in modal title
+                'bodystring' => 'confirmactivitychange', // Will be shown in modal body
+                'component' => 'local_catquiz',
+                'labelcolumn' => 'name',
             ]
         ];
 
@@ -264,4 +266,26 @@ class catscalequestions_table extends wunderbyte_table {
            'message' => get_string('success'),
        ];
    }
+
+    /**
+    * Toggle status to set item active / inactive.
+    * @param int $id
+    * @param string $data
+    * @return array
+    */
+    public function togglestatus(int $id, string $data) {
+
+        $jsonobject = json_decode($data);
+
+        $catscaleid = $jsonobject->catscaleid;
+        $status = empty($jsonobject->testitemstatus) ? TESTITEM_STATUS_INACTIVE : TESTITEM_STATUS_ACTIVE;
+
+        catscale::add_or_update_testitem_to_scale((int)$catscaleid, $id, $status);
+
+        return [
+            'success' => 1,
+            'message' => get_string('success'),
+        ];
+    }
+
 }

@@ -269,6 +269,8 @@ $string['checklinking'] = 'Linking prüfen';
 $string['confirmdeletion'] = 'Sie sind dabei das folgende Element zu löschen: <br> "{$a->data}"';
 $string['deletedatatitle'] = 'Löschen';
 $string['genericsubmit'] = 'Bestätigen';
+$string['confirmactivitychange'] = 'Sie sind dabei den Aktivitätsstatus des folgenden Elements zu ändern: <br> "{$a->data}"';
+$string['toggleactivity'] = 'Aktivitätsstatus';
 
 // CAT Quiz handler
 $string['noremainingquestions'] = "Keine weiteren Fragen";

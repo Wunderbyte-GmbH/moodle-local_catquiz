@@ -32,6 +32,8 @@ use local_catquiz\local\status;
 use moodle_exception;
 use stdClass;
 
+require_once($CFG->dirroot . '/local/catquiz/lib.php');
+
 /**
  * Class catquiz
  *
@@ -74,24 +76,32 @@ class catscale {
      *
      * @param integer $catscaleid
      * @param integer $testitemid
+     * @param int $status
      * @param string $component
      * @return result
      */
-    public static function add_or_update_testitem_to_scale(int $catscaleid, int $testitemid, string $component = 'question') {
+    public static function add_or_update_testitem_to_scale(
+            int $catscaleid,
+            int $testitemid,
+            int $status = TESTITEM_STATUS_ACTIVE,
+            string $component = 'question') {
 
         global $DB;
 
-        $data = [
+        $searchparams = [
             'componentid' => $testitemid,
-            'componentname' => 'question',
+            'componentname' => $component,
             'catscaleid' => $catscaleid,
         ];
 
-        if ($record = $DB->get_record('local_catquiz_items', $data)) {
+        $data = $searchparams;
+        $data['status'] = $status;
+
+        if ($record = $DB->get_record('local_catquiz_items', $searchparams)) {
             // Right now, there is nothing to do, as we don't have more data.
-            // $data['id'] = $record->id;
-            // $DB->update_record('local_catquiz_items', (object)$data);
             $id = $record->id;
+            $data['id'] = $id;
+            $DB->update_record('local_catquiz_items', (object)$data);
         } else {
             // We won't allow an item to be assigned to both a scale and its sub- or parent-scale
             if (self::is_assigned_to_parent_scale($catscaleid, $testitemid)
