@@ -261,9 +261,9 @@ class raschbirnbauma extends model_raschmodel
         
         $a_m = 0; // Mean of difficulty
         $a_s = 2; // Standard derivation of difficulty
-        
-        $a_tr = 3; // Use 3 times of SD as range of trusted regions
-        // $a_tr = get_config('catmodel_raschbirnbauma', 'trusted_region_factor_sd_a'); // Use x times of SD as range of trusted regions
+
+        // Use x times of SD as range of trusted regions
+        $a_tr = get_config('catmodel_raschbirnbauma', 'trusted_region_factor_sd_a');
         $a_min = get_config('catmodel_raschbirnbauma', 'trusted_region_min_a');
         $a_max = get_config('catmodel_raschbirnbauma', 'trusted_region_max_a');
 
@@ -287,8 +287,7 @@ class raschbirnbauma extends model_raschmodel
         $a_m = 0; // Mean of difficulty
         $a_s = 2; // Standard derivation of difficulty
 
-        $a_tr = 3; // Use 3 times of SD as range of trusted regions
-        // $a_tr = get_config('catmodel_raschbirnbauma', 'trusted_region_factor_sd_a');
+        $a_tr = get_config('catmodel_raschbirnbauma', 'trusted_region_factor_sd_a');
 
         return [
             fn ($x) => (($a_m - $x[0]) / ($a_s ** 2)) // d/da
