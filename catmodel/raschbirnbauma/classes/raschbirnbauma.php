@@ -282,7 +282,7 @@ class raschbirnbauma extends model_raschmodel
      * @param float $p
      * @return array
      */
-    public static function get_log_tr_jacobian(): array {
+    public static function get_log_tr_jacobian(array $parameters): array {
         // Set values for difficulty parameter
         $a_m = 0; // Mean of difficulty
         $a_s = 2; // Standard derivation of difficulty
@@ -290,7 +290,7 @@ class raschbirnbauma extends model_raschmodel
         $a_tr = get_config('catmodel_raschbirnbauma', 'trusted_region_factor_sd_a');
 
         return [
-            fn ($x) => (($a_m - $x[0]) / ($a_s ** 2)) // d/da
+            fn ($x) => (($a_m - $x['difficulty']) / ($a_s ** 2)) // d/da
         ];
     }
 
@@ -300,7 +300,7 @@ class raschbirnbauma extends model_raschmodel
      * @param float $p
      * @return array
      */
-    public static function get_log_tr_hessian(): array {
+    public static function get_log_tr_hessian(array $parameters): array {
         // Set values for difficulty parameter
         $a_m = 0; // Mean of difficulty
         $a_s = 2; // Standard derivation of difficulty
