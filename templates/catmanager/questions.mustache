@@ -52,7 +52,14 @@
         {{/table}}
         {{#detailview}}
         <div>
-            {{>local_catquiz/catmanager/questiondetailscard}}
+            {{#detailcardoutput}}
+            <div class="tab-pane fade show active" id="testitemdetails" role="tabpanel" aria-labelledby="testitemdetails-tab">
+                {{>local_catquiz/catmanager/questiondetailscard}}
+            </div>
+            {{/detailcardoutput}}
+            <div class="tab-pane fade show active" id="questionspreview" role="tabpanel" aria-labelledby="questionspreview-tab">
+            </div>
+        </div>
         </div>
         {{/detailview}}
     </div>
