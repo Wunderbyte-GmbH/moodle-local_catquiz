@@ -49,5 +49,75 @@ if ($hassiteconfig) {
                 2
             )
         );
+        $page->add(
+            new admin_setting_configtext(
+                $componentname . '/trusted_region_factor_sd_a',
+                get_string('trusted_region_factor_sd_a', $componentname),
+                get_string('trusted_region_factor_sd_a_desc', $componentname),
+                3.0,
+                PARAM_FLOAT,
+                2
+            )
+        );
+        $page->add(
+            new admin_setting_configtext(
+                $componentname . '/trusted_region_placement_b',
+                get_string('trusted_region_placement_b', $componentname),
+                get_string('trusted_region_placement_b_desc', $componentname),
+                3.0,
+                PARAM_FLOAT,
+                2
+            )
+        );
+        $page->add(
+            new admin_setting_configtext(
+                $componentname . '/trusted_region_slope_b',
+                get_string('trusted_region_slope_b', $componentname),
+                get_string('trusted_region_slope_b_desc', $componentname),
+                3.0,
+                PARAM_FLOAT,
+                2
+            )
+        );
+        $page->add(
+            new admin_setting_configtext(
+                $componentname . '/trusted_region_factor_max_b',
+                get_string('trusted_region_factor_max_b', $componentname),
+                get_string('trusted_region_factor_max_b_desc', $componentname),
+                3.0,
+                PARAM_FLOAT,
+                2
+            )
+        );
+        $page->add(
+            new admin_setting_configtext(
+                $componentname . '/trusted_region_min_b',
+                get_string('trusted_region_min_b', $componentname),
+                get_string('trusted_region_min_b_desc', $componentname),
+                3.0,
+                PARAM_FLOAT,
+                2
+            )
+        );
+        $page->add(
+            new admin_setting_configtext(
+                $componentname . '/trusted_region_max_b',
+                get_string('trusted_region_max_b', $componentname),
+                get_string('trusted_region_max_b_desc', $componentname),
+                3.0,
+                PARAM_FLOAT,
+                2
+            )
+        );
+        $page->add(
+            new admin_setting_configtext(
+                $componentname . '/trusted_region_max_c',
+                get_string('trusted_region_max_c', $componentname),
+                get_string('trusted_region_max_c_desc', $componentname),
+                3.0,
+                PARAM_FLOAT,
+                2
+            )
+        );
     }
 }

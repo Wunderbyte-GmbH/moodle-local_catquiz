@@ -453,20 +453,20 @@ class raschbirnbaumc extends model_raschmodel
         $a_m = 0; // Mean of difficulty
         $a_s = 2; // Standard derivation of difficulty
         
-        $a_tr = 3; // Use 3 times of SD as range of trusted regions
-        // $a_tr = get_config('catmodel_raschbirnbaumc', 'trusted_region_factor_sd_a');
+        // Use 3 times of SD as range of trusted regions
+        $a_tr = get_config('catmodel_raschbirnbaumc', 'trusted_region_factor_sd_a');
         $a_min = get_config('catmodel_raschbirnbaumc', 'trusted_region_min_a');
         $a_max = get_config('catmodel_raschbirnbaumc', 'trusted_region_max_a');
 
         // Set values for disrciminatory parameter
         $b = $parameters['discrimination'];
 
-        $b_p = 5; // Placement of the discriminatory parameter 
-        // $b_p = get_config('catmodel_raschbirnbaumc', 'trusted_region_placement_b');
-        $b_s = 2; // Slope of the discriminatory parameter
-        // $b_s = get_config('catmodel_raschbirnbaumc', 'trusted_region_slope_b');
-        $b_tr = 5; // Use 5 times of placement as maximal value of trusted region
-        // $b_tr = get_config('catmodel_raschbirnbaumc', 'trusted_region_factor_max_b');
+        // Placement of the discriminatory parameter
+        $b_p = get_config('catmodel_raschbirnbaumc', 'trusted_region_placement_b');
+        // Slope of the discriminatory parameter
+        $b_s = get_config('catmodel_raschbirnbaumc', 'trusted_region_slope_b');
+        // Use 5 times of placement as maximal value of trusted region
+        $b_tr = get_config('catmodel_raschbirnbaumc', 'trusted_region_factor_max_b');
         
         $b_min = get_config('catmodel_raschbirnbaumc', 'trusted_region_min_b');
         $b_max = get_config('catmodel_raschbirnbaumc', 'trusted_region_max_b'); 
@@ -510,10 +510,10 @@ class raschbirnbaumc extends model_raschmodel
         // Set values for disrciminatory parameter
         $b = $parameters['discrimination'];
 
-        $b_p = 5; // Placement of the discriminatory parameter 
-        // $b_p = get_config('catmodel_raschbirnbaumb', 'trusted_region_placement_b'); 
-        $b_s = 2; // Slope of the discriminatory parameter
-        // $b_s = get_config('catmodel_raschbirnbaumb', 'trusted_region_slope_b'); 
+        // Placement of the discriminatory parameter
+        $b_p = get_config('catmodel_raschbirnbaumb', 'trusted_region_placement_b');
+        // Slope of the discriminatory parameter
+        $b_s = get_config('catmodel_raschbirnbaumb', 'trusted_region_slope_b');
 
         return [
             fn ($x) => (($a_m - $x[0]) / ($a_s ** 2)), // d/da
@@ -535,10 +535,10 @@ class raschbirnbaumc extends model_raschmodel
         // Set values for disrciminatory parameter
         $b = $parameters['discrimination']; // Discriminatory
 
-        $b_p = 5; // Placement of the discriminatory parameter 
-        // $b_p = get_config('catmodel_raschbirnbaumb', 'trusted_region_placement_b'); // Placement of the discriminatory parameter 
-        $b_s = 2; // Slope of the discriminatory parameter
-        // $b_s = get_config('catmodel_raschbirnbaumb', 'trusted_region_slope_b'); // Placement of the discriminatory parameter 
+        // Placement of the discriminatory parameter
+        $b_p = get_config('catmodel_raschbirnbaumb', 'trusted_region_placement_b');
+        // Slope of the discriminatory parameter
+        $b_s = get_config('catmodel_raschbirnbaumb', 'trusted_region_slope_b');
 
         return [[
             fn ($x) => (-1/ ($a_s ** 2)), // d/da d/da
