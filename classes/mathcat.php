@@ -373,6 +373,13 @@ class mathcat
                 $dist = abs(array_values($z_0) - $z_1);
             }
 
+            // If one of the values is NAN, return the values restricted to the trusted region
+            if (count(array_filter($z_1, fn ($x) => is_nan($x))) > 0) {
+                $z_1 = $model->restrict_to_trusted_region($z_0);
+                echo "returning restricted value\n";
+                return array_combine($parameter_names, $z_1);
+            }
+
             $is_critical = $model->restrict_to_trusted_region($z_0) !== $z_0;
             if ($is_critical) {
                 foreach (array_keys($func) as $i) {
