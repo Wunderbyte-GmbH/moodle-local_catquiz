@@ -25,13 +25,15 @@
 }}
 
 <div>
-  <h3>{{#str}} summarygeneral, local_catquiz {{/str}}</h3>
-  <div class="catmanager-summary grid">
-    <div>{{#str}} summarynumberofassignedcatscales, local_catquiz {{/str}}: {{num_assigned_catscales}}</div>
-    <div>{{#str}} summarynumberoftests, local_catquiz {{/str}}: {{num_assigned_tests}}</div>
-    <div>{{#str}} summarytotalnumberofquestions, local_catquiz {{/str}}: {{num_assigned_questions}}</div>
-    <div>{{#str}} summarylastcalculation, local_catquiz {{/str}}: {{last_calculated}}</div>
-  </div>
+  {{#catscalestats}}
+    <h3>{{#str}} summarygeneral, local_catquiz {{/str}}</h3>
+    <div class="catmanager-summary grid">
+      <div>{{#str}} summarynumberofassignedcatscales, local_catquiz {{/str}}: {{num_assigned_catscales}}</div>
+      <div>{{#str}} summarynumberoftests, local_catquiz {{/str}}: {{num_assigned_tests}}</div>
+      <div>{{#str}} summarytotalnumberofquestions, local_catquiz {{/str}}: {{num_assigned_questions}}</div>
+      <div>{{#str}} summarylastcalculation, local_catquiz {{/str}}: {{last_calculated}}</div>
+    </div>
+  {{/catscalestats}}
 </div>
 <div>
   <h3>{{#str}} catscalesheading, local_catquiz {{/str}}</h3>

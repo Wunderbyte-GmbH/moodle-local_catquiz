@@ -22,12 +22,16 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-use local_catquiz\catquiz;
-use local_catquiz\output\catscalemanagers;
-use local_catquiz\output\catscales;
-use local_catquiz\output\questionsdisplay;
+use local_catquiz\output\managecatscaledashboard;
 
 require_once('../../config.php');
+
+$catcontextid = optional_param('contextid', 0, PARAM_INT);
+$catscale = optional_param('scale', -1, PARAM_INT);
+$usesubs = optional_param('usesubs', 1, PARAM_INT);
+$testitemid = optional_param('tiid', 0, PARAM_INT); // ID of record to be displayed in detail instead of table.
+$componentname = optional_param('component', 'question', PARAM_TEXT); // ID of record to be displayed in detail instead of table.
+
 
 global $USER;
 $context = \context_system::instance();
@@ -47,28 +51,8 @@ $PAGE->set_heading($title);
 
 echo $OUTPUT->header();
 
-$data = new catscales();
-$catscalemanagers = new catscalemanagers();
-$questions = new questionsdisplay();
-
-list($sql, $params) = catquiz::get_sql_for_number_of_assigned_catscales($USER->id);
-$num_assigned_catscales = $DB->count_records_sql($sql, $params);
-list($sql, $params) = catquiz::get_sql_for_number_of_assigned_tests($USER->id);
-$num_assigned_tests = $DB->count_records_sql($sql, $params);
-list($sql, $params) = catquiz::get_sql_for_number_of_assigned_questions($USER->id);
-$num_assigned_questions = $DB->count_records_sql($sql, $params);
-list($sql, $params) = catquiz::get_sql_for_last_calculation_time($USER->id);
-$last_calculated = userdate($DB->get_field_sql($sql, $params), get_string('strftimedatetime', 'core_langconfig'));
-
-
-echo $OUTPUT->render_from_template('local_catquiz/catscalesdashboard', [
-    'itemtree' => $data->export_for_template($OUTPUT),
-    'catscalemanagers' => $catscalemanagers->export_for_template($OUTPUT),
-    'questiontab' => $questions->export_for_template($OUTPUT),
-    'num_assigned_catscales' => $num_assigned_catscales,
-    'num_assigned_tests' => $num_assigned_tests,
-    'num_assigned_questions' => $num_assigned_questions,
-    'last_calculated' => $last_calculated,
-]);
+$managecatscaledashboard = new managecatscaledashboard($testitemid, $catcontextid, $catscale, $usesubs, $componentname);
+$data = $managecatscaledashboard->export_for_template($OUTPUT);
+echo $OUTPUT->render_from_template('local_catquiz/managecatscaledashboard', $data);
 
 echo $OUTPUT->footer();

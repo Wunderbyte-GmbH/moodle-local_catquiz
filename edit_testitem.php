@@ -48,7 +48,10 @@ $PAGE->set_heading($title);
 
 echo $OUTPUT->header();
 
-$data = new testitemdashboard($testitemid, $contextid, $catscaleid);
+$testitemdashboard = new testitemdashboard($testitemid, $contextid, $catscaleid);
+
+$data = $testitemdashboard->export_for_template($OUTPUT);
+
 $output = $PAGE->get_renderer('local_catquiz');
 echo $output->render_testitemdashboard($data);
 

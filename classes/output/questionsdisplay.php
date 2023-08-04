@@ -34,9 +34,6 @@ use html_writer;
 use local_catquiz\catquiz;
 use local_catquiz\table\catscalequestions_table;
 use moodle_url;
-use templatable;
-use renderable;
-
 
 /**
  * Renderable class for the catscalemanagers
@@ -46,7 +43,7 @@ use renderable;
  * @author     Magdalena Holczik
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class questionsdisplay implements renderable, templatable {
+class questionsdisplay {
     /**
      * @var integer
      */
@@ -70,6 +67,11 @@ class questionsdisplay implements renderable, templatable {
     /**
      * @var integer
      */
+    private int $detailsscale = 0; // The most detailed child of scale.
+
+    /**
+     * @var integer
+     */
     private int $usesubs = 1; // If subscales should be integrated in question display, value is 1.
 
     /**
@@ -85,19 +87,22 @@ class questionsdisplay implements renderable, templatable {
     /**
      * @var string
      */
-    private ?string $componentname= null; // Componentname of the testitem.
+    private string $componentname= 'question'; // Componentname of the testitem.
 
     /**
      *
      * @return void
      */
-    public function __construct() {
-        $this->catcontextid = optional_param('contextid', 0, PARAM_INT);
-        $this->scale = optional_param('scale', -1, PARAM_INT);
-        $this->subscale = optional_param('subscale', 0, PARAM_INT);
-        $this->usesubs = optional_param('usesubs', 1, PARAM_INT);
-        $this->testitemid = optional_param('tiid', null, PARAM_INT); // ID of record to be displayed in detail instead of table.
-        $this->componentname = optional_param('component', null, PARAM_TEXT); // ID of record to be displayed in detail instead of table.
+    public function __construct(int $testitemid, int $contextid, int $catscaleid = 2, int $usesubs = 1, string $componentname = 'question') {
+        $this->catcontextid = $contextid;
+        $this->detailsscale = $catscaleid;
+        $this->usesubs = $usesubs;
+        $this->testitemid = $testitemid; // ID of record to be displayed in detail instead of table.
+        $this->componentname = $componentname; // ID of record to be displayed in detail instead of table.
+
+        // TODO change scale logic!! Just for testing we stick with fixed scales.
+        $this->scale = 2;
+        $this->subscale = 3;
 
         // If a subscale is selected, we assign it for further use (i.e. to fetch the records for the table).
         // Otherwise we are using the parentscale variable.
@@ -340,13 +345,14 @@ class questionsdisplay implements renderable, templatable {
         $idcheck = "id=:userid";
         $sql = "SELECT $select FROM $from WHERE $where AND $idcheck";
         $recordinarray = $DB->get_records_sql($sql, $params, IGNORE_MISSING);
+
+        if (empty($recordinarray)) {
+            // Throw error: no record was found with id: $params['userid'];
+        }
         $record = $recordinarray[$this->testitemid];
 
         // Output for testitem details card.
         $detailcardoutput = $this->render_detailcard_of_testitem($record); // return array
-
-
-
         return [
             'detailcardoutput' => $detailcardoutput,
         ];
@@ -369,12 +375,11 @@ class questionsdisplay implements renderable, templatable {
         ];
     }
 
-
     /**
      * Return the item tree of all catscales.
      * @return array
      */
-    public function export_for_template(\renderer_base $output): array {
+    public function export_data_array(): array {
 
         $data = [
             'contextselector' => $this->render_contextselector(),
