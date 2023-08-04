@@ -31,9 +31,9 @@ if ($hassiteconfig) {
     if ($ADMIN->fulltree) {
         $page->add(
             new admin_setting_configtext(
-                $componentname . '/trusted_region_min',
-                get_string('trusted_region_min', $componentname),
-                get_string('trusted_region_min_desc', $componentname),
+                $componentname . '/trusted_region_min_a',
+                get_string('trusted_region_min_a', $componentname),
+                get_string('trusted_region_min_a_desc', $componentname),
                 -10.0,
                 PARAM_FLOAT,
                 2
@@ -41,9 +41,9 @@ if ($hassiteconfig) {
         );
         $page->add(
             new admin_setting_configtext(
-                $componentname . '/trusted_region_max',
-                get_string('trusted_region_max', $componentname),
-                get_string('trusted_region_max_desc', $componentname),
+                $componentname . '/trusted_region_max_a',
+                get_string('trusted_region_max_a', $componentname),
+                get_string('trusted_region_max_a_desc', $componentname),
                 10.0,
                 PARAM_FLOAT,
                 2

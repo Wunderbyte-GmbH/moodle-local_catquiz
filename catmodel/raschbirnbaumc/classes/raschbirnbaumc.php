@@ -446,7 +446,7 @@ class raschbirnbaumc extends model_raschmodel
 
     }
 
-    public function restrict_to_trusted_region(array $parameters): array {
+    public static function restrict_to_trusted_region(array $parameters): array {
         // Set values for difficulty parameter
         $a = $parameters['difficulty'];
 
@@ -502,13 +502,10 @@ class raschbirnbaumc extends model_raschmodel
      *
      * @return array
      */
-    public static function get_log_tr_jacobian(array $parameters): array {
+    public static function get_log_tr_jacobian(): array {
         // Set values for difficulty parameter
         $a_m = 0; // Mean of difficulty
         $a_s = 2; // Standard derivation of difficulty
-
-        // Set values for disrciminatory parameter
-        $b = $parameters['discrimination'];
 
         // Placement of the discriminatory parameter
         $b_p = get_config('catmodel_raschbirnbaumb', 'trusted_region_placement_b');
@@ -527,13 +524,10 @@ class raschbirnbaumc extends model_raschmodel
      *
      * @return array
      */
-    public static function get_log_tr_hessian(array $parameters): array {
+    public static function get_log_tr_hessian(): array {
         // Set values for difficulty parameter
         $a_m = 0; // Mean of difficulty
         $a_s = 2; // Standard derivation of difficulty
-
-        // Set values for disrciminatory parameter
-        $b = $parameters['discrimination']; // Discriminatory
 
         // Placement of the discriminatory parameter
         $b_p = get_config('catmodel_raschbirnbaumb', 'trusted_region_placement_b');
@@ -546,7 +540,7 @@ class raschbirnbaumc extends model_raschmodel
             fn ($x) => (0)
         ],[
             fn ($x) => (0), //d/db d/da
-            fn ($x) => (-($b_s ** 2 * exp($b_s * ($b_p + $b))) / (exp($b_s * $b_p) + exp($b_s * $x['discrimination'])) ** 2), // d/db d/db
+            fn ($x) => (-($b_s ** 2 * exp($b_s * ($b_p + $x['discrimination']))) / (exp($b_s * $b_p) + exp($b_s * $x['discrimination'])) ** 2), // d/db d/db
             fn ($x) => (0)
         ],[
             fn ($x) => (0),

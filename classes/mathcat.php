@@ -335,87 +335,64 @@ class mathcat
         return $z_0;
     }
 
-    static function newton_raphson_multi_stable($func, $derivative, $start, $min_inc = 0.0001, $max_iter = 2000)
-    {
-
+    static function newton_raphson_multi_stable(
+        $func,
+        $derivative,
+        $start,
+        $min_inc = 0.0001,
+        $max_iter = 2000,
+        catcalc_item_estimator $model
+    ) {
         $model_dim = count($func);
-
         $ml = new matrixcat();
-        // get real jacobian/hessian
-
         $z_0 = $start;
         $parameter_names = array_keys($z_0);
 
-        $use_gauss= array_fill(0, $model_dim, false);
-        $gauss_iter = array_fill(0, $model_dim, 0);
-
-
         // jacobian, hessian, model_dim, start_value
-
-
         for ($i = 0; $i < $max_iter; $i++) {
-
-            // gauß noise treatment
-            for ($k = 0; $k <= $model_dim - 1; $k++ ){
-
-                if ($use_gauss[$k] == true){
-
-                    $gauss_iter[$k] += 1;
-                    if ($gauss_iter[$k] % 10 == 0){
-
-                        $func[$k] = self::add_gauss_der1($func[$k],0,0.5);
-                        for ($kk = 0;$kk <= $model_dim;$kk++){
-                            $derivative[$k][$kk] = self::add_gauss_der2($derivative[$k][$kk],0,0.5);
-                        }
-                    }
-                }
-            }
-
-            for ($k = 0; $k <= $model_dim-1; $k++) {
-
+            for ($k = 0; $k <= $model_dim - 1; $k++) {
                 $real_func[$k] = [$func[$k]($z_0)];
-
-                for ($j = 0; $j <= $model_dim-1; $j++) {
+                for ($j = 0; $j <= $model_dim - 1; $j++) {
                     $real_derivative[$k][$j] = $derivative[$k][$j]($z_0);
                 }
             }
 
-
             $G = $real_func;
             $J = $real_derivative;
-
-            //$j_inv = $ml->inverseMatrix($J);
             $matrix = new matrix($J);
-            $j_inv = ($matrix->getRows() === 1 && $matrix->isSquare()) ? [[1/$J[0][0]]] : $matrix->inverse();
+            $j_inv = ($matrix->getRows() === 1 && $matrix->isSquare())
+                ? [[1 / $J[0][0]]]
+                : $matrix->inverse();
 
-
-
-
-
-            if (is_array($z_0)){
+            if (is_array($z_0)) {
                 $diff = $ml->flattenArray($ml->multiplyMatrices($j_inv, $G));
-
                 $z_1 = $ml->subtractVectors(array_values($z_0), $diff);
-                $dist = $ml->dist(array_values($z_0),$z_1);
-
-
-                //for ($ii = 0; $ii <= count($z_0);$ii++){
-                //
-                //    if (abs($z_0[$ii]) > 10){
-                //        $use_gauss[$ii] = true;
-                //        $z_1[$ii] = 0; // todo: reset to some new starting point
-                //    }
-                //}
-
+                $dist = $ml->dist(array_values($z_0), $z_1);
             } else {
                 $z_1 = array_values($z_0) - $ml->flattenArray($ml->multiplyMatrices($j_inv, $G))[0];
                 $dist = abs(array_values($z_0) - $z_1);
             }
 
-            if ($dist < $min_inc){
-                return array_combine($parameter_names, $z_1);
+            $is_critical = $model->restrict_to_trusted_region($z_0) !== $z_0;
+            if ($is_critical) {
+                foreach (array_keys($func) as $i) {
+                    $func[$i] = self::compose_plus(
+                        $model->get_log_tr_jacobian()[$i],
+                        $func[$i]
+                    );
+                    foreach (array_keys($derivative) as $j) {
+                        $derivative[$i][$j] = self::compose_plus(
+                            $model->get_log_tr_hessian()[$i][$j],
+                            $derivative[$i][$j]
+                        );
+                    }
+                }
             }
+
             $z_0 = array_combine($parameter_names, $z_1);
+            if ($dist < $min_inc) {
+                return $z_0;
+            }
         }
 
         return $z_0;

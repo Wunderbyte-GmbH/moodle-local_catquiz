@@ -305,7 +305,7 @@ class raschbirnbaumb extends model_raschmodel
 
     }
 
-    public function restrict_to_trusted_region(array $parameters): array {
+    public static function restrict_to_trusted_region(array $parameters): array {
         // Set values for difficulty parameter
         $a = $parameters['difficulty'];
 
@@ -350,13 +350,10 @@ class raschbirnbaumb extends model_raschmodel
      *
      * @return array
      */
-    public static function get_log_tr_jacobian(array $parameters): array {
+    public static function get_log_tr_jacobian(): array {
         // Set values for difficulty parameter
         $a_m = 0; // Mean of difficulty
         $a_s = 2; // Standard derivation of difficulty
-
-        // Set values for disrciminatory parameter
-        $b = $parameters['discrimination']; // Discriminatory
 
         $b_p = 5; // Placement of the discriminatory parameter 
         // $b_p = get_config('catmodel_raschbirnbaumb', 'trusted_region_placement_b'); // Placement of the discriminatory parameter 
@@ -364,8 +361,8 @@ class raschbirnbaumb extends model_raschmodel
         // $b_s = get_config('catmodel_raschbirnbaumb', 'trusted_region_slope_b');
 
         return [
-            fn ($x) => (($a_m - $x[0]) / ($a_s ** 2)), // d/da
-            fn ($x) => (-($b_s * exp($b_s * $x[1])) / (exp($b_s * $b_p) + exp($b_s * $x[1]))) // d/db
+            fn ($x) => (($a_m - $x['difficulty']) / ($a_s ** 2)), // d/da
+            fn ($x) => (-($b_s * exp($b_s * $x['discrimination'])) / (exp($b_s * $b_p) + exp($b_s * $x['discrimination']))) // d/db
         ];    
     }
 
@@ -374,13 +371,10 @@ class raschbirnbaumb extends model_raschmodel
      *
      * @return array
      */
-    public static function get_log_tr_hessian(array $parameters): array {
+    public static function get_log_tr_hessian(): array {
         // Set values for difficulty parameter
         $a_m = 0; // Mean of difficulty
         $a_s = 2; // Standard derivation of difficulty
-
-        // Set values for disrciminatory parameter
-        $b = $parameters['discrimination'];
 
         $b_p = 5; // Placement of the discriminatory parameter 
         // $b_p = get_config('catmodel_raschbirnbaumb', 'trusted_region_placement_b'); // Placement of the discriminatory parameter 
@@ -392,7 +386,7 @@ class raschbirnbaumb extends model_raschmodel
             fn ($x) => (0) //d/da d/db
 ],[
             fn ($x) => (0), //d/db d/da
-            fn ($x) => (-($b_s ** 2 * exp($b_s * ($b_p + $x[1]))) / (exp($b_s * $b_p) + exp($b_s * $x[1])) ** 2) // d/db d/db
+            fn ($x) => (-($b_s ** 2 * exp($b_s * ($b_p + $x['discrimination']))) / (exp($b_s * $b_p) + exp($b_s * $x['discrimination'])) ** 2) // d/db d/db
 ]];
     }
 }

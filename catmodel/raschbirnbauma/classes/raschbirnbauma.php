@@ -255,7 +255,7 @@ class raschbirnbauma extends model_raschmodel
 
     }
 
-    public function restrict_to_trusted_region(array $parameters): array {
+    public static function restrict_to_trusted_region(array $parameters): array {
         // Set values for difficulty parameter
         $a = $parameters['difficulty'];
         
@@ -279,10 +279,9 @@ class raschbirnbauma extends model_raschmodel
     /**
      * Calculates the 1st derivative trusted regions for item parameters
      *
-     * @param float $p
      * @return array
      */
-    public static function get_log_tr_jacobian(array $parameters): array {
+    public static function get_log_tr_jacobian(): array {
         // Set values for difficulty parameter
         $a_m = 0; // Mean of difficulty
         $a_s = 2; // Standard derivation of difficulty
@@ -297,10 +296,9 @@ class raschbirnbauma extends model_raschmodel
     /**
      * Calculates the 2nd derivative trusted regions for item parameters
      *
-     * @param float $p
      * @return array
      */
-    public static function get_log_tr_hessian(array $parameters): array {
+    public static function get_log_tr_hessian(): array {
         // Set values for difficulty parameter
         $a_m = 0; // Mean of difficulty
         $a_s = 2; // Standard derivation of difficulty
