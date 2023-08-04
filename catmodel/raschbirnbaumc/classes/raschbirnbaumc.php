@@ -107,7 +107,7 @@ class raschbirnbaumc extends model_raschmodel
     }
 
     /**
-     * Generalisierung von `likelihood`: params $a und $b werden im array/vector als $x[0] und $x[1] angesprochen
+     * Generalisierung von `likelihood`
      * Kann in likelihood umbenannt werden
      * @param mixed $p
      * @param mixed $x
