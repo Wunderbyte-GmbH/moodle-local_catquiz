@@ -23,10 +23,10 @@
  */
 
 $string['pluginname'] = '2PL Rasch-Birnbaum Modell';
-$string['trusted_region_min'] = 'Trusted Region Minimum';
-$string['trusted_region_min_desc'] = 'Trusted Region Minimum';
-$string['trusted_region_max'] = 'Trusted Region Maximum';
-$string['trusted_region_max_desc'] = 'Trusted Region Maximum';
+$string['trusted_region_min_a'] = 'Trusted Region Minimum a';
+$string['trusted_region_min_a_desc'] = 'Trusted Region Minimum a';
+$string['trusted_region_max_a'] = 'Trusted Region Maximum a';
+$string['trusted_region_max_a_desc'] = 'Trusted Region Maximum a';
 $string['trusted_region_factor_sd_a'] = 'Trusted Region Factor SD a';
 $string['trusted_region_factor_sd_a_desc'] = 'Use x times of SD as range of trusted regions';
 $string['trusted_region_placement_b'] = "Placement of the discriminatory parameter";
