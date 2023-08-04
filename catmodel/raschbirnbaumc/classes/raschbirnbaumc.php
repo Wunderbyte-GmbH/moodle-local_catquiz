@@ -454,27 +454,27 @@ class raschbirnbaumc extends model_raschmodel
         $a_s = 2; // Standard derivation of difficulty
         
         // Use 3 times of SD as range of trusted regions
-        $a_tr = get_config('catmodel_raschbirnbaumc', 'trusted_region_factor_sd_a');
-        $a_min = get_config('catmodel_raschbirnbaumc', 'trusted_region_min_a');
-        $a_max = get_config('catmodel_raschbirnbaumc', 'trusted_region_max_a');
+        $a_tr = floatval(get_config('catmodel_raschbirnbaumc', 'trusted_region_factor_sd_a'));
+        $a_min = floatval(get_config('catmodel_raschbirnbaumc', 'trusted_region_min_a'));
+        $a_max = floatval(get_config('catmodel_raschbirnbaumc', 'trusted_region_max_a'));
 
         // Set values for disrciminatory parameter
         $b = $parameters['discrimination'];
 
         // Placement of the discriminatory parameter
-        $b_p = get_config('catmodel_raschbirnbaumc', 'trusted_region_placement_b');
+        $b_p = floatval(get_config('catmodel_raschbirnbaumc', 'trusted_region_placement_b'));
         // Slope of the discriminatory parameter
-        $b_s = get_config('catmodel_raschbirnbaumc', 'trusted_region_slope_b');
+        $b_s = floatval(get_config('catmodel_raschbirnbaumc', 'trusted_region_slope_b'));
         // Use 5 times of placement as maximal value of trusted region
-        $b_tr = get_config('catmodel_raschbirnbaumc', 'trusted_region_factor_max_b');
+        $b_tr = floatval(get_config('catmodel_raschbirnbaumc', 'trusted_region_factor_max_b'));
         
-        $b_min = get_config('catmodel_raschbirnbaumc', 'trusted_region_min_b');
-        $b_max = get_config('catmodel_raschbirnbaumc', 'trusted_region_max_b'); 
+        $b_min = floatval(get_config('catmodel_raschbirnbaumc', 'trusted_region_min_b'));
+        $b_max = floatval(get_config('catmodel_raschbirnbaumc', 'trusted_region_max_b')); 
 
         // Set values for guessing parameter
         $c = $parameters['guessing'];
 
-        $c_max = get_config('catmodel_raschbirnbaumc', 'trusted_region_max_c');
+        $c_max = floatval(get_config('catmodel_raschbirnbaumc', 'trusted_region_max_c'));
         
         // Test TR for difficulty
         if (($a - $a_m) < max(-($a_tr * $a_s), $a_min)) {$a = max(-($a_tr * $a_s), $a_min); }
