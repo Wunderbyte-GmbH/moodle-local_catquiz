@@ -142,7 +142,7 @@ class testitemdashboard implements renderable, templatable {
      *
      * @return array
      */
-    private function render_testitemstats() {
+    private function get_testitems_stats_data() {
 
         global $DB;
 
@@ -228,6 +228,48 @@ class testitemdashboard implements renderable, templatable {
                 return get_string('notavailable', 'core');
         }
     }
+    /**
+     * Check if we display a table or a detailview of a specific item.
+     */
+    private function get_detail_data() {
+        global $DB;
+        if (empty($this->testitemid)) {
+            return;
+        }
+        $catcontext = empty($this->contextid) ? catquiz::get_default_context_id() : $this->contextid; // If no context is set, get default context from DB.
+
+        $this->catscaleid = 3; // Just for testing
+        // Get the record for the specific userid (fetched from optional param).
+        list($select, $from, $where, $filter, $params) = catquiz::return_sql_for_catscalequestions([$this->catscaleid], $catcontext, [], [], $this->testitemid);
+        $idcheck = "id=:userid";
+        $sql = "SELECT $select FROM $from WHERE $where AND $idcheck";
+        $recordinarray = $DB->get_records_sql($sql, $params, IGNORE_MISSING);
+
+        if (empty($recordinarray)) {
+            // Throw error: no record was found with id: $params['userid'];
+        }
+        $record = $recordinarray[$this->testitemid];
+
+        // Output for testitem details card.
+        $detailcardoutput = $this->render_detailcard_of_testitem($record); // return array
+        return $detailcardoutput;
+    }
+
+    private function render_detailcard_of_testitem(object $record) {
+
+        $title = get_string('general', 'core');
+
+        $body['id'] = $record->id;
+        $body['type'] = $record->qtype;
+        $body['status'] = $record->status;
+        $body['model'] = $record->model;
+        $body['attempts'] = $record->attempts;
+
+        return [
+            'title' => $title,
+            'body' => $body,
+        ];
+    }
 
     /**
      * Return the item tree of all catscales.
@@ -240,11 +282,27 @@ class testitemdashboard implements renderable, templatable {
         $data = [
             'returnurl' => $url->out(),
             'models' => $this->render_modelcards(),
-            'statcards' => $this->render_testitemstats(),
+            'statcards' => $this->get_testitems_stats_data(),
             'contextselector' => $this->render_contextselector(),
             'overridesforms' => $this->render_overrides_form(),
             'itemstatus' => $this->get_itemstatus(),
         ];
         return $data;
     }
+
+    /**
+    * Return the detail data of one item.
+    * @return array
+    */
+   public function return_as_array(): array {
+
+       $data = [
+            'detailview' => $this->get_detail_data(),
+           'models' => $this->render_modelcards(),
+           'statcards' => $this->get_testitems_stats_data(),
+           'overridesforms' => $this->render_overrides_form(),
+           'itemstatus' => $this->get_itemstatus(),
+       ];
+       return $data;
+   }
 }
