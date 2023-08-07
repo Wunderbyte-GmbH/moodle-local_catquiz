@@ -136,9 +136,12 @@ class managecatscaledashboard implements renderable, templatable {
         $catscalestats = new catscalestats();
         $this->catscalestatsarray = $catscalestats->export_data_array();
 
-        $testitemdashboard = new testitemdashboard($this->testitemid, $this->contextid, $this->catscaleid);
-
-        // TODO: Look into classes and make sure the export function will only return data, no html.
+        if (!empty($this->catscaleid)
+            && !empty($this->testitemid)
+            && !empty($this->contextid)) {
+                $testitemdashboard = new testitemdashboard($this->testitemid, $this->contextid, $this->catscaleid);
+                $this->testitemdashboardarray = $testitemdashboard->return_as_array();
+        }
 
     }
 
@@ -148,8 +151,6 @@ class managecatscaledashboard implements renderable, templatable {
      * @return array
      */
     public function export_for_template(\renderer_base $output): array {
-
-        $url = new moodle_url('/local/catquiz/manage_catscales.php');
 
         foreach ($this->catscalesarray as $key => $value) {
             $id = $this->catscalesarray[$key]['id'];
@@ -161,7 +162,7 @@ class managecatscaledashboard implements renderable, templatable {
             'catscalemanagers' => $this->catscalemanagersarray,
             'questionsdisplay' => $this->questionsdisplayarray,
             'catscalestats' => $this->catscalestatsarray,
-            //'testitemdetails' => $this->testitemdashboard->export_for_template(),
+            'testitemdetails' => $this->testitemdashboardarray,
         ];
         return $data;
     }
