@@ -39,9 +39,6 @@ class catscalequestions_table extends wunderbyte_table {
     /** @var integer $catscaleid */
     private $catscaleid = 0;
 
-    /** @var integer $subscaleid */
-    private $subscaleid = 0;
-
     /** @var integer */
     private $contextid = 0;
 
@@ -52,10 +49,9 @@ class catscalequestions_table extends wunderbyte_table {
      * @param integer $catscaleid
      * @param integer $contextid
      */
-    public function __construct(string $uniqueid, int $catscaleid = 0, int $subscale = 0, int $contextid = 0) {
+    public function __construct(string $uniqueid, int $catscaleid = 0, int $contextid = 0) {
 
         $this->catscaleid = $catscaleid;
-        $this->subscaleid = $subscale;
 
         if (empty($contextid)) {
             $contextid = catquiz::get_default_context_id();
@@ -80,7 +76,6 @@ class catscalequestions_table extends wunderbyte_table {
             'id' => $values->id,
             'contextid' => $this->contextid,
             'scale' => $this->catscaleid ?? 0,
-            'subscale' => $this->subscaleid ?? -1,
             'component' => $values->component ?? "",
         ], 'questions');
 

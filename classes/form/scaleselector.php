@@ -26,6 +26,7 @@ use context;
 use context_system;
 use core_form\dynamic_form;
 use local_catquiz\catquiz;
+use local_catquiz\catscale;
 use moodle_url;
 use stdClass;
 
@@ -52,24 +53,22 @@ class scaleselector extends dynamic_form {
 
         $formdata = $customdata ?? $ajaxdata ?? [];
 
-        $type = $customdata['type'] ?? "scale"; //Type i.e. 'subscale'.
-        if (isset($formdata->subscale)) {
-            $type = "subscale";
-        }
-
+        $type = $customdata['type'] ?? "scale"; //Type i.e. 'scale'.
         if (isset($formdata->id)) {
             $mform->addElement('hidden', 'id', $formdata->id);
             $mform->setType('id', PARAM_INT);
         }
 
-        $id = ["0"]; // Scales go with ID 0.
-        // If it's a subscale, we have to get the parentscaleid to display the subscales in the select.
-        if ($type == "subscale" && isset($customdata['parentscaleid'])) {
-            $id = $customdata['parentscaleid'];
-        } else if ($type == "subscale" && isset($ajaxdata->subscale)) {
-            $subscaleid = intval($ajaxdata->subscale);
-            $parentid = catquiz::get_parent_scale($subscaleid);
-            $id = [$parentid];
+        // We check if the catscale has ancestors (parent scales).
+        if (empty($ajaxdata->scale)) {
+            return;
+        }
+        $ancestorids = catscale::get_ancestors($ajaxdata->scale);
+        $ancestorslength = count($ancestorids);
+        if ($ancestorslength == 0) {
+            $id = ["0"]; // Scales go with ID 0.
+        } else { // If it's a subscale, we get the ID of the next ancestor.
+            $id = [$ancestorids[0]];
         }
 
         $contextsdb = catquiz::get_subscale_ids_from_parent($id);

@@ -27,6 +27,7 @@ namespace local_catquiz;
 
 use cache;
 use cache_helper;
+use dml_exception;
 use local_catquiz\local\result;
 use local_catquiz\local\status;
 use moodle_exception;
@@ -236,7 +237,7 @@ class catscale {
      *
      * @return array
      */
-    private static function get_subscale_ids(int $catscaleid = null): array {
+    public static function get_subscale_ids(int $catscaleid = null): array {
         global $DB;
 
         $all = $DB->get_records("local_catquiz_catscales", null, "", "id, parentid");
@@ -253,7 +254,13 @@ class catscale {
         return [];
     }
 
-    private static function get_ancestors(int $catscaleid) {
+    /**
+     * Get IDs of parentscales.
+     * @param int $catscaleid
+     * @return null|array
+     * @throws dml_exception
+     */
+    public static function get_ancestors(int $catscaleid) {
         global $DB;
         $all = $DB->get_records("local_catquiz_catscales", null, "", "id, parentid");
         return self::add_parentscales($catscaleid, $all);

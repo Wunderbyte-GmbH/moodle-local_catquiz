@@ -32,6 +32,7 @@ namespace local_catquiz\output;
 
 use html_writer;
 use local_catquiz\catquiz;
+use local_catquiz\catscale;
 use local_catquiz\table\catscalequestions_table;
 use moodle_url;
 
@@ -53,16 +54,6 @@ class questionsdisplay {
      * @var integer
      */
     private int $scale = 0; // The selected scale.
-
-    /**
-     * @var integer
-     */
-    private int $tablescale = 0; // Scale used for tabledisplay. Can be scale or subscale.
-
-    /**
-     * @var integer
-     */
-    private int $subscale = -1; // ID of selected subscale.
 
     /**
      * @var integer
@@ -93,24 +84,13 @@ class questionsdisplay {
      *
      * @return void
      */
-    public function __construct(int $testitemid, int $contextid, int $catscaleid = 2, int $usesubs = 1, string $componentname = 'question') {
+    public function __construct(int $testitemid, int $contextid, int $catscaleid = 0, int $usesubs = 1, string $componentname = 'question') {
         $this->catcontextid = $contextid;
-        $this->detailsscale = $catscaleid;
+        $this->scale = $catscaleid;
         $this->usesubs = $usesubs;
         $this->testitemid = $testitemid; // ID of record to be displayed in detail instead of table.
         $this->componentname = $componentname; // ID of record to be displayed in detail instead of table.
 
-        // TODO change scale logic!! Just for testing we stick with fixed scales.
-        $this->scale = 2;
-        $this->subscale = 3;
-
-        // If a subscale is selected, we assign it for further use (i.e. to fetch the records for the table).
-        // Otherwise we are using the parentscale variable.
-        if ($this->subscale > 0) {
-            $this->tablescale = $this->subscale;
-        } else {
-            $this->tablescale = $this->scale;
-        }
     }
     /**
      * Renders the context selector.
@@ -137,54 +117,49 @@ class questionsdisplay {
      * Renders the scale selector.
      * @return string
      */
-    private function render_scaleselector()
+    private function render_scaleselectors()
     {
-        $scaleid = empty($this->scale) ? -1 : ['scale' => $this->scale];
-
-        $customdata = [
-            'type' => 'scale',
-            'label' => get_string('selectcatscale', 'local_catquiz'),
-        ];
-
-        $form = new \local_catquiz\form\scaleselector(null, $customdata, 'post', '', [], true, $scaleid);
-        // Set the form data with the same method that is called when loaded from JS. It should correctly set the data for the supplied arguments.
-        $form->set_data_for_dynamic_submission();
-        // Render the form in a specific container, there should be nothing else in the same container.
-        return html_writer::div($form->render(), '', ['id' => 'select_scale_form']);
+        $selectors = $this->render_selector($this->scale);
+        $ancestorids = catscale::get_ancestors($this->scale);
+        if (count($ancestorids) > 0) {
+            foreach($ancestorids as $ancestorid) {
+                $selector = $this->render_selector($ancestorid);
+                $selectors = "$selector <br> $selectors";
+            }
+        }
+        $childids = catscale::get_subscale_ids($this->scale);
+        if (count($childids) > 0) {
+            // If the selected scale has subscales, we render a selector to choose them with no default selection.
+            $subscaleselector = $this->render_selector($childids[0], true);
+            $selectors .= "<br> $subscaleselector";
+        }
+        return $selectors;
     }
 
     /**
      * Renders the subscale selector.
      * @return string
      */
-    private function render_subscaleselector()
+    private function render_selector($id, $noselection = false, $label = 'selectcatscale')
     {
-        // If we have no scale selected or the selected scale doesn't have any subscales, subscale select isn't displayed.
-        if ($this->scale < 0) {
-            return "";
-        }
-        $subscaleresult = catquiz::get_subscale_ids_from_parent([$this->scale]);
-        if (empty($subscaleresult)) {
-            return "";
-        }
-        $scaleid = empty($this->scale) ? -1 : $this->scale;
-
+        $scaleid = ['scale' => $id ];
         $customdata = [
-            'type' => 'subscale',
-            'parentscaleid' => ["$scaleid"],
+            'type' => 'scale',
+            'label' => get_string($label, 'local_catquiz'),
         ];
 
-        $subscaleid = empty($this->subscale) ? [-1] : ['subscale' => $this->subscale];
-
-        $form = new \local_catquiz\form\scaleselector(null, $customdata, 'post', '', [], true, $subscaleid);
+        if ($noselection == true) {
+            $scaleid = ['scale' => "-1" ];
+        }
+        $form = new \local_catquiz\form\scaleselector(null, $customdata, 'post', '', [], true, $scaleid);
         // Set the form data with the same method that is called when loaded from JS. It should correctly set the data for the supplied arguments.
         $form->set_data_for_dynamic_submission();
         // Render the form in a specific container, there should be nothing else in the same container.
-        return html_writer::div($form->render(), '', ['id' => 'select_subscale_form']);
+        return html_writer::div($form->render(), '', ['id' => 'select_scale_form_scaleid_' . $id]);
     }
 
     /**
-     * Renders the subscale checkbox.
+     * If checked subscales are integrated in the table query.
      * @return array
      */
     private function render_subscale_checkbox()
@@ -206,23 +181,23 @@ class questionsdisplay {
      */
     public function renderquestionstable() {
         global $DB;
-        if ($this->tablescale === -1) {
+        if ($this->scale === -1) {
             return $this->get_no_table_string();
         }
         // If no context is set, get default context from DB.
         $catcontext = empty($this->catcontextid) ? catquiz::get_default_context_id() : $this->catcontextid;
 
-        $table = new catscalequestions_table('catscale_' . $this->tablescale . ' questionstable', $this->scale, $this->subscale, $catcontext);
+        $table = new catscalequestions_table('catscale_' . $this->scale . ' questionstable', $this->scale, $catcontext);
 
         // If we integrate questions from subscales, we add different ids.
         if ($this->usesubs > 0) {
             $subscaleids = catquiz::get_subscale_ids_from_parent(
-                [$this->tablescale]
+                [$this->scale]
             );
             $idsforquery = array_keys($subscaleids);
-            array_push($idsforquery, $this->tablescale);
+            array_push($idsforquery, $this->scale);
         } else {
-            $idsforquery = [$this->tablescale];
+            $idsforquery = [$this->scale];
         }
 
         list($select, $from, $where, $filter, $params) = catquiz::return_sql_for_catscalequestions($idsforquery, $catcontext, [], []);
@@ -338,8 +313,7 @@ class questionsdisplay {
 
         $data = [
             'contextselector' => $this->render_contextselector(),
-            'scaleselector' => empty($this->render_scaleselector()) ? "" : $this->render_scaleselector(),
-            'subscaleselector' => empty($this->render_subscaleselector()) ? "" : $this->render_subscaleselector(),
+            'scaleselectors' => empty($this->render_scaleselectors()) ? "" : $this->render_scaleselectors(),
             'checkbox' => $this->render_subscale_checkbox(),
             'table' => $this->check_tabledisplay(),
         ];
