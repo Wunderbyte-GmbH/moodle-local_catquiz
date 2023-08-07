@@ -139,7 +139,7 @@ class raschbirnbauma extends model_raschmodel
     public static function log_likelihood_p($pp, array $ip, float $k): float {
         $a = $ip['difficulty'];
         if ($k < 1.0) {
-            return -(exp($pp) / (exp($a) + exp($pp)));
+            return -exp($pp) / (exp($a) + exp($pp));
         } else {
             return exp($a) / (exp($a) + exp($pp));
         }
@@ -155,11 +155,7 @@ class raschbirnbauma extends model_raschmodel
      */
     public static function log_likelihood_p_p($pp, array $ip, float $k): float {
         $a = $ip['difficulty'];
-        if ($k < 1.0) {
-            return -(exp($a + $pp) / ((exp($a) + exp($pp)) ** 2));
-        } else {
-            return -(exp($a + $pp) / ((exp($a) + exp($pp)) ** 2));
-        }
+        return -(exp($a + $pp) / ((exp($a) + exp($pp)) ** 2));
     }
 
     /**
