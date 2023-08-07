@@ -13,7 +13,7 @@
 }}
 {{!
     @template local_catquiz
-    Template which defines a catquiz view page.
+    Template which defines a catquiz summary.
     Classes required for JS:
     * none
     Data attributes required for JS:
@@ -23,21 +23,17 @@
     {
     }
 }}
-<div class="catscales-dashboard grid">
-    {{#detailview}}
-    <div class="card">
-        <div class="card-header">
-            {{title}}
-        </div>
-        <div class="card-body">
-          {{#body}}
-          <div>{{#str}}id, local_catquiz{{/str}}: {{id}}</div>
-          <div>{{#str}}type, local_catquiz{{/str}}: {{type}}</div>
-          <div>{{#str}}status, core{{/str}}: {{status}}</div>
-          <div>{{#str}}model, local_catquiz{{/str}}: {{model}}</div>
-          <div>{{#str}}attempts, local_catquiz{{/str}}: {{attempts}}</div>
-          {{/body}}
+
+{{#testitemdetails}}
+    <div id="detailview">
+        {{>local_catquiz/catmanager/questiondetailscard}}
+    </div>
+    <div>
+        <div id="models">
+        {{>local_catquiz/tabs/tab_models}}
         </div>
     </div>
-    {{/detailview}}
-</div>
+    <div id="statistics">
+        {{>local_catquiz/tabs/tab_testitemstats}}
+    </div>
+{{/testitemdetails}}

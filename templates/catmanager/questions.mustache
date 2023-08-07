@@ -38,36 +38,20 @@
                 <label class="integrate-subscales-checkbox" for="integrateSubscaleQuestionsCheckbox">{{label}}</label>
             </div>
         {{/checkbox}}
+        <div id="catmanagerquestions contextselector" class="float-right" >
+            {{{contextselector}}}
+        </div>
     </div>
+
     <div>
         {{#table}}
-            <div class="float-right" id="catmanagerquestions contextselector">
-                    {{{contextselector}}}
-            </div>
-                </br>
-                </br>
             <div>
                 {{{table}}}
             </div>
         {{/table}}
-        {{#detailview}}
-        <div>
-            {{#detailcardoutput}}
-            <div id="testitemdetails">
-                {{>local_catquiz/catmanager/questiondetailscard}}
-            </div>
-            {{/detailcardoutput}}
-            <div id="questionspreview">
-            </div>
+        <div id="testitemdetails">
+            {{>local_catquiz/catmanager/testitemdetails}}
         </div>
-        <div>
-            {{#modelcards}}
-            <div id="models">
-              {{>local_catquiz/tabs/tab_models}}
-            </div>
-            {{/modelcards}}
-        </div>
-        {{/detailview}}
     </div>
 {{/questionsdisplay}}
 
