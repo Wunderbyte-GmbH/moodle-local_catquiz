@@ -77,7 +77,7 @@ class catscalequestions_table extends wunderbyte_table {
         global $OUTPUT;
 
         $url = new moodle_url('manage_catscales.php', [
-            'tiid' => $values->id,
+            'id' => $values->id,
             'contextid' => $this->contextid,
             'scale' => $this->catscaleid ?? 0,
             'subscale' => $this->subscaleid ?? -1,
