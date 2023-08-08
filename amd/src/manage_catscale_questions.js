@@ -25,7 +25,8 @@ const SELECTORS = {
     CONTEXTFORM: '#select_context_form',
     CHECKBOX: 'input.integrate-subscales-checkbox',
     SCALEFORM: '#select_scale_form',
-    SUBSCALEFORM: '#select_subscale_form',
+    SCALECONTAINER: '#catmanagerquestions scaleselectors', // Make sure to change in the code below.
+    TABCONTAINER: '#questions',
 };
 
 
@@ -34,8 +35,10 @@ const SELECTORS = {
  */
 export const init = () => {
 
+    const container = document.querySelector(SELECTORS.TABCONTAINER);
+
     // Initialize the checkbox.
-    const checkbox = document.querySelector(SELECTORS.CHECKBOX);
+    const checkbox = container.querySelector(SELECTORS.CHECKBOX);
     // eslint-disable-next-line no-unused-vars
     checkbox.addEventListener('click', e => {
         let searchParams = new URLSearchParams(window.location.search);
@@ -48,36 +51,45 @@ export const init = () => {
         }
     });
 
-    // Context: Add event listener to select and set URL params.
-    listenToSelect(SELECTORS.CONTEXTFORM, 'local_catquiz\\form\\contextselector', "contextid");
-    listenToSelect(SELECTORS.SCALEFORM, 'local_catquiz\\form\\scaleselector', "scale");
-    listenToSelect(SELECTORS.SUBSCALEFORM, 'local_catquiz\\form\\scaleselector', "subscale");
+    // Attach listener to contextselector
+    const contextselector = container.querySelector(SELECTORS.CONTEXTFORM);
+    listenToSelect(contextselector, 'local_catquiz\\form\\contextselector', "contextid");
+
+    // Attach listener to each scale select
+    const selectcontainer = container.querySelector("[id='catmanagerquestions scaleselectors']");
+    const selects = selectcontainer.querySelectorAll('[id*="select_scale_form_scaleid"]');
+    selects.forEach(select => {
+        listenToSelect(select, 'local_catquiz\\form\\scaleselector', "scale");
+    });
 };
+
+// TODO: Change function: give element not id.
 /**
  * Set an eventlistener for a select.
- *  @param {string} selector
+ *  @param {*} element
  *  @param {string} location
  *  @param {string} paramname
  *
  */
-function listenToSelect(selector, location, paramname) {
+function listenToSelect(element, location, paramname) {
         // Initialize the form - pass the container element and the form class name.
-        const dynamicForm = new DynamicForm(document.querySelector(
-            selector),
+        const dynamicForm = new DynamicForm(element,
             location
         );
+        // eslint-disable-next-line no-console
+        console.log(dynamicForm);
+
         // If a user selects a context, redirect to a URL that includes the selected
         // context as `contextid` query parameter
         dynamicForm.addEventListener(dynamicForm.events.FORM_SUBMITTED, (e) => {
             e.preventDefault();
+            window.location.reload();
+            dynamicForm.submitFormAjax();
 
             const response = e.detail;
 
             let searchParams = new URLSearchParams(window.location.search);
-            // If we change the scale, we delete the selected subscales.
-            if (paramname === "scale") {
-                searchParams.delete("subscale");
-            }
+
             if (typeof response === 'object' && response !== null) {
                 searchParams.set(Object.keys(response)[0], Object.values(response)[0]);
             } else {
