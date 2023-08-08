@@ -238,7 +238,6 @@ class testitemdashboard implements renderable, templatable {
         }
         $catcontext = empty($this->contextid) ? catquiz::get_default_context_id() : $this->contextid; // If no context is set, get default context from DB.
 
-        $this->catscaleid = 3; // Just for testing
         // Get the record for the specific userid (fetched from optional param).
         list($select, $from, $where, $filter, $params) = catquiz::return_sql_for_catscalequestions([$this->catscaleid], $catcontext, [], [], $this->testitemid);
         $idcheck = "id=:userid";
