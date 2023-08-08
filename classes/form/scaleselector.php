@@ -51,19 +51,17 @@ class scaleselector extends dynamic_form {
         $ajaxdata = (object) $this->_ajaxformdata;
         $customdata = $this->_customdata;
 
-        $formdata = $customdata ?? $ajaxdata ?? [];
-
         $type = $customdata['type'] ?? "scale"; //Type i.e. 'scale'.
-        if (isset($formdata->id)) {
-            $mform->addElement('hidden', 'id', $formdata->id);
-            $mform->setType('id', PARAM_INT);
+        if (isset($ajaxdata->selected)) {
+            $mform->addElement('hidden', 'selected', $ajaxdata->selected);
+            $mform->setType('selected', PARAM_INT);
         }
 
-        // We check if the catscale has ancestors (parent scales).
-        if (empty($ajaxdata->scale)) {
+        if (empty($ajaxdata->scaleid)) {
             return;
         }
-        $ancestorids = catscale::get_ancestors($ajaxdata->scale);
+        // We check if the catscale has ancestors (parent scales).
+        $ancestorids = catscale::get_ancestors($ajaxdata->scaleid);
         $ancestorslength = count($ancestorids);
         if ($ancestorslength == 0) {
             $id = ["0"]; // Scales go with ID 0.
@@ -71,11 +69,11 @@ class scaleselector extends dynamic_form {
             $id = [$ancestorids[0]];
         }
 
-        $contextsdb = catquiz::get_subscale_ids_from_parent($id);
-        $contexts = [];
-        $contexts[-1] = get_string('pleasechoose', 'local_catquiz');
-        foreach ($contextsdb as $contextid => $context) {
-            $contexts[$contextid] = $context->name;
+        $subscalesdb = catquiz::get_subscale_ids_from_parent($id);
+        $scales = [];
+        $scales[0] = get_string('pleasechoose', 'local_catquiz');
+        foreach ($subscalesdb as $scaleid => $scale) {
+            $scales[$scaleid] = $scale->name;
         }
         $options = array(
             'multiple' => false,
@@ -85,10 +83,10 @@ class scaleselector extends dynamic_form {
         $label = '';
 
         if(isset($customdata['label'])) {
-            $label = $customdata['label'];
+            $label = get_string($customdata['label'], 'local_catquiz');
         }
 
-        $mform->addElement('select', $type, $label, $contexts, $options);
+        $mform->addElement('select', 'scaleselector', $label, $scales, $options);
         $mform->disable_form_change_checker();
     }
 
@@ -127,6 +125,8 @@ class scaleselector extends dynamic_form {
      */
     public function set_data_for_dynamic_submission(): void {
         $data = (object) $this->_ajaxformdata;
+
+        $data->scaleselector = $data->selected;
 
         $this->set_data($data);
     }

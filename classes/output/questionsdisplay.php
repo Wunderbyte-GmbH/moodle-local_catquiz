@@ -137,25 +137,26 @@ class questionsdisplay {
     }
 
     /**
-     * Renders the subscale selector.
+     * Renders the scale selector.
      * @return string
      */
-    private function render_selector($id, $noselection = false, $label = 'selectcatscale')
+    private function render_selector($scaleid, $noselection = false, $label = 'selectcatscale')
     {
-        $scaleid = ['scale' => $id ];
+        $selected = $noselection ? 0 : $scaleid;
+        $ajaxformdata = ['selected' => $selected,
+                        'scaleid' => $scaleid,
+                        ];
         $customdata = [
             'type' => 'scale',
-            'label' => get_string($label, 'local_catquiz'),
+            'label' => $label, // String localized in 'local_catquiz';
         ];
 
-        if ($noselection == true) {
-            $scaleid = ['scale' => "-1" ];
-        }
-        $form = new \local_catquiz\form\scaleselector(null, $customdata, 'post', '', [], true, $scaleid);
+
+        $form = new \local_catquiz\form\scaleselector(null, $customdata, 'post', '', [], true, $ajaxformdata);
         // Set the form data with the same method that is called when loaded from JS. It should correctly set the data for the supplied arguments.
         $form->set_data_for_dynamic_submission();
         // Render the form in a specific container, there should be nothing else in the same container.
-        return html_writer::div($form->render(), '', ['id' => 'select_scale_form_scaleid_' . $id]);
+        return html_writer::div($form->render(), '', ['id' => 'select_scale_form_scaleid_' . $scaleid]);
     }
 
     /**
