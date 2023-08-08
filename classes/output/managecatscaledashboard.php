@@ -116,7 +116,7 @@ class managecatscaledashboard implements renderable, templatable {
      * @param int $contextid
      * @return array
      */
-    public function __construct(int $testitemid, int $contextid, int $catscaleid, int $usesubs = 1, string $componentname = 'question') {
+    public function __construct(int $testitemid, int $contextid, int $catscaleid, int $usesubs, string $componentname) {
 
         $this->testitemid = $testitemid;
         $this->contextid = $contextid;
@@ -130,7 +130,7 @@ class managecatscaledashboard implements renderable, templatable {
         $catscalemanagers = new catscalemanagers();
         $this->catscalemanagersarray = $catscalemanagers->return_as_array();
 
-        $questionsdisplay = new questionsdisplay($this->testitemid, $this->contextid, $this->catscaleid, $this->usesubs = 1, $this->componentname = 'question');
+        $questionsdisplay = new questionsdisplay($this->testitemid, $this->contextid, $this->catscaleid, $this->usesubs, $this->componentname);
         $this->questionsdisplayarray = $questionsdisplay->export_data_array();
 
         $catscalestats = new catscalestats();
