@@ -276,9 +276,9 @@ class raschbirnbaumb extends model_raschmodel
         $a_s = 2; // Standard derivation of difficulty
 
         // Placement of the discriminatory parameter
-        $b_p = get_config('catmodel_raschbirnbaumb', 'trusted_region_placement_b');
+        $b_p = floatval(get_config('catmodel_raschbirnbaumb', 'trusted_region_placement_b'));
         // Slope of the discriminatory parameter
-        $b_s = get_config('catmodel_raschbirnbaumb', 'trusted_region_slope_b');
+        $b_s = floatval(get_config('catmodel_raschbirnbaumb', 'trusted_region_slope_b'));
 
         return [
             fn ($x) => (($a_m - $x['difficulty']) / ($a_s ** 2)), // d/da
@@ -297,9 +297,9 @@ class raschbirnbaumb extends model_raschmodel
         $a_s = 2; // Standard derivation of difficulty
 
         // Placement of the discriminatory parameter
-        $b_p = get_config('catmodel_raschbirnbaumb', 'trusted_region_placement_b');
+        $b_p = floatval(get_config('catmodel_raschbirnbaumb', 'trusted_region_placement_b'));
         // Slope of the discriminatory parameter
-        $b_s = get_config('catmodel_raschbirnbaumb', 'trusted_region_slope_b');
+        $b_s = floatval(get_config('catmodel_raschbirnbaumb', 'trusted_region_slope_b'));
 
         return [[
             fn ($x) => (-1/ ($a_s ** 2)), // d/da d/da
