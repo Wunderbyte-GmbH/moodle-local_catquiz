@@ -59,7 +59,7 @@ export const init = () => {
     const selectcontainer = container.querySelector("[id='catmanagerquestions scaleselectors']");
     const selects = selectcontainer.querySelectorAll('[id*="select_scale_form_scaleid"]');
     selects.forEach(select => {
-        listenToSelect(select, 'local_catquiz\\form\\scaleselector', "scale");
+        listenToSelect(select, 'local_catquiz\\form\\scaleselector', "scaleid");
     });
 };
 
@@ -76,28 +76,16 @@ function listenToSelect(element, location, paramname) {
         const dynamicForm = new DynamicForm(element,
             location
         );
-        // eslint-disable-next-line no-console
-        console.log(dynamicForm);
 
         // If a user selects a context, redirect to a URL that includes the selected
         // context as `contextid` query parameter
         dynamicForm.addEventListener(dynamicForm.events.FORM_SUBMITTED, (e) => {
-            e.preventDefault();
-            window.location.reload();
-            dynamicForm.submitFormAjax();
 
             const response = e.detail;
 
             let searchParams = new URLSearchParams(window.location.search);
 
-            if (typeof response === 'object' && response !== null) {
-                searchParams.set(Object.keys(response)[0], Object.values(response)[0]);
-            } else {
-                if (!response.contextid) {
-                    return;
-                }
-                searchParams.set(paramname, response.contextid);
-            }
+            searchParams.set(paramname, response[paramname]);
             window.location.search = searchParams.toString();
         });
 

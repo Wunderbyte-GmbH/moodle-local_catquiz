@@ -27,7 +27,7 @@ use local_catquiz\output\managecatscaledashboard;
 require_once('../../config.php');
 
 $catcontextid = optional_param('contextid', 0, PARAM_INT);
-$catscale = optional_param('scale', -1, PARAM_INT);
+$catscale = optional_param('scaleid', -1, PARAM_INT);
 $usesubs = optional_param('usesubs', 1, PARAM_INT);
 $testitemid = optional_param('id', 0, PARAM_INT); // ID of record to be displayed in detail instead of table.
 $componentname = optional_param('component', 'question', PARAM_TEXT); // ID of record to be displayed in detail instead of table.

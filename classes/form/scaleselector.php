@@ -57,9 +57,6 @@ class scaleselector extends dynamic_form {
             $mform->setType('selected', PARAM_INT);
         }
 
-        if (empty($ajaxdata->scaleid)) {
-            return;
-        }
         // We check if the catscale has ancestors (parent scales).
         $ancestorids = catscale::get_ancestors($ajaxdata->scaleid);
         $ancestorslength = count($ancestorids);
@@ -86,7 +83,7 @@ class scaleselector extends dynamic_form {
             $label = get_string($customdata['label'], 'local_catquiz');
         }
 
-        $mform->addElement('select', 'scaleselector', $label, $scales, $options);
+        $mform->addElement('select', 'scaleid', $label, $scales, $options);
         $mform->disable_form_change_checker();
     }
 
@@ -126,7 +123,7 @@ class scaleselector extends dynamic_form {
     public function set_data_for_dynamic_submission(): void {
         $data = (object) $this->_ajaxformdata;
 
-        $data->scaleselector = $data->selected;
+        $data->scaleid = $data->selected;
 
         $this->set_data($data);
     }

@@ -143,8 +143,9 @@ class questionsdisplay {
     private function render_selector($scaleid, $noselection = false, $label = 'selectcatscale')
     {
         $selected = $noselection ? 0 : $scaleid;
-        $ajaxformdata = ['selected' => $selected,
+        $ajaxformdata = [
                         'scaleid' => $scaleid,
+                        'selected' => $selected,
                         ];
         $customdata = [
             'type' => 'scale',
