@@ -167,14 +167,14 @@ class raschbirnbauma extends model_raschmodel
      */
     public static function get_log_jacobian($pp, float $k):array
     {
-        if ($k < 1.0) {
-            return [
-                fn ($ip) => (exp($pp) / (exp($ip['difficulty']) + exp($pp))) // d/da
-                ];
-        } else {
+        if ($k >= 1.0) {
             return [
                 fn ($ip) => (-exp($ip['difficulty'] + $pp) / ((exp($ip['difficulty']) + exp($pp)) * (exp($pp)))) // d/da
-                ];
+            ];  
+        } else {
+            return [
+                fn ($ip) => (exp($pp) / (exp($ip['difficulty']) + exp($pp))) // d/da
+            ];
         }
     }
 
@@ -185,18 +185,12 @@ class raschbirnbauma extends model_raschmodel
      * @param float $k - answer category (0 or 1.0)
      * @return array of function($ip)
      */
-    public static function get_log_hessian($p, float $item_response): array
+    public static function get_log_hessian($pp, float $k): array
     {
-        // We can do this better, yet it works
-        if ($item_response < 1.0) {
-           return [[
-                fn ($ip) => (exp($pp) / (exp($ip['difficulty']) + exp($pp)) ** 2) // d^2/ da^2
-                ]];
-        } else {
-            return [[
-                fn ($ip) => (-exp($ip['difficulty'] + $pp) / (exp($ip['difficulty']) + exp($pp)) ** 2) // d^2/ da^2
-                ]];
-        }
+        // 2nd derivative is equal for both k = 0 and k = 1
+        return [[
+            fn ($ip) => -exp($ip['difficulty'] + $pp) / (exp($ip['difficulty']) + exp($pp)) ** 2 // d²/ da²               
+        ]];
     }
 
     /**
@@ -224,9 +218,9 @@ class raschbirnbauma extends model_raschmodel
         $a_s = 2; // Standard derivation of difficulty
 
         // Use x times of SD as range of trusted regions
-        $a_tr = get_config('catmodel_raschbirnbauma', 'trusted_region_factor_sd_a');
-        $a_min = get_config('catmodel_raschbirnbauma', 'trusted_region_min_a');
-        $a_max = get_config('catmodel_raschbirnbauma', 'trusted_region_max_a');
+        $a_tr = floatval(get_config('catmodel_raschbirnbauma', 'trusted_region_factor_sd_a'));
+        $a_min = floatval(get_config('catmodel_raschbirnbauma', 'trusted_region_min_a'));
+        $a_max = floatval(get_config('catmodel_raschbirnbauma', 'trusted_region_max_a'));
 
         // Test TR for difficulty
         if (($a - $a_m) < max(-($a_tr * $a_s), $a_min)) {$a = max(-($a_tr * $a_s), $a_min); }
@@ -247,7 +241,7 @@ class raschbirnbauma extends model_raschmodel
         $a_m = 0; // Mean of difficulty
         $a_s = 2; // Standard derivation of difficulty
 
-        $a_tr = get_config('catmodel_raschbirnbauma', 'trusted_region_factor_sd_a');
+        $a_tr = floatval(get_config('catmodel_raschbirnbauma', 'trusted_region_factor_sd_a'));
 
         return [
             fn ($ip) => (($a_m - $ip['difficulty']) / ($a_s ** 2)) // d/da
