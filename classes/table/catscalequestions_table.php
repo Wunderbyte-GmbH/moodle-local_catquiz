@@ -148,23 +148,30 @@ class catscalequestions_table extends wunderbyte_table {
      * @return string
      */
     public function col_status($values) {
-        $color = "";
+
+        if ($this->is_downloading()) {
+            return !empty($values->status) ? $values->status : 0;
+        }
+        $bootstrapclass = "";
 
         switch ($values->status) {
             case model_item_param::STATUS_SET_MANUALLY:
-                $color = 'green';
+                $bootstrapclass = 'success';
                 break;
             case model_item_param::STATUS_SET_BY_STRATEGY:
-                $color = 'yellow';
+                $bootstrapclass = 'warning';
                 break;
             case model_item_param::STATUS_NOT_CALCULATED:
-                $color = 'orange';
+                $bootstrapclass = 'secondary';
                 break;
             case model_item_param::STATUS_NOT_SET:
-                $color = 'red';
+                $bootstrapclass = 'danger';
+                break;
+            case model_item_param::STATUS_UPDATED_MANUALLY:
+                $bootstrapclass = 'primary';
                 break;
         }
-        return sprintf('<i class="fa fa-circle" style="color:%s;"></i>', $color);
+        return sprintf('<i class="fa fa-circle text-%s"></i>', $bootstrapclass);
     }
 
     /**
