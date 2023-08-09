@@ -60,10 +60,10 @@ class csvimport extends dynamic_form {
             $mform->setType('id', PARAM_INT);
         }
         $mform->addElement(
-            'filepicker', 
-            'csvfile', 
-            get_string('importcsv', 'local_catquiz'), 
-            null, 
+            'filepicker',
+            'csvfile',
+            get_string('importcsv', 'local_catquiz'),
+            null,
             [
                 'maxbytes' => $CFG->maxbytes,
                 'accepted_types' => 'csv',
@@ -97,13 +97,13 @@ class csvimport extends dynamic_form {
     }
 
     public static function call_settings_class() {
-
+        /*
         $columnsassociative = array(
             'userid' => array(
                 'columnname' => get_string('id'),
                 'mandatory' => true, // If mandatory and unique are set in first column, columnname will be used as key in records array.
                 'unique' => true,
-                'format' => 'string', 
+                'format' => 'string',
                 'default' => false,
             ),
             'starttime' => array(
@@ -116,32 +116,67 @@ class csvimport extends dynamic_form {
                 'format' => PARAM_INT,
             ),
         );
-
+        */
         $columnssequential = [
             array(
-            'name' => 'userid',
-            'columnname' => get_string('id'),
-            'mandatory' => true,
-            'format' => 'string',
-            'transform' => fn($x) => get_string($x, 'local_catquiz'), 
-            ), 
+                'name' => 'componentid',
+                //'columnname' => get_string('id'),
+                'mandatory' => true,
+                'format' => PARAM_INT,
+                //'transform' => fn($x) => get_string($x, 'local_catquiz'),
+            ),
+            array(
+                'name' => 'componentname',
+                'mandatory' => true,
+                'format' => 'string',
+            ),
+            array(
+                'name' => 'contextid',
+                'mandatory' => true,
+                'format' => PARAM_INT,
+                // We could set the selected cat contaxt (optional_param id) as default.
+            ),
+            array(
+                'name' => 'model',
+                'mandatory' => true,
+                'format' => 'string',
+            ),
             array (
-            'name' => 'starttime',
-            'mandatory' => false,
-            'format' => PARAM_INT,
-            'type' => 'date',
-            'defaultvalue' => 1685015874,
-            ), 
+                'name' => 'difficulty',
+                'mandatory' => false,
+                'format' => PARAM_FLOAT,
+            ),
             array (
-            'name' => 'price',
-            'mandatory' => false,
-            'format' => PARAM_INT,
+                'name' => 'status',
+                'mandatory' => false,
+                'format' => PARAM_INT,
+                'defaultvalue' => 0,
+            ),
+            array (
+                'name' => 'discrimination',
+                'mandatory' => false,
+                'format' => PARAM_FLOAT,
+            ),
+            array (
+                'name' => 'timecreated',
+                'mandatory' => false,
+                'type' => 'date', // Will throw warning if empty or 0;
+            ),
+            array (
+                'name' => 'timemodified',
+                'mandatory' => false,
+                // 'type' => 'date', Will throw warning if empty or 0;
+            ),
+            array (
+                'name' => 'guessing',
+                'mandatory' => false,
+                'format' => PARAM_FLOAT,
             )
             ];
         $settings = new csvsettings($columnssequential);
         return $settings;
     }
-    
+
     /**
      * Get list of cvs delimiters
      *
@@ -178,7 +213,7 @@ class csvimport extends dynamic_form {
         $data = $this->get_data();
         $content = $this->get_file_content('csvfile');
         $settings = $this->call_settings_class();
-        
+
         if(!empty($data->delimiter_name)) {
             $settings->set_delimiter($data->delimiter_name);
         }
@@ -188,12 +223,15 @@ class csvimport extends dynamic_form {
         if(!empty($data->dateparseformat)) {
             $settings->set_dateformat($data->dateparseformat);
         }
+        $callbackfunction = "local_catquiz\local\model\model_item_param_list::save_or_update_testitem_in_db";
+        $settings->set_callback($callbackfunction);
 
         $parser = new fileparser($settings);
         $data = $parser->process_csv_data($content);
-        
+
         return $data;
     }
+
 
     /**
      * Load in existing data as form defaults
