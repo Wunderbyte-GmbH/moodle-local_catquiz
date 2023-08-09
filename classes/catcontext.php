@@ -149,13 +149,30 @@ class catcontext {
         }
     }
 
+    /**
+     * Load from DB
+     *
+     * @param int $contextid
+     * 
+     * @return self
+     * 
+     */
     public static function load_from_db(int $contextid): self {
         global $DB;
         $record = $DB->get_record('local_catquiz_catcontext', ['id' => $contextid]);
         return new self($record);
     }
 
-    public static function create_response_from_db($contextid = 0, int $catscaleid): model_responses {
+    /**
+     * Create response from DB
+     *
+     * @param int $contextid
+     * @param int $catscaleid
+     * 
+     * @return model_responses
+     * 
+     */
+    public static function create_response_from_db(int $contextid, int $catscaleid): model_responses {
         global $DB;
 
         list ($sql, $params) = catquiz::get_sql_for_model_input($contextid, $catscaleid);
