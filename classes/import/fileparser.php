@@ -26,6 +26,7 @@ namespace local_catquiz\import;
 
 use csv_import_reader;
 use DateTime;
+use Exception;
 use html_writer;
 use stdClass;
 
@@ -67,8 +68,15 @@ class fileparser {
 
     /**
      * @var array with errors one per line
+     * Error will break the import of this record
      */
     protected $csverrors = [];
+
+    /**
+     * @var array with warnings one per line
+     * Import of record
+     */
+    protected $csvwarnings = [];
 
     /**
      * @var object
@@ -78,7 +86,7 @@ class fileparser {
     /**
      * @var array error message
      */
-    protected $error = [];
+    protected $errors = [];
 
     /**
      * @var array of fieldnames from other db tables
@@ -98,12 +106,12 @@ class fileparser {
     /**
      * @var string columnname
      */
-    public $uniquekey; 
+    public $uniquekey;
 
     /**
      * @var array of objects
      */
-    protected $record = [];
+    protected $records = [];
 
     public function __construct ($settings) {
         // optional: switch on type of settings object -> process data according to type (csv, ...)
@@ -122,14 +130,13 @@ class fileparser {
         if (!empty($this->settings->columns)) {
             $this->columns = $this->settings->columns;
         } else {
-            $this->error[] = "No column labels defined in settings object.";
+            $this->errors[] = "No column labels defined in settings object.";
             return false;
         }
 
         $this->delimiter = !empty($this->settings->delimiter) ? $this->settings->delimiter : 'comma';
         $this->enclosure = !empty($this->settings->enclosure) ? $this->settings->enclosure : '"';
         $this->encoding = !empty($this->settings->encoding) ? $this->settings->encoding : 'utf-8';
-        //$updateexisting = !empty($this->settings->updateexisting) ? $this->settings->updateexisting : false; //is this needed?
     }
 
     /**
@@ -148,54 +155,57 @@ class fileparser {
         $readcount = $cir->load_csv_content($content, $this->encoding, $this->delimiter, null, $this->enclosure);
 
         if (empty($readcount)) {
-            $this->error .= $cir->get_error();
+            $this->errors[] = $cir->get_error();
             return $data;
         }
 
         // Csv column headers.
         if (!$fieldnames = $cir->get_columns()) {
-            $this->error .= $cir->get_error();
+            $this->errors[] = $cir->get_error();
             return $data;
         }
         $this->fieldnames = $fieldnames;
         if (!empty($this->validate_fieldnames())) {
-            $this->error .= $this->validate_fieldnames();
+            $this->errors[] = $this->validate_fieldnames();
             return $data;
         }
 
         // Check if first column is set mandatory and unique
         $firstcolumn = $this->fieldnames[0];
-        if ($this->get_param_value($firstcolumn, 'mandatory') == true 
+        if ($this->get_param_value($firstcolumn, 'mandatory') == true
         && $this->get_param_value($firstcolumn, 'unique') == true) {
             $this->uniquekey = $firstcolumn;
         }
 
         $cir->init();
-        $this->record = [];
+        $this->records = [];
         while ($line = $cir->next()) {
             $csvrecord = array_combine($fieldnames, $line);
-            $this->validate_data($csvrecord, $line);
-
-            $data = array();
-            foreach ($csvrecord as $columnname => $value) {
-                $data[$columnname] = $value;
-            }
-            if (isset($this->uniquekey)) { // With unique key set, we build an associative array.
-                if (!isset($this->record[$firstcolumn])) {
-                    $this->record[$firstcolumn] = array();
+            // We treat each line, if validation is successfull.
+            if ($this->validate_data($csvrecord, $line)) {
+                $data = array();
+                foreach ($csvrecord as $columnname => $value) {
+                    $data[$columnname] = $value;
                 }
-                $this->record[$firstcolumn][$csvrecord[$firstcolumn]] = $data;
+                $this->execute_callback($data);
+                if (isset($this->uniquekey)) { // With unique key set, we build an associative array.
+                    if (!isset($this->records[$firstcolumn])) {
+                        $this->records[$firstcolumn] = array();
+                    }
+                    $this->records[$firstcolumn][$csvrecord[$firstcolumn]] = $data;
 
-            } else { // Without unique key, we build a sequential array.
-                array_push($this->record, $data);
+                } else { // Without unique key, we build a sequential array.
+                    array_push($this->records, $data);
+                }
             }
+
         }
-        // Collecting errors, warnings and general successinformation for $this->record.
+        // Collecting errors, warnings and general successinformation for $this->records.
         $this->checksuccess();
 
         $cir->cleanup(true);
         $cir->close();
-        return $this->record;
+        return $this->records;
     }
 
      /**
@@ -217,47 +227,52 @@ class fileparser {
 
     }
 
+
     /**
      * Collecting errors, warnings and general successinformation.
-     * 
+     *
      */
-    private function checksuccess() {  
-        if ($this->record !== []) {
+    private function checksuccess() {
+        if ($this->records !== []) {
             // If data was parsed successfully, return 1, else return 0.
-            $this->record['success'] = 1;
+            $this->records['success'] = 1;
         } else {
-            $this->record['success'] = 0;
+            $this->records['success'] = 0;
         }
 
-        $this->record['errors'] = array();
+        $this->records['errors'] = array();
 
-        if ($this->error !== []) {
-            $this->record['errors']['generalerrors'] = $this->error;
+        if ($this->errors !== []) {
+            $this->records['errors']['generalerrors'] = $this->errors;
         }
-        if ($this->csverrors !== []) {
-            $this->record['errors']['lineerrors'] = $this->csverrors;
+        if ($this->csverrors !== []) { // Lines with error will not be imported.
+            $this->records['errors']['lineerrors'] = $this->csverrors;
+        }
+        if ($this->csvwarnings !== []) { // Lines with warning are imported.
+            $this->records['errors']['warnings'] = $this->csvwarnings;
         }
 
         // Add warnings if needed.
     }
 
     /**
-     * Validate each record by comparing to settings.
+     * Validate each records by comparing to settings.
      *
      * @param array $csvrecord
      * @param array $line
      */
-    private function validate_data($csvrecord, $line) {  
+    private function validate_data($csvrecord, $line) {
         // Validate data
         foreach ($csvrecord as $column => $value) {
 
-            $valueisset = (("" !== $value) && (null !== $value)) ? true : false;
-            
+            // Value "0" counts as value and returns valueisset true.
+            !$valueisset = (("" !== $value) && (null !== $value)) ? true : false;
+
             // Check if empty fields are mandatory
             if (!$valueisset) {
                 if ($this->field_is_mandatory($column)) {
                     $this->add_csverror("The field $column is mandatory but contains no value.", $line[0]);
-                    break;
+                    return false;
                 }
                 // If no value is set, use defaultvalue
                 if (isset($this->settings->columns->$column->defaultvalue)) {
@@ -269,7 +284,7 @@ class fileparser {
                 case "date":
                     if (!$this->validate_datefields($value)) {
                         $format = $this->settings->dateformat;
-                        $this->add_csverror("$value is not a valid date format in $column. Format should be Unix timestamp or like: $format", $line[0]);
+                        $this->add_csvwarnings("$value is not a valid date format in $column. Format should be Unix timestamp or like: $format", $line[0]);
                         break;
                     }
                     break;
@@ -281,14 +296,14 @@ class fileparser {
                 case "int":
                     $value = $this->cast_string_to_int($value);
                     if (is_string($value)) {
-                        $this->add_csverror("$value is not a valid integer in $column", $line[0]);
+                        $this->add_csvwarnings("$value is not a valid integer in $column", $line[0]);
                     }
                     break;
                 default:
                     break;
             }
-
         };
+        return true;
     }
     /**
      * Check if the given string is a valid int and if possible, cast to int.
@@ -331,11 +346,7 @@ class fileparser {
      */
     protected function field_is_mandatory($columnname) {
 
-        if ($this->settings->columns[$columnname]->mandatory) {
-            return false;
-        } else {
-            return true;
-        }
+        return $this->settings->columns[$columnname]->mandatory;
     }
 
     /**
@@ -398,7 +409,17 @@ class fileparser {
      */
     protected function add_csverror($errorstring, $i) {
         $this->csverrors[] = "Error in line $i: ". $errorstring;
-   
+
+    }
+
+    /**
+     * Add error message to $this->csvwarnings
+     *
+     * @param $errorstring
+     */
+    protected function add_csvwarnings($errorstring, $i) {
+        $this->csvwarnings[] = "Error in line $i: ". $errorstring;
+
     }
 
     /**
@@ -409,9 +430,15 @@ class fileparser {
     }
 
     /**
+     * @return array line warnings
+     */
+    public function get_line_warnings() {
+        return $this->csvwarnings;
+    }
+    /**
      * @return array errors
      */
     public function get_error() {
-        return $this->error;
+        return $this->errors;
     }
 }
