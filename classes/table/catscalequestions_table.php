@@ -181,39 +181,45 @@ class catscalequestions_table extends wunderbyte_table {
      * @return string
      */
     public function col_qtype($values) {
-        global $OUTPUT;
 
-        $type = $values->qtype;
-
-        switch ($values->qtype) {
-            case "multichoice":
-                $type = 'MC';
-                break;
-            case "pmatch":
-                $type = 'PMTC';
-                break;
-            case "match":
-                $type = 'MTC';
-                break;
-            case "truefalse":
-                $type = 'TF';
-                break;
-            case "ddwtos":
-                $type = 'DDWT';
-                break;
-            case "ordering":
-                $type = 'ORD';
-                break;
-            case "ddimageortext":
-                $type = 'IOT';
-                break;
-            case "numerical":
-                $type = 'NUM';
-                break;
-            default:
-                break;
+        if (!empty($values->qtype)) {
+            return get_string('pluginname', 'qtype_' . $values->qtype);
         }
-        return $type;
+
+        return "problem with $values->id, no qtype";
+        // global $OUTPUT;
+
+        // $type = $values->qtype;
+
+        // switch ($values->qtype) {
+        //     case "multichoice":
+        //         $type = 'MC';
+        //         break;
+        //     case "pmatch":
+        //         $type = 'PMTC';
+        //         break;
+        //     case "match":
+        //         $type = 'MTC';
+        //         break;
+        //     case "truefalse":
+        //         $type = 'TF';
+        //         break;
+        //     case "ddwtos":
+        //         $type = 'DDWT';
+        //         break;
+        //     case "ordering":
+        //         $type = 'ORD';
+        //         break;
+        //     case "ddimageortext":
+        //         $type = 'IOT';
+        //         break;
+        //     case "numerical":
+        //         $type = 'NUM';
+        //         break;
+        //     default:
+        //         break;
+        // }
+        // return $type;
     }
 
 

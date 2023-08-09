@@ -115,7 +115,12 @@ class testitems_table extends wunderbyte_table {
      * @param object $values
      */
     public function col_qtype($values) {
-        return get_string('pluginname', 'qtype_' . $values->qtype);
+
+        if (!empty($values->qtype)) {
+            return get_string('pluginname', 'qtype_' . $values->qtype);
+        }
+
+        return "problem with $values->id, no qtype";
     }
 
     public function col_questioncontextattempts($values) {
