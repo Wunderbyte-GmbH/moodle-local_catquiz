@@ -23,7 +23,6 @@
  */
 
 namespace local_catquiz\import;
-use mod_bigbluebuttonbn\event\recording_protected;
 
 defined('MOODLE_INTERNAL') || die();
 
@@ -112,14 +111,14 @@ private function create_columns($columns) {
             );
         }
     }
-}   
+}
 
 /**
  * Calling column class to update property with given value.
- * @param string $columnname 
- * @param string $param 
- * @param string $value 
- * @return bool 
+ * @param string $columnname
+ * @param string $param
+ * @param string $value
+ * @return bool
  */
 public function set_param_in_column($columnname, $param, $value) {
     if(property_exists($this->columns[$columnname], $param)) {
@@ -132,22 +131,22 @@ public function set_param_in_column($columnname, $param, $value) {
 
 //Getters and Setters
 /**
- * 
+ *
  * @return string
  */
 public function get_delimiter() {
     return $this->delimiter;
 }
 /**
- * 
- * @param string $delimiter 
+ *
+ * @param string $delimiter
  */
 public function set_delimiter($delimiter) {
     $this->delimiter = $delimiter;
 }
 
 /**
- * 
+ *
  * @return string
  */
 public function get_enclosure() {
@@ -155,15 +154,15 @@ public function get_enclosure() {
 }
 
 /**
- * 
- * @param string $enclosure 
+ *
+ * @param string $enclosure
  */
 public function set_enclosure($enclosure) {
     $this->enclosure = $enclosure;
 }
 
 /**
- * 
+ *
  * @return string
  */
 public function get_encoding() {
@@ -171,15 +170,15 @@ public function get_encoding() {
 }
 
 /**
- * 
- * @param string $encoding 
+ *
+ * @param string $encoding
  */
 public function set_encoding($encoding) {
     $this->encoding = $encoding;
 }
 
 /**
- * 
+ *
  * @return string
  */
 public function get_dateformat() {
@@ -187,8 +186,8 @@ public function get_dateformat() {
 }
 
 /**
- * 
- * @param string $dateformat 
+ *
+ * @param string $dateformat
  */
 public function set_dateformat($dateformat) {
     $this->dateformat = $dateformat;

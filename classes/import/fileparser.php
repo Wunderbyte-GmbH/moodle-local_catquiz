@@ -110,7 +110,7 @@ class fileparser {
 
         $this->apply_settings($settings);
     }
-        
+
     /**
      * Validate and apply settings
      * @param object $settings
@@ -237,10 +237,10 @@ class fileparser {
         if ($this->csverrors !== []) {
             $this->record['errors']['lineerrors'] = $this->csverrors;
         }
-        
+
         // Add warnings if needed.
     }
-    
+
     /**
      * Validate each record by comparing to settings.
      *
@@ -299,14 +299,14 @@ class fileparser {
     protected function cast_string_to_int($value) {
 
         $validation = filter_var($value, FILTER_VALIDATE_INT);
-        
+
         if ($validation !== false) {
             // The string is a valid integer
             $int = (int)$value; // Casting to integer
             return $int;
         } else {
             return $value;
-        }        
+        }
     }
     /**
      * Comparing labels of content to required labels.
@@ -318,7 +318,7 @@ class fileparser {
             if(!in_array($fieldname, array_keys($this->columns))) {
                 $error .= "Imported CSV not containing the right labels. Check first line of imported csv file.";
                 break;
-            } 
+            }
         }
         return $error;
     }

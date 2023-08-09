@@ -69,15 +69,15 @@ public $defaultvalue;
 public $transform;
 
 public function __construct(
-    $columnname = '', 
-    $localizedname = '', 
+    $columnname = '',
+    $localizedname = '',
     $mandatory = true,
     $unique = false,
     $type = 'default',
     $format = PARAM_TEXT,
     $defaultvalue = null,
     $transform = null) {
-    
+
     $this->columnname = $columnname;
     $this->localizedname = $localizedname;
     $this->mandatory = $mandatory;
@@ -101,9 +101,9 @@ public function apply($value) {
 }
 
 /**
- * @param string $param 
- * @param string $value 
- * @return boolean 
+ * @param string $param
+ * @param string $value
+ * @return boolean
  */
 public function set_property($param, $value) {
     if(isset($this->$param)) {
@@ -116,9 +116,9 @@ public function set_property($param, $value) {
 
 /**
  * Transform a date object to a string in the defined format.
- * @param mixed $date 
- * @param string $format 
- * @return string 
+ * @param mixed $date
+ * @param string $format
+ * @return string
  */
 public function date_to_string($date, $format) {
 
@@ -127,13 +127,13 @@ public function date_to_string($date, $format) {
 }
 /**
  * Transform a string to an object in the defined format.
- * @param mixed $date 
- * @param string $format 
+ * @param mixed $date
+ * @param string $format
  * @return mixed
  */
 public function string_to_date($date, $format) {
 
-    //input is date return string in defined format
+    //input is string return date in defined format
     return "";
 }
 
