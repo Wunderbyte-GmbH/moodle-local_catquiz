@@ -31,249 +31,204 @@ use local_catquiz\local\model\model_raschmodel;
 
 defined('MOODLE_INTERNAL') || die();
 
-defined('MOODLE_INTERNAL') || die();
-
 /**
  * @copyright  2023 Wunderbyte GmbH <georg.maisser@wunderbyte.at>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class raschbirnbauma extends model_raschmodel
 {
-    
-    public static function log_likelihood_p($p, array $params, float $item_response): float {
-        if ($item_response < 1.0) {
-            return self::counter_log_likelihood_p($p, $params);
-        }
-        $b = $params['difficulty'];
 
-        return exp($b)/(exp($b) + exp($p));
-    }
+    // Definitions and Dimensions //
 
-    public static function counter_log_likelihood_p($p, array $params): float {
-        $b = $params['difficulty'];
-        return -(exp($p)/(exp($b) + exp($p)));
-    }
-
-    public static function log_likelihood_p_p($p, array $params, float $item_response): float {
-        if ($item_response < 1.0) {
-            return self::counter_log_likelihood_p_p($p, $params);
-        }
-        $b = $params['difficulty'];
-        return -(exp($b + $p)/(exp($b) + exp($p))**2);
-    }
-
-    public static function counter_log_likelihood_p_p($p, array $params): float {
-        $b = $params['difficulty'];
-        return -(exp($b + $p)/(exp($b) + exp($p))**2);
-    }
-
-    // info: x[0] <- "difficulty"
-
-
+    /**
+     * Definition of the number of model parameters
+     *
+     * @return int
+     */
     public static function get_model_dim(): int
     {
-        return 2;  // we have 2 params ( ability, difficulty)
+        return 2;  // 2 parameters: person ability, difficulty
     }
 
-
+    /**
+     * Initiate item parameter list
+     *
+     * @return model_item_param_list
+     */
     public static function get_item_parameters(): model_item_param_list
     {
         // TODO implement
         return new model_item_param_list();
     }
 
+    /**
+     * Initiate person ability parameter list
+     *
+     * @return model_person_param_list
+     */
     public static function get_person_abilities(): model_person_param_list
     {
         // TODO implement
         return new model_person_param_list();
     }
 
+    /**
+     * Estimate item parameters
+     *
+     * @param float
+     * @return model_person_param_list
+     */
     public function calculate_params($item_response): array
     {
         return catcalc::estimate_item_params($item_response, $this);
     }
 
     /**
-     * @return string[]
+     * Defines names if item parameter list
+     *
+     * @return array of string
      */
     public static function get_parameter_names(): array {
-        return ['difficulty',];
+        return ['difficulty', // WAS NOCH? (Steht das Komma hier aus einem bestimmten Grund?
+            ];
     }
-
-    // # elementary model functions
-
-
-    public static function likelihood($p, array $params, float $item_response)
-    {
-        $b = $params['difficulty'];
-
-        $a = 1;
-        $c = 0;
-
-        $value = $c + (1- $c) * (exp($a*($p - $b)))/(1 + exp($a*($p-$b)));
-
-        if ($item_response < 1.0) {
-            return 1 - $value;
-        }
-        return $value;
-    }
-
+    
+    // Calculate the Likelihood //
+    
     /**
-     * Generalisierung von `likelihood`
-     * Kann in likelihood umbenannt werden
-     * @param float $p
-     * @param array<float> $x
-     * @return int|float
-     */
-    public static function likelihood_multi(float $p, array $x)
-    {
-        $a = 1;
-        $c = 0;
-        $b = $x['difficulty'];
-
-        return $c + (1- $c) * (exp($a*($p - $b)))/(1 + exp($a*($p-$b)));
-    }
-
-    public static function log_likelihood($p, array $params, float $item_response)
-    {
-        if ($item_response < 1.0) {
-            return self::log_counter_likelihood($p, $params);
-        }
-
-        $b = $params['difficulty'];
-
-        $a = 1;
-        $c = 0;
-        return log($c + ((1-$c)*exp($a*(-$b+$p)))/(1+exp($a*(-$b+$p))));
-
-    }
-
-    public static function log_counter_likelihood($p, array $params)
-    {
-        $b = $params['difficulty'];
-
-        $a = 1;
-        $c = 0;
-        return log(1-$c-((1-$c)*exp($a*(-$b+$p)))/(1+exp($a*(-$b+$p))));
-    }
-
-    public static function log_likelihood_b($p, array $params)
-    {
-        $b = $params['difficulty'];
-
-        $a = 1;
-        $c = 0;
-        return ($a*(-1+$c)*exp($a*($b+$p)))/((exp($a * $b)+exp($a*$p))*($c*exp($a*$b)+exp($a*$p)));
-    }
-
-
-
-    // jacobian
-
-    public static function log_counter_likelihood_b($p, array $params)
-    {
-        $b = $params['difficulty'];
-        $a = 1;
-
-        return ($a*exp($a*$p))/(exp($a*$b)+exp($a*$p));
-    }
-
-
-
-    // hessian
-
-
-    public static function log_likelihood_b_b($p, array $params)
-    {
-        $b = $params['difficulty'];
-
-        $a = 1;
-        $c = 0;
-
-        return ($a**2 * (-1 + $c) * exp($a * (-$b + $p)) * (-$c + exp(2 * $a * (-$b + $p))))/((1 + exp($a * (-$b + $p)))**2 * ($c + exp($a * (-$b + $p)))**2) ;
-    }
-
-    // counter
-
-    public static function log_counter_likelihood_b_b($p, array $params)
-    {
-        $b = $params['difficulty'];
-
-        $a = 1;
-        return -(($a**2 * exp($a * ($b + $p)))/(exp($a * $b) + exp($a * $p))**2);
-    }
-
-    /**
-     * Used to estimate the item difficulty
-     * @param mixed $p
-     * @return Closure(mixed $x): float
-     */
-    public static function get_log_counter_likelihood($p)
-    {
-
-        $fun = function ($x) use ($p) {
-            return self::log_counter_likelihood($p, $x);
-        };
-        return $fun;
-    }
-
-
-    /**
-     * Get elementary matrix function for being composed
-     */
-    public static function get_log_jacobian($p, float $item_response):array
-    {
-        // We can do this better, yet it works
-        if ($item_response < 1.0) {
-            $fun1 = fn ($x) => self::log_counter_likelihood_b($p, $x);
-        } else {
-            $fun1 = fn ($x) => self::log_likelihood_b($p, $x);
-        }
-        return [$fun1];
-    }
-
-    public static function get_log_hessian($p, float $item_response): array
-    {
-        // We can do this better, yet it works
-        if ($item_response < 1.0) {
-            $fun22 = fn ($x) => self::log_counter_likelihood_b_b($p, $x);
-        } else {
-            $fun22 = fn ($x) => self::log_likelihood_b_b($p, $x);
-        }
-        return [[$fun22]];
-    }
-
-    /**
+     * Calculates the Likelihood for a given the person ability parameter
      *
-     * @param float $p
-     * @param array<float> $x
+     * @param float $pp - person ability parameter
+     * @param array<float> $ip - item parameters ('difficulty')
+     * @param float $k - answer category (0 or 1.0)
+     * @return float
+     */
+    public static function likelihood($pp, array $ip, float $k)
+    {
+        $a = $params['difficulty'];
+        if ($item_response < 1.0) {
+            return 1/(1 + exp($pp-$a));
+        } else {
+            return 1/(1 + exp($a-$pp));
+        }
+    }
+    
+    // Calculate the LOG Likelihood and its derivatives //
+
+    /**
+     * Calculates the LOG Likelihood for a given the person ability parameter
+     *
+     * @param float $pp - person ability parameter
+     * @param array<float> $ip - item parameters ('difficulty')
+     * @param float $k - answer category (0 or 1.0)
      * @return int|float
      */
-    public static function fisher_info(float $p,array $x){
-
-        return self::likelihood_multi($p,$x) * (1-self::likelihood_multi($p,$x));
-
+    public static function log_likelihood($pp, array $ip, float $k)
+    {
+        return log(self::likelihood($pp, $ip, $k));
+    }
+    
+    /**
+     * Calculates the 1st derivative of the LOG Likelihood with respect to the person ability parameter
+     *
+     * @param float $pp - person ability parameter
+     * @param array<float> $ip - item parameters ('difficulty')
+     * @param float $k - answer category (0 or 1.0)
+     * @return float
+     */
+    public static function log_likelihood_p($pp, array $ip, float $k): float {
+        $a = $ip['difficulty'];
+        if ($k < 1.0) {
+            return -exp($pp) / (exp($a) + exp($pp));
+        } else {
+            return exp($a) / (exp($a) + exp($pp));
+        }
     }
 
-    public static function restrict_to_trusted_region(array $parameters): array {
+    /**
+     * Calculates the 2nd derivative of the LOG Likelihood with respect to the person ability parameter
+     *
+     * @param float $pp - person ability parameter
+     * @param array<float> $ip - item parameters ('difficulty')
+     * @param float $k - answer category (0 or 1.0)
+     * @return float
+     */
+    public static function log_likelihood_p_p($pp, array $ip, float $k): float {
+        $a = $ip['difficulty'];
+        return -(exp($a + $pp) / ((exp($a) + exp($pp)) ** 2));
+    }
+
+    /**
+     * Calculates the 1st derivative of the LOG Likelihood with respect to the item parameters
+     *
+     * @param float $pp - person ability parameter
+     * @param float $k - answer category (0 or 1.0)
+     * @return array of function($ip)
+     */
+    public static function get_log_jacobian($pp, float $k):array
+    {
+        if ($k >= 1.0) {
+            return [
+                fn ($ip) => (-exp($ip['difficulty'] + $pp) / ((exp($ip['difficulty']) + exp($pp)) * (exp($pp)))) // d/da
+            ];  
+        } else {
+            return [
+                fn ($ip) => (exp($pp) / (exp($ip['difficulty']) + exp($pp))) // d/da
+            ];
+        }
+    }
+
+    /**
+     * Calculates the 2nd derivative of the LOG Likelihood with respect to the item parameters
+     *
+     * @param float $pp - person ability parameter
+     * @param float $k - answer category (0 or 1.0)
+     * @return array of function($ip)
+     */
+    public static function get_log_hessian($pp, float $k): array
+    {
+        // 2nd derivative is equal for both k = 0 and k = 1
+        return [[
+            fn ($ip) => -exp($ip['difficulty'] + $pp) / (exp($ip['difficulty']) + exp($pp)) ** 2 // d²/ da²               
+        ]];
+    }
+
+    /**
+     * Calculates the Fisher Information for a given person ability parameter
+     *
+     * @param float $pp
+     * @param array<float> $ip
+     * @return float
+     */
+    public static function fisher_info(float $pp,array $ip){
+        return (self::likelihood($pp,$ip,0) * self::likelihood($pp,$ip,1.0));
+    }
+
+    /**
+     * Implements a Filter Function for trusted regions in the item parameter estimation
+     *
+     * @param array $ip
+     * return array
+     */
+    public static function restrict_to_trusted_region(array $ip): array {
         // Set values for difficulty parameter
-        $a = $parameters['difficulty'];
+        $a = $ip['difficulty'];
         
         $a_m = 0; // Mean of difficulty
         $a_s = 2; // Standard derivation of difficulty
 
         // Use x times of SD as range of trusted regions
-        $a_tr = get_config('catmodel_raschbirnbauma', 'trusted_region_factor_sd_a');
-        $a_min = get_config('catmodel_raschbirnbauma', 'trusted_region_min_a');
-        $a_max = get_config('catmodel_raschbirnbauma', 'trusted_region_max_a');
+        $a_tr = floatval(get_config('catmodel_raschbirnbauma', 'trusted_region_factor_sd_a'));
+        $a_min = floatval(get_config('catmodel_raschbirnbauma', 'trusted_region_min_a'));
+        $a_max = floatval(get_config('catmodel_raschbirnbauma', 'trusted_region_max_a'));
 
         // Test TR for difficulty
         if (($a - $a_m) < max(-($a_tr * $a_s), $a_min)) {$a = max(-($a_tr * $a_s), $a_min); }
         if (($a - $a_m) > min(($a_tr * $a_s), $a_max)) {$a = min(($a_tr * $a_s), $a_max); }
 
-        $parameters['difficulty'] = $a;
+        $ip['difficulty'] = $a;
         
-        return $parameters;
+        return $ip;
     }
 
     /**
@@ -286,10 +241,10 @@ class raschbirnbauma extends model_raschmodel
         $a_m = 0; // Mean of difficulty
         $a_s = 2; // Standard derivation of difficulty
 
-        $a_tr = get_config('catmodel_raschbirnbauma', 'trusted_region_factor_sd_a');
+        $a_tr = floatval(get_config('catmodel_raschbirnbauma', 'trusted_region_factor_sd_a'));
 
         return [
-            fn ($x) => (($a_m - $x['difficulty']) / ($a_s ** 2)) // d/da
+            fn ($ip) => (($a_m - $ip['difficulty']) / ($a_s ** 2)) // d/da
         ];
     }
 
@@ -306,5 +261,81 @@ class raschbirnbauma extends model_raschmodel
         return [[
             fn ($x) => (-1/ ($a_s ** 2)) // d/da d/da
         ]];
+    }
+
+
+// DEPRICATED STUFF TO BE REMOVED //
+
+    
+    // Depricated, please remove
+    public static function counter_log_likelihood_p_p($p, array $params): float {
+        $b = $params['difficulty'];
+        return -(exp($b + $p)/(exp($b) + exp($p))**2);
+    }
+
+    // Depricated, please remove
+    public static function counter_log_likelihood_p($p, array $params): float {
+        $b = $params['difficulty'];
+        return -(exp($p)/(exp($b) + exp($p)));
+    }
+    
+    // Depricated, please remove
+    public static function log_counter_likelihood($p, array $params)
+    {
+        $b = $params['difficulty'];
+
+        $a = 1;
+        $c = 0;
+        return log(1-$c-((1-$c)*exp($a*(-$b+$p)))/(1+exp($a*(-$b+$p))));
+    }
+
+    // Should also be depricated and same as likelihood, please remove when not necessary
+    public static function likelihood_multi(float $p, array $x)
+    {
+        $a = 1;
+        $c = 0;
+        $b = $x['difficulty'];
+
+        return $c + (1- $c) * (exp($a*($p - $b)))/(1 + exp($a*($p-$b)));
+    }
+
+    // Should be depricated as well, please remove
+    public static function log_likelihood_b($pp, array $ip)
+    {
+        $a = $ip['difficulty'];
+        return ((-1)*exp(($a+$pp)))/((exp($a)+exp($pp))*(exp($pp)));
+    }
+
+    // Should be depricated as well, please remove
+    public static function log_counter_likelihood_b($p, array $params)
+    {
+        $a = $ip['difficulty'];
+        return (exp($pp))/(exp($a)+exp($pp));
+    }
+
+    // Should be depricated as well, please remove
+    public static function get_log_counter_likelihood($p)
+    {
+
+        $fun = function ($x) use ($p) {
+            return self::log_counter_likelihood($p, $x);
+        };
+        return $fun;
+    }
+
+    // Should be depricated as well, please remove
+    public static function log_likelihood_b_b($pp, array $ip)
+    {
+        $a = $ip['difficulty'];
+        return (-exp(-$a + $pp) * ( exp(2  * (-$a + $pp))))/((1 + exp(-$a + $pp))**2 * exp(-$a + $pp)**2) ;
+    }
+
+    // Should be depricated as well, please remove
+    public static function log_counter_likelihood_b_b($p, array $params)
+    {
+        $b = $params['difficulty'];
+
+        $a = 1;
+        return -(($a**2 * exp($a * ($b + $p)))/(exp($a * $b) + exp($a * $p))**2);
     }
 }
