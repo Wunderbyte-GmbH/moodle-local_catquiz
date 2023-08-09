@@ -64,6 +64,12 @@ public $columnsarrayisassociative = false;
 public $acceptunknowncolumn = false;
 
 
+/**
+ * @var string
+ */
+public $callback = '';
+
+
 public function __construct($columns) {
     $this->create_columns($columns);
 }
@@ -186,5 +192,13 @@ public function get_dateformat() {
  */
 public function set_dateformat($dateformat) {
     $this->dateformat = $dateformat;
+}
+
+/**
+ *
+ * @param string $callback
+ */
+public function set_callback($callback) {
+    $this->callback = $callback;
 }
 }

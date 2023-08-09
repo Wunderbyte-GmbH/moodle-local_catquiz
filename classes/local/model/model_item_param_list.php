@@ -26,6 +26,7 @@ namespace local_catquiz\local\model;
 use ArrayAccess;
 use ArrayIterator;
 use Countable;
+use dml_exception;
 use IteratorAggregate;
 use local_catquiz\catquiz;
 use Traversable;
@@ -225,4 +226,44 @@ class model_item_param_list implements ArrayAccess, IteratorAggregate, Countable
             $DB->update_record('local_catquiz_itemparams', $r, true);
         }
     }
+
+    /**
+     * Check if record exists to update, if not, insert.
+     * Some logic to provide the correct values if missing.
+     * @param array $newrecord
+     * @return int
+     * @throws dml_exception
+     */
+    public static function save_or_update_testitem_in_db(array $newrecord) {
+        global $DB;
+
+        $record = $DB->get_record("local_catquiz_itemparams", [
+            'componentid' => $newrecord['componentid'],
+            'componentname' => $newrecord['componentname'],
+            'model' => $newrecord['model'],
+        ]);
+        $now = time();
+        $newrecord['timemodified'] = empty($newrecord['timemodified']) ? $now : $newrecord['timemodified'];
+        if (isset($record->timecreated) && $record->timecreated != "0") {
+            $newrecord['timecreated'] = !empty($newrecord['timecreated']) ? $newrecord['timecreated'] : $record->timecreated;
+        } else {
+            $newrecord['timecreated'] = !empty($newrecord['timecreated']) ? $newrecord['timecreated'] : $now;
+        }
+
+        $newrecord['status'] = !empty($newrecord['status']) ? $newrecord['status'] : model_item_param::STATUS_UPDATED_MANUALLY;
+
+        if (!$record) {
+            // Make sure the record to insert has no id.
+            unset($newrecord['id']);
+            $id = $DB->insert_record('local_catquiz_itemparams', $newrecord);
+        } else {
+
+            $newrecord['id'] = $record->id;
+            if ($DB->update_record('local_catquiz_itemparams', $newrecord, true)) {
+                $id = $newrecord['id'];
+            }
+        }
+        return $id;
+    }
+
 };

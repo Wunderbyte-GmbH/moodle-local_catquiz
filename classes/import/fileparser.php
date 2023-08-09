@@ -198,6 +198,25 @@ class fileparser {
         return $this->record;
     }
 
+     /**
+     * Executes callback
+     *
+     */
+    private function execute_callback(array $data) {
+
+        if (!$callback = $this->settings->callback) {
+            $this->errors[] = "Callback function not properly defined.";
+            return;
+        };
+
+        try {
+            $callback($data);
+        } catch (Exception $e) {
+            $this->errors[] = "Callback function could not be applied.";
+        }
+
+    }
+
     /**
      * Collecting errors, warnings and general successinformation.
      * 
