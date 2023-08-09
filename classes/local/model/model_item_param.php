@@ -30,7 +30,7 @@ use stdClass;
 
 /**
  * This class holds a single item param object
- *  
+ *
  * This is one of the return values from a model param estimation.
  */
 class model_item_param {
@@ -44,6 +44,7 @@ class model_item_param {
     const STATUS_NOT_SET = -5;
     const STATUS_NOT_CALCULATED = 0;
     const STATUS_SET_BY_STRATEGY = 1;
+    const STATUS_UPDATED_MANUALLY = 4;
     const STATUS_SET_MANUALLY = 5;
 
     /**
@@ -79,7 +80,7 @@ class model_item_param {
 
     /**
      * Returns the item id (e.g. question id)
-     * 
+     *
      * @return int
      */
     public function get_id(): int {
@@ -123,12 +124,12 @@ class model_item_param {
     }
 
     /**
-     * @param int $componentid 
-     * @param string $model 
-     * @param int $contextid 
-     * @param stdClass $new_record 
-     * @return void 
-     * @throws Exception 
+     * @param int $componentid
+     * @param string $model
+     * @param int $contextid
+     * @param stdClass $new_record
+     * @return void
+     * @throws Exception
      */
     public static function update_in_db(
         int $id,
