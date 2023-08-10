@@ -69,7 +69,7 @@ class start_new_attempt extends external_api {
      *
      * @return array
      */
-    public static function execute(string $userid, int $categoryid): array {
+    public static function execute(int $userid, int $categoryid): array {
         $params = self::validate_parameters(self::execute_parameters(), [
             'userid' => $userid,
             'categoryid' => $categoryid,

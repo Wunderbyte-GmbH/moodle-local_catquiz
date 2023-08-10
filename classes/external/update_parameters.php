@@ -64,6 +64,7 @@ class update_parameters extends external_api {
      * Webservice for the local catquiz plugin to update context parameters
      *
      * @param int $contextid
+     * @param int $catscaleid
      *
      * @return array
      */
