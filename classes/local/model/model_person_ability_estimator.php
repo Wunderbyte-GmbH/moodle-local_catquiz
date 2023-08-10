@@ -15,7 +15,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * 
+ * Cless model_person_ability_estimator.
  *
  * @package    local_catquiz
  * @copyright  2023 Wunderbyte GmbH <georg.maisser@wunderbyte.at>
@@ -39,6 +39,12 @@ abstract class model_person_ability_estimator {
      */
     protected model_responses $responses;
 
+    /**
+     * Model-specific instantiation can go here.
+     *
+     * @param model_responses $responses
+     * 
+     */
     public function __construct(model_responses $responses) {
         $this->responses = $responses;
     }

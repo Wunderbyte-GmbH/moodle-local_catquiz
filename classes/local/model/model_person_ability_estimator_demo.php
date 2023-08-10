@@ -15,7 +15,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * 
+ * Demo class that returns random person abilities.
  *
  * @package    local_catquiz
  * @copyright  2023 Wunderbyte GmbH <georg.maisser@wunderbyte.at>
@@ -31,13 +31,21 @@ use local_catquiz\local\model\model_item_param_list;
 defined('MOODLE_INTERNAL') || die();
 
 /**
- * This is a demo class that returns random person abilities
+ * This is a demo class that returns random person abilities.
  *
  * @copyright  2023 Wunderbyte GmbH <georg.maisser@wunderbyte.at>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class model_person_ability_estimator_demo extends model_person_ability_estimator {
 
+    /**
+     * Get person abilities.
+     *
+     * @param model_item_param_list $item_param_list
+     * 
+     * @return model_person_param_list
+     * 
+     */
     public function get_person_abilities(model_item_param_list $item_param_list): model_person_param_list
     {
         $person_param_list = new model_person_param_list();

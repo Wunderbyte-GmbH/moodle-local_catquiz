@@ -25,43 +25,82 @@
 namespace local_catquiz\local\model;
 
 /**
- * This class holds a single item param object
- *  
+ * This class holds a single item param object.
+ * 
  * This is one of the return values from a model param estimation.
+ * 
+ * @package local_catquiz
+ * @copyright 2023 Wunderbyte GmbH <info@wunderbyte.at>
+ * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class model_person_param {
 
     // For some items, the model returns -INF or INF as difficulty.
     // However, we expect it to be numeric, so we encode those
     // values as -1000 and 1000
+    /**
+     * MODEL_NEG_INF
+     *
+     * @var int
+     */
     const MODEL_NEG_INF = -1000;
+    /**
+     * MODEL_POS_INF
+     *
+     * @var int
+     */
     const MODEL_POS_INF = 1000;
-
     /**
      * The ID of the user
+     * 
+     * @var int
      */
     private int $id;
 
+    /**
+     * @var float ability
+     */
+    private float $ability = 0;
+
+    /**
+     * Instantiate parameter.
+     *
+     * @param int $id
+     * 
+     */
     public function __construct(int $id) {
         $this->id = $id;
     }
 
     /**
+     * Return ID.
+     * 
      * @return int
      */
     public function get_id(): int {
         return $this->id;
     }
- 
+
     /**
-     * @var float
+     * Return ability.
+     *
+     * @return float
+     * 
      */
-    private float $ability = 0;
+    public function get_ability(): float { 
+        return $this->ability; 
+    }
 
-    public function get_ability(): float { return $this->ability; }
-
+    /**
+     * Set ability.
+     *
+     * @param float $ability
+     * 
+     * @return self
+     * 
+     */
     public function set_ability(float $ability): self {
         $this->ability = $ability;
         return $this;
     }
-};
+}

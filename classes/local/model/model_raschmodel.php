@@ -15,6 +15,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
+ * Class model_raschmodel.
  * @package    local_catquiz
  * @copyright  2023 Wunderbyte GmbH <georg.maisser@wunderbyte.at>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
@@ -28,12 +29,22 @@ use local_catquiz\catcalc_item_estimator;
 defined('MOODLE_INTERNAL') || die();
 
 /**
- * TODO: add description
+ * This class implements model raschmodel.
  *
  * @copyright  2023 Wunderbyte GmbH <georg.maisser@wunderbyte.at>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 abstract class model_raschmodel extends model_model implements catcalc_item_estimator, catcalc_ability_estimator {
+
+    /**
+     * Likelihood 1pl.
+     *
+     * @param mixed $person_ability
+     * @param mixed $item_difficulty
+     * 
+     * @return float
+     * 
+     */
     static function likelihood_1pl($person_ability, $item_difficulty ){
 
         $discrimination = 1; // hardcode override because of 1pl
@@ -69,8 +80,52 @@ abstract class model_raschmodel extends model_model implements catcalc_item_esti
      * @return array
      */
     abstract protected function calculate_params($item_response): array;
+
+    /**
+     * Likelihood.
+     *
+     * @param mixed $x
+     * @param array $item_params
+     * @param float $item_response
+     * 
+     * @return mixed
+     * 
+     */
     abstract public static function likelihood($x, array $item_params, float $item_response);
+
+    /**
+     * Log likelihood.
+     *
+     * @param mixed $x
+     * @param array $item_params
+     * @param float $item_response
+     * 
+     * @return mixed
+     * 
+     */
     abstract public static function log_likelihood($x, array $item_params, float $item_response);
+
+    /**
+     * Log likelihood p.
+     *
+     * @param mixed $x
+     * @param array $item_params
+     * @param float $item_response
+     * 
+     * @return mixed
+     * 
+     */
     abstract public static function log_likelihood_p($x, array $item_params, float $item_response);
+    
+    /**
+     * Log likelihood p p.
+     *
+     * @param mixed $x
+     * @param array $item_params
+     * @param float $item_response
+     * 
+     * @return mixed
+     * 
+     */
     abstract public static function log_likelihood_p_p($x, array $item_params, float $item_response);
 }

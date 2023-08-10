@@ -32,11 +32,15 @@ use local_catquiz\local\model\model_person_param;
 use Traversable;
 
 /**
- * This class holds a list of person param objects
+ * This class holds a list of person param objects.
  *
  * Can also be used to set values specific to the parameter estimation (e.g. model).
  *
  * This is one of the return values from a model param estimation.
+ * 
+ * @package local_catquiz
+ * @copyright 2023 Wunderbyte GmbH <info@wunderbyte.at>
+ * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class model_person_param_list implements ArrayAccess, IteratorAggregate, Countable {
 
@@ -45,6 +49,9 @@ class model_person_param_list implements ArrayAccess, IteratorAggregate, Countab
      */
     private array $person_params;
 
+    /**
+     * Model-specific instantiation can go here.
+     */
     public function __construct() {
         $this->person_params = [];
     }
@@ -78,17 +85,47 @@ class model_person_param_list implements ArrayAccess, IteratorAggregate, Countab
         return $person_abilities;
     }
 
+    /**
+     * Return count of prarms.
+     *
+     * @return int
+     * 
+     */
     public function count(): int {
         return count($this->person_params);
     }
 
+    /**
+     * Return Iterator object.
+     *
+     * @return Traversable
+     * 
+     */
     public function getIterator(): Traversable {
         return new ArrayIterator($this->person_params);
     }
 
+    /**
+     * Add param.
+     *
+     * @param model_person_param $person_param
+     * 
+     * @return void
+     * 
+     */
     public function add(model_person_param $person_param) {
         $this->person_params[$person_param->get_id()] = $person_param;
     }
+
+    /**
+     * Set param by offset.
+     *
+     * @param mixed $offset
+     * @param mixed $value
+     * 
+     * @return void
+     * 
+     */
     public function offsetSet($offset, $value): void {
         if (is_null($offset)) {
             $this->person_params[] = $value;
@@ -97,19 +134,45 @@ class model_person_param_list implements ArrayAccess, IteratorAggregate, Countab
         }
     }
 
+    /**
+     * Chek if param by offset exists.
+     *
+     * @param mixed $offset
+     * 
+     * @return bool
+     * 
+     */
     public function offsetExists($offset): bool {
         return isset($this->person_params[$offset]);
     }
 
+    /**
+     * Unset param by offset.
+     *
+     * @param mixed $offset
+     * 
+     * @return void
+     * 
+     */
     public function offsetUnset($offset): void {
         unset($this->person_params[$offset]);
     }
 
+    /**
+     * REturn param by offset.
+     *
+     * @param mixed $offset
+     * 
+     * @return model_person_param|null
+     * 
+     */
     public function offsetGet($offset): ?model_person_param {
         return isset($this->person_params[$offset]) ? $this->person_params[$offset] : null;
     }
 
     /**
+     * Return person params.
+     * 
      * @return array<model_person_param>
      */
     public function get_person_params(): array {
@@ -117,9 +180,12 @@ class model_person_param_list implements ArrayAccess, IteratorAggregate, Countab
     }
 
     /**
-     * Returns the person abilities as a float array
+     * Returns the person abilities as a float array.
      *
-     * @return array<float>
+     * @param bool $sorted
+     * 
+     * @return array
+     * 
      */
     public function get_values($sorted = false): array
     {
@@ -139,6 +205,15 @@ class model_person_param_list implements ArrayAccess, IteratorAggregate, Countab
         return $data;
     }
 
+    /**
+     * Save params to DB.
+     *
+     * @param int $contextid
+     * @param int $catscaleid
+     * 
+     * @return void
+     * 
+     */
     public function save_to_db(int $contextid, int $catscaleid) {
         global $DB;
         // Get existing records for the given contextid and model.
@@ -201,4 +276,4 @@ class model_person_param_list implements ArrayAccess, IteratorAggregate, Countab
             $DB->update_record('local_catquiz_personparams', $r, true);
         }
     }
-};
+}

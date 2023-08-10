@@ -26,21 +26,52 @@ namespace local_catquiz\local\model;
 
 /**
  * Provides data required for parameter estimation
+ * 
+ * @package local_catquiz
+ * @copyright 2023 Wunderbyte GmbH <info@wunderbyte.at>
+ * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class model_item_response {
 
+    /**
+     * @var float responce
+     */
     private float $response;
+
+    /**
+     * @var float ability
+     */
     private float $ability;
+
+    /**
+     * Set parameters for class instance.
+     *
+     * @param float $response
+     * @param float $ability
+     * 
+     */
     public function __construct(float $response, float $ability) {
         $this->response = $response;
         $this->ability = $ability;
     }
 
+    /**
+     * Return response.
+     *
+     * @return float
+     * 
+     */
     public function get_response() : float {
         return $this->response;
     }
 
+    /**
+     * Return ability.
+     *
+     * @return float
+     * 
+     */
     public function get_ability() : float {
         return $this->ability;
     }
-};
+}

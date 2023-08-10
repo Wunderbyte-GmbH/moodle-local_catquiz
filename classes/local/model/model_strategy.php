@@ -15,7 +15,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- *
+ * Class model_strategy.
  *
  * @package    local_catquiz
  * @copyright  2023 Wunderbyte GmbH <georg.maisser@wunderbyte.at>
@@ -33,6 +33,8 @@ use MoodleQuickForm;
 defined('MOODLE_INTERNAL') || die();
 
 /**
+ * Model strategy class.
+ * 
  * Objects of this class are responsible for running the estimation process and
  * returning as result the new person abilities and item difficulties.
  *
@@ -46,14 +48,24 @@ defined('MOODLE_INTERNAL') || die();
  *
  * If the process is finished, a list of person abilities and item difficulties is returned.
  *
+ * @package    local_catquiz
  * @copyright  2023 Wunderbyte GmbH <georg.maisser@wunderbyte.at>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class model_strategy {
-
+    /**
+     * MAX_ITERATIONS
+     *
+     * @var int
+     */
     const MAX_ITERATIONS = 5; // TODO: get value from DB?
-    const DEFAULT_MODEL = 'web_raschbirnbauma';
 
+    /**
+     * DEFAULT_MODEL
+     *
+     * @var string
+     */
+    const DEFAULT_MODEL = 'web_raschbirnbauma';
     /**
      * @var model_responses Contains necessary data for estimation
      */
@@ -78,16 +90,33 @@ class model_strategy {
      */
     private model_person_ability_estimator $ability_estimator;
 
+    /**
+     * @var int max_iterations
+     */
     private int $max_iterations;
 
+    /**
+     * @var int iterations
+     */
     private int $iterations = 0;
 
+    /**
+     * @var string|null model_override
+     */
     private ?string $model_override;
 
+    /**
+     * @var model_person_param_list
+     */
     private model_person_param_list $initial_person_abilities;
 
     /**
      * Model-specific instantiation can go here.
+     *
+     * @param model_responses $responses
+     * @param array $options
+     * @param model_person_param_list|null $saved_person_abilities
+     * 
      */
     public function __construct(
         model_responses $responses,
@@ -110,6 +139,14 @@ class model_strategy {
         $this->initial_person_abilities = $saved_person_abilities;
     }
 
+    /**
+     * Set_options.
+     *
+     * @param array $options
+     * 
+     * @return self
+     * 
+     */
     private function set_options(array $options): self {
         $this->max_iterations = array_key_exists('max_iterations', $options)
             ? $options['max_iterations']
@@ -125,6 +162,14 @@ class model_strategy {
         return $this;
     }
 
+    /**
+     * Handle mform.
+     *
+     * @param MoodleQuickForm $mform
+     * 
+     * @return void
+     * 
+     */
     public static function handle_mform(MoodleQuickForm &$mform) {
         $mform->addElement('header', 'strategy', get_string('strategy', 'local_catquiz'));
         $mform->addElement('text', 'max_iterations', get_string('max_iterations', 'local_catquiz'), PARAM_INT);
@@ -132,10 +177,12 @@ class model_strategy {
     }
 
     /**
-     * Updates the $errors via reference
+     * Updates the $errors via reference.
      *
      * @param array $data
      * @param array $files
+     * @param mixed $errors
+     * 
      * @return void
      */
     public static function validation($data, $files, &$errors) {
@@ -209,7 +256,7 @@ class model_strategy {
      * 
      * Merges the given item param lists into a single list
      *
-     * @param array<model_item_param_list> $item_difficulties_lists List of calculated item difficulties, one for each model
+     * @param array $item_difficulties_lists List of calculated item difficulties, one for each model
      * @return model_item_param_list A single list of item difficulties that is a combination of the input lists
      */
     public function select_item_model(array $item_difficulties_lists): model_item_param_list {
@@ -256,20 +303,46 @@ class model_strategy {
         return $new_item_difficulties;
     }
 
+    /**
+     * Return item override.
+     *
+     * @param int $item_id
+     * 
+     * @return string|null
+     * 
+     */
     private function get_item_override(int $item_id): ?string {
         return NULL; // TODO implement
     }
 
+    /**
+     * Return model override.
+     *
+     * @return string|null
+     * 
+     */
     private function get_model_override(): ?string {
         return $this->model_override; // TODO implement
     }
 
+    /**
+     * Return default model.
+     *
+     * @return string
+     * 
+     */
     private function get_default_model(): string {
         return self::DEFAULT_MODEL;
     }
 
     /**
+     * Obrain model params from DB
+     *
+     * @param int $contextid
+     * @param int $catscaleid
+     * 
      * @return array
+     * 
      */
     public function get_params_from_db(int $contextid, int $catscaleid): array {
         $models = $this->get_installed_models();
@@ -284,6 +357,12 @@ class model_strategy {
         return [$estimated_item_difficulties, $person_abilities];
     }
 
+    /**
+     * Check if max number of iterations reached.
+     *
+     * @return bool
+     * 
+     */
     private function should_stop(): bool {
         return $this->iterations >= $this->max_iterations;
     }

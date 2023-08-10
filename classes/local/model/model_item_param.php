@@ -38,22 +38,61 @@ class model_item_param {
     // For some items, the model returns -INF or INF as difficulty.
     // However, we expect it to be numeric, so we encode those
     // values as -1000 and 1000
+    /**
+     * MIN
+     *
+     * @var int
+     */
     const MIN = -1000;
+
+    /**
+     * MAX
+     *
+     * @var int
+     */
     const MAX = 1000;
 
+    /**
+     * STATUS_NOT_SET
+     *
+     * @var int
+     */
     const STATUS_NOT_SET = -5;
-    const STATUS_NOT_CALCULATED = 0;
+
+    /**
+     * STATUS_NOT_CALCULATED
+     *
+     * @var int
+     */
+    const STATUS_NOT_CALCULATED = 0;    
+
+    /**
+     * STATUS_SET_BY_STRATEGY
+     *
+     * @var int
+     */
     const STATUS_SET_BY_STRATEGY = 1;
     const STATUS_UPDATED_MANUALLY = 4;
-    const STATUS_SET_MANUALLY = 5;
 
+    /**
+     * STATUS_SET_MANUALLY
+     *
+     * @var int
+     */
+    const STATUS_SET_MANUALLY = 5;
     /**
      * @var array<float>
      */
     private array $parameters;
 
+    /**
+     * @var int status
+     */
     private int $status = 0;
 
+    /**
+     * @var string model name
+     */
     private string $model_name;
 
     /**
@@ -67,6 +106,15 @@ class model_item_param {
      */
     private int $id;
 
+    /**
+     * Set parameters for class instance.
+     *
+     * @param int $id
+     * @param string $model_name
+     * @param array $metadata
+     * @param int $status
+     * 
+     */
     public function __construct(int $id, string $model_name, array $metadata = [], int $status = self::STATUS_NOT_CALCULATED)
     {
         $this->id = $id;
@@ -74,12 +122,19 @@ class model_item_param {
         $this->metadata = $metadata;
         $this->status = $status;
     }
+
+    /**
+     * Get params array
+     *
+     * @return array
+     * 
+     */
     public function get_params_array(): array {
         return $this->parameters;
     }
 
     /**
-     * Returns the item id (e.g. question id)
+     * Returns the item id (e.g. question id).
      *
      * @return int
      */
@@ -87,49 +142,111 @@ class model_item_param {
         return $this->id;
     }
 
+    /**
+     * Return name of model.
+     *
+     * @return string
+     * 
+     */
     public function get_model_name(): string {
         return $this->model_name;
     }
 
+    /**
+     * Return difficulty.
+     *
+     * @return float
+     * 
+     */
     public function get_difficulty(): float {
         return $this->parameters['difficulty'];
     }
 
+    /**
+     * Set parameters.
+     *
+     * @param array $parameters
+     * 
+     * @return self
+     * 
+     */
     public function set_parameters(array $parameters): self {
         $this->parameters = $parameters;
         return $this;
     }
 
+    /**
+     * Set difficulty.
+     *
+     * @param float $difficulty
+     * 
+     * @return self
+     * 
+     */
     public function set_difficulty(float $difficulty): self {
         $this->parameters['difficulty'] = $difficulty;
         return $this;
     }
 
+    /**
+     * Set metadata
+     *
+     * @param array $metadata
+     * 
+     * @return self
+     * 
+     */
     public function set_metadata(array $metadata): self {
         $this->metadata = $metadata;
         return $this;
     }
 
+    /**
+     * Return metadata.
+     *
+     * @return array
+     * 
+     */
     public function get_metadata(): array {
         return $this->metadata;
     }
 
+    /**
+     * Set status.
+     *
+     * @param int $status
+     * 
+     * @return self
+     * 
+     */
     public function set_status(int $status): self {
         $this->status = $status;
         return $this;
     }
 
+    /**
+     * Return status.
+     *
+     * @return int
+     * 
+     */
     public function get_status(): int {
         return $this->status;
     }
 
     /**
+     * Update params in DB.
+     *
+     * @param int $id
      * @param int $componentid
      * @param string $model
      * @param int $contextid
      * @param stdClass $new_record
+     * 
      * @return void
-     * @throws Exception
+     * 
+     * @throws Exception 
+     * 
      */
     public static function update_in_db(
         int $id,
@@ -186,4 +303,4 @@ class model_item_param {
         );
         cache_helper::purge_by_event('changesintestitems');
     }
-};
+}

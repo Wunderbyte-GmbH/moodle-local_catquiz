@@ -33,14 +33,27 @@ use local_catquiz\local\model\model_person_param_list;
  *
  * For example: a list of users performed a test. Objects of this class show how the users performed on this test.
  * E.g.: which users took part, how did they answer the questions, etc.
+ * 
+ * @package local_catquiz
+ * @copyright 2023 Wunderbyte GmbH <info@wunderbyte.at>
+ * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class model_responses {
+    /**
+     * @var mixed data
+     */
     private $data;
 
+    /**
+     * @var array has_correct_answer
+     */
     private array $has_correct_answer = [];
 
     /**
-     * @return array<int>
+     * Return array of item ids.
+     *
+     * @return array
+     * 
      */
     public function get_item_ids(): array {
         $user_ids = array_keys($this->data);
@@ -59,6 +72,14 @@ class model_responses {
         return array_unique($question_ids);
     }
 
+    /**
+     * Create item form array.
+     *
+     * @param array $data
+     * 
+     * @return mixed
+     * 
+     */
     public static function create_from_array(array $data) {
         return (new self)->setData($data);
     }
@@ -66,7 +87,9 @@ class model_responses {
     /**
      * Helper function to get the person IDs from the response.
      *
-     * @return array<int>  */
+     * @return array
+     * 
+     */
     public function get_user_ids(): array {
         return array_keys($this->data);
     }
@@ -75,7 +98,10 @@ class model_responses {
      * Returns an array of arrays of item responses indexed by question id.
      * So for each question ID, there is an array of model_item_response entries
      *
-     * @return array<array<model_item_response>>
+     * @param model_person_param_list $person_param_list
+     * 
+     * @return array
+     * 
      */
     public function get_item_response(model_person_param_list $person_param_list): array {
         $item_response = [];
@@ -105,6 +131,14 @@ class model_responses {
         return $item_response;
     }
 
+    /**
+     * Set item data.
+     *
+     * @param mixed $data
+     * 
+     * @return mixed
+     * 
+     */
     public function setData($data) {
         $has_correct_answer = [];
         foreach ($data as $userid => $components) {
@@ -143,10 +177,13 @@ class model_responses {
     }
 
     /**
+     * Return item as_array.
+     *
      * @return array
+     * 
      */
     public function as_array() {
-        return $this->data;
+        return (array) $this->data;
     }
 
     /**
@@ -163,4 +200,4 @@ class model_responses {
         }
         return $person_param_list;
     }
-};
+}

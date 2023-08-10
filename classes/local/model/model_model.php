@@ -15,7 +15,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * 
+ * Abstract class model_model.
  *
  * @package    local_catquiz
  * @copyright  2023 Wunderbyte GmbH <georg.maisser@wunderbyte.at>
@@ -39,10 +39,17 @@ abstract class model_model {
      */
     protected model_responses $responses;
 
+    /**
+     * @var string Name of model
+     */
     protected string $model_name;
 
     /**
      * Model-specific instantiation can go here.
+     *
+     * @param model_responses $responses
+     * @param string $model_name
+     * 
      */
     public function __construct(model_responses $responses, string $model_name) {
         $this->responses = $responses;
@@ -79,16 +86,20 @@ abstract class model_model {
     abstract public function estimate_item_params(model_person_param_list $person_params): model_item_param_list;
 
     /**
-     * Returns the paramter names of the model as strings
+     * Returns the paramter names of the model as strings.
      * 
      * @return string[]
      */
     abstract protected static function get_parameter_names(): array;
 
     /**
-     * @param float $person_ability 
-     * @param array<float> $params 
-     * @return mixed 
+     * Fisher info.
+     *
+     * @param float $person_ability
+     * @param array $params
+     * 
+     * @return mixed
+     * 
      */
     abstract public static function fisher_info(float $person_ability, array $params);
 }

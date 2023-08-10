@@ -32,9 +32,13 @@ use local_catquiz\catquiz;
 use Traversable;
 
 /**
- * This class holds a list of item param objects
- *
+ * This class holds a list of item param objects.
+ * 
  * This is one of the return values from a model param estimation.
+ * 
+ * @package local_catquiz
+ * @copyright 2023 Wunderbyte GmbH <info@wunderbyte.at>
+ * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class model_item_param_list implements ArrayAccess, IteratorAggregate, Countable {
     /**
@@ -42,10 +46,19 @@ class model_item_param_list implements ArrayAccess, IteratorAggregate, Countable
      */
     private array $item_params;
 
+    /**
+     * Set parameters for class instance.
+     */
     public function __construct() {
         $this->item_params = [];
     }
 
+    /**
+     * Return count of parameters.
+     *
+     * @return int
+     * 
+     */
     public function count(): int {
         return count($this->item_params);
     }
@@ -56,8 +69,10 @@ class model_item_param_list implements ArrayAccess, IteratorAggregate, Countable
      *
      * @param int $contextid
      * @param string $model_name
-     * @param ?int $catscaleid
-     * @return model_item_param_list
+     * @param int|null $catscaleid
+     * 
+     * @return self
+     * 
      */
     public static function load_from_db(int $contextid, string $model_name, ?int $catscaleid = NULL): self {
         global $DB;
@@ -93,14 +108,37 @@ class model_item_param_list implements ArrayAccess, IteratorAggregate, Countable
         return $item_parameters;
     }
 
+    /**
+     * Return Iterator.
+     *
+     * @return Traversable
+     * 
+     */
     public function getIterator(): Traversable {
         return new ArrayIterator($this->item_params);
     }
 
+    /**
+     * Add a parameter
+     *
+     * @param model_item_param $item_param
+     * 
+     * @return void
+     * 
+     */
     public function add(model_item_param $item_param) {
         $this->item_params[$item_param->get_id()] = $item_param;
     }
 
+    /**
+     * Set parameter by offset.
+     *
+     * @param mixed $offset
+     * @param mixed $value
+     * 
+     * @return void
+     * 
+     */
     public function offsetSet($offset, $value): void {
         if (is_null($offset)) {
             $this->item_params[] = $value;
@@ -109,22 +147,49 @@ class model_item_param_list implements ArrayAccess, IteratorAggregate, Countable
         }
     }
 
+    /**
+     * Check if offset exists.
+     *
+     * @param mixed $offset
+     * 
+     * @return bool
+     * 
+     */
     public function offsetExists($offset): bool {
         return isset($this->item_params[$offset]);
     }
 
+    /**
+     * Unset offse.
+     *
+     * @param mixed $offset
+     * 
+     * @return void
+     * 
+     */
     public function offsetUnset($offset): void {
         unset($this->item_params[$offset]);
     }
 
+    /**
+     * Return parameter by offset.
+     *
+     * @param mixed $offset
+     * 
+     * @return model_item_param|null
+     * 
+     */
     public function offsetGet($offset): ?model_item_param {
         return isset($this->item_params[$offset]) ? $this->item_params[$offset] : null;
     }
 
     /**
-     * Returns the item difficulties as a float array
+     * Returns the item difficulties as a float array.
      *
-     * @return array<float>
+     * @param bool $sorted
+     * 
+     * @return array
+     * 
      */
     public function get_values($sorted = false): array
     {
@@ -144,6 +209,12 @@ class model_item_param_list implements ArrayAccess, IteratorAggregate, Countable
         return $data;
     }
 
+    /**
+     * Return parameters as array.
+     *
+     * @return array
+     * 
+     */
     public function as_array(): array
     {
         $data = [];
@@ -153,6 +224,14 @@ class model_item_param_list implements ArrayAccess, IteratorAggregate, Countable
         return $data;
     }
 
+    /**
+     * Save parameters to DB.
+     *
+     * @param int $contextid
+     * 
+     * @return void
+     * 
+     */
     public function save_to_db(int $contextid) {
 
         global $DB;
@@ -266,4 +345,4 @@ class model_item_param_list implements ArrayAccess, IteratorAggregate, Countable
         return $id;
     }
 
-};
+}
