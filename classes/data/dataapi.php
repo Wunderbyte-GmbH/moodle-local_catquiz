@@ -139,8 +139,10 @@ class dataapi {
     /**
      * Delete a catscale and invalidate cache.
      *
-     * @param int $catscale
-     * @return array true
+     * @param int $catscaleid
+     * 
+     * @return array
+     * 
      */
     public static function delete_catscale(int $catscaleid):array {
         global $DB;

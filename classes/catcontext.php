@@ -206,8 +206,12 @@ class catcontext {
      *             "min_fraction" => 0,
      *             "qtype" => "truefalse",
      *             "timestamp" => 1646955338
+     *
+     * @param mixed $data
+     * 
+     * @return array
      */
-    private static function db_to_modelinput($data) {
+    private static function db_to_modelinput($data):array {
         $modelinput = [];
         foreach ($data as $row) {
             $entry = [
@@ -299,6 +303,14 @@ class catcontext {
         $this->timecalculated = $record->timecalculated ?? $this->timecalculated ?? 0;
     }
 
+    /**
+     * Get_strategy.
+     *
+     * @param int $catscaleid
+     * 
+     * @return model_strategy
+     * 
+     */
     public function get_strategy(int $catscaleid): model_strategy {
         $responses = self::create_response_from_db($this->id, $catscaleid);
         $options = json_decode($this->json, true) ?? [];
@@ -306,7 +318,12 @@ class catcontext {
         return new model_strategy($responses, $options, $saved_abilities);
     }
 
-    // Add a default context that contains all test items
+    /**
+     * Add a default context that contains all test items.
+     *
+     * @return void
+     * 
+     */
     public function create_default_context() {
         global $DB;
         $context = $DB->get_record_sql(
@@ -331,9 +348,12 @@ class catcontext {
     }
 
     /**
+     * Get name.
+     *
      * @return string
+     * 
      */
-    public function getName() {
+    public function getName():string {
         return $this->name;
     }
 }
