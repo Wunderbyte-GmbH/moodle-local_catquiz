@@ -1,12 +1,4 @@
 <?php
-use local_catquiz\catcontext;
-use local_catquiz\local\model\model_item_param;
-use local_catquiz\local\model\model_item_param_list;
-use local_catquiz\local\model\model_person_param;
-use local_catquiz\local\model\model_person_param_list;
-use local_catquiz\local\model\model_responses;
-use local_catquiz\local\model\model_strategy;
-
 // This file is part of Moodle - http://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
@@ -31,8 +23,15 @@ use local_catquiz\local\model\model_strategy;
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-require_once('../../../config.php');
-//use \local_catquiz;
+use local_catquiz\catcontext;
+use local_catquiz\local\model\model_item_param;
+use local_catquiz\local\model\model_item_param_list;
+use local_catquiz\local\model\model_person_param;
+use local_catquiz\local\model\model_person_param_list;
+use local_catquiz\local\model\model_responses;
+use local_catquiz\local\model\model_strategy;
+
+require_once(__DIR__ . '../../../../config.php');
 
 $PAGE->set_url(new moodle_url('/local/catquiz/workspace.php'));
 $PAGE->set_context(context_system::instance());
@@ -47,7 +46,6 @@ $demo_item_difficulties = [1.53, 2.74, -0.74, 0.89, 1.23, 0.68, -0.13, 0.33, 0.2
 $demo_item_discriminations = [0.5, 1.3, 3.8, -2, -0.25, 1.4, 3.0, -2.0, 0.4, -0.5];
 $demo_item_guessing = [0.5, 0.2, 0.4, 0.2, 0.1, 0.8, 0.2, 0.23, 0.1, 0];
 
-
 $demo_persons = local_catquiz\synthcat::generate_persons($demo_person_abilities);
 $demo_items = local_catquiz\synthcat::generate_test_items_multi([$demo_item_discriminations, $demo_item_difficulties, $demo_item_guessing]);
 
@@ -56,34 +54,17 @@ $raschbb = new \catmodel_raschbirnbauma\raschbirnbauma($response,"RaschBB_1PL");
 
 $demo_response = local_catquiz\synthcat::generate_response_multi($demo_persons,$demo_items,$raschbb);
 
-
-
 $synth_item_response = \local_catquiz\synthcat::get_item_response2(80,120,0.2);
-
-
-
 
 $synth_person_response = \local_catquiz\synthcat::get_person_response(50,0);
 $synth_item_difficulty = \local_catquiz\synthcat::get_model_item_param_list(2,50);
 
-
-
-
 $x = \local_catquiz\catcalc::estimate_person_ability2($synth_person_response, $synth_item_difficulty);
-
-
-
 
 echo "pause";
 
-
-
-// problematic function:
-
-
-
+// Problematic function:
 
 echo "finished";
 
 echo $OUTPUT->footer();
-

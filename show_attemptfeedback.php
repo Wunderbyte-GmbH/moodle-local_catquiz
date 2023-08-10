@@ -16,7 +16,7 @@
 
 /**
  * Test page for quiz attempt feedback
- * @package    local_catquiz catscales
+ * @package    local_catquiz
  * @copyright  2023 Wunderbyte GmbH
  * @author     David Bogner
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later

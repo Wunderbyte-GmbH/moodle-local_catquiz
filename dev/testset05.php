@@ -1,12 +1,4 @@
 <?php
-use local_catquiz\catcontext;
-use local_catquiz\local\model\model_item_param;
-use local_catquiz\local\model\model_item_param_list;
-use local_catquiz\local\model\model_person_param;
-use local_catquiz\local\model\model_person_param_list;
-use local_catquiz\local\model\model_responses;
-use local_catquiz\local\model\model_strategy;
-
 // This file is part of Moodle - http://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
@@ -31,8 +23,16 @@ use local_catquiz\local\model\model_strategy;
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-require_once('../../../config.php');
-//use \local_catquiz;
+use local_catquiz\catcalc;
+use local_catquiz\catcontext;
+use local_catquiz\local\model\model_item_param;
+use local_catquiz\local\model\model_item_param_list;
+use local_catquiz\local\model\model_person_param;
+use local_catquiz\local\model\model_person_param_list;
+use local_catquiz\local\model\model_responses;
+use local_catquiz\local\model\model_strategy;
+
+require_once(__DIR__ . '../../../../config.php');
 
 $PAGE->set_url(new moodle_url('/local/catquiz/workspace.php'));
 $PAGE->set_context(context_system::instance());
@@ -42,35 +42,27 @@ $url_plugin = new moodle_url('workspace.php');
 
 echo $OUTPUT->header();
 
-
-
 $response = new model_responses();
-
-
 
 $synth_item_response = \local_catquiz\synthcat::get_item_response2(40,65,0.0);
 
-
-# estimate item parameter with 1 PL
+# Estimate item parameter with 1 PL.
 
 $start = [0.2];
 $model_1pl = new \catmodel_raschbirnbauma\raschbirnbauma($response,"Rasch_1PL");
-$params_model_1pl = \local_catquiz\catcalc::estimate_item_params($synth_item_response, $model_1pl, $start);
+$params_model_1pl = catcalc::estimate_item_params($synth_item_response, $model_1pl, $start);
 
-# estimate item parameter with 2 PL
+# Estimate item parameter with 2 PL.
 
 $start = [1, 3];
 $model_2pl = new \catmodel_raschbirnbaumb\raschbirnbaumb($response,"Rasch_2PL");
-$params_model_2pl = \local_catquiz\catcalc::estimate_item_params($synth_item_response, $model_2pl, $start);
+$params_model_2pl = catcalc::estimate_item_params($synth_item_response, $model_2pl, $start);
 
-# estimate item parameter with 3 PL
+# Estimate item parameter with 3 PL.
 
 $start = [1, 3, 0.2];
 $model_3pl = new \catmodel_raschbirnbaumc\raschbirnbaumc($response,"Rasch_3PL");
-$params_model_3pl = \local_catquiz\catcalc::estimate_item_params($synth_item_response, $model_3pl, $start);
-
-
-
+$params_model_3pl = catcalc::estimate_item_params($synth_item_response, $model_3pl, $start);
 
 echo "finished";
 

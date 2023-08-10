@@ -1,14 +1,4 @@
 <?php
-
-use local_catquiz\catcontext;
-use local_catquiz\local\model\model_item_param;
-use local_catquiz\local\model\model_item_param_list;
-use local_catquiz\local\model\model_person_param;
-use local_catquiz\local\model\model_person_param_list;
-use local_catquiz\local\model\model_responses;
-use local_catquiz\local\model\model_strategy;
-use local_catquiz\matrix;
-
 // This file is part of Moodle - http://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
@@ -33,8 +23,16 @@ use local_catquiz\matrix;
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-require_once('../../../config.php');
-//use \local_catquiz;
+use local_catquiz\catcontext;
+use local_catquiz\local\model\model_item_param;
+use local_catquiz\local\model\model_item_param_list;
+use local_catquiz\local\model\model_person_param;
+use local_catquiz\local\model\model_person_param_list;
+use local_catquiz\local\model\model_responses;
+use local_catquiz\local\model\model_strategy;
+use local_catquiz\matrix;
+
+require_once(__DIR__ . '../../../../config.php');
 
 $PAGE->set_url(new moodle_url('/local/catquiz/workspace.php'));
 $PAGE->set_context(context_system::instance());
@@ -43,7 +41,8 @@ $url_front = new moodle_url('/workspace.php');
 $url_plugin = new moodle_url('workspace.php');
 
 echo $OUTPUT->header();
-// php testbed for matrix inversion
+
+// PHP testbed for matrix inversion.
 
 $testmatrix = [[2,2,3],[4,5,6],[7,8,9]];
 
@@ -51,11 +50,8 @@ $m = new matrix($testmatrix);
 
 $m_inv = $m->inverse();
 
-
 $tst = $m_inv[1][1];
 
 echo "finished";
 
 echo $OUTPUT->footer();
-
-

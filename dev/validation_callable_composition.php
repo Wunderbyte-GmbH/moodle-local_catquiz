@@ -1,12 +1,4 @@
 <?php
-use local_catquiz\catcontext;
-use local_catquiz\local\model\model_item_param;
-use local_catquiz\local\model\model_item_param_list;
-use local_catquiz\local\model\model_person_param;
-use local_catquiz\local\model\model_person_param_list;
-use local_catquiz\local\model\model_responses;
-use local_catquiz\local\model\model_strategy;
-
 // This file is part of Moodle - http://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
@@ -31,8 +23,15 @@ use local_catquiz\local\model\model_strategy;
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-require_once('../../../config.php');
-//use \local_catquiz;
+use local_catquiz\catcontext;
+use local_catquiz\local\model\model_item_param;
+use local_catquiz\local\model\model_item_param_list;
+use local_catquiz\local\model\model_person_param;
+use local_catquiz\local\model\model_person_param_list;
+use local_catquiz\local\model\model_responses;
+use local_catquiz\local\model\model_strategy;
+
+require_once(__DIR__ . '../../../../config.php');
 
 $PAGE->set_url(new moodle_url('/local/catquiz/workspace.php'));
 $PAGE->set_context(context_system::instance());
@@ -43,8 +42,6 @@ $url_plugin = new moodle_url('workspace.php');
 echo $OUTPUT->header();
 
 print "hehe";
-
-
 
 $sum = 0;
 $mycallable = function($x) {return 0;};
@@ -62,16 +59,11 @@ for ($i=1; $i<=100;$i++){
     $funpart = function ($x) use ($rnd) {return $rnd*$x;};
     //$funpart = function ($x) use ($rnd) {return rand(0,100)*$x;};
 
-
     $sum = $sum + $funpart($my_x);
 
     $mycallable = fn($x) => $mycallable($x) + $funpart($x);
     array_push($callables,$mycallable);
-
-
 }
-
-
 
 echo "finished";
 
