@@ -14,6 +14,14 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
+/**
+ * The dataapi class.
+ *
+ * @package local_catquiz
+ * @copyright 2023 Georg Maißer, <info@wunderbyte.at>
+ * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
+
 namespace local_catquiz\data;
 
 use cache;
@@ -24,6 +32,10 @@ use moodle_exception;
 
 /**
  * Get and store data from db.
+ *
+ * @package local_catquiz
+ * @copyright 2023 Georg Maißer, <info@wunderbyte.at>
+ * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class dataapi {
 
@@ -51,6 +63,12 @@ class dataapi {
         return $allcatscales;
     }
 
+    /**
+     * Returns all catcontexts
+     *
+     * @return array
+     * 
+     */
     public static function get_all_catcontexts(): array {
         global $DB;
         $cache = cache::make('local_catquiz', 'catcontexts');
@@ -121,7 +139,7 @@ class dataapi {
     /**
      * Delete a catscale and invalidate cache.
      *
-     * @param catscale_structure $catscale
+     * @param int $catscale
      * @return array true
      */
     public static function delete_catscale(int $catscaleid):array {

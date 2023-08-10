@@ -14,19 +14,31 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
+/**
+ * The catquiz_base class.
+ *
+ * @package local_catquiz
+ * @copyright 2023 Georg Maißer, <info@wunderbyte.at>
+ * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
+
 namespace local_catquiz\data;
 
 /**
  * Get and store data from db.
+ *
+ * @package local_catquiz
+ * @copyright 2023 Georg Maißer, <info@wunderbyte.at>
+ * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class catquiz_base {
 
     /**
      * Returns all or parts of answered questions in the Moodle instance.
      *
-     * @param integer $testid
-     * @param integer $userid
-     * @param integer $questionid
+     * @param int $testid
+     * @param int $userid
+     * @param int $questionid
      * @return array
      */
     public static function get_question_results(int $testid = 0, int $userid = 0, int $questionid = 0):array {
@@ -69,9 +81,9 @@ class catquiz_base {
      * This Function returns the answered questions in an array...
      * ... where the userid is the key and every user has an array where the key is the questionid.
      *
-     * @param integer $testid
-     * @param integer $userid
-     * @param integer $questionid
+     * @param int $testid
+     * @param int $userid
+     * @param int $questionid
      * @return array
      */
     public static function get_question_results_by_person(int $testid = 0, int $userid = 0, int $questionid = 0):array {
