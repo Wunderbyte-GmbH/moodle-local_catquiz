@@ -36,8 +36,10 @@ Feature: As an admin I perform basic catquiz actions - create, update, delete, s
     ## And I wait "1" seconds
     And I wait until the page is ready
     Then I should see "Math" in the "[data-name=\"Math\"]" "css_element"
-    And I follow "Subscribe"
-    Then I should see "Subscribed" in the ".grid .list-group-item" "css_element"
+    ## And I follow "Subscribe"
+    ## Exact precise click
+    And I click on "Subscribe" "link" in the "[data-name=\"Math\"]" "css_element"
+    Then I should see "Subscribed" in the "[data-name=\"Math\"]" "css_element"
     And I follow "Edit"
     And the following fields match these values:
       | Name                               | Math              |
@@ -55,7 +57,7 @@ Feature: As an admin I perform basic catquiz actions - create, update, delete, s
     And I click on "CAT scales" "link" in the "#region-main" "css_element"
     Then I should see "Mathematics" in the "[data-name=\"Mathematics\"]" "css_element"
     And I follow "Subscribed"
-    Then I should see "Subscribe" in the ".grid .list-group-item" "css_element"
+    Then I should see "Subscribe" in the "[data-name=\"Mathematics\"]" "css_element"
     And I follow "Delete"
     ## TODO: should return to the same tab?
     And I click on "CAT scales" "link" in the "#region-main" "css_element"
