@@ -15,7 +15,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- *  Code for validation of developing process;
+ *  Code for validation of developing process.
  *
  * @package local_catquiz
  * @author Daniel Pasterk
@@ -61,55 +61,28 @@ echo "pause";
 
 //$demo_items = local_catquiz\synthcat::generate_test_items($demo_item_difficulties);
 
-
-
-
-//
-//
 //$something = \local_catquiz\mytestclass::testtest();
-//
-//$response = new model_responses();
-//
-////$myraschbirnbaum = \catmodel_raschbirnbaumb\raschbirnbaumb::get_stuff();
-//$myraschbirnbaum = new \catmodel_raschbirnbaumb\raschbirnbaumb($response,"RaschBB_2PL");
 
+//$response = new model_responses();
+
+//$myraschbirnbaum = \catmodel_raschbirnbaumb\raschbirnbaumb::get_stuff();
+//$myraschbirnbaum = new \catmodel_raschbirnbaumb\raschbirnbaumb($response,"RaschBB_2PL");
 
 //$testfn = $myraschbirnbaum->get_log_jacobian(0.3);
 
-
-
-
-//
-//
 //$a = \local_catquiz\catcalc::estimate_item_params_new();
-//
 
-
-
-//
 //$stuff = $myraschbirnbaum->get_stuff();
-//
 
+// Estimate parameter.
 
-
-
-// estimate parameter
-
-
-
-//
-////
-////
 $responses = model_responses::create_from_array($demo_response);
 
 $rasch_pl1 = new \catmodel_raschbirnbauma\raschbirnbauma($responses,"RaschBB_1PL");
 
+// Brauchen datenstrukturen für den Algo:
 
-
-
-// brauchen datenstrukturen für den Algo:
-
-// responses
+// Responses.
 
 //$strategie = new model_strategy($responses, ['max_iterations' => 4, 'model_override' => 'raschbirnbauma']);
 
@@ -131,5 +104,5 @@ echo "finished";
 
 echo $OUTPUT->footer();
 
-//validation:
+// Validation:
 // $raschbb->get_log_jacobian(0.2)[2]([0.5,0.5,0.5])

@@ -1,5 +1,27 @@
 <?php
+// This file is part of Moodle - http://moodle.org/
+//
+// Moodle is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// Moodle is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
+/**
+ *  Demo object.
+ *
+ * @package local_catquiz
+ * @author Daniel Pasterk
+ * @copyright 2023 Wunderbyte GmbH
+ * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
 
 //function get_demo_person_ability2(){
 //    $demo_person_abilities = [];
@@ -10,18 +32,13 @@
 //    return $demo_person_abilities;
 //}
 //
-//// array with 10 random item difficulties
+// array with 10 random item difficulties
 //function get_demo_item_difficulies(){
 //    return [0.64, 0.95, 0.28, 0.88, 0.51, 0.61, 0.8, 0.29, 0.46, 0.41];
 //}
 
-//array with 10 random item discriminations
-
-
-// ---------------- Advanced Structures -----------------
-
-
-
+// Array with 10 random item discriminations.
+// Advanced Structures.
 
 $demo_person_parameters = Array(
     'person_id' => 'person_ability'
@@ -48,7 +65,6 @@ $demo_person_response_const = Array( // response from a single person
     '9' => 1,
     '10' => 1
 );
-
 
 $demo_full_response = Array(
     '1' => Array( // item_id

@@ -15,7 +15,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- *  Code for validation of developing process;
+ *  Code for validation of developing process.
  *
  * @package local_catquiz
  * @author Daniel Pasterk

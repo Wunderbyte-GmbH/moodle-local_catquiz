@@ -15,7 +15,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- *  Code for validation of developing process;
+ *  Code for validation of developing process.
  *
  * @package local_catquiz
  * @author Daniel Pasterk
@@ -45,7 +45,6 @@ $demo_person_abilities = [-1.46, 2.17, 0.06, -0.13, 0.82, -0.83, -0.85, 3.14, -0
 $demo_item_difficulties = [1.53, 2.74, -0.74, 0.89, 1.23, 0.68, -0.13, 0.33, 0.21, -1.31] ;
 $demo_item_discriminations = [0.5, 1.3, 3.8, -2, -0.25, 1.4, 3.0, -2.0, 0.4, -0.5];
 
-
 $demo_persons = local_catquiz\synthcat::generate_persons($demo_person_abilities);
 $demo_items = local_catquiz\synthcat::generate_test_items_multi([$demo_item_discriminations, $demo_item_difficulties]);
 
@@ -54,94 +53,46 @@ $raschbb = new \catmodel_raschbirnbaumb\raschbirnbaumb($response,"RaschBB_2PL");
 
 $demo_response = local_catquiz\synthcat::generate_response_multi($demo_persons,$demo_items,$raschbb);
 
-
-
-//generate_test_items
-
+// Generate test items.
 
 // generate items and persons based on constant parameter
 
-
 //$demo_items = local_catquiz\synthcat::generate_test_items($demo_item_difficulties);
 
-
-
-
-//
-//
 //$something = \local_catquiz\mytestclass::testtest();
-//
-//$response = new model_responses();
-//
-////$myraschbirnbaum = \catmodel_raschbirnbaumb\raschbirnbaumb::get_stuff();
-//$myraschbirnbaum = new \catmodel_raschbirnbaumb\raschbirnbaumb($response,"RaschBB_2PL");
 
+//$response = new model_responses();
+
+//$myraschbirnbaum = \catmodel_raschbirnbaumb\raschbirnbaumb::get_stuff();
+//$myraschbirnbaum = new \catmodel_raschbirnbaumb\raschbirnbaumb($response,"RaschBB_2PL");
 
 //$testfn = $myraschbirnbaum->get_log_jacobian(0.3);
 
-
-
-
-//
-//
 //$a = \local_catquiz\catcalc::estimate_item_params_new();
-//
 
-
-
-//
 //$stuff = $myraschbirnbaum->get_stuff();
-//
 
+// Estimate parameter.
 
-
-
-// estimate parameter
-
-
-
-//
-////
-////
 $responses = model_responses::create_from_array($demo_response);
 
 $raschbb = new \catmodel_raschbirnbaumb\raschbirnbaumb($responses,"RaschBB_2PL");
 
+// Brauchen datenstrukturen für den Algo:
 
-
-
-// brauchen datenstrukturen für den Algo:
-
-
-// responses
+// Responses.
 
 //$strategie = new model_strategy($responses, ['max_iterations' => 4, 'model_override' => 'raschbirnbauma']);
 
 $initial_person_abilities = $responses->get_initial_person_abilities();
 
-
 $item_response = $responses->get_item_response($initial_person_abilities);
-
-
-
 
 $synth_item_resonse = \local_catquiz\synthcat::get_item_response2(80,120,0.2);
 
-
 $x = \local_catquiz\catcalc::estimate_item_params_new($synth_item_resonse,$raschbb);
 
-
-
 //$my_item_response =
-
-
-
-
-
-
-
-
-
 
 //$max_iterations = 1;
 //$strategy = new model_strategy($responses, ['max_iterations' => 4, 'model_override' => 'raschbirnbauma']);
