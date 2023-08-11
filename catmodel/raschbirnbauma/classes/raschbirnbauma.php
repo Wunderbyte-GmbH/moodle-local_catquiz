@@ -110,7 +110,6 @@ class raschbirnbauma extends model_raschmodel {
             return 1 / (1 + exp($a - $pp));
         }
     }
-
     // Calculate the LOG Likelihood and its derivatives.
 
     /**
@@ -233,7 +232,7 @@ class raschbirnbauma extends model_raschmodel {
         return $derivative;
     }
     
- /**
+    /**
      * Calculates the 2nd derivative of Least Mean Squres with respect to the item parameters
      *
      * @param array of float $pp - person ability parameter
@@ -254,6 +253,8 @@ class raschbirnbauma extends model_raschmodel {
         return $derivative;
     }
 
+    // Calculate Fisher-Information.
+    
     /**
      * Calculates the Fisher Information for a given person ability parameter.
      *
@@ -265,6 +266,8 @@ class raschbirnbauma extends model_raschmodel {
         return (self::likelihood($pp, $ip, 0) * self::likelihood($pp, $ip, 1.0));
     }
 
+    // Implements handling of the Trusted Regions (TR) approach.
+    
     /**
      * Implements a Filter Function for trusted regions in the item parameter estimation
      *
