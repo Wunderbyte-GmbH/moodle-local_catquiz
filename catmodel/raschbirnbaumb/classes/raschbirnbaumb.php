@@ -284,6 +284,8 @@ class raschbirnbaumb extends model_raschmodel
         return ($ip['discrimination'] ** 2 * self::likelihood($pp,$ip,0) * self::likelihood($pp,$ip,1.0));
     }
 
+    // Implements handling of the Trusted Regions (TR) approach.
+    
     /**
      * Implements a Filter Function for trusted regions in the item parameter estimation
      *
