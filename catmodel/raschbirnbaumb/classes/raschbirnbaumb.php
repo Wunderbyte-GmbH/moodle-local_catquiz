@@ -275,8 +275,9 @@ class raschbirnbaumb extends model_raschmodel
             $derivative[0][1]  += $n[$key] * (2 * exp($b * ($a - $ability)) * ((1 + $a * $b - $b * $ability) * ($k[$key] -1) - exp(2 * $b * ($a - $ability)) * ($b * ($a - $ability) - 1) * $k[$key] + exp($b * ($a - $ability)) * (2 * $a * $b - 2 * $b * $ability + 2 * $k[$key] - 1))) / (1 + exp($b * ($a - $ability))) ** 4; // Calculate d/da d/db.    
             $derivative[1][1]  += $n[$key] * (2 * exp($b * ($a + $ability)) * ($a - $ability) ** 2 * (2 * exp($b * ($a + $ability)) + (-exp(2 * $a * $b) + exp(2 * $b * $ability)) * $k[$key] - exp(2 * $b * $ability))) / (exp($a * $b) + exp($b * $ability)) ** 4; // Calculate d²/db².
         }
-        $derivative[1][0] = $derivative[0][1]; // Note: Partial derivations are exchangeible, cf. Theorem of Schwarz.
-        
+        // Note: Partial derivations are exchangeible, cf. Theorem of Schwarz.
+        $derivative[1][0] = $derivative[0][1];
+      
         return $derivative;
     }
 
