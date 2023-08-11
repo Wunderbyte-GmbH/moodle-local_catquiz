@@ -86,7 +86,7 @@ class raschbirnbaumb extends model_raschmodel {
      *
      * @return array of string
      */
-    public static function get_parameter_names(): array {
+    public static function get_parameter_names():array{
         return ['difficulty', 'discrimination', ];
     }
 
@@ -100,7 +100,7 @@ class raschbirnbaumb extends model_raschmodel {
      * @param float $k - answer category (0 or 1.0)
      * @return float
      */
-    public static function likelihood($pp, array $ip, float $k) {
+    public static function likelihood($pp, array $ip, float $k): float {
         $a = $ip['difficulty'];
         $b = $ip['discrimination'];
         if ($k < 1.0) {
@@ -118,9 +118,9 @@ class raschbirnbaumb extends model_raschmodel {
      * @param float $pp - person ability parameter
      * @param array $ip - item parameters ('difficulty')
      * @param float $k - answer category (0 or 1.0)
-     * @return int|float
+     * @return float
      */
-    public static function log_likelihood($pp, array $ip, float $k) {
+    public static function log_likelihood($pp, array $ip, float $k): float {
         return log(self::likelihood($pp, $ip, $k));
     }
 
@@ -132,7 +132,7 @@ class raschbirnbaumb extends model_raschmodel {
      * @param float $k - answer category (0 or 1.0)
      * @return float
      */
-    public static function log_likelihood_p($pp, array $ip, float $k): float {
+    public static function log_likelihood_p($pp, array $ip, float $k):float{
         $a = $ip['difficulty'];
         $b = $ip['discrimination'];
         if ($k < 1.0) {
@@ -150,7 +150,7 @@ class raschbirnbaumb extends model_raschmodel {
      * @param float $k - answer category (0 or 1.0)
      * @return float
      */
-    public static function log_likelihood_p_p($pp, array $ip, float $k): float {
+    public static function log_likelihood_p_p($pp, array $ip, float $k):float{
         $a = $ip['difficulty'];
         $b = $ip['discrimination'];
         return -(($b ** 2 * exp($b * ($a + $pp))) / ((exp($a * $b) + exp($b * $pp)) ** 2));
@@ -217,7 +217,7 @@ class raschbirnbaumb extends model_raschmodel {
      * @param array $n - number of observations
      * @return float - weighted residuals
      */
-    public static function least_mean_squares(array $pp, array $ip, array $k, array $n) {
+    public static function least_mean_squares(array $pp, array $ip, array $k, array $n): float {
         $lmsresiduals = 0;
         $numbertotal = 0;
 
@@ -241,7 +241,7 @@ class raschbirnbaumb extends model_raschmodel {
      * @param array $n - number of observations
      * @return array - 1st derivative
      */
-    public static function least_mean_squares_1st_derivative_ip(array $pp, array $ip, array $k, array $n) {
+    public static function least_mean_squares_1st_derivative_ip(array $pp, array $ip, array $k, array $n): float {
         $derivative = [0, 0];
         $a = $ip['difficulty']; $b = $ip['discrimination'];
 
@@ -275,9 +275,10 @@ class raschbirnbaumb extends model_raschmodel {
 
             $derivative[0][0]  += $n[$key] * (2 * $b ** 2 * exp($b ($a + $ability)) * (-exp(2 * $b * $ability) + 2 * exp($b ($a + $ability)) + (-exp(2 * $a * $b) + exp(2 * $b * $ability)) * $k[$key])) / (exp($a * $b) + exp($b * $ability)) ** 4; // Calculate d²2/da².
             $derivative[0][1]  += $n[$key] * (2 * exp($b * ($a - $ability)) * ((1 + $a * $b - $b * $ability) * ($k[$key] - 1) - exp(2 * $b * ($a - $ability)) * ($b * ($a - $ability) - 1) * $k[$key] + exp($b * ($a - $ability)) * (2 * $a * $b - 2 * $b * $ability + 2 * $k[$key] - 1))) / (1 + exp($b * ($a - $ability))) ** 4; // Calculate d/da d/db.
-            $derivative[1][0]  += $n[$key] * (2 * exp($b * ($a - $ability)) * ((1 + $a * $b - $b * $ability) * ($k[$key] - 1) - exp(2 * $b * ($a - $ability)) * ($b * ($a - $ability) - 1) * $k[$key] + exp($b * ($a - $ability)) * (2 * $a * $b - 2 * $b * $ability + 2 * $k[$key] - 1))) / (1 + exp($b * ($a - $ability))) ** 4; // Calculate d/da d/db.
             $derivative[1][1]  += $n[$key] * (2 * exp($b * ($a + $ability)) * ($a - $ability) ** 2 * (2 * exp($b * ($a + $ability)) + (-exp(2 * $a * $b) + exp(2 * $b * $ability)) * $k[$key] - exp(2 * $b * $ability))) / (exp($a * $b) + exp($b * $ability)) ** 4; // Calculate d²/db².
         }
+        $derivative[1][0] = $derivative[0][1]; // Note: Partial derivations are exchangeible, cf. Theorem of Schwarz.
+        
         return $derivative;
     }
 
@@ -290,7 +291,7 @@ class raschbirnbaumb extends model_raschmodel {
      * @param array $ip
      * @return float
      */
-    public static function fisher_info(float $pp, array $ip) {
+    public static function fisher_info(float $pp, array $ip): float {
         return ($ip['discrimination'] ** 2 * self::likelihood($pp, $ip, 0) * self::likelihood($pp, $ip, 1.0));
     }
 
@@ -302,7 +303,7 @@ class raschbirnbaumb extends model_raschmodel {
      * @return array
      *
      */
-    public static function restrict_to_trusted_region(array $parameters): array {
+    public static function restrict_to_trusted_region(array $parameters):array{
         // Set values for difficulty parameter.
         $a = $parameters['difficulty'];
 
@@ -355,7 +356,7 @@ class raschbirnbaumb extends model_raschmodel {
      *
      * @return array
      */
-    public static function get_log_tr_jacobian(): array {
+    public static function get_log_tr_jacobian():array{
         // Set values for difficulty parameter.
         $am = 0; // Mean of difficulty.
         $as = 2; // Standard derivation of difficulty.
@@ -377,7 +378,7 @@ class raschbirnbaumb extends model_raschmodel {
      *
      * @return array
      */
-    public static function get_log_tr_hessian(): array {
+    public static function get_log_tr_hessian():array{
         // Set values for difficulty parameter.
         $am = 0; // Mean of difficulty.
         $as = 2; // Standard derivation of difficulty.
