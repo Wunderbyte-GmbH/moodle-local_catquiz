@@ -39,12 +39,21 @@ class raschbirnbauma extends model_raschmodel
     // Definitions and Dimensions.
 
     /**
+     * Defines names if item parameter list
+     *
+     * @return array of string
+     */
+    public static function get_parameter_names():array{
+        return ['difficulty', ];
+    }
+    
+    /**
      * Definition of the number of model parameters
      *
      * @return int
      */
     public static function get_model_dim():int{
-        return 2;  // 2 parameters: person ability, difficulty
+        return count(self::get_parameter_names());
     }
 
     /**
@@ -75,15 +84,6 @@ class raschbirnbauma extends model_raschmodel
      */
     public function calculate_params($item_response):array{
         return catcalc::estimate_item_params($item_response, $this);
-    }
-
-    /**
-     * Defines names if item parameter list
-     *
-     * @return array of string
-     */
-    public static function get_parameter_names():array{
-        return ['difficulty', ];
     }
     
     // Calculate the Likelihood.
