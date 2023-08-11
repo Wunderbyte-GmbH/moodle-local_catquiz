@@ -98,27 +98,26 @@ class info {
         $teststrategies = self::return_available_strategies();
 
         $teststrategiesoptions = [];
-        $strategies_without_pilotquestions = [];
+        $strategieswithoutpilotquestions = [];
         foreach($teststrategies as $ts) {
             $teststrategiesoptions[$ts->id] = $ts->get_description();
             if ($ts->get_description() === get_string('teststrategy_fastest', 'local_catquiz')) {
-                $strategies_without_pilotquestions[] = $ts->id;
+                $strategieswithoutpilotquestions[] = $ts->id;
             }
         }
 
         // Choose a test strategy for this instance.
-        $elements[] =  $mform->addElement('select', 'catquiz_selectteststrategy',
+        $elements[] = $mform->addElement('select', 'catquiz_selectteststrategy',
             get_string('catquiz_selectteststrategy', 'local_catquiz'),
             $teststrategiesoptions
         );
 
-        
         $elements[] = $mform->addElement('advcheckbox', 'catquiz_includepilotquestions', get_string('includepilotquestions', 'local_catquiz'));
-        $mform->hideIf('catquiz_includepilotquestions', 'catquiz_selectteststrategy', 'eq', $strategies_without_pilotquestions);
+        $mform->hideIf('catquiz_includepilotquestions', 'catquiz_selectteststrategy', 'eq', $strategieswithoutpilotquestions);
         // Add ratio of pilot questions
         $elements[] = $mform->addElement('text', 'catquiz_pilotratio', get_string('pilotratio', 'local_catquiz'));
         $mform->hideIf('catquiz_pilotratio', 'catquiz_includepilotquestions', 'neq', 1);
-        $mform->hideIf('catquiz_pilotratio', 'catquiz_selectteststrategy', 'eq', $strategies_without_pilotquestions);
+        $mform->hideIf('catquiz_pilotratio', 'catquiz_selectteststrategy', 'eq', $strategieswithoutpilotquestions);
         $mform->setType('catquiz_pilotratio', PARAM_FLOAT);
         $mform->addHelpButton('catquiz_pilotratio', 'pilotratio', 'local_catquiz');
 
@@ -158,11 +157,11 @@ class info {
      * @return array<preselect_task>
      */
     public static function get_score_modifiers(): array {
-        $score_modifiers = core_component::get_component_classes_in_namespace(
+        $scoremodifiers = core_component::get_component_classes_in_namespace(
             "local_catquiz",
             'teststrategy\preselect_task'
         );
-        foreach (array_keys($score_modifiers) as $classname) {
+        foreach (array_keys($scoremodifiers) as $classname) {
             $instances[$classname] = new $classname();
         }
         return $instances;

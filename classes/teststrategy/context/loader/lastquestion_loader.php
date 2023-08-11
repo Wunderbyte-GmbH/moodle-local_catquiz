@@ -16,7 +16,7 @@ class lastquestion_loader implements contextloaderinterface {
 
     public function load(array $context): array {
         $cache = cache::make('local_catquiz', 'adaptivequizattempt');
-        $lastquestion = $cache->get('lastquestion') ?: NULL;
+        $lastquestion = $cache->get('lastquestion') ?: null;
         $context['lastquestion'] = $lastquestion;
         return $context;
     }

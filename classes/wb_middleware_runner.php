@@ -16,7 +16,7 @@
 
 /**
  * Class wb_middleware_runner.
- * 
+ *
  * @package local_catquiz
  * @copyright 2023 Wunderbyte GmbH
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
@@ -40,9 +40,9 @@ class wb_middleware_runner {
      * @param array $middlewares
      * @param array $context
      * @param mixed|null $action
-     * 
+     *
      * @return mixed
-     * 
+     *
      */
     public static function run(array $middlewares, array $context, $action = null) {
 

@@ -135,7 +135,7 @@ class catquiz {
         array $wherearray = [],
         array $filterarray = [],
         int $userid = 0,
-        ?string $orderby = NULL
+        ?string $orderby = null
     ) {
 
         global $DB;
@@ -275,10 +275,10 @@ class catquiz {
     ) {
         global $DB;
         $contextfilter = $contextid === 0
-            ? $DB->sql_like('ccc1.json',':default')
+            ? $DB->sql_like('ccc1.json', ':default')
             : "ccc1.id = :contextid";
 
-        list(,$context_from, $context_where, $context_params) = self::get_sql_for_stat_base_request();
+        list(, $contextfrom, $contextwhere, $contextparams) = self::get_sql_for_stat_base_request();
         $params = [];
         $select = '
             DISTINCT
@@ -301,7 +301,7 @@ class catquiz {
                 LEFT JOIN {local_catquiz_items} lci ON lci.componentid=q.id AND lci.componentname='question'
                 LEFT JOIN (
                     SELECT ccc1.id AS contextid, qa.questionid, COUNT(*) AS contextattempts
-                    FROM $context_from
+                    FROM $contextfrom
                     WHERE $contextfilter
                     GROUP BY ccc1.id, qa.questionid
                 ) s2 ON q.id = s2.questionid
@@ -549,12 +549,12 @@ class catquiz {
 
         return [$select, $from, $where, $params];
     }
-     private static function set_optional_param($params, $name, $originalvalue, $sqlstringval) {
+    private static function set_optional_param($params, $name, $originalvalue, $sqlstringval) {
         if (!empty($originalvalue)) {
             $params[$name] = $sqlstringval;
         }
         return $params;
-     }
+    }
 
     /**
      * Return sql to render all or a subset of testenvironments
@@ -600,8 +600,7 @@ class catquiz {
             JOIN {role} r ON r.id = ra.roleid
             WHERE r.shortname IN ('teacher', 'editingteacher')
             GROUP BY c.id
-            ) s2 ON s2.courseid = ct.courseid"
-        ;
+            ) s2 ON s2.courseid = ct.courseid";
 
         return [$select, $from, $where, $filter, $params];
     }
@@ -815,17 +814,17 @@ class catquiz {
      * @return int
      */
 
-     public static function get_default_context_id() {
+    public static function get_default_context_id() {
         global $DB;
         $contextid = $DB->get_field_sql(
-            "SELECT id FROM {local_catquiz_catcontext} WHERE " . $DB->sql_like(
-                'json',
-                ":default"
-            ),
-            [
-                'default' => '%"default":true%',
-            ],
-            MUST_EXIST
+           "SELECT id FROM {local_catquiz_catcontext} WHERE " . $DB->sql_like(
+               'json',
+               ":default"
+           ),
+           [
+               'default' => '%"default":true%',
+           ],
+           MUST_EXIST
         );
 
         return intval($contextid);
@@ -847,7 +846,7 @@ class catquiz {
     ) {
         global $DB;
 
-        $existing_record = $DB->get_record(
+        $existingrecord = $DB->get_record(
             'local_catquiz_personparams',
             [
                 'userid' => $userid,
@@ -864,7 +863,7 @@ class catquiz {
             'timemodified' => time(),
         ];
 
-        if (!$existing_record) {
+        if (!$existingrecord) {
             $DB->insert_record(
                 'local_catquiz_personparams',
                 $record
@@ -872,7 +871,7 @@ class catquiz {
             return;
         }
 
-        $record->id = $existing_record->id;
+        $record->id = $existingrecord->id;
         $DB->update_record('local_catquiz_personparams', $record);
     }
 
@@ -914,7 +913,7 @@ class catquiz {
             'userid' => $userid,
             'contextid' => $contextid,
             'catscaleid' => $catscaleid,
-        ]);
+            ]);
     }
 
     public static function get_last_user_attemptid(int $userid) {

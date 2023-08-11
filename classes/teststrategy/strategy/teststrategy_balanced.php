@@ -56,9 +56,9 @@ class teststrategy_balanced extends strategy {
             get_string('pilot_questions', 'local_catquiz'),
             $cache->get('num_pilot_questions')
         );
-        if (!$parent_feedback = parent::attempt_feedback()) {
+        if (!$parentfeedback = parent::attempt_feedback()) {
             return [$feedback];
         }
-        return [...$parent_feedback, $feedback];
+        return [...$parentfeedback, $feedback];
     }
 }

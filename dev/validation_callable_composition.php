@@ -36,33 +36,35 @@ require_once(__DIR__ . '../../../../config.php');
 $PAGE->set_url(new moodle_url('/local/catquiz/workspace.php'));
 $PAGE->set_context(context_system::instance());
 $PAGE->set_pagelayout('frontpage');
-$url_front = new moodle_url('/workspace.php');
-$url_plugin = new moodle_url('workspace.php');
+$urlfront = new moodle_url('/workspace.php');
+$urlplugin = new moodle_url('workspace.php');
 
 echo $OUTPUT->header();
 
 print "hehe";
 
 $sum = 0;
-$mycallable = function($x) {return 0;};
+$mycallable = function($x) {return 0;
+};
 
-$my_x = 3;
+$myx = 3;
 
 $history = [];
 
 $callables = [];
-for ($i=1; $i<=100;$i++){
+for ($i = 1; $i <= 100; $i++){
 
-    $rnd = rand(0,10);
-    array_push($history,$rnd);
+    $rnd = rand(0, 10);
+    array_push($history, $rnd);
 
-    $funpart = function ($x) use ($rnd) {return $rnd*$x;};
-    //$funpart = function ($x) use ($rnd) {return rand(0,100)*$x;};
+    $funpart = function ($x) use ($rnd) {return $rnd * $x;
+    };
+    // $funpart = function ($x) use ($rnd) {return rand(0,100)*$x;};
 
-    $sum = $sum + $funpart($my_x);
+    $sum = $sum + $funpart($myx);
 
     $mycallable = fn($x) => $mycallable($x) + $funpart($x);
-    array_push($callables,$mycallable);
+    array_push($callables, $mycallable);
 }
 
 echo "finished";

@@ -78,9 +78,9 @@ class update_parameters extends external_api {
         try {
             $cm->trigger_parameter_calculation($contextid, $catscaleid);
         } catch (Exception $e) {
-            return ['success' => false,];
+            return ['success' => false, ];
         }
-        return ['success' => true,];
+        return ['success' => true, ];
     }
 
     /**

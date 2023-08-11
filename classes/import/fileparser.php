@@ -209,9 +209,9 @@ class fileparser {
     }
 
      /**
-     * Executes callback
-     *
-     */
+      * Executes callback
+      *
+      */
     private function execute_callback(array $data) {
 
         if (!$callback = $this->settings->callback) {
@@ -355,13 +355,13 @@ class fileparser {
      * @return bool true on validation false on error
      */
     protected function validate_datefields($value) {
-        //Check if we have a readable string in correct format.
+        // Check if we have a readable string in correct format.
         $readablestring = false;
         $dateformat = !empty($this->settings->dateformat) ? $this->settings->dateformat : "j.n.Y H:i:s";
         if (date_create_from_format($dateformat, $value) &&
                 strtotime($value)) {
                     $readablestring = true;
-            }
+        }
         // Check accepts all ints.
         $date = DateTime::createFromFormat('U', $value);
 

@@ -67,7 +67,7 @@ class dataapi {
      * Returns all catcontexts
      *
      * @return array
-     * 
+     *
      */
     public static function get_all_catcontexts(): array {
         global $DB;
@@ -140,9 +140,9 @@ class dataapi {
      * Delete a catscale and invalidate cache.
      *
      * @param int $catscaleid
-     * 
+     *
      * @return array
-     * 
+     *
      */
     public static function delete_catscale(int $catscaleid):array {
         global $DB;
@@ -220,7 +220,7 @@ class dataapi {
      * @param int $id catscale id
      * @return ?object
      */
-    public static function get_catscale_by_id(int $id): ?object{
+    public static function get_catscale_by_id(int $id): ?object {
         global $DB;
         if ($DB->record_exists('local_catquiz_catscales', ['id' => $id])) {
             return $DB->get_record('local_catquiz_catscales', ['id' => $id], '*', MUST_EXIST);

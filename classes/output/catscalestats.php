@@ -50,22 +50,22 @@ class catscalestats {
     /**
      * @var integer
      */
-    private int $num_assigned_catscales = 0;
+    private int $numassignedcatscales = 0;
 
     /**
      * @var integer
      */
-    private int $num_assigned_tests = 0;
+    private int $numassignedtests = 0;
 
     /**
      * @var integer
      */
-    private int $num_assigned_questions = 0;
+    private int $numassignedquestions = 0;
 
     /**
      * @var string
      */
-    private string $last_calculated = "";
+    private string $lastcalculated = "";
 
     /**
      *

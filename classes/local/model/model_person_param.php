@@ -15,20 +15,20 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
-* Entities Class to display list of entity records.
-*
-* @package local_catquiz
-* @copyright 2023 Wunderbyte GmbH <info@wunderbyte.at>
-* @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
-*/
+ * Entities Class to display list of entity records.
+ *
+ * @package local_catquiz
+ * @copyright 2023 Wunderbyte GmbH <info@wunderbyte.at>
+ * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
 
 namespace local_catquiz\local\model;
 
 /**
  * This class holds a single item param object.
- * 
+ *
  * This is one of the return values from a model param estimation.
- * 
+ *
  * @package local_catquiz
  * @copyright 2023 Wunderbyte GmbH <info@wunderbyte.at>
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
@@ -52,7 +52,7 @@ class model_person_param {
     const MODEL_POS_INF = 1000;
     /**
      * The ID of the user
-     * 
+     *
      * @var int
      */
     private int $id;
@@ -66,7 +66,7 @@ class model_person_param {
      * Instantiate parameter.
      *
      * @param int $id
-     * 
+     *
      */
     public function __construct(int $id) {
         $this->id = $id;
@@ -74,7 +74,7 @@ class model_person_param {
 
     /**
      * Return ID.
-     * 
+     *
      * @return int
      */
     public function get_id(): int {
@@ -85,19 +85,19 @@ class model_person_param {
      * Return ability.
      *
      * @return float
-     * 
+     *
      */
-    public function get_ability(): float { 
-        return $this->ability; 
+    public function get_ability(): float {
+        return $this->ability;
     }
 
     /**
      * Set ability.
      *
      * @param float $ability
-     * 
+     *
      * @return self
-     * 
+     *
      */
     public function set_ability(float $ability): self {
         $this->ability = $ability;

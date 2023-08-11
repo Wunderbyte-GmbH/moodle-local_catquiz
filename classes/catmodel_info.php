@@ -15,13 +15,13 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
-* Class catmodel_info.
-*
-* @package local_catquiz
-* @author Georg Maißer
-* @copyright 2023 Wunderbyte GmbH <info@wunderbyte.at>
-* @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
-*/
+ * Class catmodel_info.
+ *
+ * @package local_catquiz
+ * @author Georg Maißer
+ * @copyright 2023 Wunderbyte GmbH <info@wunderbyte.at>
+ * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
 
 namespace local_catquiz;
 
@@ -33,22 +33,22 @@ use moodle_exception;
 use moodle_url;
 
 /**
-* Entities Class to display list of entity records.
-*
-* @package local_catquiz
-* @author Georg Maißer
-* @copyright 2023 Wunderbyte GmbH <info@wunderbyte.at>
-* @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
-*/
+ * Entities Class to display list of entity records.
+ *
+ * @package local_catquiz
+ * @author Georg Maißer
+ * @copyright 2023 Wunderbyte GmbH <info@wunderbyte.at>
+ * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
 class catmodel_info {
 
     /**
      * Returns the saved item parameters for the given context.
-     * 
+     *
      * The first element constains an associative array of model_item_param_lists,
      * indexed by the respective model name. The second element is a
      * model_person_param_list.
-     * 
+     *
      * @param int $contextid
      * @param int $catscaleid
      * @param bool $calculate Trigger a re-calculation of the item parameters
@@ -71,14 +71,14 @@ class catmodel_info {
      *
      * @param mixed $contextid
      * @param mixed $catscaleid
-     * 
+     *
      * @return void
-     * 
+     *
      */
     public function trigger_parameter_calculation($contextid, $catscaleid) {
-        $adhoc_recalculate_cat_model_params = new adhoc_recalculate_cat_model_params();
-        $adhoc_recalculate_cat_model_params->set_custom_data([$contextid, $catscaleid]);
-        manager::queue_adhoc_task($adhoc_recalculate_cat_model_params);
+        $adhocrecalculatecatmodelparams = new adhoc_recalculate_cat_model_params();
+        $adhocrecalculatecatmodelparams->set_custom_data([$contextid, $catscaleid]);
+        manager::queue_adhoc_task($adhocrecalculatecatmodelparams);
     }
 
     /**
@@ -86,18 +86,18 @@ class catmodel_info {
      *
      * @param mixed $contextid
      * @param mixed $catscaleid
-     * 
+     *
      * @return void
-     * 
+     *
      */
     public function update_params($contextid, $catscaleid) {
         $context = catcontext::load_from_db($contextid);
         $strategy = $context->get_strategy($catscaleid);
-        list($item_difficulties, $person_abilities) =  $strategy->run_estimation();
-        foreach ($item_difficulties as $item_param_list) {
-            $item_param_list->save_to_db($contextid);
+        list($itemdifficulties, $personabilities) = $strategy->run_estimation();
+        foreach ($itemdifficulties as $itemparamlist) {
+            $itemparamlist->save_to_db($contextid);
         }
-        $person_abilities->save_to_db($contextid, $catscaleid);
+        $personabilities->save_to_db($contextid, $catscaleid);
         $context->save_or_update((object)['timecalculated' => time()]);
     }
 }

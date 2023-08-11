@@ -52,8 +52,8 @@ use renderable;
  * @author     Georg Maißer
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class catscaledashboard implements renderable, templatable
-{
+class catscaledashboard implements renderable, templatable {
+
 
     /** @var integer of catscaleid */
     public int $catscaleid = 0;
@@ -78,8 +78,7 @@ class catscaledashboard implements renderable, templatable
      * @param boolean $allowedit
      * @return array
      */
-    public function __construct(int $catscaleid, int $catcontextid = 0, bool $triggercalculation = false)
-    {
+    public function __construct(int $catscaleid, int $catcontextid = 0, bool $triggercalculation = false) {
         global $DB;
 
         $this->catscaleid = $catscaleid;
@@ -91,16 +90,14 @@ class catscaledashboard implements renderable, templatable
         );
     }
 
-    private function render_title()
-    {
+    private function render_title() {
         global $OUTPUT;
         global $PAGE;
 
         $PAGE->set_heading($this->catscale->name);
         echo $OUTPUT->header();
     }
-    private function render_addtestitems_table(int $catscaleid)
-    {
+    private function render_addtestitems_table(int $catscaleid) {
         $table = new testitems_table('catscaleid_' . $catscaleid . ' addtestitems', $catscaleid, $this->catcontextid);
 
         list($select, $from, $where, $filter, $params) = catquiz::return_sql_for_addcatscalequestions($catscaleid, $this->catcontextid);
@@ -265,14 +262,13 @@ class catscaledashboard implements renderable, templatable
     /**
      * @param array<model_item_param_list> $item_lists
      */
-    private function render_itemdifficulties(array $item_lists)
-    {
+    private function render_itemdifficulties(array $itemlists) {
 
         global $OUTPUT;
 
         $charts = [];
-        foreach ($item_lists as $model_name => $item_list) {
-            $data = $item_list->get_values(true);
+        foreach ($itemlists as $modelname => $itemlist) {
+            $data = $itemlist->get_values(true);
             // Skip empty charts
             if (empty($data)) {
                 continue;
@@ -283,7 +279,7 @@ class catscaledashboard implements renderable, templatable
             $chart->set_smooth(true); // Calling set_smooth() passing true as parameter, will display smooth lines.
             $chart->add_series($series);
             $chart->set_labels(array_keys($data));
-            $charts[] = ['modelname' => $model_name, 'chart' => html_writer::tag('div', $OUTPUT->render($chart), ['dir' => 'ltr'])];
+            $charts[] = ['modelname' => $modelname, 'chart' => html_writer::tag('div', $OUTPUT->render($chart), ['dir' => 'ltr'])];
         }
 
         return $charts;
@@ -292,11 +288,10 @@ class catscaledashboard implements renderable, templatable
     /**
      * @param model_person_param_list $person_params
      */
-    private function render_personabilities(model_person_param_list $person_params)
-    {
+    private function render_personabilities(model_person_param_list $personparams) {
         global $OUTPUT;
 
-        $data = $person_params->get_values(true);
+        $data = $personparams->get_values(true);
         $chart = new \core\chart_line();
         $series = new \core\chart_series('Series 1 (Line)', array_values($data));
         $chart->set_smooth(true); // Calling set_smooth() passing true as parameter, will display smooth lines.
@@ -305,8 +300,7 @@ class catscaledashboard implements renderable, templatable
         return html_writer::tag('div', $OUTPUT->render($chart), ['dir' => 'ltr']);
     }
 
-    private function render_contextselector()
-    {
+    private function render_contextselector() {
         $ajaxformdata = empty($this->catcontextid) ? [] : ['contextid' => $this->catcontextid];
         $form = new \local_catquiz\form\contextselector(null, null, 'post', '', [], true, $ajaxformdata);
         // Set the form data with the same method that is called when loaded from JS. It should correctly set the data for the supplied arguments.
@@ -323,8 +317,7 @@ class catscaledashboard implements renderable, templatable
         return html_writer::div($inputform->render(), '', ['id' => 'csv_import_form']);
     }
 
-    private function render_student_stats_table(int $catscaleid, int $catcontextid)
-    {
+    private function render_student_stats_table(int $catscaleid, int $catcontextid) {
         $table = new student_stats_table('catscaleid_' . $this->catscaleid . ' students', $this->catscaleid, $this->catcontextid);
 
         list($select, $from, $where, $filter, $params) = catquiz::return_sql_for_student_stats($catcontextid);
@@ -356,18 +349,16 @@ class catscaledashboard implements renderable, templatable
 
         return $table->outhtml(10, true);
     }
-    private function render_modelbutton($contextid)
-    {
+    private function render_modelbutton($contextid) {
         return sprintf('<button class="btn btn-primary" type="button" data-contextid="%s" id="model_button">Calculate</button>', $contextid);
     }
 
-    public function export_for_template(\renderer_base $output): array
-    {
+    public function export_for_template(\renderer_base $output): array {
 
         $url = new moodle_url('/local/catquiz/manage_catscales.php');
         $testenvironmentdashboard = new testenvironmentdashboard();
         $cm = new catmodel_info;
-        list($item_difficulties, $person_abilities) = $cm->get_context_parameters(
+        list($itemdifficulties, $personabilities) = $cm->get_context_parameters(
             $this->catcontextid,
             $this->catscaleid,
             $this->triggercalculation
@@ -378,8 +369,8 @@ class catscaledashboard implements renderable, templatable
             'returnurl' => $url->out(),
             'testitemstable' => $this->render_testitems_table($this->catscaleid),
             'addtestitemstable' => $this->render_addtestitems_table($this->catscaleid),
-            'itemdifficulties' => $this->render_itemdifficulties($item_difficulties),
-            'personabilities' => $this->render_personabilities($person_abilities),
+            'itemdifficulties' => $this->render_itemdifficulties($itemdifficulties),
+            'personabilities' => $this->render_personabilities($personabilities),
             'contextselector' => $this->render_contextselector(),
             'filepicker' => $this->render_filepicker(),
             'table' => $testenvironmentdashboard->testenvironmenttable($this->catscaleid),

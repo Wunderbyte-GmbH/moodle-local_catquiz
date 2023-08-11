@@ -79,11 +79,11 @@ class testitems_table extends wunderbyte_table {
 
         global $OUTPUT;
 
-        //try {
-        //    $question = question_bank::load_question($values->id);
-        //} catch (Exception $e) {
-        //    return $values->questiontext;
-        //}
+        // try {
+        // $question = question_bank::load_question($values->id);
+        // } catch (Exception $e) {
+        // return $values->questiontext;
+        // }
 
         $context = context_system::instance();
 
@@ -149,7 +149,6 @@ class testitems_table extends wunderbyte_table {
             ]
         ];
 
-
         // This transforms the array to make it easier to use in mustache template.
         table::transform_actionbuttons_array($data['showactionbuttons']);
 
@@ -194,7 +193,7 @@ class testitems_table extends wunderbyte_table {
             case 5:
 
                 break;
-    }
+        }
 
         return get_string('pluginname', 'catmodel_' . $values->model);
     }

@@ -64,7 +64,7 @@ class testitemdashboard implements renderable, templatable {
 
     public int $catscaleid;
 
-    private catmodel_info $catmodel_info;
+    private catmodel_info $catmodelinfo;
 
     /**
      * Either returns one tree or treearray for every parentnode
@@ -109,7 +109,7 @@ class testitemdashboard implements renderable, templatable {
 
             $difficulty = $item->get_difficulty();
             $likelihoods = [];
-            for ($ability=-5; $ability<=5 ; $ability += 0.5) {
+            for ($ability = -5; $ability <= 5; $ability += 0.5) {
                 $likelihoods[] = model_raschmodel::likelihood_1pl($ability, $difficulty);
             }
 
@@ -213,8 +213,8 @@ class testitemdashboard implements renderable, templatable {
     private function get_itemstatus() {
         global $DB;
         list ($sql, $params) = catquiz::get_sql_for_max_status_for_item($this->testitemid, $this->contextid);
-        $max_status = intval($DB->get_field_sql($sql, $params));
-        switch ($max_status) {
+        $maxstatus = intval($DB->get_field_sql($sql, $params));
+        switch ($maxstatus) {
             case model_item_param::STATUS_NOT_SET:
                 return get_string('statusnotset', 'local_catquiz');
             case model_item_param::STATUS_NOT_CALCULATED:
@@ -290,18 +290,18 @@ class testitemdashboard implements renderable, templatable {
     }
 
     /**
-    * Return the detail data of one item.
-    * @return array
-    */
-   public function return_as_array(): array {
+     * Return the detail data of one item.
+     * @return array
+     */
+    public function return_as_array(): array {
 
-       $data = [
+        $data = [
             'detailview' => $this->get_detail_data(),
            'models' => $this->render_modelcards(),
            'statcards' => $this->get_testitems_stats_data(),
            'overridesforms' => $this->render_overrides_form(),
            'itemstatus' => $this->get_itemstatus(),
-       ];
-       return $data;
-   }
+        ];
+        return $data;
+    }
 }

@@ -48,7 +48,7 @@ use local_catquiz\data\catscale_structure;
 class manage_catscale extends external_api {
     /**
      * Describes the parameters for manage_catscale webservice.
-     * 
+     *
      * @return external_function_parameters
      * @see external_function_parameters
      */
@@ -76,7 +76,7 @@ class manage_catscale extends external_api {
      * @param string $action
      * @param int|null $parentid
      * @param int|null $id
-     * 
+     *
      * @return array
      */
     public static function execute(

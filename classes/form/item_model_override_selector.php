@@ -75,7 +75,7 @@ class item_model_override_selector extends dynamic_form {
             $group[] = $select;
             $group[] = $difficulty;
             $mform->addGroup($group, $id, get_string('pluginname', sprintf('catmodel_%s', $model)),
-);
+            );
         }
         $mform->disable_form_change_checker();
     }
@@ -102,91 +102,91 @@ class item_model_override_selector extends dynamic_form {
         global $DB;
         $data = $this->get_data();
 
-        $form_itemparams = [];
+        $formitemparams = [];
         $models = model_strategy::get_installed_models();
         foreach (array_keys($models) as $model) {
             $fieldname = sprintf('override_%s', $model);
             $obj = new stdClass;
             $obj->status = $data->$fieldname[sprintf('%s_select', $fieldname)];
-            $form_itemparams[$model] = $obj;
+            $formitemparams[$model] = $obj;
         }
 
-        $saved_itemparams = $this->get_item_params(
+        $saveditemparams = $this->get_item_params(
             $data->testitemid,
             $data->contextid
         );
 
-        $to_update = [];
-        $to_insert = [];
+        $toupdate = [];
+        $toinsert = [];
         foreach (array_keys($models) as $model) {
-            if ($form_itemparams[$model]->status === $saved_itemparams[$model]->status) {
+            if ($formitemparams[$model]->status === $saveditemparams[$model]->status) {
                 // Status did not change: nothing to do
                 continue;
             }
 
-            if (intval($form_itemparams[$model]->status) === model_item_param::STATUS_SET_BY_STRATEGY) {
+            if (intval($formitemparams[$model]->status) === model_item_param::STATUS_SET_BY_STRATEGY) {
                 continue;
             }
 
-            if (array_key_exists($model, $saved_itemparams)) {
-                $to_update[] = [
-                    'status' => $form_itemparams[$model]->status,
-                    'id' => $saved_itemparams[$model]->id,
+            if (array_key_exists($model, $saveditemparams)) {
+                $toupdate[] = [
+                    'status' => $formitemparams[$model]->status,
+                    'id' => $saveditemparams[$model]->id,
                 ];
             } else {
                 // If this item did not exist in the first place and the item status is set to "not calculated", don't do anything.
                 if (
-                    !array_key_exists($model, $saved_itemparams)
-                    && intval($form_itemparams[$model]->status) === model_item_param::STATUS_NOT_CALCULATED) {
+                    !array_key_exists($model, $saveditemparams)
+                    && intval($formitemparams[$model]->status) === model_item_param::STATUS_NOT_CALCULATED) {
                     continue;
                 }
-                $to_insert[] = [
-                    'status' => $form_itemparams[$model]->status,
+                $toinsert[] = [
+                    'status' => $formitemparams[$model]->status,
                     'model' => $model,
                 ];
             }
 
             // There can only be one model with this status, so we have to make
             // sure all other models that have this status are set back to 0
-            if (intval($form_itemparams[$model]->status) === model_item_param::STATUS_SET_MANUALLY) {
+            if (intval($formitemparams[$model]->status) === model_item_param::STATUS_SET_MANUALLY) {
                 foreach (array_keys($models) as $m) {
                     if ($m === $model) {
                         // Do not check our current model
                         continue;
                     }
-                    if (intval($form_itemparams[$m]->status) !== model_item_param::STATUS_SET_MANUALLY) {
+                    if (intval($formitemparams[$m]->status) !== model_item_param::STATUS_SET_MANUALLY) {
                         // Ignore models with other status
                         continue;
                     }
                     // Reset back to 0
-                    $default_status = strval(model_item_param::STATUS_NOT_CALCULATED);
-                    $form_itemparams[$m]->status = $default_status;
+                    $defaultstatus = strval(model_item_param::STATUS_NOT_CALCULATED);
+                    $formitemparams[$m]->status = $defaultstatus;
                     $fieldname = sprintf('override_%s', $m);
-                    $data->$fieldname[sprintf('%s_select', $fieldname)] = $default_status;
+                    $data->$fieldname[sprintf('%s_select', $fieldname)] = $defaultstatus;
                     $this->set_data($data);
-                    $to_update[] = [
-                        'status' => $form_itemparams[$m]->status,
-                        'id' => $saved_itemparams[$m]->id,
+                    $toupdate[] = [
+                        'status' => $formitemparams[$m]->status,
+                        'id' => $saveditemparams[$m]->id,
                     ];
                 }
             }
         }
 
-        foreach ($to_update as $updated) {
+        foreach ($toupdate as $updated) {
             $DB->update_record(
                 'local_catquiz_itemparams',
                 (object) $updated
             );
         }
 
-        foreach ($to_insert as $new) {
+        foreach ($toinsert as $new) {
             $new['componentid'] = $data->testitemid;
             $new['contextid'] = $data->contextid;
             $new['componentname'] = $data->componentname ?: self::DEFAULT_COMPONENT_NAME;
             $new['timecreated'] = time();
             $DB->insert_record(
                 'local_catquiz_itemparams',
-                (object) $new            
+                (object) $new
             );
         }
 
@@ -218,21 +218,21 @@ class item_model_override_selector extends dynamic_form {
             $itemparamsbymodel = $this->get_item_params($data->testitemid, $data->contextid);
             if (array_key_exists($model, $itemparamsbymodel)) {
                 $modelparams = $itemparamsbymodel[$model];
-                $model_status = $modelparams->status;
-                $model_difficulty = $modelparams->difficulty;
+                $modelstatus = $modelparams->status;
+                $modeldifficulty = $modelparams->difficulty;
                 if (empty($data->componentname)) {
                     $data->componentname = $modelparams->componentname;
                 }
             } else { // Set default data if there are no calculated data for the given model
-                $model_status = model_item_param::STATUS_NOT_CALCULATED;
-                $model_difficulty = '-';
+                $modelstatus = model_item_param::STATUS_NOT_CALCULATED;
+                $modeldifficulty = '-';
             }
-            $difficulty_text = sprintf(
+            $difficultytext = sprintf(
                 '%s: %s',
                 get_string('itemdifficulty', 'local_catquiz'),
-                $model_difficulty
+                $modeldifficulty
             );
-            $data->$field = [sprintf('%s_select', $field) => $model_status, sprintf('%s_difficulty', $field) => $difficulty_text];
+            $data->$field = [sprintf('%s_select', $field) => $modelstatus, sprintf('%s_difficulty', $field) => $difficultytext];
         }
 
         $this->set_data($data);

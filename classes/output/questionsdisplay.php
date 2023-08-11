@@ -78,7 +78,7 @@ class questionsdisplay {
     /**
      * @var string
      */
-    private string $componentname= 'question'; // Componentname of the testitem.
+    private string $componentname = 'question'; // Componentname of the testitem.
 
     /**
      *
@@ -96,8 +96,7 @@ class questionsdisplay {
      * Renders the context selector.
      * @return string
      */
-    private function render_contextselector()
-    {
+    private function render_contextselector() {
         $ajaxformdata = empty($this->catcontextid) ? [] : ['contextid' => $this->catcontextid];
 
         $customdata = [
@@ -117,8 +116,7 @@ class questionsdisplay {
      * Renders the scale selector.
      * @return string
      */
-    private function render_scaleselectors()
-    {
+    private function render_scaleselectors() {
         $selectors = $this->render_selector($this->scale);
         $ancestorids = catscale::get_ancestors($this->scale);
         if (count($ancestorids) > 0) {
@@ -140,8 +138,7 @@ class questionsdisplay {
      * Renders the scale selector.
      * @return string
      */
-    private function render_selector($scaleid, $noselection = false, $label = 'selectcatscale')
-    {
+    private function render_selector($scaleid, $noselection = false, $label = 'selectcatscale') {
         $selected = $noselection ? 0 : $scaleid;
         $ajaxformdata = [
                         'scaleid' => $scaleid,
@@ -151,7 +148,6 @@ class questionsdisplay {
             'type' => 'scale',
             'label' => $label, // String localized in 'local_catquiz';
         ];
-
 
         $form = new \local_catquiz\form\scaleselector(null, $customdata, 'post', '', [], true, $ajaxformdata);
         // Set the form data with the same method that is called when loaded from JS. It should correctly set the data for the supplied arguments.
@@ -164,8 +160,7 @@ class questionsdisplay {
      * If checked subscales are integrated in the table query.
      * @return array
      */
-    private function render_subscale_checkbox()
-    {
+    private function render_subscale_checkbox() {
         $checked = "checked";
         if ($this->usesubs < 1) {
             $checked = "";
@@ -280,7 +275,7 @@ class questionsdisplay {
 
         $output = $table->outhtml(10, true);
         $this->numberofrecords = $table->return_records_count()[0];
-        if ($this->numberofrecords > 0) { //Only if the table contains records, we will return it.
+        if ($this->numberofrecords > 0) { // Only if the table contains records, we will return it.
             return $output;
         } else {
             return null;

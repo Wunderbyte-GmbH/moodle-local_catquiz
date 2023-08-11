@@ -25,19 +25,19 @@
 
 namespace local_catquiz;
 
-interface catcalc_ability_estimator
-{
+interface catcalc_ability_estimator {
+
     /**
      * Likelihood.
      *
      * @param mixed $x
      * @param array $item_params
      * @param float $item_response
-     * 
+     *
      * @return mixed
-     * 
+     *
      */
-    public static function likelihood($x, array $item_params, float $item_response);
+    public static function likelihood($x, array $itemparams, float $itemresponse);
 
     /**
      * Log likelihood.
@@ -45,11 +45,11 @@ interface catcalc_ability_estimator
      * @param mixed $x
      * @param array $item_params
      * @param float $item_response
-     * 
+     *
      * @return mixed
-     * 
+     *
      */
-    public static function log_likelihood($x, array $item_params, float $item_response);
+    public static function log_likelihood($x, array $itemparams, float $itemresponse);
 
     /**
      * Log likelihood p
@@ -57,11 +57,11 @@ interface catcalc_ability_estimator
      * @param mixed $x
      * @param array $item_params
      * @param float $item_response
-     * 
+     *
      * @return mixed
-     * 
+     *
      */
-    public static function log_likelihood_p($x, array $item_params, float $item_response);
+    public static function log_likelihood_p($x, array $itemparams, float $itemresponse);
 
     /**
      * Log likelihood p p
@@ -69,10 +69,10 @@ interface catcalc_ability_estimator
      * @param mixed $x
      * @param array $item_params
      * @param float $item_response
-     * 
+     *
      * @return mixed
-     * 
+     *
      */
-    public static function log_likelihood_p_p($x, array $item_params, float $item_response);
+    public static function log_likelihood_p_p($x, array $itemparams, float $itemresponse);
 
 }

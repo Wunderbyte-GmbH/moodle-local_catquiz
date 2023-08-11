@@ -240,9 +240,9 @@ class testenvironment {
      *
      * @param int $templateidid
      * @param string $templatename
-     * 
+     *
      * @return void
-     * 
+     *
      */
     public function save_as_template(int $templateidid, string $templatename) {
 
@@ -272,7 +272,7 @@ class testenvironment {
      * This function will recreate the saved array in order to
      *
      * @param array $formdefaultvalues
-     * 
+     *
      * @return void
      */
     public function apply_jsonsaved_values(array &$formdefaultvalues) {
@@ -338,9 +338,9 @@ class testenvironment {
      * Function to update a $record by the properties of the instantiated class.
      *
      * @param stdClass $record
-     * 
+     *
      * @return [type]
-     * 
+     *
      */
     private function update_object(stdClass &$record) {
 
@@ -371,9 +371,9 @@ class testenvironment {
      * @param int $id
      * @param int $componentid
      * @param string $component
-     * 
+     *
      * @return mixed
-     * 
+     *
      */
     private function get_record(int $id = 0, int $componentid = 0, string $component = '') {
 
@@ -420,12 +420,12 @@ class testenvironment {
 
     /**
      * Returns an array of all or filtered test environments.
-     * 
+     *
      * @param string $component
      * @param bool $onlytemplates
-     * 
+     *
      * @return array
-     * 
+     *
      */
     public static function get_environments_as_array(
             string $component = 'mod_adaptivequiz',
@@ -457,9 +457,9 @@ class testenvironment {
      * Delete Testenvironment.
      *
      * @param int $id
-     * 
+     *
      * @return bool
-     * 
+     *
      */
     public static function delete_testenvironment(int $id) {
         global $DB;

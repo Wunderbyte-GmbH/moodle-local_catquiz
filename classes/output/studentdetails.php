@@ -66,20 +66,19 @@ class studentdetails implements renderable, templatable {
 
         // Get the ability. At the moment there can be different abilities for each model.
         // This might change later. For now, just take the ability of the first model.
-        $catmodel_info = new catmodel_info();
-        list(,$person_params) = $catmodel_info->get_context_parameters(1); //TODO dynamic context?
-        $selected_model = reset($person_params);
+        $catmodelinfo = new catmodel_info();
+        list(, $personparams) = $catmodelinfo->get_context_parameters(1); // TODO dynamic context?
+        $selectedmodel = reset($personparams);
         $ability = get_string('personabilitiesnodata', 'local_catquiz');
-        if (isset($selected_model[$this->studentid])) {
-            $student_param = $selected_model[$this->studentid];
-            $ability = $student_param->get_ability();
+        if (isset($selectedmodel[$this->studentid])) {
+            $studentparam = $selectedmodel[$this->studentid];
+            $ability = $studentparam->get_ability();
         }
 
         global $DB;
 
         $users = user_get_users_by_id([$this->studentid]);
         $user = reset($users);
-
 
         $courses = enrol_get_all_users_courses($user->id);
         $displaycourses = [];
@@ -96,11 +95,11 @@ class studentdetails implements renderable, templatable {
 
         // Getting the values for the last access and comparing to now
         if (isset($user->lastaccess)) {
-            $datedifference = floor((usertime(time()) - $user->lastaccess)/60/60/24);
+            $datedifference = floor((usertime(time()) - $user->lastaccess) / 60 / 60 / 24);
             if($datedifference >= 1) {
                 $differencestring = get_string('daysago', 'local_catquiz', $datedifference);
             } else {
-                $differencestring = get_string('hoursago', 'local_catquiz',floor((usertime(time()) - $user->lastaccess)/60/60));
+                $differencestring = get_string('hoursago', 'local_catquiz', floor((usertime(time()) - $user->lastaccess) / 60 / 60));
             }
             $datestring = date('D, j F Y, g:i a', $user->lastaccess) . ' ('. $differencestring . ')';
         } else {

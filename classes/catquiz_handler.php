@@ -191,7 +191,7 @@ class catquiz_handler {
             3 => get_string('timeoutabortnoresult', 'local_catquiz'),
         ];
          // Choose a model for this instance.
-         $elements[] =  $mform->addElement('select', 'catquiz_actontimeout',
+         $elements[] = $mform->addElement('select', 'catquiz_actontimeout',
             get_string('actontimeout', 'local_catquiz'), $timeoutoptions);
         $mform->hideIf('catquiz_actontimeout', 'catquiz_timepacedtest', 'neq', 1);
 
@@ -464,8 +464,7 @@ class catquiz_handler {
         $teststrategy = $tsinfo
             ->return_active_strategy($quizsettings->catquiz_selectteststrategy)
             ->set_scale($quizsettings->catquiz_catcatscales)
-            ->set_catcontextid($quizsettings->catquiz_catcontext)
-            ;
+            ->set_catcontextid($quizsettings->catquiz_catcontext);
 
         $selectioncontext = self::get_strategy_selectcontext($quizsettings, $attemptdata);
         $result = $teststrategy->return_next_testitem($selectioncontext);
@@ -507,7 +506,7 @@ class catquiz_handler {
         $contextcreator = info::get_contextcreator();
 
         if ($quizsettings->catquiz_includepilotquestions) {
-            $pilot_ratio = floatval($quizsettings->catquiz_pilotratio);
+            $pilotratio = floatval($quizsettings->catquiz_pilotratio);
         }
 
         $initialcontext = [
@@ -526,7 +525,7 @@ class catquiz_handler {
                  * Currently, it is set to 30 days
                  */
             'penalty_time_range' => 60 * 60 * 24 * 30,
-            'pilot_ratio' => $pilot_ratio ?? 0,
+            'pilot_ratio' => $pilotratio ?? 0,
             'questionsattempted' => intval($attemptdata->questionsattempted),
             'selectfirstquestion' => $quizsettings->catquiz_selectfirstquestion,
         ];

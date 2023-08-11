@@ -37,20 +37,20 @@ require_once(__DIR__ . '../../../../config.php');
 $PAGE->set_url(new moodle_url('/local/catquiz/workspace.php'));
 $PAGE->set_context(context_system::instance());
 $PAGE->set_pagelayout('frontpage');
-$url_front = new moodle_url('/workspace.php');
-$url_plugin = new moodle_url('workspace.php');
+$urlfront = new moodle_url('/workspace.php');
+$urlplugin = new moodle_url('workspace.php');
 
 echo $OUTPUT->header();
 
 // PHP testbed for matrix inversion.
 
-$testmatrix = [[2,2,3],[4,5,6],[7,8,9]];
+$testmatrix = [[2, 2, 3], [4, 5, 6], [7, 8, 9]];
 
 $m = new matrix($testmatrix);
 
-$m_inv = $m->inverse();
+$minv = $m->inverse();
 
-$tst = $m_inv[1][1];
+$tst = $minv[1][1];
 
 echo "finished";
 

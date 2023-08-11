@@ -32,72 +32,72 @@ use local_catquiz\mathcat;
 
 class catcalc {
 
-    static function estimate_initial_item_difficulties($item_list) {
+    static function estimate_initial_item_difficulties($itemlist) {
 
-        $item_difficulties = array();
-        $item_ids = array_keys($item_list);
+        $itemdifficulties = array();
+        $itemids = array_keys($itemlist);
 
-        foreach ($item_ids as $id) {
+        foreach ($itemids as $id) {
 
-            $item_fractions = $item_list[$id];
-            $num_passed = 0;
-            $num_failed = 0;
+            $itemfractions = $itemlist[$id];
+            $numpassed = 0;
+            $numfailed = 0;
 
-            foreach ($item_fractions as $fraction) {
+            foreach ($itemfractions as $fraction) {
                 if ($fraction == 1) {
-                    $num_passed += 1;
+                    $numpassed += 1;
                 } else {
-                    $num_failed += 1;
+                    $numfailed += 1;
                 }
             }
 
-            $p = $num_passed / ($num_failed + $num_passed);
-            //$item_difficulty = -log($num_passed / $num_failed);
-            $item_difficulty = -log($p / (1 - $p + 0.00001)); //TODO: numerical stability check
-            $item_difficulties[$id] = $item_difficulty;
+            $p = $numpassed / ($numfailed + $numpassed);
+            // $item_difficulty = -log($num_passed / $num_failed);
+            $itemdifficulty = -log($p / (1 - $p + 0.00001)); // TODO: numerical stability check
+            $itemdifficulties[$id] = $itemdifficulty;
 
         }
-        return $item_difficulties;
+        return $itemdifficulties;
     }
 
-    static function estimate_person_ability($person_responses, model_item_param_list $items): float {
-       $all_models = model_strategy::get_installed_models();
+    static function estimate_person_ability($personresponses, model_item_param_list $items): float {
+        $allmodels = model_strategy::get_installed_models();
 
         $likelihood = fn($x) => 1;
         $loglikelihood = fn($x) => 0;
-        $loglikelihood_1st_derivative = fn($x) => 0;
-        $loglikelihood_2nd_derivative = fn($x) => 0;
+        $loglikelihood1stderivative = fn($x) => 0;
+        $loglikelihood2ndderivative = fn($x) => 0;
 
-        foreach ($person_responses as $qid => $qresponse) {
+        foreach ($personresponses as $qid => $qresponse) {
             $item = $items[$qid];
             // The item parameter for this response was filtered out
             if ($item === null) {
                 continue;
             }
-            $item_params = $item->get_params_array();
+            $itemparams = $item->get_params_array();
 
             /**
              * @var catcalc_ability_estimator
              */
-            $model = $all_models[$item->get_model_name()];
+            $model = $allmodels[$item->get_model_name()];
             if (!in_array(catcalc_ability_estimator::class, class_implements($model))) {
                 throw new \Exception(sprintf("The given model %s can not be used with the catcalc class", $item->get_model_name()));
             }
 
-            $likelihood_part = fn ($x) => $model::likelihood($x, $item_params, $qresponse['fraction']);
-            $loglikelihood_part = fn ($x) => $model::log_likelihood($x, $item_params, $qresponse['fraction']);
-            $loglikelihood_1st_derivative_part = fn ($x) => $model::log_likelihood_p($x, $item_params, $qresponse['fraction']);
-            $loglikelihood_2nd_derivative_part = fn ($x) => $model::log_likelihood_p_p($x, $item_params, $qresponse['fraction']);
+            $likelihoodpart = fn ($x) => $model::likelihood($x, $itemparams, $qresponse['fraction']);
+            $loglikelihoodpart = fn ($x) => $model::log_likelihood($x, $itemparams, $qresponse['fraction']);
+            $loglikelihood1stderivativepart = fn ($x) => $model::log_likelihood_p($x, $itemparams, $qresponse['fraction']);
+            $loglikelihood2ndderivativepart = fn ($x) => $model::log_likelihood_p_p($x, $itemparams, $qresponse['fraction']);
 
-            $likelihood = fn ($x) => $likelihood($x) * $likelihood_part($x);
-            $loglikelihood = fn ($x) => $loglikelihood($x) + $loglikelihood_part($x);
-            $loglikelihood_1st_derivative = fn ($x) => $loglikelihood_1st_derivative($x) + $loglikelihood_1st_derivative_part($x);
-            $loglikelihood_2nd_derivative = fn ($x) => $loglikelihood_2nd_derivative($x) + $loglikelihood_2nd_derivative_part($x);
+            $likelihood = fn ($x) => $likelihood($x) * $likelihoodpart($x);
+            $loglikelihood = fn ($x) => $loglikelihood($x) + $loglikelihoodpart($x);
+            $loglikelihood1stderivative = fn ($x) => $loglikelihood1stderivative($x) + $loglikelihood1stderivativepart($x);
+            $loglikelihood2ndderivative = fn ($x) => $loglikelihood2ndderivative($x) + $loglikelihood2ndderivativepart($x);
         }
 
         $retval = mathcat::newtonraphson_stable(
-            $loglikelihood_1st_derivative,
-            $loglikelihood_2nd_derivative,
+            $loglikelihood1stderivative,
+            $loglikelihood2ndderivative,
             0,
             0.001,
             1500
@@ -111,55 +111,54 @@ class catcalc {
      * @param model_model $model
      * @return array<float>
      */
-    static function estimate_item_params(array $item_response, model_model $model) {
+    static function estimate_item_params(array $itemresponse, model_model $model) {
         if (! $model instanceof catcalc_item_estimator) {
             throw new \InvalidArgumentException("Model does not implement the catcalc_item_estimator interface");
         }
 
         // compose likelihood matrices based on actual result
 
-        $model_dim = $model::get_model_dim();
+        $modeldim = $model::get_model_dim();
 
         // Vector that contains the first derivatives for each parameter as functions
         // [Df/Da, Df,/Db, Df,Dc]
         $jacobian = [];
         // Matrix that contains the second derivatives
         // [
-        //  [Df/Daa, Df/Dab, Df/Dac]
-        //  [Df/Dba, Df/Dbb, Df/Dbc]
-        //  [Df/Dca, Df/Dcb, Df/Dcc]
+        // [Df/Daa, Df/Dab, Df/Dac]
+        // [Df/Dba, Df/Dbb, Df/Dbc]
+        // [Df/Dca, Df/Dcb, Df/Dcc]
         // ]
         $hessian = [];
-        for ($i = 0; $i <= $model_dim - 2; $i++) {
+        for ($i = 0; $i <= $modeldim - 2; $i++) {
             $jacobian[$i] = fn($x) => 0;
             $hessian[$i] = [];
-            for ($j = 0; $j <= $model_dim - 2; $j++) {
+            for ($j = 0; $j <= $modeldim - 2; $j++) {
                 $hessian[$i][$j] = fn($x) => 0;
             }
         }
 
-        foreach ($item_response as $r) {
-            $jacobian_part = $model::get_log_jacobian($r->get_ability(), $r->get_response());
-            $hessian_part = $model::get_log_hessian($r->get_ability(), $r->get_response());
+        foreach ($itemresponse as $r) {
+            $jacobianpart = $model::get_log_jacobian($r->get_ability(), $r->get_response());
+            $hessianpart = $model::get_log_hessian($r->get_ability(), $r->get_response());
 
-            for ($i=0; $i <= $model_dim-2; $i++){
-                $jacobian[$i] = fn($x) => $jacobian[$i]($x) + $jacobian_part[$i]($x);
+            for ($i = 0; $i <= $modeldim - 2; $i++){
+                $jacobian[$i] = fn($x) => $jacobian[$i]($x) + $jacobianpart[$i]($x);
 
-                for ($j=0; $j <= $model_dim-2; $j++) {
-                    $hessian[$i][$j] = fn($x) => $hessian[$i][$j]($x) + $hessian_part[$i][$j]($x);
+                for ($j = 0; $j <= $modeldim - 2; $j++) {
+                    $hessian[$i][$j] = fn($x) => $hessian[$i][$j]($x) + $hessianpart[$i][$j]($x);
                 }
             }
         }
 
         // Defines the starting point
-        $start_arr = ['difficulty' => 0.5, 'discrimination' => 0.5, 'guessing' => 0.5];
-        $z_0 = array_slice($start_arr, 0, $model_dim-1);
-
+        $startarr = ['difficulty' => 0.5, 'discrimination' => 0.5, 'guessing' => 0.5];
+        $z0 = array_slice($startarr, 0, $modeldim - 1);
 
         return mathcat::newton_raphson_multi_stable(
             $jacobian,
             $hessian,
-            $z_0,
+            $z0,
             0.001,
             50,
             $model

@@ -43,7 +43,7 @@ abstract class model_person_ability_estimator {
      * Model-specific instantiation can go here.
      *
      * @param model_responses $responses
-     * 
+     *
      */
     public function __construct(model_responses $responses) {
         $this->responses = $responses;
@@ -51,9 +51,9 @@ abstract class model_person_ability_estimator {
 
     /**
      * Estimates person abilities
-     * 
+     *
      * @param model_item_param_list $item_param_list List of item parameters
      * @return model_person_param_list
      */
-    abstract public function get_person_abilities(model_item_param_list $item_param_list): model_person_param_list;
+    abstract public function get_person_abilities(model_item_param_list $itemparamlist): model_person_param_list;
 }

@@ -34,7 +34,7 @@ defined('MOODLE_INTERNAL') || die();
 
 /**
  * Model strategy class.
- * 
+ *
  * Objects of this class are responsible for running the estimation process and
  * returning as result the new person abilities and item difficulties.
  *
@@ -88,12 +88,12 @@ class model_strategy {
     /**
      * @var model_person_ability_estimator
      */
-    private model_person_ability_estimator $ability_estimator;
+    private model_person_ability_estimator $abilityestimator;
 
     /**
      * @var int max_iterations
      */
-    private int $max_iterations;
+    private int $maxiterations;
 
     /**
      * @var int iterations
@@ -103,12 +103,12 @@ class model_strategy {
     /**
      * @var string|null model_override
      */
-    private ?string $model_override;
+    private ?string $modeloverride;
 
     /**
      * @var model_person_param_list
      */
-    private model_person_param_list $initial_person_abilities;
+    private model_person_param_list $initialpersonabilities;
 
     /**
      * Model-specific instantiation can go here.
@@ -116,42 +116,42 @@ class model_strategy {
      * @param model_responses $responses
      * @param array $options
      * @param model_person_param_list|null $saved_person_abilities
-     * 
+     *
      */
     public function __construct(
         model_responses $responses,
         array $options = [],
-        ?model_person_param_list $saved_person_abilities = NULL
+        ?model_person_param_list $savedpersonabilities = null
     ) {
         $this->responses = $responses;
         $this->models = $this->create_installed_models();
         $this->ability_estimator = new model_person_ability_estimator_demo($this->responses);
         $this->set_options($options);
 
-        if ($saved_person_abilities === NULL || count($saved_person_abilities) === 0) {
-            $saved_person_abilities = $responses->get_initial_person_abilities();
-        } else if(count($saved_person_abilities) < count($initial = $responses->get_initial_person_abilities())) {
-            $new_users = array_diff(array_keys($initial->get_person_params()), array_keys($saved_person_abilities->get_person_params()));
-            foreach ($new_users as $userid) {
-                $saved_person_abilities->add(new model_person_param($userid));
+        if ($savedpersonabilities === null || count($savedpersonabilities) === 0) {
+            $savedpersonabilities = $responses->get_initial_person_abilities();
+        } else if(count($savedpersonabilities) < count($initial = $responses->get_initial_person_abilities())) {
+            $newusers = array_diff(array_keys($initial->get_person_params()), array_keys($savedpersonabilities->get_person_params()));
+            foreach ($newusers as $userid) {
+                $savedpersonabilities->add(new model_person_param($userid));
             }
         }
-        $this->initial_person_abilities = $saved_person_abilities;
+        $this->initial_person_abilities = $savedpersonabilities;
     }
 
     /**
      * Set_options.
      *
      * @param array $options
-     * 
+     *
      * @return self
-     * 
+     *
      */
     private function set_options(array $options): self {
         $this->max_iterations = array_key_exists('max_iterations', $options)
             ? $options['max_iterations']
             : self::MAX_ITERATIONS;
-        $strategy_options = array_key_exists('strategy', $options)
+        $strategyoptions = array_key_exists('strategy', $options)
             ? $options['strategy']
             : [];
 
@@ -166,9 +166,9 @@ class model_strategy {
      * Handle mform.
      *
      * @param MoodleQuickForm $mform
-     * 
+     *
      * @return void
-     * 
+     *
      */
     public static function handle_mform(MoodleQuickForm &$mform) {
         $mform->addElement('header', 'strategy', get_string('strategy', 'local_catquiz'));
@@ -182,14 +182,14 @@ class model_strategy {
      * @param array $data
      * @param array $files
      * @param mixed $errors
-     * 
+     *
      * @return void
      */
     public static function validation($data, $files, &$errors) {
-        $max_iterations = intval($data['max_iterations']);
-        if ($max_iterations === 0) {
+        $maxiterations = intval($data['max_iterations']);
+        if ($maxiterations === 0) {
             $errors['max_iterations'] = get_string('noint', 'local_catquiz');
-        } else if ($max_iterations <= 0) {
+        } else if ($maxiterations <= 0) {
             $errors['max_iterations'] = get_string('notpositive', 'local_catquiz');
         }
     }
@@ -200,33 +200,33 @@ class model_strategy {
      * @return array<model_item_param_list, model_person_param_list>
      */
     public function run_estimation(): array {
-        $person_abilities = $this->initial_person_abilities;
+        $personabilities = $this->initial_person_abilities;
 
         /**
          * @var array<model_item_param_list>
          */
-        $item_difficulties = [];
+        $itemdifficulties = [];
         // Re-calculate until the stop condition is triggered
         while (!$this->should_stop()) {
             foreach ($this->models as $name => $model) {
-                $item_difficulties[$name] = $model
-                    ->estimate_item_params($person_abilities);
+                $itemdifficulties[$name] = $model
+                    ->estimate_item_params($personabilities);
             }
 
-            $filtered_item_difficulties = $this->select_item_model($item_difficulties);
-            $person_abilities = $this
+            $filtereditemdifficulties = $this->select_item_model($itemdifficulties);
+            $personabilities = $this
                 ->ability_estimator
-                ->get_person_abilities($filtered_item_difficulties);
+                ->get_person_abilities($filtereditemdifficulties);
 
             $this->iterations++;
         }
 
-        $item_difficulties_with_status = $this->set_status(
-            $item_difficulties,
-            $filtered_item_difficulties
+        $itemdifficultieswithstatus = $this->set_status(
+            $itemdifficulties,
+            $filtereditemdifficulties
         );
 
-        return [$item_difficulties_with_status, $person_abilities];
+        return [$itemdifficultieswithstatus, $personabilities];
     }
 
     /**
@@ -240,28 +240,28 @@ class model_strategy {
      * @return model_item_param_list[]
      */
     private function set_status(
-        array $calculated_item_difficulties,
-        model_item_param_list $selected_item_difficulties
+        array $calculateditemdifficulties,
+        model_item_param_list $selecteditemdifficulties
     ) {
-        foreach ($selected_item_difficulties as $selected_item) {
-            $model = $selected_item->get_model_name();
-            $id = $selected_item->get_id();
-            $calculated_item_difficulties[$model][$id]->set_status($selected_item->get_status());
+        foreach ($selecteditemdifficulties as $selecteditem) {
+            $model = $selecteditem->get_model_name();
+            $id = $selecteditem->get_id();
+            $calculateditemdifficulties[$model][$id]->set_status($selecteditem->get_status());
         }
-        return $calculated_item_difficulties;
+        return $calculateditemdifficulties;
     }
 
     /**
      * For each item, selects the model that should be used
-     * 
+     *
      * Merges the given item param lists into a single list
      *
      * @param array $item_difficulties_lists List of calculated item difficulties, one for each model
      * @return model_item_param_list A single list of item difficulties that is a combination of the input lists
      */
-    public function select_item_model(array $item_difficulties_lists): model_item_param_list {
-        $new_item_difficulties = new model_item_param_list();
-        $item_ids = $this->responses->get_item_ids();
+    public function select_item_model(array $itemdifficultieslists): model_item_param_list {
+        $newitemdifficulties = new model_item_param_list();
+        $itemids = $this->responses->get_item_ids();
 
         /**
          * Select items according to the following rules:
@@ -283,13 +283,13 @@ class model_strategy {
          *      }
          * }
          */
-        foreach ($item_ids as $item_id) {
-            if ($model = $this->get_item_override($item_id)) {
-                $item = $item_difficulties_lists[$model][$item_id];
+        foreach ($itemids as $itemid) {
+            if ($model = $this->get_item_override($itemid)) {
+                $item = $itemdifficultieslists[$model][$itemid];
             } else if ($model = $this->get_model_override()) {
-                $item = $item_difficulties_lists[$model][$item_id];
+                $item = $itemdifficultieslists[$model][$itemid];
             } else {
-                $item = $item_difficulties_lists[$this->get_default_model()][$item_id];
+                $item = $itemdifficultieslists[$this->get_default_model()][$itemid];
             }
 
             // If the item was filtered out by the selected model, do not add it to the list of items for the next round
@@ -297,29 +297,29 @@ class model_strategy {
                 continue;
             }
             $item->set_status(model_item_param::STATUS_SET_BY_STRATEGY);
-            $new_item_difficulties->add($item);
+            $newitemdifficulties->add($item);
         }
 
-        return $new_item_difficulties;
+        return $newitemdifficulties;
     }
 
     /**
      * Return item override.
      *
      * @param int $item_id
-     * 
+     *
      * @return string|null
-     * 
+     *
      */
-    private function get_item_override(int $item_id): ?string {
-        return NULL; // TODO implement
+    private function get_item_override(int $itemid): ?string {
+        return null; // TODO implement
     }
 
     /**
      * Return model override.
      *
      * @return string|null
-     * 
+     *
      */
     private function get_model_override(): ?string {
         return $this->model_override; // TODO implement
@@ -329,7 +329,7 @@ class model_strategy {
      * Return default model.
      *
      * @return string
-     * 
+     *
      */
     private function get_default_model(): string {
         return self::DEFAULT_MODEL;
@@ -340,28 +340,28 @@ class model_strategy {
      *
      * @param int $contextid
      * @param int $catscaleid
-     * 
+     *
      * @return array
-     * 
+     *
      */
     public function get_params_from_db(int $contextid, int $catscaleid): array {
         $models = $this->get_installed_models();
-        foreach (array_keys($models) as $model_name) {
-            $estimated_item_difficulties[$model_name] = model_item_param_list::load_from_db(
+        foreach (array_keys($models) as $modelname) {
+            $estimateditemdifficulties[$modelname] = model_item_param_list::load_from_db(
                 $contextid,
-                $model_name,
+                $modelname,
                 $catscaleid
             );
         }
-        $person_abilities = model_person_param_list::load_from_db($contextid, $catscaleid);
-        return [$estimated_item_difficulties, $person_abilities];
+        $personabilities = model_person_param_list::load_from_db($contextid, $catscaleid);
+        return [$estimateditemdifficulties, $personabilities];
     }
 
     /**
      * Check if max number of iterations reached.
      *
      * @return bool
-     * 
+     *
      */
     private function should_stop(): bool {
         return $this->iterations >= $this->max_iterations;
@@ -377,9 +377,9 @@ class model_strategy {
         $models = [];
         foreach($pm->get_plugins_of_type('catmodel') as $name => $info) {
                 $classname = sprintf('catmodel_%s\%s', $name, $name);
-                if (!class_exists($classname)) {
-                    continue;
-                }
+            if (!class_exists($classname)) {
+                continue;
+            }
                 $models[$name] = $classname;
         }
         return $models;

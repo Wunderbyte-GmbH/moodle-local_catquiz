@@ -209,7 +209,7 @@ class modal_manage_catscale extends dynamic_form {
      * @see moodleform::get_data()
      */
     public function get_data() {
-        //return parent::get_data();
+        // return parent::get_data();
 
         $data = parent::get_data();
         if (!empty($data->minmaxgroup["catquiz_minscalevalue"])) {

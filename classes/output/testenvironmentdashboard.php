@@ -84,7 +84,7 @@ class testenvironmentdashboard implements renderable, templatable {
             'catscaleid',
             'fullname',
             'numberofitems',
-            //'numberofusers',
+            // 'numberofusers',
             'teachers',
         ]);
         $table->define_headers([
@@ -122,7 +122,7 @@ class testenvironmentdashboard implements renderable, templatable {
             ], 'lang' => [
                 'localizedname' => get_string('lang', 'local_catquiz'),
             ]
-        ]);
+            ]);
         $table->define_fulltextsearchcolumns(['name', 'component', 'description']);
         $table->define_sortablecolumns([
             'name',

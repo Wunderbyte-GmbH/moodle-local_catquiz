@@ -7,8 +7,8 @@ use local_catquiz\teststrategy\preselect_task;
 use local_catquiz\wb_middleware;
 use moodle_exception;
 
-final class fisherinformation extends preselect_task implements wb_middleware
-{
+final class fisherinformation extends preselect_task implements wb_middleware {
+
     const PROPERTYNAME = 'fisherinformation';
 
     public function run(array $context, callable $next): result {
@@ -18,8 +18,8 @@ final class fisherinformation extends preselect_task implements wb_middleware
             }
 
             $model = $context['installed_models'][$item->model];
-            foreach ($model::get_parameter_names() as $param_name) {
-                $params[$param_name] = floatval($item->$param_name);
+            foreach ($model::get_parameter_names() as $paramname) {
+                $params[$paramname] = floatval($item->$paramname);
             }
 
             $item->{self::PROPERTYNAME} = $model::fisher_info(

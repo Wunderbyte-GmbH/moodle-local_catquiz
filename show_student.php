@@ -17,7 +17,7 @@ use local_catquiz\output\studentdetails;
 
 /**
  * Provides details about a student
- * 
+ *
  * @package    local_catquiz
  * @copyright  2023 Wunderbyte GmbH
  * @author     David Szkiba

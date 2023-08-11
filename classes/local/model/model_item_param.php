@@ -15,12 +15,12 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
-* Entities Class to display list of entity records.
-*
-* @package local_catquiz
-* @copyright 2023 Wunderbyte GmbH <info@wunderbyte.at>
-* @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
-*/
+ * Entities Class to display list of entity records.
+ *
+ * @package local_catquiz
+ * @copyright 2023 Wunderbyte GmbH <info@wunderbyte.at>
+ * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
 
 namespace local_catquiz\local\model;
 
@@ -64,7 +64,7 @@ class model_item_param {
      *
      * @var int
      */
-    const STATUS_NOT_CALCULATED = 0;    
+    const STATUS_NOT_CALCULATED = 0;
 
     /**
      * STATUS_SET_BY_STRATEGY
@@ -93,7 +93,7 @@ class model_item_param {
     /**
      * @var string model name
      */
-    private string $model_name;
+    private string $modelname;
 
     /**
      * Models that create items are free to use this field to store some metadata
@@ -113,12 +113,11 @@ class model_item_param {
      * @param string $model_name
      * @param array $metadata
      * @param int $status
-     * 
+     *
      */
-    public function __construct(int $id, string $model_name, array $metadata = [], int $status = self::STATUS_NOT_CALCULATED)
-    {
+    public function __construct(int $id, string $modelname, array $metadata = [], int $status = self::STATUS_NOT_CALCULATED) {
         $this->id = $id;
-        $this->model_name = $model_name;
+        $this->model_name = $modelname;
         $this->metadata = $metadata;
         $this->status = $status;
     }
@@ -127,7 +126,7 @@ class model_item_param {
      * Get params array
      *
      * @return array
-     * 
+     *
      */
     public function get_params_array(): array {
         return $this->parameters;
@@ -146,7 +145,7 @@ class model_item_param {
      * Return name of model.
      *
      * @return string
-     * 
+     *
      */
     public function get_model_name(): string {
         return $this->model_name;
@@ -156,7 +155,7 @@ class model_item_param {
      * Return difficulty.
      *
      * @return float
-     * 
+     *
      */
     public function get_difficulty(): float {
         return $this->parameters['difficulty'];
@@ -166,9 +165,9 @@ class model_item_param {
      * Set parameters.
      *
      * @param array $parameters
-     * 
+     *
      * @return self
-     * 
+     *
      */
     public function set_parameters(array $parameters): self {
         $this->parameters = $parameters;
@@ -179,9 +178,9 @@ class model_item_param {
      * Set difficulty.
      *
      * @param float $difficulty
-     * 
+     *
      * @return self
-     * 
+     *
      */
     public function set_difficulty(float $difficulty): self {
         $this->parameters['difficulty'] = $difficulty;
@@ -192,9 +191,9 @@ class model_item_param {
      * Set metadata
      *
      * @param array $metadata
-     * 
+     *
      * @return self
-     * 
+     *
      */
     public function set_metadata(array $metadata): self {
         $this->metadata = $metadata;
@@ -205,7 +204,7 @@ class model_item_param {
      * Return metadata.
      *
      * @return array
-     * 
+     *
      */
     public function get_metadata(): array {
         return $this->metadata;
@@ -215,9 +214,9 @@ class model_item_param {
      * Set status.
      *
      * @param int $status
-     * 
+     *
      * @return self
-     * 
+     *
      */
     public function set_status(int $status): self {
         $this->status = $status;
@@ -228,7 +227,7 @@ class model_item_param {
      * Return status.
      *
      * @return int
-     * 
+     *
      */
     public function get_status(): int {
         return $this->status;
@@ -242,25 +241,25 @@ class model_item_param {
      * @param string $model
      * @param int $contextid
      * @param stdClass $new_record
-     * 
+     *
      * @return void
-     * 
-     * @throws Exception 
-     * 
+     *
+     * @throws Exception
+     *
      */
     public static function update_in_db(
         int $id,
         int $componentid,
         string $model,
         int $contextid,
-        stdClass $new_record
+        stdClass $newrecord
     ) {
         global $DB;
 
-        if (intval($new_record->status) === self::STATUS_SET_MANUALLY) {
+        if (intval($newrecord->status) === self::STATUS_SET_MANUALLY) {
             // Only one model can be the selected one. Set the status of all
-            //other models back to 0
-            $existing_items = $DB->get_record(
+            // other models back to 0
+            $existingitems = $DB->get_record(
                 'local_catquiz_itemparams',
                 [
                     'componentid' => $componentid,
@@ -269,37 +268,37 @@ class model_item_param {
                 ]
             );
             // Get item params for other models
-            $other_items = array_filter(
-                $existing_items,
+            $otheritems = array_filter(
+                $existingitems,
                 function($i) use ($model) {
                     return $i->model !== $model;
                 }
             );
-            foreach ($other_items as $other_item) {
-                $other_item->status = self::STATUS_NOT_CALCULATED;
-                $DB->update_record('local_catquiz_itemparams', $other_item, true);
+            foreach ($otheritems as $otheritem) {
+                $otheritem->status = self::STATUS_NOT_CALCULATED;
+                $DB->update_record('local_catquiz_itemparams', $otheritem, true);
             }
         }
 
-        $db_record = $DB->get_record(
+        $dbrecord = $DB->get_record(
             'local_catquiz_itemparams',
             [
                 'id' => $id,
             ]
         );
-        if (!$db_record) {
+        if (!$dbrecord) {
             throw new Exception('Can not update record because it does not exist');
         }
-        foreach ($new_record as $property => $value) {
+        foreach ($newrecord as $property => $value) {
             // Some properties should not be updated
             if (in_array($property, ['id', 'componentid'])) {
                 continue;
             }
-            $db_record->$property = $value;
+            $dbrecord->$property = $value;
         }
         $DB->update_record(
             'local_catquiz_itemparams',
-            $db_record
+            $dbrecord
         );
         cache_helper::purge_by_event('changesintestitems');
     }

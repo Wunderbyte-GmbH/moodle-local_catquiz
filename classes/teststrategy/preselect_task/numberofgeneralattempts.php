@@ -15,8 +15,8 @@ use local_catquiz\wb_middleware;
  *
  * @package local_catquiz\teststrategy\preselect_task
  */
-final class numberofgeneralattempts extends preselect_task implements wb_middleware
-{
+final class numberofgeneralattempts extends preselect_task implements wb_middleware {
+
     const PROPERTYNAME = 'numberofgeneralattempts';
     public function run(array $context, callable $next): result {
         global $DB;
@@ -27,15 +27,15 @@ final class numberofgeneralattempts extends preselect_task implements wb_middlew
 
         $records = $DB->get_records_sql($sql);
 
-        $max_attempts = 0;
+        $maxattempts = 0;
         foreach ($context['questions'] as $id => &$question) {
             $attempts = array_key_exists($id, $records) ? intval($records[$id]->count) : null;
-            if ($attempts > $max_attempts) {
-                $max_attempts = $attempts;
+            if ($attempts > $maxattempts) {
+                $maxattempts = $attempts;
             }
             $question->{self::PROPERTYNAME} = $attempts;
         }
-        $context['generalnumberofattempts_max'] = $max_attempts;
+        $context['generalnumberofattempts_max'] = $maxattempts;
 
         return $next($context);
     }

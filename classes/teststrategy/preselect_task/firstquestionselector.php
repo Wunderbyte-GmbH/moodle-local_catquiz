@@ -9,8 +9,8 @@ use local_catquiz\local\status;
 use local_catquiz\teststrategy\preselect_task;
 use local_catquiz\wb_middleware;
 
-final class firstquestionselector extends preselect_task implements wb_middleware
-{
+final class firstquestionselector extends preselect_task implements wb_middleware {
+
     const STARTWITHEASIESTQUESTION = 'startwitheasiestquestion';
     const  STARTWITHFIRSTOFSECONDQUINTIL = 'startwithfirstofsecondquintil';
     const  STARTWITHFIRSTOFSECONDQUARTIL = 'startwithfirstofsecondquartil';
@@ -18,8 +18,7 @@ final class firstquestionselector extends preselect_task implements wb_middlewar
     const  STARTWITHAVERAGEABILITYOFTEST = 'startwithaverageabilityoftest';
     const  STARTWITHCURRENTABILITY = 'startwithcurrentability';
 
-    public function run(array $context, callable $next): result
-    {
+    public function run(array $context, callable $next): result {
         // Don't do anything if this is not the first question of the current
         // attempt
         $cache = cache::make('local_catquiz', 'adaptivequizattempt');
@@ -33,13 +32,13 @@ final class firstquestionselector extends preselect_task implements wb_middlewar
 
         // If we select the first question based on its difficulty, then it can
         // never be a pilot question.
-        $questions_with_difficulty = array_filter($context['questions'], fn($q) => !$q->is_pilot);
-        if (count($questions_with_difficulty) === 0) {
+        $questionswithdifficulty = array_filter($context['questions'], fn($q) => !$q->is_pilot);
+        if (count($questionswithdifficulty) === 0) {
             return result::err(status::ERROR_EMPTY_FIRST_QUESTION_LIST);
-        } elseif (count($questions_with_difficulty) === 1) {
-            return result::ok($questions_with_difficulty[array_keys($questions_with_difficulty)[0]]);
+        } else if (count($questionswithdifficulty) === 1) {
+            return result::ok($questionswithdifficulty[array_keys($questionswithdifficulty)[0]]);
         }
-        $context['questions'] = $questions_with_difficulty;
+        $context['questions'] = $questionswithdifficulty;
 
         switch ($context['selectfirstquestion']) {
             case self::STARTWITHEASIESTQUESTION:
@@ -70,8 +69,7 @@ final class firstquestionselector extends preselect_task implements wb_middlewar
         }
     }
 
-    public function get_required_context_keys(): array
-    {
+    public function get_required_context_keys(): array {
         return [
             'selectfirstquestion',
             'questions_ordered_by',
@@ -92,9 +90,9 @@ final class firstquestionselector extends preselect_task implements wb_middlewar
         return $questions[array_keys($questions)[$index]];
     }
     private function get_last_question_of_second_quartile($questions) {
-        $index_3rd_quartile = $this->get_index_for_quantile(0.5, count($questions));
+        $index3rdquartile = $this->get_index_for_quantile(0.5, count($questions));
         // We want to return the question that is right before the first of the third quartile
-        $index = $index_3rd_quartile - 1;
+        $index = $index3rdquartile - 1;
         return $questions[array_keys($questions)[$index]];
     }
 
@@ -117,7 +115,7 @@ final class firstquestionselector extends preselect_task implements wb_middlewar
         $index = 0.5 * count($abilities);
         $index -= 1; // Because we use zero-based indexing
         if ((int) $index == $index) {
-            return ($abilities[array_keys($abilities)[$index]] + $abilities[array_keys($abilities)[$index + 1]])/2;
+            return ($abilities[array_keys($abilities)[$index]] + $abilities[array_keys($abilities)[$index + 1]]) / 2;
         }
         return $abilities[array_keys($abilities)[$index]];
     }

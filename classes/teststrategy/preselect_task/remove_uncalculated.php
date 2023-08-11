@@ -11,10 +11,10 @@ use local_catquiz\wb_middleware;
  *
  * @package local_catquiz\teststrategy\preselect_task
  */
-final class remove_uncalculated extends preselect_task implements wb_middleware
-{
+final class remove_uncalculated extends preselect_task implements wb_middleware {
+
     public function run(array $context, callable $next): result {
-        $context['questions'] =  array_filter(
+        $context['questions'] = array_filter(
             $context['questions'],
             fn($item) => !is_null($item->model)
         );

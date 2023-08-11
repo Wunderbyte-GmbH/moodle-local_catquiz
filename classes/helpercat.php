@@ -40,14 +40,14 @@ class helpercat {
      *
      * @param mixed $response
      * @param mixed $user_id
-     * 
+     *
      * @return mixed
-     * 
+     *
      */
-    static function get_person_response($response, $user_id) {
+    static function get_person_response($response, $userid) {
 
-        $components = array_keys($response[$user_id]);
-        $items = $response[$user_id][$components[0]]; // TODO: fix for multiple components
+        $components = array_keys($response[$userid]);
+        $items = $response[$userid][$components[0]]; // TODO: fix for multiple components
         return $items;
 
     }
@@ -56,24 +56,25 @@ class helpercat {
      * Returns user ability.
      *
      * @param int $user_id
-     * 
+     *
      * @return mixed
-     * 
+     *
      */
-    static function get_user_ability(int $user_id) {
-        return 0.5; //dummy data
+    static function get_user_ability(int $userid) {
+        return 0.5; // dummy data
     }
 
     /**
      * REturns item params.
      *
      * @param int $item_id
-     * 
+     *
      * @return mixed
-     * 
+     *
      */
-    static function get_item_params(int $item_id) { //and context_id ?
-        return 0.5; //dummy data
+    static function get_item_params(int $itemid) {
+        // and context_id ?
+        return 0.5; // dummy data
     }
 
 }

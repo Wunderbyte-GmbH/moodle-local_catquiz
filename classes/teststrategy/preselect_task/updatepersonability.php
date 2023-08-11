@@ -19,8 +19,8 @@ use moodle_exception;
  *
  * @package local_catquiz\teststrategy\preselect_task
  */
-final class updatepersonability extends preselect_task implements wb_middleware
-{
+final class updatepersonability extends preselect_task implements wb_middleware {
+
     const UPDATE_THRESHOLD = 0.001;
 
     public function run(array $context, callable $next): result {
@@ -29,7 +29,7 @@ final class updatepersonability extends preselect_task implements wb_middleware
         // If we do not know the answer to the last question, we do not have to
         // update the person ability. Also, pilot questions should not be used
         // to update a student's ability.
-        if ($lastquestion === NULL || !empty($lastquestion->is_pilot)) {
+        if ($lastquestion === null || !empty($lastquestion->is_pilot)) {
             return $next($context);
         }
 
@@ -47,24 +47,24 @@ final class updatepersonability extends preselect_task implements wb_middleware
         // If the last answer was incorrect and the question was excluded due to
         // having only incorrect answers, the response object is the same as in
         // the previous run and we don't have to update the person ability.
-        $responses_changed = $this->has_changed($userresponses, $cachedresponses);
+        $responseschanged = $this->has_changed($userresponses, $cachedresponses);
 
-        if (!$responses_changed) {
+        if (!$responseschanged) {
             // Nothing changed since the last question, so we do not need to
             // update the person ability
             return $next($context);
         }
 
         // We will update the person ability. Select the correct model for each item:
-        $model_strategy = new model_strategy($responses);
-        $item_param_lists = [];
-        foreach (array_keys($model_strategy->get_installed_models()) as $model) {
-            $item_param_lists[$model] = model_item_param_list::load_from_db($context['contextid'], $model);
+        $modelstrategy = new model_strategy($responses);
+        $itemparamlists = [];
+        foreach (array_keys($modelstrategy->get_installed_models()) as $model) {
+            $itemparamlists[$model] = model_item_param_list::load_from_db($context['contextid'], $model);
         }
-        $item_param_list = $model_strategy->select_item_model($item_param_lists);
+        $itemparamlist = $modelstrategy->select_item_model($itemparamlists);
 
-        $updated_ability = catcalc::estimate_person_ability($userresponses, $item_param_list);
-        if (is_nan($updated_ability)) {
+        $updatedability = catcalc::estimate_person_ability($userresponses, $itemparamlist);
+        if (is_nan($updatedability)) {
             // In a production environment, we can use fallback values. However,
             // during development we want to see when we get unexpected values
             if ($CFG->debug > 0) {
@@ -84,16 +84,16 @@ final class updatepersonability extends preselect_task implements wb_middleware
             $USER->id,
             $context['contextid'],
             $context['catscaleid'],
-            $updated_ability
+            $updatedability
         );
-        if (abs($context['person_ability'] - $updated_ability) < self::UPDATE_THRESHOLD) {
+        if (abs($context['person_ability'] - $updatedability) < self::UPDATE_THRESHOLD) {
             // If we do have more than the minimum questions, we should return
             if ($context['questionsattempted'] >= $context['minimumquestions']) {
                 return result::err(status::ABORT_PERSONABILITY_NOT_CHANGED);
             }
         }
 
-        $context['person_ability'] = $updated_ability;
+        $context['person_ability'] = $updatedability;
         return $next($context);
     }
 
@@ -113,7 +113,7 @@ final class updatepersonability extends preselect_task implements wb_middleware
         $diff = array_udiff($newresponses, $oldresponses, function($a, $b) use ($field) {
             if ($a[$field] < $b[$field]) {
                 return -1;
-            } elseif ($a[$field] > $b[$field]) {
+            } else if ($a[$field] > $b[$field]) {
                 return 1;
             } else {
                 return 0;

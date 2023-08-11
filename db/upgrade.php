@@ -43,308 +43,307 @@ function xmldb_local_catquiz_upgrade($oldversion) {
     // You will also have to create the db/install.xml file by using the XMLDB Editor.
     // Documentation for the XMLDB Editor can be found at {@link https://docs.moodle.org/dev/XMLDB_editor}.
 
-        if ($oldversion < 2023012504) {
+    if ($oldversion < 2023012504) {
 
-            // Define field min / max scalevalue to be added to local_catquiz_catscales.
-            $table = new xmldb_table('local_catquiz_catscales');
+        // Define field min / max scalevalue to be added to local_catquiz_catscales.
+        $table = new xmldb_table('local_catquiz_catscales');
 
-            $field = new xmldb_field('minscalevalue', XMLDB_TYPE_NUMBER, '10, 2', null, null, null, 0, null);
-            // Conditionally launch add fields min scale value.
-            if (!$dbman->field_exists($table, $field)) {
-                $dbman->add_field($table, $field);
-            }
-
-            $field = new xmldb_field('maxscalevalue', XMLDB_TYPE_NUMBER, '10, 2', null, null, null, 0, null);
-            // Conditionally launch add fields max scale value.
-            if (!$dbman->field_exists($table, $field)) {
-                $dbman->add_field($table, $field);
-            }
-
-            // Catquiz savepoint reached.
-            upgrade_plugin_savepoint(true, 2023012504, 'local', 'catquiz');
+        $field = new xmldb_field('minscalevalue', XMLDB_TYPE_NUMBER, '10, 2', null, null, null, 0, null);
+        // Conditionally launch add fields min scale value.
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
         }
 
-        if ($oldversion < 2023030700) {
-
-            // Define table local_catquiz_tests to be created.
-            $table = new xmldb_table('local_catquiz_tests');
-
-            // Adding fields to table local_catquiz_tests.
-            $table->add_field('id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, XMLDB_SEQUENCE, null);
-            $table->add_field('componentid', XMLDB_TYPE_INTEGER, '10', null, null, null, null);
-            $table->add_field('component', XMLDB_TYPE_CHAR, '255', null, null, null, '');
-            $table->add_field('name', XMLDB_TYPE_CHAR, '255', null, null, null, '0');
-            $table->add_field('description', XMLDB_TYPE_TEXT, null, null, null, null, null);
-            $table->add_field('descriptionformat', XMLDB_TYPE_INTEGER, '2', null, null, null, '1');
-            $table->add_field('json', XMLDB_TYPE_TEXT, null, null, null, null, null);
-            $table->add_field('visible', XMLDB_TYPE_INTEGER, '2', null, null, null, '1');
-            $table->add_field('availability', XMLDB_TYPE_CHAR, '255', null, null, null, '');
-            $table->add_field('lang', XMLDB_TYPE_CHAR, '30', null, null, null, '');
-            $table->add_field('status', XMLDB_TYPE_INTEGER, '2', null, XMLDB_NOTNULL, null, '1');
-            $table->add_field('parentid', XMLDB_TYPE_INTEGER, '10', null, null, null, '0');
-            $table->add_field('timecreated', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0');
-            $table->add_field('timemodified', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0');
-
-            // Adding keys to table local_catquiz_tests.
-            $table->add_key('primary', XMLDB_KEY_PRIMARY, ['id']);
-
-            // Conditionally launch create table for local_catquiz_tests.
-            if (!$dbman->table_exists($table)) {
-                $dbman->create_table($table);
-            }
-
-            // Catquiz savepoint reached.
-            upgrade_plugin_savepoint(true, 2023030700, 'local', 'catquiz');
+        $field = new xmldb_field('maxscalevalue', XMLDB_TYPE_NUMBER, '10, 2', null, null, null, 0, null);
+        // Conditionally launch add fields max scale value.
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
         }
 
-        if ($oldversion < 2023040100) {
+        // Catquiz savepoint reached.
+        upgrade_plugin_savepoint(true, 2023012504, 'local', 'catquiz');
+    }
 
-            // Define table local_catquiz_personparams to be created.
-            $table = new xmldb_table('local_catquiz_personparams');
+    if ($oldversion < 2023030700) {
 
-            // Adding fields to table local_catquiz_personparams.
-            $table->add_field('id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, XMLDB_SEQUENCE, null);
-            $table->add_field('userid', XMLDB_TYPE_INTEGER, '10', null, null, null, null);
-            $table->add_field('contextid', XMLDB_TYPE_INTEGER, '10', null, null, null, null);
-            $table->add_field('ability', XMLDB_TYPE_INTEGER, '10', null, null, null, null);
-            $table->add_field('status', XMLDB_TYPE_INTEGER, '10', null, null, null, null);
-            $table->add_field('timecreated', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0');
-            $table->add_field('timemodified', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0');
+        // Define table local_catquiz_tests to be created.
+        $table = new xmldb_table('local_catquiz_tests');
 
-            // Adding keys to table local_catquiz_personparams.
-            $table->add_key('primary', XMLDB_KEY_PRIMARY, ['id']);
+        // Adding fields to table local_catquiz_tests.
+        $table->add_field('id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, XMLDB_SEQUENCE, null);
+        $table->add_field('componentid', XMLDB_TYPE_INTEGER, '10', null, null, null, null);
+        $table->add_field('component', XMLDB_TYPE_CHAR, '255', null, null, null, '');
+        $table->add_field('name', XMLDB_TYPE_CHAR, '255', null, null, null, '0');
+        $table->add_field('description', XMLDB_TYPE_TEXT, null, null, null, null, null);
+        $table->add_field('descriptionformat', XMLDB_TYPE_INTEGER, '2', null, null, null, '1');
+        $table->add_field('json', XMLDB_TYPE_TEXT, null, null, null, null, null);
+        $table->add_field('visible', XMLDB_TYPE_INTEGER, '2', null, null, null, '1');
+        $table->add_field('availability', XMLDB_TYPE_CHAR, '255', null, null, null, '');
+        $table->add_field('lang', XMLDB_TYPE_CHAR, '30', null, null, null, '');
+        $table->add_field('status', XMLDB_TYPE_INTEGER, '2', null, XMLDB_NOTNULL, null, '1');
+        $table->add_field('parentid', XMLDB_TYPE_INTEGER, '10', null, null, null, '0');
+        $table->add_field('timecreated', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0');
+        $table->add_field('timemodified', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0');
 
-            // Conditionally launch create table for local_catquiz_personparams.
-            if (!$dbman->table_exists($table)) {
-                $dbman->create_table($table);
-            }
+        // Adding keys to table local_catquiz_tests.
+        $table->add_key('primary', XMLDB_KEY_PRIMARY, ['id']);
 
-            // Catquiz savepoint reached.
-            upgrade_plugin_savepoint(true, 2023040100, 'local', 'catquiz');
+        // Conditionally launch create table for local_catquiz_tests.
+        if (!$dbman->table_exists($table)) {
+            $dbman->create_table($table);
         }
 
-        if ($oldversion < 2023040102) {
+        // Catquiz savepoint reached.
+        upgrade_plugin_savepoint(true, 2023030700, 'local', 'catquiz');
+    }
 
-            // Define table local_catquiz_catcontext to be created.
-            $table = new xmldb_table('local_catquiz_catcontext');
+    if ($oldversion < 2023040100) {
 
-            // Adding fields to table local_catquiz_catcontext.
-            $table->add_field('id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, XMLDB_SEQUENCE, null);
-            $table->add_field('name', XMLDB_TYPE_CHAR, '255', null, null, null, null);
-            $table->add_field('description', XMLDB_TYPE_TEXT, null, null, null, null, null);
-            $table->add_field('descriptionformat', XMLDB_TYPE_INTEGER, '2', null, null, null, null);
-            $table->add_field('starttimestamp', XMLDB_TYPE_INTEGER, '10', null, null, null, '0');
-            $table->add_field('endtimestamp', XMLDB_TYPE_INTEGER, '10', null, null, null, '0');
-            $table->add_field('json', XMLDB_TYPE_TEXT, null, null, null, null, null);
-            $table->add_field('usermodified', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0');
-            $table->add_field('timecreated', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0');
-            $table->add_field('timemodified', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0');
+        // Define table local_catquiz_personparams to be created.
+        $table = new xmldb_table('local_catquiz_personparams');
 
-            // Adding keys to table local_catquiz_catcontext.
-            $table->add_key('primary', XMLDB_KEY_PRIMARY, ['id']);
-            $table->add_key('usermodified', XMLDB_KEY_FOREIGN, ['usermodified'], 'user', ['id']);
+        // Adding fields to table local_catquiz_personparams.
+        $table->add_field('id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, XMLDB_SEQUENCE, null);
+        $table->add_field('userid', XMLDB_TYPE_INTEGER, '10', null, null, null, null);
+        $table->add_field('contextid', XMLDB_TYPE_INTEGER, '10', null, null, null, null);
+        $table->add_field('ability', XMLDB_TYPE_INTEGER, '10', null, null, null, null);
+        $table->add_field('status', XMLDB_TYPE_INTEGER, '10', null, null, null, null);
+        $table->add_field('timecreated', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0');
+        $table->add_field('timemodified', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0');
 
-            // Conditionally launch create table for local_catquiz_catcontext.
-            if (!$dbman->table_exists($table)) {
-                $dbman->create_table($table);
-            }
-            // Catquiz savepoint reached.
-            upgrade_plugin_savepoint(true, 2023040102, 'local', 'catquiz');
+        // Adding keys to table local_catquiz_personparams.
+        $table->add_key('primary', XMLDB_KEY_PRIMARY, ['id']);
+
+        // Conditionally launch create table for local_catquiz_personparams.
+        if (!$dbman->table_exists($table)) {
+            $dbman->create_table($table);
         }
 
-        if ($oldversion < 2023040701) {
+        // Catquiz savepoint reached.
+        upgrade_plugin_savepoint(true, 2023040100, 'local', 'catquiz');
+    }
 
-            // Define field catscaleid to be added to local_catquiz_tests.
-            $table = new xmldb_table('local_catquiz_tests');
-            $field = new xmldb_field('catscaleid', XMLDB_TYPE_INTEGER, '10', null, null, null, null, 'component');
+    if ($oldversion < 2023040102) {
 
-            // Conditionally launch add field catscaleid.
-            if (!$dbman->field_exists($table, $field)) {
-                $dbman->add_field($table, $field);
-            }
+        // Define table local_catquiz_catcontext to be created.
+        $table = new xmldb_table('local_catquiz_catcontext');
 
-            // Catquiz savepoint reached.
-            upgrade_plugin_savepoint(true, 2023040701, 'local', 'catquiz');
+        // Adding fields to table local_catquiz_catcontext.
+        $table->add_field('id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, XMLDB_SEQUENCE, null);
+        $table->add_field('name', XMLDB_TYPE_CHAR, '255', null, null, null, null);
+        $table->add_field('description', XMLDB_TYPE_TEXT, null, null, null, null, null);
+        $table->add_field('descriptionformat', XMLDB_TYPE_INTEGER, '2', null, null, null, null);
+        $table->add_field('starttimestamp', XMLDB_TYPE_INTEGER, '10', null, null, null, '0');
+        $table->add_field('endtimestamp', XMLDB_TYPE_INTEGER, '10', null, null, null, '0');
+        $table->add_field('json', XMLDB_TYPE_TEXT, null, null, null, null, null);
+        $table->add_field('usermodified', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0');
+        $table->add_field('timecreated', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0');
+        $table->add_field('timemodified', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0');
+
+        // Adding keys to table local_catquiz_catcontext.
+        $table->add_key('primary', XMLDB_KEY_PRIMARY, ['id']);
+        $table->add_key('usermodified', XMLDB_KEY_FOREIGN, ['usermodified'], 'user', ['id']);
+
+        // Conditionally launch create table for local_catquiz_catcontext.
+        if (!$dbman->table_exists($table)) {
+            $dbman->create_table($table);
+        }
+        // Catquiz savepoint reached.
+        upgrade_plugin_savepoint(true, 2023040102, 'local', 'catquiz');
+    }
+
+    if ($oldversion < 2023040701) {
+
+        // Define field catscaleid to be added to local_catquiz_tests.
+        $table = new xmldb_table('local_catquiz_tests');
+        $field = new xmldb_field('catscaleid', XMLDB_TYPE_INTEGER, '10', null, null, null, null, 'component');
+
+        // Conditionally launch add field catscaleid.
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
         }
 
-        if ($oldversion < 2023041400) {
+        // Catquiz savepoint reached.
+        upgrade_plugin_savepoint(true, 2023040701, 'local', 'catquiz');
+    }
 
-            // Define field model to be added to local_catquiz_personparams.
-            $table = new xmldb_table('local_catquiz_personparams');
-            $field = new xmldb_field('model', XMLDB_TYPE_CHAR, '255', null, null, null, null, 'contextid');
+    if ($oldversion < 2023041400) {
 
-            // Conditionally launch add field model.
-            if (!$dbman->field_exists($table, $field)) {
-                $dbman->add_field($table, $field);
-            }
+        // Define field model to be added to local_catquiz_personparams.
+        $table = new xmldb_table('local_catquiz_personparams');
+        $field = new xmldb_field('model', XMLDB_TYPE_CHAR, '255', null, null, null, null, 'contextid');
 
-            // Catquiz savepoint reached.
-            upgrade_plugin_savepoint(true, 2023041400, 'local', 'catquiz');
+        // Conditionally launch add field model.
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
         }
+
+        // Catquiz savepoint reached.
+        upgrade_plugin_savepoint(true, 2023041400, 'local', 'catquiz');
+    }
 
         // Add the itemparams table
-        $SAVEPOINT_ADD_ITEM_PARAMS = 2023041703;
-        if ($oldversion < $SAVEPOINT_ADD_ITEM_PARAMS) {
+        $savepointadditemparams = 2023041703;
+    if ($oldversion < $savepointadditemparams) {
 
-            // Define table local_catquiz_itemparams to be created.
-            $table = new xmldb_table('local_catquiz_itemparams');
+        // Define table local_catquiz_itemparams to be created.
+        $table = new xmldb_table('local_catquiz_itemparams');
 
-            // Adding fields to table local_catquiz_itemparams.
-            $table->add_field('id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, XMLDB_SEQUENCE, null);
-            $table->add_field('componentid', XMLDB_TYPE_INTEGER, '10', null, null, null, '0');
-            $table->add_field('componentname', XMLDB_TYPE_CHAR, '255', null, null, null, null);
-            $table->add_field('contextid', XMLDB_TYPE_INTEGER, '10', null, null, null, '0');
-            $table->add_field('model', XMLDB_TYPE_CHAR, '255', null, null, null, null);
-            $table->add_field('difficulty', XMLDB_TYPE_NUMBER, '10, 4', null, null, null, '0');
-            $table->add_field('discrimination', XMLDB_TYPE_NUMBER, '10, 4', null, null, null, '0');
+        // Adding fields to table local_catquiz_itemparams.
+        $table->add_field('id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, XMLDB_SEQUENCE, null);
+        $table->add_field('componentid', XMLDB_TYPE_INTEGER, '10', null, null, null, '0');
+        $table->add_field('componentname', XMLDB_TYPE_CHAR, '255', null, null, null, null);
+        $table->add_field('contextid', XMLDB_TYPE_INTEGER, '10', null, null, null, '0');
+        $table->add_field('model', XMLDB_TYPE_CHAR, '255', null, null, null, null);
+        $table->add_field('difficulty', XMLDB_TYPE_NUMBER, '10, 4', null, null, null, '0');
+        $table->add_field('discrimination', XMLDB_TYPE_NUMBER, '10, 4', null, null, null, '0');
 
-            // Adding keys to table local_catquiz_itemparams.
-            $table->add_key('primary', XMLDB_KEY_PRIMARY, ['id']);
+        // Adding keys to table local_catquiz_itemparams.
+        $table->add_key('primary', XMLDB_KEY_PRIMARY, ['id']);
 
-            // Conditionally launch create table for local_catquiz_itemparams.
-            if (!$dbman->table_exists($table)) {
-                $dbman->create_table($table);
-            }
-
-            // Catquiz savepoint reached.
-            upgrade_plugin_savepoint(true, $SAVEPOINT_ADD_ITEM_PARAMS, 'local', 'catquiz');
+        // Conditionally launch create table for local_catquiz_itemparams.
+        if (!$dbman->table_exists($table)) {
+            $dbman->create_table($table);
         }
 
-        $SAVEPOINT_ADD_TIME_FIELDS = 2023042001;
-        if ($oldversion < $SAVEPOINT_ADD_TIME_FIELDS) {
+        // Catquiz savepoint reached.
+        upgrade_plugin_savepoint(true, $savepointadditemparams, 'local', 'catquiz');
+    }
 
-            // Add timecreated field
-            // Define field timecreated to be added to local_catquiz_itemparams.
-            $table = new xmldb_table('local_catquiz_itemparams');
-            $field = new xmldb_field('timecreated', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0', 'discrimination');
+        $savepointaddtimefields = 2023042001;
+    if ($oldversion < $savepointaddtimefields) {
 
-            // Conditionally launch add field timecreated.
-            if (!$dbman->field_exists($table, $field)) {
-                $dbman->add_field($table, $field);
-            }
+        // Add timecreated field
+        // Define field timecreated to be added to local_catquiz_itemparams.
+        $table = new xmldb_table('local_catquiz_itemparams');
+        $field = new xmldb_field('timecreated', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0', 'discrimination');
 
-            // Add timemodified field
-            // Define field timemodified to be added to local_catquiz_itemparams.
-            $table = new xmldb_table('local_catquiz_itemparams');
-            $field = new xmldb_field('timemodified', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0', 'timecreated');
-
-            // Conditionally launch add field timemodified.
-            if (!$dbman->field_exists($table, $field)) {
-                $dbman->add_field($table, $field);
-            }
-
-            // Catquiz savepoint reached.
-            upgrade_plugin_savepoint(true, $SAVEPOINT_ADD_TIME_FIELDS, 'local', 'catquiz');
+        // Conditionally launch add field timecreated.
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
         }
 
-        $SAVEPOINT_UPDATE_ABILITY_PRECISION = 2023042101;
-        if ($oldversion < $SAVEPOINT_UPDATE_ABILITY_PRECISION) {
+        // Add timemodified field
+        // Define field timemodified to be added to local_catquiz_itemparams.
+        $table = new xmldb_table('local_catquiz_itemparams');
+        $field = new xmldb_field('timemodified', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0', 'timecreated');
 
-            // Changing precision of field ability on table local_catquiz_personparams to (10, 4).
-            $table = new xmldb_table('local_catquiz_personparams');
-            $field = new xmldb_field('ability', XMLDB_TYPE_NUMBER, '10, 4', null, null, null, null, 'model');
-
-            // Launch change of precision for field ability.
-            $dbman->change_field_precision($table, $field);
-
-            // Catquiz savepoint reached.
-            upgrade_plugin_savepoint(true, $SAVEPOINT_UPDATE_ABILITY_PRECISION, 'local', 'catquiz');
+        // Conditionally launch add field timemodified.
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
         }
 
-        $SAVEPOINT_ADD_COURSEID_FIELD = 2023050203;
-        if ($oldversion < $SAVEPOINT_ADD_COURSEID_FIELD) {
+        // Catquiz savepoint reached.
+        upgrade_plugin_savepoint(true, $savepointaddtimefields, 'local', 'catquiz');
+    }
 
-            // Define field courseid to be added to local_catquiz_tests.
-            $table = new xmldb_table('local_catquiz_tests');
-            $field = new xmldb_field('courseid', XMLDB_TYPE_INTEGER, '10', null, null, null, null, 'catscaleid');
+        $savepointupdateabilityprecision = 2023042101;
+    if ($oldversion < $savepointupdateabilityprecision) {
 
-            // Conditionally launch add field courseid.
-            if (!$dbman->field_exists($table, $field)) {
-                $dbman->add_field($table, $field);
-            }
+        // Changing precision of field ability on table local_catquiz_personparams to (10, 4).
+        $table = new xmldb_table('local_catquiz_personparams');
+        $field = new xmldb_field('ability', XMLDB_TYPE_NUMBER, '10, 4', null, null, null, null, 'model');
 
-            // Catquiz savepoint reached.
-            upgrade_plugin_savepoint(true, $SAVEPOINT_ADD_COURSEID_FIELD, 'local', 'catquiz');
+        // Launch change of precision for field ability.
+        $dbman->change_field_precision($table, $field);
+
+        // Catquiz savepoint reached.
+        upgrade_plugin_savepoint(true, $savepointupdateabilityprecision, 'local', 'catquiz');
+    }
+
+        $savepointaddcourseidfield = 2023050203;
+    if ($oldversion < $savepointaddcourseidfield) {
+
+        // Define field courseid to be added to local_catquiz_tests.
+        $table = new xmldb_table('local_catquiz_tests');
+        $field = new xmldb_field('courseid', XMLDB_TYPE_INTEGER, '10', null, null, null, null, 'catscaleid');
+
+        // Conditionally launch add field courseid.
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
         }
 
-        $SAVEPOINT_REMOVE_PERSONPARAMS_MODEL = 2023050501;
-        if ($oldversion < $SAVEPOINT_REMOVE_PERSONPARAMS_MODEL) {
+        // Catquiz savepoint reached.
+        upgrade_plugin_savepoint(true, $savepointaddcourseidfield, 'local', 'catquiz');
+    }
 
-            // Define field model to be dropped from local_catquiz_personparams.
-            $table = new xmldb_table('local_catquiz_personparams');
-            $field = new xmldb_field('model');
+        $savepointremovepersonparamsmodel = 2023050501;
+    if ($oldversion < $savepointremovepersonparamsmodel) {
 
-            // Conditionally launch drop field model.
-            if ($dbman->field_exists($table, $field)) {
-                $dbman->drop_field($table, $field);
-            }
+        // Define field model to be dropped from local_catquiz_personparams.
+        $table = new xmldb_table('local_catquiz_personparams');
+        $field = new xmldb_field('model');
 
-            // Catquiz savepoint reached.
-            upgrade_plugin_savepoint(true, $SAVEPOINT_REMOVE_PERSONPARAMS_MODEL, 'local', 'catquiz');
+        // Conditionally launch drop field model.
+        if ($dbman->field_exists($table, $field)) {
+            $dbman->drop_field($table, $field);
         }
 
-        $SAVEPOINT_ADD_ITEMPARAMS_STATUS_FIELD = 2023050503;
-        if ($oldversion < $SAVEPOINT_ADD_ITEMPARAMS_STATUS_FIELD) {
+        // Catquiz savepoint reached.
+        upgrade_plugin_savepoint(true, $savepointremovepersonparamsmodel, 'local', 'catquiz');
+    }
 
-            // Define field status to be added to local_catquiz_itemparams.
-            $table = new xmldb_table('local_catquiz_itemparams');
-            $field = new xmldb_field('status', XMLDB_TYPE_INTEGER, '2', null, XMLDB_NOTNULL, null, 0, 'difficulty');
+        $savepointadditemparamsstatusfield = 2023050503;
+    if ($oldversion < $savepointadditemparamsstatusfield) {
 
-            // Conditionally launch add field status.
-            if (!$dbman->field_exists($table, $field)) {
-                $dbman->add_field($table, $field);
-            }
+        // Define field status to be added to local_catquiz_itemparams.
+        $table = new xmldb_table('local_catquiz_itemparams');
+        $field = new xmldb_field('status', XMLDB_TYPE_INTEGER, '2', null, XMLDB_NOTNULL, null, 0, 'difficulty');
 
-            // Catquiz savepoint reached.
-            upgrade_plugin_savepoint(true, $SAVEPOINT_ADD_ITEMPARAMS_STATUS_FIELD, 'local', 'catquiz');
+        // Conditionally launch add field status.
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
         }
 
-        $SAVEPOINT_ADD_TIMECALCULATED_FIELD = 2023060201;
-        if ($oldversion < $SAVEPOINT_ADD_TIMECALCULATED_FIELD) {
+        // Catquiz savepoint reached.
+        upgrade_plugin_savepoint(true, $savepointadditemparamsstatusfield, 'local', 'catquiz');
+    }
 
-            // Define field timecalculated to be added to local_catquiz_catcontext.
-            $table = new xmldb_table('local_catquiz_catcontext');
-            $field = new xmldb_field('timecalculated', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0', 'timemodified');
+        $savepointaddtimecalculatedfield = 2023060201;
+    if ($oldversion < $savepointaddtimecalculatedfield) {
 
-            // Conditionally launch add field timecalculated.
-            if (!$dbman->field_exists($table, $field)) {
-                $dbman->add_field($table, $field);
-            }
+        // Define field timecalculated to be added to local_catquiz_catcontext.
+        $table = new xmldb_table('local_catquiz_catcontext');
+        $field = new xmldb_field('timecalculated', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0', 'timemodified');
 
-            // Catquiz savepoint reached.
-            upgrade_plugin_savepoint(true, $SAVEPOINT_ADD_TIMECALCULATED_FIELD, 'local', 'catquiz');
+        // Conditionally launch add field timecalculated.
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
         }
 
-        if ($oldversion < 2023072400) {
+        // Catquiz savepoint reached.
+        upgrade_plugin_savepoint(true, $savepointaddtimecalculatedfield, 'local', 'catquiz');
+    }
 
-            // Define field catscaleid to be added to local_catquiz_personparams.
-            $table = new xmldb_table('local_catquiz_personparams');
-            $field = new xmldb_field('catscaleid', XMLDB_TYPE_INTEGER, '10', null, null, null, '0', 'status');
+    if ($oldversion < 2023072400) {
 
-            // Conditionally launch add field catscaleid.
-            if (!$dbman->field_exists($table, $field)) {
-                $dbman->add_field($table, $field);
-            }
+        // Define field catscaleid to be added to local_catquiz_personparams.
+        $table = new xmldb_table('local_catquiz_personparams');
+        $field = new xmldb_field('catscaleid', XMLDB_TYPE_INTEGER, '10', null, null, null, '0', 'status');
 
-            // Catquiz savepoint reached.
-            upgrade_plugin_savepoint(true, 2023072400, 'local', 'catquiz');
+        // Conditionally launch add field catscaleid.
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
         }
 
-        if ($oldversion < 2023080300) {
+        // Catquiz savepoint reached.
+        upgrade_plugin_savepoint(true, 2023072400, 'local', 'catquiz');
+    }
 
-            // Define field status to be added to local_catquiz_items.
-            $table = new xmldb_table('local_catquiz_items');
-            $field = new xmldb_field('status', XMLDB_TYPE_INTEGER, '2', null, null, null, '0', 'lastupdated');
+    if ($oldversion < 2023080300) {
 
-            // Conditionally launch add field status.
-            if (!$dbman->field_exists($table, $field)) {
-                $dbman->add_field($table, $field);
-            }
+        // Define field status to be added to local_catquiz_items.
+        $table = new xmldb_table('local_catquiz_items');
+        $field = new xmldb_field('status', XMLDB_TYPE_INTEGER, '2', null, null, null, '0', 'lastupdated');
 
-            // Catquiz savepoint reached.
-            upgrade_plugin_savepoint(true, 2023080300, 'local', 'catquiz');
+        // Conditionally launch add field status.
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
         }
 
+        // Catquiz savepoint reached.
+        upgrade_plugin_savepoint(true, 2023080300, 'local', 'catquiz');
+    }
 
     return true;
 }

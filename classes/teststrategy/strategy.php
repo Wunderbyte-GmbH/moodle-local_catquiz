@@ -52,7 +52,7 @@ abstract class strategy {
     /**
      * @var array<preselect_task>
      */
-    public array $score_modifiers;
+    public array $scoremodifiers;
 
     public function __construct() {
         $this->score_modifiers = info::get_score_modifiers();
@@ -108,28 +108,28 @@ abstract class strategy {
             return $result;
         }
 
-        $selected_question = $result->unwrap();
-        if (!$selected_question) {
+        $selectedquestion = $result->unwrap();
+        if (!$selectedquestion) {
             return result::err();
         }
 
-        $selected_question->lastattempttime = $now;
-        $selected_question->userlastattempttime = $now;
+        $selectedquestion->lastattempttime = $now;
+        $selectedquestion->userlastattempttime = $now;
 
         // Keep track of which question was selected
         $playedquestions = $cache->get('playedquestions') ?: [];
-        $playedquestions[$selected_question->id] = $selected_question;
+        $playedquestions[$selectedquestion->id] = $selectedquestion;
         $cache->set('playedquestions', $playedquestions);
         $cache->set('isfirstquestionofattempt', false);
 
-        $cache->set('lastquestion', $selected_question);
+        $cache->set('lastquestion', $selectedquestion);
 
         catscale::update_testitem(
             $this->catcontextid,
-            $selected_question,
+            $selectedquestion,
             $context['includesubscales']
         );
-        return result::ok($selected_question);
+        return result::ok($selectedquestion);
     }
 
     /**

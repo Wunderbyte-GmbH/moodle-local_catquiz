@@ -120,10 +120,10 @@ class csvimport extends dynamic_form {
         $columnssequential = [
             array(
                 'name' => 'componentid',
-                //'columnname' => get_string('id'),
+                // 'columnname' => get_string('id'),
                 'mandatory' => true,
                 'format' => PARAM_INT,
-                //'transform' => fn($x) => get_string($x, 'local_catquiz'),
+                // 'transform' => fn($x) => get_string($x, 'local_catquiz'),
             ),
             array(
                 'name' => 'componentname',
@@ -184,7 +184,7 @@ class csvimport extends dynamic_form {
      */
     public static function get_delimiter_list() {
         global $CFG;
-        $delimiters = array('comma'=>',', 'semicolon'=>';', 'colon'=>':', 'tab'=>'\\t');
+        $delimiters = array('comma' => ',', 'semicolon' => ';', 'colon' => ':', 'tab' => '\\t');
         if (isset($CFG->CSV_DELIMITER) and strlen($CFG->CSV_DELIMITER) === 1 and !in_array($CFG->CSV_DELIMITER, $delimiters)) {
             $delimiters['cfg'] = $CFG->CSV_DELIMITER;
         }

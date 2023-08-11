@@ -158,7 +158,7 @@ class managecatscaledashboard implements renderable, templatable {
         }
 
         $data = [
-            'itemtree' =>  $this->catscalesarray,
+            'itemtree' => $this->catscalesarray,
             'catscalemanagers' => $this->catscalemanagersarray,
             'questionsdisplay' => $this->questionsdisplayarray,
             'catscalestats' => $this->catscalestatsarray,

@@ -108,7 +108,7 @@ class catscale {
             if (self::is_assigned_to_parent_scale($catscaleid, $testitemid)
                 || self::is_assigned_to_subscale($catscaleid, $testitemid)) {
                     return result::err(status::ERROR_TESTITEM_ALREADY_IN_RELATED_SCALE, $testitemid);
-                }
+            }
 
             $now = time();
             $data['timemodified'] = $now;
@@ -185,7 +185,7 @@ class catscale {
      * @param ?string $orderby If given, sort items by that field
      * @return array
      */
-    public function get_testitems(int $contextid, bool $includesubscales = false, ?string $orderby = NULL):array {
+    public function get_testitems(int $contextid, bool $includesubscales = false, ?string $orderby = null):array {
 
         $cache = cache::make('local_catquiz', 'adaptivequizattempt');
         $cachekey = sprintf('testitems_%s_%s', $contextid, $includesubscales);

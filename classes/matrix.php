@@ -37,13 +37,13 @@ use ArrayObject;
  *
  * Examples:
  * $m = new Matrix(4, 2); // 4 rows, 2 columns
- * 
+ *
  * $m = new Matrix([
  *      [42, 21],
  *      [84, 0],
  *      [20, -21],
  * ]);
- * 
+ *
  * $m2 = new Matrix($m3);
  *
  * You can also : add, subtract and multiply your matrix with scalar or Matrix
@@ -75,9 +75,9 @@ class matrix extends ArrayObject {
      *
      * @param mixed $value Matrix, array or number of rows
      * @param mixed|null $cols
-     * 
+     *
      * @throws MatrixException Wrong parameters
-     * 
+     *
      */
     public function __construct($value, $cols = null) {
         if ($value instanceof self) {
@@ -114,9 +114,9 @@ class matrix extends ArrayObject {
      * Add another matrix or a scalar to this matrix, return a new matrix instance.
      *
      * @param mixed $value Matrix or scalar to add to this Matrix
-     * 
+     *
      * @return Matrix New result matrix
-     * 
+     *
      * @throws MatrixException If matrices do not have the same size
      */
     public function add($value) {
@@ -147,9 +147,9 @@ class matrix extends ArrayObject {
      * Subtract another matrix or a scalar to this matrix, return a new matrix instance.
      *
      * @param mixed $value matrix or scalar to subtract to this matrix
-     * 
+     *
      * @return Matrix New result matrix
-     * 
+     *
      * @throws MatrixException If matrices do not have the same size
      */
     public function subtract($value) {
@@ -180,9 +180,9 @@ class matrix extends ArrayObject {
      * Multiply another matrix or a scalar to this matrix, return a new matrix instance.
      *
      * @param mixed $value matrix or scalar to multiply to this matrix
-     * 
+     *
      * @return Matrix New result matrix
-     * 
+     *
      * @throws MatrixException If matrices are incompatible
      */
     public function multiply($value) {
@@ -191,16 +191,16 @@ class matrix extends ArrayObject {
             if ($this->_cols != $matrix->_rows) {
                 throw new MatrixException('Cannot multiply matrices: incompatible matrices');
             }
-            $resultArray = [];
+            $resultarray = [];
             for ($i = 0; $i < $this->_rows; $i++) {
                 for ($j = 0; $j < $matrix->_cols; $j++) {
-                    $resultArray[$i][$j] = 0;
+                    $resultarray[$i][$j] = 0;
                     for ($k = 0; $k < $matrix->_rows; $k++) {
-                        $resultArray[$i][$j] += $this[$i][$k] * $matrix[$k][$j];
+                        $resultarray[$i][$j] += $this[$i][$k] * $matrix[$k][$j];
                     }
                 }
             }
-            return new self($resultArray);
+            return new self($resultarray);
         } else {
             $result = new self($this->_rows, $this->_cols);
             for ($r = 0; $r < $result->_rows; $r++) {
@@ -216,33 +216,33 @@ class matrix extends ArrayObject {
      * Return a new sub matrix from this matrix.
      *
      * @param int $rowOffset Row offset to avoid
-     * 
+     *
      * @param int $colOffset Col offset to avoid
-     * 
+     *
      * @return Matrix The new sub matrix
      */
-    public function subMatrix($rowOffset, $colOffset) {
-        $subArray = [];
-        for ($r = 0, $sR = 0; $r < $this->_rows; $r++) {
-            if ($r != $rowOffset) {
-                $subArray[$sR] = [];
-                for ($c = 0, $sC = 0; $c < $this->_cols; $c++) {
-                    if ($c != $colOffset) {
-                        $subArray[$sR][$sC] = $this[$r][$c];
-                        $sC++;
+    public function submatrix($rowoffset, $coloffset) {
+        $subarray = [];
+        for ($r = 0, $sr = 0; $r < $this->_rows; $r++) {
+            if ($r != $rowoffset) {
+                $subarray[$sr] = [];
+                for ($c = 0, $sc = 0; $c < $this->_cols; $c++) {
+                    if ($c != $coloffset) {
+                        $subarray[$sr][$sc] = $this[$r][$c];
+                        $sc++;
                     }
                 }
-                $sR++;
+                $sr++;
             }
         }
-        return new self($subArray);
+        return new self($subarray);
     }
 
     /**
      * Computes the matrix's determinant.
      *
      * @return float The matrix's determinant
-     * 
+     *
      * @throws MatrixException If matrix is not a square
      */
     public function determinant() {
@@ -254,8 +254,9 @@ class matrix extends ArrayObject {
         } else {
             $out = 0;
             for ($c = 0; $c < $this->_cols; $c++) {
-                if ($this[0][$c])
+                if ($this[0][$c]) {
                     $out += pow(-1, $c + 2) * $this[0][$c] * $this->subMatrix(0, $c)->determinant();
+                }
             }
             return $out;
         }
@@ -267,18 +268,18 @@ class matrix extends ArrayObject {
      * @return Matrix The new computed matrix
      */
     public function cofactor() {
-        $cofactorArray = [];
+        $cofactorarray = [];
         for ($c = 0; $c < $this->_cols; $c++) {
-            $cofactorArray[$c] = [];
+            $cofactorarray[$c] = [];
             for ($r = 0; $r < $this->_rows; $r++) {
                 if ($this->_cols == 2) {
-                    $cofactorArray[$c][$r] = pow(-1, $c + $r) * $this->subMatrix($c, $r)[0][0];
+                    $cofactorarray[$c][$r] = pow(-1, $c + $r) * $this->subMatrix($c, $r)[0][0];
                 } else {
-                    $cofactorArray[$c][$r] = pow(-1, $c + $r) * $this->subMatrix($c, $r)->determinant();
+                    $cofactorarray[$c][$r] = pow(-1, $c + $r) * $this->subMatrix($c, $r)->determinant();
                 }
             }
         }
-        return new self($cofactorArray);
+        return new self($cofactorarray);
     }
 
     /**
@@ -287,13 +288,13 @@ class matrix extends ArrayObject {
      * @return Matrix The new transposed matrix
      */
     public function transpose() {
-        $resultArray = [];
+        $resultarray = [];
         for ($i = 0; $i < $this->_cols; $i++) {
             for ($j = 0; $j < $this->_rows; $j++) {
-                $resultArray[$i][$j] = $this[$j][$i];
+                $resultarray[$i][$j] = $this[$j][$i];
             }
         }
-        return new self($resultArray);
+        return new self($resultarray);
     }
 
     /**
@@ -343,7 +344,7 @@ class matrix extends ArrayObject {
      *
      * @return int The number of rows
      */
-    public function getRows() {
+    public function getrows() {
         return $this->_rows;
     }
 
@@ -352,7 +353,7 @@ class matrix extends ArrayObject {
      *
      * @return int The number of columns
      */
-    public function getCols() {
+    public function getcols() {
         return $this->_cols;
     }
 
@@ -381,7 +382,7 @@ class matrix extends ArrayObject {
      *
      * @return boolean
      */
-    public function isSquare() {
+    public function issquare() {
         return $this->_rows == $this->_cols;
     }
 

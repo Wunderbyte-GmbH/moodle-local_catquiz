@@ -58,8 +58,8 @@ class contextselector extends dynamic_form {
         $contexts = [];
         foreach ($contextsdb as $contextid => $context) {
             $contexts[$contextid] = $context->name;
-            $jsonObj = json_decode($context->json);
-            if ($jsonObj && $jsonObj->default === true) {
+            $jsonobj = json_decode($context->json);
+            if ($jsonobj && $jsonobj->default === true) {
                 $default = $contextid;
             }
         }
@@ -72,7 +72,7 @@ class contextselector extends dynamic_form {
         $label = '';
         if ($PAGE->url->get_path() !== '/local/catquiz/edit_testitem.php') {
             if (empty($customdata['hideheader'])) {
-                $mform->addElement('header', 'edit_catquiz', get_string('managecatcontexts', 'local_catquiz')) ;
+                $mform->addElement('header', 'edit_catquiz', get_string('managecatcontexts', 'local_catquiz'));
             }
             if (empty($customdata['hidelabel'])) {
                 if (isset($customdata["labeltext"])) {

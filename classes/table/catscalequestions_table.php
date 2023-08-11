@@ -123,8 +123,8 @@ class catscalequestions_table extends wunderbyte_table {
                 ]
             ];
 
-        table::transform_actionbuttons_array($data['showactionbuttons']);
-        return $OUTPUT->render_from_template('local_wunderbyte_table/component_actionbutton', $data);
+            table::transform_actionbuttons_array($data['showactionbuttons']);
+            return $OUTPUT->render_from_template('local_wunderbyte_table/component_actionbutton', $data);
     }
 
     /**
@@ -192,32 +192,32 @@ class catscalequestions_table extends wunderbyte_table {
         // $type = $values->qtype;
 
         // switch ($values->qtype) {
-        //     case "multichoice":
-        //         $type = 'MC';
-        //         break;
-        //     case "pmatch":
-        //         $type = 'PMTC';
-        //         break;
-        //     case "match":
-        //         $type = 'MTC';
-        //         break;
-        //     case "truefalse":
-        //         $type = 'TF';
-        //         break;
-        //     case "ddwtos":
-        //         $type = 'DDWT';
-        //         break;
-        //     case "ordering":
-        //         $type = 'ORD';
-        //         break;
-        //     case "ddimageortext":
-        //         $type = 'IOT';
-        //         break;
-        //     case "numerical":
-        //         $type = 'NUM';
-        //         break;
-        //     default:
-        //         break;
+        // case "multichoice":
+        // $type = 'MC';
+        // break;
+        // case "pmatch":
+        // $type = 'PMTC';
+        // break;
+        // case "match":
+        // $type = 'MTC';
+        // break;
+        // case "truefalse":
+        // $type = 'TF';
+        // break;
+        // case "ddwtos":
+        // $type = 'DDWT';
+        // break;
+        // case "ordering":
+        // $type = 'ORD';
+        // break;
+        // case "ddimageortext":
+        // $type = 'IOT';
+        // break;
+        // case "numerical":
+        // $type = 'NUM';
+        // break;
+        // default:
+        // break;
         // }
         // return $type;
     }
@@ -258,31 +258,31 @@ class catscalequestions_table extends wunderbyte_table {
 
     /**
      * Function to delete selected question.
-    * @param int $id
-    * @param string $data
-    * @return array
-    */
-   public function deletequestionfromscale(int $id, string $data) {
+     * @param int $id
+     * @param string $data
+     * @return array
+     */
+    public function deletequestionfromscale(int $id, string $data) {
 
-       $jsonobject = json_decode($data);
+        $jsonobject = json_decode($data);
 
-       $catscaleid = $jsonobject->catscaleid;
-       $questionid = $jsonobject->questionid;
+        $catscaleid = $jsonobject->catscaleid;
+        $questionid = $jsonobject->questionid;
 
         catscale::remove_testitem_from_scale($catscaleid, $questionid);
 
-       return [
+        return [
            'success' => 1,
            'message' => get_string('success'),
-       ];
-   }
+        ];
+    }
 
     /**
-    * Toggle status to set item active / inactive.
-    * @param int $id
-    * @param string $data
-    * @return array
-    */
+     * Toggle status to set item active / inactive.
+     * @param int $id
+     * @param string $data
+     * @return array
+     */
     public function togglestatus(int $id, string $data) {
 
         $jsonobject = json_decode($data);

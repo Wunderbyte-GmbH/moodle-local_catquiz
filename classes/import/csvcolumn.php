@@ -28,47 +28,47 @@ defined('MOODLE_INTERNAL') || die();
 
 class csvcolumn {
 
-/**
- * @var string
- */
-public $columnname = '';
+    /**
+     * @var string
+     */
+    public $columnname = '';
 
-/**
- * @var string
- */
-public $localizedname = '';
+    /**
+     * @var string
+     */
+    public $localizedname = '';
 
-/**
- * @var boolean
- */
-public $mandatory = true;
+    /**
+     * @var boolean
+     */
+    public $mandatory = true;
 
-/**
- * @var boolean
- */
-public $unique = false;
+    /**
+     * @var boolean
+     */
+    public $unique = false;
 
-/**
- * @var string
- */
-public $format = 'string';
+    /**
+     * @var string
+     */
+    public $format = 'string';
 
-/**
- * @var string
- */
-public $type = 'default';
+    /**
+     * @var string
+     */
+    public $type = 'default';
 
-/**
- * @var *
- */
-public $defaultvalue;
+    /**
+     * @var *
+     */
+    public $defaultvalue;
 
-/**
- * @var *
- */
-public $transform;
+    /**
+     * @var *
+     */
+    public $transform;
 
-public function __construct(
+    public function __construct(
     $columnname = '',
     $localizedname = '',
     $mandatory = true,
@@ -78,64 +78,64 @@ public function __construct(
     $defaultvalue = null,
     $transform = null) {
 
-    $this->columnname = $columnname;
-    $this->localizedname = $localizedname;
-    $this->mandatory = $mandatory;
-    $this->unique = $unique;
-    $this->format = $format;
-    $this->type = $type;
-    $this->defaultvalue = $defaultvalue;
-    $this->transform = $transform;
+        $this->columnname = $columnname;
+        $this->localizedname = $localizedname;
+        $this->mandatory = $mandatory;
+        $this->unique = $unique;
+        $this->format = $format;
+        $this->type = $type;
+        $this->defaultvalue = $defaultvalue;
+        $this->transform = $transform;
 
-    $this->apply('pluginname');
-}
-
-public function apply($value) {
-
-    if(empty($this->transform)) {
-        return;
+        $this->apply('pluginname');
     }
-    $func = $this->transform;
-    $result = $func($value);
-    return $result;
-}
 
-/**
- * @param string $param
- * @param string $value
- * @return boolean
- */
-public function set_property($param, $value) {
-    if(isset($this->$param)) {
-        $this->$param = $value;
-        return true;
-    } else {
-        return false;
+    public function apply($value) {
+
+        if(empty($this->transform)) {
+            return;
+        }
+        $func = $this->transform;
+        $result = $func($value);
+        return $result;
     }
-}
 
-/**
- * Transform a date object to a string in the defined format.
- * @param mixed $date
- * @param string $format
- * @return string
- */
-public function date_to_string($date, $format) {
+    /**
+     * @param string $param
+     * @param string $value
+     * @return boolean
+     */
+    public function set_property($param, $value) {
+        if(isset($this->$param)) {
+            $this->$param = $value;
+            return true;
+        } else {
+            return false;
+        }
+    }
 
-    //input is date return string in defined format
-    return "";
-}
-/**
- * Transform a string to an object in the defined format.
- * @param mixed $date
- * @param string $format
- * @return mixed
- */
-public function string_to_date($date, $format) {
+    /**
+     * Transform a date object to a string in the defined format.
+     * @param mixed $date
+     * @param string $format
+     * @return string
+     */
+    public function date_to_string($date, $format) {
 
-    //input is string return date in defined format
-    return "";
-}
+        // input is date return string in defined format
+        return "";
+    }
+    /**
+     * Transform a string to an object in the defined format.
+     * @param mixed $date
+     * @param string $format
+     * @return mixed
+     */
+    public function string_to_date($date, $format) {
+
+        // input is string return date in defined format
+        return "";
+    }
 
 
 

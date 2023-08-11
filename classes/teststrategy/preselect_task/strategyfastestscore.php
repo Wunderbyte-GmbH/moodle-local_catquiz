@@ -10,15 +10,15 @@ use local_catquiz\wb_middleware;
 
 /**
  * Add a score to each question and sort questions descending by score
- * 
+ *
  * @package local_catquiz\teststrategy\preselect_task
  */
-final class strategyfastestscore extends preselect_task implements wb_middleware
-{
+final class strategyfastestscore extends preselect_task implements wb_middleware {
+
     public function run(array $context, callable $next): result {
         foreach ($context['questions'] as $question) {
             $question->score = (1 - (
-                $question->{lasttimeplayedpenalty::PROPERTYNAME}/$context['penalty_threshold'])) * $question->{fisherinformation::PROPERTYNAME};
+                $question->{lasttimeplayedpenalty::PROPERTYNAME} / $context['penalty_threshold'])) * $question->{fisherinformation::PROPERTYNAME};
         }
 
         uasort($context['questions'], function($q1, $q2) {

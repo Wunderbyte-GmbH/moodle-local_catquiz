@@ -28,14 +28,14 @@ use local_catquiz\local\status;
 
 /**
  * Provides methods to obtain results.
- * 
- * 
+ *
+ *
  * @package    local_catquiz
  * @copyright  2023 Wunderbyte GmbH <georg.maisser@wunderbyte.at>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class result
-{
+class result {
+
     /**
      * @var mixed status
      */
@@ -44,16 +44,15 @@ class result
      * @var mixed value
      */
     protected $value;
-    
+
     /**
      * Result-specific instantiation can go here.
      *
      * @param mixed|null $value
      * @param mixed|status $status
-     * 
+     *
      */
-    public function __construct($value = null, $status = status::OK)
-    {
+    public function __construct($value = null, $status = status::OK) {
         $this->value  = $value;
         $this->status = $status;
     }
@@ -63,69 +62,63 @@ class result
      *
      * @param mixed|status $status
      * @param mixed|null $value
-     * 
+     *
      * @return result
-     * 
+     *
      */
-    public static function err($status = status::ERROR_GENERAL, $value = null)
-    {
+    public static function err($status = status::ERROR_GENERAL, $value = null) {
         return new result($value, $status);
     }
-    
+
     /**
      * Returns OK result.
      *
      * @param mixed|null $value
-     * 
+     *
      * @return result
-     * 
+     *
      */
-    public static function ok($value = null)
-    {
+    public static function ok($value = null) {
         return new result($value, status::OK);
     }
-    
+
     /**
      * Returns status.
      *
      * @return mixed
-     * 
+     *
      */
-    public function get_status()
-    {
+    public function get_status() {
         return $this->status;
     }
-    
+
     /**
      * Returns umwrapped value.
      *
      * @return mixed
-     * 
+     *
      */
-    public function unwrap()
-    {
+    public function unwrap() {
         return $this->value;
     }
-    
+
     /**
      * Returns is result OK.
      *
      * @return bool
-     * 
+     *
      */
-    public function isOk()
-    {
+    public function isok() {
         return $this->status === Status::OK;
     }
-    
+
     /**
      * Returns is result error.
      *
      * @return bool
-     * 
+     *
      */
-    public function isErr()
-    {
+    public function iserr() {
         return $this->status !== Status::OK;
     }
 
@@ -133,10 +126,9 @@ class result
      * Returns error message.
      *
      * @return string
-     * 
+     *
      */
-    public function getErrorMessage()
-    {
+    public function geterrormessage() {
         if ($this->isOk()) {
             throw new \moodle_exception("Trying to get the error message for a result that has no error.");
         }

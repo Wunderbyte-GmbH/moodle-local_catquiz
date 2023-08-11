@@ -19,7 +19,7 @@ class personability_loader implements contextloaderinterface {
 
     public function load(array $context): array {
         global $DB, $USER;
-        $person_params = $DB->get_record(
+        $personparams = $DB->get_record(
             'local_catquiz_personparams',
             [
                 'userid' => $USER->id,
@@ -28,9 +28,9 @@ class personability_loader implements contextloaderinterface {
             ]
         );
 
-        $context['person_ability'] = empty($person_params)
+        $context['person_ability'] = empty($personparams)
             ? self::DEFAULT_ABILITY
-            : floatval($person_params->ability);
+            : floatval($personparams->ability);
 
         return $context;
     }

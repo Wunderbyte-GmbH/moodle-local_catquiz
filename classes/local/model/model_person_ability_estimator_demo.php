@@ -42,22 +42,21 @@ class model_person_ability_estimator_demo extends model_person_ability_estimator
      * Get person abilities.
      *
      * @param model_item_param_list $item_param_list
-     * 
+     *
      * @return model_person_param_list
-     * 
+     *
      */
-    public function get_person_abilities(model_item_param_list $item_param_list): model_person_param_list
-    {
-        $person_param_list = new model_person_param_list();
+    public function get_person_abilities(model_item_param_list $itemparamlist): model_person_param_list {
+        $personparamlist = new model_person_param_list();
         $responses = $this->responses->as_array();
-        foreach ($responses as $userid => $item_response) {
-            foreach(array_keys($item_response) as $component) {
+        foreach ($responses as $userid => $itemresponse) {
+            foreach(array_keys($itemresponse) as $component) {
                 $ability = rand(-500, 500) / 100;
                 $p = new model_person_param($userid);
                 $p->set_ability($ability);
-                $person_param_list->add($p);
+                $personparamlist->add($p);
             }
         }
-        return $person_param_list;
+        return $personparamlist;
     }
 }

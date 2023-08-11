@@ -26,8 +26,7 @@
 /**
  * Custom code to be run on installing the plugin.
  */
-function xmldb_catmodel_raschbirnbaumc_install()
-{
+function xmldb_catmodel_raschbirnbaumc_install() {
     global $DB;
     $dbman = $DB->get_manager();
 

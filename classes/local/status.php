@@ -26,16 +26,16 @@ namespace local_catquiz\local;
 
 /**
  * Contains status codes, that can be part of a local_catquiz\local\result.
- * 
+ *
  * The value of each error constant should have a translation string entry so
  * that it can be automatically translated by the result class.
- * 
+ *
  * @package    local_catquiz
  * @copyright  2023 Wunderbyte GmbH <georg.maisser@wunderbyte.at>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class status
-{
+class status {
+
     /**
      * OK
      *

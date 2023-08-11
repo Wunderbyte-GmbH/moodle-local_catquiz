@@ -51,7 +51,7 @@ class scaleselector extends dynamic_form {
         $ajaxdata = (object) $this->_ajaxformdata;
         $customdata = $this->_customdata;
 
-        $type = $customdata['type'] ?? "scale"; //Type i.e. 'scale'.
+        $type = $customdata['type'] ?? "scale"; // Type i.e. 'scale'.
         if (isset($ajaxdata->selected)) {
             $mform->addElement('hidden', 'selected', $ajaxdata->selected);
             $mform->setType('selected', PARAM_INT);

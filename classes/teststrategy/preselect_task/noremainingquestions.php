@@ -7,8 +7,8 @@ use local_catquiz\local\status;
 use local_catquiz\teststrategy\preselect_task;
 use local_catquiz\wb_middleware;
 
-final class noremainingquestions extends preselect_task implements wb_middleware
-{
+final class noremainingquestions extends preselect_task implements wb_middleware {
+
     public function run(array $context, callable $next): result {
         if (
             count($context['questions']) === 0

@@ -27,62 +27,62 @@ namespace local_catquiz\import;
 defined('MOODLE_INTERNAL') || die();
 
 class csvsettings {
-/**
- * @var string
- */
-public $delimiter = 'comma';
+    /**
+     * @var string
+     */
+    public $delimiter = 'comma';
 
-/**
- * @var string
- */
-public $enclosure = '"';
+    /**
+     * @var string
+     */
+    public $enclosure = '"';
 
-/**
- * @var string
- */
-public $encoding = 'UTF-8';
+    /**
+     * @var string
+     */
+    public $encoding = 'UTF-8';
 
-/**
- * @var string
- */
-public $dateformat = 'j.n.Y H:i:s';
+    /**
+     * @var string
+     */
+    public $dateformat = 'j.n.Y H:i:s';
 
-/**
- * @var array of column names
- */
-public $columns = [];
+    /**
+     * @var array of column names
+     */
+    public $columns = [];
 
-/**
- * @var boolean
- */
-public $columnsarrayisassociative = false;
+    /**
+     * @var boolean
+     */
+    public $columnsarrayisassociative = false;
 
-/**
- * @var boolean
- */
-public $acceptunknowncolumn = false;
-
-
-/**
- * @var string
- */
-public $callback = '';
+    /**
+     * @var boolean
+     */
+    public $acceptunknowncolumn = false;
 
 
-public function __construct($columns) {
-    $this->create_columns($columns);
-}
+    /**
+     * @var string
+     */
+    public $callback = '';
 
-private function create_columns($columns) {
-    if(!isset($columns)) {
-        return;
+
+    public function __construct($columns) {
+        $this->create_columns($columns);
     }
-    //Check if columns array is sequential or associative.
-    $keys = array_keys($columns);
-    if ($keys !== array_keys($keys)) {
-        $this->columnsarrayisassociative = true;
-        foreach($columns as $ckey => $cvalue) {
-            $this->columns[$ckey] = new csvcolumn(
+
+    private function create_columns($columns) {
+        if(!isset($columns)) {
+            return;
+        }
+        // Check if columns array is sequential or associative.
+        $keys = array_keys($columns);
+        if ($keys !== array_keys($keys)) {
+            $this->columnsarrayisassociative = true;
+            foreach($columns as $ckey => $cvalue) {
+                $this->columns[$ckey] = new csvcolumn(
                 $ckey,
                 !empty($cvalue['localizedname']) ? $cvalue['localizedname'] : $ckey,
                 null !== $cvalue['mandatory'] ? $cvalue['mandatory'] : null,
@@ -91,14 +91,14 @@ private function create_columns($columns) {
                 !empty($cvalue['format']) ? $cvalue['format'] : null,
                 !empty($cvalue['defaultvalue']) ? $cvalue['defaultvalue'] : null,
                 !empty($cvalue['transform']) ? $cvalue['transform'] : null,
-            );
-        }
-    } else {
-        foreach($columns as $c) {
-            if(!isset($c['name'])) {
-                break;
+                );
             }
-            $this->columns[$c['name']] = new csvcolumn(
+        } else {
+            foreach($columns as $c) {
+                if(!isset($c['name'])) {
+                    break;
+                }
+                $this->columns[$c['name']] = new csvcolumn(
                 $c['name'],
                 !empty($c['localizedname']) ? $c['localizedname'] : $c['name'],
                 null !== $c['mandatory'] ? $c['mandatory'] : null,
@@ -108,96 +108,96 @@ private function create_columns($columns) {
                 !empty($c['defaultvalue']) ? $c['defaultvalue'] : null,
                 !empty($c['transform']) ? $c['transform'] : null,
 
-            );
+                );
+            }
         }
     }
-}
 
-/**
- * Calling column class to update property with given value.
- * @param string $columnname
- * @param string $param
- * @param string $value
- * @return bool
- */
-public function set_param_in_column($columnname, $param, $value) {
-    if(property_exists($this->columns[$columnname], $param)) {
-        return $this->columns[$columnname]->set_property($param, $value);
-    } else {
-        return false;
+    /**
+     * Calling column class to update property with given value.
+     * @param string $columnname
+     * @param string $param
+     * @param string $value
+     * @return bool
+     */
+    public function set_param_in_column($columnname, $param, $value) {
+        if(property_exists($this->columns[$columnname], $param)) {
+            return $this->columns[$columnname]->set_property($param, $value);
+        } else {
+            return false;
+        }
     }
-}
 
 
-//Getters and Setters
-/**
- *
- * @return string
- */
-public function get_delimiter() {
-    return $this->delimiter;
-}
-/**
- *
- * @param string $delimiter
- */
-public function set_delimiter($delimiter) {
-    $this->delimiter = $delimiter;
-}
+    // Getters and Setters
+    /**
+     *
+     * @return string
+     */
+    public function get_delimiter() {
+        return $this->delimiter;
+    }
+    /**
+     *
+     * @param string $delimiter
+     */
+    public function set_delimiter($delimiter) {
+        $this->delimiter = $delimiter;
+    }
 
-/**
- *
- * @return string
- */
-public function get_enclosure() {
-    return $this->enclosure;
-}
+    /**
+     *
+     * @return string
+     */
+    public function get_enclosure() {
+        return $this->enclosure;
+    }
 
-/**
- *
- * @param string $enclosure
- */
-public function set_enclosure($enclosure) {
-    $this->enclosure = $enclosure;
-}
+    /**
+     *
+     * @param string $enclosure
+     */
+    public function set_enclosure($enclosure) {
+        $this->enclosure = $enclosure;
+    }
 
-/**
- *
- * @return string
- */
-public function get_encoding() {
-    return $this->encoding;
-}
+    /**
+     *
+     * @return string
+     */
+    public function get_encoding() {
+        return $this->encoding;
+    }
 
-/**
- *
- * @param string $encoding
- */
-public function set_encoding($encoding) {
-    $this->encoding = $encoding;
-}
+    /**
+     *
+     * @param string $encoding
+     */
+    public function set_encoding($encoding) {
+        $this->encoding = $encoding;
+    }
 
-/**
- *
- * @return string
- */
-public function get_dateformat() {
-    return $this->dateformat;
-}
+    /**
+     *
+     * @return string
+     */
+    public function get_dateformat() {
+        return $this->dateformat;
+    }
 
-/**
- *
- * @param string $dateformat
- */
-public function set_dateformat($dateformat) {
-    $this->dateformat = $dateformat;
-}
+    /**
+     *
+     * @param string $dateformat
+     */
+    public function set_dateformat($dateformat) {
+        $this->dateformat = $dateformat;
+    }
 
-/**
- *
- * @param string $callback
- */
-public function set_callback($callback) {
-    $this->callback = $callback;
-}
+    /**
+     *
+     * @param string $callback
+     */
+    public function set_callback($callback) {
+        $this->callback = $callback;
+    }
 }

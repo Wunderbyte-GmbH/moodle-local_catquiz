@@ -15,12 +15,12 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
-* Entities Class to display list of entity records.
-*
-* @package local_catquiz
-* @copyright 2023 Wunderbyte GmbH <info@wunderbyte.at>
-* @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
-*/
+ * Entities Class to display list of entity records.
+ *
+ * @package local_catquiz
+ * @copyright 2023 Wunderbyte GmbH <info@wunderbyte.at>
+ * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
 
 namespace local_catquiz\local\model;
 
@@ -33,7 +33,7 @@ use local_catquiz\local\model\model_person_param_list;
  *
  * For example: a list of users performed a test. Objects of this class show how the users performed on this test.
  * E.g.: which users took part, how did they answer the questions, etc.
- * 
+ *
  * @package local_catquiz
  * @copyright 2023 Wunderbyte GmbH <info@wunderbyte.at>
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
@@ -47,38 +47,38 @@ class model_responses {
     /**
      * @var array has_correct_answer
      */
-    private array $has_correct_answer = [];
+    private array $hascorrectanswer = [];
 
     /**
      * Return array of item ids.
      *
      * @return array
-     * 
+     *
      */
     public function get_item_ids(): array {
-        $user_ids = array_keys($this->data);
-        $question_ids = [];
+        $userids = array_keys($this->data);
+        $questionids = [];
 
-        foreach ($user_ids as $user_id) {
+        foreach ($userids as $userid) {
             $components = array();
-            $components = array_merge($components, array_keys($this->data[$user_id]));
+            $components = array_merge($components, array_keys($this->data[$userid]));
             foreach ($components as $component) {
-                $question_ids = array_merge(
-                    $question_ids, array_keys($this->data[$user_id][$component])
+                $questionids = array_merge(
+                    $questionids, array_keys($this->data[$userid][$component])
                 );
             }
         }
 
-        return array_unique($question_ids);
+        return array_unique($questionids);
     }
 
     /**
      * Create item form array.
      *
      * @param array $data
-     * 
+     *
      * @return mixed
-     * 
+     *
      */
     public static function create_from_array(array $data) {
         return (new self)->setData($data);
@@ -88,7 +88,7 @@ class model_responses {
      * Helper function to get the person IDs from the response.
      *
      * @return array
-     * 
+     *
      */
     public function get_user_ids(): array {
         return array_keys($this->data);
@@ -99,59 +99,60 @@ class model_responses {
      * So for each question ID, there is an array of model_item_response entries
      *
      * @param model_person_param_list $person_param_list
-     * 
+     *
      * @return array
-     * 
+     *
      */
-    public function get_item_response(model_person_param_list $person_param_list): array {
-        $item_response = [];
+    public function get_item_response(model_person_param_list $personparamlist): array {
+        $itemresponse = [];
 
         // Restructure the data
         // From:
         // $data[PERSONID] -> [All responses to different items by this user]
         // To:
         // $data[QUESTIONID] -> [All responses to this question by different users]
-        foreach ($person_param_list->get_person_params() as $pp) {
+        foreach ($personparamlist->get_person_params() as $pp) {
             $components = array();
             if (!array_key_exists($pp->get_id(), $this->data)) {
                 continue;
             }
-            $responsesByUser = $this->data[$pp->get_id()];
-            $components = array_merge($components, $responsesByUser);
+            $responsesbyuser = $this->data[$pp->get_id()];
+            $components = array_merge($components, $responsesbyuser);
             foreach (array_keys($components) as $component) {
-                $question_ids = array_keys($this->data[$pp->get_id()][$component]);
-                foreach ($question_ids as $question_id) {
-                    $fraction = $this->data[$pp->get_id()][$component][$question_id]['fraction'];
-                    $item_response[$question_id][] = new model_item_response(
+                $questionids = array_keys($this->data[$pp->get_id()][$component]);
+                foreach ($questionids as $questionid) {
+                    $fraction = $this->data[$pp->get_id()][$component][$questionid]['fraction'];
+                    $itemresponse[$questionid][] = new model_item_response(
                         $fraction, $pp->get_ability()
                     );
                 }
             }
         }
-        return $item_response;
+        return $itemresponse;
     }
 
     /**
      * Set item data.
      *
      * @param mixed $data
-     * 
+     *
      * @return mixed
-     * 
+     *
      */
-    public function setData($data) {
-        $has_correct_answer = [];
+    public function setdata($data) {
+        $hascorrectanswer = [];
         foreach ($data as $userid => $components) {
             foreach($components as $component) {
-                foreach($component as $componentid => $results)
+                foreach($component as $componentid => $results) {
                     if (floatval($results['fraction']) === 1.0) { // TODO might need to be updated
-                        $has_correct_answer[] = $componentid;
+                        $hascorrectanswer[] = $componentid;
                     }
+                }
             }
         }
 
         // Filter out items that do not have a single correct answer
-        $this->has_correct_answer = array_unique($has_correct_answer);
+        $this->has_correct_answer = array_unique($hascorrectanswer);
         foreach($data as $userid => $components) {
             foreach($components as $componentname => $component) {
                 foreach (array_keys($component) as $componentid) {
@@ -180,7 +181,7 @@ class model_responses {
      * Return item as_array.
      *
      * @return array
-     * 
+     *
      */
     public function as_array() {
         return (array) $this->data;
@@ -189,15 +190,15 @@ class model_responses {
     /**
      * Returns the person params from all persons that are found in this responses object.
      * The ability is initialized to 0.
-     * 
+     *
      * @return model_person_param_list
      */
     public function get_initial_person_abilities() {
-        $person_param_list = new model_person_param_list();
+        $personparamlist = new model_person_param_list();
         foreach (array_keys($this->as_array()) as $userid) {
             $p = new model_person_param($userid);
-            $person_param_list->add($p);
+            $personparamlist->add($p);
         }
-        return $person_param_list;
+        return $personparamlist;
     }
 }

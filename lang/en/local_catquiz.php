@@ -86,7 +86,7 @@ $string['teststrategy_balanced'] = 'Moderate CAT';
 $string['pilot_questions'] = 'Pilot questions';
 
 $string['catquiz_selectfirstquestion'] = "Selection of first question";
-$string['startwitheasiestquestion']= "Start with the easiest question";
+$string['startwitheasiestquestion'] = "Start with the easiest question";
 $string['startwithfirstofsecondquintil'] = "Start with the first question of the second quintil";
 $string['startwithfirstofsecondquartil'] = "Start with the first question of the second quartil";
 $string['startwithmostdifficultsecondquartil'] = "Start with the most difficult question of the second quartil";
@@ -294,7 +294,7 @@ $string['emptyfirstquestionlist'] = "Can't select a start question because the l
 $string['catquizfeedback'] = "Shows a summary of the last quiz attempt";
 $string['attemptfeedbacknotavailable'] = "No feedback available";
 
-//CSV Import Form
+// CSV Import Form
 $string['importcsv'] = 'Import CSV';
 $string['importsuccess'] = 'Import was successful';
 $string['importfailed'] = 'Import failed';
