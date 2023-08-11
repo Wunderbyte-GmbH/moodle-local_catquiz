@@ -38,16 +38,25 @@ use local_catquiz\local\model\model_raschmodel;
  */
 class raschbirnbaumb extends model_raschmodel {
 
-    // Definitions and Dimensions.
+  // Definitions and Dimensions.
 
-    /**
-     * Definition of the number of model parameters
-     *
-     * @return int
-     */
-    public static function get_model_dim(): int {
-        return 3;  // 3 parameters: person ability, difficulty, discrimination.
-    }
+  /**
+   * Defines names if item parameter list
+   *
+   * @return array of string
+   */
+  public static function get_parameter_names(): array {
+    return ['difficulty', 'discrimination', ];
+  }
+  
+  /**
+   * Definition of the number of model parameters
+   *
+   * @return int
+   */
+  public static function get_model_dim(): int {
+    return count (self::get_parameter_names());
+  }
 
     /**
      * Get item parameters.
