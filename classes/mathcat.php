@@ -15,7 +15,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Class for math functions;
+ * Class mathcat.
  *
  * @package local_catquiz
  * @author Daniel Pasterk
@@ -25,8 +25,28 @@
 
 namespace local_catquiz;
 
-class mathcat
-{
+/**
+ * Class for math functions.
+ *
+ * @package local_catquiz
+ * @author Daniel Pasterk
+ * @copyright 2023 Wunderbyte GmbH
+ * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
+class mathcat {
+    /**
+     * Returns newton raphson stable value. 
+     *
+     * @param mixed $func
+     * @param mixed $derivative
+     * @param int $start
+     * @param mixed $min_inc
+     * @param int $max_iter
+     * @param int $max
+     * 
+     * @return float
+     * 
+     */
     static function newtonraphson_stable(
         $func,
         $derivative,
@@ -35,7 +55,7 @@ class mathcat
         $max_iter = 150,
         $max = 50
     ): float {
-        $return_val = 0.0;
+
         $x_0 = $start;
         $use_gauss = false;
         $gauss_iter = 0;
@@ -43,19 +63,18 @@ class mathcat
         $m = 0;
         $std = 0.5;
 
-
         for ($n = 1; $n < $max_iter; $n++) {
             $diff = 0;
 
-            if ($use_gauss == true){
+            if ($use_gauss == true) {
 
                 $gauss_iter += 1;
-                if ($gauss_iter % 10 == 0){
-                    $func = mathcat::compose_plus($func, function($x) use ($n,$m,$std)  {
+                if ($gauss_iter % 10 == 0) {
+                    $func = mathcat::compose_plus($func, function($x) use ($n,$m,$std) {
                         return 1 * mathcat::gaussian_density_derivative1($x,$m,$std);
                     });
 
-                    $derivative = mathcat::compose_plus($derivative, function($x) use ($n,$m,$std){
+                    $derivative = mathcat::compose_plus($derivative, function($x) use ($n,$m,$std) {
                         return 1 * mathcat::gaussian_density_derivative2($x,$m,$std);
                     });
                     //$z_0 = $m;
@@ -99,36 +118,67 @@ class mathcat
         return $x_0;
     }
 
-
+    /**
+     * Returns gaussian density.
+     *
+     * @param mixed $x
+     * @param mixed $mean
+     * @param mixed $stdDeviation
+     * 
+     * @return mixed
+     * 
+     */
     static function gaussian_density($x, $mean, $stdDeviation) {
         $factor1 = 1 / sqrt(2 * M_PI * pow($stdDeviation, 2));
         $factor2 = exp(-pow($x - $mean, 2) / (2 * pow($stdDeviation, 2)));
         return $factor1 * $factor2;
     }
 
+    /**
+     * Returns gaussian density derivative1 value.
+     *
+     * @param mixed $x
+     * @param mixed $m
+     * @param mixed $std
+     * 
+     * @return mixed
+     * 
+     */
     static function gaussian_density_derivative1($x, $m, $std) {
         //$factor1 = -($x - $mean) / pow($stdDeviation, 2);
         //$factor2 = exp(-pow($x - $mean, 2) / (2 * pow($stdDeviation, 2)));
         //return $factor1 * $factor2;
 
         return (exp(-(($m - $x)**2 / (2 * $std**2))) * ($m - $x))/(sqrt(2 * M_PI) * $std**3);
-
-
     }
 
+    /**
+     * Returns gaussian density derivative2.
+     *
+     * @param mixed $x
+     * @param mixed $m
+     * @param mixed $std
+     * 
+     * @return mixed
+     * 
+     */
     static function gaussian_density_derivative2($x, $m, $std) {
         return (exp(-(($m - $x)**2/ (2 * $std **2))) * ($m**2 - $std**2 - 2 * $m * $x + $x**2))/(sqrt(2 * M_PI)*$std**5);
     }
 
-
-
-
-
-
-
-
-    static function newtonraphson_numeric($f, $x0, $tolerance, $max_iterations = 150, $h = 0.001)
-    {
+    /**
+     * Returns newton raphson numeric value.
+     *
+     * @param mixed $f
+     * @param mixed $x0
+     * @param mixed $tolerance
+     * @param int $max_iterations
+     * @param mixed $h
+     * 
+     * @return mixed
+     * 
+     */
+    static function newtonraphson_numeric($f, $x0, $tolerance, $max_iterations = 150, $h = 0.001) {
 
         for ($i = 0; $i < $max_iterations; $i++) {
             $fx0 = $f($x0);
@@ -150,24 +200,49 @@ class mathcat
         return $x0;
     }
 
-    static function get_numerical_derivative(callable $func, float $h = 1e-5)
-    {
+    /**
+     * Returns numerical derivative.
+     *
+     * @param callable $func
+     * @param float $h
+     * 
+     * @return mixed
+     * 
+     */
+    static function get_numerical_derivative(callable $func, float $h = 1e-5) {
         $returnfn = function ($x) use ($func, $h) {
             return ($func($x + $h) - $func($x)) / $h;
         };
         return $returnfn;
     }
 
-    static function get_numerical_derivative2(callable $func, float $h = 1e-6)
-    {
+    /**
+     * Returns numerical derivative2.
+     *
+     * @param callable $func
+     * @param float $h
+     * 
+     * @return mixed
+     * 
+     */
+    static function get_numerical_derivative2(callable $func, float $h = 1e-6) {
         $returnfn = function ($x) use ($func, $h) {
             return ($func($x + $h) - $func($x - $h)) / (2 * $h);
         };
         return $returnfn;
     }
 
-    static function gradient(callable $func, $point, $delta = 1e-5)
-    {
+    /**
+     * Returns numerical gradient.
+     *
+     * @param callable $func
+     * @param mixed $point
+     * @param mixed $delta
+     * 
+     * @return array
+     * 
+     */
+    static function gradient(callable $func, $point, $delta = 1e-5) {
         $grad = [];
         for ($i = 0; $i < count($point); $i++) {
             $point_plus_delta = $point;
@@ -179,8 +254,16 @@ class mathcat
         return $grad;
     }
 
-    static function matrix_vector_product($matrix, $vector)
-    {
+    /**
+     * Returns matrix vector product.
+     *
+     * @param mixed $matrix
+     * @param mixed $vector
+     * 
+     * @return array
+     * 
+     */
+    static function matrix_vector_product($matrix, $vector) {
         $result = [];
         for ($i = 0; $i < count($matrix); $i++) {
             $result[$i] = 0;
@@ -191,8 +274,19 @@ class mathcat
         return $result;
     }
 
-    static function bfgs(callable $func, $start_point, $step_size = 0.01, $tolerance = 1e-6, $max_iterations = 1000)
-    {
+    /**
+     * Returns bfgs value. 
+     *
+     * @param callable $func
+     * @param mixed $start_point
+     * @param mixed $step_size
+     * @param mixed $tolerance
+     * @param int $max_iterations
+     * 
+     * @return mixed
+     * 
+     */    
+    static function bfgs(callable $func, $start_point, $step_size = 0.01, $tolerance = 1e-6, $max_iterations = 1000) {
         $n = count($start_point);
         $current_point = $start_point;
         $iteration = 0;
@@ -283,21 +377,28 @@ class mathcat
         return $current_point;
     }
 
-    static function newton_raphson_multi($func, $derivative, $start, $min_inc = 0.0001, $max_iter = 2000)
-    {
+    /**
+     * Returns newton raphson multi value(s).
+     *
+     * @param mixed $func
+     * @param mixed $derivative
+     * @param mixed $start
+     * @param mixed $min_inc
+     * @param int $max_iter
+     * 
+     * @return mixed
+     * 
+     */
+    static function newton_raphson_multi($func, $derivative, $start, $min_inc = 0.0001, $max_iter = 2000) {
         $model_dim = count($func);
 
         $ml = new matrixcat();
-        // get real jacobian/hessian
 
+        // get real jacobian/hessian
         $z_0 = $start;
         $parameter_names = array_keys($z_0);
 
-
-
         // jacobian, hessian, model_dim, start_value
-
-
         for ($i = 0; $i < $max_iter; $i++) {
 
             for ($k = 0; $k <= $model_dim-1; $k++) {
@@ -308,7 +409,6 @@ class mathcat
                     $real_derivative[$k][$j] = $derivative[$k][$j]($z_0);
                 }
             }
-
 
             $G = $real_func;
             $J = $real_derivative;
@@ -322,19 +422,28 @@ class mathcat
                 $dist = abs($z_0 - $z_1);
             }
 
-
-
-
-
             if ($dist < $min_inc){
-                return array_combine($parameter_names, $z_1);
+                return array_combine($parameter_names, array($z_1));
             }
-            $z_0 = array_combine($parameter_names, $z_1);
+            $z_0 = array_combine($parameter_names, array($z_1));
         }
 
         return $z_0;
     }
 
+    /**
+     * Returns newton raphson multi stable value(s).
+     *
+     * @param mixed $func
+     * @param mixed $derivative
+     * @param mixed $start
+     * @param mixed $min_inc
+     * @param int $max_iter
+     * @param catcalc_item_estimator $model
+     * 
+     * @return mixed
+     * 
+     */
     static function newton_raphson_multi_stable(
         $func,
         $derivative,
@@ -405,8 +514,17 @@ class mathcat
         return $z_0;
     }
 
-
-    private static function add_gauss_der1(callable $func, $mean, $std){
+    /**
+     * Returns add gauss der1 callable.
+     *
+     * @param callable $func
+     * @param mixed $mean
+     * @param mixed $std
+     * 
+     * @return callable
+     * 
+     */
+    private static function add_gauss_der1(callable $func, $mean, $std) {
 
         $gaussian = function($x) use ($mean,$std)  {
             return 1 * self::gaussian_density_derivative1($x,$mean,$std);
@@ -415,7 +533,17 @@ class mathcat
         return $new_func;
     }
 
-    private static function add_gauss_der2(callable $func, $mean, $std){
+    /**
+     * Returns add gauss der1 callable.
+     *
+     * @param callable $func
+     * @param mixed $mean
+     * @param mixed $std
+     * 
+     * @return callable
+     * 
+     */
+    private static function add_gauss_der2(callable $func, $mean, $std) {
 
         $gaussian = function($x) use ($mean,$std)  {
             return 1 * self::gaussian_density_derivative2($x,$mean,$std);
@@ -424,28 +552,51 @@ class mathcat
         return $new_func;
     }
 
-    static function compose_plus($function1, $function2)
-    {
+    /**
+     * REturns compose plus (functions).
+     *
+     * @param mixed $function1
+     * @param mixed $function2
+     * 
+     * @return mixed
+     * 
+     */
+    static function compose_plus($function1, $function2) {
         $returnfn = function ($x) use ($function1, $function2) {
             return $function1($x) + $function2($x);
         };
         return $returnfn;
     }
 
-    static function compose_multiply($function1, $function2)
-    {
+    /**
+     * Returns compose multiply (functions).
+     *
+     * @param mixed $function1
+     * @param mixed $function2
+     * 
+     * @return mixed
+     * 
+     */
+    static function compose_multiply($function1, $function2) {
         $returnfn = function ($x) use ($function1, $function2) {
             return $function1($x) * $function2($x);
         };
         return $returnfn;
     }
 
-    static function compose_chain($function1, $function2)
-    {
+    /**
+     * Returns compose chain (functions).
+     *
+     * @param mixed $function1
+     * @param mixed $function2
+     * 
+     * @return mixed
+     * 
+     */
+    static function compose_chain($function1, $function2) {
         $returnfn = function ($x) use ($function1, $function2) {
             return $function1($function2);
         };
         return $returnfn;
     }
 }
-

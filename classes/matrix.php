@@ -35,26 +35,27 @@ use ArrayObject;
  * - by setting all values using bidimensional array,
  * - by setting its columns and rows
  *
- * @example $m = new Matrix(4, 2); // 4 rows, 2 columns
- * @example
- * @example $m = new Matrix([
- * @example     [42, 21],
- * @example     [84, 0],
- * @example     [20, -21],
- * @example ]);
- * @example
- * @example $m2 = new Matrix($m3);
+ * Examples:
+ * $m = new Matrix(4, 2); // 4 rows, 2 columns
+ * 
+ * $m = new Matrix([
+ *      [42, 21],
+ *      [84, 0],
+ *      [20, -21],
+ * ]);
+ * 
+ * $m2 = new Matrix($m3);
  *
  * You can also : add, subtract and multiply your matrix with scalar or Matrix
  * There are methods to compute determinant, to invert the matrix
  *
  * See methods to have more information!
  *
+ * @package local_catquiz
  * @author Romain Vermot <romain@vermot.eu>
  * @license MIT
  */
-class matrix extends ArrayObject
-{
+class matrix extends ArrayObject {
     /**
      * Number of rows in the matrix.
      *
@@ -70,13 +71,12 @@ class matrix extends ArrayObject
     private $_cols;
 
     /**
-     * Create a matrix from another matrix, an array or with its size (rows, cols)
+     * Create a matrix from another matrix, an array or with its size (rows, cols).
      *
      * @param mixed $value Matrix, array or number of rows
      * @throws MatrixException Wrong parameters
      */
-    public function __construct($value, $cols = null)
-    {
+    public function __construct($value, $cols = null) {
         if ($value instanceof self) {
             $matrix = $value;
             $this->_rows = $matrix->_rows;
@@ -108,15 +108,15 @@ class matrix extends ArrayObject
     }
 
     /**
-     * Add another matrix or a scalar to this matrix,
-     * return a new matrix instance.
+     * Add another matrix or a scalar to this matrix, return a new matrix instance.
      *
      * @param mixed $value Matrix or scalar to add to this Matrix
+     * 
      * @return Matrix New result matrix
+     * 
      * @throws MatrixException If matrices do not have the same size
      */
-    public function add($value)
-    {
+    public function add($value) {
         if ($value instanceof self) {
             $matrix = $value;
             if ($this->_rows == $matrix->_rows && $this->_cols == $matrix->_cols) {
@@ -141,15 +141,15 @@ class matrix extends ArrayObject
     }
 
     /**
-     * Subtract another matrix or a scalar to this matrix,
-     * return a new matrix instance.
+     * Subtract another matrix or a scalar to this matrix, return a new matrix instance.
      *
      * @param mixed $value matrix or scalar to subtract to this matrix
+     * 
      * @return Matrix New result matrix
+     * 
      * @throws MatrixException If matrices do not have the same size
      */
-    public function subtract($value)
-    {
+    public function subtract($value) {
         if ($value instanceof self) {
             $matrix = $value;
             if ($this->_rows == $matrix->_rows && $this->_cols == $matrix->_cols) {
@@ -174,15 +174,15 @@ class matrix extends ArrayObject
     }
 
     /**
-     * Multiply another matrix or a scalar to this matrix,
-     * return a new matrix instance.
+     * Multiply another matrix or a scalar to this matrix, return a new matrix instance.
      *
      * @param mixed $value matrix or scalar to multiply to this matrix
+     * 
      * @return Matrix New result matrix
+     * 
      * @throws MatrixException If matrices are incompatible
      */
-    public function multiply($value)
-    {
+    public function multiply($value) {
         if ($value instanceof self) {
             $matrix = $value;
             if ($this->_cols != $matrix->_rows) {
@@ -213,11 +213,12 @@ class matrix extends ArrayObject
      * Return a new sub matrix from this matrix.
      *
      * @param int $rowOffset Row offset to avoid
+     * 
      * @param int $colOffset Col offset to avoid
+     * 
      * @return Matrix The new sub matrix
      */
-    public function subMatrix($rowOffset, $colOffset)
-    {
+    public function subMatrix($rowOffset, $colOffset) {
         $subArray = [];
         for ($r = 0, $sR = 0; $r < $this->_rows; $r++) {
             if ($r != $rowOffset) {
@@ -238,10 +239,10 @@ class matrix extends ArrayObject
      * Computes the matrix's determinant.
      *
      * @return float The matrix's determinant
+     * 
      * @throws MatrixException If matrix is not a square
      */
-    public function determinant()
-    {
+    public function determinant() {
         if (!$this->isSquare()) {
             throw new MatrixException('Cannot compute determinant of non square matrix!');
         }
@@ -258,13 +259,11 @@ class matrix extends ArrayObject
     }
 
     /**
-     * Compute cofactor matrix from this one,
-     * return a new matrix instance.
+     * Compute cofactor matrix from this one, return a new matrix instance.
      *
      * @return Matrix The new computed matrix
      */
-    public function cofactor()
-    {
+    public function cofactor() {
         $cofactorArray = [];
         for ($c = 0; $c < $this->_cols; $c++) {
             $cofactorArray[$c] = [];
@@ -280,13 +279,11 @@ class matrix extends ArrayObject
     }
 
     /**
-     * Gets a new transposed matrix from this one,
-     * return a new matrix instance.
+     * Gets a new transposed matrix from this one, return a new matrix instance.
      *
      * @return Matrix The new transposed matrix
      */
-    public function transpose()
-    {
+    public function transpose() {
         $resultArray = [];
         for ($i = 0; $i < $this->_cols; $i++) {
             for ($j = 0; $j < $this->_rows; $j++) {
@@ -297,25 +294,21 @@ class matrix extends ArrayObject
     }
 
     /**
-     * Adjugate the matrix,
-     * return a new matrix instance.
+     * Adjugate the matrix, return a new matrix instance.
      *
      * @return Matrix The computed matrix
      */
-    public function adjugate()
-    {
+    public function adjugate() {
         return $this->cofactor()->transpose();
     }
 
     /**
-     * Inverse this matrix if and only if the determinant is not null,
-     * return a new matrix instance.
+     * Inverse this matrix if and only if the determinant is not null, return a new matrix instance.
      *
      * @return Matrix The inverted matrix
      * @throws MatrixException If determinant is null
      */
-    public function inverse()
-    {
+    public function inverse() {
         $det = $this->determinant();
         if ($det == 0) {
             throw new MatrixException('Cannot invert matrix: determinant is nul!');
@@ -328,8 +321,7 @@ class matrix extends ArrayObject
      *
      * @return string The matrix
      */
-    public function __toString()
-    {
+    public function __toString() {
         $out = '';
         for ($r = 0; $r < $this->_rows; $r++) {
             for ($c = 0; $c < $this->_cols; $c++) {
@@ -348,8 +340,7 @@ class matrix extends ArrayObject
      *
      * @return int The number of rows
      */
-    public function getRows()
-    {
+    public function getRows() {
         return $this->_rows;
     }
 
@@ -358,8 +349,7 @@ class matrix extends ArrayObject
      *
      * @return int The number of columns
      */
-    public function getCols()
-    {
+    public function getCols() {
         return $this->_cols;
     }
 
@@ -369,8 +359,7 @@ class matrix extends ArrayObject
      * @param Matrix $matrix The second matrix
      * @return boolean
      */
-    public function equals(Matrix $matrix)
-    {
+    public function equals(Matrix $matrix) {
         if ($this->_rows != $matrix->_rows || $this->_cols != $matrix->_cols) {
             return false;
         }
@@ -389,12 +378,9 @@ class matrix extends ArrayObject
      *
      * @return boolean
      */
-    public function isSquare()
-    {
+    public function isSquare() {
         return $this->_rows == $this->_cols;
     }
-
-
 
 }
 
@@ -406,9 +392,5 @@ use RuntimeException;
  * @author Romain Vermot <romain@vermot.eu>
  * @license MIT
  */
-class MatrixException extends RuntimeException
-{
+class MatrixException extends RuntimeException {
 }
-
-
-

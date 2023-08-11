@@ -15,7 +15,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
-* Entities Class to display list of entity records.
+* Class catmodel_info.
 *
 * @package local_catquiz
 * @author Georg Maißer
@@ -33,8 +33,13 @@ use moodle_exception;
 use moodle_url;
 
 /**
- * This class
- */
+* Entities Class to display list of entity records.
+*
+* @package local_catquiz
+* @author Georg Maißer
+* @copyright 2023 Wunderbyte GmbH <info@wunderbyte.at>
+* @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+*/
 class catmodel_info {
 
     /**
@@ -61,12 +66,30 @@ class catmodel_info {
         return $strategy->get_params_from_db($contextid, $catscaleid);
     }
 
+    /**
+     * Triggers parameter_calculation.
+     *
+     * @param mixed $contextid
+     * @param mixed $catscaleid
+     * 
+     * @return void
+     * 
+     */
     public function trigger_parameter_calculation($contextid, $catscaleid) {
         $adhoc_recalculate_cat_model_params = new adhoc_recalculate_cat_model_params();
         $adhoc_recalculate_cat_model_params->set_custom_data([$contextid, $catscaleid]);
         manager::queue_adhoc_task($adhoc_recalculate_cat_model_params);
     }
 
+    /**
+     * Update params.
+     *
+     * @param mixed $contextid
+     * @param mixed $catscaleid
+     * 
+     * @return void
+     * 
+     */
     public function update_params($contextid, $catscaleid) {
         $context = catcontext::load_from_db($contextid);
         $strategy = $context->get_strategy($catscaleid);

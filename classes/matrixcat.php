@@ -15,7 +15,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Class for math functions;
+ * Class for math functions.
  *
  * @package local_catquiz
  * @author Daniel Pasterk
@@ -25,11 +25,24 @@
 
 namespace local_catquiz;
 
-class matrixcat
-{
-    //Gauss-Jordan elimination method for matrix inverse
-    public function inverseMatrix(array $matrix)
-    {
+/**
+ * Implements matrix functions.
+ *
+ * @package local_catquiz
+ * @author Daniel Pasterk
+ * @copyright 2023 Wunderbyte GmbH
+ * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
+class matrixcat {
+    /**
+     * Gauss-Jordan elimination method for matrix inverse
+     *
+     * @param array $matrix
+     * 
+     * @return array
+     * 
+     */
+    public function inverseMatrix(array $matrix) {
         //TODO $matrix validation
 
         $matrixCount = count($matrix);
@@ -42,18 +55,22 @@ class matrixcat
         return $inverseMatrix;
     }
 
-    private function createInverseMatrix(array $matrix)
-    {
+    /**
+     * Creates inverse matrix.
+     *
+     * @param array $matrix
+     * 
+     * @return array
+     * 
+     */
+    private function createInverseMatrix(array $matrix) {
         $numberOfRows = count($matrix);
 
-        for($i=0; $i<$numberOfRows; $i++)
-        {
+        for($i=0; $i<$numberOfRows; $i++) {
             $matrix = @$this->oneOperation($matrix, $i, $i);
 
-            for($j=0; $j<$numberOfRows; $j++)
-            {
-                if($i !== $j)
-                {
+            for($j=0; $j<$numberOfRows; $j++) {
+                if($i !== $j) {
                     $matrix = $this->zeroOperation($matrix, $j, $i, $i);
                 }
             }
@@ -63,24 +80,29 @@ class matrixcat
         return $inverseMatrixWithIdentity;
     }
 
-    private function oneOperation(array $matrix, $rowPosition, $zeroPosition)
-    {
+    /**
+     * Execute operation one on matrix element.
+     *
+     * @param array $matrix
+     * @param mixed $rowPosition
+     * @param mixed $zeroPosition
+     * 
+     * @return array
+     * 
+     */
+    private function oneOperation(array $matrix, $rowPosition, $zeroPosition) {
         if($matrix[$rowPosition][$zeroPosition] !== 1)
         {
             $numberOfCols = count($matrix[$rowPosition]);
 
-            if($matrix[$rowPosition][$zeroPosition] === 0)
-            {
+            if($matrix[$rowPosition][$zeroPosition] === 0) {
                 $divisor = 0.0000000001;
                 $matrix[$rowPosition][$zeroPosition] = 0.0000000001;
-            }
-            else
-            {
+            } else {
                 $divisor = $matrix[$rowPosition][$zeroPosition];
             }
 
-            for($i=0; $i<$numberOfCols; $i++)
-            {
+            for($i=0; $i<$numberOfCols; $i++) {
                 $matrix[$rowPosition][$i] = $matrix[$rowPosition][$i] / $divisor;
             }
         }
@@ -88,16 +110,24 @@ class matrixcat
         return $matrix;
     }
 
-    private function zeroOperation(array $matrix, $rowPosition, $zeroPosition, $subjectRow)
-    {
+    /**
+     * Execute operation zero on matrix element.
+     *
+     * @param array $matrix
+     * @param mixed $rowPosition
+     * @param mixed $zeroPosition
+     * @param mixed $subjectRow
+     * 
+     * @return array
+     * 
+     */
+    private function zeroOperation(array $matrix, $rowPosition, $zeroPosition, $subjectRow) {
         $numberOfCols = count($matrix[$rowPosition]);
 
-        if($matrix[$rowPosition][$zeroPosition] !== 0)
-        {
+        if($matrix[$rowPosition][$zeroPosition] !== 0) {
             $numberToSubtract = $matrix[$rowPosition][$zeroPosition];
 
-            for($i=0; $i<$numberOfCols; $i++)
-            {
+            for($i=0; $i<$numberOfCols; $i++) {
                 $matrix[$rowPosition][$i] = $matrix[$rowPosition][$i] - $numberToSubtract * $matrix[$subjectRow][$i];
             }
         }
@@ -105,49 +135,64 @@ class matrixcat
         return $matrix;
     }
 
-    private function removeIdentityMatrix(array $matrix)
-    {
+    /**
+     * Remove identity matrix.
+     *
+     * @param array $matrix
+     * 
+     * @return array
+     * 
+     */
+    private function removeIdentityMatrix(array $matrix) {
         $inverseMatrix = array();
         $matrixCount = count($matrix);
 
-        for($i=0; $i<$matrixCount; $i++)
-        {
+        for($i=0; $i<$matrixCount; $i++) {
             $inverseMatrix[$i] = array_slice($matrix[$i], $matrixCount);
         }
 
         return $inverseMatrix;
     }
 
-    private function appendIdentityMatrixToMatrix(array $matrix, array $identityMatrix)
-    {
+    /**
+     * Append identity matrix to matrix.
+     *
+     * @param array $matrix
+     * @param array $identityMatrix
+     * 
+     * @return array
+     * 
+     */
+    private function appendIdentityMatrixToMatrix(array $matrix, array $identityMatrix) {
         //TODO $matrix & $identityMatrix compliance validation (same number of rows/columns, etc)
 
         $augmentedMatrix = array();
 
-        for($i=0; $i<count($matrix); $i++)
-        {
+        for($i=0; $i<count($matrix); $i++) {
             $augmentedMatrix[$i] = array_merge($matrix[$i], $identityMatrix[$i]);
         }
 
         return $augmentedMatrix;
     }
 
-    public function identityMatrix(int $size)
-    {
+    /**
+     * Returns Identity Matrix of given size.
+     *
+     * @param int $size
+     * 
+     * @return array
+     * 
+     */
+    public function identityMatrix(int $size) {
         //TODO validate $size
 
         $identityMatrix = array();
 
-        for($i=0; $i<$size; $i++)
-        {
-            for($j=0; $j<$size; $j++)
-            {
-                if($i == $j)
-                {
+        for($i=0; $i<$size; $i++) {
+            for($j=0; $j<$size; $j++) {
+                if($i == $j) {
                     $identityMatrix[$i][$j] = 1;
-                }
-                else
-                {
+                } else {
                     $identityMatrix[$i][$j] = 0;
                 }
             }
@@ -155,8 +200,17 @@ class matrixcat
 
         return $identityMatrix;
     }
-    public function multiplyMatrices($matrix1, $matrix2)
-    {
+    
+    /**
+     * Multiply matrices.
+     *
+     * @param mixed $matrix1
+     * @param mixed $matrix2
+     * 
+     * @return mixed
+     * 
+     */
+    public function multiplyMatrices($matrix1, $matrix2) {
         $rows1 = count($matrix1);
         $cols1 = count($matrix1[0]);
         $rows2 = count($matrix2);
@@ -180,10 +234,17 @@ class matrixcat
             }
             $result[] = $row;
         }
-
         return $result;
     }
 
+    /**
+     * Returns flatten array.
+     *
+     * @param mixed $array
+     * 
+     * @return array
+     * 
+     */
     public function flattenArray($array)
     {
         $result = [];
@@ -222,7 +283,16 @@ class matrixcat
     }
 
 
-    public function dist($vector1, $vector2){
+    /**
+     * Returns vestor's distance.
+     *
+     * @param mixed $vector1
+     * @param mixed $vector2
+     * 
+     * @return mixed
+     * 
+     */
+    public function dist($vector1, $vector2) {
         if (count($vector1) !== count($vector2)) {
             throw new \InvalidArgumentException('Vectors must have the same number of elements');
         }
@@ -237,6 +307,3 @@ class matrixcat
         return $distance;
     }
 }
-
-
-

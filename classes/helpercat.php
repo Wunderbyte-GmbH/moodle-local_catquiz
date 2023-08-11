@@ -15,7 +15,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Class for helper function in data preprocessing
+ * Class helpercat.
  *
  * @package local_catquiz
  * @author Daniel Pasterk
@@ -25,25 +25,55 @@
 
 namespace local_catquiz;
 
-class helpercat{
+/**
+ * Class for helper function in data preprocessing
+ *
+ * @package local_catquiz
+ * @author Daniel Pasterk
+ * @copyright 2023 Wunderbyte GmbH
+ * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
+class helpercat {
 
-    static function get_person_response($response, $user_id){
+    /**
+     * Returns person response.
+     *
+     * @param mixed $response
+     * @param mixed $user_id
+     * 
+     * @return mixed
+     * 
+     */
+    static function get_person_response($response, $user_id) {
 
         $components = array_keys($response[$user_id]);
         $items = $response[$user_id][$components[0]]; // TODO: fix for multiple components
         return $items;
 
     }
-    static function get_user_ability($user_id){
+
+    /**
+     * Returns user ability.
+     *
+     * @param int $user_id
+     * 
+     * @return mixed
+     * 
+     */
+    static function get_user_ability(int $user_id) {
         return 0.5; //dummy data
     }
 
-    static function get_item_params($item_id){ //and context_id ?
+    /**
+     * REturns item params.
+     *
+     * @param int $item_id
+     * 
+     * @return mixed
+     * 
+     */
+    static function get_item_params(int $item_id) { //and context_id ?
         return 0.5; //dummy data
     }
-
-
-
-
 
 }
