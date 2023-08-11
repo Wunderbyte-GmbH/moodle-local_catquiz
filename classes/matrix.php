@@ -74,7 +74,10 @@ class matrix extends ArrayObject {
      * Create a matrix from another matrix, an array or with its size (rows, cols).
      *
      * @param mixed $value Matrix, array or number of rows
+     * @param mixed|null $cols
+     * 
      * @throws MatrixException Wrong parameters
+     * 
      */
     public function __construct($value, $cols = null) {
         if ($value instanceof self) {
