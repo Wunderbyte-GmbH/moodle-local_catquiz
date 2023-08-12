@@ -33,22 +33,45 @@ namespace local_catquiz\event;
  */
 class catscale_updated extends \core\event\base {
 
+    /**
+     * Init parameters.
+     *
+     * @return void
+     *
+     */
     protected function init() {
         $this->data['crud'] = 'u'; // Meaning: u = update.
         $this->data['edulevel'] = self::LEVEL_OTHER;
         $this->data['objecttable'] = 'local_catquiz_catscales';
     }
 
+    /**
+     * Get name.
+     *
+     * @return string
+     *
+     */
     public static function get_name() {
         return get_string('catscale_updated', 'booking');
     }
 
+    /**
+     * Get description.
+     *
+     * @return string
+     *
+     */
     public function get_description() {
-
         return get_string('userupdatedcatscale', 'local_catquiz', $this);
     }
 
+    /**
+     * Get url.
+     *
+     * @return object
+     *
+     */
     public function get_url() {
-        return new \moodle_url('/local/catquiz/report.php', array('id' => $this->contextinstanceid, 'catscaleid' => $this->objectid));
+        return new \moodle_url('/local/catquiz/report.php', ['id' => $this->contextinstanceid, 'catscaleid' => $this->objectid]);
     }
 }
