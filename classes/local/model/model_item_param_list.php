@@ -50,7 +50,7 @@ class model_item_param_list implements ArrayAccess, IteratorAggregate, Countable
      * Set parameters for class instance.
      */
     public function __construct() {
-        $this->item_params = [];
+        $this->itemparams = [];
     }
 
     /**
@@ -60,7 +60,7 @@ class model_item_param_list implements ArrayAccess, IteratorAggregate, Countable
      *
      */
     public function count(): int {
-        return count($this->item_params);
+        return count($this->itemparams);
     }
 
     /**
@@ -68,7 +68,7 @@ class model_item_param_list implements ArrayAccess, IteratorAggregate, Countable
      * If none are found, it returns an empty list.
      *
      * @param int $contextid
-     * @param string $model_name
+     * @param string $modelname
      * @param int|null $catscaleid
      *
      * @return self
@@ -115,19 +115,19 @@ class model_item_param_list implements ArrayAccess, IteratorAggregate, Countable
      *
      */
     public function getiterator(): Traversable {
-        return new ArrayIterator($this->item_params);
+        return new ArrayIterator($this->itemparams);
     }
 
     /**
      * Add a parameter
      *
-     * @param model_item_param $item_param
+     * @param model_item_param $itemparam
      *
      * @return void
      *
      */
     public function add(model_item_param $itemparam) {
-        $this->item_params[$itemparam->get_id()] = $itemparam;
+        $this->itemparams[$itemparam->get_id()] = $itemparam;
     }
 
     /**
@@ -141,9 +141,9 @@ class model_item_param_list implements ArrayAccess, IteratorAggregate, Countable
      */
     public function offsetSet($offset, $value): void {
         if (is_null($offset)) {
-            $this->item_params[] = $value;
+            $this->itemparams[] = $value;
         } else {
-            $this->item_params[$offset] = $value;
+            $this->itemparams[$offset] = $value;
         }
     }
 
@@ -156,7 +156,7 @@ class model_item_param_list implements ArrayAccess, IteratorAggregate, Countable
      *
      */
     public function offsetExists($offset): bool {
-        return isset($this->item_params[$offset]);
+        return isset($this->itemparams[$offset]);
     }
 
     /**
@@ -168,7 +168,7 @@ class model_item_param_list implements ArrayAccess, IteratorAggregate, Countable
      *
      */
     public function offsetUnset($offset): void {
-        unset($this->item_params[$offset]);
+        unset($this->itemparams[$offset]);
     }
 
     /**
@@ -180,7 +180,7 @@ class model_item_param_list implements ArrayAccess, IteratorAggregate, Countable
      *
      */
     public function offsetGet($offset): ?model_item_param {
-        return isset($this->item_params[$offset]) ? $this->item_params[$offset] : null;
+        return isset($this->itemparams[$offset]) ? $this->itemparams[$offset] : null;
     }
 
     /**
@@ -196,7 +196,7 @@ class model_item_param_list implements ArrayAccess, IteratorAggregate, Countable
             function (model_item_param $param) {
                 return $param->get_difficulty();
             },
-            $this->item_params
+            $this->itemparams
         );
 
         $data = array_filter($data, function ($a) {
@@ -216,7 +216,7 @@ class model_item_param_list implements ArrayAccess, IteratorAggregate, Countable
      */
     public function as_array(): array {
         $data = [];
-        foreach ($this->item_params as $i) {
+        foreach ($this->itemparams as $i) {
             $data[$i->get_id()] = $i;
         }
         return $data;
@@ -263,7 +263,7 @@ class model_item_param_list implements ArrayAccess, IteratorAggregate, Countable
 
                 return $record;
             },
-            $this->item_params
+            $this->itemparams
         );
 
         $updatedrecords = [];
@@ -336,7 +336,7 @@ class model_item_param_list implements ArrayAccess, IteratorAggregate, Countable
         } else {
 
             $newrecord['id'] = $record->id;
-            if ($DB->update_record('local_catquiz_itemparams', $newrecord, true)) {
+            if ($DB->update_record('local_catquiz_itemparams', (object) $newrecord, true)) {
                 $id = $newrecord['id'];
             }
         }

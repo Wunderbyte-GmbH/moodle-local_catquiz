@@ -215,9 +215,9 @@ class matrix extends ArrayObject {
     /**
      * Return a new sub matrix from this matrix.
      *
-     * @param int $rowOffset Row offset to avoid
+     * @param int $rowoffset Row offset to avoid
      *
-     * @param int $colOffset Col offset to avoid
+     * @param int $coloffset Col offset to avoid
      *
      * @return Matrix The new sub matrix
      */

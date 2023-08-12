@@ -39,8 +39,8 @@ abstract class model_raschmodel extends model_model implements catcalc_item_esti
     /**
      * Likelihood 1pl.
      *
-     * @param mixed $person_ability
-     * @param mixed $item_difficulty
+     * @param mixed $personability
+     * @param mixed $itemdifficulty
      *
      * @return float
      *
@@ -55,7 +55,7 @@ abstract class model_raschmodel extends model_model implements catcalc_item_esti
      * Executes the model-specific code to estimate item-parameters based
      * on the given person abilities.
      *
-     * @param model_person_param_list $person_params
+     * @param model_person_param_list $personparams
      * @return model_item_param_list
      */
     public function estimate_item_params(model_person_param_list $personparams): model_item_param_list {
@@ -75,7 +75,7 @@ abstract class model_raschmodel extends model_model implements catcalc_item_esti
     /**
      * Returns the item parameters as associative array, with the parameter name as key.
      *
-     * @param mixed $item_response
+     * @param mixed $itemresponse
      * @return array
      */
     abstract protected function calculate_params($itemresponse): array;
@@ -84,8 +84,8 @@ abstract class model_raschmodel extends model_model implements catcalc_item_esti
      * Likelihood.
      *
      * @param mixed $x
-     * @param array $item_params
-     * @param float $item_response
+     * @param array $itemparams
+     * @param float $itemresponse
      *
      * @return mixed
      *
@@ -96,8 +96,8 @@ abstract class model_raschmodel extends model_model implements catcalc_item_esti
      * Log likelihood.
      *
      * @param mixed $x
-     * @param array $item_params
-     * @param float $item_response
+     * @param array $itemparams
+     * @param float $itemresponse
      *
      * @return mixed
      *
@@ -108,8 +108,8 @@ abstract class model_raschmodel extends model_model implements catcalc_item_esti
      * Log likelihood p.
      *
      * @param mixed $x
-     * @param array $item_params
-     * @param float $item_response
+     * @param array $itemparams
+     * @param float $itemresponse
      *
      * @return mixed
      *
@@ -120,8 +120,8 @@ abstract class model_raschmodel extends model_model implements catcalc_item_esti
      * Log likelihood p p.
      *
      * @param mixed $x
-     * @param array $item_params
-     * @param float $item_response
+     * @param array $itemparams
+     * @param float $itemresponse
      *
      * @return mixed
      *

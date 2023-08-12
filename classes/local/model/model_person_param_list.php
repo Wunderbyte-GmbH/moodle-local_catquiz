@@ -53,7 +53,7 @@ class model_person_param_list implements ArrayAccess, IteratorAggregate, Countab
      * Model-specific instantiation can go here.
      */
     public function __construct() {
-        $this->person_params = [];
+        $this->personparams = [];
     }
 
     /**
@@ -92,7 +92,7 @@ class model_person_param_list implements ArrayAccess, IteratorAggregate, Countab
      *
      */
     public function count(): int {
-        return count($this->person_params);
+        return count($this->personparams);
     }
 
     /**
@@ -102,19 +102,19 @@ class model_person_param_list implements ArrayAccess, IteratorAggregate, Countab
      *
      */
     public function getiterator(): Traversable {
-        return new ArrayIterator($this->person_params);
+        return new ArrayIterator($this->personparams);
     }
 
     /**
      * Add param.
      *
-     * @param model_person_param $person_param
+     * @param model_person_param $personparam
      *
      * @return void
      *
      */
     public function add(model_person_param $personparam) {
-        $this->person_params[$personparam->get_id()] = $personparam;
+        $this->personparams[$personparam->get_id()] = $personparam;
     }
 
     /**
@@ -128,9 +128,9 @@ class model_person_param_list implements ArrayAccess, IteratorAggregate, Countab
      */
     public function offsetSet($offset, $value): void {
         if (is_null($offset)) {
-            $this->person_params[] = $value;
+            $this->personparams[] = $value;
         } else {
-            $this->person_params[$offset] = $value;
+            $this->personparams[$offset] = $value;
         }
     }
 
@@ -143,7 +143,7 @@ class model_person_param_list implements ArrayAccess, IteratorAggregate, Countab
      *
      */
     public function offsetExists($offset): bool {
-        return isset($this->person_params[$offset]);
+        return isset($this->personparams[$offset]);
     }
 
     /**
@@ -155,7 +155,7 @@ class model_person_param_list implements ArrayAccess, IteratorAggregate, Countab
      *
      */
     public function offsetUnset($offset): void {
-        unset($this->person_params[$offset]);
+        unset($this->personparams[$offset]);
     }
 
     /**
@@ -167,7 +167,7 @@ class model_person_param_list implements ArrayAccess, IteratorAggregate, Countab
      *
      */
     public function offsetGet($offset): ?model_person_param {
-        return isset($this->person_params[$offset]) ? $this->person_params[$offset] : null;
+        return isset($this->personparams[$offset]) ? $this->personparams[$offset] : null;
     }
 
     /**
@@ -176,7 +176,7 @@ class model_person_param_list implements ArrayAccess, IteratorAggregate, Countab
      * @return array<model_person_param>
      */
     public function get_person_params(): array {
-        return $this->person_params;
+        return $this->personparams;
     }
 
     /**
@@ -192,7 +192,7 @@ class model_person_param_list implements ArrayAccess, IteratorAggregate, Countab
             function (model_person_param $param) {
                 return $param->get_ability();
             },
-            $this->person_params
+            $this->personparams
         );
 
         $data = array_filter($data, function ($a) {
@@ -247,7 +247,7 @@ class model_person_param_list implements ArrayAccess, IteratorAggregate, Countab
                     'catscaleid' => $catscaleid,
                 ];
             },
-            $this->person_params
+            $this->personparams
         );
 
         $updatedrecords = [];

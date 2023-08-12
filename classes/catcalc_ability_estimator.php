@@ -31,8 +31,8 @@ interface catcalc_ability_estimator {
      * Likelihood.
      *
      * @param mixed $x
-     * @param array $item_params
-     * @param float $item_response
+     * @param array $itemparams
+     * @param float $itemresponse
      *
      * @return mixed
      *
@@ -43,8 +43,8 @@ interface catcalc_ability_estimator {
      * Log likelihood.
      *
      * @param mixed $x
-     * @param array $item_params
-     * @param float $item_response
+     * @param array $itemparams
+     * @param float $itemresponse
      *
      * @return mixed
      *
@@ -55,8 +55,8 @@ interface catcalc_ability_estimator {
      * Log likelihood p
      *
      * @param mixed $x
-     * @param array $item_params
-     * @param float $item_response
+     * @param array $itemparams
+     * @param float $itemresponse
      *
      * @return mixed
      *
@@ -67,8 +67,8 @@ interface catcalc_ability_estimator {
      * Log likelihood p p
      *
      * @param mixed $x
-     * @param array $item_params
-     * @param float $item_response
+     * @param array $itemparams
+     * @param float $itemresponse
      *
      * @return mixed
      *

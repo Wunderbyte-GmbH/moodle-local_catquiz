@@ -39,7 +39,7 @@ class helpercat {
      * Returns person response.
      *
      * @param mixed $response
-     * @param mixed $user_id
+     * @param mixed $userid
      *
      * @return mixed
      *
@@ -55,7 +55,7 @@ class helpercat {
     /**
      * Returns user ability.
      *
-     * @param int $user_id
+     * @param int $userid
      *
      * @return mixed
      *
@@ -67,7 +67,7 @@ class helpercat {
     /**
      * REturns item params.
      *
-     * @param int $item_id
+     * @param int $itemid
      *
      * @return mixed
      *

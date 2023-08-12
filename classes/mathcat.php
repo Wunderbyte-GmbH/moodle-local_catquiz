@@ -40,8 +40,8 @@ class mathcat {
      * @param mixed $func
      * @param mixed $derivative
      * @param int $start
-     * @param mixed $min_inc
-     * @param int $max_iter
+     * @param mixed $mininc
+     * @param int $maxiter
      * @param int $max
      *
      * @return float
@@ -123,7 +123,7 @@ class mathcat {
      *
      * @param mixed $x
      * @param mixed $mean
-     * @param mixed $stdDeviation
+     * @param mixed $stddeviation
      *
      * @return mixed
      *
@@ -172,7 +172,7 @@ class mathcat {
      * @param mixed $f
      * @param mixed $x0
      * @param mixed $tolerance
-     * @param int $max_iterations
+     * @param int $maxiterations
      * @param mixed $h
      *
      * @return mixed
@@ -278,10 +278,10 @@ class mathcat {
      * Returns bfgs value.
      *
      * @param callable $func
-     * @param mixed $start_point
-     * @param mixed $step_size
+     * @param mixed $startpoint
+     * @param mixed $stepsize
      * @param mixed $tolerance
-     * @param int $max_iterations
+     * @param int $maxiterations
      *
      * @return mixed
      *
@@ -383,8 +383,8 @@ class mathcat {
      * @param mixed $func
      * @param mixed $derivative
      * @param mixed $start
-     * @param mixed $min_inc
-     * @param int $max_iter
+     * @param mixed $mininc
+     * @param int $maxiter
      *
      * @return mixed
      *
@@ -437,8 +437,8 @@ class mathcat {
      * @param mixed $func
      * @param mixed $derivative
      * @param mixed $start
-     * @param mixed $min_inc
-     * @param int $max_iter
+     * @param mixed $mininc
+     * @param int $maxiter
      * @param catcalc_item_estimator $model
      *
      * @return mixed

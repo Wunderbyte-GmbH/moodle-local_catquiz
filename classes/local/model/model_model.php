@@ -48,12 +48,12 @@ abstract class model_model {
      * Model-specific instantiation can go here.
      *
      * @param model_responses $responses
-     * @param string $model_name
+     * @param string $modelname
      *
      */
     public function __construct(model_responses $responses, string $modelname) {
         $this->responses = $responses;
-        $this->model_name = $modelname;
+        $this->modelname = $modelname;
     }
 
     /**
@@ -62,7 +62,7 @@ abstract class model_model {
      * @return string
      */
     public function get_model_name() {
-        return $this->model_name;
+        return $this->modelname;
     }
 
     /**
@@ -73,14 +73,14 @@ abstract class model_model {
      * @return model_item_param
      */
     protected function create_item_param(int $itemid, array $metadata = []): model_item_param {
-        return new model_item_param($itemid, $this->model_name, $metadata);
+        return new model_item_param($itemid, $this->modelname, $metadata);
     }
 
     /**
      * Executes the model-specific code to estimate item-parameters based
      * on the given person abilities.
      *
-     * @param model_person_param_list $person_params
+     * @param model_person_param_list $personparams
      * @return model_item_param_list
      */
     abstract public function estimate_item_params(model_person_param_list $personparams): model_item_param_list;
@@ -95,7 +95,7 @@ abstract class model_model {
     /**
      * Fisher info.
      *
-     * @param float $person_ability
+     * @param float $personability
      * @param array $params
      *
      * @return mixed

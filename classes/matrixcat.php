@@ -84,8 +84,8 @@ class matrixcat {
      * Execute operation one on matrix element.
      *
      * @param array $matrix
-     * @param mixed $rowPosition
-     * @param mixed $zeroPosition
+     * @param mixed $rowposition
+     * @param mixed $zeroposition
      *
      * @return array
      *
@@ -114,9 +114,9 @@ class matrixcat {
      * Execute operation zero on matrix element.
      *
      * @param array $matrix
-     * @param mixed $rowPosition
-     * @param mixed $zeroPosition
-     * @param mixed $subjectRow
+     * @param mixed $rowposition
+     * @param mixed $zeroposition
+     * @param mixed $subjectrow
      *
      * @return array
      *
@@ -158,7 +158,7 @@ class matrixcat {
      * Append identity matrix to matrix.
      *
      * @param array $matrix
-     * @param array $identityMatrix
+     * @param array $identitymatrix
      *
      * @return array
      *

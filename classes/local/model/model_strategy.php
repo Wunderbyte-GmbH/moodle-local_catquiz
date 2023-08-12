@@ -66,11 +66,11 @@ class model_strategy {
      * @var string
      */
     const DEFAULT_MODEL = 'web_raschbirnbauma';
+
     /**
      * @var model_responses Contains necessary data for estimation
      */
     private model_responses $responses;
-
 
     // TODO: get from DB
     // context
@@ -91,7 +91,7 @@ class model_strategy {
     private model_person_ability_estimator $abilityestimator;
 
     /**
-     * @var int max_iterations
+     * @var int maxiterations
      */
     private int $maxiterations;
 
@@ -101,7 +101,7 @@ class model_strategy {
     private int $iterations = 0;
 
     /**
-     * @var string|null model_override
+     * @var string|null modeloverride
      */
     private ?string $modeloverride;
 
@@ -115,7 +115,7 @@ class model_strategy {
      *
      * @param model_responses $responses
      * @param array $options
-     * @param model_person_param_list|null $saved_person_abilities
+     * @param model_person_param_list|null $savedpersonabilities
      *
      */
     public function __construct(
@@ -125,7 +125,7 @@ class model_strategy {
     ) {
         $this->responses = $responses;
         $this->models = $this->create_installed_models();
-        $this->ability_estimator = new model_person_ability_estimator_demo($this->responses);
+        $this->abilityestimator = new model_person_ability_estimator_demo($this->responses);
         $this->set_options($options);
 
         if ($savedpersonabilities === null || count($savedpersonabilities) === 0) {
@@ -136,7 +136,7 @@ class model_strategy {
                 $savedpersonabilities->add(new model_person_param($userid));
             }
         }
-        $this->initial_person_abilities = $savedpersonabilities;
+        $this->initialpersonabilities = $savedpersonabilities;
     }
 
     /**
@@ -148,14 +148,14 @@ class model_strategy {
      *
      */
     private function set_options(array $options): self {
-        $this->max_iterations = array_key_exists('max_iterations', $options)
+        $this->maxiterations = array_key_exists('max_iterations', $options)
             ? $options['max_iterations']
             : self::MAX_ITERATIONS;
         $strategyoptions = array_key_exists('strategy', $options)
             ? $options['strategy']
             : [];
 
-        $this->model_override = array_key_exists('model_override', $options)
+        $this->modeloverride = array_key_exists('model_override', $options)
             ? $options['model_override']
             : self::DEFAULT_MODEL;
 
@@ -200,7 +200,7 @@ class model_strategy {
      * @return array<model_item_param_list, model_person_param_list>
      */
     public function run_estimation(): array {
-        $personabilities = $this->initial_person_abilities;
+        $personabilities = $this->initialpersonabilities;
 
         /**
          * @var array<model_item_param_list>
@@ -215,7 +215,7 @@ class model_strategy {
 
             $filtereditemdifficulties = $this->select_item_model($itemdifficulties);
             $personabilities = $this
-                ->ability_estimator
+                ->abilityestimator
                 ->get_person_abilities($filtereditemdifficulties);
 
             $this->iterations++;
@@ -235,8 +235,8 @@ class model_strategy {
      * In the filtered items, the status is set to "SET_BY_STRATEGY". Here, this
      * status is copied back to the corresponding calculated items.
      *
-     * @param model_item_param_list[] $calculated_item_difficulties
-     * @param model_item_param_list $selected_item_difficulties
+     * @param model_item_param_list[] $calculateditemdifficulties
+     * @param model_item_param_list $selecteditemdifficulties
      * @return model_item_param_list[]
      */
     private function set_status(
@@ -256,7 +256,7 @@ class model_strategy {
      *
      * Merges the given item param lists into a single list
      *
-     * @param array $item_difficulties_lists List of calculated item difficulties, one for each model
+     * @param array $itemdifficultieslists List of calculated item difficulties, one for each model
      * @return model_item_param_list A single list of item difficulties that is a combination of the input lists
      */
     public function select_item_model(array $itemdifficultieslists): model_item_param_list {
@@ -306,7 +306,7 @@ class model_strategy {
     /**
      * Return item override.
      *
-     * @param int $item_id
+     * @param int $itemid
      *
      * @return string|null
      *
@@ -322,7 +322,7 @@ class model_strategy {
      *
      */
     private function get_model_override(): ?string {
-        return $this->model_override; // TODO implement
+        return $this->modeloverride; // TODO implement
     }
 
     /**
@@ -364,7 +364,7 @@ class model_strategy {
      *
      */
     private function should_stop(): bool {
-        return $this->iterations >= $this->max_iterations;
+        return $this->iterations >= $this->maxiterations;
     }
 
     /**

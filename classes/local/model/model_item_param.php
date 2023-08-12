@@ -72,6 +72,12 @@ class model_item_param {
      * @var int
      */
     const STATUS_SET_BY_STRATEGY = 1;
+
+    /**
+     * STATUS_UPDATED_MANUALLY
+     *
+     * @var int
+     */
     const STATUS_UPDATED_MANUALLY = 4;
 
     /**
@@ -110,14 +116,14 @@ class model_item_param {
      * Set parameters for class instance.
      *
      * @param int $id
-     * @param string $model_name
+     * @param string $modelname
      * @param array $metadata
      * @param int $status
      *
      */
     public function __construct(int $id, string $modelname, array $metadata = [], int $status = self::STATUS_NOT_CALCULATED) {
         $this->id = $id;
-        $this->model_name = $modelname;
+        $this->modelname = $modelname;
         $this->metadata = $metadata;
         $this->status = $status;
     }
@@ -148,7 +154,7 @@ class model_item_param {
      *
      */
     public function get_model_name(): string {
-        return $this->model_name;
+        return $this->modelname;
     }
 
     /**
@@ -240,7 +246,7 @@ class model_item_param {
      * @param int $componentid
      * @param string $model
      * @param int $contextid
-     * @param stdClass $new_record
+     * @param stdClass $newrecord
      *
      * @return void
      *

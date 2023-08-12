@@ -41,7 +41,7 @@ class model_person_ability_estimator_demo extends model_person_ability_estimator
     /**
      * Get person abilities.
      *
-     * @param model_item_param_list $item_param_list
+     * @param model_item_param_list $itemparamlist
      *
      * @return model_person_param_list
      *

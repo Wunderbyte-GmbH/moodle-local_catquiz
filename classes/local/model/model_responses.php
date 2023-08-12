@@ -45,7 +45,7 @@ class model_responses {
     private $data;
 
     /**
-     * @var array has_correct_answer
+     * @var array hascorrectanswer
      */
     private array $hascorrectanswer = [];
 
@@ -98,7 +98,7 @@ class model_responses {
      * Returns an array of arrays of item responses indexed by question id.
      * So for each question ID, there is an array of model_item_response entries
      *
-     * @param model_person_param_list $person_param_list
+     * @param model_person_param_list $personparamlist
      *
      * @return array
      *
@@ -152,11 +152,11 @@ class model_responses {
         }
 
         // Filter out items that do not have a single correct answer
-        $this->has_correct_answer = array_unique($hascorrectanswer);
+        $this->hascorrectanswer = array_unique($hascorrectanswer);
         foreach($data as $userid => $components) {
             foreach($components as $componentname => $component) {
                 foreach (array_keys($component) as $componentid) {
-                    if (!in_array($componentid, $this->has_correct_answer)) {
+                    if (!in_array($componentid, $this->hascorrectanswer)) {
                         unset($data[$userid][$componentname][$componentid]);
 
                         // If that was the only question in that component, remove the component
