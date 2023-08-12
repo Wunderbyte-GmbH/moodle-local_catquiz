@@ -14,6 +14,14 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
+/**
+ * Class teststrategy_fastest.
+ *
+ * @package local_catquiz
+ * @copyright 2023 Wunderbyte GmbH
+ * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
+
 namespace local_catquiz\teststrategy\strategy;
 
 use local_catquiz\teststrategy\preselect_task\firstquestionselector;
@@ -29,6 +37,10 @@ use local_catquiz\teststrategy\strategy;
 
 /**
  * Will select questions with the highest fisher information first
+ *
+ * @package local_catquiz
+ * @copyright 2023 Wunderbyte GmbH
+ * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class teststrategy_fastest extends strategy {
 
@@ -38,6 +50,13 @@ class teststrategy_fastest extends strategy {
      */
     public int $id = STRATEGY_FASTEST;
 
+
+    /**
+     * Returns required score modifiers.
+     *
+     * @return array
+     *
+     */
     public function requires_score_modifiers(): array {
         return [
             maximumquestionscheck::class,

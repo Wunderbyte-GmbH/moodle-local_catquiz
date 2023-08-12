@@ -14,6 +14,14 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
+/**
+ * Class info.
+ *
+ * @package local_catquiz
+ * @copyright 2023 Wunderbyte GmbH
+ * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
+
 namespace local_catquiz\teststrategy;
 
 use core_component;
@@ -22,6 +30,10 @@ use MoodleQuickForm;
 
 /**
  * Base class for test strategies.
+ *
+ * @package local_catquiz
+ * @copyright 2023 Wunderbyte GmbH
+ * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class info {
 
@@ -32,6 +44,9 @@ class info {
     public int $id = 0; // Administrativ.
 
 
+    /**
+     * Instantioate parameters.
+     */
     public function __construct() {
 
     }
@@ -99,7 +114,7 @@ class info {
 
         $teststrategiesoptions = [];
         $strategieswithoutpilotquestions = [];
-        foreach($teststrategies as $ts) {
+        foreach ($teststrategies as $ts) {
             $teststrategiesoptions[$ts->id] = $ts->get_description();
             if ($ts->get_description() === get_string('teststrategy_fastest', 'local_catquiz')) {
                 $strategieswithoutpilotquestions[] = $ts->id;
@@ -114,7 +129,7 @@ class info {
 
         $elements[] = $mform->addElement('advcheckbox', 'catquiz_includepilotquestions', get_string('includepilotquestions', 'local_catquiz'));
         $mform->hideIf('catquiz_includepilotquestions', 'catquiz_selectteststrategy', 'eq', $strategieswithoutpilotquestions);
-        // Add ratio of pilot questions
+        // Add ratio of pilot questions.
         $elements[] = $mform->addElement('text', 'catquiz_pilotratio', get_string('pilotratio', 'local_catquiz'));
         $mform->hideIf('catquiz_pilotratio', 'catquiz_includepilotquestions', 'neq', 1);
         $mform->hideIf('catquiz_pilotratio', 'catquiz_selectteststrategy', 'eq', $strategieswithoutpilotquestions);

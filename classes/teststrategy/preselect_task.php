@@ -15,6 +15,8 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
+ * Abstract class preselect_task.
+ *
  * @package local_catquiz
  * @copyright 2023 Wunderbyte GmbH
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
@@ -36,9 +38,22 @@ use local_catquiz\wb_middleware;
  * list of questions, person ability, etc. Usually the last task will calculate
  * a final score for each question based on the data added by the previous tasks
  * and return a question inside a `result` with status `ok`.
+ *
+ * @package local_catquiz
+ * @copyright 2023 Wunderbyte GmbH
+ * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 abstract class preselect_task implements wb_middleware {
 
+    /**
+     * Rrocess test strategy
+     *
+     * @param array $context
+     * @param callable $next
+     *
+     * @return result
+     *
+     */
     public function process(array $context, callable $next): result {
         foreach ($this->get_required_context_keys() as $key) {
             if (!array_key_exists($key, $context)) {

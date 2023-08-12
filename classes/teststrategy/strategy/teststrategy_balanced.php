@@ -14,6 +14,14 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
+/**
+ * Class teststrategy_balanced.
+ *
+ * @package local_catquiz
+ * @copyright 2023 Wunderbyte GmbH
+ * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
+
 namespace local_catquiz\teststrategy\strategy;
 
 use cache;
@@ -28,6 +36,10 @@ use local_catquiz\teststrategy\strategy;
 
 /**
  * Will select questions in a way that balances the general number of attempts
+ *
+ * @package local_catquiz
+ * @copyright 2023 Wunderbyte GmbH
+ * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class teststrategy_balanced extends strategy {
 
@@ -37,6 +49,12 @@ class teststrategy_balanced extends strategy {
      */
     public int $id = STRATEGY_BALANCED;
 
+    /**
+     * Return required score modifiers.
+     *
+     * @return array
+     *
+     */
     public function requires_score_modifiers(): array {
         return [
             maximumquestionscheck::class,
@@ -49,6 +67,12 @@ class teststrategy_balanced extends strategy {
         ];
     }
 
+    /**
+     * Returns attempt feedback.
+     *
+     * @return array
+     *
+     */
     public static function attempt_feedback(): array {
         $cache = cache::make('local_catquiz', 'adaptivequizattempt');
         $feedback = sprintf(

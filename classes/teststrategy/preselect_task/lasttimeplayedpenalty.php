@@ -85,9 +85,13 @@ final class lasttimeplayedpenalty extends preselect_task implements wb_middlewar
      * After 30 days, the penalty should be 0 again.
      *
      * For performance reasons, $now is passed as parameter
+     *
      * @param mixed $question
-     * @param int $now
+     * @param mixed $now
+     * @param mixed $penaltytimerange
+     *
      * @return int
+     *
      */
     private function get_penalty($question, $now, $penaltytimerange): int {
         $secondspassed = $now - $question->userlastattempttime;

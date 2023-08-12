@@ -14,6 +14,14 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
+/**
+ * Abstract class strategy.
+ *
+ * @package local_catquiz
+ * @copyright 2023 Wunderbyte GmbH
+ * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
+
 namespace local_catquiz\teststrategy;
 
 use cache;
@@ -26,16 +34,18 @@ use moodle_exception;
 
 /**
  * Base class for test strategies.
+ *
+ * @package local_catquiz
+ * @copyright 2023 Wunderbyte GmbH
+ * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 abstract class strategy {
-
 
     /**
      *
      * @var int $id // strategy id defined in lib.
      */
     public int $id = 0; // Administrativ.
-
 
     /**
      *
@@ -54,8 +64,11 @@ abstract class strategy {
      */
     public array $scoremodifiers;
 
+    /**
+     * Instantioate parameters.
+     */
     public function __construct() {
-        $this->score_modifiers = info::get_score_modifiers();
+        $this->scoremodifiers = info::get_score_modifiers();
     }
 
     /**
@@ -84,20 +97,23 @@ abstract class strategy {
     /**
      * Strategy specific way of returning the next testitem.
      *
-     * @return object
+     * @param array $context
+     *
+     * @return mixed
+     *
      */
     public function return_next_testitem(array $context) {
         $now = time();
 
         foreach ($this->requires_score_modifiers() as $modifier) {
-            if (!array_key_exists($modifier, $this->score_modifiers)) {
+            if (!array_key_exists($modifier, $this->scoremodifiers)) {
                 throw new moodle_exception(
                     sprintf(
                         'Strategy requires a score modifier that is not available: %s'
                     )
                 );
             }
-            $middlewares[] = $this->score_modifiers[$modifier];
+            $middlewares[] = $this->scoremodifiers[$modifier];
         }
 
         $result = wb_middleware_runner::run($middlewares, $context);
@@ -116,7 +132,7 @@ abstract class strategy {
         $selectedquestion->lastattempttime = $now;
         $selectedquestion->userlastattempttime = $now;
 
-        // Keep track of which question was selected
+        // Keep track of which question was selected.
         $playedquestions = $cache->get('playedquestions') ?: [];
         $playedquestions[$selectedquestion->id] = $selectedquestion;
         $cache->set('playedquestions', $playedquestions);
