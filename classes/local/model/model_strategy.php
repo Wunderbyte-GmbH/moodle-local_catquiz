@@ -30,8 +30,6 @@ use local_catquiz\catcontext;
 use local_catquiz\local\model\model_item_param_list;
 use MoodleQuickForm;
 
-defined('MOODLE_INTERNAL') || die();
-
 /**
  * Model strategy class.
  *
@@ -75,10 +73,10 @@ class model_strategy {
     // TODO: get from DB
     // context
     // max iterations
-    // models (exclude, include)
+    // models (exclude, include).
 
-    // separat: manueller override testitems: nur difficulty von 1 bestimmten modell anzeigen
-    // testitem_model_status: STATUS params (green, yellow, ...) itemid <-> model, model used in last iteration
+    // Separat: manueller override testitems: nur difficulty von 1 bestimmten modell anzeigen
+    // Testitem_model_status: STATUS params (green, yellow, ...) itemid <-> model, model used in last iteration.
 
     /**
      * @var array<model_model>
@@ -130,7 +128,7 @@ class model_strategy {
 
         if ($savedpersonabilities === null || count($savedpersonabilities) === 0) {
             $savedpersonabilities = $responses->get_initial_person_abilities();
-        } else if(count($savedpersonabilities) < count($initial = $responses->get_initial_person_abilities())) {
+        } else if (count($savedpersonabilities) < count($initial = $responses->get_initial_person_abilities())) {
             $newusers = array_diff(array_keys($initial->get_person_params()), array_keys($savedpersonabilities->get_person_params()));
             foreach ($newusers as $userid) {
                 $savedpersonabilities->add(new model_person_param($userid));
@@ -206,7 +204,7 @@ class model_strategy {
          * @var array<model_item_param_list>
          */
         $itemdifficulties = [];
-        // Re-calculate until the stop condition is triggered
+        // Re-calculate until the stop condition is triggered.
         while (!$this->should_stop()) {
             foreach ($this->models as $name => $model) {
                 $itemdifficulties[$name] = $model
@@ -292,7 +290,7 @@ class model_strategy {
                 $item = $itemdifficultieslists[$this->get_default_model()][$itemid];
             }
 
-            // If the item was filtered out by the selected model, do not add it to the list of items for the next round
+            // If the item was filtered out by the selected model, do not add it to the list of items for the next round.
             if ($item === null) {
                 continue;
             }
@@ -312,7 +310,7 @@ class model_strategy {
      *
      */
     private function get_item_override(int $itemid): ?string {
-        return null; // TODO implement
+        return null; // TODO implement.
     }
 
     /**
@@ -322,7 +320,7 @@ class model_strategy {
      *
      */
     private function get_model_override(): ?string {
-        return $this->modeloverride; // TODO implement
+        return $this->modeloverride; // TODO implement.
     }
 
     /**
@@ -375,7 +373,7 @@ class model_strategy {
     public static function get_installed_models(): array {
         $pm = core_plugin_manager::instance();
         $models = [];
-        foreach($pm->get_plugins_of_type('catmodel') as $name => $info) {
+        foreach ($pm->get_plugins_of_type('catmodel') as $name => $info) {
                 $classname = sprintf('catmodel_%s\%s', $name, $name);
             if (!class_exists($classname)) {
                 continue;
@@ -392,6 +390,7 @@ class model_strategy {
      */
     private function create_installed_models(): array {
         /**
+         *
          * @var array<model_model>
          */
         $instances = [];

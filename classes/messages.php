@@ -69,7 +69,7 @@ class messages {
         $message->fullmessageformat = FORMAT_PLAIN;
         $message->notification = 1; // Because this is a notification generated from Moodle, not a user-to-user message.
 
-        // Actually send the message
+        // Actually send the message.
         $messageid = message_send($message);
     }
 

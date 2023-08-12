@@ -27,10 +27,50 @@ namespace local_catquiz;
 
 interface catcalc_item_estimator {
 
+    /**
+     * Get log jacobian
+     *
+     * @param mixed $ability
+     * @param float $itemresponse
+     *
+     * @return mixed
+     *
+     */
     public static function get_log_jacobian($ability, float $itemresponse);
+
+    /**
+     * Get log hessian.
+     *
+     * @param mixed $ability
+     * @param float $itemresponse
+     *
+     * @return [type]
+     *
+     */
     public static function get_log_hessian($ability, float $itemresponse);
+
+    /**
+     * Get log tr jacobian.
+     *
+     * @return array
+     *
+     */
     public static function get_log_tr_jacobian(): array;
+
+    /**
+     * Get log tr hessian.
+     *
+     * @return array
+     *
+     */
     public static function get_log_tr_hessian(): array;
+
+    /**
+     * Get model dim.
+     *
+     * @return int
+     *
+     */
     public static function get_model_dim(): int;
 
     /**

@@ -32,7 +32,11 @@ use local_catquiz\local\model\model_responses;
 use local_catquiz\local\model\model_strategy;
 use local_catquiz\matrix;
 
+defined('MOODLE_INTERNAL') || die();
+
 require_once(__DIR__ . '../../../../config.php');
+
+require_login();
 
 $PAGE->set_url(new moodle_url('/local/catquiz/workspace.php'));
 $PAGE->set_context(context_system::instance());

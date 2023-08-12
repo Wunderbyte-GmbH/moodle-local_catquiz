@@ -91,7 +91,7 @@ class model_item_param_list implements ArrayAccess, IteratorAggregate, Countable
         }
         $itemparameters = new model_item_param_list();
         foreach ($itemrows as $r) {
-            // Skip NaN values here
+            // Skip NaN values here.
             if ($r->difficulty === "NaN") {
                 continue;
             }
@@ -271,8 +271,7 @@ class model_item_param_list implements ArrayAccess, IteratorAggregate, Countable
         $now = time();
         $models = model_strategy::get_installed_models();
         foreach ($records as $record) {
-            // Do not save or update items that have a NAN as one of their
-            // parameter's values
+            // Do not save or update items that have a NAN as one of their parameter's values.
             $parameternames = $models[$record['model']]::get_parameter_names();
             foreach ($parameternames as $parametername) {
                 if (is_nan($record[$parametername])) {
@@ -282,7 +281,7 @@ class model_item_param_list implements ArrayAccess, IteratorAggregate, Countable
 
             $isexistingparam = array_key_exists($record['componentid'], $existingparams)
                 && array_key_exists($record['model'], $existingparams[$record['componentid']]);
-            // If record already exists, update it. Otherwise, insert a new record to the DB
+            // If record already exists, update it. Otherwise, insert a new record to the DB.
             if ($isexistingparam) {
                 $record['id'] = $existingparams[$record['componentid']][$record['model']]->id;
                 $record['timemodified'] = $now;

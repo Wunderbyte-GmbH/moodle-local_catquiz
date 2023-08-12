@@ -40,21 +40,23 @@
 // Array with 10 random item discriminations.
 // Advanced Structures.
 
+defined('MOODLE_INTERNAL') || die();
+
 $demopersonparameters = Array(
     'person_id' => 'person_ability'
 );
 
 
 $demoitemparameter = Array(
-    '1' => Array( // item id
+    '1' => Array( // Item id.
         'difficulty' => 0.5,
         'discrimination' => 0.6,
         'param3' => 1.0
     )
 );
 
-$demopersonresponseconst = Array( // response from a single person
-    '1' => 1, // item_id
+$demopersonresponseconst = Array( // Response from a single person.
+    '1' => 1, // Item id.
     '2' => 0,
     '3' => 1,
     '4' => 1,
@@ -67,11 +69,11 @@ $demopersonresponseconst = Array( // response from a single person
 );
 
 $demofullresponse = Array(
-    '1' => Array( // item_id
+    '1' => Array( // Item_id.
         'person_abilities' => Array(0.5, 0.3, 0.2, 0.8, 0.8, 0.4),
         'item_responses' => Array(1, 0, 1, 1, 0, 1),
     ),
-    '2' => Array( // item_id
+    '2' => Array( // Item_id.
         'person_abilities' => Array(0.5, 0.3, 0.2, 0.8, 0.8, 0.4),
         'item_responses' => Array(0, 1, 0, 1, 0, 1),
     )
@@ -85,9 +87,9 @@ $demoitemresponse = Array(
 );
 
 $demoresponse = Array(
-    "1" => Array( // userid
-        "comp1" => Array( // component
-            "1" => Array( // questionid
+    "1" => Array( // Userid.
+        "comp1" => Array( // Component.
+            "1" => Array( // Questionid.
                 "fraction" => 0,
                 "max_fraction" => 1,
                 "min_fraction" => 0,

@@ -31,7 +31,11 @@ use local_catquiz\local\model\model_person_param_list;
 use local_catquiz\local\model\model_responses;
 use local_catquiz\local\model\model_strategy;
 
+defined('MOODLE_INTERNAL') || die();
+
 require_once(__DIR__ . '../../../../config.php');
+
+require_login();
 
 $PAGE->set_url(new moodle_url('/local/catquiz/workspace.php'));
 $PAGE->set_context(context_system::instance());
@@ -52,7 +56,7 @@ $myx = 3;
 $history = [];
 
 $callables = [];
-for ($i = 1; $i <= 100; $i++){
+for ($i = 1; $i <= 100; $i++) {
 
     $rnd = rand(0, 10);
     array_push($history, $rnd);

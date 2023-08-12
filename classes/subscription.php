@@ -116,7 +116,8 @@ class subscription {
      *
      * @param integer $itemid
      * @param string $area
-     * @return area
+     *
+     * @return array
      */
     public static function get_subscribed_user_ids(int $itemid, string $area) {
 

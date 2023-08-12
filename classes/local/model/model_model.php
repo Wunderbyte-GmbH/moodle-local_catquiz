@@ -24,8 +24,6 @@
 
 namespace local_catquiz\local\model;
 
-defined('MOODLE_INTERNAL') || die();
-
 /**
  * Abstract class for model classes.
  *

@@ -255,7 +255,7 @@ class model_person_param_list implements ArrayAccess, IteratorAggregate, Countab
         $now = time();
         foreach ($records as $record) {
             $isexistingparam = array_key_exists($record['userid'], $existingparams);
-            // If record already exists, update it. Otherwise, insert a new record to the DB
+            // If record already exists, update it. Otherwise, insert a new record to the DB.
             if ($isexistingparam) {
                 $record['id'] = $existingparams[$record['userid']]->id;
                 $record['timemodified'] = $now;

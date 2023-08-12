@@ -110,7 +110,7 @@ class model_responses {
         // From:
         // $data[PERSONID] -> [All responses to different items by this user]
         // To:
-        // $data[QUESTIONID] -> [All responses to this question by different users]
+        // $data[QUESTIONID] -> [All responses to this question by different users].
         foreach ($personparamlist->get_person_params() as $pp) {
             $components = array();
             if (!array_key_exists($pp->get_id(), $this->data)) {
@@ -142,28 +142,28 @@ class model_responses {
     public function setdata($data) {
         $hascorrectanswer = [];
         foreach ($data as $userid => $components) {
-            foreach($components as $component) {
-                foreach($component as $componentid => $results) {
-                    if (floatval($results['fraction']) === 1.0) { // TODO might need to be updated
+            foreach ($components as $component) {
+                foreach ($component as $componentid => $results) {
+                    if (floatval($results['fraction']) === 1.0) { // TODO: might need to be updated.
                         $hascorrectanswer[] = $componentid;
                     }
                 }
             }
         }
 
-        // Filter out items that do not have a single correct answer
+        // Filter out items that do not have a single correct answer.
         $this->hascorrectanswer = array_unique($hascorrectanswer);
-        foreach($data as $userid => $components) {
-            foreach($components as $componentname => $component) {
+        foreach ($data as $userid => $components) {
+            foreach ($components as $componentname => $component) {
                 foreach (array_keys($component) as $componentid) {
                     if (!in_array($componentid, $this->hascorrectanswer)) {
                         unset($data[$userid][$componentname][$componentid]);
 
-                        // If that was the only question in that component, remove the component
+                        // If that was the only question in that component, remove the component.
                         if (count($data[$userid][$componentname]) === 0) {
                             unset($data[$userid][$componentname]);
 
-                            // If there are no data left for this user, remove that entry
+                            // If there are no data left for this user, remove that entry.
                             if (count($data[$userid]) === 0) {
                                 unset($data[$userid]);
                             }

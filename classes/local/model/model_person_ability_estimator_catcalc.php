@@ -28,8 +28,6 @@ use core_plugin_manager;
 use local_catquiz\catcalc;
 use local_catquiz\local\model\model_item_param_list;
 
-defined('MOODLE_INTERNAL') || die();
-
 /**
  * This class uses the catcalc class to estimate person abilities
  *
@@ -50,7 +48,7 @@ class model_person_ability_estimator_catcalc extends model_person_ability_estima
         $personparamlist = new model_person_param_list();
         $responses = $this->responses->as_array();
         foreach ($responses as $userid => $itemresponse) {
-            foreach(array_keys($itemresponse) as $component) {
+            foreach (array_keys($itemresponse) as $component) {
                 $ability = catcalc::estimate_person_ability(
                     $itemresponse[$component],
                     $itemparamlist

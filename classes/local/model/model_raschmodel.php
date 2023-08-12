@@ -26,8 +26,6 @@ namespace local_catquiz\local\model;
 use local_catquiz\catcalc_ability_estimator;
 use local_catquiz\catcalc_item_estimator;
 
-defined('MOODLE_INTERNAL') || die();
-
 /**
  * This class implements model raschmodel.
  *
@@ -45,9 +43,9 @@ abstract class model_raschmodel extends model_model implements catcalc_item_esti
      * @return float
      *
      */
-    static function likelihood_1pl($personability, $itemdifficulty ) {
+    public static function likelihood_1pl($personability, $itemdifficulty ) {
 
-        $discrimination = 1; // hardcode override because of 1pl
+        $discrimination = 1; // Hardcode override because of 1pl.
         return (1 / (1 + exp($discrimination * ($itemdifficulty - $personability))));
     }
 
@@ -62,7 +60,7 @@ abstract class model_raschmodel extends model_model implements catcalc_item_esti
         $estimateditemparams = new model_item_param_list();
         foreach ($this->responses->get_item_response($personparams) as $itemid => $itemresponse) {
             $parameters = $this->calculate_params($itemresponse);
-            // Now create a new item difficulty object (param)
+            // Now create a new item difficulty object (param).
             $param = $this
                 ->create_item_param($itemid)
                 ->set_parameters($parameters);

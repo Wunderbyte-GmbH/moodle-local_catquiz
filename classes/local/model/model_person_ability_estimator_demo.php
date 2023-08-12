@@ -28,8 +28,6 @@ use core_plugin_manager;
 use local_catquiz\catcalc;
 use local_catquiz\local\model\model_item_param_list;
 
-defined('MOODLE_INTERNAL') || die();
-
 /**
  * This is a demo class that returns random person abilities.
  *
@@ -50,7 +48,7 @@ class model_person_ability_estimator_demo extends model_person_ability_estimator
         $personparamlist = new model_person_param_list();
         $responses = $this->responses->as_array();
         foreach ($responses as $userid => $itemresponse) {
-            foreach(array_keys($itemresponse) as $component) {
+            foreach (array_keys($itemresponse) as $component) {
                 $ability = rand(-500, 500) / 100;
                 $p = new model_person_param($userid);
                 $p->set_ability($ability);

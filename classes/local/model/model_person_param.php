@@ -36,8 +36,7 @@ namespace local_catquiz\local\model;
 class model_person_param {
 
     // For some items, the model returns -INF or INF as difficulty.
-    // However, we expect it to be numeric, so we encode those
-    // values as -1000 and 1000
+    // However, we expect it to be numeric, so we encode those values as -1000 and 1000.
     /**
      * MODEL_NEG_INF
      *
