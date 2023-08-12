@@ -1,4 +1,26 @@
 <?php
+// This file is part of Moodle - http://moodle.org/
+//
+// Moodle is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// Moodle is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+
+/**
+ * Class updatepersonability.
+ *
+ * @package local_catquiz
+ * @copyright 2023 Wunderbyte GmbH
+ * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
 
 namespace local_catquiz\teststrategy\preselect_task;
 
@@ -17,12 +39,28 @@ use moodle_exception;
 /**
  * Update the person ability based on the result of the previous question
  *
- * @package local_catquiz\teststrategy\preselect_task
+ * @package local_catquiz
+ * @copyright 2023 Wunderbyte GmbH
+ * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 final class updatepersonability extends preselect_task implements wb_middleware {
 
+    /**
+     * UPDATE_THRESHOLD
+     *
+     * @var int
+     */
     const UPDATE_THRESHOLD = 0.001;
 
+    /**
+     * Run preselect task.
+     *
+     * @param array $context
+     * @param callable $next
+     *
+     * @return result
+     *
+     */
     public function run(array $context, callable $next): result {
         global $CFG, $USER;
         $lastquestion = $context['lastquestion'];
@@ -51,11 +89,11 @@ final class updatepersonability extends preselect_task implements wb_middleware 
 
         if (!$responseschanged) {
             // Nothing changed since the last question, so we do not need to
-            // update the person ability
+            // update the person ability.
             return $next($context);
         }
 
-        // We will update the person ability. Select the correct model for each item:
+        // We will update the person ability. Select the correct model for each item.
         $modelstrategy = new model_strategy($responses);
         $itemparamlists = [];
         foreach (array_keys($modelstrategy->get_installed_models()) as $model) {
@@ -66,12 +104,12 @@ final class updatepersonability extends preselect_task implements wb_middleware 
         $updatedability = catcalc::estimate_person_ability($userresponses, $itemparamlist);
         if (is_nan($updatedability)) {
             // In a production environment, we can use fallback values. However,
-            // during development we want to see when we get unexpected values
+            // during development we want to see when we get unexpected values.
             if ($CFG->debug > 0) {
                 throw new moodle_exception('error', 'local_catquiz');
             }
             // If we already have an ability, just continue with that one and do not update it.
-            // Otherwise, use 0 as default value
+            // Otherwise, use 0 as default value.
             if (!is_nan($context['person_ability'])) {
                 return $next($context);
             } else {
@@ -87,7 +125,7 @@ final class updatepersonability extends preselect_task implements wb_middleware 
             $updatedability
         );
         if (abs($context['person_ability'] - $updatedability) < self::UPDATE_THRESHOLD) {
-            // If we do have more than the minimum questions, we should return
+            // If we do have more than the minimum questions, we should return.
             if ($context['questionsattempted'] >= $context['minimumquestions']) {
                 return result::err(status::ABORT_PERSONABILITY_NOT_CHANGED);
             }
@@ -97,6 +135,12 @@ final class updatepersonability extends preselect_task implements wb_middleware 
         return $next($context);
     }
 
+    /**
+     * Get required context keys.
+     *
+     * @return array
+     *
+     */
     public function get_required_context_keys(): array {
         return [
             'contextid',
@@ -105,6 +149,16 @@ final class updatepersonability extends preselect_task implements wb_middleware 
         ];
     }
 
+    /**
+     * Has changed.
+     *
+     * @param array $newresponses
+     * @param array $oldresponses
+     * @param string $field
+     *
+     * @return bool
+     *
+     */
     private function has_changed(array $newresponses, array $oldresponses, $field = 'fraction'): bool {
         if (count($newresponses) !== count($oldresponses)) {
             return true;

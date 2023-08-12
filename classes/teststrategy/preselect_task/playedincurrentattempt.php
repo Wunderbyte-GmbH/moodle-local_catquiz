@@ -52,7 +52,7 @@ final class playedincurrentattempt extends preselect_task implements wb_middlewa
     const PENALTY = 100;
 
     /**
-     * Run test strategy.
+     * Run preselect task.
      *
      * @param array $context
      * @param callable $next
