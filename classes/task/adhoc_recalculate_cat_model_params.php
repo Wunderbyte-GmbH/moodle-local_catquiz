@@ -14,13 +14,26 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
+/**
+ * Class adhoc_recalculate_cat_model_params.
+ *
+ * @package local_catquiz
+ * @author David Szkiba <david.szkiba@wunderbyte.at>
+ * @copyright 2023 Wunderbyte GmbH
+ * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
+
 namespace local_catquiz\task;
 
 use local_catquiz\catmodel_info;
 
 /**
- * Recalculates item params for the given context
+ * Recalculates item params for the given context.
+ *
+ * @package local_catquiz
  * @author David Szkiba <david.szkiba@wunderbyte.at>
+ * @copyright 2023 Wunderbyte GmbH
+ * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class adhoc_recalculate_cat_model_params extends \core\task\adhoc_task {
     /**
