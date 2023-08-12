@@ -71,7 +71,7 @@ export const init = () => {
         }, 500);
     });
 
-    const updateParameters = async (contextid) => {
+    const updateParameters = async(contextid) => {
         const urlParams = new URLSearchParams(window.location.search);
         const catscaleid = urlParams.get('id');
 

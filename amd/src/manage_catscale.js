@@ -107,8 +107,7 @@ export const performDeletion = async(element) => {
     const id = parentelement.dataset.id;
     Ajax.call([{
         methodname: 'local_catquiz_delete_catscale',
-        args: {id: id}
-        ,
+        args: {id: id},
         done: function(res) {
             // eslint-disable-next-line no-console
             console.log(res);

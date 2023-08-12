@@ -25,7 +25,7 @@ import Ajax from 'core/ajax';
 import {showNotification} from 'local_catquiz/notifications';
 
 const SELECTORS = {
-    'MANAGECATCONTEXT' : '.manage-catcontext',
+    'MANAGECATCONTEXT': '.manage-catcontext',
 };
 
 
@@ -66,6 +66,7 @@ export const init = () => {
  * @param {*} button
  */
 function managecatcontext(button) {
+    // eslint-disable-next-line capitalized-comments
     // const parentelement = button.closest('.list-group-item');
     const action = button.dataset.action;
     let formclass = "local_catquiz\\form\\edit_catcontext";
@@ -120,8 +121,7 @@ export const performDeletion = async(element) => {
     const id = parentelement.dataset.id;
     Ajax.call([{
         methodname: 'local_catquiz_delete_catcontext',
-        args: {id: id}
-        ,
+        args: {id: id},
         done: function(res) {
             // eslint-disable-next-line no-console
             console.log(res);
