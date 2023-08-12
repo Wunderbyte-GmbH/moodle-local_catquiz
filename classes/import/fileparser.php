@@ -15,7 +15,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- *
+ * Class fileparser.
  *
  * @package    local_catquiz
  * @copyright  2023 Wunderbyte GmbH <georg.maisser@wunderbyte.at>
@@ -34,6 +34,13 @@ defined('MOODLE_INTERNAL') || die();
 
 require_once($CFG->libdir . "/csvlib.class.php");
 
+/**
+ * Fileparser for import.
+ *
+ * @package    local_catquiz
+ * @copyright  2023 Wunderbyte GmbH <georg.maisser@wunderbyte.at>
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
 class fileparser {
 
     /**
@@ -113,15 +120,24 @@ class fileparser {
      */
     protected $records = [];
 
+    /**
+     * Instantioate attributes.
+     *
+     * @param mixed $settings
+     *
+     */
     public function __construct ($settings) {
-        // optional: switch on type of settings object -> process data according to type (csv, ...)
-
+        // Optional: switch on type of settings object -> process data according to type (csv, ...).
         $this->apply_settings($settings);
     }
 
     /**
      * Validate and apply settings
-     * @param object $settings
+     *
+     * @param mixed $settings
+     *
+     * @return bool|void
+     *
      */
     private function apply_settings($settings) {
         global $DB;
@@ -142,8 +158,11 @@ class fileparser {
     /**
      * Imports content and compares to settings.
      *
-     * @param $content
-     * @return array Array of records, associative if first column is defined mandatory and unique, otherwise sequential. Line errors might have happend.
+     * Returns array of records, associative if first column is defined mandatory and unique,
+     * otherwise sequential. Line errors might have happend.
+     *
+     * @param mixed $content
+     * @return array
      * @throws \coding_exception
      * @throws \dml_exception
      */
@@ -170,7 +189,7 @@ class fileparser {
             return $data;
         }
 
-        // Check if first column is set mandatory and unique
+        // Check if first column is set mandatory and unique.
         $firstcolumn = $this->fieldnames[0];
         if ($this->get_param_value($firstcolumn, 'mandatory') == true
         && $this->get_param_value($firstcolumn, 'unique') == true) {
@@ -208,10 +227,14 @@ class fileparser {
         return $this->records;
     }
 
-     /**
-      * Executes callback
-      *
-      */
+    /**
+     * Executes callback
+     *
+     * @param array $data
+     *
+     * @return void
+     *
+     */
     private function execute_callback(array $data) {
 
         if (!$callback = $this->settings->callback) {
@@ -227,9 +250,10 @@ class fileparser {
 
     }
 
-
     /**
      * Collecting errors, warnings and general successinformation.
+     *
+     * @return void
      *
      */
     private function checksuccess() {
@@ -262,24 +286,24 @@ class fileparser {
      * @param array $line
      */
     private function validate_data($csvrecord, $line) {
-        // Validate data
+        // Validate data.
         foreach ($csvrecord as $column => $value) {
 
             // Value "0" counts as value and returns valueisset true.
             !$valueisset = (("" !== $value) && (null !== $value)) ? true : false;
 
-            // Check if empty fields are mandatory
+            // Check if empty fields are mandatory.
             if (!$valueisset) {
                 if ($this->field_is_mandatory($column)) {
                     $this->add_csverror("The field $column is mandatory but contains no value.", $line[0]);
                     return false;
                 }
-                // If no value is set, use defaultvalue
+                // If no value is set, use defaultvalue.
                 if (isset($this->settings->columns->$column->defaultvalue)) {
                     $value = $this->settings->columns->$column->defaultvalue;
                 }
             }
-            // Validation of field type
+            // Validation of field type.
             switch($this->get_param_value($column, "type")) {
                 case "date":
                     if (!$this->validate_datefields($value)) {
@@ -291,7 +315,7 @@ class fileparser {
                 default:
                     break;
             }
-            // Validation of field format
+            // Validation of field format.
             switch($this->get_param_value($column, "format")) {
                 case "int":
                     $value = $this->cast_string_to_int($value);
@@ -316,8 +340,8 @@ class fileparser {
         $validation = filter_var($value, FILTER_VALIDATE_INT);
 
         if ($validation !== false) {
-            // The string is a valid integer
-            $int = (int)$value; // Casting to integer
+            // The string is a valid integer.
+            $int = (int)$value; // Casting to integer.
             return $int;
         } else {
             return $value;
@@ -388,10 +412,13 @@ class fileparser {
 
     /**
      * Sets the value of a given param of the column.
-     * @param string $columnname
-     * @param string $param
-     * @param $value
+     *
+     * @param mixed $columnname
+     * @param mixed $param
+     * @param mixed $value
+     *
      * @return boolean true if successful false on error
+     *
      */
     protected function set_param_value($columnname, $param, $value) {
         if (isset($this->settings->columns[$columnname]->$param)) {
@@ -405,24 +432,32 @@ class fileparser {
     /**
      * Add error message to $this->csverrors
      *
-     * @param $errorstring
+     * @param mixed $errorstring
+     * @param mixed $i
+     *
+     * @return void
+     *
      */
     protected function add_csverror($errorstring, $i) {
         $this->csverrors[] = "Error in line $i: ". $errorstring;
-
     }
 
     /**
      * Add error message to $this->csvwarnings
      *
-     * @param $errorstring
+     * @param mixed $errorstring
+     * @param mixed $i
+     *
+     * @return void
+     *
      */
     protected function add_csvwarnings($errorstring, $i) {
         $this->csvwarnings[] = "Error in line $i: ". $errorstring;
-
     }
 
     /**
+     * Get line errors.
+     *
      * @return array line errors
      */
     public function get_line_errors() {
@@ -430,12 +465,16 @@ class fileparser {
     }
 
     /**
+     * Get line warnings.
+     *
      * @return array line warnings
      */
     public function get_line_warnings() {
         return $this->csvwarnings;
     }
     /**
+     * Get errors.
+     *
      * @return array errors
      */
     public function get_error() {

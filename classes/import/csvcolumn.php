@@ -15,17 +15,22 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- *
+ * Class csvcolumn.
  *
  * @package    local_catquiz
  * @copyright  2023 Wunderbyte GmbH <georg.maisser@wunderbyte.at>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
- namespace local_catquiz\import;
+namespace local_catquiz\import;
 
-defined('MOODLE_INTERNAL') || die();
-
+/**
+ * Class csvcolumn for import.
+ *
+ * @package    local_catquiz
+ * @copyright  2023 Wunderbyte GmbH <georg.maisser@wunderbyte.at>
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
 class csvcolumn {
 
     /**
@@ -68,15 +73,28 @@ class csvcolumn {
      */
     public $transform;
 
+    /**
+     * Instantiate attributes.
+     *
+     * @param string $columnname
+     * @param string $localizedname
+     * @param bool $mandatory
+     * @param bool $unique
+     * @param string $type
+     * @param string $format
+     * @param mixed|null $defaultvalue
+     * @param mixed|null $transform
+     *
+     */
     public function __construct(
-    $columnname = '',
-    $localizedname = '',
-    $mandatory = true,
-    $unique = false,
-    $type = 'default',
-    $format = PARAM_TEXT,
-    $defaultvalue = null,
-    $transform = null) {
+            $columnname = '',
+            $localizedname = '',
+            $mandatory = true,
+            $unique = false,
+            $type = 'default',
+            $format = PARAM_TEXT,
+            $defaultvalue = null,
+            $transform = null) {
 
         $this->columnname = $columnname;
         $this->localizedname = $localizedname;
@@ -90,9 +108,16 @@ class csvcolumn {
         $this->apply('pluginname');
     }
 
+    /**
+     * Apply value.
+     *
+     * @param mixed $value
+     *
+     * @return [type]
+     */
     public function apply($value) {
 
-        if(empty($this->transform)) {
+        if (empty($this->transform)) {
             return;
         }
         $func = $this->transform;
@@ -101,12 +126,15 @@ class csvcolumn {
     }
 
     /**
+     * Ser property.
+     *
      * @param string $param
      * @param string $value
+     *
      * @return boolean
      */
     public function set_property($param, $value) {
-        if(isset($this->$param)) {
+        if (isset($this->$param)) {
             $this->$param = $value;
             return true;
         } else {
@@ -122,9 +150,10 @@ class csvcolumn {
      */
     public function date_to_string($date, $format) {
 
-        // input is date return string in defined format
+        // Input is date return string in defined format.
         return "";
     }
+
     /**
      * Transform a string to an object in the defined format.
      * @param mixed $date
@@ -133,12 +162,7 @@ class csvcolumn {
      */
     public function string_to_date($date, $format) {
 
-        // input is string return date in defined format
+        // Input is string return date in defined format.
         return "";
     }
-
-
-
-
-
 }

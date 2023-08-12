@@ -15,7 +15,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- *
+ * Class csvsettings.
  *
  * @package    local_catquiz
  * @copyright  2023 Wunderbyte GmbH <georg.maisser@wunderbyte.at>
@@ -24,8 +24,13 @@
 
 namespace local_catquiz\import;
 
-defined('MOODLE_INTERNAL') || die();
-
+/**
+ * Class csvsettings for import.
+ *
+ * @package    local_catquiz
+ * @copyright  2023 Wunderbyte GmbH <georg.maisser@wunderbyte.at>
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
 class csvsettings {
     /**
      * @var string
@@ -69,19 +74,33 @@ class csvsettings {
     public $callback = '';
 
 
+    /**
+     * Instantioate attributes.
+     *
+     * @param mixed $columns
+     *
+     */
     public function __construct($columns) {
         $this->create_columns($columns);
     }
 
+    /**
+     * Create column.
+     *
+     * @param mixed $columns
+     *
+     * @return void
+     *
+     */
     private function create_columns($columns) {
-        if(!isset($columns)) {
+        if (!isset($columns)) {
             return;
         }
         // Check if columns array is sequential or associative.
         $keys = array_keys($columns);
         if ($keys !== array_keys($keys)) {
             $this->columnsarrayisassociative = true;
-            foreach($columns as $ckey => $cvalue) {
+            foreach ($columns as $ckey => $cvalue) {
                 $this->columns[$ckey] = new csvcolumn(
                 $ckey,
                 !empty($cvalue['localizedname']) ? $cvalue['localizedname'] : $ckey,
@@ -94,8 +113,8 @@ class csvsettings {
                 );
             }
         } else {
-            foreach($columns as $c) {
-                if(!isset($c['name'])) {
+            foreach ($columns as $c) {
+                if (!isset($c['name'])) {
                     break;
                 }
                 $this->columns[$c['name']] = new csvcolumn(
@@ -121,23 +140,24 @@ class csvsettings {
      * @return bool
      */
     public function set_param_in_column($columnname, $param, $value) {
-        if(property_exists($this->columns[$columnname], $param)) {
+        if (property_exists($this->columns[$columnname], $param)) {
             return $this->columns[$columnname]->set_property($param, $value);
         } else {
             return false;
         }
     }
 
-
-    // Getters and Setters
     /**
+     * Returns delimiter.
      *
      * @return string
      */
     public function get_delimiter() {
         return $this->delimiter;
     }
+
     /**
+     * Set delimiter.
      *
      * @param string $delimiter
      */
@@ -146,6 +166,7 @@ class csvsettings {
     }
 
     /**
+     * Returns enclosure.
      *
      * @return string
      */
@@ -154,6 +175,7 @@ class csvsettings {
     }
 
     /**
+     * Set enclosure.
      *
      * @param string $enclosure
      */
@@ -162,6 +184,7 @@ class csvsettings {
     }
 
     /**
+     * Returns encoding
      *
      * @return string
      */
@@ -170,6 +193,7 @@ class csvsettings {
     }
 
     /**
+     * Set encoding.
      *
      * @param string $encoding
      */
@@ -178,6 +202,7 @@ class csvsettings {
     }
 
     /**
+     * Returns dateformat.
      *
      * @return string
      */
@@ -186,6 +211,7 @@ class csvsettings {
     }
 
     /**
+     * Set dateformat.
      *
      * @param string $dateformat
      */
@@ -194,6 +220,7 @@ class csvsettings {
     }
 
     /**
+     * Set callback.
      *
      * @param string $callback
      */
