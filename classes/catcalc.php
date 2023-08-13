@@ -31,7 +31,13 @@ use local_catquiz\local\model\model_strategy;
 use local_catquiz\mathcat;
 
 class catcalc {
-
+    
+    /**
+     * Gives a first (and rought) estimation of 1PL item parameters upon probability of being solved without any prior information
+     *
+     * @param array $item_list
+     * @return array<float> - difficulties of items
+     */
     static function estimate_initial_item_difficulties($item_list) {
 
         $item_difficulties = array();
@@ -43,6 +49,8 @@ class catcalc {
             $num_passed = 0;
             $num_failed = 0;
 
+            // TODO taking fractions into account
+            
             foreach ($item_fractions as $fraction) {
                 if ($fraction == 1) {
                     $num_passed += 1;
@@ -59,54 +67,61 @@ class catcalc {
         }
         return $item_difficulties;
     }
-
+    
+    /**
+     *Estimates numerically a person's ability via maximizing Log Likelihood
+     *
+     * @param array $person_responses
+     * @param model_item_param_list $items
+     * @return array<float>
+     */
     static function estimate_person_ability($person_responses, model_item_param_list $items): float {
-       $all_models = model_strategy::get_installed_models();
+        $all_models = model_strategy::get_installed_models();
 
-        $likelihood = fn($x) => 1;
-        $loglikelihood = fn($x) => 0;
-        $loglikelihood_1st_derivative = fn($x) => 0;
-        $loglikelihood_2nd_derivative = fn($x) => 0;
+        // Define 1st derivative and 2nd derivative of the Log Likelihood with resect to person ability.
+        $ll_1st_derivative = [];
+        $ll_2nd_derivative = [];
 
+        // Get 1st derivative and 2nd derivative for all given items.
         foreach ($person_responses as $qid => $qresponse) {
             $item = $items[$qid];
-            // The item parameter for this response was filtered out
+            
+            // The item parameter for this response was filtered out.
             if ($item === null) {
                 continue;
             }
             $item_params = $item->get_params_array();
 
-            /**
-             * @var catcalc_ability_estimator
-             */
             $model = $all_models[$item->get_model_name()];
             if (!in_array(catcalc_ability_estimator::class, class_implements($model))) {
                 throw new \Exception(sprintf("The given model %s can not be used with the catcalc class", $item->get_model_name()));
             }
-
-            $likelihood_part = fn ($x) => $model::likelihood($x, $item_params, $qresponse['fraction']);
-            $loglikelihood_part = fn ($x) => $model::log_likelihood($x, $item_params, $qresponse['fraction']);
-            $loglikelihood_1st_derivative_part = fn ($x) => $model::log_likelihood_p($x, $item_params, $qresponse['fraction']);
-            $loglikelihood_2nd_derivative_part = fn ($x) => $model::log_likelihood_p_p($x, $item_params, $qresponse['fraction']);
-
-            $likelihood = fn ($x) => $likelihood($x) * $likelihood_part($x);
-            $loglikelihood = fn ($x) => $loglikelihood($x) + $loglikelihood_part($x);
-            $loglikelihood_1st_derivative = fn ($x) => $loglikelihood_1st_derivative($x) + $loglikelihood_1st_derivative_part($x);
-            $loglikelihood_2nd_derivative = fn ($x) => $loglikelihood_2nd_derivative($x) + $loglikelihood_2nd_derivative_part($x);
+            
+            $ll_1st_derivative[] = fn ($pp) => $model::log_likelihood_p($pp, $item_params, $qresponse['fraction']);
+            $ll_2nd_derivative[] = fn ($pp) => $model::log_likelihood_p_p($pp, $item_params, $qresponse['fraction']);
         }
 
-        $retval = mathcat::newtonraphson_stable(
+        // Add all 1st and 2nd derivatives together to one function each.
+        $ll_1st_derivative = function($pp) use($1st_derivative) {foreach ($ll_1st_derivative as $key => $ll1) {$ll_1st_derivative[$key] = $ll1($pp);} return $ll_1st_derivative;};
+        $ll_1st_derivative = fn($pp) => $ml->multi_sum($ll_1st_derivative($pp));
+        
+        $ll_2nd_derivative = function($pp) use($ll_2nd_derivative) {foreach ($ll_2nd_derivative as $key => $ll2) {$ll_2nd_derivative[$key] = $ll2($pp);} return $ll_2nd_derivative;};
+        $ll_2nd_derivative = fn($pp) => $ml->multi_sum($ll_2nd_derivative($pp));
+
+        // Estimate person ability via Newton-Raphson algorithm.
+        return mathcat::newton_raphson_multi_stable(
             $loglikelihood_1st_derivative,
             $loglikelihood_2nd_derivative,
             0,
-            0.001,
-            1500
-        );
-
-        return $retval;
+            6,
+            100,
+            function($pp) {if ($pp < -10) {return -10;}; if ($pp > 10) {return 10;}; return $pp;}
+        ); // @DAVID: Auch hier: Trusted Regions needed, oder?
     }
 
     /**
+     *Estimates numerically item parameters via minimizing Least Mean Squares and maximizing Log Likelihood
+     *
      * @param array $item_response
      * @param model_model $model
      * @return array<float>
@@ -115,54 +130,41 @@ class catcalc {
         if (! $model instanceof catcalc_item_estimator) {
             throw new \InvalidArgumentException("Model does not implement the catcalc_item_estimator interface");
         }
-
-        // compose likelihood matrices based on actual result
-
+        
+        $ml = new matrixcat();
         $model_dim = $model::get_model_dim();
-
-        // Vector that contains the first derivatives for each parameter as functions
-        // [Df/Da, Df,/Db, Df,Dc]
-        $jacobian = [];
-        // Matrix that contains the second derivatives
-        // [
-        //  [Df/Daa, Df/Dab, Df/Dac]
-        //  [Df/Dba, Df/Dbb, Df/Dbc]
-        //  [Df/Dca, Df/Dcb, Df/Dcc]
-        // ]
-        $hessian = [];
-        for ($i = 0; $i <= $model_dim - 2; $i++) {
-            $jacobian[$i] = fn($x) => 0;
-            $hessian[$i] = [];
-            for ($j = 0; $j <= $model_dim - 2; $j++) {
-                $hessian[$i][$j] = fn($x) => 0;
-            }
-        }
-
-        foreach ($item_response as $r) {
-            $jacobian_part = $model::get_log_jacobian($r->get_ability(), $r->get_response());
-            $hessian_part = $model::get_log_hessian($r->get_ability(), $r->get_response());
-
-            for ($i=0; $i <= $model_dim-2; $i++){
-                $jacobian[$i] = fn($x) => $jacobian[$i]($x) + $jacobian_part[$i]($x);
-
-                for ($j=0; $j <= $model_dim-2; $j++) {
-                    $hessian[$i][$j] = fn($x) => $hessian[$i][$j]($x) + $hessian_part[$i][$j]($x);
-                }
-            }
-        }
-
-        // Defines the starting point
-        $start_arr = ['difficulty' => 0.5, 'discrimination' => 0.5, 'guessing' => 0.5];
+        
+        // Estimate the starting point via Least Mean Squares.
+        $start_arr = ['difficulty' => 0, 'discrimination' => 1, 'guessing' => 0]; //@DAVID: Das ist modellabhängig, da die Parameter selbst modellabhängig ist. Sollte dies nicht besser in den Modellen definiert werden?
         $z_0 = array_slice($start_arr, 0, $model_dim-1);
 
+        // @DAVID @RALF: TODO Implement Least Mean Squares estmation.
+        
+        // Define Jacobi vector (1st derivative) and Hesse matrix (2nd derivative) of the Log Likelihood.
+        $jacobian = [];
+        $hessian = [];
+        
+        foreach ($item_response as $r) {
+            $jacobian[] = fn($ip) => $model::get_log_jacobian($r->get_ability(), $ip, $r->get_response());
+            $hessian[] = fn($ip) => $model::get_log_hessian($r->get_ability(), $ip, $r->get_response());
+        }
 
+        $jacobian = function($ip) use($jacobian) {foreach ($jacobian as $key => $j) {$jacobian[$key] = $j($ip);} return $jacobian;};
+        $jacobian = fn($ip) => $ml->multi_sum($jacobian($ip));
+        
+        $hessian = function($ip) use($hessian) {foreach ($hessian as $key => $h) {$hessian[$key] = $h($ip);} return $hessian;};
+        $$hessian = fn($ip) => $ml->multi_sum($$hessian($ip));
+
+        // Estimate item parameters via Newton-Raphson algorithm.
         return mathcat::newton_raphson_multi_stable(
             $jacobian,
             $hessian,
             $z_0,
-            0.001,
-            50,
-            $model
+            6,
+            100,
+            $model->restrict_to_trusted_region,
+            $model->get_log_tr_jacobian,
+            $model->get_log_tr_hessian
         );
     }
 }
