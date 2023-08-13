@@ -15,9 +15,9 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Event factory interface.
+ * Class raschbirnbauma.
  *
- * @package    local_catquiz
+ * @package    catmodel_raschbirnbauma
  * @copyright  2023 Wunderbyte GmbH <georg.maisser@wunderbyte.at>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -29,16 +29,16 @@ use local_catquiz\local\model\model_item_param_list;
 use local_catquiz\local\model\model_person_param_list;
 use local_catquiz\local\model\model_raschmodel;
 
-defined('MOODLE_INTERNAL') || die();
-
 /**
- * @copyright  2023 Wunderbyte GmbH <georg.maisser@wunderbyte.at>
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * Class raschbirnbauma of catmodels.
+ *
+ * @package    catmodel_raschbirnbauma
+ * @copyright 2023 Wunderbyte GmbH <georg.maisser@wunderbyte.at>
+ * @license  http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class raschbirnbauma extends model_raschmodel {
 
-
-    // Definitions and Dimensions //
+    // Definitions and Dimensions.
 
     /**
      * Definition of the number of model parameters
@@ -55,7 +55,7 @@ class raschbirnbauma extends model_raschmodel {
      * @return model_item_param_list
      */
     public static function get_item_parameters(): model_item_param_list {
-        // TODO implement
+        // TODO implement.
         return new model_item_param_list();
     }
 
@@ -65,15 +65,17 @@ class raschbirnbauma extends model_raschmodel {
      * @return model_person_param_list
      */
     public static function get_person_abilities(): model_person_param_list {
-        // TODO implement
+        // TODO implement.
         return new model_person_param_list();
     }
 
     /**
      * Estimate item parameters
      *
-     * @param float
-     * @return model_person_param_list
+     * @param mixed $itemresponse
+     *
+     * @return array
+     *
      */
     public function calculate_params($itemresponse): array {
         return catcalc::estimate_item_params($itemresponse, $this);
@@ -89,15 +91,17 @@ class raschbirnbauma extends model_raschmodel {
             ];
     }
 
-    // Calculate the Likelihood //
+    // Calculate the Likelihood.
 
     /**
      * Calculates the Likelihood for a given the person ability parameter
      *
-     * @param float $pp - person ability parameter
-     * @param array<float> $ip - item parameters ('difficulty')
-     * @param float $k - answer category (0 or 1.0)
+     * @param float $pp
+     * @param array $ip
+     * @param float $k
+     *
      * @return float
+     *
      */
     public static function likelihood($pp, array $ip, float $k) {
         $a = $params['difficulty'];
@@ -108,13 +112,13 @@ class raschbirnbauma extends model_raschmodel {
         }
     }
 
-    // Calculate the LOG Likelihood and its derivatives //
+    // Calculate the LOG Likelihood and its derivatives.
 
     /**
      * Calculates the LOG Likelihood for a given the person ability parameter
      *
      * @param float $pp - person ability parameter
-     * @param array<float> $ip - item parameters ('difficulty')
+     * @param array $ip - item parameters ('difficulty')
      * @param float $k - answer category (0 or 1.0)
      * @return int|float
      */
@@ -126,7 +130,7 @@ class raschbirnbauma extends model_raschmodel {
      * Calculates the 1st derivative of the LOG Likelihood with respect to the person ability parameter
      *
      * @param float $pp - person ability parameter
-     * @param array<float> $ip - item parameters ('difficulty')
+     * @param array $ip - item parameters ('difficulty')
      * @param float $k - answer category (0 or 1.0)
      * @return float
      */
@@ -143,7 +147,7 @@ class raschbirnbauma extends model_raschmodel {
      * Calculates the 2nd derivative of the LOG Likelihood with respect to the person ability parameter
      *
      * @param float $pp - person ability parameter
-     * @param array<float> $ip - item parameters ('difficulty')
+     * @param array $ip - item parameters ('difficulty')
      * @param float $k - answer category (0 or 1.0)
      * @return float
      */
@@ -162,11 +166,11 @@ class raschbirnbauma extends model_raschmodel {
     public static function get_log_jacobian($pp, float $k):array {
         if ($k >= 1.0) {
             return [
-                fn ($ip) => (-exp($ip['difficulty'] + $pp) / ((exp($ip['difficulty']) + exp($pp)) * (exp($pp)))) // d/da
+                fn ($ip) => (-exp($ip['difficulty'] + $pp) / ((exp($ip['difficulty']) + exp($pp)) * (exp($pp)))) // The d/da .
             ];
         } else {
             return [
-                fn ($ip) => (exp($pp) / (exp($ip['difficulty']) + exp($pp))) // d/da
+                fn ($ip) => (exp($pp) / (exp($ip['difficulty']) + exp($pp))) // The d/da .
             ];
         }
     }
@@ -181,7 +185,7 @@ class raschbirnbauma extends model_raschmodel {
     public static function get_log_hessian($pp, float $k): array {
         // 2nd derivative is equal for both k = 0 and k = 1
         return [[
-            fn ($ip) => -exp($ip['difficulty'] + $pp) / (exp($ip['difficulty']) + exp($pp)) ** 2 // d²/ da²
+            fn ($ip) => -exp($ip['difficulty'] + $pp) / (exp($ip['difficulty']) + exp($pp)) ** 2 // The d²/ da² .
         ]];
     }
 
@@ -189,7 +193,7 @@ class raschbirnbauma extends model_raschmodel {
      * Calculates the Fisher Information for a given person ability parameter
      *
      * @param float $pp
-     * @param array<float> $ip
+     * @param array $ip
      * @return float
      */
     public static function fisher_info(float $pp, array $ip) {
@@ -203,21 +207,23 @@ class raschbirnbauma extends model_raschmodel {
      * return array
      */
     public static function restrict_to_trusted_region(array $ip): array {
-        // Set values for difficulty parameter
+        // Set values for difficulty parameter.
         $a = $ip['difficulty'];
 
-        $am = 0; // Mean of difficulty
-        $as = 2; // Standard derivation of difficulty
+        $am = 0; // Mean of difficulty.
+        $as = 2; // Standard derivation of difficulty.
 
-        // Use x times of SD as range of trusted regions
+        // Use x times of SD as range of trusted regions.
         $atr = floatval(get_config('catmodel_raschbirnbauma', 'trusted_region_factor_sd_a'));
         $amin = floatval(get_config('catmodel_raschbirnbauma', 'trusted_region_min_a'));
         $amax = floatval(get_config('catmodel_raschbirnbauma', 'trusted_region_max_a'));
 
-        // Test TR for difficulty
-        if (($a - $am) < max(-($atr * $as), $amin)) {$a = max(-($atr * $as), $amin);
+        // Test TR for difficulty.
+        if (($a - $am) < max(-($atr * $as), $amin)) {
+            $a = max(-($atr * $as), $amin);
         }
-        if (($a - $am) > min(($atr * $as), $amax)) {$a = min(($atr * $as), $amax);
+        if (($a - $am) > min(($atr * $as), $amax)) {
+            $a = min(($atr * $as), $amax);
         }
 
         $ip['difficulty'] = $a;
@@ -231,14 +237,14 @@ class raschbirnbauma extends model_raschmodel {
      * @return array
      */
     public static function get_log_tr_jacobian(): array {
-        // Set values for difficulty parameter
-        $am = 0; // Mean of difficulty
-        $as = 2; // Standard derivation of difficulty
+        // Set values for difficulty parameter.
+        $am = 0; // Mean of difficulty.
+        $as = 2; // Standard derivation of difficulty.
 
         $atr = floatval(get_config('catmodel_raschbirnbauma', 'trusted_region_factor_sd_a'));
 
         return [
-            fn ($ip) => (($am - $ip['difficulty']) / ($as ** 2)) // d/da
+            fn ($ip) => (($am - $ip['difficulty']) / ($as ** 2)) // The d/da .
         ];
     }
 
@@ -248,32 +254,30 @@ class raschbirnbauma extends model_raschmodel {
      * @return array
      */
     public static function get_log_tr_hessian(): array {
-        // Set values for difficulty parameter
-        $am = 0; // Mean of difficulty
-        $as = 2; // Standard derivation of difficulty
+        // Set values for difficulty parameter.
+        $am = 0; // Mean of difficulty.
+        $as = 2; // Standard derivation of difficulty.
 
         return [[
-            fn ($x) => (-1 / ($as ** 2)) // d/da d/da
+            fn ($x) => (-1 / ($as ** 2)) // The d/da d/da .
         ]];
     }
 
+    // DEPRICATED STUFF TO BE REMOVED.
 
-    // DEPRICATED STUFF TO BE REMOVED //
-
-
-    // Depricated, please remove
+    // Depricated, please remove.
     public static function counter_log_likelihood_p_p($p, array $params): float {
         $b = $params['difficulty'];
         return -(exp($b + $p) / (exp($b) + exp($p)) ** 2);
     }
 
-    // Depricated, please remove
+    // Depricated, please remove.
     public static function counter_log_likelihood_p($p, array $params): float {
         $b = $params['difficulty'];
         return -(exp($p) / (exp($b) + exp($p)));
     }
 
-    // Depricated, please remove
+    // Depricated, please remove.
     public static function log_counter_likelihood($p, array $params) {
         $b = $params['difficulty'];
 
@@ -282,7 +286,7 @@ class raschbirnbauma extends model_raschmodel {
         return log(1 - $c - ((1 - $c) * exp($a * (-$b + $p))) / (1 + exp($a * (-$b + $p))));
     }
 
-    // Should also be depricated and same as likelihood, please remove when not necessary
+    // Should also be depricated and same as likelihood, please remove when not necessary.
     public static function likelihood_multi(float $p, array $x) {
         $a = 1;
         $c = 0;
@@ -291,19 +295,19 @@ class raschbirnbauma extends model_raschmodel {
         return $c + (1 - $c) * (exp($a * ($p - $b))) / (1 + exp($a * ($p - $b)));
     }
 
-    // Should be depricated as well, please remove
+    // Should be depricated as well, please remove.
     public static function log_likelihood_b($pp, array $ip) {
         $a = $ip['difficulty'];
         return ((-1) * exp(($a + $pp))) / ((exp($a) + exp($pp)) * (exp($pp)));
     }
 
-    // Should be depricated as well, please remove
+    // Should be depricated as well, please remove.
     public static function log_counter_likelihood_b($p, array $params) {
         $a = $ip['difficulty'];
         return (exp($pp)) / (exp($a) + exp($pp));
     }
 
-    // Should be depricated as well, please remove
+    // Should be depricated as well, please remove.
     public static function get_log_counter_likelihood($p) {
 
         $fun = function ($x) use ($p) {
@@ -312,13 +316,13 @@ class raschbirnbauma extends model_raschmodel {
         return $fun;
     }
 
-    // Should be depricated as well, please remove
+    // Should be depricated as well, please remove.
     public static function log_likelihood_b_b($pp, array $ip) {
         $a = $ip['difficulty'];
         return (-exp(-$a + $pp) * ( exp(2 * (-$a + $pp)))) / ((1 + exp(-$a + $pp)) ** 2 * exp(-$a + $pp) ** 2);
     }
 
-    // Should be depricated as well, please remove
+    // Should be depricated as well, please remove.
     public static function log_counter_likelihood_b_b($p, array $params) {
         $b = $params['difficulty'];
 
