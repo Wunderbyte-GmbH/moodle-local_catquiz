@@ -82,8 +82,8 @@ class raschbirnbauma extends model_raschmodel
      * @param float
      * @return model_person_param_list
      */
-    public function calculate_params($item_response):array{
-        return catcalc::estimate_item_params($item_response, $this);
+    public function calculate_params($k):array{
+        return catcalc::estimate_item_params($k, $this);
     }
     
     // Calculate the Likelihood.
@@ -97,8 +97,8 @@ class raschbirnbauma extends model_raschmodel
      * @return float
      */
     public static function likelihood($pp, array $ip, float $k):float{
-        $a = $params['difficulty'];
-        if ($item_response < 1.0) {
+        $a = $ip['difficulty'];
+        if ($k < 1.0) {
             return 1/(1 + exp($pp-$a));
         } else {
             return 1/(1 + exp($a-$pp));
@@ -156,15 +156,15 @@ class raschbirnbauma extends model_raschmodel
      * @param float $k - answer category (0 or 1.0)
      * @return array of function($ip)
      */
-    public static function get_log_jacobian($pp, float $k):array
+    public static function get_log_jacobian($pp, $ip, float $k):array
     {
         if ($k >= 1.0) {
             return [
-                fn ($ip) => (-exp($ip['difficulty'] + $pp) / ((exp($ip['difficulty']) + exp($pp)) * (exp($pp)))) // d/da
+                (-exp($ip['difficulty'] + $pp) / ((exp($ip['difficulty']) + exp($pp)) * (exp($pp)))) // d/da
             ];  
         } else {
             return [
-                fn ($ip) => (exp($pp) / (exp($ip['difficulty']) + exp($pp))) // d/da
+                (exp($pp) / (exp($ip['difficulty']) + exp($pp))) // d/da
             ];
         }
     }
@@ -176,11 +176,11 @@ class raschbirnbauma extends model_raschmodel
      * @param float $k - answer category (0 or 1.0)
      * @return array of function($ip)
      */
-    public static function get_log_hessian($pp, float $k): array
+    public static function get_log_hessian($pp, $ip, float $k): array
     {
         // 2nd derivative is equal for both k = 0 and k = 1
         return [[
-            fn ($ip) => -exp($ip['difficulty'] + $pp) / (exp($ip['difficulty']) + exp($pp)) ** 2 // d²/ da²               
+            -exp($ip['difficulty'] + $pp) / (exp($ip['difficulty']) + exp($pp)) ** 2 // d²/ da²               
         ]];
     }
     
@@ -297,7 +297,7 @@ class raschbirnbauma extends model_raschmodel
      *
      * @return array
      */
-    public static function get_log_tr_jacobian(): array {
+    public static function get_log_tr_jacobian($ip): array {
         // Set values for difficulty parameter.
         $a_m = 0; // Mean of difficulty.
         $a_s = 2; // Standard derivation of difficulty.
@@ -305,7 +305,7 @@ class raschbirnbauma extends model_raschmodel
         $a_tr = floatval(get_config('catmodel_raschbirnbauma', 'trusted_region_factor_sd_a'));
 
         return [
-            fn ($ip) => (($a_m - $ip['difficulty']) / ($a_s ** 2)) // d/da
+            (($a_m - $ip['difficulty']) / ($a_s ** 2)) // d/da
         ];
     }
 
@@ -314,13 +314,13 @@ class raschbirnbauma extends model_raschmodel
      *
      * @return array
      */
-    public static function get_log_tr_hessian(): array {
+    public static function get_log_tr_hessian($ip): array {
         // Set values for difficulty parameter.
         $a_m = 0; // Mean of difficulty
         $a_s = 2; // Standard derivation of difficulty
 
         return [[
-            fn ($x) => (-1/ ($a_s ** 2)) // Calculate d/da d/da.
+            (-1/ ($a_s ** 2)) // Calculate d/da d/da.
         ]];
     }
 }
