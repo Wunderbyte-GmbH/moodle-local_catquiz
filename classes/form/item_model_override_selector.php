@@ -40,6 +40,11 @@ use stdClass;
  */
 class item_model_override_selector extends dynamic_form {
 
+    /**
+     * DEFAULT_COMPONENT_NAME
+     *
+     * @var string
+     */
     const DEFAULT_COMPONENT_NAME = 'question';
 
     /**
@@ -107,7 +112,7 @@ class item_model_override_selector extends dynamic_form {
         foreach (array_keys($models) as $model) {
             $fieldname = sprintf('override_%s', $model);
             $obj = new stdClass;
-            $obj->status = $data->$fieldname[sprintf('%s_select', $fieldname)];
+            $obj->status = $data->{$fieldname[sprintf('%s_select', $fieldname)]};
             $formitemparams[$model] = $obj;
         }
 
@@ -120,7 +125,7 @@ class item_model_override_selector extends dynamic_form {
         $toinsert = [];
         foreach (array_keys($models) as $model) {
             if ($formitemparams[$model]->status === $saveditemparams[$model]->status) {
-                // Status did not change: nothing to do
+                // Status did not change: nothing to do.
                 continue;
             }
 
@@ -147,22 +152,22 @@ class item_model_override_selector extends dynamic_form {
             }
 
             // There can only be one model with this status, so we have to make
-            // sure all other models that have this status are set back to 0
+            // sure all other models that have this status are set back to 0.
             if (intval($formitemparams[$model]->status) === model_item_param::STATUS_SET_MANUALLY) {
                 foreach (array_keys($models) as $m) {
                     if ($m === $model) {
-                        // Do not check our current model
+                        // Do not check our current model.
                         continue;
                     }
                     if (intval($formitemparams[$m]->status) !== model_item_param::STATUS_SET_MANUALLY) {
-                        // Ignore models with other status
+                        // Ignore models with other status.
                         continue;
                     }
-                    // Reset back to 0
+                    // Reset back to 0.
                     $defaultstatus = strval(model_item_param::STATUS_NOT_CALCULATED);
                     $formitemparams[$m]->status = $defaultstatus;
                     $fieldname = sprintf('override_%s', $m);
-                    $data->$fieldname[sprintf('%s_select', $fieldname)] = $defaultstatus;
+                    $data->{$fieldname[sprintf('%s_select', $fieldname)]} = $defaultstatus;
                     $this->set_data($data);
                     $toupdate[] = [
                         'status' => $formitemparams[$m]->status,
@@ -206,7 +211,7 @@ class item_model_override_selector extends dynamic_form {
         $data = (object) $this->_ajaxformdata;
         $models = model_strategy::get_installed_models();
 
-        if(empty($data->contextid)) {
+        if (empty($data->contextid)) {
             $data->contextid = required_param('contextid', PARAM_INT);
         }
         if (empty($data->testitemid)) {
@@ -223,7 +228,7 @@ class item_model_override_selector extends dynamic_form {
                 if (empty($data->componentname)) {
                     $data->componentname = $modelparams->componentname;
                 }
-            } else { // Set default data if there are no calculated data for the given model
+            } else { // Set default data if there are no calculated data for the given model.
                 $modelstatus = model_item_param::STATUS_NOT_CALCULATED;
                 $modeldifficulty = '-';
             }
@@ -280,6 +285,16 @@ class item_model_override_selector extends dynamic_form {
         return $errors;
     }
 
+
+    /**
+     * Get item params.
+     *
+     * @param mixed $testitemid
+     * @param mixed $contextid
+     *
+     * @return array
+     *
+     */
     private function get_item_params($testitemid, $contextid) {
         global $DB;
 

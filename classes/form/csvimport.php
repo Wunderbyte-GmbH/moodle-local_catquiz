@@ -96,6 +96,12 @@ class csvimport extends dynamic_form {
         $mform->addGroup($buttonarray, 'buttonar', '', ' ', false);
     }
 
+    /**
+     * Call settings class.
+     *
+     * @return object
+     *
+     */
     public static function call_settings_class() {
         /*
         $columnsassociative = array(
@@ -120,9 +126,11 @@ class csvimport extends dynamic_form {
         $columnssequential = [
             array(
                 'name' => 'componentid',
+                // phpcs:ignore
                 // 'columnname' => get_string('id'),
                 'mandatory' => true,
                 'format' => PARAM_INT,
+                // phpcs:ignore
                 // 'transform' => fn($x) => get_string($x, 'local_catquiz'),
             ),
             array(
@@ -160,12 +168,13 @@ class csvimport extends dynamic_form {
             array (
                 'name' => 'timecreated',
                 'mandatory' => false,
-                'type' => 'date', // Will throw warning if empty or 0;
+                'type' => 'date', // Will throw warning if empty or 0.
             ),
             array (
                 'name' => 'timemodified',
                 'mandatory' => false,
-                // 'type' => 'date', Will throw warning if empty or 0;
+                // phpcs:ignore
+                // 'type' => 'date', Will throw warning if empty or 0.
             ),
             array (
                 'name' => 'guessing',
@@ -185,7 +194,7 @@ class csvimport extends dynamic_form {
     public static function get_delimiter_list() {
         global $CFG;
         $delimiters = array('comma' => ',', 'semicolon' => ';', 'colon' => ':', 'tab' => '\\t');
-        if (isset($CFG->CSV_DELIMITER) and strlen($CFG->CSV_DELIMITER) === 1 and !in_array($CFG->CSV_DELIMITER, $delimiters)) {
+        if (isset($CFG->CSV_DELIMITER) && strlen($CFG->CSV_DELIMITER) === 1 && !in_array($CFG->CSV_DELIMITER, $delimiters)) {
             $delimiters['cfg'] = $CFG->CSV_DELIMITER;
         }
         return $delimiters;
@@ -214,13 +223,13 @@ class csvimport extends dynamic_form {
         $content = $this->get_file_content('csvfile');
         $settings = $this->call_settings_class();
 
-        if(!empty($data->delimiter_name)) {
+        if (!empty($data->delimiter_name)) {
             $settings->set_delimiter($data->delimiter_name);
         }
-        if(!empty($data->encoding)) {
+        if (!empty($data->encoding)) {
             $settings->set_encoding($data->encoding);
         }
-        if(!empty($data->dateparseformat)) {
+        if (!empty($data->dateparseformat)) {
             $settings->set_dateformat($data->dateparseformat);
         }
         $callbackfunction = "local_catquiz\local\model\model_item_param_list::save_or_update_testitem_in_db";
