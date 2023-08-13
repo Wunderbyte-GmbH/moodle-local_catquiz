@@ -103,9 +103,13 @@ class catcalc {
 
         // Add all 1st and 2nd derivatives together to one function each.
         $ll_1st_derivative = function($pp) use($1st_derivative) {foreach ($ll_1st_derivative as $key => $ll1) {$ll_1st_derivative[$key] = $ll1($pp);} return $ll_1st_derivative;};
+        // @DAVID: after merge #102 use instead:
+        // $ll_1st_derivative = $ml->build_callable_array($ll_1st_derivative);
         $ll_1st_derivative = fn($pp) => $ml->multi_sum($ll_1st_derivative($pp));
         
         $ll_2nd_derivative = function($pp) use($ll_2nd_derivative) {foreach ($ll_2nd_derivative as $key => $ll2) {$ll_2nd_derivative[$key] = $ll2($pp);} return $ll_2nd_derivative;};
+        // @DAVID: after merge #102 use instead:
+        // $ll_2nd_derivative = $ml->build_callable_array($ll_2nd_derivative);
         $ll_2nd_derivative = fn($pp) => $ml->multi_sum($ll_2nd_derivative($pp));
 
         // Estimate person ability via Newton-Raphson algorithm.
@@ -150,9 +154,13 @@ class catcalc {
         }
 
         $jacobian = function($ip) use($jacobian) {foreach ($jacobian as $key => $j) {$jacobian[$key] = $j($ip);} return $jacobian;};
+        // @DAVID: after merge #102 use instead:
+        // $jacobian = $ml->build_callable_array($jacobian);
         $jacobian = fn($ip) => $ml->multi_sum($jacobian($ip));
         
         $hessian = function($ip) use($hessian) {foreach ($hessian as $key => $h) {$hessian[$key] = $h($ip);} return $hessian;};
+        // @DAVID: after merge #102 use instead:
+        // $hessian = $ml->build_callable_array($hessian);
         $$hessian = fn($ip) => $ml->multi_sum($$hessian($ip));
 
         // Estimate item parameters via Newton-Raphson algorithm.
