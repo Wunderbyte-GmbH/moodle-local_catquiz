@@ -32,8 +32,6 @@ use local_catquiz\local\model\model_responses;
 use local_catquiz\local\model\model_strategy;
 use local_catquiz\matrix;
 
-defined('MOODLE_INTERNAL') || die();
-
 require_once(__DIR__ . '../../../../config.php');
 
 require_login();

@@ -14,6 +14,14 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
+/**
+ * Class student_stats_table.
+ *
+ * @package local_catquiz
+ * @copyright 2023 Wunderbyte GmbH
+ * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
+
 namespace local_catquiz\table;
 
 defined('MOODLE_INTERNAL') || die();
@@ -30,6 +38,10 @@ use moodle_url;
 
 /**
  * Search results for managers are shown in a table (student search results use the template searchresults_student).
+ *
+ * @package local_catquiz
+ * @copyright 2023 Wunderbyte GmbH
+ * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class student_stats_table extends wunderbyte_table {
 
@@ -43,8 +55,8 @@ class student_stats_table extends wunderbyte_table {
      * Constructor
      * @param string $uniqueid all tables have to have a unique id, this is used
      *      as a key when storing table properties like sort order in the session.
-     * @param integer $catscaleid
-     * @param integer $contextid
+     * @param int $catscaleid
+     * @param int $contextid
      */
     public function __construct(string $uniqueid, int $catscaleid = 0, int $contextid = 0) {
 
@@ -58,11 +70,20 @@ class student_stats_table extends wunderbyte_table {
     /**
      * Overrides the output for this column.
      * @param object $values
+     * @return int
      */
     public function col_userid($values) {
         return $values->id;
     }
 
+    /**
+     * Overrides the output for action column.
+     *
+     * @param mixed $values
+     *
+     * @return string
+     *
+     */
     public function col_action($values) {
         global $OUTPUT;
 

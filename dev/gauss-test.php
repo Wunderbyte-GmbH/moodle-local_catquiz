@@ -31,8 +31,6 @@ use local_catquiz\local\model\model_person_param_list;
 use local_catquiz\local\model\model_responses;
 use local_catquiz\local\model\model_strategy;
 
-defined('MOODLE_INTERNAL') || die();
-
 require_once(__DIR__ . '../../../../config.php');
 
 require_login();
@@ -67,7 +65,7 @@ $x = \local_catquiz\catcalc::estimate_person_ability2($synthpersonresponse, $syn
 
 echo "pause";
 
-// Problematic function:
+// Problematic function:.
 
 echo "finished";
 

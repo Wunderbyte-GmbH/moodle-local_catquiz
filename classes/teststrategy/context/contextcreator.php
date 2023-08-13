@@ -70,7 +70,7 @@ class contextcreator {
     /**
      * Loads context items specified by itemNames into the given Context.
      *
-     * @param  string[] $param_names The Context items to load.
+     * @param  string[] $paramnames The Context items to load.
      * @param  array  $context   The initial context to load into.
      * @return array
      */

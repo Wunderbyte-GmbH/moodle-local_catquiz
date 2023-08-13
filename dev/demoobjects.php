@@ -23,6 +23,7 @@
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+// phpcs:disable
 // function get_demo_person_ability2(){
 // $demo_person_abilities = [];
 // for ($i=1;$i <=10000;$i++){
@@ -36,11 +37,10 @@
 // function get_demo_item_difficulies(){
 // return [0.64, 0.95, 0.28, 0.88, 0.51, 0.61, 0.8, 0.29, 0.46, 0.41];
 // }
+// phpcs:enable
 
 // Array with 10 random item discriminations.
 // Advanced Structures.
-
-defined('MOODLE_INTERNAL') || die();
 
 $demopersonparameters = Array(
     'person_id' => 'person_ability'

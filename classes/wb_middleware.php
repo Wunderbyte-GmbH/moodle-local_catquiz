@@ -15,6 +15,8 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
+ * Interface wb_middleware.
+ *
  * @package local_catquiz
  * @copyright 2023 Wunderbyte GmbH
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
@@ -32,9 +34,15 @@ use local_catquiz\local\result;
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 interface wb_middleware {
+
     /**
+     * Process action.
+     *
      * @param array $context Contains related data that might be needed by middleware instances
+     * @param callable $next
+     *
      * @return result
+     *
      */
     public function process(array $context, callable $next): result;
 }

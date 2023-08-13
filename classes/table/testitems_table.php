@@ -14,6 +14,14 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
+/**
+ * Class testitems_table.
+ *
+ * @package local_catquiz
+ * @copyright 2023 Wunderbyte GmbH
+ * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
+
 namespace local_catquiz\table;
 
 defined('MOODLE_INTERNAL') || die();
@@ -38,21 +46,29 @@ use stdClass;
 
 /**
  * Search results for managers are shown in a table (student search results use the template searchresults_student).
+ *
+ * @package local_catquiz
+ * @copyright 2023 Wunderbyte GmbH
+ * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class testitems_table extends wunderbyte_table {
 
-    /** @var integer $catscaleid */
+    /**
+     * @var int $catscaleid
+     */
     private $catscaleid = 0;
 
-    /** @var integer */
+    /**
+     * @var int
+     */
     private $contextid = 0;
 
     /**
      * Constructor
      * @param string $uniqueid all tables have to have a unique id, this is used
      *      as a key when storing table properties like sort order in the session.
-     * @param integer $catscaleid
-     * @param integer $contextid
+     * @param int $catscaleid
+     * @param int $contextid
      */
     public function __construct(string $uniqueid, int $catscaleid = 0, int $contextid = 0) {
 
@@ -66,6 +82,8 @@ class testitems_table extends wunderbyte_table {
     /**
      * Overrides the output for this column.
      * @param object $values
+     *
+     * @return string
      */
     public function col_idnumber($values) {
         return html_writer::tag('span', $values->idnumber, ['class' => 'badge badge-primary']);
@@ -79,11 +97,13 @@ class testitems_table extends wunderbyte_table {
 
         global $OUTPUT;
 
+        // phpcs:disable
         // try {
         // $question = question_bank::load_question($values->id);
         // } catch (Exception $e) {
         // return $values->questiontext;
         // }
+        // phpcs:enable
 
         $context = context_system::instance();
 
@@ -123,9 +143,26 @@ class testitems_table extends wunderbyte_table {
         return "problem with $values->id, no qtype";
     }
 
+    /**
+     * Overrides the output for questioncontextattempts column.
+     *
+     * @param mixed $values
+     *
+     * @return string
+     *
+     */
     public function col_questioncontextattempts($values) {
         return $values->questioncontextattempts;
     }
+
+    /**
+     * Overrides the output for action column.
+     *
+     * @param mixed $values
+     *
+     * @return string
+     *
+     */
     public function col_action($values) {
 
         global $OUTPUT;
@@ -156,7 +193,7 @@ class testitems_table extends wunderbyte_table {
     }
 
     /**
-     * Override  model value with get_string.
+     * Override model value with get_string.
      *
      * @param stdClass $values
      * @return string
@@ -170,10 +207,10 @@ class testitems_table extends wunderbyte_table {
 
 
     /**
-     * Override  model value with get_string.
+     * Override model value with get_string.
      *
      * @param stdClass $values
-     * @return void
+     * @return string
      */
     public function col_status($values) {
 
@@ -214,7 +251,7 @@ class testitems_table extends wunderbyte_table {
 
     /**
      * Function to handle the action buttons.
-     * @param integer $testitemid
+     * @param int $testitemid
      * @param string $data
      * @return array
      */
@@ -235,7 +272,7 @@ class testitems_table extends wunderbyte_table {
         }
         $failed = array_filter($result, fn($r) => $r->isErr());
 
-        // All items were added successfully
+        // All items were added successfully.
         if (empty($failed)) {
             return [
                 'success' => 1,
@@ -243,7 +280,7 @@ class testitems_table extends wunderbyte_table {
             ];
         }
 
-        // If a single item could not be added, show a specific error message
+        // If a single item could not be added, show a specific error message.
         if (count($idarray) === 1 && count($failed) === 1) {
             return [
                 'success' => 0,
@@ -266,12 +303,11 @@ class testitems_table extends wunderbyte_table {
                 ]
             )
         ];
-
     }
 
     /**
      * Function to handle the action buttons.
-     * @param integer $testitemid
+     * @param int $testitemid
      * @param string $data
      * @return array
      */
@@ -303,7 +339,7 @@ class testitems_table extends wunderbyte_table {
     /**
      * Toggle Checkbox
      *
-     * @param integer $id
+     * @param int $id
      * @param string $data
      * @return array
      */

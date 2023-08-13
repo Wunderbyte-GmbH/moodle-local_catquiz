@@ -31,8 +31,6 @@ use local_catquiz\local\model\model_person_param_list;
 use local_catquiz\local\model\model_responses;
 use local_catquiz\local\model\model_strategy;
 
-defined('MOODLE_INTERNAL') || die();
-
 require_once(__DIR__ . '../../../../config.php');
 
 require_login();

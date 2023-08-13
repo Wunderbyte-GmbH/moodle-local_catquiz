@@ -31,8 +31,6 @@ use local_catquiz\local\model\model_person_param_list;
 use local_catquiz\local\model\model_responses;
 use local_catquiz\local\model\model_strategy;
 
-defined('MOODLE_INTERNAL') || die();
-
 require_once(__DIR__ . '../../../../config.php');
 
 require_login();
@@ -94,7 +92,7 @@ $itemresponse = $responses->get_item_response($initialpersonabilities);
 
 $synthitemresonse = \local_catquiz\synthcat::get_item_response2(80, 120, 0.2);
 
-$x = \local_catquiz\catcalc::estimate_item_params_new($synthitemresonse, $raschbb);
+$x = \local_catquiz\catcalc::estimate_item_params($synthitemresonse, $raschbb);
 
 // $my_item_response =
 

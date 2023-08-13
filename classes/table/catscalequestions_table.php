@@ -14,6 +14,14 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
+/**
+ * Class catscalequestions_table.
+ *
+ * @package local_catquiz
+ * @copyright 2023 Wunderbyte GmbH
+ * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
+
 namespace local_catquiz\table;
 
 defined('MOODLE_INTERNAL') || die();
@@ -33,6 +41,10 @@ use moodle_url;
 
 /**
  * Search results for managers are shown in a table (student search results use the template searchresults_student).
+ *
+ * @package local_catquiz
+ * @copyright 2023 Wunderbyte GmbH
+ * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class catscalequestions_table extends wunderbyte_table {
 
@@ -46,8 +58,8 @@ class catscalequestions_table extends wunderbyte_table {
      * Constructor
      * @param string $uniqueid all tables have to have a unique id, this is used
      *      as a key when storing table properties like sort order in the session.
-     * @param integer $catscaleid
-     * @param integer $contextid
+     * @param int $catscaleid
+     * @param int $contextid
      */
     public function __construct(string $uniqueid, int $catscaleid = 0, int $contextid = 0) {
 
@@ -69,6 +81,14 @@ class catscalequestions_table extends wunderbyte_table {
         return $values->id;
     }
 
+    /**
+     * Overrides the output for action column.
+     *
+     * @param mixed $values
+     *
+     * @return string
+     *
+     */
     public function col_action($values) {
         global $OUTPUT;
 
@@ -88,8 +108,8 @@ class catscalequestions_table extends wunderbyte_table {
             'data' => [ // Will be added eg as data-id = $values->id, so values can be transmitted to the method above.
                 'testitemstatus' => $values->testitemstatus,
                 'catscaleid' => $values->catscaleid,
-                'titlestring' => 'toggleactivity', // Will be shown in modal title
-                'bodystring' => 'confirmactivitychange', // Will be shown in modal body
+                'titlestring' => 'toggleactivity', // Will be shown in modal title.
+                'bodystring' => 'confirmactivitychange', // Will be shown in modal body.
                 'component' => 'local_catquiz',
                 'labelcolumn' => 'name',
             ]
@@ -116,8 +136,8 @@ class catscalequestions_table extends wunderbyte_table {
                     'questionid' => $values->id,
                     'id' => $values->id,
                     'catscaleid' => $values->catscaleid,
-                    'titlestring' => 'deletedatatitle', // Will be shown in modal title
-                    'bodystring' => 'confirmdeletion', // Will be shown in modal body in case elements are selected
+                    'titlestring' => 'deletedatatitle', // Will be shown in modal title.
+                    'bodystring' => 'confirmdeletion', // Will be shown in modal body in case elements are selected.
                     'component' => 'local_catquiz',
                     'labelcolumn' => 'name', // Verify value of record that will be deleted.
                 ]
@@ -130,7 +150,7 @@ class catscalequestions_table extends wunderbyte_table {
     /**
      * Return value for lastattempttime column.
      *
-     * @param stdClass $values
+     * @param \stdClass $values
      * @return string
      */
     public function col_lastattempttime($values) {
@@ -144,7 +164,7 @@ class catscalequestions_table extends wunderbyte_table {
     /**
      * Return symbols for status column.
      *
-     * @param stdClass $values
+     * @param \stdClass $values
      * @return string
      */
     public function col_status($values) {
@@ -177,7 +197,7 @@ class catscalequestions_table extends wunderbyte_table {
     /**
      * Return strings for column type.
      *
-     * @param stdClass $values
+     * @param \stdClass $values
      * @return string
      */
     public function col_qtype($values) {
@@ -187,6 +207,7 @@ class catscalequestions_table extends wunderbyte_table {
         }
 
         return "problem with $values->id, no qtype";
+        // phpcs:disable
         // global $OUTPUT;
 
         // $type = $values->qtype;
@@ -220,6 +241,7 @@ class catscalequestions_table extends wunderbyte_table {
         // break;
         // }
         // return $type;
+        // phpcs:enable
     }
 
 

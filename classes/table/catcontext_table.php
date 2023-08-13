@@ -14,6 +14,14 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
+/**
+ * Class catcontext_table.
+ *
+ * @package local_catquiz
+ * @copyright 2023 Wunderbyte GmbH
+ * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
+
 namespace local_catquiz\table;
 
 defined('MOODLE_INTERNAL') || die();
@@ -27,6 +35,10 @@ use stdClass;
 
 /**
  * Search results for managers are shown in a table (student search results use the template searchresults_student).
+ *
+ * @package local_catquiz
+ * @copyright 2023 Wunderbyte GmbH
+ * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class catcontext_table extends wunderbyte_table {
 
@@ -34,7 +46,6 @@ class catcontext_table extends wunderbyte_table {
      * Constructor
      * @param string $uniqueid all tables have to have a unique id, this is used
      *      as a key when storing table properties like sort order in the session.
-     * @param integer $catscaleid
      */
     public function __construct(string $uniqueid) {
 
@@ -46,7 +57,7 @@ class catcontext_table extends wunderbyte_table {
      * Return value for timecreated column.
      *
      * @param stdClass $values
-     * @return void
+     * @return string
      */
     public function col_timecreated(stdClass $values) {
 
@@ -57,7 +68,7 @@ class catcontext_table extends wunderbyte_table {
      * Return value for timemodified column.
      *
      * @param stdClass $values
-     * @return void
+     * @return string
      */
     public function col_timemodified(stdClass $values) {
 
@@ -68,7 +79,7 @@ class catcontext_table extends wunderbyte_table {
      * Return value for starttimestamp column.
      *
      * @param stdClass $values
-     * @return void
+     * @return string
      */
     public function col_starttimestamp(stdClass $values) {
 
@@ -82,7 +93,7 @@ class catcontext_table extends wunderbyte_table {
      * Return value for endtimestamp column.
      *
      * @param stdClass $values
-     * @return void
+     * @return string
      */
     public function col_endtimestamp(stdClass $values) {
 
@@ -96,7 +107,7 @@ class catcontext_table extends wunderbyte_table {
      * Return value for endtimestamp column.
      *
      * @param stdClass $values
-     * @return void
+     * @return mixed
      */
     public function col_testitems(stdClass $values) {
 
@@ -105,8 +116,16 @@ class catcontext_table extends wunderbyte_table {
         return $values->testitems;
     }
 
+    /**
+     * Return value for attempts column.
+     *
+     * @param mixed $values
+     *
+     * @return mixed
+     *
+     */
     public function col_attempts($values) {
-        if  (!empty($values->attempts)) {
+        if (!empty($values->attempts)) {
             return $values->attempts;
         }
         return '0';
@@ -116,7 +135,7 @@ class catcontext_table extends wunderbyte_table {
      * This handles the colum checkboxes.
      *
      * @param stdClass $values
-     * @return void
+     * @return string|null
      */
     public function col_action($values) {
 
@@ -128,7 +147,8 @@ class catcontext_table extends wunderbyte_table {
             'href' => '#', // You can either use the link, or JS, or both.
             'iclass' => 'fa fa-edit', // Add an icon before the label.
             'id' => $values->id,
-            'formname' => 'local_catquiz\\form\\edit_catcontext', // The method needs to be added to your child of wunderbyte_table class.
+            // The method needs to be added to your child of wunderbyte_table class.
+            'formname' => 'local_catquiz\\form\\edit_catcontext',
             'data' => [
                 'id' => $values->id,
                 'labelcolumn' => 'name'
@@ -154,14 +174,14 @@ class catcontext_table extends wunderbyte_table {
                 ]
         ];
 
-        return $OUTPUT->render_from_template('local_wunderbyte_table/component_actionbutton', $data);;
+        return $OUTPUT->render_from_template('local_wunderbyte_table/component_actionbutton', $data);
 
     }
 
     /**
      * Delete item.
      *
-     * @param integer $id
+     * @param int $id
      * @param string $data
      * @return array
      */
