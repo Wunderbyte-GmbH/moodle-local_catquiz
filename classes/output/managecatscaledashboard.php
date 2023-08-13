@@ -13,20 +13,6 @@
 //
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
-// This file is part of Moodle - http://moodle.org/
-//
-// Moodle is free software: you can redistribute it and/or modify
-// it under the terms of the GNU General Public License as published by
-// the Free Software Foundation, either version 3 of the License, or
-// (at your option) any later version.
-//
-// Moodle is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-// GNU General Public License for more details.
-//
-// You should have received a copy of the GNU General Public License
-// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 namespace local_catquiz\output;
 
@@ -109,12 +95,14 @@ class managecatscaledashboard implements renderable, templatable {
     public ?array $testitemdashboardarray = [];
 
     /**
-     * Either returns one tree or treearray for every parentnode
+     * Constructor.
      *
-     * @param int $fulltree
-     * @param boolean $allowedit
+     * @param int $testitemid
      * @param int $contextid
-     * @return array
+     * @param int $catscaleid
+     * @param int $usesubs
+     * @param string $componentname
+     *
      */
     public function __construct(int $testitemid, int $contextid, int $catscaleid, int $usesubs, string $componentname) {
 
@@ -145,10 +133,13 @@ class managecatscaledashboard implements renderable, templatable {
 
     }
 
-
     /**
-     * Return the item tree of all catscales.
+     * Export for template.
+     *
+     * @param \renderer_base $output
+     *
      * @return array
+     *
      */
     public function export_for_template(\renderer_base $output): array {
 

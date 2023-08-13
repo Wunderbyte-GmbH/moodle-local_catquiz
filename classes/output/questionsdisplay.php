@@ -13,20 +13,6 @@
 //
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
-// This file is part of Moodle - http://moodle.org/
-//
-// Moodle is free software: you can redistribute it and/or modify
-// it under the terms of the GNU General Public License as published by
-// the Free Software Foundation, either version 3 of the License, or
-// (at your option) any later version.
-//
-// Moodle is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-// GNU General Public License for more details.
-//
-// You should have received a copy of the GNU General Public License
-// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 namespace local_catquiz\output;
 
@@ -81,8 +67,14 @@ class questionsdisplay {
     private string $componentname = 'question'; // Componentname of the testitem.
 
     /**
+     * Constructor.
      *
-     * @return void
+     * @param int $testitemid
+     * @param int $contextid
+     * @param int $catscaleid
+     * @param int $usesubs
+     * @param string $componentname
+     *
      */
     public function __construct(int $testitemid, int $contextid, int $catscaleid = 0, int $usesubs = 1, string $componentname = 'question') {
         $this->catcontextid = $contextid;
@@ -92,6 +84,7 @@ class questionsdisplay {
         $this->componentname = $componentname; // ID of record to be displayed in detail instead of table.
 
     }
+
     /**
      * Renders the context selector.
      * @return string
@@ -106,7 +99,8 @@ class questionsdisplay {
         ];
 
         $form = new \local_catquiz\form\contextselector(null, $customdata, 'post', '', [], true, $ajaxformdata);
-        // Set the form data with the same method that is called when loaded from JS. It should correctly set the data for the supplied arguments.
+        // Set the form data with the same method that is called when loaded from JS.
+        // It should correctly set the data for the supplied arguments.
         $form->set_data_for_dynamic_submission();
         // Render the form in a specific container, there should be nothing else in the same container.
         return html_writer::div($form->render(), '', ['id' => 'select_context_form']);
@@ -120,7 +114,7 @@ class questionsdisplay {
         $selectors = $this->render_selector($this->scale);
         $ancestorids = catscale::get_ancestors($this->scale);
         if (count($ancestorids) > 0) {
-            foreach($ancestorids as $ancestorid) {
+            foreach ($ancestorids as $ancestorid) {
                 $selector = $this->render_selector($ancestorid);
                 $selectors = "$selector <br> $selectors";
             }
@@ -136,7 +130,13 @@ class questionsdisplay {
 
     /**
      * Renders the scale selector.
+     *
+     * @param mixed $scaleid
+     * @param bool $noselection
+     * @param string $label
+     *
      * @return string
+     *
      */
     private function render_selector($scaleid, $noselection = false, $label = 'selectcatscale') {
         $selected = $noselection ? 0 : $scaleid;
@@ -146,11 +146,12 @@ class questionsdisplay {
                         ];
         $customdata = [
             'type' => 'scale',
-            'label' => $label, // String localized in 'local_catquiz';
+            'label' => $label, // String localized in 'local_catquiz'.
         ];
 
         $form = new \local_catquiz\form\scaleselector(null, $customdata, 'post', '', [], true, $ajaxformdata);
-        // Set the form data with the same method that is called when loaded from JS. It should correctly set the data for the supplied arguments.
+        // Set the form data with the same method that is called when loaded from JS.
+        // It should correctly set the data for the supplied arguments.
         $form->set_data_for_dynamic_submission();
         // Render the form in a specific container, there should be nothing else in the same container.
         return html_writer::div($form->render(), '', ['id' => 'select_scale_form_scaleid_' . $scaleid]);
@@ -174,7 +175,8 @@ class questionsdisplay {
     }
 
     /**
-     * Render table.
+     * Render questions table.
+     * @return ?string
      */
     public function renderquestionstable() {
         global $DB;
@@ -221,7 +223,8 @@ class questionsdisplay {
         $table->addcheckboxes = true;
 
         $table->actionbuttons[] = [
-            'label' => get_string('addquestion', 'local_catquiz'), // 'NoModal, MultipleCall, NoSelection'-> Name of your action button.
+            // The 'NoModal, MultipleCall, NoSelection'-> Name of your action button.
+            'label' => get_string('addquestion', 'local_catquiz'),
             'class' => 'btn btn-primary', // Example colors bootstrap 4 classes.
             'href' => '#',
             'methodname' => 'addquestion', // The method needs to be added to your child of wunderbyte_table class.
@@ -229,11 +232,12 @@ class questionsdisplay {
             'selectionmandatory' => false, // When set to true, action will only be triggered, if elements are selected.
             'data' => [ // Will be added eg as data-id = $values->id, so values can be transmitted to the method above.
                 'id' => 'id',
-                'component' => 'local_wunderbyte_table', // Localization of strings
+                'component' => 'local_wunderbyte_table', // Localization of strings.
             ]
         ];
         $table->actionbuttons[] = [
-            'label' => get_string('addtest', 'local_catquiz'), // 'NoModal, MultipleCall, NoSelection'-> Name of your action button.
+            // The 'NoModal, MultipleCall, NoSelection'-> Name of your action button.
+            'label' => get_string('addtest', 'local_catquiz'),
             'class' => 'btn btn-primary', // Example colors bootstrap 4 classes.
             'href' => '#',
             'methodname' => 'addtest', // The method needs to be added to your child of wunderbyte_table class.
@@ -241,11 +245,12 @@ class questionsdisplay {
             'selectionmandatory' => false, // When set to true, action will only be triggered, if elements are selected.
             'data' => [ // Will be added eg as data-id = $values->id, so values can be transmitted to the method above.
                 'id' => 'id',
-                'component' => 'local_wunderbyte_table', // Localization of strings
+                'component' => 'local_wunderbyte_table', // Localization of strings.
             ]
         ];
         $table->actionbuttons[] = [
-            'label' => get_string('checklinking', 'local_catquiz'), // 'NoModal, MultipleCall, NoSelection'-> Name of your action button.
+            // The 'NoModal, MultipleCall, NoSelection'-> Name of your action button.
+            'label' => get_string('checklinking', 'local_catquiz'),
             'class' => 'btn btn-primary', // Example colors bootstrap 4 classes.
             'href' => '#',
             'methodname' => 'addquestion', // The method needs to be added to your child of wunderbyte_table class.
@@ -253,7 +258,7 @@ class questionsdisplay {
             'selectionmandatory' => false, // When set to true, action will only be triggered, if elements are selected.
             'data' => [ // Will be added eg as data-id = $values->id, so values can be transmitted to the method above.
                 'id' => 'id',
-                'component' => 'local_wunderbyte_table', // Localization of strings
+                'component' => 'local_wunderbyte_table', // Localization of strings.
             ]
         ];
         $table->placebuttonandpageelementsontop = true;
@@ -296,6 +301,7 @@ class questionsdisplay {
     }
     /**
      * Check if we display a table or a detailview of a specific item.
+     * @return string
      */
     private function check_tabledisplay() {
         $output = "";

@@ -265,7 +265,7 @@ class catquiz {
      * @param int $catscaleid
      * @param array $wherearray
      * @param array $filterarray
-     * @return void
+     * @return array
      */
     public static function return_sql_for_addcatscalequestions(
         int $catscaleid,

@@ -13,20 +13,6 @@
 //
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
-// This file is part of Moodle - http://moodle.org/
-//
-// Moodle is free software: you can redistribute it and/or modify
-// it under the terms of the GNU General Public License as published by
-// the Free Software Foundation, either version 3 of the License, or
-// (at your option) any later version.
-//
-// Moodle is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-// GNU General Public License for more details.
-//
-// You should have received a copy of the GNU General Public License
-// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 namespace local_catquiz\output;
 
@@ -55,10 +41,10 @@ use renderable;
 class catscaledashboard implements renderable, templatable {
 
 
-    /** @var integer of catscaleid */
+    /** @var int of catscaleid */
     public int $catscaleid = 0;
 
-    /** @var integer of catcontextid */
+    /** @var int of catcontextid */
     private int $catcontextid = 0;
 
     /**
@@ -74,9 +60,10 @@ class catscaledashboard implements renderable, templatable {
     /**
      * Either returns one tree or treearray for every parentnode
      *
-     * @param int $fulltree
-     * @param boolean $allowedit
-     * @return array
+     * @param int $catscaleid
+     * @param int $catcontextid
+     * @param bool $triggercalculation
+     *
      */
     public function __construct(int $catscaleid, int $catcontextid = 0, bool $triggercalculation = false) {
         global $DB;
@@ -90,13 +77,25 @@ class catscaledashboard implements renderable, templatable {
         );
     }
 
+    /**
+     * Renders title.
+     *
+     */
     private function render_title() {
-        global $OUTPUT;
-        global $PAGE;
+        global $OUTPUT, $PAGE;
 
         $PAGE->set_heading($this->catscale->name);
         echo $OUTPUT->header();
     }
+
+    /**
+     * Render addtestitems table.
+     *
+     * @param int $catscaleid
+     *
+     * @return string
+     *
+     */
     private function render_addtestitems_table(int $catscaleid) {
         $table = new testitems_table('catscaleid_' . $catscaleid . ' addtestitems', $catscaleid, $this->catcontextid);
 
@@ -180,7 +179,7 @@ class catscaledashboard implements renderable, templatable {
     /**
      * Function to render the testitems attributed to a given catscale.
      *
-     * @param integer $catscaleid
+     * @param int $catscaleid
      * @return string
      */
     private function render_testitems_table(int $catscaleid) {
@@ -260,7 +259,12 @@ class catscaledashboard implements renderable, templatable {
     }
 
     /**
-     * @param array<model_item_param_list> $item_lists
+     * Renders item difficulties.
+     *
+     * @param array $itemlists
+     *
+     * @return array
+     *
      */
     private function render_itemdifficulties(array $itemlists) {
 
@@ -269,7 +273,7 @@ class catscaledashboard implements renderable, templatable {
         $charts = [];
         foreach ($itemlists as $modelname => $itemlist) {
             $data = $itemlist->get_values(true);
-            // Skip empty charts
+            // Skip empty charts.
             if (empty($data)) {
                 continue;
             }
@@ -286,7 +290,12 @@ class catscaledashboard implements renderable, templatable {
     }
 
     /**
-     * @param model_person_param_list $person_params
+     * Render person abilities.
+     *
+     * @param model_person_param_list $personparams
+     *
+     * @return string
+     *
      */
     private function render_personabilities(model_person_param_list $personparams) {
         global $OUTPUT;
@@ -300,23 +309,46 @@ class catscaledashboard implements renderable, templatable {
         return html_writer::tag('div', $OUTPUT->render($chart), ['dir' => 'ltr']);
     }
 
+    /**
+     * Render context selector.
+     *
+     * @return string
+     *
+     */
     private function render_contextselector() {
         $ajaxformdata = empty($this->catcontextid) ? [] : ['contextid' => $this->catcontextid];
         $form = new \local_catquiz\form\contextselector(null, null, 'post', '', [], true, $ajaxformdata);
-        // Set the form data with the same method that is called when loaded from JS. It should correctly set the data for the supplied arguments.
+        // Set the form data with the same method that is called when loaded from JS.
+        // It should correctly set the data for the supplied arguments.
         $form->set_data_for_dynamic_submission();
         // Render the form in a specific container, there should be nothing else in the same container.
         return html_writer::div($form->render(), '', ['id' => 'select_context_form']);
     }
 
+    /**
+     * Renders file picker
+     *
+     * @return string
+     *
+     */
     private function render_filepicker() {
         $inputform = new \local_catquiz\form\csvimport();
-        // Set the form data with the same method that is called when loaded from JS. It should correctly set the data for the supplied arguments.
+        // Set the form data with the same method that is called when loaded from JS.
+        // It should correctly set the data for the supplied arguments.
         $inputform->set_data_for_dynamic_submission();
         // Render the form in a specific container, there should be nothing else in the same container.
         return html_writer::div($inputform->render(), '', ['id' => 'csv_import_form']);
     }
 
+    /**
+     * Renders student stats table.
+     *
+     * @param int $catscaleid
+     * @param int $catcontextid
+     *
+     * @return string
+     *
+     */
     private function render_student_stats_table(int $catscaleid, int $catcontextid) {
         $table = new student_stats_table('catscaleid_' . $this->catscaleid . ' students', $this->catscaleid, $this->catcontextid);
 
@@ -349,10 +381,28 @@ class catscaledashboard implements renderable, templatable {
 
         return $table->outhtml(10, true);
     }
+
+    /**
+     * Renders model button
+     *
+     * @param mixed $contextid
+     *
+     * @return string
+     *
+     */
     private function render_modelbutton($contextid) {
-        return sprintf('<button class="btn btn-primary" type="button" data-contextid="%s" id="model_button">Calculate</button>', $contextid);
+        return sprintf('<button class="btn btn-primary" type="button" data-contextid="%s" id="model_button">Calculate</button>',
+                        $contextid);
     }
 
+    /**
+     * Exports for template.
+     *
+     * @param \renderer_base $output
+     *
+     * @return array
+     *
+     */
     public function export_for_template(\renderer_base $output): array {
 
         $url = new moodle_url('/local/catquiz/manage_catscales.php');

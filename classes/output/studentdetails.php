@@ -13,20 +13,6 @@
 //
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
-// This file is part of Moodle - http://moodle.org/
-//
-// Moodle is free software: you can redistribute it and/or modify
-// it under the terms of the GNU General Public License as published by
-// the Free Software Foundation, either version 3 of the License, or
-// (at your option) any later version.
-//
-// Moodle is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-// GNU General Public License for more details.
-//
-// You should have received a copy of the GNU General Public License
-// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 namespace local_catquiz\output;
 
@@ -51,6 +37,8 @@ class studentdetails implements renderable, templatable {
     private int $studentid;
 
     /**
+     * Constructor.
+     *
      * @param int $studentid
      */
     public function __construct(int $studentid) {
@@ -93,10 +81,10 @@ class studentdetails implements renderable, templatable {
         list ($sql, $params) = catquiz::get_sql_for_questions_answered_incorrect([], [], [$this->studentid]);
         $numberofanswersincorrect = $DB->count_records_sql($sql, $params);
 
-        // Getting the values for the last access and comparing to now
+        // Getting the values for the last access and comparing to now.
         if (isset($user->lastaccess)) {
             $datedifference = floor((usertime(time()) - $user->lastaccess) / 60 / 60 / 24);
-            if($datedifference >= 1) {
+            if ($datedifference >= 1) {
                 $differencestring = get_string('daysago', 'local_catquiz', $datedifference);
             } else {
                 $differencestring = get_string('hoursago', 'local_catquiz', floor((usertime(time()) - $user->lastaccess) / 60 / 60));
@@ -138,7 +126,11 @@ class studentdetails implements renderable, templatable {
     }
 
     /**
+     * Export for template.
+     *
+     * @param \renderer_base $output
      * @return array
+     *
      */
     public function export_for_template(\renderer_base $output): array {
 

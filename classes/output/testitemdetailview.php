@@ -13,20 +13,6 @@
 //
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
-// This file is part of Moodle - http://moodle.org/
-//
-// Moodle is free software: you can redistribute it and/or modify
-// it under the terms of the GNU General Public License as published by
-// the Free Software Foundation, either version 3 of the License, or
-// (at your option) any later version.
-//
-// Moodle is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-// GNU General Public License for more details.
-//
-// You should have received a copy of the GNU General Public License
-// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 namespace local_catquiz\output;
 
@@ -65,12 +51,14 @@ class studentdetails implements renderable, templatable {
      */
     private int $subscale;
 
-
     /**
+     * Constructor
+     *
      * @param int $testitemid
      * @param int $catcontext
-     * @param int $testitemid
-     * @param int $testitemid
+     * @param int $scale
+     * @param int $subscale
+     *
      */
     public function __construct(int $testitemid, int $catcontext, int $scale, int $subscale) {
 
@@ -82,11 +70,16 @@ class studentdetails implements renderable, templatable {
      * @return array
      */
     private function render_testitemdetailview() {
-
+        return [];
     }
 
     /**
+     * Exports for template.
+     *
+     * @param \renderer_base $output
+     *
      * @return array
+     *
      */
     public function export_for_template(\renderer_base $output): array {
 

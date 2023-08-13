@@ -13,20 +13,6 @@
 //
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
-// This file is part of Moodle - http://moodle.org/
-//
-// Moodle is free software: you can redistribute it and/or modify
-// it under the terms of the GNU General Public License as published by
-// the Free Software Foundation, either version 3 of the License, or
-// (at your option) any later version.
-//
-// Moodle is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-// GNU General Public License for more details.
-//
-// You should have received a copy of the GNU General Public License
-// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 namespace local_catquiz\output;
 
@@ -56,11 +42,10 @@ class catscales implements renderable, templatable {
     public array $branchitems;
 
     /**
-     * Either returns one tree or treearray for every parentnode
+     * Constructor.
      *
-     * @param int $fulltree
-     * @param boolean $allowedit
-     * @return array
+     * @param bool $allowedit
+     *
      */
     public function __construct(bool $allowedit = true) {
         $this->items = dataapi::get_all_catscales();
@@ -71,8 +56,9 @@ class catscales implements renderable, templatable {
     /**
      * Build full item tree. All children are marked as 'children' in the parent item.
      *
-     * @param array $items
+     * @param array $elements
      * @param int $parentid
+     *
      * @return array
      *
      */
@@ -108,8 +94,12 @@ class catscales implements renderable, templatable {
     }
 
     /**
-     * Return the item tree of all catscales.
+     * Return the item tree of all catscales for template.
+     *
+     * @param \renderer_base $output
+     *
      * @return array
+     *
      */
     public function export_for_template(\renderer_base $output): array {
         global $DB;
@@ -124,7 +114,7 @@ class catscales implements renderable, templatable {
     }
 
     /**
-     * Return the item tree of all catscales.
+     * Return the item tree of all catscales as array.
      * @return array
      */
     public function return_as_array(): array {

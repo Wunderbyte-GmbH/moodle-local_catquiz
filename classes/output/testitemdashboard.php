@@ -13,20 +13,6 @@
 //
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
-// This file is part of Moodle - http://moodle.org/
-//
-// Moodle is free software: you can redistribute it and/or modify
-// it under the terms of the GNU General Public License as published by
-// the Free Software Foundation, either version 3 of the License, or
-// (at your option) any later version.
-//
-// Moodle is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-// GNU General Public License for more details.
-//
-// You should have received a copy of the GNU General Public License
-// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 namespace local_catquiz\output;
 
@@ -62,30 +48,36 @@ class testitemdashboard implements renderable, templatable {
      */
     private int $contextid = 0;
 
+    /**
+     * @var int
+     */
     public int $catscaleid;
 
+    /**
+     * @var catmodel_info catmodelinfo
+     */
     private catmodel_info $catmodelinfo;
 
     /**
-     * Either returns one tree or treearray for every parentnode
+     * Constructor
      *
-     * @param int $fulltree
-     * @param boolean $allowedit
+     * @param int $testitemid
      * @param int $contextid
-     * @return array
+     * @param int $catscaleid
+     *
      */
     public function __construct(int $testitemid, int $contextid, int $catscaleid) {
 
         $this->testitemid = $testitemid;
         $this->contextid = $contextid;
-        $this->catmodel_info = new catmodel_info();
+        $this->catmodelinfo = new catmodel_info();
         $this->catscaleid = $catscaleid;
     }
 
     /**
      * Render the moodle charts.
      *
-     * @return void
+     * @return array
      */
     private function render_modelcards() {
 
@@ -94,7 +86,7 @@ class testitemdashboard implements renderable, templatable {
         $returnarray = [];
 
         list($modelitemparams) = $this
-            ->catmodel_info
+            ->catmodelinfo
             ->get_context_parameters($this->contextid, $this->catscaleid);
 
         $chart = new \core\chart_line();
@@ -193,20 +185,36 @@ class testitemdashboard implements renderable, templatable {
         ];
     }
 
+    /**
+     * Renders overrides form.
+     *
+     * @return string
+     *
+     */
     private function render_overrides_form() {
         $form = new item_model_override_selector();
         $form->set_data_for_dynamic_submission();
         return html_writer::div($form->render(), '', ['id' => 'model_override_form']);
     }
+
+    /**
+     * Renders context selector.
+     *
+     * @return string
+     *
+     */
     private function render_contextselector() {
         $form = new \local_catquiz\form\contextselector(null, null, 'post', '', [], true, ['contextid' => $this->contextid]);
-        // Set the form data with the same method that is called when loaded from JS. It should correctly set the data for the supplied arguments.
+        // Set the form data with the same method that is called when loaded from JS.
+        // It should correctly set the data for the supplied arguments.
         $form->set_data_for_dynamic_submission();
         // Render the form in a specific container, there should be nothing else in the same container.
         return html_writer::div($form->render(), '', ['id' => 'select_context_form']);
     }
 
     /**
+     * Gets item status.
+     *
      * @return string
      * @throws coding_exception
      */
@@ -236,24 +244,36 @@ class testitemdashboard implements renderable, templatable {
         if (empty($this->testitemid)) {
             return;
         }
-        $catcontext = empty($this->contextid) ? catquiz::get_default_context_id() : $this->contextid; // If no context is set, get default context from DB.
+        // If no context is set, get default context from DB.
+        $catcontext = empty($this->contextid) ? catquiz::get_default_context_id() : $this->contextid;
 
         // Get the record for the specific userid (fetched from optional param).
-        list($select, $from, $where, $filter, $params) = catquiz::return_sql_for_catscalequestions([$this->catscaleid], $catcontext, [], [], $this->testitemid);
+        list($select, $from, $where, $filter, $params) = catquiz::return_sql_for_catscalequestions([$this->catscaleid],
+                                                                                                    $catcontext,
+                                                                                                    [], [],
+                                                                                                    $this->testitemid);
         $idcheck = "id=:userid";
         $sql = "SELECT $select FROM $from WHERE $where AND $idcheck";
         $recordinarray = $DB->get_records_sql($sql, $params, IGNORE_MISSING);
 
         if (empty($recordinarray)) {
-            // Throw error: no record was found with id: $params['userid'];
+            // Throw error: no record was found with id: $params['userid'].
         }
         $record = $recordinarray[$this->testitemid];
 
         // Output for testitem details card.
-        $detailcardoutput = $this->render_detailcard_of_testitem($record); // return array
+        $detailcardoutput = $this->render_detailcard_of_testitem($record); // Return array.
         return $detailcardoutput;
     }
 
+    /**
+     * Renders detailcard of testitem.
+     *
+     * @param object $record
+     *
+     * @return array
+     *
+     */
     private function render_detailcard_of_testitem(object $record) {
 
         $title = get_string('general', 'core');
@@ -271,8 +291,12 @@ class testitemdashboard implements renderable, templatable {
     }
 
     /**
-     * Return the item tree of all catscales.
+     * Export for template.
+     *
+     * @param \renderer_base $output
+     *
      * @return array
+     *
      */
     public function export_for_template(\renderer_base $output): array {
 
@@ -297,10 +321,10 @@ class testitemdashboard implements renderable, templatable {
 
         $data = [
             'detailview' => $this->get_detail_data(),
-           'models' => $this->render_modelcards(),
-           'statcards' => $this->get_testitems_stats_data(),
-           'overridesforms' => $this->render_overrides_form(),
-           'itemstatus' => $this->get_itemstatus(),
+            'models' => $this->render_modelcards(),
+            'statcards' => $this->get_testitems_stats_data(),
+            'overridesforms' => $this->render_overrides_form(),
+            'itemstatus' => $this->get_itemstatus(),
         ];
         return $data;
     }
