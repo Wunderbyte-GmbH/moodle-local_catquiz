@@ -18,7 +18,6 @@
  * Plugin capabilities are defined here.
  *
  * @package     local_catquiz
- * @category    messages
  * @copyright   2023 Wunderbyte Gmbh <info@wunderbyte.at>
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */

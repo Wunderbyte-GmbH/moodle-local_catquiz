@@ -15,7 +15,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Class for catcalc functions;
+ * Class for catcalc.
  *
  * @package local_catquiz
  * @author Daniel Pasterk
@@ -30,9 +30,25 @@ use local_catquiz\local\model\model_model;
 use local_catquiz\local\model\model_strategy;
 use local_catquiz\mathcat;
 
+/**
+ * Class for catcalc functions.
+ *
+ * @package local_catquiz
+ * @author Daniel Pasterk
+ * @copyright 2023 Wunderbyte GmbH
+ * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
 class catcalc {
 
-    static function estimate_initial_item_difficulties($itemlist) {
+    /**
+     * Estimate initial item difficulties.
+     *
+     * @param mixed $itemlist
+     *
+     * @return array
+     *
+     */
+    public static function estimate_initial_item_difficulties($itemlist) {
 
         $itemdifficulties = array();
         $itemids = array_keys($itemlist);
@@ -52,15 +68,25 @@ class catcalc {
             }
 
             $p = $numpassed / ($numfailed + $numpassed);
+            // phpcs:ignore
             // $item_difficulty = -log($num_passed / $num_failed);
-            $itemdifficulty = -log($p / (1 - $p + 0.00001)); // TODO: numerical stability check
+            $itemdifficulty = -log($p / (1 - $p + 0.00001)); // TODO: numerical stability check.
             $itemdifficulties[$id] = $itemdifficulty;
 
         }
         return $itemdifficulties;
     }
 
-    static function estimate_person_ability($personresponses, model_item_param_list $items): float {
+    /**
+     * Estimate person ability.
+     *
+     * @param mixed $personresponses
+     * @param model_item_param_list $items
+     *
+     * @return float
+     *
+     */
+    public static function estimate_person_ability($personresponses, model_item_param_list $items): float {
         $allmodels = model_strategy::get_installed_models();
 
         $likelihood = fn($x) => 1;
@@ -70,7 +96,7 @@ class catcalc {
 
         foreach ($personresponses as $qid => $qresponse) {
             $item = $items[$qid];
-            // The item parameter for this response was filtered out
+            // The item parameter for this response was filtered out.
             if ($item === null) {
                 continue;
             }
@@ -107,28 +133,32 @@ class catcalc {
     }
 
     /**
-     * @param array $item_response
+     * Estimate item params.
+     *
+     * @param array $itemresponse
      * @param model_model $model
-     * @return array<float>
+     *
+     * @return mixed
+     *
      */
-    static function estimate_item_params(array $itemresponse, model_model $model) {
+    public static function estimate_item_params(array $itemresponse, model_model $model) {
         if (! $model instanceof catcalc_item_estimator) {
             throw new \InvalidArgumentException("Model does not implement the catcalc_item_estimator interface");
         }
 
-        // compose likelihood matrices based on actual result
+        // Compose likelihood matrices based on actual result.
 
         $modeldim = $model::get_model_dim();
 
         // Vector that contains the first derivatives for each parameter as functions
-        // [Df/Da, Df,/Db, Df,Dc]
+        // [Df/Da, Df,/Db, Df,Dc].
         $jacobian = [];
         // Matrix that contains the second derivatives
         // [
         // [Df/Daa, Df/Dab, Df/Dac]
         // [Df/Dba, Df/Dbb, Df/Dbc]
         // [Df/Dca, Df/Dcb, Df/Dcc]
-        // ]
+        // ].
         $hessian = [];
         for ($i = 0; $i <= $modeldim - 2; $i++) {
             $jacobian[$i] = fn($x) => 0;
@@ -142,7 +172,7 @@ class catcalc {
             $jacobianpart = $model::get_log_jacobian($r->get_ability(), $r->get_response());
             $hessianpart = $model::get_log_hessian($r->get_ability(), $r->get_response());
 
-            for ($i = 0; $i <= $modeldim - 2; $i++){
+            for ($i = 0; $i <= $modeldim - 2; $i++) {
                 $jacobian[$i] = fn($x) => $jacobian[$i]($x) + $jacobianpart[$i]($x);
 
                 for ($j = 0; $j <= $modeldim - 2; $j++) {
@@ -151,7 +181,7 @@ class catcalc {
             }
         }
 
-        // Defines the starting point
+        // Defines the starting point.
         $startarr = ['difficulty' => 0.5, 'discrimination' => 0.5, 'guessing' => 0.5];
         $z0 = array_slice($startarr, 0, $modeldim - 1);
 

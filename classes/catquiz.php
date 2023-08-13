@@ -36,7 +36,7 @@ use moodle_exception;
 class catquiz {
 
     /**
-     * entities constructor.
+     * Entities constructor.
      */
     public function __construct() {
 
@@ -45,8 +45,8 @@ class catquiz {
     /**
      * Start a new attempt for a user.
      *
-     * @param integer $userid
-     * @param integer $categoryid
+     * @param int $userid
+     * @param int $categoryid
      * @return array
      */
     public static function start_new_attempt(int $userid, int $categoryid) {
@@ -59,9 +59,9 @@ class catquiz {
     /**
      * Deal with result from the answered question.
      *
-     * @param integer $attemptid
-     * @param integer $questionid
-     * @param integer $score
+     * @param int $attemptid
+     * @param int $questionid
+     * @param int $score
      * @return array
      */
     public static function submit_result(int $attemptid, int $questionid, int $score) {
@@ -72,8 +72,8 @@ class catquiz {
     /**
      * Deliver next questionid for attempt.
      *
-     * @param integer $attemptid
-     * @param integer $quizid
+     * @param int $attemptid
+     * @param int $quizid
      * @param string $component
      * @return array
      */
@@ -95,7 +95,7 @@ class catquiz {
      * Returns the sql to get all the questions wanted.
      * @param array $wherearray
      * @param array $filterarray
-     * @return void
+     * @return array
      */
     public static function return_sql_for_addquestions(array $wherearray = [], array $filterarray = []) {
 
@@ -121,13 +121,16 @@ class catquiz {
 
     /**
      * Returns the sql to get all the questions wanted.
+     *
      * @param array $catscaleids
+     * @param int $contextid
      * @param array $wherearray
      * @param array $filterarray
-     * @param int $catcontextid
      * @param int $userid
-     * @param ?string $orderby If given, order by the given field in ascending order
+     * @param string|null $orderby If given, order by the given field in ascending order
+     *
      * @return array
+     *
      */
     public static function return_sql_for_catscalequestions(
         array $catscaleids,
@@ -262,10 +265,14 @@ class catquiz {
 
     /**
      * Returns the sql to get all the questions wanted.
+     *
      * @param int $catscaleid
+     * @param int $contextid
      * @param array $wherearray
      * @param array $filterarray
+     *
      * @return array
+     *
      */
     public static function return_sql_for_addcatscalequestions(
         int $catscaleid,
@@ -324,9 +331,12 @@ class catquiz {
     /**
      * Return the sql for all questions answered.
      *
-     * @param array<integer> $testitemids
-     * @param array<integer> $contextids
+     * @param array $testitemids
+     * @param array $contextids
+     * @param array $studentids
+     *
      * @return array
+     *
      */
     public static function get_sql_for_questions_answered(
         array $testitemids = [],
@@ -345,9 +355,11 @@ class catquiz {
     /**
      * Return the sql for all questions answered.
      *
-     * @param array<integer> $testitemids
-     * @param integer $contextid
+     * @param array $testitemids
+     * @param array $contextids
+     *
      * @return array
+     *
      */
     public static function get_sql_for_questions_average(array $testitemids = [], array $contextids = []) {
         list ($select, $from, $where, $params) = self::get_sql_for_stat_base_request($testitemids, $contextids);
@@ -362,8 +374,12 @@ class catquiz {
     /**
      * Return the sql for all questions answered.
      *
-     * @param array<integer> $testitemids
+     * @param array $testitemids
+     * @param array $contextids
+     * @param array $studentids
+     *
      * @return array
+     *
      */
     public static function get_sql_for_questions_answered_correct(
         array $testitemids = [],
@@ -383,8 +399,12 @@ class catquiz {
     /**
      * Return the sql for all questions answered.
      *
-     * @param array<integer> $testitemids
+     * @param array $testitemids
+     * @param array $contextids
+     * @param array $studentids
+     *
      * @return array
+     *
      */
     public static function get_sql_for_questions_answered_incorrect(
         array $testitemids = [],
@@ -404,8 +424,11 @@ class catquiz {
     /**
      * Return the sql for all questions answered.
      *
-     * @param array<integer> $testitemids
+     * @param array $testitemids
+     * @param array $contextids
+     *
      * @return array
+     *
      */
     public static function get_sql_for_questions_answered_partlycorrect(array $testitemids = [], array $contextids = []) {
         list ($select, $from, $where, $params) = self::get_sql_for_stat_base_request($testitemids, $contextids);
@@ -422,8 +445,11 @@ class catquiz {
     /**
      * Return the sql for all questions answered.
      *
-     * @param array<integer> $testitemids
+     * @param array $testitemids
+     * @param array $contextids
+     *
      * @return array
+     *
      */
     public static function get_sql_for_questions_answered_by_distinct_persons(array $testitemids = [], array $contextids = []) {
 
@@ -443,8 +469,13 @@ class catquiz {
 
 
     /**
-     * Returns the sql that can be used to get input data for the
-     * helpercat::get_item_list($data) function
+     * Returns the sql that can be used to get input data for the helpercat::get_item_list($data) function.
+     *
+     * @param mixed $contextid
+     * @param int $catscaleid
+     *
+     * @return array
+     *
      */
     public static function get_sql_for_model_input($contextid, int $catscaleid) {
 
@@ -469,9 +500,12 @@ class catquiz {
     /**
      * Return the sql for all questions answered.
      *
-     * @param array<integer> $testitemids
-     * @param array<integer> $contextids
+     * @param array $testitemids
+     * @param array $contextids
+     * @param array $studentids
+     *
      * @return array
+     *
      */
     public static function get_sql_for_questions_usages_in_tests(
         array $testitemids = [],
@@ -492,6 +526,15 @@ class catquiz {
 
         return [$sql, $params];
     }
+
+    /**
+     * Returns sql for student stats.
+     *
+     * @param int $contextid
+     *
+     * @return array
+     *
+     */
     public static function return_sql_for_student_stats(int $contextid) {
 
         list ($select, $from, $where, $params) = self::get_sql_for_stat_base_request([], [$contextid]);
@@ -519,8 +562,11 @@ class catquiz {
      * Basefunction to fetch all questions in context.
      *
      * @param array $testitemids
-     * @param array $contextid
+     * @param array $contextids
+     * @param array $studentids
+     *
      * @return array
+     *
      */
     private static function get_sql_for_stat_base_request(
         array $testitemids = [],
@@ -549,6 +595,18 @@ class catquiz {
 
         return [$select, $from, $where, $params];
     }
+
+    /**
+     * Set optional param.
+     *
+     * @param array $params
+     * @param string $name
+     * @param array $originalvalue
+     * @param string $sqlstringval
+     *
+     * @return array
+     *
+     */
     private static function set_optional_param($params, $name, $originalvalue, $sqlstringval) {
         if (!empty($originalvalue)) {
             $params[$name] = $sqlstringval;
@@ -559,7 +617,11 @@ class catquiz {
     /**
      * Return sql to render all or a subset of testenvironments
      *
+     * @param string $where
+     * @param array $filterarray
+     *
      * @return array
+     *
      */
     public static function return_sql_for_testenvironments(
         string $where = "1=1",
@@ -608,7 +670,11 @@ class catquiz {
     /**
      * Return sql to render all or a subset of testenvironments
      *
+     * @param array $wherearray
+     * @param array $filterarray
+     *
      * @return array
+     *
      */
     public static function return_sql_for_catcontexts(
         array $wherearray = [],
@@ -636,9 +702,11 @@ class catquiz {
     /**
      * Return the sql for all item params for an item in a given context
      *
-     * @param integer $testitemids
-     * @param integer $contextid
+     * @param int $testitemid
+     * @param int $contextid
+     *
      * @return array
+     *
      */
     public static function get_sql_for_item_params(int $testitemid, int $contextid) {
         $sql = "SELECT *
@@ -813,7 +881,6 @@ class catquiz {
      *
      * @return int
      */
-
     public static function get_default_context_id() {
         global $DB;
         $contextid = $DB->get_field_sql(
@@ -835,8 +902,11 @@ class catquiz {
      *
      * @param int $userid
      * @param int $contextid
+     * @param int $catscaleid
      * @param float $ability
+     *
      * @return void
+     *
      */
     public static function update_person_param(
         int $userid,
@@ -897,10 +967,12 @@ class catquiz {
     /**
      * Return the person ability for the given user in the given context
      *
-     * @param int $userid,
+     * @param int $userid
      * @param int $contextid
+     * @param int $catscaleid
      *
      * @return \stdClass
+     *
      */
     public static function get_person_ability(int $userid, int $contextid, int $catscaleid) {
         global $DB;
@@ -916,6 +988,14 @@ class catquiz {
             ]);
     }
 
+    /**
+     * Get last user attemptid.
+     *
+     * @param int $userid
+     *
+     * @return int
+     *
+     */
     public static function get_last_user_attemptid(int $userid) {
         global $DB;
         $record = $DB->get_record_sql(
@@ -932,6 +1012,14 @@ class catquiz {
         return $record->id;
     }
 
+    /**
+     * Get testenvironment by attemptid.
+     *
+     * @param int $attemptid
+     *
+     * @return object
+     *
+     */
     public static function get_testenvironment_by_attemptid(int $attemptid) {
         global $DB;
 
@@ -969,6 +1057,12 @@ class catquiz {
         return $record->parentid;
     }
 
+    /**
+     * Get all catscales.
+     *
+     * @return array
+     *
+     */
     public static function get_all_catscales() {
         global $DB;
 

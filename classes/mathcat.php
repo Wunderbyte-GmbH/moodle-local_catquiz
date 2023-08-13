@@ -457,7 +457,7 @@ class mathcat {
         $z0 = $start;
         $parameternames = array_keys($z0);
 
-        // jacobian, hessian, model_dim, start_value
+        // Jacobian, hessian, model_dim, start_value.
         for ($i = 0; $i < $maxiter; $i++) {
             for ($k = 0; $k <= $modeldim - 1; $k++) {
                 $realfunc[$k] = [$func[$k]($z0)];
@@ -482,7 +482,7 @@ class mathcat {
                 $dist = abs(array_values($z0) - $z1);
             }
 
-            // If one of the values is NAN, return the values restricted to the trusted region
+            // If one of the values is NAN, return the values restricted to the trusted region.
             if (count(array_filter($z1, fn ($x) => is_nan($x))) > 0) {
                 $z1 = $model->restrict_to_trusted_region($z0);
                 echo "returning restricted value\n";

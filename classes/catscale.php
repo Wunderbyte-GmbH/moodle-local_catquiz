@@ -33,6 +33,8 @@ use local_catquiz\local\status;
 use moodle_exception;
 use stdClass;
 
+defined('MOODLE_INTERNAL') || die();
+
 require_once($CFG->dirroot . '/local/catquiz/lib.php');
 
 /**
@@ -53,18 +55,17 @@ class catscale {
     /**
      * Catscale constructor.
      *
-     * @param integer $catscaleid
+     * @param int $catscaleid
      */
     public function __construct(int $catscaleid) {
 
         $this->catscale = self::return_catscale_object($catscaleid);
     }
 
-
     /**
      * Static function to return catscale object.
      *
-     * @param integer $catscaleid
+     * @param int $catscaleid
      * @return stdClass|null
      */
     public static function return_catscale_object(int $catscaleid) {
@@ -75,8 +76,8 @@ class catscale {
     /**
      * Adds or updates attribution of question to scale.
      *
-     * @param integer $catscaleid
-     * @param integer $testitemid
+     * @param int $catscaleid
+     * @param int $testitemid
      * @param int $status
      * @param string $component
      * @return result
@@ -104,7 +105,7 @@ class catscale {
             $data['id'] = $id;
             $DB->update_record('local_catquiz_items', (object)$data);
         } else {
-            // We won't allow an item to be assigned to both a scale and its sub- or parent-scale
+            // We won't allow an item to be assigned to both a scale and its sub- or parent-scale.
             if (self::is_assigned_to_parent_scale($catscaleid, $testitemid)
                 || self::is_assigned_to_subscale($catscaleid, $testitemid)) {
                     return result::err(status::ERROR_TESTITEM_ALREADY_IN_RELATED_SCALE, $testitemid);
@@ -119,6 +120,15 @@ class catscale {
         return result::ok($id);
     }
 
+    /**
+     * Cjeck is assigned to parent scale.
+     *
+     * @param mixed $catscaleid
+     * @param int $testitemid
+     *
+     * @return bool
+     *
+     */
     public static function is_assigned_to_parent_scale($catscaleid, int $testitemid): bool {
         $ancestorids = self::get_ancestors($catscaleid);
         if (empty($ancestorids)) {
@@ -137,6 +147,15 @@ class catscale {
         return !empty($records);
     }
 
+    /**
+     * Check is assigned to subscale.
+     *
+     * @param mixed $catscaleid
+     * @param int $testitemid
+     *
+     * @return bool
+     *
+     */
     public static function is_assigned_to_subscale($catscaleid, int $testitemid): bool {
         $childids = self::get_subscale_ids($catscaleid);
         if (empty($childids)) {
@@ -158,10 +177,12 @@ class catscale {
     /**
      * Removes attribution of question to scale.
      *
-     * @param integer $catscaleid
-     * @param integer $testidemid
+     * @param int $catscaleid
+     * @param int $testidemid
      * @param string $component
+     *
      * @return void
+     *
      */
     public static function remove_testitem_from_scale(int $catscaleid, int $testidemid, string $component = 'question') {
 
@@ -182,8 +203,10 @@ class catscale {
      *
      * @param int $contextid
      * @param bool $includesubscales
-     * @param ?string $orderby If given, sort items by that field
+     * @param string|null $orderby If given, sort items by that field
+     *
      * @return array
+     *
      */
     public function get_testitems(int $contextid, bool $includesubscales = false, ?string $orderby = null):array {
 
@@ -216,6 +239,16 @@ class catscale {
         return $testitems;
     }
 
+    /**
+     * Update testitem.
+     *
+     * @param int $contextid
+     * @param mixed $question
+     * @param bool $includesubscales
+     *
+     * @return void
+     *
+     */
     public static function update_testitem(int $contextid, $question, $includesubscales = false) {
         $cache = cache::make('local_catquiz', 'adaptivequizattempt');
         $cachekey = sprintf('testitems_%s_%s', $contextid, $includesubscales);
@@ -235,7 +268,10 @@ class catscale {
     /**
      * Get all subscale IDs
      *
+     * @param int|null $catscaleid
+     *
      * @return array
+     *
      */
     public static function get_subscale_ids(int $catscaleid = null): array {
         global $DB;
@@ -245,6 +281,15 @@ class catscale {
         return self::add_subscales($catscaleid, $all);
     }
 
+    /**
+     * Add subscales.
+     *
+     * @param int $parentid
+     * @param mixed $all
+     *
+     * @return array|null
+     *
+     */
     private static function add_subscales(int $parentid, $all): ?array {
         foreach ($all as $scale) {
             if (intval($scale->parentid) === $parentid) {
@@ -266,6 +311,15 @@ class catscale {
         return self::add_parentscales($catscaleid, $all);
     }
 
+    /**
+     * Add parentscales.
+     *
+     * @param int $scaleid
+     * @param array $all
+     *
+     * @return array|null
+     *
+     */
     private static function add_parentscales(int $scaleid, array $all): ?array {
         foreach ($all as $scale) {
             if (intval($scale->id) === $scaleid && intval($scale->parentid) !== 0) {

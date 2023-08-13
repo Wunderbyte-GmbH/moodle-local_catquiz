@@ -14,6 +14,14 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
+/**
+ * Plugin tasks are defined here.
+ *
+ * @package     local_catquiz
+ * @copyright   2023 Wunderbyte Gmbh <info@wunderbyte.at>
+ * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
+
 use local_catquiz\task\recalculate_cat_model_params;
 
 defined('MOODLE_INTERNAL') || die();

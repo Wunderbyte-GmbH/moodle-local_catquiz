@@ -316,9 +316,11 @@ class catquiz_handler {
     /**
      * Delete settings related to
      *
-     * @param int $id
      * @param string $componentname
+     * @param int $id
+     *
      * @return void
+     *
      */
     public static function delete_settings(string $componentname, int $id) {
         global $DB;
@@ -330,9 +332,11 @@ class catquiz_handler {
      * When called by an external plugin, this must specify its signature.
      * Like "mod_adaptivequiz" and use its own id (not cmid, but instance id).
      *
-     * @param integer $quizid
+     * @param int $quizid
      * @param string $component
+     *
      * @return bool
+     *
      */
     public static function use_catquiz(int $quizid, string $component) {
 
