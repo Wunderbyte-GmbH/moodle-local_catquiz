@@ -162,9 +162,9 @@ class catcalc {
             $z_0,
             6,
             100,
-            $model->restrict_to_trusted_region,
-            $model->get_log_tr_jacobian,
-            $model->get_log_tr_hessian
+            fn($ip) => $model->restrict_to_trusted_region($ip), // @DAVID: Geht hier alternativ auch nur "$model->restrict_to_trusted_region" oder gibt dies Typen-Probleme?
+            fn($ip) => $model->get_log_tr_jacobian($ip),
+            fn($ip) => $model->get_log_tr_hessian($ip)
         );
     }
 }
