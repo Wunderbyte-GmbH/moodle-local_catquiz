@@ -22,7 +22,7 @@
  * @license  http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-namespace catmodel_raschbirnbauma;
+namespace catmodel_raschbirnbaumc;
 
 use local_catquiz\catcalc;
 use local_catquiz\local\model\model_item_param_list;
