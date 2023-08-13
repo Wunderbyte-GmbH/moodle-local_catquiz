@@ -243,7 +243,7 @@ class matrixcat
      * @param float|array|callable $summands
      * @return float|array|callable
      */
-    function multi_sum (...$summands) {
+    public function multi_sum (...$summands) {
     	// Test, if argument is given as packed array of arguments and unpack.
     	if (is_array($summands[0])) {
     		if (count($summands) == 1) {
@@ -283,9 +283,9 @@ class matrixcat
     	return $sum;
     }
 
-    /*
-    // @DAVID: Die folgenden Zeilen sind Testfälle für die Methode multi_sum, mit floats, arrays und callables.
-    // Bitte in einem Unit-Test implementieren und dann hier aus dem Quelltext wieder löschen. Danke
+/*
+// @DAVID: Die folgenden Zeilen sind Testfälle für die Methode multi_sum, mit floats, arrays und callables.
+// Bitte in einem Unit-Test implementieren und dann hier aus dem Quelltext wieder löschen. Danke
 $a = 2;
 $b = 5;
 $c = 3;
@@ -316,6 +316,30 @@ $fn_sum = fn($x) => multi_sum($fn_a($x), $fn_b($x));
 print_r ($fn_sum(3));
 // Expected  [[9, 5], [24, 20]]
     */
+
+    /**
+     * Re-Builds an Array of Callables into a Callable that delivers an Array
+     *
+     * @param array<callable> $fn_function
+     * @return callable<array>
+     */
+    public function build_callable_array ($fn_function) {
+        return function($x) use($fn_function) {
+            foreach ($fn_function as $key => $f) {
+            	$fn_function[$key] = $f($x);
+            }
+        	return $fn_function;
+        };
+    }
+/*
+// @DAVID: Die folgenden Zeilen sind Testfälle für die Methode multi_sum, mit floats, arrays und callables.
+// Bitte in einem Unit-Test implementieren und dann hier aus dem Quelltext wieder löschen. Danke
+$fn_array = [fn($x) => 1 * $x, fn($x) => 2 * $x, fn($x) => 3 * $x];
+
+$fn_function = build_callable_array($fn_array);
+print_r ($fn_function(5));
+// Expected: [5, 10, 15]
+*/
 }
 
 
