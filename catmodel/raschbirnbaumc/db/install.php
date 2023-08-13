@@ -17,7 +17,7 @@
 /**
  * Code to be executed after the plugin's database scheme has been installed is defined here.
  *
- * @package     local_catquiz
+ * @package     catmodel_raschbirnbaumc
  * @category    upgrade
  * @copyright   2023 Georg Maißer Wunderbyte GmbH<info@wunderbyte.at>
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later

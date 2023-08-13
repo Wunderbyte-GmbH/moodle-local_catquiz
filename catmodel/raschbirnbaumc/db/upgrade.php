@@ -17,7 +17,7 @@
 /**
  * Plugin upgrade steps are defined here.
  *
- * @package     local_catquiz
+ * @package     catmodel_raschbirnbaumc
  * @category    upgrade
  * @copyright   2023 Wunderbyte GmbH <info@wunderbyte.at>
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
