@@ -17,7 +17,7 @@
 /**
  * This file contains the version information for the 1plraschbirnbaum model catquiz plugin
  *
- * @package catmodel_raschbirnbauma
+ * @package catmodel_web_raschbirnbauma
  * @copyright  2022 Georg Maißer <info@wunderbyte.at>
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -27,4 +27,3 @@ defined('MOODLE_INTERNAL') || die();
 $plugin->version   = 2023062901;
 $plugin->requires  = 2022041900;
 $plugin->component = 'catmodel_web_raschbirnbauma';
-
