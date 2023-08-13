@@ -305,4 +305,84 @@ class matrixcat {
 
         return $distance;
     }
+
+    /**
+     * Adds everything correctly together regardless of given data structur (float, array, callables)
+     *
+     * @param float|array|callable $summands
+     * @return float|array|callable
+     */
+    function multi_sum (...$summands) {
+    	// Test, if argument is given as packed array of arguments and unpack.
+    	if (is_array($summands[0])) {
+    		if (count($summands) == 1) {
+    		    // Unpack arguments.
+    			$summands = $summands[0];
+    		}
+    	}
+    	
+    	if (is_array($summands[0])) {
+    		// Check whether all sumanands are of same dimension.
+    		$summand_count = count($summands[0]);
+    		foreach ($summands as $summand)
+    		{
+    			if (count($summand) <> $summand_count) {
+    			    // Throw exception error - there should be no calculation if summand-arrays are of different length.
+    			    // console("Summanden haben unterschiedliche Dimension!");
+                    return false;
+    			}
+    		}
+    	
+    		for($i = 0; $i < $summand_count; $i++) {
+    			// Call recursivly for each dimension.
+    			$new_args = array();
+    			foreach ($summands as $summand)
+    			{
+    				$new_args[] = $summand[$i];
+    			}
+    			$sum[$i] = multi_sum($new_args);
+    		}
+    	} else {
+    	    // If entrys are just floats, add them together. 
+    		$sum = 0;
+    		foreach ($summands as $summand) {
+    			$sum += $summand;
+    		}
+    	}
+    	return $sum;
+    }
+
+    /*
+    // @DAVID: Die folgenden Zeilen sind Testfälle für die Methode multi_sum, mit floats, arrays und callables.
+    // Bitte in einem Unit-Test implementieren und dann hier aus dem Quelltext wieder löschen. Danke
+$a = 2;
+$b = 5;
+$c = 3;
+
+print_r (multi_sum($a, $b, $c));
+// Expected: 10
+
+$a = [1, 4, 7];
+print_r (multi_sum($a));
+// Expected: 12
+
+$a = [1, 2, 3];
+$b = [4, 5, 6];
+$c = [7, 8, 9];
+
+print_r (multi_sum($a, $b, $c));
+// Expected [12, 15, 18]
+
+$a = [[1 ,2],[3, 4]];
+$b = [[5, 6], [7,8]];
+print_r (multi_sum($a, $b));
+// Expected [6, 8], [10, 12]
+
+$fn_a = fn($x) => [[1 + $x,2],[3, 4 * $x]];
+$fn_b = fn($x) => [[5, 6 - $x], [7 * $x,8]];
+
+$fn_sum = fn($x) => multi_sum($fn_a($x), $fn_b($x));
+print_r ($fn_sum(3));
+// Expected  [[9, 5], [24, 20]]
+    */
 }
