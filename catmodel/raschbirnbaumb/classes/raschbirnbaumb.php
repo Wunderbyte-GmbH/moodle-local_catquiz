@@ -15,7 +15,9 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * @package    local_catquiz
+ * Class raschbirnbaumb.
+ *
+ * @package    catmodel_raschbirnbaumb
  * @copyright  2023 Wunderbyte GmbH <georg.maisser@wunderbyte.at>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -27,14 +29,14 @@ use local_catquiz\local\model\model_item_param_list;
 use local_catquiz\local\model\model_person_param_list;
 use local_catquiz\local\model\model_raschmodel;
 
-defined('MOODLE_INTERNAL') || die();
-
 /**
+ * Class raschbirnbauma of catmodels.
+ *
+ * @package    catmodel_raschbirnbaumb
  * @copyright  2023 Wunderbyte GmbH <georg.maisser@wunderbyte.at>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class raschbirnbaumb extends model_raschmodel {
-
 
     // Definitions and Dimensions.
 
@@ -48,7 +50,7 @@ class raschbirnbaumb extends model_raschmodel {
     }
 
     /**
-     * Initiate item parameter list
+     * Get item parameters.
      *
      * @return model_item_param_list
      */
@@ -58,7 +60,7 @@ class raschbirnbaumb extends model_raschmodel {
     }
 
     /**
-     * Initiate person ability parameter list
+     * Get person abilities.
      *
      * @return model_person_param_list
      */
@@ -70,8 +72,10 @@ class raschbirnbaumb extends model_raschmodel {
     /**
      * Estimate item parameters
      *
-     * @param float
-     * @return model_person_param_list
+     * @param mixed $itemresponse
+     *
+     * @return array
+     *
      */
     public function calculate_params($itemresponse): array {
         return catcalc::estimate_item_params($itemresponse, $this);
@@ -92,7 +96,7 @@ class raschbirnbaumb extends model_raschmodel {
      * Calculates the Likelihood for a given the person ability parameter
      *
      * @param float $pp - person ability parameter
-     * @param array<float> $ip - item parameters ('difficulty', 'discrimination')
+     * @param array $ip - item parameters ('difficulty', 'discrimination')
      * @param float $k - answer category (0 or 1.0)
      * @return float
      */
@@ -112,7 +116,7 @@ class raschbirnbaumb extends model_raschmodel {
      * Calculates the LOG Likelihood for a given the person ability parameter
      *
      * @param float $pp - person ability parameter
-     * @param array<float> $ip - item parameters ('difficulty')
+     * @param array $ip - item parameters ('difficulty')
      * @param float $k - answer category (0 or 1.0)
      * @return int|float
      */
@@ -124,7 +128,7 @@ class raschbirnbaumb extends model_raschmodel {
      * Calculates the 1st derivative of the LOG Likelihood with respect to the person ability parameter
      *
      * @param float $pp - person ability parameter
-     * @param array<float> $ip - item parameters ('difficulty')
+     * @param array $ip - item parameters ('difficulty')
      * @param float $k - answer category (0 or 1.0)
      * @return float
      */
@@ -142,7 +146,7 @@ class raschbirnbaumb extends model_raschmodel {
      * Calculates the 2nd derivative of the LOG Likelihood with respect to the person ability parameter
      *
      * @param float $pp - person ability parameter
-     * @param array<float> $ip - item parameters ('difficulty')
+     * @param array $ip - item parameters ('difficulty')
      * @param float $k - answer category (0 or 1.0)
      * @return float
      */
@@ -176,9 +180,11 @@ class raschbirnbaumb extends model_raschmodel {
     /**
      * Calculates the 2nd derivative of the LOG Likelihood with respect to the item parameters
      *
-     * @param float $pp - person ability parameter
-     * @param float $k - answer category (0 or 1.0)
-     * @return array of array of function($ip)
+     * @param float $pp
+     * @param float $itemresponse
+     *
+     * @return array
+     *
      */
     public static function get_log_hessian($pp, float $itemresponse): array {
         if ($itemresponse >= 1.0) {
@@ -205,10 +211,10 @@ class raschbirnbaumb extends model_raschmodel {
     /**
      * Calculates the Least Mean Squres (residuals) for a given the person ability parameter and a given expected/observed score
      *
-     * @param array of float $pp - person ability parameter
-     * @param array of float $ip - item parameters ('difficulty', 'discrimination', 'guessing')
-     * @param array of float $k - fraction of correct (0 ... 1.0)
-     * @param array of float $n - number of observations
+     * @param array $pp - person ability parameter
+     * @param array $ip - item parameters ('difficulty', 'discrimination', 'guessing')
+     * @param array $k - fraction of correct (0 ... 1.0)
+     * @param array $n - number of observations
      * @return float - weighted residuals
      */
     public static function least_mean_squares(array $pp, array $ip, array $k, array $n) {
@@ -216,7 +222,8 @@ class raschbirnbaumb extends model_raschmodel {
         $numbertotal = 0;
 
         foreach ($pp as $key => $ability) {
-            if (!(is_float($n[$key]) && is_float($k[$key]))) { continue;
+            if (!(is_float($n[$key]) && is_float($k[$key]))) {
+                continue;
             }
 
             $lmsresiduals += $n[$key] * ($k[$key] - self::likelihood($ability, $ip, 1.0)) ** 2;
@@ -228,10 +235,10 @@ class raschbirnbaumb extends model_raschmodel {
     /**
      * Calculates the 1st derivative of Least Mean Squres with respect to the item parameters
      *
-     * @param array of float $pp - person ability parameter
-     * @param array of float $ip - item parameters ('difficulty', 'discrimination')
-     * @param array of float $k - fraction of correct (0 ... 1.0)
-     * @param array of float $n - number of observations
+     * @param array $pp - person ability parameter
+     * @param array $ip - item parameters ('difficulty', 'discrimination')
+     * @param array $k - fraction of correct (0 ... 1.0)
+     * @param array $n - number of observations
      * @return array - 1st derivative
      */
     public static function least_mean_squares_1st_derivative_ip(array $pp, array $ip, array $k, array $n) {
@@ -239,10 +246,11 @@ class raschbirnbaumb extends model_raschmodel {
         $a = $ip['difficulty']; $b = $ip['discrimination'];
 
         foreach ($pp as $key => $ability) {
-            if (!(is_float($n[$key]) && is_float($k[$key]))) { continue;
+            if (!(is_float($n[$key]) && is_float($k[$key]))) {
+                continue;
             }
 
-            $derivative[0] += $n[$key] * (2 * $b * exp($b * ($a - $ability)) ($k[$key] - 1 + exp($b * ($a - $ability)) * $k[$key])) / (1 + exp($b * ($a - $ability))) ** 3; // Calculate d/da.
+            $derivative[0] += $n[$key] * (2 * $b * exp($b * ($a - $ability)) * ($k[$key] - 1 + exp($b * ($a - $ability)) * $k[$key])) / (1 + exp($b * ($a - $ability))) ** 3; // Calculate d/da.
             $derivative[1] += $n[$key] * (2 * exp($b * ($a - $ability)) * ($a - $ability) * ($k[$key] - 1 + exp($b * ($a - $ability)) * $k[$key])) / (1 + exp($b * ($a - $ability))) ** 3; // Calculate d/db.
         }
         return $derivative;
@@ -251,10 +259,10 @@ class raschbirnbaumb extends model_raschmodel {
     /**
      * Calculates the 2nd derivative of Least Mean Squres with respect to the item parameters
      *
-     * @param array of float $pp - person ability parameter
-     * @param array of float $ip - item parameters ('difficulty', 'discrimination')
-     * @param array of float $k - fraction of correct (0 ... 1.0)
-     * @param array of float $n - number of observations
+     * @param array $pp - person ability parameter
+     * @param array $ip - item parameters ('difficulty', 'discrimination')
+     * @param array $k - fraction of correct (0 ... 1.0)
+     * @param array $n - number of observations
      * @return array - 1st derivative
      */
     public static function least_mean_squares_2nd_derivative_ip(array $pp, array $ip, array $k, array $n) {
@@ -279,7 +287,7 @@ class raschbirnbaumb extends model_raschmodel {
      * Calculates the Fisher Information for a given person ability parameter
      *
      * @param float $pp
-     * @param array<float> $ip
+     * @param array $ip
      * @return float
      */
     public static function fisher_info(float $pp, array $ip) {
@@ -289,8 +297,10 @@ class raschbirnbaumb extends model_raschmodel {
     /**
      * Implements a Filter Function for trusted regions in the item parameter estimation
      *
-     * @param array $ip
-     * return array
+     * @param array $parameters
+     *
+     * @return array
+     *
      */
     public static function restrict_to_trusted_region(array $parameters): array {
         // Set values for difficulty parameter.
@@ -318,17 +328,21 @@ class raschbirnbaumb extends model_raschmodel {
         $bmax = floatval(get_config('catmodel_raschbirnbaumb', 'trusted_region_max_b'));
 
         // Test TR for difficulty.
-        if (($a - $am) < max(-($atr * $as), $amin)) {$a = max(-($atr * $as), $amin);
+        if (($a - $am) < max(-($atr * $as), $amin)) {
+            $a = max(-($atr * $as), $amin);
         }
-        if (($a - $am) > min(($atr * $as), $amax)) {$a = min(($atr * $as), $amax);
+        if (($a - $am) > min(($atr * $as), $amax)) {
+            $a = min(($atr * $as), $amax);
         }
 
         $parameters['difficulty'] = $a;
 
         // Test TR for discriminatory.
-        if ($b < $bmin) {$b = $bmin;
+        if ($b < $bmin) {
+            $b = $bmin;
         }
-        if ($b > min(($btr * $bp), $bmax)) {$b = min(($btr * $bp), $bmax);
+        if ($b > min(($btr * $bp), $bmax)) {
+            $b = min(($btr * $bp), $bmax);
         }
 
         $parameters['discrimination'] = $b;
@@ -346,14 +360,15 @@ class raschbirnbaumb extends model_raschmodel {
         $am = 0; // Mean of difficulty.
         $as = 2; // Standard derivation of difficulty.
 
-        // Placement of the discriminatory parameter
+        // Placement of the discriminatory parameter.
         $bp = floatval(get_config('catmodel_raschbirnbaumb', 'trusted_region_placement_b'));
-        // Slope of the discriminatory parameter
+        // Slope of the discriminatory parameter.
         $bs = floatval(get_config('catmodel_raschbirnbaumb', 'trusted_region_slope_b'));
 
         return [
             fn ($x) => (($am - $x['difficulty']) / ($as ** 2)), // Calculates d/da.
-            fn ($x) => (-($bs * exp($bs * $x['discrimination'])) / (exp($bs * $bp) + exp($bs * $x['discrimination']))) // Calculates d/db.
+            // Calculates d/db.
+            fn ($x) => (-($bs * exp($bs * $x['discrimination'])) / (exp($bs * $bp) + exp($bs * $x['discrimination'])))
         ];
     }
 
