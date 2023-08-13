@@ -96,16 +96,15 @@ class raschbirnbauma extends model_raschmodel {
     /**
      * Calculates the Likelihood for a given the person ability parameter
      *
-     * @param float $pp
-     * @param array $ip
-     * @param float $k
-     *
+     * @param float $pp - person ability parameter
+     * @param array<float> $ip - item parameters ('difficulty')
+     * @param float $k - answer category (0 or 1.0)
      * @return float
      *
      */
     public static function likelihood($pp, array $ip, float $k): float {
-        $a = $params['difficulty'];
-        if ($itemresponse < 1.0) {
+        $a = $ip['difficulty'];
+        if ($k < 1.0) {
             return 1 / (1 + exp($pp - $a));
         } else {
             return 1 / (1 + exp($a - $pp));
