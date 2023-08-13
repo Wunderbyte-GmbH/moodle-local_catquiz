@@ -161,7 +161,7 @@ class raschbirnbauma extends model_raschmodel {
      *
      * @param float $pp - person ability parameter
      * @param float $k - answer category (0 or 1.0)
-     * @return array of function($ip)
+     * @return mixed of function($ip)
      */
     public static function get_log_jacobian($pp, float $k):array {
         if ($k >= 1.0) {
