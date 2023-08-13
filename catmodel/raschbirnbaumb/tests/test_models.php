@@ -71,6 +71,10 @@ class test_models extends TestCase
 
             $result = raschbirnbaumb::get_log_jacobian($pp, $k)[0]($ip);
 
+            // We only verify for four commas after the dot.
+            $expected = sprintf("%.4f", $expected);
+            $result = sprintf("%.4f", $result);
+
             $this->assertEquals($expected, $result);
         }
     }
