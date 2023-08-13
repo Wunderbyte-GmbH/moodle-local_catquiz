@@ -78,9 +78,9 @@ class raschbirnbauma extends model_raschmodel
      * @param float
      * @return model_person_param_list
      */
-    public function calculate_params($item_response): array
+    public function calculate_params($k): array
     {
-        return catcalc::estimate_item_params($item_response, $this);
+        return catcalc::estimate_item_params($k, $this);
     }
 
     /**
@@ -106,7 +106,7 @@ class raschbirnbauma extends model_raschmodel
     public static function likelihood($pp, array $ip, float $k)
     {
         $a = $params['difficulty'];
-        if ($item_response < 1.0) {
+        if ($k < 1.0) {
             return 1/(1 + exp($pp-$a));
         } else {
             return 1/(1 + exp($a-$pp));
