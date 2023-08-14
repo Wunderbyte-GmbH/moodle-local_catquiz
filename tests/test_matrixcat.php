@@ -45,4 +45,64 @@ class test_matrixcat extends TestCase {
         $result = $callablearray(5);
         $this->assertEquals($expected, $result);
     }
+
+    /**
+     * Checks if the multi_sum() function works as expected.
+     *
+     * @dataProvider multisumprovider
+     * @return void
+     * @throws InvalidArgumentException
+     * @throws ExpectationFailedException
+     */
+    public function test_multi_sum($expected, $a, $b = null, $c = null, $options = []) {
+        if (array_key_exists('callable_arg', $options)) {
+            $x = $options['callable_arg'];
+            $this->assertSame($expected, matrixcat::multi_sum($a($x), $b($x)));
+        } else {
+            if (is_null($b)) {
+                $this->assertSame($expected, matrixcat::multi_sum($a));
+            } else if (is_null($c)) {
+                $this->assertSame($expected, matrixcat::multi_sum($a, $b));
+            } else {
+                $this->assertSame($expected, matrixcat::multi_sum($a, $b, $c));
+            }
+        }
+    }
+
+    public function multisumprovider() {
+        $fna = fn ($x) => [[1 + $x, 2], [3, 4 * $x]];
+        $fnb = fn ($x) => [[5, 6 - $x], [7 * $x, 8]];
+
+        return [
+            'simple' => [
+                'expected' => 10,
+                'a' => 2,
+                'b' => 5,
+                'c' => 3,
+            ],
+            'single array' => [
+                'expected' => 12,
+                'a' => [1, 4, 7],
+            ],
+            'multiple arrays' => [
+                'expected' => [12, 15, 18],
+                'a' => [1, 2, 3],
+                'b' => [4, 5, 6],
+                'c' => [7, 8, 9],
+            ],
+            'matrices' => [
+                'expected' => [[6, 8], [10, 12]],
+                'a' => [[1, 2], [3, 4]],
+                'b' => [[5, 6], [7, 8]],
+                'c' => null,
+            ],
+            'callables' => [
+                'expected' => [[9, 5], [24, 20]],
+                'a' => $fna,
+                'b' => $fnb,
+                'c' => null,
+                'options' => ['callable_arg' => 3],
+            ]
+        ];
+    }
 }
