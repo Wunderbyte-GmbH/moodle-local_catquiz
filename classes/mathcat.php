@@ -469,9 +469,15 @@ class mathcat {
             $g = $realfunc;
             $j = $realderivative;
             $matrix = new matrix($j);
-            $jinv = ($matrix->getRows() === 1 && $matrix->isSquare())
+
+            try {
+                $jinv = ($matrix->getRows() === 1 && $matrix->isSquare())
                 ? [[1 / $j[0][0]]]
                 : $matrix->inverse();
+            } catch (MatrixException $e) {
+                echo "Can not inverse matrix - returning restricted value.\n";
+                return $model->restrict_to_trusted_region($z0);
+            }
 
             if (is_array($z0)) {
                 $diff = $ml->flattenArray($ml->multiplyMatrices($jinv, $g));
