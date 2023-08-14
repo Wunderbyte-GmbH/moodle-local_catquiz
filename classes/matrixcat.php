@@ -392,7 +392,7 @@ print_r ($fn_sum(3));
      * @param array<callable> $fn_function
      * @return callable<array>
      */
-    public function build_callable_array ($fn_function) {
+    public static function build_callable_array ($fn_function) {
         return function($x) use($fn_function) {
             foreach ($fn_function as $key => $f) {
             	$fn_function[$key] = $f($x);
@@ -400,13 +400,4 @@ print_r ($fn_sum(3));
         	return $fn_function;
         };
     }
-/*
-// @DAVID: Die folgenden Zeilen sind Testfälle für die Methode multi_sum, mit floats, arrays und callables.
-// Bitte in einem Unit-Test implementieren und dann hier aus dem Quelltext wieder löschen. Danke
-$fn_array = [fn($x) => 1 * $x, fn($x) => 2 * $x, fn($x) => 3 * $x];
-
-$fn_function = build_callable_array($fn_array);
-print_r ($fn_function(5));
-// Expected: [5, 10, 15]
-*/
 }
