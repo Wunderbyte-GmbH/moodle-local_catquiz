@@ -90,15 +90,6 @@ class raschbirnbaumb extends model_raschmodel {
         return catcalc::estimate_item_params($itemresponse, $this);
     }
 
-    /**
-     * Defines names if item parameter list
-     *
-     * @return array of string
-     */
-    public static function get_parameter_names():array{
-        return ['difficulty', 'discrimination', ];
-    }
-
     // Calculate the Likelihood.
 
     /**
