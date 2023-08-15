@@ -21,21 +21,15 @@
     Context variables required for this template:
     Example context (json):
     {
-        'id': 1,
-        'parentid': 0,
-        'description': 'xyz',
-        'name': 'Mathematics'
-        'viewlink': 'http://localhost:8000/local/catquiz/edit_catscale.php?id=1',
-        'children': [
-            'id': 1,
-            'description': 'xyz',
-            'name': 'Mathematics'
-            'viewlink': 'http://localhost:8000/local/catquiz/edit_catscale.php?id=1',
-            children: []
-        ]
+        "id": 3,
+        "parentid": 1,
+        "description": "xyz",
+        "name": "Mathematics3",
+        "subscribed" : true,
+        "viewlink":"http://localhost:8000/local/catquiz/edit_catscale.php?id=3"
     }
-
 }}
+
 <ul class="pt-2 mt-0 mb-0">
         <li class="list-group-item pr-0" data-id="{{id}}" data-description="{{description}}" data-parentid="{{parentid}}" data-name="{{name}}">
             <div class="pull-right">
