@@ -27,8 +27,10 @@ namespace local_catquiz\table;
 defined('MOODLE_INTERNAL') || die();
 
 global $CFG;
+
 require_once($CFG->libdir.'/tablelib.php');
 require_once($CFG->dirroot . '/question/engine/lib.php');
+require_once($CFG->dirroot . '/local/catquiz/lib.php');
 
 use html_writer;
 use local_catquiz\catscale;
@@ -173,25 +175,32 @@ class catscalequestions_table extends wunderbyte_table {
             return !empty($values->status) ? $values->status : 0;
         }
         $bootstrapclass = "";
+        $status = $values->status ?? STATUS_NOT_SET;
 
-        switch ($values->status) {
-            case model_item_param::STATUS_SET_MANUALLY:
-                $bootstrapclass = 'success';
+        switch ($status) {
+            case STATUS_SET_MANUALLY:
+                $bootstrapclass = 'text-success';
                 break;
-            case model_item_param::STATUS_SET_BY_STRATEGY:
-                $bootstrapclass = 'warning';
+            case STATUS_SET_BY_STRATEGY:
+                $bootstrapclass = 'text-warning';
                 break;
-            case model_item_param::STATUS_NOT_CALCULATED:
-                $bootstrapclass = 'secondary';
+            case STATUS_NOT_CALCULATED:
+                $bootstrapclass = 'text-secondary';
                 break;
-            case model_item_param::STATUS_NOT_SET:
-                $bootstrapclass = 'danger';
+            case STATUS_NOT_SET:
+                $bootstrapclass = 'text-danger';
                 break;
-            case model_item_param::STATUS_UPDATED_MANUALLY:
-                $bootstrapclass = 'primary';
+            case STATUS_UPDATED_MANUALLY:
+                $bootstrapclass = 'text-primary';
                 break;
         }
-        return sprintf('<i class="fa fa-circle text-%s"></i>', $bootstrapclass);
+
+        $labelstring = "itemstatus_" . $status;
+
+        return html_writer::tag('i', "", [
+            "class" => "fa fa-circle $bootstrapclass",
+            "aria-label" => get_string($labelstring, 'local_catquiz'),
+            "title" => get_string($labelstring, 'local_catquiz')]);
     }
 
     /**
@@ -207,41 +216,6 @@ class catscalequestions_table extends wunderbyte_table {
         }
 
         return "problem with $values->id, no qtype";
-        // phpcs:disable
-        // global $OUTPUT;
-
-        // $type = $values->qtype;
-
-        // switch ($values->qtype) {
-        // case "multichoice":
-        // $type = 'MC';
-        // break;
-        // case "pmatch":
-        // $type = 'PMTC';
-        // break;
-        // case "match":
-        // $type = 'MTC';
-        // break;
-        // case "truefalse":
-        // $type = 'TF';
-        // break;
-        // case "ddwtos":
-        // $type = 'DDWT';
-        // break;
-        // case "ordering":
-        // $type = 'ORD';
-        // break;
-        // case "ddimageortext":
-        // $type = 'IOT';
-        // break;
-        // case "numerical":
-        // $type = 'NUM';
-        // break;
-        // default:
-        // break;
-        // }
-        // return $type;
-        // phpcs:enable
     }
 
 

@@ -25,6 +25,10 @@
 
 defined('MOODLE_INTERNAL') || die();
 
+global $CFG;
+
+require_once($CFG->dirroot . '/local/catquiz/lib.php');
+
 $string['pluginname'] = 'ALiSe CAT Quiz';
 $string['catquiz'] = 'Catquiz';
 
@@ -226,11 +230,11 @@ $string['numberofanswersincorrect'] = "Wrong";
 $string['numberofanswerspartlycorrect'] = "Partly correct";
 $string['averageofallanswers'] = "Average";
 
-$string['problematic'] = 'Problematic';
-$string['notselected'] = 'Not chosen';
-$string['selected'] = 'Automatically chosen';
-$string['manuallyselected'] = 'Manually chosen';
-$string['manuallyexcluded'] = 'Manually excluded';
+$string['itemstatus_-5'] = "Manually excluded"; // STATUS_NOT_SET.
+$string['itemstatus_0'] = "Not yet calculated"; // STATUS_NOT_CALCULATED.
+$string['itemstatus_1'] = "Calculated"; // STATUS_SET_BY_STRATEGY.
+$string['itemstatus_4'] = "Manually updated"; // STATUS_UPDATED_MANUALLY.
+$string['itemstatus_5'] = "Manually confirmed"; // STATUS_SET_MANUALLY.
 
 // Student Details
 $string['studentdetails'] = "Student details";

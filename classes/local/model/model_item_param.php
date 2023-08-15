@@ -28,6 +28,9 @@ use cache_helper;
 use Exception;
 use stdClass;
 
+global $CFG;
+require_once($CFG->dirroot . '/local/catquiz/lib.php');
+
 /**
  * This class holds a single item param object
  *
@@ -52,43 +55,10 @@ class model_item_param {
     const MAX = 1000;
 
     /**
-     * STATUS_NOT_SET
-     *
-     * @var int
-     */
-    const STATUS_NOT_SET = -5;
-
-    /**
-     * STATUS_NOT_CALCULATED
-     *
-     * @var int
-     */
-    const STATUS_NOT_CALCULATED = 0;
-
-    /**
-     * STATUS_SET_BY_STRATEGY
-     *
-     * @var int
-     */
-    const STATUS_SET_BY_STRATEGY = 1;
-
-    /**
-     * STATUS_UPDATED_MANUALLY
-     *
-     * @var int
-     */
-    const STATUS_UPDATED_MANUALLY = 4;
-
-    /**
-     * STATUS_SET_MANUALLY
-     *
-     * @var int
-     */
-    const STATUS_SET_MANUALLY = 5;
-    /**
      * @var array<float>
      */
     private array $parameters;
+
 
     /**
      * @var int status

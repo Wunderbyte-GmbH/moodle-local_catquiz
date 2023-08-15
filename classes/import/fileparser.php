@@ -355,7 +355,7 @@ class fileparser {
         $error = '';
         foreach ($this->fieldnames as $fieldname) {
             if(!in_array($fieldname, array_keys($this->columns))) {
-                $error .= "Imported CSV not containing the right labels. Check first line of imported csv file.";
+                $error .= "Imported CSV not containing the right labels. Column $fieldname can not be importet.";
                 break;
             }
         }

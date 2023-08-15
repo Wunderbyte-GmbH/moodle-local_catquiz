@@ -26,6 +26,7 @@ require_once($CFG->libdir . "/csvlib.class.php");
 
 use context;
 use context_system;
+use core_component;
 use core_form\dynamic_form;
 use moodleform;
 use local_catquiz\local\csvparser;
@@ -232,7 +233,10 @@ class csvimport extends dynamic_form {
         if (!empty($data->dateparseformat)) {
             $settings->set_dateformat($data->dateparseformat);
         }
+        // For the callback, we need the path to the item as string.
+
         $callbackfunction = "local_catquiz\local\model\model_item_param_list::save_or_update_testitem_in_db";
+
         $settings->set_callback($callbackfunction);
 
         $parser = new fileparser($settings);

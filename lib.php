@@ -32,7 +32,7 @@ define('STATUS_TEST_INACTIVE', 0);
 define('STATUS_TEST_VISIBLE', 1);
 define('STATUS_TEST_INVISIBLE', 0);
 
-// Teststrategies
+// Teststrategies.
 
 define('STRATEGY_FASTEST', 1);
 define('STRATEGY_BALANCED', 2);
@@ -41,10 +41,16 @@ define('STRATEGY_LOWESTSUB', 4);
 define('STRATEGY_HIGHESTSUB', 5);
 define('STRATEGY_PILOT', 6);
 
-// Testiem Status in Scale
+// Testiem Status in Scale.
 define('TESTITEM_STATUS_ACTIVE', 0);
 define('TESTITEM_STATUS_INACTIVE', 1);
 
+// Testitem model calc status.
+define('STATUS_NOT_SET', -5);
+define('STATUS_NOT_CALCULATED', 0);
+define('STATUS_SET_BY_STRATEGY', 1);
+define('STATUS_UPDATED_MANUALLY', 4);
+define('STATUS_SET_MANUALLY', 5);
 
 /**
  * Renders the popup Link.
