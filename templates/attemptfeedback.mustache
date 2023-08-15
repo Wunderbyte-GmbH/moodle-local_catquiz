@@ -21,6 +21,13 @@
     Context variables required for this template:
     Example context (json):
     {
+        "stats": {
+            "gradedright": "gradedright",
+            "gradedwrong": "gradedwrong",
+            "gradedpartial": "gradedpartial"
+        },
+        "ability": "ability",
+        "strategy_feedback": "strategy_feedback"
     }
 }}
 {{#stats}}
@@ -28,7 +35,7 @@
 <p>{{#str}}numberofanswersincorrect, local_catquiz{{/str}}: {{gradedwrong}}</p>
 <p>{{#str}}numberofanswerspartlycorrect, local_catquiz{{/str}}: {{gradedpartial}}</p>
 {{/stats}}
-{{#str}} personability, local_catquiz {{/str}}: {{ability}}</br>
+{{#str}} personability, local_catquiz {{/str}}: {{ability}}<br>
 {{#strategy_feedback}}
-    {{.}}</br>
+    {{.}}<br>
 {{/strategy_feedback}}
