@@ -38,7 +38,6 @@ use local_catquiz\local\model\model_raschmodel;
  */
 class raschbirnbauma extends model_raschmodel {
 
-
     // Definitions and Dimensions.
 
     /**
@@ -97,7 +96,7 @@ class raschbirnbauma extends model_raschmodel {
      * Calculates the Likelihood for a given the person ability parameter
      *
      * @param float $pp - person ability parameter
-     * @param array<float> $ip - item parameters ('difficulty')
+     * @param array $ip - item parameters ('difficulty')
      * @param float $k - answer category (0 or 1.0)
      * @return float
      *
@@ -110,6 +109,7 @@ class raschbirnbauma extends model_raschmodel {
             return 1 / (1 + exp($a - $pp));
         }
     }
+
     // Calculate the LOG Likelihood and its derivatives.
 
     /**
@@ -188,14 +188,13 @@ class raschbirnbauma extends model_raschmodel {
     }
 
     // Calculate the Least-Mean-Squres (LMS) approach.
-
     /**
      * Calculates the Least Mean Squres (residuals) for a given the person ability parameter and a given expected/observed score
      *
-     * @param array of float $pp - person ability parameter
-     * @param array of float $ip - item parameters ('difficulty', 'discrimination', 'guessing')
-     * @param array of float $k - fraction of correct (0 ... 1.0)
-     * @param array of float $n - number of observations
+     * @param array $pp - person ability parameter
+     * @param array $ip - item parameters ('difficulty', 'discrimination', 'guessing')
+     * @param array $k - fraction of correct (0 ... 1.0)
+     * @param array $n - number of observations
      * @return float - weighted residuals
      */
     public static function least_mean_squares(array $pp, array $ip, array $k, array $n): float {
@@ -216,10 +215,10 @@ class raschbirnbauma extends model_raschmodel {
     /**
      * Calculates the 1st derivative of Least Mean Squres with respect to the item parameters
      *
-     * @param array of float $pp - person ability parameter
-     * @param array of float $ip - item parameters ('difficulty', 'discrimination')
-     * @param array of float $k - fraction of correct (0 ... 1.0)
-     * @param array of float $n - number of observations
+     * @param array $pp - person ability parameter
+     * @param array $ip - item parameters ('difficulty', 'discrimination')
+     * @param array $k - fraction of correct (0 ... 1.0)
+     * @param array $n - number of observations
      * @return array - 1st derivative
      */
     public static function least_mean_squares_1st_derivative_ip(array $pp, array $ip, array $k, array $n): array {
@@ -233,7 +232,9 @@ class raschbirnbauma extends model_raschmodel {
                 continue;
             }
 
-            $derivative[0] += $n[$key] * (2 * exp($a + $pp) * (exp($a) * $k[$key] + exp($pp) * ($k[$key]) - 1)) / (exp($a) + exp($pp)) ** 3; // Calculate d/da.
+            // Calculate d/da.
+            $derivative[0] += $n[$key] * (2 * exp($a + $pp) * (exp($a) * $k[$key] + exp($pp) * ($k[$key]) - 1))
+                                / (exp($a) + exp($pp)) ** 3;
         }
         return $derivative;
     }
@@ -241,10 +242,10 @@ class raschbirnbauma extends model_raschmodel {
     /**
      * Calculates the 2nd derivative of Least Mean Squres with respect to the item parameters
      *
-     * @param array of float $pp - person ability parameter
-     * @param array of float $ip - item parameters ('difficulty', 'discrimination')
-     * @param array of float $k - fraction of correct (0 ... 1.0)
-     * @param array of float $n - number of observations
+     * @param array $pp - person ability parameter
+     * @param array $ip - item parameters ('difficulty', 'discrimination')
+     * @param array $k - fraction of correct (0 ... 1.0)
+     * @param array $n - number of observations
      * @return array - 1st derivative
      */
     public static function least_mean_squares_2nd_derivative_ip(array $pp, array $ip, array $k, array $n): array {
@@ -257,7 +258,10 @@ class raschbirnbauma extends model_raschmodel {
                 continue;
             }
 
-            $derivative[0][0]  += $n[$key] * (2 * exp($a + $pp) * (2 * exp($a + $pp) + exp(2 * $pp) * (-1 + $k[$key]) - exp(2 * $a) * $k[$key])) / (exp($a) + exp($pp)) ** 4; // Calculate d²/da².
+            // Calculate d²/da².
+            $derivative[0][0]  += $n[$key] * (2 * exp($a + $pp) *
+                                (2 * exp($a + $pp) + exp(2 * $pp) * (-1 + $k[$key]) - exp(2 * $a) * $k[$key]))
+                                / (exp($a) + exp($pp)) ** 4;
         }
         return $derivative;
     }
@@ -332,8 +336,8 @@ class raschbirnbauma extends model_raschmodel {
      */
     public static function get_log_tr_hessian(): array {
         // Set values for difficulty parameter.
-        $am = 0; // Mean of difficulty
-        $as = 2; // Standard derivation of difficulty
+        $am = 0; // Mean of difficulty.
+        $as = 2; // Standard derivation of difficulty.
 
         return [[
             fn ($x) => (-1 / ($as ** 2)) // Calculate d/da d/da.

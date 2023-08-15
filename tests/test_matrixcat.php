@@ -17,18 +17,26 @@
 /**
  * Tests the matrixcat functionality.
  *
- * @package    catquiz
+ * @package local_catquiz
  * @author David Szkiba <david.szkiba@wunderbyte.at>
- * @copyright  2023 Georg Maißer <info@wunderbyte.at>
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @copyright 2023 Georg Maißer <info@wunderbyte.at>
+ * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
- namespace local_catquiz;
+namespace local_catquiz;
 
 use PHPUnit\Framework\ExpectationFailedException;
 use PHPUnit\Framework\TestCase;
 use SebastianBergmann\RecursionContext\InvalidArgumentException;
 
+/**
+ * Class test_matrixcat to tests the matrixcat functionality.
+ *
+ * @package local_catquiz
+ * @author David Szkiba <david.szkiba@wunderbyte.at>
+ * @copyright 2023 Georg Maißer <info@wunderbyte.at>
+ * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
 class test_matrixcat extends TestCase {
 
     /**
@@ -49,10 +57,17 @@ class test_matrixcat extends TestCase {
     /**
      * Checks if the multi_sum() function works as expected.
      *
-     * @dataProvider multisumprovider
+     * @param mixed $expected
+     * @param mixed $a
+     * @param mixed|null $b
+     * @param mixed|null $c
+     * @param array $options
+     *
      * @return void
+     *
      * @throws InvalidArgumentException
      * @throws ExpectationFailedException
+     *
      */
     public function test_multi_sum($expected, $a, $b = null, $c = null, $options = []) {
         if (array_key_exists('callable_arg', $options)) {
@@ -69,6 +84,12 @@ class test_matrixcat extends TestCase {
         }
     }
 
+    /**
+     * Multi sum provider.
+     *
+     * @return array
+     *
+     */
     public function multisumprovider() {
         $fna = fn ($x) => [[1 + $x, 2], [3, 4 * $x]];
         $fnb = fn ($x) => [[5, 6 - $x], [7 * $x, 8]];

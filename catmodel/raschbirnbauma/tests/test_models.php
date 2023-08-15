@@ -22,14 +22,20 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
- namespace catmodel_raschbirnbauma;
+namespace catmodel_raschbirnbauma;
 
 use PHPUnit\Framework\ExpectationFailedException;
 use PHPUnit\Framework\TestCase;
 use SebastianBergmann\RecursionContext\InvalidArgumentException;
 
-class test_models extends TestCase
-{
+/**
+ * Class test_models for catmodel_raschbirnbauma.
+ *
+ * @package    catmodel_raschbirnbauma
+ * @copyright  2023 Georg Maißer <info@wunderbyte.at>
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
+class test_models extends TestCase {
 
     /**
      * This test calls the get_log_jacobain function with the model and test its output with verified data.
@@ -37,18 +43,17 @@ class test_models extends TestCase
      * @throws InvalidArgumentException
      * @throws ExpectationFailedException
      */
-    public function test_get_log_jacobian()
-    {
-        // Test cases
-        $testCases = [
-            // Test case 1
+    public function test_get_log_jacobian() {
+        // Test cases.
+        $testcases = [
+            // Test case 1.
             [
                 'pp' => 0.5,
                 'k' => 0.8,
                 'ip' => ["difficulty" => 1],
                 'expected' => 0.3775406687981454,
             ],
-            // Test case 2
+            // Test case 2.
             [
                 'pp' => 1.2,
                 'k' => 1.5,
@@ -57,11 +62,11 @@ class test_models extends TestCase
             ],
         ];
 
-        foreach ($testCases as $testCase) {
-            $pp = $testCase['pp'];
-            $k = $testCase['k'];
-            $ip = $testCase['ip'];
-            $expected = $testCase['expected'];
+        foreach ($testcases as $testcase) {
+            $pp = $testcase['pp'];
+            $k = $testcase['k'];
+            $ip = $testcase['ip'];
+            $expected = $testcase['expected'];
 
             $result = raschbirnbauma::get_log_jacobian($pp, $k)[0]($ip);
 
