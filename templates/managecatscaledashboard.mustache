@@ -21,6 +21,7 @@
     Context variables required for this template:
     Example context (json):
     {
+        "summaryheading": "Summary Heading"
     }
 }}
 
@@ -28,25 +29,24 @@
 
 <ul class="nav nav-tabs" id="myTab" role="tablist">
   <li class="nav-item">
-    <a class="nav-link active" id="summary-tab" data-toggle="tab" href="#summary" role="tab" aria-controls="{{#str}} summary, local_catquiz {{/str}}" aria-selected="true">{{#str}}summary, local_catquiz{{/str}}</a>
+    <a class="nav-link active" id="summary-tab" data-toggle="tab" href="#summary" role="tab" aria-controls="summary" aria-selected="true">{{#str}}summary, local_catquiz{{/str}}</a>
   </li>
   <li class="nav-item">
-    <a class="nav-link" id="catscales-tab" data-toggle="tab" href="#catscales" role="tab" aria-controls="{{#str}}catscalesheading, local_catquiz{{/str}}" aria-selected="false">{{#str}} catscalesheading, local_catquiz{{/str}}</a>
+    <a class="nav-link" id="catscales-tab" data-toggle="tab" href="#catscales" role="tab" aria-controls="catscales" aria-selected="false">{{#str}} catscalesheading, local_catquiz{{/str}}</a>
   </li>
   <li class="nav-item">
-    <a class="nav-link" id="questions-tab" data-toggle="tab" href="#questions" role="tab" aria-controls="{{#str}}questions, local_catquiz{{/str}}" aria-selected="false">{{#str}}questions, local_catquiz{{/str}}</a>
+    <a class="nav-link" id="questions-tab" data-toggle="tab" href="#questions" role="tab" aria-controls="questions" aria-selected="false">{{#str}}questions, local_catquiz{{/str}}</a>
   </li>
   <li class="nav-item">
-    <a class="nav-link" id="testsandtemplates-tab" data-toggle="tab" href="#testsandtemplates" role="tab" aria-controls="{{#str}}testsandtemplates, local_catquiz{{/str}}" aria-selected="false">{{#str}}testsandtemplates, local_catquiz{{/str}}</a>
+    <a class="nav-link" id="testsandtemplates-tab" data-toggle="tab" href="#testsandtemplates" role="tab" aria-controls="testsandtemplates" aria-selected="false">{{#str}}testsandtemplates, local_catquiz{{/str}}</a>
   </li>
   <li class="nav-item">
-    <a class="nav-link" id="calculations-tab" data-toggle="tab" href="#calculations" role="tab" aria-controls="{{#str}}calculations, local_catquiz{{/str}}" aria-selected="false">{{#str}}calculations, local_catquiz{{/str}}</a>
+    <a class="nav-link" id="calculations-tab" data-toggle="tab" href="#calculations" role="tab" aria-controls="calculations" aria-selected="false">{{#str}}calculations, local_catquiz{{/str}}</a>
   </li>
   <li class="nav-item">
-    <a class="nav-link" id="versioning-tab" data-toggle="tab" href="#versioning" role="tab" aria-controls="{{#str}}versioning, local_catquiz{{/str}}" aria-selected="false">{{#str}}versioning, local_catquiz{{/str}}</a>
+    <a class="nav-link" id="versioning-tab" data-toggle="tab" href="#versioning" role="tab" aria-controls="versioning" aria-selected="false">{{#str}}versioning, local_catquiz{{/str}}</a>
   </li>
 </ul>
-
 
 <div class="tab-content" id="myTabContent">
   <div class="tab-pane fade show active" id="summary" role="tabpanel" aria-labelledby="summary-tab">

@@ -30,9 +30,9 @@
     }
 }}
 
-<div type="button" class="" data-toggle="modal" data-target=".preview-question-{{id}}">{{shorttext}}</div>
+<button type="button" class="" data-toggle="modal" data-target=".preview-question-{{id}}">{{shorttext}}</button>
 
-<div class="modal fade preview-question-{{id}}" tabindex="-1" role="dialog" aria-labelledby="{{#str}} previewquestion, local_catquiz {{/str}}" aria-hidden="true">
+<div class="modal fade preview-question-{{id}}" tabindex="-1" role="dialog" aria-label="{{#str}} previewquestion, local_catquiz {{/str}}" aria-hidden="true">
   <div class="modal-dialog modal-lg">
     <div class="modal-content preview-question">
       {{{fulltext}}}
