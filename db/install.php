@@ -39,7 +39,7 @@ function xmldb_local_catquiz_install() {
         $role = (object) array(
             'name' => 'catquiz Manager',
             'shortname' => 'catquizmanager',
-            'description' => get_string('catquizroledescription'),
+            'description' => get_string('catquizroledescription', 'local_catquiz'),
             'sortorder' => $max->id,
             'archetype' => '',
         );
