@@ -167,6 +167,24 @@ class updatepersonability extends preselect_task implements wb_middleware {
 
         return count($diff) !== 0;
     }
+
+    /**
+     * Test if we can calculate an ability with the given responses.
+     * At least two answers with different outcome are needed.
+     * 
+     * @param mixed $userresponses
+     * @return bool
+     */
+    private function has_sufficient_responses($userresponses) {
+        $first = $userresponses[array_key_first($userresponses)];
+        foreach ($userresponses as $ur) {
+            if ($ur['fraction'] !== $first['fraction']) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     protected function load_responses($context) {
         return catcontext::create_response_from_db($context['contextid'], $context['catscaleid']);
     }
