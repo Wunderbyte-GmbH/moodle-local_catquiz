@@ -23,7 +23,7 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
- namespace local_catquiz\tests\teststrategy\preselect_task;
+namespace local_catquiz\teststrategy\preselect_task;
 
 use local_catquiz\local\result;
 use local_catquiz\teststrategy\preselect_task\updatepersonabilitytesting;
@@ -31,7 +31,7 @@ use PHPUnit\Framework\ExpectationFailedException;
 use PHPUnit\Framework\TestCase;
 use SebastianBergmann\RecursionContext\InvalidArgumentException;
 
-class test_updatepersonability extends TestCase {
+class updatepersonability_test extends TestCase {
 
     /**
      * Tests that the ability is not updated in cases where it should not be updated.
