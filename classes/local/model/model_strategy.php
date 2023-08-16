@@ -294,7 +294,7 @@ class model_strategy {
             if ($item === null) {
                 continue;
             }
-            $item->set_status(model_item_param::STATUS_SET_BY_STRATEGY);
+            $item->set_status(STATUS_SET_BY_STRATEGY);
             $newitemdifficulties->add($item);
         }
 
