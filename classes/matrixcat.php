@@ -43,7 +43,7 @@ class matrixcat {
      *
      */
     public function inversematrix(array $matrix) {
-        // TODO $matrix validation
+        // TODO $matrix validation.
 
         $matrixcount = count($matrix);
 
@@ -66,11 +66,11 @@ class matrixcat {
     private function createinversematrix(array $matrix) {
         $numberofrows = count($matrix);
 
-        for($i = 0; $i < $numberofrows; $i++) {
+        for ($i = 0; $i < $numberofrows; $i++) {
             $matrix = @$this->oneOperation($matrix, $i, $i);
 
-            for($j = 0; $j < $numberofrows; $j++) {
-                if($i !== $j) {
+            for ($j = 0; $j < $numberofrows; $j++) {
+                if ($i !== $j) {
                     $matrix = $this->zeroOperation($matrix, $j, $i, $i);
                 }
             }
@@ -91,8 +91,7 @@ class matrixcat {
      *
      */
     private function oneoperation(array $matrix, $rowposition, $zeroposition) {
-        if($matrix[$rowposition][$zeroposition] !== 1)
-        {
+        if ($matrix[$rowposition][$zeroposition] !== 1) {
             $numberofcols = count($matrix[$rowposition]);
 
             if ($matrix[$rowposition][$zeroposition] === 0) {
@@ -164,11 +163,11 @@ class matrixcat {
      *
      */
     private function appendidentitymatrixtomatrix(array $matrix, array $identitymatrix) {
-        // TODO $matrix & $identityMatrix compliance validation (same number of rows/columns, etc)
+        // TODO $matrix & $identityMatrix compliance validation (same number of rows/columns, etc).
 
         $augmentedmatrix = array();
 
-        for($i = 0; $i < count($matrix); $i++) {
+        for ($i = 0; $i < count($matrix); $i++) {
             $augmentedmatrix[$i] = array_merge($matrix[$i], $identitymatrix[$i]);
         }
 
@@ -184,13 +183,13 @@ class matrixcat {
      *
      */
     public function identitymatrix(int $size) {
-        // TODO validate $size
+        // TODO validate $size.
 
         $identitymatrix = array();
 
-        for($i = 0; $i < $size; $i++) {
-            for($j = 0; $j < $size; $j++) {
-                if($i == $j) {
+        for ($i = 0; $i < $size; $i++) {
+            for ($j = 0; $j < $size; $j++) {
+                if ($i == $j) {
                     $identitymatrix[$i][$j] = 1;
                 } else {
                     $identitymatrix[$i][$j] = 0;
@@ -217,7 +216,7 @@ class matrixcat {
         $cols2 = count($matrix2[0]);
 
         if ($cols1 !== $rows2) {
-            // Matrices are not compatible for multiplication
+            // Matrices are not compatible for multiplication.
             return null;
         }
 
@@ -326,20 +325,19 @@ class matrixcat {
         if (is_array($summands[0])) {
             // Check whether all sumanands are of same dimension.
             $summandcount = count($summands[0]);
-            foreach ($summands as $summand)
-            {
+            foreach ($summands as $summand) {
                 if (count($summand) <> $summandcount) {
                     // Throw exception error - there should be no calculation if summand-arrays are of different length.
+                    // phpcs:ignore
                     // console("Summanden haben unterschiedliche Dimension!");
                     return false;
                 }
             }
 
-            for($i = 0; $i < $summandcount; $i++) {
+            for ($i = 0; $i < $summandcount; $i++) {
                 // Call recursivly for each dimension.
                 $newargs = array();
-                foreach ($summands as $summand)
-                {
+                foreach ($summands as $summand) {
                     $newargs[] = $summand[$i];
                 }
                 $sum[$i] = self::multi_sum($newargs);

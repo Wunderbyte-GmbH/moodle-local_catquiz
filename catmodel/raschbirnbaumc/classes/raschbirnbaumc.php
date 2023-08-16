@@ -369,17 +369,21 @@ class raschbirnbaumc extends model_raschmodel {
         $ip['difficulty'] = $a;
 
         // Test TR for discriminatory.
-        if ($b < $bmin) {$b = $bmin;
+        if ($b < $bmin) {
+            $b = $bmin;
         }
-        if ($b > min(($btr * $bp), $bmax)) {$b = min(($btr * $bp), $bmax);
+        if ($b > min(($btr * $bp), $bmax)) {
+            $b = min(($btr * $bp), $bmax);
         }
 
         $ip['discrimination'] = $b;
 
         // Test TR for guessing.
-        if ($c < 0) {$c = 0;
+        if ($c < 0) {
+            $c = 0;
         }
-        if ($c > $cmax) {$c = $cmax;
+        if ($c > $cmax) {
+            $c = $cmax;
         }
 
         $ip['guessing'] = $c;
@@ -404,7 +408,8 @@ class raschbirnbaumc extends model_raschmodel {
 
         return [
             fn ($ip) => (($am - $ip['difficulty']) / ($as ** 2)), // Calculate d/da.
-            fn ($ip) => (-($bs * exp($bs * $ip['discrimination'])) / (exp($bs * $bp) + exp($bs * $ip['discrimination']))), // Calculate d/db.
+            // Calculate d/db.
+            fn ($ip) => (-($bs * exp($bs * $ip['discrimination'])) / (exp($bs * $bp) + exp($bs * $ip['discrimination']))),
             fn ($ip) => (0) // Calculate d/dc.
         ];
     }

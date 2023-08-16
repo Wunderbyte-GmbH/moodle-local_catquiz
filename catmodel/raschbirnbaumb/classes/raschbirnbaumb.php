@@ -55,7 +55,7 @@ class raschbirnbaumb extends model_raschmodel {
      * @return int
      */
     public static function get_model_dim(): int {
-        // Adds +1 for the person ability
+        // Adds +1 for the person ability.
         return count(self::get_parameter_names()) + 1;
     }
 
@@ -271,7 +271,8 @@ class raschbirnbaumb extends model_raschmodel {
         $a = $ip['difficulty']; $b = $ip['discrimination'];
 
         foreach ($pp as $key => $ability) {
-            if (!(is_float($n[$key]) && is_float($k[$key]))) { continue;
+            if (!(is_float($n[$key]) && is_float($k[$key]))) {
+                continue;
             }
 
             $derivative[0][0]  += $n[$key] * (2 * $b ** 2 * exp($b ($a + $ability)) * (-exp(2 * $b * $ability) + 2 * exp($b ($a + $ability)) + (-exp(2 * $a * $b) + exp(2 * $b * $ability)) * $k[$key])) / (exp($a * $b) + exp($b * $ability)) ** 4; // Calculate d²2/da².

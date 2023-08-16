@@ -94,7 +94,7 @@ class mathcat {
             // echo "Iteration:" . $n . "and diff: " . $diff . " x_0=" . $x_0 . " value: ". $func($x_0)  . "<br>";
             $x0 += $diff;
 
-            // Restrict values to [-$max, $max] and stop if we get outside that interval
+            // Restrict values to [-$max, $max] and stop if we get outside that interval.
             if (abs($x0) > $max) {
                 if ($x0 > 0) {
                     return $max;
@@ -107,7 +107,7 @@ class mathcat {
                 $x0 = 0;
             }
 
-            if ($n == $maxiter){  // debug!
+            if ($n == $maxiter) {  // Debug!
                 echo "not converging!";
             }
 
@@ -292,7 +292,7 @@ class mathcat {
         $iteration = 0;
         $h = array();
 
-        // Initialize H with the identity matrix
+        // Initialize H with the identity matrix.
         for ($i = 0; $i < $n; $i++) {
             $h[$i] = array();
             for ($j = 0; $j < $n; $j++) {
@@ -308,13 +308,13 @@ class mathcat {
                 $direction[$i] = -$direction[$i];
             }
 
-            // Line search with constant step size
+            // Line search with constant step size.
             $nextpoint = [];
             for ($i = 0; $i < $n; $i++) {
                 $nextpoint[$i] = $currentpoint[$i] + $stepsize * $direction[$i];
             }
 
-            // Update H using BFGS formula
+            // Update H using BFGS formula.
             $s = [];
             $y = [];
             for ($i = 0; $i < $n; $i++) {
@@ -360,7 +360,7 @@ class mathcat {
 
             $h = $hnew;
 
-            // Check for convergence
+            // Check for convergence.
             $diff = 0;
             for ($i = 0; $i < count($currentpoint); $i++) {
                 $diff += abs($nextpoint[$i] - $currentpoint[$i]);
@@ -394,11 +394,11 @@ class mathcat {
 
         $ml = new matrixcat();
 
-        // get real jacobian/hessian
+        // Get real jacobian/hessian.
         $z0 = $start;
         $parameternames = array_keys($z0);
 
-        // jacobian, hessian, model_dim, start_value
+        // Jacobian, hessian, model_dim, start_value.
         for ($i = 0; $i < $maxiter; $i++) {
 
             for ($k = 0; $k <= $modeldim - 1; $k++) {
@@ -415,14 +415,14 @@ class mathcat {
 
             $jinv = $ml->inverseMatrix($j);
 
-            if (is_array($z0)){
+            if (is_array($z0)) {
 
             } else {
                 $z1 = $z0 - $ml->flattenArray($ml->multiplyMatrices($jinv, $g))[0];
                 $dist = abs($z0 - $z1);
             }
 
-            if ($dist < $mininc){
+            if ($dist < $mininc) {
                 return array_combine($parameternames, array($z1));
             }
             $z0 = array_combine($parameternames, array($z1));
