@@ -47,8 +47,8 @@ class raschbirnbauma_test extends TestCase {
         $result = raschbirnbauma::get_log_jacobian($pp, $k)[0]($ip);
 
         // We only verify for four commas after the dot.
-        $expected = sprintf("%.6f", $expected);
-        $result = sprintf("%.6f", $result);
+        $expected = (float)sprintf("%.6f", $expected);
+        $result = (float)sprintf("%.6f", $result);
 
         $this->assertEquals($expected, $result);
     }
@@ -65,8 +65,8 @@ class raschbirnbauma_test extends TestCase {
         $result = raschbirnbauma::get_log_hessian($pp, $k)[0][0]($ip);
 
         // We only verify for four commas after the dot.
-        $expected = sprintf("%.6f", $expected);
-        $result = sprintf("%.6f", $result);
+        $expected = (float)sprintf("%.6f", $expected);
+        $result = (float)sprintf("%.6f", $result);
 
         $this->assertEquals($expected, $result);
     }
