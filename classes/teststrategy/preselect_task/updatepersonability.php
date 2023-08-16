@@ -43,7 +43,7 @@ use moodle_exception;
  * @copyright 2023 Wunderbyte GmbH
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-final class updatepersonability extends preselect_task implements wb_middleware {
+class updatepersonability extends preselect_task implements wb_middleware {
 
     /**
      * UPDATE_THRESHOLD
@@ -71,16 +71,16 @@ final class updatepersonability extends preselect_task implements wb_middleware 
             return $next($context);
         }
 
-        $cache = cache::make('local_catquiz', 'userresponses');
-        $cachedresponses = $cache->get('userresponses') ?: [];
 
-        $responses = catcontext::create_response_from_db($context['contextid'], $context['catscaleid']);
         $components = ($responses->as_array())[$USER->id];
+        $cachedresponses = $this->load_cached_responses();
+
+        $responses = $this->load_responses($context);
         if (count($components) > 1) {
             throw new moodle_exception('User has answers to more than one component.');
         }
         $userresponses = reset($components);
-        $cache->set('userresponses', $userresponses);
+        $this->update_cached_responses($userresponses);
 
         // If the last answer was incorrect and the question was excluded due to
         // having only incorrect answers, the response object is the same as in
@@ -93,15 +93,11 @@ final class updatepersonability extends preselect_task implements wb_middleware 
             return $next($context);
         }
 
-        // We will update the person ability. Select the correct model for each item.
-        $modelstrategy = new model_strategy($responses);
-        $itemparamlists = [];
-        foreach (array_keys($modelstrategy->get_installed_models()) as $model) {
-            $itemparamlists[$model] = model_item_param_list::load_from_db($context['contextid'], $model);
         }
-        $itemparamlist = $modelstrategy->select_item_model($itemparamlists);
 
-        $updatedability = catcalc::estimate_person_ability($userresponses, $itemparamlist);
+        $itemparamlist = $this->get_item_param_list($responses, $context);
+        $updatedability = $this->get_updated_ability($userresponses, $itemparamlist);
+
         if (is_nan($updatedability)) {
             // In a production environment, we can use fallback values. However,
             // during development we want to see when we get unexpected values.
@@ -118,12 +114,7 @@ final class updatepersonability extends preselect_task implements wb_middleware 
             }
         }
 
-        catquiz::update_person_param(
-            $USER->id,
-            $context['contextid'],
-            $context['catscaleid'],
-            $updatedability
-        );
+        $this->update_person_param($context, $updatedability);
         if (abs($context['person_ability'] - $updatedability) < self::UPDATE_THRESHOLD) {
             // If we do have more than the minimum questions, we should return.
             if ($context['questionsattempted'] >= $context['minimumquestions']) {
@@ -175,5 +166,42 @@ final class updatepersonability extends preselect_task implements wb_middleware 
         });
 
         return count($diff) !== 0;
+    }
+    protected function load_responses($context) {
+        return catcontext::create_response_from_db($context['contextid'], $context['catscaleid']);
+    }
+
+    protected function load_cached_responses() {
+        $cache = cache::make('local_catquiz', 'userresponses');
+        return $cache->get('userresponses') ?: [];
+    }
+
+    protected function update_cached_responses($userresponses) {
+        $cache = cache::make('local_catquiz', 'userresponses');
+        $cache->set('userresponses', $userresponses);
+    }
+
+    protected function get_item_param_list($responses, $context) {
+        // We will update the person ability. Select the correct model for each item.
+        $modelstrategy = new model_strategy($responses);
+        $itemparamlists = [];
+        foreach (array_keys($modelstrategy->get_installed_models()) as $model) {
+            $itemparamlists[$model] = model_item_param_list::load_from_db($context['contextid'], $model);
+        }
+        $itemparamlist = $modelstrategy->select_item_model($itemparamlists);
+        return $itemparamlist;
+    }
+
+    protected function get_updated_ability($userresponses, $itemparamlist) {
+        return catcalc::estimate_person_ability($userresponses, $itemparamlist);
+    }
+
+    protected function update_person_param($context, $updatedability) {
+        catquiz::update_person_param(
+            $context['userid'],
+            $context['contextid'],
+            $context['catscaleid'],
+            $updatedability
+        );
     }
 }
