@@ -197,7 +197,7 @@ class updatepersonability extends preselect_task implements wb_middleware {
     }
 
     protected function load_responses($context) {
-        return catcontext::create_response_from_db($context['contextid'], $context['catscaleid']);
+        return catcontext::create_response_from_db($context['contextid'], $context['lastquestion']->catscaleid);
     }
 
     protected function load_cached_responses() {
@@ -229,7 +229,7 @@ class updatepersonability extends preselect_task implements wb_middleware {
         catquiz::update_person_param(
             $context['userid'],
             $context['contextid'],
-            $context['catscaleid'],
+            $context['lastquestion']->catscaleid,
             $updatedability
         );
     }
