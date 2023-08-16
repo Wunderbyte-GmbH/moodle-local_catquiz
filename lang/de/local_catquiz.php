@@ -297,3 +297,6 @@ $string['attemptfeedbacknotavailable'] = "Kein Feedback verfügbar";
 $string['importcsv'] = 'Import CSV';
 $string['importsuccess'] = 'Import war erfolgreich.';
 $string['importfailed'] = 'Import fehlgeschlagen.';
+$string['dateparseformat'] = 'Format des Datums';
+$string['dateparseformat_help'] = 'Bitte Datum so wie es im CSV definiert wurde verwenden. Hilfe unter <a href="http://php.net/manual/en/function.date.php">Datumsdokumentation</a> für diese Einstellung.';
+$string['defaultdateformat'] = 'j.n.Y H:i:s';

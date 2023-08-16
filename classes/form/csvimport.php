@@ -85,11 +85,11 @@ class csvimport extends dynamic_form {
         $mform->addElement('select', 'encoding', get_string('encoding', 'tool_uploaduser'), $choices);
         $mform->setDefault('encoding', 'UTF-8');
 
-        $mform->addElement('text', 'dateparseformat', get_string('dateparseformat', 'booking'));
+        $mform->addElement('text', 'dateparseformat', get_string('dateparseformat', 'local_catquiz'));
         $mform->setType('dateparseformat', PARAM_NOTAGS);
-        $mform->setDefault('dateparseformat', get_string('defaultdateformat', 'booking'));
+        $mform->setDefault('dateparseformat', get_string('defaultdateformat', 'local_catquiz'));
         $mform->addRule('dateparseformat', null, 'required', null, 'client');
-        $mform->addHelpButton('dateparseformat', 'dateparseformat', 'mod_booking');
+        $mform->addHelpButton('dateparseformat', 'dateparseformat', 'local_catquiz');
 
         $buttonarray = array();
         $buttonarray[] = $mform->createElement('submit', 'submitbutton', get_string('submit'));
