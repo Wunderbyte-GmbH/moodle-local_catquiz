@@ -242,7 +242,7 @@ class raschbirnbaumb extends model_raschmodel {
      * @param array $n - number of observations
      * @return array - 1st derivative
      */
-    public static function least_mean_squares_1st_derivative_ip(array $pp, array $ip, array $k, array $n): float {
+    public static function least_mean_squares_1st_derivative_ip(array $pp, array $ip, array $k, array $n): array {
         $derivative = [0, 0];
         $a = $ip['difficulty']; $b = $ip['discrimination'];
 
@@ -266,7 +266,7 @@ class raschbirnbaumb extends model_raschmodel {
      * @param array $n - number of observations
      * @return array - 1st derivative
      */
-    public static function least_mean_squares_2nd_derivative_ip(array $pp, array $ip, array $k, array $n) {
+    public static function least_mean_squares_2nd_derivative_ip(array $pp, array $ip, array $k, array $n): array {
         $derivative = [[0, 0], [0, 0]];
         $a = $ip['difficulty']; $b = $ip['discrimination'];
 

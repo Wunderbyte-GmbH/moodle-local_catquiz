@@ -47,7 +47,7 @@ class mathcat {
      * @return float
      *
      */
-    static function newtonraphson_stable(
+    public static function newtonraphson_stable(
         $func,
         $derivative,
         $start = 0,
@@ -128,7 +128,7 @@ class mathcat {
      * @return mixed
      *
      */
-    static function gaussian_density($x, $mean, $stddeviation) {
+    public static function gaussian_density($x, $mean, $stddeviation) {
         $factor1 = 1 / sqrt(2 * M_PI * pow($stddeviation, 2));
         $factor2 = exp(-pow($x - $mean, 2) / (2 * pow($stddeviation, 2)));
         return $factor1 * $factor2;
@@ -144,7 +144,7 @@ class mathcat {
      * @return mixed
      *
      */
-    static function gaussian_density_derivative1($x, $m, $std) {
+    public static function gaussian_density_derivative1($x, $m, $std) {
         // $factor1 = -($x - $mean) / pow($stdDeviation, 2);
         // $factor2 = exp(-pow($x - $mean, 2) / (2 * pow($stdDeviation, 2)));
         // return $factor1 * $factor2;
@@ -162,7 +162,7 @@ class mathcat {
      * @return mixed
      *
      */
-    static function gaussian_density_derivative2($x, $m, $std) {
+    public static function gaussian_density_derivative2($x, $m, $std) {
         return (exp(-(($m - $x) ** 2 / (2 * $std ** 2))) * ($m ** 2 - $std ** 2 - 2 * $m * $x + $x ** 2)) / (sqrt(2 * M_PI) * $std ** 5);
     }
 
@@ -178,7 +178,7 @@ class mathcat {
      * @return mixed
      *
      */
-    static function newtonraphson_numeric($f, $x0, $tolerance, $maxiterations = 150, $h = 0.001) {
+    public static function newtonraphson_numeric($f, $x0, $tolerance, $maxiterations = 150, $h = 0.001) {
 
         for ($i = 0; $i < $maxiterations; $i++) {
             $fx0 = $f($x0);
@@ -209,7 +209,7 @@ class mathcat {
      * @return mixed
      *
      */
-    static function get_numerical_derivative(callable $func, float $h = 1e-5) {
+    public static function get_numerical_derivative(callable $func, float $h = 1e-5) {
         $returnfn = function ($x) use ($func, $h) {
             return ($func($x + $h) - $func($x)) / $h;
         };
@@ -225,7 +225,7 @@ class mathcat {
      * @return mixed
      *
      */
-    static function get_numerical_derivative2(callable $func, float $h = 1e-6) {
+    public static function get_numerical_derivative2(callable $func, float $h = 1e-6) {
         $returnfn = function ($x) use ($func, $h) {
             return ($func($x + $h) - $func($x - $h)) / (2 * $h);
         };
@@ -242,7 +242,7 @@ class mathcat {
      * @return array
      *
      */
-    static function gradient(callable $func, $point, $delta = 1e-5) {
+    public static function gradient(callable $func, $point, $delta = 1e-5) {
         $grad = [];
         for ($i = 0; $i < count($point); $i++) {
             $pointplusdelta = $point;
@@ -263,7 +263,7 @@ class mathcat {
      * @return array
      *
      */
-    static function matrix_vector_product($matrix, $vector) {
+    public static function matrix_vector_product($matrix, $vector) {
         $result = [];
         for ($i = 0; $i < count($matrix); $i++) {
             $result[$i] = 0;
@@ -286,7 +286,7 @@ class mathcat {
      * @return mixed
      *
      */
-    static function bfgs(callable $func, $startpoint, $stepsize = 0.01, $tolerance = 1e-6, $maxiterations = 1000) {
+    public static function bfgs(callable $func, $startpoint, $stepsize = 0.01, $tolerance = 1e-6, $maxiterations = 1000) {
         $n = count($startpoint);
         $currentpoint = $startpoint;
         $iteration = 0;
@@ -389,7 +389,7 @@ class mathcat {
      * @return mixed
      *
      */
-    static function newton_raphson_multi($func, $derivative, $start, $mininc = 0.0001, $maxiter = 2000) {
+    public static function newton_raphson_multi($func, $derivative, $start, $mininc = 0.0001, $maxiter = 2000) {
         $modeldim = count($func);
 
         $ml = new matrixcat();
@@ -444,7 +444,7 @@ class mathcat {
      * @return mixed
      *
      */
-    static function newton_raphson_multi_stable(
+    public static function newton_raphson_multi_stable(
         $func,
         $derivative,
         $start,
@@ -567,7 +567,7 @@ class mathcat {
      * @return mixed
      *
      */
-    static function compose_plus($function1, $function2) {
+    public static function compose_plus($function1, $function2) {
         $returnfn = function ($x) use ($function1, $function2) {
             return $function1($x) + $function2($x);
         };
@@ -583,7 +583,7 @@ class mathcat {
      * @return mixed
      *
      */
-    static function compose_multiply($function1, $function2) {
+    public static function compose_multiply($function1, $function2) {
         $returnfn = function ($x) use ($function1, $function2) {
             return $function1($x) * $function2($x);
         };
@@ -599,7 +599,7 @@ class mathcat {
      * @return mixed
      *
      */
-    static function compose_chain($function1, $function2) {
+    public static function compose_chain($function1, $function2) {
         $returnfn = function ($x) use ($function1, $function2) {
             return $function1($function2);
         };

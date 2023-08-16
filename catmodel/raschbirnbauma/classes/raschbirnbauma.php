@@ -233,8 +233,8 @@ class raschbirnbauma extends model_raschmodel {
             }
 
             // Calculate d/da.
-            $derivative[0] += $n[$key] * (2 * exp($a + $pp) * (exp($a) * $k[$key] + exp($pp) * ($k[$key]) - 1))
-                                / (exp($a) + exp($pp)) ** 3;
+            $derivative[0] += $n[$key] * (2 * exp($a + $ability) * (exp($a) * $k[$key] + exp($ability) * ($k[$key]) - 1))
+                                / (exp($a) + exp($ability)) ** 3;
         }
         return $derivative;
     }
@@ -259,9 +259,9 @@ class raschbirnbauma extends model_raschmodel {
             }
 
             // Calculate d²/da².
-            $derivative[0][0]  += $n[$key] * (2 * exp($a + $pp) *
-                                (2 * exp($a + $pp) + exp(2 * $pp) * (-1 + $k[$key]) - exp(2 * $a) * $k[$key]))
-                                / (exp($a) + exp($pp)) ** 4;
+            $derivative[0][0]  += $n[$key] * (2 * exp($a + $ability) *
+                                (2 * exp($a + $ability) + exp(2 * $pp) * (-1 + $k[$key]) - exp(2 * $a) * $k[$key]))
+                                / (exp($a) + exp($ability)) ** 4;
         }
         return $derivative;
     }

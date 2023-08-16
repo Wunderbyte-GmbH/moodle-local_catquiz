@@ -310,7 +310,7 @@ class matrixcat {
      * param float|array|callable $summands
      * return float|array|callable
      *
-     * @param mixed $summands
+     * @param mixed ...$summands
      * @return mixed
      */
     public static function multi_sum (...$summands) {
@@ -355,7 +355,7 @@ class matrixcat {
     /**
      * Re-Builds an Array of Callables into a Callable that delivers an Array
      *
-     * @param array<callable> $fn_function
+     * @param array<callable> $fnfunction
      * @return callable<array>
      */
     public static function build_callable_array ($fnfunction) {
