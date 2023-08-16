@@ -112,7 +112,7 @@ class item_model_override_selector extends dynamic_form {
         foreach (array_keys($models) as $model) {
             $fieldname = sprintf('override_%s', $model);
             $obj = new stdClass;
-            $obj->status = $data->{$fieldname[sprintf('%s_select', $fieldname)]};
+            $obj->status = $data->$fieldname[sprintf('%s_select', $fieldname)];
             $formitemparams[$model] = $obj;
         }
 
