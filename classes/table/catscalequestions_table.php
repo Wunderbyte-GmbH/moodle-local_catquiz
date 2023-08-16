@@ -181,7 +181,7 @@ class catscalequestions_table extends wunderbyte_table {
             case STATUS_SET_MANUALLY:
                 $bootstrapclass = 'text-success';
                 break;
-            case STATUS_SET_BY_STRATEGY:
+            case STATUS_CALCULATED:
                 $bootstrapclass = 'text-warning';
                 break;
             case STATUS_NOT_CALCULATED:

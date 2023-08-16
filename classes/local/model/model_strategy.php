@@ -24,6 +24,8 @@
 
 namespace local_catquiz\local\model;
 
+require_once($CFG->dirroot . '/local/catquiz/lib.php');
+
 use core_plugin_manager;
 use dml_exception;
 use local_catquiz\catcontext;
@@ -294,7 +296,7 @@ class model_strategy {
             if ($item === null) {
                 continue;
             }
-            $item->set_status(STATUS_SET_BY_STRATEGY);
+            $item->set_status(STATUS_CALCULATED);
             $newitemdifficulties->add($item);
         }
 
