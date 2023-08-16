@@ -50,6 +50,118 @@ abstract class model_raschmodel extends model_model implements catcalc_item_esti
     }
 
     /**
+     * Calculates the Information-Criterion Deviance (DIC) for a given item
+     * under the condition that item-parameters have been optimized for the
+     * given person abilities
+     *
+     * @param model $model
+     * @param array $person_ability
+     * @param array $k
+     * @return float
+     */
+    public function calc_dic_item($model, $personability, $k) {
+        $numberofparameters = $model::get_model_dim() - 1;
+        $result = 0;
+        foreach (arrayfilter($personability, function($var){return is_float($var);
+        }, ARRAY_FILTER_USE_KEY) as $key => $pp)
+        {
+            if (array_key_exists($key, $k)) {
+                $result += $model::log_likelihood($pp, $k[$key]);
+            }
+        }
+        return -2 * $result;
+    }
+
+    /**
+     * Calculates the Aiken Information-Criterion (AIC, Akaike 1987) for a given item
+     * under the condition that item-parameters have been optimized for the
+     * given person abilities
+     *
+     * @param model $model
+     * @param array $person_ability
+     * @param array $k
+     * @return float
+     */
+    public function calc_aic_item($model, $personability, $k) {
+        $numberofparameters = $model::get_model_dim() - 1;
+        return 2 * $numberofparameters + calc_DIC_item($model, $personability, $k);
+    }
+
+    /**
+     * Calculates the Bayes Information-Criterion (BIC, Schwarz 1978) for a given item
+     * under the condition that item-parameters have been optimized for the
+     * given person abilities
+     *
+     * @param model $model
+     * @param array $person_ability
+     * @param array $k
+     * @return float
+     */
+    public function calc_bic_item($model, $personability, $k) {
+        $numberofparameters = $model::get_model_dim() - 1;
+        $numberofcases = count(
+            array_filter($personability, function($var){return is_float($var);
+            }, ARRAY_FILTER_USE_KEY)
+        );
+        return $numberofparameters * log($numberofcases) + calc_DIC_item($model, $personability, $k);
+    }
+
+    /**
+     * Calculates the Consistent Akaike Information-Criterion (CAIC, Bozdogan 1987) for a given item
+     * under the condition that item-parameters have been optimized for the
+     * given person abilities
+     *
+     * @param model $model
+     * @param array $person_ability
+     * @param array $k
+     * @return float
+     */
+    public function calc_caic_item($model, $personability, $k) {
+        $numberofparameters = $model::get_model_dim() - 1;
+        $numberofcases = count(arrayfilter($personability, function($var){return is_float($var);
+        }, ARRAY_FILTER_USE_KEY));
+        return $numberofparameters * (log($numberofcases + 1)) + calc_DIC_item($model, $personability, $k);
+    }
+
+    /**
+     * Calculates the bias corrected Akaike Information-Criterion (AICc, Sugiura 1987) for a given item
+     * under the condition that item-parameters have been optimized for the
+     * given person abilities
+     *
+     * @param model $model
+     * @param array $person_ability
+     * @param array $k
+     * @return float
+     */
+    public function calc_aicc_item($model, $personability, $k) {
+        $numberofparameters = $model::get_model_dim() - 1;
+        $numberofcases = count(arrayfilter($personability, function($var){return is_float($var);
+        }, ARRAY_FILTER_USE_KEY));
+        if ($numberofcases - $numberofparameters - 1 = < 0) { return 0;
+        }
+        return 2 * $numberofparameters + (2 * $numberofparameters * ($numberofparameters + 1)) / ($numberofcases - $numberofparameters - 1) + calc_DIC_item($model, $personability, $k);
+    }
+
+    /**
+     * Calculates the sample size adjusted Bayes Information-Criterion (saBIC, Sclove 1987) for a given item
+     * under the condition that item-parameters have been optimized for the
+     * given person abilities
+     *
+     * @param model $model
+     * @param array $person_ability
+     * @param array $k
+     * @return float
+     */
+    public function calc_sabic_item($model, $personability, $k) {
+        $numberofparameters = $model::get_model_dim() - 1;
+        $numberofcases = count(arrayfilter($personability, function($var){return is_float($var);
+        }, ARRAY_FILTER_USE_KEY));
+        if ($numberofcases - $numberofparameters - 1 = < 0) { return 0;
+        }
+        return $numberofparameters * log(($numberofcases + 2) / 24) + calc_DIC_item($model, $personability, $k);
+    }
+
+    /**
      * Executes the model-specific code to estimate item-parameters based
      * on the given person abilities.
      *
