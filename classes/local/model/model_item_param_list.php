@@ -317,6 +317,7 @@ class model_item_param_list implements ArrayAccess, IteratorAggregate, Countable
             'componentid' => $newrecord['componentid'],
             'componentname' => $newrecord['componentname'],
             'model' => $newrecord['model'],
+            'contextid' => $newrecord['contextid'],
         ]);
         $now = time();
         $newrecord['timemodified'] = empty($newrecord['timemodified']) ? $now : $newrecord['timemodified'];

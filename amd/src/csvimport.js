@@ -50,7 +50,10 @@ export const init = () => {
         // eslint-disable-next-line no-console
         console.log(response);
 
-        dynamicForm.load({arg1: 'val1'});
+        dynamicForm.load({
+            id: response.id,
+            settingscallback: response.settingscallback,
+        });
 
         // Display errors notifications if defined.
         if (errors !== [] && errors !== undefined) {

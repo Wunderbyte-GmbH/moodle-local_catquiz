@@ -30,11 +30,11 @@ use core_component;
 use core_form\dynamic_form;
 use moodleform;
 use local_catquiz\local\csvparser;
+use local_catquiz\output\catscaledashboard;
 use moodle_url;
 use stdClass;
 use core_text;
 use csv_import_reader;
-use local_catquiz\import\csvsettings;
 
 /**
  * Dynamic form.
@@ -46,6 +46,7 @@ use local_catquiz\import\csvsettings;
 class csvimport extends dynamic_form {
 
     /**
+     *
      * {@inheritdoc}
      * @see moodleform::definition()
      */
@@ -59,6 +60,11 @@ class csvimport extends dynamic_form {
         if (isset($data->id)) {
             $mform->addElement('hidden', 'id', $data->id);
             $mform->setType('id', PARAM_INT);
+        }
+
+        if (isset($data->settingscallback)) {
+            $mform->addElement('hidden', 'settingscallback', $data->settingscallback);
+            $mform->setType('settingscallback', PARAM_TEXT); // Check which type applies here!
         }
         $mform->addElement(
             'filepicker',
@@ -97,95 +103,7 @@ class csvimport extends dynamic_form {
         $mform->addGroup($buttonarray, 'buttonar', '', ' ', false);
     }
 
-    /**
-     * Call settings class.
-     *
-     * @return object
-     *
-     */
-    public static function call_settings_class() {
-        /*
-        $columnsassociative = array(
-            'userid' => array(
-                'columnname' => get_string('id'),
-                'mandatory' => true, // If mandatory and unique are set in first column, columnname will be used as key in records array.
-                'unique' => true,
-                'format' => 'string',
-                'default' => false,
-            ),
-            'starttime' => array(
-                'mandatory' => true,
-                'format' => PARAM_INT,// If format is set to PARAM_INT parser will cast given string to integer.
-                'type' => 'date',
-            ),
-            'price' => array(
-                'mandatory' => false,
-                'format' => PARAM_INT,
-            ),
-        );
-        */
-        $columnssequential = [
-            array(
-                'name' => 'componentid',
-                // phpcs:ignore
-                // 'columnname' => get_string('id'),
-                'mandatory' => true,
-                'format' => PARAM_INT,
-                // phpcs:ignore
-                // 'transform' => fn($x) => get_string($x, 'local_catquiz'),
-            ),
-            array(
-                'name' => 'componentname',
-                'mandatory' => true,
-                'format' => 'string',
-            ),
-            array(
-                'name' => 'contextid',
-                'mandatory' => true,
-                'format' => PARAM_INT,
-                // We could set the selected cat contaxt (optional_param id) as default.
-            ),
-            array(
-                'name' => 'model',
-                'mandatory' => true,
-                'format' => 'string',
-            ),
-            array (
-                'name' => 'difficulty',
-                'mandatory' => false,
-                'format' => PARAM_FLOAT,
-            ),
-            array (
-                'name' => 'status',
-                'mandatory' => false,
-                'format' => PARAM_INT,
-                'defaultvalue' => 0,
-            ),
-            array (
-                'name' => 'discrimination',
-                'mandatory' => false,
-                'format' => PARAM_FLOAT,
-            ),
-            array (
-                'name' => 'timecreated',
-                'mandatory' => false,
-                'type' => 'date', // Will throw warning if empty or 0.
-            ),
-            array (
-                'name' => 'timemodified',
-                'mandatory' => false,
-                // phpcs:ignore
-                // 'type' => 'date', Will throw warning if empty or 0.
-            ),
-            array (
-                'name' => 'guessing',
-                'mandatory' => false,
-                'format' => PARAM_FLOAT,
-            )
-            ];
-        $settings = new csvsettings($columnssequential);
-        return $settings;
-    }
+
 
     /**
      * Get list of cvs delimiters
@@ -222,29 +140,18 @@ class csvimport extends dynamic_form {
     public function process_dynamic_submission(): array {
         $data = $this->get_data();
         $content = $this->get_file_content('csvfile');
-        $settings = $this->call_settings_class();
 
-        if (!empty($data->delimiter_name)) {
-            $settings->set_delimiter($data->delimiter_name);
-        }
-        if (!empty($data->encoding)) {
-            $settings->set_encoding($data->encoding);
-        }
-        if (!empty($data->dateparseformat)) {
-            $settings->set_dateformat($data->dateparseformat);
-        }
-        // For the callback, we need the path to the item as string.
+        $callback = $data->settingscallback;
 
-        $callbackfunction = "local_catquiz\local\model\model_item_param_list::save_or_update_testitem_in_db";
 
-        $settings->set_callback($callbackfunction);
+        $returndata = $callback($data, $content);
 
-        $parser = new fileparser($settings);
-        $data = $parser->process_csv_data($content);
+        $returndata['id'] = $data->id;
+        $returndata['settingscallback'] = $data->settingscallback;
 
-        return $data;
+        // Should return array with ['success'] == 1 in case of success.
+        return $returndata;
     }
-
 
     /**
      * Load in existing data as form defaults

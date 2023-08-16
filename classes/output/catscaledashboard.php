@@ -20,6 +20,8 @@ use context_system;
 use html_writer;
 use local_catquiz\catmodel_info;
 use local_catquiz\catquiz;
+use local_catquiz\import\csvsettings;
+use local_catquiz\import\fileparser;
 use local_catquiz\local\model\model_item_param_list;
 use local_catquiz\local\model\model_person_param_list;
 use local_catquiz\synthcat;
@@ -326,18 +328,183 @@ class catscaledashboard implements renderable, templatable {
     }
 
     /**
-     * Renders file picker
+     * Render file picker
      *
      * @return string
      *
      */
-    private function render_filepicker() {
-        $inputform = new \local_catquiz\form\csvimport();
+    private function render_testitem_importer() {
+        $ajaxformdata = [
+            'id' => 'csv_import_form',
+            'settingscallback' => 'local_catquiz\output\catscaledashboard::execute_testitems_csv_import'
+        ];
+        $inputform = new \local_catquiz\form\csvimport(null, null, 'post', '', [], true, $ajaxformdata);
+
         // Set the form data with the same method that is called when loaded from JS.
         // It should correctly set the data for the supplied arguments.
         $inputform->set_data_for_dynamic_submission();
+
         // Render the form in a specific container, there should be nothing else in the same container.
         return html_writer::div($inputform->render(), '', ['id' => 'csv_import_form']);
+    }
+
+    /**
+     * Define settings and call fileparser.
+     *
+     * @param stdClass $data ajaxdata from import form
+     * @param string $content
+     * @return array
+     *
+     */
+    public static function execute_testitems_csv_import(stdClass $data, string $content) {
+
+        $definedcolumns = self::define_testitem_columns();
+        $callback = self::get_testitem_callback();
+
+        $settings = self::define_settings(
+            $definedcolumns,
+            $callback,
+            $data->delimiter,
+            $data->encoding,
+            $data->dateformat,
+        );
+
+        $parser = new fileparser($settings);
+        return $parser->process_csv_data($content);
+    }
+
+    /**
+     * Define the method executed with records during the import.
+     *
+     * @return string
+     *
+     */
+    private function get_testitem_callback() : string {
+        // For the callback, we need the path to the item as string.
+        $callbackfunction = "local_catquiz\local\model\model_item_param_list::save_or_update_testitem_in_db";
+
+        return $callbackfunction;
+    }
+
+    /**
+     * Configure and return settings object.
+     *
+     * @return stdClass
+     */
+    private function define_settings(
+        array $definedcolumns,
+        string $callbackfunction = null,
+        string $delimiter = null,
+        string $encoding = null,
+        string $dateformat = null
+        ) {
+
+        $settings = new csvsettings($definedcolumns);
+
+        if (!empty($callbackfunction)) {
+            $settings->set_callback($callbackfunction);
+        }
+
+        if (!empty($delimiter)) {
+            $settings->set_delimiter($delimiter);
+        }
+        if (!empty($encoding)) {
+            $settings->set_encoding($encoding);
+        }
+        if (!empty($dateformat)) {
+            $settings->set_dateformat($dateformat);
+        }
+
+        return $settings;
+    }
+
+    /**
+     * Define settings for csv import form.
+     *
+     * @return array
+     *
+     */
+    private function define_testitem_columns() {
+        /*
+        $columnsassociative = array(
+            'userid' => array(
+                'columnname' => get_string('id'),
+                'mandatory' => true, // If mandatory and unique are set in first column, columnname will be used as key in records array.
+                'unique' => true,
+                'format' => 'string',
+                'default' => false,
+            ),
+            'starttime' => array(
+                'mandatory' => true,
+                'format' => PARAM_INT,// If format is set to PARAM_INT parser will cast given string to integer.
+                'type' => 'date',
+            ),
+            'price' => array(
+                'mandatory' => false,
+                'format' => PARAM_INT,
+            ),
+        );
+        */
+        $columnssequential = [
+            array(
+                'name' => 'componentid',
+                // phpcs:ignore
+                // 'columnname' => get_string('id'),
+                'mandatory' => true,
+                'format' => PARAM_INT,
+                // phpcs:ignore
+                // 'transform' => fn($x) => get_string($x, 'local_catquiz'),
+            ),
+            array(
+                'name' => 'componentname',
+                'mandatory' => true,
+                'format' => 'string',
+            ),
+            array(
+                'name' => 'contextid',
+                'mandatory' => true,
+                'format' => PARAM_INT,
+                // We could set the selected cat contaxt (optional_param id) as default.
+            ),
+            array(
+                'name' => 'model',
+                'mandatory' => true,
+                'format' => 'string',
+            ),
+            array (
+                'name' => 'difficulty',
+                'mandatory' => false,
+                'format' => PARAM_FLOAT,
+            ),
+            array (
+                'name' => 'status',
+                'mandatory' => false,
+                'format' => PARAM_INT,
+                'defaultvalue' => 0,
+            ),
+            array (
+                'name' => 'discrimination',
+                'mandatory' => false,
+                'format' => PARAM_FLOAT,
+            ),
+            array (
+                'name' => 'timecreated',
+                'mandatory' => false,
+                'type' => 'date', // Will throw warning if empty or 0.
+            ),
+            array (
+                'name' => 'timemodified',
+                'mandatory' => false,
+                // phpcs:ignore
+                // 'type' => 'date', Will throw warning if empty or 0.
+            ),
+            array (
+                'name' => 'guessing',
+                'mandatory' => false,
+                'format' => PARAM_FLOAT,
+            )
+            ];
+        return $columnssequential;
     }
 
     /**
@@ -422,7 +589,7 @@ class catscaledashboard implements renderable, templatable {
             'itemdifficulties' => $this->render_itemdifficulties($itemdifficulties),
             'personabilities' => $this->render_personabilities($personabilities),
             'contextselector' => $this->render_contextselector(),
-            'filepicker' => $this->render_filepicker(),
+            'filepicker' => $this->render_testitem_importer(),
             'table' => $testenvironmentdashboard->testenvironmenttable($this->catscaleid),
             'studentstable' => $this->render_student_stats_table($this->catscaleid, $this->catcontextid),
             'modelbutton' => $this->render_modelbutton($this->catcontextid),
