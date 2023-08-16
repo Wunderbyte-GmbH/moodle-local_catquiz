@@ -95,14 +95,14 @@ class matrixcat {
         {
             $numberofcols = count($matrix[$rowposition]);
 
-            if($matrix[$rowposition][$zeroposition] === 0) {
+            if ($matrix[$rowposition][$zeroposition] === 0) {
                 $divisor = 0.0000000001;
                 $matrix[$rowposition][$zeroposition] = 0.0000000001;
             } else {
                 $divisor = $matrix[$rowposition][$zeroposition];
             }
 
-            for($i = 0; $i < $numberofcols; $i++) {
+            for ($i = 0; $i < $numberofcols; $i++) {
                 $matrix[$rowposition][$i] = $matrix[$rowposition][$i] / $divisor;
             }
         }
@@ -124,10 +124,10 @@ class matrixcat {
     private function zerooperation(array $matrix, $rowposition, $zeroposition, $subjectrow) {
         $numberofcols = count($matrix[$rowposition]);
 
-        if($matrix[$rowposition][$zeroposition] !== 0) {
+        if ($matrix[$rowposition][$zeroposition] !== 0) {
             $numbertosubtract = $matrix[$rowposition][$zeroposition];
 
-            for($i = 0; $i < $numberofcols; $i++) {
+            for ($i = 0; $i < $numberofcols; $i++) {
                 $matrix[$rowposition][$i] = $matrix[$rowposition][$i] - $numbertosubtract * $matrix[$subjectrow][$i];
             }
         }
@@ -147,7 +147,7 @@ class matrixcat {
         $inversematrix = array();
         $matrixcount = count($matrix);
 
-        for($i = 0; $i < $matrixcount; $i++) {
+        for ($i = 0; $i < $matrixcount; $i++) {
             $inversematrix[$i] = array_slice($matrix[$i], $matrixcount);
         }
 
@@ -308,48 +308,50 @@ class matrixcat {
 
     /**
      * Adds everything correctly together regardless of given data structur (float, array, callables)
+     * param float|array|callable $summands
+     * return float|array|callable
      *
-     * @param float|array|callable $summands
-     * @return float|array|callable
+     * @param mixed $summands
+     * @return mixed
      */
     public static function multi_sum (...$summands) {
-    	// Test, if argument is given as packed array of arguments and unpack.
-    	if (is_array($summands[0])) {
-    		if (count($summands) == 1) {
-    		    // Unpack arguments.
-    			$summands = $summands[0];
-    		}
-    	}
-    	
-    	if (is_array($summands[0])) {
-    		// Check whether all sumanands are of same dimension.
-    		$summand_count = count($summands[0]);
-    		foreach ($summands as $summand)
-    		{
-    			if (count($summand) <> $summand_count) {
-    			    // Throw exception error - there should be no calculation if summand-arrays are of different length.
-    			    // console("Summanden haben unterschiedliche Dimension!");
+        // Test, if argument is given as packed array of arguments and unpack.
+        if (is_array($summands[0])) {
+            if (count($summands) == 1) {
+                // Unpack arguments.
+                $summands = $summands[0];
+            }
+        }
+        
+        if (is_array($summands[0])) {
+            // Check whether all sumanands are of same dimension.
+            $summand_count = count($summands[0]);
+            foreach ($summands as $summand)
+            {
+                if (count($summand) <> $summand_count) {
+                    // Throw exception error - there should be no calculation if summand-arrays are of different length.
+                    // console("Summanden haben unterschiedliche Dimension!");
                     return false;
-    			}
-    		}
-    	
-    		for($i = 0; $i < $summand_count; $i++) {
-    			// Call recursivly for each dimension.
-    			$new_args = array();
-    			foreach ($summands as $summand)
-    			{
-    				$new_args[] = $summand[$i];
-    			}
-    			$sum[$i] = self::multi_sum($new_args);
-    		}
-    	} else {
-    	    // If entrys are just floats, add them together. 
-    		$sum = 0;
-    		foreach ($summands as $summand) {
-    			$sum += $summand;
-    		}
-    	}
-    	return $sum;
+                }
+            }
+        
+            for($i = 0; $i < $summand_count; $i++) {
+                // Call recursivly for each dimension.
+                $new_args = array();
+                foreach ($summands as $summand)
+                {
+                    $new_args[] = $summand[$i];
+                }
+                $sum[$i] = self::multi_sum($new_args);
+            }
+        } else {
+            // If entrys are just floats, add them together.
+            $sum = 0;
+            foreach ($summands as $summand) {
+                $sum += $summand;
+            }
+        }
+        return $sum;
     }
 
     /**
@@ -361,9 +363,9 @@ class matrixcat {
     public static function build_callable_array ($fn_function) {
         return function($x) use($fn_function) {
             foreach ($fn_function as $key => $f) {
-            	$fn_function[$key] = $f($x);
+                $fn_function[$key] = $f($x);
             }
-        	return $fn_function;
+            return $fn_function;
         };
     }
 }
