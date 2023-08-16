@@ -326,7 +326,7 @@ class model_item_param_list implements ArrayAccess, IteratorAggregate, Countable
             $newrecord['timecreated'] = !empty($newrecord['timecreated']) ? $newrecord['timecreated'] : $now;
         }
 
-        $newrecord['status'] = !empty($newrecord['status']) ? $newrecord['status'] : model_item_param::STATUS_UPDATED_MANUALLY;
+        $newrecord['status'] = !empty($newrecord['status']) ? $newrecord['status'] : STATUS_UPDATED_MANUALLY;
 
         if (!$record) {
             // Make sure the record to insert has no id.
