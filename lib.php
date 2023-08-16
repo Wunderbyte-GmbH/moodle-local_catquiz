@@ -48,7 +48,7 @@ define('TESTITEM_STATUS_INACTIVE', 1);
 // Testitem model calc status.
 define('STATUS_NOT_SET', -5);
 define('STATUS_NOT_CALCULATED', 0);
-define('STATUS_SET_BY_STRATEGY', 1);
+define('STATUS_CALCULATED', 1);
 define('STATUS_UPDATED_MANUALLY', 4);
 define('STATUS_SET_MANUALLY', 5);
 

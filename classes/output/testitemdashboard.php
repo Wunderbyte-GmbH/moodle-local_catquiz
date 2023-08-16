@@ -16,6 +16,8 @@
 
 namespace local_catquiz\output;
 
+require_once($CFG->dirroot . '/local/catquiz/lib.php');
+
 use coding_exception;
 use context_system;
 use html_writer;
@@ -227,7 +229,7 @@ class testitemdashboard implements renderable, templatable {
                 return get_string('statusnotset', 'local_catquiz');
             case STATUS_NOT_CALCULATED:
                 return get_string('statusnotcalculated', 'local_catquiz');
-            case STATUS_SET_BY_STRATEGY:
+            case STATUS_CALCULATED:
                 return get_string('statussetautomatically', 'local_catquiz');
             case STATUS_SET_MANUALLY:
                 return get_string('statussetmanually', 'local_catquiz');

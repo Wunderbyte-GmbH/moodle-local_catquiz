@@ -227,7 +227,7 @@ $string['averageofallanswers'] = "Durchschnitt";
 
 $string['itemstatus_-5'] = "Manuell ausgeschlossen"; // STATUS_NOT_SET.
 $string['itemstatus_0'] = "Noch nicht berechnet"; // STATUS_NOT_CALCULATED.
-$string['itemstatus_1'] = "Berechnet"; // STATUS_SET_BY_STRATEGY.
+$string['itemstatus_1'] = "Berechnet"; // STATUS_CALCULATED.
 $string['itemstatus_4'] = "Manuell gesetzt"; // STATUS_UPDATED_MANUALLY.
 $string['itemstatus_5'] = "Manuell bestätigt"; // STATUS_SET_MANUALLY.
 

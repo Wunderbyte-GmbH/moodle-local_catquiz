@@ -67,10 +67,10 @@ class item_model_override_selector extends dynamic_form {
         $models = model_strategy::get_installed_models();
 
         $options = [
-            model_item_param::STATUS_NOT_SET => get_string('statusnotset', 'local_catquiz'),
-            model_item_param::STATUS_SET_BY_STRATEGY => get_string('statussetautomatically', 'local_catquiz'),
-            model_item_param::STATUS_SET_MANUALLY => get_string('statussetmanually', 'local_catquiz'),
-            model_item_param::STATUS_NOT_CALCULATED => get_string('statusnotcalculated', 'local_catquiz'),
+            STATUS_NOT_SET => get_string('statusnotset', 'local_catquiz'),
+            STATUS_CALCULATED => get_string('statussetautomatically', 'local_catquiz'),
+            STATUS_SET_MANUALLY => get_string('statussetmanually', 'local_catquiz'),
+            STATUS_NOT_CALCULATED => get_string('statusnotcalculated', 'local_catquiz'),
         ];
         foreach (array_keys($models) as $model) {
             $group = [];
@@ -129,7 +129,7 @@ class item_model_override_selector extends dynamic_form {
                 continue;
             }
 
-            if (intval($formitemparams[$model]->status) === model_item_param::STATUS_SET_BY_STRATEGY) {
+            if (intval($formitemparams[$model]->status) === STATUS_CALCULATED) {
                 continue;
             }
 
@@ -142,7 +142,7 @@ class item_model_override_selector extends dynamic_form {
                 // If this item did not exist in the first place and the item status is set to "not calculated", don't do anything.
                 if (
                     !array_key_exists($model, $saveditemparams)
-                    && intval($formitemparams[$model]->status) === model_item_param::STATUS_NOT_CALCULATED) {
+                    && intval($formitemparams[$model]->status) === STATUS_NOT_CALCULATED) {
                     continue;
                 }
                 $toinsert[] = [
@@ -153,18 +153,18 @@ class item_model_override_selector extends dynamic_form {
 
             // There can only be one model with this status, so we have to make
             // sure all other models that have this status are set back to 0.
-            if (intval($formitemparams[$model]->status) === model_item_param::STATUS_SET_MANUALLY) {
+            if (intval($formitemparams[$model]->status) === STATUS_SET_MANUALLY) {
                 foreach (array_keys($models) as $m) {
                     if ($m === $model) {
                         // Do not check our current model.
                         continue;
                     }
-                    if (intval($formitemparams[$m]->status) !== model_item_param::STATUS_SET_MANUALLY) {
+                    if (intval($formitemparams[$m]->status) !== STATUS_SET_MANUALLY) {
                         // Ignore models with other status.
                         continue;
                     }
                     // Reset back to 0.
-                    $defaultstatus = strval(model_item_param::STATUS_NOT_CALCULATED);
+                    $defaultstatus = strval(STATUS_NOT_CALCULATED);
                     $formitemparams[$m]->status = $defaultstatus;
                     $fieldname = sprintf('override_%s', $m);
                     $data->{$fieldname[sprintf('%s_select', $fieldname)]} = $defaultstatus;
@@ -229,7 +229,7 @@ class item_model_override_selector extends dynamic_form {
                     $data->componentname = $modelparams->componentname;
                 }
             } else { // Set default data if there are no calculated data for the given model.
-                $modelstatus = model_item_param::STATUS_NOT_CALCULATED;
+                $modelstatus = STATUS_NOT_CALCULATED;
                 $modeldifficulty = '-';
             }
             $difficultytext = sprintf(
