@@ -231,7 +231,7 @@ class model_item_param {
     ) {
         global $DB;
 
-        if (intval($newrecord->status) === self::STATUS_SET_MANUALLY) {
+        if (intval($newrecord->status) === STATUS_SET_MANUALLY) {
             // Only one model can be the selected one. Set the status of all
             // other models back to 0
             $existingitems = $DB->get_record(
@@ -239,7 +239,7 @@ class model_item_param {
                 [
                     'componentid' => $componentid,
                     'contextid' => $contextid,
-                    'status' => self::STATUS_SET_MANUALLY,
+                    'status' => STATUS_SET_MANUALLY,
                 ]
             );
             // Get item params for other models
@@ -250,7 +250,7 @@ class model_item_param {
                 }
             );
             foreach ($otheritems as $otheritem) {
-                $otheritem->status = self::STATUS_NOT_CALCULATED;
+                $otheritem->status = STATUS_NOT_CALCULATED;
                 $DB->update_record('local_catquiz_itemparams', $otheritem, true);
             }
         }
