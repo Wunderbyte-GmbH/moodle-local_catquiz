@@ -67,10 +67,16 @@ class updatepersonability extends preselect_task implements wb_middleware {
         // If we do not know the answer to the last question, we do not have to
         // update the person ability. Also, pilot questions should not be used
         // to update a student's ability.
-        if ($lastquestion === null || !empty($lastquestion->is_pilot)) {
+        if ($lastquestion === null) {
+            $context['skip_reason'] = 'lastquestionnull';
             return $next($context);
+
         }
 
+        if (!empty($lastquestion->is_pilot)) {
+            $context['skip_reason'] = 'pilotquestion';
+            return $next($context);
+        }
 
         $cachedresponses = $this->load_cached_responses();
 
@@ -90,9 +96,13 @@ class updatepersonability extends preselect_task implements wb_middleware {
         if (!$responseschanged) {
             // Nothing changed since the last question, so we do not need to
             // update the person ability.
+            $context['skip_reason'] = 'nothingchanged';
             return $next($context);
         }
 
+        if (!$this->has_sufficient_responses($userresponses)) {
+            $context['skip_reason'] = 'notenoughresponses';
+            return $next($context);
         }
 
         $itemparamlist = $this->get_item_param_list($responses, $context);
@@ -106,6 +116,7 @@ class updatepersonability extends preselect_task implements wb_middleware {
             }
             // If we already have an ability, just continue with that one and do not update it.
             // Otherwise, use 0 as default value.
+            $context['skip_reason'] = 'abilityisnan';
             if (!is_nan($context['person_ability'])) {
                 return $next($context);
             } else {
