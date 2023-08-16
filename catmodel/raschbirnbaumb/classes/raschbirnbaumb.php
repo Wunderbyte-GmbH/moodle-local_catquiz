@@ -38,26 +38,26 @@ use local_catquiz\local\model\model_raschmodel;
  */
 class raschbirnbaumb extends model_raschmodel {
 
-  // Definitions and Dimensions.
+    // Definitions and Dimensions.
 
-  /**
-   * Defines names if item parameter list
-   *
-   * @return array of string
-   */
-  public static function get_parameter_names(): array {
-    return ['difficulty', 'discrimination', ];
-  }
-  
-  /**
-   * Definition of the number of model parameters
-   *
-   * @return int
-   */
-  public static function get_model_dim(): int {
-    // Adds +1 for the person ability
-    return count(self::get_parameter_names()) + 1;
-  }
+    /**
+     * Defines names if item parameter list
+     *
+     * @return array of string
+     */
+    public static function get_parameter_names(): array {
+        return ['difficulty', 'discrimination', ];
+    }
+
+    /**
+     * Definition of the number of model parameters
+     *
+     * @return int
+     */
+    public static function get_model_dim(): int {
+        // Adds +1 for the person ability
+        return count(self::get_parameter_names()) + 1;
+    }
 
     /**
      * Get item parameters.
@@ -133,7 +133,7 @@ class raschbirnbaumb extends model_raschmodel {
      * @param float $k - answer category (0 or 1.0)
      * @return float
      */
-    public static function log_likelihood_p($pp, array $ip, float $k):float{
+    public static function log_likelihood_p($pp, array $ip, float $k):float {
         $a = $ip['difficulty'];
         $b = $ip['discrimination'];
         if ($k < 1.0) {
@@ -151,7 +151,7 @@ class raschbirnbaumb extends model_raschmodel {
      * @param float $k - answer category (0 or 1.0)
      * @return float
      */
-    public static function log_likelihood_p_p($pp, array $ip, float $k):float{
+    public static function log_likelihood_p_p($pp, array $ip, float $k):float {
         $a = $ip['difficulty'];
         $b = $ip['discrimination'];
         return -(($b ** 2 * exp($b * ($a + $pp))) / ((exp($a * $b) + exp($b * $pp)) ** 2));
@@ -280,7 +280,7 @@ class raschbirnbaumb extends model_raschmodel {
         }
         // Note: Partial derivations are exchangeible, cf. Theorem of Schwarz.
         $derivative[1][0] = $derivative[0][1];
-      
+
         return $derivative;
     }
 
@@ -298,7 +298,7 @@ class raschbirnbaumb extends model_raschmodel {
     }
 
     // Implements handling of the Trusted Regions (TR) approach.
-    
+
     /**
      * Implements a Filter Function for trusted regions in the item parameter estimation
      *
@@ -307,7 +307,7 @@ class raschbirnbaumb extends model_raschmodel {
      * @return array
      *
      */
-    public static function restrict_to_trusted_region(array $parameters):array{
+    public static function restrict_to_trusted_region(array $parameters):array {
         // Set values for difficulty parameter.
         $a = $parameters['difficulty'];
 
@@ -360,7 +360,7 @@ class raschbirnbaumb extends model_raschmodel {
      *
      * @return array
      */
-    public static function get_log_tr_jacobian():array{
+    public static function get_log_tr_jacobian():array {
         // Set values for difficulty parameter.
         $am = 0; // Mean of difficulty.
         $as = 2; // Standard derivation of difficulty.
@@ -382,7 +382,7 @@ class raschbirnbaumb extends model_raschmodel {
      *
      * @return array
      */
-    public static function get_log_tr_hessian():array{
+    public static function get_log_tr_hessian():array {
         // Set values for difficulty parameter.
         $am = 0; // Mean of difficulty.
         $as = 2; // Standard derivation of difficulty.

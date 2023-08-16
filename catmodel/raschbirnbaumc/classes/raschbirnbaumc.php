@@ -131,7 +131,7 @@ class raschbirnbaumc extends model_raschmodel {
      * @param float $k - answer category (0 or 1.0)
      * @return float
      */
-    public static function log_likelihood_p($pp, array $ip, float $k):float{
+    public static function log_likelihood_p($pp, array $ip, float $k):float {
         $a = $ip['difficulty']; $b = $ip['discrimination']; $c = $ip['guessing'];
 
         if ($k < 1.0) {
@@ -193,7 +193,7 @@ class raschbirnbaumc extends model_raschmodel {
 
         if ($k >= 1.0) {
             return [[
-                fn ($ip) => -($ip['discrimination'] ** 2 * ($ip['guessing'] - 1) * exp($ip['discrimination'] * ($ip['difficulty'] + $pp)) * ($ip['guessing'] * exp(2 * $ip['difficulty'] * $ip['discrimination']) - exp(2 * $ip['discrimination'] * $pp))) / ((exp($ip['difficulty'] * $ip['discrimination']) + exp($ip['discrimination'] * $pp)) ** 2 *($ip['guessing'] * exp($ip['difficulty'] * $ip['discrimination']) + exp($ip['discrimination'] * $pp)) ** 2), // Calculate d²/ da².
+                fn ($ip) => -($ip['discrimination'] ** 2 * ($ip['guessing'] - 1) * exp($ip['discrimination'] * ($ip['difficulty'] + $pp)) * ($ip['guessing'] * exp(2 * $ip['difficulty'] * $ip['discrimination']) - exp(2 * $ip['discrimination'] * $pp))) / ((exp($ip['difficulty'] * $ip['discrimination']) + exp($ip['discrimination'] * $pp)) ** 2 * ($ip['guessing'] * exp($ip['difficulty'] * $ip['discrimination']) + exp($ip['discrimination'] * $pp)) ** 2), // Calculate d²/ da².
                 fn ($ip) => (($ip['guessing'] - 1) * exp($ip['discrimination'] * ($ip['difficulty'] + $pp)) * (exp($ip['discrimination'] * ($ip['difficulty'] + $pp)) + exp(2 * $ip['discrimination'] * $pp) * (1 + $ip['difficulty'] * $ip['discrimination'] - $ip['discrimination'] * $pp) + $ip['guessing'] * (exp($ip['discrimination'] * ($ip['difficulty'] + $pp)) + exp(2 * $ip['difficulty'] * $ip['discrimination']) * (1 - $ip['difficulty'] * $ip['discrimination'] + $ip['discrimination'] * $pp)))) / ((exp($ip['difficulty'] * $ip['discrimination']) + exp($ip['discrimination'] * $pp)) ** 2 * ($ip['guessing'] * exp($ip['difficulty'] * $ip['discrimination']) + exp($ip['discrimination'] * $pp)) ** 2), // Calculate d/da d/db.
                 fn ($ip) => ($ip['discrimination'] * exp($ip['discrimination'] * ($ip['difficulty'] + $pp))) / ($ip['guessing'] * exp($ip['difficulty'] * $ip['discrimination']) + exp($ip['discrimination'] * $pp)) ** 2 // d/da d/dc
             ], [
@@ -218,7 +218,7 @@ class raschbirnbaumc extends model_raschmodel {
                 fn ($ip) => 0, // Calculate d/da d/dc.
                 fn ($ip) => 0, // Calculate d/db d/dc.
                 fn ($ip) => -1 / ($ip['guessing'] - 1) ** 2 // Calculate d²/dc².
-            ]];
+                ]];
         }
     }
 
@@ -266,7 +266,7 @@ class raschbirnbaumc extends model_raschmodel {
                 continue;
             }
 
-            $derivative[0] += $n[$key] * (-(2 * $b * (1 - $c) * exp($b * ($a - $pp))) / (1 + exp($b * ($a - $pp)) - $k[$key]) ** 3); // Calculate d/da.         
+            $derivative[0] += $n[$key] * (-(2 * $b * (1 - $c) * exp($b * ($a - $pp))) / (1 + exp($b * ($a - $pp)) - $k[$key]) ** 3); // Calculate d/da.
             $derivative[1] += $n[$key] * (-(2 * (1 - $c) * exp($b * ($a - $pp)) * ($c + (1 - $c) / (1 + exp($b * ($a - $pp))) - $k[$key]) * ($a - $pp)) / (1 + exp($b * ($a - $pp))) ** 2); // Calculate d/db.
             $derivative[2] += $n[$key] * 2 * (1 - 1 / (1 + exp($b * ($a - $pp)))) * ($c + (1 - $c) / (1 + exp($b * ($a - $pp))) - $k[$key]); // Calculate d/dc.
         }
@@ -283,7 +283,7 @@ class raschbirnbaumc extends model_raschmodel {
      * @return array - 1st derivative
      */
     public static function least_mean_squares_2nd_derivative_ip(array $pp, array $ip, array $k, array $n) {
-        $derivative = [[0, 0, 0],[0, 0, 0],[0, 0, 0]];
+        $derivative = [[0, 0, 0], [0, 0, 0], [0, 0, 0]];
         $a = $ip['difficulty']; $b = $ip['discrimination'];
 
         foreach ($pp as $key => $ability) {
@@ -291,10 +291,10 @@ class raschbirnbaumc extends model_raschmodel {
                 continue;
             }
 
-            $derivative[0][0]  += $n[$key] * (-(2 * $b ** 2 * (1 - $c) * exp($b * ($a - $pp)) * ((1 - $c) / (exp($b * ($a - $pp)) + 1) + $c - $k[$key])) / (exp($b * ($a - $pp)) + 1) ** 2 + (4 * $b ** 2 * (1 - $c) * exp(2 * $b * ($a - $pp)) * ((1 - $c) / (exp($b * ($a - $pp)) + 1) + $c - $k[$key])) / (exp($b * ($a - $pp)) + 1) ** 3 + (2 * $b ** 2 * (1 - $c) ** 2 * exp(2 * $b * ($a - $pp))) / (exp($b * ($a - $pp)) + 1) ** 4); // Calculate d²/da².            
+            $derivative[0][0]  += $n[$key] * (-(2 * $b ** 2 * (1 - $c) * exp($b * ($a - $pp)) * ((1 - $c) / (exp($b * ($a - $pp)) + 1) + $c - $k[$key])) / (exp($b * ($a - $pp)) + 1) ** 2 + (4 * $b ** 2 * (1 - $c) * exp(2 * $b * ($a - $pp)) * ((1 - $c) / (exp($b * ($a - $pp)) + 1) + $c - $k[$key])) / (exp($b * ($a - $pp)) + 1) ** 3 + (2 * $b ** 2 * (1 - $c) ** 2 * exp(2 * $b * ($a - $pp))) / (exp($b * ($a - $pp)) + 1) ** 4); // Calculate d²/da².
             $derivative[0][1]  += $n[$key] * (-(2 * (1 - $c) * exp($b * ($a - $pp)) * ((1 - $c) / (exp($b * ($a - $pp)) + 1) + $c - $k[$key])) / (exp($b * ($a - $pp)) + 1) ** 2 - (2 * $b * (1 - $c) * ($a - $pp) * exp($b * ($a - $pp)) * ((1 - $c) / (exp($b * ($a - $pp)) + 1) + $c - $k[$key])) / (exp($b * ($a - $pp)) + 1) ** 2 + (4 * $b * (1 - $c) * ($a - $pp) * exp(2 * $b * ($a - $pp)) * ((1 - $c) / (exp($b * ($a - $pp)) + 1) + $c - $k[$key])) / (exp($b * ($a - $pp)) + 1) ** 3 + (2 * $b * (1 - $c) ** 2 * ($a - $pp) * exp(2 * $b * ($a - $pp))) / (exp($b * ($a - $pp)) + 1) ** 4); // Calculate d/da d/db.
             $derivative[0][2]  += $n[$key] * (2 * $b * exp($b * ($a - $pp)) * ((2 * $c - $k[$key] - 1) * exp($b * ($a - $pp)) - $k[$key] + 1)) / (exp($b * ($a - $pp)) + 1) ** 3; // Calculate d/da d/dc.
-            $derivative[1][1]  += $n[$key] * (2 * ($a - $pp) * exp($b * ($a - $pp)) * ((1 - $c) / (exp($b * ($a - $pp)) + 1) + $c - $k[$key])) / (exp($b * ($a - $pp)) + 1) ** 2 - (2 * (1 - $c) * ($a - $pp) * exp($b * ($a - $pp)) * (1 - 1 / (exp($b * ($a - $pp)) + 1))) / (exp($b * ($a - $pp)) + 1) ** 2; // Calculate d²/db².          
+            $derivative[1][1]  += $n[$key] * (2 * ($a - $pp) * exp($b * ($a - $pp)) * ((1 - $c) / (exp($b * ($a - $pp)) + 1) + $c - $k[$key])) / (exp($b * ($a - $pp)) + 1) ** 2 - (2 * (1 - $c) * ($a - $pp) * exp($b * ($a - $pp)) * (1 - 1 / (exp($b * ($a - $pp)) + 1))) / (exp($b * ($a - $pp)) + 1) ** 2; // Calculate d²/db².
             $derivative[1][2]  += $n[$key] * (2 * ($a - $pp) * exp($b * ($a - $pp)) * ((2 * $c - $k[$key] - 1) * exp($b * ($a - $pp)) - $k[$key] + 1)) / (exp($b * ($a - $pp)) + 1) ** 3; // Calculate d/db d/dc.
             $derivative[2][2]  += $n[$key] * (2 * exp(2 * $a * $b)) / (exp($a * $b) + exp($b * $pp)) ** 2; // Calculate d²/dc².
         }
@@ -332,51 +332,55 @@ class raschbirnbaumc extends model_raschmodel {
         // Set values for difficulty parameter.
         $a = $ip['difficulty'];
 
-        $a_m = 0; // Mean of difficulty.
-        $a_s = 2; // Standard derivation of difficulty.
+        $am = 0; // Mean of difficulty.
+        $as = 2; // Standard derivation of difficulty.
 
         // Use 3 times of SD as range of trusted regions.
-        $a_tr = floatval(get_config('catmodel_raschbirnbaumc', 'trusted_region_factor_sd_a'));
-        $a_min = floatval(get_config('catmodel_raschbirnbaumc', 'trusted_region_min_a'));
-        $a_max = floatval(get_config('catmodel_raschbirnbaumc', 'trusted_region_max_a'));
+        $atr = floatval(get_config('catmodel_raschbirnbaumc', 'trusted_region_factor_sd_a'));
+        $amin = floatval(get_config('catmodel_raschbirnbaumc', 'trusted_region_min_a'));
+        $amax = floatval(get_config('catmodel_raschbirnbaumc', 'trusted_region_max_a'));
 
         // Set values for disrciminatory parameter.
         $b = $ip['discrimination'];
 
         // Placement of the discriminatory parameter.
-        $b_p = floatval(get_config('catmodel_raschbirnbaumc', 'trusted_region_placement_b'));
+        $bp = floatval(get_config('catmodel_raschbirnbaumc', 'trusted_region_placement_b'));
         // Slope of the discriminatory parameter.
-        $b_s = floatval(get_config('catmodel_raschbirnbaumc', 'trusted_region_slope_b'));
+        $bs = floatval(get_config('catmodel_raschbirnbaumc', 'trusted_region_slope_b'));
         // Use 5 times of placement as maximal value of trusted region.
-        $b_tr = floatval(get_config('catmodel_raschbirnbaumc', 'trusted_region_factor_max_b'));
+        $btr = floatval(get_config('catmodel_raschbirnbaumc', 'trusted_region_factor_max_b'));
 
-        $b_min = floatval(get_config('catmodel_raschbirnbaumc', 'trusted_region_min_b'));
-        $b_max = floatval(get_config('catmodel_raschbirnbaumc', 'trusted_region_max_b'));
+        $bmin = floatval(get_config('catmodel_raschbirnbaumc', 'trusted_region_min_b'));
+        $bmax = floatval(get_config('catmodel_raschbirnbaumc', 'trusted_region_max_b'));
 
         // Set values for guessing parameter.
         $c = $ip['guessing'];
 
-        $c_max = floatval(get_config('catmodel_raschbirnbaumc', 'trusted_region_max_c'));
+        $cmax = floatval(get_config('catmodel_raschbirnbaumc', 'trusted_region_max_c'));
 
         // Test TR for difficulty.
-        if (($a - $a_m) < max(-($a_tr * $a_s), $a_min)) {
-            $a = max(-($a_tr * $a_s), $a_min);
+        if (($a - $am) < max(-($atr * $as), $amin)) {
+            $a = max(-($atr * $as), $amin);
         }
-        if (($a - $a_m) > min(($a_tr * $a_s), $a_max)) {
-            $a = min(($a_tr * $a_s), $a_max);
+        if (($a - $am) > min(($atr * $as), $amax)) {
+            $a = min(($atr * $as), $amax);
         }
 
         $ip['difficulty'] = $a;
 
         // Test TR for discriminatory.
-        if ($b < $b_min) {$b = $b_min; }
-        if ($b > min(($b_tr * $b_p),$b_max)) {$b = min(($b_tr * $b_p),$b_max); }
+        if ($b < $bmin) {$b = $bmin;
+        }
+        if ($b > min(($btr * $bp), $bmax)) {$b = min(($btr * $bp), $bmax);
+        }
 
         $ip['discrimination'] = $b;
 
         // Test TR for guessing.
-        if ($c < 0) {$c = 0; }
-        if ($c > $c_max) {$c = $c_max; }
+        if ($c < 0) {$c = 0;
+        }
+        if ($c > $cmax) {$c = $cmax;
+        }
 
         $ip['guessing'] = $c;
 
@@ -390,17 +394,17 @@ class raschbirnbaumc extends model_raschmodel {
      */
     public static function get_log_tr_jacobian(): array {
         // Set values for difficulty parameter.
-        $a_m = 0; // Mean of difficulty.
-        $a_s = 2; // Standard derivation of difficulty.
+        $am = 0; // Mean of difficulty.
+        $as = 2; // Standard derivation of difficulty.
 
         // Placement of the discriminatory parameter.
-        $b_p = floatval(get_config('catmodel_raschbirnbaumc', 'trusted_region_placement_b'));
+        $bp = floatval(get_config('catmodel_raschbirnbaumc', 'trusted_region_placement_b'));
         // Slope of the discriminatory parameter.
-        $b_s = floatval(get_config('catmodel_raschbirnbaumc', 'trusted_region_slope_b'));
+        $bs = floatval(get_config('catmodel_raschbirnbaumc', 'trusted_region_slope_b'));
 
         return [
-            fn ($ip) => (($a_m - $ip['difficulty']) / ($a_s ** 2)), // Calculate d/da.
-            fn ($ip) => (-($b_s * exp($b_s * $ip['discrimination'])) / (exp($b_s * $b_p) + exp($b_s * $ip['discrimination']))), // Calculate d/db.
+            fn ($ip) => (($am - $ip['difficulty']) / ($as ** 2)), // Calculate d/da.
+            fn ($ip) => (-($bs * exp($bs * $ip['discrimination'])) / (exp($bs * $bp) + exp($bs * $ip['discrimination']))), // Calculate d/db.
             fn ($ip) => (0) // Calculate d/dc.
         ];
     }
@@ -412,21 +416,21 @@ class raschbirnbaumc extends model_raschmodel {
      */
     public static function get_log_tr_hessian(): array {
         // Set values for difficulty parameter.
-        $a_m = 0; // Mean of difficulty.
-        $a_s = 2; // Standard derivation of difficulty.
+        $am = 0; // Mean of difficulty.
+        $as = 2; // Standard derivation of difficulty.
 
         // Placement of the discriminatory parameter.
-        $b_p = floatval(get_config('catmodel_raschbirnbaumc', 'trusted_region_placement_b'));
+        $bp = floatval(get_config('catmodel_raschbirnbaumc', 'trusted_region_placement_b'));
         // Slope of the discriminatory parameter.
-        $b_s = floatval(get_config('catmodel_raschbirnbaumc', 'trusted_region_slope_b'));
+        $bs = floatval(get_config('catmodel_raschbirnbaumc', 'trusted_region_slope_b'));
 
         return [[
-            fn ($ip) => (-1/ ($a_s ** 2)), // Calculate d²/da².
+            fn ($ip) => (-1 / ($as ** 2)), // Calculate d²/da².
             fn ($ip) => (0), // Calculate d/da d/db.
             fn ($ip) => (0) // Calculate d/da d/dc.
         ], [
             fn ($ip) => (0), // The d/da d/db.
-            fn ($ip) => (-($b_s ** 2 * exp($b_s * ($b_p + $ip['discrimination']))) / (exp($b_s * $b_p) + exp($b_s * $ip['discrimination'])) ** 2), // d²/db²
+            fn ($ip) => (-($bs ** 2 * exp($bs * ($bp + $ip['discrimination']))) / (exp($bs * $bp) + exp($bs * $ip['discrimination'])) ** 2), // d²/db²
             fn ($ip) => (0) // Calculate d/db d/dc.
         ], [
             fn ($ip) => (0), // Calculate d/da d/dc.

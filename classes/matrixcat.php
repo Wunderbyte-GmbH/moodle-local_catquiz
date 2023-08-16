@@ -322,27 +322,27 @@ class matrixcat {
                 $summands = $summands[0];
             }
         }
-        
+
         if (is_array($summands[0])) {
             // Check whether all sumanands are of same dimension.
-            $summand_count = count($summands[0]);
+            $summandcount = count($summands[0]);
             foreach ($summands as $summand)
             {
-                if (count($summand) <> $summand_count) {
+                if (count($summand) <> $summandcount) {
                     // Throw exception error - there should be no calculation if summand-arrays are of different length.
                     // console("Summanden haben unterschiedliche Dimension!");
                     return false;
                 }
             }
-        
-            for($i = 0; $i < $summand_count; $i++) {
+
+            for($i = 0; $i < $summandcount; $i++) {
                 // Call recursivly for each dimension.
-                $new_args = array();
+                $newargs = array();
                 foreach ($summands as $summand)
                 {
-                    $new_args[] = $summand[$i];
+                    $newargs[] = $summand[$i];
                 }
-                $sum[$i] = self::multi_sum($new_args);
+                $sum[$i] = self::multi_sum($newargs);
             }
         } else {
             // If entrys are just floats, add them together.
@@ -360,12 +360,12 @@ class matrixcat {
      * @param array<callable> $fn_function
      * @return callable<array>
      */
-    public static function build_callable_array ($fn_function) {
-        return function($x) use($fn_function) {
-            foreach ($fn_function as $key => $f) {
-                $fn_function[$key] = $f($x);
+    public static function build_callable_array ($fnfunction) {
+        return function($x) use($fnfunction) {
+            foreach ($fnfunction as $key => $f) {
+                $fnfunction[$key] = $f($x);
             }
-            return $fn_function;
+            return $fnfunction;
         };
     }
 }
