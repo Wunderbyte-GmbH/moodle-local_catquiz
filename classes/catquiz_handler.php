@@ -507,6 +507,7 @@ class catquiz_handler {
      * @param stdClass $attemptdata
      */
     private static function get_strategy_selectcontext(stdClass $quizsettings, stdClass $attemptdata) {
+        global $USER;
         $contextcreator = info::get_contextcreator();
 
         if ($quizsettings->catquiz_includepilotquestions) {
@@ -532,6 +533,8 @@ class catquiz_handler {
             'pilot_ratio' => $pilotratio ?? 0,
             'questionsattempted' => intval($attemptdata->questionsattempted),
             'selectfirstquestion' => $quizsettings->catquiz_selectfirstquestion,
+            'skip_reason' => null,
+            'userid' => $USER->id,
         ];
         return $contextcreator->load(
             [

@@ -72,10 +72,10 @@ class updatepersonability extends preselect_task implements wb_middleware {
         }
 
 
-        $components = ($responses->as_array())[$USER->id];
         $cachedresponses = $this->load_cached_responses();
 
         $responses = $this->load_responses($context);
+        $components = ($responses->as_array())[$context['userid']];
         if (count($components) > 1) {
             throw new moodle_exception('User has answers to more than one component.');
         }
