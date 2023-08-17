@@ -123,11 +123,12 @@ class model_item_param_list implements ArrayAccess, IteratorAggregate, Countable
      *
      * @param model_item_param $itemparam
      *
-     * @return void
+     * @return self
      *
      */
     public function add(model_item_param $itemparam) {
         $this->itemparams[$itemparam->get_id()] = $itemparam;
+        return $this;
     }
 
     /**

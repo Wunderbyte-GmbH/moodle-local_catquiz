@@ -110,11 +110,13 @@ class model_person_param_list implements ArrayAccess, IteratorAggregate, Countab
      *
      * @param model_person_param $personparam
      *
-     * @return void
+     * @return self
      *
      */
     public function add(model_person_param $personparam) {
         $this->personparams[$personparam->get_id()] = $personparam;
+        return $this;
+    }
     }
 
     /**
