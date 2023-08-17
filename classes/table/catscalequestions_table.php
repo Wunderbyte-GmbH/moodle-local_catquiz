@@ -179,19 +179,19 @@ class catscalequestions_table extends wunderbyte_table {
 
         switch ($status) {
             case STATUS_SET_MANUALLY:
-                $bootstrapclass = 'text-success';
+                $bootstrapclass = STATUS_SET_MANUALLY_COLOR_CLASS;
                 break;
             case STATUS_CALCULATED:
-                $bootstrapclass = 'text-warning';
+                $bootstrapclass = STATUS_CALCULATED_COLOR_CLASS;
                 break;
             case STATUS_NOT_CALCULATED:
-                $bootstrapclass = 'text-secondary';
+                $bootstrapclass = STATUS_NOT_CALCULATED_COLOR_CLASS;
                 break;
             case STATUS_NOT_SET:
-                $bootstrapclass = 'text-danger';
+                $bootstrapclass = STATUS_NOT_SET_COLOR_CLASS;
                 break;
             case STATUS_UPDATED_MANUALLY:
-                $bootstrapclass = 'text-primary';
+                $bootstrapclass = STATUS_UPDATED_MANUALLY_COLOR_CLASS;
                 break;
         }
 

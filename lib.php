@@ -52,6 +52,12 @@ define('STATUS_CALCULATED', 1);
 define('STATUS_UPDATED_MANUALLY', 4);
 define('STATUS_SET_MANUALLY', 5);
 
+define('STATUS_NOT_SET_COLOR_CLASS', 'text-danger');
+define('STATUS_NOT_CALCULATED_COLOR_CLASS', 'text-secondary');
+define('STATUS_CALCULATED_COLOR_CLASS', 'text-warning');
+define('STATUS_UPDATED_MANUALLY_COLOR_CLASS', 'text-primary');
+define('STATUS_SET_MANUALLY_COLOR_CLASS', 'text-success');
+
 /**
  * Renders the popup Link.
  *
