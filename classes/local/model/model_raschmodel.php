@@ -49,6 +49,18 @@ abstract class model_raschmodel extends model_model implements catcalc_item_esti
         return (1 / (1 + exp($discrimination * ($itemdifficulty - $personability))));
     }
 
+    public function get_information_criterion(string $criterion, model_person_param_list $personabilities, model_item_param $itemparams, model_responses $k): float {
+        switch ($criterion) {
+            case 'aic':
+                return $this->calc_aic_item($personabilities, $itemparams, $k);
+                break;
+
+            default:
+                throw new \UnexpectedValueException("Unknown information criterium" . $criterion);
+                break;
+        }
+    }
+
     /**
      * Calculates the Information-Criterion Deviance (DIC) for a given item
      * under the condition that item-parameters have been optimized for the

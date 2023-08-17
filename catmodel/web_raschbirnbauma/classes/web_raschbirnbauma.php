@@ -25,9 +25,11 @@
 namespace catmodel_web_raschbirnbauma;
 
 use local_catquiz\catcalc_ability_estimator;
+use local_catquiz\local\model\model_item_param;
 use local_catquiz\local\model\model_item_param_list;
 use local_catquiz\local\model\model_model;
 use local_catquiz\local\model\model_person_param_list;
+use local_catquiz\local\model\model_responses;
 
 /**
  * Class web_raschbirnbauma uses a webservice to calculate the parameters.
@@ -37,6 +39,8 @@ use local_catquiz\local\model\model_person_param_list;
  * @license  http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class web_raschbirnbauma extends model_model implements catcalc_ability_estimator {
+
+    public function get_information_criterion(string $criterion, model_person_param_list $personabilities, model_item_param $itemparams, model_responses $k): float { return 0.0; }
 
 
     /**
