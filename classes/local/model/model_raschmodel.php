@@ -54,20 +54,23 @@ abstract class model_raschmodel extends model_model implements catcalc_item_esti
      * under the condition that item-parameters have been optimized for the
      * given person abilities
      *
-     * @param model $model
-     * @param array $person_ability
-     * @param array $k
+     * @param model_person_param_list $personabilities
+     * @param model_item_param $item
+     * @param model_responses $k
      * @return float
      */
-    public function calc_dic_item($model, $personability, $k) {
-        $numberofparameters = $model::get_model_dim() - 1;
+    public function calc_dic_item(model_person_param_list $personabilities, model_item_param $item, model_responses $k) {
         $result = 0;
-        foreach (arrayfilter($personability, function($var){return is_float($var);
-        }, ARRAY_FILTER_USE_KEY) as $key => $pp)
-        {
-            if (array_key_exists($key, $k)) {
-                $result += $model::log_likelihood($pp, $k[$key]);
+        foreach ($personabilities->only_valid() as $pp) {
+            $userresponse = $k->get_item_response_for_person($item->get_id(), $pp->get_id());
+            if (is_null($userresponse)) {
+                continue;
             }
+            $result += $this->log_likelihood(
+                $pp->get_ability(),
+                $item->get_params_array(),
+                $userresponse
+            );
         }
         return -2 * $result;
     }
@@ -77,14 +80,14 @@ abstract class model_raschmodel extends model_model implements catcalc_item_esti
      * under the condition that item-parameters have been optimized for the
      * given person abilities
      *
-     * @param model $model
-     * @param array $person_ability
-     * @param array $k
+     * @param model_person_param_list $personabilities
+     * @param model_item_param $item
+     * @param model_responses $k
      * @return float
      */
-    public function calc_aic_item($model, $personability, $k) {
-        $numberofparameters = $model::get_model_dim() - 1;
-        return 2 * $numberofparameters + calc_DIC_item($model, $personability, $k);
+    public function calc_aic_item($personabilities, $item, model_responses $k) {
+        $numberofparameters = $this->get_model_dim() - 1;
+        return 2 * $numberofparameters + $this->calc_dic_item($personabilities, $item, $k) ;
     }
 
     /**
@@ -92,18 +95,15 @@ abstract class model_raschmodel extends model_model implements catcalc_item_esti
      * under the condition that item-parameters have been optimized for the
      * given person abilities
      *
-     * @param model $model
-     * @param array $person_ability
-     * @param array $k
+     * @param model_person_param_list $personabilities
+     * @param model_item_param $item
+     * @param model_responses $k
      * @return float
      */
-    public function calc_bic_item($model, $personability, $k) {
-        $numberofparameters = $model::get_model_dim() - 1;
-        $numberofcases = count(
-            array_filter($personability, function($var){return is_float($var);
-            }, ARRAY_FILTER_USE_KEY)
-        );
-        return $numberofparameters * log($numberofcases) + calc_DIC_item($model, $personability, $k);
+    public function calc_bic_item(model_person_param_list $personabilities, model_item_param $item, model_responses $k) {
+        $numberofparameters = $this->get_model_dim() - 1;
+        $numberofcases = count($personabilities->only_valid());
+        return $numberofparameters * log($numberofcases) + $this->calc_dic_item($personabilities, $item, $k);
     }
 
     /**
@@ -111,16 +111,15 @@ abstract class model_raschmodel extends model_model implements catcalc_item_esti
      * under the condition that item-parameters have been optimized for the
      * given person abilities
      *
-     * @param model $model
-     * @param array $person_ability
-     * @param array $k
+     * @param model_person_param_list $personabilities
+     * @param model_item_param $item
+     * @param model_responses $k
      * @return float
      */
-    public function calc_caic_item($model, $personability, $k) {
-        $numberofparameters = $model::get_model_dim() - 1;
-        $numberofcases = count(arrayfilter($personability, function($var){return is_float($var);
-        }, ARRAY_FILTER_USE_KEY));
-        return $numberofparameters * (log($numberofcases + 1)) + calc_DIC_item($model, $personability, $k);
+    public function calc_caic_item(model_person_param_list $personabilities, model_item_param $item, model_responses $k) {
+        $numberofparameters = $this->get_model_dim() - 1;
+        $numberofcases = count($personabilities->only_valid());
+        return $numberofparameters * (log($numberofcases + 1)) + $this->calc_dic_item($personabilities, $item, $k);
     }
 
     /**
@@ -128,18 +127,21 @@ abstract class model_raschmodel extends model_model implements catcalc_item_esti
      * under the condition that item-parameters have been optimized for the
      * given person abilities
      *
-     * @param model $model
-     * @param array $person_ability
-     * @param array $k
+     * @param model_person_param_list $personabilities
+     * @param model_item_param $item
+     * @param model_responses $k
      * @return float
      */
-    public function calc_aicc_item($model, $personability, $k) {
-        $numberofparameters = $model::get_model_dim() - 1;
-        $numberofcases = count(arrayfilter($personability, function($var){return is_float($var);
-        }, ARRAY_FILTER_USE_KEY));
-        if ($numberofcases - $numberofparameters - 1 = < 0) { return 0;
+    public function calc_aicc_item(model_person_param_list $personabilities, model_item_param $item, model_responses $k) {
+        $numberofparameters = $this->get_model_dim() - 1;
+        $numberofcases = count($personabilities->only_valid());
+        if ($numberofcases - $numberofparameters - 1 <= 0) {
+            return 0;
         }
-        return 2 * $numberofparameters + (2 * $numberofparameters * ($numberofparameters + 1)) / ($numberofcases - $numberofparameters - 1) + calc_DIC_item($model, $personability, $k);
+        return 2 * $numberofparameters + (2 * $numberofparameters * ($numberofparameters + 1))
+            / ($numberofcases - $numberofparameters - 1)
+            + $this->calc_dic_item($personabilities, $item, $k)
+        ;
     }
 
     /**
@@ -147,18 +149,17 @@ abstract class model_raschmodel extends model_model implements catcalc_item_esti
      * under the condition that item-parameters have been optimized for the
      * given person abilities
      *
-     * @param model $model
-     * @param array $person_ability
-     * @param array $k
+     * @param model_person_param_list $personabilities
+     * @param model_item_param $item
+     * @param model_responses $k
      * @return float
      */
-    public function calc_sabic_item($model, $personability, $k) {
-        $numberofparameters = $model::get_model_dim() - 1;
-        $numberofcases = count(arrayfilter($personability, function($var){return is_float($var);
-        }, ARRAY_FILTER_USE_KEY));
-        if ($numberofcases - $numberofparameters - 1 = < 0) { return 0;
+    public function calc_sabic_item(model_person_param_list $personabilities, model_item_param $item, model_responses $k) {
+        $numberofparameters = $this->get_model_dim() - 1;
+        $numberofcases = count($personabilities->only_valid());
+        if ($numberofcases - $numberofparameters - 1 <= 0) { return 0;
         }
-        return $numberofparameters * log(($numberofcases + 2) / 24) + calc_DIC_item($model, $personability, $k);
+        return $numberofparameters * log(($numberofcases + 2) / 24) + $this->calc_dic_item($personabilities, $item, $k);
     }
 
     /**
