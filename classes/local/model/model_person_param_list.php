@@ -117,6 +117,14 @@ class model_person_param_list implements ArrayAccess, IteratorAggregate, Countab
         $this->personparams[$personparam->get_id()] = $personparam;
         return $this;
     }
+
+    /**
+     * Filters out NAN and unset elements
+     *
+     * @return \local_catquiz\local\model\model_person_param[]
+     */
+    public function only_valid() {
+        return array_filter($this->personparams, fn($pp) => is_float($pp->get_ability()));
     }
 
     /**
