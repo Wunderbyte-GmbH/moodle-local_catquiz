@@ -201,4 +201,11 @@ class model_responses {
         }
         return $personparamlist;
     }
+
+    public function get_item_response_for_person(int $itemid, int $personid) {
+        if (empty($this->data[$personid]['component'][$itemid])) {
+            return null;
+        }
+        return floatval($this->data[$personid]['component'][$itemid]['fraction']);
+    }
 }
