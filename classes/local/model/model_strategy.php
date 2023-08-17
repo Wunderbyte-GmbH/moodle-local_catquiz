@@ -27,8 +27,6 @@ namespace local_catquiz\local\model;
 require_once($CFG->dirroot . '/local/catquiz/lib.php');
 
 use core_plugin_manager;
-use dml_exception;
-use local_catquiz\catcontext;
 use local_catquiz\local\model\model_item_param_list;
 use MoodleQuickForm;
 
@@ -59,13 +57,6 @@ class model_strategy {
      * @var int
      */
     const MAX_ITERATIONS = 5; // TODO: get value from DB?
-
-    /**
-     * DEFAULT_MODEL
-     *
-     * @var string
-     */
-    const DEFAULT_MODEL = 'web_raschbirnbauma';
 
     /**
      * @var model_responses Contains necessary data for estimation
@@ -157,7 +148,7 @@ class model_strategy {
 
         $this->modeloverride = array_key_exists('model_override', $options)
             ? $options['model_override']
-            : self::DEFAULT_MODEL;
+            : null;
 
         return $this;
     }
@@ -213,7 +204,7 @@ class model_strategy {
                     ->estimate_item_params($personabilities);
             }
 
-            $filtereditemdifficulties = $this->select_item_model($itemdifficulties);
+            $filtereditemdifficulties = $this->select_item_model($itemdifficulties, $personabilities);
             $personabilities = $this
                 ->abilityestimator
                 ->get_person_abilities($filtereditemdifficulties);
@@ -259,45 +250,40 @@ class model_strategy {
      * @param array $itemdifficultieslists List of calculated item difficulties, one for each model
      * @return model_item_param_list A single list of item difficulties that is a combination of the input lists
      */
-    public function select_item_model(array $itemdifficultieslists): model_item_param_list {
+    public function select_item_model(array $itemdifficultieslists, model_person_param_list $personabilities): model_item_param_list {
+        global $CFG;
         $newitemdifficulties = new model_item_param_list();
         $itemids = $this->responses->get_item_ids();
+        $informationcriterium = 'aic'; // TODO set via settings
+        $answers = []; // Get from $this->responses
+        $infocriteriapermodel = [];
 
         /**
          * Select items according to the following rules:
          * 1. If there is an item-level model override, select the item from that model
-         * 2. If there is a strategy-level override, select the item from that model
-         * 3. Otherwise, select the item from the default model
-         *
-         * TODO: Remove, just for illustration:
-         * This could be defined at the DB level with the following data in the `json` field:
-         * {
-         *      "default": true, // this is the default context
-         *      "max_iterations": 10,
-         *      "overrides": {
-         *          "model": "demo",
-         *          "item": [
-         *              {"id": 1, "model": "demo2",},
-         *              {"id": 35, "model": "raschbirnbauma"}
-         *          ]
-         *      }
-         * }
+         * 2. Otherwise, use the model that maximizes the given information criterium
          */
         foreach ($itemids as $itemid) {
-            if ($model = $this->get_item_override($itemid)) {
-                $item = $itemdifficultieslists[$model][$itemid];
-            } else if ($model = $this->get_model_override()) {
-                $item = $itemdifficultieslists[$model][$itemid];
-            } else {
-                $item = $itemdifficultieslists[$this->get_default_model()][$itemid];
-            }
-
-            // If the item was filtered out by the selected model, do not add it to the list of items for the next round.
-            if ($item === null) {
+            $item = $this->select_item_from_override($itemid, $itemdifficultieslists);
+            if (! is_null($item)) {
+                $newitemdifficulties->add($item);
                 continue;
             }
-            $item->set_status(STATUS_CALCULATED);
-            $newitemdifficulties->add($item);
+            foreach ($this->models as $model) {
+                /**
+                 * @var ?model_item_param
+                 */
+                $item = $itemdifficultieslists[$model->get_model_name()][$itemid];
+                if (!$item) {
+                    continue;
+                }
+                $val = $model->get_information_criterion($informationcriterium, $personabilities, $item, $this->responses);
+                $infocriteriapermodel[$model->get_model_name()] = $val;
+                $maxmodelname = array_keys($infocriteriapermodel, max($infocriteriapermodel))[0];
+                $selecteditem = $itemdifficultieslists[$maxmodelname][$itemid];
+                $selecteditem->set_status(STATUS_CALCULATED);
+                $newitemdifficulties->add($selecteditem);
+            }
         }
 
         return $newitemdifficulties;
@@ -323,16 +309,6 @@ class model_strategy {
      */
     private function get_model_override(): ?string {
         return $this->modeloverride; // TODO implement.
-    }
-
-    /**
-     * Return default model.
-     *
-     * @return string
-     *
-     */
-    private function get_default_model(): string {
-        return self::DEFAULT_MODEL;
     }
 
     /**
@@ -406,5 +382,23 @@ class model_strategy {
             $instances[$name] = $modelclass;
         }
         return $instances;
+    }
+
+    private function select_item_from_override(int $itemid, array $itemdifficultieslists) {
+        global $CFG;
+        $item = null;
+        if ($model = $this->get_item_override($itemid)) {
+            $item = $itemdifficultieslists[$model][$itemid];
+        } else if ($model = $this->get_model_override()) {
+            $item = $itemdifficultieslists[$model][$itemid];
+        }
+
+        // If there are no data for an item override, fail with an
+        // exception in the development environment but fall back to the
+        // default select strategy in a production environment.
+        if (! is_null($model) && is_null($item) && $CFG->debug > 0) {
+            throw new \Exception("Item override to a model that has no data");
+        }
+        return $item;
     }
 }
