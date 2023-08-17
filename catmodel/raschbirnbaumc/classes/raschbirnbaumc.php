@@ -155,7 +155,7 @@ class raschbirnbaumc extends model_raschmodel {
         if ($k < 1.0) {
             return -(($b ** 2 * exp($b * ($a + $pp))) / (exp($a * $b) + exp($b * $pp)) ** 2);
         } else {
-            return ($b ** 2 * ($c - 1) * exp( $b * ($pp - $a)) * (exp(2 * $b ($pp - $a)) - $c)) / ((1 + exp($b * ( $pp - $a))) ** 2 * ($c + exp($b * ($pp - $a))) ** 2);
+            return ($b ** 2 * ($c - 1) * exp( $b * ($pp - $a)) * (exp(2 * $b * ($pp - $a)) - $c)) / ((1 + exp($b * ( $pp - $a))) ** 2 * ($c + exp($b * ($pp - $a))) ** 2);
         }
     }
 
@@ -262,13 +262,17 @@ class raschbirnbaumc extends model_raschmodel {
         $a = $ip['difficulty']; $b = $ip['discrimination']; $c = $ip['guessing'];
 
         foreach ($pp as $key => $ability) {
-            if (!(is_float($n[$key]) && is_float($k[$key]))) {
+            if (!(is_numeric($n[$key]) && is_numeric($k[$key]))) {
                 continue;
             }
 
-            $derivative[0] += $n[$key] * (-(2 * $b * (1 - $c) * exp($b * ($a - $pp))) / (1 + exp($b * ($a - $pp)) - $k[$key]) ** 3); // Calculate d/da.
-            $derivative[1] += $n[$key] * (-(2 * (1 - $c) * exp($b * ($a - $pp)) * ($c + (1 - $c) / (1 + exp($b * ($a - $pp))) - $k[$key]) * ($a - $pp)) / (1 + exp($b * ($a - $pp))) ** 2); // Calculate d/db.
-            $derivative[2] += $n[$key] * 2 * (1 - 1 / (1 + exp($b * ($a - $pp)))) * ($c + (1 - $c) / (1 + exp($b * ($a - $pp))) - $k[$key]); // Calculate d/dc.
+            $derivative[0] += $n[$key] * (-(2 * $b * (1 - $c) * exp($b * ($a - $ability)))
+                / (1 + exp($b * ($a - $ability)) - $k[$key]) ** 3); // Calculate d/da.
+            $derivative[1] += $n[$key] * (-(2 * (1 - $c) * exp($b * ($a - $ability))
+                * ($c + (1 - $c) / (1 + exp($b * ($a - $ability))) - $k[$key]) * ($a - $ability))
+                / (1 + exp($b * ($a - $ability))) ** 2); // Calculate d/db.
+            $derivative[2] += $n[$key] * 2 * (1 - 1 / (1 + exp($b * ($a - $ability)))) * ($c + (1 - $c)
+                / (1 + exp($b * ($a - $ability))) - $k[$key]); // Calculate d/dc.
         }
         return $derivative;
     }
@@ -284,19 +288,35 @@ class raschbirnbaumc extends model_raschmodel {
      */
     public static function least_mean_squares_2nd_derivative_ip(array $pp, array $ip, array $k, array $n) {
         $derivative = [[0, 0, 0], [0, 0, 0], [0, 0, 0]];
-        $a = $ip['difficulty']; $b = $ip['discrimination'];
+        $a = $ip['difficulty'];
+        $b = $ip['discrimination'];
+        $c = $ip['guessing'];
 
         foreach ($pp as $key => $ability) {
-            if (!(is_float($n[$key]) && is_float($k[$key]))) {
+            if (!(is_numeric($n[$key]) && is_numeric($k[$key]))) {
                 continue;
             }
 
-            $derivative[0][0]  += $n[$key] * (-(2 * $b ** 2 * (1 - $c) * exp($b * ($a - $pp)) * ((1 - $c) / (exp($b * ($a - $pp)) + 1) + $c - $k[$key])) / (exp($b * ($a - $pp)) + 1) ** 2 + (4 * $b ** 2 * (1 - $c) * exp(2 * $b * ($a - $pp)) * ((1 - $c) / (exp($b * ($a - $pp)) + 1) + $c - $k[$key])) / (exp($b * ($a - $pp)) + 1) ** 3 + (2 * $b ** 2 * (1 - $c) ** 2 * exp(2 * $b * ($a - $pp))) / (exp($b * ($a - $pp)) + 1) ** 4); // Calculate d²/da².
-            $derivative[0][1]  += $n[$key] * (-(2 * (1 - $c) * exp($b * ($a - $pp)) * ((1 - $c) / (exp($b * ($a - $pp)) + 1) + $c - $k[$key])) / (exp($b * ($a - $pp)) + 1) ** 2 - (2 * $b * (1 - $c) * ($a - $pp) * exp($b * ($a - $pp)) * ((1 - $c) / (exp($b * ($a - $pp)) + 1) + $c - $k[$key])) / (exp($b * ($a - $pp)) + 1) ** 2 + (4 * $b * (1 - $c) * ($a - $pp) * exp(2 * $b * ($a - $pp)) * ((1 - $c) / (exp($b * ($a - $pp)) + 1) + $c - $k[$key])) / (exp($b * ($a - $pp)) + 1) ** 3 + (2 * $b * (1 - $c) ** 2 * ($a - $pp) * exp(2 * $b * ($a - $pp))) / (exp($b * ($a - $pp)) + 1) ** 4); // Calculate d/da d/db.
-            $derivative[0][2]  += $n[$key] * (2 * $b * exp($b * ($a - $pp)) * ((2 * $c - $k[$key] - 1) * exp($b * ($a - $pp)) - $k[$key] + 1)) / (exp($b * ($a - $pp)) + 1) ** 3; // Calculate d/da d/dc.
-            $derivative[1][1]  += $n[$key] * (2 * ($a - $pp) * exp($b * ($a - $pp)) * ((1 - $c) / (exp($b * ($a - $pp)) + 1) + $c - $k[$key])) / (exp($b * ($a - $pp)) + 1) ** 2 - (2 * (1 - $c) * ($a - $pp) * exp($b * ($a - $pp)) * (1 - 1 / (exp($b * ($a - $pp)) + 1))) / (exp($b * ($a - $pp)) + 1) ** 2; // Calculate d²/db².
-            $derivative[1][2]  += $n[$key] * (2 * ($a - $pp) * exp($b * ($a - $pp)) * ((2 * $c - $k[$key] - 1) * exp($b * ($a - $pp)) - $k[$key] + 1)) / (exp($b * ($a - $pp)) + 1) ** 3; // Calculate d/db d/dc.
-            $derivative[2][2]  += $n[$key] * (2 * exp(2 * $a * $b)) / (exp($a * $b) + exp($b * $pp)) ** 2; // Calculate d²/dc².
+            $derivative[0][0]  += $n[$key] * (-(2 * $b ** 2 * (1 - $c) * exp($b * ($a - $ability)) * ((1 - $c)
+                / (exp($b * ($a - $ability)) + 1) + $c - $k[$key])) / (exp($b * ($a - $ability)) + 1) ** 2
+                + (4 * $b ** 2 * (1 - $c) * exp(2 * $b * ($a - $ability)) * ((1 - $c) / (exp($b * ($a - $ability)) + 1) + $c - $k[$key]))
+                / (exp($b * ($a - $ability)) + 1) ** 3 + (2 * $b ** 2 * (1 - $c) ** 2 * exp(2 * $b * ($a - $ability)))
+                / (exp($b * ($a - $ability)) + 1) ** 4); // Calculate d²/da².
+            $derivative[0][1]  += $n[$key] * (-(2 * (1 - $c) * exp($b * ($a - $ability)) * ((1 - $c) / (exp($b * ($a - $ability)) + 1)
+                + $c - $k[$key])) / (exp($b * ($a - $ability)) + 1) ** 2 - (2 * $b * (1 - $c) * ($a - $ability)
+                * exp($b * ($a - $ability)) * ((1 - $c) / (exp($b * ($a - $ability)) + 1) + $c - $k[$key])) / (exp($b * ($a - $ability)) + 1)
+                ** 2 + (4 * $b * (1 - $c) * ($a - $ability) * exp(2 * $b * ($a - $ability)) * ((1 - $c) / (exp($b * ($a - $ability)) + 1)
+                + $c - $k[$key])) / (exp($b * ($a - $ability)) + 1) ** 3 + (2 * $b * (1 - $c) ** 2 * ($a - $ability)
+                * exp(2 * $b * ($a - $ability))) / (exp($b * ($a - $ability)) + 1) ** 4); // Calculate d/da d/db.
+            $derivative[0][2]  += $n[$key] * (2 * $b * exp($b * ($a - $ability)) * ((2 * $c - $k[$key] - 1)
+                * exp($b * ($a - $ability)) - $k[$key] + 1)) / (exp($b * ($a - $ability)) + 1) ** 3; // Calculate d/da d/dc.
+            $derivative[1][1]  += $n[$key] * (2 * ($a - $ability) * exp($b * ($a - $ability)) * ((1 - $c)
+                / (exp($b * ($a - $ability)) + 1) + $c - $k[$key])) / (exp($b * ($a - $ability)) + 1) ** 2
+                - (2 * (1 - $c) * ($a - $ability) * exp($b * ($a - $ability)) * (1 - 1 / (exp($b * ($a - $ability)) + 1)))
+                / (exp($b * ($a - $ability)) + 1) ** 2; // Calculate d²/db².
+            $derivative[1][2]  += $n[$key] * (2 * ($a - $ability) * exp($b * ($a - $ability)) * ((2 * $c - $k[$key] - 1)
+                * exp($b * ($a - $ability)) - $k[$key] + 1)) / (exp($b * ($a - $ability)) + 1) ** 3; // Calculate d/db d/dc.
+            $derivative[2][2]  += $n[$key] * (2 * exp(2 * $a * $b)) / (exp($a * $b) + exp($b * $ability)) ** 2; // Calculate d²/dc².
         }
 
         // Note: Partial derivations are exchangeible, cf. Theorem of Schwarz.

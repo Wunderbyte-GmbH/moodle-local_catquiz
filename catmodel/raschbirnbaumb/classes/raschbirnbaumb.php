@@ -167,13 +167,21 @@ class raschbirnbaumb extends model_raschmodel {
     public static function get_log_jacobian($pp, float $k):array {
         if ($k < 1.0) {
             return [
-                fn ($ip) => ($ip['discrimination'] * exp($ip['discrimination'] * $pp)) / (exp($ip['difficulty'] * $ip['discrimination']) + exp($ip['discrimination'] * $pp)), // Calculates d/da.
-                fn ($ip) => (exp($ip['discrimination'] * $pp) * ( $ip['difficulty'] - $pp)) / (exp($ip['difficulty'] * $ip['discrimination']) + exp($ip['discrimination'] * $pp)) // Calculates d/db.
+                fn ($ip) => ($ip['discrimination'] * exp($ip['discrimination']
+                    * $pp)) / (exp($ip['difficulty'] * $ip['discrimination'])
+                    + exp($ip['discrimination'] * $pp)), // Calculates d/da.
+                fn ($ip) => (exp($ip['discrimination'] * $pp) * ( $ip['difficulty'] - $pp))
+                    / (exp($ip['difficulty'] * $ip['discrimination'])
+                    + exp($ip['discrimination'] * $pp)) // Calculates d/db.
                 ];
         } else {
             return [
-                fn ($ip) => -($ip['discrimination'] * exp( $ip['difficulty'] * $ip['discrimination'])) / (exp( $ip['difficulty'] * $ip['discrimination']) + exp($ip['discrimination'] * $pp)), // Calculates d/da.
-                fn ($ip) => (exp( $ip['difficulty'] * $ip['discrimination']) * ($pp - $ip['difficulty'])) / (exp($ip['difficulty'] * $ip['discrimination']) + exp($ip['discrimination'] * $pp)) // Calculates d/db.
+                fn ($ip) => -($ip['discrimination'] * exp( $ip['difficulty']
+                    * $ip['discrimination'])) / (exp( $ip['difficulty'] * $ip['discrimination'])
+                    + exp($ip['discrimination'] * $pp)), // Calculates d/da.
+                fn ($ip) => (exp( $ip['difficulty'] * $ip['discrimination'])
+                    * ($pp - $ip['difficulty'])) / (exp($ip['difficulty'] * $ip['discrimination'])
+                    + exp($ip['discrimination'] * $pp)) // Calculates d/db.
                 ];
         }
     }
@@ -190,19 +198,42 @@ class raschbirnbaumb extends model_raschmodel {
     public static function get_log_hessian($pp, float $itemresponse): array {
         if ($itemresponse >= 1.0) {
             return [[
-                fn ($ip) => (-($ip['discrimination'] ** 2 * exp($ip['discrimination'] * ($ip['difficulty'] + $pp))) / ((exp($ip['difficulty'] * $ip['discrimination']) + exp($ip['discrimination'] * $pp)) ** 2)), // Calculates d²/da².
-                fn ($ip) => (-(exp($ip['difficulty'] * $ip['discrimination']) * (exp($ip['difficulty'] * $ip['discrimination']) + exp($ip['discrimination'] * $pp) * (1 + $ip['discrimination'] * ($ip['difficulty'] - $pp)))) / ((exp($ip['difficulty'] * $ip['discrimination']) + exp($ip['discrimination'] * $pp)) ** 2)) // Calculates d/a d/db.
+                fn ($ip) => (-($ip['discrimination'] ** 2 * exp($ip['discrimination']
+                    * ($ip['difficulty'] + $pp))) / ((exp($ip['difficulty']
+                    * $ip['discrimination']) + exp($ip['discrimination']
+                    * $pp)) ** 2)), // Calculates d²/da².
+                fn ($ip) => (-(exp($ip['difficulty'] * $ip['discrimination'])
+                    * (exp($ip['difficulty'] * $ip['discrimination']) + exp($ip['discrimination'] * $pp)
+                    * (1 + $ip['discrimination'] * ($ip['difficulty'] - $pp))))
+                    / ((exp($ip['difficulty'] * $ip['discrimination']) + exp($ip['discrimination']
+                    * $pp)) ** 2)) // Calculates d/a d/db.
                 ], [
-                fn ($ip) => (-(exp($ip['difficulty'] * $ip['discrimination']) * (exp($ip['difficulty'] * $ip['discrimination']) + exp($ip['discrimination'] * $pp) * (1 + $ip['discrimination'] * ($ip['difficulty'] - $pp)))) / ((exp($ip['difficulty'] * $ip['discrimination']) + exp($ip['discrimination'] * $pp)) ** 2)), // Calculates d/a d/db.
-                fn ($ip) => (-(exp($ip['discrimination'] * ($ip['difficulty'] + $pp)) * ($ip['difficulty'] - $pp) ** 2) / ((exp($ip['difficulty'] * $ip['discrimination']) + exp($ip['discrimination'] * $pp)) ** 2)) // Calculates d²/db².
+                fn ($ip) => (-(exp($ip['difficulty'] * $ip['discrimination'])
+                    * (exp($ip['difficulty'] * $ip['discrimination']) + exp($ip['discrimination'] * $pp)
+                    * (1 + $ip['discrimination'] * ($ip['difficulty'] - $pp))))
+                    / ((exp($ip['difficulty'] * $ip['discrimination'])
+                    + exp($ip['discrimination'] * $pp)) ** 2)), // Calculates d/a d/db.
+                fn ($ip) => (-(exp($ip['discrimination'] * ($ip['difficulty'] + $pp))
+                    * ($ip['difficulty'] - $pp) ** 2) / ((exp($ip['difficulty'] * $ip['discrimination'])
+                    + exp($ip['discrimination'] * $pp)) ** 2)) // Calculates d²/db².
             ]];
         } else {
             return [[
-                fn ($ip) => -($ip['discrimination'] ** 2 * exp($ip['discrimination'] * ($ip['difficulty'] - $pp))) / (1 + exp($ip['discrimination'] * ($ip['difficulty'] - $pp))) ** 2, // Calculates d²/da².
-                fn ($ip) => (1 + exp($ip['discrimination'] * ($ip['difficulty'] - $pp)) * (1 + $ip['discrimination'] * ($pp - $ip['difficulty']))) / (1 + exp($ip['discrimination'] * ($ip['difficulty'] - $pp))) ** 2, // Calculates d/da d/db.
+                fn ($ip) => -($ip['discrimination'] ** 2 * exp($ip['discrimination']
+                    * ($ip['difficulty'] - $pp))) / (1 + exp($ip['discrimination']
+                    * ($ip['difficulty'] - $pp))) ** 2, // Calculates d²/da².
+                fn ($ip) => (1 + exp($ip['discrimination'] * ($ip['difficulty'] - $pp))
+                    * (1 + $ip['discrimination'] * ($pp - $ip['difficulty'])))
+                    / (1 + exp($ip['discrimination'] * ($ip['difficulty'] - $pp)))
+                    ** 2, // Calculates d/da d/db.
             ], [
-                fn ($ip) => (1 + exp($ip['discrimination'] * ($ip['difficulty'] - $pp)) * (1 + $ip['discrimination'] * ($pp - $ip['difficulty']))) / (1 + exp($ip['discrimination'] * ($ip['difficulty'] - $pp))) ** 2, // Calculates d/da d/db.
-                fn ($ip) => -(exp($ip['discrimination'] * ($ip['difficulty'] - $pp)) * ($ip['difficulty'] - $pp) ** 2) / (1 + exp($ip['discrimination'] * ($ip['difficulty'] - $pp))) ** 2 // Calculates d²/db².
+                fn ($ip) => (1 + exp($ip['discrimination'] * ($ip['difficulty'] - $pp))
+                    * (1 + $ip['discrimination'] * ($pp - $ip['difficulty'])))
+                    / (1 + exp($ip['discrimination'] * ($ip['difficulty'] - $pp)))
+                    ** 2, // Calculates d/da d/db.
+                fn ($ip) => -(exp($ip['discrimination'] * ($ip['difficulty'] - $pp))
+                    * ($ip['difficulty'] - $pp) ** 2) / (1 + exp($ip['discrimination']
+                    * ($ip['difficulty'] - $pp))) ** 2 // Calculates d²/db².
             ]];
         }
     }
@@ -247,12 +278,16 @@ class raschbirnbaumb extends model_raschmodel {
         $a = $ip['difficulty']; $b = $ip['discrimination'];
 
         foreach ($pp as $key => $ability) {
-            if (!(is_float($n[$key]) && is_float($k[$key]))) {
+            if (!(is_numeric($n[$key]) && is_numeric($k[$key]))) {
                 continue;
             }
 
-            $derivative[0] += $n[$key] * (2 * $b * exp($b * ($a - $ability)) * ($k[$key] - 1 + exp($b * ($a - $ability)) * $k[$key])) / (1 + exp($b * ($a - $ability))) ** 3; // Calculate d/da.
-            $derivative[1] += $n[$key] * (2 * exp($b * ($a - $ability)) * ($a - $ability) * ($k[$key] - 1 + exp($b * ($a - $ability)) * $k[$key])) / (1 + exp($b * ($a - $ability))) ** 3; // Calculate d/db.
+            $derivative[0] += $n[$key] * (2 * $b * exp($b * ($a - $ability))
+                * ($k[$key] - 1 + exp($b * ($a - $ability)) * $k[$key])) / (1 + exp($b
+                * ($a - $ability))) ** 3; // Calculate d/da.
+            $derivative[1] += $n[$key] * (2 * exp($b * ($a - $ability))
+                * ($a - $ability) * ($k[$key] - 1 + exp($b * ($a - $ability)) * $k[$key]))
+                / (1 + exp($b * ($a - $ability))) ** 3; // Calculate d/db.
         }
         return $derivative;
     }
@@ -271,13 +306,22 @@ class raschbirnbaumb extends model_raschmodel {
         $a = $ip['difficulty']; $b = $ip['discrimination'];
 
         foreach ($pp as $key => $ability) {
-            if (!(is_float($n[$key]) && is_float($k[$key]))) {
+            if (!(is_numeric($n[$key]) && is_numeric($k[$key]))) {
                 continue;
             }
 
-            $derivative[0][0]  += $n[$key] * (2 * $b ** 2 * exp($b ($a + $ability)) * (-exp(2 * $b * $ability) + 2 * exp($b ($a + $ability)) + (-exp(2 * $a * $b) + exp(2 * $b * $ability)) * $k[$key])) / (exp($a * $b) + exp($b * $ability)) ** 4; // Calculate d²2/da².
-            $derivative[0][1]  += $n[$key] * (2 * exp($b * ($a - $ability)) * ((1 + $a * $b - $b * $ability) * ($k[$key] - 1) - exp(2 * $b * ($a - $ability)) * ($b * ($a - $ability) - 1) * $k[$key] + exp($b * ($a - $ability)) * (2 * $a * $b - 2 * $b * $ability + 2 * $k[$key] - 1))) / (1 + exp($b * ($a - $ability))) ** 4; // Calculate d/da d/db.
-            $derivative[1][1]  += $n[$key] * (2 * exp($b * ($a + $ability)) * ($a - $ability) ** 2 * (2 * exp($b * ($a + $ability)) + (-exp(2 * $a * $b) + exp(2 * $b * $ability)) * $k[$key] - exp(2 * $b * $ability))) / (exp($a * $b) + exp($b * $ability)) ** 4; // Calculate d²/db².
+            $derivative[0][0]  += $n[$key] * (2 * $b ** 2 * exp($b * ($a + $ability))
+                * (-exp(2 * $b * $ability) + 2 * exp($b * ($a + $ability)) + (-exp(2 * $a * $b)
+                + exp(2 * $b * $ability)) * $k[$key])) / (exp($a * $b)
+                + exp($b * $ability)) ** 4; // Calculate d²2/da².
+            $derivative[0][1]  += $n[$key] * (2 * exp($b * ($a - $ability))
+                * ((1 + $a * $b - $b * $ability) * ($k[$key] - 1) - exp(2 * $b
+                * ($a - $ability)) * ($b * ($a - $ability) - 1) * $k[$key] + exp($b * ($a - $ability))
+                * (2 * $a * $b - 2 * $b * $ability + 2 * $k[$key] - 1)))
+                / (1 + exp($b * ($a - $ability))) ** 4; // Calculate d/da d/db.
+            $derivative[1][1]  += $n[$key] * (2 * exp($b * ($a + $ability))
+                * ($a - $ability) ** 2 * (2 * exp($b * ($a + $ability)) + (-exp(2 * $a * $b) + exp(2 * $b * $ability))
+                * $k[$key] - exp(2 * $b * $ability))) / (exp($a * $b) + exp($b * $ability)) ** 4; // Calculate d²/db².
         }
         // Note: Partial derivations are exchangeible, cf. Theorem of Schwarz.
         $derivative[1][0] = $derivative[0][1];

@@ -22,8 +22,9 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
- namespace catmodel_raschbirnbaumb;
+namespace catmodel_raschbirnbaumb;
 
+use catmodel_raschbirnbauma\raschbirnbauma;
 use PHPUnit\Framework\ExpectationFailedException;
 use PHPUnit\Framework\TestCase;
 use SebastianBergmann\RecursionContext\InvalidArgumentException;
@@ -79,6 +80,589 @@ class raschbirnbaumb_test extends TestCase {
 
         $this->assertEquals($expectedmatrix, $result);
     }
+
+    /**
+     * Test log_likelihood_p function.
+     * @dataProvider log_likelihood_p_provider
+     * @param float $pp
+     * @param float $k
+     * @param array $ip
+     * @param float $expected
+     * @return void
+     */
+    public function test_log_likelihood_p(float $pp, float $k, array $ip, float $expected) {
+        $result = raschbirnbaumb::log_likelihood_p($pp, $ip, $k);
+
+        // We only verify for four commas after the dot.
+        $expected = (float)sprintf("%.6f", $expected);
+        $result = (float)sprintf("%.6f", $result);
+
+        $this->assertEquals($expected, $result);
+    }
+
+    /**
+     * Test log_likelihood_p function.
+     * @dataProvider log_likelihood_p_p_provider
+     * @param float $pp
+     * @param float $k
+     * @param array $ip
+     * @param float $expected
+     * @return void
+     */
+    public function test_log_likelihood_p_p(float $pp, float $k, array $ip, float $expected) {
+        $result = raschbirnbaumb::log_likelihood_p_p($pp, $ip, $k);
+
+        // We only verify for four commas after the dot.
+        $expected = (float)sprintf("%.6f", $expected);
+        $result = (float)sprintf("%.6f", $result);
+
+        $this->assertEquals($expected, $result);
+    }
+
+    /**
+     * Test least_mean_squares_1st_derivative_ip function.
+     * @dataProvider least_mean_squares_1st_derivative_ip_provider
+     * @param array $n
+     * @param array $pp
+     * @param array $k
+     * @param array $ip
+     * @param array $expected
+     * @return void
+     */
+    public function test_least_mean_squares_1st_derivative_ip(array $n, array $pp, array $k, array $ip, array $expected) {
+
+        $result = raschbirnbaumb::least_mean_squares_1st_derivative_ip($pp, $ip, $k, $n);
+
+        $result = array_map(fn ($a) => (float)sprintf("%.6f", $a), $result);
+
+        // Limit the values.
+        $expected = array_map(fn ($a) => (float)sprintf("%.6f", $a), $expected);
+
+        $this->assertEquals($expected, $result);
+
+    }
+
+    /**
+     * Test least_mean_squares_1st_derivative_ip function.
+     * @dataProvider least_mean_squares_2nd_derivative_ip_provider
+     * @param array $n
+     * @param array $pp
+     * @param array $k
+     * @param array $ip
+     * @param array $expected
+     * @return void
+     */
+    public function test_least_mean_squares_2nd_derivative_ip(array $n, array $pp, array $k, array $ip, array $expected) {
+
+        $resultmatrix = [];
+        $result = raschbirnbaumb::least_mean_squares_2nd_derivative_ip($pp, $ip, $k, $n);
+
+        foreach ($result as $row) {
+            $resultmatrix[] = array_map(fn ($a) => (float)sprintf("%.6f", $a), $row);
+        }
+
+        // Limit the values.
+        $expectedmatrix = [];
+        foreach ($expected as $row) {
+            $expectedmatrix[] = array_map(fn ($a) => (float)sprintf("%.6f", $a), $row);
+        }
+
+        $this->assertEquals($expectedmatrix, $resultmatrix);
+
+    }
+
+    /**
+     * Provider function for least_mean_squares_1st_derivative_ip
+     * @return array
+     */
+    public function least_mean_squares_1st_derivative_ip_provider() {
+        return [
+            "testcase1" => [
+                'n' => [5],
+                'pp' => [-3],
+                'k' => [0.3],
+                'ip' => [
+                    "difficulty" => -2.5,
+                    "discrimination" => 0.7,
+                ],
+                'expected' => [-0.1924646, -0.1374747],
+            ],
+            "testcase2" => [
+                'n' => [5],
+                'pp' => [-3],
+                'k' => [0.95],
+                'ip' => [
+                    "difficulty" => -2.5,
+                    "discrimination" => 0.7,
+                ],
+                'expected' => [0.9108986, 0.6506418],
+            ],
+            "testcase3" => [
+                'n' => [27],
+                'pp' => [-2],
+                'k' => [0.3],
+                'ip' => [
+                    "difficulty" => -2.5,
+                    "discrimination" => 2.0,
+                ],
+                'expected' => [-9.153136, 2.288284],
+            ],
+            "testcase4" => [
+                'n' => [27],
+                'pp' => [-2],
+                'k' => [0.95],
+                'ip' => [
+                    "difficulty" => -2.5,
+                    "discrimination" => 2.0,
+                ],
+                'expected' => [4.649022, -1.162255],
+            ],
+            "testcase5" => [
+                'n' => [3],
+                'pp' => [0.5],
+                'k' => [0.3],
+                'ip' => [
+                    "difficulty" => 0.5,
+                    "discrimination" => 2.5,
+                ],
+                'expected' => [-0.75, 4.583566e-13],
+            ],
+            "testcase6" => [
+                'n' => [3],
+                'pp' => [0.5],
+                'k' => [0.95],
+                'ip' => [
+                    "difficulty" => 0.5,
+                    "discrimination" => 2.5,
+                ],
+                'expected' => [1.6875, -9.167132e-13],
+            ],
+            "testcase7" => [
+                'n' => [1],
+                'pp' => [1.5],
+                'k' => [0.3],
+                'ip' => [
+                    "difficulty" => -1,
+                    "discrimination" => 2,
+                ],
+                'expected' => [-0.01843658, 0.02304573],
+            ],
+            "testcase8" => [
+                'n' => [1],
+                'pp' => [1.5],
+                'k' => [0.95],
+                'ip' => [
+                    "difficulty" => -1,
+                    "discrimination" => 2,
+                ],
+                'expected' => [-0.001151634, 0.001439542],
+            ],
+            "testcase9" => [
+                'n' => [100],
+                'pp' => [3.5],
+                'k' => [0.3],
+                'ip' => [
+                    "difficulty" => 1.5,
+                    "discrimination" => 1.5,
+                ],
+                'expected' => [-8.844336, 11.792448],
+            ],
+            "testcase10" => [
+                'n' => [100],
+                'pp' => [3.5],
+                'k' => [0.95],
+                'ip' => [
+                    "difficulty" => 1.5,
+                    "discrimination" => 1.5,
+                ],
+                'expected' => [-0.03488714, 0.04651618],
+            ],
+        ];
+    }
+
+    /**
+     * Provider function for least_mean_squares_1st_derivative_ip
+     * @return array
+     */
+    public function least_mean_squares_2nd_derivative_ip_provider() {
+        return [
+            "testcase1" => [
+                'n' => [5],
+                'pp' => [-3],
+                'k' => [0.3],
+                'ip' => [
+                    "difficulty" => -2.5,
+                    "discrimination" => 0.7,
+                ],
+                'expected' => [
+                    [0.31148358, -0.05246115],
+                    [-0.05246115, 0.15892019],
+                ],
+            ],
+            "testcase2" => [
+                'n' => [5],
+                'pp' => [-3],
+                'k' => [0.95],
+                'ip' => [
+                    "difficulty" => -2.5,
+                    "discrimination" => 0.7,
+                ],
+                'expected' => [
+                    [0.1776847, 1.42820128],
+                    [1.4282013, 0.09065545],
+                ],
+            ],
+            "testcase1" => [
+                'n' => [5],
+                'pp' => [-3],
+                'k' => [0.3],
+                'ip' => [
+                    "difficulty" => -2.5,
+                    "discrimination" => 0.7,
+                ],
+                'expected' => [
+                    [0.31148358, -0.05246115],
+                    [-0.05246115, 0.15892019],
+                ],
+            ],
+            "testcase2" => [
+                'n' => [5],
+                'pp' => [-3],
+                'k' => [0.95],
+                'ip' => [
+                    "difficulty" => -2.5,
+                    "discrimination" => 0.7,
+                ],
+                'expected' => [
+                    [0.1776847, 1.42820128],
+                    [1.4282013, 0.09065545],
+                ],
+            ],
+            "testcase3" => [
+                'n' => [27],
+                'pp' => [-2],
+                'k' => [0.3],
+                'ip' => [
+                    "difficulty" => -2.5,
+                    "discrimination" => 2.0,
+                ],
+                'expected' => [
+                    [-0.109892, -4.54909505],
+                    [-4.549095, -0.00686825],
+                ],
+            ],
+            "testcase4" => [
+                'n' => [27],
+                'pp' => [-2],
+                'k' => [0.95],
+                'ip' => [
+                    "difficulty" => -2.5,
+                    "discrimination" => 2.0,
+                ],
+                'expected' => [
+                    [12.6465358, -0.8371231],
+                    [-0.8371231, 0.7904085],
+                ],
+            ],
+            "testcase5" => [
+                'n' => [3],
+                'pp' => [0.5],
+                'k' => [0.3],
+                'ip' => [
+                    "difficulty" => 0.5,
+                    "discrimination" => 2.5,
+                ],
+                'expected' => [
+                    [2.34375, -0.30000],
+                    [-0.30000, 1.833426e-13],
+                ],
+            ],
+            "testcase6" => [
+                'n' => [3],
+                'pp' => [0.5],
+                'k' => [0.95],
+                'ip' => [
+                    "difficulty" => 0.5,
+                    "discrimination" => 2.5,
+                ],
+                'expected' => [
+                    [2.34375, 0.67500],
+                    [0.67500, -1.833426e-12],
+                ],
+            ],
+            "testcase7" => [
+                'n' => [1],
+                'pp' => [1.5],
+                'k' => [0.3],
+                'ip' => [
+                    "difficulty" => -1,
+                    "discrimination" => 2,
+                ],
+                'expected' => [
+                    [-0.03602602, 0.03581423],
+                    [0.03581423, -0.05629065],
+                ],
+            ],
+            "testcase8" => [
+                'n' => [1],
+                'pp' => [1.5],
+                'k' => [0.95],
+                'ip' => [
+                    "difficulty" => -1,
+                    "discrimination" => 2,
+                ],
+                'expected' => [
+                    [-0.001918863, 0.001822762],
+                    [0.001822762, -0.002998223],
+                ],
+            ],
+            "testcase9" => [
+                'n' => [100],
+                'pp' => [3.5],
+                'k' => [0.3],
+                'ip' => [
+                    "difficulty" => 1.5,
+                    "discrimination" => 1.5,
+                ],
+                'expected' => [
+                    [-11.089734, 8.890088],
+                    [8.890088, -19.715082],
+                ],
+            ],
+            "testcase10" => [
+                'n' => [100],
+                'pp' => [3.5],
+                'k' => [0.95],
+                'ip' => [
+                    "difficulty" => 1.5,
+                    "discrimination" => 1.5,
+                ],
+                'expected' => [
+                    [0.8710517, -1.184660],
+                    [-1.1846604, 1.548536],
+                ],
+            ],
+        ];
+    }
+
+    /**
+     * Provider function for log_likelihood_p
+     * @return array
+     */
+    public function log_likelihood_p_provider() {
+        return [
+            "testcase1" => [
+                'pp' => -3,
+                'k' => 1,
+                'ip' => [
+                    "difficulty" => -2.5,
+                    "discrimination" => 0.7,
+                    "guessing" => 0.15,
+                ],
+                'expected' => 0.4106323,
+            ],
+            "testcase2" => [
+                'pp' => -3,
+                'k' => 0,
+                'ip' => [
+                    "difficulty" => -2.5,
+                    "discrimination" => 0.7,
+                    "guessing" => 0.15,
+                ],
+                'expected' => -0.2893677,
+            ],
+            "testcase3" => [
+                'pp' => -2,
+                'k' => 1,
+                'ip' => [
+                    "difficulty" => -2.5,
+                    "discrimination" => 2.0,
+                    "guessing" => 0.25,
+                ],
+                'expected' => 0.5378828,
+            ],
+            "testcase4" => [
+                'pp' => -2,
+                'k' => 0,
+                'ip' => [
+                    "difficulty" => -2.5,
+                    "discrimination" => 2.0,
+                    "guessing" => 0.25,
+                ],
+                'expected' => -1.462117,
+            ],
+            "testcase5" => [
+                'pp' => 0.5,
+                'k' => 1,
+                'ip' => [
+                    "difficulty" => 0.5,
+                    "discrimination" => 2.5,
+                    "guessing" => 0.35,
+                ],
+                'expected' => 1.25,
+            ],
+            "testcase6" => [
+                'pp' => 0.5,
+                'k' => 0,
+                'ip' => [
+                    "difficulty" => 0.5,
+                    "discrimination" => 2.5,
+                    "guessing" => 0.35,
+                ],
+                'expected' => -1.25,
+            ],
+            "testcase7" => [
+                'pp' => 1.5,
+                'k' => 1,
+                'ip' => [
+                    "difficulty" => -1.0,
+                    "discrimination" => 2.0,
+                    "guessing" => 0.05,
+                ],
+                'expected' => 0.0133857,
+            ],
+            "testcase8" => [
+                'pp' => 1.5,
+                'k' => 0,
+                'ip' => [
+                    "difficulty" => -1.0,
+                    "discrimination" => 2.0,
+                    "guessing" => 0.05,
+                ],
+                'expected' => -1.986614,
+            ],
+            "testcase9" => [
+                'pp' => 3.5,
+                'k' => 1,
+                'ip' => [
+                    "difficulty" => 1.5,
+                    "discrimination" => 1.5,
+                    "guessing" => 0.25,
+                ],
+                'expected' => 0.07113881,
+            ],
+            "testcase10" => [
+                'pp' => 3.5,
+                'k' => 0,
+                'ip' => [
+                    "difficulty" => 1.5,
+                    "discrimination" => 1.5,
+                    "guessing" => 0.25,
+                ],
+                'expected' => -1.428861,
+            ],
+        ];
+    }
+
+    /**
+     * Provider function log_likelihood_p_p_provider
+     * @return array
+     */
+    public function log_likelihood_p_p_provider() {
+        return [
+            "testcase1" => [
+                'pp' => -3,
+                'k' => 1,
+                'ip' => [
+                    "difficulty" => -2.5,
+                    "discrimination" => 0.7,
+                    "guessing" => 0.15,
+                ],
+                'expected' => -0.1188237,
+            ],
+            "testcase2" => [
+                'pp' => -3,
+                'k' => 0,
+                'ip' => [
+                    "difficulty" => -2.5,
+                    "discrimination" => 0.7,
+                    "guessing" => 0.15,
+                ],
+                'expected' => -0.1188237,
+            ],
+            "testcase3" => [
+                'pp' => -2,
+                'k' => 1,
+                'ip' => [
+                    "difficulty" => -2.5,
+                    "discrimination" => 2.0,
+                    "guessing" => 0.25,
+                ],
+                'expected' => -0.7864477,
+            ],
+            "testcase4" => [
+                'pp' => -2,
+                'k' => 0,
+                'ip' => [
+                    "difficulty" => -2.5,
+                    "discrimination" => 2.0,
+                    "guessing" => 0.25,
+                ],
+                'expected' => -0.7864477,
+            ],
+            "testcase5" => [
+                'pp' => 0.5,
+                'k' => 1,
+                'ip' => [
+                    "difficulty" => 0.5,
+                    "discrimination" => 2.5,
+                    "guessing" => 0.35,
+                ],
+                'expected' => -1.5625,
+            ],
+            "testcase6" => [
+                'pp' => 0.5,
+                'k' => 0,
+                'ip' => [
+                    "difficulty" => 0.5,
+                    "discrimination" => 2.5,
+                    "guessing" => 0.35,
+                ],
+                'expected' => -1.5625,
+            ],
+            "testcase7" => [
+                'pp' => 1.5,
+                'k' => 1,
+                'ip' => [
+                    "difficulty" => -1.0,
+                    "discrimination" => 2.0,
+                    "guessing" => 0.05,
+                ],
+                'expected' => -0.02659223,
+            ],
+            "testcase8" => [
+                'pp' => 1.5,
+                'k' => 0,
+                'ip' => [
+                    "difficulty" => -1.0,
+                    "discrimination" => 2.0,
+                    "guessing" => 0.05,
+                ],
+                'expected' => -0.02659222,
+            ],
+            "testcase9" => [
+                'pp' => 3.5,
+                'k' => 1,
+                'ip' => [
+                    "difficulty" => 1.5,
+                    "discrimination" => 1.5,
+                    "guessing" => 0.25,
+                ],
+                'expected' => -0.101647,
+            ],
+            "testcase10" => [
+                'pp' => 3.5,
+                'k' => 0,
+                'ip' => [
+                    "difficulty" => 1.5,
+                    "discrimination" => 1.5,
+                    "guessing" => 0.25,
+                ],
+                'expected' => -0.101647,
+            ],
+        ];
+    }
+
 
     /**
      * Return Data for log jacobian test

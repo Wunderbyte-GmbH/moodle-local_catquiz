@@ -38,6 +38,7 @@ use local_catquiz\local\model\model_raschmodel;
  */
 class raschbirnbauma extends model_raschmodel {
 
+
     // Definitions and Dimensions.
 
     /**
@@ -109,7 +110,6 @@ class raschbirnbauma extends model_raschmodel {
             return 1 / (1 + exp($a - $pp));
         }
     }
-
     // Calculate the LOG Likelihood and its derivatives.
 
     /**
@@ -222,21 +222,18 @@ class raschbirnbauma extends model_raschmodel {
      * @return array - 1st derivative
      */
     public static function least_mean_squares_1st_derivative_ip(array $pp, array $ip, array $k, array $n): array {
-        $derivative = [0];
+        $derivative = 0;
         $a = $ip['difficulty'];
-        $b = $ip['discrimination'];
-        $c = $ip['guessing'];
 
         foreach ($pp as $key => $ability) {
-            if (!(is_float($n[$key]) && is_float($k[$key]))) {
+            if (!(is_numeric($n[$key]) && is_numeric($k[$key]))) {
                 continue;
             }
 
-            // Calculate d/da.
-            $derivative[0] += $n[$key] * (2 * exp($a + $ability) * (exp($a) * $k[$key] + exp($ability) * ($k[$key]) - 1))
-                                / (exp($a) + exp($ability)) ** 3;
+            $derivative += $n[$key] * (2 * exp($a + $ability) * (exp($a)
+                * $k[$key] + exp($ability) * ($k[$key]) - 1)) / (exp($a) + exp($ability)) ** 3; // Calculate d/da.
         }
-        return $derivative;
+        return [$derivative];
     }
 
     /**
@@ -251,16 +248,15 @@ class raschbirnbauma extends model_raschmodel {
     public static function least_mean_squares_2nd_derivative_ip(array $pp, array $ip, array $k, array $n): array {
         $derivative = [[0]];
         $a = $ip['difficulty'];
-        $b = $ip['discrimination'];
 
         foreach ($pp as $key => $ability) {
-            if (!(is_float($n[$key]) && is_float($k[$key]))) {
+            if (!(is_numeric($n[$key]) && is_numeric($k[$key]))) {
                 continue;
             }
 
             // Calculate d²/da².
             $derivative[0][0]  += $n[$key] * (2 * exp($a + $ability) *
-                                (2 * exp($a + $ability) + exp(2 * $pp) * (-1 + $k[$key]) - exp(2 * $a) * $k[$key]))
+                                (2 * exp($a + $ability) + exp(2 * $ability) * (-1 + $k[$key]) - exp(2 * $a) * $k[$key]))
                                 / (exp($a) + exp($ability)) ** 4;
         }
         return $derivative;
