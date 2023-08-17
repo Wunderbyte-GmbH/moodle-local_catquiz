@@ -289,11 +289,61 @@ class testitemdashboard implements renderable, templatable {
 
         $title = get_string('general', 'core');
 
+        // We are displaying two types of status.
+        // Information about model status...
+        switch ($record->status) {
+            case STATUS_NOT_SET:
+                $modelstatus = get_string('statusnotset', 'local_catquiz');
+                $statuscircleclass = STATUS_NOT_SET_COLOR_CLASS;
+                break;
+            case STATUS_NOT_CALCULATED:
+                $modelstatus = get_string('statusnotcalculated', 'local_catquiz');
+                $statuscircleclass = STATUS_NOT_CALCULATED_COLOR_CLASS;
+                break;
+            case STATUS_CALCULATED:
+                $modelstatus = get_string('statussetautomatically', 'local_catquiz');
+                $statuscircleclass = STATUS_CALCULATED_COLOR_CLASS;
+                break;
+            case STATUS_SET_MANUALLY:
+                $modelstatus = get_string('statussetmanually', 'local_catquiz');
+                $statuscircleclass = STATUS_SET_MANUALLY_COLOR_CLASS;
+                break;
+        }
+        // Information about activity status...
+        switch ($record->testitemstatus) {
+            case TESTITEM_STATUS_ACTIVE:
+                $closedeye = '';
+                $testitemstatus = get_string('active', 'core');
+                break;
+            case TESTITEM_STATUS_INACTIVE:
+                $closedeye = '-slash';
+                $testitemstatus = get_string('inactive', 'core');
+                break;
+        }
+        // Render the icons according to status
+        $circle = html_writer::tag('i', "", [
+            "class" => "fa fa-circle $statuscircleclass",
+            "id" => "status circle ".$record->id]);
+
+        $eye = html_writer::tag('i', "", [
+            "class" => "fa fa-eye$closedeye",
+            "id" => "status activity eye ".$record->id]);
+
+        // Join strings for status display
+        $status = " ($testitemstatus, $modelstatus)";
+
+        // Use localization for status
+
+
+        // TODO: label, auge (zum anklicken) und verändern
+
         $body['id'] = $record->id;
         $body['type'] = $record->qtype;
-        $body['status'] = $record->status;
+        $body['status'] = $status;
         $body['model'] = $record->model;
         $body['attempts'] = $record->attempts;
+        $body['eye'] = $eye;
+        $body['statuscircle'] = $circle;
 
         return [
             'title' => $title,
