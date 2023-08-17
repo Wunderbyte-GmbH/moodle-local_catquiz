@@ -332,13 +332,13 @@ class testitemdashboard implements renderable, templatable {
         // Join strings for status display
         $status = " ($testitemstatus, $modelstatus)";
 
-        // Use localization for status
-
+        // Use localization for type
+        $type = get_string('pluginname', 'qtype_' . $record->qtype);
 
         // TODO: label, auge (zum anklicken) und verändern
 
         $body['id'] = $record->id;
-        $body['type'] = $record->qtype;
+        $body['type'] = $type;
         $body['status'] = $status;
         $body['model'] = $record->model;
         $body['attempts'] = $record->attempts;
