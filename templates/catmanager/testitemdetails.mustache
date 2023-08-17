@@ -25,6 +25,9 @@
 }}
 
 {{#testitemdetails}}
+    {{#backtotablelink}}
+        <button id="backtotablelink" class='btn {{class}}' type={{type}}>{{label}}</button>
+    {{/backtotablelink}}
     <div id="detailview">
         {{>local_catquiz/catmanager/questiondetailscard}}
     </div>
@@ -37,3 +40,9 @@
         {{>local_catquiz/tabs/tab_testitemstats}}
     </div>
 {{/testitemdetails}}
+
+{{#js}}
+    require(['local_catquiz/backbutton'], function(init) {
+        init.init();
+    });
+{{/js}}

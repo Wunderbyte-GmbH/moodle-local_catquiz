@@ -282,6 +282,7 @@ $string['toggleactivity'] = 'Aktivitätsstatus';
 
 // Testitem Detail View
 $string['questionpreview'] = 'Fragevorschau';
+$string['backtotable'] = 'Zurück zur Testitems Tabelle';
 
 // CAT Quiz handler
 $string['noremainingquestions'] = "Keine weiteren Fragen";

@@ -346,6 +346,23 @@ class testitemdashboard implements renderable, templatable {
     }
 
     /**
+     * Renders button to get back to testitem overview table.
+     *
+     * @return string
+     *
+     */
+    private function get_back_to_table_button() {
+
+        $label = get_string('backtotable', 'local_catquiz');
+
+        return [
+            'label' => $label,
+            'type' => 'button',
+            'class' => "btn-link",
+        ];
+    }
+
+    /**
      * Export for template.
      *
      * @param \renderer_base $output
@@ -375,6 +392,7 @@ class testitemdashboard implements renderable, templatable {
     public function return_as_array(): array {
 
         $data = [
+            'backtotablelink' => $this->get_back_to_table_button(),
             'detailview' => $this->get_detail_data(),
             'models' => $this->render_modelcards(),
             'statcards' => $this->get_testitems_stats_data(),
