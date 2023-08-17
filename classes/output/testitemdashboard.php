@@ -17,6 +17,7 @@
 namespace local_catquiz\output;
 
 require_once($CFG->dirroot . '/local/catquiz/lib.php');
+require_once($CFG->libdir . '/questionlib.php');
 
 use coding_exception;
 use context_system;
@@ -29,6 +30,10 @@ use local_catquiz\local\model\model_raschmodel;
 use local_catquiz\local\model\model_strategy;
 use local_catquiz\table\testitems_table;
 use moodle_url;
+use qbank_previewquestion\question_preview_options;
+use question_bank;
+use question_display_options;
+use question_engine;
 use templatable;
 use renderable;
 
@@ -265,7 +270,11 @@ class testitemdashboard implements renderable, templatable {
 
         // Output for testitem details card.
         $detailcardoutput = $this->render_detailcard_of_testitem($record); // Return array.
-        return $detailcardoutput;
+        $questionpreviewoutput = $this->render_questionpreview($record); // Return array.
+        return [
+            'detailcard' => $detailcardoutput,
+            'questionpreview' => $questionpreviewoutput,
+        ];
     }
 
     /**
@@ -289,6 +298,50 @@ class testitemdashboard implements renderable, templatable {
         return [
             'title' => $title,
             'body' => $body,
+        ];
+    }
+
+    /**
+     * Renders preview of testitem (question).
+     *
+     * @param object $record
+     *
+     * @return array
+     *
+     */
+    private function render_questionpreview(object $record) {
+
+        $title = get_string('questionpreview', 'local_catquiz');
+
+        $id = $record->id;
+        $question = question_bank::load_question($id);
+
+        $quba = question_engine::make_questions_usage_by_activity(
+            'local_catquiz', context_system::instance());
+
+        $options = new question_preview_options($question);
+        $options->feedback = question_display_options::HIDDEN;
+        $options->generalfeedback = question_display_options::HIDDEN;
+        $options->flags = question_display_options::HIDDEN;
+        $options->numpartscorrect = question_display_options::HIDDEN;
+        $options->generalfeedback = question_display_options::HIDDEN;
+        $options->rightanswer = question_display_options::HIDDEN;
+        $options->manualcomment = question_display_options::HIDDEN;
+        $options->history = question_display_options::HIDDEN;
+        $options->marks = question_display_options::HIDDEN;
+        $options->readonly = false; // User can choose options. Set false for display only.
+        $quba->set_preferred_behaviour($options->behaviour);
+        $quba->add_question($question);
+
+        $slot = $quba->add_question($question, $options->maxmark);
+
+        $quba->start_all_questions();
+
+        $previewdata['question'] = $quba->render_question($slot, $options);
+
+        return [
+            'title' => $title,
+            'body' => $previewdata,
         ];
     }
 

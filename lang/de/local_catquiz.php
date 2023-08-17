@@ -280,6 +280,9 @@ $string['genericsubmit'] = 'Bestätigen';
 $string['confirmactivitychange'] = 'Sie sind dabei den Aktivitätsstatus des folgenden Elements zu ändern: <br> "{$a->data}"';
 $string['toggleactivity'] = 'Aktivitätsstatus';
 
+// Testitem Detail View
+$string['questionpreview'] = 'Fragevorschau';
+
 // CAT Quiz handler
 $string['noremainingquestions'] = "Keine weiteren Fragen";
 $string['errorfetchnextquestion'] = "Es trat ein Fehler bei der Auswahl der nächsten Frage auf.";

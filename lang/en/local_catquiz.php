@@ -285,6 +285,9 @@ $string['genericsubmit'] = 'Confirm';
 $string['deletedatatitle'] = 'Delete';
 $string['toggleactivity'] = 'Activity status';
 
+// Testitem Detail View
+$string['questionpreview'] = 'Question preview';
+
 // CAT Quiz handler
 $string['noremainingquestions'] = "You ran out of questions";
 $string['errorfetchnextquestion'] = "There was an error while selecting the next question";
