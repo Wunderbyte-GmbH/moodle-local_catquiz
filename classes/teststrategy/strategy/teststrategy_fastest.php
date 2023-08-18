@@ -28,6 +28,7 @@ use local_catquiz\teststrategy\preselect_task\firstquestionselector;
 use local_catquiz\teststrategy\preselect_task\fisherinformation;
 use local_catquiz\teststrategy\preselect_task\lasttimeplayedpenalty;
 use local_catquiz\teststrategy\preselect_task\maximumquestionscheck;
+use local_catquiz\teststrategy\preselect_task\mayberemovescale;
 use local_catquiz\teststrategy\preselect_task\noremainingquestions;
 use local_catquiz\teststrategy\preselect_task\numberofgeneralattempts;
 use local_catquiz\teststrategy\preselect_task\remove_uncalculated;
@@ -60,9 +61,10 @@ class teststrategy_fastest extends strategy {
     public function requires_score_modifiers(): array {
         return [
             maximumquestionscheck::class,
+            noremainingquestions::class,
+            mayberemovescale::class,
             firstquestionselector::class,
             updatepersonability::class,
-            noremainingquestions::class,
             remove_uncalculated::class,
             lasttimeplayedpenalty::class,
             numberofgeneralattempts::class,

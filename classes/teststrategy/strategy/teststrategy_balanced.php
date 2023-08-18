@@ -28,6 +28,7 @@ use cache;
 use local_catquiz\teststrategy\preselect_task\lasttimeplayedpenalty;
 use local_catquiz\teststrategy\preselect_task\maximumquestionscheck;
 use local_catquiz\teststrategy\preselect_task\maybe_return_pilot;
+use local_catquiz\teststrategy\preselect_task\mayberemovescale;
 use local_catquiz\teststrategy\preselect_task\noremainingquestions;
 use local_catquiz\teststrategy\preselect_task\numberofgeneralattempts;
 use local_catquiz\teststrategy\preselect_task\strategybalancedscore;
@@ -59,6 +60,7 @@ class teststrategy_balanced extends strategy {
         return [
             maximumquestionscheck::class,
             updatepersonability::class,
+            mayberemovescale::class,
             noremainingquestions::class,
             lasttimeplayedpenalty::class,
             numberofgeneralattempts::class,
