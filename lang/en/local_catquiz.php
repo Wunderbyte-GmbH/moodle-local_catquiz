@@ -288,6 +288,7 @@ $string['toggleactivity'] = 'Activity status';
 // Testitem Detail View
 $string['questionpreview'] = 'Question preview';
 $string['backtotable'] = 'Back to testitems table';
+$string['local_catquiz_toggle_testitemstatus_message'] = 'Testitem status was updated';
 
 // CAT Quiz handler
 $string['noremainingquestions'] = "You ran out of questions";

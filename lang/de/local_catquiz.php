@@ -283,6 +283,7 @@ $string['toggleactivity'] = 'Aktivitätsstatus';
 // Testitem Detail View
 $string['questionpreview'] = 'Fragevorschau';
 $string['backtotable'] = 'Zurück zur Testitems Tabelle';
+$string['local_catquiz_toggle_testitemstatus_message'] = 'Status des Elements wurde aktualisiert';
 
 // CAT Quiz handler
 $string['noremainingquestions'] = "Keine weiteren Fragen";

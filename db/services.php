@@ -78,7 +78,7 @@ $functions = array(
         'local_catquiz_get_next_question' => array(
                 'classname' => 'local_catquiz\external\get_next_question',
                 'classpath' => '',
-                'description' => 'Receive a new question id within astarted attempt.',
+                'description' => 'Receive a new question id within a started attempt.',
                 'type' => 'write',
                 'capabilities' => '',
                 'ajax' => 1,
@@ -96,5 +96,13 @@ $functions = array(
                 'description' => 'Updates the item parameters',
                 'type' => 'write',
                 'ajax' => 1,
+        ),
+        'local_catquiz_execute_action' => array(
+                'classname' => 'local_catquiz\external\execute_action',
+                'description' => 'Executes an action button',
+                'type' => 'write',
+                'capabilities' => '',
+                'ajax' => true,
+                'loginrequired' => true
         ),
 );

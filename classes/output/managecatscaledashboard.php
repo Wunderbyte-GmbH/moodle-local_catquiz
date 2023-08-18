@@ -127,7 +127,7 @@ class managecatscaledashboard implements renderable, templatable {
         if (!empty($this->catscaleid)
             && !empty($this->testitemid)
             && !empty($this->contextid)) {
-                $testitemdashboard = new testitemdashboard($this->testitemid, $this->contextid, $this->catscaleid);
+                $testitemdashboard = new testitemdashboard($this->testitemid, $this->contextid, $this->catscaleid, $this->componentname);
                 $this->testitemdashboardarray = $testitemdashboard->return_as_array();
         }
 
@@ -154,6 +154,10 @@ class managecatscaledashboard implements renderable, templatable {
             'questionsdisplay' => $this->questionsdisplayarray,
             'catscalestats' => $this->catscalestatsarray,
             'testitemdetails' => $this->testitemdashboardarray,
+            'testitemid' => $this->testitemid,
+            'contextid' => $this->contextid,
+            'component' => $this->componentname,
+            'scaleid' => $this->catscaleid,
         ];
         return $data;
     }

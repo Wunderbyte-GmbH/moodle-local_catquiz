@@ -61,6 +61,11 @@ class testitemdashboard implements renderable, templatable {
     public int $catscaleid;
 
     /**
+     * @var string
+     */
+    public string $component;
+
+    /**
      * @var catmodel_info catmodelinfo
      */
     private catmodel_info $catmodelinfo;
@@ -71,14 +76,16 @@ class testitemdashboard implements renderable, templatable {
      * @param int $testitemid
      * @param int $contextid
      * @param int $catscaleid
+     * @param string $component
      *
      */
-    public function __construct(int $testitemid, int $contextid, int $catscaleid) {
+    public function __construct(int $testitemid, int $contextid, int $catscaleid, string $component = 'question') {
 
         $this->testitemid = $testitemid;
         $this->contextid = $contextid;
         $this->catmodelinfo = new catmodel_info();
         $this->catscaleid = $catscaleid;
+        $this->component = $component;
     }
 
     /**
@@ -323,11 +330,11 @@ class testitemdashboard implements renderable, templatable {
         // Render the icons according to status
         $circle = html_writer::tag('i', "", [
             "class" => "fa fa-circle $statuscircleclass",
-            "id" => "status circle ".$record->id]);
+            "id" => "status circle"]);
 
         $eye = html_writer::tag('i', "", [
             "class" => "fa fa-eye$closedeye",
-            "id" => "status activity eye ".$record->id]);
+            "id" => "status-activity-eye"]);
 
         // Join strings for status display
         $status = " ($testitemstatus, $modelstatus)";

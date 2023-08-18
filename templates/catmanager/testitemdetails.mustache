@@ -45,4 +45,7 @@
     require(['local_catquiz/testitemdashboard/backbutton'], function(init) {
         init.init();
     });
+    require(['local_catquiz/testitemdashboard/togglestatus'], function(init) {
+        init.init({{testitemid}}, {{scaleid}}, {{contextid}}, '{{component}}');
+    });
 {{/js}}
