@@ -39,12 +39,6 @@ use local_catquiz\wb_middleware;
 final class playedincurrentattempt extends preselect_task implements wb_middleware {
 
     /**
-     * PROPERTYNAME
-     *
-     * @var string
-     */
-    const PROPERTYNAME = 'playedinattemptpenalty';
-    /**
      * PENALTY
      *
      * @var int
@@ -65,9 +59,9 @@ final class playedincurrentattempt extends preselect_task implements wb_middlewa
         $playedquestions = $cache->get('playedquestions') ?: [];
         foreach ($context['questions'] as $q) {
             if (array_key_exists($q->id, $playedquestions)) {
-                $context['questions'][$q->id]->{self::PROPERTYNAME} = self::PENALTY;
+                $context['questions'][$q->id]->playedinattemptpenalty = self::PENALTY;
             } else {
-                $context['questions'][$q->id]->{self::PROPERTYNAME} = 0;
+                $context['questions'][$q->id]->playedinattemptpenalty = 0;
             }
         }
 
