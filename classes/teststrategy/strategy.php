@@ -109,7 +109,8 @@ abstract class strategy {
             if (!array_key_exists($modifier, $this->scoremodifiers)) {
                 throw new moodle_exception(
                     sprintf(
-                        'Strategy requires a score modifier that is not available: %s'
+                        'Strategy requires a score modifier that is not available: %s',
+                        $modifier
                     )
                 );
             }
