@@ -31,6 +31,7 @@ use local_catquiz\teststrategy\info;
 use local_catquiz\teststrategy\preselect_task;
 use local_catquiz\wb_middleware_runner;
 use moodle_exception;
+use stdClass;
 
 /**
  * Base class for test strategies.
@@ -139,6 +140,11 @@ abstract class strategy {
         $cache->set('playedquestions', $playedquestions);
         $cache->set('isfirstquestionofattempt', false);
 
+        // Keep track of the questions played per scale
+        $playedquestionsperscale = $cache->get('playedquestionsperscale') ?: [];
+        $updated = $this->update_playedquestionsperscale($selectedquestion, $playedquestionsperscale);
+        $cache->set('playedquestionsperscale', $updated);
+
         $cache->set('lastquestion', $selectedquestion);
 
 
@@ -201,5 +207,16 @@ abstract class strategy {
             )];
         }
         return [];
+    }
+
+    public function update_playedquestionsperscale(
+        stdClass $selectedquestion,
+        array $playedquestionsperscale = []
+    ): array {
+        if (!array_key_exists($selectedquestion->catscaleid, $playedquestionsperscale)) {
+            $playedquestionsperscale[$selectedquestion->catscaleid] = [];
+        }
+        $playedquestionsperscale[$selectedquestion->catscaleid][] = $selectedquestion;
+        return $playedquestionsperscale;
     }
 }
