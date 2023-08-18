@@ -56,6 +56,10 @@ class mathcat {
         $max = 50
     ): float {
 
+        // @DAVID: Ersetzen durch Newton-Raphson-multi-stable. Aktueller Aufruf:
+        # return ewton_raphson_multi_stable($func, $derivative, [$start], -runden(log($mininc),10),0), $maxiter); // Plus Filter und 1./2. Ableitung
+        // Wenn erfolgreich, dann bitte diese Funktion als deprecated behandeln und entfernen.
+        
         $x0 = $start;
         $usegauss = false;
         $gaussiter = 0;
@@ -180,6 +184,8 @@ class mathcat {
      */
     public static function newtonraphson_numeric($f, $x0, $tolerance, $maxiterations = 150, $h = 0.001) {
 
+        // @DAVID: Das hier sollte deprecated sein.
+        
         for ($i = 0; $i < $maxiterations; $i++) {
             $fx0 = $f($x0);
             $dfx0 = ($f($x0 + $h) - $f($x0 - $h)) / (2 * $h);
@@ -390,6 +396,11 @@ class mathcat {
      *
      */
     public static function newton_raphson_multi($func, $derivative, $start, $mininc = 0.0001, $maxiter = 2000) {
+
+        // @DAVID: Ersetzen durch Newton-Raphson-multi-stable. Aktueller Aufruf:
+        # return ewton_raphson_multi_stable($func, $derivative, [$start], -runden(log($mininc),10),0), $maxiter); // Plus Filter und 1./2. Ableitung
+        // Wenn erfolgreich, dann bitte diese Funktion als deprecated behandeln und entfernen.
+        
         $modeldim = count($func);
 
         $ml = new matrixcat();
@@ -432,93 +443,111 @@ class mathcat {
     }
 
     /**
-     * Returns newton raphson multi stable value(s).
+     * Performs the Newton-Raphson approach for determine the zero point of a function
      *
-     * @param mixed $func
-     * @param mixed $derivative
-     * @param mixed $start
-     * @param mixed $mininc
-     * @param int $maxiter
-     * @param catcalc_item_estimator $model
+     * @param callable<array> $fn_function($parameter) - Function to be calculated on with parameter $parameter
+     * @param callable<array> $fn_derivative($parameter) - Deriavative of $fn_function with parameter $parameter
+     * @param array $parameter_start - Parameter-set to start with (should be near zero point)
+     * @param int $precission - Accuracy to how many decimal places
+     * @param int $max_iteration - Maximum number of iterations
+     * @param callable $fn_trusted_regions_filter($parameter) - Parameter-check for trusted Region
+     * @param callable $fn_trusted_regions_function($parameter) - Trusted Region modelling function
+     * @param callable $fn_trusted_regions_derivative($parameter) - Deriavative of $fn_trusted_regions_function
      *
-     * @return mixed
-     *
+     * @return array $parameter
      */
-    public static function newton_raphson_multi_stable(
-        $func,
-        $derivative,
-        $start,
-        $mininc = 0.0001,
-        $maxiter = 2000,
-        catcalc_item_estimator $model
-    ) {
-        $modeldim = count($func);
-        $ml = new matrixcat();
-        $z0 = $start;
-        $parameternames = array_keys($z0);
-
-        // Jacobian, hessian, model_dim, start_value.
-        for ($i = 0; $i < $maxiter; $i++) {
-            for ($k = 0; $k <= $modeldim - 1; $k++) {
-                $realfunc[$k] = [$func[$k]($z0)];
-                for ($j = 0; $j <= $modeldim - 1; $j++) {
-                    $realderivative[$k][$j] = $derivative[$k][$j]($z0);
-                }
-            }
-
-            $g = $realfunc;
-            $j = $realderivative;
-            $matrix = new matrix($j);
-
-            try {
-                $jinv = ($matrix->getRows() === 1 && $matrix->isSquare())
-                ? [[1 / $j[0][0]]]
-                : $matrix->inverse();
-            } catch (MatrixException $e) {
-                echo "Can not inverse matrix - returning restricted value.\n";
-                return $model->restrict_to_trusted_region($z0);
-            }
-
-            if (is_array($z0)) {
-                $diff = $ml->flattenArray($ml->multiplyMatrices($jinv, $g));
-                $z1 = $ml->subtractVectors(array_values($z0), $diff);
-                $dist = $ml->dist(array_values($z0), $z1);
+    static function newton_raphson_multi_stable (
+        $fn_function, // @DAVID: Hier werden nun Callables erwartet, die Arrays zurückgeben, NICHT Arrays of Callables
+        $fn_derivative,
+        array $parameter_start,
+        // float $min_inc = 0.0001, // @DAVID: Ersetzt durch $precision
+        int $precission = 6,
+        int $max_iterations = 50,
+        // catcalc_item_estimator $model, // @DAVID: Ersetzt durch (flexibleren) callable-Aufruf der TR-Funktionen
+        $fn_trusted_regions_filter = NULL,
+        $fn_trusted_regions_function = NULL,
+        $fn_trusted_regions_derivative = NULL): array {
+        
+        // Set initial values.
+        $parameter = $parameter_start;
+        $parameter_names = array_keys($parameter_start); // Note: Please check for yourself, that the order of your parameters in your array corresponds to the order of $fn_function!
+        $is_critical = false;
+        $max_step_length = 0.1;
+        
+        // Begin with numerical iteration.
+        for ($i = 0; $i < $max_iterations; $i++) {
+            
+            $mx_parameter = new matrix($parameter); // @DAVID: Sollte serialisiert werden für den Fall genesteter Arrays. array('diffultiy' => array ( 0...6), 'discrimination' => float);
+            $mx_parameter = $mx_parameter->transpose();
+            
+            // Calculate the function and derivative values from  $fn_function and $fn_derivative at point $parameter.
+            $val_function = $fn_function($parameter);
+            $val_derivative = $fn_derivative($parameter);
+            
+            $mx_function = new matrix($val_function);
+            $mx_derivative =  new matrix($val_derivative);
+            
+            $mx_function = $mx_function->transpose(); 
+            $mx_derivative_inv = $mx_derivative->inverse();
+            
+            // Calculate the new point $mx_parameter as well as the distance 
+            $mx_delta = $mx_derivative_inv->multiply($mx_function);
+            $mx_parameter_alt = $mx_parameter;
+            $distance = $mx_delta->rooted_summed_squares();
+            
+            if ($distance >= $max_step_length) {
+                // Shorten step matrix $mx_delta to concurrent step length.
+                $mx_delta = $mx_delta->multiply($max_step_length / $distance);
             } else {
-                $z1 = array_values($z0) - $ml->flattenArray($ml->multiplyMatrices($jinv, $g))[0];
-                $dist = abs(array_values($z0) - $z1);
+                // Set new $max_step_length.
+                $max_step_length = $distance;
             }
+            
+            $mx_parameter = $mx_parameter->subtract($mx_delta);
+            $parameter = array_combine($parameter_names, ($mx_parameter->transpose())[0]);
 
-            // If one of the values is NAN, return the values restricted to the trusted region.
-            if (count(array_filter($z1, fn ($x) => is_nan($x))) > 0) {
-                $z1 = $model->restrict_to_trusted_region($z0);
-                echo "returning restricted value\n";
-                return array_combine($parameternames, $z1);
-            }
-
-            $iscritical = $model->restrict_to_trusted_region($z0) !== $z0;
-            if ($iscritical) {
-                foreach (array_keys($func) as $i) {
-                    $func[$i] = self::compose_plus(
-                        $model->get_log_tr_jacobian()[$i],
-                        $func[$i]
-                    );
-                    foreach (array_keys($derivative) as $j) {
-                        $derivative[$i][$j] = self::compose_plus(
-                            $model->get_log_tr_hessian()[$i][$j],
-                            $derivative[$i][$j]
-                        );
-                    }
+            // If Trusted Region filter is provided, check for being still in Trusted Regions.
+            if (isset($fn_trusted_regions_filter)) {
+                // Check for glitches within the calculated result.
+                if (count(array_filter($parameter, fn ($x) => is_nan($x))) > 0) {
+                    $parameter = $fn_trusted_regions_filter($parameter); // @DAVID: Darüber sollten wir noch einmal nachdenken.
+                    $is_critical = true;
+                    return array_combine($parameter_names, $parameter);
                 }
-            }
 
-            $z0 = array_combine($parameternames, $z1);
-            if ($dist < $mininc) {
-                return $z0;
+                // Check if $parameter is still in the Trusted Region.
+                if ($fn_trusted_regions_filter($parameter) !== $parameter) { 
+                    $parameter = $fn_trusted_regions_filter($parameter);
+                    $mx_parameter = new matrix(is_array($parameter) ? [$parameter] : [[$parameter]]); // @DAVID: Sollte serialisiert werden für den Fall genesteter Arrays.
+                    $mx_parameter = $mx_parameter->transpose();
+                    
+                    // If Trusted Region function and its derivative are provided, add them to $fn_function and $fn_derivative.
+                    if (isset($fn_trusted_regions_function) && isset($fn_trusted_regions_derivative)) {
+                        $fn_function = fn($x) => multi_sum($fn_trusted_regions_function($x), $fn_function($x));
+                        $fn_derivative = fn($x) => multi_sum($fn_trusted_regions_derivative($x), $fn_derivative($x));
+                        # console ("Used Trusted Regions function and derivatied and added this to the target functions.");
+                    }
+                    
+                    // If the problem occurs a second time in a row, additionally reset the parameter $parameter to $parameter_start
+                    if ($is_critical) {
+                        $parameter = $parameter_start;
+                        $mx_parameter = new matrix(is_array($parameter) ? [$parameter] : [[$parameter]]); // @DAVID: Sollte serialisiert werden für den Fall genesteter Arrays.
+                        $mx_parameter = $mx_parameter->transpose();
+                    }
+                } else {
+                // If everything went fine, keep/reset $is_critical as FALSE.
+                $is_critical = FALSE;
+                }
+            }       
+            // Test if precisiion criteria for stopping iterations has been reached.
+            if ($mx_delta->max_absolute_element()  < 10 ** (-$precission)) {
+                return $parameter;
             }
         }
-
-        return $z0;
+        // Return the concurrent solution even the precission criteria hasn't been met.
+        return $parameter;
     }
+
 
     /**
      * Returns add gauss der1 callable.
