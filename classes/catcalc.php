@@ -146,52 +146,59 @@ class catcalc {
             throw new \InvalidArgumentException("Model does not implement the catcalc_item_estimator interface");
         }
 
-        // Compose likelihood matrices based on actual result.
-
         $modeldim = $model::get_model_dim();
 
-        // Vector that contains the first derivatives for each parameter as functions
-        // [Df/Da, Df,/Db, Df,Dc].
-        $jacobian = [];
-        // Matrix that contains the second derivatives
-        // [
-        // [Df/Daa, Df/Dab, Df/Dac]
-        // [Df/Dba, Df/Dbb, Df/Dbc]
-        // [Df/Dca, Df/Dcb, Df/Dcc]
-        // ].
-        $hessian = [];
-        for ($i = 0; $i <= $modeldim - 2; $i++) {
-            $jacobian[$i] = fn($x) => 0;
-            $hessian[$i] = [];
-            for ($j = 0; $j <= $modeldim - 2; $j++) {
-                $hessian[$i][$j] = fn($x) => 0;
-            }
-        }
-
-        foreach ($itemresponse as $r) {
-            $jacobianpart = $model::get_log_jacobian($r->get_ability(), $r->get_response());
-            $hessianpart = $model::get_log_hessian($r->get_ability(), $r->get_response());
-
-            for ($i = 0; $i <= $modeldim - 2; $i++) {
-                $jacobian[$i] = fn($x) => $jacobian[$i]($x) + $jacobianpart[$i]($x);
-
-                for ($j = 0; $j <= $modeldim - 2; $j++) {
-                    $hessian[$i][$j] = fn($x) => $hessian[$i][$j]($x) + $hessianpart[$i][$j]($x);
-                }
-            }
-        }
-
         // Defines the starting point.
-        $startarr = ['difficulty' => 0.5, 'discrimination' => 0.5, 'guessing' => 0.5];
-        $z0 = array_slice($startarr, 0, $modeldim - 1);
+        $startarr = ['difficulty' => 0.50, 'discrimination' => 1.0, 'guessing' => 0.25];
+        $z_0 = array_slice($startarr, 0, $modeldim - 1);
+    
+        // Define Jacobi vector (1st derivative) and Hesse matrix (2nd derivative) of the Log Likelihood.
+        $jacobian = []; $hessian = [];
+        
+        foreach ($itemresponse as $r) {
+            $jacobian[] = fn($ip) => $model::get_log_jacobian($r->get_ability(), $ip, $r->get_response());
+            $hessian[] = fn($ip) => $model::get_log_hessian($r->get_ability(), $ip, $r->get_response());
+        }
+    
+        $jacobian = function($ip) use($jacobian) {foreach ($jacobian as $key => $j) {$jacobian[$key] = $j($ip);} return $jacobian;};
+        // vorstehende Zeile bitte ersetzen durch: $jacobian = self::build_callable_array($jacobian);
+        $jacobian = fn($ip) => multi_sum($jacobian($ip));
+            
+        $hessian = function($ip) use($hessian) {foreach ($hessian as $key => $h) {$hessian[$key] = $h($ip);} return $hessian;};
+        // vorstehende Zeile bitte ersetzen durch: $hessian = self::build_callable_array($hessian);
+        $hessian = fn($ip) => multi_sum($hessian($ip));
 
-        return mathcat::newton_raphson_multi_stable(
-            $jacobian,
-            $hessian,
-            $z0,
-            0.001,
-            50,
-            $model
-        );
+        // Estimate item parameters via Newton-Raphson algorithm.
+        return mathcat::newton_raphson_multi_stable( $jacobian, $hessian, $z_0, 6, 50
+            , fn($ip) => $model::restrict_to_trusted_region($ip)
+            //, fn($ip) => $model::get_log_tr_jacobian($ip), fn($ip) => $model::get_log_tr_hessian($ip)
+            );
+        }
     }
+
+    // @ DAVID: Falls noch nirgendwo implementiert:
+
+    /**
+     * Re-Builds an Array of Callables into a Callable that delivers an Array
+     *
+     * @param array<callable> $fn_function
+     * @return callable<array>
+     */
+    public function build_callable_array ($fn_function) {
+        return function($x) use($fn_function) {
+            foreach ($fn_function as $key => $f) {
+            	$fn_function[$key] = $f($x);
+            }
+        	return $fn_function;
+        };
+    }
+/*
+// @DAVID: Die folgenden Zeilen sind Testfälle für die Methode multi_sum, mit floats, arrays und callables.
+// Bitte in einem Unit-Test implementieren und dann hier aus dem Quelltext wieder löschen. Danke
+$fn_array = [fn($x) => 1 * $x, fn($x) => 2 * $x, fn($x) => 3 * $x];
+
+$fn_function = build_callable_array($fn_array);
+print_r ($fn_function(5));
+// Expected: [5, 10, 15]
+*/
 }
