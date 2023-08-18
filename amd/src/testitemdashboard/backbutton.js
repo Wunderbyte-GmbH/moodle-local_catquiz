@@ -43,7 +43,7 @@ export const init = () => {
 };
 
 /**
- *
+ * Delete id param from URL to go to overview table
  */
 function goBackToTable() {
     // To get back to the table, we simply have to remove the testitem ID from the URL.
