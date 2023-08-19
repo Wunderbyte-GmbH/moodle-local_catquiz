@@ -57,7 +57,7 @@ class mathcat {
     ): float {
 
         // @DAVID: Ersetzen durch Newton-Raphson-multi-stable. Aktueller Aufruf:
-        # return ewton_raphson_multi_stable($func, $derivative, [$start], -runden(log($mininc),10),0), $maxiter); // Plus Filter und 1./2. Ableitung
+        # return newton_raphson_multi_stable($func, $derivative, [$start], -runden(log($mininc),10),0), $maxiter); // Plus Filter und 1./2. Ableitung
         // Wenn erfolgreich, dann bitte diese Funktion als deprecated behandeln und entfernen.
         
         $x0 = $start;
@@ -450,23 +450,23 @@ class mathcat {
      * @param array $parameter_start - Parameter-set to start with (should be near zero point)
      * @param int $precission - Accuracy to how many decimal places
      * @param int $max_iteration - Maximum number of iterations
-     * @param callable $fn_trusted_regions_filter($parameter) - Parameter-check for trusted Region
-     * @param callable $fn_trusted_regions_function($parameter) - Trusted Region modelling function
-     * @param callable $fn_trusted_regions_derivative($parameter) - Deriavative of $fn_trusted_regions_function
+     * @param callable<array> $fn_trusted_regions_filter($parameter) - Parameter-check for trusted Region
+     * @param callable<array> $fn_trusted_regions_function($parameter) - Trusted Region modelling function
+     * @param callable<array> $fn_trusted_regions_derivative($parameter) - Deriavative of $fn_trusted_regions_function
      *
      * @return array $parameter
      */
     static function newton_raphson_multi_stable (
-        $fn_function, // @DAVID: Hier werden nun Callables erwartet, die Arrays zurückgeben, NICHT Arrays of Callables
-        $fn_derivative,
+        callable $fn_function, // @DAVID: Hier werden nun Callables erwartet, die Arrays zurückgeben, NICHT Arrays of Callables
+        callable $fn_derivative,
         array $parameter_start,
         // float $min_inc = 0.0001, // @DAVID: Ersetzt durch $precision
         int $precission = 6,
         int $max_iterations = 50,
         // catcalc_item_estimator $model, // @DAVID: Ersetzt durch (flexibleren) callable-Aufruf der TR-Funktionen
-        $fn_trusted_regions_filter = NULL,
-        $fn_trusted_regions_function = NULL,
-        $fn_trusted_regions_derivative = NULL): array {
+        callable $fn_trusted_regions_filter = NULL,
+        callable $fn_trusted_regions_function = NULL,
+        callable $fn_trusted_regions_derivative = NULL): array {
         
         // Set initial values.
         $parameter = $parameter_start;
@@ -548,7 +548,8 @@ class mathcat {
         return $parameter;
     }
 
-
+    // Deprecated, falls bfgs nicht genutzt wird.
+    
     /**
      * Returns add gauss der1 callable.
      *
