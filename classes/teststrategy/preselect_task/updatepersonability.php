@@ -112,7 +112,7 @@ class updatepersonability extends preselect_task implements wb_middleware {
         }
 
         $this->update_person_param($context, $updatedability);
-        if (abs($context['person_ability'] - $updatedability) < self::UPDATE_THRESHOLD) {
+        if (abs($context['person_ability'][$lastquestion->catscaleid] - $updatedability) < self::UPDATE_THRESHOLD) {
             // If we do have more than the minimum questions, we should return.
             if ($context['questionsattempted'] >= $context['minimumquestions']) {
                 return result::err(status::ABORT_PERSONABILITY_NOT_CHANGED);
@@ -168,7 +168,11 @@ class updatepersonability extends preselect_task implements wb_middleware {
         $modelstrategy = new model_strategy($responses);
         $itemparamlists = [];
         foreach (array_keys($modelstrategy->get_installed_models()) as $model) {
-            $itemparamlists[$model] = model_item_param_list::load_from_db($context['contextid'], $model);
+            $itemparamlists[$model] = model_item_param_list::load_from_db(
+                $context['contextid'],
+                $model,
+                $context['lastquestion']->catscaleid
+            );
         }
         $itemparamlist = $modelstrategy->select_item_model($itemparamlists);
         return $itemparamlist;
