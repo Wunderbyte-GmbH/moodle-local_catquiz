@@ -28,6 +28,7 @@ use cache;
 use local_catquiz\catcalc;
 use local_catquiz\catcontext;
 use local_catquiz\catquiz;
+use local_catquiz\catscale;
 use local_catquiz\local\model\model_item_param_list;
 use local_catquiz\local\model\model_strategy;
 use local_catquiz\local\result;
@@ -171,7 +172,10 @@ class updatepersonability extends preselect_task implements wb_middleware {
             $itemparamlists[$model] = model_item_param_list::load_from_db(
                 $context['contextid'],
                 $model,
-                $context['lastquestion']->catscaleid
+                [
+                    $context['lastquestion']->catscaleid,
+                    ...catscale::get_subscale_ids($context['lastquestion']->catscaleid)
+                ]
             );
         }
         $itemparamlist = $modelstrategy->select_item_model($itemparamlists);

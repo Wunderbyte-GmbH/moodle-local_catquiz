@@ -69,17 +69,17 @@ class model_item_param_list implements ArrayAccess, IteratorAggregate, Countable
      *
      * @param int $contextid
      * @param string $modelname
-     * @param int|null $catscaleid
+     * @param array $catscaleid
      *
      * @return self
      *
      */
-    public static function load_from_db(int $contextid, string $modelname, ?int $catscaleid = null): self {
+    public static function load_from_db(int $contextid, string $modelname, array $catscaleids = []): self {
         global $DB;
         $models = model_strategy::get_installed_models();
 
-        if ($catscaleid) {
-            $itemrows = catquiz::get_itemparams($contextid, $catscaleid, $modelname);
+        if ($catscaleids) {
+            $itemrows = catquiz::get_itemparams($contextid, $catscaleids, $modelname);
         } else {
             $itemrows = $DB->get_records(
                 'local_catquiz_itemparams',

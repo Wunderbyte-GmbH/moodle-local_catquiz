@@ -1145,15 +1145,16 @@ class catquiz {
 
     /**
      * Returns all item parameters in the given context that are assigned to the
-     * given catscaleid and were calculated with the given modem
+     * given catscaleid and were calculated with the given model
      *
      * @param int $contextid
-     * @param int $catscaleid
+     * @param array<int> $catscaleids
      * @param string $model
      * @return array
      */
-    public static function get_itemparams(int $contextid, int $catscaleid, string $model) {
+    public static function get_itemparams(int $contextid, array $catscaleids, string $model) {
         global $DB;
+        [$insql, $inparams] = $DB->get_in_or_equal($catscaleids, SQL_PARAMS_NAMED, 'incatscales');
 
         return $DB->get_records_sql(
             "SELECT lcip.*
@@ -1163,13 +1164,15 @@ class catquiz {
                     AND lci.componentid = lcip.componentid
                     AND lcip.contextid = :contextid
                     AND lcip.model = :model
-            WHERE lci.catscaleid = :catscaleid
+            WHERE lci.catscaleid $insql
             ",
-            [
-                'contextid' => $contextid,
-                'catscaleid' => $catscaleid,
-                'model' => $model,
-            ]
+            array_merge(
+                [
+                    'contextid' => $contextid,
+                    'model' => $model,
+                ],
+                $inparams
+            )
         );
     }
 
