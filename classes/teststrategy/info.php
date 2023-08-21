@@ -160,6 +160,11 @@ class info {
             'teststrategy\context\loader'
         );
         $classnames = array_keys($contextloaders);
+        // Exclude classes that end with _testing
+        $classnames = array_filter(
+            $classnames,
+            fn ($classname) => ! self::is_testing_class($classname)
+        );
 
         $contextloaders = array_map(fn($x) => new $x(), $classnames);
 
@@ -180,5 +185,14 @@ class info {
             $instances[$classname] = new $classname();
         }
         return $instances;
+    }
+
+    /**
+     * Checks a classname to see if the class is used just for testing.
+     * @param mixed $classname 
+     * @return bool 
+     */
+    private static function is_testing_class($classname) {
+        return substr($classname, -strlen('_testing')) === '_testing';
     }
 }
