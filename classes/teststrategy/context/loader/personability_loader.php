@@ -23,10 +23,15 @@
  */
 
 namespace local_catquiz\teststrategy\context\loader;
+
+use local_catquiz\catquiz;
+use local_catquiz\catscale;
 use local_catquiz\teststrategy\context\contextloaderinterface;
 
 /**
  * Class pilotquestions_loader for test strategy.
+ * 
+ * Stores the person ability per scale in the `person_ability` key of the context array.
  *
  * @package local_catquiz
  * @copyright 2023 Wunderbyte GmbH
@@ -60,7 +65,9 @@ class personability_loader implements contextloaderinterface {
     public function requires(): array {
         return [
             'contextid',
-            'catscaleid'
+            'catscaleid',
+            'userid',
+            'includesubscales',
         ];
     }
 
@@ -73,21 +80,41 @@ class personability_loader implements contextloaderinterface {
      *
      */
     public function load(array $context): array {
-        global $DB, $USER;
-        $personparams = $DB->get_record(
-            'local_catquiz_personparams',
-            [
-                'userid' => $USER->id,
-                'contextid' => $context['contextid'],
-                'catscaleid' => $context['catscaleid'],
-            ]
-        );
-
-        $context['person_ability'] = empty($personparams)
-            ? self::DEFAULT_ABILITY
-            : floatval($personparams->ability);
+        $personparams = $this->load_saved_personparams($context);
+        $context['person_ability'] = $personparams;
 
         return $context;
     }
 
+    /**
+     * Loads the person params from the database.
+     * 
+     * @param array $context 
+     * @return array 
+     */
+    protected function load_saved_personparams(&$context) {
+        global $DB;
+        $catscaleids = [$context['catscaleid']];
+        if ($context['includesubscales']) {
+            array_push(
+                $catscaleids,
+                ...catscale::get_subscale_ids($context['catscaleid'])
+            );
+        }
+        $abilities = catquiz::get_person_abilities(
+            $context['userid'],
+            $context['contextid'],
+            $catscaleids
+        );
+
+        $personparams = [];
+        foreach ($catscaleids as $scaleid) {
+            $ability = $abilities[$scaleid]
+                ? floatval($abilities[$scaleid])
+                : self::DEFAULT_ABILITY
+                ;
+                $personparams[$scaleid] = $ability;
+        }
+        return $personparams;
+    }
 }
