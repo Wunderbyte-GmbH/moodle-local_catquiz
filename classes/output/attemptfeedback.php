@@ -17,6 +17,7 @@
 namespace local_catquiz\output;
 
 use local_catquiz\catquiz;
+use local_catquiz\catscale;
 use local_catquiz\teststrategy\info;
 use templatable;
 use renderable;
@@ -115,17 +116,19 @@ class attemptfeedback implements renderable, templatable {
      * @return mixed
      *
      */
-    private function render_person_ability() {
+    private function render_person_abilities() {
         global $USER;
         if (!$this->contextid || !$this->catscaleid) {
             return get_string('notavailable', 'core');
         }
-        $abilities = catquiz::get_person_abilities($USER->id, $this->contextid, [$this->catscaleid]);
-        if (!$abilities) {
-            return get_string('notavailable', 'core');
+        $abilities = catquiz::get_person_abilities($USER->id, $this->contextid, [$this->catscaleid, ...catscale::get_subscale_ids($this->catscaleid)]);
+        $catscales = catquiz::get_catscales(array_keys($abilities));
+
+        $result = [];
+        foreach ($abilities as $catscaleid => $ability) {
+            $result[] = ['ability' => $ability, 'catscaleid' => $catscaleid, 'name' => $catscales[$catscaleid]->name];
         }
-        $ability = reset($abilities);
-        return $ability->ability;
+        return $result;
     }
 
     /**
@@ -163,7 +166,7 @@ class attemptfeedback implements renderable, templatable {
     public function export_for_template(\renderer_base $output): array {
         return [
             'stats' => $this->render_question_stats($this->attemptid),
-            'ability' => $this->render_person_ability(),
+            'abilities' => $this->render_person_abilities(),
             'strategy_feedback' => $this->render_strategy_feedback(),
         ];
     }

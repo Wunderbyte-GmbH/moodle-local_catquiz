@@ -35,7 +35,10 @@
 <p>{{#str}}numberofanswersincorrect, local_catquiz{{/str}}: {{gradedwrong}}</p>
 <p>{{#str}}numberofanswerspartlycorrect, local_catquiz{{/str}}: {{gradedpartial}}</p>
 {{/stats}}
-{{#str}} personability, local_catquiz {{/str}}: {{ability}}<br>
+<h4>{{#str}} personability, local_catquiz {{/str}}</h4>
+{{#abilities}}
+{{name}}: {{ability}}<br>
+{{/abilities}}
 {{#strategy_feedback}}
     {{.}}<br>
 {{/strategy_feedback}}

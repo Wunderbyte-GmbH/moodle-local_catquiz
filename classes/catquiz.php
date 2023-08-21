@@ -1172,4 +1172,13 @@ class catquiz {
             ]
         );
     }
+
+    public static function get_catscales(array $catscaleids) {
+        global $DB;
+        return $DB->get_records_list(
+            "local_catquiz_catscales",
+            'id',
+            $catscaleids
+        );
+    }
 }
