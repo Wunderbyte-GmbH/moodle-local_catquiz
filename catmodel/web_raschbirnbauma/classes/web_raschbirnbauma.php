@@ -24,6 +24,7 @@
 
 namespace catmodel_web_raschbirnbauma;
 
+use catmodel_raschbirnbauma\raschbirnbauma;
 use local_catquiz\catcalc_ability_estimator;
 use local_catquiz\local\model\model_item_param;
 use local_catquiz\local\model\model_item_param_list;
@@ -41,7 +42,6 @@ use local_catquiz\local\model\model_responses;
 class web_raschbirnbauma extends model_model implements catcalc_ability_estimator {
 
     public function get_information_criterion(string $criterion, model_person_param_list $personabilities, model_item_param $itemparams, model_responses $k): float { return 0.0; }
-
 
     /**
      * Uses a web API to calculate the item parameters.
@@ -161,27 +161,7 @@ class web_raschbirnbauma extends model_model implements catcalc_ability_estimato
      *
      */
     public static function log_likelihood_p($p, array $params, float $itemresponse): float {
-        if ($itemresponse < 1.0) {
-            return self::counter_log_likelihood_p($p, $params);
-        }
-
-        $b = $params['difficulty'];
-
-        return exp($b) / (exp($b) + exp($p));
-    }
-
-    /**
-     * Returns counter log likelihood p
-     *
-     * @param mixed $p
-     * @param array $params
-     *
-     * @return float
-     *
-     */
-    public static function counter_log_likelihood_p($p, array $params): float {
-        $b = $params['difficulty'];
-        return -(exp($p) / (exp($b) + exp($p)));
+        return raschbirnbauma::log_likelihood_p($p, $params, $itemresponse);
     }
 
     /**
@@ -195,17 +175,7 @@ class web_raschbirnbauma extends model_model implements catcalc_ability_estimato
      *
      */
     public static function likelihood($p, array $params, float $itemresponse) {
-        $b = $params['difficulty'];
-
-        $a = 1;
-        $c = 0;
-
-        $value = $c + (1 - $c) * (exp($a * ($p - $b))) / (1 + exp($a * ($p - $b)));
-
-        if ($itemresponse < 1.0) {
-            return 1 - $value;
-        }
-        return $value;
+        return raschbirnbauma::likelihood($p, $params, $itemresponse);
     }
 
     /**
@@ -219,33 +189,7 @@ class web_raschbirnbauma extends model_model implements catcalc_ability_estimato
      *
      */
     public static function log_likelihood($p, array $params, float $itemresponse) {
-        if ($itemresponse < 1.0) {
-            return self::log_counter_likelihood($p, $params);
-        }
-
-        $b = $params['difficulty'];
-
-        $a = 1;
-        $c = 0;
-        return log($c + ((1 - $c) * exp($a * (-$b + $p))) / (1 + exp($a * (-$b + $p))));
-
-    }
-
-    /**
-     * Returns log counter likelihood
-     *
-     * @param mixed $p
-     * @param array $params
-     *
-     * @return float
-     *
-     */
-    public static function log_counter_likelihood($p, array $params) {
-        $b = $params['difficulty'];
-
-        $a = 1;
-        $c = 0;
-        return log(1 - $c - ((1 - $c) * exp($a * (-$b + $p))) / (1 + exp($a * (-$b + $p))));
+        return raschbirnbauma::log_likelihood($p, $params, $itemresponse);
     }
 
     /**
@@ -259,11 +203,6 @@ class web_raschbirnbauma extends model_model implements catcalc_ability_estimato
      *
      */
     public static function log_likelihood_p_p($p, array $params, float $itemresponse): float {
-        $b = $params['difficulty'];
-        $value = -(exp($b + $p) / (exp($b) + exp($p)) ** 2);
-        if ($itemresponse < 1.0) {
-            return 1 - $value;
-        }
-        return $value;
+        return raschbirnbauma::log_likelihood_p_p($p, $params, $itemresponse);
     }
 }
