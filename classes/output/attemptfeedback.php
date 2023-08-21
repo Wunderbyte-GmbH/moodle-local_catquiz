@@ -120,10 +120,11 @@ class attemptfeedback implements renderable, templatable {
         if (!$this->contextid || !$this->catscaleid) {
             return get_string('notavailable', 'core');
         }
-        $ability = catquiz::get_person_ability($USER->id, $this->contextid, $this->catscaleid);
-        if (!$ability) {
+        $abilities = catquiz::get_person_abilities($USER->id, $this->contextid, [$this->catscaleid]);
+        if (!$abilities) {
             return get_string('notavailable', 'core');
         }
+        $ability = reset($abilities);
         return $ability->ability;
     }
 

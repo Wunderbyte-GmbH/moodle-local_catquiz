@@ -979,23 +979,35 @@ class catquiz {
      *
      * @param int $userid
      * @param int $contextid
-     * @param int $catscaleid
+     * @param array<int> $catscaleids
      *
-     * @return \stdClass
+     * @return array<\stdClass>
      *
      */
-    public static function get_person_ability(int $userid, int $contextid, int $catscaleid) {
+    public static function get_person_abilities(int $userid, int $contextid, array $catscaleids) {
         global $DB;
-        return $DB->get_record_select(
-            'local_catquiz_personparams',
-            "userid = :userid
-                 AND contextid = :contextid
-                 AND catscaleid = :catscaleid",
-          [
+        [$insql, $inparams] = $DB->get_in_or_equal(
+            $catscaleids,
+            SQL_PARAMS_NAMED,
+            'incatscales'
+        );
+
+        $sql = "
+            SELECT catscaleid, ability
+            FROM {local_catquiz_personparams}
+            WHERE userid = :userid
+                AND contextid = :contextid
+                AND catscaleid $insql
+        ";
+        $params = array_merge([
             'userid' => $userid,
             'contextid' => $contextid,
-            'catscaleid' => $catscaleid,
-            ]);
+        ], $inparams);
+
+        return $DB->get_records_sql_menu(
+            $sql,
+            $params
+          );
     }
 
     /**
