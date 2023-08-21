@@ -14,22 +14,15 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
-namespace local_catquiz\output;
+namespace local_catquiz\output\catscalemanager;
 
-use coding_exception;
-use context_system;
-use html_writer;
-use local_catquiz\catmodel_info;
-use local_catquiz\catquiz;
-use local_catquiz\form\item_model_override_selector;
-use local_catquiz\local\model\model_item_param;
-use local_catquiz\local\model\model_raschmodel;
-use local_catquiz\local\model\model_strategy;
+use local_catquiz\output\catscalemanagers;
+use local_catquiz\output\catscales;
+use local_catquiz\output\testitemdashboard;
 use local_catquiz\output\catscalestats;
-use moodle_url;
+use local_catquiz\output\questionsdisplay;
 use templatable;
 use renderable;
-use stdClass;
 
 /**
  * Renderable class for the catscalemanagers
@@ -130,7 +123,6 @@ class managecatscaledashboard implements renderable, templatable {
                 $testitemdashboard = new testitemdashboard($this->testitemid, $this->contextid, $this->catscaleid, $this->componentname);
                 $this->testitemdashboardarray = $testitemdashboard->return_as_array();
         }
-
     }
 
     /**
@@ -153,7 +145,7 @@ class managecatscaledashboard implements renderable, templatable {
             'catscalemanagers' => $this->catscalemanagersarray,
             'questionsdisplay' => $this->questionsdisplayarray,
             'catscalestats' => $this->catscalestatsarray,
-            'testitemdetails' => $this->testitemdashboardarray,
+            'testitemdashboard' => $this->testitemdashboardarray,
             'testitemid' => $this->testitemid,
             'contextid' => $this->contextid,
             'component' => $this->componentname,

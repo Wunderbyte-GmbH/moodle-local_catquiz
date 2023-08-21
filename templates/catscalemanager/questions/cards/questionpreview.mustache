@@ -13,7 +13,7 @@
 }}
 {{!
     @template local_catquiz
-    Template which defines a catquiz summary.
+    Template which defines a catquiz view page.
     Classes required for JS:
     * none
     Data attributes required for JS:
@@ -21,31 +21,17 @@
     Context variables required for this template:
     Example context (json):
     {
+        "title" : "Question preview",
+        "body" : HTML
     }
 }}
-
-{{#testitemdetails}}
-    {{#backtotablelink}}
-        <button id="backtotablelink" class='btn {{class}}' type={{type}}>{{label}}</button>
-    {{/backtotablelink}}
-    <div id="detailview">
-        {{>local_catquiz/catmanager/questiondetailscard}}
+<div class="card col-7">
+    <div class="card-header">
+        {{title}}
     </div>
-    <div>
-        <div id="models">
-        {{>local_catquiz/tabs/tab_models}}
-        </div>
+    <div class="card-body">
+    {{#body}}
+        {{{question}}}
+    {{/body}}
     </div>
-    <div id="statistics">
-        {{>local_catquiz/tabs/tab_testitemstats}}
-    </div>
-{{/testitemdetails}}
-
-{{#js}}
-    require(['local_catquiz/testitemdashboard/backbutton'], function(init) {
-        init.init();
-    });
-    require(['local_catquiz/testitemdashboard/togglestatus'], function(init) {
-        init.init({{testitemid}}, {{scaleid}}, {{contextid}}, '{{component}}');
-    });
-{{/js}}
+</div>

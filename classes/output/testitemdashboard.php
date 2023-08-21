@@ -28,6 +28,7 @@ use local_catquiz\form\item_model_override_selector;
 use local_catquiz\local\model\model_item_param;
 use local_catquiz\local\model\model_raschmodel;
 use local_catquiz\local\model\model_strategy;
+use local_catquiz\output\catscalemanager\questions\questiondetailview;
 use local_catquiz\table\testitems_table;
 use moodle_url;
 use qbank_previewquestion\question_preview_options;
@@ -253,153 +254,10 @@ class testitemdashboard implements renderable, templatable {
     /**
      * Check if we display a table or a detailview of a specific item.
      */
-    private function get_detail_data() {
-        global $DB;
-        if (empty($this->testitemid)) {
-            return;
-        }
-        // If no context is set, get default context from DB.
-        $catcontext = empty($this->contextid) ? catquiz::get_default_context_id() : $this->contextid;
+    private function get_questiondetailview_data() {
 
-        // Get the record for the specific userid (fetched from optional param).
-        list($select, $from, $where, $filter, $params) = catquiz::return_sql_for_catscalequestions([$this->catscaleid],
-                                                                                                    $catcontext,
-                                                                                                    [], [],
-                                                                                                    $this->testitemid);
-        $idcheck = "id=:userid";
-        $sql = "SELECT $select FROM $from WHERE $where AND $idcheck";
-        $recordinarray = $DB->get_records_sql($sql, $params, IGNORE_MISSING);
-
-        if (empty($recordinarray)) {
-            // Throw error: no record was found with id: $params['userid'].
-        }
-        $record = $recordinarray[$this->testitemid];
-
-        // Output for testitem details card.
-        $detailcardoutput = $this->render_detailcard_of_testitem($record); // Return array.
-        $questionpreviewoutput = $this->render_questionpreview($record); // Return array.
-        return [
-            'detailcard' => $detailcardoutput,
-            'questionpreview' => $questionpreviewoutput,
-        ];
-    }
-
-    /**
-     * Renders detailcard of testitem.
-     *
-     * @param object $record
-     *
-     * @return array
-     *
-     */
-    private function render_detailcard_of_testitem(object $record) {
-
-        $title = get_string('general', 'core');
-
-        // We are displaying two types of status.
-        // Information about model status...
-        switch ($record->status) {
-            case STATUS_NOT_SET:
-                $modelstatus = get_string('statusnotset', 'local_catquiz');
-                $statuscircleclass = STATUS_NOT_SET_COLOR_CLASS;
-                break;
-            case STATUS_NOT_CALCULATED:
-                $modelstatus = get_string('statusnotcalculated', 'local_catquiz');
-                $statuscircleclass = STATUS_NOT_CALCULATED_COLOR_CLASS;
-                break;
-            case STATUS_CALCULATED:
-                $modelstatus = get_string('statussetautomatically', 'local_catquiz');
-                $statuscircleclass = STATUS_CALCULATED_COLOR_CLASS;
-                break;
-            case STATUS_SET_MANUALLY:
-                $modelstatus = get_string('statussetmanually', 'local_catquiz');
-                $statuscircleclass = STATUS_SET_MANUALLY_COLOR_CLASS;
-                break;
-        }
-        // Information about activity status...
-        switch ($record->testitemstatus) {
-            case TESTITEM_STATUS_ACTIVE:
-                $closedeye = '';
-                $testitemstatus = get_string('active', 'core');
-                break;
-            case TESTITEM_STATUS_INACTIVE:
-                $closedeye = '-slash';
-                $testitemstatus = get_string('inactive', 'core');
-                break;
-        }
-        // Render the icons according to status
-        $circle = html_writer::tag('i', "", [
-            "class" => "fa fa-circle $statuscircleclass",
-            "id" => "status circle"]);
-
-        $eye = html_writer::tag('i', "", [
-            "class" => "fa fa-eye$closedeye",
-            "id" => "status-activity-eye"]);
-
-        // Join strings for status display
-        $status = " ($testitemstatus, $modelstatus)";
-
-        // Use localization for type
-        $type = get_string('pluginname', 'qtype_' . $record->qtype);
-
-        // TODO: label, auge (zum anklicken) und verändern
-
-        $body['id'] = $record->id;
-        $body['type'] = $type;
-        $body['status'] = $status;
-        $body['model'] = $record->model;
-        $body['attempts'] = $record->attempts;
-        $body['eye'] = $eye;
-        $body['statuscircle'] = $circle;
-
-        return [
-            'title' => $title,
-            'body' => $body,
-        ];
-    }
-
-    /**
-     * Renders preview of testitem (question).
-     *
-     * @param object $record
-     *
-     * @return array
-     *
-     */
-    private function render_questionpreview(object $record) {
-
-        $title = get_string('questionpreview', 'local_catquiz');
-
-        $id = $record->id;
-        $question = question_bank::load_question($id);
-
-        $quba = question_engine::make_questions_usage_by_activity(
-            'local_catquiz', context_system::instance());
-
-        $options = new question_preview_options($question);
-        $options->feedback = question_display_options::HIDDEN;
-        $options->generalfeedback = question_display_options::HIDDEN;
-        $options->flags = question_display_options::HIDDEN;
-        $options->numpartscorrect = question_display_options::HIDDEN;
-        $options->generalfeedback = question_display_options::HIDDEN;
-        $options->rightanswer = question_display_options::HIDDEN;
-        $options->manualcomment = question_display_options::HIDDEN;
-        $options->history = question_display_options::HIDDEN;
-        $options->marks = question_display_options::HIDDEN;
-        $options->readonly = false; // User can choose options. Set false for display only.
-        $quba->set_preferred_behaviour($options->behaviour);
-        $quba->add_question($question);
-
-        $slot = $quba->add_question($question, $options->maxmark);
-
-        $quba->start_all_questions();
-
-        $previewdata['question'] = $quba->render_question($slot, $options);
-
-        return [
-            'title' => $title,
-            'body' => $previewdata,
-        ];
+        $questiondetailview = new questiondetailview($this->testitemid, $this->contextid, $this->catscaleid);
+        return $questiondetailview->renderdata();
     }
 
     /**
@@ -450,11 +308,12 @@ class testitemdashboard implements renderable, templatable {
 
         $data = [
             'backtotablelink' => $this->get_back_to_table_button(),
-            'detailview' => $this->get_detail_data(),
-            'models' => $this->render_modelcards(),
+            'questiondetailview' => $this->get_questiondetailview_data(),
             'statcards' => $this->get_testitems_stats_data(),
+            // Data for tab_models Template.
             'overridesforms' => $this->render_overrides_form(),
             'itemstatus' => $this->get_itemstatus(),
+            'models' => $this->render_modelcards(),
         ];
         return $data;
     }

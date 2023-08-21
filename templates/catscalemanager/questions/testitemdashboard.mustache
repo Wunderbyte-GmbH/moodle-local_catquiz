@@ -21,39 +21,44 @@
     Context variables required for this template:
     Example context (json):
     {
+        'backtotablelink' : [
+            'label' => "Back to testitems table",
+            'type' => 'button',
+            'class' => "btn-link",
+        ]
+
+        // For questiondetailview:
+        'questiondetailview' :
+
+        // For tab_testitemstats:
+        'statcards' :
+
+        // For tab_models:
+        'overridesforms' :
+        'itemstatus' :
+        'models' :
     }
 }}
 
-{{#questionsdisplay}}
-    <div class="catscales-dashboard grid">
-        <div id="catmanagerquestions scaleselectors">
-                {{{scaleselectors}}}
-        </div>
-        {{#checkbox}}
-            <div class="form-check">
-                <input type="checkbox" class="integrate-subscales-checkbox" id="integrateSubscaleQuestionsCheckbox" {{checked}}>
-                <label class="integrate-subscales-checkbox" for="integrateSubscaleQuestionsCheckbox">{{label}}</label>
-            </div>
-        {{/checkbox}}
-        <div id="catmanagerquestions contextselector" class="float-right" >
-            {{{contextselector}}}
-        </div>
+{{#testitemdashboard}}
+    {{#backtotablelink}}
+        <button id="backtotablelink" class='btn {{class}}' type={{type}}>{{label}}</button>
+    {{/backtotablelink}}
+    <div id="questiondetailview">
+        {{>local_catquiz/catscalemanager/questions/questiondetailview}}
     </div>
-
     <div>
-        {{#table}}
-            <div>
-                {{{table}}}
-            </div>
-        {{/table}}
-        <div id="testitemdetails">
-            {{>local_catquiz/catmanager/testitemdetails}}
+        <div id="models">
+        {{>local_catquiz/tabs/tab_models}}
         </div>
     </div>
-{{/questionsdisplay}}
+    <div id="statistics">
+        {{>local_catquiz/tabs/tab_testitemstats}}
+    </div>
+{{/testitemdashboard}}
 
 {{#js}}
-    require(['local_catquiz/manage_catscale_questions'], function(init) {
+    require(['local_catquiz/testitemdashboard/backbutton'], function(init) {
         init.init();
     });
 {{/js}}

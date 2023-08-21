@@ -23,7 +23,7 @@
  */
 
 use local_catquiz\catmodel_info;
-use local_catquiz\output\testitemdashboard;
+use local_catquiz\output\catscalemanager\testitemdashboard;
 
 require_once('../../config.php');
 

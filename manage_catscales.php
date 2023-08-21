@@ -22,7 +22,7 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-use local_catquiz\output\managecatscaledashboard;
+use local_catquiz\output\catscalemanager\managecatscaledashboard;
 
 require_once('../../config.php');
 
@@ -53,6 +53,6 @@ echo $OUTPUT->header();
 
 $managecatscaledashboard = new managecatscaledashboard($testitemid, $catcontextid, $catscale, $usesubs, $componentname);
 $data = $managecatscaledashboard->export_for_template($OUTPUT);
-echo $OUTPUT->render_from_template('local_catquiz/managecatscaledashboard', $data);
+echo $OUTPUT->render_from_template('local_catquiz/catscalemanager/managecatscaledashboard', $data);
 
 echo $OUTPUT->footer();
