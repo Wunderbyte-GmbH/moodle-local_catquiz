@@ -78,8 +78,6 @@ class updatepersonability extends preselect_task implements wb_middleware {
             return $next($context);
         }
 
-        $cachedresponses = $this->load_cached_responses();
-
         $responses = $this->load_responses($context);
         $components = ($responses->as_array())[$context['userid']];
         if (count($components) > 1) {
@@ -87,18 +85,6 @@ class updatepersonability extends preselect_task implements wb_middleware {
         }
         $userresponses = reset($components);
         $this->update_cached_responses($userresponses);
-
-        // If the last answer was incorrect and the question was excluded due to
-        // having only incorrect answers, the response object is the same as in
-        // the previous run and we don't have to update the person ability.
-        $responseschanged = $this->has_changed($userresponses, $cachedresponses);
-
-        if (!$responseschanged) {
-            // Nothing changed since the last question, so we do not need to
-            // update the person ability.
-            $context['skip_reason'] = 'nothingchanged';
-            return $next($context);
-        }
 
         if (!$this->has_sufficient_responses($userresponses)) {
             $context['skip_reason'] = 'notenoughresponses';
@@ -152,34 +138,6 @@ class updatepersonability extends preselect_task implements wb_middleware {
     }
 
     /**
-     * Has changed.
-     *
-     * @param array $newresponses
-     * @param array $oldresponses
-     * @param string $field
-     *
-     * @return bool
-     *
-     */
-    private function has_changed(array $newresponses, array $oldresponses, $field = 'fraction'): bool {
-        if (count($newresponses) !== count($oldresponses)) {
-            return true;
-        }
-
-        $diff = array_udiff($newresponses, $oldresponses, function($a, $b) use ($field) {
-            if ($a[$field] < $b[$field]) {
-                return -1;
-            } else if ($a[$field] > $b[$field]) {
-                return 1;
-            } else {
-                return 0;
-            }
-        });
-
-        return count($diff) !== 0;
-    }
-
-    /**
      * Test if we can calculate an ability with the given responses.
      * At least two answers with different outcome are needed.
      * 
@@ -198,11 +156,6 @@ class updatepersonability extends preselect_task implements wb_middleware {
 
     protected function load_responses($context) {
         return catcontext::create_response_from_db($context['contextid'], $context['lastquestion']->catscaleid);
-    }
-
-    protected function load_cached_responses() {
-        $cache = cache::make('local_catquiz', 'userresponses');
-        return $cache->get('userresponses') ?: [];
     }
 
     protected function update_cached_responses($userresponses) {
