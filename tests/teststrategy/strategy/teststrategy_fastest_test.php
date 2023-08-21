@@ -60,15 +60,27 @@ class teststrategy_fastest_test extends basic_testcase
      * @throws ExpectationFailedException
      */
     public function test_radical_CAT($expected, $attemptcontext) {
+        // Some test datasets need a cache, others do not.
         $cache = cache::make('local_catquiz', 'adaptivequizattempt');
-        $cachekey = sprintf('testitems_%s_%s', $attemptcontext['contextid'], $attemptcontext['includesubscales']);
+        // Use default values if they are not set in the test dataset.
+        $cachekeydata = array_merge($attemptcontext, ['contextid' => 1, 'includesubscales' => true,]);
+        $cachekey = sprintf('testitems_%s_%s', $cachekeydata['contextid'], $cachekeydata['includesubscales']);
         $cache->set($cachekey, [1 => (object)[]]);
+
         $radicalcatstrategy = new teststrategy_fastest();
         $result = $radicalcatstrategy->return_next_testitem($attemptcontext);
         $this->assertEquals($expected, $result);
     }
 
     public function test_radical_CAT_provider() {
+        $question1 = (object) [
+            'id' => 1,
+            'model' => 'raschbirnbauma',
+            'userlastattempttime' => time() - 100,
+            'difficulty' => 1.23,
+            'catscaleid' => 1,
+        ];
+
         return [
             'maximum questions reached' => [
                 'expected' => result::err('reachedmaximumquestions'),
@@ -86,17 +98,12 @@ class teststrategy_fastest_test extends basic_testcase
                 ]
             ],
             'maximum questions reached2' => [
-                'expected' => result::ok((object)[]),
+                'expected' => result::ok($question1),
                 'attemptcontext' => [
                     'questionsattempted' => 0,
                     'maximumquestions' => 10,
                     'questions' => [
-                        1 => (object) [
-                            'id' => 1,
-                            'model' => 'raschbirnbauma',
-                            'userlastattempttime' => time() - 100,
-                            'difficulty' => 1.23,
-                        ]
+                        1 => $question1,
                     ],
                     'selectfirstquestion' => 'startwitheasiestquestion',
                     'questions_ordered_by' => 'difficulty',
@@ -113,6 +120,8 @@ class teststrategy_fastest_test extends basic_testcase
                     ],
                     'person_ability' => 1,
                     'includesubscales' => true,
+
+                    'max_attempts_per_scale' => 10,
                 ]
             ],
         ];
