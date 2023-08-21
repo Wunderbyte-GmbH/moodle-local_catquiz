@@ -114,6 +114,16 @@ class updatepersonability extends preselect_task implements wb_middleware {
 
         $this->update_person_param($context, $updatedability);
         if (abs($context['person_ability'][$lastquestion->catscaleid] - $updatedability) < self::UPDATE_THRESHOLD) {
+            // The questions of this scale should be excluded in the remaining quiz attempt.
+            $context['questions'] = array_filter(
+                $context['questions'],
+                fn ($q) => $q->catscaleid !== $lastquestion->catscaleid
+            );
+            if (count($context['questions']) === 0) {
+                return result::err(status::ERROR_NO_REMAINING_QUESTIONS);
+            }
+            $this->mark_subscale_as_removed($lastquestion->catscaleid);
+
             // If we do have more than the minimum questions, we should return.
             if ($context['questionsattempted'] >= $context['minimumquestions']) {
                 return result::err(status::ABORT_PERSONABILITY_NOT_CHANGED);
@@ -193,5 +203,20 @@ class updatepersonability extends preselect_task implements wb_middleware {
             $context['lastquestion']->catscaleid,
             $updatedability
         );
+    }
+
+    /**
+     * Add the given catscaleid to the list of excluded catscales.
+     *
+     * By storing this information in the cache, we can remember excluded
+     * subscales for the whole quiz attempt.
+     */
+    protected function mark_subscale_as_removed($catscaleid)
+    {
+        $cache = cache::make('local_catquiz', 'adaptivequizattempt');
+        $excludedscales = $cache->get('excludedscales') ?: [];
+        $excludedscales[] = $catscaleid;
+        $excludedscales = array_unique($excludedscales);
+        $cache->set('excludedscales', $excludedscales);
     }
 }
