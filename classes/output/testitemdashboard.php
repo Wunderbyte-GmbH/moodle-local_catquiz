@@ -238,7 +238,7 @@ class testitemdashboard implements renderable, templatable {
         list ($sql, $params) = catquiz::get_sql_for_max_status_for_item($this->testitemid, $this->contextid);
         $maxstatus = intval($DB->get_field_sql($sql, $params));
         switch ($maxstatus) {
-            case STATUS_NOT_SET:
+            case STATUS_EXCLUDED_MANUALLY:
                 return get_string('statusnotset', 'local_catquiz');
             case STATUS_NOT_CALCULATED:
                 return get_string('statusnotcalculated', 'local_catquiz');

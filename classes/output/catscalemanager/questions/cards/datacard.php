@@ -120,9 +120,9 @@ class datacard implements renderable {
         // We are displaying two types of status.
         // Information about model status...
         switch ($record->status) {
-            case STATUS_NOT_SET:
+            case STATUS_EXCLUDED_MANUALLY:
                 $modelstatus = get_string('statusnotset', 'local_catquiz');
-                $statuscircleclass = STATUS_NOT_SET_COLOR_CLASS;
+                $statuscircleclass = STATUS_EXCLUDED_MANUALLY_COLOR_CLASS;
                 break;
             case STATUS_NOT_CALCULATED:
                 $modelstatus = get_string('statusnotcalculated', 'local_catquiz');

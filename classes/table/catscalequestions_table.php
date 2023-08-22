@@ -172,10 +172,10 @@ class catscalequestions_table extends wunderbyte_table {
     public function col_status($values) {
 
         if ($this->is_downloading()) {
-            return !empty($values->status) ? $values->status : 0;
+            return !empty($values->status) ? $values->status : STATUS_NOT_CALCULATED;
         }
         $bootstrapclass = "";
-        $status = $values->status ?? STATUS_NOT_SET;
+        $status = $values->status ?? STATUS_NOT_CALCULATED;
 
         switch ($status) {
             case STATUS_SET_MANUALLY:
@@ -187,8 +187,8 @@ class catscalequestions_table extends wunderbyte_table {
             case STATUS_NOT_CALCULATED:
                 $bootstrapclass = STATUS_NOT_CALCULATED_COLOR_CLASS;
                 break;
-            case STATUS_NOT_SET:
-                $bootstrapclass = STATUS_NOT_SET_COLOR_CLASS;
+            case STATUS_EXCLUDED_MANUALLY:
+                $bootstrapclass = STATUS_EXCLUDED_MANUALLY_COLOR_CLASS;
                 break;
             case STATUS_UPDATED_MANUALLY:
                 $bootstrapclass = STATUS_UPDATED_MANUALLY_COLOR_CLASS;

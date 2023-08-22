@@ -230,7 +230,7 @@ $string['numberofanswersincorrect'] = "Wrong";
 $string['numberofanswerspartlycorrect'] = "Partly correct";
 $string['averageofallanswers'] = "Average";
 
-$string['itemstatus_-5'] = "Manually excluded"; // STATUS_NOT_SET.
+$string['itemstatus_-5'] = "Manually excluded"; // STATUS_EXCLUDED_MANUALLY.
 $string['itemstatus_0'] = "Not yet calculated"; // STATUS_NOT_CALCULATED.
 $string['itemstatus_1'] = "Calculated"; // STATUS_CALCULATED.
 $string['itemstatus_4'] = "Manually updated"; // STATUS_UPDATED_MANUALLY.

@@ -67,7 +67,7 @@ class item_model_override_selector extends dynamic_form {
         $models = model_strategy::get_installed_models();
 
         $options = [
-            STATUS_NOT_SET => get_string('statusnotset', 'local_catquiz'),
+            STATUS_EXCLUDED_MANUALLY => get_string('statusnotset', 'local_catquiz'),
             STATUS_CALCULATED => get_string('statussetautomatically', 'local_catquiz'),
             STATUS_SET_MANUALLY => get_string('statussetmanually', 'local_catquiz'),
             STATUS_NOT_CALCULATED => get_string('statusnotcalculated', 'local_catquiz'),

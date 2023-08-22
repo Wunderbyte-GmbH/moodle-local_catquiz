@@ -46,13 +46,13 @@ define('TESTITEM_STATUS_ACTIVE', 0);
 define('TESTITEM_STATUS_INACTIVE', 1);
 
 // Testitem model calc status.
-define('STATUS_NOT_SET', -5);
+define('STATUS_EXCLUDED_MANUALLY', -5);
 define('STATUS_NOT_CALCULATED', 0);
 define('STATUS_CALCULATED', 1);
 define('STATUS_UPDATED_MANUALLY', 4);
 define('STATUS_SET_MANUALLY', 5);
 
-define('STATUS_NOT_SET_COLOR_CLASS', 'text-danger');
+define('STATUS_EXCLUDED_MANUALLY_COLOR_CLASS', 'text-danger');
 define('STATUS_NOT_CALCULATED_COLOR_CLASS', 'text-secondary');
 define('STATUS_CALCULATED_COLOR_CLASS', 'text-warning');
 define('STATUS_UPDATED_MANUALLY_COLOR_CLASS', 'text-primary');
