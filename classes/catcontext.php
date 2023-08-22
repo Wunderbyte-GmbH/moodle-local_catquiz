@@ -314,7 +314,7 @@ class catcontext {
     public function get_strategy(int $catscaleid): model_strategy {
         $responses = self::create_response_from_db($this->id, $catscaleid);
         $options = json_decode($this->json, true) ?? [];
-        $savedabilities = model_person_param_list::load_from_db($this->id, $catscaleid);
+        $savedabilities = model_person_param_list::load_from_db($this->id, [$catscaleid]);
         return new model_strategy($responses, $options, $savedabilities);
     }
 

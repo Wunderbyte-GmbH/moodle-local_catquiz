@@ -30,6 +30,7 @@ use local_catquiz\catcontext;
 use local_catquiz\catquiz;
 use local_catquiz\catscale;
 use local_catquiz\local\model\model_item_param_list;
+use local_catquiz\local\model\model_person_param_list;
 use local_catquiz\local\model\model_strategy;
 use local_catquiz\local\result;
 use local_catquiz\local\status;
@@ -51,7 +52,7 @@ class updatepersonability extends preselect_task implements wb_middleware {
      *
      * @var int
      */
-    const UPDATE_THRESHOLD = 0.001;
+    const UPDATE_THRESHOLD = 0.05;
 
     /**
      * Run preselect task.
@@ -104,10 +105,10 @@ class updatepersonability extends preselect_task implements wb_middleware {
             // If we already have an ability, just continue with that one and do not update it.
             // Otherwise, use 0 as default value.
             $context['skip_reason'] = 'abilityisnan';
-            if (!is_nan($context['person_ability'])) {
+            if (!is_nan($context['person_ability'][$lastquestion->catscaleid])) {
                 return $next($context);
             } else {
-                $context['person_ability'] = 0;
+                $context['person_ability'][$lastquestion->catscaleid] = 0;
                 return $next($context);
             }
         }
@@ -130,7 +131,7 @@ class updatepersonability extends preselect_task implements wb_middleware {
             }
         }
 
-        $context['person_ability'] = $updatedability;
+        $context['person_ability'][$lastquestion->catscaleid] = $updatedability;
         return $next($context);
     }
 
@@ -177,18 +178,20 @@ class updatepersonability extends preselect_task implements wb_middleware {
     protected function get_item_param_list($responses, $context) {
         // We will update the person ability. Select the correct model for each item.
         $modelstrategy = new model_strategy($responses);
+        $catscaleids = [
+            $context['lastquestion']->catscaleid,
+            ...catscale::get_subscale_ids($context['lastquestion']->catscaleid)
+        ];
         $itemparamlists = [];
+        $personparams = model_person_param_list::load_from_db($context['contextid'], $catscaleids);
         foreach (array_keys($modelstrategy->get_installed_models()) as $model) {
             $itemparamlists[$model] = model_item_param_list::load_from_db(
                 $context['contextid'],
                 $model,
-                [
-                    $context['lastquestion']->catscaleid,
-                    ...catscale::get_subscale_ids($context['lastquestion']->catscaleid)
-                ]
+                $catscaleids
             );
         }
-        $itemparamlist = $modelstrategy->select_item_model($itemparamlists);
+        $itemparamlist = $modelstrategy->select_item_model($itemparamlists, $personparams);
         return $itemparamlist;
     }
 

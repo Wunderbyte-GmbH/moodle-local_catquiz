@@ -61,11 +61,11 @@ class teststrategy_fastest extends strategy {
     public function requires_score_modifiers(): array {
         return [
             maximumquestionscheck::class,
+            remove_uncalculated::class,
             noremainingquestions::class,
             mayberemovescale::class,
             firstquestionselector::class,
             updatepersonability::class,
-            remove_uncalculated::class,
             lasttimeplayedpenalty::class,
             numberofgeneralattempts::class,
             fisherinformation::class,

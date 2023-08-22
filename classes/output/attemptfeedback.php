@@ -121,12 +121,16 @@ class attemptfeedback implements renderable, templatable {
         if (!$this->contextid || !$this->catscaleid) {
             return get_string('notavailable', 'core');
         }
-        $abilities = catquiz::get_person_abilities($USER->id, $this->contextid, [$this->catscaleid, ...catscale::get_subscale_ids($this->catscaleid)]);
-        $catscales = catquiz::get_catscales(array_keys($abilities));
+        $personparams = catquiz::get_person_abilities($this->contextid, [$this->catscaleid, ...catscale::get_subscale_ids($this->catscaleid)], $USER->id);
+        $catscales = catquiz::get_catscales(array_map(fn ($pp) => $pp->catscaleid, $personparams));
 
         $result = [];
-        foreach ($abilities as $catscaleid => $ability) {
-            $result[] = ['ability' => $ability, 'catscaleid' => $catscaleid, 'name' => $catscales[$catscaleid]->name];
+        foreach ($personparams as $pp) {
+            $result[] = [
+                'ability' => $pp->ability,
+                'catscaleid' => $pp->catscaleid,
+                'name' => $catscales[$pp->catscaleid]->name
+            ];
         }
         return $result;
     }

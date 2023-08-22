@@ -27,6 +27,7 @@ namespace local_catquiz\local\model;
 require_once($CFG->dirroot . '/local/catquiz/lib.php');
 
 use core_plugin_manager;
+use local_catquiz\catscale;
 use local_catquiz\local\model\model_item_param_list;
 use MoodleQuickForm;
 
@@ -322,14 +323,15 @@ class model_strategy {
      */
     public function get_params_from_db(int $contextid, int $catscaleid): array {
         $models = $this->get_installed_models();
+        $catscaleids = [$catscaleid, ...catscale::get_subscale_ids($catscaleid)];
         foreach (array_keys($models) as $modelname) {
             $estimateditemdifficulties[$modelname] = model_item_param_list::load_from_db(
                 $contextid,
                 $modelname,
-                $catscaleid
+                $catscaleids
             );
         }
-        $personabilities = model_person_param_list::load_from_db($contextid, $catscaleid);
+        $personabilities = model_person_param_list::load_from_db($contextid, $catscaleids);
         return [$estimateditemdifficulties, $personabilities];
     }
 

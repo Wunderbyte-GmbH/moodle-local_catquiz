@@ -28,6 +28,7 @@ use ArrayIterator;
 use Countable;
 use dml_exception;
 use IteratorAggregate;
+use local_catquiz\catquiz;
 use local_catquiz\local\model\model_person_param;
 use Traversable;
 
@@ -65,15 +66,8 @@ class model_person_param_list implements ArrayAccess, IteratorAggregate, Countab
      * @return model_person_param_list
      * @throws dml_exception
      */
-    public static function load_from_db(int $contextid, int $catscaleid): self {
-        global $DB;
-        $personrows = $DB->get_records(
-            'local_catquiz_personparams',
-            [
-                'contextid' => $contextid,
-                'catscaleid' => $catscaleid,
-            ]
-        );
+    public static function load_from_db(int $contextid, array $catscaleids): self {
+        $personrows = catquiz::get_person_abilities($contextid, $catscaleids);
 
         $personabilities = new model_person_param_list();
         foreach ($personrows as $r) {

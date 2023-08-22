@@ -101,20 +101,25 @@ class personability_loader implements contextloaderinterface {
                 ...catscale::get_subscale_ids($context['catscaleid'])
             );
         }
-        $abilities = catquiz::get_person_abilities(
-            $context['userid'],
+        $personparams = catquiz::get_person_abilities(
             $context['contextid'],
-            $catscaleids
+            $catscaleids,
+            $context['userid']
         );
+        // Index by catscale ID.
+        $filteredparams = [];
+        foreach (array_filter($personparams, fn ($pp) => in_array($pp->catscaleid, $catscaleids)) as $pp) {
+            $filteredparams[$pp->catscaleid] = $pp;
+        }
 
-        $personparams = [];
+        $abilities = [];
         foreach ($catscaleids as $scaleid) {
-            $ability = $abilities[$scaleid]
-                ? floatval($abilities[$scaleid])
+            $ability = ! empty($filteredparams[$scaleid])
+                ? floatval($filteredparams[$scaleid]->ability)
                 : self::DEFAULT_ABILITY
                 ;
-                $personparams[$scaleid] = $ability;
+                $abilities[$scaleid] = $ability;
         }
-        return $personparams;
+        return $abilities;
     }
 }

@@ -47,12 +47,6 @@ class updatepersonabilitytesting extends updatepersonability {
     protected function update_cached_responses($userresponses) {
     }
 
-    protected function get_item_param_list($responses, $context) {
-    }
-
-    protected function get_updated_ability($a, $b) {
-    }
-
     protected function update_person_param($a, $b) {
     }
 }

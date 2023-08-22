@@ -66,7 +66,7 @@ final class fisherinformation extends preselect_task implements wb_middleware {
             }
 
             $item->{self::PROPERTYNAME} = $model::fisher_info(
-                $context['person_ability'],
+                $context['person_ability'][$context['lastquestion']->catscaleid],
                 $params
             );
         }

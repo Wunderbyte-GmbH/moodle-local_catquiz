@@ -94,7 +94,10 @@ class updatepersonability_test extends TestCase {
                 'expected' => 'not_skipped',
                 'context' => [
                     'skip_reason' => 'not_skipped',
-                    'person_ability' => 1.23,
+                    'person_ability' => [
+                        1 => 1.23,
+                    ],
+                    'contextid' => 1,
                     'lastquestion' => (object) ['catscaleid' => "1"],
                     'userid' => 1, // This user does not have enough responses
                     'questions' => [
