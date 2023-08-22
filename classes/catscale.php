@@ -291,12 +291,13 @@ class catscale {
      *
      */
     private static function add_subscales(int $parentid, $all): ?array {
+        $result = [];
         foreach ($all as $scale) {
             if (intval($scale->parentid) === $parentid) {
-                return [$scale->id, ...self::add_subscales(intval($scale->id), $all)];
+                $result = [...$result, $scale->id, ...self::add_subscales(intval($scale->id), $all)];
             }
         }
-        return [];
+        return $result;
     }
 
     /**
