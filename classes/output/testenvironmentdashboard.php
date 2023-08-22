@@ -31,21 +31,28 @@ use renderable;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class testenvironmentdashboard implements renderable, templatable {
+    /**
+     * @var integer
+     */
+    private ?int $catscaleid = null;
+
 
     /**
      * Constructor.
+     * @param ?int $catscaleid
      */
-    public function __construct() {
-
+    public function __construct($catscaleid = null) {
+        $this->catscaleid = $catscaleid;
     }
 
     /**
      * REnders testenvironment table.
      *
-     * @param ?int $catscaleid If given, only return test environments that use the given cat scale
+     * @param ?int $catscaleid If given, only return test environments that use the given cat scale.
      * @return string
      */
     public function testenvironmenttable($catscaleid = null) {
+
 
         $table = new testenvironments_table('testenvironmentstable');
 
@@ -150,7 +157,7 @@ class testenvironmentdashboard implements renderable, templatable {
 
         return [
             'returnurl' => $url->out(),
-            'table' => $this->testenvironmenttable(),
+            'table' => $this->testenvironmenttable($this->catscaleid),
         ];
     }
 
