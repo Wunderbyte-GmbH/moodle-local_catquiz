@@ -187,7 +187,7 @@ class catquiz {
                 COALESCE(s3.userlastattempttime,0) as userlastattempttime
             FROM {question} q
 
-            LEFT JOIN {question_versions} qv
+            JOIN {question_versions} qv
             ON q.id=qv.questionid
 
             LEFT JOIN {question_bank_entries} qbe
@@ -232,16 +232,16 @@ class catquiz {
 
             ) as s1
             LEFT JOIN (
-            SELECT
-                maxlcip.componentid, maxlcip.componentname, maxlcip.model, maxlcip.difficulty, maxlcip.discrimination, maxlcip.guessing,
-                s4.timecreated, maxlcip.timemodified, s4.status
-            FROM (
-                SELECT lcip.*, ROW_NUMBER() OVER (PARTITION BY componentid, componentname ORDER BY lcip.status DESC, lcip.timecreated DESC) AS n
-                FROM {local_catquiz_itemparams} lcip
-            ) AS s4
-            JOIN {local_catquiz_itemparams} maxlcip
-            ON s4.id = maxlcip.id
-            WHERE n = 1
+                SELECT
+                    maxlcip.componentid, maxlcip.componentname, maxlcip.model, maxlcip.difficulty, maxlcip.discrimination, maxlcip.guessing,
+                    s4.timecreated, maxlcip.timemodified, s4.status
+                FROM (
+                    SELECT lcip.*, ROW_NUMBER() OVER (PARTITION BY componentid, componentname ORDER BY lcip.status DESC, lcip.timecreated DESC) AS n
+                    FROM {local_catquiz_itemparams} lcip
+                ) AS s4
+                JOIN {local_catquiz_itemparams} maxlcip
+                ON s4.id = maxlcip.id
+                WHERE n = 1
             ) AS s5
             ON s5.componentid = s1.id
             AND s5.componentname = s1.component
@@ -302,7 +302,15 @@ class catquiz {
         $from = "( SELECT q.id, qbe.idnumber, q.name, q.questiontext, q.qtype, qc.name as categoryname, s2.contextattempts," .
              $DB->sql_group_concat($DB->sql_concat("'-'", 'lci.catscaleid', "'-'")) ." as catscaleids
             FROM {question} q
-                JOIN {question_versions} qv ON q.id=qv.questionid
+                JOIN (
+                    SELECT *
+                    FROM (
+                        SELECT *, ROW_NUMBER() OVER (PARTITION BY questionbankentryid ORDER BY version DESC) AS n
+                        FROM m_question_versions
+                    ) s2
+                    WHERE n = 1
+                ) qv
+                ON q.id=qv.questionid
                 JOIN {question_bank_entries} qbe ON qv.questionbankentryid=qbe.id
                 JOIN {question_categories} qc ON qc.id=qbe.questioncategoryid
                 LEFT JOIN {local_catquiz_items} lci ON lci.componentid=q.id AND lci.componentname='question'
@@ -547,7 +555,8 @@ class catquiz {
         }
         $where .= " GROUP BY u.id, u.firstname, u.lastname, ccc1.id";
 
-        $from = " (SELECT u.id, u.firstname, u.lastname, ccc1.id AS contextid, COUNT(*) as studentattempts FROM $from WHERE $where) s1
+        $from = " (SELECT u.id, u.firstname, u.lastname, ccc1.id AS contextid,
+                        COUNT(*) as studentattempts FROM $from WHERE $where) s1
                     JOIN (
                         SELECT userid, contextid, MAX(ability) as ability
                         FROM {local_catquiz_personparams} cpp
@@ -654,7 +663,8 @@ class catquiz {
            GROUP BY catscaleid
         ) s1 ON ct.catscaleid = s1.itemcatscale
         JOIN (
-            SELECT c.id AS courseid, " . $DB->sql_group_concat($DB->sql_concat_join("' '", ['u.firstname', 'u.lastname']), ', ') . " AS teachers
+            SELECT c.id AS courseid, " .
+                $DB->sql_group_concat($DB->sql_concat_join("' '", ['u.firstname', 'u.lastname']), ', ') . " AS teachers
             FROM {user} u
             JOIN {role_assignments} ra ON ra.userid = u.id
             JOIN {context} ct ON ct.id = ra.contextid
