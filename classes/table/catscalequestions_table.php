@@ -104,6 +104,7 @@ class catscalequestions_table extends wunderbyte_table {
         $data['showactionbuttons'][] = [
             'class' => 'btn btn-plain btn-smaller',
             'iclass' => empty($values->testitemstatus) ? 'fa fa-eye' : 'fa fa-eye-slash',
+            'arialabel' => empty($values->testitemstatus) ? 'eye icon' : 'eye icon slashed',
             'href' => '#',
             'id' => $values->id,
             'methodname' => 'togglestatus', // The method needs to be added to your child of wunderbyte_table class.
@@ -120,6 +121,7 @@ class catscalequestions_table extends wunderbyte_table {
         $data['showactionbuttons'][] = [
                 'class' => 'btn btn-plain btn-smaller',
                 'iclass' => 'fa fa-cog',
+                'arialabel' => 'cogwheel',
                 'href' => $url->out(false),
                 'methodname' => '',
                 'nomodal' => true,
@@ -127,23 +129,24 @@ class catscalequestions_table extends wunderbyte_table {
                     'id' => 'id',
                 ],
             ];
-            $data['showactionbuttons'][] = [
-                'class' => 'btn btn-plain btn-smaller',
-                'iclass' => 'fa fa-trash',
+        $data['showactionbuttons'][] = [
+            'class' => 'btn btn-plain btn-smaller',
+            'iclass' => 'fa fa-trash',
+            'arialabel' => 'trash bin',
+            'id' => $values->id,
+            'href' => '#',
+            'methodname' => 'deletequestionfromscale',
+            'nomodal' => false,
+            'data' => [ // Will be added eg as data-id = $values->id, so values can be transmitted to the method above.
+                'questionid' => $values->id,
                 'id' => $values->id,
-                'href' => '#',
-                'methodname' => 'deletequestionfromscale',
-                'nomodal' => false,
-                'data' => [ // Will be added eg as data-id = $values->id, so values can be transmitted to the method above.
-                    'questionid' => $values->id,
-                    'id' => $values->id,
-                    'catscaleid' => $values->catscaleid,
-                    'titlestring' => 'deletedatatitle', // Will be shown in modal title.
-                    'bodystring' => 'confirmdeletion', // Will be shown in modal body in case elements are selected.
-                    'component' => 'local_catquiz',
-                    'labelcolumn' => 'name', // Verify value of record that will be deleted.
-                ]
-            ];
+                'catscaleid' => $values->catscaleid,
+                'titlestring' => 'deletedatatitle', // Will be shown in modal title.
+                'bodystring' => 'confirmdeletion', // Will be shown in modal body in case elements are selected.
+                'component' => 'local_catquiz',
+                'labelcolumn' => 'name', // Verify value of record that will be deleted.
+            ]
+        ];
 
             table::transform_actionbuttons_array($data['showactionbuttons']);
             return $OUTPUT->render_from_template('local_wunderbyte_table/component_actionbutton', $data);
