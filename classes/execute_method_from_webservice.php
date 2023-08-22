@@ -25,27 +25,39 @@
 
  namespace local_catquiz;
 
+ require_once($CFG->dirroot . '/local/catquiz/lib.php');
+
  class execute_method_from_webservice {
 
     /**
      * Execute method using params: methodname, data.
      *
      * @param array $params
+     * @param string $paramsarrayasstring
      *
      * @return boolean
      */
-    public static function execute_method($params) {
+    public static function execute_method($methodname, $paramsarrayasstring = "") {
+        // Params need to be set in the template.
+        if (!empty($paramsarrayasstring)) {
+            $params = explode(",", $paramsarrayasstring);
+        }
 
-        switch ($params['methodname']) {
+        switch ($methodname) {
 
             case 'local_catquiz_toggle_testitemstatus':
-                $data = json_decode($params['data']);
 
-                $status = $data->newstatus;
-                $catscaleid = $data->scaleid;
-                $id = $data->testitemid;
+                if ($params[2] == "-slash"){
+                    $status = TESTITEM_STATUS_ACTIVE;
+                } else {
+                    $status = TESTITEM_STATUS_INACTIVE;
+                };
 
-                catscale::add_or_update_testitem_to_scale((int)$catscaleid, $id, $status);
+                $catscaleid = $params[0];
+                $id = $params[1];
+                $component = $params[3];
+
+                catscale::add_or_update_testitem_to_scale((int)$catscaleid, $id, $status, $component);
 
                 return true;
             default:

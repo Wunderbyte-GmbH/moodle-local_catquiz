@@ -256,7 +256,7 @@ class testitemdashboard implements renderable, templatable {
      */
     private function get_questiondetailview_data() {
 
-        $questiondetailview = new questiondetailview($this->testitemid, $this->contextid, $this->catscaleid);
+        $questiondetailview = new questiondetailview($this->testitemid, $this->contextid, $this->catscaleid, $this->component);
         return $questiondetailview->renderdata();
     }
 

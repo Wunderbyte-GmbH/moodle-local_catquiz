@@ -146,10 +146,6 @@ class managecatscaledashboard implements renderable, templatable {
             'questionsdisplay' => $this->questionsdisplayarray,
             'catscalestats' => $this->catscalestatsarray,
             'testitemdashboard' => $this->testitemdashboardarray,
-            'testitemid' => $this->testitemid,
-            'contextid' => $this->contextid,
-            'component' => $this->componentname,
-            'scaleid' => $this->catscaleid,
         ];
         return $data;
     }

@@ -14,15 +14,20 @@
 {{!
     @template local_catquiz
     Template which defines a catquiz view page.
+
+    This template is an example for the generic function reloadTemplate.
+    The data-params of .fa fa-eye are necessary. Ad params are the params needed by the admethodname.
+    Td params are needed to get the context data of the template to be rerendered. Make sure this template
+    (to be rerendered) has data-templateid of elements data-templatelocation.
+
     Classes required for JS:
-    * none
+    * Selector of the item the clicklistener should be attached to (containing data, see comment above)
     Data attributes required for JS:
     * none
     Context variables required for this template:
     Example context (json):
     {
-        "datacard": {
-            "title": "Quiz Details",
+            "title": "General",
             "body": {
                 "id": "12345",
                 "type": "Practice Quiz",
@@ -30,11 +35,16 @@
                 "statuscircle": "success",
                 "status":  "(inactive, manually confirmed)" ,
                 "model": "Adaptive",
-                "attempts": "Unlimited"
+                "attempts": "Unlimited",
+                'testitemid': "0",
+                'contextid': "0",
+                'component': "question",
+                'scaleid': "1",
             }
     }
 }}
-    <div class="card mr-2 col-4">
+    <div class="card mr-2 col-4"
+        data-templateid="local_catquiz/catscalemanager/questions/cards/datacard">
         <div class="card-header">
             {{title}}
         </div>
@@ -42,9 +52,19 @@
         {{#body}}
         <div>{{#str}}id, local_catquiz{{/str}}: {{id}}</div>
         <div>{{#str}}type, local_catquiz{{/str}}: {{type}}</div>
-        <div class="testitem-togglestatus"
-            data-templatename="catcmanager/testitemdashboard">
-            {{#str}}status, core{{/str}}: <i class='fa fa-eye{{closedeye}}' id="testitem-status-activity-eye"></i> <i class='fa fa-circle {{statuscircle}}' id="testitem-status-circle"></i>{{status}}
+        <div class="testitem-togglestatus">
+            {{#str}}status, core{{/str}}:
+            <i class='fa fa-eye{{closedeye}}'
+            data-id="testitem-toggle-status"
+            data-templatelocation="local_catquiz/catscalemanager/questions/cards/datacard"
+            data-classlocation="local_catquiz\output\catscalemanager\questions\cards\datacard"
+            data-tdmethod="testitem-toggle-status"
+            data-tdparams="{{testitemid}},{{contextid}},{{scaleid}},{{component}}"
+            data-adparams="{{scaleid}},{{testitemid}},{{closedeye}},{{component}}"
+            data-admethodname="local_catquiz_toggle_testitemstatus">
+            </i>
+            <i class='fa fa-circle {{statuscircle}}' id="testitem-status-circle"></i>
+            {{status}}
         </div>
         <div>{{#str}}model, local_catquiz{{/str}}: {{model}}</div>
         <div>{{#str}}attempts, local_catquiz{{/str}}: {{attempts}}</div>
@@ -53,7 +73,7 @@
     </div>
 
     {{#js}}
-        require(['local_catquiz/testitemdashboard/togglestatus'], function(init) {
-            init.init({{testitemid}}, {{scaleid}}, {{contextid}}, '{{component}}');
+        require(['local_catquiz/reloadTemplate'], function(init) {
+            init.init('[data-id="testitem-toggle-status"]');
         });
     {{/js}}

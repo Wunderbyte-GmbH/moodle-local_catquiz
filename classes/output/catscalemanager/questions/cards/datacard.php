@@ -16,6 +16,9 @@
 
 namespace local_catquiz\output\catscalemanager\questions\cards;
 
+use local_catquiz\catquiz;
+use renderable;
+
 require_once($CFG->dirroot . '/local/catquiz/lib.php');
 require_once($CFG->libdir . '/questionlib.php');
 
@@ -28,33 +31,88 @@ require_once($CFG->libdir . '/questionlib.php');
  * @author     Georg Maißer, Magdalena Holczik
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class datacard {
+class datacard implements renderable {
 
     /**
      * @var object
      */
     private object $record;
 
-    /**
-     * Constructor
-     *
-     * @param object $object
-     *
-     */
-    public function __construct(object $record) {
+    /** @var integer of testitemid */
+    public int $testitemid = 0;
 
-        $this->record = $record;
+    /**
+     * @var integer
+     */
+    private int $contextid = 0;
+
+    /**
+    * @var integer
+    */
+    private int $catscaleid = 0;
+
+    /**
+    * @var string
+    */
+    private string $component = "";
+
+
+    /**
+     * @param int $testitemid
+     * @param int $contextid
+     * @param int $catscaleid
+     * @param string $component
+     * @param ?object $record
+     * @return void
+     */
+    public function __construct(
+        int $testitemid,
+        int $contextid,
+        int $catscaleid,
+        string $component,
+        object $record = null) {
+
+        $this->testitemid = $testitemid;
+        $this->contextid = $contextid;
+        $this->catscaleid = $catscaleid;
+        $this->component = $component;
+
+        if (empty($record)) {
+            $this->record = $this->getrecord();
+        } else {
+            $this->record = $record;
+        }
+    }
+
+    private function getrecord() {
+        global $DB;
+        // If no context is set, get default context from DB.
+        $catcontext = empty($this->contextid) ? catquiz::get_default_context_id() : $this->contextid;
+
+        // Get the record for the specific userid (fetched from optional param).
+        list($select, $from, $where, $filter, $params) = catquiz::return_sql_for_catscalequestions([$this->catscaleid],
+                                                                                                    $catcontext,
+                                                                                                    [], [],
+                                                                                                    $this->testitemid);
+        $idcheck = "id=:userid";
+        $sql = "SELECT $select FROM $from WHERE $where AND $idcheck";
+        $recordinarray = $DB->get_records_sql($sql, $params, IGNORE_MISSING);
+
+        if (empty($recordinarray)) {
+            // Throw error: no record was found with id: $params['userid'].
+        }
+        $record = $recordinarray[$this->testitemid];
+        return $record;
     }
 
     /**
      * Renders datacard of testitem.
      *
-     * @param object $record
      *
      * @return array
      *
      */
-    public function render_datacard_of_testitem() {
+    public function export_for_template(): array {
 
         $title = get_string('general', 'core');
         $record = $this->record;
@@ -108,6 +166,10 @@ class datacard {
         return [
             'title' => $title,
             'body' => $body,
+            'testitemid' => $this->testitemid,
+            'contextid' => $this->contextid,
+            'component' => $this->component,
+            'scaleid' => $this->catscaleid,
         ];
     }
 

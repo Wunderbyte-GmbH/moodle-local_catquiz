@@ -47,6 +47,11 @@ class questiondetailview {
     */
    private int $catscaleid = 0;
 
+    /**
+    * @var string
+    */
+    private string $component = "";
+
 
 
     /**
@@ -60,10 +65,12 @@ class questiondetailview {
     public function __construct(
         int $testitemid,
         int $contextid,
-        int $catscaleid) {
+        int $catscaleid,
+        string $component = 'question') {
         $this->testitemid = $testitemid;
         $this->contextid = $contextid;
         $this->catscaleid = $catscaleid;
+        $this->component = $component;
     }
 
 
@@ -111,9 +118,15 @@ class questiondetailview {
      *
      */
     private function render_datacard_of_testitem(object $record) {
+        global $OUTPUT;
 
-        $datacard = new datacard($record);
-        return $datacard->render_datacard_of_testitem();
+        $datacard = new datacard(
+            $this->testitemid,
+            $this->contextid,
+            $this->catscaleid,
+            $this->component,
+            $record);
+        return $datacard->export_for_template();
     }
 
     /**

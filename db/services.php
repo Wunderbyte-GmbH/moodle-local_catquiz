@@ -105,4 +105,12 @@ $functions = array(
                 'ajax' => true,
                 'loginrequired' => true
         ),
+        'local_catquiz_reload_template' => array(
+                'classname' => 'local_catquiz\external\reload_template',
+                'description' => 'Reloads a card',
+                'type' => 'write',
+                'capabilities' => '',
+                'ajax' => true,
+                'loginrequired' => true
+        ),
 );
