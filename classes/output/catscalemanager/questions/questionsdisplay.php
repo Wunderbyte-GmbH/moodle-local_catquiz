@@ -14,7 +14,7 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
-namespace local_catquiz\output;
+namespace local_catquiz\output\catscalemanager\questions;
 
 use html_writer;
 use local_catquiz\catquiz;

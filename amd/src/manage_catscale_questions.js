@@ -63,7 +63,6 @@ export const init = () => {
     });
 };
 
-// TODO: Change function: give element not id.
 /**
  * Set an eventlistener for a select.
  *  @param {*} element
@@ -71,7 +70,7 @@ export const init = () => {
  *  @param {string} paramname
  *
  */
-function listenToSelect(element, location, paramname) {
+export function listenToSelect(element, location, paramname) {
         // Initialize the form - pass the container element and the form class name.
         const dynamicForm = new DynamicForm(element,
             location
@@ -89,8 +88,6 @@ function listenToSelect(element, location, paramname) {
             window.location.search = searchParams.toString();
         });
 
-        // If a user selects a cat context, submit the form without waiting for the
-        // user to click the submit button
         dynamicForm.addEventListener('change', (e) => {
             e.preventDefault();
 
