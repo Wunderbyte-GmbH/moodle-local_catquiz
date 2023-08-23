@@ -31,6 +31,7 @@ use local_catquiz\catquiz;
 use local_catquiz\catscale;
 use local_catquiz\local\model\model_item_param_list;
 use local_catquiz\local\model\model_person_param_list;
+use local_catquiz\local\model\model_responses;
 use local_catquiz\local\model\model_strategy;
 use local_catquiz\local\result;
 use local_catquiz\local\status;
@@ -81,14 +82,19 @@ class updatepersonability extends preselect_task implements wb_middleware {
         }
 
         $userresponses = $this->update_cached_responses($context);
+        $components = ($userresponses->as_array())[$context['userid']];
+        if (count($components) > 1) {
+            throw new moodle_exception('User has answers to more than one component.');
+        }
+        $arrayresponses = reset($components);
 
-        if (!$this->has_sufficient_responses($userresponses)) {
+        if (!$this->has_sufficient_responses($arrayresponses)) {
             $context['skip_reason'] = 'notenoughresponses';
             return $next($context);
         }
 
         $itemparamlist = $this->get_item_param_list($userresponses, $context);
-        $updatedability = $this->get_updated_ability($userresponses, $itemparamlist);
+        $updatedability = $this->get_updated_ability($arrayresponses, $itemparamlist);
 
         if (is_nan($updatedability)) {
             // In a production environment, we can use fallback values. However,
@@ -157,26 +163,19 @@ class updatepersonability extends preselect_task implements wb_middleware {
         return false;
     }
 
-    protected function load_responses($context) {
-        return catcontext::create_response_from_db($context['contextid'], $context['lastquestion']->catscaleid);
-    }
-
     protected function update_cached_responses($context) {
         $cache = cache::make('local_catquiz', 'adaptivequizattempt');
         $userresponses = $cache->get('userresponses');
         $lastquestion = $context['lastquestion'];
-        $userresponses[$context['lastquestion']->id] = catcontext::create_response_from_db(
+        $userresponses[$context['userid']]['component'][$context['lastquestion']->id] = catcontext::getresponsedatafromdb(
             $context['contextid'],
             $lastquestion->catscaleid,
             $lastquestion->id,
             $context['userid']
-        )
-            ->as_array();
-        $components = $userresponses[$context['userid']];
-        if (count($components) > 1) {
-            throw new moodle_exception('User has answers to more than one component.');
-        }
-        $userresponses = reset($components);
+        )[$context['userid']]['component'][$context['lastquestion']->id];
+        $cache->set('userresponses', $userresponses);
+        
+        $userresponses = (new model_responses())->setdata($userresponses, false);
         return $userresponses;
     }
 

@@ -139,7 +139,12 @@ class model_responses {
      * @return mixed
      *
      */
-    public function setdata($data) {
+    public function setdata($data, bool $filter = true) {
+        if (! $filter) {
+            $this->data = $data;
+            return $this;
+        }
+
         $hascorrectanswer = [];
         foreach ($data as $userid => $components) {
             foreach ($components as $component) {

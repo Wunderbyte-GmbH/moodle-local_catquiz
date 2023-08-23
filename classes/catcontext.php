@@ -168,17 +168,19 @@ class catcontext {
      *
      * @param int $contextid
      * @param int $catscaleid
+     * @param ?int $testitemid
+     * @param ?int $userid
      *
-     * @return model_responses
+     * @return array
      *
      */
-    public static function create_response_from_db(int $contextid, int $catscaleid, ?int $testitemid = null, ?int $userid = null): model_responses {
+    public static function getresponsedatafromdb(int $contextid, int $catscaleid, ?int $testitemid = null, ?int $userid = null): array {
         global $DB;
 
         list ($sql, $params) = catquiz::get_sql_for_model_input($contextid, $catscaleid, $testitemid, $userid);
         $data = $DB->get_records_sql($sql, $params);
         $inputdata = self::db_to_modelinput($data);
-        return (new model_responses)->setData($inputdata);
+        return $inputdata;
     }
 
     /**
@@ -222,6 +224,7 @@ class catcontext {
                 'min_fraction' => $row->minfraction,
                 'qtype' => $row->qtype,
                 'timestamp' => $row->timecreated,
+                'id' => $row->id,
             ];
 
             if (!array_key_exists($row->userid, $modelinput)) {
@@ -235,7 +238,7 @@ class catcontext {
 
             // If we are here, there is already an entry. Only update it if this answer is newer than the last one.
             if ($row->id > $modelinput[$row->userid]['component'][$row->questionid]['id']) {
-                $modelinput[$row->userid]['component'][$row->questionid] = array_merge($entry, ['id' => $row->id]);
+                $modelinput[$row->userid]['component'][$row->questionid] = $entry;
             }
         }
         return $modelinput;
@@ -322,7 +325,8 @@ class catcontext {
      *
      */
     public function get_strategy(int $catscaleid): model_strategy {
-        $responses = self::create_response_from_db($this->id, $catscaleid);
+        $responsedata = self::getresponsedatafromdb($this->id, $catscaleid);
+        $responses = (new model_responses())->setdata($responsedata);
         $options = json_decode($this->json, true) ?? [];
         $savedabilities = model_person_param_list::load_from_db($this->id, [$catscaleid]);
         return new model_strategy($responses, $options, $savedabilities);
