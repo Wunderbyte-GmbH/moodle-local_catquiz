@@ -344,6 +344,23 @@ class catscaledashboard implements renderable, templatable {
         return html_writer::div($inputform->render(), '', ['id' => 'csv_import_form']);
     }
 
+    /**
+     * Render file picker
+     *
+     * @return string
+     *
+     */
+    private function render_testitem_demodata() {
+        $title = get_string('importcolumnsinfos', 'local_catquiz');
+        $columnsarray = testitemimporter::export_columns_for_template();
+        $url = new moodle_url('/local/catquiz/classes/importer/demo.csv');
+        return [
+            'title' => $title,
+            'columns' => $columnsarray,
+            'demofileurl' => $url->out(),
+        ];
+    }
+
 
     /**
      * Renders student stats table.
@@ -428,6 +445,7 @@ class catscaledashboard implements renderable, templatable {
             'personabilities' => $this->render_personabilities($personabilities),
             'contextselector' => $this->render_contextselector(),
             'testitemsimporter' => $this->render_testitem_importer(),
+            'testitemsimporterdemodata' => $this->render_testitem_demodata(),
             'table' => $testenvironmentdashboard->testenvironmenttable($this->catscaleid),
             'studentstable' => $this->render_student_stats_table($this->catscaleid, $this->catcontextid),
             'modelbutton' => $this->render_modelbutton($this->catcontextid),

@@ -310,6 +310,10 @@ $string['importfailed'] = 'Import failed';
 $string['dateparseformat'] = 'Date parse format';
 $string['dateparseformat_help'] = 'Please, use date format like specified in CSV file. Help with <a href="http://php.net/manual/en/function.date.php">this</a> resource for options.';
 $string['defaultdateformat'] = 'j.n.Y H:i:s';
+$string['importcolumnsinfos'] = 'Informations about columns to be imported:';
+$string['mandatory'] = 'mandatory';
+$string['format'] = 'format';
+$string['downloaddemofile'] = 'Download demofile';
 
 // Testenvironments table
 $string['notifyallteachers'] = 'Notify all teachers';

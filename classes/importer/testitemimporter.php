@@ -108,7 +108,7 @@ class testitemimporter {
      * @return array
      *
      */
-    private function define_testitem_columns() {
+    private static function define_testitem_columns() {
         /*
         $columnsassociative = array(
             'userid' => array(
@@ -194,5 +194,10 @@ class testitemimporter {
             )
             ];
         return $columnssequential;
+    }
+
+    /** @return array  */
+    public static function export_columns_for_template() {
+        return self::define_testitem_columns();
     }
 }
