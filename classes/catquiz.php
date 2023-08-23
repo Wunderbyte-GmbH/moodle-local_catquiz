@@ -481,13 +481,17 @@ class catquiz {
      *
      * @param mixed $contextid
      * @param int $catscaleid
+     * @param ?int $testitemid
+     * @param ?int $userid
      *
      * @return array
      *
      */
-    public static function get_sql_for_model_input($contextid, int $catscaleid) {
+    public static function get_sql_for_model_input($contextid, int $catscaleid, ?int $testitemid, ?int $userid) {
 
-        list (, $from, $where, $params) = self::get_sql_for_stat_base_request([], [$contextid]);
+        $testitemids = $testitemid ? [$testitemid] : [];
+        $userids = $userid ? [$userid] : [];
+        list (, $from, $where, $params) = self::get_sql_for_stat_base_request($testitemids, [$contextid], $userids);
 
         $sql = "
         SELECT qas.id, qas.userid, qa.questionid, qas.fraction, qa.minfraction, qa.maxfraction, q.qtype, qas.timecreated

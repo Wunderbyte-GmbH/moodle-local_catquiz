@@ -483,17 +483,15 @@ class catquiz_handler {
     /**
      * Purges the questions cache
      *
-     * @param int $componentid
-     * @param string $componentname
-     * @param bool $includesubscales
-     * @return bool Indicates whether the operation was successful
+     * @return void
      * @throws coding_exception
      * @throws cache_exception
      */
-    public static function purge_attempt_caches(int $componentid, string $componentname, bool $includesubscales = false): bool {
+    public static function prepare_attempt_caches() {
         $cache = cache::make('local_catquiz', 'adaptivequizattempt');
         $cache->purge();
-        return $cache->set('isfirstquestionofattempt', true);
+        $cache->set('isfirstquestionofattempt', true);
+     //   $cache->set('userresponses', []);
     }
 
     /**

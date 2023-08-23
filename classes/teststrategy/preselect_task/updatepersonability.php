@@ -80,20 +80,14 @@ class updatepersonability extends preselect_task implements wb_middleware {
             return $next($context);
         }
 
-        $responses = $this->load_responses($context);
-        $components = ($responses->as_array())[$context['userid']];
-        if (count($components) > 1) {
-            throw new moodle_exception('User has answers to more than one component.');
-        }
-        $userresponses = reset($components);
-        $this->update_cached_responses($userresponses);
+        $userresponses = $this->update_cached_responses($context);
 
         if (!$this->has_sufficient_responses($userresponses)) {
             $context['skip_reason'] = 'notenoughresponses';
             return $next($context);
         }
 
-        $itemparamlist = $this->get_item_param_list($responses, $context);
+        $itemparamlist = $this->get_item_param_list($userresponses, $context);
         $updatedability = $this->get_updated_ability($userresponses, $itemparamlist);
 
         if (is_nan($updatedability)) {
@@ -114,21 +108,18 @@ class updatepersonability extends preselect_task implements wb_middleware {
         }
 
         $this->update_person_param($context, $updatedability);
-        if (abs($context['person_ability'][$lastquestion->catscaleid] - $updatedability) < self::UPDATE_THRESHOLD) {
+        $hasminimumquestions = $context['questionsattempted'] >= $context['minimumquestions'];
+        $abilitynotchanged = abs($context['person_ability'][$lastquestion->catscaleid] - $updatedability) < self::UPDATE_THRESHOLD;
+        if ($hasminimumquestions && $abilitynotchanged) {
             // The questions of this scale should be excluded in the remaining quiz attempt.
             $context['questions'] = array_filter(
                 $context['questions'],
                 fn ($q) => $q->catscaleid !== $lastquestion->catscaleid
             );
             if (count($context['questions']) === 0) {
-                return result::err(status::ERROR_NO_REMAINING_QUESTIONS);
-            }
-            $this->mark_subscale_as_removed($lastquestion->catscaleid);
-
-            // If we do have more than the minimum questions, we should return.
-            if ($context['questionsattempted'] >= $context['minimumquestions']) {
                 return result::err(status::ABORT_PERSONABILITY_NOT_CHANGED);
             }
+            $this->mark_subscale_as_removed($lastquestion->catscaleid);
         }
 
         $context['person_ability'][$lastquestion->catscaleid] = $updatedability;
@@ -170,9 +161,27 @@ class updatepersonability extends preselect_task implements wb_middleware {
         return catcontext::create_response_from_db($context['contextid'], $context['lastquestion']->catscaleid);
     }
 
-    protected function update_cached_responses($userresponses) {
-        $cache = cache::make('local_catquiz', 'userresponses');
-        $cache->set('userresponses', $userresponses);
+    protected function update_cached_responses($context) {
+        $cache = cache::make('local_catquiz', 'adaptivequizattempt');
+        $userresponses = $cache->get('userresponses');
+        $lastquestion = $context['lastquestion'];
+        $userresponses[$context['lastquestion']->id] = catcontext::create_response_from_db(
+            $context['contextid'],
+            $lastquestion->catscaleid,
+            $lastquestion->id,
+            $context['userid']
+        )
+            ->as_array();
+        $components = $userresponses[$context['userid']];
+        if (count($components) > 1) {
+            throw new moodle_exception('User has answers to more than one component.');
+        }
+        $userresponses = reset($components);
+        return $userresponses;
+    }
+
+    private function get_last_userresponse($userid, $qid): float {
+        return 1.0;
     }
 
     protected function get_item_param_list($responses, $context) {

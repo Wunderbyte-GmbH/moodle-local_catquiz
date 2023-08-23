@@ -279,8 +279,8 @@ class model_strategy {
                     continue;
                 }
                 $val = $model->get_information_criterion($informationcriterium, $personabilities, $item, $this->responses);
-                $infocriteriapermodel[$model->get_model_name()] = $val;
-                $maxmodelname = array_keys($infocriteriapermodel, max($infocriteriapermodel))[0];
+                $infocriteriapermodel[$itemid][$model->get_model_name()] = $val;
+                $maxmodelname = array_keys($infocriteriapermodel[$itemid], min($infocriteriapermodel[$itemid]))[0];
                 $selecteditem = $itemdifficultieslists[$maxmodelname][$itemid];
                 $selecteditem->set_status(STATUS_CALCULATED);
                 $newitemdifficulties->add($selecteditem);
