@@ -29,6 +29,7 @@ use Countable;
 use dml_exception;
 use IteratorAggregate;
 use local_catquiz\catquiz;
+use moodle_exception;
 use Traversable;
 
 /**
@@ -315,19 +316,51 @@ class model_item_param_list implements ArrayAccess, IteratorAggregate, Countable
         global $DB;
 
         // If we have a label we look it up and identify the testitemid and use it for further matching.
-        if ($label = $newrecord['label'] ?? false) {
-            $sql = "SELECT qbe.id
-            FROM {question} q
-            JOIN {question_versions} qv
-            ON q.id = qv.questionid
-            JOIN {question_bank_entries} qbe
-            ON qbe.id = qv.questionbankentryid
-            WHERE qbe.idnumber LIKE :label
-            ORDER BY qv.version DESC";
+        // Matching works this way:
+        // - identify idnumber = label in qbe.
+        // - We get back ALL the versions, so an array of questionids.
+        // - Not sure which one to update, so we throw an error when there are more than one.
+        // Way to fix this error: make sure that there is only one version of a question used in a catscale.
+        //
 
-            if ($componentid = $DB->get_field_sql($sql, ['label' => $label])) {
-                $newrecord['componentid'] = $componentid;
-            };
+
+        if ($label = $newrecord['label'] ?? false) {
+            $sql = "SELECT qv.questionid, qv.questionbankentryid as qbeid
+            FROM {question_bank_entries} qbe
+
+            JOIN {question_versions} qv
+            ON qbe.id = qv.questionbankentryid
+
+            JOIN {local_catquiz_items} lci
+            ON lci.componentid=qv.questionid
+
+            WHERE qbe.idnumber = :label
+            GROUP BY qv.questionid, qv.questionbankentryid";
+
+            $records = $DB->get_records_sql($sql, ['label' => $label]);
+
+            $qbeid = 0;
+            foreach ($records as $record) {
+                if (!empty($qbeid)) {
+                    if ($qbeid != $record->qbeid) {
+                        return [
+                            'success' => 0, // Update successfully
+                            'message' => get_string('labelidnotunique', 'local_catquiz'),
+                            'recordid' =>$record->qbeid,
+                         ];
+                    }
+                } else {
+                    $qbeid = $record->qbeid;
+                }
+            }
+
+            foreach ($records as $record) {
+                unset($newrecord['label']);
+                $newrecord['componentid'] = $record->questionid;
+
+                $returnarray = self::save_or_update_testitem_in_db($newrecord);
+            }
+            return $returnarray;
         }
 
         $record = $DB->get_record("local_catquiz_itemparams", [
