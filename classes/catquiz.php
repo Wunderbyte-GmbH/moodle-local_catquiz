@@ -306,7 +306,7 @@ class catquiz {
                     SELECT *
                     FROM (
                         SELECT *, ROW_NUMBER() OVER (PARTITION BY questionbankentryid ORDER BY version DESC) AS n
-                        FROM m_question_versions
+                        FROM {question_versions}
                     ) s2
                     WHERE n = 1
                 ) qv
