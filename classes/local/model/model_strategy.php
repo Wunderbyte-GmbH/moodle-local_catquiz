@@ -117,7 +117,7 @@ class model_strategy {
     ) {
         $this->responses = $responses;
         $this->models = $this->create_installed_models();
-        $this->abilityestimator = new model_person_ability_estimator_demo($this->responses);
+        $this->abilityestimator = new model_person_ability_estimator_catcalc($this->responses);
         $this->set_options($options);
 
         if ($savedpersonabilities === null || count($savedpersonabilities) === 0) {
