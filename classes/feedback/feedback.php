@@ -25,6 +25,9 @@
 namespace local_catquiz\feedback;
 
 use cache;
+use coding_exception;
+use dml_exception;
+use ddl_exception;
 use local_catquiz\catscale;
 use local_catquiz\local\result;
 use local_catquiz\feedback\info;
@@ -81,31 +84,140 @@ class feedback {
         foreach ($scales as $scale) {
 
             $elements[] = $mform->addElement('static',
-                'scaleid_' . $scale->id . '_intro', $scale->name, get_string('setcoursesforscaletext', 'local_catquiz', $scale->name));
+                'feedback_scaleid_' . $scale->id . '_intro', $scale->name, get_string('setcoursesforscaletext', 'local_catquiz', $scale->name));
 
             $elements[] = $mform->addElement('autocomplete',
-                'scaleid_' . $scale->id . '_courseid', '', $coursesarray, $options);
+                'feedback_scaleid_' . $scale->id . '_courseids', '', $coursesarray, $options);
 
             $elements[] = $mform->addElement('text',
-                'scaleid_' . $scale->id . '_lowerlimit', get_string('lowerlimit', 'local_catquiz'));
-            $mform->settype('scaleid_' . $scale->id . '_lowerlimit', PARAM_FLOAT);
+                'feedback_scaleid_' . $scale->id . '_lowerlimit', get_string('lowerlimit', 'local_catquiz'));
+            $mform->settype('feedback_scaleid_' . $scale->id . '_lowerlimit', PARAM_FLOAT);
 
             $elements[] = $mform->addElement('textarea',
-                'scaleid_' . $scale->id . '_feedback', get_string('feedback', 'core'), '');
+                'feedback_scaleid_' . $scale->id . '_feedback', get_string('feedback', 'core'), '');
 
         }
     }
 
     /**
+     * Takes the result of a test and applies the after test actions.
+     * Right now, it's just very limited.
+     * As we don't have the correct structure, we assume the following:
      *
      * @param array $result
      * @return void
      */
-    public static function inscribe_users_to_failed_scales(array $result) {
+    public static function inscribe_users_to_failed_scales(
+        int $quizid,
+        string $component = 'mod_adaptivequiz',
+        array $result = []) {
 
+        global $USER;
 
+        // We use this structure just as a template to be able to execute the function.
+        // The treatment should be adjusted according to the actual result data.
+        $result = [
+            'scales' => [
+                1 => [
+                    'scaleid' => 1,
+                    'name' => "scale1",
+                    'personability' => 0.1,
+                ],
+                2 => [
+                    'scaleid' => 2,
+                    'name' => "scale2",
+                    'personability' => -0.2,
+                ],
+            ],
+        ];
 
+        // First, we need to find out the settings for the current text.
+        // We use a function to extract the data from the stored json.
+        $settings = self::return_feedback_settings_from_json($quizid, $component);
 
+        // We run through all the scales we got feedback for.
+        foreach ($result['scales'] as $scaleid => $scale) {
+
+            // If we find settings for a scale...
+            if (isset($settings[$scaleid])) {
+                // We check if we are below the lower threshhold.
+                $personability = $scale['personability'];
+                $lowerlimit = (float)$settings[$scaleid]['lowerlimit'];
+                $courseids = $settings[$scaleid]["courseid"];
+
+                if ($personability < $lowerlimit
+                    && !empty($courseids)) {
+
+                    // Do the course inscription of the current user.
+                    foreach ($courseids as $courseid) {
+
+                        self::enrol_user($USER->id, $courseid);
+                    }
+                }
+            }
+
+        }
+
+    }
+
+    /**
+     * Function to access test record and return the settings relevant for feedback.
+     * @param int $quizid
+     * @param string $component
+     * @return void
+     */
+    private static function return_feedback_settings_from_json(int $quizid, string $component) {
+
+        global $DB;
+
+        $test = $DB->get_record('local_catquiz_tests', ['componentid' => $quizid, 'component' => $component]);
+
+        $settings = json_decode($test->json);
+
+        $returnarray = [];
+        foreach ($settings as $key => $value) {
+            if (strpos($key, 'feedback_scaleid_') === 0) {
+
+                list($a, $b, $scaleid, $field) = explode('_', $key);
+
+                $returnarray[$scaleid][$field] = $value;
+
+            }
+        }
+
+        return $returnarray;
+    }
+
+    /**
+     * Function to enrol user to course.
+     * @param int $userid
+     * @param int $courseid
+     * @param int $roleid
+     * @return void
+     * @throws coding_exception
+     * @throws dml_exception
+     * @throws ddl_exception
+     * @throws moodle_exception
+     */
+    public static function enrol_user(int $userid, int $courseid, int $roleid = 0) {
+        global $DB;
+
+        if (!enrol_is_enabled('manual')) {
+            return; // Manual enrolment not enabled.
+        }
+
+        if (!$enrol = enrol_get_plugin('manual')) {
+            return; // No manual enrolment plugin.
+        }
+        if (!$instances = $DB->get_records('enrol',
+                array('enrol' => 'manual', 'courseid' => $courseid,
+                    'status' => ENROL_INSTANCE_ENABLED), 'sortorder,id ASC')) {
+            return; // No manual enrolment instance on this course.
+        }
+
+        $instance = reset($instances); // Use the first manual enrolment plugin in the course.
+
+        $enrol->enrol_user($instance, $userid, ($roleid > 0 ? $roleid : $instance->roleid));
     }
 
 }
