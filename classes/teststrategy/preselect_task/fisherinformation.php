@@ -39,13 +39,6 @@ use moodle_exception;
 final class fisherinformation extends preselect_task implements wb_middleware {
 
     /**
-     * PROPERTYNAME
-     *
-     * @var string
-     */
-    const PROPERTYNAME = 'fisherinformation';
-
-    /**
      * Run preselect task.
      *
      * @param array $context
@@ -65,8 +58,8 @@ final class fisherinformation extends preselect_task implements wb_middleware {
                 $params[$paramname] = floatval($item->$paramname);
             }
 
-            $item->{self::PROPERTYNAME} = $model::fisher_info(
-                $context['person_ability'][$context['lastquestion']->catscaleid],
+            $item->fisherinformation = $model::fisher_info(
+                $context['person_ability'][$item->catscaleid],
                 $params
             );
         }
