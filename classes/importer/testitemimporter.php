@@ -66,7 +66,7 @@ class testitemimporter {
     }
 
     /** @return string callbackfunction */
-    private function get_callbackfunction() {
+    private static function get_callbackfunction() {
         return "local_catquiz\local\model\model_item_param_list::save_or_update_testitem_in_db";
     }
 
@@ -75,7 +75,7 @@ class testitemimporter {
      *
      * @return stdClass
      */
-    private function define_settings(
+    private static function define_settings(
         array $definedcolumns,
         string $callbackfunction = null,
         string $delimiter = null,

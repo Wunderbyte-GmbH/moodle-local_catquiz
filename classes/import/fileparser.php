@@ -212,7 +212,7 @@ class fileparser {
                 $callbackresponse = $this->execute_callback($data);
                 if ($callbackresponse['success'] != 1) {
                     $this->errors[] = $callbackresponse['message'];
-                    break;
+                    continue;
                 }
 
                 if (isset($this->uniquekey)) { // With unique key set, we build an associative array.
@@ -261,7 +261,12 @@ class fileparser {
                 ];
             }
         } catch (Exception $e) {
-            throw new moodle_exception('callbackfunctionnotapplied', 'local_catquiz');
+
+            return [
+                'success' => 0,
+                'message' => $e->getMessage(),
+            ];
+            // throw new moodle_exception('callbackfunctionnotapplied', 'local_catquiz');
         }
 
     }

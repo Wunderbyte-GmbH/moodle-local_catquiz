@@ -309,7 +309,7 @@ class model_item_param_list implements ArrayAccess, IteratorAggregate, Countable
      * Check if record exists to update, if not, insert.
      * Some logic to provide the correct values if missing.
      * @param array $newrecord
-     * @return int
+     * @return array
      * @throws dml_exception
      */
     public static function save_or_update_testitem_in_db(array $newrecord) {
@@ -323,6 +323,9 @@ class model_item_param_list implements ArrayAccess, IteratorAggregate, Countable
         // Way to fix this error: make sure that there is only one version of a question used in a catscale.
         //
 
+        $returnarray = [
+            'success' => 0,
+            'message' => 'Error during callback'];
 
         if ($label = $newrecord['label'] ?? false) {
             $sql = "SELECT qv.questionid, qv.questionbankentryid as qbeid
@@ -346,7 +349,7 @@ class model_item_param_list implements ArrayAccess, IteratorAggregate, Countable
                         return [
                             'success' => 0, // Update successfully
                             'message' => get_string('labelidnotunique', 'local_catquiz'),
-                            'recordid' =>$record->qbeid,
+                            'recordid' => $record->qbeid,
                          ];
                     }
                 } else {
@@ -360,15 +363,15 @@ class model_item_param_list implements ArrayAccess, IteratorAggregate, Countable
 
                 $returnarray = self::save_or_update_testitem_in_db($newrecord);
             }
-            return $returnarray;
+            return $returnarray; // Todo: Add more information to error.
         }
 
         $record = $DB->get_record("local_catquiz_itemparams", [
             'componentid' => $newrecord['componentid'],
             'componentname' => $newrecord['componentname'],
             'model' => $newrecord['model'],
-            'contextid' => $newrecord['contextid'],
-        ]);
+            'contextid' => $newrecord['contextid']]);
+
         $now = time();
         $newrecord['timemodified'] = empty($newrecord['timemodified']) ? $now : $newrecord['timemodified'];
         if (isset($record->timecreated) && $record->timecreated != "0") {
@@ -393,7 +396,7 @@ class model_item_param_list implements ArrayAccess, IteratorAggregate, Countable
         return [
             'success' => 1, // Update successfully
             'message' => get_string('recordupdatesuccessful', 'local_catquiz'),
-            'recordid' =>$id,
+            'recordid' => $id,
          ];
     }
 
