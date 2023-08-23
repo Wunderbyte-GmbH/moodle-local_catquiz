@@ -168,7 +168,7 @@ class catquiz {
 
         $select = 'DISTINCT *';
         $from = "( SELECT s1.*, s5.model, s5.difficulty, s5.discrimination, s5.guessing,
-                    s5.timecreated, s5.timemodified, s5.status, s1.catscaleid
+                    s5.timecreated, s5.timemodified, s5.status
             FROM (
             SELECT
                 q.id,
