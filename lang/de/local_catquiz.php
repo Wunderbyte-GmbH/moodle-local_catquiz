@@ -87,6 +87,7 @@ $string['teststrategy_info'] = 'Info Klasse für Teststrategien';
 $string['teststrategy_fastest'] = 'Radikaler CAT';
 $string['teststrategy_balanced'] = 'Moderater CAT';
 $string['pilot_questions'] = 'Pilotfragen';
+$string['inferlowestskillgap'] = 'Unterste Kompetenzlücke diagnostizieren';
 
 $string['catquiz_selectfirstquestion'] = "Auswahl der ersten Quizfrage";
 $string['startwitheasiestquestion'] = "Starte mit der leichtesten Frage an";

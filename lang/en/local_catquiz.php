@@ -88,6 +88,7 @@ $string['teststrategy_info'] = 'Info class for test strategies';
 $string['teststrategy_fastest'] = 'Radical CAT';
 $string['teststrategy_balanced'] = 'Moderate CAT';
 $string['pilot_questions'] = 'Pilot questions';
+$string['inferlowestskillgap'] = 'Infer lowest skill gap';
 
 $string['catquiz_selectfirstquestion'] = "Selection of first question";
 $string['startwitheasiestquestion'] = "Start with the easiest question";

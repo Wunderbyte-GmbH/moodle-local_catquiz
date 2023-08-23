@@ -130,8 +130,10 @@ final class firstquestionselector extends preselect_task implements wb_middlewar
                 $question = $this->get_last_question_of_second_quartile($context['questions']);
                 return result::ok($question);
             case self::STARTWITHAVERAGEABILITYOFTEST:
-                $ability = $this->get_average_ability_of_test($context['testid']);
-                $context['person_ability'] = $ability;
+                $averageability = $this->get_average_ability_of_test($context['testid']);
+                foreach (array_keys($context['person_ability']) as $catscaleid) {
+                    $context['person_ability'][$catscaleid] = $averageability;
+                }
                 return $next($context);
             case self::STARTWITHCURRENTABILITY:
                 return $next($context);

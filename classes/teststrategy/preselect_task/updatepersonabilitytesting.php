@@ -47,6 +47,6 @@ class updatepersonabilitytesting extends updatepersonability {
     protected function update_cached_responses($userresponses) {
     }
 
-    protected function update_person_param($a, $b) {
+    protected function update_person_param($a, $b, $c) {
     }
 }

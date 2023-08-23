@@ -55,6 +55,9 @@ class updatepersonability extends preselect_task implements wb_middleware {
      */
     const UPDATE_THRESHOLD = 0.05;
 
+    public $userresponses;
+    public $arrayresponses;
+
     /**
      * Run preselect task.
      *
@@ -81,20 +84,35 @@ class updatepersonability extends preselect_task implements wb_middleware {
             return $next($context);
         }
 
-        $userresponses = $this->update_cached_responses($context);
-        $components = ($userresponses->as_array())[$context['userid']];
+        $this->userresponses = $this->update_cached_responses($context);
+        $components = ($this->userresponses->as_array())[$context['userid']];
         if (count($components) > 1) {
             throw new moodle_exception('User has answers to more than one component.');
         }
-        $arrayresponses = reset($components);
+        $this->arrayresponses = reset($components);
 
-        if (!$this->has_sufficient_responses($arrayresponses)) {
+        if (!$this->has_sufficient_responses()) {
             $context['skip_reason'] = 'notenoughresponses';
             return $next($context);
         }
 
-        $itemparamlist = $this->get_item_param_list($userresponses, $context);
-        $updatedability = $this->get_updated_ability($arrayresponses, $itemparamlist);
+        $catscaleid = $lastquestion->catscaleid;
+        $context = $this->updateability($context, $catscaleid);
+        foreach (catscale::get_ancestors($catscaleid) as $ancestorscale) {
+            $context = $this->updateability($context, $ancestorscale, true);
+        }
+
+        return $next($context);
+    }
+
+    private function updateability(array $context, int $catscaleid, $isancestor = false) {
+        global $CFG;
+        $itemparamlist = $this->get_item_param_list(
+            $this->userresponses,
+            $context['contextid'],
+            $catscaleid
+        );
+        $updatedability = $this->get_updated_ability($this->arrayresponses, $itemparamlist);
 
         if (is_nan($updatedability)) {
             // In a production environment, we can use fallback values. However,
@@ -105,31 +123,32 @@ class updatepersonability extends preselect_task implements wb_middleware {
             // If we already have an ability, just continue with that one and do not update it.
             // Otherwise, use 0 as default value.
             $context['skip_reason'] = 'abilityisnan';
-            if (!is_nan($context['person_ability'][$lastquestion->catscaleid])) {
-                return $next($context);
+            if (!is_nan($context['person_ability'][$catscaleid])) {
+                return $$context;
             } else {
-                $context['person_ability'][$lastquestion->catscaleid] = 0;
-                return $next($context);
+                $context['person_ability'][$catscaleid] = 0;
+                return $context;
             }
         }
 
-        $this->update_person_param($context, $updatedability);
+        $this->update_person_param($context, $catscaleid, $updatedability);
         $hasminimumquestions = $context['questionsattempted'] >= $context['minimumquestions'];
-        $abilitynotchanged = abs($context['person_ability'][$lastquestion->catscaleid] - $updatedability) < self::UPDATE_THRESHOLD;
-        if ($hasminimumquestions && $abilitynotchanged) {
+        $abilitynotchanged = abs($context['person_ability'][$catscaleid] - $updatedability) < self::UPDATE_THRESHOLD;
+        // We do not exclude questions of ancestor scales if the person ability in such a scale did not change.
+        if (! $isancestor && $hasminimumquestions && $abilitynotchanged) {
             // The questions of this scale should be excluded in the remaining quiz attempt.
             $context['questions'] = array_filter(
                 $context['questions'],
-                fn ($q) => $q->catscaleid !== $lastquestion->catscaleid
+                fn ($q) => $q->catscaleid !== $catscaleid
             );
             if (count($context['questions']) === 0) {
                 return result::err(status::ABORT_PERSONABILITY_NOT_CHANGED);
             }
-            $this->mark_subscale_as_removed($lastquestion->catscaleid);
+            $this->mark_subscale_as_removed($catscaleid);
         }
 
-        $context['person_ability'][$lastquestion->catscaleid] = $updatedability;
-        return $next($context);
+        $context['person_ability'][$catscaleid] = $updatedability;
+        return $context;
     }
 
     /**
@@ -153,9 +172,9 @@ class updatepersonability extends preselect_task implements wb_middleware {
      * @param mixed $userresponses
      * @return bool
      */
-    private function has_sufficient_responses($userresponses) {
-        $first = $userresponses[array_key_first($userresponses)];
-        foreach ($userresponses as $ur) {
+    private function has_sufficient_responses() {
+        $first = $this->arrayresponses[array_key_first($this->arrayresponses)];
+        foreach ($this->arrayresponses as $ur) {
             if ($ur['fraction'] !== $first['fraction']) {
                 return true;
             }
@@ -167,12 +186,16 @@ class updatepersonability extends preselect_task implements wb_middleware {
         $cache = cache::make('local_catquiz', 'adaptivequizattempt');
         $userresponses = $cache->get('userresponses');
         $lastquestion = $context['lastquestion'];
-        $userresponses[$context['userid']]['component'][$context['lastquestion']->id] = catcontext::getresponsedatafromdb(
+        $lastresponse = catcontext::getresponsedatafromdb(
             $context['contextid'],
             $lastquestion->catscaleid,
             $lastquestion->id,
             $context['userid']
-        )[$context['userid']]['component'][$context['lastquestion']->id];
+        );
+        if (! $lastresponse) {
+            throw new \UnexpectedValueException("No response data for last question " . $lastquestion->id);
+        }
+        $userresponses[$context['userid']]['component'][$context['lastquestion']->id] = $lastresponse[$context['userid']]['component'][$context['lastquestion']->id];
         $cache->set('userresponses', $userresponses);
         
         $userresponses = (new model_responses())->setdata($userresponses, false);
@@ -183,18 +206,18 @@ class updatepersonability extends preselect_task implements wb_middleware {
         return 1.0;
     }
 
-    protected function get_item_param_list($responses, $context) {
+    protected function get_item_param_list($responses, $contextid, $catscaleid) {
         // We will update the person ability. Select the correct model for each item.
         $modelstrategy = new model_strategy($responses);
         $catscaleids = [
-            $context['lastquestion']->catscaleid,
-            ...catscale::get_subscale_ids($context['lastquestion']->catscaleid)
+            $catscaleid,
+            ...catscale::get_subscale_ids($catscaleid)
         ];
         $itemparamlists = [];
-        $personparams = model_person_param_list::load_from_db($context['contextid'], $catscaleids);
+        $personparams = model_person_param_list::load_from_db($contextid, $catscaleids);
         foreach (array_keys($modelstrategy->get_installed_models()) as $model) {
             $itemparamlists[$model] = model_item_param_list::load_from_db(
-                $context['contextid'],
+                $contextid,
                 $model,
                 $catscaleids
             );
@@ -207,11 +230,11 @@ class updatepersonability extends preselect_task implements wb_middleware {
         return catcalc::estimate_person_ability($userresponses, $itemparamlist);
     }
 
-    protected function update_person_param($context, $updatedability) {
+    protected function update_person_param($context, $catscaleid, $updatedability) {
         catquiz::update_person_param(
             $context['userid'],
             $context['contextid'],
-            $context['lastquestion']->catscaleid,
+            $catscaleid,
             $updatedability
         );
     }
