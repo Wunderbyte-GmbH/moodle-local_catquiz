@@ -186,6 +186,11 @@ class testitemimporter {
                 'name' => 'guessing',
                 'mandatory' => false,
                 'format' => PARAM_FLOAT,
+            ),
+            array (
+                'name' => 'label',
+                'mandatory' => false,
+                'format' => PARAM_TEXT,
             )
             ];
         return $columnssequential;

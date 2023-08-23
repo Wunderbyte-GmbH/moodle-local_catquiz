@@ -73,7 +73,6 @@ class csvsettings {
      */
     public $callback = '';
 
-
     /**
      * Instantioate attributes.
      *

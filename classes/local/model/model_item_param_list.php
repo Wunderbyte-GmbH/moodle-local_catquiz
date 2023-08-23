@@ -314,6 +314,22 @@ class model_item_param_list implements ArrayAccess, IteratorAggregate, Countable
     public static function save_or_update_testitem_in_db(array $newrecord) {
         global $DB;
 
+        // If we have a label we look it up and identify the testitemid and use it for further matching.
+        if ($label = $newrecord['label'] ?? false) {
+            $sql = "SELECT qbe.id
+            FROM {question} q
+            JOIN {question_versions} qv
+            ON q.id = qv.questionid
+            JOIN {question_bank_entries} qbe
+            ON qbe.id = qv.questionbankentryid
+            WHERE qbe.idnumber LIKE :label
+            ORDER BY qv.version DESC";
+
+            if ($componentid = $DB->get_field_sql($sql, ['label' => $label])) {
+                $newrecord['componentid'] = $componentid;
+            };
+        }
+
         $record = $DB->get_record("local_catquiz_itemparams", [
             'componentid' => $newrecord['componentid'],
             'componentname' => $newrecord['componentname'],
