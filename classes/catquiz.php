@@ -865,30 +865,6 @@ class catquiz {
         ];
         return [$sql, $params];
     }
-    /** Returns an array with the ids of the subscales of the given scale.
-     *
-     * @param array $catscaleids
-     * @return array
-     *
-     */
-    public static function get_subscale_ids_from_parent(array $catscaleids) {
-        global $DB;
-        $select = "*";
-        $from = "{local_catquiz_catscales}";
-
-        $params = [];
-
-        [$insql, $inparams] = $DB->get_in_or_equal($catscaleids, SQL_PARAMS_NAMED);
-
-        $where = ' parentid '. $insql;
-        $params = array_merge($params, $inparams);
-        $filter = '';
-        $sql = "SELECT $select FROM $from WHERE $where";
-        $subscaleids = $DB->get_records_sql($sql, $params);
-
-        return $subscaleids;
-
-    }
 
     /**
      * Returns the default context id from DB.

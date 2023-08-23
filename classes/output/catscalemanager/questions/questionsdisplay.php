@@ -190,10 +190,10 @@ class questionsdisplay {
 
         // If we integrate questions from subscales, we add different ids.
         if ($this->usesubs > 0) {
-            $subscaleids = catquiz::get_subscale_ids_from_parent(
-                [$this->scale]
+            $subscaleids = catscale::get_subscale_ids(
+                $this->scale
             );
-            $idsforquery = array_keys($subscaleids);
+            $idsforquery = array_map('intval', $subscaleids);
             array_push($idsforquery, $this->scale);
         } else {
             $idsforquery = [$this->scale];
