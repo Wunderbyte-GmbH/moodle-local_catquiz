@@ -75,6 +75,8 @@ class dataapi {
         $allcatcontexts = $cache->get('allcatcontexts');
         if ($allcatcontexts) {
             return $allcatcontexts;
+        } else {
+            $allcatcontexts = [];
         }
 
         $records = $DB->get_records('local_catquiz_catcontext');
