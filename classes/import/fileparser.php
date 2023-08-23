@@ -28,6 +28,7 @@ use csv_import_reader;
 use DateTime;
 use Exception;
 use html_writer;
+use moodle_exception;
 use stdClass;
 
 defined('MOODLE_INTERNAL') || die();
@@ -206,7 +207,14 @@ class fileparser {
                 foreach ($csvrecord as $columnname => $value) {
                     $data[$columnname] = $value;
                 }
-                $this->execute_callback($data);
+
+                // Execute the callback. If this doesn't work, don't treat the record.
+                $callbackresponse = $this->execute_callback($data);
+                if ($callbackresponse['success'] != 1) {
+                    $this->errors[] = $callbackresponse['message'];
+                    break;
+                }
+
                 if (isset($this->uniquekey)) { // With unique key set, we build an associative array.
                     if (!isset($this->records[$firstcolumn])) {
                         $this->records[$firstcolumn] = array();
@@ -232,20 +240,28 @@ class fileparser {
      *
      * @param array $data
      *
-     * @return void
-     *
+     * @return array
      */
     private function execute_callback(array $data) {
 
         if (!$callback = $this->settings->callback) {
-            $this->errors[] = "Callback function not properly defined.";
-            return;
+            throw new moodle_exception('callbackfunctionnotdefined', 'local_catquiz');
         };
-
         try {
-            $callback($data);
+            $result = $callback($data);
+            if ($result['success'] != 1) {
+                return [
+                    'success' => 0,
+                    'message' => $result['message'],
+                ];
+            } else {
+                return [
+                    'success' => 1,
+                    'message' => $result['message'],
+                ];
+            }
         } catch (Exception $e) {
-            $this->errors[] = "Callback function could not be applied.";
+            throw new moodle_exception('callbackfunctionnotapplied', 'local_catquiz');
         }
 
     }

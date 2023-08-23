@@ -309,6 +309,10 @@ $string['importcolumnsinfos'] = 'Informationen zu Importfeldern:';
 $string['mandatory'] = 'verpflichtend';
 $string['format'] = 'Format';
 $string['downloaddemofile'] = 'Demofile herunterladen';
+$string['labelidnotunique'] = 'Wert in Label-Spalte muss einzigartig sein .';
+$string['recordupdatesuccessful'] = 'Eintrag erfolgreich aktualisiert.';
+$string['callbackfunctionnotdefined'] = 'Callback Funktion nicht definiert.';
+$string['callbackfunctionnotapplied'] = 'Callback Funktion konnte nicht angewandt werden.';
 
 // Testenvironments table
 $string['notifyallteachers'] = 'Kursleiter der gewählten Kurse benachrichtigen';

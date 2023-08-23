@@ -314,6 +314,10 @@ $string['importcolumnsinfos'] = 'Informations about columns to be imported:';
 $string['mandatory'] = 'mandatory';
 $string['format'] = 'format';
 $string['downloaddemofile'] = 'Download demofile';
+$string['labelidnotunique'] = 'Value in label column should be unique.';
+$string['recordupdatesuccessful'] = 'Update of record was successful.';
+$string['callbackfunctionnotdefined'] = 'Callback function is not defined.';
+$string['callbackfunctionnotapplied'] = 'Callback function could not be applied.';
 
 // Testenvironments table
 $string['notifyallteachers'] = 'Notify all teachers';

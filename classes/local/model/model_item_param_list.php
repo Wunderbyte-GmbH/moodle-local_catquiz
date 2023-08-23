@@ -357,7 +357,11 @@ class model_item_param_list implements ArrayAccess, IteratorAggregate, Countable
                 $id = $newrecord['id'];
             }
         }
-        return $id;
+        return [
+            'success' => 1, // Update successfully
+            'message' => get_string('recordupdatesuccessful', 'local_catquiz'),
+            'recordid' =>$id,
+         ];
     }
 
 }

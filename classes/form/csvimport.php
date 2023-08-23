@@ -142,10 +142,7 @@ class csvimport extends dynamic_form {
         $content = $this->get_file_content('csvfile');
 
         $callback = $data->settingscallback;
-
-
         $returndata = $callback($data, $content);
-
         $returndata['id'] = $data->id;
         $returndata['settingscallback'] = $data->settingscallback;
 
