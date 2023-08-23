@@ -196,6 +196,8 @@ class catscaledashboard implements renderable, templatable {
             'categoryname' => get_string('questioncategories', 'local_catquiz'),
             'model' => get_string('model', 'local_catquiz'),
             'difficulty' => get_string('difficulty', 'local_catquiz'),
+            'discrimination' => get_string('discrimination', 'local_catquiz'),
+            'guessing' => get_string('guessing', 'local_catquiz'),
             'lastattempttime' => get_string('lastattempttime', 'local_catquiz'),
             'attempts' => get_string('questioncontextattempts', 'local_catquiz'),
             'action' => get_string('action', 'local_catquiz'),
