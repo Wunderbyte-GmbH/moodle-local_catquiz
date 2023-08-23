@@ -78,7 +78,7 @@ $string['errorhastobefloat'] = 'Muss ein Dezimalwert sein';
 
 $string['addoredittemplate'] = "Bearbeite Vorlage";
 
-// Test Strategy
+// Test Strategy.
 $string['catquiz_teststrategyheader'] = 'Teststrategie';
 $string['catquiz_selectteststrategy'] = 'Wähle Teststrategie';
 
@@ -233,7 +233,7 @@ $string['itemstatus_1'] = "Berechnet"; // STATUS_CALCULATED.
 $string['itemstatus_4'] = "Manuell gesetzt"; // STATUS_UPDATED_MANUALLY.
 $string['itemstatus_5'] = "Manuell bestätigt"; // STATUS_SET_MANUALLY.
 
-// Student Details
+// Student Details.
 $string['studentdetails'] = "Student details";
 $string['enroled_courses'] = "Eingeschriebene Kurse";
 $string['questionresults'] = "Fragen Auswertung";
@@ -241,10 +241,10 @@ $string['daysago'] = 'Vor {$a} Tagen';
 $string['hoursago'] = 'Vor {$a} Stunden';
 $string['noaccessyet'] = 'Bisher kein Zugriff.';
 
-// Tasks
+// Tasks.
 $string['task_recalculate_cat_model_params'] = "CAT Parameter neu berechnen";
 
-// CAT Manager
+// CAT Manager.
 $string['catmanager'] = "CAT-Manager";
 $string['summary'] = "Zusammenfassung";
 $string['questions'] = "Fragen";
@@ -270,7 +270,7 @@ $string['selectcatscale'] = "Skala:";
 $string['versionchosen'] = 'ausgewählte Versionierung:';
 $string['pleasechoose'] = 'bitte auswählen';
 
-// CAT Manager Questions Table
+// CAT Manager Questions Table.
 $string['type'] = 'Typ';
 $string['attempts'] = 'Versuche';
 $string['addquestion'] = 'Frage aus Fragenkatalog hinzufügen';
@@ -282,12 +282,12 @@ $string['genericsubmit'] = 'Bestätigen';
 $string['confirmactivitychange'] = 'Sie sind dabei den Aktivitätsstatus des folgenden Elements zu ändern: <br> "{$a->data}"';
 $string['toggleactivity'] = 'Aktivitätsstatus';
 
-// Testitem Detail View
+// Testitem Detail View.
 $string['questionpreview'] = 'Fragevorschau';
 $string['backtotable'] = 'Zurück zur Testitems Tabelle';
 $string['local_catquiz_toggle_testitemstatus_message'] = 'Status des Elements wurde aktualisiert';
 
-// CAT Quiz handler
+// CAT Quiz handler.
 $string['noremainingquestions'] = "Keine weiteren Fragen";
 $string['errorfetchnextquestion'] = "Es trat ein Fehler bei der Auswahl der nächsten Frage auf.";
 $string['reachedmaximumquestions'] = "Die Maximalanzahl an Testfragen wurde erreicht";
@@ -296,11 +296,16 @@ $string['id'] = "ID";
 $string['abortpersonabilitynotchanged'] = "Personenparameter unverändert";
 $string['emptyfirstquestionlist'] = "Kann keine Startfrage wählen da die Liste leer ist";
 
-// Quiz Feedback
+// Quiz Feedback.
 $string['catquizfeedback'] = "Zusammenfassung des letzten Versuchs";
 $string['attemptfeedbacknotavailable'] = "Kein Feedback verfügbar";
 
-// CSV Import Form
+$string['catquiz_feedbackheader'] = "Feedback";
+$string['noselection'] = "Keine Auswahl";
+$string['lowerlimit'] = "Unteres Limit";
+$string['setcoursesforscaletext'] = 'Setzen sie für die Scala {$a} die Kurse, in die Nutzerinnen, die unter dem unteren Limit abschneiden, eingeschrieben werden sollen.';
+
+// CSV Import Form.
 $string['importcsv'] = 'Import CSV';
 $string['importsuccess'] = 'Import war erfolgreich.';
 $string['importfailed'] = 'Import fehlgeschlagen.';
@@ -316,6 +321,6 @@ $string['recordupdatesuccessful'] = 'Eintrag erfolgreich aktualisiert.';
 $string['callbackfunctionnotdefined'] = 'Callback Funktion nicht definiert.';
 $string['callbackfunctionnotapplied'] = 'Callback Funktion konnte nicht angewandt werden.';
 
-// Testenvironments table
+// Testenvironments table.
 $string['notifyallteachers'] = 'Kursleiter der gewählten Kurse benachrichtigen';
 $string['notifyteachersofselectedcourses'] = 'Alle Kursleiter benachrichtigen';

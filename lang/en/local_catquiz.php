@@ -79,7 +79,7 @@ $string['errorhastobefloat'] = 'Has to be a deciamal';
 
 $string['addoredittemplate'] = "Add or edit template";
 
-// Test Strategy
+// Test Strategy.
 $string['catquiz_teststrategyheader'] = 'Test strategy';
 $string['catquiz_selectteststrategy'] = 'Select test strategy';
 
@@ -183,7 +183,7 @@ $string['removetestitem'] = 'Remove test items';
 $string['testitems'] = 'Test items';
 $string['questioncontextattempts'] = '# Attempts in selected context';
 
-// Students table
+// Students table.
 $string['studentstats'] = 'Students';
 
 // Email Templates.
@@ -238,7 +238,7 @@ $string['itemstatus_1'] = "Calculated"; // STATUS_CALCULATED.
 $string['itemstatus_4'] = "Manually updated"; // STATUS_UPDATED_MANUALLY.
 $string['itemstatus_5'] = "Manually confirmed"; // STATUS_SET_MANUALLY.
 
-// Student Details
+// Student Details.
 $string['studentdetails'] = "Student details";
 $string['enroled_courses'] = "Enroled courses";
 $string['questionresults'] = "Question results";
@@ -246,10 +246,10 @@ $string['daysago'] = '{$a} days ago';
 $string['hoursago'] = '{$a} hours ago';
 $string['noaccessyet'] = 'No access yet';
 
-// Tasks
+// Tasks.
 $string['task_recalculate_cat_model_params'] = "Recalculate CAT parameters";
 
-// CAT Manager
+// CAT Manager.
 $string['catmanager'] = "CAT-Manager";
 $string['summary'] = "Summary";
 $string['questions'] = "Questions";
@@ -275,7 +275,7 @@ $string['selectcatscale'] = "Scale:";
 $string['versionchosen'] = 'Version chosen:';
 $string['pleasechoose'] = 'please choose';
 
-// CAT Manager Questions Table
+// CAT Manager Questions Table.
 $string['type'] = 'Type';
 $string['attempts'] = 'Attempts';
 $string['addquestion'] = 'Add question from catalogue';
@@ -287,12 +287,12 @@ $string['genericsubmit'] = 'Confirm';
 $string['deletedatatitle'] = 'Delete';
 $string['toggleactivity'] = 'Activity status';
 
-// Testitem Detail View
+// Testitem Detail View.
 $string['questionpreview'] = 'Question preview';
 $string['backtotable'] = 'Back to testitems table';
 $string['local_catquiz_toggle_testitemstatus_message'] = 'Testitem status was updated';
 
-// CAT Quiz handler
+// CAT Quiz handler.
 $string['noremainingquestions'] = "You ran out of questions";
 $string['errorfetchnextquestion'] = "There was an error while selecting the next question";
 $string['reachedmaximumquestions'] = "Reached maximum number of questions";
@@ -301,11 +301,17 @@ $string['id'] = "ID";
 $string['abortpersonabilitynotchanged'] = "Person parameter did not change";
 $string['emptyfirstquestionlist'] = "Can't select a start question because the list is empty";
 
-// Quiz Feedback
+// Quiz Feedback.
 $string['catquizfeedback'] = "Shows a summary of the last quiz attempt";
 $string['attemptfeedbacknotavailable'] = "No feedback available";
 
-// CSV Import Form
+$string['catquiz_feedbackheader'] = "Feedback";
+$string['noselection'] = "No selection";
+$string['lowerlimit'] = "Lower limit";
+
+$string['setcoursesforscaletext'] = 'Set for catscale {$a} the courses in which users failing the lower limit should be inscribed to.';
+
+// CSV Import Form.
 $string['importcsv'] = 'Import CSV';
 $string['importsuccess'] = 'Import was successful';
 $string['importfailed'] = 'Import failed';
@@ -321,6 +327,6 @@ $string['recordupdatesuccessful'] = 'Update of record was successful.';
 $string['callbackfunctionnotdefined'] = 'Callback function is not defined.';
 $string['callbackfunctionnotapplied'] = 'Callback function could not be applied.';
 
-// Testenvironments table
+// Testenvironments table.
 $string['notifyallteachers'] = 'Notify all teachers';
 $string['notifyteachersofselectedcourses'] = 'Notify teachers of selected courses';

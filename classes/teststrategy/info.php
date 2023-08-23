@@ -25,6 +25,7 @@
 namespace local_catquiz\teststrategy;
 
 use core_component;
+use local_catquiz\feedback\feedback;
 use local_catquiz\teststrategy\context\contextcreator;
 use MoodleQuickForm;
 
@@ -147,6 +148,8 @@ class info {
                 'startwithcurrentability' => get_string('startwithcurrentability', 'local_catquiz'),
             ]
         );
+
+        feedback::instance_form_definition($mform, $elements);
     }
 
     /**
@@ -189,8 +192,8 @@ class info {
 
     /**
      * Checks a classname to see if the class is used just for testing.
-     * @param mixed $classname 
-     * @return bool 
+     * @param mixed $classname
+     * @return bool
      */
     private static function is_testing_class($classname) {
         return substr($classname, -strlen('_testing')) === '_testing';
