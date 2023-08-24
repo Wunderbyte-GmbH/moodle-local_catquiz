@@ -24,7 +24,9 @@
 
 use local_catquiz\catscale;
 use local_catquiz\event\catscale_updated;
+use local_catquiz\feedback\feedback;
 use local_catquiz\messages;
+use mod_adaptivequiz\event\attempt_completed;
 
 /**
  * Event observer for local_catquiz.
@@ -46,5 +48,47 @@ class local_catquiz_observer {
         $catscale = catscale::return_catscale_object($catscaleid);
 
         messages::catscale_updated($catscale, $userid);
+    }
+
+    /**
+     * Observer for the attempt_completed event
+     *
+     * @param attempt_completed $event
+     */
+    public static function attempt_completed(attempt_completed $event) {
+        global $DB;
+
+        $attemptid = $event->objectid;
+        $attempt = $DB->get_record(
+            'adaptivequiz_attempt',
+            ['id' => $attemptid]
+        );
+        $quizid = $attempt->instance;
+
+        $cache = cache::make('local_catquiz', 'adaptivequizattempt');
+        $abilities = $cache->get('personabilities');
+        if (! $abilities) {
+            return;
+        }
+
+        $scaledata = [];
+        $catscales = $DB->get_records_list(
+            'local_catquiz_catscales',
+            'id',
+            array_keys($abilities)
+        );
+
+        foreach ($abilities as $catscaleid => $ability) {
+            $scaledata[$catscaleid] = [
+                'scaleid' => $catscaleid,
+                'name' => $catscales[$catscaleid]->name,
+                'personability' => $ability
+            ];
+        }
+        $result = [
+            'scales' => $scaledata,
+        ];
+
+        feedback::inscribe_users_to_failed_scales($quizid, $result);
     }
 }

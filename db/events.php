@@ -30,4 +30,8 @@
          'eventname' => '\local_catquiz\event\catscale_updated',
          'callback' => 'local_catquiz_observer::catscale_updated'
      ),
+     array(
+         'eventname' => '\mod_adaptivequiz\event\attempt_completed',
+         'callback' => 'local_catquiz_observer::attempt_completed'
+     ),
  );

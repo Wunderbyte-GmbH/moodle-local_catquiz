@@ -112,27 +112,11 @@ class feedback {
      */
     public static function inscribe_users_to_failed_scales(
         int $quizid,
-        string $component = 'mod_adaptivequiz',
-        array $result = []) {
+        array $result,
+        string $component = 'mod_adaptivequiz'
+        ) {
 
         global $USER;
-
-        // We use this structure just as a template to be able to execute the function.
-        // The treatment should be adjusted according to the actual result data.
-        $result = [
-            'scales' => [
-                1 => [
-                    'scaleid' => 1,
-                    'name' => "scale1",
-                    'personability' => 0.1,
-                ],
-                2 => [
-                    'scaleid' => 2,
-                    'name' => "scale2",
-                    'personability' => -0.2,
-                ],
-            ],
-        ];
 
         // First, we need to find out the settings for the current text.
         // We use a function to extract the data from the stored json.
