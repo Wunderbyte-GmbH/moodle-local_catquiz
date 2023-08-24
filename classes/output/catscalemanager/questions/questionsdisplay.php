@@ -211,6 +211,8 @@ class questionsdisplay {
             'attempts' => get_string('attempts', 'local_catquiz'),
             'lastattempttime' => get_string('lastattempttime', 'local_catquiz'),
             'difficulty' => get_string('difficulty', 'local_catquiz'),
+            'discrimination' => get_string('discrimination', 'local_catquiz'),
+            'guessing' => get_string('guessing', 'local_catquiz'),
             'action' => get_string('action', 'local_catquiz'),
         ];
         $table->define_columns(array_keys($columnsarray));
