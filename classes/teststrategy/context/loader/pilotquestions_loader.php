@@ -73,10 +73,27 @@ class pilotquestions_loader implements contextloaderinterface {
      *
      */
     public function load(array $context): array {
-        foreach ($context['questions'] as $id => $question) {
-            $question->is_pilot = intval($question->attempts) < self::ATTEMPTS_THRESHOLD;
-            $context['questions'][$id] = $question;
+        foreach ($context['questions'] as $question) {
+            $question->is_pilot = $this->ispilot($question);
         }
         return $context;
+    }
+
+    /**
+     * Shows if a question is a pilot question.
+     * 
+     * @param \stdClass $question
+     * @return bool
+     */
+    public function ispilot(\stdClass $question): bool {
+        if (
+            floatval($question->difficulty)
+            && (intval($question->status) >= STATUS_UPDATED_MANUALLY
+                || intval($question->attempts) >= self::ATTEMPTS_THRESHOLD
+            )
+        ) {
+            return false;
+        }
+        return true;
     }
 }
