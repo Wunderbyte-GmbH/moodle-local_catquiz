@@ -121,22 +121,27 @@ class datacard implements renderable {
         // Information about model status...
         switch ($record->status) {
             case STATUS_EXCLUDED_MANUALLY:
-                $modelstatus = get_string('statusnotset', 'local_catquiz');
+                $modelstatus = get_string('itemstatus_-5', 'local_catquiz');
                 $statuscircleclass = STATUS_EXCLUDED_MANUALLY_COLOR_CLASS;
                 break;
             case STATUS_NOT_CALCULATED:
-                $modelstatus = get_string('statusnotcalculated', 'local_catquiz');
+                $modelstatus = get_string('itemstatus_0', 'local_catquiz');
                 $statuscircleclass = STATUS_NOT_CALCULATED_COLOR_CLASS;
                 break;
             case STATUS_CALCULATED:
-                $modelstatus = get_string('statussetautomatically', 'local_catquiz');
+                $modelstatus = get_string('itemstatus_1', 'local_catquiz');
                 $statuscircleclass = STATUS_CALCULATED_COLOR_CLASS;
                 break;
-            case STATUS_SET_MANUALLY:
-                $modelstatus = get_string('statussetmanually', 'local_catquiz');
-                $statuscircleclass = STATUS_SET_MANUALLY_COLOR_CLASS;
+            case STATUS_UPDATED_MANUALLY:
+                $modelstatus = get_string('itemstatus_4', 'local_catquiz');
+                $statuscircleclass = STATUS_CONFIRMED_MANUALLY_COLOR_CLASS;
+                break;
+            case STATUS_CONFIRMED_MANUALLY:
+                $modelstatus = get_string('itemstatus_5', 'local_catquiz');
+                $statuscircleclass = STATUS_CONFIRMED_MANUALLY_COLOR_CLASS;
                 break;
         }
+
         // Information about activity status...
         switch ($record->testitemstatus) {
             case TESTITEM_STATUS_ACTIVE:

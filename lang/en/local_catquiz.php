@@ -214,10 +214,6 @@ $string['questiontext'] = "Question text";
 $string['testitemdashboard'] = "Testitem Dashboard";
 $string['itemdifficulty'] = "Item difficulty";
 $string['likelihood'] = "Likelihood";
-$string['statusnotset'] = "not set";
-$string['statussetautomatically'] = "set automatically";
-$string['statussetmanually'] = "manually confirmed";
-$string['statusnotcalculated'] = "not calculated";
 
 $string['difficulty'] = "Difficulty";
 $string['discrimination'] = "Discrimination";
@@ -236,7 +232,7 @@ $string['itemstatus_-5'] = "Manually excluded"; // STATUS_EXCLUDED_MANUALLY.
 $string['itemstatus_0'] = "Not yet calculated"; // STATUS_NOT_CALCULATED.
 $string['itemstatus_1'] = "Calculated"; // STATUS_CALCULATED.
 $string['itemstatus_4'] = "Manually updated"; // STATUS_UPDATED_MANUALLY.
-$string['itemstatus_5'] = "Manually confirmed"; // STATUS_SET_MANUALLY.
+$string['itemstatus_5'] = "Manually confirmed"; // STATUS_CONFIRMED_MANUALLY.
 
 // Student Details.
 $string['studentdetails'] = "Student details";
@@ -291,6 +287,7 @@ $string['toggleactivity'] = 'Activity status';
 $string['questionpreview'] = 'Question preview';
 $string['backtotable'] = 'Back to testitems table';
 $string['local_catquiz_toggle_testitemstatus_message'] = 'Testitem status was updated';
+$string['togglestatus'] = 'Toggle status';
 
 // CAT Quiz handler.
 $string['noremainingquestions'] = "You ran out of questions";

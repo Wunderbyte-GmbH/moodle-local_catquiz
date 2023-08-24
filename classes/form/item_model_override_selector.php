@@ -67,11 +67,13 @@ class item_model_override_selector extends dynamic_form {
         $models = model_strategy::get_installed_models();
 
         $options = [
-            STATUS_EXCLUDED_MANUALLY => get_string('statusnotset', 'local_catquiz'),
-            STATUS_CALCULATED => get_string('statussetautomatically', 'local_catquiz'),
-            STATUS_SET_MANUALLY => get_string('statussetmanually', 'local_catquiz'),
-            STATUS_NOT_CALCULATED => get_string('statusnotcalculated', 'local_catquiz'),
+            STATUS_EXCLUDED_MANUALLY => get_string('itemstatus_-5', 'local_catquiz'),
+            STATUS_CALCULATED => get_string('itemstatus_1', 'local_catquiz'),
+            STATUS_CONFIRMED_MANUALLY => get_string('itemstatus_5', 'local_catquiz'),
+            STATUS_UPDATED_MANUALLY => get_string('itemstatus_4', 'local_catquiz'),
+            STATUS_NOT_CALCULATED => get_string('itemstatus_0', 'local_catquiz'),
         ];
+
         foreach (array_keys($models) as $model) {
             $group = [];
             $id = sprintf('override_%s', $model);
@@ -153,13 +155,13 @@ class item_model_override_selector extends dynamic_form {
 
             // There can only be one model with this status, so we have to make
             // sure all other models that have this status are set back to 0.
-            if (intval($formitemparams[$model]->status) === STATUS_SET_MANUALLY) {
+            if (intval($formitemparams[$model]->status) === STATUS_CONFIRMED_MANUALLY) {
                 foreach (array_keys($models) as $m) {
                     if ($m === $model) {
                         // Do not check our current model.
                         continue;
                     }
-                    if (intval($formitemparams[$m]->status) !== STATUS_SET_MANUALLY) {
+                    if (intval($formitemparams[$m]->status) !== STATUS_CONFIRMED_MANUALLY) {
                         // Ignore models with other status.
                         continue;
                     }

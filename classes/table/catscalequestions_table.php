@@ -181,8 +181,8 @@ class catscalequestions_table extends wunderbyte_table {
         $status = $values->status ?? STATUS_NOT_CALCULATED;
 
         switch ($status) {
-            case STATUS_SET_MANUALLY:
-                $bootstrapclass = STATUS_SET_MANUALLY_COLOR_CLASS;
+            case STATUS_CONFIRMED_MANUALLY:
+                $bootstrapclass = STATUS_CONFIRMED_MANUALLY_COLOR_CLASS;
                 break;
             case STATUS_CALCULATED:
                 $bootstrapclass = STATUS_CALCULATED_COLOR_CLASS;

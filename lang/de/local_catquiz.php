@@ -209,10 +209,6 @@ $string['questiontext'] = "Fragentext";
 $string['testitemdashboard'] = "Testitem Dashboard";
 $string['itemdifficulty'] = "Item difficulty";
 $string['likelihood'] = "Likelihood";
-$string['statusnotset'] = "ungesetzt";
-$string['statussetautomatically'] = "automatisch gesetzt";
-$string['statussetmanually'] = "manuell bestätigt";
-$string['statusnotcalculated'] = "unberechnet (Pilotierung)";
 
 $string['difficulty'] = "Schwierigkeit";
 $string['discrimination'] = "Diskriminierung";
@@ -231,7 +227,7 @@ $string['itemstatus_-5'] = "Manuell ausgeschlossen"; // STATUS_EXCLUDED_MANUALLY
 $string['itemstatus_0'] = "Noch nicht berechnet"; // STATUS_NOT_CALCULATED.
 $string['itemstatus_1'] = "Berechnet"; // STATUS_CALCULATED.
 $string['itemstatus_4'] = "Manuell gesetzt"; // STATUS_UPDATED_MANUALLY.
-$string['itemstatus_5'] = "Manuell bestätigt"; // STATUS_SET_MANUALLY.
+$string['itemstatus_5'] = "Manuell bestätigt"; // STATUS_CONFIRMED_MANUALLY.
 
 // Student Details.
 $string['studentdetails'] = "Student details";
@@ -286,6 +282,7 @@ $string['toggleactivity'] = 'Aktivitätsstatus';
 $string['questionpreview'] = 'Fragevorschau';
 $string['backtotable'] = 'Zurück zur Testitems Tabelle';
 $string['local_catquiz_toggle_testitemstatus_message'] = 'Status des Elements wurde aktualisiert';
+$string['togglestatus'] = 'Status ändern';
 
 // CAT Quiz handler.
 $string['noremainingquestions'] = "Keine weiteren Fragen";

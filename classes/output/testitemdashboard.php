@@ -239,14 +239,15 @@ class testitemdashboard implements renderable, templatable {
         $maxstatus = intval($DB->get_field_sql($sql, $params));
         switch ($maxstatus) {
             case STATUS_EXCLUDED_MANUALLY:
-                return get_string('statusnotset', 'local_catquiz');
+                return get_string('itemstatus_-5', 'local_catquiz');
             case STATUS_NOT_CALCULATED:
-                return get_string('statusnotcalculated', 'local_catquiz');
+                return get_string('itemstatus_0', 'local_catquiz');
             case STATUS_CALCULATED:
-                return get_string('statussetautomatically', 'local_catquiz');
-            case STATUS_SET_MANUALLY:
-                return get_string('statussetmanually', 'local_catquiz');
-
+                return get_string('itemstatus_1', 'local_catquiz');
+            case STATUS_CONFIRMED_MANUALLY:
+                return get_string('itemstatus_5', 'local_catquiz');
+            case STATUS_UPDATED_MANUALLY:
+                return get_string('itemstatus_4', 'local_catquiz');
             default:
                 return get_string('notavailable', 'core');
         }

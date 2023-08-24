@@ -231,7 +231,7 @@ class model_item_param {
     ) {
         global $DB;
 
-        if (intval($newrecord->status) === STATUS_SET_MANUALLY) {
+        if (intval($newrecord->status) === STATUS_CONFIRMED_MANUALLY) {
             // Only one model can be the selected one. Set the status of all
             // other models back to 0
             $existingitems = $DB->get_record(
@@ -239,7 +239,7 @@ class model_item_param {
                 [
                     'componentid' => $componentid,
                     'contextid' => $contextid,
-                    'status' => STATUS_SET_MANUALLY,
+                    'status' => STATUS_CONFIRMED_MANUALLY,
                 ]
             );
             // Get item params for other models
