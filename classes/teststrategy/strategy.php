@@ -140,6 +140,11 @@ abstract class strategy {
         $cache->set('playedquestions', $playedquestions);
         $cache->set('isfirstquestionofattempt', false);
 
+        if ($selectedquestion->is_pilot) {
+            $numpilotquestions = $cache->get('num_pilot_questions') ?: 0;
+            $cache->set('num_pilot_questions', ++$numpilotquestions);
+        }
+
         // Keep track of the questions played per scale
         $playedquestionsperscale = $cache->get('playedquestionsperscale') ?: [];
         $updated = $this->update_playedquestionsperscale($selectedquestion, $playedquestionsperscale);

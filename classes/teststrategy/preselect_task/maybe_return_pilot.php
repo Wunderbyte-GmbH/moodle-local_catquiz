@@ -59,17 +59,13 @@ final class maybe_return_pilot extends preselect_task implements wb_middleware {
             return $next($context);
         }
 
-        $cache = cache::make('local_catquiz', 'adaptivequizattempt');
-        $numpilotquestions = $cache->get('num_pilot_questions') ?: 0;
         // If there are only pilot questions, then return a random pilot question.
         if (count($nonpilotquestions) === 0) {
-            $cache->set('num_pilot_questions', ++$numpilotquestions);
             return $next($context);
         }
 
         $shouldreturnpilot = rand(0, 100) <= $context['pilot_ratio'] * 100;
         if ($shouldreturnpilot) {
-            $cache->set('num_pilot_questions', ++$numpilotquestions);
             $context['questions'] = $pilotquestions;
             return (new strategybalancedscore())->run($context, fn () => "nevercalled");
         } else {
