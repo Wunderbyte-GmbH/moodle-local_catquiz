@@ -70,6 +70,9 @@ class feedback {
 
         $coursesarray = [];
         foreach ($courses as $course) {
+            if ($course->id == 1) {
+                continue;
+            }
             $coursesarray[$course->id] = $course->fullname;
         }
 
@@ -143,7 +146,7 @@ class feedback {
                 // We check if we are below the lower threshhold.
                 $personability = $scale['personability'];
                 $lowerlimit = (float)$settings[$scaleid]['lowerlimit'];
-                $courseids = $settings[$scaleid]["courseid"];
+                $courseids = $settings[$scaleid]["courseids"];
 
                 if ($personability < $lowerlimit
                     && !empty($courseids)) {
