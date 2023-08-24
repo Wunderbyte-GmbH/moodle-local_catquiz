@@ -282,6 +282,7 @@ $string['confirmactivitychange'] = 'You are about to change the activity status 
 $string['genericsubmit'] = 'Confirm';
 $string['deletedatatitle'] = 'Delete';
 $string['toggleactivity'] = 'Activity status';
+$string['errorrecordnotfound'] = 'There was an error with the database query. The record was not found.';
 
 // Testitem Detail View.
 $string['questionpreview'] = 'Question preview';

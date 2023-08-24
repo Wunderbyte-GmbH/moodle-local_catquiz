@@ -277,6 +277,7 @@ $string['deletedatatitle'] = 'Löschen';
 $string['genericsubmit'] = 'Bestätigen';
 $string['confirmactivitychange'] = 'Sie sind dabei den Aktivitätsstatus des folgenden Elements zu ändern: <br> "{$a->data}"';
 $string['toggleactivity'] = 'Aktivitätsstatus';
+$string['errorrecordnotfound'] = 'Fehler mit der Datenbankabfrage. Der Datensatz wurde nicht gefunden.';
 
 // Testitem Detail View.
 $string['questionpreview'] = 'Fragevorschau';

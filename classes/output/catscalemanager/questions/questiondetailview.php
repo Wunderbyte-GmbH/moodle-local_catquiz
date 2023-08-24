@@ -19,6 +19,7 @@ namespace local_catquiz\output\catscalemanager\questions;
 use local_catquiz\catquiz;
 use local_catquiz\output\catscalemanager\questions\cards\datacard;
 use local_catquiz\output\catscalemanager\questions\cards\questionpreview;
+use moodle_exception;
 
 require_once($CFG->dirroot . '/local/catquiz/lib.php');
 require_once($CFG->libdir . '/questionlib.php');
@@ -95,7 +96,7 @@ class questiondetailview {
         $recordinarray = $DB->get_records_sql($sql, $params, IGNORE_MISSING);
 
         if (empty($recordinarray)) {
-            // Throw error: no record was found with id: $params['userid'].
+            throw new moodle_exception('errorrecordnotfound', 'local_catquiz');
         }
         $record = $recordinarray[$this->testitemid];
 
