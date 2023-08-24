@@ -68,7 +68,7 @@ class scaleselector extends dynamic_form {
 
         $subscalesdb = catscale::get_next_level_subscales_ids_from_parent($id);
         $scales = [];
-        $scales[0] = get_string('pleasechoose', 'local_catquiz');
+        $scales[-1] = get_string('pleasechoose', 'local_catquiz');
         foreach ($subscalesdb as $scaleid => $scale) {
             $scales[$scaleid] = $scale->name;
         }

@@ -25,7 +25,8 @@ const SELECTORS = {
     CONTEXTFORM: '#select_context_form',
     CHECKBOX: 'input.integrate-subscales-checkbox',
     SCALEFORM: '#select_scale_form',
-    SCALECONTAINER: '#catmanagerquestions scaleselectors', // Make sure to change in the code below.
+    SCALECONTAINER: "[id='catmanagerquestions scaleselectors']", // Make sure to change in the code below.
+    SELECTS: '[id*="select_scale_form_scaleid"]',
     TABCONTAINER: '#questions',
 };
 
@@ -56,8 +57,8 @@ export const init = () => {
     listenToSelect(contextselector, 'local_catquiz\\form\\contextselector', "contextid");
 
     // Attach listener to each scale select
-    const selectcontainer = container.querySelector("[id='catmanagerquestions scaleselectors']");
-    const selects = selectcontainer.querySelectorAll('[id*="select_scale_form_scaleid"]');
+    const selectcontainer = container.querySelector(SELECTORS.SCALECONTAINER);
+    const selects = selectcontainer.querySelectorAll(SELECTORS.SELECTS);
     selects.forEach(select => {
         listenToSelect(select, 'local_catquiz\\form\\scaleselector', "scaleid");
     });
@@ -83,9 +84,16 @@ export function listenToSelect(element, location, paramname) {
             const response = e.detail;
 
             let searchParams = new URLSearchParams(window.location.search);
+            // If we have scaleselector set to default, we check if there is a parentscale to apply.
+            if (paramname == "scaleid" && response[paramname] == "-1") {
+                let scaleid = getvalueofparentscaleselector(element);
+                searchParams.set(paramname, scaleid);
+            } else {
+                searchParams.set(paramname, response[paramname]);
+            }
 
-            searchParams.set(paramname, response[paramname]);
             window.location.search = searchParams.toString();
+
         });
 
         dynamicForm.addEventListener('change', (e) => {
@@ -97,5 +105,39 @@ export function listenToSelect(element, location, paramname) {
                 dynamicForm.submitFormAjax();
             }, 500);
         });
+}
 
+/**
+ * Check if there is a parentscaleselector,
+ * read and return the value.
+ * @param {*} element
+ * @return {String} parentscaleid
+ */
+function getvalueofparentscaleselector(element) {
+
+    var selectcontainer = document.querySelector(SELECTORS.SCALECONTAINER);
+    var selects = selectcontainer.querySelectorAll(SELECTORS.SELECTS);
+    let last;
+
+    // Make sure to get the select.
+    const select = element.closest(SELECTORS.SELECTS);
+
+    // Keep deleting the last selects until the one that triggered the change is deleted.
+    let keepdeletinglastnode = true;
+    // eslint-disable-next-line no-unmodified-loop-condition
+    while (keepdeletinglastnode) {
+        selects = selectcontainer.querySelectorAll(SELECTORS.SELECTS);
+        last = selects[selects.length - 1];
+        if (last == select) {
+            keepdeletinglastnode = false;
+        }
+        last.remove();
+    }
+    selects = selectcontainer.querySelectorAll(SELECTORS.SELECTS);
+    last = selects[selects.length - 1];
+
+    // Fetch the value of the last selector.
+    const selectedscaleid = last.querySelector('[name="scaleid"]').value;
+
+    return selectedscaleid;
 }
