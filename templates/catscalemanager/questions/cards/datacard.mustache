@@ -54,7 +54,9 @@
         <div>{{#str}}type, local_catquiz{{/str}}: {{type}}</div>
         <div class="testitem-togglestatus">
             {{#str}}status, core{{/str}}:
+            <a href='#'>
             <i class='fa fa-eye{{closedeye}}'
+            title='{{#str}}togglestatus, local_catquiz{{/str}}'
             aria-label="eye icon {{closedeye}}"
             data-id="testitem-toggle-status"
             data-templatelocation="local_catquiz/catscalemanager/questions/cards/datacard"
@@ -63,9 +65,11 @@
             data-tdparams="{{testitemid}},{{contextid}},{{scaleid}},{{component}}"
             data-adparams="{{scaleid}},{{testitemid}},{{closedeye}},{{component}}"
             data-admethodname="local_catquiz_toggle_testitemstatus">
-            </i>
-            <i class='fa fa-circle {{statuscircle}}' id="testitem-status-circle"></i>
-            {{status}}
+            </i></a>
+            <a><i class='fa fa-circle {{statuscircle}}'
+                id="testitem-status-circle"
+                title='{{statustitle}}'></i></a>
+                {{status}}
         </div>
         <div>{{#str}}model, local_catquiz{{/str}}: {{model}}</div>
         <div>{{#str}}attempts, local_catquiz{{/str}}: {{attempts}}</div>

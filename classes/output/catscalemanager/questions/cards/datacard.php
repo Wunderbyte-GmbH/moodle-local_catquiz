@@ -162,6 +162,7 @@ class datacard implements renderable {
         $body['attempts'] = $record->attempts;
         $body['closedeye'] = $closedeye;
         $body['statuscircle'] = $statuscircleclass;
+        $body['statustitle'] = $modelstatus;
 
         return [
             'title' => $title,
