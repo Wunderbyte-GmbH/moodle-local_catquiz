@@ -62,17 +62,7 @@ final class filterforlowestsubscale extends preselect_task implements wb_middlew
             } 
         }
 
-        foreach ($context['questions'] as $question) {
-            $question->score = (1 - (
-                $question->{lasttimeplayedpenalty::PROPERTYNAME} / $context['penalty_threshold']))
-                * $question->fisherinformation;
-        }
-
-        uasort($context['questions'], function($q1, $q2) {
-            return $q2->score <=> $q1->score;
-        });
-
-        return result::ok(reset($context['questions']));
+        return next($context['questions']);
     }
 
     /**
