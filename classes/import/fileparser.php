@@ -280,6 +280,7 @@ class fileparser {
     private function checksuccess() {
         if ($this->records !== []) {
             // If data was parsed successfully, return 1, else return 0.
+            $this->records['numberofsuccessfulupdatedrecords'] = count($this->records);
             $this->records['success'] = 1;
         } else {
             $this->records['success'] = 0;

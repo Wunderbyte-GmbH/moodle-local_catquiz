@@ -318,7 +318,7 @@ $string['setcoursesforscaletext'] = 'Setzen sie für die Scala {$a} die Kurse, i
 
 // CSV Import Form.
 $string['importcsv'] = 'Import CSV';
-$string['importsuccess'] = 'Import war erfolgreich.';
+$string['importsuccess'] = 'Import war erfolgreich. Es wurden {$a} Datensatz/Datensätze bearbeitet.';
 $string['importfailed'] = 'Import fehlgeschlagen.';
 $string['dateparseformat'] = 'Format des Datums';
 $string['dateparseformat_help'] = 'Bitte Datum so wie es im CSV definiert wurde verwenden. Hilfe unter <a href="http://php.net/manual/en/function.date.php">Datumsdokumentation</a> für diese Einstellung.';
@@ -328,7 +328,7 @@ $string['mandatory'] = 'verpflichtend';
 $string['format'] = 'Format';
 $string['downloaddemofile'] = 'Demofile herunterladen';
 $string['labelidnotunique'] = 'Wert in Label-Spalte muss einzigartig sein .';
-$string['recordupdatesuccessful'] = 'Eintrag erfolgreich aktualisiert.';
+$string['recordupdatesuccessful'] = '{$a} Eintrag/Einträge erfolgreich aktualisiert.';
 $string['callbackfunctionnotdefined'] = 'Callback Funktion nicht definiert.';
 $string['callbackfunctionnotapplied'] = 'Callback Funktion konnte nicht angewandt werden.';
 $string['canbesetto0iflabelgiven'] = 'Kann 0 sein, wenn Abgleich über Label stattfindet.';

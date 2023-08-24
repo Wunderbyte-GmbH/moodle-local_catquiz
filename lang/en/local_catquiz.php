@@ -324,7 +324,7 @@ $string['setcoursesforscaletext'] = 'Set for catscale {$a} the courses in which 
 
 // CSV Import Form.
 $string['importcsv'] = 'Import CSV';
-$string['importsuccess'] = 'Import was successful';
+$string['importsuccess'] = 'Import was successful. {$a} record(s) treated.';
 $string['importfailed'] = 'Import failed';
 $string['dateparseformat'] = 'Date parse format';
 $string['dateparseformat_help'] = 'Please, use date format like specified in CSV file. Help with <a href="http://php.net/manual/en/function.date.php">this</a> resource for options.';
@@ -334,7 +334,7 @@ $string['mandatory'] = 'mandatory';
 $string['format'] = 'format';
 $string['downloaddemofile'] = 'Download demofile';
 $string['labelidnotunique'] = 'Value in label column should be unique.';
-$string['recordupdatesuccessful'] = 'Update of record was successful.';
+$string['recordupdatesuccessful'] = 'Update of {$a} record(s) was successful.';
 $string['callbackfunctionnotdefined'] = 'Callback function is not defined.';
 $string['callbackfunctionnotapplied'] = 'Callback function could not be applied.';
 $string['canbesetto0iflabelgiven'] = 'Can be 0 if matching of testitem is via label.';

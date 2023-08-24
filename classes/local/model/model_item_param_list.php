@@ -381,21 +381,24 @@ class model_item_param_list implements ArrayAccess, IteratorAggregate, Countable
         }
 
         $newrecord['status'] = !empty($newrecord['status']) ? $newrecord['status'] : STATUS_UPDATED_MANUALLY;
-
+        $recordcounter = 0;
         if (!$record) {
             // Make sure the record to insert has no id.
             unset($newrecord['id']);
             $id = $DB->insert_record('local_catquiz_itemparams', $newrecord);
+            $recordcounter++;
         } else {
 
             $newrecord['id'] = $record->id;
             if ($DB->update_record('local_catquiz_itemparams', (object) $newrecord, true)) {
                 $id = $newrecord['id'];
+                $recordcounter++;
             }
         }
         return [
             'success' => 1, // Update successfully
-            'message' => get_string('recordupdatesuccessful', 'local_catquiz'),
+            'message' => get_string('recordupdatesuccessful', 'local_catquiz', $recordcounter),
+            'numberofrecordstreated' => $recordcounter,
             'recordid' => $id,
          ];
     }
