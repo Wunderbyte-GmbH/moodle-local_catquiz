@@ -148,6 +148,10 @@ class updatepersonability extends preselect_task implements wb_middleware {
         }
 
         $context['person_ability'][$catscaleid] = $updatedability;
+        $cache = cache::make('local_catquiz', 'adaptivequizattempt');
+        $cachedabilities = $cache->get('personabilities') ?: [];
+        $cachedabilities[$catscaleid] = $updatedability;
+        $cache->set('personabilities', $cachedabilities);
         return $context;
     }
 
