@@ -67,7 +67,7 @@ final class mayberemovescale extends preselect_task implements wb_middleware {
         foreach ($excludedscales as $catscaleid) {
             $context['questions'] = array_filter(
                 $context['questions'],
-                fn ($q) => $q->catscaleid !== $catscaleid
+                fn ($q) => $q->catscaleid != $catscaleid
             );
         }
 

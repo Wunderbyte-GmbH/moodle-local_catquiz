@@ -68,10 +68,10 @@ class inferlowestskillgap extends strategy {
             firstquestionselector::class, // If this is the first question of this attempt, return it here.
             lasttimeplayedpenalty::class,
             numberofgeneralattempts::class,
+            mayberemovescale::class, // Remove questions from excluded subscales.
             maybe_return_pilot::class,
             remove_uncalculated::class, // Remove items that do not have item parameters.
             noremainingquestions::class, // Cancel quiz attempt if no questions are left.
-            mayberemovescale::class, // Remove questions from excluded subscales.
             fisherinformation::class, // Add the fisher information to each question.
             filterforlowestsubscale::class, // Keep only questions that are assigned to the subscale where the user has the lowest ability.
             strategyfastestscore::class,
