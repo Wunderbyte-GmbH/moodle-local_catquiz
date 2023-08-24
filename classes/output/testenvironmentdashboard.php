@@ -54,7 +54,7 @@ class testenvironmentdashboard implements renderable, templatable {
     public function testenvironmenttable($catscaleid = null) {
 
 
-        $table = new testenvironments_table('testenvironmentstable');
+        $table = new testenvironments_table('testenvironmentstable' . $catscaleid ?? "");
 
         list($select, $from, $where, $filter, $params) = $catscaleid
         ? catquiz::return_sql_for_testenvironments("catscaleid=$catscaleid")
@@ -173,9 +173,7 @@ class testenvironmentdashboard implements renderable, templatable {
             ]
             ];
 
-
         list($idstring, $encodedtable, $html) = $table->lazyouthtml(10, true);
-
         return $html;
 
         //return $table->outhtml(10, true);
