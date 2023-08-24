@@ -249,6 +249,7 @@ $string['testsandtemplates'] = "Tests & Templates";
 $string['calculations'] = "Berechnungen";
 $string['versioning'] = "Versionierung";
 $string['catscalesheading'] = "CAT Skalen";
+$string['subscribedcatscalesheading'] = "Eingeschriebene CAT Scales";
 $string['summarygeneral'] = "Allgemeines";
 $string['summarynumberofassignedcatscales'] = "Anzahl der Ihnen zugeordneten CAT Skalen";
 $string['summarynumberoftests'] = "Anzahl der einsetzenden Tests";

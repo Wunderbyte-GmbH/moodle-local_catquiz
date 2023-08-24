@@ -254,6 +254,7 @@ $string['testsandtemplates'] = "Tests & Templates";
 $string['calculations'] = "Calculations";
 $string['versioning'] = "Versioning";
 $string['catscalesheading'] = "CAT scales";
+$string['subscribedcatscalesheading'] = "Subscribed CAT scales";
 $string['summarygeneral'] = "General";
 $string['summarynumberofassignedcatscales'] = "Number of assigned CAT scales";
 $string['summarynumberoftests'] = "Number of assigned tests";
