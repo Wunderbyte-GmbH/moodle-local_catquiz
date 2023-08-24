@@ -16,6 +16,7 @@
 
 namespace local_catquiz\output;
 
+use cache;
 use local_catquiz\catquiz;
 use local_catquiz\catscale;
 use local_catquiz\teststrategy\info;
@@ -119,17 +120,23 @@ class attemptfeedback implements renderable, templatable {
     private function render_person_abilities() {
         global $USER;
         if (!$this->contextid || !$this->catscaleid) {
-            return get_string('notavailable', 'core');
+            return;
         }
-        $personparams = catquiz::get_person_abilities($this->contextid, [$this->catscaleid, ...catscale::get_subscale_ids($this->catscaleid)], $USER->id);
-        $catscales = catquiz::get_catscales(array_map(fn ($pp) => $pp->catscaleid, $personparams));
 
+        // If we have person abilities in the cache, show them.
+        $cache = cache::make('local_catquiz', 'adaptivequizattempt');
+        $personabilities = $cache->get('personabilities');
+        if (!$personabilities) {
+            return;
+        }
+
+        $catscales = catquiz::get_catscales(array_keys($personabilities));
         $result = [];
-        foreach ($personparams as $pp) {
+        foreach ($personabilities as $catscaleid => $ability) {
             $result[] = [
-                'ability' => $pp->ability,
-                'catscaleid' => $pp->catscaleid,
-                'name' => $catscales[$pp->catscaleid]->name
+                'ability' => sprintf("%.2f", $ability),
+                'catscaleid' => $catscaleid,
+                'name' => $catscales[$catscaleid]->name
             ];
         }
         return $result;
