@@ -34,6 +34,7 @@ use local_catquiz\teststrategy\preselect_task\maybe_return_pilot;
 use local_catquiz\teststrategy\preselect_task\noremainingquestions;
 use local_catquiz\teststrategy\preselect_task\numberofgeneralattempts;
 use local_catquiz\teststrategy\preselect_task\remove_uncalculated;
+use local_catquiz\teststrategy\preselect_task\removeplayedquestions;
 use local_catquiz\teststrategy\preselect_task\strategyfastestscore;
 use local_catquiz\teststrategy\preselect_task\updatepersonability;
 use local_catquiz\teststrategy\strategy;
@@ -64,6 +65,7 @@ class inferlowestskillgap extends strategy {
         return [
             maximumquestionscheck::class, // Cancel quiz attempt if we reached maximum of questions.
             updatepersonability::class,
+            removeplayedquestions::class,
             noremainingquestions::class,
             firstquestionselector::class, // If this is the first question of this attempt, return it here.
             lasttimeplayedpenalty::class,
