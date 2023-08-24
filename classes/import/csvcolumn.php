@@ -64,6 +64,11 @@ class csvcolumn {
     public $type = 'default';
 
     /**
+     * @var string
+     */
+    public $importinstruction = '';
+
+    /**
      * @var *
      */
     public $defaultvalue;
@@ -94,7 +99,8 @@ class csvcolumn {
             $type = 'default',
             $format = PARAM_TEXT,
             $defaultvalue = null,
-            $transform = null) {
+            $transform = null,
+            $importinstruction = '') {
 
         $this->columnname = $columnname;
         $this->localizedname = $localizedname;
@@ -104,6 +110,7 @@ class csvcolumn {
         $this->type = $type;
         $this->defaultvalue = $defaultvalue;
         $this->transform = $transform;
+        $this->importinstruction = $importinstruction;
 
         $this->apply('pluginname');
     }

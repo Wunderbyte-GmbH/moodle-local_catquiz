@@ -136,6 +136,7 @@ class testitemimporter {
                 // 'columnname' => get_string('id'),
                 'mandatory' => true,
                 'format' => PARAM_INT,
+                'importinstruction' => get_string('canbesetto0iflabelgiven', 'local_catquiz'),
                 // phpcs:ignore
                 // 'transform' => fn($x) => get_string($x, 'local_catquiz'),
             ),
@@ -191,6 +192,7 @@ class testitemimporter {
                 'name' => 'label',
                 'mandatory' => false,
                 'format' => PARAM_TEXT,
+                'importinstruction' => get_string('ifdefinedusedtomatch', 'local_catquiz'),
             )
             ];
         return $columnssequential;

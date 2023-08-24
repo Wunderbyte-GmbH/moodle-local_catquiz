@@ -109,6 +109,7 @@ class csvsettings {
                 !empty($cvalue['format']) ? $cvalue['format'] : null,
                 !empty($cvalue['defaultvalue']) ? $cvalue['defaultvalue'] : null,
                 !empty($cvalue['transform']) ? $cvalue['transform'] : null,
+                !empty($cvalue['importinstruction']) ? $cvalue['importinstruction'] : null,
                 );
             }
         } else {
@@ -125,7 +126,7 @@ class csvsettings {
                 !empty($c['format']) ? $c['format'] : null,
                 !empty($c['defaultvalue']) ? $c['defaultvalue'] : null,
                 !empty($c['transform']) ? $c['transform'] : null,
-
+                !empty($c['importinstruction']) ? $c['importinstruction'] : null,
                 );
             }
         }

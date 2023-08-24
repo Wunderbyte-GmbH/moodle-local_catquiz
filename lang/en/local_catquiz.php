@@ -337,6 +337,8 @@ $string['labelidnotunique'] = 'Value in label column should be unique.';
 $string['recordupdatesuccessful'] = 'Update of record was successful.';
 $string['callbackfunctionnotdefined'] = 'Callback function is not defined.';
 $string['callbackfunctionnotapplied'] = 'Callback function could not be applied.';
+$string['canbesetto0iflabelgiven'] = 'Can be 0 if matching of testitem is via label.';
+$string['ifdefinedusedtomatch'] = 'If defined, will be used to match.';
 
 // Testenvironments table.
 $string['notifyallteachers'] = 'Notify all teachers';
