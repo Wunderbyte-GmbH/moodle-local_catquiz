@@ -39,13 +39,6 @@ use local_catquiz\wb_middleware;
 final class lasttimeplayedpenalty extends preselect_task implements wb_middleware {
 
     /**
-     * PROPERTYNAME
-     *
-     * @var string
-     */
-    const PROPERTYNAME = 'lasttimeplayedpenalty';
-
-    /**
      * Run preselect task.
      *
      * @param array $context
@@ -57,7 +50,7 @@ final class lasttimeplayedpenalty extends preselect_task implements wb_middlewar
     public function run(array $context, callable $next): result {
         $now = time();
         $context['questions'] = array_map(function($q) use ($now, $context) {
-            $q->{self::PROPERTYNAME} = $this->get_penalty($q, $now, $context['penalty_time_range']);
+            $q->lasttimeplayedpenalty = $this->get_penalty($q, $now, $context['penalty_time_range']);
             return $q;
         }, $context['questions']);
 
