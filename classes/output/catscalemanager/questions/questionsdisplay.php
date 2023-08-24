@@ -280,13 +280,17 @@ class questionsdisplay {
         $table->showdownloadbutton = true;
         $table->define_baseurl(new moodle_url('/local/catquiz/download.php'));
 
+        list($idstring, $encodedtable, $html) = $table->lazyouthtml(10, true);
+        return $html;
+
+        /*   // Instead of lazyouttable
         $output = $table->outhtml(10, true);
         $this->numberofrecords = $table->return_records_count()[0];
         if ($this->numberofrecords > 0) { // Only if the table contains records, we will return it.
             return $output;
         } else {
             return null;
-        }
+        } */
     }
     /**
      * When there is no table to display, return the right message.
