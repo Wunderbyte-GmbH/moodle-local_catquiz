@@ -302,6 +302,8 @@ $string['emptyfirstquestionlist'] = "Can't select a start question because the l
 // Quiz Feedback.
 $string['catquizfeedback'] = "Shows a summary of the last quiz attempt";
 $string['attemptfeedbacknotavailable'] = "No feedback available";
+$string['allquestionsincorrect'] = "Not available - all questions were answered incorrectly";
+$string['allquestionscorrect'] = "Not available- all questions were answered correctly";
 
 $string['catquiz_feedbackheader'] = "Feedback";
 $string['noselection'] = "No selection";

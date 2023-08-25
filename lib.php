@@ -58,6 +58,8 @@ define('STATUS_CALCULATED_COLOR_CLASS', 'text-warning');
 define('STATUS_UPDATED_MANUALLY_COLOR_CLASS', 'text-primary');
 define('STATUS_CONFIRMED_MANUALLY_COLOR_CLASS', 'text-success');
 
+define('PERSONABILITY_MAX', 50);
+
 /**
  * Renders the popup Link.
  *
