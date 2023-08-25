@@ -124,7 +124,7 @@ class updatepersonability extends preselect_task implements wb_middleware {
             // Otherwise, use 0 as default value.
             $context['skip_reason'] = 'abilityisnan';
             if (!is_nan($context['person_ability'][$catscaleid])) {
-                return $$context;
+                return $context;
             } else {
                 $context['person_ability'][$catscaleid] = 0;
                 return $context;
