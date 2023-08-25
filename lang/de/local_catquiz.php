@@ -328,11 +328,14 @@ $string['mandatory'] = 'verpflichtend';
 $string['format'] = 'Format';
 $string['downloaddemofile'] = 'Demofile herunterladen';
 $string['labelidnotunique'] = 'Wert in Label-Spalte muss einzigartig sein .';
-$string['recordupdatesuccessful'] = '{$a} Eintrag/Einträge erfolgreich aktualisiert.';
+$string['updatedrecords'] = '{$a} Eintrag/Einträge aktualisiert.';
+$string['addedrecords'] = '{$a} Eintrag/Einträge hinzugefügt.';
 $string['callbackfunctionnotdefined'] = 'Callback Funktion nicht definiert.';
 $string['callbackfunctionnotapplied'] = 'Callback Funktion konnte nicht angewandt werden.';
 $string['canbesetto0iflabelgiven'] = 'Kann 0 sein, wenn Abgleich über Label stattfindet.';
 $string['ifdefinedusedtomatch'] = 'Wenn angegeben findet der Abgleich über diesen Wert statt.';
+$string['ifdefinedusedtomatch'] = 'Wenn angegeben findet der Abgleich über diesen Wert statt.';
+
 
 // Testenvironments table.
 $string['notifyallteachers'] = 'Kursleiter der gewählten Kurse benachrichtigen';

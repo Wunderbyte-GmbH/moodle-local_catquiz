@@ -77,13 +77,19 @@ export const init = () => {
 
         // Display general success status.
         if (response.success == 1) {
-            getString('importsuccess', 'local_catquiz').then(message => {
+
+            // eslint-disable-next-line no-console
+            console.log(response, response.numberofsuccessfullyupdatedrecords);
+            getString('importsuccess', 'local_catquiz', response.numberofsuccessfullyupdatedrecords).then(message => {
                 showNotification(message, 'success');
                 return;
             }).catch(e => {
                 // eslint-disable-next-line no-console
                 console.error(e);
             });
+            if (response.callbackresponse !== null && response.callbackresponse.message !== null) {
+                showNotification(response.callbackresponse.message, 'success');
+            }
         } else {
             getString('importfailed', 'local_catquiz').then(message => {
                 showNotification(message, 'danger');

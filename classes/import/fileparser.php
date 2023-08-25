@@ -214,6 +214,7 @@ class fileparser {
                     $this->errors[] = $callbackresponse['message'];
                     continue;
                 }
+                $this->records['callbackresponse'] = $callbackresponse;
 
                 if (isset($this->uniquekey)) { // With unique key set, we build an associative array.
                     if (!isset($this->records[$firstcolumn])) {
@@ -279,8 +280,8 @@ class fileparser {
      */
     private function checksuccess() {
         if ($this->records !== []) {
+            $this->records['numberofsuccessfullyupdatedrecords'] = count($this->records) - 1;
             // If data was parsed successfully, return 1, else return 0.
-            $this->records['numberofsuccessfulupdatedrecords'] = count($this->records);
             $this->records['success'] = 1;
         } else {
             $this->records['success'] = 0;
