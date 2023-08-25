@@ -206,10 +206,6 @@ class updatepersonability extends preselect_task implements wb_middleware {
         return $userresponses;
     }
 
-    private function get_last_userresponse($userid, $qid): float {
-        return 1.0;
-    }
-
     protected function get_item_param_list($responses, $contextid, $catscaleid) {
         // We will update the person ability. Select the correct model for each item.
         $modelstrategy = new model_strategy($responses);
