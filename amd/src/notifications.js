@@ -26,15 +26,17 @@ const SELECTORS = {
     NOTIFICATION_LIST: '#user-notifications div.alert'
 };
 
-export const showNotification = (message, type) => {
+export const showNotification = (message, type, settimeout = true, timeout = 5000) => {
 
     Notification.addNotification({
         message,
         type
     });
-    setTimeout(() => {
-        let notificationslist = document.querySelectorAll(SELECTORS.NOTIFICATION_LIST);
-        const notificatonelement = notificationslist[notificationslist.length - 1];
-        notificatonelement.remove();
-    }, 5000);
+    if (settimeout) {
+        setTimeout(() => {
+            let notificationslist = document.querySelectorAll(SELECTORS.NOTIFICATION_LIST);
+            const notificatonelement = notificationslist[notificationslist.length - 1];
+            notificatonelement.remove();
+        }, timeout);
+    }
 };
