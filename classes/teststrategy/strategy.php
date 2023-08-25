@@ -140,7 +140,7 @@ abstract class strategy {
         $cache->set('playedquestions', $playedquestions);
         $cache->set('isfirstquestionofattempt', false);
 
-        if ($selectedquestion->is_pilot) {
+        if (! empty($selectedquestion->is_pilot)) {
             $numpilotquestions = $cache->get('num_pilot_questions') ?: 0;
             $cache->set('num_pilot_questions', ++$numpilotquestions);
         }
