@@ -112,6 +112,16 @@ class updatepersonability extends preselect_task implements wb_middleware {
             $context['contextid'],
             $catscaleid
         );
+
+        // Remove all responses that are not in the item param list and check again
+        $arrayresponsesforscale = []; 
+        foreach ($itemparamlist as $item) {
+            $arrayresponsesforscale[$item->get_id()] = $this->arrayresponses[$item->get_id()];
+        }
+        if (! $this->has_sufficient_responses($arrayresponsesforscale)) {
+            return $context;
+        }
+
         $updatedability = $this->get_updated_ability($this->arrayresponses, $itemparamlist);
 
         if (is_nan($updatedability)) {
@@ -173,12 +183,18 @@ class updatepersonability extends preselect_task implements wb_middleware {
      * Test if we can calculate an ability with the given responses.
      * At least two answers with different outcome are needed.
      * 
+     * Note: Even if this function returns true, we still have to check on a
+     * per-scale basis if we have enough answers in that scale.
+     * 
      * @param mixed $userresponses
      * @return bool
      */
-    private function has_sufficient_responses() {
-        $first = $this->arrayresponses[array_key_first($this->arrayresponses)];
-        foreach ($this->arrayresponses as $ur) {
+    private function has_sufficient_responses($arrayresponses = []) {
+        if (! $arrayresponses) {
+            $arrayresponses = $this->arrayresponses;
+        }
+        $first = $arrayresponses[array_key_first($arrayresponses)];
+        foreach ($arrayresponses as $ur) {
             if ($ur['fraction'] !== $first['fraction']) {
                 return true;
             }
