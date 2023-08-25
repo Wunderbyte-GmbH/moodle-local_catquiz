@@ -105,6 +105,7 @@ class catscalequestions_table extends wunderbyte_table {
             'class' => 'btn btn-plain btn-smaller',
             'iclass' => empty($values->testitemstatus) ? 'fa fa-eye' : 'fa fa-eye-slash',
             'arialabel' => empty($values->testitemstatus) ? 'eye icon' : 'eye icon slashed',
+            'title' => get_string('eyeicontitle', 'local_catquiz'),
             'href' => '#',
             'id' => $values->id,
             'methodname' => 'togglestatus', // The method needs to be added to your child of wunderbyte_table class.
@@ -122,6 +123,7 @@ class catscalequestions_table extends wunderbyte_table {
                 'class' => 'btn btn-plain btn-smaller',
                 'iclass' => 'fa fa-cog',
                 'arialabel' => 'cogwheel',
+                'title' => get_string('cogwheeltitle', 'local_catquiz'),
                 'href' => $url->out(false),
                 'methodname' => '',
                 'nomodal' => true,
@@ -133,6 +135,7 @@ class catscalequestions_table extends wunderbyte_table {
             'class' => 'btn btn-plain btn-smaller',
             'iclass' => 'fa fa-trash',
             'arialabel' => 'trash bin',
+            'title' => get_string('trashbintitle', 'local_catquiz'),
             'id' => $values->id,
             'href' => '#',
             'methodname' => 'deletequestionfromscale',

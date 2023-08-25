@@ -280,6 +280,9 @@ $string['genericsubmit'] = 'Bestätigen';
 $string['confirmactivitychange'] = 'Sie sind dabei den Aktivitätsstatus des folgenden Elements zu ändern: <br> "{$a->data}"';
 $string['toggleactivity'] = 'Aktivitätsstatus';
 $string['errorrecordnotfound'] = 'Fehler mit der Datenbankabfrage. Der Datensatz wurde nicht gefunden.';
+$string['trashbintitle'] = 'Element löschen';
+$string['cogwheeltitle'] = 'Details anzeigen';
+$string['eyeicontitle'] = 'Aktivieren/Deaktivieren';
 
 // Testitem Detail View.
 $string['questionpreview'] = 'Fragevorschau';
