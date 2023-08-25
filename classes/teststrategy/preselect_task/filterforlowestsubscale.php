@@ -24,13 +24,14 @@
 
 namespace local_catquiz\teststrategy\preselect_task;
 
+use local_catquiz\catscale;
 use local_catquiz\local\result;
 use local_catquiz\teststrategy\preselect_task;
-use local_catquiz\teststrategy\preselect_task\lasttimeplayedpenalty;
 use local_catquiz\wb_middleware;
 
 /**
- * Keep only questions that belong to the subscale where the user has the lowest ability.
+ * Keep only questions that belong to the subscale that has the largest negative
+ * difference in person ability to its direct parent scale.
  *
  * @package local_catquiz
  * @copyright 2023 Wunderbyte GmbH
@@ -48,12 +49,21 @@ final class filterforlowestsubscale extends preselect_task implements wb_middlew
      *
      */
     public function run(array $context, callable $next): result {
-        // If there is no information about ability per scale, just pick a
-        // question from the top-most scale via weighted fisher information
         $abilities = $context['person_ability'];
-        asort($abilities);
-        $catscaleids = array_keys($abilities);
+        // The difference to itself is 0.
+        $abilitydifference = [$context['catscaleid'] => 0];
+        foreach (array_keys($abilities) as $catscaleid) {
+            // For each scale, calculate the relative difference of its person ability compared to its direct ancestor.
+            $childscaleids = array_keys(
+                catscale::get_next_level_subscales_ids_from_parent([$catscaleid])
+            );
+            foreach ($childscaleids as $childscaleid) {
+                $abilitydifference[$childscaleid] = $abilities[$childscaleid] - $abilities[$catscaleid];
+            }
+        }
 
+        asort($abilitydifference);
+        $catscaleids = array_keys($abilitydifference);
         foreach ($catscaleids as $catscaleid) {
             $questions = array_filter($context['questions'], fn ($q) => $q->catscaleid == $catscaleid);
             if (count($questions) > 0) {
@@ -61,8 +71,6 @@ final class filterforlowestsubscale extends preselect_task implements wb_middlew
                 return $next($context);
             } 
         }
-
-        return next($context['questions']);
     }
 
     /**
@@ -73,7 +81,6 @@ final class filterforlowestsubscale extends preselect_task implements wb_middlew
      */
     public function get_required_context_keys(): array {
         return [
-            'penalty_threshold',
             'questions',
         ];
     }
