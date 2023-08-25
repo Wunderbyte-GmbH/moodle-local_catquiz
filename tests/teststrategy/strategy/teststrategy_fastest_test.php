@@ -97,7 +97,7 @@ class teststrategy_fastest_test extends basic_testcase
                     'questions' => [],
                 ]
             ],
-            'maximum questions reached2' => [
+            'returns a question' => [
                 'expected' => result::ok($question1),
                 'attemptcontext' => [
                     'questionsattempted' => 0,
@@ -118,7 +118,7 @@ class teststrategy_fastest_test extends basic_testcase
                     'installed_models' => [
                         'raschbirnbauma' => 'catmodel_raschbirnbauma\raschbirnbauma',
                     ],
-                    'person_ability' => 1,
+                    'person_ability' => [ 1 => 0.1234],
                     'includesubscales' => true,
 
                     'max_attempts_per_scale' => 10,

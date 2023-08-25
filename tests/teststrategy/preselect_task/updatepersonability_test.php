@@ -121,7 +121,9 @@ class updatepersonability_test extends TestCase {
                                 3 => ['fraction' => "0.000"],
                             ]
                         ],
-                    ]
+                    ],
+                    'questionsattempted' => 0,
+                    'minimumquestions' => 10,
                 ]
             ]
         ];
