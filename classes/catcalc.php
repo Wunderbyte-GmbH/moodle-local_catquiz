@@ -126,7 +126,8 @@ class catcalc {
             $loglikelihood2ndderivative,
             0,
             0.001,
-            1500
+            1500,
+            PERSONABILITY_MAX
         );
 
         return $retval;

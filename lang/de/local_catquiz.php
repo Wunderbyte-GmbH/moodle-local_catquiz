@@ -297,6 +297,8 @@ $string['emptyfirstquestionlist'] = "Kann keine Startfrage wählen da die Liste 
 // Quiz Feedback.
 $string['catquizfeedback'] = "Zusammenfassung des letzten Versuchs";
 $string['attemptfeedbacknotavailable'] = "Kein Feedback verfügbar";
+$string['allquestionsincorrect'] = "Nicht verfügbar - alle Fragen wurden falsch beantwortet";
+$string['allquestionscorrect'] = "Nicht verfügbar - alle Fragen wurden richtig beantwortet";
 
 $string['catquiz_feedbackheader'] = "Feedback";
 $string['noselection'] = "Keine Auswahl";

@@ -133,8 +133,17 @@ class attemptfeedback implements renderable, templatable {
         $catscales = catquiz::get_catscales(array_keys($personabilities));
         $result = [];
         foreach ($personabilities as $catscaleid => $ability) {
+            if (abs(floatval($ability)) === abs(floatval(PERSONABILITY_MAX))) {
+                if ($ability < 0) {
+                    $ability = get_string('allquestionsincorrect', 'local_catquiz');
+                } else {
+                    $ability = get_string('allquestionscorrect', 'local_catquiz');
+                }
+            } else {
+                $ability = sprintf("%.2f", $ability);
+            }
             $result[] = [
-                'ability' => sprintf("%.2f", $ability),
+                'ability' => $ability,
                 'catscaleid' => $catscaleid,
                 'name' => $catscales[$catscaleid]->name
             ];
