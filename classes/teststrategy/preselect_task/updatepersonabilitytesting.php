@@ -44,7 +44,8 @@ class updatepersonabilitytesting extends updatepersonability {
         return [];
     }
 
-    protected function update_cached_responses($userresponses) {
+    protected function update_cached_responses($context) {
+        return (new model_responses())->setdata($context['fake_response_data']);
     }
 
     protected function update_person_param($a, $b, $c) {
