@@ -63,15 +63,15 @@ export const init = () => {
 
             if (errors.warnings !== undefined && errors.warnings !== []) {
                 errors.warnings.forEach(
-                    (warning) => showNotification(warning, "warning"));
+                    (warning) => showNotification(warning, "warning", false));
             }
             if (errors.lineerrors !== undefined) {
                 errors.lineerrors.forEach(
-                    (error) => showNotification(error, "danger"));
+                    (error) => showNotification(error, "danger", false));
             }
             if (errors.generalerrors !== undefined) {
                 errors.generalerrors.forEach(
-                    (error) => showNotification(error, "danger"));
+                    (error) => showNotification(error, "danger", false));
             }
         }
 
@@ -81,18 +81,18 @@ export const init = () => {
             // eslint-disable-next-line no-console
             console.log(response, response.numberofsuccessfullyupdatedrecords);
             getString('importsuccess', 'local_catquiz', response.numberofsuccessfullyupdatedrecords).then(message => {
-                showNotification(message, 'success');
+                showNotification(message, 'success', false);
                 return;
             }).catch(e => {
                 // eslint-disable-next-line no-console
                 console.error(e);
             });
             if (response.callbackresponse !== null && response.callbackresponse.message !== null) {
-                showNotification(response.callbackresponse.message, 'success');
+                showNotification(response.callbackresponse.message, 'success', false);
             }
         } else {
             getString('importfailed', 'local_catquiz').then(message => {
-                showNotification(message, 'danger');
+                showNotification(message, 'danger', false);
                 return;
             }).catch(e => {
                 // eslint-disable-next-line no-console
