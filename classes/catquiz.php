@@ -662,11 +662,11 @@ class catquiz {
         $from = "
         {local_catquiz_tests} ct
         JOIN {course} c ON c.id = ct.courseid
-        JOIN (SELECT catscaleid as itemcatscale, COUNT(*) AS numberofitems
+        LEFT JOIN (SELECT catscaleid as itemcatscale, COUNT(*) AS numberofitems
            FROM {local_catquiz_items}
            GROUP BY catscaleid
         ) s1 ON ct.catscaleid = s1.itemcatscale
-        JOIN (
+        LEFT JOIN (
             SELECT c.id AS courseid, " .
                 $DB->sql_group_concat($DB->sql_concat_join("' '", ['u.firstname', 'u.lastname']), ', ') . " AS teachers
             FROM {user} u
