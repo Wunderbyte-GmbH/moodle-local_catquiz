@@ -93,7 +93,6 @@ class personability_loader implements contextloaderinterface {
      * @return array 
      */
     protected function load_saved_personparams(&$context) {
-        global $DB;
         $catscaleids = [$context['catscaleid']];
         if ($context['includesubscales']) {
             array_push(
