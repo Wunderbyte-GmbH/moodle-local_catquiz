@@ -15,7 +15,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Class filterforlowestsubscale.
+ * Class filterforsubscale.
  *
  * @package local_catquiz
  * @copyright 2023 Wunderbyte GmbH
@@ -38,7 +38,7 @@ use local_catquiz\wb_middleware;
  * @copyright 2023 Wunderbyte GmbH
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-final class filterforlowestsubscale extends preselect_task implements wb_middleware {
+final class filterforsubscale extends preselect_task implements wb_middleware {
 
     /**
      * Run preselect task.
@@ -51,6 +51,16 @@ final class filterforlowestsubscale extends preselect_task implements wb_middlew
      */
     public function run(array $context, callable $next): result {
         $abilities = $context['person_ability'];
+
+        if (! in_array($context['teststrategy'], ['inferlowestskillgap', 'inferhighestskillgap'])) {
+            global $CFG;
+            if ($CFG->debug > 0) {
+                throw new \UnexpectedValueException(
+                    "Filterforsubscale encountered unknown teststrategy " . $context['teststrategy']
+                );
+            }
+            return $next($context);
+        }
 
         // If there is no information about ability per scale, select a question
         // from the top-most scale via weighted fisher information.
@@ -72,7 +82,15 @@ final class filterforlowestsubscale extends preselect_task implements wb_middlew
             }
         }
 
-        asort($abilitydifference);
+        switch ($context['teststrategy']) {
+            case 'inferhighestskillgap':
+                arsort($abilitydifference);
+                break;
+            case 'inferlowestskillgap':
+                asort($abilitydifference);
+                break;
+        };
+
         $catscaleids = array_keys($abilitydifference);
         foreach ($catscaleids as $catscaleid) {
             $questions = array_filter($context['questions'], fn ($q) => $q->catscaleid == $catscaleid);
