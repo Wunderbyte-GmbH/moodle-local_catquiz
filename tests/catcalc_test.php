@@ -59,6 +59,6 @@ class catcalc_test extends basic_testcase
             ->add((new model_item_param(50, 'web_raschbirnbauma'))->set_parameters(['difficulty' => -37.7967]))
             ->add((new model_item_param(58, 'web_raschbirnbauma'))->set_parameters(['difficulty' => -37.7967]));
         $result = catcalc::estimate_person_ability($personresponses, $itemparamlist);
-        $this->assertEquals(12345, $result);
+        $this->assertEquals(-17.9611, sprintf("%.4f", $result));
     }
 }
