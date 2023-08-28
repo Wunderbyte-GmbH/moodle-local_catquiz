@@ -535,6 +535,7 @@ class catquiz_handler {
             'skip_reason' => null,
             'userid' => $USER->id,
             'max_attempts_per_scale' => 10, // TODO: configure via quiz settings
+            'teststrategy' => $quizsettings->catquiz_selectteststrategy,
         ];
         return $contextcreator->load(
             [
