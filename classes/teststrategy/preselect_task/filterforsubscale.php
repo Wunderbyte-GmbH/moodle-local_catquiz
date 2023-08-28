@@ -38,7 +38,7 @@ use local_catquiz\wb_middleware;
  * @copyright 2023 Wunderbyte GmbH
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-final class filterforsubscale extends preselect_task implements wb_middleware {
+class filterforsubscale extends preselect_task implements wb_middleware {
 
     /**
      * Run preselect task.
@@ -74,9 +74,7 @@ final class filterforsubscale extends preselect_task implements wb_middleware {
         $abilitydifference = [$context['catscaleid'] => 0];
         foreach (array_keys($abilities) as $catscaleid) {
             // For each scale, calculate the relative difference of its person ability compared to its direct ancestor.
-            $childscaleids = array_keys(
-                catscale::get_next_level_subscales_ids_from_parent([$catscaleid])
-            );
+            $childscaleids = $this->getsubscaleids($catscaleid, $context);
             foreach ($childscaleids as $childscaleid) {
                 $abilitydifference[$childscaleid] = $abilities[$childscaleid] - $abilities[$catscaleid];
             }
@@ -113,6 +111,12 @@ final class filterforsubscale extends preselect_task implements wb_middleware {
         return [
             'questions',
         ];
+    }
+
+    protected function getsubscaleids($catscaleid, $context) {
+        return array_keys(
+            catscale::get_next_level_subscales_ids_from_parent([$catscaleid])
+        );
     }
 
     private function get_default_abilies($abilities) {
