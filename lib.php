@@ -41,6 +41,11 @@ define('STRATEGY_LOWESTSUB', 4);
 define('STRATEGY_HIGHESTSUB', 5);
 define('STRATEGY_PILOT', 6);
 
+// Pilotingstrategy options
+define('PILOTINGSTRATEGY_FAVOR_LESS', 1);
+define('PILOTINGSTRATEGY_FAVOR_MANY', 2);
+define('PILOTINGSTRATEGY_INDEPENDENT', 3);
+
 // Testiem Status in Scale.
 define('TESTITEM_STATUS_ACTIVE', 0);
 define('TESTITEM_STATUS_INACTIVE', 1);

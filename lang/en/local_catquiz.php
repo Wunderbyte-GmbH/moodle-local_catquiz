@@ -59,6 +59,11 @@ $string['passinglevel_help'] = 'There is a level of personal competency that can
 $string['pilotratio'] = 'Rate of pilot questions';
 $string['pilotratio_help'] = 'Floating point number that specifies how often pilot questions should be displayed. When a value of 0.5 is specified, then on average every second attempt will display a pilot question.';
 $string['includepilotquestions'] = 'Include pilot questions in the quiz';
+$string['catquiz_pilotingstrategy'] = 'Piloting Strategy';
+$string['catquiz_pilotingstrategyfavormany'] = 'Favor items with many attempts';
+$string['catquiz_pilotingstrategyfavorless'] = 'Favor items with less attempts';
+$string['catquiz_pilotingstrategyindependentofattempts'] = 'Select items independent of attempts';
+$string['unknownpilotingstrategy'] = 'Unknown piloting strategy';
 
 $string['timepacedtest'] = 'Timepaced test';
 $string['maxtime'] = 'Max time for test';

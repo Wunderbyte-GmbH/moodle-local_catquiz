@@ -58,6 +58,11 @@ $string['passinglevel_help'] = 'Die Bestehensgenze bezieht sich auf die Personen
 $string['pilotratio'] = 'Verhältnis von Pilotfragen';
 $string['pilotratio_help'] = 'Gleitkommazahl für das Verhältnis von Pilotfragen. Bei einem Wert von 0.5 wird im Schnitt bei jedem zweiten Versuch eine Pilotfrage angezeigt.';
 $string['includepilotquestions'] = 'Pilotfragen anzeigen';
+$string['catquiz_pilotingstrategy'] = 'Pilotierungsstrategie';
+$string['catquiz_pilotingstrategyfavormany'] = 'Bevorzuge Fragen mit vielen Versuchen';
+$string['catquiz_pilotingstrategyfavorless'] = 'Bevorzuge Fragen mit wenigen Versuchen';
+$string['catquiz_pilotingstrategyindependentofattempts'] = 'Fragenauswahl unabhängig von Versuchen';
+$string['unknownpilotingstrategy'] = 'Unbekannte Pilotierungsstrategie';
 
 $string['timepacedtest'] = 'Zeitbeschränkungen für den Test aktivieren';
 $string['maxtime'] = 'Maximale Dauer des Tests';

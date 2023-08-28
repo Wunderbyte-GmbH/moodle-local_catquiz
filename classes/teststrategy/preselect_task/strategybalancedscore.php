@@ -26,8 +26,6 @@ namespace local_catquiz\teststrategy\preselect_task;
 
 use local_catquiz\local\result;
 use local_catquiz\teststrategy\preselect_task;
-use local_catquiz\teststrategy\preselect_task\fisherinformation;
-use local_catquiz\teststrategy\preselect_task\lasttimeplayedpenalty;
 use local_catquiz\wb_middleware;
 
 /**
@@ -52,9 +50,23 @@ final class strategybalancedscore extends preselect_task implements wb_middlewar
         foreach ($context['questions'] as $question) {
             $lasttimeplayedpenaltyweighted = (1 - (
                $question->lasttimeplayedpenalty / $context['penalty_threshold']));
-            $numberofgeneralattemptspenaltyweighted = (1 - (
-                $question->{numberofgeneralattempts::PROPERTYNAME} / $context['generalnumberofattempts_max']));
-            $question->score = $numberofgeneralattemptspenaltyweighted * $lasttimeplayedpenaltyweighted;
+            $attemptratio = $question->numberofgeneralattempts / $context['generalnumberofattempts_max'];
+            switch ($context['pilotingstrategy']) {
+                case PILOTINGSTRATEGY_INDEPENDENT:
+                    $weightedattemptspenalty = 1;
+                    break;
+                case PILOTINGSTRATEGY_FAVOR_LESS:
+                    $weightedattemptspenalty = 1 - $attemptratio;
+                    break;
+                case PILOTINGSTRATEGY_FAVOR_MANY:
+                    $weightedattemptspenalty = $attemptratio;
+                    break;
+                default:
+                    throw new \UnexpectedValueException(
+                        get_string('unknownpilotingstrategy', 'local_catquiz')
+                    );
+            }
+            $question->score = $weightedattemptspenalty * $lasttimeplayedpenaltyweighted;
         }
 
         uasort($context['questions'], function($q1, $q2) {

@@ -511,6 +511,7 @@ class catquiz_handler {
 
         if ($quizsettings->catquiz_includepilotquestions) {
             $pilotratio = floatval($quizsettings->catquiz_pilotratio);
+            $pilotingstrategy = $quizsettings->catquiz_pilotingstrategy;
         }
 
         $initialcontext = [
@@ -523,6 +524,7 @@ class catquiz_handler {
             'includesubscales' => true,
             'maximumquestions' => intval($quizsettings->maximumquestions),
             'minimumquestions' => intval($quizsettings->minimumquestions),
+            'pilotingstrategy' => $pilotingstrategy,
             'penalty_threshold' => 60 * 60 * 24 * 30 - 90, // TODO: make dynamic
             /*
                  * After this time, the penalty for a question goes back to 0

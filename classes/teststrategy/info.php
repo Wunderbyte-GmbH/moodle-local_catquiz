@@ -137,6 +137,16 @@ class info {
         $mform->setType('catquiz_pilotratio', PARAM_FLOAT);
         $mform->addHelpButton('catquiz_pilotratio', 'pilotratio', 'local_catquiz');
 
+        $pilotingstrategyoptions = [
+            PILOTINGSTRATEGY_FAVOR_MANY => get_string('catquiz_pilotingstrategyfavormany', 'local_catquiz'),
+            PILOTINGSTRATEGY_FAVOR_LESS => get_string('catquiz_pilotingstrategyfavorless', 'local_catquiz'),
+            PILOTINGSTRATEGY_INDEPENDENT => get_string('catquiz_pilotingstrategyindependentofattempts', 'local_catquiz'),
+        ];
+        $elements[] = $mform->addElement('select', 'catquiz_pilotingstrategy', get_string('catquiz_pilotingstrategy', 'local_catquiz'), $pilotingstrategyoptions);
+        $mform->setDefault('catquiz_pilotingstrategy', PILOTINGSTRATEGY_FAVOR_LESS);
+        $mform->hideIf('catquiz_pilotingstrategy', 'catquiz_includepilotquestions', 'neq', 1);
+        //$mform->hideIf('catquiz_pilotingstrategy', 'catquiz_selectteststrategy', 'eq', $strategieswithoutpilotquestions);
+
         $elements[] = $mform->addElement('select', 'catquiz_selectfirstquestion',
             get_string('catquiz_selectfirstquestion', 'local_catquiz'),
             [
