@@ -26,6 +26,7 @@ namespace local_catquiz\teststrategy\preselect_task;
 
 use local_catquiz\catscale;
 use local_catquiz\local\result;
+use local_catquiz\teststrategy\context\loader\personability_loader;
 use local_catquiz\teststrategy\preselect_task;
 use local_catquiz\wb_middleware;
 
@@ -50,6 +51,15 @@ final class filterforlowestsubscale extends preselect_task implements wb_middlew
      */
     public function run(array $context, callable $next): result {
         $abilities = $context['person_ability'];
+
+        // If there is no information about ability per scale, select a question
+        // from the top-most scale via weighted fisher information.
+        $numdefaultabilities = count($this->get_default_abilies($context['person_ability']));
+        $alldefault = count($context['person_ability']) === $numdefaultabilities;
+        if ($alldefault) {
+            return $next($context);
+        }
+
         // The difference to itself is 0.
         $abilitydifference = [$context['catscaleid'] => 0];
         foreach (array_keys($abilities) as $catscaleid) {
@@ -71,6 +81,8 @@ final class filterforlowestsubscale extends preselect_task implements wb_middlew
                 return $next($context);
             } 
         }
+
+        return $next($context);
     }
 
     /**
@@ -83,5 +95,12 @@ final class filterforlowestsubscale extends preselect_task implements wb_middlew
         return [
             'questions',
         ];
+    }
+
+    private function get_default_abilies($abilities) {
+        return array_filter(
+            $abilities,
+            fn ($p) => $p === personability_loader::DEFAULT_ABILITY
+        );
     }
 }
