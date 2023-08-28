@@ -1,0 +1,125 @@
+<?php
+// This file is part of Moodle - http://moodle.org/
+//
+// Moodle is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// Moodle is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+
+/**
+ * Tests the filterforsubscale class.
+ *
+ * @package    catquiz
+ * @author David Szkiba <david.szkiba@wunderbyte.at>
+ * @copyright  2023 Georg Maißer <info@wunderbyte.at>
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
+
+namespace local_catquiz;
+
+use basic_testcase;
+use local_catquiz\teststrategy\preselect_task\filterforsubscale;
+use local_catquiz\teststrategy\preselect_task\filterforsubscaletesting;
+use local_catquiz\teststrategy\preselect_task\strategyfastestscore;
+use PHPUnit\Framework\ExpectationFailedException;
+use SebastianBergmann\RecursionContext\InvalidArgumentException;
+use UnexpectedValueException;
+
+/**
+ * @package local_catquiz
+ * @covers \local_catquiz\teststrategy\preselect_task\filterforsubscale
+ */
+class filterforsubscale_test extends basic_testcase
+{
+    /**
+     * Test that questions of subscales are removed as needed.
+     *
+     * @return void
+     * @throws InvalidArgumentException
+     * @throws ExpectationFailedException
+     */
+    public function test_throws_an_exception_for_unknown_teststrategy() {
+        $context = [
+            'teststrategy' => 'XXX',
+            'person_ability' => [1 => 1.0,],
+        ];
+        $this->expectException(UnexpectedValueException::class);
+        (new filterforsubscale())->run($context, fn () => 'nevercalled');
+    }
+
+    /**
+     * @dataProvider provider
+     * @param array $context 
+     * @param mixed $expected 
+     * @return void 
+     */
+    public function test_returns_expected_question_from_expected_catscale(
+        array $context, $expected
+    ) {
+        $result = (new filterforsubscaletesting())->run($context, fn ($context) => (new strategyfastestscore())->run($context, fn () => 'nevercalled'));
+        $this->assertEquals($expected, $result->unwrap()->id);
+    }
+
+    public function provider()
+    {
+        $context['questions'] = [
+            '1' => (object) [
+                'id' => 1,
+                'catscaleid' => 1,
+                'lasttimeplayedpenalty' => 1,
+                'fisherinformation' => 1,
+            ],
+            '2' => (object) [
+                'id' => 2,
+                'catscaleid' => 2,
+                'lasttimeplayedpenalty' => 1,
+                'fisherinformation' => 1,
+            ],
+            '3' => (object) [
+                'id' => 3,
+                'catscaleid' => 3,
+                'lasttimeplayedpenalty' => 1,
+                'fisherinformation' => 1,
+            ],
+            '4' => (object) [
+                'id' => 4,
+                'catscaleid' => 4,
+                'lasttimeplayedpenalty' => 1,
+                'fisherinformation' => 1,
+            ]
+        ];
+        $context['person_ability'] = [
+            1 => -2.0,
+            2 => -1.0,
+            3 => 0,
+            4 => 1.0
+        ];
+        $context['catscaleid'] = 1;
+        $context['penalty_threshold'] = 5;
+        $context['fake_subscaleids'] = [
+            1 => [2, 3, 4],
+            2 => [],
+            3 => [],
+            4 => [],
+        ];
+
+        return [
+            'select highest subscale' => [
+                'context' => array_merge($context, ['teststrategy' => STRATEGY_HIGHESTSUB]),
+                'expected_id' => 4,
+            ],
+            'select lowest subscale' => [
+                'context' => array_merge($context, ['teststrategy' => STRATEGY_LOWESTSUB]),
+                'expected_id' => 1,
+            ],
+        ];
+    }
+}
