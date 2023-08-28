@@ -52,7 +52,7 @@ class catscale_updated extends \core\event\base {
      *
      */
     public static function get_name() {
-        return get_string('catscale_updated', 'booking');
+        return get_string('catscale_updated', 'local_catquiz');
     }
 
     /**
