@@ -24,6 +24,7 @@
 
 use local_catquiz\catscale;
 use local_catquiz\event\catscale_updated;
+use local_catquiz\event\testiteminscale_added;
 use local_catquiz\feedback\feedback;
 use local_catquiz\messages;
 use mod_adaptivequiz\event\attempt_completed;
@@ -91,4 +92,18 @@ class local_catquiz_observer {
 
         feedback::inscribe_users_to_failed_scales($quizid, $result);
     }
+    /**
+     * Observer for the testiteminscale_added event
+     *
+     * @param testiteminscale_added $event
+     */
+    public static function testiteminscale_added(testiteminscale_added $event) {
+
+        $testitemid = $event->objectid; // Item to be treated
+        $catscaleid = $event->other['catscaleid'];
+
+        catscale::add_or_update_testitem_to_scale($catscaleid, $testitemid);
+    }
+
+
 }

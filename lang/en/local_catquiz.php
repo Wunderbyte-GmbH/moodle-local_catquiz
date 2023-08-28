@@ -142,6 +142,9 @@ $string['timemodified'] = 'Time modified';
 
 // Events.
 $string['userupdatedcatscale'] = 'User with id {$a->userid} updated CAT scale with id {$a->objectid}';
+$string['catscale_updated'] = 'CAT scale updated';
+$string['add_testitem_to_scale'] = 'Testitem with id {$a->objectid} added.';
+$string['testitem_added_to_scale'] = 'Testitem added to CAT scale';
 
 // Message.
 $string['messageprovider:catscaleupdate'] = 'Notification of CAT scale update';

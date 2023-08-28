@@ -138,7 +138,10 @@ $string['subscribe'] = 'Abonniere';
 $string['subscribed'] = 'Abonniert';
 
 // Events.
-$string['userupdatedcatscale'] = 'Nutzerin mit der Id {$a->userid} hat die CAT Skala mit der Id {$a->objectid} aktualisiert.';
+$string['userupdatedcatscale'] = 'NutzerIn mit der Id {$a->userid} hat die CAT Skala mit der Id {$a->objectid} aktualisiert.';
+$string['catscale_updated'] = 'CAT Skala aktualisert';
+$string['add_testitem_to_scale'] = 'Frage mit der Id {$a->objectid} wurde der CAT Skala mit der Id {$a->other["catscaleid"]} hinzugefügt.';
+$string['testitem_added_to_scale'] = 'Frage zu CAT Skala hinzugefügt';
 
 // Message.
 $string['messageprovider:catscaleupdate'] = 'Benachrichtung über eine Aktualisierung einer CAT Skala.';
