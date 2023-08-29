@@ -25,6 +25,7 @@
 
 namespace local_catquiz;
 
+use local_catquiz\event\context_created;
 use local_catquiz\local\model\model_person_param_list;
 use local_catquiz\local\model\model_responses;
 use local_catquiz\local\model\model_strategy;
@@ -234,7 +235,7 @@ class catcontext {
             if (! array_key_exists($row->questionid, $modelinput[$row->userid]['component'])) {
                 $modelinput[$row->userid]['component'][$row->questionid] = $entry;
                 continue;
-            } 
+            }
 
             // If we are here, there is already an entry. Only update it if this answer is newer than the last one.
             if ($row->id > $modelinput[$row->userid]['component'][$row->questionid]['id']) {
@@ -265,6 +266,19 @@ class catcontext {
             $DB->update_record('local_catquiz_catcontext', $this->return_as_class());
         } else {
             $DB->insert_record('local_catquiz_catcontext', $this->return_as_class());
+
+            // Trigger context created event
+            $event = context_created::create([
+                'objectid' => $this->name,
+                'context' => \context_system::instance(),
+                'other' => [
+                    'contextname' => $this->name,
+                    'contextid' => $this->id,
+                    'context' => $this->return_as_class(),
+                ]
+                ]);
+            $event->trigger();
+
         }
     }
 

@@ -27,6 +27,7 @@ namespace local_catquiz\data;
 use cache;
 use context_system;
 use local_catquiz\catcontext;
+use local_catquiz\event\catscale_created;
 use local_catquiz\event\catscale_updated;
 use moodle_exception;
 
@@ -131,6 +132,18 @@ class dataapi {
             return 0;
         }
         $id = $DB->insert_record('local_catquiz_catscales', $catscale);
+
+        // Trigger catscale created event
+        $event = catscale_created::create([
+            'objectid' => $id,
+            'context' => \context_system::instance(),
+            'other' => [
+                'scalename' => $catscale->name,
+                'catscaleid' => $id,
+                'catscale' => $catscale,
+            ]
+            ]);
+        $event->trigger();
 
         // Invalidate cache. TODO: Instead of invalidating cache, add the item to the cache.
         $cache = cache::make('local_catquiz', 'catscales');

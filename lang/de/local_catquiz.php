@@ -150,7 +150,10 @@ $string['activitystatussetinactive'] = 'Die Frage ist jetzt deaktiviert.';
 $string['activitystatussetactive'] = 'Die Frage ist jetzt aktiviert.';
 $string['update_testitem_status'] = 'Status der Frage aktualisiert.';
 $string['testitem_status_updated_description'] = 'Der neue Status der Frage mit der ID {$a->objectid} ist nun: {$a->statusstring}';
-
+$string['catscale_created'] = 'CAT Skala erzeugt';
+$string['create_catscale_description'] = 'CAT Skala "{$a->scalename}" mit der ID {$a->objectid} erzeugt.';
+$string['catscale_created'] = 'CAT Context erzeugt';
+$string['create_catscale_description'] = 'CAT Context "{$a->scalename}" erzeugt.';
 // Message.
 $string['messageprovider:catscaleupdate'] = 'Benachrichtung über eine Aktualisierung einer CAT Skala.';
 $string['catscaleupdatedtitle'] = 'Eine CAT Skala wurde aktualisiert';

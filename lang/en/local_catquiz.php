@@ -153,6 +153,10 @@ $string['activitystatussetinactive'] = 'Testitem is now inactive.';
 $string['activitystatussetactive'] = 'Testitem is now active.';
 $string['update_testitem_status'] = 'Status of testitem updated.';
 $string['testitem_status_updated_description'] = 'Status of testitem with id {$a->objectid} set to: {$a->statusstring}';
+$string['catscale_created'] = 'CAT scale created';
+$string['create_catscale_description'] = 'CAT scale "{$a->scalename}" with id {$a->objectid} created.';
+$string['catscale_created'] = 'CAT context created.';
+$string['create_catscale_description'] = 'CAT context "{$a->scalename}" created.';
 
 // Message.
 $string['messageprovider:catscaleupdate'] = 'Notification of CAT scale update';
