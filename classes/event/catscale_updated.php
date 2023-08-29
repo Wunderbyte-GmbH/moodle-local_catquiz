@@ -62,7 +62,7 @@ class catscale_updated extends \core\event\base {
      *
      */
     public function get_description() {
-        return get_string('userupdatedcatscale', 'local_catquiz', $this);
+        return get_string('userupdatedcatscale', 'local_catquiz', $this->data);
     }
 
     /**

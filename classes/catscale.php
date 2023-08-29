@@ -28,6 +28,7 @@ namespace local_catquiz;
 use cache;
 use cache_helper;
 use dml_exception;
+use local_catquiz\event\testiteminscale_added;
 use local_catquiz\local\result;
 use local_catquiz\local\status;
 use moodle_exception;
@@ -89,6 +90,7 @@ class catscale {
             string $component = 'question') {
 
         global $DB;
+        $context = \context_system::instance();
 
         $searchparams = [
             'componentid' => $testitemid,
@@ -115,13 +117,24 @@ class catscale {
             $data['timemodified'] = $now;
             $data['timecreated'] = $now;
             $id = $DB->insert_record('local_catquiz_items', (object)$data);
+
+            // Trigger event
+            $event = testiteminscale_added::create([
+                'objectid' => $testitemid,
+                'context' => $context,
+                'other' => [
+                    'catscaleid' => $catscaleid,
+                    'testitemid' => $testitemid,
+                ]
+                ]);
+            $event->trigger();
         }
         cache_helper::purge_by_event('changesintestitems');
         return result::ok($id);
     }
 
     /**
-     * Cjeck is assigned to parent scale.
+     * Check is assigned to parent scale.
      *
      * @param mixed $catscaleid
      * @param int $testitemid

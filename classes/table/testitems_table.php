@@ -36,7 +36,6 @@ use context_system;
 use Exception;
 use html_writer;
 use local_catquiz\catscale;
-use local_catquiz\event\testiteminscale_added;
 use local_catquiz\local\model\model_item_param;
 use local_wunderbyte_table\output\table;
 use local_wunderbyte_table\wunderbyte_table;
@@ -258,8 +257,6 @@ class testitems_table extends wunderbyte_table {
      */
     public function addtestitem(int $testitemid, string $data) {
 
-        $context = \context_system::instance();
-
         $jsonobject = json_decode($data);
 
         $catscaleid = $jsonobject->catscaleid;
@@ -271,16 +268,6 @@ class testitems_table extends wunderbyte_table {
         }
 
         foreach ($idarray as $id) {
-            /*  // Could be done with the event.
-                $event = testiteminscale_added::create([
-                    'objectid' => $id,
-                    'context' => $context,
-                    'other' => [
-                        'catscaleid' => $catscaleid,
-                    ]
-                    ]);
-                $event->trigger(); */
-
         $result[] = catscale::add_or_update_testitem_to_scale($catscaleid, $id);
         }
         $failed = array_filter($result, fn($r) => $r->isErr());

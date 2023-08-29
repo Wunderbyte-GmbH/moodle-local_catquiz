@@ -99,10 +99,9 @@ class local_catquiz_observer {
      */
     public static function testiteminscale_added(testiteminscale_added $event) {
 
-        $testitemid = $event->objectid; // Item to be treated
-        $catscaleid = $event->other['catscaleid'];
+        //$testitemid = $event->objectid;
+        //$catscaleid = $event->other['catscaleid'];
 
-        catscale::add_or_update_testitem_to_scale($catscaleid, $testitemid);
     }
 
 

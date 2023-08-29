@@ -62,7 +62,9 @@ class testiteminscale_added extends \core\event\base {
      *
      */
     public function get_description() {
-        return get_string('add_testitem_to_scale', 'local_catquiz', $this);
+        $catscaleid = $this->data['other']['catscaleid'];
+        $this->data['catscaleid'] = $catscaleid;
+        return get_string('add_testitem_to_scale', 'local_catquiz', $this->data);
     }
 
     /**
