@@ -171,7 +171,7 @@ class attemptfeedback implements renderable, templatable {
             return '';
         }
 
-        return $attemptstrategy::attempt_feedback();
+        return $attemptstrategy::attempt_feedback($this->contextid);
     }
 
     /**

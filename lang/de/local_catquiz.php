@@ -299,6 +299,8 @@ $string['emptyfirstquestionlist'] = "Kann keine Startfrage wählen da die Liste 
 $string['attemptfeedbacknotavailable'] = "Kein Feedback verfügbar";
 $string['allquestionsincorrect'] = "Nicht verfügbar - alle Fragen wurden falsch beantwortet";
 $string['allquestionscorrect'] = "Nicht verfügbar - alle Fragen wurden richtig beantwortet";
+$string['feedbackcomparetoaverage'] = 'Sie sind besser als {$a} Ihrer Mit-Studierenden im aktuellen Jahrgang.';
+$string['feedbackneedsimprovement'] = "Da geht doch sicher noch etwas, oder?";
 
 $string['catquiz_feedbackheader'] = "Feedback";
 $string['noselection'] = "Keine Auswahl";
