@@ -29,6 +29,7 @@ use cache;
 use cache_helper;
 use dml_exception;
 use local_catquiz\event\testiteminscale_added;
+use local_catquiz\event\testiteminscale_updated;
 use local_catquiz\local\result;
 use local_catquiz\local\status;
 use moodle_exception;
@@ -106,6 +107,18 @@ class catscale {
             $id = $record->id;
             $data['id'] = $id;
             $DB->update_record('local_catquiz_items', (object)$data);
+
+            // Trigger event
+            $event = testiteminscale_updated::create([
+                'objectid' => $testitemid,
+                'context' => $context,
+                'other' => [
+                    'catscaleid' => $catscaleid,
+                    'testitemid' => $testitemid,
+                ]
+                ]);
+            $event->trigger();
+
         } else {
             // We won't allow an item to be assigned to both a scale and its sub- or parent-scale.
             if (self::is_assigned_to_parent_scale($catscaleid, $testitemid)
