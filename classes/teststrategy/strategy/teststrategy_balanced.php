@@ -25,6 +25,7 @@
 namespace local_catquiz\teststrategy\strategy;
 
 use cache;
+use local_catquiz\teststrategy\feedbackgenerator\questionssummary;
 use local_catquiz\teststrategy\preselect_task\lasttimeplayedpenalty;
 use local_catquiz\teststrategy\preselect_task\maximumquestionscheck;
 use local_catquiz\teststrategy\preselect_task\maybe_return_pilot;
@@ -69,22 +70,9 @@ class teststrategy_balanced extends strategy {
         ];
     }
 
-    /**
-     * Returns attempt feedback.
-     *
-     * @return array
-     *
-     */
-    public static function attempt_feedback(int $contextid): array {
-        $cache = cache::make('local_catquiz', 'adaptivequizattempt');
-        $feedback = sprintf(
-            '%s: %d',
-            get_string('pilot_questions', 'local_catquiz'),
-            $cache->get('num_pilot_questions')
-        );
-        if (!$parentfeedback = parent::attempt_feedback($contextid)) {
-            return [$feedback];
-        }
-        return [...$parentfeedback, $feedback];
+    public function get_feedbackgenerators(): array {
+        return [
+            questionssummary::class,
+        ];
     }
 }

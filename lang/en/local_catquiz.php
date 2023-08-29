@@ -306,6 +306,7 @@ $string['feedbackneedsimprovement'] = "Don't you think that you can do better?";
 $string['attemptfeedbacknotavailable'] = "No feedback available";
 $string['allquestionsincorrect'] = "Not available - all questions were answered incorrectly";
 $string['allquestionscorrect'] = "Not available- all questions were answered correctly";
+$string['questionssummary'] = "Summary";
 
 $string['catquiz_feedbackheader'] = "Feedback";
 $string['noselection'] = "No selection";

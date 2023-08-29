@@ -89,28 +89,6 @@ class attemptfeedback implements renderable, templatable {
     }
 
     /**
-     * Rendes question stats.
-     *
-     * @param int $attemptid
-     *
-     * @return mixed
-     *
-     */
-    private function render_question_stats(int $attemptid) {
-        // 2. If an attemptid is given and belongs to the current user (or the user has permissions to see it), return that one.
-        $attempt = catquiz::get_attempt_statistics($attemptid);
-        if ($attempt) {
-            return [
-                'gradedright' => $attempt['gradedright']->count ?? 0,
-                'gradedwrong' => $attempt['gradedwrong']->count ?? 0,
-                'gradedpartial' => $attempt['gradedpartial']->count ?? 0,
-            ];
-        }
-
-        return get_string('attemptfeedbacknotavailable', 'local_catquiz');
-    }
-
-    /**
      * Renders person ability.
      *
      * @return mixed
@@ -171,7 +149,21 @@ class attemptfeedback implements renderable, templatable {
             return '';
         }
 
-        return $attemptstrategy::attempt_feedback($this->contextid);
+        $feedbackclasses = $attemptstrategy->get_feedbackgenerators();
+        $generators = [];
+        foreach ($feedbackclasses as $classname) {
+            $generators[] = new $classname();
+        }
+
+        $context = [
+            'attemptid' => $this->attemptid,
+            'feedback' => [],
+        ];
+        
+        foreach ($generators as $generator) {
+            $context['feedback'][] = $generator->run($context);
+        }
+        return $context['feedback'];
     }
 
     /**
@@ -184,9 +176,7 @@ class attemptfeedback implements renderable, templatable {
      */
     public function export_for_template(\renderer_base $output): array {
         return [
-            'stats' => $this->render_question_stats($this->attemptid),
-            'abilities' => $this->render_person_abilities(),
-            'strategy_feedback' => $this->render_strategy_feedback(),
+            'feedback' => $this->render_strategy_feedback(),
         ];
     }
 }
