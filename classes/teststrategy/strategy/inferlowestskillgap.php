@@ -24,6 +24,7 @@
 
 namespace local_catquiz\teststrategy\strategy;
 
+use local_catquiz\teststrategy\feedbackgenerator\questionssummary;
 use local_catquiz\teststrategy\preselect_task\filterforsubscale;
 use local_catquiz\teststrategy\preselect_task\firstquestionselector;
 use local_catquiz\teststrategy\preselect_task\fisherinformation;
@@ -80,8 +81,9 @@ class inferlowestskillgap extends strategy {
         ];
     }
 
-    public static function attempt_feedback(int $contextid): array
-    {
-        return teststrategy_balanced::attempt_feedback();
+    public function get_feedbackgenerators(): array {
+        return [
+            questionssummary::class,
+        ];
     }
 }

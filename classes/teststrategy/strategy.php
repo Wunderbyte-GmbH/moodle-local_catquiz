@@ -197,34 +197,7 @@ abstract class strategy {
         return $this;
     }
 
-    /**
-     * Provide feedback about the last quiz attempt
-     *
-     * @return array<string>
-     */
-    public static function attempt_feedback(int $contextid): array {
-        $feedback = [];
-
-        // Summary: performance in this attempt compared to other students.
-        $feedback[] = self::compare_user_to_test_average($contextid);
-
-        $cache = cache::make('local_catquiz', 'adaptivequizattempt');
-        if ($stopreason = $cache->get('stopreason')) {
-            $feedback[] = sprintf(
-                "%s: %s",
-                get_string('attemptstopcriteria', 'mod_adaptivequiz'),
-                get_string($stopreason, 'local_catquiz')
-            );
-        }
-
-        $quizsettings = $cache->get('quizsettings');
-        $personabilities = $cache->get('personabilities') ?: [];
-        if ($scalefeedback = self::feedbackforscales($quizsettings, $personabilities)) {
-            $feedback[] = $scalefeedback;
-        }
-
-        return $feedback;
-    }
+    abstract public function get_feedbackgenerators(): array;
 
     public function update_playedquestionsperscale(
         stdClass $selectedquestion,

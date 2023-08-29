@@ -301,6 +301,7 @@ $string['allquestionsincorrect'] = "Nicht verfügbar - alle Fragen wurden falsch
 $string['allquestionscorrect'] = "Nicht verfügbar - alle Fragen wurden richtig beantwortet";
 $string['feedbackcomparetoaverage'] = 'Sie sind besser als {$a} Ihrer Mit-Studierenden im aktuellen Jahrgang.';
 $string['feedbackneedsimprovement'] = "Da geht doch sicher noch etwas, oder?";
+$string['questionssummary'] = "Zusammenfassung";
 
 $string['catquiz_feedbackheader'] = "Feedback";
 $string['noselection'] = "Keine Auswahl";

@@ -21,19 +21,11 @@
     Context variables required for this template:
     Example context (json):
     {
-        "feedback": {
-            [
-                "name": "questionssummary",
-                "content": "<p>graded right: X</p>",
-            ],
-            [
-                "name": "bbb",
-                "content": "<b>HTML text</b>"
-            ]
-        },
+        "gradedright": "gradedright",
+        "gradedwrong": "gradedwrong",
+        "gradedpartial": "gradedpartial"
     }
 }}
-{{#feedback}}
-    <h3>{{heading}}</h3>
-    <div>{{{content}}}</div>
-{{/feedback}}
+<p>{{#str}}numberofanswerscorrect, local_catquiz{{/str}}: {{gradedright}}</p>
+<p>{{#str}}numberofanswersincorrect, local_catquiz{{/str}}: {{gradedwrong}}</p>
+<p>{{#str}}numberofanswerspartlycorrect, local_catquiz{{/str}}: {{gradedpartial}}</p>
