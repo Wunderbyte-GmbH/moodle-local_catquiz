@@ -28,11 +28,13 @@ namespace local_catquiz;
 use cache;
 use cache_exception;
 use cache_helper;
+use cm_info;
 use coding_exception;
 use context_system;
 use core_plugin_manager;
 use Exception;
 use local_catquiz\local\model\model_strategy;
+use local_catquiz\output\attemptfeedback;
 use local_catquiz\teststrategy\info;
 use moodle_exception;
 use MoodleQuickForm;
@@ -496,6 +498,19 @@ class catquiz_handler {
         $cache->purge();
         $cache->set('isfirstquestionofattempt', true);
         $cache->set('userresponses', [$USER->id => []]);
+    }
+
+    public static function attemptfeedback(
+        stdClass $adaptivequiz,
+        cm_info $cm,
+        stdClass $attemptrecord): string {
+        global $OUTPUT;
+        $contextid = optional_param('context', 0, PARAM_INT);
+
+        $attemptfeedback = new attemptfeedback($attemptrecord->id, $contextid);
+        $data = $attemptfeedback->export_for_template($OUTPUT);
+
+        return $OUTPUT->render_from_template('local_catquiz/attemptfeedback', $data);
     }
 
     /**
