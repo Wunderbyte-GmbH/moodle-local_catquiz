@@ -301,7 +301,6 @@ $string['abortpersonabilitynotchanged'] = "Person parameter did not change";
 $string['emptyfirstquestionlist'] = "Can't select a start question because the list is empty";
 
 // Quiz Feedback.
-$string['catquizfeedback'] = "Shows a summary of the last quiz attempt";
 $string['attemptfeedbacknotavailable'] = "No feedback available";
 $string['allquestionsincorrect'] = "Not available - all questions were answered incorrectly";
 $string['allquestionscorrect'] = "Not available- all questions were answered correctly";
