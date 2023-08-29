@@ -36,10 +36,10 @@ use context_system;
 use Exception;
 use html_writer;
 use local_catquiz\catscale;
+use local_catquiz\event\testitemstatus_updated;
 use local_catquiz\local\model\model_item_param;
 use local_wunderbyte_table\output\table;
 use local_wunderbyte_table\wunderbyte_table;
-use mod_booking\booking;
 use moodle_url;
 use question_bank;
 use stdClass;
@@ -366,6 +366,17 @@ class testitems_table extends wunderbyte_table {
                 'message' => 'Could not update item in the DB',
             ];
         }
+
+        // Trigger status changed event
+        $event = testitemstatus_updated::create([
+            'objectid' => $dataobject->id,
+            'context' => \context_system::instance(),
+            'other' => [
+                'activitystatus' => $dataobject->status,
+                'testitemid' => $dataobject->id,
+            ]
+            ]);
+        $event->trigger();
 
         return [
             'success' => 1,
