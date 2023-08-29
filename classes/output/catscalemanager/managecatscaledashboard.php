@@ -96,6 +96,12 @@ class managecatscaledashboard implements renderable, templatable {
     public ?array $testitemdashboardarray = [];
 
     /**
+     *
+     * @var string $eventlogtable.
+     */
+    public ?string $eventlogtable = "";
+
+    /**
      * Constructor.
      *
      * @param int $testitemid
@@ -134,6 +140,9 @@ class managecatscaledashboard implements renderable, templatable {
                 $testitemdashboard = new testitemdashboard($this->testitemid, $this->contextid, $this->catscaleid, $this->componentname);
                 $this->testitemdashboardarray = $testitemdashboard->return_as_array();
         }
+
+        $eventlogtable = new eventlogtableinstance();
+        $this->eventlogtable = $eventlogtable->render_event_log_table();
     }
 
     /**
@@ -158,6 +167,7 @@ class managecatscaledashboard implements renderable, templatable {
             'testsandtemplatesdisplay' => $this->testsandtemplatesdisplay,
             'catscalestats' => $this->catscalestatsarray,
             'testitemdashboard' => $this->testitemdashboardarray,
+            'eventlogtable' => $this->eventlogtable,
         ];
         return $data;
     }

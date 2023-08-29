@@ -1167,4 +1167,29 @@ class catquiz {
             $catscaleids
         );
     }
+
+    /**
+     * Return the sql for the event logs of catquiz component.
+     *
+     * @param string $component
+     *
+     * @return array
+     *
+     */
+    public static function return_sql_for_event_logs($component = 'local_catquiz') {
+
+        $select = "*";
+
+        $from = "{logstore_standard_log}";
+
+        $where = 'component = :component AND 1=1';
+
+        $filter = '';
+
+        $params = [
+            'component' => $component,
+        ];
+
+        return [$select, $from, $where, $filter, $params];
+    }
 }

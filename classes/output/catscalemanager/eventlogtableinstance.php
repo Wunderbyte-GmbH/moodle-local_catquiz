@@ -1,0 +1,88 @@
+<?php
+// This file is part of Moodle - http://moodle.org/
+//
+// Moodle is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// Moodle is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+
+namespace local_catquiz\output\catscalemanager;
+
+use html_writer;
+use local_catquiz\catquiz;
+use local_catquiz\table\event_log_table;
+use moodle_url;
+
+/**
+ * Renderable class for the catscalemanagers
+ *
+ * @package    local_catquiz
+ * @copyright  2023 Wunderbyte GmbH
+ * @author     Magdalena Holczik
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
+class eventlogtableinstance {
+
+
+    /**
+     * Constructor.
+     *
+     */
+    public function __construct() {
+
+    }
+
+
+    /**
+     * Render event log table.
+     * @return ?string
+     */
+    public function render_event_log_table() {
+        global $DB;
+
+        $table = new event_log_table('eventlogtable');
+
+        list($select, $from, $where, $filter, $params) = catquiz::return_sql_for_event_logs();
+
+        $table->set_filter_sql($select, $from, $where, $filter, $params);
+
+        $columnsarray = [
+            'id' => get_string('id', 'local_catquiz'),
+            'eventname' => get_string('eventname', 'core'),
+            'action' => get_string('action', 'core'),
+            'target' => get_string('target', 'local_catquiz'),
+            'description' => get_string('description', 'core'),
+            'timecreated' => get_string('timecreated', 'core'),
+        ];
+        $table->define_columns(array_keys($columnsarray));
+        $table->define_headers(array_values($columnsarray));
+
+        $table->define_sortablecolumns(array_keys($columnsarray));
+
+        $table->tabletemplate = 'local_wunderbyte_table/twtable_list';
+        //$table->define_cache('local_catquiz', 'eventlogtable');
+
+        $table->pageable(true);
+
+        $table->showcountlabel = true;
+        $table->showdownloadbutton = false;
+        $table->showreloadbutton = true;
+        $table->showrowcountselect = true;
+
+        $table->filteronloadinactive = false;
+
+        $table->define_baseurl(new moodle_url('/local/catquiz/download.php'));
+
+        //list($idstring, $encodedtable, $html) = $table->lazyouthtml(10, true);
+        //return $html;
+        return $table->outhtml(10, true);
+    }
+}
