@@ -202,8 +202,12 @@ abstract class strategy {
      *
      * @return array<string>
      */
-    public static function attempt_feedback(): array {
-       $feedback = []; 
+    public static function attempt_feedback(int $contextid): array {
+        $feedback = [];
+
+        // Summary: performance in this attempt compared to other students.
+        $feedback[] = self::compare_user_to_test_average($contextid);
+
         $cache = cache::make('local_catquiz', 'adaptivequizattempt');
         if ($stopreason = $cache->get('stopreason')) {
             $feedback[] = sprintf(
@@ -215,15 +219,9 @@ abstract class strategy {
 
         $quizsettings = $cache->get('quizsettings');
         $personabilities = $cache->get('personabilities') ?: [];
-        $scalefeedbackarr = self::feedbackforscales($quizsettings, $personabilities);
-        if ($scalefeedbackarr) {
-            $scalefeedback = "";
-            $catscales = catquiz::get_catscales(array_keys($scalefeedbackarr));
-            foreach ($catscales as $cs) {
-                $scalefeedback .= $cs->name . ': ' . $scalefeedbackarr[$cs->id] . '<br/>';
-            }
+        if ($scalefeedback = self::feedbackforscales($quizsettings, $personabilities)) {
+            $feedback[] = $scalefeedback;
         }
-        $feedback[] = $scalefeedback;
 
         return $feedback;
     }
@@ -246,7 +244,7 @@ abstract class strategy {
      * @param mixed $personabilities 
      * @return array 
      */
-    private static function feedbackforscales($quizsettings, $personabilities): array {
+    private static function feedbackforscales($quizsettings, $personabilities): string {
         $scalefeedback = [];
         foreach ($personabilities as $catscaleid => $personability) {
             $lowerlimitprop = sprintf('feedback_scaleid_%d_lowerlimit', $catscaleid);
@@ -264,6 +262,52 @@ abstract class strategy {
 
             $scalefeedback[$catscaleid] = $feedback;
         }
-        return $scalefeedback;
+        
+        if (! $scalefeedback) {
+            return "";
+        }
+
+        $catscales = catquiz::get_catscales(array_keys($scalefeedback));
+        $result = "";
+        foreach ($catscales as $cs) {
+            $result .= $cs->name . ': ' . $scalefeedback[$cs->id] . '<br/>';
+        }
+        return $result;
+    }
+
+    private static function compare_user_to_test_average(int $contextid): string {
+        global $USER;
+        $cache = cache::make('local_catquiz', 'adaptivequizattempt');
+        $quizsettings = $cache->get('quizsettings');
+        if (! $catscaleid = $quizsettings->catquiz_catcatscales) {
+            return '';
+        }
+
+        $abilities = $cache->get('personabilities');
+        if (! $abilities) {
+            return '';
+        }
+        $ability = $abilities[$catscaleid];
+        if (! $ability) {
+            return '';
+        }
+
+        $personparams = catquiz::get_person_abilities($contextid, array_keys($abilities));
+        $worseabilities = array_filter(
+            $personparams,
+            fn ($pp) => $pp->ability < $ability
+        );
+
+        if (!$worseabilities) {
+            return '';
+        }
+
+        $quantile = (count($worseabilities)/count($personparams)) * 100;
+        $feedback = get_string('feedbackcomparetoaverage', 'local_catquiz', $quantile);
+        $needsimprovementthreshold = 40; // TODO: do not hardcode.
+        if ($quantile < $needsimprovementthreshold) {
+            $feedback .= " " . get_string('feedbackneedsimprovement', 'local_catquiz');
+        }
+        return $feedback;
     }
 }

@@ -75,14 +75,14 @@ class teststrategy_balanced extends strategy {
      * @return array
      *
      */
-    public static function attempt_feedback(): array {
+    public static function attempt_feedback(int $contextid): array {
         $cache = cache::make('local_catquiz', 'adaptivequizattempt');
         $feedback = sprintf(
             '%s: %d',
             get_string('pilot_questions', 'local_catquiz'),
             $cache->get('num_pilot_questions')
         );
-        if (!$parentfeedback = parent::attempt_feedback()) {
+        if (!$parentfeedback = parent::attempt_feedback($contextid)) {
             return [$feedback];
         }
         return [...$parentfeedback, $feedback];

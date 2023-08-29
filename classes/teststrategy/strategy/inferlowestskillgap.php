@@ -80,7 +80,7 @@ class inferlowestskillgap extends strategy {
         ];
     }
 
-    public static function attempt_feedback(): array
+    public static function attempt_feedback(int $contextid): array
     {
         return teststrategy_balanced::attempt_feedback();
     }

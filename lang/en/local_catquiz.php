@@ -299,6 +299,8 @@ $string['error'] = "An error occured";
 $string['id'] = "ID";
 $string['abortpersonabilitynotchanged'] = "Person parameter did not change";
 $string['emptyfirstquestionlist'] = "Can't select a start question because the list is empty";
+$string['feedbackcomparetoaverage'] = 'You performed better than {$a}% of your fellow students.';
+$string['feedbackneedsimprovement'] = "Don't you think that you can do better?";
 
 // Quiz Feedback.
 $string['attemptfeedbacknotavailable'] = "No feedback available";
