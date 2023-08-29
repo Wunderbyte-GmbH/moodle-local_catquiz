@@ -145,6 +145,9 @@ $string['add_testitem_to_scale'] = 'Frage mit der Id {$a->objectid} wurde der CA
 $string['testitem_added_to_scale'] = 'Frage zu CAT Skala hinzugefügt';
 $string['testitem_updated_in_scale'] = 'Frage in CAT Skala aktualisert';
 $string['update_testitem_in_scale'] = 'Frage mit der Id {$a->objectid} wurde der CAT Skala mit der Id {$a->catscaleid} aktualisiert.';
+$string['update_testitem_activity_status'] = 'Der Aktivitätsstatus der Frage mit der Id {$a->objectid} wurde aktualisiert.';
+$string['activitystatussetinactive'] = 'Die Frage ist jetzt deaktiviert.';
+$string['activitystatussetactive'] = 'Die Frage ist jetzt aktiviert.';
 
 // Message.
 $string['messageprovider:catscaleupdate'] = 'Benachrichtung über eine Aktualisierung einer CAT Skala.';

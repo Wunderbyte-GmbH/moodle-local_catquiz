@@ -148,7 +148,9 @@ $string['add_testitem_to_scale'] = 'Testitem with id {$a->objectid} added to CAT
 $string['testitem_added_to_scale'] = 'Testitem added to CAT scale';
 $string['testitem_updated_in_scale'] = 'Testitem updated in CAT scale';
 $string['update_testitem_in_scale'] = 'Testitem with id {$a->objectid} updated in CAT scale {$a->catscaleid}';
-
+$string['update_testitem_activity_status'] = 'Activity status of testitem with id {$a->objectid} changed.';
+$string['activitystatussetinactive'] = 'Testitem is now inactive.';
+$string['activitystatussetactive'] = 'Testitem is now active.';
 
 // Message.
 $string['messageprovider:catscaleupdate'] = 'Notification of CAT scale update';

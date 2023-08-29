@@ -28,6 +28,7 @@ namespace local_catquiz;
 use cache;
 use cache_helper;
 use dml_exception;
+use local_catquiz\event\testitemactivitystatus_updated;
 use local_catquiz\event\testiteminscale_added;
 use local_catquiz\event\testiteminscale_updated;
 use local_catquiz\local\result;
@@ -87,7 +88,7 @@ class catscale {
     public static function add_or_update_testitem_to_scale(
             int $catscaleid,
             int $testitemid,
-            int $status = TESTITEM_STATUS_ACTIVE,
+            int $status = 2, // Just to check if status is changed, we make a nonsense default.
             string $component = 'question') {
 
         global $DB;
@@ -99,6 +100,14 @@ class catscale {
             'catscaleid' => $catscaleid,
         ];
 
+        // Check if status is changed
+        $statuschanged = false;
+        if ($status == 2) {
+            $status = TESTITEM_STATUS_ACTIVE;
+        } else {
+            $statuschanged = true;
+        }
+
         $data = $searchparams;
         $data['status'] = $status;
 
@@ -108,7 +117,20 @@ class catscale {
             $data['id'] = $id;
             $DB->update_record('local_catquiz_items', (object)$data);
 
-            // Trigger event
+            if ($statuschanged) {
+                // Trigger status changed event
+                $event = testitemactivitystatus_updated::create([
+                    'objectid' => $testitemid,
+                    'context' => $context,
+                    'other' => [
+                        'activitystatus' => $status,
+                        'testitemid' => $testitemid,
+                    ]
+                    ]);
+                $event->trigger();
+            }
+
+            // Trigger general testitem updated event.
             $event = testiteminscale_updated::create([
                 'objectid' => $testitemid,
                 'context' => $context,
