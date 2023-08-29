@@ -18,7 +18,6 @@ namespace local_catquiz\output;
 
 use cache;
 use local_catquiz\catquiz;
-use local_catquiz\catscale;
 use local_catquiz\teststrategy\info;
 use templatable;
 use renderable;
