@@ -64,7 +64,7 @@ class filterforsubscale extends preselect_task implements wb_middleware {
 
         // If there is no information about ability per scale, select a question
         // from the top-most scale via weighted fisher information.
-        $numdefaultabilities = count($this->get_default_abilies($context['person_ability']));
+        $numdefaultabilities = count($this->get_default_abilities($context['person_ability']));
         $alldefault = count($context['person_ability']) === $numdefaultabilities;
         if ($alldefault) {
             return $next($context);
@@ -119,7 +119,7 @@ class filterforsubscale extends preselect_task implements wb_middleware {
         );
     }
 
-    private function get_default_abilies($abilities) {
+    private function get_default_abilities($abilities) {
         return array_filter(
             $abilities,
             fn ($p) => $p === personability_loader::DEFAULT_ABILITY
