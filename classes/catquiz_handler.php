@@ -463,6 +463,9 @@ class catquiz_handler {
         $testenvironment = new testenvironment($data);
 
         $quizsettings = $testenvironment->return_settings();
+        $cache = cache::make('local_catquiz', 'adaptivequizattempt');
+        $cache->set('quizsettings', $quizsettings);
+        $cache->set('attemptdata', $attemptdata);
 
         $tsinfo = new info();
         $teststrategy = $tsinfo

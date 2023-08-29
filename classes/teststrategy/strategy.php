@@ -25,6 +25,7 @@
 namespace local_catquiz\teststrategy;
 
 use cache;
+use local_catquiz\catquiz;
 use local_catquiz\catscale;
 use local_catquiz\local\result;
 use local_catquiz\teststrategy\info;
@@ -202,16 +203,29 @@ abstract class strategy {
      * @return array<string>
      */
     public static function attempt_feedback(): array {
+       $feedback = []; 
         $cache = cache::make('local_catquiz', 'adaptivequizattempt');
-
         if ($stopreason = $cache->get('stopreason')) {
-            return [sprintf(
+            $feedback[] = sprintf(
                 "%s: %s",
                 get_string('attemptstopcriteria', 'mod_adaptivequiz'),
                 get_string($stopreason, 'local_catquiz')
-            )];
+            );
         }
-        return [];
+
+        $quizsettings = $cache->get('quizsettings');
+        $personabilities = $cache->get('personabilities') ?: [];
+        $scalefeedbackarr = self::feedbackforscales($quizsettings, $personabilities);
+        if ($scalefeedbackarr) {
+            $scalefeedback = "";
+            $catscales = catquiz::get_catscales(array_keys($scalefeedbackarr));
+            foreach ($catscales as $cs) {
+                $scalefeedback .= $cs->name . ': ' . $scalefeedbackarr[$cs->id] . '<br/>';
+            }
+        }
+        $feedback[] = $scalefeedback;
+
+        return $feedback;
     }
 
     public function update_playedquestionsperscale(
@@ -223,5 +237,33 @@ abstract class strategy {
         }
         $playedquestionsperscale[$selectedquestion->catscaleid][] = $selectedquestion;
         return $playedquestionsperscale;
+    }
+
+    /**
+     * Returns an array with catscale feedback strings indexed by the catscale ID.
+     * 
+     * @param mixed $quizsettings 
+     * @param mixed $personabilities 
+     * @return array 
+     */
+    private static function feedbackforscales($quizsettings, $personabilities): array {
+        $scalefeedback = [];
+        foreach ($personabilities as $catscaleid => $personability) {
+            $lowerlimitprop = sprintf('feedback_scaleid_%d_lowerlimit', $catscaleid);
+            $lowerlimit = floatval($quizsettings->$lowerlimitprop);
+            if ($personability >= $lowerlimit) {
+                continue;
+            }
+
+            $feedbackprop = sprintf('feedback_scaleid_%d_feedback', $catscaleid);
+            $feedback = $quizsettings->$feedbackprop;
+            // Do not display empty feedback messages.
+            if (!$feedback) {
+                continue;
+            }
+
+            $scalefeedback[$catscaleid] = $feedback;
+        }
+        return $scalefeedback;
     }
 }
