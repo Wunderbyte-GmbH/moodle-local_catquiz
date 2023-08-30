@@ -26,6 +26,7 @@
 namespace local_catquiz;
 
 use local_catquiz\event\context_created;
+use local_catquiz\event\context_updated;
 use local_catquiz\local\model\model_person_param_list;
 use local_catquiz\local\model\model_responses;
 use local_catquiz\local\model\model_strategy;
@@ -264,6 +265,19 @@ class catcontext {
 
         if (!empty($this->id)) {
             $DB->update_record('local_catquiz_catcontext', $this->return_as_class());
+
+            // Trigger context updated event
+            $event = context_updated::create([
+                'objectid' => $this->name,
+                'context' => \context_system::instance(),
+                'other' => [
+                    'contextname' => $this->name,
+                    'contextid' => $this->id,
+                    'context' => $this->return_as_class(),
+                ]
+                ]);
+            $event->trigger();
+
         } else {
             $DB->insert_record('local_catquiz_catcontext', $this->return_as_class());
 

@@ -157,6 +157,9 @@ $string['catscale_created'] = 'CAT scale created';
 $string['create_catscale_description'] = 'CAT scale "{$a->scalename}" with id {$a->objectid} created.';
 $string['catscale_created'] = 'CAT context created.';
 $string['create_catscale_description'] = 'CAT context "{$a->scalename}" created.';
+$string['catscale_created'] = 'CAT context updated.';
+$string['create_catscale_description'] = 'CAT context "{$a->scalename}" updated.';
+
 
 // Message.
 $string['messageprovider:catscaleupdate'] = 'Notification of CAT scale update';
