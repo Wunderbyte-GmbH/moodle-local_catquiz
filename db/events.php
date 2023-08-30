@@ -35,7 +35,7 @@
          'callback' => 'local_catquiz_observer::attempt_completed'
      ),
      array(
-        'eventname' => '\mod_adaptivequiz\event\testiteminscale_added',
+        'eventname' => '\local_catquiz\event\testiteminscale_added',
         'callback' => 'local_catquiz_observer::testiteminscale_added'
     ),
  );
