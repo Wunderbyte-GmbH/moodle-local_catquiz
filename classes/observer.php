@@ -28,6 +28,7 @@ use local_catquiz\event\testiteminscale_added;
 use local_catquiz\feedback\feedback;
 use local_catquiz\messages;
 use mod_adaptivequiz\event\attempt_completed;
+use core\event\question_deleted;
 
 /**
  * Event observer for local_catquiz.
@@ -102,6 +103,22 @@ class local_catquiz_observer {
         //$testitemid = $event->objectid;
         //$catscaleid = $event->other['catscaleid'];
 
+    }
+    /**
+     * Observer for the question_deleted event
+     *
+     * @param question_deleted $event
+     */
+    public static function question_deleted(question_deleted $event) {
+        global $DB;
+
+        // Questions used (for example in a quiz) are not deleted, just hidden
+        // ...therefore the deletion from the table should never really apply.
+        $questionid = $event->objectid;
+        $data = [
+            'componentid' => $questionid,
+        ];
+        $DB->delete_records('local_catquiz_items', $data);
     }
 
 
