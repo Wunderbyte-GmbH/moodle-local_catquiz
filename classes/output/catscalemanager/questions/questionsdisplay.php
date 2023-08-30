@@ -218,6 +218,8 @@ class questionsdisplay {
         $table->define_columns(array_keys($columnsarray));
         $table->define_headers(array_values($columnsarray));
 
+        $table->define_fulltextsearchcolumns(['idnumber', 'name', 'qtype', 'model', 'lastattempttime']);
+
         $sortcolumns = $columnsarray;
         unset($sortcolumns['action']);
         $table->define_sortablecolumns(array_keys($sortcolumns));
