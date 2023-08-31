@@ -26,6 +26,7 @@ namespace local_catquiz\teststrategy\feedbackgenerator;
 
 use local_catquiz\catquiz;
 use local_catquiz\teststrategy\feedbackgenerator;
+use local_catquiz\teststrategy\preselect_task\firstquestionselector;
 
 /**
  * Compare the ability of this attempt to the average abilities of other
@@ -66,12 +67,26 @@ class comparetotestaverage extends feedbackgenerator {
         }
 
         $quantile = (count($worseabilities)/count($personparams)) * 100;
-        $feedback = get_string('feedbackcomparetoaverage', 'local_catquiz', $quantile);
+        $text = get_string('feedbackcomparetoaverage', 'local_catquiz', sprintf('%.2f', $quantile));
         if ($needsimprovementthreshold = $context['needsimprovementthreshold']) {
             if ($quantile < $needsimprovementthreshold) {
-                $feedback .= " " . get_string('feedbackneedsimprovement', 'local_catquiz');
+                $text .= " " . get_string('feedbackneedsimprovement', 'local_catquiz');
             }
         }
+
+        $testaverage = (new firstquestionselector())->get_average_ability_of_test($personparams);
+        $data = [
+            'testaverageability' => sprintf('%.2f', $testaverage),
+            'userability' => sprintf('%.2f', $ability),
+            // Used for positioning in the progress bar. 0 is left, 50 middle and 100 right.
+            // This assumes that all values are in the range [-5, 5].
+            'testaverageposition' => ($testaverage + 5) * 10,
+            'userabilityposition' => ($ability + 5) * 10,
+            'text' => $text
+        ];
+
+        global $OUTPUT;
+        $feedback = $OUTPUT->render_from_template('local_catquiz/feedback/comparetotestaverage', $data);
 
        return [
             'heading' => $this->get_heading(),

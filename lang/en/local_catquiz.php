@@ -307,6 +307,13 @@ $string['attemptfeedbacknotavailable'] = "No feedback available";
 $string['allquestionsincorrect'] = "Not available - all questions were answered incorrectly";
 $string['allquestionscorrect'] = "Not available- all questions were answered correctly";
 $string['questionssummary'] = "Summary";
+$string['currentability'] = "Your current skill level";
+$string['currentabilityfellowstudents'] = "Current skill level of your fellow students";
+$string['feedbackbarlegend'] = "Color code";
+$string['feedbackbarlegend_region_1'] = "TODO: translate - too bad";
+$string['feedbackbarlegend_region_2'] = "TODO: translate - you will struggle";
+$string['feedbackbarlegend_region_3'] = "TODO: translate - you meet the requirements";
+$string['feedbackbarlegend_region_4'] = "TODO: translate - more skills than required";
 
 $string['catquiz_feedbackheader'] = "Feedback";
 $string['noselection'] = "No selection";
