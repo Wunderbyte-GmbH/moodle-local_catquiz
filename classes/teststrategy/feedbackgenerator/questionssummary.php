@@ -25,6 +25,7 @@
 namespace local_catquiz\teststrategy\feedbackgenerator;
 
 use local_catquiz\catquiz;
+use local_catquiz\teststrategy\feedbackgenerator;
 
 /**
  * Returns rendered attempt statistics.
@@ -33,22 +34,23 @@ use local_catquiz\catquiz;
  * @copyright 2023 Wunderbyte GmbH
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class questionssummary {
+class questionssummary extends feedbackgenerator {
     public function run(array $context): array {
-        $feedback = get_string('attemptfeedbacknotavailable', 'local_catquiz');
         $attemptid = $context['attemptid'];
         // 2. If an attemptid is given and belongs to the current user (or the user has permissions to see it), return that one.
         $attempt = catquiz::get_attempt_statistics($attemptid);
         $data = [];
-        if ($attempt) {
-            $data = [
-                'gradedright' => $attempt['gradedright']->count ?? 0,
-                'gradedwrong' => $attempt['gradedwrong']->count ?? 0,
-                'gradedpartial' => $attempt['gradedpartial']->count ?? 0,
-            ];
-            global $OUTPUT;
-            $feedback = $OUTPUT->render_from_template('local_catquiz/feedback/questionssummary', $data);
+        if (! $attempt) {
+            return $this->no_data();
         }
+
+        $data = [
+            'gradedright' => $attempt['gradedright']->count ?? 0,
+            'gradedwrong' => $attempt['gradedwrong']->count ?? 0,
+            'gradedpartial' => $attempt['gradedpartial']->count ?? 0,
+        ];
+        global $OUTPUT;
+        $feedback = $OUTPUT->render_from_template('local_catquiz/feedback/questionssummary', $data);
 
         return [
             'heading' => $this->get_heading(),
@@ -56,7 +58,11 @@ class questionssummary {
         ];
     }
 
-    private function get_heading(): string {
+    public function get_heading(): string {
         return get_string('questionssummary', 'local_catquiz');
+    }
+
+    public function get_required_context_keys(): array {
+        return ['attemptid'];
     }
 }
