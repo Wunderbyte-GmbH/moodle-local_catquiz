@@ -141,7 +141,7 @@ $string['subscribed'] = 'Subscribed';
 $string['timemodified'] = 'Time modified';
 
 // Events and Event Logs.
-$string['target'] = 'Ziel';
+$string['target'] = 'Target';
 $string['userupdatedcatscale'] = 'User with id {$a->userid} updated CAT scale with id {$a->objectid}';
 $string['catscale_updated'] = 'CAT scale updated';
 $string['add_testitem_to_scale'] = 'Testitem with id {$a->objectid} added to CAT scale {$a->catscaleid}';
