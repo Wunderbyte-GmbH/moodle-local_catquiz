@@ -26,6 +26,10 @@
  defined('MOODLE_INTERNAL') || die();
 
  $observers = array(
+    array(
+        'eventname' => '\local_catquiz\event\*',
+        'callback' => 'local_catquiz_observer::purge_event_cache'
+    ),
      array(
          'eventname' => '\local_catquiz\event\catscale_updated',
          'callback' => 'local_catquiz_observer::catscale_updated'

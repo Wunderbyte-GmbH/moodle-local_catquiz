@@ -22,6 +22,7 @@
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+use core\event\base;
 use local_catquiz\catscale;
 use local_catquiz\event\catscale_updated;
 use local_catquiz\event\testiteminscale_added;
@@ -34,6 +35,15 @@ use core\event\question_deleted;
  * Event observer for local_catquiz.
  */
 class local_catquiz_observer {
+
+    /**
+     * Observer for the update_catscale event
+     *
+     * @param base $event
+     */
+    public static function purge_event_caches(base $event) {
+        cache_helper::purge_by_event('changesineventlog');
+    }
 
     /**
      * Observer for the update_catscale event
