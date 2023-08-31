@@ -24,6 +24,7 @@
 
 namespace local_catquiz\teststrategy\strategy;
 
+use local_catquiz\teststrategy\feedbackgenerator\personabilities;
 use local_catquiz\teststrategy\feedbackgenerator\questionssummary;
 use local_catquiz\teststrategy\preselect_task\filterforsubscale;
 use local_catquiz\teststrategy\preselect_task\firstquestionselector;
@@ -84,6 +85,7 @@ class inferlowestskillgap extends strategy {
     public function get_feedbackgenerators(): array {
         return [
             questionssummary::class,
+            personabilities::class,
         ];
     }
 }
