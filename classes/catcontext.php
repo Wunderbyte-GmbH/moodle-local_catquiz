@@ -25,6 +25,7 @@
 
 namespace local_catquiz;
 
+use cache_helper;
 use local_catquiz\event\context_created;
 use local_catquiz\event\context_updated;
 use local_catquiz\local\model\model_person_param_list;
@@ -292,8 +293,8 @@ class catcontext {
                 ]
                 ]);
             $event->trigger();
-
         }
+        cache_helper::purge_by_event('changesincatcontexts');
     }
 
     /**

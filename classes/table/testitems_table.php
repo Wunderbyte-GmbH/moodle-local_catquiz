@@ -31,6 +31,7 @@ require_once(__DIR__ . '/../../lib.php');
 require_once($CFG->libdir.'/tablelib.php');
 require_once($CFG->dirroot . '/question/engine/lib.php');
 
+use cache_helper;
 use context_module;
 use context_system;
 use Exception;
@@ -377,6 +378,7 @@ class testitems_table extends wunderbyte_table {
             ]
             ]);
         $event->trigger();
+        cache_helper::purge_by_event('changesintestitems');
 
         return [
             'success' => 1,

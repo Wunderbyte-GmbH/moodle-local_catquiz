@@ -112,7 +112,6 @@ class local_catquiz_observer {
 
         //$testitemid = $event->objectid;
         //$catscaleid = $event->other['catscaleid'];
-
     }
     /**
      * Observer for the question_deleted event
@@ -129,6 +128,8 @@ class local_catquiz_observer {
             'componentid' => $questionid,
         ];
         $DB->delete_records('local_catquiz_items', $data);
+
+        cache_helper::purge_by_event('changesintestitems');
     }
 
 
