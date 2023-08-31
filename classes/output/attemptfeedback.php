@@ -134,7 +134,11 @@ class attemptfeedback implements renderable, templatable {
         }
         
         foreach ($generators as $generator) {
-            $context['feedback'][] = $generator->run($context);
+            $feedback = $generator->get_feedback($context);
+            if (! $feedback) {
+                continue;
+            }
+            $context['feedback'][] = $feedback;
         }
         return $context['feedback'];
     }
