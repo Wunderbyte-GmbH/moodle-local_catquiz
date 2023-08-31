@@ -210,44 +210,6 @@ abstract class strategy {
         return $playedquestionsperscale;
     }
 
-    /**
-     * Returns an array with catscale feedback strings indexed by the catscale ID.
-     * 
-     * @param mixed $quizsettings 
-     * @param mixed $personabilities 
-     * @return array 
-     */
-    private static function feedbackforscales($quizsettings, $personabilities): string {
-        $scalefeedback = [];
-        foreach ($personabilities as $catscaleid => $personability) {
-            $lowerlimitprop = sprintf('feedback_scaleid_%d_lowerlimit', $catscaleid);
-            $lowerlimit = floatval($quizsettings->$lowerlimitprop);
-            if ($personability >= $lowerlimit) {
-                continue;
-            }
-
-            $feedbackprop = sprintf('feedback_scaleid_%d_feedback', $catscaleid);
-            $feedback = $quizsettings->$feedbackprop;
-            // Do not display empty feedback messages.
-            if (!$feedback) {
-                continue;
-            }
-
-            $scalefeedback[$catscaleid] = $feedback;
-        }
-        
-        if (! $scalefeedback) {
-            return "";
-        }
-
-        $catscales = catquiz::get_catscales(array_keys($scalefeedback));
-        $result = "";
-        foreach ($catscales as $cs) {
-            $result .= $cs->name . ': ' . $scalefeedback[$cs->id] . '<br/>';
-        }
-        return $result;
-    }
-
     private static function compare_user_to_test_average(int $contextid): string {
         global $USER;
         $cache = cache::make('local_catquiz', 'adaptivequizattempt');

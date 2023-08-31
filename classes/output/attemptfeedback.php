@@ -124,6 +124,14 @@ class attemptfeedback implements renderable, templatable {
             'attemptid' => $this->attemptid,
             'feedback' => [],
         ];
+
+        $cache = cache::make('local_catquiz', 'adaptivequizattempt');
+        if ($personabilities = $cache->get('personabilities')) {
+            $context['personabilities'] = $personabilities;
+        }
+        if ($quizsettings = $cache->get('quizsettings')) {
+            $context['quizsettings'] = $quizsettings;
+        }
         
         foreach ($generators as $generator) {
             $context['feedback'][] = $generator->run($context);
