@@ -209,40 +209,4 @@ abstract class strategy {
         $playedquestionsperscale[$selectedquestion->catscaleid][] = $selectedquestion;
         return $playedquestionsperscale;
     }
-
-    private static function compare_user_to_test_average(int $contextid): string {
-        global $USER;
-        $cache = cache::make('local_catquiz', 'adaptivequizattempt');
-        $quizsettings = $cache->get('quizsettings');
-        if (! $catscaleid = $quizsettings->catquiz_catcatscales) {
-            return '';
-        }
-
-        $abilities = $cache->get('personabilities');
-        if (! $abilities) {
-            return '';
-        }
-        $ability = $abilities[$catscaleid];
-        if (! $ability) {
-            return '';
-        }
-
-        $personparams = catquiz::get_person_abilities($contextid, array_keys($abilities));
-        $worseabilities = array_filter(
-            $personparams,
-            fn ($pp) => $pp->ability < $ability
-        );
-
-        if (!$worseabilities) {
-            return '';
-        }
-
-        $quantile = (count($worseabilities)/count($personparams)) * 100;
-        $feedback = get_string('feedbackcomparetoaverage', 'local_catquiz', $quantile);
-        $needsimprovementthreshold = 40; // TODO: do not hardcode.
-        if ($quantile < $needsimprovementthreshold) {
-            $feedback .= " " . get_string('feedbackneedsimprovement', 'local_catquiz');
-        }
-        return $feedback;
-    }
 }
