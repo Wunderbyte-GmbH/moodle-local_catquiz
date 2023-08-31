@@ -62,9 +62,11 @@ class catscale_created extends \core\event\base {
      *
      */
     public function get_description() {
-        $scalename = $this->data['other']['scalename'];
-        $this->data['scalename'] = $scalename;
-        return get_string('create_catscale_description', 'local_catquiz', $this->data);
+        $data = $this->data;
+        $otherarray = json_decode($data['other']);
+        $scalename = $otherarray->scalename;
+        $data['scalename'] = $scalename;
+        return get_string('create_catscale_description', 'local_catquiz', $data);
     }
 
     /**

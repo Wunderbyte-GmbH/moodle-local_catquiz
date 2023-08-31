@@ -64,14 +64,16 @@ class testitemstatus_updated extends \core\event\base {
      *
      */
     public function get_description() {
+        $data = $this->data;
+        $otherarray = json_decode($data['other']);
 
-        $statusint = $this->data['other']['status'];
+        $statusint = $otherarray->status;
         $string = 'itemstatus_'.$statusint;
 
         $statusstring = get_string($string, 'local_catquiz');
-        $this->data['statusstring'] = $statusstring;
+        $data['statusstring'] = $statusstring;
 
-        $message = get_string('update_testitem_status', 'local_catquiz', $this->data);
+        $message = get_string('update_testitem_status', 'local_catquiz', $data);
         return  $message;
     }
 

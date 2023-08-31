@@ -49,4 +49,46 @@ class event_log_table extends wunderbyte_table {
 
     }
 
+    /**
+     * Overrides the output for this column.
+     * @param object $values
+     */
+    public function col_eventname($values) {
+
+        unset($values->id);
+        unset($values->origin);
+        unset($values->ip);
+        unset($values->realuserid);
+
+        $event = $values->eventname::restore((array)$values, []);
+
+        return $event->get_name();
+    }
+
+    /**
+     * Overrides the output for this column.
+     * @param object $values
+     */
+    public function col_description($values) {
+        unset($values->id);
+        unset($values->origin);
+        unset($values->ip);
+        unset($values->realuserid);
+
+        // todo values array structure
+        $event = $values->eventname::restore((array)$values, []);
+
+        return $event->get_description();
+    }
+
+    /**
+     * The context information column.
+     *
+     * @param stdClass $values The row data.
+     * @return string
+     */
+    public function col_timecreated($values) {
+        return userdate($values->timecreated);
+    }
+
 }
