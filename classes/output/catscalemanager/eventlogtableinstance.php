@@ -55,10 +55,11 @@ class eventlogtableinstance {
         $table->set_filter_sql($select, $from, $where, $filter, $params);
 
         $columnsarray = [
-            'id' => get_string('id', 'local_catquiz'),
+            //'id' => get_string('id', 'local_catquiz'),
+            'user' => get_string('user', 'core'),
             'eventname' => get_string('eventname', 'core'),
-            'action' => get_string('action', 'core'),
-            'target' => get_string('target', 'local_catquiz'),
+            //'action' => get_string('action', 'core'),
+            //'target' => get_string('target', 'local_catquiz'),
             'description' => get_string('description', 'core'),
             'timecreated' => get_string('timecreated', 'core'),
         ];
@@ -68,7 +69,7 @@ class eventlogtableinstance {
         $table->define_sortablecolumns(array_keys($columnsarray));
         $table->sort_default_column = 'timecreated';
         $table->sort_default_order = SORT_DESC;
-        $table->define_fulltextsearchcolumns(['eventname', 'action', 'target', 'description', 'timecreated']);
+        $table->define_fulltextsearchcolumns(['eventname','description', 'timecreated']);
 
         $filtercolumns = [
             'timecreated' => [ // Columns containing Unix timestamps can be filtered.
@@ -86,7 +87,7 @@ class eventlogtableinstance {
                     ]
                 ]
             ],
-            'eventname', 'action', 'target'
+            'eventname',
         ];
         $table->define_filtercolumns($filtercolumns);
 

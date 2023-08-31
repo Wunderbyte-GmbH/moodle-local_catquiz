@@ -1192,4 +1192,25 @@ class catquiz {
 
         return [$select, $from, $where, $filter, $params];
     }
+
+    /**
+     * Return the record of a user
+     *
+     * @param int $userid
+     *
+     * @return object
+     *
+     */
+    public static function get_user_by_id($userid) {
+        global $DB;
+
+        $sql = "SELECT *
+                FROM {user}
+                WHERE id = $userid AND 1=1
+                ";
+
+        $record = $DB->get_record_sql($sql);
+
+        return $record;
+    }
 }

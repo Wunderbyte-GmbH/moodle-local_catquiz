@@ -31,6 +31,7 @@ require_once(__DIR__ . '/../../lib.php');
 require_once($CFG->libdir.'/tablelib.php');
 require_once($CFG->dirroot . '/question/engine/lib.php');
 
+use local_catquiz\catquiz;
 use local_wunderbyte_table\wunderbyte_table;
 
 class event_log_table extends wunderbyte_table {
@@ -88,6 +89,20 @@ class event_log_table extends wunderbyte_table {
      */
     public function col_timecreated($values) {
         return userdate($values->timecreated);
+    }
+
+    /**
+     * The context information column.
+     *
+     * @param stdClass $values The row data.
+     * @return string
+     */
+    public function col_user($values) {
+
+        $userid = $values->userid;
+        $user = catquiz::get_user_by_id($userid);
+
+        return $user->username;
     }
 
 }
