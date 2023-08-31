@@ -54,7 +54,6 @@ class event_log_table extends wunderbyte_table {
      * @param object $values
      */
     public function col_eventname($values) {
-
         unset($values->id);
         unset($values->origin);
         unset($values->ip);

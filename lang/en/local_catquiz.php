@@ -159,6 +159,8 @@ $string['catscale_created'] = 'CAT context created.';
 $string['create_catscale_description'] = 'CAT context "{$a->scalename}" created.';
 $string['catscale_created'] = 'CAT context updated.';
 $string['create_catscale_description'] = 'CAT context "{$a->scalename}" updated.';
+$string['logsafter'] = 'Logs after';
+$string['logsbefore'] = 'Logs before';
 
 
 // Message.

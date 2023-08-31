@@ -66,9 +66,32 @@ class eventlogtableinstance {
         $table->define_headers(array_values($columnsarray));
 
         $table->define_sortablecolumns(array_keys($columnsarray));
+        $table->sort_default_column = 'timecreated';
+        $table->sort_default_order = SORT_DESC;
+        $table->define_fulltextsearchcolumns(['eventname', 'action', 'target', 'description', 'timecreated']);
+
+        $filtercolumns = [
+            'timecreated' => [ // Columns containing Unix timestamps can be filtered.
+                'localizedname' => get_string('timecreated'),
+                'datepicker' => [
+                    get_string('logsafter', 'local_catquiz') => [ // Can be localized and like "Courses starting after:".
+                        'operator' => '>', // Must be defined, can be any SQL comparison operator.
+                        'defaultvalue' => 'now', // Can also be Unix timestamp or string "now".
+                        'checkboxlabel' => get_string('apply_filter', 'local_wunderbyte_table'), // Can be localized and will be displayed next to the filter checkbox (ie 'apply filter').
+                    ],
+                    get_string('logsbefore', 'local_catquiz') => [ // Can be localized and like "Courses starting after:".
+                        'operator' => '<',
+                        'defaultvalue' => 'now', // Can also be Unix timestamp or string "now".
+                        'checkboxlabel' => get_string('apply_filter', 'local_wunderbyte_table'), // Can be localized and will be displayed next to the filter checkbox (ie 'apply filter').
+                    ]
+                ]
+            ],
+            'eventname', 'action', 'target'
+        ];
+        $table->define_filtercolumns($filtercolumns);
 
         $table->tabletemplate = 'local_wunderbyte_table/twtable_list';
-        //$table->define_cache('local_catquiz', 'eventlogtable');
+        $table->define_cache('local_catquiz', 'eventlogtable');
 
         $table->pageable(true);
 
@@ -77,7 +100,7 @@ class eventlogtableinstance {
         $table->showreloadbutton = true;
         $table->showrowcountselect = true;
 
-        $table->filteronloadinactive = false;
+        $table->filteronloadinactive = true;
 
         $table->define_baseurl(new moodle_url('/local/catquiz/download.php'));
 

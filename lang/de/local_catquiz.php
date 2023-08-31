@@ -156,6 +156,8 @@ $string['catscale_created'] = 'CAT Context erzeugt';
 $string['create_catscale_description'] = 'CAT Context "{$a->scalename}" erzeugt.';
 $string['catscale_created'] = 'CAT Context aktualisiert';
 $string['create_catscale_description'] = 'CAT Context "{$a->scalename}" aktualisiert.';
+$string['logsafter'] = 'Logs after';
+$string['logsbefore'] = 'Logs before';
 
 // Message.
 $string['messageprovider:catscaleupdate'] = 'Benachrichtung über eine Aktualisierung einer CAT Skala.';
