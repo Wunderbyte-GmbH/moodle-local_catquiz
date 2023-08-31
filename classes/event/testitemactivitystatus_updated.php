@@ -54,7 +54,7 @@ class testitemactivitystatus_updated extends \core\event\base {
      *
      */
     public static function get_name() {
-        return get_string('testitem_activity_status_updated', 'local_catquiz');
+        return get_string('update_testitem_status', 'local_catquiz');
     }
 
     /**
@@ -68,9 +68,13 @@ class testitemactivitystatus_updated extends \core\event\base {
         $testitemstring = get_string('update_testitem_activity_status', 'local_catquiz', $this->data);
 
         $activitystring = "";
-        if ($this->data['other']['activitystatus'] == TESTITEM_STATUS_INACTIVE) {
+
+        $data = $this->data;
+        $otherarray = json_decode($data['other']);
+        $activitystatus = $otherarray->activitystatus;
+        if (intval($activitystatus) == TESTITEM_STATUS_INACTIVE) {
             $activitystring = get_string('activitystatussetinactive', 'local_catquiz');
-        } else if ($this->data['other']['activitystatus'] == TESTITEM_STATUS_ACTIVE) {
+        } else if (intval($activitystatus) == TESTITEM_STATUS_ACTIVE) {
             $activitystring = get_string('activitystatussetactive', 'local_catquiz');
         }
 
