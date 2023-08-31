@@ -1,0 +1,80 @@
+{{!
+    This file is part of Moodle - http://moodle.org/
+    Moodle is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+    Moodle is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+    You should have received a copy of the GNU General Public License
+    along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+}}
+{{!
+    @template local_catquiz
+    Template which defines a quiz attempt feedback.
+    Classes required for JS:
+    * none
+    Data attributes required for JS:
+    * none
+    Context variables required for this template:
+    Example context (json):
+    {
+        "text": "You performed better than 25% of your fellow students",
+        "testaverageability": 1.23,
+        "userability": 2.34,
+        "testaverageposition": 26,
+    }
+}}
+{{text}}
+<div class="catquiz-feedbackbar">
+    <div class="catquiz-feedbackbar-bar">
+        <div class="catquiz-feedbackbar-uppertext">
+            {{#str}}currentability, local_catquiz{{/str}}
+            <span style="position: absolute; left: {{userabilityposition}}%;">
+                <span style="position: absolute; left: -15px; top: 1.5em; transform: rotate(180deg);">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" fill="currentColor" class="bi bi-triangle-fill" viewBox="0 0 16 16">
+                        <path fill-rule="evenodd" d="M7.022 1.566a1.13 1.13 0 0 1 1.96 0l6.857 11.667c.457.778-.092 1.767-.98 1.767H1.144c-.889 0-1.437-.99-.98-1.767L7.022 1.566z"/>
+                    </svg>
+                </span>
+                <span style="position: absolute; left: 20px; top: 1.5em;">
+                    {{userability}}
+                </span>
+            </span>
+        </div>
+        <div class="catquiz-feedbackbar-lowertext">
+            <div style="position: absolute; width: 100%;"> <!-- legend -->
+                <span style="position: absolute; left: -0.5em;">-5</span>
+                <span style="position: absolute; left: 50%; margin-left: -0.25em;">0</span>
+                <span style="position: absolute; right: -0.5em">5</span>
+            </div>
+            <span style="position: absolute; left: {{testaverageposition}}%; margin-left: -15px; top: 0.8em;">{{testaverageability}}</span>
+            <span style="position: absolute; left: {{testaverageposition}}%; margin-left:-15px; top: -1em;">
+                <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" fill="currentColor" class="bi bi-triangle-fill" viewBox="0 0 16 16">
+                    <path fill-rule="evenodd" d="M7.022 1.566a1.13 1.13 0 0 1 1.96 0l6.857 11.667c.457.778-.092 1.767-.98 1.767H1.144c-.889 0-1.437-.99-.98-1.767L7.022 1.566z"/>
+                </svg>
+            </span>
+            <div style="position: absolute; top: 2em; width: 100%;">{{#str}}currentabilityfellowstudents, local_catquiz{{/str}}</div>
+        </div>
+    </div>
+</div>
+<div class="catquiz-legend">
+    <h4>{{#str}}feedbackbarlegend, local_catquiz{{/str}}</h4>
+    <div>
+        <span class="catquiz-legend-symbol" style="background: #ff0000;"></span>
+        <span class="catquiz-legend-description">{{#str}}feedbackbarlegend_region_1, local_catquiz{{/str}}</span>
+    </div>
+    <div>
+        <span class="catquiz-legend-symbol" style="background: #af5000;"></span>
+        <span class="catquiz-legend-description">{{#str}}feedbackbarlegend_region_2, local_catquiz{{/str}}</span>
+    </div>
+    <div>
+        <span class="catquiz-legend-symbol" style="background: #5ea100;"></span>
+        <span class="catquiz-legend-description">{{#str}}feedbackbarlegend_region_3, local_catquiz{{/str}}</span>
+    </div>
+    <div>
+        <span class="catquiz-legend-symbol" style="background: #00ff00;"></span>
+        <span class="catquiz-legend-description">{{#str}}feedbackbarlegend_region_4, local_catquiz{{/str}}</span>
+    </div>
+</div>
