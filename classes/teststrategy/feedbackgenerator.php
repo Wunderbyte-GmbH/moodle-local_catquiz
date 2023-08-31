@@ -40,7 +40,7 @@ abstract class feedbackgenerator {
      * @param array $context 
      * @return array 
      */
-    abstract public function run(array $context): array;
+    abstract protected function run(array $context): array;
 
     /**
      * Returns an array of the required elements in the $context array that will
@@ -95,13 +95,18 @@ abstract class feedbackgenerator {
                 return false;
             }
         }
+        return true;
     }
 
     /**
      * Make sure that the feedbackgenerator returned the expected data.
      */
     private function isvalidfeedback(array $feedback): bool {
-        $expectedelements = ['heading', 'feedback'];
+        // Allow empty array.
+        if ($feedback === []) {
+            return true;
+        }
+        $expectedelements = ['heading', 'content'];
         foreach ($expectedelements as $elem) {
             if (!array_key_exists($elem, $feedback)) {
                 global $CFG;

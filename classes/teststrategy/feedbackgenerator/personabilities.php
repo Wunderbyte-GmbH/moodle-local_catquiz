@@ -24,7 +24,6 @@
 
 namespace local_catquiz\teststrategy\feedbackgenerator;
 
-use cache;
 use local_catquiz\catquiz;
 use local_catquiz\teststrategy\feedbackgenerator;
 
@@ -36,11 +35,10 @@ use local_catquiz\teststrategy\feedbackgenerator;
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class personabilities extends feedbackgenerator {
-    public function run(array $context): array {
+    protected function run(array $context): array {
 
         // If we have person abilities in the cache, show them.
-        $cache = cache::make('local_catquiz', 'adaptivequizattempt');
-        $personabilities = $cache->get('personabilities');
+        $personabilities = $context['personabilities'];
         if (!$personabilities) {
             return $this->no_data();
         }
@@ -74,8 +72,7 @@ class personabilities extends feedbackgenerator {
 
     public function get_required_context_keys(): array {
         return [
-            'contextid',
-            'catscaleid',
+            'personabilities',
         ];
     }
 

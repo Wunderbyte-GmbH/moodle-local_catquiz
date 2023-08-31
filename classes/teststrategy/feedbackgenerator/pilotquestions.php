@@ -35,7 +35,7 @@ use local_catquiz\teststrategy\feedbackgenerator;
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class pilotquestions extends feedbackgenerator {
-    public function run(array $context): array {
+    protected function run(array $context): array {
         $cache = cache::make('local_catquiz', 'adaptivequizattempt');
         $numpilotquestions = $cache->get('num_pilot_questions');
 
@@ -56,10 +56,7 @@ class pilotquestions extends feedbackgenerator {
     }
 
     public function get_required_context_keys(): array {
-        return [
-            'contextid',
-            'catscaleid',
-        ];
+        return [];
     }
 
     public function get_heading(): string {

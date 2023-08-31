@@ -39,7 +39,7 @@ use local_catquiz\teststrategy\feedbackgenerator;
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class customscalefeedback extends feedbackgenerator {
-    public function run(array $context): array {
+    protected function run(array $context): array {
         $quizsettings = $context['quizsettings'];
         $personabilities = $context['personabilities'];
 
