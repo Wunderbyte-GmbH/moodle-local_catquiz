@@ -26,6 +26,7 @@ namespace local_catquiz\teststrategy\feedbackgenerator;
 
 use cache;
 use local_catquiz\catquiz;
+use local_catquiz\teststrategy\feedbackgenerator;
 
 /**
  * Returns rendered person abilities.
@@ -34,25 +35,14 @@ use local_catquiz\catquiz;
  * @copyright 2023 Wunderbyte GmbH
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class personabilities {
+class personabilities extends feedbackgenerator {
     public function run(array $context): array {
-
-        if (!$this->has_required_context_keys($context)) {
-            return [
-                'heading' => $this->get_heading(),
-                'content' => get_string('attemptfeedbacknotavailable', 'local_catquiz'),
-            ];
-        }
 
         // If we have person abilities in the cache, show them.
         $cache = cache::make('local_catquiz', 'adaptivequizattempt');
         $personabilities = $cache->get('personabilities');
         if (!$personabilities) {
-            // duplicate of line 41
-            return [
-                'heading' => $this->get_heading(),
-                'content' => get_string('attemptfeedbacknotavailable', 'local_catquiz'),
-            ];
+            return $this->no_data();
         }
 
         $catscales = catquiz::get_catscales(array_keys($personabilities));
@@ -82,22 +72,14 @@ class personabilities {
         ];
     }
 
-    private function get_required_context_keys() {
+    public function get_required_context_keys(): array {
         return [
             'contextid',
             'catscaleid',
         ];
     }
-    
-    private function has_required_context_keys($context) {
-        foreach ($this->get_required_context_keys() as $key) {
-            if (!array_key_exists($key, $context)) {
-                return false;
-            }
-        }
-    }
 
-    private function get_heading(): string {
+    public function get_heading(): string {
         return get_string('personability', 'local_catquiz');
     }
 }

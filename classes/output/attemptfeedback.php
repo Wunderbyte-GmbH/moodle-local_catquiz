@@ -18,6 +18,7 @@ namespace local_catquiz\output;
 
 use cache;
 use local_catquiz\catquiz;
+use local_catquiz\teststrategy\feedbackgenerator;
 use local_catquiz\teststrategy\info;
 use templatable;
 use renderable;
@@ -110,6 +111,10 @@ class attemptfeedback implements renderable, templatable {
         }
 
         $feedbackclasses = $attemptstrategy->get_feedbackgenerators();
+
+        /**
+         * @var feedbackgenerator[]
+         */
         $generators = [];
         foreach ($feedbackclasses as $classname) {
             $generators[] = new $classname();
