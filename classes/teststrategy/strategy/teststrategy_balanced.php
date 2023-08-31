@@ -25,6 +25,7 @@
 namespace local_catquiz\teststrategy\strategy;
 
 use cache;
+use local_catquiz\teststrategy\feedbackgenerator\personabilities;
 use local_catquiz\teststrategy\feedbackgenerator\questionssummary;
 use local_catquiz\teststrategy\preselect_task\lasttimeplayedpenalty;
 use local_catquiz\teststrategy\preselect_task\maximumquestionscheck;
@@ -73,6 +74,7 @@ class teststrategy_balanced extends strategy {
     public function get_feedbackgenerators(): array {
         return [
             questionssummary::class,
+            personabilities::class,
         ];
     }
 }

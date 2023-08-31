@@ -89,46 +89,6 @@ class attemptfeedback implements renderable, templatable {
     }
 
     /**
-     * Renders person ability.
-     *
-     * @return mixed
-     *
-     */
-    private function render_person_abilities() {
-        global $USER;
-        if (!$this->contextid || !$this->catscaleid) {
-            return;
-        }
-
-        // If we have person abilities in the cache, show them.
-        $cache = cache::make('local_catquiz', 'adaptivequizattempt');
-        $personabilities = $cache->get('personabilities');
-        if (!$personabilities) {
-            return;
-        }
-
-        $catscales = catquiz::get_catscales(array_keys($personabilities));
-        $result = [];
-        foreach ($personabilities as $catscaleid => $ability) {
-            if (abs(floatval($ability)) === abs(floatval(PERSONABILITY_MAX))) {
-                if ($ability < 0) {
-                    $ability = get_string('allquestionsincorrect', 'local_catquiz');
-                } else {
-                    $ability = get_string('allquestionscorrect', 'local_catquiz');
-                }
-            } else {
-                $ability = sprintf("%.2f", $ability);
-            }
-            $result[] = [
-                'ability' => $ability,
-                'catscaleid' => $catscaleid,
-                'name' => $catscales[$catscaleid]->name
-            ];
-        }
-        return $result;
-    }
-
-    /**
      * Renders strategy feedback.
      *
      * @return mixed
