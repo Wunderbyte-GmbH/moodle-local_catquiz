@@ -24,6 +24,8 @@
 
 namespace local_catquiz\event;
 
+use local_catquiz\catscale;
+
 /**
  * The catscale_updated event class.
  *
@@ -65,7 +67,26 @@ class testiteminscale_added extends \core\event\base {
         $data = $this->data;
         $otherarray = json_decode($data['other']);
         $catscaleid = $otherarray->catscaleid;
-        $data['catscaleid'] = $catscaleid;
+        $testitemid = $data['objectid'];
+
+        if (!empty($otherarray->catscaleid) &&
+            !empty($otherarray->context) &&
+            !empty($otherarray->component)
+        ) {
+            $linktotestitemdetailview = catscale::get_link_to_testitem(
+                $testitemid,
+                $otherarray->catscaleid,
+                $otherarray->context,
+                $otherarray->component);
+        } else {
+            $linktotestitemdetailview = get_string('testitem', 'local_catquiz', $testitemid);
+        }
+
+        $data['testitemlink'] = $linktotestitemdetailview;
+
+        $linktoscale = catscale::get_link_to_catscale($catscaleid);
+        $data['catscalelink'] = $linktoscale;
+
         return get_string('add_testitem_to_scale', 'local_catquiz', $data);
     }
 

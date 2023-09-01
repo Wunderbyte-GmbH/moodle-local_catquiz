@@ -139,23 +139,24 @@ $string['subscribed'] = 'Abonniert';
 
 // Events and Event Log.
 $string['target'] = 'Ziel';
-$string['userupdatedcatscale'] = 'NutzerIn mit der Id {$a->userid} hat die CAT Skala mit der Id {$a->objectid} aktualisiert.';
+$string['userupdatedcatscale'] = 'NutzerIn mit der Id {$a->userid} hat {$a->catscalelink} aktualisiert.';
 $string['catscale_updated'] = 'CAT Skala aktualisert';
-$string['add_testitem_to_scale'] = 'Frage mit der Id {$a->objectid} wurde der CAT Skala mit der Id {$a->catscaleid} hinzugefügt.';
+$string['testitem'] = 'Frage mit ID {$a}';
+$string['add_testitem_to_scale'] = '{$a->testitemlink} wurde {$a->catscalelink} hinzugefügt.';
 $string['testitem_added_to_scale'] = 'Frage zu CAT Skala hinzugefügt';
 $string['testitem_updated_in_scale'] = 'Frage in CAT Skala aktualisert';
-$string['update_testitem_in_scale'] = 'Frage mit der Id {$a->objectid} wurde der CAT Skala mit der Id {$a->catscaleid} aktualisiert.';
+$string['update_testitem_in_scale'] = '{$a->testitemlink} wurde in {$a->catscalelink} aktualisiert.';
 $string['update_testitem_activity_status'] = 'Der Aktivitätsstatus der Frage mit der Id {$a->objectid} wurde aktualisiert.';
 $string['activitystatussetinactive'] = 'Die Frage ist jetzt deaktiviert.';
 $string['activitystatussetactive'] = 'Die Frage ist jetzt aktiviert.';
 $string['update_testitem_status'] = 'Status der Frage aktualisiert.';
-$string['testitem_status_updated_description'] = 'Der neue Status der Frage mit der ID {$a->objectid} ist nun: {$a->statusstring}';
+$string['testitem_status_updated_description'] = 'Der neue Status der {$a->testitemlink} ist nun: {$a->statusstring}';
 $string['catscale_created'] = 'CAT Skala erzeugt';
-$string['create_catscale_description'] = 'CAT Skala "{$a->scalename}" mit der ID {$a->objectid} erzeugt.';
-$string['catscale_created'] = 'CAT Context erzeugt';
-$string['create_catscale_description'] = 'CAT Context "{$a->scalename}" erzeugt.';
-$string['catscale_created'] = 'CAT Context aktualisiert';
-$string['create_catscale_description'] = 'CAT Context "{$a->scalename}" aktualisiert.';
+$string['create_catscale_description'] = 'CAT Skala "{$a->catscalelink}" mit der ID {$a->objectid} erzeugt.';
+$string['catcontext_created'] = 'CAT Context erzeugt';
+$string['create_catscale_description'] = 'CAT Context {$a} erzeugt.';
+$string['catcontext_updated'] = 'CAT Context aktualisiert';
+$string['create_catscale_description'] = 'CAT Context {$a} aktualisiert.';
 $string['logsafter'] = 'Logs after';
 $string['logsbefore'] = 'Logs before';
 

@@ -24,6 +24,8 @@
 
 namespace local_catquiz\event;
 
+use html_writer;
+
 /**
  * The catscale_updated event class.
  *

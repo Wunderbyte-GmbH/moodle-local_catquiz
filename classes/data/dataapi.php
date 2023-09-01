@@ -207,6 +207,9 @@ class dataapi {
             'objectid' => $catscale->id,
             'context' => $context,
             'userid' => $USER->id, // The user who did cancel.
+            'other' => [
+                'catscaleid' => $catscale->id,
+            ]
         ]);
         $event->trigger();
 

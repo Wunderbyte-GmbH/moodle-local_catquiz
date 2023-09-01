@@ -142,23 +142,24 @@ $string['timemodified'] = 'Time modified';
 
 // Events and Event Logs.
 $string['target'] = 'Target';
-$string['userupdatedcatscale'] = 'User with id {$a->userid} updated CAT scale with id {$a->objectid}';
+$string['userupdatedcatscale'] = 'User with id {$a->userid} updated {$a->catscalelink}';
 $string['catscale_updated'] = 'CAT scale updated';
-$string['add_testitem_to_scale'] = 'Testitem with id {$a->objectid} added to CAT scale {$a->catscaleid}';
+$string['testitem'] = 'Testitem with id {$a}';
+$string['add_testitem_to_scale'] = '{$a->testitemlink} added to {$a->catscalelink}';
 $string['testitem_added_to_scale'] = 'Testitem added to CAT scale';
 $string['testitem_updated_in_scale'] = 'Testitem updated in CAT scale';
-$string['update_testitem_in_scale'] = 'Testitem with id {$a->objectid} updated in CAT scale {$a->catscaleid}';
-$string['update_testitem_activity_status'] = 'Activity status of testitem with id {$a->objectid} changed.';
+$string['update_testitem_in_scale'] = '{$a->testitemlink} updated in {$a->catscalelink}';
+$string['update_testitem_activity_status'] = 'Activity status of {$a->testitemlink} changed.';
 $string['activitystatussetinactive'] = 'Testitem is now inactive.';
 $string['activitystatussetactive'] = 'Testitem is now active.';
 $string['update_testitem_status'] = 'Status of testitem updated.';
-$string['testitem_status_updated_description'] = 'Status of testitem with id {$a->objectid} set to: {$a->statusstring}';
+$string['testitem_status_updated_description'] = 'Status of {$a->testitemlink} set to: {$a->statusstring}';
 $string['catscale_created'] = 'CAT scale created';
-$string['create_catscale_description'] = 'CAT scale "{$a->scalename}" with id {$a->objectid} created.';
-$string['catscale_created'] = 'CAT context created.';
-$string['create_catscale_description'] = 'CAT context "{$a->scalename}" created.';
-$string['catscale_created'] = 'CAT context updated.';
-$string['create_catscale_description'] = 'CAT context "{$a->scalename}" updated.';
+$string['create_catscale_description'] = 'CAT scale {$a->catscalelink} with id {$a->objectid} created.';
+$string['catcontext_created'] = 'CAT context created.';
+$string['create_catscale_description'] = 'CAT context {$a} created.';
+$string['catcontext_updated'] = 'CAT context updated.';
+$string['update_context_description'] = 'CAT context {$a} updated.';
 $string['logsafter'] = 'Logs after';
 $string['logsbefore'] = 'Logs before';
 

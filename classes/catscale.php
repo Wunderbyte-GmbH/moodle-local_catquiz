@@ -113,6 +113,9 @@ class catscale {
         $data = $searchparams;
         $data['status'] = $status;
 
+        // We need the default context for the events that will be triggered
+        $catcontext = catquiz::get_default_context_id();
+
         if ($record = $DB->get_record('local_catquiz_items', $searchparams)) {
             // Right now, there is nothing to do, as we don't have more data.
             $id = $record->id;
@@ -127,6 +130,9 @@ class catscale {
                     'other' => [
                         'activitystatus' => $status,
                         'testitemid' => $testitemid,
+                        'catscaleid' => $catscaleid,
+                        'context' => $catcontext,
+                        'component' => $component,
                     ]
                     ]);
                 $event->trigger();
@@ -139,6 +145,8 @@ class catscale {
                 'other' => [
                     'catscaleid' => $catscaleid,
                     'testitemid' => $testitemid,
+                    'context' => $catcontext,
+                    'component' => $component,
                 ]
                 ]);
             $event->trigger();
@@ -160,8 +168,10 @@ class catscale {
                 'objectid' => $testitemid,
                 'context' => $context,
                 'other' => [
-                    'catscaleid' => $catscaleid,
                     'testitemid' => $testitemid,
+                    'catscaleid' => $catscaleid,
+                    'context' => $catcontext,
+                    'component' => $component,
                 ]
                 ]);
             $event->trigger();
@@ -443,6 +453,7 @@ class catscale {
         $url->param('contextid', $context);
         $url->param('scaleid', $catscaleid);
         $url->param('component', $component);
+        $url->set_anchor("questions");
 
         $linktoscale = html_writer::link($url, $linktext);
 
