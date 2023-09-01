@@ -145,6 +145,7 @@ $string['testitem'] = 'Frage mit ID {$a}';
 $string['add_testitem_to_scale'] = '{$a->testitemlink} wurde {$a->catscalelink} hinzugefügt.';
 $string['testitem_added_to_scale'] = 'Frage zu CAT Skala hinzugefügt';
 $string['testitem_updated_in_scale'] = 'Frage in CAT Skala aktualisert';
+$string['testitem_activity_status_updated'] = 'Aktivitätsstatus der Frage aktualisiert.';
 $string['update_testitem_in_scale'] = '{$a->testitemlink} wurde in {$a->catscalelink} aktualisiert.';
 $string['update_testitem_activity_status'] = 'Der Aktivitätsstatus der Frage mit der Id {$a->objectid} wurde aktualisiert.';
 $string['activitystatussetinactive'] = 'Die Frage ist jetzt deaktiviert.';

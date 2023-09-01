@@ -149,6 +149,7 @@ $string['add_testitem_to_scale'] = '{$a->testitemlink} added to {$a->catscalelin
 $string['testitem_added_to_scale'] = 'Testitem added to CAT scale';
 $string['testitem_updated_in_scale'] = 'Testitem updated in CAT scale';
 $string['update_testitem_in_scale'] = '{$a->testitemlink} updated in {$a->catscalelink}';
+$string['testitem_activity_status_updated'] = 'Activity status of testitem updated.';
 $string['update_testitem_activity_status'] = 'Activity status of {$a->testitemlink} changed.';
 $string['activitystatussetinactive'] = 'Testitem is now inactive.';
 $string['activitystatussetactive'] = 'Testitem is now active.';
