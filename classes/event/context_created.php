@@ -24,6 +24,8 @@
 
 namespace local_catquiz\event;
 
+use html_writer;
+
 /**
  * The catscale_updated event class.
  *
@@ -62,7 +64,9 @@ class context_created extends \core\event\base {
      *
      */
     public function get_description() {
-        return get_string('create_context_description', 'local_catquiz', $this->data);
+        $data = $this->data;
+        $contextnamelink = html_writer::link('local/catquiz/manage_catcontexts.php', $data['objectid']);
+        return get_string('create_context_description', 'local_catquiz', $contextnamelink);
     }
 
     /**

@@ -23,6 +23,9 @@
  */
 
 namespace local_catquiz\event;
+
+use local_catquiz\catscale;
+
 require_once($CFG->dirroot . '/local/catquiz/lib.php');
 
 
@@ -64,8 +67,26 @@ class testitemactivitystatus_updated extends \core\event\base {
      *
      */
     public function get_description() {
+        $data = $this->data;
+        $otherarray = json_decode($data['other']);
 
-        $testitemstring = get_string('update_testitem_activity_status', 'local_catquiz', $this->data);
+        if (!empty($otherarray->catscaleid) &&
+            !empty($data['objectid']) &&
+            !empty($otherarray->context) &&
+            !empty($otherarray->component)
+        ) {
+            $linktotestitemdetailview = catscale::get_link_to_testitem(
+                $data['objectid'],
+                $otherarray->catscaleid,
+                $otherarray->context,
+                $otherarray->component);
+        } else {
+            $linktotestitemdetailview = get_string('testitem', 'local_catquiz', $data['objectid']);
+        }
+
+        $data['testitemlink'] = $linktotestitemdetailview;
+
+        $testitemstring = get_string('update_testitem_activity_status', 'local_catquiz', $data);
 
         $activitystring = "";
 

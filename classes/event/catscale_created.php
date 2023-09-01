@@ -24,6 +24,8 @@
 
 namespace local_catquiz\event;
 
+use local_catquiz\catscale;
+
 /**
  * The catscale_updated event class.
  *
@@ -64,8 +66,9 @@ class catscale_created extends \core\event\base {
     public function get_description() {
         $data = $this->data;
         $otherarray = json_decode($data['other']);
-        $scalename = $otherarray->scalename;
-        $data['scalename'] = $scalename;
+        $catscaleid = $otherarray->catscaleid;
+        $linktoscale = catscale::get_link_to_catscale($catscaleid);
+        $data['catscalelink'] = $linktoscale;
         return get_string('create_catscale_description', 'local_catquiz', $data);
     }
 

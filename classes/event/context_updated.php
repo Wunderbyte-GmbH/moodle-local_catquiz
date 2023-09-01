@@ -62,7 +62,9 @@ class context_updated extends \core\event\base {
      *
      */
     public function get_description() {
-        return get_string('update_context_description', 'local_catquiz', $this->data);
+        $data = $this->data;
+        $contextnamelink = html_writer::link('local/catquiz/manage_catcontexts.php', $data['objectid']);
+        return get_string('update_context_description', 'local_catquiz', $contextnamelink);
     }
 
     /**
