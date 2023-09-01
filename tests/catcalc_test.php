@@ -41,11 +41,12 @@ class catcalc_test extends basic_testcase
     /**
      * Test if the person ability is calculated correctly.
      *
+     * @dataProvider provider
      * @return void
      * @throws InvalidArgumentException
      * @throws ExpectationFailedException
      */
-    public function test_estimate_person_ability_returns_expected_values() {
+    public function test_estimate_person_ability_returns_expected_values(string $model, float $expected) {
         $personresponses = [
             5 => ['fraction' => 0.0],
             33 => ['fraction' => 1.0],
@@ -54,11 +55,32 @@ class catcalc_test extends basic_testcase
         ];
         $itemparamlist = new model_item_param_list();
         $itemparamlist
-            ->add((new model_item_param(5, 'web_raschbirnbauma'))->set_parameters(['difficulty' => 0.7758]))
-            ->add((new model_item_param(33, 'web_raschbirnbauma'))->set_parameters(['difficulty' => -37.7967]))
-            ->add((new model_item_param(50, 'web_raschbirnbauma'))->set_parameters(['difficulty' => -37.7967]))
-            ->add((new model_item_param(58, 'web_raschbirnbauma'))->set_parameters(['difficulty' => -37.7967]));
+            ->add((new model_item_param(5, $model))->set_parameters(['difficulty' => 0.7758, 'discrimination' => 0.5, 'guessing' => 0.2,]))
+            ->add((new model_item_param(33, $model))->set_parameters(['difficulty' => -37.7967, 'discrimination' => 1.2, 'guessing' => 1.2,]))
+            ->add((new model_item_param(50, $model))->set_parameters(['difficulty' => -37.7967, 'discrimination' => 0.3, 'guessing' => 0.7,]))
+            ->add((new model_item_param(58, $model))->set_parameters(['difficulty' => -37.7967, 'discrimination' => 0, 'guessing' => 0.4,]));
         $result = catcalc::estimate_person_ability($personresponses, $itemparamlist);
-        $this->assertEquals(-17.9611, sprintf("%.4f", $result));
+        $this->assertEquals($expected, sprintf("%.4f", $result));
+    }
+
+    public function provider() {
+        return [
+            'web-raschbirnbauma' => [
+                'model' => 'web_raschbirnbauma',
+                'expected' => -17.9611,
+            ],
+            'raschbirnbauma' => [
+                'model' => 'raschbirnbauma',
+                'expected' => -17.9611,
+            ],
+            'raschbirnbaumb' => [
+                'model' => 'raschbirnbaumb',
+                'expected' => -14.3279,
+            ],
+            'raschbirnbaumc' => [
+                'model' => 'raschbirnbaumc',
+                'expected' => -15.8350,
+            ],
+        ];
     }
 }
