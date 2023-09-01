@@ -28,12 +28,14 @@ namespace local_catquiz;
 use cache;
 use cache_helper;
 use dml_exception;
+use html_writer;
 use local_catquiz\event\testitemactivitystatus_updated;
 use local_catquiz\event\testiteminscale_added;
 use local_catquiz\event\testiteminscale_updated;
 use local_catquiz\local\result;
 use local_catquiz\local\status;
 use moodle_exception;
+use moodle_url;
 use stdClass;
 
 defined('MOODLE_INTERNAL') || die();
@@ -401,5 +403,49 @@ class catscale {
             }
         }
         return [];
+    }
+
+    /**
+     * Get HTML link to scale detail view.
+     * @param int $catscaleid
+     * @return string
+     */
+    public static function get_link_to_catscale(int $catscaleid, $url = '/local/catquiz/edit_catscale.php') {
+
+        $catscale = self::return_catscale_object($catscaleid);
+        $catscalename = $catscale->name;
+
+        $url = new moodle_url($url);
+        $url->param('id', $catscaleid);
+        $linktoscale = html_writer::link($url, $catscalename);
+
+        return $linktoscale;
+    }
+
+    /**
+     * Get HTML link to testitem detail view.
+     * @param int $catscaleid
+     * @return string
+     */
+    public static function get_link_to_testitem(
+        int $testitemid,
+        int $catscaleid,
+        int $context,
+        string $component,
+        string $linktext = "",
+        $url = '/local/catquiz/manage_catscales.php') {
+
+        if (empty($linktext)) {
+            $linktext = get_string('testitem', 'local_catquiz', $testitemid);
+        }
+        $url = new moodle_url($url);
+        $url->param('id', $testitemid);
+        $url->param('contextid', $context);
+        $url->param('scaleid', $catscaleid);
+        $url->param('component', $component);
+
+        $linktoscale = html_writer::link($url, $linktext);
+
+        return $linktoscale;
     }
 }
