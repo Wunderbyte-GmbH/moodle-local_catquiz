@@ -163,7 +163,6 @@ $string['update_context_description'] = 'CAT context {$a} updated.';
 $string['logsafter'] = 'Logs after';
 $string['logsbefore'] = 'Logs before';
 
-
 // Message.
 $string['messageprovider:catscaleupdate'] = 'Notification of CAT scale update';
 $string['catscaleupdatedtitle'] = 'A CAT scale was updated';

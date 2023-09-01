@@ -368,18 +368,6 @@ class testitems_table extends wunderbyte_table {
             ];
         }
 
-        // Trigger status changed event
-        $event = testitemstatus_updated::create([
-            'objectid' => $dataobject->id,
-            'context' => \context_system::instance(),
-            'other' => [
-                'activitystatus' => $dataobject->status,
-                'testitemid' => $dataobject->id,
-            ]
-            ]);
-        $event->trigger();
-        cache_helper::purge_by_event('changesintestitems');
-
         return [
             'success' => 1,
         ];

@@ -57,7 +57,7 @@ class testitemstatus_updated extends \core\event\base {
      *
      */
     public static function get_name() {
-        return get_string('testitem_status_updated_description', 'local_catquiz');
+        return get_string('update_testitem_status', 'local_catquiz');
     }
 
     /**
@@ -83,17 +83,20 @@ class testitemstatus_updated extends \core\event\base {
         } else {
             $linktotestitemdetailview = get_string('testitem', 'local_catquiz', $testitemid);
         }
-
         $data['testitemlink'] = $linktotestitemdetailview;
 
-        $statusint = $otherarray->status;
-        $string = 'itemstatus_'.$statusint;
+        // If we have information about the testitem and it's status, we display it.
+        if (!empty($otherarray->status)) {
+            $statusint = $otherarray->status;
+            $string = 'itemstatus_'.$statusint;
 
-        $statusstring = get_string($string, 'local_catquiz');
-        $data['statusstring'] = $statusstring;
+            $statusstring = get_string($string, 'local_catquiz');
+            $data['statusstring'] = $statusstring;
 
-        $message = get_string('update_testitem_status', 'local_catquiz', $data);
-        return  $message;
+            $message = get_string('testitem_status_updated_description', 'local_catquiz', $data);
+            return  $message;
+        } else {
+            return $this->get_name();}
     }
 
     /**

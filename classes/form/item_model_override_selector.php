@@ -26,6 +26,7 @@ use context;
 use context_system;
 use core_form\dynamic_form;
 use local_catquiz\catquiz;
+use local_catquiz\event\testitemstatus_updated;
 use local_catquiz\local\model\model_item_param;
 use local_catquiz\local\model\model_strategy;
 use moodle_url;
@@ -184,6 +185,20 @@ class item_model_override_selector extends dynamic_form {
                 'local_catquiz_itemparams',
                 (object) $updated
             );
+        // Trigger status changed event
+        $event = testitemstatus_updated::create([
+            'objectid' => $updated['id'],
+            'context' => \context_system::instance(),
+            'other' => [
+                'status' => $updated['status'],
+                'testitemid' => $updated['id'],
+                // More information needed to display link in event_log_table
+                //'catscaleid' => ,
+                //'context' => ,
+                //'component' => ,
+            ]
+            ]);
+        $event->trigger();
         }
 
         foreach ($toinsert as $new) {
@@ -195,6 +210,21 @@ class item_model_override_selector extends dynamic_form {
                 'local_catquiz_itemparams',
                 (object) $new
             );
+
+        // Trigger status changed event
+        $event = testitemstatus_updated::create([
+            'objectid' => $new['id'],
+            'context' => \context_system::instance(),
+            'other' => [
+                'status' => $new['status'],
+                'testitemid' => $new['id'],
+                // More information needed to display link in event_log_table
+                //'catscaleid' => ,
+                //'context' => ,
+                //'component' => ,
+            ]
+            ]);
+        $event->trigger();
         }
 
         return $data;
