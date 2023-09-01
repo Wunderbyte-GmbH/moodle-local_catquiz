@@ -26,8 +26,13 @@
 namespace local_catquiz;
 
 use basic_testcase;
+use catmodel_raschbirnbauma\raschbirnbauma;
+use catmodel_raschbirnbaumb\raschbirnbaumb;
+use catmodel_raschbirnbaumc\raschbirnbaumc;
 use local_catquiz\local\model\model_item_param;
 use local_catquiz\local\model\model_item_param_list;
+use local_catquiz\local\model\model_item_response;
+use local_catquiz\local\model\model_responses;
 use PHPUnit\Framework\ExpectationFailedException;
 use SebastianBergmann\RecursionContext\InvalidArgumentException;
 
@@ -80,6 +85,95 @@ class catcalc_test extends basic_testcase
             'raschbirnbaumc' => [
                 'model' => 'raschbirnbaumc',
                 'expected' => -15.8350,
+            ],
+        ];
+    }
+
+    /**
+     * Test if item parameters are calculated correctly.
+     *
+     * @dataProvider item_param_provider
+     * @return void
+     * @throws InvalidArgumentException
+     * @throws ExpectationFailedException
+     */
+    public function test_estimate_item_parameter_calculation_returns_expected_values(string $modelname, array $responses, array $userabilities, float $expected) {
+        $itemresponses = [];
+        foreach ($userabilities as $userid => $ability) {
+            foreach (['q1', 'q2'] as $qid) {
+                $ir = new model_item_response(
+                    $responses[$userid]['component'][$qid]['fraction'],
+                    $ability
+                );
+                $itemresponses[] = $ir;
+            }
+        }
+        switch ($modelname) {
+            case 'raschbirnbauma':
+                $model = new raschbirnbauma(model_responses::create_from_array($responses), $modelname);
+                break;
+            case 'raschbirnbaumb':
+                $model = new raschbirnbaumb(model_responses::create_from_array($responses), $modelname);
+                break;
+            case 'raschbirnbaumc':
+                $model = new raschbirnbaumc(model_responses::create_from_array($responses), $modelname);
+                break;
+        };
+        $result = catcalc::estimate_item_params($itemresponses, $model);
+        $this->assertEquals($expected, sprintf("%.4f", $result['difficulty']));
+    }
+
+    public function item_param_provider() {
+        $responses = [
+            1 => [
+                'component' => [
+                    'q1' => ['fraction' => 0.0],
+                    'q2' => ['fraction' => 1.0]
+                ]
+            ],
+            2 => [
+                'component' => [
+                    'q1' => ['fraction' => 0.0],
+                    'q2' => ['fraction' => 0.0]
+                ]
+            ],
+            3 => [
+                'component' => [
+                    'q1' => ['fraction' => 1.0],
+                    'q2' => ['fraction' => 1.0]
+                ]
+            ],
+            4 => [
+                'component' => [
+                    'q1' => ['fraction' => 1.0],
+                    'q2' => ['fraction' => 0.0]
+                ]
+            ],
+        ];
+        $userabilities = [
+            1 => 0.5,
+            2 => -1,
+            3 => 2.3,
+            4 => 0.7,
+        ];
+        return [
+            'raschbirnbauma' => [
+                'model' => 'raschbirnbauma',
+                'responses' => $responses,
+                'userabilities' => $userabilities,
+                'expected' => 0.6176,
+            ],
+            'raschbirnbaumb' => [
+                'model' => 'raschbirnbaumb',
+                'responses' => $responses,
+                'userabilities' => $userabilities,
+                'expected' => 0.0121,
+            ],
+            'raschbirnbaumc' => [
+                'model' => 'raschbirnbaumc',
+                'responses' => $responses,
+                'userabilities' => $userabilities,
+                'expected' => -1.0000,
             ],
         ];
     }
