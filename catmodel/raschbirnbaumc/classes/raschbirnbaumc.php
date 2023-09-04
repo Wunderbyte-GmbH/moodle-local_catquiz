@@ -54,7 +54,8 @@ class raschbirnbaumc extends model_raschmodel {
      * @return int
      */
     public static function get_model_dim():int {
-        return count (self::get_parameter_names());
+        // Adds +1 for the person ability.
+        return count (self::get_parameter_names()) + 1;
     }
 
     /**
