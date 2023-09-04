@@ -25,6 +25,7 @@
 namespace local_catquiz\teststrategy\strategy;
 
 use cache;
+use local_catquiz\teststrategy\feedbackgenerator\debuginfo;
 use local_catquiz\teststrategy\feedbackgenerator\personabilities;
 use local_catquiz\teststrategy\feedbackgenerator\pilotquestions;
 use local_catquiz\teststrategy\feedbackgenerator\questionssummary;
@@ -77,6 +78,7 @@ class teststrategy_balanced extends strategy {
             questionssummary::class,
             personabilities::class,
             pilotquestions::class,
+            debuginfo::class,
         ];
     }
 }

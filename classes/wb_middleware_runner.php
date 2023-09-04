@@ -24,6 +24,7 @@
 
 namespace local_catquiz;
 
+use cache;
 use local_catquiz\local\result;
 
 /**
@@ -45,13 +46,16 @@ class wb_middleware_runner {
      *
      */
     public static function run(array $middlewares, array $context, $action = null) {
+        global $CFG;
+        $cache = null;
+        if ($CFG->debug > 0) {
+                $cache = cache::make('local_catquiz', 'adaptivequizattempt');
+        }
 
         // Set a default action that just wraps the $context in a result
         if (!$action) {
             // Will be called last
-            $action = function (array $context): result {
-                return result::ok($context);
-            };
+            $action = self::get_last_action();
         }
 
         foreach (array_reverse($middlewares) as $middleware) {
@@ -60,9 +64,30 @@ class wb_middleware_runner {
                     sprintf('Class %s does not implement the wb_middleware interface', get_class($middleware))
                 );
             }
-            $action = fn(array $context): result => $middleware->process($context, $action);
+            $action = function (array $context) use ($action, $middleware, $cache): result {
+                if ($cache) {
+                    $cachedcontexts = $cache->get('context') ?: [];
+                    $cachedcontexts[$context['questionsattempted']] = $context;
+                    $cache->set('context', $cachedcontexts);
+                }
+                return $middleware->process($context, $action);
+            };
         }
 
         return $action($context);
+    }
+
+    private static function get_last_action() {
+        global $CFG;
+
+        if ($CFG->debug > 0) {
+            return function (array $context): result {
+                $cache = cache::make('local_catquiz', 'adaptivequizattempt');
+                $cache->set('context', $context);
+                return result::ok($context);
+            };
+        }
+
+        return fn (array $context): result => result::ok($context);
     }
 }

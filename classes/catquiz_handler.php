@@ -554,6 +554,7 @@ class catquiz_handler {
             'userid' => $USER->id,
             'max_attempts_per_scale' => 10, // TODO: configure via quiz settings
             'teststrategy' => $quizsettings->catquiz_selectteststrategy,
+            'timestamp' => time(),
         ];
         return $contextcreator->load(
             [
