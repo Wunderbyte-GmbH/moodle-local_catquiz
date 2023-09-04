@@ -39,7 +39,7 @@ class pilotquestions_loader implements contextloaderinterface {
      *
      * @var int
      */
-    const ATTEMPTS_THRESHOLD = 30;
+    const ATTEMPTS_THRESHOLD = 10;
 
     /**
      * Returns array ['pilot_questions'].
