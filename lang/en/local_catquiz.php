@@ -371,7 +371,8 @@ $string['checkdelimiteroremptycontent'] = 'Check if data is given and separated 
 $string['wronglabels'] = 'Imported CSV not containing the right labels. Column {$a} can not be importet.';
 $string['nolabels'] = 'No column labels defined in settings object.';
 $string['checkdelimiter'] = 'Check if data is separated via the selected symbol.';
-$string['scaleinformation'] = 'The scale (and subscales) the item should be assigned to.';
+$string['scaleinformation'] = 'The id of the CAT scale the item should be assigned to.';
+$string['scalenameinformation'] = 'The name of the CAT scale the item should be assigned to. If no catscale id given, matching is done via name.';
 
 // Testenvironments table.
 $string['notifyallteachers'] = 'Notify all teachers';

@@ -365,7 +365,8 @@ $string['checkdelimiteroremptycontent'] = 'Überprüfen Sie ob Daten vorhanden u
 $string['wronglabels'] = 'Die importierten Spaltennamen entsprechen nicht der Vorgabe. {$a} kann nicht importiert werden.';
 $string['nolabels'] = 'Keine Spaltennamen definiert.';
 $string['checkdelimiter'] = 'Überprüfen Sie die Spaltennamen durch das angegebene Zeichen getrennt sind.';
-$string['scaleinformation'] = 'Die CAT Skala (und ggf. Subskalen) denen die Frage zugeordnet werden soll.';
+$string['scaleinformation'] = 'Die ID der CAT Skala der die Frage zugeordnet werden soll.';
+$string['scalenameinformation'] = 'Der Name der CAT Skala der die Frage zugeordnet werden soll. Falls keine ID angegeben, wird Matching über Name vorgenommen.';
 
 // Testenvironments table.
 $string['notifyallteachers'] = 'Kursleiter der gewählten Kurse benachrichtigen';

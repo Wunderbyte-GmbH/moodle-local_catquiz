@@ -29,6 +29,7 @@ use Countable;
 use dml_exception;
 use IteratorAggregate;
 use local_catquiz\catquiz;
+use local_catquiz\event\testiteminscale_added;
 use moodle_exception;
 use Traversable;
 
@@ -347,7 +348,7 @@ class model_item_param_list implements ArrayAccess, IteratorAggregate, Countable
                 if (!empty($qbeid)) {
                     if ($qbeid != $record->qbeid) {
                         return [
-                            'success' => 0, // Update successfully
+                            'success' => 0, // Update not successful.
                             'message' => get_string('labelidnotunique', 'local_catquiz'),
                             'recordid' => $record->qbeid,
                          ];
@@ -363,8 +364,11 @@ class model_item_param_list implements ArrayAccess, IteratorAggregate, Countable
 
                 $returnarray = self::save_or_update_testitem_in_db($newrecord);
             }
-            return $returnarray; // Todo: Add more information to error.
+            return $returnarray;
         }
+
+        // Scale logic is in this function: get scale id and update in table.
+        $newrecord = self::update_in_scale($newrecord);
 
         $record = $DB->get_record("local_catquiz_itemparams", [
             'componentid' => $newrecord['componentid'],
@@ -409,5 +413,61 @@ class model_item_param_list implements ArrayAccess, IteratorAggregate, Countable
             'recordid' => $id,
          ];
     }
+
+    /**
+     * Gets scaleid and updates scaleid of record.
+     * @param stdClass $newrecord
+     * @return stdClass
+     */
+    private function update_in_scale($newrecord) {
+        global $DB;
+
+        // If we don't know the catscaleid we get it via the catscalename.
+        if (empty($newrecord['catscaleid']) && !empty($newrecord['catscalename'])) {
+            $sql = "SELECT id
+                    FROM {local_catquiz_catscales}
+                    WHERE name = :name";
+            $record = $DB->get_record_sql($sql, ['name' => $newrecord['catscalename']]);
+
+            if (!empty($record)) {
+                $newrecord['catscaleid'] = $record->id;
+            }
+        }
+        $scalerecord = $DB->get_record("local_catquiz_items", [
+            'componentid' => $newrecord['componentid'],
+            'componentname' => $newrecord['componentname'],
+            'catscaleid' => $newrecord['catscaleid'],
+        ]);
+        if (!$scalerecord) {
+            $columnstoinclude = ['componentname', 'componentid', 'catscaleid', 'lastupdated', 'status'];
+            $recordforquery = $newrecord;
+            foreach ($recordforquery as $key => $value) {
+                if (!in_array($key, $columnstoinclude, true)) {
+                    unset($recordforquery[$key]);
+                }
+                // If no activity status is given, set to active by default.
+                if ($key == "status" && empty($value)) {
+                    $recordforquery["status"] = 0;
+                }
+            }
+            $DB->insert_record('local_catquiz_items', $recordforquery);
+
+            // Trigger event
+            $event = testiteminscale_added::create([
+                'objectid' => $newrecord['componentid'],
+                'context' => \context_system::instance(),
+                'other' => [
+                    'testitemid' => $newrecord['componentid'],
+                    'catscaleid' => $newrecord['catscaleid'],
+                    'context' => catquiz::get_default_context_id(),
+                    'component' => $newrecord['componentname'],
+                ]
+                ]);
+            $event->trigger();
+        }
+
+        return $newrecord;
+    }
+
 
 }

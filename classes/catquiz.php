@@ -182,6 +182,7 @@ class catquiz {
                 lci.catscaleid catscaleid,
                 lci.status testitemstatus,
                 lci.componentname component,
+                lccs.name as catscalename,
                 s2.attempts,
                 COALESCE(s2.lastattempttime,0) as lastattempttime,
                 s3.userattempts,
@@ -199,6 +200,9 @@ class catquiz {
 
             RIGHT JOIN {local_catquiz_items} lci
             ON lci.componentid=q.id AND lci.componentname='question'
+
+            LEFT JOIN {local_catquiz_catscales} lccs
+            ON lci.catscaleid = lccs.id
 
             LEFT JOIN (
                 SELECT ccc1.id AS contextid, qa.questionid, COUNT(*) AS attempts, MAX(qas.timecreated) as lastattempttime

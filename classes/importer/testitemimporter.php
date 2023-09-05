@@ -170,10 +170,16 @@ class testitemimporter {
                 'importinstruction' => get_string('ifdefinedusedtomatch', 'local_catquiz'),
             ),
             array (
-                'name' => 'scale',
+                'name' => 'catscaleid',
+                'mandatory' => false,
+                'format' => PARAM_INT,
+                'importinstruction' => get_string('scaleinformation', 'local_catquiz'),
+            ),
+            array (
+                'name' => 'catscalename',
                 'mandatory' => false,
                 'format' => PARAM_TEXT,
-                'importinstruction' => get_string('scaleinformation', 'local_catquiz'),
+                'importinstruction' => get_string('scalenameinformation', 'local_catquiz'),
             ),
             array (
                 'name' => 'qtype',

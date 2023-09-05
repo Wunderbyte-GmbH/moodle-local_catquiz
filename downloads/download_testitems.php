@@ -54,6 +54,8 @@ $columnstoinclude = [
     'timecreated' => get_string('timecreated'),
     'timemodified' => get_string('timemodified', 'local_catquiz'),
     'status' => get_string('status'),
+    'catscaleid' => get_string('catscaleid', 'local_catquiz'),
+    'catscalename' => 'catscalename',
 ];
 
 foreach ($table->columns as $key => $value) {
