@@ -332,7 +332,7 @@ class catscaledashboard implements renderable, templatable {
      * @return string
      *
      */
-    private function render_testitem_importer() {
+    public static function render_testitem_importer() {
 
         $inputform = new \local_catquiz\form\csvimport(null, null, 'post', '', [], true, testitemimporter::return_ajaxformdata());
 
@@ -350,7 +350,7 @@ class catscaledashboard implements renderable, templatable {
      * @return string
      *
      */
-    private function render_testitem_demodata() {
+    public static function render_testitem_demodata() {
         $title = get_string('importcolumnsinfos', 'local_catquiz');
         $columnsarray = testitemimporter::export_columns_for_template();
         $url = new moodle_url('/local/catquiz/classes/importer/demo.csv');

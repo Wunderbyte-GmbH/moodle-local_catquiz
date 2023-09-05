@@ -53,6 +53,9 @@
   <li class="nav-item">
     <a class="nav-link" id="versioning-tab" data-toggle="tab" href="#versioning" role="tab" aria-controls="versioning" aria-selected="false">{{#str}}versioning, local_catquiz{{/str}}</a>
   </li>
+  <li class="nav-item">
+    <a class="nav-link" id="importer-tab" data-toggle="tab" href="#importer" role="tab" aria-controls="importer" aria-selected="false">{{#str}} import, core{{/str}}</a>
+  </li>
 </ul>
 
 <div class="tab-content" id="myTabContent">
@@ -73,5 +76,9 @@
   </div>
   <div class="tab-pane fade" id="versioning" role="tabpanel" aria-labelledby="versioning-tab">
     Versioning
+  </div>
+  <div class="tab-pane fade" id="importer" role="tabpanel" aria-labelledby="versioning-tab">
+    {{{testitemsimporter}}}
+    {{>local_catquiz/importer/importerdatainfodisplay}}
   </div>
 </div>

@@ -16,6 +16,7 @@
 
 namespace local_catquiz\output\catscalemanager;
 
+use local_catquiz\output\catscaledashboard;
 use local_catquiz\output\catscalemanagers;
 use local_catquiz\output\catscales;
 use local_catquiz\output\testitemdashboard;
@@ -168,6 +169,8 @@ class managecatscaledashboard implements renderable, templatable {
             'catscalestats' => $this->catscalestatsarray,
             'testitemdashboard' => $this->testitemdashboardarray,
             'eventlogtable' => $this->eventlogtable,
+            'testitemsimporter' => catscaledashboard::render_testitem_importer(),
+            'testitemsimporterdemodata' => catscaledashboard::render_testitem_demodata(),
         ];
         return $data;
     }
