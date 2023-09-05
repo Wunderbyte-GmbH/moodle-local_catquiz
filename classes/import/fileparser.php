@@ -344,36 +344,38 @@ class fileparser {
                 if (isset($this->settings->columns->$column->defaultvalue)) {
                     $value = $this->settings->columns->$column->defaultvalue;
                 }
-            }
-            // Validation of field type.
-            switch($this->get_param_value($column, "type")) {
-                case "date":
-                    if (!$this->validate_datefields($value)) {
-                        $format = $this->settings->dateformat;
-                        $this->add_csvwarnings("$value is not a valid date format in $column. Format should be Unix timestamp or like: $format", $line[0]);
+            } else {
+                // Validation of field type.
+                switch($this->get_param_value($column, "type")) {
+                    case "date":
+                        if (!$this->validate_datefields($value)) {
+                            $format = $this->settings->dateformat;
+                            $this->add_csvwarnings("$value is not a valid date format in $column. Format should be Unix timestamp or like: $format", $line[0]);
+                            break;
+                        }
                         break;
-                    }
-                    break;
-                default:
-                    break;
+                    default:
+                        break;
+                }
+                // Validation of field format.
+                switch($this->get_param_value($column, "format")) {
+                    case PARAM_INT:
+                        $value = $this->cast_string_to_int($value);
+                        if (is_string($value)) {
+                            $this->add_csvwarnings("$value is not a valid integer in $column", $line[0]);
+                        }
+                        break;
+                    case PARAM_FLOAT:
+                        $value = $this->cast_string_to_float($value);
+                        if (is_string($value)) {
+                            $this->add_csvwarnings("$value is not a valid float in $column", $line[0]);
+                        }
+                        break;
+                    default:
+                        break;
+                }
             }
-            // Validation of field format.
-            switch($this->get_param_value($column, "format")) {
-                case PARAM_INT:
-                    $value = $this->cast_string_to_int($value);
-                    if (is_string($value)) {
-                        $this->add_csvwarnings("$value is not a valid integer in $column", $line[0]);
-                    }
-                    break;
-                case PARAM_FLOAT:
-                    $value = $this->cast_string_to_float($value);
-                    if (is_string($value)) {
-                        $this->add_csvwarnings("$value is not a valid float in $column", $line[0]);
-                    }
-                    break;
-                default:
-                    break;
-            }
+
         };
         return true;
     }
@@ -510,26 +512,26 @@ class fileparser {
      * Add error message to $this->csverrors
      *
      * @param mixed $errorstring
-     * @param mixed $i
+     * @param mixed $i id of record
      *
      * @return void
      *
      */
     protected function add_csverror($errorstring, $i) {
-        $this->csverrors[] = "Error in line $i: ". $errorstring;
+        $this->csverrors[] = "Error for id $i: ". $errorstring;
     }
 
     /**
      * Add error message to $this->csvwarnings
      *
      * @param mixed $errorstring
-     * @param mixed $i
+     * @param mixed $i id of record
      *
      * @return void
      *
      */
     protected function add_csvwarnings($errorstring, $i) {
-        $this->csvwarnings[] = "Error in line $i: ". $errorstring;
+        $this->csvwarnings[] = "Error for id $i: ". $errorstring;
     }
 
     /**
