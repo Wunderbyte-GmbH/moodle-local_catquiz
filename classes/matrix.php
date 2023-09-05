@@ -107,6 +107,7 @@ class matrix extends ArrayObject {
                 }
             } else {
                 // Note: int|float is given, convert to proper matrix.
+                // Throws error "Object of class Closure can not be converted to float.
                 $value = [[floatval($value)]];
             }
             parent::__construct($value);

@@ -57,7 +57,15 @@ class mathcat {
     ): float {
 
         // @DAVID: Ersetzen durch Newton-Raphson-multi-stable. Aktueller Aufruf:
-        # return newton_raphson_multi_stable($func, $derivative, [$start], -runden(log($mininc),10),0), $maxiter); // Plus Filter und 1./2. Ableitung
+        return self::newton_raphson_multi_stable(
+            $func,
+            $derivative,
+            [$start],
+            6,
+            50
+        );
+
+            //-runden(log($mininc),10),0), $maxiter); // Plus Filter und 1./2. Ableitung
         // Wenn erfolgreich, dann bitte diese Funktion als deprecated behandeln und entfernen.
         
         $x0 = $start;
@@ -460,10 +468,8 @@ class mathcat {
         callable $fn_function, // @DAVID: Hier werden nun Callables erwartet, die Arrays zurückgeben, NICHT Arrays of Callables
         callable $fn_derivative,
         array $parameter_start,
-        // float $min_inc = 0.0001, // @DAVID: Ersetzt durch $precision
         int $precission = 6,
         int $max_iterations = 50,
-        // catcalc_item_estimator $model, // @DAVID: Ersetzt durch (flexibleren) callable-Aufruf der TR-Funktionen
         callable $fn_trusted_regions_filter = NULL,
         callable $fn_trusted_regions_function = NULL,
         callable $fn_trusted_regions_derivative = NULL): array {
@@ -484,10 +490,12 @@ class mathcat {
             $val_function = $fn_function($parameter);
             $val_derivative = $fn_derivative($parameter);
             
+            // Throws error Object of class Closure can not be converted to float.
             $mx_function = new matrix($val_function);
             $mx_derivative =  new matrix($val_derivative);
             
             $mx_function = $mx_function->transpose(); 
+            // TODO: handle case where this does not work (determinant is 0).
             $mx_derivative_inv = $mx_derivative->inverse();
             
             // Calculate the new point $mx_parameter as well as the distance 
@@ -523,9 +531,9 @@ class mathcat {
                     
                     // If Trusted Region function and its derivative are provided, add them to $fn_function and $fn_derivative.
                     if (isset($fn_trusted_regions_function) && isset($fn_trusted_regions_derivative)) {
-                        $fn_function = fn($x) => multi_sum($fn_trusted_regions_function($x), $fn_function($x));
-                        $fn_derivative = fn($x) => multi_sum($fn_trusted_regions_derivative($x), $fn_derivative($x));
-                        # console ("Used Trusted Regions function and derivatied and added this to the target functions.");
+                        $fn_function = fn($x) => matrixcat::multi_sum($fn_trusted_regions_function($x), $fn_function($x));
+                        $fn_derivative = fn($x) => matrixcat::multi_sum($fn_trusted_regions_derivative($x), $fn_derivative($x));
+                        print("Used Trusted Regions function and derivatied and added this to the target functions.");
                     }
                     
                     // If the problem occurs a second time in a row, additionally reset the parameter $parameter to $parameter_start

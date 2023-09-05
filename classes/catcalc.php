@@ -121,6 +121,14 @@ class catcalc {
             $loglikelihood2ndderivative = fn ($x) => $loglikelihood2ndderivative($x) + $loglikelihood2ndderivativepart($x);
         }
 
+        return mathcat::newton_raphson_multi_stable(
+            $loglikelihood1stderivative,
+            $loglikelihood2ndderivative,
+            [0.1],
+            6,
+            50
+            //fn ($ip) => $model::restrict_to_trusted_region($ip)
+        );
         $retval = mathcat::newtonraphson_stable(
             $loglikelihood1stderivative,
             $loglikelihood2ndderivative,
@@ -161,22 +169,31 @@ class catcalc {
             $hessian[] = fn($ip) => $model::get_log_hessian($r->get_ability(), $ip, $r->get_response());
         }
     
-        $jacobian = function($ip) use($jacobian) {foreach ($jacobian as $key => $j) {$jacobian[$key] = $j($ip);} return $jacobian;};
-        // vorstehende Zeile bitte ersetzen durch: $jacobian = self::build_callable_array($jacobian);
-        $jacobian = fn($ip) => multi_sum($jacobian($ip));
+        $jacobian = function($ip) use ($jacobian) {
+            foreach ($jacobian as $key => $j) {
+                $jacobian[$key] = $j($ip);
+            }
+            return $jacobian;
+        };
+        $jacobian = self::build_callable_array($jacobian);
             
-        $hessian = function($ip) use($hessian) {foreach ($hessian as $key => $h) {$hessian[$key] = $h($ip);} return $hessian;};
-        // vorstehende Zeile bitte ersetzen durch: $hessian = self::build_callable_array($hessian);
-        $hessian = fn($ip) => multi_sum($hessian($ip));
+        $hessian = function($ip) use ($hessian) {
+            foreach ($hessian as $key => $h) {
+                $hessian[$key] = $h($ip);
+            } return $hessian;
+        };
+        $hessian = self::build_callable_array($hessian);
 
         // Estimate item parameters via Newton-Raphson algorithm.
-        return mathcat::newton_raphson_multi_stable( $jacobian, $hessian, $z_0, 6, 50
-            , fn($ip) => $model::restrict_to_trusted_region($ip)
-            //, fn($ip) => $model::get_log_tr_jacobian($ip), fn($ip) => $model::get_log_tr_hessian($ip)
-            );
+        return mathcat::newton_raphson_multi_stable(
+            $jacobian,
+            $hessian,
+            $z_0,
+            6,
+            50,
+        //    fn ($ip) => $model::restrict_to_trusted_region($ip)
+        );
         }
-    }
-
     // @ DAVID: Falls noch nirgendwo implementiert:
 
     /**
@@ -185,7 +202,7 @@ class catcalc {
      * @param array<callable> $fn_function
      * @return callable<array>
      */
-    public function build_callable_array ($fn_function) {
+    public static function build_callable_array ($fn_function) {
         return function($x) use($fn_function) {
             foreach ($fn_function as $key => $f) {
             	$fn_function[$key] = $f($x);
@@ -203,3 +220,4 @@ print_r ($fn_function(5));
 // Expected: [5, 10, 15]
 */
 }
+//    }
