@@ -78,8 +78,6 @@ export const init = () => {
         // Display general success status.
         if (response.success == 1) {
 
-            // eslint-disable-next-line no-console
-            console.log(response, response.numberofsuccessfullyupdatedrecords);
             getString('importsuccess', 'local_catquiz', response.numberofsuccessfullyupdatedrecords).then(message => {
                 showNotification(message, 'success', false);
                 return;

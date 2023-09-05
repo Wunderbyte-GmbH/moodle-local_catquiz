@@ -15,7 +15,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * The testiteminscale_updated event.
+ * The testitemactivitystatus_updated event.
  *
  * @package local_catquiz
  * @copyright 2023 Wunderbyte <info@wunderbyte.at>
@@ -45,7 +45,7 @@ class testitemactivitystatus_updated extends \core\event\base {
      *
      */
     protected function init() {
-        $this->data['crud'] = 'u'; // Meaning: u = update.
+        $this->data['crud'] = 'u';
         $this->data['edulevel'] = self::LEVEL_OTHER;
         $this->data['objecttable'] = 'local_catquiz_items';
     }

@@ -1194,7 +1194,7 @@ class catquiz {
     }
 
     /**
-     * Return the record of a user
+     * Return the record of a user.
      *
      * @param int $userid
      *
