@@ -174,6 +174,7 @@ class catquiz {
                 q.id,
                 lci.componentid,
                 qbe.idnumber as label,
+                qbe.idnumber,
                 q.name,
                 q.questiontext,
                 q.qtype,
