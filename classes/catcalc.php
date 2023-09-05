@@ -165,24 +165,15 @@ class catcalc {
         $jacobian = []; $hessian = [];
         
         foreach ($itemresponse as $r) {
-            $jacobian[] = fn($ip) => $model::get_log_jacobian($r->get_ability(), $ip, $r->get_response());
-            $hessian[] = fn($ip) => $model::get_log_hessian($r->get_ability(), $ip, $r->get_response());
+            $jacobian[] = fn($ip) => $model::get_log_jacobian($r->get_ability(), $r->get_response());
+            $hessian[] = fn($ip) => $model::get_log_hessian($r->get_ability(), $r->get_response());
         }
     
-        $jacobian = function($ip) use ($jacobian) {
-            foreach ($jacobian as $key => $j) {
-                $jacobian[$key] = $j($ip);
-            }
-            return $jacobian;
-        };
         $jacobian = self::build_callable_array($jacobian);
+        $jacobian = fn ($ip) => matrixcat::multi_sum($jacobian($ip));
             
-        $hessian = function($ip) use ($hessian) {
-            foreach ($hessian as $key => $h) {
-                $hessian[$key] = $h($ip);
-            } return $hessian;
-        };
         $hessian = self::build_callable_array($hessian);
+        $hessian = fn ($ip) => matrixcat::multi_sum($hessian($ip));
 
         // Estimate item parameters via Newton-Raphson algorithm.
         return mathcat::newton_raphson_multi_stable(
