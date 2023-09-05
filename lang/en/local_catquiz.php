@@ -163,6 +163,8 @@ $string['catcontext_updated'] = 'CAT context updated.';
 $string['update_context_description'] = 'CAT context {$a} updated.';
 $string['logsafter'] = 'Logs after';
 $string['logsbefore'] = 'Logs before';
+$string['calculation_executed'] = 'Calculation executed.';
+$string['executed_calculation_description'] = 'A Calculation was executed.';
 
 // Message.
 $string['messageprovider:catscaleupdate'] = 'Notification of CAT scale update';
@@ -364,6 +366,12 @@ $string['callbackfunctionnotdefined'] = 'Callback function is not defined.';
 $string['callbackfunctionnotapplied'] = 'Callback function could not be applied.';
 $string['canbesetto0iflabelgiven'] = 'Can be 0 if matching of testitem is via label.';
 $string['ifdefinedusedtomatch'] = 'If defined, will be used to match.';
+$string['fieldnamesdontmatch'] = 'The imported fieldnames don`t match the defined fieldnames.';
+$string['checkdelimiteroremptycontent'] = 'Check if data is given and separated via the selected symbol.';
+$string['wronglabels'] = 'Imported CSV not containing the right labels. Column {$a} can not be importet.';
+$string['nolabels'] = 'No column labels defined in settings object.';
+$string['checkdelimiter'] = 'Check if data is separated via the selected symbol.';
+$string['scaleinformation'] = 'The scale (and subscales) the item should be assigned to.';
 
 // Testenvironments table.
 $string['notifyallteachers'] = 'Notify all teachers';

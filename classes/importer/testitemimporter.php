@@ -47,9 +47,9 @@ class testitemimporter {
         $settings = self::define_settings(
             $definedcolumns,
             $callback,
-            $data->delimiter,
+            $data->delimiter_name,
             $data->encoding,
-            $data->dateformat,
+            $data->dateparseformat,
         );
 
         $parser = new fileparser($settings);
@@ -109,36 +109,13 @@ class testitemimporter {
      *
      */
     private static function define_testitem_columns() {
-        /*
-        $columnsassociative = array(
-            'userid' => array(
-                'columnname' => get_string('id'),
-                'mandatory' => true, // If mandatory and unique are set in first column, columnname will be used as key in records array.
-                'unique' => true,
-                'format' => 'string',
-                'default' => false,
-            ),
-            'starttime' => array(
-                'mandatory' => true,
-                'format' => PARAM_INT,// If format is set to PARAM_INT parser will cast given string to integer.
-                'type' => 'date',
-            ),
-            'price' => array(
-                'mandatory' => false,
-                'format' => PARAM_INT,
-            ),
-        );
-        */
+
         $columnssequential = [
             array(
                 'name' => 'componentid',
-                // phpcs:ignore
-                // 'columnname' => get_string('id'),
                 'mandatory' => true,
                 'format' => PARAM_INT,
                 'importinstruction' => get_string('canbesetto0iflabelgiven', 'local_catquiz'),
-                // phpcs:ignore
-                // 'transform' => fn($x) => get_string($x, 'local_catquiz'),
             ),
             array(
                 'name' => 'componentname',
@@ -149,7 +126,7 @@ class testitemimporter {
                 'name' => 'contextid',
                 'mandatory' => true,
                 'format' => PARAM_INT,
-                // We could set the selected cat contaxt (optional_param id) as default.
+                // We could set the selected cat context (optional_param id) as default.
             ),
             array(
                 'name' => 'model',
@@ -180,8 +157,6 @@ class testitemimporter {
             array (
                 'name' => 'timemodified',
                 'mandatory' => false,
-                // phpcs:ignore
-                // 'type' => 'date', Will throw warning if empty or 0.
             ),
             array (
                 'name' => 'guessing',
@@ -193,6 +168,30 @@ class testitemimporter {
                 'mandatory' => false,
                 'format' => PARAM_TEXT,
                 'importinstruction' => get_string('ifdefinedusedtomatch', 'local_catquiz'),
+            ),
+            array (
+                'name' => 'scale',
+                'mandatory' => false,
+                'format' => PARAM_TEXT,
+                'importinstruction' => get_string('scaleinformation', 'local_catquiz'),
+            ),
+            array (
+                'name' => 'qtype',
+                'mandatory' => false,
+                'format' => PARAM_TEXT,
+            ),
+            array (
+                'name' => 'name',
+                'mandatory' => false,
+                'format' => PARAM_TEXT,
+            ),
+            array (
+                'name' => 'attempts',
+                'mandatory' => false,
+            ),
+            array (
+                'name' => 'lastattempttime',
+                'mandatory' => false,
             )
             ];
         return $columnssequential;

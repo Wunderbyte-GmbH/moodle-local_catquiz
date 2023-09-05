@@ -147,7 +147,7 @@ class fileparser {
         if (!empty($this->settings->columns)) {
             $this->columns = $this->settings->columns;
         } else {
-            $this->errors[] = "No column labels defined in settings object.";
+            $this->errors[] = get_string('nolabels', 'local catquiz');
             return false;
         }
 
@@ -170,27 +170,35 @@ class fileparser {
     public function process_csv_data($content) {
         $data = [];
         $iid = csv_import_reader::get_new_iid($this->pluginname);
+        if (empty($iid)) {
+            $this->errors[] = "Could not get new import id.";
+        }
         $cir = new csv_import_reader($iid, $this->pluginname);
 
+        // TODO: Check if delimiter, enclosure and encoding is correctly set.
+        // In $content, is the delimiter set?
         $readcount = $cir->load_csv_content($content, $this->encoding, $this->delimiter, null, $this->enclosure);
 
         if (empty($readcount)) {
             $this->errors[] = $cir->get_error();
-            return $data;
+            return $this->exit_and_return_records($cir);
         }
 
+        $fieldnames = $cir->get_columns();
         // Csv column headers.
-        if (!$fieldnames = $cir->get_columns()) {
+        if ($fieldnames == false) {
             $this->errors[] = $cir->get_error();
-            return $data;
+            $this->errors[] = get_string('checkdelimiteroremptycontent', 'local_catquiz');
+            return $this->exit_and_return_records($cir);
         }
         $this->fieldnames = $fieldnames;
         if (!empty($this->validate_fieldnames())) {
             $this->errors[] = $this->validate_fieldnames();
-            return $data;
+            return $this->exit_and_return_records($cir);
         }
 
         // Check if first column is set mandatory and unique.
+        // If unique column existis -> key
         $firstcolumn = $this->fieldnames[0];
         if ($this->get_param_value($firstcolumn, 'mandatory') == true
         && $this->get_param_value($firstcolumn, 'unique') == true) {
@@ -228,13 +236,26 @@ class fileparser {
             }
 
         }
+        return $this->exit_and_return_records($cir);
+    }
+
+    /**
+     * Exit and return
+     *
+     * @param array $data
+     *
+     * @return array
+     */
+    private function exit_and_return_records(object $cir) {
+
         // Collecting errors, warnings and general successinformation for $this->records.
         $this->checksuccess();
-
         $cir->cleanup(true);
         $cir->close();
         return $this->records;
+
     }
+
 
     /**
      * Executes callback
@@ -298,8 +319,6 @@ class fileparser {
         if ($this->csvwarnings !== []) { // Lines with warning are imported.
             $this->records['errors']['warnings'] = $this->csvwarnings;
         }
-
-        // Add warnings if needed.
     }
 
     /**
@@ -340,10 +359,16 @@ class fileparser {
             }
             // Validation of field format.
             switch($this->get_param_value($column, "format")) {
-                case "int":
+                case PARAM_INT:
                     $value = $this->cast_string_to_int($value);
                     if (is_string($value)) {
                         $this->add_csvwarnings("$value is not a valid integer in $column", $line[0]);
+                    }
+                    break;
+                case PARAM_FLOAT:
+                    $value = $this->cast_string_to_float($value);
+                    if (is_string($value)) {
+                        $this->add_csvwarnings("$value is not a valid float in $column", $line[0]);
                     }
                     break;
                 default:
@@ -352,6 +377,31 @@ class fileparser {
         };
         return true;
     }
+    /**
+     * Check if the given string is a valid float.
+     * If separated via comma, replace by dot and - if possible -, cast to float.
+     *
+     * @param string $value
+     * @return * either float or the given value (string)
+     */
+    protected function cast_string_to_float($value) {
+
+        // Check if separated by comma.
+        $commacount = substr_count($value, ',');
+        if ($commacount == 1) {
+            $floatstring = str_replace(',', '.', $value);
+
+        } else {
+            $floatstring = $value;
+        }
+        $validation = filter_var($floatstring, FILTER_VALIDATE_FLOAT);
+        if ($validation !== false) {
+            return $validation;
+        } else {
+            return $value;
+        }
+    }
+
     /**
      * Check if the given string is a valid int and if possible, cast to int.
      *
@@ -376,9 +426,13 @@ class fileparser {
      */
     protected function validate_fieldnames() {
         $error = '';
+        if (count($this->fieldnames) == 1 && count($this->columns) > 1) {
+            $error .= get_string('checkdelimiter', 'local_catquiz');
+            return $error;
+        }
         foreach ($this->fieldnames as $fieldname) {
             if(!in_array($fieldname, array_keys($this->columns))) {
-                $error .= "Imported CSV not containing the right labels. Column $fieldname can not be importet.";
+                $error .= get_string('wronglabels', 'local_catquiz', $fieldname);
                 break;
             }
         }

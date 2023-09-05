@@ -160,6 +160,8 @@ $string['catcontext_updated'] = 'CAT Context aktualisiert';
 $string['create_catscale_description'] = 'CAT Context {$a} aktualisiert.';
 $string['logsafter'] = 'Logs after';
 $string['logsbefore'] = 'Logs before';
+$string['calculation_executed'] = 'Berechnung durchgeführt.';
+$string['executed_calculation_description'] = 'Es wurde eine Berechnung durchgeführt.';
 
 // Message.
 $string['messageprovider:catscaleupdate'] = 'Benachrichtung über eine Aktualisierung einer CAT Skala.';
@@ -358,8 +360,12 @@ $string['callbackfunctionnotdefined'] = 'Callback Funktion nicht definiert.';
 $string['callbackfunctionnotapplied'] = 'Callback Funktion konnte nicht angewandt werden.';
 $string['canbesetto0iflabelgiven'] = 'Kann 0 sein, wenn Abgleich über Label stattfindet.';
 $string['ifdefinedusedtomatch'] = 'Wenn angegeben findet der Abgleich über diesen Wert statt.';
-$string['ifdefinedusedtomatch'] = 'Wenn angegeben findet der Abgleich über diesen Wert statt.';
-
+$string['fieldnamesdontmatch'] = 'Die importierten Spaltennamen entsprechen nicht der Vorgabe.';
+$string['checkdelimiteroremptycontent'] = 'Überprüfen Sie ob Daten vorhanden und durch das angegebene Zeichen getrennt sind.';
+$string['wronglabels'] = 'Die importierten Spaltennamen entsprechen nicht der Vorgabe. {$a} kann nicht importiert werden.';
+$string['nolabels'] = 'Keine Spaltennamen definiert.';
+$string['checkdelimiter'] = 'Überprüfen Sie die Spaltennamen durch das angegebene Zeichen getrennt sind.';
+$string['scaleinformation'] = 'Die CAT Skala (und ggf. Subskalen) denen die Frage zugeordnet werden soll.';
 
 // Testenvironments table.
 $string['notifyallteachers'] = 'Kursleiter der gewählten Kurse benachrichtigen';
