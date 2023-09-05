@@ -130,7 +130,7 @@ class testitemimporter {
             ),
             array(
                 'name' => 'model',
-                'mandatory' => true,
+                'mandatory' => false,
                 'format' => 'string',
             ),
             array (
