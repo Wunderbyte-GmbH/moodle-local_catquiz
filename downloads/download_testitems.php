@@ -22,7 +22,7 @@
 
 use local_wunderbyte_table\wunderbyte_table;
 
-require_once("../../config.php");
+require_once("../../../config.php");
 
 global $CFG, $PAGE;
 
@@ -35,7 +35,7 @@ $encodedtable = optional_param('encodedtable', '', PARAM_RAW);
 
 $context = context_system::instance();
 $PAGE->set_context($context);
-$PAGE->set_url('/download.php');
+$PAGE->set_url('/downloads/download.php');
 
 $table = wunderbyte_table::instantiate_from_tablecache_hash($encodedtable);
 
@@ -44,22 +44,30 @@ $table = wunderbyte_table::instantiate_from_tablecache_hash($encodedtable);
 // And we don't have the action column and checkbox column.
 
 $newcolumns = [
-    'id' => 'id'
+    'componentid' => 'componentid'
 ];
 
 $columnstoexclude = ['action', 'wbcheckbox'];
+$columnstoinclude = [
+    'label' => get_string('label', 'local_catquiz'),
+    'guessing' => get_string('guessing', 'local_catquiz'),
+    'timecreated' => get_string('timecreated'),
+    'timemodified' => get_string('timemodified', 'local_catquiz'),
+    'status' => get_string('status'),
+];
+
 foreach ($table->columns as $key => $value) {
 
     if (!in_array($key, $columnstoexclude, true)) {
         $newcolumns[$key] = $table->headers[$value];
     }
 }
-
+$newcolumns = array_merge($newcolumns, $columnstoinclude);
 $table->columns = [];
 $table->headers = [];
 
 $table->define_columns(array_keys($newcolumns));
-$table->define_headers(array_values($newcolumns));
+$table->define_headers(array_keys($newcolumns));
 
 $table->is_downloading($download, 'download', 'download');
 

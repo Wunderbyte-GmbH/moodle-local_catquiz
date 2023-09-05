@@ -173,7 +173,7 @@ class catquiz {
             SELECT
                 q.id,
                 lci.componentid,
-                qbe.idnumber,
+                qbe.idnumber as label,
                 q.name,
                 q.questiontext,
                 q.qtype,

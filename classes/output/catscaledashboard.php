@@ -254,7 +254,7 @@ class catscaledashboard implements renderable, templatable {
         $table->filteronloadinactive = true;
 
         // We use our own download logic.
-        $table->define_baseurl(new moodle_url('/local/catquiz/download.php'));
+        $table->define_baseurl(new moodle_url('/local/catquiz/downloads/download.php'));
 
         return $table->outhtml(10, true);
     }
@@ -360,7 +360,6 @@ class catscaledashboard implements renderable, templatable {
             'demofileurl' => $url->out(),
         ];
     }
-
 
     /**
      * Renders student stats table.

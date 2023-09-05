@@ -280,7 +280,7 @@ class questionsdisplay {
         $table->filteronloadinactive = true;
 
         $table->showdownloadbutton = true;
-        $table->define_baseurl(new moodle_url('/local/catquiz/download.php'));
+        $table->define_baseurl(new moodle_url('/local/catquiz/downloads/download_testitems.php'));
 
         list($idstring, $encodedtable, $html) = $table->lazyouthtml(10, true);
         return $html;

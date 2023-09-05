@@ -87,7 +87,7 @@ class testitems_table extends wunderbyte_table {
      * @return string
      */
     public function col_idnumber($values) {
-        return html_writer::tag('span', $values->idnumber, ['class' => 'badge badge-primary']);
+        return html_writer::tag('span', $values->label, ['class' => 'badge badge-primary']);
     }
 
     /**
