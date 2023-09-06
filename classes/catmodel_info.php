@@ -27,6 +27,7 @@ namespace local_catquiz;
 
 use core\task\manager;
 use local_catquiz\catcontext;
+use local_catquiz\event\calculation_executed;
 use local_catquiz\task\adhoc_recalculate_cat_model_params;
 use local_catquiz\task\recalculate_cat_model_params;
 use moodle_exception;
@@ -76,27 +77,48 @@ class catmodel_info {
      *
      */
     public function trigger_parameter_calculation($contextid, $catscaleid) {
+        global $USER;
         $adhocrecalculatecatmodelparams = new adhoc_recalculate_cat_model_params();
-        $adhocrecalculatecatmodelparams->set_custom_data([$contextid, $catscaleid]);
+        $adhocrecalculatecatmodelparams->set_custom_data([
+            'contextid' => $contextid,
+            'catscaleid' => $catscaleid,
+            'userid' => $USER->id,
+        ]);
         manager::queue_adhoc_task($adhocrecalculatecatmodelparams);
     }
 
     /**
      * Update params.
      *
-     * @param mixed $contextid
-     * @param mixed $catscaleid
+     * @param int $contextid
+     * @param int $catscaleid
+     * @param int $userid
      *
      * @return void
      *
      */
-    public function update_params($contextid, $catscaleid) {
+    public function update_params($contextid, $catscaleid, $userid = 0) {
         $context = catcontext::load_from_db($contextid);
         $strategy = $context->get_strategy($catscaleid);
         list($itemdifficulties, $personabilities) = $strategy->run_estimation();
         foreach ($itemdifficulties as $itemparamlist) {
             $itemparamlist->save_to_db($contextid);
         }
+
+        // Trigger event.
+        $event = calculation_executed::create([
+            'objectid' => $catscaleid,
+            'context' => \context_system::instance(),
+            'userid' => $userid,
+            'other' => [
+                'catscaleid' => $catscaleid,
+                'contextid' => $contextid,
+                'userid' => $userid,
+                'numberofitems' => count($itemdifficulties),
+            ]
+        ]);
+        $event->trigger();
+
         $personabilities->save_to_db($contextid, $catscaleid);
         $context->save_or_update((object)['timecalculated' => time()]);
     }

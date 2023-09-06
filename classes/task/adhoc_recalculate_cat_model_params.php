@@ -41,8 +41,8 @@ class adhoc_recalculate_cat_model_params extends \core\task\adhoc_task {
      * @return void
      */
     public function execute() {
-        [$contextid, $catscaleid] = $this->get_custom_data();
-        $cm = new catmodel_info();
-        $cm->update_params($contextid, $catscaleid);
+        $taskdata = (array) $this->get_custom_data();
+        $cmi = new catmodel_info();
+        $cmi->update_params($taskdata['contextid'], $taskdata['catscaleid'], $taskdata['userid']);
     }
 }

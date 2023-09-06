@@ -161,7 +161,8 @@ $string['create_catscale_description'] = 'CAT Context {$a} aktualisiert.';
 $string['logsafter'] = 'Logs after';
 $string['logsbefore'] = 'Logs before';
 $string['calculation_executed'] = 'Berechnung durchgeführt.';
-$string['executed_calculation_description'] = 'Es wurde eine Berechnung durchgeführt.';
+$string['executed_calculation_description'] =
+    'Es wurde eine Berechnung der CAT Skala {$a->catscalename} mit der ID {$a->catscaleid} im Kontext {$a->contextid} durchgeführt von {$a->userid}. Es wurden {$a->numberofitems} Fragen neu berechnet.';
 
 // Message.
 $string['messageprovider:catscaleupdate'] = 'Benachrichtung über eine Aktualisierung einer CAT Skala.';

@@ -67,10 +67,10 @@ class recalculate_cat_model_params extends \core\task\scheduled_task {
             ]
         );
         $catscales = catquiz::get_all_catscales();
-        $cm = new catmodel_info();
+        $cmi = new catmodel_info();
         foreach ($contexts as $context) {
             foreach ($catscales as $catscale) {
-                $cm->update_params($context->id, $catscale->id);
+                $cmi->update_params($context->id, $catscale->id);
             }
         }
     }

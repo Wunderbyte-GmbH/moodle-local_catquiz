@@ -164,7 +164,7 @@ $string['update_context_description'] = 'CAT context {$a} updated.';
 $string['logsafter'] = 'Logs after';
 $string['logsbefore'] = 'Logs before';
 $string['calculation_executed'] = 'Calculation executed.';
-$string['executed_calculation_description'] = 'A Calculation was executed.';
+$string['executed_calculation_description'] = 'A calculation was executed of catscale {$a->catscalename} with id {$a->catscaleid} in context {$a->contextid} by user {$a->userid}. {$a->numberofitems} items were recalculated.';
 
 // Message.
 $string['messageprovider:catscaleupdate'] = 'Notification of CAT scale update';
