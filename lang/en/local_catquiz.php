@@ -373,6 +373,7 @@ $string['nolabels'] = 'No column labels defined in settings object.';
 $string['checkdelimiter'] = 'Check if data is separated via the selected symbol.';
 $string['scaleinformation'] = 'The id of the CAT scale the item should be assigned to.';
 $string['scalenameinformation'] = 'The name of the CAT scale the item should be assigned to. If no catscale id given, matching is done via name.';
+$string['dataincomplete'] = 'Record with componentid {$a->id} is incomplete and could not be treated entirely. Check field "{$a->field}".';
 
 // Testenvironments table.
 $string['notifyallteachers'] = 'Notify all teachers';

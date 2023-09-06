@@ -271,14 +271,14 @@ class fileparser {
         };
         try {
             $result = $callback($data);
-            if ($result['success'] != 1) {
+            if ($result['success'] != 1 && $result['success'] != 2) {
                 return [
                     'success' => 0,
                     'message' => $result['message'],
                 ];
             } else {
                 return [
-                    'success' => 1,
+                    'success' => $result['success'],
                     'message' => $result['message'],
                 ];
             }

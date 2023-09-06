@@ -370,6 +370,14 @@ class model_item_param_list implements ArrayAccess, IteratorAggregate, Countable
         // Scale logic is in this function: get scale id and update in table.
         $newrecord = self::update_in_scale($newrecord);
 
+        if (empty($newrecord['model'])) {
+            return [
+                'success' => 2, // Update successful, but errors triggered.
+                'message' => get_string('dataincomplete', 'local_catquiz', ['id' => $newrecord['componentid'], 'field' => 'model']),
+                'recordid' => $newrecord['componentid'],
+             ];
+        }
+
         $record = $DB->get_record("local_catquiz_itemparams", [
             'componentid' => $newrecord['componentid'],
             'componentname' => $newrecord['componentname'],
