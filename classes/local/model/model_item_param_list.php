@@ -444,7 +444,7 @@ class model_item_param_list implements ArrayAccess, IteratorAggregate, Countable
         }
         $scalerecord = $DB->get_record("local_catquiz_items", [
             'componentid' => $newrecord['componentid'],
-            'componentname' => $newrecord['componentname'],
+            'status' => $newrecord['status'],
             'catscaleid' => $newrecord['catscaleid'],
         ]);
         if (!$scalerecord) {
