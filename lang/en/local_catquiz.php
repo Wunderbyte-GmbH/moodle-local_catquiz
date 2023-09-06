@@ -374,6 +374,7 @@ $string['checkdelimiter'] = 'Check if data is separated via the selected symbol.
 $string['scaleinformation'] = 'The id of the CAT scale the item should be assigned to.';
 $string['scalenameinformation'] = 'The name of the CAT scale the item should be assigned to. If no catscale id given, matching is done via name.';
 $string['dataincomplete'] = 'Record with componentid {$a->id} is incomplete and could not be treated entirely. Check field "{$a->field}".';
+$string['modelinformation'] = 'This field is necessary to entirely treat the record. If it is empty, item can only be assigned to CAT scale.';
 
 // Testenvironments table.
 $string['notifyallteachers'] = 'Notify all teachers';

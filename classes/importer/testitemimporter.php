@@ -132,6 +132,7 @@ class testitemimporter {
                 'name' => 'model',
                 'mandatory' => false,
                 'format' => 'string',
+                'importinstruction' => get_string('modelinformation', 'local_catquiz'),
             ),
             array (
                 'name' => 'difficulty',
@@ -152,7 +153,7 @@ class testitemimporter {
             array (
                 'name' => 'timecreated',
                 'mandatory' => false,
-                'type' => 'date', // Will throw warning if empty or 0.
+                'type' => 'date', // Will throw warning if not empty and not in correct format.
             ),
             array (
                 'name' => 'timemodified',
