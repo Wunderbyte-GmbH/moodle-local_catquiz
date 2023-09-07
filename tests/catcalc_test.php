@@ -177,4 +177,54 @@ class catcalc_test extends basic_testcase
             ],
         ];
     }
+
+    public function test_itemparam_jacobian_function_can_be_called() {
+        $responses = [
+            1 => [
+                'component' => [
+                    'q1' => ['fraction' => 0.0],
+                    'q2' => ['fraction' => 1.0]
+                ]
+            ],
+            2 => [
+                'component' => [
+                    'q1' => ['fraction' => 0.0],
+                    'q2' => ['fraction' => 0.0]
+                ]
+            ],
+            3 => [
+                'component' => [
+                    'q1' => ['fraction' => 1.0],
+                    'q2' => ['fraction' => 1.0]
+                ]
+            ],
+            4 => [
+                'component' => [
+                    'q1' => ['fraction' => 1.0],
+                    'q2' => ['fraction' => 0.0]
+                ]
+            ],
+        ];
+        $userabilities = [
+            1 => 0.5,
+            2 => -1,
+            3 => 2.3,
+            4 => 0.7,
+        ];
+        $itemresponses = [];
+        foreach ($userabilities as $userid => $ability) {
+            foreach (['q1', 'q2'] as $qid) {
+                $ir = new model_item_response(
+                    $responses[$userid]['component'][$qid]['fraction'],
+                    $ability
+                );
+                $itemresponses[] = $ir;
+            }
+        }
+        $model = new raschbirnbauma(model_responses::create_from_array($responses), 'raschbirnbauma');
+        $jacobian = catcalc::build_itemparam_jacobian($itemresponses, $model);
+        $result = $jacobian(['difficulty' => 0.5]);
+        $this->assertIsArray($result);
+        $this->assertIsFloat(reset($result));
+    }
 }
