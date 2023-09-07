@@ -25,6 +25,7 @@
 
 namespace local_catquiz;
 
+use Closure;
 use local_catquiz\local\model\model_item_param_list;
 use local_catquiz\local\model\model_model;
 use local_catquiz\local\model\model_strategy;
@@ -121,7 +122,7 @@ class catcalc {
             $loglikelihood2ndderivative = fn ($x) => $loglikelihood2ndderivative($x) + $loglikelihood2ndderivativepart($x);
         }
 
-        return mathcat::newton_raphson_multi_stable(
+        $result = mathcat::newton_raphson_multi_stable(
             $loglikelihood1stderivative,
             $loglikelihood2ndderivative,
             [0.1],
@@ -129,16 +130,8 @@ class catcalc {
             50
             //fn ($ip) => $model::restrict_to_trusted_region($ip)
         );
-        $retval = mathcat::newtonraphson_stable(
-            $loglikelihood1stderivative,
-            $loglikelihood2ndderivative,
-            0,
-            0.001,
-            1500,
-            PERSONABILITY_MAX
-        );
 
-        return $retval;
+        return reset($result);
     }
 
     /**
@@ -161,19 +154,8 @@ class catcalc {
         $startarr = ['difficulty' => 0.50, 'discrimination' => 1.0, 'guessing' => 0.25];
         $z_0 = array_slice($startarr, 0, $modeldim - 1);
     
-        // Define Jacobi vector (1st derivative) and Hesse matrix (2nd derivative) of the Log Likelihood.
-        $jacobian = []; $hessian = [];
-        
-        foreach ($itemresponse as $r) {
-            $jacobian[] = fn($ip) => $model::get_log_jacobian($r->get_ability(), $r->get_response());
-            $hessian[] = fn($ip) => $model::get_log_hessian($r->get_ability(), $r->get_response());
-        }
-    
-        $jacobian = self::build_callable_array($jacobian);
-        $jacobian = fn ($ip) => matrixcat::multi_sum($jacobian($ip));
-            
-        $hessian = self::build_callable_array($hessian);
-        $hessian = fn ($ip) => matrixcat::multi_sum($hessian($ip));
+        $jacobian = self::build_itemparam_jacobian($itemresponse, $model);
+        $hessian = self::build_itemparam_hessian($itemresponse, $model);
 
         // Estimate item parameters via Newton-Raphson algorithm.
         return mathcat::newton_raphson_multi_stable(
@@ -188,13 +170,55 @@ class catcalc {
     // @ DAVID: Falls noch nirgendwo implementiert:
 
     /**
+     * Builds the jacobian function for item params and the given model. 
+     * 
+     * @param array $itemresponse 
+     * @param mixed $model 
+     * @return Closure(mixed $ip): mixed 
+     */
+    public static function build_itemparam_jacobian(array $itemresponse, catcalc_item_estimator $model) {
+        // Define Jacobi vector (1st derivative) of the Log Likelihood.
+        $funs = [];
+        
+        foreach ($itemresponse as $r) {
+            $funs[] = fn($ip) => $model::get_log_jacobian($r->get_ability(), $r->get_response())($ip);
+        }
+    
+        $jacobian = fn ($ip) => self::build_callable_array($funs)($ip); // from [fn($x), fn($x),...] to fn($x): [...]
+        $jacobian = matrixcat::multi_sum($jacobian);
+
+        return $jacobian;
+    }
+
+    /**
+     * Builds the hessian function for item params and the given model.
+     * 
+     * @param array $itemresponse 
+     * @param mixed $model 
+     * @return Closure(mixed $ip): mixed 
+     */
+    public static function build_itemparam_hessian(array $itemresponse, $model) {
+        // Define Hesse matrix (2nd derivative) of the Log Likelihood.
+        $hessian = [];
+        
+        foreach ($itemresponse as $r) {
+            $hessian[] = fn($ip) => $model::get_log_hessian($ip, $r->get_response());
+        }
+            
+        $hessian = self::build_callable_array($hessian);
+        $hessian = fn ($ip) => matrixcat::multi_sum($hessian($ip));
+
+        return $hessian;
+    }
+
+    /**
      * Re-Builds an Array of Callables into a Callable that delivers an Array
      *
      * @param array<callable> $fn_function
      * @return callable<array>
      */
     public static function build_callable_array ($fn_function) {
-        return function($x) use($fn_function) {
+        return function($x) use ($fn_function) {
             foreach ($fn_function as $key => $f) {
             	$fn_function[$key] = $f($x);
             }
