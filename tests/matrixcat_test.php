@@ -112,6 +112,7 @@ class matrixcat_test extends basic_testcase
             'callables_2' => [
                 'expected' => [5, 10, 15],
                 'a' => [fn ($x) => 1 * $x, fn ($x) => 2 * $x, fn ($x) => 3 * $x],
+                'options' => ['callable_arg' => 5],
             ]
         ];
     }

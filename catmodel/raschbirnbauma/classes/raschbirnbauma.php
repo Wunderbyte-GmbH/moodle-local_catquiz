@@ -144,14 +144,14 @@ class raschbirnbauma extends model_raschmodel {
     /**
      * Calculates the 2nd derivative of the LOG Likelihood with respect to the person ability parameter
      *
-     * @param float $pp - person ability parameter
+     * @param array<float> $pp - person ability parameter
      * @param array $ip - item parameters ('difficulty')
      * @param float $k - answer category (0 or 1.0)
      * @return float
      */
     public static function log_likelihood_p_p($pp, array $ip, float $k): float {
         $a = $ip['difficulty'];
-        return - (exp($a + $pp) / ((exp($a) + exp($pp)) ** 2));
+        return - (exp($a + $pp[0]) / ((exp($a) + exp($pp[0])) ** 2));
     }
 
     /**
