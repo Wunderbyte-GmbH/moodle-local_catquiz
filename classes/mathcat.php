@@ -495,7 +495,12 @@ class mathcat {
             $mx_derivative =  new matrix($val_derivative);
             
             $mx_function = $mx_function->transpose(); 
-            // TODO: handle case where this does not work (determinant is 0).
+            
+            // If the determinant is null, we already found the value.
+            if ($mx_derivative->determinant() == 0) {
+                return array_combine($parameter_names, $parameter);
+            }
+
             $mx_derivative_inv = $mx_derivative->inverse();
             
             // Calculate the new point $mx_parameter as well as the distance 
