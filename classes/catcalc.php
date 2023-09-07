@@ -214,15 +214,15 @@ class catcalc {
     /**
      * Re-Builds an Array of Callables into a Callable that delivers an Array
      *
-     * @param array<callable> $fn_function
-     * @return callable<array>
+     * @param array<callable> $functions
+     * @return Closure(mixed $x): array
      */
-    public static function build_callable_array ($fn_function) {
-        return function($x) use ($fn_function) {
-            foreach ($fn_function as $key => $f) {
-            	$fn_function[$key] = $f($x);
+    public static function build_callable_array ($functions) {
+        return function($x) use ($functions) {
+            foreach ($functions as $key => $f) {
+            	$functions[$key] = $f($x);
             }
-        	return $fn_function;
+        	return $functions;
         };
     }
 }
