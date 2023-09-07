@@ -227,4 +227,17 @@ class catcalc_test extends basic_testcase
         $this->assertIsArray($result);
         $this->assertIsFloat(reset($result));
     }
+
+    public function test_build_callable_array_works_as_expected() {
+        $inarray = [
+            fn ($x) => $x,
+            fn ($x) => 2 * $x,
+            fn ($x) => 3 * $x,
+            fn () => 4,
+        ];
+
+        $result = catcalc::build_callable_array($inarray);
+        $this->assertEquals(fn ($x) => [$x, 2* $x, 3 * $x, 4], $result);
+        $this->assertEquals($result(1), [1, 2, 3, 4]);
+    }
 }
