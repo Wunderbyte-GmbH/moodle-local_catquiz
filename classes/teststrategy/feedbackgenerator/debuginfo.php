@@ -89,7 +89,7 @@ class debuginfo extends feedbackgenerator {
 
             $data[] = [
                 'userid' => $context['userid'],
-                'attemptid' => $context['testid'],
+                'attemptid' => $context['attemptid'],
                 'questionsattempted' => $context['questionsattempted'],
                 'timestamp' => $context['timestamp'],
                 'contextid' => $context['contextid'],
