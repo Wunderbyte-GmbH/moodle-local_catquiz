@@ -91,7 +91,7 @@ final class firstquestionselector extends preselect_task implements wb_middlewar
      * @return result
      *
      */
-    public function run(array $context, callable $next): result {
+    public function run(array &$context, callable $next): result {
         // Don't do anything if this is not the first question of the current attempt.
         $cache = cache::make('local_catquiz', 'adaptivequizattempt');
         if (!$cache->get('isfirstquestionofattempt')) {

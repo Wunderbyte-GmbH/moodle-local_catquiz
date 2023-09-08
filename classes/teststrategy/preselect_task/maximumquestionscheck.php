@@ -47,7 +47,7 @@ final class maximumquestionscheck extends preselect_task implements wb_middlewar
      * @return result
      *
      */
-    public function run(array $context, callable $next): result {
+    public function run(array &$context, callable $next): result {
         if ($context['questionsattempted'] >= $context['maximumquestions']) {
             return result::err(status::ERROR_REACHED_MAXIMUM_QUESTIONS);
         }

@@ -46,7 +46,7 @@ final class remove_uncalculated extends preselect_task implements wb_middleware 
      * @return result
      *
      */
-    public function run(array $context, callable $next): result {
+    public function run(array &$context, callable $next): result {
         $context['questions'] = array_filter(
             $context['questions'],
             fn($item) => !is_null($item->model)

@@ -46,7 +46,7 @@ final class strategyrandom extends preselect_task implements wb_middleware {
      * @return result
      *
      */
-    public function run(array $context, callable $next): result {
+    public function run(array &$context, callable $next): result {
         shuffle($context['questions']);
         return result::ok(reset($context['questions']));
     }

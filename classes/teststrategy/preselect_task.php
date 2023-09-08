@@ -54,13 +54,14 @@ abstract class preselect_task implements wb_middleware {
      * @return result
      *
      */
-    public function process(array $context, callable $next): result {
+    public function process(array &$context, callable $next): result {
         foreach ($this->get_required_context_keys() as $key) {
             if (!array_key_exists($key, $context)) {
                 return result::err(status::ERROR_FETCH_NEXT_QUESTION);
             }
         }
 
+        $context['lastmiddleware'] = str_replace(__NAMESPACE__ . '\\preselect_task\\', '', get_class($this));
         return $this->run($context, $next);
     }
 
@@ -74,7 +75,7 @@ abstract class preselect_task implements wb_middleware {
      * @param callable $next Callable that calls the next middleware
      * @return result
      */
-    abstract public function run(array $context, callable $next): result;
+    abstract public function run(array &$context, callable $next): result;
 
     /**
      * If a middleware requires a specific key to be available in the $context

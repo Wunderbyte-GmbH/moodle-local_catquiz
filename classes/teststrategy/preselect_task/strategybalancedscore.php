@@ -48,7 +48,7 @@ final class strategybalancedscore extends preselect_task implements wb_middlewar
      * @return result
      *
      */
-    public function run(array $context, callable $next): result {
+    public function run(array &$context, callable $next): result {
         foreach ($context['questions'] as $question) {
             $lasttimeplayedpenaltyweighted = (1 - (
                $question->lasttimeplayedpenalty / $context['penalty_threshold']));

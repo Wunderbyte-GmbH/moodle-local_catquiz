@@ -49,7 +49,7 @@ class filterforsubscale extends preselect_task implements wb_middleware {
      * @return result
      *
      */
-    public function run(array $context, callable $next): result {
+    public function run(array &$context, callable $next): result {
         $abilities = $context['person_ability'];
 
         if (! in_array($context['teststrategy'], [STRATEGY_LOWESTSUB, STRATEGY_HIGHESTSUB])) {

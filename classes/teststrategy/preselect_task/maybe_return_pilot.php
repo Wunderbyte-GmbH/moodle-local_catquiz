@@ -47,7 +47,7 @@ final class maybe_return_pilot extends preselect_task implements wb_middleware {
      * @return result
      *
      */
-    public function run(array $context, callable $next): result {
+    public function run(array &$context, callable $next): result {
         if ($context['pilot_ratio'] === 0) {
             return $next($context);
         }

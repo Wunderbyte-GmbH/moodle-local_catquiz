@@ -48,7 +48,7 @@ final class strategyfastestscore extends preselect_task implements wb_middleware
      * @return result
      *
      */
-    public function run(array $context, callable $next): result {
+    public function run(array &$context, callable $next): result {
         foreach ($context['questions'] as $question) {
             $question->score = (1 - (
                 $question->lasttimeplayedpenalty / $context['penalty_threshold']))

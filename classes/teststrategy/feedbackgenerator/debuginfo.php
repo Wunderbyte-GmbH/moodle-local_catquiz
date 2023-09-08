@@ -100,6 +100,7 @@ class debuginfo extends feedbackgenerator {
                 'active_scales' => '"' . implode(", ", array_map(fn ($catscale) => $catscale->name, $catscales)) . '"',
                 'lastquestion' => (array) $context['lastquestion'],
                 'selectedscale' => $selectedscale,
+                'lastmiddleware' => $context['lastmiddleware'],
             ];
         }
         global $OUTPUT;
