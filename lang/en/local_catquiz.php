@@ -58,6 +58,8 @@ $string['passinglevel'] = 'Passing level in %';
 $string['passinglevel_help'] = 'There is a level of personal competency that can be set for the test.';
 $string['pilotratio'] = 'Rate of pilot questions';
 $string['pilotratio_help'] = 'Floating point number that specifies how often pilot questions should be displayed. When a value of 0.5 is specified, then on average every second attempt will display a pilot question.';
+$string['pilotattemptsthreshold'] = 'Pilotquestion attempt threshold';
+$string['pilotattemptsthreshold_help'] = 'Questions with less attempts will be considered pilot questions';
 $string['includepilotquestions'] = 'Include pilot questions in the quiz';
 
 $string['timepacedtest'] = 'Timepaced test';

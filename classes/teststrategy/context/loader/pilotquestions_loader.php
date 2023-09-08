@@ -35,13 +35,6 @@ use local_catquiz\teststrategy\context\contextloaderinterface;
 class pilotquestions_loader implements contextloaderinterface {
 
     /**
-     * Question with less attempts will be considered pilot questions.
-     *
-     * @var int
-     */
-    const ATTEMPTS_THRESHOLD = 10;
-
-    /**
      * Returns array ['pilot_questions'].
      *
      * @return array
@@ -61,6 +54,7 @@ class pilotquestions_loader implements contextloaderinterface {
         return [
             'questions',
             'pilot_ratio',
+            'pilot_attempts_threshold'
         ];
     }
 
@@ -74,7 +68,7 @@ class pilotquestions_loader implements contextloaderinterface {
      */
     public function load(array $context): array {
         foreach ($context['questions'] as $question) {
-            $question->is_pilot = $this->ispilot($question);
+            $question->is_pilot = $this->ispilot($question, $context['pilot_attempts_threshold']);
         }
         return $context;
     }
@@ -85,11 +79,11 @@ class pilotquestions_loader implements contextloaderinterface {
      * @param \stdClass $question
      * @return bool
      */
-    public function ispilot(\stdClass $question): bool {
+    public function ispilot(\stdClass $question, int $attemptsthreshold): bool {
         if (
             floatval($question->difficulty)
             && (intval($question->status) >= STATUS_UPDATED_MANUALLY
-                || intval($question->attempts) >= self::ATTEMPTS_THRESHOLD
+                || intval($question->attempts) >= $attemptsthreshold
             )
         ) {
             return false;

@@ -548,6 +548,7 @@ class catquiz_handler {
                  */
             'penalty_time_range' => 60 * 60 * 24 * 30,
             'pilot_ratio' => $pilotratio ?? 0,
+            'pilot_attempts_threshold' => intval($quizsettings->catquiz_pilotattemptsthreshold),
             'questionsattempted' => intval($attemptdata->questionsattempted),
             'selectfirstquestion' => $quizsettings->catquiz_selectfirstquestion,
             'skip_reason' => null,
