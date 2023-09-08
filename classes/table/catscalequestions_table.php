@@ -299,5 +299,15 @@ class catscalequestions_table extends wunderbyte_table {
             'message' => get_string('success'),
         ];
     }
+    /**
+     * Return strings for column type.
+     *
+     * @param \stdClass $values
+     * @return string
+     */
+    public function col_parentscalenames($values) {
+
+        return "parentscaleid";
+    }
 
 }

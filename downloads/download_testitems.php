@@ -56,6 +56,7 @@ $columnstoinclude = [
     'status' => get_string('status'),
     'catscaleid' => get_string('catscaleid', 'local_catquiz'),
     'catscalename' => 'catscalename',
+    'parentscalenames' => 'parentscalenames',
 ];
 
 foreach ($table->columns as $key => $value) {
