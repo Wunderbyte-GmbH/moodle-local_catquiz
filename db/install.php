@@ -78,3 +78,16 @@ function xmldb_local_catquiz_install() {
 
     return true;
 }
+
+function add_link_to_catmanager() {
+    global $CFG;
+
+    $custommenu = $CFG->custommenuitems;
+
+    $catquiz = get_string('catmanager', 'local_catquiz') . "|/local/catquiz/manage_catscales.php";
+
+    if (!strpos($custommenu, $catquiz)) {
+        $custommenu .= PHP_EOL . $catquiz;
+        set_config('custommenuitems', $custommenu);
+    }
+}
