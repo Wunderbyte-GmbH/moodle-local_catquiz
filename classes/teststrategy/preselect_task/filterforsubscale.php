@@ -94,6 +94,7 @@ class filterforsubscale extends preselect_task implements wb_middleware {
             $questions = array_filter($context['questions'], fn ($q) => $q->catscaleid == $catscaleid);
             if (count($questions) > 0) {
                 $context['questions'] = $questions;
+                $context['selected_catscale'] = $catscaleid;
                 return $next($context);
             } 
         }
