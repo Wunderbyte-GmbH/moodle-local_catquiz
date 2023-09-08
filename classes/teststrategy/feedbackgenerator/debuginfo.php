@@ -53,7 +53,7 @@ class debuginfo extends feedbackgenerator {
 
         $teststrategies = info::return_available_strategies();
         $teststrategy = array_filter($teststrategies, fn ($t) => $t->id == $cachedcontexts[0]['teststrategy']);
-        $reflect = new \ReflectionClass($teststrategy[0]);
+        $reflect = new \ReflectionClass($teststrategy[array_key_first($teststrategy)]);
 
 
         // Each cachedcontext corresponds to one question attempt.

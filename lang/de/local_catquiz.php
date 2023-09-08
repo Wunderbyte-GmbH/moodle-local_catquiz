@@ -57,6 +57,8 @@ $string['passinglevel'] = 'Bestehensgrenze in %';
 $string['passinglevel_help'] = 'Die Bestehensgenze bezieht sich auf die Personenkompetenz und kann für jeden Test individuell gesetzt werden.';
 $string['pilotratio'] = 'Verhältnis von Pilotfragen';
 $string['pilotratio_help'] = 'Gleitkommazahl für das Verhältnis von Pilotfragen. Bei einem Wert von 0.5 wird im Schnitt bei jedem zweiten Versuch eine Pilotfrage angezeigt.';
+$string['pilotattemptsthreshold'] = 'Schwellenwert der Versuche für Pilotfragen';
+$string['pilotattemptsthreshold_help'] = 'Fragen mit weniger Versuchen werden als Pilotfragen klassifiziert';
 $string['includepilotquestions'] = 'Pilotfragen anzeigen';
 
 $string['timepacedtest'] = 'Zeitbeschränkungen für den Test aktivieren';

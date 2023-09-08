@@ -137,6 +137,14 @@ class info {
         $mform->setType('catquiz_pilotratio', PARAM_FLOAT);
         $mform->addHelpButton('catquiz_pilotratio', 'pilotratio', 'local_catquiz');
 
+        // Add attempts threshold for pilot questions.
+        $elements[] = $mform->addElement('text', 'catquiz_pilotattemptsthreshold', get_string('pilotattemptsthreshold', 'local_catquiz'));
+        $mform->hideIf('catquiz_pilotattemptsthreshold', 'catquiz_includepilotquestions', 'neq', 1);
+        $mform->hideIf('catquiz_pilotattemptsthreshold', 'catquiz_selectteststrategy', 'eq', $strategieswithoutpilotquestions);
+        $mform->setType('catquiz_pilotattemptsthreshold', PARAM_INT);
+        $mform->addHelpButton('catquiz_pilotattemptsthreshold', 'pilotattemptsthreshold', 'local_catquiz');
+        $mform->setDefault('catquiz_pilotattemptsthreshold', 30);
+
         $elements[] = $mform->addElement('select', 'catquiz_selectfirstquestion',
             get_string('catquiz_selectfirstquestion', 'local_catquiz'),
             [
