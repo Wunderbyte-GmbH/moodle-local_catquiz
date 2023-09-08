@@ -28,18 +28,11 @@ var SELECTORS = {
 
 export const init = (itemid, area) => {
 
-    // eslint-disable-next-line no-console
-    console.log('subscribe', itemid, area);
-
     const selector = SELECTORS.SUBSCRIBEBUTTON +
     '[data-id="' + itemid + '"]' +
     '[data-area="' + area + '"]';
 
     const buttons = document.querySelectorAll(selector);
-
-
-    // eslint-disable-next-line no-console
-    console.log(selector, buttons);
 
     if (!buttons) {
         return;
@@ -47,9 +40,6 @@ export const init = (itemid, area) => {
 
     // We support more than one booking button on the same page.
     buttons.forEach(button => {
-
-        // eslint-disable-next-line no-console
-        console.log('add click listener ', button);
         if (!button.dataset.initialized) {
             button.dataset.initialized = 'true';
 
@@ -82,9 +72,6 @@ function toggleSubscription(itemid, area, userid) {
         },
         done: function(res) {
 
-            // eslint-disable-next-line no-console
-            console.log(res);
-
             const data = {
                 id: itemid,
                 area: area,
@@ -94,7 +81,7 @@ function toggleSubscription(itemid, area, userid) {
                 data.subscribed = 'true';
             }
 
-            // We render for promice for all the containers.
+            // We render for promise for all the containers.
             Templates.renderForPromise('local_catquiz/buttons/button_subscribe', data).then(({html, js}) => {
 
                 const selector = SELECTORS.SUBSCRIBEBUTTON +
