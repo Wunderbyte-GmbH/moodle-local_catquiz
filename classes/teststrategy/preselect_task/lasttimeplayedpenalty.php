@@ -47,7 +47,7 @@ final class lasttimeplayedpenalty extends preselect_task implements wb_middlewar
      * @return result
      *
      */
-    public function run(array $context, callable $next): result {
+    public function run(array &$context, callable $next): result {
         $now = time();
         $context['questions'] = array_map(function($q) use ($now, $context) {
             $q->lasttimeplayedpenalty = $this->get_penalty($q, $now, $context['penalty_time_range']);

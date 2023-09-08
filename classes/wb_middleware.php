@@ -44,5 +44,5 @@ interface wb_middleware {
      * @return result
      *
      */
-    public function process(array $context, callable $next): result;
+    public function process(array &$context, callable $next): result;
 }

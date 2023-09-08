@@ -36,7 +36,7 @@
     }
 }}
 
-userid;attemptid;questionsattempted;timestamp;contextid;catscale;teststrategy;personabilities;lastquestion;questions;active_scales;selectedscale<br>
+userid;attemptid;questionsattempted;timestamp;contextid;catscale;teststrategy;personabilities;lastquestion;questions;active_scales;selectedscale;lastmiddleware<br>
 {{#data}}
     {{ userid }}
     ;{{ attemptid }}
@@ -51,5 +51,6 @@ userid;attemptid;questionsattempted;timestamp;contextid;catscale;teststrategy;pe
         "id: {{id}}, type: {{type}}, fisherinformation: {{fisherinformation}}, score: {{score}}"{{^last}},{{/last}}
     {{/questions}}
     ;{{ active_scales }}
-    ;{{ selectedscale}}<br>
+    ;{{ selectedscale }}
+    ;{{ lastmiddleware }}<br>
 {{/data}}

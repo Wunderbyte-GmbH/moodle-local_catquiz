@@ -54,7 +54,7 @@ final class playedincurrentattempt extends preselect_task implements wb_middlewa
      * @return result
      *
      */
-    public function run(array $context, callable $next): result {
+    public function run(array &$context, callable $next): result {
         $cache = cache::make('local_catquiz', 'adaptivequizattempt');
         $playedquestions = $cache->get('playedquestions') ?: [];
         foreach ($context['questions'] as $q) {

@@ -67,7 +67,7 @@ class updatepersonability extends preselect_task implements wb_middleware {
      * @return result
      *
      */
-    public function run(array $context, callable $next): result {
+    public function run(array &$context, callable $next): result {
         global $CFG, $USER;
         $lastquestion = $context['lastquestion'];
         // If we do not know the answer to the last question, we do not have to

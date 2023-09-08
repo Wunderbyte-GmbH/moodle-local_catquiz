@@ -45,7 +45,7 @@ class wb_middleware_runner {
      * @return mixed
      *
      */
-    public static function run(array $middlewares, array $context, $action = null) {
+    public static function run(array $middlewares, array &$context, $action = null) {
         global $CFG;
         $cache = null;
         if ($CFG->debug > 0) {
@@ -64,13 +64,14 @@ class wb_middleware_runner {
                     sprintf('Class %s does not implement the wb_middleware interface', get_class($middleware))
                 );
             }
-            $action = function (array $context) use ($action, $middleware, $cache): result {
+            $action = function (array &$context) use ($action, $middleware, $cache): result {
+                $result = $middleware->process($context, $action);
                 if ($cache) {
                     $cachedcontexts = $cache->get('context') ?: [];
                     $cachedcontexts[$context['questionsattempted']] = $context;
                     $cache->set('context', $cachedcontexts);
                 }
-                return $middleware->process($context, $action);
+                return $result;
             };
         }
 

@@ -57,7 +57,7 @@ final class numberofgeneralattempts extends preselect_task implements wb_middlew
      * @return result
      *
      */
-    public function run(array $context, callable $next): result {
+    public function run(array &$context, callable $next): result {
         global $DB;
 
         $sql = "SELECT questionid, COUNT(*) AS count

@@ -47,7 +47,7 @@ final class fisherinformation extends preselect_task implements wb_middleware {
      * @return result
      *
      */
-    public function run(array $context, callable $next): result {
+    public function run(array &$context, callable $next): result {
         foreach ($context['questions'] as $item) {
             if (!array_key_exists($item->model, $context['installed_models'])) {
                 throw new moodle_exception('missingmodel', 'local_catquiz');

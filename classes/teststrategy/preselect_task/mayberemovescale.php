@@ -46,7 +46,7 @@ final class mayberemovescale extends preselect_task implements wb_middleware {
      * @return result
      *
      */
-    public function run(array $context, callable $next): result {
+    public function run(array &$context, callable $next): result {
         $cache = cache::make('local_catquiz', 'adaptivequizattempt');
         $played = $cache->get('playedquestionsperscale') ?: [];
         if (count($played) === 0) {
