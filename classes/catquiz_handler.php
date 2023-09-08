@@ -556,6 +556,7 @@ class catquiz_handler {
             'max_attempts_per_scale' => 10, // TODO: configure via quiz settings
             'teststrategy' => $quizsettings->catquiz_selectteststrategy,
             'timestamp' => time(),
+            'attemptid' => intval($attemptdata->id),
         ];
         return $contextcreator->load(
             [
