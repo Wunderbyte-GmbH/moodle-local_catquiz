@@ -300,14 +300,15 @@ class catscalequestions_table extends wunderbyte_table {
         ];
     }
     /**
-     * Return strings for column type.
+     * Return string of parentscale like "childscale|parentscale|grandparentscale".
      *
      * @param \stdClass $values
      * @return string
      */
     public function col_parentscalenames($values) {
 
-        return "parentscaleid";
+        $ancestors = catscale::get_ancestors($values->catscaleid, true);
+        return implode('|', $ancestors);
     }
 
 }

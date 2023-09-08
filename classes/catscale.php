@@ -391,10 +391,16 @@ class catscale {
      * @return null|array
      * @throws dml_exception
      */
-    public static function get_ancestors(int $catscaleid) {
+    public static function get_ancestors(int $catscaleid, bool $returnnames = false) {
         global $DB;
-        $all = $DB->get_records("local_catquiz_catscales", null, "", "id, parentid");
-        return self::add_parentscales($catscaleid, $all);
+        $all = $DB->get_records("local_catquiz_catscales", null, "", "id, parentid, name");
+        $ancestorsintarray = self::add_parentscales($catscaleid, $all);
+        if (!$returnnames) {
+            return $ancestorsintarray;
+        } else {
+            return array_map(fn($a) => $all[$a]->name, $ancestorsintarray);
+        }
+
     }
 
     /**
