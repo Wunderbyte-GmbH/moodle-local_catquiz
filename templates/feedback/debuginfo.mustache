@@ -32,10 +32,11 @@
         'questions' => [{"id": 1, "score": 0.3}, {"id": 2, "score", 0.01}],
         'active_scales' => ["scale1", "scale2", "scale3"]
         'lastquestion' => {"id": 1, "score": 1.2},
+        'selectedscale' => "Deutsch"
     }
 }}
 
-userid;attemptid;questionsattempted;timestamp;contextid;catscale;teststrategy;personabilities;lastquestion;questions;active_scales<br>
+userid;attemptid;questionsattempted;timestamp;contextid;catscale;teststrategy;personabilities;lastquestion;questions;active_scales;selectedscale<br>
 {{#data}}
     {{ userid }}
     ;{{ attemptid }}
@@ -49,5 +50,6 @@ userid;attemptid;questionsattempted;timestamp;contextid;catscale;teststrategy;pe
     ;{{#questions}}
         "id: {{id}}, type: {{type}}, fisherinformation: {{fisherinformation}}, score: {{score}}"{{^last}},{{/last}}
     {{/questions}}
-    ;{{ active_scales }}<br>
+    ;{{ active_scales }}
+    ;{{ selectedscale}}<br>
 {{/data}}

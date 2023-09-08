@@ -83,6 +83,10 @@ class debuginfo extends feedbackgenerator {
             }
             $questions[array_key_last($questions)]['last'] = true;
 
+            $selectedscale = isset($context['selected_catscale'])
+                ? $catscales[$context['selected_catscale']]->name
+                : "NA";
+
             $data[] = [
                 'userid' => $context['userid'],
                 'attemptid' => $context['testid'],
@@ -95,6 +99,7 @@ class debuginfo extends feedbackgenerator {
                 'questions' => $questions,
                 'active_scales' => '"' . implode(", ", array_map(fn ($catscale) => $catscale->name, $catscales)) . '"',
                 'lastquestion' => (array) $context['lastquestion'],
+                'selectedscale' => $selectedscale,
             ];
         }
         global $OUTPUT;
