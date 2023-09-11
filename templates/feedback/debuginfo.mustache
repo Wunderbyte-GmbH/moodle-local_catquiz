@@ -36,7 +36,7 @@
     }
 }}
 
-userid;attemptid;questionsattempted;timestamp;contextid;catscale;teststrategy;personabilities;lastquestion;questions;active_scales;selectedscale;lastmiddleware<br>
+userid;attemptid;questionsattempted;timestamp;contextid;catscale;teststrategy;personabilities;lastquestion;questions;active_scales;selectedscale;lastmiddleware;updateabilityfallback;excluded subscales;lastresponse<br>
 {{#data}}
     {{ userid }}
     ;{{ attemptid }}
@@ -46,11 +46,14 @@ userid;attemptid;questionsattempted;timestamp;contextid;catscale;teststrategy;pe
     ;{{ catscale }}
     ;{{ teststrategy }}
     ;{{ personabilities }}
-    ;{{#lastquestion}}"id: {{ id }}, score: {{ score }}"{{/lastquestion}}{{^lastquestion}}NA{{/lastquestion}}
+    ;{{#lastquestion}}"id: {{ id }}, score: {{ score }}, fisherinformation: {{#fisherinformation}}{{fisherinformation}}{{/fisherinformation}}{{^fisherinformation}}NA{{/fisherinformation}}, lasttimeplayedpenalty: {{#lasttimeplayedpenalty}}{{lasttimeplayedpenalty}}{{/lasttimeplayedpenalty}}{{^lasttimeplayedpenalty}}NA{{/lasttimeplayedpenalty}}, difficulty: {{difficulty}}, fraction: {{fraction}}"{{/lastquestion}}{{^lastquestion}}NA{{/lastquestion}}
     ;{{#questions}}
         "id: {{id}}, type: {{type}}, fisherinformation: {{fisherinformation}}, score: {{score}}"{{^last}},{{/last}}
     {{/questions}}
     ;{{ active_scales }}
     ;{{ selectedscale }}
-    ;{{ lastmiddleware }}<br>
+    ;{{ lastmiddleware }}
+    ;{{ updateabilityfallback }}
+    ;{{ excludedsubscales }}
+    ;{{ lastresponse }}<br>
 {{/data}}
