@@ -25,6 +25,7 @@
 namespace local_catquiz\teststrategy\feedbackgenerator;
 
 use cache;
+use context_system;
 use local_catquiz\catquiz;
 use local_catquiz\teststrategy\feedbackgenerator;
 use local_catquiz\teststrategy\info;
@@ -39,10 +40,7 @@ use local_catquiz\teststrategy\info;
 class debuginfo extends feedbackgenerator {
     protected function run(array $context): array {
         if (! $this->has_permissions()) {
-            return [
-                'heading' => $this->get_heading(),
-                'content' => 'No permission to view debug info',
-            ];
+            return [];
         }
 
         $cache = cache::make('local_catquiz', 'adaptivequizattempt');
@@ -128,8 +126,9 @@ class debuginfo extends feedbackgenerator {
     }
 
     private function has_permissions() {
-        // TODO: implement.
-        return true;
+        return has_capability(
+            'local/catquiz:view_debug_info', context_system::instance()
+        );
     }
 
     private function get_question_details(array $context) {
