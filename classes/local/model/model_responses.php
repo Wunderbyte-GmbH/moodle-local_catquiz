@@ -214,7 +214,19 @@ class model_responses {
         return floatval($this->data[$personid]['component'][$itemid]['fraction']);
     }
 
+    /**
+     * Returns the last response of the given user.
+     *
+     * @param int $userid
+     * @return ?mixed
+     */
     public function get_last_response(int $userid) {
+        if (! array_key_exists($userid, $this->data)
+            || ! array_key_exists('component', $this->data[$userid])
+        ) {
+            return null;
+        }
+
         $responsesbyuser = $this->data[$userid]['component'];
         return $responsesbyuser[array_key_last($responsesbyuser)];
     }
