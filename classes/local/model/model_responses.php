@@ -213,4 +213,9 @@ class model_responses {
         }
         return floatval($this->data[$personid]['component'][$itemid]['fraction']);
     }
+
+    public function get_last_response(int $userid) {
+        $responsesbyuser = $this->data[$userid]['component'];
+        return $responsesbyuser[array_key_last($responsesbyuser)];
+    }
 }

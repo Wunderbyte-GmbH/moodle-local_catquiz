@@ -87,6 +87,10 @@ class debuginfo extends feedbackgenerator {
                 ? $catscales[$context['selected_catscale']]->name
                 : "NA";
 
+            $lastresponse = isset($context['lastresponse'])
+                ? $context['lastresponse']['fraction']
+                : "NA";
+
             $data[] = [
                 'userid' => $context['userid'],
                 'attemptid' => $context['attemptid'],
@@ -101,6 +105,9 @@ class debuginfo extends feedbackgenerator {
                 'lastquestion' => (array) $context['lastquestion'],
                 'selectedscale' => $selectedscale,
                 'lastmiddleware' => $context['lastmiddleware'],
+                'updateabilityfallback' => $context['updateabilityfallback'],
+                'excludedsubscales' => implode(',', $context['excludedsubscales']),
+                'lastresponse' => $lastresponse,
             ];
         }
         global $OUTPUT;

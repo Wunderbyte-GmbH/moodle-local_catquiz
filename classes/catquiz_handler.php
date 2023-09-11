@@ -557,6 +557,8 @@ class catquiz_handler {
             'teststrategy' => $quizsettings->catquiz_selectteststrategy,
             'timestamp' => time(),
             'attemptid' => intval($attemptdata->id),
+            'updateabilityfallback' => false,
+            'excludedsubscales' => [],
         ];
         return $contextcreator->load(
             [
