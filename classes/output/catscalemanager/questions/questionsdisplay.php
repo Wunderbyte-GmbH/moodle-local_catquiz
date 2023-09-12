@@ -218,11 +218,25 @@ class questionsdisplay {
         $table->define_columns(array_keys($columnsarray));
         $table->define_headers(array_values($columnsarray));
 
-        $table->define_fulltextsearchcolumns(['idnumber', 'name', 'qtype', 'model', 'lastattempttime']);
+        $table->define_fulltextsearchcolumns([
+            'idnumber',
+            'name',
+            'questiontext',
+            'qtype',
+            'model',
+            'lastattempttime']);
 
         $sortcolumns = $columnsarray;
         unset($sortcolumns['action']);
         $table->define_sortablecolumns(array_keys($sortcolumns));
+        $table->define_filtercolumns([
+            'qtype' => [
+                'localizedname' => get_string('questiontype', 'local_catquiz')
+            ],
+            'model' => [
+                'localizedname' => get_string('model', 'local_catquiz')
+            ],
+        ]);
 
         $table->addcheckboxes = true;
 
@@ -276,6 +290,7 @@ class questionsdisplay {
         $table->showdownloadbutton = false;
         $table->showreloadbutton = false;
         $table->showrowcountselect = true;
+        // $table->showreloadbutton = true;
 
         $table->filteronloadinactive = true;
 

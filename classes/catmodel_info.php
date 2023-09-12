@@ -55,13 +55,13 @@ class catmodel_info {
      * @param bool $calculate Trigger a re-calculation of the item parameters
      * @return array
      */
-    public function get_context_parameters(int $contextid = 0, int $catscaleid, bool $calculate = false) {
-        // Trigger calculation in the background but do not wait for it to finish
+    public function get_context_parameters(int $contextid = 0, int $catscaleid = 0, bool $calculate = false) {
+        // Trigger calculation in the background but do not wait for it to finish.
         if ($calculate) {
             $this->trigger_parameter_calculation($contextid, $catscaleid);
         }
 
-        // Return the data that are currently saved in the DB
+        // Return the data that are currently saved in the DB.
         $context = catcontext::load_from_db($contextid);
         $strategy = $context->get_strategy($catscaleid);
         return $strategy->get_params_from_db($contextid, $catscaleid);

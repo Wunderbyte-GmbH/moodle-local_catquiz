@@ -69,7 +69,7 @@ class eventlogtableinstance {
         $table->define_sortablecolumns(array_keys($columnsarray));
         $table->sort_default_column = 'timecreated';
         $table->sort_default_order = SORT_DESC;
-        $table->define_fulltextsearchcolumns(['eventname','description', 'timecreated']);
+        $table->define_fulltextsearchcolumns(['eventname', 'timecreated', 'other']);
 
         $filtercolumns = [
             'timecreated' => [ // Columns containing Unix timestamps can be filtered.
