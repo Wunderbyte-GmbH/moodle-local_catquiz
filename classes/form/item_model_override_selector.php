@@ -338,7 +338,6 @@ class item_model_override_selector extends dynamic_form {
         $itemparamsbymodel = [];
         foreach ($itemparams as $itemparam) {
             $itemparamsbymodel[$itemparam->model] = $itemparam;
-            reset($itemparams[$itemparam->id]);
         }
         return $itemparamsbymodel;
     }
