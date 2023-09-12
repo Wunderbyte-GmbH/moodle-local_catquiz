@@ -48,7 +48,10 @@ final class removeplayedquestions extends preselect_task implements wb_middlewar
      */
     public function run(array &$context, callable $next): result {
         $cache = cache::make('local_catquiz', 'adaptivequizattempt');
-        $playedquestions = $cache->get('playedquestions') ?: [];
+        $playedquestions = $cache->get('playedquestions');
+        if (! $playedquestions) {
+            return $next($context);
+        }
         foreach (array_keys($context['questions']) as $qid) {
             if (array_key_exists($qid, $playedquestions)) {
                 unset($context['questions'][$qid]);
