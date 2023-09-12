@@ -423,6 +423,11 @@ class catscale {
     public static function get_link_to_catscale(int $catscaleid, $url = '/local/catquiz/edit_catscale.php') {
 
         $catscale = self::return_catscale_object($catscaleid);
+
+        if (empty($catscale)) {
+            return "";
+        }
+
         $catscalename = $catscale->name;
 
         $url = new moodle_url($url);

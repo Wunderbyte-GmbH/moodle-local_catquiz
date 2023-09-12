@@ -66,7 +66,7 @@ class testiteminscale_added extends \core\event\base {
     public function get_description() {
         $data = $this->data;
         $otherarray = json_decode($data['other']);
-        $catscaleid = $otherarray->catscaleid;
+        $catscaleid = $otherarray->catscaleid ?? 0;
         $testitemid = $data['objectid'];
 
         if (!empty($otherarray->catscaleid) &&
