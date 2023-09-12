@@ -79,9 +79,10 @@ abstract class model_model {
      * on the given person abilities.
      *
      * @param model_person_param_list $personparams
+     * @param ?model_item_param_list $olditemparams
      * @return model_item_param_list
      */
-    abstract public function estimate_item_params(model_person_param_list $personparams): model_item_param_list;
+    abstract public function estimate_item_params(model_person_param_list $personparams, ?model_item_param_list $olditemparams = null): model_item_param_list;
 
     /**
      * Returns the paramter names of the model as strings.

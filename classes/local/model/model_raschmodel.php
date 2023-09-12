@@ -174,21 +174,24 @@ abstract class model_raschmodel extends model_model implements catcalc_item_esti
         return $numberofparameters * log(($numberofcases + 2) / 24) + $this->calc_dic_item($personabilities, $item, $k);
     }
 
-    /**
-     * Executes the model-specific code to estimate item-parameters based
-     * on the given person abilities.
-     *
-     * @param model_person_param_list $personparams
-     * @return model_item_param_list
-     */
-    public function estimate_item_params(model_person_param_list $personparams): model_item_param_list {
+    public function estimate_item_params(model_person_param_list $personparams, ?model_item_param_list $olditemparams = null): model_item_param_list {
         $estimateditemparams = new model_item_param_list();
         foreach ($this->responses->get_item_response($personparams) as $itemid => $itemresponse) {
+            $oldparam = $olditemparams[$itemid] ?? null;
+            if ($oldparam && $oldparam->get_status() >= STATUS_CALCULATED) {
+                $estimateditemparams->add($oldparam);
+                continue;
+            }
             $parameters = $this->calculate_params($itemresponse);
             // Now create a new item difficulty object (param).
             $param = $this
                 ->create_item_param($itemid)
-                ->set_parameters($parameters);
+                ->set_parameters($parameters)
+                ->set_status(STATUS_CALCULATED);
+
+            if ($oldparam) {
+                $param->set_status($olditemparams[$itemid]->get_status());
+            }
             // ... and append it to the list of calculated item difficulties
             $estimateditemparams->add($param);
         }

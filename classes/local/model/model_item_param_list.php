@@ -97,7 +97,7 @@ class model_item_param_list implements ArrayAccess, IteratorAggregate, Countable
             if ($r->difficulty === "NaN") {
                 continue;
             }
-            $i = new model_item_param($r->componentid, $modelname);
+            $i = new model_item_param($r->componentid, $modelname, [], $r->status);
             $parameternames = $models[$modelname]::get_parameter_names();
             $params = [];
             foreach ($parameternames as $paramname) {

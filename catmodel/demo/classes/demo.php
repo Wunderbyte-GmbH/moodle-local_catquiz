@@ -43,16 +43,7 @@ class demo extends model_model {
         return 0.0;
     }
 
-
-    /**
-     * Estimate item params.
-     *
-     * @param model_person_param_list $personparams
-     *
-     * @return model_item_param_list
-     *
-     */
-    public function estimate_item_params(model_person_param_list $personparams): model_item_param_list {
+    public function estimate_item_params(model_person_param_list $personparams, ?model_item_param_list $olditemparams = null): model_item_param_list {
         return new model_item_param_list();
     }
 

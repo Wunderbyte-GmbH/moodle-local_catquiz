@@ -28,6 +28,7 @@ namespace local_catquiz;
 use cache_helper;
 use local_catquiz\event\context_created;
 use local_catquiz\event\context_updated;
+use local_catquiz\local\model\model_item_param_list;
 use local_catquiz\local\model\model_person_param_list;
 use local_catquiz\local\model\model_responses;
 use local_catquiz\local\model\model_strategy;
@@ -358,7 +359,12 @@ class catcontext {
         $responses = (new model_responses())->setdata($responsedata);
         $options = json_decode($this->json, true) ?? [];
         $savedabilities = model_person_param_list::load_from_db($this->id, [$catscaleid]);
-        return new model_strategy($responses, $options, $savedabilities);
+        $installedmodels = model_strategy::get_installed_models();
+        $olditemparams = [];
+        foreach (array_keys($installedmodels) as $model) {
+            $olditemparams[$model] = model_item_param_list::load_from_db($this->id, $model, [$catscaleid]);
+        }
+        return new model_strategy($responses, $options, $savedabilities, $olditemparams);
     }
 
     /**

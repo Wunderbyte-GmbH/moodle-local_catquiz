@@ -103,22 +103,31 @@ class model_strategy {
     private model_person_param_list $initialpersonabilities;
 
     /**
+     * @var array<model_item_param_list> $olditemparams
+     * @var array
+     */
+    private array $olditemparams;
+
+    /**
      * Model-specific instantiation can go here.
      *
      * @param model_responses $responses
      * @param array $options
      * @param model_person_param_list|null $savedpersonabilities
+     * @param array<model_item_param_list> $olditemparams
      *
      */
     public function __construct(
         model_responses $responses,
         array $options = [],
-        ?model_person_param_list $savedpersonabilities = null
+        ?model_person_param_list $savedpersonabilities = null,
+        array $olditemparams = []
     ) {
         $this->responses = $responses;
         $this->models = $this->create_installed_models();
         $this->abilityestimator = new model_person_ability_estimator_catcalc($this->responses);
         $this->set_options($options);
+        $this->olditemparams = $olditemparams;
 
         if ($savedpersonabilities === null || count($savedpersonabilities) === 0) {
             $savedpersonabilities = $responses->get_initial_person_abilities();
@@ -201,8 +210,9 @@ class model_strategy {
         // Re-calculate until the stop condition is triggered.
         while (!$this->should_stop()) {
             foreach ($this->models as $name => $model) {
+                $oldmodelparams = $this->olditemparams[$name] ?? null;
                 $itemdifficulties[$name] = $model
-                    ->estimate_item_params($personabilities);
+                    ->estimate_item_params($personabilities, $oldmodelparams);
             }
 
             $filtereditemdifficulties = $this->select_item_model($itemdifficulties, $personabilities);
@@ -294,12 +304,35 @@ class model_strategy {
      * Return item override.
      *
      * @param int $itemid
+     * @param array<model_item_param_list> $itemdifficultieslists
      *
-     * @return string|null
+     * @return ?model_item_param
      *
      */
-    private function get_item_override(int $itemid): ?string {
-        return null; // TODO implement.
+    private function get_item_override(int $itemid, array $itemdifficultieslists): ?model_item_param {
+        $items = [];
+        foreach ($itemdifficultieslists as $model => $itemparams) {
+            if (! $itemparams[$itemid]) {
+                continue;
+            }
+            $items[] = $itemparams[$itemid];
+        }
+
+        if (! $items) {
+            return null;
+        }
+
+        $manuallyconfirmed = array_filter($items, fn ($ip) =>  $ip->get_status() === STATUS_CONFIRMED_MANUALLY);
+        if ($manuallyconfirmed) {
+            return reset($manuallyconfirmed);
+        }
+
+        $manuallyupdated = array_filter($items, fn ($ip) => $ip->get_status() === STATUS_UPDATED_MANUALLY);
+        if ($manuallyupdated) {
+            return reset($manuallyupdated);
+        }
+
+        return null;
     }
 
     /**
@@ -388,10 +421,12 @@ class model_strategy {
 
     private function select_item_from_override(int $itemid, array $itemdifficultieslists) {
         global $CFG;
+        if ($item = $this->get_item_override($itemid, $itemdifficultieslists)) {
+            return $item;
+        }
+        
         $item = null;
-        if ($model = $this->get_item_override($itemid)) {
-            $item = $itemdifficultieslists[$model][$itemid];
-        } else if ($model = $this->get_model_override()) {
+        if ($model = $this->get_model_override()) {
             $item = $itemdifficultieslists[$model][$itemid];
         }
 

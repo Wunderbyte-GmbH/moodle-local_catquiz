@@ -59,13 +59,8 @@ class web_raschbirnbauma extends model_model implements catcalc_ability_estimato
      * }
      *
      * Items that have only "0" responses will not be included in the JSON.
-     *
-     * @param model_person_param_list $personparams
-     *
-     * @return model_item_param_list
-     *
      */
-    public function estimate_item_params(model_person_param_list $personparams): model_item_param_list {
+    public function estimate_item_params(model_person_param_list $personparams, ?model_item_param_list $olditemparams = null): model_item_param_list {
         $estimateditemparams = new model_item_param_list();
 
         $data = [];
@@ -76,6 +71,11 @@ class web_raschbirnbauma extends model_model implements catcalc_ability_estimato
                     // We have to prepend the itemid with a letter so that the
                     // result returned by the API contains item names.
                     $itemname = sprintf('I%s', $itemid);
+                    $oldparam = $olditemparams[$itemid] ?? null;
+                    if ($oldparam && $oldparam->get_status() >= STATUS_UPDATED_MANUALLY) {
+                        $estimateditemparams->add($oldparam);
+                        continue;
+                    }
                     $dataobj->$itemname = intval($itemdata['fraction']);
                 }
             }
@@ -104,7 +104,11 @@ class web_raschbirnbauma extends model_model implements catcalc_ability_estimato
             $itemid = intval(ltrim($itemdata->_row, 'I'));
             $param = $this
                 ->create_item_param($itemid)
-                ->set_parameters(['difficulty' => $itemdata->xsi]);
+                ->set_parameters(['difficulty' => $itemdata->xsi])
+                ;
+            if ($oldparam) {
+                $param->set_status($oldparam->get_status());
+            }
             $estimateditemparams->add($param);
         }
         return $estimateditemparams;
