@@ -77,7 +77,7 @@ class catscale_structure {
             $this->timemodified = $data['timemodified'];
             $this->timecreated = $data['timecreated'];
             $this->name = $data['name'];
-            $this->description = $data['description'];
+            $this->description = $data['description'] ?? '';
             $this->minscalevalue = empty($data["minmaxgroup"]["catquiz_minscalevalue"]) ? 0 : $data["minmaxgroup"]["catquiz_minscalevalue"];
             $this->maxscalevalue = empty($data["minmaxgroup"]["catquiz_maxscalevalue"]) ? 0 : $data["minmaxgroup"]["catquiz_maxscalevalue"];
 

@@ -183,6 +183,12 @@ class testitemimporter {
                 'importinstruction' => get_string('scalenameinformation', 'local_catquiz'),
             ),
             array (
+                'name' => 'parentscalenames',
+                'mandatory' => false,
+                'format' => PARAM_TEXT,
+                'importinstruction' => get_string('parentscalenamesinformation', 'local_catquiz'),
+            ),
+            array (
                 'name' => 'qtype',
                 'mandatory' => false,
                 'format' => PARAM_TEXT,

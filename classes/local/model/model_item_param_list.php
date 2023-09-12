@@ -25,10 +25,15 @@
 namespace local_catquiz\local\model;
 use ArrayAccess;
 use ArrayIterator;
+use coding_exception;
 use Countable;
+use ddl_exception;
 use dml_exception;
 use IteratorAggregate;
 use local_catquiz\catquiz;
+use local_catquiz\catscale;
+use local_catquiz\data\catscale_structure;
+use local_catquiz\data\dataapi;
 use local_catquiz\event\testiteminscale_added;
 use moodle_exception;
 use Traversable;
@@ -327,6 +332,7 @@ class model_item_param_list implements ArrayAccess, IteratorAggregate, Countable
             'success' => 0,
             'message' => 'Error during callback'];
 
+        // Scale logic is in this function: get scale id and update in table.
         if ($label = $newrecord['label'] ?? false) {
             $sql = "SELECT qv.questionid, qv.questionbankentryid as qbeid
             FROM {question_bank_entries} qbe
@@ -334,10 +340,10 @@ class model_item_param_list implements ArrayAccess, IteratorAggregate, Countable
             JOIN {question_versions} qv
             ON qbe.id = qv.questionbankentryid
 
-            JOIN {local_catquiz_items} lci
+            LEFT JOIN {local_catquiz_items} lci
             ON lci.componentid=qv.questionid
 
-            WHERE qbe.idnumber = :label
+            WHERE qbe.idnumber LIKE :label
             GROUP BY qv.questionid, qv.questionbankentryid";
 
             $records = $DB->get_records_sql($sql, ['label' => $label]);
@@ -361,13 +367,14 @@ class model_item_param_list implements ArrayAccess, IteratorAggregate, Countable
                 unset($newrecord['label']);
                 $newrecord['componentid'] = $record->questionid;
 
+                // We call the same function again, now with the componentid and without the label id.
                 $returnarray = self::save_or_update_testitem_in_db($newrecord);
             }
             return $returnarray;
         }
 
-        // Scale logic is in this function: get scale id and update in table.
-        $newrecord = self::update_in_scale($newrecord);
+        // We only run this once we have the component id.
+        self::update_in_scale($newrecord);
 
         if (empty($newrecord['model'])) {
             return [
@@ -425,10 +432,10 @@ class model_item_param_list implements ArrayAccess, IteratorAggregate, Countable
 
     /**
      * Gets scaleid and updates scaleid of record.
-     * @param stdClass $newrecord
-     * @return stdClass
+     * @param array $newrecord
+     * @return array
      */
-    private function update_in_scale($newrecord) {
+    private static function update_in_scale(array $newrecord) {
         global $DB;
 
         // If we don't know the catscaleid we get it via the catscalename.
@@ -436,17 +443,26 @@ class model_item_param_list implements ArrayAccess, IteratorAggregate, Countable
             $sql = "SELECT id
                     FROM {local_catquiz_catscales}
                     WHERE name = :name";
-            $record = $DB->get_record_sql($sql, ['name' => $newrecord['catscalename']]);
+            $catscaleid = $DB->get_field_sql($sql, ['name' => $newrecord['catscalename']]);
 
-            if (!empty($record)) {
-                $newrecord['catscaleid'] = $record->id;
+            if (!empty($catscaleid)) {
+                $newrecord['catscaleid'] = $catscaleid;
             }
         }
+
+        // If at this point, the scale is still empty, we need to create it.
+        self::create_scales_for_new_record($newrecord);
+
+        if (empty($newrecord['catscaleid'])) {
+            throw new moodle_exception('nocatscaleid', 'local_catquiz');
+        }
+
         $scalerecord = $DB->get_record("local_catquiz_items", [
             'componentid' => $newrecord['componentid'],
-            'status' => $newrecord['status'],
+            // 'status' => $newrecord['status'] ?? 0,
             'catscaleid' => $newrecord['catscaleid'],
         ]);
+
         if (!$scalerecord) {
             $columnstoinclude = ['componentname', 'componentid', 'catscaleid', 'lastupdated', 'status'];
             $recordforquery = $newrecord;
@@ -457,6 +473,9 @@ class model_item_param_list implements ArrayAccess, IteratorAggregate, Countable
                 // If no activity status is given, set to active by default.
                 if ($key == "status" && empty($value)) {
                     $recordforquery["status"] = 0;
+                }
+                if ($key == "lastupdated" && empty($value)) {
+                    $recordforquery["lastupdated"] = time();
                 }
             }
             $DB->insert_record('local_catquiz_items', $recordforquery);
@@ -478,5 +497,55 @@ class model_item_param_list implements ArrayAccess, IteratorAggregate, Countable
         return $newrecord;
     }
 
+    /**
+     * This function creates the catscale structure on the fly.
+     * @param array $newrecord
+     * @return void
+     * @throws dml_exception
+     * @throws coding_exception
+     * @throws ddl_exception
+     */
+    private static function create_scales_for_new_record(array &$newrecord) {
 
+        global $DB;
+
+        // First check if there are parents:
+
+        $parents = [];
+        if (!empty($newrecord['parentscalenames'])) {
+            $newrecord['parentscalenames'] .= "|" . $newrecord['catscalename'];
+            $parents = explode('|', $newrecord['parentscalenames']);
+            // Make sure there are no spaces around.
+            $parents = array_map(fn($a) => trim($a), $parents);
+        } else if (!empty($newrecord['catscalename'])) {
+            $parents[] = $newrecord['catscalename'];
+        }
+
+        $catscaleid = 0;
+
+        foreach ($parents as $parent) {
+
+            // Check if the scale exists.
+            // We also need to look at the parentids.
+            $searcharray = [
+                'name' => $parent,
+            ];
+
+            if ($record = $DB->get_record('local_catquiz_catscales', $searcharray)) {
+                $catscaleid = $record->id;
+                continue;
+            }
+
+            $catscale = new catscale_structure([
+                'name' => $parent,
+                'parentid' => $catscaleid,
+                'description' => '',
+                'timecreated' => time(),
+                'timemodified' => time(),
+            ]);
+
+            $catscaleid = dataapi::create_catscale($catscale);
+
+        }
+    }
 }

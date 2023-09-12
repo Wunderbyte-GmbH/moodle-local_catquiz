@@ -372,6 +372,7 @@ $string['scaleinformation'] = 'Die ID der CAT Skala der die Frage zugeordnet wer
 $string['scalenameinformation'] = 'Der Name der CAT Skala der die Frage zugeordnet werden soll. Falls keine ID angegeben, wird Matching über Name vorgenommen.';
 $string['dataincomplete'] = 'Der Datensatz mit "componentid" {$a->id} ist unvollständig und konnte nicht gänzlich eingefügt werden. Überprüfen Sie das Feld "{$a->field}".';
 $string['modelinformation'] = 'Dieses Feld ist notwendig, um Fragen vollständig zu erfassen. Ist das Feld leer, kann die Frage lediglich einer Skala zugeordnet werden.';
+$string['parentscalenamesinformation'] = 'Alle Eltern Scalen können beim Import angelegt werden. Starten sie mit dem Namen der höchsten Scala und fügen sie alle Kinder mit | getrennt hinzu.';
 
 // Testenvironments table.
 $string['notifyallteachers'] = 'Kursleiter der gewählten Kurse benachrichtigen';

@@ -96,7 +96,7 @@ class questiondetailview {
         $recordinarray = $DB->get_records_sql($sql, $params, IGNORE_MISSING);
 
         if (empty($recordinarray)) {
-            throw new moodle_exception('errorrecordnotfound', 'local_catquiz');
+            return [];
         }
         $record = $recordinarray[$this->testitemid];
 
