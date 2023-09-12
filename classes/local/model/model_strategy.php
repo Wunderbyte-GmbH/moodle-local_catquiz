@@ -262,11 +262,9 @@ class model_strategy {
      * @return model_item_param_list A single list of item difficulties that is a combination of the input lists
      */
     public function select_item_model(array $itemdifficultieslists, model_person_param_list $personabilities): model_item_param_list {
-        global $CFG;
         $newitemdifficulties = new model_item_param_list();
         $itemids = $this->responses->get_item_ids();
         $informationcriterium = 'aic'; // TODO set via settings
-        $answers = []; // Get from $this->responses
         $infocriteriapermodel = [];
 
         /**
