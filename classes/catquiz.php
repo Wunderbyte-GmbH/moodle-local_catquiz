@@ -485,17 +485,22 @@ class catquiz {
      * Returns the sql that can be used to get input data for the helpercat::get_item_list($data) function.
      *
      * @param mixed $contextid
-     * @param int $catscaleid
+     * @param array $catscaleids
      * @param ?int $testitemid
      * @param ?int $userid
      *
      * @return array
      *
      */
-    public static function get_sql_for_model_input($contextid, int $catscaleid, ?int $testitemid, ?int $userid) {
-
+    public static function get_sql_for_model_input($contextid, array $catscaleids, ?int $testitemid, ?int $userid) {
+        global $DB;
         $testitemids = $testitemid ? [$testitemid] : [];
         $userids = $userid ? [$userid] : [];
+        [$insql, $inparams] = $DB->get_in_or_equal(
+            $catscaleids,
+            SQL_PARAMS_NAMED,
+            'incatscales'
+        );
         list (, $from, $where, $params) = self::get_sql_for_stat_base_request($testitemids, [$contextid], $userids);
 
         $sql = "
@@ -505,13 +510,11 @@ class catquiz {
             ON qa.questionid = q.id
         JOIN {local_catquiz_items} lci
             ON q.id = lci.componentid
-            AND lci.catscaleid = :catscaleid
+            AND lci.catscaleid $insql
         WHERE $where
         ";
 
-        $params['catscaleid'] = $catscaleid;
-
-        return [$sql, $params];
+        return [$sql, array_merge($inparams, $params)];
     }
 
     /**
