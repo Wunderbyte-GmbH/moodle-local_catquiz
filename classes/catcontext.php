@@ -268,31 +268,31 @@ class catcontext {
             $DB->update_record('local_catquiz_catcontext', $this->return_as_class());
 
             // Trigger context updated event.
-            $event = context_updated::create([
-                'objectid' => $this->name,
-                'context' => \context_system::instance(),
-                'other' => [
-                    'contextname' => $this->name,
-                    'contextid' => $this->id,
-                    'context' => $this->return_as_class(),
-                ]
-                ]);
-            $event->trigger();
+            //$event = context_updated::create([
+            //    // 'objectid' => $this->name, // Commented out because this throws an error: objectid has to be a number.
+            //    'context' => \context_system::instance(),
+            //    'other' => [
+            //        'contextname' => $this->name,
+            //        'contextid' => $this->id,
+            //        'context' => $this->return_as_class(),
+            //    ]
+            //    ]);
+            //$event->trigger();
 
         } else {
             $DB->insert_record('local_catquiz_catcontext', $this->return_as_class());
 
             // Trigger context created event.
-            $event = context_created::create([
-                'objectid' => $this->name,
-                'context' => \context_system::instance(),
-                'other' => [
-                    'contextname' => $this->name,
-                    'contextid' => $this->id,
-                    'context' => $this->return_as_class(),
-                ]
-                ]);
-            $event->trigger();
+            //$event = context_created::create([
+            //    'objectid' => $this->name,
+            //    'context' => \context_system::instance(),
+            //    'other' => [
+            //        'contextname' => $this->name,
+            //        'contextid' => $this->id,
+            //        'context' => $this->return_as_class(),
+            //    ]
+            //    ]);
+            //$event->trigger();
         }
         cache_helper::purge_by_event('changesincatcontexts');
     }
