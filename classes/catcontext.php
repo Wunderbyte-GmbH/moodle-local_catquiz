@@ -178,11 +178,10 @@ class catcontext {
      * @return array
      *
      */
-    public static function getresponsedatafromdb(int $contextid, int $catscaleid, ?int $testitemid = null, ?int $userid = null): array {
+    public static function getresponsedatafromdb(int $contextid, array $catscaleids, ?int $testitemid = null, ?int $userid = null): array {
         global $DB;
 
-        $catscales = [$catscaleid, ...catscale::get_subscale_ids($catscaleid)];
-        list ($sql, $params) = catquiz::get_sql_for_model_input($contextid, $catscales, $testitemid, $userid);
+        list ($sql, $params) = catquiz::get_sql_for_model_input($contextid, $catscaleids, $testitemid, $userid);
         $data = $DB->get_records_sql($sql, $params);
         $inputdata = self::db_to_modelinput($data);
         return $inputdata;
@@ -356,14 +355,15 @@ class catcontext {
      *
      */
     public function get_strategy(int $catscaleid): model_strategy {
-        $responsedata = self::getresponsedatafromdb($this->id, $catscaleid);
+        $catscaleids = [$catscaleid, ...catscale::get_subscale_ids($catscaleid)];
+        $responsedata = self::getresponsedatafromdb($this->id, $catscaleids);
         $responses = (new model_responses())->setdata($responsedata);
         $options = json_decode($this->json, true) ?? [];
-        $savedabilities = model_person_param_list::load_from_db($this->id, [$catscaleid, ...catscale::get_subscale_ids($catscaleid)]);
+        $savedabilities = model_person_param_list::load_from_db($this->id, $catscaleids);
         $installedmodels = model_strategy::get_installed_models();
         $olditemparams = [];
         foreach (array_keys($installedmodels) as $model) {
-            $olditemparams[$model] = model_item_param_list::load_from_db($this->id, $model, [$catscaleid, ...catscale::get_subscale_ids($catscaleid)]);
+            $olditemparams[$model] = model_item_param_list::load_from_db($this->id, $model, $catscaleids);
         }
         return new model_strategy($responses, $options, $savedabilities, $olditemparams);
     }

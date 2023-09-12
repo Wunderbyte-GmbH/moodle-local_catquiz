@@ -210,7 +210,7 @@ class updatepersonability extends preselect_task implements wb_middleware {
         $this->lastquestion = $context['lastquestion'];
         $lastresponse = catcontext::getresponsedatafromdb(
             $context['contextid'],
-            $this->lastquestion->catscaleid,
+            [$this->lastquestion->catscaleid],
             $this->lastquestion->id,
             $context['userid']
         );
