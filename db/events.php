@@ -27,7 +27,7 @@
 
  $observers = array(
     array(
-        'eventname' => '\local_catquiz\event\*',
+        'eventname' => '*',
         'callback' => 'local_catquiz_observer::purge_event_cache'
     ),
      array(
