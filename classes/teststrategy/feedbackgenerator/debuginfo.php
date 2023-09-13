@@ -89,6 +89,19 @@ class debuginfo extends feedbackgenerator {
                 ? $context['lastresponse']['fraction']
                 : "NA";
 
+            $standarderrorperscale = [];
+            if (array_key_exists('standarderrorperscale', $context)) {
+                foreach ($context['standarderrorperscale'] as $scaleid => $standarderror) {
+                    $standarderrorperscale[] = [
+                        'name' => $catscales[$scaleid]->name,
+                        'se' => $standarderror,
+                    ];
+                }
+            }
+            if ($standarderrorperscale) {
+                $standarderrorperscale[array_key_last($standarderrorperscale)]['last'] = true;
+            }
+
             $data[] = [
                 'userid' => $context['userid'],
                 'attemptid' => $context['attemptid'],
@@ -106,6 +119,7 @@ class debuginfo extends feedbackgenerator {
                 'updateabilityfallback' => $context['updateabilityfallback'],
                 'excludedsubscales' => implode(',', $context['excludedsubscales']),
                 'lastresponse' => $lastresponse,
+                'standarderrorperscale' => $standarderrorperscale,
             ];
         }
         global $OUTPUT;
