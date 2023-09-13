@@ -429,18 +429,19 @@ class catscale {
     public static function get_link_to_catscale(int $catscaleid, $url = '/local/catquiz/edit_catscale.php') {
 
         $catscale = self::return_catscale_object($catscaleid);
+        if (!empty($catscale->name)) {
+            $catscalename = $catscale->name;
 
-        if (empty($catscale)) {
-            return "";
+            $url = new moodle_url($url);
+            $url->param('id', $catscaleid);
+            $linktoscale = html_writer::link($url, $catscalename);
+
+            return $linktoscale;
+        } else {
+            return get_string("deletedcatscale", "local_catquiz");
         }
 
-        $catscalename = $catscale->name;
 
-        $url = new moodle_url($url);
-        $url->param('id', $catscaleid);
-        $linktoscale = html_writer::link($url, $catscalename);
-
-        return $linktoscale;
     }
 
     /**

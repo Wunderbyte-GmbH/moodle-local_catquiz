@@ -168,6 +168,7 @@ $string['logsafter'] = 'Logs after';
 $string['logsbefore'] = 'Logs before';
 $string['calculation_executed'] = 'Calculation executed.';
 $string['executed_calculation_description'] = 'A calculation was executed of catscale {$a->catscalename} with id {$a->catscaleid} in context {$a->contextid} by user {$a->userid}. {$a->numberofitems} items were recalculated.';
+$string['deletedcatscale'] = 'catscale that doesn`t exist anymore';
 
 // Message.
 $string['messageprovider:catscaleupdate'] = 'Notification of CAT scale update';
