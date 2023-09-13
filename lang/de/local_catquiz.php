@@ -32,6 +32,7 @@ $string['pluginname'] = 'ALiSe CAT Quiz';
 $string['catquiz'] = 'Catquiz';
 
 // Catquiz handler.
+$string['catscale'] = 'CAT Skala';
 $string['catquizsettings'] = 'Cat Quiz Einstellungen';
 $string['selectmodel'] = 'Wähle ein Modell';
 $string['model'] = 'Modell';
@@ -166,6 +167,7 @@ $string['logsbefore'] = 'Logs before';
 $string['calculation_executed'] = 'Berechnung durchgeführt.';
 $string['executed_calculation_description'] =
     'Es wurde eine Berechnung der CAT Skala {$a->catscalename} mit der ID {$a->catscaleid} im Kontext {$a->contextid} durchgeführt von {$a->userid}. Es wurden {$a->numberofitems} Fragen neu berechnet.';
+$string['deletedcatscale'] = 'CAT Skala die nicht mehr exisitiert.';
 
 // Message.
 $string['messageprovider:catscaleupdate'] = 'Benachrichtung über eine Aktualisierung einer CAT Skala.';
