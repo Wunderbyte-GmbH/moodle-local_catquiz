@@ -1190,7 +1190,7 @@ class catquiz {
 
         $from = "{logstore_standard_log}";
 
-        $where = 'component = :component AND 1=1';
+        $where = 'component = :component ';
 
         $filter = '';
 

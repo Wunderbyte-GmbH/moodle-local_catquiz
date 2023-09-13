@@ -17,6 +17,7 @@
 namespace local_catquiz\output\catscalemanager;
 
 use local_catquiz\output\catscaledashboard;
+use local_catquiz\output\catscalemanager\calculations\calculationsdisplay;
 use local_catquiz\output\catscalemanagers;
 use local_catquiz\output\catscales;
 use local_catquiz\output\testitemdashboard;
@@ -103,6 +104,12 @@ class managecatscaledashboard implements renderable, templatable {
     public ?string $eventlogtable = "";
 
     /**
+     *
+     * @var array $calculationsdisplay.
+     */
+    public ?array $calculationsdisplay = [];
+
+    /**
      * Constructor.
      *
      * @param int $testitemid
@@ -144,6 +151,9 @@ class managecatscaledashboard implements renderable, templatable {
 
         $eventlogtable = new eventlogtableinstance();
         $this->eventlogtable = $eventlogtable->render_event_log_table();
+
+        $calculationsdisplay = new calculationsdisplay();
+        $this->calculationsdisplay = $calculationsdisplay->export_data_array();
     }
 
     /**
@@ -171,6 +181,7 @@ class managecatscaledashboard implements renderable, templatable {
             'eventlogtable' => $this->eventlogtable,
             'testitemsimporter' => catscaledashboard::render_testitem_importer(),
             'testitemsimporterdemodata' => catscaledashboard::render_testitem_demodata(),
+            'calculationsdisplay' => $this->calculationsdisplay,
         ];
         return $data;
     }
