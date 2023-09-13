@@ -559,6 +559,7 @@ class catquiz_handler {
             'attemptid' => intval($attemptdata->id),
             'updateabilityfallback' => false,
             'excludedsubscales' => [],
+            'has_fisherinformation' => false,
         ];
         return $contextcreator->load(
             [
