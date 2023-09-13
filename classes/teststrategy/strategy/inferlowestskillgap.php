@@ -27,7 +27,6 @@ namespace local_catquiz\teststrategy\strategy;
 use local_catquiz\teststrategy\feedbackgenerator\debuginfo;
 use local_catquiz\teststrategy\feedbackgenerator\personabilities;
 use local_catquiz\teststrategy\feedbackgenerator\questionssummary;
-use local_catquiz\teststrategy\preselect_task\addscalestandarderror;
 use local_catquiz\teststrategy\preselect_task\filterforsubscale;
 use local_catquiz\teststrategy\preselect_task\firstquestionselector;
 use local_catquiz\teststrategy\preselect_task\fisherinformation;
@@ -56,7 +55,7 @@ class inferlowestskillgap extends strategy {
      *
      * @var int $id // strategy id defined in lib.
      */
-    public int $id = STRATEGY_LOWESTSUB;
+    public int $id = STRATEGY_ALLSUBS;
 
 
     /**
@@ -79,7 +78,6 @@ class inferlowestskillgap extends strategy {
             remove_uncalculated::class, // Remove items that do not have item parameters.
             noremainingquestions::class, // Cancel quiz attempt if no questions are left.
             fisherinformation::class, // Add the fisher information to each question.
-            addscalestandarderror::class,
             filterforsubscale::class, // Keep only questions that are assigned to the subscale where the user has the lowest ability.
             strategyfastestscore::class,
         ];
