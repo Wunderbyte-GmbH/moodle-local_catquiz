@@ -36,7 +36,7 @@
     }
 }}
 
-userid;attemptid;questionsattempted;timestamp;contextid;catscale;teststrategy;personabilities;lastquestion;questions;active_scales;selectedscale;lastmiddleware;updateabilityfallback;excluded subscales;lastresponse<br>
+userid;attemptid;questionsattempted;timestamp;contextid;catscale;teststrategy;personabilities;lastquestion;questions;active_scales;selectedscale;lastmiddleware;updateabilityfallback;excluded subscales;lastresponse;standard error<br>
 {{#data}}
     {{ userid }}
     ;{{ attemptid }}
@@ -55,5 +55,6 @@ userid;attemptid;questionsattempted;timestamp;contextid;catscale;teststrategy;pe
     ;{{ lastmiddleware }}
     ;{{ updateabilityfallback }}
     ;{{ excludedsubscales }}
-    ;{{ lastresponse }}<br>
+    ;{{ lastresponse }}
+    ;{{#standarderrorperscale}}{{name}}: {{se}}{{^last}}, {{/last}}{{/standarderrorperscale}}{{^standarderrorperscale}}NA{{/standarderrorperscale}}<br>
 {{/data}}
