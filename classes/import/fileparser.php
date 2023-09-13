@@ -334,10 +334,13 @@ class fileparser {
             // Value "0" counts as value and returns valueisset true.
             !$valueisset = (("" !== $value) && (null !== $value)) ? true : false;
 
+
+            $linevalues = implode(', ', $line);
+
             // Check if empty fields are mandatory.
             if (!$valueisset) {
                 if ($this->field_is_mandatory($column)) {
-                    $this->add_csverror("The field $column is mandatory but contains no value.", $line[0]);
+                    $this->add_csverror("The field $column is mandatory but contains no value.", $linevalues);
                     return false;
                 }
                 // If no value is set, use defaultvalue.
@@ -362,13 +365,13 @@ class fileparser {
                     case PARAM_INT:
                         $value = $this->cast_string_to_int($value);
                         if (is_string($value)) {
-                            $this->add_csvwarnings("$value is not a valid integer in $column", $line[0]);
+                            $this->add_csvwarnings("$value is not a valid integer in $column", $linevalues);
                         }
                         break;
                     case PARAM_FLOAT:
                         $value = $this->cast_string_to_float($value);
                         if (is_string($value)) {
-                            $this->add_csvwarnings("$value is not a valid float in $column", $line[0]);
+                            $this->add_csvwarnings("$value is not a valid float in $column", $linevalues);
                         }
                         break;
                     default:
@@ -518,7 +521,8 @@ class fileparser {
      *
      */
     protected function add_csverror($errorstring, $i) {
-        $this->csverrors[] = "Error for id $i: ". $errorstring;
+        //$this->csverrors[] = $errorstring . PHP_EOL . "In line with values: $i ";
+        $this->csverrors[] = nl2br($errorstring.".\nIn line with values: $i ");
     }
 
     /**
@@ -531,9 +535,8 @@ class fileparser {
      *
      */
     protected function add_csvwarnings($errorstring, $i) {
-        $this->csvwarnings[] = "Error for id $i: ". $errorstring;
+        $this->csvwarnings[] = nl2br($errorstring.".\nIn line with values: $i ");
     }
-
     /**
      * Get line errors.
      *
