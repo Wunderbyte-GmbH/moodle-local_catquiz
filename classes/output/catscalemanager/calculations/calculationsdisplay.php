@@ -14,7 +14,7 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
-namespace local_catquiz\output\catscalemanager;
+namespace local_catquiz\output\catscalemanager\calculations;
 
 use html_writer;
 use local_catquiz\catquiz;
@@ -29,8 +29,7 @@ use moodle_url;
  * @author     Magdalena Holczik
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class eventlogtableinstance {
-
+class calculationsdisplay {
 
     /**
      * Constructor.
@@ -44,12 +43,15 @@ class eventlogtableinstance {
      * Render event log table.
      * @return ?string
      */
-    public function render_event_log_table() {
+    public function render_calculations_log_table() {
         global $DB;
 
         $table = new event_log_table('eventlogtable');
 
         list($select, $from, $where, $filter, $params) = catquiz::return_sql_for_event_logs();
+
+        $where .= " AND eventname LIKE :eventname ";
+        $params['eventname'] = '%calculation_executed';
 
         $table->set_filter_sql($select, $from, $where, $filter, $params);
 
@@ -107,5 +109,17 @@ class eventlogtableinstance {
         //list($idstring, $encodedtable, $html) = $table->lazyouthtml(10, true);
         //return $html;
         return $table->outhtml(10, true);
+    }
+
+    /**
+     * Return all data to be rendered and displayed.
+     * @return array
+     */
+    public function export_data_array(): array {
+
+        $data = [
+            'table' => $this->render_calculations_log_table(),
+        ];
+        return $data;
     }
 }
