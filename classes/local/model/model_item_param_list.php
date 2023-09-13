@@ -330,7 +330,7 @@ class model_item_param_list implements ArrayAccess, IteratorAggregate, Countable
 
         $returnarray = [
             'success' => 0,
-            'message' => 'Error during callback'];
+            'message' => 'Callback could not be executed'];
 
         // Scale logic is in this function: get scale id and update in table.
         if ($label = $newrecord['label'] ?? false) {
@@ -346,30 +346,28 @@ class model_item_param_list implements ArrayAccess, IteratorAggregate, Countable
             WHERE qbe.idnumber LIKE :label
             GROUP BY qv.questionid, qv.questionbankentryid";
 
+            // We check if we find entries.
             $records = $DB->get_records_sql($sql, ['label' => $label]);
 
-            $qbeid = 0;
-            foreach ($records as $record) {
-                if (!empty($qbeid)) {
-                    if ($qbeid != $record->qbeid) {
-                        return [
-                            'success' => 0, // Update not successful.
-                            'message' => get_string('labelidnotunique', 'local_catquiz'),
-                            'recordid' => $record->qbeid,
-                         ];
-                    }
-                } else {
-                    $qbeid = $record->qbeid;
-                }
+            if (!count($records) > 0) {
+                return [
+                    'success' => 0, // Update not successful.
+                    'message' => get_string('labelidnotfound', 'local_catquiz', $newrecord['label']),
+                 ];
+            } else if (count($records) > 1) {
+                return [
+                    'success' => 0, // Update not successful.
+                    'message' => get_string('labelidnotunique', 'local_catquiz', $newrecord['label']),
+                 ];
             }
 
-            foreach ($records as $record) {
-                unset($newrecord['label']);
-                $newrecord['componentid'] = $record->questionid;
+            $record = reset($records);
+            unset($newrecord['label']);
+            $newrecord['componentid'] = $record->questionid;
 
-                // We call the same function again, now with the componentid and without the label id.
-                $returnarray = self::save_or_update_testitem_in_db($newrecord);
-            }
+            // We call the same function again, now with the componentid and without the label id.
+            $returnarray = self::save_or_update_testitem_in_db($newrecord);
+
             return $returnarray;
         }
 
@@ -438,6 +436,9 @@ class model_item_param_list implements ArrayAccess, IteratorAggregate, Countable
     private static function update_in_scale(array $newrecord) {
         global $DB;
 
+        // If at this point, the scale is still empty, we need to create it.
+        self::create_scales_for_new_record($newrecord);
+
         // If we don't know the catscaleid we get it via the catscalename.
         if (empty($newrecord['catscaleid']) && !empty($newrecord['catscalename'])) {
             $sql = "SELECT id
@@ -449,9 +450,6 @@ class model_item_param_list implements ArrayAccess, IteratorAggregate, Countable
                 $newrecord['catscaleid'] = $catscaleid;
             }
         }
-
-        // If at this point, the scale is still empty, we need to create it.
-        self::create_scales_for_new_record($newrecord);
 
         if (empty($newrecord['catscaleid'])) {
             throw new moodle_exception('nocatscaleid', 'local_catquiz');
@@ -493,7 +491,6 @@ class model_item_param_list implements ArrayAccess, IteratorAggregate, Countable
                 ]);
             $event->trigger();
         }
-
         return $newrecord;
     }
 
