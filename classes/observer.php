@@ -60,10 +60,10 @@ class local_catquiz_observer {
         $userid = $event->userid;
 
         // See which users need to actually be notified.
-
         $catscale = catscale::return_catscale_object($catscaleid);
 
         messages::catscale_updated($catscale, $userid);
+        cache_helper::purge_by_event('changesincatscales');
     }
 
     /**
