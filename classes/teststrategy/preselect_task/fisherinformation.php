@@ -63,6 +63,7 @@ final class fisherinformation extends preselect_task implements wb_middleware {
                 $params
             );
         }
+        $context['has_fisherinformation'] = true;
         return $next($context);
     }
 

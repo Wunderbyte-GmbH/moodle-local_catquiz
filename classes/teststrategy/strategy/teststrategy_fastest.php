@@ -27,6 +27,7 @@ namespace local_catquiz\teststrategy\strategy;
 use local_catquiz\teststrategy\feedbackgenerator\debuginfo;
 use local_catquiz\teststrategy\feedbackgenerator\personabilities;
 use local_catquiz\teststrategy\feedbackgenerator\questionssummary;
+use local_catquiz\teststrategy\preselect_task\addscalestandarderror;
 use local_catquiz\teststrategy\preselect_task\firstquestionselector;
 use local_catquiz\teststrategy\preselect_task\fisherinformation;
 use local_catquiz\teststrategy\preselect_task\lasttimeplayedpenalty;
@@ -72,6 +73,7 @@ class teststrategy_fastest extends strategy {
             lasttimeplayedpenalty::class,
             numberofgeneralattempts::class,
             fisherinformation::class,
+            addscalestandarderror::class,
             strategyfastestscore::class,
         ];
     }
