@@ -307,7 +307,8 @@ class questionsdisplay {
 
         $table->filteronloadinactive = true;
 
-        return $table->outhtml(10, true);
+        list($idstring, $encodedtable, $html) = $table->lazyouthtml(10, true);
+        return $html;
     }
 
 
