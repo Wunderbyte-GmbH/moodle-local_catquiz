@@ -385,3 +385,5 @@ $string['parentscalenamesinformation'] = 'You can enter parent scales for the de
 // Testenvironments table.
 $string['notifyallteachers'] = 'Notify all teachers';
 $string['notifyteachersofselectedcourses'] = 'Notify teachers of selected courses';
+
+$string['close'] = 'Close';

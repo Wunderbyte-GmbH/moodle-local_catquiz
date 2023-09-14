@@ -413,4 +413,67 @@ class catscalequestions_table extends wunderbyte_table {
         return $values->questioncontextattempts;
     }
 
+        /**
+     * Function to handle the action buttons.
+     * @param int $testitemid
+     * @param string $data
+     * @return array
+     */
+    public function addtestitem(int $testitemid, string $data) {
+
+        $jsonobject = json_decode($data);
+
+        $catscaleid = $jsonobject->catscaleid;
+
+        if ($catscaleid == -1) {
+            return [
+                'success' => 0,
+                'message' => get_string('noscaleselected', 'local_catquiz'),
+            ];
+        }
+
+        if ($testitemid == -1) {
+            $idarray = $jsonobject->checkedids;
+        } else if ($testitemid > 0) {
+            $idarray = [$testitemid];
+        }
+
+        foreach ($idarray as $id) {
+        $result[] = catscale::add_or_update_testitem_to_scale($catscaleid, $id);
+        }
+        $failed = array_filter($result, fn($r) => $r->isErr());
+
+        // All items were added successfully.
+        if (empty($failed)) {
+            return [
+                'success' => 1,
+                'message' => get_string('success'),
+            ];
+        }
+
+        // If a single item could not be added, show a specific error message.
+        if (count($idarray) === 1 && count($failed) === 1) {
+            return [
+                'success' => 0,
+                'message' => $failed[0]->getErrorMessage(),
+            ];
+        }
+
+        // Multiple items could not be added.
+        $numadded = count($result) - count($failed);
+        $failedids = array_map(fn($f) => $f->unwrap(), $failed);
+        return [
+            'success' => 0,
+            'message' => get_string(
+                'failedtoaddmultipleitems',
+                'local_catquiz',
+                [
+                    'numadded' => $numadded,
+                    'numfailed' => count($failed),
+                    'failedids' => implode(',', $failedids),
+                ]
+            )
+        ];
+    }
+
 }

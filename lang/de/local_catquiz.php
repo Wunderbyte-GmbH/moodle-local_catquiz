@@ -381,3 +381,5 @@ $string['parentscalenamesinformation'] = 'Alle Eltern Scalen können beim Import
 // Testenvironments table.
 $string['notifyallteachers'] = 'Kursleiter der gewählten Kurse benachrichtigen';
 $string['notifyteachersofselectedcourses'] = 'Alle Kursleiter benachrichtigen';
+
+$string['close'] = 'Schließen';
