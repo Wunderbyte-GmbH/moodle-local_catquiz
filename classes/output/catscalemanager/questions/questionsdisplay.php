@@ -19,6 +19,7 @@ namespace local_catquiz\output\catscalemanager\questions;
 use html_writer;
 use local_catquiz\catquiz;
 use local_catquiz\catscale;
+use local_catquiz\output\catscalemanager\scaleandcontexselector;
 use local_catquiz\table\catscalequestions_table;
 use moodle_url;
 
@@ -83,95 +84,6 @@ class questionsdisplay {
         $this->testitemid = $testitemid; // ID of record to be displayed in detail instead of table.
         $this->componentname = $componentname; // ID of record to be displayed in detail instead of table.
 
-    }
-
-    /**
-     * Renders the context selector.
-     * @return string
-     */
-    private function render_contextselector() {
-        $ajaxformdata = empty($this->catcontextid) ? [] : ['contextid' => $this->catcontextid];
-
-        $customdata = [
-            "hideheader" => true,
-            "hidelabel" => false,
-            "labeltext" => get_string('versionchosen', 'local_catquiz'),
-        ];
-
-        $form = new \local_catquiz\form\contextselector(null, $customdata, 'post', '', [], true, $ajaxformdata);
-        // Set the form data with the same method that is called when loaded from JS.
-        // It should correctly set the data for the supplied arguments.
-        $form->set_data_for_dynamic_submission();
-        // Render the form in a specific container, there should be nothing else in the same container.
-        return html_writer::div($form->render(), '', ['id' => 'select_context_form']);
-    }
-
-    /**
-     * Renders the scale selector.
-     * @return string
-     */
-    private function render_scaleselectors() {
-        $selectors = $this->render_selector($this->scale);
-        $ancestorids = catscale::get_ancestors($this->scale);
-        if (count($ancestorids) > 0) {
-            foreach ($ancestorids as $ancestorid) {
-                $selector = $this->render_selector($ancestorid);
-                $selectors = "$selector <br> $selectors";
-            }
-        }
-        $childids = catscale::get_subscale_ids($this->scale);
-        if (count($childids) > 0) {
-            // If the selected scale has subscales, we render a selector to choose them with no default selection.
-            $subscaleselector = $this->render_selector($childids[0], true);
-            $selectors .= "<br> $subscaleselector";
-        }
-        return $selectors;
-    }
-
-    /**
-     * Renders the scale selector.
-     *
-     * @param mixed $scaleid
-     * @param bool $noselection
-     * @param string $label
-     *
-     * @return string
-     *
-     */
-    private function render_selector($scaleid, $noselection = false, $label = 'selectcatscale') {
-        $selected = $noselection ? 0 : $scaleid;
-        $ajaxformdata = [
-                        'scaleid' => $scaleid,
-                        'selected' => $selected,
-                        ];
-        $customdata = [
-            'type' => 'scale',
-            'label' => $label, // String localized in 'local_catquiz'.
-        ];
-
-        $form = new \local_catquiz\form\scaleselector(null, $customdata, 'post', '', [], true, $ajaxformdata);
-        // Set the form data with the same method that is called when loaded from JS.
-        // It should correctly set the data for the supplied arguments.
-        $form->set_data_for_dynamic_submission();
-        // Render the form in a specific container, there should be nothing else in the same container.
-        return html_writer::div($form->render(), '', ['id' => 'select_scale_form_scaleid_' . $scaleid]);
-    }
-
-    /**
-     * If checked subscales are integrated in the table query.
-     * @return array
-     */
-    private function render_subscale_checkbox() {
-        $checked = "checked";
-        if ($this->usesubs < 1) {
-            $checked = "";
-        }
-        $checkboxarray = [
-            'label' => get_string('integratequestions', 'local_catquiz'),
-            'checked' => $checked,
-        ];
-
-        return $checkboxarray;
     }
 
     /**
@@ -341,9 +253,9 @@ class questionsdisplay {
     public function export_data_array(): array {
 
         $data = [
-            'contextselector' => $this->render_contextselector(),
-            'scaleselectors' => empty($this->render_scaleselectors()) ? "" : $this->render_scaleselectors(),
-            'checkbox' => $this->render_subscale_checkbox(),
+            'contextselector' => scaleandcontexselector::render_contextselector($this->catcontextid),
+            'scaleselectors' => empty(scaleandcontexselector::render_scaleselectors($this->scale)) ? "" : scaleandcontexselector::render_scaleselectors($this->scale),
+            'checkbox' => scaleandcontexselector::render_subscale_checkbox($this->usesubs),
             'table' => $this->check_tabledisplay(),
         ];
 
