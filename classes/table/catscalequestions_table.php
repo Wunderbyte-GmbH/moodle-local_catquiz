@@ -110,8 +110,8 @@ class catscalequestions_table extends wunderbyte_table {
             'id' => $values->id,
             'methodname' => 'togglestatus', // The method needs to be added to your child of wunderbyte_table class.
             'data' => [ // Will be added eg as data-id = $values->id, so values can be transmitted to the method above.
-                'testitemstatus' => $values->testitemstatus,
-                'catscaleid' => $values->catscaleid,
+                'testitemstatus' => !empty($values->testitemstatus) ? $values->testitemstatus : "",
+                'catscaleid' => $values->catscaleid ?? $this->catscaleid,
                 'titlestring' => 'toggleactivity', // Will be shown in modal title.
                 'bodystring' => 'confirmactivitychange', // Will be shown in modal body.
                 'component' => 'local_catquiz',
@@ -143,7 +143,7 @@ class catscalequestions_table extends wunderbyte_table {
             'data' => [ // Will be added eg as data-id = $values->id, so values can be transmitted to the method above.
                 'questionid' => $values->id,
                 'id' => $values->id,
-                'catscaleid' => $values->catscaleid,
+                'catscaleid' => $values->catscaleid ?? $this->catscaleid,
                 'titlestring' => 'deletedatatitle', // Will be shown in modal title.
                 'bodystring' => 'confirmdeletion', // Will be shown in modal body in case elements are selected.
                 'component' => 'local_catquiz',
@@ -153,6 +153,44 @@ class catscalequestions_table extends wunderbyte_table {
 
             table::transform_actionbuttons_array($data['showactionbuttons']);
             return $OUTPUT->render_from_template('local_wunderbyte_table/component_actionbutton', $data);
+    }
+
+
+    /**
+     * Overrides the output for action column.
+     *
+     * @param mixed $values
+     *
+     * @return string
+     *
+     */
+    public function col_view($values) {
+
+        global $OUTPUT;
+
+        $url = new moodle_url('manage_catscales.php', [
+            'id' => $values->id,
+            'contextid' => $this->contextid,
+            'scaleid' => $values->catscaleid ?? $this->catscaleid,
+            'component' => $values->component ?? "",
+        ], 'questions');
+
+        $data['showactionbuttons'][] = [
+            'label' => get_string('view', 'core'), // Name of your action button.
+            'class' => 'btn btn-plain btn-smaller',
+            'iclass' => 'fa fa-edit',
+            'href' => $url->out(false),
+            'id' => $values->id,
+            'methodname' => '', // The method needs to be added to your child of wunderbyte_table class.
+            'data' => [ // Will be added eg as data-id = $values->id, so values can be transmitted to the method above.
+                'id' => $values->id,
+            ]
+        ];
+
+        // This transforms the array to make it easier to use in mustache template.
+        table::transform_actionbuttons_array($data['showactionbuttons']);
+
+        return $OUTPUT->render_from_template('local_wunderbyte_table/component_actionbutton', $data);
     }
 
     /**
@@ -309,6 +347,70 @@ class catscalequestions_table extends wunderbyte_table {
 
         $ancestors = catscale::get_ancestors($values->catscaleid, true);
         return implode('|', $ancestors);
+    }
+
+    /**
+     * Overrides the output for this column.
+     * @param object $values
+     *
+     * @return string
+     */
+    public function col_idnumber($values) {
+        return html_writer::tag('span', $values->idnumber, ['class' => 'badge badge-primary']);
+    }
+
+    /**
+     * Overrides the output for this column.
+     * @param object $values
+     */
+    public function col_questiontext($values) {
+
+        global $OUTPUT;
+
+        // phpcs:disable
+        // try {
+        // $question = question_bank::load_question($values->id);
+        // } catch (Exception $e) {
+        // return $values->questiontext;
+        // }
+        // phpcs:enable
+
+        $context = context_system::instance();
+
+        $questiontext = question_rewrite_question_urls(
+            $values->questiontext,
+            'pluginfile.php',
+            $context->id,
+            'question',
+            'questiontext',
+            [],
+            $values->id);
+
+        $fulltext = format_text($questiontext);
+        $questiontext = strip_tags($fulltext);
+        $shorttext = substr($questiontext, 0, 30);
+        $shorttext .= strlen($shorttext) < strlen($questiontext) ? '...' : '';
+
+        $data = [
+            'shorttext' => $shorttext,
+            'fulltext' => $fulltext,
+            'id' => $values->id,
+        ];
+
+        return $OUTPUT->render_from_template('local_catquiz/modals/modal_questionpreview', $data);
+    }
+
+
+    /**
+     * Overrides the output for questioncontextattempts column.
+     *
+     * @param mixed $values
+     *
+     * @return string
+     *
+     */
+    public function col_questioncontextattempts($values) {
+        return $values->questioncontextattempts;
     }
 
 }

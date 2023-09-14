@@ -222,6 +222,96 @@ class questionsdisplay {
         } */
     }
     /**
+     * Render addtestitems table.
+     *
+     * @param int $catscaleid
+     *
+     * @return string
+     *
+     */
+    private function render_addtestitems_table(int $catscaleid) {
+        $id = $catscaleid > -1 ? $catscaleid : 0;
+        $table = new catscalequestions_table('catscaleid_' . $id . '_additems', $catscaleid, $this->catcontextid);
+
+        list($select, $from, $where, $filter, $params) = catquiz::return_sql_for_addcatscalequestions($catscaleid, $this->catcontextid);
+
+        $table->set_filter_sql($select, $from, $where, $filter, $params);
+
+        $table->define_columns([
+            'idnumber',
+            'questiontext',
+            'qtype',
+            'categoryname',
+            'questioncontextattempts',
+            'view',
+        ]);
+        $table->define_headers([
+            get_string('label', 'local_catquiz'),
+            get_string('questiontext', 'local_catquiz'),
+            get_string('questiontype', 'local_catquiz'),
+            get_string('questioncategories', 'local_catquiz'),
+            get_string('questioncontextattempts', 'local_catquiz'),
+            get_string('view', 'core'),
+        ]);
+
+        $table->define_filtercolumns(['categoryname' => [
+            'localizedname' => get_string('questioncategories', 'local_catquiz')
+        ], 'qtype' => [
+            'localizedname' => get_string('questiontype', 'local_catquiz'),
+            'ddimageortext' => get_string('pluginname', 'qtype_ddimageortext'),
+            'essay' => get_string('pluginname', 'qtype_essay'),
+            'gapselect' => get_string('pluginname', 'qtype_gapselect'),
+            'multianswer' => get_string('pluginname', 'qtype_multianswer'),
+            'multichoice' => get_string('pluginname', 'qtype_multichoice'),
+            'numerical' => get_string('pluginname', 'qtype_numerical'),
+            'shortanswer' => get_string('pluginname', 'qtype_shortanswer'),
+            'truefalse' => get_string('pluginname', 'qtype_truefalse'),
+        ]]);
+        $table->define_fulltextsearchcolumns(['idnumber', 'name', 'questiontext', 'qtype']);
+        $table->define_sortablecolumns([
+            'idnunber',
+            'name',
+            'questiontext',
+            'qtype',
+            'questioncontextattempts',
+        ]);
+
+        $table->tabletemplate = 'local_wunderbyte_table/twtable_list';
+        $table->define_cache('local_catquiz', 'testitemstable');
+
+        $table->addcheckboxes = true;
+
+        $table->actionbuttons[] = [
+            'label' => get_string('addtestitem', 'local_catquiz'), // Name of your action button.
+            'class' => 'btn btn-success',
+            'href' => '#',
+            'methodname' => 'addtestitem', // The method needs to be added to your child of wunderbyte_table class.
+            'id' => -1, // This makes one Ajax call for all selected item, not one for each.
+            'data' => [ // Will be added eg as data-id = $values->id, so values can be transmitted to the method above.
+                'titlestring' => 'addtestitemtitle',
+                'bodystring' => 'addtestitembody',
+                'submitbuttonstring' => 'addtestitemsubmit',
+                'component' => 'local_catquiz',
+                'labelcolumn' => 'questiontext',
+                'catscaleid' => $catscaleid,
+            ]
+        ];
+
+        $table->pageable(true);
+
+        $table->stickyheader = false;
+        $table->showcountlabel = true;
+        $table->showdownloadbutton = true;
+        $table->showreloadbutton = true;
+        $table->showrowcountselect = true;
+
+        $table->filteronloadinactive = true;
+
+        return $table->outhtml(10, true);
+    }
+
+
+    /**
      * When there is no table to display, return the right message.
      * @return string
      */
@@ -257,6 +347,7 @@ class questionsdisplay {
             'scaleselectors' => empty(scaleandcontexselector::render_scaleselectors($this->scale)) ? "" : scaleandcontexselector::render_scaleselectors($this->scale),
             'checkbox' => scaleandcontexselector::render_subscale_checkbox($this->usesubs),
             'table' => $this->check_tabledisplay(),
+            'modaltable' => $this->render_addtestitems_table($this->scale),
         ];
 
         return $data;
