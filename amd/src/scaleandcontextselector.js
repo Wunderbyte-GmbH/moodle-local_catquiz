@@ -127,11 +127,15 @@ function getvalueofparentscaleselector(element) {
     // eslint-disable-next-line no-unmodified-loop-condition
     while (keepdeletinglastnode) {
         selects = selectcontainer.querySelectorAll(SELECTORS.SELECTS);
-        last = selects[selects.length - 1];
-        if (last == select) {
+        if (selects.length > 1) {
+            last = selects[selects.length - 1];
+            if (last == select) {
+                keepdeletinglastnode = false;
+            }
+            last.remove();
+        } else {
             keepdeletinglastnode = false;
         }
-        last.remove();
     }
     selects = selectcontainer.querySelectorAll(SELECTORS.SELECTS);
     last = selects[selects.length - 1];
