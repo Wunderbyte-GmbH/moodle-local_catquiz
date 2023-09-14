@@ -46,7 +46,7 @@ class calculationsdisplay {
     public function render_calculations_log_table() {
         global $DB;
 
-        $table = new event_log_table('eventlogtable');
+        $table = new event_log_table('eventlogtable_calculations');
 
         list($select, $from, $where, $filter, $params) = catquiz::return_sql_for_event_logs();
 
@@ -106,9 +106,8 @@ class calculationsdisplay {
 
         $table->define_baseurl(new moodle_url('/local/catquiz/downloads/download.php'));
 
-        //list($idstring, $encodedtable, $html) = $table->lazyouthtml(10, true);
-        //return $html;
-        return $table->outhtml(10, true);
+        list($idstring, $encodedtable, $html) = $table->lazyouthtml(10, true);
+        return $html;
     }
 
     /**
