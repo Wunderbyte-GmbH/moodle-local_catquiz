@@ -333,8 +333,12 @@ class questionsdisplay {
         $output = "";
         if (empty($this->testitemid)) {
             $output = empty($this->renderquestionstable()) ? $this->get_no_table_string() : $this->renderquestionstable();
+            $notable = ($this->renderquestionstable() == $this->get_no_table_string()) ? true : false;
         }
-        return $output;
+        return [
+            'output' => $output,
+            'notable' => $notable,
+        ];
     }
 
     /**
@@ -347,7 +351,8 @@ class questionsdisplay {
             'contextselector' => scaleandcontexselector::render_contextselector($this->catcontextid),
             'scaleselectors' => empty(scaleandcontexselector::render_scaleselectors($this->scale)) ? "" : scaleandcontexselector::render_scaleselectors($this->scale),
             'checkbox' => scaleandcontexselector::render_subscale_checkbox($this->usesubs),
-            'table' => $this->check_tabledisplay(),
+            'table' => $this->check_tabledisplay()['output'],
+            'notable' => $this->check_tabledisplay()['notable'],
             'modaltable' => $this->render_addtestitems_table($this->scale),
         ];
 

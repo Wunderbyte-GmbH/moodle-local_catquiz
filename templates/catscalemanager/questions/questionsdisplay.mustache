@@ -34,26 +34,27 @@
 {{#questionsdisplay}}
     {{>local_catquiz/catscalemanager/scaleandcontextselector}}
     <div>
-        <button type="button" class="btn btn-primary" data-toggle="modal" data-target=".bd-example-modal-xl">{{#str}}addtestitemtitle, local_catquiz{{/str}}</button>
-
-        <div class="modal fade bd-example-modal-xl" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
-            <div class="modal-dialog modal-xl">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title">{{#str}}addtestitemtitle, local_catquiz{{/str}}</h5>
-                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                          <span aria-hidden="true">&times;</span>
-                        </button>
-                      </div>
-                      <div class="modal-body">
-                        <div>{{{modaltable}}}</div>
-                      </div>
-                      <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-dismiss="modal">{{#str}}close, local_catquiz{{/str}}</button>
-                      </div>
+        {{^notable}}
+            <button type="button" class="btn btn-primary" data-toggle="modal" data-target=".bd-example-modal-xl">{{#str}}addtestitemtitle, local_catquiz{{/str}}</button>
+            <div class="modal fade bd-example-modal-xl" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
+                <div class="modal-dialog modal-xl">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title">{{#str}}addtestitemtitle, local_catquiz{{/str}}</h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <div class="modal-body">
+                            <div>{{{modaltable}}}</div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal">{{#str}}close, local_catquiz{{/str}}</button>
+                        </div>
+                    </div>
                 </div>
             </div>
-        </div>
+        {{/notable}}
         {{#table}}
             <div>
                 {{{table}}}
