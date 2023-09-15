@@ -330,15 +330,18 @@ class questionsdisplay {
      * @return string
      */
     private function check_tabledisplay() {
-        $output = "";
-        if (empty($this->testitemid)) {
-            $output = empty($this->renderquestionstable()) ? $this->get_no_table_string() : $this->renderquestionstable();
-            $notable = ($this->renderquestionstable() == $this->get_no_table_string()) ? true : false;
+
+        if ($this->scale === -1) {
+            return [
+                'output' => $this->get_no_table_string(),
+                'notable' => true,
+            ];
+        } else {
+            return [
+                'output' => $this->renderquestionstable(),
+                'notable' => false,
+            ];
         }
-        return [
-            'output' => $output,
-            'notable' => $notable,
-        ];
     }
 
     /**
