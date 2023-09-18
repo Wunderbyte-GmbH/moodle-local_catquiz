@@ -49,7 +49,7 @@ final class addscalestandarderror extends preselect_task implements wb_middlewar
             return $next($context);
         }
 
-        $questionsperscale = [];
+        $fisherinfoperscale = [];
         // Lists for each scale the IDs of the scale itself and its parent scales.
         $scales = [];
         foreach ($context['questions'] as $q) {
@@ -60,11 +60,11 @@ final class addscalestandarderror extends preselect_task implements wb_middlewar
                 ];
             }
             foreach ($scales[$q->catscaleid] as $scaleid) {
-                if (!array_key_exists($scaleid, $questionsperscale)) {
-                    $questionsperscale[$scaleid] = $q->fisherinformation;
+                if (!array_key_exists($scaleid, $fisherinfoperscale)) {
+                    $fisherinfoperscale[$scaleid] = $q->fisherinformation;
                     continue;
                 }
-                $questionsperscale[$scaleid] += $q->fisherinformation;
+                $fisherinfoperscale[$scaleid] += $q->fisherinformation;
             }
         }
 
@@ -72,8 +72,8 @@ final class addscalestandarderror extends preselect_task implements wb_middlewar
         $threshold = $context['standarderrorpersubscale'];
         $excludedscales = $cache->get('excludedscales') ?: [];
         $standarderrorperscale = [];
-        foreach ($questionsperscale as $catscaleid => $numquestions) {
-            $standarderror = (1 / sqrt($numquestions));
+        foreach ($fisherinfoperscale as $catscaleid => $fisherinfo) {
+            $standarderror = (1 / sqrt($fisherinfo));
             $standarderrorperscale[$catscaleid] = $standarderror;
 
             // We already have enough information about that scale.
