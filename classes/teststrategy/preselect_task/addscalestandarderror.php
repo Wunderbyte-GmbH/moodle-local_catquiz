@@ -83,7 +83,11 @@ final class addscalestandarderror extends preselect_task implements wb_middlewar
                 $context['questions'] = array_filter($context['questions'], fn ($q) => $q->id != $catscaleid);
             }
         }
-        // TODO: Handle case where no questions are left.
+        // Handle case where no questions are left.
+        if ($context['questions'] === []) {
+            return result::err(status::ERROR_NO_REMAINING_QUESTIONS);
+        }
+
         $excludedscales = array_unique($excludedscales);
         $cache->set('excludedscale', $excludedscales);
 
