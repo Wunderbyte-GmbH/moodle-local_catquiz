@@ -199,11 +199,20 @@ class info {
 
         $elements[] = $mform->addElement(
             'text',
+            'catquiz_maxquestionspersubscale',
+            get_string('maxquestionspersubscale', 'local_catquiz')
+        );
+        $mform->setDefault('catquiz_maxquestionspersubscale', 0);
+        $mform->addHelpButton('catquiz_maxquestionspersubscale', 'maxquestionspersubscale', 'local_catquiz');
+
+        $elements[] = $mform->addElement(
+            'text',
             'catquiz_maxtimeperquestion',
             get_string('maxtimeperquestion', 'local_catquiz')
         );
         $mform->setDefault('catquiz_maxtimeperquestion', 60);
         $mform->addHelpButton('catquiz_maxtimeperquestion', 'maxtimeperquestion', 'local_catquiz');
+        
         $elements[] = $mform->addElement(
             'text',
             'catquiz_breakduration',
