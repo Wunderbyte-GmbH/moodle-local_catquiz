@@ -77,6 +77,7 @@ class questions_loader implements contextloaderinterface {
             'difficulty'
         );
         $context['questions_ordered_by'] = 'difficulty';
+        $context['original_questions'] = $context['questions'];
 
         $cache = cache::make('local_catquiz', 'adaptivequizattempt');
         if ($cache->get('isfirstquestionofattempt')) {

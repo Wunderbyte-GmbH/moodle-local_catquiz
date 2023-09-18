@@ -58,11 +58,16 @@ final class fisherinformation extends preselect_task implements wb_middleware {
                 $params[$paramname] = floatval($item->$paramname);
             }
 
-            $item->fisherinformation = $model::fisher_info(
+            $fisherinformation = $model::fisher_info(
                 ['ability' => $context['person_ability'][$item->catscaleid]],
                 $params
             );
+            $item->fisherinformation = $fisherinformation;
+            // In order to calculate the standarderror per scale, we need the
+            // fisher information for all questions there.
+            $context['original_questions'][$item->id]->fisherinformation = $fisherinformation;
         }
+
         $context['has_fisherinformation'] = true;
         return $next($context);
     }
@@ -78,6 +83,7 @@ final class fisherinformation extends preselect_task implements wb_middleware {
             'installed_models',
             'person_ability',
             'questions',
+            'original_questions',
         ];
     }
 }

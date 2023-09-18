@@ -52,7 +52,12 @@ final class addscalestandarderror extends preselect_task implements wb_middlewar
         $fisherinfoperscale = [];
         // Lists for each scale the IDs of the scale itself and its parent scales.
         $scales = [];
-        foreach ($context['questions'] as $q) {
+        foreach ($context['original_questions'] as $q) {
+            // Questions that have no item parameters and hence fisher
+            // information are ignored here.
+            if (empty($q->fisherinformation)) {
+                continue;
+            }
             if (!array_key_exists($q->catscaleid, $scales)) {
                 $scales[$q->catscaleid] = [
                     $q->catscaleid,
@@ -105,6 +110,7 @@ final class addscalestandarderror extends preselect_task implements wb_middlewar
     public function get_required_context_keys(): array {
         return [
             'questions',
+            'original_questions',
             'has_fisherinformation',
             'standarderrorpersubscale',
         ];
