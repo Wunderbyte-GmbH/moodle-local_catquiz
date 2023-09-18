@@ -26,8 +26,6 @@ namespace local_catquiz\teststrategy\preselect_task;
 
 use local_catquiz\local\result;
 use local_catquiz\teststrategy\preselect_task;
-use local_catquiz\teststrategy\preselect_task\fisherinformation;
-use local_catquiz\teststrategy\preselect_task\lasttimeplayedpenalty;
 use local_catquiz\wb_middleware;
 
 /**
