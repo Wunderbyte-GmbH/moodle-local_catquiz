@@ -141,10 +141,14 @@ class info {
 
         $teststrategiesoptions = [];
         $strategieswithoutpilotquestions = [];
+        $strategyhasstandarderrorperscale = [];
         foreach ($teststrategies as $ts) {
             $teststrategiesoptions[$ts->id] = $ts->get_description();
             if ($ts->get_description() === get_string('teststrategy_fastest', 'local_catquiz')) {
                 $strategieswithoutpilotquestions[] = $ts->id;
+            }
+            if ($ts->get_description() === get_string('inferallsubscales', 'local_catquiz')) {
+                $strategyhasstandarderrorperscale[] = $ts->id;
             }
         }
 
@@ -170,6 +174,16 @@ class info {
         $mform->setType('catquiz_pilotattemptsthreshold', PARAM_INT);
         $mform->addHelpButton('catquiz_pilotattemptsthreshold', 'pilotattemptsthreshold', 'local_catquiz');
         $mform->setDefault('catquiz_pilotattemptsthreshold', 30);
+
+        $elements[] = $mform->addElement('text', 'catquiz_standarderrorpersubscale', get_string('standarderrorpersubscale', 'local_catquiz'));
+        $mform->addHelpButton('catquiz_standarderrorpersubscale', 'standarderrorpersubscale', 'local_catquiz');
+        $mform->setDefault('catquiz_standarderrorpersubscale', 5);
+        $mform->hideIf(
+            'catquiz_standarderrorpersubscale',
+            'catquiz_selectteststrategy',
+            'neq',
+            $strategyhasstandarderrorperscale
+        );
 
         $elements[] = $mform->addElement('select', 'catquiz_selectfirstquestion',
             get_string('catquiz_selectfirstquestion', 'local_catquiz'),

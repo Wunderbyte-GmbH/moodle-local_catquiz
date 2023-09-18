@@ -61,6 +61,8 @@ $string['pilotratio_help'] = 'Gleitkommazahl für das Verhältnis von Pilotfrage
 $string['pilotattemptsthreshold'] = 'Schwellenwert der Versuche für Pilotfragen';
 $string['pilotattemptsthreshold_help'] = 'Fragen mit weniger Versuchen werden als Pilotfragen klassifiziert';
 $string['includepilotquestions'] = 'Pilotfragen anzeigen';
+$string['standarderrorpersubscale'] = 'Standarderror pro Subskala in Prozent';
+$string['standarderrorpersubscale_help'] = 'Sobald der Standardfehler einer Subskala unter diesen Wert fällt, wird sie nicht weiter getestet.';
 
 $string['timepacedtest'] = 'Zeitbeschränkungen für den Test aktivieren';
 $string['maxtime'] = 'Maximale Dauer des Tests';
