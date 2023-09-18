@@ -62,6 +62,8 @@ $string['pilotratio_help'] = 'Floating point number that specifies how often pil
 $string['pilotattemptsthreshold'] = 'Pilotquestion attempt threshold';
 $string['pilotattemptsthreshold_help'] = 'Questions with less attempts will be considered pilot questions';
 $string['includepilotquestions'] = 'Include pilot questions in the quiz';
+$string['standarderrorpersubscale'] = 'Standarderror per subscale in percent';
+$string['standarderrorpersubscale_help'] = 'If the standard error for a scale drops below this value, it will no longer be tested.';
 
 $string['timepacedtest'] = 'Timepaced test';
 $string['maxtime'] = 'Max time for test';

@@ -69,7 +69,7 @@ final class addscalestandarderror extends preselect_task implements wb_middlewar
         }
 
         $cache = cache::make('local_catquiz', 'adaptivequizattempt');
-        $threshold = 1; // TODO get from quiz settings
+        $threshold = $context['standarderrorpersubscale'];
         $excludedscales = $cache->get('excludedscales') ?: [];
         $standarderrorperscale = [];
         foreach ($questionsperscale as $catscaleid => $numquestions) {
@@ -102,6 +102,7 @@ final class addscalestandarderror extends preselect_task implements wb_middlewar
         return [
             'questions',
             'has_fisherinformation',
+            'standarderrorpersubscale',
         ];
     }
 }
