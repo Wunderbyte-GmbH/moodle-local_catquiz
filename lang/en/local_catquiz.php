@@ -64,6 +64,8 @@ $string['pilotattemptsthreshold_help'] = 'Questions with less attempts will be c
 $string['includepilotquestions'] = 'Include pilot questions in the quiz';
 $string['standarderrorpersubscale'] = 'Standarderror per subscale in percent';
 $string['standarderrorpersubscale_help'] = 'If the standard error for a scale drops below this value, it will no longer be tested.';
+$string['maxquestionspersubscale'] = 'Maximum number of questions returned per subscale';
+$string['maxquestionspersubscale_help'] = 'When this number of questions was returned for any subscale, no more questions from this scale will be shown. A value of 0 means that there is no limit.';
 
 $string['timepacedtest'] = 'Timepaced test';
 $string['maxtime'] = 'Max time for test';

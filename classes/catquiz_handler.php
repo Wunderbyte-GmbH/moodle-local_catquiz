@@ -557,7 +557,7 @@ class catquiz_handler {
             'selectfirstquestion' => $quizsettings->catquiz_selectfirstquestion,
             'skip_reason' => null,
             'userid' => $USER->id,
-            'max_attempts_per_scale' => 10, // TODO: configure via quiz settings
+            'max_attempts_per_scale' => $quizsettings->catquiz_maxquestionspersubscale,
             'teststrategy' => $quizsettings->catquiz_selectteststrategy,
             'timestamp' => time(),
             'attemptid' => intval($attemptdata->id),
