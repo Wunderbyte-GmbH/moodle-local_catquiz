@@ -54,25 +54,25 @@ interface catcalc_ability_estimator {
     /**
      * Log likelihood p
      *
-     * @param mixed $x
+     * @param array $x
      * @param array $itemparams
      * @param float $itemresponse
      *
      * @return mixed
      *
      */
-    public static function log_likelihood_p($x, array $itemparams, float $itemresponse);
+    public static function log_likelihood_p(array $x, array $itemparams, float $itemresponse);
 
     /**
      * Log likelihood p p
      *
-     * @param mixed $x
+     * @param array $x
      * @param array $itemparams
      * @param float $itemresponse
      *
      * @return mixed
      *
      */
-    public static function log_likelihood_p_p($x, array $itemparams, float $itemresponse);
+    public static function log_likelihood_p_p(array $x, array $itemparams, float $itemresponse);
 
 }

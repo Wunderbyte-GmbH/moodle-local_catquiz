@@ -163,7 +163,7 @@ class catcalc {
             $hessian,
             $z_0,
             6,
-            50,
+            50//,
         //    fn ($ip) => $model::restrict_to_trusted_region($ip)
         );
         }
@@ -181,11 +181,11 @@ class catcalc {
         $funs = [];
         
         foreach ($itemresponse as $r) {
-            $funs[] = fn($ip) => $model::get_log_jacobian($r->get_ability(), $r->get_response())($ip);
+            $funs[] = fn($ip) => $model::get_log_jacobian($r->get_ability(), $ip, $r->get_response());
         }
     
-        $jacobian = fn ($ip) => self::build_callable_array($funs)($ip); // from [fn($x), fn($x),...] to fn($x): [...]
-        $jacobian = matrixcat::multi_sum($jacobian);
+        $jacobian = self::build_callable_array($funs); // from [fn($x), fn($x),...] to fn($x): [...]
+        $jacobian = fn ($ip) => matrixcat::multi_sum($jacobian($ip));
 
         return $jacobian;
     }
@@ -202,7 +202,7 @@ class catcalc {
         $hessian = [];
         
         foreach ($itemresponse as $r) {
-            $hessian[] = fn($ip) => $model::get_log_hessian($ip, $r->get_response());
+            $hessian[] = fn($ip) => $model::get_log_hessian($r->get_ability(), $ip, $r->get_response());
         }
             
         $hessian = self::build_callable_array($hessian);
@@ -219,10 +219,11 @@ class catcalc {
      */
     public static function build_callable_array ($functions) {
         return function($x) use ($functions) {
+            $new = [];
             foreach ($functions as $key => $f) {
-            	$functions[$key] = $f($x);
+            	$new[$key] = $f($x);
             }
-        	return $functions;
+        	return $new;
         };
     }
 }
