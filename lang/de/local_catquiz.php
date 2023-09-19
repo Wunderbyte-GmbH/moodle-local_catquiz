@@ -168,6 +168,8 @@ $string['calculation_executed'] = 'Berechnung durchgeführt.';
 $string['executed_calculation_description'] =
     'Es wurde eine Berechnung der CAT Skala {$a->catscalename} mit der ID {$a->catscaleid} im Kontext {$a->contextid} durchgeführt von {$a->userid}. Es wurden {$a->numberofitems} Fragen neu berechnet.';
 $string['deletedcatscale'] = 'CAT Skala die nicht mehr exisitiert.';
+$string['attempt_completed'] = 'Versuch abgeschlossen';
+$string['complete_attempt_description'] = 'Versuch mit ID {$a->attemptid} in CAT Skala {$a->catscalelink} durchgeführt von User {$a->userid}.';
 
 // Message.
 $string['messageprovider:catscaleupdate'] = 'Benachrichtung über eine Aktualisierung einer CAT Skala.';
