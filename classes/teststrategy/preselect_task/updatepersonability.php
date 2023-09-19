@@ -217,7 +217,7 @@ class updatepersonability extends preselect_task implements wb_middleware {
         );
         if (! $lastresponse) {
             // TODO: This should not happen, so maybe log this as event somewhere?
-            return $userresponses;
+            return (new model_responses())->setdata($userresponses, false);
         }
         $userresponses[$context['userid']]['component'][$context['lastquestion']->id] = $lastresponse[$context['userid']]['component'][$context['lastquestion']->id];
         $cache->set('userresponses', $userresponses);
