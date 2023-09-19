@@ -31,23 +31,25 @@ interface catcalc_item_estimator {
      * Get log jacobian
      *
      * @param mixed $ability
+     * @param array $ip
      * @param float $itemresponse
      *
      * @return mixed
      *
      */
-    public static function get_log_jacobian($ability, float $itemresponse);
+    public static function get_log_jacobian($ability, array $ip, float $itemresponse);
 
     /**
      * Get log hessian.
      *
      * @param mixed $ability
+     * @param array $ip
      * @param float $itemresponse
      *
      * @return [type]
      *
      */
-    public static function get_log_hessian($ability, float $itemresponse);
+    public static function get_log_hessian($ability, array $ip, float $itemresponse);
 
     /**
      * Get log tr jacobian.

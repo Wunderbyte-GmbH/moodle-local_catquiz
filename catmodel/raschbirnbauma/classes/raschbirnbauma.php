@@ -127,12 +127,13 @@ class raschbirnbauma extends model_raschmodel {
     /**
      * Calculates the 1st derivative of the LOG Likelihood with respect to the person ability parameter
      *
-     * @param float $pp - person ability parameter
+     * @param array $pp - person ability parameter
      * @param array $ip - item parameters ('difficulty')
      * @param float $k - answer category (0 or 1.0)
      * @return float
      */
-    public static function log_likelihood_p($pp, array $ip, float $k): float {
+    public static function log_likelihood_p(array $pp, array $ip, float $k): float {
+        $pp = $pp[0];
         $a = $ip['difficulty'];
         if ($k < 1.0) {
             return -exp($pp) / (exp($a) + exp($pp));
@@ -149,7 +150,7 @@ class raschbirnbauma extends model_raschmodel {
      * @param float $k - answer category (0 or 1.0)
      * @return float
      */
-    public static function log_likelihood_p_p($pp, array $ip, float $k): float {
+    public static function log_likelihood_p_p(array $pp, array $ip, float $k): float {
         $a = $ip['difficulty'];
         return - (exp($a + $pp[0]) / ((exp($a) + exp($pp[0])) ** 2));
     }
@@ -161,14 +162,14 @@ class raschbirnbauma extends model_raschmodel {
      * @param float $k - answer category (0 or 1.0)
      * @return mixed of function($ip)
      */
-    public static function get_log_jacobian($pp, float $k): array {
+    public static function get_log_jacobian($pp, array $ip, float $k): array {
         if ($k >= 1.0) {
             return [
-                fn ($ip) => (-exp($ip['difficulty'] + $pp) / ((exp($ip['difficulty']) + exp($pp)) * (exp($pp)))) // The d/da .
+                (-exp($ip['difficulty'] + $pp) / ((exp($ip['difficulty']) + exp($pp)) * (exp($pp)))) // The d/da .
             ];
         } else {
             return [
-                fn ($ip) => (exp($pp) / (exp($ip['difficulty']) + exp($pp))) // The d/da .
+                (exp($pp) / (exp($ip['difficulty']) + exp($pp))) // The d/da .
             ];
         }
     }
@@ -180,10 +181,10 @@ class raschbirnbauma extends model_raschmodel {
      * @param float $k - answer category (0 or 1.0)
      * @return array of function($ip)
      */
-    public static function get_log_hessian($pp, float $k): array {
+    public static function get_log_hessian($pp, $ip, float $k): array {
         // 2nd derivative is equal for both k = 0 and k = 1
         return [[
-            fn ($ip) => -exp($ip['difficulty'] + $pp) / (exp($ip['difficulty']) + exp($pp)) ** 2 // The d²/ da² .
+            -exp($ip['difficulty'] + $pp) / (exp($ip['difficulty']) + exp($pp)) ** 2 // The d²/ da² .
         ]];
     }
 

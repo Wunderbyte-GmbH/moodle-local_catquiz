@@ -43,7 +43,7 @@ class raschbirnbauma_test extends TestCase {
      */
     public function test_get_log_jacobian(float $pp, float $k, array $ip, float $expected) {
 
-        $result = raschbirnbauma::get_log_jacobian($pp, $k)[0]($ip);
+        $result = raschbirnbauma::get_log_jacobian($pp, $ip, $k)[0];
 
         // We only verify for four commas after the dot.
         $expected = (float)sprintf("%.6f", $expected);
@@ -79,7 +79,8 @@ class raschbirnbauma_test extends TestCase {
      * @param float $expected
      * @return void
      */
-    public function test_log_likelihood_p(float $pp, float $k, array $ip, float $expected) {
+    public function test_log_likelihood_p(array $pp, float $k, array $ip, float $expected) {
+        $pp = $pp[0];
         $result = raschbirnbauma::log_likelihood_p($pp, $ip, $k);
 
         // We only verify for four commas after the dot.
