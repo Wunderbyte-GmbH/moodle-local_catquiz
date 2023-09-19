@@ -136,5 +136,31 @@
         <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
       </KEYS>
     </TABLE>
+    <TABLE NAME="local_catquiz_attempts" COMMENT="Table to save all relevant data about attempts of adaptive quiz instances. ">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
+        <FIELD NAME="userid" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
+        <FIELD NAME="timecreated" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
+        <FIELD NAME="timemodified" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
+        <FIELD NAME="scaleid" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false" COMMENT="id of the catscale"/>
+        <FIELD NAME="contextid" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false" COMMENT="id of the catcontext"/>
+        <FIELD NAME="courseid" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false" COMMENT="id of the course"/>
+        <FIELD NAME="attemptid" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false" COMMENT="id of corresponding component (i.e. mod_adaptive_quiz)"/>
+        <FIELD NAME="component" TYPE="char" LENGTH="255" NOTNULL="false" SEQUENCE="false"/>
+        <FIELD NAME="instanceid" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false" COMMENT="the instance id of the mod adaptive quiz"/>
+        <FIELD NAME="teststrategy" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false" COMMENT="'STRATEGY_FASTEST': 1 'STRATEGY_BALANCED': 2 'STRATEGY_ALLSUBS': 3 'STRATEGY_LOWESTSUB': 4 'STRATEGY_HIGHESTSUB': 5 'STRATEGY_PILOT': 6"/>
+        <FIELD NAME="status" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false" COMMENT="status defined as ints (see lib.php)"/>
+        <FIELD NAME="total_number_of_testitems" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false" COMMENT="all testitems relevant for this attempt"/>
+        <FIELD NAME="number_of_testitems_used" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false" COMMENT="number of testitems used in the attempt"/>
+        <FIELD NAME="personability_before_attempt" TYPE="number" LENGTH="10" NOTNULL="false" SEQUENCE="false" DECIMALS="4" COMMENT="the personability before the attempt was taken using the scale that is selected for the attempt (see scaleid column)"/>
+        <FIELD NAME="personability_after_attempt" TYPE="number" LENGTH="10" NOTNULL="false" SEQUENCE="false" DECIMALS="4" COMMENT="new person ability after the attempt was completed using the scale that is selected for the attempt (see scaleid column)"/>
+        <FIELD NAME="starttime" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false" COMMENT="start of attempt as unix timestamp"/>
+        <FIELD NAME="endtime" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false" COMMENT="the moment the attempt was completed as unix timestamp"/>
+        <FIELD NAME="json" TYPE="text" NOTNULL="false" SEQUENCE="false" COMMENT="all data concerning attempt including specific data parsed as json"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+      </KEYS>
+</TABLE>
   </TABLES>
 </XMLDB>

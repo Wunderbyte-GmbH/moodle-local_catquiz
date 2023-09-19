@@ -345,5 +345,43 @@ function xmldb_local_catquiz_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2023080300, 'local', 'catquiz');
     }
 
+    if ($oldversion < 2023091900) {
+
+        // Define table local_catquiz_attempts to be created.
+        $table = new xmldb_table('local_catquiz_attempts');
+
+        // Adding fields to table local_catquiz_attempts.
+        $table->add_field('id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, XMLDB_SEQUENCE, null);
+        $table->add_field('userid', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0');
+        $table->add_field('timecreated', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0');
+        $table->add_field('timemodified', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0');
+        $table->add_field('scaleid', XMLDB_TYPE_INTEGER, '10', null, null, null, null);
+        $table->add_field('contextid', XMLDB_TYPE_INTEGER, '10', null, null, null, null);
+        $table->add_field('courseid', XMLDB_TYPE_INTEGER, '10', null, null, null, null);
+        $table->add_field('attemptid', XMLDB_TYPE_INTEGER, '10', null, null, null, null);
+        $table->add_field('component', XMLDB_TYPE_CHAR, '255', null, null, null, null);
+        $table->add_field('instanceid', XMLDB_TYPE_INTEGER, '10', null, null, null, null);
+        $table->add_field('teststrategy', XMLDB_TYPE_INTEGER, '10', null, null, null, null);
+        $table->add_field('status', XMLDB_TYPE_INTEGER, '10', null, null, null, null);
+        $table->add_field('total_number_of_testitems', XMLDB_TYPE_INTEGER, '10', null, null, null, null);
+        $table->add_field('number_of_testitems_used', XMLDB_TYPE_INTEGER, '10', null, null, null, null);
+        $table->add_field('personability_before_attempt', XMLDB_TYPE_NUMBER, '10, 4', null, null, null, null);
+        $table->add_field('personability_after_attempt', XMLDB_TYPE_NUMBER, '10, 4', null, null, null, null);
+        $table->add_field('starttime', XMLDB_TYPE_INTEGER, '10', null, null, null, null);
+        $table->add_field('endtime', XMLDB_TYPE_INTEGER, '10', null, null, null, null);
+        $table->add_field('json', XMLDB_TYPE_TEXT, null, null, null, null, null);
+
+        // Adding keys to table local_catquiz_attempts.
+        $table->add_key('primary', XMLDB_KEY_PRIMARY, ['id']);
+
+        // Conditionally launch create table for local_catquiz_attempts.
+        if (!$dbman->table_exists($table)) {
+            $dbman->create_table($table);
+        }
+
+        // Catquiz savepoint reached.
+        upgrade_plugin_savepoint(true, 2023091900, 'local', 'catquiz');
+    }
+
     return true;
 }
