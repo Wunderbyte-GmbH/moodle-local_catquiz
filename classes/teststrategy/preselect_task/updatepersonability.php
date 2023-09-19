@@ -205,6 +205,7 @@ class updatepersonability extends preselect_task implements wb_middleware {
     }
 
     protected function update_cached_responses($context) {
+        global $CFG;
         $cache = cache::make('local_catquiz', 'adaptivequizattempt');
         $userresponses = $cache->get('userresponses');
         $this->lastquestion = $context['lastquestion'];
@@ -215,7 +216,14 @@ class updatepersonability extends preselect_task implements wb_middleware {
             $context['userid']
         );
         if (! $lastresponse) {
-            throw new \UnexpectedValueException("No response data for last question " . $this->lastquestion->id);
+            // This should not happen, but we can get here if the user made use
+            // of the browser's back-button. In that case, throw an exception in
+            // a development environment but silently ignore the last question
+            // in a production environment.
+            if ($CFG->debug > 0) {
+                throw new \UnexpectedValueException("No response data for last question " . $this->lastquestion->id);
+            }
+            return $userresponses;
         }
         $userresponses[$context['userid']]['component'][$context['lastquestion']->id] = $lastresponse[$context['userid']]['component'][$context['lastquestion']->id];
         $cache->set('userresponses', $userresponses);
