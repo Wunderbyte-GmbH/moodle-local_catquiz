@@ -96,6 +96,7 @@ class attemptfeedback implements renderable, templatable {
      *
      */
     private function render_strategy_feedback() {
+        global $USER;
         if (!$this->teststrategy) {
             return '';
         }
@@ -134,7 +135,10 @@ class attemptfeedback implements renderable, templatable {
         if ($quizsettings = $cache->get('quizsettings')) {
             $context['quizsettings'] = $quizsettings;
         }
-        
+        $context['userid'] = $USER->id;
+        $context['catscaleid'] = $this->catscaleid;
+        $context['teststrategy'] = $this->teststrategy;
+
         foreach ($generators as $generator) {
             $feedback = $generator->get_feedback($context);
             if (! $feedback) {
@@ -142,6 +146,7 @@ class attemptfeedback implements renderable, templatable {
             }
             $context['feedback'][] = $feedback;
         }
+        $saveattemptstatus = catquiz::save_attempt_to_db($context);
         return $context['feedback'];
     }
 

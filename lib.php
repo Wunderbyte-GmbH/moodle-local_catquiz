@@ -58,6 +58,10 @@ define('STATUS_CALCULATED_COLOR_CLASS', 'text-warning');
 define('STATUS_UPDATED_MANUALLY_COLOR_CLASS', 'text-primary');
 define('STATUS_CONFIRMED_MANUALLY_COLOR_CLASS', 'text-success');
 
+// Attempt Status.
+define('ATTEMPT_OK', 0);
+define('ATTEMPT_ABORTED', 1);
+
 define('PERSONABILITY_MAX', 50);
 
 /**

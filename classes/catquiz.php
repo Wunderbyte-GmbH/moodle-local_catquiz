@@ -24,7 +24,12 @@
  */
 
 namespace local_catquiz;
+
+use core\check\result;
+use dml_exception;
+use local_catquiz\event\attempt_completed;
 use moodle_exception;
+use stdClass;
 
 /**
  * Class catquiz
@@ -1220,5 +1225,99 @@ class catquiz {
         $record = $DB->get_record_sql($sql);
 
         return $record;
+    }
+
+    /**
+     * Adds or updates an attempt to db
+     *
+     * @param array $attemptdata
+     * @return int 1 for success, 0 for error
+     */
+    public static function save_attempt_to_db(array $attemptdata) {
+    global $DB;
+
+    if (empty($attemptdata)) {
+        return 0;
+    }
+    // To query the db only once we fetch courseid und instanceid here.
+    $courseandinstance = self::return_course_and_instance_id($attemptdata);
+
+    $data = new stdClass;
+    $data->userid = $attemptdata['userid'];
+    $data->scaleid = $attemptdata['catscaleid'];
+    $data->contextid = $attemptdata['contextid'];
+    $data->courseid = $courseandinstance['courseid'];
+    $data->attemptid = $attemptdata['attemptid'];
+    $data->component = $attemptdata['quizsettings']->modulename;
+    $data->instanceid = $courseandinstance['instanceid'];
+    $data->teststrategy = $attemptdata['teststrategy'];
+    $data->status = ATTEMPT_OK;
+    $data->total_number_of_testitems = null; // ??
+    $data->number_of_testitems_used = null; // ??
+    $data->personability_before_attempt = null; // ??
+    $data->personability_after_attempt = $attemptdata['personabilities'][$attemptdata['catscaleid']];
+    $data->starttime = null; // ??;
+    $data->endtime = $attemptdata['quizsettings']->timemodified;
+
+    $now = time();
+    $data->timemodified = $now;
+    $data->timecreated = $now;
+
+    $data->json = json_encode($attemptdata);
+
+    $id = $DB->insert_record('local_catquiz_attempts', (object)$data);
+
+    if ($id) {
+        // Trigger attempt_completed event.
+        $event = attempt_completed::create([
+            'objectid' => $data->attemptid,
+            'context' => \context_system::instance(),
+            'other' => [
+                'attemptid' => $data->attemptid,
+                'catscaleid' => $data->scaleid,
+                'userid' => $data->userid,
+                'contextid' => $data->contextid,
+                'component' => $data->component,
+                'instanceid' => $data->instanceid,
+                'teststrategy' => $data->teststrategy,
+                'status' => $data->status,
+            ]
+            ]);
+        $event->trigger();
+    }
+
+    //cache_helper::purge_by_event('attemptcreated');
+    //return result::ok($id);
+    return 1;
+    }
+
+    /** Fetch courseid and and instanceid from DB for attempt.
+     * @param array $attemptdata
+     * @return array
+     * @throws dml_exception
+     */
+    public static function return_course_and_instance_id(array $attemptdata) {
+        global $DB;
+        $courseid = 0;
+        $instanceid = 0;
+        if ($attemptdata['quizsettings']->modulename == 'adaptivequiz') {
+            $sql = "SELECT aq.id, aq.course
+                    FROM {adaptivequiz_attempt} aqa
+                    JOIN {adaptivequiz} aq
+                    ON aq.id = aqa.instance
+                    WHERE aqa.id = :attemptid";
+
+            $params = [
+                'attemptid' => $attemptdata['attemptid'],
+            ];
+            $record = $DB->get_record_sql($sql, $params);
+            $courseid = $record->course;
+            $instanceid = $record->id;
+        }
+
+        return [
+            'courseid' => $courseid,
+            'instanceid' => $instanceid,
+        ];
     }
 }
