@@ -53,8 +53,9 @@ class testenvironmentdashboard implements renderable, templatable {
      */
     public function testenvironmenttable($catscaleid = null) {
 
+        $tablesuffix = $catscaleid < 1 ? "" : $catscaleid;
 
-        $table = new testenvironments_table('testenvironmentstable' . $catscaleid ?? "");
+        $table = new testenvironments_table('testenvironmentstable' . $tablesuffix);
 
         list($select, $from, $where, $filter, $params) = $catscaleid
         ? catquiz::return_sql_for_testenvironments("catscaleid=$catscaleid")
