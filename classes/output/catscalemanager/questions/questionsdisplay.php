@@ -82,7 +82,7 @@ class questionsdisplay {
         $this->scale = $catscaleid;
         $this->usesubs = $usesubs;
         $this->testitemid = $testitemid; // ID of record to be displayed in detail instead of table.
-        $this->componentname = $componentname; // ID of record to be displayed in detail instead of table.
+        $this->componentname = $componentname;
 
     }
 
