@@ -104,7 +104,7 @@ export function listenToSelect(element, location, paramname) {
         dynamicForm.addEventListener(dynamicForm.events.FORM_SUBMITTED, (e) => {
             if (!dynamicForm) {
                 // eslint-disable-next-line no-console
-                console.log("change", e);
+                console.log("no dynamic form", e);
                 return;
             }
 
@@ -151,8 +151,6 @@ function getvalueofparentscaleselector(element) {
 
     // Make sure to get the select.
     const select = element.closest(SELECTORS.SELECTS);
-            // eslint-disable-next-line no-console
-            console.log("select", select, "element", element);
 
     // Keep deleting the last selects until the one that triggered the change is deleted.
     let keepdeletinglastnode = true;
@@ -174,16 +172,8 @@ function getvalueofparentscaleselector(element) {
         }
     }
     selects = selectcontainer.querySelectorAll(SELECTORS.SELECTS);
-            // eslint-disable-next-line no-console
-            console.log("selects", selects);
     last = selects[selects.length - 1];
-            // eslint-disable-next-line no-console
-            console.log("last", last);
     // Fetch the value of the last selector.
     const selectedscaleid = last.querySelector('[name="scaleid"]').value;
-
-        // eslint-disable-next-line no-console
-        console.log("value", selectedscaleid);
-
     return selectedscaleid;
 }
