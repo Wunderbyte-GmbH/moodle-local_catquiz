@@ -39,10 +39,11 @@ use local_catquiz\teststrategy\info;
  */
 class debuginfo extends feedbackgenerator {
     protected function run(array $context): array {
+        /*
         if (! $this->has_permissions()) {
-            return [];
+                    return [];
         }
-
+        */
         $cache = cache::make('local_catquiz', 'adaptivequizattempt');
         $cachedcontexts = $cache->get('context');
         if (! $cachedcontexts) {
