@@ -147,6 +147,8 @@ class attemptfeedback implements renderable, templatable {
             $context['feedback'][] = $feedback;
         }
         $saveattemptstatus = catquiz::save_attempt_to_db($context);
+
+        unset($context['feedback'][2]);
         return $context['feedback'];
     }
 
