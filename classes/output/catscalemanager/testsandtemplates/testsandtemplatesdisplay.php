@@ -19,6 +19,7 @@ namespace local_catquiz\output\catscalemanager\testsandtemplates;
 use html_writer;
 use local_catquiz\catquiz;
 use local_catquiz\catscale;
+use local_catquiz\output\catscalemanager\scaleandcontexselector;
 use local_catquiz\output\testenvironmentdashboard;
 use local_catquiz\table\catscalequestions_table;
 use moodle_url;
@@ -39,6 +40,16 @@ class testsandtemplatesdisplay {
      */
     private int $scaleid = 0; // The selected scale.
 
+    /**
+     * @var integer
+     */
+    private int $usesubs = 1; // If subscales should be integrated in question display, value is 1.
+
+    /**
+     * @var string
+     */
+    private string $componentname = 'question'; // Componentname of the testitem.
+
 
     /**
      * Constructor.
@@ -46,60 +57,12 @@ class testsandtemplatesdisplay {
      * @param int $catscaleid
      *
      */
-    public function __construct(int $catscaleid = 0) {
+    public function __construct(int $catscaleid = 0, int $usesubs = 1, string $componentname = 'question') {
         $this->scaleid = $catscaleid;
+        $this->usesubs = $usesubs;
+        $this->componentname = $componentname;
     }
 
-    /**
-     * Renders the scale selector.
-     * @return string
-     */
-    private function render_scaleselectors() {
-        $selectors = $this->render_selector($this->scaleid);
-        $ancestorids = catscale::get_ancestors($this->scaleid);
-        if (count($ancestorids) > 0) {
-            foreach ($ancestorids as $ancestorid) {
-                $selector = $this->render_selector($ancestorid);
-                $selectors = "$selector <br> $selectors";
-            }
-        }
-        $childids = catscale::get_subscale_ids($this->scaleid);
-        if (count($childids) > 0) {
-            // If the selected scale has subscales, we render a selector to choose them with no default selection.
-            $subscaleselector = $this->render_selector($childids[0], true);
-            $selectors .= "<br> $subscaleselector";
-        }
-        return $selectors;
-    }
-
-    /**
-     * Renders the scale selector.
-     *
-     * @param mixed $scaleid
-     * @param bool $noselection
-     * @param string $label
-     *
-     * @return string
-     *
-     */
-    private function render_selector($scaleid, $noselection = false, $label = 'selectcatscale') {
-        $selected = $noselection ? 0 : $scaleid;
-        $ajaxformdata = [
-                        'scaleid' => $scaleid,
-                        'selected' => $selected,
-                        ];
-        $customdata = [
-            'type' => 'scale',
-            'label' => $label, // String localized in 'local_catquiz'.
-        ];
-
-        $form = new \local_catquiz\form\scaleselector(null, $customdata, 'post', '', [], true, $ajaxformdata);
-        // Set the form data with the same method that is called when loaded from JS.
-        // It should correctly set the data for the supplied arguments.
-        $form->set_data_for_dynamic_submission();
-        // Render the form in a specific container, there should be nothing else in the same container.
-        return html_writer::div($form->render(), '', ['id' => 'select_scale_form_scaleid_' . $scaleid]);
-    }
 
     private function render_table() {
 
@@ -114,7 +77,8 @@ class testsandtemplatesdisplay {
     public function export_data_array(): array {
 
         $data = [
-            'scaleselectors' => empty($this->render_scaleselectors()) ? "" : $this->render_scaleselectors(),
+            'scaleselectors' => empty(scaleandcontexselector::render_scaleselectors($this->scaleid)) ? "" : scaleandcontexselector::render_scaleselectors($this->scaleid),
+            'checkbox' => scaleandcontexselector::render_subscale_checkbox($this->usesubs),
             'table' => $this->render_table(),
 
         ];

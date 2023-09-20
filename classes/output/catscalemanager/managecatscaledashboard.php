@@ -136,7 +136,7 @@ class managecatscaledashboard implements renderable, templatable {
         $questionsdisplay = new questionsdisplay($this->testitemid, $this->contextid, $this->catscaleid, $this->usesubs, $this->componentname);
         $this->questionsdisplayarray = $questionsdisplay->export_data_array();
 
-        $testenvironmentdashboard = new testsandtemplatesdisplay($this->catscaleid);
+        $testenvironmentdashboard = new testsandtemplatesdisplay($this->catscaleid, $this->usesubs, $this->componentname);
         $this->testsandtemplatesdisplay = $testenvironmentdashboard->export_data_array();
 
         $catscalestats = new catscalestats();

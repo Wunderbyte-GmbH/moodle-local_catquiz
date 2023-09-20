@@ -27,17 +27,6 @@
 }}
 
 {{#testsandtemplatesdisplay}}
-    <div class="catscales-dashboard grid">
-        <div id="catmanagertestandtemplates scaleselectors">
-                {{{scaleselectors}}}
-        </div>
-    </div>
+    {{>local_catquiz/catscalemanager/scaleandcontextselector}}
     {{{table}}}
 {{/testsandtemplatesdisplay}}
-
-
-{{#js}}
-    require(['local_catquiz/testsandtemplates'], function(init) {
-        init.init();
-    });
-{{/js}}

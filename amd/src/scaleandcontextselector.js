@@ -23,11 +23,11 @@ import DynamicForm from 'core_form/dynamicform';
 
 const SELECTORS = {
     CONTEXTFORM: '#select_context_form',
-    CHECKBOX: 'input.integrate-subscales-checkbox',
+    CHECKBOXSELECTOR: 'input.integrate-subscales-checkbox',
     SCALEFORM: '#select_scale_form',
-    SCALECONTAINER: "[id='catmanagerquestions scaleselectors']", // Make sure to change in the code below.
+    SCALECONTAINER: "[id='catmanagerquestions-scaleselectors']", // Make sure to change in the code below.
     SELECTS: '[id*="select_scale_form_scaleid"]',
-    TABCONTAINER: '#questions',
+    CONTAINERCLASSSELECTOR: '.catscales-dashboard',
 };
 
 
@@ -36,12 +36,23 @@ const SELECTORS = {
  */
 export const init = () => {
 
-    const container = document.querySelector(SELECTORS.TABCONTAINER);
+    const containers = document.querySelectorAll(SELECTORS.CONTAINERCLASSSELECTOR);
 
+    containers.forEach(container => {
+        initComponents(container);
+    });
+};
+/**
+ * Set an eventlistener for a select.
+ *  @param {*} container
+ *
+ */
+function initComponents(container) {
     // Initialize the checkbox.
-    const checkbox = container.querySelector(SELECTORS.CHECKBOX);
-    // eslint-disable-next-line no-unused-vars
-    checkbox.addEventListener('click', e => {
+    var checkbox = container.querySelector(SELECTORS.CHECKBOXSELECTOR);
+    if (checkbox) {
+        // eslint-disable-next-line no-unused-vars
+        checkbox.addEventListener('click', e => {
         let searchParams = new URLSearchParams(window.location.search);
         if (checkbox.checked === true) {
             searchParams.set("usesubs", 1);
@@ -50,19 +61,30 @@ export const init = () => {
             searchParams.set("usesubs", 0);
             window.location.search = searchParams.toString();
         }
-    });
+        });
+    }
 
     // Attach listener to contextselector
     const contextselector = container.querySelector(SELECTORS.CONTEXTFORM);
-    listenToSelect(contextselector, 'local_catquiz\\form\\contextselector', "contextid");
+    if (contextselector) {
+        listenToSelect(contextselector, 'local_catquiz\\form\\contextselector', "contextid");
+    }
+
 
     // Attach listener to each scale select
     const selectcontainer = container.querySelector(SELECTORS.SCALECONTAINER);
-    const selects = selectcontainer.querySelectorAll(SELECTORS.SELECTS);
-    selects.forEach(select => {
-        listenToSelect(select, 'local_catquiz\\form\\scaleselector', "scaleid");
-    });
-};
+    if (selectcontainer) {
+        var selects = selectcontainer.querySelectorAll(SELECTORS.SELECTS);
+        if (selects) {
+            selects.forEach(select => {
+                listenToSelect(select, 'local_catquiz\\form\\scaleselector', "scaleid");
+            });
+        }
+    }
+
+
+
+}
 
 /**
  * Set an eventlistener for a select.
@@ -80,6 +102,11 @@ export function listenToSelect(element, location, paramname) {
         // If a user selects a context, redirect to a URL that includes the selected
         // context as `contextid` query parameter
         dynamicForm.addEventListener(dynamicForm.events.FORM_SUBMITTED, (e) => {
+            if (!dynamicForm) {
+                // eslint-disable-next-line no-console
+                console.log("change", e);
+                return;
+            }
 
             const response = e.detail;
 
@@ -91,19 +118,22 @@ export function listenToSelect(element, location, paramname) {
             } else {
                 searchParams.set(paramname, response[paramname]);
             }
-
             window.location.search = searchParams.toString();
 
         });
 
         dynamicForm.addEventListener('change', (e) => {
+            // eslint-disable-next-line no-console
+            console.log("change", e);
             e.preventDefault();
 
             // We have to wait a little bit so that the data are included in the submit
             // request
             setTimeout(() => {
-                dynamicForm.submitFormAjax();
-            }, 500);
+                if (dynamicForm) {
+                    dynamicForm.submitFormAjax();
+                }
+            }, 100);
         });
 }
 
@@ -115,20 +145,26 @@ export function listenToSelect(element, location, paramname) {
  */
 function getvalueofparentscaleselector(element) {
 
-    var selectcontainer = document.querySelector(SELECTORS.SCALECONTAINER);
+    var selectcontainer = element.closest(SELECTORS.SCALECONTAINER);
     var selects = selectcontainer.querySelectorAll(SELECTORS.SELECTS);
     let last;
 
     // Make sure to get the select.
     const select = element.closest(SELECTORS.SELECTS);
+            // eslint-disable-next-line no-console
+            console.log("select", select, "element", element);
 
     // Keep deleting the last selects until the one that triggered the change is deleted.
     let keepdeletinglastnode = true;
     // eslint-disable-next-line no-unmodified-loop-condition
     while (keepdeletinglastnode) {
         selects = selectcontainer.querySelectorAll(SELECTORS.SELECTS);
+        // eslint-disable-next-line no-console
+        console.log("selects", selects);
         if (selects.length > 1) {
             last = selects[selects.length - 1];
+            // eslint-disable-next-line no-console
+            console.log(last);
             if (last == select) {
                 keepdeletinglastnode = false;
             }
@@ -138,10 +174,16 @@ function getvalueofparentscaleselector(element) {
         }
     }
     selects = selectcontainer.querySelectorAll(SELECTORS.SELECTS);
+            // eslint-disable-next-line no-console
+            console.log("selects", selects);
     last = selects[selects.length - 1];
-
+            // eslint-disable-next-line no-console
+            console.log("last", last);
     // Fetch the value of the last selector.
     const selectedscaleid = last.querySelector('[name="scaleid"]').value;
+
+        // eslint-disable-next-line no-console
+        console.log("value", selectedscaleid);
 
     return selectedscaleid;
 }
