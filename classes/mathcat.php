@@ -179,42 +179,6 @@ class mathcat {
     }
 
     /**
-     * Returns newton raphson numeric value.
-     *
-     * @param mixed $f
-     * @param mixed $x0
-     * @param mixed $tolerance
-     * @param int $maxiterations
-     * @param mixed $h
-     *
-     * @return mixed
-     *
-     */
-    public static function newtonraphson_numeric($f, $x0, $tolerance, $maxiterations = 150, $h = 0.001) {
-
-        // @DAVID: Das hier sollte deprecated sein.
-        
-        for ($i = 0; $i < $maxiterations; $i++) {
-            $fx0 = $f($x0);
-            $dfx0 = ($f($x0 + $h) - $f($x0 - $h)) / (2 * $h);
-
-            if ($dfx0 == 0) {
-                return $x0;
-            }
-
-            $x1 = $x0 - $fx0 / $dfx0;
-
-            if (abs($x1 - $x0) < $tolerance) {
-                return $x1;
-            }
-            // echo "Iteration:" . $i . "and diff: " . $x1 - $x0 . " x_0=" . $x1 . " value: ". $f($x1)  . "<br>";
-            $x0 = $x1;
-        }
-
-        return $x0;
-    }
-
-    /**
      * Returns numerical derivative.
      *
      * @param callable $func
