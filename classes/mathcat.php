@@ -275,7 +275,7 @@ class mathcat {
      * @return array $parameter
      */
     static function newton_raphson_multi_stable (
-        callable $fn_function, // @DAVID: Hier werden nun Callables erwartet, die Arrays zurückgeben, NICHT Arrays of Callables
+        callable $fn_function,
         callable $fn_derivative,
         array $parameter_start,
         int $precission = 6,
