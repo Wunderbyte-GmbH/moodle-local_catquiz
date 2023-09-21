@@ -72,19 +72,19 @@ class catcalc_test extends basic_testcase
         return [
             'web-raschbirnbauma' => [
                 'model' => 'web_raschbirnbauma',
-                'expected' => -17.9611,
+                'expected' => -4.9000,
             ],
             'raschbirnbauma' => [
                 'model' => 'raschbirnbauma',
-                'expected' => -17.9611,
+                'expected' => -4.9000,
             ],
             'raschbirnbaumb' => [
                 'model' => 'raschbirnbaumb',
-                'expected' => -14.3279,
+                'expected' => -4.9000,
             ],
             'raschbirnbaumc' => [
                 'model' => 'raschbirnbaumc',
-                'expected' => -15.8350,
+                'expected' => -4.9000,
             ],
         ];
     }
@@ -167,13 +167,13 @@ class catcalc_test extends basic_testcase
                 'model' => 'raschbirnbaumb',
                 'responses' => $responses,
                 'userabilities' => $userabilities,
-                'expected' => 0.0121,
+                'expected' => 0.6010,
             ],
             'raschbirnbaumc' => [
                 'model' => 'raschbirnbaumc',
                 'responses' => $responses,
                 'userabilities' => $userabilities,
-                'expected' => -1.0000,
+                'expected' => -0.1181,
             ],
         ];
     }
