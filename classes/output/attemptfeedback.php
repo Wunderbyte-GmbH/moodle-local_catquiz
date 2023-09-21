@@ -17,6 +17,7 @@
 namespace local_catquiz\output;
 
 use cache;
+use context_system;
 use local_catquiz\catquiz;
 use local_catquiz\teststrategy\feedbackgenerator;
 use local_catquiz\teststrategy\info;
@@ -148,7 +149,10 @@ class attemptfeedback implements renderable, templatable {
         }
         $saveattemptstatus = catquiz::save_attempt_to_db($context);
 
-        unset($context['feedback'][2]);
+        if (!has_capability('local/catquiz:view_debug_info', context_system::instance())) {
+            unset($context['feedback'][2]);
+        }
+
         return $context['feedback'];
     }
 
