@@ -39,43 +39,10 @@ use local_catquiz\teststrategy\feedbackgenerator;
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class customscalefeedback extends feedbackgenerator {
-    protected function run(array $context): array {
-        $quizsettings = $context['quizsettings'];
-        $personabilities = $context['personabilities'];
+    protected function run(array $data): array {
 
-        if (! $personabilities) {
-            return $this->no_data();
-        }
-
-        $scalefeedback = [];
-        foreach ($personabilities as $catscaleid => $personability) {
-            $lowerlimitprop = sprintf('feedback_scaleid_%d_lowerlimit', $catscaleid);
-            $lowerlimit = floatval($quizsettings->$lowerlimitprop);
-            if ($personability >= $lowerlimit) {
-                continue;
-            }
-
-            $feedbackprop = sprintf('feedback_scaleid_%d_feedback', $catscaleid);
-            $feedback = $quizsettings->$feedbackprop;
-            // Do not display empty feedback messages.
-            if (!$feedback) {
-                continue;
-            }
-
-            $scalefeedback[$catscaleid] = $feedback;
-        }
-        
-        if (! $scalefeedback) {
-            return [];
-        }
-
-        $catscales = catquiz::get_catscales(array_keys($scalefeedback));
-        $text = "";
-        foreach ($catscales as $cs) {
-            $text .= $cs->name . ': ' . $scalefeedback[$cs->id] . '<br/>';
-        }
-
-       return [
+        $text = $data['customscalefeedback'];
+        return [
             'heading' => $this->get_heading(),
             'content' => $text,
         ];
@@ -85,10 +52,58 @@ class customscalefeedback extends feedbackgenerator {
         return [
             'quizsettings',
             'personabilities',
+            'customscalefeedback',
         ];
     }
 
     public function get_heading(): string {
         return get_string('catquiz_feedbackheader', 'local_catquiz');
+    }
+
+    public function load_data(int $attemptid, array $initialcontext): ?array {
+        $cache = cache::make('local_catquiz', 'adaptivequizattempt');
+        $quizsettings = (array) ($initialcontext['quizsettings'] ?? $cache->get('quizsettings')) ?? null;
+        if ($quizsettings === null) {
+            return null;
+        }
+
+        $personabilities = $initialcontext['personabilities'] ?? $cache->get('personabilities') ?? null;
+        if ($personabilities === null) {
+            return null;
+        }
+
+        $scalefeedback = [];
+        foreach ($personabilities as $catscaleid => $personability) {
+            $lowerlimitprop = sprintf('feedback_scaleid_%d_lowerlimit', $catscaleid);
+            $lowerlimit = floatval($quizsettings[$lowerlimitprop]);
+            if ($personability >= $lowerlimit) {
+                continue;
+            }
+
+            $feedbackprop = sprintf('feedback_scaleid_%d_feedback', $catscaleid);
+            $feedback = $quizsettings[$feedbackprop];
+            // Do not display empty feedback messages.
+            if (!$feedback) {
+                continue;
+            }
+
+            $scalefeedback[$catscaleid] = $feedback;
+        }
+        
+        if (! $scalefeedback) {
+            return null;
+        }
+
+        $catscales = catquiz::get_catscales(array_keys($scalefeedback));
+        $text = "";
+        foreach ($catscales as $cs) {
+            $text .= $cs->name . ': ' . $scalefeedback[$cs->id] . '<br/>';
+        }
+
+        return [
+            'customscalefeedback' => $text,
+            'quizsettings' => $quizsettings,
+            'personabilities' => $personabilities,
+        ];
     }
 }

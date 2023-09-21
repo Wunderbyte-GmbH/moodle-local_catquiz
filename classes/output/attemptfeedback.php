@@ -92,6 +92,8 @@ class attemptfeedback implements renderable, templatable {
 
     /**
      * Renders strategy feedback.
+     * 
+     * In addition, it saves all feedback data to the database.
      *
      * @return mixed
      *
@@ -102,55 +104,85 @@ class attemptfeedback implements renderable, templatable {
             return '';
         }
 
-        $availableteststrategies = info::return_available_strategies();
-        $filteredstrategies = array_filter(
-            $availableteststrategies,
-            fn ($strategy) => $strategy->id === $this->teststrategy
-        );
-
-        if (!$attemptstrategy = reset($filteredstrategies)) {
-            return '';
-        }
-
-        $feedbackclasses = $attemptstrategy->get_feedbackgenerators();
-
-        /**
-         * @var feedbackgenerator[]
-         */
-        $generators = [];
-        foreach ($feedbackclasses as $classname) {
-            $generators[] = new $classname();
-        }
+        $generators = $this->get_feedback_generators_for_teststrategy($this->teststrategy);
 
         $context = [
             'attemptid' => $this->attemptid,
             'contextid' => $this->contextid,
+            'strategyid' => $this->teststrategy,
             'needsimprovementthreshold' => 0, // TODO: Get the quantile threshold from the quiz settings.
+            'userid' => $USER->id,
+            'catscaleid' => $this->catscaleid,
+            'teststrategy' => $this->teststrategy,
             'feedback' => [],
         ];
 
-        $cache = cache::make('local_catquiz', 'adaptivequizattempt');
-        if ($personabilities = $cache->get('personabilities')) {
-            $context['personabilities'] = $personabilities;
+        // Get the data required to generate the feedback. This can be saved to
+        // the DB.
+        $feedbackdata = $context;
+        foreach ($generators as $generator) {
+            $generatordata = $generator->load_data($this->attemptid, $context);
+            if (! $generatordata) {
+                continue;
+            }
+            $feedbackdata = array_merge(
+                $feedbackdata,
+                $generatordata
+            );
         }
-        if ($quizsettings = $cache->get('quizsettings')) {
-            $context['quizsettings'] = $quizsettings;
-        }
-        $context['userid'] = $USER->id;
-        $context['catscaleid'] = $this->catscaleid;
-        $context['teststrategy'] = $this->teststrategy;
+        $id = catquiz::save_attempt_to_db($feedbackdata);
 
         foreach ($generators as $generator) {
-            $feedback = $generator->get_feedback($context);
+            $feedback = $generator->get_feedback($feedbackdata);
             if (! $feedback) {
                 continue;
             }
             $context['feedback'][] = $feedback;
         }
-        $saveattemptstatus = catquiz::save_attempt_to_db($context);
 
-        if (!has_capability('local/catquiz:view_debug_info', context_system::instance())) {
-            unset($context['feedback'][2]);
+        return $context['feedback'];
+    }
+
+    /**
+     * 
+     * @param int $strategyid 
+     * @return array<feedbackgenerator>
+     */
+    public function get_feedback_generators_for_teststrategy(int $strategyid): array {
+        $availableteststrategies = info::return_available_strategies();
+        $filteredstrategies = array_filter(
+            $availableteststrategies,
+            fn ($strategy) => $strategy->id === $strategyid
+        );
+
+        if (!$attemptstrategy = reset($filteredstrategies)) {
+            return [];
+        }
+
+        $generators = array_map(
+            fn ($classname) => new $classname(),
+            $attemptstrategy->get_feedbackgenerators());
+
+        return $generators;
+    }
+        
+    public function get_feedback_for_attempt(int $attemptid): array {
+        global $DB;
+        $feedbackdata = json_decode(
+            $DB->get_field(
+                'local_catquiz_attempts',
+                'json',
+                ['attemptid' => $attemptid]
+            ),
+            true
+        );
+        $generators = $this->get_feedback_generators_for_teststrategy($feedbackdata['strategyid']);
+        foreach ($generators as $generator) {
+            $feedback = $generator->get_feedback($feedbackdata);
+            if (!$feedback) {
+                continue;
+            }
+            $context['feedback'][] = $feedback;
         }
 
         return $context['feedback'];

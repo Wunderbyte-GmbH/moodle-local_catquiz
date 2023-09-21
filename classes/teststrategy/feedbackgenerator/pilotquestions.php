@@ -35,18 +35,11 @@ use local_catquiz\teststrategy\feedbackgenerator;
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class pilotquestions extends feedbackgenerator {
-    protected function run(array $context): array {
-        $cache = cache::make('local_catquiz', 'adaptivequizattempt');
-        $numpilotquestions = $cache->get('num_pilot_questions');
-
-        if (! $numpilotquestions) {
-            return $this->no_data();
-        }
-
+    protected function run(array $data): array {
         $feedback = sprintf(
             '%s: %d',
             get_string('pilot_questions', 'local_catquiz'),
-            $cache->get('num_pilot_questions')
+            $data['num_pilot_questions']
         );
 
        return [
@@ -56,10 +49,26 @@ class pilotquestions extends feedbackgenerator {
     }
 
     public function get_required_context_keys(): array {
-        return [];
+        return ['num_pilot_questions'];
     }
 
     public function get_heading(): string {
         return get_string('pilot_questions', 'local_catquiz');
+    }
+
+    public function load_data(int $attemptid, array $initialcontext): ?array
+    {
+        $cache = cache::make('local_catquiz', 'adaptivequizattempt');
+        $numpilotquestions = $initialcontext['num_pilot_questions'] ?? $cache->get('num_pilot_questions') ?? null;
+
+        if ($numpilotquestions === null) {
+            return null;
+        }
+
+        return [
+            'num_pilot_questions' => $numpilotquestions,
+        ];
+
+
     }
 }

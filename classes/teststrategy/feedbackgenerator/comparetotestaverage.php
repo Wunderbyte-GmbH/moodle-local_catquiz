@@ -24,6 +24,7 @@
 
 namespace local_catquiz\teststrategy\feedbackgenerator;
 
+use cache;
 use local_catquiz\catquiz;
 use local_catquiz\teststrategy\feedbackgenerator;
 use local_catquiz\teststrategy\preselect_task\firstquestionselector;
@@ -37,54 +38,7 @@ use local_catquiz\teststrategy\preselect_task\firstquestionselector;
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class comparetotestaverage extends feedbackgenerator {
-    protected function run(array $context): array {
-        $quizsettings = $context['quizsettings'];
-        if (! $catscaleid = $quizsettings->catquiz_catcatscales) {
-            return [];
-        }
-
-        $abilities = $context['personabilities'];
-        if (! $abilities) {
-            return [];
-        }
-
-        $ability = $abilities[$catscaleid];
-        if (! $ability) {
-            return [];
-        }
-
-        $personparams = catquiz::get_person_abilities(
-            $context['contextid'],
-            array_keys($abilities)
-        );
-        $worseabilities = array_filter(
-            $personparams,
-            fn ($pp) => $pp->ability < $ability
-        );
-
-        if (!$worseabilities) {
-            return [];
-        }
-
-        $quantile = (count($worseabilities)/count($personparams)) * 100;
-        $text = get_string('feedbackcomparetoaverage', 'local_catquiz', sprintf('%.2f', $quantile));
-        if ($needsimprovementthreshold = $context['needsimprovementthreshold']) {
-            if ($quantile < $needsimprovementthreshold) {
-                $text .= " " . get_string('feedbackneedsimprovement', 'local_catquiz');
-            }
-        }
-
-        $testaverage = (new firstquestionselector())->get_average_ability_of_test($personparams);
-        $data = [
-            'testaverageability' => sprintf('%.2f', $testaverage),
-            'userability' => sprintf('%.2f', $ability),
-            // Used for positioning in the progress bar. 0 is left, 50 middle and 100 right.
-            // This assumes that all values are in the range [-5, 5].
-            'testaverageposition' => ($testaverage + 5) * 10,
-            'userabilityposition' => ($ability + 5) * 10,
-            'text' => $text
-        ];
-
+    protected function run(array $data): array {
         global $OUTPUT;
         $feedback = $OUTPUT->render_from_template('local_catquiz/feedback/comparetotestaverage', $data);
 
@@ -100,10 +54,76 @@ class comparetotestaverage extends feedbackgenerator {
             'personabilities',
             'quizsettings',
             'needsimprovementthreshold',
+            'testaverageability',
+            'userability',
+            // Used for positioning in the progress bar. 0 is left, 50 middle and 100 right.
+            // This assumes that all values are in the range [-5, 5].
+            'testaverageposition',
+            'userabilityposition',
+            'text',
         ];
     }
 
     public function get_heading(): string {
         return get_string('personability', 'local_catquiz');
+    }
+
+    public function load_data(int $attemptid, array $initialcontext): ?array {
+        $cache = cache::make('local_catquiz', 'adaptivequizattempt');
+        if (! $quizsettings = $cache->get('quizsettings')) {
+            return null;
+        }
+
+        if (! $catscaleid = $quizsettings->catquiz_catcatscales) {
+            return null;
+        }
+
+        if (! $personabilities = $cache->get('personabilities')) {
+            return null;
+        }
+
+        if (! $personabilities) {
+            return null;
+        }
+
+        $ability = $personabilities[$catscaleid];
+        if (! $ability) {
+            return null;
+        }
+
+        $personparams = catquiz::get_person_abilities(
+            $initialcontext['contextid'],
+            array_keys($personabilities)
+        );
+        $worseabilities = array_filter(
+            $personparams,
+            fn ($pp) => $pp->ability < $ability
+        );
+
+        if (!$worseabilities) {
+            return null;
+        }
+
+        $quantile = (count($worseabilities)/count($personparams)) * 100;
+        $text = get_string('feedbackcomparetoaverage', 'local_catquiz', sprintf('%.2f', $quantile));
+        if ($needsimprovementthreshold = $initialcontext['needsimprovementthreshold']) {
+            if ($quantile < $needsimprovementthreshold) {
+                $text .= " " . get_string('feedbackneedsimprovement', 'local_catquiz');
+            }
+        }
+
+        $testaverage = (new firstquestionselector())->get_average_ability_of_test($personparams);
+
+        return [
+            'contextid' => $initialcontext['contextid'],
+            'personabilities' => $personabilities,
+            'quizsettings' => $quizsettings,
+            'needsimprovementthreshold' => $needsimprovementthreshold,
+            'testaverageability' => sprintf('%.2f', $testaverage),
+            'userability' => sprintf('%.2f', $ability),
+            'testaverageposition' => ($testaverage + 5) * 10,
+            'userabilityposition' => ($ability + 5) * 10,
+            'text' => $text
+        ];
     }
 }
