@@ -35,20 +35,7 @@ use local_catquiz\teststrategy\feedbackgenerator;
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class questionssummary extends feedbackgenerator {
-    protected function run(array $context): array {
-        $attemptid = $context['attemptid'];
-        // 2. If an attemptid is given and belongs to the current user (or the user has permissions to see it), return that one.
-        $attempt = catquiz::get_attempt_statistics($attemptid);
-        $data = [];
-        if (! $attempt) {
-            return $this->no_data();
-        }
-
-        $data = [
-            'gradedright' => $attempt['gradedright']->count ?? 0,
-            'gradedwrong' => $attempt['gradedwrong']->count ?? 0,
-            'gradedpartial' => $attempt['gradedpartial']->count ?? 0,
-        ];
+    protected function run(array $data): array {
         global $OUTPUT;
         $feedback = $OUTPUT->render_from_template('local_catquiz/feedback/questionssummary', $data);
 
@@ -62,7 +49,23 @@ class questionssummary extends feedbackgenerator {
         return get_string('questionssummary', 'local_catquiz');
     }
 
+    public function load_data(int $attemptid, array $initialcontext): ?array {
+        if (! $attempt = catquiz::get_attempt_statistics($attemptid)) {
+            return null;
+        }
+
+        return [
+            'gradedright' => $attempt['gradedright']->count ?? 0,
+            'gradedwrong' => $attempt['gradedwrong']->count ?? 0,
+            'gradedpartial' => $attempt['gradedpartial']->count ?? 0,
+        ];
+    }
+
     public function get_required_context_keys(): array {
-        return ['attemptid'];
+        return [
+            'gradedright',
+            'gradedwrong',
+            'gradedpartial',
+        ];
     }
 }

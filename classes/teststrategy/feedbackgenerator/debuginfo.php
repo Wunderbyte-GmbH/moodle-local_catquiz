@@ -38,93 +38,13 @@ use local_catquiz\teststrategy\info;
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class debuginfo extends feedbackgenerator {
-    protected function run(array $context): array {
-        /*
+    protected function run(array $data): array {
         if (! $this->has_permissions()) {
                     return [];
         }
-        */
-        $cache = cache::make('local_catquiz', 'adaptivequizattempt');
-        $cachedcontexts = $cache->get('context');
-        if (! $cachedcontexts) {
-            return $this->no_data();
-        }
 
-        $teststrategies = info::return_available_strategies();
-        $teststrategy = array_filter($teststrategies, fn ($t) => $t->id == $cachedcontexts[0]['teststrategy']);
-        $reflect = new \ReflectionClass($teststrategy[array_key_first($teststrategy)]);
-
-
-        // Each cachedcontext corresponds to one question attempt.
-        $data = [];
-        $catscales = catquiz::get_catscales(array_keys($cachedcontexts[0]['person_ability']));
-        $teststrategy = get_string($reflect->getShortName(), 'local_catquiz');
-
-        foreach ($cachedcontexts as $context) {
-
-            $personabilities = [];
-            foreach ($context['person_ability'] as $catscaleid => $pp) {
-                $personabilities[] = $catscales[$catscaleid]->name . ": " . $pp;
-            }
-            $personabilities = '"' . implode(", ", $personabilities) . '"';
-
-            $questions = [];
-            foreach ($context['questions'] as $qid => $question) {
-                $fisherinformation = $question->fisherinformation ?? "NA";
-                $score = $question->score ?? "NA";
-                $questions[] = [
-                    'id' => $qid,
-                    'text' => $question->questiontext,
-                    'type' => $question->qtype,
-                    'fisherinformation' => $fisherinformation,
-                    'score' => $score,
-                ];
-            }
-            $questions[array_key_last($questions)]['last'] = true;
-
-            $selectedscale = isset($context['selected_catscale'])
-                ? $catscales[$context['selected_catscale']]->name
-                : "NA";
-
-            $lastresponse = isset($context['lastresponse'])
-                ? $context['lastresponse']['fraction']
-                : "NA";
-
-            $standarderrorperscale = [];
-            if (array_key_exists('standarderrorperscale', $context)) {
-                foreach ($context['standarderrorperscale'] as $scaleid => $standarderror) {
-                    $standarderrorperscale[] = [
-                        'name' => $catscales[$scaleid]->name,
-                        'se' => $standarderror,
-                    ];
-                }
-            }
-            if ($standarderrorperscale) {
-                $standarderrorperscale[array_key_last($standarderrorperscale)]['last'] = true;
-            }
-
-            $data[] = [
-                'userid' => $context['userid'],
-                'attemptid' => $context['attemptid'],
-                'questionsattempted' => $context['questionsattempted'],
-                'timestamp' => $context['timestamp'],
-                'contextid' => $context['contextid'],
-                'catscale' => $catscales[$context['catscaleid']]->name,
-                'teststrategy' => $teststrategy,
-                'personabilities' => $personabilities,
-                'questions' => $questions,
-                'active_scales' => '"' . implode(", ", array_map(fn ($catscale) => $catscale->name, $catscales)) . '"',
-                'lastquestion' => (array) $context['lastquestion'],
-                'selectedscale' => $selectedscale,
-                'lastmiddleware' => $context['lastmiddleware'],
-                'updateabilityfallback' => $context['updateabilityfallback'],
-                'excludedsubscales' => implode(',', $context['excludedsubscales']),
-                'lastresponse' => $lastresponse,
-                'standarderrorperscale' => $standarderrorperscale,
-            ];
-        }
         global $OUTPUT;
-        $feedback = $OUTPUT->render_from_template('local_catquiz/feedback/debuginfo', ['data' => $data]);
+        $feedback = $OUTPUT->render_from_template('local_catquiz/feedback/debuginfo', ['data' => $data['debuginfo']]);
 
         return [
             'heading' => $this->get_heading(),
@@ -137,7 +57,7 @@ class debuginfo extends feedbackgenerator {
     }
 
     public function get_required_context_keys(): array {
-        return [];
+        return ['debuginfo'];
     }
 
     private function has_permissions() {
@@ -148,5 +68,86 @@ class debuginfo extends feedbackgenerator {
 
     private function get_question_details(array $context) {
         return array_map(fn ($q) => (array) $q, $context['questions']);
+    }
+
+    public function load_data(int $attemptid, array $initialcontext): ?array {
+        $cache = cache::make('local_catquiz', 'adaptivequizattempt');
+        if (! $cachedcontexts = $cache->get('context')) {
+            return null;
+        }
+
+        $teststrategies = info::return_available_strategies();
+        $teststrategy = array_filter($teststrategies, fn ($t) => $t->id == $cachedcontexts[0]['teststrategy']);
+        $reflect = new \ReflectionClass($teststrategy[array_key_first($teststrategy)]);
+
+        // Each cachedcontext corresponds to one question attempt.
+        $debuginfo = [];
+        $catscales = catquiz::get_catscales(array_keys($cachedcontexts[0]['person_ability']));
+        $teststrategy = get_string($reflect->getShortName(), 'local_catquiz');
+
+        foreach ($cachedcontexts as $data) {
+
+            $personabilities = [];
+            foreach ($data['person_ability'] as $catscaleid => $pp) {
+                $personabilities[] = $catscales[$catscaleid]->name . ": " . $pp;
+            }
+            $personabilities = '"' . implode(", ", $personabilities) . '"';
+
+            $questions = [];
+            foreach ($data['questions'] as $qid => $question) {
+                $fisherinformation = $question->fisherinformation ?? "NA";
+                $score = $question->score ?? "NA";
+                $questions[] = [
+                    'id' => $qid,
+                    'text' => $question->questiontext,
+                    'type' => $question->qtype,
+                    'fisherinformation' => $fisherinformation,
+                    'score' => $score,
+                ];
+            }
+            $questions[array_key_last($questions)]['last'] = true;
+
+            $selectedscale = isset($data['selected_catscale'])
+                ? $catscales[$data['selected_catscale']]->name
+                : "NA";
+
+            $lastresponse = isset($data['lastresponse'])
+                ? $data['lastresponse']['fraction']
+                : "NA";
+
+            $standarderrorperscale = [];
+            if (array_key_exists('standarderrorperscale', $data)) {
+                foreach ($data['standarderrorperscale'] as $scaleid => $standarderror) {
+                    $standarderrorperscale[] = [
+                        'name' => $catscales[$scaleid]->name,
+                        'se' => $standarderror,
+                    ];
+                }
+            }
+            if ($standarderrorperscale) {
+                $standarderrorperscale[array_key_last($standarderrorperscale)]['last'] = true;
+            }
+
+            $debuginfo[] = [
+                'userid' => $data['userid'],
+                'attemptid' => $data['attemptid'],
+                'questionsattempted' => $data['questionsattempted'],
+                'timestamp' => $data['timestamp'],
+                'contextid' => $data['contextid'],
+                'catscale' => $catscales[$data['catscaleid']]->name,
+                'teststrategy' => $teststrategy,
+                'personabilities' => $personabilities,
+                'questions' => $questions,
+                'active_scales' => '"' . implode(", ", array_map(fn ($catscale) => $catscale->name, $catscales)) . '"',
+                'lastquestion' => (array) $data['lastquestion'],
+                'selectedscale' => $selectedscale,
+                'lastmiddleware' => $data['lastmiddleware'],
+                'updateabilityfallback' => $data['updateabilityfallback'],
+                'excludedsubscales' => implode(',', $data['excludedsubscales']),
+                'lastresponse' => $lastresponse,
+                'standarderrorperscale' => $standarderrorperscale,
+            ];
+        }
+        return ['debuginfo' => $debuginfo];
     }
 }

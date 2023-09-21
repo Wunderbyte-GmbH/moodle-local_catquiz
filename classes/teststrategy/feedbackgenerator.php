@@ -37,34 +37,43 @@ use UnexpectedValueException;
 abstract class feedbackgenerator {
     /**
      * Returns an array with two keys 'heading' and 'context'
-     * @param array $context 
-     * @return array 
+     * @param array $data
+     * @return array
      */
-    abstract protected function run(array $context): array;
+    abstract protected function run(array $data): array;
 
     /**
      * Returns an array of the required elements in the $context array that will
      * be passed to the feedbackgenerator.
-     * 
-     * @return array 
+     *
+     * @return array
      */
     abstract public function get_required_context_keys(): array;
-    
+
     /**
      * The translated heading of this feedback.
-     * @return string 
+     * @return string
      */
     abstract public function get_heading(): string;
-    
+
+    /**
+     * Loads the data required to render the feedback
+     * @param int $attemptid
+     * @param int $contextid
+     * @return ?array
+     */
+    abstract public function load_data(int $attemptid, array $initialcontext): ?array;
+
     /**
      * Returns the feedback as an array with elements 'heading' and 'feedback'.
-     * 
-     * @param array $context 
-     * @return array 
-     * @throws coding_exception 
-     * @throws UnexpectedValueException 
+     *
+     * @param array $context
+     * @return array
+     * @throws coding_exception
+     * @throws UnexpectedValueException
      */
     public function get_feedback(array $context): array {
+        // Check if all required data are provided. If not, load them.
         if (!$this->has_required_context_keys($context)) {
             return $this->no_data();
         }
@@ -79,8 +88,8 @@ abstract class feedbackgenerator {
 
     /**
      * Returns a fallback if no feedback can be generated.
-     * @return array 
-     * @throws coding_exception 
+     * @return array
+     * @throws coding_exception
      */
     protected function no_data(): array {
         return [

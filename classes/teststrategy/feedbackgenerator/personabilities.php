@@ -24,6 +24,7 @@
 
 namespace local_catquiz\teststrategy\feedbackgenerator;
 
+use cache;
 use local_catquiz\catquiz;
 use local_catquiz\teststrategy\feedbackgenerator;
 
@@ -35,12 +36,35 @@ use local_catquiz\teststrategy\feedbackgenerator;
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class personabilities extends feedbackgenerator {
-    protected function run(array $context): array {
+    protected function run(array $data): array {
+        global $OUTPUT;
+        $feedback = $OUTPUT->render_from_template(
+            'local_catquiz/feedback/personabilities',
+            ['abilities' => $data['feedback_personabilities']]
+        );
 
-        // If we have person abilities in the cache, show them.
-        $personabilities = $context['personabilities'];
-        if (!$personabilities) {
-            return $this->no_data();
+       return [
+            'heading' => $this->get_heading(),
+            'content' => $feedback,
+        ];
+    }
+
+    public function get_required_context_keys(): array {
+        return [
+            'feedback_personabilities',
+        ];
+    }
+
+    public function get_heading(): string {
+        return get_string('personability', 'local_catquiz');
+    }
+    
+    public function load_data(int $attemptid, array $initialcontext): ?array
+    {
+        $cache = cache::make('local_catquiz', 'adaptivequizattempt');
+        $personabilities = $initialcontext['personabilities'] ?? $cache->get('personabilities') ?? null;
+        if ($personabilities === null) {
+            return null;
         }
 
         $catscales = catquiz::get_catscales(array_keys($personabilities));
@@ -60,23 +84,6 @@ class personabilities extends feedbackgenerator {
                 'name' => $catscales[$catscaleid]->name
             ];
         }
-
-        global $OUTPUT;
-        $feedback = $OUTPUT->render_from_template('local_catquiz/feedback/personabilities', ['abilities' => $data]);
-
-       return [
-            'heading' => $this->get_heading(),
-            'content' => $feedback,
-        ];
-    }
-
-    public function get_required_context_keys(): array {
-        return [
-            'personabilities',
-        ];
-    }
-
-    public function get_heading(): string {
-        return get_string('personability', 'local_catquiz');
+        return ['feedback_personabilities' => $data];
     }
 }
