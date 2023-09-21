@@ -28,28 +28,28 @@ namespace local_catquiz;
 interface catcalc_item_estimator {
 
     /**
-     * Get log jacobian
+     * Calculates the 1st derivative of the LOG Likelihood with respect to the item parameters
      *
-     * @param mixed $ability
+     * @param float $ability
      * @param array $ip
      * @param float $itemresponse
      *
-     * @return mixed
+     * @return array
      *
      */
-    public static function get_log_jacobian($ability, array $ip, float $itemresponse);
+    public static function get_log_jacobian($ability, array $ip, float $itemresponse): array;
 
     /**
-     * Get log hessian.
+     * Calculates the 2nd derivative of the LOG Likelihood with respect to the item parameters
      *
-     * @param mixed $ability
+     * @param float $ability
      * @param array $ip
      * @param float $itemresponse
      *
-     * @return [type]
+     * @return array
      *
      */
-    public static function get_log_hessian($ability, array $ip, float $itemresponse);
+    public static function get_log_hessian($ability, array $ip, float $itemresponse): array;
 
     /**
      * Get log tr jacobian.

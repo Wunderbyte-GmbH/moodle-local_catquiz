@@ -154,16 +154,6 @@ class web_raschbirnbauma extends model_model implements catcalc_ability_estimato
         return self::likelihood_multi($personability, $params) * (1 - self::likelihood_multi($personability, $params));
     }
 
-    /**
-     * Returns log likelihood p
-     *
-     * @param mixed $p
-     * @param array $params
-     * @param float $itemresponse
-     *
-     * @return float
-     *
-     */
     public static function log_likelihood_p($p, array $params, float $itemresponse): float {
         return raschbirnbauma::log_likelihood_p($p, $params, $itemresponse);
     }
@@ -196,16 +186,6 @@ class web_raschbirnbauma extends model_model implements catcalc_ability_estimato
         return raschbirnbauma::log_likelihood($p, $params, $itemresponse);
     }
 
-    /**
-     * Returns log likelihood p p
-     *
-     * @param mixed $p
-     * @param array $params
-     * @param float $itemresponse
-     *
-     * @return float
-     *
-     */
     public static function log_likelihood_p_p($p, array $params, float $itemresponse): float {
         return raschbirnbauma::log_likelihood_p_p($p, $params, $itemresponse);
     }
