@@ -128,7 +128,6 @@ class catcalc {
             [0.1],
             6,
             50
-            //fn ($ip) => $model::restrict_to_trusted_region($ip)
         );
 
         return reset($result);
