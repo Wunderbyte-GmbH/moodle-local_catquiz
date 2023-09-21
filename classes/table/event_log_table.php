@@ -102,7 +102,7 @@ class event_log_table extends wunderbyte_table {
         $userid = $values->userid;
         $user = catquiz::get_user_by_id($userid);
 
-        return $user->username;
+        return $user->username ?? 'anonymous'; // TODO: localize this.
     }
 
 }
