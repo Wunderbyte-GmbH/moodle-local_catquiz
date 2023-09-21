@@ -130,7 +130,9 @@ class catcalc {
             50
         );
 
-        return reset($result);
+        // The ability is wrapped inside an array.
+        $ability = $result[0];
+        return $ability;
     }
 
     /**
