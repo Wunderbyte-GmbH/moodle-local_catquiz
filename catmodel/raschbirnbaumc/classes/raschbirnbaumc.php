@@ -124,14 +124,6 @@ class raschbirnbaumc extends model_raschmodel {
         return log(self::likelihood($pp, $ip, $k));
     }
 
-    /**
-     * Calculates the 1st derivative of the LOG Likelihood with respect to the person ability parameter
-     *
-     * @param float $pp - person ability parameter
-     * @param array $ip - item parameters ('difficulty')
-     * @param float $k - answer category (0 or 1.0)
-     * @return float
-     */
     public static function log_likelihood_p(array $pp, array $ip, float $k):float {
         $pp = $pp[0];
         $a = $ip['difficulty']; $b = $ip['discrimination']; $c = $ip['guessing'];
@@ -143,14 +135,6 @@ class raschbirnbaumc extends model_raschmodel {
         }
     }
 
-    /**
-     * Calculates the 2nd derivative of the LOG Likelihood with respect to the person ability parameter
-     *
-     * @param array $pp - person ability parameter
-     * @param array $ip - item parameters ('difficulty')
-     * @param float $k - answer category (0 or 1.0)
-     * @return float
-     */
     public static function log_likelihood_p_p(array $pp, array $ip, float $k):float {
         $pp = $pp[0];
         $a = $ip['difficulty']; $b = $ip['discrimination']; $c = $ip['guessing'];
@@ -162,13 +146,6 @@ class raschbirnbaumc extends model_raschmodel {
         }
     }
 
-    /**
-     * Calculates the 1st derivative of the LOG Likelihood with respect to the item parameters
-     *
-     * @param float $pp - person ability parameter
-     * @param float $k - answer category (0 or 1.0)
-     * @return array of function($ip)
-     */
     public static function get_log_jacobian($pp, $ip, float $k):array {
         if ($k >= 1.0) {
             return [
@@ -185,13 +162,6 @@ class raschbirnbaumc extends model_raschmodel {
         }
     }
 
-    /**
-     * Calculates the 2nd derivative of the LOG Likelihood with respect to the item parameters
-     *
-     * @param float $pp - person ability parameter
-     * @param float $k - answer category (0 or 1.0)
-     * @return array of function($ip)
-     */
     public static function get_log_hessian($pp, $ip, float $k):array {
 
         if ($k >= 1.0) {

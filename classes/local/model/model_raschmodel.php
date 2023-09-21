@@ -230,27 +230,5 @@ abstract class model_raschmodel extends model_model implements catcalc_item_esti
      */
     abstract public static function log_likelihood($x, array $itemparams, float $itemresponse);
 
-    /**
-     * Log likelihood p.
-     *
-     * @param array $x
-     * @param array $itemparams
-     * @param float $itemresponse
-     *
-     * @return mixed
-     *
-     */
-    abstract public static function log_likelihood_p(array $x, array $itemparams, float $itemresponse);
-
-    /**
-     * Log likelihood p p.
-     *
-     * @param array $x
-     * @param array $itemparams
-     * @param float $itemresponse
-     *
-     * @return mixed
-     *
-     */
     abstract public static function log_likelihood_p_p(array $x, array $itemparams, float $itemresponse);
 }
