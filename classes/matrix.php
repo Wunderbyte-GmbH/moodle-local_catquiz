@@ -290,20 +290,20 @@ class matrix extends ArrayObject {
      * @return Matrix The new computed matrix
      */
     public function cofactor() {
-        $cofactorArray = [];
+        $cofactorarray = [];
         for ($c = 0; $c < $this->_cols; $c++) {
-            $cofactorArray[$c] = [];
+            $cofactorarray[$c] = [];
             for ($r = 0; $r < $this->_rows; $r++) {
                 if ($this->_cols == 1) {
-                    $cofactorArray[$c][$r] = 1;
+                    $cofactorarray[$c][$r] = 1;
                 } elseif ($this->_cols == 2) {
-                    $cofactorArray[$c][$r] = pow(-1, $c + $r) * $this->subMatrix($c, $r)[0][0];
+                    $cofactorarray[$c][$r] = pow(-1, $c + $r) * $this->subMatrix($c, $r)[0][0];
                 } else {
-                    $cofactorArray[$c][$r] = pow(-1, $c + $r) * $this->subMatrix($c, $r)->determinant();
+                    $cofactorarray[$c][$r] = pow(-1, $c + $r) * $this->subMatrix($c, $r)->determinant();
                 }
             }
         }
-        return new self($cofactorArray);
+        return new self($cofactorarray);
     }
 
     /**
