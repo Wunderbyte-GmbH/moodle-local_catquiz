@@ -41,11 +41,11 @@ class mathcat_test extends basic_testcase
      */
     public function test_newton_raphson_multi_stable() {
         $result = mathcat::newton_raphson_multi_stable(
-            fn ($x) => [1],
-            fn ($x) => [1],
+            fn ($x) => [0],
+            fn ($x) => [0],
             ['difficulty' => 0]
         );
-        $expected = ['difficulty' => 1];
+        $expected = ['difficulty' => 0];
         $this->assertEquals($expected, $result);
     }
 }

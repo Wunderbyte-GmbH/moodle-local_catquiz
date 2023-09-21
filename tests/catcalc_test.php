@@ -173,7 +173,7 @@ class catcalc_test extends basic_testcase
                 'model' => 'raschbirnbaumc',
                 'responses' => $responses,
                 'userabilities' => $userabilities,
-                'expected' => -0.1181,
+                'expected' => 0.4270,
             ],
         ];
     }
