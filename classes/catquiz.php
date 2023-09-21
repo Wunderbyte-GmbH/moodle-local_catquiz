@@ -1234,61 +1234,61 @@ class catquiz {
      * @return int 1 for success, 0 for error
      */
     public static function save_attempt_to_db(array $attemptdata) {
-    global $DB;
+        global $DB;
 
-    if (empty($attemptdata)) {
-        return 0;
-    }
-    // To query the db only once we fetch courseid und instanceid here.
-    $courseandinstance = self::return_course_and_instance_id($attemptdata);
+        if (empty($attemptdata)) {
+            return 0;
+        }
+        // To query the db only once we fetch courseid und instanceid here.
+        $courseandinstance = self::return_course_and_instance_id($attemptdata);
 
-    $data = new stdClass;
-    $data->userid = $attemptdata['userid'];
-    $data->scaleid = $attemptdata['catscaleid'];
-    $data->contextid = $attemptdata['contextid'];
-    $data->courseid = $courseandinstance['courseid'];
-    $data->attemptid = $attemptdata['attemptid'];
-    $data->component = $attemptdata['quizsettings']->modulename;
-    $data->instanceid = $courseandinstance['instanceid'];
-    $data->teststrategy = $attemptdata['teststrategy'];
-    $data->status = ATTEMPT_OK;
-    $data->total_number_of_testitems = null; // ??
-    $data->number_of_testitems_used = null; // ??
-    $data->personability_before_attempt = null; // ??
-    $data->personability_after_attempt = $attemptdata['personabilities'][$attemptdata['catscaleid']];
-    $data->starttime = null; // ??;
-    $data->endtime = $attemptdata['quizsettings']->timemodified;
+        $data = new stdClass;
+        $data->userid = $attemptdata['userid'];
+        $data->scaleid = $attemptdata['catscaleid'];
+        $data->contextid = $attemptdata['contextid'];
+        $data->courseid = $courseandinstance['courseid'];
+        $data->attemptid = $attemptdata['attemptid'];
+        $data->component = $attemptdata['quizsettings']->modulename;
+        $data->instanceid = $courseandinstance['instanceid'];
+        $data->teststrategy = $attemptdata['teststrategy'];
+        $data->status = ATTEMPT_OK;
+        $data->total_number_of_testitems = null; // ??
+        $data->number_of_testitems_used = null; // ??
+        $data->personability_before_attempt = null; // ??
+        $data->personability_after_attempt = $attemptdata['personabilities'][$attemptdata['catscaleid']] ?? null;
+        $data->starttime = null; // ??;
+        $data->endtime = $attemptdata['quizsettings']->timemodified ?? time();
 
-    $now = time();
-    $data->timemodified = $now;
-    $data->timecreated = $now;
+        $now = time();
+        $data->timemodified = $now;
+        $data->timecreated = $now;
 
-    $data->json = json_encode($attemptdata);
+        $data->json = json_encode($attemptdata);
 
-    $id = $DB->insert_record('local_catquiz_attempts', (object)$data);
+        $id = $DB->insert_record('local_catquiz_attempts', (object)$data);
 
-    if ($id) {
-        // Trigger attempt_completed event.
-        $event = attempt_completed::create([
-            'objectid' => $data->attemptid,
-            'context' => \context_system::instance(),
-            'other' => [
-                'attemptid' => $data->attemptid,
-                'catscaleid' => $data->scaleid,
-                'userid' => $data->userid,
-                'contextid' => $data->contextid,
-                'component' => $data->component,
-                'instanceid' => $data->instanceid,
-                'teststrategy' => $data->teststrategy,
-                'status' => $data->status,
-            ]
-            ]);
-        $event->trigger();
-    }
+        if ($id) {
+            // Trigger attempt_completed event.
+            $event = attempt_completed::create([
+                'objectid' => $data->attemptid,
+                'context' => \context_system::instance(),
+                'other' => [
+                    'attemptid' => $data->attemptid,
+                    'catscaleid' => $data->scaleid,
+                    'userid' => $data->userid,
+                    'contextid' => $data->contextid,
+                    'component' => $data->component,
+                    'instanceid' => $data->instanceid,
+                    'teststrategy' => $data->teststrategy,
+                    'status' => $data->status,
+                ]
+                ]);
+            $event->trigger();
+        }
 
-    //cache_helper::purge_by_event('attemptcreated');
-    //return result::ok($id);
-    return 1;
+        //cache_helper::purge_by_event('attemptcreated');
+        //return result::ok($id);
+        return 1;
     }
 
     /** Fetch courseid and and instanceid from DB for attempt.
