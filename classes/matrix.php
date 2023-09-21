@@ -107,7 +107,6 @@ class matrix extends ArrayObject {
                 }
             } else {
                 // Note: int|float is given, convert to proper matrix.
-                // Throws error "Object of class Closure can not be converted to float.
                 $value = [[floatval($value)]];
             }
             parent::__construct($value);
@@ -267,7 +266,6 @@ class matrix extends ArrayObject {
      */
     public function determinant() {
         if (!$this->isSquare()) {
-            print_r($this);
             throw new MatrixException('Cannot compute determinant of non square matrix!');
         }
         if ($this->_rows == 1) {
