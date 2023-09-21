@@ -392,65 +392,6 @@ class mathcat {
     }
 
     /**
-     * Returns newton raphson multi value(s).
-     *
-     * @param mixed $func
-     * @param mixed $derivative
-     * @param mixed $start
-     * @param mixed $mininc
-     * @param int $maxiter
-     *
-     * @return mixed
-     *
-     */
-    public static function newton_raphson_multi($func, $derivative, $start, $mininc = 0.0001, $maxiter = 2000) {
-
-        // @DAVID: Ersetzen durch Newton-Raphson-multi-stable. Aktueller Aufruf:
-        # return ewton_raphson_multi_stable($func, $derivative, [$start], -runden(log($mininc),10),0), $maxiter); // Plus Filter und 1./2. Ableitung
-        // Wenn erfolgreich, dann bitte diese Funktion als deprecated behandeln und entfernen.
-        
-        $modeldim = count($func);
-
-        $ml = new matrixcat();
-
-        // Get real jacobian/hessian.
-        $z0 = $start;
-        $parameternames = array_keys($z0);
-
-        // Jacobian, hessian, model_dim, start_value.
-        for ($i = 0; $i < $maxiter; $i++) {
-
-            for ($k = 0; $k <= $modeldim - 1; $k++) {
-
-                $realfunc[$k] = [$func[$k]($z0)];
-
-                for ($j = 0; $j <= $modeldim - 1; $j++) {
-                    $realderivative[$k][$j] = $derivative[$k][$j]($z0);
-                }
-            }
-
-            $g = $realfunc;
-            $j = $realderivative;
-
-            $jinv = $ml->inverseMatrix($j);
-
-            if (is_array($z0)) {
-
-            } else {
-                $z1 = $z0 - $ml->flattenArray($ml->multiplyMatrices($jinv, $g))[0];
-                $dist = abs($z0 - $z1);
-            }
-
-            if ($dist < $mininc) {
-                return array_combine($parameternames, array($z1));
-            }
-            $z0 = array_combine($parameternames, array($z1));
-        }
-
-        return $z0;
-    }
-
-    /**
      * Performs the Newton-Raphson approach for determine the zero point of a function
      *
      * @param callable<array> $fn_function($parameter) - Function to be calculated on with parameter $parameter
