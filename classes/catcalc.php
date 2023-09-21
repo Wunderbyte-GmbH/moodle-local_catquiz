@@ -163,11 +163,10 @@ class catcalc {
             $hessian,
             $z_0,
             6,
-            50//,
-        //    fn ($ip) => $model::restrict_to_trusted_region($ip)
+            50,
+            fn ($ip) => $model::restrict_to_trusted_region($ip)
         );
-        }
-    // @ DAVID: Falls noch nirgendwo implementiert:
+    }
 
     /**
      * Builds the jacobian function for item params and the given model. 
