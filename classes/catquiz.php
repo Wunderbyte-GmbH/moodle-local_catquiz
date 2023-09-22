@@ -695,6 +695,32 @@ class catquiz {
     }
 
     /**
+     * Return sql to render quiz attempts.
+     *
+     * @param string $where
+     * @param array $filterarray
+     *
+     * @return array
+     *
+     */
+    public static function return_sql_for_quizattempts(
+        string $where = "1=1",
+        array $filterarray = []) {
+        global $DB;
+        $params = [];
+        $filter = '';
+
+        $select = "*";
+
+        $from = "
+            {local_catquiz_attempts} a
+            JOIN {user} u ON a.userid = u.id
+        ";
+
+        return [$select, $from, $where, $filter, $params];
+    }
+
+    /**
      * Return sql to render all or a subset of testenvironments
      *
      * @param array $wherearray
