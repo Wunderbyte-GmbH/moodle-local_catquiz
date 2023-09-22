@@ -1231,7 +1231,7 @@ class catquiz {
      * Adds or updates an attempt to db
      *
      * @param array $attemptdata
-     * @return int 1 for success, 0 for error
+     * @return int The Id of the attemptdata entry, 0 for error
      */
     public static function save_attempt_to_db(array $attemptdata) {
         global $DB;
@@ -1239,6 +1239,13 @@ class catquiz {
         if (empty($attemptdata)) {
             return 0;
         }
+
+        // Ensure there is only one row per attempt.
+        $existingrecord = $DB->get_record('local_catquiz_attempts', ['attemptid' => $attemptdata['attemptid']]);
+        if ($existingrecord) {
+            return 0;
+        }
+
         // To query the db only once we fetch courseid und instanceid here.
         $courseandinstance = self::return_course_and_instance_id($attemptdata);
 
@@ -1288,7 +1295,7 @@ class catquiz {
 
         //cache_helper::purge_by_event('attemptcreated');
         //return result::ok($id);
-        return 1;
+        return $id;
     }
 
     /** Fetch courseid and and instanceid from DB for attempt.
