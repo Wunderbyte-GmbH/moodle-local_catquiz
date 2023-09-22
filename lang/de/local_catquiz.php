@@ -298,6 +298,7 @@ $string['selectsubscale'] = "Subskala auswählen";
 $string['selectcatscale'] = "Skala:";
 $string['versionchosen'] = 'ausgewählte Versionierung:';
 $string['pleasechoose'] = 'bitte auswählen';
+$string['quizattempts'] = 'Quiz Versuche';
 
 // CAT Manager Questions Table.
 $string['type'] = 'Typ';

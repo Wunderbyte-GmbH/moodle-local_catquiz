@@ -23,6 +23,7 @@ use local_catquiz\output\catscales;
 use local_catquiz\output\testitemdashboard;
 use local_catquiz\output\catscalestats;
 use local_catquiz\output\catscalemanager\questions\questionsdisplay;
+use local_catquiz\output\catscalemanager\quizattempts\quizattemptsdisplay;
 use local_catquiz\output\catscalemanager\testsandtemplates\testsandtemplatesdisplay;
 use local_catquiz\output\testenvironmentdashboard;
 use templatable;
@@ -85,6 +86,8 @@ class managecatscaledashboard implements renderable, templatable {
      */
     public ?array $testsandtemplatesdisplay = [];
 
+    public array $quizattemptsdisplay = [];
+
     /**
      *
      * @var array $atscalestats.
@@ -139,6 +142,9 @@ class managecatscaledashboard implements renderable, templatable {
         $testenvironmentdashboard = new testsandtemplatesdisplay($this->catscaleid, $this->usesubs, $this->componentname);
         $this->testsandtemplatesdisplay = $testenvironmentdashboard->export_data_array();
 
+        $quizattempts = new quizattemptsdisplay();
+        $this->quizattemptsdisplay = $quizattempts->export_data_array();
+
         $catscalestats = new catscalestats();
         $this->catscalestatsarray = $catscalestats->export_data_array();
 
@@ -176,6 +182,7 @@ class managecatscaledashboard implements renderable, templatable {
             'catscalemanagers' => $this->catscalemanagersarray,
             'questionsdisplay' => $this->questionsdisplayarray,
             'testsandtemplatesdisplay' => $this->testsandtemplatesdisplay,
+            'quizattemptsdisplay' => $this->quizattemptsdisplay,
             'catscalestats' => $this->catscalestatsarray,
             'testitemdashboard' => $this->testitemdashboardarray,
             'eventlogtable' => $this->eventlogtable,

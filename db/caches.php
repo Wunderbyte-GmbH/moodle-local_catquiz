@@ -74,5 +74,12 @@ $definitions = array(
         'staticaccelerationsize' => 1,
         'invalidationevents' => ['changesineventlog']
     ),
+    'quizattempts' => array(
+        'mode' => cache_store::MODE_APPLICATION,
+        'simplekeys' => true,
+        'staticacceleration' => true,
+        'staticaccelerationsize' => 1,
+        'invalidationevents' => ['changesinquizattempts']
+    ),
 
 );
