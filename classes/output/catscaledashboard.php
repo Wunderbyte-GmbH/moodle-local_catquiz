@@ -323,7 +323,7 @@ class catscaledashboard implements renderable, templatable {
         // It should correctly set the data for the supplied arguments.
         $form->set_data_for_dynamic_submission();
         // Render the form in a specific container, there should be nothing else in the same container.
-        return html_writer::div($form->render(), '', ['id' => 'select_context_form']);
+        return html_writer::div($form->render(), '', ['id' => 'lcq_select_context_form']);
     }
 
     /**
@@ -341,7 +341,7 @@ class catscaledashboard implements renderable, templatable {
         $inputform->set_data_for_dynamic_submission();
 
         // Render the form in a specific container, there should be nothing else in the same container.
-        return html_writer::div($inputform->render(), '', ['id' => 'csv_import_form']);
+        return html_writer::div($inputform->render(), '', ['id' => 'lcq_csv_import_form']);
     }
 
     /**

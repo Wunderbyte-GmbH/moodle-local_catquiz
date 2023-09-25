@@ -24,7 +24,7 @@ import {showNotification} from 'local_catquiz/notifications';
 import {get_string as getString} from 'core/str';
 
 const SELECTORS = {
-    FORMCONTAINER: '#csv_import_form',
+    FORMCONTAINER: '#lcq_csv_import_form',
     BUTTON: 'input[type="submit"]',
 };
 /**
