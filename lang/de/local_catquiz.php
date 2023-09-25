@@ -351,6 +351,17 @@ $string['noselection'] = "Keine Auswahl";
 $string['lowerlimit'] = "Unteres Limit";
 $string['setcoursesforscaletext'] = 'Setzen sie für die Scala {$a} die Kurse, in die Nutzerinnen, die unter dem unteren Limit abschneiden, eingeschrieben werden sollen.';
 
+// Quiz attempts
+$string['catcontext'] = 'CAT Kontext';
+$string['totalnumberoftestitems'] = "Gesamtzahl Fragen";
+$string['numberoftestitemsused'] = "Anzahl getesteter Fragen";
+$string['personabilitybeforeattempt'] = "Ability vor Versuch";
+$string['personabilityafterattempt'] = "Ability nach Versuch";
+$string['instance'] = "Test";
+$string['teststrategy'] = "Teststrategie";
+$string['starttime'] = "Beginn";
+$string['endtime'] = "Ende";
+
 // CSV Import Form.
 $string['importcsv'] = 'Import CSV';
 $string['importsuccess'] = 'Import war erfolgreich. Es wurden {$a} Datensatz/Datensätze bearbeitet.';

@@ -33,6 +33,7 @@ $string['pluginname'] = 'ALiSe CAT Quiz';
 $string['catquiz'] = 'Catquiz';
 
 // Catquiz handler.
+$string['catscale'] = 'CAT scale';
 $string['catquizsettings'] = 'CAT quiz settings';
 $string['selectmodel'] = 'Choose a model';
 $string['model'] = 'Model';
@@ -354,6 +355,17 @@ $string['noselection'] = "No selection";
 $string['lowerlimit'] = "Lower limit";
 
 $string['setcoursesforscaletext'] = 'Set for catscale {$a} the courses in which users failing the lower limit should be inscribed to.';
+
+// Quiz attempts
+$string['catcontext'] = 'CAT Context';
+$string['totalnumberoftestitems'] = "Total number of questions";
+$string['numberoftestitemsused'] = "Number of displayed questions";
+$string['personabilitybeforeattempt'] = "Ability before attempt";
+$string['personabilityafterattempt'] = "Ability after attempt";
+$string['instance'] = "Test";
+$string['teststrategy'] = "Teststrategy";
+$string['starttime'] = "Start";
+$string['endtime'] = "End";
 
 // CSV Import Form.
 $string['importcsv'] = 'Import CSV';
