@@ -39,6 +39,12 @@ use local_wunderbyte_table\wunderbyte_table;
 class quizattempts_table extends wunderbyte_table {
 
     /**
+     * Acts like a cache and stores names of teststrategies.
+     * @var array<string>
+     */
+    private array $teststrategynames;
+
+    /**
      * Constructor
      * @param string $uniqueid all tables have to have a unique id, this is used
      *      as a key when storing table properties like sort order in the session.
@@ -46,6 +52,7 @@ class quizattempts_table extends wunderbyte_table {
     public function __construct(string $uniqueid) {
 
         parent::__construct($uniqueid);
+        $this->teststrategynames = [];
 
     }
 
@@ -87,11 +94,14 @@ class quizattempts_table extends wunderbyte_table {
      * @return string
      */
     public function col_teststrategy($values) {
-        $teststrategy = info::get_teststrategy($values->teststrategy);
-        // Gets the unqualified classname without namespace.
-        // See https://stackoverflow.com/a/27457689
-        $classname = substr(strrchr(get_class($teststrategy), '\\'), 1);
-        return get_string($classname, 'local_catquiz');
+        if (empty($this->teststrategynames[$values->teststrategy])) {
+            $teststrategy = info::get_teststrategy($values->teststrategy);
+            // Gets the unqualified classname without namespace.
+            // See https://stackoverflow.com/a/27457689
+            $classname = substr(strrchr(get_class($teststrategy), '\\'), 1);
+            $this->teststrategynames[$values->teststrategy] = get_string($classname, 'local_catquiz');
+        }
+        return $this->teststrategynames[$values->teststrategy];
     }
 
     /**
