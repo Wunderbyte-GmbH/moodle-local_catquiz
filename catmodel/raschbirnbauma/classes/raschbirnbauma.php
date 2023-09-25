@@ -106,7 +106,7 @@ class raschbirnbauma extends model_raschmodel {
         $a = $ip['difficulty'];
         
         if ($k < 1.0) {
-            return 1 / (1 + exp($pp - $a));
+            return 1 - self::likelihood($pp, $ip, 1.0);
         } else {
             return 1 / (1 + exp($a - $pp));
         }
