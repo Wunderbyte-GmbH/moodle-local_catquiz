@@ -349,16 +349,23 @@ class questionsdisplay {
      * @return array
      */
     public function export_data_array(): array {
-
+        // Scale- and Contextselector will always be displayed.
         $data = [
             'contextselector' => scaleandcontexselector::render_contextselector($this->catcontextid),
             'scaleselectors' => empty(scaleandcontexselector::render_scaleselectors($this->scale)) ? "" : scaleandcontexselector::render_scaleselectors($this->scale),
             'checkbox' => scaleandcontexselector::render_subscale_checkbox($this->usesubs),
-            'table' => $this->check_tabledisplay()['output'],
-            'notable' => $this->check_tabledisplay()['notable'],
-            'modaltable' => $this->render_addtestitems_table($this->scale),
         ];
 
+        // Check if it's a detailview and return tables only if not.
+        if (!empty($this->testitemid)) {
+            $data['table'] = "";
+            $data['notable'] = true;
+            $data['modaltable'] = "";
+        } else {
+            $data['table'] = $this->check_tabledisplay()['output'];
+            $data['notable'] = $this->check_tabledisplay()['notable'];
+            $data['modaltable'] = $this->render_addtestitems_table($this->scale);
+        }
         return $data;
     }
 }
