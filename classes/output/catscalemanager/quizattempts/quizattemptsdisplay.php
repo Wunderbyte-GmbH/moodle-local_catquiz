@@ -40,10 +40,40 @@ class quizattemptsdisplay {
         $table->define_columns([
             'name',
             'timecreated',
+            'timemodified',
+            'catscale',
+            'catcontext',
+            'course',
+            'component',
+            'instance',
+            'teststrategy',
+            'status',
+            'total_number_of_testitems',
+            'number_of_testitems_used',
+            'personability_before_attempt',
+            'personability_after_attempt',
+            'starttime',
+            'endtime',
+            'action'
         ]);
         $table->define_headers([
             get_string('name', 'core'),
-            get_string('timecreated')
+            get_string('timecreated', 'core'),
+            get_string('timemodified', 'local_catquiz'),
+            get_string('catscale', 'local_catquiz'),
+            get_string('catcontext', 'local_catquiz'),
+            get_string('course', 'core'),
+            get_string('component', 'local_catquiz'),
+            get_string('instance', 'local_catquiz'),
+            get_string('teststrategy', 'local_catquiz'),
+            get_string('status', 'core'),
+            get_string('totalnumberoftestitems', 'local_catquiz'),
+            get_string('numberoftestitemsused', 'local_catquiz'),
+            get_string('personabilitybeforeattempt', 'local_catquiz'),
+            get_string('personabilityafterattempt', 'local_catquiz'),
+            get_string('starttime', 'local_catquiz'),
+            get_string('endtime', 'local_catquiz'),
+            get_string('action', 'core'),
         ]);
 
         //$table->define_filtercolumns(
