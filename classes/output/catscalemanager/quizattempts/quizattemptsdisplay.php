@@ -20,6 +20,7 @@ use local_catquiz\catquiz;
 use local_catquiz\output\catscalemanager\scaleandcontexselector;
 use local_catquiz\output\testenvironmentdashboard;
 use local_catquiz\table\quizattempts_table;
+use local_catquiz\teststrategy\info;
 
 /**
  * Renderable class for the catscalemanagers
@@ -76,24 +77,40 @@ class quizattemptsdisplay {
             get_string('action', 'core'),
         ]);
 
-        //$table->define_filtercolumns(
-        //    ['name' => [
-        //        'localizedname' => get_string('name', 'core')
-        //    ], 'component' => [
-        //        'localizedname' => get_string('component', 'local_catquiz'),
-        //    ], 'visible' => [
-        //        'localizedname' => get_string('visible', 'core'),
-        //        '1' => get_string('visible', 'core'),
-        //        '0' => get_string('invisible', 'local_catquiz'),
-        //    ], 'status' => [
-        //        'localizedname' => get_string('status'),
-        //        '2' => get_string('force', 'local_catquiz'),
-        //        '1' => get_string('active', 'core'),
-        //        '0' => get_string('inactive', 'core'),
-        //    ], 'lang' => [
-        //        'localizedname' => get_string('lang', 'local_catquiz'),
-        //    ]
-        //    ]);
+        $teststrategyfilter = [
+            'localizedname' => get_string('teststrategy', 'local_catquiz'),
+        ];
+        foreach (info::return_available_strategies() as $strategy) {
+            $classname = substr(strrchr(get_class($strategy), '\\'), 1);
+            $teststrategyfilter["$strategy->id"] = get_string($classname, 'local_catquiz');
+        }
+
+        $table->define_filtercolumns(
+            [
+                'name' => [
+                    'localizedname' => get_string('name', 'core')
+                ],
+                'component' => [
+                    'localizedname' => get_string('component', 'local_catquiz'),
+                ],
+                'status' => [
+                    'localizedname' => get_string('status')
+                ],
+                'instance' => [
+                    'localizedname' => get_string('instance', 'local_catquiz'),
+                ],
+                'teststrategy' => $teststrategyfilter,
+                'course' => [
+                    'localizedname' => get_string('course')
+                ],
+                'catscale' => [
+                    'localizedname' => get_string('catscale', 'local_catquiz')
+                ],
+                'catcontext' => [
+                    'localizedname' => get_string('catcontext', 'local_catquiz')
+                ],
+            ]
+        );
         //$table->define_fulltextsearchcolumns(['name', 'component', 'description']);
         //$table->define_sortablecolumns([
         //    'name',
@@ -147,6 +164,7 @@ class quizattemptsdisplay {
         //    ]
         //    ];
 
+        // TODO: lazyload
         return $table->outhtml(10, true);
     }
 
