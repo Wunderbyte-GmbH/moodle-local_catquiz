@@ -402,3 +402,6 @@ $string['notifyallteachers'] = 'Notify all teachers';
 $string['notifyteachersofselectedcourses'] = 'Notify teachers of selected courses';
 
 $string['close'] = 'Close';
+
+// Shortcodes
+$string['shortcodeslistofquizattempts'] = 'Returns a table of quiz attempts';
