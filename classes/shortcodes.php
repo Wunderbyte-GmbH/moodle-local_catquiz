@@ -24,7 +24,7 @@
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-namespace local_musi;
+namespace local_catquiz;
 
 use context_system;
 use local_catquiz\table\quizattempts_table;
