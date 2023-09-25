@@ -397,3 +397,6 @@ $string['notifyallteachers'] = 'Kursleiter der gewählten Kurse benachrichtigen'
 $string['notifyteachersofselectedcourses'] = 'Alle Kursleiter benachrichtigen';
 
 $string['close'] = 'Schließen';
+
+// Shortcodes
+$string['shortcodeslistofquizattempts'] = 'Gibt eine Tabelle mit Quiz-Versuchen zurück';

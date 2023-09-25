@@ -17,7 +17,7 @@
 /**
  * Shortcodes for local_catquiz
  *
- * @package local_musi
+ * @package local_catquiz
  * @subpackage db
  * @since Moodle 3.11
  * @copyright 2023 Wunderbyte GmbH
@@ -26,16 +26,7 @@
 
 namespace local_catquiz;
 
-use context_system;
-use local_catquiz\table\quizattempts_table;
-use mod_booking\output\page_allteachers;
-use local_musi\output\userinformation;
-use local_musi\table\musi_table;
-use local_shopping_cart\shopping_cart;
-use local_shopping_cart\shopping_cart_credits;
-use mod_booking\booking;
-use mod_booking\singleton_service;
-use moodle_url;
+use local_catquiz\output\catscalemanager\quizattempts\quizattemptsdisplay;
 
 /**
  * Deals with local_shortcodes regarding catquiz.
@@ -50,10 +41,9 @@ class shortcodes {
      * @param string|null $content
      * @param object $env
      * @param Closure $next
-     * @return void
+     * @return string
      */
     public static function allquizattempts($shortcode, $args, $content, $env, $next) {
-        // TODO
+        return (new quizattemptsdisplay())->render_table();
     }
-
 }
