@@ -84,14 +84,13 @@ class info {
      * @return strategy[]
      */
     public static function return_available_strategies() {
-
         global $CFG;
+        require_once($CFG->dirroot . '/local/catquiz/lib.php');
+
         $cache = cache::make('local_catquiz', 'teststrategies');
         if ($strategies = $cache->get('all')) {
             return $strategies;
         }
-
-        require_once($CFG->dirroot . '/local/catquiz/lib.php');
 
         $strategies = core_component::get_component_classes_in_namespace(
             "local_catquiz",
@@ -110,6 +109,9 @@ class info {
     }
 
     public static function get_teststrategy(int $id) {
+        global $CFG;
+        require_once($CFG->dirroot . '/local/catquiz/lib.php');
+
         $cache = cache::make('local_catquiz', 'teststrategies');
         if ($strategy = $cache->get($id)) {
             return $strategy;

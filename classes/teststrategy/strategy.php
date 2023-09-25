@@ -70,6 +70,9 @@ abstract class strategy {
      * Instantioate parameters.
      */
     public function __construct() {
+        global $CFG;
+        require_once($CFG->dirroot . '/local/catquiz/lib.php');
+
         $this->scoremodifiers = info::get_score_modifiers();
     }
 

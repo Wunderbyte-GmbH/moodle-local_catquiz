@@ -149,13 +149,7 @@ class attemptfeedback implements renderable, templatable {
      * @return array<feedbackgenerator>
      */
     public function get_feedback_generators_for_teststrategy(int $strategyid): array {
-        $availableteststrategies = info::return_available_strategies();
-        $filteredstrategies = array_filter(
-            $availableteststrategies,
-            fn ($strategy) => $strategy->id === $strategyid
-        );
-
-        if (!$attemptstrategy = reset($filteredstrategies)) {
+        if(! $attemptstrategy = info::get_teststrategy($strategyid)) {
             return [];
         }
 
