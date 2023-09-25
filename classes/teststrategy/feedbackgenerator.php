@@ -36,7 +36,8 @@ use UnexpectedValueException;
  */
 abstract class feedbackgenerator {
     /**
-     * Returns an array with two keys 'heading' and 'context'
+     * Returns an array with two keys 'heading' and 'context'.
+     *
      * @param array $data
      * @return array
      */
@@ -52,14 +53,16 @@ abstract class feedbackgenerator {
 
     /**
      * The translated heading of this feedback.
+     *
      * @return string
      */
     abstract public function get_heading(): string;
 
     /**
-     * Loads the data required to render the feedback
+     * Loads the data required to render the feedback.
+     *
      * @param int $attemptid
-     * @param int $contextid
+     * @param array $initialcontext
      * @return ?array
      */
     abstract public function load_data(int $attemptid, array $initialcontext): ?array;
@@ -88,6 +91,7 @@ abstract class feedbackgenerator {
 
     /**
      * Returns a fallback if no feedback can be generated.
+     *
      * @return array
      * @throws coding_exception
      */
@@ -109,6 +113,9 @@ abstract class feedbackgenerator {
 
     /**
      * Make sure that the feedbackgenerator returned the expected data.
+     *
+     * @param array $feedback
+     * @return bool
      */
     private function isvalidfeedback(array $feedback): bool {
         // Allow empty array.
