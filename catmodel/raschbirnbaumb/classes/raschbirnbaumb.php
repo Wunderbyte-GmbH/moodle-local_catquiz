@@ -386,7 +386,7 @@ class raschbirnbaumb extends model_raschmodel {
      * @param array<float> $ip - item parameters ('difficulty', 'discrimination', 'guessing')
      * return array - chunked item parameter
      */
-   function restrict_to_trusted_region(array $ip): array {
+     function restrict_to_trusted_region(array $ip): array {
         // Set values for difficulty parameter.
         $a = $ip['difficulty'];
 
@@ -432,23 +432,22 @@ class raschbirnbaumb extends model_raschmodel {
      * @param array<float> $ip - item parameters ('difficulty', 'discrimination', 'guessing')
      * @return array - 1st derivative of TR function with respect to $ip
      */
-   function get_log_tr_jacobian($ip): array {
-        // Set values for difficulty parameter.
-        
-        // @DAVID: Diese Werte sollten dynamisch berechnet werden können
-        
-        $a_m = 0; // Mean of difficulty.
-        $a_s = 2; // Standard derivation of difficulty.
+    function get_log_tr_jacobian($ip): array {
+      // Set values for difficulty parameter.
 
-        // Placement of the discriminatory parameter.
-        $b_p = floatval(get_config('catmodel_raschbirnbaumb', 'trusted_region_placement_b'));
-        // Slope of the discriminatory parameter.
-        $b_s = floatval(get_config('catmodel_raschbirnbaumb', 'trusted_region_slope_b'));
+      // @DAVID: Diese Werte sollten dynamisch berechnet werden können
+      $a_m = 0; // Mean of difficulty.
+      $a_s = 2; // Standard derivation of difficulty.
 
-        return [
-            (($a_m - $ip['difficulty']) / ($a_s ** 2)), // Calculates d/da.
-            (-($b_s * exp($b_s * $ip['discrimination'])) / (exp($b_s * $b_p) + exp($b_s * $ip['discrimination']))) // Calculates d/db.
-        ];
+      // Placement of the discriminatory parameter.
+      $b_p = floatval(get_config('catmodel_raschbirnbaumb', 'trusted_region_placement_b'));
+      // Slope of the discriminatory parameter.
+      $b_s = floatval(get_config('catmodel_raschbirnbaumb', 'trusted_region_slope_b'));
+
+      return [
+        ($a_m - $ip['difficulty']) / ($a_s ** 2), // Calculates d/da.
+        -($b_s * exp($b_s * $ip['discrimination'])) / (exp($b_s * $b_p) + exp($b_s * $ip['discrimination'])) // Calculates d/db.
+      ];
     }
 
     /**
@@ -457,25 +456,25 @@ class raschbirnbaumb extends model_raschmodel {
      * @param array<float> $ip - item parameters ('difficulty', 'discrimination', 'guessing')
      * @return array<array> - 2nd derivative of TR function with respect to $ip
      */
-   function get_log_tr_hessian(array $ip):array{
-        // Set values for difficulty parameter.
-        
-        // @DAVID: Diese Werte sollten dynamisch berechnet werden können
-            
-        $a_m = 0; // Mean of difficulty.
-        $a_s = 2; // Standard derivation of difficulty.
+    function get_log_tr_hessian(array $ip):array{
+      // Set values for difficulty parameter.
 
-        // Placement of the discriminatory parameter.
-        $b_p = floatval(get_config('catmodel_raschbirnbaumb', 'trusted_region_placement_b'));
-        // Slope of the discriminatory parameter.
-        $b_s = floatval(get_config('catmodel_raschbirnbaumb', 'trusted_region_slope_b'));
+      // @DAVID: Diese Werte sollten dynamisch berechnet werden können  
+      $a_m = 0; // Mean of difficulty.
+      $a_s = 2; // Standard derivation of difficulty.
 
-        return [[
-          (-1/ ($a_s ** 2)), // Calculates d²/da².
-          (0) // Calculates d/da d/db.
-        ],[
-          (0), // Calculates d/da d/db.
-          (-($b_s ** 2 * exp($b_s * ($b_p + $ip['discrimination']))) / (exp($b_s * $b_p) + exp($b_s * $ip['discrimination'])) ** 2) // Calculates d²/db².
-        ]];
+      // Placement of the discriminatory parameter.
+      $b_p = floatval(get_config('catmodel_raschbirnbaumb', 'trusted_region_placement_b'));
+      // Slope of the discriminatory parameter.
+      $b_s = floatval(get_config('catmodel_raschbirnbaumb', 'trusted_region_slope_b'));
+
+      return [[
+        -1/ ($a_s ** 2), // Calculates d²/da².
+        0 // Calculates d/da d/db.
+      ],[
+        0, // Calculates d/da d/db.
+        -($b_s ** 2 * exp($b_s * ($b_p + $ip['discrimination']))) / (exp($b_s * $b_p) + exp($b_s * $ip['discrimination'])) ** 2 // Calculates d²/db².
+      ]];  
     }
+    
 }
