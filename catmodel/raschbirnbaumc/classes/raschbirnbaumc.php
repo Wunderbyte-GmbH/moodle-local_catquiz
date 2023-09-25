@@ -281,10 +281,10 @@ class raschbirnbaumc extends model_raschmodel {
 
         // Pre-Calculate high frequently used exp-terms.
         $exp_bap = exp($b * ($a - $pp));
-        
-        $derivative[0] = $n * (-(2 * $b * (1 - $c) * exp($b * ($a - $pp))) / (1 + exp($b * ($a - $pp)) - $k) ** 3); // Calculate d/da.
-        $derivative[1] = $n* (-(2 * (1 - $c) * exp($b * ($a - $pp)) * ($c + (1 - $c) / (1 + exp($b * ($a - $pp))) - $k) * ($a - $pp)) / (1 + exp($b * ($a - $pp))) ** 2); // Calculate d/db.
-        $derivative[2] = $n * 2 * (1 - 1 / (1 + exp($b * ($a - $pp)))) * ($c + (1 - $c) / (1 + exp($b * ($a - $pp))) - $k); // Calculate d/dc.
+
+        $derivative[0] = $n * (-(2 * $b * (1 - $c) * $exp_bap) / (1 + $exp_bap - $k) ** 3); // Calculate d/da.
+        $derivative[1] = $n* (-(2 * (1 - $c) * $exp_bap * ($c + (1 - $c) / (1 + $exp_bap) - $k) * ($a - $pp)) / (1 + $exp_bap) ** 2); // Calculate d/db.
+        $derivative[2] = $n * 2 * (1 - 1 / (1 + $exp_bap)) * ($c + (1 - $c) / (1 + $exp_bap) - $k); // Calculate d/dc.
 
         return $derivative;
     }
@@ -364,9 +364,11 @@ class raschbirnbaumc extends model_raschmodel {
        
         $derivative = [];
 
+        // @RALF: Korrekte Formeln für 3PL implementieren!
+
         $derivative[0] = $n * 2 * $b * ($b * ($a - $pp) + log($or)); // Calculate d/da.            
         $derivative[1] = $n * 2 * ($a - $pp) * ($b * ($a - $pp) + log($or)); // Calculate d/db.
-        
+
         return $derivative;
     }
     
@@ -386,6 +388,8 @@ class raschbirnbaumc extends model_raschmodel {
         $c = $ip['guessing'];
         
         $derivative = [[]];
+
+        // @RALF: Korrekte Formeln für 3PL implementieren!
         
         $derivative[0][0]  = $n * 2 * $b ** 2; // Calculate d²2/da².            
         $derivative[0][1]  = 0; // $n * 2 * (2 * $b * ($a - $pp) + log($or)); // Calculate d/da d/db.    
