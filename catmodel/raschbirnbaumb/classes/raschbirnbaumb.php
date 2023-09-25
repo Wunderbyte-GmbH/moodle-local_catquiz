@@ -160,7 +160,7 @@ class raschbirnbaumb extends model_raschmodel {
         $a = $ip['difficulty'];
         $b = $ip['discrimination'];
         
-        return [[-(($b ** 2 * exp($b * ($a + $pp))) / ((exp($a * $b) + exp($b * $pp)) ** 2))]];
+        return -(($b ** 2 * exp($b * ($a + $pp))) / ((exp($a * $b) + exp($b * $pp)) ** 2));
     }
 
     /**
