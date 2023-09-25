@@ -109,7 +109,6 @@ class attemptfeedback implements renderable, templatable {
         $context = [
             'attemptid' => $this->attemptid,
             'contextid' => $this->contextid,
-            'strategyid' => $this->teststrategy,
             'needsimprovementthreshold' => 0, // TODO: Get the quantile threshold from the quiz settings.
             'userid' => $USER->id,
             'catscaleid' => $this->catscaleid,
@@ -170,7 +169,7 @@ class attemptfeedback implements renderable, templatable {
             ),
             true
         );
-        $generators = $this->get_feedback_generators_for_teststrategy($feedbackdata['strategyid']);
+        $generators = $this->get_feedback_generators_for_teststrategy($feedbackdata['teststrategy']);
         foreach ($generators as $generator) {
             $feedback = $generator->get_feedback($feedbackdata);
             if (!$feedback) {
