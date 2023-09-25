@@ -22,16 +22,21 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+use local_catquiz\catquiz;
 use local_catquiz\output\catscalemanager\managecatscaledashboard;
 
 require_once('../../config.php');
 
 $catcontextid = optional_param('contextid', 0, PARAM_INT);
 $catscale = optional_param('scaleid', -1, PARAM_INT);
+$scaledetailview = optional_param('sdv', 0, PARAM_INT); // Scale-Detail-View if set to 1, detailview of selected scale will be rendered.
 $usesubs = optional_param('usesubs', 1, PARAM_INT);
 $testitemid = optional_param('id', 0, PARAM_INT); // ID of record to be displayed in detail instead of table.
-$componentname = optional_param('component', 'question', PARAM_TEXT); // ID of record to be displayed in detail instead of table.
+$componentname = optional_param('component', 'question', PARAM_TEXT);
 
+if (empty($catcontextid)) {
+    $catcontextid = catquiz::get_default_context_id();
+}
 
 global $USER;
 $context = \context_system::instance();
@@ -51,7 +56,7 @@ $PAGE->set_heading($title);
 
 echo $OUTPUT->header();
 
-$managecatscaledashboard = new managecatscaledashboard($testitemid, $catcontextid, $catscale, $usesubs, $componentname);
+$managecatscaledashboard = new managecatscaledashboard($testitemid, $catcontextid, $catscale, $scaledetailview, $usesubs, $componentname);
 $data = $managecatscaledashboard->export_for_template($OUTPUT);
 echo $OUTPUT->render_from_template('local_catquiz/catscalemanager/managecatscaledashboard', $data);
 

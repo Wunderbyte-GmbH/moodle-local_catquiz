@@ -53,6 +53,11 @@ class managecatscaledashboard implements renderable, templatable {
     private int $catscaleid = 0;
 
     /**
+     * @var array
+     */
+    private array $catscalesdetailview = [];
+
+    /**
      * @var integer
      */
     private int $usesubs = 1;
@@ -118,11 +123,12 @@ class managecatscaledashboard implements renderable, templatable {
      * @param int $testitemid
      * @param int $contextid
      * @param int $catscaleid
+     * @param int $scaledetailview
      * @param int $usesubs
      * @param string $componentname
      *
      */
-    public function __construct(int $testitemid, int $contextid, int $catscaleid, int $usesubs, string $componentname) {
+    public function __construct(int $testitemid, int $contextid, int $catscaleid, int $scaledetailview, int $usesubs, string $componentname) {
 
         $this->testitemid = $testitemid;
         $this->contextid = $contextid;
@@ -130,8 +136,9 @@ class managecatscaledashboard implements renderable, templatable {
         $this->usesubs = $usesubs;
         $this->componentname = $componentname;
 
-        $catscales = new catscales();
+        $catscales = new catscales($this->catscaleid, $scaledetailview, $this->contextid);
         $this->catscalesarray = $catscales->return_as_array();
+        $this->catscalesdetailview = $catscales->return_detailview();
 
         $catscalemanagers = new catscalemanagers();
         $this->catscalemanagersarray = $catscalemanagers->return_as_array();
@@ -179,6 +186,7 @@ class managecatscaledashboard implements renderable, templatable {
 
         $data = [
             'itemtree' => $this->catscalesarray,
+            'catscaledetailview' => $this->catscalesdetailview,
             'catscalemanagers' => $this->catscalemanagersarray,
             'questionsdisplay' => $this->questionsdisplayarray,
             'testsandtemplatesdisplay' => $this->testsandtemplatesdisplay,

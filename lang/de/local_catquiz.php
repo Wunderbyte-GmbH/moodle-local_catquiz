@@ -231,6 +231,7 @@ $string['itemdifficulties'] = "Item difficulties";
 $string['itemdifficultiesnodata'] = "No item difficulties were calculated";
 $string['somethingwentwrong'] = 'Etwas ist schiefgelaufen. Melden Sie den Fehler ihrem Admin';
 $string['recalculationscheduled'] = 'Neuberechnung der Kontext-Paremeter wurde veranlasst';
+$string['scaledetailviewheading'] = 'Detailansicht von CAT-Skala {$a}';
 
 // Table.
 $string['label'] = "Kennzeichen";

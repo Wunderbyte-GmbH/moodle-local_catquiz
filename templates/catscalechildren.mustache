@@ -31,9 +31,10 @@
 }}
 
 <ul class="pt-2 mt-0 mb-0">
-        <li class="list-group-item pr-0" data-id="{{id}}" data-description="{{description}}" data-parentid="{{parentid}}" data-name="{{name}}">
+        <li class="list-group-item pr-0" data-id="{{id}}" data-description="{{description}}" data-parentid="{{parentid}}" data-name="{{name}}"
+        data-scaleid="{{id}}">
             <div class="pull-right">
-                <a data-action="view" href="#" class="view-catscale btn btn--plain btn--smaller btn-catscales text-danger">
+                <a data-action="view" href="#" class="manage-catscale btn btn--plain btn--smaller btn-catscales" data-scaleid="{{id}}">
                     <i class="fa fa-edit disabled"></i>
                     {{#str}} view, moodle {{/str}}</a>
                 <a data-action="edit" href="#" class="manage-catscale btn btn--plain btn--smaller btn-catscales">

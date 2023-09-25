@@ -235,6 +235,7 @@ $string['itemdifficulties'] = "Item difficulties";
 $string['itemdifficultiesnodata'] = "No item difficulties were calculated";
 $string['somethingwentwrong'] = 'Something went wrong. Please contact your admin.';
 $string['recalculationscheduled'] = 'Recalculation of the context parameters has been scheduled';
+$string['scaledetailviewheading'] = 'Detailview of catscale {$a}';
 
 // Table.
 $string['label'] = "Label";

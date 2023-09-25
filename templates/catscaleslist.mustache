@@ -55,9 +55,10 @@
 {{#itemtree}}
         <div id="local-catscales-container-{{id}}">
             <ul class="list-group w-100 mt-2">
-                <li class="list-group-item" data-id="{{id}}" data-description="{{description}}" data-parentid="{{parentid}}" data-name="{{name}}">
+                <li class="list-group-item" data-id="{{id}}" data-description="{{description}}" data-parentid="{{parentid}}" data-name="{{name}}"
+                data-scaleid="{{id}}">
                     <div class="pull-right">
-                        <a href="#" class="view-catscale btn btn--plain btn--smaller btn-catscales text-danger" data-action="view">
+                        <a href="#" class="manage-catscale btn btn--plain btn--smaller btn-catscales" data-action="view" data-scaleid="{{id}}">
                             <i class="fa fa-edit disabled"></i>
                             {{#str}} view, moodle {{/str}} </a>
                         <a href="#" class="manage-catscale btn btn--plain btn--smaller btn-catscales" data-action="edit">

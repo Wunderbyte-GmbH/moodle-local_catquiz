@@ -16,8 +16,11 @@
 
 namespace local_catquiz\output;
 
+use html_writer;
 use local_catquiz\catquiz;
 use local_catquiz\data\dataapi;
+use local_catquiz\local\model\model_person_param_list;
+use local_catquiz\output\catscaledashboard;
 use local_catquiz\subscription;
 use templatable;
 use renderable;
@@ -40,14 +43,36 @@ class catscales implements renderable, templatable {
 
     /** @var array $branchitems */
     public array $branchitems;
+    /**
+     * @var integer
+     */
+    private int $catscaleid = 0;
+
+    /** If set to 1, detailview of selected scale will be rendered.
+     * @var integer
+     */
+    private int $scaledetailview= 0;
+
+    /**
+     * @var integer
+     */
+    private int $contextid = 0;
 
     /**
      * Constructor.
      *
      * @param bool $allowedit
+     * @param int $catscaleid
+     * @param int $scaledetailview
+     * @param int $contextid
      *
      */
-    public function __construct(bool $allowedit = true) {
+    public function __construct(&$catscaleid, &$scaledetailview, &$contextid, bool $allowedit = true) {
+
+        $this->catscaleid = $catscaleid;
+        $this->scaledetailview = $scaledetailview;
+        $this->contextid = $contextid;
+
         $this->items = dataapi::get_all_catscales();
         $this->build_tree($this->items);
         $this->itemtree = $this->branchitems[0];
@@ -125,6 +150,25 @@ class catscales implements renderable, templatable {
             list($sql, $params) = catquiz::get_sql_for_number_of_questions_in_scale($item['id']);
             $item['numberofquestions'] = $DB->count_records_sql($sql, $params);
         }
+
         return $out;
     }
+    /**
+     * Return the item tree of all catscales as array.
+     * @return array
+     */
+    public function return_detailview(): array {
+        global $OUTPUT;
+
+        $out = [];
+        // Check if we have a detailview and if so, show data.
+        if ($this->catscaleid != -1 && $this->scaledetailview == 1) {
+            $catscaledashboard = new catscaledashboard($this->catscaleid, $this->contextid);
+            $out['scaledetailview'] = $catscaledashboard->export_scaledetails($OUTPUT);
+        } else {
+            $out['scaledetailview'] = "";
+        }
+        return $out;
+    }
+
 }

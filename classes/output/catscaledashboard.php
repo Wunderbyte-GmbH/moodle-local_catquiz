@@ -450,4 +450,36 @@ class catscaledashboard implements renderable, templatable {
             'modelbutton' => $this->render_modelbutton($this->catcontextid),
         ];
     }
+
+    /**
+     * Exports for template.
+     *
+     * @param \renderer_base $output
+     *
+     * @return array
+     *
+     */
+    public function export_scaledetails(\renderer_base $output): array {
+
+        $cm = new catmodel_info;
+        list($itemdifficulties, $personabilities) = $cm->get_context_parameters(
+            $this->catcontextid,
+            $this->catscaleid,
+            $this->triggercalculation
+        );
+
+        $backbutton = [
+            'label' => get_string('backtotable', 'local_catquiz'),
+            'type' => 'button',
+            'class' => "btn-link",
+        ];
+
+        return [
+            'backtoscaleslink' => $backbutton,
+            'scaledetailviewheading' => get_string('scaledetailviewheading', 'local_catquiz', $this->catscale->name),
+            'itemdifficulties' => $this->render_itemdifficulties($itemdifficulties),
+            'personabilities' => $this->render_personabilities($personabilities),
+            'modelbutton' => $this->render_modelbutton($this->catcontextid),
+        ];
+    }
 }

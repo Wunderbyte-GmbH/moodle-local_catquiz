@@ -24,33 +24,50 @@
     }
 }}
 
-<div class="grid">
-    {{> local_catquiz/catscaleslist}}
-</div>
+{{#catscaledetailview}}
+    {{#scaledetailview}}
+        <h4>{{scaledetailviewheading}}</h4>
+        {{#backtoscaleslink}}
+            <button class='btn {{class}}' type={{type}} data-id="backtoscaleview">{{label}}</button>
+        {{/backtoscaleslink}}
+        {{> local_catquiz/tabs/tab_statistics}}
 
-<div class="catscales-dashboard grid">
-    <div class="card">
-        <div class="card-header">
-            {{#str}} showlistofcatscalemanagers, local_catquiz {{/str}}
+        {{#js}}
+            require(['local_catquiz/testitemdashboard/backtoscaleviewbutton'], function(init) {
+                init.init();
+            });
+        {{/js}}
+    {{/scaledetailview}}
+    {{^scaledetailview}}
+        <div class="grid">
+            {{> local_catquiz/catscaleslist}}
         </div>
-        <div class="card-body">
-            {{> local_catquiz/catscalemanagers}}
+
+        <div class="catscales-dashboard grid">
+            <div class="card">
+                <div class="card-header">
+                    {{#str}} showlistofcatscalemanagers, local_catquiz {{/str}}
+                </div>
+                <div class="card-body">
+                    {{> local_catquiz/catscalemanagers}}
+                </div>
+            </div>
+            <div class="card">
+                <div class="card-header">
+                    {{#str}} addcategory, local_catquiz {{/str}}
+                </div>
+                <div class="card-body">
+                    <a class="btn btn-primary" href="#"><i class="fa fa-plus px-2" aria-hidden="true"></i>{{#str}} addcategory, local_catquiz {{/str}}</a>
+                </div>
+            </div>
+            <div class="card">
+                <div class="card-header">
+                    {{#str}} documentation, local_catquiz {{/str}}
+                </div>
+                <div class="card-body">
+                    <a class="btn btn-primary" href="#"><i class="fa fa-plus px-2" aria-hidden="true"></i>{{#str}} documentation, local_catquiz {{/str}}</a>
+                </div>
+            </div>
         </div>
-    </div>
-    <div class="card">
-        <div class="card-header">
-            {{#str}} addcategory, local_catquiz {{/str}}
-        </div>
-        <div class="card-body">
-            <a class="btn btn-primary" href="#"><i class="fa fa-plus px-2" aria-hidden="true"></i>{{#str}} addcategory, local_catquiz {{/str}}</a>
-        </div>
-    </div>
-    <div class="card">
-        <div class="card-header">
-            {{#str}} documentation, local_catquiz {{/str}}
-        </div>
-        <div class="card-body">
-            <a class="btn btn-primary" href="#"><i class="fa fa-plus px-2" aria-hidden="true"></i>{{#str}} documentation, local_catquiz {{/str}}</a>
-        </div>
-    </div>
-</div>
+    {{/scaledetailview}}
+{{/catscaledetailview}}

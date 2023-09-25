@@ -37,8 +37,13 @@ export const init = () => {
         button.addEventListener('click', e => {
             e.preventDefault();
             const element = e.target;
+
+            // eslint-disable-next-line no-console
+            console.log("click", element, element.dataset.action);
             if (element.dataset.action === "delete") {
                 performDeletion(element);
+            } else if (element.dataset.action === "view") {
+                displayDetailView(element);
             } else {
                 manageCatscale(element);
             }
@@ -124,3 +129,22 @@ export const performDeletion = async(element) => {
         },
     }]);
 };
+
+/**
+ *
+ * @param {*} element
+ */
+function displayDetailView(element) {
+
+    let searchParams = new URLSearchParams(window.location.search);
+    let scaleid = element.dataset.scaleid;
+    let urlscaleid = searchParams.get('scaleid');
+    searchParams.set('scaleid', scaleid);
+
+    // If it's a new scale, we want to display on first click.
+    // Otherwise we switch the value.
+    let sdv = (searchParams.get('sdv') == 0 || searchParams.get('sdv') === null || urlscaleid != scaleid) ? 1 : 0;
+
+    searchParams.set('sdv', sdv);
+    window.location.search = searchParams.toString();
+}
