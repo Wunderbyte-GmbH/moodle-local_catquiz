@@ -96,8 +96,8 @@ class raschbirnbaumb extends model_raschmodel {
     /**
      * Calculates the Likelihood for a given the person ability parameter
      *
-     * @param array <float> $pp - person ability parameter ('ability')
-     * @param array <float> $ip - item parameters ('difficulty', 'discrimination')
+     * @param array<float> $pp - person ability parameter
+     * @param array<float> $ip - item parameters ('difficulty', 'discrimination')
      * @param float $k - answer category (0 or 1.0)
      * @return float
      */
@@ -118,8 +118,8 @@ class raschbirnbaumb extends model_raschmodel {
     /**
      * Calculates the LOG Likelihood for a given the person ability parameter
      *
-     * @param array <float> $pp - person ability parameter ('ability')
-     * @param array $ip - item parameters ('difficulty', 'discrimination')
+     * @param array<float> $pp - person ability parameter
+     * @param array<float> $ip - item parameters ('difficulty', 'discrimination')
      * @param float $k - answer category (0 or 1.0)
      * @return float - log likelihood
      */
@@ -130,7 +130,8 @@ class raschbirnbaumb extends model_raschmodel {
     /**
      * Calculates the 1st derivative of the LOG Likelihood with respect to the item parameters
      *
-     * @param float $pp - person ability parameter
+     * @param array<float> $pp - person ability parameter
+     * @param array<float> $ip - item parameters ('difficulty', 'discrimination')
      * @param float $k - answer category (0 or 1.0)
      * @return float - 1st derivative of log likelihood with respect to $pp
      */
