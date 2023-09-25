@@ -107,7 +107,7 @@ class raschbirnbaumb extends model_raschmodel {
         $b = $ip['discrimination'];
         
         if ($k < 1.0) {
-            return 1 / (1 + exp($b * ($pp - $a)));
+            return 1 - self::likelihood($pp, $ip, 1.0);
         } else {
             return 1 / (1 + exp($b * ($a - $pp)));
         }
