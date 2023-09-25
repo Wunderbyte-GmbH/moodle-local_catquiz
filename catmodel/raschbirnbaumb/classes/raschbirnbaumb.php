@@ -232,7 +232,7 @@ class raschbirnbaumb extends model_raschmodel {
      * Calculates the Least Mean Squres (residuals) for a given the person ability parameter and a given expected/observed score
      *
      * @param array<float> $pp - person ability parameter ('ability')
-     * @param array<float> $ip - item parameters ('difficulty', 'discrimination', 'guessing')
+     * @param array<float> $ip - item parameters ('difficulty', 'discrimination')
      * @param float $k - fraction of correct (0 ... 1.0)
      * @param float $n - number of observations
      * @return float - weighted residuals
@@ -245,7 +245,7 @@ class raschbirnbaumb extends model_raschmodel {
      * Calculates the 1st derivative of Least Mean Squares with respect to the item parameters
      *
      * @param array<float> $pp - person ability parameter ('ability')
-     * @param array<float> $ip - item parameters ('difficulty', 'discrimination', 'guessing')
+     * @param array<float> $ip - item parameters ('difficulty', 'discrimination')
      * @param float $k - fraction of correct (0 ... 1.0)
      * @param float $n - number of observations
      * @return array - 1st derivative of lms with respect to $ip
@@ -270,7 +270,7 @@ class raschbirnbaumb extends model_raschmodel {
      * Calculates the 2nd derivative of Least Mean Squres with respect to the item parameters
      *
      * @param array<float> $pp - person ability parameter ('ability')
-     * @param array<float> $ip - item parameters ('difficulty', 'discrimination', 'guessing')
+     * @param array<float> $ip - item parameters ('difficulty', 'discrimination')
      * @param float $k - fraction of correct (0 ... 1.0)
      * @param float $n - number of observations
      * @return array - 2nd derivative of lms with respect to $ip
@@ -304,7 +304,7 @@ class raschbirnbaumb extends model_raschmodel {
      * Calculates the Log'ed Odds-Ratio Squared (residuals) for a given the person ability parameter and a given expected/observed score
      *
      * @param array<float> $pp - person ability parameter ('ability')
-     * @param array<float> $ip - item parameters ('difficulty', 'discrimination', 'guessing')
+     * @param array<float> $ip - item parameters ('difficulty', 'discrimination')
      * @param float $or - odds ratio
      * @param float $n - number of observations
      * @return float - weighted residuals
@@ -321,7 +321,7 @@ class raschbirnbaumb extends model_raschmodel {
      * Calculates the 1st derivative of Log'ed Odds-Ratio Squared with respect to the item parameters
      *
      * @param array<float> $pp - person ability parameter ('ability')
-     * @param array<float> $ip - item parameters ('difficulty', 'discrimination', 'guessing')
+     * @param array<float> $ip - item parameters ('difficulty', 'discrimination')
      * @param float $or - odds ratio
      * @param float $n - number of observations
      * @return array - 1st derivative
@@ -343,7 +343,7 @@ class raschbirnbaumb extends model_raschmodel {
      * Calculates the 2nd derivative of Log'ed Odds-Ratio Squared with respect to the item parameters
      *
      * @param array<float> $pp - person ability parameter ('ability')
-     * @param array<float> $ip - item parameters ('difficulty', 'discrimination', 'guessing')
+     * @param array<float> $ip - item parameters ('difficulty', 'discrimination')
      * @param float $or - odds ratio
      * @param float $n - number of observations
      * @return array - 1st derivative
@@ -371,7 +371,7 @@ class raschbirnbaumb extends model_raschmodel {
      * Calculates the Fisher Information for a given person ability parameter
      *
      * @param array<float> $pp - person ability parameter ('ability')
-     * @param array<float> $ip - item parameters ('difficulty', 'discrimination', 'guessing')
+     * @param array<float> $ip - item parameters ('difficulty', 'discrimination')
      * @return float
      */
     public static function fisher_info(array $pp, array $ip): float {
@@ -383,7 +383,7 @@ class raschbirnbaumb extends model_raschmodel {
     /**
      * Implements a Filter Function for trusted regions in the item parameter estimation
      *
-     * @param array<float> $ip - item parameters ('difficulty', 'discrimination', 'guessing')
+     * @param array<float> $ip - item parameters ('difficulty', 'discrimination')
      * return array - chunked item parameter
      */
      function restrict_to_trusted_region(array $ip): array {
@@ -429,7 +429,7 @@ class raschbirnbaumb extends model_raschmodel {
     /**
      * Calculates the 1st derivative trusted regions for item parameters
      *
-     * @param array<float> $ip - item parameters ('difficulty', 'discrimination', 'guessing')
+     * @param array<float> $ip - item parameters ('difficulty', 'discrimination')
      * @return array - 1st derivative of TR function with respect to $ip
      */
     function get_log_tr_jacobian($ip): array {
@@ -453,7 +453,7 @@ class raschbirnbaumb extends model_raschmodel {
     /**
      * Calculates the 2nd derivative trusted regions for item parameters
      *
-     * @param array<float> $ip - item parameters ('difficulty', 'discrimination', 'guessing')
+     * @param array<float> $ip - item parameters ('difficulty', 'discrimination')
      * @return array<array> - 2nd derivative of TR function with respect to $ip
      */
     function get_log_tr_hessian(array $ip):array{
@@ -476,5 +476,4 @@ class raschbirnbaumb extends model_raschmodel {
         -($b_s ** 2 * exp($b_s * ($b_p + $ip['discrimination']))) / (exp($b_s * $b_p) + exp($b_s * $ip['discrimination'])) ** 2 // Calculates d²/db².
       ]];  
     }
-    
 }
