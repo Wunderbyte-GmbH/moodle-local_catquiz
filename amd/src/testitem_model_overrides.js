@@ -22,7 +22,7 @@
 import DynamicForm from 'core_form/dynamicform';
 
 const SELECTORS = {
-    FORMCONTAINER: '#model_override_form',
+    FORMCONTAINER: '#lcq_model_override_form',
 };
 /**
  * Add event listener to the form

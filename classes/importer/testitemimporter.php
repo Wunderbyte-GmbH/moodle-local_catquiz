@@ -59,7 +59,7 @@ class testitemimporter {
     /** @return array formdata for filepicker */
     public static function return_ajaxformdata() : array {
         $ajaxformdata = [
-            'id' => 'csv_import_form',
+            'id' => 'lcq_csv_import_form',
             'settingscallback' => 'local_catquiz\importer\testitemimporter::execute_testitems_csv_import'
         ];
         return $ajaxformdata;

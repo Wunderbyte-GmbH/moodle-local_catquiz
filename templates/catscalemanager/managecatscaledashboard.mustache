@@ -37,54 +37,54 @@
 
 <ul class="nav nav-tabs" id="myTab" role="tablist">
   <li class="nav-item">
-    <a class="nav-link active" id="summary-tab" data-toggle="tab" href="#summary" role="tab" aria-controls="summary" aria-selected="true">{{#str}}summary, local_catquiz{{/str}}</a>
+    <a class="nav-link active" id="summary-tab" data-toggle="tab" href="#lcq_summary" role="tab" aria-controls="lcq_summary" aria-selected="true">{{#str}}summary, local_catquiz{{/str}}</a>
   </li>
   <li class="nav-item">
-    <a class="nav-link" id="catscales-tab" data-toggle="tab" href="#catscales" role="tab" aria-controls="catscales" aria-selected="false">{{#str}} catscalesheading, local_catquiz{{/str}}</a>
+    <a class="nav-link" id="catscales-tab" data-toggle="tab" href="#lcq_catscales" role="tab" aria-controls="lcq_catscales" aria-selected="false">{{#str}} catscalesheading, local_catquiz{{/str}}</a>
   </li>
   <li class="nav-item">
-    <a class="nav-link" id="questions-tab" data-toggle="tab" href="#questions" role="tab" aria-controls="questions" aria-selected="false">{{#str}}questions, local_catquiz{{/str}}</a>
+    <a class="nav-link" id="questions-tab" data-toggle="tab" href="#lcq_questions" role="tab" aria-controls="lcq_questions" aria-selected="false">{{#str}}questions, local_catquiz{{/str}}</a>
   </li>
   <li class="nav-item">
-    <a class="nav-link" id="testsandtemplates-tab" data-toggle="tab" href="#testsandtemplates" role="tab" aria-controls="testsandtemplates" aria-selected="false">{{#str}}testsandtemplates, local_catquiz{{/str}}</a>
+    <a class="nav-link" id="testsandtemplates-tab" data-toggle="tab" href="#lcq_testsandtemplates" role="tab" aria-controls="lcq_testsandtemplates" aria-selected="false">{{#str}}testsandtemplates, local_catquiz{{/str}}</a>
   </li>
   <li class="nav-item">
     <a class="nav-link" id="lcq_quizattempts-tab" data-toggle="tab" href="#lcq_quizattempts" role="tab" aria-controls="quizattempts" aria-selected="false">{{#str}}quizattempts, local_catquiz{{/str}}</a>
   </li>
   <li class="nav-item">
-    <a class="nav-link" id="calculations-tab" data-toggle="tab" href="#calculations" role="tab" aria-controls="calculations" aria-selected="false">{{#str}}calculations, local_catquiz{{/str}}</a>
+    <a class="nav-link" id="calculations-tab" data-toggle="tab" href="#lcq_calculations" role="tab" aria-controls="lcq_calculations" aria-selected="false">{{#str}}calculations, local_catquiz{{/str}}</a>
   </li>
   <li class="nav-item">
-    <a class="nav-link" id="versioning-tab" data-toggle="tab" href="#versioning" role="tab" aria-controls="versioning" aria-selected="false">{{#str}}versioning, local_catquiz{{/str}}</a>
+    <a class="nav-link" id="versioning-tab" data-toggle="tab" href="#lcq_versioning" role="tab" aria-controls="lcq_versioning" aria-selected="false">{{#str}}versioning, local_catquiz{{/str}}</a>
   </li>
   <li class="nav-item">
-    <a class="nav-link" id="importer-tab" data-toggle="tab" href="#importer" role="tab" aria-controls="importer" aria-selected="false">{{#str}} import, core{{/str}}</a>
+    <a class="nav-link" id="importer-tab" data-toggle="tab" href="#lcq_importer" role="tab" aria-controls="lcq_importer" aria-selected="false">{{#str}} import, core{{/str}}</a>
   </li>
 </ul>
 
 <div class="tab-content" id="myTabContent">
-  <div class="tab-pane fade show active" id="summary" role="tabpanel" aria-labelledby="summary-tab">
+  <div class="tab-pane fade show active" id="lcq_summary" role="tabpanel" aria-labelledby="lcq_summary-tab">
     {{> local_catquiz/catscalemanager/summary}}
   </div>
-  <div class="tab-pane fade" id="catscales" role="tabpanel" aria-labelledby="catscales-tab">
+  <div class="tab-pane fade" id="lcq_catscales" role="tabpanel" aria-labelledby="lcq_catscales-tab">
     {{> local_catquiz/catscalemanager/catscales}}
   </div>
-  <div class="tab-pane fade" id="questions" role="tabpanel" aria-labelledby="questions-tab">
+  <div class="tab-pane fade" id="lcq_questions" role="tabpanel" aria-labelledby="lcq_questions-tab">
     {{> local_catquiz/catscalemanager/questions/questionsdisplay}}
   </div>
-  <div class="tab-pane fade" id="testsandtemplates" role="tabpanel" aria-labelledby="testsandtemplates-tab">
+  <div class="tab-pane fade" id="lcq_testsandtemplates" role="tabpanel" aria-labelledby="lcq_testsandtemplates-tab">
     {{> local_catquiz/catscalemanager/testsandtemplates/testsandtemplatesdisplay}}
   </div>
   <div class="tab-pane fade" id="lcq_quizattempts" role="tabpanel" aria-labelledby="lcq_quizattempts-tab">
     {{> local_catquiz/catscalemanager/quizattempts/quizattemptsdisplay}}
   </div>
-  <div class="tab-pane fade" id="calculations" role="tabpanel" aria-labelledby="calculations-tab">
+  <div class="tab-pane fade" id="lcq_calculations" role="tabpanel" aria-labelledby="lcq_calculations-tab">
     {{> local_catquiz/catscalemanager/calculations/calculationsdisplay}}
   </div>
-  <div class="tab-pane fade" id="versioning" role="tabpanel" aria-labelledby="versioning-tab">
+  <div class="tab-pane fade" id="lcq_versioning" role="tabpanel" aria-labelledby="lcq_versioning-tab">
     Versioning
   </div>
-  <div class="tab-pane fade" id="importer" role="tabpanel" aria-labelledby="importer-tab">
+  <div class="tab-pane fade" id="lcq_importer" role="tabpanel" aria-labelledby="lcq_importer-tab">
     {{{testitemsimporter}}}
     {{>local_catquiz/importer/importerdatainfodisplay}}
   </div>

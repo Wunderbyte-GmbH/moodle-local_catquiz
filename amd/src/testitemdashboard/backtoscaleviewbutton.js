@@ -22,7 +22,7 @@
 
 var SELECTORS = {
     BACKBUTTON: "[data-id='backtoscaleview']",
-    TABCONTAINER: '#catscales',
+    TABCONTAINER: '#lcq_catscales',
 };
 
 export const init = () => {

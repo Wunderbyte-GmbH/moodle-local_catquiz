@@ -209,7 +209,7 @@ class testitemdashboard implements renderable, templatable {
     private function render_overrides_form() {
         $form = new item_model_override_selector();
         $form->set_data_for_dynamic_submission();
-        return html_writer::div($form->render(), '', ['id' => 'model_override_form']);
+        return html_writer::div($form->render(), '', ['id' => 'lcq_model_override_form']);
     }
 
     /**
@@ -224,7 +224,7 @@ class testitemdashboard implements renderable, templatable {
         // It should correctly set the data for the supplied arguments.
         $form->set_data_for_dynamic_submission();
         // Render the form in a specific container, there should be nothing else in the same container.
-        return html_writer::div($form->render(), '', ['id' => 'select_context_form']);
+        return html_writer::div($form->render(), '', ['id' => 'lcq_select_context_form']);
     }
 
     /**

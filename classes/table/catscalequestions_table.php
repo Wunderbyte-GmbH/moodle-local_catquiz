@@ -99,7 +99,7 @@ class catscalequestions_table extends wunderbyte_table {
             'contextid' => $this->contextid,
             'scaleid' => $values->catscaleid ?? 0,
             'component' => $values->component ?? "",
-        ], 'questions');
+        ], 'lcq_questions');
 
         $data['showactionbuttons'][] = [
             'class' => 'btn btn-plain btn-smaller',

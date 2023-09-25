@@ -25,7 +25,7 @@ import DynamicForm from 'core_form/dynamicform';
 import Notification from 'core/notification';
 
 const SELECTORS = {
-    FORMCONTAINER: '#select_context_form',
+    FORMCONTAINER: '#lcq_select_context_form',
     CALCULATEBUTTON: '#model_button'
 };
 /**

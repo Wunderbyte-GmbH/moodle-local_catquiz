@@ -17,7 +17,7 @@ The importer can be rendered like:
 
     $inputform->set_data_for_dynamic_submission();
 
-    return html_writer::div($inputform->render(), '', ['id' => 'csv_import_form']);
+    return html_writer::div($inputform->render(), '', ['id' => 'lcq_csv_import_form']);
 
 Make sure to use a corresponding JS File, listening to the DynamicForm submitted event.
     (Demo in \local_catquiz\amd\src\csvimport.js)

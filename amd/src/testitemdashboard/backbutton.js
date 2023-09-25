@@ -22,7 +22,7 @@
 
 var SELECTORS = {
     BACKBUTTON: '#backtotablelink',
-    TABCONTAINER: '#questions',
+    TABCONTAINER: '#lcq_questions',
 };
 
 export const init = () => {
