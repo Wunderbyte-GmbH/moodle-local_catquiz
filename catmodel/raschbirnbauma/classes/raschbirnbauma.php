@@ -348,7 +348,7 @@ class raschbirnbauma extends model_raschmodel {
      * @return float
      */
 
-    public static function fisher_info(float $pp, array $ip) {
+    public static function fisher_info(array $pp, array $ip) {
         return (self::likelihood($pp, $ip, 0) * self::likelihood($pp, $ip, 1.0));
     }
 
