@@ -38,6 +38,8 @@ use local_wunderbyte_table\wunderbyte_table;
  */
 class quizattempts_table extends wunderbyte_table {
 
+    private $url;
+
     /**
      * Acts like a cache and stores names of teststrategies.
      * @var array<string>
@@ -50,9 +52,12 @@ class quizattempts_table extends wunderbyte_table {
      *      as a key when storing table properties like sort order in the session.
      */
     public function __construct(string $uniqueid) {
+        global $PAGE;
 
         parent::__construct($uniqueid);
         $this->teststrategynames = [];
+        $this->url = clone $PAGE->url;
+        $this->url->params($_GET);
 
     }
 
@@ -131,10 +136,16 @@ class quizattempts_table extends wunderbyte_table {
      * @return string 
      */
     public function col_action($values) {
+        $url = clone $this->url;
+        $url->params(['attemptid' => $values->id]);
+
+
         return sprintf(
-            '<a href="/local/catquiz/attempts.php?id=%s">%s</a>',
-            $values->id,
-            get_string('view')
+            '<a class="btn btn-plain btn-smaller"
+                href="%s#quizattempts"><i class="fa fa-cog" title="%s"></i>
+            </a>',
+            $url,
+            get_string('cogwheeltitle', 'local_catquiz')
         );
     }
 }

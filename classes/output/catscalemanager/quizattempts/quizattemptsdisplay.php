@@ -17,6 +17,7 @@
 namespace local_catquiz\output\catscalemanager\quizattempts;
 
 use local_catquiz\catquiz;
+use local_catquiz\output\attemptfeedback;
 use local_catquiz\output\catscalemanager\scaleandcontexselector;
 use local_catquiz\output\testenvironmentdashboard;
 use local_catquiz\table\quizattempts_table;
@@ -168,17 +169,25 @@ class quizattemptsdisplay {
         return $table->outhtml(10, true);
     }
 
+    public function render_attempt_details(int $attemptid) {
+        $attemptfeedback = new attemptfeedback($attemptid);
+        $feedback = $attemptfeedback->get_feedback_for_attempt($attemptid);
+        return $feedback;
+    }
+
     /**
      * Return the item tree of all catscales.
      * @return array
      */
     public function export_data_array(): array {
 
-        $data = [
+        $attemptid = optional_param('attemptid', 0, PARAM_INT);
+        if ($attemptid) {
+            return ['feedback' => $this->render_attempt_details($attemptid)];
+        }
+
+        return [
             'table' => $this->render_table(),
-
         ];
-
-        return $data;
     }
 }
