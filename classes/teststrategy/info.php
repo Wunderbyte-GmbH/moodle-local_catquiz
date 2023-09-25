@@ -24,6 +24,7 @@
 
 namespace local_catquiz\teststrategy;
 
+use cache;
 use core_component;
 use local_catquiz\feedback\feedback;
 use local_catquiz\teststrategy\context\contextcreator;
@@ -85,6 +86,10 @@ class info {
     public static function return_available_strategies() {
 
         global $CFG;
+        $cache = cache::make('local_catquiz', 'teststrategies');
+        if ($strategies = $cache->get('all')) {
+            return $strategies;
+        }
 
         require_once($CFG->dirroot . '/local/catquiz/lib.php');
 
@@ -95,7 +100,26 @@ class info {
 
         $classnames = array_keys($strategies);
 
-        return array_map(fn($x) => new $x(), $classnames);
+        $strategies = array_map(fn($x) => new $x(), $classnames);
+
+        $cache->set('all', $strategies);
+        foreach ($strategies as $strategy) {
+            $cache->set($strategy->id, $strategy);
+        }
+        return $strategies;
+    }
+
+    public static function get_teststrategy(int $id) {
+        $cache = cache::make('local_catquiz', 'teststrategies');
+        if ($strategy = $cache->get($id)) {
+            return $strategy;
+        }
+
+        $strategy = array_filter(
+                self::return_available_strategies(),
+                fn ($strategy) => $strategy->id == $id
+        );
+        return reset($strategy);
     }
 
     /**
