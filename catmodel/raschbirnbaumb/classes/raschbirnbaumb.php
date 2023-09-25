@@ -96,14 +96,16 @@ class raschbirnbaumb extends model_raschmodel {
     /**
      * Calculates the Likelihood for a given the person ability parameter
      *
-     * @param float $pp - person ability parameter
-     * @param array $ip - item parameters ('difficulty', 'discrimination')
+     * @param array <float> $pp - person ability parameter ('ability')
+     * @param array <float> $ip - item parameters ('difficulty', 'discrimination')
      * @param float $k - answer category (0 or 1.0)
      * @return float
      */
-    public static function likelihood($pp, array $ip, float $k): float {
+    public static function likelihood(array $pp, array $ip, float $k): float {
+        $pp = $pp['ability'];
         $a = $ip['difficulty'];
         $b = $ip['discrimination'];
+        
         if ($k < 1.0) {
             return 1 / (1 + exp($b * ($pp - $a)));
         } else {
@@ -116,19 +118,27 @@ class raschbirnbaumb extends model_raschmodel {
     /**
      * Calculates the LOG Likelihood for a given the person ability parameter
      *
-     * @param float $pp - person ability parameter
+     * @param array <float> $pp - person ability parameter ('ability')
      * @param array $ip - item parameters ('difficulty')
      * @param float $k - answer category (0 or 1.0)
-     * @return float
+     * @return float - log likelihood
      */
-    public static function log_likelihood($pp, array $ip, float $k): float {
+    public static function log_likelihood(array $pp, array $ip, float $k): float {
         return log(self::likelihood($pp, $ip, $k));
     }
-
+    
+    /**
+     * Calculates the 1st derivative of the LOG Likelihood with respect to the item parameters
+     *
+     * @param float $pp - person ability parameter
+     * @param float $k - answer category (0 or 1.0)
+     * @return float - 1st derivative of log likelihood with respect to $pp
+     */
     public static function log_likelihood_p(array $pp, array $ip, float $k):float {
-        $pp = $pp[0];
+        $pp = $pp['ability'];
         $a = $ip['difficulty'];
         $b = $ip['discrimination'];
+        
         if ($k < 1.0) {
             return -($b * exp($b * $pp)) / (exp($a * $b) + exp($b * $pp));
         } else {
@@ -136,76 +146,84 @@ class raschbirnbaumb extends model_raschmodel {
         }
     }
 
+    /**
+     * Calculates the 2nd derivative of the LOG Likelihood with respect to the person ability parameter
+     *
+     * @param array<float> $pp - person ability parameter
+     * @param array<float> $ip - item parameters ('difficulty')
+     * @param float $k - answer category (0 or 1.0)
+     * @return float - 2nd derivative of log likelihood with respect to $pp
+     */
     public static function log_likelihood_p_p(array $pp, array $ip, float $k):float {
-        $pp = $pp[0];
+        $pp = $pp['ability'];
         $a = $ip['difficulty'];
         $b = $ip['discrimination'];
-        return -(($b ** 2 * exp($b * ($a + $pp))) / ((exp($a * $b) + exp($b * $pp)) ** 2));
+        
+        return [[-(($b ** 2 * exp($b * ($a + $pp))) / ((exp($a * $b) + exp($b * $pp)) ** 2))]];
     }
 
-    public static function get_log_jacobian($pp, array $ip, float $k):array {
+    /**
+     * Calculates the 1st derivative of the LOG Likelihood with respect to the item parameters
+     *
+     * @param array<float> $pp - person ability parameter ('ability')
+     * @param array<float> $ip - item parameters ('difficulty', 'discrimination')
+     * @param float $k - answer category (0 or 1.0)
+     * @return array - jacobian vector
+     */
+    public static function get_log_jacobian(array $pp, array $ip, float $k):array {
+        $pp = $pp['ability'];
+        $a = $ip['difficulty'];
+        $b = $ip['discrimination'];
+        
+        $jacobian = [];
+        
+        // Pre-Calculate high frequently used exp-terms.
+        $exp_ab = exp($a * $b);
+        $exp_bp = exp($b * $pp);
+      
         if ($k < 1.0) {
-            return [
-                ($ip['discrimination'] * exp($ip['discrimination']
-                    * $pp)) / (exp($ip['difficulty'] * $ip['discrimination'])
-                    + exp($ip['discrimination'] * $pp)), // Calculates d/da.
-                (exp($ip['discrimination'] * $pp) * ( $ip['difficulty'] - $pp))
-                    / (exp($ip['difficulty'] * $ip['discrimination'])
-                    + exp($ip['discrimination'] * $pp)) // Calculates d/db.
-                ];
+          $jacobian[0] = ($b * $exp_bp) / ($exp_ab + $exp_bp); // Calculates d/da.
+          $jacobian[1] = ($exp_bp * ( $a - $pp)) / ($exp_ab + $exp_bp); // Calculates d/db.
         } else {
-            return [
-                -($ip['discrimination'] * exp( $ip['difficulty']
-                    * $ip['discrimination'])) / (exp( $ip['difficulty'] * $ip['discrimination'])
-                    + exp($ip['discrimination'] * $pp)), // Calculates d/da.
-                (exp( $ip['difficulty'] * $ip['discrimination'])
-                    * ($pp - $ip['difficulty'])) / (exp($ip['difficulty'] * $ip['discrimination'])
-                    + exp($ip['discrimination'] * $pp)) // Calculates d/db.
-                ];
+          $jacobian[0] = -$b * $exp_ab / (exp( $a * $b) + $exp_bp); // Calculates d/da.
+          $jacobian[1] = $exp_ab * ($pp - $a) / ($exp_ab + $exp_bp); // Calculates d/db.
         }
+      return $jacobian;
     }
-
-    public static function get_log_hessian($pp, array $ip, float $itemresponse): array {
-        if ($itemresponse >= 1.0) {
-            return [[
-                (-($ip['discrimination'] ** 2 * exp($ip['discrimination']
-                    * ($ip['difficulty'] + $pp))) / ((exp($ip['difficulty']
-                    * $ip['discrimination']) + exp($ip['discrimination']
-                    * $pp)) ** 2)), // Calculates d²/da².
-                (-(exp($ip['difficulty'] * $ip['discrimination'])
-                    * (exp($ip['difficulty'] * $ip['discrimination']) + exp($ip['discrimination'] * $pp)
-                    * (1 + $ip['discrimination'] * ($ip['difficulty'] - $pp))))
-                    / ((exp($ip['difficulty'] * $ip['discrimination']) + exp($ip['discrimination']
-                    * $pp)) ** 2)) // Calculates d/a d/db.
-                ], [
-                (-(exp($ip['difficulty'] * $ip['discrimination'])
-                    * (exp($ip['difficulty'] * $ip['discrimination']) + exp($ip['discrimination'] * $pp)
-                    * (1 + $ip['discrimination'] * ($ip['difficulty'] - $pp))))
-                    / ((exp($ip['difficulty'] * $ip['discrimination'])
-                    + exp($ip['discrimination'] * $pp)) ** 2)), // Calculates d/a d/db.
-                (-(exp($ip['discrimination'] * ($ip['difficulty'] + $pp))
-                    * ($ip['difficulty'] - $pp) ** 2) / ((exp($ip['difficulty'] * $ip['discrimination'])
-                    + exp($ip['discrimination'] * $pp)) ** 2)) // Calculates d²/db².
-            ]];
+    
+    /**
+     * Calculates the 2nd derivative of the LOG Likelihood with respect to the item parameters
+     *
+     * @param array<float> $pp - person ability parameter ('ability')
+     * @param array<float> $ip - item parameters ('difficulty', 'discrimination')
+     * @param float $k - answer category (0 or 1.0)
+     * @return array - hessian matrx
+     */
+    public static function get_log_hessian(array $pp, array $ip, float $itemresponse): array {
+        $pp = $pp['ability'];
+        $a = $ip['difficulty'];
+        $b = $ip['discrimination'];
+        
+        $hessian = [[]];
+        
+        // Pre-Calculate high frequently used exp-terms.
+        $exp_ab = exp($a * $b);
+        $exp_bp = exp($b * $pp);
+         
+        if ($k >= 1.0) {
+          $exp_bap1 = exp($b * ($a + $pp));
+          $hessian[0][0] = (-($b ** 2 * $exp_bap1) / (($exp_ab + $exp_bp) ** 2)); // Calculates d²/da².
+          $hessian[0][1] = (-($exp_ab * ($exp_ab + $exp_bp * (1 + $b * ($a - $pp)))) / (($exp_ab + $exp_bp) ** 2)); // Calculates d/a d/db.
+          $hessian[1][0] = $hessian[0][1];
+          $hessian[1][1] = (-($exp_bap1 * ($a - $pp) ** 2) / (($exp_ab + $exp_bp) ** 2)); // Calculates d²/db².
         } else {
-            return [[
-                -($ip['discrimination'] ** 2 * exp($ip['discrimination']
-                    * ($ip['difficulty'] - $pp))) / (1 + exp($ip['discrimination']
-                    * ($ip['difficulty'] - $pp))) ** 2, // Calculates d²/da².
-                (1 + exp($ip['discrimination'] * ($ip['difficulty'] - $pp))
-                    * (1 + $ip['discrimination'] * ($pp - $ip['difficulty'])))
-                    / (1 + exp($ip['discrimination'] * ($ip['difficulty'] - $pp)))
-                    ** 2, // Calculates d/da d/db.
-            ], [
-                (1 + exp($ip['discrimination'] * ($ip['difficulty'] - $pp))
-                    * (1 + $ip['discrimination'] * ($pp - $ip['difficulty'])))
-                    / (1 + exp($ip['discrimination'] * ($ip['difficulty'] - $pp)))
-                    ** 2, // Calculates d/da d/db.
-                -(exp($ip['discrimination'] * ($ip['difficulty'] - $pp))
-                    * ($ip['difficulty'] - $pp) ** 2) / (1 + exp($ip['discrimination']
-                    * ($ip['difficulty'] - $pp))) ** 2 // Calculates d²/db².
-            ]];
+          $exp_bap0 = exp($b * ($a - $pp));
+          $hessian[0][0] = -($b ** 2 * $exp_bap0) / (1 + $exp_bap0) ** 2; // Calculates d²/da².
+          $hessian[0][1] = (1 + $exp_bap0 * (1 + $b * ($pp - $a))) / (1 + $exp_bap0) ** 2; // Calculates d/da d/db.
+          $hessian[1][0] = $hessian[0][1];
+          $hessian[1][1] = -($exp_bap0 * ($a - $pp) ** 2) / (1 + $exp_bap0) ** 2; // Calculates d²/db².
         }
+      return $hessian;
     }
 
     // Calculate the Least-Mean-Squres (LMS) approach.
@@ -213,207 +231,251 @@ class raschbirnbaumb extends model_raschmodel {
     /**
      * Calculates the Least Mean Squres (residuals) for a given the person ability parameter and a given expected/observed score
      *
-     * @param array $pp - person ability parameter
-     * @param array $ip - item parameters ('difficulty', 'discrimination', 'guessing')
-     * @param array $k - fraction of correct (0 ... 1.0)
-     * @param array $n - number of observations
+     * @param array<float> $pp - person ability parameter ('ability')
+     * @param array<float> $ip - item parameters ('difficulty', 'discrimination', 'guessing')
+     * @param float $k - fraction of correct (0 ... 1.0)
+     * @param float $n - number of observations
      * @return float - weighted residuals
      */
-    public static function least_mean_squares(array $pp, array $ip, array $k, array $n): float {
-        $lmsresiduals = 0;
-        $numbertotal = 0;
-
-        foreach ($pp as $key => $ability) {
-            if (!(is_float($n[$key]) && is_float($k[$key]))) {
-                continue;
-            }
-
-            $lmsresiduals += $n[$key] * ($k[$key] - self::likelihood($ability, $ip, 1.0)) ** 2;
-            $numbertotal += $n[$key];
-        }
-        return (($numbertotal > 0) ? ($lmsresiduals / $numbertotal) : (0));
+   function least_mean_squares(array $pp, array $ip, float $k, float $n):float{
+        return $n * ($k - likelihood($pp, $ip, 1.0)) ** 2;
     }
 
     /**
-     * Calculates the 1st derivative of Least Mean Squres with respect to the item parameters
+     * Calculates the 1st derivative of Least Mean Squares with respect to the item parameters
      *
-     * @param array $pp - person ability parameter
-     * @param array $ip - item parameters ('difficulty', 'discrimination')
-     * @param array $k - fraction of correct (0 ... 1.0)
-     * @param array $n - number of observations
-     * @return array - 1st derivative
-     */
-    public static function least_mean_squares_1st_derivative_ip(array $pp, array $ip, array $k, array $n): array {
-        $derivative = [0, 0];
-        $a = $ip['difficulty']; $b = $ip['discrimination'];
+     * @param array<float> $pp - person ability parameter ('ability')
+     * @param array<float> $ip - item parameters ('difficulty', 'discrimination', 'guessing')
+     * @param float $k - fraction of correct (0 ... 1.0)
+     * @param float $n - number of observations
+     * @return array - 1st derivative of lms with respect to $ip
+     */ 
+   function least_mean_squares_1st_derivative_ip(array $pp, array $ip, float $k, float $n):array{
+        $pp = $pp['ability'];
+        $a = $ip['difficulty'];
+        $b = $ip['discrimination'];
 
-        foreach ($pp as $key => $ability) {
-            if (!(is_numeric($n[$key]) && is_numeric($k[$key]))) {
-                continue;
-            }
+        $derivative = [];
+        
+        // Pre-Calculate high frequently used exp-terms.
+        $exp_bap = exp($b * ($a - $pp));
+        
+        $derivative[0] = $n * (2 * $b * $exp_bap * ($k -1 + $exp_bap * $k)) / (1 + $exp_bap) ** 3; // Calculate d/da.            
+        $derivative[1] = $n * (2 * $exp_bap * ($a - $pp) * ($k -1 + $exp_bap * $k)) / (1 + $exp_bap) ** 3; // Calculate d/db.
 
-            $derivative[0] += $n[$key] * (2 * $b * exp($b * ($a - $ability))
-                * ($k[$key] - 1 + exp($b * ($a - $ability)) * $k[$key])) / (1 + exp($b
-                * ($a - $ability))) ** 3; // Calculate d/da.
-            $derivative[1] += $n[$key] * (2 * exp($b * ($a - $ability))
-                * ($a - $ability) * ($k[$key] - 1 + exp($b * ($a - $ability)) * $k[$key]))
-                / (1 + exp($b * ($a - $ability))) ** 3; // Calculate d/db.
-        }
         return $derivative;
     }
 
     /**
      * Calculates the 2nd derivative of Least Mean Squres with respect to the item parameters
      *
-     * @param array $pp - person ability parameter
-     * @param array $ip - item parameters ('difficulty', 'discrimination')
-     * @param array $k - fraction of correct (0 ... 1.0)
-     * @param array $n - number of observations
-     * @return array - 1st derivative
-     */
-    public static function least_mean_squares_2nd_derivative_ip(array $pp, array $ip, array $k, array $n): array {
-        $derivative = [[0, 0], [0, 0]];
-        $a = $ip['difficulty']; $b = $ip['discrimination'];
+     * @param array<float> $pp - person ability parameter ('ability')
+     * @param array<float> $ip - item parameters ('difficulty', 'discrimination', 'guessing')
+     * @param float $k - fraction of correct (0 ... 1.0)
+     * @param float $n - number of observations
+     * @return array - 2nd derivative of lms with respect to $ip
+     */ 
+   function least_mean_squares_2nd_derivative_ip(array $pp, array $ip, float $k, float $n):array{
+        $pp = $pp['ability'];
+        $a = $ip['difficulty'];
+        $b = $ip['discrimination'];
 
-        foreach ($pp as $key => $ability) {
-            if (!(is_numeric($n[$key]) && is_numeric($k[$key]))) {
-                continue;
-            }
+        $derivative = [[]];
+        
+        // Pre-Calculate high frequently used exp-terms.
+        $exp_bap1 = exp($b * ($a + $pp));
+        $exp_bap0 = exp($b * ($a - $pp));
+        $exp_ab = exp($a * $b);
+        $exp_bp = exp($b * $pp):
+        
+        $derivative[0][0]  = $n * (2 * $b ** 2 * $exp_bap1 * (-$exp_bp ** 2 + 2 * $exp_bap1 + (-$exp_ab ** 2 + $exp_bp ** 2) * $k)) / ($exp_ab + $exp_bp) ** 4; // Calculate d²2/da².            
+        $derivative[0][1]  = $n * (2 * $exp_bap0 * ((1 + $a * $b - $b * $pp) * ($k -1) - $exp_bap0 ** 2 * ($b * ($a - $pp) - 1) * $k + $exp_bap0 * (2 * $a * $b - 2 * $b * $pp + 2 * $k - 1))) / (1 + $exp_bap0) ** 4; // Calculate d/da d/db.    
+        $derivative[1][1]  = $n * (2 * $exp_bap1 * ($a - $pp) ** 2 * (2 * $exp_bap1 + (-$exp_ab ** 2 + $exp_bp ** 2) * $k - $exp_bp ** 2)) / ($exp_ab + $exp_bp) ** 4; // Calculate d²/db².
 
-            $derivative[0][0]  += $n[$key] * (2 * $b ** 2 * exp($b * ($a + $ability))
-                * (-exp(2 * $b * $ability) + 2 * exp($b * ($a + $ability)) + (-exp(2 * $a * $b)
-                + exp(2 * $b * $ability)) * $k[$key])) / (exp($a * $b)
-                + exp($b * $ability)) ** 4; // Calculate d²2/da².
-            $derivative[0][1]  += $n[$key] * (2 * exp($b * ($a - $ability))
-                * ((1 + $a * $b - $b * $ability) * ($k[$key] - 1) - exp(2 * $b
-                * ($a - $ability)) * ($b * ($a - $ability) - 1) * $k[$key] + exp($b * ($a - $ability))
-                * (2 * $a * $b - 2 * $b * $ability + 2 * $k[$key] - 1)))
-                / (1 + exp($b * ($a - $ability))) ** 4; // Calculate d/da d/db.
-            $derivative[1][1]  += $n[$key] * (2 * exp($b * ($a + $ability))
-                * ($a - $ability) ** 2 * (2 * exp($b * ($a + $ability)) + (-exp(2 * $a * $b) + exp(2 * $b * $ability))
-                * $k[$key] - exp(2 * $b * $ability))) / (exp($a * $b) + exp($b * $ability)) ** 4; // Calculate d²/db².
-        }
-        // Note: Partial derivations are exchangeible, cf. Theorem of Schwarz.
+        // Note: Partial derivations are exchangeable, cf. Theorem of Schwarz.
         $derivative[1][0] = $derivative[0][1];
-
+      
         return $derivative;
     }
 
+    // Calculate the Log'ed Odds-Ratio Squared (LORS) approach.
+    
+    /**
+     * Calculates the Log'ed Odds-Ratio Squared (residuals) for a given the person ability parameter and a given expected/observed score
+     *
+     * @param array<float> $pp - person ability parameter ('ability')
+     * @param array<float> $ip - item parameters ('difficulty', 'discrimination', 'guessing')
+     * @param float $or - odds ratio
+     * @param float $n - number of observations
+     * @return float - weighted residuals
+     */   
+    function lors_residuals(array $pp, array $ip, float $or, float $n = 1):float {
+        $pp = $pp['ability'];
+        $a = $ip['difficulty'];
+        $b = $ip['discrimination'];
+        
+        return $n * (log($or) + $b * ($a - $pp)) ** 2;
+    }
+
+    /**
+     * Calculates the 1st derivative of Log'ed Odds-Ratio Squared with respect to the item parameters
+     *
+     * @param array<float> $pp - person ability parameter ('ability')
+     * @param array<float> $ip - item parameters ('difficulty', 'discrimination', 'guessing')
+     * @param float $or - odds ratio
+     * @param float $n - number of observations
+     * @return array - 1st derivative
+     */   
+   function lors_1st_derivative_ip(array $pp, array $ip, float $or, float $n = 1): array {
+        $pp = $pp['ability'];
+        $a = $ip['difficulty'];
+        $b = $ip['discrimination'];  
+       
+        $derivative = [];
+
+        $derivative[0] = $n * 2 * $b * ($b * ($a - $pp) + log($or)); // Calculate d/da.            
+        $derivative[1] = $n * 2 * ($a - $pp) * ($b * ($a - $pp) + log($or)); // Calculate d/db.
+        
+        return $derivative;
+    }
+    
+    /**
+     * Calculates the 2nd derivative of Log'ed Odds-Ratio Squared with respect to the item parameters
+     *
+     * @param array<float> $pp - person ability parameter ('ability')
+     * @param array<float> $ip - item parameters ('difficulty', 'discrimination', 'guessing')
+     * @param float $or - odds ratio
+     * @param float $n - number of observations
+     * @return array - 1st derivative
+     */   
+   function lors_2nd_derivative_ip(array $pp, array $ip, float $or, float $n = 1): array {
+        $pp = $pp['ability'];
+        $a = $ip['difficulty'];
+        $b = $ip['discrimination'];
+        
+        $derivative = [[]];
+        
+        $derivative[0][0]  = $n * 2 * $b ** 2; // Calculate d²2/da².            
+        $derivative[0][1]  = 0; // $n * 2 * (2 * $b * ($a - $pp) + log($or)); // Calculate d/da d/db.    
+        $derivative[1][1]  = $n * 2 * ($a - $pp) ** 2; // Calculate d²/db².
+
+        // Note: Partial derivations are exchangeable, cf. Theorem of Schwarz.
+        $derivative[1][0] = $derivative[0][1];
+      
+        return $derivative;
+    }
+    
     // Calculate Fisher-Information.
 
     /**
      * Calculates the Fisher Information for a given person ability parameter
      *
-     * @param float $pp
-     * @param array $ip
+     * @param array<float> $pp - person ability parameter ('ability')
+     * @param array<float> $ip - item parameters ('difficulty', 'discrimination', 'guessing')
      * @return float
      */
-    public static function fisher_info(float $pp, array $ip): float {
+    public static function fisher_info(array $pp, array $ip): float {
         return ($ip['discrimination'] ** 2 * self::likelihood($pp, $ip, 0) * self::likelihood($pp, $ip, 1.0));
     }
 
     // Implements handling of the Trusted Regions (TR) approach.
-
+    
     /**
      * Implements a Filter Function for trusted regions in the item parameter estimation
      *
-     * @param array $parameters
-     *
-     * @return array
-     *
+     * @param array<float> $ip - item parameters ('difficulty', 'discrimination', 'guessing')
+     * return array - chunked item parameter
      */
-    public static function restrict_to_trusted_region(array $parameters):array {
+   function restrict_to_trusted_region(array $ip): array {
         // Set values for difficulty parameter.
-        $a = $parameters['difficulty'];
+        $a = $ip['difficulty'];
 
-        $am = 0; // Mean of difficulty.
-        $as = 2; // Standard derivation of difficulty.
+        $a_m = 0; // Mean of difficulty.
+        $a_s = 2; // Standard derivation of difficulty.
 
         // Use x times of SD as range of trusted regions.
-        $atr = floatval(get_config('catmodel_raschbirnbaumb', 'trusted_region_factor_sd_a'));
-        $amin = floatval(get_config('catmodel_raschbirnbaumb', 'trusted_region_min_a'));
-        $amax = floatval(get_config('catmodel_raschbirnbaumb', 'trusted_region_max_a'));
+        $a_tr = floatval(get_config('catmodel_raschbirnbaumb', 'trusted_region_factor_sd_a'));
+        $a_min = floatval(get_config('catmodel_raschbirnbaumb', 'trusted_region_min_a'));
+        $a_max = floatval(get_config('catmodel_raschbirnbaumb', 'trusted_region_max_a'));
 
         // Set values for disrciminatory parameter.
-        $b = $parameters['discrimination'];
+        $b = $ip['discrimination'];
 
         // Placement of the discriminatory parameter.
-        $bp = floatval(get_config('catmodel_raschbirnbaumb', 'trusted_region_placement_b'));
+        $b_p = floatval(get_config('catmodel_raschbirnbaumb', 'trusted_region_placement_b'));
         // Slope of the discriminatory parameter.
-        $bs = floatval(get_config('catmodel_raschbirnbaumb', 'trusted_region_slope_b'));
+        $b_s = floatval(get_config('catmodel_raschbirnbaumb', 'trusted_region_slope_b'));
         // Use x times of placement as maximal value of trusted region.
-        $btr = floatval(get_config('catmodel_raschbirnbaumb', 'trusted_region_factor_max_b'));
+        $b_tr = floatval(get_config('catmodel_raschbirnbaumb', 'trusted_region_factor_max_b'));
 
-        $bmin = floatval(get_config('catmodel_raschbirnbaumb', 'trusted_region_min_b'));
-        $bmax = floatval(get_config('catmodel_raschbirnbaumb', 'trusted_region_max_b'));
+        $b_min = floatval(get_config('catmodel_raschbirnbaumb', 'trusted_region_min_b'));
+        $b_max = floatval(get_config('catmodel_raschbirnbaumb', 'trusted_region_max_b'));
 
         // Test TR for difficulty.
-        if (($a - $am) < max(-($atr * $as), $amin)) {
-            $a = max(-($atr * $as), $amin);
-        }
-        if (($a - $am) > min(($atr * $as), $amax)) {
-            $a = min(($atr * $as), $amax);
-        }
+        if ($a < max($a_m - ($a_tr * $a_s), $a_min)) {$a = max($a_m - ($a_tr * $a_s), $a_min); }
+        if ($a > min($a_m + ($a_tr * $a_s), $a_max)) {$a = min($a_m + ($a_tr * $a_s), $a_max); }
 
-        $parameters['difficulty'] = $a;
+        $ip['difficulty'] = $a;
 
         // Test TR for discriminatory.
-        if ($b < $bmin) {
-            $b = $bmin;
-        }
-        if ($b > min(($btr * $bp), $bmax)) {
-            $b = min(($btr * $bp), $bmax);
-        }
+        if ($b < $b_min) {$b = $b_min; }
+        if ($b > min(($b_tr * $b_p),$b_max)) {$b = min(($b_tr * $b_p),$b_max); }
 
-        $parameters['discrimination'] = $b;
+        $ip['discrimination'] = $b;
 
-        return $parameters;
+        return $ip;
     }
 
     /**
      * Calculates the 1st derivative trusted regions for item parameters
      *
-     * @return array
+     * @param array<float> $ip - item parameters ('difficulty', 'discrimination', 'guessing')
+     * @return array - 1st derivative of TR function with respect to $ip
      */
-    public static function get_log_tr_jacobian():array {
+   function get_log_tr_jacobian($ip): array {
         // Set values for difficulty parameter.
-        $am = 0; // Mean of difficulty.
-        $as = 2; // Standard derivation of difficulty.
+        
+        // @DAVID: Diese Werte sollten dynamisch berechnet werden können
+        
+        $a_m = 0; // Mean of difficulty.
+        $a_s = 2; // Standard derivation of difficulty.
 
         // Placement of the discriminatory parameter.
-        $bp = floatval(get_config('catmodel_raschbirnbaumb', 'trusted_region_placement_b'));
+        $b_p = floatval(get_config('catmodel_raschbirnbaumb', 'trusted_region_placement_b'));
         // Slope of the discriminatory parameter.
-        $bs = floatval(get_config('catmodel_raschbirnbaumb', 'trusted_region_slope_b'));
+        $b_s = floatval(get_config('catmodel_raschbirnbaumb', 'trusted_region_slope_b'));
 
         return [
-            fn ($x) => (($am - $x['difficulty']) / ($as ** 2)), // Calculates d/da.
-            // Calculates d/db.
-            fn ($x) => (-($bs * exp($bs * $x['discrimination'])) / (exp($bs * $bp) + exp($bs * $x['discrimination'])))
+            (($a_m - $ip['difficulty']) / ($a_s ** 2)), // Calculates d/da.
+            (-($b_s * exp($b_s * $ip['discrimination'])) / (exp($b_s * $b_p) + exp($b_s * $ip['discrimination']))) // Calculates d/db.
         ];
     }
 
     /**
      * Calculates the 2nd derivative trusted regions for item parameters
      *
-     * @return array
+     * @param array<float> $ip - item parameters ('difficulty', 'discrimination', 'guessing')
+     * @return array<array> - 2nd derivative of TR function with respect to $ip
      */
-    public static function get_log_tr_hessian():array {
+   function get_log_tr_hessian(array $ip):array{
         // Set values for difficulty parameter.
-        $am = 0; // Mean of difficulty.
-        $as = 2; // Standard derivation of difficulty.
+        
+        // @DAVID: Diese Werte sollten dynamisch berechnet werden können
+            
+        $a_m = 0; // Mean of difficulty.
+        $a_s = 2; // Standard derivation of difficulty.
 
         // Placement of the discriminatory parameter.
-        $bp = floatval(get_config('catmodel_raschbirnbaumb', 'trusted_region_placement_b'));
+        $b_p = floatval(get_config('catmodel_raschbirnbaumb', 'trusted_region_placement_b'));
         // Slope of the discriminatory parameter.
-        $bs = floatval(get_config('catmodel_raschbirnbaumb', 'trusted_region_slope_b'));
+        $b_s = floatval(get_config('catmodel_raschbirnbaumb', 'trusted_region_slope_b'));
 
         return [[
-            fn ($x) => (-1 / ($as ** 2)), // Calculates d²/da².
-            fn ($x) => (0) // Calculates d/da d/db.
-        ], [
-            fn ($x) => (0), // Calculates d/da d/db.
-            fn ($x) => (-($bs ** 2 * exp($bs * ($bp + $x['discrimination']))) / (exp($bs * $bp) + exp($bs * $x['discrimination'])) ** 2) // Calculates d²/db².
+          (-1/ ($a_s ** 2)), // Calculates d²/da².
+          (0) // Calculates d/da d/db.
+        ],[
+          (0), // Calculates d/da d/db.
+          (-($b_s ** 2 * exp($b_s * ($b_p + $ip['discrimination']))) / (exp($b_s * $b_p) + exp($b_s * $ip['discrimination'])) ** 2) // Calculates d²/db².
         ]];
     }
-
 }
