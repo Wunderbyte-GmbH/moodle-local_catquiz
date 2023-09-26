@@ -25,7 +25,6 @@
 namespace local_catquiz\teststrategy\feedbackgenerator;
 
 use cache;
-use context_system;
 use local_catquiz\catquiz;
 use local_catquiz\teststrategy\feedbackgenerator;
 use local_catquiz\teststrategy\info;
@@ -38,11 +37,13 @@ use local_catquiz\teststrategy\info;
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class debuginfo extends feedbackgenerator {
-    protected function run(array $data): array {
-        if (! $this->has_permissions()) {
-                    return [];
-        }
 
+
+    protected function get_studentfeedback(array $data): array {
+        return [];
+    }
+
+    protected function get_teacherfeedback(array $data): array {
         global $OUTPUT;
         $feedback = $OUTPUT->render_from_template('local_catquiz/feedback/debuginfo', ['data' => $data['debuginfo']]);
 
@@ -58,12 +59,6 @@ class debuginfo extends feedbackgenerator {
 
     public function get_required_context_keys(): array {
         return ['debuginfo'];
-    }
-
-    private function has_permissions() {
-        return has_capability(
-            'local/catquiz:view_debug_info', context_system::instance()
-        );
     }
 
     private function get_question_details(array $context) {

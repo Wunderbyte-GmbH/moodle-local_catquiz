@@ -35,7 +35,11 @@ use local_catquiz\teststrategy\feedbackgenerator;
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class pilotquestions extends feedbackgenerator {
-    protected function run(array $data): array {
+    protected function get_studentfeedback(array $data): array {
+        return [];
+    }
+
+    protected function get_teacherfeedback(array $data): array {
         $feedback = sprintf(
             '%s: %d',
             get_string('pilot_questions', 'local_catquiz'),

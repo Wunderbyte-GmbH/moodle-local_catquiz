@@ -39,13 +39,17 @@ use local_catquiz\teststrategy\feedbackgenerator;
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class customscalefeedback extends feedbackgenerator {
-    protected function run(array $data): array {
+    protected function get_studentfeedback(array $data): array {
 
         $text = $data['customscalefeedback'];
         return [
             'heading' => $this->get_heading(),
             'content' => $text,
         ];
+    }
+
+    protected function get_teacherfeedback(array $data): array {
+        return [];
     }
 
     public function get_required_context_keys(): array {

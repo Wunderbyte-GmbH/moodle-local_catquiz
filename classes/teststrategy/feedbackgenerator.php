@@ -25,6 +25,7 @@
 namespace local_catquiz\teststrategy;
 
 use coding_exception;
+use context_system;
 use UnexpectedValueException;
 
 /**
@@ -41,7 +42,15 @@ abstract class feedbackgenerator {
      * @param array $data
      * @return array
      */
-    abstract protected function run(array $data): array;
+    abstract protected function get_studentfeedback(array $data): array;
+
+    /**
+     * Returns an array with two keys 'heading' and 'context'.
+     *
+     * @param array $data
+     * @return array
+     */
+    abstract protected function get_teacherfeedback(array $data): array;
 
     /**
      * Returns an array of the required elements in the $context array that will
@@ -81,12 +90,23 @@ abstract class feedbackgenerator {
             return $this->no_data();
         }
 
-        $feedback = $this->run($context);
-        if (! $this->isvalidfeedback($feedback)) {
-            return $this->no_data();
+        $studentfeedback = $this->get_studentfeedback($context);
+        if (! $this->isvalidfeedback($studentfeedback)) {
+            $studentfeedback = $this->no_data();
         }
 
-        return $feedback;
+        $teacherfeedback = [];
+        if ($this->has_teacherfeedbackpermission()) {
+            $teacherfeedback = $this->get_teacherfeedback($context);
+        }
+        if (! $this->isvalidfeedback($teacherfeedback)) {
+            $teacherfeedback = $this->no_data();
+        }
+
+        return [
+            'studentfeedback' => $studentfeedback,
+            'teacherfeedback' => $teacherfeedback,
+        ];
     }
 
     /**
@@ -134,4 +154,10 @@ abstract class feedbackgenerator {
         }
         return true;
     }
+    private function has_teacherfeedbackpermission(): bool {
+        return has_capability(
+            'local/catquiz:view_teacher_feedback', context_system::instance()
+        );
+    }
+
  }

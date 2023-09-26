@@ -345,6 +345,7 @@ $string['feedbackbarlegend_region_1'] = "Ihre zukünftigen Lehrenden schätzen e
 $string['feedbackbarlegend_region_2'] = "Mit einem Wissensstand in diesem Bereich ist im Fachstudium mit regelmäßigen Verständnisproblemen zu rechnen.";
 $string['feedbackbarlegend_region_3'] = "In diesem Bereich der Wissensstände ist erfahrungsgemäß ein Studium in der Regelstudienzeit möglich.";
 $string['feedbackbarlegend_region_4'] = "Dieser Bereich legt ein Vorwissen nahe, was über die Anforderungen des Fachstudiums sogar hinausgeht.";
+$string['teacherfeedback'] = "Feedback für Lehrende";
 
 $string['catquiz_feedbackheader'] = "Feedback";
 $string['noselection'] = "Keine Auswahl";

@@ -35,7 +35,7 @@ use local_catquiz\teststrategy\feedbackgenerator;
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class questionssummary extends feedbackgenerator {
-    protected function run(array $data): array {
+    protected function get_studentfeedback(array $data): array {
         global $OUTPUT;
         $feedback = $OUTPUT->render_from_template('local_catquiz/feedback/questionssummary', $data);
 
@@ -43,6 +43,10 @@ class questionssummary extends feedbackgenerator {
             'heading' => $this->get_heading(),
             'content' => $feedback,
         ];
+    }
+
+    protected function get_teacherfeedback(array $data): array {
+        return [];
     }
 
     public function get_heading(): string {

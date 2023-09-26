@@ -349,6 +349,7 @@ $string['feedbackbarlegend_region_1'] = "TODO: translate - too bad";
 $string['feedbackbarlegend_region_2'] = "TODO: translate - you will struggle";
 $string['feedbackbarlegend_region_3'] = "TODO: translate - you meet the requirements";
 $string['feedbackbarlegend_region_4'] = "TODO: translate - more skills than required";
+$string['teacherfeedback'] = "Feedback for teachers";
 
 $string['catquiz_feedbackheader'] = "Feedback";
 $string['noselection'] = "No selection";
