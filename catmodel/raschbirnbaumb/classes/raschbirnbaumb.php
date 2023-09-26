@@ -234,12 +234,12 @@ class raschbirnbaumb extends model_raschmodel {
      *
      * @param array<float> $pp - person ability parameter ('ability')
      * @param array<float> $ip - item parameters ('difficulty', 'discrimination')
-     * @param float $k - fraction of correct (0 ... 1.0)
+     * @param float $frac - fraction of correct (0 ... 1.0)
      * @param float $n - number of observations
      * @return float - weighted residuals
      */
-   function least_mean_squares(array $pp, array $ip, float $k, float $n):float{
-        return $n * ($k - likelihood($pp, $ip, 1.0)) ** 2;
+   function least_mean_squares(array $pp, array $ip, float $frac, float $n):float{
+        return $n * ($frac - likelihood($pp, $ip, 1.0)) ** 2;
     }
 
     /**
@@ -247,11 +247,11 @@ class raschbirnbaumb extends model_raschmodel {
      *
      * @param array<float> $pp - person ability parameter ('ability')
      * @param array<float> $ip - item parameters ('difficulty', 'discrimination')
-     * @param float $k - fraction of correct (0 ... 1.0)
+     * @param float $frac - fraction of correct (0 ... 1.0)
      * @param float $n - number of observations
      * @return array - 1st derivative of lms with respect to $ip
      */ 
-   function least_mean_squares_1st_derivative_ip(array $pp, array $ip, float $k, float $n):array{
+   function least_mean_squares_1st_derivative_ip(array $pp, array $ip, float $frac, float $n):array{
         $pp = $pp['ability'];
         $a = $ip['difficulty'];
         $b = $ip['discrimination'];
@@ -261,8 +261,8 @@ class raschbirnbaumb extends model_raschmodel {
         // Pre-Calculate high frequently used exp-terms.
         $exp_bap = exp($b * ($a - $pp));
         
-        $derivative[0] = $n * (2 * $b * $exp_bap * ($k -1 + $exp_bap * $k)) / (1 + $exp_bap) ** 3; // Calculate d/da.            
-        $derivative[1] = $n * (2 * $exp_bap * ($a - $pp) * ($k -1 + $exp_bap * $k)) / (1 + $exp_bap) ** 3; // Calculate d/db.
+        $derivative[0] = $n * (2 * $b * $exp_bap * ($frac -1 + $exp_bap * $frac)) / (1 + $exp_bap) ** 3; // Calculate d/da.            
+        $derivative[1] = $n * (2 * $exp_bap * ($a - $pp) * ($frac -1 + $exp_bap * $frac)) / (1 + $exp_bap) ** 3; // Calculate d/db.
 
         return $derivative;
     }
@@ -272,11 +272,11 @@ class raschbirnbaumb extends model_raschmodel {
      *
      * @param array<float> $pp - person ability parameter ('ability')
      * @param array<float> $ip - item parameters ('difficulty', 'discrimination')
-     * @param float $k - fraction of correct (0 ... 1.0)
+     * @param float $frac - fraction of correct (0 ... 1.0)
      * @param float $n - number of observations
      * @return array - 2nd derivative of lms with respect to $ip
      */ 
-   function least_mean_squares_2nd_derivative_ip(array $pp, array $ip, float $k, float $n):array{
+   function least_mean_squares_2nd_derivative_ip(array $pp, array $ip, float $frac, float $n):array{
         $pp = $pp['ability'];
         $a = $ip['difficulty'];
         $b = $ip['discrimination'];
@@ -289,9 +289,9 @@ class raschbirnbaumb extends model_raschmodel {
         $exp_ab = exp($a * $b);
         $exp_bp = exp($b * $pp):
         
-        $derivative[0][0]  = $n * (2 * $b ** 2 * $exp_bap1 * (-$exp_bp ** 2 + 2 * $exp_bap1 + (-$exp_ab ** 2 + $exp_bp ** 2) * $k)) / ($exp_ab + $exp_bp) ** 4; // Calculate d²2/da².            
-        $derivative[0][1]  = $n * (2 * $exp_bap0 * ((1 + $a * $b - $b * $pp) * ($k -1) - $exp_bap0 ** 2 * ($b * ($a - $pp) - 1) * $k + $exp_bap0 * (2 * $a * $b - 2 * $b * $pp + 2 * $k - 1))) / (1 + $exp_bap0) ** 4; // Calculate d/da d/db.    
-        $derivative[1][1]  = $n * (2 * $exp_bap1 * ($a - $pp) ** 2 * (2 * $exp_bap1 + (-$exp_ab ** 2 + $exp_bp ** 2) * $k - $exp_bp ** 2)) / ($exp_ab + $exp_bp) ** 4; // Calculate d²/db².
+        $derivative[0][0]  = $n * (2 * $b ** 2 * $exp_bap1 * (-$exp_bp ** 2 + 2 * $exp_bap1 + (-$exp_ab ** 2 + $exp_bp ** 2) * $frac)) / ($exp_ab + $exp_bp) ** 4; // Calculate d²2/da².            
+        $derivative[0][1]  = $n * (2 * $exp_bap0 * ((1 + $a * $b - $b * $pp) * ($k -1) - $exp_bap0 ** 2 * ($b * ($a - $pp) - 1) * $frac + $exp_bap0 * (2 * $a * $b - 2 * $b * $pp + 2 * $frac - 1))) / (1 + $exp_bap0) ** 4; // Calculate d/da d/db.    
+        $derivative[1][1]  = $n * (2 * $exp_bap1 * ($a - $pp) ** 2 * (2 * $exp_bap1 + (-$exp_ab ** 2 + $exp_bp ** 2) * $frac - $exp_bp ** 2)) / ($exp_ab + $exp_bp) ** 4; // Calculate d²/db².
 
         // Note: Partial derivations are exchangeable, cf. Theorem of Schwarz.
         $derivative[1][0] = $derivative[0][1];
