@@ -127,6 +127,7 @@ abstract class strategy {
         $cache = cache::make('local_catquiz', 'adaptivequizattempt');
         if ($result->isErr()) {
             $cache->set('stopreason', $result->get_status());
+            $cache->set('endtime', time());
             return $result;
         }
 

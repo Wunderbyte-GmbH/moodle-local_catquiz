@@ -498,6 +498,7 @@ class catquiz_handler {
         $cache->purge();
         $cache->set('isfirstquestionofattempt', true);
         $cache->set('userresponses', [$USER->id => []]);
+        $cache->set('starttime', time());
     }
 
     public static function attemptfeedback(
