@@ -65,6 +65,41 @@ define('ATTEMPT_ABORTED', 1);
 define('PERSONABILITY_MAX', 50);
 
 /**
+ * Renders the popup Link.
+ *
+ * @param renderer_base $renderer
+ * @return string The HTML
+ */
+function local_catquiz_render_navbar_output(\renderer_base $renderer) {
+    global $CFG;
+
+    // Early bail out conditions.
+    if (!isloggedin() || isguestuser() || !has_capability('local/catquiz:canmanage', context_system::instance())) {
+        return;
+    }
+
+    $output = '<div class="popover-region nav-link icon-no-margin dropdown">
+        <button class="btn btn-secondary dropdown-toggle" type="button"
+        id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+        '. get_string('catquiz', 'local_catquiz') .'
+        </button>
+        <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+            <a class="dropdown-item" href="'
+                . $CFG->wwwroot . '/local/catquiz/manage_catscales.php"">'
+                . get_string('managecatscales', 'local_catquiz') . '</a>
+            <a class="dropdown-item" href="'
+                . $CFG->wwwroot . '/local/catquiz/manage_catcontexts.php"">'
+                . get_string('managecatcontexts', 'local_catquiz') . '</a>
+            <a class="dropdown-item" href="'
+                . $CFG->wwwroot . '/local/catquiz/manage_testenvironments.php"">'
+                . get_string('managetestenvironments', 'local_catquiz') . '</a>
+        </div>
+    </div>';
+
+    return $output;
+}
+
+/**
  * Validate the data in the new field when the form is submitted
  *
  * @param moodleform_mod $fromform
