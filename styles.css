@@ -72,11 +72,3 @@ canvas {
     width: 100%;
     top: 4em;
 }
-
-/* Display notifications on top area, fixed, with full width.
-*/
-#user-notifications {
-    position: fixed;
-    width: -webkit-fill-available;
-    z-index: 5000;
-}
