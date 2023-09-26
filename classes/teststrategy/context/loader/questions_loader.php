@@ -78,6 +78,11 @@ class questions_loader implements contextloaderinterface {
         );
         $context['questions_ordered_by'] = 'difficulty';
 
+        $cache = cache::make('local_catquiz', 'adaptivequizattempt');
+        if ($cache->get('isfirstquestionofattempt')) {
+            $cache->set('totalnumberoftestitems', count($context['questions']));
+        }
+
         return $context;
     }
 

@@ -24,6 +24,7 @@
 
 namespace local_catquiz\teststrategy\context\loader;
 
+use cache;
 use local_catquiz\catquiz;
 use local_catquiz\catscale;
 use local_catquiz\teststrategy\context\contextloaderinterface;
@@ -81,6 +82,10 @@ class personability_loader implements contextloaderinterface {
      */
     public function load(array $context): array {
         $personparams = $this->load_saved_personparams($context);
+        $cache = cache::make('local_catquiz', 'adaptivequizattempt');
+        if ($cache->get('isfirstquestionofattempt')) {
+            $cache->set('abilitybeforeattempt', $personparams[$context['catscaleid']]);
+        }
         $context['person_ability'] = $personparams;
 
         return $context;

@@ -106,6 +106,7 @@ class attemptfeedback implements renderable, templatable {
 
         $generators = $this->get_feedback_generators_for_teststrategy($this->teststrategy);
 
+        $cache = cache::make('local_catquiz', 'adaptivequizattempt');
         $context = [
             'attemptid' => $this->attemptid,
             'contextid' => $this->contextid,
@@ -113,6 +114,11 @@ class attemptfeedback implements renderable, templatable {
             'userid' => $USER->id,
             'catscaleid' => $this->catscaleid,
             'teststrategy' => $this->teststrategy,
+            'starttime' => $cache->get('starttime'),
+            'endtime' => $cache->get('endtime'),
+            'total_number_of_testitems' => $cache->get('totalnumberoftestitems'),
+            'number_of_testitems_used' => count($cache->get('playedquestions')),
+            'ability_before_attempt' => $cache->get('abilitybeforeattempt'),
             'feedback' => [],
         ];
 
