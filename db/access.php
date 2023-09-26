@@ -62,7 +62,7 @@ $capabilities = [
                         'manager' => CAP_ALLOW
                 ]
         ],
-        'local/catquiz:view_debug_info' => [
+        'local/catquiz:view_teacher_feedback' => [
                 'captype' => 'write',
                 'contextlevel' => CONTEXT_SYSTEM,
                 'archetypes' => [

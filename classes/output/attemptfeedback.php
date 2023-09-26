@@ -119,7 +119,8 @@ class attemptfeedback implements renderable, templatable {
             'total_number_of_testitems' => $cache->get('totalnumberoftestitems'),
             'number_of_testitems_used' => count($cache->get('playedquestions')),
             'ability_before_attempt' => $cache->get('abilitybeforeattempt'),
-            'feedback' => [],
+            'studentfeedback' => [],
+            'teacherfeedback' => [],
         ];
 
         // Get the data required to generate the feedback. This can be saved to
@@ -136,16 +137,7 @@ class attemptfeedback implements renderable, templatable {
             );
         }
         $id = catquiz::save_attempt_to_db($feedbackdata);
-
-        foreach ($generators as $generator) {
-            $feedback = $generator->get_feedback($feedbackdata);
-            if (! $feedback) {
-                continue;
-            }
-            $context['feedback'][] = $feedback;
-        }
-
-        return $context['feedback'];
+        return $this->generate_feedback($generators, $feedbackdata);
     }
 
     /**
@@ -176,15 +168,7 @@ class attemptfeedback implements renderable, templatable {
             true
         );
         $generators = $this->get_feedback_generators_for_teststrategy($feedbackdata['teststrategy']);
-        foreach ($generators as $generator) {
-            $feedback = $generator->get_feedback($feedbackdata);
-            if (!$feedback) {
-                continue;
-            }
-            $context['feedback'][] = $feedback;
-        }
-
-        return $context['feedback'];
+        return $this->generate_feedback($generators, $feedbackdata);
     }
 
     /**
@@ -199,5 +183,19 @@ class attemptfeedback implements renderable, templatable {
         return [
             'feedback' => $this->render_strategy_feedback(),
         ];
+    }
+
+    private function generate_feedback(array $generators, array $feedbackdata): array {
+        foreach ($generators as $generator) {
+            $feedback = $generator->get_feedback($feedbackdata);
+            // Loop over studentfeedback and teacherfeedback.
+            foreach ($feedback as $fbtype => $feedback) {
+                if (!$feedback) {
+                    continue;
+                }
+                $context[$fbtype][] = $feedback;
+            }
+        }
+        return $context;
     }
 }
