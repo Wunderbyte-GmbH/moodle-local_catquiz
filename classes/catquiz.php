@@ -715,7 +715,7 @@ class catquiz {
             lca.attemptid as attemptid,
             lca.timecreated AS timecreated,
             lca.timemodified AS timemodified,
-            u.username,
+            u.username AS username,
             lcc.name AS catscale,
             lccc.name AS catcontext,
             c.fullname AS course,

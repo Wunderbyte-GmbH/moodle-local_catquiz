@@ -63,9 +63,9 @@ class quizattempts_table extends wunderbyte_table {
 
     /**
      * Shows the username.
-     * 
+     *
      * @param mixed $values The row data.
-     * @return mixed 
+     * @return mixed
      */
     public function col_name($values) {
         $name =  $values->username ?? 'anonymous';
@@ -94,7 +94,7 @@ class quizattempts_table extends wunderbyte_table {
 
     /**
      * Shows the name of the teststrategy.
-     * 
+     *
      * @param \stdClas $values The row data.
      * @return string
      */
@@ -131,9 +131,9 @@ class quizattempts_table extends wunderbyte_table {
 
     /**
      * Shows the action column.
-     * 
+     *
      * @param \stdClass $values The row data.
-     * @return string 
+     * @return string
      */
     public function col_action($values) {
         $url = clone $this->url;

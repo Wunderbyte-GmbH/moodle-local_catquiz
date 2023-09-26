@@ -32,13 +32,13 @@ use local_catquiz\teststrategy\info;
 class quizattemptsdisplay {
 
     public function render_table() {
-        $table = new quizattempts_table('testenvironmentstable');
+        $table = new quizattempts_table('quizattemptstable');
 
         list($select, $from, $where, $filter, $params) = catquiz::return_sql_for_quizattempts();
         $table->set_filter_sql($select, $from, $where, $filter, $params);
 
-        $table->define_columns([
-            'name',
+        $columns = [
+            'username',
             'timecreated',
             'timemodified',
             'catscale',
@@ -55,9 +55,10 @@ class quizattemptsdisplay {
             'starttime',
             'endtime',
             'action'
-        ]);
+        ];
+        $table->define_columns($columns);
         $table->define_headers([
-            get_string('name', 'core'),
+            get_string('username', 'core'),
             get_string('timecreated', 'core'),
             get_string('timemodified', 'local_catquiz'),
             get_string('catscale', 'local_catquiz'),
@@ -86,8 +87,8 @@ class quizattemptsdisplay {
 
         $table->define_filtercolumns(
             [
-                'name' => [
-                    'localizedname' => get_string('name', 'core')
+                'username' => [
+                    'localizedname' => get_string('username', 'core')
                 ],
                 'component' => [
                     'localizedname' => get_string('component', 'local_catquiz'),
@@ -112,21 +113,12 @@ class quizattemptsdisplay {
         );
 
         $table->define_fulltextsearchcolumns([
-            'name',
+            'username',
             'catscale',
             'catcontext',
-            'instance',
-            'teststrategy',
         ]);
 
-        $table->define_sortablecolumns([
-            'name',
-            'status',
-            'timemodified',
-            'timecreated',
-            'starttime',
-            'endtime'
-        ]);
+        $table->define_sortablecolumns($columns);
 
         $table->define_cache('local_catquiz', 'quizattempts');
 
