@@ -142,7 +142,7 @@ class quizattempts_table extends wunderbyte_table {
 
         return sprintf(
             '<a class="btn btn-plain btn-smaller"
-                href="%s#quizattempts"><i class="fa fa-cog" title="%s"></i>
+                href="%s#lcq_quizattempts"><i class="fa fa-cog" title="%s"></i>
             </a>',
             $url,
             get_string('cogwheeltitle', 'local_catquiz')
