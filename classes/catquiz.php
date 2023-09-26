@@ -1283,7 +1283,8 @@ class catquiz {
      * @return int The Id of the attemptdata entry, 0 for error
      */
     public static function save_attempt_to_db(array $attemptdata) {
-        global $DB;
+        global $DB, $CFG;
+        require_once($CFG->dirroot . '/local/catquiz/lib.php');
 
         if (empty($attemptdata)) {
             return 0;
