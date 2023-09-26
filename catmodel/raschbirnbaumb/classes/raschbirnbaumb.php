@@ -290,7 +290,7 @@ class raschbirnbaumb extends model_raschmodel {
         $exp_bp = exp($b * $pp):
         
         $derivative[0][0]  = $n * (2 * $b ** 2 * $exp_bap1 * (-$exp_bp ** 2 + 2 * $exp_bap1 + (-$exp_ab ** 2 + $exp_bp ** 2) * $frac)) / ($exp_ab + $exp_bp) ** 4; // Calculate d²2/da².            
-        $derivative[0][1]  = $n * (2 * $exp_bap0 * ((1 + $a * $b - $b * $pp) * ($k -1) - $exp_bap0 ** 2 * ($b * ($a - $pp) - 1) * $frac + $exp_bap0 * (2 * $a * $b - 2 * $b * $pp + 2 * $frac - 1))) / (1 + $exp_bap0) ** 4; // Calculate d/da d/db.    
+        $derivative[0][1]  = $n * (2 * $exp_bap0 * ((1 + $a * $b - $b * $pp) * ($frac -1) - $exp_bap0 ** 2 * ($b * ($a - $pp) - 1) * $frac + $exp_bap0 * (2 * $a * $b - 2 * $b * $pp + 2 * $frac - 1))) / (1 + $exp_bap0) ** 4; // Calculate d/da d/db.    
         $derivative[1][1]  = $n * (2 * $exp_bap1 * ($a - $pp) ** 2 * (2 * $exp_bap1 + (-$exp_ab ** 2 + $exp_bp ** 2) * $frac - $exp_bp ** 2)) / ($exp_ab + $exp_bp) ** 4; // Calculate d²/db².
 
         // Note: Partial derivations are exchangeable, cf. Theorem of Schwarz.
