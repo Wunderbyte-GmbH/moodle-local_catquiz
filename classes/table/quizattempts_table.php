@@ -137,7 +137,7 @@ class quizattempts_table extends wunderbyte_table {
      */
     public function col_action($values) {
         $url = clone $this->url;
-        $url->params(['attemptid' => $values->id]);
+        $url->params(['attemptid' => $values->attemptid]);
 
 
         return sprintf(

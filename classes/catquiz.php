@@ -712,6 +712,7 @@ class catquiz {
 
         $select = "
             lca.id AS id,
+            lca.attemptid as attemptid,
             lca.timecreated AS timecreated,
             lca.timemodified AS timemodified,
             u.username,
