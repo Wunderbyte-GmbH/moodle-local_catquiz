@@ -62,15 +62,15 @@ class personabilities extends feedbackgenerator {
     public function get_heading(): string {
         return get_string('personability', 'local_catquiz');
     }
-    
+
     public function load_data(int $attemptid, array $initialcontext): ?array
     {
         global $CFG;
         require_once($CFG->dirroot . '/local/catquiz/lib.php');
 
         $cache = cache::make('local_catquiz', 'adaptivequizattempt');
-        $personabilities = $initialcontext['personabilities'] ?? $cache->get('personabilities') ?? null;
-        if ($personabilities === null) {
+        $personabilities = $initialcontext['personabilities'] ?? $cache->get('personabilities') ?: [];
+        if ($personabilities === []) {
             return null;
         }
 

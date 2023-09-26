@@ -75,7 +75,7 @@ class catscale {
      */
     public static function return_catscale_object(int $catscaleid) {
         global $DB;
-        return $DB->get_record('local_catquiz_catscales', ['id' => $catscaleid]) ?? null;
+        return $DB->get_record('local_catquiz_catscales', ['id' => $catscaleid]) ?: null;
     }
 
     /**
@@ -270,6 +270,10 @@ class catscale {
      */
     public function get_testitems(int $contextid, bool $includesubscales = false, ?string $orderby = null):array {
 
+        if (empty($this->catscale)) {
+            return [];
+        }
+
         $cache = cache::make('local_catquiz', 'adaptivequizattempt');
         $cachekey = sprintf('testitems_%s_%s', $contextid, $includesubscales);
         if ($testitems = $cache->get($cachekey)) {
@@ -344,14 +348,18 @@ class catscale {
     /**
      * Add subscales.
      *
-     * @param int $parentid
+     * @param ?int $parentid
      * @param mixed $all
      *
      * @return array|null
      *
      */
-    private static function add_subscales(int $parentid, $all): ?array {
+    private static function add_subscales(?int $parentid, $all): ?array {
         $result = [];
+        if ($parentid === null) {
+            return $result;
+        }
+
         foreach ($all as $scale) {
             if (intval($scale->parentid) === $parentid) {
                 $result = [...$result, $scale->id, ...self::add_subscales(intval($scale->id), $all)];

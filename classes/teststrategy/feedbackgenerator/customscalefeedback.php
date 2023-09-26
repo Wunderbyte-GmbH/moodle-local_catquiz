@@ -66,12 +66,12 @@ class customscalefeedback extends feedbackgenerator {
 
     public function load_data(int $attemptid, array $initialcontext): ?array {
         $cache = cache::make('local_catquiz', 'adaptivequizattempt');
-        $quizsettings = (array) ($initialcontext['quizsettings'] ?? $cache->get('quizsettings')) ?? null;
+        $quizsettings = (array) ($initialcontext['quizsettings'] ?? $cache->get('quizsettings')) ?: null;
         if ($quizsettings === null) {
             return null;
         }
 
-        $personabilities = $initialcontext['personabilities'] ?? $cache->get('personabilities') ?? null;
+        $personabilities = $initialcontext['personabilities'] ?? $cache->get('personabilities') ?: null;
         if ($personabilities === null) {
             return null;
         }
@@ -93,7 +93,7 @@ class customscalefeedback extends feedbackgenerator {
 
             $scalefeedback[$catscaleid] = $feedback;
         }
-        
+
         if (! $scalefeedback) {
             return null;
         }

@@ -1221,6 +1221,11 @@ class catquiz {
         );
     }
 
+    /**
+     * Summary of get_catscales
+     * @param array $catscaleids
+     * @return mixed
+     */
     public static function get_catscales(array $catscaleids) {
         global $DB;
         return $DB->get_records_list(

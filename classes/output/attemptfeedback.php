@@ -92,7 +92,7 @@ class attemptfeedback implements renderable, templatable {
 
     /**
      * Renders strategy feedback.
-     * 
+     *
      * In addition, it saves all feedback data to the database.
      *
      * @return mixed
@@ -100,7 +100,9 @@ class attemptfeedback implements renderable, templatable {
      */
     private function render_strategy_feedback() {
         global $USER;
-        if (!$this->teststrategy) {
+        if (!$this->teststrategy
+        //|| empty($cache->get('playedquestions'))
+        ) {
             return '';
         }
 
@@ -117,7 +119,7 @@ class attemptfeedback implements renderable, templatable {
             'starttime' => $cache->get('starttime'),
             'endtime' => $cache->get('endtime'),
             'total_number_of_testitems' => $cache->get('totalnumberoftestitems'),
-            'number_of_testitems_used' => count($cache->get('playedquestions')),
+            'number_of_testitems_used' => empty($cache->get('playedquestions')) ? 0 : count($cache->get('playedquestions')),
             'ability_before_attempt' => $cache->get('abilitybeforeattempt'),
             'studentfeedback' => [],
             'teacherfeedback' => [],
@@ -141,8 +143,8 @@ class attemptfeedback implements renderable, templatable {
     }
 
     /**
-     * 
-     * @param int $strategyid 
+     *
+     * @param int $strategyid
      * @return array<feedbackgenerator>
      */
     public function get_feedback_generators_for_teststrategy(int $strategyid): array {
@@ -156,7 +158,7 @@ class attemptfeedback implements renderable, templatable {
 
         return $generators;
     }
-        
+
     public function get_feedback_for_attempt(int $attemptid): array {
         global $DB;
         $feedbackdata = json_decode(
