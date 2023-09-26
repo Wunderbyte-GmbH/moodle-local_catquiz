@@ -84,6 +84,9 @@ class debuginfo extends feedbackgenerator {
 
             $personabilities = [];
             foreach ($data['person_ability'] as $catscaleid => $pp) {
+                if (empty($catscales[$catscaleid])) {
+                    continue;
+                }
                 $personabilities[] = $catscales[$catscaleid]->name . ": " . $pp;
             }
             $personabilities = '"' . implode(", ", $personabilities) . '"';
@@ -129,7 +132,7 @@ class debuginfo extends feedbackgenerator {
                 'questionsattempted' => $data['questionsattempted'],
                 'timestamp' => $data['timestamp'],
                 'contextid' => $data['contextid'],
-                'catscale' => $catscales[$data['catscaleid']]->name,
+                'catscale' => !empty($catscales[$data['catscaleid']]->name) ? $catscales[$data['catscaleid']]->name : "no catscale",
                 'teststrategy' => $teststrategy,
                 'personabilities' => $personabilities,
                 'questions' => $questions,
