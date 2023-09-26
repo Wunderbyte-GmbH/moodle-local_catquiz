@@ -18,8 +18,6 @@ namespace local_catquiz\output\catscalemanager\quizattempts;
 
 use local_catquiz\catquiz;
 use local_catquiz\output\attemptfeedback;
-use local_catquiz\output\catscalemanager\scaleandcontexselector;
-use local_catquiz\output\testenvironmentdashboard;
 use local_catquiz\table\quizattempts_table;
 use local_catquiz\teststrategy\info;
 
@@ -112,20 +110,23 @@ class quizattemptsdisplay {
                 ],
             ]
         );
-        //$table->define_fulltextsearchcolumns(['name', 'component', 'description']);
-        //$table->define_sortablecolumns([
-        //    'name',
-        //    'component',
-        //    'visible',
-        //    'availability',
-        //    'lang',
-        //    'status',
-        //    'parentid',
-        //    'timemodified',
-        //    'timecreated',
-        //    'action',
-        //    'course',
-        //]);
+
+        $table->define_fulltextsearchcolumns([
+            'name',
+            'catscale',
+            'catcontext',
+            'instance',
+            'teststrategy',
+        ]);
+
+        $table->define_sortablecolumns([
+            'name',
+            'status',
+            'timemodified',
+            'timecreated',
+            'starttime',
+            'endtime'
+        ]);
 
         $table->define_cache('local_catquiz', 'quizattempts');
 
@@ -136,34 +137,6 @@ class quizattemptsdisplay {
         $table->showdownloadbutton = true;
         $table->showreloadbutton = true;
         $table->addcheckboxes = true;
-
-
-        //$table->actionbuttons[] = [
-        //    'label' => get_string('notifyteachersofselectedcourses', 'local_catquiz'), // Name of your action button.
-        //    'methodname' => 'notifyteachersofselectedcourses', // The method needs to be added to your child of wunderbyte_table class.
-        //    'class' => 'btn btn-primary',
-        //    'href' => '#',
-        //    'id' => -1, // This forces single call execution.
-        //    'nomodal' => false,
-        //    'selectionmandatory' => true,
-        //    'data' => [ // Will be added eg as data-id = $values->id, so values can be transmitted to the method above.
-        //        'id' => 'id',
-        //        'name' => 'name'
-        //    ]
-        //    ];
-
-        //$table->actionbuttons[] = [
-        //    'label' => get_string('notifyallteachers', 'local_catquiz'), // Name of your action button.
-        //    'methodname' => 'notifyallteachers', // The method needs to be added to your child of wunderbyte_table class.
-        //    'class' => 'btn btn-primary',
-        //    'href' => '#',
-        //    'id' => -1, // This forces single call execution.
-        //    'nomodal' => false,
-        //    'data' => [ // Will be added eg as data-id = $values->id, so values can be transmitted to the method above.
-        //        'id' => 'id',
-        //        'name' => 'name'
-        //    ]
-        //    ];
 
         // TODO: lazyload
         return $table->outhtml(10, true);
