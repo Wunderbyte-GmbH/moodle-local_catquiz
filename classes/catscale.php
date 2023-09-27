@@ -434,14 +434,13 @@ class catscale {
      * @param int $catscaleid
      * @return string
      */
-    public static function get_link_to_catscale(int $catscaleid, $url = '/local/catquiz/edit_catscale.php') {
+    public static function get_link_to_catscale(int $catscaleid, $url = '/local/catquiz/manage_catscales.php') {
 
         $catscale = self::return_catscale_object($catscaleid);
         if (!empty($catscale->name)) {
             $catscalename = $catscale->name;
 
-            $url = new moodle_url($url);
-            $url->param('id', $catscaleid);
+            $url = new moodle_url($url, ['scaleid' => $catscaleid], 'lcq_catscales');
             $linktoscale = html_writer::link($url, $catscalename);
 
             return $linktoscale;
