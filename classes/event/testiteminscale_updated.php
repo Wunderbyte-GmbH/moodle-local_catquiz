@@ -56,7 +56,7 @@ class testiteminscale_updated extends \core\event\base {
      *
      */
     public static function get_name() {
-        return get_string('testitem_updated_in_scale', 'local_catquiz');
+        return get_string('testiteminscale_updated', 'local_catquiz');
     }
 
     /**
