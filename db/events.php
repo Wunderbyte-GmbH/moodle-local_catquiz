@@ -46,5 +46,9 @@
         'eventname' => '\core\event\question_deleted',
         'callback' => 'local_catquiz_observer::question_deleted'
     ),
+    array(
+        'eventname' => '\local_catquiz\event\testitem_imported',
+        'callback' => 'local_catquiz_observer::testitem_imported'
+    ),
 
  );

@@ -174,6 +174,8 @@ $string['attempt_completed'] = 'Attempt completed';
 $string['complete_attempt_description'] = 'Attempt with id {$a->attemptid} in CAT scale {$a->catscalelink} completed by user {$a->userid}.';
 $string['eventtime'] = 'Event time';
 $string['eventname'] = 'Event name';
+$string['testitem_imported'] = 'Testitem(s) imported';
+$string['imported_testitem_description'] = '{$a} testitems were imported.';
 
 // Message.
 $string['messageprovider:catscaleupdate'] = 'Notification of CAT scale update';

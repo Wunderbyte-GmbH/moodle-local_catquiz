@@ -28,6 +28,7 @@ use csv_import_reader;
 use DateTime;
 use Exception;
 use html_writer;
+use local_catquiz\event\testitem_imported;
 use moodle_exception;
 use stdClass;
 
@@ -304,6 +305,8 @@ class fileparser {
             $this->records['numberofsuccessfullyupdatedrecords'] = count($this->records) - 1;
             // If data was parsed successfully, return 1, else return 0.
             $this->records['success'] = 1;
+            $this->trigger_testitem_imported_event(count($this->records) - 1);
+
         } else {
             $this->records['success'] = 0;
         }
@@ -561,5 +564,19 @@ class fileparser {
      */
     public function get_error() {
         return $this->errors;
+    }
+
+    /**
+     * Trigger event for testitem imported.
+     *@param int $numberofimporteditems
+     */
+    private function trigger_testitem_imported_event($numberofimporteditems) {
+        $event = testitem_imported::create([
+            'context' => \context_system::instance(),
+            'other' => [
+                'itemcount' => $numberofimporteditems,
+            ]
+            ]);
+        $event->trigger();
     }
 }

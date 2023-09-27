@@ -172,6 +172,8 @@ $string['attempt_completed'] = 'Versuch abgeschlossen';
 $string['complete_attempt_description'] = 'Versuch mit ID {$a->attemptid} in CAT Skala {$a->catscalelink} durchgeführt von User {$a->userid}.';
 $string['eventtime'] = 'Zeitpunkt des Ereignisses';
 $string['eventname'] = 'Name des Ereignisses';
+$string['testitem_imported'] = 'Frage(n) importiert';
+$string['imported_testitem_description'] = 'Es wurden {$a} Frage(n) importiert.';
 
 // Message.
 $string['messageprovider:catscaleupdate'] = 'Benachrichtung über eine Aktualisierung einer CAT Skala.';
