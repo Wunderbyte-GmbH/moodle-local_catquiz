@@ -54,11 +54,8 @@ class eventlogtableinstance {
         $table->set_filter_sql($select, $from, $where, $filter, $params);
 
         $columnsarray = [
-            //'id' => get_string('id', 'local_catquiz'),
-            'user' => get_string('user', 'core'),
+            'username' => get_string('user', 'core'),
             'eventname' => get_string('eventname', 'core'),
-            //'action' => get_string('action', 'core'),
-            //'target' => get_string('target', 'local_catquiz'),
             'description' => get_string('description', 'core'),
             'timecreated' => get_string('timecreated', 'core'),
         ];
@@ -68,9 +65,25 @@ class eventlogtableinstance {
         $table->define_sortablecolumns(array_keys($columnsarray));
         $table->sort_default_column = 'timecreated';
         $table->sort_default_order = SORT_DESC;
-        $table->define_fulltextsearchcolumns(['eventname', 'timecreated', 'other']);
 
         $filtercolumns = [
+            'username' => [
+                'localizedname' => get_string('user', 'core'),
+            ],
+            'eventname' => [
+                'localizedname' => get_string('eventname', 'local_catquiz'),
+                '\local_catquiz\event\attempt_completed' => get_string('attempt_completed', 'local_catquiz'),
+                '\local_catquiz\event\calculation_executed' => get_string('calculation_executed', 'local_catquiz'),
+                '\local_catquiz\event\catscale_created' => get_string('catscale_created', 'local_catquiz'),
+                '\local_catquiz\event\catscale_updated' => get_string('catscale_updated', 'local_catquiz'),
+                '\local_catquiz\event\context_created' => get_string('context_created', 'local_catquiz'),
+                '\local_catquiz\event\context_updated' => get_string('context_updated', 'local_catquiz'),
+                '\local_catquiz\event\testitemactivitystatus_updated' => get_string('testitemactivitystatus_updated', 'local_catquiz'),
+                '\local_catquiz\event\testiteminscale_added' => get_string('testiteminscale_added', 'local_catquiz'),
+                '\local_catquiz\event\testiteminscale_updated' => get_string('testiteminscale_updated', 'local_catquiz'),
+                '\local_catquiz\event\testitemstatus_updated' => get_string('testitemstatus_updated', 'local_catquiz'),
+
+            ],
             'timecreated' => [ // Columns containing Unix timestamps can be filtered.
                 'localizedname' => get_string('eventtime', 'local_catquiz'),
                 'datepicker' => [
@@ -85,9 +98,6 @@ class eventlogtableinstance {
                         'checkboxlabel' => get_string('apply_filter', 'local_wunderbyte_table'), // Can be localized and will be displayed next to the filter checkbox (ie 'apply filter').
                     ]
                 ]
-            ],
-            'eventname' => [ // Columns containing Unix timestamps can be filtered.
-                'localizedname' => get_string('eventname', 'local_catquiz'),
             ],
         ];
         $table->define_filtercolumns($filtercolumns);

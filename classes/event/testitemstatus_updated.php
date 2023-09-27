@@ -57,7 +57,7 @@ class testitemstatus_updated extends \core\event\base {
      *
      */
     public static function get_name() {
-        return get_string('update_testitem_status', 'local_catquiz');
+        return get_string('testitemstatus_updated', 'local_catquiz');
     }
 
     /**

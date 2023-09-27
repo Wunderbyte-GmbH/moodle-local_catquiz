@@ -53,12 +53,16 @@ class event_log_table extends wunderbyte_table {
     /**
      * Overrides the output for this column.
      * @param object $values
+     * @return string
      */
     public function col_eventname($values) {
         unset($values->id);
         unset($values->origin);
         unset($values->ip);
         unset($values->realuserid);
+        unset($values->user);
+        unset($values->uniqueid);
+        unset($values->username);
 
         $event = $values->eventname::restore((array)$values, []);
 
@@ -68,14 +72,17 @@ class event_log_table extends wunderbyte_table {
     /**
      * Overrides the output for this column.
      * @param object $values
+     * @return string
      */
     public function col_description($values) {
         unset($values->id);
         unset($values->origin);
         unset($values->ip);
         unset($values->realuserid);
+        unset($values->user);
+        unset($values->uniqueid);
+        unset($values->username);
 
-        // todo values array structure
         $event = $values->eventname::restore((array)$values, []);
 
         return $event->get_description();
@@ -84,25 +91,11 @@ class event_log_table extends wunderbyte_table {
     /**
      * The context information column.
      *
-     * @param stdClass $values The row data.
+     * @param object $values The row data.
      * @return string
      */
     public function col_timecreated($values) {
         return userdate($values->timecreated);
-    }
-
-    /**
-     * The context information column.
-     *
-     * @param stdClass $values The row data.
-     * @return string
-     */
-    public function col_user($values) {
-
-        $userid = $values->userid;
-        $user = catquiz::get_user_by_id($userid);
-
-        return $user->username ?? 'anonymous'; // TODO: localize this.
     }
 
 }

@@ -1247,10 +1247,18 @@ class catquiz {
      *
      */
     public static function return_sql_for_event_logs($component = 'local_catquiz') {
+        global $DB;
 
         $select = "*";
 
-        $from = "{logstore_standard_log}";
+        $from = "(
+                    SELECT lsl.id as uniqueid, " .
+                    $DB->sql_concat("u.firstname", "' '", "u.lastname") . " as username,
+                    lsl.*
+                    FROM {logstore_standard_log} lsl
+                    LEFT JOIN {user} u
+                    ON u.id = lsl.userid
+                ) as s1";
 
         $where = 'component = :component ';
 
