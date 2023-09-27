@@ -72,7 +72,7 @@ class eventlogtableinstance {
 
         $filtercolumns = [
             'timecreated' => [ // Columns containing Unix timestamps can be filtered.
-                'localizedname' => get_string('timecreated'),
+                'localizedname' => get_string('eventtime', 'local_catquiz'),
                 'datepicker' => [
                     get_string('logsafter', 'local_catquiz') => [ // Can be localized and like "Courses starting after:".
                         'operator' => '>', // Must be defined, can be any SQL comparison operator.
@@ -86,7 +86,9 @@ class eventlogtableinstance {
                     ]
                 ]
             ],
-            'eventname',
+            'eventname' => [ // Columns containing Unix timestamps can be filtered.
+                'localizedname' => get_string('eventname', 'local_catquiz'),
+            ],
         ];
         $table->define_filtercolumns($filtercolumns);
 
