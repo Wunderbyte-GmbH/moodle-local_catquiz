@@ -26,381 +26,386 @@
 defined('MOODLE_INTERNAL') || die();
 
 global $CFG;
+
 require_once($CFG->dirroot . '/local/catquiz/lib.php');
 
 $string['pluginname'] = 'ALiSe CAT Quiz';
 $string['catquiz'] = 'Catquiz';
 
 // Catquiz handler.
-$string['catscale'] = 'CAT Skala';
-$string['catquizsettings'] = 'Cat Quiz Einstellungen';
-$string['selectmodel'] = 'Wähle ein Modell';
-$string['model'] = 'Modell';
-$string['modeldeactivated'] = 'Deaktiviere CAT engine';
-$string['usecatquiz'] = 'Verwende die Catquiz Engine für dieses Quiz.';
-$string['catscales'] = 'CAT quiz Dimnensionen verwalten';
-$string['catscales:information'] = 'Verwalte CAT Test Skalen: {$a->link}';
-$string['catscalesname_exists'] = 'Der Name wird bereits verwendet';
-$string['cachedef_catscales'] = 'Caches the catscales of catquiz';
-$string['catcatscales'] = 'CAT Skalen für den Test';
-$string['catcatscales_help'] = 'Jede CAT Skala hat Testitems (Fragen) die im Test verwendet werden.';
-$string['nameexists'] = 'Der Name der CAT Skala wurde bereits verwendet';
-$string['createnewcatscale'] = 'Neue CAT Skala erstellen';
-$string['parent'] = 'Übergeordnete CAT Skala - keine Auswahl falls Top-Level CAT Skala';
-$string['managecatscale'] = 'CAT Skalen verwalten';
-$string['managetestenvironments'] = 'Testumgebungen verwalten';
-$string['showlistofcatscalemanagers'] = "Catscale Managers";
-$string['addcategory'] = "Kategorie hinzufügen";
-$string['documentation'] = "Dokumentation";
-$string['createcatscale'] = 'Erstellen Sie die erste CAT Skala';
-$string['cannotdeletescalewithchildren'] = 'CAT Skalen mit Unterskalen können nicht gelöscht werden.';
-$string['passinglevel'] = 'Bestehensgrenze in %';
-$string['passinglevel_help'] = 'Die Bestehensgenze bezieht sich auf die Personenkompetenz und kann für jeden Test individuell gesetzt werden.';
-$string['pilotratio'] = 'Verhältnis von Pilotfragen';
-$string['pilotratio_help'] = 'Gleitkommazahl für das Verhältnis von Pilotfragen. Bei einem Wert von 0.5 wird im Schnitt bei jedem zweiten Versuch eine Pilotfrage angezeigt.';
-$string['pilotattemptsthreshold'] = 'Schwellenwert der Versuche für Pilotfragen';
-$string['pilotattemptsthreshold_help'] = 'Fragen mit weniger Versuchen werden als Pilotfragen klassifiziert';
-$string['includepilotquestions'] = 'Pilotfragen anzeigen';
+$string['catscale'] = 'CAT scale';
+$string['catquizsettings'] = 'CAT quiz settings';
+$string['selectmodel'] = 'Choose a model';
+$string['model'] = 'Model';
+$string['modeldeactivated'] = 'Deactivate CAT engine';
+$string['usecatquiz'] = 'Use the catquiz engine for this test instance.';
+$string['catscales'] = 'Define catquiz CAT scales';
+$string['catscales:information'] = 'Define CAT scales: {$a->link}';
+$string['catscalesname_exists'] = 'The name is already being used';
+$string['cachedef_catscales'] = 'Caches the CAT scales of catquiz';
+$string['catcatscales'] = 'CAT scales to be tested';
+$string['catcatscales_help'] = 'Every CAT scales has testitems (questions) which will be used in the test.';
+$string['nameexists'] = 'The name of the CAT scale already exists';
+$string['createnewcatscale'] = 'Create new CAT scale';
+$string['parent'] = 'Parent CAT scale - None if top level CAT scale';
+$string['managecatscale'] = 'Manage CAT scale';
+$string['managetestenvironments'] = 'Manage testenvironments';
+$string['showlistofcatscalemanagers'] = "Show list of CAT scale managers";
+$string['addcategory'] = "Add category";
+$string['documentation'] = "Documentation";
+$string['createcatscale'] = 'Create your first catquiz CAT scale!';
+$string['cannotdeletescalewithchildren'] = 'Cannot delete CAT scale with children';
+$string['passinglevel'] = 'Passing level in %';
+$string['passinglevel_help'] = 'There is a level of personal competency that can be set for the test.';
+$string['pilotratio'] = 'Rate of pilot questions';
+$string['pilotratio_help'] = 'Floating point number that specifies how often pilot questions should be displayed. When a value of 0.5 is specified, then on average every second attempt will display a pilot question.';
+$string['pilotattemptsthreshold'] = 'Pilotquestion attempt threshold';
+$string['pilotattemptsthreshold_help'] = 'Questions with less attempts will be considered pilot questions';
+$string['includepilotquestions'] = 'Include pilot questions in the quiz';
 
-$string['timepacedtest'] = 'Zeitbeschränkungen für den Test aktivieren';
-$string['maxtime'] = 'Maximale Dauer des Tests';
-$string['maxtimeperitem'] = 'Höchstzeit pro Frage in Sekunden';
-$string['mintimeperitem'] = 'Mindestzeit pro Frage in Sekunden';
-$string['actontimeout'] = 'Aktion nach Ablauf der Zeit';
+$string['timepacedtest'] = 'Timepaced test';
+$string['maxtime'] = 'Max time for test';
+$string['maxtimeperitem'] = 'Max time per question in seconds';
+$string['mintimeperitem'] = 'Min time per question in seconds';
+$string['actontimeout'] = 'Action on timeout';
 
-$string['timeoutabortnoresult'] = 'Test wird sofort beendet und nicht abschließend bewertet';
-$string['timeoutabortresult'] = 'Test wird sofort beendet und abschließend bewertet';
-$string['timeoutfinishwithresult'] = 'Nachfrist: angezeigte Items können beendet werden';
+$string['timeoutabortnoresult'] = 'Test aborted without result.';
+$string['timeoutabortresult'] = 'Test aborted with result.';
+$string['timeoutfinishwithresult'] = 'Test aborted after finished current question.';
 
-$string['minmaxgroup'] = 'Geben Sie Minimal und Maximal als Dezimalwert ein';
-$string['minscalevalue'] = 'Minimalwert';
-$string['maxscalevalue'] = 'Maximalwert';
-$string['chooseparent'] = 'Wähle übergeordnete Scala';
-$string['errorminscalevalue'] = 'Der Minimalwert muss kleiner sein als der Maximalwert der Skala';
-$string['errorhastobefloat'] = 'Muss ein Dezimalwert sein';
+$string['minmaxgroup'] = 'Add min and max value as decimal';
+$string['minscalevalue'] = 'Min value';
+$string['maxscalevalue'] = 'Max value';
+$string['chooseparent'] = 'Choose parent scale';
+$string['errorminscalevalue'] = 'Min value has to be smaller than max value';
+$string['errorhastobefloat'] = 'Has to be a deciamal';
 
-$string['addoredittemplate'] = "Bearbeite Vorlage";
+$string['addoredittemplate'] = "Add or edit template";
 
 // Test Strategy.
-$string['catquiz_teststrategyheader'] = 'Teststrategie';
-$string['catquiz_selectteststrategy'] = 'Wähle Teststrategie';
+$string['catquiz_teststrategyheader'] = 'Test strategy';
+$string['catquiz_selectteststrategy'] = 'Select test strategy';
 
-$string['teststrategy_base'] = 'Basisklase der Teststrategien';
-$string['teststrategy_info'] = 'Info Klasse für Teststrategien';
-$string['teststrategy_fastest'] = 'Radikaler CAT';
-$string['teststrategy_balanced'] = 'Moderater CAT';
-$string['pilot_questions'] = 'Pilotfragen';
-$string['inferlowestskillgap'] = 'Unterste Kompetenzlücke diagnostizieren';
-$string['infergreateststrength'] = 'Größte Stärke diagnostizieren';
-$string['inferallsubscales'] = 'Alle Subskalen bestimmen';
+$string['teststrategy_base'] = 'Base class for test strategies';
+$string['teststrategy_info'] = 'Info class for test strategies';
+$string['teststrategy_fastest'] = 'Radical CAT';
+$string['teststrategy_balanced'] = 'Moderate CAT';
+$string['pilot_questions'] = 'Pilot questions';
+$string['inferlowestskillgap'] = 'Infer lowest skill gap';
+$string['infergreateststrength'] = 'Infer greatest strength';
+$string['inferallsubscales'] = 'Infer all subscales';
 
-$string['catquiz_selectfirstquestion'] = "Auswahl der ersten Quizfrage";
-$string['startwitheasiestquestion'] = "Starte mit der leichtesten Frage an";
-$string['startwithfirstofsecondquintil'] = "Starte mit der leichtesten Frage aus dem zweiten Quintil";
-$string['startwithfirstofsecondquartil'] = "Starte mit der leichtesten Frage aus dem zweiten Quartil";
-$string['startwithmostdifficultsecondquartil'] = "Starte mit der schwierigsten Frage aus dem zweiten Quartil";
-$string['startwithaverageabilityoftest'] = "Personenparamter entspricht Mittelwert der bisher im Test gemessenen Population";
-$string['startwithcurrentability'] = "Personenparameter aus vorherigem Testlauf nutzen";
+$string['catquiz_selectfirstquestion'] = "Selection of first question";
+$string['startwitheasiestquestion'] = "Start with the easiest question";
+$string['startwithfirstofsecondquintil'] = "Start with the first question of the second quintil";
+$string['startwithfirstofsecondquartil'] = "Start with the first question of the second quartil";
+$string['startwithmostdifficultsecondquartil'] = "Start with the most difficult question of the second quartil";
+$string['startwithaverageabilityoftest'] = "Use the average person ability of the current test";
+$string['startwithcurrentability'] = "Use the person's current ability to determine the first question";
 
 // Tests environment.
-$string['newcustomtest'] = 'Benutzerdefinierter Test';
-$string['lang'] = 'Sprache';
+$string['newcustomtest'] = 'Custom test';
+$string['lang'] = 'Language';
 $string['component'] = 'Plugin';
-$string['timemodified'] = 'Modifiziert';
-$string['invisible'] = 'Unsichtbar';
-$string['edittestenvironment'] = 'Bearbeite Testumgebung';
-$string['choosetest'] = 'Wähle Testumgebung';
-$string['parentid'] = 'Eltern id';
-$string['force'] = 'Erzwinge Werte';
-$string['catscaleid'] = 'CAT Skala ID';
-$string['numberofquestions'] = '# Fragen';
-$string['numberofusers'] = '# Studierende';
+$string['invisible'] = 'Invisible';
+$string['edittestenvironment'] = 'Edit testenvironment';
+$string['choosetest'] = 'Choose a test environment';
+$string['parentid'] = 'Parent id';
+$string['force'] = 'Force values';
+$string['catscaleid'] = 'CAT scale ID';
+$string['numberofquestions'] = '# questions';
+$string['numberofusers'] = '# users';
 
 // Cat contexts.
-$string['addcontext'] = 'Cat Kontext hinzufügen';
-$string['managecatcontexts'] = 'Cat Kontexte verwalten';
-$string['manage_catcontexts'] = 'Cat Kontexte verwalten';
-$string['starttimestamp'] = 'Kontext Startzeit';
-$string['endtimestamp'] = 'Kontext Endzeit';
-$string['timemodified'] = 'Zuletzt geändert';
-$string['notimelimit'] = 'No time limit';
-$string['attempts'] = 'Versuche';
+$string['addcontext'] = 'Add CAT context';
+$string['managecatcontexts'] = 'Manage CAT contexts';
+$string['manage_catcontexts'] = 'Manage CAT contexts';
+$string['starttimestamp'] = 'Context start time';
+$string['endtimestamp'] = 'Context end time';
+$string['timemodified'] = 'Time modified';
+$string['notimelimit'] = 'Kein Zeitlimit';
+$string['attempts'] = 'Attempts';
 $string['action'] = 'Action';
-$string['searchcatcontext'] = 'Cat Kontexte durchsuchen';
-$string['selectcatcontext'] = 'Cat Kontext auswählen';
-$string['starttimestamp'] = 'Zeitraum Anfang';
-$string['endtimestamp'] = 'Zeitraum Ende';
-$string['defaultcontextname'] = 'Standard Cat Kontext';
-$string['defaultcontextdescription'] = 'Beinhaltet alle Testitems';
-$string['noint'] = 'Bitte geben Sie eine Zahl ein';
-$string['notpositive'] = 'Bitte geben Sie eine positive Zahl ein';
-$string['strategy'] = 'Strategie';
-$string['max_iterations'] = 'Maximale Anzahl an Iterationen';
-$string['model_override'] = 'Nur dieses Modell verwenden';
-// Buttons.
-$string['subscribe'] = 'Abonniere';
-$string['subscribed'] = 'Abonniert';
+$string['searchcatcontext'] = 'Search CAT contexts';
+$string['selectcatcontext'] = 'Select a CAT context';
+$string['defaultcontextname'] = 'Default CAT context';
+$string['defaultcontextdescription'] = 'Includes all test items';
+$string['noint'] = 'Please enter an integer number';
+$string['notpositive'] = 'Please enter a positive number';
+$string['strategy'] = 'Strategy';
+$string['max_iterations'] = 'Maximum number of iterations';
+$string['model_override'] = 'Only use this model';
 
-// Events and Event Log.
-$string['target'] = 'Ziel';
-$string['userupdatedcatscale'] = 'NutzerIn mit der Id {$a->userid} hat {$a->catscalelink} aktualisiert.';
-$string['catscale_updated'] = 'CAT Skala aktualisert';
-$string['testitem'] = 'Frage mit ID {$a}';
-$string['add_testitem_to_scale'] = '{$a->testitemlink} wurde {$a->catscalelink} hinzugefügt.';
-$string['testitem_added_to_scale'] = 'Frage zu CAT Skala hinzugefügt';
-$string['testitem_updated_in_scale'] = 'Frage in CAT Skala aktualisert';
-$string['testitem_activity_status_updated'] = 'Aktivitätsstatus der Frage aktualisiert.';
-$string['update_testitem_in_scale'] = '{$a->testitemlink} wurde in {$a->catscalelink} aktualisiert.';
-$string['update_testitem_activity_status'] = 'Der Aktivitätsstatus der Frage mit der Id {$a->objectid} wurde aktualisiert.';
-$string['activitystatussetinactive'] = 'Die Frage ist jetzt deaktiviert.';
-$string['activitystatussetactive'] = 'Die Frage ist jetzt aktiviert.';
-$string['update_testitem_status'] = 'Status der Frage aktualisiert.';
-$string['testitem_status_updated_description'] = 'Der neue Status der {$a->testitemlink} ist nun: {$a->statusstring}';
-$string['catscale_created'] = 'CAT Skala erzeugt';
-$string['create_catscale_description'] = 'CAT Skala "{$a->catscalelink}" mit der ID {$a->objectid} erzeugt.';
-$string['context_updated'] = 'CAT Context aktualisiert';
-$string['update_catscale_description'] = 'CAT Context {$a} aktualisiert.';
-$string['context_created'] = 'CAT Context erzeugt';
-$string['created_catscale_description'] = 'CAT Context {$a} erzeugt.';
+$string['starttimestamp'] = 'Starttime';
+$string['endtimestamp'] = 'Endtime';
+
+// Buttons.
+$string['subscribe'] = 'Subscribe';
+$string['subscribed'] = 'Subscribed';
+$string['timemodified'] = 'Time modified';
+
+// Events and Event Logs.
+$string['target'] = 'Target';
+$string['userupdatedcatscale'] = 'User with id {$a->userid} updated {$a->catscalelink}';
+$string['catscale_updated'] = 'CAT scale updated';
+$string['testitem'] = 'Testitem with id {$a}';
+$string['add_testitem_to_scale'] = '{$a->testitemlink} added to {$a->catscalelink}';
+$string['testitem_added_to_scale'] = 'Testitem added to CAT scale';
+$string['testitem_updated_in_scale'] = 'Testitem updated in CAT scale';
+$string['update_testitem_in_scale'] = '{$a->testitemlink} updated in {$a->catscalelink}';
+$string['testitem_activity_status_updated'] = 'Activity status of testitem updated.';
+$string['update_testitem_activity_status'] = 'Activity status of {$a->testitemlink} changed.';
+$string['activitystatussetinactive'] = 'Testitem is now inactive.';
+$string['activitystatussetactive'] = 'Testitem is now active.';
+$string['update_testitem_status'] = 'Status of testitem updated.';
+$string['testitem_status_updated_description'] = 'Status of {$a->testitemlink} set to: {$a->statusstring}';
+$string['catscale_created'] = 'CAT scale created';
+$string['create_catscale_description'] = 'CAT scale {$a->catscalelink} with id {$a->objectid} created.';
+$string['context_created'] = 'CAT context created.';
+$string['create_context_description'] = 'CAT context {$a} created.';
+$string['context_updated'] = 'CAT Context updated';
+$string['update_context_description'] = 'CAT context {$a} updated.';
 $string['logsafter'] = 'Logs after';
 $string['logsbefore'] = 'Logs before';
-$string['calculation_executed'] = 'Berechnung durchgeführt.';
-$string['executed_calculation_description'] =
-    'Es wurde eine Berechnung der CAT Skala {$a->catscalename} mit der ID {$a->catscaleid} im Kontext {$a->contextid} durchgeführt von {$a->userid}. Es wurden {$a->numberofitems} Fragen neu berechnet.';
-$string['deletedcatscale'] = 'CAT Skala die nicht mehr exisitiert.';
-$string['attempt_completed'] = 'Versuch abgeschlossen';
-$string['complete_attempt_description'] = 'Versuch mit ID {$a->attemptid} in CAT Skala {$a->catscalelink} durchgeführt von User {$a->userid}.';
+$string['calculation_executed'] = 'Calculation executed.';
+$string['executed_calculation_description'] = 'A calculation was executed of catscale {$a->catscalename} with id {$a->catscaleid} in context {$a->contextid} by user {$a->userid}. {$a->numberofitems} items were recalculated.';
+$string['deletedcatscale'] = 'catscale that doesn`t exist anymore';
+$string['attempt_completed'] = 'Attempt completed';
+$string['complete_attempt_description'] = 'Attempt with id {$a->attemptid} in CAT scale {$a->catscalelink} completed by user {$a->userid}.';
 $string['eventtime'] = 'Event time';
 $string['eventname'] = 'Event name';
 
 // Message.
-$string['messageprovider:catscaleupdate'] = 'Benachrichtung über eine Aktualisierung einer CAT Skala.';
-$string['catscaleupdatedtitle'] = 'Eine CAT Skala wurde aktualisiert';
-$string['catscaleupdatedbody'] = 'Eine CAT Skala wurde aktualisiert. TODO: Mehr Details.';
-$string['messageprovider:updatecatscale'] = 'Hat Berechtigung zum Updaten der CAT Skala';
+$string['messageprovider:catscaleupdate'] = 'Notification of CAT scale update';
+$string['catscaleupdatedtitle'] = 'A CAT scale was updated';
+$string['catscaleupdatedbody'] = 'A CAT scale was updated. TODO: more description.';
+$string['messageprovider:updatecatscale'] = 'Is allowed to update catscale';
 
-// Access.
-$string['catquiz:canmanage'] = 'Darf Catquiz Plugin verwalten';
-$string['catquiz:subscribecatscales'] = 'Darf CAT Skalen abonnieren';
-$string['catquiz:manage_catscales'] = 'Darf CAT Skalen verwalten';
+// Access.php.
+$string['catquiz:canmanage'] = 'Is allowed to manage Catquiz plugin';
+$string['catquiz:subscribecatscales'] = 'Is allowed to subscribe to Catquiz CAT scales';
+$string['catquiz:manage_catscales'] = 'Is allowed to manage Catquiz CAT scales';
 
 // Role.
-$string['catquizroledescription'] = 'Catquiz VerwalterIn';
+$string['catquizroledescription'] = 'Catquiz Manager';
 
 // Navbar.
-$string['managecatscales'] = 'Verwalte Skalen';
-$string['test'] = 'Teste Abos';
+$string['managecatscales'] = 'Manage CAT scales';
+$string['test'] = 'Test Subscription';
 
 // Assign testitems to catscale page.
-$string['assigntestitemstocatscales'] = "Weise den CAT Skalen Fragen zu";
-$string['assign'] = "Ordne zu";
-$string['questioncategories'] = 'Fragekategorien';
-$string['questiontype'] = 'Fragentyp';
-$string['addtestitemtitle'] = 'Testitems zu CAT Skalen hinzufügen';
-$string['addtestitembody'] = 'Wollen Sie folgende Testitems der aktuellen Skale zuorden? <br> {$a->data}';
-$string['addtestitemsubmit'] = 'Hinzufügen';
-$string['addtestitem'] = 'Testitems hinzufügen';
-$string['usage'] = 'Übersicht';
-$string['failedtoaddmultipleitems'] = '{$a->numadded} Fragen wurden erfolgreich hinzugefügt, bei folgenden {$a->numfailed} Fragen traten Probleme auf: {$a->failedids}';
-$string['testiteminrelatedscale'] = 'Testitem ist bereits einer Kind- oder Eltern-Skala zugeordnet';
+$string['assigntestitemstocatscales'] = "Assign testitem to CAT scale";
+$string['assign'] = "Assign";
+$string['questioncategories'] = 'Question category';
+$string['questiontype'] = 'Question type';
+$string['addtestitemtitle'] = 'Add test items to CAT scales';
+$string['addtestitembody'] = 'Do you want to add the following test items to the current CAT scale? <br> {$a->data}';
+$string['addtestitemsubmit'] = 'Add';
+$string['addtestitem'] = 'Add test items';
+$string['usage'] = 'Usage';
+$string['failedtoaddmultipleitems'] = '{$a->numadded} questions successfully added, failed with {$a->numfailed} questions: {$a->failedids}';
+$string['testiteminrelatedscale'] = 'Test item is already assigned to a parent- or subscale';
+$string['notyetcalculated'] = 'Not yet calculated';
+$string['notyetattempted'] = 'No attempts';
 
-$string['removetestitemtitle'] = 'Testitems von CAT Skalen entfernen';
-$string['removetestitembody'] = 'Wollen Sie folgende Testitems aus aktuellen Skale entfernen? <br> {$a->data}';
-$string['removetestitemsubmit'] = 'Entfernen';
-$string['removetestitem'] = 'Testitems entfernen';
+$string['removetestitemtitle'] = 'Remove test item from CAT scale';
+$string['removetestitembody'] = 'Do you want to remove the following test items from the current CAT scale? <br> {$a->data}';
+$string['removetestitemsubmit'] = 'Remove';
+$string['removetestitem'] = 'Remove test items';
 
-$string['testitems'] = 'Testitems';
-$string['questioncontextattempts'] = '# Versuche im ausgewählten Kontext';
+$string['testitems'] = 'Test items';
+$string['questioncontextattempts'] = '# Attempts in selected context';
 
-$string['studentstats'] = 'Studierende';
-$string['notyetcalculated'] = 'Noch nicht berechnet';
-$string['notyetattempted'] = 'Noch keine Versuche';
+// Students table.
+$string['studentstats'] = 'Students';
 
 // Email Templates.
-$string['notificationcatscalechange'] = 'Hallo {$a->firstname} {$a->lastname},
-CAT Skalen wurden verändert auf der Moolde Plattform {$a->instancename}.
-Dieses e-Mail informiert Sie als CAT Manager* verantwortlich für dieses Skala. {$a->editorname} hat die folgenden Änderungen an der Skala "{$a->catscalename}" vorgenommen.":
+$string['notificationcatscalechange'] = 'Hello {$a->firstname} {$a->lastname},
+CAT scales have been changed on the Moodle platform {$a->instancename}.
+This email informs you as the CAT Manager* responsible for those CAT scales of these changes . {$a->editorname} made the following changes to the CAT scale "{$a->catscalename}":
     {$a->changedescription}
-Sie können den aktuellen Stand hier überprüfen. {$a->linkonscale}';
+You can review the current state here: {$a->linkonscale}';
 
 // Catscale Dashboard.
-$string['statistics'] = "Statistik";
-$string['models'] = "Modelle";
-$string['previewquestion'] = "Fragen Vorschau";
+$string['statistics'] = "Stats";
+$string['models'] = "Models";
+$string['previewquestion'] = "Preview question";
 $string['personability'] = "Person ability";
 $string['personabilities'] = "Person abilities";
+$string['personabilitiesnodata'] = "No person abilities were calculated";
 $string['itemdifficulties'] = "Item difficulties";
 $string['itemdifficultiesnodata'] = "No item difficulties were calculated";
-$string['somethingwentwrong'] = 'Etwas ist schiefgelaufen. Melden Sie den Fehler ihrem Admin';
-$string['recalculationscheduled'] = 'Neuberechnung der Kontext-Paremeter wurde veranlasst';
-$string['scaledetailviewheading'] = 'Detailansicht von CAT-Skala {$a}';
+$string['somethingwentwrong'] = 'Something went wrong. Please contact your admin.';
+$string['recalculationscheduled'] = 'Recalculation of the context parameters has been scheduled';
+$string['scaledetailviewheading'] = 'Detailview of catscale {$a}';
 
 // Table.
-$string['label'] = "Kennzeichen";
+$string['label'] = "Label";
 $string['name'] = "Name";
-$string['questiontext'] = "Fragentext";
+$string['questiontext'] = "Question text";
 
 // Testitem Dashboard.
 $string['testitemdashboard'] = "Testitem Dashboard";
 $string['itemdifficulty'] = "Item difficulty";
 $string['likelihood'] = "Likelihood";
 
-$string['difficulty'] = "Schwierigkeit";
-$string['discrimination'] = "Diskriminierung";
-$string['lastattempttime'] = "Letzter Versuch";
+$string['difficulty'] = "Difficulty";
+$string['discrimination'] = "Discrimination";
+$string['lastattempttime'] = "Last attempt";
 $string['guessing'] = "Guessing";
 
-$string['numberofanswers'] = "Antworten";
-$string['numberofusagesintests'] = "In verschiedenen Tests";
-$string['numberofpersonsanswered'] = "Von Personen";
-$string['numberofanswerscorrect'] = "Richtig";
-$string['numberofanswersincorrect'] = "Falsch";
-$string['numberofanswerspartlycorrect'] = "Teilweise richtig";
-$string['averageofallanswers'] = "Durchschnitt";
+$string['numberofanswers'] = "Answers total";
+$string['numberofusagesintests'] = "In tests";
+$string['numberofpersonsanswered'] = "By different persons";
+$string['numberofanswerscorrect'] = "Correct";
+$string['numberofanswersincorrect'] = "Wrong";
+$string['numberofanswerspartlycorrect'] = "Partly correct";
+$string['averageofallanswers'] = "Average";
 
-$string['itemstatus_-5'] = "Manuell ausgeschlossen"; // STATUS_EXCLUDED_MANUALLY.
-$string['itemstatus_0'] = "Noch nicht berechnet"; // STATUS_NOT_CALCULATED.
-$string['itemstatus_1'] = "Berechnet"; // STATUS_CALCULATED.
-$string['itemstatus_4'] = "Manuell gesetzt"; // STATUS_UPDATED_MANUALLY.
-$string['itemstatus_5'] = "Manuell bestätigt"; // STATUS_CONFIRMED_MANUALLY.
+$string['itemstatus_-5'] = "Manually excluded"; // STATUS_EXCLUDED_MANUALLY.
+$string['itemstatus_0'] = "Not yet calculated"; // STATUS_NOT_CALCULATED.
+$string['itemstatus_1'] = "Calculated"; // STATUS_CALCULATED.
+$string['itemstatus_4'] = "Manually updated"; // STATUS_UPDATED_MANUALLY.
+$string['itemstatus_5'] = "Manually confirmed"; // STATUS_CONFIRMED_MANUALLY.
 
 // Student Details.
 $string['studentdetails'] = "Student details";
-$string['enroled_courses'] = "Eingeschriebene Kurse";
-$string['questionresults'] = "Fragen Auswertung";
-$string['daysago'] = 'Vor {$a} Tagen';
-$string['hoursago'] = 'Vor {$a} Stunden';
-$string['noaccessyet'] = 'Bisher kein Zugriff.';
+$string['enroled_courses'] = "Enroled courses";
+$string['questionresults'] = "Question results";
+$string['daysago'] = '{$a} days ago';
+$string['hoursago'] = '{$a} hours ago';
+$string['noaccessyet'] = 'No access yet';
 
 // Tasks.
-$string['task_recalculate_cat_model_params'] = "CAT Parameter neu berechnen";
+$string['task_recalculate_cat_model_params'] = "Recalculate CAT parameters";
 
 // CAT Manager.
 $string['catmanager'] = "CAT-Manager";
-$string['summary'] = "Zusammenfassung";
-$string['questions'] = "Fragen";
+$string['summary'] = "Summary";
+$string['questions'] = "Questions";
 $string['testsandtemplates'] = "Tests & Templates";
-$string['calculations'] = "Berechnungen";
-$string['versioning'] = "Versionierung";
-$string['catscalesheading'] = "CAT Skalen";
-$string['subscribedcatscalesheading'] = "Eingeschriebene CAT Scales";
-$string['summarygeneral'] = "Allgemeines";
-$string['summarynumberofassignedcatscales'] = "Anzahl der Ihnen zugeordneten CAT Skalen";
-$string['summarynumberoftests'] = "Anzahl der einsetzenden Tests";
-$string['summarytotalnumberofquestions'] = "Anzahl der Fragen (insgesamt)";
-$string['summarylastcalculation'] = "Letzte (vollständige) Berechnung";
-$string['recentevents'] = "Letzte Bearbeitungen";
-$string['aria:catscaleimage'] = "Hintergrundmuster für die CAT Skala";
-$string['healthstatus'] = "Health-Status";
-$string['catmanagernumberofsubscales'] = "Anzahl Subskalen";
-$string['catmanagernumberofquestions'] = "Anzahl Fragen";
-$string['integratequestions'] = "Fragen aus untergeordneten Skalen einbeziehen";
-$string['noscaleselected'] = "Keine CAT-Skala gewählt.";
-$string['norecordsfound'] = "Keine Fragen in dieser Skala gefunden.";
-$string['selectsubscale'] = "Subskala auswählen";
-$string['selectcatscale'] = "Skala:";
-$string['versionchosen'] = 'ausgewählte Versionierung:';
-$string['pleasechoose'] = 'bitte auswählen';
-$string['quizattempts'] = 'Quiz Versuche';
+$string['calculations'] = "Calculations";
+$string['versioning'] = "Versioning";
+$string['catscalesheading'] = "CAT scales";
+$string['subscribedcatscalesheading'] = "Subscribed CAT scales";
+$string['summarygeneral'] = "General";
+$string['summarynumberofassignedcatscales'] = "Number of assigned CAT scales";
+$string['summarynumberoftests'] = "Number of assigned tests";
+$string['summarytotalnumberofquestions'] = "Number of questions (total)";
+$string['summarylastcalculation'] = "Last complete calculation";
+$string['recentevents'] = "Recent Events";
+$string['aria:catscaleimage'] = "Background pattern for this CAT scale";
+$string['healthstatus'] = "Health status";
+$string['catmanagernumberofsubscales'] = "Number of subscales";
+$string['catmanagernumberofquestions'] = "Number of questions";
+$string['integratequestions'] = "Integrate questions from subscales";
+$string['noscaleselected'] = "No scale selected";
+$string['norecordsfound'] = "There are no questions in this scale";
+$string['selectsubscale'] = "Select a subscale";
+$string['selectcatscale'] = "Scale:";
+$string['versionchosen'] = 'Version chosen:';
+$string['pleasechoose'] = 'please choose';
+$string['quizattempts'] = 'Quiz Attempts';
 
 // CAT Manager Questions Table.
-$string['type'] = 'Typ';
-$string['attempts'] = 'Versuche';
-$string['addquestion'] = 'Frage aus Fragenkatalog hinzufügen';
-$string['addtest'] = 'Bestehenden Test hinzufügen';
-$string['checklinking'] = 'Linking prüfen';
-$string['confirmdeletion'] = 'Sie sind dabei das folgende Element zu löschen: <br> "{$a->data}"';
-$string['deletedatatitle'] = 'Löschen';
-$string['genericsubmit'] = 'Bestätigen';
-$string['confirmactivitychange'] = 'Sie sind dabei den Aktivitätsstatus des folgenden Elements zu ändern: <br> "{$a->data}"';
-$string['toggleactivity'] = 'Aktivitätsstatus';
-$string['errorrecordnotfound'] = 'Fehler mit der Datenbankabfrage. Der Datensatz wurde nicht gefunden.';
-$string['trashbintitle'] = 'Element löschen';
-$string['cogwheeltitle'] = 'Details anzeigen';
-$string['eyeicontitle'] = 'Aktivieren/Deaktivieren';
+$string['type'] = 'Type';
+$string['attempts'] = 'Attempts';
+$string['addquestion'] = 'Add question from catalogue';
+$string['addtest'] = 'Add existing test';
+$string['checklinking'] = 'Check linking';
+$string['confirmdeletion'] = 'You are about to delete the following item: <br> "{$a->data}"';
+$string['confirmactivitychange'] = 'You are about to change the activity status of the following item: <br> "{$a->data}"';
+$string['genericsubmit'] = 'Confirm';
+$string['deletedatatitle'] = 'Delete';
+$string['toggleactivity'] = 'Activity status';
+$string['errorrecordnotfound'] = 'There was an error with the database query. The record was not found.';
+$string['trashbintitle'] = 'Delete item';
+$string['cogwheeltitle'] = 'Display details';
+$string['eyeicontitle'] = 'Activate/Disable';
 
 // Testitem Detail View.
-$string['questionpreview'] = 'Fragevorschau';
-$string['backtotable'] = 'Zurück zur Testitems Tabelle';
-$string['local_catquiz_toggle_testitemstatus_message'] = 'Status des Elements wurde aktualisiert';
-$string['togglestatus'] = 'Status ändern';
+$string['questionpreview'] = 'Question preview';
+$string['backtotable'] = 'Back to testitems table';
+$string['local_catquiz_toggle_testitemstatus_message'] = 'Testitem status was updated';
+$string['togglestatus'] = 'Toggle status';
 
 // CAT Quiz handler.
-$string['noremainingquestions'] = "Keine weiteren Fragen";
-$string['errorfetchnextquestion'] = "Es trat ein Fehler bei der Auswahl der nächsten Frage auf.";
-$string['reachedmaximumquestions'] = "Die Maximalanzahl an Testfragen wurde erreicht";
-$string['error'] = "Es ist ein Fehler aufgetreten";
+$string['noremainingquestions'] = "You ran out of questions";
+$string['errorfetchnextquestion'] = "There was an error while selecting the next question";
+$string['reachedmaximumquestions'] = "Reached maximum number of questions";
+$string['error'] = "An error occured";
 $string['id'] = "ID";
-$string['abortpersonabilitynotchanged'] = "Personenparameter unverändert";
-$string['emptyfirstquestionlist'] = "Kann keine Startfrage wählen da die Liste leer ist";
+$string['abortpersonabilitynotchanged'] = "Person parameter did not change";
+$string['emptyfirstquestionlist'] = "Can't select a start question because the list is empty";
+$string['feedbackcomparetoaverage'] = 'You performed better than {$a}% of your fellow students.';
+$string['feedbackneedsimprovement'] = "Don't you think that you can do better?";
 
 // Quiz Feedback.
-$string['attemptfeedbacknotavailable'] = "Kein Feedback verfügbar";
-$string['allquestionsincorrect'] = "Nicht verfügbar - alle Fragen wurden falsch beantwortet";
-$string['allquestionscorrect'] = "Nicht verfügbar - alle Fragen wurden richtig beantwortet";
-$string['feedbackcomparetoaverage'] = 'Sie sind besser als {$a} Ihrer Mit-Studierenden im aktuellen Jahrgang.';
-$string['feedbackneedsimprovement'] = "Da geht doch sicher noch etwas, oder?";
-$string['questionssummary'] = "Zusammenfassung";
-$string['currentability'] = "Ihr momentaner Wissensstand";
-$string['currentabilityfellowstudents'] = "Momentaner Mittelwert der Wissensstände Ihrer zukünftigen Mit-Studierenden";
-$string['feedbackbarlegend'] = "Bedeutung der Farbskala";
-$string['feedbackbarlegend_region_1'] = "Ihre zukünftigen Lehrenden schätzen einen solchen Wissensstand als zu gering ein, um im Fachstudium mithalten zu können.";
-$string['feedbackbarlegend_region_2'] = "Mit einem Wissensstand in diesem Bereich ist im Fachstudium mit regelmäßigen Verständnisproblemen zu rechnen.";
-$string['feedbackbarlegend_region_3'] = "In diesem Bereich der Wissensstände ist erfahrungsgemäß ein Studium in der Regelstudienzeit möglich.";
-$string['feedbackbarlegend_region_4'] = "Dieser Bereich legt ein Vorwissen nahe, was über die Anforderungen des Fachstudiums sogar hinausgeht.";
-$string['teacherfeedback'] = "Feedback für Lehrende";
+$string['attemptfeedbacknotavailable'] = "No feedback available";
+$string['allquestionsincorrect'] = "Not available - all questions were answered incorrectly";
+$string['allquestionscorrect'] = "Not available- all questions were answered correctly";
+$string['questionssummary'] = "Summary";
+$string['currentability'] = "Your current skill level";
+$string['currentabilityfellowstudents'] = "Current skill level of your fellow students";
+$string['feedbackbarlegend'] = "Color code";
+$string['feedbackbarlegend_region_1'] = "TODO: translate - too bad";
+$string['feedbackbarlegend_region_2'] = "TODO: translate - you will struggle";
+$string['feedbackbarlegend_region_3'] = "TODO: translate - you meet the requirements";
+$string['feedbackbarlegend_region_4'] = "TODO: translate - more skills than required";
+$string['teacherfeedback'] = "Feedback for teachers";
 
 $string['catquiz_feedbackheader'] = "Feedback";
-$string['noselection'] = "Keine Auswahl";
-$string['lowerlimit'] = "Unteres Limit";
-$string['setcoursesforscaletext'] = 'Setzen sie für die Scala {$a} die Kurse, in die Nutzerinnen, die unter dem unteren Limit abschneiden, eingeschrieben werden sollen.';
+$string['noselection'] = "No selection";
+$string['lowerlimit'] = "Lower limit";
+
+$string['setcoursesforscaletext'] = 'Set for catscale {$a} the courses in which users failing the lower limit should be inscribed to.';
 
 // Quiz attempts
-$string['catcontext'] = 'CAT Kontext';
-$string['totalnumberoftestitems'] = "Gesamtzahl Fragen";
-$string['numberoftestitemsused'] = "Anzahl getesteter Fragen";
-$string['personabilitybeforeattempt'] = "Ability vor Versuch";
-$string['personabilityafterattempt'] = "Ability nach Versuch";
+$string['catcontext'] = 'CAT Context';
+$string['totalnumberoftestitems'] = "Total number of questions";
+$string['numberoftestitemsused'] = "Number of displayed questions";
+$string['personabilitybeforeattempt'] = "Ability before attempt";
+$string['personabilityafterattempt'] = "Ability after attempt";
 $string['instance'] = "Test";
-$string['teststrategy'] = "Teststrategie";
-$string['starttime'] = "Beginn";
-$string['endtime'] = "Ende";
+$string['teststrategy'] = "Teststrategy";
+$string['starttime'] = "Start";
+$string['endtime'] = "End";
 
 // CSV Import Form.
 $string['importcsv'] = 'Import CSV';
-$string['importsuccess'] = 'Import war erfolgreich. Es wurden {$a} Datensatz/Datensätze bearbeitet.';
-$string['importfailed'] = 'Import fehlgeschlagen.';
-$string['dateparseformat'] = 'Format des Datums';
-$string['dateparseformat_help'] = 'Bitte Datum so wie es im CSV definiert wurde verwenden. Hilfe unter <a href="http://php.net/manual/en/function.date.php">Datumsdokumentation</a> für diese Einstellung.';
+$string['importsuccess'] = 'Import was successful. {$a} record(s) treated.';
+$string['importfailed'] = 'Import failed';
+$string['dateparseformat'] = 'Date parse format';
+$string['dateparseformat_help'] = 'Please, use date format like specified in CSV file. Help with <a href="http://php.net/manual/en/function.date.php">this</a> resource for options.';
 $string['defaultdateformat'] = 'j.n.Y H:i:s';
-$string['importcolumnsinfos'] = 'Informationen zu Importfeldern:';
-$string['mandatory'] = 'verpflichtend';
-$string['format'] = 'Format';
-$string['downloaddemofile'] = 'Demofile herunterladen';
-$string['labelidnotunique'] = 'Wert von Label {$a} muss einzigartig sein.';
-$string['labelidnotfound'] = 'Wert von Label {$a} nicht gefunden.';
-$string['updatedrecords'] = '{$a} Eintrag/Einträge aktualisiert.';
-$string['addedrecords'] = '{$a} Eintrag/Einträge hinzugefügt.';
-$string['callbackfunctionnotdefined'] = 'Callback Funktion nicht definiert.';
-$string['callbackfunctionnotapplied'] = 'Callback Funktion konnte nicht angewandt werden.';
-$string['canbesetto0iflabelgiven'] = 'Kann 0 sein, wenn Abgleich über Label stattfindet.';
-$string['ifdefinedusedtomatch'] = 'Wenn angegeben findet der Abgleich über diesen Wert statt.';
-$string['fieldnamesdontmatch'] = 'Die importierten Spaltennamen entsprechen nicht der Vorgabe.';
-$string['checkdelimiteroremptycontent'] = 'Überprüfen Sie ob Daten vorhanden und durch das angegebene Zeichen getrennt sind.';
-$string['wronglabels'] = 'Die importierten Spaltennamen entsprechen nicht der Vorgabe. {$a} kann nicht importiert werden.';
-$string['nolabels'] = 'Keine Spaltennamen definiert.';
-$string['checkdelimiter'] = 'Überprüfen Sie die Spaltennamen durch das angegebene Zeichen getrennt sind.';
-$string['scaleinformation'] = 'Die ID der CAT Skala der die Frage zugeordnet werden soll.';
-$string['scalenameinformation'] = 'Der Name der CAT Skala der die Frage zugeordnet werden soll. Falls keine ID angegeben, wird Matching über Name vorgenommen.';
-$string['dataincomplete'] = 'Der Datensatz mit "componentid" {$a->id} ist unvollständig und konnte nicht gänzlich eingefügt werden. Überprüfen Sie das Feld "{$a->field}".';
-$string['modelinformation'] = 'Dieses Feld ist notwendig, um Fragen vollständig zu erfassen. Ist das Feld leer, kann die Frage lediglich einer Skala zugeordnet werden.';
-$string['parentscalenamesinformation'] = 'Alle Eltern Scalen können beim Import angelegt werden. Starten sie mit dem Namen der höchsten Scala und fügen sie alle Kinder mit | getrennt hinzu.';
+$string['importcolumnsinfos'] = 'Informations about columns to be imported:';
+$string['mandatory'] = 'mandatory';
+$string['format'] = 'format';
+$string['downloaddemofile'] = 'Download demofile';
+$string['labelidnotunique'] = 'Label {$a} is not unique.';
+$string['labelidnotfound'] = 'Label {$a} not found.';
+$string['updatedrecords'] = '{$a} record(s) updated.';
+$string['addedrecords'] = '{$a} record(s) added.';
+$string['callbackfunctionnotdefined'] = 'Callback function is not defined.';
+$string['callbackfunctionnotapplied'] = 'Callback function could not be applied.';
+$string['canbesetto0iflabelgiven'] = 'Can be 0 if matching of testitem is via label.';
+$string['ifdefinedusedtomatch'] = 'If defined, will be used to match.';
+$string['fieldnamesdontmatch'] = 'The imported fieldnames don`t match the defined fieldnames.';
+$string['checkdelimiteroremptycontent'] = 'Check if data is given and separated via the selected symbol.';
+$string['wronglabels'] = 'Imported CSV not containing the right labels. Column {$a} can not be importet.';
+$string['nolabels'] = 'No column labels defined in settings object.';
+$string['checkdelimiter'] = 'Check if data is separated via the selected symbol.';
+$string['scaleinformation'] = 'The id of the CAT scale the item should be assigned to.';
+$string['scalenameinformation'] = 'The name of the CAT scale the item should be assigned to. If no catscale id given, matching is done via name.';
+$string['dataincomplete'] = 'Record with componentid {$a->id} is incomplete and could not be treated entirely. Check field "{$a->field}".';
+$string['modelinformation'] = 'This field is necessary to entirely treat the record. If it is empty, item can only be assigned to CAT scale.';
+$string['parentscalenamesinformation'] = 'You can enter parent scales for the defined scale, in order to create the correct scale strucutre on the fly. Start with the highest parent and separate all children with |';
 
 // Testenvironments table.
-$string['notifyallteachers'] = 'Kursleiter der gewählten Kurse benachrichtigen';
-$string['notifyteachersofselectedcourses'] = 'Alle Kursleiter benachrichtigen';
+$string['notifyallteachers'] = 'Notify all teachers';
+$string['notifyteachersofselectedcourses'] = 'Notify teachers of selected courses';
 
-$string['close'] = 'Schließen';
+$string['close'] = 'Close';
 
 // Shortcodes
-$string['shortcodeslistofquizattempts'] = 'Gibt eine Tabelle mit Quiz-Versuchen zurück';
+$string['shortcodeslistofquizattempts'] = 'Returns a table of quiz attempts';
