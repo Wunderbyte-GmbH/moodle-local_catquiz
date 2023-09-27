@@ -25,6 +25,7 @@
 use core\event\base;
 use local_catquiz\catscale;
 use local_catquiz\event\catscale_updated;
+use local_catquiz\event\testitem_imported;
 use local_catquiz\event\testiteminscale_added;
 use local_catquiz\feedback\feedback;
 use local_catquiz\messages;
@@ -134,6 +135,19 @@ class local_catquiz_observer {
         $DB->delete_records('local_catquiz_items', $data);
 
         cache_helper::purge_by_event('changesintestitems');
+    }
+
+    /**
+     * Observer for the testitem_imported event
+     *
+     * @param testitem_imported $event
+     */
+    public static function testitem_imported(testitem_imported $event) {
+
+        cache_helper::purge_by_event('changesintestitems');
+        cache_helper::purge_by_event('changesineventlog');
+        header("Refresh:0");
+        header("Refresh:0");
     }
 
 

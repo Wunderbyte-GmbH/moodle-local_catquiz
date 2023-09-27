@@ -82,6 +82,7 @@ class eventlogtableinstance {
                 '\local_catquiz\event\testiteminscale_added' => get_string('testiteminscale_added', 'local_catquiz'),
                 '\local_catquiz\event\testiteminscale_updated' => get_string('testiteminscale_updated', 'local_catquiz'),
                 '\local_catquiz\event\testitemstatus_updated' => get_string('testitemstatus_updated', 'local_catquiz'),
+                '\local_catquiz\event\testitem_imported' => get_string('testitem_imported', 'local_catquiz'),
 
             ],
             'timecreated' => [ // Columns containing Unix timestamps can be filtered.
