@@ -56,11 +56,8 @@ class calculationsdisplay {
         $table->set_filter_sql($select, $from, $where, $filter, $params);
 
         $columnsarray = [
-            //'id' => get_string('id', 'local_catquiz'),
-            'user' => get_string('user', 'core'),
+            'username' => get_string('user', 'core'),
             'eventname' => get_string('eventname', 'core'),
-            //'action' => get_string('action', 'core'),
-            //'target' => get_string('target', 'local_catquiz'),
             'description' => get_string('description', 'core'),
             'timecreated' => get_string('timecreated', 'core'),
         ];
@@ -70,11 +67,13 @@ class calculationsdisplay {
         $table->define_sortablecolumns(array_keys($columnsarray));
         $table->sort_default_column = 'timecreated';
         $table->sort_default_order = SORT_DESC;
-        $table->define_fulltextsearchcolumns(['eventname', 'timecreated', 'other']);
 
         $filtercolumns = [
+            'username' => [
+                'localizedname' => get_string('user', 'core'),
+                    ],
             'timecreated' => [ // Columns containing Unix timestamps can be filtered.
-                'localizedname' => get_string('timecreated'),
+                'localizedname' => get_string('eventtime', 'local_catquiz'),
                 'datepicker' => [
                     get_string('logsafter', 'local_catquiz') => [ // Can be localized and like "Courses starting after:".
                         'operator' => '>', // Must be defined, can be any SQL comparison operator.
@@ -87,8 +86,7 @@ class calculationsdisplay {
                         'checkboxlabel' => get_string('apply_filter', 'local_wunderbyte_table'), // Can be localized and will be displayed next to the filter checkbox (ie 'apply filter').
                     ]
                 ]
-            ],
-            'eventname',
+                    ],
         ];
         $table->define_filtercolumns($filtercolumns);
 
