@@ -92,6 +92,7 @@ class debuginfo extends feedbackgenerator {
             $personabilities = '"' . implode(", ", $personabilities) . '"';
 
             $questions = [];
+            $questionsperscale = [];
             foreach ($data['questions'] as $qid => $question) {
                 $fisherinformation = $question->fisherinformation ?? "NA";
                 $score = $question->score ?? "NA";
@@ -102,6 +103,13 @@ class debuginfo extends feedbackgenerator {
                     'fisherinformation' => $fisherinformation,
                     'score' => $score,
                 ];
+                if (! array_key_exists($question->catscaleid, $questionsperscale)) {
+                    $questionsperscale[$question->catscaleid] = [
+                        'num' => 0,
+                        'name' => $catscales[$question->catscaleid]->name
+                    ];
+                }
+                $questionsperscale[$question->catscaleid]['num'] = $questionsperscale[$question->catscaleid]['num'] + 1;
             }
             $questions[array_key_last($questions)]['last'] = true;
 
@@ -144,6 +152,7 @@ class debuginfo extends feedbackgenerator {
                 'excludedsubscales' => implode(',', $data['excludedsubscales']),
                 'lastresponse' => $lastresponse,
                 'standarderrorperscale' => $standarderrorperscale,
+                'numquestionsperscale' => '"' . implode(", ", array_map(fn ($entry) => $entry['name'].": ".$entry['num'], $questionsperscale)) . '"',
             ];
         }
         return ['debuginfo' => $debuginfo];
