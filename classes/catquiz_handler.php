@@ -557,14 +557,16 @@ class catquiz_handler {
             'selectfirstquestion' => $quizsettings->catquiz_selectfirstquestion,
             'skip_reason' => null,
             'userid' => $USER->id,
-            'max_attempts_per_scale' => $quizsettings->catquiz_maxquestionspersubscale,
+            'max_attempts_per_scale' => $quizsettings->catquiz_maxquestionspersubscale ?? null,
             'teststrategy' => $quizsettings->catquiz_selectteststrategy,
             'timestamp' => time(),
             'attemptid' => intval($attemptdata->id),
             'updateabilityfallback' => false,
             'excludedsubscales' => [],
             'has_fisherinformation' => false,
-            'standarderrorpersubscale' => $quizsettings->catquiz_standarderrorpersubscale / 100,
+            'standarderrorpersubscale' => empty($quizsettings->catquiz_standarderrorpersubscale)
+                ? null
+                : ($quizsettings->catquiz_standarderrorpersubscale / 100),            
             'breakduration' => $quizsettings->catquiz_breakduration,
             'breakinfourl' => '/local/catquiz/breakinfo.php',
             'maxtimeperquestion' => $quizsettings->catquiz_maxtimeperquestion,
