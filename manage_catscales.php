@@ -46,11 +46,8 @@ require_capability('local/catquiz:manage_catscales', $context);
 
 $PAGE->set_url(new moodle_url('/local/catquiz/manage_catscales.php', array()));
 
-$title = sprintf(
-    '%s: %s',
-    get_string('catmanager', 'local_catquiz'),
-    get_string('summary', 'local_catquiz')
-);
+$title = get_string('catmanager', 'local_catquiz');
+
 $PAGE->set_title($title);
 $PAGE->set_heading($title);
 
