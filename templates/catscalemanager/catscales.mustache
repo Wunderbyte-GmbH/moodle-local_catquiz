@@ -30,11 +30,16 @@
         {{#backtoscaleslink}}
             <button class='btn {{class}}' type={{type}} data-id="backtoscaleview">{{label}}</button>
         {{/backtoscaleslink}}
-        {{> local_catquiz/tabs/tab_statistics}}
-
+        <div>
+            {{> local_catquiz/tabs/tab_statistics}}
+            {{{modelbutton}}}
+        </div>
         {{#js}}
             require(['local_catquiz/testitemdashboard/backtoscaleviewbutton'], function(init) {
                 init.init();
+            require(['local_catquiz/calculatescales'], function(init) {
+                init.init();
+            });
             });
         {{/js}}
     {{/scaledetailview}}
