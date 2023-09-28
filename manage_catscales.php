@@ -38,6 +38,10 @@ if (empty($catcontextid)) {
     $catcontextid = catquiz::get_default_context_id();
 }
 
+if ($catscale != -1) {
+    $scaledetailview = 1;
+}
+
 global $USER;
 $context = \context_system::instance();
 $PAGE->set_context($context);
