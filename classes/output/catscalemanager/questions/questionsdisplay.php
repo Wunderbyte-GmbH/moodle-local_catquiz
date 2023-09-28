@@ -152,45 +152,6 @@ class questionsdisplay {
 
         $table->addcheckboxes = true;
 
-        $table->actionbuttons[] = [
-            // The 'NoModal, MultipleCall, NoSelection'-> Name of your action button.
-            'label' => get_string('addquestion', 'local_catquiz'),
-            'class' => 'btn btn-primary', // Example colors bootstrap 4 classes.
-            'href' => '#',
-            'methodname' => 'addquestion', // The method needs to be added to your child of wunderbyte_table class.
-            'nomodal' => true, // If set to true, there is no modal and the method will be called directly.
-            'selectionmandatory' => false, // When set to true, action will only be triggered, if elements are selected.
-            'data' => [ // Will be added eg as data-id = $values->id, so values can be transmitted to the method above.
-                'id' => 'id',
-                'component' => 'local_wunderbyte_table', // Localization of strings.
-            ]
-        ];
-        $table->actionbuttons[] = [
-            // The 'NoModal, MultipleCall, NoSelection'-> Name of your action button.
-            'label' => get_string('addtest', 'local_catquiz'),
-            'class' => 'btn btn-primary', // Example colors bootstrap 4 classes.
-            'href' => '#',
-            'methodname' => 'addtest', // The method needs to be added to your child of wunderbyte_table class.
-            'nomodal' => true, // If set to true, there is no modal and the method will be called directly.
-            'selectionmandatory' => false, // When set to true, action will only be triggered, if elements are selected.
-            'data' => [ // Will be added eg as data-id = $values->id, so values can be transmitted to the method above.
-                'id' => 'id',
-                'component' => 'local_wunderbyte_table', // Localization of strings.
-            ]
-        ];
-        $table->actionbuttons[] = [
-            // The 'NoModal, MultipleCall, NoSelection'-> Name of your action button.
-            'label' => get_string('checklinking', 'local_catquiz'),
-            'class' => 'btn btn-primary', // Example colors bootstrap 4 classes.
-            'href' => '#',
-            'methodname' => 'addquestion', // The method needs to be added to your child of wunderbyte_table class.
-            'nomodal' => true, // If set to true, there is no modal and the method will be called directly.
-            'selectionmandatory' => false, // When set to true, action will only be triggered, if elements are selected.
-            'data' => [ // Will be added eg as data-id = $values->id, so values can be transmitted to the method above.
-                'id' => 'id',
-                'component' => 'local_wunderbyte_table', // Localization of strings.
-            ]
-        ];
         $table->placebuttonandpageelementsontop = true;
 
         $table->tabletemplate = 'local_wunderbyte_table/twtable_list';
