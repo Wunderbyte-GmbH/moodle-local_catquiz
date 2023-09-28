@@ -52,6 +52,8 @@ final class addscalestandarderror extends preselect_task implements wb_middlewar
         $fisherinfoperscale = [];
         // Lists for each scale the IDs of the scale itself and its parent scales.
         $scales = [];
+        $cache = cache::make('local_catquiz', 'adaptivequizattempt');
+        $playedquestionids = array_keys($cache->get('playedquestions') ?: []);
         foreach ($context['original_questions'] as $q) {
             // Questions that have no item parameters and hence fisher
             // information are ignored here.
@@ -65,29 +67,35 @@ final class addscalestandarderror extends preselect_task implements wb_middlewar
                 ];
             }
             foreach ($scales[$q->catscaleid] as $scaleid) {
+                $key = in_array($q->id, $playedquestionids) ? 'played' : 'remaining';
                 if (!array_key_exists($scaleid, $fisherinfoperscale)) {
-                    $fisherinfoperscale[$scaleid] = $q->fisherinformation;
+                    $fisherinfoperscale[$scaleid] = [];
+                }
+                if (! array_key_exists($key, $fisherinfoperscale[$scaleid])) {
+                    $fisherinfoperscale[$scaleid][$key] = $q->fisherinformation;
                     continue;
                 }
-                $fisherinfoperscale[$scaleid] += $q->fisherinformation;
+                $fisherinfoperscale[$scaleid][$key] += $q->fisherinformation;
             }
         }
 
-        $cache = cache::make('local_catquiz', 'adaptivequizattempt');
-        $threshold = $context['standarderrorpersubscale'];
+       $threshold = $context['standarderrorpersubscale'];
         $excludedscales = $cache->get('excludedscales') ?: [];
         $standarderrorperscale = [];
-        foreach ($fisherinfoperscale as $catscaleid => $fisherinfo) {
-            $standarderror = (1 / sqrt($fisherinfo));
-            $standarderrorperscale[$catscaleid] = $standarderror;
+        foreach ($fisherinfoperscale as $region => $infoperscale) {
+            foreach ($infoperscale as $catscaleid => $fisherinfo) {
+                $standarderror = (1 / sqrt($fisherinfo));
+                $standarderrorperscale[$region][$catscaleid] = $standarderror;
 
-            // We already have enough information about that scale.
-            if ($standarderror < $threshold) {
-                // Questions of this scale will be excluded in the next run.
-                $excludedscales[] = $catscaleid;
-                $context['questions'] = array_filter($context['questions'], fn ($q) => $q->id != $catscaleid);
+                // We already have enough information about that scale.
+                if ($standarderror < $threshold) {
+                    // Questions of this scale will be excluded in the next run.
+                    $excludedscales[] = $catscaleid;
+                    $context['questions'] = array_filter($context['questions'], fn ($q) => $q->id != $catscaleid);
+                }
             }
         }
+
         // Handle case where no questions are left.
         if ($context['questions'] === []) {
             return result::err(status::ERROR_NO_REMAINING_QUESTIONS);
