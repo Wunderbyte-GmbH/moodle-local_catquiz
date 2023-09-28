@@ -51,7 +51,7 @@ class model_item_param_list implements ArrayAccess, IteratorAggregate, Countable
     /**
      * @var array<model_item_param>
      */
-    private array $itemparams;
+    public array $itemparams;
 
     /**
      * Set parameters for class instance.

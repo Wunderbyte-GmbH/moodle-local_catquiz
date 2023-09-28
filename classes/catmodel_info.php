@@ -101,8 +101,10 @@ class catmodel_info {
         $context = catcontext::load_from_db($contextid);
         $strategy = $context->get_strategy($catscaleid);
         list($itemdifficulties, $personabilities) = $strategy->run_estimation();
+        $itemcounter = 0;
         foreach ($itemdifficulties as $itemparamlist) {
             $itemparamlist->save_to_db($contextid);
+            $itemcounter += count($itemparamlist->itemparams);
         }
 
         // Trigger event.
@@ -114,7 +116,7 @@ class catmodel_info {
                 'catscaleid' => $catscaleid,
                 'contextid' => $contextid,
                 'userid' => $userid,
-                'numberofitems' => count($itemdifficulties),
+                'numberofitems' => $itemcounter,
             ]
         ]);
         $event->trigger();
