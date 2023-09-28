@@ -194,16 +194,16 @@ class model_person_param_list implements ArrayAccess, IteratorAggregate, Countab
     public function get_values($sorted = false): array {
         $data = array_map(
             function (model_person_param $param) {
-                return $param->get_ability();
+                return $param->to_array();
             },
             $this->personparams
         );
 
         $data = array_filter($data, function ($a) {
-            return is_finite($a) && abs($a) != model_person_param::MODEL_POS_INF;
+            return is_finite($a['ability']) && abs($a['ability']) != model_person_param::MODEL_POS_INF;
         });
         if ($sorted) {
-            sort($data);
+            uasort($data, fn($a1, $a2) => $a1['ability'] <=> $a2['ability']);
         }
         return $data;
     }

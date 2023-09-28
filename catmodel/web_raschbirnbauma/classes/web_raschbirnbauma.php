@@ -141,16 +141,8 @@ class web_raschbirnbauma extends model_model implements catcalc_ability_estimato
         return $c + (1 - $c) * (exp($a * ($p - $b))) / (1 + exp($a * ($p - $b)));
     }
 
-    /**
-     * Returns Fisher info
-     *
-     * @param float $personability
-     * @param array $params
-     *
-     * @return int|float
-     *
-     */
-    public static function fisher_info(float $personability, array $params) {
+    public static function fisher_info(array $pp, array $params) {
+        $personability = $pp['ability'];
         return self::likelihood_multi($personability, $params) * (1 - self::likelihood_multi($personability, $params));
     }
 

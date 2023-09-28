@@ -102,4 +102,8 @@ class model_person_param {
         $this->ability = $ability;
         return $this;
     }
+
+    public function to_array(): array {
+        return ['ability' => $this->ability];
+    } 
 }
