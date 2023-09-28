@@ -36,7 +36,7 @@
     }
 }}
 
-userid;attemptid;questionsattempted;timestamp;contextid;catscale;teststrategy;personabilities;lastquestion;questions;active_scales;selectedscale;lastmiddleware;updateabilityfallback;excluded subscales;lastresponse;standard error<br>
+userid;attemptid;questionsattempted;timestamp;contextid;catscale;teststrategy;personabilities;lastquestion;questions;active_scales;selectedscale;lastmiddleware;updateabilityfallback;excluded subscales;lastresponse;standard error;num questions per scale<br>
 {{#data}}
     {{ userid }}
     ;{{ attemptid }}
@@ -56,5 +56,6 @@ userid;attemptid;questionsattempted;timestamp;contextid;catscale;teststrategy;pe
     ;{{ updateabilityfallback }}
     ;{{ excludedsubscales }}
     ;{{ lastresponse }}
-    ;{{#standarderrorperscale}}{{name}}: {{se}}{{^last}}, {{/last}}{{/standarderrorperscale}}{{^standarderrorperscale}}NA{{/standarderrorperscale}}<br>
+    ;{{#standarderrorperscale}}{{name}}: {{se}}{{^last}}, {{/last}}{{/standarderrorperscale}}{{^standarderrorperscale}}NA{{/standarderrorperscale}}
+    ;{{numquestionsperscale}}{{^numquestionsperscale}}NA{{/numquestionsperscale}}<br>
 {{/data}}
