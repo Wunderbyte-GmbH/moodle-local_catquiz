@@ -288,6 +288,9 @@ class catquiz_handler {
 
         $errors = [];
 
+        if (empty($data['maximumquestions'])) {
+            $errors['maximumquestions'] = get_string('valuemustbegreaterzero', 'local_catquiz');
+        }
         // Todo: Make a real validation of necessary fields.
 
         return $errors;
