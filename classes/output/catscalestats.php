@@ -90,7 +90,7 @@ class catscalestats {
             'num_assigned_catscales' => $this->numassignedcatscales,
             'num_assigned_tests' => $this->numassignedtests,
             'num_assigned_questions' => $this->numassignedquestions,
-            'last_calculated' => $this->lastcalculated,
+            'last_calculated' => ($this->lastcalculated > 0) ? $this->lastcalculated : get_string('notyetcalculated', 'local_catquiz'),
         ];
         return $data;
     }
