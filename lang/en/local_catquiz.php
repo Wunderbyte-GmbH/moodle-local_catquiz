@@ -411,3 +411,6 @@ $string['close'] = 'Close';
 
 // Shortcodes
 $string['shortcodeslistofquizattempts'] = 'Returns a table of quiz attempts';
+
+// Validation
+$string['valuemustbegreaterzero'] = 'Value must be greater than zero.';

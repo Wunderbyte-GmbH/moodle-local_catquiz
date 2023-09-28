@@ -406,3 +406,6 @@ $string['close'] = 'Schließen';
 
 // Shortcodes
 $string['shortcodeslistofquizattempts'] = 'Gibt eine Tabelle mit Quiz-Versuchen zurück';
+
+// Validation
+$string['valuemustbegreaterzero'] = 'Wert muss höher als 0 sein.';
