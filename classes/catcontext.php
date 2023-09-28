@@ -34,6 +34,8 @@ use local_catquiz\local\model\model_responses;
 use local_catquiz\local\model\model_strategy;
 use stdClass;
 
+defined('MOODLE_INTERNAL') || die();
+
 require_once($CFG->dirroot . '/local/catquiz/lib.php');
 
 /**
@@ -141,7 +143,7 @@ class catcontext {
         }
 
         if ($newrecord && isset($newrecord->id)) {
-            // If we have a new record
+            // If we have a new record.
             if ($oldrecord = $DB->get_record('local_catquiz_catcontext', ['id' => $newrecord->id])) {
                 $this->apply_values($oldrecord);
             }
@@ -219,7 +221,7 @@ class catcontext {
      */
     private static function db_to_modelinput($data):array {
         $modelinput = [];
-        // Check: use only most recent answer for each question
+        // Check: use only most recent answer for each question.
 
         foreach ($data as $row) {
             $entry = [
@@ -385,14 +387,14 @@ class catcontext {
         if (!$context) {
             $json = new stdClass();
             $json->default = true;
-            $context = (object) array(
+            $context = (object) [
                 'name' => get_string('defaultcontextname', 'local_catquiz'),
                 'description' => get_string('defaultcontextdescription', 'local_catquiz'),
                 'descriptionformat' => 1,
                 'starttimestamp' => 0,
                 'endtimestamp' => PHP_INT_MAX,
                 'json' => json_encode($json),
-            );
+            ];
             $this->save_or_update($context);
         }
     }
