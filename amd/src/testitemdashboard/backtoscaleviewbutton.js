@@ -48,7 +48,9 @@ export const init = () => {
  */
 function goBackToTable() {
     // To get back to the table, we simply have to remove the sdv param from the URL.
+    // We also unset the scaleid, since no more scale is selected.
     let searchParams = new URLSearchParams(window.location.search);
     searchParams.delete('sdv');
+    searchParams.delete('scaleid');
     window.location.search = searchParams.toString();
 }
