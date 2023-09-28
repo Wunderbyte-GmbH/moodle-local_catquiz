@@ -46,7 +46,7 @@ class calculation_executed extends \core\event\base {
     protected function init() {
         $this->data['crud'] = 'u';
         $this->data['edulevel'] = self::LEVEL_OTHER;
-        $this->data['objecttable'] = 'local_catquiz_items';
+        //$this->data['objecttable'] = 'local_catquiz_items';
     }
 
     /**
