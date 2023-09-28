@@ -304,6 +304,7 @@ $string['selectcatscale'] = "Skala:";
 $string['versionchosen'] = 'ausgewählte Versionierung:';
 $string['pleasechoose'] = 'bitte auswählen';
 $string['quizattempts'] = 'Quiz Versuche';
+$string['calculate'] = 'Berechnen';
 
 // CAT Manager Questions Table.
 $string['type'] = 'Typ';

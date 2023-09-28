@@ -412,8 +412,9 @@ class catscaledashboard implements renderable, templatable {
      *
      */
     private function render_modelbutton($contextid) {
-        return sprintf('<button class="btn btn-primary" type="button" data-contextid="%s" id="model_button">Calculate</button>',
-                        $contextid);
+        $buttontitle = get_string('calculate', 'local_catquiz');
+        return sprintf('<button class="btn btn-primary" type="button" data-contextid="%s" id="model_button">%s</button>',
+                        $contextid, $buttontitle);
     }
 
     /**
