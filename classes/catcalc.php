@@ -125,13 +125,13 @@ class catcalc {
         $result = mathcat::newton_raphson_multi_stable(
             $loglikelihood1stderivative,
             $loglikelihood2ndderivative,
-            [0.1],
+            ['ability' => 0.1],
             6,
             50
         );
 
         // The ability is wrapped inside an array.
-        $ability = $result[0];
+        $ability = $result['ability'];
         return $ability;
     }
 
@@ -181,7 +181,7 @@ class catcalc {
         $funs = [];
         
         foreach ($itemresponse as $r) {
-            $funs[] = fn($ip) => $model::get_log_jacobian($r->get_ability(), $ip, $r->get_response());
+            $funs[] = fn($ip) => $model::get_log_jacobian(['ability' => $r->get_ability()], $ip, $r->get_response());
         }
     
         $jacobian = self::build_callable_array($funs); // from [fn($x), fn($x),...] to fn($x): [...]
@@ -202,7 +202,7 @@ class catcalc {
         $hessian = [];
         
         foreach ($itemresponse as $r) {
-            $hessian[] = fn($ip) => $model::get_log_hessian($r->get_ability(), $ip, $r->get_response());
+            $hessian[] = fn($ip) => $model::get_log_hessian(['ability' => $r->get_ability()], $ip, $r->get_response());
         }
             
         $hessian = self::build_callable_array($hessian);

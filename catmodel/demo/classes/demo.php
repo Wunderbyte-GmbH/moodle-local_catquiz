@@ -56,15 +56,6 @@ class demo extends model_model {
         return ['difficulty', ];
     }
 
-    /**
-     * Fisher info.
-     *
-     * @param mixed $personability
-     * @param mixed $params
-     *
-     * @return int
-     *
-     */
     public static function fisher_info($personability, $params) {
         return 1;
     }

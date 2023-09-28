@@ -102,13 +102,13 @@ class raschbirnbauma extends model_raschmodel {
      * @return float
      */
     public static function likelihood(array $pp, array $ip, float $k): float {
-        $pp = $pp['ability'];
+        $ability = $pp['ability'];
         $a = $ip['difficulty'];
         
         if ($k < 1.0) {
             return 1 - self::likelihood($pp, $ip, 1.0);
         } else {
-            return 1 / (1 + exp($a - $pp));
+            return 1 / (1 + exp($a - $ability));
         }
     }
     
@@ -187,9 +187,9 @@ class raschbirnbauma extends model_raschmodel {
         $exp_p = exp($pp);
         
         if ($k >= 1.0) {
-            $jacobian[0] = -($exp_a * $exp_p) / (($exp_a + $exp_p) * $exp_p) // The d/da .
+            $jacobian[0] = -($exp_a * $exp_p) / (($exp_a + $exp_p) * $exp_p); // The d/da .
         } else {
-            $jacobian[0] = $exp_p / ($exp_a + $exp_p) // The d/da .
+            $jacobian[0] = $exp_p / ($exp_a + $exp_p); // The d/da .
         }
         return $jacobian;
     }
@@ -213,7 +213,7 @@ class raschbirnbauma extends model_raschmodel {
         $exp_p = exp($pp);
 
         // 2nd derivative is equal for both k = 0 and k = 1
-        $hessian[0][0] = -($exp_a * $exp_p) / ($exp_a + $exp_p) ** 2 // The d²/ da² .
+        $hessian[0][0] = -($exp_a * $exp_p) / ($exp_a + $exp_p) ** 2; // The d²/ da² .
         return $hessian; 
     }
 
@@ -229,7 +229,7 @@ class raschbirnbauma extends model_raschmodel {
      * @return float - weighted residuals
      */
    function least_mean_squares(array $pp, array $ip, float $frac, float $n):float{
-        return $n * ($frac - likelihood($pp, $ip, 1.0)) ** 2;
+        return $n * ($frac - self::likelihood($pp, $ip, 1.0)) ** 2;
     }
 
     /**
@@ -274,7 +274,7 @@ class raschbirnbauma extends model_raschmodel {
         $exp_bap1 = exp($a + $pp);
         $exp_bap0 = exp($a - $pp);
         $exp_a = exp($a);
-        $exp_p = exp($pp):
+        $exp_p = exp($pp);
         
         $derivative[0][0]  = $n * (2 * ($exp_a * $exp_p) * (-$exp_p ** 2 + 2 * ($exp_a * $exp_p) + (-$exp_a ** 2 + $exp_p ** 2) * $frac)) / ($exp_a + $exp_p) ** 4; // Calculate d²2/da². 
               
@@ -340,14 +340,6 @@ class raschbirnbauma extends model_raschmodel {
     }
     
     // Calculate Fisher-Information.
-
-    /**
-     * Calculates the Fisher Information for a given person ability parameter
-     *
-     * @param array<float> $pp - person ability parameter ('ability')
-     * @param array<float> $ip - item parameters ('difficulty')
-     * @return float
-     */
 
     public static function fisher_info(array $pp, array $ip) {
         return (self::likelihood($pp, $ip, 0) * self::likelihood($pp, $ip, 1.0));

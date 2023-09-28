@@ -53,11 +53,9 @@ abstract class model_raschmodel extends model_model implements catcalc_item_esti
         switch ($criterion) {
             case 'aic':
                 return $this->calc_aic_item($personabilities, $itemparams, $k);
-                break;
 
             default:
                 throw new \UnexpectedValueException("Unknown information criterium" . $criterion);
-                break;
         }
     }
 
@@ -79,7 +77,7 @@ abstract class model_raschmodel extends model_model implements catcalc_item_esti
                 continue;
             }
             $result += $this->log_likelihood(
-                $pp->get_ability(),
+                $pp->to_array(),
                 $item->get_params_array(),
                 $userresponse
             );
@@ -209,26 +207,26 @@ abstract class model_raschmodel extends model_model implements catcalc_item_esti
     /**
      * Likelihood.
      *
-     * @param mixed $x
+     * @param array<float> $pp
      * @param array $itemparams
      * @param float $itemresponse
      *
      * @return mixed
      *
      */
-    abstract public static function likelihood($x, array $itemparams, float $itemresponse);
+    abstract public static function likelihood(array $pp, array $itemparams, float $itemresponse);
 
     /**
      * Log likelihood.
      *
-     * @param mixed $x
+     * @param array<float> $pp
      * @param array $itemparams
      * @param float $itemresponse
      *
      * @return mixed
      *
      */
-    abstract public static function log_likelihood($x, array $itemparams, float $itemresponse);
+    abstract public static function log_likelihood(array $pp, array $itemparams, float $itemresponse);
 
     abstract public static function log_likelihood_p_p(array $x, array $itemparams, float $itemresponse);
 }

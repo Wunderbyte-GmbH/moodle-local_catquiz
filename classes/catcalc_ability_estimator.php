@@ -30,26 +30,26 @@ interface catcalc_ability_estimator {
     /**
      * Likelihood.
      *
-     * @param mixed $x
+     * @param array<float> $pp
      * @param array $itemparams
      * @param float $itemresponse
      *
      * @return mixed
      *
      */
-    public static function likelihood($x, array $itemparams, float $itemresponse);
+    public static function likelihood(array $pp, array $itemparams, float $itemresponse);
 
     /**
      * Log likelihood.
      *
-     * @param mixed $x
+     * @param array<float> $pp
      * @param array $itemparams
      * @param float $itemresponse
      *
      * @return mixed
      *
      */
-    public static function log_likelihood($x, array $itemparams, float $itemresponse);
+    public static function log_likelihood(array $pp, array $itemparams, float $itemresponse);
 
     /**
      * Calculates the 1st derivative of the LOG Likelihood with respect to the person ability parameter

@@ -59,7 +59,7 @@ final class fisherinformation extends preselect_task implements wb_middleware {
             }
 
             $item->fisherinformation = $model::fisher_info(
-                $context['person_ability'][$item->catscaleid],
+                ['ability' => $context['person_ability'][$item->catscaleid]],
                 $params
             );
         }
