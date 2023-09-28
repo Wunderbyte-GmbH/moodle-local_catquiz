@@ -281,15 +281,15 @@ class catcontext {
             $event->trigger();
 
         } else {
-            $id = $DB->insert_record('local_catquiz_catcontext', $this->return_as_class());
+            $this->id = $DB->insert_record('local_catquiz_catcontext', $this->return_as_class());
 
             // Trigger context created event.
             $event = context_created::create([
-                'objectid' => $id,
+                'objectid' => $this->id,
                 'context' => \context_system::instance(),
                 'other' => [
                     'contextname' => $this->name,
-                    'contextid' => $id,
+                    'contextid' => $this->id,
                     'contextobjectcallback' => 'local_catquiz\local\classes\catcontext::return_as_class',
                 ]
                 ]);
