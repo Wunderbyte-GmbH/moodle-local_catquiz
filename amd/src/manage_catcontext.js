@@ -33,15 +33,8 @@ const SELECTORS = {
  * Add event listener to buttons.
  */
 export const init = () => {
-
-    // eslint-disable-next-line no-console
-    console.log('manage catcontext init');
-
     let buttons = document.querySelectorAll(SELECTORS.MANAGECATCONTEXT);
     buttons.forEach(button => {
-
-        // eslint-disable-next-line no-console
-        console.log(button);
 
         if (button.initialized) {
             return;
