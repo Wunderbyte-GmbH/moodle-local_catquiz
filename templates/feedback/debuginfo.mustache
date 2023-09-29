@@ -56,6 +56,6 @@ userid;attemptid;questionsattempted;timestamp;contextid;catscale;teststrategy;pe
     ;{{ updateabilityfallback }}
     ;{{ excludedsubscales }}
     ;{{ lastresponse }}
-    ;{{#standarderrorperscale}}{{name}}: {{se}}{{^last}}, {{/last}}{{/standarderrorperscale}}{{^standarderrorperscale}}NA{{/standarderrorperscale}}
+    ;{{#standarderrorperscale}}{{name}}: [{{#se}}played: {{played}}, remaining: {{remaining}}{{/se}}]{{^last}}, {{/last}}{{/standarderrorperscale}}{{^standarderrorperscale}}NA{{/standarderrorperscale}}
     ;{{numquestionsperscale}}{{^numquestionsperscale}}NA{{/numquestionsperscale}}<br>
 {{/data}}

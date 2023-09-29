@@ -54,12 +54,24 @@ final class addscalestandarderror extends preselect_task implements wb_middlewar
         $scales = [];
         $cache = cache::make('local_catquiz', 'adaptivequizattempt');
         $playedquestionids = array_keys($cache->get('playedquestions') ?: []);
-        foreach ($context['original_questions'] as $q) {
-            // Questions that have no item parameters and hence fisher
-            // information are ignored here.
-            if (empty($q->fisherinformation)) {
+        // Questions that have no item parameters and hence fisher
+        // information are ignored here.
+        $questions = array_filter($context['original_questions'], fn ($q) => ! empty($q->fisherinformation));
+        // Sort descending by fisher information. This way, we can calculate the
+        // maximum test information TI per subscale when including only the
+        // maximum amount of remining questions.
+        uasort($questions, fn ($q1, $q2) => $q2->fisherinformation <=> $q1->fisherinformation);
+        $catscales = [$context['catscaleid'], ...catscale::get_subscale_ids($context['catscaleid'])];
+        $remainingperscale = [];
+        $playedquestionsperscale = $cache->get('playedquestionsperscale') ?: [];
+        foreach ($catscales as $scaleid) {
+            if (! array_key_exists($scaleid, $playedquestionsperscale)) {
+                $remainingperscale[$scaleid] = $context['max_attempts_per_scale'];
                 continue;
             }
+            $remainingperscale[$scaleid] = $context['max_attempts_per_scale'] - count($playedquestionsperscale[$scaleid]);
+        }
+        foreach ($questions as $q) {
             if (!array_key_exists($q->catscaleid, $scales)) {
                 $scales[$q->catscaleid] = [
                     $q->catscaleid,
@@ -68,6 +80,12 @@ final class addscalestandarderror extends preselect_task implements wb_middlewar
             }
             foreach ($scales[$q->catscaleid] as $scaleid) {
                 $key = in_array($q->id, $playedquestionids) ? 'played' : 'remaining';
+                if ($key === 'remaining' && $remainingperscale[$scaleid] <= 0) {
+                    // Do not add the question to the list of remaining
+                    // questions if it can never be answered due to the
+                    // max_attempts_per_scale setting.
+                    continue;
+                }
                 if (!array_key_exists($scaleid, $fisherinfoperscale)) {
                     $fisherinfoperscale[$scaleid] = [];
                 }
@@ -80,19 +98,29 @@ final class addscalestandarderror extends preselect_task implements wb_middlewar
         }
 
        $threshold = $context['standarderrorpersubscale'];
-        $excludedscales = $cache->get('excludedscales') ?: [];
         $standarderrorperscale = [];
-        foreach ($fisherinfoperscale as $region => $infoperscale) {
-            foreach ($infoperscale as $catscaleid => $fisherinfo) {
-                $standarderror = (1 / sqrt($fisherinfo));
-                $standarderrorperscale[$region][$catscaleid] = $standarderror;
+        foreach ($fisherinfoperscale as $catscaleid => $fisherinfo) {
+            $fisherinfoplayed = $fisherinfoperscale[$catscaleid]['played'] ?? 0;
+            $fisherinfoall = ($fisherinfoperscale[$catscaleid]['played'] ?? 0) + ($fisherinfoperscale[$catscaleid]['remaining'] ?? 0);
+            $standarderror['played'] = $fisherinfoplayed === 0 ? INF : (1 / sqrt($fisherinfoplayed));
+            $standarderror['remaining'] = $fisherinfoall === 0 ? INF : (1 / sqrt($fisherinfoall));
+            $standarderrorperscale[$catscaleid] = $standarderror;
 
-                // We already have enough information about that scale.
-                if ($standarderror < $threshold) {
-                    // Questions of this scale will be excluded in the next run.
-                    $excludedscales[] = $catscaleid;
-                    $context['questions'] = array_filter($context['questions'], fn ($q) => $q->id != $catscaleid);
-                }
+            // If we already have enough information about that scale or if
+            // we can never get below the standarderror threshold for that
+            // scale, exclude it.
+            $attemptsinscale = empty($playedquestionsperscale[$catscaleid])
+                ? 0
+                : count($playedquestionsperscale[$catscaleid]);
+            if (
+                $attemptsinscale >= $context['min_attempts_per_scale']
+                && (
+                    $standarderror['played'] < $threshold
+                    || $standarderror['remaining'] > $threshold
+                )
+            ) {
+                // Questions of this scale will not be selected in this attempt.
+                $context['questions'] = array_filter($context['questions'], fn ($q) => $q->catscaleid != $catscaleid);
             }
         }
 
@@ -100,9 +128,6 @@ final class addscalestandarderror extends preselect_task implements wb_middlewar
         if ($context['questions'] === []) {
             return result::err(status::ERROR_NO_REMAINING_QUESTIONS);
         }
-
-        $excludedscales = array_unique($excludedscales);
-        $cache->set('excludedscale', $excludedscales);
 
         $context['standarderrorperscale'] = $standarderrorperscale;
 
