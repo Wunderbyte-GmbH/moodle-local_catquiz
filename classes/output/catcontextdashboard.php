@@ -71,12 +71,10 @@ class catcontextdashboard implements renderable, templatable {
         $table->define_fulltextsearchcolumns(['name']);
         $table->define_sortablecolumns(array_keys($columns));
 
-        // phpcs:ignore
-        // $table->tabletemplate = 'local_wunderbyte_table/twtable_list';
-        $table->define_cache('local_catquiz', 'catcontexts');
+        $table->sort_default_column = 'timecreated';
+        $table->sort_default_order = SORT_DESC;
 
-        // phpcs:ignore
-        // $table->addcheckboxes = true;
+        $table->define_cache('local_catquiz', 'catcontexts');
 
         $table->pageable(true);
 

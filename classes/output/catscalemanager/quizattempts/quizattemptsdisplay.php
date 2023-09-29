@@ -120,6 +120,9 @@ class quizattemptsdisplay {
 
         $table->define_sortablecolumns($columns);
 
+        $table->sort_default_column = 'timemodified';
+        $table->sort_default_order = SORT_DESC;
+
         $table->define_cache('local_catquiz', 'quizattempts');
 
         $table->pageable(true);
