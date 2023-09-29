@@ -27,6 +27,7 @@ namespace local_catquiz;
 
 use Closure;
 use local_catquiz\local\model\model_item_param_list;
+use local_catquiz\local\model\model_item_response;
 use local_catquiz\local\model\model_model;
 use local_catquiz\local\model\model_strategy;
 use local_catquiz\mathcat;
@@ -172,7 +173,7 @@ class catcalc {
     /**
      * Builds the jacobian function for item params and the given model. 
      * 
-     * @param array $itemresponse 
+     * @param array<model_item_response> $itemresponse 
      * @param mixed $model 
      * @return Closure(mixed $ip): mixed 
      */
@@ -181,7 +182,7 @@ class catcalc {
         $funs = [];
         
         foreach ($itemresponse as $r) {
-            $funs[] = fn($ip) => $model::get_log_jacobian(['ability' => $r->get_ability()], $ip, $r->get_response());
+            $funs[] = fn($ip) => $model::get_log_jacobian($r->get_personparams()->to_array(), $ip, $r->get_response());
         }
     
         $jacobian = self::build_callable_array($funs); // from [fn($x), fn($x),...] to fn($x): [...]
@@ -202,7 +203,7 @@ class catcalc {
         $hessian = [];
         
         foreach ($itemresponse as $r) {
-            $hessian[] = fn($ip) => $model::get_log_hessian(['ability' => $r->get_ability()], $ip, $r->get_response());
+            $hessian[] = fn($ip) => $model::get_log_hessian($r->get_personparams()->to_array(), $ip, $r->get_response());
         }
             
         $hessian = self::build_callable_array($hessian);

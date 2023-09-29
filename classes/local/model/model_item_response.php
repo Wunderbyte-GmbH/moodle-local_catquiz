@@ -34,14 +34,14 @@ namespace local_catquiz\local\model;
 class model_item_response {
 
     /**
-     * @var float responce
+     * @var float response
      */
     private float $response;
 
     /**
-     * @var float ability
+     * @var model_person_param personparams
      */
-    private float $ability;
+    private model_person_param $personparams;
 
     /**
      * Set parameters for class instance.
@@ -50,9 +50,9 @@ class model_item_response {
      * @param float $ability
      *
      */
-    public function __construct(float $response, float $ability) {
+    public function __construct(float $response, model_person_param $personparams) {
         $this->response = $response;
-        $this->ability = $ability;
+        $this->personparams = $personparams;
     }
 
     /**
@@ -71,7 +71,7 @@ class model_item_response {
      * @return float
      *
      */
-    public function get_ability() : float {
-        return $this->ability;
+    public function get_personparams() : model_person_param {
+        return $this->personparams;
     }
 }
