@@ -37,7 +37,7 @@ use renderable;
  * @author     Georg Maißer
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class catscaledashboard implements renderable, templatable {
+class catscaledashboard {
 
 
     /** @var int of catscaleid */
@@ -76,188 +76,6 @@ class catscaledashboard implements renderable, templatable {
         );
     }
 
-    /**
-     * Renders title.
-     *
-     */
-    private function render_title() {
-        global $OUTPUT, $PAGE;
-
-        $PAGE->set_heading($this->catscale->name);
-        echo $OUTPUT->header();
-    }
-
-    /**
-     * Render addtestitems table.
-     *
-     * @param int $catscaleid
-     *
-     * @return string
-     *
-     */
-    private function render_addtestitems_table(int $catscaleid) {
-        $table = new testitems_table('catscaleid_' . $catscaleid . ' addtestitems', $catscaleid, $this->catcontextid);
-
-        list($select, $from, $where, $filter, $params) = catquiz::return_sql_for_addcatscalequestions($catscaleid, $this->catcontextid);
-
-        $table->set_filter_sql($select, $from, $where, $filter, $params);
-
-        $table->define_columns([
-            'idnumber',
-            'questiontext',
-            'qtype',
-            'categoryname',
-            'questioncontextattempts',
-            'action'
-        ]);
-        $table->define_headers([
-            get_string('label', 'local_catquiz'),
-            get_string('questiontext', 'local_catquiz'),
-            get_string('questiontype', 'local_catquiz'),
-            get_string('questioncategories', 'local_catquiz'),
-            get_string('questioncontextattempts', 'local_catquiz'),
-            get_string('action', 'local_catquiz'),
-        ]);
-
-        $table->define_filtercolumns(['categoryname' => [
-            'localizedname' => get_string('questioncategories', 'local_catquiz')
-        ], 'qtype' => [
-            'localizedname' => get_string('questiontype', 'local_catquiz'),
-            'ddimageortext' => get_string('pluginname', 'qtype_ddimageortext'),
-            'essay' => get_string('pluginname', 'qtype_essay'),
-            'gapselect' => get_string('pluginname', 'qtype_gapselect'),
-            'multianswer' => get_string('pluginname', 'qtype_multianswer'),
-            'multichoice' => get_string('pluginname', 'qtype_multichoice'),
-            'numerical' => get_string('pluginname', 'qtype_numerical'),
-            'shortanswer' => get_string('pluginname', 'qtype_shortanswer'),
-            'truefalse' => get_string('pluginname', 'qtype_truefalse'),
-        ]]);
-        $table->define_fulltextsearchcolumns(['idnumber', 'name', 'questiontext', 'qtype']);
-        $table->define_sortablecolumns([
-            'idnunber',
-            'name',
-            'questiontext',
-            'qtype',
-            'questioncontextattempts',
-        ]);
-
-        $table->tabletemplate = 'local_wunderbyte_table/twtable_list';
-        $table->define_cache('local_catquiz', 'testitemstable');
-
-        $table->addcheckboxes = true;
-
-        $table->actionbuttons[] = [
-            'label' => get_string('addtestitem', 'local_catquiz'), // Name of your action button.
-            'class' => 'btn btn-success',
-            'href' => '#',
-            'methodname' => 'addtestitem', // The method needs to be added to your child of wunderbyte_table class.
-            'id' => -1, // This makes one Ajax call for all selected item, not one for each.
-            'data' => [ // Will be added eg as data-id = $values->id, so values can be transmitted to the method above.
-                'titlestring' => 'addtestitemtitle',
-                'bodystring' => 'addtestitembody',
-                'submitbuttonstring' => 'addtestitemsubmit',
-                'component' => 'local_catquiz',
-                'labelcolumn' => 'questiontext',
-                'catscaleid' => $catscaleid,
-            ]
-        ];
-
-        $table->pageable(true);
-
-        $table->stickyheader = false;
-        $table->showcountlabel = true;
-        $table->showdownloadbutton = true;
-        $table->showreloadbutton = true;
-        $table->showrowcountselect = true;
-
-        $table->filteronloadinactive = true;
-
-        return $table->outhtml(10, true);
-    }
-
-    /**
-     * Function to render the testitems attributed to a given catscale.
-     *
-     * @param int $catscaleid
-     * @return string
-     */
-    private function render_testitems_table(int $catscaleid) {
-
-        $table = new testitems_table('catscaleid_' . $this->catscaleid . ' testitems', $this->catscaleid, $this->catcontextid);
-
-        list($select, $from, $where, $filter, $params) = catquiz::return_sql_for_catscalequestions([$catscaleid], $this->catcontextid, [], []);
-
-        $table->set_filter_sql($select, $from, $where, $filter, $params);
-
-        $columnsarray = [
-            'idnumber' => get_string('label', 'local_catquiz'),
-            'questiontext' => get_string('questiontext', 'local_catquiz'),
-            'qtype' => get_string('questiontype', 'local_catquiz'),
-            'categoryname' => get_string('questioncategories', 'local_catquiz'),
-            'model' => get_string('model', 'local_catquiz'),
-            'difficulty' => get_string('difficulty', 'local_catquiz'),
-            'discrimination' => get_string('discrimination', 'local_catquiz'),
-            'guessing' => get_string('guessing', 'local_catquiz'),
-            'lastattempttime' => get_string('lastattempttime', 'local_catquiz'),
-            'attempts' => get_string('questioncontextattempts', 'local_catquiz'),
-            'action' => get_string('action', 'local_catquiz'),
-        ];
-
-        $table->define_columns(array_keys($columnsarray));
-        $table->define_headers(array_values($columnsarray));
-
-        $table->define_filtercolumns(['categoryname' => [
-            'localizedname' => get_string('questioncategories', 'local_catquiz'),
-        ], 'qtype' => [
-            'localizedname' => get_string('questiontype', 'local_catquiz'),
-            'truefalse' => get_string('pluginname', 'qtype_truefalse'),
-            'ddimageortext' => get_string('pluginname', 'qtype_ddimageortext'),
-            'essay' => get_string('pluginname', 'qtype_essay'),
-            'gapselect' => get_string('pluginname', 'qtype_gapselect'),
-            'multianswer' => get_string('pluginname', 'qtype_multianswer'),
-            'multichoice' => get_string('pluginname', 'qtype_multichoice'),
-            'numerical' => get_string('pluginname', 'qtype_numerical'),
-            'shortanswer' => get_string('pluginname', 'qtype_shortanswer'),
-        ]]);
-        $table->define_fulltextsearchcolumns(['idnumber', 'name', 'questiontext', 'qtype', 'model']);
-        $table->define_sortablecolumns(array_keys($columnsarray));
-
-        $table->tabletemplate = 'local_wunderbyte_table/twtable_list';
-        $table->define_cache('local_catquiz', 'testitemstable');
-
-        $table->addcheckboxes = true;
-
-        $table->actionbuttons[] = [
-            'label' => get_string('removetestitem', 'local_catquiz'), // Name of your action button.
-            'class' => 'btn btn-danger',
-            'href' => '#',
-            'methodname' => 'removetestitem', // The method needs to be added to your child of wunderbyte_table class.
-            'id' => -1, // This makes one Ajax call for all selected item, not one for each.
-            'data' => [ // Will be added eg as data-id = $values->id, so values can be transmitted to the method above.
-                'titlestring' => 'removetestitemtitle',
-                'bodystring' => 'removetestitembody',
-                'submitbuttonstring' => 'removetestitemsubmit',
-                'component' => 'local_catquiz',
-                'labelcolumn' => 'questiontext',
-                'catscaleid' => $catscaleid,
-            ]
-        ];
-
-        $table->pageable(true);
-
-        $table->stickyheader = false;
-        $table->showcountlabel = true;
-        $table->showdownloadbutton = true;
-        $table->showreloadbutton = true;
-        $table->showrowcountselect = true;
-
-        $table->filteronloadinactive = true;
-
-        // We use our own download logic.
-        $table->define_baseurl(new moodle_url('/local/catquiz/downloads/download.php'));
-
-        return $table->outhtml(10, true);
-    }
 
     /**
      * Renders item difficulties.
@@ -311,22 +129,6 @@ class catscaledashboard implements renderable, templatable {
     }
 
     /**
-     * Render context selector.
-     *
-     * @return string
-     *
-     */
-    private function render_contextselector() {
-        $ajaxformdata = empty($this->catcontextid) ? [] : ['contextid' => $this->catcontextid];
-        $form = new \local_catquiz\form\contextselector(null, null, 'post', '', [], true, $ajaxformdata);
-        // Set the form data with the same method that is called when loaded from JS.
-        // It should correctly set the data for the supplied arguments.
-        $form->set_data_for_dynamic_submission();
-        // Render the form in a specific container, there should be nothing else in the same container.
-        return html_writer::div($form->render(), '', ['id' => 'lcq_select_context_form']);
-    }
-
-    /**
      * Render file picker
      *
      * @return string
@@ -370,7 +172,8 @@ class catscaledashboard implements renderable, templatable {
      * @return string
      *
      */
-    private function render_student_stats_table(int $catscaleid, int $catcontextid) {
+        /*     // TODO: Check if this is needed somewhere
+        private function render_student_stats_table(int $catscaleid, int $catcontextid) {
         $table = new student_stats_table('catscaleid_' . $this->catscaleid . ' students', $this->catscaleid, $this->catcontextid);
 
         list($select, $from, $where, $filter, $params) = catquiz::return_sql_for_student_stats($catcontextid);
@@ -401,7 +204,7 @@ class catscaledashboard implements renderable, templatable {
         $table->showrowcountselect = true;
 
         return $table->outhtml(10, true);
-    }
+    } */
 
     /**
      * Renders model button
@@ -415,41 +218,6 @@ class catscaledashboard implements renderable, templatable {
         $buttontitle = get_string('calculate', 'local_catquiz');
         return sprintf('<button class="btn btn-primary" type="button" data-contextid="%s" id="model_button">%s</button>',
                         $contextid, $buttontitle);
-    }
-
-    /**
-     * Exports for template.
-     *
-     * @param \renderer_base $output
-     *
-     * @return array
-     *
-     */
-    public function export_for_template(\renderer_base $output): array {
-
-        $url = new moodle_url('/local/catquiz/manage_catscales.php');
-        $testenvironmentdashboard = new testenvironmentdashboard();
-        $cm = new catmodel_info;
-        list($itemdifficulties, $personabilities) = $cm->get_context_parameters(
-            $this->catcontextid,
-            $this->catscaleid,
-            $this->triggercalculation
-        );
-
-        return [
-            'title' => $this->render_title(),
-            'returnurl' => $url->out(),
-            'testitemstable' => $this->render_testitems_table($this->catscaleid),
-            'addtestitemstable' => $this->render_addtestitems_table($this->catscaleid),
-            'itemdifficulties' => $this->render_itemdifficulties($itemdifficulties),
-            'personabilities' => $this->render_personabilities($personabilities),
-            'contextselector' => $this->render_contextselector(),
-            'testitemsimporter' => $this->render_testitem_importer(),
-            'testitemsimporterdemodata' => $this->render_testitem_demodata(),
-            'table' => $testenvironmentdashboard->testenvironmenttable($this->catscaleid),
-            'studentstable' => $this->render_student_stats_table($this->catscaleid, $this->catcontextid),
-            'modelbutton' => $this->render_modelbutton($this->catcontextid),
-        ];
     }
 
     /**
