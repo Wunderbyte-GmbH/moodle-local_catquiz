@@ -204,6 +204,13 @@ class info {
         );
         $mform->setDefault('catquiz_maxquestionspersubscale', 0);
         $mform->addHelpButton('catquiz_maxquestionspersubscale', 'maxquestionspersubscale', 'local_catquiz');
+        $elements[] = $mform->addElement(
+            'text',
+            'catquiz_minquestionspersubscale',
+            get_string('minquestionspersubscale', 'local_catquiz')
+        );
+        $mform->setDefault('catquiz_minquestionspersubscale', 0);
+        $mform->addHelpButton('catquiz_minquestionspersubscale', 'minquestionspersubscale', 'local_catquiz');
 
         $elements[] = $mform->addElement(
             'text',
