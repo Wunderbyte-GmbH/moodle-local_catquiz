@@ -66,6 +66,8 @@ $string['standarderrorpersubscale'] = 'Standarderror per subscale in percent';
 $string['standarderrorpersubscale_help'] = 'If the standard error for a scale drops below this value, it will no longer be tested.';
 $string['maxquestionspersubscale'] = 'Maximum number of questions returned per subscale';
 $string['maxquestionspersubscale_help'] = 'When this number of questions was returned for any subscale, no more questions from this scale will be shown. A value of 0 means that there is no limit.';
+$string['minquestionspersubscale'] = 'Minimum number of questions returned per subscale';
+$string['minquestionspersubscale_help'] = 'Questions of a subscale will be excluded only if at least the minimum number of questions was shown.';
 
 $string['timepacedtest'] = 'Timepaced test';
 $string['maxtime'] = 'Max time for test';

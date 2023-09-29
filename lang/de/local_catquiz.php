@@ -65,6 +65,8 @@ $string['standarderrorpersubscale'] = 'Standarderror pro Subskala in Prozent';
 $string['standarderrorpersubscale_help'] = 'Sobald der Standardfehler einer Subskala unter diesen Wert fällt, wird sie nicht weiter getestet.';
 $string['maxquestionspersubscale'] = 'Maximalanzahl an angezeigten Fragen pro Subskala';
 $string['maxquestionspersubscale_help'] = 'Wenn von einer Subskala so viele Fragen angezeigt wurden, werden keine weiteren Fragen dieser Skala mehr ausgespielt. Wenn auf 0 gesetzt, dann gibt es kein Limit.';
+$string['minquestionspersubscale'] = 'Minimum an angezeigten Fragen pro Subskala';
+$string['minquestionspersubscale_help'] = 'Eine Subskala wird frühestens dann ausgeschlossen, wenn die Minimalanzahl an Fragen aus dieser Skala angezeigt wurden.';
 
 $string['timepacedtest'] = 'Zeitbeschränkungen für den Test aktivieren';
 $string['maxtime'] = 'Maximale Dauer des Tests';
