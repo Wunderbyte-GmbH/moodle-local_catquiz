@@ -132,11 +132,10 @@ class testenvironmentdashboard implements renderable, templatable {
             'course',
         ]);
 
-        // phpcs:ignore
-        // $table->tabletemplate = 'local_wunderbyte_table/twtable_list';
+        $table->sort_default_column = 'timemodified';
+        $table->sort_default_order = SORT_DESC;
+
         $table->define_cache('local_catquiz', 'testenvironments');
-        // phpcs:ignore
-        // $table->addcheckboxes = true;
 
         $table->pageable(true);
 
