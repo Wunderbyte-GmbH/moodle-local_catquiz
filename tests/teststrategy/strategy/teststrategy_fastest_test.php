@@ -105,6 +105,9 @@ class teststrategy_fastest_test extends basic_testcase
                     'questions' => [
                         1 => $question1,
                     ],
+                    'original_questions' => [
+                        1 => $question1,
+                    ],
                     'selectfirstquestion' => 'startwitheasiestquestion',
                     'questions_ordered_by' => 'difficulty',
                     'testid' => 1,
