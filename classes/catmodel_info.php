@@ -109,7 +109,6 @@ class catmodel_info {
 
         // Trigger event.
         $event = calculation_executed::create([
-            'objectid' => $catscaleid,
             'context' => \context_system::instance(),
             'userid' => $userid,
             'other' => [
