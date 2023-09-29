@@ -74,13 +74,13 @@ class inferallsubscales extends strategy {
             updatepersonability::class,
             removeplayedquestions::class,
             noremainingquestions::class,
+            fisherinformation::class, // Add the fisher information to each question.
             firstquestionselector::class, // If this is the first question of this attempt, return it here.
             lasttimeplayedpenalty::class,
             mayberemovescale::class, // Remove questions from excluded subscales.
             numberofgeneralattempts::class,
             maybe_return_pilot::class,
             remove_uncalculated::class, // Remove items that do not have item parameters.
-            fisherinformation::class, // Add the fisher information to each question.
             addscalestandarderror::class,
             noremainingquestions::class, // Cancel quiz attempt if no questions are left.
             strategyfastestscore::class,
