@@ -27,7 +27,6 @@ namespace local_catquiz\teststrategy\preselect_task;
 use local_catquiz\local\result;
 use local_catquiz\teststrategy\preselect_task;
 use local_catquiz\wb_middleware;
-use moodle_exception;
 
 /**
  * Test strategy fisherinformation.
@@ -49,8 +48,9 @@ final class fisherinformation extends preselect_task implements wb_middleware {
      */
     public function run(array &$context, callable $next): result {
         foreach ($context['questions'] as $item) {
+            // Just skip questions where we can not calculate the fisher information.
             if (!array_key_exists($item->model, $context['installed_models'])) {
-                throw new moodle_exception('missingmodel', 'local_catquiz');
+                continue;
             }
 
             $model = $context['installed_models'][$item->model];
