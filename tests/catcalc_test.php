@@ -32,6 +32,7 @@ use catmodel_raschbirnbaumc\raschbirnbaumc;
 use local_catquiz\local\model\model_item_param;
 use local_catquiz\local\model\model_item_param_list;
 use local_catquiz\local\model\model_item_response;
+use local_catquiz\local\model\model_person_param;
 use local_catquiz\local\model\model_responses;
 use PHPUnit\Framework\ExpectationFailedException;
 use SebastianBergmann\RecursionContext\InvalidArgumentException;
@@ -103,7 +104,7 @@ class catcalc_test extends basic_testcase
             foreach (['q1', 'q2'] as $qid) {
                 $ir = new model_item_response(
                     $responses[$userid]['component'][$qid]['fraction'],
-                    $ability
+                    (new model_person_param($userid))->set_ability($ability)
                 );
                 $itemresponses[] = $ir;
             }
@@ -216,7 +217,7 @@ class catcalc_test extends basic_testcase
             foreach (['q1', 'q2'] as $qid) {
                 $ir = new model_item_response(
                     $responses[$userid]['component'][$qid]['fraction'],
-                    $ability
+                    (new model_person_param($userid))->set_ability($ability)
                 );
                 $itemresponses[] = $ir;
             }

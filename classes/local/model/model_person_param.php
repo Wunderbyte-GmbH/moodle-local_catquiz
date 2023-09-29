@@ -33,7 +33,7 @@ namespace local_catquiz\local\model;
  * @copyright 2023 Wunderbyte GmbH <info@wunderbyte.at>
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class model_person_param {
+class model_person_param implements \ArrayAccess {
 
     // For some items, the model returns -INF or INF as difficulty.
     // However, we expect it to be numeric, so we encode those values as -1000 and 1000.
@@ -62,6 +62,12 @@ class model_person_param {
     private float $ability = 0;
 
     /**
+     * Supported parameters
+     * @var array<string>
+     */
+    private array $params;
+
+    /**
      * Instantiate parameter.
      *
      * @param int $id
@@ -69,7 +75,28 @@ class model_person_param {
      */
     public function __construct(int $id) {
         $this->id = $id;
+        $this->params = ['ability'];
     }
+
+    public function offsetExists($offset): bool {
+        return in_array($offset, $this->params);
+    }
+
+    public function offsetGet($offset) {
+        if (! $this->offsetExists($offset)) {
+            return null;
+        }
+        return $this->$offset;
+    }
+
+    public function offsetSet($offset, $value): void {
+        if (! $this->offsetExists($offset)) {
+            return;
+        }
+        $this->$offset = $value;
+    }
+
+    public function offsetUnset($offset): void {}
 
     /**
      * Return ID.

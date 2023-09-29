@@ -123,7 +123,7 @@ class model_responses {
                 foreach ($questionids as $questionid) {
                     $fraction = $this->data[$pp->get_id()][$component][$questionid]['fraction'];
                     $itemresponse[$questionid][] = new model_item_response(
-                        $fraction, $pp->get_ability()
+                        $fraction, $pp
                     );
                 }
             }
