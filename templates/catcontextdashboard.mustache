@@ -23,10 +23,12 @@
     {
     }
 }}
-<p>
-  <a class="btn btn-primary manage-catcontext" href="#">{{#str}} addcontext, local_catquiz {{/str}}</a>
-</p>
-{{{table}}}
+{{#catcontextdisplay}}
+    <p>
+    <a class="btn btn-primary manage-catcontext" href="#">{{#str}} addcontext, local_catquiz {{/str}}</a>
+    </p>
+    {{{table}}}
+{{/catcontextdisplay}}
 
 {{#js}}
     require(['local_catquiz/manage_catcontext'], function(init) {
