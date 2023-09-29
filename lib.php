@@ -79,21 +79,11 @@ function local_catquiz_render_navbar_output(\renderer_base $renderer) {
     }
 
     $output = '<div class="popover-region nav-link icon-no-margin dropdown">
-        <button class="btn btn-secondary dropdown-toggle" type="button"
-        id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+        <a class="btn btn-secondary"
+        id="dropdownMenuButton" aria-haspopup="true" aria-expanded="false" href="'. $CFG->wwwroot . '/local/catquiz/manage_catscales.php"
+        role="button">
         '. get_string('catquiz', 'local_catquiz') .'
-        </button>
-        <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-            <a class="dropdown-item" href="'
-                . $CFG->wwwroot . '/local/catquiz/manage_catscales.php"">'
-                . get_string('managecatscales', 'local_catquiz') . '</a>
-            <a class="dropdown-item" href="'
-                . $CFG->wwwroot . '/local/catquiz/manage_catcontexts.php"">'
-                . get_string('managecatcontexts', 'local_catquiz') . '</a>
-            <a class="dropdown-item" href="'
-                . $CFG->wwwroot . '/local/catquiz/manage_testenvironments.php"">'
-                . get_string('managetestenvironments', 'local_catquiz') . '</a>
-        </div>
+        </a>
     </div>';
 
     return $output;
