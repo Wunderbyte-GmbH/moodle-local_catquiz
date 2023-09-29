@@ -535,6 +535,11 @@ class catquiz_handler {
             $pilotratio = floatval($quizsettings->catquiz_pilotratio);
         }
 
+        $maxquestionsperscale = $quizsettings->catquiz_maxquestionspersubscale;
+        if ($maxquestionsperscale == 0) {
+            $maxquestionsperscale = INF;
+        }
+
         $initialcontext = [
             'testid' => intval($attemptdata->instance),
             'contextid' => intval($quizsettings->catquiz_catcontext),
@@ -557,7 +562,7 @@ class catquiz_handler {
             'selectfirstquestion' => $quizsettings->catquiz_selectfirstquestion,
             'skip_reason' => null,
             'userid' => $USER->id,
-            'max_attempts_per_scale' => $quizsettings->catquiz_maxquestionspersubscale ?? null,
+            'max_attempts_per_scale' => $maxquestionsperscale,
             'min_attempts_per_scale' => $quizsettings->catquiz_minquestionspersubscale,
             'teststrategy' => $quizsettings->catquiz_selectteststrategy,
             'timestamp' => time(),
