@@ -351,10 +351,10 @@ $string['questionssummary'] = "Summary";
 $string['currentability'] = "Your current skill level";
 $string['currentabilityfellowstudents'] = "Current skill level of your fellow students";
 $string['feedbackbarlegend'] = "Color code";
-$string['feedbackbarlegend_region_1'] = "TODO: translate - too bad";
-$string['feedbackbarlegend_region_2'] = "TODO: translate - you will struggle";
-$string['feedbackbarlegend_region_3'] = "TODO: translate - you meet the requirements";
-$string['feedbackbarlegend_region_4'] = "TODO: translate - more skills than required";
+$string['feedbackbarlegend_region_1'] = "Your future instructors consider this level of knowledge to be insufficient to keep up with the studies.";
+$string['feedbackbarlegend_region_2'] = "With this level of knowledge, one can expect to encounter regular difficulties during the studies.";
+$string['feedbackbarlegend_region_3'] = "Experience has shown that it is typically possible to complete the program within the standard study period with knowledge at this level.";
+$string['feedbackbarlegend_region_4'] = "This domain suggests a prior knowledge that even exceeds the requirements of the subject studies.";
 $string['teacherfeedback'] = "Feedback for teachers";
 
 $string['catquiz_feedbackheader'] = "Feedback";
