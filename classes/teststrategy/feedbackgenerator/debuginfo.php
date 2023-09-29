@@ -124,6 +124,13 @@ class debuginfo extends feedbackgenerator {
             $standarderrorperscale = [];
             if (array_key_exists('standarderrorperscale', $data)) {
                 foreach ($data['standarderrorperscale'] as $scaleid => $standarderror) {
+                    // Convert INF to string so that the data can be json
+                    // encoded and saved to the DB.
+                    foreach (['played', 'remaining'] as $region) {
+                        if (is_infinite($standarderror[$region])) {
+                            $standarderror[$region] = "INF";
+                        }
+                    }
                     $standarderrorperscale[] = [
                         'name' => $catscales[$scaleid]->name,
                         'se' => $standarderror,
