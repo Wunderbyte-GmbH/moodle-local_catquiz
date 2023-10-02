@@ -60,7 +60,7 @@ class teststrategy_balanced extends strategy {
      * @return array
      *
      */
-    public function requires_score_modifiers(): array {
+    public function get_preselecttasks(): array {
         return [
             maximumquestionscheck::class,
             updatepersonability::class,
