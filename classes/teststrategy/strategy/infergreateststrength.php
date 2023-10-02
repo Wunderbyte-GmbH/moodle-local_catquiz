@@ -67,7 +67,7 @@ class infergreateststrength extends strategy {
      * @return array
      *
      */
-    public function requires_score_modifiers(): array {
+    public function get_preselecttasks(): array {
         return [
             maximumquestionscheck::class, // Cancel quiz attempt if we reached maximum of questions.
             updatepersonability::class,

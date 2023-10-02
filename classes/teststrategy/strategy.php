@@ -83,7 +83,7 @@ abstract class strategy {
      *
      * @return array
      */
-    abstract public function requires_score_modifiers(): array;
+    abstract public function get_preselecttasks(): array;
 
     /**
      * Returns the translated description of this strategy
@@ -110,7 +110,7 @@ abstract class strategy {
     public function return_next_testitem(array $context) {
         $now = time();
 
-        foreach ($this->requires_score_modifiers() as $modifier) {
+        foreach ($this->get_preselecttasks() as $modifier) {
             if (!array_key_exists($modifier, $this->scoremodifiers)) {
                 throw new moodle_exception(
                     sprintf(

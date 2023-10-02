@@ -61,7 +61,7 @@ class teststrategy_fastest extends strategy {
      * @return array
      *
      */
-    public function requires_score_modifiers(): array {
+    public function get_preselecttasks(): array {
         return [
             maximumquestionscheck::class,
             remove_uncalculated::class,
