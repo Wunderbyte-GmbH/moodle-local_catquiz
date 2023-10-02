@@ -111,7 +111,9 @@ class debuginfo extends feedbackgenerator {
                 }
                 $questionsperscale[$question->catscaleid]['num'] = $questionsperscale[$question->catscaleid]['num'] + 1;
             }
-            $questions[array_key_last($questions)]['last'] = true;
+            if ($questions) {
+                $questions[array_key_last($questions)]['last'] = true;
+            }
 
             $selectedscale = isset($data['selected_catscale'])
                 ? $catscales[$data['selected_catscale']]->name

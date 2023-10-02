@@ -50,6 +50,9 @@ userid;attemptid;questionsattempted;timestamp;contextid;catscale;teststrategy;pe
     ;{{#questions}}
         "id: {{id}}, type: {{type}}, fisherinformation: {{fisherinformation}}, score: {{score}}"{{^last}},{{/last}}
     {{/questions}}
+    {{^questions}}
+    NA
+    {{/questions}}
     ;{{ active_scales }}
     ;{{ selectedscale }}
     ;{{ lastmiddleware }}
