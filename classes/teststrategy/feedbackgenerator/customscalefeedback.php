@@ -66,7 +66,7 @@ class customscalefeedback extends feedbackgenerator {
 
     public function load_data(int $attemptid, array $initialcontext): ?array {
         $cache = cache::make('local_catquiz', 'adaptivequizattempt');
-        $quizsettings = (array) ($initialcontext['quizsettings'] ?? $cache->get('quizsettings')) ?: null;
+        $quizsettings = ($initialcontext['quizsettings'] ?? $cache->get('quizsettings')) ?: null;
         if ($quizsettings === null) {
             return null;
         }
@@ -79,13 +79,13 @@ class customscalefeedback extends feedbackgenerator {
         $scalefeedback = [];
         foreach ($personabilities as $catscaleid => $personability) {
             $lowerlimitprop = sprintf('feedback_scaleid_%d_lowerlimit', $catscaleid);
-            $lowerlimit = floatval($quizsettings[$lowerlimitprop]);
+            $lowerlimit = floatval($quizsettings->$lowerlimitprop);
             if ($personability >= $lowerlimit) {
                 continue;
             }
 
             $feedbackprop = sprintf('feedback_scaleid_%d_feedback', $catscaleid);
-            $feedback = $quizsettings[$feedbackprop];
+            $feedback = $quizsettings->$feedbackprop;
             // Do not display empty feedback messages.
             if (!$feedback) {
                 continue;
