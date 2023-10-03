@@ -31,4 +31,8 @@ $shortcodes = [
         'callback' => 'local_catquiz\shortcodes::allquizattempts',
         'description' => 'shortcodeslistofquizattempts'
     ],
+    'catquizfeedback' => [
+        'callback' => 'local_catquiz\shortcodes::catquizfeedback',
+        'description' => 'shortcodescatquizfeedback'
+    ],
 ];

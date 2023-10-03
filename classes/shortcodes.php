@@ -26,6 +26,7 @@
 
 namespace local_catquiz;
 
+use local_catquiz\output\attemptfeedback;
 use local_catquiz\output\catscalemanager\quizattempts\quizattemptsdisplay;
 
 /**
@@ -45,5 +46,40 @@ class shortcodes {
      */
     public static function allquizattempts($shortcode, $args, $content, $env, $next) {
         return (new quizattemptsdisplay())->render_table();
+    }
+
+    /**
+     * Displays feedback of attempts
+     *
+     * @param string $shortcode
+     * @param array $args
+     * @param string|null $content
+     * @param object $env
+     * @param Closure $next
+     * @return string
+     */
+    public static function catquizfeedback($shortcode, $args, $content, $env, $next) {
+
+        global $OUTPUT;
+
+        $records = catquiz::return_attempt_and_contextid_from_attemptstable(
+            intval($args['numberofattempts'] ?? 3),
+            intval($args['instanceid'] ?? 0),
+            intval($args['courseid'] ?? 0)
+            );
+        $output = [
+            'attempt' => [],
+        ];
+        foreach($records as $record) {
+            $attemptfeedback = new attemptfeedback($record->attemptid, $record->contextid);
+            $headerstring = get_string('feedbacksheader', 'local_catquiz', $record->attemptid);
+            $data = [
+                'feedback' => $attemptfeedback->get_feedback_for_attempt($record->attemptid),
+                'header' => $headerstring,
+                'attemptid' => $record->attemptid,
+            ];
+            $output['attempt'][] = $data;
+        }
+        return $OUTPUT->render_from_template('local_catquiz/feedback/collapsablefeedback', $output);
     }
 }

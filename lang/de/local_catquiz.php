@@ -377,6 +377,8 @@ $string['instance'] = "Test";
 $string['teststrategy'] = "Teststrategie";
 $string['starttime'] = "Beginn";
 $string['endtime'] = "Ende";
+$string['feedbacksheader'] = 'Versuch {$a}';
+$string['attemptscollapsableheading'] = 'Feedback für Ihre Versuche:';
 
 // CSV Import Form.
 $string['importcsv'] = 'Import CSV';

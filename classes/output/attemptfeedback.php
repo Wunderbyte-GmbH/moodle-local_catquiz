@@ -98,7 +98,7 @@ class attemptfeedback implements renderable, templatable {
      * @return mixed
      *
      */
-    private function render_strategy_feedback() {
+    private function render_strategy_feedback($savetodb = true) {
         global $USER;
         if (!$this->teststrategy
         //|| empty($cache->get('playedquestions'))
@@ -139,7 +139,9 @@ class attemptfeedback implements renderable, templatable {
                 $generatordata
             );
         }
-        $id = catquiz::save_attempt_to_db($feedbackdata);
+        if ($savetodb) {
+            $id = catquiz::save_attempt_to_db($feedbackdata);
+        }
         return $this->generate_feedback($generators, $feedbackdata);
     }
 
@@ -178,13 +180,14 @@ class attemptfeedback implements renderable, templatable {
      * Export for template.
      *
      * @param \renderer_base $output
+     * @param boolean $savetodb
      *
      * @return array
      *
      */
-    public function export_for_template(\renderer_base $output): array {
+    public function export_for_template(\renderer_base $output, $savetodb = true): array {
         return [
-            'feedback' => $this->render_strategy_feedback(),
+            'feedback' => $this->render_strategy_feedback($savetodb),
         ];
     }
 
