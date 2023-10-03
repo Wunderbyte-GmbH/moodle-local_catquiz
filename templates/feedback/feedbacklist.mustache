@@ -28,13 +28,13 @@
       <div class="card">
         <div class="card-header" id="heading{{attemptid}}">
           <h5 class="mb-0">
-            <button class="btn btn-link collapsed" data-toggle="collapse" data-target="#attempt{{attemptid}}" aria-expanded="false" aria-controls="attempt{{attemptid}}">
+            <button class="btn btn-link {{^active}}collapsed{{/active}}" data-toggle="collapse" data-target="#attempt{{attemptid}}" aria-expanded="{{^active}}false{{/active}}{{#active}}true{{/active}}" aria-controls="attempt{{attemptid}}">
               {{header}}
             </button>
           </h5>
         </div>
 
-        <div id="attempt{{attemptid}}" class="collapse" aria-labelledby="heading{{attemptid}}" data-parent="#accordion">
+        <div id="attempt{{attemptid}}" class="collapse {{#active}}show{{/active}}" aria-labelledby="heading{{attemptid}}" data-parent="#accordion">
           <div class="card-body">
               {{> local_catquiz/attemptfeedback}}
           </div>

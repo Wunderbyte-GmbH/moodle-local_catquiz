@@ -63,7 +63,7 @@ class shortcodes {
         global $OUTPUT;
 
         $records = catquiz::return_attempt_and_contextid_from_attemptstable(
-            intval($args['numberofattempts'] ?? 3),
+            intval($args['numberofattempts'] ?? 1),
             intval($args['instanceid'] ?? 0),
             intval($args['courseid'] ?? 0)
             );
@@ -77,6 +77,7 @@ class shortcodes {
                 'feedback' => $attemptfeedback->get_feedback_for_attempt($record->attemptid),
                 'header' => $headerstring,
                 'attemptid' => $record->attemptid,
+                'active' => empty($output['attempt']) ? true : false,
             ];
             $output['attempt'][] = $data;
         }
