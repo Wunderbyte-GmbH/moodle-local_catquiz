@@ -414,7 +414,7 @@ $string['shortcodeslistofquizattempts'] = 'Gibt eine Tabelle mit Quiz-Versuchen 
 // Validation
 $string['valuemustbegreaterzero'] = 'Wert muss höher als 0 sein.';
 
-// Breakinfo
+// Breakinfo.
 $string['breakinfo_title'] = 'Test pausiert';
 $string['breakinfo_description'] = 'Der Test wurde pausiert.';
 $string['breakinfo_continue'] = 'Der Test kann um {$a} fortgesetzt werden';
