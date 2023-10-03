@@ -72,12 +72,12 @@ class debuginfo extends feedbackgenerator {
         }
 
         $teststrategies = info::return_available_strategies();
-        $teststrategy = array_filter($teststrategies, fn ($t) => $t->id == $cachedcontexts[0]['teststrategy']);
+        $teststrategy = array_filter($teststrategies, fn ($t) => $t->id == $cachedcontexts[array_key_first($cachedcontexts)]['teststrategy']);
         $reflect = new \ReflectionClass($teststrategy[array_key_first($teststrategy)]);
 
         // Each cachedcontext corresponds to one question attempt.
         $debuginfo = [];
-        $catscales = catquiz::get_catscales(array_keys($cachedcontexts[0]['person_ability']));
+        $catscales = catquiz::get_catscales(array_keys($cachedcontexts[array_key_first($cachedcontexts)]['person_ability']));
         $teststrategy = get_string($reflect->getShortName(), 'local_catquiz');
 
         foreach ($cachedcontexts as $data) {
