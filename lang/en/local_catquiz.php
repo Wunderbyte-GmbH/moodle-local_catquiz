@@ -419,3 +419,9 @@ $string['shortcodeslistofquizattempts'] = 'Returns a table of quiz attempts.';
 
 // Validation
 $string['valuemustbegreaterzero'] = 'Value must be greater than zero.';
+
+// Breakinfo
+$string['breakinfo_title'] = 'Test paused';
+$string['breakinfo_description'] = 'Test was paused';
+$string['breakinfo_continue'] = 'You can continue the test at {$a}';
+$string['breakinfo_backtotest'] = 'Back to the test';
