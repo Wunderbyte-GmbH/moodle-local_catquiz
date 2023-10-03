@@ -164,49 +164,6 @@ class catscaledashboard {
     }
 
     /**
-     * Renders student stats table.
-     *
-     * @param int $catscaleid
-     * @param int $catcontextid
-     *
-     * @return string
-     *
-     */
-        /*     // TODO: Check if this is needed somewhere
-        private function render_student_stats_table(int $catscaleid, int $catcontextid) {
-        $table = new student_stats_table('catscaleid_' . $this->catscaleid . ' students', $this->catscaleid, $this->catcontextid);
-
-        list($select, $from, $where, $filter, $params) = catquiz::return_sql_for_student_stats($catcontextid);
-
-        $table->set_filter_sql($select, $from, $where, $filter, $params);
-
-        $table->define_columns(['firstname', 'lastname', 'studentattempts', 'ability', 'action']);
-        $table->define_headers([
-            get_string('firstname', 'core'),
-            get_string('lastname', 'core'),
-            get_string('questioncontextattempts', 'local_catquiz'),
-            get_string('personabilities', 'local_catquiz'),
-            get_string('action', 'local_catquiz'),
-        ]);
-
-        $table->define_fulltextsearchcolumns(['firstname', 'lastname']);
-        $table->define_sortablecolumns(['firstname', 'lastname', 'studentattempts', 'ability']);
-
-        $table->tabletemplate = 'local_wunderbyte_table/twtable_list';
-        $table->define_cache('local_catquiz', 'studentstatstable');
-
-        $table->pageable(true);
-
-        $table->stickyheader = false;
-        $table->showcountlabel = true;
-        $table->showdownloadbutton = true;
-        $table->showreloadbutton = true;
-        $table->showrowcountselect = true;
-
-        return $table->outhtml(10, true);
-    } */
-
-    /**
      * Renders model button
      *
      * @param mixed $contextid

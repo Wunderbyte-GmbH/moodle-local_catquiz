@@ -747,6 +747,68 @@ class catquiz {
     }
 
     /**
+     * Return sql to render quiz attempts.
+     *
+     * @param int $numberofrecords
+     * @param ?int $attemptid
+     * @param ?int $courseid
+     *
+     * @return array
+     *
+     */
+    public static function return_attempt_and_contextid_from_attemptstable(
+        int $numberofrecords = 1,
+        int $instanceid = 0,
+        int $courseid = 0) {
+
+        global $DB;
+
+        $sqlarray = self::return_sql_for_attemptid_contextid($numberofrecords, $instanceid, $courseid);
+
+        $recordsarray = $DB->get_records_sql($sqlarray[0], $sqlarray[1]);
+
+        return $recordsarray;
+    }
+
+    /**
+     * Summary of return_sql_for_attemptid_contextid
+     * @param int $numberofrecords
+     * @param int $instanceid
+     * @param int $courseid
+     * @return array
+     */
+    private static function return_sql_for_attemptid_contextid(
+        int $numberofrecords = 1,
+        int $instanceid = 0,
+        int $courseid = 0):array {
+
+        $sql = "SELECT
+        attemptid, contextid FROM {local_catquiz_attempts} ";
+
+        $wherearray = [];
+        $params = [];
+
+        if (!empty($instanceid)) {
+            $wherearray[] = ' instanceid = :instanceid ';
+            $params['instanceid'] = $instanceid;
+        }
+
+        if (!empty($courseid)) {
+            $wherearray[] = ' courseid = :courseid ';
+            $params['courseid'] = $courseid;
+        }
+
+        if (count($wherearray) > 0) {
+            $sql .= " WHERE " . implode(' AND ', $wherearray);
+        }
+
+        $sql .= " ORDER BY timemodified DESC
+        LIMIT " . $numberofrecords;
+
+        return [$sql, $params];
+    }
+
+    /**
      * Return sql to render all or a subset of testenvironments
      *
      * @param array $wherearray
