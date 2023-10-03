@@ -564,6 +564,9 @@ class catquiz_handler {
             'updateabilityfallback' => false,
             'excludedsubscales' => [],
             'has_fisherinformation' => false,
+            'breakduration' => 600, // TODO: set via quizsettings.
+            'breakinfourl' => '/local/catquiz/breakinfo.php', // TODO: set via quizsettings
+            'timetotriggerbreak' => 120, // TODO: set via quizsettings.
         ];
         return $contextcreator->load(
             [

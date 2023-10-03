@@ -108,8 +108,6 @@ abstract class strategy {
      *
      */
     public function return_next_testitem(array $context) {
-        $now = time();
-
         foreach ($this->get_preselecttasks() as $modifier) {
             if (!array_key_exists($modifier, $this->scoremodifiers)) {
                 throw new moodle_exception(
@@ -136,6 +134,7 @@ abstract class strategy {
             return result::err();
         }
 
+        $now = time();
         $selectedquestion->lastattempttime = $now;
         $selectedquestion->userlastattempttime = $now;
 
@@ -144,6 +143,7 @@ abstract class strategy {
         $playedquestions[$selectedquestion->id] = $selectedquestion;
         $cache->set('playedquestions', $playedquestions);
         $cache->set('isfirstquestionofattempt', false);
+        $cache->set('lastquestionreturntime', $now);
 
         if (! empty($selectedquestion->is_pilot)) {
             $numpilotquestions = $cache->get('num_pilot_questions') ?: 0;
