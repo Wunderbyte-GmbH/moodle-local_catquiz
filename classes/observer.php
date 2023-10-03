@@ -138,7 +138,7 @@ class local_catquiz_observer {
     }
 
     /**
-     * Observer for the testitem_imported event
+     * Observer for the testitem_imported event.
      *
      * @param testitem_imported $event
      */
