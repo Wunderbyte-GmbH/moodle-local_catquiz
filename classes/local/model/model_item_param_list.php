@@ -38,6 +38,7 @@ use local_catquiz\event\testiteminscale_added;
 use moodle_exception;
 use Traversable;
 
+require_once($CFG->dirroot . '/local/catquiz/lib.php');
 /**
  * This class holds a list of item param objects.
  *
@@ -382,11 +383,17 @@ class model_item_param_list implements ArrayAccess, IteratorAggregate, Countable
              ];
         }
 
-        $record = $DB->get_record("local_catquiz_itemparams", [
-            'componentid' => $newrecord['componentid'],
-            'componentname' => $newrecord['componentname'],
-            'model' => $newrecord['model'],
-            'contextid' => $newrecord['contextid']]);
+        if (isset($newrecord['id'])) {
+            $record = $DB->get_record("local_catquiz_itemparams", [
+                'id' => $newrecord['id'],
+            ]);
+        } else {
+            $record = $DB->get_record("local_catquiz_itemparams", [
+                'componentid' => $newrecord['componentid'],
+                'componentname' => $newrecord['componentname'],
+                'model' => $newrecord['model'],
+                'contextid' => $newrecord['contextid']]);
+        }
 
         $now = time();
         $newrecord['timemodified'] = empty($newrecord['timemodified']) ? $now : $newrecord['timemodified'];
@@ -397,33 +404,21 @@ class model_item_param_list implements ArrayAccess, IteratorAggregate, Countable
         }
 
         $newrecord['status'] = !empty($newrecord['status']) ? $newrecord['status'] : STATUS_UPDATED_MANUALLY;
-        //$recordcounter = [];
-        //$addedrecords = 0;
-        //$updatedrecords = 0;
         if (!$record) {
             // Make sure the record to insert has no id.
             unset($newrecord['id']);
             $id = $DB->insert_record('local_catquiz_itemparams', $newrecord);
-            //$addedrecords++;
-        } else {
 
+        } else {
             $newrecord['id'] = $record->id;
             if ($DB->update_record('local_catquiz_itemparams', (object) $newrecord, true)) {
                 $id = $newrecord['id'];
-                //$updatedrecords++;
             }
         }
-        /*
-        $recordcounter = [
-            'addedrecords' => $addedrecords,
-            'updatedrecords' => $updatedrecords,
-        ];
-        */
+
         return [
             'success' => 1, // Update successfully
-            //'message' => get_string('addedrecords', 'local_catquiz', $recordcounter['addedrecords']) . " " .
-            //            get_string('updatedrecords', 'local_catquiz', $recordcounter['updatedrecords']),
-            //'numberofrecordstreated' => $recordcounter,
+            'message' => get_string('success', 'core'),
             'recordid' => $id,
          ];
     }

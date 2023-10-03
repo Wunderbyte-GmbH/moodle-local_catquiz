@@ -335,6 +335,7 @@ $string['errorrecordnotfound'] = 'There was an error with the database query. Th
 $string['trashbintitle'] = 'Delete item';
 $string['cogwheeltitle'] = 'Display details';
 $string['eyeicontitle'] = 'Activate/Disable';
+$string['edititemparams'] = 'Edit item params';
 
 // Testitem Detail View.
 $string['questionpreview'] = 'Question preview';

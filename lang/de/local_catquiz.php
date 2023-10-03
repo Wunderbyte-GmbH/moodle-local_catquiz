@@ -330,6 +330,7 @@ $string['errorrecordnotfound'] = 'Fehler mit der Datenbankabfrage. Der Datensatz
 $string['trashbintitle'] = 'Element löschen';
 $string['cogwheeltitle'] = 'Details anzeigen';
 $string['eyeicontitle'] = 'Aktivieren/Deaktivieren';
+$string['edititemparams'] = 'Daten ändern';
 
 // Testitem Detail View.
 $string['questionpreview'] = 'Fragevorschau';
