@@ -28,6 +28,7 @@ use cache;
 use local_catquiz\local\result;
 use local_catquiz\teststrategy\preselect_task;
 use local_catquiz\wb_middleware;
+use moodle_url;
 
 /**
  * Checks if it took the user too long to answer the last question.
@@ -44,24 +45,42 @@ final class checkbreak extends preselect_task implements wb_middleware {
     public function run(array &$context, callable $next): result {
         $now = time();
         $cache = cache::make('local_catquiz', 'adaptivequizattempt');
-        $forcedbreakuntil = $cache->get('forcedbreakuntil');
-        // The user finished the break.
-        if ($forcedbreakuntil && $forcedbreakuntil <= $now) {
-            $cache->set('forcedbreakuntil', false);
-            return $next($context);
+        $forcedbreakend = $cache->get('forcedbreakend');
+        if ($forcedbreakend) {
+            // The user finished the break.
+            if ($forcedbreakend <= $now) {
+                $cache->set('forcedbreakend', false);
+                return $next($context);
+            } else {
+                $breakinfourl = new moodle_url(
+                    $context['breakinfourl'],
+                    [
+                        'cmid' => $_REQUEST['cmid'],
+                        'breakend' => $forcedbreakend,
+                    ]
+                );
+                redirect($breakinfourl);
+            }
         }
 
         $lastquestionreturntime = $cache->get('lastquestionreturntime');
-        if (!$lastquestionreturntime || $now - $lastquestionreturntime <= $context['timetotriggerbreak']) {
+        if (!$lastquestionreturntime || $now - $lastquestionreturntime <= $context['maxtimeperquestion']) {
             return $next($context);
         }
 
         // User should take a break.
         $context['lastquestion'] = null; // Do not count the last answer.
-        $forcedbreakduration = $now + $context['breakduration'];
-        $cache->set('forcedbreakuntil', $forcedbreakduration);
+        $forcedbreakend = $now + $context['breakduration'];
+        $cache->set('forcedbreakend', $forcedbreakend);
+        $breakinfourl = new moodle_url(
+            $context['breakinfourl'],
+            [
+                'cmid' => $_REQUEST['cmid'],
+                'breakend' => $forcedbreakend,
+            ]
+        );
         // Return forced break info page.
-        redirect($context['breakinfourl']);
+        redirect($breakinfourl);
     }
 
     /**
@@ -74,7 +93,7 @@ final class checkbreak extends preselect_task implements wb_middleware {
         return [
             'breakduration',
             'breakinfourl',
-            'timetotriggerbreak'
+            'maxtimeperquestion'
         ];
     }
 }

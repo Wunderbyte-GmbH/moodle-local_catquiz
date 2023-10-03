@@ -29,6 +29,13 @@ use renderable;
  */
 class breakinfo implements renderable, templatable {
 
+    public int $cmid;
+    public int $breakend;
+    public function __construct(int $cmid, int $breakend) {
+        $this->cmid = $cmid;
+        $this->breakend = $breakend;
+    }
+
     /**
      * Return the breakinfo for the template.
      *
@@ -38,6 +45,9 @@ class breakinfo implements renderable, templatable {
      *
      */
     public function export_for_template(\renderer_base $output): array {
-        return [];
+        return [
+            'cmid' => $this->cmid,
+            'breakend' => date('H:i:s', $this->breakend),
+        ];
     }
 }
