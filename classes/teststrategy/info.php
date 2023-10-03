@@ -183,6 +183,20 @@ class info {
             ]
         );
 
+        $elements[] = $mform->addElement(
+            'text',
+            'catquiz_maxtimeperquestion',
+            get_string('maxtimeperquestion', 'local_catquiz')
+        );
+        $mform->setDefault('catquiz_maxtimeperquestion', 60);
+        $mform->addHelpButton('catquiz_maxtimeperquestion', 'maxtimeperquestion', 'local_catquiz');
+        $elements[] = $mform->addElement(
+            'text',
+            'catquiz_breakduration',
+            get_string('breakduration', 'local_catquiz')
+        );
+        $mform->setDefault('catquiz_breakduration', 300);
+
         feedback::instance_form_definition($mform, $elements);
     }
 
