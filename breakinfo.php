@@ -35,9 +35,11 @@ $PAGE->set_url(new moodle_url('/local/catquiz/breakinfo.php', []));
 $title = 'TODO translate breakinfo';
 $PAGE->set_title($title);
 $PAGE->set_heading($title);
+$cmid = required_param('cmid', PARAM_INT);
+$breakend = required_param('breakend', PARAM_INT);
 
 echo $OUTPUT->header();
-$breakinfo = new breakinfo();
+$breakinfo = new breakinfo($cmid, $breakend);
 $data = $breakinfo->export_for_template($OUTPUT);
 echo $OUTPUT->render_from_template('local_catquiz/breakinfo', $data);
 echo $OUTPUT->footer();
