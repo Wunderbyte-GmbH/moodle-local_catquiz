@@ -29,6 +29,7 @@ use local_catquiz\teststrategy\feedbackgenerator\debuginfo;
 use local_catquiz\teststrategy\feedbackgenerator\personabilities;
 use local_catquiz\teststrategy\feedbackgenerator\pilotquestions;
 use local_catquiz\teststrategy\feedbackgenerator\questionssummary;
+use local_catquiz\teststrategy\preselect_task\checkbreak;
 use local_catquiz\teststrategy\preselect_task\lasttimeplayedpenalty;
 use local_catquiz\teststrategy\preselect_task\maximumquestionscheck;
 use local_catquiz\teststrategy\preselect_task\maybe_return_pilot;
@@ -63,6 +64,7 @@ class teststrategy_balanced extends strategy {
     public function get_preselecttasks(): array {
         return [
             maximumquestionscheck::class,
+            checkbreak::class, // Maybe force user to take a break.
             updatepersonability::class,
             mayberemovescale::class,
             noremainingquestions::class,

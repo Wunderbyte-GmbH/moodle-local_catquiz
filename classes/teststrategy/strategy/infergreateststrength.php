@@ -30,6 +30,7 @@ use local_catquiz\teststrategy\feedbackgenerator\debuginfo;
 use local_catquiz\teststrategy\feedbackgenerator\personabilities;
 use local_catquiz\teststrategy\feedbackgenerator\pilotquestions;
 use local_catquiz\teststrategy\feedbackgenerator\questionssummary;
+use local_catquiz\teststrategy\preselect_task\checkbreak;
 use local_catquiz\teststrategy\preselect_task\filterforsubscale;
 use local_catquiz\teststrategy\preselect_task\firstquestionselector;
 use local_catquiz\teststrategy\preselect_task\fisherinformation;
@@ -70,6 +71,7 @@ class infergreateststrength extends strategy {
     public function get_preselecttasks(): array {
         return [
             maximumquestionscheck::class, // Cancel quiz attempt if we reached maximum of questions.
+            checkbreak::class, // Maybe force user to take a break.
             updatepersonability::class,
             removeplayedquestions::class,
             noremainingquestions::class,
