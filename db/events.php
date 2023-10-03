@@ -25,30 +25,30 @@
 
  defined('MOODLE_INTERNAL') || die();
 
- $observers = array(
-    array(
+ $observers = [
+    [
         'eventname' => '*',
         'callback' => 'local_catquiz_observer::purge_event_cache'
-    ),
-     array(
+        ],
+    [
          'eventname' => '\local_catquiz\event\catscale_updated',
          'callback' => 'local_catquiz_observer::catscale_updated'
-     ),
-     array(
+        ],
+    [
          'eventname' => '\mod_adaptivequiz\event\attempt_completed',
          'callback' => 'local_catquiz_observer::attempt_completed'
-     ),
-     array(
+        ],
+     [
         'eventname' => '\local_catquiz\event\testiteminscale_added',
         'callback' => 'local_catquiz_observer::testiteminscale_added'
-    ),
-    array(
+        ],
+    [
         'eventname' => '\core\event\question_deleted',
         'callback' => 'local_catquiz_observer::question_deleted'
-    ),
-    array(
+        ],
+    [
         'eventname' => '\local_catquiz\event\testitem_imported',
         'callback' => 'local_catquiz_observer::testitem_imported'
-    ),
+    ],
 
- );
+];
