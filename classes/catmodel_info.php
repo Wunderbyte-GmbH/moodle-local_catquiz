@@ -100,6 +100,9 @@ class catmodel_info {
      */
     public function update_params($contextid, $catscaleid, $userid = 0) {
         $context = catcontext::load_from_db($contextid);
+        if (! $this->needs_update($context, $catscaleid)) {
+            return;
+        }
         $strategy = $context->get_strategy($catscaleid);
         list($itemdifficulties, $personabilities) = $strategy->run_estimation();
         $updatedmodels = [];
@@ -111,6 +114,9 @@ class catmodel_info {
             $model = get_string('pluginname', 'catmodel_'.$modelname);
             $updatedmodels[$model] = $itemcounter;
         }
+        // One item might have been recalculated by different models. We just
+        // want to know the total number of items.
+        $itemcounter = count(array_unique($updateditems));
 
         $updatedmodelsjson = json_encode($updatedmodels);
         // Trigger event.
@@ -128,5 +134,26 @@ class catmodel_info {
 
         $personabilities->save_to_db($contextid, $catscaleid);
         $context->save_or_update((object)['timecalculated' => time()]);
+    }
+
+    /**
+     * Checks if there are new responses to the questions associated with a CAT
+     * context and a CAT scale.
+     * 
+     * @param mixed $context 
+     * @param mixed $catscaleid 
+     * @return bool 
+     */
+    public function needs_update(catcontext $context, int $catscaleid) {
+        global $DB;
+        $subscales = catscale::get_subscale_ids($catscaleid);
+        [$sql, $params] = catquiz::get_sql_for_new_responses(
+            $context->id,
+            [$catscaleid, ...$subscales],
+            $context->gettimecalculated()
+        );
+        $newresponses = intval(($DB->get_record_sql($sql, $params))->count);
+
+        return $newresponses > 0;
     }
 }

@@ -537,6 +537,48 @@ class catquiz {
     }
 
     /**
+     * Returns the SQL to retrieve the number of new responses.
+     *
+     * Returns the number of new responses since $lastcalclation for a CAT
+     * context and a list of CAT scales.
+     *
+     * @param int $contextid
+     * @param array<int> $catscaleids
+     * @param int $lastcalculation
+     * @return array
+     */
+    public static function get_sql_for_new_responses(int $contextid, array $catscaleids, int $lastcalculation) {
+        global $DB;
+        [$insql, $inparams] = $DB->get_in_or_equal(
+            $catscaleids,
+            SQL_PARAMS_NAMED,
+            'incatscales'
+        );
+        list (, $from, $where, $params) = self::get_sql_for_stat_base_request([], [$contextid]);
+
+        $sql = "
+        SELECT COUNT(*)
+        FROM $from
+        JOIN {question} q
+            ON qa.questionid = q.id
+        JOIN {local_catquiz_items} lci
+            ON q.id = lci.componentid
+            AND lci.catscaleid $insql
+        WHERE $where
+        AND qas.timecreated >= :lastcalculation
+        ";
+
+        return [
+            $sql,
+            array_merge(
+                $inparams,
+                $params,
+                ['lastcalculation' => $lastcalculation]
+            ),
+        ];
+    }
+
+    /**
      * Return the sql for all questions answered.
      *
      * @param array $testitemids
