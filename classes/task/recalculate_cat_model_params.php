@@ -70,6 +70,9 @@ class recalculate_cat_model_params extends \core\task\scheduled_task {
         $cmi = new catmodel_info();
         foreach ($contexts as $context) {
             foreach ($catscales as $catscale) {
+                if (! $cmi->needs_update($context, $catscale->id)) {
+                    continue;
+                }
                 $cmi->update_params($context->id, $catscale->id);
             }
         }

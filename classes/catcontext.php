@@ -502,4 +502,12 @@ class catcontext {
         // If no record was found, return false.
         return false;
     }
+
+    /**
+     * Returns the time when the items of this context have last been updated.
+     * @return int
+     */
+    public function gettimecalculated(): int {
+        return $this->timecalculated;
+    }
 }
