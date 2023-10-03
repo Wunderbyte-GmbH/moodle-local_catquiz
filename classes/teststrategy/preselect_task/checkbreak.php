@@ -52,13 +52,7 @@ final class checkbreak extends preselect_task implements wb_middleware {
                 $cache->set('forcedbreakend', false);
                 return $next($context);
             } else {
-                $breakinfourl = new moodle_url(
-                    $context['breakinfourl'],
-                    [
-                        'cmid' => $_REQUEST['cmid'],
-                        'breakend' => $forcedbreakend,
-                    ]
-                );
+                $breakinfourl = $this->get_breakinfourl($context, $forcedbreakend);
                 redirect($breakinfourl);
             }
         }
@@ -72,14 +66,8 @@ final class checkbreak extends preselect_task implements wb_middleware {
         $context['lastquestion'] = null; // Do not count the last answer.
         $forcedbreakend = $now + $context['breakduration'];
         $cache->set('forcedbreakend', $forcedbreakend);
-        $breakinfourl = new moodle_url(
-            $context['breakinfourl'],
-            [
-                'cmid' => $_REQUEST['cmid'],
-                'breakend' => $forcedbreakend,
-            ]
-        );
-        // Return forced break info page.
+        $breakinfourl = $this->get_breakinfourl($context, $forcedbreakend);
+       // Return forced break info page.
         redirect($breakinfourl);
     }
 
@@ -95,5 +83,15 @@ final class checkbreak extends preselect_task implements wb_middleware {
             'breakinfourl',
             'maxtimeperquestion'
         ];
+    }
+
+    private function get_breakinfourl($context, $forcedbreakend) {
+        return new moodle_url(
+            $context['breakinfourl'],
+            [
+                'cmid' => $_REQUEST['cmid'],
+                'breakend' => usertime($forcedbreakend),
+            ]
+        );
     }
 }

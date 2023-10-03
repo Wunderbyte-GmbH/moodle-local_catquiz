@@ -32,7 +32,7 @@ $PAGE->set_url('/local/catquiz/breakinfo.php');
 require_login();
 $PAGE->set_url(new moodle_url('/local/catquiz/breakinfo.php', []));
 
-$title = 'TODO translate breakinfo';
+$title = get_string('breakinfo_title', 'local_catquiz');
 $PAGE->set_title($title);
 $PAGE->set_heading($title);
 $cmid = required_param('cmid', PARAM_INT);
