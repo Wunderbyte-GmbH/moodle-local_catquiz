@@ -103,6 +103,10 @@ $string['startwithmostdifficultsecondquartil'] = "Start with the most difficult 
 $string['startwithaverageabilityoftest'] = "Use the average person ability of the current test";
 $string['startwithcurrentability'] = "Use the person's current ability to determine the first question";
 
+$string['maxtimeperquestion'] = "Maximum time per question in seconds";
+$string['maxtimeperquestion_help'] = "If the user takes longer to answer a question, a break will be enforced";
+$string['breakduration'] = "Duration of a forced break in seconds";
+
 // Tests environment.
 $string['newcustomtest'] = 'Custom test';
 $string['lang'] = 'Language';

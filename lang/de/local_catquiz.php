@@ -101,6 +101,9 @@ $string['startwithfirstofsecondquartil'] = "Starte mit der leichtesten Frage aus
 $string['startwithmostdifficultsecondquartil'] = "Starte mit der schwierigsten Frage aus dem zweiten Quartil";
 $string['startwithaverageabilityoftest'] = "Personenparamter entspricht Mittelwert der bisher im Test gemessenen Population";
 $string['startwithcurrentability'] = "Personenparameter aus vorherigem Testlauf nutzen";
+$string['maxtimeperquestion'] = "Erlaube Zeit pro Frage in Sekunden";
+$string['maxtimeperquestion_help'] = "Falls die Beantwortung einer Frage länger dauert, wird eine Pause erzwungen";
+$string['breakduration'] = "Dauer der Pause in Sekunden";
 
 // Tests environment.
 $string['newcustomtest'] = 'Benutzerdefinierter Test';

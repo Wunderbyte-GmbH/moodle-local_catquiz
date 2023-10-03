@@ -564,9 +564,9 @@ class catquiz_handler {
             'updateabilityfallback' => false,
             'excludedsubscales' => [],
             'has_fisherinformation' => false,
-            'breakduration' => 600, // TODO: set via quizsettings.
-            'breakinfourl' => '/local/catquiz/breakinfo.php', // TODO: set via quizsettings
-            'timetotriggerbreak' => 120, // TODO: set via quizsettings.
+            'breakduration' => $quizsettings->catquiz_breakduration,
+            'breakinfourl' => '/local/catquiz/breakinfo.php',
+            'maxtimeperquestion' => $quizsettings->catquiz_maxtimeperquestion,
         ];
         return $contextcreator->load(
             [
