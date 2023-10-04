@@ -23,6 +23,7 @@
 
 namespace local_catquiz\event;
 
+use local_catquiz\catquiz;
 use local_catquiz\catscale;
 use moodle_url;
 
@@ -75,10 +76,36 @@ class calculation_executed extends \core\event\base {
         $catscalename = $catscale->name;
         $data['catscalename'] = $catscalename;
 
-        foreach ($otherarray as $key => $value) {
-            $data[$key] = $value;
+        // Handle the counter for items updated
+        // We get a json array from the event.
+        $updatedmodels = json_decode($otherarray->updatedmodelsjson);
+        $updatedmodelstring = '';
+        foreach ($updatedmodels as $modelname => $questioncount) {
+            if (intval($questioncount) > 0) {
+                // We generate a string with the modelnames and number of items calculated.
+                $updatedmodelstring .= $modelname . ': ' . $questioncount . ', ';
+            }
+        }
+        // Find the position of the last comma.
+        $lastCommaPosition = strrpos($updatedmodelstring, ',');
+
+        if ($lastCommaPosition !== false) {
+            // Replace the last comma with a period.
+            $updatedmodelstring = substr_replace($updatedmodelstring, '.', $lastCommaPosition, 1);
+        }
+        $data['updatedmodels'] = $updatedmodelstring;
+
+        // Find the username corresponding to the ID for display.
+        if ($otherarray->userid != 0) {
+            $user = catquiz::get_user_by_id($otherarray->userid);
+            $data['user'] = $user->firstname . " " . $user->lastname;
+        } else {
+            $data['user'] = get_string('automaticallygeneratedbycron', 'local_catquiz');
         }
 
+        foreach($otherarray as $key => $value) {
+            $data[$key] = $value;
+        }
         return get_string('executed_calculation_description', 'local_catquiz', $data);
     }
 

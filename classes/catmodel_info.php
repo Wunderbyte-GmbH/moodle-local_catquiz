@@ -102,13 +102,17 @@ class catmodel_info {
         $context = catcontext::load_from_db($contextid);
         $strategy = $context->get_strategy($catscaleid);
         list($itemdifficulties, $personabilities) = $strategy->run_estimation();
-        $itemcounter = 0;
-        /** @var model_item_param_list $itemparamlist */
-        foreach ($itemdifficulties as $itemparamlist) {
+        $updatedmodels = [];
+		/** @var model_item_param_list $itemparamlist */
+        foreach ($itemdifficulties as $modelname => $itemparamlist) {
+            $itemcounter = 0;
             $itemparamlist->save_to_db($contextid);
             $itemcounter += count($itemparamlist->itemparams);
+            $model = get_string('pluginname', 'catmodel_'.$modelname);
+            $updatedmodels[$model] = $itemcounter;
         }
 
+        $updatedmodelsjson = json_encode($updatedmodels);
         // Trigger event.
         $event = calculation_executed::create([
             'context' => \context_system::instance(),
@@ -117,8 +121,8 @@ class catmodel_info {
                 'catscaleid' => $catscaleid,
                 'contextid' => $contextid,
                 'userid' => $userid,
-                'numberofitems' => $itemcounter,
-            ],
+                'updatedmodelsjson' => $updatedmodelsjson,
+            ]
         ]);
         $event->trigger();
 
