@@ -82,7 +82,7 @@ class model_person_param implements \ArrayAccess {
         return in_array($offset, $this->params);
     }
 
-    public function offsetGet($offset) {
+    public function offsetGet($offset): mixed {
         if (! $this->offsetExists($offset)) {
             return null;
         }
