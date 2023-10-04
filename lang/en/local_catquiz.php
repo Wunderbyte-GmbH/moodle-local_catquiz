@@ -431,6 +431,7 @@ $string['close'] = 'Close';
 
 // Shortcodes.
 $string['shortcodeslistofquizattempts'] = 'Returns a table of quiz attempts.';
+$string['catquizfeedback'] = 'Returns an overview of the last quiz attempts.';
 $string['shortcodescatquizfeedback'] = 'Display feedback for quiz attempts';
 
 // Validation.
