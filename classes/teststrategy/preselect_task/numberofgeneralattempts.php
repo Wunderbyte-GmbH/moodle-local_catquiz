@@ -42,13 +42,6 @@ use local_catquiz\wb_middleware;
 final class numberofgeneralattempts extends preselect_task implements wb_middleware {
 
     /**
-     * PROPERTYNAME
-     *
-     * @var string
-     */
-    const PROPERTYNAME = 'numberofgeneralattempts';
-
-    /**
      * Run preselect task.
      *
      * @param array $context
@@ -72,7 +65,7 @@ final class numberofgeneralattempts extends preselect_task implements wb_middlew
             if ($attempts > $maxattempts) {
                 $maxattempts = $attempts;
             }
-            $question->{self::PROPERTYNAME} = $attempts;
+            $question->numberofgeneralattempts = $attempts;
         }
         $context['generalnumberofattempts_max'] = $maxattempts;
 

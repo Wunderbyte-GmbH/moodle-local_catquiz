@@ -51,7 +51,7 @@ final class strategybalancedscore extends preselect_task implements wb_middlewar
             $lasttimeplayedpenaltyweighted = (1 - (
                $question->lasttimeplayedpenalty / $context['penalty_threshold']));
             $numberofgeneralattemptspenaltyweighted = (1 - (
-                $question->{numberofgeneralattempts::PROPERTYNAME} / $context['generalnumberofattempts_max']));
+                $question->numberofgeneralattempts / $context['generalnumberofattempts_max']));
             $question->score = $numberofgeneralattemptspenaltyweighted * $lasttimeplayedpenaltyweighted;
         }
 
