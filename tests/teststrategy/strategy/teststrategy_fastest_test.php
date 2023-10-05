@@ -25,20 +25,43 @@
 
 namespace local_catquiz;
 
-use basic_testcase;
+use advanced_testcase;
 use cache;
+use local_catquiz\data\catscale_structure;
+use local_catquiz\data\dataapi;
 use local_catquiz\importer\testitemimporter;
 use local_catquiz\local\result;
 use local_catquiz\teststrategy\strategy\teststrategy_fastest;
 use PHPUnit\Framework\ExpectationFailedException;
+use qformat_xml;
 use SebastianBergmann\RecursionContext\InvalidArgumentException;
 
 /**
  * @package local_catquiz
  * @covers \local_catquiz\teststrategy\strategy\teststrategy_fastest
  */
-class teststrategy_fastest_test extends basic_testcase
+class teststrategy_fastest_test extends advanced_testcase
 {
+
+    public function setUp(): void {
+        global $DB;
+        $this->resetAfterTest(true);
+
+        // Import questions.
+        $this->setAdminUser();
+        $course = $this->getDataGenerator()->create_course();
+        $qformat = $this->create_qformat('questions_la.xml', $course);
+        $imported = $qformat->importprocess();
+        $this->assertTrue($imported);
+
+        // Add imported questions to a new CAT scale.
+        $catscaleid = $this->create_catscale();
+        foreach ($qformat->questionids as $qid) {
+            catscale::add_or_update_testitem_to_scale($catscaleid, $qid);
+        }
+
+        $this->import_itemparams();
+    }
 
     /**
      * Test it can be instantiated
@@ -131,20 +154,64 @@ class teststrategy_fastest_test extends basic_testcase
         ];
     }
 
-    public function test_import() {
-        global $DB;
+    private function import_itemparams() {
         $importer = new testitemimporter();
-        $content = file_get_contents(__DIR__ . '/../../fixtures/params_import.csv');
-        $importresult = $importer->execute_testitems_csv_import(
+        $content = file_get_contents(__DIR__ . '/../../fixtures/params_la.csv');
+        $importer->execute_testitems_csv_import(
             (object) [
-                'delimiter_name' => null,
+                'delimiter_name' => 'semicolon',
                 'encoding' => null,
                 'dateparseformat' => null,
             ],
             $content
         );
+    }
 
-        $result = $DB->get_records('local_catquiz_itemparams');
-        $this->assertEquals(123, count($result));
+    private function create_catscale() {
+        $catscalestructure = new catscale_structure(
+            [
+                'parentid' => 0,
+                'timemodified' => time(),
+                'timecreated' => time(),
+                'minmaxgroup' => [
+                    'catquiz_minscalevalue' => 0,
+                    'catquiz_maxscalevalue' => 100,
+                ],
+                'name' => 'UnitTestScale',
+
+            ]
+        );
+        $catscaleid = dataapi::create_catscale($catscalestructure);
+        return $catscaleid;
+    }
+
+    /**
+     * NOTE: copied from qformat_xml_import_export_test.php
+     * 
+     * Create object qformat_xml for test.
+     * @param string $filename with name for testing file.
+     * @param \stdClass $course
+     * @return qformat_xml XML question format object.
+     */
+    private function create_qformat($filename, $course) {
+        global $CFG, $DB;
+        require_once($CFG->dirroot . '/question/format/xml/format.php');
+        $qformat = new qformat_xml();
+        $contexts = $DB->get_records('context');
+        $importfile = __DIR__ . '/../../fixtures/' .$filename;
+        $realfilename = $filename;
+        $qformat->setContexts($contexts);
+        $qformat->setCourse($course);
+        $qformat->setFilename($importfile);
+        $qformat->setRealfilename($realfilename);
+        $qformat->setMatchgrades('error');
+        $qformat->setCatfromfile(1);
+        $qformat->setContextfromfile(1);
+        $qformat->setStoponerror(1);
+        $qformat->setCattofile(1);
+        $qformat->setContexttofile(1);
+        $qformat->set_display_progress(false);
+
+        return $qformat;
     }
 }
