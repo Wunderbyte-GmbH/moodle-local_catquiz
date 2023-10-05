@@ -321,6 +321,8 @@ $string['versionchosen'] = 'ausgewählte Versionierung:';
 $string['pleasechoose'] = 'bitte auswählen';
 $string['quizattempts'] = 'Quiz Versuche';
 $string['calculate'] = 'Berechnen';
+$string['noedit'] = 'Editieren beenden';
+$string['undefined'] = 'nicht definiert';
 
 // CAT Manager Questions Table.
 $string['type'] = 'Typ';

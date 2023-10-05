@@ -28,6 +28,7 @@ use core_form\dynamic_form;
 use local_catquiz\catquiz;
 use local_catquiz\event\testitemstatus_updated;
 use local_catquiz\local\model\model_item_param;
+use local_catquiz\local\model\model_item_param_list;
 use local_catquiz\local\model\model_strategy;
 use moodle_url;
 use stdClass;
@@ -58,12 +59,22 @@ class item_model_override_selector extends dynamic_form {
 
         $mform = $this->_form;
         $data = (object) $this->_ajaxformdata;
+
+        if (!empty($data->editing)) {
+            if ($data->editing == "false") {
+                $data->editing = false;
+            } else {
+                $data->editing = true;
+            }
+        }
         $mform->addElement('hidden', 'testitemid');
         $mform->setType('testitemid', PARAM_INT);
         $mform->addElement('hidden', 'contextid');
         $mform->setType('contextid', PARAM_INT);
         $mform->addElement('hidden', 'componentname');
         $mform->setType('componentname', PARAM_TEXT);
+        $mform->addElement('hidden', 'editing', $data->editing ?? false);
+        $mform->setType('editing', PARAM_BOOL);
 
         $models = model_strategy::get_installed_models();
 
@@ -78,14 +89,50 @@ class item_model_override_selector extends dynamic_form {
         foreach (array_keys($models) as $model) {
             $group = [];
             $id = sprintf('override_%s', $model);
-            $select = $mform->createElement('select', sprintf('%s_select', $id), $model, $options, ['multiple' => false]);
-            $difficulty = $mform->createElement('static', sprintf('%s_difficulty', $id), 'mylabel', 'static text');
+            
+            if (!empty($data->editing)) {
+                $select = $mform->createElement('select', sprintf('%s_select', $id), $model, $options, ['multiple' => false]);
+            } else {
+                $select = $mform->createElement('static', sprintf('%s_select', $id), $model, $options, ['multiple' => false]);
+            }
+
             $group[] = $select;
-            $group[] = $difficulty;
+            $this->add_element_to_group('difficulty', $id, $group, $mform, $data->editing ?? false);
+            $this->add_element_to_group('discrimination', $id, $group, $mform, $data->editing ?? false);
+            $this->add_element_to_group('guessing', $id, $group, $mform, $data->editing ?? false);
             $mform->addGroup($group, $id, get_string('pluginname', sprintf('catmodel_%s', $model)),
             );
         }
+
+        if (!empty($data->editing)) {
+            $mform->registerNoSubmitButton('noedititemparams');
+            $mform->addElement('submit', 'noedititemparams', get_string('noedit', 'local_catquiz'),
+             ['data-action' => 'edititemparams']);
+
+            $mform->registerNoSubmitButton('saveitemparams');
+            $mform->addElement('submit', 'saveitemparams', get_string('save'),
+              ['data-action' => 'saveitemparams']);
+        } else {
+            $mform->registerNoSubmitButton('edititemparams');
+            $mform->addElement('submit', 'edititemparams', get_string('edit'),
+             ['data-action' => 'edititemparams']);
+        }
+
         $mform->disable_form_change_checker();
+    }
+
+    private function add_element_to_group(string $name, string $id, array &$group, &$mform, bool $editing = false) {
+
+        $type = ($editing) ? 'text' : 'static';
+
+        $label = $mform->createElement('static', sprintf('%s_%slabel', $id, $name), 'mylabel', 'static text');
+        $value = $mform->createElement($type, sprintf('%s_%s', $id, $name), 'mylabel', 'static text');
+        if ($editing) {
+            $value->setType(sprintf('%s_%s', $id, $name), PARAM_FLOAT);
+        };
+        $group[] = $label;
+        $group[] = $value;
+
     }
 
     /**
@@ -109,6 +156,13 @@ class item_model_override_selector extends dynamic_form {
     public function process_dynamic_submission(): object {
         global $DB;
         $data = $this->get_data();
+        if (!empty($data->editing)) {
+            if ($data->editing == "false") {
+                $data->editing = false;
+            } else {
+                $data->editing = true;
+            }
+        }
 
         $formitemparams = [];
         $models = model_strategy::get_installed_models();
@@ -232,8 +286,17 @@ class item_model_override_selector extends dynamic_form {
      *     $this->set_data(get_entity($this->_ajaxformdata['cmid']));
      */
     public function set_data_for_dynamic_submission(): void {
+
         $data = (object) $this->_ajaxformdata;
         $models = model_strategy::get_installed_models();
+
+        if (!empty($data->editing)) {
+            if ($data->editing == "false") {
+                $data->editing = false;
+            } else {
+                $data->editing = true;
+            }
+        }
 
         if (empty($data->contextid)) {
             $data->contextid = required_param('contextid', PARAM_INT);
@@ -249,20 +312,53 @@ class item_model_override_selector extends dynamic_form {
                 $modelparams = $itemparamsbymodel[$model];
                 $modelstatus = $modelparams->status;
                 $modeldifficulty = $modelparams->difficulty;
+                $modelguessing = $modelparams->guessing;
+                $modeldiscrimination = $modelparams->discrimination;
                 if (empty($data->componentname)) {
                     $data->componentname = $modelparams->componentname;
                 }
             } else { // Set default data if there are no calculated data for the given model.
                 $modelstatus = STATUS_NOT_CALCULATED;
-                $modeldifficulty = '-';
+                // initial load
+                $modeldifficulty = get_string('undefined', 'local_catquiz');
+                $modelguessing = get_string('undefined', 'local_catquiz');
+                $modeldiscrimination = get_string('undefined', 'local_catquiz');
             }
-            $difficultytext = sprintf(
-                '%s: %s',
-                get_string('itemdifficulty', 'local_catquiz'),
-                $modeldifficulty
-            );
-            $data->$field = [sprintf('%s_select', $field) => $modelstatus, sprintf('%s_difficulty', $field) => $difficultytext];
+            // In editing mode we want to display a string for status.
+            if (empty($data->editing)) {
+                $status = empty($modelparams->status) ? $modelstatus : $modelparams->status;
+                $string = sprintf('itemstatus_%s', $status);
+                $modelstatus = get_string($string, 'local_catquiz');
+            }
+            $difficultytext = 
+                get_string('itemdifficulty', 'local_catquiz') . ":";
+            $guessingtext = 
+                get_string('guessing', 'local_catquiz') . ":";
+            $discriminationtext = 
+                get_string('discrimination', 'local_catquiz') . ":";
+            $data->$field = [
+                sprintf('%s_select', $field) => $modelstatus, 
+                sprintf('%s_difficultylabel', $field) => $difficultytext,
+                sprintf('%s_difficulty', $field) => $modeldifficulty,
+                sprintf('%s_guessinglabel', $field) => $guessingtext,
+                sprintf('%s_guessing', $field) => $modelguessing,
+                sprintf('%s_discriminationlabel', $field) => $discriminationtext,
+                sprintf('%s_discrimination', $field) => $modeldiscrimination,
+            ];
         }
+
+        if (!empty($data->updateitem)) {
+            $item = [];
+            $item['timecreated'] = time();
+            $item['timemodified'] = time();
+        }
+        // Trigger only if param is set via js
+/*         $item = $data;
+        $item->catscaleid = empty($data->catscaleid) ? required_param('catscaleid', PARAM_INT) : $data->catscaleid;
+        $item->timecreated = time();
+        $item->timemodified = time();
+ */
+        //$result = model_item_param_list::save_or_update_testitem_in_db((array)$item);
 
         $this->set_data($data);
     }

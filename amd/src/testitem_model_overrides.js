@@ -23,6 +23,7 @@ import DynamicForm from 'core_form/dynamicform';
 
 const SELECTORS = {
     FORMCONTAINER: '#lcq_model_override_form',
+    NOEDITBUTTON: '[name="noedititemparams"]',
 };
 /**
  * Add event listener to the form
@@ -35,25 +36,29 @@ export const init = () => {
     );
 
     dynamicForm.addEventListener(dynamicForm.events.FORM_SUBMITTED, (e) => {
+
+        // eslint-disable-next-line no-console
+        console.log("form submitted");
         e.preventDefault();
-        window.location.reload();
+        //window.location.reload();
     });
 
-    // If a user changes a model status, submit the form without waiting for the
-    // user to click the submit button
-    dynamicForm.addEventListener('change', (e) => {
-        e.preventDefault();
-        dynamicForm.submitFormAjax();
+    dynamicForm.addEventListener(dynamicForm.events.NOSUBMIT_BUTTON_PRESSED, (e) => {
 
-        // Reload the form with updated data
+        // eslint-disable-next-line no-console
+        console.log(e, e.detail.name);
+
+        let formcontainer = document.querySelector(
+            SELECTORS.FORMCONTAINER);
+        e.preventDefault();
         const searchParams = new URLSearchParams(window.location.search);
-        const params = {
+        //
+        dynamicForm.load({
+            editing: formcontainer.querySelector(SELECTORS.NOEDITBUTTON) ? false : true,
             testitemid: searchParams.get("id"),
             contextid: searchParams.get("contextid"),
-        };
-        // Wait before loading the updated model data
-        setTimeout(() => {
-            dynamicForm.load(params);
-        }, 300);
+            updateitem: (e.detail.name == "saveitemparams") ? 1 : null,
+        });
     });
+
 };
