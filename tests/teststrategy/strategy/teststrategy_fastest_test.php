@@ -27,6 +27,7 @@ namespace local_catquiz;
 
 use basic_testcase;
 use cache;
+use local_catquiz\importer\testitemimporter;
 use local_catquiz\local\result;
 use local_catquiz\teststrategy\strategy\teststrategy_fastest;
 use PHPUnit\Framework\ExpectationFailedException;
@@ -128,5 +129,22 @@ class teststrategy_fastest_test extends basic_testcase
                 ]
             ],
         ];
+    }
+
+    public function test_import() {
+        global $DB;
+        $importer = new testitemimporter();
+        $content = file_get_contents(__DIR__ . '/../../fixtures/params_import.csv');
+        $importresult = $importer->execute_testitems_csv_import(
+            (object) [
+                'delimiter_name' => null,
+                'encoding' => null,
+                'dateparseformat' => null,
+            ],
+            $content
+        );
+
+        $result = $DB->get_records('local_catquiz_itemparams');
+        $this->assertEquals(123, count($result));
     }
 }
