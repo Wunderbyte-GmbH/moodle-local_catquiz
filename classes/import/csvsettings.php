@@ -120,8 +120,8 @@ class csvsettings {
                 $this->columns[$c['name']] = new csvcolumn(
                 $c['name'],
                 !empty($c['localizedname']) ? $c['localizedname'] : $c['name'],
-                null !== $c['mandatory'] ? $c['mandatory'] : null,
-                null !== $c['unique'] ? $c['unique'] : null,
+                array_key_exists('mandatory', $c) ? $c['mandatory'] : null,
+                array_key_exists('unique', $c) ? $c['unique'] : null,
                 !empty($c['type']) ? $c['type'] : null,
                 !empty($c['format']) ? $c['format'] : null,
                 !empty($c['defaultvalue']) ? $c['defaultvalue'] : null,
