@@ -93,7 +93,7 @@ class item_model_override_selector extends dynamic_form {
             if (!empty($data->editing)) {
                 $select = $mform->createElement('select', sprintf('%s_select', $id), $model, $options, ['multiple' => false]);
             } else {
-                $select = $mform->createElement('static', sprintf('%s_select', $id), $model, $options, ['multiple' => false]);
+                $select = $mform->createElement('static', sprintf('%s_select', $id), $model);
             }
 
             $group[] = $select;
@@ -109,9 +109,7 @@ class item_model_override_selector extends dynamic_form {
             $mform->addElement('submit', 'noedititemparams', get_string('noedit', 'local_catquiz'),
              ['data-action' => 'edititemparams']);
 
-            $mform->registerNoSubmitButton('saveitemparams');
-            $mform->addElement('submit', 'saveitemparams', get_string('save'),
-              ['data-action' => 'saveitemparams']);
+            $this->add_action_buttons(false);
         } else {
             $mform->registerNoSubmitButton('edititemparams');
             $mform->addElement('submit', 'edititemparams', get_string('edit'),
@@ -169,7 +167,10 @@ class item_model_override_selector extends dynamic_form {
         foreach (array_keys($models) as $model) {
             $fieldname = sprintf('override_%s', $model);
             $obj = new stdClass;
-            $obj->status = $data->{$fieldname[sprintf('%s_select', $fieldname)]};
+            $obj->status = $data->$fieldname[sprintf('%s_select', $fieldname)];
+            $obj->difficulty = $data->$fieldname[sprintf('%s_difficulty', $fieldname)];
+            $obj->discrimination = $data->$fieldname[sprintf('%s_discrimination', $fieldname)];
+            $obj->guessing = $data->$fieldname[sprintf('%s_guessing', $fieldname)];
             $formitemparams[$model] = $obj;
         }
 
@@ -181,30 +182,41 @@ class item_model_override_selector extends dynamic_form {
         $toupdate = [];
         $toinsert = [];
         foreach (array_keys($models) as $model) {
-            if ($formitemparams[$model]->status === $saveditemparams[$model]->status) {
-                // Status did not change: nothing to do.
+            
+            // Check in each object for each value if there is a change.
+            $change = true;
+            foreach ($formitemparams[$model] as $key => $value) {
+                if ( isset($saveditemparams[$model]) &&
+                    (property_exists($saveditemparams[$model], $key) 
+                    && $saveditemparams[$model]->$key == $value)) {
+                    $change = false;
+                }
+            }
+            if (!$change) {
+                // Nothing changed.
                 continue;
             }
 
-            if (intval($formitemparams[$model]->status) === STATUS_CALCULATED) {
-                continue;
+            // If status is unchanged, change must be within values, so we set the new status to manually confirmed.
+            if ($formitemparams[$model]->status == $saveditemparams[$model]->status) {
+                $formitemparams[$model]->status = STATUS_CONFIRMED_MANUALLY;
             }
 
             if (array_key_exists($model, $saveditemparams)) {
                 $toupdate[] = [
                     'status' => $formitemparams[$model]->status,
                     'id' => $saveditemparams[$model]->id,
+                    'difficulty' => $formitemparams[$model]->difficulty,
+                    'discrimination' => $formitemparams[$model]->discrimination,
+                    'guessing' => $formitemparams[$model]->guessing,
                 ];
             } else {
-                // If this item did not exist in the first place and the item status is set to "not calculated", don't do anything.
-                if (
-                    !array_key_exists($model, $saveditemparams)
-                    && intval($formitemparams[$model]->status) === STATUS_NOT_CALCULATED) {
-                    continue;
-                }
                 $toinsert[] = [
-                    'status' => $formitemparams[$model]->status,
+                    'status' => STATUS_CONFIRMED_MANUALLY,
                     'model' => $model,
+                    'difficulty' => $formitemparams[$model]->difficulty,
+                    'discrimination' => $formitemparams[$model]->discrimination,
+                    'guessing' => $formitemparams[$model]->guessing,
                 ];
             }
 
@@ -320,10 +332,11 @@ class item_model_override_selector extends dynamic_form {
             } else { // Set default data if there are no calculated data for the given model.
                 $modelstatus = STATUS_NOT_CALCULATED;
                 // initial load
-                $modeldifficulty = get_string('undefined', 'local_catquiz');
-                $modelguessing = get_string('undefined', 'local_catquiz');
-                $modeldiscrimination = get_string('undefined', 'local_catquiz');
+                $modeldifficulty = null;
+                $modelguessing = null;
+                $modeldiscrimination = null;
             }
+            $status = $modelstatus;
             // In editing mode we want to display a string for status.
             if (empty($data->editing)) {
                 $status = empty($modelparams->status) ? $modelstatus : $modelparams->status;
@@ -338,6 +351,7 @@ class item_model_override_selector extends dynamic_form {
                 get_string('discrimination', 'local_catquiz') . ":";
             $data->$field = [
                 sprintf('%s_select', $field) => $modelstatus, 
+                sprintf('%s_status', $field) => $status, 
                 sprintf('%s_difficultylabel', $field) => $difficultytext,
                 sprintf('%s_difficulty', $field) => $modeldifficulty,
                 sprintf('%s_guessinglabel', $field) => $guessingtext,
@@ -347,11 +361,13 @@ class item_model_override_selector extends dynamic_form {
             ];
         }
 
-        if (!empty($data->updateitem)) {
+/*         if (!empty($data->updateitem) && $data->updateitem == "true") {
             $item = [];
-            $item['timecreated'] = time();
-            $item['timemodified'] = time();
-        }
+            $this->define_item_for_update('difficulty', $item, $data);
+            $this->define_item_for_update('guessing', $item, $data);
+            $this->define_item_for_update('discrimination', $item, $data);
+
+        } */
         // Trigger only if param is set via js
 /*         $item = $data;
         $item->catscaleid = empty($data->catscaleid) ? required_param('catscaleid', PARAM_INT) : $data->catscaleid;
@@ -362,6 +378,35 @@ class item_model_override_selector extends dynamic_form {
 
         $this->set_data($data);
     }
+
+/*     private function define_item_for_update(string $keyname, array &$item, object $data) {
+        $values = get_object_vars($data);
+            foreach (array_keys($values) as $key) {
+                if (strpos($key, "override_") == 0) {
+                    foreach ($values[$key] as $modellabel => $modelvalue) {
+                        $stringparts = explode("_", $modellabel);
+                        if ($stringparts[2] == $keyname) {
+                            $item[$keyname] = $modelvalue == "undefined" ? null : $modelvalue;
+                        }
+                    }
+                    $item['model'] = $stringparts[1];
+                    $item['timecreated'] = time();
+                    $item['timemodified'] = time();
+                    $item['catscaleid'] = $data->scaleid;
+                    $item['componentname'] = $data->component;
+                    $item['contextid'] = $data->contextid;
+                    $item['componentid'] = $data->testitemid;
+        
+                    $result = model_item_param_list::save_or_update_testitem_in_db($item);
+                }
+            }
+            // foreach array in array_values 
+            // check if override is included, if so, delete override_ to get model_name
+            // check in array_keys delete override_modelname_ and find values of "status", "difficulty", "guessing", "discrimination"
+            // set to $item array and update item
+
+
+    } */
 
     /**
      * Returns form context

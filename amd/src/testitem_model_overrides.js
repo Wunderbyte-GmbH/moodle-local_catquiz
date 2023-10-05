@@ -40,6 +40,17 @@ export const init = () => {
         // eslint-disable-next-line no-console
         console.log("form submitted");
         e.preventDefault();
+        let formcontainer = document.querySelector(
+            SELECTORS.FORMCONTAINER);
+        const searchParams = new URLSearchParams(window.location.search);
+        dynamicForm.load({
+            editing: formcontainer.querySelector(SELECTORS.NOEDITBUTTON) ? false : true,
+            testitemid: searchParams.get("id"),
+            contextid: searchParams.get("contextid"),
+            scaleid: searchParams.get("scaleid"),
+            component: searchParams.get("component"),
+            updateitem: true,
+        });
         //window.location.reload();
     });
 
@@ -57,7 +68,8 @@ export const init = () => {
             editing: formcontainer.querySelector(SELECTORS.NOEDITBUTTON) ? false : true,
             testitemid: searchParams.get("id"),
             contextid: searchParams.get("contextid"),
-            updateitem: (e.detail.name == "saveitemparams") ? 1 : null,
+            scaleid: searchParams.get("scaleid"),
+            component: searchParams.get("component"),
         });
     });
 
