@@ -14,7 +14,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /*
- * @package    local_shopping_cart
+ * @package    local_catquiz
  * @copyright  Wunderbyte GmbH <info@wunderbyte.at>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -26,15 +26,20 @@ const SELECTORS = {
     NOTIFICATION_LIST: '#user-notifications div.alert'
 };
 
-export const showNotification = (message, type) => {
+export const showNotification = (message, type, settimeout = true, timeout = 5000) => {
 
     Notification.addNotification({
         message,
         type
     });
-    setTimeout(() => {
-        let notificationslist = document.querySelectorAll(SELECTORS.NOTIFICATION_LIST);
-        const notificatonelement = notificationslist[notificationslist.length - 1];
-        notificatonelement.remove();
-    }, 5000);
+    if (settimeout) {
+        setTimeout(() => {
+            let notificationslist = document.querySelectorAll(SELECTORS.NOTIFICATION_LIST);
+            const notificatonelement = notificationslist[notificationslist.length - 1];
+            if (notificatonelement == undefined) {
+                return;
+            }
+            notificatonelement.remove();
+        }, timeout);
+    }
 };

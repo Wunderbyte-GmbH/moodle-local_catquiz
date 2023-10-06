@@ -25,9 +25,17 @@
 
 namespace local_catquiz;
 
+use cache;
+use cache_exception;
 use cache_helper;
+use cm_info;
+use coding_exception;
 use context_system;
 use core_plugin_manager;
+use Exception;
+use local_catquiz\local\model\model_strategy;
+use local_catquiz\output\attemptfeedback;
+use local_catquiz\teststrategy\info;
 use moodle_exception;
 use MoodleQuickForm;
 use stdClass;
@@ -67,6 +75,12 @@ class catquiz_handler {
 
         $elements = [];
 
+        // This function is for some architectural reason executed twice.
+        // In order to avoid adding elements twice, we need this exit.
+        if ($mform->elementExists('choosetest')) {
+            return [];
+        }
+
         $pm = core_plugin_manager::instance();
         $models = $pm->get_plugins_of_type('catmodel');
         $modelarray = [];
@@ -97,6 +111,7 @@ class catquiz_handler {
             // If you have the right, you can define this setting as template.
             $elements[] = $mform->addElement('advcheckbox', 'testenvironment_addoredittemplate', get_string('addoredittemplate', 'local_catquiz'));
             $elements[] = $mform->addElement('text', 'testenvironment_name', get_string('name', 'core'));
+            $mform->setType('testenvironment_name', PARAM_TEXT);
             $mform->hideIf('testenvironment_name', 'testenvironment_addoredittemplate', 'eq', 0);
         }
 
@@ -124,7 +139,7 @@ class catquiz_handler {
 
         $catscales = \local_catquiz\data\dataapi::get_all_catscales();
         $options = array(
-            'multiple' => true,
+            'multiple' => false,
             'noselectionstring' => get_string('allareas', 'search'),
         );
 
@@ -134,6 +149,25 @@ class catquiz_handler {
         }
         $elements[] = $mform->addElement('autocomplete', 'catquiz_catcatscales', get_string('catcatscales', 'local_catquiz'), $select, $options);
         $mform->addHelpButton('catquiz_catcatscales', 'catcatscales', 'local_catquiz');
+
+        $catcontexts = \local_catquiz\data\dataapi::get_all_catcontexts();
+        $options = array(
+            'multiple' => false,
+            'noselectionstring' => get_string('defaultcontextname', 'local_catquiz'),
+        );
+
+        $select = [];
+        foreach ($catcontexts as $catcontext) {
+            $select[$catcontext->id] = $catcontext->getName();
+        }
+        $elements[] = $mform->addElement(
+            'autocomplete',
+            'catquiz_catcontext',
+            get_string('selectcatcontext', 'local_catquiz'),
+            $select,
+            $options
+        );
+        $mform->setDefault('catquiz_catcontext',  1);
 
         $elements[] = $mform->addElement('text', 'catquiz_passinglevel', get_string('passinglevel', 'local_catquiz'));
         $mform->addHelpButton('catquiz_passinglevel', 'passinglevel', 'local_catquiz');
@@ -159,9 +193,11 @@ class catquiz_handler {
             3 => get_string('timeoutabortnoresult', 'local_catquiz'),
         ];
          // Choose a model for this instance.
-         $elements[] =  $mform->addElement('select', 'catquiz_actontimeout',
+         $elements[] = $mform->addElement('select', 'catquiz_actontimeout',
             get_string('actontimeout', 'local_catquiz'), $timeoutoptions);
         $mform->hideIf('catquiz_actontimeout', 'catquiz_timepacedtest', 'neq', 1);
+
+        info::instance_form_definition($mform, $elements);
 
         return $elements;
     }
@@ -252,6 +288,9 @@ class catquiz_handler {
 
         $errors = [];
 
+        if (empty($data['maximumquestions'])) {
+            $errors['maximumquestions'] = get_string('valuemustbegreaterzero', 'local_catquiz');
+        }
         // Todo: Make a real validation of necessary fields.
 
         return $errors;
@@ -282,9 +321,11 @@ class catquiz_handler {
     /**
      * Delete settings related to
      *
-     * @param int $id
      * @param string $componentname
+     * @param int $id
+     *
      * @return void
+     *
      */
     public static function delete_settings(string $componentname, int $id) {
         global $DB;
@@ -296,9 +337,11 @@ class catquiz_handler {
      * When called by an external plugin, this must specify its signature.
      * Like "mod_adaptivequiz" and use its own id (not cmid, but instance id).
      *
-     * @param integer $quizid
+     * @param int $quizid
      * @param string $component
+     *
      * @return bool
+     *
      */
     public static function use_catquiz(int $quizid, string $component) {
 
@@ -324,7 +367,7 @@ class catquiz_handler {
         unset($clone->section);
 
         // If there is a new template name.
-        if (!empty($quizdata->testenvironment_name && !empty($quizdata->testenvironment_addoredittemplate))) {
+        if (!empty($quizdata->testenvironment_addoredittemplate) && !empty($quizdata->testenvironment_name)) {
 
             // If we have a template name, we first check if we come from an existing template.
             // Create stdClass with all the values.
@@ -332,6 +375,7 @@ class catquiz_handler {
                 'id' => $quizdata->choosetest, // When a template is selected, we might want to update it.
                 'json' => json_encode($clone),
                 'component' => 'mod_adaptivequiz',
+                'catscaleid' => $clone->catquiz_catcatscales,
             ];
 
             $test = new testenvironment($cattest);
@@ -347,6 +391,8 @@ class catquiz_handler {
             'component' => 'mod_adaptivequiz',
             'json' => json_encode($clone),
             'parentid' => $parentid ?? 0,
+            'catscaleid' => $quizdata->catquiz_catcatscales,
+            'courseid' => $quizdata->course
         ];
 
          // Pass on the values as stdClas.
@@ -382,20 +428,164 @@ class catquiz_handler {
             'testenvironment_addoredittemplate' => '0',
         ];
 
+        $igonorevalues = [
+            'choosetest'
+        ];
+
         foreach ($values as $k => $v) {
 
             if (isset($overridevalues[$k])) {
                 $v = $overridevalues[$k];
             }
 
+            if (in_array($k, $igonorevalues)) {
+                continue;
+            }
+
             if ($mform->elementExists($k)) {
                 $element = $mform->getElement($k);
                 $element->setValue($v);
-                if ($test->status_force()) {
+                if ($test->status_force() && $k !== 'choosetest') {
                     $element->freeze();
                 }
             }
         }
     }
 
+    /**
+     * Returns the ID of the next question
+     *
+     * This is called by adaptive quiz
+     * @param int $cmid // Cmid of quiz instance.
+     * @param string $component // like mod_adaptivequiz
+     * @param stdClass $attemptdata
+     * @return array
+     */
+    public static function fetch_question_id(int $cmid, string $component, stdClass $attemptdata): array {
+
+        $data = (object)['componentid' => $cmid, 'component' => $component];
+
+        $testenvironment = new testenvironment($data);
+
+        $quizsettings = $testenvironment->return_settings();
+        $cache = cache::make('local_catquiz', 'adaptivequizattempt');
+        $cache->set('quizsettings', $quizsettings);
+        $cache->set('attemptdata', $attemptdata);
+
+        $tsinfo = new info();
+        $teststrategy = $tsinfo
+            ->return_active_strategy($quizsettings->catquiz_selectteststrategy)
+            ->set_scale($quizsettings->catquiz_catcatscales)
+            ->set_catcontextid($quizsettings->catquiz_catcontext);
+
+        $selectioncontext = self::get_strategy_selectcontext($quizsettings, $attemptdata);
+        $result = $teststrategy->return_next_testitem($selectioncontext);
+        if (!$result->isOk()) {
+            return [0, $result->getErrorMessage()];
+        }
+
+        $question = $result->unwrap();
+        return [$question->id, ""];
+    }
+
+    /**
+     * Purges the questions cache
+     *
+     * @return void
+     * @throws coding_exception
+     * @throws cache_exception
+     */
+    public static function prepare_attempt_caches() {
+        global $USER;
+        $cache = cache::make('local_catquiz', 'adaptivequizattempt');
+        $cache->purge();
+        $cache->set('isfirstquestionofattempt', true);
+        $cache->set('userresponses', [$USER->id => []]);
+        $cache->set('starttime', time());
+    }
+
+    public static function attemptfeedback(
+        stdClass $adaptivequiz,
+        cm_info $cm,
+        stdClass $attemptrecord): string {
+        global $OUTPUT;
+        $contextid = optional_param('context', 0, PARAM_INT);
+
+        $attemptfeedback = new attemptfeedback($attemptrecord->id, $contextid);
+        $data = $attemptfeedback->export_for_template($OUTPUT);
+
+        return $OUTPUT->render_from_template('local_catquiz/attemptfeedback', $data);
+    }
+
+    /**
+     * Gets data required by the preselect_task middleware classes.
+     *
+     * Don't confuse with the context from local_catquiz_catcontext table.
+     * This context contains data that are required by the preselect_task
+     * middleware classes.
+     *
+     * @param stdClass $quizsettings
+     * @param stdClass $attemptdata
+     */
+    private static function get_strategy_selectcontext(stdClass $quizsettings, stdClass $attemptdata) {
+        global $USER;
+        $contextcreator = info::get_contextcreator();
+
+        if ($quizsettings->catquiz_includepilotquestions) {
+            $pilotratio = floatval($quizsettings->catquiz_pilotratio);
+        }
+
+        $maxquestionsperscale = $quizsettings->catquiz_maxquestionspersubscale;
+        if ($maxquestionsperscale == 0) {
+            $maxquestionsperscale = INF;
+        }
+
+        $initialcontext = [
+            'testid' => intval($attemptdata->instance),
+            'contextid' => intval($quizsettings->catquiz_catcontext),
+            'catscaleid' => $quizsettings->catquiz_catcatscales,
+            'installed_models' => model_strategy::get_installed_models(),
+            // When selecting questions from a scale, also include questions from its subscales.
+            // This option is required by the questions_loader context loader.
+            'includesubscales' => true,
+            'maximumquestions' => intval($quizsettings->maximumquestions),
+            'minimumquestions' => intval($quizsettings->minimumquestions),
+            'penalty_threshold' => 60 * 60 * 24 * 30 - 90, // TODO: make dynamic
+            /*
+                 * After this time, the penalty for a question goes back to 0
+                 * Currently, it is set to 30 days
+                 */
+            'penalty_time_range' => 60 * 60 * 24 * 30,
+            'pilot_ratio' => $pilotratio ?? 0,
+            'pilot_attempts_threshold' => intval($quizsettings->catquiz_pilotattemptsthreshold),
+            'questionsattempted' => intval($attemptdata->questionsattempted),
+            'selectfirstquestion' => $quizsettings->catquiz_selectfirstquestion,
+            'skip_reason' => null,
+            'userid' => $USER->id,
+            'max_attempts_per_scale' => $maxquestionsperscale,
+            'min_attempts_per_scale' => $quizsettings->catquiz_minquestionspersubscale,
+            'teststrategy' => $quizsettings->catquiz_selectteststrategy,
+            'timestamp' => time(),
+            'attemptid' => intval($attemptdata->id),
+            'updateabilityfallback' => false,
+            'excludedsubscales' => [],
+            'has_fisherinformation' => false,
+            'standarderrorpersubscale' => empty($quizsettings->catquiz_standarderrorpersubscale)
+                ? null
+                : ($quizsettings->catquiz_standarderrorpersubscale / 100),            
+            'breakduration' => $quizsettings->catquiz_breakduration,
+            'breakinfourl' => '/local/catquiz/breakinfo.php',
+            'maxtimeperquestion' => $quizsettings->catquiz_maxtimeperquestion,
+        ];
+        return $contextcreator->load(
+            [
+                'lastquestion',
+                'person_ability',
+                'contextid',
+                'questions',
+                'pilot_questions',
+            ],
+            $initialcontext
+        );
+    }
 }

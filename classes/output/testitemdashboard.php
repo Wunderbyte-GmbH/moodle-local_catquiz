@@ -13,29 +13,28 @@
 //
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
-// This file is part of Moodle - http://moodle.org/
-//
-// Moodle is free software: you can redistribute it and/or modify
-// it under the terms of the GNU General Public License as published by
-// the Free Software Foundation, either version 3 of the License, or
-// (at your option) any later version.
-//
-// Moodle is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-// GNU General Public License for more details.
-//
-// You should have received a copy of the GNU General Public License
-// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 namespace local_catquiz\output;
 
+require_once($CFG->dirroot . '/local/catquiz/lib.php');
+require_once($CFG->libdir . '/questionlib.php');
+
+use coding_exception;
 use context_system;
 use html_writer;
 use local_catquiz\catmodel_info;
 use local_catquiz\catquiz;
+use local_catquiz\form\item_model_override_selector;
+use local_catquiz\local\model\model_item_param;
+use local_catquiz\local\model\model_raschmodel;
+use local_catquiz\local\model\model_strategy;
+use local_catquiz\output\catscalemanager\questions\questiondetailview;
 use local_catquiz\table\testitems_table;
 use moodle_url;
+use qbank_previewquestion\question_preview_options;
+use question_bank;
+use question_display_options;
+use question_engine;
 use templatable;
 use renderable;
 
@@ -53,21 +52,47 @@ class testitemdashboard implements renderable, templatable {
     public int $testitemid = 0;
 
     /**
-     * Either returns one tree or treearray for every parentnode
-     *
-     * @param int $fulltree
-     * @param boolean $allowedit
-     * @return array
+     * @var integer
      */
-    public function __construct(int $testitemid) {
+    private int $contextid = 0;
+
+    /**
+     * @var int
+     */
+    public int $catscaleid;
+
+    /**
+     * @var string
+     */
+    public string $component;
+
+    /**
+     * @var catmodel_info catmodelinfo
+     */
+    private catmodel_info $catmodelinfo;
+
+    /**
+     * Constructor
+     *
+     * @param int $testitemid
+     * @param int $contextid
+     * @param int $catscaleid
+     * @param string $component
+     *
+     */
+    public function __construct(int $testitemid, int $contextid, int $catscaleid, string $component = 'question') {
 
         $this->testitemid = $testitemid;
+        $this->contextid = $contextid;
+        $this->catmodelinfo = new catmodel_info();
+        $this->catscaleid = $catscaleid;
+        $this->component = $component;
     }
 
     /**
      * Render the moodle charts.
      *
-     * @return void
+     * @return array
      */
     private function render_modelcards() {
 
@@ -75,50 +100,46 @@ class testitemdashboard implements renderable, templatable {
 
         $returnarray = [];
 
-        $modelitemparams = catmodel_info::get_item_parameters(0, $this->testitemid);
+        list($modelitemparams) = $this
+            ->catmodelinfo
+            ->get_context_parameters($this->contextid, $this->catscaleid);
 
-        // Example item parameters
+        $chart = new \core\chart_line();
+        $chart->set_smooth(true); // Calling set_smooth() passing true as parameter, will display smooth lines.
 
-        $difficulty = -1.0;
-        $discrimination = 1.0;
+        foreach ($modelitemparams as $modelname => $itemparamlist) {
 
-        // Example person abilities
-        $abilities = [-3.0, -2.0, -1.0, 0.0, 1.0, 2.0, 3.0, 4.0, 5.0, 6.0];
+            $item = $itemparamlist[$this->testitemid];
+            if (! $item) {
+                continue;
+            }
 
-        // Calculate the probability correct for each person ability
-        $probabilities = [];
-        foreach ($abilities as $ability) {
-            $logit = $discrimination * ($ability - $difficulty);
-            $probability = 1 / (1 + exp(-$logit));
-            $probabilities[] = $probability;
-        }
-
-        // Output the datapoints
-        $datapoints = [];
-        for ($i = 0; $i < count($abilities); $i++) {
-            $datapoints[] = $probabilities[$i];
-        }
-
-        foreach ($modelitemparams as $item) {
-
-            $chart = new \core\chart_line();
-            $chart->set_smooth(true); // Calling set_smooth() passing true as parameter, will display smooth lines.
+            $difficulty = $item->get_difficulty();
+            $likelihoods = [];
+            for ($ability = -5; $ability <= 5; $ability += 0.5) {
+                $likelihoods[] = model_raschmodel::likelihood_1pl($ability, $difficulty);
+            }
 
             // Create the graph for difficulty.
-            $series1 = new \core\chart_series(get_string('difficulty', 'local_catquiz'), $datapoints);
-
+            $series1 = new \core\chart_series(
+                sprintf(
+                    '%s: %s',
+                    get_string('pluginname', sprintf('catmodel_%s', $modelname)),
+                    $difficulty
+                ),
+                array_values($likelihoods));
+            $labels = range(-5, 5, 0.5);
             $chart->add_series($series1);
-            $label = ["-3.0", "-2.0", "-1.0", "0.0", "1.0", "2.0", "3.0", "4.0", "5.0", "6.0"];
+            $chart->set_labels($labels);
+            $chart->get_xaxis(0, true)->set_label(get_string('personability', 'local_catquiz'));
 
-            $chart->set_labels($label);
-
-            $body = html_writer::tag('div', $OUTPUT->render($chart), ['dir' => 'ltr']);
-
-            $returnarray[]= [
-                'title' => get_string('pluginname', "catmodel_" . $item['modelname']),
-                'body' => $body,
-            ];
         }
+        $body = html_writer::tag('div', $OUTPUT->render($chart), ['dir' => 'ltr']);
+
+        $returnarray[] = [
+            'title' => get_string('likelihood', 'local_catquiz'),
+            'body' => $body,
+        ];
 
         return $returnarray;
     }
@@ -126,26 +147,26 @@ class testitemdashboard implements renderable, templatable {
     /**
      * Render the moodle charts.
      *
-     * @return void
+     * @return array
      */
-    private function render_testitemstats() {
+    private function get_testitems_stats_data() {
 
         global $DB;
 
-        list ($sql, $params) = catquiz::get_sql_for_questions_answered($this->testitemid);
+        list ($sql, $params) = catquiz::get_sql_for_questions_answered([$this->testitemid], [$this->contextid]);
         $numberofanswers = $DB->count_records_sql($sql, $params);
-        list ($sql, $params) = catquiz::get_sql_for_questions_usages_in_tests($this->testitemid);
+        list ($sql, $params) = catquiz::get_sql_for_questions_usages_in_tests([$this->testitemid], [$this->contextid]);
         $numberofusagesintests = $DB->count_records_sql($sql, $params);
-        list ($sql, $params) = catquiz::get_sql_for_questions_answered_by_distinct_persons($this->testitemid);
+        list ($sql, $params) = catquiz::get_sql_for_questions_answered_by_distinct_persons([$this->testitemid], [$this->contextid]);
         $numberofpersonsanswered = $DB->count_records_sql($sql, $params);
-        list ($sql, $params) = catquiz::get_sql_for_questions_answered_correct($this->testitemid);
+        list ($sql, $params) = catquiz::get_sql_for_questions_answered_correct([$this->testitemid], [$this->contextid]);
         $numberofanswerscorrect = $DB->count_records_sql($sql, $params);
-        list ($sql, $params) = catquiz::get_sql_for_questions_answered_incorrect($this->testitemid);
+        list ($sql, $params) = catquiz::get_sql_for_questions_answered_incorrect([$this->testitemid], [$this->contextid]);
         $numberofanswersincorrect = $DB->count_records_sql($sql, $params);
-        list ($sql, $params) = catquiz::get_sql_for_questions_answered_partlycorrect($this->testitemid);
+        list ($sql, $params) = catquiz::get_sql_for_questions_answered_partlycorrect([$this->testitemid], [$this->contextid]);
         $numberofanswerspartlycorrect = $DB->count_records_sql($sql, $params);
-        list ($sql, $params) = catquiz::get_sql_for_questions_average($this->testitemid);
-        $averageofallanswers = $DB->get_field_sql($sql, $params);
+        list ($sql, $params) = catquiz::get_sql_for_questions_average([$this->testitemid], [$this->contextid]);
+        $averageofallanswers = $DB->get_field_sql($sql, $params) ?: get_string('notavailable', 'core');
 
         return [
             [
@@ -180,17 +201,121 @@ class testitemdashboard implements renderable, templatable {
     }
 
     /**
-     * Return the item tree of all catscales.
+     * Renders overrides form.
+     *
+     * @return string
+     *
+     */
+    private function render_overrides_form() {
+        $form = new item_model_override_selector();
+        $form->set_data_for_dynamic_submission();
+        return html_writer::div($form->render(), '', ['id' => 'lcq_model_override_form']);
+    }
+
+    /**
+     * Renders context selector.
+     *
+     * @return string
+     *
+     */
+    private function render_contextselector() {
+        $form = new \local_catquiz\form\contextselector(null, null, 'post', '', [], true, ['contextid' => $this->contextid]);
+        // Set the form data with the same method that is called when loaded from JS.
+        // It should correctly set the data for the supplied arguments.
+        $form->set_data_for_dynamic_submission();
+        // Render the form in a specific container, there should be nothing else in the same container.
+        return html_writer::div($form->render(), '', ['id' => 'lcq_select_context_form']);
+    }
+
+    /**
+     * Gets item status.
+     *
+     * @return string
+     * @throws coding_exception
+     */
+    private function get_itemstatus() {
+        global $DB;
+        list ($sql, $params) = catquiz::get_sql_for_max_status_for_item($this->testitemid, $this->contextid);
+        $maxstatus = intval($DB->get_field_sql($sql, $params));
+        switch ($maxstatus) {
+            case STATUS_EXCLUDED_MANUALLY:
+                return get_string('itemstatus_-5', 'local_catquiz');
+            case STATUS_NOT_CALCULATED:
+                return get_string('itemstatus_0', 'local_catquiz');
+            case STATUS_CALCULATED:
+                return get_string('itemstatus_1', 'local_catquiz');
+            case STATUS_CONFIRMED_MANUALLY:
+                return get_string('itemstatus_5', 'local_catquiz');
+            case STATUS_UPDATED_MANUALLY:
+                return get_string('itemstatus_4', 'local_catquiz');
+            default:
+                return get_string('notavailable', 'core');
+        }
+    }
+    /**
+     * Check if we display a table or a detailview of a specific item.
+     */
+    private function get_questiondetailview_data() {
+
+        $questiondetailview = new questiondetailview($this->testitemid, $this->contextid, $this->catscaleid, $this->component);
+        return $questiondetailview->renderdata();
+    }
+
+    /**
+     * Renders button to get back to testitem overview table.
+     *
+     * @return string
+     *
+     */
+    private function get_back_to_table_button() {
+
+        $label = get_string('backtotable', 'local_catquiz');
+
+        return [
+            'label' => $label,
+            'type' => 'button',
+            'class' => "btn-link",
+        ];
+    }
+
+    /**
+     * Export for template.
+     *
+     * @param \renderer_base $output
+     *
      * @return array
+     *
      */
     public function export_for_template(\renderer_base $output): array {
 
         $url = new moodle_url('/local/catquiz/manage_catscales.php');
 
-        return [
+        $data = [
             'returnurl' => $url->out(),
             'models' => $this->render_modelcards(),
-            'statcards' => $this->render_testitemstats(),
+            'statcards' => $this->get_testitems_stats_data(),
+            'contextselector' => $this->render_contextselector(),
+            'overridesforms' => $this->render_overrides_form(),
+            'itemstatus' => $this->get_itemstatus(),
         ];
+        return $data;
+    }
+
+    /**
+     * Return the detail data of one item.
+     * @return array
+     */
+    public function return_as_array(): array {
+
+        $data = [
+            'backtotablelink' => $this->get_back_to_table_button(),
+            'questiondetailview' => $this->get_questiondetailview_data(),
+            'statcards' => $this->get_testitems_stats_data(),
+            // Data for tab_models Template.
+            'overridesforms' => $this->render_overrides_form(),
+            'itemstatus' => $this->get_itemstatus(),
+            'models' => $this->render_modelcards(),
+        ];
+        return $data;
     }
 }

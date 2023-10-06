@@ -21,10 +21,12 @@
     Context variables required for this template:
     Example context (json):
     {
-        'catscalemanagers': [
-            'firstname': 'Maxima',
-            'firstname': 'Yoga',
-            'email': 'maxima@yoga.at',
+        "catscalemanagers": [
+            {
+                "firstname": "Maxima",
+                "firstname": "Yoga",
+                "email": "maxima@yoga.at"
+            }
         ]
     }
 }}
@@ -33,14 +35,11 @@
 {{#catscalemanagers}}
      <li class="list-group-item list-group-item-action">
         <div>
-            <a href="{{link}}">
-                <h5 class="mb-1">
-                    {{firstname}} {{lastname}}
-                </h5>
-            </a>
+            <h5 class="mb-1">
+                {{firstname}} {{lastname}}
+            </h5>
         </div>
         <p class="mb-1">{{email}}</p>
     </li>
 {{/catscalemanagers}}
 </ul>
-

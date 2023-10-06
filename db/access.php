@@ -55,4 +55,19 @@ $capabilities = [
                         'manager' => CAP_ALLOW
                 ]
         ],
+        'local/catquiz:manage_catcontexts' => [
+                'captype' => 'write',
+                'contextlevel' => CONTEXT_SYSTEM,
+                'archetypes' => [
+                        'manager' => CAP_ALLOW
+                ]
+        ],
+        'local/catquiz:view_teacher_feedback' => [
+                'captype' => 'write',
+                'contextlevel' => CONTEXT_SYSTEM,
+                'archetypes' => [
+                        'manager' => CAP_ALLOW,
+                        'teacher' => CAP_ALLOW,
+                ]
+        ],
 ];

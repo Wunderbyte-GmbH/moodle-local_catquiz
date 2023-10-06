@@ -16,17 +16,33 @@
 
 /**
  * catquiz catscales view page
- * @package    local_catquiz catscales
+ * @package    local_catquiz
  * @copyright  2023 Wunderbyte GmbH
  * @author     David Bogner
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-use local_catquiz\output\catscalemanagers;
-use local_catquiz\output\catscales;
+use local_catquiz\catquiz;
+use local_catquiz\output\catscalemanager\managecatscaledashboard;
 
 require_once('../../config.php');
 
+$catcontextid = optional_param('contextid', 0, PARAM_INT);
+$catscale = optional_param('scaleid', -1, PARAM_INT);
+$scaledetailview = optional_param('sdv', 0, PARAM_INT); // Scale-Detail-View if set to 1, detailview of selected scale will be rendered.
+$usesubs = optional_param('usesubs', 1, PARAM_INT);
+$testitemid = optional_param('id', 0, PARAM_INT); // ID of record to be displayed in detail instead of table.
+$componentname = optional_param('component', 'question', PARAM_TEXT);
+
+if (empty($catcontextid)) {
+    $catcontextid = catquiz::get_default_context_id();
+}
+
+if ($catscale != -1) {
+    $scaledetailview = 1;
+}
+
+global $USER;
 $context = \context_system::instance();
 $PAGE->set_context($context);
 require_login();
@@ -34,18 +50,15 @@ require_capability('local/catquiz:manage_catscales', $context);
 
 $PAGE->set_url(new moodle_url('/local/catquiz/manage_catscales.php', array()));
 
-$title = get_string('pluginname', 'local_catquiz');
+$title = get_string('catmanager', 'local_catquiz');
+
 $PAGE->set_title($title);
 $PAGE->set_heading($title);
 
 echo $OUTPUT->header();
 
-$data = new catscales();
-$catscalemanagers = new catscalemanagers();
-
-echo $OUTPUT->render_from_template('local_catquiz/catscalesdashboard', [
-    'itemtree' => $data->itemtree,
-    'catscalemanagers' => $catscalemanagers->return_as_array(),
-]);
+$managecatscaledashboard = new managecatscaledashboard($testitemid, $catcontextid, $catscale, $scaledetailview, $usesubs, $componentname);
+$data = $managecatscaledashboard->export_for_template($OUTPUT);
+echo $OUTPUT->render_from_template('local_catquiz/catscalemanager/managecatscaledashboard', $data);
 
 echo $OUTPUT->footer();

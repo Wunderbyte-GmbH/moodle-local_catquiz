@@ -15,8 +15,8 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * catquiz catscales view page
- * @package    local_catquiz catscales
+ * catquiz testenvironments view page
+ * @package    local_catquiz
  * @copyright  2023 Wunderbyte GmbH
  * @author     Georg Maißer
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later

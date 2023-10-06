@@ -37,8 +37,18 @@ use external_single_structure;
 use local_catquiz\data\dataapi;
 use local_catquiz\data\catscale_structure;
 
+/**
+ * External Service for local catquiz.
+ *
+ * @package   local_catquiz
+ * @copyright 2022 Wunderbyte GmbH {@link http://www.wunderbyte.at}
+ * @author    Georg Maißer
+ * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
 class manage_catscale extends external_api {
     /**
+     * Describes the parameters for manage_catscale webservice.
+     *
      * @return external_function_parameters
      * @see external_function_parameters
      */
@@ -49,24 +59,35 @@ class manage_catscale extends external_api {
                         'description' => new external_value(PARAM_RAW, 'The description of the catscale', VALUE_REQUIRED),
                         'minscalevalue' => new external_value(PARAM_FLOAT, 'Min scale value', VALUE_REQUIRED),
                         'maxscalevalue' => new external_value(PARAM_FLOAT, 'Max scale value', VALUE_REQUIRED),
+                        'action' => new external_value(PARAM_ALPHA, 'update or create', VALUE_REQUIRED),
                         'parentid' => new external_value(PARAM_INT, 'The parent ID of the catscale', VALUE_OPTIONAL, null),
                         'id' => new external_value(PARAM_INT, 'The id of the catscale', VALUE_OPTIONAL, null),
-                        'action' => new external_value(PARAM_ALPHA, 'update or create', VALUE_REQUIRED),
                 )
         );
     }
 
     /**
-     * Create the catscale
+     * Create the catscale.
      *
-     * @param $name
-     * @param $description
-     * @param $id
-     * @param $action
-     * @param $parentid
+     * @param string $name
+     * @param string $description
+     * @param float $minscalevalue
+     * @param float $maxscalevalue
+     * @param string $action
+     * @param int|null $parentid
+     * @param int|null $id
+     *
      * @return array
      */
-    public static function execute($name, $description, $minscalevalue, $maxscalevalue, $id, $action, $parentid = null): array {
+    public static function execute(
+                                string $name,
+                                string $description,
+                                float $minscalevalue,
+                                float $maxscalevalue,
+                                string $action,
+                                int $parentid = null,
+                                int $id = null
+                                ): array {
 
         $params = self::validate_parameters(self::execute_parameters(), [
                 'name' => $name,

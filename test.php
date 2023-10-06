@@ -67,6 +67,6 @@ if ($subscribed) {
     $data['subscribed'] = 'true';
 }
 
-echo $OUTPUT->render_from_template('local_catquiz/button_subscribe', $data);
+echo $OUTPUT->render_from_template('local_catquiz/buttons/button_subscribe', $data);
 
 echo $OUTPUT->footer();

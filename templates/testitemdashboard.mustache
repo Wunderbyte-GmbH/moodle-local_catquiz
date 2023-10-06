@@ -21,17 +21,34 @@
     Context variables required for this template:
     Example context (json):
     {
+        "returnurl": "",
+        "contextselector": "Contextselector HTML",
+        "overridesforms": "Overrides Forms HTML",
+        "itemstatus": "Item Status",
+        "models": [
+          {
+            "title": "model name",
+            "body": "<div>rendered model stats</div>"
+          }
+        ],
+        "statcards": [
+          {
+            "title": "model name",
+            "body": "<div>rendered model stats</div>"
+          }
+        ]
     }
 }}
-<p>
+<div>
   <a class="btn btn-primary" href="{{{returnurl}}}">{{#str}} managecatscales, local_catquiz {{/str}}</a>
-</p>
+  <div id="testitemdashboard_contextselector">{{{contextselector}}}</div>
+</div>
 <ul class="nav nav-tabs" id="myTab" role="tablist">
   <li class="nav-item">
-    <a class="nav-link active" id="models-tab" data-toggle="tab" href="#models" role="tab" aria-controls="{{#str}} models, local_catquiz {{/str}}" aria-selected="true">{{#str}} models, local_catquiz{{/str}}</a>
+    <a class="nav-link active" id="models-tab" data-toggle="tab" href="#models" role="tab" aria-controls="models" aria-selected="true">{{#str}} models, local_catquiz{{/str}}</a>
   </li>
   <li class="nav-item">
-    <a class="nav-link" id="statistics-tab" data-toggle="tab" href="#statistics" role="tab" aria-controls="{{#str}} statistics, local_catquiz {{/str}}" aria-selected="true">{{#str}} statistics, local_catquiz{{/str}}</a>
+    <a class="nav-link" id="statistics-tab" data-toggle="tab" href="#statistics" role="tab" aria-controls="statistics" aria-selected="true">{{#str}} statistics, local_catquiz{{/str}}</a>
   </li>
 </ul>
 <div class="tab-content" id="myTabContent">
@@ -42,3 +59,9 @@
     {{>local_catquiz/tabs/tab_testitemstats}}
   </div>
 </div>
+
+{{#js}}
+    require(['local_catquiz/contextselector'], function(init) {
+        init.init();
+    });
+{{/js}}

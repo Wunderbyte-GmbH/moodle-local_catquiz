@@ -45,10 +45,12 @@ class messages {
     /**
      * Generic send message function for catquiz.
      *
-     * @param integer $recepientid
+     * @param int $recepientid
      * @param string $messagesubject
-     * @param string $message
+     * @param string $messagetext
+     *
      * @return void
+     *
      */
     public static function send_message(int $recepientid, string $messagesubject, string $messagetext) {
 
@@ -69,7 +71,7 @@ class messages {
         $message->fullmessageformat = FORMAT_PLAIN;
         $message->notification = 1; // Because this is a notification generated from Moodle, not a user-to-user message.
 
-        // Actually send the message
+        // Actually send the message.
         $messageid = message_send($message);
     }
 
@@ -77,7 +79,10 @@ class messages {
      * Notifiy all subscribed users of an update of a catscale.
      *
      * @param stdClass $catscale
+     * @param int $usermodified
+     *
      * @return void
+     *
      */
     public static function catscale_updated(stdClass $catscale, int $usermodified) {
 

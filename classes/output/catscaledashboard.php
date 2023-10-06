@@ -13,28 +13,19 @@
 //
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
-// This file is part of Moodle - http://moodle.org/
-//
-// Moodle is free software: you can redistribute it and/or modify
-// it under the terms of the GNU General Public License as published by
-// the Free Software Foundation, either version 3 of the License, or
-// (at your option) any later version.
-//
-// Moodle is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-// GNU General Public License for more details.
-//
-// You should have received a copy of the GNU General Public License
-// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 namespace local_catquiz\output;
 
 use context_system;
 use html_writer;
+use local_catquiz\catmodel_info;
 use local_catquiz\catquiz;
+use local_catquiz\importer\testitemimporter;
+use local_catquiz\local\model\model_person_param_list;
 use local_catquiz\table\testitems_table;
+use local_catquiz\table\student_stats_table;
 use moodle_url;
+use stdClass;
 use templatable;
 use renderable;
 
@@ -46,213 +37,175 @@ use renderable;
  * @author     Georg Maißer
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class catscaledashboard implements renderable, templatable {
+class catscaledashboard {
 
-    /** @var integer of catscaleid */
+
+    /** @var int of catscaleid */
     public int $catscaleid = 0;
+
+    /** @var int of catcontextid */
+    private int $catcontextid = 0;
+
+    /**
+     * If set to true, we execute the CAT parameter estimation algorithm.
+     *
+     * @var boolean
+     */
+    private bool $triggercalculation;
+
+    /** @var stdClass|bool */
+    private $catscale;
 
     /**
      * Either returns one tree or treearray for every parentnode
      *
-     * @param int $fulltree
-     * @param boolean $allowedit
-     * @return array
+     * @param int $catscaleid
+     * @param int $catcontextid
+     * @param bool $triggercalculation
+     *
      */
-    public function __construct(int $catscaleid) {
+    public function __construct(int $catscaleid, int $catcontextid = 0, bool $triggercalculation = false) {
+        global $DB;
 
         $this->catscaleid = $catscaleid;
+        $this->catcontextid = $catcontextid;
+        $this->triggercalculation = $triggercalculation;
+        $this->catscale = $DB->get_record(
+            'local_catquiz_catscales',
+            ['id' => $catscaleid]
+        );
     }
 
-    private function render_addtestitems_table(int $catscaleid) {
 
-        $table = new testitems_table('addtestitems', $catscaleid);
+    /**
+     * Renders item difficulties.
+     *
+     * @param array $itemlists
+     *
+     * @return array
+     *
+     */
+    private function render_itemdifficulties(array $itemlists) {
 
-        list($select, $from, $where, $filter, $params) = catquiz::return_sql_for_addcatscalequestions($catscaleid);
+        global $OUTPUT;
 
-        $table->set_filter_sql($select, $from, $where, $filter, $params);
+        $charts = [];
+        foreach ($itemlists as $modelname => $itemlist) {
+            $data = $itemlist->get_values(true);
+            // Skip empty charts.
+            if (empty($data)) {
+                continue;
+            }
 
-        $table->define_columns(['idnumber', 'questiontext', 'qtype', 'categoryname', 'action']);
-        $table->define_headers([
-            get_string('label', 'local_catquiz'),
-            get_string('questiontext', 'local_catquiz'),
-            get_string('questiontype', 'local_catquiz'),
-            get_string('questioncategories', 'local_catquiz')
-        ]);
+            $chart = new \core\chart_line();
+            $series = new \core\chart_series('Series 1 (Line)', array_values($data));
+            $chart->set_smooth(true); // Calling set_smooth() passing true as parameter, will display smooth lines.
+            $chart->add_series($series);
+            $chart->set_labels(array_keys($data));
+            $charts[] = ['modelname' => $modelname, 'chart' => html_writer::tag('div', $OUTPUT->render($chart), ['dir' => 'ltr'])];
+        }
 
-        $table->define_filtercolumns(['categoryname' => [
-            'localizedname' => get_string('questioncategories', 'local_catquiz')
-        ], 'qtype' => [
-            'localizedname' => get_string('questiontype', 'local_catquiz'),
-            'ddimageortext' => get_string('pluginname', 'qtype_ddimageortext'),
-            'essay' => get_string('pluginname', 'qtype_essay'),
-            'gapselect' => get_string('pluginname', 'qtype_gapselect'),
-            'multianswer' => get_string('pluginname', 'qtype_multianswer'),
-            'multichoice' => get_string('pluginname', 'qtype_multichoice'),
-            'numerical' => get_string('pluginname', 'qtype_numerical'),
-            'shortanswer' => get_string('pluginname', 'qtype_shortanswer'),
-            'truefalse' => get_string('pluginname', 'qtype_truefalse'),
-        ]]);
-        $table->define_fulltextsearchcolumns(['idnumber', 'name', 'questiontext', 'qtype']);
-        $table->define_sortablecolumns(['idnunber', 'name', 'questiontext', 'qtype']);
-
-        $table->tabletemplate = 'local_wunderbyte_table/twtable_list';
-        $table->define_cache('local_catquiz', 'testitemstable');
-
-        $table->addcheckboxes = true;
-
-        $table->actionbuttons[] = [
-            'label' => get_string('addtestitem', 'local_catquiz'), // Name of your action button.
-            'class' => 'btn btn-success',
-            'href' => '#',
-            'methodname' => 'addtestitem', // The method needs to be added to your child of wunderbyte_table class.
-            'id' => -1, // This makes one Ajax call for all selected item, not one for each.
-            'data' => [ // Will be added eg as data-id = $values->id, so values can be transmitted to the method above.
-                'titlestring' => 'addtestitemtitle',
-                'bodystring' => 'addtestitembody',
-                'submitbuttonstring' => 'addtestitemsubmit',
-                'component' => 'local_catquiz',
-                'labelcolumn' => 'idnumber',
-                'catscaleid' => $catscaleid,
-            ]
-        ];
-
-        $table->pageable(true);
-
-        $table->stickyheader = false;
-        $table->showcountlabel = true;
-        $table->showdownloadbutton = true;
-        $table->showreloadbutton = true;
-
-        return $table->outhtml(10, true);
+        return $charts;
     }
 
     /**
-     * Function to render the testitems attributed to a given catscale.
+     * Render person abilities.
      *
-     * @param integer $catscaleid
+     * @param model_person_param_list $personparams
+     *
      * @return string
+     *
      */
-    private function render_testitems_table(int $catscaleid) {
-
-        $table = new testitems_table('testitems');
-
-        list($select, $from, $where, $filter, $params) = catquiz::return_sql_for_catscalequestions($catscaleid);
-
-        $table->set_filter_sql($select, $from, $where, $filter, $params);
-
-        $table->define_columns(['idnumber', 'questiontext', 'qtype', 'categoryname', 'action']);
-        $table->define_headers([
-            get_string('label', 'local_catquiz'),
-            get_string('questiontext', 'local_catquiz'),
-            get_string('questiontype', 'local_catquiz'),
-            get_string('questioncategories', 'local_catquiz')
-        ]);
-
-        $table->define_filtercolumns(['categoryname' => [
-            'localizedname' => get_string('questioncategories', 'local_catquiz')
-        ], 'qtype' => [
-            'localizedname' => get_string('questiontype', 'local_catquiz'),
-            'ddimageortext' => get_string('pluginname', 'qtype_ddimageortext'),
-            'essay' => get_string('pluginname', 'qtype_essay'),
-            'gapselect' => get_string('pluginname', 'qtype_gapselect'),
-            'multianswer' => get_string('pluginname', 'qtype_multianswer'),
-            'multichoice' => get_string('pluginname', 'qtype_multichoice'),
-            'numerical' => get_string('pluginname', 'qtype_numerical'),
-            'shortanswer' => get_string('pluginname', 'qtype_shortanswer'),
-            'truefalse' => get_string('pluginname', 'qtype_truefalse'),
-        ]]);
-        $table->define_fulltextsearchcolumns(['idnumber', 'name', 'questiontext', 'qtype']);
-        $table->define_sortablecolumns(['idnumber', 'name', 'questiontext', 'qtype']);
-
-        $table->tabletemplate = 'local_wunderbyte_table/twtable_list';
-        $table->define_cache('local_catquiz', 'testitemstable');
-
-        $table->addcheckboxes = true;
-
-        $table->actionbuttons[] = [
-            'label' => get_string('removetestitem', 'local_catquiz'), // Name of your action button.
-            'class' => 'btn btn-danger',
-            'href' => '#',
-            'methodname' => 'removetestitem', // The method needs to be added to your child of wunderbyte_table class.
-            'id' => -1, // This makes one Ajax call for all selected item, not one for each.
-            'data' => [ // Will be added eg as data-id = $values->id, so values can be transmitted to the method above.
-                'titlestring' => 'removetestitemtitle',
-                'bodystring' => 'removetestitembody',
-                'submitbuttonstring' => 'removetestitemsubmit',
-                'component' => 'local_catquiz',
-                'labelcolumn' => 'idnumber',
-                'catscaleid' => $catscaleid,
-            ]
-        ];
-
-        $table->pageable(true);
-
-        $table->stickyheader = false;
-        $table->showcountlabel = true;
-        $table->showdownloadbutton = true;
-        $table->showreloadbutton = true;
-
-        return $table->outhtml(10, true);
-    }
-
-    private function render_differentialitem() {
-
+    private function render_personabilities(model_person_param_list $personparams) {
         global $OUTPUT;
 
+        $data = $personparams->get_values(true);
         $chart = new \core\chart_line();
-        $series1 = new \core\chart_series('Series 1 (Line)', [0.2, 0.3, 0.1, 0.4, 0.5, 0.2, 0.1, 0.3, 0.1, 0.4]);
-        $series2 = new \core\chart_series('Series 2 (Line)', [0.22, 0.35, 0.09, 0.38, 0.4, 0.24, 0.18, 0.31, 0.09, 0.4]);
-        $chart->set_smooth(true); // Calling set_smooth() passing true as parameter, will display smooth lines.
-        $chart->add_series($series1);
-        $chart->add_series($series2);
-        $chart->set_labels(['1', '2', '3', '4', '5', '6', '7', '8', '9', '10']);
-
-        return html_writer::tag('div', $OUTPUT->render($chart), ['dir' => 'ltr']);
-    }
-
-    private function render_statindependence() {
-
-        global $OUTPUT;
-
-        $chart = new \core\chart_line(); // Create a bar chart instance.
-        $series1 = new \core\chart_series('Series 1 (Line)', [1.26, -0.87, 0.39, 2.31, 1.47, -0.53, 0.02, -1.14, 1.29, -0.04]);
-        $series2 = new \core\chart_series('Series 2 (Line)', [0.63, -0.04, -0.42, 1.98, -1.23, 0.53, 0.87, -0.35, -0.64, 0.18]);
-        $series2->set_type(\core\chart_series::TYPE_LINE); // Set the series type to line chart.
-        $chart->add_series($series2);
-        $chart->add_series($series1);
-        $chart->set_labels(['1', '2', '3', '4', '5', '6', '7', '8', '9', '10']);
-
-        return html_writer::tag('div', $OUTPUT->render($chart), ['dir' => 'ltr']);
-    }
-
-    private function render_loglikelihood() {
-
-        global $OUTPUT;
-
-        $chart = new \core\chart_line();
-        $series = new \core\chart_series('Series 1 (Line)', [-1.53, 0.34, 1.21, 2.64, -0.35, -0.02, -0.56, 1.28, 1.26, 0.09, -0.5]);
+        $series = new \core\chart_series('Series 1 (Line)', array_values($data));
         $chart->set_smooth(true); // Calling set_smooth() passing true as parameter, will display smooth lines.
         $chart->add_series($series);
-        $chart->set_labels(["-5", "-4", "-3", "-2", "-1", "0", "1", "2", "3", "4", "5"]);
-
+        $chart->set_labels(array_keys($data));
         return html_writer::tag('div', $OUTPUT->render($chart), ['dir' => 'ltr']);
     }
 
     /**
-     * Return the item tree of all catscales.
-     * @return array
+     * Render file picker
+     *
+     * @return string
+     *
      */
-    public function export_for_template(\renderer_base $output): array {
+    public static function render_testitem_importer() {
 
-        $url = new moodle_url('/local/catquiz/manage_catscales.php');
+        $inputform = new \local_catquiz\form\csvimport(null, null, 'post', '', [], true, testitemimporter::return_ajaxformdata());
+
+        // Set the form data with the same method that is called when loaded from JS.
+        // It should correctly set the data for the supplied arguments.
+        $inputform->set_data_for_dynamic_submission();
+
+        // Render the form in a specific container, there should be nothing else in the same container.
+        return html_writer::div($inputform->render(), '', ['id' => 'lcq_csv_import_form']);
+    }
+
+    /**
+     * Render file picker
+     *
+     * @return string
+     *
+     */
+    public static function render_testitem_demodata() {
+        $title = get_string('importcolumnsinfos', 'local_catquiz');
+        $columnsarray = testitemimporter::export_columns_for_template();
+        $url = new moodle_url('/local/catquiz/classes/importer/demo.csv');
+        return [
+            'title' => $title,
+            'columns' => $columnsarray,
+            'demofileurl' => $url->out(),
+        ];
+    }
+
+    /**
+     * Renders model button
+     *
+     * @param mixed $contextid
+     *
+     * @return string
+     *
+     */
+    private function render_modelbutton($contextid) {
+        $buttontitle = get_string('calculate', 'local_catquiz');
+        return sprintf('<button class="btn btn-primary" type="button" data-contextid="%s" id="model_button">%s</button>',
+                        $contextid, $buttontitle);
+    }
+
+    /**
+     * Exports for template.
+     *
+     * @param \renderer_base $output
+     *
+     * @return array
+     *
+     */
+    public function export_scaledetails(\renderer_base $output): array {
+
+        $cm = new catmodel_info;
+        list($itemdifficulties, $personabilities) = $cm->get_context_parameters(
+            $this->catcontextid,
+            $this->catscaleid,
+            $this->triggercalculation
+        );
+
+        $backbutton = [
+            'label' => get_string('backtotable', 'local_catquiz'),
+            'type' => 'button',
+            'class' => "btn-link",
+        ];
 
         return [
-            'returnurl' => $url->out(),
-            'testitemstable' => $this->render_testitems_table($this->catscaleid),
-            'addtestitemstable' => $this->render_addtestitems_table($this->catscaleid),
-            'statindependence' => $this->render_statindependence(),
-            'loglikelihood' => $this->render_loglikelihood(),
-            'differentialitem' => $this->render_differentialitem(),
+            'backtoscaleslink' => $backbutton,
+            'scaledetailviewheading' => get_string('scaledetailviewheading', 'local_catquiz', $this->catscale->name),
+            'itemdifficulties' => $this->render_itemdifficulties($itemdifficulties),
+            'personabilities' => $this->render_personabilities($personabilities),
+            'modelbutton' => $this->render_modelbutton($this->catcontextid),
         ];
     }
 }

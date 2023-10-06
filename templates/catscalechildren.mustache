@@ -21,26 +21,21 @@
     Context variables required for this template:
     Example context (json):
     {
-        'id': 1,
-        'parentid': 0,
-        'description': 'xyz',
-        'name': 'Mathematics'
-        'viewlink': 'http://localhost:8000/local/catquiz/edit_catscale.php?id=1',
-        'children': [
-            'id': 1,
-            'description': 'xyz',
-            'name': 'Mathematics'
-            'viewlink': 'http://localhost:8000/local/catquiz/edit_catscale.php?id=1',
-            children: []
-        ]
+        "id": 3,
+        "parentid": 1,
+        "description": "xyz",
+        "name": "Mathematics3",
+        "subscribed" : true,
+        "viewlink":"http://localhost:8000/local/catquiz/manage_catscales.php?id=3#lcq_questions"
     }
-
 }}
+
 <ul class="pt-2 mt-0 mb-0">
-        <li class="list-group-item pr-0" data-id="{{id}}" data-description="{{description}}" data-parentid="{{parentid}}" data-name="{{name}}">
+        <li class="list-group-item pr-0" data-id="{{id}}" data-description="{{description}}" data-parentid="{{parentid}}" data-name="{{name}}"
+        data-scaleid="{{id}}">
             <div class="pull-right">
-                <a data-action="view" href="{{{viewlink}}}" class="view-catscale btn btn--plain btn--smaller btn-catscales">
-                    <i class="fa fa-edit"></i>
+                <a data-action="view" href="#" class="manage-catscale btn btn--plain btn--smaller btn-catscales" data-scaleid="{{id}}">
+                    <i class="fa fa-edit disabled"></i>
                     {{#str}} view, moodle {{/str}}</a>
                 <a data-action="edit" href="#" class="manage-catscale btn btn--plain btn--smaller btn-catscales">
                     <i class="fa fa-edit"></i>

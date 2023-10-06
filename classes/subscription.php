@@ -41,9 +41,12 @@ class subscription {
     /**
      * Toggles the subscription and returns the state.
      *
-     * @param integer $userid
+     * @param int $userid
      * @param string $area
+     * @param int $itemid
+     *
      * @return array
+     *
      */
     public static function toggle_subscription(int $userid, string $area, int $itemid) {
 
@@ -89,8 +92,9 @@ class subscription {
     /**
      * Toggles the subscription and returns the state.
      *
-     * @param integer $userid
+     * @param int $userid
      * @param string $area
+     * @param int $itemid
      * @return integer
      */
     public static function return_subscription_state(int $userid, string $area, int $itemid) {
@@ -114,9 +118,10 @@ class subscription {
     /**
      * Return subscribed usersids as array of one subscribeable item.
      *
-     * @param integer $itemid
+     * @param int $itemid
      * @param string $area
-     * @return area
+     *
+     * @return array
      */
     public static function get_subscribed_user_ids(int $itemid, string $area) {
 

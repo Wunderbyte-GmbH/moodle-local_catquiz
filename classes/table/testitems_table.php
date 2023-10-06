@@ -14,6 +14,14 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
+/**
+ * Class testitems_table.
+ *
+ * @package local_catquiz
+ * @copyright 2023 Wunderbyte GmbH
+ * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
+
 namespace local_catquiz\table;
 
 defined('MOODLE_INTERNAL') || die();
@@ -23,35 +31,50 @@ require_once(__DIR__ . '/../../lib.php');
 require_once($CFG->libdir.'/tablelib.php');
 require_once($CFG->dirroot . '/question/engine/lib.php');
 
+use cache_helper;
 use context_module;
 use context_system;
+use Exception;
 use html_writer;
 use local_catquiz\catscale;
+use local_catquiz\event\testitemstatus_updated;
+use local_catquiz\local\model\model_item_param;
+use local_wunderbyte_table\output\table;
 use local_wunderbyte_table\wunderbyte_table;
-use mod_booking\booking;
 use moodle_url;
 use question_bank;
+use stdClass;
 
 /**
  * Search results for managers are shown in a table (student search results use the template searchresults_student).
+ *
+ * @package local_catquiz
+ * @copyright 2023 Wunderbyte GmbH
+ * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class testitems_table extends wunderbyte_table {
 
-    /** @var context_module $buyforuser */
-    private $context = null;
-
-    /** @var integer $catscaleid */
+    /**
+     * @var int $catscaleid
+     */
     private $catscaleid = 0;
+
+    /**
+     * @var int
+     */
+    private $contextid = 0;
 
     /**
      * Constructor
      * @param string $uniqueid all tables have to have a unique id, this is used
      *      as a key when storing table properties like sort order in the session.
-     * @param integer $catscaleid
+     * @param int $catscaleid
+     * @param int $contextid
      */
-    public function __construct(string $uniqueid, int $catscaleid = 0) {
+    public function __construct(string $uniqueid, int $catscaleid = 0, int $contextid = 0) {
 
         $this->catscaleid = $catscaleid;
+        $this->contextid = $contextid;
 
         parent::__construct($uniqueid);
 
@@ -60,6 +83,8 @@ class testitems_table extends wunderbyte_table {
     /**
      * Overrides the output for this column.
      * @param object $values
+     *
+     * @return string
      */
     public function col_idnumber($values) {
         return html_writer::tag('span', $values->idnumber, ['class' => 'badge badge-primary']);
@@ -73,7 +98,13 @@ class testitems_table extends wunderbyte_table {
 
         global $OUTPUT;
 
-        $question = question_bank::load_question($values->id);
+        // phpcs:disable
+        // try {
+        // $question = question_bank::load_question($values->id);
+        // } catch (Exception $e) {
+        // return $values->questiontext;
+        // }
+        // phpcs:enable
 
         $context = context_system::instance();
 
@@ -105,9 +136,34 @@ class testitems_table extends wunderbyte_table {
      * @param object $values
      */
     public function col_qtype($values) {
-        return get_string('pluginname', 'qtype_' . $values->qtype);
+
+        if (!empty($values->qtype)) {
+            return get_string('pluginname', 'qtype_' . $values->qtype);
+        }
+
+        return "problem with $values->id, no qtype";
     }
 
+    /**
+     * Overrides the output for questioncontextattempts column.
+     *
+     * @param mixed $values
+     *
+     * @return string
+     *
+     */
+    public function col_questioncontextattempts($values) {
+        return $values->questioncontextattempts;
+    }
+
+    /**
+     * Overrides the output for action column.
+     *
+     * @param mixed $values
+     *
+     * @return string
+     *
+     */
     public function col_action($values) {
 
         global $OUTPUT;
@@ -116,6 +172,7 @@ class testitems_table extends wunderbyte_table {
             'id' => $values->id,
             'catscaleid' => $this->catscaleid ?? 0,
             'component' => $values->component,
+            'contextid' => $this->contextid,
         ]);
 
         $data['showactionbuttons'][] = [
@@ -126,17 +183,76 @@ class testitems_table extends wunderbyte_table {
             'id' => $values->id,
             'methodname' => '', // The method needs to be added to your child of wunderbyte_table class.
             'data' => [ // Will be added eg as data-id = $values->id, so values can be transmitted to the method above.
-                'key' => 'id',
-                'value' => $values->id,
+                'id' => $values->id,
             ]
         ];
 
-        return $OUTPUT->render_from_template('local_wunderbyte_table/component_actionbutton', $data);;
+        // This transforms the array to make it easier to use in mustache template.
+        table::transform_actionbuttons_array($data['showactionbuttons']);
+
+        return $OUTPUT->render_from_template('local_wunderbyte_table/component_actionbutton', $data);
+    }
+
+    /**
+     * Override model value with get_string.
+     *
+     * @param stdClass $values
+     * @return string
+     */
+    public function col_model($values): string {
+        if (is_null($values->model)) {
+            return get_string('notyetattempted', 'local_catquiz');
+        }
+        return get_string('pluginname', 'catmodel_' . $values->model);
+    }
+
+
+    /**
+     * Override model value with get_string.
+     *
+     * @param stdClass $values
+     * @return string
+     */
+    public function col_status($values) {
+
+        switch ($values->status) {
+            case -5:
+
+                break;
+            case -1:
+
+                break;
+            case 0:
+
+                break;
+            case 1:
+
+                break;
+            case 5:
+
+                break;
+        }
+
+        return get_string('pluginname', 'catmodel_' . $values->model);
+    }
+
+    /**
+     * Return value for lastattempttime column.
+     *
+     * @param stdClass $values
+     * @return string
+     */
+    public function col_lastattempttime(stdClass $values) {
+
+        if (intval($values->lastattempttime) === 0) {
+            return get_string('notyetcalculated', 'local_catquiz');
+        }
+        return userdate($values->lastattempttime);
     }
 
     /**
      * Function to handle the action buttons.
-     * @param integer $testitemid
+     * @param int $testitemid
      * @param string $data
      * @return array
      */
@@ -147,24 +263,52 @@ class testitems_table extends wunderbyte_table {
         $catscaleid = $jsonobject->catscaleid;
 
         if ($testitemid == -1) {
-            $idarray = explode(',', $jsonobject->checkedids);
+            $idarray = $jsonobject->checkedids;
         } else if ($testitemid > 0) {
             $idarray = [$testitemid];
         }
 
         foreach ($idarray as $id) {
-            catscale::add_or_update_testitem_to_scale($catscaleid, $id);
+        $result[] = catscale::add_or_update_testitem_to_scale($catscaleid, $id);
+        }
+        $failed = array_filter($result, fn($r) => $r->isErr());
+
+        // All items were added successfully.
+        if (empty($failed)) {
+            return [
+                'success' => 1,
+                'message' => get_string('success'),
+            ];
         }
 
+        // If a single item could not be added, show a specific error message.
+        if (count($idarray) === 1 && count($failed) === 1) {
+            return [
+                'success' => 0,
+                'message' => $failed[0]->getErrorMessage(),
+            ];
+        }
+
+        // Multiple items could not be added.
+        $numadded = count($result) - count($failed);
+        $failedids = array_map(fn($f) => $f->unwrap(), $failed);
         return [
-            'success' => 1,
-            'message' => get_string('success'),
+            'success' => 0,
+            'message' => get_string(
+                'failedtoaddmultipleitems',
+                'local_catquiz',
+                [
+                    'numadded' => $numadded,
+                    'numfailed' => count($failed),
+                    'failedids' => implode(',', $failedids),
+                ]
+            )
         ];
     }
 
     /**
      * Function to handle the action buttons.
-     * @param integer $testitemid
+     * @param int $testitemid
      * @param string $data
      * @return array
      */
@@ -176,6 +320,9 @@ class testitems_table extends wunderbyte_table {
 
         if ($testitemid == -1) {
             $idarray = explode(',', $jsonobject->checkedids);
+            if (empty($idarray)) {
+                $idarray = [$jsonobject->checkedids[0]];
+            }
         } else if ($testitemid > 0) {
             $idarray = [$testitemid];
         }
@@ -187,6 +334,42 @@ class testitems_table extends wunderbyte_table {
         return [
             'success' => 1,
             'message' => get_string('success'),
+        ];
+    }
+
+    /**
+     * Toggle Checkbox
+     *
+     * @param int $id
+     * @param string $data
+     * @return array
+     */
+    public function update_item_status(int $id, string $data): array {
+        $dataobject = json_decode($data);
+
+        // If the checkbox is unchecked, set the status to "not set".
+        // Otherwise, keep the selected status.
+        $dataobject->status = $dataobject->state == 'false'
+            ? STATUS_EXCLUDED_MANUALLY
+            : $dataobject->status;
+
+        try {
+            model_item_param::update_in_db(
+                $dataobject->id,
+                $dataobject->componentid,
+                $dataobject->model,
+                $this->contextid,
+                $dataobject
+            );
+        } catch (Exception $e) {
+            return [
+                'success' => false,
+                'message' => 'Could not update item in the DB',
+            ];
+        }
+
+        return [
+            'success' => 1,
         ];
     }
 }

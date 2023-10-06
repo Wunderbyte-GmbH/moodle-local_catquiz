@@ -15,90 +15,112 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
-* Entities Class to display list of entity records.
-*
-* @package local_catquiz
-* @author Georg Maißer
-* @copyright 2023 Wunderbyte GmbH <info@wunderbyte.at>
-* @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
-*/
+ * Class catmodel_info.
+ *
+ * @package local_catquiz
+ * @author Georg Maißer
+ * @copyright 2023 Wunderbyte GmbH <info@wunderbyte.at>
+ * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
 
 namespace local_catquiz;
 
-use core_plugin_manager;
-use Exception;
-use local_catquiz\data\catquiz_base;
+use core\task\manager;
+use local_catquiz\catcontext;
+use local_catquiz\event\calculation_executed;
+use local_catquiz\task\adhoc_recalculate_cat_model_params;
+use local_catquiz\task\recalculate_cat_model_params;
+use moodle_exception;
+use moodle_url;
 
 /**
- * This class
+ * Entities Class to display list of entity records.
+ *
+ * @package local_catquiz
+ * @author Georg Maißer
+ * @copyright 2023 Wunderbyte GmbH <info@wunderbyte.at>
+ * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class catmodel_info {
 
-
     /**
-     * Undocumented function
+     * Returns the saved item parameters for the given context.
      *
-     * @param integer $catcontext
-     * @param integer $testitemid
-     * @param string $component
-     * @param string $model
+     * The first element constains an associative array of model_item_param_lists,
+     * indexed by the respective model name. The second element is a
+     * model_person_param_list.
+     *
+     * @param int $contextid
+     * @param int $catscaleid
+     * @param bool $calculate Trigger a re-calculation of the item parameters
      * @return array
      */
-    public static function get_item_parameters(
-        int $catcontext = 0,
-        int $testitemid = 0,
-        string $component = '',
-        string $model = ''):array {
-
-        $returnarray = [];
-
-        // Retrieve all the responses in the given context.
-        $responses = catquiz_base::get_question_results_by_person(0, 0, $testitemid);
-
-        // Right now, we need different responses.
-        $responses = [
-            [0, 1, 1, 0, 1]];
-
-        // Get all Models.
-        $models = self::get_installed_models();
-
-        // We run through all the models.
-        $classes = [];
-
-        foreach ($models as $model) {
-            $classname = 'catmodel_' . $model->name . '\\' . $model->name;
-
-            if (class_exists($classname)) {
-                $modelclass = new $classname($responses); // The constructure takes our array of responses.
-                $classes[] = $modelclass;
-                $itemparams = $modelclass->get_item_parameters([]);
-                $returnarray[] = [
-                    'modelname' => $model->name,
-                    'itemparameters' => $itemparams,
-                ];
-            }
+    public function get_context_parameters(int $contextid = 0, int $catscaleid = 0, bool $calculate = false) {
+        // Trigger calculation in the background but do not wait for it to finish.
+        if ($calculate) {
+            $this->trigger_parameter_calculation($contextid, $catscaleid);
         }
 
-        return $returnarray;
+        // Return the data that are currently saved in the DB.
+        $context = catcontext::load_from_db($contextid);
+        $strategy = $context->get_strategy($catscaleid);
+        return $strategy->get_params_from_db($contextid, $catscaleid);
     }
-
 
     /**
-     * Returns an array of installed models.
+     * Triggers parameter_calculation.
      *
-     * @return array
+     * @param mixed $contextid
+     * @param mixed $catscaleid
+     *
+     * @return void
+     *
      */
-    public static function get_installed_models():array {
-
-        $pm = core_plugin_manager::instance();
-        return $pm->get_plugins_of_type('catmodel');
+    public function trigger_parameter_calculation($contextid, $catscaleid) {
+        global $USER;
+        $adhocrecalculatecatmodelparams = new adhoc_recalculate_cat_model_params();
+        $adhocrecalculatecatmodelparams->set_custom_data([
+            'contextid' => $contextid,
+            'catscaleid' => $catscaleid,
+            'userid' => $USER->id,
+        ]);
+        manager::queue_adhoc_task($adhocrecalculatecatmodelparams);
     }
 
-};
+    /**
+     * Update params.
+     *
+     * @param int $contextid
+     * @param int $catscaleid
+     * @param int $userid
+     *
+     * @return void
+     *
+     */
+    public function update_params($contextid, $catscaleid, $userid = 0) {
+        $context = catcontext::load_from_db($contextid);
+        $strategy = $context->get_strategy($catscaleid);
+        list($itemdifficulties, $personabilities) = $strategy->run_estimation();
+        $itemcounter = 0;
+        foreach ($itemdifficulties as $itemparamlist) {
+            $itemparamlist->save_to_db($contextid);
+            $itemcounter += count($itemparamlist->itemparams);
+        }
 
+        // Trigger event.
+        $event = calculation_executed::create([
+            'context' => \context_system::instance(),
+            'userid' => $userid,
+            'other' => [
+                'catscaleid' => $catscaleid,
+                'contextid' => $contextid,
+                'userid' => $userid,
+                'numberofitems' => $itemcounter,
+            ]
+        ]);
+        $event->trigger();
 
-
-
-
-
-
+        $personabilities->save_to_db($contextid, $catscaleid);
+        $context->save_or_update((object)['timecalculated' => time()]);
+    }
+}

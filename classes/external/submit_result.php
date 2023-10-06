@@ -55,8 +55,9 @@ class submit_result extends external_api {
      */
     public static function execute_parameters(): external_function_parameters {
         return new external_function_parameters(array(
-            'userid'  => new external_value(PARAM_INT, 'userid', VALUE_REQUIRED),
-            'categoryid'  => new external_value(PARAM_INT, 'categorid', VALUE_REQUIRED),
+            'attemptid'  => new external_value(PARAM_TEXT, 'userid', VALUE_REQUIRED),
+            'questionid'  => new external_value(PARAM_INT, 'userid', VALUE_REQUIRED),
+            'score'  => new external_value(PARAM_INT, 'categorid', VALUE_REQUIRED),
             )
         );
     }
@@ -64,8 +65,9 @@ class submit_result extends external_api {
     /**
      * Webservice for the local catquiz plugin to submit the result of an answered question.
      *
-     * @param int $userid
-     * @param int $categoryid
+     * @param string $attemptid
+     * @param int $questionid
+     * @param int $score
      *
      * @return array
      */

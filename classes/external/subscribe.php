@@ -66,8 +66,7 @@ class subscribe extends external_api {
     /**
      * Webservice for the local catquiz plugin to get next question.
      *
-     * @param int $attemptid
-     * @param int $quizid
+     * @param int $userid
      * @param string $area
      * @param int $itemid
      *

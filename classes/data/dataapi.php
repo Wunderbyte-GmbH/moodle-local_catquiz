@@ -14,15 +14,29 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
+/**
+ * The dataapi class.
+ *
+ * @package local_catquiz
+ * @copyright 2023 Georg Maißer, <info@wunderbyte.at>
+ * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
+
 namespace local_catquiz\data;
 
 use cache;
 use context_system;
+use local_catquiz\catcontext;
+use local_catquiz\event\catscale_created;
 use local_catquiz\event\catscale_updated;
 use moodle_exception;
 
 /**
  * Get and store data from db.
+ *
+ * @package local_catquiz
+ * @copyright 2023 Georg Maißer, <info@wunderbyte.at>
+ * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class dataapi {
 
@@ -36,6 +50,7 @@ class dataapi {
         $cache = cache::make('local_catquiz', 'catscales');
         $allcatscales = $cache->get('allcatscales');
         if (!$allcatscales) {
+            $allcatscales = array();
             $records = $DB->get_records('local_catquiz_catscales');
             if (!empty($records)) {
                 foreach ($records as $record) {
@@ -47,6 +62,34 @@ class dataapi {
             $cache->set('allcatscales', $allcatscales);
         }
         return $allcatscales;
+    }
+
+    /**
+     * Returns all catcontexts
+     *
+     * @return array
+     *
+     */
+    public static function get_all_catcontexts(): array {
+        global $DB;
+        $cache = cache::make('local_catquiz', 'catcontexts');
+        $allcatcontexts = $cache->get('allcatcontexts');
+        if ($allcatcontexts) {
+            return $allcatcontexts;
+        } else {
+            $allcatcontexts = [];
+        }
+
+        $records = $DB->get_records('local_catquiz_catcontext');
+        if (!empty($records)) {
+            foreach ($records as $record) {
+                $allcatcontexts[$record->id] = new catcontext($record);
+            }
+        } else {
+            $allcatcontexts = [];
+        }
+        $cache->set('allcatcontexts', $allcatcontexts);
+        return $allcatcontexts;
     }
 
     /**
@@ -90,6 +133,18 @@ class dataapi {
         }
         $id = $DB->insert_record('local_catquiz_catscales', $catscale);
 
+        // Trigger catscale created event
+        $event = catscale_created::create([
+            'objectid' => $id,
+            'context' => \context_system::instance(),
+            'other' => [
+                'scalename' => $catscale->name,
+                'catscaleid' => $id,
+                'catscale' => $catscale,
+            ]
+            ]);
+        $event->trigger();
+
         // Invalidate cache. TODO: Instead of invalidating cache, add the item to the cache.
         $cache = cache::make('local_catquiz', 'catscales');
         $cache->delete('allcatscales');
@@ -99,8 +154,10 @@ class dataapi {
     /**
      * Delete a catscale and invalidate cache.
      *
-     * @param catscale_structure $catscale
-     * @return array true
+     * @param int $catscaleid
+     *
+     * @return array
+     *
      */
     public static function delete_catscale(int $catscaleid):array {
         global $DB;
@@ -150,6 +207,9 @@ class dataapi {
             'objectid' => $catscale->id,
             'context' => $context,
             'userid' => $USER->id, // The user who did cancel.
+            'other' => [
+                'catscaleid' => $catscale->id,
+            ]
         ]);
         $event->trigger();
 
@@ -178,7 +238,7 @@ class dataapi {
      * @param int $id catscale id
      * @return ?object
      */
-    public static function get_catscale_by_id(int $id): ?object{
+    public static function get_catscale_by_id(int $id): ?object {
         global $DB;
         if ($DB->record_exists('local_catquiz_catscales', ['id' => $id])) {
             return $DB->get_record('local_catquiz_catscales', ['id' => $id], '*', MUST_EXIST);

@@ -1,0 +1,84 @@
+{{!
+    This file is part of Moodle - http://moodle.org/
+    Moodle is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+    Moodle is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+    You should have received a copy of the GNU General Public License
+    along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+}}
+{{!
+    @template local_catquiz
+    Template which defines a catquiz view page.
+
+    This template is an example for the generic function reloadTemplate.
+    The data-params of .fa fa-eye are necessary. Ad params are the params needed by the admethodname.
+    Td params are needed to get the context data of the template to be rerendered. Make sure this template
+    (to be rerendered) has data-templateid of elements data-templatelocation.
+
+    Classes required for JS:
+    * Selector of the item the clicklistener should be attached to (containing data, see comment above)
+    Data attributes required for JS:
+    * none
+    Context variables required for this template:
+    Example context (json):
+    {
+            "title": "General",
+            "body": {
+                "id": "12345",
+                "type": "Practice Quiz",
+                "closedeye": "slash" | "",
+                "statuscircle": "success",
+                "status":  "(inactive, manually confirmed)" ,
+                "model": "Adaptive",
+                "attempts": "Unlimited",
+                'testitemid': "0",
+                'contextid': "0",
+                'component': "question",
+                'scaleid': "1",
+            }
+    }
+}}
+    <div class="card mr-2 col-4"
+        data-templateid="local_catquiz/catscalemanager/questions/cards/datacard">
+        <div class="card-header">
+            {{title}}
+        </div>
+        <div class="card-body">
+        {{#body}}
+        <div>{{#str}}id, local_catquiz{{/str}}: {{id}}</div>
+        <div>{{#str}}type, local_catquiz{{/str}}: {{type}}</div>
+        <div class="testitem-togglestatus">
+            {{#str}}status, core{{/str}}:
+            <a href='#'>
+            <i class='fa fa-eye{{closedeye}}'
+            title='{{#str}}togglestatus, local_catquiz{{/str}}'
+            aria-label="eye icon {{closedeye}}"
+            data-id="testitem-toggle-status"
+            data-templatelocation="local_catquiz/catscalemanager/questions/cards/datacard"
+            data-classlocation="local_catquiz\output\catscalemanager\questions\cards\datacard"
+            data-tdmethod="testitem-toggle-status"
+            data-tdparams="{{testitemid}},{{contextid}},{{scaleid}},{{component}}"
+            data-adparams="{{scaleid}},{{testitemid}},{{closedeye}},{{component}}"
+            data-admethodname="local_catquiz_toggle_testitemstatus">
+            </i></a>
+            <a><i class='fa fa-circle {{statuscircle}}'
+                id="testitem-status-circle"
+                title='{{statustitle}}'></i></a>
+                {{status}}
+        </div>
+        <div>{{#str}}model, local_catquiz{{/str}}: {{model}}</div>
+        <div>{{#str}}attempts, local_catquiz{{/str}}: {{attempts}}</div>
+        {{/body}}
+        </div>
+    </div>
+
+    {{#js}}
+        require(['local_catquiz/reloadTemplate'], function(init) {
+            init.init('[data-id="testitem-toggle-status"]');
+        });
+    {{/js}}

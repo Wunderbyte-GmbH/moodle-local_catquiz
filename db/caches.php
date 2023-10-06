@@ -39,11 +39,54 @@ $definitions = array(
         'staticaccelerationsize' => 1,
         'invalidationevents' => ['changesintestitems']
     ),
+    'studentstatstable' => array(
+        'mode' => cache_store::MODE_APPLICATION,
+        'simplekeys' => true,
+        'staticacceleration' => true,
+        'staticaccelerationsize' => 1,
+        'invalidationevents' => ['changesintestitems']
+    ),
     'testenvironments' => array(
         'mode' => cache_store::MODE_APPLICATION,
         'simplekeys' => true,
         'staticacceleration' => true,
         'staticaccelerationsize' => 1,
         'invalidationevents' => ['changesintestenvironments']
-    )
+    ),
+    'catcontexts' => array(
+        'mode' => cache_store::MODE_APPLICATION,
+        'simplekeys' => true,
+        'staticacceleration' => true,
+        'staticaccelerationsize' => 1,
+        'invalidationevents' => ['changesincatcontexts']
+    ),
+    'adaptivequizattempt' => array(
+        'mode' => cache_store::MODE_SESSION,
+        'simplekeys' => true,
+        'staticacceleration' => true,
+        'staticaccelerationsize' => 1,
+        'invalidationevents' => ['changesinadaptivequizattempt']
+    ),
+    'eventlogtable' => array(
+        'mode' => cache_store::MODE_APPLICATION,
+        'simplekeys' => true,
+        'staticacceleration' => true,
+        'staticaccelerationsize' => 1,
+        'invalidationevents' => ['changesineventlog']
+    ),
+    'quizattempts' => array(
+        'mode' => cache_store::MODE_APPLICATION,
+        'simplekeys' => true,
+        'staticacceleration' => true,
+        'staticaccelerationsize' => 1,
+        'invalidationevents' => ['changesinquizattempts']
+    ),
+    'teststrategies' => array(
+        'mode' => cache_store::MODE_APPLICATION,
+        'simplekeys' => true,
+        'staticacceleration' => true,
+        'staticaccelerationsize' => 1,
+        'invalidationevents' => ['changesinteststrategies']
+    ),
+
 );

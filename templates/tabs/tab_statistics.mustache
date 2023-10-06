@@ -21,32 +21,49 @@
     Context variables required for this template:
     Example context (json):
     {
+        "personabilities": "Person abilities",
+        "itemdifficulties": [
+            {
+                "modelname": "Model name",
+                "chart": "Chart"
+            }
+        ]
     }
 }}
 
 <div class="catscales-dashboard grid">
   <div class="card">
       <div class="card-header">
-          {{#str}} loglikelihood, local_catquiz {{/str}}
+         Person abilities
       </div>
       <div class="card-body">
-        {{{loglikelihood}}}
+        {{{personabilities}}}
       </div>
   </div>
+  {{#itemdifficulties}}
   <div class="card">
       <div class="card-header">
-          {{#str}} statindependence, local_catquiz {{/str}}
+        {{#str}} itemdifficulties, local_catquiz {{/str}} ({{modelname}})
       </div>
       <div class="card-body">
-        {{{statindependence}}}
+        {{{chart}}}
       </div>
   </div>
+  {{/itemdifficulties}}
+  {{^itemdifficulties}}
   <div class="card">
       <div class="card-header">
-          {{#str}} differentialitem, local_catquiz {{/str}}
+        {{#str}} itemdifficultiesnodata, local_catquiz {{/str}}
       </div>
       <div class="card-body">
-        {{{differentialitem}}}
+        {{{chart}}}
       </div>
   </div>
+  {{/itemdifficulties}}
 </div>
+
+{{#js}}
+  require(['local_catquiz/testitemdashboard/backtoscaleviewbutton'], function(init) {
+      init.init();
+  });
+{{/js}}

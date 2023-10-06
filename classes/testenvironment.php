@@ -31,7 +31,7 @@ use stdClass;
 require_once($CFG->dirroot . '/local/catquiz/lib.php');
 
 /**
- * Class testenvironment
+ * Class testenvironment.
  *
  * @author Georg Maißer
  * @copyright 2022 Wunderbyte GmbH
@@ -82,6 +82,11 @@ class testenvironment {
     private string $component;
 
     /**
+     * @var integer
+     */
+    private ?int $catscaleid;
+
+    /**
      * $componentid
      *
      * @var integer
@@ -124,11 +129,17 @@ class testenvironment {
     private int $parentid;
 
     /**
+     * $courseid
+     *
+     * @var int
+     */
+    private int $courseid;
+
+    /**
      * Testenvironment constructor.
      * @param stdClass $newrecord
      */
-    public function __construct(
-        stdClass $newrecord) {
+    public function __construct(stdClass $newrecord) {
 
         // If we have just the id, but not the component..
         // We probably just want to fetch the right information.
@@ -150,6 +161,7 @@ class testenvironment {
 
         $this->componentid = $record->componentid ?? 0;
         $this->component = $record->component ?? '';
+        $this->catscaleid = $record->catscaleid ?? null;
         $this->name = $record->name ?? get_string('newcustomtest', 'local_catquiz');
         $this->description = $record->description ?? '';
         $this->descriptionformat = $record->descriptionformat ?? 1;
@@ -159,6 +171,7 @@ class testenvironment {
         $this->lang = $record->lang ?? '';
         $this->status = $record->status ?? STATUS_TEST_ACTIVE;
         $this->parentid = $record->parentid ?? 0;
+        $this->courseid = $record->courseid ?? 0;
     }
 
     /**
@@ -225,9 +238,11 @@ class testenvironment {
     /**
      * Function to save current instance as template.
      *
-     * @param int $templateid
+     * @param int $templateidid
      * @param string $templatename
+     *
      * @return void
+     *
      */
     public function save_as_template(int $templateidid, string $templatename) {
 
@@ -257,6 +272,7 @@ class testenvironment {
      * This function will recreate the saved array in order to
      *
      * @param array $formdefaultvalues
+     *
      * @return void
      */
     public function apply_jsonsaved_values(array &$formdefaultvalues) {
@@ -321,14 +337,17 @@ class testenvironment {
     /**
      * Function to update a $record by the properties of the instantiated class.
      *
-     * @param stdClass $recordtoupdate
-     * @return void
+     * @param stdClass $record
+     *
+     * @return [type]
+     *
      */
     private function update_object(stdClass &$record) {
 
         // If we have the record, we update everything, if there are new values. if not, we leave the old ones.
         $record->componentid = $this->componentid ?? $record->componentid;
         $record->component = $this->component ?? $record->component;
+        $record->catscaleid = $this->catscaleid ?? $record->catscaleid;
         $record->name = $this->name ?? $record->name;
         $record->description = $this->description ?? $record->description;
         $record->descriptionformat = $this->descriptionformat ?? $record->descriptionformat;
@@ -338,6 +357,7 @@ class testenvironment {
         $record->lang = $this->lang ?? $record->lang;
         $record->status = $this->status ?? $record->status;
         $record->parentid = $this->parentid ?? $record->parentid ?? 0;
+        $record->courseid = $this->courseid ?? $record->courseid;
 
         $now = time();
 
@@ -348,10 +368,12 @@ class testenvironment {
     /**
      * Get test record either by id or by combination of componentid & component.
      *
-     * @param integer $id
-     * @param integer $componentid
+     * @param int $id
+     * @param int $componentid
      * @param string $component
-     * @return ?stdClass
+     *
+     * @return mixed
+     *
      */
     private function get_record(int $id = 0, int $componentid = 0, string $component = '') {
 
@@ -388,9 +410,22 @@ class testenvironment {
     }
 
     /**
+     * Returns settings saved as JSON.
+     *
+     * @return stdClass
+     */
+    public function return_settings():stdClass {
+        return json_decode($this->json);
+    }
+
+    /**
      * Returns an array of all or filtered test environments.
+     *
      * @param string $component
+     * @param bool $onlytemplates
+     *
      * @return array
+     *
      */
     public static function get_environments_as_array(
             string $component = 'mod_adaptivequiz',
@@ -421,8 +456,10 @@ class testenvironment {
     /**
      * Delete Testenvironment.
      *
-     * @param integer $id
+     * @param int $id
+     *
      * @return bool
+     *
      */
     public static function delete_testenvironment(int $id) {
         global $DB;

@@ -21,14 +21,34 @@
     Context variables required for this template:
     Example context (json):
     {
-      'models': [
-        'title': 'model name',
-        'body': '<div>rendered model stats</div>'
+      "overridesforms": "Overrides Forms HTML",
+      "itemstatus": "Item Status",
+      "models": [
+        {
+          "title": "model name",
+          "body": "<div>rendered model stats</div>"
+        }
       ]
     }
 }}
 
 <div class="catscales-dashboard grid">
+  <div class="card">
+    <div class="card-header">
+      {{#str}} settings, core {{/str}}
+    </div>
+    <div class="card-body">
+      {{{overridesforms}}}
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-header">
+      {{#str}} status, core {{/str}}
+    </div>
+    <div class="card-body" style="display: flex; justify-content: center; align-items: center;">
+      <h3>{{itemstatus}}</h3>
+    </div>
+  </div>
   {{#models}}
     <div class="card">
         <div class="card-header">
@@ -40,3 +60,9 @@
     </div>
   {{/models}}
 </div>
+
+{{#js}}
+    require(['local_catquiz/testitem_model_overrides'], function(init) {
+        init.init();
+      });
+{{/js}}

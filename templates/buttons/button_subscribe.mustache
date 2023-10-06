@@ -23,26 +23,28 @@
     Data attributes required for JS:
     * data-region
 
-     Example context (json):
+    Example context (json):
     {
-        'id' : '1',
-        'area' : 'area',
+        "id" : "1",
+        "subscribed" : false,
+        "area" : "area",
+        "js" : true
     }
 }}
 
 <a data-action="create" href="#" class="catquiz-button-subscribe btn btn--plain btn--smaller btn-catscales"
+    role="button"
     data-id="{{id}}"
     data-area="catscale">
     {{#subscribed}}
-        <i class="fa fa fa-bell" aria-label="{{#str}} subscribed, local_catquiz {{/str}}"></i>
+        <i class="fa fa fa-bell"></i>
         {{#str}} subscribed, local_catquiz {{/str}}
     {{/subscribed}}
     {{^subscribed}}
-        <i class="fa fa fa-bell-o" aria-label="{{#str}} subscribe, local_catquiz {{/str}}"></i>
+        <i class="fa fa fa-bell-o"></i>
         {{#str}} subscribe, local_catquiz {{/str}}
     {{/subscribed}}
 </a>
-
 
 {{#js}}
     require(['local_catquiz/subscribe'], function(init) {

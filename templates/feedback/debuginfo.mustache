@@ -1,0 +1,64 @@
+{{!
+    This file is part of Moodle - http://moodle.org/
+    Moodle is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+    Moodle is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+    You should have received a copy of the GNU General Public License
+    along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+}}
+{{!
+    @template local_catquiz
+    Template which defines a quiz attempt feedback.
+    Classes required for JS:
+    * none
+    Data attributes required for JS:
+    * none
+    Context variables required for this template:
+    Example context (json):
+    {
+        'userid' => 2,
+        'attemptid' => 3,
+        'questionsattempted' => 3,
+        'timestamp' => 123456,
+        'contextid' => 1,
+        'catscale' => "Deutsch",
+        'teststrategy' => "Infer lowest subscale",
+        'personabilities' => '"scale1": 0.5, "scale2": 1.2',
+        'questions' => [{"id": 1, "score": 0.3}, {"id": 2, "score", 0.01}],
+        'active_scales' => ["scale1", "scale2", "scale3"]
+        'lastquestion' => {"id": 1, "score": 1.2},
+        'selectedscale' => "Deutsch"
+    }
+}}
+
+userid;attemptid;questionsattempted;timestamp;contextid;catscale;teststrategy;personabilities;lastquestion;questions;active_scales;selectedscale;lastmiddleware;updateabilityfallback;excluded subscales;lastresponse;standard error;num questions per scale<br>
+{{#data}}
+    {{ userid }}
+    ;{{ attemptid }}
+    ;{{questionsattempted}}
+    ;{{ timestamp }}
+    ;{{ contextid }}
+    ;{{ catscale }}
+    ;{{ teststrategy }}
+    ;{{ personabilities }}
+    ;{{#lastquestion}}"id: {{ id }}, score: {{ score }}, fisherinformation: {{#fisherinformation}}{{fisherinformation}}{{/fisherinformation}}{{^fisherinformation}}NA{{/fisherinformation}}, lasttimeplayedpenalty: {{#lasttimeplayedpenalty}}{{lasttimeplayedpenalty}}{{/lasttimeplayedpenalty}}{{^lasttimeplayedpenalty}}NA{{/lasttimeplayedpenalty}}, difficulty: {{difficulty}}, fraction: {{fraction}}"{{/lastquestion}}{{^lastquestion}}NA{{/lastquestion}}
+    ;{{#questions}}
+        "id: {{id}}, type: {{type}}, fisherinformation: {{fisherinformation}}, score: {{score}}"{{^last}},{{/last}}
+    {{/questions}}
+    {{^questions}}
+    NA
+    {{/questions}}
+    ;{{ active_scales }}
+    ;{{ selectedscale }}
+    ;{{ lastmiddleware }}
+    ;{{ updateabilityfallback }}
+    ;{{ excludedsubscales }}
+    ;{{ lastresponse }}
+    ;{{#standarderrorperscale}}{{name}}: [{{#se}}played: {{played}}, remaining: {{remaining}}{{/se}}]{{^last}}, {{/last}}{{/standarderrorperscale}}{{^standarderrorperscale}}NA{{/standarderrorperscale}}
+    ;{{numquestionsperscale}}{{^numquestionsperscale}}NA{{/numquestionsperscale}}<br>
+{{/data}}

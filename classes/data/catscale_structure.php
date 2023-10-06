@@ -14,13 +14,24 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
+/**
+ * The catscale_structure class.
+ *
+ * @package local_catquiz
+ * @copyright 2023 Georg Maißer, <info@wunderbyte.at>
+ * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
+
 namespace local_catquiz\data;
 
 use moodle_url;
 
 /**
- *
  * Simple data structure reflecting the db table scheme. Should be same as in install.xml.
+ *
+ * @package local_catquiz
+ * @copyright 2023 Georg Maißer, <info@wunderbyte.at>
+ * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class catscale_structure {
 
@@ -66,13 +77,13 @@ class catscale_structure {
             $this->timemodified = $data['timemodified'];
             $this->timecreated = $data['timecreated'];
             $this->name = $data['name'];
-            $this->description = $data['description'];
+            $this->description = $data['description'] ?? '';
             $this->minscalevalue = empty($data["minmaxgroup"]["catquiz_minscalevalue"]) ? 0 : $data["minmaxgroup"]["catquiz_minscalevalue"];
             $this->maxscalevalue = empty($data["minmaxgroup"]["catquiz_maxscalevalue"]) ? 0 : $data["minmaxgroup"]["catquiz_maxscalevalue"];
 
-            $url = new moodle_url('/local/catquiz/edit_catscale.php', [
-                'id' => $data['id']
-            ]);
+            $url = new moodle_url('/local/catquiz/manage_catscales.php', [
+                'scaleid' => $data['id']
+            ], 'lcq_catscales');
 
             // Add the link to the view php.
             $this->viewlink = $url->out();

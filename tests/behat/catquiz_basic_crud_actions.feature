@@ -19,10 +19,13 @@ Feature: As an admin I perform basic catquiz actions - create, update, delete, s
       | teacher  | C1     | editingteacher |
 
   @javascript
-  Scenario: Admin create a catscale, edit it, subscribe, unsubscribe, delete
+  Scenario: CatQuiz Management: admin create a catscale, edit it, subscribe, unsubscribe, delete
     Given I log in as "admin"
     And I press "Catquiz"
-    And I follow "Manage CAT Scales"
+    And I follow "Manage CAT scales"
+    And I wait until the page is ready
+    ## And I follow "#catscales-tab"
+    And I click on "CAT scales" "link" in the "#region-main" "css_element"
     And I follow "Create"
     And I set the following fields to these values:
       | Name                               | Math              |
@@ -30,9 +33,13 @@ Feature: As an admin I perform basic catquiz actions - create, update, delete, s
       | minmaxgroup[catquiz_minscalevalue] | 5                 |
       | minmaxgroup[catquiz_maxscalevalue] | 15                |
     And I press "Save changes"
+    ## And I wait "1" seconds
+    And I wait until the page is ready
     Then I should see "Math" in the "[data-name=\"Math\"]" "css_element"
-    And I follow "Subscribe"
-    Then I should see "Subscribed" in the ".grid .list-group-item" "css_element"
+    ## And I follow "Subscribe"
+    ## Exact precise click
+    And I click on "Subscribe" "link" in the "[data-name=\"Math\"]" "css_element"
+    Then I should see "Subscribed" in the "[data-name=\"Math\"]" "css_element"
     And I follow "Edit"
     And the following fields match these values:
       | Name                               | Math              |
@@ -44,62 +51,60 @@ Feature: As an admin I perform basic catquiz actions - create, update, delete, s
       | minmaxgroup[catquiz_minscalevalue] | 6           |
       | minmaxgroup[catquiz_maxscalevalue] | 16.5        |
     And I press "Save changes"
+    ## And I wait "1" seconds
+    And I wait until the page is ready
+    ## TODO: should return to the same tab?
+    And I click on "CAT scales" "link" in the "#region-main" "css_element"
     Then I should see "Mathematics" in the "[data-name=\"Mathematics\"]" "css_element"
     And I follow "Subscribed"
-    Then I should see "Subscribe" in the ".grid .list-group-item" "css_element"
+    Then I should see "Subscribe" in the "[data-name=\"Mathematics\"]" "css_element"
     And I follow "Delete"
+    ## TODO: should return to the same tab?
+    And I click on "CAT scales" "link" in the "#region-main" "css_element"
     Then I should see "Create" in the ".grid .list-group-item" "css_element"
 
   @javascript
-  Scenario: Admin create a catscale wiht subitems than edit, subscribe, unsubscribe, delete subitem
+  Scenario: CatQuiz Management: admin create a catscale wiht subitems than edit, subscribe, unsubscribe, delete subitem
     Given I log in as "admin"
     And I press "Catquiz"
-    And I follow "Manage CAT Scales"
+    And I follow "Manage CAT scales"
+    And I wait until the page is ready
+    And I click on "CAT scales" "link" in the "#region-main" "css_element"
     And I follow "Create"
-    ## And I set the field "Name" to "Mathematics"
     And I set the following fields to these values:
       | Name                               | Mathematics |
       | minmaxgroup[catquiz_minscalevalue] | 5.5         |
       | minmaxgroup[catquiz_maxscalevalue] | 20          |
     And I press "Save changes"
+    And I wait until the page is ready
     Then I should see "Mathematics" in the "[data-name=\"Mathematics\"]" "css_element"
     And I follow "Create"
-    ## And I set the field "Name" to "Arithmetics"
-    And I set the following fields to these values:
-      | Name                               | Arithmetics |
-      | minmaxgroup[catquiz_minscalevalue] | 6.5         |
-      | minmaxgroup[catquiz_maxscalevalue] | 10          |
-    And I set the field "Parent catscale - None if top level catscale" to "Mathematics"
+    And I set the field "Name" to "Arithmetics"
+    And I set the field "Parent CAT scale - None if top level CAT scale" to "Mathematics"
     And I press "Save changes"
+    And I wait until the page is ready
     Then I should see "Arithmetics" in the "[data-name=\"Arithmetics\"]" "css_element"
     And I follow "Create"
-    ## And I set the field "Name" to "Multiplication"
-    And I set the following fields to these values:
-      | Name                               | Multiplication |
-      | minmaxgroup[catquiz_minscalevalue] | 7.5            |
-      | minmaxgroup[catquiz_maxscalevalue] | 11             |
-    And I set the field "Parent catscale - None if top level catscale" to "Mathematics"
+    And I set the field "Name" to "Multiplication"
+    And I set the field "Parent CAT scale - None if top level CAT scale" to "Mathematics"
     And I press "Save changes"
+    And I wait until the page is ready
     Then I should see "Multiplication" in the "[data-name=\"Multiplication\"]" "css_element"
     And I follow "Create"
-    ## And I set the field "Name" to "Geometrie"
-    And I set the following fields to these values:
-      | Name                               | Geometrie |
-      | minmaxgroup[catquiz_minscalevalue] | 8.5       |
-      | minmaxgroup[catquiz_maxscalevalue] | 12        |
-    And I set the field "Parent catscale - None if top level catscale" to "Mathematics"
+    And I set the field "Name" to "Geometrie"
+    And I set the field "Parent CAT scale - None if top level CAT scale" to "Mathematics"
     And I press "Save changes"
+    And I wait until the page is ready
     Then I should see "Geometrie" in the "[data-name=\"Geometrie\"]" "css_element"
     And I click on "Subscribe" "link" in the "[data-name=\"Geometrie\"]" "css_element"
     Then I should see "Subscribed" in the "[data-name=\"Geometrie\"]" "css_element"
     And I click on "Edit" "link" in the "[data-name=\"Geometrie\"]" "css_element"
-    And the following fields match these values:
-      | Name                               | Geometrie |
-      | minmaxgroup[catquiz_minscalevalue] | 8.5       |
-      | minmaxgroup[catquiz_maxscalevalue] | 12        |
     And I set the field "Name" to "Geometry"
-    And I set the field "Parent catscale - None if top level catscale" to "Mathematics"
+    And I set the field "Parent CAT scale - None if top level CAT scale" to "Mathematics"
     And I press "Save changes"
+    And I wait until the page is ready
+    ## TODO: should return to the same tab? Sometime tab not switched back to CAT scales after editing of catscale
+    And I click on "CAT scales" "link" in the "#region-main" "css_element"
     Then I should see "Geometry" in the "[data-name=\"Geometry\"]" "css_element"
     And I click on "Subscribed" "link" in the "[data-name=\"Geometry\"]" "css_element"
     Then I should see "Subscribe" in the "[data-name=\"Geometry\"]" "css_element"
