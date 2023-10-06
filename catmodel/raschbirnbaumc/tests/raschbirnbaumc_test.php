@@ -27,6 +27,7 @@
 use PHPUnit\Framework\ExpectationFailedException;
 use PHPUnit\Framework\TestCase;
 use SebastianBergmann\RecursionContext\InvalidArgumentException;
+use local_catquiz\local\model\model_responses;
 
 /**
  * @package catmodel_raschbirnbaumc
@@ -42,12 +43,12 @@ class raschbirnbaumc_test extends TestCase {
      * @throws InvalidArgumentException
      * @throws ExpectationFailedException
      */
-    public function test_get_log_jacobian(float $pp, float $k, array $ip, array $expected) {
+    public function test_get_log_jacobian(array $pp, float $k, array $ip, array $expected) {
 
         $result = [];
-        $callbacks = raschbirnbaumc::get_log_jacobian($pp, $k);
+        $result = raschbirnbaumc::get_log_jacobian($pp, $ip, $k);
 
-        $result = array_map(fn ($a) => (float)sprintf("%.6f", $a($ip)), $callbacks);
+        $result = array_map(fn ($a) => (float)sprintf("%.6f", $a), $result);
 
         // Limit the values.
         $expected = array_map(fn ($a) => (float)sprintf("%.6f", $a), $expected);
@@ -62,13 +63,13 @@ class raschbirnbaumc_test extends TestCase {
      * @throws InvalidArgumentException
      * @throws ExpectationFailedException
      */
-    public function test_get_log_hessian(float $pp, float $k, array $ip, array $expected) {
+    public function test_get_log_hessian(array $pp, float $k, array $ip, array $expected) {
 
         $result = [];
-        $callbacksmatrix = raschbirnbaumc::get_log_hessian($pp, $k);
+        $resultsmatrix = raschbirnbaumc::get_log_hessian($pp, $ip, $k);
 
-        foreach ($callbacksmatrix as $callbacks) {
-            $result[] = array_map(fn ($a) => (float)sprintf("%.6f", $a($ip)), $callbacks);
+        foreach ($resultsmatrix as $results) {
+            $result[] = array_map(fn ($a) => (float)sprintf("%.6f", $a), $results);
         }
 
         // Limit the values.
@@ -83,13 +84,13 @@ class raschbirnbaumc_test extends TestCase {
     /**
      * Test log_likelihood_p function.
      * @dataProvider log_likelihood_p_provider
-     * @param float $pp
+     * @param array $pp
      * @param float $k
      * @param array $ip
      * @param float $expected
      * @return void
      */
-    public function test_log_likelihood_p(float $pp, float $k, array $ip, float $expected) {
+    public function test_log_likelihood_p(array $pp, float $k, array $ip, float $expected) {
         $result = raschbirnbaumc::log_likelihood_p($pp, $ip, $k);
 
         // We only verify for four commas after the dot.
@@ -102,13 +103,13 @@ class raschbirnbaumc_test extends TestCase {
     /**
      * Test log_likelihood_p function.
      * @dataProvider log_likelihood_p_p_provider
-     * @param float $pp
+     * @param array $pp
      * @param float $k
      * @param array $ip
      * @param float $expected
      * @return void
      */
-    public function test_log_likelihood_p_p(float $pp, float $k, array $ip, float $expected) {
+    public function test_log_likelihood_p_p(array $pp, float $k, array $ip, float $expected) {
         $result = raschbirnbaumc::log_likelihood_p_p($pp, $ip, $k);
 
         // We only verify for four commas after the dot.
@@ -121,16 +122,16 @@ class raschbirnbaumc_test extends TestCase {
     /**
      * Test least_mean_squares_1st_derivative_ip function.
      * @dataProvider least_mean_squares_1st_derivative_ip_provider
-     * @param array $n
+     * @param int $n
      * @param array $pp
-     * @param array $k
+     * @param float $k
      * @param array $ip
      * @param array $expected
      * @return void
      */
-    public function test_least_mean_squares_1st_derivative_ip(array $n, array $pp, array $k, array $ip, array $expected) {
+    public function test_least_mean_squares_1st_derivative_ip(int $n, array $pp, float $k, array $ip, array $expected) {
 
-        $result = raschbirnbaumc::least_mean_squares_1st_derivative_ip($pp, $ip, $k, $n);
+        $result = $this->getmodel()->least_mean_squares_1st_derivative_ip($pp, $ip, $k, $n);
 
         $result = array_map(fn ($a) => (float)sprintf("%.6f", $a), $result);
 
@@ -144,17 +145,17 @@ class raschbirnbaumc_test extends TestCase {
     /**
      * Test least_mean_squares_1st_derivative_ip function.
      * @dataProvider least_mean_squares_2nd_derivative_ip_provider
-     * @param array $n
+     * @param int $n
      * @param array $pp
-     * @param array $k
+     * @param float $k
      * @param array $ip
      * @param array $expected
      * @return void
      */
-    public function test_least_mean_squares_2nd_derivative_ip(array $n, array $pp, array $k, array $ip, array $expected) {
+    public function test_least_mean_squares_2nd_derivative_ip(int $n, array $pp, float $k, array $ip, array $expected) {
 
         $resultmatrix = [];
-        $result = raschbirnbaumc::least_mean_squares_2nd_derivative_ip($pp, $ip, $k, $n);
+        $result = $this->getmodel()->least_mean_squares_2nd_derivative_ip($pp, $ip, $k, $n);
 
         foreach ($result as $row) {
             $resultmatrix[] = array_map(fn ($a) => (float)sprintf("%.6f", $a), $row);
@@ -177,9 +178,9 @@ class raschbirnbaumc_test extends TestCase {
     public function least_mean_squares_1st_derivative_ip_provider() {
         return [
             "testcase1" => [
-                'n' => [5],
-                'pp' => [-3],
-                'k' => [0.3],
+                'n' => 5,
+                'pp' => ['ability' => -3],
+                'k' => 0.3,
                 'ip' => [
                     "difficulty" => -2.5,
                     "discrimination" => 0.7,
@@ -188,9 +189,9 @@ class raschbirnbaumc_test extends TestCase {
                 'expected' => [-0.2905559, -0.2075399, 1.181301],
             ],
             "testcase2" => [
-                'n' => [5],
-                'pp' => [-3],
-                'k' => [0.95],
+                'n' => 5,
+                'pp' => ['ability' => -3],
+                'k' => 0.95,
                 'ip' => [
                     "difficulty" => -2.5,
                     "discrimination" => 0.7,
@@ -199,9 +200,9 @@ class raschbirnbaumc_test extends TestCase {
                 'expected' => [0.6473028, 0.4623591, -2.631713],
             ],
             "testcase3" => [
-                'n' => [27],
-                'pp' => [-2],
-                'k' => [0.3],
+                'n' => 27,
+                'pp' => ['ability' => -2],
+                'k' => 0.3,
                 'ip' => [
                     "difficulty" => -2.5,
                     "discrimination" => 2.0,
@@ -210,9 +211,9 @@ class raschbirnbaumc_test extends TestCase {
                 'expected' => [-7.935613, 1.983903, 7.236641],
             ],
             "testcase4" => [
-                'n' => [27],
-                'pp' => [-2],
-                'k' => [0.95],
+                'n' => 27,
+                'pp' => ['ability' => -2],
+                'k' => 0.95,
                 'ip' => [
                     "difficulty" => -2.5,
                     "discrimination" => 2.0,
@@ -221,9 +222,9 @@ class raschbirnbaumc_test extends TestCase {
                 'expected' => [2.416005, -0.6040013, -2.203202],
             ],
             "testcase5" => [
-                'n' => [3],
-                'pp' => [0.5],
-                'k' => [0.3],
+                'n' => 3,
+                'pp' => ['ability' => 0.5],
+                'k' => 0.3,
                 'ip' => [
                     "difficulty" => 0.5,
                     "discrimination" => 2.5,
@@ -232,9 +233,9 @@ class raschbirnbaumc_test extends TestCase {
                 'expected' => [-0.9140625, -9.167132e-13, 1.125]
             ],
             "testcase6" => [
-                'n' => [3],
-                'pp' => [0.5],
-                'k' => [0.95],
+                'n' => 3,
+                'pp' => ['ability' => 0.5],
+                'k' => 0.95,
                 'ip' => [
                     "difficulty" => 0.5,
                     "discrimination" => 2.5,
@@ -243,9 +244,9 @@ class raschbirnbaumc_test extends TestCase {
                 'expected' => [2.416005, -0.6040013, -2.203202],
             ],
             "testcase7" => [
-                'n' => [1],
-                'pp' => [1.5],
-                'k' => [0.3],
+                'n' => 1,
+                'pp' => ['ability' => 1.5],
+                'k' => 0.3,
                 'ip' => [
                     "difficulty" => -1,
                     "discrimination" => 2,
@@ -254,9 +255,9 @@ class raschbirnbaumc_test extends TestCase {
                 'expected' => [-0.01752321, 0.02190401, 0.009284882],
             ],
             "testcase8" => [
-                'n' => [1],
-                'pp' => [1.5],
-                'k' => [0.95],
+                'n' => 1,
+                'pp' => ['ability' => 1.5],
+                'k' => 0.95,
                 'ip' => [
                     "difficulty" => -1,
                     "discrimination" => 2,
@@ -265,9 +266,9 @@ class raschbirnbaumc_test extends TestCase {
                 'expected' => [-0.001102506, 0.001378132, 0.000584176],
             ],
             "testcase9" => [
-                'n' => [100],
-                'pp' => [3.5],
-                'k' => [0.3],
+                'n' => 100,
+                'pp' => ['ability' => 3.5],
+                'k' => 0.3,
                 'ip' => [
                     "difficulty" => 1.5,
                     "discrimination" => 1.5,
@@ -276,9 +277,9 @@ class raschbirnbaumc_test extends TestCase {
                 'expected' => [-6.75377, 9.005026, 6.30224],
             ],
             "testcase10" => [
-                'n' => [100],
-                'pp' => [3.5],
-                'k' => [0.95],
+                'n' => 100,
+                'pp' => ['ability' => 3.5],
+                'k' => 0.95,
                 'ip' => [
                     "difficulty" => 1.5,
                     "discrimination" => 1.5,
@@ -296,9 +297,9 @@ class raschbirnbaumc_test extends TestCase {
     public function least_mean_squares_2nd_derivative_ip_provider() {
         return [
             "testcase1" => [
-                'n' => [5],
-                'pp' => [-3],
-                'k' => [0.3],
+                'n' => 5,
+                'pp' => ['ability' => -3],
+                'k' => 0.3,
                 'ip' => [
                     "difficulty" => -2.5,
                     "discrimination" => 0.7,
@@ -311,9 +312,9 @@ class raschbirnbaumc_test extends TestCase {
                 ],
             ],
             "testcase2" => [
-                'n' => [5],
-                'pp' => [-3],
-                'k' => [0.95],
+                'n' => 5,
+                'pp' => ['ability' => -3],
+                'k' => 0.95,
                 'ip' => [
                     "difficulty" => -2.5,
                     "discrimination" => 0.7,
@@ -326,9 +327,9 @@ class raschbirnbaumc_test extends TestCase {
                 ],
             ],
             "testcase3" => [
-                'n' => [27],
-                'pp' => [-2],
-                'k' => [0.3],
+                'n' => 27,
+                'pp' => ['ability' => -2],
+                'k' => 0.3,
                 'ip' => [
                     "difficulty" => -2.5,
                     "discrimination" => 2.0,
@@ -341,9 +342,9 @@ class raschbirnbaumc_test extends TestCase {
                 ],
             ],
             "testcase4" => [
-                'n' => [27],
-                'pp' => [-2],
-                'k' => [0.95],
+                'n' => 27,
+                'pp' => ['ability' => -2],
+                'k' => 0.95,
                 'ip' => [
                     "difficulty" => -2.5,
                     "discrimination" => 2.0,
@@ -356,9 +357,9 @@ class raschbirnbaumc_test extends TestCase {
                 ],
             ],
             "testcase5" => [
-                'n' => [3],
-                'pp' => [0.5],
-                'k' => [0.3],
+                'n' => 3,
+                'pp' => ['ability' => 0.5],
+                'k' => 0.3,
                 'ip' => [
                     "difficulty" => 0.5,
                     "discrimination" => 2.5,
@@ -371,9 +372,9 @@ class raschbirnbaumc_test extends TestCase {
                 ],
             ],
             "testcase6" => [
-                'n' => [3],
-                'pp' => [0.5],
-                'k' => [0.95],
+                'n' => 3,
+                'pp' => ['ability' => 0.5],
+                'k' => 0.95,
                 'ip' => [
                     "difficulty" => 0.5,
                     "discrimination" => 2.5,
@@ -386,9 +387,9 @@ class raschbirnbaumc_test extends TestCase {
                 ],
             ],
             "testcase7" => [
-                'n' => [1],
-                'pp' => [1.5],
-                'k' => [0.3],
+                'n' => 1,
+                'pp' => ['ability' => 1.5],
+                'k' => 0.3,
                 'ip' => [
                     "difficulty" => -1,
                     "discrimination" => 2,
@@ -401,9 +402,9 @@ class raschbirnbaumc_test extends TestCase {
                 ],
             ],
             "testcase8" => [
-                'n' => [1],
-                'pp' => [1.5],
-                'k' => [0.95],
+                'n' => 1,
+                'pp' => ['ability' => 1.5],
+                'k' => 0.95,
                 'ip' => [
                     "difficulty" => -1,
                     "discrimination" => 2,
@@ -416,9 +417,9 @@ class raschbirnbaumc_test extends TestCase {
                 ],
             ],
             "testcase9" => [
-                'n' => [100],
-                'pp' => [3.5],
-                'k' => [0.3],
+                'n' => 100,
+                'pp' => ['ability' => 3.5],
+                'k' => 0.3,
                 'ip' => [
                     "difficulty" => 1.5,
                     "discrimination" => 1.5,
@@ -431,9 +432,9 @@ class raschbirnbaumc_test extends TestCase {
                 ],
             ],
             "testcase10" => [
-                'n' => [100],
-                'pp' => [3.5],
-                'k' => [0.95],
+                'n' => 100,
+                'pp' => ['ability' => 3.5],
+                'k' => 0.95,
                 'ip' => [
                     "difficulty" => 1.5,
                     "discrimination" => 1.5,
@@ -455,7 +456,7 @@ class raschbirnbaumc_test extends TestCase {
     public function log_likelihood_p_provider() {
         return [
             "testcase1" => [
-                'pp' => -3,
+                'pp' => ['ability' => -3],
                 'k' => 1,
                 'ip' => [
                     "difficulty" => -2.5,
@@ -465,7 +466,7 @@ class raschbirnbaumc_test extends TestCase {
                 'expected' => 0.2877805,
             ],
             "testcase2" => [
-                'pp' => -3,
+                'pp' => ['ability' => -3],
                 'k' => 0,
                 'ip' => [
                     "difficulty" => -2.5,
@@ -475,7 +476,7 @@ class raschbirnbaumc_test extends TestCase {
                 'expected' => -0.2893677,
             ],
             "testcase3" => [
-                'pp' => -2,
+                'pp' => ['ability' => -2],
                 'k' => 1,
                 'ip' => [
                     "difficulty" => -2.5,
@@ -485,7 +486,7 @@ class raschbirnbaumc_test extends TestCase {
                 'expected' => 0.3694352,
             ],
             "testcase4" => [
-                'pp' => -2,
+                'pp' => ['ability' => -2],
                 'k' => 0,
                 'ip' => [
                     "difficulty" => -2.5,
@@ -495,7 +496,7 @@ class raschbirnbaumc_test extends TestCase {
                 'expected' => -1.462117,
             ],
             "testcase5" => [
-                'pp' => 0.5,
+                'pp' => ['ability' => 0.5],
                 'k' => 1,
                 'ip' => [
                     "difficulty" => 0.5,
@@ -505,7 +506,7 @@ class raschbirnbaumc_test extends TestCase {
                 'expected' => 0.6018519,
             ],
             "testcase6" => [
-                'pp' => 0.5,
+                'pp' => ['ability' => 0.5],
                 'k' => 0,
                 'ip' => [
                     "difficulty" => 0.5,
@@ -515,7 +516,7 @@ class raschbirnbaumc_test extends TestCase {
                 'expected' => -1.25,
             ],
             "testcase7" => [
-                'pp' => 1.5,
+                'pp' => ['ability' => 1.5],
                 'k' => 1,
                 'ip' => [
                     "difficulty" => -1.0,
@@ -525,7 +526,7 @@ class raschbirnbaumc_test extends TestCase {
                 'expected' => 0.01271213,
             ],
             "testcase8" => [
-                'pp' => 1.5,
+                'pp' => ['ability' => 1.5],
                 'k' => 0,
                 'ip' => [
                     "difficulty" => -1.0,
@@ -535,7 +536,7 @@ class raschbirnbaumc_test extends TestCase {
                 'expected' => -1.986614,
             ],
             "testcase9" => [
-                'pp' => 3.5,
+                'pp' => ['ability' => 3.5],
                 'k' => 1,
                 'ip' => [
                     "difficulty" => 1.5,
@@ -545,7 +546,7 @@ class raschbirnbaumc_test extends TestCase {
                 'expected' => 0.05269819,
             ],
             "testcase10" => [
-                'pp' => 3.5,
+                'pp' => ['ability' => 3.5],
                 'k' => 0,
                 'ip' => [
                     "difficulty" => 1.5,
@@ -564,7 +565,7 @@ class raschbirnbaumc_test extends TestCase {
     public function log_likelihood_p_p_provider() {
         return [
             "testcase1" => [
-                'pp' => -3,
+                'pp' => ['ability' => -3],
                 'k' => 1,
                 'ip' => [
                     "difficulty" => -2.5,
@@ -574,7 +575,7 @@ class raschbirnbaumc_test extends TestCase {
                 'expected' => -0.04792001,
             ],
             "testcase2" => [
-                'pp' => -3,
+                'pp' => ['ability' => -3],
                 'k' => 0,
                 'ip' => [
                     "difficulty" => -2.5,
@@ -584,7 +585,7 @@ class raschbirnbaumc_test extends TestCase {
                 'expected' => -0.1188237,
             ],
             "testcase3" => [
-                'pp' => -2,
+                'pp' => ['ability' => -2],
                 'k' => 1,
                 'ip' => [
                     "difficulty" => -2.5,
@@ -594,7 +595,7 @@ class raschbirnbaumc_test extends TestCase {
                 'expected' => -0.4779271,
             ],
             "testcase4" => [
-                'pp' => -2,
+                'pp' => ['ability' => -2],
                 'k' => 0,
                 'ip' => [
                     "difficulty" => -2.5,
@@ -604,7 +605,7 @@ class raschbirnbaumc_test extends TestCase {
                 'expected' => -0.7864477,
             ],
             "testcase5" => [
-                'pp' => 0.5,
+                'pp' => ['ability' => 0.5],
                 'k' => 1,
                 'ip' => [
                     "difficulty" => 0.5,
@@ -614,7 +615,7 @@ class raschbirnbaumc_test extends TestCase {
                 'expected' => -0.3622257,
             ],
             "testcase6" => [
-                'pp' => 0.5,
+                'pp' => ['ability' => 0.5],
                 'k' => 0,
                 'ip' => [
                     "difficulty" => 0.5,
@@ -624,7 +625,7 @@ class raschbirnbaumc_test extends TestCase {
                 'expected' => -1.5625,
             ],
             "testcase7" => [
-                'pp' => 1.5,
+                'pp' => ['ability' => 1.5],
                 'k' => 1,
                 'ip' => [
                     "difficulty" => -1.0,
@@ -634,7 +635,7 @@ class raschbirnbaumc_test extends TestCase {
                 'expected' => -0.02524554,
             ],
             "testcase8" => [
-                'pp' => 1.5,
+                'pp' => ['ability' => 1.5],
                 'k' => 0,
                 'ip' => [
                     "difficulty" => -1.0,
@@ -644,7 +645,7 @@ class raschbirnbaumc_test extends TestCase {
                 'expected' => -0.02659222,
             ],
             "testcase9" => [
-                'pp' => 3.5,
+                'pp' => ['ability' => 3.5],
                 'k' => 1,
                 'ip' => [
                     "difficulty" => 1.5,
@@ -654,7 +655,7 @@ class raschbirnbaumc_test extends TestCase {
                 'expected' => -0.0743266,
             ],
             "testcase10" => [
-                'pp' => 3.5,
+                'pp' => ['ability' => 3.5],
                 'k' => 0,
                 'ip' => [
                     "difficulty" => 1.5,
@@ -673,7 +674,7 @@ class raschbirnbaumc_test extends TestCase {
     public function get_log_jacobian_provider() {
         return [
             "testcase 1" => [
-                'pp' => -3,
+                'pp' => ['ability' => -3],
                 'k' => 1,
                 'ip' => [
                     "difficulty" => -2.5,
@@ -683,7 +684,7 @@ class raschbirnbaumc_test extends TestCase {
                 'expected' => [-0.2877805, -0.205557, 1.170017],
             ],
             "testcase 2" => [
-                'pp' => -3,
+                'pp' => ['ability' => -3],
                 'k' => 0,
                 'ip' => [
                     "difficulty" => -2.5,
@@ -694,7 +695,7 @@ class raschbirnbaumc_test extends TestCase {
             ],
             // Add the remaining test cases...
             "testcase 3" => [
-                'pp' => 0.5,
+                'pp' => ['ability' => 0.5],
                 'k' => 1,
                 'ip' => [
                     "difficulty" => -2.5,
@@ -704,7 +705,7 @@ class raschbirnbaumc_test extends TestCase {
                 'expected' => [-0.3694352, 0.09235881, 0.3368952],
             ],
             "testcase 4" => [
-                'pp' => 0.5,
+                'pp' => ['ability' => 0.5],
                 'k' => 0,
                 'ip' => [
                     "difficulty" => -2.5,
@@ -714,7 +715,7 @@ class raschbirnbaumc_test extends TestCase {
                 'expected' => [1.462117, -0.3655293, -1.333333],
             ],
             "testcase 5" => [
-                'pp' => 1.5,
+                'pp' => ['ability' => 1.5],
                 'k' => 1,
                 'ip' => [
                     "difficulty" => -1.00,
@@ -724,7 +725,7 @@ class raschbirnbaumc_test extends TestCase {
                 'expected' => [-0.01271213, 0.01589017, 0.006735678],
             ],
             "testcase 6" => [
-                'pp' => 1.5,
+                'pp' => ['ability' => 1.5],
                 'k' => 0,
                 'ip' => [
                     "difficulty" => -1.00,
@@ -734,7 +735,7 @@ class raschbirnbaumc_test extends TestCase {
                 'expected' => [1.986614, -2.483268, -1.052632],
             ],
             "testcase 7" => [
-                'pp' => 3.5,
+                'pp' => ['ability' => 3.5],
                 'k' => 1,
                 'ip' => [
                     "difficulty" => 1.50,
@@ -744,7 +745,7 @@ class raschbirnbaumc_test extends TestCase {
                 'expected' => [-0.05269819, 0.07026425, 0.049175],
             ],
             "testcase 8" => [
-                'pp' => 3.5,
+                'pp' => ['ability' => 3.5],
                 'k' => 0,
                 'ip' => [
                     "difficulty" => 1.50,
@@ -755,7 +756,7 @@ class raschbirnbaumc_test extends TestCase {
             ],
             // Add the remaining test cases...
             "testcase 9" => [
-                'pp' => 4.5,
+                'pp' => ['ability' => 4.5],
                 'k' => 1,
                 'ip' => [
                     "difficulty" => 0.00,
@@ -765,7 +766,7 @@ class raschbirnbaumc_test extends TestCase {
                 'expected' => [0.06338283, 0.02728076, -0.02040469],
             ],
             "testcase 10" => [
-                'pp' => 4.5,
+                'pp' => ['ability' => 4.5],
                 'k' => 0,
                 'ip' => [
                     "difficulty" => 0.00,
@@ -785,7 +786,7 @@ class raschbirnbaumc_test extends TestCase {
 
         return [
             "testcase 1" => [
-                'pp' => -3,
+                'pp' => ['ability' => -3],
                 'k' => 1,
                 'ip' => [
                     "difficulty" => -2.5,
@@ -799,7 +800,7 @@ class raschbirnbaumc_test extends TestCase {
                 ],
             ],
             "testcase 2" => [
-                'pp' => -3,
+                'pp' => ['ability' => -3],
                 'k' => 0,
                 'ip' => [
                     "difficulty" => -2.5,
@@ -813,7 +814,7 @@ class raschbirnbaumc_test extends TestCase {
                 ],
             ],
             "testcase 3" => [
-                'pp' => 0.5,
+                'pp' => ['ability' => 0.5],
                 'k' => 1,
                 'ip' => [
                     "difficulty" => -2.5,
@@ -827,7 +828,7 @@ class raschbirnbaumc_test extends TestCase {
                 ],
             ],
             "testcase 4" => [
-                'pp' => 0.5,
+                'pp' => ['ability' => 0.5],
                 'k' => 0,
                 'ip' => [
                     "difficulty" => -2.5,
@@ -841,7 +842,7 @@ class raschbirnbaumc_test extends TestCase {
                 ],
             ],
             "testcase 5" => [
-                'pp' => 1.5,
+                'pp' => ['ability' => 1.5],
                 'k' => 1,
                 'ip' => [
                     "difficulty" => -1.00,
@@ -855,7 +856,7 @@ class raschbirnbaumc_test extends TestCase {
                 ],
             ],
             "testcase 6" => [
-                'pp' => 1.5,
+                'pp' => ['ability' => 1.5],
                 'k' => 0,
                 'ip' => [
                     "difficulty" => -1.00,
@@ -869,7 +870,7 @@ class raschbirnbaumc_test extends TestCase {
                 ],
             ],
             "testcase 7" => [
-                'pp' => 3.5,
+                'pp' => ['ability' => 3.5],
                 'k' => 1,
                 'ip' => [
                     "difficulty" => 1.50,
@@ -883,7 +884,7 @@ class raschbirnbaumc_test extends TestCase {
                 ],
             ],
             "testcase 8" => [
-                'pp' => 3.5,
+                'pp' => ['ability' => 3.5],
                 'k' => 0,
                 'ip' => [
                     "difficulty" => 1.50,
@@ -898,7 +899,7 @@ class raschbirnbaumc_test extends TestCase {
             ],
             // Add the remaining test cases...
             "testcase 9" => [
-                'pp' => 4.5,
+                'pp' => ['ability' => 4.5],
                 'k' => 1,
                 'ip' => [
                     "difficulty" => 0.00,
@@ -912,7 +913,7 @@ class raschbirnbaumc_test extends TestCase {
                 ],
             ],
             "testcase 10" => [
-                'pp' => 4.5,
+                'pp' => ['ability' => 4.5],
                 'k' => 0,
                 'ip' => [
                     "difficulty" => 0.00,
@@ -926,5 +927,9 @@ class raschbirnbaumc_test extends TestCase {
                 ],
             ],
         ];
+    }
+    private function getmodel(): raschbirnbaumc {
+        $mr = new model_responses();
+        return new raschbirnbaumc($mr, 'raschbirnbaumc');
     }
 }
