@@ -198,6 +198,12 @@ $string['catquiz:manage_catscales'] = 'Darf CAT Skalen verwalten';
 // Role.
 $string['catquizroledescription'] = 'Catquiz VerwalterIn';
 
+// Capabilities.
+$string['catquiz:manage_catcontexts'] = 'Verwalte Versionen';
+$string['catquiz:manage_testenvironments'] = 'Verwalte Testumgebungen';
+$string['catquiz:view_teacher_feedback'] = 'Zugriff auf LehrerInnen Feedback';
+
+
 // Navbar.
 $string['managecatscales'] = 'Verwalte Skalen';
 $string['test'] = 'Teste Abos';
@@ -417,10 +423,11 @@ $string['notifyteachersofselectedcourses'] = 'Alle Kursleiter benachrichtigen';
 
 $string['close'] = 'Schließen';
 
-// Shortcodes
+// Shortcodes.
 $string['shortcodeslistofquizattempts'] = 'Gibt eine Tabelle mit Quiz-Versuchen zurück.';
+$string['shortcodescatquizfeedback'] = 'Zeige Feedback zu Versuchen an.';
 
-// Validation
+// Validation.
 $string['valuemustbegreaterzero'] = 'Wert muss höher als 0 sein.';
 
 // Breakinfo.

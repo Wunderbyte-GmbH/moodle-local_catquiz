@@ -201,6 +201,11 @@ $string['catquiz:manage_catscales'] = 'Is allowed to manage Catquiz CAT scales';
 // Role.
 $string['catquizroledescription'] = 'Catquiz Manager';
 
+// Capabilities.
+$string['catquiz:manage_catcontexts'] = 'Manage Cat contexts';
+$string['catquiz:manage_testenvironments'] = 'Mange test environments';
+$string['catquiz:view_teacher_feedback'] = 'Access teacher feedback';
+
 // Navbar.
 $string['managecatscales'] = 'Manage CAT scales';
 $string['test'] = 'Test Subscription';
@@ -423,10 +428,11 @@ $string['notifyteachersofselectedcourses'] = 'Notify teachers of selected course
 
 $string['close'] = 'Close';
 
-// Shortcodes
+// Shortcodes.
 $string['shortcodeslistofquizattempts'] = 'Returns a table of quiz attempts.';
+$string['shortcodescatquizfeedback'] = 'Display feedback for quiz attempts';
 
-// Validation
+// Validation.
 $string['valuemustbegreaterzero'] = 'Value must be greater than zero.';
 
 // Breakinfo.
