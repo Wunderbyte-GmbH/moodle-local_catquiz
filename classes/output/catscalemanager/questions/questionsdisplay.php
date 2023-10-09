@@ -228,7 +228,7 @@ class questionsdisplay {
                 'numerical' => get_string('pluginname', 'qtype_numerical'),
                 'shortanswer' => get_string('pluginname', 'qtype_shortanswer'),
                 'truefalse' => get_string('pluginname', 'qtype_truefalse'),
-            ]
+            ],
         ]);
         $table->define_fulltextsearchcolumns(['idnumber', 'name', 'questiontext', 'qtype']);
         $table->define_sortablecolumns([

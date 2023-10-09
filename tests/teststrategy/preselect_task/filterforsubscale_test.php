@@ -49,7 +49,7 @@ class filterforsubscale_test extends basic_testcase {
     public function test_throws_an_exception_for_unknown_teststrategy() {
         $context = [
             'teststrategy' => 'XXX',
-            'person_ability' => [1 => 1.0, ],
+            'person_ability' => [1 => 1.0],
         ];
         $this->expectException(UnexpectedValueException::class);
         (new filterforsubscale())->run($context, fn () => 'nevercalled');
@@ -64,11 +64,18 @@ class filterforsubscale_test extends basic_testcase {
     public function test_returns_expected_question_from_expected_catscale(
         array $context, $expected
     ) {
-        $result = (new filterforsubscaletesting())->run($context, fn ($context) => (new strategyfastestscore())->run($context, fn () => 'nevercalled'));
+        $result = (new filterforsubscaletesting())->run($context,
+            fn ($context) => (new strategyfastestscore())->run($context,
+            fn () => 'nevercalled'));
         $this->assertEquals($expected, $result->unwrap()->id);
     }
 
-    public function provider() {
+    /**
+     * Data Provider.
+     *
+     * @return array
+     */
+    public static function provider():array {
         $context['questions'] = [
             '1' => (object) [
                 'id' => 1,

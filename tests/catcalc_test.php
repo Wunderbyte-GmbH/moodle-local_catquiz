@@ -60,20 +60,34 @@ class catcalc_test extends basic_testcase {
             58 => ['fraction' => 1.0],
         ];
         $itemparamlist = new model_item_param_list();
-        $itemparamlist
-            ->add((new model_item_param(5, $model))->set_parameters(['difficulty' =>
-                0.7758, 'discrimination' => 0.5, 'guessing' => 0.2]))
-            ->add((new model_item_param(33, $model))->set_parameters(['difficulty' =>
-                -37.7967, 'discrimination' => 1.2, 'guessing' => 1.2]))
-            ->add((new model_item_param(50, $model))->set_parameters(['difficulty' =>
-                -37.7967, 'discrimination' => 0.3, 'guessing' => 0.7]))
-            ->add((new model_item_param(58, $model))->set_parameters(['difficulty' =>
-                -37.7967, 'discrimination' => 0, 'guessing' => 0.4]));
+        $itemparamlist->add((new model_item_param(5, $model))->set_parameters([
+                'difficulty' => 0.7758,
+                'discrimination' => 0.5,
+                'guessing' => 0.2,
+                ]))->add((new model_item_param(33, $model))->set_parameters([
+                    'difficulty' => -37.7967,
+                    'discrimination' => 1.2,
+                    'guessing' => 1.2,
+                ]))->add((new model_item_param(50, $model))->set_parameters([
+                    'difficulty' => -37.7967,
+                    'discrimination' => 0.3,
+                    'guessing' => 0.7,
+                ]))->add((new model_item_param(58, $model))->set_parameters([
+                    'difficulty' => -37.7967,
+                    'discrimination' => 0,
+                    'guessing' => 0.4,
+                ]));
         $result = catcalc::estimate_person_ability($personresponses, $itemparamlist);
         $this->assertEquals($expected, sprintf("%.4f", $result));
     }
 
-    public function provider() {
+    /**
+     * Provider function.
+     *
+     * @return array
+     *
+     */
+    public static function provider():array {
         return [
             'web-raschbirnbauma' => [
                 'model' => 'web_raschbirnbauma',
@@ -132,7 +146,13 @@ class catcalc_test extends basic_testcase {
         $this->assertEquals($expected, sprintf("%.4f", $result['difficulty']));
     }
 
-    public function item_param_provider() {
+    /**
+     * Item provider fucntion.
+     *
+     * @return array
+     *
+     */
+    public static function item_param_provider():array {
         $responses = [
             1 => [
                 'component' => [
@@ -187,6 +207,12 @@ class catcalc_test extends basic_testcase {
         ];
     }
 
+    /**
+     * Test function.
+     *
+     * @return void
+     *
+     */
     public function test_itemparam_jacobian_function_can_be_called() {
         $responses = [
             1 => [
@@ -237,6 +263,11 @@ class catcalc_test extends basic_testcase {
         $this->assertIsFloat(reset($result));
     }
 
+    /**
+     * Test_build_callable_array_works_as_expected
+     *
+     * @return void
+     */
     public function test_build_callable_array_works_as_expected() {
         $inarray = [
             fn ($x) => $x,

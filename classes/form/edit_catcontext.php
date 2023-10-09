@@ -59,11 +59,11 @@ class edit_catcontext extends dynamic_form {
 
         $mform->addElement('header', 'edit_catquiz', get_string('managecatcontexts', 'local_catquiz'));
 
-        // Add a text field for the catcontext name
+        // Add a text field for the catcontext name.
         $mform->addElement('text', 'name', get_string('name'));
         $mform->setType('name', PARAM_TEXT);
 
-        // Add a textarea field for the catscale description
+        // Add a textarea field for the catscale description.
         $mform->addElement('editor', 'description', get_string('description'), 'wrap="virtual" rows="5" cols="50"');
         $mform->setType('description', PARAM_CLEANHTML);
 

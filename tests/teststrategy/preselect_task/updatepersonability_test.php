@@ -65,7 +65,7 @@ class updatepersonability_test extends TestCase {
                 'expected' => 'not skipped',
                 'context' => [
                     'lastquestion' => (object) ['catscaleid' => "1"],
-                    'userid' => 1, // This user does not have enough responses
+                    'userid' => 1, // This user does not have enough responses.
                     'contextid' => 1,
                     'person_ability' => [
                         '1' => 0.12,
@@ -78,7 +78,7 @@ class updatepersonability_test extends TestCase {
                         (object) ['catscaleid' => "2"],
                     ],
                     // Answers that do not have at least one correct response are filtered out.
-                    // In this case, only item 1 will be kept
+                    // In this case, only item 1 will be kept.
                     'fake_response_data' => [
                         1 => [
                             'component' => [
@@ -106,13 +106,13 @@ class updatepersonability_test extends TestCase {
                     ],
                     'contextid' => 1,
                     'lastquestion' => (object) ['catscaleid' => "1"],
-                    'userid' => 1, // This user does not have enough responses
+                    'userid' => 1, // This user does not have enough responses.
                     'questions' => [
                         (object) ['catscaleid' => "1"],
                         (object) ['catscaleid' => "2"],
                     ],
                     // Answers that do not have at least one correct response are filtered out.
-                    // In this case, only item 1 will be kept
+                    // In this case, only item 1 will be kept.
                     'fake_response_data' => [
                         1 => [
                             'component' => [

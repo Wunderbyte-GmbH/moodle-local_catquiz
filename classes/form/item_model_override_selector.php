@@ -89,7 +89,6 @@ class item_model_override_selector extends dynamic_form {
         foreach (array_keys($models) as $model) {
             $group = [];
             $id = sprintf('override_%s', $model);
-            
             if (!empty($data->editing)) {
                 $select = $mform->createElement('select', sprintf('%s_select', $id), $model, $options, ['multiple' => false]);
             } else {
@@ -168,10 +167,10 @@ class item_model_override_selector extends dynamic_form {
         foreach (array_keys($models) as $model) {
             $fieldname = sprintf('override_%s', $model);
             $obj = new stdClass;
-            $obj->status = $data->$fieldname[sprintf('%s_select', $fieldname)];
-            $obj->difficulty = $data->$fieldname[sprintf('%s_difficulty', $fieldname)];
-            $obj->discrimination = $data->$fieldname[sprintf('%s_discrimination', $fieldname)];
-            $obj->guessing = $data->$fieldname[sprintf('%s_guessing', $fieldname)];
+            $obj->status = $data->{$fieldname[sprintf('%s_select', $fieldname)]};
+            $obj->difficulty = $data->{$fieldname[sprintf('%s_difficulty', $fieldname)]};
+            $obj->discrimination = $data->{$fieldname[sprintf('%s_discrimination', $fieldname)]};
+            $obj->guessing = $data->{$fieldname[sprintf('%s_guessing', $fieldname)]};
             $formitemparams[$model] = $obj;
         }
         // Fetch record from db.
@@ -183,13 +182,13 @@ class item_model_override_selector extends dynamic_form {
         $toupdate = [];
         $toinsert = [];
         foreach (array_keys($models) as $model) {
-            
+
             // Check if model already exists in db.
             if (isset($saveditemparams[$model])) {
                 // Check for each model if there is a change.
                 foreach ($formitemparams[$model] as $key => $value) {
                     if ( isset($saveditemparams[$model]) &&
-                        (property_exists($saveditemparams[$model], $key) 
+                        (property_exists($saveditemparams[$model], $key)
                         && $saveditemparams[$model]->$key == $value)) {
                         // If nothing is changed, we unset the values.
                         unset($formitemparams[$model]->$key);
@@ -245,7 +244,7 @@ class item_model_override_selector extends dynamic_form {
                     $defaultstatus = strval(STATUS_NOT_CALCULATED);
                     $formitemparams[$m]->status = $defaultstatus;
                     $fieldname = sprintf('override_%s', $m);
-                    $data->$fieldname[sprintf('%s_select', $fieldname)] = $defaultstatus;
+                    $data->{$fieldname[sprintf('%s_select', $fieldname)]} = $defaultstatus;
                     $this->set_data($data);
                     $toupdate[] = [
                         'status' => $formitemparams[$m]->status,
@@ -281,7 +280,7 @@ class item_model_override_selector extends dynamic_form {
             $new['timemodified'] = time();
             $new['status'] = !empty($new['discrimination']) &&
                             !empty($new['difficulty']) &&
-                            !empty($new['guessing']) ? 
+                            !empty($new['guessing']) ?
                             STATUS_UPDATED_MANUALLY : $new['status'];
             $DB->insert_record(
                 'local_catquiz_itemparams',
@@ -309,7 +308,7 @@ class item_model_override_selector extends dynamic_form {
      * @param array $update
      * @param array $formitemparams
      * @param string $model
-     * 
+     *
      * @return void
      */
     private function update_item(string $key, array &$update, array $formitemparams, string $model):void {
@@ -361,7 +360,7 @@ class item_model_override_selector extends dynamic_form {
                 }
             } else { // Set default data if there are no calculated data for the given model.
                 $modelstatus = STATUS_NOT_CALCULATED;
-                // initial load
+                // Initial load.
                 $modeldifficulty = null;
                 $modelguessing = null;
                 $modeldiscrimination = null;
@@ -373,15 +372,15 @@ class item_model_override_selector extends dynamic_form {
                 $string = sprintf('itemstatus_%s', $status);
                 $modelstatus = get_string($string, 'local_catquiz');
             }
-            $difficultytext = 
+            $difficultytext =
                 get_string('itemdifficulty', 'local_catquiz') . ":";
-            $guessingtext = 
+            $guessingtext =
                 get_string('guessing', 'local_catquiz') . ":";
-            $discriminationtext = 
+            $discriminationtext =
                 get_string('discrimination', 'local_catquiz') . ":";
             $data->$field = [
-                sprintf('%s_select', $field) => $modelstatus, 
-                sprintf('%s_status', $field) => $status, 
+                sprintf('%s_select', $field) => $modelstatus,
+                sprintf('%s_status', $field) => $status,
                 sprintf('%s_difficultylabel', $field) => $difficultytext,
                 sprintf('%s_difficulty', $field) => $modeldifficulty,
                 sprintf('%s_guessinglabel', $field) => $guessingtext,
@@ -390,53 +389,8 @@ class item_model_override_selector extends dynamic_form {
                 sprintf('%s_discrimination', $field) => $modeldiscrimination,
             ];
         }
-
-/*         if (!empty($data->updateitem) && $data->updateitem == "true") {
-            $item = [];
-            $this->define_item_for_update('difficulty', $item, $data);
-            $this->define_item_for_update('guessing', $item, $data);
-            $this->define_item_for_update('discrimination', $item, $data);
-
-        } */
-        // Trigger only if param is set via js
-/*         $item = $data;
-        $item->catscaleid = empty($data->catscaleid) ? required_param('catscaleid', PARAM_INT) : $data->catscaleid;
-        $item->timecreated = time();
-        $item->timemodified = time();
- */
-        //$result = model_item_param_list::save_or_update_testitem_in_db((array)$item);
-
         $this->set_data($data);
     }
-
-/*     private function define_item_for_update(string $keyname, array &$item, object $data) {
-        $values = get_object_vars($data);
-            foreach (array_keys($values) as $key) {
-                if (strpos($key, "override_") == 0) {
-                    foreach ($values[$key] as $modellabel => $modelvalue) {
-                        $stringparts = explode("_", $modellabel);
-                        if ($stringparts[2] == $keyname) {
-                            $item[$keyname] = $modelvalue == "undefined" ? null : $modelvalue;
-                        }
-                    }
-                    $item['model'] = $stringparts[1];
-                    $item['timecreated'] = time();
-                    $item['timemodified'] = time();
-                    $item['catscaleid'] = $data->scaleid;
-                    $item['componentname'] = $data->component;
-                    $item['contextid'] = $data->contextid;
-                    $item['componentid'] = $data->testitemid;
-        
-                    $result = model_item_param_list::save_or_update_testitem_in_db($item);
-                }
-            }
-            // foreach array in array_values 
-            // check if override is included, if so, delete override_ to get model_name
-            // check in array_keys delete override_modelname_ and find values of "status", "difficulty", "guessing", "discrimination"
-            // set to $item array and update item
-
-
-    } */
 
     /**
      * Returns form context

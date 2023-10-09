@@ -78,7 +78,7 @@ class teststrategy_fastest_test extends advanced_testcase {
     /**
      * Test it can run
      *
-     * @dataProvider test_radical_CAT_provider
+     * @dataProvider radical_CAT_provider
      * @return void
      * @throws InvalidArgumentException
      * @throws ExpectationFailedException
@@ -87,7 +87,7 @@ class teststrategy_fastest_test extends advanced_testcase {
         // Some test datasets need a cache, others do not.
         $cache = cache::make('local_catquiz', 'adaptivequizattempt');
         // Use default values if they are not set in the test dataset.
-        $cachekeydata = array_merge($attemptcontext, ['contextid' => 1, 'includesubscales' => true, ]);
+        $cachekeydata = array_merge($attemptcontext, ['contextid' => 1, 'includesubscales' => true]);
         $cachekey = sprintf('testitems_%s_%s', $cachekeydata['contextid'], $cachekeydata['includesubscales']);
         $cache->set($cachekey, [1 => (object)[]]);
 
@@ -96,7 +96,12 @@ class teststrategy_fastest_test extends advanced_testcase {
         $this->assertEquals($expected, $result);
     }
 
-    public function test_radical_cat_provider() {
+    /**
+     * Radical_cat_provider
+     *
+     * @return array
+     */
+    public function radical_cat_provider() {
         $question1 = (object) [
             'id' => 1,
             'model' => 'raschbirnbauma',
@@ -163,6 +168,11 @@ class teststrategy_fastest_test extends advanced_testcase {
         ];
     }
 
+    /**
+     * [Description for import_itemparams]
+     *
+     * @return void
+     */
     private function import_itemparams() {
         $importer = new testitemimporter();
         $content = file_get_contents(__DIR__ . '/../../fixtures/params_la.csv');
@@ -176,6 +186,11 @@ class teststrategy_fastest_test extends advanced_testcase {
         );
     }
 
+    /**
+     * [Description for create_catscale]
+     *
+     * @return int
+     */
     private function create_catscale() {
         $catscalestructure = new catscale_structure(
             [

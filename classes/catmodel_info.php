@@ -103,9 +103,9 @@ class catmodel_info {
         $strategy = $context->get_strategy($catscaleid);
         list($itemdifficulties, $personabilities) = $strategy->run_estimation();
         $updatedmodels = [];
-		/** @var model_item_param_list $itemparamlist */
         foreach ($itemdifficulties as $modelname => $itemparamlist) {
             $itemcounter = 0;
+            /** @var model_item_param_list $itemparamlist */
             $itemparamlist->save_to_db($contextid);
             $itemcounter += count($itemparamlist->itemparams);
             $model = get_string('pluginname', 'catmodel_'.$modelname);
@@ -122,7 +122,7 @@ class catmodel_info {
                 'contextid' => $contextid,
                 'userid' => $userid,
                 'updatedmodelsjson' => $updatedmodelsjson,
-            ]
+            ],
         ]);
         $event->trigger();
 

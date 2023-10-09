@@ -59,14 +59,20 @@ class mayberemovescale_test extends basic_testcase {
         $this->assertEquals($expected, $result->unwrap());
     }
 
-    public function provider() {
+    /**
+     * Data Provider.
+     *
+     * @return array
+     *
+     */
+    public static function provider():array {
         // Create some dummy questions for testing.
         $questions = [
             1 => (object) ['catscaleid' => 1],
-            2 => (object) ['catscaleid' => 1, ],
-            3 => (object) ['catscaleid' => 1, ],
-            4 => (object) ['catscaleid' => 1, ],
-            5 => (object) ['catscaleid' => 2, ],
+            2 => (object) ['catscaleid' => 1],
+            3 => (object) ['catscaleid' => 1],
+            4 => (object) ['catscaleid' => 1],
+            5 => (object) ['catscaleid' => 2],
         ];
 
         // Create the played questions array.

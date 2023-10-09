@@ -59,7 +59,7 @@ class edit_testenvironment extends dynamic_form {
 
         $mform->addElement('header', 'edit_testenvironment', get_string('edittestenvironment', 'local_catquiz'));
 
-        // Add a text field for the testenvironment name
+        // Add a text field for the testenvironment name.
         $mform->addElement('text', 'name', get_string('name'));
         $mform->setType('name', PARAM_TEXT);
 

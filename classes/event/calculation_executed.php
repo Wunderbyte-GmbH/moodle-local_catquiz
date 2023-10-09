@@ -87,11 +87,11 @@ class calculation_executed extends \core\event\base {
             }
         }
         // Find the position of the last comma.
-        $lastCommaPosition = strrpos($updatedmodelstring, ',');
+        $lastcommaposition = strrpos($updatedmodelstring, ',');
 
-        if ($lastCommaPosition !== false) {
+        if ($lastcommaposition !== false) {
             // Replace the last comma with a period.
-            $updatedmodelstring = substr_replace($updatedmodelstring, '.', $lastCommaPosition, 1);
+            $updatedmodelstring = substr_replace($updatedmodelstring, '.', $lastcommaposition, 1);
         }
         $data['updatedmodels'] = $updatedmodelstring;
 
@@ -103,7 +103,7 @@ class calculation_executed extends \core\event\base {
             $data['user'] = get_string('automaticallygeneratedbycron', 'local_catquiz');
         }
 
-        foreach($otherarray as $key => $value) {
+        foreach ($otherarray as $key => $value) {
             $data[$key] = $value;
         }
         return get_string('executed_calculation_description', 'local_catquiz', $data);

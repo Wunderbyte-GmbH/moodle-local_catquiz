@@ -79,7 +79,7 @@ class scaleselector extends dynamic_form {
 
         $label = '';
 
-        if(isset($customdata['label'])) {
+        if (isset($customdata['label'])) {
             $label = get_string($customdata['label'], 'local_catquiz');
         }
 
