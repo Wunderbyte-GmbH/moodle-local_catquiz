@@ -133,7 +133,7 @@ class quizattemptsdisplay {
         $table->showreloadbutton = true;
         $table->addcheckboxes = true;
 
-        // TODO: lazyload
+        // TODO: lazyload.
         return $table->outhtml(10, true);
     }
 

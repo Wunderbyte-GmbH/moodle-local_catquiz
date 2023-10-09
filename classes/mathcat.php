@@ -62,9 +62,6 @@ class mathcat {
      *
      */
     public static function gaussian_density_derivative1($x, $m, $std) {
-        // $factor1 = -($x - $mean) / pow($stdDeviation, 2);
-        // $factor2 = exp(-pow($x - $mean, 2) / (2 * pow($stdDeviation, 2)));
-        // return $factor1 * $factor2;
 
         return (exp(-(($m - $x) ** 2 / (2 * $std ** 2))) * ($m - $x)) / (sqrt(2 * M_PI) * $std ** 3);
     }
@@ -80,7 +77,8 @@ class mathcat {
      *
      */
     public static function gaussian_density_derivative2($x, $m, $std) {
-        return (exp(-(($m - $x) ** 2 / (2 * $std ** 2))) * ($m ** 2 - $std ** 2 - 2 * $m * $x + $x ** 2)) / (sqrt(2 * M_PI) * $std ** 5);
+        return (exp(-(($m - $x) ** 2 / (2 * $std ** 2)))
+            * ($m ** 2 - $std ** 2 - 2 * $m * $x + $x ** 2)) / (sqrt(2 * M_PI) * $std ** 5);
     }
 
     /**
@@ -274,7 +272,7 @@ class mathcat {
      *
      * @return array $parameter
      */
-    static function newton_raphson_multi_stable (
+    public static function newton_raphson_multi_stable (
         callable $fnfunction,
         callable $fnderivative,
         array $parameterstart,
@@ -286,14 +284,17 @@ class mathcat {
 
         // Set initial values.
         $parameter = $parameterstart;
-        $parameternames = array_keys($parameterstart); // Note: Please check for yourself, that the order of your parameters in your array corresponds to the order of $fn_function!
+        // Note: Please check for yourself...
+        // ... that the order of your parameters in your array corresponds to the order of $fn_function!
+        $parameternames = array_keys($parameterstart);
         $iscritical = false;
         $maxsteplength = 0.1;
 
         // Begin with numerical iteration.
         for ($i = 0; $i < $maxiterations; $i++) {
 
-            $mxparameter = new matrix($parameter); // @DAVID: Sollte serialisiert werden für den Fall genesteter Arrays. array('diffultiy' => array ( 0...6), 'discrimination' => float);
+            // DAVID: Sollte serialisiert werden für den Fall genesteter Arrays.
+            $mxparameter = new matrix($parameter);
             $mxparameter = $mxparameter->transpose();
 
             // Calculate the function and derivative values from  $fn_function and $fn_derivative at point $parameter.
@@ -313,7 +314,7 @@ class mathcat {
 
             $mxderivativeinv = $mxderivative->inverse();
 
-            // Calculate the new point $mx_parameter as well as the distance
+            // Calculate the new point $mx_parameter as well as the distance.
             $mxdelta = $mxderivativeinv->multiply($mxfunction);
             $mxparameteralt = $mxparameter;
             $distance = $mxdelta->rooted_summed_squares();
@@ -333,7 +334,7 @@ class mathcat {
             if (isset($fntrustedregionsfilter)) {
                 // Check for glitches within the calculated result.
                 if (count(array_filter($parameter, fn ($x) => is_nan($x))) > 0) {
-                    $parameter = $fntrustedregionsfilter($parameter); // @DAVID: Darüber sollten wir noch einmal nachdenken.
+                    $parameter = $fntrustedregionsfilter($parameter); // DAVID: Darüber sollten wir noch einmal nachdenken.
                     $iscritical = true;
                     return array_combine($parameternames, $parameter);
                 }
@@ -341,7 +342,8 @@ class mathcat {
                 // Check if $parameter is still in the Trusted Region.
                 if ($fntrustedregionsfilter($parameter) !== $parameter) {
                     $parameter = $fntrustedregionsfilter($parameter);
-                    $mxparameter = new matrix(is_array($parameter) ? [$parameter] : [[$parameter]]); // @DAVID: Sollte serialisiert werden für den Fall genesteter Arrays.
+                    // DAVID: Sollte serialisiert werden für den Fall genesteter Arrays.
+                    $mxparameter = new matrix(is_array($parameter) ? [$parameter] : [[$parameter]]);
                     $mxparameter = $mxparameter->transpose();
 
                     // If Trusted Region function and its derivative are provided, add them to $fn_function and $fn_derivative.
@@ -351,10 +353,12 @@ class mathcat {
                         print("Used Trusted Regions function and derivatied and added this to the target functions.");
                     }
 
-                    // If the problem occurs a second time in a row, additionally reset the parameter $parameter to $parameter_start
+                    // If the problem occurs a second time in a row...
+                    // ... additionally reset the parameter $parameter to $parameter_start.
                     if ($iscritical) {
                         $parameter = $parameterstart;
-                        $mxparameter = new matrix(is_array($parameter) ? [$parameter] : [[$parameter]]); // @DAVID: Sollte serialisiert werden für den Fall genesteter Arrays.
+                        // DAVID: Sollte serialisiert werden für den Fall genesteter Arrays.
+                        $mxparameter = new matrix(is_array($parameter) ? [$parameter] : [[$parameter]]);
                         $mxparameter = $mxparameter->transpose();
                     }
                 } else {

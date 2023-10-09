@@ -22,6 +22,8 @@ use question_bank;
 use question_display_options;
 use question_engine;
 
+defined('MOODLE_INTERNAL') || die();
+
 require_once($CFG->dirroot . '/local/catquiz/lib.php');
 require_once($CFG->libdir . '/questionlib.php');
 
@@ -70,7 +72,7 @@ class questionpreview {
         $quba = question_engine::make_questions_usage_by_activity(
             'local_catquiz', context_system::instance());
 
-        $options = new question_preview_options($question);
+        $options = new question_preview_options((object)$question);
         $options->feedback = question_display_options::HIDDEN;
         $options->generalfeedback = question_display_options::HIDDEN;
         $options->flags = question_display_options::HIDDEN;

@@ -29,9 +29,11 @@ require_once('../../config.php');
 
 $catcontextid = optional_param('contextid', 0, PARAM_INT);
 $catscale = optional_param('scaleid', -1, PARAM_INT);
-$scaledetailview = optional_param('sdv', 0, PARAM_INT); // Scale-Detail-View if set to 1, detailview of selected scale will be rendered.
+// Scale-Detail-View if set to 1, detailview of selected scale will be rendered.
+$scaledetailview = optional_param('sdv', 0, PARAM_INT);
 $usesubs = optional_param('usesubs', 1, PARAM_INT);
-$testitemid = optional_param('id', 0, PARAM_INT); // ID of record to be displayed in detail instead of table.
+// ID of record to be displayed in detail instead of table.
+$testitemid = optional_param('id', 0, PARAM_INT);
 $componentname = optional_param('component', 'question', PARAM_TEXT);
 
 if (empty($catcontextid)) {
@@ -57,7 +59,13 @@ $PAGE->set_heading($title);
 
 echo $OUTPUT->header();
 
-$managecatscaledashboard = new managecatscaledashboard($testitemid, $catcontextid, $catscale, $scaledetailview, $usesubs, $componentname);
+$managecatscaledashboard = new managecatscaledashboard(
+    $testitemid,
+    $catcontextid,
+    $catscale,
+    $scaledetailview,
+    $usesubs,
+    $componentname);
 $data = $managecatscaledashboard->export_for_template($OUTPUT);
 echo $OUTPUT->render_from_template('local_catquiz/catscalemanager/managecatscaledashboard', $data);
 

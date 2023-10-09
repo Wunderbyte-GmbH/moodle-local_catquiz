@@ -78,12 +78,14 @@ class calculationsdisplay {
                     get_string('logsafter', 'local_catquiz') => [ // Can be localized and like "Courses starting after:".
                         'operator' => '>', // Must be defined, can be any SQL comparison operator.
                         'defaultvalue' => 'now', // Can also be Unix timestamp or string "now".
-                        'checkboxlabel' => get_string('apply_filter', 'local_wunderbyte_table'), // Can be localized and will be displayed next to the filter checkbox (ie 'apply filter').
+                        // Can be localized and will be displayed next to the filter checkbox (ie 'apply filter').
+                        'checkboxlabel' => get_string('apply_filter', 'local_wunderbyte_table'),
                     ],
                     get_string('logsbefore', 'local_catquiz') => [ // Can be localized and like "Courses starting after:".
                         'operator' => '<',
                         'defaultvalue' => 'now', // Can also be Unix timestamp or string "now".
-                        'checkboxlabel' => get_string('apply_filter', 'local_wunderbyte_table'), // Can be localized and will be displayed next to the filter checkbox (ie 'apply filter').
+                        // Can be localized and will be displayed next to the filter checkbox (ie 'apply filter').
+                        'checkboxlabel' => get_string('apply_filter', 'local_wunderbyte_table'),
                     ],
                 ],
                     ],

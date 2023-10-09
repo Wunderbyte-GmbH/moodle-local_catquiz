@@ -100,9 +100,7 @@ class attemptfeedback implements renderable, templatable {
      */
     private function render_strategy_feedback($savetodb = true) {
         global $USER;
-        if (!$this->teststrategy
-        // || empty($cache->get('playedquestions'))
-        ) {
+        if (!$this->teststrategy) {
             return '';
         }
 
@@ -151,7 +149,7 @@ class attemptfeedback implements renderable, templatable {
      * @return array<feedbackgenerator>
      */
     public function get_feedback_generators_for_teststrategy(int $strategyid): array {
-        if(! $attemptstrategy = info::get_teststrategy($strategyid)) {
+        if (! $attemptstrategy = info::get_teststrategy($strategyid)) {
             return [];
         }
 

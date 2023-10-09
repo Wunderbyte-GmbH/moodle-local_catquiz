@@ -19,6 +19,8 @@ namespace local_catquiz\output\catscalemanager\questions\cards;
 use local_catquiz\catquiz;
 use renderable;
 
+defined('MOODLE_INTERNAL') || die();
+
 require_once($CFG->dirroot . '/local/catquiz/lib.php');
 require_once($CFG->libdir . '/questionlib.php');
 
@@ -98,9 +100,6 @@ class datacard implements renderable {
         $sql = "SELECT $select FROM $from WHERE $where AND $idcheck";
         $recordinarray = $DB->get_records_sql($sql, $params, IGNORE_MISSING);
 
-        if (empty($recordinarray)) {
-            // Throw error: no record was found with id: $params['userid'].
-        }
         $record = $recordinarray[$this->testitemid];
         return $record;
     }
@@ -154,10 +153,10 @@ class datacard implements renderable {
                 break;
         }
 
-        // Join strings for status display
+        // Join strings for status display.
         $status = " ($testitemstatus, $modelstatus)";
 
-        // Use localization for type
+        // Use localization for type.
         $type = get_string('pluginname', 'qtype_' . $record->qtype);
 
         $body['id'] = $record->id;

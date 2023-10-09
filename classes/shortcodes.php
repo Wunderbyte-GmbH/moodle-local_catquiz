@@ -60,8 +60,6 @@ class shortcodes {
      */
     public static function catquizfeedback($shortcode, $args, $content, $env, $next) {
 
-        return 'x';
-
         global $OUTPUT;
 
         $records = catquiz::return_attempt_and_contextid_from_attemptstable(

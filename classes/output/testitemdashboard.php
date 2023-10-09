@@ -16,6 +16,8 @@
 
 namespace local_catquiz\output;
 
+defined('MOODLE_INTERNAL') || die();
+
 require_once($CFG->dirroot . '/local/catquiz/lib.php');
 require_once($CFG->libdir . '/questionlib.php');
 

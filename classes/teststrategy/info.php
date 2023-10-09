@@ -158,7 +158,10 @@ class info {
             $teststrategiesoptions
         );
 
-        $elements[] = $mform->addElement('advcheckbox', 'catquiz_includepilotquestions', get_string('includepilotquestions', 'local_catquiz'));
+        $elements[] = $mform->addElement(
+            'advcheckbox',
+            'catquiz_includepilotquestions',
+            get_string('includepilotquestions', 'local_catquiz'));
         $mform->hideIf('catquiz_includepilotquestions', 'catquiz_selectteststrategy', 'eq', $strategieswithoutpilotquestions);
         // Add ratio of pilot questions.
         $elements[] = $mform->addElement('text', 'catquiz_pilotratio', get_string('pilotratio', 'local_catquiz'));
@@ -168,14 +171,20 @@ class info {
         $mform->addHelpButton('catquiz_pilotratio', 'pilotratio', 'local_catquiz');
 
         // Add attempts threshold for pilot questions.
-        $elements[] = $mform->addElement('text', 'catquiz_pilotattemptsthreshold', get_string('pilotattemptsthreshold', 'local_catquiz'));
+        $elements[] = $mform->addElement(
+            'text',
+            'catquiz_pilotattemptsthreshold',
+            get_string('pilotattemptsthreshold', 'local_catquiz'));
         $mform->hideIf('catquiz_pilotattemptsthreshold', 'catquiz_includepilotquestions', 'neq', 1);
         $mform->hideIf('catquiz_pilotattemptsthreshold', 'catquiz_selectteststrategy', 'eq', $strategieswithoutpilotquestions);
         $mform->setType('catquiz_pilotattemptsthreshold', PARAM_INT);
         $mform->addHelpButton('catquiz_pilotattemptsthreshold', 'pilotattemptsthreshold', 'local_catquiz');
         $mform->setDefault('catquiz_pilotattemptsthreshold', 30);
 
-        $elements[] = $mform->addElement('text', 'catquiz_standarderrorpersubscale', get_string('standarderrorpersubscale', 'local_catquiz'));
+        $elements[] = $mform->addElement(
+            'text',
+            'catquiz_standarderrorpersubscale',
+            get_string('standarderrorpersubscale', 'local_catquiz'));
         $mform->addHelpButton('catquiz_standarderrorpersubscale', 'standarderrorpersubscale', 'local_catquiz');
         $mform->setDefault('catquiz_standarderrorpersubscale', 5);
         $mform->hideIf(
@@ -241,7 +250,7 @@ class info {
             'teststrategy\context\loader'
         );
         $classnames = array_keys($contextloaders);
-        // Exclude classes that end with _testing
+        // Exclude classes that end with _testing.
         $classnames = array_filter(
             $classnames,
             fn ($classname) => ! self::is_testing_class($classname)

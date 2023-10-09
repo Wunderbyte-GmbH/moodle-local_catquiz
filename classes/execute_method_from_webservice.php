@@ -25,6 +25,8 @@
 
  namespace local_catquiz;
 
+ defined('MOODLE_INTERNAL') || die();
+
  require_once($CFG->dirroot . '/local/catquiz/lib.php');
 
 class execute_method_from_webservice {
@@ -47,7 +49,7 @@ class execute_method_from_webservice {
 
             case 'local_catquiz_toggle_testitemstatus':
 
-                if ($params[2] == "-slash"){
+                if ($params[2] == "-slash") {
                     $status = TESTITEM_STATUS_ACTIVE;
                 } else {
                     $status = TESTITEM_STATUS_INACTIVE;

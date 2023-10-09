@@ -227,7 +227,10 @@ class catquiz {
             ON q.id = s2.questionid
 
             LEFT JOIN (
-                SELECT ccc1.id AS contextid, qa.questionid, COUNT(*) AS userattempts, MAX(qas.timecreated) as userlastattempttime
+                SELECT ccc1.id AS contextid,
+                    qa.questionid,
+                    COUNT(*) AS userattempts,
+                    MAX(qas.timecreated) as userlastattempttime
                 FROM {local_catquiz_catcontext} ccc1
                         JOIN {question_attempt_steps} qas
                             ON ccc1.starttimestamp < qas.timecreated AND ccc1.endtimestamp > qas.timecreated
@@ -243,10 +246,20 @@ class catquiz {
             ) as s1
             LEFT JOIN (
                 SELECT
-                    maxlcip.componentid, maxlcip.componentname, maxlcip.model, maxlcip.difficulty, maxlcip.discrimination, maxlcip.guessing,
-                    s4.timecreated, maxlcip.timemodified, s4.status
+                    maxlcip.componentid,
+                    maxlcip.componentname,
+                    maxlcip.model,
+                    maxlcip.difficulty,
+                    maxlcip.discrimination,
+                    maxlcip.guessing,
+                    s4.timecreated,
+                    maxlcip.timemodified,
+                    s4.status
                 FROM (
-                    SELECT lcip.*, ROW_NUMBER() OVER (PARTITION BY componentid, componentname ORDER BY lcip.status DESC, lcip.timecreated DESC) AS n
+                    SELECT lcip.*,
+                        ROW_NUMBER() OVER (PARTITION BY componentid,
+                        componentname ORDER BY lcip.status DESC,
+                        lcip.timecreated DESC) AS n
                     FROM {local_catquiz_itemparams} lcip
                 ) AS s4
                 JOIN {local_catquiz_itemparams} maxlcip
@@ -1421,8 +1434,6 @@ class catquiz {
             $event->trigger();
         }
 
-        // cache_helper::purge_by_event('attemptcreated');
-        // return result::ok($id);
         return $id;
     }
 

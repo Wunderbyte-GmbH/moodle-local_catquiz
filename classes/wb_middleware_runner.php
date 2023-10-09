@@ -52,9 +52,9 @@ class wb_middleware_runner {
                 $cache = cache::make('local_catquiz', 'adaptivequizattempt');
         }
 
-        // Set a default action that just wraps the $context in a result
+        // Set a default action that just wraps the $context in a result.
         if (!$action) {
-            // Will be called last
+            // Will be called last.
             $action = self::get_last_action();
         }
 

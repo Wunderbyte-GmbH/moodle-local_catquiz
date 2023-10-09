@@ -77,7 +77,9 @@ class testsandtemplatesdisplay {
     public function export_data_array(): array {
 
         $data = [
-            'scaleselectors' => empty(scaleandcontexselector::render_scaleselectors($this->scaleid)) ? "" : scaleandcontexselector::render_scaleselectors($this->scaleid),
+            'scaleselectors' =>
+                empty(scaleandcontexselector::render_scaleselectors($this->scaleid))
+                ? "" : scaleandcontexselector::render_scaleselectors($this->scaleid),
             'checkbox' => scaleandcontexselector::render_subscale_checkbox($this->usesubs),
             'table' => $this->render_table(),
 

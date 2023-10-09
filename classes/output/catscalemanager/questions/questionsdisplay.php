@@ -77,7 +77,12 @@ class questionsdisplay {
      * @param string $componentname
      *
      */
-    public function __construct(int $testitemid, int $contextid, int $catscaleid = 0, int $usesubs = 1, string $componentname = 'question') {
+    public function __construct(
+            int $testitemid,
+            int $contextid,
+            int $catscaleid = 0,
+            int $usesubs = 1,
+            string $componentname = 'question') {
         $this->catcontextid = $contextid;
         $this->scale = $catscaleid;
         $this->usesubs = $usesubs;
@@ -111,7 +116,8 @@ class questionsdisplay {
             $idsforquery = [$this->scale];
         }
 
-        list($select, $from, $where, $filter, $params) = catquiz::return_sql_for_catscalequestions($idsforquery, $catcontext, [], []);
+        list($select, $from, $where, $filter, $params)
+            = catquiz::return_sql_for_catscalequestions($idsforquery, $catcontext, [], []);
 
         $table->set_filter_sql($select, $from, $where, $filter, $params);
 
@@ -163,7 +169,6 @@ class questionsdisplay {
         $table->showdownloadbutton = false;
         $table->showreloadbutton = false;
         $table->showrowcountselect = true;
-        // $table->showreloadbutton = true;
 
         $table->filteronloadinactive = true;
 
@@ -173,14 +178,6 @@ class questionsdisplay {
         list($idstring, $encodedtable, $html) = $table->lazyouthtml(10, true);
         return $html;
 
-        /*   // Instead of lazyouttable
-        $output = $table->outhtml(10, true);
-        $this->numberofrecords = $table->return_records_count()[0];
-        if ($this->numberofrecords > 0) { // Only if the table contains records, we will return it.
-            return $output;
-        } else {
-            return null;
-        } */
     }
     /**
      * Render addtestitems table.
@@ -194,7 +191,8 @@ class questionsdisplay {
         $id = $catscaleid > -1 ? $catscaleid : 0;
         $table = new catscalequestions_table('catscaleid_' . $id . '_additems', $catscaleid, $this->catcontextid);
 
-        list($select, $from, $where, $filter, $params) = catquiz::return_sql_for_addcatscalequestions($catscaleid, $this->catcontextid);
+        list($select, $from, $where, $filter, $params)
+            = catquiz::return_sql_for_addcatscalequestions($catscaleid, $this->catcontextid);
 
         $table->set_filter_sql($select, $from, $where, $filter, $params);
 
@@ -313,7 +311,9 @@ class questionsdisplay {
         // Scale- and Contextselector will always be displayed.
         $data = [
             'contextselector' => scaleandcontexselector::render_contextselector($this->catcontextid),
-            'scaleselectors' => empty(scaleandcontexselector::render_scaleselectors($this->scale)) ? "" : scaleandcontexselector::render_scaleselectors($this->scale),
+            'scaleselectors' =>
+                empty(scaleandcontexselector::render_scaleselectors($this->scale))
+                ? "" : scaleandcontexselector::render_scaleselectors($this->scale),
             'checkbox' => scaleandcontexselector::render_subscale_checkbox($this->usesubs),
         ];
 

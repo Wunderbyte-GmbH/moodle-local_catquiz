@@ -83,7 +83,8 @@ class infergreateststrength extends strategy {
             remove_uncalculated::class, // Remove items that do not have item parameters.
             noremainingquestions::class, // Cancel quiz attempt if no questions are left.
             fisherinformation::class, // Add the fisher information to each question.
-            filterforsubscale::class, // Keep only questions that are assigned to the subscale where the user has the largest ability values .
+             // Keep only questions that are assigned to the subscale where the user has the largest ability values.
+            filterforsubscale::class,
             strategyfastestscore::class,
         ];
     }

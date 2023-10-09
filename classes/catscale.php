@@ -102,7 +102,7 @@ class catscale {
             'catscaleid' => $catscaleid,
         ];
 
-        // Check if status is changed
+        // Check if status is changed.
         $statuschanged = false;
         if ($status == 2) {
             $status = TESTITEM_STATUS_ACTIVE;
@@ -113,7 +113,7 @@ class catscale {
         $data = $searchparams;
         $data['status'] = $status;
 
-        // We need the default context for the events that will be triggered
+        // We need the default context for the events that will be triggered.
         $catcontext = catquiz::get_default_context_id();
 
         if ($record = $DB->get_record('local_catquiz_items', $searchparams)) {
@@ -123,7 +123,7 @@ class catscale {
             $DB->update_record('local_catquiz_items', (object)$data);
 
             if ($statuschanged) {
-                // Trigger status changed event
+                // Trigger status changed event.
                 $event = testitemactivitystatus_updated::create([
                     'objectid' => $testitemid,
                     'context' => $context,
@@ -163,7 +163,7 @@ class catscale {
             $data['timecreated'] = $now;
             $id = $DB->insert_record('local_catquiz_items', (object)$data);
 
-            // Trigger event
+            // Trigger event.
             $event = testiteminscale_added::create([
                 'objectid' => $testitemid,
                 'context' => $context,

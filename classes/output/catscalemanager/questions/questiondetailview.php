@@ -21,6 +21,8 @@ use local_catquiz\output\catscalemanager\questions\cards\datacard;
 use local_catquiz\output\catscalemanager\questions\cards\questionpreview;
 use moodle_exception;
 
+defined('MOODLE_INTERNAL') || die();
+
 require_once($CFG->dirroot . '/local/catquiz/lib.php');
 require_once($CFG->libdir . '/questionlib.php');
 

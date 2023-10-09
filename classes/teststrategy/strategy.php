@@ -159,7 +159,7 @@ abstract class strategy {
             $cache->set('num_pilot_questions', ++$numpilotquestions);
         }
 
-        // Keep track of the questions played per scale
+        // Keep track of the questions played per scale.
         $playedquestionsperscale = $cache->get('playedquestionsperscale') ?: [];
         $updated = $this->update_playedquestionsperscale($selectedquestion, $playedquestionsperscale);
         $cache->set('playedquestionsperscale', $updated);

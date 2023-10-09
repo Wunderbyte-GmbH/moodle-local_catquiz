@@ -109,7 +109,10 @@ class catquiz_handler {
 
         if (has_capability('local/catquiz:manage_testenvironments', $context)) {
             // If you have the right, you can define this setting as template.
-            $elements[] = $mform->addElement('advcheckbox', 'testenvironment_addoredittemplate', get_string('addoredittemplate', 'local_catquiz'));
+            $elements[] = $mform->addElement(
+                'advcheckbox',
+                'testenvironment_addoredittemplate',
+                get_string('addoredittemplate', 'local_catquiz'));
             $elements[] = $mform->addElement('text', 'testenvironment_name', get_string('name', 'core'));
             $mform->setType('testenvironment_name', PARAM_TEXT);
             $mform->hideIf('testenvironment_name', 'testenvironment_addoredittemplate', 'eq', 0);
@@ -147,7 +150,10 @@ class catquiz_handler {
         foreach ($catscales as $catscale) {
             $select[$catscale->id] = $catscale->name;
         }
-        $elements[] = $mform->addElement('autocomplete', 'catquiz_catcatscales', get_string('catcatscales', 'local_catquiz'), $select, $options);
+        $elements[] = $mform->addElement(
+            'autocomplete',
+            'catquiz_catcatscales',
+            get_string('catcatscales', 'local_catquiz'), $select, $options);
         $mform->addHelpButton('catquiz_catcatscales', 'catcatscales', 'local_catquiz');
 
         $catcontexts = \local_catquiz\data\dataapi::get_all_catcontexts();
@@ -178,12 +184,10 @@ class catquiz_handler {
                 get_string('timepacedtest', 'local_catquiz'), null, null, [0, 1]);
 
         $elements[] = $mform->addElement('text', 'catquiz_maxtimeperitem', get_string('maxtimeperitem', 'local_catquiz'));
-        // $mform->addHelpButton('catquiz_maxtimeperitem', 'maxtimeperitem', 'local_catquiz');
         $mform->setType('catquiz_maxtimeperitem', PARAM_INT);
         $mform->hideIf('catquiz_maxtimeperitem', 'catquiz_timepacedtest', 'neq', 1);
 
         $elements[] = $mform->addElement('text', 'catquiz_mintimeperitem', get_string('mintimeperitem', 'local_catquiz'));
-        // $mform->addHelpButton('catquiz_mintimeperitem', 'mintimeperitem', 'local_catquiz');
         $mform->setType('catquiz_mintimeperitem', PARAM_INT);
         $mform->hideIf('catquiz_mintimeperitem', 'catquiz_timepacedtest', 'neq', 1);
 
@@ -550,7 +554,7 @@ class catquiz_handler {
             'includesubscales' => true,
             'maximumquestions' => intval($quizsettings->maximumquestions),
             'minimumquestions' => intval($quizsettings->minimumquestions),
-            'penalty_threshold' => 60 * 60 * 24 * 30 - 90, // TODO: make dynamic
+            'penalty_threshold' => 60 * 60 * 24 * 30 - 90, // TODO: make dynamic.
             /*
                  * After this time, the penalty for a question goes back to 0
                  * Currently, it is set to 30 days

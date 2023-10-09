@@ -30,6 +30,7 @@ use local_catquiz\catcontext;
 use local_catquiz\event\calculation_executed;
 use local_catquiz\task\adhoc_recalculate_cat_model_params;
 use local_catquiz\task\recalculate_cat_model_params;
+use local_catquiz\local\model\model_item_param_list;
 use moodle_exception;
 use moodle_url;
 
@@ -102,6 +103,7 @@ class catmodel_info {
         $strategy = $context->get_strategy($catscaleid);
         list($itemdifficulties, $personabilities) = $strategy->run_estimation();
         $itemcounter = 0;
+        /** @var model_item_param_list $itemparamlist */
         foreach ($itemdifficulties as $itemparamlist) {
             $itemparamlist->save_to_db($contextid);
             $itemcounter += count($itemparamlist->itemparams);

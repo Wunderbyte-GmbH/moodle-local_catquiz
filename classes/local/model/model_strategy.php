@@ -24,6 +24,8 @@
 
 namespace local_catquiz\local\model;
 
+defined('MOODLE_INTERNAL') || die();
+
 require_once($CFG->dirroot . '/local/catquiz/lib.php');
 
 use core_plugin_manager;
@@ -132,7 +134,9 @@ class model_strategy {
         if ($savedpersonabilities === null || count($savedpersonabilities) === 0) {
             $savedpersonabilities = $responses->get_initial_person_abilities();
         } else if (count($savedpersonabilities) < count($initial = $responses->get_initial_person_abilities())) {
-            $newusers = array_diff(array_keys($initial->get_person_params()), array_keys($savedpersonabilities->get_person_params()));
+            $newusers = array_diff(
+                array_keys($initial->get_person_params()),
+                array_keys($savedpersonabilities->get_person_params()));
             foreach ($newusers as $userid) {
                 $savedpersonabilities->add(new model_person_param($userid));
             }
@@ -203,9 +207,7 @@ class model_strategy {
     public function run_estimation(): array {
         $personabilities = $this->initialpersonabilities;
 
-        /**
-         * @var array<model_item_param_list>
-         */
+        /** @var array<model_item_param_list> $itemdifficulties */
         $itemdifficulties = [];
         // Re-calculate until the stop condition is triggered.
         while (!$this->should_stop()) {
@@ -261,13 +263,16 @@ class model_strategy {
      * @param array $itemdifficultieslists List of calculated item difficulties, one for each model
      * @return model_item_param_list A single list of item difficulties that is a combination of the input lists
      */
-    public function select_item_model(array $itemdifficultieslists, model_person_param_list $personabilities): model_item_param_list {
+    public function select_item_model(
+        array $itemdifficultieslists,
+        model_person_param_list $personabilities): model_item_param_list {
         $newitemdifficulties = new model_item_param_list();
         $itemids = $this->responses->get_item_ids();
-        $informationcriterium = 'aic'; // TODO set via settings
+        // TODO set via settings.
+        $informationcriterium = 'aic';
         $infocriteriapermodel = [];
 
-        /**
+        /*
          * Select items according to the following rules:
          * 1. If there is an item-level model override, select the item from that model
          * 2. Otherwise, use the model that maximizes the given information criterium
@@ -279,9 +284,7 @@ class model_strategy {
                 continue;
             }
             foreach ($this->models as $model) {
-                /**
-                 * @var ?model_item_param
-                 */
+                /** @var ?model_item_param $item */
                 $item = $itemdifficultieslists[$model->get_model_name()][$itemid];
                 if (!$item) {
                     continue;
@@ -400,10 +403,7 @@ class model_strategy {
      * @return array<model_model>
      */
     private function create_installed_models(): array {
-        /**
-         *
-         * @var array<model_model>
-         */
+        /** @var array<model_model> $instances */
         $instances = [];
         $ignorelist = ['raschbirnbaumc'];
 

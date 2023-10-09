@@ -44,10 +44,10 @@ class helpercat {
      * @return mixed
      *
      */
-    static function get_person_response($response, $userid) {
+    public static function get_person_response($response, $userid) {
 
         $components = array_keys($response[$userid]);
-        $items = $response[$userid][$components[0]]; // TODO: fix for multiple components
+        $items = $response[$userid][$components[0]]; // TODO: fix for multiple components.
         return $items;
 
     }
@@ -60,8 +60,8 @@ class helpercat {
      * @return mixed
      *
      */
-    static function get_user_ability(int $userid) {
-        return 0.5; // dummy data
+    public static function get_user_ability(int $userid) {
+        return 0.5; // Dummy data.
     }
 
     /**
@@ -72,9 +72,9 @@ class helpercat {
      * @return mixed
      *
      */
-    static function get_item_params(int $itemid) {
-        // and context_id ?
-        return 0.5; // dummy data
+    public static function get_item_params(int $itemid) {
+        // And context_id ?.
+        return 0.5; // Dummy data.
     }
 
 }

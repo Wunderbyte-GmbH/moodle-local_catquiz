@@ -104,9 +104,7 @@ class catcalc {
             }
             $itemparams = $item->get_params_array();
 
-            /**
-             * @var catcalc_ability_estimator
-             */
+            /** @var catcalc_ability_estimator $model */
             $model = $allmodels[$item->get_model_name()];
             if (!in_array(catcalc_ability_estimator::class, class_implements($model))) {
                 throw new \Exception(sprintf("The given model %s can not be used with the catcalc class", $item->get_model_name()));
@@ -185,7 +183,9 @@ class catcalc {
             $funs[] = fn($ip) => $model::get_log_jacobian($r->get_personparams()->to_array(), $ip, $r->get_response());
         }
 
-        $jacobian = self::build_callable_array($funs); // from [fn($x), fn($x),...] to fn($x): [...]
+        // phpcs:ignore Squiz.PHP.CommentedOutCode.Found
+        // From [fn($x), fn($x),...] to fn($x): [...].
+        $jacobian = self::build_callable_array($funs);
         $jacobian = fn ($ip) => matrixcat::multi_sum($jacobian($ip));
 
         return $jacobian;

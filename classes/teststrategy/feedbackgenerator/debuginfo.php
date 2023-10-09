@@ -72,7 +72,9 @@ class debuginfo extends feedbackgenerator {
         }
 
         $teststrategies = info::return_available_strategies();
-        $teststrategy = array_filter($teststrategies, fn ($t) => $t->id == $cachedcontexts[array_key_first($cachedcontexts)]['teststrategy']);
+        $teststrategy = array_filter(
+            $teststrategies,
+            fn ($t) => $t->id == $cachedcontexts[array_key_first($cachedcontexts)]['teststrategy']);
         $reflect = new \ReflectionClass($teststrategy[array_key_first($teststrategy)]);
 
         // Each cachedcontext corresponds to one question attempt.
@@ -161,7 +163,8 @@ class debuginfo extends feedbackgenerator {
                 'excludedsubscales' => implode(',', $data['excludedsubscales']),
                 'lastresponse' => $lastresponse,
                 'standarderrorperscale' => $standarderrorperscale,
-                'numquestionsperscale' => '"' . implode(", ", array_map(fn ($entry) => $entry['name'].": ".$entry['num'], $questionsperscale)) . '"',
+                'numquestionsperscale' => '"'
+                    . implode(", ", array_map(fn ($entry) => $entry['name'].": ".$entry['num'], $questionsperscale)) . '"',
             ];
         }
         return ['debuginfo' => $debuginfo];

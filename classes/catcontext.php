@@ -180,7 +180,11 @@ class catcontext {
      * @return array
      *
      */
-    public static function getresponsedatafromdb(int $contextid, array $catscaleids, ?int $testitemid = null, ?int $userid = null): array {
+    public static function getresponsedatafromdb(
+            int $contextid,
+            array $catscaleids,
+            ?int $testitemid = null,
+            ?int $userid = null): array {
         global $DB;
 
         list ($sql, $params) = catquiz::get_sql_for_model_input($contextid, $catscaleids, $testitemid, $userid);

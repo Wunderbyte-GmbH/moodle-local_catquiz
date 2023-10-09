@@ -28,6 +28,8 @@ namespace local_catquiz;
 use moodle_exception;
 use stdClass;
 
+defined('MOODLE_INTERNAL') || die();
+
 require_once($CFG->dirroot . '/local/catquiz/lib.php');
 
 /**
@@ -184,7 +186,7 @@ class testenvironment {
         // We get the current json.
         $object = json_decode($this->json);
 
-        // Change the current name
+        // Change the current name.
         $object->testenvironment_name = $this->name;
 
         // And set it back as json.
@@ -281,7 +283,7 @@ class testenvironment {
             return;
         }
 
-        foreach($jsonobject as $key => $value) {
+        foreach ($jsonobject as $key => $value) {
 
             // Never overwrite a few values.
             if (in_array($key, [

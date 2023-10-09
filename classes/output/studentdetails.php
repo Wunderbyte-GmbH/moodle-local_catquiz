@@ -87,7 +87,8 @@ class studentdetails implements renderable, templatable {
             if ($datedifference >= 1) {
                 $differencestring = get_string('daysago', 'local_catquiz', $datedifference);
             } else {
-                $differencestring = get_string('hoursago', 'local_catquiz', floor((usertime(time()) - $user->lastaccess) / 60 / 60));
+                $differencestring
+                    = get_string('hoursago', 'local_catquiz', floor((usertime(time()) - $user->lastaccess) / 60 / 60));
             }
             $datestring = date('D, j F Y, g:i a', $user->lastaccess) . ' ('. $differencestring . ')';
         } else {

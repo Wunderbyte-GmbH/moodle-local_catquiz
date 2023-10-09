@@ -101,7 +101,8 @@ final class addscalestandarderror extends preselect_task implements wb_middlewar
         $standarderrorperscale = [];
         foreach ($fisherinfoperscale as $catscaleid => $fisherinfo) {
             $fisherinfoplayed = $fisherinfoperscale[$catscaleid]['played'] ?? 0;
-            $fisherinfoall = ($fisherinfoperscale[$catscaleid]['played'] ?? 0) + ($fisherinfoperscale[$catscaleid]['remaining'] ?? 0);
+            $fisherinfoall
+                = ($fisherinfoperscale[$catscaleid]['played'] ?? 0) + ($fisherinfoperscale[$catscaleid]['remaining'] ?? 0);
             $standarderror['played'] = $fisherinfoplayed === 0 ? INF : (1 / sqrt($fisherinfoplayed));
             $standarderror['remaining'] = $fisherinfoall === 0 ? INF : (1 / sqrt($fisherinfoall));
             $standarderrorperscale[$catscaleid] = $standarderror;

@@ -82,7 +82,9 @@ abstract class model_model {
      * @param ?model_item_param_list $olditemparams
      * @return model_item_param_list
      */
-    abstract public function estimate_item_params(model_person_param_list $personparams, ?model_item_param_list $olditemparams = null): model_item_param_list;
+    abstract public function estimate_item_params(
+        model_person_param_list $personparams,
+        ?model_item_param_list $olditemparams = null): model_item_param_list;
 
     /**
      * Returns the paramter names of the model as strings.
@@ -102,5 +104,9 @@ abstract class model_model {
      */
     abstract public static function fisher_info(array $personability, array $params);
 
-    abstract public function get_information_criterion(string $criterion, model_person_param_list $personabilities, model_item_param $itemparams, model_responses $k): float;
+    abstract public function get_information_criterion(
+        string $criterion,
+        model_person_param_list $personabilities,
+        model_item_param $itemparams,
+        model_responses $k): float;
 }

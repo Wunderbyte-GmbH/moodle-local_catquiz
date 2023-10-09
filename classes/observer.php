@@ -115,8 +115,6 @@ class local_catquiz_observer {
      */
     public static function testiteminscale_added(testiteminscale_added $event) {
 
-        // $testitemid = $event->objectid;
-        // $catscaleid = $event->other['catscaleid'];
     }
     /**
      * Observer for the question_deleted event

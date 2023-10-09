@@ -179,7 +179,7 @@ $string['logsafter'] = 'Logs after';
 $string['logsbefore'] = 'Logs before';
 $string['calculation_executed'] = 'Calculation executed.';
 $string['executed_calculation_description'] = 'A calculation was executed of catscale {$a->catscalename} with id {$a->catscaleid} in context {$a->contextid} by user {$a->userid}. {$a->numberofitems} items were recalculated.';
-$string['deletedcatscale'] = 'catscale that doesn`t exist anymore';
+$string['deletedcatscale'] = "Catscale that doesn't exist anymore";
 $string['attempt_completed'] = 'Attempt completed';
 $string['complete_attempt_description'] = 'Attempt with id {$a->attemptid} in CAT scale {$a->catscalelink} completed by user {$a->userid}.';
 $string['eventtime'] = 'Event time';
@@ -379,7 +379,7 @@ $string['lowerlimit'] = "Lower limit";
 
 $string['setcoursesforscaletext'] = 'Set for catscale {$a} the courses in which users failing the lower limit should be inscribed to.';
 
-// Quiz attempts
+// Quiz attempts.
 $string['catcontext'] = 'CAT Context';
 $string['totalnumberoftestitems'] = "Total number of questions";
 $string['numberoftestitemsused'] = "Number of displayed questions";
@@ -411,7 +411,7 @@ $string['callbackfunctionnotdefined'] = 'Callback function is not defined.';
 $string['callbackfunctionnotapplied'] = 'Callback function could not be applied.';
 $string['canbesetto0iflabelgiven'] = 'Can be 0 if matching of testitem is via label.';
 $string['ifdefinedusedtomatch'] = 'If defined, will be used to match.';
-$string['fieldnamesdontmatch'] = 'The imported fieldnames don`t match the defined fieldnames.';
+$string['fieldnamesdontmatch'] = "The imported fieldnames don't match the defined fieldnames.";
 $string['checkdelimiteroremptycontent'] = 'Check if data is given and separated via the selected symbol.';
 $string['wronglabels'] = 'Imported CSV not containing the right labels. Column {$a} can not be importet.';
 $string['nolabels'] = 'No column labels defined in settings object.';

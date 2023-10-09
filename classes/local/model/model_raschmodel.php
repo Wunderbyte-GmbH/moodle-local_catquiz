@@ -49,7 +49,12 @@ abstract class model_raschmodel extends model_model implements catcalc_item_esti
         return (1 / (1 + exp($discrimination * ($itemdifficulty - $personability))));
     }
 
-    public function get_information_criterion(string $criterion, model_person_param_list $personabilities, model_item_param $itemparams, model_responses $k): float {
+    public function get_information_criterion(
+        string $criterion,
+        model_person_param_list $personabilities,
+        model_item_param $itemparams,
+        model_responses $k): float {
+
         switch ($criterion) {
             case 'aic':
                 return $this->calc_aic_item($personabilities, $itemparams, $k);
@@ -166,12 +171,15 @@ abstract class model_raschmodel extends model_model implements catcalc_item_esti
     public function calc_sabic_item(model_person_param_list $personabilities, model_item_param $item, model_responses $k) {
         $numberofparameters = $this->get_model_dim() - 1;
         $numberofcases = count($personabilities->only_valid());
-        if ($numberofcases - $numberofparameters - 1 <= 0) { return 0;
+        if ($numberofcases - $numberofparameters - 1 <= 0) {
+            return 0;
         }
         return $numberofparameters * log(($numberofcases + 2) / 24) + $this->calc_dic_item($personabilities, $item, $k);
     }
 
-    public function estimate_item_params(model_person_param_list $personparams, ?model_item_param_list $olditemparams = null): model_item_param_list {
+    public function estimate_item_params(
+        model_person_param_list $personparams,
+        ?model_item_param_list $olditemparams = null): model_item_param_list {
         $estimateditemparams = new model_item_param_list();
         foreach ($this->responses->get_item_response($personparams) as $itemid => $itemresponse) {
             $oldparam = $olditemparams[$itemid] ?? null;

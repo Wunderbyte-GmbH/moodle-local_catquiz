@@ -24,8 +24,6 @@
 
 namespace local_catquiz\table;
 
-defined('MOODLE_INTERNAL') || die();
-
 use local_catquiz\teststrategy\info;
 use local_wunderbyte_table\wunderbyte_table;
 
@@ -95,14 +93,14 @@ class quizattempts_table extends wunderbyte_table {
     /**
      * Shows the name of the teststrategy.
      *
-     * @param \stdClas $values The row data.
+     * @param \stdClass $values The row data.
      * @return string
      */
     public function col_teststrategy($values) {
         if (empty($this->teststrategynames[$values->teststrategy])) {
             $teststrategy = info::get_teststrategy($values->teststrategy);
             // Gets the unqualified classname without namespace.
-            // See https://stackoverflow.com/a/27457689
+            // See https://stackoverflow.com/a/27457689.
             $classname = substr(strrchr(get_class($teststrategy), '\\'), 1);
             $this->teststrategynames[$values->teststrategy] = get_string($classname, 'local_catquiz');
         }

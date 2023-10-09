@@ -78,7 +78,8 @@ class eventlogtableinstance {
                 '\local_catquiz\event\catscale_updated' => get_string('catscale_updated', 'local_catquiz'),
                 '\local_catquiz\event\context_created' => get_string('context_created', 'local_catquiz'),
                 '\local_catquiz\event\context_updated' => get_string('context_updated', 'local_catquiz'),
-                '\local_catquiz\event\testitemactivitystatus_updated' => get_string('testitemactivitystatus_updated', 'local_catquiz'),
+                '\local_catquiz\event\testitemactivitystatus_updated' =>
+                    get_string('testitemactivitystatus_updated', 'local_catquiz'),
                 '\local_catquiz\event\testiteminscale_added' => get_string('testiteminscale_added', 'local_catquiz'),
                 '\local_catquiz\event\testiteminscale_updated' => get_string('testiteminscale_updated', 'local_catquiz'),
                 '\local_catquiz\event\testitemstatus_updated' => get_string('testitemstatus_updated', 'local_catquiz'),
@@ -91,12 +92,14 @@ class eventlogtableinstance {
                     get_string('logsafter', 'local_catquiz') => [ // Can be localized and like "Courses starting after:".
                         'operator' => '>', // Must be defined, can be any SQL comparison operator.
                         'defaultvalue' => 'now', // Can also be Unix timestamp or string "now".
-                        'checkboxlabel' => get_string('apply_filter', 'local_wunderbyte_table'), // Can be localized and will be displayed next to the filter checkbox (ie 'apply filter').
+                        // Can be localized and will be displayed next to the filter checkbox (ie 'apply filter').
+                        'checkboxlabel' => get_string('apply_filter', 'local_wunderbyte_table'),
                     ],
                     get_string('logsbefore', 'local_catquiz') => [ // Can be localized and like "Courses starting after:".
                         'operator' => '<',
                         'defaultvalue' => 'now', // Can also be Unix timestamp or string "now".
-                        'checkboxlabel' => get_string('apply_filter', 'local_wunderbyte_table'), // Can be localized and will be displayed next to the filter checkbox (ie 'apply filter').
+                        // Can be localized and will be displayed next to the filter checkbox (ie 'apply filter').
+                        'checkboxlabel' => get_string('apply_filter', 'local_wunderbyte_table'),
                     ],
                 ],
             ],
@@ -117,8 +120,6 @@ class eventlogtableinstance {
 
         $table->define_baseurl(new moodle_url('/local/catquiz/downloads/download.php'));
 
-        // list($idstring, $encodedtable, $html) = $table->lazyouthtml(10, true);
-        // return $html;
         return $table->outhtml(10, true);
     }
 }

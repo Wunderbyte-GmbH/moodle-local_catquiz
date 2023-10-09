@@ -135,7 +135,13 @@ class managecatscaledashboard implements renderable, templatable {
      * @param string $componentname
      *
      */
-    public function __construct(int $testitemid, int $contextid, int $catscaleid, int $scaledetailview, int $usesubs, string $componentname) {
+    public function __construct(
+        int $testitemid,
+        int $contextid,
+        int $catscaleid,
+        int $scaledetailview,
+        int $usesubs,
+        string $componentname) {
 
         $this->testitemid = $testitemid;
         $this->contextid = $contextid;
@@ -150,7 +156,12 @@ class managecatscaledashboard implements renderable, templatable {
         $catscalemanagers = new catscalemanagers();
         $this->catscalemanagersarray = $catscalemanagers->return_as_array();
 
-        $questionsdisplay = new questionsdisplay($this->testitemid, $this->contextid, $this->catscaleid, $this->usesubs, $this->componentname);
+        $questionsdisplay = new questionsdisplay(
+            $this->testitemid,
+            $this->contextid,
+            $this->catscaleid,
+            $this->usesubs,
+            $this->componentname);
         $this->questionsdisplayarray = $questionsdisplay->export_data_array();
 
         $testenvironmentdashboard = new testsandtemplatesdisplay($this->catscaleid, $this->usesubs, $this->componentname);
@@ -165,7 +176,11 @@ class managecatscaledashboard implements renderable, templatable {
         if (!empty($this->catscaleid)
             && !empty($this->testitemid)
             && !empty($this->contextid)) {
-                $testitemdashboard = new testitemdashboard($this->testitemid, $this->contextid, $this->catscaleid, $this->componentname);
+                $testitemdashboard = new testitemdashboard(
+                    $this->testitemid,
+                    $this->contextid,
+                    $this->catscaleid,
+                    $this->componentname);
                 $this->testitemdashboardarray = $testitemdashboard->return_as_array();
         }
 

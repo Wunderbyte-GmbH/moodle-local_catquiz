@@ -38,6 +38,8 @@ use local_catquiz\event\testiteminscale_added;
 use moodle_exception;
 use Traversable;
 
+defined('MOODLE_INTERNAL') || die();
+
 require_once($CFG->dirroot . '/local/catquiz/lib.php');
 /**
  * This class holds a list of item param objects.
@@ -417,7 +419,7 @@ class model_item_param_list implements ArrayAccess, IteratorAggregate, Countable
         }
 
         return [
-            'success' => 1, // Update successfully
+            'success' => 1, // Update successfully.
             'message' => get_string('success', 'core'),
             'recordid' => $id,
          ];
@@ -452,7 +454,6 @@ class model_item_param_list implements ArrayAccess, IteratorAggregate, Countable
 
         $scalerecord = $DB->get_record("local_catquiz_items", [
             'componentid' => $newrecord['componentid'],
-            // 'status' => $newrecord['status'] ?? 0,
             'catscaleid' => $newrecord['catscaleid'],
         ]);
 
@@ -473,7 +474,7 @@ class model_item_param_list implements ArrayAccess, IteratorAggregate, Countable
             }
             $DB->insert_record('local_catquiz_items', $recordforquery);
 
-            // Trigger event
+            // Trigger event.
             $event = testiteminscale_added::create([
                 'objectid' => $newrecord['componentid'],
                 'context' => \context_system::instance(),
@@ -501,7 +502,7 @@ class model_item_param_list implements ArrayAccess, IteratorAggregate, Countable
 
         global $DB;
 
-        // First check if there are parents:
+        // First check if there are parents.
 
         $parents = [];
         if (!empty($newrecord['parentscalenames'])) {

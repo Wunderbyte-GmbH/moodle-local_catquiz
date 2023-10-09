@@ -28,6 +28,8 @@ use cache_helper;
 use Exception;
 use stdClass;
 
+defined('MOODLE_INTERNAL') || die();
+
 global $CFG;
 require_once($CFG->dirroot . '/local/catquiz/lib.php');
 
@@ -232,8 +234,8 @@ class model_item_param {
         global $DB;
 
         if (intval($newrecord->status) === STATUS_CONFIRMED_MANUALLY) {
-            // Only one model can be the selected one. Set the status of all
-            // other models back to 0
+            // Only one model can be the selected one. Set the status of all...
+            // ... other models back to 0.
             $existingitems = $DB->get_record(
                 'local_catquiz_itemparams',
                 [
@@ -242,7 +244,7 @@ class model_item_param {
                     'status' => STATUS_CONFIRMED_MANUALLY,
                 ]
             );
-            // Get item params for other models
+            // Get item params for other models.
             $otheritems = array_filter(
                 $existingitems,
                 function($i) use ($model) {
@@ -265,7 +267,7 @@ class model_item_param {
             throw new Exception('Can not update record because it does not exist');
         }
         foreach ($newrecord as $property => $value) {
-            // Some properties should not be updated
+            // Some properties should not be updated.
             if (in_array($property, ['id', 'componentid'])) {
                 continue;
             }

@@ -113,7 +113,7 @@ class updatepersonability extends preselect_task implements wb_middleware {
             $catscaleid
         );
 
-        // Remove all responses that are not in the item param list and check again
+        // Remove all responses that are not in the item param list and check again.
         $arrayresponsesforscale = [];
         foreach ($itemparamlist as $item) {
             $arrayresponsesforscale[$item->get_id()] = $this->arrayresponses[$item->get_id()];
@@ -219,7 +219,8 @@ class updatepersonability extends preselect_task implements wb_middleware {
             // TODO: This should not happen, so maybe log this as event somewhere?
             return (new model_responses())->setdata($userresponses, false);
         }
-        $userresponses[$context['userid']]['component'][$context['lastquestion']->id] = $lastresponse[$context['userid']]['component'][$context['lastquestion']->id];
+        $userresponses[$context['userid']]['component'][$context['lastquestion']->id]
+            = $lastresponse[$context['userid']]['component'][$context['lastquestion']->id];
         $cache->set('userresponses', $userresponses);
 
         $userresponses = (new model_responses())->setdata($userresponses, false);

@@ -74,13 +74,15 @@ function local_catquiz_render_navbar_output(\renderer_base $renderer) {
     global $CFG;
 
     // Early bail out conditions.
-    if (!isloggedin() || isguestuser() || !has_capability('local/catquiz:canmanage', context_system::instance())) {
+    if (!isloggedin() || isguestuser()
+        || !has_capability('local/catquiz:canmanage', context_system::instance())) {
         return;
     }
 
     $output = '<div class="popover-region nav-link icon-no-margin dropdown">
         <a class="btn btn-secondary"
-        id="dropdownMenuButton" aria-haspopup="true" aria-expanded="false" href="'. $CFG->wwwroot . '/local/catquiz/manage_catscales.php"
+        id="dropdownMenuButton" aria-haspopup="true" aria-expanded="false" href="'
+            . $CFG->wwwroot . '/local/catquiz/manage_catscales.php"
         role="button">
         '. get_string('catquiz', 'local_catquiz') .'
         </a>

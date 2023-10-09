@@ -374,7 +374,7 @@ $string['noselection'] = "Keine Auswahl";
 $string['lowerlimit'] = "Unteres Limit";
 $string['setcoursesforscaletext'] = 'Setzen sie für die Scala {$a} die Kurse, in die Nutzerinnen, die unter dem unteren Limit abschneiden, eingeschrieben werden sollen.';
 
-// Quiz attempts
+// Quiz attempts.
 $string['catcontext'] = 'CAT Kontext';
 $string['totalnumberoftestitems'] = "Gesamtzahl Fragen";
 $string['numberoftestitemsused'] = "Anzahl getesteter Fragen";
