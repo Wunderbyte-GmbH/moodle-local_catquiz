@@ -28,7 +28,7 @@ defined('MOODLE_INTERNAL') || die();
 
 $services = [
         'Catquiz external' => [ // Very important, don't rename or will break local_bookingapi plugin!!!
-                'functions' =>  [
+                'functions' => [
                         'local_catquiz_start_new_attempt',
                         'local_catquiz_submit_result',
                         'local_catquiz_get_next_question',

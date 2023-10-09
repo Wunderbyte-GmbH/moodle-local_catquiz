@@ -28,8 +28,6 @@ declare(strict_types=1);
 
 namespace local_catquiz\external;
 
-defined('MOODLE_INTERNAL') || die();
-
 use external_api;
 use external_function_parameters;
 use external_value;

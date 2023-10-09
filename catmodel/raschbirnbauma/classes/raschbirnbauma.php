@@ -228,7 +228,7 @@ class raschbirnbauma extends model_raschmodel {
      * @param float $n - number of observations
      * @return float - weighted residuals
      */
-    function least_mean_squares(array $pp, array $ip, float $frac, float $n):float {
+    public function least_mean_squares(array $pp, array $ip, float $frac, float $n):float {
         return $n * ($frac - self::likelihood($pp, $ip, 1.0)) ** 2;
     }
 
@@ -241,7 +241,7 @@ class raschbirnbauma extends model_raschmodel {
      * @param float $n - number of observations
      * @return array - 1st derivative of lms with respect to $ip
      */
-    function least_mean_squares_1st_derivative_ip(array $pp, array $ip, float $frac, float $n):array {
+    public function least_mean_squares_1st_derivative_ip(array $pp, array $ip, float $frac, float $n):array {
         $pp = $pp['ability'];
         $a = $ip['difficulty'];
 
@@ -264,7 +264,7 @@ class raschbirnbauma extends model_raschmodel {
      * @param float $n - number of observations
      * @return array - 2nd derivative of lms with respect to $ip
      */
-    function least_mean_squares_2nd_derivative_ip(array $pp, array $ip, float $frac, float $n):array {
+    public function least_mean_squares_2nd_derivative_ip(array $pp, array $ip, float $frac, float $n):array {
         $pp = $pp['ability'];
         $a = $ip['difficulty'];
 
@@ -276,7 +276,9 @@ class raschbirnbauma extends model_raschmodel {
         $expa = exp($a);
         $expp = exp($pp);
 
-        $derivative[0][0]  = $n * (2 * ($expa * $expp) * (-$expp ** 2 + 2 * ($expa * $expp) + (-$expa ** 2 + $expp ** 2) * $frac)) / ($expa + $expp) ** 4; // Calculate d²2/da².
+        $derivative[0][0] = $n * (2 * ($expa * $expp)
+            * (-$expp ** 2 + 2 * ($expa * $expp)
+            + (-$expa ** 2 + $expp ** 2) * $frac)) / ($expa + $expp) ** 4;
 
         return $derivative;
     }
@@ -284,7 +286,8 @@ class raschbirnbauma extends model_raschmodel {
     // Calculate the Log'ed Odds-Ratio Squared (LORS) approach.
 
     /**
-     * Calculates the Log'ed Odds-Ratio Squared (residuals) for a given the person ability parameter and a given expected/observed score
+     * Calculates the Log'ed Odds-Ratio Squared (residuals)
+     * for a given the person ability parameter and a given expected/observed score
      *
      * @param array<float> $pp - person ability parameter ('ability')
      * @param array<float> $ip - item parameters ('difficulty')
@@ -292,7 +295,7 @@ class raschbirnbauma extends model_raschmodel {
      * @param float $n - number of observations
      * @return float - weighted residuals
      */
-    function lors_residuals(array $pp, array $ip, float $or, float $n = 1):float {
+    public function lors_residuals(array $pp, array $ip, float $or, float $n = 1):float {
         $pp = $pp['ability'];
         $a = $ip['difficulty'];
 
@@ -308,7 +311,7 @@ class raschbirnbauma extends model_raschmodel {
      * @param float $n - number of observations
      * @return array - 1st derivative
      */
-    function lors_1st_derivative_ip(array $pp, array $ip, float $or, float $n = 1): array {
+    public function lors_1st_derivative_ip(array $pp, array $ip, float $or, float $n = 1): array {
         $pp = $pp['ability'];
         $a = $ip['difficulty'];
 
@@ -328,7 +331,7 @@ class raschbirnbauma extends model_raschmodel {
      * @param float $n - number of observations
      * @return array - 1st derivative
      */
-    function lors_2nd_derivative_ip(array $pp, array $ip, float $or, float $n = 1): array {
+    public function lors_2nd_derivative_ip(array $pp, array $ip, float $or, float $n = 1): array {
         $pp = $pp['ability'];
         $a = $ip['difficulty'];
 

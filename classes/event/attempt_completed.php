@@ -25,6 +25,7 @@
 namespace local_catquiz\event;
 
 use local_catquiz\catscale;
+use moodle_url;
 
 /**
  * The attempt_completed event class.
@@ -84,6 +85,6 @@ class attempt_completed extends \core\event\base {
      *
      */
     public function get_url() {
-        return null;
+        return new moodle_url('');
     }
 }

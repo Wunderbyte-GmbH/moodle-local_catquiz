@@ -61,10 +61,14 @@ class catcalc_test extends basic_testcase {
         ];
         $itemparamlist = new model_item_param_list();
         $itemparamlist
-            ->add((new model_item_param(5, $model))->set_parameters(['difficulty' => 0.7758, 'discrimination' => 0.5, 'guessing' => 0.2, ]))
-            ->add((new model_item_param(33, $model))->set_parameters(['difficulty' => -37.7967, 'discrimination' => 1.2, 'guessing' => 1.2, ]))
-            ->add((new model_item_param(50, $model))->set_parameters(['difficulty' => -37.7967, 'discrimination' => 0.3, 'guessing' => 0.7, ]))
-            ->add((new model_item_param(58, $model))->set_parameters(['difficulty' => -37.7967, 'discrimination' => 0, 'guessing' => 0.4, ]));
+            ->add((new model_item_param(5, $model))->set_parameters(['difficulty' =>
+                0.7758, 'discrimination' => 0.5, 'guessing' => 0.2]))
+            ->add((new model_item_param(33, $model))->set_parameters(['difficulty' =>
+                -37.7967, 'discrimination' => 1.2, 'guessing' => 1.2]))
+            ->add((new model_item_param(50, $model))->set_parameters(['difficulty' =>
+                -37.7967, 'discrimination' => 0.3, 'guessing' => 0.7]))
+            ->add((new model_item_param(58, $model))->set_parameters(['difficulty' =>
+                -37.7967, 'discrimination' => 0, 'guessing' => 0.4]));
         $result = catcalc::estimate_person_ability($personresponses, $itemparamlist);
         $this->assertEquals($expected, sprintf("%.4f", $result));
     }
@@ -98,7 +102,11 @@ class catcalc_test extends basic_testcase {
      * @throws InvalidArgumentException
      * @throws ExpectationFailedException
      */
-    public function test_estimate_item_parameter_calculation_returns_expected_values(string $modelname, array $responses, array $userabilities, float $expected) {
+    public function test_estimate_item_parameter_calculation_returns_expected_values(
+            string $modelname,
+            array $responses,
+            array $userabilities,
+            float $expected) {
         $itemresponses = [];
         foreach ($userabilities as $userid => $ability) {
             foreach (['q1', 'q2'] as $qid) {

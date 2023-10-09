@@ -133,10 +133,10 @@ class dataapi {
         }
         $id = $DB->insert_record('local_catquiz_catscales', $catscale);
 
-        // Trigger catscale created event
+        // Trigger catscale created event.
         $event = catscale_created::create([
             'objectid' => $id,
-            'context' => \context_system::instance(),
+            'context' => context_system::instance(),
             'other' => [
                 'scalename' => $catscale->name,
                 'catscaleid' => $id,
@@ -169,7 +169,7 @@ class dataapi {
         if (!in_array($catscaleid, $catscaleids)) {
             $result = $DB->delete_records('local_catquiz_catscales', ['id' => $catscaleid]);
         } else {
-            // throw new moodle_exception('', 'local_catquiz');
+            // Throw new moodle_exception('', 'local_catquiz').
             // Cannot delete catscale which has children.
             $result = false;
             $message = get_string('cannotdeletescalewithchildren', 'local_catquiz');

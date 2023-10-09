@@ -46,7 +46,17 @@ class catquiz_base {
         global $DB;
 
         $params = [];
-        $sql = "SELECT qas.id, qa.questionid, qas.userid, qas.fraction, q.qtype, qas.state, qa.maxmark, qa.maxfraction, qa.minfraction, qas.state, qas.timecreated
+        $sql = "SELECT qas.id,
+                    qa.questionid,
+                    qas.userid,
+                    qas.fraction,
+                    q.qtype,
+                    qas.state,
+                    qa.maxmark,
+                    qa.maxfraction,
+                    qa.minfraction,
+                    qas.state,
+                    qas.timecreated
                 FROM {question_attempts} qa
                 JOIN {question_attempt_steps} qas
                 ON qas.questionattemptid = qa.id

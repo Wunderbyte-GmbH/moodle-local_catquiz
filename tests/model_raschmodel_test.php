@@ -111,70 +111,80 @@ class model_raschmodel_test extends basic_testcase {
                 $personabilities,
                 $item->set_parameters(['difficulty' => 5]),
                 $responses,
-                fn ($personparams, $item, $responses) => $raschbirnbauma->calc_dic_item($personparams, $item, $responses),
+                fn ($personparams, $item, $responses) =>
+                    $raschbirnbauma->calc_dic_item($personparams, $item, $responses),
             ],
             'raschbirnbaumb with dic' => [
                 'expected' => '60.0008',
                 $personabilities,
                 $item->set_parameters(['difficulty' => 5, 'discrimination' => 2]),
                 $responses,
-                fn ($personparams, $item, $responses) => $raschbirnbaumb->calc_dic_item($personparams, $item, $responses),
+                fn ($personparams, $item, $responses) =>
+                    $raschbirnbaumb->calc_dic_item($personparams, $item, $responses),
             ],
             'raschbirnbauma with bic' => [
                 'expected' => '31.1533',
                 $personabilities,
                 $item->set_parameters(['difficulty' => 5]),
                 $responses,
-                fn ($personparams, $item, $responses) => $raschbirnbauma->calc_bic_item($personparams, $item, $responses),
+                fn ($personparams, $item, $responses) =>
+                    $raschbirnbauma->calc_bic_item($personparams, $item, $responses),
             ],
             'raschbirnbaumb with bic' => [
                 'expected' => '62.1980',
                 $personabilities,
                 $item->set_parameters(['difficulty' => 5, 'discrimination' => 2]),
                 $responses,
-                fn ($personparams, $item, $responses) => $raschbirnbaumb->calc_bic_item($personparams, $item, $responses),
+                fn ($personparams, $item, $responses) =>
+                    $raschbirnbaumb->calc_bic_item($personparams, $item, $responses),
             ],
             'raschbirnbauma with caic' => [
                 'expected' => '31.4410',
                 $personabilities,
                 $item->set_parameters(['difficulty' => 5]),
                 $responses,
-                fn ($personparams, $item, $responses) => $raschbirnbauma->calc_caic_item($personparams, $item, $responses),
+                fn ($personparams, $item, $responses) =>
+                    $raschbirnbauma->calc_caic_item($personparams, $item, $responses),
             ],
             'raschbirnbaumb with caic' => [
                 'expected' => '62.7734',
                 $personabilities,
                 $item->set_parameters(['difficulty' => 5, 'discrimination' => 2]),
                 $responses,
-                fn ($personparams, $item, $responses) => $raschbirnbaumb->calc_caic_item($personparams, $item, $responses),
+                fn ($personparams, $item, $responses) =>
+                    $raschbirnbaumb->calc_caic_item($personparams, $item, $responses),
             ],
             'raschbirnbauma with aicc' => [
                 'expected' => '36.0547',
                 $personabilities,
                 $item->set_parameters(['difficulty' => 5]),
                 $responses,
-                fn ($personparams, $item, $responses) => $raschbirnbauma->calc_aicc_item($personparams, $item, $responses),
+                fn ($personparams, $item, $responses) =>
+                    $raschbirnbauma->calc_aicc_item($personparams, $item, $responses),
             ],
             'raschbirnbaumb with aicc' => [
                 'expected' => '0.0000',
                 $personabilities,
                 $item->set_parameters(['difficulty' => 5, 'discrimination' => 2]),
                 $responses,
-                fn ($personparams, $item, $responses) => $raschbirnbaumb->calc_aicc_item($personparams, $item, $responses),
+                fn ($personparams, $item, $responses) =>
+                    $raschbirnbaumb->calc_aicc_item($personparams, $item, $responses),
             ],
             'raschbirnbauma with sabic' => [
                 'expected' => '28.4861',
                 $personabilities,
                 $item->set_parameters(['difficulty' => 5]),
                 $responses,
-                fn ($personparams, $item, $responses) => $raschbirnbauma->calc_sabic_item($personparams, $item, $responses),
+                fn ($personparams, $item, $responses) =>
+                    $raschbirnbauma->calc_sabic_item($personparams, $item, $responses),
             ],
             'raschbirnbaumb with sabic' => [
                 'expected' => '0.0000',
                 $personabilities,
                 $item->set_parameters(['difficulty' => 5, 'discrimination' => 2]),
                 $responses,
-                fn ($personparams, $item, $responses) => $raschbirnbaumb->calc_sabic_item($personparams, $item, $responses),
+                fn ($personparams, $item, $responses) =>
+                    $raschbirnbaumb->calc_sabic_item($personparams, $item, $responses),
             ],
         ];
     }

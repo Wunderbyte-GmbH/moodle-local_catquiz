@@ -289,7 +289,6 @@ class fileparser {
                 'success' => 0,
                 'message' => $e->getMessage(),
             ];
-            // throw new moodle_exception('callbackfunctionnotapplied', 'local_catquiz');
         }
 
     }
@@ -355,7 +354,9 @@ class fileparser {
                     case "date":
                         if (!$this->validate_datefields($value)) {
                             $format = $this->settings->dateformat;
-                            $this->add_csvwarnings("$value is not a valid date format in $column. Format should be Unix timestamp or like: $format", $line[0]);
+                            $this->add_csvwarnings(
+                                "$value is not a valid date format in $column. Format should be Unix timestamp or like: $format",
+                                $line[0]);
                             break;
                         }
                         break;
@@ -523,7 +524,6 @@ class fileparser {
      *
      */
     protected function add_csverror($errorstring, $i) {
-        // $this->csverrors[] = $errorstring . PHP_EOL . "In line with values: $i ";
         $this->csverrors[] = nl2br($errorstring.".\nIn line with values: $i ");
     }
 

@@ -47,20 +47,20 @@ class modal_manage_catscale extends dynamic_form {
 
         $mform->addElement('header', 'create_catscale', get_string('createnewcatscale', 'local_catquiz'));
 
-        // Add a text field for the catscale name
+        // Add a text field for the catscale name.
         $mform->addElement('text', 'name', get_string('name'));
         $mform->setType('name', PARAM_TEXT);
         $mform->addRule('name', get_string('required'), 'required', PARAM_ALPHAEXT, 'client');
 
-        // Add a textarea field for the catscale description
+        // Add a textarea field for the catscale description.
         $mform->addElement('textarea', 'description', get_string('description'), 'wrap="virtual" rows="5" cols="50"');
         $mform->setType('description', PARAM_CLEANHTML);
 
-        // Add a textarea field for the catscale description
+        // Add a textarea field for the catscale description.
         $mform->addElement('hidden', 'id', '');
         $mform->setType('id', PARAM_INT);
 
-        // Add a select field for the parent ID
+        // Add a select field for the parent ID.
         $options = ['0' => get_string('none')];
         $catscales = dataapi::get_all_catscales();
         foreach ($catscales as $catscale) {
@@ -76,15 +76,13 @@ class modal_manage_catscale extends dynamic_form {
                 get_string('chooseparent', 'local_catquiz'),
                 $buttonargs),
         ];
-        $mform->addGroup($categoryselect, 'chooseparent', get_string('chooseparent', 'local_catquiz'), [' '], false);
+        $mform->addGroup($categoryselect, 'chooseparent', get_string('chooseparent', 'local_catquiz'), '', false);
         $mform->setType('chooseparent', PARAM_NOTAGS);
         $mform->setType('parentid', PARAM_INT);
 
         $group[] = $mform->createElement('text', 'catquiz_minscalevalue', get_string('minscalevalue', 'local_catquiz'));
-        // $mform->addHelpButton('catquiz_mintimeperitem', 'mintimeperitem', 'local_catquiz');
 
         $group[] = $mform->createElement('text', 'catquiz_maxscalevalue', get_string('maxscalevalue', 'local_catquiz'));
-        // $mform->addHelpButton('catquiz_mintimeperitem', 'mintimeperitem', 'local_catquiz');
 
         $mform->addGroup($group, 'minmaxgroup', get_string('minmaxgroup', 'local_catquiz'));
         $mform->hideIf('minmaxgroup', 'parentid', 'neq', '0'); // Hide group when not parent.
@@ -180,7 +178,7 @@ class modal_manage_catscale extends dynamic_form {
     /**
      * Validate form.
      *
-     * @param stdClass $data
+     * @param array $data
      * @param array $files
      * @return array $errors
      */
@@ -209,7 +207,6 @@ class modal_manage_catscale extends dynamic_form {
      * @see moodleform::get_data()
      */
     public function get_data() {
-        // return parent::get_data();
 
         $data = parent::get_data();
         if (!empty($data->minmaxgroup["catquiz_minscalevalue"])) {

@@ -57,7 +57,8 @@ class subscription {
         if (!$record = $DB->get_record('local_catquiz_subscriptions', [
             'userid' => $userid,
             'area' => $area,
-            'itemid' => $itemid])) {
+            'itemid' => $itemid,
+            ])) {
 
             $record = (object)[
                 'userid' => $userid,
@@ -108,7 +109,8 @@ class subscription {
             'userid' => $userid,
             'itemid' => $itemid,
             'area' => $area,
-            'status' => STATUS_SUBSCRIPTION_BOOKED])) {
+            'status' => STATUS_SUBSCRIPTION_BOOKED,
+            ])) {
             $status = 1;
         }
 

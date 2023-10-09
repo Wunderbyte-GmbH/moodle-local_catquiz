@@ -41,7 +41,11 @@ use local_catquiz\local\model\model_responses;
  */
 class web_raschbirnbauma extends model_model implements catcalc_ability_estimator {
 
-    public function get_information_criterion(string $criterion, model_person_param_list $personabilities, model_item_param $itemparams, model_responses $k): float {
+    public function get_information_criterion(
+        string $criterion,
+        model_person_param_list $personabilities,
+        model_item_param $itemparams,
+        model_responses $k): float {
         return 0.0;
     }
 
@@ -62,7 +66,9 @@ class web_raschbirnbauma extends model_model implements catcalc_ability_estimato
      *
      * Items that have only "0" responses will not be included in the JSON.
      */
-    public function estimate_item_params(model_person_param_list $personparams, ?model_item_param_list $olditemparams = null): model_item_param_list {
+    public function estimate_item_params(
+        model_person_param_list $personparams,
+        ?model_item_param_list $olditemparams = null): model_item_param_list {
         $estimateditemparams = new model_item_param_list();
 
         $data = [];

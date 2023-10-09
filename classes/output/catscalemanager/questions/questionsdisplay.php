@@ -142,7 +142,8 @@ class questionsdisplay {
             'questiontext',
             'qtype',
             'model',
-            'lastattempttime']);
+            'lastattempttime',
+        ]);
 
         $sortcolumns = $columnsarray;
         unset($sortcolumns['action']);
@@ -213,19 +214,22 @@ class questionsdisplay {
             get_string('view', 'core'),
         ]);
 
-        $table->define_filtercolumns(['categoryname' => [
-            'localizedname' => get_string('questioncategories', 'local_catquiz'),
-        ], 'qtype' => [
-            'localizedname' => get_string('questiontype', 'local_catquiz'),
-            'ddimageortext' => get_string('pluginname', 'qtype_ddimageortext'),
-            'essay' => get_string('pluginname', 'qtype_essay'),
-            'gapselect' => get_string('pluginname', 'qtype_gapselect'),
-            'multianswer' => get_string('pluginname', 'qtype_multianswer'),
-            'multichoice' => get_string('pluginname', 'qtype_multichoice'),
-            'numerical' => get_string('pluginname', 'qtype_numerical'),
-            'shortanswer' => get_string('pluginname', 'qtype_shortanswer'),
-            'truefalse' => get_string('pluginname', 'qtype_truefalse'),
-        ]]);
+        $table->define_filtercolumns([
+            'categoryname' => [
+                    'localizedname' => get_string('questioncategories', 'local_catquiz'),
+            ],
+            'qtype' => [
+                'localizedname' => get_string('questiontype', 'local_catquiz'),
+                'ddimageortext' => get_string('pluginname', 'qtype_ddimageortext'),
+                'essay' => get_string('pluginname', 'qtype_essay'),
+                'gapselect' => get_string('pluginname', 'qtype_gapselect'),
+                'multianswer' => get_string('pluginname', 'qtype_multianswer'),
+                'multichoice' => get_string('pluginname', 'qtype_multichoice'),
+                'numerical' => get_string('pluginname', 'qtype_numerical'),
+                'shortanswer' => get_string('pluginname', 'qtype_shortanswer'),
+                'truefalse' => get_string('pluginname', 'qtype_truefalse'),
+            ]
+        ]);
         $table->define_fulltextsearchcolumns(['idnumber', 'name', 'questiontext', 'qtype']);
         $table->define_sortablecolumns([
             'idnunber',

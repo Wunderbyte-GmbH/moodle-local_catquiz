@@ -115,7 +115,7 @@ class item_model_override_selector extends dynamic_form {
         foreach (array_keys($models) as $model) {
             $fieldname = sprintf('override_%s', $model);
             $obj = new stdClass;
-            $obj->status = $data->$fieldname[sprintf('%s_select', $fieldname)];
+            $obj->status = $data->{$fieldname[sprintf('%s_select', $fieldname)]};
             $formitemparams[$model] = $obj;
         }
 
@@ -185,17 +185,13 @@ class item_model_override_selector extends dynamic_form {
                 'local_catquiz_itemparams',
                 (object) $updated
             );
-            // Trigger status changed event
+            // Trigger status changed event.
             $event = testitemstatus_updated::create([
             'objectid' => $updated['id'],
-            'context' => \context_system::instance(),
+            'context' => context_system::instance(),
             'other' => [
                 'status' => $updated['status'],
                 'testitemid' => $updated['id'],
-                // More information needed to display link in event_log_table
-                // 'catscaleid' => ,
-                // 'context' => ,
-                // 'component' => ,
             ],
             ]);
             $event->trigger();
@@ -211,17 +207,13 @@ class item_model_override_selector extends dynamic_form {
                 (object) $new
             );
 
-            // Trigger status changed event
+            // Trigger status changed event.
             $event = testitemstatus_updated::create([
             'objectid' => $new['id'],
-            'context' => \context_system::instance(),
+            'context' => context_system::instance(),
             'other' => [
                 'status' => $new['status'],
                 'testitemid' => $new['id'],
-                // More information needed to display link in event_log_table
-                // 'catscaleid' => ,
-                // 'context' => ,
-                // 'component' => ,
             ],
             ]);
             $event->trigger();

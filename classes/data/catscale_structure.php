@@ -78,10 +78,12 @@ class catscale_structure {
             $this->timecreated = $data['timecreated'];
             $this->name = $data['name'];
             $this->description = $data['description'] ?? '';
-            $this->minscalevalue = empty($data["minmaxgroup"]["catquiz_minscalevalue"]) ? 0 : $data["minmaxgroup"]["catquiz_minscalevalue"];
-            $this->maxscalevalue = empty($data["minmaxgroup"]["catquiz_maxscalevalue"]) ? 0 : $data["minmaxgroup"]["catquiz_maxscalevalue"];
+            $this->minscalevalue
+                = empty($data["minmaxgroup"]["catquiz_minscalevalue"]) ? 0 : $data["minmaxgroup"]["catquiz_minscalevalue"];
+            $this->maxscalevalue
+            = empty($data["minmaxgroup"]["catquiz_maxscalevalue"]) ? 0 : $data["minmaxgroup"]["catquiz_maxscalevalue"];
 
-            if(!empty($data['id'])) {
+            if (!empty($data['id'])) {
                 $url = new moodle_url('/local/catquiz/manage_catscales.php', [
                     'scaleid' => $data['id'],
                 ], 'lcq_catscales');

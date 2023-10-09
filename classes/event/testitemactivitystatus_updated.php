@@ -25,6 +25,9 @@
 namespace local_catquiz\event;
 
 use local_catquiz\catscale;
+use moodle_url;
+
+defined('MOODLE_INTERNAL') || die();
 
 require_once($CFG->dirroot . '/local/catquiz/lib.php');
 
@@ -109,6 +112,6 @@ class testitemactivitystatus_updated extends \core\event\base {
      *
      */
     public function get_url() {
-        return null;
+        return new moodle_url('');
     }
 }

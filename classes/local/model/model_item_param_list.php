@@ -249,7 +249,7 @@ class model_item_param_list implements ArrayAccess, IteratorAggregate, Countable
         // whether we should create a new item param or update an existing one.
         $existingparamsrows = $DB->get_records(
             'local_catquiz_itemparams',
-            ['contextid' => $contextid, ]
+            ['contextid' => $contextid]
         );
         $existingparams = [];
         foreach ($existingparamsrows as $r) {
@@ -333,7 +333,8 @@ class model_item_param_list implements ArrayAccess, IteratorAggregate, Countable
 
         $returnarray = [
             'success' => 0,
-            'message' => 'Callback could not be executed'];
+            'message' => 'Callback could not be executed',
+        ];
 
         // Scale logic is in this function: get scale id and update in table.
         if ($label = $newrecord['label'] ?? false) {
@@ -394,7 +395,8 @@ class model_item_param_list implements ArrayAccess, IteratorAggregate, Countable
                 'componentid' => $newrecord['componentid'],
                 'componentname' => $newrecord['componentname'],
                 'model' => $newrecord['model'],
-                'contextid' => $newrecord['contextid']]);
+                'contextid' => $newrecord['contextid'],
+            ]);
         }
 
         $now = time();

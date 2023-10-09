@@ -49,7 +49,7 @@ class feedback {
 
     /**
      * Add Form elements to form.
-     * @param local_catquiz\feedback\MoodleQuickForm $mform
+     * @param MoodleQuickForm $mform
      * @param array $elements
      * @return void
      */
@@ -86,8 +86,11 @@ class feedback {
 
         foreach ($scales as $scale) {
 
-            $elements[] = $mform->addElement('static',
-                'feedback_scaleid_' . $scale->id . '_intro', $scale->name, get_string('setcoursesforscaletext', 'local_catquiz', $scale->name));
+            $elements[] = $mform->addElement(
+                'static',
+                'feedback_scaleid_' . $scale->id . '_intro',
+                $scale->name,
+                get_string('setcoursesforscaletext', 'local_catquiz', $scale->name));
 
             $elements[] = $mform->addElement('autocomplete',
                 'feedback_scaleid_' . $scale->id . '_courseids', '', $coursesarray, $options);
@@ -151,7 +154,7 @@ class feedback {
      * Function to access test record and return the settings relevant for feedback.
      * @param int $quizid
      * @param string $component
-     * @return void
+     * @return array
      */
     private static function return_feedback_settings_from_json(int $quizid, string $component) {
 

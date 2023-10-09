@@ -265,7 +265,8 @@ class catscalequestions_table extends wunderbyte_table {
         return html_writer::tag('i', "", [
             "class" => "fa fa-circle $bootstrapclass",
             "aria-label" => get_string($labelstring, 'local_catquiz'),
-            "title" => get_string($labelstring, 'local_catquiz')]);
+            "title" => get_string($labelstring, 'local_catquiz'),
+        ]);
     }
 
     /**

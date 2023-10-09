@@ -98,6 +98,6 @@ class testiteminscale_updated extends \core\event\base {
      *
      */
     public function get_url() {
-        return null;
+        return new moodle_url('');
     }
 }

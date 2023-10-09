@@ -25,6 +25,7 @@
 namespace local_catquiz\event;
 
 use local_catquiz\catscale;
+use moodle_url;
 
 /**
  * The catscale_updated event class.
@@ -79,6 +80,6 @@ class catscale_created extends \core\event\base {
      *
      */
     public function get_url() {
-        return null;
+        return new moodle_url('');
     }
 }

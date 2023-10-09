@@ -24,9 +24,11 @@
 namespace local_catquiz\event;
 
 use local_catquiz\catscale;
+use moodle_url;
+
+defined('MOODLE_INTERNAL') || die();
 
 require_once($CFG->dirroot . '/local/catquiz/lib.php');
-
 
 /**
  * The calculation_executed event class.
@@ -73,7 +75,7 @@ class calculation_executed extends \core\event\base {
         $catscalename = $catscale->name;
         $data['catscalename'] = $catscalename;
 
-        foreach($otherarray as $key => $value) {
+        foreach ($otherarray as $key => $value) {
             $data[$key] = $value;
         }
 
@@ -87,6 +89,6 @@ class calculation_executed extends \core\event\base {
      *
      */
     public function get_url() {
-        return null;
+        return new moodle_url('');
     }
 }

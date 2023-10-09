@@ -61,7 +61,8 @@ $subscribed = subscription::return_subscription_state($userid, 'catscale', 79);
 
 $data = [
     'id' => 1,
-    'area' => 'catscale'];
+    'area' => 'catscale',
+];
 
 if ($subscribed) {
     $data['subscribed'] = 'true';
