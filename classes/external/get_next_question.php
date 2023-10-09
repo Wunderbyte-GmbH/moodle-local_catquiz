@@ -55,7 +55,7 @@ class get_next_question extends external_api {
      */
     public static function execute_parameters(): external_function_parameters {
         return new external_function_parameters([
-            'attemptid'  => new external_value(PARAM_INT, 'attemptid', VALUE_REQUIRED)
+            'attemptid'  => new external_value(PARAM_INT, 'attemptid', VALUE_REQUIRED),
             ]
         );
     }

@@ -56,7 +56,7 @@ class delete_catscale extends external_api {
      */
     public static function execute_parameters(): external_function_parameters {
         return new external_function_parameters([
-            'id'  => new external_value(PARAM_INT, 'id', VALUE_REQUIRED)
+            'id'  => new external_value(PARAM_INT, 'id', VALUE_REQUIRED),
             ]
         );
     }

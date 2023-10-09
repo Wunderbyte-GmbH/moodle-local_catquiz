@@ -392,7 +392,7 @@ class raschbirnbauma extends model_raschmodel {
         $atr = floatval(get_config('catmodel_raschbirnbauma', 'trusted_region_factor_sd_a'));
 
         return [
-            ($am - $ip['difficulty']) / ($as ** 2) // The d/da .
+            ($am - $ip['difficulty']) / ($as ** 2), // The d/da .
         ];
     }
 
@@ -408,7 +408,7 @@ class raschbirnbauma extends model_raschmodel {
         $as = 2; // Standard derivation of difficulty.
 
         return [[
-            -1 / ($as ** 2) // Calculate d/da d/da.
+            -1 / ($as ** 2), // Calculate d/da d/da.
         ]];
     }
 }

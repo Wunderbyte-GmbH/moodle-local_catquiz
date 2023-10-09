@@ -482,7 +482,7 @@ class model_item_param_list implements ArrayAccess, IteratorAggregate, Countable
                     'catscaleid' => $newrecord['catscaleid'],
                     'context' => catquiz::get_default_context_id(),
                     'component' => $newrecord['componentname'],
-                ]
+                ],
                 ]);
             $event->trigger();
         }

@@ -72,7 +72,7 @@ final class strategybalancedscore extends preselect_task implements wb_middlewar
         return [
             'penalty_threshold',
             'questions',
-            'generalnumberofattempts_max'
+            'generalnumberofattempts_max',
         ];
     }
 }

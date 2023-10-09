@@ -116,7 +116,7 @@ class catscalequestions_table extends wunderbyte_table {
                 'bodystring' => 'confirmactivitychange', // Will be shown in modal body.
                 'component' => 'local_catquiz',
                 'labelcolumn' => 'name',
-            ]
+            ],
         ];
 
         $data['showactionbuttons'][] = [
@@ -148,7 +148,7 @@ class catscalequestions_table extends wunderbyte_table {
                 'bodystring' => 'confirmdeletion', // Will be shown in modal body in case elements are selected.
                 'component' => 'local_catquiz',
                 'labelcolumn' => 'name', // Verify value of record that will be deleted.
-            ]
+            ],
         ];
         $data['showactionbuttons'][] = [
             'class' => 'btn btn-plain btn-smaller',
@@ -170,7 +170,7 @@ class catscalequestions_table extends wunderbyte_table {
                 'componentid' => $values->componentid,
                 'contextid' => $this->contextid,
                 'componentname' => $values->component,
-            ]
+            ],
         ];
             table::transform_actionbuttons_array($data['showactionbuttons']);
             return $OUTPUT->render_from_template('local_wunderbyte_table/component_actionbutton', $data);
@@ -205,7 +205,7 @@ class catscalequestions_table extends wunderbyte_table {
             'methodname' => '', // The method needs to be added to your child of wunderbyte_table class.
             'data' => [ // Will be added eg as data-id = $values->id, so values can be transmitted to the method above.
                 'id' => $values->id,
-            ]
+            ],
         ];
 
         // This transforms the array to make it easier to use in mustache template.
@@ -493,7 +493,7 @@ class catscalequestions_table extends wunderbyte_table {
                     'numfailed' => count($failed),
                     'failedids' => implode(',', $failedids),
                 ]
-            )
+            ),
         ];
     }
 

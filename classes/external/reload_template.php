@@ -57,7 +57,7 @@ class reload_template extends external_api {
      */
     public static function execute_parameters(): external_function_parameters {
         return new external_function_parameters([
-            'data'  => new external_value(PARAM_RAW, 'Data package as json.', VALUE_REQUIRED)
+            'data'  => new external_value(PARAM_RAW, 'Data package as json.', VALUE_REQUIRED),
             ]
         );
     }

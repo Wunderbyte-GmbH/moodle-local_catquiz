@@ -60,7 +60,7 @@ class testitemimporter {
     public static function return_ajaxformdata() : array {
         $ajaxformdata = [
             'id' => 'lcq_csv_import_form',
-            'settingscallback' => 'local_catquiz\importer\testitemimporter::execute_testitems_csv_import'
+            'settingscallback' => 'local_catquiz\importer\testitemimporter::execute_testitems_csv_import',
         ];
         return $ajaxformdata;
     }
@@ -205,7 +205,7 @@ class testitemimporter {
              [
                 'name' => 'lastattempttime',
                 'mandatory' => false,
-            ]
+            ],
             ];
         return $columnssequential;
     }

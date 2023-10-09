@@ -158,8 +158,8 @@ class testenvironments_table extends wunderbyte_table {
             'formname' => 'local_catquiz\\form\\edit_testenvironment',
             'data' => [
                 'id' => $values->id,
-                'labelcolumn' => 'name'
-                ]
+                'labelcolumn' => 'name',
+                ],
         ];
 
         $data['showactionbuttons'][] = [
@@ -178,7 +178,7 @@ class testenvironments_table extends wunderbyte_table {
                     'key' => 'labelcolumn',
                     'value' => 'name',
                 ],
-                ]
+                ],
         ];
 
         return $OUTPUT->render_from_template('local_wunderbyte_table/component_actionbutton', $data);;

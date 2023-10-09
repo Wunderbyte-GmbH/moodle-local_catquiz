@@ -278,7 +278,7 @@ class catcontext {
                     'contextname' => $this->name,
                     'contextid' => $this->id,
                     'contextobjectcallback' => 'local_catquiz\local\classes\catcontext::return_as_class',
-                ]
+                ],
                 ]);
             $event->trigger();
 
@@ -293,7 +293,7 @@ class catcontext {
                     'contextname' => $this->name,
                     'contextid' => $this->id,
                     'contextobjectcallback' => 'local_catquiz\local\classes\catcontext::return_as_class',
-                ]
+                ],
                 ]);
             $event->trigger();
         }

@@ -230,7 +230,7 @@ class raschbirnbaumc_test extends TestCase {
                     "discrimination" => 2.5,
                     "guessing" => 1.181301,
                 ],
-                'expected' => [-0.9140625, -9.167132e-13, 1.125]
+                'expected' => [-0.9140625, -9.167132e-13, 1.125],
             ],
             "testcase6" => [
                 'n' => 3,

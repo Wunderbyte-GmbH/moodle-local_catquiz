@@ -57,7 +57,7 @@ class strategy_test extends basic_testcase {
     public function update_played_questions_per_scale_works_provider() {
         $question1 = (object)[
             'id' => 1,
-            'catscaleid' => 1
+            'catscaleid' => 1,
         ];
         $question2 = $question1;
         $question2 = (object)[
@@ -171,7 +171,7 @@ class strategy_test extends basic_testcase {
                         (object) ['ability' => 0],
                         (object) ['ability' => 1],
                         (object) ['ability' => 2],
-                    ]
+                    ],
                 ],
                 'custom_setup_fun' => function () {
                     $cache = cache::make('local_catquiz', 'adaptivequizattempt');
@@ -200,7 +200,7 @@ class strategy_test extends basic_testcase {
                     53,
                 ],
                 'strategy' => (new teststrategy_fastest()),
-            ]
+            ],
         ];
     }
 

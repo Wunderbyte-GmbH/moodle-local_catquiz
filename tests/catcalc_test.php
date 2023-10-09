@@ -129,26 +129,26 @@ class catcalc_test extends basic_testcase {
             1 => [
                 'component' => [
                     'q1' => ['fraction' => 0.0],
-                    'q2' => ['fraction' => 1.0]
-                ]
+                    'q2' => ['fraction' => 1.0],
+                ],
             ],
             2 => [
                 'component' => [
                     'q1' => ['fraction' => 0.0],
-                    'q2' => ['fraction' => 0.0]
-                ]
+                    'q2' => ['fraction' => 0.0],
+                ],
             ],
             3 => [
                 'component' => [
                     'q1' => ['fraction' => 1.0],
-                    'q2' => ['fraction' => 1.0]
-                ]
+                    'q2' => ['fraction' => 1.0],
+                ],
             ],
             4 => [
                 'component' => [
                     'q1' => ['fraction' => 1.0],
-                    'q2' => ['fraction' => 0.0]
-                ]
+                    'q2' => ['fraction' => 0.0],
+                ],
             ],
         ];
         $userabilities = [
@@ -184,26 +184,26 @@ class catcalc_test extends basic_testcase {
             1 => [
                 'component' => [
                     'q1' => ['fraction' => 0.0],
-                    'q2' => ['fraction' => 1.0]
-                ]
+                    'q2' => ['fraction' => 1.0],
+                ],
             ],
             2 => [
                 'component' => [
                     'q1' => ['fraction' => 0.0],
-                    'q2' => ['fraction' => 0.0]
-                ]
+                    'q2' => ['fraction' => 0.0],
+                ],
             ],
             3 => [
                 'component' => [
                     'q1' => ['fraction' => 1.0],
-                    'q2' => ['fraction' => 1.0]
-                ]
+                    'q2' => ['fraction' => 1.0],
+                ],
             ],
             4 => [
                 'component' => [
                     'q1' => ['fraction' => 1.0],
-                    'q2' => ['fraction' => 0.0]
-                ]
+                    'q2' => ['fraction' => 0.0],
+                ],
             ],
         ];
         $userabilities = [

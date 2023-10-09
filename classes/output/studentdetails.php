@@ -121,7 +121,7 @@ class studentdetails implements renderable, templatable {
                     'numberofanswerscorrect' => $numberofanswerscorrect,
                     'numberofanswersincorrect' => $numberofanswersincorrect,
                 ],
-            ]
+            ],
         ];
     }
 

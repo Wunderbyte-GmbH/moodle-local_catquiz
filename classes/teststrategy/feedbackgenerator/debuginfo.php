@@ -106,7 +106,7 @@ class debuginfo extends feedbackgenerator {
                 if (! array_key_exists($question->catscaleid, $questionsperscale)) {
                     $questionsperscale[$question->catscaleid] = [
                         'num' => 0,
-                        'name' => $catscales[$question->catscaleid]->name
+                        'name' => $catscales[$question->catscaleid]->name,
                     ];
                 }
                 $questionsperscale[$question->catscaleid]['num'] = $questionsperscale[$question->catscaleid]['num'] + 1;

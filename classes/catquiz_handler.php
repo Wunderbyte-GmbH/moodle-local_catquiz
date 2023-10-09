@@ -392,7 +392,7 @@ class catquiz_handler {
             'json' => json_encode($clone),
             'parentid' => $parentid ?? 0,
             'catscaleid' => $quizdata->catquiz_catcatscales,
-            'courseid' => $quizdata->course
+            'courseid' => $quizdata->course,
         ];
 
          // Pass on the values as stdClas.
@@ -429,7 +429,7 @@ class catquiz_handler {
         ];
 
         $igonorevalues = [
-            'choosetest'
+            'choosetest',
         ];
 
         foreach ($values as $k => $v) {

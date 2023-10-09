@@ -127,7 +127,7 @@ class comparetotestaverage extends feedbackgenerator {
             'userability' => sprintf('%.2f', $ability),
             'testaverageposition' => ($testaverage + 5) * 10,
             'userabilityposition' => ($ability + 5) * 10,
-            'text' => $text
+            'text' => $text,
         ];
     }
 }

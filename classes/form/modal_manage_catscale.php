@@ -74,7 +74,7 @@ class modal_manage_catscale extends dynamic_form {
             $mform->createElement('submit',
                 'btn_changeparentid',
                 get_string('chooseparent', 'local_catquiz'),
-                $buttonargs)
+                $buttonargs),
         ];
         $mform->addGroup($categoryselect, 'chooseparent', get_string('chooseparent', 'local_catquiz'), [' '], false);
         $mform->setType('chooseparent', PARAM_NOTAGS);

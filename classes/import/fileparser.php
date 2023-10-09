@@ -574,7 +574,7 @@ class fileparser {
             'context' => \context_system::instance(),
             'other' => [
                 'itemcount' => $numberofimporteditems,
-            ]
+            ],
             ]);
         $event->trigger();
     }

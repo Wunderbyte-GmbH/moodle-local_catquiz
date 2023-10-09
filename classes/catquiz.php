@@ -57,7 +57,7 @@ class catquiz {
     public static function start_new_attempt(int $userid, int $categoryid) {
 
         return [
-            'attemptid' => 0
+            'attemptid' => 0,
         ];
     }
 
@@ -92,7 +92,7 @@ class catquiz {
         $questionid = $DB->get_field_sql($sql);
 
         return [
-            'questionid' => $questionid
+            'questionid' => $questionid,
         ];
     }
 
@@ -988,7 +988,7 @@ class catquiz {
             WHERE catscaleid = :catscaleid
         ";
         $params = [
-            'catscaleid' => $catscaleid
+            'catscaleid' => $catscaleid,
         ];
         return [$sql, $params];
     }
@@ -1038,7 +1038,7 @@ class catquiz {
             [
                 'userid' => $userid,
                 'contextid' => $contextid,
-                'catscaleid' => $catscaleid
+                'catscaleid' => $catscaleid,
             ]
         );
 
@@ -1416,7 +1416,7 @@ class catquiz {
                     'instanceid' => $data->instanceid,
                     'teststrategy' => $data->teststrategy,
                     'status' => $data->status,
-                ]
+                ],
                 ]);
             $event->trigger();
         }

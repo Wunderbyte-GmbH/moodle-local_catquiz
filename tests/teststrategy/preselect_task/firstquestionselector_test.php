@@ -61,27 +61,27 @@ class firstquestionselector_test extends basic_testcase {
                 'expected' => 0.0,
                 'personparams' => [
                     (object) ['ability' => 0.0],
-                ]
+                ],
             ],
             'single value 2' => [
                 'expected' => -1.0,
                 'personparams' => [
                     (object) ['ability' => -1.0],
-                ]
+                ],
             ],
             'two values 1' => [
                 'expected' => -1.5,
                 'personparams' => [
                     (object) ['ability' => -1.0],
                     (object) ['ability' => -2.0],
-                ]
+                ],
             ],
             'two values 2' => [
                 'expected' => 2.0,
                 'personparams' => [
                     (object) ['ability' => 0.0],
                     (object) ['ability' => 4.0],
-                ]
+                ],
             ],
             'three values 1' => [
                 'expected' => 2.0,
@@ -89,7 +89,7 @@ class firstquestionselector_test extends basic_testcase {
                     (object) ['ability' => 1.0],
                     (object) ['ability' => 2.0],
                     (object) ['ability' => 3.0],
-                ]
+                ],
             ],
             'three values 2' => [
                 'expected' => 3.0,
@@ -97,7 +97,7 @@ class firstquestionselector_test extends basic_testcase {
                     (object) ['ability' => -2.0],
                     (object) ['ability' => 3.0],
                     (object) ['ability' => 4.0],
-                ]
+                ],
             ],
             'three values 3' => [
                 'expected' => -1.0,
@@ -105,7 +105,7 @@ class firstquestionselector_test extends basic_testcase {
                     (object) ['ability' => -2.0],
                     (object) ['ability' => -1.0],
                     (object) ['ability' => 3.0],
-                ]
+                ],
             ],
         ];
     }

@@ -99,7 +99,7 @@ class local_catquiz_observer {
             $scaledata[$catscaleid] = [
                 'scaleid' => $catscaleid,
                 'name' => $catscales[$catscaleid]->name,
-                'personability' => $ability
+                'personability' => $ability,
             ];
         }
         $result = [

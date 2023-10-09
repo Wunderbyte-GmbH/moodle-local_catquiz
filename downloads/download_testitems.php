@@ -44,7 +44,7 @@ $table = wunderbyte_table::instantiate_from_tablecache_hash($encodedtable);
 // And we don't have the action column and checkbox column.
 
 $newcolumns = [
-    'componentid' => 'componentid'
+    'componentid' => 'componentid',
 ];
 
 $columnstoexclude = ['action', 'wbcheckbox'];

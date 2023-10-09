@@ -121,7 +121,7 @@ class manage_catscale extends external_api {
     public static function execute_returns(): external_single_structure {
         return new external_single_structure(
                 [
-                        'id' => new external_value(PARAM_INT, 'The ID of the newly created catscale')
+                        'id' => new external_value(PARAM_INT, 'The ID of the newly created catscale'),
                 ]
         );
     }

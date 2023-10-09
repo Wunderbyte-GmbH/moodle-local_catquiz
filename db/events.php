@@ -28,27 +28,27 @@
  $observers = [
     [
         'eventname' => '*',
-        'callback' => 'local_catquiz_observer::purge_event_cache'
+        'callback' => 'local_catquiz_observer::purge_event_cache',
         ],
     [
          'eventname' => '\local_catquiz\event\catscale_updated',
-         'callback' => 'local_catquiz_observer::catscale_updated'
+         'callback' => 'local_catquiz_observer::catscale_updated',
         ],
     [
          'eventname' => '\mod_adaptivequiz\event\attempt_completed',
-         'callback' => 'local_catquiz_observer::attempt_completed'
+         'callback' => 'local_catquiz_observer::attempt_completed',
         ],
      [
         'eventname' => '\local_catquiz\event\testiteminscale_added',
-        'callback' => 'local_catquiz_observer::testiteminscale_added'
+        'callback' => 'local_catquiz_observer::testiteminscale_added',
         ],
     [
         'eventname' => '\core\event\question_deleted',
-        'callback' => 'local_catquiz_observer::question_deleted'
+        'callback' => 'local_catquiz_observer::question_deleted',
         ],
     [
         'eventname' => '\local_catquiz\event\testitem_imported',
-        'callback' => 'local_catquiz_observer::testitem_imported'
+        'callback' => 'local_catquiz_observer::testitem_imported',
     ],
 
  ];

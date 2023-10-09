@@ -83,7 +83,7 @@ class catscale_structure {
 
             if(!empty($data['id'])) {
                 $url = new moodle_url('/local/catquiz/manage_catscales.php', [
-                    'scaleid' => $data['id']
+                    'scaleid' => $data['id'],
                 ], 'lcq_catscales');
 
                 // Add the link to the view php.

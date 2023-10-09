@@ -141,7 +141,7 @@ class dataapi {
                 'scalename' => $catscale->name,
                 'catscaleid' => $id,
                 'catscale' => $catscale,
-            ]
+            ],
             ]);
         $event->trigger();
 
@@ -181,7 +181,7 @@ class dataapi {
 
         if ($result) {
             return [
-                'success' => true
+                'success' => true,
             ];
         } else {
             return [
@@ -209,7 +209,7 @@ class dataapi {
             'userid' => $USER->id, // The user who did cancel.
             'other' => [
                 'catscaleid' => $catscale->id,
-            ]
+            ],
         ]);
         $event->trigger();
 

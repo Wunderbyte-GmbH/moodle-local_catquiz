@@ -37,7 +37,7 @@ $services = [
                 'shortname' => 'local_catquiz_external',
                 'downloadfiles' => 1,    // Allow file downloads.
                 'uploadfiles'  => 1,      // Allow file uploads.
-                'enabled' => 1
+                'enabled' => 1,
         ],
 ];
 
@@ -103,7 +103,7 @@ $functions = [
                 'type' => 'write',
                 'capabilities' => '',
                 'ajax' => true,
-                'loginrequired' => true
+                'loginrequired' => true,
         ],
         'local_catquiz_reload_template' => [
                 'classname' => 'local_catquiz\external\reload_template',
@@ -111,6 +111,6 @@ $functions = [
                 'type' => 'write',
                 'capabilities' => '',
                 'ajax' => true,
-                'loginrequired' => true
+                'loginrequired' => true,
         ],
 ];

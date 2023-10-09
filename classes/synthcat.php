@@ -51,7 +51,7 @@ class synthcat {
         for ($i = 1; $i <= count($randomvec); $i++) {
             $person = [
                     'id' => $i,
-                    'ability' => $randomvec[$i - 1] // Generate a random ability parameter between 0 and 1.
+                    'ability' => $randomvec[$i - 1], // Generate a random ability parameter between 0 and 1.
             ];
             array_push($persons, $person);
         }
@@ -143,7 +143,7 @@ class synthcat {
                         'max_fraction' => 1,
                         'min_fraction' => 0,
                         'qtype' => 'truefalse',
-                        'timestamp' => 12345678
+                        'timestamp' => 12345678,
                 ];
                 $response[$personid][$componentname][$itemid] = $itemresponse;
             }
@@ -180,7 +180,7 @@ class synthcat {
 
             $item = [
                     'id' => $i + 1,
-                    'params' => $temp
+                    'params' => $temp,
             ];
 
             array_push($testitems, $item);
@@ -254,7 +254,7 @@ class synthcat {
                         'max_fraction' => 1,
                         'min_fraction' => 0,
                         'qtype' => 'truefalse',
-                        'timestamp' => 12345678
+                        'timestamp' => 12345678,
                 ];
                 $response[$personid][$componentname][$itemid] = $itemresponse;
             }
@@ -406,7 +406,7 @@ class synthcat2 {
         for ($i = 1; $i <= count($randomvec); $i++) {
             $person = [
                     'id' => $i,
-                    'ability' => $randomvec[$i - 1] // Generate a random ability parameter between 0 and 1.
+                    'ability' => $randomvec[$i - 1], // Generate a random ability parameter between 0 and 1.
             ];
             array_push($persons, $person);
         }
@@ -442,7 +442,7 @@ class synthcat2 {
 
             $item = [
                     'id' => $i,
-                    'params' => $temp
+                    'params' => $temp,
             ];
 
             array_push($testitems, $item);

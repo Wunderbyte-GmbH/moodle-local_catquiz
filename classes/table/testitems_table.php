@@ -184,7 +184,7 @@ class testitems_table extends wunderbyte_table {
             'methodname' => '', // The method needs to be added to your child of wunderbyte_table class.
             'data' => [ // Will be added eg as data-id = $values->id, so values can be transmitted to the method above.
                 'id' => $values->id,
-            ]
+            ],
         ];
 
         // This transforms the array to make it easier to use in mustache template.
@@ -302,7 +302,7 @@ class testitems_table extends wunderbyte_table {
                     'numfailed' => count($failed),
                     'failedids' => implode(',', $failedids),
                 ]
-            )
+            ),
         ];
     }
 

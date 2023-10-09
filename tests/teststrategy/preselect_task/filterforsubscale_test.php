@@ -93,13 +93,13 @@ class filterforsubscale_test extends basic_testcase {
                 'catscaleid' => 4,
                 'lasttimeplayedpenalty' => 1,
                 'fisherinformation' => 1,
-            ]
+            ],
         ];
         $context['person_ability'] = [
             1 => -2.0,
             2 => -1.0,
             3 => 0,
-            4 => 1.0
+            4 => 1.0,
         ];
         $context['catscaleid'] = 1;
         $context['penalty_threshold'] = 5;

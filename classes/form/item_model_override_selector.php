@@ -196,7 +196,7 @@ class item_model_override_selector extends dynamic_form {
                 // 'catscaleid' => ,
                 // 'context' => ,
                 // 'component' => ,
-            ]
+            ],
             ]);
             $event->trigger();
         }
@@ -222,7 +222,7 @@ class item_model_override_selector extends dynamic_form {
                 // 'catscaleid' => ,
                 // 'context' => ,
                 // 'component' => ,
-            ]
+            ],
             ]);
             $event->trigger();
         }

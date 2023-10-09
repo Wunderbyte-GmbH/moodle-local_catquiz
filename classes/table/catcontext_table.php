@@ -151,8 +151,8 @@ class catcontext_table extends wunderbyte_table {
             'formname' => 'local_catquiz\\form\\edit_catcontext',
             'data' => [
                 'id' => $values->id,
-                'labelcolumn' => 'name'
-                ]
+                'labelcolumn' => 'name',
+                ],
         ];
 
         $data['showactionbuttons'][] = [
@@ -171,7 +171,7 @@ class catcontext_table extends wunderbyte_table {
                     'key' => 'labelcolumn',
                     'value' => 'name',
                 ],
-                ]
+                ],
         ];
 
         return $OUTPUT->render_from_template('local_wunderbyte_table/component_actionbutton', $data);

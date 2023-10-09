@@ -66,20 +66,20 @@ class mayberemovescale_test extends basic_testcase {
             2 => (object) ['catscaleid' => 1, ],
             3 => (object) ['catscaleid' => 1, ],
             4 => (object) ['catscaleid' => 1, ],
-            5 => (object) ['catscaleid' => 2, ]
+            5 => (object) ['catscaleid' => 2, ],
         ];
 
         // Create the played questions array.
         // This shows the questions per scale.
         $played = [
             1 => [1, 2, 3, 4, ],
-            2 => [5, ]
+            2 => [5, ],
         ];
 
         // Create the minimal context required by the mayberemovescale middleware.
         $attemptcontext = [
                     'questions' => $questions,
-                    'max_attempts_per_scale' => 5
+                    'max_attempts_per_scale' => 5,
         ];
 
         return [

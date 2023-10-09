@@ -97,8 +97,8 @@ class eventlogtableinstance {
                         'operator' => '<',
                         'defaultvalue' => 'now', // Can also be Unix timestamp or string "now".
                         'checkboxlabel' => get_string('apply_filter', 'local_wunderbyte_table'), // Can be localized and will be displayed next to the filter checkbox (ie 'apply filter').
-                    ]
-                ]
+                    ],
+                ],
             ],
         ];
         $table->define_filtercolumns($filtercolumns);

@@ -49,7 +49,7 @@ class personability_loader_test extends TestCase {
             'userid' => 2,
             'fake_personparams' => [
                 9 => 1.23,
-                10 => 1.1
+                10 => 1.1,
             ],
         ];
 
@@ -60,7 +60,7 @@ class personability_loader_test extends TestCase {
             'person_ability' => [
                 9 => 1.23,
                 10 => 1.1,
-            ]
+            ],
         ];
         $result = $loader->load($context);
         $this->assertEquals($expected, $result);

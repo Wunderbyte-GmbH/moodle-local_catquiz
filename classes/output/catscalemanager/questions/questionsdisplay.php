@@ -143,10 +143,10 @@ class questionsdisplay {
         $table->define_sortablecolumns(array_keys($sortcolumns));
         $table->define_filtercolumns([
             'qtype' => [
-                'localizedname' => get_string('questiontype', 'local_catquiz')
+                'localizedname' => get_string('questiontype', 'local_catquiz'),
             ],
             'model' => [
-                'localizedname' => get_string('model', 'local_catquiz')
+                'localizedname' => get_string('model', 'local_catquiz'),
             ],
         ]);
 
@@ -216,7 +216,7 @@ class questionsdisplay {
         ]);
 
         $table->define_filtercolumns(['categoryname' => [
-            'localizedname' => get_string('questioncategories', 'local_catquiz')
+            'localizedname' => get_string('questioncategories', 'local_catquiz'),
         ], 'qtype' => [
             'localizedname' => get_string('questiontype', 'local_catquiz'),
             'ddimageortext' => get_string('pluginname', 'qtype_ddimageortext'),
@@ -255,7 +255,7 @@ class questionsdisplay {
                 'component' => 'local_catquiz',
                 'labelcolumn' => 'questiontext',
                 'catscaleid' => $catscaleid,
-            ]
+            ],
         ];
 
         $table->pageable(true);

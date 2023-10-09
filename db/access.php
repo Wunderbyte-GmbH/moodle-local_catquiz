@@ -31,36 +31,36 @@ $capabilities = [
             'captype' => 'write',
             'contextlevel' => CONTEXT_SYSTEM,
             'archetypes' => [
-                'manager' => CAP_ALLOW
-            ]
+                'manager' => CAP_ALLOW,
+            ],
         ],
         'local/catquiz:subscribecatscales' => [
             'captype' => 'read',
             'contextlevel' => CONTEXT_SYSTEM,
             'archetypes' => [
-                'manager' => CAP_ALLOW
-            ]
+                'manager' => CAP_ALLOW,
+            ],
         ],
         'local/catquiz:manage_catscales' => [
                 'captype' => 'write',
                 'contextlevel' => CONTEXT_SYSTEM,
                 'archetypes' => [
-                        'manager' => CAP_ALLOW
-                ]
+                        'manager' => CAP_ALLOW,
+                ],
         ],
         'local/catquiz:manage_testenvironments' => [
                 'captype' => 'write',
                 'contextlevel' => CONTEXT_SYSTEM,
                 'archetypes' => [
-                        'manager' => CAP_ALLOW
-                ]
+                        'manager' => CAP_ALLOW,
+                ],
         ],
         'local/catquiz:manage_catcontexts' => [
                 'captype' => 'write',
                 'contextlevel' => CONTEXT_SYSTEM,
                 'archetypes' => [
-                        'manager' => CAP_ALLOW
-                ]
+                        'manager' => CAP_ALLOW,
+                ],
         ],
         'local/catquiz:view_teacher_feedback' => [
                 'captype' => 'write',
@@ -68,6 +68,6 @@ $capabilities = [
                 'archetypes' => [
                         'manager' => CAP_ALLOW,
                         'teacher' => CAP_ALLOW,
-                ]
+                ],
         ],
 ];

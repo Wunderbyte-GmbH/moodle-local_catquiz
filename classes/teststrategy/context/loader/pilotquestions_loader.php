@@ -54,7 +54,7 @@ class pilotquestions_loader implements contextloaderinterface {
         return [
             'questions',
             'pilot_ratio',
-            'pilot_attempts_threshold'
+            'pilot_attempts_threshold',
         ];
     }
 

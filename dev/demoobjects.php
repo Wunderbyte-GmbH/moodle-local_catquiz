@@ -43,7 +43,7 @@
 // Advanced Structures.
 
 $demopersonparameters = [
-    'person_id' => 'person_ability'
+    'person_id' => 'person_ability',
 ];
 
 
@@ -51,8 +51,8 @@ $demoitemparameter = [
     '1' => [ // Item id.
         'difficulty' => 0.5,
         'discrimination' => 0.6,
-        'param3' => 1.0
-    ]
+        'param3' => 1.0,
+    ],
 ];
 
 $demopersonresponseconst = [ // Response from a single person.
@@ -65,7 +65,7 @@ $demopersonresponseconst = [ // Response from a single person.
     '7' => 1,
     '8' => 0,
     '9' => 1,
-    '10' => 1
+    '10' => 1,
 ];
 
 $demofullresponse = [
@@ -76,14 +76,14 @@ $demofullresponse = [
     '2' => [ // Item_id.
         'person_abilities' => [0.5, 0.3, 0.2, 0.8, 0.8, 0.4],
         'item_responses' => [0, 1, 0, 1, 0, 1],
-    ]
+    ],
 ];
 
 $demoitemresponse = [
     [
         'person_abilities' => [0.5, 0.3, 0.2, 0.8, 0.8, 0.4],
         'item_responses' => [1, 0, 1, 1, 0, 1],
-    ]
+    ],
 ];
 
 $demoresponse = [
@@ -94,23 +94,23 @@ $demoresponse = [
                 "max_fraction" => 1,
                 "min_fraction" => 0,
                 "qtype" => "truefalse",
-                "timestamp" => 1646955326
+                "timestamp" => 1646955326,
             ],
             "2" => [
                 "fraction" => 0,
                 "max_fraction" => 1,
                 "min_fraction" => 0,
                 "qtype" => "truefalse",
-                "timestamp" => 1646955332
+                "timestamp" => 1646955332,
             ],
             "3" => [
                 "fraction" => 1,
                 "max_fraction" => 1,
                 "min_fraction" => 0,
                 "qtype" => "truefalse",
-                "timestamp" => 1646955338
-            ]
-        ]
+                "timestamp" => 1646955338,
+            ],
+        ],
     ],
     "2" => [
         "comp2" => [
@@ -119,22 +119,22 @@ $demoresponse = [
                 "max_fraction" => 1,
                 "min_fraction" => 0,
                 "qtype" => "truefalse",
-                "timestamp" => 1646955326
+                "timestamp" => 1646955326,
             ],
             "2" => [
                 "fraction" => 1,
                 "max_fraction" => 1,
                 "min_fraction" => 0,
                 "qtype" => "truefalse",
-                "timestamp" => 1646955332
+                "timestamp" => 1646955332,
             ],
             "3" => [
                 "fraction" => 1,
                 "max_fraction" => 1,
                 "min_fraction" => 0,
                 "qtype" => "truefalse",
-                "timestamp" => 1646955338
-            ]
-        ]
-    ]
+                "timestamp" => 1646955338,
+            ],
+        ],
+    ],
 ];

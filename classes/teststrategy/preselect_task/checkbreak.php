@@ -81,7 +81,7 @@ final class checkbreak extends preselect_task implements wb_middleware {
         return [
             'breakduration',
             'breakinfourl',
-            'maxtimeperquestion'
+            'maxtimeperquestion',
         ];
     }
 

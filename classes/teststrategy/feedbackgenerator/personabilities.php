@@ -87,7 +87,7 @@ class personabilities extends feedbackgenerator {
             }
             $data[] = [
                 'ability' => $ability,
-                'name' => $catscales[$catscaleid]->name
+                'name' => $catscales[$catscaleid]->name,
             ];
         }
         return ['feedback_personabilities' => $data];

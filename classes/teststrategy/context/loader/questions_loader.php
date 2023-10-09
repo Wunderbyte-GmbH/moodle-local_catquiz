@@ -57,7 +57,7 @@ class questions_loader implements contextloaderinterface {
         return [
             'catscaleid',
             'contextid',
-            'includesubscales'
+            'includesubscales',
         ];
     }
 

@@ -133,7 +133,7 @@ class catscale {
                         'catscaleid' => $catscaleid,
                         'context' => $catcontext,
                         'component' => $component,
-                    ]
+                    ],
                     ]);
                 $event->trigger();
             }
@@ -147,7 +147,7 @@ class catscale {
                     'testitemid' => $testitemid,
                     'context' => $catcontext,
                     'component' => $component,
-                ]
+                ],
                 ]);
             $event->trigger();
 
@@ -172,7 +172,7 @@ class catscale {
                     'catscaleid' => $catscaleid,
                     'context' => $catcontext,
                     'component' => $component,
-                ]
+                ],
                 ]);
             $event->trigger();
         }

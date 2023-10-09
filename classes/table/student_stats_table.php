@@ -103,7 +103,7 @@ class student_stats_table extends wunderbyte_table {
             'data' => [ // Will be added eg as data-id = $values->id, so values can be transmitted to the method above.
                 'key' => 'id',
                 'value' => $values->id,
-            ]
+            ],
         ];
 
         return $OUTPUT->render_from_template('local_wunderbyte_table/component_actionbutton', $data);;

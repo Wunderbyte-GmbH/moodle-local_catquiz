@@ -75,7 +75,7 @@ final class addscalestandarderror extends preselect_task implements wb_middlewar
             if (!array_key_exists($q->catscaleid, $scales)) {
                 $scales[$q->catscaleid] = [
                     $q->catscaleid,
-                    ...catscale::get_ancestors($q->catscaleid)
+                    ...catscale::get_ancestors($q->catscaleid),
                 ];
             }
             foreach ($scales[$q->catscaleid] as $scaleid) {

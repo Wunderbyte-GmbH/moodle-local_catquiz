@@ -114,7 +114,7 @@ class teststrategy_fastest_test extends advanced_testcase {
                     'breakduration' => 60,
                     'breakinfourl' => 'xxx' ,
                     'maxtimeperquestion' => 30,
-                ]
+                ],
             ],
             'no remaining questions' => [
                 'expected' => result::err('noremainingquestions'),
@@ -125,7 +125,7 @@ class teststrategy_fastest_test extends advanced_testcase {
                     'breakduration' => 60,
                     'breakinfourl' => 'xxx' ,
                     'maxtimeperquestion' => 30,
-                ]
+                ],
             ],
             'returns a question' => [
                 'expected' => result::ok($question1),
@@ -158,7 +158,7 @@ class teststrategy_fastest_test extends advanced_testcase {
                     'breakduration' => 60,
                     'breakinfourl' => 'xxx' ,
                     'maxtimeperquestion' => 30,
-                ]
+                ],
             ],
         ];
     }

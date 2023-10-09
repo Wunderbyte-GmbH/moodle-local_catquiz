@@ -101,7 +101,7 @@ class testenvironmentdashboard implements renderable, templatable {
 
         $table->define_filtercolumns(
             ['name' => [
-                'localizedname' => get_string('name', 'core')
+                'localizedname' => get_string('name', 'core'),
             ], 'component' => [
                 'localizedname' => get_string('component', 'local_catquiz'),
             ], 'visible' => [
@@ -115,7 +115,7 @@ class testenvironmentdashboard implements renderable, templatable {
                 '0' => get_string('inactive', 'core'),
             ], 'lang' => [
                 'localizedname' => get_string('lang', 'local_catquiz'),
-            ]
+            ],
             ]);
         $table->define_fulltextsearchcolumns(['name', 'component', 'description']);
         $table->define_sortablecolumns([
@@ -155,8 +155,8 @@ class testenvironmentdashboard implements renderable, templatable {
             'selectionmandatory' => true,
             'data' => [ // Will be added eg as data-id = $values->id, so values can be transmitted to the method above.
                 'id' => 'id',
-                'name' => 'name'
-            ]
+                'name' => 'name',
+            ],
             ];
 
         $table->actionbuttons[] = [
@@ -168,8 +168,8 @@ class testenvironmentdashboard implements renderable, templatable {
             'nomodal' => false,
             'data' => [ // Will be added eg as data-id = $values->id, so values can be transmitted to the method above.
                 'id' => 'id',
-                'name' => 'name'
-            ]
+                'name' => 'name',
+            ],
             ];
 
         list($idstring, $encodedtable, $html) = $table->lazyouthtml(10, true);

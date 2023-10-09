@@ -231,7 +231,7 @@ class updatepersonability extends preselect_task implements wb_middleware {
         $modelstrategy = new model_strategy($responses);
         $catscaleids = [
             $catscaleid,
-            ...catscale::get_subscale_ids($catscaleid)
+            ...catscale::get_subscale_ids($catscaleid),
         ];
         $itemparamlists = [];
         $personparams = model_person_param_list::load_from_db($contextid, $catscaleids);

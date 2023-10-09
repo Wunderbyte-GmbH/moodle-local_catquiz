@@ -496,7 +496,7 @@ class raschbirnbaumc extends model_raschmodel {
             ($am - $ip['difficulty']) / ($as ** 2), // Calculate d/da.
             // Calculate d/db.
             -($bs * exp($bs * $ip['discrimination'])) / (exp($bs * $bp) + exp($bs * $ip['discrimination'])),
-            0 // Calculate d/dc.
+            0, // Calculate d/dc.
         ];
     }
 
@@ -519,15 +519,15 @@ class raschbirnbaumc extends model_raschmodel {
         return [[
             -1 / ($as ** 2), // Calculate d²/da².
             0, // Calculate d/da d/db.
-            0 // Calculate d/da d/dc.
+            0, // Calculate d/da d/dc.
         ], [
             0, // The d/da d/db.
             -($bs ** 2 * exp($bs * ($bp + $ip['discrimination']))) / (exp($bs * $bp) + exp($bs * $ip['discrimination'])) ** 2, // d²/db²
-            0 // Calculate d/db d/dc.
+            0, // Calculate d/db d/dc.
         ], [
             0, // Calculate d/da d/dc.
             0, // Calculate d/db d/dc.
-            0 // Calculate d²/dc².
+            0, // Calculate d²/dc².
         ]];
     }
 }

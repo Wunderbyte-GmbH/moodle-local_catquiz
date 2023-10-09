@@ -29,10 +29,10 @@ defined('MOODLE_INTERNAL') || die();
 $shortcodes = [
     'allquizattempts' => [
         'callback' => 'local_catquiz\shortcodes::allquizattempts',
-        'description' => 'shortcodeslistofquizattempts'
+        'description' => 'shortcodeslistofquizattempts',
     ],
     'catquizfeedback' => [
         'callback' => 'local_catquiz\shortcodes::catquizfeedback',
-        'description' => 'shortcodescatquizfeedback'
+        'description' => 'shortcodescatquizfeedback',
     ],
 ];

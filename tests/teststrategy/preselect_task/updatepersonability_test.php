@@ -85,16 +85,16 @@ class updatepersonability_test extends TestCase {
                                 1 => ['fraction' => "1.000"],
                                 2 => ['fraction' => "0.000"],
                                 3 => ['fraction' => "0.000"],
-                            ]
+                            ],
                         ],
                         844 => [
                             'component' => [
                                 1 => ['fraction' => "0.000"],
                                 2 => ['fraction' => "0.000"],
                                 3 => ['fraction' => "0.000"],
-                            ]
+                            ],
                         ],
-                    ]
+                    ],
                 ],
             ],
             'has_enough_responses' => [
@@ -119,20 +119,20 @@ class updatepersonability_test extends TestCase {
                                 1 => ['fraction' => "1.000"],
                                 2 => ['fraction' => "0.000"],
                                 3 => ['fraction' => "0.000"],
-                            ]
+                            ],
                         ],
                         844 => [
                             'component' => [
                                 1 => ['fraction' => "0.000"],
                                 2 => ['fraction' => "1.000"],
                                 3 => ['fraction' => "0.000"],
-                            ]
+                            ],
                         ],
                     ],
                     'questionsattempted' => 0,
                     'minimumquestions' => 10,
-                ]
-            ]
+                ],
+            ],
         ];
     }
 }

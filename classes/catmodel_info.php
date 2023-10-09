@@ -116,7 +116,7 @@ class catmodel_info {
                 'contextid' => $contextid,
                 'userid' => $userid,
                 'numberofitems' => $itemcounter,
-            ]
+            ],
         ]);
         $event->trigger();
 

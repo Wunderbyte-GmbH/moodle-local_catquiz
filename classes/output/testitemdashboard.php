@@ -196,7 +196,7 @@ class testitemdashboard implements renderable, templatable {
             [
                 'title' => get_string('averageofallanswers', 'local_catquiz'),
                 'body' => $averageofallanswers,
-            ]
+            ],
         ];
     }
 

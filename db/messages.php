@@ -26,6 +26,6 @@
  $messageproviders =  [
      // Notify subscribers of catscales.
      'updatecatscale' =>  [
-         'capability'  => 'local/catquiz:subscribecatscales'
+         'capability'  => 'local/catquiz:subscribecatscales',
      ],
  ];

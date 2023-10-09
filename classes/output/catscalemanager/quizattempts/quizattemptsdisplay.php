@@ -54,7 +54,7 @@ class quizattemptsdisplay {
             'personability_after_attempt',
             'starttime',
             'endtime',
-            'action'
+            'action',
         ];
         $table->define_columns($columns);
         $table->define_headers([
@@ -88,26 +88,26 @@ class quizattemptsdisplay {
         $table->define_filtercolumns(
             [
                 'username' => [
-                    'localizedname' => get_string('username', 'core')
+                    'localizedname' => get_string('username', 'core'),
                 ],
                 'component' => [
                     'localizedname' => get_string('component', 'local_catquiz'),
                 ],
                 'status' => [
-                    'localizedname' => get_string('status')
+                    'localizedname' => get_string('status'),
                 ],
                 'instance' => [
                     'localizedname' => get_string('instance', 'local_catquiz'),
                 ],
                 'teststrategy' => $teststrategyfilter,
                 'course' => [
-                    'localizedname' => get_string('course')
+                    'localizedname' => get_string('course'),
                 ],
                 'catscale' => [
-                    'localizedname' => get_string('catscale', 'local_catquiz')
+                    'localizedname' => get_string('catscale', 'local_catquiz'),
                 ],
                 'catcontext' => [
-                    'localizedname' => get_string('catcontext', 'local_catquiz')
+                    'localizedname' => get_string('catcontext', 'local_catquiz'),
                 ],
             ]
         );
