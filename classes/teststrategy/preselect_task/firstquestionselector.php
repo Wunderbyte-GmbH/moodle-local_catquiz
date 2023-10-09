@@ -30,6 +30,7 @@ use local_catquiz\local\result;
 use local_catquiz\local\status;
 use local_catquiz\teststrategy\preselect_task;
 use local_catquiz\wb_middleware;
+use moodle_exception;
 
 /**
  * Test strategy firstquestionselector.
@@ -38,7 +39,7 @@ use local_catquiz\wb_middleware;
  * @copyright 2023 Wunderbyte GmbH
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-final class firstquestionselector extends preselect_task implements wb_middleware {
+class firstquestionselector extends preselect_task implements wb_middleware {
 
     /**
      * STARTWITHEASIESTQUESTION
@@ -130,8 +131,8 @@ final class firstquestionselector extends preselect_task implements wb_middlewar
                 $question = $this->get_last_question_of_second_quartile($context['questions']);
                 return result::ok($question);
             case self::STARTWITHAVERAGEABILITYOFTEST:
-                $personparams = catquiz::get_personparams_for_adaptivequiz_test($context['testid']);
                 $averageability = $this->get_average_ability_of_test($personparams);
+                $personparams = $this->get_personparams_for_adaptivequiz_test($context);
                 foreach (array_keys($context['person_ability']) as $catscaleid) {
                     $context['person_ability'][$catscaleid] = $averageability;
                 }
@@ -250,5 +251,17 @@ final class firstquestionselector extends preselect_task implements wb_middlewar
             return $index;
         }
         return ceil($index);
+    }
+
+    /**
+     * Gets the person params from the database.
+     * 
+     * Is overwritten in a _testing class, so that we do not need a database for testing.
+     * @param array $context 
+     * @return array 
+     * @throws moodle_exception 
+     */
+    protected function get_personparams_for_adaptivequiz_test(array $context) {
+        return catquiz::get_personparams_for_adaptivequiz_test($context['testid']);
     }
 }

@@ -109,6 +109,15 @@ abstract class strategy {
      */
     public function return_next_testitem(array $context) {
         foreach ($this->get_preselecttasks() as $modifier) {
+            // When this is called for running tests, check if there is a
+            // X_testing class and if so, use that one.
+            if (defined('IS_PHPUNIT_TEST') && IS_PHPUNIT_TEST === true) {
+                $testingclass = sprintf('%s_testing', $modifier);
+                if (array_key_exists($testingclass, $this->scoremodifiers)) {
+                    $middlewares[] = $this->scoremodifiers[$testingclass];
+                    continue;
+                }
+            }
             if (!array_key_exists($modifier, $this->scoremodifiers)) {
                 throw new moodle_exception(
                     sprintf(
