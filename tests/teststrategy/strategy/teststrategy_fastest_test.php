@@ -111,6 +111,9 @@ class teststrategy_fastest_test extends advanced_testcase
                 'attemptcontext' => [
                     'questionsattempted' => 10,
                     'maximumquestions' => 10,
+                    'breakduration' => 60,
+                    'breakinfourl' => 'xxx' ,
+                    'maxtimeperquestion' => 30,
                 ]
             ],
             'no remaining questions' => [
@@ -119,6 +122,9 @@ class teststrategy_fastest_test extends advanced_testcase
                     'questionsattempted' => 0,
                     'maximumquestions' => 10,
                     'questions' => [],
+                    'breakduration' => 60,
+                    'breakinfourl' => 'xxx' ,
+                    'maxtimeperquestion' => 30,
                 ]
             ],
             'returns a question' => [
@@ -149,6 +155,9 @@ class teststrategy_fastest_test extends advanced_testcase
                     'includesubscales' => true,
 
                     'max_attempts_per_scale' => 10,
+                    'breakduration' => 60,
+                    'breakinfourl' => 'xxx' ,
+                    'maxtimeperquestion' => 30,
                 ]
             ],
         ];
