@@ -196,7 +196,7 @@ class edit_testenvironment extends dynamic_form {
      * @return array $errors
      */
     public function validation($data, $files): array {
-        $errors = array();
+        $errors = [];
 
         return $errors;
     }

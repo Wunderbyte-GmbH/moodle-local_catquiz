@@ -54,7 +54,7 @@ class manage_catscale extends external_api {
      */
     public static function execute_parameters(): external_function_parameters {
         return new external_function_parameters(
-                array(
+                [
                         'name' => new external_value(PARAM_TEXT, 'The name of the catscale', VALUE_REQUIRED),
                         'description' => new external_value(PARAM_RAW, 'The description of the catscale', VALUE_REQUIRED),
                         'minscalevalue' => new external_value(PARAM_FLOAT, 'Min scale value', VALUE_REQUIRED),
@@ -62,7 +62,7 @@ class manage_catscale extends external_api {
                         'action' => new external_value(PARAM_ALPHA, 'update or create', VALUE_REQUIRED),
                         'parentid' => new external_value(PARAM_INT, 'The parent ID of the catscale', VALUE_OPTIONAL, null),
                         'id' => new external_value(PARAM_INT, 'The id of the catscale', VALUE_OPTIONAL, null),
-                )
+                ]
         );
     }
 
@@ -110,7 +110,7 @@ class manage_catscale extends external_api {
         }
 
         // Return the ID of the newly created record.
-        return array('id' => $id);
+        return ['id' => $id];
     }
 
     /**
@@ -120,9 +120,9 @@ class manage_catscale extends external_api {
      */
     public static function execute_returns(): external_single_structure {
         return new external_single_structure(
-                array(
+                [
                         'id' => new external_value(PARAM_INT, 'The ID of the newly created catscale')
-                )
+                ]
         );
     }
 }

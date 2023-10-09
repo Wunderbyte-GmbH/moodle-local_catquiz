@@ -138,10 +138,10 @@ class catquiz_handler {
         // Question categories or tags to use for this quiz.
 
         $catscales = \local_catquiz\data\dataapi::get_all_catscales();
-        $options = array(
+        $options = [
             'multiple' => false,
             'noselectionstring' => get_string('allareas', 'search'),
-        );
+        ];
 
         $select = [];
         foreach ($catscales as $catscale) {
@@ -151,10 +151,10 @@ class catquiz_handler {
         $mform->addHelpButton('catquiz_catcatscales', 'catcatscales', 'local_catquiz');
 
         $catcontexts = \local_catquiz\data\dataapi::get_all_catcontexts();
-        $options = array(
+        $options = [
             'multiple' => false,
             'noselectionstring' => get_string('defaultcontextname', 'local_catquiz'),
-        );
+        ];
 
         $select = [];
         foreach ($catcontexts as $catcontext) {

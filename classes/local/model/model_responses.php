@@ -60,7 +60,7 @@ class model_responses {
         $questionids = [];
 
         foreach ($userids as $userid) {
-            $components = array();
+            $components = [];
             $components = array_merge($components, array_keys($this->data[$userid]));
             foreach ($components as $component) {
                 $questionids = array_merge(
@@ -112,7 +112,7 @@ class model_responses {
         // To:
         // $data[QUESTIONID] -> [All responses to this question by different users].
         foreach ($personparamlist->get_person_params() as $pp) {
-            $components = array();
+            $components = [];
             if (!array_key_exists($pp->get_id(), $this->data)) {
                 continue;
             }

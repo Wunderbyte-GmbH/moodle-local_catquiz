@@ -31,44 +31,44 @@ use local_catquiz\catcontext;
 function xmldb_local_catquiz_install() {
     global $DB;
 
-    $role = $DB->get_record('role', array('shortname' => 'catquizmanager'));
+    $role = $DB->get_record('role', ['shortname' => 'catquizmanager']);
     if (empty($role->id)) {
         $sql = "SELECT MAX(sortorder)+1 AS id FROM {role}";
-        $max = $DB->get_record_sql($sql, array());
+        $max = $DB->get_record_sql($sql, []);
 
-        $role = (object) array(
+        $role = (object) [
             'name' => 'catquiz Manager',
             'shortname' => 'catquizmanager',
             'description' => get_string('catquizroledescription', 'local_catquiz'),
             'sortorder' => $max->id,
             'archetype' => '',
-        );
+        ];
         $role->id = $DB->insert_record('role', $role);
     }
 
     // Ensure, that this role is assigned in the required context levels.
-    $chk = $DB->get_record('role_context_levels', array('roleid' => $role->id, 'contextlevel' => CONTEXT_SYSTEM));
+    $chk = $DB->get_record('role_context_levels', ['roleid' => $role->id, 'contextlevel' => CONTEXT_SYSTEM]);
     if (empty($chk->id)) {
-        $DB->insert_record('role_context_levels', array('roleid' => $role->id, 'contextlevel' => CONTEXT_SYSTEM));
+        $DB->insert_record('role_context_levels', ['roleid' => $role->id, 'contextlevel' => CONTEXT_SYSTEM]);
     }
 
     // Ensure, that this role has the required capabilities.
     $ctx = \context_system::instance();
-    $caps = array(
+    $caps = [
         'local/catquiz:canmanage',
         'local/catquiz:manage_catscales',
         'local/catquiz:subscribecatscales',
-    );
+    ];
     foreach ($caps as $cap) {
-        $chk = $DB->get_record('role_capabilities', array('contextid' => $ctx->id, 'roleid' => $role->id, 'capability' => $cap, 'permission' => 1));
+        $chk = $DB->get_record('role_capabilities', ['contextid' => $ctx->id, 'roleid' => $role->id, 'capability' => $cap, 'permission' => 1]);
         if (empty($chk->id)) {
-            $DB->insert_record('role_capabilities', array(
+            $DB->insert_record('role_capabilities', [
                 'contextid' => $ctx->id,
                 'roleid' => $role->id,
                 'capability' => $cap,
                 'permission' => 1,
                 'timemodified' => time(),
-                'modifierid' => 2));
+                'modifierid' => 2]);
         }
     }
 

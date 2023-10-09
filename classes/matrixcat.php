@@ -143,7 +143,7 @@ class matrixcat {
      *
      */
     private function removeidentitymatrix(array $matrix) {
-        $inversematrix = array();
+        $inversematrix = [];
         $matrixcount = count($matrix);
 
         for ($i = 0; $i < $matrixcount; $i++) {
@@ -165,7 +165,7 @@ class matrixcat {
     private function appendidentitymatrixtomatrix(array $matrix, array $identitymatrix) {
         // TODO $matrix & $identityMatrix compliance validation (same number of rows/columns, etc).
 
-        $augmentedmatrix = array();
+        $augmentedmatrix = [];
 
         for ($i = 0; $i < count($matrix); $i++) {
             $augmentedmatrix[$i] = array_merge($matrix[$i], $identitymatrix[$i]);
@@ -185,7 +185,7 @@ class matrixcat {
     public function identitymatrix(int $size) {
         // TODO validate $size.
 
-        $identitymatrix = array();
+        $identitymatrix = [];
 
         for ($i = 0; $i < $size; $i++) {
             for ($j = 0; $j < $size; $j++) {
@@ -220,10 +220,10 @@ class matrixcat {
             return null;
         }
 
-        $result = array();
+        $result = [];
 
         for ($i = 0; $i < $rows1; $i++) {
-            $row = array();
+            $row = [];
             for ($j = 0; $j < $cols2; $j++) {
                 $sum = 0;
                 for ($k = 0; $k < $cols1; $k++) {
@@ -270,7 +270,7 @@ class matrixcat {
             throw new \InvalidArgumentException("Vectors should have the same length for subtraction");
         }
 
-        $result = array();
+        $result = [];
         $length = count($vector1);
 
         for ($i = 0; $i < $length; $i++) {
@@ -336,7 +336,7 @@ class matrixcat {
 
             for ($i = 0; $i < $summandcount; $i++) {
                 // Call recursivly for each dimension.
-                $newargs = array();
+                $newargs = [];
                 foreach ($summands as $summand) {
                     $newargs[] = $summand[$i];
                 }

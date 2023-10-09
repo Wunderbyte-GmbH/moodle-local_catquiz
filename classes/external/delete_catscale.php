@@ -55,9 +55,9 @@ class delete_catscale extends external_api {
      * @return external_function_parameters
      */
     public static function execute_parameters(): external_function_parameters {
-        return new external_function_parameters(array(
+        return new external_function_parameters([
             'id'  => new external_value(PARAM_INT, 'id', VALUE_REQUIRED)
-            )
+            ]
         );
     }
 
@@ -88,10 +88,10 @@ class delete_catscale extends external_api {
      * @return external_single_structure
      */
     public static function execute_returns(): external_single_structure {
-        return new external_single_structure(array(
+        return new external_single_structure([
             'success' => new external_value(PARAM_BOOL, 'Successful deletion', VALUE_REQUIRED),
             'message' => new external_value(PARAM_RAW, 'message if necessary', VALUE_OPTIONAL, ''),
-            )
+            ]
         );
     }
 }

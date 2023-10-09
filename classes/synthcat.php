@@ -47,12 +47,12 @@ class synthcat {
      *
      */
     public static function generate_persons($randomvec) {
-        $persons = array();
+        $persons = [];
         for ($i = 1; $i <= count($randomvec); $i++) {
-            $person = array(
+            $person = [
                     'id' => $i,
                     'ability' => $randomvec[$i - 1] // Generate a random ability parameter between 0 and 1.
-            );
+            ];
             array_push($persons, $person);
         }
         return $persons;
@@ -67,14 +67,14 @@ class synthcat {
      *
      */
     public static function generate_test_items($difficultyvec) {
-        $testitems = array();
+        $testitems = [];
         for ($i = 1; $i <= count($difficultyvec); $i++) {
-            $item = array(
+            $item = [
                     'id' => $i,
                     'difficulty' => $difficultyvec[$i - 1], // Generate a random difficulty parameter between 0 and 1.
                 // 'discrimination' => rand(0, 100) / 100 // Generate a random discrimination parameter between 0 and 1.
                 // 'discrimination' => 1 // Generate a random discrimination parameter between 0 and 1.
-            );
+            ];
             array_push($testitems, $item);
         }
         return $testitems;
@@ -108,13 +108,13 @@ class synthcat {
      */
     public static function generate_response($demopersons, $demoitems) {
         $componentname = 'comp1';
-        $response = array();
+        $response = [];
 
         foreach ($demopersons as $person) {
 
             $personid = $person['id'];
-            $response[$personid] = Array();
-            $response[$personid][$componentname] = Array();
+            $response[$personid] = [];
+            $response[$personid][$componentname] = [];
 
             $personability = $person['ability']; // Set the person's ability parameter.
             foreach ($demoitems as $item) {
@@ -138,13 +138,13 @@ class synthcat {
                     $passed = 0;
                 }
 
-                $itemresponse = array(
+                $itemresponse = [
                         'fraction' => $passed,
                         'max_fraction' => 1,
                         'min_fraction' => 0,
                         'qtype' => 'truefalse',
                         'timestamp' => 12345678
-                );
+                ];
                 $response[$personid][$componentname][$itemid] = $itemresponse;
             }
         }
@@ -161,7 +161,7 @@ class synthcat {
      */
     public static function generate_test_items_multi ($paramvec) {
 
-        $testitems = array();
+        $testitems = [];
 
         // Get the number of subarrays.
         $numsubarrays = count($paramvec);
@@ -171,17 +171,17 @@ class synthcat {
 
         // Iterate over the elements of the subarrays.
         for ($i = 0; $i < $subarraylength; $i++) {
-            $temp = array();
+            $temp = [];
 
             // Iterate over the subarrays.
             for ($j = 0; $j < $numsubarrays; $j++) {
                 $temp[] = $paramvec[$j][$i];
             }
 
-            $item = array(
+            $item = [
                     'id' => $i + 1,
                     'params' => $temp
-            );
+            ];
 
             array_push($testitems, $item);
 
@@ -219,13 +219,13 @@ class synthcat {
     public static function generate_response_multi($demopersons, $demoitems, $model) {
 
         $componentname = 'comp1';
-        $response = array();
+        $response = [];
 
         foreach ($demopersons as $person) {
 
             $personid = $person['id'];
-            $response[$personid] = array();
-            $response[$personid][$componentname] = array();
+            $response[$personid] = [];
+            $response[$personid][$componentname] = [];
 
             $personability = $person['ability']; // Set the person's ability parameter.
             foreach ($demoitems as $item) {
@@ -249,13 +249,13 @@ class synthcat {
                     $passed = 0;
                 }
 
-                $itemresponse = array(
+                $itemresponse = [
                         'fraction' => $passed,
                         'max_fraction' => 1,
                         'min_fraction' => 0,
                         'qtype' => 'truefalse',
                         'timestamp' => 12345678
-                );
+                ];
                 $response[$personid][$componentname][$itemid] = $itemresponse;
             }
         }
@@ -402,12 +402,12 @@ class synthcat2 {
      *
      */
     public static function generate_persons($randomvec) {
-        $persons = array();
+        $persons = [];
         for ($i = 1; $i <= count($randomvec); $i++) {
-            $person = array(
+            $person = [
                     'id' => $i,
                     'ability' => $randomvec[$i - 1] // Generate a random ability parameter between 0 and 1.
-            );
+            ];
             array_push($persons, $person);
         }
         return $persons;
@@ -423,7 +423,7 @@ class synthcat2 {
      */
     public static function generate_test_items ($paramvec) {
 
-        $testitems = array();
+        $testitems = [];
 
         // Get the number of subarrays.
         $numsubarrays = count($paramvec);
@@ -433,17 +433,17 @@ class synthcat2 {
 
         // Iterate over the elements of the subarrays.
         for ($i = 0; $i < $subarraylength; $i++) {
-            $temp = array();
+            $temp = [];
 
             // Iterate over the subarrays.
             for ($j = 0; $j < $numsubarrays; $j++) {
                 $temp[] = $paramvec[$j][$i];
             }
 
-            $item = array(
+            $item = [
                     'id' => $i,
                     'params' => $temp
-            );
+            ];
 
             array_push($testitems, $item);
 

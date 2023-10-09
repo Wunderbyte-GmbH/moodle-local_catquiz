@@ -31,7 +31,7 @@ $PAGE->set_context($context);
 require_login();
 require_capability('local/catquiz:manage_testenvironments', $context);
 
-$PAGE->set_url(new moodle_url('/local/catquiz/manage_testenvironments.php', array()));
+$PAGE->set_url(new moodle_url('/local/catquiz/manage_testenvironments.php', []));
 
 $title = get_string('pluginname', 'local_catquiz');
 $PAGE->set_title($title);

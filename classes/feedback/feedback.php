@@ -76,10 +76,10 @@ class feedback {
             $coursesarray[$course->id] = $course->fullname;
         }
 
-        $options = array(
+        $options = [
             'multiple' => true,
             'noselectionstring' => get_string('noselection', 'local_catquiz'),
-        );
+        ];
 
         // Right now, we just get all subscales.
         $scales = $DB->get_records('local_catquiz_catscales');
@@ -197,8 +197,8 @@ class feedback {
             return; // No manual enrolment plugin.
         }
         if (!$instances = $DB->get_records('enrol',
-                array('enrol' => 'manual', 'courseid' => $courseid,
-                    'status' => ENROL_INSTANCE_ENABLED), 'sortorder,id ASC')) {
+                ['enrol' => 'manual', 'courseid' => $courseid,
+                    'status' => ENROL_INSTANCE_ENABLED], 'sortorder,id ASC')) {
             return; // No manual enrolment instance on this course.
         }
 

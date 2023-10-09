@@ -50,7 +50,7 @@ class dataapi {
         $cache = cache::make('local_catquiz', 'catscales');
         $allcatscales = $cache->get('allcatscales');
         if (!$allcatscales) {
-            $allcatscales = array();
+            $allcatscales = [];
             $records = $DB->get_records('local_catquiz_catscales');
             if (!empty($records)) {
                 foreach ($records as $record) {

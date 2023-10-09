@@ -48,7 +48,7 @@ $PAGE->set_context($context);
 require_login();
 require_capability('local/catquiz:manage_catscales', $context);
 
-$PAGE->set_url(new moodle_url('/local/catquiz/manage_catscales.php', array()));
+$PAGE->set_url(new moodle_url('/local/catquiz/manage_catscales.php', []));
 
 $title = get_string('catmanager', 'local_catquiz');
 

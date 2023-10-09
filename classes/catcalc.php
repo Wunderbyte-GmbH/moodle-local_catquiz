@@ -52,7 +52,7 @@ class catcalc {
      */
     public static function estimate_initial_item_difficulties($itemlist) {
 
-        $itemdifficulties = array();
+        $itemdifficulties = [];
         $itemids = array_keys($itemlist);
 
         foreach ($itemids as $id) {

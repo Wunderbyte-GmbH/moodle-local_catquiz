@@ -54,9 +54,9 @@ class get_next_question extends external_api {
      * @return external_function_parameters
      */
     public static function execute_parameters(): external_function_parameters {
-        return new external_function_parameters(array(
+        return new external_function_parameters([
             'attemptid'  => new external_value(PARAM_INT, 'attemptid', VALUE_REQUIRED)
-            )
+            ]
         );
     }
 
@@ -93,9 +93,9 @@ class get_next_question extends external_api {
      * @return external_single_structure
      */
     public static function execute_returns(): external_single_structure {
-        return new external_single_structure(array(
+        return new external_single_structure([
             'questionid' => new external_value(PARAM_INT, 'questionid of next question', VALUE_REQUIRED),
-            )
+            ]
         );
     }
 }

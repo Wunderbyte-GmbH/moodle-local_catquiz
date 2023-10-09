@@ -97,7 +97,7 @@ class csvimport extends dynamic_form {
         $mform->addRule('dateparseformat', null, 'required', null, 'client');
         $mform->addHelpButton('dateparseformat', 'dateparseformat', 'local_catquiz');
 
-        $buttonarray = array();
+        $buttonarray = [];
         $buttonarray[] = $mform->createElement('submit', 'submitbutton', get_string('submit'));
         $buttonarray[] = $mform->createElement('cancel');
         $mform->addGroup($buttonarray, 'buttonar', '', ' ', false);
@@ -112,7 +112,7 @@ class csvimport extends dynamic_form {
      */
     public static function get_delimiter_list() {
         global $CFG;
-        $delimiters = array('comma' => ',', 'semicolon' => ';', 'colon' => ':', 'tab' => '\\t');
+        $delimiters = ['comma' => ',', 'semicolon' => ';', 'colon' => ':', 'tab' => '\\t'];
         if (isset($CFG->CSV_DELIMITER) && strlen($CFG->CSV_DELIMITER) === 1 && !in_array($CFG->CSV_DELIMITER, $delimiters)) {
             $delimiters['cfg'] = $CFG->CSV_DELIMITER;
         }
@@ -202,7 +202,7 @@ class csvimport extends dynamic_form {
      * @return array $errors
      */
     public function validation($data, $files): array {
-        $errors = array();
+        $errors = [];
 
         return $errors;
     }

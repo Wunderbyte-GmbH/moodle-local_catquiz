@@ -196,7 +196,7 @@ class edit_catcontext extends dynamic_form {
      * @return array $errors
      */
     public function validation($data, $files): array {
-        $errors = array();
+        $errors = [];
         model_strategy::validation($data, $files, $errors);
         return $errors;
     }

@@ -111,101 +111,101 @@ class testitemimporter {
     private static function define_testitem_columns() {
 
         $columnssequential = [
-            array(
+            [
                 'name' => 'componentid',
                 'mandatory' => true,
                 'format' => PARAM_INT,
                 'importinstruction' => get_string('canbesetto0iflabelgiven', 'local_catquiz'),
-            ),
-            array(
+            ],
+            [
                 'name' => 'componentname',
                 'mandatory' => true,
                 'format' => 'string',
-            ),
-            array(
+            ],
+            [
                 'name' => 'contextid',
                 'mandatory' => true,
                 'format' => PARAM_INT,
                 // We could set the selected cat context (optional_param id) as default.
-            ),
-            array(
+            ],
+            [
                 'name' => 'model',
                 'mandatory' => false,
                 'format' => 'string',
                 'importinstruction' => get_string('modelinformation', 'local_catquiz'),
-            ),
-            array (
+            ],
+             [
                 'name' => 'difficulty',
                 'mandatory' => false,
                 'format' => PARAM_FLOAT,
-            ),
-            array (
+            ],
+             [
                 'name' => 'status',
                 'mandatory' => false,
                 'format' => PARAM_INT,
                 'defaultvalue' => 0,
-            ),
-            array (
+            ],
+             [
                 'name' => 'discrimination',
                 'mandatory' => false,
                 'format' => PARAM_FLOAT,
-            ),
-            array (
+            ],
+             [
                 'name' => 'timecreated',
                 'mandatory' => false,
                 'type' => 'date', // Will throw warning if not empty and not in correct format.
-            ),
-            array (
+            ],
+             [
                 'name' => 'timemodified',
                 'mandatory' => false,
-            ),
-            array (
+            ],
+             [
                 'name' => 'guessing',
                 'mandatory' => false,
                 'format' => PARAM_FLOAT,
-            ),
-            array (
+            ],
+             [
                 'name' => 'label',
                 'mandatory' => false,
                 'format' => PARAM_TEXT,
                 'importinstruction' => get_string('ifdefinedusedtomatch', 'local_catquiz'),
-            ),
-            array (
+            ],
+             [
                 'name' => 'catscaleid',
                 'mandatory' => false,
                 'format' => PARAM_INT,
                 'importinstruction' => get_string('scaleinformation', 'local_catquiz'),
-            ),
-            array (
+            ],
+             [
                 'name' => 'catscalename',
                 'mandatory' => false,
                 'format' => PARAM_TEXT,
                 'importinstruction' => get_string('scalenameinformation', 'local_catquiz'),
-            ),
-            array (
+            ],
+             [
                 'name' => 'parentscalenames',
                 'mandatory' => false,
                 'format' => PARAM_TEXT,
                 'importinstruction' => get_string('parentscalenamesinformation', 'local_catquiz'),
-            ),
-            array (
+            ],
+             [
                 'name' => 'qtype',
                 'mandatory' => false,
                 'format' => PARAM_TEXT,
-            ),
-            array (
+            ],
+             [
                 'name' => 'name',
                 'mandatory' => false,
                 'format' => PARAM_TEXT,
-            ),
-            array (
+            ],
+             [
                 'name' => 'attempts',
                 'mandatory' => false,
-            ),
-            array (
+            ],
+             [
                 'name' => 'lastattempttime',
                 'mandatory' => false,
-            )
+            ]
             ];
         return $columnssequential;
     }

@@ -72,10 +72,10 @@ class scaleselector extends dynamic_form {
         foreach ($subscalesdb as $scaleid => $scale) {
             $scales[$scaleid] = $scale->name;
         }
-        $options = array(
+        $options = [
             'multiple' => false,
             'class' => 'justify-content-end',
-        );
+        ];
 
         $label = '';
 
@@ -165,7 +165,7 @@ class scaleselector extends dynamic_form {
      * @return array $errors
      */
     public function validation($data, $files): array {
-        $errors = array();
+        $errors = [];
 
         return $errors;
     }

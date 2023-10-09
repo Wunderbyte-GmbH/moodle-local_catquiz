@@ -91,7 +91,7 @@ class catscales implements renderable, templatable {
 
         global $USER;
 
-        $branch = array();
+        $branch = [];
 
         foreach ($elements as $catscaleitem) {
             // Transform object catscale_structur into array, which is needed here.

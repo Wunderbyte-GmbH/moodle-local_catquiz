@@ -23,9 +23,9 @@
  */
 
  defined('MOODLE_INTERNAL') || die();
- $messageproviders = array (
+ $messageproviders =  [
      // Notify subscribers of catscales.
-     'updatecatscale' => array (
+     'updatecatscale' =>  [
          'capability'  => 'local/catquiz:subscribecatscales'
-     ),
- );
+     ],
+ ];

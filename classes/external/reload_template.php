@@ -56,9 +56,9 @@ class reload_template extends external_api {
      * @return external_function_parameters
      */
     public static function execute_parameters(): external_function_parameters {
-        return new external_function_parameters(array(
+        return new external_function_parameters([
             'data'  => new external_value(PARAM_RAW, 'Data package as json.', VALUE_REQUIRED)
-            )
+            ]
         );
     }
 
@@ -113,11 +113,11 @@ class reload_template extends external_api {
      * @return external_single_structure
      */
     public static function execute_returns(): external_single_structure {
-        return new external_single_structure(array(
+        return new external_single_structure([
             'success' => new external_value(PARAM_INT, '1 is success, 0 isn\'t'),
             'message' => new external_value(PARAM_RAW, 'Message to be displayed', VALUE_OPTIONAL, ''),
             'data' => new external_value(PARAM_RAW, 'Data for the template to be rendered', VALUE_OPTIONAL, null),
-            )
+            ]
         );
     }
 }

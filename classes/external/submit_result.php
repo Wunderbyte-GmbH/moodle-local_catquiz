@@ -54,11 +54,11 @@ class submit_result extends external_api {
      * @return external_function_parameters
      */
     public static function execute_parameters(): external_function_parameters {
-        return new external_function_parameters(array(
+        return new external_function_parameters([
             'attemptid'  => new external_value(PARAM_TEXT, 'userid', VALUE_REQUIRED),
             'questionid'  => new external_value(PARAM_INT, 'userid', VALUE_REQUIRED),
             'score'  => new external_value(PARAM_INT, 'categorid', VALUE_REQUIRED),
-            )
+            ]
         );
     }
 
@@ -95,9 +95,9 @@ class submit_result extends external_api {
      * @return external_single_structure
      */
     public static function execute_returns(): external_single_structure {
-        return new external_single_structure(array(
+        return new external_single_structure([
             'success' => new external_value(PARAM_INT, '1 for success', VALUE_REQUIRED),
-            )
+            ]
         );
     }
 }

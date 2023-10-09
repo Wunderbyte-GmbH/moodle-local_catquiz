@@ -54,10 +54,10 @@ class start_new_attempt extends external_api {
      * @return external_function_parameters
      */
     public static function execute_parameters(): external_function_parameters {
-        return new external_function_parameters(array(
+        return new external_function_parameters([
             'userid'  => new external_value(PARAM_INT, 'userid', VALUE_REQUIRED),
             'categoryid'  => new external_value(PARAM_INT, 'categorid', VALUE_REQUIRED),
-            )
+            ]
         );
     }
 
@@ -92,9 +92,9 @@ class start_new_attempt extends external_api {
      * @return external_single_structure
      */
     public static function execute_returns(): external_single_structure {
-        return new external_single_structure(array(
+        return new external_single_structure([
             'attemptid' => new external_value(PARAM_INT, 'Attempt id', VALUE_REQUIRED),
-            )
+            ]
         );
     }
 }

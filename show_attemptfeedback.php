@@ -38,7 +38,7 @@ $contextid = optional_param('contextid', 0, PARAM_INT);
 
 $attemptfeedback = new attemptfeedback($attemptid, $contextid);
 
-$PAGE->set_url(new moodle_url('/local/catquiz/show_attemptfeedback.php', array()));
+$PAGE->set_url(new moodle_url('/local/catquiz/show_attemptfeedback.php', []));
 
 echo $OUTPUT->header();
 

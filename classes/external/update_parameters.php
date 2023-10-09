@@ -53,10 +53,10 @@ class update_parameters extends external_api {
      * @return external_function_parameters
      */
     public static function execute_parameters(): external_function_parameters {
-        return new external_function_parameters(array(
+        return new external_function_parameters([
             'contextid'  => new external_value(PARAM_INT, 'context ID'),
             'catscaleid' => new external_value(PARAM_INT, 'CAT scale ID'),
-            )
+            ]
         );
     }
 
@@ -89,10 +89,10 @@ class update_parameters extends external_api {
      * @return external_single_structure
      */
     public static function execute_returns(): external_single_structure {
-        return new external_single_structure(array(
+        return new external_single_structure([
             'success' => new external_value(PARAM_BOOL, 'Successful calculation', VALUE_REQUIRED),
             'message' => new external_value(PARAM_RAW, 'message if necessary', VALUE_OPTIONAL, ''),
-            )
+            ]
         );
     }
 }

@@ -91,7 +91,7 @@ class web_raschbirnbauma extends model_model implements catcalc_ability_estimato
         // Setup request to send json via POST.
         $payload = json_encode(["m" => $data]);
         curl_setopt($ch, CURLOPT_POSTFIELDS, $payload);
-        curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-Type:application/json'));
+        curl_setopt($ch, CURLOPT_HTTPHEADER, ['Content-Type:application/json']);
         // Return response instead of printing.
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
         // Send request.

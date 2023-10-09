@@ -312,7 +312,7 @@ class item_model_override_selector extends dynamic_form {
      * @return array $errors
      */
     public function validation($data, $files): array {
-        $errors = array();
+        $errors = [];
 
         return $errors;
     }

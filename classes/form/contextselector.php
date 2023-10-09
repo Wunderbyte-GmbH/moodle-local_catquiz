@@ -63,11 +63,11 @@ class contextselector extends dynamic_form {
                 $default = $contextid;
             }
         }
-        $options = array(
+        $options = [
             'multiple' => false,
             'noselectionstring' => get_string('searchcatcontext', 'local_catquiz'),
             'class' => 'justify-content-end',
-        );
+        ];
 
         $label = '';
         if ($PAGE->url->get_path() !== '/local/catquiz/edit_testitem.php') {
@@ -165,7 +165,7 @@ class contextselector extends dynamic_form {
      * @return array $errors
      */
     public function validation($data, $files): array {
-        $errors = array();
+        $errors = [];
 
         return $errors;
     }

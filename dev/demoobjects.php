@@ -42,20 +42,20 @@
 // Array with 10 random item discriminations.
 // Advanced Structures.
 
-$demopersonparameters = Array(
+$demopersonparameters = [
     'person_id' => 'person_ability'
-);
+];
 
 
-$demoitemparameter = Array(
-    '1' => Array( // Item id.
+$demoitemparameter = [
+    '1' => [ // Item id.
         'difficulty' => 0.5,
         'discrimination' => 0.6,
         'param3' => 1.0
-    )
-);
+    ]
+];
 
-$demopersonresponseconst = Array( // Response from a single person.
+$demopersonresponseconst = [ // Response from a single person.
     '1' => 1, // Item id.
     '2' => 0,
     '3' => 1,
@@ -66,75 +66,75 @@ $demopersonresponseconst = Array( // Response from a single person.
     '8' => 0,
     '9' => 1,
     '10' => 1
-);
+];
 
-$demofullresponse = Array(
-    '1' => Array( // Item_id.
-        'person_abilities' => Array(0.5, 0.3, 0.2, 0.8, 0.8, 0.4),
-        'item_responses' => Array(1, 0, 1, 1, 0, 1),
-    ),
-    '2' => Array( // Item_id.
-        'person_abilities' => Array(0.5, 0.3, 0.2, 0.8, 0.8, 0.4),
-        'item_responses' => Array(0, 1, 0, 1, 0, 1),
-    )
-);
+$demofullresponse = [
+    '1' => [ // Item_id.
+        'person_abilities' => [0.5, 0.3, 0.2, 0.8, 0.8, 0.4],
+        'item_responses' => [1, 0, 1, 1, 0, 1],
+    ],
+    '2' => [ // Item_id.
+        'person_abilities' => [0.5, 0.3, 0.2, 0.8, 0.8, 0.4],
+        'item_responses' => [0, 1, 0, 1, 0, 1],
+    ]
+];
 
-$demoitemresponse = Array(
-    Array(
-        'person_abilities' => Array(0.5, 0.3, 0.2, 0.8, 0.8, 0.4),
-        'item_responses' => Array(1, 0, 1, 1, 0, 1),
-    )
-);
+$demoitemresponse = [
+    [
+        'person_abilities' => [0.5, 0.3, 0.2, 0.8, 0.8, 0.4],
+        'item_responses' => [1, 0, 1, 1, 0, 1],
+    ]
+];
 
-$demoresponse = Array(
-    "1" => Array( // Userid.
-        "comp1" => Array( // Component.
-            "1" => Array( // Questionid.
+$demoresponse = [
+    "1" => [ // Userid.
+        "comp1" => [ // Component.
+            "1" => [ // Questionid.
                 "fraction" => 0,
                 "max_fraction" => 1,
                 "min_fraction" => 0,
                 "qtype" => "truefalse",
                 "timestamp" => 1646955326
-            ),
-            "2" => Array(
+            ],
+            "2" => [
                 "fraction" => 0,
                 "max_fraction" => 1,
                 "min_fraction" => 0,
                 "qtype" => "truefalse",
                 "timestamp" => 1646955332
-            ),
-            "3" => Array(
+            ],
+            "3" => [
                 "fraction" => 1,
                 "max_fraction" => 1,
                 "min_fraction" => 0,
                 "qtype" => "truefalse",
                 "timestamp" => 1646955338
-            )
-        )
-    ),
-    "2" => Array(
-        "comp2" => Array(
-            "1" => Array(
+            ]
+        ]
+    ],
+    "2" => [
+        "comp2" => [
+            "1" => [
                 "fraction" => 1,
                 "max_fraction" => 1,
                 "min_fraction" => 0,
                 "qtype" => "truefalse",
                 "timestamp" => 1646955326
-            ),
-            "2" => Array(
+            ],
+            "2" => [
                 "fraction" => 1,
                 "max_fraction" => 1,
                 "min_fraction" => 0,
                 "qtype" => "truefalse",
                 "timestamp" => 1646955332
-            ),
-            "3" => Array(
+            ],
+            "3" => [
                 "fraction" => 1,
                 "max_fraction" => 1,
                 "min_fraction" => 0,
                 "qtype" => "truefalse",
                 "timestamp" => 1646955338
-            )
-        )
-    )
-);
+            ]
+        ]
+    ]
+];

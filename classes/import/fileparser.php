@@ -212,7 +212,7 @@ class fileparser {
             $csvrecord = array_combine($fieldnames, $line);
             // We treat each line, if validation is successfull.
             if ($this->validate_data($csvrecord, $line)) {
-                $data = array();
+                $data = [];
                 foreach ($csvrecord as $columnname => $value) {
                     $data[$columnname] = $value;
                 }
@@ -227,7 +227,7 @@ class fileparser {
 
                 if (isset($this->uniquekey)) { // With unique key set, we build an associative array.
                     if (!isset($this->records[$firstcolumn])) {
-                        $this->records[$firstcolumn] = array();
+                        $this->records[$firstcolumn] = [];
                     }
                     $this->records[$firstcolumn][$csvrecord[$firstcolumn]] = $data;
 
@@ -311,7 +311,7 @@ class fileparser {
             $this->records['success'] = 0;
         }
 
-        $this->records['errors'] = array();
+        $this->records['errors'] = [];
 
         if ($this->errors !== []) {
             $this->records['errors']['generalerrors'] = $this->errors;

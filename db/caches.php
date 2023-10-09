@@ -24,69 +24,69 @@
 
 defined('MOODLE_INTERNAL') || die;
 
-$definitions = array(
-    'catscales' => array(
+$definitions = [
+    'catscales' => [
         'mode' => cache_store::MODE_APPLICATION,
         'simplekeys' => true,
         'staticacceleration' => true,
         'staticaccelerationsize' => 1,
         'invalidationevents' => ['changesincatscales']
-    ),
-    'testitemstable' => array(
+    ],
+    'testitemstable' => [
         'mode' => cache_store::MODE_APPLICATION,
         'simplekeys' => true,
         'staticacceleration' => true,
         'staticaccelerationsize' => 1,
         'invalidationevents' => ['changesintestitems']
-    ),
-    'studentstatstable' => array(
+    ],
+    'studentstatstable' => [
         'mode' => cache_store::MODE_APPLICATION,
         'simplekeys' => true,
         'staticacceleration' => true,
         'staticaccelerationsize' => 1,
         'invalidationevents' => ['changesintestitems']
-    ),
-    'testenvironments' => array(
+    ],
+    'testenvironments' => [
         'mode' => cache_store::MODE_APPLICATION,
         'simplekeys' => true,
         'staticacceleration' => true,
         'staticaccelerationsize' => 1,
         'invalidationevents' => ['changesintestenvironments']
-    ),
-    'catcontexts' => array(
+    ],
+    'catcontexts' => [
         'mode' => cache_store::MODE_APPLICATION,
         'simplekeys' => true,
         'staticacceleration' => true,
         'staticaccelerationsize' => 1,
         'invalidationevents' => ['changesincatcontexts']
-    ),
-    'adaptivequizattempt' => array(
+    ],
+    'adaptivequizattempt' => [
         'mode' => cache_store::MODE_SESSION,
         'simplekeys' => true,
         'staticacceleration' => true,
         'staticaccelerationsize' => 1,
         'invalidationevents' => ['changesinadaptivequizattempt']
-    ),
-    'eventlogtable' => array(
+    ],
+    'eventlogtable' => [
         'mode' => cache_store::MODE_APPLICATION,
         'simplekeys' => true,
         'staticacceleration' => true,
         'staticaccelerationsize' => 1,
         'invalidationevents' => ['changesineventlog']
-    ),
-    'quizattempts' => array(
+    ],
+    'quizattempts' => [
         'mode' => cache_store::MODE_APPLICATION,
         'simplekeys' => true,
         'staticacceleration' => true,
         'staticaccelerationsize' => 1,
         'invalidationevents' => ['changesinquizattempts']
-    ),
-    'teststrategies' => array(
+    ],
+    'teststrategies' => [
         'mode' => cache_store::MODE_APPLICATION,
         'simplekeys' => true,
         'staticacceleration' => true,
         'staticaccelerationsize' => 1,
         'invalidationevents' => ['changesinteststrategies']
-    ),
+    ],
 
-);
+];

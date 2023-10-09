@@ -173,11 +173,11 @@ class mathcat {
         $n = count($startpoint);
         $currentpoint = $startpoint;
         $iteration = 0;
-        $h = array();
+        $h = [];
 
         // Initialize H with the identity matrix.
         for ($i = 0; $i < $n; $i++) {
-            $h[$i] = array();
+            $h[$i] = [];
             for ($j = 0; $j < $n; $j++) {
                 $h[$i][$j] = $i == $j ? 1 : 0;
             }
@@ -211,7 +211,7 @@ class mathcat {
 
             $i = [];
             for ($i = 0; $i < $n; $i++) {
-                $i[$i] = array();
+                $i[$i] = [];
                 for ($j = 0; $j < $n; $j++) {
                     $i[$i][$j] = $i == $j ? 1 : 0;
                 }
@@ -219,7 +219,7 @@ class mathcat {
 
             $a1 = [];
             for ($i = 0; $i < $n; $i++) {
-                $a1[$i] = array();
+                $a1[$i] = [];
                 for ($j = 0; $j < $n; $j++) {
                     $a1[$i][$j] = $i[$i][$j] - $rho * $s[$i] * $y[$j];
                 }
@@ -227,7 +227,7 @@ class mathcat {
 
             $a2 = [];
             for ($i = 0; $i < $n; $i++) {
-                $a2[$i] = array();
+                $a2[$i] = [];
                 for ($j = 0; $j < $n; $j++) {
                     $a2[$i][$j] = $i[$i][$j] - $rho * $y[$i] * $s[$j];
                 }
@@ -235,7 +235,7 @@ class mathcat {
 
             $hnew = [];
             for ($i = 0; $i < $n; $i++) {
-                $hnew[$i] = array();
+                $hnew[$i] = [];
                 for ($j = 0; $j < $n; $j++) {
                     $hnew[$i][$j] = $a1[$i][$j] * $h[$j][$i] * $a2[$j][$i] + $rho * $s[$i] * $s[$j];
                 }

@@ -61,14 +61,14 @@ class modal_manage_catscale extends dynamic_form {
         $mform->setType('id', PARAM_INT);
 
         // Add a select field for the parent ID
-        $options = array('0' => get_string('none'));
+        $options = ['0' => get_string('none')];
         $catscales = dataapi::get_all_catscales();
         foreach ($catscales as $catscale) {
             $options[$catscale->id] = $catscale->name;
         }
 
         $mform->registerNoSubmitButton('btn_changeparentid');
-        $buttonargs = array('style' => 'visibility:hidden;');
+        $buttonargs = ['style' => 'visibility:hidden;'];
         $categoryselect = [
             $mform->createElement('autocomplete', 'parentid', get_string('parent', 'local_catquiz'), $options),
             $mform->createElement('submit',
@@ -185,7 +185,7 @@ class modal_manage_catscale extends dynamic_form {
      * @return array $errors
      */
     public function validation($data, $files): array {
-        $errors = array();
+        $errors = [];
         if (dataapi::name_exists($data['name']) && $data['id'] === 0) {
             $errors['name'] = get_string('catscalesname_exists', 'local_catquiz');
         }
