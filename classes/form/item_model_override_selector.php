@@ -162,6 +162,7 @@ class item_model_override_selector extends dynamic_form {
             }
         }
 
+        // Set data for each model in array.
         $formitemparams = [];
         $models = model_strategy::get_installed_models();
         foreach (array_keys($models) as $model) {
@@ -173,7 +174,7 @@ class item_model_override_selector extends dynamic_form {
             $obj->guessing = $data->$fieldname[sprintf('%s_guessing', $fieldname)];
             $formitemparams[$model] = $obj;
         }
-
+        // Fetch record from db.
         $saveditemparams = $this->get_item_params(
             $data->testitemid,
             $data->contextid
@@ -183,36 +184,44 @@ class item_model_override_selector extends dynamic_form {
         $toinsert = [];
         foreach (array_keys($models) as $model) {
             
-            // Check in each object for each value if there is a change.
-            $change = true;
-            foreach ($formitemparams[$model] as $key => $value) {
-                if ( isset($saveditemparams[$model]) &&
-                    (property_exists($saveditemparams[$model], $key) 
-                    && $saveditemparams[$model]->$key == $value)) {
-                    $change = false;
+            // Check if model already exists in db.
+            if (isset($saveditemparams[$model])) {
+                // Check for each model if there is a change.
+                foreach ($formitemparams[$model] as $key => $value) {
+                    if ( isset($saveditemparams[$model]) &&
+                        (property_exists($saveditemparams[$model], $key) 
+                        && $saveditemparams[$model]->$key == $value)) {
+                        // If nothing is changed, we unset the values.
+                        unset($formitemparams[$model]->$key);
+                    }
+                    // Exisiting identical models need no further treatment.
+                    if (count((array)$formitemparams[$model]) == 0) {
+                        unset($formitemparams[$model]);
+                        continue;
+                    }
                 }
             }
-            if (!$change) {
-                // Nothing changed.
+            if (!isset($formitemparams[$model])) {
                 continue;
             }
-
-            // If status is unchanged, change must be within values, so we set the new status to manually confirmed.
-            if ($formitemparams[$model]->status == $saveditemparams[$model]->status) {
-                $formitemparams[$model]->status = STATUS_CONFIRMED_MANUALLY;
+            // If status is unchanged, change must be within values, so we set the new status to manually updated.
+            if (!isset($formitemparams[$model]->status)) {
+                $formitemparams[$model]->status = STATUS_UPDATED_MANUALLY;
             }
 
+            // If the model exists already in the db, we proceed with updating.
             if (array_key_exists($model, $saveditemparams)) {
-                $toupdate[] = [
-                    'status' => $formitemparams[$model]->status,
-                    'id' => $saveditemparams[$model]->id,
-                    'difficulty' => $formitemparams[$model]->difficulty,
-                    'discrimination' => $formitemparams[$model]->discrimination,
-                    'guessing' => $formitemparams[$model]->guessing,
-                ];
+                $update = [];
+                $update['id'] = $saveditemparams[$model]->id;
+                $this->update_item('status', $update, $formitemparams, $model);
+                $this->update_item('difficulty', $update, $formitemparams, $model);
+                $this->update_item('discrimination', $update, $formitemparams, $model);
+                $this->update_item('guessing', $update, $formitemparams, $model);
+                $toupdate[] = $update;
             } else {
+                // If it's new, we prepare the insert.
                 $toinsert[] = [
-                    'status' => STATUS_CONFIRMED_MANUALLY,
+                    'status' => $formitemparams[$model]->status,
                     'model' => $model,
                     'difficulty' => $formitemparams[$model]->difficulty,
                     'discrimination' => $formitemparams[$model]->discrimination,
@@ -241,6 +250,7 @@ class item_model_override_selector extends dynamic_form {
                     $toupdate[] = [
                         'status' => $formitemparams[$m]->status,
                         'id' => $saveditemparams[$m]->id,
+                        'timemodified' => time(),
                     ];
                 }
             }
@@ -268,6 +278,11 @@ class item_model_override_selector extends dynamic_form {
             $new['contextid'] = $data->contextid;
             $new['componentname'] = $data->componentname ?: self::DEFAULT_COMPONENT_NAME;
             $new['timecreated'] = time();
+            $new['timemodified'] = time();
+            $new['status'] = !empty($new['discrimination']) &&
+                            !empty($new['difficulty']) &&
+                            !empty($new['guessing']) ? 
+                            STATUS_UPDATED_MANUALLY : $new['status'];
             $DB->insert_record(
                 'local_catquiz_itemparams',
                 (object) $new
@@ -286,6 +301,21 @@ class item_model_override_selector extends dynamic_form {
         }
 
         return $data;
+    }
+    /**
+     * Copy changed values = existing params.
+     *
+     * @param string $key
+     * @param array $update
+     * @param array $formitemparams
+     * @param string $model
+     * 
+     * @return void
+     */
+    private function update_item(string $key, array &$update, array $formitemparams, string $model):void {
+        if (isset($formitemparams[$model]->$key)) {
+            $update[$key] = $formitemparams[$model]->$key;
+        }
     }
 
     /**
