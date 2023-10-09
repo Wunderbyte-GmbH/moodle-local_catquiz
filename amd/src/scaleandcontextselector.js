@@ -81,9 +81,6 @@ function initComponents(container) {
             });
         }
     }
-
-
-
 }
 
 /**
