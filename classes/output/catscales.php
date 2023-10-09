@@ -51,7 +51,7 @@ class catscales implements renderable, templatable {
     /** If set to 1, detailview of selected scale will be rendered.
      * @var integer
      */
-    private int $scaledetailview= 0;
+    private int $scaledetailview = 0;
 
     /**
      * @var integer

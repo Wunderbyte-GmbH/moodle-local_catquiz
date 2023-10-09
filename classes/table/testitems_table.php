@@ -269,7 +269,7 @@ class testitems_table extends wunderbyte_table {
         }
 
         foreach ($idarray as $id) {
-        $result[] = catscale::add_or_update_testitem_to_scale($catscaleid, $id);
+            $result[] = catscale::add_or_update_testitem_to_scale($catscaleid, $id);
         }
         $failed = array_filter($result, fn($r) => $r->isErr());
 

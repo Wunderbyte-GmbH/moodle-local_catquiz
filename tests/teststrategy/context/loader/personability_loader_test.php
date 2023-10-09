@@ -16,7 +16,7 @@
 
 /**
  * Tests the personability_loader class.
- * 
+ *
  * @package    catquiz
  * @author David Szkiba <david.szkiba@wunderbyte.at>
  * @copyright  2023 Georg Maißer <info@wunderbyte.at>

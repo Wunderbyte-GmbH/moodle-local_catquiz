@@ -96,7 +96,7 @@ class filterforsubscale extends preselect_task implements wb_middleware {
                 $context['questions'] = $questions;
                 $context['selected_catscale'] = $catscaleid;
                 return $next($context);
-            } 
+            }
         }
 
         return $next($context);

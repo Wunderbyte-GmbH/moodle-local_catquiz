@@ -37,8 +37,8 @@ use SebastianBergmann\RecursionContext\InvalidArgumentException;
  * @package local_catquiz
  * @covers \local_catquiz\teststrategy\strategy\strategy
  */
-class strategy_test extends basic_testcase
-{
+class strategy_test extends basic_testcase {
+
 
     /**
      * Test adding new questions per subscale works as expected.
@@ -89,10 +89,10 @@ class strategy_test extends basic_testcase
 
     /**
      * @dataProvider teststrategies_return_expected_questions_provider
-     * @param mixed $expected 
-     * @param mixed $attemptcontext 
-     * @param mixed $cache 
-     * @return void 
+     * @param mixed $expected
+     * @param mixed $attemptcontext
+     * @param mixed $cache
+     * @return void
      */
     public function test_teststrategies_return_expected_questions(
         $expected,
@@ -102,16 +102,16 @@ class strategy_test extends basic_testcase
         ) {
             $attemptcontext = array_merge($this->getattemptcontext(), $attemptcontextdiff);
             $cache = $this->prepareadaptivequizcache($attemptcontext);
-            if ($fun) {
-                $fun();
-            }
+        if ($fun) {
+            $fun();
+        }
             $cache = cache::make('local_catquiz', 'adaptivequizattempt');
-            foreach ($expected as $attempt => $exp) {
-                $result = $strategy->return_next_testitem($attemptcontext);
-                $this->assertEquals($exp, $result->unwrap()->id, sprintf("Failed for question number %d", $attempt+1));
-                $lastquestion = $cache->get('lastquestion');
-                $this->assertEquals($lastquestion->id, $exp);
-            }
+        foreach ($expected as $attempt => $exp) {
+            $result = $strategy->return_next_testitem($attemptcontext);
+            $this->assertEquals($exp, $result->unwrap()->id, sprintf("Failed for question number %d", $attempt + 1));
+            $lastquestion = $cache->get('lastquestion');
+            $this->assertEquals($lastquestion->id, $exp);
+        }
     }
 
     public function teststrategies_return_expected_questions_provider() {
@@ -141,7 +141,7 @@ class strategy_test extends basic_testcase
             [
                 'expected_question_id' => [25],
                 'strategy' => (new teststrategy_fastest()),
-                'attemptcontextdiff' => 
+                'attemptcontextdiff' =>
                     ['selectfirstquestion' => 'startwithfirstofsecondquartil'],
                 'custom_setup_fun' => function () {
                     $cache = cache::make('local_catquiz', 'adaptivequizattempt');
@@ -253,7 +253,7 @@ class strategy_test extends basic_testcase
         $maxdifficulty = 5;
         for ($i = 1; $i <= $num; $i++) { // Use 1-based indexing to facilitate interpreting quantile ranges.
             if ($difficultydistribution === 'uniform') {
-                $difficulty = $mindifficulty + ($i*($maxdifficulty - $mindifficulty))/($num);
+                $difficulty = $mindifficulty + ($i * ($maxdifficulty - $mindifficulty)) / ($num);
             }
             $questions[$i] = (object) [
                 'id' => $i,

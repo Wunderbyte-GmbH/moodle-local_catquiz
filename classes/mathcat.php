@@ -275,95 +275,95 @@ class mathcat {
      * @return array $parameter
      */
     static function newton_raphson_multi_stable (
-        callable $fn_function,
-        callable $fn_derivative,
-        array $parameter_start,
+        callable $fnfunction,
+        callable $fnderivative,
+        array $parameterstart,
         int $precission = 6,
-        int $max_iterations = 50,
-        callable $fn_trusted_regions_filter = NULL,
-        callable $fn_trusted_regions_function = NULL,
-        callable $fn_trusted_regions_derivative = NULL): array {
-        
+        int $maxiterations = 50,
+        callable $fntrustedregionsfilter = null,
+        callable $fntrustedregionsfunction = null,
+        callable $fntrustedregionsderivative = null): array {
+
         // Set initial values.
-        $parameter = $parameter_start;
-        $parameter_names = array_keys($parameter_start); // Note: Please check for yourself, that the order of your parameters in your array corresponds to the order of $fn_function!
-        $is_critical = false;
-        $max_step_length = 0.1;
-        
+        $parameter = $parameterstart;
+        $parameternames = array_keys($parameterstart); // Note: Please check for yourself, that the order of your parameters in your array corresponds to the order of $fn_function!
+        $iscritical = false;
+        $maxsteplength = 0.1;
+
         // Begin with numerical iteration.
-        for ($i = 0; $i < $max_iterations; $i++) {
-            
-            $mx_parameter = new matrix($parameter); // @DAVID: Sollte serialisiert werden für den Fall genesteter Arrays. array('diffultiy' => array ( 0...6), 'discrimination' => float);
-            $mx_parameter = $mx_parameter->transpose();
-            
+        for ($i = 0; $i < $maxiterations; $i++) {
+
+            $mxparameter = new matrix($parameter); // @DAVID: Sollte serialisiert werden für den Fall genesteter Arrays. array('diffultiy' => array ( 0...6), 'discrimination' => float);
+            $mxparameter = $mxparameter->transpose();
+
             // Calculate the function and derivative values from  $fn_function and $fn_derivative at point $parameter.
-            $val_function = $fn_function($parameter);
-            $val_derivative = $fn_derivative($parameter);
-            
+            $valfunction = $fnfunction($parameter);
+            $valderivative = $fnderivative($parameter);
+
             // Throws error Object of class Closure can not be converted to float.
-            $mx_function = new matrix($val_function);
-            $mx_derivative =  new matrix($val_derivative);
-            
-            $mx_function = $mx_function->transpose(); 
-            
+            $mxfunction = new matrix($valfunction);
+            $mxderivative = new matrix($valderivative);
+
+            $mxfunction = $mxfunction->transpose();
+
             // If the determinant is null, we already found the value.
-            if ($mx_derivative->determinant() == 0) {
-                return array_combine($parameter_names, $parameter);
+            if ($mxderivative->determinant() == 0) {
+                return array_combine($parameternames, $parameter);
             }
 
-            $mx_derivative_inv = $mx_derivative->inverse();
-            
-            // Calculate the new point $mx_parameter as well as the distance 
-            $mx_delta = $mx_derivative_inv->multiply($mx_function);
-            $mx_parameter_alt = $mx_parameter;
-            $distance = $mx_delta->rooted_summed_squares();
-            
-            if ($distance >= $max_step_length) {
+            $mxderivativeinv = $mxderivative->inverse();
+
+            // Calculate the new point $mx_parameter as well as the distance
+            $mxdelta = $mxderivativeinv->multiply($mxfunction);
+            $mxparameteralt = $mxparameter;
+            $distance = $mxdelta->rooted_summed_squares();
+
+            if ($distance >= $maxsteplength) {
                 // Shorten step matrix $mx_delta to concurrent step length.
-                $mx_delta = $mx_delta->multiply($max_step_length / $distance);
+                $mxdelta = $mxdelta->multiply($maxsteplength / $distance);
             } else {
                 // Set new $max_step_length.
-                $max_step_length = $distance;
+                $maxsteplength = $distance;
             }
-            
-            $mx_parameter = $mx_parameter->subtract($mx_delta);
-            $parameter = array_combine($parameter_names, ($mx_parameter->transpose())[0]);
+
+            $mxparameter = $mxparameter->subtract($mxdelta);
+            $parameter = array_combine($parameternames, ($mxparameter->transpose())[0]);
 
             // If Trusted Region filter is provided, check for being still in Trusted Regions.
-            if (isset($fn_trusted_regions_filter)) {
+            if (isset($fntrustedregionsfilter)) {
                 // Check for glitches within the calculated result.
                 if (count(array_filter($parameter, fn ($x) => is_nan($x))) > 0) {
-                    $parameter = $fn_trusted_regions_filter($parameter); // @DAVID: Darüber sollten wir noch einmal nachdenken.
-                    $is_critical = true;
-                    return array_combine($parameter_names, $parameter);
+                    $parameter = $fntrustedregionsfilter($parameter); // @DAVID: Darüber sollten wir noch einmal nachdenken.
+                    $iscritical = true;
+                    return array_combine($parameternames, $parameter);
                 }
 
                 // Check if $parameter is still in the Trusted Region.
-                if ($fn_trusted_regions_filter($parameter) !== $parameter) { 
-                    $parameter = $fn_trusted_regions_filter($parameter);
-                    $mx_parameter = new matrix(is_array($parameter) ? [$parameter] : [[$parameter]]); // @DAVID: Sollte serialisiert werden für den Fall genesteter Arrays.
-                    $mx_parameter = $mx_parameter->transpose();
-                    
+                if ($fntrustedregionsfilter($parameter) !== $parameter) {
+                    $parameter = $fntrustedregionsfilter($parameter);
+                    $mxparameter = new matrix(is_array($parameter) ? [$parameter] : [[$parameter]]); // @DAVID: Sollte serialisiert werden für den Fall genesteter Arrays.
+                    $mxparameter = $mxparameter->transpose();
+
                     // If Trusted Region function and its derivative are provided, add them to $fn_function and $fn_derivative.
-                    if (isset($fn_trusted_regions_function) && isset($fn_trusted_regions_derivative)) {
-                        $fn_function = fn($x) => matrixcat::multi_sum($fn_trusted_regions_function($x), $fn_function($x));
-                        $fn_derivative = fn($x) => matrixcat::multi_sum($fn_trusted_regions_derivative($x), $fn_derivative($x));
+                    if (isset($fntrustedregionsfunction) && isset($fntrustedregionsderivative)) {
+                        $fnfunction = fn($x) => matrixcat::multi_sum($fntrustedregionsfunction($x), $fnfunction($x));
+                        $fnderivative = fn($x) => matrixcat::multi_sum($fntrustedregionsderivative($x), $fnderivative($x));
                         print("Used Trusted Regions function and derivatied and added this to the target functions.");
                     }
-                    
+
                     // If the problem occurs a second time in a row, additionally reset the parameter $parameter to $parameter_start
-                    if ($is_critical) {
-                        $parameter = $parameter_start;
-                        $mx_parameter = new matrix(is_array($parameter) ? [$parameter] : [[$parameter]]); // @DAVID: Sollte serialisiert werden für den Fall genesteter Arrays.
-                        $mx_parameter = $mx_parameter->transpose();
+                    if ($iscritical) {
+                        $parameter = $parameterstart;
+                        $mxparameter = new matrix(is_array($parameter) ? [$parameter] : [[$parameter]]); // @DAVID: Sollte serialisiert werden für den Fall genesteter Arrays.
+                        $mxparameter = $mxparameter->transpose();
                     }
                 } else {
-                // If everything went fine, keep/reset $is_critical as FALSE.
-                $is_critical = FALSE;
+                    // If everything went fine, keep/reset $is_critical as FALSE.
+                    $iscritical = false;
                 }
-            }       
+            }
             // Test if precisiion criteria for stopping iterations has been reached.
-            if ($mx_delta->max_absolute_element()  < 10 ** (-$precission)) {
+            if ($mxdelta->max_absolute_element() < 10 ** (-$precission)) {
                 return $parameter;
             }
         }
@@ -372,7 +372,7 @@ class mathcat {
     }
 
     // Deprecated, falls bfgs nicht genutzt wird.
-    
+
     /**
      * Returns add gauss der1 callable.
      *

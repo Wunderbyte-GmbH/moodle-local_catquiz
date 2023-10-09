@@ -75,7 +75,7 @@ class pilotquestions_loader implements contextloaderinterface {
 
     /**
      * Shows if a question is a pilot question.
-     * 
+     *
      * @param \stdClass $question
      * @return bool
      */

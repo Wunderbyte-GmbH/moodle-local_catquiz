@@ -34,15 +34,15 @@ use PHPUnit\Framework\ExpectationFailedException;
  * @package local_catquiz
  * @covers \local_catquiz\teststrategy\preselect_task\firstquestionselector
  */
-class firstquestionselector_test extends basic_testcase
-{
+class firstquestionselector_test extends basic_testcase {
+
     /**
      * @dataProvider median_ability_of_personparams_is_calculated_correctly_provider
-     * @param float $expected 
-     * @param array<object> $personparams 
-     * @return void 
-     * @throws InvalidArgumentException 
-     * @throws ExpectationFailedException 
+     * @param float $expected
+     * @param array<object> $personparams
+     * @return void
+     * @throws InvalidArgumentException
+     * @throws ExpectationFailedException
      */
     public function test_median_ability_of_personparams_is_calculated_correctly(
         float $expected,

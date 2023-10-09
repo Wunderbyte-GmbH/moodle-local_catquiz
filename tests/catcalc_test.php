@@ -41,8 +41,8 @@ use SebastianBergmann\RecursionContext\InvalidArgumentException;
  * @package local_catquiz
  * @covers \local_catquiz\catcalc
  */
-class catcalc_test extends basic_testcase
-{
+class catcalc_test extends basic_testcase {
+
 
     /**
      * Test if the person ability is calculated correctly.
@@ -61,10 +61,10 @@ class catcalc_test extends basic_testcase
         ];
         $itemparamlist = new model_item_param_list();
         $itemparamlist
-            ->add((new model_item_param(5, $model))->set_parameters(['difficulty' => 0.7758, 'discrimination' => 0.5, 'guessing' => 0.2,]))
-            ->add((new model_item_param(33, $model))->set_parameters(['difficulty' => -37.7967, 'discrimination' => 1.2, 'guessing' => 1.2,]))
-            ->add((new model_item_param(50, $model))->set_parameters(['difficulty' => -37.7967, 'discrimination' => 0.3, 'guessing' => 0.7,]))
-            ->add((new model_item_param(58, $model))->set_parameters(['difficulty' => -37.7967, 'discrimination' => 0, 'guessing' => 0.4,]));
+            ->add((new model_item_param(5, $model))->set_parameters(['difficulty' => 0.7758, 'discrimination' => 0.5, 'guessing' => 0.2, ]))
+            ->add((new model_item_param(33, $model))->set_parameters(['difficulty' => -37.7967, 'discrimination' => 1.2, 'guessing' => 1.2, ]))
+            ->add((new model_item_param(50, $model))->set_parameters(['difficulty' => -37.7967, 'discrimination' => 0.3, 'guessing' => 0.7, ]))
+            ->add((new model_item_param(58, $model))->set_parameters(['difficulty' => -37.7967, 'discrimination' => 0, 'guessing' => 0.4, ]));
         $result = catcalc::estimate_person_ability($personresponses, $itemparamlist);
         $this->assertEquals($expected, sprintf("%.4f", $result));
     }
@@ -238,7 +238,7 @@ class catcalc_test extends basic_testcase
         ];
 
         $result = catcalc::build_callable_array($inarray);
-        $this->assertEquals(fn ($x) => [$x, 2* $x, 3 * $x, 4], $result);
+        $this->assertEquals(fn ($x) => [$x, 2 * $x, 3 * $x, 4], $result);
         $this->assertEquals($result(1), [1, 2, 3, 4]);
     }
 }

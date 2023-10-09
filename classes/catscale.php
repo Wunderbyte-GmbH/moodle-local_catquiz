@@ -448,7 +448,6 @@ class catscale {
             return get_string("deletedcatscale", "local_catquiz");
         }
 
-
     }
 
     /**

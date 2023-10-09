@@ -337,7 +337,6 @@ class fileparser {
             // Value "0" counts as value and returns valueisset true.
             !$valueisset = (("" !== $value) && (null !== $value)) ? true : false;
 
-
             $linevalues = implode(', ', $line);
 
             // Check if empty fields are mandatory.
@@ -524,7 +523,7 @@ class fileparser {
      *
      */
     protected function add_csverror($errorstring, $i) {
-        //$this->csverrors[] = $errorstring . PHP_EOL . "In line with values: $i ";
+        // $this->csverrors[] = $errorstring . PHP_EOL . "In line with values: $i ";
         $this->csverrors[] = nl2br($errorstring.".\nIn line with values: $i ");
     }
 
@@ -568,7 +567,7 @@ class fileparser {
 
     /**
      * Trigger event for testitem imported.
-     *@param int $numberofimporteditems
+     * @param int $numberofimporteditems
      */
     private function trigger_testitem_imported_event($numberofimporteditems) {
         $event = testitem_imported::create([

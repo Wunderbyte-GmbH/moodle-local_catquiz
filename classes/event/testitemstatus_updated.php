@@ -96,7 +96,8 @@ class testitemstatus_updated extends \core\event\base {
             $message = get_string('testitem_status_updated_description', 'local_catquiz', $data);
             return  $message;
         } else {
-            return $this->get_name();}
+            return $this->get_name();
+        }
     }
 
     /**

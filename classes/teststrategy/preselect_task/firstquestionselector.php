@@ -170,9 +170,9 @@ class firstquestionselector extends preselect_task implements wb_middleware {
     public function get_median_ability_of_test(array $personparams) {
         $abilities = array_map(fn ($param) => floatval($param->ability), $personparams);
         sort($abilities);
-        $index = count($abilities)/2;
+        $index = count($abilities) / 2;
         if ((int) $index == $index) {
-            return ($abilities[array_keys($abilities)[$index-1]] + $abilities[array_keys($abilities)[$index]]) / 2;
+            return ($abilities[array_keys($abilities)[$index - 1]] + $abilities[array_keys($abilities)[$index]]) / 2;
         }
         return $abilities[array_keys($abilities)[floor($index)]];
     }
@@ -254,11 +254,11 @@ class firstquestionselector extends preselect_task implements wb_middleware {
 
     /**
      * Gets the person params from the database.
-     * 
+     *
      * Is overwritten in a _testing class, so that we do not need a database for testing.
-     * @param array $context 
-     * @return array 
-     * @throws moodle_exception 
+     * @param array $context
+     * @return array
+     * @throws moodle_exception
      */
     protected function get_personparams_for_adaptivequiz_test(array $context) {
         return catquiz::get_personparams_for_adaptivequiz_test($context['testid']);

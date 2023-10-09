@@ -68,7 +68,7 @@ class quizattempts_table extends wunderbyte_table {
      * @return mixed
      */
     public function col_name($values) {
-        $name =  $values->username ?? 'anonymous';
+        $name = $values->username ?? 'anonymous';
         return $name;
     }
 
@@ -138,7 +138,6 @@ class quizattempts_table extends wunderbyte_table {
     public function col_action($values) {
         $url = clone $this->url;
         $url->params(['attemptid' => $values->attemptid]);
-
 
         return sprintf(
             '<a class="btn btn-plain btn-smaller"

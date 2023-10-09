@@ -43,7 +43,7 @@ class personabilities extends feedbackgenerator {
             ['abilities' => $data['feedback_personabilities']]
         );
 
-       return [
+        return [
             'heading' => $this->get_heading(),
             'content' => $feedback,
         ];
@@ -63,8 +63,7 @@ class personabilities extends feedbackgenerator {
         return get_string('personability', 'local_catquiz');
     }
 
-    public function load_data(int $attemptid, array $initialcontext): ?array
-    {
+    public function load_data(int $attemptid, array $initialcontext): ?array {
         global $CFG;
         require_once($CFG->dirroot . '/local/catquiz/lib.php');
 

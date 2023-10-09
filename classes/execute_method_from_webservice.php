@@ -27,7 +27,7 @@
 
  require_once($CFG->dirroot . '/local/catquiz/lib.php');
 
- class execute_method_from_webservice {
+class execute_method_from_webservice {
 
     /**
      * Execute method using params: methodname, data.
@@ -66,4 +66,4 @@
 
     }
 
- };
+};

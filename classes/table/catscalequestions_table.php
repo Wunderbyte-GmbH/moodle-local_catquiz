@@ -435,11 +435,11 @@ class catscalequestions_table extends wunderbyte_table {
     }
 
         /**
-     * Function to handle the action buttons.
-     * @param int $testitemid
-     * @param string $data
-     * @return array
-     */
+         * Function to handle the action buttons.
+         * @param int $testitemid
+         * @param string $data
+         * @return array
+         */
     public function addtestitem(int $testitemid, string $data) {
 
         $jsonobject = json_decode($data);
@@ -460,7 +460,7 @@ class catscalequestions_table extends wunderbyte_table {
         }
 
         foreach ($idarray as $id) {
-        $result[] = catscale::add_or_update_testitem_to_scale($catscaleid, $id);
+            $result[] = catscale::add_or_update_testitem_to_scale($catscaleid, $id);
         }
         $failed = array_filter($result, fn($r) => $r->isErr());
 

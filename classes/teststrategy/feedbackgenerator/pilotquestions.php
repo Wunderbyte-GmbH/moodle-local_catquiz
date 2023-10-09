@@ -46,7 +46,7 @@ class pilotquestions extends feedbackgenerator {
             $data['num_pilot_questions']
         );
 
-       return [
+        return [
             'heading' => $this->get_heading(),
             'content' => $feedback,
         ];
@@ -60,8 +60,7 @@ class pilotquestions extends feedbackgenerator {
         return get_string('pilot_questions', 'local_catquiz');
     }
 
-    public function load_data(int $attemptid, array $initialcontext): ?array
-    {
+    public function load_data(int $attemptid, array $initialcontext): ?array {
         $cache = cache::make('local_catquiz', 'adaptivequizattempt');
         $numpilotquestions = $initialcontext['num_pilot_questions'] ?? $cache->get('num_pilot_questions') ?? null;
 
@@ -72,7 +71,6 @@ class pilotquestions extends feedbackgenerator {
         return [
             'num_pilot_questions' => $numpilotquestions,
         ];
-
 
     }
 }

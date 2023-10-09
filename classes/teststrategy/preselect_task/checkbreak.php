@@ -67,7 +67,7 @@ final class checkbreak extends preselect_task implements wb_middleware {
         $forcedbreakend = $now + $context['breakduration'];
         $cache->set('forcedbreakend', $forcedbreakend);
         $breakinfourl = $this->get_breakinfourl($context, $forcedbreakend);
-       // Return forced break info page.
+        // Return forced break info page.
         redirect($breakinfourl);
     }
 

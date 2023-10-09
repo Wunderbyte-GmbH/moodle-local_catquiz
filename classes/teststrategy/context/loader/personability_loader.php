@@ -31,7 +31,7 @@ use local_catquiz\teststrategy\context\contextloaderinterface;
 
 /**
  * Class pilotquestions_loader for test strategy.
- * 
+ *
  * Stores the person ability per scale in the `person_ability` key of the context array.
  *
  * @package local_catquiz
@@ -93,9 +93,9 @@ class personability_loader implements contextloaderinterface {
 
     /**
      * Loads the person params from the database.
-     * 
-     * @param array $context 
-     * @return array 
+     *
+     * @param array $context
+     * @return array
      */
     protected function load_saved_personparams(&$context) {
         $catscaleids = [$context['catscaleid']];
@@ -120,8 +120,7 @@ class personability_loader implements contextloaderinterface {
         foreach ($catscaleids as $scaleid) {
             $ability = ! empty($filteredparams[$scaleid])
                 ? floatval($filteredparams[$scaleid]->ability)
-                : self::DEFAULT_ABILITY
-                ;
+                : self::DEFAULT_ABILITY;
                 $abilities[$scaleid] = $ability;
         }
 

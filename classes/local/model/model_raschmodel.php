@@ -97,7 +97,7 @@ abstract class model_raschmodel extends model_model implements catcalc_item_esti
      */
     public function calc_aic_item($personabilities, $item, model_responses $k) {
         $numberofparameters = $this->get_model_dim() - 1;
-        return 2 * $numberofparameters + $this->calc_dic_item($personabilities, $item, $k) ;
+        return 2 * $numberofparameters + $this->calc_dic_item($personabilities, $item, $k);
     }
 
     /**
@@ -150,8 +150,7 @@ abstract class model_raschmodel extends model_model implements catcalc_item_esti
         }
         return 2 * $numberofparameters + (2 * $numberofparameters * ($numberofparameters + 1))
             / ($numberofcases - $numberofparameters - 1)
-            + $this->calc_dic_item($personabilities, $item, $k)
-        ;
+            + $this->calc_dic_item($personabilities, $item, $k);
     }
 
     /**

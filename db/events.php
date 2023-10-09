@@ -51,4 +51,4 @@
         'callback' => 'local_catquiz_observer::testitem_imported'
     ],
 
-];
+ ];

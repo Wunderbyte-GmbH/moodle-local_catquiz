@@ -572,7 +572,7 @@ class catquiz_handler {
             'has_fisherinformation' => false,
             'standarderrorpersubscale' => empty($quizsettings->catquiz_standarderrorpersubscale)
                 ? null
-                : ($quizsettings->catquiz_standarderrorpersubscale / 100),            
+                : ($quizsettings->catquiz_standarderrorpersubscale / 100),
             'breakduration' => $quizsettings->catquiz_breakduration,
             'breakinfourl' => '/local/catquiz/breakinfo.php',
             'maxtimeperquestion' => $quizsettings->catquiz_maxtimeperquestion,

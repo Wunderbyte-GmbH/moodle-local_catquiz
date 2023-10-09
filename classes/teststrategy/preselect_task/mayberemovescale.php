@@ -72,7 +72,7 @@ final class mayberemovescale extends preselect_task implements wb_middleware {
                     $context['questions'],
                     fn ($q) => $q->catscaleid !== $catscaleid
                 );
-            } 
+            }
         }
 
         return $next($context);

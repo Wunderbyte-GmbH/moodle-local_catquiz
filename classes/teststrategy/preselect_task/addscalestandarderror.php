@@ -97,7 +97,7 @@ final class addscalestandarderror extends preselect_task implements wb_middlewar
             }
         }
 
-       $threshold = $context['standarderrorpersubscale'];
+        $threshold = $context['standarderrorpersubscale'];
         $standarderrorperscale = [];
         foreach ($fisherinfoperscale as $catscaleid => $fisherinfo) {
             $fisherinfoplayed = $fisherinfoperscale[$catscaleid]['played'] ?? 0;

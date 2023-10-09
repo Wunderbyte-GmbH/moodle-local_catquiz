@@ -31,8 +31,8 @@ use basic_testcase;
  * @package local_catquiz
  * @covers \local_catquiz\mathcat
  */
-class mathcat_test extends basic_testcase
-{
+class mathcat_test extends basic_testcase {
+
 
     /**
      * Test if the newton raphson multi stable function returns expected outputs.

@@ -42,7 +42,7 @@ class comparetotestaverage extends feedbackgenerator {
         global $OUTPUT;
         $feedback = $OUTPUT->render_from_template('local_catquiz/feedback/comparetotestaverage', $data);
 
-       return [
+        return [
             'heading' => $this->get_heading(),
             'content' => $feedback,
         ];
@@ -108,7 +108,7 @@ class comparetotestaverage extends feedbackgenerator {
             return null;
         }
 
-        $quantile = (count($worseabilities)/count($personparams)) * 100;
+        $quantile = (count($worseabilities) / count($personparams)) * 100;
         $text = get_string('feedbackcomparetoaverage', 'local_catquiz', sprintf('%.2f', $quantile));
         if ($needsimprovementthreshold = $initialcontext['needsimprovementthreshold']) {
             if ($quantile < $needsimprovementthreshold) {

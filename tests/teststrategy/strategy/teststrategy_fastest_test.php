@@ -40,8 +40,8 @@ use SebastianBergmann\RecursionContext\InvalidArgumentException;
  * @package local_catquiz
  * @covers \local_catquiz\teststrategy\strategy\teststrategy_fastest
  */
-class teststrategy_fastest_test extends advanced_testcase
-{
+class teststrategy_fastest_test extends advanced_testcase {
+
 
     public function setUp(): void {
         global $DB;
@@ -83,11 +83,11 @@ class teststrategy_fastest_test extends advanced_testcase
      * @throws InvalidArgumentException
      * @throws ExpectationFailedException
      */
-    public function test_radical_CAT($expected, $attemptcontext) {
+    public function test_radical_cat($expected, $attemptcontext) {
         // Some test datasets need a cache, others do not.
         $cache = cache::make('local_catquiz', 'adaptivequizattempt');
         // Use default values if they are not set in the test dataset.
-        $cachekeydata = array_merge($attemptcontext, ['contextid' => 1, 'includesubscales' => true,]);
+        $cachekeydata = array_merge($attemptcontext, ['contextid' => 1, 'includesubscales' => true, ]);
         $cachekey = sprintf('testitems_%s_%s', $cachekeydata['contextid'], $cachekeydata['includesubscales']);
         $cache->set($cachekey, [1 => (object)[]]);
 
@@ -96,7 +96,7 @@ class teststrategy_fastest_test extends advanced_testcase
         $this->assertEquals($expected, $result);
     }
 
-    public function test_radical_CAT_provider() {
+    public function test_radical_cat_provider() {
         $question1 = (object) [
             'id' => 1,
             'model' => 'raschbirnbauma',
@@ -145,8 +145,8 @@ class teststrategy_fastest_test extends advanced_testcase
                     'catscaleid' => 1,
                     'lastquestion' => null,
 
-                    'penalty_threshold' => 60*60*24*30-90,
-                    'penalty_time_range' => 60*60*24*30,
+                    'penalty_threshold' => 60 * 60 * 24 * 30 - 90,
+                    'penalty_time_range' => 60 * 60 * 24 * 30,
 
                     'installed_models' => [
                         'raschbirnbauma' => 'catmodel_raschbirnbauma\raschbirnbauma',
@@ -196,7 +196,7 @@ class teststrategy_fastest_test extends advanced_testcase
 
     /**
      * NOTE: copied from qformat_xml_import_export_test.php
-     * 
+     *
      * Create object qformat_xml for test.
      * @param string $filename with name for testing file.
      * @param \stdClass $course

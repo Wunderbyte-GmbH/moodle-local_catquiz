@@ -41,7 +41,9 @@ use local_catquiz\local\model\model_responses;
  */
 class web_raschbirnbauma extends model_model implements catcalc_ability_estimator {
 
-    public function get_information_criterion(string $criterion, model_person_param_list $personabilities, model_item_param $itemparams, model_responses $k): float { return 0.0; }
+    public function get_information_criterion(string $criterion, model_person_param_list $personabilities, model_item_param $itemparams, model_responses $k): float {
+        return 0.0;
+    }
 
     /**
      * Uses a web API to calculate the item parameters.
@@ -104,8 +106,7 @@ class web_raschbirnbauma extends model_model implements catcalc_ability_estimato
             $itemid = intval(ltrim($itemdata->_row, 'I'));
             $param = $this
                 ->create_item_param($itemid)
-                ->set_parameters(['difficulty' => $itemdata->xsi])
-                ;
+                ->set_parameters(['difficulty' => $itemdata->xsi]);
             if ($oldparam) {
                 $param->set_status($oldparam->get_status());
             }

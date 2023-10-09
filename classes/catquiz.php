@@ -1421,8 +1421,8 @@ class catquiz {
             $event->trigger();
         }
 
-        //cache_helper::purge_by_event('attemptcreated');
-        //return result::ok($id);
+        // cache_helper::purge_by_event('attemptcreated');
+        // return result::ok($id);
         return $id;
     }
 

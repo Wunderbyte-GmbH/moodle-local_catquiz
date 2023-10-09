@@ -145,7 +145,6 @@ class testenvironmentdashboard implements renderable, templatable {
         $table->showreloadbutton = true;
         $table->addcheckboxes = true;
 
-
         $table->actionbuttons[] = [
             'label' => get_string('notifyteachersofselectedcourses', 'local_catquiz'), // Name of your action button.
             'methodname' => 'notifyteachersofselectedcourses', // The method needs to be added to your child of wunderbyte_table class.
@@ -176,7 +175,7 @@ class testenvironmentdashboard implements renderable, templatable {
         list($idstring, $encodedtable, $html) = $table->lazyouthtml(10, true);
         return $html;
 
-        //return $table->outhtml(10, true);
+        // return $table->outhtml(10, true);
     }
 
     /**

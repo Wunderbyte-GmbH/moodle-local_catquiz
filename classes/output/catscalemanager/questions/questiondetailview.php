@@ -44,13 +44,13 @@ class questiondetailview {
     private int $contextid = 0;
 
     /**
-    * @var integer
-    */
-   private int $catscaleid = 0;
+     * @var integer
+     */
+    private int $catscaleid = 0;
 
     /**
-    * @var string
-    */
+     * @var string
+     */
     private string $component = "";
 
 

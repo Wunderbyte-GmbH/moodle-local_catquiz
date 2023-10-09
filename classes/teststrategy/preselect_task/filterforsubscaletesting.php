@@ -16,7 +16,7 @@
 
 /**
  * Class filterforsubscaletesting.
- * 
+ *
  * Overwrites just a small part to facilitate testing.
  *
  * @package local_catquiz

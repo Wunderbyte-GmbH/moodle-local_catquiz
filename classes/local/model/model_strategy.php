@@ -422,7 +422,7 @@ class model_strategy {
         if ($item = $this->get_item_override($itemid, $itemdifficultieslists)) {
             return $item;
         }
-        
+
         $item = null;
         if ($model = $this->get_model_override()) {
             $item = $itemdifficultieslists[$model][$itemid];

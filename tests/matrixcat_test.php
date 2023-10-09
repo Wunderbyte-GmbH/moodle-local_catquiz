@@ -34,8 +34,8 @@ use SebastianBergmann\RecursionContext\InvalidArgumentException;
  * @package local_catquiz
  * @covers \local_catquiz\matrixcat
  */
-class matrixcat_test extends basic_testcase
-{
+class matrixcat_test extends basic_testcase {
+
 
     /**
      * Test if callable arrays are built properly.

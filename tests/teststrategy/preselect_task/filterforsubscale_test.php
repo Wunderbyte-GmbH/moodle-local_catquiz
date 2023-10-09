@@ -37,8 +37,8 @@ use UnexpectedValueException;
  * @package local_catquiz
  * @covers \local_catquiz\teststrategy\preselect_task\filterforsubscale
  */
-class filterforsubscale_test extends basic_testcase
-{
+class filterforsubscale_test extends basic_testcase {
+
     /**
      * Test that questions of subscales are removed as needed.
      *
@@ -49,7 +49,7 @@ class filterforsubscale_test extends basic_testcase
     public function test_throws_an_exception_for_unknown_teststrategy() {
         $context = [
             'teststrategy' => 'XXX',
-            'person_ability' => [1 => 1.0,],
+            'person_ability' => [1 => 1.0, ],
         ];
         $this->expectException(UnexpectedValueException::class);
         (new filterforsubscale())->run($context, fn () => 'nevercalled');
@@ -57,9 +57,9 @@ class filterforsubscale_test extends basic_testcase
 
     /**
      * @dataProvider provider
-     * @param array $context 
-     * @param mixed $expected 
-     * @return void 
+     * @param array $context
+     * @param mixed $expected
+     * @return void
      */
     public function test_returns_expected_question_from_expected_catscale(
         array $context, $expected
@@ -68,8 +68,7 @@ class filterforsubscale_test extends basic_testcase
         $this->assertEquals($expected, $result->unwrap()->id);
     }
 
-    public function provider()
-    {
+    public function provider() {
         $context['questions'] = [
             '1' => (object) [
                 'id' => 1,

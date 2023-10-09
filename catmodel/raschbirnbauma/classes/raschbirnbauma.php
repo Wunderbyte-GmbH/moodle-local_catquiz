@@ -104,14 +104,14 @@ class raschbirnbauma extends model_raschmodel {
     public static function likelihood(array $pp, array $ip, float $k): float {
         $ability = $pp['ability'];
         $a = $ip['difficulty'];
-        
+
         if ($k < 1.0) {
             return 1 - self::likelihood($pp, $ip, 1.0);
         } else {
             return 1 / (1 + exp($a - $ability));
         }
     }
-    
+
     // Calculate the LOG Likelihood and its derivatives.
 
     /**
@@ -137,15 +137,15 @@ class raschbirnbauma extends model_raschmodel {
     public static function log_likelihood_p(array $pp, array $ip, float $k): float {
         $pp = $pp['ability'];
         $a = $ip['difficulty'];
-        
+
         // Pre-Calculate high frequently used exp-terms.
-        $exp_a = exp($a);
-        $exp_p = exp($pp);
-        
+        $expa = exp($a);
+        $expp = exp($pp);
+
         if ($k < 1.0) {
-            return -$exp_p / ($exp_a + $exp_p);
+            return -$expp / ($expa + $expp);
         } else {
-            return $exp_a / ($exp_a + $exp_p);
+            return $expa / ($expa + $expp);
         }
     }
 
@@ -160,12 +160,12 @@ class raschbirnbauma extends model_raschmodel {
     public static function log_likelihood_p_p(array $pp, array $ip, float $k): float {
         $pp = $pp['ability'];
         $a = $ip['difficulty'];
-        
+
         // Pre-Calculate high frequently used exp-terms.
-        $exp_a = exp($a);
-        $exp_p = exp($pp);
-        
-        return - ($exp_a * $exp_p) / (($exp_a + $exp_p) ** 2);
+        $expa = exp($a);
+        $expp = exp($pp);
+
+        return - ($expa * $expp) / (($expa + $expp) ** 2);
     }
 
     /**
@@ -179,17 +179,17 @@ class raschbirnbauma extends model_raschmodel {
     public static function get_log_jacobian(array $pp, array $ip, float $k): array {
         $pp = $pp['ability'];
         $a = $ip['difficulty'];
-        
+
         $jacobian = [];
-        
+
         // Pre-Calculate high frequently used exp-terms.
-        $exp_a = exp($a);
-        $exp_p = exp($pp);
-        
+        $expa = exp($a);
+        $expp = exp($pp);
+
         if ($k >= 1.0) {
-            $jacobian[0] = -($exp_a * $exp_p) / (($exp_a + $exp_p) * $exp_p); // The d/da .
+            $jacobian[0] = -($expa * $expp) / (($expa + $expp) * $expp); // The d/da .
         } else {
-            $jacobian[0] = $exp_p / ($exp_a + $exp_p); // The d/da .
+            $jacobian[0] = $expp / ($expa + $expp); // The d/da .
         }
         return $jacobian;
     }
@@ -205,20 +205,20 @@ class raschbirnbauma extends model_raschmodel {
     public static function get_log_hessian(array $pp, $ip, float $k): array {
         $pp = $pp['ability'];
         $a = $ip['difficulty'];
-        
+
         $hessian = [[]];
 
-        // Pre-Calculate high frequently used exp-terms.        
-        $exp_a = exp($a);
-        $exp_p = exp($pp);
+        // Pre-Calculate high frequently used exp-terms.
+        $expa = exp($a);
+        $expp = exp($pp);
 
         // 2nd derivative is equal for both k = 0 and k = 1
-        $hessian[0][0] = -($exp_a * $exp_p) / ($exp_a + $exp_p) ** 2; // The d²/ da² .
-        return $hessian; 
+        $hessian[0][0] = -($expa * $expp) / ($expa + $expp) ** 2; // The d²/ da² .
+        return $hessian;
     }
 
     // Calculate the Least-Mean-Squres (LMS) approach.
-    
+
     /**
      * Calculates the Least Mean Squres (residuals) for a given the person ability parameter and a given expected/observed score
      *
@@ -228,7 +228,7 @@ class raschbirnbauma extends model_raschmodel {
      * @param float $n - number of observations
      * @return float - weighted residuals
      */
-   function least_mean_squares(array $pp, array $ip, float $frac, float $n):float{
+    function least_mean_squares(array $pp, array $ip, float $frac, float $n):float {
         return $n * ($frac - self::likelihood($pp, $ip, 1.0)) ** 2;
     }
 
@@ -241,16 +241,16 @@ class raschbirnbauma extends model_raschmodel {
      * @param float $n - number of observations
      * @return array - 1st derivative of lms with respect to $ip
      */
-   function least_mean_squares_1st_derivative_ip(array $pp, array $ip, float $frac, float $n):array{
+    function least_mean_squares_1st_derivative_ip(array $pp, array $ip, float $frac, float $n):array {
         $pp = $pp['ability'];
         $a = $ip['difficulty'];
 
         $derivative = [];
-        
+
         // Pre-Calculate high frequently used exp-terms.
-        $exp_ap0 = exp($a - $pp);
-        
-        $derivative[0] = $n * (2 * $exp_ap0 * ($frac - 1 + $exp_ap0 * $frac)) / (1 + $exp_ap0) ** 3; // Calculate d/da.            
+        $expap0 = exp($a - $pp);
+
+        $derivative[0] = $n * (2 * $expap0 * ($frac - 1 + $expap0 * $frac)) / (1 + $expap0) ** 3; // Calculate d/da.
 
         return $derivative;
     }
@@ -263,26 +263,26 @@ class raschbirnbauma extends model_raschmodel {
      * @param float $frac - fraction of correct (0 ... 1.0)
      * @param float $n - number of observations
      * @return array - 2nd derivative of lms with respect to $ip
-     */ 
-   function least_mean_squares_2nd_derivative_ip(array $pp, array $ip, float $frac, float $n):array{
+     */
+    function least_mean_squares_2nd_derivative_ip(array $pp, array $ip, float $frac, float $n):array {
         $pp = $pp['ability'];
         $a = $ip['difficulty'];
 
         $derivative = [[]];
-        
+
         // Pre-Calculate high frequently used exp-terms.
-        $exp_bap1 = exp($a + $pp);
-        $exp_bap0 = exp($a - $pp);
-        $exp_a = exp($a);
-        $exp_p = exp($pp);
-        
-        $derivative[0][0]  = $n * (2 * ($exp_a * $exp_p) * (-$exp_p ** 2 + 2 * ($exp_a * $exp_p) + (-$exp_a ** 2 + $exp_p ** 2) * $frac)) / ($exp_a + $exp_p) ** 4; // Calculate d²2/da². 
-              
+        $expbap1 = exp($a + $pp);
+        $expbap0 = exp($a - $pp);
+        $expa = exp($a);
+        $expp = exp($pp);
+
+        $derivative[0][0]  = $n * (2 * ($expa * $expp) * (-$expp ** 2 + 2 * ($expa * $expp) + (-$expa ** 2 + $expp ** 2) * $frac)) / ($expa + $expp) ** 4; // Calculate d²2/da².
+
         return $derivative;
     }
 
     // Calculate the Log'ed Odds-Ratio Squared (LORS) approach.
-    
+
     /**
      * Calculates the Log'ed Odds-Ratio Squared (residuals) for a given the person ability parameter and a given expected/observed score
      *
@@ -291,11 +291,11 @@ class raschbirnbauma extends model_raschmodel {
      * @param float $or - odds ratio
      * @param float $n - number of observations
      * @return float - weighted residuals
-     */   
+     */
     function lors_residuals(array $pp, array $ip, float $or, float $n = 1):float {
         $pp = $pp['ability'];
         $a = $ip['difficulty'];
-        
+
         return $n * (log($or) + ($a - $pp)) ** 2;
     }
 
@@ -307,18 +307,18 @@ class raschbirnbauma extends model_raschmodel {
      * @param float $or - odds ratio
      * @param float $n - number of observations
      * @return array - 1st derivative
-     */   
-   function lors_1st_derivative_ip(array $pp, array $ip, float $or, float $n = 1): array {
+     */
+    function lors_1st_derivative_ip(array $pp, array $ip, float $or, float $n = 1): array {
         $pp = $pp['ability'];
         $a = $ip['difficulty'];
-       
+
         $derivative = [];
 
-        $derivative[0] = $n * 2 * ($a - $pp + log($or)); // Calculate d/da.            
-        
+        $derivative[0] = $n * 2 * ($a - $pp + log($or)); // Calculate d/da.
+
         return $derivative;
     }
-    
+
     /**
      * Calculates the 2nd derivative of Log'ed Odds-Ratio Squared with respect to the item parameters
      *
@@ -327,18 +327,18 @@ class raschbirnbauma extends model_raschmodel {
      * @param float $or - odds ratio
      * @param float $n - number of observations
      * @return array - 1st derivative
-     */   
-   function lors_2nd_derivative_ip(array $pp, array $ip, float $or, float $n = 1): array {
+     */
+    function lors_2nd_derivative_ip(array $pp, array $ip, float $or, float $n = 1): array {
         $pp = $pp['ability'];
         $a = $ip['difficulty'];
-        
+
         $derivative = [[]];
-        
-        $derivative[0][0]  = $n * 2; // Calculate d²2/da².            
-      
+
+        $derivative[0][0]  = $n * 2; // Calculate d²2/da².
+
         return $derivative;
     }
-    
+
     // Calculate Fisher-Information.
 
     public static function fisher_info(array $pp, array $ip) {

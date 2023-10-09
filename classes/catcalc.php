@@ -154,8 +154,8 @@ class catcalc {
 
         // Defines the starting point.
         $startarr = ['difficulty' => 0.50, 'discrimination' => 1.0, 'guessing' => 0.25];
-        $z_0 = array_slice($startarr, 0, $modeldim - 1);
-    
+        $z0 = array_slice($startarr, 0, $modeldim - 1);
+
         $jacobian = self::build_itemparam_jacobian($itemresponse, $model);
         $hessian = self::build_itemparam_hessian($itemresponse, $model);
 
@@ -163,7 +163,7 @@ class catcalc {
         return mathcat::newton_raphson_multi_stable(
             $jacobian,
             $hessian,
-            $z_0,
+            $z0,
             6,
             50,
             fn ($ip) => $model::restrict_to_trusted_region($ip)
@@ -171,20 +171,20 @@ class catcalc {
     }
 
     /**
-     * Builds the jacobian function for item params and the given model. 
-     * 
-     * @param array<model_item_response> $itemresponse 
-     * @param mixed $model 
-     * @return Closure(mixed $ip): mixed 
+     * Builds the jacobian function for item params and the given model.
+     *
+     * @param array<model_item_response> $itemresponse
+     * @param mixed $model
+     * @return Closure(mixed $ip): mixed
      */
     public static function build_itemparam_jacobian(array $itemresponse, catcalc_item_estimator $model) {
         // Define Jacobi vector (1st derivative) of the Log Likelihood.
         $funs = [];
-        
+
         foreach ($itemresponse as $r) {
             $funs[] = fn($ip) => $model::get_log_jacobian($r->get_personparams()->to_array(), $ip, $r->get_response());
         }
-    
+
         $jacobian = self::build_callable_array($funs); // from [fn($x), fn($x),...] to fn($x): [...]
         $jacobian = fn ($ip) => matrixcat::multi_sum($jacobian($ip));
 
@@ -193,19 +193,19 @@ class catcalc {
 
     /**
      * Builds the hessian function for item params and the given model.
-     * 
-     * @param array $itemresponse 
-     * @param mixed $model 
-     * @return Closure(mixed $ip): mixed 
+     *
+     * @param array $itemresponse
+     * @param mixed $model
+     * @return Closure(mixed $ip): mixed
      */
     public static function build_itemparam_hessian(array $itemresponse, $model) {
         // Define Hesse matrix (2nd derivative) of the Log Likelihood.
         $hessian = [];
-        
+
         foreach ($itemresponse as $r) {
             $hessian[] = fn($ip) => $model::get_log_hessian($r->get_personparams()->to_array(), $ip, $r->get_response());
         }
-            
+
         $hessian = self::build_callable_array($hessian);
         $hessian = fn ($ip) => matrixcat::multi_sum($hessian($ip));
 
@@ -222,9 +222,9 @@ class catcalc {
         return function($x) use ($functions) {
             $new = [];
             foreach ($functions as $key => $f) {
-            	$new[$key] = $f($x);
+                $new[$key] = $f($x);
             }
-        	return $new;
+            return $new;
         };
     }
 }

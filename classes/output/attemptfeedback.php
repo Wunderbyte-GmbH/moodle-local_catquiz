@@ -101,7 +101,7 @@ class attemptfeedback implements renderable, templatable {
     private function render_strategy_feedback($savetodb = true) {
         global $USER;
         if (!$this->teststrategy
-        //|| empty($cache->get('playedquestions'))
+        // || empty($cache->get('playedquestions'))
         ) {
             return '';
         }

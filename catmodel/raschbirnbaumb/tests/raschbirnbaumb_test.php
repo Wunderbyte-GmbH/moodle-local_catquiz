@@ -67,7 +67,7 @@ class raschbirnbaumb_test extends TestCase {
     public function test_get_log_hessian(array $pp, float $k, array $ip, array $expected) {
 
         $result = [];
-        $resultmatrix= raschbirnbaumb::get_log_hessian($pp, $ip, $k);
+        $resultmatrix = raschbirnbaumb::get_log_hessian($pp, $ip, $k);
 
         foreach ($resultmatrix as $results) {
             $result[] = array_map(fn ($a) => (float)sprintf("%.6f", $a), $results);

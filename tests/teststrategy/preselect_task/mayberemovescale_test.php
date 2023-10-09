@@ -36,8 +36,8 @@ use SebastianBergmann\RecursionContext\InvalidArgumentException;
  * @package local_catquiz
  * @covers \local_catquiz\teststrategy\preselect_task\mayberemovescale
  */
-class mayberemovescale_test extends basic_testcase
-{
+class mayberemovescale_test extends basic_testcase {
+
     /**
      * Test that questions of subscales are removed as needed.
      *
@@ -63,10 +63,10 @@ class mayberemovescale_test extends basic_testcase
         // Create some dummy questions for testing.
         $questions = [
             1 => (object) ['catscaleid' => 1],
-            2 => (object) ['catscaleid' => 1,],
-            3 => (object) ['catscaleid' => 1,],
-            4 => (object) ['catscaleid' => 1,],
-            5 => (object) ['catscaleid' => 2,]
+            2 => (object) ['catscaleid' => 1, ],
+            3 => (object) ['catscaleid' => 1, ],
+            4 => (object) ['catscaleid' => 1, ],
+            5 => (object) ['catscaleid' => 2, ]
         ];
 
         // Create the played questions array.

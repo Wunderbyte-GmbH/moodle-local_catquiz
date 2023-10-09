@@ -96,7 +96,8 @@ class model_person_param implements \ArrayAccess {
         $this->$offset = $value;
     }
 
-    public function offsetUnset($offset): void {}
+    public function offsetUnset($offset): void {
+    }
 
     /**
      * Return ID.
@@ -132,5 +133,5 @@ class model_person_param implements \ArrayAccess {
 
     public function to_array(): array {
         return ['ability' => $this->ability];
-    } 
+    }
 }

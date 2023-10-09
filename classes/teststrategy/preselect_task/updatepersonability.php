@@ -114,7 +114,7 @@ class updatepersonability extends preselect_task implements wb_middleware {
         );
 
         // Remove all responses that are not in the item param list and check again
-        $arrayresponsesforscale = []; 
+        $arrayresponsesforscale = [];
         foreach ($itemparamlist as $item) {
             $arrayresponsesforscale[$item->get_id()] = $this->arrayresponses[$item->get_id()];
         }
@@ -184,10 +184,10 @@ class updatepersonability extends preselect_task implements wb_middleware {
     /**
      * Test if we can calculate an ability with the given responses.
      * At least two answers with different outcome are needed.
-     * 
+     *
      * Note: Even if this function returns true, we still have to check on a
      * per-scale basis if we have enough answers in that scale.
-     * 
+     *
      * @param mixed $userresponses
      * @return bool
      */
@@ -221,7 +221,7 @@ class updatepersonability extends preselect_task implements wb_middleware {
         }
         $userresponses[$context['userid']]['component'][$context['lastquestion']->id] = $lastresponse[$context['userid']]['component'][$context['lastquestion']->id];
         $cache->set('userresponses', $userresponses);
-        
+
         $userresponses = (new model_responses())->setdata($userresponses, false);
         return $userresponses;
     }
@@ -265,8 +265,7 @@ class updatepersonability extends preselect_task implements wb_middleware {
      * By storing this information in the cache, we can remember excluded
      * subscales for the whole quiz attempt.
      */
-    protected function mark_subscale_as_removed($catscaleid)
-    {
+    protected function mark_subscale_as_removed($catscaleid) {
         $cache = cache::make('local_catquiz', 'adaptivequizattempt');
         $excludedscales = $cache->get('excludedscales') ?: [];
         $excludedscales[] = $catscaleid;
@@ -279,11 +278,11 @@ class updatepersonability extends preselect_task implements wb_middleware {
      * between the current ability and the maximum value.
      * If the last question is partly correct, e.g. the fraction is 0.6, then
      * the change of the person ability is multiplied by that value.
-     * 
+     *
      * For incorrect answers, the change will update the ability towards the
      * minimum value.
-     * 
-     * @return float 
+     *
+     * @return float
      */
     public function fallback_ability_update($catscaleid) {
         $fraction = $this->userresponses->get_last_response($this->context['userid'])['fraction'];

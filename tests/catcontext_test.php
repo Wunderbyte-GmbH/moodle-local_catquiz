@@ -31,8 +31,8 @@ use basic_testcase;
  * @package local_catquiz
  * @covers \local_catquiz\catcontext
  */
-class catcontext_test extends basic_testcase
-{
+class catcontext_test extends basic_testcase {
+
 
     /**
      * Test if there is a default CAT context.

@@ -47,13 +47,13 @@ class datacard implements renderable {
     private int $contextid = 0;
 
     /**
-    * @var integer
-    */
+     * @var integer
+     */
     private int $catscaleid = 0;
 
     /**
-    * @var string
-    */
+     * @var string
+     */
     private string $component = "";
 
 

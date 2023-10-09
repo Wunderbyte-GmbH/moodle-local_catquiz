@@ -166,7 +166,6 @@ abstract class strategy {
 
         $cache->set('lastquestion', $selectedquestion);
 
-
         catscale::update_testitem(
             $context['contextid'],
             $selectedquestion,

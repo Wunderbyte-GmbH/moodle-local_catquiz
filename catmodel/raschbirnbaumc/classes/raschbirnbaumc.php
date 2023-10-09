@@ -182,22 +182,22 @@ class raschbirnbaumc extends model_raschmodel {
         $a = $ip['difficulty'];
         $b = $ip['discrimination'];
         $c = $ip['guessing'];
-                
+
         $jacobian = [];
-        
+
         // Pre-Calculate high frequently used exp-terms.
-        $exp_ab = exp($a * $b);
-        $exp_bp = exp($b * $pp);
-        $exp_bap1 = exp($b * ($a + $pp));
-        $exp_bap0 = exp($b * ($a - $pp));
-        
+        $expab = exp($a * $b);
+        $expbp = exp($b * $pp);
+        $expbap1 = exp($b * ($a + $pp));
+        $expbap0 = exp($b * ($a - $pp));
+
         if ($k >= 1.0) {
-            $jacobian[0] = ($b * ($c - 1) * $exp_bap1) / (($exp_ab + $exp_bp) * ($c * $exp_ab + $exp_bp)); // Calculate d/da.
-            $jacobian[1] = (($c - 1) * $exp_bap1 * ($a - $pp)) / (($exp_ab + $exp_bp) * ($c * $exp_ab + $exp_bp)); // Calculate d/db.
-            $jacobian[2] = $exp_ab / ($c * $exp_ab + $exp_bp); // Calculate d/dc.
+            $jacobian[0] = ($b * ($c - 1) * $expbap1) / (($expab + $expbp) * ($c * $expab + $expbp)); // Calculate d/da.
+            $jacobian[1] = (($c - 1) * $expbap1 * ($a - $pp)) / (($expab + $expbp) * ($c * $expab + $expbp)); // Calculate d/db.
+            $jacobian[2] = $expab / ($c * $expab + $expbp); // Calculate d/dc.
         } else {
-            $jacobian[0] = $b / (1 + $exp_bap0); // Calculate d/da.
-            $jacobian[1] = ($a - $pp) / (1 + $exp_bap0); // Calculate d/db.
+            $jacobian[0] = $b / (1 + $expbap0); // Calculate d/da.
+            $jacobian[1] = ($a - $pp) / (1 + $expbap0); // Calculate d/db.
             $jacobian[2] = 1 / ($c - 1); // Calculate d/dc.
         }
         return $jacobian;
@@ -216,32 +216,32 @@ class raschbirnbaumc extends model_raschmodel {
         $a = $ip['difficulty'];
         $b = $ip['discrimination'];
         $c = $ip['guessing'];
-        
+
         $hessian = [[]];
-        
+
         // Pre-Calculate high frequently used exp-terms.
-        $exp_ab = exp($a * $b);
-        $exp_bp = exp($b * $pp);
-        
+        $expab = exp($a * $b);
+        $expbp = exp($b * $pp);
+
         if ($k >= 1.0) {
             $hessian[0][0] = -($b ** 2 * ($c - 1) * exp($b * ($a + $pp)) * ($c * exp(2 * $a * $b) - exp(2 * $b * $pp))) / ((exp($a * $b) + exp($b * $pp)) ** 2 * ($c * exp($a * $b) + exp($b * $pp)) ** 2); // Calculate d²/ da².
             $hessian[0][1] = (($c - 1) * exp($b * ($a + $pp)) * (exp($b * ($a + $pp)) + exp(2 * $b * $pp) * (1 + $a * $b - $b * $pp) + $c * (exp($b * ($a + $pp)) + exp(2 * $a * $b) * (1 - $a * $b + $b * $pp)))) / ((exp($a * $b) + exp($b * $pp)) ** 2 * ($c * exp($a * $b) + exp($b * $pp)) ** 2); // Calculate d/da d/db.
             $hessian[0][2] = ($b * exp($b * ($a + $pp))) / ($c * exp($a * $b) + exp($b * $pp)) ** 2;// d/da d/dc
             $hessian[1][0] = $hessian[0][1];
-            $hessian[1][1] =  -(($c - 1) * exp($b * ($a - $pp)) * ($c * exp(2 * $b * ($a - $pp)) - 1) * ($a - $pp) ** 2) / (((1 + exp($b * ($a - $pp))) * (1 + $c * exp($b * ($a - $pp)))) ** 2); // Calculate d²/db².
-            $hessian[1][2] =  (exp($b * ($a + $pp)) * ($a - $pp)) / ($c * exp($a * $b) + exp($b * $pp)) ** 2;// Calculate d/db d/dc.
+            $hessian[1][1] = -(($c - 1) * exp($b * ($a - $pp)) * ($c * exp(2 * $b * ($a - $pp)) - 1) * ($a - $pp) ** 2) / (((1 + exp($b * ($a - $pp))) * (1 + $c * exp($b * ($a - $pp)))) ** 2); // Calculate d²/db².
+            $hessian[1][2] = (exp($b * ($a + $pp)) * ($a - $pp)) / ($c * exp($a * $b) + exp($b * $pp)) ** 2;// Calculate d/db d/dc.
             $hessian[2][0] = $hessian[0][2];
             $hessian[2][1] = $hessian[1][2];
             $hessian[2][2] = -exp(2 * $a * $b) / ($c * exp($a * $b) + exp($b * $pp)) ** 2; // Calculate d²/dc².
         } else {
             $hessian[0][0] = -($b ** 2 * exp($b * ($a - $pp))) / (1 + exp($b * ($a - $pp))) ** 2; // Calculate d²/da².
             $hessian[0][1] = (exp($b * ($a - $pp)) * ($b * ($pp - $a) + 1) + 1) / (exp($b * ($a - $pp)) + 1) ** 2; // Calculate d/da d/db.
-            $hessian[0][2] =  0; // Calculate d/da d/dc.
-            $hessian[1][0] = $hessian[0][1];          
+            $hessian[0][2] = 0; // Calculate d/da d/dc.
+            $hessian[1][0] = $hessian[0][1];
             $hessian[1][1] = -(exp($b * ($a - $pp)) * ($a - $pp) ** 2) / (1 + exp($b * ($a - $pp))) ** 2; // Calculate .d²/db²
-            $hessian[1][2] =  0; // Calculate d/db d/dc.
+            $hessian[1][2] = 0; // Calculate d/db d/dc.
             $hessian[2][0] = $hessian[0][2];
-            $hessian[2][1] = $hessian[1][2];           
+            $hessian[2][1] = $hessian[1][2];
             $hessian[2][2] = -1 / ($c - 1) ** 2; // Calculate d²/dc².
         }
         return $hessian;
@@ -258,7 +258,7 @@ class raschbirnbaumc extends model_raschmodel {
      * @param float $n - number of observations
      * @return float - weighted residuals
      */
-   function least_mean_squares(array $pp, array $ip, float $frac, float $n):float{
+    function least_mean_squares(array $pp, array $ip, float $frac, float $n):float {
         return $n * ($frac - self::likelihood($pp, $ip, 1.0)) ** 2;
     }
 
@@ -270,21 +270,21 @@ class raschbirnbaumc extends model_raschmodel {
      * @param float $frac - fraction of correct (0 ... 1.0)
      * @param float $n - number of observations
      * @return array - 1st derivative of lms with respect to $ip
-     */ 
+     */
     public static function least_mean_squares_1st_derivative_ip(array $pp, array $ip, float $frac, float $n):array {
         $pp = $pp['ability'];
         $a = $ip['difficulty'];
         $b = $ip['discrimination'];
         $c = $ip['guessing'];
-        
+
         $derivative = [];
 
         // Pre-Calculate high frequently used exp-terms.
-        $exp_bap = exp($b * ($a - $pp));
+        $expbap = exp($b * ($a - $pp));
 
-        $derivative[0] = $n * (-(2 * $b * (1 - $c) * $exp_bap) / (1 + $exp_bap - $frac) ** 3); // Calculate d/da.
-        $derivative[1] = $n* (-(2 * (1 - $c) * $exp_bap * ($c + (1 - $c) / (1 + $exp_bap) - $frac) * ($a - $pp)) / (1 + $exp_bap) ** 2); // Calculate d/db.
-        $derivative[2] = $n * 2 * (1 - 1 / (1 + $exp_bap)) * ($c + (1 - $c) / (1 + $exp_bap) - $frac); // Calculate d/dc.
+        $derivative[0] = $n * (-(2 * $b * (1 - $c) * $expbap) / (1 + $expbap - $frac) ** 3); // Calculate d/da.
+        $derivative[1] = $n * (-(2 * (1 - $c) * $expbap * ($c + (1 - $c) / (1 + $expbap) - $frac) * ($a - $pp)) / (1 + $expbap) ** 2); // Calculate d/db.
+        $derivative[2] = $n * 2 * (1 - 1 / (1 + $expbap)) * ($c + (1 - $c) / (1 + $expbap) - $frac); // Calculate d/dc.
 
         return $derivative;
     }
@@ -297,26 +297,26 @@ class raschbirnbaumc extends model_raschmodel {
      * @param float $frac - fraction of correct (0 ... 1.0)
      * @param float $n - number of observations
      * @return array - 2nd derivative of lms with respect to $ip
-     */ 
+     */
     public static function least_mean_squares_2nd_derivative_ip(array $pp, array $ip, float $frac, float $n):array {
         $pp = $pp['ability'];
         $a = $ip['difficulty'];
         $b = $ip['discrimination'];
         $c = $ip['guessing'];
-        
+
         $derivative = [[]];
 
         // Pre-Calculate high frequently used exp-terms.
-        $exp_bap = exp($b * ($a - $pp));
-        $exp_ab = exp($a * $b);
-        $exp_bp = exp($b * $pp);
-        
-        $derivative[0][0]  = $n * (-(2 * $b ** 2 * (1 - $c) * $exp_bap * ((1 - $c) / ($exp_bap + 1) + $c - $frac)) / ($exp_bap + 1) ** 2 + (4 * $b ** 2 * (1 - $c) * $exp_bap ** 2 * ((1 - $c) / ($exp_bap + 1) + $c - $frac)) / ($exp_bap + 1) ** 3 + (2 * $b ** 2 * (1 - $c) ** 2 * $exp_bap ** 2) / ($exp_bap + 1) ** 4); // Calculate d²/da².
-        $derivative[0][1]  = $n * (-(2 * (1 - $c) * $exp_bap * ((1 - $c) / ($exp_bap + 1) + $c - $frac)) / ($exp_bap + 1) ** 2 - (2 * $b * (1 - $c) * ($a - $pp) * $exp_bap * ((1 - $c) / ($exp_bap + 1) + $c - $frac)) / ($exp_bap + 1) ** 2 + (4 * $b * (1 - $c) * ($a - $pp) * $exp_bap ** 2 * ((1 - $c) / ($exp_bap + 1) + $c - $frac)) / ($exp_bap + 1) ** 3 + (2 * $b * (1 - $c) ** 2 * ($a - $pp) * $exp_bap ** 2) / ($exp_bap + 1) ** 4); // Calculate d/da d/db.
-        $derivative[0][2]  = $n * (2 * $b * $exp_bap * ((2 * $c - $frac - 1) * $exp_bap - $frac + 1)) / ($exp_bap + 1) ** 3; // Calculate d/da d/dc.
-        $derivative[1][1]  = $n * (2 * ($a - $pp) * $exp_bap * ((1 - $c) / ($exp_bap + 1) + $c - $frac)) / ($exp_bap + 1) ** 2 - (2 * (1 - $c) * ($a - $pp) * $exp_bap * (1 - 1 / ($exp_bap + 1))) / ($exp_bap + 1) ** 2; // Calculate d²/db².
-        $derivative[1][2]  = $n * (2 * ($a - $pp) * $exp_bap * ((2 * $c - $frac - 1) * $exp_bap - $frac + 1)) / ($exp_bap + 1) ** 3; // Calculate d/db d/dc.
-        $derivative[2][2]  = $n * (2 * $exp_ab ** 2) / ($exp_ab + $exp_bp) ** 2; // Calculate d²/dc².
+        $expbap = exp($b * ($a - $pp));
+        $expab = exp($a * $b);
+        $expbp = exp($b * $pp);
+
+        $derivative[0][0]  = $n * (-(2 * $b ** 2 * (1 - $c) * $expbap * ((1 - $c) / ($expbap + 1) + $c - $frac)) / ($expbap + 1) ** 2 + (4 * $b ** 2 * (1 - $c) * $expbap ** 2 * ((1 - $c) / ($expbap + 1) + $c - $frac)) / ($expbap + 1) ** 3 + (2 * $b ** 2 * (1 - $c) ** 2 * $expbap ** 2) / ($expbap + 1) ** 4); // Calculate d²/da².
+        $derivative[0][1]  = $n * (-(2 * (1 - $c) * $expbap * ((1 - $c) / ($expbap + 1) + $c - $frac)) / ($expbap + 1) ** 2 - (2 * $b * (1 - $c) * ($a - $pp) * $expbap * ((1 - $c) / ($expbap + 1) + $c - $frac)) / ($expbap + 1) ** 2 + (4 * $b * (1 - $c) * ($a - $pp) * $expbap ** 2 * ((1 - $c) / ($expbap + 1) + $c - $frac)) / ($expbap + 1) ** 3 + (2 * $b * (1 - $c) ** 2 * ($a - $pp) * $expbap ** 2) / ($expbap + 1) ** 4); // Calculate d/da d/db.
+        $derivative[0][2]  = $n * (2 * $b * $expbap * ((2 * $c - $frac - 1) * $expbap - $frac + 1)) / ($expbap + 1) ** 3; // Calculate d/da d/dc.
+        $derivative[1][1]  = $n * (2 * ($a - $pp) * $expbap * ((1 - $c) / ($expbap + 1) + $c - $frac)) / ($expbap + 1) ** 2 - (2 * (1 - $c) * ($a - $pp) * $expbap * (1 - 1 / ($expbap + 1))) / ($expbap + 1) ** 2; // Calculate d²/db².
+        $derivative[1][2]  = $n * (2 * ($a - $pp) * $expbap * ((2 * $c - $frac - 1) * $expbap - $frac + 1)) / ($expbap + 1) ** 3; // Calculate d/db d/dc.
+        $derivative[2][2]  = $n * (2 * $expab ** 2) / ($expab + $expbp) ** 2; // Calculate d²/dc².
 
         // Note: Partial derivations are exchangeible, cf. Theorem of Schwarz.
         $derivative[1][0] = $derivative[0][1];
@@ -328,7 +328,7 @@ class raschbirnbaumc extends model_raschmodel {
 
 
     // Calculate the Log'ed Odds-Ratio Squared (LORS) approach.
-    
+
     /**
      * Calculates the Log'ed Odds-Ratio Squared (residuals) for a given the person ability parameter and a given expected/observed score
      *
@@ -337,13 +337,13 @@ class raschbirnbaumc extends model_raschmodel {
      * @param float $or - odds ratio
      * @param float $n - number of observations
      * @return float - weighted residuals
-     */   
+     */
     function lors_residuals(array $pp, array $ip, float $or, float $n = 1):float {
         $pp = $pp['ability'];
         $a = $ip['difficulty'];
         $b = $ip['discrimination'];
         $c = $ip['guessing'];
-        
+
         return $n * (log($or) + $b * ($a - $pp)) ** 2;
     }
 
@@ -355,23 +355,23 @@ class raschbirnbaumc extends model_raschmodel {
      * @param float $or - odds ratio
      * @param float $n - number of observations
      * @return array - 1st derivative
-     */   
-   function lors_1st_derivative_ip(array $pp, array $ip, float $or, float $n = 1):array {
+     */
+    function lors_1st_derivative_ip(array $pp, array $ip, float $or, float $n = 1):array {
         $pp = $pp['ability'];
         $a = $ip['difficulty'];
         $b = $ip['discrimination'];
         $c = $ip['guessing'];
-       
+
         $derivative = [];
 
         // @RALF: Korrekte Formeln für 3PL implementieren!
 
-        $derivative[0] = $n * 2 * $b * ($b * ($a - $pp) + log($or)); // Calculate d/da.            
+        $derivative[0] = $n * 2 * $b * ($b * ($a - $pp) + log($or)); // Calculate d/da.
         $derivative[1] = $n * 2 * ($a - $pp) * ($b * ($a - $pp) + log($or)); // Calculate d/db.
 
         return $derivative;
     }
-    
+
     /**
      * Calculates the 2nd derivative of Log'ed Odds-Ratio Squared with respect to the item parameters
      *
@@ -380,27 +380,27 @@ class raschbirnbaumc extends model_raschmodel {
      * @param float $or - odds ratio
      * @param float $n - number of observations
      * @return array - 1st derivative
-     */   
-   function lors_2nd_derivative_ip(array $pp, array $ip, float $or, float $n = 1):array {
+     */
+    function lors_2nd_derivative_ip(array $pp, array $ip, float $or, float $n = 1):array {
         $pp = $pp['ability'];
         $a = $ip['difficulty'];
         $b = $ip['discrimination'];
         $c = $ip['guessing'];
-        
+
         $derivative = [[]];
 
         // @RALF: Korrekte Formeln für 3PL implementieren!
-        
-        $derivative[0][0]  = $n * 2 * $b ** 2; // Calculate d²2/da².            
-        $derivative[0][1]  = 0; // $n * 2 * (2 * $b * ($a - $pp) + log($or)); // Calculate d/da d/db.    
+
+        $derivative[0][0]  = $n * 2 * $b ** 2; // Calculate d²2/da².
+        $derivative[0][1]  = 0; // $n * 2 * (2 * $b * ($a - $pp) + log($or)); // Calculate d/da d/db.
         $derivative[1][1]  = $n * 2 * ($a - $pp) ** 2; // Calculate d²/db².
 
         // Note: Partial derivations are exchangeable, cf. Theorem of Schwarz.
         $derivative[1][0] = $derivative[0][1];
-      
+
         return $derivative;
     }
-    
+
     // Calculate Fisher-Information.
 
     public static function fisher_info(array $pp, array $ip):float {

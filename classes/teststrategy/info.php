@@ -219,7 +219,7 @@ class info {
         );
         $mform->setDefault('catquiz_maxtimeperquestion', 60);
         $mform->addHelpButton('catquiz_maxtimeperquestion', 'maxtimeperquestion', 'local_catquiz');
-        
+
         $elements[] = $mform->addElement(
             'text',
             'catquiz_breakduration',

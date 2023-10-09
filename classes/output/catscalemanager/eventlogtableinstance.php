@@ -117,8 +117,8 @@ class eventlogtableinstance {
 
         $table->define_baseurl(new moodle_url('/local/catquiz/downloads/download.php'));
 
-        //list($idstring, $encodedtable, $html) = $table->lazyouthtml(10, true);
-        //return $html;
+        // list($idstring, $encodedtable, $html) = $table->lazyouthtml(10, true);
+        // return $html;
         return $table->outhtml(10, true);
     }
 }

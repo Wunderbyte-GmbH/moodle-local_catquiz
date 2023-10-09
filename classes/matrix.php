@@ -90,7 +90,7 @@ class matrix extends ArrayObject {
                     $this[$r][$c] = $matrix[$r][$c];
                 }
             }
-        } elseif ($cols == null) {
+        } else if ($cols == null) {
             // Check, if $value is array.
             if (is_array($value)) {
                 // Strip of any associated indices.
@@ -103,7 +103,7 @@ class matrix extends ArrayObject {
                     }
                 } else {
                     // Note: Vector is given, convert to proper matrix.
-                    $value = [$value]; 
+                    $value = [$value];
                 }
             } else {
                 // Note: int|float is given, convert to proper matrix.
@@ -270,13 +270,14 @@ class matrix extends ArrayObject {
         }
         if ($this->_rows == 1) {
             return $this[0][0];
-        } elseif ($this->_rows == 2) {
+        } else if ($this->_rows == 2) {
             return $this[0][0] * $this[1][1] - $this[0][1] * $this[1][0];
         } else {
             $out = 0;
             for ($c = 0; $c < $this->_cols; $c++) {
-                if ($this[0][$c])
+                if ($this[0][$c]) {
                     $out += pow(-1, $c + 2) * $this[0][$c] * $this->subMatrix(0, $c)->determinant();
+                }
             }
             return $out;
         }
@@ -294,7 +295,7 @@ class matrix extends ArrayObject {
             for ($r = 0; $r < $this->_rows; $r++) {
                 if ($this->_cols == 1) {
                     $cofactorarray[$c][$r] = 1;
-                } elseif ($this->_cols == 2) {
+                } else if ($this->_cols == 2) {
                     $cofactorarray[$c][$r] = pow(-1, $c + $r) * $this->subMatrix($c, $r)[0][0];
                 } else {
                     $cofactorarray[$c][$r] = pow(-1, $c + $r) * $this->subMatrix($c, $r)->determinant();
@@ -310,14 +311,14 @@ class matrix extends ArrayObject {
      * @return Matrix The new transposed matrix
      */
     public function transpose() {
-        $resultArray = [];
+        $resultarray = [];
         for ($i = 0; $i < $this->_cols; $i++) {
-            $resultArray[$i] = [];
+            $resultarray[$i] = [];
             for ($j = 0; $j < $this->_rows; $j++) {
-                $resultArray[$i][$j] = $this[$j][$i];
+                $resultarray[$i][$j] = $this[$j][$i];
             }
         }
-        return new self($resultArray);
+        return new self($resultarray);
     }
 
     /**
@@ -385,9 +386,8 @@ class matrix extends ArrayObject {
      * of the matrix.
      *
      * return float
-    */
-    public function rooted_summed_squares():float
-    {
+     */
+    public function rooted_summed_squares():float {
         $result = 0;
         for ($r = 0; $r < $this->_rows; $r++) {
             for ($c = 0; $c < $this->_cols; $c++) {
@@ -402,9 +402,8 @@ class matrix extends ArrayObject {
      * of the matrix.
      *
      * return float
-    */
-    public function max_absolute_element():float
-    {
+     */
+    public function max_absolute_element():float {
         $result = 0;
         for ($r = 0; $r < $this->_rows; $r++) {
             for ($c = 0; $c < $this->_cols; $c++) {
@@ -417,9 +416,8 @@ class matrix extends ArrayObject {
     /**
      * Print the matrix as pretty php code (bracket array).
      *
-    */
-    public function print_m()
-    {
+     */
+    public function print_m() {
         echo '('.$this->_rows. " x " . $this->_cols. ")-matrix : [";
         for ($r = 0; $r < $this->_rows; $r++) {
             echo "[";
