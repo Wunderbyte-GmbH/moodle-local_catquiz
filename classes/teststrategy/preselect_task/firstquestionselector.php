@@ -131,8 +131,8 @@ class firstquestionselector extends preselect_task implements wb_middleware {
                 $question = $this->get_last_question_of_second_quartile($context['questions']);
                 return result::ok($question);
             case self::STARTWITHAVERAGEABILITYOFTEST:
-                $averageability = $this->get_average_ability_of_test($personparams);
                 $personparams = $this->get_personparams_for_adaptivequiz_test($context);
+                $averageability = $this->get_median_ability_of_test($personparams);
                 foreach (array_keys($context['person_ability']) as $catscaleid) {
                     $context['person_ability'][$catscaleid] = $averageability;
                 }
@@ -160,22 +160,21 @@ class firstquestionselector extends preselect_task implements wb_middleware {
     }
 
     /**
-     * Get average ability of test.
+     * Returns the median ability of the given person parameters.
      *
      * @param int $testid
      *
      * @return mixed
      *
      */
-    public function get_average_ability_of_test(array $personparams) {
+    public function get_median_ability_of_test(array $personparams) {
         $abilities = array_map(fn ($param) => floatval($param->ability), $personparams);
         sort($abilities);
-        $index = 0.5 * count($abilities);
-        $index -= 1; // Because we use zero-based indexing.
+        $index = count($abilities)/2;
         if ((int) $index == $index) {
-            return ($abilities[array_keys($abilities)[$index]] + $abilities[array_keys($abilities)[$index + 1]]) / 2;
+            return ($abilities[array_keys($abilities)[$index-1]] + $abilities[array_keys($abilities)[$index]]) / 2;
         }
-        return $abilities[array_keys($abilities)[$index]];
+        return $abilities[array_keys($abilities)[floor($index)]];
     }
 
     /**

@@ -116,7 +116,7 @@ class comparetotestaverage extends feedbackgenerator {
             }
         }
 
-        $testaverage = (new firstquestionselector())->get_average_ability_of_test($personparams);
+        $testaverage = (new firstquestionselector())->get_median_ability_of_test($personparams);
 
         return [
             'contextid' => $initialcontext['contextid'],
