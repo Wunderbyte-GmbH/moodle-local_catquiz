@@ -199,7 +199,7 @@ class fileparser {
         }
 
         // Check if first column is set mandatory and unique.
-        // If unique column existis -> key
+        // If unique column existis -> key.
         $firstcolumn = $this->fieldnames[0];
         if ($this->get_param_value($firstcolumn, 'mandatory') == true
         && $this->get_param_value($firstcolumn, 'unique') == true) {
@@ -438,7 +438,7 @@ class fileparser {
             return $error;
         }
         foreach ($this->fieldnames as $fieldname) {
-            if(!in_array($fieldname, array_keys($this->columns))) {
+            if (!in_array($fieldname, array_keys($this->columns))) {
                 $error .= get_string('wronglabels', 'local_catquiz', $fieldname);
                 break;
             }

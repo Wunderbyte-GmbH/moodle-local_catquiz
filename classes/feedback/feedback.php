@@ -196,9 +196,11 @@ class feedback {
         if (!$enrol = enrol_get_plugin('manual')) {
             return; // No manual enrolment plugin.
         }
-        if (!$instances = $DB->get_records('enrol',
-                ['enrol' => 'manual', 'courseid' => $courseid,
-                    'status' => ENROL_INSTANCE_ENABLED], 'sortorder,id ASC')) {
+        if (!$instances = $DB->get_records(
+                'enrol',
+                ['enrol' => 'manual', 'courseid' => $courseid, 'status' => ENROL_INSTANCE_ENABLED],
+                'sortorder,id ASC'
+            )) {
             return; // No manual enrolment instance on this course.
         }
 
