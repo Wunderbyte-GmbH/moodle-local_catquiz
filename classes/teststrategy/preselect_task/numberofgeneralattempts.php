@@ -25,7 +25,6 @@
 namespace local_catquiz\teststrategy\preselect_task;
 
 use local_catquiz\local\result;
-use local_catquiz\local\status;
 use local_catquiz\teststrategy\preselect_task;
 use local_catquiz\wb_middleware;
 
@@ -39,7 +38,7 @@ use local_catquiz\wb_middleware;
  * @copyright 2023 Wunderbyte GmbH
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-final class numberofgeneralattempts extends preselect_task implements wb_middleware {
+class numberofgeneralattempts extends preselect_task implements wb_middleware {
 
     /**
      * Run preselect task.
@@ -51,13 +50,7 @@ final class numberofgeneralattempts extends preselect_task implements wb_middlew
      *
      */
     public function run(array &$context, callable $next): result {
-        global $DB;
-
-        $sql = "SELECT questionid, COUNT(*) AS count
-                FROM {question_attempts}
-                GROUP BY questionid";
-
-        $records = $DB->get_records_sql($sql);
+        $records = $this->getquestionswithattemptscount($context);
 
         $maxattempts = 0;
         foreach ($context['questions'] as $id => &$question) {
@@ -82,5 +75,19 @@ final class numberofgeneralattempts extends preselect_task implements wb_middlew
         return [
             'questions',
         ];
+    }
+
+    /**
+     * Can be overwritten in the _testing class to prevent access to the DB.
+     * @param mixed $context 
+     * @return array 
+     */
+    protected function getquestionswithattemptscount($context): array {
+        global $DB;
+        $sql = "SELECT questionid, COUNT(*) AS count
+                FROM {question_attempts}
+                GROUP BY questionid";
+
+        return $DB->get_records_sql($sql);
     }
 }

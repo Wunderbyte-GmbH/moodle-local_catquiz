@@ -29,6 +29,7 @@ use basic_testcase;
 use cache;
 use local_catquiz\local\result;
 use local_catquiz\teststrategy\strategy;
+use local_catquiz\teststrategy\strategy\teststrategy_balanced;
 use local_catquiz\teststrategy\strategy\teststrategy_fastest;
 use PHPUnit\Framework\ExpectationFailedException;
 use SebastianBergmann\RecursionContext\InvalidArgumentException;
@@ -230,6 +231,24 @@ class strategy_test extends basic_testcase {
                 ],
                 'strategy' => (new teststrategy_fastest()),
             ],
+            'moderate CAT' =>
+            [
+                // In the generated fake data, the number of general attempts
+                // for each question is the same as its question ID. So we
+                // expect questions with the lowest IDs to be selected first.
+                'expected_question_id' => [
+                    1,
+                    2,
+                    3,
+                    4,
+                    5,
+                ],
+                'strategy' => (new teststrategy_balanced()),
+                'attemptcontextdiff' => [
+                    'pilot_ratio' => 0.0,
+                    'fake_questionattemptcounts' => $this->generatequestionattemptcounts(),
+                ],
+            ],
         ];
     }
 
@@ -317,8 +336,18 @@ class strategy_test extends basic_testcase {
                 'difficulty' => $difficulty,
                 'catscaleid' => $catscaleid,
                 'is_pilot' => false,
+                'attempts' => $i,
             ];
         }
         return $questions;
+    }
+
+    private function generatequestionattemptcounts() {
+        $attemptcounts = [];
+        $questions = $this->generatequestions();
+        foreach ($questions as $qid => $question) {
+            $attemptcounts[$qid] = (object)['count' => $qid];
+        }
+        return $attemptcounts;
     }
 }
