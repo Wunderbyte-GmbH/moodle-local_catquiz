@@ -116,9 +116,11 @@ class teststrategy_fastest_test extends advanced_testcase {
                 'attemptcontext' => [
                     'questionsattempted' => 10,
                     'maximumquestions' => 10,
+                    // phpcs:disable
                     // 'breakduration' => 60,
                     // 'breakinfourl' => 'xxx' ,
                     // 'maxtimeperquestion' => 30,
+                    // phpcs:enable
                 ],
             ],
             'no remaining questions' => [
@@ -127,9 +129,11 @@ class teststrategy_fastest_test extends advanced_testcase {
                     'questionsattempted' => 0,
                     'maximumquestions' => 10,
                     'questions' => [],
+                    // phpcs:disable
                     // 'breakduration' => 60,
                     // 'breakinfourl' => 'xxx' ,
                     // 'maxtimeperquestion' => 30,
+                    // phpcs:enable
                 ],
             ],
             'returns a question' => [
@@ -160,9 +164,11 @@ class teststrategy_fastest_test extends advanced_testcase {
                     'includesubscales' => true,
 
                     'max_attempts_per_scale' => 10,
+                    // phpcs:disable
                     // 'breakduration' => 60,
                     // 'breakinfourl' => 'xxx' ,
                     // 'maxtimeperquestion' => 30,
+                    // phpcs:enable
                 ],
             ],
         ];

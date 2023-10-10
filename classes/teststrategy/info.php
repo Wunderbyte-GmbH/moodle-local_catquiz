@@ -221,6 +221,7 @@ class info {
         $mform->setDefault('catquiz_minquestionspersubscale', 0);
         $mform->addHelpButton('catquiz_minquestionspersubscale', 'minquestionspersubscale', 'local_catquiz');
 
+        // phpcs:disable
         // $elements[] = $mform->addElement(
         // 'text',
         // 'catquiz_maxtimeperquestion',
@@ -235,6 +236,7 @@ class info {
         // get_string('breakduration', 'local_catquiz')
         // );
         // $mform->setDefault('catquiz_breakduration', 300);
+        // phpcs:enable
 
         feedback::instance_form_definition($mform, $elements);
     }

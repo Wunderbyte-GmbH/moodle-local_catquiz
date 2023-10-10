@@ -236,9 +236,11 @@ class strategy_test extends basic_testcase {
             'includesubscales' => true,
 
             'max_attempts_per_scale' => 10,
+            // phpcs:disable
             // 'breakduration' => 60,
             // 'breakinfourl' => 'xxx',
             // 'maxtimeperquestion' => 30,
+            // phpcs:enable
             'fake_personparams_for_test' => [],
         ];
     }

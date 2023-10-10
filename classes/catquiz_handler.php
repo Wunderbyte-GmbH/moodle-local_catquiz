@@ -577,9 +577,11 @@ class catquiz_handler {
             'standarderrorpersubscale' => empty($quizsettings->catquiz_standarderrorpersubscale)
                 ? null
                 : ($quizsettings->catquiz_standarderrorpersubscale / 100),
+            // phpcs:disable
             // 'breakduration' => $quizsettings->catquiz_breakduration,
             // 'breakinfourl' => '/local/catquiz/breakinfo.php',
             // 'maxtimeperquestion' => $quizsettings->catquiz_maxtimeperquestion,
+            // phpcs:enable
         ];
         return $contextcreator->load(
             [
