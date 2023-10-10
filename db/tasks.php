@@ -27,6 +27,13 @@ use local_catquiz\task\recalculate_cat_model_params;
 defined('MOODLE_INTERNAL') || die();
 
 $tasks = [
-    ['classname' => recalculate_cat_model_params::class, 'blocking' => 0,
-        'minute' => 'R', 'hour' => '0', 'day' => '*', 'dayofweek' => '*', 'month' => '*'],
+    [
+        'classname' => recalculate_cat_model_params::class,
+        'blocking' => 0,
+        'minute' => 'R',
+        'hour' => '0',
+        'day' => '*',
+        'dayofweek' => '*',
+        'month' => '*',
+    ],
 ];

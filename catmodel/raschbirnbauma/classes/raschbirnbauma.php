@@ -88,7 +88,7 @@ class raschbirnbauma extends model_raschmodel {
      * @return array of string
      */
     public static function get_parameter_names(): array {
-        return ['difficulty', ];
+        return ['difficulty'];
     }
 
     // Calculate the Likelihood.
@@ -228,7 +228,7 @@ class raschbirnbauma extends model_raschmodel {
      * @param float $n - number of observations
      * @return float - weighted residuals
      */
-    public function least_mean_squares(array $pp, array $ip, float $frac, float $n):float {
+    public static function least_mean_squares(array $pp, array $ip, float $frac, float $n):float {
         return $n * ($frac - self::likelihood($pp, $ip, 1.0)) ** 2;
     }
 
@@ -241,7 +241,7 @@ class raschbirnbauma extends model_raschmodel {
      * @param float $n - number of observations
      * @return array - 1st derivative of lms with respect to $ip
      */
-    public function least_mean_squares_1st_derivative_ip(array $pp, array $ip, float $frac, float $n):array {
+    public static function least_mean_squares_1st_derivative_ip(array $pp, array $ip, float $frac, float $n):array {
         $pp = $pp['ability'];
         $a = $ip['difficulty'];
 
@@ -264,7 +264,7 @@ class raschbirnbauma extends model_raschmodel {
      * @param float $n - number of observations
      * @return array - 2nd derivative of lms with respect to $ip
      */
-    public function least_mean_squares_2nd_derivative_ip(array $pp, array $ip, float $frac, float $n):array {
+    public static function least_mean_squares_2nd_derivative_ip(array $pp, array $ip, float $frac, float $n):array {
         $pp = $pp['ability'];
         $a = $ip['difficulty'];
 
@@ -295,7 +295,7 @@ class raschbirnbauma extends model_raschmodel {
      * @param float $n - number of observations
      * @return float - weighted residuals
      */
-    public function lors_residuals(array $pp, array $ip, float $or, float $n = 1):float {
+    public static function lors_residuals(array $pp, array $ip, float $or, float $n = 1):float {
         $pp = $pp['ability'];
         $a = $ip['difficulty'];
 
@@ -311,7 +311,7 @@ class raschbirnbauma extends model_raschmodel {
      * @param float $n - number of observations
      * @return array - 1st derivative
      */
-    public function lors_1st_derivative_ip(array $pp, array $ip, float $or, float $n = 1): array {
+    public static function lors_1st_derivative_ip(array $pp, array $ip, float $or, float $n = 1): array {
         $pp = $pp['ability'];
         $a = $ip['difficulty'];
 
@@ -331,7 +331,7 @@ class raschbirnbauma extends model_raschmodel {
      * @param float $n - number of observations
      * @return array - 1st derivative
      */
-    public function lors_2nd_derivative_ip(array $pp, array $ip, float $or, float $n = 1): array {
+    public static function lors_2nd_derivative_ip(array $pp, array $ip, float $or, float $n = 1): array {
         $pp = $pp['ability'];
         $a = $ip['difficulty'];
 
@@ -410,8 +410,7 @@ class raschbirnbauma extends model_raschmodel {
         $am = 0; // Mean of difficulty.
         $as = 2; // Standard derivation of difficulty.
 
-        return [[
-            -1 / ($as ** 2), // Calculate d/da d/da.
-        ]];
+        // Calculate d/da d/da.
+        return [[ -1 / ($as ** 2) ]];
     }
 }

@@ -182,7 +182,7 @@ function xmldb_local_catquiz_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2023041400, 'local', 'catquiz');
     }
 
-        // Add the itemparams table
+        // Add the itemparams table.
         $savepointadditemparams = 2023041703;
     if ($oldversion < $savepointadditemparams) {
 

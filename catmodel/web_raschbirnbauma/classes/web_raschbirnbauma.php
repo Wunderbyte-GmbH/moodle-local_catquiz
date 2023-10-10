@@ -128,7 +128,7 @@ class web_raschbirnbauma extends model_model implements catcalc_ability_estimato
      *
      */
     public static function get_parameter_names(): array {
-        return ['difficulty', ];
+        return ['difficulty'];
     }
 
     /**

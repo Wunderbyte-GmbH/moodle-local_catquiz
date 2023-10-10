@@ -60,7 +60,12 @@ function xmldb_local_catquiz_install() {
         'local/catquiz:subscribecatscales',
     ];
     foreach ($caps as $cap) {
-        $chk = $DB->get_record('role_capabilities', ['contextid' => $ctx->id, 'roleid' => $role->id, 'capability' => $cap, 'permission' => 1]);
+        $chk = $DB->get_record('role_capabilities', [
+                'contextid' => $ctx->id,
+                'roleid' => $role->id,
+                'capability' => $cap,
+                'permission' => 1,
+            ]);
         if (empty($chk->id)) {
             $DB->insert_record('role_capabilities', [
                 'contextid' => $ctx->id,
@@ -68,11 +73,12 @@ function xmldb_local_catquiz_install() {
                 'capability' => $cap,
                 'permission' => 1,
                 'timemodified' => time(),
-                'modifierid' => 2]);
+                'modifierid' => 2,
+            ]);
         }
     }
 
-    // Make sure the database contains a default context
+    // Make sure the database contains a default context.
     $defaultcontext = new catcontext();
     $defaultcontext->create_default_context();
 

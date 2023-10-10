@@ -59,7 +59,7 @@ class demo extends model_model {
      * @return string[]
      */
     public static function get_parameter_names(): array {
-        return ['difficulty', ];
+        return ['difficulty'];
     }
 
     public static function fisher_info($personability, $params) {
