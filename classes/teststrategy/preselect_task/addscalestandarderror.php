@@ -83,11 +83,15 @@ class addscalestandarderror extends preselect_task implements wb_middleware {
             }
             foreach ($scales[$q->catscaleid] as $scaleid) {
                 $key = in_array($q->id, $playedquestionids) ? 'played' : 'remaining';
-                if ($key === 'remaining' && $remainingperscale[$scaleid] <= 0) {
+                if ($key === 'remaining') {
+                    if ($remainingperscale[$scaleid] <= 0) {
                     // Do not add the question to the list of remaining
                     // questions if it can never be answered due to the
                     // max_attempts_per_scale setting.
                     continue;
+                    } else {
+                        $remainingperscale[$scaleid]--;
+                    }
                 }
                 if (!array_key_exists($scaleid, $fisherinfoperscale)) {
                     $fisherinfoperscale[$scaleid] = [];
