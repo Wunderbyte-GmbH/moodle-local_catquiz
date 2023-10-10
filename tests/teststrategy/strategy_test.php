@@ -28,6 +28,7 @@ namespace local_catquiz;
 use basic_testcase;
 use cache;
 use local_catquiz\local\result;
+use local_catquiz\local\status;
 use local_catquiz\teststrategy\strategy;
 use local_catquiz\teststrategy\strategy\inferallsubscales;
 use local_catquiz\teststrategy\strategy\teststrategy_balanced;
@@ -111,6 +112,11 @@ class strategy_test extends basic_testcase {
         $cache = cache::make('local_catquiz', 'adaptivequizattempt');
         foreach ($expected as $attempt => $exp) {
             $result = $strategy->return_next_testitem($attemptcontext);
+            if ($exp instanceof result && $exp->iserr()) {
+                $this->assertInstanceOf(result::class, $result);
+                $this->assertEquals($exp->get_status(), $result->get_status());
+                continue;
+            }
             $this->assertEquals($exp, $result->unwrap()->id, sprintf("Failed for question number %d", $attempt + 1));
             $lastquestion = $cache->get('lastquestion');
             $this->assertEquals($lastquestion->id, $exp);
@@ -230,6 +236,75 @@ class strategy_test extends basic_testcase {
                 'attemptcontextdiff' => [
                     'standarderrorpersubscale' => 0.5,
                     'min_attempts_per_scale' => 1,
+                    'questions' => $infersubscalesquestions,
+                    'original_questions' => $infersubscalesquestions,
+                    'fake_ancestor_scales' => [
+                        1 => [],
+                        2 => [1],
+                        3 => [2, 1],
+                        4 => [2, 1],
+                        5 => [2, 1],
+
+                    ],
+                    'fake_child_scales' => [
+                        1 => [2, 3, 4, 5],
+                        2 => [3, 4, 5],
+                        3 => [],
+                        4 => [],
+                        5 => [],
+                    ],
+                    'person_ability' => [
+                        1 => 0.3,
+                        2 => 0.3,
+                        3 => 0.4,
+                        4 => 0.3,
+                        5 => 0.5,
+                    ]
+                ],
+            ],
+            'infer all subscales minimum attempts 0 max attempts 10' => [
+                'expected' => [
+                    (result::err(status::ERROR_NO_REMAINING_QUESTIONS)),
+                ],
+                'strategy' => (new inferallsubscales()),
+                'attemptcontextdiff' => [
+                    'standarderrorpersubscale' => 0.5,
+                    'min_attempts_per_scale' => 0,
+                    'questions' => $infersubscalesquestions,
+                    'original_questions' => $infersubscalesquestions,
+                    'fake_ancestor_scales' => [
+                        1 => [],
+                        2 => [1],
+                        3 => [2, 1],
+                        4 => [2, 1],
+                        5 => [2, 1],
+
+                    ],
+                    'fake_child_scales' => [
+                        1 => [2, 3, 4, 5],
+                        2 => [3, 4, 5],
+                        3 => [],
+                        4 => [],
+                        5 => [],
+                    ],
+                    'person_ability' => [
+                        1 => 0.3,
+                        2 => 0.3,
+                        3 => 0.4,
+                        4 => 0.3,
+                        5 => 0.5,
+                    ]
+                ],
+            ],
+            'infer all subscales minimum attempts 0 max attempts 20' => [
+                'expected' => [
+                    74,
+                ],
+                'strategy' => (new inferallsubscales()),
+                'attemptcontextdiff' => [
+                    'standarderrorpersubscale' => 0.5,
+                    'min_attempts_per_scale' => 0,
+                    'max_attempts_per_scale' => 20,
                     'questions' => $infersubscalesquestions,
                     'original_questions' => $infersubscalesquestions,
                     'fake_ancestor_scales' => [
