@@ -78,22 +78,26 @@ class calculation_executed extends \core\event\base {
 
         // Handle the counter for items updated
         // We get a json array from the event.
-        $updatedmodels = json_decode($otherarray->updatedmodelsjson);
-        $updatedmodelstring = '';
-        foreach ($updatedmodels as $modelname => $questioncount) {
-            if (intval($questioncount) > 0) {
-                // We generate a string with the modelnames and number of items calculated.
-                $updatedmodelstring .= $modelname . ': ' . $questioncount . ', ';
+
+        if (!empty($otherarray->updatedmodelsjson)) {
+            $updatedmodels = json_decode($otherarray->updatedmodelsjson);
+            $updatedmodelstring = '';
+            foreach ($updatedmodels as $modelname => $questioncount) {
+                if (intval($questioncount) > 0) {
+                    // We generate a string with the modelnames and number of items calculated.
+                    $updatedmodelstring .= $modelname . ': ' . $questioncount . ', ';
+                }
+            }
+            // Find the position of the last comma.
+            $lastcommaposition = strrpos($updatedmodelstring, ',');
+
+            if ($lastcommaposition !== false) {
+                // Replace the last comma with a period.
+                $updatedmodelstring = substr_replace($updatedmodelstring, '.', $lastcommaposition, 1);
             }
         }
-        // Find the position of the last comma.
-        $lastcommaposition = strrpos($updatedmodelstring, ',');
 
-        if ($lastcommaposition !== false) {
-            // Replace the last comma with a period.
-            $updatedmodelstring = substr_replace($updatedmodelstring, '.', $lastcommaposition, 1);
-        }
-        $data['updatedmodels'] = $updatedmodelstring;
+        $data['updatedmodels'] = $updatedmodelstring ?? '';
 
         // Find the username corresponding to the ID for display.
         if ($otherarray->userid != 0) {
