@@ -31,6 +31,12 @@ use local_catquiz\teststrategy\info;
  */
 class quizattemptsdisplay {
 
+    /**
+     * Renders table.
+     *
+     * @return mixed
+     *
+     */
     public function render_table() {
         $table = new quizattempts_table('quizattemptstable');
 
@@ -137,6 +143,14 @@ class quizattemptsdisplay {
         return $table->outhtml(10, true);
     }
 
+    /**
+     * Renders attempt details.
+     *
+     * @param int $attemptid
+     *
+     * @return mixed
+     *
+     */
     public function render_attempt_details(int $attemptid) {
         $attemptfeedback = new attemptfeedback($attemptid);
         $feedback = $attemptfeedback->get_feedback_for_attempt($attemptid);

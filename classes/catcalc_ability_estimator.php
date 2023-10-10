@@ -30,7 +30,7 @@ interface catcalc_ability_estimator {
     /**
      * Likelihood.
      *
-     * @param array<float> $pp
+     * @param array $pp
      * @param array $itemparams
      * @param float $itemresponse
      *
@@ -42,7 +42,7 @@ interface catcalc_ability_estimator {
     /**
      * Log likelihood.
      *
-     * @param array<float> $pp
+     * @param array $pp
      * @param array $itemparams
      * @param float $itemresponse
      *

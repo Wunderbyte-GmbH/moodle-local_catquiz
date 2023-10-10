@@ -92,6 +92,10 @@ class managecatscaledashboard implements renderable, templatable {
      */
     public ?array $testsandtemplatesdisplay = [];
 
+    /**
+     *
+     * @var array $quizattemptsdisplay
+     */
     public array $quizattemptsdisplay = [];
 
     /**

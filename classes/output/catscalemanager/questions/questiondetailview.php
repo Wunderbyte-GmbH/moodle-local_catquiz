@@ -55,14 +55,13 @@ class questiondetailview {
      */
     private string $component = "";
 
-
-
     /**
-     * Constructor
+     * Constructor.
      *
      * @param int $testitemid
      * @param int $contextid
      * @param int $catscaleid
+     * @param string $component
      *
      */
     public function __construct(

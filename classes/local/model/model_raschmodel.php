@@ -234,7 +234,7 @@ abstract class model_raschmodel extends model_model implements catcalc_item_esti
     /**
      * Likelihood.
      *
-     * @param array<float> $pp
+     * @param array $pp
      * @param array $itemparams
      * @param float $itemresponse
      *
@@ -246,7 +246,7 @@ abstract class model_raschmodel extends model_model implements catcalc_item_esti
     /**
      * Log likelihood.
      *
-     * @param array<float> $pp
+     * @param array $pp
      * @param array $itemparams
      * @param float $itemresponse
      *

@@ -92,9 +92,9 @@ class attemptfeedback implements renderable, templatable {
 
     /**
      * Renders strategy feedback.
-     *
      * In addition, it saves all feedback data to the database.
      *
+     * @param  bool $savetodb
      * @return mixed
      *
      */
@@ -144,6 +144,7 @@ class attemptfeedback implements renderable, templatable {
     }
 
     /**
+     * Gets feedback generators for teststrategy.
      *
      * @param int $strategyid
      * @return array<feedbackgenerator>
@@ -160,6 +161,14 @@ class attemptfeedback implements renderable, templatable {
         return $generators;
     }
 
+    /**
+     * Gets feedback for attempt.
+     *
+     * @param int $attemptid
+     *
+     * @return array
+     *
+     */
     public function get_feedback_for_attempt(int $attemptid): array {
         global $DB;
         $feedbackdata = json_decode(
@@ -189,6 +198,15 @@ class attemptfeedback implements renderable, templatable {
         ];
     }
 
+    /**
+     * Generates feedback.
+     *
+     * @param array $generators
+     * @param array $feedbackdata
+     *
+     * @return array
+     *
+     */
     private function generate_feedback(array $generators, array $feedbackdata): array {
         foreach ($generators as $generator) {
             $feedback = $generator->get_feedback($feedbackdata);

@@ -36,6 +36,11 @@ use local_wunderbyte_table\wunderbyte_table;
  */
 class quizattempts_table extends wunderbyte_table {
 
+    /**
+     * Contains utl.
+     *
+     * @var mixed
+     */
     private $url;
 
     /**

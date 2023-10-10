@@ -61,10 +61,10 @@ class catscales implements renderable, templatable {
     /**
      * Constructor.
      *
+     * @param mixed $catscaleid
+     * @param mixed $scaledetailview
+     * @param mixed $contextid
      * @param bool $allowedit
-     * @param int $catscaleid
-     * @param int $scaledetailview
-     * @param int $contextid
      *
      */
     public function __construct(&$catscaleid, &$scaledetailview, &$contextid, bool $allowedit = true) {

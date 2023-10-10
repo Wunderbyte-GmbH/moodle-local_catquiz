@@ -62,7 +62,7 @@ class model_person_param_list implements ArrayAccess, IteratorAggregate, Countab
      * If none are found, it returns an empty list.
      *
      * @param int $contextid
-     * @param int $catscaleid
+     * @param array $catscaleid
      * @return self
      * @throws dml_exception
      */

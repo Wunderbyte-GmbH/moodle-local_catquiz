@@ -58,14 +58,15 @@ class datacard implements renderable {
      */
     private string $component = "";
 
-
     /**
+     * Constructor.
+     *
      * @param int $testitemid
      * @param int $contextid
      * @param int $catscaleid
      * @param string $component
-     * @param ?object $record
-     * @return void
+     * @param object|null $record
+     *
      */
     public function __construct(
         int $testitemid,
@@ -86,6 +87,12 @@ class datacard implements renderable {
         }
     }
 
+    /**
+     * Gets record.
+     *
+     * @return mixed
+     *
+     */
     private function getrecord() {
         global $DB;
         // If no context is set, get default context from DB.

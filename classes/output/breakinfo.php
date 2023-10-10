@@ -29,8 +29,26 @@ use renderable;
  */
 class breakinfo implements renderable, templatable {
 
+    /**
+     * Cmid
+     *
+     * @var int $cmid
+     */
     public int $cmid;
+
+    /**
+     *
+     * @var int $breakend
+     */
     public int $breakend;
+
+    /**
+     * Constructor.
+     *
+     * @param int $cmid
+     * @param int $breakend
+     *
+     */
     public function __construct(int $cmid, int $breakend) {
         $this->cmid = $cmid;
         $this->breakend = $breakend;

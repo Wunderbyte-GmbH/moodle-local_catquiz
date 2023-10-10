@@ -28,10 +28,14 @@ use local_catquiz\catscale;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class scaleandcontexselector {
+
     /**
      * Renders the context selector.
-     * @param int $usesubs
-     * @return string
+     *
+     * @param int $catcontextid
+     *
+     * @return mixed
+     *
      */
     public static function render_contextselector(int $catcontextid) {
         $ajaxformdata = empty($catcontextid) ? [] : ['contextid' => $catcontextid];
@@ -52,8 +56,11 @@ class scaleandcontexselector {
 
     /**
      * Renders the scale selector.
-     * @param int $usesubs
-     * @return string
+     *
+     * @param int $scale
+     *
+     * @return mixed
+     *
      */
     public static function render_scaleselectors(int $scale) {
         $selectors = self::render_selector($scale);

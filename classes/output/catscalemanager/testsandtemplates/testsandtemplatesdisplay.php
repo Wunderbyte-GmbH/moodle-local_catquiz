@@ -50,11 +50,12 @@ class testsandtemplatesdisplay {
      */
     private string $componentname = 'question'; // Componentname of the testitem.
 
-
     /**
      * Constructor.
      *
      * @param int $catscaleid
+     * @param int $usesubs
+     * @param string $componentname
      *
      */
     public function __construct(int $catscaleid = 0, int $usesubs = 1, string $componentname = 'question') {
@@ -63,7 +64,12 @@ class testsandtemplatesdisplay {
         $this->componentname = $componentname;
     }
 
-
+    /**
+     * Renders table.
+     *
+     * @return mixed
+     *
+     */
     private function render_table() {
 
         $testenvironmentdashboard = new testenvironmentdashboard();

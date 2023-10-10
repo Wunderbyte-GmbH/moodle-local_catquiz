@@ -34,6 +34,13 @@ require_once($CFG->dirroot . '/question/engine/lib.php');
 use local_catquiz\catquiz;
 use local_wunderbyte_table\wunderbyte_table;
 
+/**
+ * Event log table class.
+ *
+ * @package local_catquiz
+ * @copyright 2023 Wunderbyte GmbH
+ * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
 class event_log_table extends wunderbyte_table {
 
     /**
