@@ -53,8 +53,13 @@ final class strategyfastestscore extends preselect_task implements wb_middleware
                 * $question->fisherinformation;
         }
 
+        // In order to have predictable results, in case the values of two
+        // elements are exactly the same, sort by question ID.
         uasort($context['questions'], function($q1, $q2) {
-            return $q2->score <=> $q1->score;
+            if (! ($q2->score === $q1->score)) {
+                return $q2->score <=> $q1->score;
+            }
+            return $q2->id <=> $q1->id;
         });
 
         return result::ok(reset($context['questions']));
