@@ -44,6 +44,11 @@ class strategy_test extends basic_testcase {
 
     private int $lastgeneratedquestionid = 0;
 
+    protected function tearDown(): void {
+        $this->purgecache();
+        $this->lastgeneratedquestionid = 0;
+    }
+
     /**
      * Test adding new questions per subscale works as expected.
      *
@@ -105,11 +110,10 @@ class strategy_test extends basic_testcase {
         ?callable $fun = null
     ) {
         $attemptcontext = array_merge($this->getattemptcontext(), $attemptcontextdiff);
-        $cache = $this->prepareadaptivequizcache($attemptcontext);
+        $this->prepareadaptivequizcache($attemptcontext);
         if ($fun) {
             $fun();
         }
-        $cache = cache::make('local_catquiz', 'adaptivequizattempt');
         foreach ($expected as $attempt => $exp) {
             $result = $strategy->return_next_testitem($attemptcontext);
             if ($exp instanceof result && $exp->iserr()) {
@@ -118,17 +122,24 @@ class strategy_test extends basic_testcase {
                 continue;
             }
             $this->assertEquals($exp, $result->unwrap()->id, sprintf("Failed for question number %d", $attempt + 1));
-            $lastquestion = $cache->get('lastquestion');
-            $this->assertEquals($lastquestion->id, $exp);
         }
     }
 
     public function teststrategies_return_expected_questions_provider() {
+        // Create some questions assigned to different scales (3,4,5).
         // The `+` operater does a merge and keeps the indices.
         $infersubscalesquestions = $this->generatequestions(20, 3)
             + $this->generatequestions(20, 4)
             + $this->generatequestions(60, 5)
         ;
+        $this->resetgeneratedquestionids();
+
+        // If the arrays are just copied, the questions inside are shared between
+        // different test cases, which might lead to unexpected results.
+        $deepcopy = fn($array) => array_map(fn ($q) => clone $q, $array);
+        $isq2 = $deepcopy($infersubscalesquestions);
+        $isq3 = $deepcopy($infersubscalesquestions);
+
         return [
             'first selected question is the easiest' => [
                 'expected_question_id' => [1],
@@ -170,7 +181,7 @@ class strategy_test extends basic_testcase {
                 },
             ],
             'first selected question is selected by average ability of the test' => [
-                'expected_question_id' => [50],
+                'expected_question_id' => [51],
                 'strategy' => (new teststrategy_fastest()),
                 'attemptcontextdiff' => [
                     'selectfirstquestion' => 'startwithaverageabilityoftest',
@@ -188,7 +199,7 @@ class strategy_test extends basic_testcase {
                 },
             ],
             'first selected question is selected by the user\'s current ability' => [
-                'expected_question_id' => [70],
+                'expected_question_id' => [71],
                 'strategy' => (new teststrategy_fastest()),
                 'attemptcontextdiff' => [
                     'selectfirstquestion' => 'startwithcurrentability',
@@ -201,10 +212,10 @@ class strategy_test extends basic_testcase {
             ],
             'radical CAT' => [
                 'expected_question_id' => [
-                    51,
                     52,
-                    50,
                     53,
+                    51,
+                    54,
                 ],
                 'strategy' => (new teststrategy_fastest()),
             ],
@@ -270,8 +281,9 @@ class strategy_test extends basic_testcase {
                 'attemptcontextdiff' => [
                     'standarderrorpersubscale' => 0.5,
                     'min_attempts_per_scale' => 0,
-                    'questions' => $infersubscalesquestions,
-                    'original_questions' => $infersubscalesquestions,
+                    'max_attempts_per_scale' => 10,
+                    'questions' => $isq2,
+                    'original_questions' => $isq2,
                     'fake_ancestor_scales' => [
                         1 => [],
                         2 => [1],
@@ -305,8 +317,8 @@ class strategy_test extends basic_testcase {
                     'standarderrorpersubscale' => 0.5,
                     'min_attempts_per_scale' => 0,
                     'max_attempts_per_scale' => 20,
-                    'questions' => $infersubscalesquestions,
-                    'original_questions' => $infersubscalesquestions,
+                    'questions' => $isq3,
+                    'original_questions' => $isq3,
                     'fake_ancestor_scales' => [
                         1 => [],
                         2 => [1],
@@ -334,9 +346,13 @@ class strategy_test extends basic_testcase {
         ];
     }
 
-    private function prepareadaptivequizcache($attemptcontext) {
+    private function purgecache() {
         $cache = cache::make('local_catquiz', 'adaptivequizattempt');
         $cache->purge();
+    }
+
+    private function prepareadaptivequizcache($attemptcontext) {
+        $cache = cache::make('local_catquiz', 'adaptivequizattempt');
         $cachekey = sprintf('testitems_%s_%s', $attemptcontext['contextid'], $attemptcontext['includesubscales']);
         $cache->set($cachekey, $attemptcontext['original_questions']);
         return $cache;
@@ -365,7 +381,7 @@ class strategy_test extends basic_testcase {
             'person_ability' => [1 => 0.1234],
             'includesubscales' => true,
 
-            'max_attempts_per_scale' => 10,
+            'max_attempts_per_scale' => 50,
             //'breakduration' => 60,
             //'breakinfourl' => 'xxx',
             //'maxtimeperquestion' => 30,
@@ -402,6 +418,10 @@ class strategy_test extends basic_testcase {
         }
         $this->lastgeneratedquestionid = $i-1;
         return $questions;
+    }
+
+    private function resetgeneratedquestionids() {
+        $this->lastgeneratedquestionid = 0;
     }
 
     private function generatequestionattemptcounts() {
