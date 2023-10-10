@@ -260,8 +260,7 @@ class strategy_test extends basic_testcase {
                 'strategy' => (new inferallsubscales()),
                 'attemptcontextdiff' => [
                     'standarderrorpersubscale' => 0.5,
-                    'min_attempts_per_scale' => 3,
-                    'max_attempts_per_scale' => 3,
+                    'min_attempts_per_scale' => 1,
                     'questions' => $infersubscalesquestions,
                     'original_questions' => $infersubscalesquestions,
                     'fake_ancestor_scales' => [
