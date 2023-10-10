@@ -126,13 +126,13 @@ class strategy_test extends basic_testcase {
         strategy $strategy,
         array $attemptcontextdiff = [],
         ?callable $fun = null
-        ) {
-            $attemptcontext = array_merge($this->getattemptcontext(), $attemptcontextdiff);
-            $cache = $this->prepareadaptivequizcache($attemptcontext);
+    ) {
+        $attemptcontext = array_merge($this->getattemptcontext(), $attemptcontextdiff);
+        $cache = $this->prepareadaptivequizcache($attemptcontext);
         if ($fun) {
             $fun();
         }
-            $cache = cache::make('local_catquiz', 'adaptivequizattempt');
+        $cache = cache::make('local_catquiz', 'adaptivequizattempt');
         foreach ($expected as $attempt => $exp) {
             $result = $strategy->return_next_testitem($attemptcontext);
             $this->assertEquals($exp, $result->unwrap()->id, sprintf("Failed for question number %d", $attempt + 1));
