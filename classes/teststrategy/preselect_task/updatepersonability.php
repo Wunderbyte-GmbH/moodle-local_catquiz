@@ -55,11 +55,6 @@ class updatepersonability extends preselect_task implements wb_middleware {
      */
     const UPDATE_THRESHOLD = 0.05;
 
-    /**
-     *
-     * @var mixed $context
-     */
-    public $context;
 
     /**
      *
@@ -90,7 +85,6 @@ class updatepersonability extends preselect_task implements wb_middleware {
      */
     public function run(array &$context, callable $next): result {
         global $CFG, $USER;
-        $this->context = $context;
         $this->lastquestion = $context['lastquestion'];
         // If we do not know the answer to the last question, we do not have to
         // update the person ability. Also, pilot questions should not be used

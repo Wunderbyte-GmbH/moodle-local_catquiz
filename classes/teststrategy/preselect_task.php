@@ -45,6 +45,8 @@ use local_catquiz\wb_middleware;
  */
 abstract class preselect_task implements wb_middleware {
 
+    protected array $context;
+
     /**
      * Rrocess test strategy
      *
@@ -62,6 +64,7 @@ abstract class preselect_task implements wb_middleware {
         }
 
         $context['lastmiddleware'] = str_replace(__NAMESPACE__ . '\\preselect_task\\', '', get_class($this));
+        $this->context = $context;
         return $this->run($context, $next);
     }
 
