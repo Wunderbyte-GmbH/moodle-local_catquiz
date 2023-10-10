@@ -52,8 +52,8 @@ final class removeplayedquestions extends preselect_task implements wb_middlewar
         if (! $playedquestions) {
             return $next($context);
         }
-        foreach (array_keys($context['questions']) as $qid) {
-            if (array_key_exists($qid, $playedquestions)) {
+        foreach (array_keys($playedquestions) as $qid) {
+            if (array_key_exists($qid, $context['questions'])) {
                 unset($context['questions'][$qid]);
             }
         }
