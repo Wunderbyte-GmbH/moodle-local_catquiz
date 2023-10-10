@@ -31,6 +31,8 @@ use local_catquiz\teststrategy\preselect_task;
 use local_catquiz\wb_middleware;
 
 /**
+ * Filterforsubscale.
+ *
  * Keep only questions that belong to the subscale that has the largest negative
  * difference in person ability to its direct parent scale.
  *
@@ -114,12 +116,29 @@ class filterforsubscale extends preselect_task implements wb_middleware {
         ];
     }
 
+    /**
+     * Get subscaleids.
+     *
+     * @param mixed $catscaleid
+     * @param mixed $context
+     *
+     * @return mixed
+     *
+     */
     protected function getsubscaleids($catscaleid, $context) {
         return array_keys(
             catscale::get_next_level_subscales_ids_from_parent([$catscaleid])
         );
     }
 
+    /**
+     * Get default abilities.
+     *
+     * @param mixed $abilities
+     *
+     * @return mixed
+     *
+     */
     private function get_default_abilities($abilities) {
         return array_filter(
             $abilities,

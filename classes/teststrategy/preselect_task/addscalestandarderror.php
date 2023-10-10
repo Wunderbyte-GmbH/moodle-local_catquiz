@@ -40,6 +40,15 @@ use local_catquiz\wb_middleware;
  */
 final class addscalestandarderror extends preselect_task implements wb_middleware {
 
+    /**
+     * Run method.
+     *
+     * @param array $context
+     * @param callable $next
+     *
+     * @return result
+     *
+     */
     public function run(array &$context, callable $next): result {
         if (count($context['questions']) === 0) {
                 return result::err(status::ERROR_NO_REMAINING_QUESTIONS);

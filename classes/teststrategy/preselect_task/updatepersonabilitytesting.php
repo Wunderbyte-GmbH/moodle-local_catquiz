@@ -19,7 +19,7 @@
  *
  * This class overrides methods that access the DB or caches but leaves everything else as is.
  *
- * @package    catquiz
+ * @package    local_catquiz
  * @author David Szkiba <david.szkiba@wunderbyte.at>
  * @copyright  2023 Georg Maißer <info@wunderbyte.at>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
@@ -30,8 +30,23 @@ namespace local_catquiz\teststrategy\preselect_task;
 use local_catquiz\local\model\model_responses;
 use local_catquiz\teststrategy\preselect_task\updatepersonability;
 
+/**
+ * Update person ability testing.
+ *
+ * @package local_catquiz
+ * @copyright 2023 Wunderbyte GmbH
+ * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
 class updatepersonabilitytesting extends updatepersonability {
 
+    /**
+     * Load responses.
+     *
+     * @param mixed $context
+     *
+     * @return mixed
+     *
+     */
     protected function load_responses($context) {
         $responses = new model_responses();
         $responses = $responses->setdata(
@@ -40,14 +55,38 @@ class updatepersonabilitytesting extends updatepersonability {
         return $responses;
     }
 
+    /**
+     * Load cached responses.
+     *
+     * @return mixed
+     *
+     */
     protected function load_cached_responses() {
         return [];
     }
 
+    /**
+     * Update cached responses.
+     *
+     * @param mixed $context
+     *
+     * @return mixed
+     *
+     */
     protected function update_cached_responses($context) {
         return (new model_responses())->setdata($context['fake_response_data']);
     }
 
+    /**
+     * Update person param.
+     *
+     * @param mixed $a
+     * @param mixed $b
+     * @param mixed $c
+     *
+     * @return mixed
+     *
+     */
     protected function update_person_param($a, $b, $c) {
     }
 }

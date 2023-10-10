@@ -55,10 +55,28 @@ class updatepersonability extends preselect_task implements wb_middleware {
      */
     const UPDATE_THRESHOLD = 0.05;
 
+    /**
+     *
+     * @var mixed $context
+     */
     public $context;
+
+    /**
+     *
+     * @var mixed $userresponses
+     */
     public $userresponses;
+
+    /**
+     *
+     * @var mixed $arrayresponses
+     */
     public $arrayresponses;
 
+    /**
+     *
+     * @var mixed $lastquestion
+     */
     public $lastquestion;
 
     /**
@@ -105,6 +123,16 @@ class updatepersonability extends preselect_task implements wb_middleware {
         return $next($context);
     }
 
+    /**
+     * Update ability.
+     *
+     * @param array $context
+     * @param int $catscaleid
+     * @param bool $isancestor
+     *
+     * @return mixed
+     *
+     */
     private function updateability(array $context, int $catscaleid, $isancestor = false) {
         global $CFG;
         $itemparamlist = $this->get_item_param_list(
@@ -188,8 +216,8 @@ class updatepersonability extends preselect_task implements wb_middleware {
      * Note: Even if this function returns true, we still have to check on a
      * per-scale basis if we have enough answers in that scale.
      *
-     * @param mixed $userresponses
-     * @return bool
+     * @param array $arrayresponses
+     * @return mixed
      */
     private function has_sufficient_responses($arrayresponses = []) {
         if (! $arrayresponses) {
@@ -204,6 +232,14 @@ class updatepersonability extends preselect_task implements wb_middleware {
         return false;
     }
 
+    /**
+     * Update cached responses.
+     *
+     * @param mixed $context
+     *
+     * @return mixed
+     *
+     */
     protected function update_cached_responses($context) {
         global $CFG;
         $cache = cache::make('local_catquiz', 'adaptivequizattempt');
@@ -227,6 +263,16 @@ class updatepersonability extends preselect_task implements wb_middleware {
         return $userresponses;
     }
 
+    /**
+     * Get item param list.
+     *
+     * @param mixed $responses
+     * @param mixed $contextid
+     * @param mixed $catscaleid
+     *
+     * @return mixed
+     *
+     */
     protected function get_item_param_list($responses, $contextid, $catscaleid) {
         // We will update the person ability. Select the correct model for each item.
         $modelstrategy = new model_strategy($responses);
@@ -247,10 +293,29 @@ class updatepersonability extends preselect_task implements wb_middleware {
         return $itemparamlist;
     }
 
+    /**
+     * Get updated ability.
+     *
+     * @param mixed $userresponses
+     * @param mixed $itemparamlist
+     *
+     * @return mixed
+     *
+     */
     protected function get_updated_ability($userresponses, $itemparamlist) {
         return catcalc::estimate_person_ability($userresponses, $itemparamlist);
     }
 
+    /**
+     * Update person param.
+     *
+     * @param mixed $context
+     * @param mixed $catscaleid
+     * @param mixed $updatedability
+     *
+     * @return mixed
+     *
+     */
     protected function update_person_param($context, $catscaleid, $updatedability) {
         catquiz::update_person_param(
             $context['userid'],
@@ -265,6 +330,11 @@ class updatepersonability extends preselect_task implements wb_middleware {
      *
      * By storing this information in the cache, we can remember excluded
      * subscales for the whole quiz attempt.
+     *
+     * @param mixed $catscaleid
+     *
+     * @return mixed
+     *
      */
     protected function mark_subscale_as_removed($catscaleid) {
         $cache = cache::make('local_catquiz', 'adaptivequizattempt');
@@ -283,7 +353,10 @@ class updatepersonability extends preselect_task implements wb_middleware {
      * For incorrect answers, the change will update the ability towards the
      * minimum value.
      *
-     * @return float
+     * @param mixed $catscaleid
+     *
+     * @return mixed
+     *
      */
     public function fallback_ability_update($catscaleid) {
         $fraction = $this->userresponses->get_last_response($this->context['userid'])['fraction'];

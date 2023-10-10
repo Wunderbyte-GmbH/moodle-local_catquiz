@@ -508,6 +508,16 @@ class catquiz_handler {
         $cache->set('starttime', time());
     }
 
+    /**
+     * Attempt feedback.
+     *
+     * @param stdClass $adaptivequiz
+     * @param cm_info $cm
+     * @param stdClass $attemptrecord
+     *
+     * @return string
+     *
+     */
     public static function attemptfeedback(
         stdClass $adaptivequiz,
         cm_info $cm,
