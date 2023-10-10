@@ -53,6 +53,7 @@ class testitemimporter {
         );
 
         $parser = new fileparser($settings);
+
         return $parser->process_csv_data($content);
     }
 
@@ -73,7 +74,7 @@ class testitemimporter {
     /**
      * Configure and return settings object.
      *
-     * @return stdClass
+     * @return csvsettings
      */
     private static function define_settings(
         array $definedcolumns,
