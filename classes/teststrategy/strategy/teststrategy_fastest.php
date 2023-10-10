@@ -27,7 +27,6 @@ namespace local_catquiz\teststrategy\strategy;
 use local_catquiz\teststrategy\feedbackgenerator\debuginfo;
 use local_catquiz\teststrategy\feedbackgenerator\personabilities;
 use local_catquiz\teststrategy\feedbackgenerator\questionssummary;
-use local_catquiz\teststrategy\preselect_task\checkbreak;
 use local_catquiz\teststrategy\preselect_task\firstquestionselector;
 use local_catquiz\teststrategy\preselect_task\fisherinformation;
 use local_catquiz\teststrategy\preselect_task\lasttimeplayedpenalty;
@@ -65,7 +64,6 @@ class teststrategy_fastest extends strategy {
     public function get_preselecttasks(): array {
         return [
             maximumquestionscheck::class,
-            checkbreak::class, // Maybe force user to take a break.
             remove_uncalculated::class,
             noremainingquestions::class,
             mayberemovescale::class,

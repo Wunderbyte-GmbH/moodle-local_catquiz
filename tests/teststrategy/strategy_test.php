@@ -236,9 +236,9 @@ class strategy_test extends basic_testcase {
             'includesubscales' => true,
 
             'max_attempts_per_scale' => 10,
-            'breakduration' => 60,
-            'breakinfourl' => 'xxx',
-            'maxtimeperquestion' => 30,
+            //'breakduration' => 60,
+            //'breakinfourl' => 'xxx',
+            //'maxtimeperquestion' => 30,
             'fake_personparams_for_test' => [],
         ];
     }
