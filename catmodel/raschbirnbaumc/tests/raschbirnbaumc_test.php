@@ -175,7 +175,7 @@ class raschbirnbaumc_test extends TestCase {
      * Provider function for least_mean_squares_1st_derivative_ip
      * @return array
      */
-    public function least_mean_squares_1st_derivative_ip_provider() {
+    public static function least_mean_squares_1st_derivative_ip_provider() {
         return [
             "testcase1" => [
                 'n' => 5,
@@ -294,7 +294,7 @@ class raschbirnbaumc_test extends TestCase {
      * Provider function for least_mean_squares_1st_derivative_ip
      * @return array
      */
-    public function least_mean_squares_2nd_derivative_ip_provider() {
+    public static function least_mean_squares_2nd_derivative_ip_provider() {
         return [
             "testcase1" => [
                 'n' => 5,
@@ -453,7 +453,7 @@ class raschbirnbaumc_test extends TestCase {
      * Provider function for log_likelihood_p
      * @return array
      */
-    public function log_likelihood_p_provider() {
+    public static function log_likelihood_p_provider() {
         return [
             "testcase1" => [
                 'pp' => ['ability' => -3],
@@ -562,7 +562,7 @@ class raschbirnbaumc_test extends TestCase {
      * Provider function log_likelihood_p_p_provider
      * @return array
      */
-    public function log_likelihood_p_p_provider() {
+    public static function log_likelihood_p_p_provider() {
         return [
             "testcase1" => [
                 'pp' => ['ability' => -3],
@@ -669,9 +669,9 @@ class raschbirnbaumc_test extends TestCase {
 
     /**
      * Return Data for log jacobian test
-     * @return (int|float[]|float)[][]
+     * @return array
      */
-    public function get_log_jacobian_provider() {
+    public static function get_log_jacobian_provider() {
         return [
             "testcase 1" => [
                 'pp' => ['ability' => -3],
@@ -780,9 +780,9 @@ class raschbirnbaumc_test extends TestCase {
 
      /**
       * Return Data for log hessian test
-      * @return (int|float[]|float)[][]
+      * @return array
       */
-    public function get_log_hessian_provider() {
+    public static function get_log_hessian_provider() {
 
         return [
             "testcase 1" => [
@@ -928,6 +928,13 @@ class raschbirnbaumc_test extends TestCase {
             ],
         ];
     }
+
+    /**
+     * Get model.
+     *
+     * @return raschbirnbaumc
+     *
+     */
     private function getmodel(): raschbirnbaumc {
         $mr = new model_responses();
         return new raschbirnbaumc($mr, 'raschbirnbaumc');

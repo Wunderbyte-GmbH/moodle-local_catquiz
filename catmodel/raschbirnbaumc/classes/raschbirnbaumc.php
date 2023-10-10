@@ -551,18 +551,23 @@ class raschbirnbaumc extends model_raschmodel {
         // Slope of the discriminatory parameter.
         $bs = floatval(get_config('catmodel_raschbirnbaumc', 'trusted_region_slope_b'));
 
-        return [[
-            -1 / ($as ** 2), // Calculate d²/da².
-            0, // Calculate d/da d/db.
-            0, // Calculate d/da d/dc.
-        ], [
-            0, // The d/da d/db.
-            -($bs ** 2 * exp($bs * ($bp + $ip['discrimination']))) / (exp($bs * $bp) + exp($bs * $ip['discrimination'])) ** 2, // d²/db²
-            0, // Calculate d/db d/dc.
-        ], [
-            0, // Calculate d/da d/dc.
-            0, // Calculate d/db d/dc.
-            0, // Calculate d²/dc².
-        ]];
+        return [
+            [
+                -1 / ($as ** 2), // Calculate d²/da².
+                0, // Calculate d/da d/db.
+                0, // Calculate d/da d/dc.
+            ],
+            [
+                0, // The d/da d/db.
+                -($bs ** 2 * exp($bs * ($bp + $ip['discrimination']))) /
+                    (exp($bs * $bp) + exp($bs * $ip['discrimination'])) ** 2, // Calculate d²/db².
+                0, // Calculate d/db d/dc.
+            ],
+            [
+                0, // Calculate d/da d/dc.
+                0, // Calculate d/db d/dc.
+                0, // Calculate d²/dc².
+            ]
+        ];
     }
 }

@@ -176,7 +176,7 @@ class raschbirnbaumb_test extends TestCase {
      * Provider function for least_mean_squares_1st_derivative_ip
      * @return array
      */
-    public function least_mean_squares_1st_derivative_ip_provider() {
+    public static function least_mean_squares_1st_derivative_ip_provider() {
         return [
             "testcase1" => [
                 'n' => 5,
@@ -285,7 +285,7 @@ class raschbirnbaumb_test extends TestCase {
      * Provider function for least_mean_squares_1st_derivative_ip
      * @return array
      */
-    public function least_mean_squares_2nd_derivative_ip_provider() {
+    public static function least_mean_squares_2nd_derivative_ip_provider() {
         return [
             "testcase1" => [
                 'n' => 5,
@@ -313,7 +313,7 @@ class raschbirnbaumb_test extends TestCase {
                     [1.4282013, 0.09065545],
                 ],
             ],
-            "testcase1" => [
+            "testcase3" => [
                 'n' => 5,
                 'pp' => ['ability' => -3],
                 'k' => 0.3,
@@ -326,7 +326,7 @@ class raschbirnbaumb_test extends TestCase {
                     [-0.05246115, 0.15892019],
                 ],
             ],
-            "testcase2" => [
+            "testcase4" => [
                 'n' => 5,
                 'pp' => ['ability' => -3],
                 'k' => 0.95,
@@ -339,7 +339,7 @@ class raschbirnbaumb_test extends TestCase {
                     [1.4282013, 0.09065545],
                 ],
             ],
-            "testcase3" => [
+            "testcase5" => [
                 'n' => 27,
                 'pp' => ['ability' => -2],
                 'k' => 0.3,
@@ -352,7 +352,7 @@ class raschbirnbaumb_test extends TestCase {
                     [-4.549095, -0.00686825],
                 ],
             ],
-            "testcase4" => [
+            "testcase6" => [
                 'n' => 27,
                 'pp' => ['ability' => -2],
                 'k' => 0.95,
@@ -365,7 +365,7 @@ class raschbirnbaumb_test extends TestCase {
                     [-0.8371231, 0.7904085],
                 ],
             ],
-            "testcase5" => [
+            "testcase7" => [
                 'n' => 3,
                 'pp' => ['ability' => 0.5],
                 'k' => 0.3,
@@ -378,7 +378,7 @@ class raschbirnbaumb_test extends TestCase {
                     [-0.30000, 1.833426e-13],
                 ],
             ],
-            "testcase6" => [
+            "testcase8" => [
                 'n' => 3,
                 'pp' => ['ability' => 0.5],
                 'k' => 0.95,
@@ -391,7 +391,7 @@ class raschbirnbaumb_test extends TestCase {
                     [0.67500, -1.833426e-12],
                 ],
             ],
-            "testcase7" => [
+            "testcase9" => [
                 'n' => 1,
                 'pp' => ['ability' => 1.5],
                 'k' => 0.3,
@@ -404,7 +404,7 @@ class raschbirnbaumb_test extends TestCase {
                     [0.03581423, -0.05629065],
                 ],
             ],
-            "testcase8" => [
+            "testcase10" => [
                 'n' => 1,
                 'pp' => ['ability' => 1.5],
                 'k' => 0.95,
@@ -417,7 +417,7 @@ class raschbirnbaumb_test extends TestCase {
                     [0.001822762, -0.002998223],
                 ],
             ],
-            "testcase9" => [
+            "testcase11" => [
                 'n' => 100,
                 'pp' => ['ability' => 3.5],
                 'k' => 0.3,
@@ -430,7 +430,7 @@ class raschbirnbaumb_test extends TestCase {
                     [8.890088, -19.715082],
                 ],
             ],
-            "testcase10" => [
+            "testcase12" => [
                 'n' => 100,
                 'pp' => ['ability' => 3.5],
                 'k' => 0.95,
@@ -450,7 +450,7 @@ class raschbirnbaumb_test extends TestCase {
      * Provider function for log_likelihood_p
      * @return array
      */
-    public function log_likelihood_p_provider() {
+    public static function log_likelihood_p_provider() {
         return [
             "testcase1" => [
                 'pp' => ['ability' => -3],
@@ -559,7 +559,7 @@ class raschbirnbaumb_test extends TestCase {
      * Provider function log_likelihood_p_p_provider
      * @return array
      */
-    public function log_likelihood_p_p_provider() {
+    public static function log_likelihood_p_p_provider() {
         return [
             "testcase1" => [
                 'pp' => ['ability' => -3],
@@ -667,9 +667,9 @@ class raschbirnbaumb_test extends TestCase {
 
     /**
      * Return Data for log jacobian test
-     * @return (int|float[]|float)[][]
+     * @return array
      */
-    public function get_log_jacobian_provider() {
+    public static function get_log_jacobian_provider() {
         return [
             // Test case 1.
             "testcase 1" => [
@@ -776,9 +776,9 @@ class raschbirnbaumb_test extends TestCase {
 
      /**
       * Return Data for log hessian test
-      * @return (int|float[]|float)[][]
+      * @return array
       */
-    public function get_log_hessian_provider() {
+    public static function get_log_hessian_provider() {
 
         return [
             // Test case 1.
@@ -914,6 +914,13 @@ class raschbirnbaumb_test extends TestCase {
             ],
         ];
     }
+
+    /**
+     * Get model.
+     *
+     * @return raschbirnbaumb
+     *
+     */
     private function getmodel(): raschbirnbaumb {
         $mr = new model_responses();
         return new raschbirnbaumb($mr, 'raschbirnbaumb');

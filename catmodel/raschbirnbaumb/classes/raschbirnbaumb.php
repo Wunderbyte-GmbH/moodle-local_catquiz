@@ -290,9 +290,15 @@ class raschbirnbaumb extends model_raschmodel {
         $expab = exp($a * $b);
         $expbp = exp($b * $pp);
 
-        $derivative[0][0]  = $n * (2 * $b ** 2 * $expbap1 * (-$expbp ** 2 + 2 * $expbap1 + (-$expab ** 2 + $expbp ** 2) * $frac)) / ($expab + $expbp) ** 4; // Calculate d²2/da².
-        $derivative[0][1]  = $n * (2 * $expbap0 * ((1 + $a * $b - $b * $pp) * ($frac - 1) - $expbap0 ** 2 * ($b * ($a - $pp) - 1) * $frac + $expbap0 * (2 * $a * $b - 2 * $b * $pp + 2 * $frac - 1))) / (1 + $expbap0) ** 4; // Calculate d/da d/db.
-        $derivative[1][1]  = $n * (2 * $expbap1 * ($a - $pp) ** 2 * (2 * $expbap1 + (-$expab ** 2 + $expbp ** 2) * $frac - $expbp ** 2)) / ($expab + $expbp) ** 4; // Calculate d²/db².
+        // Calculate d²2/da².
+        $derivative[0][0]  = $n * (2 * $b ** 2 * $expbap1 * (-$expbp ** 2 + 2 * $expbap1 + (-$expab ** 2 + $expbp ** 2) * $frac))
+            / ($expab + $expbp) ** 4;
+        // Calculate d/da d/db.
+        $derivative[0][1]  = $n * (2 * $expbap0 * ((1 + $a * $b - $b * $pp) * ($frac - 1) - $expbap0 ** 2 * ($b * ($a - $pp) - 1)
+            * $frac + $expbap0 * (2 * $a * $b - 2 * $b * $pp + 2 * $frac - 1))) / (1 + $expbap0) ** 4;
+        // Calculate d²/db².
+        $derivative[1][1]  = $n * (2 * $expbap1 * ($a - $pp) ** 2 * (2 * $expbap1 + (-$expab ** 2 + $expbp ** 2)
+            * $frac - $expbp ** 2)) / ($expab + $expbp) ** 4;
 
         // Note: Partial derivations are exchangeable, cf. Theorem of Schwarz.
         $derivative[1][0] = $derivative[0][1];
@@ -463,7 +469,7 @@ class raschbirnbaumb extends model_raschmodel {
     public static function get_log_tr_hessian(array $ip):array {
         // Set values for difficulty parameter.
 
-        // TODO: @DAVID: Diese Werte sollten dynamisch berechnet werden können
+        // TODO: @DAVID: Diese Werte sollten dynamisch berechnet werden können.
         $am = 0; // Mean of difficulty.
         $as = 2; // Standard derivation of difficulty.
 
@@ -472,12 +478,16 @@ class raschbirnbaumb extends model_raschmodel {
         // Slope of the discriminatory parameter.
         $bs = floatval(get_config('catmodel_raschbirnbaumb', 'trusted_region_slope_b'));
 
-        return [[
-        -1 / ($as ** 2), // Calculates d²/da².
-        0, // Calculates d/da d/db.
-        ], [
-        0, // Calculates d/da d/db.
-        -($bs ** 2 * exp($bs * ($bp + $ip['discrimination']))) / (exp($bs * $bp) + exp($bs * $ip['discrimination'])) ** 2, // Calculates d²/db².
-        ]];
+        return [
+            [
+                -1 / ($as ** 2), // Calculates d²/da².
+                0, // Calculates d/da d/db.
+            ],
+            [
+                0, // Calculates d/da d/db.
+                -($bs ** 2 * exp($bs * ($bp + $ip['discrimination']))) /
+                    (exp($bs * $bp) + exp($bs * $ip['discrimination'])) ** 2, // Calculates d²/db².
+            ]
+        ];
     }
 }
