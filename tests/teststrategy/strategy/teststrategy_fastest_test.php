@@ -78,7 +78,7 @@ class teststrategy_fastest_test extends advanced_testcase {
     /**
      * Test it can run
      *
-     * @dataProvider radical_CAT_provider
+     * @dataProvider radical_cat_provider
      * @return void
      * @throws InvalidArgumentException
      * @throws ExpectationFailedException
@@ -101,7 +101,7 @@ class teststrategy_fastest_test extends advanced_testcase {
      *
      * @return array
      */
-    public function radical_cat_provider() {
+    public static function radical_cat_provider():array {
         $question1 = (object) [
             'id' => 1,
             'model' => 'raschbirnbauma',

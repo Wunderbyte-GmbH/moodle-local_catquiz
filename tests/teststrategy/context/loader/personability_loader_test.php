@@ -29,6 +29,10 @@ use PHPUnit\Framework\ExpectationFailedException;
 use PHPUnit\Framework\TestCase;
 use SebastianBergmann\RecursionContext\InvalidArgumentException;
 
+/**
+ * @package local_catquiz
+ * @covers \local_catquiz\teststrategy\strategy\personability_loader
+ */
 class personability_loader_test extends TestCase {
 
     /**

@@ -17,7 +17,7 @@
 /**
  * Tests the updatepersonability class
  *
- * @package    catquiz
+ * @package    local_catquiz
  * @author David Szkiba <david.szkiba@wunderbyte.at>
  * @copyright  2023 Georg Maißer <info@wunderbyte.at>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
@@ -31,6 +31,10 @@ use PHPUnit\Framework\ExpectationFailedException;
 use PHPUnit\Framework\TestCase;
 use SebastianBergmann\RecursionContext\InvalidArgumentException;
 
+/**
+ * @package local_catquiz
+ * @covers \local_catquiz\teststrategy\preselect_task\updatepersonability
+ */
 class updatepersonability_test extends TestCase {
 
     /**
@@ -51,7 +55,7 @@ class updatepersonability_test extends TestCase {
         $this->assertEquals($expected, $result->unwrap()['skip_reason']);
     }
 
-    public function skippedprovider() {
+    public static function skippedprovider():array {
         return [
             'last_question_is_null' => [
                 'expected' => 'lastquestionnull',

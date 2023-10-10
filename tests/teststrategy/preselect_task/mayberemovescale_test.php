@@ -78,8 +78,8 @@ class mayberemovescale_test extends basic_testcase {
         // Create the played questions array.
         // This shows the questions per scale.
         $played = [
-            1 => [1, 2, 3, 4, ],
-            2 => [5, ],
+            1 => [1, 2, 3, 4],
+            2 => [5],
         ];
 
         // Create the minimal context required by the mayberemovescale middleware.

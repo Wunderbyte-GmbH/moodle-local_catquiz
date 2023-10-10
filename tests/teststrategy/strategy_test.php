@@ -54,7 +54,13 @@ class strategy_test extends basic_testcase {
         $this->assertEquals($expected, $result);
     }
 
-    public function update_played_questions_per_scale_works_provider() {
+    /**
+     * Data Provider update_played_questions_per_scale_works_provider.
+     *
+     * @return array
+     *
+     */
+    public static function update_played_questions_per_scale_works_provider():array {
         $question1 = (object)[
             'id' => 1,
             'catscaleid' => 1,
@@ -114,7 +120,13 @@ class strategy_test extends basic_testcase {
         }
     }
 
-    public function teststrategies_return_expected_questions_provider() {
+    /**
+     * Data Provider teststrategies_return_expected_questions_provider.
+     *
+     * @return array
+     *
+     */
+    public static function teststrategies_return_expected_questions_provider():array {
         return [
             'first selected question is the easiest' =>
             [
@@ -204,6 +216,14 @@ class strategy_test extends basic_testcase {
         ];
     }
 
+    /**
+     * Prepare adaptive quizcache.
+     *
+     * @param mixed $attemptcontext
+     *
+     * @return mixed
+     *
+     */
     private function prepareadaptivequizcache($attemptcontext) {
         $cache = cache::make('local_catquiz', 'adaptivequizattempt');
         $cache->purge();
@@ -212,6 +232,12 @@ class strategy_test extends basic_testcase {
         return $cache;
     }
 
+    /**
+     * Get attempt context.
+     *
+     * @return mixed
+     *
+     */
     private function getattemptcontext() {
         $questions = $this->generatequestions();
         return [
@@ -245,6 +271,16 @@ class strategy_test extends basic_testcase {
         ];
     }
 
+    /**
+     * Generate questions.
+     *
+     * @param int $num
+     * @param int $catscaleid
+     * @param string $difficultydistribution
+     *
+     * @return mixed
+     *
+     */
     private function generatequestions(
         int $num = 100,
         int $catscaleid = 1,

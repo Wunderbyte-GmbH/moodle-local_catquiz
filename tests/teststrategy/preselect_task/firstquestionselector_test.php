@@ -39,7 +39,7 @@ class firstquestionselector_test extends basic_testcase {
     /**
      * @dataProvider median_ability_of_personparams_is_calculated_correctly_provider
      * @param float $expected
-     * @param array<object> $personparams
+     * @param array $personparams
      * @return void
      * @throws InvalidArgumentException
      * @throws ExpectationFailedException
@@ -55,7 +55,7 @@ class firstquestionselector_test extends basic_testcase {
         );
     }
 
-    public function median_ability_of_personparams_is_calculated_correctly_provider() {
+    public static function median_ability_of_personparams_is_calculated_correctly_provider():array {
         return [
             'single value 1' => [
                 'expected' => 0.0,
