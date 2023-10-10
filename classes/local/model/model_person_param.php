@@ -78,10 +78,26 @@ class model_person_param implements \ArrayAccess {
         $this->params = ['ability'];
     }
 
+    /**
+     * OffsetExists.
+     *
+     * @param mixed $offset
+     *
+     * @return bool
+     *
+     */
     public function offsetExists($offset): bool {
         return in_array($offset, $this->params);
     }
 
+    /**
+     * OffsetGet.
+     *
+     * @param mixed $offset
+     *
+     * @return mixed
+     *
+     */
     public function offsetGet($offset): mixed {
         if (! $this->offsetExists($offset)) {
             return null;
@@ -89,6 +105,15 @@ class model_person_param implements \ArrayAccess {
         return $this->$offset;
     }
 
+    /**
+     * OffsetSet.
+     *
+     * @param mixed $offset
+     * @param mixed $value
+     *
+     * @return void
+     *
+     */
     public function offsetSet($offset, $value): void {
         if (! $this->offsetExists($offset)) {
             return;
@@ -96,6 +121,14 @@ class model_person_param implements \ArrayAccess {
         $this->$offset = $value;
     }
 
+    /**
+     * OffsetUnset.
+     *
+     * @param mixed $offset
+     *
+     * @return void
+     *
+     */
     public function offsetUnset($offset): void {
     }
 
@@ -131,6 +164,12 @@ class model_person_param implements \ArrayAccess {
         return $this;
     }
 
+    /**
+     * To array.
+     *
+     * @return array
+     *
+     */
     public function to_array(): array {
         return ['ability' => $this->ability];
     }

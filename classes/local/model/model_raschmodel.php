@@ -49,6 +49,17 @@ abstract class model_raschmodel extends model_model implements catcalc_item_esti
         return (1 / (1 + exp($discrimination * ($itemdifficulty - $personability))));
     }
 
+    /**
+     * Gets information criteria
+     *
+     * @param string $criterion
+     * @param model_person_param_list $personabilities
+     * @param model_item_param $itemparams
+     * @param model_responses $k
+     *
+     * @return float
+     *
+     */
     public function get_information_criterion(
         string $criterion,
         model_person_param_list $personabilities,
@@ -177,6 +188,15 @@ abstract class model_raschmodel extends model_model implements catcalc_item_esti
         return $numberofparameters * log(($numberofcases + 2) / 24) + $this->calc_dic_item($personabilities, $item, $k);
     }
 
+    /**
+     * Estimate item params.
+     *
+     * @param model_person_param_list $personparams
+     * @param model_item_param_list|null $olditemparams
+     *
+     * @return model_item_param_list
+     *
+     */
     public function estimate_item_params(
         model_person_param_list $personparams,
         ?model_item_param_list $olditemparams = null): model_item_param_list {
@@ -235,5 +255,15 @@ abstract class model_raschmodel extends model_model implements catcalc_item_esti
      */
     abstract public static function log_likelihood(array $pp, array $itemparams, float $itemresponse);
 
+    /**
+     * Log likelihood_p_p.
+     *
+     * @param array $x
+     * @param array $itemparams
+     * @param float $itemresponse
+     *
+     * @return mixed
+     *
+     */
     abstract public static function log_likelihood_p_p(array $x, array $itemparams, float $itemresponse);
 }

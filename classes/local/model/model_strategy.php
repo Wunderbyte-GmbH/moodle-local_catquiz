@@ -116,7 +116,7 @@ class model_strategy {
      * @param model_responses $responses
      * @param array $options
      * @param model_person_param_list|null $savedpersonabilities
-     * @param array<model_item_param_list> $olditemparams
+     * @param array $olditemparams
      *
      */
     public function __construct(
@@ -258,10 +258,11 @@ class model_strategy {
     /**
      * For each item, selects the model that should be used
      *
-     * Merges the given item param lists into a single list
-     *
      * @param array $itemdifficultieslists List of calculated item difficulties, one for each model
-     * @return model_item_param_list A single list of item difficulties that is a combination of the input lists
+     * @param model_person_param_list $personabilities A single list of item difficulties that is a combination of the input lists
+     *
+     * @return model_item_param_list
+     *
      */
     public function select_item_model(
         array $itemdifficultieslists,
@@ -305,9 +306,9 @@ class model_strategy {
      * Return item override.
      *
      * @param int $itemid
-     * @param array<model_item_param_list> $itemdifficultieslists
+     * @param array $itemdifficultieslists
      *
-     * @return ?model_item_param
+     * @return model_item_param|null
      *
      */
     private function get_item_override(int $itemid, array $itemdifficultieslists): ?model_item_param {
@@ -417,6 +418,15 @@ class model_strategy {
         return $instances;
     }
 
+    /**
+     * Select item from override.
+     *
+     * @param int $itemid
+     * @param array $itemdifficultieslists
+     *
+     * @return mixed
+     *
+     */
     private function select_item_from_override(int $itemid, array $itemdifficultieslists) {
         global $CFG;
         if ($item = $this->get_item_override($itemid, $itemdifficultieslists)) {

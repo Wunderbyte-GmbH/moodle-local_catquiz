@@ -79,7 +79,7 @@ class model_item_param_list implements ArrayAccess, IteratorAggregate, Countable
      *
      * @param int $contextid
      * @param string $modelname
-     * @param array $catscaleid
+     * @param array $catscaleids
      *
      * @return self
      *

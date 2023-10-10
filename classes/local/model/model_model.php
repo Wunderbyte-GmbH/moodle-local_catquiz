@@ -96,7 +96,7 @@ abstract class model_model {
     /**
      * Fisher info.
      *
-     * @param array<float> $personability
+     * @param array $personability
      * @param array $params
      *
      * @return mixed
@@ -104,6 +104,17 @@ abstract class model_model {
      */
     abstract public static function fisher_info(array $personability, array $params);
 
+    /**
+     * Get information criterion
+     *
+     * @param string $criterion
+     * @param model_person_param_list $personabilities
+     * @param model_item_param $itemparams
+     * @param model_responses $k
+     *
+     * @return float
+     *
+     */
     abstract public function get_information_criterion(
         string $criterion,
         model_person_param_list $personabilities,

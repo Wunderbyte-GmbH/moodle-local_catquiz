@@ -243,7 +243,7 @@ class fileparser {
     /**
      * Exit and return
      *
-     * @param array $data
+     * @param object $cir
      *
      * @return array
      */

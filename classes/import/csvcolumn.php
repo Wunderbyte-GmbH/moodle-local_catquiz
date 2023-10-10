@@ -89,7 +89,7 @@ class csvcolumn {
      * @param string $format
      * @param mixed|null $defaultvalue
      * @param mixed|null $transform
-     *
+     * @param string $importinstruction
      */
     public function __construct(
             $columnname = '',

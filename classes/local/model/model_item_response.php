@@ -47,7 +47,7 @@ class model_item_response {
      * Set parameters for class instance.
      *
      * @param float $response
-     * @param float $ability
+     * @param model_person_param $personparams
      *
      */
     public function __construct(float $response, model_person_param $personparams) {

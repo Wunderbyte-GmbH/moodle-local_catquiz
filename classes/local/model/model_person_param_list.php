@@ -63,7 +63,7 @@ class model_person_param_list implements ArrayAccess, IteratorAggregate, Countab
      *
      * @param int $contextid
      * @param int $catscaleid
-     * @return model_person_param_list
+     * @return self
      * @throws dml_exception
      */
     public static function load_from_db(int $contextid, array $catscaleids): self {

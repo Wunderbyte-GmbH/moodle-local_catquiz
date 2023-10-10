@@ -110,7 +110,9 @@ class feedback {
      * Right now, it's just very limited.
      * As we don't have the correct structure, we assume the following:
      *
+     * @param int $quizid
      * @param array $result
+     * @param string $component
      * @return void
      */
     public static function inscribe_users_to_failed_scales(

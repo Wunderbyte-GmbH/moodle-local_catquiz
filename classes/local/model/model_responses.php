@@ -135,6 +135,7 @@ class model_responses {
      * Set item data.
      *
      * @param mixed $data
+     * @param bool $filter
      *
      * @return mixed
      *
@@ -207,6 +208,15 @@ class model_responses {
         return $personparamlist;
     }
 
+    /**
+     * Get item response for person.
+     *
+     * @param int $itemid
+     * @param int $personid
+     *
+     * @return mixed
+     *
+     */
     public function get_item_response_for_person(int $itemid, int $personid) {
         if (empty($this->data[$personid]['component'][$itemid])) {
             return null;
