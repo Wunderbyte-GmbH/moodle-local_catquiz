@@ -29,6 +29,7 @@ use basic_testcase;
 use cache;
 use local_catquiz\local\result;
 use local_catquiz\teststrategy\strategy;
+use local_catquiz\teststrategy\strategy\inferallsubscales;
 use local_catquiz\teststrategy\strategy\teststrategy_balanced;
 use local_catquiz\teststrategy\strategy\teststrategy_fastest;
 use PHPUnit\Framework\ExpectationFailedException;
@@ -40,6 +41,7 @@ use SebastianBergmann\RecursionContext\InvalidArgumentException;
  */
 class strategy_test extends basic_testcase {
 
+    private int $lastgeneratedquestionid = 0;
 
     /**
      * Test adding new questions per subscale works as expected.
@@ -116,6 +118,11 @@ class strategy_test extends basic_testcase {
     }
 
     public function teststrategies_return_expected_questions_provider() {
+        // The `+` operater does a merge and keeps the indices.
+        $infersubscalesquestions = $this->generatequestions(20, 3)
+            + $this->generatequestions(20, 4)
+            + $this->generatequestions(60, 5)
+        ;
         return [
             'first selected question is the easiest' =>
             [
@@ -216,9 +223,47 @@ class strategy_test extends basic_testcase {
                 ],
                 'strategy' => (new teststrategy_balanced()),
                 'attemptcontextdiff' => [
-                    'pilot_ratio' => 0.0,
                     'fake_questionattemptcounts' => $this->generatequestionattemptcounts(),
                 ],
+            ],
+            'infer all subscales' => [
+            'expected_question_id' => [
+                74,
+                12,
+                75,
+                73,
+                32,
+            ],
+            'strategy' => (new inferallsubscales()),
+            'attemptcontextdiff' => [
+                'standarderrorpersubscale' => 0.5,
+                'min_attempts_per_scale' => 3,
+                'max_attempts_per_scale' => 3,
+                'questions' => $infersubscalesquestions,
+                'original_questions' => $infersubscalesquestions,
+                'fake_ancestor_scales' => [
+                    1 => [],
+                    2 => [1],
+                    3 => [2, 1],
+                    4 => [2, 1],
+                    5 => [2, 1],
+
+                ],
+                'fake_child_scales' => [
+                    1 => [2, 3, 4, 5],
+                    2 => [3, 4, 5],
+                    3 => [],
+                    4 => [],
+                    5 => [],
+                ],
+                'person_ability' => [
+                    1 => 0.3,
+                    2 => 0.3,
+                    3 => 0.4,
+                    4 => 0.3,
+                    5 => 0.5,
+                ]
+            ],
             ],
         ];
     }
@@ -259,6 +304,7 @@ class strategy_test extends basic_testcase {
             //'breakinfourl' => 'xxx',
             //'maxtimeperquestion' => 30,
             'fake_personparams_for_test' => [],
+            'pilot_ratio' => 0.0,
         ];
     }
 
@@ -270,9 +316,13 @@ class strategy_test extends basic_testcase {
         $questions = [];
         $mindifficulty = -5;
         $maxdifficulty = 5;
-        for ($i = 1; $i <= $num; $i++) { // Use 1-based indexing to facilitate interpreting quantile ranges.
+        for (
+            $i = $this->lastgeneratedquestionid + 1, $j = 0;
+            $i <= $this->lastgeneratedquestionid + $num;
+            $i++, $j++
+        ) { // Use 1-based indexing to facilitate interpreting quantile ranges.
             if ($difficultydistribution === 'uniform') {
-                $difficulty = $mindifficulty + ($i * ($maxdifficulty - $mindifficulty)) / ($num);
+                $difficulty = $mindifficulty + ($j * ($maxdifficulty - $mindifficulty)) / ($num);
             }
             $questions[$i] = (object) [
                 'id' => $i,
@@ -284,6 +334,7 @@ class strategy_test extends basic_testcase {
                 'attempts' => $i,
             ];
         }
+        $this->lastgeneratedquestionid = $i-1;
         return $questions;
     }
 
