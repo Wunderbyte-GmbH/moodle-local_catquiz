@@ -73,7 +73,7 @@ class calculation_executed extends \core\event\base {
 
         $catscaleid = $otherarray->catscaleid;
         $catscale = catscale::return_catscale_object($catscaleid);
-        $catscalename = $catscale->name;
+        $catscalename = $catscale->name ?? get_string('deletedcatscale', 'local_catquiz');
         $data['catscalename'] = $catscalename;
 
         // Handle the counter for items updated
