@@ -155,8 +155,7 @@ class strategy_test extends basic_testcase {
         ;
     
         return [
-            'first selected question is the easiest' =>
-            [
+            'first selected question is the easiest' => [
                 'expected_question_id' => [1],
                 'strategy' => (new teststrategy_fastest()),
                 'attemptcontextdiff' => [],
@@ -165,41 +164,37 @@ class strategy_test extends basic_testcase {
                     $cache->set('isfirstquestionofattempt', true);
                 },
             ],
-            'first selected question is the first of the second quintil' =>
-            [
+            'first selected question is the first of the second quintil' => [
                 'expected_question_id' => [20],
                 'strategy' => (new teststrategy_fastest()),
                 'attemptcontextdiff' =>
-                    ['selectfirstquestion' => 'startwithfirstofsecondquintil'],
+                ['selectfirstquestion' => 'startwithfirstofsecondquintil'],
                 'custom_setup_fun' => function () {
                     $cache = cache::make('local_catquiz', 'adaptivequizattempt');
                     $cache->set('isfirstquestionofattempt', true);
                 },
             ],
-            'first selected question is the first of the second quartil' =>
-            [
+            'first selected question is the first of the second quartil' => [
                 'expected_question_id' => [25],
                 'strategy' => (new teststrategy_fastest()),
                 'attemptcontextdiff' =>
-                    ['selectfirstquestion' => 'startwithfirstofsecondquartil'],
+                ['selectfirstquestion' => 'startwithfirstofsecondquartil'],
                 'custom_setup_fun' => function () {
                     $cache = cache::make('local_catquiz', 'adaptivequizattempt');
                     $cache->set('isfirstquestionofattempt', true);
                 },
             ],
-            'first selected question is the most difficult of the second quartil' =>
-            [
+            'first selected question is the most difficult of the second quartil' => [
                 'expected_question_id' => [49],
                 'strategy' => (new teststrategy_fastest()),
                 'attemptcontextdiff' =>
-                    ['selectfirstquestion' => 'startwithmostdifficultsecondquartil'],
+                ['selectfirstquestion' => 'startwithmostdifficultsecondquartil'],
                 'custom_setup_fun' => function () {
                     $cache = cache::make('local_catquiz', 'adaptivequizattempt');
                     $cache->set('isfirstquestionofattempt', true);
                 },
             ],
-            'first selected question is selected by average ability of the test' =>
-            [
+            'first selected question is selected by average ability of the test' => [
                 'expected_question_id' => [50],
                 'strategy' => (new teststrategy_fastest()),
                 'attemptcontextdiff' => [
@@ -217,21 +212,19 @@ class strategy_test extends basic_testcase {
                     $cache->set('isfirstquestionofattempt', true);
                 },
             ],
-            'first selected question is selected by the user\'s current ability' =>
-            [
+            'first selected question is selected by the user\'s current ability' => [
                 'expected_question_id' => [70],
                 'strategy' => (new teststrategy_fastest()),
                 'attemptcontextdiff' => [
-                        'selectfirstquestion' => 'startwithcurrentability',
-                        'person_ability' => [1 => 2.0],
+                    'selectfirstquestion' => 'startwithcurrentability',
+                    'person_ability' => [1 => 2.0],
                 ],
                 'custom_setup_fun' => function () {
                     $cache = cache::make('local_catquiz', 'adaptivequizattempt');
                     $cache->set('isfirstquestionofattempt', true);
                 },
             ],
-            'radical CAT' =>
-            [
+            'radical CAT' => [
                 'expected_question_id' => [
                     51,
                     52,
@@ -240,8 +233,7 @@ class strategy_test extends basic_testcase {
                 ],
                 'strategy' => (new teststrategy_fastest()),
             ],
-            'moderate CAT' =>
-            [
+            'moderate CAT' => [
                 // In the generated fake data, the number of general attempts
                 // for each question is the same as its question ID. So we
                 // expect questions with the lowest IDs to be selected first.
@@ -258,43 +250,43 @@ class strategy_test extends basic_testcase {
                 ],
             ],
             'infer all subscales' => [
-            'expected_question_id' => [
-                74,
-                12,
-                75,
-                73,
-                32,
-            ],
-            'strategy' => (new inferallsubscales()),
-            'attemptcontextdiff' => [
-                'standarderrorpersubscale' => 0.5,
-                'min_attempts_per_scale' => 3,
-                'max_attempts_per_scale' => 3,
-                'questions' => $infersubscalesquestions,
-                'original_questions' => $infersubscalesquestions,
-                'fake_ancestor_scales' => [
-                    1 => [],
-                    2 => [1],
-                    3 => [2, 1],
-                    4 => [2, 1],
-                    5 => [2, 1],
+                'expected_question_id' => [
+                    74,
+                    12,
+                    75,
+                    73,
+                    32,
+                ],
+                'strategy' => (new inferallsubscales()),
+                'attemptcontextdiff' => [
+                    'standarderrorpersubscale' => 0.5,
+                    'min_attempts_per_scale' => 3,
+                    'max_attempts_per_scale' => 3,
+                    'questions' => $infersubscalesquestions,
+                    'original_questions' => $infersubscalesquestions,
+                    'fake_ancestor_scales' => [
+                        1 => [],
+                        2 => [1],
+                        3 => [2, 1],
+                        4 => [2, 1],
+                        5 => [2, 1],
 
+                    ],
+                    'fake_child_scales' => [
+                        1 => [2, 3, 4, 5],
+                        2 => [3, 4, 5],
+                        3 => [],
+                        4 => [],
+                        5 => [],
+                    ],
+                    'person_ability' => [
+                        1 => 0.3,
+                        2 => 0.3,
+                        3 => 0.4,
+                        4 => 0.3,
+                        5 => 0.5,
+                    ]
                 ],
-                'fake_child_scales' => [
-                    1 => [2, 3, 4, 5],
-                    2 => [3, 4, 5],
-                    3 => [],
-                    4 => [],
-                    5 => [],
-                ],
-                'person_ability' => [
-                    1 => 0.3,
-                    2 => 0.3,
-                    3 => 0.4,
-                    4 => 0.3,
-                    5 => 0.5,
-                ]
-            ],
             ],
         ];
     }
