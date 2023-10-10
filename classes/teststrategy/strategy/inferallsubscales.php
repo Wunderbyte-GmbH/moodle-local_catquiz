@@ -37,7 +37,6 @@ use local_catquiz\teststrategy\preselect_task\maximumquestionscheck;
 use local_catquiz\teststrategy\preselect_task\mayberemovescale;
 use local_catquiz\teststrategy\preselect_task\maybe_return_pilot;
 use local_catquiz\teststrategy\preselect_task\noremainingquestions;
-use local_catquiz\teststrategy\preselect_task\numberofgeneralattempts;
 use local_catquiz\teststrategy\preselect_task\remove_uncalculated;
 use local_catquiz\teststrategy\preselect_task\removeplayedquestions;
 use local_catquiz\teststrategy\preselect_task\strategyfastestscore;
@@ -76,7 +75,6 @@ class inferallsubscales extends strategy {
             firstquestionselector::class, // If this is the first question of this attempt, return it here.
             lasttimeplayedpenalty::class,
             mayberemovescale::class, // Remove questions from excluded subscales.
-            numberofgeneralattempts::class,
             maybe_return_pilot::class,
             remove_uncalculated::class, // Remove items that do not have item parameters.
             addscalestandarderror::class,
