@@ -61,6 +61,7 @@ for ($i = 1; $i <= 100; $i++) {
 
     $funpart = function ($x) use ($rnd) {return $rnd * $x;
     };
+    // phpcs:ignore
     // $funpart = function ($x) use ($rnd) {return rand(0,100)*$x;};
 
     $sum = $sum + $funpart($myx);

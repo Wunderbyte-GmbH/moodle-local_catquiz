@@ -23,6 +23,8 @@
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+defined('MOODLE_INTERNAL') || die();
+
 // phpcs:disable
 // function get_demo_person_ability2(){
 // $demo_person_abilities = [];
@@ -45,7 +47,6 @@
 $demopersonparameters = [
     'person_id' => 'person_ability',
 ];
-
 
 $demoitemparameter = [
     '1' => [ // Item id.
