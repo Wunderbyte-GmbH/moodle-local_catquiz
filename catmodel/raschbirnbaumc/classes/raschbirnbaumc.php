@@ -528,10 +528,12 @@ class raschbirnbaumc extends model_raschmodel {
         $bs = floatval(get_config('catmodel_raschbirnbaumc', 'trusted_region_slope_b'));
 
         return [
-            ($am - $ip['difficulty']) / ($as ** 2), // Calculate d/da.
+            // Calculate d/da.
+            ($am - $ip['difficulty']) / ($as ** 2),
             // Calculate d/db.
             -($bs * exp($bs * $ip['discrimination'])) / (exp($bs * $bp) + exp($bs * $ip['discrimination'])),
-            0, // Calculate d/dc.
+            // Calculate d/dc.
+            0,
         ];
     }
 
@@ -567,7 +569,7 @@ class raschbirnbaumc extends model_raschmodel {
                 0, // Calculate d/da d/dc.
                 0, // Calculate d/db d/dc.
                 0, // Calculate d²/dc².
-            ]
+            ],
         ];
     }
 }

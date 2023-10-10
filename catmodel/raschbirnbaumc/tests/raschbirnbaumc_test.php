@@ -175,7 +175,7 @@ class raschbirnbaumc_test extends TestCase {
      * Provider function for least_mean_squares_1st_derivative_ip
      * @return array
      */
-    public static function least_mean_squares_1st_derivative_ip_provider() {
+    public static function least_mean_squares_1st_derivative_ip_provider():array {
         return [
             "testcase1" => [
                 'n' => 5,
@@ -294,7 +294,7 @@ class raschbirnbaumc_test extends TestCase {
      * Provider function for least_mean_squares_1st_derivative_ip
      * @return array
      */
-    public static function least_mean_squares_2nd_derivative_ip_provider() {
+    public static function least_mean_squares_2nd_derivative_ip_provider():array {
         return [
             "testcase1" => [
                 'n' => 5,
@@ -453,7 +453,7 @@ class raschbirnbaumc_test extends TestCase {
      * Provider function for log_likelihood_p
      * @return array
      */
-    public static function log_likelihood_p_provider() {
+    public static function log_likelihood_p_provider():array {
         return [
             "testcase1" => [
                 'pp' => ['ability' => -3],
@@ -562,7 +562,7 @@ class raschbirnbaumc_test extends TestCase {
      * Provider function log_likelihood_p_p_provider
      * @return array
      */
-    public static function log_likelihood_p_p_provider() {
+    public static function log_likelihood_p_p_provider():array {
         return [
             "testcase1" => [
                 'pp' => ['ability' => -3],
@@ -671,7 +671,7 @@ class raschbirnbaumc_test extends TestCase {
      * Return Data for log jacobian test
      * @return array
      */
-    public static function get_log_jacobian_provider() {
+    public static function get_log_jacobian_provider():array {
         return [
             "testcase 1" => [
                 'pp' => ['ability' => -3],
@@ -782,7 +782,7 @@ class raschbirnbaumc_test extends TestCase {
       * Return Data for log hessian test
       * @return array
       */
-    public static function get_log_hessian_provider() {
+    public static function get_log_hessian_provider():array {
 
         return [
             "testcase 1" => [

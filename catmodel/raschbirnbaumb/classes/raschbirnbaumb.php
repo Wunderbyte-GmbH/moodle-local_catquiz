@@ -487,7 +487,7 @@ class raschbirnbaumb extends model_raschmodel {
                 0, // Calculates d/da d/db.
                 -($bs ** 2 * exp($bs * ($bp + $ip['discrimination']))) /
                     (exp($bs * $bp) + exp($bs * $ip['discrimination'])) ** 2, // Calculates d²/db².
-            ]
+            ],
         ];
     }
 }
