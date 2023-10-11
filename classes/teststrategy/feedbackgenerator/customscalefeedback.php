@@ -39,6 +39,15 @@ use local_catquiz\teststrategy\feedbackgenerator;
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class customscalefeedback extends feedbackgenerator {
+
+    /**
+     * Get student feedback.
+     *
+     * @param array $data
+     *
+     * @return array
+     *
+     */
     protected function get_studentfeedback(array $data): array {
 
         $text = $data['customscalefeedback'];
@@ -48,10 +57,24 @@ class customscalefeedback extends feedbackgenerator {
         ];
     }
 
+    /**
+     * Get teacher feedback.
+     *
+     * @param array $data
+     *
+     * @return array
+     *
+     */
     protected function get_teacherfeedback(array $data): array {
         return [];
     }
 
+    /**
+     * Get required context keys.
+     *
+     * @return array
+     *
+     */
     public function get_required_context_keys(): array {
         return [
             'quizsettings',
@@ -60,10 +83,25 @@ class customscalefeedback extends feedbackgenerator {
         ];
     }
 
+    /**
+     * Get heading.
+     *
+     * @return string
+     *
+     */
     public function get_heading(): string {
         return get_string('catquiz_feedbackheader', 'local_catquiz');
     }
 
+    /**
+     * Load data.
+     *
+     * @param int $attemptid
+     * @param array $initialcontext
+     *
+     * @return array|null
+     *
+     */
     public function load_data(int $attemptid, array $initialcontext): ?array {
         $cache = cache::make('local_catquiz', 'adaptivequizattempt');
         $quizsettings = ($initialcontext['quizsettings'] ?? $cache->get('quizsettings')) ?: null;

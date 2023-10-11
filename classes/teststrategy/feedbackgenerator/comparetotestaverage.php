@@ -38,6 +38,15 @@ use local_catquiz\teststrategy\preselect_task\firstquestionselector;
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class comparetotestaverage extends feedbackgenerator {
+
+    /**
+     * Get student feedback.
+     *
+     * @param array $data
+     *
+     * @return array
+     *
+     */
     protected function get_studentfeedback(array $data): array {
         global $OUTPUT;
         $feedback = $OUTPUT->render_from_template('local_catquiz/feedback/comparetotestaverage', $data);
@@ -48,10 +57,24 @@ class comparetotestaverage extends feedbackgenerator {
         ];
     }
 
+    /**
+     * Get teacher feedback.
+     *
+     * @param array $data
+     *
+     * @return array
+     *
+     */
     protected function get_teacherfeedback(array $data): array {
         return [];
     }
 
+    /**
+     * Get required context keys.
+     *
+     * @return array
+     *
+     */
     public function get_required_context_keys(): array {
         return [
             'contextid',
@@ -68,10 +91,25 @@ class comparetotestaverage extends feedbackgenerator {
         ];
     }
 
+    /**
+     * Get heading.
+     *
+     * @return string
+     *
+     */
     public function get_heading(): string {
         return get_string('personability', 'local_catquiz');
     }
 
+    /**
+     * Load data.
+     *
+     * @param int $attemptid
+     * @param array $initialcontext
+     *
+     * @return array|null
+     *
+     */
     public function load_data(int $attemptid, array $initialcontext): ?array {
         $cache = cache::make('local_catquiz', 'adaptivequizattempt');
         if (! $quizsettings = $cache->get('quizsettings')) {

@@ -84,6 +84,12 @@ class inferlowestskillgap extends strategy {
         ];
     }
 
+    /**
+     * Get feedback generators.
+     *
+     * @return array
+     *
+     */
     public function get_feedbackgenerators(): array {
         return [
             questionssummary::class,

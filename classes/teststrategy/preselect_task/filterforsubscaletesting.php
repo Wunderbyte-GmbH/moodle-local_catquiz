@@ -40,6 +40,16 @@ use local_catquiz\wb_middleware;
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 final class filterforsubscaletesting extends filterforsubscale {
+
+    /**
+     * Get subscale ids.
+     *
+     * @param mixed $catscaleid
+     * @param mixed $context
+     *
+     * @return mixed
+     *
+     */
     protected function getsubscaleids($catscaleid, $context) {
         return $context['fake_subscaleids'][$catscaleid];
     }

@@ -38,11 +38,26 @@ use local_catquiz\teststrategy\info;
  */
 class debuginfo extends feedbackgenerator {
 
-
+    /**
+     * Get student feedback.
+     *
+     * @param array $data
+     *
+     * @return array
+     *
+     */
     protected function get_studentfeedback(array $data): array {
         return [];
     }
 
+    /**
+     * Get teacher feedback.
+     *
+     * @param array $data
+     *
+     * @return array
+     *
+     */
     protected function get_teacherfeedback(array $data): array {
         global $OUTPUT;
         $feedback = $OUTPUT->render_from_template('local_catquiz/feedback/debuginfo', ['data' => $data['debuginfo']]);
@@ -53,18 +68,47 @@ class debuginfo extends feedbackgenerator {
         ];
     }
 
+    /**
+     * Get heading.
+     *
+     * @return string
+     *
+     */
     public function get_heading(): string {
         return 'debug info';
     }
 
+    /**
+     * Get required context keys.
+     *
+     * @return array
+     *
+     */
     public function get_required_context_keys(): array {
         return ['debuginfo'];
     }
 
+    /**
+     * Get question details.
+     *
+     * @param array $context
+     *
+     * @return mixed
+     *
+     */
     private function get_question_details(array $context) {
         return array_map(fn ($q) => (array) $q, $context['questions']);
     }
 
+    /**
+     * Load data.
+     *
+     * @param int $attemptid
+     * @param array $initialcontext
+     *
+     * @return array|null
+     *
+     */
     public function load_data(int $attemptid, array $initialcontext): ?array {
         $cache = cache::make('local_catquiz', 'adaptivequizattempt');
         if (! $cachedcontexts = $cache->get('context')) {

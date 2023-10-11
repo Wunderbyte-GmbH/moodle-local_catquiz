@@ -122,6 +122,14 @@ abstract class feedbackgenerator {
         ];
     }
 
+    /**
+     * Has required context keys.
+     *
+     * @param mixed $context
+     *
+     * @return mixed
+     *
+     */
     private function has_required_context_keys($context) {
         foreach ($this->get_required_context_keys() as $key) {
             if (!array_key_exists($key, $context)) {
@@ -154,6 +162,12 @@ abstract class feedbackgenerator {
         }
         return true;
     }
+    /**
+     * Has teacherfeedbackpermission.
+     *
+     * @return bool
+     *
+     */
     private function has_teacherfeedbackpermission(): bool {
         return has_capability(
             'local/catquiz:view_teacher_feedback', context_system::instance()

@@ -162,7 +162,7 @@ class firstquestionselector extends preselect_task implements wb_middleware {
     /**
      * Returns the median ability of the given person parameters.
      *
-     * @param int $testid
+     * @param array $personparams
      *
      * @return mixed
      *

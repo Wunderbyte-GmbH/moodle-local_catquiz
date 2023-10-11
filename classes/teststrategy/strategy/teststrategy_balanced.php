@@ -73,6 +73,12 @@ class teststrategy_balanced extends strategy {
         ];
     }
 
+    /**
+     * Get feedbac kgenerators.
+     *
+     * @return array
+     *
+     */
     public function get_feedbackgenerators(): array {
         return [
             questionssummary::class,

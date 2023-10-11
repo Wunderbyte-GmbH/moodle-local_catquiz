@@ -108,6 +108,14 @@ class info {
         return $strategies;
     }
 
+    /**
+     * Get test strategy.
+     *
+     * @param int $id
+     *
+     * @return mixed
+     *
+     */
     public static function get_teststrategy(int $id) {
         global $CFG;
         require_once($CFG->dirroot . '/local/catquiz/lib.php');

@@ -209,8 +209,23 @@ abstract class strategy {
         return $this;
     }
 
+    /**
+     * Get feedback generators.
+     *
+     * @return array
+     *
+     */
     abstract public function get_feedbackgenerators(): array;
 
+    /**
+     * Update played questions per scale.
+     *
+     * @param stdClass $selectedquestion
+     * @param array $playedquestionsperscale
+     *
+     * @return array
+     *
+     */
     public function update_playedquestionsperscale(
         stdClass $selectedquestion,
         array $playedquestionsperscale = []

@@ -77,7 +77,10 @@ class pilotquestions_loader implements contextloaderinterface {
      * Shows if a question is a pilot question.
      *
      * @param \stdClass $question
+     * @param int $attemptsthreshold
+     *
      * @return bool
+     *
      */
     public function ispilot(\stdClass $question, int $attemptsthreshold): bool {
         if (

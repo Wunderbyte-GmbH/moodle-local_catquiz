@@ -42,6 +42,15 @@ use moodle_url;
  */
 final class checkbreak extends preselect_task implements wb_middleware {
 
+    /**
+     * Run.
+     *
+     * @param array $context
+     * @param callable $next
+     *
+     * @return result
+     *
+     */
     public function run(array &$context, callable $next): result {
         $now = time();
         $cache = cache::make('local_catquiz', 'adaptivequizattempt');
@@ -85,6 +94,15 @@ final class checkbreak extends preselect_task implements wb_middleware {
         ];
     }
 
+    /**
+     * Gets breakinfo url.
+     *
+     * @param mixed $context
+     * @param mixed $forcedbreakend
+     *
+     * @return mixed
+     *
+     */
     private function get_breakinfourl($context, $forcedbreakend) {
         return new moodle_url(
             $context['breakinfourl'],
