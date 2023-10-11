@@ -171,9 +171,11 @@ class catcalc {
     /**
      * Builds the jacobian function for item params and the given model.
      *
-     * @param array<model_item_response> $itemresponse
-     * @param mixed $model
-     * @return Closure(mixed $ip): mixed
+     * @param array $itemresponse
+     * @param catcalc_item_estimator $model
+     *
+     * @return mixed
+     *
      */
     public static function build_itemparam_jacobian(array $itemresponse, catcalc_item_estimator $model) {
         // Define Jacobi vector (1st derivative) of the Log Likelihood.

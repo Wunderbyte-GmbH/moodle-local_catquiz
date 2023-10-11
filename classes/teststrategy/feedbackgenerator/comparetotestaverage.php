@@ -30,8 +30,7 @@ use local_catquiz\teststrategy\feedbackgenerator;
 use local_catquiz\teststrategy\preselect_task\firstquestionselector;
 
 /**
- * Compare the ability of this attempt to the average abilities of other
- * students that took this test.
+ * Compare the ability of this attempt to the average abilities of other students that took this test.
  *
  * @package local_catquiz
  * @copyright 2023 Wunderbyte GmbH

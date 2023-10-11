@@ -57,7 +57,12 @@ class testitemimporter {
         return $parser->process_csv_data($content);
     }
 
-    /** @return array formdata for filepicker */
+    /**
+     * Return ajax formdata.
+     *
+     * @return array formdata for filepicker
+     *
+     */
     public static function return_ajaxformdata() : array {
         $ajaxformdata = [
             'id' => 'lcq_csv_import_form',
@@ -66,7 +71,12 @@ class testitemimporter {
         return $ajaxformdata;
     }
 
-    /** @return string callbackfunction */
+    /**
+     * Get callback function.
+     *
+     * @return mixed callbackfunction
+     *
+     */
     private static function get_callbackfunction() {
         return "local_catquiz\local\model\model_item_param_list::save_or_update_testitem_in_db";
     }
@@ -74,7 +84,16 @@ class testitemimporter {
     /**
      * Configure and return settings object.
      *
+     * @param array $definedcolumns
+     * @param string|null $callbackfunction
+     * @param string|null $delimiter
+     * @param string|null $encoding
+     * @param string|null $dateformat
+     *
+     * @return mixed
+     *
      * @return csvsettings
+     *
      */
     private static function define_settings(
         array $definedcolumns,
@@ -211,7 +230,12 @@ class testitemimporter {
         return $columnssequential;
     }
 
-    /** @return array  */
+    /**
+     * Export columns for template.
+     *
+     * @return mixed
+     *
+     */
     public static function export_columns_for_template() {
         return self::define_testitem_columns();
     }

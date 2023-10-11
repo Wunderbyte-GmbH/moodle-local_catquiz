@@ -78,6 +78,12 @@ class wb_middleware_runner {
         return $action($context);
     }
 
+    /**
+     * Get last action.
+     *
+     * @return mixed
+     *
+     */
     private static function get_last_action() {
         global $CFG;
 

@@ -261,16 +261,17 @@ class mathcat {
     /**
      * Performs the Newton-Raphson approach for determine the zero point of a function
      *
-     * @param callable<array> $fn_function($parameter) - Function to be calculated on with parameter $parameter
-     * @param callable<array> $fn_derivative($parameter) - Deriavative of $fn_function with parameter $parameter
-     * @param array $parameter_start - Parameter-set to start with (should be near zero point)
+     * @param callable $fnfunction - Function to be calculated on with parameter $parameter
+     * @param callable $fnderivative - Deriavative of $fn_function with parameter $parameter
+     * @param array $parameterstart - Parameter-set to start with (should be near zero point)
      * @param int $precission - Accuracy to how many decimal places
-     * @param int $max_iteration - Maximum number of iterations
-     * @param callable<array> $fn_trusted_regions_filter($parameter) - Parameter-check for trusted Region
-     * @param callable<array> $fn_trusted_regions_function($parameter) - Trusted Region modelling function
-     * @param callable<array> $fn_trusted_regions_derivative($parameter) - Deriavative of $fn_trusted_regions_function
+     * @param int $maxiterations - Maximum number of iterations
+     * @param callable|null $fntrustedregionsfilter - Parameter-check for trusted Region
+     * @param callable|null $fntrustedregionsfunction - Trusted Region modelling function
+     * @param callable|null $fntrustedregionsderivative - Deriavative of $fn_trusted_regions_function
      *
-     * @return array $parameter
+     * @return array
+     *
      */
     public static function newton_raphson_multi_stable (
         callable $fnfunction,

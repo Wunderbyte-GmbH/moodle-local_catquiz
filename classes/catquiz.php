@@ -763,10 +763,10 @@ class catquiz {
      * Return sql to render quiz attempts.
      *
      * @param int $numberofrecords
-     * @param ?int $attemptid
-     * @param ?int $courseid
+     * @param int $instanceid
+     * @param int $courseid
      *
-     * @return array
+     * @return mixed
      *
      */
     public static function return_attempt_and_contextid_from_attemptstable(
@@ -1098,10 +1098,10 @@ class catquiz {
      * Return the person ability for the given user in the given context
      *
      * @param int $contextid
-     * @param array<int> $catscaleids
-     * @param ?int $userid
+     * @param array $catscaleids
+     * @param int|null $userid
      *
-     * @return array<\stdClass>
+     * @return mixed
      *
      */
     public static function get_person_abilities(int $contextid, array $catscaleids, ?int $userid = null) {
@@ -1271,9 +1271,11 @@ class catquiz {
      * given catscaleid and were calculated with the given model
      *
      * @param int $contextid
-     * @param array<int> $catscaleids
+     * @param array $catscaleids
      * @param string $model
-     * @return array
+     *
+     * @return mixed
+     *
      */
     public static function get_itemparams(int $contextid, array $catscaleids, string $model) {
         global $DB;

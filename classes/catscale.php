@@ -83,14 +83,16 @@ class catscale {
      *
      * @param int $catscaleid
      * @param int $testitemid
-     * @param int $status
+     * @param int $status // Just to check if status is changed, we make a nonsense default.
      * @param string $component
-     * @return result
+     *
+     * @return mixed
+     *
      */
     public static function add_or_update_testitem_to_scale(
             int $catscaleid,
             int $testitemid,
-            int $status = 2, // Just to check if status is changed, we make a nonsense default.
+            int $status = 2,
             string $component = 'question') {
 
         global $DB;
@@ -395,9 +397,12 @@ class catscale {
 
     /**
      * Get IDs of parentscales.
+     *
      * @param int $catscaleid
-     * @return null|array
-     * @throws dml_exception
+     * @param bool $returnnames
+     *
+     * @return mixed
+     *
      */
     public static function get_ancestors(int $catscaleid, bool $returnnames = false) {
         global $DB;
@@ -431,7 +436,10 @@ class catscale {
 
     /**
      * Get HTML link to scale detail view.
+     *
      * @param int $catscaleid
+     * @param string $url
+     *
      * @return string
      */
     public static function get_link_to_catscale(int $catscaleid, $url = '/local/catquiz/manage_catscales.php') {
@@ -452,7 +460,14 @@ class catscale {
 
     /**
      * Get HTML link to testitem detail view.
+     *
+     * @param int $testitemid
      * @param int $catscaleid
+     * @param int $context
+     * @param string $component
+     * @param string $linktext
+     * @param string $url
+     *
      * @return string
      */
     public static function get_link_to_testitem(

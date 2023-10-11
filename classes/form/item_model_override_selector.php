@@ -118,6 +118,18 @@ class item_model_override_selector extends dynamic_form {
         $mform->disable_form_change_checker();
     }
 
+    /**
+     * Add element to group.
+     *
+     * @param string $name
+     * @param string $id
+     * @param array $group
+     * @param mixed $mform
+     * @param bool $editing
+     *
+     * @return mixed
+     *
+     */
     private function add_element_to_group(string $name, string $id, array &$group, &$mform, bool $editing = false) {
 
         $type = ($editing) ? 'text' : 'static';

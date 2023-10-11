@@ -170,12 +170,12 @@ class catcontext {
     }
 
     /**
-     * Create response from DB
+     * Create response from DB.
      *
      * @param int $contextid
-     * @param int $catscaleid
-     * @param ?int $testitemid
-     * @param ?int $userid
+     * @param array $catscaleids
+     * @param int|null $testitemid
+     * @param int|null $userid
      *
      * @return array
      *

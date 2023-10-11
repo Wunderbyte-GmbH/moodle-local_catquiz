@@ -30,8 +30,8 @@ interface catcalc_item_estimator {
     /**
      * Calculates the 1st derivative of the LOG Likelihood with respect to the item parameters
      *
-     * @param array<float> $ability
-     * @param array<float> $ip
+     * @param array $ability
+     * @param array $ip
      * @param float $itemresponse
      *
      * @return array
@@ -42,7 +42,7 @@ interface catcalc_item_estimator {
     /**
      * Calculates the 2nd derivative of the LOG Likelihood with respect to the item parameters
      *
-     * @param array<float> $ability
+     * @param array $ability
      * @param array $ip
      * @param float $itemresponse
      *
@@ -54,6 +54,8 @@ interface catcalc_item_estimator {
     /**
      * Get log tr jacobian.
      *
+     * @param array $ip
+     *
      * @return array
      *
      */
@@ -61,6 +63,8 @@ interface catcalc_item_estimator {
 
     /**
      * Get log tr hessian.
+     *
+     * @param array $ip
      *
      * @return array
      *
@@ -78,6 +82,7 @@ interface catcalc_item_estimator {
     /**
      * Update parameters so that they are located in a trusted region
      * @param array $parameters
+     *
      * @return array
      */
     public static function restrict_to_trusted_region(array $parameters): array;
