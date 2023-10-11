@@ -21,12 +21,12 @@
     Context variables required for this template:
     Example context (json):
     {
-        'contextselector' => HTML,
-        'scaleselectors' => HTML,
-        'checkbox' => [
-            'label' => "Integrate questions from subscales",
-            'checked' => "checked",
-        ]
+        "scaleselectors": "HTML Content for Scale Selectors",
+        "checkbox": {
+            "checked": "checked",  // You can set this to an empty string or remove it if not checked.
+            "label": "Integrate Subscale Questions"
+        },
+        "contextselector": "HTML Content for Context Selector"
     }
 }}
 

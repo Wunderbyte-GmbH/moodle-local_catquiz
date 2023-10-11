@@ -21,9 +21,30 @@
     Context variables required for this template:
     Example context (json):
     {
-        "questiondetailview":
-            'datacard' : [...]
-            'questionspreview': [...]
+        "questiondetailview": {
+            "datacard": {
+                "title": "General",
+                "body": {
+                    "id": "12345",
+                    "type": "Practice Quiz",
+                    "closedeye": "slash",
+                    "statuscircle": "success",
+                    "status":  "(inactive, manually confirmed)" ,
+                    "model": "Adaptive",
+                    "attempts": "Unlimited",
+                    "testitemid": "0",
+                    "contextid": "0",
+                    "component": "question",
+                    "scaleid": "1"
+                }
+            },
+            "questionpreview": {
+                "title": "Question preview",
+                "body": {
+                    "question": "<p>This is the question content.</p>"
+                }
+            }
+        }
     }
 }}
 <div class="catscales-dashboard">
