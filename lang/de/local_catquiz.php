@@ -99,6 +99,7 @@ $string['pilot_questions'] = 'Pilotfragen';
 $string['inferlowestskillgap'] = 'Unterste Kompetenzlücke diagnostizieren';
 $string['infergreateststrength'] = 'Größte Stärke diagnostizieren';
 $string['inferallsubscales'] = 'Alle Subskalen bestimmen';
+$string['classicalcat'] = 'Klassischer Test';
 
 $string['catquiz_selectfirstquestion'] = "Auswahl der ersten Quizfrage";
 $string['startwitheasiestquestion'] = "Starte mit der leichtesten Frage an";

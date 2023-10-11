@@ -100,6 +100,7 @@ $string['pilot_questions'] = 'Pilot questions';
 $string['inferlowestskillgap'] = 'Infer lowest skill gap';
 $string['infergreateststrength'] = 'Infer greatest strength';
 $string['inferallsubscales'] = 'Infer all subscales';
+$string['classicalcat'] = 'Classical test';
 
 $string['catquiz_selectfirstquestion'] = "Selection of first question";
 $string['startwitheasiestquestion'] = "Start with the easiest question";
