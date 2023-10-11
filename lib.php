@@ -40,6 +40,7 @@ define('STRATEGY_ALLSUBS', 3);
 define('STRATEGY_LOWESTSUB', 4);
 define('STRATEGY_HIGHESTSUB', 5);
 define('STRATEGY_PILOT', 6);
+define('STRATEGY_CLASSIC', 7);
 
 // Testiem Status in Scale.
 define('TESTITEM_STATUS_ACTIVE', 0);
