@@ -17,7 +17,7 @@
 /**
  * Tests the filterforsubscale class.
  *
- * @package    catquiz
+ * @package    local_catquiz
  * @author David Szkiba <david.szkiba@wunderbyte.at>
  * @copyright  2023 Georg Maißer <info@wunderbyte.at>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
@@ -34,7 +34,13 @@ use SebastianBergmann\RecursionContext\InvalidArgumentException;
 use UnexpectedValueException;
 
 /**
- * @package local_catquiz
+ * Tests the filterforsubscale class.
+ *
+ * @package    local_catquiz
+ * @author David Szkiba <david.szkiba@wunderbyte.at>
+ * @copyright  2023 Georg Maißer <info@wunderbyte.at>
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ *
  * @covers \local_catquiz\teststrategy\preselect_task\filterforsubscale
  */
 class filterforsubscale_test extends basic_testcase {
@@ -56,9 +62,13 @@ class filterforsubscale_test extends basic_testcase {
     }
 
     /**
+     * Test returns expected question from expected catscale provider
+     *
      * @dataProvider provider
+     *
      * @param array $context
      * @param mixed $expected
+     *
      * @return void
      */
     public function test_returns_expected_question_from_expected_catscale(

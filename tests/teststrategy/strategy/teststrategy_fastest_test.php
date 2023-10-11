@@ -17,7 +17,7 @@
 /**
  * Tests teststrategy_fastest
  *
- * @package    catquiz
+ * @package    local_catquiz
  * @author David Szkiba <david.szkiba@wunderbyte.at>
  * @copyright  2023 Georg Maißer <info@wunderbyte.at>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
@@ -37,7 +37,13 @@ use qformat_xml;
 use SebastianBergmann\RecursionContext\InvalidArgumentException;
 
 /**
- * @package local_catquiz
+ * Tests teststrategy_fastest
+ *
+ * @package    local_catquiz
+ * @author David Szkiba <david.szkiba@wunderbyte.at>
+ * @copyright  2023 Georg Maißer <info@wunderbyte.at>
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ *
  * @covers \local_catquiz\teststrategy\strategy\teststrategy_fastest
  */
 class teststrategy_fastest_test extends advanced_testcase {
@@ -79,7 +85,11 @@ class teststrategy_fastest_test extends advanced_testcase {
      * Test it can run
      *
      * @dataProvider radical_cat_provider
-     * @return void
+     *
+     * @param mixed $expected
+     * @param mixed $attemptcontext
+     *
+     * @return mixed
      * @throws InvalidArgumentException
      * @throws ExpectationFailedException
      */

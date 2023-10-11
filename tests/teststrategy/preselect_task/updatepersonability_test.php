@@ -32,7 +32,13 @@ use PHPUnit\Framework\TestCase;
 use SebastianBergmann\RecursionContext\InvalidArgumentException;
 
 /**
- * @package local_catquiz
+ * Tests the updatepersonability class
+ *
+ * @package    local_catquiz
+ * @author David Szkiba <david.szkiba@wunderbyte.at>
+ * @copyright  2023 Georg Maißer <info@wunderbyte.at>
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ *
  * @covers \local_catquiz\teststrategy\preselect_task\updatepersonability
  */
 class updatepersonability_test extends TestCase {
@@ -41,9 +47,14 @@ class updatepersonability_test extends TestCase {
      * Tests that the ability is not updated in cases where it should not be updated.
      *
      * @dataProvider skippedprovider
-     * @return void
+     *
+     * @param mixed $expected
+     * @param mixed $context
+     *
+     * @return mixed
      * @throws InvalidArgumentException
      * @throws ExpectationFailedException
+     *
      */
     public function test_ability_calculation_is_skipped_correctly($expected, $context) {
         $returncontext = fn($context) => result::ok($context);
@@ -55,6 +66,12 @@ class updatepersonability_test extends TestCase {
         $this->assertEquals($expected, $result->unwrap()['skip_reason']);
     }
 
+    /**
+     * Skipped provider.
+     *
+     * @return array
+     *
+     */
     public static function skippedprovider():array {
         return [
             'last_question_is_null' => [

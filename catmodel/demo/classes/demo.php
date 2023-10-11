@@ -39,6 +39,17 @@ use local_catquiz\local\model\model_responses;
  */
 class demo extends model_model {
 
+    /**
+     * Get information criterion.
+     *
+     * @param string $criterion
+     * @param model_person_param_list $personabilities
+     * @param model_item_param $itemparams
+     * @param model_responses $k
+     *
+     * @return float
+     *
+     */
     public function get_information_criterion(
         string $criterion,
         model_person_param_list $personabilities,
@@ -47,6 +58,15 @@ class demo extends model_model {
         return 0.0;
     }
 
+    /**
+     * Estimate item params.
+     *
+     * @param model_person_param_list $personparams
+     * @param model_item_param_list|null $olditemparams
+     *
+     * @return model_item_param_list
+     *
+     */
     public function estimate_item_params(
         model_person_param_list $personparams,
         ?model_item_param_list $olditemparams = null): model_item_param_list {
@@ -62,6 +82,15 @@ class demo extends model_model {
         return ['difficulty'];
     }
 
+    /**
+     * Fisher info.
+     *
+     * @param mixed $personability
+     * @param mixed $params
+     *
+     * @return mixed
+     *
+     */
     public static function fisher_info($personability, $params) {
         return 1;
     }

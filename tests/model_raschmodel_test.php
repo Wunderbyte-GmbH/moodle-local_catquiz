@@ -17,7 +17,7 @@
 /**
  * Tests model_raschmodel
  *
- * @package    catquiz
+ * @package    local_catquiz
  * @author David Szkiba <david.szkiba@wunderbyte.at>
  * @copyright  2023 Georg Maißer <info@wunderbyte.at>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
@@ -37,7 +37,13 @@ use PHPUnit\Framework\ExpectationFailedException;
 use SebastianBergmann\RecursionContext\InvalidArgumentException;
 
 /**
- * @package local_catquiz
+ * Tests model_raschmodel
+ *
+ * @package    local_catquiz
+ * @author David Szkiba <david.szkiba@wunderbyte.at>
+ * @copyright  2023 Georg Maißer <info@wunderbyte.at>
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ *
  * @covers \local_catquiz\local\model\model_raschmodel
  */
 class model_raschmodel_test extends basic_testcase {
@@ -46,9 +52,17 @@ class model_raschmodel_test extends basic_testcase {
      * Test if the information criteria functions return the expected values.
      *
      * @dataProvider can_calculate_information_criteria_provider
-     * @return void
+     *
+     * @param string $expected
+     * @param model_person_param_list $personabilities
+     * @param model_item_param $item
+     * @param model_responses $responses
+     * @param callable $function
+     *
+     * @return mixed
      * @throws InvalidArgumentException
      * @throws ExpectationFailedException
+     *
      */
     public function test_information_criteria_functions_return_expected_values(
         string $expected,
@@ -61,6 +75,12 @@ class model_raschmodel_test extends basic_testcase {
         $this->assertEquals($expected, sprintf("%.4f", $result));
     }
 
+    /**
+     * Can calculate information criteria provider.
+     *
+     * @return array
+     *
+     */
     public static function can_calculate_information_criteria_provider(): array {
         $personabilities = self::create_person_param_list([1 => 1, 2 => 0, 3 => -1]);
         $item = new model_item_param(1, 'XXX');
@@ -189,6 +209,14 @@ class model_raschmodel_test extends basic_testcase {
         ];
     }
 
+    /**
+     * Create person param list.
+     *
+     * @param array $abilities
+     *
+     * @return model_person_param_list
+     *
+     */
     private static function create_person_param_list(array $abilities): model_person_param_list {
         $personabilities = new model_person_param_list();
         foreach ($abilities as $id => $ability) {

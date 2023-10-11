@@ -31,18 +31,29 @@ use SebastianBergmann\RecursionContext\InvalidArgumentException;
 use local_catquiz\local\model\model_responses;
 
 /**
- * @package catmodel_raschbirnbaumb
+ * Tests for core_message_inbound to test Variable Envelope Return Path functionality.
+ *
+ * @package    catmodel_raschbirnbaumb
+ * @copyright  2023 Georg Maißer <info@wunderbyte.at>
+ *
  * @covers \catmodel_raschbirnbaumb\raschbirnbaumb
  */
 class raschbirnbaumb_test extends TestCase {
 
-
     /**
      * This test calls the get_log_jacobain function with the model and test its output with verified data.
+     *
      * @dataProvider get_log_jacobian_provider
-     * @return void
+     *
+     * @param array $pp
+     * @param float $k
+     * @param array $ip
+     * @param array $expected
+     *
+     * @return mixed
      * @throws InvalidArgumentException
      * @throws ExpectationFailedException
+     *
      */
     public function test_get_log_jacobian(array $pp, float $k, array $ip, array $expected) {
 
@@ -59,10 +70,18 @@ class raschbirnbaumb_test extends TestCase {
 
     /**
      * This test calls the get_log_jacobain function with the model and test its output with verified data.
+     *
      * @dataProvider get_log_hessian_provider
-     * @return void
+     *
+     * @param array $pp
+     * @param float $k
+     * @param array $ip
+     * @param array $expected
+     *
+     * @return mixed
      * @throws InvalidArgumentException
      * @throws ExpectationFailedException
+     *
      */
     public function test_get_log_hessian(array $pp, float $k, array $ip, array $expected) {
 

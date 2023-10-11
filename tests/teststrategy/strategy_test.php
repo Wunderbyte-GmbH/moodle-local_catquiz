@@ -17,7 +17,7 @@
 /**
  * Tests strategy
  *
- * @package    catquiz
+ * @package    local_catquiz
  * @author David Szkiba <david.szkiba@wunderbyte.at>
  * @copyright  2023 Georg Maißer <info@wunderbyte.at>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
@@ -34,19 +34,30 @@ use PHPUnit\Framework\ExpectationFailedException;
 use SebastianBergmann\RecursionContext\InvalidArgumentException;
 
 /**
- * @package local_catquiz
+ * Tests strategy
+ *
+ * @package    local_catquiz
+ * @author David Szkiba <david.szkiba@wunderbyte.at>
+ * @copyright  2023 Georg Maißer <info@wunderbyte.at>
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ *
  * @covers \local_catquiz\teststrategy\strategy\strategy
  */
 class strategy_test extends basic_testcase {
-
 
     /**
      * Test adding new questions per subscale works as expected.
      *
      * @dataProvider update_played_questions_per_scale_works_provider
-     * @return void
+     *
+     * @param mixed $expected
+     * @param mixed $questions
+     * @param mixed $newquestion
+     *
+     * @return mixed
      * @throws InvalidArgumentException
      * @throws ExpectationFailedException
+     *
      */
     public function test_update_played_questions_per_scale_works($expected, $questions, $newquestion) {
         $fastest = new teststrategy_fastest();
@@ -94,11 +105,17 @@ class strategy_test extends basic_testcase {
     }
 
     /**
+     * Test teststrategies return expected questions provide.
+     *
      * @dataProvider teststrategies_return_expected_questions_provider
+     *
      * @param mixed $expected
-     * @param mixed $attemptcontext
-     * @param mixed $cache
-     * @return void
+     * @param strategy $strategy
+     * @param array $attemptcontextdiff
+     * @param callable|null $fun
+     *
+     * @return mixed
+     *
      */
     public function test_teststrategies_return_expected_questions(
         $expected,

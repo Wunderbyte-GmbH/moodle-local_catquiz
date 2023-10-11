@@ -17,7 +17,7 @@
 /**
  * Tests the question pre-select task mayberemovescale.
  *
- * @package    catquiz
+ * @package    local_catquiz
  * @author David Szkiba <david.szkiba@wunderbyte.at>
  * @copyright  2023 Georg Maißer <info@wunderbyte.at>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
@@ -33,7 +33,13 @@ use PHPUnit\Framework\ExpectationFailedException;
 use SebastianBergmann\RecursionContext\InvalidArgumentException;
 
 /**
- * @package local_catquiz
+ * Tests the question pre-select task mayberemovescale.
+ *
+ * @package    local_catquiz
+ * @author David Szkiba <david.szkiba@wunderbyte.at>
+ * @copyright  2023 Georg Maißer <info@wunderbyte.at>
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ *
  * @covers \local_catquiz\teststrategy\preselect_task\mayberemovescale
  */
 class mayberemovescale_test extends basic_testcase {
@@ -42,9 +48,15 @@ class mayberemovescale_test extends basic_testcase {
      * Test that questions of subscales are removed as needed.
      *
      * @dataProvider provider
-     * @return void
+     *
+     * @param mixed $expected
+     * @param mixed $attemptcontext
+     * @param mixed $played
+     *
+     * @return mixed
      * @throws InvalidArgumentException
      * @throws ExpectationFailedException
+     *
      */
     public function test_questions_from_subscales_are_removed_as_needed(
         $expected,

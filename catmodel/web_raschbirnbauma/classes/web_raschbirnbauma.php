@@ -41,6 +41,17 @@ use local_catquiz\local\model\model_responses;
  */
 class web_raschbirnbauma extends model_model implements catcalc_ability_estimator {
 
+    /**
+     * Get information criterion.
+     *
+     * @param string $criterion
+     * @param model_person_param_list $personabilities
+     * @param model_item_param $itemparams
+     * @param model_responses $k
+     *
+     * @return float
+     *
+     */
     public function get_information_criterion(
         string $criterion,
         model_person_param_list $personabilities,
@@ -65,6 +76,12 @@ class web_raschbirnbauma extends model_model implements catcalc_ability_estimato
      * }
      *
      * Items that have only "0" responses will not be included in the JSON.
+     *
+     * @param model_person_param_list $personparams
+     * @param model_item_param_list|null $olditemparams
+     *
+     * @return model_item_param_list
+     *
      */
     public function estimate_item_params(
         model_person_param_list $personparams,
@@ -148,11 +165,30 @@ class web_raschbirnbauma extends model_model implements catcalc_ability_estimato
         return $c + (1 - $c) * (exp($a * ($p - $b))) / (1 + exp($a * ($p - $b)));
     }
 
+    /**
+     * Fisher info.
+     *
+     * @param array $pp
+     * @param array $params
+     *
+     * @return mixed
+     *
+     */
     public static function fisher_info(array $pp, array $params) {
         $personability = $pp['ability'];
         return self::likelihood_multi($personability, $params) * (1 - self::likelihood_multi($personability, $params));
     }
 
+    /**
+     * Log likelihood_p.
+     *
+     * @param mixed $p
+     * @param array $params
+     * @param float $itemresponse
+     *
+     * @return float
+     *
+     */
     public static function log_likelihood_p($p, array $params, float $itemresponse): float {
         return raschbirnbauma::log_likelihood_p($p, $params, $itemresponse);
     }
@@ -185,6 +221,16 @@ class web_raschbirnbauma extends model_model implements catcalc_ability_estimato
         return raschbirnbauma::log_likelihood($p, $params, $itemresponse);
     }
 
+    /**
+     * Log likelihood_p_p.
+     *
+     * @param mixed $p
+     * @param array $params
+     * @param float $itemresponse
+     *
+     * @return float
+     *
+     */
     public static function log_likelihood_p_p($p, array $params, float $itemresponse): float {
         return raschbirnbauma::log_likelihood_p_p($p, $params, $itemresponse);
     }

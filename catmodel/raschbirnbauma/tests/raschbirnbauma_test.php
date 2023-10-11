@@ -30,17 +30,30 @@ use SebastianBergmann\RecursionContext\InvalidArgumentException;
 use local_catquiz\local\model\model_responses;
 
 /**
- * @package catmodel_raschbirnbauma
+ * Tests for core_message_inbound to test Variable Envelope Return Path functionality.
+ *
+ * @package    catmodel_raschbirnbauma
+ * @copyright  2023 Georg Maißer <info@wunderbyte.at>
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ *
  * @covers \catmodel_raschbirnbauma\raschbirnbauma
  */
 class raschbirnbauma_test extends TestCase {
 
     /**
      * This test calls the get_log_jacobain function with the model and test its output with verified data.
+     *
      * @dataProvider get_log_jacobian_provider
-     * @return void
+     *
+     * @param array $pp
+     * @param float $k
+     * @param array $ip
+     * @param float $expected
+     *
+     * @return mixed
      * @throws InvalidArgumentException
      * @throws ExpectationFailedException
+     *
      */
     public function test_get_log_jacobian(array $pp, float $k, array $ip, float $expected) {
 
@@ -55,10 +68,18 @@ class raschbirnbauma_test extends TestCase {
 
     /**
      * This test calls the get_log_jacobain function with the model and test its output with verified data.
+     *
      * @dataProvider get_log_hessian_provider
-     * @return void
+     *
+     * @param array $pp
+     * @param float $k
+     * @param array $ip
+     * @param float $expected
+     *
+     * @return mixed
      * @throws InvalidArgumentException
      * @throws ExpectationFailedException
+     *
      */
     public function test_get_log_hessian(array $pp, float $k, array $ip, float $expected) {
 
@@ -73,11 +94,14 @@ class raschbirnbauma_test extends TestCase {
 
     /**
      * Test log_likelihood_p function.
+     *
      * @dataProvider log_likelihood_p_provider
-     * @param array<float> $pp
+     *
+     * @param array $pp
      * @param float $k
      * @param array $ip
      * @param float $expected
+     *
      * @return void
      */
     public function test_log_likelihood_p(array $pp, float $k, array $ip, float $expected) {
@@ -92,11 +116,14 @@ class raschbirnbauma_test extends TestCase {
 
     /**
      * Test log_likelihood_p function.
+     *
      * @dataProvider log_likelihood_p_p_provider
+     *
      * @param array $pp
      * @param float $k
      * @param array $ip
      * @param float $expected
+     *
      * @return void
      */
     public function test_log_likelihood_p_p(array $pp, float $k, array $ip, float $expected) {
@@ -111,12 +138,15 @@ class raschbirnbauma_test extends TestCase {
 
     /**
      * Test least_mean_squares_1st_derivative_ip function.
+     *
      * @dataProvider least_mean_squares_1st_derivative_ip_provider
+     *
      * @param int $n
      * @param array $pp
      * @param float $k
      * @param array $ip
      * @param float $expected
+     *
      * @return void
      */
     public function test_least_mean_squares_1st_derivative_ip(int $n, array $pp, float $k, array $ip, float $expected) {
@@ -133,12 +163,15 @@ class raschbirnbauma_test extends TestCase {
 
     /**
      * Test least_mean_squares_1st_derivative_ip function.
+     *
      * @dataProvider least_mean_squares_1st_derivative_ip_provider
+     *
      * @param int $n
      * @param array $pp
      * @param float $k
      * @param array $ip
      * @param float $expected
+     *
      * @return void
      */
     public function test_least_mean_squares_2nd_derivative_ip(int $n, array $pp, float $k, array $ip, float $expected) {
@@ -155,6 +188,7 @@ class raschbirnbauma_test extends TestCase {
 
     /**
      * Provider function for least_mean_squares_1st_derivative_ip
+     *
      * @return array
      */
     public static function least_mean_squares_1st_derivative_ip_provider():array {
