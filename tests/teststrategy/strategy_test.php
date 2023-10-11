@@ -122,6 +122,7 @@ class strategy_test extends basic_testcase {
                 continue;
             }
             $this->assertEquals($exp, $result->unwrap()->id, sprintf("Failed for question number %d", $attempt + 1));
+            $attemptcontext['questionsattempted']++;
         }
     }
 
