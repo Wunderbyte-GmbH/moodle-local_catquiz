@@ -61,8 +61,8 @@ class model_raschmodel_test extends basic_testcase {
         $this->assertEquals($expected, sprintf("%.4f", $result));
     }
 
-    public function can_calculate_information_criteria_provider(): array {
-        $personabilities = $this->create_person_param_list([1 => 1, 2 => 0, 3 => -1]);
+    public static function can_calculate_information_criteria_provider(): array {
+        $personabilities = self::create_person_param_list([1 => 1, 2 => 0, 3 => -1]);
         $item = new model_item_param(1, 'XXX');
         $responses = (new model_responses())
             ->setdata([
@@ -189,7 +189,7 @@ class model_raschmodel_test extends basic_testcase {
         ];
     }
 
-    private function create_person_param_list(array $abilities): model_person_param_list {
+    private static function create_person_param_list(array $abilities): model_person_param_list {
         $personabilities = new model_person_param_list();
         foreach ($abilities as $id => $ability) {
             $pp = (new model_person_param($id))

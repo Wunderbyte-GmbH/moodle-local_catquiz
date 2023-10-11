@@ -17,7 +17,7 @@
 /**
  * Tests the mathcat functionality.
  *
- * @package    catquiz
+ * @package    local_catquiz
  * @author David Szkiba <david.szkiba@wunderbyte.at>
  * @copyright  2023 Georg Maißer <info@wunderbyte.at>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
@@ -28,8 +28,15 @@ namespace local_catquiz;
 use basic_testcase;
 
 /**
- * @package local_catquiz
+ * Tests the mathcat functionality.
+ *
+ * @package    local_catquiz
+ * @author David Szkiba <david.szkiba@wunderbyte.at>
+ * @copyright  2023 Georg Maißer <info@wunderbyte.at>
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ *
  * @covers \local_catquiz\mathcat
+ *
  */
 class mathcat_test extends basic_testcase {
 

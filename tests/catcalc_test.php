@@ -17,7 +17,7 @@
 /**
  * Tests the catcalc functionality.
  *
- * @package    catquiz
+ * @package    local_catquiz
  * @author David Szkiba <david.szkiba@wunderbyte.at>
  * @copyright  2023 Georg Maißer <info@wunderbyte.at>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
@@ -38,19 +38,28 @@ use PHPUnit\Framework\ExpectationFailedException;
 use SebastianBergmann\RecursionContext\InvalidArgumentException;
 
 /**
- * @package local_catquiz
+ * Tests the catcalc functionality.
+ *
+ * @package    local_catquiz
+ * @author David Szkiba <david.szkiba@wunderbyte.at>
+ * @copyright  2023 Georg Maißer <info@wunderbyte.at>
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ *
  * @covers \local_catquiz\catcalc
+ *
  */
 class catcalc_test extends basic_testcase {
-
 
     /**
      * Test if the person ability is calculated correctly.
      *
-     * @dataProvider provider
-     * @return void
+     * @param string $model
+     * @param float $expected
+     *
+     * @return mixed
      * @throws InvalidArgumentException
      * @throws ExpectationFailedException
+     *
      */
     public function test_estimate_person_ability_returns_expected_values(string $model, float $expected) {
         $personresponses = [
@@ -111,10 +120,15 @@ class catcalc_test extends basic_testcase {
     /**
      * Test if item parameters are calculated correctly.
      *
-     * @dataProvider item_param_provider
-     * @return void
+     * @param string $modelname
+     * @param array $responses
+     * @param array $userabilities
+     * @param float $expected
+     *
+     * @return mixed
      * @throws InvalidArgumentException
      * @throws ExpectationFailedException
+     *
      */
     public function test_estimate_item_parameter_calculation_returns_expected_values(
             string $modelname,
