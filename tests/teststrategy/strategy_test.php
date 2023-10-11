@@ -30,6 +30,7 @@ use cache;
 use local_catquiz\local\result;
 use local_catquiz\local\status;
 use local_catquiz\teststrategy\strategy;
+use local_catquiz\teststrategy\strategy\classicalcat;
 use local_catquiz\teststrategy\strategy\inferallsubscales;
 use local_catquiz\teststrategy\strategy\teststrategy_balanced;
 use local_catquiz\teststrategy\strategy\teststrategy_fastest;
@@ -132,6 +133,11 @@ class strategy_test extends basic_testcase {
         $infersubscalesquestions = $this->generatequestions(20, 3)
             + $this->generatequestions(20, 4)
             + $this->generatequestions(60, 5)
+        ;
+
+        $qstartwith101 = $this->generatequestions(10, 3)
+            + $this->generatequestions(10, 4)
+            + $this->generatequestions(10, 5)
         ;
         $this->resetgeneratedquestionids();
 
@@ -320,6 +326,44 @@ class strategy_test extends basic_testcase {
                     'max_attempts_per_scale' => 20,
                     'questions' => $isq3,
                     'original_questions' => $isq3,
+                    'fake_ancestor_scales' => [
+                        1 => [],
+                        2 => [1],
+                        3 => [2, 1],
+                        4 => [2, 1],
+                        5 => [2, 1],
+
+                    ],
+                    'fake_child_scales' => [
+                        1 => [2, 3, 4, 5],
+                        2 => [3, 4, 5],
+                        3 => [],
+                        4 => [],
+                        5 => [],
+                    ],
+                    'person_ability' => [
+                        1 => 0.3,
+                        2 => 0.3,
+                        3 => 0.4,
+                        4 => 0.3,
+                        5 => 0.5,
+                    ]
+                ],
+            ],
+            // In this test, questions are just returned in ascending order of
+            // the question ID.
+            'classical CAT' => [
+                'expected' => [
+                    101,
+                    102,
+                    103,
+                    104,
+                    105,
+                ],
+                'strategy' => (new classicalcat()),
+                'attemptcontextdiff' => [
+                    'questions' => $qstartwith101,
+                    'original_questions' => $qstartwith101,
                     'fake_ancestor_scales' => [
                         1 => [],
                         2 => [1],
