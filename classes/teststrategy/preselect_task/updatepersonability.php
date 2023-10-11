@@ -84,7 +84,6 @@ class updatepersonability extends preselect_task implements wb_middleware {
      *
      */
     public function run(array &$context, callable $next): result {
-        global $CFG, $USER;
         $this->lastquestion = $context['lastquestion'];
         // If we do not know the answer to the last question, we do not have to
         // update the person ability. Also, pilot questions should not be used
