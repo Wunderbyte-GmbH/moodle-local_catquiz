@@ -45,7 +45,7 @@ use local_catquiz\wb_middleware;
  */
 abstract class preselect_task implements wb_middleware {
 
-    protected array $context;
+    protected ?array $context;
 
     /**
      * Rrocess test strategy
