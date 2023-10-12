@@ -31,12 +31,11 @@ class behat_local_catquiz_generator extends behat_generator_base {
      */
     protected function get_creatable_entities(): array {
         return [
-            'question bank questions' => [
-                'datagenerator' => 'question_bank_questions',
-                'required' => ['user', 'filepath', 'filename'],
-                'switchids' => ['user' => 'userid'],
+            'questions' => [
+                'datagenerator' => 'catquiz_questions',
+                'required' => ['user', 'filepath', 'filename', 'course'],
+                'switchids' => ['user' => 'userid', 'course' => 'courseid'],
             ],
         ];
     }
-
 }

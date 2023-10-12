@@ -14,6 +14,10 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
+defined('MOODLE_INTERNAL') || die();
+
+require_once($CFG->dirroot . '/question/format/xml/format.php');
+
 /**
  * Class local_catquiz_generator for generation of dummy data
  *
@@ -30,8 +34,8 @@ class local_catquiz_generator extends testing_module_generator {
      * @param array $data
      * @return void
      */
-    protected function create_question_bank_questions(array $data) {
-        global $CFG;
+    public function create_catquiz_questions(array $data) {
+        global $CFG, $DB;
 
         $userid = $data['userid'];
         $fs = get_file_storage();
@@ -41,30 +45,31 @@ class local_catquiz_generator extends testing_module_generator {
             throw new coding_exception("File '{$filepath}' does not exist");
         }
 
-        $filerecord = [
-            'userid' => $userid,
-            'contextid' => context_user::instance($userid)->id,
-            'component' => 'user',
-            'filearea' => 'private',
-            'itemid' => 0,
-            'filepath'  => '/',
-            'filename'  => basename($filepath),
-        ];
-        $fs->create_file_from_pathname($filerecord, $filepath);
+        $course = get_course($data['courseid']);
+        $context = context_course::instance($course->id);
+        $category = question_get_top_category($context->id, true);
 
-        // Get file.
-        $file = $fs->get_file($filerecord['contextid'], $filerecord['component'], $filerecord['filearea'],
-                      $filerecord['itemid'], $filerecord['filepath'], $filerecord['filename']);
-        // Read contents.
-        if ($file) {
-            $xml = $file->get_content();
-            $xmldata = xmlize($xml);
-
-            $importer = new \qformat_xml();
-            $q = $importer->try_importing_using_qtypes(
-                    $xmldata['question'], null, null, '');
-        } else {
-            throw new coding_exception("Cannot parse XML from file '{$filepath}'");
+        // Load data into class.
+        $qformat = new qformat_xml();
+        $qformat->setCategory($category);
+        $qformat->setContexts([$context]);
+        $qformat->setCourse($course);
+        $qformat->setFilename($filepath);
+        $qformat->setRealfilename($filepath);
+        $qformat->setCatfromfile(true);
+        $qformat->setContextfromfile(false);
+        $qformat->setStoponerror(true);
+        // Do anything before that we need to.
+        if (!$qformat->importpreprocess()) {
+            throw new moodle_exception('Cannot import {$filepath} (preprocessing)', '', '');
+        }
+        // Process the uploaded file.
+        if (!$qformat->importprocess()) {
+            throw new moodle_exception('Cannot import {$filepath} (processing)', '', '');
+        }
+        // In case anything needs to be done after.
+        if (!$qformat->importpostprocess()) {
+            throw new moodle_exception('Cannot import {$filepath} (postprocessing)', '', '');
         }
     }
 }
