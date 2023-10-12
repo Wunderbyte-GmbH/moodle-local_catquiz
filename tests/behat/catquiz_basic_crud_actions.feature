@@ -22,7 +22,6 @@ Feature: As an admin I perform basic catquiz actions - create, update, delete, s
   Scenario: CatQuiz Management: admin create a catscale, edit it, subscribe, unsubscribe, delete
     Given I log in as "admin"
     And I press "Catquiz"
-    And I follow "Manage CAT scales"
     And I wait until the page is ready
     ## And I follow "#catscales-tab"
     And I click on "CAT scales" "link" in the "#region-main" "css_element"
@@ -67,7 +66,6 @@ Feature: As an admin I perform basic catquiz actions - create, update, delete, s
   Scenario: CatQuiz Management: admin create a catscale wiht subitems than edit, subscribe, unsubscribe, delete subitem
     Given I log in as "admin"
     And I press "Catquiz"
-    And I follow "Manage CAT scales"
     And I wait until the page is ready
     And I click on "CAT scales" "link" in the "#region-main" "css_element"
     And I follow "Create"
