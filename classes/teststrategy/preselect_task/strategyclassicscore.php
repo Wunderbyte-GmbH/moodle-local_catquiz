@@ -48,7 +48,7 @@ final class strategyclassicscore extends preselect_task implements wb_middleware
      */
     public function run(array &$context, callable $next): result {
         uasort($context['questions'], function($q1, $q2) {
-            return $q1->id <=> $q2->id;
+            return $q1->itemid <=> $q2->itemid;
         });
 
         return result::ok(reset($context['questions']));
