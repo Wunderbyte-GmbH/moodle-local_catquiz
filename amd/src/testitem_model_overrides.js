@@ -51,6 +51,7 @@ export const init = () => {
             component: searchParams.get("component"),
             updateitem: true,
         });
+        // eslint-disable-next-line
         //window.location.reload();
     });
 
@@ -63,7 +64,7 @@ export const init = () => {
             SELECTORS.FORMCONTAINER);
         e.preventDefault();
         const searchParams = new URLSearchParams(window.location.search);
-        //
+
         dynamicForm.load({
             editing: formcontainer.querySelector(SELECTORS.NOEDITBUTTON) ? false : true,
             testitemid: searchParams.get("id"),
