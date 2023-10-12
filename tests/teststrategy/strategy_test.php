@@ -115,14 +115,33 @@ class strategy_test extends basic_testcase {
         if ($fun) {
             $fun();
         }
-        foreach ($expected as $attempt => $exp) {
+
+        $field = 'id';
+        $expectedvalues = $expected;
+        // By default, the expected value contains the ID of the expected
+        // question. To check other fields, the `field` value is set to the
+        // field that should be tested and the expected values are in the
+        // `values` array.
+        if (array_key_exists('field', $expected)
+            && array_key_exists('values', $expected)
+        ) {
+            $field = $expected['field'];
+            $expectedvalues = $expected['values'];
+        }
+
+        // Test for expected question IDs.
+        foreach ($expectedvalues as $attempt => $exp) {
             $result = $strategy->return_next_testitem($attemptcontext);
             if ($exp instanceof result && $exp->iserr()) {
                 $this->assertInstanceOf(result::class, $result);
                 $this->assertEquals($exp->get_status(), $result->get_status());
                 continue;
             }
-            $this->assertEquals($exp, $result->unwrap()->id, sprintf("Failed for question number %d", $attempt + 1));
+            $this->assertEquals(
+                $exp,
+                $result->unwrap()->$field,
+                sprintf("Failed for question number %d", $attempt + 1)
+            );
             $attemptcontext['questionsattempted']++;
         }
     }
@@ -354,11 +373,14 @@ class strategy_test extends basic_testcase {
             // the question ID.
             'classical CAT' => [
                 'expected' => [
-                    101,
-                    102,
-                    103,
-                    104,
-                    105,
+                    'field' => 'itemid',
+                    'values' => [
+                        111,
+                        112,
+                        113,
+                        114,
+                        115,
+                    ]
                 ],
                 'strategy' => (new classicalcat()),
                 'attemptcontextdiff' => [
@@ -459,6 +481,8 @@ class strategy_test extends basic_testcase {
                 'catscaleid' => $catscaleid,
                 'is_pilot' => false,
                 'attempts' => $i,
+                // Set it to qid + 10 just to emphasize its different.
+                'itemid' => $i+10,
             ];
         }
         $this->lastgeneratedquestionid = $i-1;

@@ -187,6 +187,7 @@ class catquiz {
                 lci.catscaleid catscaleid,
                 lci.status testitemstatus,
                 lci.componentname component,
+                lci.id as itemid,
                 lccs.name as catscalename,
                 s2.attempts,
                 COALESCE(s2.lastattempttime,0) as lastattempttime,
