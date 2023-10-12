@@ -42,7 +42,7 @@
     <a class="nav-link" id="testsandtemplates-tab" data-toggle="tab" href="#lcq_testsandtemplates" role="tab" aria-controls="lcq_testsandtemplates" aria-selected="false">{{#str}}testsandtemplates, local_catquiz{{/str}}</a>
   </li>
   <li class="nav-item">
-    <a class="nav-link" id="lcq_quizattempts-tab" data-toggle="tab" href="#lcq_quizattempts" role="tab" aria-controls="quizattempts" aria-selected="false">{{#str}}quizattempts, local_catquiz{{/str}}</a>
+    <a class="nav-link" id="lcq_quizattempts-tab" data-toggle="tab" href="#lcq_quizattempts" role="tab" aria-controls="lcq_quizattempts" aria-selected="false">{{#str}}quizattempts, local_catquiz{{/str}}</a>
   </li>
   <li class="nav-item">
     <a class="nav-link" id="calculations-tab" data-toggle="tab" href="#lcq_calculations" role="tab" aria-controls="lcq_calculations" aria-selected="false">{{#str}}calculations, local_catquiz{{/str}}</a>
@@ -56,28 +56,28 @@
 </ul>
 
 <div class="tab-content" id="myTabContent">
-  <div class="tab-pane fade show active" id="lcq_summary" role="tabpanel" aria-labelledby="lcq_summary-tab">
+  <div class="tab-pane fade show active" id="lcq_summary" role="tabpanel" aria-labelledby="summary-tab">
     {{> local_catquiz/catscalemanager/summary}}
   </div>
-  <div class="tab-pane fade" id="lcq_catscales" role="tabpanel" aria-labelledby="lcq_catscales-tab">
+  <div class="tab-pane fade" id="lcq_catscales" role="tabpanel" aria-labelledby="catscales-tab">
     {{> local_catquiz/catscalemanager/catscales}}
   </div>
-  <div class="tab-pane fade" id="lcq_questions" role="tabpanel" aria-labelledby="lcq_questions-tab">
+  <div class="tab-pane fade" id="lcq_questions" role="tabpanel" aria-labelledby="questions-tab">
     {{> local_catquiz/catscalemanager/questions/questionsdisplay}}
   </div>
-  <div class="tab-pane fade" id="lcq_testsandtemplates" role="tabpanel" aria-labelledby="lcq_testsandtemplates-tab">
+  <div class="tab-pane fade" id="lcq_testsandtemplates" role="tabpanel" aria-labelledby="testsandtemplates-tab">
     {{> local_catquiz/catscalemanager/testsandtemplates/testsandtemplatesdisplay}}
   </div>
-  <div class="tab-pane fade" id="lcq_quizattempts" role="tabpanel" aria-labelledby="lcq_quizattempts-tab">
+  <div class="tab-pane fade" id="lcq_quizattempts" role="tabpanel" aria-labelledby="quizattempts-tab">
     {{> local_catquiz/catscalemanager/quizattempts/quizattemptsdisplay}}
   </div>
-  <div class="tab-pane fade" id="lcq_calculations" role="tabpanel" aria-labelledby="lcq_calculations-tab">
+  <div class="tab-pane fade" id="lcq_calculations" role="tabpanel" aria-labelledby="calculations-tab">
     {{> local_catquiz/catscalemanager/calculations/calculationsdisplay}}
   </div>
-  <div class="tab-pane fade" id="lcq_versioning" role="tabpanel" aria-labelledby="lcq_versioning-tab">
+  <div class="tab-pane fade" id="lcq_versioning" role="tabpanel" aria-labelledby="versioning-tab">
     {{> local_catquiz/catcontextdashboard}}
   </div>
-  <div class="tab-pane fade" id="lcq_importer" role="tabpanel" aria-labelledby="lcq_importer-tab">
+  <div class="tab-pane fade" id="lcq_importer" role="tabpanel" aria-labelledby="importer-tab">
     {{{testitemsimporter}}}
     {{>local_catquiz/importer/importerdatainfodisplay}}
   </div>
