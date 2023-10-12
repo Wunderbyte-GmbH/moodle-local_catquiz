@@ -17,9 +17,9 @@ Feature: As an admin I perform import of catquiz alonf with questions to check S
       | user1    | C1     | student        |
       | user2    | C1     | student        |
       | teacher  | C1     | editingteacher |
-    ##And the following "question bank questions" exist:
-    ##  | user     | filepath                                        | filename              |
-    ##  | admin | local/catquiz/tests/fixtures/mathematik2scales.xml | mathematik2scales.xml |
+    And the following "question bank questions" exist:
+      | user     | filepath                                        | filename              |
+      | admin | local/catquiz/tests/fixtures/mathematik2scales.xml | mathematik2scales.xml |
     And the following "user private files" exist:
       | user     | filepath                                        | filename              |
       | admin | local/catquiz/tests/fixtures/mathematik2scales.csv | mathematik2scales.csv |
@@ -39,4 +39,4 @@ Feature: As an admin I perform import of catquiz alonf with questions to check S
     And I wait "1" seconds
     And I press "Submit"
     And I wait until the page is ready
-    ## Then I should see "Import was successful. 44 record(s) treated."
+    ## Then I should see "Import was successful. 3 record(s) treated."
