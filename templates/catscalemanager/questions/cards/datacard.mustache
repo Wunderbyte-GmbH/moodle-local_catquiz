@@ -27,20 +27,23 @@
     Context variables required for this template:
     Example context (json):
     {
-        "title": "General",
-        "body": {
-            "id": "12345",
-            "type": "Practice Quiz",
-            "closedeye": "slash",
-            "statuscircle": "success",
-            "status":  "(inactive, manually confirmed)" ,
-            "model": "Adaptive",
-            "attempts": "Unlimited",
-            "testitemid": "0",
-            "contextid": "0",
-            "component": "question",
-            "scaleid": "1"
-        }
+        "title": "Sample Title",
+        "body": [
+            {
+                "id": "123",
+                "type": "Practice Quiz",
+                "closedeye": "-slash",
+                "testitemid": "456",
+                "contextid": "789",
+                "scaleid": "10",
+                "component": "Sample Component",
+                "status": "Active",
+                "statuscircle": "success",
+                "statustitle": "Manually confirmed",
+                "model": "Adaptive",
+                "attempts": "Unlimited"
+            }
+        ]
     }
 }}
     <div class="card mr-2 col-4"
@@ -57,7 +60,7 @@
             <a href='#'>
             <i class='fa fa-eye{{closedeye}}'
             title='{{#str}}togglestatus, local_catquiz{{/str}}'
-            aria-label="eye icon {{closedeye}}"
+            aria-label="icon closed eye"
             data-id="testitem-toggle-status"
             data-templatelocation="local_catquiz/catscalemanager/questions/cards/datacard"
             data-classlocation="local_catquiz\output\catscalemanager\questions\cards\datacard"
