@@ -1,5 +1,4 @@
 @local @local_catquiz @javascript
-
 Feature: As an admin I perform import of catquiz alonf with questions to check Scales and Feedbacks.
 
   Background:
@@ -17,12 +16,12 @@ Feature: As an admin I perform import of catquiz alonf with questions to check S
       | user1    | C1     | student        |
       | user2    | C1     | student        |
       | teacher  | C1     | editingteacher |
-    And the following "question bank questions" exist:
-      | user     | filepath                                        | filename              |
-      | admin | local/catquiz/tests/fixtures/mathematik2scales.xml | mathematik2scales.xml |
+    And the following "local_catquiz > questions" exist:
+      | user     | filepath                                           | filename              | course |
+      | admin    | local/catquiz/tests/fixtures/mathematik2scales.xml | mathematik2scales.xml | C1     |
     And the following "user private files" exist:
-      | user     | filepath                                        | filename              |
-      | admin | local/catquiz/tests/fixtures/mathematik2scales.csv | mathematik2scales.csv |
+      | user     | filepath                                           | filename              |
+      | admin    | local/catquiz/tests/fixtures/mathematik2scales.csv | mathematik2scales.csv |
 
   @javascript
   Scenario: CatQuiz Import: admin imports catscales for already imported questions and verified it
@@ -37,6 +36,24 @@ Feature: As an admin I perform import of catquiz alonf with questions to check S
     And I click on "Select this file" "button"
     And I set the field "CSV separator" to ";"
     And I wait "1" seconds
-    And I press "Submit"
+    When I press "Submit"
     And I wait until the page is ready
-    ## Then I should see "Import was successful. 3 record(s) treated."
+    Then I should see "Import was successful. 3 record(s) treated."
+    ## TODO: potential issue - need to reload page?
+    And I reload the page
+    And I wait until the page is ready
+    And I click on "CAT scales" "link" in the "#region-main" "css_element"
+    And I should see "Mathematik"
+    And I should see "A03"
+    And I should see "A02"
+    And I click on "Questions" "link" in the "#region-main" "css_element"
+    And I set the field "Scale" to "Mathematik"
+    And I should see "3 of 3 records found"
+    And I wait "1" seconds
+    ## And I set the field "Search" to "Rechenregel"
+    And I set the field with xpath "//input[contains(@name, 'search-catscale')]" to "Rechenregel"
+    And I wait "1" seconds
+    And I should see "1 of 3 records found"
+    And I should see "-2.8624" in the "[data-label=\"difficulty\"]" "css_element"
+    And I should see "1.0814" in the "[data-label=\"discrimination\"]" "css_element"
+    And I should see "0.0000" in the "[data-label=\"guessing\"]" "css_element"
