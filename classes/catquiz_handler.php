@@ -528,6 +528,9 @@ class catquiz_handler {
         $attemptfeedback = new attemptfeedback($attemptrecord->id, $contextid);
         $data = $attemptfeedback->export_for_template($OUTPUT);
 
+        // We need to delete caches.
+        cache_helper::purge_by_event('changesinquizattempts');
+
         return $OUTPUT->render_from_template('local_catquiz/attemptfeedback', $data);
     }
 
