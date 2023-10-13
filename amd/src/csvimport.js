@@ -56,12 +56,12 @@ export const init = () => {
         });
 
         // Display errors notifications if defined.
-        if (errors !== [] && errors !== undefined) {
+        if (errors != [] && errors !== undefined) {
 
             // eslint-disable-next-line no-console
             console.log("errors.warnings: ", errors.warnings);
 
-            if (errors.warnings !== undefined && errors.warnings !== []) {
+            if (errors.warnings !== undefined && errors.warnings != []) {
                 errors.warnings.forEach(
                     (warning) => showNotification(warning, "warning", false));
             }

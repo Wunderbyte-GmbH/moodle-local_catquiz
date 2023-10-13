@@ -24,28 +24,31 @@ import {get_string as getString} from 'core/str';
 import Ajax from 'core/ajax';
 import {showNotification} from 'local_catquiz/notifications';
 
+const SELECTORS = {
+    'MANAGECATCONTEXT': '.manage-catcontext',
+};
+
+
 /**
  * Add event listener to buttons.
  */
 export const init = () => {
-
-    // eslint-disable-next-line no-console
-    console.log('manage catscale init');
-
-    let buttons = document.querySelectorAll('.manage-catscale');
+    let buttons = document.querySelectorAll(SELECTORS.MANAGECATCONTEXT);
     buttons.forEach(button => {
+
+        if (button.initialized) {
+            return;
+        }
+
+        button.initialized = true;
+
         button.addEventListener('click', e => {
             e.preventDefault();
             const element = e.target;
-
-            // eslint-disable-next-line no-console
-            console.log("click", element, element.dataset.action);
             if (element.dataset.action === "delete") {
                 performDeletion(element);
-            } else if (element.dataset.action === "view") {
-                displayDetailView(element);
             } else {
-                manageCatscale(element);
+                managecatcontext(element);
             }
         });
     });
@@ -55,21 +58,20 @@ export const init = () => {
  *
  * @param {*} button
  */
-function manageCatscale(button) {
-    const parentelement = button.closest('.list-group-item');
+function managecatcontext(button) {
+    // eslint-disable-next-line capitalized-comments
+    // const parentelement = button.closest('.list-group-item');
     const action = button.dataset.action;
-    let formclass = "local_catquiz\\form\\modal_manage_catscale";
+    let formclass = "local_catquiz\\form\\edit_catcontext";
     let formvalues = {
-        id: parentelement.dataset.id ?? 0,
-        description: parentelement.dataset.description ?? '',
-        name: parentelement.dataset.name ?? '',
-        parentid: parentelement.dataset.parentid ?? 0};
+        id: button.dataset.id ?? 0,
+    };
 
     // eslint-disable-next-line no-console
     console.log(action, formvalues);
     switch (action) {
         case 'create':
-            formvalues = {parentid: parentelement.dataset.id};
+            formvalues = {parentid: button.dataset.id ?? 0};
             break;
     }
     let modalForm = new ModalForm({
@@ -78,7 +80,7 @@ function manageCatscale(button) {
         // Add as many arguments as you need, they will be passed to the form:
         args: formvalues,
         // Pass any configuration settings to the modal dialogue, for example, the title:
-        modalConfig: {title: getString('managecatscale', 'local_catquiz')},
+        modalConfig: {title: getString('managecatcontexts', 'local_catquiz')},
         // DOM element that should get the focus after the modal dialogue is closed:
         returnFocus: button,
     });
@@ -92,7 +94,7 @@ function manageCatscale(button) {
         window.location.reload();
 
         // eslint-disable-next-line no-console
-        console.log('createCatscale: form submitted');
+        console.log('createcatcontext: form submitted');
     });
 
     // Show the form.
@@ -111,7 +113,7 @@ export const performDeletion = async(element) => {
     const parentelement = element.closest('.list-group-item');
     const id = parentelement.dataset.id;
     Ajax.call([{
-        methodname: 'local_catquiz_delete_catscale',
+        methodname: 'local_catquiz_delete_catcontext',
         args: {id: id},
         done: function(res) {
             // eslint-disable-next-line no-console
@@ -129,22 +131,3 @@ export const performDeletion = async(element) => {
         },
     }]);
 };
-
-/**
- *
- * @param {*} element
- */
-function displayDetailView(element) {
-
-    let searchParams = new URLSearchParams(window.location.search);
-    let scaleid = element.dataset.scaleid;
-    let urlscaleid = searchParams.get('scaleid');
-    searchParams.set('scaleid', scaleid);
-
-    // If it's a new scale, we want to display on first click.
-    // Otherwise we switch the value.
-    let sdv = (searchParams.get('sdv') == 0 || searchParams.get('sdv') === null || urlscaleid != scaleid) ? 1 : 0;
-
-    searchParams.set('sdv', sdv);
-    window.location.search = searchParams.toString();
-}
