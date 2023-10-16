@@ -79,9 +79,9 @@ class model_item_param {
     private array $metadata;
 
     /**
-     * @var integer $id The item id, e.g. question id
+     * @var string $id The item id, e.g. question id
      */
-    private int $id;
+    private string $id;
 
     /**
      * Set parameters for class instance.
@@ -92,7 +92,7 @@ class model_item_param {
      * @param int $status
      *
      */
-    public function __construct(int $id, string $modelname, array $metadata = [], int $status = STATUS_NOT_CALCULATED) {
+    public function __construct(string $id, string $modelname, array $metadata = [], int $status = STATUS_NOT_CALCULATED) {
         $this->id = $id;
         $this->modelname = $modelname;
         $this->metadata = $metadata;
@@ -112,9 +112,9 @@ class model_item_param {
     /**
      * Returns the item id (e.g. question id).
      *
-     * @return int
+     * @return string
      */
-    public function get_id(): int {
+    public function get_id(): string {
         return $this->id;
     }
 

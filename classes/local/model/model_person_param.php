@@ -52,9 +52,9 @@ class model_person_param implements \ArrayAccess {
     /**
      * The ID of the user
      *
-     * @var int
+     * @var string
      */
-    private int $id;
+    private string $id;
 
     /**
      * @var float ability
@@ -70,10 +70,10 @@ class model_person_param implements \ArrayAccess {
     /**
      * Instantiate parameter.
      *
-     * @param int $id
+     * @param string $id
      *
      */
-    public function __construct(int $id) {
+    public function __construct(string $id) {
         $this->id = $id;
         $this->params = ['ability'];
     }
@@ -135,9 +135,9 @@ class model_person_param implements \ArrayAccess {
     /**
      * Return ID.
      *
-     * @return int
+     * @return string
      */
-    public function get_id(): int {
+    public function get_id(): string {
         return $this->id;
     }
 
