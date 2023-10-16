@@ -77,7 +77,7 @@ class catquiz_handler {
 
         // This function is for some architectural reason executed twice.
         // In order to avoid adding elements twice, we need this exit.
-        if ($mform->elementExists('choosetest')) {
+        if ($mform->elementExists('choosetemplate')) {
             return [];
         }
 
@@ -97,13 +97,13 @@ class catquiz_handler {
 
         $elements[] = $mform->addElement(
             'select',
-            'choosetest',
-            get_string('choosetest',
+            'choosetemplate',
+            get_string('choosetemplate',
             'local_catquiz'),
             $testtemplates,
             ['data-on-change-action' => 'reloadTestForm']);
 
-        $mform->setType('choosetest', PARAM_INT);
+        $mform->setType('choosetemplate', PARAM_INT);
 
         $context = context_system::instance();
 
@@ -243,7 +243,7 @@ class catquiz_handler {
         }
 
         // The test environment is always on custom to start with.
-        if (empty($data['choosetest'])) {
+        if (empty($data['choosetemplate'])) {
 
             // Create stdClass with all the values.
             $cattest = (object)[
@@ -254,11 +254,11 @@ class catquiz_handler {
             // Pass on the values as stdClas.
             $test = new testenvironment($cattest);
             $test->apply_jsonsaved_values($formdefaultvalues);
-            $formdefaultvalues['choosetest'] = 0;
+            $formdefaultvalues['choosetemplate'] = 0;
         } else {
             // Create stdClass with all the values.
             $cattest = (object)[
-                'id' => $data['choosetest'],
+                'id' => $data['choosetemplate'],
             ];
             // Pass on the values as stdClas.
             $test = new testenvironment($cattest);
@@ -376,7 +376,7 @@ class catquiz_handler {
             // If we have a template name, we first check if we come from an existing template.
             // Create stdClass with all the values.
             $cattest = (object)[
-                'id' => $quizdata->choosetest, // When a template is selected, we might want to update it.
+                'id' => $quizdata->choosetemplate, // When a template is selected, we might want to update it.
                 'json' => json_encode($clone),
                 'component' => 'mod_adaptivequiz',
                 'catscaleid' => $clone->catquiz_catcatscales,
@@ -417,12 +417,12 @@ class catquiz_handler {
 
         $values = $mform->getSubmitValues();
 
-        if (empty($values['choosetest'])) {
+        if (empty($values['choosetemplate'])) {
             return;
         }
 
         $cattest = (object)[
-            'id' => $values['choosetest'],
+            'id' => $values['choosetemplate'],
         ];
         // Pass on the values as stdClas.
         $test = new testenvironment($cattest);
@@ -433,7 +433,7 @@ class catquiz_handler {
         ];
 
         $igonorevalues = [
-            'choosetest',
+            'choosetemplate',
         ];
 
         foreach ($values as $k => $v) {
@@ -449,7 +449,7 @@ class catquiz_handler {
             if ($mform->elementExists($k)) {
                 $element = $mform->getElement($k);
                 $element->setValue($v);
-                if ($test->status_force() && $k !== 'choosetest') {
+                if ($test->status_force() && $k !== 'choosetemplate') {
                     $element->freeze();
                 }
             }

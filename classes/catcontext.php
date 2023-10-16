@@ -159,7 +159,6 @@ class catcontext {
         }
 
         if ($newrecord) {
-
             $this->apply_values($newrecord);
         }
     }
