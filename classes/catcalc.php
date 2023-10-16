@@ -91,11 +91,8 @@ class catcalc {
     public static function estimate_person_ability($personresponses, model_item_param_list $items): float {
         $allmodels = model_strategy::get_installed_models();
 
-        $likelihood = fn($x) => 1;
-        $loglikelihood = fn($x) => 0;
-        $loglikelihood1stderivative = fn($x) => 0;
-        $loglikelihood2ndderivative = fn($x) => 0;
-
+        $jfuns = [];
+        $hfuns = [];
         foreach ($personresponses as $qid => $qresponse) {
             $item = $items[$qid];
             // The item parameter for this response was filtered out.
@@ -110,20 +107,17 @@ class catcalc {
                 throw new \Exception(sprintf("The given model %s can not be used with the catcalc class", $item->get_model_name()));
             }
 
-            $likelihoodpart = fn ($x) => $model::likelihood($x, $itemparams, $qresponse['fraction']);
-            $loglikelihoodpart = fn ($x) => $model::log_likelihood($x, $itemparams, $qresponse['fraction']);
-            $loglikelihood1stderivativepart = fn ($x) => $model::log_likelihood_p($x, $itemparams, $qresponse['fraction']);
-            $loglikelihood2ndderivativepart = fn ($x) => $model::log_likelihood_p_p($x, $itemparams, $qresponse['fraction']);
-
-            $likelihood = fn ($x) => $likelihood($x) * $likelihoodpart($x);
-            $loglikelihood = fn ($x) => $loglikelihood($x) + $loglikelihoodpart($x);
-            $loglikelihood1stderivative = fn ($x) => $loglikelihood1stderivative($x) + $loglikelihood1stderivativepart($x);
-            $loglikelihood2ndderivative = fn ($x) => $loglikelihood2ndderivative($x) + $loglikelihood2ndderivativepart($x);
+            $jfuns[] = fn ($pp) => $model::log_likelihood_p($pp, $itemparams, $qresponse['fraction']);
+            $hfuns[] = fn($pp) => $model::log_likelihood_p_p($pp, $itemparams, $qresponse['fraction']);
         }
+        $jacobian = self::build_callable_array($jfuns);
+        $jacobian = fn ($pp) => matrixcat::multi_sum($jacobian($pp));
+        $hessian = self::build_callable_array($hfuns);
+        $hessian = fn ($pp) => matrixcat::multi_sum($hessian($pp));
 
         $result = mathcat::newton_raphson_multi_stable(
-            $loglikelihood1stderivative,
-            $loglikelihood2ndderivative,
+            $jacobian,
+            $hessian,
             ['ability' => 0.1],
             6,
             50
