@@ -45,9 +45,21 @@ class model_responses {
     private $data;
 
     /**
-     * @var array hascorrectanswer
+     *
+     * @var array $canbecalculated True for a componentid with correct and
+     * incorrect answers.
      */
-    private array $hascorrectanswer = [];
+    private array $canbecalculated = [];
+
+    /**
+     * @var array $excludeditems Componentids of items that can not be calculated.
+     */
+    private array $excludeditems = [];
+
+    /**
+     * @var array $excludedusers Userids of users for which no ability can be calculated.
+     */
+    private array $excludedusers = [];
 
     /**
      * Return array of item ids.
@@ -147,22 +159,49 @@ class model_responses {
         }
 
         $hascorrectanswer = [];
+        $haswronganswer = [];
         foreach ($data as $userid => $components) {
             foreach ($components as $component) {
+
+                // If the user has only correct or incorrect answers, no ability can
+                // be caluclated and the user will be filtered out.
+                $sumoffractions = array_reduce(
+                    $component,
+                    fn ($carry, $item) => $carry + floatval($item['fraction']),
+                    0.0
+                );
+                if (
+                    $sumoffractions === 0.0
+                    || intval($sumoffractions) === count($component)
+                ) {
+                    unset($data[$userid]);
+                    $this->excludedusers[] = $userid;
+                    continue;
+                }
+
                 foreach ($component as $componentid => $results) {
                     if (floatval($results['fraction']) === 1.0) { // TODO: might need to be updated.
                         $hascorrectanswer[] = $componentid;
+                    } else if (floatval($results['fraction']) === 0.0) {
+                        $haswronganswer[] = $componentid;
                     }
                 }
             }
         }
 
         // Filter out items that do not have a single correct answer.
-        $this->hascorrectanswer = array_unique($hascorrectanswer);
+        $hascorrectanswer = array_unique($hascorrectanswer);
+        $haswronganswer = array_unique($haswronganswer);
+        $this->canbecalculated = array_intersect($hascorrectanswer, $haswronganswer);
+        $this->excludeditems = array_diff(
+            $hascorrectanswer + $haswronganswer,
+            $this->canbecalculated
+        );
+
         foreach ($data as $userid => $components) {
             foreach ($components as $componentname => $component) {
                 foreach (array_keys($component) as $componentid) {
-                    if (!in_array($componentid, $this->hascorrectanswer)) {
+                    if (!in_array($componentid, $this->canbecalculated)) {
                         unset($data[$userid][$componentname][$componentid]);
 
                         // If that was the only question in that component, remove the component.
@@ -239,5 +278,21 @@ class model_responses {
 
         $responsesbyuser = $this->data[$userid]['component'];
         return $responsesbyuser[array_key_last($responsesbyuser)];
+    }
+
+    /**
+     * Returns the itemids for which no difficulty can be calculated.
+     * @return array
+     */
+    public function get_excluded_items() {
+        return $this->excludeditems;
+    }
+
+    /**
+     * Returns the userids for which no ability can be calculated.
+     * @return array
+     */
+    public function get_excluded_users() {
+        return $this->excludedusers;
     }
 }
