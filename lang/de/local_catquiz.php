@@ -33,7 +33,7 @@ $string['catquiz'] = 'Catquiz';
 
 // Catquiz handler.
 $string['catscale'] = 'CAT Skala';
-$string['catquizsettings'] = 'Cat Quiz Einstellungen';
+$string['catquizsettings'] = 'Test-Inhalt und Einsatz-Kontext';
 $string['selectmodel'] = 'Wähle ein Modell';
 $string['model'] = 'Modell';
 $string['modeldeactivated'] = 'Deaktiviere CAT engine';
@@ -42,8 +42,8 @@ $string['catscales'] = 'CAT quiz Dimnensionen verwalten';
 $string['catscales:information'] = 'Verwalte CAT Test Skalen: {$a->link}';
 $string['catscalesname_exists'] = 'Der Name wird bereits verwendet';
 $string['cachedef_catscales'] = 'Caches the catscales of catquiz';
-$string['catcatscales'] = 'CAT Skalen für den Test';
-$string['catcatscales_help'] = 'Jede CAT Skala hat Testitems (Fragen) die im Test verwendet werden.';
+$string['catcatscales'] = 'Auswahl Subskalen';
+$string['catcatscales_help'] = 'Wählen Sie die für Sie die für Sie relevanten Subskalen an und ab. Eine Subskala umfasst Fragen aus einen Teil des gewählten Inhaltsbereichs. In einem Test-Versuch werden nur Fragen aus den angewählten Subskalen verwendet.';
 $string['nameexists'] = 'Der Name der CAT Skala wurde bereits verwendet';
 $string['createnewcatscale'] = 'Neue CAT Skala erstellen';
 $string['parent'] = 'Übergeordnete CAT Skala - keine Auswahl falls Top-Level CAT Skala';
@@ -56,16 +56,16 @@ $string['createcatscale'] = 'Erstellen Sie eine CAT Skala';
 $string['cannotdeletescalewithchildren'] = 'CAT Skalen mit Unterskalen können nicht gelöscht werden.';
 $string['passinglevel'] = 'Bestehensgrenze in %';
 $string['passinglevel_help'] = 'Die Bestehensgenze bezieht sich auf die Personenkompetenz und kann für jeden Test individuell gesetzt werden.';
-$string['pilotratio'] = 'Verhältnis von Pilotfragen';
-$string['pilotratio_help'] = 'Gleitkommazahl für das Verhältnis von Pilotfragen. Bei einem Wert von 0.5 wird im Schnitt bei jedem zweiten Versuch eine Pilotfrage angezeigt.';
-$string['pilotattemptsthreshold'] = 'Schwellenwert der Versuche für Pilotfragen';
+$string['pilotratio'] = 'Anteil zu pilotierender Fragen in %';
+$string['pilotratio_help'] = 'Anteil von noch zu pilotierender Fragen an der Gesamtfragezahl in einem Test-Versuch. Die Angabe 20% führt beispielsweise dazu, dass eine von fünf Fragen  eines Test-Versuches eine zu pilotierende Frage sein wird.';
+$string['pilotattemptsthreshold'] = 'Mindestanzahl an Bearbeitungen';
 $string['pilotattemptsthreshold_help'] = 'Fragen mit weniger Versuchen werden als Pilotfragen klassifiziert';
-$string['includepilotquestions'] = 'Pilotfragen anzeigen';
+$string['includepilotquestions'] = 'Pilotierungsmodus aktivieren';
 $string['standarderrorpersubscale'] = 'Standarderror pro Subskala in Prozent';
 $string['standarderrorpersubscale_help'] = 'Sobald der Standardfehler einer Subskala unter diesen Wert fällt, wird sie nicht weiter getestet.';
-$string['maxquestionspersubscale'] = 'Maximalanzahl an angezeigten Fragen pro Subskala';
+$string['maxquestionspersubscale'] = 'max. Frageanzahl pro Subskala';
 $string['maxquestionspersubscale_help'] = 'Wenn von einer Subskala so viele Fragen angezeigt wurden, werden keine weiteren Fragen dieser Skala mehr ausgespielt. Wenn auf 0 gesetzt, dann gibt es kein Limit.';
-$string['minquestionspersubscale'] = 'Minimum an angezeigten Fragen pro Subskala';
+$string['minquestionspersubscale'] = 'min. Frageanzahl pro Subskala';
 $string['minquestionspersubscale_help'] = 'Eine Subskala wird frühestens dann ausgeschlossen, wenn die Minimalanzahl an Fragen aus dieser Skala angezeigt wurden.';
 
 $string['timepacedtest'] = 'Zeitbeschränkungen für den Test aktivieren';
@@ -85,11 +85,11 @@ $string['chooseparent'] = 'Wähle übergeordnete Scala';
 $string['errorminscalevalue'] = 'Der Minimalwert muss kleiner sein als der Maximalwert der Skala';
 $string['errorhastobefloat'] = 'Muss ein Dezimalwert sein';
 
-$string['addoredittemplate'] = "Bearbeite Vorlage";
+$string['addoredittemplate'] = "Einstellungs-Vorlage bearbeiten";
 
 // Test Strategy.
-$string['catquiz_teststrategyheader'] = 'Teststrategie';
-$string['catquiz_selectteststrategy'] = 'Wähle Teststrategie';
+$string['catquiz_teststrategyheader'] = 'CAT-Einstellungen';
+$string['catquiz_selectteststrategy'] = 'Testzweck';
 
 $string['teststrategy_base'] = 'Basisklase der Teststrategien';
 $string['teststrategy_info'] = 'Info Klasse für Teststrategien';
@@ -100,7 +100,7 @@ $string['inferlowestskillgap'] = 'Unterste Kompetenzlücke diagnostizieren';
 $string['infergreateststrength'] = 'Größte Stärke diagnostizieren';
 $string['inferallsubscales'] = 'Alle Subskalen bestimmen';
 
-$string['catquiz_selectfirstquestion'] = "Auswahl der ersten Quizfrage";
+$string['catquiz_selectfirstquestion'] = "Starte neue CAT-Test-Versuche mit...";
 $string['startwitheasiestquestion'] = "Starte mit der leichtesten Frage an";
 $string['startwithfirstofsecondquintil'] = "Starte mit der leichtesten Frage aus dem zweiten Quintil";
 $string['startwithfirstofsecondquartil'] = "Starte mit der leichtesten Frage aus dem zweiten Quartil";
@@ -118,7 +118,7 @@ $string['component'] = 'Plugin';
 $string['timemodified'] = 'Modifiziert';
 $string['invisible'] = 'Unsichtbar';
 $string['edittestenvironment'] = 'Bearbeite Testumgebung';
-$string['choosetest'] = 'Wähle Testumgebung';
+$string['choosetemplate'] = 'Einstellungs-Vorlage wählen';
 $string['parentid'] = 'Eltern id';
 $string['force'] = 'Erzwinge Werte';
 $string['catscaleid'] = 'CAT Skala ID';
@@ -135,8 +135,8 @@ $string['timemodified'] = 'Zuletzt geändert';
 $string['notimelimit'] = 'No time limit';
 $string['attempts'] = 'Versuche';
 $string['action'] = 'Action';
-$string['searchcatcontext'] = 'Cat Kontexte durchsuchen';
-$string['selectcatcontext'] = 'Cat Kontext auswählen';
+$string['searchcatcontext'] = 'Einsatz-Kontexte durchsuchen';
+$string['selectcatcontext'] = 'Einsatz-Kontext auswählen';
 $string['starttimestamp'] = 'Zeitraum Anfang';
 $string['endtimestamp'] = 'Zeitraum Ende';
 $string['defaultcontextname'] = 'Standard Cat Kontext';
@@ -371,11 +371,39 @@ $string['feedbackbarlegend_region_2'] = "Mit einem Wissensstand in diesem Bereic
 $string['feedbackbarlegend_region_3'] = "In diesem Bereich der Wissensstände ist erfahrungsgemäß ein Studium in der Regelstudienzeit möglich.";
 $string['feedbackbarlegend_region_4'] = "Dieser Bereich legt ein Vorwissen nahe, was über die Anforderungen des Fachstudiums sogar hinausgeht.";
 $string['teacherfeedback'] = "Feedback für Lehrende";
-
 $string['catquiz_feedbackheader'] = "Feedback";
 $string['noselection'] = "Keine Auswahl";
 $string['lowerlimit'] = "Unteres Limit";
-$string['setcoursesforscaletext'] = 'Setzen sie für die Scala {$a} die Kurse, in die Nutzerinnen, die unter dem unteren Limit abschneiden, eingeschrieben werden sollen.';
+$string['setcoursesforscaletext'] = 'Legen sie für die (Sub-) Skala {$a} die Fähigkeitsbereiche für die einzelnen Feedbacks, die schriftlichen Rückmeldungen sowie jeweiligen Einschreibungen in Kurse oder Gruppen fest.';
+// No used yet.
+$string['catcatscaleprime'] = 'Inhaltsbereich/Skala';
+$string['catcatscaleprime_help'] = 'Wählen Sie den für Sie relevanten Inhaltsbereich aus. Inhaltsbereche werden als sogenannte Skala durch eine*n CAT-Manager*in angelegt und verwaltet. Falls Sie eigene Inhalts- und Teilbereiche wünschen, wenden Sie sich bitte an den oder die CAT-Manager*in oder den bzw. die Adminstrator*in Ihrer Moodle-Instanz.';
+$string['catcatscales_selectall'] = 'Alle Subskalen auswählen';
+$string['catcatscaleprime_help'] = 'Wählen Sie den für Sie relevanten Inhaltsbereich aus. Inhaltsbereche werden als sogenannte Skala durch eine*n CAT-Manager*in angelegt und verwaltet. Falls Sie eigene Inhalts- und Teilbereiche wünschen, wenden Sie sich bitte an den oder die CAT-Manager*in oder den bzw. die Adminstrator*in Ihrer Moodle-Instanz.';
+$string['selectcatcontext_help'] = 'Einsatz-Kontexte differenzieren die Daten hinsichtlich Zielgruppe, Einsatzzweck oder Zeit/Kohorte. Der Einsatz-Kontext wird durch den bzw. die CAT-Manager*in verwaltet. Falls Sie für Ihren Einsatzzweck einen eigenen Einsatz-Kontext wünschen, wenden Sie sich bitte an den oder die CAT-Manager*in oder den bzw. die Adminstrator*in Ihrer Moodle-Instanz.';
+$string['includepilotquestions_help'] = 'Im Pilotierungsmodus werden den Testdurchläufen Fragen beigemischt, deren Fragen-Parameter (z.B. Schwierigkeit, Trennschärfe) noch nicht bestimmt sind. Diese tragen nicht zum Test-Ergebnis bei. Die durch die Bearbeitungen angefallenen Daten können durch eine*n CAT-Manager*in zu einem späteren Zeitpunkt zur Bestimmung der Fragen-Parameter statistisch ausgewertet werden.';
+$string['catquiz_selectfirstquestion_help'] = 'Bei einem Test-Versuch entscheidet der Algorithmus aufgrund dieser Einstellung, nach welchem Kriterium die erste Frage gewählt wird, die ausgespielt wird.';
+$string['numberoffeedbackoptionpersubscale'] = 'Anzahl an Feedback-Optionen pro Subskala';
+$string['numberoffeedbackoptionpersubscale_help'] = 'Wählen Sie aus, wieviele Optionen an Feedback Sie pro Subskala benötigen. Mithilfe der Feedback-Optionen können Sie in Abhängigkeit der ermittelten Fähigkeit gestufte, schriftliche Rückmeldungen erteilen und in verschiedene Kurse oder Gruppen einschreiben.';
+$string['choosesubscaleforfeedback'] = 'Subskala wählen';
+// Check display line breaks etc.
+$string['choosesubscaleforfeedback_help'] = 'Für die angezeigten Subskalen können Sie nun {$a} Feedback-Angaben hinterlegen. Wählen Sie die jeweilige (Sub-)Skala an, um Ihr Feedback einzugeben. Die farbigen Symbole zeigen Ihnen den aktuellen Stand der Bearbeitung an, gemessen an den vor Ihnen hinterlegten Anzahl an Feedback-Optionen:
+    grau - noch kein Feedback in der Sub-Skala hinterlegt
+    gelb - noch einige Feedback-Optionen unausgefüllt
+    grün - Feedback vollumfänglich hinterlegt';
+// String $string['choosesubscaleforfeedback_text'] = ''; .
+$string['setfeedbackforscale'] = 'schriftliches Feedback';
+// For setfeedbackforscale_help: Param =  <Name der Subskala>.
+$string['setfeedbackforscale_help'] = 'Dieser Text wird den Testteilnehmenden nach Beendigung des Tests angezeigt, sofern das Ergebnis für die Subskala {$a} in den eingestellten Fähigkeitsbereich fällt.';
+$string['setgrouprenrolmentforscale'] = 'Einschreibung in eine Gruppe';
+// For setgroupenrolmentforscale_help: Param =  <Name der Subskala>.
+$string['setgroupenrolmentforscale_help'] = 'In diese Gruppe des Kurses werden Testteilnehmende nach Beendigung des Tests eingeschrieben, sofern das Ergebnis für die Subskala {$a} in den eingestellten Fähigkeitsbereich fällt. Falls Sie keine Einschreibung in eine Gruppe wünschen, lassen Sie dieses Feld bitte leer.';
+$string['setcourseenrolmentforscale'] = 'Einschreibung in einen Kurs';
+// For setcourseenrolmentforscale_help: Param =  <Name der Subskala>.
+$string['setcourseenrolmentforscale_help'] = 'In diesen (externen) Kurs werden Testteilnehmende nach Beendigung des Tests eingeschrieben, sofern das Ergebnis für die Subskala {$a} in den eingestellten Fähigkeitsbereich fällt. Sie können nur Kurse auswählen, zu denen Sie die Berechtung zur Einschreibung haben oder die zur Einschreibung durch einen CAT-Manager*in freigegeben wurden. Falls Sie keine Einschreibung in einen externen Kurs wünschen, lassen Sie dieses Feld bitte leer.';
+$string['setautonitificationonenrolmentforscale'] = 'Teilnehmende über eine Gruppen- oder Kurseinschreibung mittels Standardtext informieren.';
+// Check Params for setautonitificationonenrolmentforscale_help text. Group and courselink.
+$string['setautonitificationonenrolmentforscale_help'] = 'Teilnehmende erhalten zusätzlich zu deren schriftlichen Feedback folgenden Hinweis: "Sie wurden automatisch in die Gruppe <Gruppenname> / den Kurs <Kursname als Link> eingeschrieben."';
 
 // Quiz attempts.
 $string['catcontext'] = 'CAT Kontext';

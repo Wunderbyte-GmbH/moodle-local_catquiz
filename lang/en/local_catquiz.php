@@ -34,7 +34,7 @@ $string['catquiz'] = 'Catquiz';
 
 // Catquiz handler.
 $string['catscale'] = 'CAT scale';
-$string['catquizsettings'] = 'CAT quiz settings';
+$string['catquizsettings'] = 'Test content and context';
 $string['selectmodel'] = 'Choose a model';
 $string['model'] = 'Model';
 $string['modeldeactivated'] = 'Deactivate CAT engine';
@@ -43,8 +43,8 @@ $string['catscales'] = 'Define catquiz CAT scales';
 $string['catscales:information'] = 'Define CAT scales: {$a->link}';
 $string['catscalesname_exists'] = 'The name is already being used';
 $string['cachedef_catscales'] = 'Caches the CAT scales of catquiz';
-$string['catcatscales'] = 'CAT scales to be tested';
-$string['catcatscales_help'] = 'Every CAT scales has testitems (questions) which will be used in the test.';
+$string['catcatscales'] = 'Selection subscales';
+$string['catcatscales_help'] = 'Select and deselect the subscales that are relevant to you. A subscale includes questions from part of the selected content area. In a test experiment, only questions from the selected subscales are used.';
 $string['nameexists'] = 'The name of the CAT scale already exists';
 $string['createnewcatscale'] = 'Create new CAT scale';
 $string['parent'] = 'Parent CAT scale - None if top level CAT scale';
@@ -57,11 +57,11 @@ $string['createcatscale'] = 'Create a CAT scale';
 $string['cannotdeletescalewithchildren'] = 'Cannot delete CAT scale with children';
 $string['passinglevel'] = 'Passing level in %';
 $string['passinglevel_help'] = 'There is a level of personal competency that can be set for the test.';
-$string['pilotratio'] = 'Rate of pilot questions';
-$string['pilotratio_help'] = 'Floating point number that specifies how often pilot questions should be displayed. When a value of 0.5 is specified, then on average every second attempt will display a pilot question.';
-$string['pilotattemptsthreshold'] = 'Pilotquestion attempt threshold';
+$string['pilotratio'] = 'Proportion of questions to be piloted in %';
+$string['pilotratio_help'] = 'Proportion of questions still to be piloted in the total number of questions in a test attempt. For example, specifying 20% ​means that one out of five questions in a test experiment will be a question to be piloted';
+$string['pilotattemptsthreshold'] = 'Minimum number of adaptations';
 $string['pilotattemptsthreshold_help'] = 'Questions with less attempts will be considered pilot questions';
-$string['includepilotquestions'] = 'Include pilot questions in the quiz';
+$string['includepilotquestions'] = 'Activate pilot mode';
 $string['standarderrorpersubscale'] = 'Standarderror per subscale in percent';
 $string['standarderrorpersubscale_help'] = 'If the standard error for a scale drops below this value, it will no longer be tested.';
 $string['maxquestionspersubscale'] = 'Maximum number of questions returned per subscale';
@@ -89,8 +89,8 @@ $string['errorhastobefloat'] = 'Has to be a deciamal';
 $string['addoredittemplate'] = "Add or edit template";
 
 // Test Strategy.
-$string['catquiz_teststrategyheader'] = 'Test strategy';
-$string['catquiz_selectteststrategy'] = 'Select test strategy';
+$string['catquiz_teststrategyheader'] = 'CAT Settings';
+$string['catquiz_selectteststrategy'] = 'Purpose of test';
 
 $string['teststrategy_base'] = 'Base class for test strategies';
 $string['teststrategy_info'] = 'Info class for test strategies';
@@ -101,7 +101,7 @@ $string['inferlowestskillgap'] = 'Infer lowest skill gap';
 $string['infergreateststrength'] = 'Infer greatest strength';
 $string['inferallsubscales'] = 'Infer all subscales';
 
-$string['catquiz_selectfirstquestion'] = "Selection of first question";
+$string['catquiz_selectfirstquestion'] = "Start new CAT test with...";
 $string['startwitheasiestquestion'] = "Start with the easiest question";
 $string['startwithfirstofsecondquintil'] = "Start with the first question of the second quintil";
 $string['startwithfirstofsecondquartil'] = "Start with the first question of the second quartil";
@@ -119,7 +119,7 @@ $string['lang'] = 'Language';
 $string['component'] = 'Plugin';
 $string['invisible'] = 'Invisible';
 $string['edittestenvironment'] = 'Edit testenvironment';
-$string['choosetest'] = 'Choose a test environment';
+$string['choosetemplate'] = 'Choose a test environment';
 $string['parentid'] = 'Parent id';
 $string['force'] = 'Force values';
 $string['catscaleid'] = 'CAT scale ID';
@@ -375,12 +375,40 @@ $string['feedbackbarlegend_region_2'] = "With this level of knowledge, one can e
 $string['feedbackbarlegend_region_3'] = "Experience has shown that it is typically possible to complete the program within the standard study period with knowledge at this level.";
 $string['feedbackbarlegend_region_4'] = "This domain suggests a prior knowledge that even exceeds the requirements of the subject studies.";
 $string['teacherfeedback'] = "Feedback for teachers";
-
 $string['catquiz_feedbackheader'] = "Feedback";
 $string['noselection'] = "No selection";
 $string['lowerlimit'] = "Lower limit";
-
-$string['setcoursesforscaletext'] = 'Set for catscale {$a} the courses in which users failing the lower limit should be inscribed to.';
+$string['setcoursesforscaletext'] = 'For catscale {$a}, determine the ability for the individual feedback, the written feedback and the respective enrollments in courses or groups.';
+// Not used yet.
+$string['limitrange'] = 'Limit range';
+$string['catcatscaleprime'] = 'Content/Scale';
+$string['catcatscaleprime_help'] = 'Select the content area that is relevant to you. Content areas are created and managed as a so-called scale by a CAT manager. If you would like your own content and sub-areas, please contact the CAT manager or the administrator of your Moodle instance.';
+$string['catcatscales_selectall'] = 'Select all subscales';
+$string['selectcatcontext_help'] = 'Contexts differentiate the data in terms of target group, purpose or time/cohort. The deployment context is managed by the CAT manager. If you would like your own context of use for your purpose, please contact the CAT manager or the administrator of your Moodle instance.';
+$string['includepilotquestions_help'] = 'In the pilot mode, questions are added to the tests whose parameters (e.g. difficulty, guessing) are not determined yet. These do not contribute to the test result. The data generated by the processing can later be statistically evaluated by a CAT manager to determine the question parameters.';
+$string['catquiz_selectfirstquestion_help'] = 'During a test attempt, the algorithm decides based on this setting which criterion will be used to select the first question to be played.';
+$string['numberoffeedbackoptionpersubscale'] = 'Anzahl an Feedback-Optionen pro Subskala';
+$string['numberoffeedbackoptionpersubscale_help'] = 'Select how many options of feedback you need per subscale. Using the feedback options, you can provide graded, written feedback depending on the ability identified and enroll in different courses or groups.';
+$string['choosesubscaleforfeedback'] = 'Select a subscale';
+// Check display line breaks etc.
+$string['choosesubscaleforfeedback_help'] = 'You can now store <number of options> feedback informations for the subscales displayed. Select a (sub-)scale to enter your feedback. The colored symbols indicate the current status of processing, measured by the number of feedback options you entered:
+    gray - no feedback stored in the sub-scale yet
+    yellow - some feedback options still unfilled
+    green - feedback fully deposited';
+// String $string['choosesubscaleforfeedback_text'] = ''; .
+$string['setfeedbackforscale'] = 'written feedback';
+// For setfeedbackforscale_help: Param =  <Name der Subskala>.
+$string['setfeedbackforscale_help'] = 'This text will be displayed to the test participants after completion of the test, provided the result for the subscale <subscale name> falls within the defined ability range.';
+$string['setgrouprenrolmentforscale'] = 'Enrole to a groupe';
+// For setgroupenrolmentforscale_help: Param =  <Name der Subskala>.
+$string['setgroupenrolmentforscale_help'] = 'Test participants are enrolled in this group of the course after completing the test, provided the result for the subscale {$a} falls within the set ability range. If you do not wish to be enrolled in a group, please leave this field blank.';
+$string['setcourseenrolmentforscale'] = 'Subscription to a course';
+// For setcourseenrolmentforscale_help: Param =  <Name der Subskala>.
+$string['setcourseenrolmentforscale_help'] = 'Test participants are enrolled in this (external) course after completing the test, provided the result for the subscale {$a} falls within the set ability range. You can only select courses for which you have the right to enroll or which have been approved for enrollment by a CAT manager. If you do not wish to enroll in an external course, please leave this field blank.';
+$string['setautonitificationonenrolmentforscale'] = 'Inform participants about group or course enrollment using the standard text.';
+// Check Params for setautonitificationonenrolmentforscale_help text. Group and courselink.
+$string['setautonitificationonenrolmentforscale_help'] = '
+In addition to their written feedback, participants will receive the following note: "You have been automatically enrolled in the group <group name> / the course <course name as a link>."';
 
 // Quiz attempts.
 $string['catcontext'] = 'CAT Context';
