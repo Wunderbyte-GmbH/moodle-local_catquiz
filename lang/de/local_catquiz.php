@@ -142,11 +142,13 @@ $string['starttimestamp'] = 'Zeitraum Anfang';
 $string['endtimestamp'] = 'Zeitraum Ende';
 $string['defaultcontextname'] = 'Standard Cat Kontext';
 $string['defaultcontextdescription'] = 'Beinhaltet alle Testitems';
+$string['autocontextdescription'] = 'Automatisch durch einen Import generiert für Skala {$a}.';
 $string['noint'] = 'Bitte geben Sie eine Zahl ein';
 $string['notpositive'] = 'Bitte geben Sie eine positive Zahl ein';
 $string['strategy'] = 'Strategie';
 $string['max_iterations'] = 'Maximale Anzahl an Iterationen';
 $string['model_override'] = 'Nur dieses Modell verwenden';
+
 // Buttons.
 $string['subscribe'] = 'Abonniere';
 $string['subscribed'] = 'Abonniert';

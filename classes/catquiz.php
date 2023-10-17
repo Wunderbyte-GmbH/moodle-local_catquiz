@@ -1029,6 +1029,28 @@ class catquiz {
     }
 
     /**
+     * Returns the default context object from DB.
+     *
+     * @return object
+     */
+    public static function get_default_context_object() {
+        global $DB;
+        
+        $context = $DB->get_record_sql(
+           "SELECT * FROM {local_catquiz_catcontext} WHERE " . $DB->sql_like(
+               'json',
+               ":default"
+           ),
+           [
+               'default' => '%"default":true%',
+           ],
+           MUST_EXIST
+        );
+
+        return $context;
+    }
+
+    /**
      * Updates the person ability for the given user in the given context
      *
      * @param int $userid
