@@ -131,6 +131,15 @@ class catcontext {
     private int $timecalculated = 0;
 
     /**
+     *
+     * Provide sigleton context instances
+     *
+     * @var array
+     */
+    private static $catcontexts = [];
+
+
+    /**
      * Catcontext constructor.
      * @param stdClass $newrecord
      */
@@ -155,6 +164,31 @@ class catcontext {
         }
     }
 
+    public static function get_instance(int $scaleid) {
+        if (empty(self::$catcontexts[$scaleid])) {
+            return null;
+        } else {
+           return self::$catcontexts[$scaleid];
+        }
+    }
+    /**
+     * Store generated context in singleton array.
+     *
+     * @param catcontext $catcontext
+     * @param int $scaleid
+     *
+     * @return self
+     *
+     */
+    public static function store_context_as_singleton(catcontext $catcontext, int $scaleid) {
+        if (empty(self::$catcontexts[$scaleid])) {
+            self::$catcontexts[$scaleid] = $catcontext;
+            return true;
+        } else {
+            return false;
+        }
+
+    }
     /**
      * Load from DB
      *
@@ -441,8 +475,7 @@ class catcontext {
         }
 
         $explodedname = explode("_", $this->name);
-
-        // TODO: Get all context records from db. 
+ 
         $dbrecords = $DB->get_records_sql(
             "SELECT * FROM {local_catquiz_catcontext}"
         );

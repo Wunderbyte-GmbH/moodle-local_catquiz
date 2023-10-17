@@ -367,7 +367,7 @@ class catscalequestions_table extends wunderbyte_table {
      */
     public function col_parentscalenames($values) {
 
-        $ancestors = catscale::get_ancestors($values->catscaleid, true);
+        $ancestors = catscale::get_ancestors($values->catscaleid, 2);
         return implode('|', $ancestors);
     }
 

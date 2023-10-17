@@ -397,21 +397,31 @@ class catscale {
 
     /**
      * Get IDs of parentscales.
+     * The highest parent being the first value in array.
+     * With return names, returnvalue is either only the scaleids (1), 
+     * scalenames (2) or both (3).
      *
      * @param int $catscaleid
-     * @param bool $returnnames
+     * @param int $returnnames
      *
      * @return mixed
      *
      */
-    public static function get_ancestors(int $catscaleid, bool $returnnames = false) {
+    public static function get_ancestors(int $catscaleid, int $returnnames = 1) {
         global $DB;
         $all = $DB->get_records("local_catquiz_catscales", null, "", "id, parentid, name");
         $ancestorsintarray = self::add_parentscales($catscaleid, $all);
-        if (!$returnnames) {
-            return $ancestorsintarray;
-        } else {
-            return array_map(fn($a) => $all[$a]->name, $ancestorsintarray);
+        switch ($returnnames) {
+            case 1:
+                return $ancestorsintarray;
+            case 2:
+                return array_map(fn($a) => $all[$a]->name, $ancestorsintarray);
+            case 3:
+                return [
+                    'catscalenames' => array_map(fn($a) => $all[$a]->name, $ancestorsintarray),
+                    'catscaleids' => $ancestorsintarray,
+                ];
+
         }
 
     }

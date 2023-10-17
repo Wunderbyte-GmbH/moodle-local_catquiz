@@ -142,6 +142,7 @@ $string['selectcatcontext'] = 'Select a CAT context';
 $string['defaultcontextname'] = 'Default CAT context';
 $string['defaultcontextdescription'] = 'Includes all test items';
 $string['autocontextdescription'] = 'Automatically generated via import for CAT scale {$a}.';
+$string['uploadcontext'] = 'uploadcontext_{$a->scalename}_{$a->usertime}';
 $string['noint'] = 'Please enter an integer number';
 $string['notpositive'] = 'Please enter a positive number';
 $string['strategy'] = 'Strategy';

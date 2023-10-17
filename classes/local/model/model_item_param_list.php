@@ -376,55 +376,11 @@ class model_item_param_list implements ArrayAccess, IteratorAggregate, Countable
 
             return $returnarray;
         }
-        $parentscalename = isset($newrecord['parentscalenames']) ? $newrecord['parentscalenames'] : null;
         // We only run this once we have the component id.
         $newrecord = self::update_in_scale($newrecord);
 
-        // TODO: Decide: If there is no parentscale given, but assigned scale has a parent: create context for parent?
-        // Check if context if empty. If so, create new context for this scale.
-        // Make sure, the following lines with the same scale use the same context.
-        if (empty($newrecord['contextid'])) {
-            // If given, we get name and id of parent scale. Otherwise we use the scale.
-            if (!empty($parentscalename)) {
-                // If we have a parentscalename, we get the id of the scale.
-                $sql = "SELECT id
-                    FROM {local_catquiz_catscales}
-                    WHERE name = :name";
-                $scaleid = $DB->get_field_sql($sql, ['name' => $parentscalename]);
-                if (empty($scaleid)) {
-                    unset($parentscalename);
-                } else {
-                    $scalename = $parentscalename;
-                }
-            } 
-            // We check again, to include cases where parentscalename was unset because not found in query.
-            if (empty($parentscalename)) {
-                $scaleid = $newrecord['catscaleid'];
-                if (empty($newrecord['catscalename'])) {
-                    $sql = "SELECT name
-                        FROM {local_catquiz_catscales}
-                        WHERE id = :id";
-                    $scalename = $DB->get_field_sql($sql, ['id' => $scaleid]);
-                } else {
-                    $scalename = $newrecord['catscalename'];
-                }
-            }
-
-            $defaultcontext = catquiz::get_default_context_object();
-            $newcontext = new stdClass;
-            $newcontext->name = "autocontext_". $scalename . "_" . $scaleid . "_". time();
-            $newcontext->starttimestamp = $defaultcontext->starttimestamp;
-            $newcontext->endtimestamp = $defaultcontext->endtimestamp;
-            $newcontext->description = get_string('autocontextdescription', 'local_catquiz', $scalename);
-
-            $contextobject = new catcontext($newcontext);
-
-            // Check if context was created recently, for same scale and if so, assign same context.
-            if (empty($contextobject->compare_to_existing_contexts($newcontext))) {
-                $contextobject->save_or_update($newcontext);
-            }
-            $newrecord['contextid'] = $contextobject->id;
-        }
+        // Assign corresponding context
+        self::assign_catcontext($newrecord);
 
         if (empty($newrecord['model'])) {
             return [
@@ -590,4 +546,59 @@ class model_item_param_list implements ArrayAccess, IteratorAggregate, Countable
 
         }
     }
+    /**
+     * This function checks if the context-param is empty. 
+     * If it's empty and a scale is given  
+     * @param array $newrecord
+     * @return void
+     */
+    private static function assign_catcontext(&$newrecord) {
+        global $DB;
+        // Check if context if empty. If so, create new context for this scale.
+        // Make sure, the following lines with the same scale use the same context.
+        if (!empty($newrecord['contextid'])) {
+            return;
+        }
+        if (empty($newrecord['catscaleid'])) {
+            return;
+        }
+        // We get the id and the name of the parent catscale.
+        if (!empty(catscale::get_ancestors($newrecord['catscaleid'], 3)['catscaleids'])) {
+            $parentscales = catscale::get_ancestors($newrecord['catscaleid'], 3);
+            $scaleid = intval($parentscales['catscaleids'][0]);
+            $scalename = $parentscales['catscalenames'][0];
+        } else {
+            $scaleid = intval($newrecord['catscaleid']);
+            $scalename = $newrecord['catscalename'];
+        }
+
+        // Check if context was created with this import for this scale.
+        // If so, use this context. 
+        // Else: create context and store in singleton.
+        if (empty(catcontext::get_instance($scaleid))) {
+
+            $defaultcontext = catquiz::get_default_context_object();
+            $timestring = userdate(time(), get_string('strftimedatetimeshort', 'core_langconfig'));
+            $usertime = str_replace(' ', '', $timestring);
+    
+            $data = new stdClass;
+            $data->name = get_string('uploadcontext', 'local_catquiz', [
+                'scalename' => $scalename,
+                'usertime' => $usertime
+                ]);
+            $data->starttimestamp = $defaultcontext->starttimestamp;
+            $data->endtimestamp = $defaultcontext->endtimestamp;
+            $data->description = get_string('autocontextdescription', 'local_catquiz', $scalename);
+    
+            $context = new catcontext($data);
+            $context->save_or_update($data);
+            catcontext::store_context_as_singleton($context, $scaleid);
+            $catcontext = $context;
+        } else {
+           $catcontext = catcontext::get_instance($scaleid);
+        };
+
+        $newrecord['contextid'] = $catcontext->id;
+    }
+
 }
