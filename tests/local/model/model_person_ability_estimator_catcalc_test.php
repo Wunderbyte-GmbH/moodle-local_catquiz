@@ -107,21 +107,27 @@ class model_person_ability_estimator_catcalc_test extends basic_testcase {
         switch ($modelname) {
             case 'raschbirnbauma':
                 require_once(
-                    $CFG->dirroot . '/local/catquiz/tests/fixtures/responses 1PL.php'
+                    $CFG->dirroot . '/local/catquiz/tests/fixtures/responses1PL_testdata.php'
                 );
-                $data = responses1PL;
+                // phpcs:disable
+                $data = responses1PL_testdata::return_testdata();
+                // phpcs:enable
                 break;
             case 'raschbirnbaumb':
                 require_once(
-                    $CFG->dirroot . '/local/catquiz/tests/fixtures/responses 2PL.php'
+                    $CFG->dirroot . '/local/catquiz/tests/fixtures/responses2PL_testdata.php'
                 );
-                $data = responses2PL;
+                // phpcs:disable
+                $data = responses2PL_testdata::return_testdata();
+                // phpcs:enable
                 break;
             case 'raschbirnbaumc':
                 require_once(
-                    $CFG->dirroot . '/local/catquiz/tests/fixtures/responses 3PL.php'
+                    $CFG->dirroot . '/local/catquiz/tests/fixtures/responses3PL_testdata.php'
                 );
-                $data = responses3PL;
+                // phpcs:disable
+                $data = responses3PL_testdata::return_testdata();
+                // phpcs:enable
                 break;
 
             default:
