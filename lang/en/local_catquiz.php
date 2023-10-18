@@ -350,7 +350,7 @@ $string['edititemparams'] = 'Edit item params';
 
 // Testitem Detail View.
 $string['questionpreview'] = 'Question preview';
-$string['backtotable'] = 'Back to testitems table';
+$string['backtotable'] = 'Back to overview table';
 $string['local_catquiz_toggle_testitemstatus_message'] = 'Testitem status was updated';
 $string['togglestatus'] = 'Toggle status';
 

@@ -347,7 +347,7 @@ $string['edititemparams'] = 'Daten ändern';
 
 // Testitem Detail View.
 $string['questionpreview'] = 'Fragevorschau';
-$string['backtotable'] = 'Zurück zur Testitems Tabelle';
+$string['backtotable'] = 'Zurück zur Übersichts Tabelle';
 $string['local_catquiz_toggle_testitemstatus_message'] = 'Status des Elements wurde aktualisiert';
 $string['togglestatus'] = 'Status ändern';
 
