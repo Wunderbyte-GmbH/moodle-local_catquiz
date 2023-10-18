@@ -176,6 +176,8 @@ class model_person_ability_estimator_catcalc_test extends basic_testcase {
     /**
      * Create item params
      *
+     * @param mixed $modelname
+     *
      * @return model_item_param_list
      */
     private static function createitemparams($modelname) {

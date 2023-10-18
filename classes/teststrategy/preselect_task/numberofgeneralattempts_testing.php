@@ -43,7 +43,7 @@ final class numberofgeneralattempts_testing extends numberofgeneralattempts {
     /**
      * Returns array of questions with attempt scount.
      *
-     * @param mixed $content
+     * @param mixed $context
      *
      * @return array
      */
