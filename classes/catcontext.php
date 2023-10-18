@@ -162,12 +162,15 @@ class catcontext {
             $this->apply_values($newrecord);
         }
     }
-
+    /**
+     *
+     * @return catcontext|null
+     */
     public static function get_instance(int $scaleid) {
         if (empty(self::$catcontexts[$scaleid])) {
             return null;
         } else {
-           return self::$catcontexts[$scaleid];
+            return self::$catcontexts[$scaleid];
         }
     }
     /**
@@ -447,7 +450,7 @@ class catcontext {
     }
 
     /**
-     * Compare the context to contexts in db. Returns similar context if found, else false. 
+     * Compare the context to contexts in db. Returns similar context if found, else false.
      *
      * @return stdClass|boolean
      */
@@ -474,13 +477,13 @@ class catcontext {
         }
 
         $explodedname = explode("_", $this->name);
- 
+
         $dbrecords = $DB->get_records_sql(
             "SELECT * FROM {local_catquiz_catcontext}"
         );
 
-        // Check if $record->name contains 
-        // If context was created less than 2 minutes ago, and it's for the same scale, we return it. 
+        // Check if $record->name contains
+        // If context was created less than 2 minutes ago, and it's for the same scale, we return it.
         $time = intval(time());
         foreach ($dbrecords as $dbrecord) {
             // TODO change again to 120!
@@ -488,8 +491,8 @@ class catcontext {
                 && str_contains($dbrecord->name, $explodedname[1])
                 && str_contains($dbrecord->name, $explodedname[2])
                 ) {
-            $this->id = $dbrecord->id;
-            return $dbrecord;
+                $this->id = $dbrecord->id;
+                return $dbrecord;
             }
         }
         // If no record was found, return false.

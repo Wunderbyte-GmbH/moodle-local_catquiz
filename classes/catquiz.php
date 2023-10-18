@@ -1035,7 +1035,7 @@ class catquiz {
      */
     public static function get_default_context_object() {
         global $DB;
-        
+
         $context = $DB->get_record_sql(
            "SELECT * FROM {local_catquiz_catcontext} WHERE " . $DB->sql_like(
                'json',

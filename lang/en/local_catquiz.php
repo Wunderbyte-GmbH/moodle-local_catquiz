@@ -398,7 +398,7 @@ $string['choosesubscaleforfeedback_help'] = 'You can now store <number of option
     gray - no feedback stored in the sub-scale yet
     yellow - some feedback options still unfilled
     green - feedback fully deposited';
-// String $string['choosesubscaleforfeedback_text'] = ''; .
+$string['choosesubscaleforfeedback_text'] = '';
 $string['setfeedbackforscale'] = 'written feedback';
 // For setfeedbackforscale_help: Param =  <Name der Subskala>.
 $string['setfeedbackforscale_help'] = 'This text will be displayed to the test participants after completion of the test, provided the result for the subscale <subscale name> falls within the defined ability range.';

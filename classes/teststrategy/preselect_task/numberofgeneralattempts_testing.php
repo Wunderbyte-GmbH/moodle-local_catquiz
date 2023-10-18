@@ -32,10 +32,19 @@ namespace local_catquiz\teststrategy\preselect_task;
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 final class numberofgeneralattempts_testing extends numberofgeneralattempts {
+    /**
+     * Returns array of required context keys.
+     *
+     * @return array
+     */
     public function get_required_context_keys(): array {
         return parent::get_required_context_keys()[] = ['fake_questionattemptcounts'];
     }
-
+    /**
+     * Returns array of questions with attempt scount.
+     *
+     * @return array
+     */
     protected function getquestionswithattemptscount($context): array {
         return $context['fake_questionattemptcounts'];
     }

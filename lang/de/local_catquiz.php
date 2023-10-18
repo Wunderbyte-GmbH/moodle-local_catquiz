@@ -395,7 +395,7 @@ $string['choosesubscaleforfeedback_help'] = 'Für die angezeigten Subskalen kön
     grau - noch kein Feedback in der Sub-Skala hinterlegt
     gelb - noch einige Feedback-Optionen unausgefüllt
     grün - Feedback vollumfänglich hinterlegt';
-// String $string['choosesubscaleforfeedback_text'] = ''; .
+$string['choosesubscaleforfeedback_text'] = '';
 $string['setfeedbackforscale'] = 'schriftliches Feedback';
 // For setfeedbackforscale_help: Param =  <Name der Subskala>.
 $string['setfeedbackforscale_help'] = 'Dieser Text wird den Testteilnehmenden nach Beendigung des Tests angezeigt, sofern das Ergebnis für die Subskala {$a} in den eingestellten Fähigkeitsbereich fällt.';

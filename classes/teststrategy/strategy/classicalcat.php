@@ -73,10 +73,15 @@ class classicalcat extends strategy {
             mayberemovescale::class,
             firstquestionselector::class,
             updatepersonability::class,
-            strategyclassicscore::class
+            strategyclassicscore::class,
         ];
     }
-
+    /**
+     * Returns feedback generators.
+     *
+     * @return array
+     *
+     */
     public function get_feedbackgenerators(): array {
         return [
             comparetotestaverage::class,

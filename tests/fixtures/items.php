@@ -1,5 +1,5 @@
 <?php
-
+// phpcs:disable
 $items = [
   'A/A01' => [
     'A01-00' => [

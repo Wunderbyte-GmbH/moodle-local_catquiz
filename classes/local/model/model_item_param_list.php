@@ -379,7 +379,7 @@ class model_item_param_list implements ArrayAccess, IteratorAggregate, Countable
         // We only run this once we have the component id.
         $newrecord = self::update_in_scale($newrecord);
 
-        // Assign corresponding context
+        // Assign corresponding context.
         self::assign_catcontext($newrecord);
 
         if (empty($newrecord['model'])) {
@@ -547,8 +547,8 @@ class model_item_param_list implements ArrayAccess, IteratorAggregate, Countable
         }
     }
     /**
-     * This function checks if the context-param is empty. 
-     * If it's empty and a scale is given  
+     * This function checks if the context-param is empty.
+     * If it's empty and a scale is given, a new context is created.
      * @param array $newrecord
      * @return void
      */
@@ -573,29 +573,29 @@ class model_item_param_list implements ArrayAccess, IteratorAggregate, Countable
         }
 
         // Check if context was created with this import for this scale.
-        // If so, use this context. 
+        // If so, use this context.
         // Else: create context and store in singleton.
         if (empty(catcontext::get_instance($scaleid))) {
 
             $defaultcontext = catquiz::get_default_context_object();
             $timestring = userdate(time(), get_string('strftimedatetimeshort', 'core_langconfig'));
             $usertime = str_replace(' ', '', $timestring);
-    
+
             $data = new stdClass;
             $data->name = get_string('uploadcontext', 'local_catquiz', [
                 'scalename' => $scalename,
-                'usertime' => $usertime
+                'usertime' => $usertime,
                 ]);
             $data->starttimestamp = $defaultcontext->starttimestamp;
             $data->endtimestamp = $defaultcontext->endtimestamp;
             $data->description = get_string('autocontextdescription', 'local_catquiz', $scalename);
-    
+
             $context = new catcontext($data);
             $context->save_or_update($data);
             catcontext::store_context_as_singleton($context, $scaleid);
             $catcontext = $context;
         } else {
-           $catcontext = catcontext::get_instance($scaleid);
+            $catcontext = catcontext::get_instance($scaleid);
         };
 
         $newrecord['contextid'] = $catcontext->id;

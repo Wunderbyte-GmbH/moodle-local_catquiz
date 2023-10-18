@@ -79,8 +79,8 @@ class numberofgeneralattempts extends preselect_task implements wb_middleware {
 
     /**
      * Can be overwritten in the _testing class to prevent access to the DB.
-     * @param mixed $context 
-     * @return array 
+     * @param mixed $context
+     * @return array
      */
     protected function getquestionswithattemptscount($context): array {
         global $DB;

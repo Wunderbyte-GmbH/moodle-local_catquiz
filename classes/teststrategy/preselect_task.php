@@ -45,6 +45,10 @@ use local_catquiz\wb_middleware;
  */
 abstract class preselect_task implements wb_middleware {
 
+    /**
+     *
+     * @var array|null $context
+     */
     protected ?array $context;
 
     /**

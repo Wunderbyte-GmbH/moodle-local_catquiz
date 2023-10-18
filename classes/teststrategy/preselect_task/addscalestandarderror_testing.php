@@ -33,6 +33,11 @@ namespace local_catquiz\teststrategy\preselect_task;
  */
 final class addscalestandarderror_testing extends addscalestandarderror {
 
+    /**
+     * Returns array of required context keys.
+     *
+     * @return array
+     */
     public function get_required_context_keys(): array {
         return [
             ...parent::get_required_context_keys(),
@@ -41,13 +46,22 @@ final class addscalestandarderror_testing extends addscalestandarderror {
         ];
     }
 
+    /**
+     * Returns array with ancestor scales.
+     *
+     * @return array
+     */
     protected function get_with_ancestor_scales($scaleid): array {
         return [
             $scaleid,
             ...$this->context['fake_ancestor_scales'][$scaleid],
         ];
     }
-
+    /**
+     * Returns array with child scales.
+     *
+     * @return array
+     */
     protected function get_with_child_scales($scaleid): array {
         return [
             $scaleid,

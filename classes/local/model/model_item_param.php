@@ -86,7 +86,7 @@ class model_item_param {
     /**
      * Set parameters for class instance.
      *
-     * @param int $id
+     * @param string $id
      * @param string $modelname
      * @param array $metadata
      * @param int $status

@@ -41,6 +41,11 @@ use local_catquiz\wb_middleware;
  */
 class addscalestandarderror extends preselect_task implements wb_middleware {
 
+    /**
+     * Playes questions per scale.
+     *
+     * @var array|null
+     */
     protected ?array $playedquestionsperscale = null;
 
     /**
@@ -85,12 +90,12 @@ class addscalestandarderror extends preselect_task implements wb_middleware {
                 $key = in_array($q->id, $playedquestionids) ? 'played' : 'remaining';
                 if ($key === 'remaining') {
                     if ($remainingperscale[$scaleid] <= 0) {
-                    // Do not add the question to the list of remaining
-                    // questions if it can never be answered due to the
-                    // max_attempts_per_scale setting.
-                    continue;
-                    } else {
-                        $remainingperscale[$scaleid]--;
+                        // Do not add the question to the list of remaining...
+                        // Questions if it can never be answered due to the...
+                        // Max_attempts_per_scale setting.
+                        continue;
+                        } else {
+                            $remainingperscale[$scaleid]--;
                     }
                 }
                 if (!array_key_exists($scaleid, $fisherinfoperscale)) {
@@ -183,7 +188,11 @@ class addscalestandarderror extends preselect_task implements wb_middleware {
             ...catscale::get_subscale_ids($scaleid),
         ];
     }
-
+    /**
+     * Returns array played questions per scale.
+     *
+     * @return array
+     */
     protected function getplayedquestionsperscale(): array {
         if (($pq = $this->playedquestionsperscale) !== null) {
             return $pq;
@@ -192,7 +201,11 @@ class addscalestandarderror extends preselect_task implements wb_middleware {
         $this->playedquestionsperscale = $cache->get('playedquestionsperscale') ?: [];
         return $this->playedquestionsperscale;
     }
-
+    /**
+     * Returns array with number of remaining questions per scale.
+     *
+     * @return array
+     */
     protected function getnumberofremainingquestionsperscale(): array {
         $pq = $this->getplayedquestionsperscale();
         $catscales = $this->get_with_child_scales($this->context['catscaleid']);

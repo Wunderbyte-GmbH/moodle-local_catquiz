@@ -17,8 +17,8 @@
 /**
  * Tests the person ability estimator that uses catcalc.
  *
- * @package    catquiz
- * @author David Szkiba <david.szkiba@wunderbyte.at>
+ * @package    local_catquiz
+ * @author     David Szkiba <david.szkiba@wunderbyte.at>
  * @copyright  2023 Georg Maißer <info@wunderbyte.at>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -31,8 +31,10 @@ use local_catquiz\local\model\model_item_param_list;
 use local_catquiz\local\model\model_person_ability_estimator_catcalc;
 use local_catquiz\local\model\model_responses;
 
-/**
+/** model_person_ability_estimator_catcalc_test
+ *
  * @package local_catquiz
+ *
  * @covers \local_catquiz\local\model\model_person_ability_estimator_catcalc
  */
 class model_person_ability_estimator_catcalc_test extends basic_testcase {
@@ -61,7 +63,11 @@ class model_person_ability_estimator_catcalc_test extends basic_testcase {
         }
         return $this->assertEquals($expected, $result);
     }
-
+    /**
+     * Person_ability_estimation_returns_expected_values_provider.
+     *
+     * @return array
+     */
     public static function person_ability_estimation_returns_expected_values_provider() {
         return [
             [
@@ -84,7 +90,10 @@ class model_person_ability_estimator_catcalc_test extends basic_testcase {
             ],
         ];
     }
-
+    /**
+     * Create model response.
+     * @return array
+     */
     private static function createmodelresponse($modelname) {
         global $CFG;
         switch ($modelname) {
@@ -156,7 +165,11 @@ class model_person_ability_estimator_catcalc_test extends basic_testcase {
         }
         return $modelresponses;
     }
-
+    /**
+     * Create item params
+     *
+     * @return model_item_param_list
+     */
     private static function createitemparams($modelname) {
         global $CFG;
         require_once($CFG->dirroot . '/local/catquiz/tests/fixtures/items.php');
