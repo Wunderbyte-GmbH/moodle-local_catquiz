@@ -59,6 +59,9 @@ class feedback {
 
         require_once($CFG->libdir .'/datalib.php');
 
+        // Get all Values from the form.
+        $data = $mform->exportValues();
+
         $elements[] = $mform->addElement('header', 'catquiz_feedback',
                 get_string('catquiz_feedbackheader', 'local_catquiz'));
         $mform->setExpanded('catquiz_feedback');
