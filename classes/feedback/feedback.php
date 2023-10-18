@@ -87,6 +87,9 @@ class feedback {
         // Right now, we just get all subscales.
         $scales = $DB->get_records('local_catquiz_catscales');
 
+        // TODO: 1. Create Feedback only for selected scale.
+        // 2. For each scale: select how many feedback options should be present.
+
         foreach ($scales as $scale) {
 
             $elements[] = $mform->addElement(
