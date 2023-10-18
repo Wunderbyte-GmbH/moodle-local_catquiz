@@ -40,7 +40,14 @@ use local_catquiz\local\model\model_responses;
 class model_person_ability_estimator_catcalc_test extends basic_testcase {
 
     /**
-     * @dataProvider person_ability_estimation_returns_expected_values_provider
+     * Function test_person_ability_estimation_returns_expected_values.
+     *
+     * @param mixed $expected
+     * @param mixed $modelname
+     * @param mixed $responses
+     * @param mixed $itemparams
+     *
+     *
      */
     public function test_person_ability_estimation_returns_expected_values(
         $expected,
@@ -92,6 +99,7 @@ class model_person_ability_estimator_catcalc_test extends basic_testcase {
     }
     /**
      * Create model response.
+     * @param mixed $modelname
      * @return array
      */
     private static function createmodelresponse($modelname) {

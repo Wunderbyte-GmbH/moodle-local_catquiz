@@ -94,8 +94,8 @@ class addscalestandarderror extends preselect_task implements wb_middleware {
                         // Questions if it can never be answered due to the...
                         // Max_attempts_per_scale setting.
                         continue;
-                        } else {
-                            $remainingperscale[$scaleid]--;
+                    } else {
+                        $remainingperscale[$scaleid]--;
                     }
                 }
                 if (!array_key_exists($scaleid, $fisherinfoperscale)) {

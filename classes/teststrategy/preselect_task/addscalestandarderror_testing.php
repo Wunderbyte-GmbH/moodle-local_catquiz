@@ -49,6 +49,7 @@ final class addscalestandarderror_testing extends addscalestandarderror {
     /**
      * Returns array with ancestor scales.
      *
+     * @param mixed $scaleid
      * @return array
      */
     protected function get_with_ancestor_scales($scaleid): array {
@@ -59,7 +60,7 @@ final class addscalestandarderror_testing extends addscalestandarderror {
     }
     /**
      * Returns array with child scales.
-     *
+     * @param mixed $scaleid
      * @return array
      */
     protected function get_with_child_scales($scaleid): array {

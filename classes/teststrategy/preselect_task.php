@@ -52,7 +52,7 @@ abstract class preselect_task implements wb_middleware {
     protected ?array $context;
 
     /**
-     * Rrocess test strategy
+     * Process test strategy
      *
      * @param array $context
      * @param callable $next
