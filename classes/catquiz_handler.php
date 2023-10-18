@@ -140,7 +140,7 @@ class catquiz_handler {
             $select[$catscale->id] = $catscale->name;
         }
         $elements[] = $mform->addElement(
-            'autocomplete',
+            'select',
             'catquiz_catcatscales',
             get_string('catcatscales', 'local_catquiz'), $select, $options);
         $mform->addHelpButton('catquiz_catcatscales', 'catcatscales', 'local_catquiz');
