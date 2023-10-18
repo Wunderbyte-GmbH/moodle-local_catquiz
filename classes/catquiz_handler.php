@@ -75,6 +75,8 @@ class catquiz_handler {
 
         $elements = [];
 
+        $formdata = $mform->exportValues();
+
         // This function is for some architectural reason executed twice.
         // In order to avoid adding elements twice, we need this exit.
         if ($mform->elementExists('choosetemplate')) {
@@ -129,21 +131,34 @@ class catquiz_handler {
 
         // Question categories or tags to use for this quiz.
 
-        $catscales = \local_catquiz\data\dataapi::get_all_catscales();
+        // Parent Catscales have parentscaleid 0.
+        $parentcatscales = \local_catquiz\data\dataapi::get_catscales_by_parent(0);
         $options = [
             'multiple' => false,
             'noselectionstring' => get_string('allareas', 'search'),
         ];
 
         $select = [];
-        foreach ($catscales as $catscale) {
+        foreach ($parentcatscales as $catscale) {
             $select[$catscale->id] = $catscale->name;
         }
         $elements[] = $mform->addElement(
             'select',
             'catquiz_catcatscales',
-            get_string('catcatscales', 'local_catquiz'), $select, $options);
+            get_string('selectparentscale', 'local_catquiz'), $select, $options);
         $mform->addHelpButton('catquiz_catcatscales', 'catcatscales', 'local_catquiz');
+
+        // Get data from select, trigger change.
+        //$selectedparentscale = intval($formdata['catquiz_catcatscales']);
+        if (!empty($selectedparentscale)) {
+            $subscales = \local_catquiz\data\dataapi::get_catscales_by_parent(2);
+
+            foreach ($subscales as $subscale) {
+                $elements[] = $mform->addElement('advcheckbox', 'catquiz_subscalecheckbox_' . $subscale->name,
+                    $subscale->name, null, null, [0, 1]);
+            }
+        }
+
 
         $catcontexts = \local_catquiz\data\dataapi::get_all_catcontexts();
         $options = [

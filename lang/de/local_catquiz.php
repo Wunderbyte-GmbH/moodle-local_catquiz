@@ -43,6 +43,7 @@ $string['catscales:information'] = 'Verwalte CAT Test Skalen: {$a->link}';
 $string['catscalesname_exists'] = 'Der Name wird bereits verwendet';
 $string['cachedef_catscales'] = 'Caches the catscales of catquiz';
 $string['catcatscales'] = 'Auswahl Subskalen';
+$string['selectparentscale'] = 'Auswahl CAT Skala';
 $string['catcatscales_help'] = 'Wählen Sie die für Sie die für Sie relevanten Subskalen an und ab. Eine Subskala umfasst Fragen aus einen Teil des gewählten Inhaltsbereichs. In einem Test-Versuch werden nur Fragen aus den angewählten Subskalen verwendet.';
 $string['nameexists'] = 'Der Name der CAT Skala wurde bereits verwendet';
 $string['createnewcatscale'] = 'Neue CAT Skala erstellen';
