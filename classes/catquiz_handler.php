@@ -81,13 +81,6 @@ class catquiz_handler {
             return [];
         }
 
-        $pm = core_plugin_manager::instance();
-        $models = $pm->get_plugins_of_type('catmodel');
-        $modelarray = [];
-        foreach ($models as $model) {
-            $modelarray[$model->name] = $model->displayname;
-        }
-
         $testtemplates = testenvironment::get_environments_as_array();
 
         // We introduce the option of a custom test environment.
@@ -133,10 +126,6 @@ class catquiz_handler {
         $elements[] = $mform->addElement('header', 'catquiz_header',
                 get_string('catquizsettings', 'local_catquiz'));
         $mform->setExpanded('catquiz_header');
-
-        // Choose a model for this instance.
-        $elements[] = $mform->addElement('select', 'catquiz_model_select',
-                get_string('selectmodel', 'local_catquiz'), $modelarray);
 
         // Question categories or tags to use for this quiz.
 
@@ -292,9 +281,6 @@ class catquiz_handler {
 
         $errors = [];
 
-        if (empty($data['maximumquestions'])) {
-            $errors['maximumquestions'] = get_string('valuemustbegreaterzero', 'local_catquiz');
-        }
         // Todo: Make a real validation of necessary fields.
 
         return $errors;
