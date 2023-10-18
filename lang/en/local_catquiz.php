@@ -44,6 +44,7 @@ $string['catscales:information'] = 'Define CAT scales: {$a->link}';
 $string['catscalesname_exists'] = 'The name is already being used';
 $string['cachedef_catscales'] = 'Caches the CAT scales of catquiz';
 $string['catcatscales'] = 'Selection subscales';
+$string['selectparentscale'] = 'Select CAT scale';
 $string['catcatscales_help'] = 'Select and deselect the subscales that are relevant to you. A subscale includes questions from part of the selected content area. In a test experiment, only questions from the selected subscales are used.';
 $string['nameexists'] = 'The name of the CAT scale already exists';
 $string['createnewcatscale'] = 'Create new CAT scale';

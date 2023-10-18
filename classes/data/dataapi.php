@@ -246,4 +246,19 @@ class dataapi {
             return null;
         }
     }
+
+    /**
+     * Get catscales with specific parent scale.
+     *
+     * @param int $paramscaleid
+     * @return array
+     */
+    public static function get_catscales_by_parent(int $parentscaleid): array {
+
+        $allcatscales = self::get_all_catscales();
+
+        $filteredscales = array_filter($allcatscales, fn($a) => ($a->parentid == $parentscaleid));
+        return $filteredscales;
+    }
+
 }
