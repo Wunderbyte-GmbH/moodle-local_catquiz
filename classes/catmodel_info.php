@@ -114,9 +114,6 @@ class catmodel_info {
             $model = get_string('pluginname', 'catmodel_'.$modelname);
             $updatedmodels[$model] = $itemcounter;
         }
-        // One item might have been recalculated by different models. We just
-        // want to know the total number of items.
-        $itemcounter = count(array_unique($updateditems));
 
         $updatedmodelsjson = json_encode($updatedmodels);
         // Trigger event.
@@ -139,10 +136,10 @@ class catmodel_info {
     /**
      * Checks if there are new responses to the questions associated with a CAT
      * context and a CAT scale.
-     * 
-     * @param mixed $context 
-     * @param mixed $catscaleid 
-     * @return bool 
+     *
+     * @param mixed $context
+     * @param mixed $catscaleid
+     * @return bool
      */
     public function needs_update(catcontext $context, int $catscaleid) {
         global $DB;
