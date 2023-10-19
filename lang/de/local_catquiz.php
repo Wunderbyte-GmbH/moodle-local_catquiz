@@ -383,6 +383,7 @@ $string['teacherfeedback'] = "Feedback für Lehrende";
 $string['catquiz_feedbackheader'] = "Feedback";
 $string['noselection'] = "Keine Auswahl";
 $string['lowerlimit'] = "Unteres Limit";
+$string['upperlimit'] = "Oberes Limit";
 $string['setcoursesforscaletext'] = 'Legen sie für die (Sub-) Skala {$a} die Fähigkeitsbereiche für die einzelnen Feedbacks, die schriftlichen Rückmeldungen sowie jeweiligen Einschreibungen in Kurse oder Gruppen fest.';
 // No used yet.
 $string['catcatscaleprime'] = 'Inhaltsbereich/Skala';
@@ -403,16 +404,19 @@ $string['choosesubscaleforfeedback_help'] = 'Für die angezeigten Subskalen kön
 $string['choosesubscaleforfeedback_text'] = '';
 $string['setfeedbackforscale'] = 'schriftliches Feedback';
 // For setfeedbackforscale_help: Param =  <Name der Subskala>.
-$string['setfeedbackforscale_help'] = 'Dieser Text wird den Testteilnehmenden nach Beendigung des Tests angezeigt, sofern das Ergebnis für die Subskala {$a} in den eingestellten Fähigkeitsbereich fällt.';
+$string['setfeedbackforscale_help'] = 'Dieser Text wird den Testteilnehmenden nach Beendigung des Tests angezeigt, sofern das Ergebnis in den eingestellten Fähigkeitsbereich fällt.';
 $string['setgrouprenrolmentforscale'] = 'Einschreibung in eine Gruppe';
+$string['groupselection'] = 'Gruppenauswahl';
+$string['courseselection'] = 'Kursauswahl';
 // For setgroupenrolmentforscale_help: Param =  <Name der Subskala>.
-$string['setgroupenrolmentforscale_help'] = 'In diese Gruppe des Kurses werden Testteilnehmende nach Beendigung des Tests eingeschrieben, sofern das Ergebnis für die Subskala {$a} in den eingestellten Fähigkeitsbereich fällt. Falls Sie keine Einschreibung in eine Gruppe wünschen, lassen Sie dieses Feld bitte leer.';
+$string['setgrouprenrolmentforscale_help'] = 'In diese Gruppe des Kurses werden Testteilnehmende nach Beendigung des Tests eingeschrieben, sofern das Ergebnis in den eingestellten Fähigkeitsbereich fällt. Falls Sie keine Einschreibung in eine Gruppe wünschen, lassen Sie dieses Feld bitte leer.';
 $string['setcourseenrolmentforscale'] = 'Einschreibung in einen Kurs';
 // For setcourseenrolmentforscale_help: Param =  <Name der Subskala>.
-$string['setcourseenrolmentforscale_help'] = 'In diesen (externen) Kurs werden Testteilnehmende nach Beendigung des Tests eingeschrieben, sofern das Ergebnis für die Subskala {$a} in den eingestellten Fähigkeitsbereich fällt. Sie können nur Kurse auswählen, zu denen Sie die Berechtung zur Einschreibung haben oder die zur Einschreibung durch einen CAT-Manager*in freigegeben wurden. Falls Sie keine Einschreibung in einen externen Kurs wünschen, lassen Sie dieses Feld bitte leer.';
+$string['setcourseenrolmentforscale_help'] = 'In diesen (externen) Kurs werden Testteilnehmende nach Beendigung des Tests eingeschrieben, sofern das Ergebnis in den eingestellten Fähigkeitsbereich fällt. Sie können nur Kurse auswählen, zu denen Sie die Berechtung zur Einschreibung haben oder die zur Einschreibung durch einen CAT-Manager*in freigegeben wurden. Falls Sie keine Einschreibung in einen externen Kurs wünschen, lassen Sie dieses Feld bitte leer.';
 $string['setautonitificationonenrolmentforscale'] = 'Teilnehmende über eine Gruppen- oder Kurseinschreibung mittels Standardtext informieren.';
 // Check Params for setautonitificationonenrolmentforscale_help text. Group and courselink.
 $string['setautonitificationonenrolmentforscale_help'] = 'Teilnehmende erhalten zusätzlich zu deren schriftlichen Feedback folgenden Hinweis: "Sie wurden automatisch in die Gruppe <Gruppenname> / den Kurs <Kursname als Link> eingeschrieben."';
+$string['copysettingsforallsubscales'] = 'gewählte Einstellungen für alle Subskalen übernehmen';
 
 // Quiz attempts.
 $string['catcontext'] = 'CAT Kontext';
