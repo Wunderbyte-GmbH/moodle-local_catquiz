@@ -31,6 +31,7 @@ use local_catquiz\local\model\model_item_response;
 use local_catquiz\local\model\model_model;
 use local_catquiz\local\model\model_strategy;
 use local_catquiz\mathcat;
+use moodle_exception;
 
 /**
  * Class for catcalc functions.
@@ -110,6 +111,11 @@ class catcalc {
             $jfuns[] = fn ($pp) => $model::log_likelihood_p($pp, $itemparams, $qresponse['fraction']);
             $hfuns[] = fn($pp) => $model::log_likelihood_p_p($pp, $itemparams, $qresponse['fraction']);
         }
+
+        if ($jfuns === [] || $hfuns === []) {
+            throw new moodle_exception('abilitycannotbecalculated', 'local_catquiz');
+        }
+
         $jacobian = self::build_callable_array($jfuns);
         $jacobian = fn ($pp) => matrixcat::multi_sum($jacobian($pp));
         $hessian = self::build_callable_array($hfuns);

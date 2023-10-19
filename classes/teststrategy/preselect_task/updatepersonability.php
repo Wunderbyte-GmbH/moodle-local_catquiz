@@ -100,6 +100,10 @@ class updatepersonability extends preselect_task implements wb_middleware {
         }
 
         $this->userresponses = $this->update_cached_responses($context);
+        if (in_array($context['userid'], $this->userresponses->get_excluded_users())) {
+            $context['skip_reason'] = 'notenoughdataforuser';
+            return $next($context);
+        }
         $context['lastresponse'] = $this->userresponses->get_last_response($context['userid']);
         $components = ($this->userresponses->as_array())[$context['userid']];
         if (count($components) > 1) {
