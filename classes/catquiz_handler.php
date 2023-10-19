@@ -77,12 +77,6 @@ class catquiz_handler {
 
         $formdata = $mform->exportValues();
 
-        // This function is for some architectural reason executed twice.
-        // In order to avoid adding elements twice, we need this exit.
-        if ($mform->elementExists('choosetemplate')) {
-            return [];
-        }
-
         $testtemplates = testenvironment::get_environments_as_array();
 
         // We introduce the option of a custom test environment.
