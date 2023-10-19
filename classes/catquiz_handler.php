@@ -75,8 +75,6 @@ class catquiz_handler {
 
         $elements = [];
 
-        $formdata = $mform->exportValues();
-
         $testtemplates = testenvironment::get_environments_as_array();
 
         // We introduce the option of a custom test environment.
@@ -113,13 +111,13 @@ class catquiz_handler {
         // We want to make sure the cat model section is always expanded.
         $mform->setExpanded('catmodelheading');
 
-         // Button to attach JavaScript to reload the form.
-         $mform->registerNoSubmitButton('submitcattestoption');
-         $elements[] = $mform->addElement('submit', 'submitcattestoption', 'cattestsubmit',
-             [
-                'class' => 'd-none',
-                'data-action' => 'submitCatTest',
-            ]);
+        // Button to attach JavaScript to reload the form.
+        $mform->registerNoSubmitButton('submitcattestoption');
+        $elements[] = $mform->addElement('submit', 'submitcattestoption', 'cattestsubmit',
+            [
+            'class' => 'd-none',
+            'data-action' => 'submitCatTest',
+        ]);
 
         // Add a special header for catquiz.
         $elements[] = $mform->addElement('header', 'catquiz_header',
@@ -142,23 +140,34 @@ class catquiz_handler {
         }
         $elements[] = $mform->addElement(
             'select',
-            'catquiz_catcatscales',
+            'catquiz_catscales',
             get_string('selectparentscale', 'local_catquiz'), $select, $options);
-        $mform->addHelpButton('catquiz_catcatscales', 'catcatscales', 'local_catquiz');
+        $mform->addHelpButton('catquiz_catscales', 'catcatscales', 'local_catquiz');
 
+        // We want to adjust our form depending on the nosubmit action which might just have taken place.
+        // But we don't get the correct data, because these elements are added to the mform only...
+        // ... after this function has finished execution. submitted form.
+        // But the submitted via post, so we can access the variable via the superglobal $POST.
 
-        // Get data from select, trigger change.
-        $selectedparentscale = $formdata['catquiz_catcatscales'] ?? null;
+        $selectedparentscale = optional_param('catquiz_catscales', 0, PARAM_INT)
+            ?? $mform->getSubmitValue('catquiz_catscales');
         if (!empty($selectedparentscale)) {
-            $selectedparentscale = intval($selectedparentscale);
+            $element = $mform->getElement('catquiz_catscales');
+            $element->setValue($selectedparentscale);
+            $subscales = \local_catquiz\data\dataapi::get_catscales_by_parent($selectedparentscale);
+            foreach ($subscales as $subscale) {
+                $elements[] = $mform->addElement('advcheckbox', 'catquiz_subscalecheckbox_' . $subscale->name,
+                    $subscale->name, null, null, [0, 1]);
+            }
         }
 
-        $subscales = \local_catquiz\data\dataapi::get_all_catscales();
-        foreach ($subscales as $subscale) {
-            $elements[] = $mform->addElement('advcheckbox', 'catquiz_subscalecheckbox_' . $subscale->id,
-                $subscale->name, null, null, [0, 1]);
-                $mform->hideIf('catquiz_subscalecheckbox_' . $subscale->id, 'catquiz_catcatscales', 'neq', $subscale->parentid);
-        }
+        // Button to attach JavaScript to reload the form.
+        $mform->registerNoSubmitButton('submitcatscaleoption');
+        $elements[] = $mform->addElement('submit', 'submitcatscaleoption', 'catscalesubmit',
+            [
+            'class' => 'd-none',
+            'data-action' => 'submitCatScale',
+        ]);
 
         $catcontexts = \local_catquiz\data\dataapi::get_all_catcontexts();
         $options = [
@@ -245,8 +254,13 @@ class catquiz_handler {
             $data = $mform->getSubmitValues();
         }
 
+        $submitcattestoption = optional_param('submitcattestoption', '', PARAM_ACTION);
+        if ($submitcattestoption == "cattestsubmit") {
+            $choosetemplate = optional_param('choosetemplate', '', PARAM_ACTION);
+        }
+
         // The test environment is always on custom to start with.
-        if (empty($data['choosetemplate'])) {
+        if (empty($choosetemplate)) {
 
             // Create stdClass with all the values.
             $cattest = (object)[
@@ -261,11 +275,19 @@ class catquiz_handler {
         } else {
             // Create stdClass with all the values.
             $cattest = (object)[
-                'id' => $data['choosetemplate'],
+                'id' => $choosetemplate,
             ];
             // Pass on the values as stdClas.
             $test = new testenvironment($cattest);
             $test->apply_jsonsaved_values($formdefaultvalues);
+
+            // There are a few fields which we need directly in the definition_after_data.
+            // These form-default-values are not available at this point.
+            // So we need to add them to the $POST superglobal.
+
+            if (!empty($formdefaultvalues['catquiz_catscales'])) {
+                $_POST['catquiz_catscales'] = $formdefaultvalues['catquiz_catscales'];
+            }
         }
 
         $formdefaultvalues['testenvironment_addoredittemplate'] = 0;
@@ -379,7 +401,7 @@ class catquiz_handler {
                 'id' => $quizdata->choosetemplate, // When a template is selected, we might want to update it.
                 'json' => json_encode($clone),
                 'component' => 'mod_adaptivequiz',
-                'catscaleid' => $clone->catquiz_catcatscales,
+                'catscaleid' => $clone->catquiz_catscales,
             ];
 
             $test = new testenvironment($cattest);
@@ -395,7 +417,7 @@ class catquiz_handler {
             'component' => 'mod_adaptivequiz',
             'json' => json_encode($clone),
             'parentid' => $parentid ?? 0,
-            'catscaleid' => $quizdata->catquiz_catcatscales,
+            'catscaleid' => $quizdata->catquiz_catscales,
             'courseid' => $quizdata->course,
         ];
 
@@ -417,7 +439,8 @@ class catquiz_handler {
 
         $values = $mform->getSubmitValues();
 
-        if (empty($values['choosetemplate'])) {
+        if (!isset($values["submitcattestoption"])
+            || $values["submitcattestoption"] != "cattestsubmit") {
             return;
         }
 
@@ -479,7 +502,7 @@ class catquiz_handler {
         $tsinfo = new info();
         $teststrategy = $tsinfo
             ->return_active_strategy($quizsettings->catquiz_selectteststrategy)
-            ->set_scale($quizsettings->catquiz_catcatscales)
+            ->set_scale($quizsettings->catquiz_catscales)
             ->set_catcontextid($quizsettings->catquiz_catcontext);
 
         $selectioncontext = self::get_strategy_selectcontext($quizsettings, $attemptdata);
@@ -565,7 +588,7 @@ class catquiz_handler {
         $initialcontext = [
             'testid' => intval($attemptdata->instance),
             'contextid' => intval($quizsettings->catquiz_catcontext),
-            'catscaleid' => $quizsettings->catquiz_catcatscales,
+            'catscaleid' => $quizsettings->catquiz_catscales,
             'installed_models' => model_strategy::get_installed_models(),
             // When selecting questions from a scale, also include questions from its subscales.
             // This option is required by the questions_loader context loader.
