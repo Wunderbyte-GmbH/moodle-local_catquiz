@@ -137,11 +137,11 @@ class catmodel_info {
      * Checks if there are new responses to the questions associated with a CAT
      * context and a CAT scale.
      *
-     * @param mixed $context
-     * @param mixed $catscaleid
+     * @param catcontext $context
+     * @param int $catscaleid
      * @return bool
      */
-    public function needs_update(catcontext $context, int $catscaleid) {
+    public function needs_update(catcontext $context, int $catscaleid): bool {
         global $DB;
         $subscales = catscale::get_subscale_ids($catscaleid);
         [$sql, $params] = catquiz::get_sql_for_new_responses(
