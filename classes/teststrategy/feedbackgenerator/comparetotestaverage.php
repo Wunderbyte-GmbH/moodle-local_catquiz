@@ -119,14 +119,7 @@ class comparetotestaverage extends feedbackgenerator {
             return null;
         }
 
-        if (! $personabilities = $cache->get('personabilities')) {
-            return null;
-        }
-
-        if (! $personabilities) {
-            return null;
-        }
-
+        $personabilities = $initialcontext['personabilities'];
         $ability = $personabilities[$catscaleid];
         if (! $ability) {
             return null;
@@ -157,7 +150,6 @@ class comparetotestaverage extends feedbackgenerator {
 
         return [
             'contextid' => $initialcontext['contextid'],
-            'personabilities' => $personabilities,
             'quizsettings' => $quizsettings,
             'needsimprovementthreshold' => $needsimprovementthreshold,
             'testaverageability' => sprintf('%.2f', $testaverage),
