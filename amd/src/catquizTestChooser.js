@@ -1,3 +1,4 @@
+/* eslint-disable no-case-declarations */
 // This file is part of Moodle - http://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
@@ -21,9 +22,10 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-const selectors = {
-    catTestChooser: '[data-on-change-action="reloadTestForm"]',
-    catTestSubmit: '[data-action="submitCatTest"]'
+const SELECTORS = {
+    CATTESTCHOOSER: '[data-on-change-action]',
+    CATTESTSUBMIT: '[data-action="submitCatTest"]',
+    CATSCALESUBMIT: '[data-action="submitCatScale"]'
 };
 
 /**
@@ -31,19 +33,48 @@ const selectors = {
  */
 export const init = () => {
 
-    document.querySelector(selectors.catTestChooser).addEventListener('change', e => {
+    const selectors = document.querySelectorAll(SELECTORS.CATTESTCHOOSER);
 
-        // eslint-disable-next-line no-console
-        console.log('change');
+                // eslint-disable-next-line no-console
+                console.log(selectors, 'selectors');
+    if (selectors.length === 0) {
+        return;
+    }
+    selectors.forEach(selector =>
+        selector.addEventListener('change', e => {
 
-        const form = e.target.closest('form');
-        const submitCatTest = form.querySelector(selectors.catTestSubmit);
-        const fieldset = submitCatTest.closest('fieldset');
+            switch (e.target.dataset.onChangeAction) {
+                case 'reloadTestForm':
+                    clickNoSubmitButton(e.target, SELECTORS.CATTESTSUBMIT);
+                    break;
+                case 'reloadFormFromScaleSelect':
+                    clickNoSubmitButton(e.target, SELECTORS.CATSCALESUBMIT);
+                    break;
+            }
 
-        const url = new URL(form.action);
-        url.hash = fieldset.id;
+        })
+    );
 
-        form.action = url.toString();
-        submitCatTest.click();
-    });
 };
+
+/**
+ * No Submit Button triggered.
+ * @param {HTMLElement} element
+ * @param {string} buttonselector
+ */
+function clickNoSubmitButton(element, buttonselector) {
+
+    const form = element.closest('form');
+    // Find container for query selector.
+    const submitCatTest = form.querySelector(buttonselector);
+    const fieldset = submitCatTest.closest('fieldset');
+
+    // eslint-disable-next-line no-console
+    console.log(submitCatTest, 'submitCatTest');
+
+    const url = new URL(form.action);
+    url.hash = fieldset.id;
+
+    form.action = url.toString();
+    submitCatTest.click();
+}
