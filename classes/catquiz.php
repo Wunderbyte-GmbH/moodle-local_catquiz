@@ -542,9 +542,10 @@ class catquiz {
      * Returns the number of new responses since $lastcalclation for a CAT
      * context and a list of CAT scales.
      *
-     * @param int $contextid
-     * @param array<int> $catscaleids
-     * @param int $lastcalculation
+     * @param int   $contextid
+     * @param array $catscaleids
+     * @param int   $lastcalculation
+     *
      * @return array
      */
     public static function get_sql_for_new_responses(int $contextid, array $catscaleids, int $lastcalculation) {
