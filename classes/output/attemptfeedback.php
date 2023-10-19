@@ -127,6 +127,7 @@ class attemptfeedback implements renderable, templatable {
             'studentfeedback' => [],
             'teacherfeedback' => [],
             'quizsettings' => $cache->get('quizsettings'),
+            'personabilities' => $cache->get('personabilities'),
         ];
 
         // Get the data required to generate the feedback. This can be saved to
