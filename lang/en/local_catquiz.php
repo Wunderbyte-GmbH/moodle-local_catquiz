@@ -385,6 +385,7 @@ $string['teacherfeedback'] = "Feedback for teachers";
 $string['catquiz_feedbackheader'] = "Feedback";
 $string['noselection'] = "No selection";
 $string['lowerlimit'] = "Lower limit";
+$string['upperlimit'] = "Upper limit";
 $string['setcoursesforscaletext'] = 'For catscale {$a}, determine the ability for the individual feedback, the written feedback and the respective enrollments in courses or groups.';
 // Not used yet.
 $string['limitrange'] = 'Limit range';
@@ -406,16 +407,19 @@ $string['choosesubscaleforfeedback_text'] = '';
 $string['setfeedbackforscale'] = 'written feedback';
 // For setfeedbackforscale_help: Param =  <Name der Subskala>.
 $string['setfeedbackforscale_help'] = 'This text will be displayed to the test participants after completion of the test, provided the result for the subscale <subscale name> falls within the defined ability range.';
-$string['setgrouprenrolmentforscale'] = 'Enrole to a groupe';
+$string['setgrouprenrolmentforscale'] = 'Enrole to a group';
+$string['groupselection'] = 'Select group';
+$string['courseselection'] = 'Select course';
 // For setgroupenrolmentforscale_help: Param =  <Name der Subskala>.
-$string['setgroupenrolmentforscale_help'] = 'Test participants are enrolled in this group of the course after completing the test, provided the result for the subscale {$a} falls within the set ability range. If you do not wish to be enrolled in a group, please leave this field blank.';
+$string['setgrouprenrolmentforscale_help'] = 'Test participants are enrolled in this group of the course after completing the test, provided the result falls within the set ability range. If you do not wish to be enrolled in a group, please leave this field blank.';
 $string['setcourseenrolmentforscale'] = 'Subscription to a course';
 // For setcourseenrolmentforscale_help: Param =  <Name der Subskala>.
-$string['setcourseenrolmentforscale_help'] = 'Test participants are enrolled in this (external) course after completing the test, provided the result for the subscale {$a} falls within the set ability range. You can only select courses for which you have the right to enroll or which have been approved for enrollment by a CAT manager. If you do not wish to enroll in an external course, please leave this field blank.';
+$string['setcourseenrolmentforscale_help'] = 'Test participants are enrolled in this (external) course after completing the test, provided the result falls within the set ability range. You can only select courses for which you have the right to enroll or which have been approved for enrollment by a CAT manager. If you do not wish to enroll in an external course, please leave this field blank.';
 $string['setautonitificationonenrolmentforscale'] = 'Inform participants about group or course enrollment using the standard text.';
 // Check Params for setautonitificationonenrolmentforscale_help text. Group and courselink.
 $string['setautonitificationonenrolmentforscale_help'] = '
 In addition to their written feedback, participants will receive the following note: "You have been automatically enrolled in the group <group name> / the course <course name as a link>."';
+$string['copysettingsforallsubscales'] = 'apply values for all subscales';
 
 // Quiz attempts.
 $string['catcontext'] = 'CAT Context';
