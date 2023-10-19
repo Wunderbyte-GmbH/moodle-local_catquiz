@@ -114,14 +114,6 @@ class feedback {
 
             // TODO: Add missing elements: Anzahl Feedbackoptionen, Farbbereich
 
-            // No Submit Button to apply values for all subscales.
-            // TODO: Attach function!
-            $mform->registerNoSubmitButton('copysettingsforallsubscales');
-            $elements[] = $mform->addElement('submit', 'copysettingsforallsubscales', get_string('copysettingsforallsubscales', 'local_catquiz'),
-                [
-                    //'class' => 'd-none',
-                    'data-action' => 'submitFeedbackValues',
-                ]);
 
             // TODO: Display range of ability in one row.
             $elements[] = $mform->addElement('text',
