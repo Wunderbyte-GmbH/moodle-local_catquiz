@@ -119,10 +119,13 @@ class catquiz_handler {
         // We want to make sure the cat model section is always expanded.
         $mform->setExpanded('catmodelheading');
 
-         // Button to attach JavaScript to to reload the form.
+         // Button to attach JavaScript to reload the form.
          $mform->registerNoSubmitButton('submitcattestoption');
          $elements[] = $mform->addElement('submit', 'submitcattestoption', 'cattestsubmit',
-             ['class' => 'd-none', 'data-action' => 'submitCatTest']);
+             [
+                'class' => 'd-none',
+                'data-action' => 'submitCatTest',
+            ]);
 
         // Add a special header for catquiz.
         $elements[] = $mform->addElement('header', 'catquiz_header',
@@ -136,6 +139,7 @@ class catquiz_handler {
         $options = [
             'multiple' => false,
             'noselectionstring' => get_string('allareas', 'search'),
+            'data-on-change-action' => 'reloadFormFromScaleSelect',
         ];
 
         $select = [];
@@ -148,17 +152,19 @@ class catquiz_handler {
             get_string('selectparentscale', 'local_catquiz'), $select, $options);
         $mform->addHelpButton('catquiz_catcatscales', 'catcatscales', 'local_catquiz');
 
-        // Get data from select, trigger change.
-        //$selectedparentscale = intval($formdata['catquiz_catcatscales']);
-        if (!empty($selectedparentscale)) {
-            $subscales = \local_catquiz\data\dataapi::get_catscales_by_parent(2);
 
-            foreach ($subscales as $subscale) {
-                $elements[] = $mform->addElement('advcheckbox', 'catquiz_subscalecheckbox_' . $subscale->name,
-                    $subscale->name, null, null, [0, 1]);
-            }
+        // Get data from select, trigger change.
+        $selectedparentscale = $formdata['catquiz_catcatscales'] ?? null;
+        if (!empty($selectedparentscale)) {
+            $selectedparentscale = intval($selectedparentscale);
         }
 
+        $subscales = \local_catquiz\data\dataapi::get_all_catscales();
+        foreach ($subscales as $subscale) {
+            $elements[] = $mform->addElement('advcheckbox', 'catquiz_subscalecheckbox_' . $subscale->id,
+                $subscale->name, null, null, [0, 1]);
+                $mform->hideIf('catquiz_subscalecheckbox_' . $subscale->id, 'catquiz_catcatscales', 'neq', $subscale->parentid);
+        }
 
         $catcontexts = \local_catquiz\data\dataapi::get_all_catcontexts();
         $options = [
