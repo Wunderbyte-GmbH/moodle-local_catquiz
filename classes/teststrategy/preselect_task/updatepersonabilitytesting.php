@@ -27,6 +27,8 @@
 
 namespace local_catquiz\teststrategy\preselect_task;
 
+use local_catquiz\local\model\model_item_param;
+use local_catquiz\local\model\model_item_param_list;
 use local_catquiz\local\model\model_responses;
 use local_catquiz\teststrategy\preselect_task\updatepersonability;
 
@@ -88,5 +90,20 @@ class updatepersonabilitytesting extends updatepersonability {
      *
      */
     protected function update_person_param($a, $b, $c) {
+    }
+
+    protected function get_item_param_list($responses, $contextid, $catscaleid) {
+        $itemparamlist = new model_item_param_list();
+        if (! array_key_exists('fake_item_params', $this->context)) {
+            return $itemparamlist;
+        }
+
+        foreach ($this->context['fake_item_params'] as $id => $values) {
+            $itemparamlist->add(
+                (new model_item_param($id, 'raschbirnbauma'))
+                    ->set_difficulty($values['difficulty'])
+            );
+        }
+        return $itemparamlist;
     }
 }

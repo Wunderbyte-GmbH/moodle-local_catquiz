@@ -62,7 +62,7 @@ class updatepersonability_test extends TestCase {
         // of the updatepersonability class that just overrides parts that load
         // data from the DB or cache.
         $updatepersonability = new updatepersonabilitytesting();
-        $result = $updatepersonability->run($context, $returncontext);
+        $result = $updatepersonability->process($context, $returncontext);
         $this->assertEquals($expected, $result->unwrap()['skip_reason']);
     }
 
@@ -76,14 +76,22 @@ class updatepersonability_test extends TestCase {
         return [
             'last_question_is_null' => [
                 'expected' => 'lastquestionnull',
-                'context' => ['lastquestion' => null],
+                'context' => [
+                    'lastquestion' => null,
+                    'contextid' => 1,
+                    'catscaleid' => 1,
+                ],
             ],
             'is_pilot_question' => [
                 'expected' => 'pilotquestion',
-                'context' => ['lastquestion' => (object) ['is_pilot' => true]],
+                'context' => [
+                    'lastquestion' => (object) ['is_pilot' => true],
+                    'contextid' => 1,
+                    'catscaleid' => 1,
+                ],
             ],
             'not_enough_responses' => [
-                'expected' => 'not skipped',
+                'expected' => 'notenoughdataforuser',
                 'context' => [
                     'lastquestion' => (object) ['catscaleid' => "1"],
                     'userid' => 1, // This user does not have enough responses.
@@ -91,6 +99,7 @@ class updatepersonability_test extends TestCase {
                     'person_ability' => [
                         '1' => 0.12,
                     ],
+                    'catscaleid' => 1,
                     'questionsattempted' => 1,
                     'minimumquestions' => 3,
                     'skip_reason' => 'not skipped',
@@ -116,6 +125,10 @@ class updatepersonability_test extends TestCase {
                             ],
                         ],
                     ],
+                    'fake_item_params' => [
+                            1 => ['difficulty' => 2.1],
+                            2 => ['difficulty' => -1.4],
+                    ],
                 ],
             ],
             'has_enough_responses' => [
@@ -126,6 +139,7 @@ class updatepersonability_test extends TestCase {
                         1 => 1.23,
                     ],
                     'contextid' => 1,
+                    'catscaleid' => 1,
                     'lastquestion' => (object) ['catscaleid' => "1"],
                     'userid' => 1, // This user does not have enough responses.
                     'questions' => [
@@ -149,6 +163,10 @@ class updatepersonability_test extends TestCase {
                                 3 => ['fraction' => "0.000"],
                             ],
                         ],
+                    ],
+                    'fake_item_params' => [
+                            1 => ['difficulty' => 2.1],
+                            2 => ['difficulty' => -1.4],
                     ],
                     'questionsattempted' => 0,
                     'minimumquestions' => 10,

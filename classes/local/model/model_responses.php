@@ -153,14 +153,14 @@ class model_responses {
      *
      */
     public function setdata($data, bool $filter = true) {
+        $this->data = $data;
         if (! $filter) {
-            $this->data = $data;
             return $this;
         }
 
         $hascorrectanswer = [];
         $haswronganswer = [];
-        foreach ($data as $userid => $components) {
+        foreach ($this->data as $userid => $components) {
             foreach ($components as $component) {
 
                 // If the user has only correct or incorrect answers, no ability can
@@ -174,8 +174,7 @@ class model_responses {
                     $sumoffractions === 0.0
                     || intval($sumoffractions) === count($component)
                 ) {
-                    unset($data[$userid]);
-                    $this->excludedusers[] = $userid;
+                    $this->removeuser($userid);
                     continue;
                 }
 
@@ -194,23 +193,23 @@ class model_responses {
         $haswronganswer = array_unique($haswronganswer);
         $this->canbecalculated = array_intersect($hascorrectanswer, $haswronganswer);
         $this->excludeditems = array_diff(
-            $hascorrectanswer + $haswronganswer,
+            array_unique(array_merge($hascorrectanswer, $haswronganswer)),
             $this->canbecalculated
         );
 
-        foreach ($data as $userid => $components) {
+        foreach ($this->data as $userid => $components) {
             foreach ($components as $componentname => $component) {
                 foreach (array_keys($component) as $componentid) {
                     if (!in_array($componentid, $this->canbecalculated)) {
-                        unset($data[$userid][$componentname][$componentid]);
+                        unset($this->data[$userid][$componentname][$componentid]);
 
                         // If that was the only question in that component, remove the component.
-                        if (count($data[$userid][$componentname]) === 0) {
-                            unset($data[$userid][$componentname]);
+                        if (count($this->data[$userid][$componentname]) === 0) {
+                            unset($this->data[$userid][$componentname]);
 
                             // If there are no data left for this user, remove that entry.
-                            if (count($data[$userid]) === 0) {
-                                unset($data[$userid]);
+                            if (count($this->data[$userid]) === 0) {
+                                $this->removeuser($userid);
                             }
                         }
                     }
@@ -294,5 +293,10 @@ class model_responses {
      */
     public function get_excluded_users() {
         return $this->excludedusers;
+    }
+
+    private function removeuser(string $userid): void {
+        unset($this->data[$userid]);
+        $this->excludedusers[] = $userid;
     }
 }
