@@ -54,7 +54,7 @@ class inferlowestskillgap extends strategy {
      *
      * @var int $id // strategy id defined in lib.
      */
-    public int $id = STRATEGY_ALLSUBS;
+    public int $id = STRATEGY_LOWESTSUB;
 
 
     /**
