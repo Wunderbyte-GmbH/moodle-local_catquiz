@@ -250,7 +250,7 @@ class dataapi {
     /**
      * Get catscales with specific parent scale.
      *
-     * @param int $paramscaleid
+     * @param int $parentscaleid
      * @return array
      */
     public static function get_catscales_by_parent(int $parentscaleid): array {
