@@ -56,7 +56,7 @@ class inferallsubscales extends strategy {
      *
      * @var int $id // strategy id defined in lib.
      */
-    public int $id = STRATEGY_LOWESTSUB;
+    public int $id = STRATEGY_ALLSUBS;
 
 
     /**
