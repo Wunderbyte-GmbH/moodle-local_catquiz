@@ -155,10 +155,8 @@ class catquiz_handler {
             $element = $mform->getElement('catquiz_catscales');
             $element->setValue($selectedparentscale);
             $subscales = \local_catquiz\data\dataapi::get_catscales_by_parent($selectedparentscale);
-            foreach ($subscales as $subscale) {
-                $elements[] = $mform->addElement('advcheckbox', 'catquiz_subscalecheckbox_' . $subscale->name,
-                    $subscale->name, null, null, [0, 1]);
-            }
+
+            self::generate_subscale_checkboxes($subscales, $elements, $mform);
         }
 
         // Button to attach JavaScript to reload the form.
@@ -216,6 +214,37 @@ class catquiz_handler {
         info::instance_form_definition($mform, $elements);
 
         return $elements;
+    }
+
+    /**
+     *  Generate recursive checkboxes for sub(-sub)scales.
+     * @param array $subscales
+     * @param array $elements
+     * @param mixed $mform
+     * @param mixed string
+     *
+     * @return void
+     */
+    public static function generate_subscale_checkboxes (
+        array $subscales,
+        array &$elements,
+        $mform,
+        string $elementadded = '',
+        $parentscalename = '')
+        {
+        if (empty($subscales)) {
+            return;
+        }
+
+        foreach ($subscales as $subscale) {
+            $elements[] = $mform->addElement('advcheckbox', 'catquiz_subscalecheckbox_' . $subscale->name,
+                $elementadded . $subscale->name, null, null, [0, 1]);
+            // Default checked ? $mform->setDefault('catquiz_subscalecheckbox_' . $subscale->name, 1);
+            $subsubscales = catscale::get_next_level_subscales_ids_from_parent([$subscale->id]);
+
+            $mform->hideIf('catquiz_subscalecheckbox_' . $subscale->name, $parentscalename, 'eq', 0);
+            self::generate_subscale_checkboxes($subsubscales, $elements, $mform, $elementadded . '- ', 'catquiz_subscalecheckbox_' . $subscale->name);
+        }
     }
 
     /**
