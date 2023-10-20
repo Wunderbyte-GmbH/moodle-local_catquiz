@@ -186,14 +186,14 @@ class info {
         $mform->hideIf('catquiz_pilotattemptsthreshold', 'catquiz_selectteststrategy', 'eq', $strategieswithoutpilotquestions);
         $mform->setType('catquiz_pilotattemptsthreshold', PARAM_INT);
         $mform->addHelpButton('catquiz_pilotattemptsthreshold', 'pilotattemptsthreshold', 'local_catquiz');
-        $mform->setDefault('catquiz_pilotattemptsthreshold', 30);
+        // $mform->setDefault('catquiz_pilotattemptsthreshold', 30);
 
         $elements[] = $mform->addElement(
             'text',
             'catquiz_standarderrorpersubscale',
             get_string('standarderrorpersubscale', 'local_catquiz'));
         $mform->addHelpButton('catquiz_standarderrorpersubscale', 'standarderrorpersubscale', 'local_catquiz');
-        $mform->setDefault('catquiz_standarderrorpersubscale', 80);
+        // $mform->setDefault('catquiz_standarderrorpersubscale', 80);
         $mform->hideIf(
             'catquiz_standarderrorpersubscale',
             'catquiz_selectteststrategy',
@@ -218,14 +218,14 @@ class info {
             'catquiz_maxquestionspersubscale',
             get_string('maxquestionspersubscale', 'local_catquiz')
         );
-        $mform->setDefault('catquiz_maxquestionspersubscale', 0);
+        // $mform->setDefault('catquiz_maxquestionspersubscale', 0);
         $mform->addHelpButton('catquiz_maxquestionspersubscale', 'maxquestionspersubscale', 'local_catquiz');
         $elements[] = $mform->addElement(
             'text',
             'catquiz_minquestionspersubscale',
             get_string('minquestionspersubscale', 'local_catquiz')
         );
-        $mform->setDefault('catquiz_minquestionspersubscale', 0);
+        // $mform->setDefault('catquiz_minquestionspersubscale', 0);
         $mform->addHelpButton('catquiz_minquestionspersubscale', 'minquestionspersubscale', 'local_catquiz');
 
         $elements[] = $mform->addElement(
@@ -233,14 +233,14 @@ class info {
             'catquiz_maxquestions',
             get_string('maxquestions', 'local_catquiz')
         );
-        $mform->setDefault('catquiz_maxquestions', 0);
+        // $mform->setDefault('catquiz_maxquestions', 0);
         $mform->addHelpButton('catquiz_maxquestions', 'maxquestions', 'local_catquiz');
         $elements[] = $mform->addElement(
             'text',
             'catquiz_minquestions',
             get_string('minquestions', 'local_catquiz')
         );
-        $mform->setDefault('catquiz_minquestions', 0);
+        // $mform->setDefault('catquiz_minquestions', 0);
         $mform->addHelpButton('catquiz_minquestions', 'minquestions', 'local_catquiz');
 
         // phpcs:disable
