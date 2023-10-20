@@ -538,7 +538,7 @@ class catquiz_handler {
             $pilotratio = floatval($quizsettings->catquiz_pilotratio);
         }
 
-        $maxquestionsperscale = $quizsettings->catquiz_maxquestionspersubscale;
+        $maxquestionsperscale = intval($quizsettings->catquiz_maxquestionspersubscale);
         if ($maxquestionsperscale == 0) {
             $maxquestionsperscale = INF;
         }
@@ -556,8 +556,8 @@ class catquiz_handler {
             // When selecting questions from a scale, also include questions from its subscales.
             // This option is required by the questions_loader context loader.
             'includesubscales' => true,
-            'maximumquestions' => intval($maxquestions),
-            'minimumquestions' => intval($quizsettings->catquiz_minquestions),
+            'maximumquestions' => $maxquestions,
+            'minimumquestions' => $quizsettings->catquiz_minquestions,
             'penalty_threshold' => 60 * 60 * 24 * 30 - 90, // TODO: make dynamic.
             /*
                  * After this time, the penalty for a question goes back to 0
