@@ -417,7 +417,7 @@ $string['setcourseenrolmentforscale_help'] = 'In diesen (externen) Kurs werden T
 $string['setautonitificationonenrolmentforscale'] = 'Teilnehmende über eine Gruppen- oder Kurseinschreibung mittels Standardtext informieren.';
 // Check Params for setautonitificationonenrolmentforscale_help text. Group and courselink.
 $string['setautonitificationonenrolmentforscale_help'] = 'Teilnehmende erhalten zusätzlich zu deren schriftlichen Feedback folgenden Hinweis: "Sie wurden automatisch in die Gruppe <Gruppenname> / den Kurs <Kursname als Link> eingeschrieben."';
-$string['copysettingsforallsubscales'] = 'gewählte Einstellungen für alle Subskalen übernehmen';
+$string['copysettingsforallsubscales'] = 'Gewählte Einstellungen für alle Subskalen übernehmen';
 
 // Quiz attempts.
 $string['catcontext'] = 'CAT Kontext';
