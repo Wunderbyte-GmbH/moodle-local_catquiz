@@ -152,10 +152,9 @@ class info {
         $strategyhasstandarderrorperscale = [];
         foreach ($teststrategies as $ts) {
             $teststrategiesoptions[$ts->id] = $ts->get_description();
-            if ($ts->get_description() === get_string('teststrategy_fastest', 'local_catquiz')) {
-                $strategieswithoutpilotquestions[] = $ts->id;
-            }
-            if ($ts->get_description() === get_string('inferallsubscales', 'local_catquiz')) {
+
+            // Only for those strategies in the array, we want to show the standard error setting.
+            if (!in_array($ts->id, [STRATEGY_LOWESTSUB, STRATEGY_HIGHESTSUB, STRATEGY_ALLSUBS])) {
                 $strategyhasstandarderrorperscale[] = $ts->id;
             }
         }
@@ -194,11 +193,11 @@ class info {
             'catquiz_standarderrorpersubscale',
             get_string('standarderrorpersubscale', 'local_catquiz'));
         $mform->addHelpButton('catquiz_standarderrorpersubscale', 'standarderrorpersubscale', 'local_catquiz');
-        $mform->setDefault('catquiz_standarderrorpersubscale', 5);
+        $mform->setDefault('catquiz_standarderrorpersubscale', 80);
         $mform->hideIf(
             'catquiz_standarderrorpersubscale',
             'catquiz_selectteststrategy',
-            'neq',
+            'in',
             $strategyhasstandarderrorperscale
         );
 
