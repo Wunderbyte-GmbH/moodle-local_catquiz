@@ -24,6 +24,8 @@
 
 namespace local_catquiz\teststrategy\strategy;
 
+use local_catquiz\teststrategy\feedbackgenerator\comparetotestaverage;
+use local_catquiz\teststrategy\feedbackgenerator\customscalefeedback;
 use local_catquiz\teststrategy\feedbackgenerator\debuginfo;
 use local_catquiz\teststrategy\feedbackgenerator\personabilities;
 use local_catquiz\teststrategy\feedbackgenerator\questionssummary;
@@ -92,9 +94,11 @@ class inferlowestskillgap extends strategy {
      */
     public function get_feedbackgenerators(): array {
         return [
-            questionssummary::class,
-            personabilities::class,
+            comparetotestaverage::class,
+            customscalefeedback::class,
             debuginfo::class,
+            personabilities::class,
+            questionssummary::class,
         ];
     }
 }
