@@ -35,9 +35,10 @@ const SELECTORS = {
 export const init = () => {
 
     const selectors = document.querySelectorAll(SELECTORS.CATTESTCHOOSER);
+    if (!selectors) {
+        return;
+    }
 
-                // eslint-disable-next-line no-console
-                console.log(selectors, 'selectors');
     if (selectors.length === 0) {
         return;
     }
