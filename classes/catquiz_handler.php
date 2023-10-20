@@ -273,6 +273,10 @@ class catquiz_handler {
             $test = new testenvironment($cattest);
             $test->apply_jsonsaved_values($formdefaultvalues);
             $formdefaultvalues['choosetemplate'] = 0;
+
+            if (!empty($formdefaultvalues['catquiz_catscales'])) {
+                $_POST['catquiz_catscales'] = $formdefaultvalues['catquiz_catscales'];
+            }
         } else {
             // Create stdClass with all the values.
             $cattest = (object)[
