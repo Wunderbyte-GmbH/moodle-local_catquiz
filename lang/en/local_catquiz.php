@@ -68,7 +68,10 @@ $string['maxquestionspersubscale'] = 'Maximum number of questions returned per s
 $string['maxquestionspersubscale_help'] = 'When this number of questions was returned for any subscale, no more questions from this scale will be shown. A value of 0 means that there is no limit.';
 $string['minquestionspersubscale'] = 'Minimum number of questions returned per subscale';
 $string['minquestionspersubscale_help'] = 'Questions of a subscale will be excluded only if at least the minimum number of questions was shown.';
-
+$string['maxquestions'] = 'Max. questions per test.';
+$string['maxquestions_help'] = '0 means no limit.';
+$string['minquestions'] = 'Min. number of questions per test.';
+$string['minquestions_help'] = 'There will be at least this number of questions in the test.';
 $string['timepacedtest'] = 'Timepaced test';
 $string['maxtime'] = 'Max time for test';
 $string['maxtimeperitem'] = 'Max time per question in seconds';

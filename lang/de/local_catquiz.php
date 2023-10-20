@@ -65,6 +65,10 @@ $string['standarderrorpersubscale'] = 'Standarderror pro Subskala in Prozent';
 $string['standarderrorpersubscale_help'] = 'Sobald der Standardfehler einer Subskala unter diesen Wert fällt, wird sie nicht weiter getestet.';
 $string['maxquestionspersubscale'] = 'max. Frageanzahl pro Subskala';
 $string['maxquestionspersubscale_help'] = 'Wenn von einer Subskala so viele Fragen angezeigt wurden, werden keine weiteren Fragen dieser Skala mehr ausgespielt. Wenn auf 0 gesetzt, dann gibt es kein Limit.';
+$string['maxquestions'] = 'max. Frageanzahl pro Test';
+$string['maxquestions_help'] = 'Es werden nicht mehr Fragen pro Test angezeigt. 0 bedeutet keine Begrenzung.';
+$string['minquestions'] = 'Min. Frageanzahl pro Test';
+$string['minquestions_help'] = 'Es müssen mindestens so viele Fragen pro Test angezeigt werden.';
 $string['minquestionspersubscale'] = 'min. Frageanzahl pro Subskala';
 $string['minquestionspersubscale_help'] = 'Eine Subskala wird frühestens dann ausgeschlossen, wenn die Minimalanzahl an Fragen aus dieser Skala angezeigt wurden.';
 

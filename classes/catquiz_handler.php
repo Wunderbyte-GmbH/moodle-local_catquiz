@@ -377,7 +377,7 @@ class catquiz_handler {
 
         // Create stdClass with all the values.
         $cattest = (object)[
-            'componentid' => $quizdata->id,
+             'componentid' => $quizdata->id,
             'component' => 'mod_adaptivequiz',
             'json' => json_encode($clone),
             'parentid' => $parentid ?? 0,
@@ -543,6 +543,11 @@ class catquiz_handler {
             $maxquestionsperscale = INF;
         }
 
+        $maxquestions = $quizsettings->catquiz_maxquestions;
+        if ($maxquestions == 0) {
+            $maxquestions = INF;
+        }
+
         $initialcontext = [
             'testid' => intval($attemptdata->instance),
             'contextid' => intval($quizsettings->catquiz_catcontext),
@@ -551,8 +556,8 @@ class catquiz_handler {
             // When selecting questions from a scale, also include questions from its subscales.
             // This option is required by the questions_loader context loader.
             'includesubscales' => true,
-            'maximumquestions' => intval($quizsettings->maximumquestions),
-            'minimumquestions' => intval($quizsettings->minimumquestions),
+            'maximumquestions' => intval($maxquestions),
+            'minimumquestions' => intval($quizsettings->catquiz_minquestions),
             'penalty_threshold' => 60 * 60 * 24 * 30 - 90, // TODO: make dynamic.
             /*
                  * After this time, the penalty for a question goes back to 0
