@@ -381,11 +381,11 @@ $string['feedbackbarlegend_region_3'] = "In diesem Bereich der Wissensstände is
 $string['feedbackbarlegend_region_4'] = "Dieser Bereich legt ein Vorwissen nahe, was über die Anforderungen des Fachstudiums sogar hinausgeht.";
 $string['teacherfeedback'] = "Feedback für Lehrende";
 $string['catquiz_feedbackheader'] = "Feedback";
+$string['catquizfeedbackheader'] = 'Feedback für "{$a}"';
 $string['noselection'] = "Keine Auswahl";
 $string['lowerlimit'] = "Unteres Limit";
 $string['upperlimit'] = "Oberes Limit";
 $string['setcoursesforscaletext'] = 'Legen sie für die (Sub-) Skala {$a} die Fähigkeitsbereiche für die einzelnen Feedbacks, die schriftlichen Rückmeldungen sowie jeweiligen Einschreibungen in Kurse oder Gruppen fest.';
-// No used yet.
 $string['catcatscaleprime'] = 'Inhaltsbereich/Skala';
 $string['catcatscaleprime_help'] = 'Wählen Sie den für Sie relevanten Inhaltsbereich aus. Inhaltsbereche werden als sogenannte Skala durch eine*n CAT-Manager*in angelegt und verwaltet. Falls Sie eigene Inhalts- und Teilbereiche wünschen, wenden Sie sich bitte an den oder die CAT-Manager*in oder den bzw. die Adminstrator*in Ihrer Moodle-Instanz.';
 $string['catcatscales_selectall'] = 'Alle Subskalen auswählen';
@@ -394,6 +394,7 @@ $string['selectcatcontext_help'] = 'Einsatz-Kontexte differenzieren die Daten hi
 $string['includepilotquestions_help'] = 'Im Pilotierungsmodus werden den Testdurchläufen Fragen beigemischt, deren Fragen-Parameter (z.B. Schwierigkeit, Trennschärfe) noch nicht bestimmt sind. Diese tragen nicht zum Test-Ergebnis bei. Die durch die Bearbeitungen angefallenen Daten können durch eine*n CAT-Manager*in zu einem späteren Zeitpunkt zur Bestimmung der Fragen-Parameter statistisch ausgewertet werden.';
 $string['catquiz_selectfirstquestion_help'] = 'Bei einem Test-Versuch entscheidet der Algorithmus aufgrund dieser Einstellung, nach welchem Kriterium die erste Frage gewählt wird, die ausgespielt wird.';
 $string['numberoffeedbackoptionpersubscale'] = 'Anzahl an Feedback-Optionen pro Subskala';
+$string['feedbacknumber'] = 'Feedback für Bereich {$a}';
 $string['numberoffeedbackoptionpersubscale_help'] = 'Wählen Sie aus, wieviele Optionen an Feedback Sie pro Subskala benötigen. Mithilfe der Feedback-Optionen können Sie in Abhängigkeit der ermittelten Fähigkeit gestufte, schriftliche Rückmeldungen erteilen und in verschiedene Kurse oder Gruppen einschreiben.';
 $string['choosesubscaleforfeedback'] = 'Subskala wählen';
 // Check display line breaks etc.

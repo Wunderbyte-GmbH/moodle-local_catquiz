@@ -87,49 +87,54 @@ class feedback {
         // Right now, we just get all subscales.
         $scales = $DB->get_records('local_catquiz_catscales');
 
-        // TODO: 1. Create Feedback only for selected scale.
-        // 2. For each scale: select how many feedback options should be present.
+        // Select to set number of feedback options per subscale.
+        $options = [];
+        for ($i = 1; $i <= 10; $i++) {
+            $options[$i] = $i;
+        }
+        $numbersselect = $mform->addElement('select', 'numberoffeedbackoptionsselect',
+        get_string('numberoffeedbackoptionpersubscale', 'local_catquiz'), $options, ['data-on-change-action' => 'numberOfFeedbacksSubmit']);
+        //$numbersselect->setMultiple(true);
+        $mform->addHelpButton('numberoffeedbackoptionsselect', 'numberoffeedbackoptionpersubscale', 'local_catquiz');
+        $mform->setDefault('numberoffeedbackoptionsselect', 3);
+        $elements[] = $numbersselect;
 
+        // Button to attach JavaScript to reload the form.
+        $mform->registerNoSubmitButton('submitnumberoffeedbackoptions');
+        $elements[] = $mform->addElement('submit', 'submitnumberoffeedbackoptions', 'numberoffeedbackoptionssubmit',
+            [
+            'class' => 'd-none',
+            'data-action' => 'submitNumberOfFeedbackOptions',
+        ]);
+
+        // TODO get data from select.
+        $numberoffeedbackspersubscale = intval($numbersselect->_values[0]) ?? 3;
+
+        $countfeedback = 1;
         foreach ($scales as $scale) {
+            // Add a header for each scale.
+            $elements[] = $mform->addElement('header', 'catquiz_feedback_header_' . $scale->id,
+                get_string('catquizfeedbackheader', 'local_catquiz', $scale->name));
 
-            // $elements[] = $mform->addElement('autocomplete',
-            //      'feedback_scaleid_' . $scale->id . '_courseids', '', $coursesarray, $options);
+            for ($j = 1; $j <= $numberoffeedbackspersubscale; $j++) {
+                // Header for Subfeedback.
+                $elements[] = $mform->addElement('static', 'headingforfeedback' . $scale->id . $j,
+                get_string('feedbacknumber', 'local_catquiz', $j));
 
-            // // $elements[] = $mform->addElement(
-            // //     'static',
-            // //     'feedback_scaleid_' . $scale->id . '_intro',
-            // //     $scale->name,
-            // //     get_string('setcoursesforscaletext', 'local_catquiz', $scale->name));
-            // $mform->hideIf(
-            //     'feedback_scaleid_' . $scale->id . '_courseids',
-            //     'catquiz_subscalecheckbox_' . $scale->id,
-            //     'neq',
-            //     1);
-            // $mform->hideIf(
-            //     'feedback_scaleid_' . $scale->id . '_intro',
-            //     'catquiz_catcatscales',
-            //     'neq',
-            //     $scale->parentid);
+                // Define range.
+                $elements[] = $mform->addElement('text',
+                        'feedback_scaleid_' . $scale->id . '_lowerlimit'  . $j, get_string('lowerlimit', 'local_catquiz'));
+                $mform->settype('feedback_scaleid_' . $scale->id . '_lowerlimit'  . $j, PARAM_FLOAT);
+                $elements[] = $mform->addElement('text',
+                'feedback_scaleid_' . $scale->id . '_upperlimit', get_string('upperlimit', 'local_catquiz'));
+                $mform->settype('feedback_scaleid_' . $scale->id . '_upperlimit'  . $j, PARAM_FLOAT);
 
+                // Rich text field for subfeedback.
+                $elements[] = $mform->addElement('editor', 'feedbackeditor_scaleid_' . $scale->id  . $j, get_string('feedback', 'core'), array('rows' => 10), array('maxfiles' => EDITOR_UNLIMITED_FILES,
+                        'noclean' => true, CONTEXT_SYSTEM, 'subdirs' => true));
+                    $mform->setType('feedbackeditor_scaleid_' . $scale->id  . $j, PARAM_RAW);
 
-            // TODO: Add missing elements: Anzahl Feedbackoptionen, Farbbereich
-
-
-            // TODO: Display range of ability in one row.
-            $elements[] = $mform->addElement('text',
-                    'feedback_scaleid_' . $scale->id . '_lowerlimit', get_string('lowerlimit', 'local_catquiz'));
-            $mform->settype('feedback_scaleid_' . $scale->id . '_lowerlimit', PARAM_FLOAT);
-            $elements[] = $mform->addElement('text',
-            'feedback_scaleid_' . $scale->id . '_upperlimit', get_string('upperlimit', 'local_catquiz'));
-            $mform->settype('feedback_scaleid_' . $scale->id . '_upperlimit', PARAM_FLOAT);
-
-            $elements[] = $mform->addElement('editor', 'feedbackeditor_scaleid_' . $scale->id, get_string('feedback', 'core'), array('rows' => 10), array('maxfiles' => EDITOR_UNLIMITED_FILES,
-                    'noclean' => true, CONTEXT_SYSTEM, 'subdirs' => true));
-                $mform->setType('feedbackeditor_scaleid_' . $scale->id, PARAM_RAW); // no XSS prevention here, users must be trusted
-
-            // Display group- and courseselect under which condition?
-            $condition = true;
-            if  ($condition) {
+                // Enrole to a group.
                 $groups = groups_get_all_groups(intval($course->id));
                 $options = [
                     'multiple' => false,
@@ -141,17 +146,17 @@ class feedback {
                 }
                 $elements[] = $mform->addElement(
                     'autocomplete',
-                    'catquiz_groups_' . $scale->id,
+                    'catquiz_groups_' . $scale->id . $j,
                     get_string('setgrouprenrolmentforscale', 'local_catquiz'),
                     $select,
                     $options
                 );
                 // TODO: Set default unselected.
                 //$mform->setDefault('catquiz_groups_' . $scale->id', 0);
-                $mform->addHelpButton('catquiz_groups_' . $scale->id, 'setgrouprenrolmentforscale', 'local_catquiz');
+                $mform->addHelpButton('catquiz_groups_' . $scale->id  . $j, 'setgrouprenrolmentforscale', 'local_catquiz');
 
-
-                // Should we really fetch all courses?
+                // Enrole to a group.
+                // Limit Courses - See GH-183.
                 $courses = get_courses("all");
                 $options = [
                     'multiple' => false,
@@ -163,16 +168,27 @@ class feedback {
                 }
                 $elements[] = $mform->addElement(
                     'autocomplete',
-                    'catquiz_courses_' . $scale->id,
+                    'catquiz_courses_' . $scale->id . $j,
                     get_string('setcourseenrolmentforscale', 'local_catquiz'),
                     $select,
                     $options
                 );
                 // TODO: Set default unselected.
                 //$mform->setDefault('catquiz_courses_' . $scale->id, 0);
-                $mform->addHelpButton('catquiz_courses_' . $scale->id, 'setcourseenrolmentforscale', 'local_catquiz');
+                $mform->addHelpButton('catquiz_courses_' . $scale->id  . $j, 'setcourseenrolmentforscale', 'local_catquiz');
             }
 
+            // Only for the first form, we display to button to apply values for all subscales.
+            if ($countfeedback === 1) {
+                // TODO: Attach function!
+                $mform->registerNoSubmitButton('copysettingsforallsubscales');
+                $elements[] = $mform->addElement('submit', 'copysettingsforallsubscales', get_string('copysettingsforallsubscales', 'local_catquiz'),
+                    [
+                        //'class' => 'd-none',
+                        'data-action' => 'submitFeedbackValues',
+                    ]);
+            }
+            $countfeedback ++;
         }
     }
 
