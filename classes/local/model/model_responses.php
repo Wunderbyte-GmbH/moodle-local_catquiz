@@ -295,6 +295,11 @@ class model_responses {
         return $this->excludedusers;
     }
 
+    /**
+     * Removes the user and associated responses.
+     *
+     * @return void
+     */
     private function removeuser(string $userid): void {
         unset($this->data[$userid]);
         $this->excludedusers[] = $userid;
