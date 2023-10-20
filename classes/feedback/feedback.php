@@ -29,6 +29,7 @@ use coding_exception;
 use dml_exception;
 use ddl_exception;
 use local_catquiz\catscale;
+use local_catquiz\data\dataapi;
 use local_catquiz\local\result;
 use local_catquiz\feedback\info;
 use local_catquiz\feedback\preselect_task;
@@ -55,7 +56,7 @@ class feedback {
      */
     public static function instance_form_definition(MoodleQuickForm &$mform, array &$elements) {
 
-        global $CFG, $DB;
+        global $CFG, $USER;
 
         require_once($CFG->libdir .'/datalib.php');
 
@@ -85,7 +86,7 @@ class feedback {
         ];
 
         // Right now, we just get all subscales.
-        $scales = $DB->get_records('local_catquiz_catscales');
+        $scales = dataapi::get_all_catscales();
 
         // Select to set number of feedback options per subscale.
         $options = [];
@@ -157,7 +158,7 @@ class feedback {
 
                 // Enrole to a group.
                 // Limit Courses - See GH-183.
-                $courses = get_courses("all");
+                $courses = enrol_get_my_courses();
                 $options = [
                     'multiple' => false,
                     'noselectionstring' => get_string('courseselection', 'local_catquiz'),
@@ -176,6 +177,12 @@ class feedback {
                 // TODO: Set default unselected.
                 //$mform->setDefault('catquiz_courses_' . $scale->id, 0);
                 $mform->addHelpButton('catquiz_courses_' . $scale->id  . $j, 'setcourseenrolmentforscale', 'local_catquiz');
+
+                // Checkbox dependent on groupselect and courseselect.
+                $elements[] = $mform->addElement('advcheckbox', 'enrolement_message_checkbox' . $scale->id . $j,
+                get_string('setautonitificationonenrolmentforscale', 'local_catquiz'), null, null, [0, 1]);
+                $mform->setDefault('enrolement_message_checkbox' . $scale->id . $j, 1);
+                // TODO: If none of both is selected, hide properly. $mform->hideIf('enrolement_message_checkbox' . $scale->id . $j, 'catquiz_groups_' . $scale->id . $j, 'eq', 0);
             }
 
             // Only for the first form, we display to button to apply values for all subscales.
