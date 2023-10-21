@@ -106,6 +106,11 @@ class attemptfeedback implements renderable, templatable {
 
         $generators = $this->get_feedback_generators_for_teststrategy($this->teststrategy);
 
+        // Todo: Depending on the strategy, we should also sort the data differently.
+        // Eg: Infer lowest skillgap should order the lowest person ability in a subscale on top.
+        // While highest skill should sort the highest ability on top. etc.
+        // Right now, we just sort for lowest skill.
+
         $cache = cache::make('local_catquiz', 'adaptivequizattempt');
         $context = [
             'attemptid' => $this->attemptid,
@@ -208,6 +213,24 @@ class attemptfeedback implements renderable, templatable {
      *
      */
     private function generate_feedback(array $generators, array $feedbackdata): array {
+
+        // At this point, we might want to resort data, depending on the teststrategy.
+        // Todo: Give this task to the teststrategy classes.
+
+        switch ($feedbackdata["teststrategy"]) {
+            case STRATEGY_LOWESTSUB:
+                sort($feedbackdata["personabilities"]);
+                usort($feedbackdata["feedback_personabilities"], fn($a, $b) => $a['ability'] > $b['ability'] ? 1 : -1);
+                break;
+            case STRATEGY_HIGHESTSUB:
+                rsort($feedbackdata["personabilities"]);
+                usort($feedbackdata["feedback_personabilities"], fn($a, $b) => $a['ability'] < $b['ability'] ? 1 : -1);
+                break;
+            default:
+                sort($feedbackdata["personabilities"]);
+                usort($feedbackdata["feedback_personabilities"], fn($a, $b) => $a['ability'] > $b['ability'] ? 1 : -1);
+        }
+
         foreach ($generators as $generator) {
             $feedback = $generator->get_feedback($feedbackdata);
             // Loop over studentfeedback and teacherfeedback.

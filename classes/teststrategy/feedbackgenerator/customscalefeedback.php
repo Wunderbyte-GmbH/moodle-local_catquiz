@@ -114,6 +114,9 @@ class customscalefeedback extends feedbackgenerator {
             return null;
         }
 
+        // Todo: make the sorting dependent on the strategy!
+        asort($personabilities);
+
         $scalefeedback = [];
         foreach ($personabilities as $catscaleid => $personability) {
             $lowerlimitprop = sprintf('feedback_scaleid_%d_lowerlimit', $catscaleid);
@@ -138,8 +141,9 @@ class customscalefeedback extends feedbackgenerator {
 
         $catscales = catquiz::get_catscales(array_keys($scalefeedback));
         $text = "";
-        foreach ($catscales as $cs) {
-            $text .= $cs->name . ': ' . $scalefeedback[$cs->id] . '<br/>';
+
+        foreach ($scalefeedback as $scaleid => $value) {
+            $text .= $catscales[$scaleid]->name . ': ' . $feedback . '<br/>';
         }
 
         return [
