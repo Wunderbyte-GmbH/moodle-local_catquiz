@@ -77,7 +77,7 @@ class model_person_ability_estimator_catcalc_test extends basic_testcase {
      *
      * @return array
      */
-    public static function person_ability_estimation_returns_expected_values_provider() {
+    public static function person_ability_estimation_returns_expected_values_provider(): array {
         return [
             [
                 'expected' => 1,
