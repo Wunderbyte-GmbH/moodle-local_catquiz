@@ -298,6 +298,8 @@ class model_responses {
     /**
      * Removes the user and associated responses.
      *
+     * @param string $userid
+     *
      * @return void
      */
     private function removeuser(string $userid): void {
