@@ -71,7 +71,7 @@ class catquiz_handler {
      */
     public static function instance_form_definition(MoodleQuickForm &$mform) {
 
-        global $PAGE;
+        global $PAGE, $OUTPUT;
 
         $elements = [];
 
@@ -110,6 +110,18 @@ class catquiz_handler {
 
         // We want to make sure the cat model section is always expanded.
         $mform->setExpanded('catmodelheading');
+
+        $options = [
+            "#0000ff" => "#0000ff",
+            "#ff0000" => "#ff0000",
+            "#008000" => "#008000",
+        ];
+
+        $elements[] = $mform->addElement('select', 'colourpicker', 'x', $options);
+
+        $elements[] = $mform->addElement('hidden', 'selectedcolour', '', PARAM_TEXT);
+        // We have require JS to click no submit button on change of test environment.
+        $PAGE->requires->js_call_amd('local_catquiz/colourpicker', 'init');
 
         // Button to attach JavaScript to reload the form.
         $mform->registerNoSubmitButton('submitcattestoption');
