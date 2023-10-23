@@ -65,6 +65,9 @@ define('ATTEMPT_ABORTED', 1);
 
 define('PERSONABILITY_MAX', 50);
 
+define('PERSONABILITY_LOWER_LIMIT', -5);
+define('PERSONABILITY_UPPER_LIMIT', 5);
+
 /**
  * Renders the popup Link.
  *
