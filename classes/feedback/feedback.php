@@ -63,6 +63,7 @@ class feedback {
         // Get all Values from the form.
         $data = $mform->exportValues();
 
+        // TODO: Display Name of Teststrategy. $teststrategyid = intval($data['catquiz_selectteststrategy']);
         $elements[] = $mform->addElement('header', 'catquiz_feedback',
                 get_string('catquiz_feedbackheader', 'local_catquiz'));
         $mform->setExpanded('catquiz_feedback');
