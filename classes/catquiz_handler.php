@@ -221,7 +221,8 @@ class catquiz_handler {
      * @param array $subscales
      * @param array $elements
      * @param mixed $mform
-     * @param mixed string
+     * @param string $elementadded
+     * @param string $parentscalename
      *
      * @return void
      */
@@ -231,20 +232,21 @@ class catquiz_handler {
         $mform,
         string $elementadded = '',
         $parentscalename = '') {
-            if (empty($subscales)) {
-                return;
-            }
 
-            foreach ($subscales as $subscale) {
-                $elements[] = $mform->addElement('advcheckbox', 'catquiz_subscalecheckbox_' . $subscale->name,
-                    $elementadded . $subscale->name, null, null, [0, 1]);
-                // Default checked ? $mform->setDefault('catquiz_subscalecheckbox_' . $subscale->name, 1);
-                $subsubscales = catscale::get_next_level_subscales_ids_from_parent([$subscale->id]);
-
-                $mform->hideIf('catquiz_subscalecheckbox_' . $subscale->name, $parentscalename, 'eq', 0);
-                self::generate_subscale_checkboxes($subsubscales, $elements, $mform, $elementadded . '- ', 'catquiz_subscalecheckbox_' . $subscale->name);
-            }
+        if (empty($subscales)) {
+            return;
         }
+
+        foreach ($subscales as $subscale) {
+            $elements[] = $mform->addElement('advcheckbox', 'catquiz_subscalecheckbox_' . $subscale->name,
+                $elementadded . $subscale->name, null, null, [0, 1]);
+            // Default checked ? $mform->setDefault('catquiz_subscalecheckbox_' . $subscale->name, 1);
+            $subsubscales = catscale::get_next_level_subscales_ids_from_parent([$subscale->id]);
+
+            $mform->hideIf('catquiz_subscalecheckbox_' . $subscale->name, $parentscalename, 'eq', 0);
+            self::generate_subscale_checkboxes($subsubscales, $elements, $mform, $elementadded . '- ', 'catquiz_subscalecheckbox_' . $subscale->name);
+        }
+    }
 
     /**
      * Set the data relvant to this plugin.
