@@ -117,6 +117,10 @@ class feedback {
         // Get data from select.
         $numberoffeedbackspersubscale = intval($numbersselect->_values[0]) ?? DEFAULT_NUMBER_OF_FEEDBACKS_PER_SCALE;
 
+        // Calculate equal default values for limits in scales.
+        $sizeofrange = abs(PERSONABILITY_LOWER_LIMIT - PERSONABILITY_UPPER_LIMIT);
+        $increment = $sizeofrange / $numberoffeedbackspersubscale;
+
         $countfeedback = 1;
         foreach ($scales as $scale) {
             // Add a header for each scale.
@@ -130,11 +134,14 @@ class feedback {
 
                 // Define range.
                 $elements[] = $mform->addElement('text',
-                        'feedback_scaleid_' . $scale->id . '_lowerlimit'  . $j, get_string('lowerlimit', 'local_catquiz'));
-                $mform->settype('feedback_scaleid_' . $scale->id . '_lowerlimit'  . $j, PARAM_FLOAT);
+                        'feedback_scaleid_' . $scale->id . '_lowerlimit' . $j, get_string('lowerlimit', 'local_catquiz'));
+                $mform->settype('feedback_scaleid_' . $scale->id . '_lowerlimit' . $j, PARAM_FLOAT);
+                $mform->setDefault('feedback_scaleid_' . $scale->id . '_lowerlimit' . $j, PERSONABILITY_LOWER_LIMIT + ($j-1)*$increment);
+
                 $elements[] = $mform->addElement('text',
-                'feedback_scaleid_' . $scale->id . '_upperlimit', get_string('upperlimit', 'local_catquiz'));
-                $mform->settype('feedback_scaleid_' . $scale->id . '_upperlimit'  . $j, PARAM_FLOAT);
+                'feedback_scaleid_' . $scale->id . '_upperlimit' . $j, get_string('upperlimit', 'local_catquiz'));
+                $mform->settype('feedback_scaleid_' . $scale->id . '_upperlimit' . $j, PARAM_FLOAT);
+                $mform->setDefault('feedback_scaleid_' . $scale->id . '_upperlimit'  . $j, PERSONABILITY_LOWER_LIMIT + $j*$increment);
 
                 // Rich text field for subfeedback.
                 $elements[] = $mform->addElement(
