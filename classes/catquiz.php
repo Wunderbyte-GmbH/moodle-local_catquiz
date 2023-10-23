@@ -1306,7 +1306,7 @@ class catquiz {
         }
 
         $contextid = intval($testsettings->catquiz_catcontext);
-        $catscaleids = explode(",", $testsettings->catquiz_catcatscales);
+        $catscaleids = explode(",", $testsettings->catquiz_catscales);
         [$insql, $inparams] = $DB->get_in_or_equal($catscaleids, SQL_PARAMS_NAMED, 'incatscales');
 
         $sql = "
