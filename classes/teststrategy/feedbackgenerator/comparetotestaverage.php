@@ -115,7 +115,7 @@ class comparetotestaverage extends feedbackgenerator {
             return null;
         }
 
-        if (! $catscaleid = $quizsettings->catquiz_catcatscales) {
+        if (! $catscaleid = $quizsettings->catquiz_catscales) {
             return null;
         }
 
