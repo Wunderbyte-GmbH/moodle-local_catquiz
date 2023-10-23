@@ -103,7 +103,7 @@ class feedback {
         );
         // $numbersselect->setMultiple(true);
         $mform->addHelpButton('numberoffeedbackoptionsselect', 'numberoffeedbackoptionpersubscale', 'local_catquiz');
-        $mform->setDefault('numberoffeedbackoptionsselect', 3);
+        $mform->setDefault('numberoffeedbackoptionsselect', DEFAULT_NUMBER_OF_FEEDBACKS_PER_SCALE);
         $elements[] = $numbersselect;
 
         // Button to attach JavaScript to reload the form.
@@ -114,8 +114,8 @@ class feedback {
             'data-action' => 'submitNumberOfFeedbackOptions',
         ]);
 
-        // TODO get data from select.
-        $numberoffeedbackspersubscale = intval($numbersselect->_values[0]) ?? 3;
+        // Get data from select.
+        $numberoffeedbackspersubscale = intval($numbersselect->_values[0]) ?? DEFAULT_NUMBER_OF_FEEDBACKS_PER_SCALE;
 
         $countfeedback = 1;
         foreach ($scales as $scale) {
