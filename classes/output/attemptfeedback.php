@@ -85,7 +85,7 @@ class attemptfeedback implements renderable, templatable {
         $this->contextid = $contextid;
 
         if ($catscaleid === 0) {
-            $catscaleid = intval($settings->catquiz_catcatscales);
+            $catscaleid = intval($settings->catquiz_catscales);
         }
         $this->catscaleid = $catscaleid;
     }
