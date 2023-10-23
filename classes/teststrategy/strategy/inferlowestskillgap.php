@@ -27,6 +27,7 @@ namespace local_catquiz\teststrategy\strategy;
 use local_catquiz\teststrategy\feedbackgenerator\comparetotestaverage;
 use local_catquiz\teststrategy\feedbackgenerator\customscalefeedback;
 use local_catquiz\teststrategy\feedbackgenerator\debuginfo;
+use local_catquiz\teststrategy\feedbackgenerator\graphicalsummary;
 use local_catquiz\teststrategy\feedbackgenerator\personabilities;
 use local_catquiz\teststrategy\feedbackgenerator\questionssummary;
 use local_catquiz\teststrategy\preselect_task\addscalestandarderror;
@@ -35,8 +36,8 @@ use local_catquiz\teststrategy\preselect_task\firstquestionselector;
 use local_catquiz\teststrategy\preselect_task\fisherinformation;
 use local_catquiz\teststrategy\preselect_task\lasttimeplayedpenalty;
 use local_catquiz\teststrategy\preselect_task\maximumquestionscheck;
-use local_catquiz\teststrategy\preselect_task\mayberemovescale;
 use local_catquiz\teststrategy\preselect_task\maybe_return_pilot;
+use local_catquiz\teststrategy\preselect_task\mayberemovescale;
 use local_catquiz\teststrategy\preselect_task\noremainingquestions;
 use local_catquiz\teststrategy\preselect_task\remove_uncalculated;
 use local_catquiz\teststrategy\preselect_task\removeplayedquestions;
@@ -99,6 +100,7 @@ class inferlowestskillgap extends strategy {
             debuginfo::class,
             personabilities::class,
             questionssummary::class,
+            graphicalsummary::class,
         ];
     }
 }

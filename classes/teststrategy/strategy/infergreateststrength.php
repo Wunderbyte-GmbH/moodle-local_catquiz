@@ -27,6 +27,7 @@ namespace local_catquiz\teststrategy\strategy;
 use local_catquiz\teststrategy\feedbackgenerator\comparetotestaverage;
 use local_catquiz\teststrategy\feedbackgenerator\customscalefeedback;
 use local_catquiz\teststrategy\feedbackgenerator\debuginfo;
+use local_catquiz\teststrategy\feedbackgenerator\graphicalsummary;
 use local_catquiz\teststrategy\feedbackgenerator\personabilities;
 use local_catquiz\teststrategy\feedbackgenerator\pilotquestions;
 use local_catquiz\teststrategy\feedbackgenerator\questionssummary;
@@ -99,6 +100,7 @@ class infergreateststrength extends strategy {
             customscalefeedback::class,
             comparetotestaverage::class,
             debuginfo::class,
+            graphicalsummary::class,
         ];
     }
 }
