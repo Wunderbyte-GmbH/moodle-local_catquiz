@@ -68,6 +68,8 @@ define('PERSONABILITY_MAX', 50);
 define('PERSONABILITY_LOWER_LIMIT', -5);
 define('PERSONABILITY_UPPER_LIMIT', 5);
 
+define('DEFAULT_NUMBER_OF_FEEDBACKS_PER_SCALE', 3);
+
 /**
  * Renders the popup Link.
  *
