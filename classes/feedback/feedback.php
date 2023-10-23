@@ -93,9 +93,14 @@ class feedback {
         for ($i = 1; $i <= 10; $i++) {
             $options[$i] = $i;
         }
-        $numbersselect = $mform->addElement('select', 'numberoffeedbackoptionsselect',
-        get_string('numberoffeedbackoptionpersubscale', 'local_catquiz'), $options, ['data-on-change-action' => 'numberOfFeedbacksSubmit']);
-        //$numbersselect->setMultiple(true);
+        $numbersselect = $mform->addElement(
+            'select',
+            'numberoffeedbackoptionsselect',
+            get_string('numberoffeedbackoptionpersubscale', 'local_catquiz'),
+            $options,
+            ['data-on-change-action' => 'numberOfFeedbacksSubmit'],
+        );
+        // $numbersselect->setMultiple(true);
         $mform->addHelpButton('numberoffeedbackoptionsselect', 'numberoffeedbackoptionpersubscale', 'local_catquiz');
         $mform->setDefault('numberoffeedbackoptionsselect', 3);
         $elements[] = $numbersselect;
@@ -131,8 +136,16 @@ class feedback {
                 $mform->settype('feedback_scaleid_' . $scale->id . '_upperlimit'  . $j, PARAM_FLOAT);
 
                 // Rich text field for subfeedback.
-                $elements[] = $mform->addElement('editor', 'feedbackeditor_scaleid_' . $scale->id  . $j, get_string('feedback', 'core'), array('rows' => 10), array('maxfiles' => EDITOR_UNLIMITED_FILES,
-                        'noclean' => true, CONTEXT_SYSTEM, 'subdirs' => true));
+                $elements[] = $mform->addElement(
+                    'editor',
+                    'feedbackeditor_scaleid_' . $scale->id  . $j,
+                    get_string('feedback', 'core'),
+                    ['rows' => 10],
+                    [
+                        'maxfiles' => EDITOR_UNLIMITED_FILES,
+                        'noclean' => true, CONTEXT_SYSTEM,
+                        'subdirs' => true,
+                    ]);
                     $mform->setType('feedbackeditor_scaleid_' . $scale->id  . $j, PARAM_RAW);
 
                 // Enrole to a group.
@@ -153,8 +166,7 @@ class feedback {
                     $options
                 );
                 // TODO: Set default unselected.
-                //$mform->setDefault('catquiz_groups_' . $scale->id', 0);
-                $mform->addHelpButton('catquiz_groups_' . $scale->id  . $j, 'setgrouprenrolmentforscale', 'local_catquiz');
+                $mform->addHelpButton('catquiz_groups_' . $scale->id . $j, 'setgrouprenrolmentforscale', 'local_catquiz');
 
                 // Enrole to a group.
                 // Limit Courses - See GH-183.
@@ -175,7 +187,6 @@ class feedback {
                     $options
                 );
                 // TODO: Set default unselected.
-                //$mform->setDefault('catquiz_courses_' . $scale->id, 0);
                 $mform->addHelpButton('catquiz_courses_' . $scale->id  . $j, 'setcourseenrolmentforscale', 'local_catquiz');
 
                 // Checkbox dependent on groupselect and courseselect.
@@ -191,7 +202,7 @@ class feedback {
                 $mform->registerNoSubmitButton('copysettingsforallsubscales');
                 $elements[] = $mform->addElement('submit', 'copysettingsforallsubscales', get_string('copysettingsforallsubscales', 'local_catquiz'),
                     [
-                        //'class' => 'd-none',
+                        // 'class' => 'd-none',
                         'data-action' => 'submitFeedbackValues',
                     ]);
             }
