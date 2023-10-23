@@ -149,8 +149,18 @@ class catquiz_handler {
         // ... after this function has finished execution. submitted form.
         // But the submitted via post, so we can access the variable via the superglobal $POST.
 
-        $selectedparentscale = optional_param('catquiz_catscales', 0, PARAM_INT)
-            ?? $mform->getSubmitValue('catquiz_catscales');
+        // $submitcattestoption = optional_param('submitcattestoption', '', PARAM_ACTION);
+        // $submitcattestoption = optional_param('submitcatscaleoption', '', PARAM_ACTION);
+        // $submittedvalue = $mform->getSubmitValue('catquiz_catscales');
+
+        // if (empty($submittedvalue) || $submitcattestoption != "cattestsubmit") {
+        //     $selectedparentscale = optional_param('catquiz_catscales', 0, PARAM_INT);
+        // } else {
+        //     $selectedparentscale = $submittedvalue;
+        // }
+
+        $selectedparentscale = optional_param('catquiz_catscales', 0, PARAM_INT);
+
         if (!empty($selectedparentscale)) {
             $element = $mform->getElement('catquiz_catscales');
             $element->setValue($selectedparentscale);
@@ -284,14 +294,12 @@ class catquiz_handler {
             $data = $mform->getSubmitValues();
         }
 
-        $submitcattestoption = optional_param('submitcattestoption', '', PARAM_ACTION);
-        if ($submitcattestoption == "cattestsubmit") {
-            $choosetemplate = optional_param('choosetemplate', '', PARAM_ACTION);
-        }
+        // We have the following cases.
 
-        // The test environment is always on custom to start with.
-        if (empty($choosetemplate)) {
-
+        // A) If load the first time, we load the json values from our custom environment.
+        // We have no submitted values => we load new.
+        // Post variable with json value.
+        if (empty($data)) {
             // Create stdClass with all the values.
             $cattest = (object)[
                 'componentid' => $componentid,
@@ -303,31 +311,28 @@ class catquiz_handler {
             $test->apply_jsonsaved_values($formdefaultvalues);
             $formdefaultvalues['choosetemplate'] = 0;
 
-            if (!empty($formdefaultvalues['catquiz_catscales'])) {
-                $_POST['catquiz_catscales'] = $formdefaultvalues['catquiz_catscales'];
-            }
-        } else {
+            $_POST['catquiz_catscales'] = $formdefaultvalues['catquiz_catscales'];
+
+        } else if (isset($data['submitcattestoption'])
+            && !empty($data['choosetemplate'])
+            && ($data['submitcattestoption'] == "cattestsubmit")) {
+            // B) If we have submitted a new testenvironment, we need to take this an load different json values.
+            // cattestsubmit && choosetemplate not empty.
+            // Post variable has to be set with json value.
+
+
             // Create stdClass with all the values.
             $cattest = (object)[
-                'id' => $choosetemplate,
+                'id' => $data['choosetemplate'],
             ];
+
             // Pass on the values as stdClas.
             $test = new testenvironment($cattest);
             $test->apply_jsonsaved_values($formdefaultvalues);
+            $formdefaultvalues['choosetemplate'] = 0;
 
-            // There are a few fields which we need directly in the definition_after_data.
-            // These form-default-values are not available at this point.
-            // So we need to add them to the $POST superglobal.
-
-            if (!empty($formdefaultvalues['catquiz_catscales'])) {
-                $_POST['catquiz_catscales'] = $formdefaultvalues['catquiz_catscales'];
-            }
+            $_POST['catquiz_catscales'] = $formdefaultvalues['catquiz_catscales'];
         }
-
-        $formdefaultvalues['testenvironment_addoredittemplate'] = 0;
-        unset($formdefaultvalues['testenvironment_name']);
-
-        // Todo: Read json and set all the values.
     }
 
     /**
