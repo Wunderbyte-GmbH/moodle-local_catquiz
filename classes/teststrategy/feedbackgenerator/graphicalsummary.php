@@ -77,7 +77,7 @@ class graphicalsummary extends feedbackgenerator {
      *
      */
     public function get_heading(): string {
-        return get_string('graphicalsummary', 'local_catquiz');
+        return get_string('quizgraphicalsummary', 'local_catquiz');
     }
 
     /**
@@ -160,31 +160,31 @@ class graphicalsummary extends feedbackgenerator {
 
         // Create the graph for difficulty.
         $difficultieschart = new \core\chart_series(
-            "question difficulty",
+            get_string('difficulty', 'local_catquiz'),
             $difficulties
         );
         $fractionschart = new \core\chart_series(
-            "response",
+            get_string('response', 'local_catquiz'),
             $fractions
         );
         $abilitieschart = new \core\chart_series(
-            "person ability in tested scale",
+            get_string('abilityintestedscale', 'local_catquiz'),
             $abilities
         );
         $fisherinfochart = new \core\chart_series(
-            "fisher information",
+            get_string('fisherinformation', 'local_catquiz'),
             $fisherinfo
         );
         $scorechart = new \core\chart_series(
-            "score",
+            get_string('score', 'local_catquiz'),
             $score
         );
         $diffnextbeforechart = new \core\chart_series(
-            "difficulty of next less difficult",
+            get_string('difficulty_next_easier', 'local_catquiz'),
             $diffnextbefore
         );
         $diffnextafterchart = new \core\chart_series(
-            "difficulty of next more difficult",
+            get_string('difficulty_next_more_difficult', 'local_catquiz'),
             $diffnextafter
         );
         $chart->add_series($difficultieschart);

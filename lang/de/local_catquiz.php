@@ -412,6 +412,13 @@ $string['setcourseenrolmentforscale_help'] = 'In diesen (externen) Kurs werden T
 $string['setautonitificationonenrolmentforscale'] = 'Teilnehmende über eine Gruppen- oder Kurseinschreibung mittels Standardtext informieren.';
 // Check Params for setautonitificationonenrolmentforscale_help text. Group and courselink.
 $string['setautonitificationonenrolmentforscale_help'] = 'Teilnehmende erhalten zusätzlich zu deren schriftlichen Feedback folgenden Hinweis: "Sie wurden automatisch in die Gruppe <Gruppenname> / den Kurs <Kursname als Link> eingeschrieben."';
+$string['quizgraphicalsummary'] = 'Quizverlauf';
+$string['score'] = 'Gewichteter Score';
+$string['response'] = 'Antwort';
+$string['abilityintestedscale'] = 'Ability in der getesteten Skala';
+$string['fisherinformation'] = 'Fisherinformation';
+$string['difficulty_next_easier'] = 'Nächstschwierigere Frage';
+$string['difficulty_next_more_difficult'] = 'Nächstleichtere Frage';
 
 // Quiz attempts.
 $string['catcontext'] = 'CAT Kontext';

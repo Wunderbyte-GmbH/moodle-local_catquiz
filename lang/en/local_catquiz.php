@@ -415,6 +415,13 @@ $string['setautonitificationonenrolmentforscale'] = 'Inform participants about g
 // Check Params for setautonitificationonenrolmentforscale_help text. Group and courselink.
 $string['setautonitificationonenrolmentforscale_help'] = '
 In addition to their written feedback, participants will receive the following note: "You have been automatically enrolled in the group <group name> / the course <course name as a link>."';
+$string['quizgraphicalsummary'] = 'Quiz progress summary';
+$string['score'] = 'Weighted score';
+$string['response'] = 'Response';
+$string['abilityintestedscale'] = 'Ability in tested scale';
+$string['fisherinformation'] = 'Fisherinformation';
+$string['difficulty_next_easier'] = 'Next more difficult question';
+$string['difficulty_next_more_difficult'] = 'Next easier question';
 
 // Quiz attempts.
 $string['catcontext'] = 'CAT Context';
