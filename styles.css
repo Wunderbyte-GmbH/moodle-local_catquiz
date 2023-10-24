@@ -73,8 +73,8 @@ canvas {
     top: 4em;
 }
 
-span.catquiz_colourpick .colourpickercircle,
-span.catquiz_colourpick .colourpickercircle {
+span.wb_colourpick .colourpickercircle,
+span.wb_colourpick .colourpickercircle {
     width: 25px;
     height: 25px;
     border-radius: 50%;
@@ -83,17 +83,17 @@ span.catquiz_colourpick .colourpickercircle {
     border: 3px solid;
 }
 
-span.catquiz_colourpick .colourpickercircle:hover,
-span.catquiz_colourpick.colourpickercircle:hover {
+span.wb_colourpick .colourpickercircle:hover,
+span.wb_colourpick.colourpickercircle:hover {
     border-color: orange;
 }
-span.catquiz_colourpick .colourpickercircle.selected,
-span.catquiz_colourpick.colourpickercircle.selected {
+span.wb_colourpick .colourpickercircle.selected,
+span.wb_colourpick.colourpickercircle.selected {
     background-image: url([[pix:format_tiles|check-white]]);
     background-size: contain;
 }
-span.catquiz_colourpick #colourselectnotify,
-span.catquiz_colourpick #colourselectnotify {
+span.wb_colourpick #colourselectnotify,
+span.wb_colourpick #colourselectnotify {
     color: #212529;
     background-color: #e9ecef;
     border-radius: 0.2rem;

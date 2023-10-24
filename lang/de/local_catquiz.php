@@ -491,3 +491,25 @@ $string['breakinfo_title'] = 'Test pausiert';
 $string['breakinfo_description'] = 'Der Test wurde pausiert.';
 $string['breakinfo_continue'] = 'Der Test kann um {$a} fortgesetzt werden';
 $string['breakinfo_backtotest'] = 'Zurück zum Test';
+
+// CAT Colors.
+$string['feedback_colorrange'] = 'Farbbereich auf einer Feedback-Skala';
+
+$string['catcolor_red'] = 'Rot';
+$string['catcolor_black'] = 'Schwarz';
+$string['catcolor_darkred'] = 'Dunkelrot';
+$string['catcolor_orange'] = 'Orange';
+$string['catcolor_yellow'] = 'Gelb';
+$string['catcolor_lightgreen'] = 'Hellgrün';
+$string['catcolor_darkgreen'] = 'Dunkelgrün';
+$string['catcolor_white'] = 'Weiß';
+
+$string['colorvalue_red'] = '#ff0000';
+$string['colorvalue_black'] = '#000000';
+$string['colorvalue_darkred'] = '#8b0000';
+$string['colorvalue_orange'] = '#ffa500';
+$string['colorvalue_yellow'] = '#ffff00';
+$string['colorvalue_lightgreen'] = '#90ee90';
+$string['colorvalue_darkgreen'] = '#006400';
+$string['colorvalue_white'] = '#ffffff';
+
