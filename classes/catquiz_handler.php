@@ -162,7 +162,6 @@ class catquiz_handler {
             $select,
             $options
         );
-        // $mform->setDefault('catquiz_catcontext',  1);
 
         $elements[] = $mform->addElement('text', 'catquiz_passinglevel', get_string('passinglevel', 'local_catquiz'));
         $mform->addHelpButton('catquiz_passinglevel', 'passinglevel', 'local_catquiz');
