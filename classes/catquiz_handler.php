@@ -149,16 +149,6 @@ class catquiz_handler {
         // ... after this function has finished execution. submitted form.
         // But the submitted via post, so we can access the variable via the superglobal $POST.
 
-        // $submitcattestoption = optional_param('submitcattestoption', '', PARAM_ACTION);
-        // $submitcattestoption = optional_param('submitcatscaleoption', '', PARAM_ACTION);
-        // $submittedvalue = $mform->getSubmitValue('catquiz_catscales');
-
-        // if (empty($submittedvalue) || $submitcattestoption != "cattestsubmit") {
-        //     $selectedparentscale = optional_param('catquiz_catscales', 0, PARAM_INT);
-        // } else {
-        //     $selectedparentscale = $submittedvalue;
-        // }
-
         $selectedparentscale = optional_param('catquiz_catscales', 0, PARAM_INT);
 
         if (!empty($selectedparentscale)) {
@@ -252,7 +242,6 @@ class catquiz_handler {
                 $elementadded . $subscale->name, null, null, [0, 1]);
             // Default checked ? $mform->setDefault('catquiz_subscalecheckbox_' . $subscale->name, 1);
             $subsubscales = catscale::get_next_level_subscales_ids_from_parent([$subscale->id]);
-
             $mform->hideIf('catquiz_subscalecheckbox_' . $subscale->name, $parentscalename, 'eq', 0);
             self::generate_subscale_checkboxes($subsubscales, $elements, $mform, $elementadded . '- ', 'catquiz_subscalecheckbox_' . $subscale->name);
         }

@@ -86,8 +86,14 @@ class feedback {
             'noselectionstring' => get_string('noselection', 'local_catquiz'),
         ];
 
-        // Right now, we just get all subscales.
-        $scales = dataapi::get_all_catscales();
+        $selectedparentscale = optional_param('catquiz_catscales', 0, PARAM_INT);
+
+        if (!empty($selectedparentscale)) {
+            $scales = dataapi::get_catscale_and_children($selectedparentscale, true);
+        } else {
+            // Right now, we just get all subscales.
+            $scales = dataapi::get_all_catscales();
+        }
 
         // Select to set number of feedback options per subscale.
         $options = [];

@@ -99,22 +99,32 @@ class dataapi {
      * @param bool $getchildren
      * @return array
      */
-    public static function get_catscale_and_children($parentid = 0, bool $getchildren = false) {
+    public static function get_catscale_and_children($parentid = 0, bool $getsubchildren = false) {
 
         $catscales = self::get_all_catscales();
         $returnarray = [];
 
         foreach ($catscales as $catscale) {
 
-            if ($catscale->parentid == $parentid) {
-                $returnarray[] = $catscale;
+            // First check is, if the scale is already in our return array.
+            // This can happen when we return children, run the function again and return ourselves.
+            if (isset($returnarray[$catscale->id])) {
+                continue;
+            }
 
-                if ($getchildren) {
+            if ($catscale->parentid == $parentid) {
+
+                $returnarray[$catscale->id] = $catscale;
+
+                if ($getsubchildren) {
                     // Now get all children.
-                    $children = self::get_catscale_and_children($catscale->id, $getchildren);
+                    $children = self::get_catscale_and_children($catscale->id, $getsubchildren);
 
                     $returnarray = array_merge($returnarray, $children);
                 }
+            } else if ($catscale->id == $parentid) {
+                // We add the array at the first place.
+                $returnarray = array_merge([$catscale->id => $catscale], $returnarray);
             }
         }
         return $returnarray;
