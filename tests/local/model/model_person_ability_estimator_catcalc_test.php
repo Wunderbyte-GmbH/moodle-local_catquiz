@@ -30,6 +30,7 @@ use local_catquiz\local\model\model_item_param;
 use local_catquiz\local\model\model_item_param_list;
 use local_catquiz\local\model\model_person_ability_estimator_catcalc;
 use local_catquiz\local\model\model_responses;
+use UnexpectedValueException;
 
 /** model_person_ability_estimator_catcalc_test
  *
@@ -60,16 +61,14 @@ class model_person_ability_estimator_catcalc_test extends basic_testcase {
         foreach ($responses as $scaleid => $modelresponse) {
             $estimator = new model_person_ability_estimator_catcalc($modelresponse);
             $result = $estimator->get_person_abilities($itemparams);
-            foreach ($result as $p) {
-                echo sprintf(
-                    "%s;%s;%s;%f",
-                    $modelname,
-                    $scaleid,
-                    $p->get_id(),
-                    $p->get_ability()
-                ) . PHP_EOL;
+            $print = false;
+            if ($print) {
+                $this->printascsv($result, $modelname, $scaleid);
             }
         }
+        // TODO: When we know the expected values, write them to a separate CSV
+        // file and use the assertion to compare the expected and calculated
+        // values.
         return $this->assertTrue(true);
     }
     /**
@@ -92,10 +91,10 @@ class model_person_ability_estimator_catcalc_test extends basic_testcase {
                 'itemparams' => self::createitemparams('raschbirnbaumb'),
             ],
             [
-                'expected' => 1,
-                'modelname' => '3PL',
-                'responses' => self::createmodelresponse('raschbirnbaumc'),
-                'itemparams' => self::createitemparams('raschbirnbaumc'),
+            'expected' => 1,
+            'modelname' => '3PL',
+            'responses' => self::createmodelresponse('raschbirnbaumc'),
+            'itemparams' => self::createitemparams('raschbirnbaumc'),
             ],
         ];
     }
@@ -108,28 +107,13 @@ class model_person_ability_estimator_catcalc_test extends basic_testcase {
         global $CFG;
         switch ($modelname) {
             case 'raschbirnbauma':
-                require_once(
-                    $CFG->dirroot . '/local/catquiz/tests/fixtures/responses1PL_testdata.php'
-                );
-                // phpcs:disable
-                $data = responses1PL_testdata::return_testdata();
-                // phpcs:enable
+                $data = self::loadresponsesdata($CFG->dirroot . '/local/catquiz/tests/fixtures/responses.1PL.csv');
                 break;
             case 'raschbirnbaumb':
-                require_once(
-                    $CFG->dirroot . '/local/catquiz/tests/fixtures/responses2PL_testdata.php'
-                );
-                // phpcs:disable
-                $data = responses2PL_testdata::return_testdata();
-                // phpcs:enable
+                $data = self::loadresponsesdata($CFG->dirroot . '/local/catquiz/tests/fixtures/responses.2PL.csv');
                 break;
             case 'raschbirnbaumc':
-                require_once(
-                    $CFG->dirroot . '/local/catquiz/tests/fixtures/responses3PL_testdata.php'
-                );
-                // phpcs:disable
-                $data = responses3PL_testdata::return_testdata();
-                // phpcs:enable
+                $data = self::loadresponsesdata($CFG->dirroot . '/local/catquiz/tests/fixtures/responses.3PL.csv');
                 break;
 
             default:
@@ -194,5 +178,54 @@ class model_person_ability_estimator_catcalc_test extends basic_testcase {
             }
         }
         return $itemparamlist;
+    }
+
+    /**
+     * Returns the responses as an array.
+     *
+     * @param string $filename
+     * @return array
+     */
+    private static function loadresponsesdata(string $filename): array {
+        if (($handle = fopen($filename, "r")) === false) {
+            throw new UnexpectedValueException("Can not open file: " . $filename);
+        }
+
+        $row = 0;
+        $responses = [];
+        $columnames = [];
+        while (($data = fgetcsv($handle, 0, ";")) !== false) {
+            $row++;
+            if ($row == 1) {
+                // Skip the header row.
+                $columnames = array_slice($data, 1);
+                continue;
+            }
+
+            $responses[$data[0]] = array_combine($columnames, array_slice($data, 1));
+        }
+
+        fclose($handle);
+        return $responses;
+    }
+
+    /**
+     * Prints the result as CSV to the console
+     *
+     * @param mixed $result
+     * @param string $modelname
+     * @param string $scaleid
+     * @return void
+     */
+    private function printascsv($result, string $modelname, string $scaleid): void {
+        foreach ($result as $p) {
+            echo sprintf(
+                "%s;%s;%s;%f",
+                $modelname,
+                $scaleid,
+                $p->get_id(),
+                $p->get_ability()
+            ) . PHP_EOL;
+        }
     }
 }
