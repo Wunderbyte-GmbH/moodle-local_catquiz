@@ -25,8 +25,8 @@
 import Templates from 'core/templates';
 
 const SELECTORS = {
-    SELECTCOLOURPICKER: 'select[name="colourpicker"]',
-    COLOURPICKER: 'span.catquiz_colourpick',
+    SELECTCOLOURPICKER: 'select[name^="wb_colourpicker_"]',
+    COLOURPICKER: 'span.wb_colourpick',
     COLOUR: 'span.colourpickercircle',
     COLOURSELECTMENU: '.colourselectnotify'
 };
@@ -36,40 +36,70 @@ const SELECTORS = {
  */
 export const init = () => {
 
-    const selectcolors = document.querySelector(SELECTORS.SELECTCOLOURPICKER);
+    const selectcolors = document.querySelectorAll(SELECTORS.SELECTCOLOURPICKER);
 
-    const colours = [...selectcolors.querySelectorAll('option')].map(el => {
+    selectcolors.forEach(selectcolor => {
+        if (selectcolor.dataset.initialized) {
+            return;
+        }
+        selectcolor.dataset.initialized = 'true';
+
+        addClickListener(selectcolor);
+    });
+};
+
+/**
+ * Add Click Listener to element.
+ *
+ * @param {mixed} selectcolor
+ */
+function addClickListener(selectcolor) {
+    const colours = [...selectcolor.querySelectorAll('option')].map(el => {
 
         // const colourSelectMenu = document.querySelector(SELECTORS.COLOURSELECTMENU);
         const colour = el.value;
         return {
             colour,
             colourname: el.textContent,
-            selected: selectcolors.value == el.value,
-            id: colour.replace("#", "")
+            selected: selectcolor.value == el.value,
+            id: selectcolor.name
         };
     });
 
     // eslint-disable-next-line no-console
-    console.log(colours, selectcolors.value);
+    console.log(colours, selectcolor.value);
 
+    const colourobject = colours.filter(e => e.selected).pop();
 
-    Templates.renderForPromise('local_catquiz/colour_picker', {colours}).then(({html}) => {
+    // eslint-disable-next-line no-console
+    console.log(colourobject, 'colourobject');
 
+    const data = {
+        colours,
+        colour: colourobject.colourname,
+        id: selectcolor.name
+    };
 
-        selectcolors.classList.add('hidden');
+    // eslint-disable-next-line no-console
+    console.log(data, 'data');
 
-        selectcolors.insertAdjacentHTML('afterend', html);
+    Templates.renderForPromise('local_catquiz/colour_picker', data).then(({html}) => {
 
-        const colourpicker = document.querySelector(SELECTORS.COLOURPICKER);
+        //selectcolor.classList.add('hidden');
+
+        selectcolor.insertAdjacentHTML('afterend', html);
+
+        const colourpicker = document.querySelector('span[data-id=wb_colourpick_id_' + selectcolor.name + ']');
+        // eslint-disable-next-line no-console
+        console.log(colourpicker, 'colourpicker');
 
         // eslint-disable-next-line no-console
-        console.log(selectcolors, html);
+        console.log(selectcolor, html);
 
         const colours = colourpicker.querySelectorAll(SELECTORS.COLOUR);
 
         // eslint-disable-next-line no-console
-        console.log(selectcolors, colourpicker, colours, html);
+        console.log(selectcolor, colourpicker, colours, html);
 
         colours.forEach(el => {
             el.addEventListener('click', e => {
@@ -79,7 +109,7 @@ export const init = () => {
 
                 colours.forEach(el => el.classList.remove('selected'));
                 e.target.classList.add('selected');
-                selectcolors.value = e.target.dataset.colour;
+                selectcolor.value = e.target.dataset.colour;
 
             });
         });
@@ -89,4 +119,4 @@ export const init = () => {
           // eslint-disable-next-line no-console
           console.log(e);
       });
-};
+}

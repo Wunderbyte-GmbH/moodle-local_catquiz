@@ -56,7 +56,7 @@ class feedback {
      */
     public static function instance_form_definition(MoodleQuickForm &$mform, array &$elements) {
 
-        global $CFG, $USER;
+        global $CFG, $PAGE;
 
         require_once($CFG->libdir .'/datalib.php');
 
@@ -91,7 +91,7 @@ class feedback {
 
         // Select to set number of feedback options per subscale.
         $options = [];
-        for ($i = 1; $i <= 10; $i++) {
+        for ($i = 1; $i <= 8; $i++) {
             $options[$i] = $i;
         }
         $numbersselect = $mform->addElement(
@@ -136,12 +136,27 @@ class feedback {
                 $elements[] = $mform->addElement('text',
                         'feedback_scaleid_' . $scale->id . '_lowerlimit' . $j, get_string('lowerlimit', 'local_catquiz'));
                 $mform->settype('feedback_scaleid_' . $scale->id . '_lowerlimit' . $j, PARAM_FLOAT);
+                // TODO: Set previous upper limit as lower limit for next field.
                 $mform->setDefault('feedback_scaleid_' . $scale->id . '_lowerlimit' . $j, PERSONABILITY_LOWER_LIMIT + ($j-1)*$increment);
 
                 $elements[] = $mform->addElement('text',
                 'feedback_scaleid_' . $scale->id . '_upperlimit' . $j, get_string('upperlimit', 'local_catquiz'));
                 $mform->settype('feedback_scaleid_' . $scale->id . '_upperlimit' . $j, PARAM_FLOAT);
                 $mform->setDefault('feedback_scaleid_' . $scale->id . '_upperlimit'  . $j, PERSONABILITY_LOWER_LIMIT + $j*$increment);
+
+                // TODO Switch to check which colors should be displayed.
+                $options = self::get_array_of_colors($numberoffeedbackspersubscale);
+
+                $elements[] = $mform->addElement(
+                    'select',
+                    'wb_colourpicker_' .$scale->id . $j,
+                    get_string('feedback_colorrange', 'local_catquiz'),
+                    $options
+                );
+
+                $elements[] = $mform->addElement('hidden', 'selectedcolour', '', PARAM_TEXT);
+                // We have require JS to click no submit button on change of test environment.
+                $PAGE->requires->js_call_amd('local_catquiz/colourpicker', 'init');
 
                 // Rich text field for subfeedback.
                 $elements[] = $mform->addElement(
@@ -217,6 +232,97 @@ class feedback {
             $countfeedback ++;
         }
     }
+
+    /**
+     * Fill coloroptions array with strings.
+     *
+     * @param string $color
+     * @param array $coloroptions
+     *
+     */
+    public static function add_coloroption(string $color, array &$coloroptions) {
+        $coloroptions[get_string('colorvalue_'. $color, 'local_catquiz')] = get_string('colorvalue_'. $color, 'local_catquiz');
+    }
+
+    /**
+     * Get right number and type of colors.
+     *
+     * @param int $numberoffeedbackspersubscale
+     * @return array $coloroptions
+     *
+     */
+    public static function get_array_of_colors($numberoffeedbackspersubscale) {
+
+        $coloroptions = [];
+        // Depending of the number of options, different colors will be chosen.
+        switch ($numberoffeedbackspersubscale) {
+            case 1:
+                self::add_coloroption("red", $coloroptions);
+                break;
+            case 2:
+                self::add_coloroption("red", $coloroptions);
+                self::add_coloroption("lightgreen", $coloroptions);
+                break;
+            case 3:
+                self::add_coloroption("red", $coloroptions);
+                self::add_coloroption("yellow", $coloroptions);
+                self::add_coloroption("lightgreen", $coloroptions);
+                break;
+            case 4:
+                self::add_coloroption('red', $coloroptions);
+                self::add_coloroption('orange', $coloroptions);
+                self::add_coloroption('yellow', $coloroptions);
+                self::add_coloroption('lightgreen', $coloroptions);
+                break;
+            case 5:
+                self::add_coloroption('red', $coloroptions);
+                self::add_coloroption('orange', $coloroptions);
+                self::add_coloroption('yellow', $coloroptions);
+                self::add_coloroption('lightgreen', $coloroptions);
+                self::add_coloroption('darkgreen', $coloroptions);
+                break;
+            case 6:
+                self::add_coloroption('darkred', $coloroptions);
+                self::add_coloroption('red', $coloroptions);
+                self::add_coloroption('orange', $coloroptions);
+                self::add_coloroption('yellow', $coloroptions);
+                self::add_coloroption('lightgreen', $coloroptions);
+                self::add_coloroption('darkgreen', $coloroptions);
+                break;
+            case 7:
+                self::add_coloroption('black', $coloroptions);
+                self::add_coloroption('darkred', $coloroptions);
+                self::add_coloroption('red', $coloroptions);
+                self::add_coloroption('orange', $coloroptions);
+                self::add_coloroption('yellow', $coloroptions);
+                self::add_coloroption('lightgreen', $coloroptions);
+                self::add_coloroption('darkgreen', $coloroptions);
+                break;
+            case 7:
+                self::add_coloroption('black', $coloroptions);
+                self::add_coloroption('darkred', $coloroptions);
+                self::add_coloroption('red', $coloroptions);
+                self::add_coloroption('orange', $coloroptions);
+                self::add_coloroption('yellow', $coloroptions);
+                self::add_coloroption('lightgreen', $coloroptions);
+                self::add_coloroption('darkgreen', $coloroptions);
+                break;
+            case 8:
+                self::add_coloroption('black', $coloroptions);
+                self::add_coloroption('darkred', $coloroptions);
+                self::add_coloroption('red', $coloroptions);
+                self::add_coloroption('orange', $coloroptions);
+                self::add_coloroption('yellow', $coloroptions);
+                self::add_coloroption('lightgreen', $coloroptions);
+                self::add_coloroption('darkgreen', $coloroptions);
+                self::add_coloroption('white', $coloroptions);
+                break;
+        }
+
+        return $coloroptions;
+    }
+
+
 
     /**
      * Takes the result of a test and applies the after test actions.

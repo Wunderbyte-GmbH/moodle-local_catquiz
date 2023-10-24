@@ -111,18 +111,6 @@ class catquiz_handler {
         // We want to make sure the cat model section is always expanded.
         $mform->setExpanded('catmodelheading');
 
-        $options = [
-            "#0000ff" => "#0000ff",
-            "#ff0000" => "#ff0000",
-            "#008000" => "#008000",
-        ];
-
-        $elements[] = $mform->addElement('select', 'colourpicker', 'x', $options);
-
-        $elements[] = $mform->addElement('hidden', 'selectedcolour', '', PARAM_TEXT);
-        // We have require JS to click no submit button on change of test environment.
-        $PAGE->requires->js_call_amd('local_catquiz/colourpicker', 'init');
-
         // Button to attach JavaScript to reload the form.
         $mform->registerNoSubmitButton('submitcattestoption');
         $elements[] = $mform->addElement('submit', 'submitcattestoption', 'cattestsubmit',
@@ -261,12 +249,12 @@ class catquiz_handler {
         }
 
         foreach ($subscales as $subscale) {
-            $elements[] = $mform->addElement('advcheckbox', 'catquiz_subscalecheckbox_' . $subscale->name,
+            $elements[] = $mform->addElement('advcheckbox', 'catquiz_subscalecheckbox_' . $subscale->id,
                 $elementadded . $subscale->name, null, null, [0, 1]);
-            // Default checked ? $mform->setDefault('catquiz_subscalecheckbox_' . $subscale->name, 1);
+            // Get submitted value, check if null and set default only if not set: $mform->setDefault('catquiz_subscalecheckbox_' . $subscale->id, 1);
             $subsubscales = catscale::get_next_level_subscales_ids_from_parent([$subscale->id]);
 
-            $mform->hideIf('catquiz_subscalecheckbox_' . $subscale->name, $parentscalename, 'eq', 0);
+            $mform->hideIf('catquiz_subscalecheckbox_' . $subscale->id, $parentscalename, 'eq', 0);
             self::generate_subscale_checkboxes($subsubscales, $elements, $mform, $elementadded . '- ', 'catquiz_subscalecheckbox_' . $subscale->name);
         }
     }

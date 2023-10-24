@@ -485,3 +485,24 @@ $string['breakinfo_title'] = 'Test paused';
 $string['breakinfo_description'] = 'Test was paused';
 $string['breakinfo_continue'] = 'You can continue the test at {$a}';
 $string['breakinfo_backtotest'] = 'Back to the test';
+
+// CAT Colors.
+$string['feedback_colorrange'] = 'Colorrange of a feedbackscale';
+
+$string['catcolor_red'] = 'Red';
+$string['catcolor_black'] = 'Black';
+$string['catcolor_darkred'] = 'Darkred';
+$string['catcolor_orange'] = 'Orange';
+$string['catcolor_yellow'] = 'Yellow';
+$string['catcolor_lightgreen'] = 'Lightgreen';
+$string['catcolor_darkgreen'] = 'Darkgreen';
+$string['catcolor_white'] = 'White';
+
+$string['colorvalue_red'] = '#ff0000';
+$string['colorvalue_black'] = '#000000';
+$string['colorvalue_darkred'] = '#8b0000';
+$string['colorvalue_orange'] = '#ffa500';
+$string['colorvalue_yellow'] = '#ffff00';
+$string['colorvalue_lightgreen'] = '#90ee90';
+$string['colorvalue_darkgreen'] = '#006400';
+$string['colorvalue_white'] = '#ffffff';
