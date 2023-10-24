@@ -88,6 +88,9 @@ class updatepersonability_test extends TestCase {
                     'lastquestion' => (object) ['is_pilot' => true],
                     'contextid' => 1,
                     'catscaleid' => 1,
+                    'userid' => 1,
+                    // Can be null here, because for pilot questions the ability will not be updated.
+                    'fake_response_data' => [],
                 ],
             ],
             'not_enough_responses' => [
