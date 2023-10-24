@@ -99,10 +99,15 @@ class dataapi {
      * @param bool $getchildren
      * @return array
      */
-    public static function get_catscale_and_children($parentid = 0, bool $getsubchildren = false) {
+    public static function get_catscale_and_children($parentid = 0, bool $getsubchildren = false, $catscales = []) {
 
-        $catscales = self::get_all_catscales();
+        $catscales = empty($catscales) ? self::get_all_catscales() : $catscales;
         $returnarray = [];
+
+        $parentscales = array_filter($catscales, fn($a) => $a->id === $parentid);
+        $parentscale = reset($parentscales);
+
+        $returnarray[$parentscale->id] = $parentscale;
 
         foreach ($catscales as $catscale) {
 
@@ -118,13 +123,15 @@ class dataapi {
 
                 if ($getsubchildren) {
                     // Now get all children.
-                    $children = self::get_catscale_and_children($catscale->id, $getsubchildren);
+                    $children = self::get_catscale_and_children($catscale->id, $getsubchildren, $catscales);
 
-                    $returnarray = array_merge($returnarray, $children);
+                    foreach ($children as $child) {
+                        if (isset($returnarray[$child->id])) {
+                            continue;
+                        }
+                        $returnarray[$child->id] = $child;
+                    }
                 }
-            } else if ($catscale->id == $parentid) {
-                // We add the array at the first place.
-                $returnarray = array_merge([$catscale->id => $catscale], $returnarray);
             }
         }
         return $returnarray;
