@@ -62,6 +62,17 @@ final class strategyfastestscore extends preselect_task implements wb_middleware
             return $q2->id <=> $q1->id;
         });
 
+        // Save the surrounding questions with higher and lower difficulty.
+        $qdiff = $context['questions'];
+        uasort($qdiff, fn($q1, $q2) => $q1->difficulty <=> $q2->difficulty);
+        $pos = array_search(array_keys($context['questions'])[0], array_keys($qdiff));
+        $afterindex = $pos === count($context['questions']) ? $pos : $pos + 1;
+        $after = $qdiff[array_keys($qdiff)[$afterindex]];
+        $beforeindex = $pos === 0 ? 0 : $pos - 1;
+        $before = $qdiff[array_keys($qdiff)[$beforeindex]];
+        $context['nextbestquestion_before'] = $before;
+        $context['nextbestquestion_after'] = $after;
+
         return result::ok(reset($context['questions']));
     }
 

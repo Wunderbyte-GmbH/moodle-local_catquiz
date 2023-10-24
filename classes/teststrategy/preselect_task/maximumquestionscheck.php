@@ -24,6 +24,7 @@
 
 namespace local_catquiz\teststrategy\preselect_task;
 
+use local_catquiz\catcontext;
 use local_catquiz\local\result;
 use local_catquiz\local\status;
 use local_catquiz\teststrategy\preselect_task;
@@ -49,6 +50,15 @@ final class maximumquestionscheck extends preselect_task implements wb_middlewar
      */
     public function run(array &$context, callable $next): result {
         if ($context['questionsattempted'] >= $context['maximumquestions']) {
+            // Save the last response so that we can display it as feedback.
+            $lastquestion = $context['lastquestion'];
+            $lastresponse = catcontext::getresponsedatafromdb(
+                $context['contextid'],
+                [$lastquestion->catscaleid],
+                $lastquestion->id,
+                $context['userid']
+            );
+            $context['lastresponse'] = $lastresponse[$context['userid']]['component'][$context['lastquestion']->id];
             return result::err(status::ERROR_REACHED_MAXIMUM_QUESTIONS);
         }
 

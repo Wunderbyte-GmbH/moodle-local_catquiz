@@ -25,6 +25,7 @@
 namespace local_catquiz\teststrategy\feedbackgenerator;
 
 use cache;
+use html_writer;
 use local_catquiz\catquiz;
 use local_catquiz\teststrategy\feedbackgenerator;
 use local_catquiz\teststrategy\info;
@@ -60,7 +61,8 @@ class graphicalsummary extends feedbackgenerator {
      */
     protected function get_teacherfeedback(array $data): array {
         global $OUTPUT;
-        $feedback = $OUTPUT->render_from_template('local_catquiz/feedback/graphicalsummary', ['data' => $data['graphicalsummary']]);
+        $chart = $this->render_chart($data['graphicalsummary']);
+        $feedback = $OUTPUT->render_from_template('local_catquiz/feedback/graphicalsummary', ['data' => $chart]);
 
         return [
             'heading' => $this->get_heading(),
@@ -102,74 +104,100 @@ class graphicalsummary extends feedbackgenerator {
         if (! $cachedcontexts = $cache->get('context')) {
             return null;
         }
-
-        $teststrategies = info::return_available_strategies();
-        $teststrategy = array_filter(
-            $teststrategies,
-            fn ($t) => $t->id == $cachedcontexts[array_key_first($cachedcontexts)]['teststrategy']);
-        $reflect = new \ReflectionClass($teststrategy[array_key_first($teststrategy)]);
-
-        // Each cachedcontext corresponds to one question attempt.
         $graphicalsummary = [];
-        $catscales = catquiz::get_catscales(array_keys($cachedcontexts[array_key_first($cachedcontexts)]['person_ability']));
-        $teststrategy = get_string($reflect->getShortName(), 'local_catquiz');
+        foreach ($cachedcontexts as $index => $data) {
 
-        foreach ($cachedcontexts as $data) {
-
-            $personabilities = [];
-            foreach ($data['person_ability'] as $catscaleid => $pp) {
-                if (empty($catscales[$catscaleid])) {
-                    continue;
-                }
-                $personabilities[] = $catscales[$catscaleid]->name . ": " . $pp;
+            if ($index > 0) {
+                $lastresponse = $data['lastresponse'];
+                $lastquestion = $data['lastquestion'];
+                $graphicalsummary[$index - 1]['lastresponse'] = $lastresponse['fraction'];
+                $graphicalsummary[$index - 1]['difficulty'] = $lastquestion->difficulty;
+                $graphicalsummary[$index - 1]['fisherinformation'] = $lastquestion->fisherinformation ?? null;
+                $graphicalsummary[$index - 1]['score'] = $lastquestion->score ?? null;
             }
-            $personabilities = '"' . implode(", ", $personabilities) . '"';
-
-            $selectedscale = isset($data['selected_catscale'])
-                ? $catscales[$data['selected_catscale']]->name
-                : "NA";
-
-            $lastresponse = isset($data['lastresponse'])
-                ? $data['lastresponse']['fraction']
-                : "NA";
-
-            $standarderrorperscale = [];
-            if (array_key_exists('standarderrorperscale', $data)) {
-                foreach ($data['standarderrorperscale'] as $scaleid => $standarderror) {
-                    // Convert INF to string so that the data can be json
-                    // encoded and saved to the DB.
-                    foreach (['played', 'remaining'] as $region) {
-                        if (is_infinite($standarderror[$region])) {
-                            $standarderror[$region] = "INF";
-                        }
-                    }
-                    $standarderrorperscale[] = [
-                        'name' => $catscales[$scaleid]->name,
-                        'se' => $standarderror,
-                    ];
-                }
-            }
-            if ($standarderrorperscale) {
-                $standarderrorperscale[array_key_last($standarderrorperscale)]['last'] = true;
+            if ($index === array_key_last($cachedcontexts)) {
+                $lastquestion = $cache->get('lastquestion');
+                $graphicalsummary[$index]['difficulty'] = $lastquestion->difficulty;
+                $graphicalsummary[$index]['fisherinformation'] = $lastquestion->fisherinformation;
+                $graphicalsummary[$index]['score'] = $lastquestion->score;
             }
 
-            $graphicalsummary[] = [
-                'userid' => $data['userid'],
-                'attemptid' => $data['attemptid'],
-                'questionsattempted' => $data['questionsattempted'],
-                'timestamp' => $data['timestamp'],
-                'contextid' => $data['contextid'],
-                'catscale' => !empty($catscales[$data['catscaleid']]->name) ? $catscales[$data['catscaleid']]->name : "no catscale",
-                'teststrategy' => $teststrategy,
-                'personabilities' => $personabilities,
-                'active_scales' => '"' . implode(", ", array_map(fn ($catscale) => $catscale->name, $catscales)) . '"',
-                'lastquestion' => (array) $data['lastquestion'],
-                'selectedscale' => $selectedscale,
-                'updateabilityfallback' => $data['updateabilityfallback'],
-                'excludedsubscales' => implode(',', $data['excludedsubscales']),
-                'lastresponse' => $lastresponse,
+            $nextbestbefore = isset($data['nextbestquestion_before'])
+                ? $data['nextbestquestion_before']
+                : null;
+            $nextbestafter = isset($data['nextbestquestion_after'])
+                ? $data['nextbestquestion_after']
+                : null;
+
+            $graphicalsummary[$index] = [
+                'personability' => $data['person_ability'][$data['catscaleid']],
+                'difficultynextbefore' => $nextbestbefore ? $nextbestbefore->difficulty ?? null : null,
+                'difficultynextafter' => $nextbestafter ? $nextbestafter->difficulty ?? null : null,
             ];
         }
-        return ['graphicalsummary' => ['info' => 'testtesttest']];
+        return ['graphicalsummary' => $graphicalsummary];
+    }
+
+    /**
+     * Render the moodle charts.
+     *
+     * @param array $data
+     *
+     * @return string
+     */
+    private function render_chart(array $data) {
+        global $OUTPUT;
+
+        $chart = new \core\chart_line();
+        $chart->set_smooth(true); // Calling set_smooth() passing true as parameter, will display smooth lines.
+        $difficulties = array_map(fn($round) => $round['difficulty'] ?? null, $data);
+        $fractions = array_map(fn($round) => $round['lastresponse'] ?? null, $data);
+        $abilities = array_map(fn($round) => $round['personability'], $data);
+        $fisherinfo = array_map(fn($round) => $round['fisherinformation'] ?? null, $data);
+        $diffnextbefore = array_map(fn($round) => $round['difficultynextbefore'], $data);
+        $diffnextafter = array_map(fn($round) => $round['difficultynextafter'], $data);
+        $score = array_map(fn($round) => $round['score'] ?? null, $data);
+
+        // Create the graph for difficulty.
+        $difficultieschart = new \core\chart_series(
+            "question difficulty",
+            $difficulties
+        );
+        $fractionschart = new \core\chart_series(
+            "response",
+            $fractions
+        );
+        $abilitieschart = new \core\chart_series(
+            "person ability in tested scale",
+            $abilities
+        );
+        $fisherinfochart = new \core\chart_series(
+            "fisher information",
+            $fisherinfo
+        );
+        $scorechart = new \core\chart_series(
+            "score",
+            $score
+        );
+        $diffnextbeforechart = new \core\chart_series(
+            "difficulty of next less difficult",
+            $diffnextbefore
+        );
+        $diffnextafterchart = new \core\chart_series(
+            "difficulty of next more difficult",
+            $diffnextafter
+        );
+        $chart->add_series($difficultieschart);
+        $chart->add_series($fractionschart);
+        $chart->add_series($abilitieschart);
+        $chart->add_series($fisherinfochart);
+        $chart->add_series($scorechart);
+        $chart->add_series($diffnextbeforechart);
+        $chart->add_series($diffnextafterchart);
+
+        $labels = range(0, count($difficulties) - 1);
+        $chart->set_labels($labels);
+
+        return html_writer::tag('div', $OUTPUT->render($chart), ['dir' => 'ltr']);
     }
 }

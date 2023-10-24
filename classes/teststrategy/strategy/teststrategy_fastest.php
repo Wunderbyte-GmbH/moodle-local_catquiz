@@ -35,6 +35,7 @@ use local_catquiz\teststrategy\preselect_task\maximumquestionscheck;
 use local_catquiz\teststrategy\preselect_task\mayberemovescale;
 use local_catquiz\teststrategy\preselect_task\noremainingquestions;
 use local_catquiz\teststrategy\preselect_task\remove_uncalculated;
+use local_catquiz\teststrategy\preselect_task\removeplayedquestions;
 use local_catquiz\teststrategy\preselect_task\strategyfastestscore;
 use local_catquiz\teststrategy\preselect_task\updatepersonability;
 use local_catquiz\teststrategy\strategy;
@@ -64,6 +65,7 @@ class teststrategy_fastest extends strategy {
     public function get_preselecttasks(): array {
         return [
             maximumquestionscheck::class,
+            removeplayedquestions::class,
             remove_uncalculated::class,
             noremainingquestions::class,
             mayberemovescale::class,
