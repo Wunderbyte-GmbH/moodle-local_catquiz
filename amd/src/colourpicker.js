@@ -28,7 +28,6 @@ const SELECTORS = {
     SELECTCOLOURPICKER: 'select[name^="wb_colourpicker_"]',
     COLOURPICKER: 'span.wb_colourpick',
     COLOUR: 'span.colourpickercircle',
-    COLOURSELECTMENU: '.colourselectnotify'
 };
 
 /**
@@ -56,7 +55,6 @@ export const init = () => {
 function addClickListener(selectcolor) {
     const colours = [...selectcolor.querySelectorAll('option')].map(el => {
 
-        // const colourSelectMenu = document.querySelector(SELECTORS.COLOURSELECTMENU);
         const colour = el.value;
         return {
             colour,
@@ -66,54 +64,31 @@ function addClickListener(selectcolor) {
         };
     });
 
-    // eslint-disable-next-line no-console
-    console.log(colours, selectcolor.value);
-
     const colourobject = colours.filter(e => e.selected).pop();
-
-    // eslint-disable-next-line no-console
-    console.log(colourobject, 'colourobject');
 
     const data = {
         colours,
-        colour: colourobject.colourname,
+        colour: colourobject.colour,
         id: selectcolor.name
     };
 
-    // eslint-disable-next-line no-console
-    console.log(data, 'data');
-
     Templates.renderForPromise('local_catquiz/colour_picker', data).then(({html}) => {
 
-        //selectcolor.classList.add('hidden');
-
+        selectcolor.classList.add('hidden');
         selectcolor.insertAdjacentHTML('afterend', html);
-
         const colourpicker = document.querySelector('span[data-id=wb_colourpick_id_' + selectcolor.name + ']');
-        // eslint-disable-next-line no-console
-        console.log(colourpicker, 'colourpicker');
-
-        // eslint-disable-next-line no-console
-        console.log(selectcolor, html);
-
+        const colourselectnotify = document.querySelector('span[data-id=wb_colourselectnotify_id_' + selectcolor.name + ']');
         const colours = colourpicker.querySelectorAll(SELECTORS.COLOUR);
-
-        // eslint-disable-next-line no-console
-        console.log(selectcolor, colourpicker, colours, html);
 
         colours.forEach(el => {
             el.addEventListener('click', e => {
-
-                // eslint-disable-next-line no-console
-                console.log(e.target.dataset.colour);
+                colourselectnotify.innerHTML = e.target.dataset.colour;
 
                 colours.forEach(el => el.classList.remove('selected'));
                 e.target.classList.add('selected');
                 selectcolor.value = e.target.dataset.colour;
-
             });
         });
-
         return true;
       }).catch((e) => {
           // eslint-disable-next-line no-console
