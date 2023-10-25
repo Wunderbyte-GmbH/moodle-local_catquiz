@@ -25,7 +25,8 @@
 const SELECTORS = {
     CATTESTCHOOSER: '[data-on-change-action]',
     CATTESTSUBMIT: '[data-action="submitCatTest"]',
-    CATSCALESUBMIT: '[data-action="submitCatScale"]'
+    CATSCALESUBMIT: '[data-action="submitCatScale"]',
+    NUMBEROFFEEDBACKSSUBMIT: '[data-action="submitNumberOfFeedbackOptions"]'
 };
 
 /**
@@ -34,9 +35,10 @@ const SELECTORS = {
 export const init = () => {
 
     const selectors = document.querySelectorAll(SELECTORS.CATTESTCHOOSER);
+    if (!selectors) {
+        return;
+    }
 
-                // eslint-disable-next-line no-console
-                console.log(selectors, 'selectors');
     if (selectors.length === 0) {
         return;
     }
@@ -49,6 +51,9 @@ export const init = () => {
                     break;
                 case 'reloadFormFromScaleSelect':
                     clickNoSubmitButton(e.target, SELECTORS.CATSCALESUBMIT);
+                    break;
+                case 'numberOfFeedbacksSubmit':
+                    clickNoSubmitButton(e.target, SELECTORS.NUMBEROFFEEDBACKSSUBMIT);
                     break;
             }
 
