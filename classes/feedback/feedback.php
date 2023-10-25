@@ -47,7 +47,6 @@ use stdClass;
  */
 class feedback {
 
-
     /**
      * Add Form elements to form.
      * @param MoodleQuickForm $mform
@@ -59,6 +58,9 @@ class feedback {
         global $CFG, $PAGE;
 
         require_once($CFG->libdir .'/datalib.php');
+
+        // Get all Values from the form.
+        $data = $mform->getSubmitValues();
 
         // TODO: Display Name of Teststrategy. $teststrategyid = intval($data['catquiz_selectteststrategy']);
         $elements[] = $mform->addElement('header', 'catquiz_feedback',
@@ -118,9 +120,7 @@ class feedback {
         ]);
 
         $numbersselectvalue = $mform->getSubmitValue('numberoffeedbackoptionsselect');
-
-        // Get data from select.
-        $numberoffeedbackspersubscale = intval($numbersselectvalues) ?? DEFAULT_NUMBER_OF_FEEDBACKS_PER_SCALE;
+        $numberoffeedbackspersubscale = empty(intval($numbersselectvalue)) ? DEFAULT_NUMBER_OF_FEEDBACKS_PER_SCALE : intval($numbersselectvalue);
 
         // Calculate equal default values for limits in scales.
         $sizeofrange = abs(PERSONABILITY_LOWER_LIMIT - PERSONABILITY_UPPER_LIMIT);
@@ -145,16 +145,39 @@ class feedback {
                 get_string('feedbacknumber', 'local_catquiz', $j));
 
                 // Define range.
-                $elements[] = $mform->addElement('text',
-                        'feedback_scaleid_' . $scale->id . '_lowerlimit' . $j, get_string('lowerlimit', 'local_catquiz'));
-                $mform->settype('feedback_scaleid_' . $scale->id . '_lowerlimit' . $j, PARAM_FLOAT);
-                // TODO: Set previous upper limit as lower limit for next field.
-                $mform->setDefault('feedback_scaleid_' . $scale->id . '_lowerlimit' . $j, PERSONABILITY_LOWER_LIMIT + ($j-1)*$increment);
+                $element = $mform->addElement(
+                    'text',
+                    'feedback_scaleid_limit_lower_'. $scale->id . '_' . $j,
+                     get_string('lowerlimit', 'local_catquiz'
+                ));
+                $mform->settype('feedback_scaleid_limit_lower_'. $scale->id . '_' . $j, PARAM_FLOAT);
 
-                $elements[] = $mform->addElement('text',
-                'feedback_scaleid_' . $scale->id . '_upperlimit' . $j, get_string('upperlimit', 'local_catquiz'));
-                $mform->settype('feedback_scaleid_' . $scale->id . '_upperlimit' . $j, PARAM_FLOAT);
-                $mform->setDefault('feedback_scaleid_' . $scale->id . '_upperlimit'  . $j, PERSONABILITY_LOWER_LIMIT + $j*$increment);
+                if (isset($data["submitnumberoffeedbackoptions"])
+                    && $data["submitnumberoffeedbackoptions"] == "numberoffeedbackoptionssubmit") {
+                    //$element = $mform->getElement('feedback_scaleid_limit_lower_'. $scale->id . '_' . $j);
+                    $element->setValue("4");
+                };
+                $elements[] = $element;
+
+                $lowerlimit = optional_param('feedback_scaleid_limit_lower_'. $scale->id . '_' . $j, 0, PARAM_INT);
+                if (empty($lowerlimit)) {
+                    $lowerlimit = PERSONABILITY_LOWER_LIMIT + ($j-1)*$increment;
+                }
+                // TODO: Set previous upper limit as lower limit for next field.
+                //$mform->setDefault('feedback_scaleid_limit_lower_'. $scale->id . '_' . $j, $lowerlimit);
+
+                $elements[] = $mform->addElement(
+                    'text',
+                    'feedback_scaleid_limit_upper_'. $scale->id . '_' . $j,
+                    get_string('upperlimit', 'local_catquiz'
+                ));
+                $mform->settype('feedback_scaleid_limit_upper_' . $scale->id . '_' . $j, PARAM_FLOAT);
+
+                $upperlimit = optional_param('feedback_scaleid_limit_upper_'. $scale->id . '_' . $j, 0, PARAM_INT);
+                if (empty($upperlimit)) {
+                    $upperlimit = PERSONABILITY_LOWER_LIMIT + $j*$increment;
+                }
+                //$mform->setDefault('feedback_scaleid_limit_upper_'. $scale->id . '_' . $j, $upperlimit);
 
                 // TODO Switch to check which colors should be displayed.
                 $options = self::get_array_of_colors($numberoffeedbackspersubscale);

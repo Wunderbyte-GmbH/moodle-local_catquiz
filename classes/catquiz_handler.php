@@ -292,8 +292,6 @@ class catquiz_handler {
      */
     public static function data_preprocessing(array &$formdefaultvalues, MoodleQuickForm &$mform = null) {
 
-        global $DB;
-
         if (!isset($formdefaultvalues['instance'])) {
             return;
         }
@@ -332,7 +330,6 @@ class catquiz_handler {
             // B) If we have submitted a new testenvironment, we need to take this an load different json values.
             // cattestsubmit && choosetemplate not empty.
             // Post variable has to be set with json value.
-
 
             // Create stdClass with all the values.
             $cattest = (object)[
