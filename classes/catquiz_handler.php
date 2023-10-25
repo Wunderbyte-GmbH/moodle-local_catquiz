@@ -154,9 +154,12 @@ class catquiz_handler {
         if (!empty($selectedparentscale)) {
             $element = $mform->getElement('catquiz_catscales');
             $element->setValue($selectedparentscale);
-            $subscales = \local_catquiz\data\dataapi::get_catscales_by_parent($selectedparentscale);
+            $subscales = \local_catquiz\data\dataapi::get_catscale_and_children($selectedparentscale, true);
 
             self::generate_subscale_checkboxes($subscales, $elements, $mform);
+        } else {
+            $selectedparentscale = reset($parentcatscales)->id ?? 0;
+            $_POST['catquiz_catscales'] = $selectedparentscale;
         }
 
         // Button to attach JavaScript to reload the form.
@@ -233,18 +236,38 @@ class catquiz_handler {
         string $elementadded = '',
         $parentscalename = '') {
 
+        // We don't need the parent scale.
+        $parentscale = array_shift($subscales);
+
         if (empty($subscales)) {
             return;
         }
 
         foreach ($subscales as $subscale) {
-            $elements[] = $mform->addElement('advcheckbox', 'catquiz_subscalecheckbox_' . $subscale->id,
-                $elementadded . $subscale->name, null, null, [0, 1]);
-            // Get submitted value, check if null and set default only if not set: $mform->setDefault('catquiz_subscalecheckbox_' . $subscale->id, 1);
-            $subsubscales = catscale::get_next_level_subscales_ids_from_parent([$subscale->id]);
+            if (!isset($_POST['catquiz_subscalecheckbox_' . $subscale->id])) {
+                $_POST['catquiz_subscalecheckbox_' . $subscale->id] = "1";
+            }
 
-            $mform->hideIf('catquiz_subscalecheckbox_' . $subscale->id, $parentscalename, 'eq', 0);
-            self::generate_subscale_checkboxes($subsubscales, $elements, $mform, $elementadded . '- ', 'catquiz_subscalecheckbox_' . $subscale->name);
+            $parentscalechecked = optional_param('catquiz_subscalecheckbox_' . $subscale->parentid, 0, PARAM_INT);
+
+            if (empty($parentscalechecked) && $subscale->parentid != $parentscale->id) {
+                $_POST['catquiz_subscalecheckbox_' . $subscale->id] = "0";
+                continue;
+            }
+
+            // For subsubscales add a sign to show nested structure.
+            $elementadded = str_repeat('- ', $subscale->depth - 1);
+
+            $elements[] = $mform->addElement(
+                'advcheckbox',
+                'catquiz_subscalecheckbox_' . $subscale->id,
+                $elementadded . $subscale->name,
+                null,
+                ['data-on-change-action' => 'reloadFormFromScaleSelect'],
+                [0, 1]
+            );
+            $value = optional_param('catquiz_subscalecheckbox_' . $subscale->id, 0, PARAM_INT);
+            $mform->setDefault('catquiz_subscalecheckbox_' . $subscale->id, $value);
         }
     }
 
@@ -301,7 +324,7 @@ class catquiz_handler {
             $test->apply_jsonsaved_values($formdefaultvalues);
             $formdefaultvalues['choosetemplate'] = 0;
 
-            $_POST['catquiz_catscales'] = $formdefaultvalues['catquiz_catscales'];
+            self::write_variables_to_post($formdefaultvalues);
 
         } else if (isset($data['submitcattestoption'])
             && !empty($data['choosetemplate'])
@@ -321,8 +344,36 @@ class catquiz_handler {
             $test->apply_jsonsaved_values($formdefaultvalues);
             $formdefaultvalues['choosetemplate'] = 0;
 
-            $_POST['catquiz_catscales'] = $formdefaultvalues['catquiz_catscales'];
+            self::write_variables_to_post($formdefaultvalues);
         }
+    }
+
+    /**
+     * Write values from formdefaultvalues into POST variable.
+     *
+     * @param array $values
+     *
+     */
+    private static function write_variables_to_post(array $values) {
+
+        // Boolean stands for exact match of name.
+        $keystooverwrite = [
+            'catquiz_catscales' => true,
+            'catquiz_subscalecheckbox_' => false,
+        ];
+
+        foreach($values as $key => $value) {
+            if (isset($keystooverwrite[$key])) {
+                $_POST[$key] = $value;
+            } else {
+                foreach ($keystooverwrite as $kokey => $kovalue) {
+                    if (!$kovalue && (strpos($key, $kokey) !== false)) {
+                        $_POST[$key] = $value;
+                    }
+                }
+            }
+        }
+
     }
 
     /**

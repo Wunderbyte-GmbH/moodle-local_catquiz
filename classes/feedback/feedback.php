@@ -129,8 +129,10 @@ class feedback {
         $sizeofrange = abs(PERSONABILITY_LOWER_LIMIT - PERSONABILITY_UPPER_LIMIT);
         $increment = $sizeofrange / $numberoffeedbackspersubscale;
 
-        $countfeedback = 1;
+        // Exclude scaled that are unchecked in subscalecheckboxes.
+        $selectedparentscales = optional_param('catquiz_subscalecheckbox%', 0, PARAM_INT);
         foreach ($scales as $scale) {
+            $selectedparentscales = optional_param('catquiz_subscalecheckbox%', 0, PARAM_INT);
             // Add a header for each scale.
             $elements[] = $mform->addElement('header', 'catquiz_feedback_header_' . $scale->id,
                 get_string('catquizfeedbackheader', 'local_catquiz', $scale->name));
@@ -227,8 +229,8 @@ class feedback {
                 // TODO: If none of both is selected, hide properly. $mform->hideIf('enrolement_message_checkbox' . $scale->id . $j, 'catquiz_groups_' . $scale->id . $j, 'eq', 0);
             }
 
-            // Only for the first form, we display to button to apply values for all subscales.
-            if ($countfeedback === 1) {
+            // Only for the parentscale (=first form), we display to button to apply values for all subscales.
+            if ($scale->parentid == 0) {
                 // TODO: Attach function!
                 $mform->registerNoSubmitButton('copysettingsforallsubscales');
                 $elements[] = $mform->addElement('submit', 'copysettingsforallsubscales', get_string('copysettingsforallsubscales', 'local_catquiz'),
@@ -237,7 +239,6 @@ class feedback {
                         'data-action' => 'submitFeedbackValues',
                     ]);
             }
-            $countfeedback ++;
         }
     }
 

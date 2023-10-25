@@ -106,6 +106,9 @@ class dataapi {
 
         $parentscales = array_filter($catscales, fn($a) => $a->id === $parentid);
         $parentscale = reset($parentscales);
+        if ($parentscale->parentid == 0) {
+            $parentscale->depth = 0;
+        }
 
         $returnarray[$parentscale->id] = $parentscale;
 
@@ -118,6 +121,7 @@ class dataapi {
             }
 
             if ($catscale->parentid == $parentid) {
+                $catscale->depth = $parentscale->depth + 1;
 
                 $returnarray[$catscale->id] = $catscale;
 

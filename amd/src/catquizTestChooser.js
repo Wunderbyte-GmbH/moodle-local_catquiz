@@ -26,6 +26,7 @@ const SELECTORS = {
     CATTESTCHOOSER: '[data-on-change-action]',
     CATTESTSUBMIT: '[data-action="submitCatTest"]',
     CATSCALESUBMIT: '[data-action="submitCatScale"]',
+    CATTESTCHECKBOXES: 'input[name^="catquiz_subscalecheckbox"]',
     NUMBEROFFEEDBACKSSUBMIT: '[data-action="submitNumberOfFeedbackOptions"]'
 };
 
@@ -35,15 +36,24 @@ const SELECTORS = {
 export const init = () => {
 
     const selectors = document.querySelectorAll(SELECTORS.CATTESTCHOOSER);
-    if (!selectors) {
+    const checkboxes = document.querySelectorAll(SELECTORS.CATTESTCHECKBOXES);
+
+    var elements = new Set([
+        ...selectors,
+        ...checkboxes
+    ]);
+    if (!elements) {
         return;
     }
 
-    if (selectors.length === 0) {
+    if (elements.length === 0) {
         return;
     }
-    selectors.forEach(selector =>
+    elements.forEach(selector =>
         selector.addEventListener('change', e => {
+
+            // eslint-disable-next-line no-console
+            console.log(e.target.checked, e.target.dataset.onChangeAction, "change");
 
             switch (e.target.dataset.onChangeAction) {
                 case 'reloadTestForm':
