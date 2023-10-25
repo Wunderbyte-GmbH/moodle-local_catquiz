@@ -60,9 +60,6 @@ class feedback {
 
         require_once($CFG->libdir .'/datalib.php');
 
-        // Get all Values from the form.
-        $data = $mform->exportValues();
-
         // TODO: Display Name of Teststrategy. $teststrategyid = intval($data['catquiz_selectteststrategy']);
         $elements[] = $mform->addElement('header', 'catquiz_feedback',
                 get_string('catquiz_feedbackheader', 'local_catquiz'));
@@ -129,10 +126,15 @@ class feedback {
         $sizeofrange = abs(PERSONABILITY_LOWER_LIMIT - PERSONABILITY_UPPER_LIMIT);
         $increment = $sizeofrange / $numberoffeedbackspersubscale;
 
-        // Exclude scaled that are unchecked in subscalecheckboxes.
-        $selectedparentscales = optional_param('catquiz_subscalecheckbox%', 0, PARAM_INT);
         foreach ($scales as $scale) {
-            $selectedparentscales = optional_param('catquiz_subscalecheckbox%', 0, PARAM_INT);
+
+            // Only for parentscales and selected scales we display the feedbackoptions.
+            $checkboxchecked = optional_param('catquiz_subscalecheckbox_' . $scale->id, 0, PARAM_INT);
+            if ($scale->depth !== 0 && $checkboxchecked !== 1) {
+                continue;
+            }
+
+            $checkboxchecked = optional_param('catquiz_subscalecheckbox%', 0, PARAM_INT);
             // Add a header for each scale.
             $elements[] = $mform->addElement('header', 'catquiz_feedback_header_' . $scale->id,
                 get_string('catquizfeedbackheader', 'local_catquiz', $scale->name));
