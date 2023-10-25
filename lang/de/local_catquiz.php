@@ -485,14 +485,14 @@ $string['breakinfo_backtotest'] = 'Zurück zum Test';
 // CAT Colors.
 $string['feedback_colorrange'] = 'Farbbereich auf einer Feedback-Skala';
 
-$string['catcolor_red'] = 'Rot';
-$string['catcolor_black'] = 'Schwarz';
-$string['catcolor_darkred'] = 'Dunkelrot';
-$string['catcolor_orange'] = 'Orange';
-$string['catcolor_yellow'] = 'Gelb';
-$string['catcolor_lightgreen'] = 'Hellgrün';
-$string['catcolor_darkgreen'] = 'Dunkelgrün';
-$string['catcolor_white'] = 'Weiß';
+$string['colorpicker_color_red'] = 'Rot';
+$string['colorpicker_color_black'] = 'Schwarz';
+$string['colorpicker_color_darkred'] = 'Dunkelrot';
+$string['colorpicker_color_orange'] = 'Orange';
+$string['colorpicker_color_yellow'] = 'Gelb';
+$string['colorpicker_color_lightgreen'] = 'Hellgrün';
+$string['colorpicker_color_darkgreen'] = 'Dunkelgrün';
+$string['colorpicker_color_white'] = 'Weiß';
 
 $string['colorvalue_red'] = '#ff0000';
 $string['colorvalue_black'] = '#000000';
@@ -501,5 +501,14 @@ $string['colorvalue_orange'] = '#ffa500';
 $string['colorvalue_yellow'] = '#ffff00';
 $string['colorvalue_lightgreen'] = '#90ee90';
 $string['colorvalue_darkgreen'] = '#006400';
-$string['colorvalue_white'] = '#ffffff';
+$string['colorvalue_white'] = '#e8e9eb';
+
+$string['#ff0000'] = 'Rot';
+$string['#000000'] = 'Schwarz';
+$string['#8b0000'] = 'Dunkelrot';
+$string['#ffa500'] = 'Orange';
+$string['#ffff00'] = 'Gelb';
+$string['#90ee90'] = 'Hellgrün';
+$string['#006400'] = 'Dunkelgrün';
+$string['#e8e9eb'] = 'Weiß';
 
