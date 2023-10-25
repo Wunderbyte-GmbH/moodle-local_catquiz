@@ -120,8 +120,10 @@ class feedback {
             'data-action' => 'submitNumberOfFeedbackOptions',
         ]);
 
+        $numbersselectvalue = $mform->getSubmitValue('numberoffeedbackoptionsselect');
+
         // Get data from select.
-        $numberoffeedbackspersubscale = intval($numbersselect->_values[0]) ?? DEFAULT_NUMBER_OF_FEEDBACKS_PER_SCALE;
+        $numberoffeedbackspersubscale = intval($numbersselectvalues) ?? DEFAULT_NUMBER_OF_FEEDBACKS_PER_SCALE;
 
         // Calculate equal default values for limits in scales.
         $sizeofrange = abs(PERSONABILITY_LOWER_LIMIT - PERSONABILITY_UPPER_LIMIT);
