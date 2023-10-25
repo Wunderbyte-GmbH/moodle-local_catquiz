@@ -37,6 +37,7 @@ use local_catquiz\local\model\model_strategy;
 use local_catquiz\output\attemptfeedback;
 use local_catquiz\teststrategy\info;
 use moodle_exception;
+use moodleform_mod;
 use MoodleQuickForm;
 use stdClass;
 
@@ -359,7 +360,7 @@ class catquiz_handler {
             'catquiz_subscalecheckbox_' => false,
         ];
 
-        foreach($values as $key => $value) {
+        foreach ($values as $key => $value) {
             if (isset($keystooverwrite[$key])) {
                 $_POST[$key] = $value;
             } else {
@@ -516,7 +517,27 @@ class catquiz_handler {
 
         $values = $mform->getSubmitValues();
 
-        if (!isset($values["submitcattestoption"])
+        // If we just changed the number of the feedbackoptions.
+        // We add the right values.
+        if (isset($values["submitnumberoffeedbackoptions"])
+            && $values["submitnumberoffeedbackoptions"] == "numberoffeedbackoptionssubmit") {
+
+            $element = $mform->getElement("catquiz_maxquestions");
+            $element->setValue(24);
+
+            foreach ($values as $k => $v) {
+
+                if (strpos($k, 'feedback_scaleid_limit_') !== false) {
+
+                    if ($mform->elementExists($k)) {
+                        $element = $mform->getElement($k);
+                        $element->setValue(1);
+                    }
+                }
+            }
+
+            return;
+        } else if (!isset($values["submitcattestoption"])
             || $values["submitcattestoption"] != "cattestsubmit") {
             return;
         }

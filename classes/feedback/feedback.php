@@ -155,13 +155,12 @@ class feedback {
                 if (isset($data["submitnumberoffeedbackoptions"])
                     && $data["submitnumberoffeedbackoptions"] == "numberoffeedbackoptionssubmit") {
                     //$element = $mform->getElement('feedback_scaleid_limit_lower_'. $scale->id . '_' . $j);
-                    $element->setValue("4");
                 };
                 $elements[] = $element;
 
                 $lowerlimit = optional_param('feedback_scaleid_limit_lower_'. $scale->id . '_' . $j, 0, PARAM_INT);
                 if (empty($lowerlimit)) {
-                    $lowerlimit = PERSONABILITY_LOWER_LIMIT + ($j-1)*$increment;
+                    $lowerlimit = PERSONABILITY_LOWER_LIMIT + ($j - 1) * $increment;
                 }
                 // TODO: Set previous upper limit as lower limit for next field.
                 //$mform->setDefault('feedback_scaleid_limit_lower_'. $scale->id . '_' . $j, $lowerlimit);
@@ -175,7 +174,7 @@ class feedback {
 
                 $upperlimit = optional_param('feedback_scaleid_limit_upper_'. $scale->id . '_' . $j, 0, PARAM_INT);
                 if (empty($upperlimit)) {
-                    $upperlimit = PERSONABILITY_LOWER_LIMIT + $j*$increment;
+                    $upperlimit = PERSONABILITY_LOWER_LIMIT + $j * $increment;
                 }
                 //$mform->setDefault('feedback_scaleid_limit_upper_'. $scale->id . '_' . $j, $upperlimit);
 
