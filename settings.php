@@ -46,4 +46,26 @@ if ($hassiteconfig) {
                     get_string('catscales:information', 'local_catquiz', $settingsling),
             )
     );
+
+    $sql = "SELECT t.id, t.name
+            FROM m_tag t
+            LEFT JOIN m_tag_instance ti ON t.id=ti.tagid
+            WHERE ti.component=:component AND ti.itemtype=:itemtype";
+
+    $params = [
+        'component' => 'core',
+        'itemtype' => 'course',
+    ];
+
+    $records = $DB->get_records_sql($sql, $params);
+    $options = array_map(fn($a) => [$a->id => $a->name], $records) ?? [0 => 'notags'];
+
+    $setting = new admin_setting_configselect(
+        'adaptivequiz/catmodel',
+        get_string('modformcatmodel', 'adaptivequiz'),
+        '',
+        0,
+        $options,
+    );
+    $settings->add($setting);
 }
