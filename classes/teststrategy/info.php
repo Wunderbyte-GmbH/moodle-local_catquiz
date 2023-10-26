@@ -236,7 +236,6 @@ class info {
             get_string('minquestions', 'local_catquiz')
         );
         $mform->addHelpButton('catquiz_minquestions', 'minquestions', 'local_catquiz');
-        $mform->setDefault('catquiz_maxquestions', 67);
 
         // phpcs:disable
         // $elements[] = $mform->addElement(

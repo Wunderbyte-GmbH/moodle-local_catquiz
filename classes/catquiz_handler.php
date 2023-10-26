@@ -359,6 +359,7 @@ class catquiz_handler {
         $keystooverwrite = [
             'catquiz_catscales' => true,
             'catquiz_subscalecheckbox_' => false,
+            'numberoffeedbackoptionsselect' => true,
         ];
 
         foreach ($values as $key => $value) {

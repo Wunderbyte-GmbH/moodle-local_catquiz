@@ -99,17 +99,22 @@ class feedback {
         for ($i = 1; $i <= 8; $i++) {
             $options[$i] = $i;
         }
-        $numbersselect = $mform->addElement(
+
+        $numberoffeedbackspersubscale = $data['numberoffeedbackoptionsselect']
+            ?? optional_param('numberoffeedbackoptionsselect', 0, PARAM_INT);
+        $numberoffeedbackspersubscale = empty($numberoffeedbackspersubscale)
+            ? DEFAULT_NUMBER_OF_FEEDBACKS_PER_SCALE : intval($numberoffeedbackspersubscale);
+
+        $element = $mform->addElement(
             'select',
             'numberoffeedbackoptionsselect',
             get_string('numberoffeedbackoptionpersubscale', 'local_catquiz'),
             $options,
             ['data-on-change-action' => 'numberOfFeedbacksSubmit'],
         );
-        // $numbersselect->setMultiple(true);
+        $element->setValue($numberoffeedbackspersubscale);
         $mform->addHelpButton('numberoffeedbackoptionsselect', 'numberoffeedbackoptionpersubscale', 'local_catquiz');
-        $mform->setDefault('numberoffeedbackoptionsselect', DEFAULT_NUMBER_OF_FEEDBACKS_PER_SCALE);
-        $elements[] = $numbersselect;
+        $elements[] = $element;
 
         // Button to attach JavaScript to reload the form.
         $mform->registerNoSubmitButton('submitnumberoffeedbackoptions');
@@ -118,10 +123,6 @@ class feedback {
             'class' => 'd-none',
             'data-action' => 'submitNumberOfFeedbackOptions',
         ]);
-
-        $numberoffeedbackspersubscale = $mform->getSubmitValue('numberoffeedbackoptionsselect');
-        $numberoffeedbackspersubscale = empty($numbersselectvalue)
-            ? DEFAULT_NUMBER_OF_FEEDBACKS_PER_SCALE : intval($numbersselectvalue);
 
         foreach ($scales as $scale) {
 
@@ -151,8 +152,8 @@ class feedback {
 
                 // If the Element is new, we set the default.
                 // If we get a value here, the overriding value is set in the set_data_after_definition function.
-                $lowerlimit = optional_param('feedback_scaleid_limit_lower_'. $scale->id . '_' . $j, 0, PARAM_INT);
-                if (empty($lowerlimit)) {
+                $lowerlimit = $data['feedback_scaleid_limit_lower_'. $scale->id . '_' . $j] ?? null;
+                if ($lowerlimit === null) {
                     $lowerlimit = self::return_limits_for_scale($numberoffeedbackspersubscale, $j, true);
                     $element->setValue($lowerlimit);
                 }
@@ -168,8 +169,8 @@ class feedback {
 
                 // If the Element is new, we set the default.
                 // If we get a value here, the overriding value is set in the set_data_after_definition function.
-                $upperlimit = optional_param('feedback_scaleid_limit_upper_'. $scale->id . '_' . $j, 0, PARAM_INT);
-                if (empty($upperlimit)) {
+                $upperlimit = $data['feedback_scaleid_limit_upper_'. $scale->id . '_' . $j] ?? null;
+                if ($upperlimit === null) {
                     $upperlimit = self::return_limits_for_scale($numberoffeedbackspersubscale, $j, false);
                     $element->setValue($upperlimit);
                 }
