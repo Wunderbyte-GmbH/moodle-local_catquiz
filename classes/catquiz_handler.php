@@ -371,7 +371,11 @@ class catquiz_handler {
             } else {
                 foreach ($keystooverwrite as $kokey => $kovalue) {
                     if (!$kovalue && (strpos($key, $kokey) !== false)) {
-                        $_POST[$key] = $value;
+                        if (gettype($value) === 'array') {
+                            $_POST[$key] = json_encode($value);
+                        } else {
+                            $_POST[$key] = $value;
+                        }
                     }
                 }
             }

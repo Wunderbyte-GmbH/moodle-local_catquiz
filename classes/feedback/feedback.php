@@ -133,10 +133,26 @@ class feedback {
                 continue;
             }
 
-            $checkboxchecked = optional_param('catquiz_subscalecheckbox%', 0, PARAM_INT);
+            // TODO: check in loop alle f
+            // _ zwischen scaleid und j
+
+            $feedback = optional_param('feedbackeditor_scaleid_'  . $scale->id . '1', "", PARAM_RAW);
+            $jsonobject = json_decode($feedback);
+            $feedbacktext = strip_tags($jsonobject->text);
+            if (strlen($feedbacktext) > 0) {
+                $headersuffix = "ksndks";
+                $expanded = false;
+            } else {
+                $headersuffix = "";
+                $expanded = true;
+            }
+            // 3. fall: partiell fertig
+            // Setz elemente in anderes array und appende dann am ende in elements, damit ich die header checken kann.+
+
+
             // Add a header for each scale.
             $elements[] = $mform->addElement('header', 'catquiz_feedback_header_' . $scale->id,
-                get_string('catquizfeedbackheader', 'local_catquiz', $scale->name));
+                get_string('catquizfeedbackheader', 'local_catquiz', $scale->name) . $headersuffix);
 
             for ($j = 1; $j <= $numberoffeedbackspersubscale; $j++) {
                 // Header for Subfeedback.
