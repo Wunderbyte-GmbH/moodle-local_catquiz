@@ -119,12 +119,9 @@ class feedback {
             'data-action' => 'submitNumberOfFeedbackOptions',
         ]);
 
-        $numbersselectvalue = $mform->getSubmitValue('numberoffeedbackoptionsselect');
-        $numberoffeedbackspersubscale = empty(intval($numbersselectvalue)) ? DEFAULT_NUMBER_OF_FEEDBACKS_PER_SCALE : intval($numbersselectvalue);
-
-        // Calculate equal default values for limits in scales.
-        $sizeofrange = abs(PERSONABILITY_LOWER_LIMIT - PERSONABILITY_UPPER_LIMIT);
-        $increment = $sizeofrange / $numberoffeedbackspersubscale;
+        $numberoffeedbackspersubscale = $mform->getSubmitValue('numberoffeedbackoptionsselect');
+        $numberoffeedbackspersubscale = empty($numbersselectvalue)
+            ? DEFAULT_NUMBER_OF_FEEDBACKS_PER_SCALE : intval($numbersselectvalue);
 
         foreach ($scales as $scale) {
 
@@ -152,31 +149,32 @@ class feedback {
                 ));
                 $mform->settype('feedback_scaleid_limit_lower_'. $scale->id . '_' . $j, PARAM_FLOAT);
 
-                if (isset($data["submitnumberoffeedbackoptions"])
-                    && $data["submitnumberoffeedbackoptions"] == "numberoffeedbackoptionssubmit") {
-                    //$element = $mform->getElement('feedback_scaleid_limit_lower_'. $scale->id . '_' . $j);
-                };
-                $elements[] = $element;
-
+                // If the Element is new, we set the default.
+                // If we get a value here, the overriding value is set in the set_data_after_definition function.
                 $lowerlimit = optional_param('feedback_scaleid_limit_lower_'. $scale->id . '_' . $j, 0, PARAM_INT);
                 if (empty($lowerlimit)) {
-                    $lowerlimit = PERSONABILITY_LOWER_LIMIT + ($j - 1) * $increment;
+                    $lowerlimit = self::return_limits_for_scale($numberoffeedbackspersubscale, $j, true);
+                    $element->setValue($lowerlimit);
                 }
-                // TODO: Set previous upper limit as lower limit for next field.
-                //$mform->setDefault('feedback_scaleid_limit_lower_'. $scale->id . '_' . $j, $lowerlimit);
 
-                $elements[] = $mform->addElement(
+                $elements[] = $element;
+
+                $element = $mform->addElement(
                     'text',
                     'feedback_scaleid_limit_upper_'. $scale->id . '_' . $j,
                     get_string('upperlimit', 'local_catquiz'
                 ));
                 $mform->settype('feedback_scaleid_limit_upper_' . $scale->id . '_' . $j, PARAM_FLOAT);
 
+                // If the Element is new, we set the default.
+                // If we get a value here, the overriding value is set in the set_data_after_definition function.
                 $upperlimit = optional_param('feedback_scaleid_limit_upper_'. $scale->id . '_' . $j, 0, PARAM_INT);
                 if (empty($upperlimit)) {
-                    $upperlimit = PERSONABILITY_LOWER_LIMIT + $j * $increment;
+                    $upperlimit = self::return_limits_for_scale($numberoffeedbackspersubscale, $j, false);
+                    $element->setValue($upperlimit);
                 }
-                //$mform->setDefault('feedback_scaleid_limit_upper_'. $scale->id . '_' . $j, $upperlimit);
+
+                $elements[] = $element;
 
                 // TODO Switch to check which colors should be displayed.
                 $options = self::get_array_of_colors($numberoffeedbackspersubscale);
@@ -466,4 +464,27 @@ class feedback {
         $enrol->enrol_user($instance, $userid, ($roleid > 0 ? $roleid : $instance->roleid));
     }
 
+
+    /**
+     * Returns lower or upper value for scales, depending on bool.
+     *
+     * @param mixed $nroptions
+     * @param mixed $optioncounter
+     * @param bool $lower
+     *
+     * @return int
+     *
+     */
+    public static function return_limits_for_scale($nroptions, $j, bool $lower) {
+
+        // Calculate equal default values for limits in scales.
+        $sizeofrange = abs(PERSONABILITY_LOWER_LIMIT - PERSONABILITY_UPPER_LIMIT);
+        $increment = $sizeofrange / $nroptions;
+
+        if ($lower) {
+            return PERSONABILITY_LOWER_LIMIT + ($j - 1) * $increment;
+        } else {
+            return PERSONABILITY_LOWER_LIMIT + $j * $increment;
+        }
+    }
 }

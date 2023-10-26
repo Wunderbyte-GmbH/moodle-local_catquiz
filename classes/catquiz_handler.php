@@ -33,6 +33,7 @@ use coding_exception;
 use context_system;
 use core_plugin_manager;
 use Exception;
+use local_catquiz\feedback\feedback;
 use local_catquiz\local\model\model_strategy;
 use local_catquiz\output\attemptfeedback;
 use local_catquiz\teststrategy\info;
@@ -522,16 +523,26 @@ class catquiz_handler {
         if (isset($values["submitnumberoffeedbackoptions"])
             && $values["submitnumberoffeedbackoptions"] == "numberoffeedbackoptionssubmit") {
 
-            $element = $mform->getElement("catquiz_maxquestions");
-            $element->setValue(24);
+            // First, get the setting.
+            $numberofoptions = $values['numberoffeedbackoptionsselect'];
 
             foreach ($values as $k => $v) {
 
                 if (strpos($k, 'feedback_scaleid_limit_') !== false) {
 
                     if ($mform->elementExists($k)) {
+
+                        preg_match('/_(\d+)$/', $k, $matches);
+                        $j = $matches[1];
+
+                        if (strpos($k, '_lower')) {
+                            $value = feedback::return_limits_for_scale($numberofoptions, $j, true);
+                        } else {
+                            $value = feedback::return_limits_for_scale($numberofoptions, $j, false);
+                        }
+
                         $element = $mform->getElement($k);
-                        $element->setValue(1);
+                        $element->setValue($value);
                     }
                 }
             }
