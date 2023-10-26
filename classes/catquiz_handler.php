@@ -102,6 +102,7 @@ class catquiz_handler {
                 'advcheckbox',
                 'testenvironment_addoredittemplate',
                 get_string('addoredittemplate', 'local_catquiz'));
+
             $elements[] = $mform->addElement('text', 'testenvironment_name', get_string('name', 'core'));
             $mform->setType('testenvironment_name', PARAM_TEXT);
             $mform->hideIf('testenvironment_name', 'testenvironment_addoredittemplate', 'eq', 0);
@@ -319,10 +320,9 @@ class catquiz_handler {
                 'component' => $component,
             ];
 
-            // Pass on the values as stdClas.
+            // Pass on the values as stdClass.
             $test = new testenvironment($cattest);
             $test->apply_jsonsaved_values($formdefaultvalues);
-            $formdefaultvalues['choosetemplate'] = 0;
 
             self::write_variables_to_post($formdefaultvalues);
 
@@ -341,10 +341,12 @@ class catquiz_handler {
             // Pass on the values as stdClas.
             $test = new testenvironment($cattest);
             $test->apply_jsonsaved_values($formdefaultvalues);
-            $formdefaultvalues['choosetemplate'] = 0;
 
             self::write_variables_to_post($formdefaultvalues);
         }
+
+        $formdefaultvalues['choosetemplate'] = 0;
+        $formdefaultvalues['testenvironment_addoredittemplate'] = 0;
     }
 
     /**
@@ -360,6 +362,7 @@ class catquiz_handler {
             'catquiz_catscales' => true,
             'catquiz_subscalecheckbox_' => false,
             'numberoffeedbackoptionsselect' => true,
+            'feedbackeditor_scaleid_' => false,
         ];
 
         foreach ($values as $key => $value) {
@@ -511,6 +514,8 @@ class catquiz_handler {
 
     /**
      * We use this function to apply eg template data.
+     * This is the latest moment where we can change the values.
+     * We can override submitted values here.
      *
      * @param MoodleQuickForm $mform
      * @return void

@@ -210,7 +210,9 @@ class feedback {
                     'multiple' => false,
                     'noselectionstring' => get_string('groupselection', 'local_catquiz'),
                 ];
-                $select = [];
+                $select = [
+                    0 => get_string('groupselection', 'local_catquiz'),
+                ];
                 foreach ($groups as $group) {
                     $select[$group->id] = $group->name;
                 }
@@ -221,7 +223,6 @@ class feedback {
                     $select,
                     $options
                 );
-                // TODO: Set default unselected.
                 $mform->addHelpButton('catquiz_groups_' . $scale->id . $j, 'setgrouprenrolmentforscale', 'local_catquiz');
 
                 // Enrole to a group.
@@ -231,7 +232,9 @@ class feedback {
                     'multiple' => false,
                     'noselectionstring' => get_string('courseselection', 'local_catquiz'),
                 ];
-                $select = [];
+                $select = [
+                    0 => get_string('courseselection', 'local_catquiz'),
+                ];
                 foreach ($courses as $course) {
                     $select[$course->id] = $course->fullname;
                 }
@@ -242,7 +245,6 @@ class feedback {
                     $select,
                     $options
                 );
-                // TODO: Set default unselected.
                 $mform->addHelpButton('catquiz_courses_' . $scale->id  . $j, 'setcourseenrolmentforscale', 'local_catquiz');
 
                 // Checkbox dependent on groupselect and courseselect.
