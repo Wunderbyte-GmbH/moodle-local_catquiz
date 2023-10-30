@@ -66,6 +66,9 @@ final class strategyfastestscore extends preselect_task implements wb_middleware
         if (count($context['questions']) === 0) {
             $context['nextbestquestion_before'] = null;
             $context['nextbestquestion_after'] = null;
+        } else if (count($context['questions']) === 1) {
+            $context['nextbestquestion_before'] = $context['questions'][array_key_first($context['questions'])];
+            $context['nextbestquestion_after'] = $context['questions'][array_key_first($context['questions'])];
         } else {
             $qdiff = $context['questions'];
             uasort($qdiff, fn ($q1, $q2) => $q1->difficulty <=> $q2->difficulty);
