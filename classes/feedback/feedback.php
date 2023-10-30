@@ -157,7 +157,7 @@ class feedback {
                     }
 
                 // Header for Subfeedback.
-                $subelements[] = $mform->addElement('static', 'headingforfeedback' . $scale->id . $j,
+                $subelements[] = $mform->addElement('static', 'headingforfeedback' . $scale->id . '_'. $j,
                 get_string('feedbacknumber', 'local_catquiz', $j));
 
                 // Define range.
@@ -234,12 +234,12 @@ class feedback {
                 }
                 $subelements[] = $mform->addElement(
                     'autocomplete',
-                    'catquiz_groups_' . $scale->id . $j,
+                    'catquiz_groups_' . $scale->id . '_'. $j,
                     get_string('setgrouprenrolmentforscale', 'local_catquiz'),
                     $select,
                     $options
                 );
-                $mform->addHelpButton('catquiz_groups_' . $scale->id . $j, 'setgrouprenrolmentforscale', 'local_catquiz');
+                $mform->addHelpButton('catquiz_groups_' . $scale->id . '_'. $j, 'setgrouprenrolmentforscale', 'local_catquiz');
 
                 // Enrole to a group.
                 // Limit Courses - See GH-183.
@@ -256,7 +256,7 @@ class feedback {
                 }
                 $subelements[] = $mform->addElement(
                     'autocomplete',
-                    'catquiz_courses_' . $scale->id . $j,
+                    'catquiz_courses_' . $scale->id . '_'. $j,
                     get_string('setcourseenrolmentforscale', 'local_catquiz'),
                     $select,
                     $options
@@ -264,11 +264,10 @@ class feedback {
                 $mform->addHelpButton('catquiz_courses_' . $scale->id  . $j, 'setcourseenrolmentforscale', 'local_catquiz');
 
                 // Checkbox dependent on groupselect and courseselect.
-                $subelements[] = $mform->addElement('advcheckbox', 'enrolement_message_checkbox' . $scale->id . $j,
+                $subelements[] = $mform->addElement('advcheckbox', 'enrolement_message_checkbox' . $scale->id . '_'. $j,
                 get_string('setautonitificationonenrolmentforscale', 'local_catquiz'), null, null, [0, 1]);
-                $mform->setDefault('enrolement_message_checkbox' . $scale->id . $j, 1);
-                // phpcs:ignore
-                // TODO: If none of both is selected, hide properly. $mform->hideIf('enrolement_message_checkbox' . $scale->id . $j, 'catquiz_groups_' . $scale->id . $j, 'eq', 0);
+                $mform->setDefault('enrolement_message_checkbox' . $scale->id . '_'. $j, 1);
+                // TODO: If none of both is selected, hide properly. $mform->hideIf('enrolement_message_checkbox' . $scale->id . '_'. $j, 'catquiz_groups_' . $scale->id . '_'. $j, 'eq', 0);
             }
 
             // Only for the parentscale (=first form), we display to button to apply values for all subscales.
