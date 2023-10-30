@@ -424,9 +424,6 @@ $string['setautonitificationonenrolmentforscale'] = 'Inform participants about g
 $string['setautonitificationonenrolmentforscale_help'] = '
 In addition to their written feedback, participants will receive the following note: "You have been automatically enrolled in the group <group name> / the course <course name as a link>."';
 $string['copysettingsforallsubscales'] = 'Apply values for all subscales';
-$string['copysettingsforallsubscales'] = 'apply values for all subscales';
-$string['copysettingsforallsubscales'] = 'Apply values for all subscales';
-$string['copysettingsforallsubscales'] = 'apply values for all subscales';
 $string['quizgraphicalsummary'] = 'Quiz progress summary';
 $string['score'] = 'Weighted score';
 $string['response'] = 'Response';

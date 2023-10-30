@@ -152,9 +152,9 @@ class feedback {
                         $feedbacktext = strip_tags($jsonobject->text);
                     }
                 }
-                    if (isset($feedbacktext) && strlen($feedbacktext) > 0) {
-                        $numberoffeedbacksfilledout ++;
-                    }
+                if (isset($feedbacktext) && strlen($feedbacktext) > 0) {
+                    $numberoffeedbacksfilledout ++;
+                }
 
                 // Header for Subfeedback.
                 $subelements[] = $mform->addElement('static', 'headingforfeedback' . $scale->id . '_'. $j,
@@ -296,7 +296,7 @@ class feedback {
                 $expanded = false;
             } else {
                 // Partially submitted feedback
-                $statusofcompletion = $numberoffeedbacksfilledout . '/' . $j - 1;
+                $statusofcompletion = strval($numberoffeedbacksfilledout) . "/" . strval($j - 1);
                 $headersuffix = ' : ' . get_string('feedbackcompletedpartially', 'local_catquiz', $statusofcompletion);
                 $expanded = true;
             }
