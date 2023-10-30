@@ -389,21 +389,6 @@ $string['noselection'] = "No selection";
 $string['lowerlimit'] = "Lower limit";
 $string['upperlimit'] = "Upper limit";
 $string['setcoursesforscaletext'] = 'For catscale {$a}, determine the ability for the individual feedback, the written feedback and the respective enrollments in courses or groups.';
-// $string['catcatscaleprime'] = 'Inhaltsbereich/Skala';
-// $string['catcatscaleprime_help'] = 'Wählen Sie den für Sie relevanten Inhaltsbereich aus. Inhaltsbereche werden als sogenannte Skala durch eine*n CAT-Manager*in angelegt und verwaltet. Falls Sie eigene Inhalts- und Teilbereiche wünschen, wenden Sie sich bitte an den oder die CAT-Manager*in oder den bzw. die Adminstrator*in Ihrer Moodle-Instanz.';
-// $string['catcatscales_selectall'] = 'Alle Subskalen auswählen';
-// $string['catcatscaleprime_help'] = 'Wählen Sie den für Sie relevanten Inhaltsbereich aus. Inhaltsbereche werden als sogenannte Skala durch eine*n CAT-Manager*in angelegt und verwaltet. Falls Sie eigene Inhalts- und Teilbereiche wünschen, wenden Sie sich bitte an den oder die CAT-Manager*in oder den bzw. die Adminstrator*in Ihrer Moodle-Instanz.';
-// $string['selectcatcontext_help'] = 'Einsatz-Kontexte differenzieren die Daten hinsichtlich Zielgruppe, Einsatzzweck oder Zeit/Kohorte. Der Einsatz-Kontext wird durch den bzw. die CAT-Manager*in verwaltet. Falls Sie für Ihren Einsatzzweck einen eigenen Einsatz-Kontext wünschen, wenden Sie sich bitte an den oder die CAT-Manager*in oder den bzw. die Adminstrator*in Ihrer Moodle-Instanz.';
-// $string['includepilotquestions_help'] = 'Im Pilotierungsmodus werden den Testdurchläufen Fragen beigemischt, deren Fragen-Parameter (z.B. Schwierigkeit, Trennschärfe) noch nicht bestimmt sind. Diese tragen nicht zum Test-Ergebnis bei. Die durch die Bearbeitungen angefallenen Daten können durch eine*n CAT-Manager*in zu einem späteren Zeitpunkt zur Bestimmung der Fragen-Parameter statistisch ausgewertet werden.';
-// $string['catquiz_selectfirstquestion_help'] = 'Bei einem Test-Versuch entscheidet der Algorithmus aufgrund dieser Einstellung, nach welchem Kriterium die erste Frage gewählt wird, die ausgespielt wird.';
-// $string['numberoffeedbackoptionpersubscale'] = 'Anzahl an Feedback-Optionen pro Subskala';
-// $string['feedbacknumber'] = 'Feedback für Bereich {$a}';
-// $string['numberoffeedbackoptionpersubscale_help'] = 'Wählen Sie aus, wieviele Optionen an Feedback Sie pro Subskala benötigen. Mithilfe der Feedback-Optionen können Sie in Abhängigkeit der ermittelten Fähigkeit gestufte, schriftliche Rückmeldungen erteilen und in verschiedene Kurse oder Gruppen einschreiben.';
-// $string['choosesubscaleforfeedback'] = 'Subskala wählen';
-$string['feedbackcompletedpartially'] = '{$a} feedbacks completed.';
-$string['feedbackcompletedentirely'] = 'All feedbacks completed.';
-
-// Not used yet.
 $string['limitrange'] = 'Limit range';
 $string['catcatscaleprime'] = 'Content/Scale';
 $string['catcatscaleprime_help'] = 'Select the content area that is relevant to you. Content areas are created and managed as a so-called scale by a CAT manager. If you would like your own content and sub-areas, please contact the CAT manager or the administrator of your Moodle instance.';
@@ -414,6 +399,9 @@ $string['catquiz_selectfirstquestion_help'] = 'During a test attempt, the algori
 $string['numberoffeedbackoptionpersubscale'] = 'Anzahl an Feedback-Optionen pro Subskala';
 $string['numberoffeedbackoptionpersubscale_help'] = 'Select how many options of feedback you need per subscale. Using the feedback options, you can provide graded, written feedback depending on the ability identified and enroll in different courses or groups.';
 $string['choosesubscaleforfeedback'] = 'Select a subscale';
+$string['feedbackcompletedpartially'] = '{$a} feedbacks completed.';
+$string['feedbackcompletedentirely'] = 'All feedbacks completed.';
+
 // Check display line breaks etc.
 $string['choosesubscaleforfeedback_help'] = 'You can now store <number of options> feedback informations for the subscales displayed. Select a (sub-)scale to enter your feedback. The colored symbols indicate the current status of processing, measured by the number of feedback options you entered:
     gray - no feedback stored in the sub-scale yet
