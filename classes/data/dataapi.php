@@ -96,7 +96,8 @@ class dataapi {
      * We'll get an array of catscales where every catscale is followed by its children.
      *
      * @param integer $parentid
-     * @param bool $getchildren
+     * @param bool $getsubchildren
+     * @param array $catscales
      * @return array
      */
     public static function get_catscale_and_children($parentid = 0, bool $getsubchildren = false, $catscales = []) {
