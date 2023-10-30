@@ -478,16 +478,16 @@ class feedback {
      * @return int
      *
      */
-    public static function return_limits_for_scale($nroptions, $j, bool $lower) {
+    public static function return_limits_for_scale($nroptions, $optioncounter, bool $lower) {
 
         // Calculate equal default values for limits in scales.
         $sizeofrange = abs(PERSONABILITY_LOWER_LIMIT - PERSONABILITY_UPPER_LIMIT);
         $increment = $sizeofrange / $nroptions;
 
         if ($lower) {
-            return PERSONABILITY_LOWER_LIMIT + ($j - 1) * $increment;
+            return PERSONABILITY_LOWER_LIMIT + ($optioncounter - 1) * $increment;
         } else {
-            return PERSONABILITY_LOWER_LIMIT + $j * $increment;
+            return PERSONABILITY_LOWER_LIMIT + $optioncounter * $increment;
         }
     }
 }
