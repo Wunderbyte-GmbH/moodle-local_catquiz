@@ -126,6 +126,8 @@ class feedback {
         ]);
 
         foreach ($scales as $scale) {
+            $subelements = [];
+            $numberoffeedbacksfilledout = 0;
 
             // Only for parentscales and selected scales we display the feedbackoptions.
             $checkboxchecked = optional_param('catquiz_subscalecheckbox_' . $scale->id, 0, PARAM_INT);
@@ -133,30 +135,29 @@ class feedback {
                 continue;
             }
 
-            // TODO: check in loop alle f
-            // _ zwischen scaleid und j
-
-            $feedback = optional_param('feedbackeditor_scaleid_'  . $scale->id . '1', "", PARAM_RAW);
-            $jsonobject = json_decode($feedback);
-            $feedbacktext = strip_tags($jsonobject->text);
-            if (strlen($feedbacktext) > 0) {
-                $headersuffix = "ksndks";
-                $expanded = false;
-            } else {
-                $headersuffix = "";
-                $expanded = true;
-            }
-            // 3. fall: partiell fertig
-            // Setz elemente in anderes array und appende dann am ende in elements, damit ich die header checken kann.+
-
-
-            // Add a header for each scale.
-            $elements[] = $mform->addElement('header', 'catquiz_feedback_header_' . $scale->id,
-                get_string('catquizfeedbackheader', 'local_catquiz', $scale->name) . $headersuffix);
-
             for ($j = 1; $j <= $numberoffeedbackspersubscale; $j++) {
+                // Check for each feedback editor field, if there is content.
+                // This is the preparation for the header element (to be appended in the end) where we apply the distinction.
+
+                // TODO: Maybe find a better check if form is newly loaded or saved.
+                if (count($data) > 1) {
+                    $feedback = optional_param_array('feedbackeditor_scaleid_'  . $scale->id . '_' . $j, [], PARAM_RAW);
+                    if ($feedback != []) {
+                        $feedbacktext = $feedback['text'];
+                    }
+                } else {
+                    $feedback = optional_param('feedbackeditor_scaleid_'  . $scale->id . '_' . $j, "", PARAM_TEXT);
+                    if (!empty($feedback)) {
+                        $jsonobject = json_decode($feedback);
+                        $feedbacktext = strip_tags($jsonobject->text);
+                    }
+                }
+                    if (isset($feedbacktext) && strlen($feedbacktext) > 0) {
+                        $numberoffeedbacksfilledout ++;
+                    }
+
                 // Header for Subfeedback.
-                $elements[] = $mform->addElement('static', 'headingforfeedback' . $scale->id . $j,
+                $subelements[] = $mform->addElement('static', 'headingforfeedback' . $scale->id . $j,
                 get_string('feedbacknumber', 'local_catquiz', $j));
 
                 // Define range.
@@ -174,8 +175,7 @@ class feedback {
                     $lowerlimit = self::return_limits_for_scale($numberoffeedbackspersubscale, $j, true);
                     $element->setValue($lowerlimit);
                 }
-
-                $elements[] = $element;
+                $subelements[] = $element;
 
                 $element = $mform->addElement(
                     'text',
@@ -191,27 +191,26 @@ class feedback {
                     $upperlimit = self::return_limits_for_scale($numberoffeedbackspersubscale, $j, false);
                     $element->setValue($upperlimit);
                 }
-
-                $elements[] = $element;
+                $subelements[] = $element;
 
                 // TODO Switch to check which colors should be displayed.
                 $options = self::get_array_of_colors($numberoffeedbackspersubscale);
 
-                $elements[] = $mform->addElement(
+                $subelements[] = $mform->addElement(
                     'select',
-                    'wb_colourpicker_' .$scale->id . $j,
+                    'wb_colourpicker_' .$scale->id . '_' . $j,
                     get_string('feedback_colorrange', 'local_catquiz'),
                     $options
                 );
 
-                $elements[] = $mform->addElement('hidden', 'selectedcolour', '', PARAM_TEXT);
+                $subelements[] = $mform->addElement('hidden', 'selectedcolour', '', PARAM_TEXT);
                 // We have require JS to click no submit button on change of test environment.
                 $PAGE->requires->js_call_amd('local_catquiz/colourpicker', 'init');
 
                 // Rich text field for subfeedback.
-                $elements[] = $mform->addElement(
+                $subelements[] = $mform->addElement(
                     'editor',
-                    'feedbackeditor_scaleid_' . $scale->id  . $j,
+                    'feedbackeditor_scaleid_' . $scale->id . '_' . $j,
                     get_string('feedback', 'core'),
                     ['rows' => 10],
                     [
@@ -233,7 +232,7 @@ class feedback {
                 foreach ($groups as $group) {
                     $select[$group->id] = $group->name;
                 }
-                $elements[] = $mform->addElement(
+                $subelements[] = $mform->addElement(
                     'autocomplete',
                     'catquiz_groups_' . $scale->id . $j,
                     get_string('setgrouprenrolmentforscale', 'local_catquiz'),
@@ -255,7 +254,7 @@ class feedback {
                 foreach ($courses as $course) {
                     $select[$course->id] = $course->fullname;
                 }
-                $elements[] = $mform->addElement(
+                $subelements[] = $mform->addElement(
                     'autocomplete',
                     'catquiz_courses_' . $scale->id . $j,
                     get_string('setcourseenrolmentforscale', 'local_catquiz'),
@@ -265,7 +264,7 @@ class feedback {
                 $mform->addHelpButton('catquiz_courses_' . $scale->id  . $j, 'setcourseenrolmentforscale', 'local_catquiz');
 
                 // Checkbox dependent on groupselect and courseselect.
-                $elements[] = $mform->addElement('advcheckbox', 'enrolement_message_checkbox' . $scale->id . $j,
+                $subelements[] = $mform->addElement('advcheckbox', 'enrolement_message_checkbox' . $scale->id . $j,
                 get_string('setautonitificationonenrolmentforscale', 'local_catquiz'), null, null, [0, 1]);
                 $mform->setDefault('enrolement_message_checkbox' . $scale->id . $j, 1);
                 // phpcs:ignore
@@ -276,7 +275,7 @@ class feedback {
             if ($scale->parentid == 0) {
                 // TODO: Attach function!
                 $mform->registerNoSubmitButton('copysettingsforallsubscales');
-                $elements[] = $mform->addElement(
+                $subelements[] = $mform->addElement(
                     'submit',
                     'copysettingsforallsubscales',
                     get_string('copysettingsforallsubscales', 'local_catquiz'),
@@ -285,6 +284,34 @@ class feedback {
                     ]
                 );
             }
+
+            // Add a header for each scale.
+            // We check if feedbacks completed partially, entirely or not at all.
+            if ($numberoffeedbacksfilledout == 0) {
+                // No feedback entries saved in editor.
+                $headersuffix = "";
+                $expanded = true;
+            } else if ($numberoffeedbacksfilledout == $j - 1) {
+                // All feedback entries saved in editor.
+                $headersuffix = ' : ' . get_string('feedbackcompletedentirely', 'local_catquiz');
+                $expanded = false;
+            } else {
+                // Partially submitted feedback
+                $statusofcompletion = $numberoffeedbacksfilledout . '/' . $j - 1;
+                $headersuffix = ' : ' . get_string('feedbackcompletedpartially', 'local_catquiz', $statusofcompletion);
+                $expanded = true;
+            }
+            $elements[] = $mform->addElement('header', 'catquiz_feedback_header_' . $scale->id,
+            get_string('catquizfeedbackheader', 'local_catquiz', $scale->name) . $headersuffix);
+            if ($expanded) {
+                $mform->setExpanded('catquiz_feedback_header_' . $scale->id);
+            }
+
+            // Now append elements from loop.
+            foreach ($subelements as $element) {
+                $elements[] = $element;
+            }
+
         }
     }
 

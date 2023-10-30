@@ -213,7 +213,6 @@ $string['catquiz:manage_catcontexts'] = 'Verwalte Versionen';
 $string['catquiz:manage_testenvironments'] = 'Verwalte Testumgebungen';
 $string['catquiz:view_teacher_feedback'] = 'Zugriff auf LehrerInnen Feedback';
 
-
 // Navbar.
 $string['managecatscales'] = 'Verwalte Skalen';
 $string['test'] = 'Teste Abos';
@@ -397,6 +396,9 @@ $string['numberoffeedbackoptionpersubscale'] = 'Anzahl an Feedback-Optionen pro 
 $string['feedbacknumber'] = 'Feedback für Bereich {$a}';
 $string['numberoffeedbackoptionpersubscale_help'] = 'Wählen Sie aus, wieviele Optionen an Feedback Sie pro Subskala benötigen. Mithilfe der Feedback-Optionen können Sie in Abhängigkeit der ermittelten Fähigkeit gestufte, schriftliche Rückmeldungen erteilen und in verschiedene Kurse oder Gruppen einschreiben.';
 $string['choosesubscaleforfeedback'] = 'Subskala wählen';
+$string['feedbackcompletedpartially'] = '{$a} Feedbacks eingetragen.';
+$string['feedbackcompletedentirely'] = 'Alle Feedbacks eingetragen.';
+
 // Check display line breaks etc.
 $string['choosesubscaleforfeedback_help'] = 'Für die angezeigten Subskalen können Sie nun {$a} Feedback-Angaben hinterlegen. Wählen Sie die jeweilige (Sub-)Skala an, um Ihr Feedback einzugeben. Die farbigen Symbole zeigen Ihnen den aktuellen Stand der Bearbeitung an, gemessen an den vor Ihnen hinterlegten Anzahl an Feedback-Optionen:
     grau - noch kein Feedback in der Sub-Skala hinterlegt
