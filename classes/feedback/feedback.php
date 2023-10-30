@@ -62,6 +62,7 @@ class feedback {
         // Get all Values from the form.
         $data = $mform->getSubmitValues();
 
+        // phpcs:ignore
         // TODO: Display Name of Teststrategy. $teststrategyid = intval($data['catquiz_selectteststrategy']);
         $elements[] = $mform->addElement('header', 'catquiz_feedback',
                 get_string('catquiz_feedbackheader', 'local_catquiz'));
@@ -251,6 +252,7 @@ class feedback {
                 $elements[] = $mform->addElement('advcheckbox', 'enrolement_message_checkbox' . $scale->id . $j,
                 get_string('setautonitificationonenrolmentforscale', 'local_catquiz'), null, null, [0, 1]);
                 $mform->setDefault('enrolement_message_checkbox' . $scale->id . $j, 1);
+                // phpcs:ignore
                 // TODO: If none of both is selected, hide properly. $mform->hideIf('enrolement_message_checkbox' . $scale->id . $j, 'catquiz_groups_' . $scale->id . $j, 'eq', 0);
             }
 
@@ -258,11 +260,14 @@ class feedback {
             if ($scale->parentid == 0) {
                 // TODO: Attach function!
                 $mform->registerNoSubmitButton('copysettingsforallsubscales');
-                $elements[] = $mform->addElement('submit', 'copysettingsforallsubscales', get_string('copysettingsforallsubscales', 'local_catquiz'),
+                $elements[] = $mform->addElement(
+                    'submit',
+                    'copysettingsforallsubscales',
+                    get_string('copysettingsforallsubscales', 'local_catquiz'),
                     [
-                        // 'class' => 'd-none',
                         'data-action' => 'submitFeedbackValues',
-                    ]);
+                    ]
+                );
             }
         }
     }
@@ -275,7 +280,11 @@ class feedback {
      *
      */
     public static function add_coloroption(string $color, array &$coloroptions) {
-        $coloroptions[get_string('colorpicker_color_'. $color, 'local_catquiz')] = get_string('colorvalue_'. $color, 'local_catquiz');
+        $colorname = get_string('colorpicker_color_'. $color, 'local_catquiz');
+        $coloroptions[$colorname] = get_string(
+            'colorvalue_'. $color,
+            'local_catquiz'
+        );
     }
 
     /**
