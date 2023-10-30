@@ -267,7 +267,8 @@ class feedback {
                 $subelements[] = $mform->addElement('advcheckbox', 'enrolement_message_checkbox' . $scale->id . '_'. $j,
                 get_string('setautonitificationonenrolmentforscale', 'local_catquiz'), null, null, [0, 1]);
                 $mform->setDefault('enrolement_message_checkbox' . $scale->id . '_'. $j, 1);
-                // TODO: If none of both is selected, hide properly. $mform->hideIf('enrolement_message_checkbox' . $scale->id . '_'. $j, 'catquiz_groups_' . $scale->id . '_'. $j, 'eq', 0);
+
+                // TODO: If none of both ('catquiz_groups_'... & 'catquiz_courses_'...) is selected, hide checkbox.
             }
 
             // Only for the parentscale (=first form), we display to button to apply values for all subscales.
