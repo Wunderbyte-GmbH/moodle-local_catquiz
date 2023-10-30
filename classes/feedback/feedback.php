@@ -296,7 +296,7 @@ class feedback {
                 $headersuffix = ' : ' . get_string('feedbackcompletedentirely', 'local_catquiz');
                 $expanded = false;
             } else {
-                // Partially submitted feedback
+                // Partially submitted feedback.
                 $statusofcompletion = strval($numberoffeedbacksfilledout) . "/" . strval($j - 1);
                 $headersuffix = ' : ' . get_string('feedbackcompletedpartially', 'local_catquiz', $statusofcompletion);
                 $expanded = true;

@@ -203,8 +203,6 @@ class testenvironment {
     public function save_or_update($templatename = '') {
         global $DB;
 
-        // Maybe match on templatename like $record = $DB->get_record('local_catquiz_tests', ['name' => $templatename]);
-
         // If we find the exact record, it might still be the case that we want to save a copy of a template.
         if ($record = $this->get_record($this->id, $this->componentid, $this->component)) {
 
