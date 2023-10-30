@@ -261,7 +261,7 @@ class feedback {
                     $select,
                     $options
                 );
-                $mform->addHelpButton('catquiz_courses_' . $scale->id  . $j, 'setcourseenrolmentforscale', 'local_catquiz');
+                $mform->addHelpButton('catquiz_courses_' . $scale->id . '_' . $j, 'setcourseenrolmentforscale', 'local_catquiz');
 
                 // Checkbox dependent on groupselect and courseselect.
                 $subelements[] = $mform->addElement('advcheckbox', 'enrolement_message_checkbox' . $scale->id . '_'. $j,
