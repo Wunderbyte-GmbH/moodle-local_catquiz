@@ -145,7 +145,9 @@ class updatepersonability extends preselect_task implements wb_middleware {
         foreach ($itemparamlist as $item) {
             $arrayresponsesforscale[$item->get_id()] = $this->arrayresponses[$item->get_id()];
         }
-        if (! $this->has_sufficient_responses($arrayresponsesforscale)) {
+
+        if (! $this->has_sufficient_responses($arrayresponsesforscale)
+            || count($itemparamlist) === 0) {
             $updatedability = $this->fallback_ability_update($catscaleid);
             $context['updateabilityfallback'] = true;
         } else {

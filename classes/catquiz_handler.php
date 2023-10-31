@@ -700,7 +700,7 @@ class catquiz_handler {
         }
 
         $maxquestions = $quizsettings->catquiz_maxquestions;
-        if ($maxquestions == 0) {
+        if (!$maxquestions) {
             $maxquestions = INF;
         }
 

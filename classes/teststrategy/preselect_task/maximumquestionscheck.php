@@ -52,12 +52,17 @@ final class maximumquestionscheck extends preselect_task implements wb_middlewar
         if ($context['questionsattempted'] >= $context['maximumquestions']) {
             // Save the last response so that we can display it as feedback.
             $lastquestion = $context['lastquestion'];
+            // If there is no last question, we return the next one.
+            if ($lastquestion === null) {
+                return $next($context);
+            }
             $lastresponse = catcontext::getresponsedatafromdb(
                 $context['contextid'],
                 [$lastquestion->catscaleid],
                 $lastquestion->id,
                 $context['userid']
             );
+            // TODO: Error handling if no question was answered.
             $context['lastresponse'] = $lastresponse[$context['userid']]['component'][$context['lastquestion']->id];
             return result::err(status::ERROR_REACHED_MAXIMUM_QUESTIONS);
         }
