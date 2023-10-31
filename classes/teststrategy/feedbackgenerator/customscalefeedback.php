@@ -119,20 +119,23 @@ class customscalefeedback extends feedbackgenerator {
 
         $scalefeedback = [];
         foreach ($personabilities as $catscaleid => $personability) {
-            $lowerlimitprop = sprintf('feedback_scaleid_%d_lowerlimit', $catscaleid);
-            $lowerlimit = floatval($quizsettings->$lowerlimitprop);
-            if ($personability >= $lowerlimit) {
-                continue;
-            }
+            for ($j = 1; $j <= $quizsettings->numberoffeedbackoptionsselect; $j++) {
+                $lowerlimitprop = sprintf('feedback_scaleid_limit_lower_%d_%d', $catscaleid, $j);
+                $lowerlimit = floatval($quizsettings->$lowerlimitprop);
+                $upperlimitprop = sprintf('feedback_scaleid_limit_uppser_%d_%d', $catscaleid, $j);
+                $upperlimit = floatval($quizsettings->$lowerlimitprop);
+                if ($personability < $lowerlimit || $personability > $upperlimit) {
+                    continue;
+                }
 
-            $feedbackprop = sprintf('feedback_scaleid_%d_feedback', $catscaleid);
-            $feedback = $quizsettings->$feedbackprop;
-            // Do not display empty feedback messages.
-            if (!$feedback) {
-                continue;
-            }
+                $feedback = $this->getfeedbackforrange($catscaleid, $j);
+                // Do not display empty feedback messages.
+                if (!$feedback) {
+                    continue;
+                }
 
-            $scalefeedback[$catscaleid] = $feedback;
+                $scalefeedback[$catscaleid] = $feedback;
+            }
         }
 
         if (! $scalefeedback) {
@@ -151,5 +154,19 @@ class customscalefeedback extends feedbackgenerator {
             'quizsettings' => $quizsettings,
             'personabilities' => $personabilities,
         ];
+    }
+
+    /**
+     * Gets the feedback for the given scale and range.
+     *
+     * @param int $catscaleid The CAT scale.
+     * @param int $groupnumber Identifies the feedback within the scale.
+     * @return ?string
+     */
+    private function getfeedbackforrange(int $catscaleid, int $groupnumber): ?string
+    {
+        // TODO: Implement getting the feedback.
+        return null;
+
     }
 }
