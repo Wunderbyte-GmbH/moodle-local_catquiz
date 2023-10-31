@@ -120,6 +120,10 @@ class modal_manage_catscale extends dynamic_form {
             $catscaleid = $data->id;
         } else {
             $catscaleid = dataapi::create_catscale($catscale);
+            // For a new parent catscale, create new auto-context.
+            if (intval($data->parentid) === 0) {
+                dataapi::create_new_context_for_scale($catscaleid, $data->name);
+            }
         }
         $data->id = $catscaleid;
         return $data;

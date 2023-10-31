@@ -576,24 +576,7 @@ class model_item_param_list implements ArrayAccess, IteratorAggregate, Countable
         // If so, use this context.
         // Else: create context and store in singleton.
         if (empty(catcontext::get_instance($scaleid))) {
-
-            $defaultcontext = catquiz::get_default_context_object();
-            $timestring = userdate(time(), get_string('strftimedatetimeshort', 'core_langconfig'));
-            $usertime = str_replace(' ', '', $timestring);
-
-            $data = new stdClass;
-            $data->name = get_string('uploadcontext', 'local_catquiz', [
-                'scalename' => $scalename,
-                'usertime' => $usertime,
-                ]);
-            $data->starttimestamp = $defaultcontext->starttimestamp;
-            $data->endtimestamp = $defaultcontext->endtimestamp;
-            $data->description = get_string('autocontextdescription', 'local_catquiz', $scalename);
-
-            $context = new catcontext($data);
-            $context->save_or_update($data);
-            catcontext::store_context_as_singleton($context, $scaleid);
-            $catcontext = $context;
+            $catcontext = dataapi::create_new_context_for_scale($scaleid, $scalename);
         } else {
             $catcontext = catcontext::get_instance($scaleid);
         };

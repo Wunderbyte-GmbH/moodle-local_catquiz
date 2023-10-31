@@ -27,9 +27,11 @@ namespace local_catquiz\data;
 use cache;
 use context_system;
 use local_catquiz\catcontext;
+use local_catquiz\catquiz;
 use local_catquiz\event\catscale_created;
 use local_catquiz\event\catscale_updated;
 use moodle_exception;
+use stdClass;
 
 /**
  * Get and store data from db.
@@ -90,6 +92,35 @@ class dataapi {
         }
         $cache->set('allcatcontexts', $allcatcontexts);
         return $allcatcontexts;
+    }
+
+    /**
+     * Creates a new context for a new scale.
+     *
+     * @param int $scaleid
+     * @param string $scalename
+     *
+     * @return catcontext
+     */
+    public static function create_new_context_for_scale(int $scaleid, string $scalename = "") {
+
+        $defaultcontext = catquiz::get_default_context_object();
+        $timestring = userdate(time(), get_string('strftimedatetimeshort', 'core_langconfig'));
+        $usertime = str_replace(' ', '', $timestring);
+
+        $data = new stdClass;
+        $data->name = get_string('uploadcontext', 'local_catquiz', [
+            'scalename' => $scalename,
+            'usertime' => $usertime
+            ]);
+        $data->starttimestamp = $defaultcontext->starttimestamp;
+        $data->endtimestamp = $defaultcontext->endtimestamp;
+        $data->description = get_string('autocontextdescription', 'local_catquiz', $scalename);
+
+        $context = new catcontext($data);
+        $context->save_or_update($data);
+        catcontext::store_context_as_singleton($context, $scaleid);
+        return $context;
     }
 
     /**
