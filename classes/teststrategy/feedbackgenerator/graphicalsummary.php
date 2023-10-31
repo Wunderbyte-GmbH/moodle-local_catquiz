@@ -26,9 +26,7 @@ namespace local_catquiz\teststrategy\feedbackgenerator;
 
 use cache;
 use html_writer;
-use local_catquiz\catquiz;
 use local_catquiz\teststrategy\feedbackgenerator;
-use local_catquiz\teststrategy\info;
 
 /**
  * Compare the ability of this attempt to the average abilities of other students that took this test.
