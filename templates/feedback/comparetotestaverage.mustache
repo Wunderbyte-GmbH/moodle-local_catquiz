@@ -25,12 +25,13 @@
         "testaverageability": 1.23,
         "userabilityposition": 15,
         "userability": 2.34,
-        "testaverageposition": 26
+        "testaverageposition": 26,
+        "colorgradestring": "#ff0000 0.00%, #ffff00 50.00%, #90ee90 100%"
     }
 }}
 {{text}}
 <div class="catquiz-feedbackbar">
-    <div class="catquiz-feedbackbar-bar" style="background: linear-gradient(to right, #9500ff 0%, #ff8725 33%, #edff4f 66%, #00ff00 100%);">
+    <div class="catquiz-feedbackbar-bar" style="background: linear-gradient(to right, {{colorgradestring}});">
         <div class="catquiz-feedbackbar-uppertext">
             {{#str}}currentability, local_catquiz{{/str}}
             <span style="position: absolute; left: {{userabilityposition}}%;">

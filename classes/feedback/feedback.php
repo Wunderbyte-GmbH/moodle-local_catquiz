@@ -33,6 +33,7 @@ use local_catquiz\data\dataapi;
 use local_catquiz\local\result;
 use local_catquiz\feedback\info;
 use local_catquiz\feedback\preselect_task;
+use local_catquiz\teststrategy\feedbackgenerator\comparetotestaverage;
 use local_catquiz\wb_middleware_runner;
 use moodle_exception;
 use MoodleQuickForm;
@@ -124,6 +125,16 @@ class feedback {
             'class' => 'd-none',
             'data-action' => 'submitNumberOfFeedbackOptions',
         ]);
+        // Generate the options for the colors. Same values are applied to all subscales and subfeedbacks.
+        $coloroptions = self::get_array_of_colors($numberoffeedbackspersubscale);
+
+        // Same colors as selected should be displayed in the feedback progressbar comparing testresults to average.
+        // So we generate a string and save it as hidden element.
+        $colorgradientstring = self::set_colors_for_colorbar($coloroptions);
+
+        // TODO: Make sure the information is updated when value is changed. Check in catquiz_handler.
+        $mform->addElement('hidden', 'colorgradientstring', $colorgradientstring);
+        $mform->setType('colorgradientstring', PARAM_TEXT);
 
         foreach ($scales as $scale) {
             $subelements = [];
@@ -193,14 +204,11 @@ class feedback {
                 }
                 $subelements[] = $element;
 
-                // TODO Switch to check which colors should be displayed.
-                $options = self::get_array_of_colors($numberoffeedbackspersubscale);
-
                 $subelements[] = $mform->addElement(
                     'select',
                     'wb_colourpicker_' .$scale->id . '_' . $j,
                     get_string('feedback_colorrange', 'local_catquiz'),
-                    $options
+                    $coloroptions
                 );
 
                 $subelements[] = $mform->addElement('hidden', 'selectedcolour', '', PARAM_TEXT);
@@ -273,7 +281,6 @@ class feedback {
 
             // Only for the parentscale (=first form), we display to button to apply values for all subscales.
             if ($scale->parentid == 0) {
-                // TODO: Attach function!
                 $mform->registerNoSubmitButton('copysettingsforallsubscales');
                 $subelements[] = $mform->addElement(
                     'submit',
@@ -406,6 +413,31 @@ class feedback {
         }
 
         return $coloroptions;
+    }
+
+    /**
+     * Define settings for colorbar.
+     *
+     * @param array $values
+     *
+     * @return string
+     */
+    private static function set_colors_for_colorbar(array $values): string {
+
+        $colorvalues = array_values($values);
+        $totalvalues = count($colorvalues);
+        $interval = 100 / ($totalvalues - 1);
+
+        $output = "";
+
+        for ($i = 0; $i < $totalvalues - 1; $i++) {
+            $percentage = number_format($interval * $i, 2);
+            $output .= "{$colorvalues[$i]} {$percentage}%, ";
+        }
+
+        $output .= "{$colorvalues[$totalvalues - 1]} 100%";
+
+        return $output;
     }
 
 
