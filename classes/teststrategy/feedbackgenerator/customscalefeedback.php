@@ -169,8 +169,7 @@ class customscalefeedback extends feedbackgenerator {
      * @param int $groupnumber Identifies the feedback within the scale.
      * @return ?string
      */
-    private function getfeedbackforrange(int $catscaleid, int $groupnumber): ?string
-    {
+    private function getfeedbackforrange(int $catscaleid, int $groupnumber): ?string {
         // TODO: Implement getting the feedback.
         return null;
 
