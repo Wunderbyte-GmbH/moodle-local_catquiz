@@ -264,9 +264,9 @@ class feedback {
                 $mform->addHelpButton('catquiz_courses_' . $scale->id . '_' . $j, 'setcourseenrolmentforscale', 'local_catquiz');
 
                 // Checkbox dependent on groupselect and courseselect.
-                $subelements[] = $mform->addElement('advcheckbox', 'enrolement_message_checkbox' . $scale->id . '_'. $j,
+                $subelements[] = $mform->addElement('advcheckbox', 'enrolement_message_checkbox_' . $scale->id . '_'. $j,
                 get_string('setautonitificationonenrolmentforscale', 'local_catquiz'), null, null, [0, 1]);
-                $mform->setDefault('enrolement_message_checkbox' . $scale->id . '_'. $j, 1);
+                $mform->setDefault('enrolement_message_checkbox_' . $scale->id . '_'. $j, 1);
 
                 // TODO: If none of both ('catquiz_groups_'... & 'catquiz_courses_'...) is selected, hide checkbox.
             }
