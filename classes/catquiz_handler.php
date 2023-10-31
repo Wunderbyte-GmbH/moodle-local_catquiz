@@ -556,10 +556,56 @@ class catquiz_handler {
                     }
                 }
             }
-
             return;
+        } else if (isset($values['copysettingsforallsubscales'])) {
+            // Copy values from parent scale to all other subscale elements.
+            $catscaleid = $values['catquiz_catscales'];
+            $subscaleids = [];
+            $numberoffeedbackoptions = intval($values['numberoffeedbackoptionsselect']);
+            $standardvalues = [];
+            $feedbackvaluekeys = [
+                'feedback_scaleid_limit_lower_',
+                'feedback_scaleid_limit_upper_',
+                'wb_colourpicker_',
+                'feedbackeditor_scaleid_',
+                'catquiz_groups_',
+                'catquiz_courses_',
+                'enrolement_message_checkbox_',
+            ];
+            // Fetch standard values from the parentscale, we want to apply to all subscales.
+            for ($j = 1; $j <= $numberoffeedbackoptions; $j++) {
+                foreach ($feedbackvaluekeys as $feedbackvaluekey) {
+                    if (!empty($standardvalues[$feedbackvaluekey])) {
+                        $standardvalues[$feedbackvaluekey];
+                    }
+                    $keyname = $feedbackvaluekey . $catscaleid . '_' . $j;
+                    $standardvalues[$feedbackvaluekey][$j] = $values[$keyname] ?: null;
+                }
+            }
+
+            // Get the ids of all scales to apply feedback to.
+            foreach ($values as $k => $v) {
+                if (strpos($k, 'catquiz_subscalecheckbox') !== false
+                    && intval($v) === 1 ) {
+                    $subscaleids[] = trim($k, 'catquiz_subscalecheckbox_');
+                }
+            }
+
+            // Apply standard values to all subscales.
+            // For all keys (in array) with all subscales (in array) for required number of feedbackoptions.
+            foreach ($values as $k => $v) {
+                foreach ($feedbackvaluekeys as $feedbackvaluekey) {
+                    foreach ($subscaleids as $subscaleid) {
+                        for ($j = 1; $j <= $numberoffeedbackoptions; $j++) {
+                            $subscalekey = $feedbackvaluekey . $subscaleid . '_' . $j;
+                            $values[$subscalekey] = $standardvalues[$feedbackvaluekey][$j];
+                        }
+                    }
+                }
+            }
+            $finished = "oh yeah";
         } else if (!isset($values["submitcattestoption"])
-            || $values["submitcattestoption"] != "cattestsubmit") {
+        || $values["submitcattestoption"] != "cattestsubmit") {
             return;
         }
 
