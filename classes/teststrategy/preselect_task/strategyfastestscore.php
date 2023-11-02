@@ -62,29 +62,6 @@ final class strategyfastestscore extends preselect_task implements wb_middleware
             return $q2->id <=> $q1->id;
         });
 
-        // Save the surrounding questions with higher and lower difficulty.
-        $qdiff = $context['questions'];
-        uasort($qdiff, fn ($q1, $q2) => $q1->difficulty <=> $q2->difficulty);
-        if (count($qdiff) === 1) {
-            $context['nextbestquestion_before'] = reset($qdiff);
-            $context['nextbestquestion_after'] = reset($qdiff);
-        } else {
-            // We find the position of the selected question within the
-            // difficulty-sorted question list $qdiff so that we can find the
-            // neighboring questions.
-            $selected = reset($context['questions']);
-            $pos = array_search($selected->id, array_keys($qdiff));
-
-            $afterindex = $pos === count($context['questions']) - 1 ? $pos : $pos + 1;
-            [$after] = array_slice($qdiff, $afterindex, 1);
-
-            $beforeindex = $pos === 0 ? 0 : $pos - 1;
-            [$before] = array_slice($qdiff, $beforeindex, 1);
-
-            $context['nextbestquestion_before'] = $before;
-            $context['nextbestquestion_after'] = $after;
-        }
-
         return result::ok(reset($context['questions']));
     }
 

@@ -104,34 +104,24 @@ class graphicalsummary extends feedbackgenerator {
         }
         $graphicalsummary = [];
         foreach ($cachedcontexts as $index => $data) {
-
-            if ($index > 0) {
-                $lastresponse = $data['lastresponse'];
-                $lastquestion = $data['lastquestion'];
-                $graphicalsummary[$index - 1]['lastresponse'] = $lastresponse['fraction'];
-                $graphicalsummary[$index - 1]['difficulty'] = $lastquestion->difficulty;
-                $graphicalsummary[$index - 1]['fisherinformation'] = $lastquestion->fisherinformation ?? null;
-                $graphicalsummary[$index - 1]['score'] = $lastquestion->score ?? null;
-            }
-            if ($index === array_key_last($cachedcontexts)) {
-                $lastquestion = $cache->get('lastquestion');
-                $graphicalsummary[$index]['difficulty'] = $lastquestion->difficulty;
-                $graphicalsummary[$index]['fisherinformation'] = $lastquestion->fisherinformation;
-                $graphicalsummary[$index]['score'] = $lastquestion->score;
+            if ($index === 0) {
+                continue;
             }
 
-            $nextbestbefore = isset($data['nextbestquestion_before'])
-                ? $data['nextbestquestion_before']
-                : null;
-            $nextbestafter = isset($data['nextbestquestion_after'])
-                ? $data['nextbestquestion_after']
-                : null;
-
-            $graphicalsummary[$index] = [
-                'personability' => $data['person_ability'][$data['catscaleid']],
-                'difficultynextbefore' => $nextbestbefore ? $nextbestbefore->difficulty ?? null : null,
-                'difficultynextafter' => $nextbestafter ? $nextbestafter->difficulty ?? null : null,
-            ];
+            $lastresponse = $data['lastresponse'];
+            $lastquestion = $data['lastquestion'];
+            $graphicalsummary[$index - 1]['lastresponse'] = $lastresponse['fraction'];
+            $graphicalsummary[$index - 1]['difficulty'] = $lastquestion->difficulty;
+            $graphicalsummary[$index - 1]['questionscale'] = $lastquestion->catscaleid;
+            $graphicalsummary[$index - 1]['fisherinformation'] = $lastquestion->fisherinformation ?? null;
+            $graphicalsummary[$index - 1]['score'] = $lastquestion->score ?? null;
+            [$before, $after] = $this->getneighborquestions(
+                $lastquestion,
+                $cachedcontexts[$index - 1]['questions']
+            );
+            $graphicalsummary[$index - 1]['difficultynextbefore'] = $before->difficulty;
+            $graphicalsummary[$index - 1]['difficultynextafter'] = $after->difficulty;
+            $graphicalsummary[$index - 1]['personability'] = $data['person_ability'][$data['catscaleid']];
         }
         return ['graphicalsummary' => $graphicalsummary];
     }
@@ -149,17 +139,22 @@ class graphicalsummary extends feedbackgenerator {
         $chart = new \core\chart_line();
         $chart->set_smooth(true); // Calling set_smooth() passing true as parameter, will display smooth lines.
         $difficulties = array_map(fn($round) => $round['difficulty'] ?? null, $data);
+        $questionscales = array_map(fn($round) => $round['questionscale'] ?? null, $data);
         $fractions = array_map(fn($round) => $round['lastresponse'] ?? null, $data);
-        $abilities = array_map(fn($round) => $round['personability'], $data);
+        $abilities = array_map(fn($round) => $round['personability'] ?? null, $data);
         $fisherinfo = array_map(fn($round) => $round['fisherinformation'] ?? null, $data);
-        $diffnextbefore = array_map(fn($round) => $round['difficultynextbefore'], $data);
-        $diffnextafter = array_map(fn($round) => $round['difficultynextafter'], $data);
+        $diffnextbefore = array_map(fn($round) => $round['difficultynextbefore'] ?? null, $data);
+        $diffnextafter = array_map(fn($round) => $round['difficultynextafter'] ?? null, $data);
         $score = array_map(fn($round) => $round['score'] ?? null, $data);
 
         // Create the graph for difficulty.
         $difficultieschart = new \core\chart_series(
             get_string('difficulty', 'local_catquiz'),
             $difficulties
+        );
+        $questionscalechart = new \core\chart_series(
+            'scale of selected question',
+            $questionscales
         );
         $fractionschart = new \core\chart_series(
             get_string('response', 'local_catquiz'),
@@ -192,10 +187,40 @@ class graphicalsummary extends feedbackgenerator {
         $chart->add_series($scorechart);
         $chart->add_series($diffnextbeforechart);
         $chart->add_series($diffnextafterchart);
+        $chart->add_series($questionscalechart);
 
         $labels = range(0, count($difficulties) - 1);
         $chart->set_labels($labels);
 
         return html_writer::tag('div', $OUTPUT->render($chart), ['dir' => 'ltr']);
+    }
+
+    /**
+     * Returns the next-more-difficult and next-easier questions surounding the
+     * selected question.
+     *
+     * @param mixed $selectedquestion
+     * @param array $questionpool
+     * @param string $property Sort by this property before finding the neighbor questions.
+     * @return array
+     */
+    private function getneighborquestions($selectedquestion, $questionpool, $property = "difficulty") {
+        uasort($questionpool, fn($q1, $q2) => $q1->$property <=> $q2->$property);
+        if (count($questionpool) === 1) {
+            return [reset($questionpool), reset($questionpool)];
+        }
+
+        // We find the position of the selected question within the
+        // $property-sorted question list, so that we can find the
+        // neighboring questions.
+        $pos = array_search($selectedquestion->id, array_keys($questionpool));
+
+        $afterindex = $pos === count($questionpool) - 1 ? $pos : $pos + 1;
+        [$after] = array_slice($questionpool, $afterindex, 1);
+
+        $beforeindex = $pos === 0 ? 0 : $pos - 1;
+        [$before] = array_slice($questionpool, $beforeindex, 1);
+
+        return [$before, $after];
     }
 }
