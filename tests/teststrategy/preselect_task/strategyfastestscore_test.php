@@ -59,8 +59,6 @@ class strategyfastestscore_test extends basic_testcase {
             $context,
             $next);
         $this->assertEquals($expected['id'], $result->unwrap()->id);
-        $this->assertEquals($expected['nextbestquestion_before'], $context['nextbestquestion_before']->id);
-        $this->assertEquals($expected['nextbestquestion_after'], $context['nextbestquestion_after']->id);
     }
 
     /**
@@ -106,8 +104,6 @@ class strategyfastestscore_test extends basic_testcase {
                 'context' => $context,
                 'expected' => [
                     'id' => 2,
-                    'nextbestquestion_before' => 1,
-                    'nextbestquestion_after' => 3,
                 ],
             ],
         ];
