@@ -50,7 +50,7 @@ class model_person_ability_estimator_catcalc_test extends basic_testcase {
      * @param mixed $responses
      * @param mixed $itemparams
      *
-     *
+     * @group large
      */
     public function test_person_ability_estimation_returns_expected_values(
         $expected,
