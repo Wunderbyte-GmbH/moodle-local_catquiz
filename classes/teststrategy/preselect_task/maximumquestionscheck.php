@@ -60,7 +60,11 @@ final class maximumquestionscheck extends preselect_task implements wb_middlewar
             );
             // TODO: Error handling if no question was answered.
             $context['lastresponse'] = $lastresponse[$context['userid']]['component'][$context['lastquestion']->id];
-            return result::err(status::ERROR_REACHED_MAXIMUM_QUESTIONS);
+
+            // Update the person ability and then end the quiz.
+            $next = fn () => result::err(status::ERROR_REACHED_MAXIMUM_QUESTIONS);
+            $updatepersonability = new updatepersonability();
+            return $updatepersonability->process($context, $next);
         }
 
         return $next($context);
