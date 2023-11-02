@@ -178,11 +178,11 @@ class graphicalsummary extends feedbackgenerator {
             $score
         );
         $diffnextbeforechart = new \core\chart_series(
-            get_string('difficulty_next_easier', 'local_catquiz'),
+            get_string('difficulty_next_more_difficult', 'local_catquiz'),
             $diffnextbefore
         );
         $diffnextafterchart = new \core\chart_series(
-            get_string('difficulty_next_more_difficult', 'local_catquiz'),
+            get_string('difficulty_next_easier', 'local_catquiz'),
             $diffnextafter
         );
         $chart->add_series($difficultieschart);
