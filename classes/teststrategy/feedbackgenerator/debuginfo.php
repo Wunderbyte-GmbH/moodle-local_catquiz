@@ -53,6 +53,9 @@ class debuginfo extends feedbackgenerator {
     /**
      * Get teacher feedback.
      *
+     * This renders a link with the href attribute set to data:text/csv and the
+     * data contained within the link.
+     *
      * @param array $data
      *
      * @return array
@@ -60,7 +63,100 @@ class debuginfo extends feedbackgenerator {
      */
     protected function get_teacherfeedback(array $data): array {
         global $OUTPUT;
-        $feedback = $OUTPUT->render_from_template('local_catquiz/feedback/debuginfo', ['data' => $data['debuginfo']]);
+
+        $columnames = [
+            'userid',
+            'attemptid',
+            'questionsattempted',
+            'timestamp',
+            'contextid',
+            'catscale',
+            'teststrategy',
+            'personabilities',
+            'lastquestion',
+            'questions',
+            'active_scales',
+            'selectedscale',
+            'lastmiddleware',
+            'updateabilityfallback',
+            'excluded subscales',
+            'lastresponse',
+            'standard error',
+            'num questions per scale',
+        ];
+        $csvstring = implode(';', $columnames).PHP_EOL;
+
+        foreach ($data['debuginfo'] as $row) {
+            $rowarr = [];
+            $rowarr[] = $row['userid'];
+            $rowarr[] = $row['attemptid'];
+            $rowarr[] = $row['questionsattempted'];
+            $rowarr[] = $row['timestamp'];
+            $rowarr[] = $row['contextid'];
+            $rowarr[] = $row['catscale'];
+            $rowarr[] = $row['teststrategy'];
+            $rowarr[] = $row['personabilities'];
+
+            $lastquestion = $row['lastquestion'];
+            if (! $lastquestion) {
+                $rowarr[] = 'NA';
+            } else {
+                $rowarr[] =
+                "id: " . $lastquestion['id']
+                .", score: " . $lastquestion['score']
+                .", fisherinformation: " . $lastquestion['fisherinformation'] ?? 'NA'
+                .", lasttimeplayedpenalty: " . $lastquestion['lasttimeplayedpenalty'] ?? 'NA'
+                .", difficulty: " . $lastquestion['difficulty']
+                .", fraction: " . $lastquestion['fraction'];
+            }
+
+            $questions = $row['questions'];
+            if (! $questions) {
+                $rowarr[] = 'NA';
+            } else {
+                $questionsstr = "";
+                foreach ($questions as $question) {
+                    $questionsstr .= sprintf(
+                       "id: %s, type: %s, fisherinformation: %s, score: %s%s",
+                       $question['id'],
+                       $question['type'],
+                       $question['fisherinformation'],
+                       $question['score'],
+                       isset($question['last']) ? "" : ","
+                    );
+                }
+                $rowarr[] = $questionsstr;
+            }
+
+            $rowarr[] = $row['active_scales'];
+            $rowarr[] = $row['selectedscale'];
+            $rowarr[] = $row['lastmiddleware'];
+            $rowarr[] = $row['updateabilityfallback'];
+            $rowarr[] = $row['excludedsubscales'];
+            $rowarr[] = $row['lastresponse'];
+            $se = $row['standarderrorperscale'];
+            if (! $se) {
+                $rowarr[] = 'NA';
+            } else {
+                $rowarr[] = sprintf(
+                    "%s: [played: %d, remaining: %d]%s",
+                    $se['name'],
+                    $se['se']['played'],
+                    $se['se']['remaining'],
+                    isset($se['se']['last']) ? "" : ","
+                );
+            }
+
+            $rowarr[] = $row['numquestionsperscale'] ?? 'NA';
+            $csvstring .= implode(';', $rowarr).PHP_EOL;
+        }
+        $feedback = $OUTPUT->render_from_template(
+            'local_catquiz/feedback/debuginfo',
+            [
+                'data' => rawurlencode($csvstring),
+                'attemptid' => $data['debuginfo'][0]['attemptid'] ?? 'nan',
+            ]
+        );
 
         return [
             'heading' => $this->get_heading(),

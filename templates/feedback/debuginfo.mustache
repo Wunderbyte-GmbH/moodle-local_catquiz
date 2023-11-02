@@ -36,29 +36,4 @@
     }
 }}
 
-userid;attemptid;questionsattempted;timestamp;contextid;catscale;teststrategy;personabilities;lastquestion;questions;active_scales;selectedscale;lastmiddleware;updateabilityfallback;excluded subscales;lastresponse;standard error;num questions per scale<br>
-{{#data}}
-    {{ userid }}
-    ;{{ attemptid }}
-    ;{{questionsattempted}}
-    ;{{ timestamp }}
-    ;{{ contextid }}
-    ;{{ catscale }}
-    ;{{ teststrategy }}
-    ;{{ personabilities }}
-    ;{{#lastquestion}}"id: {{ id }}, score: {{ score }}, fisherinformation: {{#fisherinformation}}{{fisherinformation}}{{/fisherinformation}}{{^fisherinformation}}NA{{/fisherinformation}}, lasttimeplayedpenalty: {{#lasttimeplayedpenalty}}{{lasttimeplayedpenalty}}{{/lasttimeplayedpenalty}}{{^lasttimeplayedpenalty}}NA{{/lasttimeplayedpenalty}}, difficulty: {{difficulty}}, fraction: {{fraction}}"{{/lastquestion}}{{^lastquestion}}NA{{/lastquestion}}
-    ;{{#questions}}
-        "id: {{id}}, type: {{type}}, fisherinformation: {{fisherinformation}}, score: {{score}}"{{^last}},{{/last}}
-    {{/questions}}
-    {{^questions}}
-    NA
-    {{/questions}}
-    ;{{ active_scales }}
-    ;{{ selectedscale }}
-    ;{{ lastmiddleware }}
-    ;{{ updateabilityfallback }}
-    ;{{ excludedsubscales }}
-    ;{{ lastresponse }}
-    ;{{#standarderrorperscale}}{{name}}: [{{#se}}played: {{played}}, remaining: {{remaining}}{{/se}}]{{^last}}, {{/last}}{{/standarderrorperscale}}{{^standarderrorperscale}}NA{{/standarderrorperscale}}
-    ;{{numquestionsperscale}}{{^numquestionsperscale}}NA{{/numquestionsperscale}}<br>
-{{/data}}
+<a download="catquiz_debuginfo_attempt{{attemptid}}.csv" id="download-link" href="data:text/csv;charset=utf-8,{{{data}}}" target="_blank">Download Debug Info as CSV file</a>
