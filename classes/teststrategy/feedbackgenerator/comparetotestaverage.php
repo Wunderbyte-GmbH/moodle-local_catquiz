@@ -101,6 +101,48 @@ class comparetotestaverage extends feedbackgenerator {
     }
 
     /**
+     * Get feedbackdata.
+     *
+     * @param object $quizsettings
+     * @return array
+     *
+     */
+    private function get_feedbacks($quizsettings): array {
+        if (!$quizsettings) {
+            return [];
+        }
+        // For the moment, we collect the feedbackdata only for the parentscale.
+        $feedbacks = [];
+        $colorarray = json_decode($quizsettings->colors, true) ?? [];
+        $parentscaleid = $quizsettings->catquiz_catscales;
+        $numberoffeedbackoptions = intval($quizsettings->numberoffeedbackoptionsselect);
+
+        $feedbacktexts = [];
+        for ($j = 1; $j <= $numberoffeedbackoptions; $j++) {
+            $colorkey = 'wb_colourpicker_' . $parentscaleid . '_' . $j;
+            $feedbacktextkey = 'feedbackeditor_scaleid_' . $parentscaleid . '_' . $j;
+
+            // TODO: Handling if feedback is in other form than text.
+            $feedbackelement = $quizsettings->$feedbacktextkey;
+            $textelement = $feedbackelement->text;
+            $text = strip_tags($textelement);
+
+            $colorname = $quizsettings->$colorkey;
+            $colorvalue = $colorarray[$colorname];
+
+            $feedbacktexts[$colorvalue] = $text;
+        }
+
+        foreach ($colorarray as $colorname => $colorvalue) {
+            $feedbacks[] = [
+                'subcolorcode' => $colorvalue,
+                'subfeedbacktext' => $feedbacktexts[$colorvalue] ?? "",
+            ];
+        }
+        return $feedbacks;
+    }
+
+    /**
      * Load data.
      *
      * @param int $attemptid
@@ -160,6 +202,7 @@ class comparetotestaverage extends feedbackgenerator {
             'userabilityposition' => ($ability + 5) * 10,
             'text' => $text,
             'colorgradestring' => $colorgradientstring,
+            'feedbackbarlegend' => $this->get_feedbacks($quizsettings),
         ];
     }
 }

@@ -33,7 +33,6 @@ use local_catquiz\data\dataapi;
 use local_catquiz\local\result;
 use local_catquiz\feedback\info;
 use local_catquiz\feedback\preselect_task;
-use local_catquiz\teststrategy\feedbackgenerator\comparetotestaverage;
 use local_catquiz\wb_middleware_runner;
 use moodle_exception;
 use MoodleQuickForm;
@@ -128,13 +127,16 @@ class feedback {
         // Generate the options for the colors. Same values are applied to all subscales and subfeedbacks.
         $coloroptions = self::get_array_of_colors($numberoffeedbackspersubscale);
 
+        // TODO: Check if colorbar is to be generated for each (sub-)scale to process exact limits of feedback parts.
         // Same colors as selected should be displayed in the feedback progressbar comparing testresults to average.
         // So we generate a string and save it as hidden element.
         $colorgradientstring = self::set_colors_for_colorbar($coloroptions);
-
-        // TODO: Make sure the information is updated when value is changed. Check in catquiz_handler.
         $mform->addElement('hidden', 'colorgradientstring', $colorgradientstring);
         $mform->setType('colorgradientstring', PARAM_TEXT);
+
+        // Return array of colors.
+        $mform->addElement('hidden', 'colors', json_encode($coloroptions));
+        $mform->setType('colors', PARAM_RAW);
 
         foreach ($scales as $scale) {
             $subelements = [];
@@ -146,6 +148,7 @@ class feedback {
                 continue;
             }
 
+            $feedbacktexts = [];
             for ($j = 1; $j <= $numberoffeedbackspersubscale; $j++) {
                 // Check for each feedback editor field, if there is content.
                 // This is the preparation for the header element (to be appended in the end) where we apply the distinction.
@@ -210,7 +213,6 @@ class feedback {
                     get_string('feedback_colorrange', 'local_catquiz'),
                     $coloroptions
                 );
-
                 $subelements[] = $mform->addElement('hidden', 'selectedcolour', '', PARAM_TEXT);
                 // We have require JS to click no submit button on change of test environment.
                 $PAGE->requires->js_call_amd('local_catquiz/colourpicker', 'init');

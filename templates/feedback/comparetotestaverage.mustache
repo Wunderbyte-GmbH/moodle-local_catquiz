@@ -63,20 +63,10 @@
 </div>
 <div class="catquiz-legend">
     <h4>{{#str}}feedbackbarlegend, local_catquiz{{/str}}</h4>
-    <div>
-        <span class="catquiz-legend-symbol" style="background: #ff0000;"></span>
-        <span class="catquiz-legend-description">{{#str}}feedbackbarlegend_region_1, local_catquiz{{/str}}</span>
-    </div>
-    <div>
-        <span class="catquiz-legend-symbol" style="background: #ff8725;"></span>
-        <span class="catquiz-legend-description">{{#str}}feedbackbarlegend_region_2, local_catquiz{{/str}}</span>
-    </div>
-    <div>
-        <span class="catquiz-legend-symbol" style="background: #edff4f;"></span>
-        <span class="catquiz-legend-description">{{#str}}feedbackbarlegend_region_3, local_catquiz{{/str}}</span>
-    </div>
-    <div>
-        <span class="catquiz-legend-symbol" style="background: #00ff00;"></span>
-        <span class="catquiz-legend-description">{{#str}}feedbackbarlegend_region_4, local_catquiz{{/str}}</span>
-    </div>
+    {{#feedbackbarlegend}}
+        <div>
+            <span class="catquiz-legend-symbol" style="background: {{subcolorcode}};"></span>
+            <span class="catquiz-legend-description">{{subfeedbacktext}}</span>
+        </div>
+    {{/feedbackbarlegend}}
 </div>
