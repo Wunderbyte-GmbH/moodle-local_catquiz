@@ -37,11 +37,12 @@
     Example context (json):
     {
         "selected": 1,
-        "colour": "#123456",
+        "colour": "blue",
+        "colourvalue": "#123456",
         "id": 12345,
         "colourname": "blue"
     }
 }}
 <span class="colourpickercircle{{#selected}} selected{{/selected}}"
-      style="background-color: {{colourvalue}}; border-color: black"
+      style="background-color: {{colourvalue}}; border-color: #000000"
       title="{{colour}}" data-colour="{{colour}}" data-id="colourpickercircle_id_{{id}}"></span>
