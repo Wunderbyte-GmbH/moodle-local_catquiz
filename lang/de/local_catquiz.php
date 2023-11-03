@@ -204,6 +204,9 @@ $string['messageprovider:updatecatscale'] = 'Hat Berechtigung zum Updaten der CA
 $string['catquiz:canmanage'] = 'Darf Catquiz Plugin verwalten';
 $string['catquiz:subscribecatscales'] = 'Darf CAT Skalen abonnieren';
 $string['catquiz:manage_catscales'] = 'Darf CAT Skalen verwalten';
+$string['catquiz:manage_catscales'] = 'Darf CAT Skalen verwalten';
+$string['catquiz:manage_catcontexts'] = 'Darf CAT Kontexte verwalten';
+$string['catquiz:manage_testenvironments'] = 'Darf Testumgebung verwalten';
 
 // Role.
 $string['catquizroledescription'] = 'Catquiz VerwalterIn';

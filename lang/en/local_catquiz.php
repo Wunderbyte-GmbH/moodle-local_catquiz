@@ -205,6 +205,8 @@ $string['messageprovider:updatecatscale'] = 'Is allowed to update catscale';
 $string['catquiz:canmanage'] = 'Is allowed to manage Catquiz plugin';
 $string['catquiz:subscribecatscales'] = 'Is allowed to subscribe to Catquiz CAT scales';
 $string['catquiz:manage_catscales'] = 'Is allowed to manage Catquiz CAT scales';
+$string['catquiz:manage_catcontexts'] = 'Is allowed to manage Catquiz CAT contexts';
+$string['catquiz:manage_testenvironments'] = 'Is allowed to manage test-environment';
 
 // Role.
 $string['catquizroledescription'] = 'Catquiz Manager';
