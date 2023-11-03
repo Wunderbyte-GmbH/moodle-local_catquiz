@@ -56,9 +56,11 @@ function addClickListener(selectcolor) {
     const colours = [...selectcolor.querySelectorAll('option')].map(el => {
 
         const colour = el.value;
+
         return {
             colour,
             colourname: el.textContent,
+            colourvalue: el.innerHTML,
             selected: selectcolor.value == el.value,
             id: selectcolor.name
         };
