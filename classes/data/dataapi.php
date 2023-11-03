@@ -111,7 +111,7 @@ class dataapi {
         $data = new stdClass;
         $data->name = get_string('uploadcontext', 'local_catquiz', [
             'scalename' => $scalename,
-            'usertime' => $usertime
+            'usertime' => $usertime,
             ]);
         $data->starttimestamp = $defaultcontext->starttimestamp;
         $data->endtimestamp = $defaultcontext->endtimestamp;
