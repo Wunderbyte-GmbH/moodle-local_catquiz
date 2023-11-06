@@ -108,38 +108,31 @@ class comparetotestaverage extends feedbackgenerator {
      * @return array
      *
      */
-    private function get_feedbacks($quizsettings): array {
+    private function get_colorbarlegend($quizsettings): array {
         if (!$quizsettings) {
             return [];
         }
-        // For the moment, we collect the feedbackdata only for the parentscale.
+        // We collect the feedbackdata only for the parentscale.
         $feedbacks = [];
-        $colorarray = json_decode($quizsettings->colors, true) ?? [];
         $parentscaleid = $quizsettings->catquiz_catscales;
         $numberoffeedbackoptions = intval($quizsettings->numberoffeedbackoptionsselect);
+        $colorarray = feedbackclass::get_array_of_colors($numberoffeedbackoptions);
 
-        $feedbacktexts = [];
         for ($j = 1; $j <= $numberoffeedbackoptions; $j++) {
             $colorkey = 'wb_colourpicker_' . $parentscaleid . '_' . $j;
-            $feedbacktextkey = 'feedbackeditor_scaleid_' . $parentscaleid . '_' . $j;
+            $feedbacktextkey = 'feedbacklegend_scaleid_' . $parentscaleid . '_' . $j;
 
-            // TODO: Handling if feedback is in other form than text.
-            $feedbackelement = $quizsettings->$feedbacktextkey;
-            $textelement = $feedbackelement->text;
-            $text = strip_tags($textelement);
+            $text = $quizsettings->$feedbacktextkey ?? "";
 
             $colorname = $quizsettings->$colorkey;
             $colorvalue = $colorarray[$colorname];
 
-            $feedbacktexts[$colorvalue] = $text;
-        }
-
-        foreach ($colorarray as $colorname => $colorvalue) {
             $feedbacks[] = [
                 'subcolorcode' => $colorvalue,
-                'subfeedbacktext' => $feedbacktexts[$colorvalue] ?? "",
+                'subfeedbacktext' => $text,
             ];
         }
+
         return $feedbacks;
     }
 
@@ -266,8 +259,8 @@ class comparetotestaverage extends feedbackgenerator {
             'testaverageposition' => ($testaverage + 5) * 10,
             'userabilityposition' => ($ability + 5) * 10,
             'text' => $text,
-            'feedbackbarlegend' => $this->get_feedbacks($quizsettings),
             'colorgradestring' => $this->get_colorgradientstring($quizsettings),
+            'feedbackbarlegend' => $this->get_colorbarlegend($quizsettings),
         ];
     }
 }
