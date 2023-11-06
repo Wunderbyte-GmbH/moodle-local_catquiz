@@ -383,5 +383,20 @@ function xmldb_local_catquiz_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2023091900, 'local', 'catquiz');
     }
 
+    if ($oldversion < 2023110600) {
+
+        // Define field contextid to be added to local_catquiz_catscales.
+        $table = new xmldb_table('local_catquiz_catscales');
+        $field = new xmldb_field('contextid', XMLDB_TYPE_INTEGER, '10', null, null, null, null, 'parentid');
+
+        // Conditionally launch add field contextid.
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        // Catquiz savepoint reached.
+        upgrade_plugin_savepoint(true, 2023110600, 'local', 'catquiz');
+    }
+
     return true;
 }
