@@ -153,22 +153,16 @@ class comparetotestaverage extends feedbackgenerator {
     private function get_colorgradientstring($quizsettings): string {
         if (!$quizsettings) {
             // TODO maybe return default.
-            return [];
+            // Default: $interval = 100 / ($totalvalues - 1);.
+            return "";
         }
 
-        $colorarray = json_decode($quizsettings->colors, true) ?? [];
         $parentscaleid = $quizsettings->catquiz_catscales;
         $numberoffeedbackoptions = intval($quizsettings->numberoffeedbackoptionsselect);
+        $colorarray = feedbackclass::get_array_of_colors($numberoffeedbackoptions);
         $colorvalues = array_values($colorarray);
 
-        // TODO: Get intervalls and use.
-
-        // lowest limit first - highest limit last:
-        // zusammen 100%
-        // schritte ergeben prozentabteile, wobei der anfang bei null ist und das ende bei 100%
-
         $totalvalues = count($colorvalues);
-        // Standard: $interval = 100 / ($totalvalues - 1);
 
         $output = "";
 
@@ -180,7 +174,12 @@ class comparetotestaverage extends feedbackgenerator {
             $rangeend = $quizsettings->$highestlimitkey;
 
             $percentage = $this->calculate_percentage($quizsettings, $parentscaleid, $i, $rangestart, $rangeend);
-            $output .= "{$colorvalues[$i - 1]} {$percentage}%, ";
+
+            $colorkey = 'wb_colourpicker_' . $parentscaleid . '_' . $i;
+            $colorname = $quizsettings->$colorkey;
+            $colorvalue = $colorarray[$colorname];
+
+            $output .= "{$colorvalue} {$percentage}%, ";
         }
 
         $output .= "{$colorvalues[$totalvalues - 1]} 100%";
@@ -189,6 +188,15 @@ class comparetotestaverage extends feedbackgenerator {
 
     }
 
+    /**
+     * @param stdClass $quizsettings
+     * @param int $parentscaleid
+     * @param int $i
+     * @param float $rangestart
+     * @param float $rangeend
+     *
+     * @return float
+     */
     private function calculate_percentage($quizsettings, $parentscaleid, $i, $rangestart, $rangeend) {
         $lowerlimitkey = "feedback_scaleid_limit_lower_" . $parentscaleid . "_" . $i;
         $upperlimitkey = "feedback_scaleid_limit_upper_" . $parentscaleid . "_" . $i;
