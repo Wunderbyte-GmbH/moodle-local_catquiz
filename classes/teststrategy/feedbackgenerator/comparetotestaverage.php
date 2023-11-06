@@ -255,8 +255,6 @@ class comparetotestaverage extends feedbackgenerator {
             }
         }
 
-        $colorgradientstring = $quizsettings->colorgradientstring;
-
         $testaverage = (new firstquestionselector())->get_median_ability_of_test($personparams);
 
         return [
