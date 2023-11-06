@@ -153,26 +153,31 @@ class comparetotestaverage extends feedbackgenerator {
         $parentscaleid = $quizsettings->catquiz_catscales;
         $numberoffeedbackoptions = intval($quizsettings->numberoffeedbackoptionsselect);
         $colorarray = feedbackclass::get_array_of_colors($numberoffeedbackoptions);
-        $colorvalues = array_values($colorarray);
-
-        $totalvalues = count($colorvalues);
+        $gradient = COLORBARGRADIENT;
 
         $output = "";
 
         for ($i = 1; $i <= $numberoffeedbackoptions; $i++) {
             $lowestlimitkey = "feedback_scaleid_limit_lower_" . $parentscaleid . "_1";
             $highestlimitkey = "feedback_scaleid_limit_upper_" . $parentscaleid . "_" . $numberoffeedbackoptions;
-
             $rangestart = $quizsettings->$lowestlimitkey;
             $rangeend = $quizsettings->$highestlimitkey;
 
-            $percentage = $this->calculate_percentage($quizsettings, $parentscaleid, $i, $rangestart, $rangeend);
+            $lowerlimitkey = "feedback_scaleid_limit_lower_" . $parentscaleid . "_" . $i;
+            $upperlimitkey = "feedback_scaleid_limit_upper_" . $parentscaleid . "_" . $i;
+
+            $lowerlimit = $quizsettings->$lowerlimitkey;
+            $upperlimit = $quizsettings->$upperlimitkey;
+
+            $lowerpercentage = (($lowerlimit - $rangestart) / ($rangeend - $rangestart)) * 100 + $gradient;
+            $upperpercentage = (($upperlimit - $rangestart) / ($rangeend - $rangestart)) * 100 - $gradient;
 
             $colorkey = 'wb_colourpicker_' . $parentscaleid . '_' . $i;
             $colorname = $quizsettings->$colorkey;
             $colorvalue = $colorarray[$colorname];
 
-            $output .= "{$colorvalue} {$percentage}%, ";
+            $output .= "{$colorvalue} {$lowerpercentage}%, ";
+            $output .= "{$colorvalue} {$upperpercentage}%, ";
         }
         // Remove the last comma.
         $output = rtrim($output, ", ");
