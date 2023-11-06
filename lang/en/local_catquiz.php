@@ -401,6 +401,8 @@ $string['numberoffeedbackoptionpersubscale_help'] = 'Select how many options of 
 $string['choosesubscaleforfeedback'] = 'Select a subscale';
 $string['feedbackcompletedpartially'] = '{$a} feedbacks completed.';
 $string['feedbackcompletedentirely'] = 'All feedbacks completed.';
+$string['feedbacklegend'] = 'Feedback to be displayed in color bar legend';
+$string['disclaimer:numberoffeedbackchange'] = 'Changes may require an adjustment of feedback content.';
 
 // Check display line breaks etc.
 $string['choosesubscaleforfeedback_help'] = 'You can now store <number of options> feedback informations for the subscales displayed. Select a (sub-)scale to enter your feedback. The colored symbols indicate the current status of processing, measured by the number of feedback options you entered:

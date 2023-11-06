@@ -398,6 +398,8 @@ $string['numberoffeedbackoptionpersubscale_help'] = 'Wählen Sie aus, wieviele O
 $string['choosesubscaleforfeedback'] = 'Subskala wählen';
 $string['feedbackcompletedpartially'] = '{$a} Feedbacks eingetragen.';
 $string['feedbackcompletedentirely'] = 'Alle Feedbacks eingetragen.';
+$string['feedbacklegend'] = 'Feedback zur Anzeige in der Legende des Farbbalkes';
+$string['disclaimer:numberoffeedbackchange'] = 'Änderungen erfordern möglicherweise eine Anpassung der Feedback Inhalte.';
 
 // Check display line breaks etc.
 $string['choosesubscaleforfeedback_help'] = 'Für die angezeigten Subskalen können Sie nun {$a} Feedback-Angaben hinterlegen. Wählen Sie die jeweilige (Sub-)Skala an, um Ihr Feedback einzugeben. Die farbigen Symbole zeigen Ihnen den aktuellen Stand der Bearbeitung an, gemessen an den vor Ihnen hinterlegten Anzahl an Feedback-Optionen:
