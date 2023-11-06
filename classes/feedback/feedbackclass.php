@@ -216,19 +216,6 @@ class feedbackclass {
                     ]);
                 $mform->setType('feedbackeditor_scaleid_' . $scale->id . '_' . $j, PARAM_RAW);
 
-                $subelements[] = $mform->addElement(
-                    'select',
-                    'wb_colourpicker_' .$scale->id . '_' . $j,
-                    get_string('feedback_colorrange', 'local_catquiz'),
-                    $coloroptions,
-                );
-                // Preset selected color regarding order of feedbacks.
-                $sequencecolors = array_keys($coloroptions);
-                $mform->setDefault('wb_colourpicker_' .$scale->id . '_' . $j, $sequencecolors[$j - 1]);
-
-                $subelements[] = $mform->addElement('hidden', 'selectedcolour', '', PARAM_TEXT);
-                $PAGE->requires->js_call_amd('local_catquiz/colourpicker', 'init');
-
                 // Text field for feedback legend. Displayed only for parentscale.
                 if ($scale->parentid == 0) {
                     $subelements[] = $mform->addElement(
@@ -237,6 +224,19 @@ class feedbackclass {
                         get_string('feedbacklegend', 'local_catquiz'),
                         'size="80"',
                     );
+
+                    $subelements[] = $mform->addElement(
+                        'select',
+                        'wb_colourpicker_' .$scale->id . '_' . $j,
+                        get_string('feedback_colorrange', 'local_catquiz'),
+                        $coloroptions,
+                    );
+                    // Preset selected color regarding order of feedbacks.
+                    $sequencecolors = array_keys($coloroptions);
+                    $mform->setDefault('wb_colourpicker_' .$scale->id . '_' . $j, $sequencecolors[$j - 1]);
+
+                    $subelements[] = $mform->addElement('hidden', 'selectedcolour', '', PARAM_TEXT);
+                    $PAGE->requires->js_call_amd('local_catquiz/colourpicker', 'init');
                 }
                 // Enrole to a group.
                 $groups = groups_get_all_groups(intval($course->id));
