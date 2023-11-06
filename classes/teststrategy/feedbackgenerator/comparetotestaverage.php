@@ -166,7 +166,7 @@ class comparetotestaverage extends feedbackgenerator {
 
         $output = "";
 
-        for ($i = 1; $i < $numberoffeedbackoptions; $i++) {
+        for ($i = 1; $i <= $numberoffeedbackoptions; $i++) {
             $lowestlimitkey = "feedback_scaleid_limit_lower_" . $parentscaleid . "_1";
             $highestlimitkey = "feedback_scaleid_limit_upper_" . $parentscaleid . "_" . $numberoffeedbackoptions;
 
@@ -181,9 +181,8 @@ class comparetotestaverage extends feedbackgenerator {
 
             $output .= "{$colorvalue} {$percentage}%, ";
         }
-
-        $output .= "{$colorvalues[$totalvalues - 1]} 100%";
-
+        // Remove the last comma.
+        $output = rtrim($output, ", ");
         return $output;
 
     }
