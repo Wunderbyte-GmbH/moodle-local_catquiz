@@ -185,27 +185,6 @@ class comparetotestaverage extends feedbackgenerator {
 
     }
 
-    /**
-     * @param stdClass $quizsettings
-     * @param int $parentscaleid
-     * @param int $i
-     * @param float $rangestart
-     * @param float $rangeend
-     *
-     * @return float
-     */
-    private function calculate_percentage($quizsettings, $parentscaleid, $i, $rangestart, $rangeend) {
-        $lowerlimitkey = "feedback_scaleid_limit_lower_" . $parentscaleid . "_" . $i;
-        $upperlimitkey = "feedback_scaleid_limit_upper_" . $parentscaleid . "_" . $i;
-
-        $lowerlimit = isset($quizsettings->$lowerlimitkey) ? $quizsettings->$lowerlimitkey : 0;
-        $upperlimit = isset($quizsettings->$upperlimitkey) ? $quizsettings->$upperlimitkey : 100;
-
-        $limit = ($lowerlimit + $upperlimit) / 2;
-
-        $percentage = (($limit - $rangestart) / ($rangeend - $rangestart)) * 100;
-        return number_format($percentage, 2);
-    }
 
     /**
      * Load data.
