@@ -26,7 +26,7 @@ namespace local_catquiz\teststrategy;
 
 use cache;
 use core_component;
-use local_catquiz\feedback\feedback;
+use local_catquiz\feedback\feedbackclass;
 use local_catquiz\teststrategy\context\contextcreator;
 use MoodleQuickForm;
 
@@ -257,7 +257,7 @@ class info {
         // $mform->setDefault('catquiz_breakduration', 300);
         // phpcs:enable
 
-        feedback::instance_form_definition($mform, $elements);
+        feedbackclass::instance_form_definition($mform, $elements);
     }
 
     /**

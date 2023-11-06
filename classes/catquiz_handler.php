@@ -33,7 +33,7 @@ use coding_exception;
 use context_system;
 use core_plugin_manager;
 use Exception;
-use local_catquiz\feedback\feedback;
+use local_catquiz\feedback\feedbackclass;
 use local_catquiz\local\model\model_strategy;
 use local_catquiz\output\attemptfeedback;
 use local_catquiz\teststrategy\info;
@@ -546,9 +546,9 @@ class catquiz_handler {
                         $j = $matches[1];
 
                         if (strpos($k, '_lower')) {
-                            $value = feedback::return_limits_for_scale($numberofoptions, $j, true);
+                            $value = feedbackclass::return_limits_for_scale($numberofoptions, $j, true);
                         } else {
-                            $value = feedback::return_limits_for_scale($numberofoptions, $j, false);
+                            $value = feedbackclass::return_limits_for_scale($numberofoptions, $j, false);
                         }
 
                         $element = $mform->getElement($k);

@@ -27,10 +27,10 @@ use local_catquiz\catscale;
 use local_catquiz\event\catscale_updated;
 use local_catquiz\event\testitem_imported;
 use local_catquiz\event\testiteminscale_added;
-use local_catquiz\feedback\feedback;
 use local_catquiz\messages;
 use mod_adaptivequiz\event\attempt_completed;
 use core\event\question_deleted;
+use local_catquiz\feedback\feedbackclass;
 
 /**
  * Event observer for local_catquiz.
@@ -106,7 +106,7 @@ class local_catquiz_observer {
             'scales' => $scaledata,
         ];
 
-        feedback::inscribe_users_to_failed_scales($quizid, $result);
+        feedbackclass::inscribe_users_to_failed_scales($quizid, $result);
     }
     /**
      * Observer for the testiteminscale_added event
