@@ -135,10 +135,6 @@ class feedbackclass {
         // Generate the options for the colors. Same values are applied to all subscales and subfeedbacks.
         $coloroptions = self::get_array_of_colors($numberoffeedbackspersubscale);
 
-        // Return array of colors.
-        $mform->addElement('hidden', 'colors', json_encode($coloroptions));
-        $mform->setType('colors', PARAM_RAW);
-
         foreach ($scales as $scale) {
             $subelements = [];
             $numberoffeedbacksfilledout = 0;
@@ -224,8 +220,12 @@ class feedbackclass {
                     'select',
                     'wb_colourpicker_' .$scale->id . '_' . $j,
                     get_string('feedback_colorrange', 'local_catquiz'),
-                    $coloroptions
+                    $coloroptions,
                 );
+                // Preset selected color regarding order of feedbacks.
+                $sequencecolors = array_keys($coloroptions);
+                $mform->setDefault('wb_colourpicker_' .$scale->id . '_' . $j, $sequencecolors[$j - 1]);
+
                 $subelements[] = $mform->addElement('hidden', 'selectedcolour', '', PARAM_TEXT);
                 $PAGE->requires->js_call_amd('local_catquiz/colourpicker', 'init');
 
