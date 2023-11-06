@@ -127,13 +127,6 @@ class feedback {
         // Generate the options for the colors. Same values are applied to all subscales and subfeedbacks.
         $coloroptions = self::get_array_of_colors($numberoffeedbackspersubscale);
 
-        // TODO: Check if colorbar is to be generated for each (sub-)scale to process exact limits of feedback parts.
-        // Same colors as selected should be displayed in the feedback progressbar comparing testresults to average.
-        // So we generate a string and save it as hidden element.
-        $colorgradientstring = self::set_colors_for_colorbar($coloroptions);
-        $mform->addElement('hidden', 'colorgradientstring', $colorgradientstring);
-        $mform->setType('colorgradientstring', PARAM_TEXT);
-
         // Return array of colors.
         $mform->addElement('hidden', 'colors', json_encode($coloroptions));
         $mform->setType('colors', PARAM_RAW);
@@ -416,33 +409,6 @@ class feedback {
 
         return $coloroptions;
     }
-
-    /**
-     * Define settings for colorbar.
-     *
-     * @param array $values
-     *
-     * @return string
-     */
-    private static function set_colors_for_colorbar(array $values): string {
-
-        $colorvalues = array_values($values);
-        $totalvalues = count($colorvalues);
-        $interval = 100 / ($totalvalues - 1);
-
-        $output = "";
-
-        for ($i = 0; $i < $totalvalues - 1; $i++) {
-            $percentage = number_format($interval * $i, 2);
-            $output .= "{$colorvalues[$i]} {$percentage}%, ";
-        }
-
-        $output .= "{$colorvalues[$totalvalues - 1]} 100%";
-
-        return $output;
-    }
-
-
 
     /**
      * Takes the result of a test and applies the after test actions.

@@ -101,7 +101,7 @@ class comparetotestaverage extends feedbackgenerator {
     }
 
     /**
-     * Get feedbackdata.
+     * Write string to define color gradiant bar.
      *
      * @param object $quizsettings
      * @return array
@@ -140,6 +140,65 @@ class comparetotestaverage extends feedbackgenerator {
             ];
         }
         return $feedbacks;
+    }
+
+    /**
+     * Get feedbackdata.
+     *
+     * @param object $quizsettings
+     * @return string
+     *
+     */
+    private function get_colorgradientstring($quizsettings): string {
+        if (!$quizsettings) {
+            // TODO maybe return default.
+            return [];
+        }
+
+        $colorarray = json_decode($quizsettings->colors, true) ?? [];
+        $parentscaleid = $quizsettings->catquiz_catscales;
+        $numberoffeedbackoptions = intval($quizsettings->numberoffeedbackoptionsselect);
+        $colorvalues = array_values($colorarray);
+
+        // TODO: Get intervalls and use.
+
+        // lowest limit first - highest limit last:
+        // zusammen 100%
+        // schritte ergeben prozentabteile, wobei der anfang bei null ist und das ende bei 100%
+
+        $totalvalues = count($colorvalues);
+        // Standard: $interval = 100 / ($totalvalues - 1);
+
+        $output = "";
+
+        for ($i = 1; $i < $numberoffeedbackoptions; $i++) {
+            $lowestlimitkey = "feedback_scaleid_limit_lower_" . $parentscaleid . "_1";
+            $highestlimitkey = "feedback_scaleid_limit_upper_" . $parentscaleid . "_" . $numberoffeedbackoptions;
+
+            $rangestart = $quizsettings->$lowestlimitkey;
+            $rangeend = $quizsettings->$highestlimitkey;
+
+            $percentage = $this->calculate_percentage($quizsettings, $parentscaleid, $i, $rangestart, $rangeend);
+            $output .= "{$colorvalues[$i - 1]} {$percentage}%, ";
+        }
+
+        $output .= "{$colorvalues[$totalvalues - 1]} 100%";
+
+        return $output;
+
+    }
+
+    private function calculate_percentage($quizsettings, $parentscaleid, $i, $rangestart, $rangeend) {
+        $lowerlimitkey = "feedback_scaleid_limit_lower_" . $parentscaleid . "_" . $i;
+        $upperlimitkey = "feedback_scaleid_limit_upper_" . $parentscaleid . "_" . $i;
+
+        $lowerlimit = isset($quizsettings->$lowerlimitkey) ? $quizsettings->$lowerlimitkey : 0;
+        $upperlimit = isset($quizsettings->$upperlimitkey) ? $quizsettings->$upperlimitkey : 100;
+
+        $limit = ($lowerlimit + $upperlimit) / 2;
+
+        $percentage = (($limit - $rangestart) / ($rangeend - $rangestart)) * 100;
+        return number_format($percentage, 2);
     }
 
     /**
@@ -201,8 +260,8 @@ class comparetotestaverage extends feedbackgenerator {
             'testaverageposition' => ($testaverage + 5) * 10,
             'userabilityposition' => ($ability + 5) * 10,
             'text' => $text,
-            'colorgradestring' => $colorgradientstring,
             'feedbackbarlegend' => $this->get_feedbacks($quizsettings),
+            'colorgradestring' => $this->get_colorgradientstring($quizsettings),
         ];
     }
 }
