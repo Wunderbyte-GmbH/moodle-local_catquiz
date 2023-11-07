@@ -103,6 +103,7 @@ class dataapi {
      * @return catcontext
      */
     public static function create_new_context_for_scale(int $scaleid, string $scalename = "") {
+        global $DB;
 
         $defaultcontext = catquiz::get_default_context_object();
         $timestring = userdate(time(), get_string('strftimedatetimeshort', 'core_langconfig'));
@@ -120,6 +121,14 @@ class dataapi {
         $context = new catcontext($data);
         $context->save_or_update($data);
         catcontext::store_context_as_singleton($context, $scaleid);
+
+        // We set the new context as a default context in the catscale.
+        $catscale = new stdClass();
+        $catscale->id = $scaleid;
+        $catscale->contextid = $context->id;
+        $catscale->timemodified = time();
+        $result = $DB->update_record('local_catquiz_catscales', $catscale);
+
         return $context;
     }
 
