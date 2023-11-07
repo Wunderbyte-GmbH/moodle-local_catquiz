@@ -127,7 +127,7 @@ class dataapi {
         $catscale->id = $scaleid;
         $catscale->contextid = $context->id;
         $catscale->timemodified = time();
-        $result = $DB->update_record('local_catquiz_catscales', $catscale);
+        self::update_catscale($catscale);
 
         return $context;
     }
@@ -256,11 +256,15 @@ class dataapi {
     /**
      * Update a catscale and invalidate cache.
      *
-     * @param catscale_structure $catscale
+     * @param catscale_structure|stdClass $catscale
      * @return bool
      */
-    public static function update_catscale(catscale_structure $catscale): bool {
+    public static function update_catscale($catscale): bool {
         global $DB, $USER;
+        if (!isset($catscale->id)) {
+            throw new moodle_exception('noidset', 'local_catquiz');
+        }
+
         $result = $DB->update_record('local_catquiz_catscales', $catscale);
 
         $context = context_system::instance();

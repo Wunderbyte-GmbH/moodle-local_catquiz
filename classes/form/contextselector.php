@@ -25,6 +25,8 @@ require_once($CFG->dirroot . "/local/catquiz/lib.php");
 use context;
 use context_system;
 use core_form\dynamic_form;
+use local_catquiz\catcontext;
+use local_catquiz\catscale;
 use moodle_url;
 use stdClass;
 
@@ -43,7 +45,7 @@ class contextselector extends dynamic_form {
      */
     public function definition() {
 
-        global $CFG, $DB, $PAGE;
+        global $PAGE;
 
         $mform = $this->_form;
         $data = (object) $this->_ajaxformdata;
@@ -54,12 +56,15 @@ class contextselector extends dynamic_form {
             $mform->setType('id', PARAM_INT);
         }
 
-        $contextsdb = $DB->get_records('local_catquiz_catcontext');
+        $contextsdb = catcontext::return_all_catcontexts();
         $contexts = [];
         foreach ($contextsdb as $contextid => $context) {
             $contexts[$contextid] = $context->name;
             $jsonobj = json_decode($context->json);
-            if ($jsonobj && $jsonobj->default === true) {
+            if ($jsonobj
+                && $jsonobj->default === true
+                && !isset($default)
+                ) {
                 $default = $contextid;
             }
         }
@@ -124,6 +129,16 @@ class contextselector extends dynamic_form {
      */
     public function set_data_for_dynamic_submission(): void {
         $data = (object) $this->_ajaxformdata;
+        // If Context was changed, override default.
+        $contextidfromurl = optional_param('contextid', 0, PARAM_INT);
+        if (empty($contextidfromurl)) {
+            // If we find a scaleid, we set the context to the contextid of the scale.
+            $catscaleid = optional_param('scaleid', 0, PARAM_INT);
+            $catscale = catscale::return_catscale_object($catscaleid);
+            if (!empty($catscale) && isset($catscale->contextid)) {
+                $data->contextid = intval($catscale->contextid);
+            }
+        }
 
         $this->set_data($data);
     }

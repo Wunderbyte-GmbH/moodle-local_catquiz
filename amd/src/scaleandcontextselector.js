@@ -115,6 +115,7 @@ export function listenToSelect(element, location, paramname) {
             } else {
                 searchParams.set(paramname, response[paramname]);
             }
+            searchParams.delete('contextid');
             window.location.search = searchParams.toString();
 
         });

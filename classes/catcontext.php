@@ -210,6 +210,19 @@ class catcontext {
     }
 
     /**
+     * Load all contexts from DB.
+     *
+     * @return array
+     *
+     */
+    public static function return_all_catcontexts():array {
+        global $DB;
+        // TODO Caching.
+        $records = $DB->get_records('local_catquiz_catcontext');
+        return $records;
+    }
+
+    /**
      * Create response from DB.
      *
      * @param int $contextid
