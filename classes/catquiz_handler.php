@@ -603,7 +603,6 @@ class catquiz_handler {
                     }
                 }
             }
-            // TODO: Display first and collapse following feedback elements?
         } else if (!isset($values["submitcattestoption"])
         || $values["submitcattestoption"] != "cattestsubmit") {
             return;
