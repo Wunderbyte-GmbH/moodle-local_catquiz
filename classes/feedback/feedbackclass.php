@@ -320,20 +320,43 @@ class feedbackclass {
             }
             // $elements[] = $mform->addElement('header', 'catquiz_feedback_header_' . $scale->id,
             // get_string('catquizfeedbackheader', 'local_catquiz', $scale->name) . $headersuffix);
-            // if ($expanded) {
-            //     $mform->setExpanded('catquiz_feedback_header_' . $scale->id);
-            // }
+            $headername = get_string('catquizfeedbackheader', 'local_catquiz', $scale->name) . $headersuffix;
+            $html1 = '
+                <div id="accordion">
+                    <div class="card">
+                        <div class="card-header" id="catquiz_feedback_header_"' . $scale->id . '>
+                            <h5 class="mb-0">
+                            <button class="btn btn-link collapsed"
+                            data-toggle="collapse"
+                            data-target="#header' . $scale->id . '"
+                            aria-expanded="false"
+                            aria-controls="#header' . $scale->id . '">' . $headername . '
+                            </button>
+                            </h5>
+                        </div>
+                    <div id="#header' . $scale->id . '"
+                        class="collapse"
+                        aria-labelledby="catquiz_feedback_header_"' . $scale->id . '"
+                        data-parent="#accordion">
+                    <div class="card-body">';
+            $html2 = '
+                    </div>
+                </div>';
 
-            $element = $mform->createElement('html', '<div>xxxxxx' . $scale->id . '</div>');
-            $element->setName('name-' . $scale->id);
+            $element = $mform->createElement('html', $html1);
+            $element->setName('header_accordion_start_scale_' . $scale->id);
             $mform->addElement($element);
-
             $elements[] = $element;
 
             // Now append elements from loop.
             foreach ($subelements as $element) {
                 $elements[] = $element;
             }
+
+            $element = $mform->createElement('html', $html2);
+            $element->setName('header_accordion_end_scale_' . $scale->id);
+            $mform->addElement($element);
+            $elements[] = $element;
 
         }
     }
