@@ -575,7 +575,7 @@ class catquiz_handler {
             // Fetch standard values from the parentscale, we want to apply to all subscales.
             for ($j = 1; $j <= $numberoffeedbackoptions; $j++) {
                 foreach ($feedbackvaluekeys as $feedbackvaluekey) {
-                    if (!empty($standardvalues[$feedbackvaluekey])) {
+                    if (!isset($standardvalues[$feedbackvaluekey])) {
                         $standardvalues[$feedbackvaluekey];
                     }
                     $keyname = $feedbackvaluekey . $catscaleid . '_' . $j;
