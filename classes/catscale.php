@@ -79,6 +79,28 @@ class catscale {
     }
 
     /**
+     * Static function to return the value of contextid of a catscale.
+     *
+     * @param int $catscaleid
+     * @return int|null
+     */
+    public static function return_default_contextid_of_catscale(int $catscaleid) {
+
+        $catscale = self::return_catscale_object($catscaleid);
+        if (!empty($catscale) && isset($catscale->contextid)) {
+            return intval($catscale->contextid);
+        } else {
+            return null;
+        }
+
+        $catscale = self::return_catscale_object($catscaleid);
+        if (!$catscale) {
+            return null;
+        }
+        return $catscale->contextid;
+    }
+
+    /**
      * Adds or updates attribution of question to scale.
      *
      * @param int $catscaleid

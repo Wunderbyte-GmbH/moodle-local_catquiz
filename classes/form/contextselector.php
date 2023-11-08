@@ -134,10 +134,10 @@ class contextselector extends dynamic_form {
         if (empty($contextidfromurl)) {
             // If we find a scaleid, we set the context to the contextid of the scale.
             $catscaleid = optional_param('scaleid', 0, PARAM_INT);
-            $catscale = catscale::return_catscale_object($catscaleid);
-            if (!empty($catscale) && isset($catscale->contextid)) {
-                $data->contextid = intval($catscale->contextid);
+            if (!empty(catscale::return_default_contextid_of_catscale($catscaleid))) {
+                $data->contextid = catscale::return_default_contextid_of_catscale($catscaleid);
             }
+
         }
 
         $this->set_data($data);

@@ -603,6 +603,13 @@ class catquiz_handler {
                     }
                 }
             }
+        } else if (isset($values['submitcatscaleoption'])) {
+            // Check if there is a default contextid for the scale and set it.
+            $scaleid = $values['catquiz_catscales'];
+            if (!empty($scaleid)) {
+                // Get right element to set value here.
+                $values['catquiz_catcontext'] = catscale::return_default_contextid_of_catscale($scaleid) ?? 0;
+            }
         } else if (!isset($values["submitcattestoption"])
         || $values["submitcattestoption"] != "cattestsubmit") {
             return;
