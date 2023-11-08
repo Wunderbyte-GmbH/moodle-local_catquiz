@@ -321,25 +321,32 @@ class feedbackclass {
             // $elements[] = $mform->addElement('header', 'catquiz_feedback_header_' . $scale->id,
             // get_string('catquizfeedbackheader', 'local_catquiz', $scale->name) . $headersuffix);
             $headername = get_string('catquizfeedbackheader', 'local_catquiz', $scale->name) . $headersuffix;
+            $headerid = "catquiz_feedback_header_' . $scale->id . '";
+            $collapseid = "catquiz_feedback_collapse_' . $scale->id . '";
+            $accordionid = "accordion_header_scaleid' . $scale->id . '";
             $html1 = '
-                <div id="accordion">
+                <div id="'. $accordionid .'">
                     <div class="card">
-                        <div class="card-header" id="catquiz_feedback_header_"' . $scale->id . '>
+                        <div class="card-header" id="' . $headerid . '">
                             <h5 class="mb-0">
-                            <button class="btn btn-link collapsed"
-                            data-toggle="collapse"
-                            data-target="#header' . $scale->id . '"
-                            aria-expanded="false"
-                            aria-controls="#header' . $scale->id . '">' . $headername . '
-                            </button>
+                                <button class="btn btn-link"
+                                data-toggle="collapse"
+                                data-target="#' . $collapseid . '"
+                                aria-expanded="false"
+                                aria-controls="' . $collapseid . '">'
+                                . $headername . '
+                                </button>
                             </h5>
                         </div>
-                    <div id="#header' . $scale->id . '"
+
+                    <div id="' . $collapseid . '"
                         class="collapse"
-                        aria-labelledby="catquiz_feedback_header_"' . $scale->id . '"
-                        data-parent="#accordion">
+                        aria-labelledby="' . $headerid . '"
+                        data-parent="#' . $accordionid .'">
                     <div class="card-body">';
             $html2 = '
+                        </div>
+                        </div>
                     </div>
                 </div>';
 
