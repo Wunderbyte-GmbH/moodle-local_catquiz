@@ -321,21 +321,21 @@ class feedbackclass {
             // $elements[] = $mform->addElement('header', 'catquiz_feedback_header_' . $scale->id,
             // get_string('catquizfeedbackheader', 'local_catquiz', $scale->name) . $headersuffix);
             $headername = get_string('catquizfeedbackheader', 'local_catquiz', $scale->name) . $headersuffix;
-            $headerid = "catquiz_feedback_header_' . $scale->id . '";
-            $collapseid = "catquiz_feedback_collapse_' . $scale->id . '";
-            $accordionid = "accordion_header_scaleid' . $scale->id . '";
+            $headerid = 'catquiz_feedback_header_' . $scale->id;
+            $collapseid = 'catquiz_feedback_collapse_' . $scale->id;
+            $accordionid = 'accordion_header_scaleid' . $scale->id;
             $html1 = '
                 <div id="'. $accordionid .'">
                     <div class="card">
                         <div class="card-header" id="' . $headerid . '">
                             <h5 class="mb-0">
-                                <button class="btn btn-link"
+                                <div class="btn btn-link"
                                 data-toggle="collapse"
                                 data-target="#' . $collapseid . '"
                                 aria-expanded="false"
                                 aria-controls="' . $collapseid . '">'
                                 . $headername . '
-                                </button>
+                                </div>
                             </h5>
                         </div>
 
