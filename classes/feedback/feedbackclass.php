@@ -318,11 +318,17 @@ class feedbackclass {
                 $headersuffix = ' : ' . get_string('feedbackcompletedpartially', 'local_catquiz', $statusofcompletion);
                 $expanded = true;
             }
-            $elements[] = $mform->addElement('header', 'catquiz_feedback_header_' . $scale->id,
-            get_string('catquizfeedbackheader', 'local_catquiz', $scale->name) . $headersuffix);
-            if ($expanded) {
-                $mform->setExpanded('catquiz_feedback_header_' . $scale->id);
-            }
+            // $elements[] = $mform->addElement('header', 'catquiz_feedback_header_' . $scale->id,
+            // get_string('catquizfeedbackheader', 'local_catquiz', $scale->name) . $headersuffix);
+            // if ($expanded) {
+            //     $mform->setExpanded('catquiz_feedback_header_' . $scale->id);
+            // }
+
+            $element = $mform->createElement('html', '<div>xxxxxx' . $scale->id . '</div>');
+            $element->setName('name-' . $scale->id);
+            $mform->addElement($element);
+
+            $elements[] = $element;
 
             // Now append elements from loop.
             foreach ($subelements as $element) {
