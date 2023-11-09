@@ -578,7 +578,7 @@ class catquiz_handler {
             for ($j = 1; $j <= $numberoffeedbackoptions; $j++) {
                 foreach ($feedbackvaluekeys as $feedbackvaluekey) {
                     if (!isset($standardvalues[$feedbackvaluekey])) {
-                        $standardvalues[$feedbackvaluekey];
+                        $standardvalues[$feedbackvaluekey] = [];
                     }
                     $keyname = $feedbackvaluekey . $catscaleid . '_' . $j;
                     $standardvalues[$feedbackvaluekey][$j] = $values[$keyname] ?: null;
