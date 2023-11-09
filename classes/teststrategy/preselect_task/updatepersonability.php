@@ -25,6 +25,7 @@
 namespace local_catquiz\teststrategy\preselect_task;
 
 use cache;
+use Exception;
 use local_catquiz\catcalc;
 use local_catquiz\catcontext;
 use local_catquiz\catquiz;
@@ -224,6 +225,10 @@ class updatepersonability extends preselect_task implements wb_middleware {
         if (! $arrayresponses) {
             $arrayresponses = $this->arrayresponses;
         }
+
+        if (!$arrayresponses) {
+            return false;
+        }
         $first = $arrayresponses[array_key_first($arrayresponses)];
         foreach ($arrayresponses as $ur) {
             if ($ur['fraction'] !== $first['fraction']) {
@@ -360,7 +365,13 @@ class updatepersonability extends preselect_task implements wb_middleware {
      *
      */
     public function fallback_ability_update($catscaleid) {
-        $fraction = $this->userresponses->get_last_response($this->context['userid'])['fraction'];
+        try {
+            $fraction = $this->userresponses->get_last_response($this->context['userid'])['fraction'];
+        } catch (Exception $e) {
+            // Fallback for no answer yet.
+            $fraction = 0.5;
+        }
+
         $max = ($fraction < 0.5)
             ? -5 * (1 - $fraction)
             : 5 * $fraction;
