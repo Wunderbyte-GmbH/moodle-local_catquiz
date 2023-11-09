@@ -72,7 +72,6 @@ class feedbackclass {
         // $scaleids = catscale::get_subscale_ids(0);
 
         $courses = get_courses("all", "c.sortorder ASC", "c.id, c.fullname");
-
         $coursesarray = [];
         foreach ($courses as $course) {
             if ($course->id == 1) {
@@ -307,19 +306,15 @@ class feedbackclass {
             if ($numberoffeedbacksfilledout == 0) {
                 // No feedback entries saved in editor.
                 $headersuffix = "";
-                $expanded = true;
             } else if ($numberoffeedbacksfilledout == $j - 1) {
                 // All feedback entries saved in editor.
                 $headersuffix = ' : ' . get_string('feedbackcompletedentirely', 'local_catquiz');
-                $expanded = false;
             } else {
                 // Partially submitted feedback.
                 $statusofcompletion = strval($numberoffeedbacksfilledout) . "/" . strval($j - 1);
                 $headersuffix = ' : ' . get_string('feedbackcompletedpartially', 'local_catquiz', $statusofcompletion);
-                $expanded = true;
             }
-            // $elements[] = $mform->addElement('header', 'catquiz_feedback_header_' . $scale->id,
-            // get_string('catquizfeedbackheader', 'local_catquiz', $scale->name) . $headersuffix);
+
             $headername = get_string('catquizfeedbackheader', 'local_catquiz', $scale->name) . $headersuffix;
             $headerid = 'catquiz_feedback_header_' . $scale->id;
             $collapseid = 'catquiz_feedback_collapse_' . $scale->id;
