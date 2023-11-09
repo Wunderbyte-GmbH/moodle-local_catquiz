@@ -160,8 +160,10 @@ class comparetotestaverage extends feedbackgenerator {
         for ($i = 1; $i <= $numberoffeedbackoptions; $i++) {
             $lowestlimitkey = "feedback_scaleid_limit_lower_" . $parentscaleid . "_1";
             $highestlimitkey = "feedback_scaleid_limit_upper_" . $parentscaleid . "_" . $numberoffeedbackoptions;
-            $rangestart = $quizsettings->$lowestlimitkey;
-            $rangeend = $quizsettings->$highestlimitkey;
+            $rangestart = ($quizsettings->$lowestlimitkey >= PERSONABILITY_LOWER_LIMIT) ?
+                $quizsettings->$lowestlimitkey : PERSONABILITY_LOWER_LIMIT;
+            $rangeend = ($quizsettings->$highestlimitkey <= PERSONABILITY_UPPER_LIMIT) ?
+            $quizsettings->$highestlimitkey : PERSONABILITY_UPPER_LIMIT;
 
             $lowerlimitkey = "feedback_scaleid_limit_lower_" . $parentscaleid . "_" . $i;
             $upperlimitkey = "feedback_scaleid_limit_upper_" . $parentscaleid . "_" . $i;
