@@ -551,8 +551,10 @@ class catquiz_handler {
                             $value = feedbackclass::return_limits_for_scale($numberofoptions, $j, false);
                         }
 
-                        $element = $mform->getElement($k);
-                        $element->setValue($value);
+                        if ($mform->elementExists($k)) {
+                            $element = $mform->getElement($k);
+                            $element->setValue($value);
+                        }
                     }
                 }
             }
