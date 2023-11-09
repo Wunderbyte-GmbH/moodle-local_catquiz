@@ -573,6 +573,7 @@ class catquiz_handler {
                 'catquiz_groups_',
                 'catquiz_courses_',
                 'enrolement_message_checkbox_',
+                'feedbacklegend_scaleid_',
             ];
             // Fetch standard values from the parentscale, we want to apply to all subscales.
             for ($j = 1; $j <= $numberoffeedbackoptions; $j++) {
