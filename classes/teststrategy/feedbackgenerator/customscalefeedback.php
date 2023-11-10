@@ -121,8 +121,8 @@ class customscalefeedback extends feedbackgenerator {
         foreach ($personabilities as $catscaleid => $personability) {
             // TODO: Get limits only if set in feedback.
             $checkboxprop = sprintf('catquiz_subscalecheckbox_%d', $catscaleid);
-            if (!isset($quizsettings->$checkboxprop)
-                || intval($quizsettings->$checkboxprop) !== 1) {
+            if (isset($quizsettings->$checkboxprop)
+                && intval($quizsettings->$checkboxprop) !== 1) {
                 continue;
             }
             for ($j = 1; $j <= $quizsettings->numberoffeedbackoptionsselect; $j++) {
@@ -149,7 +149,7 @@ class customscalefeedback extends feedbackgenerator {
         }
 
         $catscales = catquiz::get_catscales(array_keys($scalefeedback));
-        $text = "";
+        $text = "xxxx";
 
         foreach ($scalefeedback as $scaleid => $value) {
             $text .= $catscales[$scaleid]->name . ': ' . $feedback . '<br/>';
@@ -171,7 +171,10 @@ class customscalefeedback extends feedbackgenerator {
      */
     private function getfeedbackforrange(int $catscaleid, int $groupnumber): ?string {
         // TODO: Implement getting the feedback.
-        return null;
+
+        // Editor mit key scale und personability schauen.
+        // Und mit api abgleichen.
+        return "xxx";
 
     }
 }
