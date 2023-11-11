@@ -56,7 +56,7 @@ class execute_action extends external_api {
     public static function execute_parameters(): external_function_parameters {
         return new external_function_parameters([
             'methodname'  => new external_value(PARAM_TEXT, 'Methodname to be executed.', VALUE_REQUIRED),
-            'data'  => new external_value(PARAM_RAW, 'Data package as json', VALUE_OPTIONAL, '{}'),
+            'data'  => new external_value(PARAM_RAW, 'Data package as json', VALUE_DEFAULT, '{}'),
             ]
         );
     }
