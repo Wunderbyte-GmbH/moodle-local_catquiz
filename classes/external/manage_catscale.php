@@ -87,7 +87,7 @@ class manage_catscale extends external_api {
                                 int $id = null
                                 ): array {
 
-        $params = external_api::validate_parameters(self::execute_parameters(), [
+        $params = self::validate_parameters(self::execute_parameters(), [
                 'name' => $name,
                 'description' => $description,
                 'minscalevalue' => $minscalevalue,
