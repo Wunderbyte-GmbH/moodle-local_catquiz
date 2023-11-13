@@ -298,7 +298,7 @@ class catscale {
      * @return array
      *
      */
-    public function get_testitems(int $contextid, bool $includesubscales = false, ?string $orderby = null):array {
+    public function get_testitems(int $contextid, bool $includesubscales = false, ?string $orderby = null, array $selectedsubscales = []):array {
 
         if (empty($this->catscale)) {
             return [];
@@ -313,7 +313,8 @@ class catscale {
         global $DB, $USER;
         $scaleids = [$this->catscale->id];
         if ($includesubscales) {
-            $subscaleids = self::get_subscale_ids($this->catscale->id);
+            // Subscales ids for checked subscale boxes.
+            $subscaleids = !empty($selectedsubscales) ? $selectedsubscales : self::get_subscale_ids($this->catscale->id);
             $scaleids = array_merge($scaleids, $subscaleids);
         }
 

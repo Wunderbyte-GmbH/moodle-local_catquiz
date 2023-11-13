@@ -102,7 +102,7 @@ class personability_loader implements contextloaderinterface {
         if ($context['includesubscales']) {
             array_push(
                 $catscaleids,
-                ...catscale::get_subscale_ids($context['catscaleid'])
+                ...$context['selectedsubscales']
             );
         }
         $personparams = catquiz::get_person_abilities(
