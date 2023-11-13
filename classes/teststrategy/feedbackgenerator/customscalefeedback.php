@@ -143,7 +143,7 @@ class customscalefeedback extends feedbackgenerator {
                     continue;
                 }
 
-                $feedback = $this->getfeedbackforrange($catscaleid, $j);
+                $feedback = $this->getfeedbackforrange($catscaleid, $j, $quizsettings);
                 // Do not display empty feedback messages.
                 if (!$feedback) {
                     continue;
@@ -158,7 +158,7 @@ class customscalefeedback extends feedbackgenerator {
         }
 
         $catscales = catquiz::get_catscales(array_keys($scalefeedback));
-        $text = "xxxx";
+        $text = "";
 
         foreach ($scalefeedback as $scaleid => $value) {
             $text .= $catscales[$scaleid]->name . ': ' . $feedback . '<br/>';
@@ -176,14 +176,16 @@ class customscalefeedback extends feedbackgenerator {
      *
      * @param int $catscaleid The CAT scale.
      * @param int $groupnumber Identifies the feedback within the scale.
+     * @param object $quizsettings Data from form.
      * @return ?string
      */
-    private function getfeedbackforrange(int $catscaleid, int $groupnumber): ?string {
+    private function getfeedbackforrange(int $catscaleid, int $groupnumber, object $quizsettings): ?string {
         // TODO: Implement getting the feedback.
 
         // Editor mit key scale und personability schauen.
         // Und mit api abgleichen.
-        return "xxx";
+        $quizsettingskey = 'feedbackeditor_scaleid_' . $catscaleid . '_' . $groupnumber;
+        return $quizsettings->$quizsettingskey->text;
 
     }
 }
