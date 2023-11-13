@@ -74,7 +74,8 @@ class questions_loader implements contextloaderinterface {
         $context['questions'] = $catscale->get_testitems(
             $context['contextid'],
             $context['includesubscales'],
-            'difficulty'
+            'difficulty',
+            $context['selectedsubscales'],
         );
         $context['questions_ordered_by'] = 'difficulty';
         $context['original_questions'] = $context['questions'];

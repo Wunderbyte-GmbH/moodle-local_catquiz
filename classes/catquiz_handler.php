@@ -759,6 +759,16 @@ class catquiz_handler {
             $maxquestions = INF;
         }
 
+        // Get selected subscales from quizdata.
+        $selectedsubscales = [];
+        foreach ($quizsettings as $key => $value) {
+            if (strpos($key, 'catquiz_subscalecheckbox_') !== false
+                && $value == "1") {
+                    $catscaleid = substr_replace($key, '', 0, 25);
+                    $selectedsubscales[] = $catscaleid;
+            }
+        };
+
         $initialcontext = [
             'testid' => intval($attemptdata->instance),
             'contextid' => intval($quizsettings->catquiz_catcontext),
@@ -767,6 +777,7 @@ class catquiz_handler {
             // When selecting questions from a scale, also include questions from its subscales.
             // This option is required by the questions_loader context loader.
             'includesubscales' => true,
+            'selectedsubscales' => $selectedsubscales,
             'maximumquestions' => $maxquestions,
             'minimumquestions' => $quizsettings->catquiz_minquestions,
             'penalty_threshold' => 60 * 60 * 24 * 30 - 90, // TODO: make dynamic.

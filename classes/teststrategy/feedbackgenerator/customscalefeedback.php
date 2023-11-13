@@ -134,12 +134,6 @@ class customscalefeedback extends feedbackgenerator {
 
         $scalefeedback = [];
         foreach ($personabilities as $catscaleid => $personability) {
-            // TODO: Get limits only if set in feedback.
-            $checkboxprop = sprintf('catquiz_subscalecheckbox_%d', $catscaleid);
-            if (isset($quizsettings->$checkboxprop)
-                && intval($quizsettings->$checkboxprop) !== 1) {
-                continue;
-            }
             for ($j = 1; $j <= $quizsettings->numberoffeedbackoptionsselect; $j++) {
                 $lowerlimitprop = sprintf('feedback_scaleid_limit_lower_%d_%d', $catscaleid, $j);
                 $lowerlimit = floatval($quizsettings->$lowerlimitprop);
