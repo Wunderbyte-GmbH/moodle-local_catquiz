@@ -94,13 +94,13 @@ class infergreateststrength extends strategy {
      */
     public function get_feedbackgenerators(): array {
         return [
-            questionssummary::class,
-            personabilities::class,
-            pilotquestions::class,
-            customscalefeedback::class,
-            comparetotestaverage::class,
-            debuginfo::class,
-            graphicalsummary::class,
+            new questionssummary(),
+            new personabilities(),
+            new pilotquestions(),
+            new customscalefeedback(fn(&$x) => arsort($x)),
+            new comparetotestaverage(),
+            new debuginfo(),
+            new graphicalsummary(),
         ];
     }
 }
