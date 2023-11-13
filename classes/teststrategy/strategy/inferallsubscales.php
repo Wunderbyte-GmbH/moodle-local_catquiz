@@ -92,12 +92,12 @@ class inferallsubscales extends strategy {
      */
     public function get_feedbackgenerators(): array {
         return [
-            questionssummary::class,
-            personabilities::class,
-            comparetotestaverage::class,
-            customscalefeedback::class,
-            debuginfo::class,
-            graphicalsummary::class,
+            new questionssummary(),
+            new personabilities(),
+            new comparetotestaverage(),
+            new customscalefeedback(),
+            new debuginfo(),
+            new graphicalsummary(),
         ];
     }
 }

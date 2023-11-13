@@ -160,11 +160,7 @@ class attemptfeedback implements renderable, templatable {
             return [];
         }
 
-        $generators = array_map(
-            fn ($classname) => new $classname(),
-            $attemptstrategy->get_feedbackgenerators());
-
-        return $generators;
+        return $attemptstrategy->get_feedbackgenerators();
     }
 
     /**

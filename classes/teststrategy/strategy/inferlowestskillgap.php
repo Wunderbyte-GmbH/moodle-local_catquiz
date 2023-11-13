@@ -95,12 +95,12 @@ class inferlowestskillgap extends strategy {
      */
     public function get_feedbackgenerators(): array {
         return [
-            comparetotestaverage::class,
-            customscalefeedback::class,
-            debuginfo::class,
-            personabilities::class,
-            questionssummary::class,
-            graphicalsummary::class,
+            new comparetotestaverage(),
+            new customscalefeedback(),
+            new debuginfo(),
+            new personabilities(),
+            new questionssummary(),
+            new graphicalsummary(),
         ];
     }
 }

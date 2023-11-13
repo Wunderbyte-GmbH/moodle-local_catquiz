@@ -41,6 +41,22 @@ use local_catquiz\teststrategy\feedbackgenerator;
 class customscalefeedback extends feedbackgenerator {
 
     /**
+     * @var callable $sortfun
+     */
+    private $sortfun;
+
+    /**
+     * Creates a new customscale feedback generator.
+     *
+     * @param callable $sortfun Optional. A function to order the feedbacks by
+     * their scale ability. If none is given, the feedbacks are displayed in
+     * ascending order of their ability.
+     */
+    public function __construct(?callable $sortfun = null) {
+        $this->sortfun = $sortfun ?? fn(&$x) => asort($x);
+    }
+
+    /**
      * Get student feedback.
      *
      * @param array $data
@@ -114,8 +130,7 @@ class customscalefeedback extends feedbackgenerator {
             return null;
         }
 
-        // Todo: make the sorting dependent on the strategy!
-        asort($personabilities);
+        ($this->sortfun)($personabilities);
 
         $scalefeedback = [];
         foreach ($personabilities as $catscaleid => $personability) {

@@ -82,11 +82,11 @@ class teststrategy_balanced extends strategy {
      */
     public function get_feedbackgenerators(): array {
         return [
-            questionssummary::class,
-            personabilities::class,
-            pilotquestions::class,
-            debuginfo::class,
-            graphicalsummary::class,
+          new   questionssummary(),
+          new   personabilities(),
+          new   pilotquestions(),
+          new   debuginfo(),
+          new   graphicalsummary(),
         ];
     }
 }
