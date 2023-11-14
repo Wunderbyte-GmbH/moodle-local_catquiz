@@ -62,7 +62,7 @@ class catcontext {
      *
      * @var string
      */
-    private string $name = '';
+    public string $name = '';
 
     /**
      * $description

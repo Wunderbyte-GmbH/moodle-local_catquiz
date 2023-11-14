@@ -59,6 +59,9 @@ class catscale_structure {
     /** @var ?int $parentid */
     public ?int $parentid = null;
 
+    /** @var ?int $context */
+    public ?int $contextid = null;
+
     /** @var ?string $viewlink */
     public ?string $viewlink = null;
 
@@ -74,6 +77,7 @@ class catscale_structure {
                 $this->id = $data['id'];
             }
             $this->parentid = $data['parentid'];
+            $this->contextid = $data['contextid'];
             $this->timemodified = $data['timemodified'];
             $this->timecreated = $data['timecreated'];
             $this->name = $data['name'];

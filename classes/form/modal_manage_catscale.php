@@ -61,24 +61,35 @@ class modal_manage_catscale extends dynamic_form {
         $mform->setType('id', PARAM_INT);
 
         // Add a select field for the parent ID.
-        $options = ['0' => get_string('none')];
+        $parents = ['0' => get_string('none')];
         $catscales = dataapi::get_all_catscales();
         foreach ($catscales as $catscale) {
-            $options[$catscale->id] = $catscale->name;
+            $parents[$catscale->id] = $catscale->name;
         }
 
         $mform->registerNoSubmitButton('btn_changeparentid');
         $buttonargs = ['style' => 'visibility:hidden;'];
         $categoryselect = [
-            $mform->createElement('autocomplete', 'parentid', get_string('parent', 'local_catquiz'), $options),
+            $mform->createElement('autocomplete', 'parentid', get_string('parent', 'local_catquiz'), $parents),
             $mform->createElement('submit',
                 'btn_changeparentid',
                 get_string('chooseparent', 'local_catquiz'),
                 $buttonargs),
         ];
+
         $mform->addGroup($categoryselect, 'chooseparent', get_string('chooseparent', 'local_catquiz'), '', false);
         $mform->setType('chooseparent', PARAM_NOTAGS);
         $mform->setType('parentid', PARAM_INT);
+
+        // Add a select field for the context.
+        $defaultcontext = get_string('defaultcontext', 'local_catquiz');
+        $contextoptions = [0 => $defaultcontext];
+        $catcontexts = dataapi::get_all_catcontexts();
+        foreach ($catcontexts as $context) {
+            $contextoptions[$context->id] = $context->name;
+        }
+        $mform->addElement('autocomplete', 'contextid', get_string('choosecontextid', 'local_catquiz'), $contextoptions);
+        $mform->hideIf('contextid', 'parentid', 'neq', '0'); // Selector only for parent scales.
 
         $group[] = $mform->createElement('text', 'catquiz_minscalevalue', get_string('minscalevalue', 'local_catquiz'));
 
@@ -121,7 +132,8 @@ class modal_manage_catscale extends dynamic_form {
         } else {
             $catscaleid = dataapi::create_catscale($catscale);
             // For a new parent catscale, create new auto-context.
-            if (intval($data->parentid) === 0) {
+            if (intval($data->parentid) === 0
+            && $data->contextid == 0) {
                 dataapi::create_new_context_for_scale($catscaleid, $data->name);
             }
         }
