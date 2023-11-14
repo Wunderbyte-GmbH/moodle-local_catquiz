@@ -55,7 +55,7 @@ class feedbackclass {
      */
     public static function instance_form_definition(MoodleQuickForm &$mform, array &$elements) {
 
-        global $CFG, $PAGE;
+        global $CFG, $PAGE, $OUTPUT;
 
         require_once($CFG->libdir .'/datalib.php');
 
@@ -133,6 +133,8 @@ class feedbackclass {
         ]);
         // Generate the options for the colors. Same values are applied to all subscales and subfeedbacks.
         $coloroptions = self::get_array_of_colors($numberoffeedbackspersubscale);
+        // We need this to close the collapsable header elements.
+        $html2 = $OUTPUT->render_from_template('local_catquiz/feedback/feedbackform_collapsible_close', []);
 
         foreach ($scales as $scale) {
             $subelements = [];
@@ -314,35 +316,37 @@ class feedbackclass {
                 $headersuffix = ' : ' . get_string('feedbackcompletedpartially', 'local_catquiz', $statusofcompletion);
             }
 
+            $numberofclosinghtmls = 0;
+            if (!isset($previousdepth) || !isset($previousparentscaleid)) {
+                $numberofclosinghtmls = 0;
+                // If it's the first scale, don't close the html.
+            } else if ($scale->depth == $previousdepth) {
+                $numberofclosinghtmls = 1;
+                // Element on the same level.
+            } else if ($scale->parentid != $previousparentscaleid
+            && $scale->depth < $previousdepth) {
+                $depthdifference = $previousdepth - $scale->depth;
+                $numberofclosinghtmls = 2 + $depthdifference;
+            }
+
+            $previousparentscaleid = $scale->parentid;
+            $previousdepth = $scale->depth;
+
             $headername = get_string('catquizfeedbackheader', 'local_catquiz', $scale->name) . $headersuffix;
             $headerid = 'catquiz_feedback_header_' . $scale->id;
             $collapseid = 'catquiz_feedback_collapse_' . $scale->id;
-            $accordionid = 'accordion_header_scaleid' . $scale->id;
-            $html1 = '
-                <div id="'. $accordionid .'">
-                    <div class="card">
-                        <div class="card-header" id="' . $headerid . '">
-                            <h5 class="mb-0">
-                                <div class="btn btn-link"
-                                data-toggle="collapse"
-                                data-target="#' . $collapseid . '"
-                                aria-expanded="false"
-                                aria-controls="' . $collapseid . '">'
-                                . $headername . '
-                                </div>
-                            </h5>
-                        </div>
+            $accordionid = 'accordion_header_scaleid_' . $scale->id;
+            $data = [
+                'headername' => $headername,
+                'headerid' => $headerid,
+                'collapseid' => $collapseid,
+                'accordionid' => $accordionid,
+            ];
 
-                    <div id="' . $collapseid . '"
-                        class="collapse"
-                        aria-labelledby="' . $headerid . '"
-                        data-parent="#' . $accordionid .'">
-                    <div class="card-body">';
-            $html2 = '
-                        </div>
-                        </div>
-                    </div>
-                </div>';
+            $html1 = $OUTPUT->render_from_template('local_catquiz/feedback/feedbackform_collapsible_open', $data);
+
+            // Closing the elements.
+            self::add_closing_html($numberofclosinghtmls, $scale->id, $mform, $elements, $html2);
 
             $element = $mform->createElement('html', $html1);
             $element->setName('header_accordion_start_scale_' . $scale->id);
@@ -353,12 +357,16 @@ class feedbackclass {
             foreach ($subelements as $element) {
                 $elements[] = $element;
             }
+        }
+        self::add_closing_html(1, $scale->id, $mform, $elements, $html2);
+    }
 
+    private static function add_closing_html($counter, $scaleid, &$mform, &$elements, $html2) {
+        for ($i = 1; $i <= $counter; $i++) {
             $element = $mform->createElement('html', $html2);
-            $element->setName('header_accordion_end_scale_' . $scale->id);
+            $element->setName('header_accordion_end_scale_' . $scaleid . '_' . $i);
             $mform->addElement($element);
             $elements[] = $element;
-
         }
     }
 
