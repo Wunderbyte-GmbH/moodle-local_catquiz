@@ -149,12 +149,14 @@ class dataapi {
         $parentscale = reset($parentscales);
         if ($parentscale->parentid == 0) {
             $parentscale->depth = 0;
+            $parentcontextid = $parentscale->contextid;
         }
 
         $returnarray[$parentscale->id] = $parentscale;
 
         foreach ($catscales as $catscale) {
 
+            $catscales[$catscale->id]->contextid = $parentcontextid ?? $catscales[$parentid]->contextid;
             // First check is, if the scale is already in our return array.
             // This can happen when we return children, run the function again and return ourselves.
             if (isset($returnarray[$catscale->id])) {
@@ -173,6 +175,9 @@ class dataapi {
                     foreach ($children as $child) {
                         if (isset($returnarray[$child->id])) {
                             continue;
+                        }
+                        if (!empty($parentcontextid)) {
+                            $child->contextid = $parentcontextid;
                         }
                         $returnarray[$child->id] = $child;
                     }
