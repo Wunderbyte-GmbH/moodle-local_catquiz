@@ -138,6 +138,8 @@ class debuginfo extends feedbackgenerator {
             if (! $se) {
                 $rowarr[] = 'NA';
             } else {
+                // Sort scales by name.
+                uasort($se, fn($a, $b) => $a['name'] <=> $b['name']);
                 $seinfo = array_map(fn($se) => sprintf(
                     "%s: [played: %f, remaining: %f]",
                     $se['name'],
