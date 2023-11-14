@@ -139,7 +139,7 @@ class debuginfo extends feedbackgenerator {
                 $rowarr[] = 'NA';
             } else {
                 $seinfo = array_map(fn($se) => sprintf(
-                    "%s: [played: %d, remaining: %d]",
+                    "%s: [played: %f, remaining: %f]",
                     $se['name'],
                     $se['se']['played'],
                     $se['se']['remaining']
