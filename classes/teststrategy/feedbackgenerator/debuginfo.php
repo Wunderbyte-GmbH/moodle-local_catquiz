@@ -138,13 +138,13 @@ class debuginfo extends feedbackgenerator {
             if (! $se) {
                 $rowarr[] = 'NA';
             } else {
-                $rowarr[] = sprintf(
-                    "%s: [played: %d, remaining: %d]%s",
+                $seinfo = array_map(fn($se) => sprintf(
+                    "%s: [played: %d, remaining: %d]",
                     $se['name'],
                     $se['se']['played'],
-                    $se['se']['remaining'],
-                    isset($se['se']['last']) ? "" : ","
-                );
+                    $se['se']['remaining']
+                ), $se);
+                $rowarr[] = implode(', ', $seinfo);
             }
 
             $rowarr[] = $row['numquestionsperscale'] ?? 'NA';
