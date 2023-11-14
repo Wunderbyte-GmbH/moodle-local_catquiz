@@ -48,11 +48,11 @@ class customscalefeedback extends feedbackgenerator {
     /**
      * Creates a new customscale feedback generator.
      *
-     * @param callable $sortfun Optional. A function to order the feedbacks by
+     * @param ?callable $sortfun Optional. A function to order the feedbacks by
      * their scale ability. If none is given, the feedbacks are displayed in
      * ascending order of their ability.
      */
-    public function __construct(?callable $sortfun = null) {
+    public function __construct($sortfun = null) {
         $this->sortfun = $sortfun ?? fn(&$x) => asort($x);
     }
 
