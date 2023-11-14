@@ -294,11 +294,16 @@ class catscale {
      * @param int $contextid
      * @param bool $includesubscales
      * @param string|null $orderby If given, sort items by that field
+     * @param array $selectedsubscales Ids of subscales to be treated
      *
      * @return array
      *
      */
-    public function get_testitems(int $contextid, bool $includesubscales = false, ?string $orderby = null, array $selectedsubscales = []):array {
+    public function get_testitems(
+        int $contextid,
+        bool $includesubscales = false,
+        ?string $orderby = null,
+        array $selectedsubscales = []):array {
 
         if (empty($this->catscale)) {
             return [];
