@@ -110,6 +110,7 @@ class graphicalsummary extends feedbackgenerator {
 
             $lastresponse = $data['lastresponse'];
             $lastquestion = $data['lastquestion'];
+            $graphicalsummary[$index - 1]['id'] = $lastquestion->id;
             $graphicalsummary[$index - 1]['lastresponse'] = $lastresponse['fraction'];
             $graphicalsummary[$index - 1]['difficulty'] = $lastquestion->difficulty;
             $graphicalsummary[$index - 1]['questionscale'] = $lastquestion->catscaleid;
@@ -189,8 +190,7 @@ class graphicalsummary extends feedbackgenerator {
         $chart->add_series($diffnextafterchart);
         $chart->add_series($questionscalechart);
 
-        $labels = range(0, count($difficulties) - 1);
-        $chart->set_labels($labels);
+        $chart->set_labels(array_map(fn($round) => $round['id'], $data));
 
         return html_writer::tag('div', $OUTPUT->render($chart), ['dir' => 'ltr']);
     }
