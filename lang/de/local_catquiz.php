@@ -72,6 +72,9 @@ $string['minquestions'] = 'Min. Frageanzahl pro Test';
 $string['minquestions_help'] = 'Es müssen mindestens so viele Fragen pro Test angezeigt werden.';
 $string['minquestionspersubscale'] = 'min. Frageanzahl pro Subskala';
 $string['minquestionspersubscale_help'] = 'Eine Subskala wird frühestens dann ausgeschlossen, wenn die Minimalanzahl an Fragen aus dieser Skala angezeigt wurden.';
+$string['contextidselect'] = 'CAT Kontext - ohne Auswahl wird ein neuer Kontext erstellt';
+$string['choosecontextid'] = 'CAT Kontext auswählen';
+$string['defaultcontext'] = 'Neuer Standard Kontext für Skala';
 
 $string['timepacedtest'] = 'Zeitbeschränkungen für den Test aktivieren';
 $string['maxtime'] = 'Maximale Dauer des Tests';
