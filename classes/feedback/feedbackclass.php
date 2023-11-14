@@ -361,6 +361,16 @@ class feedbackclass {
         self::add_closing_html(1, $scale->id, $mform, $elements, $html2);
     }
 
+    /**
+     * Add HTML Elements to close collapsable accordion.
+     *
+     * @param int $counter
+     * @param int $scaleid
+     * @param mixed $mform
+     * @param array $elements
+     * @param string $html2
+     *
+     */
     private static function add_closing_html($counter, $scaleid, &$mform, &$elements, $html2) {
         for ($i = 1; $i <= $counter; $i++) {
             $element = $mform->createElement('html', $html2);
