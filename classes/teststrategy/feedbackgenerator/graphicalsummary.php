@@ -122,7 +122,9 @@ class graphicalsummary extends feedbackgenerator {
             );
             $graphicalsummary[$index - 1]['difficultynextbefore'] = $before->difficulty;
             $graphicalsummary[$index - 1]['difficultynextafter'] = $after->difficulty;
-            $graphicalsummary[$index - 1]['personability'] = $data['person_ability'][$data['catscaleid']];
+            $graphicalsummary[$index - 1]['personability_after'] = $data['person_ability'][$data['catscaleid']];
+            $graphicalsummary[$index - 1]['personability_before'] =
+                $cachedcontexts[$index - 1]['person_ability'][$data['catscaleid']];
         }
         return ['graphicalsummary' => $graphicalsummary];
     }
@@ -142,7 +144,8 @@ class graphicalsummary extends feedbackgenerator {
         $difficulties = array_map(fn($round) => $round['difficulty'] ?? null, $data);
         $questionscales = array_map(fn($round) => $round['questionscale'] ?? null, $data);
         $fractions = array_map(fn($round) => $round['lastresponse'] ?? null, $data);
-        $abilities = array_map(fn($round) => $round['personability'] ?? null, $data);
+        $abilitiesafter = array_map(fn($round) => $round['personability_after'] ?? null, $data);
+        $abilitiesbefore = array_map(fn($round) => $round['personability_before'] ?? null, $data);
         $fisherinfo = array_map(fn($round) => $round['fisherinformation'] ?? null, $data);
         $diffnextbefore = array_map(fn($round) => $round['difficultynextbefore'] ?? null, $data);
         $diffnextafter = array_map(fn($round) => $round['difficultynextafter'] ?? null, $data);
@@ -161,9 +164,13 @@ class graphicalsummary extends feedbackgenerator {
             get_string('response', 'local_catquiz'),
             $fractions
         );
-        $abilitieschart = new \core\chart_series(
-            get_string('abilityintestedscale', 'local_catquiz'),
-            $abilities
+        $abilitiesbeforechart = new \core\chart_series(
+            get_string('abilityintestedscale_before', 'local_catquiz'),
+            $abilitiesbefore
+        );
+        $abilitiesafterchart = new \core\chart_series(
+            get_string('abilityintestedscale_after', 'local_catquiz'),
+            $abilitiesafter
         );
         $fisherinfochart = new \core\chart_series(
             get_string('fisherinformation', 'local_catquiz'),
@@ -183,7 +190,8 @@ class graphicalsummary extends feedbackgenerator {
         );
         $chart->add_series($difficultieschart);
         $chart->add_series($fractionschart);
-        $chart->add_series($abilitieschart);
+        $chart->add_series($abilitiesbeforechart);
+        $chart->add_series($abilitiesafterchart);
         $chart->add_series($fisherinfochart);
         $chart->add_series($scorechart);
         $chart->add_series($diffnextbeforechart);
