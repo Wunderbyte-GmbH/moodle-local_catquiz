@@ -27,6 +27,7 @@ namespace local_catquiz\teststrategy\feedbackgenerator;
 use cache;
 use html_writer;
 use local_catquiz\teststrategy\feedbackgenerator;
+use local_catquiz\teststrategy\info;
 
 /**
  * Compare the ability of this attempt to the average abilities of other students that took this test.
@@ -60,7 +61,10 @@ class graphicalsummary extends feedbackgenerator {
     protected function get_teacherfeedback(array $data): array {
         global $OUTPUT;
         $chart = $this->render_chart($data['graphicalsummary']);
-        $feedback = $OUTPUT->render_from_template('local_catquiz/feedback/graphicalsummary', ['data' => $chart]);
+        $feedback = $OUTPUT->render_from_template(
+            'local_catquiz/feedback/graphicalsummary',
+            ['data' => $chart, 'teststrategy' => $data['teststrategyname']]
+        );
 
         return [
             'heading' => $this->get_heading(),
@@ -126,7 +130,12 @@ class graphicalsummary extends feedbackgenerator {
             $graphicalsummary[$index - 1]['personability_before'] =
                 $cachedcontexts[$index - 1]['person_ability'][$data['catscaleid']];
         }
-        return ['graphicalsummary' => $graphicalsummary];
+
+        return [
+            'graphicalsummary' => $graphicalsummary,
+            'teststrategyname' => info::get_teststrategy($initialcontext['teststrategy'])
+                ->get_description(),
+        ];
     }
 
     /**
