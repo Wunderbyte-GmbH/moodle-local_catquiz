@@ -178,18 +178,19 @@ class graphicalsummary extends feedbackgenerator {
 
         $hasnewabilities = array_key_exists('personability_after', $data[0]) && array_key_exists('personability_before', $data[0]);
         if ($hasnewabilities) {
-            $abilitiesafter = array_map(fn($round) => $round['personability_after'] ?? null, $data);
-            $abilitiesafterchart = new \core\chart_series(
-                get_string('abilityintestedscale_after', 'local_catquiz'),
-                $abilitiesafter
-            );
-            $chart->add_series($abilitiesafterchart);
             $abilitiesbefore = array_map(fn($round) => $round['personability_before'] ?? null, $data);
             $abilitiesbeforechart = new \core\chart_series(
                 get_string('abilityintestedscale_before', 'local_catquiz'),
                 $abilitiesbefore
             );
             $chart->add_series($abilitiesbeforechart);
+
+            $abilitiesafter = array_map(fn($round) => $round['personability_after'] ?? null, $data);
+            $abilitiesafterchart = new \core\chart_series(
+                get_string('abilityintestedscale_after', 'local_catquiz'),
+                $abilitiesafter
+            );
+            $chart->add_series($abilitiesafterchart);
         } else {
             $abilities = array_map(fn($round) => $round['personability'] ?? null, $data);
             $abilitieschart = new \core\chart_series(
