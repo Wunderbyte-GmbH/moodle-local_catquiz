@@ -58,7 +58,7 @@ if ($hassiteconfig) {
     $sql = "SELECT t.id, t.name
             FROM m_tag t
             LEFT JOIN m_tag_instance ti ON t.id=ti.tagid
-            WHERE ti.component=:component AND ti.itemtype=:itemtype";
+            WHERE ti.component=:component AND ti.itemtype=:itemtype AND t.isstandard=1";
 
     $params = [
         'component' => 'core',
@@ -66,15 +66,18 @@ if ($hassiteconfig) {
     ];
 
     $records = $DB->get_records_sql($sql, $params);
-    $options = array_map(fn($a) => [$a->id => $a->name], $records) ?? [0 => 'notags'];
+    $options = [0 => 'notags'];
+    foreach ($records as $record) {
+        $options[$record->id] = $record->name;
+    }
 
-    $setting = new admin_setting_configselect(
-        'adaptivequiz/catmodel',
-        get_string('choosetags', 'adaptivequiz'),
+    $setting = new admin_setting_configmultiselect(
+        'local_catquiz/cattags',
+        get_string('choosetags', 'local_catquiz'),
         '',
-        0,
+        [],
         $options,
     );
-    $settings->add(new admin_setting_description('cattagdisclaimer', '', get_string('choosetags:disclaimer', 'adaptivequiz')));
+    $settings->add(new admin_setting_description('cattagdisclaimer', '', get_string('choosetags:disclaimer', 'local_catquiz')));
     $settings->add($setting);
 }

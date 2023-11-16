@@ -43,6 +43,7 @@ $string['catscales:information'] = 'Verwalte CAT Test Skalen: {$a->link}';
 $string['cattags'] = 'Kurs Tags verwalten';
 $string['cattags:information'] = 'Diese Tags kennzeichnen Kurse, zu denen Lehrende Studierende einschreiben können, unabhängig davon, ob sie Teil des Kurses sind.';
 $string['choosetags'] = 'Tag(s) auswählen';
+$string['choosetags:disclaimer'] = 'Mehrfachauswahl mit "⌘ command" (Apple) oder "Ctrl" (Windows, Linux)';
 $string['catscalesname_exists'] = 'Der Name wird bereits verwendet';
 $string['cachedef_catscales'] = 'Caches the catscales of catquiz';
 $string['catcatscales'] = 'Auswahl Subskalen';

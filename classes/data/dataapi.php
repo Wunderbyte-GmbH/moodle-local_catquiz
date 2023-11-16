@@ -332,4 +332,80 @@ class dataapi {
         return $filteredscales;
     }
 
+
+    /**
+     * Start a new attempt for a user.
+     *
+     * @return array
+     */
+    public static function get_courses_from_settings_tags() {
+        $list = self::buildsqlquery();
+        return $list;
+    }
+
+    /**
+     * Build sql query with config filters.
+     *
+     * @return array
+     */
+    public static function buildsqlquery() {
+        global $DB;
+        $where = "c.id IN (SELECT t.itemid FROM {tag_instance} t WHERE (";
+        $configs = get_config('local_catquiz');
+
+        // Search courses that are tagged with the specified tag.
+        $configtags['OR'] = explode(',', str_replace(' ', '', $configs->cattags));
+
+        $params = [];
+
+        // Filter according to the tags.
+        if ($configtags['OR'][0] != null) {
+
+            $indexparam = 0;
+            foreach ($configtags as $operator => $tags) {
+                if (!empty($tags[0])) {
+                    $tagscount = count($tags);
+                    foreach ($tags as $index => $tag) {
+                        $tag = (array) $DB->get_record('tag', ['id' => $tag], 'id, name');
+                        $params['tag'. $indexparam] = $tag['id'];
+                        $where .= "t.tagid";
+                        $where .= $operator == 'OR' ? ' = ' : ' != ';
+                        $where .= ":tag" . $indexparam;
+                        if ($index + 1 < $tagscount) {
+                            $where .= ' ' . $operator .' ';
+                        } else {
+                            $where .= ")";
+                        };
+                        $indexparam += 1;
+                    }
+                }
+            }
+        }
+
+        $where .= ")";
+        return self::get_course_records($where, $params);
+
+    }
+
+    /**
+     * Build sql query with config filters.
+     * @param str $whereclause
+     * @param array $params
+     * @return object
+     */
+    protected static function get_course_records($whereclause, $params) {
+        global $DB;
+        $fields = ['c.id', 'c.fullname', 'c.shortname'];
+        // TODO  user query includieren 154-157 && available courses anzeigen.
+        $sql = "SELECT ". join(',', $fields).
+                " FROM {course} c
+                JOIN {context} ctx ON c.id = ctx.instanceid
+                AND ctx.contextlevel = :contextcourse
+                WHERE " .
+                $whereclause."ORDER BY c.sortorder";
+        $list = $DB->get_records_sql($sql,
+            ['contextcourse' => CONTEXT_COURSE] + $params);
+        return $list;
+    }
+
 }

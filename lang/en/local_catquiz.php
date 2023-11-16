@@ -44,6 +44,7 @@ $string['catscales:information'] = 'Define CAT scales: {$a->link}';
 $string['cattags'] = 'Manage course tags';
 $string['cattags:information'] = 'These tags identify courses that teachers can enroll students in, regardless of whether they are part of the course.';
 $string['choosetags'] = 'Choose tag(s)';
+$string['choosetags:disclaimer'] = 'Multiple selection with key "⌘ command" (apple) or "Ctrl" (windows, linux)';
 $string['catscalesname_exists'] = 'The name is already being used';
 $string['cachedef_catscales'] = 'Caches the CAT scales of catquiz';
 $string['catcatscales'] = 'Selection subscales';
