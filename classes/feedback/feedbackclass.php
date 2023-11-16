@@ -261,7 +261,10 @@ class feedbackclass {
 
                 // Enrole to a group.
                 // Limit Courses - See GH-183.
-                $courses = enrol_get_my_courses();
+                $enroledcourses = enrol_get_my_courses();
+                $coursesfromtags = dataapi::get_courses_from_settings_tags();
+                $courses = array_merge($enroledcourses, $coursesfromtags);
+
                 $options = [
                     'multiple' => false,
                     'noselectionstring' => get_string('courseselection', 'local_catquiz'),
