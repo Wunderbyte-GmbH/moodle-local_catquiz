@@ -336,14 +336,14 @@ class feedbackclass {
             $headerid = 'catquiz_feedback_header_' . $scale->id;
             $collapseid = 'catquiz_feedback_collapse_' . $scale->id;
             $accordionid = 'accordion_header_scaleid_' . $scale->id;
-            $data = [
+            $headerdata = [
                 'headername' => $headername,
                 'headerid' => $headerid,
                 'collapseid' => $collapseid,
                 'accordionid' => $accordionid,
             ];
 
-            $html1 = $OUTPUT->render_from_template('local_catquiz/feedback/feedbackform_collapsible_open', $data);
+            $html1 = $OUTPUT->render_from_template('local_catquiz/feedback/feedbackform_collapsible_open', $headerdata);
 
             // Closing the elements.
             self::add_closing_html($numberofclosinghtmls, $scale->id, $mform, $elements, $html2);
