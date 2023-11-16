@@ -108,14 +108,7 @@ class local_catquiz_observer {
 
         feedbackclass::inscribe_users_to_failed_scales($quizid, $result);
     }
-    /**
-     * Observer for the testiteminscale_added event
-     *
-     * @param testiteminscale_added $event
-     */
-    public static function testiteminscale_added(testiteminscale_added $event) {
 
-    }
     /**
      * Observer for the question_deleted event
      *
