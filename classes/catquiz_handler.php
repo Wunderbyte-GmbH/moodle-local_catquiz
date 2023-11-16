@@ -37,8 +37,6 @@ use local_catquiz\feedback\feedbackclass;
 use local_catquiz\local\model\model_strategy;
 use local_catquiz\output\attemptfeedback;
 use local_catquiz\teststrategy\info;
-use moodle_exception;
-use moodleform_mod;
 use MoodleQuickForm;
 use stdClass;
 
@@ -73,7 +71,7 @@ class catquiz_handler {
      */
     public static function instance_form_definition(MoodleQuickForm &$mform) {
 
-        global $PAGE, $OUTPUT;
+        global $PAGE;
 
         $elements = [];
 
@@ -281,8 +279,6 @@ class catquiz_handler {
      * @return void
      */
     public static function instance_form_before_set_data(stdClass &$data) {
-        global $DB;
-
         // Todo: We might rather use data_preprocessing.
     }
 
