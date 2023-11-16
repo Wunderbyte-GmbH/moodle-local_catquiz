@@ -461,7 +461,9 @@ $string['dateparseformat_help'] = 'Bitte Datum so wie es im CSV definiert wurde 
 $string['defaultdateformat'] = 'j.n.Y H:i:s';
 $string['importcolumnsinfos'] = 'Informationen zu Importfeldern:';
 $string['mandatory'] = 'verpflichtend';
+$string['optional'] = 'optional';
 $string['format'] = 'Format';
+$string['openformat'] = 'offenes Format';
 $string['downloaddemofile'] = 'Demofile herunterladen';
 $string['labelidnotunique'] = 'Wert von Label {$a} muss einzigartig sein.';
 $string['labelidnotfound'] = 'Wert von Label {$a} nicht gefunden.';
@@ -474,13 +476,14 @@ $string['ifdefinedusedtomatch'] = 'Wenn angegeben findet der Abgleich über dies
 $string['fieldnamesdontmatch'] = 'Die importierten Spaltennamen entsprechen nicht der Vorgabe.';
 $string['checkdelimiteroremptycontent'] = 'Überprüfen Sie ob Daten vorhanden und durch das angegebene Zeichen getrennt sind.';
 $string['wronglabels'] = 'Die importierten Spaltennamen entsprechen nicht der Vorgabe. {$a} kann nicht importiert werden.';
+$string['missinglabel'] = 'Im importierten File fehlt die verpflichtede Spalte {$a}. Daten können nicht importiert werden.';
 $string['nolabels'] = 'Keine Spaltennamen definiert.';
 $string['checkdelimiter'] = 'Überprüfen Sie die Spaltennamen durch das angegebene Zeichen getrennt sind.';
 $string['scaleinformation'] = 'Die ID der CAT Skala der die Frage zugeordnet werden soll.';
 $string['scalenameinformation'] = 'Der Name der CAT Skala der die Frage zugeordnet werden soll. Falls keine ID angegeben, wird Matching über Name vorgenommen.';
 $string['dataincomplete'] = 'Der Datensatz mit "componentid" {$a->id} ist unvollständig und konnte nicht gänzlich eingefügt werden. Überprüfen Sie das Feld "{$a->field}".';
 $string['modelinformation'] = 'Dieses Feld ist notwendig, um Fragen vollständig zu erfassen. Ist das Feld leer, kann die Frage lediglich einer Skala zugeordnet werden.';
-$string['parentscalenamesinformation'] = 'Alle Eltern Scalen können beim Import angelegt werden. Starten sie mit dem Namen der höchsten Scala und fügen sie alle Kinder mit | getrennt hinzu.';
+$string['parentscalenamesinformation'] = 'Alle Eltern Scalen können beim Import angelegt werden. Starten sie mit dem Namen der höchsten Scala und fügen sie alle Kinder mit "|" (Vertikaler String Unicode U+007C - nicht zu verwechseln mit "/" Slash) getrennt hinzu.';
 
 // Testenvironments table.
 $string['notifyallteachers'] = 'Kursleiter der gewählten Kurse benachrichtigen';

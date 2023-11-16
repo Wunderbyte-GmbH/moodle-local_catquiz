@@ -465,7 +465,9 @@ $string['dateparseformat_help'] = 'Please, use date format like specified in CSV
 $string['defaultdateformat'] = 'j.n.Y H:i:s';
 $string['importcolumnsinfos'] = 'Informations about columns to be imported:';
 $string['mandatory'] = 'mandatory';
+$string['optional'] = 'optional';
 $string['format'] = 'format';
+$string['openformat'] = 'open format';
 $string['downloaddemofile'] = 'Download demofile';
 $string['labelidnotunique'] = 'Label {$a} is not unique.';
 $string['labelidnotfound'] = 'Label {$a} not found.';
@@ -477,14 +479,15 @@ $string['canbesetto0iflabelgiven'] = 'Can be 0 if matching of testitem is via la
 $string['ifdefinedusedtomatch'] = 'If defined, will be used to match.';
 $string['fieldnamesdontmatch'] = "The imported fieldnames don't match the defined fieldnames.";
 $string['checkdelimiteroremptycontent'] = 'Check if data is given and separated via the selected symbol.';
-$string['wronglabels'] = 'Imported CSV not containing the right labels. Column {$a} can not be importet.';
+$string['wronglabels'] = 'Imported CSV not containing the right labels. Column {$a} can not be imported.';
+$string['missinglabel'] = 'Imported CSV does not contain mandatory column {$a}. Data can not be imported.';
 $string['nolabels'] = 'No column labels defined in settings object.';
 $string['checkdelimiter'] = 'Check if data is separated via the selected symbol.';
 $string['scaleinformation'] = 'The id of the CAT scale the item should be assigned to.';
 $string['scalenameinformation'] = 'The name of the CAT scale the item should be assigned to. If no catscale id given, matching is done via name.';
 $string['dataincomplete'] = 'Record with componentid {$a->id} is incomplete and could not be treated entirely. Check field "{$a->field}".';
 $string['modelinformation'] = 'This field is necessary to entirely treat the record. If it is empty, item can only be assigned to CAT scale.';
-$string['parentscalenamesinformation'] = 'You can enter parent scales for the defined scale, in order to create the correct scale strucutre on the fly. Start with the highest parent and separate all children with |';
+$string['parentscalenamesinformation'] = 'You can enter parent scales for the defined scale, in order to create the correct scale strucutre on the fly. Start with the highest parent and separate all children with "|" (vertical line unicode U+007C - do not mistake for slash "/").';
 
 // Testenvironments table.
 $string['notifyallteachers'] = 'Notify all teachers';
