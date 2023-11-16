@@ -77,7 +77,7 @@ class catscale_structure {
                 $this->id = $data['id'];
             }
             $this->parentid = $data['parentid'];
-            $this->contextid = $data['contextid'];
+            $this->contextid = $data['contextid'] ?: null;
             $this->timemodified = $data['timemodified'];
             $this->timecreated = $data['timecreated'];
             $this->name = $data['name'];
