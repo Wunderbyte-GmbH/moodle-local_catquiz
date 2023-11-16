@@ -438,6 +438,15 @@ class fileparser {
             $error .= get_string('checkdelimiter', 'local_catquiz');
             return $error;
         }
+        foreach ($this->columns as $column) {
+            if (!in_array($column->columnname, array_values($this->fieldnames))
+                && $column->mandatory == true) {
+                // Should all keys be there or only mandatory?
+                $error .= get_string('missinglabel', 'local_catquiz', $column->columnname);
+                break;
+            }
+        }
+
         foreach ($this->fieldnames as $fieldname) {
             if (!in_array($fieldname, array_keys($this->columns))) {
                 $error .= get_string('wronglabels', 'local_catquiz', $fieldname);
