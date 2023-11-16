@@ -25,6 +25,7 @@
 namespace local_catquiz\teststrategy\feedbackgenerator;
 
 use cache;
+use html_table;
 use html_writer;
 use local_catquiz\teststrategy\feedbackgenerator;
 use local_catquiz\teststrategy\info;
@@ -60,11 +61,16 @@ class graphicalsummary extends feedbackgenerator {
      */
     protected function get_teacherfeedback(array $feedbackdata): array {
         global $OUTPUT;
+
         $chart = $this->render_chart($feedbackdata['graphicalsummary']);
+        $table = $this->render_table($feedbackdata['graphicalsummary']);
+
         $data['chart'] = $chart;
         if (array_key_exists('teststrategyname', $feedbackdata)) {
             $data['strategyname'] = $feedbackdata['teststrategyname'];
             $data['hasstrategyname'] = true;
+            $data['hastable'] = $table !== null;
+            $data['table'] = $table;
         }
         $feedback = $OUTPUT->render_from_template(
             'local_catquiz/feedback/graphicalsummary',
@@ -163,13 +169,6 @@ class graphicalsummary extends feedbackgenerator {
         );
         $chart->add_series($difficultieschart);
 
-        $questionscales = array_map(fn($round) => $round['questionscale'] ?? null, $data);
-        $questionscalechart = new \core\chart_series(
-            'scale of selected question',
-            $questionscales
-        );
-        $chart->add_series($questionscalechart);
-
         $fractions = array_map(fn($round) => $round['lastresponse'] ?? null, $data);
         $fractionschart = new \core\chart_series(
             get_string('response', 'local_catquiz'),
@@ -235,6 +234,26 @@ class graphicalsummary extends feedbackgenerator {
         }
 
         return html_writer::tag('div', $OUTPUT->render($chart), ['dir' => 'ltr']);
+    }
+
+    /**
+     * Render a table with data that do not fit in the chart
+     *
+     * @param array $data The feedback data
+     * @return ?string If all required data are present, the rendered HTML table.
+     */
+    private function render_table($data): ?string {
+        if (! array_key_exists('id', $data[0])) {
+            return null;
+        }
+
+        $table = new html_table();
+        $table->head = ['questionid', 'scale'];
+        $table->data = array_map(
+            fn($round) => [$round['id'], $round['questionscale']],
+            $data
+        );
+        return html_writer::table($table);
     }
 
     /**
