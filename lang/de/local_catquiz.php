@@ -425,6 +425,7 @@ $string['copysettingsforallsubscales'] = 'Gewählte Einstellungen für alle Subs
 $string['quizgraphicalsummary'] = 'Quizverlauf';
 $string['score'] = 'Gewichteter Score';
 $string['response'] = 'Antwort';
+$string['abilityintestedscale'] = 'Ability in der obersten Skala';
 $string['abilityintestedscale_before'] = 'Ability in der obersten Skala - davor';
 $string['abilityintestedscale_after'] = 'Ability in der obersten Skala - danach';
 $string['fisherinformation'] = 'Fisherinformation';
