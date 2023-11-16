@@ -101,13 +101,19 @@ class debuginfo extends feedbackgenerator {
             if (! $lastquestion) {
                 $rowarr[] = 'NA';
             } else {
+                $id = $lastquestion['id'] ?? 'NA';
+                $score = $lastquestion['score'] ?? 'NA';
+                $fisherinformation = $lastquestion['fisherinformation'] ?? 'NA';
+                $lasttimeplayedpenalty = $lastquestion['lasttimeplayedpenalty'] ?? 'NA';
+                $difficulty = $lastquestion['difficulty'] ?? 'NA';
+                $fraction = $lastquestion['fraction'] ?? 'NA';
                 $rowarr[] =
-                "id: " . $lastquestion['id']
-                .", score: " . $lastquestion['score']
-                .", fisherinformation: " . $lastquestion['fisherinformation'] ?? 'NA'
-                .", lasttimeplayedpenalty: " . $lastquestion['lasttimeplayedpenalty'] ?? 'NA'
-                .", difficulty: " . $lastquestion['difficulty']
-                .", fraction: " . $lastquestion['fraction'];
+                "id: $id,
+                score: $score,
+                fisherinformation: $fisherinformation,
+                lasttimeplayedpenalty: $lasttimeplayedpenalty,
+                difficulty: $difficulty,
+                fraction: $fraction";
             }
 
             $questions = $row['questions'];
