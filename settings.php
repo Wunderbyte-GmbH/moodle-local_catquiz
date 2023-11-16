@@ -38,14 +38,22 @@ if ($hassiteconfig) {
 
     $catscalelink = new moodle_url('/local/catquiz/manage_catscales.php');
     $actionlink = new action_link($catscalelink, get_string('catquizsettings', 'local_catquiz'));
-    $settingsling = ['link' => $OUTPUT->render($actionlink)];
+    $settingslink = ['link' => $OUTPUT->render($actionlink)];
     $settings->add(
             new admin_setting_heading(
                     'local_catquiz/catscales',
                     get_string('catscales', 'local_catquiz'),
-                    get_string('catscales:information', 'local_catquiz', $settingsling),
+                    get_string('catscales:information', 'local_catquiz', $settingslink),
             )
     );
+
+    $settings->add(
+        new admin_setting_heading(
+                'local_catquiz/cattags',
+                get_string('cattags', 'local_catquiz'),
+                get_string('cattags:information', 'local_catquiz'),
+        )
+        );
 
     $sql = "SELECT t.id, t.name
             FROM m_tag t
@@ -62,10 +70,11 @@ if ($hassiteconfig) {
 
     $setting = new admin_setting_configselect(
         'adaptivequiz/catmodel',
-        get_string('modformcatmodel', 'adaptivequiz'),
+        get_string('choosetags', 'adaptivequiz'),
         '',
         0,
         $options,
     );
+    $settings->add(new admin_setting_description('cattagdisclaimer', '', get_string('choosetags:disclaimer', 'adaptivequiz')));
     $settings->add($setting);
 }
