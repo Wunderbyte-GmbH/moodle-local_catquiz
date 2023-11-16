@@ -145,7 +145,6 @@ class local_catquiz_observer {
         cache_helper::purge_by_event('changesintestitems');
         cache_helper::purge_by_event('changesineventlog');
         header("Refresh:0");
-        header("Refresh:0");
     }
 
 
