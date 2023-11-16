@@ -53,17 +53,22 @@ class graphicalsummary extends feedbackgenerator {
     /**
      * Get teacher feedback.
      *
-     * @param array $data
+     * @param array $feedbackdata
      *
      * @return array
      *
      */
-    protected function get_teacherfeedback(array $data): array {
+    protected function get_teacherfeedback(array $feedbackdata): array {
         global $OUTPUT;
-        $chart = $this->render_chart($data['graphicalsummary']);
+        $chart = $this->render_chart($feedbackdata['graphicalsummary']);
+        $data['chart'] = $chart;
+        if (array_key_exists('teststrategyname', $feedbackdata)) {
+            $data['strategyname'] = $feedbackdata['teststrategyname'];
+            $data['hasstrategyname'] = true;
+        }
         $feedback = $OUTPUT->render_from_template(
             'local_catquiz/feedback/graphicalsummary',
-            ['data' => $chart, 'teststrategy' => $data['teststrategyname']]
+            $data
         );
 
         return [
@@ -153,8 +158,29 @@ class graphicalsummary extends feedbackgenerator {
         $difficulties = array_map(fn($round) => $round['difficulty'] ?? null, $data);
         $questionscales = array_map(fn($round) => $round['questionscale'] ?? null, $data);
         $fractions = array_map(fn($round) => $round['lastresponse'] ?? null, $data);
-        $abilitiesafter = array_map(fn($round) => $round['personability_after'] ?? null, $data);
-        $abilitiesbefore = array_map(fn($round) => $round['personability_before'] ?? null, $data);
+
+        $hasnewabilities = array_key_exists('personability_after', $data[0]) && array_key_exists('personability_before', $data[0]);
+        if ($hasnewabilities) {
+            $abilitiesafter = array_map(fn($round) => $round['personability_after'] ?? null, $data);
+            $abilitiesafterchart = new \core\chart_series(
+                get_string('abilityintestedscale_after', 'local_catquiz'),
+                $abilitiesafter
+            );
+            $chart->add_series($abilitiesafterchart);
+            $abilitiesbefore = array_map(fn($round) => $round['personability_before'] ?? null, $data);
+            $abilitiesbeforechart = new \core\chart_series(
+                get_string('abilityintestedscale_before', 'local_catquiz'),
+                $abilitiesbefore
+            );
+            $chart->add_series($abilitiesbeforechart);
+        } else {
+            $abilities = array_map(fn($round) => $round['personability'] ?? null, $data);
+            $abilitieschart = new \core\chart_series(
+                get_string('abilityintestedscale', 'local_catquiz'),
+                $abilities
+            );
+            $chart->add_series($abilitieschart);
+        }
         $fisherinfo = array_map(fn($round) => $round['fisherinformation'] ?? null, $data);
         $diffnextbefore = array_map(fn($round) => $round['difficultynextbefore'] ?? null, $data);
         $diffnextafter = array_map(fn($round) => $round['difficultynextafter'] ?? null, $data);
@@ -172,14 +198,6 @@ class graphicalsummary extends feedbackgenerator {
         $fractionschart = new \core\chart_series(
             get_string('response', 'local_catquiz'),
             $fractions
-        );
-        $abilitiesbeforechart = new \core\chart_series(
-            get_string('abilityintestedscale_before', 'local_catquiz'),
-            $abilitiesbefore
-        );
-        $abilitiesafterchart = new \core\chart_series(
-            get_string('abilityintestedscale_after', 'local_catquiz'),
-            $abilitiesafter
         );
         $fisherinfochart = new \core\chart_series(
             get_string('fisherinformation', 'local_catquiz'),
@@ -199,15 +217,17 @@ class graphicalsummary extends feedbackgenerator {
         );
         $chart->add_series($difficultieschart);
         $chart->add_series($fractionschart);
-        $chart->add_series($abilitiesbeforechart);
-        $chart->add_series($abilitiesafterchart);
         $chart->add_series($fisherinfochart);
         $chart->add_series($scorechart);
         $chart->add_series($diffnextbeforechart);
         $chart->add_series($diffnextafterchart);
         $chart->add_series($questionscalechart);
 
-        $chart->set_labels(array_map(fn($round) => $round['id'], $data));
+        if (array_key_exists('id', $data[0])) {
+            $chart->set_labels(array_map(fn($round) => $round['id'], $data));
+        } else {
+            $chart->set_labels(range(0, count($difficulties) - 1));
+        }
 
         return html_writer::tag('div', $OUTPUT->render($chart), ['dir' => 'ltr']);
     }

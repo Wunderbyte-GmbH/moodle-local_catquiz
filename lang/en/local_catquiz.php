@@ -429,6 +429,7 @@ $string['copysettingsforallsubscales'] = 'Apply values for all subscales';
 $string['quizgraphicalsummary'] = 'Quiz progress summary';
 $string['score'] = 'Weighted score';
 $string['response'] = 'Response';
+$string['abilityintestedscale'] = 'Ability in top-most parent scale';
 $string['abilityintestedscale_before'] = 'Ability in top-most parent scale - before';
 $string['abilityintestedscale_after'] = 'Ability in top-most parent scale - after';
 $string['fisherinformation'] = 'Fisherinformation';
