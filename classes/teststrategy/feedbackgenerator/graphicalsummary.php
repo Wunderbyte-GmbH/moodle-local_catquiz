@@ -155,9 +155,27 @@ class graphicalsummary extends feedbackgenerator {
 
         $chart = new \core\chart_line();
         $chart->set_smooth(true); // Calling set_smooth() passing true as parameter, will display smooth lines.
+
         $difficulties = array_map(fn($round) => $round['difficulty'] ?? null, $data);
+        $difficultieschart = new \core\chart_series(
+            get_string('difficulty', 'local_catquiz'),
+            $difficulties
+        );
+        $chart->add_series($difficultieschart);
+
         $questionscales = array_map(fn($round) => $round['questionscale'] ?? null, $data);
+        $questionscalechart = new \core\chart_series(
+            'scale of selected question',
+            $questionscales
+        );
+        $chart->add_series($questionscalechart);
+
         $fractions = array_map(fn($round) => $round['lastresponse'] ?? null, $data);
+        $fractionschart = new \core\chart_series(
+            get_string('response', 'local_catquiz'),
+            $fractions
+        );
+        $chart->add_series($fractionschart);
 
         $hasnewabilities = array_key_exists('personability_after', $data[0]) && array_key_exists('personability_before', $data[0]);
         if ($hasnewabilities) {
@@ -181,47 +199,34 @@ class graphicalsummary extends feedbackgenerator {
             );
             $chart->add_series($abilitieschart);
         }
-        $fisherinfo = array_map(fn($round) => $round['fisherinformation'] ?? null, $data);
-        $diffnextbefore = array_map(fn($round) => $round['difficultynextbefore'] ?? null, $data);
-        $diffnextafter = array_map(fn($round) => $round['difficultynextafter'] ?? null, $data);
-        $score = array_map(fn($round) => $round['score'] ?? null, $data);
 
-        // Create the graph for difficulty.
-        $difficultieschart = new \core\chart_series(
-            get_string('difficulty', 'local_catquiz'),
-            $difficulties
-        );
-        $questionscalechart = new \core\chart_series(
-            'scale of selected question',
-            $questionscales
-        );
-        $fractionschart = new \core\chart_series(
-            get_string('response', 'local_catquiz'),
-            $fractions
-        );
+        $fisherinfo = array_map(fn($round) => $round['fisherinformation'] ?? null, $data);
         $fisherinfochart = new \core\chart_series(
             get_string('fisherinformation', 'local_catquiz'),
             $fisherinfo
         );
-        $scorechart = new \core\chart_series(
-            get_string('score', 'local_catquiz'),
-            $score
-        );
+        $chart->add_series($fisherinfochart);
+
+        $diffnextbefore = array_map(fn($round) => $round['difficultynextbefore'] ?? null, $data);
         $diffnextbeforechart = new \core\chart_series(
             get_string('difficulty_next_more_difficult', 'local_catquiz'),
             $diffnextbefore
         );
+        $chart->add_series($diffnextbeforechart);
+
+        $diffnextafter = array_map(fn($round) => $round['difficultynextafter'] ?? null, $data);
         $diffnextafterchart = new \core\chart_series(
             get_string('difficulty_next_easier', 'local_catquiz'),
             $diffnextafter
         );
-        $chart->add_series($difficultieschart);
-        $chart->add_series($fractionschart);
-        $chart->add_series($fisherinfochart);
-        $chart->add_series($scorechart);
-        $chart->add_series($diffnextbeforechart);
         $chart->add_series($diffnextafterchart);
-        $chart->add_series($questionscalechart);
+
+        $score = array_map(fn($round) => $round['score'] ?? null, $data);
+        $scorechart = new \core\chart_series(
+            get_string('score', 'local_catquiz'),
+            $score
+        );
+        $chart->add_series($scorechart);
 
         if (array_key_exists('id', $data[0])) {
             $chart->set_labels(array_map(fn($round) => $round['id'], $data));
