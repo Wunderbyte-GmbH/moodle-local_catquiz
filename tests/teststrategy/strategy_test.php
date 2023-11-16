@@ -29,8 +29,6 @@ use advanced_testcase;
 use context_course;
 use context_module;
 use core_question\local\bank\question_edit_contexts;
-use local_catquiz\data\catscale_structure;
-use local_catquiz\data\dataapi;
 use local_catquiz\importer\testitemimporter;
 use mod_adaptivequiz\local\question\question_answer_evaluation;
 use question_bank;
@@ -80,8 +78,10 @@ class strategy_test extends advanced_testcase {
     private mixed $adaptivequiz;
 
     public function setUp(): void {
-        $this->import('mathematik2scales.xml', 'mathematik2scales.csv');
-        $this->createtestenvironment()->save_or_update();
+        $this->import('simulation.xml', 'simulation.csv');
+        $this
+            ->createtestenvironment()
+            ->save_or_update();
 
         // Needed to simulate question answers.
 
@@ -205,7 +205,7 @@ class strategy_test extends advanced_testcase {
      */
     private function createtestenvironment(): testenvironment {
         global $DB;
-        $catscale = $DB->get_record('local_catquiz_catscales', ['name' => 'Mathematik']);
+        $catscale = $DB->get_record('local_catquiz_catscales', ['parentid' => 0]);
         $this->catscaleid = $catscale->id;
         $json = file_get_contents(__DIR__ . '/../fixtures/testenvironment.json');
         $jsondata = json_decode($json);
