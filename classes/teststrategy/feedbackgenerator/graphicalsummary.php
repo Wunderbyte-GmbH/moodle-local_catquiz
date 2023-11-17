@@ -27,6 +27,7 @@ namespace local_catquiz\teststrategy\feedbackgenerator;
 use cache;
 use html_table;
 use html_writer;
+use local_catquiz\catscale;
 use local_catquiz\teststrategy\feedbackgenerator;
 use local_catquiz\teststrategy\info;
 
@@ -126,9 +127,13 @@ class graphicalsummary extends feedbackgenerator {
             $lastresponse = $data['lastresponse'];
             $lastquestion = $data['lastquestion'];
             $graphicalsummary[$index - 1]['id'] = $lastquestion->id;
+            $graphicalsummary[$index - 1]['questionname'] = $lastquestion->name;
             $graphicalsummary[$index - 1]['lastresponse'] = $lastresponse['fraction'];
             $graphicalsummary[$index - 1]['difficulty'] = $lastquestion->difficulty;
             $graphicalsummary[$index - 1]['questionscale'] = $lastquestion->catscaleid;
+            $graphicalsummary[$index - 1]['questionscale_name'] = catscale::return_catscale_object(
+                $lastquestion->catscaleid
+            )->name;
             $graphicalsummary[$index - 1]['fisherinformation'] = $lastquestion->fisherinformation ?? null;
             $graphicalsummary[$index - 1]['score'] = $lastquestion->score ?? null;
             [$before, $after] = $this->getneighborquestions(
@@ -249,11 +254,40 @@ class graphicalsummary extends feedbackgenerator {
         }
 
         $table = new html_table();
-        $table->head = ['questionid', 'scale'];
-        $table->data = array_map(
-            fn($round) => [$round['id'], $round['questionscale']],
-            $data
-        );
+        $table->head = [
+            get_string('feedback_table_questionnumber', 'local_catquiz'),
+            get_string('question'),
+            get_string('response', 'local_catquiz'),
+            get_string('catscale', 'local_catquiz'),
+            get_string('personability', 'local_catquiz'),
+        ];
+
+        $tabledata = [];
+        foreach ($data as $index => $values) {
+            $responsestring = get_string(
+                'feedback_table_answerincorrect',
+                'local_catquiz'
+            );
+            if ($values['lastresponse'] == 1) {
+                $responsestring = get_string(
+                    'feedback_table_answercorrect',
+                    'local_catquiz'
+                );
+            } else if ($values['lastresponse'] > 0) {
+                $responsestring = get_string(
+                    'feedback_table_answerpartlycorrect',
+                    'local_catquiz'
+                );
+            }
+            $tabledata[] = [
+                $index,
+                $values['questionname'],
+                $responsestring,
+                $values['questionscale_name'],
+                $values['personability_after'],
+            ];
+        }
+        $table->data = $tabledata;
         return html_writer::table($table);
     }
 

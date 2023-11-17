@@ -253,7 +253,7 @@ Sie können den aktuellen Stand hier überprüfen. {$a->linkonscale}';
 $string['statistics'] = "Statistik";
 $string['models'] = "Modelle";
 $string['previewquestion'] = "Fragen Vorschau";
-$string['personability'] = "Person ability";
+$string['personability'] = "Fähigkeitswert";
 $string['personabilities'] = "Person abilities";
 $string['itemdifficulties'] = "Item difficulties";
 $string['itemdifficultiesnodata'] = "No item difficulties were calculated";
@@ -400,6 +400,10 @@ $string['feedbackcompletedpartially'] = '{$a} Feedbacks eingetragen.';
 $string['feedbackcompletedentirely'] = 'Alle Feedbacks eingetragen.';
 $string['feedbacklegend'] = 'Feedback zur Anzeige in der Legende des Farbbalkes';
 $string['disclaimer:numberoffeedbackchange'] = 'Änderungen erfordern möglicherweise eine Anpassung der Feedback Inhalte.';
+$string['feedback_table_questionnumber'] = 'Nr.';
+$string['feedback_table_answercorrect'] = "Richtig";
+$string['feedback_table_answerincorrect'] = "Falsch";
+$string['feedback_table_answerpartlycorrect'] = "Teilweise richtig";
 
 // Check display line breaks etc.
 $string['choosesubscaleforfeedback_help'] = 'Für die angezeigten Subskalen können Sie nun {$a} Feedback-Angaben hinterlegen. Wählen Sie die jeweilige (Sub-)Skala an, um Ihr Feedback einzugeben. Die farbigen Symbole zeigen Ihnen den aktuellen Stand der Bearbeitung an, gemessen an den vor Ihnen hinterlegten Anzahl an Feedback-Optionen:
@@ -436,8 +440,8 @@ $string['difficulty_next_more_difficult'] = 'Nächstleichtere Frage';
 $string['catcontext'] = 'CAT Kontext';
 $string['totalnumberoftestitems'] = "Gesamtzahl Fragen";
 $string['numberoftestitemsused'] = "Anzahl getesteter Fragen";
-$string['personabilitybeforeattempt'] = "Ability vor Versuch";
-$string['personabilityafterattempt'] = "Ability nach Versuch";
+$string['personabilitybeforeattempt'] = "Fähigkeitswert vor Versuch";
+$string['personabilityafterattempt'] = "Fähigkeitswert nach Versuch";
 $string['instance'] = "Test";
 $string['teststrategy'] = "Teststrategie";
 $string['starttime'] = "Beginn";
