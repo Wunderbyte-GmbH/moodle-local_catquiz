@@ -75,7 +75,13 @@ class catscale {
      */
     public static function return_catscale_object(int $catscaleid) {
         global $DB;
-        return $DB->get_record('local_catquiz_catscales', ['id' => $catscaleid]) ?: null;
+        $cache = cache::make('local_catquiz', 'catscales');
+        if ($catscale = $cache->get($catscaleid)) {
+            return $catscale;
+        }
+        $catscale = $DB->get_record('local_catquiz_catscales', ['id' => $catscaleid]) ?: null;
+        $cache->set($catscaleid, $catscale);
+        return $catscale;
     }
 
     /**
