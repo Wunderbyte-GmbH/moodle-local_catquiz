@@ -200,7 +200,11 @@ class dataapi {
         }
         $id = $DB->insert_record('local_catquiz_catscales', $catscale);
 
-        $catcontext = self::create_new_context_for_scale($id, $catscale->name);
+        // For a new parent catscale, create new auto-context.
+        if (intval($catscale->parentid) === 0
+        && $catscale->contextid == 0) {
+            $catcontext = self::create_new_context_for_scale($id, $catscale->name);
+        }
 
         // Trigger catscale created event.
         $event = catscale_created::create([
@@ -210,7 +214,7 @@ class dataapi {
                 'scalename' => $catscale->name,
                 'catscaleid' => $id,
                 'catscale' => $catscale,
-                'catcontext' => $catcontext,
+                'catcontext' => $catcontext ?? null,
             ],
             ]);
         $event->trigger();
