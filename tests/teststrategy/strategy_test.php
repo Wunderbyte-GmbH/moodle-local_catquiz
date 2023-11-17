@@ -63,7 +63,7 @@ class strategy_test extends advanced_testcase {
     private int $catscaleid;
 
     /**
-     * @var $quba question_usage This is created so that we can simulate a quiz attempt.
+     * @var question_usage_by_activity $quba question_usage This is created so that we can simulate a quiz attempt.
      */
     private question_usage_by_activity $quba;
 
@@ -94,8 +94,10 @@ class strategy_test extends advanced_testcase {
 
     public function test_import_worked() {
         global $DB;
+        $questions = $DB->get_records('question');
+        $this->assertNotEmpty($questions, 'No questions were imported');
         $itemparams = $DB->get_records('local_catquiz_itemparams');
-        $this->assertNotEmpty($itemparams);
+        $this->assertNotEmpty($itemparams, 'No itemparams were imported');
     }
 
     /**
@@ -133,7 +135,7 @@ class strategy_test extends advanced_testcase {
             [$nextquestionid, $message] = catquiz_handler::fetch_question_id('1', 'mod_adaptivequiz', $attemptdata);
             $question = question_bank::load_question($nextquestionid);
             $this->assertEquals($expectedquestion['label'], $question->idnumber);
-            $this->createresponse($question, $expectedquestion['response']);
+            $this->createresponse($question, $expectedquestion['is_correct_response']);
             $attemptdata->questionsattempted++;
         }
     }
@@ -148,20 +150,20 @@ class strategy_test extends advanced_testcase {
             'radical CAT' => [
                 'questions' => [
                     [
-                        'label' => 'W_LE01_A04c',
-                        'response' => 'True',
+                        'label' => 'SIMB01-18',
+                        'is_correct_response' => true,
                         'ability_before' => 0,
                         'ability_after' => 0,
                     ],
                     [
-                        'label' => 'W_LE01_A04f',
-                        'response' => 'True',
+                        'label' => 'SIMA01-15',
+                        'is_correct_response' => false,
                         'ability_before' => 0,
                         'ability_after' => -2.5000,
                     ],
                     [
                         'label' => 'W_LE01_A04a',
-                        'response' => 'True',
+                        'is_correct_response' => true,
                         'ability_before' => -2.5000,
                         'ability_after' => -2.5000,
                     ],
@@ -174,23 +176,31 @@ class strategy_test extends advanced_testcase {
      * Create a response for the given question and save it in the database.
      *
      * @param mixed $question The question
-     * @param mixed $response The response
+     * @param bool $iscorrect Shows if the response is correct or not
      *
      * @return void
      */
-    private function createresponse($question, $response): void {
+    private function createresponse($question, $iscorrect): void {
         $questiongenerator = $this->getDataGenerator()->get_plugin_generator('core_question');
         $slot = $this->quba->add_question($question);
         $this->quba->start_question($slot);
 
         $time = time();
-        $this->quba->process_all_actions(
-            $time,
-            $questiongenerator->get_simulated_post_data_for_questions_in_usage(
-                $this->quba,
-                [$slot => $response], false
-            )
-        );
+        $response = $correctresponse = $this->quba->get_correct_response($slot);
+        if (is_null($correctresponse)) {
+            throw new \Exception("No correct response possible");
+        }
+
+        // Choose another valid but incorrect response.
+        // TODO: fix: correctresponse is an array ['answer' => ID]
+        if (! $iscorrect) {
+            if ($correctresponse >= 1) {
+                $response = $correctresponse - 1;
+            } else {
+                $response = $correctresponse + 1;
+            }
+        }
+        $this->quba->process_action($slot, $response);
         $this->quba->finish_all_questions($time);
 
         // When performing answer evaluation.
@@ -257,6 +267,12 @@ class strategy_test extends advanced_testcase {
      * @return void
      */
     private function import_itemparams($filename) {
+        // Just to test
+        global $DB;
+        $questions = $DB->get_records('question');
+        if (! $questions) {
+            exit('No questions were imported');
+        }
         $importer = new testitemimporter();
         $content = file_get_contents(__DIR__ . '/../fixtures/' . $filename);
         $importer->execute_testitems_csv_import(
@@ -289,7 +305,7 @@ class strategy_test extends advanced_testcase {
         $qformat->setCatfromfile(1);
         $qformat->setContextfromfile(1);
         $qformat->setStoponerror(1);
-        $qformat->setCattofile(1);
+        //$qformat->setCattofile(1);
         $qformat->setContexttofile(1);
         $qformat->set_display_progress(false);
 
