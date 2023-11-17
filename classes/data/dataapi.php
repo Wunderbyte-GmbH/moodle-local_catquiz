@@ -360,6 +360,9 @@ class dataapi {
         $where = "c.id IN (SELECT t.itemid FROM {tag_instance} t WHERE (";
         $configs = get_config('local_catquiz');
 
+        if (!isset($configs->cattags)) {
+            return [];
+        }
         // Search courses that are tagged with the specified tag.
         $configtags['OR'] = explode(',', str_replace(' ', '', $configs->cattags));
 
