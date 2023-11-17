@@ -29,6 +29,7 @@ use cache;
 use cache_helper;
 use dml_exception;
 use html_writer;
+use local_catquiz\data\dataapi;
 use local_catquiz\event\testitemactivitystatus_updated;
 use local_catquiz\event\testiteminscale_added;
 use local_catquiz\event\testiteminscale_updated;
@@ -74,14 +75,11 @@ class catscale {
      * @return stdClass|null
      */
     public static function return_catscale_object(int $catscaleid) {
-        global $DB;
-        $cache = cache::make('local_catquiz', 'catscales');
-        if ($catscale = $cache->get($catscaleid)) {
-            return $catscale;
+        $allcatscales = dataapi::get_all_catscales();
+        if (! array_key_exists($catscaleid, $allcatscales)) {
+            return null;
         }
-        $catscale = $DB->get_record('local_catquiz_catscales', ['id' => $catscaleid]) ?: null;
-        $cache->set($catscaleid, $catscale);
-        return $catscale;
+        return $allcatscales[$catscaleid];
     }
 
     /**
