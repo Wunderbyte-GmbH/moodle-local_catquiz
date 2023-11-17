@@ -379,9 +379,6 @@ class model_item_param_list implements ArrayAccess, IteratorAggregate, Countable
         // We only run this once we have the component id.
         $newrecord = self::update_in_scale($newrecord);
 
-        // Assign corresponding context.
-        self::assign_catcontext($newrecord);
-
         if (empty($newrecord['model'])) {
             return [
                 'success' => 2, // Update successful, but errors triggered.
@@ -457,7 +454,7 @@ class model_item_param_list implements ArrayAccess, IteratorAggregate, Countable
         if (empty($newrecord['catscaleid'])) {
             throw new moodle_exception('nocatscaleid', 'local_catquiz');
         }
-
+        // See if the item already exists.
         $scalerecord = $DB->get_record("local_catquiz_items", [
             'componentid' => $newrecord['componentid'],
             'catscaleid' => $newrecord['catscaleid'],
@@ -479,6 +476,9 @@ class model_item_param_list implements ArrayAccess, IteratorAggregate, Countable
                 }
             }
             $DB->insert_record('local_catquiz_items', $recordforquery);
+
+            // Assign corresponding context.
+            self::assign_catcontext($newrecord);
 
             // Trigger event.
             $event = testiteminscale_added::create([

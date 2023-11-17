@@ -200,6 +200,8 @@ class dataapi {
         }
         $id = $DB->insert_record('local_catquiz_catscales', $catscale);
 
+        $catcontext = self::create_new_context_for_scale($id, $catscale->name);
+
         // Trigger catscale created event.
         $event = catscale_created::create([
             'objectid' => $id,
@@ -208,6 +210,7 @@ class dataapi {
                 'scalename' => $catscale->name,
                 'catscaleid' => $id,
                 'catscale' => $catscale,
+                'catcontext' => $catcontext,
             ],
             ]);
         $event->trigger();
