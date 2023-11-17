@@ -392,7 +392,8 @@ class feedbackclass {
      */
     public static function add_coloroption(string $color, array &$coloroptions) {
         $colorname = get_string('colorpicker_color_'. $color, 'local_catquiz');
-        $coloroptions[$colorname] = get_string(
+
+        $coloroptions[$color] = get_string(
             'colorvalue_'. $color,
             'local_catquiz'
         );
