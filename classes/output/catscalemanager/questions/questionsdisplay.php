@@ -173,7 +173,7 @@ class questionsdisplay {
                 'component' => 'local_catquiz',
                 'labelcolumn' => 'idnumber',
                 'catscaleid' => $this->scale,
-            ]
+            ],
         ];
 
         $table->tabletemplate = 'local_wunderbyte_table/twtable_list';
