@@ -56,8 +56,8 @@ if ($hassiteconfig) {
         );
 
     $sql = "SELECT t.id, t.name
-            FROM m_tag t
-            LEFT JOIN m_tag_instance ti ON t.id=ti.tagid
+            FROM {tag} t
+            LEFT JOIN {tag_instance} ti ON t.id=ti.tagid
             WHERE ti.component=:component AND ti.itemtype=:itemtype AND t.isstandard=1";
 
     $params = [
