@@ -275,6 +275,7 @@ $string['scaledetailviewheading'] = 'Detailview of catscale {$a}';
 $string['label'] = "Label";
 $string['name'] = "Name";
 $string['questiontext'] = "Question text";
+$string['selectitem'] = "No items selected";
 
 // Testitem Dashboard.
 $string['testitemdashboard'] = "Testitem Dashboard";

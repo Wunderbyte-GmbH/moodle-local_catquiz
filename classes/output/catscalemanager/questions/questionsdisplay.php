@@ -159,7 +159,23 @@ class questionsdisplay {
 
         $table->addcheckboxes = true;
 
-        $table->placebuttonandpageelementsontop = true;
+        $table->actionbuttons[] = [
+            'label' => get_string('removetestitem', 'local_catquiz'), // Name of your action button.
+            'class' => 'btn btn-danger',
+            'href' => '#',
+            //'selectionmandatory' => true,
+            'methodname' => 'removetestitem', // The method needs to be added to your child of wunderbyte_table class.
+            'id' => -1, // This makes one Ajax call for all selected item, not one for each.
+            'data' => [ // Will be added eg as data-id = $values->id, so values can be transmitted to the method above.
+                'titlestring' => 'removetestitemtitle', // get_string('removetestitemtitle', 'local_catquiz'),
+                'bodystring' => 'removetestitembody', // get_string('removetestitembody', 'local_catquiz'),
+                'submitbuttonstring' => 'removetestitemsubmit', //get_string('removetestitemsubmit', 'local_catquiz'),
+                'noselectionbodystring' => 'selectitem', //get_string('selectitems', 'local_catquiz'),
+                'component' => 'local_catquiz',
+                'labelcolumn' => 'idnumber',
+                'catscaleid' => $this->scale,
+            ]
+        ];
 
         $table->tabletemplate = 'local_wunderbyte_table/twtable_list';
         $table->define_cache('local_catquiz', 'testitemstable');

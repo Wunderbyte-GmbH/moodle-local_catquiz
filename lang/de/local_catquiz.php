@@ -272,6 +272,7 @@ $string['scaledetailviewheading'] = 'Detailansicht von CAT-Skala {$a}';
 $string['label'] = "Kennzeichen";
 $string['name'] = "Name";
 $string['questiontext'] = "Fragentext";
+$string['selectitem'] = "Keine Daten ausgewählt";
 
 // Testitem Dashboard.
 $string['testitemdashboard'] = "Testitem Dashboard";

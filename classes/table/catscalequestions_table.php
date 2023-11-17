@@ -138,7 +138,7 @@ class catscalequestions_table extends wunderbyte_table {
             'title' => get_string('trashbintitle', 'local_catquiz'),
             'id' => $values->id,
             'href' => '#',
-            'methodname' => 'deletequestionfromscale',
+            'methodname' => 'removetestitem',
             'nomodal' => false,
             'data' => [ // Will be added eg as data-id = $values->id, so values can be transmitted to the method above.
                 'questionid' => $values->id,
@@ -319,23 +319,38 @@ class catscalequestions_table extends wunderbyte_table {
     }
 
     /**
-     * Function to delete selected question.
-     * @param int $id
+     * Function to handle the action buttons.
+     * @param int $testitemid
      * @param string $data
      * @return array
      */
-    public function deletequestionfromscale(int $id, string $data) {
+    public function removetestitem(int $testitemid, string $data) {
 
         $jsonobject = json_decode($data);
 
         $catscaleid = $jsonobject->catscaleid;
-        $questionid = $jsonobject->questionid;
 
-        catscale::remove_testitem_from_scale($catscaleid, $questionid);
+        if ($testitemid == -1) {
+
+            if (gettype($jsonobject->checkedids) == 'string') {
+                $idarray = explode(',', $jsonobject->checkedids);
+            } else if (gettype($jsonobject->checkedids) == 'array') {
+                $idarray = $jsonobject->checkedids;
+            } else {
+                $idarray = [$jsonobject->checkedids[0]];
+            }
+
+        } else if ($testitemid > 0) {
+            $idarray = [$testitemid];
+        }
+
+        foreach ($idarray as $id) {
+            catscale::remove_testitem_from_scale($catscaleid, $id);
+        }
 
         return [
-           'success' => 1,
-           'message' => get_string('success'),
+            'success' => 1,
+            'message' => get_string('success'),
         ];
     }
 
