@@ -124,15 +124,30 @@ class strategy_test extends advanced_testcase {
             'questionsattempted' => 0,
             'id' => 1,
         ];
-        foreach ($expected as $expectedquestion) {
+        foreach ($expected as $index => $expectedquestion) {
             $abilityrecord = $DB->get_record(
                 'local_catquiz_personparams',
                 ['userid' => $USER->id, 'catscaleid' => $this->catscaleid],
                 'ability'
             );
             $ability = $abilityrecord ? $abilityrecord->ability : 0;
-            $this->assertEquals($expectedquestion['ability_before'], $ability);
+            $this->assertEquals(
+                $expectedquestion['ability_before'],
+                $ability,
+                'Ability before fetch is not correct for question number ' . ($index + 1)
+            );
             [$nextquestionid, $message] = catquiz_handler::fetch_question_id('1', 'mod_adaptivequiz', $attemptdata);
+            $abilityrecord = $DB->get_record(
+                'local_catquiz_personparams',
+                ['userid' => $USER->id, 'catscaleid' => $this->catscaleid],
+                'ability'
+            );
+            $ability = $abilityrecord ? $abilityrecord->ability : 0;
+            $this->assertEquals(
+                $expectedquestion['ability_after'],
+                $ability,
+                'Ability after fetch is not correct for question number ' . ($index + 1)
+            );
             $question = question_bank::load_question($nextquestionid);
             $this->assertEquals($expectedquestion['label'], $question->idnumber);
             $this->createresponse($question, $expectedquestion['is_correct_response']);
@@ -153,19 +168,19 @@ class strategy_test extends advanced_testcase {
                         'label' => 'SIMB01-18',
                         'is_correct_response' => true,
                         'ability_before' => 0,
-                        'ability_after' => 0,
+                        'ability_after' => 0.0,
                     ],
                     [
                         'label' => 'SIMA01-15',
                         'is_correct_response' => false,
                         'ability_before' => 0,
-                        'ability_after' => -2.5000,
+                        'ability_after' => 2.5,
                     ],
                     [
-                        'label' => 'W_LE01_A04a',
+                        'label' => 'SIMA02-02',
                         'is_correct_response' => true,
-                        'ability_before' => -2.5000,
-                        'ability_after' => -2.5000,
+                        'ability_before' => 2.5,
+                        'ability_after' => -1.25,
                     ],
                 ],
             ],
@@ -186,13 +201,9 @@ class strategy_test extends advanced_testcase {
         $this->quba->start_question($slot);
 
         $time = time();
-        $response = $correctresponse = $this->quba->get_correct_response($slot);
-        if (is_null($correctresponse)) {
-            throw new \Exception("No correct response possible");
-        }
+        $response = $correctresponse = $this->quba->get_correct_response($slot)['answer'];
 
         // Choose another valid but incorrect response.
-        // TODO: fix: correctresponse is an array ['answer' => ID]
         if (! $iscorrect) {
             if ($correctresponse >= 1) {
                 $response = $correctresponse - 1;
@@ -200,7 +211,7 @@ class strategy_test extends advanced_testcase {
                 $response = $correctresponse + 1;
             }
         }
-        $this->quba->process_action($slot, $response);
+        $this->quba->process_action($slot, ['answer' => $response]);
         $this->quba->finish_all_questions($time);
 
         // When performing answer evaluation.
@@ -267,7 +278,6 @@ class strategy_test extends advanced_testcase {
      * @return void
      */
     private function import_itemparams($filename) {
-        // Just to test
         global $DB;
         $questions = $DB->get_records('question');
         if (! $questions) {
@@ -305,7 +315,7 @@ class strategy_test extends advanced_testcase {
         $qformat->setCatfromfile(1);
         $qformat->setContextfromfile(1);
         $qformat->setStoponerror(1);
-        //$qformat->setCattofile(1);
+        $qformat->setCattofile(1);
         $qformat->setContexttofile(1);
         $qformat->set_display_progress(false);
 
