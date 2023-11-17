@@ -47,9 +47,6 @@ export const init = (itemid, area) => {
 
                 e.stopPropagation();
 
-                // eslint-disable-next-line no-console
-                console.log('clicked ', e.target);
-
                 toggleSubscription(itemid, area, 0);
             });
         }

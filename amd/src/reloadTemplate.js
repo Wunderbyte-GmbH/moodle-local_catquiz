@@ -1,4 +1,3 @@
-/* eslint-disable require-jsdoc */
 // This file is part of Moodle - http://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
@@ -81,12 +80,6 @@ const templateid = "[data-templateid='" + dataobject.templatelocation + "']";
 
 // The data of the response gives us the context for the template.
 const responseobject = JSON.parse(response.data);
-      // eslint-disable-next-line no-console
-      console.log(template);
-            // eslint-disable-next-line no-console
-            console.log(responseobject);
-                        // eslint-disable-next-line no-console
-                        console.log(templateid);
 
 Templates.renderForPromise(template, responseobject).then(({html, js}) => {
 

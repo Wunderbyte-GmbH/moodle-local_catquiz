@@ -38,17 +38,12 @@ export const init = () => {
     const dynamicForm = new DynamicForm(formContainer,
         'local_catquiz\\form\\csvimport'
     );
-     // eslint-disable-next-line no-console
-     console.log(dynamicForm);
 
     // If a user imports an element, trigger treatment of input.
     dynamicForm.addEventListener(dynamicForm.events.FORM_SUBMITTED, (e) => {
 
         const response = e.detail;
         const errors = response.errors;
-
-        // eslint-disable-next-line no-console
-        console.log(response);
 
         dynamicForm.load({
             id: response.id,

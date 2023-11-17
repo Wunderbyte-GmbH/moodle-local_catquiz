@@ -57,9 +57,6 @@ export const init = () => {
 
     dynamicForm.addEventListener(dynamicForm.events.NOSUBMIT_BUTTON_PRESSED, (e) => {
 
-        // eslint-disable-next-line no-console
-        console.log(e, e.detail.name);
-
         let formcontainer = document.querySelector(
             SELECTORS.FORMCONTAINER);
         e.preventDefault();

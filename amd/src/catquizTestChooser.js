@@ -1,4 +1,3 @@
-/* eslint-disable no-case-declarations */
 // This file is part of Moodle - http://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
@@ -51,9 +50,6 @@ export const init = () => {
     }
     elements.forEach(selector =>
         selector.addEventListener('change', e => {
-
-            // eslint-disable-next-line no-console
-            console.log(e.target.checked, e.target.dataset.onChangeAction, "change");
 
             switch (e.target.dataset.onChangeAction) {
                 case 'reloadTestForm':

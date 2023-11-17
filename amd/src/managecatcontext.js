@@ -59,16 +59,12 @@ export const init = () => {
  * @param {*} button
  */
 function managecatcontext(button) {
-    // eslint-disable-next-line capitalized-comments
-    // const parentelement = button.closest('.list-group-item');
     const action = button.dataset.action;
     let formclass = "local_catquiz\\form\\edit_catcontext";
     let formvalues = {
         id: button.dataset.id ?? 0,
     };
 
-    // eslint-disable-next-line no-console
-    console.log(action, formvalues);
     switch (action) {
         case 'create':
             formvalues = {parentid: button.dataset.id ?? 0};
@@ -87,14 +83,10 @@ function managecatcontext(button) {
 
     // Listen to events if you want to execute something on form submit.
     // Event detail will contain everything the process() function returned:
-    modalForm.addEventListener(modalForm.events.FORM_SUBMITTED, (e) => {
-        window.console.log(e.detail);
+    modalForm.addEventListener(modalForm.events.FORM_SUBMITTED, () => {
 
         // Reload window after cancelling.
         window.location.reload();
-
-        // eslint-disable-next-line no-console
-        console.log('createcatcontext: form submitted');
     });
 
     // Show the form.
@@ -107,17 +99,12 @@ function managecatcontext(button) {
  */
 export const performDeletion = async(element) => {
 
-    // eslint-disable-next-line no-console
-    console.log('performDeletion');
-
     const parentelement = element.closest('.list-group-item');
     const id = parentelement.dataset.id;
     Ajax.call([{
         methodname: 'local_catquiz_delete_catcontext',
         args: {id: id},
         done: function(res) {
-            // eslint-disable-next-line no-console
-            console.log(res);
 
             if (res.success) {
                 window.location.reload();

@@ -100,8 +100,6 @@ export function listenToSelect(element, location, paramname) {
         // context as `contextid` query parameter
         dynamicForm.addEventListener(dynamicForm.events.FORM_SUBMITTED, (e) => {
             if (!dynamicForm) {
-                // eslint-disable-next-line no-console
-                console.log("no dynamic form", e);
                 return;
             }
 
@@ -121,8 +119,7 @@ export function listenToSelect(element, location, paramname) {
         });
 
         dynamicForm.addEventListener('change', (e) => {
-            // eslint-disable-next-line no-console
-            console.log("change", e);
+
             e.preventDefault();
 
             // We have to wait a little bit so that the data are included in the submit
@@ -152,15 +149,10 @@ function getvalueofparentscaleselector(element) {
 
     // Keep deleting the last selects until the one that triggered the change is deleted.
     let keepdeletinglastnode = true;
-    // eslint-disable-next-line no-unmodified-loop-condition
     while (keepdeletinglastnode) {
         selects = selectcontainer.querySelectorAll(SELECTORS.SELECTS);
-        // eslint-disable-next-line no-console
-        console.log("selects", selects);
         if (selects.length > 1) {
             last = selects[selects.length - 1];
-            // eslint-disable-next-line no-console
-            console.log(last);
             if (last == select) {
                 keepdeletinglastnode = false;
             }

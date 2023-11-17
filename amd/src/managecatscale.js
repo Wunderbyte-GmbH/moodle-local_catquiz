@@ -29,17 +29,12 @@ import {showNotification} from 'local_catquiz/notifications';
  */
 export const init = () => {
 
-    // eslint-disable-next-line no-console
-    console.log('manage catscale init');
-
     let buttons = document.querySelectorAll('.manage-catscale');
     buttons.forEach(button => {
         button.addEventListener('click', e => {
             e.preventDefault();
             const element = e.target;
 
-            // eslint-disable-next-line no-console
-            console.log("click", element, element.dataset.action);
             if (element.dataset.action === "delete") {
                 performDeletion(element);
             } else if (element.dataset.action === "view") {
@@ -65,8 +60,6 @@ function manageCatscale(button) {
         name: parentelement.dataset.name ?? '',
         parentid: parentelement.dataset.parentid ?? 0};
 
-    // eslint-disable-next-line no-console
-    console.log(action, formvalues);
     switch (action) {
         case 'create':
             formvalues = {parentid: parentelement.dataset.id};
@@ -91,8 +84,6 @@ function manageCatscale(button) {
         // Reload window after cancelling.
         window.location.reload();
 
-        // eslint-disable-next-line no-console
-        console.log('createCatscale: form submitted');
     });
 
     // Show the form.
@@ -105,17 +96,12 @@ function manageCatscale(button) {
  */
 export const performDeletion = async(element) => {
 
-    // eslint-disable-next-line no-console
-    console.log('performDeletion');
-
     const parentelement = element.closest('.list-group-item');
     const id = parentelement.dataset.id;
     Ajax.call([{
         methodname: 'local_catquiz_delete_catscale',
         args: {id: id},
         done: function(res) {
-            // eslint-disable-next-line no-console
-            console.log(res);
 
             if (res.success) {
                 window.location.reload();

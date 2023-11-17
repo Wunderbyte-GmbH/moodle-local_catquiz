@@ -38,10 +38,7 @@ export const initassignbutton = (catscaleid, containerselector) => {
 
     const button = document.querySelector(".assign-testitems-to-catscale");
 
-    // eslint-disable-next-line no-console
-    console.log('button init', button);
-
-    button.addEventListener('click', e => {
+    button.addEventListener('click', () => {
         const checkboxes = document.querySelectorAll(SELECTORS.CHECKBOX);
 
         const checkedboxes = [];
@@ -51,8 +48,5 @@ export const initassignbutton = (catscaleid, containerselector) => {
                 checkedboxes.push(x);
             }
         });
-
-        // eslint-disable-next-line no-console
-        console.log('checkboxes', checkedboxes, e);
     });
 };
