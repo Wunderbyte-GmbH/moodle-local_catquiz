@@ -232,9 +232,15 @@ class strategy_test extends advanced_testcase {
         $jsondata = json_decode($json);
         $jsondata->catquiz_catscales = $this->catscaleid;
         $jsondata->catscaleid = $this->catscaleid;
-        $jsondata->json = json_encode($jsondata);
+
+        // Include all subscales in the test.
+        foreach ([$catscale->id, ...catscale::get_subscale_ids($catscale->id)] as $scaleid) {
+            $propertyname = sprintf('catquiz_subscalecheckbox_%d', $scaleid);
+            $jsondata->$propertyname = true;
+        }
         $jsondata->componentid = '1';
         $jsondata->component = 'mod_adaptivequiz';
+        $jsondata->json = json_encode($jsondata);
         $testenvironment = new testenvironment($jsondata);
         return $testenvironment;
     }
