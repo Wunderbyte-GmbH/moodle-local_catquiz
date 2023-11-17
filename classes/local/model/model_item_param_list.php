@@ -477,9 +477,6 @@ class model_item_param_list implements ArrayAccess, IteratorAggregate, Countable
             }
             $DB->insert_record('local_catquiz_items', $recordforquery);
 
-            // Assign corresponding context.
-            self::assign_catcontext($newrecord);
-
             // Trigger event.
             $event = testiteminscale_added::create([
                 'objectid' => $newrecord['componentid'],
@@ -487,12 +484,15 @@ class model_item_param_list implements ArrayAccess, IteratorAggregate, Countable
                 'other' => [
                     'testitemid' => $newrecord['componentid'],
                     'catscaleid' => $newrecord['catscaleid'],
-                    'context' => $newrecord['contextid'],
+                    'context' => $newrecord['contextid'] ?? '',
                     'component' => $newrecord['componentname'],
                 ],
                 ]);
             $event->trigger();
         }
+
+        // Assign corresponding context.
+        self::assign_catcontext($newrecord);
         return $newrecord;
     }
 
