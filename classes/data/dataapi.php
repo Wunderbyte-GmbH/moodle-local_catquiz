@@ -240,6 +240,7 @@ class dataapi {
         // Invalidate cache. TODO: Instead of invalidating cache, delete the item from the cache.
         $cache = cache::make('local_catquiz', 'catscales');
         $cache->delete('allcatscales');
+        $cache->delete($catscaleid);
 
         if ($result) {
             return [
@@ -282,6 +283,7 @@ class dataapi {
         // Invalidate cache. TODO: Instead of invalidating cache, delete and add the item from the cache.
         $cache = cache::make('local_catquiz', 'catscales');
         $cache->delete('allcatscales');
+        $cache->delete($catscale->id);
         return $result;
     }
 
