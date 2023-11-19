@@ -107,5 +107,7 @@ Feature: As an admin I perform basic catquiz actions - create, update, delete, s
     And I click on "Subscribed" "link" in the "[data-name=\"Geometry\"]" "css_element"
     Then I should see "Subscribe" in the "[data-name=\"Geometry\"]" "css_element"
     And I click on "Delete" "link" in the "[data-name=\"Geometry\"]" "css_element"
-    And I wait "1" seconds
+    And I wait until the page is ready
+    ## TODO: should return to the same tab? Sometime tab not switched back to CAT scales after editing of catscale
+    And I click on "CAT scales" "link" in the "#region-main" "css_element"
     Then I should not see "Geometry"
