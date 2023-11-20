@@ -42,7 +42,7 @@ require_once($CFG->dirroot . '/question/format/xml/format.php');
 require_once($CFG->dirroot . '/question/format.php');
 require_once($CFG->dirroot . '/question/engine/tests/helpers.php');
 require_once($CFG->dirroot . '/question/editlib.php');
-require_once(__DIR__ . '../../../lib.php');
+require_once($CFG->dirroot . '/local/catquiz/lib.php');
 
 
 /**
@@ -79,10 +79,6 @@ class strategy_test extends advanced_testcase {
 
     public function setUp(): void {
         $this->import('simulation.xml', 'simulation.csv');
-        $this
-            ->createtestenvironment()
-            ->save_or_update();
-
         // Needed to simulate question answers.
 
         $cm = get_coursemodule_from_instance('adaptivequiz', $this->adaptivequiz->id);
@@ -109,14 +105,19 @@ class strategy_test extends advanced_testcase {
      * question, we simulate a correct or incorrect response before getting the
      * next question.
      *
-     * @param array $expected The data from the dataprovider.
+     * @param int $strategy The ID of the teststrategy.
+     * @param array $questions The expected list of questions.
      *
      * TODO: add group large?
      * TODO: Use different testenvironment.json files for different teststrategies.
      * @dataProvider strategy_returns_expected_questions_provider
      */
-    public function test_strategy_returns_expected_questions($expected) {
+    public function test_strategy_returns_expected_questions(int $strategy, array $questions) {
         global $DB, $USER;
+        $this
+            ->createtestenvironment($strategy)
+            ->save_or_update();
+
         catquiz_handler::prepare_attempt_caches();
 
         // This is needed so that the responses to the questions are indeed saved to the database.
@@ -126,7 +127,7 @@ class strategy_test extends advanced_testcase {
             'questionsattempted' => 0,
             'id' => 1,
         ];
-        foreach ($expected as $index => $expectedquestion) {
+        foreach ($questions as $index => $expectedquestion) {
             $abilityrecord = $DB->get_record(
                 'local_catquiz_personparams',
                 ['userid' => $USER->id, 'catscaleid' => $this->catscaleid],
@@ -165,6 +166,7 @@ class strategy_test extends advanced_testcase {
     public static function strategy_returns_expected_questions_provider(): array {
         return [
             'radical CAT' => [
+                'strategy' => STRATEGY_FASTEST,
                 'questions' => [
                     [
                         'label' => 'SIMB01-18',
@@ -173,7 +175,53 @@ class strategy_test extends advanced_testcase {
                         'ability_after' => 0.0,
                     ],
                     [
-                        'label' => 'SIMA01-15',
+                        'label' => 'SIMB02-07',
+                        'is_correct_response' => false,
+                        'ability_before' => 0,
+                        'ability_after' => 2.5,
+                    ],
+                    [
+                        'label' => 'SIMA02-02',
+                        'is_correct_response' => true,
+                        'ability_before' => 2.5,
+                        'ability_after' => -1.25,
+                    ],
+                ],
+            ],
+            'moderate CAT' => [
+                'strategy' => STRATEGY_BALANCED,
+                'questions' => [
+                    [
+                        'label' => 'SIMA01-09',
+                        'is_correct_response' => true,
+                        'ability_before' => 0,
+                        'ability_after' => 0.0,
+                    ],
+                    [
+                        'label' => 'SIMA01-01',
+                        'is_correct_response' => false,
+                        'ability_before' => 0,
+                        'ability_after' => 2.5,
+                    ],
+                    [
+                        'label' => 'SIMA01-00',
+                        'is_correct_response' => true,
+                        'ability_before' => 2.5,
+                        'ability_after' => -1.25,
+                    ],
+                ],
+            ],
+            'Infer lowest subscale' => [
+                'strategy' => STRATEGY_ALLSUBS,
+                'questions' => [
+                    [
+                        'label' => 'SIMB01-18',
+                        'is_correct_response' => true,
+                        'ability_before' => 0,
+                        'ability_after' => 0.0,
+                    ],
+                    [
+                        'label' => 'SIMB02-07',
                         'is_correct_response' => false,
                         'ability_before' => 0,
                         'ability_after' => 2.5,
@@ -224,9 +272,10 @@ class strategy_test extends advanced_testcase {
     /**
      * Parse a json file to create a test environment that will be used for the attempt.
      *
+     * @param int $strategyid
      * @return testenvironment
      */
-    private function createtestenvironment(): testenvironment {
+    private function createtestenvironment(int $strategyid): testenvironment {
         global $DB;
         $catscale = $DB->get_record('local_catquiz_catscales', ['parentid' => 0]);
         $this->catscaleid = $catscale->id;
@@ -242,6 +291,7 @@ class strategy_test extends advanced_testcase {
         }
         $jsondata->componentid = '1';
         $jsondata->component = 'mod_adaptivequiz';
+        $jsondata->catquiz_selectteststrategy = $strategyid;
         $jsondata->json = json_encode($jsondata);
         $testenvironment = new testenvironment($jsondata);
         return $testenvironment;
