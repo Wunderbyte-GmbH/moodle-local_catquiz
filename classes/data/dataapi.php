@@ -357,7 +357,7 @@ class dataapi {
      */
     public static function buildsqlquery() {
         global $DB;
-        $where = "c.id IN (SELECT t.itemid FROM {tag_instance} t WHERE (";
+        $where = "c.id IN (SELECT t.itemid FROM {tag_instance} t";
         $configs = get_config('local_catquiz');
 
         if (!isset($configs->cattags)) {
@@ -370,6 +370,7 @@ class dataapi {
 
         // Filter according to the tags.
         if ($configtags['OR'][0] != null) {
+            $where .= " WHERE (";
 
             $indexparam = 0;
             foreach ($configtags as $operator => $tags) {
@@ -390,9 +391,9 @@ class dataapi {
                     }
                 }
             }
+            $where .= ")";
         }
 
-        $where .= ")";
         return self::get_course_records($where, $params);
 
     }
