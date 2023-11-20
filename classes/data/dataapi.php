@@ -360,7 +360,7 @@ class dataapi {
         $where = "c.id IN (SELECT t.itemid FROM {tag_instance} t";
         $configs = get_config('local_catquiz');
 
-        if (!isset($configs->cattags)) {
+        if (empty($configs->cattags)) {
             return [];
         }
         // Search courses that are tagged with the specified tag.
@@ -378,6 +378,9 @@ class dataapi {
                     $tagscount = count($tags);
                     foreach ($tags as $index => $tag) {
                         $tag = (array) $DB->get_record('tag', ['id' => $tag], 'id, name');
+                        if ($tag[0] === false) {
+                            throw new moodle_exception('tag(s) not found in database');
+                        }
                         $params['tag'. $indexparam] = $tag['id'];
                         $where .= "t.tagid";
                         $where .= $operator == 'OR' ? ' = ' : ' != ';
@@ -407,7 +410,6 @@ class dataapi {
     protected static function get_course_records($whereclause, $params) {
         global $DB;
         $fields = ['c.id', 'c.fullname', 'c.shortname'];
-        // TODO  user query includieren 154-157 && available courses anzeigen.
         $sql = "SELECT ". join(',', $fields).
                 " FROM {course} c
                 JOIN {context} ctx ON c.id = ctx.instanceid
