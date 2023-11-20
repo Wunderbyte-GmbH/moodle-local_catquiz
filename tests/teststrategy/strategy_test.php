@@ -117,6 +117,8 @@ class strategy_test extends advanced_testcase {
      */
     public function test_strategy_returns_expected_questions($expected) {
         global $DB, $USER;
+        catquiz_handler::prepare_attempt_caches();
+
         // This is needed so that the responses to the questions are indeed saved to the database.
         $this->preventResetByRollback();
         $attemptdata = (object)[
