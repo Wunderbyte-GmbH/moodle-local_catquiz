@@ -380,8 +380,8 @@ class dataapi {
                     $tagscount = count($tags);
                     foreach ($tags as $index => $tag) {
                         $tag = (array) $DB->get_record('tag', ['id' => $tag], 'id, name');
-                        if ($tag[0] === false) {
-                            throw new moodle_exception('tag(s) not found in database');
+                        if (!isset($tag[0]) || $tag[0] === false) {
+                            throw new moodle_exception('tagnotfoundindb', 'local_catquiz');
                         }
                         $params['tag'. $indexparam] = $tag['id'];
                         $where .= "t.tagid";
