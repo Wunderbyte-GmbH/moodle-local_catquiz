@@ -48,6 +48,11 @@ final class strategybalancedscore extends preselect_task implements wb_middlewar
      */
     public function run(array &$context, callable $next): result {
         foreach ($context['questions'] as $question) {
+            // If no question has any attempt yet, they all get the same score of 0.
+            if ($context['generalnumberofattempts_max'] === 0) {
+                $question->score = 0;
+                continue;
+            }
             $lasttimeplayedpenaltyweighted = (1 - (
                $question->lasttimeplayedpenalty / $context['penalty_threshold']));
             $numberofgeneralattemptspenaltyweighted = (1 - (
