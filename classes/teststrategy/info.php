@@ -201,6 +201,7 @@ class info {
             'in',
             $strategyhasstandarderrorperscale
         );
+        $mform->setDefault('catquiz_standarderrorpersubscale', 50);
 
         $elements[] = $mform->addElement('select', 'catquiz_selectfirstquestion',
             get_string('catquiz_selectfirstquestion', 'local_catquiz'),
