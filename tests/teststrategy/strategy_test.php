@@ -70,7 +70,7 @@ class strategy_test extends advanced_testcase {
     /**
      * @var Stores the course we create for this test.
      */
-    private mixed $course;
+    private \stdClass $course;
 
     /**
      * @var An instance of an adaptive quiz
