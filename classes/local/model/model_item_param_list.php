@@ -420,12 +420,21 @@ class model_item_param_list implements ArrayAccess, IteratorAggregate, Countable
                 $id = $newrecord['id'];
             }
         }
+        if ($newrecord['warning'] != '') {
+            return [
+                'success' => 2, // Update successfull with warning.
+                'message' => $newrecord['warning'],
+                'recordid' => $id,
+             ];
+        } else {
+            return [
+                'success' => 1, // Update successfully.
+                'message' => get_string('success', 'core'),
+                'recordid' => $id,
+             ];
 
-        return [
-            'success' => 1, // Update successfully.
-            'message' => get_string('success', 'core'),
-            'recordid' => $id,
-         ];
+        }
+
     }
 
     /**
@@ -450,9 +459,37 @@ class model_item_param_list implements ArrayAccess, IteratorAggregate, Countable
                 $newrecord['catscaleid'] = $catscaleid;
             }
         }
-
         if (empty($newrecord['catscaleid'])) {
             throw new moodle_exception('nocatscaleid', 'local_catquiz');
+        } else if (!empty($newrecord['catscaleid']) && !empty($newrecord['componentid'])) {
+            // Check if record is already assigned to another scale.
+            $catscaleidofexisitingrecords = catscale::return_catscaleids_and_links_for_testitemitem(
+                                                        $newrecord['componentid'],
+                                                        $newrecord['componentname'],
+                                                    );
+            $newrecord['warning'] = '';
+            if (count($catscaleidofexisitingrecords) > 1) {
+                $links = '';
+                foreach ($catscaleidofexisitingrecords as $catscaleidofexisitingrecord => $link) {
+                    if ($catscaleidofexisitingrecords != $newrecord['catscaleid']) {
+                        $links .= $link . ', ';
+                    }
+                };
+                $links = substr($links, 0, -2);
+                $infodata = new stdClass;
+                $infodata->scalelink = $links;
+                $infodata->newscalename = catscale::get_link_to_catscale($newrecord['catscaleid']);
+                $infodata->componentid = $newrecord['componentid'];
+                $newrecord['warning'] .= get_string('itemassignedtosecondscale', 'local_catquiz', $infodata);
+            } else {
+                if (key($catscaleidofexisitingrecords) != $newrecord['catscaleid']) {
+                    $infodata = new stdClass;
+                    $infodata->scalelink = current($catscaleidofexisitingrecords);
+                    $infodata->newscalename = catscale::get_link_to_catscale($newrecord['catscaleid']);
+                    $infodata->componentid = $newrecord['componentid'];
+                    $newrecord['warning'] .= get_string('itemassignedtosecondscale', 'local_catquiz', $infodata);
+                }
+            }
         }
         // See if the item already exists.
         $scalerecord = $DB->get_record("local_catquiz_items", [

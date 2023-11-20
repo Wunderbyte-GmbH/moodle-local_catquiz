@@ -219,9 +219,12 @@ class fileparser {
 
                 // Execute the callback. If this doesn't work, don't treat the record.
                 $callbackresponse = $this->execute_callback($data);
-                if ($callbackresponse['success'] != 1) {
+                if ($callbackresponse['success'] == 0) {
                     $this->errors[] = $callbackresponse['message'];
                     continue;
+                } else if ($callbackresponse['success'] == 2) {
+                    $this->csvwarnings[] = $callbackresponse['message'];
+                    unset($callbackresponse['message']);
                 }
                 $this->records['callbackresponse'] = $callbackresponse;
 

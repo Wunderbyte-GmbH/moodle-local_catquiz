@@ -478,6 +478,7 @@ $string['labelidnotunique'] = 'Label {$a} is not unique.';
 $string['labelidnotfound'] = 'Label {$a} not found.';
 $string['updatedrecords'] = '{$a} record(s) updated.';
 $string['addedrecords'] = '{$a} record(s) added.';
+$string['itemassignedtosecondscale'] = 'Record with componentid {$a->componentid} is already assigned to scale {$a->scalelink}, now also assigned to {$a->newscalename}.';
 $string['callbackfunctionnotdefined'] = 'Callback function is not defined.';
 $string['callbackfunctionnotapplied'] = 'Callback function could not be applied.';
 $string['canbesetto0iflabelgiven'] = 'Can be 0 if matching of testitem is via label.';

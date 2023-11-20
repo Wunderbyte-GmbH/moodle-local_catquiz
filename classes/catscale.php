@@ -85,6 +85,30 @@ class catscale {
     }
 
     /**
+     * Static function to return array with key catscaleid and value link to catscale.
+     *
+     * @param int $componentid
+     * @param string $componentname
+     * @return array
+     */
+    public static function return_catscaleids_and_links_for_testitemitem(int $componentid, string $componentname = "question") {
+        global $DB;
+
+        $sql = "SELECT catscaleid
+        FROM {local_catquiz_items}
+        WHERE componentid = :componentid
+        AND componentname = :componentname";
+        $catscaleids = $DB->get_fieldset_sql($sql, [
+            'componentid' => $componentid,
+            'componentname' => $componentname,
+        ]);
+        $returndata = [];
+        foreach ($catscaleids as $catscaleid) {
+            $returndata[$catscaleid] = self::get_link_to_catscale($catscaleid);
+        }
+        return $returndata;
+    }
+    /**
      * Static function to return the value of contextid of a catscale.
      *
      * @param int $catscaleid
