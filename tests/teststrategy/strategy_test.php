@@ -75,7 +75,7 @@ class strategy_test extends advanced_testcase {
     /**
      * @var An instance of an adaptive quiz
      */
-    private mixed $adaptivequiz;
+    private \stdClass $adaptivequiz;
 
     public function setUp(): void {
         $this->import('simulation.xml', 'simulation.csv');
