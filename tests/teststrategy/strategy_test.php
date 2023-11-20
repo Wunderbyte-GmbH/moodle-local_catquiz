@@ -211,7 +211,53 @@ class strategy_test extends advanced_testcase {
                     ],
                 ],
             ],
-            'Infer lowest subscale' => [
+            'Infer lowest skillgap' => [
+                'strategy' => STRATEGY_LOWESTSUB,
+                'questions' => [
+                    [
+                        'label' => 'SIMB01-18',
+                        'is_correct_response' => true,
+                        'ability_before' => 0,
+                        'ability_after' => 0.0,
+                    ],
+                    [
+                        'label' => 'SIMB02-07',
+                        'is_correct_response' => false,
+                        'ability_before' => 0,
+                        'ability_after' => 2.5,
+                    ],
+                    [
+                        'label' => 'SIMA01-07',
+                        'is_correct_response' => true,
+                        'ability_before' => 2.5,
+                        'ability_after' => -1.25,
+                    ],
+                ],
+            ],
+            'Infer greatest strength' => [
+                'strategy' => STRATEGY_HIGHESTSUB,
+                'questions' => [
+                    [
+                        'label' => 'SIMB01-18',
+                        'is_correct_response' => true,
+                        'ability_before' => 0,
+                        'ability_after' => 0.0,
+                    ],
+                    [
+                        'label' => 'SIMA01-15',
+                        'is_correct_response' => false,
+                        'ability_before' => 0,
+                        'ability_after' => 2.5,
+                    ],
+                    [
+                        'label' => 'SIMA02-02',
+                        'is_correct_response' => true,
+                        'ability_before' => 2.5,
+                        'ability_after' => -1.25,
+                    ],
+                ],
+            ],
+            'Infer all subscales' => [
                 'strategy' => STRATEGY_ALLSUBS,
                 'questions' => [
                     [
@@ -228,6 +274,29 @@ class strategy_test extends advanced_testcase {
                     ],
                     [
                         'label' => 'SIMA02-02',
+                        'is_correct_response' => true,
+                        'ability_before' => 2.5,
+                        'ability_after' => -1.25,
+                    ],
+                ],
+            ],
+            'Classical test' => [
+                'strategy' => STRATEGY_CLASSIC,
+                'questions' => [
+                    [
+                        'label' => 'SIMA01-00',
+                        'is_correct_response' => true,
+                        'ability_before' => 0,
+                        'ability_after' => 0.0,
+                    ],
+                    [
+                        'label' => 'SIMA01-01',
+                        'is_correct_response' => false,
+                        'ability_before' => 0,
+                        'ability_after' => 2.5,
+                    ],
+                    [
+                        'label' => 'SIMA01-02',
                         'is_correct_response' => true,
                         'ability_before' => 2.5,
                         'ability_after' => -1.25,
