@@ -136,12 +136,16 @@ class graphicalsummary extends feedbackgenerator {
             )->name;
             $graphicalsummary[$index - 1]['fisherinformation'] = $lastquestion->fisherinformation ?? null;
             $graphicalsummary[$index - 1]['score'] = $lastquestion->score ?? null;
-            [$before, $after] = $this->getneighborquestions(
-                $lastquestion,
-                $cachedcontexts[$index - 1]['questions']
-            );
-            $graphicalsummary[$index - 1]['difficultynextbefore'] = $before->difficulty;
-            $graphicalsummary[$index - 1]['difficultynextafter'] = $after->difficulty;
+            $before = null;
+            $after = null;
+            if (array_key_exists('questions', $cachedcontexts[$index - 1])) {
+                [$before, $after] = $this->getneighborquestions(
+                    $lastquestion,
+                    $cachedcontexts[$index - 1]['questions']
+                );
+            }
+            $graphicalsummary[$index - 1]['difficultynextbefore'] = $before->difficulty ?? null;
+            $graphicalsummary[$index - 1]['difficultynextafter'] = $after->difficulty ?? null;
             $graphicalsummary[$index - 1]['personability_after'] = $data['person_ability'][$data['catscaleid']];
             $graphicalsummary[$index - 1]['personability_before'] =
                 $cachedcontexts[$index - 1]['person_ability'][$data['catscaleid']];
