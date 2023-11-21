@@ -84,10 +84,10 @@ class filterforsubscale extends preselect_task implements wb_middleware {
 
         switch ($context['teststrategy']) {
             case STRATEGY_HIGHESTSUB:
-                arsort($abilitydifference);
+                array_multisort($abilitydifference, SORT_DESC, array_keys($abilitydifference));
                 break;
             case STRATEGY_LOWESTSUB:
-                asort($abilitydifference);
+                array_multisort($abilitydifference, SORT_ASC, array_keys($abilitydifference));
                 break;
         };
 
