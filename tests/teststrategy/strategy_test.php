@@ -227,7 +227,7 @@ class strategy_test extends advanced_testcase {
                         'ability_after' => 2.5,
                     ],
                     [
-                        'label' => 'SIMA02-02',
+                        'label' => 'SIMA01-07',
                         'is_correct_response' => true,
                         'ability_before' => 2.5,
                         'ability_after' => -1.25,
@@ -244,7 +244,7 @@ class strategy_test extends advanced_testcase {
                         'ability_after' => 0.0,
                     ],
                     [
-                        'label' => 'SIMB02-07',
+                        'label' => 'SIMA01-15',
                         'is_correct_response' => false,
                         'ability_before' => 0,
                         'ability_after' => 2.5,

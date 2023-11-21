@@ -82,17 +82,17 @@ class filterforsubscale extends preselect_task implements wb_middleware {
             }
         }
 
+        $abilitykeys = array_keys($abilitydifference);
         switch ($context['teststrategy']) {
             case STRATEGY_HIGHESTSUB:
-                array_multisort($abilitydifference, SORT_DESC, array_keys($abilitydifference));
+                array_multisort($abilitydifference, SORT_DESC, $abilitykeys);
                 break;
             case STRATEGY_LOWESTSUB:
-                array_multisort($abilitydifference, SORT_ASC, array_keys($abilitydifference));
+                array_multisort($abilitydifference, SORT_ASC, $abilitykeys);
                 break;
         };
 
-        $catscaleids = array_keys($abilitydifference);
-        foreach ($catscaleids as $catscaleid) {
+        foreach ($abilitykeys as $catscaleid) {
             $questions = array_filter($context['questions'], fn ($q) => $q->catscaleid == $catscaleid);
             if (count($questions) > 0) {
                 $context['questions'] = $questions;
