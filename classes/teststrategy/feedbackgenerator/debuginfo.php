@@ -243,23 +243,25 @@ class debuginfo extends feedbackgenerator {
 
             $questions = [];
             $questionsperscale = [];
-            foreach ($data['questions'] as $qid => $question) {
-                $fisherinformation = $question->fisherinformation ?? "NA";
-                $score = $question->score ?? "NA";
-                $questions[] = [
-                    'id' => $qid,
-                    'text' => $question->questiontext,
-                    'type' => $question->qtype,
-                    'fisherinformation' => $fisherinformation,
-                    'score' => $score,
-                ];
-                if (! array_key_exists($question->catscaleid, $questionsperscale)) {
-                    $questionsperscale[$question->catscaleid] = [
-                        'num' => 0,
-                        'name' => $catscales[$question->catscaleid]->name,
+            if (array_key_exists('questions', $data)) {
+                foreach ($data['questions'] as $qid => $question) {
+                    $fisherinformation = $question->fisherinformation ?? "NA";
+                    $score = $question->score ?? "NA";
+                    $questions[] = [
+                        'id' => $qid,
+                        'text' => $question->questiontext,
+                        'type' => $question->qtype,
+                        'fisherinformation' => $fisherinformation,
+                        'score' => $score,
                     ];
+                    if (! array_key_exists($question->catscaleid, $questionsperscale)) {
+                        $questionsperscale[$question->catscaleid] = [
+                            'num' => 0,
+                            'name' => $catscales[$question->catscaleid]->name,
+                        ];
+                    }
+                    $questionsperscale[$question->catscaleid]['num'] = $questionsperscale[$question->catscaleid]['num'] + 1;
                 }
-                $questionsperscale[$question->catscaleid]['num'] = $questionsperscale[$question->catscaleid]['num'] + 1;
             }
             if ($questions) {
                 $questions[array_key_last($questions)]['last'] = true;

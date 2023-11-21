@@ -67,6 +67,8 @@ class wb_middleware_runner {
                 if ($cache) {
                     $cachedcontexts = $cache->get('context') ?: [];
                     $cachedcontexts[$context['questionsattempted']] = $context;
+                    unset($cachedcontexts[$context['questionsattempted']]['original_questions']);
+                    unset($cachedcontexts[$context['questionsattempted']]['questions']);
                     $cache->set('context', $cachedcontexts);
                 }
                 return $result;
