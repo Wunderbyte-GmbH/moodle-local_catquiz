@@ -60,8 +60,13 @@ final class strategybalancedscore extends preselect_task implements wb_middlewar
             $question->score = $numberofgeneralattemptspenaltyweighted * $lasttimeplayedpenaltyweighted;
         }
 
+        // In order to have predictable results, in case the values of two
+        // elements are exactly the same, sort by question ID.
         uasort($context['questions'], function($q1, $q2) {
-            return $q2->score <=> $q1->score;
+            if (! ($q2->score === $q1->score)) {
+                return $q2->score <=> $q1->score;
+            }
+            return $q1->id <=> $q2->id;
         });
 
         return result::ok(reset($context['questions']));

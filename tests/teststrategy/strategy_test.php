@@ -192,7 +192,7 @@ class strategy_test extends advanced_testcase {
                 'strategy' => STRATEGY_BALANCED,
                 'questions' => [
                     [
-                        'label' => 'SIMA01-09',
+                        'label' => 'SIMA01-00',
                         'is_correct_response' => true,
                         'ability_before' => 0,
                         'ability_after' => 0.0,
@@ -204,7 +204,7 @@ class strategy_test extends advanced_testcase {
                         'ability_after' => 2.5,
                     ],
                     [
-                        'label' => 'SIMA01-00',
+                        'label' => 'SIMA01-02',
                         'is_correct_response' => true,
                         'ability_before' => 2.5,
                         'ability_after' => -1.25,
@@ -227,7 +227,7 @@ class strategy_test extends advanced_testcase {
                         'ability_after' => 2.5,
                     ],
                     [
-                        'label' => 'SIMA01-07',
+                        'label' => 'SIMA02-02',
                         'is_correct_response' => true,
                         'ability_before' => 2.5,
                         'ability_after' => -1.25,
@@ -244,7 +244,7 @@ class strategy_test extends advanced_testcase {
                         'ability_after' => 0.0,
                     ],
                     [
-                        'label' => 'SIMA01-15',
+                        'label' => 'SIMB02-07',
                         'is_correct_response' => false,
                         'ability_before' => 0,
                         'ability_after' => 2.5,

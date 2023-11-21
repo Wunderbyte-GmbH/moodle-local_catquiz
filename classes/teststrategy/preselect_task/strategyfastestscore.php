@@ -59,7 +59,7 @@ final class strategyfastestscore extends preselect_task implements wb_middleware
             if (! ($q2->score === $q1->score)) {
                 return $q2->score <=> $q1->score;
             }
-            return $q2->id <=> $q1->id;
+            return $q1->id <=> $q2->id;
         });
 
         return result::ok(reset($context['questions']));
