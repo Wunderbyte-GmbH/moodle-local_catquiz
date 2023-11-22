@@ -379,6 +379,13 @@ class model_item_param_list implements ArrayAccess, IteratorAggregate, Countable
         // We only run this once we have the component id.
         $newrecord = self::update_in_scale($newrecord);
 
+        if (isset($newrecord['error'])) {
+            return [
+                'success' => 0, // Update not successful.
+                'message' => $newrecord['error'],
+             ];
+        }
+
         if (empty($newrecord['model'])) {
             return [
                 'success' => 2, // Update successful, but errors triggered.
@@ -461,36 +468,13 @@ class model_item_param_list implements ArrayAccess, IteratorAggregate, Countable
         }
         if (empty($newrecord['catscaleid'])) {
             throw new moodle_exception('nocatscaleid', 'local_catquiz');
-        } else if (!empty($newrecord['catscaleid']) && !empty($newrecord['componentid'])) {
-            // Check if record is already assigned to another scale.
-            $catscaleidofexisitingrecords = catscale::return_catscaleids_and_links_for_testitemitem(
-                                                        $newrecord['componentid'],
-                                                        $newrecord['componentname'],
-                                                        true
-                                                    );
-            $newrecord['warning'] = '';
-            if (count($catscaleidofexisitingrecords) > 1) {
-                $links = '';
-                foreach ($catscaleidofexisitingrecords as $catscaleidofexisitingrecord => $link) {
-                    if ($catscaleidofexisitingrecords != $newrecord['catscaleid']) {
-                        $links .= $link . ', ';
-                    }
-                };
-                $links = substr($links, 0, -2);
-                $infodata = new stdClass;
-                $infodata->scalelink = $links;
-                $infodata->newscalename = catscale::get_link_to_catscale($newrecord['catscaleid']);
-                $infodata->componentid = $newrecord['componentid'];
-                $newrecord['warning'] .= get_string('itemassignedtosecondscale', 'local_catquiz', $infodata);
-            } else {
-                if (key($catscaleidofexisitingrecords) != $newrecord['catscaleid']) {
+        }
+        if (catscale::is_assigned_to_parent_scale($catscaleid, $newrecord['componentid'])
+                || catscale::is_assigned_to_subscale($catscaleid, $newrecord['componentid'])) {
                     $infodata = new stdClass;
-                    $infodata->scalelink = current($catscaleidofexisitingrecords);
                     $infodata->newscalename = catscale::get_link_to_catscale($newrecord['catscaleid']);
                     $infodata->componentid = $newrecord['componentid'];
-                    $newrecord['warning'] .= get_string('itemassignedtosecondscale', 'local_catquiz', $infodata);
-                }
-            }
+                    $newrecord['error'] = get_string('itemassignedtoparentorsubscale', 'local_catquiz', $infodata);
         }
         // See if the item already exists.
         $scalerecord = $DB->get_record("local_catquiz_items", [

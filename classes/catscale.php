@@ -89,9 +89,13 @@ class catscale {
      *
      * @param int $componentid
      * @param string $componentname
+     * @param boolean $returnlink
      * @return array
      */
-    public static function return_catscaleids_and_links_for_testitemitem(int $componentid, string $componentname = "question") {
+    public static function return_catscaleids_and_links_for_testitemitem(
+            int $componentid,
+            string $componentname = "question",
+            bool $returnlink = false) {
         global $DB;
 
         $sql = "SELECT catscaleid
@@ -102,11 +106,16 @@ class catscale {
             'componentid' => $componentid,
             'componentname' => $componentname,
         ]);
-        $returndata = [];
-        foreach ($catscaleids as $catscaleid) {
-            $returndata[$catscaleid] = self::get_link_to_catscale($catscaleid);
+        if ($returnlink) {
+            $returndata = [];
+            foreach ($catscaleids as $catscaleid) {
+                $returndata[$catscaleid] = self::get_link_to_catscale($catscaleid);
+            }
+            return $returndata;
+        } else {
+            return $catscaleids;
         }
-        return $returndata;
+
     }
     /**
      * Static function to return the value of contextid of a catscale.
