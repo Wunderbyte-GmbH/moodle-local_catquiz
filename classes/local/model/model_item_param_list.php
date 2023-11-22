@@ -466,6 +466,7 @@ class model_item_param_list implements ArrayAccess, IteratorAggregate, Countable
             $catscaleidofexisitingrecords = catscale::return_catscaleids_and_links_for_testitemitem(
                                                         $newrecord['componentid'],
                                                         $newrecord['componentname'],
+                                                        true
                                                     );
             $newrecord['warning'] = '';
             if (count($catscaleidofexisitingrecords) > 1) {
