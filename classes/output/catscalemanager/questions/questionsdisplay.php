@@ -263,15 +263,11 @@ class questionsdisplay {
             'label' => get_string('addtestitem', 'local_catquiz'), // Name of your action button.
             'class' => 'btn btn-success',
             'href' => '#',
-            'methodname' => 'addtestitem', // The method needs to be added to your child of wunderbyte_table class.
+            'formname' => 'local_catquiz\\form\\add_testitem_to_scale',
             'id' => -1, // This makes one Ajax call for all selected item, not one for each.
             'data' => [ // Will be added eg as data-id = $values->id, so values can be transmitted to the method above.
-                'titlestring' => 'addtestitemtitle',
-                'bodystring' => 'addtestitembody',
-                'submitbuttonstring' => 'addtestitemsubmit',
-                'component' => 'local_catquiz',
-                'labelcolumn' => 'questiontext',
                 'catscaleid' => $catscaleid,
+                'title' => get_string('addtestitemtitle', 'local_catquiz'),
             ],
         ];
 

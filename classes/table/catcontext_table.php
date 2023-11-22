@@ -136,7 +136,6 @@ class catcontext_table extends wunderbyte_table {
             'href' => '#', // You can either use the link, or JS, or both.
             'iclass' => 'fa fa-edit', // Add an icon before the label.
             'id' => $values->id,
-            // The method needs to be added to your child of wunderbyte_table class.
             'formname' => 'local_catquiz\\form\\edit_catcontext',
             'data' => [
                 'id' => $values->id,
