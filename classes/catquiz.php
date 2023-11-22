@@ -1534,4 +1534,16 @@ class catquiz {
             'instanceid' => $instanceid,
         ];
     }
+
+    /** Takes an array of ids and returns an array of the questions with these ids.
+     * @param array $questionids
+     * @return array
+     */
+    public static function get_questions_by_ids(array $questionids) {
+        global $DB;
+
+        $questions = $DB->get_records_list('question', 'id', $questionids);
+
+        return $questions;
+    }
 }
