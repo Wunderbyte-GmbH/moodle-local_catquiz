@@ -137,6 +137,7 @@ class testenvironments_table extends wunderbyte_table {
 
         global $OUTPUT;
 
+        $url = new moodle_url('/course/view.php', ['id' => $values->id]);
         $data['showactionbuttons'][] = [
             'label' => get_string('edit', 'core'), // Name of your action button.
             'class' => 'btn btn-blank',
@@ -155,7 +156,7 @@ class testenvironments_table extends wunderbyte_table {
             'label' => get_string('delete', 'core'), // Name of your action button.
             'class' => 'btn btn-blank',
             'href' => '#', // You can either use the link, or JS, or both.
-            'iclass' => 'fa fa-edit', // Add an icon before the label.
+            'iclass' => 'fa fa-trash', // Add an icon before the label.
             'id' => $values->id,
             'methodname' => 'deleteitem', // The method needs to be added to your child of wunderbyte_table class.
             'data' => [
@@ -168,6 +169,14 @@ class testenvironments_table extends wunderbyte_table {
                     'value' => 'name',
                 ],
                 ],
+        ];
+
+        $data['showactionbuttons'][] = [
+            'label' => get_string('show', 'core'), // Name of your action button.
+            'class' => 'btn btn-blank',
+            'href' => $url->out(),
+            'iclass' => 'fa fa-eye', // Add an icon before the label.
+            'id' => $values->id,
         ];
 
         return $OUTPUT->render_from_template('local_wunderbyte_table/component_actionbutton', $data);;
