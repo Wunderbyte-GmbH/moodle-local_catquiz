@@ -450,12 +450,12 @@ class catscalequestions_table extends wunderbyte_table {
         return $values->questioncontextattempts;
     }
 
-        /**
-         * Function to handle the action buttons.
-         * @param int $testitemid
-         * @param string $data
-         * @return array
-         */
+    /**
+     * Function to handle the action buttons.
+     * @param int $testitemid
+     * @param string $data
+     * @return array
+     */
     public function addtestitem(int $testitemid, string $data) {
 
         $jsonobject = json_decode($data);
