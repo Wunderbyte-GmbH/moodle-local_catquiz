@@ -145,8 +145,6 @@ class comparetotestaverage extends feedbackgenerator {
      */
     private function get_colorgradientstring($quizsettings): string {
         if (!$quizsettings) {
-            // TODO maybe return default.
-            // Default: $interval = 100 / ($totalvalues - 1);.
             return "";
         }
 

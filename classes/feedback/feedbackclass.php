@@ -306,8 +306,7 @@ class feedbackclass {
                 $headersuffix = ' : ' . get_string('feedbackcompletedpartially', 'local_catquiz', $statusofcompletion);
             }
 
-
-            $mform->registerNoSubmitButton('copysettingsforallsubscales');
+            $mform->registerNoSubmitButton('copysettingsforallsubscales_' . $scale->id);
             $subelements[] = $mform->addElement(
                 'submit',
                 'copysettingsforallsubscales_' . $scale->id,
