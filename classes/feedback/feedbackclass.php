@@ -292,19 +292,6 @@ class feedbackclass {
                 // TODO: If none of both ('catquiz_groups_'... & 'catquiz_courses_'...) is selected, hide checkbox.
             }
 
-            // Only for the parentscale (=first form), we display to button to apply values for all subscales.
-            if ($scale->parentid == 0) {
-                $mform->registerNoSubmitButton('copysettingsforallsubscales');
-                $subelements[] = $mform->addElement(
-                    'submit',
-                    'copysettingsforallsubscales',
-                    get_string('copysettingsforallsubscales', 'local_catquiz'),
-                    [
-                        'data-action' => 'submitFeedbackValues',
-                    ]
-                );
-            }
-
             // Add a header for each scale.
             // We check if feedbacks completed partially, entirely or not at all.
             if ($numberoffeedbacksfilledout == 0) {
@@ -319,6 +306,17 @@ class feedbackclass {
                 $headersuffix = ' : ' . get_string('feedbackcompletedpartially', 'local_catquiz', $statusofcompletion);
             }
 
+
+            $mform->registerNoSubmitButton('copysettingsforallsubscales');
+            $subelements[] = $mform->addElement(
+                'submit',
+                'copysettingsforallsubscales_' . $scale->id,
+                get_string('copysettingsforallsubscales', 'local_catquiz'),
+                [
+                    'data-action' => 'submitFeedbackValues',
+                ]
+            );
+
             $numberofclosinghtmls = 0;
             if (!isset($previousdepth) || !isset($previousparentscaleid)) {
                 $numberofclosinghtmls = 0;
@@ -331,7 +329,6 @@ class feedbackclass {
                 $depthdifference = $previousdepth - $scale->depth;
                 $numberofclosinghtmls = 2 + $depthdifference;
             }
-
             $previousparentscaleid = $scale->parentid;
             $previousdepth = $scale->depth;
 

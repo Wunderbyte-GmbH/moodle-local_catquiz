@@ -524,6 +524,15 @@ class catquiz_handler {
 
         $values = $mform->getSubmitValues();
 
+        // Check if button was triggered to copy values.
+        foreach ($values as $key => $value) {
+            if (strpos($key, 'copysettingsforallsubscales_') === 0) {
+                $scaleidofcopyvalue = substr($key, strlen('copysettingsforallsubscales_'));
+                $subscaleids = catscale::get_subscale_ids(intval($scaleidofcopyvalue));
+            }
+
+        };
+
         // If we just changed the number of the feedbackoptions.
         // We add the right values.
         if (isset($values["submitnumberoffeedbackoptions"])
@@ -555,10 +564,8 @@ class catquiz_handler {
                 }
             }
             return;
-        } else if (isset($values['copysettingsforallsubscales'])) {
-            // Copy values from parent scale to all other subscale elements.
-            $catscaleid = $values['catquiz_catscales'];
-            $subscaleids = [];
+        } else if (isset($scaleidofcopyvalue) && !empty($subscaleids)) {
+            // Copy values from a parent scale to all other subscale elements.
             $numberoffeedbackoptions = intval($values['numberoffeedbackoptionsselect']);
             $standardvalues = [];
             $feedbackvaluekeys = [
@@ -577,28 +584,27 @@ class catquiz_handler {
                     if (!isset($standardvalues[$feedbackvaluekey])) {
                         $standardvalues[$feedbackvaluekey] = [];
                     }
-                    $keyname = $feedbackvaluekey . $catscaleid . '_' . $j;
-                    $standardvalues[$feedbackvaluekey][$j] = $values[$keyname] ?: null;
+                    $keyname = $feedbackvaluekey . $scaleidofcopyvalue . '_' . $j;
+                    $standardvalues[$feedbackvaluekey][$j] = $values[$keyname] ?? null;
                 }
             }
 
+            // Check foreach subscale if it's selected.
             // Get the ids of all scales to apply feedback to.
-            foreach ($values as $k => $v) {
-                if (strpos($k, 'catquiz_subscalecheckbox') !== false
-                    && intval($v) === 1 ) {
-                    $subscaleids[] = trim($k, 'catquiz_subscalecheckbox_');
+            foreach ($subscaleids as $k => $subscaleid) {
+                $key = 'catquiz_subscalecheckbox_' . $subscaleid;
+                if (!isset($values[$key]) || $values[$key] == "0") {
+                    unset($subscaleids[$k]);
                 }
             }
 
             // Apply standard values to all subscales.
             // For all keys (in array) with all subscales (in array) for required number of feedbackoptions.
-            foreach ($values as $k => $v) {
-                foreach ($feedbackvaluekeys as $feedbackvaluekey) {
-                    foreach ($subscaleids as $subscaleid) {
-                        for ($j = 1; $j <= $numberoffeedbackoptions; $j++) {
-                            $subscalekey = $feedbackvaluekey . $subscaleid . '_' . $j;
-                            $values[$subscalekey] = $standardvalues[$feedbackvaluekey][$j];
-                        }
+            foreach ($feedbackvaluekeys as $feedbackvaluekey) {
+                foreach ($subscaleids as $subscaleid) {
+                    for ($j = 1; $j <= $numberoffeedbackoptions; $j++) {
+                        $subscalekey = $feedbackvaluekey . $subscaleid . '_' . $j;
+                        $values[$subscalekey] = $standardvalues[$feedbackvaluekey][$j];
                     }
                 }
             }
