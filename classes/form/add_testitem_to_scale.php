@@ -28,6 +28,7 @@ use context_system;
 use core_form\dynamic_form;
 use local_catquiz\catcontext;
 use local_catquiz\catquiz;
+use local_catquiz\catscale;
 use moodle_url;
 
 /**
@@ -48,21 +49,31 @@ class add_testitem_to_scale extends dynamic_form {
         $mform = $this->_form;
         $data = (object) $this->_ajaxformdata;
 
-        if (isset($data->catscaleid)) {
-            $mform->addElement('hidden', 'id', $data->catscaleid);
+        $catscaleid = $data->catscaleid ?? optional_param('scaleid', 0, PARAM_INT);
+
+        if (isset($catscaleid)) {
+            $mform->addElement('hidden', 'catscaleid', $catscaleid);
         }
-        if (empty($data->checkedids)) {
-            return;
+        if (isset($data->checkedids)) {
+            $mform->addElement('hidden', 'checkedids', $data->checkedids);
         }
+
         $mform->addElement('header', 'addtestitemtitle_catquiz_body', get_string('addtestitembody', 'local_catquiz'));
 
         $checkedids = explode(",", $data->checkedids);
         $questions = catquiz::get_questions_by_ids($checkedids);
         foreach ($questions as $question) {
             $questiontext = $question->questiontext;
-            $mform->addElement('static', 'questiontext_' . $question->id, $question->name, $questiontext);
+            $mform->addElement('static', 'questiontext_' . $question->id, $question->id, $questiontext);
+
+            // Check if question has an assigned scale and compare to newscale.
+            if (catscale::is_assigned_to_parent_scale($catscaleid, $question->id)
+            || catscale::is_assigned_to_subscale($catscaleid, $question->id)) {
+                $mform->addElement('hidden', 'itemalreadyinotherscale_' . $question->id, $question->id);
+            }
 
         }
+        $mform->addElement('advcheckbox', 'validateitemsscaleid', "", 0, ['class' => 'hidden']);
     }
 
     /**
@@ -86,25 +97,6 @@ class add_testitem_to_scale extends dynamic_form {
     public function process_dynamic_submission(): object {
         $data = $this->get_data();
 
-        // if (isset($data->id)) {
-
-        //     $data->descriptionformat = $data->description['format'];
-        //     $data->description = $data->description['text'];
-        //     $data->json = json_encode(
-        //         [
-        //             'max_iterations' => $data->max_iterations,
-        //             'default' => $data->default ? true : false,
-        //             'strategy' => ['model_override' => $data->model_override],
-        //         ]);
-
-        //     $catcontext = new catcontext($data);
-
-        //     $catcontext->save_or_update();
-
-        // }
-
-        // cache_helper::purge_by_event('changesincatcontexts');
-
         return $data;
     }
 
@@ -119,30 +111,6 @@ class add_testitem_to_scale extends dynamic_form {
      */
     public function set_data_for_dynamic_submission(): void {
         $data = (object) $this->_ajaxformdata;
-        $form = $this->_form;
-        // if (!empty($data->id)) {
-
-        //     $record = (object)[
-        //         'id' => $data->id,
-        //     ];
-        //     $catcontext = new catcontext($record);
-        //     $storeddata = (array)$catcontext->return_as_class();
-
-        //     $storeddata['description'] = [
-        //         'format' => $storeddata['descriptionformat'],
-        //         'text' => $storeddata['description'],
-        //     ];
-
-        //     $jsonobj = json_decode($storeddata['json']);
-        //     $storeddata['max_iterations'] = $jsonobj->max_iterations;
-        //     $storeddata['model_override'] = $jsonobj->strategy->model_override;
-        //     $storeddata['default'] = $jsonobj->default;
-
-        //     foreach ($storeddata as $key => $value) {
-        //         $data->$key = $value;
-        //     }
-
-        // }
 
         $this->set_data($data);
     }
@@ -186,7 +154,23 @@ class add_testitem_to_scale extends dynamic_form {
     public function validation($data, $files): array {
         $errors = [];
 
-        //model_strategy::validation($data, $files, $errors);
+        if ($data['validateitemsscaleid'] != 1) {
+            $errors['validateitemsscaleid'] = get_string('pleasecheckorcancel');
+        }
+        $mform = $this->_form;
+
+        $itemsalreadyassigned = [];
+        foreach ($data as $key => $value) {
+            if (strpos($key, 'itemalreadyinotherscale') === 0) {
+                $itemsalreadyassigned[] = $value;
+            }
+        }
+        if (count($itemsalreadyassigned) > 0) {
+            $itemids = implode(', ', $itemsalreadyassigned);
+            $messagetext = get_string('moveitemtootherscale', 'local_catquiz', $itemids);
+            $mform->addElement('advcheckbox', 'validateitemsscaleid', $messagetext, 0);
+        }
+
         return $errors;
     }
 }

@@ -79,6 +79,8 @@ $string['minquestionspersubscale_help'] = 'Eine Subskala wird frühestens dann a
 $string['contextidselect'] = 'CAT Kontext - ohne Auswahl wird ein neuer Kontext erstellt';
 $string['choosecontextid'] = 'CAT Kontext auswählen';
 $string['defaultcontext'] = 'Neuer Standard Kontext für Skala';
+$string['moveitemtootherscale'] = 'Testitem(s) {$a} sind bereits einer anderen (Sub-)Skala des selben Baumes zugeordnet. Zuordnung ändern?';
+$string['pleasecheckorcancel'] = 'Bitte bestätigen oder abbrechen';
 
 $string['timepacedtest'] = 'Zeitbeschränkungen für den Test aktivieren';
 $string['maxtime'] = 'Maximale Dauer des Tests';

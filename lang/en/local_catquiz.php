@@ -85,6 +85,8 @@ $string['actontimeout'] = 'Action on timeout';
 $string['contextidselect'] = 'CAT context - without selection default context is created';
 $string['choosecontextid'] = 'Choose CAT context';
 $string['defaultcontext'] = 'New default context for scale';
+$string['moveitemtootherscale'] = 'Testitem(s) {$a} already assigned to another (sub-)scale of the same tree. Modify assignment?';
+$string['pleasecheckorcancel'] = 'Please confirm or cancel';
 
 $string['timeoutabortnoresult'] = 'Test aborted without result.';
 $string['timeoutabortresult'] = 'Test aborted with result.';
