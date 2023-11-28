@@ -29,6 +29,7 @@ use core_form\dynamic_form;
 use local_catquiz\catcontext;
 use local_catquiz\catquiz;
 use local_catquiz\catscale;
+use local_catquiz\table\catscalequestions_table;
 use moodle_url;
 
 /**
@@ -97,7 +98,13 @@ class add_testitem_to_scale extends dynamic_form {
     public function process_dynamic_submission(): object {
         $data = $this->get_data();
 
-        return $data;
+        $testitems = explode(",", $data->checkedids);
+        if (count($testitems) > 1) {
+            $result = catscalequestions_table::addtestitem(-1, json_encode($data), true);
+        } else {
+            $result = catscalequestions_table::addtestitem($testitems[0], json_encode($data), true);
+        }
+        return (object)$result;
     }
 
     /**
@@ -155,7 +162,7 @@ class add_testitem_to_scale extends dynamic_form {
         $errors = [];
 
         if ($data['validateitemsscaleid'] != 1) {
-            $errors['validateitemsscaleid'] = get_string('pleasecheckorcancel');
+            $errors['validateitemsscaleid'] = get_string('pleasecheckorcancel', 'local_catquiz');
         }
         $mform = $this->_form;
 

@@ -456,7 +456,7 @@ class catscalequestions_table extends wunderbyte_table {
      * @param string $data
      * @return array
      */
-    public function addtestitem(int $testitemid, string $data) {
+    public static function addtestitem(int $testitemid, string $data, bool $overridecatscale = false) {
 
         $jsonobject = json_decode($data);
 
@@ -471,12 +471,21 @@ class catscalequestions_table extends wunderbyte_table {
 
         if ($testitemid == -1) {
             $idarray = $jsonobject->checkedids;
+            if (gettype($idarray) === "string") {
+                $idarray = explode(",", $idarray);
+            }
         } else if ($testitemid > 0) {
             $idarray = [$testitemid];
         }
 
         foreach ($idarray as $id) {
-            $result[] = catscale::add_or_update_testitem_to_scale($catscaleid, $id);
+            $result[] = catscale::add_or_update_testitem_to_scale(
+                $catscaleid,
+                $id,
+                TESTITEM_STATUS_UNDEFINED,
+                'question',
+                $overridecatscale
+            );
         }
         $failed = array_filter($result, fn($r) => $r->isErr());
 

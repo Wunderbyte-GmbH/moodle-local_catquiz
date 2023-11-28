@@ -34,6 +34,7 @@ use local_catquiz\event\testiteminscale_added;
 use local_catquiz\event\testiteminscale_updated;
 use local_catquiz\local\result;
 use local_catquiz\local\status;
+use context_system;
 use moodle_exception;
 use moodle_url;
 use stdClass;
@@ -153,21 +154,25 @@ class catscale {
     public static function add_or_update_testitem_to_scale(
             int $catscaleid,
             int $testitemid,
-            int $status = 2,
-            string $component = 'question') {
+            int $status = TESTITEM_STATUS_UNDEFINED,
+            string $component = 'question',
+            bool $overridecatscale = false) {
 
         global $DB;
-        $context = \context_system::instance();
+        $context = context_system::instance();
 
         $searchparams = [
             'componentid' => $testitemid,
             'componentname' => $component,
             'catscaleid' => $catscaleid,
         ];
+        if ($overridecatscale) {
+            unset($searchparams['catscaleid']);
+        }
 
         // Check if status is changed.
         $statuschanged = false;
-        if ($status == 2) {
+        if ($status == LOCAL_CATQUIZ_TESTITEM_STATUS_UNDEFINED) {
             $status = LOCAL_CATQUIZ_TESTITEM_STATUS_ACTIVE;
         } else {
             $statuschanged = true;
@@ -183,6 +188,9 @@ class catscale {
             // Right now, there is nothing to do, as we don't have more data.
             $id = $record->id;
             $data['id'] = $id;
+            if ($overridecatscale) {
+                $data['catscaleid'] = $catscaleid;
+            }
             $DB->update_record('local_catquiz_items', (object)$data);
 
             if ($statuschanged) {
