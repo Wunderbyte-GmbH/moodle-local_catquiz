@@ -45,6 +45,7 @@ define('STRATEGY_CLASSIC', 7);
 // Testiem Status in Scale.
 define('TESTITEM_STATUS_ACTIVE', 0);
 define('TESTITEM_STATUS_INACTIVE', 1);
+define('TESTITEM_STATUS_UNDEFINED', 2);
 
 // Testitem model calc status.
 define('STATUS_EXCLUDED_MANUALLY', -5);
