@@ -79,25 +79,25 @@ abstract class feedbackgenerator {
     /**
      * Returns the feedback as an array with elements 'heading' and 'feedback'.
      *
-     * @param array $context
+     * @param array $feedbackdata
      * @return array
      * @throws coding_exception
      * @throws UnexpectedValueException
      */
-    public function get_feedback(array $context): array {
+    public function get_feedback(array $feedbackdata): array {
         // Check if all required data are provided. If not, load them.
-        if (!$this->has_required_context_keys($context)) {
+        if (!$this->has_required_context_keys($feedbackdata)) {
             return $this->no_data();
         }
 
-        $studentfeedback = $this->get_studentfeedback($context);
+        $studentfeedback = $this->get_studentfeedback($feedbackdata);
         if (! $this->isvalidfeedback($studentfeedback)) {
             $studentfeedback = $this->no_data();
         }
 
         $teacherfeedback = [];
         if ($this->has_teacherfeedbackpermission()) {
-            $teacherfeedback = $this->get_teacherfeedback($context);
+            $teacherfeedback = $this->get_teacherfeedback($feedbackdata);
         }
         if (! $this->isvalidfeedback($teacherfeedback)) {
             $teacherfeedback = $this->no_data();

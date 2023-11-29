@@ -415,6 +415,10 @@ $string['feedback_table_answercorrect'] = "Richtig";
 $string['feedback_table_answerincorrect'] = "Falsch";
 $string['feedback_table_answerpartlycorrect'] = "Teilweise richtig";
 
+// Chart in Feedback.
+$string['labelforrelativepersonabilitychart'] = "Relative Personenfähigkeit";
+$string['chartlegendabilityrelative'] = '{$a->ability} (Personenfähigkeit dieser Skala); {$a->difference} (Im Vergleich zur Mutterskala)';
+
 // Check display line breaks etc.
 $string['choosesubscaleforfeedback_help'] = 'Für die angezeigten Subskalen können Sie nun {$a} Feedback-Angaben hinterlegen. Wählen Sie die jeweilige (Sub-)Skala an, um Ihr Feedback einzugeben. Die farbigen Symbole zeigen Ihnen den aktuellen Stand der Bearbeitung an, gemessen an den vor Ihnen hinterlegten Anzahl an Feedback-Optionen:
     grau - noch kein Feedback in der Sub-Skala hinterlegt

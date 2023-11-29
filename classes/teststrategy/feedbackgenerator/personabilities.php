@@ -25,8 +25,13 @@
 namespace local_catquiz\teststrategy\feedbackgenerator;
 
 use cache;
+use core\chart_axis;
+use core\chart_bar;
+use core\chart_series;
 use local_catquiz\catquiz;
+use local_catquiz\feedback\feedbackclass;
 use local_catquiz\teststrategy\feedbackgenerator;
+use stdClass;
 
 /**
  * Returns rendered person abilities.
@@ -47,6 +52,10 @@ class personabilities extends feedbackgenerator {
      */
     protected function get_studentfeedback(array $data): array {
         global $OUTPUT;
+        // Feedback data is rendered from template.
+
+        $chart = $this->render_chart($data);
+
         $feedback = $OUTPUT->render_from_template(
             'local_catquiz/feedback/personabilities',
             ['abilities' => $data['feedback_personabilities']]
@@ -54,7 +63,7 @@ class personabilities extends feedbackgenerator {
 
         return [
             'heading' => $this->get_heading(),
-            'content' => $feedback,
+            'content' => $chart,
         ];
     }
 
@@ -102,6 +111,8 @@ class personabilities extends feedbackgenerator {
      *
      */
     public function load_data(int $attemptid, array $initialcontext): ?array {
+
+        // We get the data here.
         global $CFG;
         require_once($CFG->dirroot . '/local/catquiz/lib.php');
 
@@ -126,8 +137,99 @@ class personabilities extends feedbackgenerator {
             $data[] = [
                 'ability' => $ability,
                 'name' => $catscales[$catscaleid]->name,
+                'catscaleid' => $catscaleid,
             ];
         }
         return ['feedback_personabilities' => $data];
+    }
+
+    /**
+     * Render chart for personabilities.
+     *
+     * @param array $data
+     *
+     * @return array
+     *
+     */
+    private function render_chart(array $data) {
+        global $OUTPUT;
+
+        $parentscaleid = $data['quizsettings']['catquiz_catscales'];
+
+        $parentability = 0;
+        // First we get the personability of the parentscale.
+        foreach ($data['feedback_personabilities'] as $dataitem) {
+            if ($dataitem['catscaleid'] == $parentscaleid) {
+                $parentability = floatval($dataitem['ability']);
+            }
+        }
+        $chart = new chart_bar();
+        $chart->set_horizontal(true);
+        $chartseries = [];
+        $chartseries['series'] = [];
+        $chartseries['labels'] = [];
+        foreach ($data['feedback_personabilities'] as $dataitem) {
+            $subscaleability = floatval($dataitem['ability']);
+            $subscalename = $dataitem['name'];
+            $difference = round($subscaleability - $parentability, 2);
+            $series = new chart_series($subscalename, [0 => $difference]);
+
+            $stringforchartlegend = get_string(
+                'chartlegendabilityrelative',
+                'local_catquiz',
+                [
+                    'ability' => strval($subscaleability),
+                    'difference' => strval($difference),
+                ]);
+            $series->set_labels([0 => $stringforchartlegend]);
+
+            $colorvalue = $this->get_color_for_personabily(
+                $data['quizsettings'],
+                floatval($subscaleability),
+                floatval($dataitem['catscaleid'])
+            );
+            $series->set_colors([0 => $colorvalue]);
+            $chart->add_series($series);
+            $chart->set_labels([0 => get_string('labelforrelativepersonabilitychart', 'local_catquiz')]);
+        };
+        $out = $OUTPUT->render($chart);
+
+        return $out;
+
+    }
+
+    /**
+     * Write information about colorgradient for colorbar.
+     *
+     * @param object $quizsettings
+     * @param float $personability
+     * @param float $catscaleid
+     * @return string
+     *
+     */
+    private function get_color_for_personabily($quizsettings, float $personability, float $catscaleid): string {
+        $default = "#000000";
+        if (!$quizsettings ||
+            $personability < PERSONABILITY_LOWER_LIMIT ||
+            $personability > PERSONABILITY_UPPER_LIMIT) {
+            return $default;
+        }
+        $numberoffeedbackoptions = intval($quizsettings['numberoffeedbackoptionsselect']) ?? 8;
+        $colorarray = feedbackclass::get_array_of_colors($numberoffeedbackoptions);
+
+        for ($i = 1; $i <= $numberoffeedbackoptions; $i++) {
+            $rangestartkey = "feedback_scaleid_limit_lower_" . $catscaleid . "_" . $i;
+            $rangeendkey = "feedback_scaleid_limit_upper_" . $catscaleid . "_" . $i;
+            $rangestart = floatval($quizsettings[$rangestartkey]);
+            $rangeend = floatval($quizsettings[$rangeendkey]);
+
+            if ($personability >= $rangestart && $personability <= $rangeend) {
+                $colorkey = 'wb_colourpicker_' . $catscaleid . '_' . $i;
+                $colorname = $quizsettings[$colorkey];
+                return $colorarray[$colorname];
+            }
+
+        }
+        return $default;
     }
 }

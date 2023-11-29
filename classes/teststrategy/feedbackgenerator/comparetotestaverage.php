@@ -137,7 +137,7 @@ class comparetotestaverage extends feedbackgenerator {
     }
 
     /**
-     * Get feedbackdata.
+     * Write information about colorgradient for colorbar.
      *
      * @param object $quizsettings
      * @return string
@@ -184,7 +184,6 @@ class comparetotestaverage extends feedbackgenerator {
         // Remove the last comma.
         $output = rtrim($output, ", ");
         return $output;
-
     }
 
 
