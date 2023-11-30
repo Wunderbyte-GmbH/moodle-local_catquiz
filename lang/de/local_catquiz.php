@@ -417,7 +417,7 @@ $string['feedback_table_answerpartlycorrect'] = "Teilweise richtig";
 
 // Chart in Feedback.
 $string['labelforrelativepersonabilitychart'] = "Relative Personenfähigkeit";
-$string['chartlegendabilityrelative'] = '{$a->ability} (Personenfähigkeit dieser Skala); {$a->difference} (Im Vergleich zur Mutterskala)';
+$string['chartlegendabilityrelative'] = '{$a->difference} (Im Vergleich zur Mutterskala); {$a->ability} (Personenfähigkeit dieser Skala)';
 $string['personabilitycharttitle'] = 'Relative Personenfähigkeit in den Subskalen - im Vergleich zur Mutterskala';
 $string['personabilitytitle'] = 'Personenfähigkeit in den Subskalen';
 $string['itemsplayed'] = 'Fragen gespielt';

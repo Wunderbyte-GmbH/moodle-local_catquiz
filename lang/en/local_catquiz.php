@@ -420,7 +420,7 @@ $string['feedback_table_answerpartlycorrect'] = "partly correct";
 
 // Personability & chart in Feedback.
 $string['labelforrelativepersonabilitychart'] = "Relative personability";
-$string['chartlegendabilityrelative'] = '{$a->ability} (Personability of scale); {$a->difference} (Compared to parentscale)';
+$string['chartlegendabilityrelative'] = '{$a->difference} (Compared to parentscale); {$a->ability} (Personability of scale)';
 $string['personabilitycharttitle'] = 'Relative personability in subscales - compared to parentscale';
 $string['personabilitytitle'] = 'Personability in subscales';
 $string['itemsplayed'] = 'Items played';
