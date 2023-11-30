@@ -53,7 +53,7 @@ class teststrategy_balanced extends strategy {
      *
      * @var int $id // strategy id defined in lib.
      */
-    public int $id = STRATEGY_BALANCED;
+    public int $id = LOCAL_CATQUIZ_STRATEGY_BALANCED;
 
     /**
      * Return required score modifiers.

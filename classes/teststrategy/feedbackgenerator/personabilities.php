@@ -256,8 +256,8 @@ class personabilities extends feedbackgenerator {
     private function get_color_for_personabily(array $quizsettings, float $personability, float $catscaleid): string {
         $default = "#000000";
         if (!$quizsettings ||
-            $personability < PERSONABILITY_LOWER_LIMIT ||
-            $personability > PERSONABILITY_UPPER_LIMIT) {
+            $personability < LOCAL_CATQUIZ_PERSONABILITY_LOWER_LIMIT ||
+            $personability > LOCAL_CATQUIZ_PERSONABILITY_UPPER_LIMIT) {
             return $default;
         }
         $numberoffeedbackoptions = intval($quizsettings['numberoffeedbackoptionsselect']) ?? 8;
