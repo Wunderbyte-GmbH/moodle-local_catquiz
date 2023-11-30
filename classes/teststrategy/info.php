@@ -178,7 +178,6 @@ class info {
         $mform->addHelpButton('catquiz_pilotratio', 'pilotratio', 'local_catquiz');
 
         // Add attempts threshold for pilot questions.
-
         $element = $mform->addElement(
             'text',
             'catquiz_pilotattemptsthreshold',

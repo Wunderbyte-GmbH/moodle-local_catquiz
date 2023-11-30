@@ -24,17 +24,29 @@
         "abilities": [
             {
                 "ability": 1.23,
-                "name": "Mathematics"
+                "name": "Mathematics",
+                "isparentscale": 1,
+                "numberofitemsplayed": 3,
+                "questionpreviews": [
+                    "preview": "<div>...</div>",
+                    "preview": "<div>...</div>"
+                ]
             },
             {
                 "ability": 3.21,
-                "name": "catscale2"
+                "name": "catscale2",
+                "isparentscale": 0,
+                "numberofitemsplayed": 2,
+                "questionpreviews": [
+                    "preview": "<div>...</div>",
+                    "preview": "<div>...</div>"
+                ]
             }
         ],
         "chartdisplay": [
             {
                 "charttitle": "Person ability relative to parentscale",
-                "chart": <HTML Code>
+                "chart": "<HTML Code>""
             }
         ],
         "standarderrorpersubscales" : "50"
@@ -42,7 +54,11 @@
 }}
 <h5>{{#str}}personabilitytitle, local_catquiz{{/str}}</h5>
 {{#abilities}}
-    {{name}}: {{ability}}
+    <div {{#isparentscale}} class="font-weight-bold" data-toggle="tooltip" data-placement="top" title="{{#str}}parentscale, local_catquiz{{/str}}" {{/isparentscale}}
+        {{^isparentscale}} class="font-weight-normal" {{/isparentscale}}
+    >
+        {{name}}: {{ability}}
+    </div>
     <button type="button" class="btn btn-light" data-toggle="modal" data-target=".catquizfeedbackabilitiesplayedquestions{{name}}">{{numberofitemsplayed}} {{#str}}itemsplayed, local_catquiz{{/str}}</button>
 
     <div class="modal fade bd-example-modal-xl catquizfeedbackabilitiesplayedquestions{{name}}" tabindex="-1" role="dialog" aria-labelledby="catquizfeedbackabilitiesplayedquestions" aria-hidden="true">

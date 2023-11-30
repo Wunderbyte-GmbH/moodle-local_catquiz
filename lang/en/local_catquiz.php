@@ -417,13 +417,15 @@ $string['feedback_table_questionnumber'] = '#';
 $string['feedback_table_answercorrect'] = "correct";
 $string['feedback_table_answerincorrect'] = "incorrect";
 $string['feedback_table_answerpartlycorrect'] = "partly correct";
+$string['parentscale'] = "Parentscale";
+$string['seeitemsplayed'] = "Display items played";
 
 // Personability & chart in Feedback.
 $string['labelforrelativepersonabilitychart'] = "Relative personability";
 $string['chartlegendabilityrelative'] = '{$a->difference} (Compared to parentscale); {$a->ability} (Personability of scale)';
 $string['personabilitycharttitle'] = 'Relative personability in subscales - compared to parentscale';
 $string['personabilitytitle'] = 'Personability in subscales';
-$string['itemsplayed'] = 'Items played';
+$string['itemsplayed'] = 'Item(s) played';
 
 // Check display line breaks etc.
 $string['choosesubscaleforfeedback_help'] = 'You can now store <number of options> feedback informations for the subscales displayed. Select a (sub-)scale to enter your feedback. The colored symbols indicate the current status of processing, measured by the number of feedback options you entered:

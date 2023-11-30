@@ -130,6 +130,8 @@ class personabilities extends feedbackgenerator {
         if (! $cachedcontexts = $cache->get('context')) {
             return null;
         }
+
+        $parentscaleid = intval($initialcontext['quizsettings']->catquiz_catscales);
         $countscales = [];
         foreach ($cachedcontexts as $index => $data) {
             if ($index === 0) {
@@ -160,6 +162,7 @@ class personabilities extends feedbackgenerator {
             } else {
                 $ability = sprintf("%.2f", $ability);
             }
+            $isparentscale = ($catscaleid == $parentscaleid) ? true : false;
             $data[] = [
                 'ability' => $ability,
                 'name' => $catscales[$catscaleid]->name,
@@ -167,6 +170,7 @@ class personabilities extends feedbackgenerator {
                 'numberofitemsplayed' => isset($countscales[$catscaleid]['count']) ? $countscales[$catscaleid]['count'] : 0,
                 'questionpreviews' =>
                     isset($countscales[$catscaleid]['questionpreviews']) ? $countscales[$catscaleid]['questionpreviews'] : "",
+                'isparentscale' => $isparentscale,
             ];
         }
 
