@@ -54,13 +54,13 @@
 }}
 <h5>{{#str}}personabilitytitle, local_catquiz{{/str}}</h5>
 {{#abilities}}
-    <div {{#isparentscale}} class="font-weight-bold" data-toggle="tooltip" data-placement="top" title="{{#str}}parentscale, local_catquiz{{/str}}" {{/isparentscale}}
-        {{^isparentscale}} class="font-weight-normal" {{/isparentscale}}
-    >
+    <span {{#isparentscale}} class="font-weight-bold" data-toggle="tooltip" data-placement="top" title="{{#str}}parentscale, local_catquiz{{/str}}" {{/isparentscale}}
+        {{^isparentscale}} class="font-weight-normal" {{/isparentscale}}>
         {{name}}: {{ability}}
+    </span>
+    <div class="btn btn-light" data-toggle="modal" data-target=".catquizfeedbackabilitiesplayedquestions{{name}}">
+        {{numberofitemsplayed}} {{#str}}itemsplayed, local_catquiz{{/str}}
     </div>
-    <button type="button" class="btn btn-light" data-toggle="modal" data-target=".catquizfeedbackabilitiesplayedquestions{{name}}">{{numberofitemsplayed}} {{#str}}itemsplayed, local_catquiz{{/str}}</button>
-
     <div class="modal fade bd-example-modal-xl catquizfeedbackabilitiesplayedquestions{{name}}" tabindex="-1" role="dialog" aria-labelledby="catquizfeedbackabilitiesplayedquestions" aria-hidden="true">
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
