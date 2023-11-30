@@ -114,7 +114,7 @@ class personabilities extends feedbackgenerator {
         $catscales = catquiz::get_catscales(array_keys($personabilities));
         $data = [];
         foreach ($personabilities as $catscaleid => $ability) {
-            if (abs(floatval($ability)) === abs(floatval(PERSONABILITY_MAX))) {
+            if (abs(floatval($ability)) === abs(floatval(LOCAL_CATQUIZ_PERSONABILITY_MAX))) {
                 if ($ability < 0) {
                     $ability = get_string('allquestionsincorrect', 'local_catquiz');
                 } else {

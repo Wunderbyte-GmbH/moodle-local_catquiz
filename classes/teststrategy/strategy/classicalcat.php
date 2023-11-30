@@ -57,7 +57,7 @@ class classicalcat extends strategy {
      *
      * @var int $id // strategy id defined in lib.
      */
-    public int $id = STRATEGY_CLASSIC;
+    public int $id = LOCAL_CATQUIZ_STRATEGY_CLASSIC;
 
 
     /**

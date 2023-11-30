@@ -294,7 +294,7 @@ class model_strategy {
                 $infocriteriapermodel[$itemid][$model->get_model_name()] = $val;
                 $maxmodelname = array_keys($infocriteriapermodel[$itemid], min($infocriteriapermodel[$itemid]))[0];
                 $selecteditem = $itemdifficultieslists[$maxmodelname][$itemid];
-                $selecteditem->set_status(STATUS_CALCULATED);
+                $selecteditem->set_status(LOCAL_CATQUIZ_STATUS_CALCULATED);
                 $newitemdifficulties->add($selecteditem);
             }
         }
@@ -324,12 +324,12 @@ class model_strategy {
             return null;
         }
 
-        $manuallyconfirmed = array_filter($items, fn ($ip) =>  $ip->get_status() === STATUS_CONFIRMED_MANUALLY);
+        $manuallyconfirmed = array_filter($items, fn ($ip) =>  $ip->get_status() === LOCAL_CATQUIZ_STATUS_CONFIRMED_MANUALLY);
         if ($manuallyconfirmed) {
             return reset($manuallyconfirmed);
         }
 
-        $manuallyupdated = array_filter($items, fn ($ip) => $ip->get_status() === STATUS_UPDATED_MANUALLY);
+        $manuallyupdated = array_filter($items, fn ($ip) => $ip->get_status() === LOCAL_CATQUIZ_STATUS_UPDATED_MANUALLY);
         if ($manuallyupdated) {
             return reset($manuallyupdated);
         }

@@ -58,7 +58,7 @@ class inferlowestskillgap extends strategy {
      *
      * @var int $id // strategy id defined in lib.
      */
-    public int $id = STRATEGY_LOWESTSUB;
+    public int $id = LOCAL_CATQUIZ_STRATEGY_LOWESTSUB;
 
 
     /**

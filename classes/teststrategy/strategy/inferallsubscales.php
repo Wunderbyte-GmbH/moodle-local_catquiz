@@ -57,7 +57,7 @@ class inferallsubscales extends strategy {
      *
      * @var int $id // strategy id defined in lib.
      */
-    public int $id = STRATEGY_ALLSUBS;
+    public int $id = LOCAL_CATQUIZ_STRATEGY_ALLSUBS;
 
 
     /**

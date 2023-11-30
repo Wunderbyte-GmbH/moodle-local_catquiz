@@ -159,7 +159,7 @@ class catscale {
         // Check if status is changed.
         $statuschanged = false;
         if ($status == 2) {
-            $status = TESTITEM_STATUS_ACTIVE;
+            $status = LOCAL_CATQUIZ_TESTITEM_STATUS_ACTIVE;
         } else {
             $statuschanged = true;
         }

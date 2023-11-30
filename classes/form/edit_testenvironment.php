@@ -80,9 +80,9 @@ class edit_testenvironment extends dynamic_form {
         $mform->setDefault('lang', $CFG->lang);
 
         $statusarray = [
-            STATUS_TEST_INACTIVE => get_string('inactive', 'core'),
-            STATUS_TEST_ACTIVE => get_string('active', 'core'),
-            STATUS_TEST_FORCE => get_string('force', 'local_catquiz'),
+            LOCAL_CATQUIZ_STATUS_TEST_INACTIVE => get_string('inactive', 'core'),
+            LOCAL_CATQUIZ_STATUS_TEST_ACTIVE => get_string('active', 'core'),
+            LOCAL_CATQUIZ_STATUS_TEST_FORCE => get_string('force', 'local_catquiz'),
         ];
 
         $mform->addElement('select', 'status', get_string('status', 'core'), $statusarray);

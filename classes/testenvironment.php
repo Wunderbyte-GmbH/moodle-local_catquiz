@@ -168,10 +168,10 @@ class testenvironment {
         $this->description = $record->description ?? '';
         $this->descriptionformat = $record->descriptionformat ?? 1;
         $this->json = $record->json ?? '';
-        $this->visible = $record->visible ?? STATUS_TEST_INVISIBLE;
+        $this->visible = $record->visible ?? LOCAL_CATQUIZ_STATUS_TEST_INVISIBLE;
         $this->availability = $record->availability ?? '';
         $this->lang = $record->lang ?? '';
-        $this->status = $record->status ?? STATUS_TEST_ACTIVE;
+        $this->status = $record->status ?? LOCAL_CATQUIZ_STATUS_TEST_ACTIVE;
         $this->parentid = $record->parentid ?? 0;
         $this->courseid = $record->courseid ?? 0;
     }
@@ -408,7 +408,7 @@ class testenvironment {
      */
     public function status_force():bool {
 
-        return $this->status === STATUS_TEST_FORCE ? true : false;
+        return $this->status === LOCAL_CATQUIZ_STATUS_TEST_FORCE ? true : false;
     }
 
     /**

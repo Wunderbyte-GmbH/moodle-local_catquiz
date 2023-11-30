@@ -237,26 +237,26 @@ class catscalequestions_table extends wunderbyte_table {
     public function col_status($values) {
 
         if ($this->is_downloading()) {
-            return !empty($values->status) ? $values->status : STATUS_NOT_CALCULATED;
+            return !empty($values->status) ? $values->status : LOCAL_CATQUIZ_STATUS_NOT_CALCULATED;
         }
         $bootstrapclass = "";
-        $status = $values->status ?? STATUS_NOT_CALCULATED;
+        $status = $values->status ?? LOCAL_CATQUIZ_STATUS_NOT_CALCULATED;
 
         switch ($status) {
-            case STATUS_CONFIRMED_MANUALLY:
-                $bootstrapclass = STATUS_CONFIRMED_MANUALLY_COLOR_CLASS;
+            case LOCAL_CATQUIZ_STATUS_CONFIRMED_MANUALLY:
+                $bootstrapclass = LOCAL_CATQUIZ_STATUS_CONFIRMED_MANUALLY_COLOR_CLASS;
                 break;
-            case STATUS_CALCULATED:
-                $bootstrapclass = STATUS_CALCULATED_COLOR_CLASS;
+            case LOCAL_CATQUIZ_STATUS_CALCULATED:
+                $bootstrapclass = LOCAL_CATQUIZ_STATUS_CALCULATED_COLOR_CLASS;
                 break;
-            case STATUS_NOT_CALCULATED:
-                $bootstrapclass = STATUS_NOT_CALCULATED_COLOR_CLASS;
+            case LOCAL_CATQUIZ_STATUS_NOT_CALCULATED:
+                $bootstrapclass = LOCAL_CATQUIZ_STATUS_NOT_CALCULATED_COLOR_CLASS;
                 break;
-            case STATUS_EXCLUDED_MANUALLY:
-                $bootstrapclass = STATUS_EXCLUDED_MANUALLY_COLOR_CLASS;
+            case LOCAL_CATQUIZ_STATUS_EXCLUDED_MANUALLY:
+                $bootstrapclass = LOCAL_CATQUIZ_STATUS_EXCLUDED_MANUALLY_COLOR_CLASS;
                 break;
-            case STATUS_UPDATED_MANUALLY:
-                $bootstrapclass = STATUS_UPDATED_MANUALLY_COLOR_CLASS;
+            case LOCAL_CATQUIZ_STATUS_UPDATED_MANUALLY:
+                $bootstrapclass = LOCAL_CATQUIZ_STATUS_UPDATED_MANUALLY_COLOR_CLASS;
                 break;
         }
 
@@ -365,7 +365,7 @@ class catscalequestions_table extends wunderbyte_table {
         $jsonobject = json_decode($data);
 
         $catscaleid = $jsonobject->catscaleid;
-        $status = empty($jsonobject->testitemstatus) ? TESTITEM_STATUS_INACTIVE : TESTITEM_STATUS_ACTIVE;
+        $status = empty($jsonobject->testitemstatus) ? LOCAL_CATQUIZ_TESTITEM_STATUS_INACTIVE : LOCAL_CATQUIZ_TESTITEM_STATUS_ACTIVE;
 
         catscale::add_or_update_testitem_to_scale((int)$catscaleid, $id, $status);
 

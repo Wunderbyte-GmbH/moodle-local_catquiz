@@ -292,11 +292,11 @@ $string['numberofanswersincorrect'] = "Falsch";
 $string['numberofanswerspartlycorrect'] = "Teilweise richtig";
 $string['averageofallanswers'] = "Durchschnitt";
 
-$string['itemstatus_-5'] = "Manuell ausgeschlossen"; // STATUS_EXCLUDED_MANUALLY.
-$string['itemstatus_0'] = "Noch nicht berechnet"; // STATUS_NOT_CALCULATED.
-$string['itemstatus_1'] = "Berechnet"; // STATUS_CALCULATED.
-$string['itemstatus_4'] = "Manuell gesetzt"; // STATUS_UPDATED_MANUALLY.
-$string['itemstatus_5'] = "Manuell bestätigt"; // STATUS_CONFIRMED_MANUALLY.
+$string['itemstatus_-5'] = "Manuell ausgeschlossen"; // LOCAL_CATQUIZ_STATUS_EXCLUDED_MANUALLY.
+$string['itemstatus_0'] = "Noch nicht berechnet"; // LOCAL_CATQUIZ_STATUS_NOT_CALCULATED.
+$string['itemstatus_1'] = "Berechnet"; // LOCAL_CATQUIZ_STATUS_CALCULATED.
+$string['itemstatus_4'] = "Manuell gesetzt"; // LOCAL_CATQUIZ_STATUS_UPDATED_MANUALLY.
+$string['itemstatus_5'] = "Manuell bestätigt"; // LOCAL_CATQUIZ_STATUS_CONFIRMED_MANUALLY.
 
 // Student Details.
 $string['studentdetails'] = "Student details";

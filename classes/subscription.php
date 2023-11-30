@@ -64,7 +64,7 @@ class subscription {
                 'userid' => $userid,
                 'itemid' => $itemid,
                 'area' => $area,
-                'status' => STATUS_SUBSCRIPTION_BOOKED,
+                'status' => LOCAL_CATQUIZ_STATUS_SUBSCRIPTION_BOOKED,
                 'usermodified' => $USER->id,
                 'timemodified' => $now,
                 'timecreated' => $now,
@@ -73,13 +73,13 @@ class subscription {
             $DB->insert_record('local_catquiz_subscriptions', $record);
         } else {
             switch ($record->status) {
-                case STATUS_SUBSCRIPTION_BOOKED:
-                    $record->status = STATUS_SUBSCRIPTION_DELETED;
+                case LOCAL_CATQUIZ_STATUS_SUBSCRIPTION_BOOKED:
+                    $record->status = LOCAL_CATQUIZ_STATUS_SUBSCRIPTION_DELETED;
                     $record->timemodified = $now;
                     $record->usermodified = $USER->id;
                     break;
-                case STATUS_SUBSCRIPTION_DELETED:
-                    $record->status = STATUS_SUBSCRIPTION_BOOKED;
+                case LOCAL_CATQUIZ_STATUS_SUBSCRIPTION_DELETED:
+                    $record->status = LOCAL_CATQUIZ_STATUS_SUBSCRIPTION_BOOKED;
                     $record->timemodified = $now;
                     $record->usermodified = $USER->id;
                     break;
@@ -103,13 +103,13 @@ class subscription {
         global $DB;
 
         $status = 0;
-        $booked = STATUS_SUBSCRIPTION_BOOKED;
+        $booked = LOCAL_CATQUIZ_STATUS_SUBSCRIPTION_BOOKED;
 
         if ($DB->record_exists('local_catquiz_subscriptions', [
             'userid' => $userid,
             'itemid' => $itemid,
             'area' => $area,
-            'status' => STATUS_SUBSCRIPTION_BOOKED,
+            'status' => LOCAL_CATQUIZ_STATUS_SUBSCRIPTION_BOOKED,
             ])) {
             $status = 1;
         }

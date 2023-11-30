@@ -97,7 +97,7 @@ class web_raschbirnbauma extends model_model implements catcalc_ability_estimato
                     // result returned by the API contains item names.
                     $itemname = sprintf('I%s', $itemid);
                     $oldparam = $olditemparams[$itemid] ?? null;
-                    if ($oldparam && $oldparam->get_status() >= STATUS_UPDATED_MANUALLY) {
+                    if ($oldparam && $oldparam->get_status() >= LOCAL_CATQUIZ_STATUS_UPDATED_MANUALLY) {
                         $estimateditemparams->add($oldparam);
                         continue;
                     }

@@ -126,35 +126,35 @@ class datacard implements renderable {
         // We are displaying two types of status.
         // Information about model status...
         switch ($record->status) {
-            case STATUS_EXCLUDED_MANUALLY:
+            case LOCAL_CATQUIZ_STATUS_EXCLUDED_MANUALLY:
                 $modelstatus = get_string('itemstatus_-5', 'local_catquiz');
-                $statuscircleclass = STATUS_EXCLUDED_MANUALLY_COLOR_CLASS;
+                $statuscircleclass = LOCAL_CATQUIZ_STATUS_EXCLUDED_MANUALLY_COLOR_CLASS;
                 break;
-            case STATUS_NOT_CALCULATED:
+            case LOCAL_CATQUIZ_STATUS_NOT_CALCULATED:
                 $modelstatus = get_string('itemstatus_0', 'local_catquiz');
-                $statuscircleclass = STATUS_NOT_CALCULATED_COLOR_CLASS;
+                $statuscircleclass = LOCAL_CATQUIZ_STATUS_NOT_CALCULATED_COLOR_CLASS;
                 break;
-            case STATUS_CALCULATED:
+            case LOCAL_CATQUIZ_STATUS_CALCULATED:
                 $modelstatus = get_string('itemstatus_1', 'local_catquiz');
-                $statuscircleclass = STATUS_CALCULATED_COLOR_CLASS;
+                $statuscircleclass = LOCAL_CATQUIZ_STATUS_CALCULATED_COLOR_CLASS;
                 break;
-            case STATUS_UPDATED_MANUALLY:
+            case LOCAL_CATQUIZ_STATUS_UPDATED_MANUALLY:
                 $modelstatus = get_string('itemstatus_4', 'local_catquiz');
-                $statuscircleclass = STATUS_CONFIRMED_MANUALLY_COLOR_CLASS;
+                $statuscircleclass = LOCAL_CATQUIZ_STATUS_CONFIRMED_MANUALLY_COLOR_CLASS;
                 break;
-            case STATUS_CONFIRMED_MANUALLY:
+            case LOCAL_CATQUIZ_STATUS_CONFIRMED_MANUALLY:
                 $modelstatus = get_string('itemstatus_5', 'local_catquiz');
-                $statuscircleclass = STATUS_CONFIRMED_MANUALLY_COLOR_CLASS;
+                $statuscircleclass = LOCAL_CATQUIZ_STATUS_CONFIRMED_MANUALLY_COLOR_CLASS;
                 break;
         }
 
         // Information about activity status...
         switch ($record->testitemstatus) {
-            case TESTITEM_STATUS_ACTIVE:
+            case LOCAL_CATQUIZ_TESTITEM_STATUS_ACTIVE:
                 $closedeye = '';
                 $testitemstatus = get_string('active', 'core');
                 break;
-            case TESTITEM_STATUS_INACTIVE:
+            case LOCAL_CATQUIZ_TESTITEM_STATUS_INACTIVE:
                 $closedeye = '-slash';
                 $testitemstatus = get_string('inactive', 'core');
                 break;

@@ -103,7 +103,7 @@ class feedbackclass {
         $numberoffeedbackspersubscale = $data['numberoffeedbackoptionsselect']
             ?? optional_param('numberoffeedbackoptionsselect', 0, PARAM_INT);
         $numberoffeedbackspersubscale = empty($numberoffeedbackspersubscale)
-            ? DEFAULT_NUMBER_OF_FEEDBACKS_PER_SCALE : intval($numberoffeedbackspersubscale);
+            ? LOCAL_CATQUIZ_DEFAULT_NUMBER_OF_FEEDBACKS_PER_SCALE : intval($numberoffeedbackspersubscale);
 
         $element = $mform->addElement(
             'static',
@@ -600,13 +600,13 @@ class feedbackclass {
     public static function return_limits_for_scale($nroptions, $optioncounter, bool $lower) {
 
         // Calculate equal default values for limits in scales.
-        $sizeofrange = abs(PERSONABILITY_LOWER_LIMIT - PERSONABILITY_UPPER_LIMIT);
+        $sizeofrange = abs(LOCAL_CATQUIZ_PERSONABILITY_LOWER_LIMIT - LOCAL_CATQUIZ_PERSONABILITY_UPPER_LIMIT);
         $increment = $sizeofrange / $nroptions;
 
         if ($lower) {
-            return PERSONABILITY_LOWER_LIMIT + ($optioncounter - 1) * $increment;
+            return LOCAL_CATQUIZ_PERSONABILITY_LOWER_LIMIT + ($optioncounter - 1) * $increment;
         } else {
-            return PERSONABILITY_LOWER_LIMIT + $optioncounter * $increment;
+            return LOCAL_CATQUIZ_PERSONABILITY_LOWER_LIMIT + $optioncounter * $increment;
         }
     }
 }

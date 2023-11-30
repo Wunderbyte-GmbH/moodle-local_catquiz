@@ -215,11 +215,11 @@ class attemptfeedback implements renderable, templatable {
         // Todo: Give this task to the teststrategy classes.
 
         switch ($feedbackdata["teststrategy"]) {
-            case STRATEGY_LOWESTSUB:
+            case LOCAL_CATQUIZ_STRATEGY_LOWESTSUB:
                 sort($feedbackdata["personabilities"]);
                 usort($feedbackdata["feedback_personabilities"], fn($a, $b) => $a['ability'] > $b['ability'] ? 1 : -1);
                 break;
-            case STRATEGY_HIGHESTSUB:
+            case LOCAL_CATQUIZ_STRATEGY_HIGHESTSUB:
                 rsort($feedbackdata["personabilities"]);
                 usort($feedbackdata["feedback_personabilities"], fn($a, $b) => $a['ability'] < $b['ability'] ? 1 : -1);
                 break;

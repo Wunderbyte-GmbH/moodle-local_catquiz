@@ -126,7 +126,7 @@ class personability_loader implements contextloaderinterface {
 
         // Replace MAX values with default ability.
         foreach ($abilities as $catscaleid => $ability) {
-            if (abs($ability) == PERSONABILITY_MAX) {
+            if (abs($ability) == LOCAL_CATQUIZ_PERSONABILITY_MAX) {
                 $abilities[$catscaleid] = self::DEFAULT_ABILITY;
             }
         }

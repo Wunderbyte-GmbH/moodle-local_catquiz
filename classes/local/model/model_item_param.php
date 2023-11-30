@@ -92,7 +92,7 @@ class model_item_param {
      * @param int $status
      *
      */
-    public function __construct(string $id, string $modelname, array $metadata = [], int $status = STATUS_NOT_CALCULATED) {
+    public function __construct(string $id, string $modelname, array $metadata = [], int $status = LOCAL_CATQUIZ_STATUS_NOT_CALCULATED) {
         $this->id = $id;
         $this->modelname = $modelname;
         $this->metadata = $metadata;
@@ -233,7 +233,7 @@ class model_item_param {
     ) {
         global $DB;
 
-        if (intval($newrecord->status) === STATUS_CONFIRMED_MANUALLY) {
+        if (intval($newrecord->status) === LOCAL_CATQUIZ_STATUS_CONFIRMED_MANUALLY) {
             // Only one model can be the selected one. Set the status of all...
             // ... other models back to 0.
             $existingitems = $DB->get_record(
@@ -241,7 +241,7 @@ class model_item_param {
                 [
                     'componentid' => $componentid,
                     'contextid' => $contextid,
-                    'status' => STATUS_CONFIRMED_MANUALLY,
+                    'status' => LOCAL_CATQUIZ_STATUS_CONFIRMED_MANUALLY,
                 ]
             );
             // Get item params for other models.
@@ -252,7 +252,7 @@ class model_item_param {
                 }
             );
             foreach ($otheritems as $otheritem) {
-                $otheritem->status = STATUS_NOT_CALCULATED;
+                $otheritem->status = LOCAL_CATQUIZ_STATUS_NOT_CALCULATED;
                 $DB->update_record('local_catquiz_itemparams', $otheritem, true);
             }
         }

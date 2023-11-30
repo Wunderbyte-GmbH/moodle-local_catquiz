@@ -350,7 +350,7 @@ class testitems_table extends wunderbyte_table {
         // If the checkbox is unchecked, set the status to "not set".
         // Otherwise, keep the selected status.
         $dataobject->status = $dataobject->state == 'false'
-            ? STATUS_EXCLUDED_MANUALLY
+            ? LOCAL_CATQUIZ_STATUS_EXCLUDED_MANUALLY
             : $dataobject->status;
 
         try {

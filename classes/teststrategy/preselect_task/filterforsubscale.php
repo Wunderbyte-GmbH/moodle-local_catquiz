@@ -54,7 +54,7 @@ class filterforsubscale extends preselect_task implements wb_middleware {
     public function run(array &$context, callable $next): result {
         $abilities = $context['person_ability'];
 
-        if (! in_array($context['teststrategy'], [STRATEGY_LOWESTSUB, STRATEGY_HIGHESTSUB])) {
+        if (! in_array($context['teststrategy'], [LOCAL_CATQUIZ_STRATEGY_LOWESTSUB, LOCAL_CATQUIZ_STRATEGY_HIGHESTSUB])) {
             global $CFG;
             if ($CFG->debug > 0) {
                 throw new \UnexpectedValueException(
@@ -84,7 +84,7 @@ class filterforsubscale extends preselect_task implements wb_middleware {
 
         $abilitykeys = array_keys($abilitydifference);
         switch ($context['teststrategy']) {
-            case STRATEGY_HIGHESTSUB:
+            case LOCAL_CATQUIZ_STRATEGY_HIGHESTSUB:
                 array_multisort($abilitydifference, SORT_DESC, $abilitykeys);
                 break;
             case STRATEGY_LOWESTSUB:

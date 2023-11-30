@@ -79,11 +79,11 @@ class item_model_override_selector extends dynamic_form {
         $models = model_strategy::get_installed_models();
 
         $options = [
-            STATUS_EXCLUDED_MANUALLY => get_string('itemstatus_-5', 'local_catquiz'),
-            STATUS_CALCULATED => get_string('itemstatus_1', 'local_catquiz'),
-            STATUS_CONFIRMED_MANUALLY => get_string('itemstatus_5', 'local_catquiz'),
-            STATUS_UPDATED_MANUALLY => get_string('itemstatus_4', 'local_catquiz'),
-            STATUS_NOT_CALCULATED => get_string('itemstatus_0', 'local_catquiz'),
+            LOCAL_CATQUIZ_STATUS_EXCLUDED_MANUALLY => get_string('itemstatus_-5', 'local_catquiz'),
+            LOCAL_CATQUIZ_STATUS_CALCULATED => get_string('itemstatus_1', 'local_catquiz'),
+            LOCAL_CATQUIZ_STATUS_CONFIRMED_MANUALLY => get_string('itemstatus_5', 'local_catquiz'),
+            LOCAL_CATQUIZ_STATUS_UPDATED_MANUALLY => get_string('itemstatus_4', 'local_catquiz'),
+            LOCAL_CATQUIZ_STATUS_NOT_CALCULATED => get_string('itemstatus_0', 'local_catquiz'),
         ];
 
         foreach (array_keys($models) as $model) {
@@ -217,7 +217,7 @@ class item_model_override_selector extends dynamic_form {
             }
             // If status is unchanged, change must be within values, so we set the new status to manually updated.
             if (!isset($formitemparams[$model]->status)) {
-                $formitemparams[$model]->status = STATUS_UPDATED_MANUALLY;
+                $formitemparams[$model]->status = LOCAL_CATQUIZ_STATUS_UPDATED_MANUALLY;
             }
 
             // If the model exists already in the db, we proceed with updating.
@@ -242,18 +242,18 @@ class item_model_override_selector extends dynamic_form {
 
             // There can only be one model with this status, so we have to make
             // sure all other models that have this status are set back to 0.
-            if (intval($formitemparams[$model]->status) === STATUS_CONFIRMED_MANUALLY) {
+            if (intval($formitemparams[$model]->status) === LOCAL_CATQUIZ_STATUS_CONFIRMED_MANUALLY) {
                 foreach (array_keys($models) as $m) {
                     if ($m === $model) {
                         // Do not check our current model.
                         continue;
                     }
-                    if (intval($formitemparams[$m]->status) !== STATUS_CONFIRMED_MANUALLY) {
+                    if (intval($formitemparams[$m]->status) !== LOCAL_CATQUIZ_STATUS_CONFIRMED_MANUALLY) {
                         // Ignore models with other status.
                         continue;
                     }
                     // Reset back to 0.
-                    $defaultstatus = strval(STATUS_NOT_CALCULATED);
+                    $defaultstatus = strval(LOCAL_CATQUIZ_STATUS_NOT_CALCULATED);
                     $formitemparams[$m]->status = $defaultstatus;
                     $fieldname = sprintf('override_%s', $m);
                     $data->{$fieldname[sprintf('%s_select', $fieldname)]} = $defaultstatus;
@@ -293,7 +293,7 @@ class item_model_override_selector extends dynamic_form {
             $new['status'] = !empty($new['discrimination']) &&
                             !empty($new['difficulty']) &&
                             !empty($new['guessing']) ?
-                            STATUS_UPDATED_MANUALLY : $new['status'];
+                            LOCAL_CATQUIZ_STATUS_UPDATED_MANUALLY : $new['status'];
             $DB->insert_record(
                 'local_catquiz_itemparams',
                 (object) $new
@@ -371,7 +371,7 @@ class item_model_override_selector extends dynamic_form {
                     $data->componentname = $modelparams->componentname;
                 }
             } else { // Set default data if there are no calculated data for the given model.
-                $modelstatus = STATUS_NOT_CALCULATED;
+                $modelstatus = LOCAL_CATQUIZ_STATUS_NOT_CALCULATED;
                 // Initial load.
                 $modeldifficulty = null;
                 $modelguessing = null;

@@ -58,9 +58,9 @@ class execute_method_from_webservice {
             case 'local_catquiz_toggle_testitemstatus':
 
                 if ($params[2] == "-slash") {
-                    $status = TESTITEM_STATUS_ACTIVE;
+                    $status = LOCAL_CATQUIZ_TESTITEM_STATUS_ACTIVE;
                 } else {
-                    $status = TESTITEM_STATUS_INACTIVE;
+                    $status = LOCAL_CATQUIZ_TESTITEM_STATUS_INACTIVE;
                 };
 
                 $catscaleid = $params[0];

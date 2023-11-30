@@ -85,7 +85,7 @@ class pilotquestions_loader implements contextloaderinterface {
     public function ispilot(\stdClass $question, int $attemptsthreshold): bool {
         if (
             floatval($question->difficulty)
-            && (intval($question->status) >= STATUS_UPDATED_MANUALLY
+            && (intval($question->status) >= LOCAL_CATQUIZ_STATUS_UPDATED_MANUALLY
                 || intval($question->attempts) >= $attemptsthreshold
             )
         ) {

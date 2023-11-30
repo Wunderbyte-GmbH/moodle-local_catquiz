@@ -153,17 +153,17 @@ class comparetotestaverage extends feedbackgenerator {
         $parentscaleid = $quizsettings->catquiz_catscales;
         $numberoffeedbackoptions = intval($quizsettings->numberoffeedbackoptionsselect);
         $colorarray = feedbackclass::get_array_of_colors($numberoffeedbackoptions);
-        $gradient = COLORBARGRADIENT;
+        $gradient = LOCAL_CATQUIZ_COLORBARGRADIENT;
 
         $output = "";
 
         for ($i = 1; $i <= $numberoffeedbackoptions; $i++) {
             $lowestlimitkey = "feedback_scaleid_limit_lower_" . $parentscaleid . "_1";
             $highestlimitkey = "feedback_scaleid_limit_upper_" . $parentscaleid . "_" . $numberoffeedbackoptions;
-            $rangestart = ($quizsettings->$lowestlimitkey >= PERSONABILITY_LOWER_LIMIT) ?
-                $quizsettings->$lowestlimitkey : PERSONABILITY_LOWER_LIMIT;
-            $rangeend = ($quizsettings->$highestlimitkey <= PERSONABILITY_UPPER_LIMIT) ?
-            $quizsettings->$highestlimitkey : PERSONABILITY_UPPER_LIMIT;
+            $rangestart = ($quizsettings->$lowestlimitkey >= LOCAL_CATQUIZ_PERSONABILITY_LOWER_LIMIT) ?
+                $quizsettings->$lowestlimitkey : LOCAL_CATQUIZ_PERSONABILITY_LOWER_LIMIT;
+            $rangeend = ($quizsettings->$highestlimitkey <= LOCAL_CATQUIZ_PERSONABILITY_UPPER_LIMIT) ?
+            $quizsettings->$highestlimitkey : LOCAL_CATQUIZ_PERSONABILITY_UPPER_LIMIT;
 
             $lowerlimitkey = "feedback_scaleid_limit_lower_" . $parentscaleid . "_" . $i;
             $upperlimitkey = "feedback_scaleid_limit_upper_" . $parentscaleid . "_" . $i;

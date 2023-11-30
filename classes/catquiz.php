@@ -1467,7 +1467,7 @@ class catquiz {
         $data->component = $attemptdata['quizsettings']->modulename;
         $data->instanceid = $courseandinstance['instanceid'];
         $data->teststrategy = $attemptdata['teststrategy'];
-        $data->status = ATTEMPT_OK;
+        $data->status = LOCAL_CATQUIZ_ATTEMPT_OK;
         $data->total_number_of_testitems = $attemptdata['total_number_of_testitems'];
         $data->number_of_testitems_used = $attemptdata['number_of_testitems_used'];
         $data->personability_before_attempt = $attemptdata['ability_before_attempt'];

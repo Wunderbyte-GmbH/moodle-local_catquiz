@@ -166,7 +166,7 @@ class strategy_test extends advanced_testcase {
     public static function strategy_returns_expected_questions_provider(): array {
         return [
             'radical CAT' => [
-                'strategy' => STRATEGY_FASTEST,
+                'strategy' => LOCAL_CATQUIZ_STRATEGY_FASTEST,
                 'questions' => [
                     [
                         'label' => 'SIMB01-18',
@@ -189,7 +189,7 @@ class strategy_test extends advanced_testcase {
                 ],
             ],
             'moderate CAT' => [
-                'strategy' => STRATEGY_BALANCED,
+                'strategy' => LOCAL_CATQUIZ_STRATEGY_BALANCED,
                 'questions' => [
                     [
                         'label' => 'SIMA01-00',
@@ -212,7 +212,7 @@ class strategy_test extends advanced_testcase {
                 ],
             ],
             'Infer lowest skillgap' => [
-                'strategy' => STRATEGY_LOWESTSUB,
+                'strategy' => LOCAL_CATQUIZ_STRATEGY_LOWESTSUB,
                 'questions' => [
                     [
                         'label' => 'SIMB01-18',
@@ -235,7 +235,7 @@ class strategy_test extends advanced_testcase {
                 ],
             ],
             'Infer greatest strength' => [
-                'strategy' => STRATEGY_HIGHESTSUB,
+                'strategy' => LOCAL_CATQUIZ_STRATEGY_HIGHESTSUB,
                 'questions' => [
                     [
                         'label' => 'SIMB01-18',
@@ -258,7 +258,7 @@ class strategy_test extends advanced_testcase {
                 ],
             ],
             'Infer all subscales' => [
-                'strategy' => STRATEGY_ALLSUBS,
+                'strategy' => LOCAL_CATQUIZ_STRATEGY_ALLSUBS,
                 'questions' => [
                     [
                         'label' => 'SIMB01-18',
@@ -281,7 +281,7 @@ class strategy_test extends advanced_testcase {
                 ],
             ],
             'Classical test' => [
-                'strategy' => STRATEGY_CLASSIC,
+                'strategy' => LOCAL_CATQUIZ_STRATEGY_CLASSIC,
                 'questions' => [
                     [
                         'label' => 'SIMA01-00',

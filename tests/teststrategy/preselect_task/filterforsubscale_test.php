@@ -129,11 +129,11 @@ class filterforsubscale_test extends basic_testcase {
 
         return [
             'select highest subscale' => [
-                'context' => array_merge($context, ['teststrategy' => STRATEGY_HIGHESTSUB]),
+                'context' => array_merge($context, ['teststrategy' => LOCAL_CATQUIZ_STRATEGY_HIGHESTSUB]),
                 'expected_id' => 4,
             ],
             'select lowest subscale' => [
-                'context' => array_merge($context, ['teststrategy' => STRATEGY_LOWESTSUB]),
+                'context' => array_merge($context, ['teststrategy' => LOCAL_CATQUIZ_STRATEGY_LOWESTSUB]),
                 'expected_id' => 1,
             ],
         ];

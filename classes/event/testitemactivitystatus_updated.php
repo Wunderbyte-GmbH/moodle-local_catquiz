@@ -96,9 +96,9 @@ class testitemactivitystatus_updated extends \core\event\base {
         $data = $this->data;
         $otherarray = json_decode($data['other']);
         $activitystatus = $otherarray->activitystatus;
-        if (intval($activitystatus) == TESTITEM_STATUS_INACTIVE) {
+        if (intval($activitystatus) == LOCAL_CATQUIZ_TESTITEM_STATUS_INACTIVE) {
             $activitystring = get_string('activitystatussetinactive', 'local_catquiz');
-        } else if (intval($activitystatus) == TESTITEM_STATUS_ACTIVE) {
+        } else if (intval($activitystatus) == LOCAL_CATQUIZ_TESTITEM_STATUS_ACTIVE) {
             $activitystring = get_string('activitystatussetactive', 'local_catquiz');
         }
 

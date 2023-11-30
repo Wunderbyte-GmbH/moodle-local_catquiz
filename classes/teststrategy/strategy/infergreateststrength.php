@@ -58,7 +58,7 @@ class infergreateststrength extends strategy {
      *
      * @var int $id // strategy id defined in lib.
      */
-    public int $id = STRATEGY_HIGHESTSUB;
+    public int $id = LOCAL_CATQUIZ_STRATEGY_HIGHESTSUB;
 
 
     /**

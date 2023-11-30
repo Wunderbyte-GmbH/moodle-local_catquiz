@@ -203,7 +203,7 @@ abstract class model_raschmodel extends model_model implements catcalc_item_esti
         $estimateditemparams = new model_item_param_list();
         foreach ($this->responses->get_item_response($personparams) as $itemid => $itemresponse) {
             $oldparam = $olditemparams[$itemid] ?? null;
-            if ($oldparam && $oldparam->get_status() >= STATUS_CALCULATED) {
+            if ($oldparam && $oldparam->get_status() >= LOCAL_CATQUIZ_STATUS_CALCULATED) {
                 $estimateditemparams->add($oldparam);
                 continue;
             }
@@ -212,7 +212,7 @@ abstract class model_raschmodel extends model_model implements catcalc_item_esti
             $param = $this
                 ->create_item_param($itemid)
                 ->set_parameters($parameters)
-                ->set_status(STATUS_CALCULATED);
+                ->set_status(LOCAL_CATQUIZ_STATUS_CALCULATED);
 
             if ($oldparam) {
                 $param->set_status($olditemparams[$itemid]->get_status());
