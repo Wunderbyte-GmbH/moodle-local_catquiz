@@ -30,13 +30,21 @@
                 "ability": 3.21,
                 "name": "catscale2"
             }
-        ]
+        ],
+        "chartdisplay": [
+            {
+                "charttitle": "Person ability relative to parentscale",
+                "chart": <HTML Code>
+            }
+        ],
+        "standarderrorpersubscales" : "50"
     }
 }}
 <h5>{{#str}}personabilitytitle, local_catquiz{{/str}}</h5>
 {{#abilities}}
     {{name}}: {{ability}} ({{numberofitemsplayed}} {{#str}}itemsplayed, local_catquiz{{/str}})<br>
 {{/abilities}}
+<h5>{{#str}}standarderrorpersubscale, local_catquiz{{/str}}: {{standarderrorpersubscales}}</h5>
 {{#chartdisplay}}
     <h5>
     {{charttitle}}

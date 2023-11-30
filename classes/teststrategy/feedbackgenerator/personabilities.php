@@ -61,6 +61,7 @@ class personabilities extends feedbackgenerator {
             [
                 'abilities' => $data['feedback_personabilities'],
                 'chartdisplay' => $chart,
+                'standarderrorpersubscales' => $data['standarderrorpersubscales'],
             ]
         );
 
@@ -105,7 +106,7 @@ class personabilities extends feedbackgenerator {
     }
 
     /**
-     * Loads data.
+     * Loads data personability, number of items played per subscale and standarderrorpersubscale.
      *
      * @param int $attemptid
      * @param array $initialcontext
@@ -124,8 +125,6 @@ class personabilities extends feedbackgenerator {
         if ($personabilities === []) {
             return null;
         }
-
-        $cache = cache::make('local_catquiz', 'adaptivequizattempt');
         // Check how many questions have been played whithin each subscale.
         if (! $cachedcontexts = $cache->get('context')) {
             return null;
@@ -142,11 +141,8 @@ class personabilities extends feedbackgenerator {
             } else {
                 $countscales[$scaleid] = 1;
             }
-
         }
         $catscales = catquiz::get_catscales(array_keys($personabilities));
-
-        // Write scaleid counter into personabilites array.
 
         $data = [];
         foreach ($personabilities as $catscaleid => $ability) {
@@ -166,7 +162,12 @@ class personabilities extends feedbackgenerator {
                 'numberofitemsplayed' => isset($countscales[$catscaleid]) ? $countscales[$catscaleid] : 0,
             ];
         }
-        return ['feedback_personabilities' => $data];
+
+        $standarderrorpersubscales = $initialcontext['quizsettings']->catquiz_standarderrorpersubscale ?? "";
+        return [
+            'feedback_personabilities' => $data,
+            'standarderrorpersubscales' => $standarderrorpersubscales,
+        ];
     }
 
     /**
