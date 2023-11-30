@@ -420,6 +420,7 @@ $string['labelforrelativepersonabilitychart'] = "Relative Personenfähigkeit";
 $string['chartlegendabilityrelative'] = '{$a->ability} (Personenfähigkeit dieser Skala); {$a->difference} (Im Vergleich zur Mutterskala)';
 $string['personabilitycharttitle'] = 'Relative Personenfähigkeit in den Subskalen - im Vergleich zur Mutterskala';
 $string['personabilitytitle'] = 'Personenfähigkeit in den Subskalen';
+$string['itemsplayed'] = 'Fragen gespielt';
 
 // Check display line breaks etc.
 $string['choosesubscaleforfeedback_help'] = 'Für die angezeigten Subskalen können Sie nun {$a} Feedback-Angaben hinterlegen. Wählen Sie die jeweilige (Sub-)Skala an, um Ihr Feedback einzugeben. Die farbigen Symbole zeigen Ihnen den aktuellen Stand der Bearbeitung an, gemessen an den vor Ihnen hinterlegten Anzahl an Feedback-Optionen:

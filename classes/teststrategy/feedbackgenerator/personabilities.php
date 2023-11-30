@@ -125,7 +125,29 @@ class personabilities extends feedbackgenerator {
             return null;
         }
 
+        $cache = cache::make('local_catquiz', 'adaptivequizattempt');
+        // Check how many questions have been played whithin each subscale.
+        if (! $cachedcontexts = $cache->get('context')) {
+            return null;
+        }
+        $countscales = [];
+        foreach ($cachedcontexts as $index => $data) {
+            if ($index === 0) {
+                continue;
+            }
+            $lastquestion = $data['lastquestion'];
+            $scaleid = $lastquestion->catscaleid;
+            if (isset($countscales[$scaleid])) {
+                $countscales[$scaleid] ++;
+            } else {
+                $countscales[$scaleid] = 1;
+            }
+
+        }
         $catscales = catquiz::get_catscales(array_keys($personabilities));
+
+        // Write scaleid counter into personabilites array.
+
         $data = [];
         foreach ($personabilities as $catscaleid => $ability) {
             if (abs(floatval($ability)) === abs(floatval(LOCAL_CATQUIZ_PERSONABILITY_MAX))) {
@@ -141,6 +163,7 @@ class personabilities extends feedbackgenerator {
                 'ability' => $ability,
                 'name' => $catscales[$catscaleid]->name,
                 'catscaleid' => $catscaleid,
+                'numberofitemsplayed' => isset($countscales[$catscaleid]) ? $countscales[$catscaleid] : 0,
             ];
         }
         return ['feedback_personabilities' => $data];
