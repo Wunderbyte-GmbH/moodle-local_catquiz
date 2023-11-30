@@ -454,6 +454,7 @@ class catscalequestions_table extends wunderbyte_table {
      * Function to handle the action buttons.
      * @param int $testitemid
      * @param string $data
+     * @param bool $overridecatscale // When true, an item already assigned to a catscale of the same tree will be updated.
      * @return array
      */
     public static function addtestitem(int $testitemid, string $data, bool $overridecatscale = false) {

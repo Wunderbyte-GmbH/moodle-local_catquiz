@@ -90,7 +90,7 @@ class catscale {
      *
      * @param int $componentid
      * @param string $componentname
-     * @param boolean $returnlink
+     * @param bool $returnlink
      * @return array
      */
     public static function return_catscaleids_and_links_for_testitemitem(
@@ -147,6 +147,7 @@ class catscale {
      * @param int $testitemid
      * @param int $status // Just to check if status is changed, we make a nonsense default.
      * @param string $component
+     * @param bool $overridecatscale // When true, an item already assigned to a catscale of the same tree will be updated.
      *
      * @return mixed
      *
