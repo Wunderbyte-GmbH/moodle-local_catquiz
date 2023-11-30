@@ -33,7 +33,13 @@
         ]
     }
 }}
-
+<h5>{{#str}}personabilitytitle, local_catquiz{{/str}}</h5>
 {{#abilities}}
-{{name}}: {{ability}}<br>
+    {{name}}: {{ability}}<br>
 {{/abilities}}
+{{#chartdisplay}}
+    <h5>
+    {{charttitle}}
+    </h5>
+    {{{chart}}}
+{{/chartdisplay}}

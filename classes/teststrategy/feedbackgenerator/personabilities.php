@@ -58,12 +58,15 @@ class personabilities extends feedbackgenerator {
 
         $feedback = $OUTPUT->render_from_template(
             'local_catquiz/feedback/personabilities',
-            ['abilities' => $data['feedback_personabilities']]
+            [
+                'abilities' => $data['feedback_personabilities'],
+                'chartdisplay' => $chart,
+            ]
         );
 
         return [
             'heading' => $this->get_heading(),
-            'content' => $chart,
+            'content' => $feedback,
         ];
     }
 
@@ -154,7 +157,12 @@ class personabilities extends feedbackgenerator {
     private function render_chart(array $data) {
         global $OUTPUT;
 
-        $parentscaleid = $data['quizsettings']['catquiz_catscales'];
+        if (gettype($data['quizsettings']) != "array") {
+            $quizsettings = (array)$data['quizsettings'];
+        } else {
+            $quizsettings = $data['quizsettings'];
+        }
+        $parentscaleid = $quizsettings['catquiz_catscales'];
 
         $parentability = 0;
         // First we get the personability of the parentscale.
@@ -184,7 +192,7 @@ class personabilities extends feedbackgenerator {
             $series->set_labels([0 => $stringforchartlegend]);
 
             $colorvalue = $this->get_color_for_personabily(
-                $data['quizsettings'],
+                $quizsettings,
                 floatval($subscaleability),
                 floatval($dataitem['catscaleid'])
             );
@@ -194,20 +202,23 @@ class personabilities extends feedbackgenerator {
         };
         $out = $OUTPUT->render($chart);
 
-        return $out;
+        return [
+            'chart' => $out,
+            'charttitle' => get_string('personabilitycharttitle', 'local_catquiz'),
+        ];
 
     }
 
     /**
      * Write information about colorgradient for colorbar.
      *
-     * @param object $quizsettings
+     * @param array $quizsettings
      * @param float $personability
      * @param float $catscaleid
      * @return string
      *
      */
-    private function get_color_for_personabily($quizsettings, float $personability, float $catscaleid): string {
+    private function get_color_for_personabily(array $quizsettings, float $personability, float $catscaleid): string {
         $default = "#000000";
         if (!$quizsettings ||
             $personability < PERSONABILITY_LOWER_LIMIT ||
