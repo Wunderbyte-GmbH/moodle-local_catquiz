@@ -90,6 +90,30 @@ class questionssummary extends feedbackgenerator {
             return null;
         }
 
+        switch($initialcontext['teststrategy']) {
+            case LOCAL_CATQUIZ_STRATEGY_FASTEST:
+                $strategyname = get_string('teststrategy_fastest', 'local_catquiz');
+                break;
+            case LOCAL_CATQUIZ_STRATEGY_BALANCED:
+                $strategyname = get_string('teststrategy_balanced', 'local_catquiz');
+                break;
+            case LOCAL_CATQUIZ_STRATEGY_ALLSUBS:
+                $strategyname = get_string('inferallsubscales', 'local_catquiz');
+                break;
+            case LOCAL_CATQUIZ_STRATEGY_LOWESTSUB:
+                $strategyname = get_string('inferlowestskillgap', 'local_catquiz');
+                break;
+            case LOCAL_CATQUIZ_STRATEGY_HIGHESTSUB:
+                $strategyname = get_string('infergreateststrength', 'local_catquiz');
+                break;
+            case LOCAL_CATQUIZ_STRATEGY_PILOT:
+                $strategyname = get_string('pilot_questions', 'local_catquiz');
+                break;
+            default:
+                $strategyname = get_string('classicalcat', 'local_catquiz');
+                break;
+
+        }
         return [
             'gradedright' => $attempt['gradedright']->count ?? 0,
             // We want to count skipped questions as wrong. The skipped answers
@@ -97,6 +121,7 @@ class questionssummary extends feedbackgenerator {
             'gradedwrong' => ($attempt['gradedwrong']->count ?? 0)
                 + ($attempt[null]->count ?? 0),
             'gradedpartial' => $attempt['gradedpartial']->count ?? 0,
+            'teststrategy' => $strategyname,
         ];
     }
 
