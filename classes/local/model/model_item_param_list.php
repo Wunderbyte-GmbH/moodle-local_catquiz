@@ -427,7 +427,7 @@ class model_item_param_list implements ArrayAccess, IteratorAggregate, Countable
                 $id = $newrecord['id'];
             }
         }
-        if ($newrecord['warning'] != '') {
+        if (!empty($newrecord['warning'])) {
             return [
                 'success' => 2, // Update successfull with warning.
                 'message' => $newrecord['warning'],
