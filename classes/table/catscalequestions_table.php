@@ -365,7 +365,8 @@ class catscalequestions_table extends wunderbyte_table {
         $jsonobject = json_decode($data);
 
         $catscaleid = $jsonobject->catscaleid;
-        $status = empty($jsonobject->testitemstatus) ? LOCAL_CATQUIZ_TESTITEM_STATUS_INACTIVE : LOCAL_CATQUIZ_TESTITEM_STATUS_ACTIVE;
+        $status = empty($jsonobject->testitemstatus) ?
+        LOCAL_CATQUIZ_TESTITEM_STATUS_INACTIVE : LOCAL_CATQUIZ_TESTITEM_STATUS_ACTIVE;
 
         catscale::add_or_update_testitem_to_scale((int)$catscaleid, $id, $status);
 

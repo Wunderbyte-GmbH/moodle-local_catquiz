@@ -92,7 +92,11 @@ class model_item_param {
      * @param int $status
      *
      */
-    public function __construct(string $id, string $modelname, array $metadata = [], int $status = LOCAL_CATQUIZ_STATUS_NOT_CALCULATED) {
+    public function __construct(
+        string $id,
+        string $modelname,
+        array $metadata = [],
+        int $status = LOCAL_CATQUIZ_STATUS_NOT_CALCULATED) {
         $this->id = $id;
         $this->modelname = $modelname;
         $this->metadata = $metadata;

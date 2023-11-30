@@ -154,7 +154,11 @@ class info {
             $teststrategiesoptions[$ts->id] = $ts->get_description();
 
             // Only for those strategies in the array, we want to show the standard error setting.
-            if (!in_array($ts->id, [LOCAL_CATQUIZ_STRATEGY_LOWESTSUB, LOCAL_CATQUIZ_STRATEGY_HIGHESTSUB, LOCAL_CATQUIZ_STRATEGY_ALLSUBS])) {
+            if (!in_array($ts->id, [
+                    LOCAL_CATQUIZ_STRATEGY_LOWESTSUB,
+                    LOCAL_CATQUIZ_STRATEGY_HIGHESTSUB,
+                    LOCAL_CATQUIZ_STRATEGY_ALLSUBS,
+                    ])) {
                 $strategyhasstandarderrorperscale[] = $ts->id;
             }
         }
