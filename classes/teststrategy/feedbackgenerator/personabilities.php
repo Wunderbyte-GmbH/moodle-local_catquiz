@@ -30,6 +30,7 @@ use core\chart_bar;
 use core\chart_series;
 use local_catquiz\catquiz;
 use local_catquiz\feedback\feedbackclass;
+use local_catquiz\output\catscalemanager\questions\cards\questionpreview;
 use local_catquiz\teststrategy\feedbackgenerator;
 use stdClass;
 
@@ -136,14 +137,18 @@ class personabilities extends feedbackgenerator {
             }
             $lastquestion = $data['lastquestion'];
             $scaleid = $lastquestion->catscaleid;
-            if (isset($countscales[$scaleid])) {
-                $countscales[$scaleid] ++;
+            if (isset($countscales[$scaleid]['count'])) {
+                $countscales[$scaleid]['count'] ++;
             } else {
-                $countscales[$scaleid] = 1;
+                $countscales[$scaleid]['count'] = 1;
             }
+
+            $questiondisplay = $this->render_questionpreview($lastquestion);
+            $countscales[$scaleid]['questionpreviews'][] = [
+                'preview' => $questiondisplay['body']['question'],
+            ];
         }
         $catscales = catquiz::get_catscales(array_keys($personabilities));
-
         $data = [];
         foreach ($personabilities as $catscaleid => $ability) {
             if (abs(floatval($ability)) === abs(floatval(LOCAL_CATQUIZ_PERSONABILITY_MAX))) {
@@ -159,7 +164,9 @@ class personabilities extends feedbackgenerator {
                 'ability' => $ability,
                 'name' => $catscales[$catscaleid]->name,
                 'catscaleid' => $catscaleid,
-                'numberofitemsplayed' => isset($countscales[$catscaleid]) ? $countscales[$catscaleid] : 0,
+                'numberofitemsplayed' => isset($countscales[$catscaleid]['count']) ? $countscales[$catscaleid]['count'] : 0,
+                'questionpreviews' =>
+                    isset($countscales[$catscaleid]['questionpreviews']) ? $countscales[$catscaleid]['questionpreviews'] : "",
             ];
         }
 
@@ -266,5 +273,18 @@ class personabilities extends feedbackgenerator {
 
         }
         return $default;
+    }
+
+    /**
+     * Renders preview of testitem (question).
+     *
+     * @param object $record
+     *
+     * @return array
+     *
+     */
+    private function render_questionpreview(object $record) {
+        $questionpreview = new questionpreview($record);
+        return $questionpreview->render_questionpreview();
     }
 }

@@ -42,7 +42,19 @@
 }}
 <h5>{{#str}}personabilitytitle, local_catquiz{{/str}}</h5>
 {{#abilities}}
-    {{name}}: {{ability}} ({{numberofitemsplayed}} {{#str}}itemsplayed, local_catquiz{{/str}})<br>
+    {{name}}: {{ability}}
+    <button type="button" class="btn btn-light" data-toggle="modal" data-target=".catquizfeedbackabilitiesplayedquestions{{name}}">{{numberofitemsplayed}} {{#str}}itemsplayed, local_catquiz{{/str}}</button>
+
+    <div class="modal fade bd-example-modal-xl catquizfeedbackabilitiesplayedquestions{{name}}" tabindex="-1" role="dialog" aria-labelledby="catquizfeedbackabilitiesplayedquestions" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            {{#questionpreviews}}
+                <br> {{{preview}}} <br>
+            {{/questionpreviews}}
+        </div>
+    </div>
+    </div>
+    <br>
 {{/abilities}}
 <h5>{{#str}}standarderrorpersubscale, local_catquiz{{/str}}: {{standarderrorpersubscales}}</h5>
 {{#chartdisplay}}
