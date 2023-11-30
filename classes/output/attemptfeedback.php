@@ -214,21 +214,20 @@ class attemptfeedback implements renderable, templatable {
         // At this point, we might want to resort data, depending on the teststrategy.
         // Todo: Give this task to the teststrategy classes.
         if ($feedbackdata["personabilities"] != false) {
-        switch ($feedbackdata["teststrategy"]) {
-            case LOCAL_CATQUIZ_STRATEGY_LOWESTSUB:
-                sort($feedbackdata["personabilities"]);
-                usort($feedbackdata["feedback_personabilities"], fn($a, $b) => $a['ability'] > $b['ability'] ? 1 : -1);
-                break;
-            case LOCAL_CATQUIZ_STRATEGY_HIGHESTSUB:
-                rsort($feedbackdata["personabilities"]);
-                usort($feedbackdata["feedback_personabilities"], fn($a, $b) => $a['ability'] < $b['ability'] ? 1 : -1);
-                break;
-            default:
-                sort($feedbackdata["personabilities"]);
-                usort($feedbackdata["feedback_personabilities"], fn($a, $b) => $a['ability'] > $b['ability'] ? 1 : -1);
+            switch ($feedbackdata["teststrategy"]) {
+                case LOCAL_CATQUIZ_STRATEGY_LOWESTSUB:
+                    sort($feedbackdata["personabilities"]);
+                    usort($feedbackdata["feedback_personabilities"], fn($a, $b) => $a['ability'] > $b['ability'] ? 1 : -1);
+                    break;
+                case LOCAL_CATQUIZ_STRATEGY_HIGHESTSUB:
+                    rsort($feedbackdata["personabilities"]);
+                    usort($feedbackdata["feedback_personabilities"], fn($a, $b) => $a['ability'] < $b['ability'] ? 1 : -1);
+                    break;
+                default:
+                    sort($feedbackdata["personabilities"]);
+                    usort($feedbackdata["feedback_personabilities"], fn($a, $b) => $a['ability'] > $b['ability'] ? 1 : -1);
+            }
         }
-		}
-
         foreach ($generators as $generator) {
             $feedback = $generator->get_feedback($feedbackdata);
             // Loop over studentfeedback and teacherfeedback.
