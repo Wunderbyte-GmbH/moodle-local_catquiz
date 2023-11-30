@@ -149,7 +149,7 @@
         <FIELD NAME="attemptid" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false" COMMENT="id of corresponding component (i.e. mod_adaptive_quiz)"/>
         <FIELD NAME="component" TYPE="char" LENGTH="255" NOTNULL="false" SEQUENCE="false"/>
         <FIELD NAME="instanceid" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false" COMMENT="the instance id of the mod adaptive quiz"/>
-        <FIELD NAME="teststrategy" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false" COMMENT="'STRATEGY_FASTEST': 1 'STRATEGY_BALANCED': 2 'STRATEGY_ALLSUBS': 3 'STRATEGY_LOWESTSUB': 4 'STRATEGY_HIGHESTSUB': 5 'STRATEGY_PILOT': 6"/>
+        <FIELD NAME="teststrategy" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false" COMMENT="'LOCAL_CATQUIZ_STRATEGY_FASTEST': 1 'STRATEGY_BALANCED': 2 'LOCAL_CATQUIZ_STRATEGY_ALLSUBS': 3 'LOCAL_CATQUIZ_STRATEGY_LOWESTSUB': 4 'LOCAL_CATQUIZ_STRATEGY_HIGHESTSUB': 5 'LOCAL_CATQUIZ_STRATEGY_PILOT': 6"/>
         <FIELD NAME="status" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false" COMMENT="status defined as ints (see lib.php)"/>
         <FIELD NAME="total_number_of_testitems" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false" COMMENT="all testitems relevant for this attempt"/>
         <FIELD NAME="number_of_testitems_used" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false" COMMENT="number of testitems used in the attempt"/>
