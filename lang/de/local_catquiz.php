@@ -416,6 +416,7 @@ $string['feedback_table_answerincorrect'] = "Falsch";
 $string['feedback_table_answerpartlycorrect'] = "Teilweise richtig";
 $string['parentscale'] = "Mutterskala";
 $string['seeitemsplayed'] = "Gespielte Fragen anzeigen";
+$string['subfeedbackrange'] = '({$a->lowerlimit} bis {$a->upperlimit})';
 
 // Chart in Feedback.
 $string['labelforrelativepersonabilitychart'] = "Relative Personenfähigkeit";

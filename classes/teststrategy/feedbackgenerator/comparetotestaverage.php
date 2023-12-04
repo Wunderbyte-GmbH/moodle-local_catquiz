@@ -121,6 +121,16 @@ class comparetotestaverage extends feedbackgenerator {
         for ($j = 1; $j <= $numberoffeedbackoptions; $j++) {
             $colorkey = 'wb_colourpicker_' . $parentscaleid . '_' . $j;
             $feedbacktextkey = 'feedbacklegend_scaleid_' . $parentscaleid . '_' . $j;
+            $lowerlimitkey = "feedback_scaleid_limit_lower_" . $parentscaleid . "_" . $j;
+            $upperlimitkey = "feedback_scaleid_limit_upper_" . $parentscaleid . "_" . $j;
+
+            $feedbackrangestring = get_string(
+                'subfeedbackrange',
+                'local_catquiz',
+                [
+                    'upperlimit' => round($quizsettings->$upperlimitkey, 2),
+                    'lowerlimit' => round($quizsettings->$lowerlimitkey, 2),
+                ]);
 
             $text = $quizsettings->$feedbacktextkey ?? "";
 
@@ -130,6 +140,7 @@ class comparetotestaverage extends feedbackgenerator {
             $feedbacks[] = [
                 'subcolorcode' => $colorvalue,
                 'subfeedbacktext' => $text,
+                'subfeedbackrange' => $feedbackrangestring,
             ];
         }
 

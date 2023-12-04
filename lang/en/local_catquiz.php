@@ -419,6 +419,7 @@ $string['feedback_table_answerincorrect'] = "incorrect";
 $string['feedback_table_answerpartlycorrect'] = "partly correct";
 $string['parentscale'] = "Parentscale";
 $string['seeitemsplayed'] = "Display items played";
+$string['subfeedbackrange'] = '({$a->lowerlimit} to {$a->upperlimit})';
 
 // Personability & chart in Feedback.
 $string['labelforrelativepersonabilitychart'] = "Relative personability";
