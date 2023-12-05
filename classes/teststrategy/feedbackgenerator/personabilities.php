@@ -61,7 +61,7 @@ class personabilities extends feedbackgenerator {
     /**
      * Creates a new personabilities feedback generator.
      *
-     * @param feedbacksettings
+     * @param feedbacksettings $feedbacksettings
      */
     public function __construct(feedbacksettings $feedbacksettings) {
 
@@ -165,7 +165,7 @@ class personabilities extends feedbackgenerator {
 
         if (!empty($this->primaryscaleid)
             && $this->primaryscaleid === 'strongest') {
-                // Find the key with the highest float value
+                // Find the key with the highest float value.
             $selectedscaleid = array_search(max($personabilities), $personabilities);
             $selectedscale = 'strongestscaleselected';
         } else if (!empty($this->primaryscaleid)
@@ -229,7 +229,6 @@ class personabilities extends feedbackgenerator {
                 'name' => $catscales[$catscaleid]->name,
                 'catscaleid' => $catscaleid,
                 'numberofitemsplayed' => $numberofitems,
-                'catscaleid' => $catscaleid,
                 'questionpreviews' =>
                     isset($countscales[$catscaleid]['questionpreviews']) ? $countscales[$catscaleid]['questionpreviews'] : "",
                 'isselectedscale' => $isselectedscale,
@@ -249,7 +248,7 @@ class personabilities extends feedbackgenerator {
      * Render chart for personabilities.
      *
      * @param array $data
-     * @param stdClass $catscaleid
+     * @param stdClass $primarycatscale
      *
      * @return array
      *

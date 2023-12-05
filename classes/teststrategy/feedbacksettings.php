@@ -59,7 +59,8 @@ class feedbacksettings {
     /**
      * Constructor for feedbackclass.
      *
-     *
+     * @param string $primaryscalename
+     * @param string $scaleresult
      */
     public function __construct($primaryscalename = 'parent', $scaleresult = '') {
 

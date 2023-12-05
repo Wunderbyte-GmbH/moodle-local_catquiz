@@ -88,7 +88,7 @@ class catscale {
     /**
      * Static function to return catscale object.
      *
-     * @param string $catscaleid
+     * @param string $catscalename
      * @return stdClass|null
      */
     public static function return_catscale_by_name(string $catscalename) {

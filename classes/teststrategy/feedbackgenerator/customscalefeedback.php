@@ -49,7 +49,7 @@ class customscalefeedback extends feedbackgenerator {
     /**
      * Creates a new customscale feedback generator.
      *
-     * @param feedbacksettings
+     * @param feedbacksettings $feedbacksettings
      */
     public function __construct(feedbacksettings $feedbacksettings) {
 

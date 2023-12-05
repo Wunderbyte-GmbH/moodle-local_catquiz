@@ -50,7 +50,7 @@ class comparetotestaverage extends feedbackgenerator {
     /**
      * Creates a new customscale feedback generator.
      *
-     * @param feedbacksettings
+     * @param feedbacksettings $feedbacksettings
      */
     public function __construct(feedbacksettings $feedbacksettings) {
 
@@ -242,7 +242,7 @@ class comparetotestaverage extends feedbackgenerator {
 
         if (!empty($this->primaryscaleid)
             && $this->primaryscaleid === 'strongest') {
-                // Find the key with the highest float value
+                // Find the key with the highest float value.
             $catscaleid = array_search(max($personabilities), $personabilities);
             $selectedscale = 'strongestscaleselected';
         } else if (!empty($this->primaryscaleid)
