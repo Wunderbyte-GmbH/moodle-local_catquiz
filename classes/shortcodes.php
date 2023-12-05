@@ -28,6 +28,7 @@ namespace local_catquiz;
 
 use local_catquiz\output\attemptfeedback;
 use local_catquiz\output\catscalemanager\quizattempts\quizattemptsdisplay;
+use local_catquiz\teststrategy\feedbacksettings;
 
 /**
  * Deals with local_shortcodes regarding catquiz.
@@ -70,8 +71,14 @@ class shortcodes {
         $output = [
             'attempt' => [],
         ];
+
+        $primaryscale = $args['primaryscale'] ?? 'parent';
+        $scaleresult = $args['scaleresult'] ?? '';
+        $feedbacksettings = new feedbacksettings($primaryscale, $scaleresult);
+
         foreach ($records as $record) {
             $attemptfeedback = new attemptfeedback($record->attemptid, $record->contextid);
+            $attemptfeedback->define_settings($feedbacksettings);
             $headerstring = get_string('feedbacksheader', 'local_catquiz', $record->attemptid);
             $data = [
                 'feedback' => $attemptfeedback->get_feedback_for_attempt($record->attemptid),
