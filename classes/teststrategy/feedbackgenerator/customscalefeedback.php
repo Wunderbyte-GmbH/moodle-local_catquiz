@@ -27,6 +27,7 @@ namespace local_catquiz\teststrategy\feedbackgenerator;
 use cache;
 use local_catquiz\catquiz;
 use local_catquiz\teststrategy\feedbackgenerator;
+use local_catquiz\teststrategy\feedbacksettings;
 
 /**
  * Returns a custom feedback for each scale.
@@ -48,12 +49,22 @@ class customscalefeedback extends feedbackgenerator {
     /**
      * Creates a new customscale feedback generator.
      *
-     * @param ?callable $sortfun Optional. A function to order the feedbacks by
-     * their scale ability. If none is given, the feedbacks are displayed in
-     * ascending order of their ability.
+     * @param feedbacksettings
      */
-    public function __construct($sortfun = null) {
-        $this->sortfun = $sortfun ?? fn(&$x) => asort($x);
+    public function __construct(feedbacksettings $feedbacksettings) {
+
+        if (!isset($feedbacksettings)) {
+            return;
+        }
+
+        // Order the feedbacks by their scale ability.
+        // If none is given, the feedbacks are displayed in descending order of their ability.
+        if ($feedbacksettings->sortorder == LOCAL_CATQUIZ_SORTORDER_ASC) {
+            $this->sortfun = fn(&$x) => asort($x);
+        } else {
+            $this->sortfun = fn(&$x) => arsort($x);
+        }
+
     }
 
     /**

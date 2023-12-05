@@ -211,11 +211,18 @@ abstract class strategy {
 
     /**
      * Get feedback generators.
-     *
+     * @param feedbacksettings $feedbacksettings
      * @return array
      *
      */
-    abstract public function get_feedbackgenerators(): array;
+    abstract public function get_feedbackgenerators(feedbacksettings $feedbacksettings): array;
+
+    /**
+     * Check defined settings and apply specific settings strategy.
+     * @param feedbacksettings $feedbacksettings
+     *
+     */
+    abstract public function apply_feedbacksettings(feedbacksettings $feedbacksettings);
 
     /**
      * Update played questions per scale.

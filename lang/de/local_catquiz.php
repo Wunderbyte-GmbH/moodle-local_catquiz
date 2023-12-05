@@ -378,11 +378,11 @@ $string['emptyfirstquestionlist'] = "Kann keine Startfrage wählen da die Liste 
 $string['attemptfeedbacknotavailable'] = "Kein Feedback verfügbar";
 $string['allquestionsincorrect'] = "Nicht verfügbar - alle Fragen wurden falsch beantwortet";
 $string['allquestionscorrect'] = "Nicht verfügbar - alle Fragen wurden richtig beantwortet";
-$string['feedbackcomparetoaverage'] = 'Sie sind besser als {$a}% Ihrer Mit-Studierenden im aktuellen Jahrgang.';
+$string['feedbackcomparetoaverage'] = 'Sie sind besser als {$a->quantile}% Ihrer Mit-Studierenden im aktuellen Jahrgang in {$a->scaleinfo}.';
 $string['feedbackneedsimprovement'] = "Da geht doch sicher noch etwas, oder?";
 $string['questionssummary'] = "Zusammenfassung";
-$string['currentability'] = "Ihr momentaner Wissensstand";
-$string['currentabilityfellowstudents'] = "Momentaner Mittelwert der Wissensstände Ihrer zukünftigen Mit-Studierenden";
+$string['currentability'] = 'Ihr momentaner Wissensstand in der Skala {$a}';
+$string['currentabilityfellowstudents'] = 'Momentaner Mittelwert der Wissensstände Ihrer zukünftigen Mit-Studierenden in der Skala {$a}';
 $string['feedbackbarlegend'] = "Bedeutung der Farbskala";
 $string['feedbackbarlegend_region_1'] = "Ihre zukünftigen Lehrenden schätzen einen solchen Wissensstand als zu gering ein, um im Fachstudium mithalten zu können.";
 $string['feedbackbarlegend_region_2'] = "Mit einem Wissensstand in diesem Bereich ist im Fachstudium mit regelmäßigen Verständnisproblemen zu rechnen.";
@@ -417,11 +417,15 @@ $string['feedback_table_answerpartlycorrect'] = "Teilweise richtig";
 $string['parentscale'] = "Mutterskala";
 $string['seeitemsplayed'] = "Gespielte Fragen anzeigen";
 $string['subfeedbackrange'] = '({$a->lowerlimit} bis {$a->upperlimit})';
+$string['strongestscaleselected'] = 'stärkster Skala {$a}';
+$string['lowestscaleselected'] = 'schwächster Skala {$a}';
+$string['parentscaleselected'] = 'globaler Skala {$a}';
+$string['scaleselected'] = 'Skala {$a}';
 
 // Chart in Feedback.
 $string['labelforrelativepersonabilitychart'] = "Relative Personenfähigkeit";
 $string['chartlegendabilityrelative'] = '{$a->difference} (Im Vergleich zur Mutterskala); {$a->ability} (Personenfähigkeit dieser Skala)';
-$string['personabilitycharttitle'] = 'Relative Personenfähigkeit in den Subskalen - im Vergleich zur Mutterskala';
+$string['personabilitycharttitle'] = 'Relative Personenfähigkeit in den Subskalen im Vergleich zu {$a}';
 $string['personabilitytitle'] = 'Personenfähigkeit in den Subskalen';
 $string['itemsplayed'] = 'Frage(n) gespielt';
 

@@ -73,6 +73,10 @@ define('LOCAL_CATQUIZ_COLORBARGRADIENT', 3);
 
 define('LOCAL_CATQUIZ_DEFAULT_NUMBER_OF_FEEDBACKS_PER_SCALE', 2);
 
+// Sortorder.
+define('LOCAL_CATQUIZ_SORTORDER_ASC', 1);
+define('LOCAL_CATQUIZ_SORTORDER_DESC', 2);
+
 /**
  * Renders the popup Link.
  *

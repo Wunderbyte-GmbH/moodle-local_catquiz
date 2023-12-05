@@ -20,9 +20,11 @@ use cache;
 use context_system;
 use local_catquiz\catquiz;
 use local_catquiz\teststrategy\feedbackgenerator;
+use local_catquiz\teststrategy\feedbacksettings;
 use local_catquiz\teststrategy\info;
 use templatable;
 use renderable;
+use stdClass;
 
 /**
  * Renderable class for the catscalemanagers
@@ -52,6 +54,11 @@ class attemptfeedback implements renderable, templatable {
      * @var ?int
      */
     public int $teststrategy;
+
+    /**
+     * @var ?object
+     */
+    public feedbacksettings $feedbacksettings;
 
     /**
      * Constructor of class.
@@ -88,6 +95,16 @@ class attemptfeedback implements renderable, templatable {
             $catscaleid = intval($settings->catquiz_catscales);
         }
         $this->catscaleid = $catscaleid;
+    }
+
+    /**
+     * Pass the feedbacksettingsobject.
+     *
+     * @param feedbacksettings $feedbacksettings
+     *
+     */
+    public function define_settings(feedbacksettings $feedbacksettings) {
+        $this->feedbacksettings = $feedbacksettings;
     }
 
     /**
@@ -160,7 +177,10 @@ class attemptfeedback implements renderable, templatable {
             return [];
         }
 
-        return $attemptstrategy->get_feedbackgenerators();
+        if (!isset($this->feedbacksettings)) {
+            $this->feedbacksettings = new feedbacksettings();
+        }
+        return $attemptstrategy->get_feedbackgenerators($this->feedbacksettings);
     }
 
     /**
@@ -211,23 +231,6 @@ class attemptfeedback implements renderable, templatable {
      */
     private function generate_feedback(array $generators, array $feedbackdata): array {
 
-        // At this point, we might want to resort data, depending on the teststrategy.
-        // Todo: Give this task to the teststrategy classes.
-        if ($feedbackdata["personabilities"] != false) {
-            switch ($feedbackdata["teststrategy"]) {
-                case LOCAL_CATQUIZ_STRATEGY_LOWESTSUB:
-                    sort($feedbackdata["personabilities"]);
-                    usort($feedbackdata["feedback_personabilities"], fn($a, $b) => $a['ability'] > $b['ability'] ? 1 : -1);
-                    break;
-                case LOCAL_CATQUIZ_STRATEGY_HIGHESTSUB:
-                    rsort($feedbackdata["personabilities"]);
-                    usort($feedbackdata["feedback_personabilities"], fn($a, $b) => $a['ability'] < $b['ability'] ? 1 : -1);
-                    break;
-                default:
-                    sort($feedbackdata["personabilities"]);
-                    usort($feedbackdata["feedback_personabilities"], fn($a, $b) => $a['ability'] > $b['ability'] ? 1 : -1);
-            }
-        }
         foreach ($generators as $generator) {
             $feedback = $generator->get_feedback($feedbackdata);
             // Loop over studentfeedback and teacherfeedback.

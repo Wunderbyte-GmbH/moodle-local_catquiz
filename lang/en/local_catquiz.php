@@ -376,7 +376,7 @@ $string['error'] = "An error occured";
 $string['id'] = "ID";
 $string['abortpersonabilitynotchanged'] = "Person parameter did not change";
 $string['emptyfirstquestionlist'] = "Can't select a start question because the list is empty";
-$string['feedbackcomparetoaverage'] = 'You performed better than {$a}% of your fellow students.';
+$string['feedbackcomparetoaverage'] = 'You performed better than {$a->quantile}% of your fellow students for {$a->scaleinfo}.';
 $string['feedbackneedsimprovement'] = "Don't you think that you can do better?";
 
 // Quiz Feedback.
@@ -384,8 +384,8 @@ $string['attemptfeedbacknotavailable'] = "No feedback available";
 $string['allquestionsincorrect'] = "Not available - all questions were answered incorrectly";
 $string['allquestionscorrect'] = "Not available- all questions were answered correctly";
 $string['questionssummary'] = "Summary";
-$string['currentability'] = "Your current skill level";
-$string['currentabilityfellowstudents'] = "Current skill level of your fellow students";
+$string['currentability'] = 'Your current skill level for scale {$a}';
+$string['currentabilityfellowstudents'] = 'Current skill level of your fellow students for scale {$a}';
 $string['feedbackbarlegend'] = "Color code";
 $string['feedbackbarlegend_region_1'] = "Your future instructors consider this level of knowledge to be insufficient to keep up with the studies.";
 $string['feedbackbarlegend_region_2'] = "With this level of knowledge, one can expect to encounter regular difficulties during the studies.";
@@ -420,11 +420,15 @@ $string['feedback_table_answerpartlycorrect'] = "partly correct";
 $string['parentscale'] = "Parentscale";
 $string['seeitemsplayed'] = "Display items played";
 $string['subfeedbackrange'] = '({$a->lowerlimit} to {$a->upperlimit})';
+$string['strongestscaleselected'] = 'your strongest scale {$a}';
+$string['lowestscaleselected'] = 'your lowest scale {$a}';
+$string['parentscaleselected'] = 'parent scale {$a}';
+$string['scaleselected'] = 'defined scale {$a}';
 
 // Personability & chart in Feedback.
 $string['labelforrelativepersonabilitychart'] = "Relative personability";
 $string['chartlegendabilityrelative'] = '{$a->difference} (Compared to parentscale); {$a->ability} (Personability of scale)';
-$string['personabilitycharttitle'] = 'Relative personability in subscales - compared to parentscale';
+$string['personabilitycharttitle'] = 'Relative personability in subscales compared to {$a}';
 $string['personabilitytitle'] = 'Personability in subscales';
 $string['itemsplayed'] = 'Item(s) played';
 

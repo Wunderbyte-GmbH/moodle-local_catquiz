@@ -26,8 +26,10 @@ namespace local_catquiz\teststrategy\feedbackgenerator;
 
 use cache;
 use local_catquiz\catquiz;
+use local_catquiz\catscale;
 use local_catquiz\feedback\feedbackclass;
 use local_catquiz\teststrategy\feedbackgenerator;
+use local_catquiz\teststrategy\feedbacksettings;
 use local_catquiz\teststrategy\preselect_task\firstquestionselector;
 
 /**
@@ -38,6 +40,27 @@ use local_catquiz\teststrategy\preselect_task\firstquestionselector;
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class comparetotestaverage extends feedbackgenerator {
+
+    /**
+     *
+     * @var mixed $primaryscaleid // The scale to be displayed in detail in the colorbar.
+     */
+    public mixed $primaryscaleid;
+
+    /**
+     * Creates a new customscale feedback generator.
+     *
+     * @param feedbacksettings
+     */
+    public function __construct(feedbacksettings $feedbacksettings) {
+
+        // Will be 0 if no scale set correctly.
+        if (isset($feedbacksettings->primaryscale)) {
+            $this->primaryscaleid = $feedbacksettings->primaryscale;
+        } else {
+            $this->primaryscaleid = 0;
+        }
+    }
 
     /**
      * Get student feedback.
@@ -105,24 +128,24 @@ class comparetotestaverage extends feedbackgenerator {
      * Write string to define color gradiant bar.
      *
      * @param object $quizsettings
+     * @param string|int $catscaleid
      * @return array
      *
      */
-    private function get_colorbarlegend($quizsettings): array {
+    private function get_colorbarlegend($quizsettings, $catscaleid): array {
         if (!$quizsettings) {
             return [];
         }
         // We collect the feedbackdata only for the parentscale.
         $feedbacks = [];
-        $parentscaleid = $quizsettings->catquiz_catscales;
         $numberoffeedbackoptions = intval($quizsettings->numberoffeedbackoptionsselect);
         $colorarray = feedbackclass::get_array_of_colors($numberoffeedbackoptions);
 
         for ($j = 1; $j <= $numberoffeedbackoptions; $j++) {
-            $colorkey = 'wb_colourpicker_' . $parentscaleid . '_' . $j;
-            $feedbacktextkey = 'feedbacklegend_scaleid_' . $parentscaleid . '_' . $j;
-            $lowerlimitkey = "feedback_scaleid_limit_lower_" . $parentscaleid . "_" . $j;
-            $upperlimitkey = "feedback_scaleid_limit_upper_" . $parentscaleid . "_" . $j;
+            $colorkey = 'wb_colourpicker_' . $catscaleid . '_' . $j;
+            $feedbacktextkey = 'feedbacklegend_scaleid_' . $catscaleid . '_' . $j;
+            $lowerlimitkey = "feedback_scaleid_limit_lower_" . $catscaleid . "_" . $j;
+            $upperlimitkey = "feedback_scaleid_limit_upper_" . $catscaleid . "_" . $j;
 
             $feedbackrangestring = get_string(
                 'subfeedbackrange',
@@ -151,15 +174,15 @@ class comparetotestaverage extends feedbackgenerator {
      * Write information about colorgradient for colorbar.
      *
      * @param object $quizsettings
+     * @param string|int $catscaleid
      * @return string
      *
      */
-    private function get_colorgradientstring($quizsettings): string {
+    private function get_colorgradientstring($quizsettings, $catscaleid): string {
         if (!$quizsettings) {
             return "";
         }
 
-        $parentscaleid = $quizsettings->catquiz_catscales;
         $numberoffeedbackoptions = intval($quizsettings->numberoffeedbackoptionsselect);
         $colorarray = feedbackclass::get_array_of_colors($numberoffeedbackoptions);
         $gradient = LOCAL_CATQUIZ_COLORBARGRADIENT;
@@ -167,15 +190,15 @@ class comparetotestaverage extends feedbackgenerator {
         $output = "";
 
         for ($i = 1; $i <= $numberoffeedbackoptions; $i++) {
-            $lowestlimitkey = "feedback_scaleid_limit_lower_" . $parentscaleid . "_1";
-            $highestlimitkey = "feedback_scaleid_limit_upper_" . $parentscaleid . "_" . $numberoffeedbackoptions;
+            $lowestlimitkey = "feedback_scaleid_limit_lower_" . $catscaleid . "_1";
+            $highestlimitkey = "feedback_scaleid_limit_upper_" . $catscaleid . "_" . $numberoffeedbackoptions;
             $rangestart = ($quizsettings->$lowestlimitkey >= LOCAL_CATQUIZ_PERSONABILITY_LOWER_LIMIT) ?
                 $quizsettings->$lowestlimitkey : LOCAL_CATQUIZ_PERSONABILITY_LOWER_LIMIT;
             $rangeend = ($quizsettings->$highestlimitkey <= LOCAL_CATQUIZ_PERSONABILITY_UPPER_LIMIT) ?
             $quizsettings->$highestlimitkey : LOCAL_CATQUIZ_PERSONABILITY_UPPER_LIMIT;
 
-            $lowerlimitkey = "feedback_scaleid_limit_lower_" . $parentscaleid . "_" . $i;
-            $upperlimitkey = "feedback_scaleid_limit_upper_" . $parentscaleid . "_" . $i;
+            $lowerlimitkey = "feedback_scaleid_limit_lower_" . $catscaleid . "_" . $i;
+            $upperlimitkey = "feedback_scaleid_limit_upper_" . $catscaleid . "_" . $i;
 
             $lowerlimit = $quizsettings->$lowerlimitkey;
             $upperlimit = $quizsettings->$upperlimitkey;
@@ -183,7 +206,7 @@ class comparetotestaverage extends feedbackgenerator {
             $lowerpercentage = (($lowerlimit - $rangestart) / ($rangeend - $rangestart)) * 100 + $gradient;
             $upperpercentage = (($upperlimit - $rangestart) / ($rangeend - $rangestart)) * 100 - $gradient;
 
-            $colorkey = 'wb_colourpicker_' . $parentscaleid . '_' . $i;
+            $colorkey = 'wb_colourpicker_' . $catscaleid . '_' . $i;
             $colorname = $quizsettings->$colorkey;
             $colorvalue = $colorarray[$colorname];
 
@@ -210,21 +233,38 @@ class comparetotestaverage extends feedbackgenerator {
         if (! $quizsettings = $cache->get('quizsettings')) {
             return null;
         }
-
-        if (! $catscaleid = $quizsettings->catquiz_catscales) {
-            return null;
-        }
-
         $personabilities = $initialcontext['personabilities'];
-        $ability = $personabilities[$catscaleid];
-        if (! $ability) {
-            return null;
-        }
 
         $personparams = catquiz::get_person_abilities(
             $initialcontext['contextid'],
             array_keys($personabilities)
         );
+
+        if (!empty($this->primaryscaleid)
+            && $this->primaryscaleid === 'strongest') {
+                // Find the key with the highest float value
+            $catscaleid = array_search(max($personabilities), $personabilities);
+            $selectedscale = 'strongestscaleselected';
+        } else if (!empty($this->primaryscaleid)
+            && $this->primaryscaleid === 'lowest') {
+            $catscaleid = array_search(min($personabilities), $personabilities);
+            $selectedscale = 'lowestscaleselected';
+        } else if (!empty($this->primaryscaleid
+            && gettype($this->primaryscaleid) === "integer")) {
+            $catscaleid = $this->primaryscaleid;
+            $selectedscale = 'scaleselected';
+        } else if (! $catscaleid = $quizsettings->catquiz_catscales) {
+            $selectedscale = 'parentscaleselected';
+            return null;
+        } else {
+            $selectedscale = 'parentscaleselected';
+        }
+
+        $catscale = catscale::return_catscale_object($catscaleid);
+        $ability = $personabilities[$catscaleid];
+        if (! $ability) {
+            return null;
+        }
         $worseabilities = array_filter(
             $personparams,
             fn ($pp) => $pp->ability < $ability
@@ -235,7 +275,13 @@ class comparetotestaverage extends feedbackgenerator {
         }
 
         $quantile = (count($worseabilities) / count($personparams)) * 100;
-        $text = get_string('feedbackcomparetoaverage', 'local_catquiz', sprintf('%.2f', $quantile));
+        $text = get_string(
+            'feedbackcomparetoaverage',
+            'local_catquiz',
+            [
+                'quantile' => sprintf('%.2f', $quantile),
+                'scaleinfo' => get_string($selectedscale, 'local_catquiz', $catscale->name),
+            ]);
         if ($needsimprovementthreshold = $initialcontext['needsimprovementthreshold']) {
             if ($quantile < $needsimprovementthreshold) {
                 $text .= " " . get_string('feedbackneedsimprovement', 'local_catquiz');
@@ -253,8 +299,10 @@ class comparetotestaverage extends feedbackgenerator {
             'testaverageposition' => ($testaverage + 5) * 10,
             'userabilityposition' => ($ability + 5) * 10,
             'text' => $text,
-            'colorgradestring' => $this->get_colorgradientstring($quizsettings),
-            'feedbackbarlegend' => $this->get_colorbarlegend($quizsettings),
+            'colorgradestring' => $this->get_colorgradientstring($quizsettings, $catscaleid),
+            'feedbackbarlegend' => $this->get_colorbarlegend($quizsettings, $catscaleid),
+            'currentability' => get_string('currentability', 'local_catquiz', $catscale->name),
+            'currentabilityfellowstudents' => get_string('currentabilityfellowstudents', 'local_catquiz', $catscale->name),
         ];
     }
 }

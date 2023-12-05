@@ -30,6 +30,7 @@ use local_catquiz\teststrategy\feedbackgenerator\debuginfo;
 use local_catquiz\teststrategy\feedbackgenerator\graphicalsummary;
 use local_catquiz\teststrategy\feedbackgenerator\personabilities;
 use local_catquiz\teststrategy\feedbackgenerator\questionssummary;
+use local_catquiz\teststrategy\feedbacksettings;
 use local_catquiz\teststrategy\preselect_task\addscalestandarderror;
 use local_catquiz\teststrategy\preselect_task\filterforsubscale;
 use local_catquiz\teststrategy\preselect_task\firstquestionselector;
@@ -60,6 +61,11 @@ class inferlowestskillgap extends strategy {
      */
     public int $id = LOCAL_CATQUIZ_STRATEGY_LOWESTSUB;
 
+    /**
+     *
+     * @var stdClass $feedbacksettings.
+     */
+    public feedbacksettings $feedbacksettings;
 
     /**
      * Returns required score modifiers.
@@ -90,17 +96,36 @@ class inferlowestskillgap extends strategy {
     /**
      * Get feedback generators.
      *
+     * @param feedbacksettings $feedbacksettings
      * @return array
      *
      */
-    public function get_feedbackgenerators(): array {
+    public function get_feedbackgenerators(feedbacksettings $feedbacksettings = null): array {
+
+        $this->apply_feedbacksettings($feedbacksettings);
+
         return [
-            new comparetotestaverage(),
-            new customscalefeedback(),
-            new debuginfo(),
-            new personabilities(),
-            new questionssummary(),
-            new graphicalsummary(),
+            new comparetotestaverage($this->feedbacksettings),
+            new customscalefeedback($this->feedbacksettings),
+            new debuginfo($this->feedbacksettings),
+            new personabilities($this->feedbacksettings),
+            new questionssummary($this->feedbacksettings),
+            new graphicalsummary($this->feedbacksettings),
         ];
+    }
+
+    /**
+     * Gets predefined values and completes them with specific behaviour of strategy.
+     *
+     * @param feedbacksettings $feedbacksettings
+     *
+     */
+    public function apply_feedbacksettings(feedbacksettings $feedbacksettings) {
+        if ($feedbacksettings->overridesettings) {
+            $feedbacksettings->sortorder = LOCAL_CATQUIZ_SORTORDER_ASC;
+            $feedbacksettings->primaryscale = 'lowest';
+        }
+
+        $this->feedbacksettings = $feedbacksettings;
     }
 }

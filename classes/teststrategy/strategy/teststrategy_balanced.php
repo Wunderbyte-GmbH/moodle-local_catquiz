@@ -30,6 +30,7 @@ use local_catquiz\teststrategy\feedbackgenerator\graphicalsummary;
 use local_catquiz\teststrategy\feedbackgenerator\personabilities;
 use local_catquiz\teststrategy\feedbackgenerator\pilotquestions;
 use local_catquiz\teststrategy\feedbackgenerator\questionssummary;
+use local_catquiz\teststrategy\feedbacksettings;
 use local_catquiz\teststrategy\preselect_task\lasttimeplayedpenalty;
 use local_catquiz\teststrategy\preselect_task\maximumquestionscheck;
 use local_catquiz\teststrategy\preselect_task\maybe_return_pilot;
@@ -56,6 +57,12 @@ class teststrategy_balanced extends strategy {
     public int $id = LOCAL_CATQUIZ_STRATEGY_BALANCED;
 
     /**
+     *
+     * @var stdClass $feedbacksettings.
+     */
+    public feedbacksettings $feedbacksettings;
+
+    /**
      * Return required score modifiers.
      *
      * @return array
@@ -77,16 +84,31 @@ class teststrategy_balanced extends strategy {
     /**
      * Get feedbac kgenerators.
      *
+     * @param feedbacksettings $feedbacksettings
+     *
      * @return array
      *
      */
-    public function get_feedbackgenerators(): array {
+    public function get_feedbackgenerators(feedbacksettings $feedbacksettings = null): array {
+
+        $this->apply_feedbacksettings($feedbacksettings);
+
         return [
-          new   questionssummary(),
-          new   personabilities(),
-          new   pilotquestions(),
-          new   debuginfo(),
-          new   graphicalsummary(),
+          new   questionssummary($this->feedbacksettings),
+          new   personabilities($this->feedbacksettings),
+          new   pilotquestions($this->feedbacksettings),
+          new   debuginfo($this->feedbacksettings),
+          new   graphicalsummary($this->feedbacksettings),
         ];
+    }
+
+    /**
+     * Gets predefined values and completes them with specific behaviour of strategy.
+     *
+     * @param feedbacksettings $feedbacksettings
+     *
+     */
+    public function apply_feedbacksettings(feedbacksettings $feedbacksettings) {
+        $this->feedbacksettings = $feedbacksettings;
     }
 }

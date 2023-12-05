@@ -86,6 +86,18 @@ class catscale {
     }
 
     /**
+     * Static function to return catscale object.
+     *
+     * @param string $catscaleid
+     * @return stdClass|null
+     */
+    public static function return_catscale_by_name(string $catscalename) {
+        global $DB;
+        $catscale = $DB->get_record('local_catquiz_catscales', ['name' => $catscalename]) ?: null;
+        return $catscale;
+    }
+
+    /**
      * Static function to return array with key catscaleid and value link to catscale.
      *
      * @param int $componentid

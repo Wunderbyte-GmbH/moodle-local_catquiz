@@ -31,6 +31,7 @@ use local_catquiz\teststrategy\feedbackgenerator\graphicalsummary;
 use local_catquiz\teststrategy\feedbackgenerator\personabilities;
 use local_catquiz\teststrategy\feedbackgenerator\pilotquestions;
 use local_catquiz\teststrategy\feedbackgenerator\questionssummary;
+use local_catquiz\teststrategy\feedbacksettings;
 use local_catquiz\teststrategy\preselect_task\filterforsubscale;
 use local_catquiz\teststrategy\preselect_task\firstquestionselector;
 use local_catquiz\teststrategy\preselect_task\fisherinformation;
@@ -60,6 +61,11 @@ class infergreateststrength extends strategy {
      */
     public int $id = LOCAL_CATQUIZ_STRATEGY_HIGHESTSUB;
 
+    /**
+     *
+     * @var stdClass $feedbacksettings.
+     */
+    public feedbacksettings $feedbacksettings;
 
     /**
      * Returns required score modifiers.
@@ -88,19 +94,34 @@ class infergreateststrength extends strategy {
 
     /**
      * Get feedback generators.
-     *
+     * @param feedbacksettings $feedbacksettings
      * @return array
      *
      */
-    public function get_feedbackgenerators(): array {
+    public function get_feedbackgenerators(feedbacksettings $feedbacksettings = null): array {
+
+        $this->apply_feedbacksettings($feedbacksettings);
+
         return [
-            new questionssummary(),
-            new personabilities(),
-            new pilotquestions(),
-            new customscalefeedback(fn(&$x) => arsort($x)),
-            new comparetotestaverage(),
-            new debuginfo(),
-            new graphicalsummary(),
+            new questionssummary($this->feedbacksettings),
+            new personabilities($this->feedbacksettings),
+            new pilotquestions($this->feedbacksettings),
+            new customscalefeedback($this->feedbacksettings),
+            new comparetotestaverage($this->feedbacksettings),
+            new debuginfo($this->feedbacksettings),
+            new graphicalsummary($this->feedbacksettings),
         ];
+    }
+    /**
+     * Gets predefined values and completes them with specific behaviour of strategy.
+     *
+     * @param feedbacksettings $feedbacksettings
+     *
+     */
+    public function apply_feedbacksettings(feedbacksettings $feedbacksettings) {
+        if ($feedbacksettings->overridesettings) {
+            $feedbacksettings->primaryscale = 'strongest';
+        }
+        $this->feedbacksettings = $feedbacksettings;
     }
 }

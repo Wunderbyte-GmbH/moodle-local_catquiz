@@ -29,9 +29,11 @@ use core\chart_axis;
 use core\chart_bar;
 use core\chart_series;
 use local_catquiz\catquiz;
+use local_catquiz\catscale;
 use local_catquiz\feedback\feedbackclass;
 use local_catquiz\output\catscalemanager\questions\cards\questionpreview;
 use local_catquiz\teststrategy\feedbackgenerator;
+use local_catquiz\teststrategy\feedbacksettings;
 use stdClass;
 
 /**
@@ -44,6 +46,39 @@ use stdClass;
 class personabilities extends feedbackgenerator {
 
     /**
+     *
+     * @var stdClass $feedbacksettings.
+     */
+    public feedbacksettings $feedbacksettings;
+
+    /**
+     *
+     * @var mixed $primaryscaleid // The scale to be displayed in detail in the colorbar.
+     */
+    public mixed $primaryscaleid;
+
+
+    /**
+     * Creates a new personabilities feedback generator.
+     *
+     * @param feedbacksettings
+     */
+    public function __construct(feedbacksettings $feedbacksettings) {
+
+        if (!isset($feedbacksettings)) {
+            return;
+        }
+        // Will be 0 if no scale set correctly.
+        if (isset($feedbacksettings->primaryscale)) {
+            $this->primaryscaleid = $feedbacksettings->primaryscale;
+        } else {
+            $this->primaryscaleid = 0;
+        }
+        $this->feedbacksettings = $feedbacksettings;
+
+    }
+
+    /**
      * Get student feedback.
      *
      * @param array $data
@@ -53,15 +88,12 @@ class personabilities extends feedbackgenerator {
      */
     protected function get_studentfeedback(array $data): array {
         global $OUTPUT;
-        // Feedback data is rendered from template.
-
-        $chart = $this->render_chart($data);
 
         $feedback = $OUTPUT->render_from_template(
             'local_catquiz/feedback/personabilities',
             [
                 'abilities' => $data['feedback_personabilities'],
-                'chartdisplay' => $chart,
+                'chartdisplay' => $data['chart'],
                 'standarderrorpersubscales' => $data['standarderrorpersubscales'],
             ]
         );
@@ -131,7 +163,26 @@ class personabilities extends feedbackgenerator {
             return null;
         }
 
-        $parentscaleid = intval($initialcontext['quizsettings']->catquiz_catscales);
+        if (!empty($this->primaryscaleid)
+            && $this->primaryscaleid === 'strongest') {
+                // Find the key with the highest float value
+            $selectedscaleid = array_search(max($personabilities), $personabilities);
+            $selectedscale = 'strongestscaleselected';
+        } else if (!empty($this->primaryscaleid)
+            && $this->primaryscaleid === 'lowest') {
+            $selectedscaleid = array_search(min($personabilities), $personabilities);
+            $selectedscale = 'lowestscaleselected';
+        } else if (!empty($this->primaryscaleid
+            && gettype($this->primaryscaleid) === "integer")) {
+            $selectedscaleid = $this->primaryscaleid;
+            $selectedscale = 'scaleselected';
+        } else if (! $selectedscaleid = $initialcontext['quizsettings']->catquiz_catscales) {
+            $selectedscale = 'parentscaleselected';
+            return null;
+        } else {
+            $selectedscale = 'parentscaleselected';
+        }
+
         $countscales = [];
         foreach ($cachedcontexts as $index => $data) {
             if ($index === 0) {
@@ -162,22 +213,34 @@ class personabilities extends feedbackgenerator {
             } else {
                 $ability = sprintf("%.2f", $ability);
             }
-            $isparentscale = ($catscaleid == $parentscaleid) ? true : false;
+            $isselectedscale = ($catscaleid == intval($selectedscaleid)) ? true : false;
+
+            if (isset($countscales[$catscaleid]['count'])) {
+                $numberofitems = ['itemsplayed' => $countscales[$catscaleid]['count']];
+            } else if ($this->feedbacksettings->displayscaleswithoutitemsplayed) {
+                $numberofitems = ['noplayed' => 0];
+            } else {
+                $numberofitems = "";
+            }
+
+            $tooltiptitle = get_string($selectedscale, 'local_catquiz', $catscales[$catscaleid]->name);
             $data[] = [
                 'ability' => $ability,
                 'name' => $catscales[$catscaleid]->name,
                 'catscaleid' => $catscaleid,
-                'numberofitemsplayed' => isset($countscales[$catscaleid]['count']) ? $countscales[$catscaleid]['count'] : 0,
+                'numberofitemsplayed' => $numberofitems,
                 'questionpreviews' =>
                     isset($countscales[$catscaleid]['questionpreviews']) ? $countscales[$catscaleid]['questionpreviews'] : "",
-                'isparentscale' => $isparentscale,
+                'isselectedscale' => $isselectedscale,
+                'tooltiptitle' => $tooltiptitle,
             ];
         }
-
+        $chart = $this->render_chart($initialcontext, $catscales[$selectedscaleid]);
         $standarderrorpersubscales = $initialcontext['quizsettings']->catquiz_standarderrorpersubscale ?? "";
         return [
             'feedback_personabilities' => $data,
             'standarderrorpersubscales' => $standarderrorpersubscales,
+            'chart' => $chart,
         ];
     }
 
@@ -185,11 +248,12 @@ class personabilities extends feedbackgenerator {
      * Render chart for personabilities.
      *
      * @param array $data
+     * @param stdClass $catscaleid
      *
      * @return array
      *
      */
-    private function render_chart(array $data) {
+    private function render_chart(array $data, $primarycatscale) {
         global $OUTPUT;
 
         if (gettype($data['quizsettings']) != "array") {
@@ -197,13 +261,12 @@ class personabilities extends feedbackgenerator {
         } else {
             $quizsettings = $data['quizsettings'];
         }
-        $parentscaleid = $quizsettings['catquiz_catscales'];
-
-        $parentability = 0;
-        // First we get the personability of the parentscale.
-        foreach ($data['feedback_personabilities'] as $dataitem) {
-            if ($dataitem['catscaleid'] == $parentscaleid) {
-                $parentability = floatval($dataitem['ability']);
+        $primarycatscaleid = $primarycatscale->id;
+        $primaryability = 0;
+        // First we get the personability of the primaryscale.
+        foreach ($data['personabilities'] as $subscaleid => $ability) {
+            if ($subscaleid == $primarycatscaleid) {
+                $primaryability = floatval($ability);
             }
         }
         $chart = new chart_bar();
@@ -211,10 +274,11 @@ class personabilities extends feedbackgenerator {
         $chartseries = [];
         $chartseries['series'] = [];
         $chartseries['labels'] = [];
-        foreach ($data['feedback_personabilities'] as $dataitem) {
-            $subscaleability = floatval($dataitem['ability']);
-            $subscalename = $dataitem['name'];
-            $difference = round($subscaleability - $parentability, 2);
+        foreach ($data['personabilities'] as $subscaleid => $ability) {
+            $subscaleability = $ability;
+            $subscale = catscale::return_catscale_object($subscaleid);
+            $subscalename = $subscale->name;
+            $difference = round($subscaleability - $primaryability, 2);
             $series = new chart_series($subscalename, [0 => $difference]);
 
             $stringforchartlegend = get_string(
@@ -229,7 +293,7 @@ class personabilities extends feedbackgenerator {
             $colorvalue = $this->get_color_for_personabily(
                 $quizsettings,
                 floatval($subscaleability),
-                floatval($dataitem['catscaleid'])
+                floatval($subscaleid)
             );
             $series->set_colors([0 => $colorvalue]);
             $chart->add_series($series);
@@ -239,7 +303,7 @@ class personabilities extends feedbackgenerator {
 
         return [
             'chart' => $out,
-            'charttitle' => get_string('personabilitycharttitle', 'local_catquiz'),
+            'charttitle' => get_string('personabilitycharttitle', 'local_catquiz', $primarycatscale->name),
         ];
 
     }
