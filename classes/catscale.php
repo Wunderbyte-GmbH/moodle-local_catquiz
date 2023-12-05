@@ -167,7 +167,7 @@ class catscale {
     public static function add_or_update_testitem_to_scale(
             int $catscaleid,
             int $testitemid,
-            int $status = TESTITEM_STATUS_UNDEFINED,
+            int $status = LOCAL_CATQUIZ_TESTITEM_STATUS_UNDEFINED,
             string $component = 'question',
             bool $overridecatscale = false) {
 
