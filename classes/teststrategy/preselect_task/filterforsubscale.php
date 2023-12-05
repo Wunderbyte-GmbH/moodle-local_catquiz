@@ -87,7 +87,7 @@ class filterforsubscale extends preselect_task implements wb_middleware {
             case LOCAL_CATQUIZ_STRATEGY_HIGHESTSUB:
                 array_multisort($abilitydifference, SORT_DESC, $abilitykeys);
                 break;
-            case STRATEGY_LOWESTSUB:
+            case LOCAL_CATQUIZ_STRATEGY_LOWESTSUB:
                 array_multisort($abilitydifference, SORT_ASC, $abilitykeys);
                 break;
         };

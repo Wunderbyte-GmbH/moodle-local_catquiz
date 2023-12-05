@@ -229,6 +229,7 @@ class personabilities extends feedbackgenerator {
                 'name' => $catscales[$catscaleid]->name,
                 'catscaleid' => $catscaleid,
                 'numberofitemsplayed' => $numberofitems,
+                'catscaleid' => $catscaleid,
                 'questionpreviews' =>
                     isset($countscales[$catscaleid]['questionpreviews']) ? $countscales[$catscaleid]['questionpreviews'] : "",
                 'isselectedscale' => $isselectedscale,

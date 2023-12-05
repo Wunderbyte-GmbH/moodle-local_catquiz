@@ -26,6 +26,7 @@
                 "ability": 1.23,
                 "name": "Mathematics",
                 "isselectedscale": 1,
+                "catscaleid": 3,
                 "numberofitemsplayed":[
                     "noplayed": "0"
                 ],
@@ -40,6 +41,7 @@
                 "ability": 3.21,
                 "name": "catscale2",
                 "isselectedscale": 0,
+                "catscaleid": 3,
                 "numberofitemsplayed": [
                     "itemsplayed": "3"
                 ],
@@ -68,7 +70,7 @@
     </span>
     {{#numberofitemsplayed}}
         {{#itemsplayed}}
-            <div class="btn btn-light" data-toggle="modal" data-target=".catquizfeedbackabilitiesplayedquestions{{name}}">
+            <div class="btn btn-light" data-toggle="modal" data-target=".catquizfeedbackabilitiesplayedquestions_{{catscaleid}}">
                 {{itemsplayed}} {{#str}}itemsplayed, local_catquiz{{/str}}
             </div>
         {{/itemsplayed}}
@@ -76,8 +78,8 @@
             <span> {{noplayed}} {{#str}}itemsplayed, local_catquiz{{/str}} </span>
         {{/itemsplayed}}
     {{/numberofitemsplayed}}
-    <div class="modal fade bd-example-modal-xl catquizfeedbackabilitiesplayedquestions{{name}}" tabindex="-1" role="dialog" aria-labelledby="catquizfeedbackabilitiesplayedquestions{{name}}" aria-hidden="true">
-    <div class="modal-dialog modal-lg">
+    <div class="modal fade bd-example-modal-xl catquizfeedbackabilitiesplayedquestions_{{catscaleid}}" tabindex="-1" role="dialog" aria-labelledby="catquizfeedbackabilitiesplayedquestions_{{catscaleid}}" aria-hidden="true">
+    <div class="modal-dialog modal-xl">
         <div class="modal-content">
             {{#questionpreviews}}
                 <br> {{{preview}}} <br>
