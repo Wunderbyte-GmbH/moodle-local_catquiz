@@ -123,7 +123,7 @@ class inferlowestskillgap extends strategy {
     public function apply_feedbacksettings(feedbacksettings $feedbacksettings) {
         if ($feedbacksettings->overridesettings) {
             $feedbacksettings->sortorder = LOCAL_CATQUIZ_SORTORDER_ASC;
-            $feedbacksettings->primaryscale = 'lowest';
+            $feedbacksettings->primaryscaleid = LOCAL_CATQUIZ_PRIMARYCATSCALE_LOWEST;
         }
 
         $this->feedbacksettings = $feedbacksettings;

@@ -43,9 +43,9 @@ class comparetotestaverage extends feedbackgenerator {
 
     /**
      *
-     * @var mixed $primaryscaleid // The scale to be displayed in detail in the colorbar.
+     * @var int $primaryscaleid // The scale to be displayed in detail in the colorbar.
      */
-    public mixed $primaryscaleid;
+    public int $primaryscaleid;
 
     /**
      * Creates a new customscale feedback generator.
@@ -55,10 +55,10 @@ class comparetotestaverage extends feedbackgenerator {
     public function __construct(feedbacksettings $feedbacksettings) {
 
         // Will be 0 if no scale set correctly.
-        if (isset($feedbacksettings->primaryscale)) {
-            $this->primaryscaleid = $feedbacksettings->primaryscale;
+        if (isset($feedbacksettings->primaryscaleid)) {
+            $this->primaryscaleid = $feedbacksettings->primaryscaleid;
         } else {
-            $this->primaryscaleid = 0;
+            $this->primaryscaleid = LOCAL_CATQUIZ_PRIMARYCATSCALE_PARENT;
         }
     }
 
@@ -241,16 +241,15 @@ class comparetotestaverage extends feedbackgenerator {
         );
 
         if (!empty($this->primaryscaleid)
-            && $this->primaryscaleid === 'strongest') {
+            && $this->primaryscaleid === LOCAL_CATQUIZ_PRIMARYCATSCALE_STRONGEST) {
                 // Find the key with the highest float value.
             $catscaleid = array_search(max($personabilities), $personabilities);
             $selectedscale = 'strongestscaleselected';
         } else if (!empty($this->primaryscaleid)
-            && $this->primaryscaleid === 'lowest') {
+            && $this->primaryscaleid === LOCAL_CATQUIZ_PRIMARYCATSCALE_LOWEST) {
             $catscaleid = array_search(min($personabilities), $personabilities);
             $selectedscale = 'lowestscaleselected';
-        } else if (!empty($this->primaryscaleid
-            && gettype($this->primaryscaleid) === "integer")) {
+        } else if (!empty($this->primaryscaleid)) {
             $catscaleid = $this->primaryscaleid;
             $selectedscale = 'scaleselected';
         } else if (! $catscaleid = $quizsettings->catquiz_catscales) {

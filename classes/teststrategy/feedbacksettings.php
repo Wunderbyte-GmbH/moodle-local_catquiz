@@ -31,9 +31,9 @@ require_once($CFG->dirroot.'/user/lib.php');
  */
 class feedbacksettings {
     /** The scale for which detailed feedback will be displayed. Can be a single scaleid or an array of scales.
-     * @var string
+     * @var int
      */
-    public $primaryscale;
+    public $primaryscaleid;
 
     /** Selects the scale to which the feedback values of the other scales refer to.
      * @var string
@@ -59,27 +59,19 @@ class feedbacksettings {
     /**
      * Constructor for feedbackclass.
      *
-     * @param string $primaryscalename
-     * @param string $scaleresult
+     * @param int $primaryscaleid
+     * @param int $scaleresult
      */
-    public function __construct($primaryscalename = 'parent', $scaleresult = '') {
-
-        if ($primaryscalename != 'parent') {
-            $catscale = catscale::return_catscale_by_name($primaryscalename);
-            $this->primaryscale = isset($catscale) ? $catscale->id : 0;
-        } else {
-            $this->primaryscale = 0;
-        }
+    public function __construct($primaryscaleid = LOCAL_CATQUIZ_PRIMARYCATSCALE_PARENT, $scaleresult = 0) {
+        $this->primaryscaleid = $primaryscaleid;
 
         if (!isset($scaleresult)) {
-            $this->scaleresult = $this->primaryscale;
+            $this->scaleresult = $this->primaryscaleid;
         } else {
-            $catscale = catscale::return_catscale_by_name($scaleresult);
-            $this->scaleresult = isset($catscale) ? $catscale->id : $this->primaryscale;
+            $this->scaleresult = $scaleresult;
         }
 
+        // Default sortorder is descendent.
         $this->sortorder = LOCAL_CATQUIZ_SORTORDER_DESC;
     }
-
-
 }

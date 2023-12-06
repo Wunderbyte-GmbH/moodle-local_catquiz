@@ -69,10 +69,10 @@ class personabilities extends feedbackgenerator {
             return;
         }
         // Will be 0 if no scale set correctly.
-        if (isset($feedbacksettings->primaryscale)) {
-            $this->primaryscaleid = $feedbacksettings->primaryscale;
+        if (isset($feedbacksettings->primaryscaleid)) {
+            $this->primaryscaleid = $feedbacksettings->primaryscaleid;
         } else {
-            $this->primaryscaleid = 0;
+            $this->primaryscaleid = LOCAL_CATQUIZ_PRIMARYCATSCALE_PARENT;
         }
         $this->feedbacksettings = $feedbacksettings;
 
@@ -164,16 +164,14 @@ class personabilities extends feedbackgenerator {
         }
 
         if (!empty($this->primaryscaleid)
-            && $this->primaryscaleid === 'strongest') {
-                // Find the key with the highest float value.
+            && $this->primaryscaleid == LOCAL_CATQUIZ_PRIMARYCATSCALE_STRONGEST) {
             $selectedscaleid = array_search(max($personabilities), $personabilities);
             $selectedscale = 'strongestscaleselected';
         } else if (!empty($this->primaryscaleid)
-            && $this->primaryscaleid === 'lowest') {
+            && $this->primaryscaleid == LOCAL_CATQUIZ_PRIMARYCATSCALE_LOWEST) {
             $selectedscaleid = array_search(min($personabilities), $personabilities);
             $selectedscale = 'lowestscaleselected';
-        } else if (!empty($this->primaryscaleid
-            && gettype($this->primaryscaleid) === "integer")) {
+        } else if (!empty($this->primaryscaleid)) {
             $selectedscaleid = $this->primaryscaleid;
             $selectedscale = 'scaleselected';
         } else if (! $selectedscaleid = $initialcontext['quizsettings']->catquiz_catscales) {
