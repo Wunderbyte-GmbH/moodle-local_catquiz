@@ -26,6 +26,29 @@
         "gradedpartial": "gradedpartial"
     }
 }}
-<p>{{#str}}numberofanswerscorrect, local_catquiz{{/str}}: {{gradedright}}</p>
-<p>{{#str}}numberofanswersincorrect, local_catquiz{{/str}}: {{gradedwrong}}</p>
-<p>{{#str}}numberofanswerspartlycorrect, local_catquiz{{/str}}: {{gradedpartial}}</p>
+<div class="container">
+  <div class="row">
+    <div class="col-6 text-right">
+        {{#str}}numberofanswerscorrect, local_catquiz{{/str}}:
+    </div>
+    <div class="col-6 text-left">
+        {{gradedright}}
+    </div>
+  </div>
+    <div class="row">
+    <div class="col-6 text-right">
+        {{#str}}numberofanswersincorrect, local_catquiz{{/str}}:
+    </div>
+    <div class="col-6 text-left">
+        {{gradedwrong}}
+    </div>
+  </div>
+    <div class="row">
+    <div class="col-6 text-right">
+        {{#str}}numberofanswerspartlycorrect, local_catquiz{{/str}}:
+    </div>
+    <div class="col-6 text-left">
+        {{gradedpartial}}
+    </div>
+  </div>
+</div>

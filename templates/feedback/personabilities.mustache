@@ -72,32 +72,55 @@
 }
 }}
 <h5>{{#str}}personabilitytitle, local_catquiz{{/str}}</h5>
-{{#abilities}}
-    <span {{#isselectedscale}} class="font-weight-bold" data-toggle="tooltip" data-placement="top" title="{{tooltiptitle}}" {{/isselectedscale}}
-        {{^isselectedscale}} class="font-weight-normal" {{/isselectedscale}}>
-        {{name}}: {{ability}}
-    </span>
+<div class="container">
+    {{#abilities}}
+    <div class="row">
     {{#numberofitemsplayed}}
+        <div {{#isselectedscale}}
+                class="font-weight-bold col-6 text-right"
+                data-toggle="tooltip"
+                data-placement="top"
+                title="{{tooltiptitle}}"
+            {{/isselectedscale}}
+            {{^isselectedscale}}
+                class="font-weight-normal col-6 text-right"
+            {{/isselectedscale}}>
+            {{name}} :
+        </div>
+        <div {{#isselectedscale}}
+                class="font-weight-bold col-2 text-left"
+                data-toggle="tooltip"
+                data-placement="top"
+                title="{{tooltiptitle}}"
+            {{/isselectedscale}}
+            {{^isselectedscale}}
+                class="font-weight-normal col-2 text-left"
+            {{/isselectedscale}}>
+            {{ability}}
+        </div>
         {{#itemsplayed}}
-            <div class="btn btn-light" data-toggle="modal" data-target=".catquizfeedbackabilitiesplayedquestions_{{catscaleid}}">
+            <div class="btn btn-light btn-sm col" data-toggle="modal" data-target=".catquizfeedbackabilitiesplayedquestions_{{catscaleid}}">
                 {{itemsplayed}} {{#str}}itemsplayed, local_catquiz{{/str}}
             </div>
         {{/itemsplayed}}
         {{^itemsplayed}}
-            <span> {{noplayed}} {{#str}}itemsplayed, local_catquiz{{/str}} </span>
+            <div class="btn btn-light btn-sm col">
+                {{noplayed}} {{#str}}itemsplayed, local_catquiz{{/str}}
+            </div>
         {{/itemsplayed}}
-    {{/numberofitemsplayed}}
-    <div class="modal fade bd-example-modal-xl catquizfeedbackabilitiesplayedquestions_{{catscaleid}}" tabindex="-1" role="dialog" aria-labelledby="catquizfeedbackabilitiesplayedquestions_{{catscaleid}}" aria-hidden="true">
-    <div class="modal-dialog modal-xl">
-        <div class="modal-content">
-            {{#questionpreviews}}
-                <br> {{{preview}}} <br>
-            {{/questionpreviews}}
+        {{/numberofitemsplayed}}
+        <div class="modal fade bd-example-modal-xl catquizfeedbackabilitiesplayedquestions_{{catscaleid}}" tabindex="-1" role="dialog" aria-labelledby="catquizfeedbackabilitiesplayedquestions_{{catscaleid}}" aria-hidden="true">
+        <div class="modal-dialog modal-xl">
+            <div class="modal-content">
+                {{#questionpreviews}}
+                    <br> {{{preview}}} <br>
+                {{/questionpreviews}}
+            </div>
+        </div>
         </div>
     </div>
-    </div>
-    <br>
-{{/abilities}}
+    {{/abilities}}
+</div>
 <h5>{{#str}}standarderrorpersubscale, local_catquiz{{/str}}: {{standarderrorpersubscales}}</h5>
 {{#chartdisplay}}
     <h5>
