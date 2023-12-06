@@ -21,46 +21,55 @@
     Context variables required for this template:
     Example context (json):
     {
-        "abilities": [
-            {
-                "ability": 1.23,
-                "name": "Mathematics",
-                "isselectedscale": 1,
-                "catscaleid": 3,
-                "numberofitemsplayed":[
+{
+    "abilities": [
+        {
+            "ability": 1.23,
+            "name": "Mathematics",
+            "isselectedscale": 1,
+            "catscaleid": 3,
+            "numberofitemsplayed": [
+                {
                     "noplayed": "0"
-                ],
-                "questionpreviews": [
-                    {
-                        "preview": "<div>...</div>",
-                        "preview": "<div>...</div>"
-                    }
-                ]
-            },
-            {
-                "ability": 3.21,
-                "name": "catscale2",
-                "isselectedscale": 0,
-                "catscaleid": 3,
-                "numberofitemsplayed": [
+                }
+            ],
+            "questionpreviews": [
+                {
+                    "preview": "<div>...</div>"
+                },
+                {
+                    "preview": "<div>...</div>"
+                }
+            ]
+        },
+        {
+            "ability": 3.21,
+            "name": "catscale2",
+            "isselectedscale": 0,
+            "catscaleid": 3,
+            "numberofitemsplayed": [
+                {
                     "itemsplayed": "3"
-                ],
-                "questionpreviews": [
-                    {
-                        "preview": "<div>...</div>",
-                        "preview": "<div>...</div>"
-                    }
-                ]
-            }
-        ],
-        "chartdisplay": [
-            {
-                "charttitle": "Person ability relative to parentscale",
-                "chart": "<div>...</div>"
-            }
-        ],
-        "standarderrorpersubscales" : "50"
-    }
+                }
+            ],
+            "questionpreviews": [
+                {
+                    "preview": "<div>...</div>"
+                },
+                {
+                    "preview": "<div>...</div>"
+                }
+            ]
+        }
+    ],
+    "chartdisplay": [
+        {
+            "charttitle": "Person ability relative to parentscale",
+            "chart": "<div>...</div>"
+        }
+    ],
+    "standarderrorpersubscales": "50"
+}
 }}
 <h5>{{#str}}personabilitytitle, local_catquiz{{/str}}</h5>
 {{#abilities}}
