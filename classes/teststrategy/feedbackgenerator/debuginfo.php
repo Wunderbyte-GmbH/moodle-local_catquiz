@@ -103,7 +103,7 @@ class debuginfo extends feedbackgenerator {
             } else {
                 $rowarr[] =
                 "id: " . $lastquestion['id']
-                .", score: " . $lastquestion['score']
+                .", score: " . $lastquestion['score'] ?? 'NA'
                 .", fisherinformation: " . $lastquestion['fisherinformation'] ?? 'NA'
                 .", lasttimeplayedpenalty: " . $lastquestion['lasttimeplayedpenalty'] ?? 'NA'
                 .", difficulty: " . $lastquestion['difficulty']
