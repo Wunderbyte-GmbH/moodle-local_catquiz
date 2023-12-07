@@ -484,7 +484,7 @@ class catscalequestions_table extends wunderbyte_table {
             $result[] = catscale::add_or_update_testitem_to_scale(
                 $catscaleid,
                 $id,
-                TESTITEM_STATUS_UNDEFINED,
+                LOCAL_CATQUIZ_TESTITEM_STATUS_UNDEFINED,
                 'question',
                 $overridecatscale
             );
