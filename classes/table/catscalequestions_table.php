@@ -324,7 +324,7 @@ class catscalequestions_table extends wunderbyte_table {
      * @param string $data
      * @return array
      */
-    public function removetestitem(int $testitemid, string $data) {
+    public function action_removetestitem(int $testitemid, string $data) {
 
         $jsonobject = json_decode($data);
 
@@ -360,7 +360,7 @@ class catscalequestions_table extends wunderbyte_table {
      * @param string $data
      * @return array
      */
-    public function togglestatus(int $id, string $data) {
+    public function action_togglestatus(int $id, string $data) {
 
         $jsonobject = json_decode($data);
 
@@ -458,7 +458,7 @@ class catscalequestions_table extends wunderbyte_table {
      * @param bool $overridecatscale // When true, an item already assigned to a catscale of the same tree will be updated.
      * @return array
      */
-    public static function addtestitem(int $testitemid, string $data, bool $overridecatscale = false) {
+    public static function action_addtestitem(int $testitemid, string $data, bool $overridecatscale = false) {
 
         $jsonobject = json_decode($data);
 

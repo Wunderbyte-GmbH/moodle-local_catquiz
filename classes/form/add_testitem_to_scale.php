@@ -100,9 +100,9 @@ class add_testitem_to_scale extends dynamic_form {
 
         $testitems = explode(",", $data->checkedids);
         if (count($testitems) > 1) {
-            $result = catscalequestions_table::addtestitem(-1, json_encode($data), true);
+            $result = catscalequestions_table::action_addtestitem(-1, json_encode($data), true);
         } else {
-            $result = catscalequestions_table::addtestitem($testitems[0], json_encode($data), true);
+            $result = catscalequestions_table::action_addtestitem($testitems[0], json_encode($data), true);
         }
         return (object)$result;
     }

@@ -256,7 +256,7 @@ class testitems_table extends wunderbyte_table {
      * @param string $data
      * @return array
      */
-    public function addtestitem(int $testitemid, string $data) {
+    public function action_addtestitem(int $testitemid, string $data) {
 
         $jsonobject = json_decode($data);
 
@@ -312,7 +312,7 @@ class testitems_table extends wunderbyte_table {
      * @param string $data
      * @return array
      */
-    public function removetestitem(int $testitemid, string $data) {
+    public function action_removetestitem(int $testitemid, string $data) {
 
         $jsonobject = json_decode($data);
 
@@ -344,7 +344,7 @@ class testitems_table extends wunderbyte_table {
      * @param string $data
      * @return array
      */
-    public function update_item_status(int $id, string $data): array {
+    public function action_update_item_status(int $id, string $data): array {
         $dataobject = json_decode($data);
 
         // If the checkbox is unchecked, set the status to "not set".
