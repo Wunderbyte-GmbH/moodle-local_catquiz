@@ -316,6 +316,7 @@ class feedbackclass {
                 ]
             );
 
+            // Make the differnt feedback options nested.
             $numberofclosinghtmls = 0;
             if (!isset($previousdepth) || !isset($previousparentscaleid)) {
                 $numberofclosinghtmls = 0;
@@ -326,7 +327,7 @@ class feedbackclass {
             } else if ($scale->parentid != $previousparentscaleid
             && $scale->depth < $previousdepth) {
                 $depthdifference = $previousdepth - $scale->depth;
-                $numberofclosinghtmls = 2 + $depthdifference;
+                $numberofclosinghtmls = $depthdifference * 2;
             }
             $previousparentscaleid = $scale->parentid;
             $previousdepth = $scale->depth;
