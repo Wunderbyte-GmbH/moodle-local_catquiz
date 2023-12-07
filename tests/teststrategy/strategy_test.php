@@ -34,6 +34,7 @@ use mod_adaptivequiz\local\question\question_answer_evaluation;
 use question_bank;
 use question_engine;
 use question_usage_by_activity;
+use UnexpectedValueException;
 
 defined('MOODLE_INTERNAL') || die();
 global $CFG;
@@ -307,6 +308,75 @@ class strategy_test extends advanced_testcase {
     }
 
     /**
+     * Test if the correct person ability is calculated, given a set of responses.
+     * This does not test a specific strategy but just that the overall value is correct.
+     * @dataProvider given_responses_lead_to_expected_abilities_provider
+     *
+     * @param int $strategy The test strategy to use
+     * @param array $responsepattern The given responses
+     * @param float $abilityafter The expected ability
+     * @return void
+     */
+    public function test_given_responses_lead_to_expected_abilities(
+        int $strategy,
+        array $responsepattern,
+        float $abilityafter
+    ) {
+        global $DB, $USER;
+        $this
+            ->createtestenvironment($strategy)
+            ->save_or_update();
+
+        catquiz_handler::prepare_attempt_caches();
+
+        // This is needed so that the responses to the questions are indeed saved to the database.
+        $this->preventResetByRollback();
+        $attemptdata = (object)[
+            'instance' => 1,
+            'questionsattempted' => 0,
+            'id' => 1,
+        ];
+        foreach ($responsepattern as $label => $iscorrect) {
+            [$nextquestionid, $message] = catquiz_handler::fetch_question_id('1', 'mod_adaptivequiz', $attemptdata);
+            $question = question_bank::load_question($nextquestionid);
+            $this->assertEquals($label, $question->idnumber);
+            $this->createresponse($question, $iscorrect);
+            $attemptdata->questionsattempted++;
+        }
+        $abilityrecord = $DB->get_record(
+            'local_catquiz_personparams',
+            ['userid' => $USER->id, 'catscaleid' => $this->catscaleid],
+            'ability'
+        );
+
+        $ability = $abilityrecord ? $abilityrecord->ability : 0;
+        $this->assertEquals(
+            $abilityafter,
+            $ability,
+            'Ability after fetch is not correct'
+        );
+    }
+
+    /**
+     * Data provider to test that the expected questions are returned.
+     *
+     * @return array
+     */
+    public static function given_responses_lead_to_expected_abilities_provider(): array {
+        global $CFG;
+        $responsepattern = self::loadresponsesdata(
+            $CFG->dirroot . '/local/catquiz/tests/fixtures/responses.2PL.csv'
+        );
+        return [
+            'Classical test' => [
+                'strategy' => LOCAL_CATQUIZ_STRATEGY_CLASSIC,
+                'response_pattern' => $responsepattern,
+                'ability_after' => 0.123,
+            ],
+        ];
+    }
+
+    /**
      * Create a response for the given question and save it in the database.
      *
      * @param mixed $question The question
@@ -361,6 +431,7 @@ class strategy_test extends advanced_testcase {
         $jsondata->componentid = '1';
         $jsondata->component = 'mod_adaptivequiz';
         $jsondata->catquiz_selectteststrategy = $strategyid;
+        $jsondata->catquiz_maxquestions = 0;
         $jsondata->json = json_encode($jsondata);
         $testenvironment = new testenvironment($jsondata);
         return $testenvironment;
@@ -447,5 +518,39 @@ class strategy_test extends advanced_testcase {
         $qformat->set_display_progress(false);
 
         return $qformat;
+    }
+
+    /**
+     * Loads the responses from the first person of a CSV file.
+     *
+     * @param string $filename The file to load the responses from.
+     * @return array
+     */
+    private static function loadresponsesdata($filename) {
+        if (($handle = fopen($filename, "r")) === false) {
+            throw new UnexpectedValueException("Can not open file: " . $filename);
+        }
+
+        $row = 0;
+        $questionids = [];
+        while (($data = fgetcsv($handle, 0, ";")) !== false) {
+            $row++;
+            if ($row == 1) {
+                // The first row contains the question labels.
+                // Prefix the label with SIM. E.g., A01-01 will become SIMA01-01.
+                $questionids = preg_filter(
+                    '/^/',
+                    'SIM',
+                    array_slice($data, 1)
+                );
+                continue;
+            }
+            // The responses for person 1.
+            $responses = array_slice($data, 1);
+            break;
+        }
+
+        fclose($handle);
+        return array_combine($questionids, $responses);
     }
 }
