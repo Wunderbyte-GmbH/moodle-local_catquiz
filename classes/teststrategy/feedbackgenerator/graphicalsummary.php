@@ -95,6 +95,16 @@ class graphicalsummary extends feedbackgenerator {
     }
 
     /**
+     * Get generatorname.
+     *
+     * @return string
+     *
+     */
+    public function get_generatorname(): string {
+        return 'graphicalsummary';
+    }
+
+    /**
      * Get required context keys.
      *
      * @return array

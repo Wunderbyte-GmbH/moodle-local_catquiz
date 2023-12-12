@@ -90,6 +90,16 @@ class pilotquestions extends feedbackgenerator {
     }
 
     /**
+     * Get generatorname.
+     *
+     * @return string
+     *
+     */
+    public function get_generatorname(): string {
+        return 'pilotquestions';
+    }
+
+    /**
      * Loads data.
      *
      * @param int $attemptid

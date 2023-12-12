@@ -50,17 +50,51 @@ class feedbacksettings {
      */
     public $sortorder;
 
+    /**
+     * @var ?array
+     */
+    public $areastohide;
+
 
     /**
      * Constructor for feedbackclass.
      *
      * @param int $primaryscaleid
      */
-    public function __construct($primaryscaleid = LOCAL_CATQUIZ_PRIMARYCATSCALE_DEFAULT) {
+    public function __construct($primaryscaleid = LOCAL_CATQUIZ_PRIMARYCATSCALE_DEFAULT, ?array $areastohide = []) {
         $this->primaryscaleid = $primaryscaleid;
 
         // Default sortorder is descendent.
         $this->sortorder = LOCAL_CATQUIZ_SORTORDER_DESC;
+
+        if (count($areastohide) > 0) {
+            $this->areastohide = $areastohide;
+        }
+
+    }
+
+    /**
+     * Define and set areanamed to feedback data keys.
+     *
+     * @param string $generatorname
+     * @return array
+     */
+    private function get_feedbackdatakeys_to_exclude(string $generatorname): array {
+
+        $areanamesforfeedbackdatakeys = [];
+        switch ($generatorname) {
+            case 'comparetotestaverage':
+                $areanamesforfeedbackdatakeys = [
+                    'colorbar' => [
+                        'colorgradestring',
+                        'feedbackbarlegend',
+                    ]
+                ];
+        }
+
+        // Names of areas as in $areastohide can be defined here to apply to keys in feedbackdataobject.
+        // Name of feedbackgeneratorclass will apply to all data of generator.
+        return $areanamesforfeedbackdatakeys;
     }
 
     /**
@@ -100,5 +134,42 @@ class feedbacksettings {
             'selectedscaleid' => $selectedscaleid,
             'selectedscalestringkey' => $selectedscale,
         ];
+    }
+
+    /**
+     * Remove unwanted areas (keys) from array.
+     *
+     * @param array $feedbackdata
+     * @param array $areastohide
+     * @param string $generatorname
+     */
+    public function hide_defined_elements(array $feedbackdata, string $generatorname) {
+        if (empty($this->areastohide)) {
+            return $feedbackdata;
+        }
+        // Some exclusion keys are not equivalent to the keys in $feedbackdata.
+        // Therefore we get the definition from each generator.
+        $areanamesforfeedbackdatakeys = $this->get_feedbackdatakeys_to_exclude($generatorname);
+        $excludedkeys = [];
+
+        if (!empty($feedbackdata) && !empty($areanamesforfeedbackdatakeys)) {
+            // Match fieldnames with keys as defined in areanamesforfeedbackdatakeys.
+            foreach ($areanamesforfeedbackdatakeys as $areaname => $keys) {
+                if (in_array($areaname, $this->areastohide[$generatorname])) {
+                    $excludedkeys = array_merge($excludedkeys, $keys);
+                }
+            }
+            // Add the areas named identically as in feedbackdata.
+            foreach ($this->areastohide[$generatorname] as $keytoexclude) {
+                if (in_array($keytoexclude, array_keys($feedbackdata))) {
+                    $excludedkeys[] = $keytoexclude;
+                }
+            }
+
+            // Remove the keys found in $excludedkeys from $feedbackdata.
+            $excludedkeys = array_intersect($excludedkeys, array_keys($feedbackdata));
+            $feedbackdata = array_diff_key($feedbackdata, array_flip($excludedkeys));
+        }
+        return $feedbackdata;
     }
 }

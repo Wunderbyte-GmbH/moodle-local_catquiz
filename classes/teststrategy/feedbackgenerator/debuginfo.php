@@ -182,6 +182,16 @@ class debuginfo extends feedbackgenerator {
     }
 
     /**
+     * Get generatorname.
+     *
+     * @return string
+     *
+     */
+    public function get_generatorname(): string {
+        return 'debuginfo';
+    }
+
+    /**
      * Get required context keys.
      *
      * @return array

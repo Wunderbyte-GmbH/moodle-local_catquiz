@@ -102,6 +102,8 @@ class attemptfeedback implements renderable, templatable {
 
         if (!isset($feedbacksettings)) {
             $this->feedbacksettings = new feedbacksettings();
+        } else {
+            $this->feedbacksettings = $feedbacksettings;
         }
         $this->catscaleid = intval($this->quizsettings->catquiz_catscales);
 

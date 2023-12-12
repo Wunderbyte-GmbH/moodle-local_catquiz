@@ -77,6 +77,16 @@ class questionssummary extends feedbackgenerator {
     }
 
     /**
+     * Get generatorname.
+     *
+     * @return string
+     *
+     */
+    public function get_generatorname(): string {
+        return 'questionssummary';
+    }
+
+    /**
      * Loads data.
      *
      * @param int $attemptid

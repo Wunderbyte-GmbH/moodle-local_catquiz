@@ -68,6 +68,13 @@ abstract class feedbackgenerator {
     abstract public function get_heading(): string;
 
     /**
+     * The translated heading of this feedback.
+     *
+     * @return string
+     */
+    abstract public function get_generatorname(): string;
+
+    /**
      * Loads the data required to render the feedback.
      *
      * @param int $attemptid

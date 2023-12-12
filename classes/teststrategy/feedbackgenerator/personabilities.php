@@ -148,6 +148,16 @@ class personabilities extends feedbackgenerator {
     }
 
     /**
+     * Get generatorname.
+     *
+     * @return string
+     *
+     */
+    public function get_generatorname(): string {
+        return 'personabilities';
+    }
+
+    /**
      * Loads data personability, number of items played per subscale and standarderrorpersubscale.
      *
      * @param int $attemptid
@@ -269,7 +279,7 @@ class personabilities extends feedbackgenerator {
             ];
         }
         $chart = $this->render_chart($personabilities, (array)$initialcontext['quizsettings'], $catscales[$selectedscaleid]);
-        $standarderrorpersubscales = $initialcontext['quizsettings']->catquiz_standarderrorpersubscale ?? "";
+        $standarderrorpersubscales = $quizsettings->catquiz_standarderrorpersubscale ?? "";
         return [
             'feedback_personabilities' => $data,
             'standarderrorpersubscales' => $standarderrorpersubscales,

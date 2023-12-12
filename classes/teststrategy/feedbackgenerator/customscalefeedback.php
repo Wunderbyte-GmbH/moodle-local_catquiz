@@ -121,6 +121,16 @@ class customscalefeedback extends feedbackgenerator {
     }
 
     /**
+     * Get generatorname.
+     *
+     * @return string
+     *
+     */
+    public function get_generatorname(): string {
+        return 'customscalefeedback';
+    }
+
+    /**
      * Load data.
      *
      * @param int $attemptid

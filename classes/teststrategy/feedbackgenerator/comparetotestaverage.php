@@ -106,7 +106,14 @@ class comparetotestaverage extends feedbackgenerator {
      */
     public function update_feedbackdata(array $feedbackdata) {
         // In this case, the update is implemented in the generate feeback class.
-        return $feedbackdata = $this->generate_feedback($feedbackdata, (object)$feedbackdata['quizsettings']);
+        $feedbackdata = $this->generate_feedback($feedbackdata, (object)$feedbackdata['quizsettings']);
+
+        // Get excluded names from settings.
+        // Check if whole generator or only certain keys are excluded.
+        // Compare with names for fields and write new array with feedbackkeys only.
+        // Exclude feedbackkeys from feedbackdata.
+        $feedbackdata = $this->feedbacksettings->hide_defined_elements($feedbackdata, $this->get_generatorname());
+        return $feedbackdata;
     }
 
     /**
@@ -139,6 +146,16 @@ class comparetotestaverage extends feedbackgenerator {
      */
     public function get_heading(): string {
         return get_string('personability', 'local_catquiz');
+    }
+
+    /**
+     * Get generatorname.
+     *
+     * @return string
+     *
+     */
+    public function get_generatorname(): string {
+        return 'comparetotestaverage';
     }
 
     /**
@@ -318,7 +335,7 @@ class comparetotestaverage extends feedbackgenerator {
             'userability' => sprintf('%.2f', $ability),
             'testaverageposition' => ($testaverage + 5) * 10,
             'userabilityposition' => ($ability + 5) * 10,
-            'text' => $text,
+            'comparisontext' => $text,
             'colorgradestring' => $this->get_colorgradientstring($quizsettings, $catscaleid),
             'feedbackbarlegend' => $this->get_colorbarlegend($quizsettings, $catscaleid),
             'currentability' => get_string('currentability', 'local_catquiz', $catscale->name),

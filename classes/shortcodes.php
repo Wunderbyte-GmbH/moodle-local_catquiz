@@ -92,7 +92,51 @@ class shortcodes {
             $primaryscale = !empty(catscale::return_catscale_by_name($primaryscale))
                 ? intval(catscale::return_catscale_by_name($primaryscale)->id) : LOCAL_CATQUIZ_PRIMARYCATSCALE_DEFAULT;
         }
-        $feedbacksettings = new feedbacksettings(intval($primaryscale));
+
+        $areanames = [
+            'personabilitites' => [
+                'personabilitieslist',
+                'standarderrorpersubscales',
+                'chart',
+            ],
+            'comparetotestaverage' => [
+                'comparisontext', // You performed better than ...
+                'feedbackbar', // The colorbar.
+                'feedbackbarlegend', // Legend of the colorbar.
+                'colorbar', // Legend of the colorbar.
+            ],
+            'customscalefeedback' => [
+            ],
+            'debuginfo' => [
+            ],
+            'graphicalsummary' => [
+            ],
+            'pilotquestions' => [
+            ],
+            'questionssummary' => [
+            ],
+        ];
+
+        $hiddenareas = $args['hidden'] ?? [];
+
+        if ($hiddenareas != []) {
+            $hiddenareasarray = explode(',', $hiddenareas);
+            $areastohide = [];
+
+            if (!empty($areanames)) {
+                foreach ($areanames as $key => $values) {
+                    // Check if any element in the $values array matches any name in $hiddenareasarray
+                    $matchingvalues = array_intersect($values, $hiddenareasarray);
+                    if (!empty($matchingvalues) || in_array($key, $hiddenareasarray)) {
+                        $areastohide[$key] = array_values($matchingvalues);
+                    }
+                }
+            }
+        } else {
+            $areastohide = [];
+        }
+
+        $feedbacksettings = new feedbacksettings(intval($primaryscale), $areastohide);
 
         foreach ($records as $record) {
             $attemptfeedback = new attemptfeedback($record->attemptid, $record->contextid, $feedbacksettings);
