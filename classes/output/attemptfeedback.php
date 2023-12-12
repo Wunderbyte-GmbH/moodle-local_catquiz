@@ -70,7 +70,7 @@ class attemptfeedback implements renderable, templatable {
      *
      * @param int $attemptid
      * @param int $contextid
-     * @param feedbacksettings $feedbacksettings
+     * @param ?feedbacksettings $feedbacksettings
      *
      */
     public function __construct(

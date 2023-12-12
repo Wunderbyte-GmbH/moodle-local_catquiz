@@ -55,7 +55,6 @@ class feedbacksettings {
      * Constructor for feedbackclass.
      *
      * @param int $primaryscaleid
-     * @param int $scaleresult
      */
     public function __construct($primaryscaleid = LOCAL_CATQUIZ_PRIMARYCATSCALE_DEFAULT) {
         $this->primaryscaleid = $primaryscaleid;
