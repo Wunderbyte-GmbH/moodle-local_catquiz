@@ -119,7 +119,7 @@ class infergreateststrength extends strategy {
      *
      */
     public function apply_feedbacksettings(feedbacksettings $feedbacksettings) {
-        if ($feedbacksettings->overridesettings) {
+        if ($feedbacksettings->primaryscaleid == LOCAL_CATQUIZ_PRIMARYCATSCALE_DEFAULT) {
             $feedbacksettings->primaryscaleid = LOCAL_CATQUIZ_PRIMARYCATSCALE_STRONGEST;
         }
         $this->feedbacksettings = $feedbacksettings;

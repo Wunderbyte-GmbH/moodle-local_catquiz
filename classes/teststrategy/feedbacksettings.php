@@ -35,11 +35,6 @@ class feedbacksettings {
      */
     public $primaryscaleid;
 
-    /** Selects the scale to which the feedback values of the other scales refer to.
-     * @var string
-     */
-    public $scaleresult;
-
     /**
      * @var boolean
      */
@@ -62,16 +57,49 @@ class feedbacksettings {
      * @param int $primaryscaleid
      * @param int $scaleresult
      */
-    public function __construct($primaryscaleid = LOCAL_CATQUIZ_PRIMARYCATSCALE_PARENT, $scaleresult = 0) {
+    public function __construct($primaryscaleid = LOCAL_CATQUIZ_PRIMARYCATSCALE_DEFAULT) {
         $this->primaryscaleid = $primaryscaleid;
-
-        if (!isset($scaleresult)) {
-            $this->scaleresult = $this->primaryscaleid;
-        } else {
-            $this->scaleresult = $scaleresult;
-        }
 
         // Default sortorder is descendent.
         $this->sortorder = LOCAL_CATQUIZ_SORTORDER_DESC;
+    }
+
+    /**
+     * Return the right catscaleid and information about type.
+     *
+     * @param array $personabilities
+     * @param object $quizsettings
+     * @param int $catscaleid
+     */
+    public function get_scaleid_and_stringkey(array $personabilities, object $quizsettings, int $catscaleid) {
+
+        switch ($catscaleid) {
+            // Default is parent.
+            case LOCAL_CATQUIZ_PRIMARYCATSCALE_DEFAULT:
+                $selectedscaleid = $quizsettings->catquiz_catscales;
+                $selectedscale = 'parentscaleselected';
+                break;
+            case LOCAL_CATQUIZ_PRIMARYCATSCALE_PARENT:
+                $selectedscaleid = $quizsettings->catquiz_catscales;
+                $selectedscale = 'parentscaleselected';
+                break;
+            case LOCAL_CATQUIZ_PRIMARYCATSCALE_LOWEST:
+                $selectedscaleid = array_search(min($personabilities), $personabilities);
+                $selectedscale = 'lowestscaleselected';
+                break;
+            case LOCAL_CATQUIZ_PRIMARYCATSCALE_STRONGEST:
+                $selectedscaleid = array_search(max($personabilities), $personabilities);
+                $selectedscale = 'strongestscaleselected';
+                break;
+            default:
+                $selectedscaleid = $catscaleid;
+                $selectedscale = 'scaleselected';
+                break;
+        }
+
+        return [
+            'selectedscaleid' => $selectedscaleid,
+            'selectedscalestringkey' => $selectedscale,
+        ];
     }
 }

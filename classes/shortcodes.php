@@ -72,13 +72,31 @@ class shortcodes {
             'attempt' => [],
         ];
 
-        $primaryscale = $args['primaryscale'] ?? 'parent';
-        $scaleresult = $args['scaleresult'] ?? '';
-        $feedbacksettings = new feedbacksettings($primaryscale, $scaleresult);
+        // Get scaleid, it is possible to apply name of catscale, catscaleid or predefined strings (see switch).
+        $primaryscale = $args['primaryscale'] ?? LOCAL_CATQUIZ_PRIMARYCATSCALE_DEFAULT;
+        switch ($primaryscale) {
+            case 'lowest':
+                $primaryscale = LOCAL_CATQUIZ_PRIMARYCATSCALE_LOWEST;
+                break;
+            case 'strongest':
+                $primaryscale = LOCAL_CATQUIZ_PRIMARYCATSCALE_STRONGEST;
+                break;
+            case 'highest':
+                $primaryscale = LOCAL_CATQUIZ_PRIMARYCATSCALE_STRONGEST;
+                break;
+            case 'parent':
+                $primaryscale = LOCAL_CATQUIZ_PRIMARYCATSCALE_PARENT;
+                break;
+        }
+        if (isset($primaryscale) && !is_numeric($primaryscale)) {
+            $primaryscale = !empty(catscale::return_catscale_by_name($primaryscale))
+                ? intval(catscale::return_catscale_by_name($primaryscale)->id) : LOCAL_CATQUIZ_PRIMARYCATSCALE_DEFAULT;
+        }
+        $feedbacksettings = new feedbacksettings(intval($primaryscale));
 
         foreach ($records as $record) {
-            $attemptfeedback = new attemptfeedback($record->attemptid, $record->contextid);
-            $attemptfeedback->define_settings($feedbacksettings);
+            $attemptfeedback = new attemptfeedback($record->attemptid, $record->contextid, $feedbacksettings);
+
             $headerstring = get_string('feedbacksheader', 'local_catquiz', $record->attemptid);
             $data = [
                 'feedback' => $attemptfeedback->get_feedback_for_attempt($record->attemptid),

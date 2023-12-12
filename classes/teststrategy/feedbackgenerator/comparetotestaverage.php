@@ -48,6 +48,12 @@ class comparetotestaverage extends feedbackgenerator {
     public int $primaryscaleid;
 
     /**
+     *
+     * @var stdClass $feedbacksettings.
+     */
+    public feedbacksettings $feedbacksettings;
+
+    /**
      * Creates a new customscale feedback generator.
      *
      * @param feedbacksettings $feedbacksettings
@@ -58,8 +64,9 @@ class comparetotestaverage extends feedbackgenerator {
         if (isset($feedbacksettings->primaryscaleid)) {
             $this->primaryscaleid = $feedbacksettings->primaryscaleid;
         } else {
-            $this->primaryscaleid = LOCAL_CATQUIZ_PRIMARYCATSCALE_PARENT;
+            $this->primaryscaleid = LOCAL_CATQUIZ_PRIMARYCATSCALE_DEFAULT;
         }
+        $this->feedbacksettings = $feedbacksettings;
     }
 
     /**
@@ -90,6 +97,16 @@ class comparetotestaverage extends feedbackgenerator {
      */
     protected function get_teacherfeedback(array $data): array {
         return [];
+    }
+
+    /**
+     * For specific feedbackdata defined in generators.
+     *
+     * @param array $feedbackdata
+     */
+    public function update_feedbackdata(array $feedbackdata) {
+        // In this case, the update is implemented in the generate feeback class.
+        return $feedbackdata = $this->generate_feedback($feedbackdata, (object)$feedbackdata['quizsettings']);
     }
 
     /**
@@ -233,6 +250,21 @@ class comparetotestaverage extends feedbackgenerator {
         if (! $quizsettings = $cache->get('quizsettings')) {
             return null;
         }
+
+        return $this->generate_feedback($initialcontext, $quizsettings);
+    }
+
+
+    /**
+     * Generate feedbacks.
+     *
+     * @param array $initialcontext
+     * @param object $quizsettings
+     *
+     * @return array|null
+     *
+     */
+    private function generate_feedback(array $initialcontext, object $quizsettings): ?array {
         $personabilities = $initialcontext['personabilities'];
 
         $personparams = catquiz::get_person_abilities(
@@ -240,24 +272,13 @@ class comparetotestaverage extends feedbackgenerator {
             array_keys($personabilities)
         );
 
-        if (!empty($this->primaryscaleid)
-            && $this->primaryscaleid === LOCAL_CATQUIZ_PRIMARYCATSCALE_STRONGEST) {
-                // Find the key with the highest float value.
-            $catscaleid = array_search(max($personabilities), $personabilities);
-            $selectedscale = 'strongestscaleselected';
-        } else if (!empty($this->primaryscaleid)
-            && $this->primaryscaleid === LOCAL_CATQUIZ_PRIMARYCATSCALE_LOWEST) {
-            $catscaleid = array_search(min($personabilities), $personabilities);
-            $selectedscale = 'lowestscaleselected';
-        } else if (!empty($this->primaryscaleid)) {
-            $catscaleid = $this->primaryscaleid;
-            $selectedscale = 'scaleselected';
-        } else if (! $catscaleid = $quizsettings->catquiz_catscales) {
-            $selectedscale = 'parentscaleselected';
-            return null;
-        } else {
-            $selectedscale = 'parentscaleselected';
-        }
+        $selectedscalearray = $this->feedbacksettings->get_scaleid_and_stringkey(
+                $personabilities,
+                $quizsettings,
+                $this->primaryscaleid);
+
+        $catscaleid = $selectedscalearray['selectedscaleid'];
+        $selectedscalestringkey = $selectedscalearray['selectedscalestringkey'];
 
         $catscale = catscale::return_catscale_object($catscaleid);
         $ability = $personabilities[$catscaleid];
@@ -279,7 +300,7 @@ class comparetotestaverage extends feedbackgenerator {
             'local_catquiz',
             [
                 'quantile' => sprintf('%.2f', $quantile),
-                'scaleinfo' => get_string($selectedscale, 'local_catquiz', $catscale->name),
+                'scaleinfo' => get_string($selectedscalestringkey, 'local_catquiz', $catscale->name),
             ]);
         if ($needsimprovementthreshold = $initialcontext['needsimprovementthreshold']) {
             if ($quantile < $needsimprovementthreshold) {

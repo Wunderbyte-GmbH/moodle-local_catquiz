@@ -77,6 +77,15 @@ abstract class feedbackgenerator {
     abstract public function load_data(int $attemptid, array $initialcontext): ?array;
 
     /**
+     * To update feedbackdata (that will be rendered later) according to specific settings.
+     *
+     * @param array $feedbackdata
+     */
+    public function update_feedbackdata(array $feedbackdata) {
+        return $feedbackdata;
+    }
+
+    /**
      * Returns the feedback as an array with elements 'heading' and 'feedback'.
      *
      * @param array $feedbackdata
@@ -89,6 +98,8 @@ abstract class feedbackgenerator {
         if (!$this->has_required_context_keys($feedbackdata)) {
             return $this->no_data();
         }
+
+        $feedbackdata = $this->update_feedbackdata($feedbackdata);
 
         $studentfeedback = $this->get_studentfeedback($feedbackdata);
         if (! $this->isvalidfeedback($studentfeedback)) {

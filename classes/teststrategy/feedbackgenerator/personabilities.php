@@ -25,7 +25,6 @@
 namespace local_catquiz\teststrategy\feedbackgenerator;
 
 use cache;
-use core\chart_axis;
 use core\chart_bar;
 use core\chart_series;
 use local_catquiz\catquiz;
@@ -67,15 +66,27 @@ class personabilities extends feedbackgenerator {
         if (!isset($feedbacksettings)) {
             return;
         }
-        // Will be 0 if no scale set correctly.
+        // Will be default if no scale set correctly.
         if (isset($feedbacksettings->primaryscaleid)) {
             $this->primaryscaleid = $feedbacksettings->primaryscaleid;
         } else {
-            $this->primaryscaleid = LOCAL_CATQUIZ_PRIMARYCATSCALE_PARENT;
+            $this->primaryscaleid = LOCAL_CATQUIZ_PRIMARYCATSCALE_DEFAULT;
         }
         $this->feedbacksettings = $feedbacksettings;
     }
 
+    /**
+     * For specific feedbackdata defined in generators.
+     *
+     * @param array $feedbackdata
+     */
+    public function update_feedbackdata(array $feedbackdata) {
+        // In this case, the update via settings is implemented in the generate feedback class.
+        return $feedbackdata = $this->generate_feedback(
+                $feedbackdata,
+                (array)$feedbackdata['personabilities'],
+                $feedbackdata['cached_contexts']);
+    }
     /**
      * Get student feedback.
      *
@@ -146,11 +157,6 @@ class personabilities extends feedbackgenerator {
      *
      */
     public function load_data(int $attemptid, array $initialcontext): ?array {
-
-        // We get the data here.
-        global $CFG;
-        require_once($CFG->dirroot . '/local/catquiz/lib.php');
-
         $cache = cache::make('local_catquiz', 'adaptivequizattempt');
         $personabilities = $initialcontext['personabilities'] ?? $cache->get('personabilities') ?: [];
         if ($personabilities === []) {
@@ -161,23 +167,30 @@ class personabilities extends feedbackgenerator {
             return null;
         }
 
-        if (!empty($this->primaryscaleid)
-            && $this->primaryscaleid == LOCAL_CATQUIZ_PRIMARYCATSCALE_STRONGEST) {
-            $selectedscaleid = array_search(max($personabilities), $personabilities);
-            $selectedscale = 'strongestscaleselected';
-        } else if (!empty($this->primaryscaleid)
-            && $this->primaryscaleid == LOCAL_CATQUIZ_PRIMARYCATSCALE_LOWEST) {
-            $selectedscaleid = array_search(min($personabilities), $personabilities);
-            $selectedscale = 'lowestscaleselected';
-        } else if (!empty($this->primaryscaleid)) {
-            $selectedscaleid = $this->primaryscaleid;
-            $selectedscale = 'scaleselected';
-        } else if (! $selectedscaleid = $initialcontext['quizsettings']->catquiz_catscales) {
-            $selectedscale = 'parentscaleselected';
-            return null;
-        } else {
-            $selectedscale = 'parentscaleselected';
-        }
+        return $this->generate_feedback($initialcontext, $personabilities, $cachedcontexts);
+    }
+
+    /**
+     * Loads data personability, number of items played per subscale and standarderrorpersubscale.
+     *
+     * @param array $initialcontext
+     * @param array $personabilities
+     * @param array $cachedcontexts
+     *
+     * @return array|null
+     *
+     */
+    public function generate_feedback(array $initialcontext, $personabilities, $cachedcontexts): ?array {
+        global $CFG;
+        require_once($CFG->dirroot . '/local/catquiz/lib.php');
+        $quizsettings = (object)$initialcontext['quizsettings'];
+
+        $selectedscalearray = $this->feedbacksettings->get_scaleid_and_stringkey(
+            $personabilities,
+            $quizsettings,
+            $this->primaryscaleid);
+        $selectedscaleid = $selectedscalearray['selectedscaleid'];
+        $selectedscalestringkey = $selectedscalearray['selectedscalestringkey'];
 
         $countscales = [];
         foreach ($cachedcontexts as $index => $data) {
@@ -185,14 +198,18 @@ class personabilities extends feedbackgenerator {
                 continue;
             }
             $lastquestion = $data['lastquestion'];
-            $scaleid = $lastquestion->catscaleid;
+            if (gettype($lastquestion) == 'array') {
+                $scaleid = $lastquestion['catscaleid'];
+            } else {
+                $scaleid = $lastquestion->catscaleid;
+            }
             if (isset($countscales[$scaleid]['count'])) {
                 $countscales[$scaleid]['count'] ++;
             } else {
                 $countscales[$scaleid]['count'] = 1;
             }
 
-            $questiondisplay = $this->render_questionpreview($lastquestion);
+            $questiondisplay = $this->render_questionpreview((object)$lastquestion);
             $countscales[$scaleid]['questionpreviews'][] = [
                 'preview' => $questiondisplay['body']['question'],
             ];
@@ -223,7 +240,7 @@ class personabilities extends feedbackgenerator {
             }
             if ($catscaleid == $selectedscaleid) {
                 $isselectedscale = true;
-                $tooltiptitle = get_string($selectedscale, 'local_catquiz', $catscales[$catscaleid]->name);
+                $tooltiptitle = get_string($selectedscalestringkey, 'local_catquiz', $catscales[$catscaleid]->name);
             } else {
                 $isselectedscale = false;
                 $tooltiptitle = $catscales[$catscaleid]->name;
@@ -257,6 +274,7 @@ class personabilities extends feedbackgenerator {
             'feedback_personabilities' => $data,
             'standarderrorpersubscales' => $standarderrorpersubscales,
             'chart' => $chart,
+            'cached_contexts' => $cachedcontexts,
         ];
     }
 

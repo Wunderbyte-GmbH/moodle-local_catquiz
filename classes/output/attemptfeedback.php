@@ -61,14 +61,22 @@ class attemptfeedback implements renderable, templatable {
     public feedbacksettings $feedbacksettings;
 
     /**
+     * @var ?object
+     */
+    public stdClass $quizsettings;
+
+    /**
      * Constructor of class.
      *
      * @param int $attemptid
      * @param int $contextid
-     * @param int $catscaleid
+     * @param feedbacksettings $feedbacksettings
      *
      */
-    public function __construct(int $attemptid, int $contextid = 0, int $catscaleid = 0) {
+    public function __construct(
+        int $attemptid,
+        int $contextid = 0,
+        ?feedbacksettings $feedbacksettings = null) {
         global $USER;
         if ($attemptid === 0) {
             // This can still return nothing. In that case, we show a message that the user has no attempts yet.
@@ -83,6 +91,7 @@ class attemptfeedback implements renderable, templatable {
         }
 
         $settings = json_decode($testenvironment->json);
+        $this->quizsettings = $settings;
         $this->teststrategy = intval($settings->catquiz_selectteststrategy);
 
         if ($contextid === 0) {
@@ -91,20 +100,11 @@ class attemptfeedback implements renderable, templatable {
         }
         $this->contextid = $contextid;
 
-        if ($catscaleid === 0) {
-            $catscaleid = intval($settings->catquiz_catscales);
+        if (!isset($feedbacksettings)) {
+            $this->feedbacksettings = new feedbacksettings();
         }
-        $this->catscaleid = $catscaleid;
-    }
+        $this->catscaleid = intval($this->quizsettings->catquiz_catscales);
 
-    /**
-     * Pass the feedbacksettingsobject.
-     *
-     * @param feedbacksettings $feedbacksettings
-     *
-     */
-    public function define_settings(feedbacksettings $feedbacksettings) {
-        $this->feedbacksettings = $feedbacksettings;
     }
 
     /**
@@ -122,11 +122,6 @@ class attemptfeedback implements renderable, templatable {
         }
 
         $generators = $this->get_feedback_generators_for_teststrategy($this->teststrategy);
-
-        // Todo: Depending on the strategy, we should also sort the data differently.
-        // Eg: Infer lowest skillgap should order the lowest person ability in a subscale on top.
-        // While highest skill should sort the highest ability on top. etc.
-        // Right now, we just sort for lowest skill.
 
         $cache = cache::make('local_catquiz', 'adaptivequizattempt');
         $context = [
@@ -147,6 +142,21 @@ class attemptfeedback implements renderable, templatable {
             'personabilities' => $cache->get('personabilities'),
         ];
 
+        $feedbackdata = $this->load_data_from_generators($generators, $context);
+        if ($savetodb) {
+            $id = catquiz::save_attempt_to_db($feedbackdata);
+        }
+        return $this->generate_feedback($generators, $feedbackdata);
+    }
+
+    /**
+     * Get the data from the feedbackgenerators.
+     *
+     * @param array $generators
+     * @param array $context
+     * @return array
+     */
+    private function load_data_from_generators(array $generators, array $context): array {
         // Get the data required to generate the feedback. This can be saved to
         // the DB.
         $feedbackdata = $context;
@@ -160,10 +170,8 @@ class attemptfeedback implements renderable, templatable {
                 $generatordata
             );
         }
-        if ($savetodb) {
-            $id = catquiz::save_attempt_to_db($feedbackdata);
-        }
-        return $this->generate_feedback($generators, $feedbackdata);
+
+        return $feedbackdata;
     }
 
     /**
