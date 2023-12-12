@@ -336,8 +336,12 @@ class comparetotestaverage extends feedbackgenerator {
             'testaverageposition' => ($testaverage + 5) * 10,
             'userabilityposition' => ($ability + 5) * 10,
             'comparisontext' => $text,
-            'colorgradestring' => $this->get_colorgradientstring($quizsettings, $catscaleid),
-            'feedbackbarlegend' => $this->get_colorbarlegend($quizsettings, $catscaleid),
+            'colorbar' => [
+                'colorgradestring' => $this->get_colorgradientstring($quizsettings, $catscaleid),
+            ],
+            'legendofcolorbar' => [
+                'feedbackbarlegend' => $this->get_colorbarlegend($quizsettings, $catscaleid),
+            ],
             'currentability' => get_string('currentability', 'local_catquiz', $catscale->name),
             'currentabilityfellowstudents' => get_string('currentabilityfellowstudents', 'local_catquiz', $catscale->name),
         ];

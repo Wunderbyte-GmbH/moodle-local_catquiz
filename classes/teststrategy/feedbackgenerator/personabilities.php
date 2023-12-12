@@ -82,10 +82,13 @@ class personabilities extends feedbackgenerator {
      */
     public function update_feedbackdata(array $feedbackdata) {
         // In this case, the update via settings is implemented in the generate feedback class.
-        return $feedbackdata = $this->generate_feedback(
+        $feedbackdata = $this->generate_feedback(
                 $feedbackdata,
                 (array)$feedbackdata['personabilities'],
                 $feedbackdata['cached_contexts']);
+
+        $feedbackdata = $this->feedbacksettings->hide_defined_elements($feedbackdata, $this->get_generatorname());
+        return $feedbackdata;
     }
     /**
      * Get student feedback.

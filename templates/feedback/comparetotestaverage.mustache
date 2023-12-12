@@ -26,51 +26,61 @@
         "userabilityposition": 15,
         "userability": 2.34,
         "testaverageposition": 26,
-        "colorgradestring": "#ff0000 0.00%, #ffff00 50.00%, #90ee90 100%",
+        "colorbar": [
+            "colorgradestring": "#ff0000 0.00%, #ffff00 50.00%, #90ee90 100%",
+            'feedbackbarlegend': [
+                "subfeedbacktext": "great",
+                "subfeedbackrange": "(0-1)",
+            ]
+        ]
         "subcolorcode": "#ff00f0",
         "subfeedbacktext": "Very good result",
         "subfeedbackrange": "3.3-0"
     }
 }}
 {{comparisontext}}
-<div class="catquiz-feedbackbar">
-    <div class="catquiz-feedbackbar-bar" style="background: linear-gradient(to right, {{colorgradestring}});">
-        <div class="catquiz-feedbackbar-uppertext">
-            {{currentability}}
-            <span style="position: absolute; left: {{userabilityposition}}%;">
-                <span style="position: absolute; left: -15px; top: 1.5em; transform: rotate(180deg);">
+{{#colorbar}}
+    <div class="catquiz-feedbackbar">
+        <div class="catquiz-feedbackbar-bar" style="background: linear-gradient(to right, {{colorgradestring}});">
+            <div class="catquiz-feedbackbar-uppertext">
+                {{currentability}}
+                <span style="position: absolute; left: {{userabilityposition}}%;">
+                    <span style="position: absolute; left: -15px; top: 1.5em; transform: rotate(180deg);">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" fill="currentColor" class="bi bi-triangle-fill" viewBox="0 0 16 16">
+                            <path fill-rule="evenodd" d="M7.022 1.566a1.13 1.13 0 0 1 1.96 0l6.857 11.667c.457.778-.092 1.767-.98 1.767H1.144c-.889 0-1.437-.99-.98-1.767L7.022 1.566z"/>
+                        </svg>
+                    </span>
+                    <span style="position: absolute; left: 20px; top: 1.5em; min-width: 60px;">
+                        {{userability}}
+                    </span>
+                </span>
+            </div>
+            <div class="catquiz-feedbackbar-lowertext">
+                <div style="position: absolute; width: 100%;"> <!-- legend -->
+                    <span style="position: absolute; left: -0.5em;">-5</span>
+                    <span style="position: absolute; left: 50%; margin-left: -0.25em;">0</span>
+                    <span style="position: absolute; right: -0.5em">5</span>
+                </div>
+                <span style="position: absolute; left: {{testaverageposition}}%; margin-left: -15px; top: 0.8em;">{{testaverageability}}</span>
+                <span style="position: absolute; left: {{testaverageposition}}%; margin-left: -15px; top: -1em;">
                     <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" fill="currentColor" class="bi bi-triangle-fill" viewBox="0 0 16 16">
                         <path fill-rule="evenodd" d="M7.022 1.566a1.13 1.13 0 0 1 1.96 0l6.857 11.667c.457.778-.092 1.767-.98 1.767H1.144c-.889 0-1.437-.99-.98-1.767L7.022 1.566z"/>
                     </svg>
                 </span>
-                <span style="position: absolute; left: 20px; top: 1.5em; min-width: 60px;">
-                    {{userability}}
-                </span>
-            </span>
-        </div>
-        <div class="catquiz-feedbackbar-lowertext">
-            <div style="position: absolute; width: 100%;"> <!-- legend -->
-                <span style="position: absolute; left: -0.5em;">-5</span>
-                <span style="position: absolute; left: 50%; margin-left: -0.25em;">0</span>
-                <span style="position: absolute; right: -0.5em">5</span>
+                <div style="position: absolute; top: 2em; width: 100%;">{{currentabilityfellowstudents}}</div>
             </div>
-            <span style="position: absolute; left: {{testaverageposition}}%; margin-left: -15px; top: 0.8em;">{{testaverageability}}</span>
-            <span style="position: absolute; left: {{testaverageposition}}%; margin-left: -15px; top: -1em;">
-                <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" fill="currentColor" class="bi bi-triangle-fill" viewBox="0 0 16 16">
-                    <path fill-rule="evenodd" d="M7.022 1.566a1.13 1.13 0 0 1 1.96 0l6.857 11.667c.457.778-.092 1.767-.98 1.767H1.144c-.889 0-1.437-.99-.98-1.767L7.022 1.566z"/>
-                </svg>
-            </span>
-            <div style="position: absolute; top: 2em; width: 100%;">{{currentabilityfellowstudents}}</div>
         </div>
     </div>
-</div>
-<div class="catquiz-legend">
-    <h4>{{#str}}feedbackbarlegend, local_catquiz{{/str}}</h4>
-    {{#feedbackbarlegend}}
-        <div>
-            <span class="catquiz-legend-symbol" style="background: {{subcolorcode}};"></span>
-            <span class="catquiz-legend-description">{{subfeedbacktext}}</span>
-            <span class="catquiz-legend-range">{{subfeedbackrange}}</span>
-        </div>
-    {{/feedbackbarlegend}}
-</div>
+{{/colorbar}}
+{{#legendofcolorbar}}
+    <div class="catquiz-legend">
+        <h4>{{#str}}feedbackbarlegend, local_catquiz{{/str}}</h4>
+        {{#feedbackbarlegend}}
+            <div>
+                <span class="catquiz-legend-symbol" style="background: {{subcolorcode}};"></span>
+                <span class="catquiz-legend-description">{{subfeedbacktext}}</span>
+                <span class="catquiz-legend-range">{{subfeedbackrange}}</span>
+            </div>
+        {{/feedbackbarlegend}}
+    </div>
+{{/legendofcolorbar}}

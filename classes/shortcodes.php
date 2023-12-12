@@ -92,7 +92,8 @@ class shortcodes {
             $primaryscale = !empty(catscale::return_catscale_by_name($primaryscale))
                 ? intval(catscale::return_catscale_by_name($primaryscale)->id) : LOCAL_CATQUIZ_PRIMARYCATSCALE_DEFAULT;
         }
-
+        // Defines areas that can be hidden. First level keys must match generatornames.
+        // Last level values (2nd or 3rd) must match keys from feedbackdata / mustachetemplate.
         $areanames = [
             'personabilitites' => [
                 'personabilitieslist',
@@ -101,9 +102,11 @@ class shortcodes {
             ],
             'comparetotestaverage' => [
                 'comparisontext', // You performed better than ...
-                'feedbackbar', // The colorbar.
-                'feedbackbarlegend', // Legend of the colorbar.
-                'colorbar', // Legend of the colorbar.
+                'legendofcolorbar', // This hides only the legend of the colorbar.
+                'entirecolorbar' => [
+                    'colorbar',
+                    'legendofcolorbar',
+                ],
             ],
             'customscalefeedback' => [
             ],
@@ -125,7 +128,7 @@ class shortcodes {
 
             if (!empty($areanames)) {
                 foreach ($areanames as $key => $values) {
-                    // Check if any element in the $values array matches any name in $hiddenareasarray
+                    // Check if any element in the $values array matches any name in $hiddenareasarray.
                     $matchingvalues = array_intersect($values, $hiddenareasarray);
                     if (!empty($matchingvalues) || in_array($key, $hiddenareasarray)) {
                         $areastohide[$key] = array_values($matchingvalues);
@@ -137,6 +140,7 @@ class shortcodes {
         }
 
         $feedbacksettings = new feedbacksettings(intval($primaryscale), $areastohide);
+        $feedbacksettings->set_areas_to_hide_keys($areanames);
 
         foreach ($records as $record) {
             $attemptfeedback = new attemptfeedback($record->attemptid, $record->contextid, $feedbacksettings);
