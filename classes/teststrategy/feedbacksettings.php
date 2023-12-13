@@ -103,57 +103,6 @@ class feedbacksettings {
     }
 
     /**
-     * Define structure and keys of areas in feedback. Must correspond to template/ data to be rendered.
-     * Will be used to validate keys to be hidden.
-     *
-     * @param array $areanames
-     */
-    public function set_areakeys(array $areanames) {
-
-        // Defines areas that can be hidden. First level keys must match generatornames.
-        // Values must match keys from feedbackdata / mustachetemplate.
-        $areanames = [
-            'personabilities' => [
-                'personabilitieslist',
-                'standarderrorpersubscales',
-                'chart',
-            ],
-            'comparetotestaverage' => [
-                'comparisontext', // You performed better than ...
-                'colorbarlegend', // This hides only the legend of the colorbar.
-                'colorbar',
-            ],
-            'customscalefeedback' => [
-            ],
-            'debuginfo' => [
-            ],
-            'graphicalsummary' => [
-            ],
-            'pilotquestions' => [
-            ],
-            'questionssummary' => [
-            ],
-        ];
-
-        $this->definedareastohidekeys = $areanames;
-    }
-
-    /**
-     * Define and set areanamed to feedback data keys.
-     *
-     * @param string $generatorname
-     * @return array
-     */
-    private function get_feedbackdatakeys_to_exclude(string $generatorname): array {
-
-        if (empty($this->definedareastohidekeys)) {
-            return [];
-        }
-
-        return $this->definedareastohidekeys[$generatorname];
-    }
-
-    /**
      * Remove unwanted areas (keys) from array.
      *
      * @param array $feedbackdata
