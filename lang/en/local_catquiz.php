@@ -463,6 +463,8 @@ $string['abilityintestedscale_after'] = 'Ability in top-most parent scale - afte
 $string['fisherinformation'] = 'Fisherinformation';
 $string['difficulty_next_easier'] = 'Next more difficult question';
 $string['difficulty_next_more_difficult'] = 'Next easier question';
+$string['scaleiddisplay'] = ' (ID: {$a})';
+
 
 // Quiz attempts.
 $string['catcontext'] = 'CAT Context';

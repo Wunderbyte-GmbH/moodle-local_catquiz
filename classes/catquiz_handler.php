@@ -259,10 +259,12 @@ class catquiz_handler {
             // For subsubscales add a sign to show nested structure.
             $elementadded = str_repeat('- ', $subscale->depth - 1);
 
+            $scaleiddisplay = get_string('scaleiddisplay', 'local_catquiz', $subscale->id);
+
             $elements[] = $mform->addElement(
                 'advcheckbox',
                 'catquiz_subscalecheckbox_' . $subscale->id,
-                $elementadded . $subscale->name,
+                $elementadded . $subscale->name . $scaleiddisplay,
                 null,
                 ['data-on-change-action' => 'reloadFormFromScaleSelect'],
                 [0, 1]

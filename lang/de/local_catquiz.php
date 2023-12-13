@@ -459,6 +459,7 @@ $string['abilityintestedscale_after'] = 'Ability in der obersten Skala - danach'
 $string['fisherinformation'] = 'Fisherinformation';
 $string['difficulty_next_easier'] = 'Nächstschwierigere Frage';
 $string['difficulty_next_more_difficult'] = 'Nächstleichtere Frage';
+$string['scaleiddisplay'] = ' (ID: {$a})';
 
 // Quiz attempts.
 $string['catcontext'] = 'CAT Kontext';
