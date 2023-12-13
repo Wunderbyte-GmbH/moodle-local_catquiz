@@ -92,55 +92,24 @@ class shortcodes {
             $primaryscale = !empty(catscale::return_catscale_by_name($primaryscale))
                 ? intval(catscale::return_catscale_by_name($primaryscale)->id) : LOCAL_CATQUIZ_PRIMARYCATSCALE_DEFAULT;
         }
-        // Defines areas that can be hidden. First level keys must match generatornames.
-        // Last level values (2nd or 3rd) must match keys from feedbackdata / mustachetemplate.
-        $areanames = [
-            'personabilitites' => [
-                'personabilitieslist',
-                'standarderrorpersubscales',
-                'chart',
-            ],
-            'comparetotestaverage' => [
-                'comparisontext', // You performed better than ...
-                'legendofcolorbar', // This hides only the legend of the colorbar.
-                'entirecolorbar' => [
-                    'colorbar',
-                    'legendofcolorbar',
-                ],
-            ],
-            'customscalefeedback' => [
-            ],
-            'debuginfo' => [
-            ],
-            'graphicalsummary' => [
-            ],
-            'pilotquestions' => [
-            ],
-            'questionssummary' => [
-            ],
-        ];
 
         $hiddenareas = $args['hidden'] ?? [];
 
         if ($hiddenareas != []) {
-            $hiddenareasarray = explode(',', $hiddenareas);
-            $areastohide = [];
-
-            if (!empty($areanames)) {
-                foreach ($areanames as $key => $values) {
-                    // Check if any element in the $values array matches any name in $hiddenareasarray.
-                    $matchingvalues = array_intersect($values, $hiddenareasarray);
-                    if (!empty($matchingvalues) || in_array($key, $hiddenareasarray)) {
-                        $areastohide[$key] = array_values($matchingvalues);
-                    }
-                }
-            }
+            $areastohide = explode(',', $hiddenareas);
         } else {
             $areastohide = [];
         }
+        // Some areas are hidden by default. They can be displayed via shortcode.
+        $showareas = $args['show'] ?? [];
+        if ($showareas != []) {
+            $areastoshow = explode(',', $showareas);
+        } else {
+            $areastoshow = [];
+        }
 
-        $feedbacksettings = new feedbacksettings(intval($primaryscale), $areastohide);
-        $feedbacksettings->set_areas_to_hide_keys($areanames);
+        $feedbacksettings = new feedbacksettings(intval($primaryscale));
+        $feedbacksettings->hide_and_show_areas($areastohide, $areastoshow);
 
         foreach ($records as $record) {
             $attemptfeedback = new attemptfeedback($record->attemptid, $record->contextid, $feedbacksettings);

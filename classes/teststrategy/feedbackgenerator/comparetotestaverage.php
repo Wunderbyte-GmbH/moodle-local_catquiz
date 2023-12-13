@@ -81,10 +81,14 @@ class comparetotestaverage extends feedbackgenerator {
         global $OUTPUT;
         $feedback = $OUTPUT->render_from_template('local_catquiz/feedback/comparetotestaverage', $data);
 
-        return [
-            'heading' => $this->get_heading(),
-            'content' => $feedback,
-        ];
+        if (empty($feedback)) {
+            return [];
+        } else {
+            return [
+                'heading' => $this->get_heading(),
+                'content' => $feedback,
+            ];
+        }
     }
 
     /**
@@ -339,7 +343,7 @@ class comparetotestaverage extends feedbackgenerator {
             'colorbar' => [
                 'colorgradestring' => $this->get_colorgradientstring($quizsettings, $catscaleid),
             ],
-            'legendofcolorbar' => [
+            'colorbarlegend' => [
                 'feedbackbarlegend' => $this->get_colorbarlegend($quizsettings, $catscaleid),
             ],
             'currentability' => get_string('currentability', 'local_catquiz', $catscale->name),

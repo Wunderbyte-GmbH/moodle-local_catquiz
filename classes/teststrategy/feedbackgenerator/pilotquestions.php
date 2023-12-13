@@ -26,6 +26,7 @@ namespace local_catquiz\teststrategy\feedbackgenerator;
 
 use cache;
 use local_catquiz\teststrategy\feedbackgenerator;
+use local_catquiz\teststrategy\feedbacksettings;
 
 /**
  * Returns feedback for pilotquestions.
@@ -35,6 +36,22 @@ use local_catquiz\teststrategy\feedbackgenerator;
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class pilotquestions extends feedbackgenerator {
+
+    /**
+     *
+     * @var stdClass $feedbacksettings.
+     */
+    public feedbacksettings $feedbacksettings;
+
+    /**
+     * Creates a new customscale feedback generator.
+     *
+     * @param feedbacksettings $feedbacksettings
+     */
+    public function __construct(feedbacksettings $feedbacksettings) {
+
+        $this->feedbacksettings = $feedbacksettings;
+    }
 
     /**
      * Get student feedback
@@ -63,10 +80,14 @@ class pilotquestions extends feedbackgenerator {
             $data['num_pilot_questions']
         );
 
-        return [
-            'heading' => $this->get_heading(),
-            'content' => $feedback,
-        ];
+        if (empty($feedback)) {
+            return [];
+        } else {
+            return [
+                'heading' => $this->get_heading(),
+                'content' => $feedback,
+            ];
+        }
     }
 
     /**

@@ -110,10 +110,14 @@ class personabilities extends feedbackgenerator {
             ]
         );
 
-        return [
-            'heading' => $this->get_heading(),
-            'content' => $feedback,
-        ];
+        if (empty($feedback)) {
+            return [];
+        } else {
+            return [
+                'heading' => $this->get_heading(),
+                'content' => $feedback,
+            ];
+        }
     }
 
     /**

@@ -20,35 +20,38 @@
     * none
     Context variables required for this template:
     Example context (json):
-    {
-        "gradedright": "gradedright",
-        "gradedwrong": "gradedwrong",
-        "gradedpartial": "gradedpartial"
+    {   "summary": {
+            "gradedright": "gradedright",
+            "gradedwrong": "gradedwrong",
+            "gradedpartial": "gradedpartial"
+        }
     }
 }}
-<div class="container">
-  <div class="row">
-    <div class="col-6 text-right">
-        {{#str}}numberofanswerscorrect, local_catquiz{{/str}}:
-    </div>
-    <div class="col-6 text-left">
-        {{gradedright}}
-    </div>
-  </div>
+{{#summary}}
+    <div class="container">
     <div class="row">
-    <div class="col-6 text-right">
-        {{#str}}numberofanswersincorrect, local_catquiz{{/str}}:
+        <div class="col-6 text-right">
+            {{#str}}numberofanswerscorrect, local_catquiz{{/str}}:
+        </div>
+        <div class="col-6 text-left">
+            {{gradedright}}
+        </div>
     </div>
-    <div class="col-6 text-left">
-        {{gradedwrong}}
+        <div class="row">
+        <div class="col-6 text-right">
+            {{#str}}numberofanswersincorrect, local_catquiz{{/str}}:
+        </div>
+        <div class="col-6 text-left">
+            {{gradedwrong}}
+        </div>
     </div>
-  </div>
-    <div class="row">
-    <div class="col-6 text-right">
-        {{#str}}numberofanswerspartlycorrect, local_catquiz{{/str}}:
+        <div class="row">
+        <div class="col-6 text-right">
+            {{#str}}numberofanswerspartlycorrect, local_catquiz{{/str}}:
+        </div>
+        <div class="col-6 text-left">
+            {{gradedpartial}}
+        </div>
     </div>
-    <div class="col-6 text-left">
-        {{gradedpartial}}
     </div>
-  </div>
-</div>
+{{/summary}}

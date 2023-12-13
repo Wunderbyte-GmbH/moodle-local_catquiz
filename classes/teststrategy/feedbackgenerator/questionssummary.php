@@ -26,6 +26,7 @@ namespace local_catquiz\teststrategy\feedbackgenerator;
 
 use local_catquiz\catquiz;
 use local_catquiz\teststrategy\feedbackgenerator;
+use local_catquiz\teststrategy\feedbacksettings;
 
 /**
  * Returns rendered attempt statistics.
@@ -35,6 +36,22 @@ use local_catquiz\teststrategy\feedbackgenerator;
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class questionssummary extends feedbackgenerator {
+
+    /**
+     *
+     * @var stdClass $feedbacksettings.
+     */
+    public feedbacksettings $feedbacksettings;
+
+    /**
+     * Creates a new customscale feedback generator.
+     *
+     * @param feedbacksettings $feedbacksettings
+     */
+    public function __construct(feedbacksettings $feedbacksettings) {
+
+        $this->feedbacksettings = $feedbacksettings;
+    }
 
     /**
      * Get student feedback.
@@ -48,10 +65,15 @@ class questionssummary extends feedbackgenerator {
         global $OUTPUT;
         $feedback = $OUTPUT->render_from_template('local_catquiz/feedback/questionssummary', $data);
 
-        return [
-            'heading' => $this->get_heading(),
-            'content' => $feedback,
-        ];
+        if (empty($feedback)) {
+            return [];
+        } else {
+            return [
+                'heading' => $this->get_heading(),
+                'content' => $feedback,
+            ];
+        }
+
     }
 
     /**
@@ -87,6 +109,20 @@ class questionssummary extends feedbackgenerator {
     }
 
     /**
+     * For specific feedbackdata defined in generators.
+     *
+     * @param array $feedbackdata
+     */
+    public function update_feedbackdata(array $feedbackdata) {
+        // Get excluded names from settings.
+        // Check if whole generator or only certain keys are excluded.
+        // Compare with names for fields and write new array with feedbackkeys only.
+        // Exclude feedbackkeys from feedbackdata.
+        $feedbackdata = $this->feedbacksettings->hide_defined_elements($feedbackdata, $this->get_generatorname());
+        return $feedbackdata;
+    }
+
+    /**
      * Loads data.
      *
      * @param int $attemptid
@@ -100,13 +136,14 @@ class questionssummary extends feedbackgenerator {
             return null;
         }
 
-        return [
-            'gradedright' => $attempt['gradedright']->count ?? 0,
-            // We want to count skipped questions as wrong. The skipped answers
-            // are stored under array key null.
-            'gradedwrong' => ($attempt['gradedwrong']->count ?? 0)
-                + ($attempt[null]->count ?? 0),
-            'gradedpartial' => $attempt['gradedpartial']->count ?? 0,
+        return ['summary' => [
+                'gradedright' => $attempt['gradedright']->count ?? 0,
+                // We want to count skipped questions as wrong. The skipped answers
+                // are stored under array key null.
+                'gradedwrong' => ($attempt['gradedwrong']->count ?? 0)
+                    + ($attempt[null]->count ?? 0),
+                'gradedpartial' => $attempt['gradedpartial']->count ?? 0,
+            ],
         ];
     }
 

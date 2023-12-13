@@ -77,11 +77,16 @@ class customscalefeedback extends feedbackgenerator {
      */
     protected function get_studentfeedback(array $data): array {
 
-        $text = $data['customscalefeedback'];
-        return [
-            'heading' => $this->get_heading(),
-            'content' => $text,
-        ];
+        $feedback = $data['customscalefeedback'];
+
+        if (empty($feedback)) {
+            return [];
+        } else {
+            return [
+                'heading' => $this->get_heading(),
+                'content' => $feedback,
+            ];
+        }
     }
 
     /**

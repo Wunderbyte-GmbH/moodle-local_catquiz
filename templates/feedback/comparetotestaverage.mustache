@@ -28,7 +28,7 @@
         "testaverageposition": 26,
         "colorbar": [
             "colorgradestring": "#ff0000 0.00%, #ffff00 50.00%, #90ee90 100%",
-            'feedbackbarlegend': [
+            'colorbarlegend': [
                 "subfeedbacktext": "great",
                 "subfeedbackrange": "(0-1)",
             ]
@@ -72,7 +72,7 @@
         </div>
     </div>
 {{/colorbar}}
-{{#legendofcolorbar}}
+{{#colorbarlegend}}
     <div class="catquiz-legend">
         <h4>{{#str}}feedbackbarlegend, local_catquiz{{/str}}</h4>
         {{#feedbackbarlegend}}
@@ -83,4 +83,4 @@
             </div>
         {{/feedbackbarlegend}}
     </div>
-{{/legendofcolorbar}}
+{{/colorbarlegend}}
