@@ -109,7 +109,7 @@ class shortcodes {
         }
 
         $feedbacksettings = new feedbacksettings(intval($primaryscale));
-        $feedbacksettings->hide_and_show_areas($areastohide, $areastoshow);
+        $feedbacksettings->set_hide_and_show_areas($areastohide, $areastoshow);
 
         foreach ($records as $record) {
             $attemptfeedback = new attemptfeedback($record->attemptid, $record->contextid, $feedbacksettings);

@@ -53,12 +53,12 @@ class feedbacksettings {
     /**
      * @var ?array
      */
-    public $areastohide;
+    public $areastohide = [];
 
     /**
      * @var ?array
      */
-    public $areashiddenbydefault;
+    public $areashiddenbydefault = [];
 
     /**
      * @var ?array
@@ -86,7 +86,7 @@ class feedbacksettings {
      * @param array $areastohide
      * @param array $areastoshow
      */
-    public function hide_and_show_areas(array $areastohide = [], array $areastoshow = []) {
+    public function set_hide_and_show_areas(array $areastohide = [], array $areastoshow = []) {
 
         if (count($areastoshow) > 0) {
             foreach ($areastoshow as $areatoshow) {
@@ -109,7 +109,10 @@ class feedbacksettings {
      * @param string $generatorname
      */
     public function hide_defined_elements(array $feedbackdata, string $generatorname) {
-
+        $this->areastohide = array_merge($this->areastohide, $this->areashiddenbydefault);
+        if (empty($this->areastohide)) {
+            return $feedbackdata;
+        }
         // If generator is set as exclusion key, hide the whole data from this generator.
         foreach ($this->areastohide as $areatohide) {
             if ($areatohide == $generatorname) {

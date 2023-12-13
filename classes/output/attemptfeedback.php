@@ -211,6 +211,9 @@ class attemptfeedback implements renderable, templatable {
             ),
             true
         );
+        if (empty($feedbackdata)) {
+            return [];
+        }
         $generators = $this->get_feedback_generators_for_teststrategy($feedbackdata['teststrategy']);
         return $this->generate_feedback($generators, $feedbackdata);
     }

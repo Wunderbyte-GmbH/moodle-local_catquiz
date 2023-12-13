@@ -136,7 +136,7 @@ class questionssummary extends feedbackgenerator {
             return null;
         }
 
-        return ['summary' => [
+        return ['questionssummary' => [
                 'gradedright' => $attempt['gradedright']->count ?? 0,
                 // We want to count skipped questions as wrong. The skipped answers
                 // are stored under array key null.
@@ -155,9 +155,7 @@ class questionssummary extends feedbackgenerator {
      */
     public function get_required_context_keys(): array {
         return [
-            'gradedright',
-            'gradedwrong',
-            'gradedpartial',
+            'questionssummary',
         ];
     }
 }
