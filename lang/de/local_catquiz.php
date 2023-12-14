@@ -519,6 +519,7 @@ $string['close'] = 'Schließen';
 $string['shortcodeslistofquizattempts'] = 'Gibt eine Tabelle mit Quiz-Versuchen zurück.';
 $string['catquizfeedback'] = 'Zeigt eine Übersicht zu den letzten Quiz-Versuchen.';
 $string['shortcodescatquizfeedback'] = 'Zeige Feedback zu Versuchen an.';
+$string['shortcodescatscalesoverview'] = 'Zeige Übersicht zu CAT-Skalen an.';
 
 // Validation.
 $string['valuemustbegreaterzero'] = 'Wert muss höher als 0 sein.';

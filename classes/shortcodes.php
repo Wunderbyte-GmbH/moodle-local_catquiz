@@ -28,6 +28,7 @@ namespace local_catquiz;
 
 use local_catquiz\output\attemptfeedback;
 use local_catquiz\output\catscalemanager\quizattempts\quizattemptsdisplay;
+use local_catquiz\output\catscales;
 use local_catquiz\teststrategy\feedbacksettings;
 
 /**
@@ -60,7 +61,6 @@ class shortcodes {
      * @return string
      */
     public static function catquizfeedback($shortcode, $args, $content, $env, $next) {
-
         global $OUTPUT;
 
         $records = catquiz::return_attempt_and_contextid_from_attemptstable(
@@ -124,5 +124,30 @@ class shortcodes {
             $output['attempt'][] = $data;
         }
         return $OUTPUT->render_from_template('local_catquiz/feedback/collapsablefeedback', $output);
+    }
+
+    /**
+     * Prints out list of catquiz attempts.
+     *
+     * @param string $shortcode
+     * @param array $args
+     * @param string|null $content
+     * @param object $env
+     * @param Closure $next
+     * @return string
+     */
+    public static function catscalesoverview($shortcode, $args, $content, $env, $next) {
+        global $OUTPUT;
+
+        $contextid = catquiz::get_default_context_id();
+        $catscaleid = -1;
+        $foo = -1;
+        $catscales = new catscales($catscaleid, $foo, $contextid);
+        $catscalesarray = $catscales->return_as_array();
+        $data = [
+            'itemtree' => $catscalesarray,
+        ];
+        // TODO: Create template for these objects.
+        return $OUTPUT->render_from_template('local_catquiz/catscaleshortcodeslist', $data);
     }
 }
