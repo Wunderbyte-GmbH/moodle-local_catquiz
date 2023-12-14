@@ -107,7 +107,7 @@ jobs:
         env:
           DB: ${{ matrix.database }}
           MOODLE_BRANCH: ${{ matrix.moodle-branch }}
-          MUSTACHE_IGNORE_NAMES: 'feedbackform_collapsible_close.mustache,feedbackform_collapsible_open.mustache'
+          MUSTACHE_IGNORE_NAMES: 'feedbackform_collapsible_close.mustache,feedbackform_collapsible_open.mustache,catscaleshortcodetablechildren.mustache'
 
       - name: PHP Lint
         if: ${{ always() }}
