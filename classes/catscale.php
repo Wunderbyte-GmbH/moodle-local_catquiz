@@ -505,10 +505,11 @@ class catscale {
             case 2:
                 return array_map(fn($a) => $all[$a]->name, $ancestorsintarray);
             case 3:
+                $parentscales = array_filter($ancestorsintarray, fn($a) => $all[$a]->parentid == 0);
                 return [
                     'catscalenames' => array_map(fn($a) => $all[$a]->name, $ancestorsintarray),
                     'catscaleids' => $ancestorsintarray,
-                    'mainscale' => reset(array_filter($ancestorsintarray, fn($a) => $all[$a]->parentid == 0)),
+                    'mainscale' => reset($parentscales),
                 ];
         }
     }
