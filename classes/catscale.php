@@ -153,6 +153,23 @@ class catscale {
     }
 
     /**
+     * Returns the contextid associated with a catscale.
+     *
+     * If a catscale does not have a contextid, it returns the contextid of the
+     * ancestor scale that has one.
+     *
+     * @param int $catscaleid
+     * @return int
+     */
+    public static function get_context_id(int $catscaleid): int {
+        $catscale = self::return_catscale_object($catscaleid);
+        if ($catscale->contextid) {
+            return $catscale->contextid;
+        }
+        return self::get_context_id($catscale->parentid);
+    }
+
+    /**
      * Adds or updates attribution of question to scale.
      *
      * @param int $catscaleid
