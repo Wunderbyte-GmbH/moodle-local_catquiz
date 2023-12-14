@@ -285,6 +285,7 @@ class updatepersonability extends preselect_task implements wb_middleware {
     protected function get_item_param_list($responses, $contextid, $catscaleid) {
         // We will update the person ability. Select the correct model for each item.
         $modelstrategy = new model_strategy($responses);
+        $catscalecontext = catscale::get_context_id($catscaleid);
         $catscaleids = [
             $catscaleid,
             ...catscale::get_subscale_ids($catscaleid),
@@ -293,7 +294,7 @@ class updatepersonability extends preselect_task implements wb_middleware {
         $personparams = model_person_param_list::load_from_db($contextid, $catscaleids);
         foreach (array_keys($modelstrategy->get_installed_models()) as $model) {
             $itemparamlists[$model] = model_item_param_list::load_from_db(
-                $contextid,
+                $catscalecontext,
                 $model,
                 $catscaleids
             );
