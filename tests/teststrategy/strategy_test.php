@@ -34,7 +34,6 @@ use mod_adaptivequiz\local\question\question_answer_evaluation;
 use question_bank;
 use question_engine;
 use question_usage_by_activity;
-use UnexpectedValueException;
 
 defined('MOODLE_INTERNAL') || die();
 global $CFG;
@@ -44,6 +43,7 @@ require_once($CFG->dirroot . '/question/format.php');
 require_once($CFG->dirroot . '/question/engine/tests/helpers.php');
 require_once($CFG->dirroot . '/question/editlib.php');
 require_once($CFG->dirroot . '/local/catquiz/lib.php');
+require_once($CFG->dirroot . '/local/catquiz/tests/lib.php');
 
 
 /**
@@ -364,7 +364,7 @@ class strategy_test extends advanced_testcase {
      */
     public static function given_responses_lead_to_expected_abilities_provider(): array {
         global $CFG;
-        $responsepattern = self::loadresponsesdata(
+        $responsepattern = loadresponsesdata(
             $CFG->dirroot . '/local/catquiz/tests/fixtures/responses.2PL.csv'
         );
         return [
@@ -520,37 +520,4 @@ class strategy_test extends advanced_testcase {
         return $qformat;
     }
 
-    /**
-     * Loads the responses from the first person of a CSV file.
-     *
-     * @param string $filename The file to load the responses from.
-     * @return array
-     */
-    private static function loadresponsesdata($filename) {
-        if (($handle = fopen($filename, "r")) === false) {
-            throw new UnexpectedValueException("Can not open file: " . $filename);
-        }
-
-        $row = 0;
-        $questionids = [];
-        while (($data = fgetcsv($handle, 0, ";")) !== false) {
-            $row++;
-            if ($row == 1) {
-                // The first row contains the question labels.
-                // Prefix the label with SIM. E.g., A01-01 will become SIMA01-01.
-                $questionids = preg_filter(
-                    '/^/',
-                    'SIM',
-                    array_slice($data, 1)
-                );
-                continue;
-            }
-            // The responses for person 1.
-            $responses = array_slice($data, 1);
-            break;
-        }
-
-        fclose($handle);
-        return array_combine($questionids, $responses);
-    }
 }
