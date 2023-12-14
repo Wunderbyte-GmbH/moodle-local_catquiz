@@ -162,7 +162,6 @@ class shortcodes {
                 break;
         }
 
-        // TODO: Create template for these objects.
         return $OUTPUT->render_from_template($template, $data);
     }
 }

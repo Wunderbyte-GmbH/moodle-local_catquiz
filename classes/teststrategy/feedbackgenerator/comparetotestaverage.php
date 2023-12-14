@@ -138,7 +138,9 @@ class comparetotestaverage extends feedbackgenerator {
             // This assumes that all values are in the range [-5, 5].
             'testaverageposition',
             'userabilityposition',
-            'text',
+            'comparisontext',
+            'colorbar',
+            'colorbarlegend',
         ];
     }
 
