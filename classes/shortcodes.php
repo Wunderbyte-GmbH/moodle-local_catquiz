@@ -147,7 +147,22 @@ class shortcodes {
         $data = [
             'itemtree' => $catscalesarray,
         ];
+
+        $display = $args['display'] ?? "";
+
+        switch($display) {
+            case "table":
+                $template = 'local_catquiz/catscaleshortcodes/catscaleshortcodetable';
+                break;
+            case "list":
+                $template = 'local_catquiz/catscaleshortcodes/catscaleshortcodelist';
+                break;
+            default:
+                $template = 'local_catquiz/catscaleshortcodes/catscaleshortcodelist';
+                break;
+        }
+
         // TODO: Create template for these objects.
-        return $OUTPUT->render_from_template('local_catquiz/catscaleshortcodeslist', $data);
+        return $OUTPUT->render_from_template($template, $data);
     }
 }

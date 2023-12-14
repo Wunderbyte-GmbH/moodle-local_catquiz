@@ -29,18 +29,14 @@
         "viewlink":"http://localhost:8000/local/catquiz/manage_catscales.php?id=3#lcq_questions"
     }
 }}
-{{#itemtree}}
-<div id="local-catscales-container-shortcodes-{{id}}">
-    <ul class="list-group w-100 mt-2">
-        <li class="list-group-item" data-id="{{id}}" data-description="{{description}}" data-parentid="{{parentid}}" data-name="{{name}}"
-        data-scaleid="{{id}}">
-            <div class="h4"> {{name}}</div>
-            <div class="h6">ID: {{id}}</div>
-            <div>{{description}}</div>
-        </li>
-    </ul>
-</div>
+
+
+<tr>
+    <td>{{name}}</td>
+    <td>{{id}}</td>
+    <td>{{description}}</td>
+</tr>
 {{#children}}
-    {{>local_catquiz/catscaleshortcodechildren}}
+    {{>local_catquiz/catscaleshortcodes/catscaleshortcodetablechildren}}
 {{/children}}
-{{/itemtree}}
+
