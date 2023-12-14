@@ -28,6 +28,7 @@ use cache;
 use context_system;
 use local_catquiz\catcontext;
 use local_catquiz\catquiz;
+use local_catquiz\catscale;
 use local_catquiz\event\catscale_created;
 use local_catquiz\event\catscale_updated;
 use moodle_exception;
@@ -121,6 +122,11 @@ class dataapi {
         $context = new catcontext($data);
         $context->save_or_update($data);
         catcontext::store_context_as_singleton($context, $scaleid);
+
+        // If there is already an old context, we duplicate all the items.
+        if ($oldcontextid = $DB->get_field('local_catquiz_catscales', 'contextid', ['id' => $scaleid])) {
+            catscale::duplicate_testitemparams_for_scale_with_new_contextid($scaleid, $oldcontextid, $context->id);
+        }
 
         // We set the new context as a default context in the catscale.
         $catscale = new stdClass();

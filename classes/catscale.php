@@ -508,10 +508,9 @@ class catscale {
                 return [
                     'catscalenames' => array_map(fn($a) => $all[$a]->name, $ancestorsintarray),
                     'catscaleids' => $ancestorsintarray,
+                    'mainscale' => reset(array_filter($ancestorsintarray, fn($a) => $all[$a]->parentid == 0)),
                 ];
-
         }
-
     }
 
     /**
@@ -589,5 +588,44 @@ class catscale {
         $linktoscale = html_writer::link($url, $linktext);
 
         return $linktoscale;
+    }
+
+    /**
+     * This function duplicates all the records from the old context for the new context.
+     * @param mixed $scaleid
+     * @param mixed $oldcontextid
+     * @param mixed $contextid
+     * @return void
+     * @throws dml_exception
+     */
+    public static function duplicate_testitemparams_for_scale_with_new_contextid($scaleid, $oldcontextid, $contextid) {
+
+        global $DB;
+
+        // Make sure we don't do unnecessary work.
+        if ($oldcontextid == $contextid) {
+            return;
+        }
+
+        $scaleids = self::get_subscale_ids($scaleid);
+        $scaleids[] = $scaleid;
+        list($inorequal, $params) = $DB->get_in_or_equal($scaleids, SQL_PARAMS_NAMED);
+
+        $sql = "SELECT lcip.*
+                FROM {local_catquiz_items} lci
+                JOIN {local_catquiz_itemparams} lcip
+                ON (lci.componentid=lcip.componentid AND lci.componentname=lcip.componentname)
+                WHERE lci.catscaleid $inorequal
+                AND lcip.contextid=:contextid";
+        $params['catscaleid'] = $scaleid;
+        $params['contextid'] = $oldcontextid;
+
+        $records = $DB->get_records_sql($sql, $params);
+
+        foreach ($records as $record) {
+            $record->contextid = $contextid;
+            unset($record->id);
+            $DB->insert_record('local_catquiz_itemparams', $record);
+        }
     }
 }

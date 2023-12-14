@@ -587,8 +587,8 @@ class model_item_param_list implements ArrayAccess, IteratorAggregate, Countable
         // We get the id and the name of the parent catscale.
         if (!empty(catscale::get_ancestors($newrecord['catscaleid'], 3)['catscaleids'])) {
             $parentscales = catscale::get_ancestors($newrecord['catscaleid'], 3);
-            $scaleid = intval($parentscales['catscaleids'][0]);
-            $scalename = $parentscales['catscalenames'][0];
+            $scaleid = end($parentscales['catscaleids']);
+            $scalename = end($parentscales['catscalenames']);
         } else {
             $scaleid = intval($newrecord['catscaleid']);
             $scalename = $newrecord['catscalename'];
@@ -597,11 +597,10 @@ class model_item_param_list implements ArrayAccess, IteratorAggregate, Countable
         // Check if context was created with this import for this scale.
         // If so, use this context.
         // Else: create context and store in singleton.
-        if (empty(catcontext::get_instance($scaleid))) {
+        if (!$catcontext = catcontext::get_instance($scaleid)) {
+            // This will happen only once during an import.
             $catcontext = dataapi::create_new_context_for_scale($scaleid, $scalename);
-        } else {
-            $catcontext = catcontext::get_instance($scaleid);
-        };
+        }
 
         $newrecord['contextid'] = $catcontext->id;
     }
