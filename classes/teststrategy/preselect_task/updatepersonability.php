@@ -114,10 +114,13 @@ class updatepersonability extends preselect_task implements wb_middleware {
         $this->arrayresponses = reset($components);
 
         $catscaleid = $this->lastquestion->catscaleid;
+        $scalestoupdate = array_reverse(
+            [$catscaleid, ...catscale::get_ancestors($catscaleid)]
+        );
         try {
-            $context = $this->updateability($context, $catscaleid);
-            foreach (catscale::get_ancestors($catscaleid) as $ancestorscale) {
-                $context = $this->updateability($context, $ancestorscale, true);
+            foreach ($scalestoupdate as $scale) {
+                $isancestor = $scale != $catscaleid;
+                $context = $this->updateability($context, $scale, $isancestor);
             }
         } catch (\Exception $e) {
             if ($e->getMessage() === status::ABORT_PERSONABILITY_NOT_CHANGED) {
