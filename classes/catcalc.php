@@ -85,11 +85,16 @@ class catcalc {
      *
      * @param mixed $personresponses
      * @param model_item_param_list $items
+     * @param float $startvalue
      *
      * @return float
      *
      */
-    public static function estimate_person_ability($personresponses, model_item_param_list $items): float {
+    public static function estimate_person_ability(
+        $personresponses,
+        model_item_param_list $items,
+        float $startvalue = 0.1
+    ): float {
         $allmodels = model_strategy::get_installed_models();
 
         $jfuns = [];
@@ -124,7 +129,7 @@ class catcalc {
         $result = mathcat::newton_raphson_multi_stable(
             $jacobian,
             $hessian,
-            ['ability' => 0.1],
+            ['ability' => $startvalue],
             6,
             50
         );
