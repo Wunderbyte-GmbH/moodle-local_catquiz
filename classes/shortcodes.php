@@ -26,9 +26,9 @@
 
 namespace local_catquiz;
 
+use local_catquiz\data\dataapi;
 use local_catquiz\output\attemptfeedback;
 use local_catquiz\output\catscalemanager\quizattempts\quizattemptsdisplay;
-use local_catquiz\output\catscales;
 use local_catquiz\teststrategy\feedbacksettings;
 
 /**
@@ -139,28 +139,19 @@ class shortcodes {
     public static function catscalesoverview($shortcode, $args, $content, $env, $next) {
         global $OUTPUT;
 
-        $contextid = catquiz::get_default_context_id();
-        $catscaleid = -1;
-        $foo = -1;
-        $catscales = new catscales($catscaleid, $foo, $contextid);
-        $catscalesarray = $catscales->return_as_array();
+        $catscaleandchildren = dataapi::get_catscale_and_children(0, true, [], true);
+        foreach ($catscaleandchildren as $index => $catscale) {
+            if ($catscale['depth'] > 0) {
+                $catscaleandchildren[$index]['padding'] = $catscale['depth'] * 30;
+                $catscaleandchildren[$index]['ischild'] = 1;
+            }
+        }
+
         $data = [
-            'itemtree' => $catscalesarray,
+            'itemtree' => $catscaleandchildren,
         ];
 
-        $display = $args['display'] ?? "";
-
-        switch($display) {
-            case "table":
-                $template = 'local_catquiz/catscaleshortcodes/catscaleshortcodetable';
-                break;
-            case "list":
-                $template = 'local_catquiz/catscaleshortcodes/catscaleshortcodelist';
-                break;
-            default:
-                $template = 'local_catquiz/catscaleshortcodes/catscaleshortcodelist';
-                break;
-        }
+        $template = 'local_catquiz/catscaleshortcodes/catscaleshortcodetable';
 
         return $OUTPUT->render_from_template($template, $data);
     }

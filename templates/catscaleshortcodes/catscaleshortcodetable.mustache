@@ -40,13 +40,15 @@
     <tbody>
         {{#itemtree}}
             <tr>
-                <th scope="row">{{name}}</th>
+                {{^ischild}}
+                    <th scope="row">{{name}}</td>
+                {{/ischild}}
+                {{#ischild}}
+                    <td style="padding-left: {{padding}}px">{{name}}</td>
+                {{/ischild}}
                 <td>{{id}}</td>
                 <td>{{description}}</td>
             </tr>
-            {{#children}}
-                {{>local_catquiz/catscaleshortcodes/catscaleshortcodetablechildren}}
-            {{/children}}
         {{/itemtree}}
     </tbody>
 </table>
