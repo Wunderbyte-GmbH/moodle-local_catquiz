@@ -502,7 +502,7 @@ class catscale {
 
     /**
      * Get IDs of parentscales.
-     * The highest parent being the first value in array.
+     * The highest parent being the last value in array.
      * With return names, returnvalue is either only the scaleids (1),
      * scalenames (2) or both (3).
      *
