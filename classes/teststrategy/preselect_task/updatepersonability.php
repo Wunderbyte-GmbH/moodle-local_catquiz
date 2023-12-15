@@ -118,9 +118,12 @@ class updatepersonability extends preselect_task implements wb_middleware {
             [$catscaleid, ...catscale::get_ancestors($catscaleid)]
         );
         try {
+            $index = 0;
             foreach ($scalestoupdate as $scale) {
                 $isancestor = $scale != $catscaleid;
-                $context = $this->updateability($context, $scale, $isancestor);
+                $parentscale = $index == 0 ? null : $scalestoupdate[$index - 1];
+                $index++;
+                $context = $this->updateability($context, $scale, $isancestor, $parentscale);
             }
         } catch (\Exception $e) {
             if ($e->getMessage() === status::ABORT_PERSONABILITY_NOT_CHANGED) {
@@ -139,11 +142,12 @@ class updatepersonability extends preselect_task implements wb_middleware {
      * @param array $context
      * @param int $catscaleid
      * @param bool $isancestor
+     * @param int $parentscale
      *
      * @return mixed
      *
      */
-    private function updateability(array $context, int $catscaleid, $isancestor = false) {
+    private function updateability(array $context, int $catscaleid, $isancestor = false, $parentscale = null) {
         global $CFG;
         $itemparamlist = $this->get_item_param_list(
             $this->userresponses,
@@ -162,7 +166,11 @@ class updatepersonability extends preselect_task implements wb_middleware {
             $updatedability = $this->fallback_ability_update($catscaleid);
             $context['updateabilityfallback'] = true;
         } else {
-            $updatedability = $this->get_updated_ability($this->arrayresponses, $itemparamlist);
+            $startvalue = $context['person_ability'][$catscaleid] ?? 0.1;
+            if ($parentscale) {
+                $startvalue = $context['person_ability'][$parentscale];
+            }
+            $updatedability = catcalc::estimate_person_ability($this->arrayresponses, $itemparamlist, $startvalue);
         }
 
         if (is_nan($updatedability)) {
