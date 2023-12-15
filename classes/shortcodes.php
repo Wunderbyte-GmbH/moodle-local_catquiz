@@ -93,7 +93,7 @@ class shortcodes {
                 ? intval(catscale::return_catscale_by_name($primaryscale)->id) : LOCAL_CATQUIZ_PRIMARYCATSCALE_DEFAULT;
         }
 
-        $hiddenareas = $args['hidden'] ?? [];
+        $hiddenareas = $args['hide'] ?? [];
 
         if ($hiddenareas != []) {
             $areastohide = explode(',', $hiddenareas);
@@ -146,13 +146,10 @@ class shortcodes {
                 $catscaleandchildren[$index]['ischild'] = 1;
             }
         }
-
         $data = [
             'itemtree' => $catscaleandchildren,
         ];
 
-        $template = 'local_catquiz/catscaleshortcodes/catscaleshortcodetable';
-
-        return $OUTPUT->render_from_template($template, $data);
+        return $OUTPUT->render_from_template('local_catquiz/catscaleshortcodes/catscaleshortcodetable', $data);
     }
 }
