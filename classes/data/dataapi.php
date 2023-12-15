@@ -144,21 +144,35 @@ class dataapi {
      * @param integer $parentid
      * @param bool $getsubchildren
      * @param array $catscales
+     * @param bool $returnasarray
+     * @param ?int $catcontext
      * @return array
      */
-    public static function get_catscale_and_children($parentid = 0, bool $getsubchildren = false, $catscales = []) {
+    public static function get_catscale_and_children(
+        $parentid = 0,
+        bool $getsubchildren = false,
+        $catscales = [],
+        $returnasarray = false,
+        $catcontext = null) {
 
         $catscales = empty($catscales) ? self::get_all_catscales() : $catscales;
         $returnarray = [];
 
-        $parentscales = array_filter($catscales, fn($a) => $a->id === $parentid);
-        $parentscale = reset($parentscales);
-        if ($parentscale->parentid == 0) {
+        $parentscales = array_filter($catscales, fn($a) => $a->id == $parentid);
+        if (empty($parentscales)) {
+            $parentscale = new stdClass;
+            $parentcontextid = $catcontext ?? catquiz::get_default_context_id();
             $parentscale->depth = 0;
-            $parentcontextid = $parentscale->contextid;
-        }
+        } else {
+            $parentscale = reset($parentscales);
 
-        $returnarray[$parentscale->id] = $parentscale;
+            if ($parentscale->parentid == 0) {
+                $parentscale->depth = 0;
+                $parentcontextid = $parentscale->contextid;
+            }
+
+            $returnarray[$parentscale->id] = $parentscale;
+        }
 
         foreach ($catscales as $catscale) {
 
@@ -190,7 +204,17 @@ class dataapi {
                 }
             }
         }
-        return $returnarray;
+
+        if ($returnasarray) {
+            $returndata = [];
+            foreach ($returnarray as $catscalestructure) {
+                $catscale = get_object_vars($catscalestructure);
+                $returndata[] = $catscale;
+            }
+            return $returndata;
+        } else {
+            return $returnarray;
+        }
     }
 
     /**
