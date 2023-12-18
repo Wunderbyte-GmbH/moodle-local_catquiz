@@ -809,6 +809,7 @@ class catquiz {
      * @param int $numberofrecords
      * @param int $instanceid
      * @param int $courseid
+     * @param int $userid
      *
      * @return mixed
      *
@@ -816,11 +817,12 @@ class catquiz {
     public static function return_attempt_and_contextid_from_attemptstable(
         int $numberofrecords = 1,
         int $instanceid = 0,
-        int $courseid = 0) {
+        int $courseid = 0,
+        int $userid = -1) {
 
         global $DB;
 
-        $sqlarray = self::return_sql_for_attemptid_contextid($numberofrecords, $instanceid, $courseid);
+        $sqlarray = self::return_sql_for_attemptid_contextid($numberofrecords, $instanceid, $courseid, $userid);
 
         $recordsarray = $DB->get_records_sql($sqlarray[0], $sqlarray[1]);
 
@@ -832,12 +834,14 @@ class catquiz {
      * @param int $numberofrecords
      * @param int $instanceid
      * @param int $courseid
+     * @param int $userid
      * @return array
      */
     private static function return_sql_for_attemptid_contextid(
         int $numberofrecords = 1,
         int $instanceid = 0,
-        int $courseid = 0):array {
+        int $courseid = 0,
+        int $userid = -1):array {
 
         $sql = "SELECT
         attemptid, contextid FROM {local_catquiz_attempts} ";
@@ -853,6 +857,10 @@ class catquiz {
         if (!empty($courseid)) {
             $wherearray[] = ' courseid = :courseid ';
             $params['courseid'] = $courseid;
+        }
+        if ($userid != -1) {
+            $wherearray[] = ' userid = :userid ';
+            $params['userid'] = $userid;
         }
 
         if (count($wherearray) > 0) {

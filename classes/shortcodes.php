@@ -61,12 +61,21 @@ class shortcodes {
      * @return string
      */
     public static function catquizfeedback($shortcode, $args, $content, $env, $next) {
-        global $OUTPUT;
+        global $OUTPUT, $USER, $context;
+
+        // Students get to see only feedback for their own attempts, teacher see all attempts of this course.
+
+        $capability = has_capability('local/catquiz:canmanage', $context, $USER);
+
+        if (!$capability) {
+            $userid = $USER->id;
+        }
 
         $records = catquiz::return_attempt_and_contextid_from_attemptstable(
             intval($args['numberofattempts'] ?? 1),
             intval($args['instanceid'] ?? 0),
-            intval($args['courseid'] ?? 0)
+            intval($args['courseid'] ?? 0),
+            intval($userid ?? -1)
             );
         $output = [
             'attempt' => [],
