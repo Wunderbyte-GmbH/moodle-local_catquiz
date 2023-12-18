@@ -109,12 +109,9 @@ class comparetotestaverage extends feedbackgenerator {
      * @param array $feedbackdata
      */
     public function update_feedbackdata(array $feedbackdata) {
-        // In this case, the update is implemented in the generate feeback class.
+        // In this case, the update is implemented in the generate feedback class.
         $feedbackdata = $this->generate_feedback($feedbackdata, (object)$feedbackdata['quizsettings']);
 
-        // Get excluded names from settings.
-        // Check if whole generator or only certain keys are excluded.
-        // Compare with names for fields and write new array with feedbackkeys only.
         // Exclude feedbackkeys from feedbackdata.
         $feedbackdata = $this->feedbacksettings->hide_defined_elements($feedbackdata, $this->get_generatorname());
         return $feedbackdata;

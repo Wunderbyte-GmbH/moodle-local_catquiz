@@ -80,12 +80,16 @@ class graphicalsummary extends feedbackgenerator {
     protected function get_teacherfeedback(array $feedbackdata): array {
         global $OUTPUT;
 
-        $chart = $this->render_chart($feedbackdata['testprogresschart']);
-        $table = $this->render_table($feedbackdata['testresultstable']);
+        if (isset($feedbackdata['testprogresschart'])) {
+            $chart = $this->render_chart($feedbackdata['testprogresschart']);
+        }
+        if (isset($feedbackdata['testresultstable'])) {
+            $table = $this->render_chart($feedbackdata['testresultstable']);
+        }
 
-        $data['chart'] = $chart;
-        $data['strategyname'] = $feedbackdata['teststrategyname'];
-        $data['table'] = $table;
+        $data['chart'] = $chart ?? "";
+        $data['strategyname'] = $feedbackdata['teststrategyname'] ?? "";
+        $data['table'] = $table ?? "";
 
         $feedback = $OUTPUT->render_from_template(
             'local_catquiz/feedback/graphicalsummary',
@@ -100,6 +104,18 @@ class graphicalsummary extends feedbackgenerator {
                 'content' => $feedback,
             ];
         }
+    }
+
+    /**
+     * For specific feedbackdata defined in generators.
+     *
+     * @param array $feedbackdata
+     */
+    public function update_feedbackdata(array $feedbackdata) {
+
+        // Exclude feedbackkeys from feedbackdata.
+        $feedbackdata = $this->feedbacksettings->hide_defined_elements($feedbackdata, $this->get_generatorname());
+        return $feedbackdata;
     }
 
     /**
@@ -182,12 +198,15 @@ class graphicalsummary extends feedbackgenerator {
             $graphicalsummary[$index - 1]['personability_before'] =
                 $cachedcontexts[$index - 1]['person_ability'][$data['catscaleid']];
         }
-
+        $teststrategyname = get_string(
+            'teststrategy',
+            'local_catquiz',
+            info::get_teststrategy($initialcontext['teststrategy'])
+        ->get_description());
         return [
             'testprogresschart' => $graphicalsummary,
             'testresultstable' => $graphicalsummary,
-            'teststrategyname' => info::get_teststrategy($initialcontext['teststrategy'])
-                ->get_description(),
+            'teststrategyname' => $teststrategyname,
         ];
     }
 
