@@ -457,10 +457,10 @@ class raschbirnbauma extends model_raschmodel {
      * @param float $sd - standard deviation e.g. standard error of distribution
      * @return array<array> - 2nd derivative of TR function with respect to $ip
      */
-    public static function get_log_tr_hessian(array $pp, $mean = 0, float $sd = 1): array {
+    public static function get_ability_tr_hessian(array $pp, $mean = 0, float $sd = 1): array {
 
         return [[
-            (- 1 / ($sd**2)) // Calculate d/dp d/dp.
+            (- 1 / ($sd**2)) // Calculate d/dpp d/dpp.
         ]];
     }
 }
