@@ -80,16 +80,13 @@ class graphicalsummary extends feedbackgenerator {
     protected function get_teacherfeedback(array $feedbackdata): array {
         global $OUTPUT;
 
-        $chart = $this->render_chart($feedbackdata['graphicalsummary']);
-        $table = $this->render_table($feedbackdata['graphicalsummary']);
+        $chart = $this->render_chart($feedbackdata['testprogresschart']);
+        $table = $this->render_table($feedbackdata['testresultstable']);
 
         $data['chart'] = $chart;
-        if (array_key_exists('teststrategyname', $feedbackdata)) {
-            $data['strategyname'] = $feedbackdata['teststrategyname'];
-            $data['hasstrategyname'] = true;
-            $data['hastable'] = $table !== null;
-            $data['table'] = $table;
-        }
+        $data['strategyname'] = $feedbackdata['teststrategyname'];
+        $data['table'] = $table;
+
         $feedback = $OUTPUT->render_from_template(
             'local_catquiz/feedback/graphicalsummary',
             $data
@@ -132,7 +129,11 @@ class graphicalsummary extends feedbackgenerator {
      *
      */
     public function get_required_context_keys(): array {
-        return ['graphicalsummary'];
+        return [
+            'testprogresschart',
+            'testresultstable',
+            'teststrategyname',
+        ];
     }
 
     /**
@@ -183,7 +184,8 @@ class graphicalsummary extends feedbackgenerator {
         }
 
         return [
-            'graphicalsummary' => $graphicalsummary,
+            'testprogresschart' => $graphicalsummary,
+            'testresultstable' => $graphicalsummary,
             'teststrategyname' => info::get_teststrategy($initialcontext['teststrategy'])
                 ->get_description(),
         ];
