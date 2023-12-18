@@ -434,4 +434,33 @@ class raschbirnbauma extends model_raschmodel {
         // Calculate d/da d/da.
         return [[ -1 / ($as ** 2) ]];
     }
+
+     /**
+     * Calculates the 1st derivative trusted regions for person ability
+     *
+     * @param array<float> $pp - person parameter ('ability')
+     * @param float $mean - mean of the estimated destribution
+     * @param float $sd - standard deviation e.g. standard error of distribution
+     * @return array<float> - 1st derivative of TR function with respect to $pp
+     */
+    public static function get_ability_tr_jacobian(array $pp, float, $mean = 0, float $sd = 1): array {
+        return [
+            (($mean - $pp['ability']) / ($sd**2)) // The d/dpp .
+        ];
+    }
+
+    /**
+     * Calculates the 2nd derivative trusted regions for person ability
+     *
+     * @param array<float> $pp - person parameter ('ability')
+     * @param float $mean - mean of the estimated destribution
+     * @param float $sd - standard deviation e.g. standard error of distribution
+     * @return array<array> - 2nd derivative of TR function with respect to $ip
+     */
+    public static function get_log_tr_hessian(array $pp, $mean = 0, float $sd = 1): array {
+
+        return [[
+            (- 1 / ($sd**2)) // Calculate d/da d/da.
+        ]];
+    }
 }
