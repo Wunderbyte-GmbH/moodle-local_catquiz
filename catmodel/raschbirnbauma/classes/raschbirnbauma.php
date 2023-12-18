@@ -460,7 +460,7 @@ class raschbirnbauma extends model_raschmodel {
     public static function get_log_tr_hessian(array $pp, $mean = 0, float $sd = 1): array {
 
         return [[
-            (- 1 / ($sd**2)) // Calculate d/da d/da.
+            (- 1 / ($sd**2)) // Calculate d/dp d/dp.
         ]];
     }
 }
