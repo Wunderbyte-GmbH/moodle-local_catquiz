@@ -177,24 +177,21 @@ class catcontext {
             return self::$catcontexts[$scaleid];
         }
     }
+
     /**
      * Store generated context in singleton array.
      *
      * @param catcontext $catcontext
      * @param int $scaleid
      *
-     * @return self
+     * @return bool
      *
      */
     public static function store_context_as_singleton(catcontext $catcontext, int $scaleid) {
-        if (empty(self::$catcontexts[$scaleid])) {
-            self::$catcontexts[$scaleid] = $catcontext;
-            return true;
-        } else {
-            return false;
-        }
-
+        self::$catcontexts[$scaleid] = $catcontext;
+        return true;
     }
+
     /**
      * Load from DB
      *
