@@ -70,4 +70,14 @@ $capabilities = [
                         'teacher' => CAP_ALLOW,
                 ],
         ],
+        // Capability to feedback of users other than current.
+        'local/catquiz:view_users_feedback' => [
+                'captype' => 'read',
+                'contextlevel' => CONTEXT_SYSTEM,
+                'archetypes' => [
+                        'manager' => CAP_ALLOW,
+                        'editingteacher' => CAP_ALLOW,
+                        'teacher' => CAP_ALLOW,
+                ]
+        ],
 ];

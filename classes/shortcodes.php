@@ -65,7 +65,7 @@ class shortcodes {
 
         // Students get to see only feedback for their own attempts, teacher see all attempts of this course.
 
-        $capability = has_capability('local/catquiz:canmanage', $context, $USER);
+        $capability = has_capability('local/catquiz:view_users_feedback', $context, $USER);
 
         if (!$capability) {
             $userid = $USER->id;

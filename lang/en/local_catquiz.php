@@ -222,6 +222,7 @@ $string['catquizroledescription'] = 'Catquiz Manager';
 $string['catquiz:manage_catcontexts'] = 'Manage Cat contexts';
 $string['catquiz:manage_testenvironments'] = 'Mange test environments';
 $string['catquiz:view_teacher_feedback'] = 'Access teacher feedback';
+$string['catquiz:view_users_feedback'] = 'Access feedback from all users, not only current one.';
 
 // Navbar.
 $string['managecatscales'] = 'Manage CAT scales';

@@ -221,6 +221,7 @@ $string['catquizroledescription'] = 'Catquiz VerwalterIn';
 $string['catquiz:manage_catcontexts'] = 'Verwalte Versionen';
 $string['catquiz:manage_testenvironments'] = 'Verwalte Testumgebungen';
 $string['catquiz:view_teacher_feedback'] = 'Zugriff auf LehrerInnen Feedback';
+$string['catquiz:view_users_feedback'] = 'Zugriff auf Feedback von allen UserInnen, nicht nur dem eigenen.';
 
 // Navbar.
 $string['managecatscales'] = 'Verwalte Skalen';
