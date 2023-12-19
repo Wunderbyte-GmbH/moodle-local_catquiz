@@ -105,7 +105,7 @@ class personabilities extends feedbackgenerator {
             'local_catquiz/feedback/personabilities',
             [
                 'abilities' => $data['feedback_personabilities'],
-                'chartdisplay' => $data['chart'],
+                'chartdisplay' => $data['personabilitychart'],
                 'standarderrorpersubscales' => $data['standarderrorpersubscales'],
                 'progressindividual' => $data['progressindividual'],
                 'progresscomparison' => $data['progresscomparison'],
@@ -297,7 +297,7 @@ class personabilities extends feedbackgenerator {
         return [
             'feedback_personabilities' => $data,
             'standarderrorpersubscales' => $standarderrorpersubscales,
-            'chart' => $chart,
+            'personabilitychart' => $chart,
             'cached_contexts' => $cachedcontexts,
             'progressindividual' => $abilityprogress['individual'],
             'progresscomparison' => $abilityprogress['comparison'],

@@ -33,10 +33,12 @@ The following parameters can be defined:
 * show=questionssummary // Parts of the feedback that are hidden by default can be displayed with the show attribute.
 * hide=comparetotestaverage,chart,pilotquestions // Parts of the feedbacks can be hidden. Either the enitre feedback of a section or keys for certain parts. Generators and subkeys are:
 
-'personabilitites' => [
+'personabilities' => [
     'feedback_personabilities',
     'standarderrorpersubscales',
-    'chart',
+    'personabilitychart',
+    'progressindividual',
+    'progresscomparison',
 ];
 'comparetotestaverage' => [
     'comparisontext', // You performed better than ...
