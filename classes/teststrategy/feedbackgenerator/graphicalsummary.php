@@ -84,7 +84,7 @@ class graphicalsummary extends feedbackgenerator {
             $chart = $this->render_chart($feedbackdata['testprogresschart']);
         }
         if (isset($feedbackdata['testresultstable'])) {
-            $table = $this->render_chart($feedbackdata['testresultstable']);
+            $table = $this->render_table($feedbackdata['testresultstable']);
         }
 
         $data['chart'] = $chart ?? "";
