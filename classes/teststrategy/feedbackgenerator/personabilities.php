@@ -437,8 +437,8 @@ class personabilities extends feedbackgenerator {
 
         $labels = array_keys($userattemptswithnulls);
 
-        $chart->add_series($peerattempts);
         $chart->add_series($userattempts);
+        $chart->add_series($peerattempts);
         $chart->set_labels($labels);
         $out = $OUTPUT->render($chart);
 
