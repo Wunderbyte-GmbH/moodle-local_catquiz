@@ -30,6 +30,7 @@ use local_catquiz\data\dataapi;
 use local_catquiz\output\attemptfeedback;
 use local_catquiz\output\catscalemanager\quizattempts\quizattemptsdisplay;
 use local_catquiz\teststrategy\feedbacksettings;
+use context_course;
 
 /**
  * Deals with local_shortcodes regarding catquiz.
@@ -61,11 +62,11 @@ class shortcodes {
      * @return string
      */
     public static function catquizfeedback($shortcode, $args, $content, $env, $next) {
-        global $OUTPUT, $USER, $context;
+        global $OUTPUT, $COURSE, $USER;
 
         // Students get to see only feedback for their own attempts, teacher see all attempts of this course.
-
-        $capability = has_capability('local/catquiz:view_users_feedback', $context, $USER);
+        $context = context_course::instance($COURSE->id);
+        $capability = has_capability('local/catquiz:view_users_feedback', $context);
 
         if (!$capability) {
             $userid = $USER->id;
