@@ -429,6 +429,9 @@ $string['chartlegendabilityrelative'] = '{$a->difference} Unterschied zur Vergle
 $string['personabilitycharttitle'] = 'Relative Personenfähigkeit in den Subskalen im Vergleich zu {$a}';
 $string['personabilitytitle'] = 'Personenfähigkeit in den Subskalen';
 $string['itemsplayed'] = 'ausgewertete Fragen:';
+$string['personabilityinscale'] = 'Personenfähigkeit für Skala "{$a}"';
+$string['yourscorein'] = 'Ihre "{$a}"-Ergebnisse';
+$string['scoreofpeers'] = 'Mittelwert Ihrer Mit-Studierenden';
 
 // Check display line breaks etc.
 $string['choosesubscaleforfeedback_help'] = 'Für die angezeigten Subskalen können Sie nun {$a} Feedback-Angaben hinterlegen. Wählen Sie die jeweilige (Sub-)Skala an, um Ihr Feedback einzugeben. Die farbigen Symbole zeigen Ihnen den aktuellen Stand der Bearbeitung an, gemessen an den vor Ihnen hinterlegten Anzahl an Feedback-Optionen:

@@ -107,6 +107,8 @@ class personabilities extends feedbackgenerator {
                 'abilities' => $data['feedback_personabilities'],
                 'chartdisplay' => $data['chart'],
                 'standarderrorpersubscales' => $data['standarderrorpersubscales'],
+                'progressindividual' => $data['progressindividual'],
+                'progresscomparison' => $data['progresscomparison'],
             ]
         );
 
@@ -286,14 +288,262 @@ class personabilities extends feedbackgenerator {
             ];
         }
         $chart = $this->render_chart($personabilities, (array)$initialcontext['quizsettings'], $catscales[$selectedscaleid]);
+
+        $abilityprogress = $this->render_abilitiyprogress(
+            (array)$initialcontext,
+            $catscales[$selectedscaleid]);
+
         $standarderrorpersubscales = $quizsettings->catquiz_standarderrorpersubscale ?? "";
         return [
             'feedback_personabilities' => $data,
             'standarderrorpersubscales' => $standarderrorpersubscales,
             'chart' => $chart,
             'cached_contexts' => $cachedcontexts,
+            'progressindividual' => $abilityprogress['individual'],
+            'progresscomparison' => $abilityprogress['comparison'],
         ];
     }
+
+    /**
+     * Render chart for personabilities.
+     *
+     * @param array $initialcontext
+     * @param stdClass $primarycatscale
+     *
+     * @return array
+     *
+     */
+    private function render_abilitiyprogress(array $initialcontext, $primarycatscale) {
+        $userid = $initialcontext['userid'];
+        $endtime = $initialcontext['endtime'];
+        $courseid = $initialcontext['courseid'] ?? null;
+        $attemptid = $initialcontext['attemptid'] ?? null;
+
+        $day = userdate($endtime, '%d');
+        $month = userdate($endtime, '%m');
+        $year = userdate($endtime, '%Y');
+        $start = make_timestamp($year, $month, $day, 0, 0, 0);
+        $end = make_timestamp($year, $month, $day, 23, 59, 59);
+
+        // Compare to other courses.
+        // Find all courses before the end of the day of this attempt.
+        $records = catquiz::get_attempts(
+                null,
+                $initialcontext['catscaleid'],
+                $courseid,
+                $initialcontext['contextid'],
+                null,
+                $end);
+
+        $attemptsofuser = array_filter($records, fn($r) => $r->userid == $userid);
+        $attemptsofpeers = array_filter($records, fn($r) => $r->userid != $userid);
+
+        $progressindividual = $this->render_chart_for_individual_user($attemptsofuser, $primarycatscale);
+        $progresscomparison = $this->render_chart_for_comparison($attemptsofuser, $attemptsofpeers, $primarycatscale);
+        return [
+            'individual' => $progressindividual,
+            'comparison' => $progresscomparison,
+        ];
+
+    }
+
+    /**
+     * Render chart for individual progress.
+     *
+     * @param array $attemptsofuser
+     * @param stdClass $primarycatscale
+     *
+     * @return array
+     *
+     */
+    private function render_chart_for_individual_user(array $attemptsofuser, stdClass $primarycatscale) {
+        global $OUTPUT;
+        $scalename = $primarycatscale->name;
+
+        $chart = new \core\chart_line();
+        $chart->set_smooth(true); // Calling set_smooth() passing true as parameter, will display smooth lines.
+
+        $personabilities = [];
+        foreach ($attemptsofuser as $attempt) {
+            if (isset($attempt->personability_after_attempt)) {
+                $personabilities[] = $attempt->personability_after_attempt;
+            }
+        }
+
+        $chartserie = new \core\chart_series(
+            get_string('personabilityinscale', 'local_catquiz', $scalename),
+            $personabilities
+        );
+
+        $labels = range(1, count($personabilities));
+
+        $chart->add_series($chartserie);
+        $chart->set_labels($labels);
+        $out = $OUTPUT->render($chart);
+
+        return [
+            'chart' => $out,
+            'charttitle' => get_string('progress', 'core'),
+        ];
+
+    }
+
+    /**
+     * Render chart for progress compared to peers and grouped by date.
+     *
+     * @param array $attemptsofuser
+     * @param array $attemptsofpeers
+     * @param stdClass $primarycatscale
+     *
+     * @return array
+     *
+     */
+    private function render_chart_for_comparison(
+        array $attemptsofuser,
+        array $attemptsofpeers,
+        stdClass $primarycatscale) {
+        global $OUTPUT;
+        $scalename = $primarycatscale->name;
+
+        $chart = new \core\chart_line();
+        $chart->set_smooth(true); // Calling set_smooth() passing true as parameter, will display smooth lines.
+
+        $peerattemptsbydate = $this->order_average_attemptresults_by_date($attemptsofpeers);
+        $userattemptsbydate = $this->order_average_attemptresults_by_date($attemptsofuser);
+
+        // Combine keys from both arrays
+        $alldates = array_merge(array_keys($peerattemptsbydate), array_keys($userattemptsbydate));
+        sort($alldates);
+
+        $peerattemptswithnulls = [];
+        $userattemptswithnulls = [];
+        foreach ($alldates as $key) {
+            $peerattemptswithnulls[$key] = array_key_exists($key, $peerattemptsbydate) ? $peerattemptsbydate[$key] : null;
+            $userattemptswithnulls[$key] = array_key_exists($key, $userattemptsbydate) ? $userattemptsbydate[$key] : null;
+        }
+        // To display the chartserie lines connected, we fill empty keys with average.
+        $peerattempts = $this->fill_empty_values_with_average($peerattemptswithnulls);
+        $userattempts = $this->fill_empty_values_with_average($userattemptswithnulls);
+
+        $peerattempts = new \core\chart_series(
+            get_string('scoreofpeers', 'local_catquiz'),
+            array_values($peerattempts)
+        );
+        $peerattempts->set_labels(array_values($peerattemptswithnulls));
+
+        $userattempts = new \core\chart_series(
+            get_string('yourscorein', 'local_catquiz', $scalename),
+            array_values($userattempts)
+        );
+        $userattempts->set_labels(array_values($userattemptswithnulls));
+
+        $labels = array_keys($userattemptswithnulls);
+
+        $chart->add_series($peerattempts);
+        $chart->add_series($userattempts);
+        $chart->set_labels($labels);
+        $out = $OUTPUT->render($chart);
+
+        return [
+            'chart' => $out,
+            'charttitle' => get_string('progress', 'core'),
+        ];
+
+    }
+
+    /**
+     * In order to make the chartvalues connected, we need to calculate averages between entries, if there are no values set.
+     *
+     * @param array $attemptswithnulls
+     *
+     * @return array
+     *
+     */
+    private function fill_empty_values_with_average(array $attemptswithnulls) {
+        $result = [];
+
+        $keys = array_keys($attemptswithnulls);
+
+        foreach ($keys as $key) {
+            // If the current value is null.
+            if ($attemptswithnulls[$key] === null) {
+                // Find the nearest non-null values.
+                $prevkey = array_search($key, $keys) - 1;
+                $nextkey = array_search($key, $keys) + 1;
+
+                $prevvalue = $this->find_non_nullable_value($keys, $prevkey, $attemptswithnulls);
+                $nextvalue = $this->find_non_nullable_value($keys, $nextkey, $attemptswithnulls);
+
+                // Calculate the average of the neighboring values.
+                $average = null;
+
+                if ($prevvalue !== null && $nextvalue !== null) {
+                    $average = ($prevvalue + $nextvalue) / 2;
+                } else if ($prevvalue !== null) {
+                    $average = $prevvalue;
+                } else if ($nextvalue !== null) {
+                    $average = $nextvalue;
+                }
+
+                // Replace the null value with the calculated average.
+                $result[$key] = $average;
+            } else {
+                // If the current value is not null, keep it unchanged.
+                $result[$key] = $attemptswithnulls[$key];
+            }
+        }
+        return $result;
+
+    }
+
+    /**
+     * Return average of personabilities ordered by date of quizattempt.
+     *
+     * @param array $keys
+     * @param string $index
+     * @param array $array
+     *
+     * @return float
+     *
+     */
+    private function find_non_nullable_value(array $keys, string $index, array $array) {
+        while ($index !== false && !array_key_exists($index, $keys)) {
+            $index--;
+        }
+
+        return $index !== false ? $array[$keys[$index]] : null;
+    }
+
+    /**
+     * Return average of personabilities ordered by date of quizattempt.
+     *
+     * @param array $attemptsofuser
+     *
+     * @return array
+     *
+     */
+    private function order_average_attemptresults_by_date(array $attempts) {
+
+        $attemptsbydate = [];
+        foreach ($attempts as $attempt) {
+            $datestring = userdate($attempt->endtime, '%d.%m.%Y');
+            if (!empty($attempt->personability_after_attempt)) {
+                if (!isset($attemptsbydate[$datestring])) {
+                    $attemptsbydate[$datestring] = [];
+                }
+                $attemptsbydate[$datestring][] = $attempt->personability_after_attempt;
+            }
+        }
+        // Calculate average personability of this day.
+        foreach ($attemptsbydate as $date => $attempt) {
+            $floats = array_map('floatval', $attempt);
+            $average = count($floats) > 0 ? array_sum($floats) / count($floats) : $attempt;
+            $attemptsbydate[$date] = $average;
+        }
+        return $attemptsbydate;
+
+    }
+
 
     /**
      * Render chart for personabilities.

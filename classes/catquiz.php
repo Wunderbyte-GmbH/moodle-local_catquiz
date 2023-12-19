@@ -1554,4 +1554,56 @@ class catquiz {
 
         return $questions;
     }
+
+    /** Get all quizattempts corresponding to given params.
+     * @param int $userid
+     * @param int $catscaleid
+     * @param int $courseid
+     * @param int $contextid
+     * @param int $starttime
+     * @param int $endtime
+     * @return array
+     */
+    public static function get_attempts(
+            int $userid = null,
+            int $catscaleid = null,
+            int $courseid = null,
+            int $contextid = null,
+            int $starttime = null,
+            int $endtime = null) {
+        global $DB;
+
+        $sql = "SELECT * FROM {local_catquiz_attempts} WHERE 1=1";
+
+        if (!is_null($userid)) {
+            $sql .= " AND userid = :userid";
+        }
+        if (!is_null($catscaleid)) {
+            $sql .= " AND scaleid = :catscaleid";
+        }
+        if (!is_null($courseid)) {
+            $sql .= " AND courseid = :courseid";
+        }
+        if (!is_null($contextid)) {
+            $sql .= " AND contextid = :contextid";
+        }
+        if (!is_null($starttime)) {
+            $sql .= " AND timecreated >= :starttime";
+        }
+        if (!is_null($endtime)) {
+            $sql .= " AND timecreated <= :endtime";
+        }
+
+        $params = array(
+            'userid' => $userid,
+            'catscaleid' => $catscaleid,
+            'courseid' => $courseid,
+            'contextid' => $contextid,
+            'starttime' => $starttime,
+            'endtime' => $endtime,
+        );
+
+        $records = $DB->get_records_sql($sql, $params);
+        return $records;
+    }
 }

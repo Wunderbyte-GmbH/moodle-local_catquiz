@@ -432,6 +432,9 @@ $string['chartlegendabilityrelative'] = '{$a->difference} (Compared to parentsca
 $string['personabilitycharttitle'] = 'Relative personability in subscales compared to {$a}';
 $string['personabilitytitle'] = 'Personability in subscales';
 $string['itemsplayed'] = 'Item(s) played';
+$string['personabilityinscale'] = 'Personability in scale "{$a}"';
+$string['yourscorein'] = 'Your scores in "{$a}"';
+$string['scoreofpeers'] = 'Average of your peers';
 
 // Check display line breaks etc.
 $string['choosesubscaleforfeedback_help'] = 'You can now store <number of options> feedback informations for the subscales displayed. Select a (sub-)scale to enter your feedback. The colored symbols indicate the current status of processing, measured by the number of feedback options you entered:
