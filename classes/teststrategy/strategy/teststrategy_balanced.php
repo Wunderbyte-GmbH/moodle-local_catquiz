@@ -31,6 +31,8 @@ use local_catquiz\teststrategy\feedbackgenerator\personabilities;
 use local_catquiz\teststrategy\feedbackgenerator\pilotquestions;
 use local_catquiz\teststrategy\feedbackgenerator\questionssummary;
 use local_catquiz\teststrategy\feedbacksettings;
+use local_catquiz\teststrategy\preselect_task\addscalestandarderror;
+use local_catquiz\teststrategy\preselect_task\fisherinformation;
 use local_catquiz\teststrategy\preselect_task\lasttimeplayedpenalty;
 use local_catquiz\teststrategy\preselect_task\maximumquestionscheck;
 use local_catquiz\teststrategy\preselect_task\maybe_return_pilot;
@@ -77,6 +79,8 @@ class teststrategy_balanced extends strategy {
             lasttimeplayedpenalty::class,
             numberofgeneralattempts::class,
             maybe_return_pilot::class,
+            fisherinformation::class,
+            addscalestandarderror::class,
             strategybalancedscore::class,
         ];
     }
