@@ -53,6 +53,11 @@ class attemptfeedback implements renderable, templatable {
     /**
      * @var ?int
      */
+    public int $courseid;
+
+    /**
+     * @var ?int
+     */
     public int $teststrategy;
 
     /**
@@ -71,12 +76,14 @@ class attemptfeedback implements renderable, templatable {
      * @param int $attemptid
      * @param int $contextid
      * @param ?feedbacksettings $feedbacksettings
+     * @param int $courseid
      *
      */
     public function __construct(
         int $attemptid,
         int $contextid = 0,
-        ?feedbacksettings $feedbacksettings = null) {
+        ?feedbacksettings $feedbacksettings = null,
+        $courseid = null) {
         global $USER;
         if ($attemptid === 0) {
             // This can still return nothing. In that case, we show a message that the user has no attempts yet.
@@ -85,6 +92,10 @@ class attemptfeedback implements renderable, templatable {
             }
         }
         $this->attemptid = $attemptid;
+
+        if (!empty($courseid)) {
+            $this->courseid = $courseid;
+        }
 
         if (!$testenvironment = catquiz::get_testenvironment_by_attemptid($attemptid)) {
             return;
@@ -129,6 +140,7 @@ class attemptfeedback implements renderable, templatable {
         $context = [
             'attemptid' => $this->attemptid,
             'contextid' => $this->contextid,
+            'courseid' => $this->courseid ?? 0,
             'needsimprovementthreshold' => 0, // TODO: Get the quantile threshold from the quiz settings.
             'userid' => $USER->id,
             'catscaleid' => $this->catscaleid,

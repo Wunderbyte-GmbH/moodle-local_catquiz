@@ -723,10 +723,10 @@ class catquiz_handler {
         stdClass $adaptivequiz,
         cm_info $cm,
         stdClass $attemptrecord): string {
-        global $OUTPUT;
+        global $OUTPUT, $COURSE;
         $contextid = optional_param('context', 0, PARAM_INT);
 
-        $attemptfeedback = new attemptfeedback($attemptrecord->id, $contextid);
+        $attemptfeedback = new attemptfeedback($attemptrecord->id, $contextid, null, $COURSE->id);
         $data = $attemptfeedback->export_for_template($OUTPUT);
 
         // We need to delete caches.

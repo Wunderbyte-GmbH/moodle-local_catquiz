@@ -1487,6 +1487,7 @@ class catquiz {
         $data->timemodified = $now;
         $data->timecreated = $now;
 
+        $attemptdata['courseid'] = $courseandinstance['courseid'];
         $data->json = json_encode($attemptdata);
 
         $id = $DB->insert_record('local_catquiz_attempts', (object)$data);

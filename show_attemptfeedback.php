@@ -27,7 +27,7 @@ use local_catquiz\output\attemptfeedback;
 
 require_once('../../config.php');
 
-global $USER, $OUTPUT;
+global $USER, $OUTPUT, $COURSE;
 $context = \context_system::instance();
 $PAGE->set_context($context);
 require_login();
@@ -35,8 +35,9 @@ require_capability('local/catquiz:manage_catscales', $context);
 
 $attemptid = optional_param('attemptid', 0, PARAM_INT);
 $contextid = optional_param('contextid', 0, PARAM_INT);
+$courseid = $COURSE->id;
 
-$attemptfeedback = new attemptfeedback($attemptid, $contextid);
+$attemptfeedback = new attemptfeedback($attemptid, $contextid, null, $courseid);
 
 $PAGE->set_url(new moodle_url('/local/catquiz/show_attemptfeedback.php', []));
 
