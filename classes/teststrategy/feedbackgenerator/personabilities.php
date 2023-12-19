@@ -291,7 +291,7 @@ class personabilities extends feedbackgenerator {
 
         $abilityprogress = $this->render_abilitiyprogress(
             (array)$initialcontext,
-            $catscales[$selectedscaleid]);
+            $catscales[$catscaleid]);
 
         $standarderrorpersubscales = $quizsettings->catquiz_standarderrorpersubscale ?? "";
         return [
@@ -316,13 +316,11 @@ class personabilities extends feedbackgenerator {
     private function render_abilitiyprogress(array $initialcontext, $primarycatscale) {
         $userid = $initialcontext['userid'];
         $endtime = $initialcontext['endtime'];
-        $courseid = $initialcontext['courseid'] ?? null;
-        $attemptid = $initialcontext['attemptid'] ?? null;
+        $courseid = empty($initialcontext['courseid']) ? null : $initialcontext['courseid'];
 
         $day = userdate($endtime, '%d');
         $month = userdate($endtime, '%m');
         $year = userdate($endtime, '%Y');
-        $start = make_timestamp($year, $month, $day, 0, 0, 0);
         $end = make_timestamp($year, $month, $day, 23, 59, 59);
 
         // Compare to other courses.
@@ -411,7 +409,7 @@ class personabilities extends feedbackgenerator {
         $peerattemptsbydate = $this->order_average_attemptresults_by_date($attemptsofpeers);
         $userattemptsbydate = $this->order_average_attemptresults_by_date($attemptsofuser);
 
-        // Combine keys from both arrays
+        // Combine keys from both arrays.
         $alldates = array_merge(array_keys($peerattemptsbydate), array_keys($userattemptsbydate));
         sort($alldates);
 
