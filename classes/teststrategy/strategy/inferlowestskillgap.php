@@ -32,6 +32,7 @@ use local_catquiz\teststrategy\feedbackgenerator\personabilities;
 use local_catquiz\teststrategy\feedbackgenerator\questionssummary;
 use local_catquiz\teststrategy\feedbacksettings;
 use local_catquiz\teststrategy\preselect_task\addscalestandarderror;
+use local_catquiz\teststrategy\preselect_task\filterbystandarderror;
 use local_catquiz\teststrategy\preselect_task\filterforsubscale;
 use local_catquiz\teststrategy\preselect_task\firstquestionselector;
 use local_catquiz\teststrategy\preselect_task\fisherinformation;
@@ -88,6 +89,7 @@ class inferlowestskillgap extends strategy {
             noremainingquestions::class, // Cancel quiz attempt if no questions are left.
             // Keep only questions that are assigned to the subscale where the user has the lowest ability.
             addscalestandarderror::class,
+            filterbystandarderror::class,
             filterforsubscale::class,
             strategyfastestscore::class,
         ];
