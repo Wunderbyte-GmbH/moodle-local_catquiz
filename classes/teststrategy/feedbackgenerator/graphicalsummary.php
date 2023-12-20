@@ -111,7 +111,7 @@ class graphicalsummary extends feedbackgenerator {
      *
      * @param array $feedbackdata
      */
-    public function update_feedbackdata(array $feedbackdata) {
+    public function apply_settings_to_feedbackdata(array $feedbackdata) {
 
         // Exclude feedbackkeys from feedbackdata.
         $feedbackdata = $this->feedbacksettings->hide_defined_elements($feedbackdata, $this->get_generatorname());

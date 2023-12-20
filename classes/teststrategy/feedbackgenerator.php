@@ -88,7 +88,7 @@ abstract class feedbackgenerator {
      *
      * @param array $feedbackdata
      */
-    public function update_feedbackdata(array $feedbackdata) {
+    public function apply_settings_to_feedbackdata(array $feedbackdata) {
         return $feedbackdata;
     }
 
@@ -106,7 +106,7 @@ abstract class feedbackgenerator {
             return $this->no_data();
         }
 
-        $feedbackdata = $this->update_feedbackdata($feedbackdata);
+        $feedbackdata = $this->apply_settings_to_feedbackdata($feedbackdata);
 
         $studentfeedback = $this->get_studentfeedback($feedbackdata);
         if (! $this->isvalidfeedback($studentfeedback)) {

@@ -80,7 +80,7 @@ class personabilities extends feedbackgenerator {
      *
      * @param array $feedbackdata
      */
-    public function update_feedbackdata(array $feedbackdata) {
+    public function apply_settings_to_feedbackdata(array $feedbackdata) {
         // In this case, the update via settings is implemented in the generate feedback class.
         $feedbackdata = $this->generate_feedback(
                 $feedbackdata,

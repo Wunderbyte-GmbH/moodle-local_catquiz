@@ -113,7 +113,7 @@ class questionssummary extends feedbackgenerator {
      *
      * @param array $feedbackdata
      */
-    public function update_feedbackdata(array $feedbackdata) {
+    public function apply_settings_to_feedbackdata(array $feedbackdata) {
         // Get excluded names from settings.
         // Check if whole generator or only certain keys are excluded.
         // Compare with names for fields and write new array with feedbackkeys only.
