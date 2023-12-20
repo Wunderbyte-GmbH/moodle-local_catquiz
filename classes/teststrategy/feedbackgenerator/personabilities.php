@@ -672,7 +672,7 @@ class personabilities extends feedbackgenerator {
     /**
      * Return average of personabilities ordered by date of quizattempt.
      *
-     * @param array $attemptsofuser
+     * @param array $attempts
      * @param int $scaleid
      * @param int $timerange
      *
