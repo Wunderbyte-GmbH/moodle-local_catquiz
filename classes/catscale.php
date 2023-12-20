@@ -65,7 +65,9 @@ class catscale {
      */
     public function __construct(int $catscaleid) {
 
-        $this->catscale = self::return_catscale_object($catscaleid);
+        $catscale = self::return_catscale_object($catscaleid);
+        $this->catscale = $catscale;
+        return $catscale;
     }
 
     /**
@@ -381,7 +383,7 @@ class catscale {
         }
 
         $cache = cache::make('local_catquiz', 'adaptivequizattempt');
-        $cachekey = sprintf('testitems_%s_%s', $contextid, $includesubscales);
+        $cachekey = sprintf('testitems_%s_%s_%s', $contextid, $includesubscales, $this->catscale->id);
         if ($testitems = $cache->get($cachekey)) {
             return $testitems;
         }
@@ -416,13 +418,14 @@ class catscale {
      * @param int $contextid
      * @param mixed $question
      * @param bool $includesubscales
+     * @param mixed $catscaleid
      *
      * @return void
      *
      */
-    public static function update_testitem(int $contextid, $question, $includesubscales = false) {
+    public static function update_testitem(int $contextid, $question, $catscaleid, $includesubscales = false) {
         $cache = cache::make('local_catquiz', 'adaptivequizattempt');
-        $cachekey = sprintf('testitems_%s_%s', $contextid, $includesubscales);
+        $cachekey = sprintf('testitems_%s_%s_%s', $contextid, $includesubscales, $catscaleid);
         // This should never happen...
         if (!$testitems = $cache->get($cachekey)) {
             throw new moodle_exception(
