@@ -1595,14 +1595,14 @@ class catquiz {
             $sql .= " AND timecreated <= :endtime";
         }
         $sql .= " ORDER BY endtime ASC";
-        $params = array(
+        $params = [
             'userid' => $userid,
             'catscaleid' => $catscaleid,
             'courseid' => $courseid,
             'contextid' => $contextid,
             'starttime' => $starttime,
             'endtime' => $endtime,
-        );
+        ];
 
         $records = $DB->get_records_sql($sql, $params);
         return $records;
