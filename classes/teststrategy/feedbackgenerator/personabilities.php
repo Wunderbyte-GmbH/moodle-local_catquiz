@@ -26,6 +26,7 @@ namespace local_catquiz\teststrategy\feedbackgenerator;
 
 use cache;
 use core\chart_bar;
+use core\chart_line;
 use core\chart_series;
 use local_catquiz\catquiz;
 use local_catquiz\catscale;
@@ -33,6 +34,7 @@ use local_catquiz\feedback\feedbackclass;
 use local_catquiz\output\catscalemanager\questions\cards\questionpreview;
 use local_catquiz\teststrategy\feedbackgenerator;
 use local_catquiz\teststrategy\feedbacksettings;
+use local_catquiz\local\model\model_strategy;
 use stdClass;
 
 /**
@@ -109,6 +111,7 @@ class personabilities extends feedbackgenerator {
                 'standarderrorpersubscales' => $data['standarderrorpersubscales'],
                 'progressindividual' => $data['progressindividual'],
                 'progresscomparison' => $data['progresscomparison'],
+                'abilityprofile' => $data['abilityprofile'],
             ]
         );
 
@@ -295,6 +298,7 @@ class personabilities extends feedbackgenerator {
             (array)$initialcontext,
             $catscales[$selectedscaleid]);
 
+        $abilityprofile = $this->render_abilityprofile_chart((array)$initialcontext, $catscales[$selectedscaleid]);
         $standarderrorpersubscales = $quizsettings->catquiz_standarderrorpersubscale ?? "";
         return [
             'feedback_personabilities' => $data,
@@ -303,6 +307,86 @@ class personabilities extends feedbackgenerator {
             'cached_contexts' => $cachedcontexts,
             'progressindividual' => $abilityprogress['individual'],
             'progresscomparison' => $abilityprogress['comparison'],
+            'abilityprofile' => $abilityprofile,
+        ];
+    }
+
+    /**
+     * Render chart for histogram of personabilities.
+     *
+     * @param array $initialcontext
+     * @param stdClass $primarycatscale
+     *
+     * @return array
+     *
+     */
+    private function render_abilityprofile_chart(array $initialcontext, $primarycatscale) {
+        global $OUTPUT;
+
+        $abilitysteps = [];
+        for ($i = LOCAL_CATQUIZ_PERSONABILITY_LOWER_LIMIT + 0.25; $i <= LOCAL_CATQUIZ_PERSONABILITY_UPPER_LIMIT - 0.25; $i += 0.5) {
+            $abilitysteps[] = $i;
+        }
+
+        $catscale = new catscale($primarycatscale->id);
+        $items = $catscale->get_testitems($initialcontext['contextid'], true);
+
+        $models = model_strategy::get_installed_models();
+
+        $fisherinfos = [];
+        foreach ($items as $item) {
+            $key = $item->model;
+            $model = $models[$key] ?? $models['raschbirnbaumb'];
+            foreach ($model::get_parameter_names() as $paramname) {
+                $params[$paramname] = floatval($item->$paramname);
+            }
+            foreach ($abilitysteps as $ability) {
+                $fisherinformation = $model::fisher_info(
+                    ['ability' => $ability],
+                    $params
+                );
+                $stringkey = strval($ability);
+
+                if (!isset($fisherinfos[$stringkey])) {
+                    $fisherinfos[$stringkey] = $fisherinformation;
+                } else {
+                    $fisherinfos[$stringkey] += $fisherinformation;
+                }
+            }
+
+        }
+
+        $chart = new chart_bar();
+        $chartseries = [];
+        $chartseries['series'] = [];
+        $chartseries['labels'] = [];
+
+        // This needs to be done with chart_bar.
+        // foreach ($fisherinfos as $ability => $fisherinfo) {
+        //     $value = round($fisherinfo, 2);
+        //     $series = new chart_series($ability, [0 => $value]);
+        //     //$series->set_fill(true);
+        //     $series->set_labels([0 => $ability]);
+
+        //     $colorvalue = $this->get_color_for_personabily(
+        //         $initialcontext['quizsettings'],
+        //         floatval($ability),
+        //         floatval($primarycatscale->id)
+        //     );
+        //     $series->set_colors([0 => $colorvalue]);
+        //     $chart->add_series($series);
+        //     $chart->set_labels([0 => get_string('abilityprofile', 'local_catquiz', $primarycatscale->name)]);
+        // };
+
+        // Could be done with chart_lines to add other line.
+        $series = new chart_series("mathe-score", array_values($fisherinfos));
+        $chart->add_series($series);
+        $chart->set_labels(array_keys($fisherinfos));
+
+        $out = $OUTPUT->render($chart);
+        return [
+            'chart' => $out,
+            'charttitle' => get_string('abilityprofile', 'local_catquiz', $primarycatscale->name),
         ];
     }
 
