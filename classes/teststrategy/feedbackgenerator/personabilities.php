@@ -287,11 +287,13 @@ class personabilities extends feedbackgenerator {
                 'tooltiptitle' => $tooltiptitle,
             ];
         }
+        // The chart showing all present personabilities in relation to each other.
         $chart = $this->render_chart($personabilities, (array)$initialcontext['quizsettings'], $catscales[$selectedscaleid]);
 
+        // The charts showing past and present personabilities (in relation to peers).
         $abilityprogress = $this->render_abilitiyprogress(
             (array)$initialcontext,
-            $catscales[$catscaleid]);
+            $catscales[$selectedscaleid]);
 
         $standarderrorpersubscales = $quizsettings->catquiz_standarderrorpersubscale ?? "";
         return [
@@ -315,7 +317,7 @@ class personabilities extends feedbackgenerator {
      */
     private function render_abilitiyprogress(array $initialcontext, $primarycatscale) {
         $userid = $initialcontext['userid'];
-        $endtime = $initialcontext['endtime'];
+        $endtime = intval($initialcontext['endtime']);
         $courseid = empty($initialcontext['courseid']) ? null : $initialcontext['courseid'];
 
         $day = userdate($endtime, '%d');
@@ -332,17 +334,51 @@ class personabilities extends feedbackgenerator {
                 $initialcontext['contextid'],
                 null,
                 $end);
+        // Compare records to define range for average.
+        $startingrecord = reset($records);
+        $beginningoftimerange = intval($startingrecord->endtime);
+        $timerange = $this->get_timerange_for_average($beginningoftimerange, $endtime);
 
         $attemptsofuser = array_filter($records, fn($r) => $r->userid == $userid);
         $attemptsofpeers = array_filter($records, fn($r) => $r->userid != $userid);
 
         $progressindividual = $this->render_chart_for_individual_user($attemptsofuser, $primarycatscale);
-        $progresscomparison = $this->render_chart_for_comparison($attemptsofuser, $attemptsofpeers, $primarycatscale);
+        $progresscomparison = $this->render_chart_for_comparison(
+                $attemptsofuser,
+                $attemptsofpeers,
+                $primarycatscale,
+                $timerange,
+                [$beginningoftimerange, $endtime]);
         return [
             'individual' => $progressindividual,
             'comparison' => $progresscomparison,
         ];
 
+    }
+    /**
+     * Return value to define range of time average.
+     *
+     * @param int $beginningoftimerange
+     * @param int $endtime
+     *
+     * @return int
+     *
+     */
+    private function get_timerange_for_average(int $beginningoftimerange, int $endtime) {
+        $differenceindays = ($endtime - $beginningoftimerange) / (60 * 60 * 24);
+        $range = LOCAL_CATQUIZ_TIMERANGE_DAY;
+
+        if ($differenceindays <= 30) {
+            $range = LOCAL_CATQUIZ_TIMERANGE_DAY;
+        } else if ($differenceindays > 30 && $differenceindays <= 183) {
+            $range = LOCAL_CATQUIZ_TIMERANGE_WEEK;
+        } else if ($differenceindays > 183 && $differenceindays <= 730) {
+            $range = LOCAL_CATQUIZ_TIMERANGE_MONTH;
+        } else {
+            $range = LOCAL_CATQUIZ_TIMERANGE_QUARTEROFYEAR;
+        }
+
+         return $range;
     }
 
     /**
@@ -357,14 +393,16 @@ class personabilities extends feedbackgenerator {
     private function render_chart_for_individual_user(array $attemptsofuser, stdClass $primarycatscale) {
         global $OUTPUT;
         $scalename = $primarycatscale->name;
+        $scaleid = $primarycatscale->id;
 
         $chart = new \core\chart_line();
         $chart->set_smooth(true); // Calling set_smooth() passing true as parameter, will display smooth lines.
 
         $personabilities = [];
         foreach ($attemptsofuser as $attempt) {
-            if (isset($attempt->personability_after_attempt)) {
-                $personabilities[] = $attempt->personability_after_attempt;
+            $data = json_decode($attempt->json);
+            if (isset($data->personabilities->$scaleid)) {
+                $personabilities[] = $data->personabilities->$scaleid;
             }
         }
 
@@ -392,6 +430,8 @@ class personabilities extends feedbackgenerator {
      * @param array $attemptsofuser
      * @param array $attemptsofpeers
      * @param stdClass $primarycatscale
+     * @param int $timerange
+     * @param array $beginningandendofrange
      *
      * @return array
      *
@@ -399,43 +439,60 @@ class personabilities extends feedbackgenerator {
     private function render_chart_for_comparison(
         array $attemptsofuser,
         array $attemptsofpeers,
-        stdClass $primarycatscale) {
+        stdClass $primarycatscale,
+        int $timerange,
+        array $beginningandendofrange) {
         global $OUTPUT;
         $scalename = $primarycatscale->name;
+        $scaleid = $primarycatscale->id;
 
         $chart = new \core\chart_line();
         $chart->set_smooth(true); // Calling set_smooth() passing true as parameter, will display smooth lines.
 
-        $peerattemptsbydate = $this->order_average_attemptresults_by_date($attemptsofpeers);
-        $userattemptsbydate = $this->order_average_attemptresults_by_date($attemptsofuser);
+        $pa = $this->order_average_attemptresults_by_timerange($attemptsofpeers, $scaleid, $timerange);
+        $ua = $this->order_average_attemptresults_by_timerange($attemptsofuser, $scaleid, $timerange);
 
-        // Combine keys from both arrays.
-        $alldates = array_merge(array_keys($peerattemptsbydate), array_keys($userattemptsbydate));
-        sort($alldates);
+        $alldates = $this->get_timerangekeys($timerange, $beginningandendofrange);
+        $peerattemptsbydate = [];
+        $userattemptsbydate = [];
+        $firstvalue = true;
+        foreach ($alldates as $index => $key) {
 
-        $peerattemptswithnulls = [];
-        $userattemptswithnulls = [];
-        foreach ($alldates as $key) {
-            $peerattemptswithnulls[$key] = array_key_exists($key, $peerattemptsbydate) ? $peerattemptsbydate[$key] : null;
-            $userattemptswithnulls[$key] = array_key_exists($key, $userattemptsbydate) ? $userattemptsbydate[$key] : null;
+            if (!isset($pa[$key]) && !isset($ua[$key]) && $firstvalue) {
+                unset($alldates[$index]);
+                continue;
+            }
+            $firstvalue = false;
+            if (isset($pa[$key])) {
+                $peerattemptsbydate[$key] = $pa[$key];
+            } else {
+                $peerattemptsbydate[$key] = null;
+            }
+
+            if (isset($ua[$key])) {
+                $userattemptsbydate[$key] = $ua[$key];
+            } else {
+                $userattemptsbydate[$key] = null;
+            }
         }
+
         // To display the chartserie lines connected, we fill empty keys with average.
-        $peerattempts = $this->fill_empty_values_with_average($peerattemptswithnulls);
-        $userattempts = $this->fill_empty_values_with_average($userattemptswithnulls);
+        $peerattempts = $this->fill_empty_values_with_average($peerattemptsbydate);
+        $userattempts = $this->fill_empty_values_with_average($userattemptsbydate);
 
         $peerattempts = new \core\chart_series(
             get_string('scoreofpeers', 'local_catquiz'),
             array_values($peerattempts)
         );
-        $peerattempts->set_labels(array_values($peerattemptswithnulls));
+        $peerattempts->set_labels(array_values($peerattemptsbydate));
 
         $userattempts = new \core\chart_series(
             get_string('yourscorein', 'local_catquiz', $scalename),
             array_values($userattempts)
         );
-        $userattempts->set_labels(array_values($userattemptswithnulls));
+        $userattempts->set_labels(array_values($userattemptsbydate));
 
-        $labels = array_keys($userattemptswithnulls);
+        $labels = array_values($alldates);
 
         $chart->add_series($userattempts);
         $chart->add_series($peerattempts);
@@ -465,16 +522,11 @@ class personabilities extends feedbackgenerator {
         foreach ($keys as $key) {
             // If the current value is null.
             if ($attemptswithnulls[$key] === null) {
-                // Find the nearest non-null values.
-                $prevkey = array_search($key, $keys) - 1;
-                $nextkey = array_search($key, $keys) + 1;
+                $neighborvalues = $this->find_non_nullable_value($keys, $attemptswithnulls, $key);
+                $prevvalue = $neighborvalues['prevvalue'];
+                $nextvalue = $neighborvalues['nextvalue'];
 
-                $prevvalue = $this->find_non_nullable_value($keys, $prevkey, $attemptswithnulls);
-                $nextvalue = $this->find_non_nullable_value($keys, $nextkey, $attemptswithnulls);
-
-                // Calculate the average of the neighboring values.
                 $average = null;
-
                 if ($prevvalue !== null && $nextvalue !== null) {
                     $average = ($prevvalue + $nextvalue) / 2;
                 } else if ($prevvalue !== null) {
@@ -498,50 +550,152 @@ class personabilities extends feedbackgenerator {
      * Return average of personabilities ordered by date of quizattempt.
      *
      * @param array $keys
-     * @param string $index
-     * @param array $array
+     * @param array $attemptswithnulls
+     * @param string $key
      *
      * @return float
      *
      */
-    private function find_non_nullable_value(array $keys, string $index, array $array) {
-        while ($index !== false && !array_key_exists($index, $keys)) {
-            $index--;
+    private function find_non_nullable_value(array $keys, array $attemptswithnulls, string $key) {
+
+        if (!empty($attemptswithnulls[$key])) {
+            return $attemptswithnulls[$key];
+        }
+        $prevkey = null;
+        $nextkey = null;
+        $stop = false;
+        foreach ($keys as $k) {
+            if (!empty($attemptswithnulls[$k])) {
+                $pk = $k;
+            }
+            if ($key == $k) {
+                $prevkey = $pk ?? null;
+                $stop = true;
+                continue;
+            }
+            if ($stop) {
+                $nextkey = $k;
+                break;
+            }
         }
 
-        return $index !== false ? $array[$keys[$index]] : null;
+        return [
+            'prevvalue' => $attemptswithnulls[$prevkey] ?? null,
+            'nextvalue' => $attemptswithnulls[$nextkey],
+        ];
     }
 
     /**
      * Return average of personabilities ordered by date of quizattempt.
      *
      * @param array $attemptsofuser
+     * @param int $scaleid
+     * @param int $timerange
      *
      * @return array
      *
      */
-    private function order_average_attemptresults_by_date(array $attempts) {
+    private function order_average_attemptresults_by_timerange(array $attempts, int $scaleid, int $timerange) {
 
-        $attemptsbydate = [];
+        $attemptsbytimerange = [];
+
+        switch ($timerange) {
+            case LOCAL_CATQUIZ_TIMERANGE_DAY:
+                $dateformat = '%d.%m.%Y';
+                $stringfordate = 'day';
+                break;
+            case LOCAL_CATQUIZ_TIMERANGE_WEEK:
+                $dateformat = '%W';
+                $stringfordate = 'week';
+                break;
+            case LOCAL_CATQUIZ_TIMERANGE_MONTH:
+                $dateformat = '%m';
+                $stringfordate = 'month';
+                break;
+            case LOCAL_CATQUIZ_TIMERANGE_QUARTEROFYEAR:
+                $dateformat = '%m';
+                $stringfordate = 'quarter';
+                break;
+        }
+
         foreach ($attempts as $attempt) {
-            $datestring = userdate($attempt->endtime, '%d.%m.%Y');
-            if (!empty($attempt->personability_after_attempt)) {
-                if (!isset($attemptsbydate[$datestring])) {
-                    $attemptsbydate[$datestring] = [];
+            $data = json_decode($attempt->json);
+            $date = userdate($attempt->endtime, $dateformat);
+            if ($timerange === LOCAL_CATQUIZ_TIMERANGE_QUARTEROFYEAR) {
+                $date = ceil($date / 3);
+            };
+            if ($timerange === LOCAL_CATQUIZ_TIMERANGE_MONTH) {
+                $datestring = get_string('stringdate:month:' . $date, 'local_catquiz');
+            } else {
+                $datestring = get_string('stringdate:' . $stringfordate, 'local_catquiz', $date);
+            }
+
+            if (!empty($data->personabilities->$scaleid)) {
+                if (!isset($attemptsbytimerange[$datestring])) {
+                    $attemptsbytimerange[$datestring] = [];
                 }
-                $attemptsbydate[$datestring][] = $attempt->personability_after_attempt;
+                $attemptsbytimerange[$datestring][] = $data->personabilities->$scaleid;
             }
         }
-        // Calculate average personability of this day.
-        foreach ($attemptsbydate as $date => $attempt) {
+        // Calculate average personability of this period.
+        foreach ($attemptsbytimerange as $date => $attempt) {
             $floats = array_map('floatval', $attempt);
             $average = count($floats) > 0 ? array_sum($floats) / count($floats) : $attempt;
-            $attemptsbydate[$date] = $average;
+            $attemptsbytimerange[$date] = $average;
         }
-        return $attemptsbydate;
-
+        return $attemptsbytimerange;
     }
 
+    /**
+     * Return keys for all moments in defined timerange.
+     *
+     * @param int $timerange
+     * @param array $beginningandendofrange
+     *
+     * @return array
+     *
+     */
+    private function get_timerangekeys($timerange, $beginningandendofrange) {
+        switch ($timerange) {
+            case LOCAL_CATQUIZ_TIMERANGE_DAY:
+                $dateformat = '%d.%m.%Y';
+                $stringfordate = 'day';
+                break;
+            case LOCAL_CATQUIZ_TIMERANGE_WEEK:
+                $dateformat = '%W';
+                $stringfordate = 'week';
+                break;
+            case LOCAL_CATQUIZ_TIMERANGE_MONTH:
+                $dateformat = '%m';
+                $stringfordate = 'month';
+                break;
+            case LOCAL_CATQUIZ_TIMERANGE_QUARTEROFYEAR:
+                $dateformat = '%m';
+                $stringfordate = 'quarter';
+                break;
+        }
+
+        $result = [];
+        $currenttimestamp = $beginningandendofrange[0];
+        $endtimestamp = $beginningandendofrange[1];
+
+        while ($currenttimestamp <= $endtimestamp) {
+            $date = userdate($currenttimestamp, $dateformat);
+
+            if ($timerange === LOCAL_CATQUIZ_TIMERANGE_QUARTEROFYEAR) {
+                $date = ceil($date / 3);
+            };
+            if ($timerange === LOCAL_CATQUIZ_TIMERANGE_MONTH) {
+                $result[] = get_string('stringdate:month:' . $date, 'local_catquiz');
+            } else {
+                $result[] = get_string('stringdate:' . $stringfordate, 'local_catquiz', $date);
+            }
+
+            $currenttimestamp = strtotime('+1 day', $currenttimestamp);
+        }
+
+        return array_unique($result);
+    }
 
     /**
      * Render chart for personabilities.

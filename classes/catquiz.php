@@ -1594,7 +1594,7 @@ class catquiz {
         if (!is_null($endtime)) {
             $sql .= " AND timecreated <= :endtime";
         }
-
+        $sql .= " ORDER BY endtime ASC";
         $params = array(
             'userid' => $userid,
             'catscaleid' => $catscaleid,

@@ -433,7 +433,7 @@ $string['personabilitycharttitle'] = 'Relative personability in subscales compar
 $string['personabilitytitle'] = 'Personability in subscales';
 $string['itemsplayed'] = 'Item(s) played';
 $string['personabilityinscale'] = 'Personability in scale "{$a}"';
-$string['yourscorein'] = 'Your scores in "{$a}"';
+$string['yourscorein'] = 'Your average scores in "{$a}"';
 $string['scoreofpeers'] = 'Average of your peers';
 
 // Check display line breaks etc.
@@ -568,3 +568,21 @@ $string['#ffff00'] = 'Yellow';
 $string['#90ee90'] = 'Lightgreen';
 $string['#006400'] = 'Darkgreen';
 $string['#e8e9eb'] = 'White';
+
+// Stringdates.
+$string['stringdate:day'] = '{$a}';
+$string['stringdate:week'] = 'week {$a}';
+$string['stringdate:month:1'] = 'January';
+$string['stringdate:month:2'] = 'February';
+$string['stringdate:month:3'] = 'March';
+$string['stringdate:month:4'] = 'April';
+$string['stringdate:month:5'] = 'May';
+$string['stringdate:month:6'] = 'June';
+$string['stringdate:month:7'] = 'July';
+$string['stringdate:month:8'] = 'August';
+$string['stringdate:month:9'] = 'September';
+$string['stringdate:month:10'] = 'October';
+$string['stringdate:month:11'] = 'November';
+$string['stringdate:month:12'] = 'December';
+$string['stringdate:quarter'] = 'Q{$a}';
+
