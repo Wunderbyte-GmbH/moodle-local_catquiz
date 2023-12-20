@@ -435,6 +435,7 @@ $string['itemsplayed'] = 'Item(s) played';
 $string['personabilityinscale'] = 'Personability in scale "{$a}"';
 $string['yourscorein'] = 'Your average scores in "{$a}"';
 $string['scoreofpeers'] = 'Average of your peers';
+$string['abilityprofile'] = 'Abilityprofile in "{$a}"';
 
 // Check display line breaks etc.
 $string['choosesubscaleforfeedback_help'] = 'You can now store <number of options> feedback informations for the subscales displayed. Select a (sub-)scale to enter your feedback. The colored symbols indicate the current status of processing, measured by the number of feedback options you entered:

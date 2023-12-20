@@ -432,6 +432,7 @@ $string['itemsplayed'] = 'ausgewertete Fragen:';
 $string['personabilityinscale'] = 'Personenfähigkeit für Skala "{$a}"';
 $string['yourscorein'] = 'Ihre durchschnittlichen "{$a}"-Ergebnisse';
 $string['scoreofpeers'] = 'Mittelwert Ihrer Mit-Studierenden';
+$string['abilityprofile'] = '{$a}-Score';
 
 // Check display line breaks etc.
 $string['choosesubscaleforfeedback_help'] = 'Für die angezeigten Subskalen können Sie nun {$a} Feedback-Angaben hinterlegen. Wählen Sie die jeweilige (Sub-)Skala an, um Ihr Feedback einzugeben. Die farbigen Symbole zeigen Ihnen den aktuellen Stand der Bearbeitung an, gemessen an den vor Ihnen hinterlegten Anzahl an Feedback-Optionen:
