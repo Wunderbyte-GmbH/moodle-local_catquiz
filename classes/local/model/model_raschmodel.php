@@ -273,12 +273,12 @@ abstract class model_raschmodel extends model_model implements catcalc_item_esti
       * @param array $pp - person parameter ('ability')
       * @param float $mean - mean of the estimated destribution
       * @param float $sd - standard deviation e.g. standard error of distribution
-      * @return array 1st derivative of TR function with respect to $pp
+      * @return float 1st derivative of TR function with respect to $pp
       */
-    public static function get_ability_tr_jacobian(array $pp, float $mean = 0, float $sd = 1): array {
-        return [
-            (($mean - $pp['ability']) / ($sd ** 2)), // The d/dpp .
-        ];
+    public static function get_ability_tr_jacobian(array $pp, float $mean = 0, float $sd = 1): float {
+        return 
+            (($mean - $pp['ability']) / ($sd ** 2)) // The d/dpp .
+        ;
     }
 
     /**
@@ -287,12 +287,12 @@ abstract class model_raschmodel extends model_model implements catcalc_item_esti
      * @param array $pp - person parameter ('ability')
      * @param float $mean - mean of the estimated destribution
      * @param float $sd - standard deviation e.g. standard error of distribution
-     * @return array 2nd derivative of TR function with respect to $ip
+     * @return float 2nd derivative of TR function with respect to $ip
      */
-    public static function get_ability_tr_hessian(array $pp, $mean = 0, float $sd = 1): array {
+    public static function get_ability_tr_hessian(array $pp, $mean = 0, float $sd = 1): float {
 
-        return [[
-            (- 1 / ($sd ** 2)), // Calculate d/dpp d/dpp.
-        ], ];
+        return 
+            (- 1 / ($sd ** 2)) // Calculate d/dpp d/dpp.
+        ;
     }
 }
