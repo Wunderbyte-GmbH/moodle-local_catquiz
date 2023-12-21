@@ -417,8 +417,8 @@ class catscale {
      *
      * @param int $contextid
      * @param mixed $question
-     * @param bool $includesubscales
      * @param mixed $catscaleid
+     * @param bool $includesubscales
      *
      * @return void
      *
