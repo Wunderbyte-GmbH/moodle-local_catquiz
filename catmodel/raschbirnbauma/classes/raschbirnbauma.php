@@ -434,31 +434,4 @@ class raschbirnbauma extends model_raschmodel {
         // Calculate d/da d/da.
         return [[ -1 / ($as ** 2) ]];
     }
-
-    /**
-     * Implements a Filter Function for trusted regions in the person ability parameter estimation
-     *
-     * @param array<float> $pp - person parameter ('ability')
-     * @param float $mean - mean of the estimated destribution
-     * @param float $sd - standard deviation e.g. standard error of distribution
-     * return array - chunked item parameter
-     */
-    public static function restrict_to_trusted_region_pp (array $pp, $mean = 0, float $sd = 1):): array {
-
-        $pp_tr = floatval(get_config('catmodel_raschbirnbauma', 'trusted_region_factor_sd_a'));
-        
-        $pp_min = floatval(get_config('catmodel_raschbirnbauma', 'trusted_region_min_a'));
-        $pp_max = floatval(get_config('catmodel_raschbirnbauma', 'trusted_region_max_a'));
-        // @David: hier bitte max und min-Werte der verwendeten Skala anwenden
-
-        // Test TR for difficulty.
-        if (($pp['ability'] - $mean) < max(- ($pp_tr * $sd), $pp_min)) {
-            $pp['ability'] = max(- ($pp_tr * $sd), $pp_min);
-        }
-        if (($pp['ability'] - $mean) > min(($pp_tr * $sd), $pp_max)) {
-            $pp['ability'] = min(($pp_tr * $sd), $pp_max);
-        }
-
-        return $pp;
-    }
 }

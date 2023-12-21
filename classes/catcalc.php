@@ -131,16 +131,15 @@ class catcalc {
 
         $trustedregionsfunction = fn($ability) => model_raschmodel::get_ability_tr_jacobian($ability, $mean, $sd);
         $trustedregionsderivate = fn($ability) => model_raschmodel::get_ability_tr_hessian($ability, $mean, $sd);
-        // TODO: Replace with a better function.
-        $trustedregionfilter = function ($ability) {
-            if ($ability['ability'] > 5.0) {
-                return ['ability' => 5.0];
-            }
-            if ($ability['ability'] < -5.0) {
-                return ['ability' => -5.0];
-            }
-            return $ability;
-        };
+        $tr = floatval(get_config('catmodel_raschbirnbauma', 'trusted_region_factor_sd_a'));
+        $trustedregionfilter = fn($ability) => model_raschmodel::restrict_to_trusted_region_pp(
+            $ability,
+            LOCAL_CATQUIZ_PERSONABILITY_LOWER_LIMIT,
+            LOCAL_CATQUIZ_PERSONABILITY_UPPER_LIMIT,
+            $tr,
+            $mean,
+            $sd
+        );
 
         $result = mathcat::newton_raphson_multi_stable(
             $jacobian,
