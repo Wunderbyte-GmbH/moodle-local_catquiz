@@ -87,6 +87,8 @@ class catcalc {
      * @param mixed $personresponses
      * @param model_item_param_list $items
      * @param float $startvalue
+     * @param float $mean The mean value of current abilities
+     * @param float $sd The standard deviation of current abilities
      *
      * @return float
      *
