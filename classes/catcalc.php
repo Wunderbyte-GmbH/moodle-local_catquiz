@@ -29,6 +29,7 @@ use Closure;
 use local_catquiz\local\model\model_item_param_list;
 use local_catquiz\local\model\model_item_response;
 use local_catquiz\local\model\model_model;
+use local_catquiz\local\model\model_raschmodel;
 use local_catquiz\local\model\model_strategy;
 use local_catquiz\mathcat;
 use moodle_exception;
@@ -93,7 +94,9 @@ class catcalc {
     public static function estimate_person_ability(
         $personresponses,
         model_item_param_list $items,
-        float $startvalue = 0.1
+        float $startvalue = 0.0,
+        float $mean = 0,
+        float $sd = 1
     ): float {
         $allmodels = model_strategy::get_installed_models();
 
@@ -126,12 +129,28 @@ class catcalc {
         $hessian = self::build_callable_array($hfuns);
         $hessian = fn ($pp) => matrixcat::multi_sum($hessian($pp));
 
+        $trustedregionsfunction = fn($ability) => model_raschmodel::get_ability_tr_jacobian($ability, $mean, $sd);
+        $trustedregionsderivate = fn($ability) => model_raschmodel::get_ability_tr_hessian($ability, $mean, $sd);
+        // TODO: Replace with a better function.
+        $trustedregionfilter = function ($ability) {
+            if ($ability['ability'] > 5.0) {
+                return ['ability' => 5.0];
+            }
+            if ($ability['ability'] < -5.0) {
+                return ['ability' => -5.0];
+            }
+            return $ability;
+        };
+
         $result = mathcat::newton_raphson_multi_stable(
             $jacobian,
             $hessian,
             ['ability' => $startvalue],
             6,
-            50
+            50,
+            $trustedregionfilter,
+            $trustedregionsfunction,
+            $trustedregionsderivate
         );
 
         // The ability is wrapped inside an array.

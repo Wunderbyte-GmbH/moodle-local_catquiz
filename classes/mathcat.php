@@ -320,13 +320,19 @@ class mathcat {
             $mxparameteralt = $mxparameter;
             $distance = $mxdelta->rooted_summed_squares();
 
-            if ($distance >= $maxsteplength) {
-                // Shorten step matrix $mx_delta to concurrent step length.
-                $mxdelta = $mxdelta->multiply($maxsteplength / $distance);
-            } else {
-                // Set new $max_step_length.
-                $maxsteplength = $distance;
-            }
+            // TODO: If used like this, the reduction of the $mxdelta value will
+            //prevent the trusted regions filter to be applied, because with the
+            //reduced delta we will never leave the trusted region. If we still
+            //want to use this code, it has to be refactored. Maybe the
+            //reduction should happen after application of the trusted region
+            //filter.
+            //if ($distance >= $maxsteplength) {
+            //    // Shorten step matrix $mx_delta to concurrent step length.
+            //    $mxdelta = $mxdelta->multiply($maxsteplength / $distance);
+            //} else {
+            //    // Set new $max_step_length.
+            //    $maxsteplength = $distance;
+            //}
 
             $mxparameter = $mxparameter->subtract($mxdelta);
             $parameter = array_combine($parameternames, ($mxparameter->transpose())[0]);
