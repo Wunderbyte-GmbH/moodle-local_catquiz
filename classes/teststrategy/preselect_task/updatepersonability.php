@@ -315,19 +315,6 @@ class updatepersonability extends preselect_task implements wb_middleware {
     }
 
     /**
-     * Get updated ability.
-     *
-     * @param mixed $userresponses
-     * @param mixed $itemparamlist
-     *
-     * @return mixed
-     *
-     */
-    protected function get_updated_ability($userresponses, $itemparamlist) {
-        return catcalc::estimate_person_ability($userresponses, $itemparamlist);
-    }
-
-    /**
      * Update person param.
      *
      * @param mixed $context
