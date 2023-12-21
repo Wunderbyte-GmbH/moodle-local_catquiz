@@ -26,8 +26,13 @@
 namespace local_catquiz;
 
 use basic_testcase;
+use coding_exception;
+use Exception;
 use local_catquiz\local\model\model_item_param;
 use local_catquiz\local\model\model_item_param_list;
+use moodle_exception;
+use SebastianBergmann\RecursionContext\InvalidArgumentException;
+use PHPUnit\Framework\ExpectationFailedException;
 use UnexpectedValueException;
 
 defined('MOODLE_INTERNAL') || die();
@@ -193,6 +198,38 @@ class catcalc_test extends basic_testcase {
     }
 
     /**
+     * Compares our results with the ones from the SimulatinoSteps radikaler CAT CSV
+     * 
+     * @param mixed $responses 
+     * @param model_item_param_list $items 
+     * @param float $expectedability 
+     * @return void 
+     * @throws coding_exception 
+     * @throws Exception 
+     * @throws moodle_exception 
+     * @throws MatrixException 
+     * @throws InvalidArgumentException 
+     * @throws ExpectationFailedException 
+     * 
+     * @dataProvider simulation_steps_calculated_ability_is_correct_provider
+     */
+    public function test_simulation_steps_calculated_ability_is_correct($responses, model_item_param_list $items, float $expectedability) {
+        $ability = catcalc::estimate_person_ability($responses, $items);
+        $this->assertEquals($expectedability, sprintf('%.2f', $ability));
+    }
+
+    /**
+     * Data provider for test_simulation_steps_calculated_ability_is_correct()
+     * 
+     * @return array 
+     * @throws UnexpectedValueException 
+     */
+    public static function simulation_steps_calculated_ability_is_correct_provider() {
+        global $CFG;
+        return self::parsesimulationsteps($CFG->dirroot . '/local/catquiz/tests/fixtures/SimulationSteps_radikaler_CAT.csv');
+    }
+
+    /**
      * Internal function to filter responses to questions with a certain label.
      *
      * @param string $label     The label to filter for.
@@ -200,6 +237,86 @@ class catcalc_test extends basic_testcase {
      */
     private static function filterforlabel(string $label, array $responses): array {
         return array_filter($responses, fn($l) => preg_match(sprintf('/^SIM%s\-/', $label), $l), ARRAY_FILTER_USE_KEY);
+    }
+
+    /**
+     * Parses the results for the step-wise calculation of person abilities from a CSV file
+     * 
+     * @param string $filename 
+     * @param string $modelname 
+     * @return array 
+     * @throws UnexpectedValueException 
+     */
+    private static function parsesimulationsteps(string $filename, $modelname = 'raschbirnbaumb') {
+        if (($handle = fopen($filename, "r")) === false) {
+            throw new UnexpectedValueException("Can not open file: " . $filename);
+        }
+
+        $row = 0;
+        $inpersonrange = false;
+        $steps = [];
+        $person = '';
+        while (($data = fgetcsv($handle, 0, ",")) !== false) {
+            $row++;
+            if ($row <= 2) {
+                // The first two row contains no relevant data.
+                continue;
+            }
+
+            if ($data[0] !== '' && $data[1] === '') {
+                $inpersonrange = true;
+                $person = $data[0];
+                continue;
+            }
+
+            if ($inpersonrange) {
+                if ($data[0] === '' && $data[1] === ''
+                || $data[0] === $person && $data[1] !== '' && $data[2] === ''
+                ) {
+                    $inpersonrange = false;
+                    $person = '';
+                    continue;
+                }
+
+                $step = $data[1];
+                $itemid = $data[2];
+                $difficulty = floatval($data[3]);
+                $discrimination = floatval($data[4]);
+                $fraction = floatval($data[5]);
+                $item = new model_item_param($itemid, $modelname);
+                $item->set_parameters([
+                    'difficulty' => $difficulty,
+                    'discrimination' => $discrimination,
+                ]);
+
+                if ($step > 1) {
+                    $items = clone($steps[$person][$step - 1]['items']);
+                    $items->add($item);
+                    $responses = $steps[$person][$step - 1]['responses'];
+                    $responses[$itemid] = ['fraction' => floatval($fraction)];
+                } else {
+                    $items = (new model_item_param_list())->add($item);
+                    $responses = [$itemid => ['fraction' => floatval($fraction)]];
+                }
+                $steps[$person][$step]['items'] = $items;
+                $steps[$person][$step]['responses'] = $responses;
+                preg_match('/(.*)\s\(/', $data[6], $matches);
+                $steps[$person][$step]['expected_ability'] = floatval($matches[1]);
+            }
+        }
+        fclose($handle);
+
+        $result = [];
+        foreach ($steps as $personid => $persondata) {
+            foreach ($persondata as $stepnum => $stepdata) {
+                $result[sprintf('%s Step %d', $personid, $stepnum)] = [
+                    'responses' => $stepdata['responses'],
+                    'items' =>$stepdata['items'],
+                    'expected_ability' => $stepdata['expected_ability'],
+                ];
+            }
+        }
+        return $result;
     }
 
     /**
