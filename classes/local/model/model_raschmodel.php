@@ -295,4 +295,26 @@ abstract class model_raschmodel extends model_model implements catcalc_item_esti
             (- 1 / ($sd ** 2)) // Calculate d/dpp d/dpp.
         ;
     }
+
+    /**
+     * Implements a Filter Function for trusted regions in the person ability parameter estimation
+     *
+     * @param array $pp - person parameter ('ability')
+     * @param float $pp_min
+     * @param float $pp_max
+     * @param float $pp_tr
+     * @param float $mean - mean of the estimated destribution
+     * @param float $sd - standard deviation e.g. standard error of distribution
+     * return array - chunked item parameter
+     */
+    public static function restrict_to_trusted_region_pp (array $pp, float $pp_min, float $pp_max, float $pp_tr, $mean = 0, float $sd = 1): array {
+        if (($pp['ability'] - $mean) < max(- ($pp_tr * $sd), $pp_min)) {
+            $pp['ability'] = max(- ($pp_tr * $sd), $pp_min);
+        }
+        if (($pp['ability'] - $mean) > min(($pp_tr * $sd), $pp_max)) {
+            $pp['ability'] = min(($pp_tr * $sd), $pp_max);
+        }
+
+        return $pp;
+    }
 }
