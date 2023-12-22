@@ -211,11 +211,18 @@ class catcalc_test extends basic_testcase {
      * @throws InvalidArgumentException 
      * @throws ExpectationFailedException 
      * 
-     * @dataProvider simulation_steps_calculated_ability_is_correct_provider
+     * @dataProvider simulation_steps_calculated_ability_provider
      */
-    public function test_simulation_steps_calculated_ability_is_correct($responses, model_item_param_list $items, float $expectedability) {
-        $ability = catcalc::estimate_person_ability($responses, $items);
-        $this->assertEquals($expectedability, sprintf('%.2f', $ability));
+    public function test_simulation_steps_calculated_ability(
+        $responses,
+        model_item_param_list $items,
+        float $expectedability,
+        float $startvalue,
+        float $mean,
+        float $sd
+    ) {
+        $ability = catcalc::estimate_person_ability($responses, $items, $startvalue, $mean, $sd);
+        $this->assertEqualsWithDelta($expectedability, $ability, 0.01);
     }
 
     /**
@@ -224,9 +231,18 @@ class catcalc_test extends basic_testcase {
      * @return array 
      * @throws UnexpectedValueException 
      */
-    public static function simulation_steps_calculated_ability_is_correct_provider() {
+    public static function simulation_steps_calculated_ability_provider() {
         global $CFG;
-        return self::parsesimulationsteps($CFG->dirroot . '/local/catquiz/tests/fixtures/SimulationSteps_radikaler_CAT.csv');
+        $radCat1 = self::parsesimulationsteps(
+            $CFG->dirroot . '/local/catquiz/tests/fixtures/SimulationSteps radCAT 2023-12-21 09-02-35.csv'
+        );
+        //$radCat2 = self::parsesimulationsteps(
+        //    $CFG->dirroot . '/local/catquiz/tests/fixtures/SimulationSteps radCAT 2023-12-21 09-22-26.csv',
+        //    'raschbirnbaumb',
+        //    0.02,
+        //    2.97
+        //);
+        return $radCat1;
     }
 
     /**
@@ -247,7 +263,12 @@ class catcalc_test extends basic_testcase {
      * @return array 
      * @throws UnexpectedValueException 
      */
-    private static function parsesimulationsteps(string $filename, $modelname = 'raschbirnbaumb') {
+    private static function parsesimulationsteps(
+        string $filename,
+        $modelname = 'raschbirnbaumb',
+        float $mean = 0.0,
+        float $sd = 1.0
+    ) {
         if (($handle = fopen($filename, "r")) === false) {
             throw new UnexpectedValueException("Can not open file: " . $filename);
         }
@@ -256,22 +277,27 @@ class catcalc_test extends basic_testcase {
         $inpersonrange = false;
         $steps = [];
         $person = '';
-        while (($data = fgetcsv($handle, 0, ",")) !== false) {
+        while (($data = fgetcsv($handle, 0, ";")) !== false) {
             $row++;
-            if ($row <= 2) {
+            if ($row <= 5) {
                 // The first two row contains no relevant data.
                 continue;
             }
 
-            if ($data[0] !== '' && $data[1] === '') {
+            if ($data[0] !== '' && empty($data[1])) {
                 $inpersonrange = true;
                 $person = $data[0];
+                continue;
+            }
+
+            if ($data[0] === "Time:") {
                 continue;
             }
 
             if ($inpersonrange) {
                 if ($data[0] === '' && $data[1] === ''
                 || $data[0] === $person && $data[1] !== '' && $data[2] === ''
+                || $data[0] === $person && ! is_numeric($data[1])
                 ) {
                     $inpersonrange = false;
                     $person = '';
@@ -294,14 +320,18 @@ class catcalc_test extends basic_testcase {
                     $items->add($item);
                     $responses = $steps[$person][$step - 1]['responses'];
                     $responses[$itemid] = ['fraction' => floatval($fraction)];
+                    $startvalue = $steps[$person][$step - 1]['expected_ability'];
                 } else {
                     $items = (new model_item_param_list())->add($item);
                     $responses = [$itemid => ['fraction' => floatval($fraction)]];
+                    $startvalue = $mean;
                 }
                 $steps[$person][$step]['items'] = $items;
                 $steps[$person][$step]['responses'] = $responses;
-                preg_match('/(.*)\s\(/', $data[6], $matches);
+                preg_match('/(.*)\s\(SE\s(.*)\sbei/', $data[6], $matches);
                 $steps[$person][$step]['expected_ability'] = floatval($matches[1]);
+                $steps[$person][$step]['standard_error'] = floatval($matches[2]);
+                $steps[$person][$step]['startvalue'] = $startvalue;
             }
         }
         fclose($handle);
@@ -309,10 +339,16 @@ class catcalc_test extends basic_testcase {
         $result = [];
         foreach ($steps as $personid => $persondata) {
             foreach ($persondata as $stepnum => $stepdata) {
+                // The standard error is 0 for the first question or the SE calculated after the last response.
+                $se = $stepnum === 1 ? $sd : $persondata[$stepnum - 1]['standard_error'];
+                $personmean = $stepnum === 1 ? $mean : $persondata[$stepnum - 1]['expected_ability'];
                 $result[sprintf('%s Step %d', $personid, $stepnum)] = [
                     'responses' => $stepdata['responses'],
                     'items' =>$stepdata['items'],
                     'expected_ability' => $stepdata['expected_ability'],
+                    'startvalue' => $stepdata['startvalue'],
+                    'mean' => $personmean,
+                    'sd' => $se,
                 ];
             }
         }
