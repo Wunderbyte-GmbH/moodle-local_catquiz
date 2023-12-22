@@ -161,17 +161,19 @@ class updatepersonability extends preselect_task implements wb_middleware {
             $arrayresponsesforscale[$item->get_id()] = $this->arrayresponses[$item->get_id()];
         }
 
-        if (! $this->has_sufficient_responses($arrayresponsesforscale)
-            || count($itemparamlist) === 0) {
-            $updatedability = $this->fallback_ability_update($catscaleid);
-            $context['updateabilityfallback'] = true;
-        } else {
-            $startvalue = $context['person_ability'][$catscaleid] ?? 0.1;
-            if ($parentscale) {
-                $startvalue = $context['person_ability'][$parentscale];
-            }
-            $updatedability = catcalc::estimate_person_ability($this->arrayresponses, $itemparamlist, $startvalue);
+
+        $startvalue = $context['person_ability'][$catscaleid] ?? 0.0;
+        if ($parentscale) {
+            $startvalue = $context['person_ability'][$parentscale];
         }
+        $mean = $startvalue;
+
+        // We use the standarderror that is calculated by the previous ability and the previous items.
+        $itemclone = clone($itemparamlist);
+        $itemclone->offsetUnset($context['lastquestion']->id);
+        $sd = catscale::get_standarderror($startvalue, $itemclone);
+
+        $updatedability = catcalc::estimate_person_ability($this->arrayresponses, $itemparamlist, $startvalue, $mean, $sd);
 
         if (is_nan($updatedability)) {
             // In a production environment, we can use fallback values. However,
