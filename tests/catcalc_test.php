@@ -377,9 +377,9 @@ class catcalc_test extends basic_testcase {
             }
             $item = new model_item_param($data[7], $data[3], [], 4);
             $item->set_parameters([
-                'difficulty' => $data[4],
-                'discrimination' => $data[5],
-                'guessing' => $data[6],
+                'difficulty' => floatval($data[4]),
+                'discrimination' => floatval($data[5]),
+                'guessing' => floatval($data[6]),
             ]);
             $itemparams->add($item);
         }
