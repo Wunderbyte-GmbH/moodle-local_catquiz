@@ -35,6 +35,8 @@ use local_catquiz\event\testiteminscale_updated;
 use local_catquiz\local\result;
 use local_catquiz\local\status;
 use context_system;
+use local_catquiz\local\model\model_item_param_list;
+use local_catquiz\local\model\model_strategy;
 use moodle_exception;
 use moodle_url;
 use stdClass;
@@ -648,5 +650,30 @@ class catscale {
             unset($record->id);
             $DB->insert_record('local_catquiz_itemparams', $record);
         }
+    }
+
+    /**
+     * Returns the standard error for the given ability and items
+     * 
+     * @param float $ability 
+     * @param model_item_param_list $items
+     * @param float $default
+     * @return float 
+     */
+    public static function get_standarderror(
+        float $ability,
+        model_item_param_list $items,
+        float $default = 1.0
+    ): float {
+        if (count($items) === 0) {
+            return $default;
+        }
+
+        $fisherinfo = 0.0;
+        $models = model_strategy::get_installed_models();
+        foreach ($items as $item) {
+            $fisherinfo += $models[$item->get_model_name()]::fisher_info(['ability' => $ability], $item->get_params_array());
+        }
+        return (1/sqrt($fisherinfo));
     }
 }
