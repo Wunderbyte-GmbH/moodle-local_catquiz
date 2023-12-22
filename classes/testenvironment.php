@@ -29,6 +29,9 @@ use moodle_exception;
 use stdClass;
 
 defined('MOODLE_INTERNAL') || die();
+define('LOCAL_CATQUIZ_TESTENVIRONMENT_ALL', 0);
+define('LOCAL_CATQUIZ_TESTENVIRONMENT_ONLYTEMPLATES', 1);
+define('LOCAL_CATQUIZ_TESTENVIRONMENT_NOTEMPLATES', 2);
 
 require_once($CFG->dirroot . '/local/catquiz/lib.php');
 
@@ -424,35 +427,73 @@ class testenvironment {
      * Returns an array of all or filtered test environments.
      *
      * @param string $component
-     * @param bool $onlytemplates
+     * @param int $onlytemplates
+     *  @param int $componentid // Overrides the onlytemplate setting and returns the exact test by id.
      *
      * @return array
      *
      */
     public static function get_environments_as_array(
             string $component = 'mod_adaptivequiz',
-            bool $onlytemplates = true) {
+            int $onlytemplates = LOCAL_CATQUIZ_TESTENVIRONMENT_ONLYTEMPLATES,
+            int $componentid = 0) {
         global $DB;
 
         $returnarray = [];
 
-        $params = [
-            'component' => $component,
-        ];
-
-        if ($onlytemplates) {
-            $params['componentid'] = 0;
-        }
-
-        if (!$records = $DB->get_records('local_catquiz_tests', $params)) {
-            return $returnarray;
-        }
+        $records = self::get_environments($component, $onlytemplates, $componentid);
 
         foreach ($records as $record) {
             $returnarray[$record->id] = $record->name;
         }
 
         return $returnarray;
+    }
+
+
+    /**
+     * Returns all or filtered test environments.
+     *
+     * @param string $component
+     * @param int $componentid // Overrides the onlytemplate setting and returns the exact test by id.
+     * @param int $onlytemplates
+     *
+     * @return array
+     *
+     */
+    public static function get_environments(
+        string $component = 'mod_adaptivequiz',
+        int $componentid = 0,
+        int $onlytemplates = LOCAL_CATQUIZ_TESTENVIRONMENT_ONLYTEMPLATES) {
+        global $DB;
+
+        $returnarray = [];
+
+        $params = [
+            'component' => $component,
+            'componentid' => $componentid,
+        ];
+
+        switch ($onlytemplates) {
+            case LOCAL_CATQUIZ_TESTENVIRONMENT_ALL:
+                break;
+            case LOCAL_CATQUIZ_TESTENVIRONMENT_ONLYTEMPLATES:
+                $equal = " WHERE " . $DB->sql_equal('componentid', ':componentid');
+                break;
+            case LOCAL_CATQUIZ_TESTENVIRONMENT_NOTEMPLATES:
+                $equal = "WHERE componentid <> :componentid";
+                break;
+        }
+
+        $sql = "SELECT *
+                FROM {local_catquiz_tests}
+                $equal";
+
+        if (!$records = $DB->get_records_sql($sql, $params)) {
+            return $returnarray;
+        } else {
+            return $records;
+        }
     }
 
     /**
