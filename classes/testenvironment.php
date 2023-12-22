@@ -426,17 +426,18 @@ class testenvironment {
     /**
      * Returns an array of all or filtered test environments.
      *
-     * @param string $component
-     * @param int $onlytemplates
+    * @param string $component
      * @param int $componentid // Overrides the onlytemplate setting and returns the exact test by id.
+     * @param int $onlytemplates
      *
      * @return array
      *
      */
     public static function get_environments_as_array(
             string $component = 'mod_adaptivequiz',
-            int $onlytemplates = LOCAL_CATQUIZ_TESTENVIRONMENT_ONLYTEMPLATES,
-            int $componentid = 0) {
+            int $componentid = 0,
+            int $onlytemplates = LOCAL_CATQUIZ_TESTENVIRONMENT_ONLYTEMPLATES
+            ) {
         global $DB;
 
         $returnarray = [];
@@ -473,7 +474,7 @@ class testenvironment {
             'component' => $component,
             'componentid' => $componentid,
         ];
-
+        $equal = '';
         switch ($onlytemplates) {
             case LOCAL_CATQUIZ_TESTENVIRONMENT_ALL:
                 break;

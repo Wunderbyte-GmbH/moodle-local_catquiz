@@ -764,14 +764,7 @@ class catquiz_handler {
         }
 
         // Get selected subscales from quizdata.
-        $selectedsubscales = [];
-        foreach ($quizsettings as $key => $value) {
-            if (strpos($key, 'catquiz_subscalecheckbox_') !== false
-                && $value == "1") {
-                    $catscaleid = substr_replace($key, '', 0, 25);
-                    $selectedsubscales[] = $catscaleid;
-            }
-        };
+        $selectedsubscales = self::get_selected_subscales($quizsettings);
 
         $initialcontext = [
             'testid' => intval($attemptdata->instance),
@@ -823,5 +816,26 @@ class catquiz_handler {
             ],
             $initialcontext
         );
+    }
+
+    /**
+     * Gets selected subscales
+     *
+     *
+     * @param stdClass $quizsettings
+     * @return array
+     *
+     */
+    public static function get_selected_subscales(stdClass $quizsettings) {
+        // Get selected subscales from quizdata.
+        $selectedsubscales = [];
+        foreach ($quizsettings as $key => $value) {
+            if (strpos($key, 'catquiz_subscalecheckbox_') !== false
+                && $value == "1") {
+                    $catscaleid = substr_replace($key, '', 0, 25);
+                    $selectedsubscales[] = $catscaleid;
+            }
+        };
+        return $selectedsubscales;
     }
 }
