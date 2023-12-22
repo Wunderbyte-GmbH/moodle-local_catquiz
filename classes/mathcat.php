@@ -357,7 +357,6 @@ class mathcat {
                     if (isset($fntrustedregionsfunction) && isset($fntrustedregionsderivative)) {
                         $fnfunction = fn($x) => matrixcat::multi_sum($fntrustedregionsfunction($x), $fnfunction($x));
                         $fnderivative = fn($x) => matrixcat::multi_sum($fntrustedregionsderivative($x), $fnderivative($x));
-                        print("Used Trusted Regions function and derivatied and added this to the target functions.");
                     }
 
                     // If the problem occurs a second time in a row...
