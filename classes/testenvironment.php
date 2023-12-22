@@ -426,7 +426,7 @@ class testenvironment {
     /**
      * Returns an array of all or filtered test environments.
      *
-    * @param string $component
+     * @param string $component
      * @param int $componentid // Overrides the onlytemplate setting and returns the exact test by id.
      * @param int $onlytemplates
      *
