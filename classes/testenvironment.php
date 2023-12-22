@@ -428,7 +428,7 @@ class testenvironment {
      *
      * @param string $component
      * @param int $onlytemplates
-     *  @param int $componentid // Overrides the onlytemplate setting and returns the exact test by id.
+     * @param int $componentid // Overrides the onlytemplate setting and returns the exact test by id.
      *
      * @return array
      *
