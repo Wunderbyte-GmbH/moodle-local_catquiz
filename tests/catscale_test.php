@@ -44,7 +44,7 @@ class catscale_test extends basic_testcase {
 
     /**
      * Tests if the standarderror is calculated correctly
-     * 
+     *
      * @dataProvider standarderror_is_calculated_correctly_provider
      */
     public function test_standarderror_is_calculated_correctly($items, $ability, $expected) {
@@ -52,8 +52,12 @@ class catscale_test extends basic_testcase {
         $this->assertEqualsWithDelta($expected, $standarderror, 0.01);
     }
 
-    public static function standarderror_is_calculated_correctly_provider()
-    {
+    /**
+     * Data provider for test_standarderror_is_calculated_correctly
+     *
+     * @return array
+     */
+    public static function standarderror_is_calculated_correctly_provider(): array {
         return [
             [
                 'items' => (new model_item_param_list())

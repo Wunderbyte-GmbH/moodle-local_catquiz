@@ -654,11 +654,11 @@ class catscale {
 
     /**
      * Returns the standard error for the given ability and items
-     * 
-     * @param float $ability 
+     *
+     * @param float $ability
      * @param model_item_param_list $items
      * @param float $default
-     * @return float 
+     * @return float
      */
     public static function get_standarderror(
         float $ability,
@@ -674,6 +674,6 @@ class catscale {
         foreach ($items as $item) {
             $fisherinfo += $models[$item->get_model_name()]::fisher_info(['ability' => $ability], $item->get_params_array());
         }
-        return (1/sqrt($fisherinfo));
+        return (1 / sqrt($fisherinfo));
     }
 }

@@ -199,18 +199,19 @@ class catcalc_test extends basic_testcase {
 
     /**
      * Compares our results with the ones from the SimulatinoSteps radikaler CAT CSV
-     * 
-     * @param mixed $responses 
-     * @param model_item_param_list $items 
-     * @param float $expectedability 
+     *
+     * @param mixed $responses
+     * @param model_item_param_list $items
+     * @param float $expectedability
      * @return void 
-     * @throws coding_exception 
-     * @throws Exception 
-     * @throws moodle_exception 
-     * @throws MatrixException 
-     * @throws InvalidArgumentException 
-     * @throws ExpectationFailedException 
-     * 
+     * @return void
+     * @throws coding_exception
+     * @throws Exception
+     * @throws moodle_exception
+     * @throws MatrixException
+     * @throws InvalidArgumentException
+     * @throws ExpectationFailedException
+     *
      * @dataProvider simulation_steps_calculated_ability_provider
      */
     public function test_simulation_steps_calculated_ability(
@@ -227,11 +228,11 @@ class catcalc_test extends basic_testcase {
 
     /**
      * Data provider for test_simulation_steps_calculated_ability_is_correct()
-     * 
-     * @return array 
-     * @throws UnexpectedValueException 
+     *
+     * @return array
+     * @throws UnexpectedValueException
      */
-    public static function simulation_steps_calculated_ability_provider() {
+    public static function simulation_steps_calculated_ability_provider(): array {
         global $CFG;
         $radCat1 = self::parsesimulationsteps(
             $CFG->dirroot . '/local/catquiz/tests/fixtures/SimulationSteps radCAT 2023-12-21 09-02-35.csv'
@@ -257,11 +258,11 @@ class catcalc_test extends basic_testcase {
 
     /**
      * Parses the results for the step-wise calculation of person abilities from a CSV file
-     * 
-     * @param string $filename 
-     * @param string $modelname 
-     * @return array 
-     * @throws UnexpectedValueException 
+     *
+     * @param string $filename
+     * @param string $modelname
+     * @return array
+     * @throws UnexpectedValueException
      */
     private static function parsesimulationsteps(
         string $filename,
