@@ -300,9 +300,9 @@ abstract class model_raschmodel extends model_model implements catcalc_item_esti
      * Implements a Filter Function for trusted regions in the person ability parameter estimation
      *
      * @param array $pp - person parameter ('ability')
-     * @param float $pp_min
-     * @param float $pp_max
-     * @param float $pp_tr
+     * @param float $ppmin
+     * @param float $ppmax
+     * @param float $pptr
      * @param float $mean - mean of the estimated destribution
      * @param float $sd - standard deviation e.g. standard error of distribution
      * return array - chunked item parameter
