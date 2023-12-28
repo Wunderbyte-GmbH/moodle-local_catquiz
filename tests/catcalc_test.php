@@ -203,6 +203,9 @@ class catcalc_test extends basic_testcase {
      * @param mixed $responses
      * @param model_item_param_list $items
      * @param float $expectedability
+     * @param float $startvalue
+     * @param float $mean
+     * @param float $sd
      * @param string $personid
      * @return void
      * @throws coding_exception
@@ -285,6 +288,8 @@ class catcalc_test extends basic_testcase {
      *
      * @param string $filename
      * @param string $modelname
+     * @param float $mean
+     * @param float $sd
      * @return array
      * @throws UnexpectedValueException
      */
