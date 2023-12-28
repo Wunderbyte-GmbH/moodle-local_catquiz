@@ -76,7 +76,7 @@ class catcalc_test extends basic_testcase {
      */
     public static function estimate_person_ability_provider(): array {
         global $CFG;
-        $person = 1;
+        $person = 0;
         $responses = loadresponsesdata($CFG->dirroot . '/local/catquiz/tests/fixtures/responses.2PL.csv', $person);
         $abilities = self::loadabilities($CFG->dirroot . '/local/catquiz/tests/fixtures/persons.csv', $person);
         foreach ($responses as $label => $correct) {
@@ -425,7 +425,7 @@ class catcalc_test extends basic_testcase {
      * @param string $filename The path to the CSV file.
      * @param int    $personnum If given, load abilities of the Nth person.
      */
-    public static function loadabilities($filename, $personnum = 1): array {
+    public static function loadabilities($filename, $personnum = 0): array {
         if (($handle = fopen($filename, "r")) === false) {
             throw new UnexpectedValueException("Can not open file: " . $filename);
         }
@@ -443,7 +443,7 @@ class catcalc_test extends basic_testcase {
                 );
                 continue;
             }
-            if ($row < $personnum + 1) {
+            if ($row < $personnum) {
                 continue;
             }
             $abilities = array_map(
