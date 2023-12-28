@@ -76,7 +76,7 @@ class catcalc_test extends basic_testcase {
      */
     public static function estimate_person_ability_provider(): array {
         global $CFG;
-        $person = 3;
+        $person = 1;
         $responses = loadresponsesdata($CFG->dirroot . '/local/catquiz/tests/fixtures/responses.2PL.csv', $person);
         $abilities = self::loadabilities($CFG->dirroot . '/local/catquiz/tests/fixtures/persons.csv', $person);
         foreach ($responses as $label => $correct) {
@@ -203,7 +203,7 @@ class catcalc_test extends basic_testcase {
      * @param mixed $responses
      * @param model_item_param_list $items
      * @param float $expectedability
-     * @return void 
+     * @param string $personid
      * @return void
      * @throws coding_exception
      * @throws Exception
@@ -220,9 +220,32 @@ class catcalc_test extends basic_testcase {
         float $expectedability,
         float $startvalue,
         float $mean,
-        float $sd
+        float $sd,
+        string $personid
     ) {
         $ability = catcalc::estimate_person_ability($responses, $items, $startvalue, $mean, $sd);
+        $standarderror = catscale::get_standarderror($ability, $items);
+
+        // If the CATQUIZ_CREATE_TESTOUTPUT environment variable is set, write a
+        // CSV file with information about the test results.
+        if (getenv('CATQUIZ_CREATE_TESTOUTPUT')) {
+            $csv = implode(';', [
+                $personid,
+                count($items),
+                array_key_last($responses),
+                $items[array_key_last($responses)]->get_difficulty(),
+                $items[array_key_last($responses)]->get_params_array()['discrimination'],
+                $responses[array_key_last($responses)]['fraction'],
+                sprintf('%.2f (SE %.2f bei %d Fragen)', $ability, $standarderror, count($items)),
+                ($ability - $expectedability) <= 0.01
+                    ? 'match'
+                    : sprintf('mismatch: calculated %.2f but expected %.2f', $ability, $expectedability),
+            ]);
+
+            $file = '/tmp/testoutput.csv';
+            file_put_contents($file, $csv . PHP_EOL, FILE_APPEND | LOCK_EX);
+        }
+
         $this->assertEqualsWithDelta($expectedability, $ability, 0.01);
     }
 
@@ -234,16 +257,17 @@ class catcalc_test extends basic_testcase {
      */
     public static function simulation_steps_calculated_ability_provider(): array {
         global $CFG;
-        $radCat1 = self::parsesimulationsteps(
+        $radcat1 = self::parsesimulationsteps(
             $CFG->dirroot . '/local/catquiz/tests/fixtures/SimulationSteps radCAT 2023-12-21 09-02-35.csv'
         );
-        //$radCat2 = self::parsesimulationsteps(
-        //    $CFG->dirroot . '/local/catquiz/tests/fixtures/SimulationSteps radCAT 2023-12-21 09-22-26.csv',
-        //    'raschbirnbaumb',
-        //    0.02,
-        //    2.97
-        //);
-        return $radCat1;
+        $radcat2 = self::parsesimulationsteps(
+            $CFG->dirroot . '/local/catquiz/tests/fixtures/SimulationSteps radCAT 2023-12-21 09-22-26.csv',
+            'raschbirnbaumb',
+            0.02,
+            2.97
+        );
+        $data = array_merge($radcat1, $radcat2);
+        return $data;
     }
 
     /**
@@ -343,13 +367,14 @@ class catcalc_test extends basic_testcase {
                 // The standard error is 0 for the first question or the SE calculated after the last response.
                 $se = $stepnum === 1 ? $sd : $persondata[$stepnum - 1]['standard_error'];
                 $personmean = $stepnum === 1 ? $mean : $persondata[$stepnum - 1]['expected_ability'];
-                $result[sprintf('%s Step %d', $personid, $stepnum)] = [
+                $result[sprintf('%s: %s Step %d', basename($filename), $personid, $stepnum)] = [
                     'responses' => $stepdata['responses'],
-                    'items' =>$stepdata['items'],
+                    'items' => $stepdata['items'],
                     'expected_ability' => $stepdata['expected_ability'],
                     'startvalue' => $stepdata['startvalue'],
                     'mean' => $personmean,
                     'sd' => $se,
+                    'person' => $personid,
                 ];
             }
         }
