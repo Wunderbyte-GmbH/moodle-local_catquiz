@@ -276,9 +276,9 @@ abstract class model_raschmodel extends model_model implements catcalc_item_esti
       * @return float 1st derivative of TR function with respect to $pp
       */
     public static function get_ability_tr_jacobian(array $pp, float $mean = 0, float $sd = 1): float {
-        return 
-            (($mean - $pp['ability']) / ($sd ** 2)) // The d/dpp .
-        ;
+        return
+            (($mean - $pp['ability']) / ($sd ** 2)); // The d/dpp .
+
     }
 
     /**
@@ -291,9 +291,9 @@ abstract class model_raschmodel extends model_model implements catcalc_item_esti
      */
     public static function get_ability_tr_hessian(array $pp, $mean = 0, float $sd = 1): float {
 
-        return 
-            (- 1 / ($sd ** 2)) // Calculate d/dpp d/dpp.
-        ;
+        return
+            (- 1 / ($sd ** 2)); // Calculate d/dpp d/dpp.
+
     }
 
     /**
@@ -307,12 +307,19 @@ abstract class model_raschmodel extends model_model implements catcalc_item_esti
      * @param float $sd - standard deviation e.g. standard error of distribution
      * return array - chunked item parameter
      */
-    public static function restrict_to_trusted_region_pp (array $pp, float $pp_min, float $pp_max, float $pp_tr, $mean = 0, float $sd = 1): array {
-        if (($pp['ability'] - $mean) < max(- ($pp_tr * $sd), $pp_min)) {
-            $pp['ability'] = max(- ($pp_tr * $sd), $pp_min);
+    public static function restrict_to_trusted_region_pp(
+        array $pp,
+        float $ppmin,
+        float $ppmax,
+        float $pptr,
+        $mean = 0,
+        float $sd = 1
+    ): array {
+        if (($pp['ability'] - $mean) < max(- ($pptr * $sd), $ppmin)) {
+            $pp['ability'] = max(- ($pptr * $sd), $ppmin);
         }
-        if (($pp['ability'] - $mean) > min(($pp_tr * $sd), $pp_max)) {
-            $pp['ability'] = min(($pp_tr * $sd), $pp_max);
+        if (($pp['ability'] - $mean) > min(($pptr * $sd), $ppmax)) {
+            $pp['ability'] = min(($pptr * $sd), $ppmax);
         }
 
         return $pp;

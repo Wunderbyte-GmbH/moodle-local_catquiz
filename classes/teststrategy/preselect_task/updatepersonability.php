@@ -161,7 +161,6 @@ class updatepersonability extends preselect_task implements wb_middleware {
             $arrayresponsesforscale[$item->get_id()] = $this->arrayresponses[$item->get_id()];
         }
 
-
         $startvalue = $context['person_ability'][$catscaleid] ?? 0.0;
         if ($parentscale) {
             $startvalue = $context['person_ability'][$parentscale];
