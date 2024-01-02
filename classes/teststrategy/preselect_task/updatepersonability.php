@@ -301,7 +301,7 @@ class updatepersonability extends preselect_task implements wb_middleware {
      * @param mixed $contextid
      * @param mixed $catscaleid
      *
-     * @return mixed
+     * @return model_item_param_list
      *
      */
     protected function get_item_param_list($responses, $contextid, $catscaleid) {
