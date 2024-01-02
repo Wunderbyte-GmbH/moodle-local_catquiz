@@ -75,6 +75,14 @@ class updatepersonability extends preselect_task implements wb_middleware {
     public $lastquestion;
 
     /**
+     * Contains IDs of catscales that have at least two different (correct and
+     * incorrect) answers.
+     *
+     * @var array $diverseanswers
+     */
+    private array $diverseanswers = [];
+
+    /**
      * Run preselect task.
      *
      * @param array $context
@@ -160,19 +168,21 @@ class updatepersonability extends preselect_task implements wb_middleware {
         foreach ($itemparamlist as $item) {
             $arrayresponsesforscale[$item->get_id()] = $this->arrayresponses[$item->get_id()];
         }
+        $this->diverseanswers[$catscaleid] = $this->has_sufficient_responses($arrayresponsesforscale);
 
+        $parentability = $context['person_ability'][$parentscale] ?? 0.0;
         $startvalue = $context['person_ability'][$catscaleid] ?? 0.0;
-        if ($parentscale) {
-            $startvalue = $context['person_ability'][$parentscale];
+        if ($parentscale && $this->diverseanswers[$parentscale] ?? false) {
+            $startvalue = $parentability;
         }
-        $mean = $startvalue;
+        $sdability = $context['person_ability'][$catscaleid] ?? 0.0;
 
         // We use the standarderror that is calculated by the previous ability and the previous items.
         $itemclone = clone($itemparamlist);
         $itemclone->offsetUnset($context['lastquestion']->id);
-        $sd = catscale::get_standarderror($startvalue, $itemclone);
+        $sd = catscale::get_standarderror($sdability, $itemclone);
 
-        $updatedability = catcalc::estimate_person_ability($this->arrayresponses, $itemparamlist, $startvalue, $mean, $sd);
+        $updatedability = catcalc::estimate_person_ability($this->arrayresponses, $itemparamlist, $startvalue, $startvalue, $sd);
 
         if (is_nan($updatedability)) {
             // In a production environment, we can use fallback values. However,
