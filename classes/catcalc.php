@@ -89,6 +89,9 @@ class catcalc {
      * @param float $startvalue
      * @param float $mean The mean value of current abilities
      * @param float $sd The standard deviation of current abilities
+     * @param float $trlowerlimit The lower limit of the trusted region
+     * @param float $trupperlimit The upper limit of the trusted region
+     * @param float $tr This factor is multiplied with $sd to determine if a value is trusted
      *
      * @return float
      *
@@ -98,7 +101,10 @@ class catcalc {
         model_item_param_list $items,
         float $startvalue = 0.0,
         float $mean = 0,
-        float $sd = 1
+        float $sd = 1,
+        float $trlowerlimit = -10.0,
+        float $trupperlimit = 10.0,
+        float $tr = 10.0
     ): float {
         $allmodels = model_strategy::get_installed_models();
 
@@ -133,11 +139,10 @@ class catcalc {
 
         $trustedregionsfunction = fn($ability) => model_raschmodel::get_ability_tr_jacobian($ability, $mean, $sd);
         $trustedregionsderivate = fn($ability) => model_raschmodel::get_ability_tr_hessian($ability, $mean, $sd);
-        $tr = floatval(get_config('catmodel_raschbirnbauma', 'trusted_region_factor_sd_a'));
         $trustedregionfilter = fn($ability) => model_raschmodel::restrict_to_trusted_region_pp(
             $ability,
-            LOCAL_CATQUIZ_PERSONABILITY_LOWER_LIMIT,
-            LOCAL_CATQUIZ_PERSONABILITY_UPPER_LIMIT,
+            $trlowerlimit,
+            $trupperlimit,
             $tr,
             $mean,
             $sd
@@ -148,7 +153,7 @@ class catcalc {
             $hessian,
             ['ability' => $startvalue],
             6,
-            50,
+            500,
             $trustedregionfilter,
             $trustedregionsfunction,
             $trustedregionsderivate
