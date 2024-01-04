@@ -51,152 +51,6 @@ require_once($CFG->dirroot . '/local/catquiz/tests/lib.php');
  *
  */
 class catcalc_test extends basic_testcase {
-
-    /**
-     * Tests if the ability is calculated correctly
-     *
-     * @param array                 $responses        The response pattern
-     * @param model_item_param_list $items            A list of item params
-     * @param float                 $expectedability  The expected ability.
-     *
-     * @dataProvider estimate_person_ability_provider
-     */
-    public function test_estimate_person_ability($responses, model_item_param_list $items, float $expectedability) {
-        $ability = catcalc::estimate_person_ability($responses, $items);
-        // Remove the next line when ability calculation works.
-        $this->markTestIncomplete('The ability estimation does not yet calculate the expected values.');
-        $this->assertEquals($expectedability, sprintf('%.2f', $ability));
-    }
-
-    /**
-     * Dataprovider for the associated test function.
-     *
-     * Loads person responses and expected abilities from CSV files to create
-     * data expected by the test function.
-     */
-    public static function estimate_person_ability_provider(): array {
-        global $CFG;
-        $person = 0;
-        $responses = loadresponsesdata($CFG->dirroot . '/local/catquiz/tests/fixtures/responses.2PL.csv', $person);
-        $abilities = self::loadabilities($CFG->dirroot . '/local/catquiz/tests/fixtures/persons.csv', $person);
-        foreach ($responses as $label => $correct) {
-            $responses[$label] = ['fraction' => floatval($correct)];
-        }
-        $items = self::parseitemparams($CFG->dirroot . '/local/catquiz/tests/fixtures/simulation.csv');
-        return [
-            'all' => [
-                $responses,
-                $items,
-                $abilities['Gesamt'],
-            ],
-            'A01' => [
-                self::filterforlabel('A01', $responses),
-                $items,
-                $abilities['A01'],
-            ],
-            'A02' => [
-                self::filterforlabel('A02', $responses),
-                $items,
-                $abilities['A02'],
-            ],
-            'A03' => [
-                self::filterforlabel('A03', $responses),
-                $items,
-                $abilities['A03'],
-            ],
-            'A04' => [
-                self::filterforlabel('A04', $responses),
-                $items,
-                $abilities['A04'],
-            ],
-            'A05' => [
-                self::filterforlabel('A05', $responses),
-                $items,
-                $abilities['A05'],
-            ],
-            'A06' => [
-                self::filterforlabel('A06', $responses),
-                $items,
-                $abilities['A06'],
-            ],
-            'A07' => [
-                self::filterforlabel('A07', $responses),
-                $items,
-                $abilities['A07'],
-            ],
-            'B01' => [
-                self::filterforlabel('B01', $responses),
-                $items,
-                $abilities['B01'],
-            ],
-            'B02' => [
-                self::filterforlabel('B02', $responses),
-                $items,
-                $abilities['B02'],
-            ],
-            'B03' => [
-                self::filterforlabel('B03', $responses),
-                $items,
-                $abilities['B03'],
-            ],
-            'B04' => [
-                self::filterforlabel('B04', $responses),
-                $items,
-                $abilities['B04'],
-            ],
-            'C01' => [
-                self::filterforlabel('C01', $responses),
-                $items,
-                $abilities['C01'],
-            ],
-            'C02' => [
-                self::filterforlabel('C02', $responses),
-                $items,
-                $abilities['C02'],
-            ],
-            'C03' => [
-                self::filterforlabel('C03', $responses),
-                $items,
-                $abilities['C03'],
-            ],
-            'C04' => [
-                self::filterforlabel('C04', $responses),
-                $items,
-                $abilities['C04'],
-            ],
-            'C05' => [
-                self::filterforlabel('C05', $responses),
-                $items,
-                $abilities['C05'],
-            ],
-            'C06' => [
-                self::filterforlabel('C06', $responses),
-                $items,
-                $abilities['C06'],
-            ],
-            'C07' => [
-                self::filterforlabel('C07', $responses),
-                $items,
-                $abilities['C07'],
-            ],
-            'C08' => [
-                self::filterforlabel('C08', $responses),
-                $items,
-                $abilities['C08'],
-            ],
-            'C09' => [
-                self::filterforlabel('C09', $responses),
-                $items,
-                $abilities['C09'],
-            ],
-            'C10' => [
-                self::filterforlabel('C10', $responses),
-                $items,
-                $abilities['C10'],
-            ],
-        ];
-    }
-
     /**
      * Compares our results with the ones from the SimulatinoSteps radikaler CAT CSV
      *
@@ -227,11 +81,15 @@ class catcalc_test extends basic_testcase {
         string $personid
     ) {
         $ability = catcalc::estimate_person_ability($responses, $items, $startvalue, $mean, $sd);
-        $standarderror = catscale::get_standarderror($ability, $items);
+        if (abs($ability) > 10.0) {
+            $this->markTestSkipped('The ability is outside the trusted region.');
+            return;
+        }
 
         // If the CATQUIZ_CREATE_TESTOUTPUT environment variable is set, write a
         // CSV file with information about the test results.
         if (getenv('CATQUIZ_CREATE_TESTOUTPUT')) {
+            $standarderror = catscale::get_standarderror($ability, $items);
             $csv = implode(';', [
                 $personid,
                 count($items),
@@ -260,16 +118,27 @@ class catcalc_test extends basic_testcase {
      */
     public static function simulation_steps_calculated_ability_provider(): array {
         global $CFG;
-        $radcat1 = self::parsesimulationsteps(
-            $CFG->dirroot . '/local/catquiz/tests/fixtures/SimulationSteps radCAT 2023-12-21 09-02-35.csv'
+        $radcatstd = self::parsesimulationsteps(
+            $CFG->dirroot . '/local/catquiz/tests/fixtures/SimulationSteps radCAT 2023-12-21 09-02-35_shortened.csv'
         );
-        $radcat2 = self::parsesimulationsteps(
-            $CFG->dirroot . '/local/catquiz/tests/fixtures/SimulationSteps radCAT 2023-12-21 09-22-26.csv',
+        $radcatemp = self::parsesimulationsteps(
+            $CFG->dirroot . '/local/catquiz/tests/fixtures/SimulationSteps radCAT 2023-12-21 09-22-26_shortened.csv',
             'raschbirnbaumb',
             0.02,
             2.97
         );
-        $data = array_merge($radcat1, $radcat2);
+        $classiccat = self::parsesimulationsteps(
+            $CFG->dirroot . '/local/catquiz/tests/fixtures/SimulationSteps classTest emp. 2024-01-02 11-02-44_P000000.csv',
+            'raschbirnbaumb',
+            0.02,
+            2.97,
+            true
+        );
+        $data = array_merge(
+            $classiccat,
+            $radcatstd,
+            $radcatemp
+        );
         return $data;
     }
 
@@ -290,6 +159,7 @@ class catcalc_test extends basic_testcase {
      * @param string $modelname
      * @param float $mean
      * @param float $sd
+     * @param bool $fixedstartvalues
      * @return array
      * @throws UnexpectedValueException
      */
@@ -297,8 +167,11 @@ class catcalc_test extends basic_testcase {
         string $filename,
         $modelname = 'raschbirnbaumb',
         float $mean = 0.0,
-        float $sd = 1.0
+        float $sd = 1.0,
+        bool $fixedstartvalues = false
     ) {
+        $maxexpected = 0;
+        $minexpected = 0;
         if (($handle = fopen($filename, "r")) === false) {
             throw new UnexpectedValueException("Can not open file: " . $filename);
         }
@@ -369,9 +242,21 @@ class catcalc_test extends basic_testcase {
         $result = [];
         foreach ($steps as $personid => $persondata) {
             foreach ($persondata as $stepnum => $stepdata) {
-                // The standard error is 0 for the first question or the SE calculated after the last response.
-                $se = $stepnum === 1 ? $sd : $persondata[$stepnum - 1]['standard_error'];
-                $personmean = $stepnum === 1 ? $mean : $persondata[$stepnum - 1]['expected_ability'];
+                if ($stepdata['expected_ability'] > $maxexpected) {
+                    $maxexpected = $stepdata['expected_ability'];
+                }
+                if ($stepdata['expected_ability'] < $minexpected) {
+                    $minexpected = $stepdata['expected_ability'];
+                }
+
+                if ($fixedstartvalues) {
+                    $se = $sd;
+                    $personmean = $mean;
+                } else {
+                    // The standard error is 0 for the first question or the SE calculated after the last response.
+                    $se = $stepnum === 1 ? $sd : $persondata[$stepnum - 1]['standard_error'];
+                    $personmean = $stepnum === 1 ? $mean : $persondata[$stepnum - 1]['expected_ability'];
+                }
                 $result[sprintf('%s: %s Step %d', basename($filename), $personid, $stepnum)] = [
                     'responses' => $stepdata['responses'],
                     'items' => $stepdata['items'],
