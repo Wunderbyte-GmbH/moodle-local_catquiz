@@ -278,7 +278,7 @@ class mathcat {
         callable $fnderivative,
         array $parameterstart,
         int $precission = 6,
-        int $maxiterations = 50,
+        int $maxiterations = 500,
         callable $fntrustedregionsfilter = null,
         callable $fntrustedregionsfunction = null,
         callable $fntrustedregionsderivative = null): array {
@@ -290,6 +290,7 @@ class mathcat {
         $parameternames = array_keys($parameterstart);
         $iscritical = false;
         $maxsteplength = 0.1;
+        $usegauss = false;
 
         // Begin with numerical iteration.
         for ($i = 0; $i < $maxiterations; $i++) {
@@ -320,21 +321,20 @@ class mathcat {
             $mxparameteralt = $mxparameter;
             $distance = $mxdelta->rooted_summed_squares();
 
-            // TODO: If used like this, the reduction of the $mxdelta value will
+            // TODO: If used like this, the reduction of the $mxdelta value can
             // prevent the trusted regions filter to be applied, because with the
-            // reduced delta we will never leave the trusted region. If we still
+            // reduced delta we might not leave the trusted region. If we still
             // want to use this code, it has to be refactored. Maybe the
             // reduction should happen after application of the trusted region
-            // filter.
-            // phpcs:disable
-            // if ($distance >= $maxsteplength) {
-            // Shorten step matrix $mx_delta to concurrent step length.
-            // $mxdelta = $mxdelta->multiply($maxsteplength / $distance);
-            // } else {
-            // Set new $max_step_length.
-            // $maxsteplength = $distance;
-            // }
-            // phpcs:enable
+            // filter or we add a $maxsteplength argument and let the calling
+            // function set it.
+            if ($distance >= $maxsteplength) {
+                // Shorten step matrix $mx_delta to concurrent step length.
+                $mxdelta = $mxdelta->multiply($maxsteplength / $distance);
+            } else {
+                // Set new $max_step_length.
+                $maxsteplength = $distance;
+            }
 
             $mxparameter = $mxparameter->subtract($mxdelta);
             $parameter = array_combine($parameternames, ($mxparameter->transpose())[0]);
@@ -356,9 +356,10 @@ class mathcat {
                     $mxparameter = $mxparameter->transpose();
 
                     // If Trusted Region function and its derivative are provided, add them to $fn_function and $fn_derivative.
-                    if (isset($fntrustedregionsfunction) && isset($fntrustedregionsderivative)) {
+                    if (isset($fntrustedregionsfunction) && isset($fntrustedregionsderivative) && ! $usegauss) {
                         $fnfunction = fn($x) => matrixcat::multi_sum($fntrustedregionsfunction($x), $fnfunction($x));
                         $fnderivative = fn($x) => matrixcat::multi_sum($fntrustedregionsderivative($x), $fnderivative($x));
+                        $usegauss = true;
                     }
 
                     // If the problem occurs a second time in a row...
