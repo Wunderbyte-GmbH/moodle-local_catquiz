@@ -97,12 +97,15 @@ class graphicalsummary extends feedbackgenerator {
         } else {
             $catscaleid = $feedbackdata['catscaleid'];
         }
+        $catscale = catscale::return_catscale_object($catscaleid);
+        $catscalename = $catscale->name;
 
-        $participationcharts = $this->render_participationcharts($feedbackdata, $catscaleid);
+        $participationcharts = $this->render_participationcharts($feedbackdata, $catscaleid, $feedbackdata['catscaleid']);
 
         $data['chart'] = $chart ?? "";
         $data['strategyname'] = $feedbackdata['teststrategyname'] ?? "";
         $data['table'] = $table ?? "";
+        $data['attemptchartstitle'] = get_string('attemptchartstitle', 'local_catquiz', $catscalename);
         $data['attemptscounterchart'] = $participationcharts['attemptscounterchart']['chart'];
         $data['attemptresultstackchart'] = $participationcharts['attemptresultstackchart']['chart'];
 
