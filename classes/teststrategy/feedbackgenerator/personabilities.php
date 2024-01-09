@@ -52,9 +52,9 @@ class personabilities extends feedbackgenerator {
 
     /**
      *
-     * @var mixed $primaryscaleid // The scale to be displayed in detail in the colorbar.
+     * @var int $primaryscaleid // The scale to be displayed in detail in the colorbar.
      */
-    public mixed $primaryscaleid;
+    public int $primaryscaleid;
 
     /**
      * Creates a new personabilities feedback generator.
