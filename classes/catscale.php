@@ -683,4 +683,52 @@ class catscale {
         $fisherinfo = max(10 ** -6, $fisherinfo);
         return (1 / sqrt($fisherinfo));
     }
+
+    /**
+     * Calculates the test potential for the items of a scale.
+     *
+     * This returns the sum of the fisher information of the X items with the
+     * greatest fisher information, where X is the number of remaining
+     * questions that can be drawn from the scale.
+     *
+     * @param float $ability The person ability in the given scale.
+     * @param model_item_param_list $items The items in the scale.
+     * @param int $remaining The number of items that can be drawn.
+     * @return float
+     */
+    public static function get_testpotential(float $ability, model_item_param_list $items, int $remaining): float {
+        if ($remaining < 1) {
+            return 0.0;
+        }
+
+        $models = model_strategy::get_installed_models();
+        $fi = [];
+        foreach ($items as $item) {
+            $fi[] = $models[$item->get_model_name()]::fisher_info(['ability' => $ability], $item->get_params_array());
+        }
+        rsort($fi, SORT_NUMERIC);
+        $mostinformative = array_slice($fi, 0, $remaining);
+        return array_sum($mostinformative);
+    }
+
+    /**
+     * Calculates the test information of the given items.
+     *
+     * This returns the sum of the fisher information of the given items.     *
+     *
+     * @param float $ability The person ability in the given scale.
+     * @param model_item_param_list $items The items in the scale.
+     * @return float
+     */
+    public static function get_testinformation(float $ability, model_item_param_list $items): float {
+        $models = model_strategy::get_installed_models();
+        $fi = [];
+        foreach ($items as $item) {
+            $fi[] = $models[$item->get_model_name()]::fisher_info(
+                ['ability' => $ability],
+                $item->get_params_array()
+            );
+        }
+        return array_sum($fi);
+    }
 }
