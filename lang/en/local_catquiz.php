@@ -537,14 +537,14 @@ $string['breakinfo_backtotest'] = 'Back to the test';
 // CAT Colors.
 $string['feedback_colorrange'] = 'Colorrange of a feedbackscale';
 
-$string['color_1_value'] = 'Red';
-$string['color_2_value'] = 'Black';
-$string['color_3_value'] = 'Darkred';
-$string['color_4_value'] = 'Orange';
-$string['color_5_value'] = 'Yellow';
-$string['color_6_value'] = 'Lightgreen';
-$string['color_7_value'] = 'Darkgreen';
-$string['color_8_value'] = 'White';
+$string['color_1_name'] = 'Red';
+$string['color_2_name'] = 'Black';
+$string['color_3_name'] = 'Darkred';
+$string['color_4_name'] = 'Orange';
+$string['color_5_name'] = 'Yellow';
+$string['color_6_name'] = 'Lightgreen';
+$string['color_7_name'] = 'Darkgreen';
+$string['color_8_name'] = 'White';
 
 $string['color_1_code'] = '#ff0000';
 $string['color_2_code'] = '#000000';

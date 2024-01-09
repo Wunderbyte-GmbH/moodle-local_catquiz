@@ -527,14 +527,14 @@ $string['breakinfo_backtotest'] = 'Zurück zum Test';
 // CAT Colors.
 $string['feedback_colorrange'] = 'Farbbereich auf einer Feedback-Skala';
 
-$string['color_1_value'] = 'Rot';
-$string['color_2_value'] = 'Schwarz';
-$string['color_3_value'] = 'Dunkelrot';
-$string['color_4_value'] = 'Orange';
-$string['color_5_value'] = 'Gelb';
-$string['color_6_value'] = 'Hellgrün';
-$string['color_7_value'] = 'Dunkelgrün';
-$string['color_8_value'] = 'Weiß';
+$string['color_1_name'] = 'Rot';
+$string['color_2_name'] = 'Schwarz';
+$string['color_3_name'] = 'Dunkelrot';
+$string['color_4_name'] = 'Orange';
+$string['color_5_name'] = 'Gelb';
+$string['color_6_name'] = 'Hellgrün';
+$string['color_7_name'] = 'Dunkelgrün';
+$string['color_8_name'] = 'Weiß';
 
 $string['color_1_code'] = '#ff0000';
 $string['color_2_code'] = '#000000';

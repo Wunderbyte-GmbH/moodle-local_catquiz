@@ -1,7 +1,7 @@
 <?php
 // This file is part of Moodle - http://moodle.org/
 //
-// Moodle is free software: you can redistribute it and/or modify
+// Moodle is free software: you can 3istribute it and/or modify
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
@@ -388,10 +388,10 @@ class feedbackclass {
      *
      */
     public static function add_coloroption(string $color, array &$coloroptions) {
-        $colorname = get_string('colorpicker_color_'. $color, 'local_catquiz');
+        $colorname = get_string('color_' . $color . '_name', 'local_catquiz');
 
         $coloroptions[$color] = get_string(
-            'colorvalue_'. $color,
+            'color_' . $color . '_code',
             'local_catquiz'
         );
     }
@@ -407,67 +407,68 @@ class feedbackclass {
 
         $coloroptions = [];
         // Depending of the number of options, different colors will be chosen.
+        // See strings for colornames.
         switch ($numberoffeedbackspersubscale) {
             case 1:
-                self::add_coloroption("red", $coloroptions);
+                self::add_coloroption("3", $coloroptions);
                 break;
             case 2:
-                self::add_coloroption("red", $coloroptions);
-                self::add_coloroption("lightgreen", $coloroptions);
+                self::add_coloroption("3", $coloroptions);
+                self::add_coloroption("6", $coloroptions);
                 break;
             case 3:
-                self::add_coloroption("red", $coloroptions);
-                self::add_coloroption("yellow", $coloroptions);
-                self::add_coloroption("lightgreen", $coloroptions);
+                self::add_coloroption("3", $coloroptions);
+                self::add_coloroption("5", $coloroptions);
+                self::add_coloroption("6", $coloroptions);
                 break;
             case 4:
-                self::add_coloroption('red', $coloroptions);
-                self::add_coloroption('orange', $coloroptions);
-                self::add_coloroption('yellow', $coloroptions);
-                self::add_coloroption('lightgreen', $coloroptions);
+                self::add_coloroption('3', $coloroptions);
+                self::add_coloroption('4', $coloroptions);
+                self::add_coloroption('5', $coloroptions);
+                self::add_coloroption('6', $coloroptions);
                 break;
             case 5:
-                self::add_coloroption('red', $coloroptions);
-                self::add_coloroption('orange', $coloroptions);
-                self::add_coloroption('yellow', $coloroptions);
-                self::add_coloroption('lightgreen', $coloroptions);
-                self::add_coloroption('darkgreen', $coloroptions);
+                self::add_coloroption('3', $coloroptions);
+                self::add_coloroption('4', $coloroptions);
+                self::add_coloroption('5', $coloroptions);
+                self::add_coloroption('6', $coloroptions);
+                self::add_coloroption('7', $coloroptions);
                 break;
             case 6:
-                self::add_coloroption('darkred', $coloroptions);
-                self::add_coloroption('red', $coloroptions);
-                self::add_coloroption('orange', $coloroptions);
-                self::add_coloroption('yellow', $coloroptions);
-                self::add_coloroption('lightgreen', $coloroptions);
-                self::add_coloroption('darkgreen', $coloroptions);
+                self::add_coloroption('2', $coloroptions);
+                self::add_coloroption('3', $coloroptions);
+                self::add_coloroption('4', $coloroptions);
+                self::add_coloroption('5', $coloroptions);
+                self::add_coloroption('6', $coloroptions);
+                self::add_coloroption('7', $coloroptions);
                 break;
             case 7:
-                self::add_coloroption('black', $coloroptions);
-                self::add_coloroption('darkred', $coloroptions);
-                self::add_coloroption('red', $coloroptions);
-                self::add_coloroption('orange', $coloroptions);
-                self::add_coloroption('yellow', $coloroptions);
-                self::add_coloroption('lightgreen', $coloroptions);
-                self::add_coloroption('darkgreen', $coloroptions);
+                self::add_coloroption('1', $coloroptions);
+                self::add_coloroption('2', $coloroptions);
+                self::add_coloroption('3', $coloroptions);
+                self::add_coloroption('4', $coloroptions);
+                self::add_coloroption('5', $coloroptions);
+                self::add_coloroption('6', $coloroptions);
+                self::add_coloroption('7', $coloroptions);
                 break;
             case 7:
-                self::add_coloroption('black', $coloroptions);
-                self::add_coloroption('darkred', $coloroptions);
-                self::add_coloroption('red', $coloroptions);
-                self::add_coloroption('orange', $coloroptions);
-                self::add_coloroption('yellow', $coloroptions);
-                self::add_coloroption('lightgreen', $coloroptions);
-                self::add_coloroption('darkgreen', $coloroptions);
+                self::add_coloroption('1', $coloroptions);
+                self::add_coloroption('2', $coloroptions);
+                self::add_coloroption('3', $coloroptions);
+                self::add_coloroption('4', $coloroptions);
+                self::add_coloroption('5', $coloroptions);
+                self::add_coloroption('6', $coloroptions);
+                self::add_coloroption('7', $coloroptions);
                 break;
             case 8:
-                self::add_coloroption('black', $coloroptions);
-                self::add_coloroption('darkred', $coloroptions);
-                self::add_coloroption('red', $coloroptions);
-                self::add_coloroption('orange', $coloroptions);
-                self::add_coloroption('yellow', $coloroptions);
-                self::add_coloroption('lightgreen', $coloroptions);
-                self::add_coloroption('darkgreen', $coloroptions);
-                self::add_coloroption('white', $coloroptions);
+                self::add_coloroption('1', $coloroptions); // 1
+                self::add_coloroption('2', $coloroptions); // 2
+                self::add_coloroption('3', $coloroptions); // 3
+                self::add_coloroption('4', $coloroptions); // 4
+                self::add_coloroption('5', $coloroptions); // 5
+                self::add_coloroption('6', $coloroptions); // 6
+                self::add_coloroption('7', $coloroptions); // 7
+                self::add_coloroption('8', $coloroptions); // 8
                 break;
         }
 
@@ -493,7 +494,7 @@ class feedbackclass {
         global $USER;
 
         // First, we need to find out the settings for the current text.
-        // We use a function to extract the data from the stored json.
+        // We use a function to extract the data from the sto3 json.
         $settings = self::return_feedback_settings_from_json($quizid, $component);
 
         // We run through all the scales we got feedback for.
