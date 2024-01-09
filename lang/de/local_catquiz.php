@@ -545,15 +545,6 @@ $string['colorvalue_lightgreen'] = '#90ee90';
 $string['colorvalue_darkgreen'] = '#006400';
 $string['colorvalue_white'] = '#e8e9eb';
 
-$string['#ff0000'] = 'Rot';
-$string['#000000'] = 'Schwarz';
-$string['#8b0000'] = 'Dunkelrot';
-$string['#ffa500'] = 'Orange';
-$string['#ffff00'] = 'Gelb';
-$string['#90ee90'] = 'Hellgrün';
-$string['#006400'] = 'Dunkelgrün';
-$string['#e8e9eb'] = 'Weiß';
-
 // Stringdates.
 $string['stringdate:day'] = '{$a}';
 $string['stringdate:week'] = 'KW {$a}';
