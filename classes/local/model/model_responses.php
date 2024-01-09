@@ -24,7 +24,8 @@
 
 namespace local_catquiz\local\model;
 
-use local_catquiz\local\model\model_item_list;
+use local_catquiz\catscale;
+use local_catquiz\local\model\model_item_param_list;
 use local_catquiz\local\model\model_item_response;
 use local_catquiz\local\model\model_person_param_list;
 
@@ -293,6 +294,34 @@ class model_responses {
      */
     public function get_excluded_users() {
         return $this->excludedusers;
+    }
+
+    /**
+     * Get item param list.
+     *
+     * @param int $catscaleid
+     * @param int $contextid
+     *
+     * @return model_item_param_list
+     */
+    public function get_items_for_scale(int $catscaleid, int $contextid): model_item_param_list {
+        $modelstrategy = new model_strategy($this);
+        $catscalecontext = catscale::get_context_id($catscaleid);
+        $catscaleids = [
+            $catscaleid,
+            ...catscale::get_subscale_ids($catscaleid),
+        ];
+        $itemparamlists = [];
+        $personparams = model_person_param_list::load_from_db($contextid, $catscaleids);
+        foreach (array_keys($modelstrategy->get_installed_models()) as $model) {
+            $itemparamlists[$model] = model_item_param_list::load_from_db(
+                $catscalecontext,
+                $model,
+                $catscaleids
+            );
+        }
+        $itemparamlist = $modelstrategy->select_item_model($itemparamlists, $personparams);
+        return $itemparamlist;
     }
 
     /**
