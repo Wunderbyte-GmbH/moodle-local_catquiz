@@ -428,6 +428,7 @@ $string['itemsplayed'] = 'ausgewertete Fragen:';
 $string['personabilityinscale'] = 'Fähigkeits-Score für Skala "{$a}"';
 $string['yourscorein'] = 'Ihre durchschnittlichen "{$a}"-Ergebnisse';
 $string['scoreofpeers'] = 'Mittelwert Ihrer Mit-Studierenden';
+$string['numberofattempts'] = 'Anzahl der Testversuche';
 $string['labelforrelativepersonabilitychart'] = 'Relative Fähigkeit';
 
 // Check display line breaks etc.

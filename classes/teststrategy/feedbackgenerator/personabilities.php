@@ -344,7 +344,7 @@ class personabilities extends feedbackgenerator {
         }
         $startingrecord = reset($records);
         $beginningoftimerange = intval($startingrecord->endtime);
-        $timerange = $this->get_timerange_for_average($beginningoftimerange, $endtime);
+        $timerange = $this->get_timerange_for_attempts($beginningoftimerange, $endtime);
 
         $attemptsofuser = array_filter($records, fn($r) => $r->userid == $userid);
         $attemptsofpeers = array_filter($records, fn($r) => $r->userid != $userid);
@@ -377,7 +377,7 @@ class personabilities extends feedbackgenerator {
      * @return int
      *
      */
-    private function get_timerange_for_average(int $beginningoftimerange, int $endtime) {
+    public static function get_timerange_for_attempts(int $beginningoftimerange, int $endtime) {
         $differenceindays = ($endtime - $beginningoftimerange) / (60 * 60 * 24);
         $range = LOCAL_CATQUIZ_TIMERANGE_DAY;
 
@@ -465,10 +465,12 @@ class personabilities extends feedbackgenerator {
         $chart = new \core\chart_line();
         $chart->set_smooth(true); // Calling set_smooth() passing true as parameter, will display smooth lines.
 
-        $pa = $this->order_average_attemptresults_by_timerange($attemptsofpeers, $scaleid, $timerange);
-        $ua = $this->order_average_attemptresults_by_timerange($attemptsofuser, $scaleid, $timerange);
+        $orderedattemptspeers = self::order_attempts_by_timerange($attemptsofpeers, $scaleid, $timerange);
+        $pa = $this->assign_average_result_to_timerange($orderedattemptspeers);
+        $orderedattemptsuser = self::order_attempts_by_timerange($attemptsofuser, $scaleid, $timerange);
+        $ua = $this->assign_average_result_to_timerange($orderedattemptsuser);
 
-        $alldates = $this->get_timerangekeys($timerange, $beginningandendofrange);
+        $alldates = self::get_timerangekeys($timerange, $beginningandendofrange);
         $peerattemptsbydate = [];
         $userattemptsbydate = [];
         $firstvalue = true;
@@ -611,7 +613,7 @@ class personabilities extends feedbackgenerator {
      * @return array
      *
      */
-    private function order_average_attemptresults_by_timerange(array $attempts, int $scaleid, int $timerange) {
+    public static function order_attempts_by_timerange(array $attempts, int $scaleid, int $timerange) {
 
         $attemptsbytimerange = [];
 
@@ -653,6 +655,16 @@ class personabilities extends feedbackgenerator {
                 $attemptsbytimerange[$datestring][] = $data->personabilities->$scaleid;
             }
         }
+        return $attemptsbytimerange;
+    }
+
+    /**
+     * Assign average of result for each period.
+     * @param array $attemptsbytimerange
+     *
+     * @return array
+     */
+    private function assign_average_result_to_timerange(array $attemptsbytimerange) {
         // Calculate average personability of this period.
         foreach ($attemptsbytimerange as $date => $attempt) {
             $floats = array_map('floatval', $attempt);
@@ -661,7 +673,6 @@ class personabilities extends feedbackgenerator {
         }
         return $attemptsbytimerange;
     }
-
     /**
      * Return keys for all moments in defined timerange.
      *
@@ -671,7 +682,7 @@ class personabilities extends feedbackgenerator {
      * @return array
      *
      */
-    private function get_timerangekeys($timerange, $beginningandendofrange) {
+    public static function get_timerangekeys($timerange, $beginningandendofrange) {
         switch ($timerange) {
             case LOCAL_CATQUIZ_TIMERANGE_DAY:
                 $dateformat = '%d.%m.%Y';
@@ -755,10 +766,10 @@ class personabilities extends feedbackgenerator {
                 ]);
             $series->set_labels([0 => $stringforchartlegend]);
 
-            $colorvalue = $this->get_color_for_personabily(
+            $colorvalue = self::get_color_for_personability(
                 $quizsettings,
                 floatval($subscaleability),
-                floatval($subscaleid)
+                intval($subscaleid)
             );
             $series->set_colors([0 => $colorvalue]);
             $chart->add_series($series);
@@ -778,11 +789,11 @@ class personabilities extends feedbackgenerator {
      *
      * @param array $quizsettings
      * @param float $personability
-     * @param float $catscaleid
+     * @param int $catscaleid
      * @return string
      *
      */
-    private function get_color_for_personabily(array $quizsettings, float $personability, float $catscaleid): string {
+    public static function get_color_for_personability(array $quizsettings, float $personability, int $catscaleid): string {
         $default = "#000000";
         if (!$quizsettings ||
             $personability < LOCAL_CATQUIZ_PERSONABILITY_LOWER_LIMIT ||

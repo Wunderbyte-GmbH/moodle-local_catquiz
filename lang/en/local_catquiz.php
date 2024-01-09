@@ -431,6 +431,7 @@ $string['itemsplayed'] = 'evaluated items:';
 $string['personabilityinscale'] = 'Ability score in scale "{$a}"';
 $string['yourscorein'] = 'Your average scores in "{$a}"';
 $string['scoreofpeers'] = 'Average of your peers';
+$string['numberofattempts'] = 'Number of attempts';
 $string['abilityprofile'] = 'Ability score profile in "{$a}"';
 $string['labelforrelativepersonabilitychart'] = 'Relative Ability';
 

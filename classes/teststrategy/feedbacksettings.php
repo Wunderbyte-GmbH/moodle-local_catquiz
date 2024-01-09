@@ -17,6 +17,7 @@
 namespace local_catquiz\teststrategy;
 
 use local_catquiz\catscale;
+use local_catquiz\feedback\feedbackclass;
 
 defined('MOODLE_INTERNAL') || die();
 
@@ -141,6 +142,8 @@ class feedbacksettings {
      * @param array $personabilities
      * @param object $quizsettings
      * @param int $catscaleid
+     *
+     * return array
      */
     public function get_scaleid_and_stringkey(array $personabilities, object $quizsettings, int $catscaleid) {
 
@@ -172,5 +175,31 @@ class feedbacksettings {
             'selectedscaleid' => $selectedscaleid,
             'selectedscalestringkey' => $selectedscale,
         ];
+    }
+
+    /**
+     * Return all colors defined in feedbacksettings for this scale.
+     *
+     * @param array $quizsettings
+     * @param int $catscaleid
+     *
+     * return array
+     */
+    public function get_defined_feedbackcolors_for_scale(array $quizsettings, int $catscaleid) {
+
+        $colors = [];
+
+        $numberoffeedbackoptions = intval($quizsettings['numberoffeedbackoptionsselect']) ?? 8;
+        $colorarray = feedbackclass::get_array_of_colors($numberoffeedbackoptions);
+
+        for ($i = 1; $i <= $numberoffeedbackoptions; $i++) {
+            $colorkey = 'wb_colourpicker_' . $catscaleid . '_' . $i;
+            $colorname = $quizsettings[$colorkey];
+            if (isset($colorarray[$colorname])) {
+                $colors[] = $colorarray[$colorname];
+            }
+
+        }
+        return $colors;
     }
 }
