@@ -527,23 +527,23 @@ $string['breakinfo_backtotest'] = 'Zurück zum Test';
 // CAT Colors.
 $string['feedback_colorrange'] = 'Farbbereich auf einer Feedback-Skala';
 
-$string['colorpicker_color_red'] = 'Rot';
-$string['colorpicker_color_black'] = 'Schwarz';
-$string['colorpicker_color_darkred'] = 'Dunkelrot';
-$string['colorpicker_color_orange'] = 'Orange';
-$string['colorpicker_color_yellow'] = 'Gelb';
-$string['colorpicker_color_lightgreen'] = 'Hellgrün';
-$string['colorpicker_color_darkgreen'] = 'Dunkelgrün';
-$string['colorpicker_color_white'] = 'Weiß';
+$string['color_1_value'] = 'Rot';
+$string['color_2_value'] = 'Schwarz';
+$string['color_3_value'] = 'Dunkelrot';
+$string['color_4_value'] = 'Orange';
+$string['color_5_value'] = 'Gelb';
+$string['color_6_value'] = 'Hellgrün';
+$string['color_7_value'] = 'Dunkelgrün';
+$string['color_8_value'] = 'Weiß';
 
-$string['colorvalue_red'] = '#ff0000';
-$string['colorvalue_black'] = '#000000';
-$string['colorvalue_darkred'] = '#8b0000';
-$string['colorvalue_orange'] = '#ffa500';
-$string['colorvalue_yellow'] = '#ffff00';
-$string['colorvalue_lightgreen'] = '#90ee90';
-$string['colorvalue_darkgreen'] = '#006400';
-$string['colorvalue_white'] = '#e8e9eb';
+$string['color_1_code'] = '#ff0000';
+$string['color_2_code'] = '#000000';
+$string['color_3_code'] = '#8b0000';
+$string['color_4_code'] = '#ffa500';
+$string['color_5_code'] = '#ffff00';
+$string['color_6_code'] = '#90ee90';
+$string['color_7_code'] = '#006400';
+$string['color_8_code'] = '#e8e9eb';
 
 // Stringdates.
 $string['stringdate:day'] = '{$a}';
