@@ -170,6 +170,9 @@ class catscale {
         if ($catscale->contextid) {
             return $catscale->contextid;
         }
+        if ($catscale->parentid === 0) {
+            return catquiz::get_default_context_id();
+        }
         return self::get_context_id($catscale->parentid);
     }
 
