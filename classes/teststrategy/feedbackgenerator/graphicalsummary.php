@@ -400,7 +400,7 @@ class graphicalsummary extends feedbackgenerator {
      * Render the charts with data about participation by day.
      *
      * @param array $data
-     * @param int $catscaleid
+     * @param int $primarycatscaleid
      * @param int $parentscaleid
      * @param int $contextid
      *
@@ -427,8 +427,6 @@ class graphicalsummary extends feedbackgenerator {
         $attemptsbytimerange = personabilities::order_attempts_by_timerange($records, $primarycatscaleid, $timerange);
         $attemptscounterchart = $this->render_attemptscounterchart($attemptsbytimerange);
         $attemptresultstackchart = $this->render_attemptresultstackchart($attemptsbytimerange, $primarycatscaleid, $data);
-        // Graph 2: Group by date and stack attempt results.
-        // $attemptsstackerchart = $this->attemptsstackchart($records, $timerange);
         return [
             'attemptscounterchart' => $attemptscounterchart,
             'attemptresultstackchart' => $attemptresultstackchart,
@@ -482,9 +480,6 @@ class graphicalsummary extends feedbackgenerator {
         $series = [];
         $labels = [];
         $quizsettings = $attemptdata['quizsettings'];
-        // Check in quizsettings for this scale the colorranges.
-        // wb_colorpicker_scaleid_i = name
-        // feedback_scaleid_limit_upper_scaleid_i = range
 
         foreach ($attemptsbytimerange as $timestamp => $attempts) {
             $labels[] = (string)$timestamp;
@@ -498,10 +493,7 @@ class graphicalsummary extends feedbackgenerator {
                 }
             }
         }
-        // Make new array:
-        // foreach date foreach index count and order.
-        // find string name for color. maybe use value from colorpicker and localize it
-        // set color.
+
         $chart = new \core\chart_bar();
         $chart->set_stacked(true);
 

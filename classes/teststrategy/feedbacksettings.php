@@ -143,7 +143,7 @@ class feedbacksettings {
      * @param object $quizsettings
      * @param int $catscaleid
      *
-     * return array
+     * @return array
      */
     public function get_scaleid_and_stringkey(array $personabilities, object $quizsettings, int $catscaleid) {
 
@@ -183,7 +183,7 @@ class feedbacksettings {
      * @param array $quizsettings
      * @param int $catscaleid
      *
-     * return array
+     * @return array
      */
     public function get_defined_feedbackcolors_for_scale(array $quizsettings, int $catscaleid) {
 
