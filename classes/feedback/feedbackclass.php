@@ -1,7 +1,7 @@
 <?php
 // This file is part of Moodle - http://moodle.org/
 //
-// Moodle is free software: you can 3istribute it and/or modify
+// Moodle is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
@@ -494,7 +494,7 @@ class feedbackclass {
         global $USER;
 
         // First, we need to find out the settings for the current text.
-        // We use a function to extract the data from the sto3 json.
+        // We use a function to extract the data from the stored json.
         $settings = self::return_feedback_settings_from_json($quizid, $component);
 
         // We run through all the scales we got feedback for.
