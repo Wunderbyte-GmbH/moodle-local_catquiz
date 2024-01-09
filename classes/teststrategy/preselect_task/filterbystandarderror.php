@@ -24,29 +24,19 @@
 
 namespace local_catquiz\teststrategy\preselect_task;
 
-use cache;
-use dml_exception;
-use local_catquiz\catscale;
 use local_catquiz\local\result;
 use local_catquiz\local\status;
 use local_catquiz\teststrategy\preselect_task;
 use local_catquiz\wb_middleware;
 
 /**
- * Calculates the standarderror for each available catscale.
+ * Excludes scales based on standard error.
  *
  * @package local_catquiz
  * @copyright 2023 Wunderbyte GmbH
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class filterbystandarderror extends preselect_task implements wb_middleware {
-
-    /**
-     * Playes questions per scale.
-     *
-     * @var array|null
-     */
-    protected ?array $playedquestionsperscale = null;
 
     /**
      * Run method.
