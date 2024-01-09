@@ -401,10 +401,12 @@ class graphicalsummary extends feedbackgenerator {
      *
      * @param array $data
      * @param int $catscaleid
+     * @param int $parentscaleid
+     * @param int $contextid
      *
      * @return array
      */
-    private function render_participationcharts(array $data, int $catscaleid, int $contextid = 0) {
+    private function render_participationcharts(array $data, int $primarycatscaleid, int $parentscaleid, int $contextid = 0) {
 
         // In case you want to make context a changeable param of feedbacksettings, apply logic here.
         if (empty($contextid)) {
@@ -413,7 +415,7 @@ class graphicalsummary extends feedbackgenerator {
 
         $records = catquiz::get_attempts(
             null,
-            $catscaleid,
+            $parentscaleid,
             $data['courseid'],
             $contextid,
             null,
@@ -422,9 +424,9 @@ class graphicalsummary extends feedbackgenerator {
         $startingrecord = reset($records);
         $beginningoftimerange = intval($startingrecord->endtime);
         $timerange = personabilities::get_timerange_for_attempts($beginningoftimerange, $data['endtime']);
-        $attemptsbytimerange = personabilities::order_attempts_by_timerange($records, $catscaleid, $timerange);
+        $attemptsbytimerange = personabilities::order_attempts_by_timerange($records, $primarycatscaleid, $timerange);
         $attemptscounterchart = $this->render_attemptscounterchart($attemptsbytimerange);
-        $attemptresultstackchart = $this->render_attemptresultstackchart($attemptsbytimerange, $catscaleid, $data);
+        $attemptresultstackchart = $this->render_attemptresultstackchart($attemptsbytimerange, $primarycatscaleid, $data);
         // Graph 2: Group by date and stack attempt results.
         // $attemptsstackerchart = $this->attemptsstackchart($records, $timerange);
         return [
