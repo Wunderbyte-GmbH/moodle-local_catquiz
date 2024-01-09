@@ -275,7 +275,7 @@ class debuginfo extends feedbackgenerator {
             $questionsperscale = [];
             if (array_key_exists('questions', $data)) {
                 foreach ($data['questions'] as $qid => $question) {
-                    $fisherinformation = $question->fisherinformation ?? "NA";
+                    $fisherinformation = $question->fisherinformation[$data['catscaleid']] ?? "NA";
                     $score = $question->score ?? "NA";
                     $questions[] = [
                         'id' => $qid,
