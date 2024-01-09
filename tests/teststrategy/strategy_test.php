@@ -228,29 +228,31 @@ class strategy_test extends advanced_testcase {
             //        ],
             //    ],
             //],
-            //'Infer lowest skillgap' => [
-            //    'strategy' => LOCAL_CATQUIZ_STRATEGY_LOWESTSUB,
-            //    'questions' => [
-            //        [
-            //            'label' => 'SIMB01-18',
-            //            'is_correct_response' => true,
-            //            'ability_before' => 0,
-            //            'ability_after' => 0.0,
-            //        ],
-            //        [
-            //            'label' => 'SIMB02-07',
-            //            'is_correct_response' => false,
-            //            'ability_before' => 0,
-            //            'ability_after' => 2.5,
-            //        ],
-            //        [
-            //            'label' => 'SIMB03-06',
-            //            'is_correct_response' => true,
-            //            'ability_before' => 2.5,
-            //            'ability_after' => 1.1569,
-            //        ],
-            //    ],
-            //],
+            // phpcs:enable
+            'Infer lowest skillgap' => [
+                'strategy' => LOCAL_CATQUIZ_STRATEGY_LOWESTSUB,
+                'questions' => [
+                    [
+                        'label' => 'SIMB01-18',
+                        'is_correct_response' => false,
+                        'ability_before' => 0,
+                        'ability_after' => 0.0,
+                    ],
+                    [
+                        'label' => 'SIMA06-15',
+                        'is_correct_response' => false,
+                        'ability_before' => 0,
+                        'ability_after' => -0.67,
+                    ],
+                    [
+                        'label' => 'SIMA02-02',
+                        'is_correct_response' => true,
+                        'ability_before' => -0.67,
+                        'ability_after' => -1.3,
+                    ],
+                ],
+            ],
+            // phpcs:disable
             //'Infer greatest strength' => [
             //    'strategy' => LOCAL_CATQUIZ_STRATEGY_HIGHESTSUB,
             //    'questions' => [
