@@ -33,6 +33,7 @@ use local_catquiz\teststrategy\feedbackgenerator\pilotquestions;
 use local_catquiz\teststrategy\feedbackgenerator\questionssummary;
 use local_catquiz\teststrategy\feedbacksettings;
 use local_catquiz\teststrategy\preselect_task\addscalestandarderror;
+use local_catquiz\teststrategy\preselect_task\filterbystandarderror;
 use local_catquiz\teststrategy\preselect_task\filterforsubscale;
 use local_catquiz\teststrategy\preselect_task\firstquestionselector;
 use local_catquiz\teststrategy\preselect_task\fisherinformation;
@@ -88,6 +89,7 @@ class infergreateststrength extends strategy {
             noremainingquestions::class, // Cancel quiz attempt if no questions are left.
             fisherinformation::class, // Add the fisher information to each question.
             addscalestandarderror::class,
+            filterbystandarderror::class,
              // Keep only questions that are assigned to the subscale where the user has the largest ability values.
             filterforsubscale::class,
             strategyfastestscore::class,
