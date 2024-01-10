@@ -484,7 +484,7 @@ class graphicalsummary extends feedbackgenerator {
         foreach ($attemptsbytimerange as $timestamp => $attempts) {
             $labels[] = (string)$timestamp;
             foreach ($attempts as $attempt) {
-                $color = personabilities::get_color_for_personability($quizsettings, $attempt, $catscaleid);
+                $color = personabilities::get_color_for_personability((array)$quizsettings, $attempt, $catscaleid);
 
                 if (!isset($series[$timestamp][$color])) {
                         $series[$timestamp][$color] = 1;
