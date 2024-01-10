@@ -769,7 +769,7 @@ class personabilities extends feedbackgenerator {
             $colorvalue = self::get_color_for_personability(
                 $quizsettings,
                 floatval($subscaleability),
-                intval($subscaleid)
+                intval($primarycatscaleid)
             );
             $series->set_colors([0 => $colorvalue]);
             $chart->add_series($series);
@@ -794,7 +794,7 @@ class personabilities extends feedbackgenerator {
      *
      */
     public static function get_color_for_personability(array $quizsettings, float $personability, int $catscaleid): string {
-        $default = "#000000";
+        $default = "#878787";
         if (!$quizsettings ||
             $personability < LOCAL_CATQUIZ_PERSONABILITY_LOWER_LIMIT ||
             $personability > LOCAL_CATQUIZ_PERSONABILITY_UPPER_LIMIT) {
