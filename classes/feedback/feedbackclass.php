@@ -327,8 +327,9 @@ class feedbackclass {
             } else if ($scale->parentid != $previousparentscaleid
             && $scale->depth < $previousdepth) {
                 $depthdifference = $previousdepth - $scale->depth;
-                $numberofclosinghtmls = $depthdifference * 2;
+                $numberofclosinghtmls = $depthdifference + 1;
             }
+
             $previousparentscaleid = $scale->parentid;
             $previousdepth = $scale->depth;
 
@@ -343,10 +344,10 @@ class feedbackclass {
                 'accordionid' => $accordionid,
             ];
 
-            $html1 = $OUTPUT->render_from_template('local_catquiz/feedback/feedbackform_collapsible_open', $headerdata);
-
             // Closing the elements.
             self::add_closing_html($numberofclosinghtmls, $scale->id, $mform, $elements, $html2);
+
+            $html1 = $OUTPUT->render_from_template('local_catquiz/feedback/feedbackform_collapsible_open', $headerdata);
 
             $element = $mform->createElement('html', $html1);
             $element->setName('header_accordion_start_scale_' . $scale->id);
