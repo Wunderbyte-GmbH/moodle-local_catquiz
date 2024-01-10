@@ -49,7 +49,8 @@ final class maximumquestionscheck extends preselect_task implements wb_middlewar
      *
      */
     public function run(array &$context, callable $next): result {
-        if ($context['questionsattempted'] >= $context['maximumquestions']) {
+        $maxquestions = $context['maximumquestions'];
+        if (($maxquestions == -1) || ($context['questionsattempted'] >= $maxquestions)) {
             // Save the last response so that we can display it as feedback.
             $lastquestion = $context['lastquestion'];
             $lastresponse = catcontext::getresponsedatafromdb(

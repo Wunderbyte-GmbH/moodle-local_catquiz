@@ -753,14 +753,15 @@ class catquiz_handler {
             $pilotratio = floatval($quizsettings->catquiz_pilotratio);
         }
 
+        // Default is infinite represented by -1.
         $maxquestionsperscale = intval($quizsettings->catquiz_maxquestionspersubscale);
         if ($maxquestionsperscale == 0) {
-            $maxquestionsperscale = INF;
+            $maxquestionsperscale = -1;
         }
 
         $maxquestions = $quizsettings->catquiz_maxquestions;
         if (!$maxquestions) {
-            $maxquestions = INF;
+            $maxquestions = -1;
         }
 
         // Get selected subscales from quizdata.
