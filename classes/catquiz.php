@@ -1462,6 +1462,7 @@ class catquiz {
         if ($existingrecord) {
             return 0;
         }
+        $catcontext = catscale::get_context_id($attemptdata['catscaleid']);
 
         // To query the db only once we fetch courseid und instanceid here.
         $courseandinstance = self::return_course_and_instance_id($attemptdata);
@@ -1469,7 +1470,7 @@ class catquiz {
         $data = new stdClass;
         $data->userid = $attemptdata['userid'];
         $data->scaleid = $attemptdata['catscaleid'];
-        $data->contextid = $attemptdata['contextid'];
+        $data->contextid = $catcontext;
         $data->courseid = $courseandinstance['courseid'];
         $data->attemptid = $attemptdata['attemptid'];
         $data->component = $attemptdata['quizsettings']->modulename;

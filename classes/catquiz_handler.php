@@ -171,24 +171,6 @@ class catquiz_handler {
             'data-action' => 'submitCatScale',
         ]);
 
-        $catcontexts = \local_catquiz\data\dataapi::get_all_catcontexts();
-        $options = [
-            'multiple' => false,
-            'noselectionstring' => get_string('defaultcontextname', 'local_catquiz'),
-        ];
-
-        $select = [];
-        foreach ($catcontexts as $catcontext) {
-            $select[$catcontext->id] = $catcontext->getName();
-        }
-        $elements[] = $mform->addElement(
-            'autocomplete',
-            'catquiz_catcontext',
-            get_string('selectcatcontext', 'local_catquiz'),
-            $select,
-            $options
-        );
-
         $elements[] = $mform->addElement('text', 'catquiz_passinglevel', get_string('passinglevel', 'local_catquiz'));
         $mform->addHelpButton('catquiz_passinglevel', 'passinglevel', 'local_catquiz');
         $mform->setType('catquiz_passinglevel', PARAM_INT);
@@ -210,9 +192,9 @@ class catquiz_handler {
             2 => get_string('timeoutabortresult', 'local_catquiz'),
             3 => get_string('timeoutabortnoresult', 'local_catquiz'),
         ];
-         // Choose a model for this instance.
-         $elements[] = $mform->addElement('select', 'catquiz_actontimeout',
-            get_string('actontimeout', 'local_catquiz'), $timeoutoptions);
+        // Choose a model for this instance.
+        $elements[] = $mform->addElement('select', 'catquiz_actontimeout',
+        get_string('actontimeout', 'local_catquiz'), $timeoutoptions);
         $mform->hideIf('catquiz_actontimeout', 'catquiz_timepacedtest', 'neq', 1);
 
         info::instance_form_definition($mform, $elements);
@@ -498,7 +480,7 @@ class catquiz_handler {
 
         // Create stdClass with all the values.
         $cattest = (object)[
-             'componentid' => $quizdata->id,
+            'componentid' => $quizdata->id,
             'component' => 'mod_adaptivequiz',
             'json' => json_encode($clone),
             'parentid' => $parentid ?? 0,
@@ -610,13 +592,6 @@ class catquiz_handler {
                     }
                 }
             }
-        } else if (isset($values['submitcatscaleoption'])) {
-            // Check if there is a default contextid for the scale and set it.
-            $scaleid = $values['catquiz_catscales'];
-            if (!empty($scaleid)) {
-                // Get right element to set value here.
-                $values['catquiz_catcontext'] = catscale::return_default_contextid_of_catscale($scaleid) ?? 0;
-            }
         } else if (!isset($values["submitcattestoption"])
         || $values["submitcattestoption"] != "cattestsubmit") {
             return;
@@ -625,7 +600,7 @@ class catquiz_handler {
         $cattest = (object)[
             'id' => $values['choosetemplate'],
         ];
-        // Pass on the values as stdClas.
+        // Pass on the values as stdClass.
         $test = new testenvironment($cattest);
         $test->apply_jsonsaved_values($values);
 
@@ -677,11 +652,12 @@ class catquiz_handler {
         $cache->set('quizsettings', $quizsettings);
         $cache->set('attemptdata', $attemptdata);
 
+        $catcontext = catscale::get_context_id($quizsettings->catquiz_catscales);
         $tsinfo = new info();
         $teststrategy = $tsinfo
             ->return_active_strategy($quizsettings->catquiz_selectteststrategy)
             ->set_scale($quizsettings->catquiz_catscales)
-            ->set_catcontextid($quizsettings->catquiz_catcontext);
+            ->set_catcontextid($catcontext);
 
         $selectioncontext = self::get_strategy_selectcontext($quizsettings, $attemptdata);
         $result = $teststrategy->return_next_testitem($selectioncontext);
@@ -753,22 +729,24 @@ class catquiz_handler {
             $pilotratio = floatval($quizsettings->catquiz_pilotratio);
         }
 
+        // Default is infinite represented by -1.
         $maxquestionsperscale = intval($quizsettings->catquiz_maxquestionspersubscale);
         if ($maxquestionsperscale == 0) {
-            $maxquestionsperscale = INF;
+            $maxquestionsperscale = -1;
         }
 
         $maxquestions = $quizsettings->catquiz_maxquestions;
         if (!$maxquestions) {
-            $maxquestions = INF;
+            $maxquestions = -1;
         }
 
         // Get selected subscales from quizdata.
         $selectedsubscales = self::get_selected_subscales($quizsettings);
 
+        $catcontext = catscale::get_context_id($quizsettings->catquiz_catscales);
         $initialcontext = [
             'testid' => intval($attemptdata->instance),
-            'contextid' => intval($quizsettings->catquiz_catcontext),
+            'contextid' => $catcontext,
             'catscaleid' => $quizsettings->catquiz_catscales,
             'installed_models' => model_strategy::get_installed_models(),
             // When selecting questions from a scale, also include questions from its subscales.

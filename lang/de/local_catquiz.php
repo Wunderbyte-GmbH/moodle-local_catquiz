@@ -378,6 +378,7 @@ $string['emptyfirstquestionlist'] = "Kann keine Startfrage wählen da die Liste 
 
 // Quiz Feedback.
 $string['attemptfeedbacknotavailable'] = "Kein Feedback verfügbar";
+$string['attemptfeedbacknotyetavailable'] = "Feedback wird angezeigt sobald es verfügbar ist.";
 $string['allquestionsincorrect'] = "Genauer Fähigkeits-Score kann nicht ermittelt werden, da alle Fragen falsch beantwortet wurden.";
 $string['allquestionscorrect'] = "Genauer Fähigkeits-Score kann nicht ermittelt werden, da alle Fragen richtig beantwortet wurden.";
 $string['feedbackcomparetoaverage'] = 'Sie sind besser in "{$a->scaleinfo}" als {$a->quantile}% aller Teilnehmenden.';
@@ -427,7 +428,10 @@ $string['itemsplayed'] = 'ausgewertete Fragen:';
 $string['personabilityinscale'] = 'Fähigkeits-Score für Skala "{$a}"';
 $string['yourscorein'] = 'Ihre durchschnittlichen "{$a}"-Ergebnisse';
 $string['scoreofpeers'] = 'Mittelwert Ihrer Mit-Studierenden';
+$string['numberofattempts'] = 'Anzahl der Testversuche';
+$string['attemptchartstitle'] = 'Anzahl und Ergebnisse der Testversuche für Skala "{$a}"';
 $string['labelforrelativepersonabilitychart'] = 'Relative Fähigkeit';
+$string['personabilityrangestring'] = '{$a->rangestart} - {$a->rangeend}';
 
 // Check display line breaks etc.
 $string['choosesubscaleforfeedback_help'] = 'Für die angezeigten Skalen können Sie nun {$a} Feedback-Angaben hinterlegen. Wählen Sie die jeweilige (Sub-)Skala an, um Ihr Feedback einzugeben. Die farbigen Symbole zeigen Ihnen den aktuellen Stand der Bearbeitung an, gemessen an den vor Ihnen hinterlegten Anzahl an Feedback-Optionen:

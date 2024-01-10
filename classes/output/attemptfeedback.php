@@ -19,6 +19,7 @@ namespace local_catquiz\output;
 use cache;
 use context_system;
 use local_catquiz\catquiz;
+use local_catquiz\catscale;
 use local_catquiz\teststrategy\feedbackgenerator;
 use local_catquiz\teststrategy\feedbacksettings;
 use local_catquiz\teststrategy\info;
@@ -105,19 +106,19 @@ class attemptfeedback implements renderable, templatable {
         $this->quizsettings = $settings;
         $this->teststrategy = intval($settings->catquiz_selectteststrategy);
 
-        if ($contextid === 0) {
-            // Get the contextid from the attempt.
-            $contextid = intval($settings->catquiz_catcontext);
-        }
-        $this->contextid = $contextid;
-
         if (!isset($feedbacksettings)) {
             $this->feedbacksettings = new feedbacksettings();
         } else {
             $this->feedbacksettings = $feedbacksettings;
         }
-        $this->catscaleid = intval($this->quizsettings->catquiz_catscales);
+        $catscaleid = intval($this->quizsettings->catquiz_catscales);
+        $this->catscaleid = $catscaleid;
 
+        if ($contextid === 0) {
+            // Get the contextid of the catscale.
+            $contextid = catscale::get_context_id($catscaleid);
+        }
+        $this->contextid = $contextid;
     }
 
     /**

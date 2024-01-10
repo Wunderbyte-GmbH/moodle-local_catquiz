@@ -382,6 +382,7 @@ $string['feedbackcomparetoaverage'] = 'You performed better than {$a->quantile}%
 
 // Quiz Feedback.
 $string['attemptfeedbacknotavailable'] = "No feedback available";
+$string['attemptfeedbacknotyetavailable'] = "Feedback for attempts will be displayed when available.";
 $string['allquestionsincorrect'] = "Not available - all questions were answered incorrectly";
 $string['allquestionscorrect'] = "Not available- all questions were answered correctly";
 $string['questionssummary'] = "Summary";
@@ -430,8 +431,11 @@ $string['itemsplayed'] = 'evaluated items:';
 $string['personabilityinscale'] = 'Ability score in scale "{$a}"';
 $string['yourscorein'] = 'Your average scores in "{$a}"';
 $string['scoreofpeers'] = 'Average of your peers';
+$string['numberofattempts'] = 'Number of attempts';
 $string['abilityprofile'] = 'Ability score profile in "{$a}"';
 $string['labelforrelativepersonabilitychart'] = 'Relative Ability';
+$string['attemptchartstitle'] = 'Number and results of attempts in scale "{$a}"';
+$string['personabilityrangestring'] = '{$a->rangestart} - {$a->rangeend}';
 
 // Check display line breaks etc.
 $string['choosesubscaleforfeedback_help'] = 'You can now store <number of options> feedback informations for the subscales displayed. Select a (sub-)scale to enter your feedback. The colored symbols indicate the current status of processing, measured by the number of feedback options you entered:

@@ -394,7 +394,7 @@ class raschbirnbaumb extends model_raschmodel {
      * Implements a Filter Function for trusted regions in the item parameter estimation
      *
      * @param array $ip - item parameters ('difficulty', 'discrimination')
-     * return array - chunked item parameter
+     * @return array - chunked item parameter
      */
     public static function restrict_to_trusted_region(array $ip): array {
         // Set values for difficulty parameter.
