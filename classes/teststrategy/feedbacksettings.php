@@ -194,9 +194,12 @@ class feedbacksettings {
 
         for ($i = 1; $i <= $numberoffeedbackoptions; $i++) {
             $colorkey = 'wb_colourpicker_' . $catscaleid . '_' . $i;
+            $rangestartkey = "feedback_scaleid_limit_lower_" . $catscaleid . "_" . $i;
+            $rangeendkey = "feedback_scaleid_limit_upper_" . $catscaleid . "_" . $i;
             $colorname = $quizsettings[$colorkey];
             if (isset($colorarray[$colorname])) {
-                $colors[] = $colorarray[$colorname];
+                    $colors[$colorarray[$colorname]]['rangestart'] = $quizsettings[$rangestartkey];
+                    $colors[$colorarray[$colorname]]['rangeend'] = $quizsettings[$rangeendkey];
             }
 
         }

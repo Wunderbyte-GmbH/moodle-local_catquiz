@@ -497,10 +497,9 @@ class graphicalsummary extends feedbackgenerator {
         $chart = new \core\chart_bar();
         $chart->set_stacked(true);
 
-        $colorsarray = $this->feedbacksettings->get_defined_feedbackcolors_for_scale($quizsettings, $catscaleid);
-        $colornamesvaluesarray = feedbackclass::get_array_of_colors(8);
+        $colorsarray = $this->feedbacksettings->get_defined_feedbackcolors_for_scale((array)$quizsettings, $catscaleid);
 
-        foreach ($colorsarray as $colorcode) {
+        foreach ($colorsarray as $colorcode => $rangesarray) {
             $serie = [];
             foreach ($series as $timestamp => $cc) {
                 $valuefound = false;
@@ -515,10 +514,14 @@ class graphicalsummary extends feedbackgenerator {
                     $serie[] = 0;
                 }
             }
-            $colorname = array_search($colorcode, $colornamesvaluesarray);
-            $string = get_string('colorpicker_color_'.$colorname, 'local_catquiz');
+            $rangestart = $rangesarray['rangestart'];
+            $rangeend = $rangesarray['rangeend'];
+            $labelstring = get_string(
+                'personabilityrangestring',
+                'local_catquiz',
+                ['rangestart' => $rangestart, 'rangeend' => $rangeend]);
             $s = new \core\chart_series(
-                $string,
+                $labelstring,
                 $serie
             );
             $s->set_colors([0 => $colorcode]);

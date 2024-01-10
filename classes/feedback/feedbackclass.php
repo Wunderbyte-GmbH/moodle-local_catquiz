@@ -316,7 +316,7 @@ class feedbackclass {
                 ]
             );
 
-            // Make the differnt feedback options nested.
+            // Make the different feedback options nested.
             $numberofclosinghtmls = 0;
             if (!isset($previousdepth) || !isset($previousparentscaleid)) {
                 $numberofclosinghtmls = 0;
