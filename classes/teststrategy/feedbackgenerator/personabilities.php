@@ -335,6 +335,13 @@ class personabilities extends feedbackgenerator {
                 null,
                 $end);
         // Compare records to define range for average.
+        // Minimum 3 records required to display progress charts.
+        if (count($records) < 3) {
+            return [
+                'individual' => '',
+                'comparison' => '',
+            ];
+        }
         $startingrecord = reset($records);
         $beginningoftimerange = intval($startingrecord->endtime);
         $timerange = $this->get_timerange_for_average($beginningoftimerange, $endtime);
@@ -343,6 +350,12 @@ class personabilities extends feedbackgenerator {
         $attemptsofpeers = array_filter($records, fn($r) => $r->userid != $userid);
 
         $progressindividual = $this->render_chart_for_individual_user($attemptsofuser, $primarycatscale);
+        if (count($attemptsofpeers) < 3) {
+            return [
+                'individual' => $progressindividual,
+                'comparison' => '',
+            ];
+        }
         $progresscomparison = $this->render_chart_for_comparison(
                 $attemptsofuser,
                 $attemptsofpeers,
@@ -404,6 +417,9 @@ class personabilities extends feedbackgenerator {
             if (isset($data->personabilities->$scaleid)) {
                 $personabilities[] = $data->personabilities->$scaleid;
             }
+        }
+        if (count($personabilities) < 2) {
+            return '';
         }
 
         $chartserie = new \core\chart_series(
