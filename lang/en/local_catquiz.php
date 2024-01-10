@@ -382,6 +382,7 @@ $string['feedbackcomparetoaverage'] = 'You performed better than {$a->quantile}%
 
 // Quiz Feedback.
 $string['attemptfeedbacknotavailable'] = "No feedback available";
+$string['attemptfeedbacknotyetavailable'] = "Feedback for attempts will be displayed when available.";
 $string['allquestionsincorrect'] = "Not available - all questions were answered incorrectly";
 $string['allquestionscorrect'] = "Not available- all questions were answered correctly";
 $string['questionssummary'] = "Summary";
