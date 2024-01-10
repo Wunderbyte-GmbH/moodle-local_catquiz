@@ -81,6 +81,7 @@ $string['choosecontextid'] = 'Einsatz-Kontext auswählen';
 $string['defaultcontext'] = 'Neuer Standard Einsatz-Kontext für Skala';
 $string['moveitemtootherscale'] = 'Testitem(s) {$a} sind bereits einer anderen Skala des selben Baumes zugeordnet. Zuordnung ändern?';
 $string['pleasecheckorcancel'] = 'Bitte bestätigen oder abbrechen';
+$string['progress'] = 'Fortschritt';
 
 $string['timepacedtest'] = 'Zeitbeschränkungen für den Test aktivieren';
 $string['maxtime'] = 'Maximale Dauer des Tests';
@@ -426,6 +427,7 @@ $string['itemsplayed'] = 'ausgewertete Fragen:';
 $string['personabilityinscale'] = 'Fähigkeits-Score für Skala "{$a}"';
 $string['yourscorein'] = 'Ihre durchschnittlichen "{$a}"-Ergebnisse';
 $string['scoreofpeers'] = 'Mittelwert Ihrer Mit-Studierenden';
+$string['labelforrelativepersonabilitychart'] = 'Relative Fähigkeit';
 
 // Check display line breaks etc.
 $string['choosesubscaleforfeedback_help'] = 'Für die angezeigten Skalen können Sie nun {$a} Feedback-Angaben hinterlegen. Wählen Sie die jeweilige (Sub-)Skala an, um Ihr Feedback einzugeben. Die farbigen Symbole zeigen Ihnen den aktuellen Stand der Bearbeitung an, gemessen an den vor Ihnen hinterlegten Anzahl an Feedback-Optionen:

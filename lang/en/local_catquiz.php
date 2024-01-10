@@ -87,6 +87,7 @@ $string['choosecontextid'] = 'Choose CAT context';
 $string['defaultcontext'] = 'New default context for scale';
 $string['moveitemtootherscale'] = 'Testitem(s) {$a} already assigned to another (sub-)scale of the same tree. Modify assignment?';
 $string['pleasecheckorcancel'] = 'Please confirm or cancel';
+$string['progress'] = 'Progress';
 
 $string['timeoutabortnoresult'] = 'Test aborted without result.';
 $string['timeoutabortresult'] = 'Test aborted with result.';
@@ -430,6 +431,7 @@ $string['personabilityinscale'] = 'Ability score in scale "{$a}"';
 $string['yourscorein'] = 'Your average scores in "{$a}"';
 $string['scoreofpeers'] = 'Average of your peers';
 $string['abilityprofile'] = 'Ability score profile in "{$a}"';
+$string['labelforrelativepersonabilitychart'] = 'Relative Ability';
 
 // Check display line breaks etc.
 $string['choosesubscaleforfeedback_help'] = 'You can now store <number of options> feedback informations for the subscales displayed. Select a (sub-)scale to enter your feedback. The colored symbols indicate the current status of processing, measured by the number of feedback options you entered:

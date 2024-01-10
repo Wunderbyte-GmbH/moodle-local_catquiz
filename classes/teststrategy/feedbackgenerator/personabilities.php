@@ -419,7 +419,7 @@ class personabilities extends feedbackgenerator {
 
         return [
             'chart' => $out,
-            'charttitle' => get_string('progress', 'core'),
+            'charttitle' => get_string('progress', 'local_catquiz'),
         ];
 
     }
@@ -501,7 +501,7 @@ class personabilities extends feedbackgenerator {
 
         return [
             'chart' => $out,
-            'charttitle' => get_string('progress', 'core'),
+            'charttitle' => get_string('progress', 'local_catquiz'),
         ];
 
     }
@@ -581,7 +581,7 @@ class personabilities extends feedbackgenerator {
 
         return [
             'prevvalue' => $attemptswithnulls[$prevkey] ?? null,
-            'nextvalue' => $attemptswithnulls[$nextkey],
+            'nextvalue' => $attemptswithnulls[$nextkey] ?? null,
         ];
     }
 
