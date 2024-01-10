@@ -65,6 +65,9 @@ class catscale_structure {
     /** @var ?string $viewlink */
     public ?string $viewlink = null;
 
+    /** @var ?int $depth */
+    public ?int $depth = null;
+
     /**
      * Constructor for a single catscale data object.
      *

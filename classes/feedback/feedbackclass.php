@@ -160,7 +160,7 @@ class feedbackclass {
                     $feedback = optional_param('feedbackeditor_scaleid_'  . $scale->id . '_' . $j, "", PARAM_TEXT);
                     if (!empty($feedback)) {
                         $jsonobject = json_decode($feedback);
-                        $feedbacktext = strip_tags($jsonobject->text);
+                        $feedbacktext = strip_tags($jsonobject->text ?? '');
                     }
                 }
                 if (isset($feedbacktext) && strlen($feedbacktext) > 0) {
