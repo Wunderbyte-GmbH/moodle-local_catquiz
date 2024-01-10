@@ -32,7 +32,7 @@ $string['pluginname'] = 'ALiSe CAT Quiz';
 $string['catquiz'] = 'Catquiz';
 
 // Catquiz handler.
-$string['catscale'] = 'CAT Skala';
+$string['catscale'] = 'Skala';
 $string['catquizsettings'] = 'Test-Inhalt und Einsatz-Kontext';
 $string['selectmodel'] = 'Wähle ein Modell';
 $string['model'] = 'Modell';
@@ -47,18 +47,18 @@ $string['choosetags:disclaimer'] = 'Mehrfachauswahl mit "⌘ command" (Apple) od
 $string['catscalesname_exists'] = 'Der Name wird bereits verwendet';
 $string['cachedef_catscales'] = 'Speichert (Cache) die Skalen von catquiz';
 $string['catcatscales'] = 'Auswahl untergeordnete Skalen';
-$string['selectparentscale'] = 'Auswahl CAT Skala';
+$string['selectparentscale'] = 'Auswahl Skala';
 $string['catcatscales_help'] = 'Wählen Sie die für Sie die für Sie relevanten untergeordneten Skalen an und ab. Eine untergeordnete Skala umfasst Fragen aus einen Teil des gewählten Inhaltsbereichs. In einem Test-Versuch werden nur Fragen aus den angewählten Skalen verwendet.';
-$string['nameexists'] = 'Der Name der CAT Skala wurde bereits verwendet';
-$string['createnewcatscale'] = 'Neue CAT Skala erstellen';
-$string['parent'] = 'Übergeordnete CAT Skala - keine Auswahl falls Top-Level CAT Skala';
-$string['managecatscale'] = 'CAT Skalen verwalten';
+$string['nameexists'] = 'Der Name der Skala wurde bereits verwendet';
+$string['createnewcatscale'] = 'Neue Skala erstellen';
+$string['parent'] = 'Übergeordnete Skala - keine Auswahl falls Top-Level Skala';
+$string['managecatscale'] = 'Skalen verwalten';
 $string['managetestenvironments'] = 'Testumgebungen verwalten';
 $string['showlistofcatscalemanagers'] = "Catscale Managers";
 $string['addcategory'] = "Kategorie hinzufügen";
 $string['documentation'] = "Dokumentation";
-$string['createcatscale'] = 'Erstellen Sie eine CAT Skala';
-$string['cannotdeletescalewithchildren'] = 'CAT Skalen mit Unterskalen können nicht gelöscht werden.';
+$string['createcatscale'] = 'Erstellen Sie eine Skala';
+$string['cannotdeletescalewithchildren'] = 'Skalen mit Unterskalen können nicht gelöscht werden.';
 $string['passinglevel'] = 'Bestehensgrenze in %';
 $string['passinglevel_help'] = 'Die Bestehensgenze bezieht sich auf die Personenkompetenz und kann für jeden Test individuell gesetzt werden.';
 $string['pilotratio'] = 'Anteil zu pilotierender Fragen in %';
@@ -137,7 +137,7 @@ $string['edittestenvironment'] = 'Bearbeite Testumgebung';
 $string['choosetemplate'] = 'Einstellungs-Vorlage wählen';
 $string['parentid'] = 'Übergeordnete ID';
 $string['force'] = 'Erzwinge Werte';
-$string['catscaleid'] = 'CAT Skala ID';
+$string['catscaleid'] = 'Skala ID';
 $string['numberofquestions'] = '# Fragen';
 $string['numberofusers'] = '# Studierende';
 
@@ -155,7 +155,7 @@ $string['searchcatcontext'] = 'Einsatz-Kontexte durchsuchen';
 $string['selectcatcontext'] = 'Einsatz-Kontext auswählen';
 $string['starttimestamp'] = 'Zeitraum Anfang';
 $string['endtimestamp'] = 'Zeitraum Ende';
-$string['defaultcontextname'] = 'Standard Cat Kontext';
+$string['defaultcontextname'] = 'Standard Kontext';
 $string['defaultcontextdescription'] = 'Beinhaltet alle Testitems';
 $string['autocontextdescription'] = 'Automatisch durch einen Import generiert für Skala {$a}.';
 $string['uploadcontext'] = 'autocontext_{$a->scalename}_{$a->usertime}';
@@ -172,11 +172,11 @@ $string['subscribed'] = 'Abonniert';
 // Events and Event Log.
 $string['target'] = 'Ziel';
 $string['userupdatedcatscale'] = 'NutzerIn mit der Id {$a->userid} hat {$a->catscalelink} aktualisiert.';
-$string['catscale_updated'] = 'CAT Skala aktualisert';
+$string['catscale_updated'] = 'Skala aktualisert';
 $string['testitem'] = 'Frage mit ID {$a}';
 $string['add_testitem_to_scale'] = '{$a->testitemlink} wurde {$a->catscalelink} hinzugefügt.';
-$string['testiteminscale_added'] = 'Frage zu CAT Skala hinzugefügt';
-$string['testiteminscale_updated'] = 'Frage in CAT Skala aktualisert';
+$string['testiteminscale_added'] = 'Frage zu Skala hinzugefügt';
+$string['testiteminscale_updated'] = 'Frage in Skala aktualisert';
 $string['testitemactivitystatus_updated'] = 'Aktivitätsstatus der Frage aktualisiert.';
 $string['update_testitem_in_scale'] = '{$a->testitemlink} wurde in {$a->catscalelink} aktualisiert.';
 $string['update_testitem_activity_status'] = 'Der Aktivitätsstatus der Frage mit der Id {$a->objectid} wurde aktualisiert.';
@@ -184,8 +184,8 @@ $string['activitystatussetinactive'] = 'Die Frage ist jetzt deaktiviert.';
 $string['activitystatussetactive'] = 'Die Frage ist jetzt aktiviert.';
 $string['testitemstatus_updated'] = 'Status der Frage aktualisiert.';
 $string['testitem_status_updated_description'] = 'Der neue Status der {$a->testitemlink} ist nun: {$a->statusstring}';
-$string['catscale_created'] = 'CAT Skala erzeugt';
-$string['create_catscale_description'] = 'CAT Skala "{$a->catscalelink}" mit der ID {$a->objectid} erzeugt.';
+$string['catscale_created'] = 'Skala erzeugt';
+$string['create_catscale_description'] = 'Skala "{$a->catscalelink}" mit der ID {$a->objectid} erzeugt.';
 $string['context_updated'] = 'Einsatz-Kontext aktualisiert';
 $string['update_catscale_description'] = 'Einsatz-Kontext {$a} aktualisiert.';
 $string['context_created'] = 'Einsatz-Kontext erzeugt';
@@ -194,21 +194,21 @@ $string['logsafter'] = 'Einträge vor';
 $string['logsbefore'] = 'Einträge nach';
 $string['calculation_executed'] = 'Berechnung durchgeführt.';
 $string['executed_calculation_description'] =
-    'Es wurde eine Berechnung der CAT Skala {$a->catscalename} mit der ID {$a->catscaleid} im Kontext {$a->contextid} durchgeführt von {$a->user}. In folgenden Modellen wurden Fragen neu berechnet: {$a->updatedmodels}';
+    'Es wurde eine Berechnung der Skala {$a->catscalename} mit der ID {$a->catscaleid} im Kontext {$a->contextid} durchgeführt von {$a->user}. In folgenden Modellen wurden Fragen neu berechnet: {$a->updatedmodels}';
 $string['automaticallygeneratedbycron'] = 'Cron Job (automatisch durchgeführt)';
-$string['deletedcatscale'] = 'CAT Skala die nicht mehr exisitiert';
+$string['deletedcatscale'] = 'Skala die nicht mehr exisitiert';
 $string['attempt_completed'] = 'Testversuch abgeschlossen';
-$string['complete_attempt_description'] = 'Testversuch mit ID {$a->attemptid} in CAT Skala {$a->catscalelink} durchgeführt von User {$a->userid}.';
+$string['complete_attempt_description'] = 'Testversuch mit ID {$a->attemptid} in Skala {$a->catscalelink} durchgeführt von User {$a->userid}.';
 $string['eventtime'] = 'Zeitpunkt des Ereignisses';
 $string['eventname'] = 'Name des Ereignisses';
 $string['testitem_imported'] = 'Frage(n) importiert';
 $string['imported_testitem_description'] = 'Es wurden {$a} Frage(n) importiert.';
 
 // Message.
-$string['messageprovider:catscaleupdate'] = 'Benachrichtung über eine Aktualisierung einer CAT Skala.';
-$string['catscaleupdatedtitle'] = 'Eine CAT Skala wurde aktualisiert';
-$string['catscaleupdatedbody'] = 'Eine CAT Skala wurde aktualisiert. TODO: Mehr Details.';
-$string['messageprovider:updatecatscale'] = 'Hat Berechtigung zum Updaten der CAT Skala';
+$string['messageprovider:catscaleupdate'] = 'Benachrichtung über eine Aktualisierung einer Skala.';
+$string['catscaleupdatedtitle'] = 'Eine Skala wurde aktualisiert';
+$string['catscaleupdatedbody'] = 'Eine Skala wurde aktualisiert. TODO: Mehr Details.';
+$string['messageprovider:updatecatscale'] = 'Hat Berechtigung zum Updaten der Skala';
 
 // Access.
 $string['catquiz:canmanage'] = 'Darf Catquiz Plugin verwalten';
@@ -229,11 +229,11 @@ $string['managecatscales'] = 'Verwalte Skalen';
 $string['test'] = 'Teste Abos';
 
 // Assign testitems to catscale page.
-$string['assigntestitemstocatscales'] = "Weise den CAT Skalen Fragen zu";
+$string['assigntestitemstocatscales'] = "Weise den Skalen Fragen zu";
 $string['assign'] = "Ordne zu";
 $string['questioncategories'] = 'Fragekategorien';
 $string['questiontype'] = 'Fragentyp';
-$string['addtestitemtitle'] = 'Testitems zu CAT Skalen hinzufügen';
+$string['addtestitemtitle'] = 'Testitems zu Skalen hinzufügen';
 $string['addtestitembody'] = 'Wollen Sie folgende Testitems der aktuellen Skala zuorden?';
 $string['addtestitemsubmit'] = 'Hinzufügen';
 $string['addtestitem'] = 'Testitems hinzufügen';
@@ -241,7 +241,7 @@ $string['usage'] = 'Übersicht';
 $string['failedtoaddmultipleitems'] = '{$a->numadded} Fragen wurden erfolgreich hinzugefügt, bei folgenden {$a->numfailed} Fragen traten Probleme auf: {$a->failedids}';
 $string['testiteminrelatedscale'] = 'Testitem ist bereits einer Kind- oder Eltern-Skala zugeordnet';
 
-$string['removetestitemtitle'] = 'Testitems von CAT Skalen entfernen';
+$string['removetestitemtitle'] = 'Testitems von Skalen entfernen';
 $string['removetestitembody'] = 'Wollen Sie folgende Testitems aus aktuellen Skale entfernen? <br> {$a->data}';
 $string['removetestitemsubmit'] = 'Entfernen';
 $string['removetestitem'] = 'Testitems entfernen';
@@ -255,7 +255,7 @@ $string['notyetattempted'] = 'Noch keine Testversuche';
 
 // Email Templates.
 $string['notificationcatscalechange'] = 'Hallo {$a->firstname} {$a->lastname},
-CAT Skalen wurden verändert auf der Moolde Plattform {$a->instancename}.
+Skalen wurden verändert auf der Moolde Plattform {$a->instancename}.
 Dieses e-Mail informiert Sie als CAT Manager* verantwortlich für dieses Skala. {$a->editorname} hat die folgenden Änderungen an der Skala "{$a->catscalename}" vorgenommen.":
     {$a->changedescription}
 Sie können den aktuellen Stand hier überprüfen. {$a->linkonscale}';
@@ -320,15 +320,15 @@ $string['questions'] = "Fragen";
 $string['testsandtemplates'] = "Tests & Templates";
 $string['calculations'] = "Berechnungen";
 $string['versioning'] = "Versionierung";
-$string['catscalesheading'] = "CAT Skalen";
-$string['subscribedcatscalesheading'] = "Eingeschriebene CAT Skalen";
+$string['catscalesheading'] = "Skalen";
+$string['subscribedcatscalesheading'] = "Eingeschriebene Skalen";
 $string['summarygeneral'] = "Allgemeines";
-$string['summarynumberofassignedcatscales'] = "Anzahl der Ihnen zugeordneten CAT Skalen";
+$string['summarynumberofassignedcatscales'] = "Anzahl der Ihnen zugeordneten Skalen";
 $string['summarynumberoftests'] = "Anzahl der einsetzenden Tests";
 $string['summarytotalnumberofquestions'] = "Anzahl der Fragen (insgesamt)";
 $string['summarylastcalculation'] = "Letzte (vollständige) Berechnung";
 $string['recentevents'] = "Letzte Bearbeitungen";
-$string['aria:catscaleimage'] = "Hintergrundmuster für die CAT Skala";
+$string['aria:catscaleimage'] = "Hintergrundmuster für die Skala";
 $string['healthstatus'] = "Health-Status";
 $string['catmanagernumberofsubscales'] = "Anzahl untergeordneter Skalen";
 $string['catmanagernumberofquestions'] = "Anzahl Fragen";
@@ -503,8 +503,8 @@ $string['wronglabels'] = 'Die importierten Spaltennamen entsprechen nicht der Vo
 $string['missinglabel'] = 'Im importierten File fehlt die verpflichtede Spalte {$a}. Daten können nicht importiert werden.';
 $string['nolabels'] = 'Keine Spaltennamen definiert.';
 $string['checkdelimiter'] = 'Überprüfen Sie die Spaltennamen durch das angegebene Zeichen getrennt sind.';
-$string['scaleinformation'] = 'Die ID der CAT Skala der die Frage zugeordnet werden soll.';
-$string['scalenameinformation'] = 'Der Name der CAT Skala der die Frage zugeordnet werden soll. Falls keine ID angegeben, wird Matching über Name vorgenommen.';
+$string['scaleinformation'] = 'Die ID der Skala der die Frage zugeordnet werden soll.';
+$string['scalenameinformation'] = 'Der Name der Skala der die Frage zugeordnet werden soll. Falls keine ID angegeben, wird Matching über Name vorgenommen.';
 $string['dataincomplete'] = 'Der Datensatz mit "componentid" {$a->id} ist unvollständig und konnte nicht gänzlich eingefügt werden. Überprüfen Sie das Feld "{$a->field}".';
 $string['modelinformation'] = 'Dieses Feld ist notwendig, um Fragen vollständig zu erfassen. Ist das Feld leer, kann die Frage lediglich einer Skala zugeordnet werden.';
 $string['parentscalenamesinformation'] = 'Alle Eltern Scalen können beim Import angelegt werden. Starten sie mit dem Namen der höchsten Scala und fügen sie alle Kinder mit "|" (Vertikaler String Unicode U+007C - nicht zu verwechseln mit "/" Slash) getrennt hinzu.';
