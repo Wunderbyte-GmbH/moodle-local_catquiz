@@ -98,14 +98,18 @@ class graphicalsummary extends feedbackgenerator {
             $catscaleid = $feedbackdata['catscaleid'];
         }
         $catscale = catscale::return_catscale_object($catscaleid);
-        $catscalename = $catscale->name;
 
-        $participationcharts = $this->render_participationcharts($feedbackdata, $catscaleid, $feedbackdata['catscaleid']);
+        $participationcharts = $this->render_participationcharts(
+            $feedbackdata,
+            $catscaleid,
+            $feedbackdata['catscaleid'],
+            0,
+            $catscale->name);
 
         $data['chart'] = $chart ?? "";
         $data['strategyname'] = $feedbackdata['teststrategyname'] ?? "";
         $data['table'] = $table ?? "";
-        $data['attemptchartstitle'] = get_string('attemptchartstitle', 'local_catquiz', $catscalename);
+
         $data['attemptscounterchart'] = $participationcharts['attemptscounterchart']['chart'];
         $data['attemptresultstackchart'] = $participationcharts['attemptresultstackchart']['chart'];
 
@@ -403,10 +407,16 @@ class graphicalsummary extends feedbackgenerator {
      * @param int $primarycatscaleid
      * @param int $parentscaleid
      * @param int $contextid
+     * @param string $catscalename
      *
      * @return array
      */
-    private function render_participationcharts(array $data, int $primarycatscaleid, int $parentscaleid, int $contextid = 0) {
+    private function render_participationcharts(
+        array $data,
+        int $primarycatscaleid,
+        int $parentscaleid,
+        int $contextid = 0,
+        string $catscalename) {
 
         // In case you want to make context a changeable param of feedbacksettings, apply logic here.
         if (empty($contextid)) {
@@ -420,6 +430,9 @@ class graphicalsummary extends feedbackgenerator {
             $contextid,
             null,
             null);
+        if (count($records) < 2) {
+            return "";
+        }
         // Get all items of this catscale and catcontext.
         $startingrecord = reset($records);
         $beginningoftimerange = intval($startingrecord->endtime);
@@ -427,9 +440,11 @@ class graphicalsummary extends feedbackgenerator {
         $attemptsbytimerange = personabilities::order_attempts_by_timerange($records, $primarycatscaleid, $timerange);
         $attemptscounterchart = $this->render_attemptscounterchart($attemptsbytimerange);
         $attemptresultstackchart = $this->render_attemptresultstackchart($attemptsbytimerange, $primarycatscaleid, $data);
+
         return [
             'attemptscounterchart' => $attemptscounterchart,
             'attemptresultstackchart' => $attemptresultstackchart,
+            'attemptchartstitle' => get_string('attemptchartstitle', 'local_catquiz', $catscalename),
         ];
 
     }
