@@ -384,7 +384,7 @@ $string['allquestionscorrect'] = "Genauer Fähigkeits-Score kann nicht ermittelt
 $string['feedbackcomparetoaverage'] = 'Sie sind besser in "{$a->scaleinfo}" als {$a->quantile}% aller Teilnehmenden.';
 $string['questionssummary'] = "Zusammenfassung";
 $string['currentability'] = 'Ihr momentaner Fähigkeits-Score in der Skala "{$a}"';
-$string['currentabilityfellowstudents'] = 'Aktueller Mittelwert aller Fähigkeits-Scores aller Teilnehmenden in der Skala {$a}';
+$string['currentabilityfellowstudents'] = 'Aktueller Mittelwert aller Fähigkeits-Scores aller Teilnehmenden in der Skala "{$a}"';
 $string['feedbackbarlegend'] = "Bedeutung der Farben";
 $string['teacherfeedback'] = "Feedback für Lehrende";
 $string['catquiz_feedbackheader'] = "Feedback";
@@ -417,7 +417,7 @@ $string['seeitemsplayed'] = "Beantwortete Fragen anzeigen";
 $string['subfeedbackrange'] = '({$a->lowerlimit} bis {$a->upperlimit})';
 $string['strongestscaleselected'] = 'Ihre stärkste Skala {$a}';
 $string['lowestscaleselected'] = 'Ihre schwächste Skala {$a}';
-$string['parentscaleselected'] = 'Ausgewählter Inhaltsbereich (Globalskala) "{$a}"';
+$string['parentscaleselected'] = 'Globalskala "{$a}"';
 $string['scaleselected'] = 'Skala "{$a}"';
 
 // Chart in Feedback.
