@@ -103,7 +103,6 @@ class graphicalsummary extends feedbackgenerator {
             $feedbackdata,
             $catscaleid,
             $feedbackdata['catscaleid'],
-            0,
             $catscale->name);
 
         $data['chart'] = $chart ?? "";
@@ -415,8 +414,8 @@ class graphicalsummary extends feedbackgenerator {
         array $data,
         int $primarycatscaleid,
         int $parentscaleid,
-        int $contextid = 0,
-        string $catscalename) {
+        string $catscalename,
+        int $contextid = 0) {
 
         // In case you want to make context a changeable param of feedbacksettings, apply logic here.
         if (empty($contextid)) {
