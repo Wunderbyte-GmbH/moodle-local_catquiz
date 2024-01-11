@@ -324,15 +324,17 @@ class personabilities extends feedbackgenerator {
         global $OUTPUT, $DB;
 
         $abilitysteps = [];
-        for ($i = LOCAL_CATQUIZ_PERSONABILITY_LOWER_LIMIT + 0.25; $i <= LOCAL_CATQUIZ_PERSONABILITY_UPPER_LIMIT - 0.25; $i += 0.5) {
+        $abilitystep = 0.25;
+        $interval = $abilitystep * 2;
+        for ($i = LOCAL_CATQUIZ_PERSONABILITY_LOWER_LIMIT + $abilitystep; $i <= LOCAL_CATQUIZ_PERSONABILITY_UPPER_LIMIT - $abilitystep; $i += $interval) {
             $abilitysteps[] = $i;
         }
 
         $catscale = new catscale($primarycatscale->id);
+
+        // Prepare data for test information line.
         $items = $catscale->get_testitems($initialcontext['contextid'], true);
-
         $models = model_strategy::get_installed_models();
-
         $fisherinfos = [];
         foreach ($items as $item) {
             $key = $item->model;
@@ -356,64 +358,43 @@ class personabilities extends feedbackgenerator {
 
         }
 
-        $chart = new chart_bar();
-        $chartseries = [];
-        $chartseries['series'] = [];
-        $chartseries['labels'] = [];
-
-        // Testinformation = Summe der Fisherinfos pro Personability
-        // Mathe-Score = Wieviele Personen haben diese Personability in dieser Skala - jetzt aktuell, also im neuesten Score
-        // get_abilities_of_scale($catscaleid)
-        // context auch? default context of scale (parent) : eher nicht, würd ich meinen. aber param mitgeben.
-        // returns all records for this scale
-        // abilitycounter wie gehabt.
-        // foreach record ability runden und vergleichen und zählen.
+        // Prepare data for scorecounter bars.
         $abilityrecords = $DB->get_records('local_catquiz_personparams', ['catscaleid' => $primarycatscale->id]);
         $abilityseries = [];
-        foreach ($abilitysteps as $abilitystep) {
+        foreach ($abilitysteps as $as) {
+            $counter = 0;
             foreach ($abilityrecords as $record) {
-                $counter = 0;
                 $a = floatval($record->ability);
-                $ability = round($a / 0.05) * 0.05;
-                if ($ability != $abilitystep) {
+                $ability = $this->round_to_customsteps($a, $abilitystep, $interval);
+                if ($ability != $as) {
                     continue;
+                } else {
+                    $counter ++;
                 }
-                $counter ++;
             }
             $colorvalue = $this->get_color_for_personability(
                 $initialcontext['quizsettings'],
-                $abilitystep,
+                $as,
                 intval($primarycatscale->id)
                 );
-            $abilityseries['counter'][$abilitystep] = $counter;
-            $abilityseries['colors'][$abilitystep] = $colorvalue;
+            $abilitystring = strval($as);
+            $abilityseries['counter'][$abilitystring] = $counter;
+            $abilityseries['colors'][$abilitystring] = $colorvalue;
         }
+        // Scale the values of $fisherinfos before creating chart series.
+        $scaledtiseries = $this->scalevalues(array_values($fisherinfos), array_values($abilityseries['counter']));
 
-        $aseries = new chart_series('label', $abilityseries['counter']);
-        $aseries->set_colors($abilityseries['colors']);
+        $aserieslabel = get_string('scalescorechartlabel', 'local_catquiz', $catscale->catscale->name);
+        $aseries = new chart_series($aserieslabel, array_values($abilityseries['counter']));
+        $aseries->set_colors(array_values($abilityseries['colors']));
 
-        // This needs to be done with chart_bar.
-        // foreach ($fisherinfos as $ability => $fisherinfo) {
-        //     $value = round($fisherinfo, 2);
-        //     $series = new chart_series($ability, [0 => $value]);
-        //     //$series->set_fill(true);
-        //     $series->set_labels([0 => $ability]);
-
-        //     $colorvalue = $this->get_color_for_personabily(
-        //         $initialcontext['quizsettings'],
-        //         floatval($ability),
-        //         floatval($primarycatscale->id)
-        //     );
-        //     $series->set_colors([0 => $colorvalue]);
-        //     $chart->add_series($series);
-        //     $chart->set_labels([0 => get_string('abilityprofile', 'local_catquiz', $primarycatscale->name)]);
-        // };
-
-        // Could be done with chart_lines to add other line.
         $testinfolabel = get_string('testinfolabel', 'local_catquiz');
-        $series = new chart_series($testinfolabel, array_values($fisherinfos));
-        $series->set_type(\core\chart_series::TYPE_LINE);
-        $chart->add_series($series);
+        $tiseries = new chart_series($testinfolabel, $scaledtiseries);
+        $tiseries->set_type(\core\chart_series::TYPE_LINE);
+
+        $chart = new chart_bar();
+        $chart->add_series($tiseries);
+        $chart->add_series($aseries);
         $chart->set_labels(array_keys($fisherinfos));
 
         $out = $OUTPUT->render($chart);
@@ -421,6 +402,53 @@ class personabilities extends feedbackgenerator {
             'chart' => $out,
             'charttitle' => get_string('abilityprofile', 'local_catquiz', $primarycatscale->name),
         ];
+    }
+
+    /**
+     * Round float to steps as defined.
+     *
+     * @param float $number
+     * @param float $step
+     * @param float $interval
+     *
+     * @return float
+     */
+    private function round_to_customsteps(float $number, float $step, float $interval):float {
+        $roundedvalue = round($number / $step) * $step;
+
+        // Exclude rounding to steps with 0.5
+        if ($roundedvalue - floor($roundedvalue) == 0.5) {
+            $roundedvalue = floor($roundedvalue) + $step;
+        }
+
+        return $roundedvalue;
+    }
+
+    /**
+     * Scale values of testinfo (sum of fisherinfos) for better display in chart.
+     *
+     * @param array $fisherinfos
+     * @param array $attemptscounter
+     *
+     * @return array
+     */
+    private function scalevalues($fisherinfos, $attemptscounter) {
+        // Find the maximum values in arrays.
+        $maxattempts = max($attemptscounter);
+        $maxfisherinfo = max($fisherinfos);
+
+        // Avoid division by zero.
+        if ($maxfisherinfo == 0 || $maxattempts == 0) {
+            return $fisherinfos;
+        }
+
+        $scalingfactor = $maxattempts / $maxfisherinfo;
+
+        // Scale the values in $fisherinfos based on the scaling factor.
+        foreach ($fisherinfos as &$value) {
+            $value *= $scalingfactor;
+        }
+        return $fisherinfos;
     }
 
     /**
