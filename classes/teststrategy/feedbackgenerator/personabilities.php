@@ -321,7 +321,7 @@ class personabilities extends feedbackgenerator {
      *
      */
     private function render_abilityprofile_chart(array $initialcontext, $primarycatscale) {
-        global $OUTPUT;
+        global $OUTPUT, $DB;
 
         $abilitysteps = [];
         for ($i = LOCAL_CATQUIZ_PERSONABILITY_LOWER_LIMIT + 0.25; $i <= LOCAL_CATQUIZ_PERSONABILITY_UPPER_LIMIT - 0.25; $i += 0.5) {
@@ -361,6 +361,37 @@ class personabilities extends feedbackgenerator {
         $chartseries['series'] = [];
         $chartseries['labels'] = [];
 
+        // Testinformation = Summe der Fisherinfos pro Personability
+        // Mathe-Score = Wieviele Personen haben diese Personability in dieser Skala - jetzt aktuell, also im neuesten Score
+        // get_abilities_of_scale($catscaleid)
+        // context auch? default context of scale (parent) : eher nicht, würd ich meinen. aber param mitgeben.
+        // returns all records for this scale
+        // abilitycounter wie gehabt.
+        // foreach record ability runden und vergleichen und zählen.
+        $abilityrecords = $DB->get_records('local_catquiz_personparams', ['catscaleid' => $primarycatscale->id]);
+        $abilityseries = [];
+        foreach ($abilitysteps as $abilitystep) {
+            foreach ($abilityrecords as $record) {
+                $counter = 0;
+                $a = floatval($record->ability);
+                $ability = round($a / 0.05) * 0.05;
+                if ($ability != $abilitystep) {
+                    continue;
+                }
+                $counter ++;
+            }
+            $colorvalue = $this->get_color_for_personability(
+                $initialcontext['quizsettings'],
+                $abilitystep,
+                intval($primarycatscale->id)
+                );
+            $abilityseries['counter'][$abilitystep] = $counter;
+            $abilityseries['colors'][$abilitystep] = $colorvalue;
+        }
+
+        $aseries = new chart_series('label', $abilityseries['counter']);
+        $aseries->set_colors($abilityseries['colors']);
+
         // This needs to be done with chart_bar.
         // foreach ($fisherinfos as $ability => $fisherinfo) {
         //     $value = round($fisherinfo, 2);
@@ -379,7 +410,9 @@ class personabilities extends feedbackgenerator {
         // };
 
         // Could be done with chart_lines to add other line.
-        $series = new chart_series("mathe-score", array_values($fisherinfos));
+        $testinfolabel = get_string('testinfolabel', 'local_catquiz');
+        $series = new chart_series($testinfolabel, array_values($fisherinfos));
+        $series->set_type(\core\chart_series::TYPE_LINE);
         $chart->add_series($series);
         $chart->set_labels(array_keys($fisherinfos));
 

@@ -432,6 +432,7 @@ $string['numberofattempts'] = 'Anzahl der Testversuche';
 $string['attemptchartstitle'] = 'Anzahl und Ergebnisse der Testversuche für Skala "{$a}"';
 $string['labelforrelativepersonabilitychart'] = 'Relative Fähigkeit';
 $string['personabilityrangestring'] = '{$a->rangestart} - {$a->rangeend}';
+$string['testinfolabel'] = 'Testinformation';
 
 // Check display line breaks etc.
 $string['choosesubscaleforfeedback_help'] = 'Für die angezeigten Skalen können Sie nun {$a} Feedback-Angaben hinterlegen. Wählen Sie die jeweilige (Sub-)Skala an, um Ihr Feedback einzugeben. Die farbigen Symbole zeigen Ihnen den aktuellen Stand der Bearbeitung an, gemessen an den vor Ihnen hinterlegten Anzahl an Feedback-Optionen:
