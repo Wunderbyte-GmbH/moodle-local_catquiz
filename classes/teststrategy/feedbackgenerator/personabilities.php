@@ -375,7 +375,7 @@ class personabilities extends feedbackgenerator {
                 }
             }
             $colorvalue = $this->get_color_for_personability(
-                $initialcontext['quizsettings'],
+                (array)$initialcontext['quizsettings'],
                 $as,
                 intval($primarycatscale->id)
                 );
