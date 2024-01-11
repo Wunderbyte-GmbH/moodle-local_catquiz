@@ -326,9 +326,9 @@ class personabilities extends feedbackgenerator {
         $abilitysteps = [];
         $abilitystep = 0.25;
         $interval = $abilitystep * 2;
-        for ($i = LOCAL_CATQUIZ_PERSONABILITY_LOWER_LIMIT + $abilitystep;
-            $i <= LOCAL_CATQUIZ_PERSONABILITY_UPPER_LIMIT - $abilitystep;
-            $i += $interval) {
+        $ul = LOCAL_CATQUIZ_PERSONABILITY_UPPER_LIMIT;
+        $ll = LOCAL_CATQUIZ_PERSONABILITY_LOWER_LIMIT;
+        for ($i = $ll + $abilitystep; $i <= $ul - $abilitystep; $i += $interval) {
             $abilitysteps[] = $i;
         }
 
