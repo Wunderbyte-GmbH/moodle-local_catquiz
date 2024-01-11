@@ -1518,6 +1518,7 @@ class catquiz {
     }
 
     /**
+     * Replace INF values in array with -1.
      * @param mixed $array
      *
      * @return void
