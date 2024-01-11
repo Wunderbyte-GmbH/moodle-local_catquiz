@@ -62,7 +62,7 @@ final class mayberemovescale extends preselect_task implements wb_middleware {
             );
         }
 
-        if ($context['max_attempts_per_scale'] == 0) {
+        if ($context['max_attempts_per_scale'] == -1) {
             return $next($context);
         }
 
