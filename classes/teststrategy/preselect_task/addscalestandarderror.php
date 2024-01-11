@@ -181,14 +181,17 @@ class addscalestandarderror extends preselect_task implements wb_middleware {
      * @return array
      */
     protected function getnumberofremainingquestionsperscale(): array {
+        $maxattemptsperscale = $this->context['max_attempts_per_scale'] === -1
+            ? INF
+            : $this->context['max_attempts_per_scale'];
         $pq = $this->getplayedquestionsperscale();
         $catscales = $this->get_with_child_scales($this->context['catscaleid']);
         foreach ($catscales as $scaleid) {
             if (!array_key_exists($scaleid, $pq)) {
-                $remainingperscale[$scaleid] = $this->context['max_attempts_per_scale'];
+                $remainingperscale[$scaleid] = $maxattemptsperscale;
                 continue;
             }
-            $remainingperscale[$scaleid] = $this->context['max_attempts_per_scale'] - count($pq[$scaleid]);
+            $remainingperscale[$scaleid] = $maxattemptsperscale - count($pq[$scaleid]);
         }
         return $remainingperscale;
     }
