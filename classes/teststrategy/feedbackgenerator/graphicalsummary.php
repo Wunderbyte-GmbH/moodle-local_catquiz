@@ -405,8 +405,8 @@ class graphicalsummary extends feedbackgenerator {
      * @param array $data
      * @param int $primarycatscaleid
      * @param int $parentscaleid
-     * @param int $contextid
      * @param string $catscalename
+     * @param int $contextid
      *
      * @return array
      */
