@@ -1489,6 +1489,8 @@ class catquiz {
         $data->timecreated = $now;
 
         $attemptdata['courseid'] = $courseandinstance['courseid'];
+
+        self::replace_inf_with_minusone($attemptdata);
         $data->json = json_encode($attemptdata);
 
         $id = $DB->insert_record('local_catquiz_attempts', (object)$data);
@@ -1515,6 +1517,24 @@ class catquiz {
         return $id;
     }
 
+    /**
+     * @param mixed $array
+     *
+     * @return void
+     */
+    public static function replace_inf_with_minusone(&$array) {
+        foreach ($array as &$element) {
+            if (empty($element)) {
+                continue;
+            } else if (is_array($element)) {
+                self::replace_inf_with_minusone($element); // Recursively call the function for nested arrays.
+            } else {
+                if ($element === INF) {
+                    $element = -1;
+                }
+            }
+        }
+    }
     /** Fetch courseid and and instanceid from DB for attempt.
      * @param array $attemptdata
      * @return array
