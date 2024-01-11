@@ -326,7 +326,9 @@ class personabilities extends feedbackgenerator {
         $abilitysteps = [];
         $abilitystep = 0.25;
         $interval = $abilitystep * 2;
-        for ($i = LOCAL_CATQUIZ_PERSONABILITY_LOWER_LIMIT + $abilitystep; $i <= LOCAL_CATQUIZ_PERSONABILITY_UPPER_LIMIT - $abilitystep; $i += $interval) {
+        for ($i = LOCAL_CATQUIZ_PERSONABILITY_LOWER_LIMIT + $abilitystep;
+            $i <= LOCAL_CATQUIZ_PERSONABILITY_UPPER_LIMIT - $abilitystep;
+            $i += $interval) {
             $abilitysteps[] = $i;
         }
 
@@ -416,8 +418,8 @@ class personabilities extends feedbackgenerator {
     private function round_to_customsteps(float $number, float $step, float $interval):float {
         $roundedvalue = round($number / $step) * $step;
 
-        // Exclude rounding to steps with 0.5
-        if ($roundedvalue - floor($roundedvalue) == 0.5) {
+        // Exclude rounding to steps defined in $interval.
+        if ($roundedvalue - floor($roundedvalue) == $interval) {
             $roundedvalue = floor($roundedvalue) + $step;
         }
 
