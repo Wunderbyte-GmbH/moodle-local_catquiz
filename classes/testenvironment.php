@@ -442,7 +442,7 @@ class testenvironment {
 
         $returnarray = [];
 
-        $records = self::get_environments($component, $onlytemplates, $componentid);
+        $records = self::get_environments($component, $componentid, $onlytemplates);
 
         foreach ($records as $record) {
             $returnarray[$record->id] = $record->name;
