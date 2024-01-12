@@ -61,6 +61,7 @@ class feedbackclass {
 
         // Get all Values from the form.
         $data = $mform->getSubmitValues();
+        $defaultvalues = $mform->_defaultValues;
 
         // phpcs:ignore
         // TODO: Display Name of Teststrategy. $teststrategyid = intval($data['catquiz_selectteststrategy']);
@@ -150,19 +151,19 @@ class feedbackclass {
                 // Check for each feedback editor field, if there is content.
                 // This is the preparation for the header element (to be appended in the end) where we apply the distinction.
 
-                // TODO: Maybe find a better check if form is newly loaded or saved.
-                if (count($data) > 1) {
-                    $feedback = optional_param_array('feedbackeditor_scaleid_'  . $scale->id . '_' . $j, [], PARAM_RAW);
-                    if ($feedback != []) {
-                        $feedbacktext = $feedback['text'];
-                    }
-                } else {
-                    $feedback = optional_param('feedbackeditor_scaleid_'  . $scale->id . '_' . $j, "", PARAM_TEXT);
-                    if (!empty($feedback)) {
-                        $jsonobject = json_decode($feedback);
-                        $feedbacktext = strip_tags($jsonobject->text ?? '');
-                    }
+                // If reload was triggered (ie via nosubmitbutton), data is set in submitvalues.
+                if (isset($data['feedbackeditor_scaleid_'  . $scale->id . '_' . $j])) {
+                    $feedback = $data['feedbackeditor_scaleid_'  . $scale->id . '_' . $j];
+                } else if (isset($defaultvalues['feedbackeditor_scaleid_'  . $scale->id . '_' . $j])) {
+                    // If values of form where saved before, and form is loaded, data is in defaultvalues.
+                    $feedback = $defaultvalues['feedbackeditor_scaleid_'  . $scale->id . '_' . $j];
                 }
+                // Check type and value.
+                if (!empty($feedback)) {
+                    $feedbacktext = $feedback['text'];
+                    $feedbacktext = strip_tags($feedbacktext ?? '');
+                }
+
                 if (isset($feedbacktext) && strlen($feedbacktext) > 0) {
                     $numberoffeedbacksfilledout ++;
                 }
