@@ -592,6 +592,23 @@ class catquiz_handler {
                     }
                 }
             }
+
+            // Make sure the counter in the headerelement is corrected.
+            if ($mform->elementExists('header_accordion_start_scale_' . $scaleidofcopyvalue)) {
+                $parentheader = $mform->getElement('header_accordion_start_scale_' . $scaleidofcopyvalue);
+                $pht = $parentheader->_text;
+                $parentscalename = catscale::return_catscale_object($scaleidofcopyvalue)->name;
+                // $pht = strip_tags($parentheader->_text);
+                // $pheadertxt = trim($pht);
+                foreach ($subscaleids as $subscaleid) {
+                    if ($mform->elementExists('header_accordion_start_scale_' . $subscaleid)) {
+                        $element = $mform->getElement('header_accordion_start_scale_' . $subscaleid);
+                        $subscalename = catscale::return_catscale_object($subscaleid)->name;
+                        $newtext = str_replace($parentscalename, $subscalename, $pht);
+                        $element->_text = $newtext;
+                    }
+                }
+            }
         } else if (!isset($values["submitcattestoption"])
         || $values["submitcattestoption"] != "cattestsubmit") {
             return;
