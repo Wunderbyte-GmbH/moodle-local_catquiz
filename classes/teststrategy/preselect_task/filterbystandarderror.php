@@ -24,13 +24,17 @@
 
 namespace local_catquiz\teststrategy\preselect_task;
 
+use cache;
+use local_catquiz\catscale;
+use local_catquiz\local\model\model_item_param_list;
 use local_catquiz\local\result;
 use local_catquiz\local\status;
 use local_catquiz\teststrategy\preselect_task;
 use local_catquiz\wb_middleware;
 
 /**
- * Excludes scales based on standard error.
+ * Modifies the $context['active_scales'] content depending on whether a scale
+ * should be included or excluded.
  *
  * @package local_catquiz
  * @copyright 2023 Wunderbyte GmbH
@@ -48,34 +52,65 @@ class filterbystandarderror extends preselect_task implements wb_middleware {
      *
      */
     public function run(array &$context, callable $next): result {
-        $threshold = $context['standarderrorpersubscale'];
+        $cache = cache::make('local_catquiz', 'adaptivequizattempt');
+        $activescales = $cache->get('active_scales');
 
-        // If we already have enough information about that scale or if
-        // we can never get below the standarderror threshold for that
-        // scale, exclude it.
-        foreach ($context['standarderrorperscale'] as $catscaleid => $standarderror) {
-            $playedquestionsperscale = $context['playedquestionsperscale'][$catscaleid] ?? [];
-            $attemptsinscale = empty($playedquestionsperscale)
-                ? 0
-                : count($playedquestionsperscale);
-            if (
-                $attemptsinscale >= $context['min_attempts_per_scale']
-                && (
-                    $standarderror['played'] < $threshold
-                    || $standarderror['remaining'] > $threshold
-                )
-            ) {
-                // Questions of this scale will not be selected in this attempt.
-                $context['questions'] = array_filter($context['questions'], fn ($q) => $q->catscaleid != $catscaleid);
+        $lastquestion = $this->context['lastquestion'];
+        if (!$lastquestion) {
+            // If this is the first question and the cache is not yet set, set the
+            // root scale active.
+            $activescales = [$this->context['catscaleid']];
+            $this->context['active_scales'] = $activescales;
+            $cache->set('active_scales', $activescales);
+            return $this->next();
+        }
+
+        $scaleid = $lastquestion->catscaleid;
+        $updatedscales = [$scaleid, ...catscale::get_ancestors($scaleid)];
+        foreach ($updatedscales as $scaleid) {
+            // All played items that belong to the scale or one of its ancestor scales.
+            $playeditems = model_item_param_list::from_array(
+                $this->context['playedquestionsperscale'][$scaleid]
+            );
+            $allitems = model_item_param_list::from_array(
+                $this->context['questionsperscale'][$scaleid]
+            );
+            $remainingitems = clone ($allitems);
+            foreach ($remainingitems as $i) {
+                if (in_array($i->get_id(), $playeditems->get_item_ids())) {
+                    $remainingitems->offsetUnset($i->get_id());
+                }
+            }
+
+            $remaining = $this->context['max_attempts_per_scale'] === -1
+                ? count($remainingitems)
+                : $this->context['max_attempts_per_scale'] - count($playeditems);
+            $testpotential = catscale::get_testpotential(
+                $this->context['person_ability'][$scaleid],
+                $remainingitems,
+                $remaining
+            );
+            $testinformation = catscale::get_testinformation(
+                $this->context['person_ability'][$scaleid],
+                $playeditems
+            );
+
+            $exclude = $testpotential + $testinformation <= 1 / $this->context['se_max'] ** 2;
+            $exclude = $exclude || $this->context['max_attempts_per_scale'] !== -1 && count($playeditems) >= $this->context['max_attempts_per_scale'];
+            if ($exclude && in_array($scaleid, $activescales)) {
+                unset($activescales[array_search($scaleid, $activescales)]);
+                echo "drop " . (catscale::return_catscale_object($scaleid))->name . PHP_EOL;
+            }
+            if (!$exclude && !in_array($scaleid, $activescales)) {
+                $activescales[] = $scaleid;
+                echo "enact " . (catscale::return_catscale_object($scaleid))->name . PHP_EOL;
             }
         }
+        $activescales = array_unique($activescales);
+        $this->context['active_scales'] = $activescales;
+        $cache->set('active_scales', $activescales);
 
-        // Handle case where no questions are left.
-        if ($context['questions'] === []) {
-            return result::err(status::ERROR_NO_REMAINING_QUESTIONS);
-        }
-
-        return $next($context);
+        return $this->next();
     }
 
     /**
@@ -88,8 +123,9 @@ class filterbystandarderror extends preselect_task implements wb_middleware {
         return [
             'questions',
             'standarderrorpersubscale',
-            'standarderrorperscale',
             'playedquestionsperscale',
+            'se_max'
         ];
     }
+
 }
