@@ -107,7 +107,7 @@ class shortcodes {
         }
 
         $hiddenareas = $args['hide'] ?? [];
-
+        // Find keys for areas to hide in the README documentation.
         if ($hiddenareas != []) {
             $areastohide = explode(',', $hiddenareas);
         } else {
