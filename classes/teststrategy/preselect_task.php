@@ -52,6 +52,13 @@ abstract class preselect_task implements wb_middleware {
     protected ?array $context;
 
     /**
+     * The next task
+     *  
+     * @var callable
+     */
+    protected $nexttask;
+
+    /**
      * Process test strategy
      *
      * @param array $context
@@ -60,7 +67,7 @@ abstract class preselect_task implements wb_middleware {
      * @return result
      *
      */
-    public function process(array &$context, callable $next): result {
+    public function process(array &$context, callable $nexttask): result {
         foreach ($this->get_required_context_keys() as $key) {
             if (!array_key_exists($key, $context)) {
                 return result::err(status::ERROR_FETCH_NEXT_QUESTION);
@@ -69,7 +76,12 @@ abstract class preselect_task implements wb_middleware {
 
         $context['lastmiddleware'] = str_replace(__NAMESPACE__ . '\\preselect_task\\', '', get_class($this));
         $this->context = $context;
-        return $this->run($context, $next);
+        $this->nexttask = $nexttask;
+        return $this->run($context, $nexttask);
+    }
+
+    public function next() {
+        return ($this->nexttask)($this->context);
     }
 
     /**
