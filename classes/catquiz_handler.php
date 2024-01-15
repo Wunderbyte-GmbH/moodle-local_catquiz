@@ -605,8 +605,6 @@ class catquiz_handler {
                 $parentheader = $mform->getElement('header_accordion_start_scale_' . $scaleidofcopyvalue);
                 $pht = $parentheader->_text;
                 $parentscalename = catscale::return_catscale_object($scaleidofcopyvalue)->name;
-                // $pht = strip_tags($parentheader->_text);
-                // $pheadertxt = trim($pht);
                 foreach ($subscaleids as $subscaleid) {
                     if ($mform->elementExists('header_accordion_start_scale_' . $subscaleid)) {
                         $element = $mform->getElement('header_accordion_start_scale_' . $subscaleid);
