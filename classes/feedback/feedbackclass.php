@@ -601,14 +601,14 @@ class feedbackclass {
      * @param mixed $optioncounter
      * @param bool $lower
      *
-     * @return int
+     * @return float
      *
      */
     public static function return_limits_for_scale($nroptions, $optioncounter, bool $lower) {
 
         // Calculate equal default values for limits in scales.
         $sizeofrange = abs(LOCAL_CATQUIZ_PERSONABILITY_LOWER_LIMIT - LOCAL_CATQUIZ_PERSONABILITY_UPPER_LIMIT);
-        $increment = $sizeofrange / $nroptions;
+        $increment = round($sizeofrange / $nroptions, 2);
 
         if ($lower) {
             return LOCAL_CATQUIZ_PERSONABILITY_LOWER_LIMIT + ($optioncounter - 1) * $increment;
