@@ -234,10 +234,12 @@ class feedbackclass {
                 );
                 // Preset selected color regarding order of feedbacks.
                 $sequencecolors = array_keys($coloroptions);
-                $savedcolorvalue = $mform->_defaultValues['wb_colourpicker_' .$scale->id . '_' . $j]
-                    ?? $data['wb_colourpicker_' .$scale->id . '_' . $j];
 
-                if (!isset($savedcolorvalue)) {
+                $savedcolorvalue = $mform->_defaultValues['wb_colourpicker_' .$scale->id . '_' . $j]
+                    ?? $data['wb_colourpicker_' .$scale->id . '_' . $j]
+                    ?? 0;
+
+                if (empty($savedcolorvalue)) {
                     $mform->setDefault('wb_colourpicker_' .$scale->id . '_' . $j, $sequencecolors[$j - 1]);
                 }
 
