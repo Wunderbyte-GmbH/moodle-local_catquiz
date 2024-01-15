@@ -39,6 +39,7 @@ use local_catquiz\event\testiteminscale_added;
 use moodle_exception;
 use stdClass;
 use Traversable;
+use UnexpectedValueException;
 
 defined('MOODLE_INTERNAL') || die();
 
@@ -219,6 +220,15 @@ class model_item_param_list implements ArrayAccess, IteratorAggregate, Countable
             sort($data);
         }
         return $data;
+    }
+
+    /**
+     * Returns the item IDs.
+     *
+     * @return array
+     */
+    public function get_item_ids(): array {
+        return array_keys($this->itemparams);
     }
 
     /**
@@ -603,6 +613,38 @@ class model_item_param_list implements ArrayAccess, IteratorAggregate, Countable
         }
 
         $newrecord['contextid'] = $catcontext->id;
+    }
+
+    /**
+     * Converts the given data to a model_item_param_list
+     * 
+     * @param array $data 
+     * @return model_item_param_list 
+     * @throws UnexpectedValueException 
+     */
+    public static function from_array(array $data) {
+        $items = new self();
+        $models = model_strategy::get_installed_models();
+        foreach ($data as $d) {
+            if (
+                ! property_exists($d, 'id')
+                || ! property_exists($d, 'model')
+                || ! property_exists($d, 'status')
+            ) {
+                throw new UnexpectedValueException('Some property is missing from the given data');
+            }
+
+            $i = new model_item_param($d->id, $d->model, [], $d->status);
+
+            $params = [];
+            foreach ($models[$d->model]::get_parameter_names() as $param) {
+                $params[$param] = $d->$param;
+            }
+            $i->set_parameters($params);
+
+            $items->add($i);
+        }
+        return $items;
     }
 
 }
