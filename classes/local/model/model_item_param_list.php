@@ -174,7 +174,7 @@ class model_item_param_list implements ArrayAccess, IteratorAggregate, Countable
     }
 
     /**
-     * Unset offse.
+     * Unset offset.
      *
      * @param mixed $offset
      *

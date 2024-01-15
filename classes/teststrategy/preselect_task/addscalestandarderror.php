@@ -60,6 +60,14 @@ class addscalestandarderror extends preselect_task implements wb_middleware {
     protected ?array $playedquestionsperscale = null;
 
     /**
+     * Creates a new instance
+     * @return self
+     */
+    public function __construct() {
+        $this->playedquestionsperscale = null;
+    }
+
+    /**
      * Run method.
      *
      * @param array $context
@@ -69,7 +77,6 @@ class addscalestandarderror extends preselect_task implements wb_middleware {
      *
      */
     public function run(array &$context, callable $next): result {
-        $this->playedquestionsperscale = null;
         if (count($context['questions']) === 0) {
                 return result::err(status::ERROR_NO_REMAINING_QUESTIONS);
         }
@@ -85,11 +92,18 @@ class addscalestandarderror extends preselect_task implements wb_middleware {
         $playedquestionids = array_keys($cache->get('playedquestions') ?: []);
         // Questions that have no item parameters and hence fisher
         // information are ignored here.
-        $questions = array_filter($context['original_questions'], fn ($q) => ! empty($q->fisherinformation));
+        $questions = array_filter(
+            $context['original_questions'],
+            fn ($q) => ! empty($q->fisherinformation)
+        );
         // Sort descending by fisher information. This way, we can calculate the
         // maximum test information TI per subscale when including only the
         // maximum amount of remining questions.
-        uasort($questions, fn ($q1, $q2) => $q2->fisherinformation[$q1->catscaleid] <=> $q1->fisherinformation[$q2->catscaleid]);
+        uasort(
+            $questions,
+            fn ($q1, $q2) =>
+                $q2->fisherinformation[$q1->catscaleid] <=> $q1->fisherinformation[$q2->catscaleid]
+            );
         $remainingperscale = [];
         $context['playedquestionsperscale'] = $this->getplayedquestionsperscale();
         $remainingperscale = $this->getnumberofremainingquestionsperscale();
