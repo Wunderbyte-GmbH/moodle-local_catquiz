@@ -246,9 +246,75 @@ class strategy_test extends advanced_testcase {
                     ],
                     [
                         'label' => 'SIMA02-02',
-                        'is_correct_response' => true,
+                        'is_correct_response' => false,
                         'ability_before' => -0.67,
                         'ability_after' => -1.3,
+                    ],
+                    [
+                        'label' => 'SIMA02-19',
+                        'is_correct_response' => false,
+                        'ability_before' => -1.3,
+                        'ability_after' => -1.86,
+                    ],
+                    [
+                        'label' => 'SIMA02-17',
+                        'is_correct_response' => false,
+                        'ability_before' => -1.86,
+                        'ability_after' => -2.33,
+                    ],
+                    [
+                        'label' => 'SIMA06-02',
+                        'is_correct_response' => false,
+                        'ability_before' => -2.33,
+                        'ability_after' => -3.06,
+                    ],
+                    [
+                        'label' => 'SIMB02-00',
+                        'is_correct_response' => false,
+                        'ability_before' => -3.06,
+                        'ability_after' => -3.06,
+                    ],
+                    [
+                        'label' => 'SIMB01-17',
+                        'is_correct_response' => false,
+                        'ability_before' => -3.06,
+                        'ability_after' => -3.06,
+                    ],
+                    [
+                        'label' => 'SIMB01-12',
+                        'is_correct_response' => false,
+                        'ability_before' => -3.06,
+                        'ability_after' => -3.06,
+                    ],
+                    [
+                        'label' => 'SIMA02-04',
+                        'is_correct_response' => false,
+                        'ability_before' => -3.06,
+                        'ability_after' => -3.06,
+                    ],
+                    [
+                        'label' => 'SIMB02-02',
+                        'is_correct_response' => false,
+                        'ability_before' => -3.06,
+                        'ability_after' => -3.39,
+                    ],
+                    [
+                        'label' => 'SIMA01-13',
+                        'is_correct_response' => true,
+                        'ability_before' => -3.39,
+                        'ability_after' => -3.39,
+                    ],
+                    [
+                        'label' => 'SIMA01-16',
+                        'is_correct_response' => true,
+                        'ability_before' => -3.39,
+                        'ability_after' => -3.41,
+                    ],
+                    [
+                        'label' => 'SIMA01-19',
+                        'is_correct_response' => false,
+                        'ability_before' => -3.41,
+                        'ability_after' => -3.24,
                     ],
                 ],
             ],
@@ -459,6 +525,7 @@ class strategy_test extends advanced_testcase {
         $jsondata->catquiz_selectteststrategy = $strategyid;
         $jsondata->catquiz_maxquestions = 0;
         $jsondata->catquiz_minquestions = 500;
+        $jsondata->catquiz_maxquestionspersubscale = 10;
         $jsondata->json = json_encode($jsondata);
         $testenvironment = new testenvironment($jsondata);
         return $testenvironment;
