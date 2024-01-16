@@ -17,18 +17,17 @@ Feature: As an admin I perform import of catquiz alonf with questions to check S
       | user2    | C1     | student        |
       | teacher  | C1     | editingteacher |
     And the following "local_catquiz > questions" exist:
-      | user     | filepath                                           | filename              | course |
-      | admin    | local/catquiz/tests/fixtures/mathematik2scales.xml | mathematik2scales.xml | C1     |
-    And the following "user private files" exist:
-      | user     | filepath                                           | filename              |
-      | admin    | local/catquiz/tests/fixtures/mathematik2scales.csv | mathematik2scales.csv |
+      | filepath                                           | filename              | course |
+      | local/catquiz/tests/fixtures/mathematik2scales.xml | mathematik2scales.xml | C1     |
 
   @javascript
   Scenario: Catscales import: admin imports catscales for already imported questions and verified it
-    Given I log in as "admin"
+    Given the following "user private files" exist:
+      | user     | filepath                                           | filename              |
+      | admin    | local/catquiz/tests/fixtures/mathematik2scales.csv | mathematik2scales.csv |
+    And I log in as "admin"
     And I press "Catquiz"
     And I wait until the page is ready
-    ## And I follow "#catscales-tab"
     And I click on "Import" "link" in the "#region-main" "css_element"
     And I click on "Choose a file..." "button"
     And I click on "Private files" "link" in the ".fp-repo-area" "css_element"
@@ -41,6 +40,30 @@ Feature: As an admin I perform import of catquiz alonf with questions to check S
     Then I should see "Import was successful. 3 record(s) treated."
     ## TODO: potential issue - need to reload page?
     And I reload the page
+    And I wait until the page is ready
+    And I click on "CAT scales" "link" in the "#region-main" "css_element"
+    And I should see "Mathematik"
+    And I should see "A03"
+    And I should see "A02"
+    And I click on "Questions" "link" in the "#region-main" "css_element"
+    And I set the field "Scale" to "Mathematik"
+    And I should see "3 of 3 records found"
+    And I wait "1" seconds
+    ## And I set the field "Search" to "Rechenregel"
+    And I set the field with xpath "//input[contains(@name, 'search-catscale')]" to "Rechenregel"
+    And I wait "1" seconds
+    And I should see "1 of 3 records found"
+    And I should see "-2.8624" in the "[data-label=\"difficulty\"]" "css_element"
+    And I should see "1.0814" in the "[data-label=\"discrimination\"]" "css_element"
+    And I should see "0.0000" in the "[data-label=\"guessing\"]" "css_element"
+
+  @javascript
+  Scenario: Catscales import: admin verified already imported catscales
+    Given the following "local_catquiz > importedcatscales" exist:
+      | filepath                                           | filename              |
+      | local/catquiz/tests/fixtures/mathematik2scales.csv | mathematik2scales.csv |
+    And I log in as "admin"
+    And I press "Catquiz"
     And I wait until the page is ready
     And I click on "CAT scales" "link" in the "#region-main" "css_element"
     And I should see "Mathematik"
