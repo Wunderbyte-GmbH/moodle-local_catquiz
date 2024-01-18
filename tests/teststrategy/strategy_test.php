@@ -154,6 +154,10 @@ class strategy_test extends advanced_testcase {
                 0.01,
                 'Ability after fetch is not correct for question number ' . ($index + 1)
             );
+            if ($expectedquestion['label'] === 'FINISH') {
+                return;
+            }
+
             $question = question_bank::load_question($nextquestionid);
             $this->assertEquals($expectedquestion['label'], $question->idnumber);
             $this->createresponse($question, $expectedquestion['is_correct_response']);
@@ -316,6 +320,78 @@ class strategy_test extends advanced_testcase {
                         'ability_before' => -3.41,
                         'ability_after' => -3.24,
                     ],
+                    [
+                        'label' => 'SIMA01-06',
+                        'is_correct_response' => true,
+                        'ability_before' => -3.24,
+                        'ability_after' => -3.35,
+                    ],
+                    [
+                        'label' => 'SIMA03-13',
+                        'is_correct_response' => true,
+                        'ability_before' => -3.35,
+                        'ability_after' => -3.31,
+                    ],
+                    [
+                        'label' => 'SIMA03-03',
+                        'is_correct_response' => true,
+                        'ability_before' => -3.31,
+                        'ability_after' => -3.27,
+                    ],
+                    [
+                        'label' => 'SIMA03-16',
+                        'is_correct_response' => true,
+                        'ability_before' => -3.27,
+                        'ability_after' => -3.21,
+                    ],
+                    [
+                        'label' => 'SIMA05-00',
+                        'is_correct_response' => false,
+                        'ability_before' => -3.21,
+                        'ability_after' => -3.15,
+                    ],
+                    [
+                        'label' => 'SIMA05-07',
+                        'is_correct_response' => false,
+                        'ability_before' => -3.15,
+                        'ability_after' => -3.21,
+                    ],
+                    [
+                        'label' => 'SIMA05-15',
+                        'is_correct_response' => false,
+                        'ability_before' => -3.21,
+                        'ability_after' => -3.25,
+                    ],
+                    [
+                        'label' => 'SIMA01-07',
+                        'is_correct_response' => false,
+                        'ability_before' => -3.25,
+                        'ability_after' => -3.29,
+                    ],
+                    [
+                        'label' => 'SIMA01-12',
+                        'is_correct_response' => false,
+                        'ability_before' => -3.29,
+                        'ability_after' => -3.31,
+                    ],
+                    [
+                        'label' => 'SIMA01-14',
+                        'is_correct_response' => true,
+                        'ability_before' => -3.31,
+                        'ability_after' => -3.45,
+                    ],
+                    [
+                        'label' => 'SIMA03-19',
+                        'is_correct_response' => true,
+                        'ability_before' => -3.45,
+                        'ability_after' => -3.41,
+                    ],
+                    [
+                        'label' => 'FINISH',
+                        'is_correct_response' => false,
+                        'ability_before' => -3.41,
+                        'ability_after' => -3.38,
+                    ]
                 ],
             ],
             // phpcs:disable
@@ -523,7 +599,7 @@ class strategy_test extends advanced_testcase {
         $jsondata->componentid = '1';
         $jsondata->component = 'mod_adaptivequiz';
         $jsondata->catquiz_selectteststrategy = $strategyid;
-        $jsondata->catquiz_maxquestions = 0;
+        $jsondata->catquiz_maxquestions = 25;
         $jsondata->catquiz_minquestions = 500;
         $jsondata->catquiz_maxquestionspersubscale = 10;
         $jsondata->json = json_encode($jsondata);
