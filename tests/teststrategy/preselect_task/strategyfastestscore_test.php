@@ -72,32 +72,33 @@ class strategyfastestscore_test extends basic_testcase {
                 'id' => 1,
                 'catscaleid' => 1,
                 'lasttimeplayedpenalty' => 1,
-                'fisherinformation' => 0,
+                'fisherinformation' => [1 => 0],
                 'difficulty' => -1,
             ],
             '2' => (object) [
                 'id' => 2,
                 'catscaleid' => 1,
                 'lasttimeplayedpenalty' => 1,
-                'fisherinformation' => 1,
+                'fisherinformation' => [1 => 1],
                 'difficulty' => 0,
             ],
             '3' => (object) [
                 'id' => 3,
                 'catscaleid' => 1,
                 'lasttimeplayedpenalty' => 0,
-                'fisherinformation' => 0,
+                'fisherinformation' => [1 => 0],
                 'difficulty' => 1,
             ],
             '4' => (object) [
                 'id' => 4,
                 'catscaleid' => 1,
                 'lasttimeplayedpenalty' => 0,
-                'fisherinformation' => 0,
+                'fisherinformation' => [1 => 0],
                 'difficulty' => 2,
             ],
         ];
         $context['penalty_threshold'] = 5;
+        $context['catscaleid'] = 1;
 
         return [
             'test' => [
