@@ -159,7 +159,6 @@ class updatepersonability extends preselect_task implements wb_middleware {
         global $CFG;
         $itemparamlist = $this->get_item_param_list(
             $this->userresponses,
-            $context['contextid'],
             $catscaleid
         );
 
@@ -298,13 +297,12 @@ class updatepersonability extends preselect_task implements wb_middleware {
      * Get item param list.
      *
      * @param mixed $responses
-     * @param mixed $contextid
      * @param mixed $catscaleid
      *
      * @return model_item_param_list
      *
      */
-    protected function get_item_param_list($responses, $contextid, $catscaleid) {
+    protected function get_item_param_list($responses, $catscaleid) {
         // We will update the person ability. Select the correct model for each item.
         $modelstrategy = new model_strategy($responses);
         $catscalecontext = catscale::get_context_id($catscaleid);
@@ -313,7 +311,7 @@ class updatepersonability extends preselect_task implements wb_middleware {
             ...catscale::get_subscale_ids($catscaleid),
         ];
         $itemparamlists = [];
-        $personparams = model_person_param_list::load_from_db($contextid, $catscaleids);
+        $personparams = model_person_param_list::load_from_db($catscalecontext, $catscaleids);
         foreach (array_keys($modelstrategy->get_installed_models()) as $model) {
             $itemparamlists[$model] = model_item_param_list::load_from_db(
                 $catscalecontext,
@@ -338,7 +336,7 @@ class updatepersonability extends preselect_task implements wb_middleware {
     protected function update_person_param($context, $catscaleid, $updatedability) {
         catquiz::update_person_param(
             $context['userid'],
-            $context['contextid'],
+            catscale::get_context_id($catscaleid),
             $catscaleid,
             $updatedability
         );
