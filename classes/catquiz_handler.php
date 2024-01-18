@@ -254,7 +254,11 @@ class catquiz_handler {
                 'catquiz_subscalecheckbox_' . $subscale->id,
                 $elementadded . $subscale->name . $scaleiddisplay,
                 null,
-                ['data-on-change-action' => 'reloadFormFromScaleSelect'],
+                [
+                    'data-on-change-action' => 'reloadFormFromScaleSelect',
+                    'data-name' => $subscale->name,
+                    'data-depth' => $subscale->depth,
+                ],
                 [0, 1]
             );
             $value = optional_param('catquiz_subscalecheckbox_' . $subscale->id, 0, PARAM_INT);
