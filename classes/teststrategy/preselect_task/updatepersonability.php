@@ -263,7 +263,7 @@ class updatepersonability extends preselect_task implements wb_middleware {
                 );
 
                 if (catscale::return_catscale_object($scale)->name == 'SimA06') {
-                    echo sprintf('Updating SIMA06 from %f to %f%s',
+                    getenv('CATQUIZ_CREATE_TESTOUTPUT') && printf('Updating SIMA06 from %f to %f%s',
                         $this->context['person_ability'][$scale],
                         $ability,
                         PHP_EOL
