@@ -49,14 +49,6 @@ use moodle_exception;
 class updatepersonability extends preselect_task implements wb_middleware {
 
     /**
-     * UPDATE_THRESHOLD
-     *
-     * @var int
-     */
-    const UPDATE_THRESHOLD = 0.05;
-
-
-    /**
      *
      * @var mixed $userresponses
      */
@@ -84,6 +76,8 @@ class updatepersonability extends preselect_task implements wb_middleware {
 
     private float $parent_ability;
     private float $parent_se;
+
+    private array $scalestoupdate;
 
     /**
      * Run preselect task.
@@ -127,14 +121,14 @@ class updatepersonability extends preselect_task implements wb_middleware {
         $this->arrayresponses = reset($components);
 
         $catscaleid = $this->lastquestion->catscaleid;
-        $scalestoupdate = array_reverse(
+        $this->scalestoupdate = array_reverse(
             [$catscaleid, ...catscale::get_ancestors($catscaleid)]
         );
         try {
             $index = 0;
-            foreach ($scalestoupdate as $scale) {
+            foreach ($this->scalestoupdate as $scale) {
                 $isancestor = $scale != $catscaleid;
-                $parentscale = $index == 0 ? null : $scalestoupdate[$index - 1];
+                $parentscale = $index == 0 ? null : $this->scalestoupdate[$index - 1];
                 $index++;
                 $context = $this->updateability($context, $scale, $isancestor, $parentscale);
             }
@@ -207,28 +201,78 @@ class updatepersonability extends preselect_task implements wb_middleware {
             $this->parent_se = catscale::get_standarderror($updatedability, $itemparamlist);
         }
 
-        $this->update_person_param($context, $catscaleid, $updatedability);
+        $this->update_person_param($catscaleid, $updatedability);
         $hasminimumquestions = $context['questionsattempted'] >= $context['minimumquestions'];
-        $abilitynotchanged = abs($context['person_ability'][$catscaleid] - $updatedability) < self::UPDATE_THRESHOLD;
-        // We do not exclude questions of ancestor scales if the person ability in such a scale did not change.
-        if (! $isancestor && $hasminimumquestions && $abilitynotchanged) {
-            // The questions of this scale should be excluded in the remaining quiz attempt.
-            $context['questions'] = array_filter(
-                $context['questions'],
-                fn ($q) => $q->catscaleid !== $catscaleid
-            );
-            if (count($context['questions']) === 0) {
-                throw new \Exception(status::ABORT_PERSONABILITY_NOT_CHANGED);
-            }
-            $this->mark_subscale_as_removed($catscaleid);
-            $context['excludedsubscales'][] = $catscaleid;
-        }
+        //$abilitynotchanged = abs($context['person_ability'][$catscaleid] - $updatedability) < self::UPDATE_THRESHOLD;
+        //// We do not exclude questions of ancestor scales if the person ability in such a scale did not change.
+        //if (! $isancestor && $hasminimumquestions && $abilitynotchanged) {
+        //    // The questions of this scale should be excluded in the remaining quiz attempt.
+        //    $context['questions'] = array_filter(
+        //        $context['questions'],
+        //        fn ($q) => $q->catscaleid !== $catscaleid
+        //    );
+        //    if (count($context['questions']) === 0) {
+        //        throw new \Exception(status::ABORT_PERSONABILITY_NOT_CHANGED);
+        //    }
+        //    $this->mark_subscale_as_removed($catscaleid);
+        //    $context['excludedsubscales'][] = $catscaleid;
+        //}
 
+        $context['prev_ability'][$catscaleid] = $context['person_ability'][$catscaleid];
         $context['person_ability'][$catscaleid] = $updatedability;
         $cache = cache::make('local_catquiz', 'adaptivequizattempt');
         $cachedabilities = $cache->get('personabilities') ?: [];
         $cachedabilities[$catscaleid] = $updatedability;
         $cache->set('personabilities', $cachedabilities);
+
+        if ($this->diverseanswers[$catscaleid]) {
+            // Get all scales that are a subscale of the current catscale.
+            $scales = array_filter(
+                array_keys($this->context['person_ability']),
+                fn ($id) => in_array($id, catscale::get_subscale_ids($catscaleid))
+            );
+            // Exclude scales that will be updated anyway.
+            $scales = array_filter($scales, fn ($s) => !in_array($s, $this->scalestoupdate));
+            
+            foreach ($scales as $scale) {
+                // Exclude scales that have wrong and right answers.
+                $itemparamlist = $this->userresponses->get_items_for_scale(
+                    $scale,
+                    $context['contextid']
+                );
+                if (count($itemparamlist) === 0) {
+                    continue;
+                }
+
+                // Remove all responses that are not in the item param list and check again.
+                $arrayresponsesforscale = [];
+                foreach ($itemparamlist as $item) {
+                    $arrayresponsesforscale[$item->get_id()] = $this->arrayresponses[$item->get_id()];
+                }
+                $this->diverseanswers[$scale] = $this->has_sufficient_responses($arrayresponsesforscale);
+                if ($this->diverseanswers[$scale]) {
+                    continue;
+                }
+                $startvalue = $this->context['person_ability'][$scale] ?? $this->parent_ability;
+                $ability = catcalc::estimate_person_ability(
+                    $arrayresponsesforscale,
+                    $itemparamlist,
+                    $startvalue,
+                    $this->parent_ability,
+                    $this->parent_se
+                );
+
+                if (catscale::return_catscale_object($scale)->name == 'SimA06') {
+                    echo sprintf('Updating SIMA06 from %f to %f%s',
+                        $this->context['person_ability'][$scale],
+                        $ability,
+                        PHP_EOL
+                    );
+                }
+                $this->update_person_param($scale, $ability);
+            }
+        }
+
         return $context;
     }
 
@@ -256,9 +300,9 @@ class updatepersonability extends preselect_task implements wb_middleware {
      * @param array $arrayresponses
      * @return mixed
      */
-    private function has_sufficient_responses($arrayresponses = []) {
+    private function has_sufficient_responses($arrayresponses) {
         if (! $arrayresponses) {
-            $arrayresponses = $this->arrayresponses;
+            return false;
         }
         $first = $arrayresponses[array_key_first($arrayresponses)];
         foreach ($arrayresponses as $ur) {
