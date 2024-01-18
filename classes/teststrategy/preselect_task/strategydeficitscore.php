@@ -94,6 +94,22 @@ final class strategydeficitscore extends preselect_task implements wb_middleware
                     * $question->processterm
                     * $question->scaleterm
                     * $question->itemterm;
+
+                if (in_array($question->label, ['SIMA03-19', 'SIMA06-12']) && $this->context['questionsattempted'] === 24) {
+                        echo sprintf(
+                            '%s in %-10s: TI: %f FI: %f PT: %f ST: %f IT: %f SC: %f PP: %f NC: %d',
+                            $question->label,
+                            catscale::return_catscale_object($scaleid)->name,
+                            $testinfo,
+                            $question->fisherinformation[$scaleid],
+                            $question->processterm,
+                            $question->scaleterm,
+                            $question->itemterm,
+                            $score,
+                            $this->context['person_ability'][$scaleid],
+                            count($this->context['playedquestionsperscale'][$scaleid] ?? [])
+                        ) . PHP_EOL;
+                }
                 if (! property_exists($question, 'score') || $score > $question->score) {
                     $question->score = $score;
                 }
