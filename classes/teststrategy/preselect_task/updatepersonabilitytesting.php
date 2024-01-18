@@ -96,13 +96,12 @@ class updatepersonabilitytesting extends updatepersonability {
      * Get item param list.
      *
      * @param mixed $responses
-     * @param mixed $contextid
      * @param mixed $catscaleid
      *
      * @return mixed
      *
      */
-    protected function get_item_param_list($responses, $contextid, $catscaleid) {
+    protected function get_item_param_list($responses, $catscaleid) {
         $itemparamlist = new model_item_param_list();
         if (! array_key_exists('fake_item_params', $this->context)) {
             return $itemparamlist;
