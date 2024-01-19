@@ -137,9 +137,9 @@ class feedbackclass {
         // We need this to close the collapsable header elements.
         $html2 = $OUTPUT->render_from_template('local_catquiz/feedback/feedbackform_collapsible_close', []);
 
-        $enroledcourses = enrol_get_my_courses();
+        $enrolledcourses = enrol_get_my_courses();
         $coursesfromtags = dataapi::get_courses_from_settings_tags() ?? [];
-        $courses = array_merge($enroledcourses, $coursesfromtags);
+        $courses = array_merge($enrolledcourses, $coursesfromtags);
 
         foreach ($scales as $scale) {
             $subelements = [];

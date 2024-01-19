@@ -1637,7 +1637,7 @@ class catquiz {
      *
      * @return bool
      */
-    public static function enrole_user(
+    public static function enrol_user(
         int $userid,
         array $quizsettings,
         array $personabilities) {
@@ -1656,8 +1656,8 @@ class catquiz {
                 if ($personability >= $lowerlimit && $personability <= $upperlimit) {
                     $message = empty($quizsettings["enrolment_message_checkbox_" . $catscaleid . "_" . $i]) ? false : true;
                     $groupstoenrol = $quizsettings['catquiz_group_' . $catscaleid . '_' . $i] ?? "";
-                    if (!empty($groupstoenrole)) {
-                        $groupsarray = explode(",", $groupstoenrole);
+                    if (!empty($groupstoenrol)) {
+                        $groupsarray = explode(",", $groupstoenrol);
                     } else {
                         $groupsarray = [];
                     }

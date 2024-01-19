@@ -312,7 +312,7 @@ $string['itemstatus_5'] = "Manuell bestätigt"; // LOCAL_CATQUIZ_STATUS_CONFIRME
 
 // Student Details.
 $string['studentdetails'] = "Student details";
-$string['enroled_courses'] = "Eingeschriebene Kurse";
+$string['enrolled_courses'] = "Eingeschriebene Kurse";
 $string['questionresults'] = "Fragen Auswertung";
 $string['daysago'] = 'Vor {$a} Tagen';
 $string['hoursago'] = 'Vor {$a} Stunden';
