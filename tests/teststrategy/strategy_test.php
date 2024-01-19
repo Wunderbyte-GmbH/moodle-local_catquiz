@@ -108,12 +108,22 @@ class strategy_test extends advanced_testcase {
      *
      * @param int $strategy The ID of the teststrategy.
      * @param array $questions The expected list of questions.
+     * @param float $initialability The initial ability in the main scale.
+     * @param float $initialse The initial standarderror in the main scale.
      *
      * TODO: add group large?
      * TODO: Use different testenvironment.json files for different teststrategies.
      * @dataProvider strategy_returns_expected_questions_provider
      */
-    public function test_strategy_returns_expected_questions(int $strategy, array $questions) {
+    public function test_strategy_returns_expected_questions(
+        int $strategy,
+        array $questions,
+        float $initialability = 0.0,
+        float $initialse = 1.0
+    ) {
+        putenv('USE_TESTING_CLASS_FOR=local_catquiz\teststrategy\preselect_task\updatepersonability');
+        putenv("CATQUIZ_TESTING_ABILITY=$initialability");
+        putenv("CATQUIZ_TESTING_STANDARDERROR=$initialse");
         global $DB, $USER;
         $this
             ->createtestenvironment($strategy)
@@ -393,6 +403,8 @@ class strategy_test extends advanced_testcase {
                         'ability_after' => -3.38,
                     ],
                 ],
+                'initial_ability' => 0.02,
+                'initial_se' => 2.97,
             ],
             // phpcs:disable
             //'Infer greatest strength' => [
