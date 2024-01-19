@@ -48,11 +48,12 @@ class messages {
      * @param int $recepientid
      * @param string $messagesubject
      * @param string $messagetext
+     * @param string $messagename
      *
      * @return void
      *
      */
-    public static function send_message(int $recepientid, string $messagesubject, string $messagetext) {
+    public static function send_message(int $recepientid, string $messagesubject, string $messagetext, string $messagename) {
 
         global $CFG;
         require_once($CFG->dirroot . '/user/lib.php');
@@ -63,7 +64,7 @@ class messages {
 
         $message = new \core\message\message();
         $message->component = 'local_catquiz'; // Your plugin's name.
-        $message->name = 'updatecatscale'; // Your notification name from message.php.
+        $message->name = $messagename; // Your notification name from message.php.
         $message->userfrom = core_user::get_noreply_user(); // If the message is 'from' a specific user you can set them here.
         $message->userto = $user;
         $message->subject = $messagesubject;
@@ -115,7 +116,8 @@ class messages {
             self::send_message(
                 $user->id,
                 get_string('catscaleupdatedtitle', 'local_catquiz'),
-                get_string('notificationcatscalechange', 'local_catquiz', $data));
+                get_string('notificationcatscalechange', 'local_catquiz', $data),
+                'updatecatscale');
         }
     }
 

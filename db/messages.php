@@ -28,4 +28,5 @@
      'updatecatscale' => [
          'capability'  => 'local/catquiz:subscribecatscales',
      ],
+     'enrolementfeedback' => [],
  ];
