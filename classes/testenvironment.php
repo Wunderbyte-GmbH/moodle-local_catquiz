@@ -458,6 +458,7 @@ class testenvironment {
      * @param string $component
      * @param int $componentid // Overrides the onlytemplate setting and returns the exact test by id.
      * @param int $onlytemplates
+     * @param bool $includecoursenames
      *
      * @return array
      *
