@@ -488,7 +488,7 @@ class testenvironment {
         }
 
         $sql = "SELECT *
-                FROM {local_catquiz_tests} cat
+                FROM {local_catquiz_tests}
                 $equal";
 
         if ($includecoursenames) {
