@@ -75,6 +75,14 @@ class updatepersonability extends preselect_task implements wb_middleware {
     public $lastquestion;
 
     /**
+     * Contains IDs of catscales that have at least two different (correct and
+     * incorrect) answers.
+     *
+     * @var array $diverseanswers
+     */
+    private array $diverseanswers = [];
+
+    /**
      * Run preselect task.
      *
      * @param array $context
@@ -151,7 +159,6 @@ class updatepersonability extends preselect_task implements wb_middleware {
         global $CFG;
         $itemparamlist = $this->get_item_param_list(
             $this->userresponses,
-            $context['contextid'],
             $catscaleid
         );
 
@@ -160,18 +167,21 @@ class updatepersonability extends preselect_task implements wb_middleware {
         foreach ($itemparamlist as $item) {
             $arrayresponsesforscale[$item->get_id()] = $this->arrayresponses[$item->get_id()];
         }
+        $this->diverseanswers[$catscaleid] = $this->has_sufficient_responses($arrayresponsesforscale);
 
-        if (! $this->has_sufficient_responses($arrayresponsesforscale)
-            || count($itemparamlist) === 0) {
-            $updatedability = $this->fallback_ability_update($catscaleid);
-            $context['updateabilityfallback'] = true;
-        } else {
-            $startvalue = $context['person_ability'][$catscaleid] ?? 0.1;
-            if ($parentscale) {
-                $startvalue = $context['person_ability'][$parentscale];
-            }
-            $updatedability = catcalc::estimate_person_ability($this->arrayresponses, $itemparamlist, $startvalue);
+        $parentability = $context['person_ability'][$parentscale] ?? 0.0;
+        $startvalue = $context['person_ability'][$catscaleid] ?? 0.0;
+        if ($parentscale && $this->diverseanswers[$parentscale] ?? false) {
+            $startvalue = $parentability;
         }
+        $sdability = $context['person_ability'][$catscaleid] ?? 0.0;
+
+        // We use the standarderror that is calculated by the previous ability and the previous items.
+        $itemclone = clone($itemparamlist);
+        $itemclone->offsetUnset($context['lastquestion']->id);
+        $sd = catscale::get_standarderror($sdability, $itemclone);
+
+        $updatedability = catcalc::estimate_person_ability($this->arrayresponses, $itemparamlist, $startvalue, $startvalue, $sd);
 
         if (is_nan($updatedability)) {
             // In a production environment, we can use fallback values. However,
@@ -287,13 +297,12 @@ class updatepersonability extends preselect_task implements wb_middleware {
      * Get item param list.
      *
      * @param mixed $responses
-     * @param mixed $contextid
      * @param mixed $catscaleid
      *
-     * @return mixed
+     * @return model_item_param_list
      *
      */
-    protected function get_item_param_list($responses, $contextid, $catscaleid) {
+    protected function get_item_param_list($responses, $catscaleid) {
         // We will update the person ability. Select the correct model for each item.
         $modelstrategy = new model_strategy($responses);
         $catscalecontext = catscale::get_context_id($catscaleid);
@@ -302,7 +311,7 @@ class updatepersonability extends preselect_task implements wb_middleware {
             ...catscale::get_subscale_ids($catscaleid),
         ];
         $itemparamlists = [];
-        $personparams = model_person_param_list::load_from_db($contextid, $catscaleids);
+        $personparams = model_person_param_list::load_from_db($catscalecontext, $catscaleids);
         foreach (array_keys($modelstrategy->get_installed_models()) as $model) {
             $itemparamlists[$model] = model_item_param_list::load_from_db(
                 $catscalecontext,
@@ -312,19 +321,6 @@ class updatepersonability extends preselect_task implements wb_middleware {
         }
         $itemparamlist = $modelstrategy->select_item_model($itemparamlists, $personparams);
         return $itemparamlist;
-    }
-
-    /**
-     * Get updated ability.
-     *
-     * @param mixed $userresponses
-     * @param mixed $itemparamlist
-     *
-     * @return mixed
-     *
-     */
-    protected function get_updated_ability($userresponses, $itemparamlist) {
-        return catcalc::estimate_person_ability($userresponses, $itemparamlist);
     }
 
     /**
@@ -340,7 +336,7 @@ class updatepersonability extends preselect_task implements wb_middleware {
     protected function update_person_param($context, $catscaleid, $updatedability) {
         catquiz::update_person_param(
             $context['userid'],
-            $context['contextid'],
+            catscale::get_context_id($catscaleid),
             $catscaleid,
             $updatedability
         );

@@ -464,56 +464,6 @@ class catcontext {
     }
 
     /**
-     * Compare the context to contexts in db. Returns similar context if found, else false.
-     *
-     * @return stdClass|boolean
-     */
-    public function compare_to_existing_contexts() {
-
-        global $DB;
-
-        $record = (object)[
-            'name' => $this->name,
-            'description' => $this->description,
-            'descriptionformat' => $this->descriptionformat,
-            'starttimestamp' => $this->starttimestamp,
-            'endtimestamp' => $this->endtimestamp,
-            'json' => $this->json,
-            'usermodified' => $this->usermodified,
-            'timecreated' => $this->timecreated,
-            'timemodified' => $this->timemodified,
-            'timecalculated' => $this->timecalculated,
-        ];
-
-        // Only if the id is not empty, we add the id key.
-        if (!empty($this->id)) {
-            $record->id = $this->id;
-        }
-
-        $explodedname = explode("_", $this->name);
-
-        $dbrecords = $DB->get_records_sql(
-            "SELECT * FROM {local_catquiz_catcontext}"
-        );
-
-        // Check if $record->name contains
-        // If context was created less than 2 minutes ago, and it's for the same scale, we return it.
-        $time = intval(time());
-        foreach ($dbrecords as $dbrecord) {
-            // TODO change again to 120!
-            if ($time - intval($dbrecord->timecreated) < 1200
-                && str_contains($dbrecord->name, $explodedname[1])
-                && str_contains($dbrecord->name, $explodedname[2])
-                ) {
-                $this->id = $dbrecord->id;
-                return $dbrecord;
-            }
-        }
-        // If no record was found, return false.
-        return false;
-    }
-
-    /**
      * Returns the time when the items of this context have last been updated.
      * @return int
      */

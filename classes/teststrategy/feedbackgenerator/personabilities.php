@@ -26,6 +26,7 @@ namespace local_catquiz\teststrategy\feedbackgenerator;
 
 use cache;
 use core\chart_bar;
+use core\chart_line;
 use core\chart_series;
 use local_catquiz\catquiz;
 use local_catquiz\catscale;
@@ -33,6 +34,7 @@ use local_catquiz\feedback\feedbackclass;
 use local_catquiz\output\catscalemanager\questions\cards\questionpreview;
 use local_catquiz\teststrategy\feedbackgenerator;
 use local_catquiz\teststrategy\feedbacksettings;
+use local_catquiz\local\model\model_strategy;
 use stdClass;
 
 /**
@@ -52,9 +54,9 @@ class personabilities extends feedbackgenerator {
 
     /**
      *
-     * @var mixed $primaryscaleid // The scale to be displayed in detail in the colorbar.
+     * @var int $primaryscaleid // The scale to be displayed in detail in the colorbar.
      */
-    public mixed $primaryscaleid;
+    public int $primaryscaleid;
 
     /**
      * Creates a new personabilities feedback generator.
@@ -109,6 +111,7 @@ class personabilities extends feedbackgenerator {
                 'standarderrorpersubscales' => $data['standarderrorpersubscales'],
                 'progressindividual' => $data['progressindividual'],
                 'progresscomparison' => $data['progresscomparison'],
+                'abilityprofile' => $data['abilityprofile'],
             ]
         );
 
@@ -295,6 +298,7 @@ class personabilities extends feedbackgenerator {
             (array)$initialcontext,
             $catscales[$selectedscaleid]);
 
+        $abilityprofile = $this->render_abilityprofile_chart((array)$initialcontext, $catscales[$selectedscaleid]);
         $standarderrorpersubscales = $quizsettings->catquiz_standarderrorpersubscale ?? "";
         return [
             'feedback_personabilities' => $data,
@@ -303,7 +307,150 @@ class personabilities extends feedbackgenerator {
             'cached_contexts' => $cachedcontexts,
             'progressindividual' => $abilityprogress['individual'],
             'progresscomparison' => $abilityprogress['comparison'],
+            'abilityprofile' => $abilityprofile,
         ];
+    }
+
+    /**
+     * Render chart for histogram of personabilities.
+     *
+     * @param array $initialcontext
+     * @param stdClass $primarycatscale
+     *
+     * @return array
+     *
+     */
+    private function render_abilityprofile_chart(array $initialcontext, $primarycatscale) {
+        global $OUTPUT, $DB;
+
+        $abilitysteps = [];
+        $abilitystep = 0.25;
+        $interval = $abilitystep * 2;
+        $ul = LOCAL_CATQUIZ_PERSONABILITY_UPPER_LIMIT;
+        $ll = LOCAL_CATQUIZ_PERSONABILITY_LOWER_LIMIT;
+        for ($i = $ll + $abilitystep; $i <= $ul - $abilitystep; $i += $interval) {
+            $abilitysteps[] = $i;
+        }
+
+        $catscale = new catscale($primarycatscale->id);
+
+        // Prepare data for test information line.
+        $items = $catscale->get_testitems($initialcontext['contextid'], true);
+        $models = model_strategy::get_installed_models();
+        $fisherinfos = [];
+        foreach ($items as $item) {
+            $key = $item->model;
+            $model = $models[$key] ?? $models['raschbirnbaumb'];
+            foreach ($model::get_parameter_names() as $paramname) {
+                $params[$paramname] = floatval($item->$paramname);
+            }
+            foreach ($abilitysteps as $ability) {
+                $fisherinformation = $model::fisher_info(
+                    ['ability' => $ability],
+                    $params
+                );
+                $stringkey = strval($ability);
+
+                if (!isset($fisherinfos[$stringkey])) {
+                    $fisherinfos[$stringkey] = $fisherinformation;
+                } else {
+                    $fisherinfos[$stringkey] += $fisherinformation;
+                }
+            }
+
+        }
+
+        // Prepare data for scorecounter bars.
+        $abilityrecords = $DB->get_records('local_catquiz_personparams', ['catscaleid' => $primarycatscale->id]);
+        $abilityseries = [];
+        foreach ($abilitysteps as $as) {
+            $counter = 0;
+            foreach ($abilityrecords as $record) {
+                $a = floatval($record->ability);
+                $ability = $this->round_to_customsteps($a, $abilitystep, $interval);
+                if ($ability != $as) {
+                    continue;
+                } else {
+                    $counter ++;
+                }
+            }
+            $colorvalue = $this->get_color_for_personability(
+                (array)$initialcontext['quizsettings'],
+                $as,
+                intval($primarycatscale->id)
+                );
+            $abilitystring = strval($as);
+            $abilityseries['counter'][$abilitystring] = $counter;
+            $abilityseries['colors'][$abilitystring] = $colorvalue;
+        }
+        // Scale the values of $fisherinfos before creating chart series.
+        $scaledtiseries = $this->scalevalues(array_values($fisherinfos), array_values($abilityseries['counter']));
+
+        $aserieslabel = get_string('scalescorechartlabel', 'local_catquiz', $catscale->catscale->name);
+        $aseries = new chart_series($aserieslabel, array_values($abilityseries['counter']));
+        $aseries->set_colors(array_values($abilityseries['colors']));
+
+        $testinfolabel = get_string('testinfolabel', 'local_catquiz');
+        $tiseries = new chart_series($testinfolabel, $scaledtiseries);
+        $tiseries->set_type(\core\chart_series::TYPE_LINE);
+
+        $chart = new chart_bar();
+        $chart->add_series($tiseries);
+        $chart->add_series($aseries);
+        $chart->set_labels(array_keys($fisherinfos));
+
+        $out = $OUTPUT->render($chart);
+        return [
+            'chart' => $out,
+            'charttitle' => get_string('abilityprofile', 'local_catquiz', $primarycatscale->name),
+        ];
+    }
+
+    /**
+     * Round float to steps as defined.
+     *
+     * @param float $number
+     * @param float $step
+     * @param float $interval
+     *
+     * @return float
+     */
+    private function round_to_customsteps(float $number, float $step, float $interval):float {
+        $roundedvalue = round($number / $step) * $step;
+
+        // Exclude rounding to steps defined in $interval.
+        if ($roundedvalue - floor($roundedvalue) == $interval) {
+            $roundedvalue = floor($roundedvalue) + $step;
+        }
+
+        return $roundedvalue;
+    }
+
+    /**
+     * Scale values of testinfo (sum of fisherinfos) for better display in chart.
+     *
+     * @param array $fisherinfos
+     * @param array $attemptscounter
+     *
+     * @return array
+     */
+    private function scalevalues($fisherinfos, $attemptscounter) {
+        // Find the maximum values in arrays.
+        $maxattempts = max($attemptscounter);
+        $maxfisherinfo = max($fisherinfos);
+
+        // Avoid division by zero.
+        if ($maxfisherinfo == 0 || $maxattempts == 0) {
+            return $fisherinfos;
+        }
+
+        $scalingfactor = $maxattempts / $maxfisherinfo;
+
+        // Scale the values in $fisherinfos based on the scaling factor.
+        foreach ($fisherinfos as &$value) {
+            $value *= $scalingfactor;
+        }
+        return $fisherinfos;
     }
 
     /**
@@ -335,14 +482,27 @@ class personabilities extends feedbackgenerator {
                 null,
                 $end);
         // Compare records to define range for average.
+        // Minimum 3 records required to display progress charts.
+        if (count($records) < 3) {
+            return [
+                'individual' => '',
+                'comparison' => '',
+            ];
+        }
         $startingrecord = reset($records);
         $beginningoftimerange = intval($startingrecord->endtime);
-        $timerange = $this->get_timerange_for_average($beginningoftimerange, $endtime);
+        $timerange = $this->get_timerange_for_attempts($beginningoftimerange, $endtime);
 
         $attemptsofuser = array_filter($records, fn($r) => $r->userid == $userid);
         $attemptsofpeers = array_filter($records, fn($r) => $r->userid != $userid);
 
         $progressindividual = $this->render_chart_for_individual_user($attemptsofuser, $primarycatscale);
+        if (count($attemptsofpeers) < 3) {
+            return [
+                'individual' => $progressindividual,
+                'comparison' => '',
+            ];
+        }
         $progresscomparison = $this->render_chart_for_comparison(
                 $attemptsofuser,
                 $attemptsofpeers,
@@ -364,7 +524,7 @@ class personabilities extends feedbackgenerator {
      * @return int
      *
      */
-    private function get_timerange_for_average(int $beginningoftimerange, int $endtime) {
+    public static function get_timerange_for_attempts(int $beginningoftimerange, int $endtime) {
         $differenceindays = ($endtime - $beginningoftimerange) / (60 * 60 * 24);
         $range = LOCAL_CATQUIZ_TIMERANGE_DAY;
 
@@ -405,6 +565,9 @@ class personabilities extends feedbackgenerator {
                 $personabilities[] = $data->personabilities->$scaleid;
             }
         }
+        if (count($personabilities) < 2) {
+            return '';
+        }
 
         $chartserie = new \core\chart_series(
             get_string('personabilityinscale', 'local_catquiz', $scalename),
@@ -419,7 +582,7 @@ class personabilities extends feedbackgenerator {
 
         return [
             'chart' => $out,
-            'charttitle' => get_string('progress', 'core'),
+            'charttitle' => get_string('progress', 'local_catquiz'),
         ];
 
     }
@@ -449,10 +612,12 @@ class personabilities extends feedbackgenerator {
         $chart = new \core\chart_line();
         $chart->set_smooth(true); // Calling set_smooth() passing true as parameter, will display smooth lines.
 
-        $pa = $this->order_average_attemptresults_by_timerange($attemptsofpeers, $scaleid, $timerange);
-        $ua = $this->order_average_attemptresults_by_timerange($attemptsofuser, $scaleid, $timerange);
+        $orderedattemptspeers = self::order_attempts_by_timerange($attemptsofpeers, $scaleid, $timerange);
+        $pa = $this->assign_average_result_to_timerange($orderedattemptspeers);
+        $orderedattemptsuser = self::order_attempts_by_timerange($attemptsofuser, $scaleid, $timerange);
+        $ua = $this->assign_average_result_to_timerange($orderedattemptsuser);
 
-        $alldates = $this->get_timerangekeys($timerange, $beginningandendofrange);
+        $alldates = self::get_timerangekeys($timerange, $beginningandendofrange);
         $peerattemptsbydate = [];
         $userattemptsbydate = [];
         $firstvalue = true;
@@ -501,7 +666,7 @@ class personabilities extends feedbackgenerator {
 
         return [
             'chart' => $out,
-            'charttitle' => get_string('progress', 'core'),
+            'charttitle' => get_string('progress', 'local_catquiz'),
         ];
 
     }
@@ -581,7 +746,7 @@ class personabilities extends feedbackgenerator {
 
         return [
             'prevvalue' => $attemptswithnulls[$prevkey] ?? null,
-            'nextvalue' => $attemptswithnulls[$nextkey],
+            'nextvalue' => $attemptswithnulls[$nextkey] ?? null,
         ];
     }
 
@@ -595,7 +760,7 @@ class personabilities extends feedbackgenerator {
      * @return array
      *
      */
-    private function order_average_attemptresults_by_timerange(array $attempts, int $scaleid, int $timerange) {
+    public static function order_attempts_by_timerange(array $attempts, int $scaleid, int $timerange) {
 
         $attemptsbytimerange = [];
 
@@ -637,6 +802,16 @@ class personabilities extends feedbackgenerator {
                 $attemptsbytimerange[$datestring][] = $data->personabilities->$scaleid;
             }
         }
+        return $attemptsbytimerange;
+    }
+
+    /**
+     * Assign average of result for each period.
+     * @param array $attemptsbytimerange
+     *
+     * @return array
+     */
+    private function assign_average_result_to_timerange(array $attemptsbytimerange) {
         // Calculate average personability of this period.
         foreach ($attemptsbytimerange as $date => $attempt) {
             $floats = array_map('floatval', $attempt);
@@ -645,7 +820,6 @@ class personabilities extends feedbackgenerator {
         }
         return $attemptsbytimerange;
     }
-
     /**
      * Return keys for all moments in defined timerange.
      *
@@ -655,7 +829,7 @@ class personabilities extends feedbackgenerator {
      * @return array
      *
      */
-    private function get_timerangekeys($timerange, $beginningandendofrange) {
+    public static function get_timerangekeys($timerange, $beginningandendofrange) {
         switch ($timerange) {
             case LOCAL_CATQUIZ_TIMERANGE_DAY:
                 $dateformat = '%d.%m.%Y';
@@ -739,10 +913,10 @@ class personabilities extends feedbackgenerator {
                 ]);
             $series->set_labels([0 => $stringforchartlegend]);
 
-            $colorvalue = $this->get_color_for_personabily(
+            $colorvalue = self::get_color_for_personability(
                 $quizsettings,
                 floatval($subscaleability),
-                floatval($subscaleid)
+                intval($primarycatscaleid)
             );
             $series->set_colors([0 => $colorvalue]);
             $chart->add_series($series);
@@ -762,12 +936,12 @@ class personabilities extends feedbackgenerator {
      *
      * @param array $quizsettings
      * @param float $personability
-     * @param float $catscaleid
+     * @param int $catscaleid
      * @return string
      *
      */
-    private function get_color_for_personabily(array $quizsettings, float $personability, float $catscaleid): string {
-        $default = "#000000";
+    public static function get_color_for_personability(array $quizsettings, float $personability, int $catscaleid): string {
+        $default = "#878787";
         if (!$quizsettings ||
             $personability < LOCAL_CATQUIZ_PERSONABILITY_LOWER_LIMIT ||
             $personability > LOCAL_CATQUIZ_PERSONABILITY_UPPER_LIMIT) {

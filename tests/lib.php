@@ -28,7 +28,7 @@
  * @param int    $person   Optional. If given, the Nth person will be loaded.
  * @return array
  */
-function loadresponsesdata($filename, $person = 1) {
+function loadresponsesdata($filename, $person = 0) {
     if (($handle = fopen($filename, "r")) === false) {
         throw new UnexpectedValueException("Can not open file: " . $filename);
     }
@@ -47,7 +47,7 @@ function loadresponsesdata($filename, $person = 1) {
             );
             continue;
         }
-        if ($row < $person + 1) {
+        if ($row < $person) {
             continue;
         }
         // The responses for person 1.

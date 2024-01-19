@@ -27,7 +27,9 @@ namespace local_catquiz\teststrategy\feedbackgenerator;
 use cache;
 use html_table;
 use html_writer;
+use local_catquiz\catquiz;
 use local_catquiz\catscale;
+use local_catquiz\feedback\feedbackclass;
 use local_catquiz\teststrategy\feedbackgenerator;
 use local_catquiz\teststrategy\feedbacksettings;
 use local_catquiz\teststrategy\info;
@@ -86,10 +88,29 @@ class graphicalsummary extends feedbackgenerator {
         if (isset($feedbackdata['testresultstable'])) {
             $table = $this->render_table($feedbackdata['testresultstable']);
         }
+        if (isset($this->feedbacksettings->primaryscaleid)) {
+            $selectedscalearray = $this->feedbacksettings->get_scaleid_and_stringkey(
+                $feedbackdata['personabilities'],
+                (object)$feedbackdata['quizsettings'],
+                $this->feedbacksettings->primaryscaleid);
+            $catscaleid = $selectedscalearray['selectedscaleid'];
+        } else {
+            $catscaleid = $feedbackdata['catscaleid'];
+        }
+        $catscale = catscale::return_catscale_object($catscaleid);
+
+        $participationcharts = $this->render_participationcharts(
+            $feedbackdata,
+            $catscaleid,
+            $feedbackdata['catscaleid'],
+            $catscale->name);
 
         $data['chart'] = $chart ?? "";
         $data['strategyname'] = $feedbackdata['teststrategyname'] ?? "";
         $data['table'] = $table ?? "";
+
+        $data['attemptscounterchart'] = $participationcharts['attemptscounterchart']['chart'];
+        $data['attemptresultstackchart'] = $participationcharts['attemptresultstackchart']['chart'];
 
         $feedback = $OUTPUT->render_from_template(
             'local_catquiz/feedback/graphicalsummary',
@@ -203,6 +224,7 @@ class graphicalsummary extends feedbackgenerator {
             'local_catquiz',
             info::get_teststrategy($initialcontext['teststrategy'])
         ->get_description());
+
         return [
             'testprogresschart' => $graphicalsummary,
             'testresultstable' => $graphicalsummary,
@@ -374,5 +396,158 @@ class graphicalsummary extends feedbackgenerator {
         [$before] = array_slice($questionpool, $beforeindex, 1);
 
         return [$before, $after];
+    }
+
+
+    /**
+     * Render the charts with data about participation by day.
+     *
+     * @param array $data
+     * @param int $primarycatscaleid
+     * @param int $parentscaleid
+     * @param string $catscalename
+     * @param int $contextid
+     *
+     * @return array
+     */
+    private function render_participationcharts(
+        array $data,
+        int $primarycatscaleid,
+        int $parentscaleid,
+        string $catscalename,
+        int $contextid = 0) {
+
+        // In case you want to make context a changeable param of feedbacksettings, apply logic here.
+        if (empty($contextid)) {
+            $contextid = $data['contextid'];
+        }
+
+        $records = catquiz::get_attempts(
+            null,
+            $parentscaleid,
+            $data['courseid'],
+            $contextid,
+            null,
+            null);
+        if (count($records) < 2) {
+            return "";
+        }
+        // Get all items of this catscale and catcontext.
+        $startingrecord = reset($records);
+        $beginningoftimerange = intval($startingrecord->endtime);
+        $timerange = personabilities::get_timerange_for_attempts($beginningoftimerange, $data['endtime']);
+        $attemptsbytimerange = personabilities::order_attempts_by_timerange($records, $primarycatscaleid, $timerange);
+        $attemptscounterchart = $this->render_attemptscounterchart($attemptsbytimerange);
+        $attemptresultstackchart = $this->render_attemptresultstackchart($attemptsbytimerange, $primarycatscaleid, $data);
+
+        return [
+            'attemptscounterchart' => $attemptscounterchart,
+            'attemptresultstackchart' => $attemptresultstackchart,
+            'attemptchartstitle' => get_string('attemptchartstitle', 'local_catquiz', $catscalename),
+        ];
+
+    }
+
+    /**
+     * Chart grouping by date and counting attempts.
+     *
+     * @param array $attemptsbytimerange
+     *
+     * @return string
+     */
+    private function render_attemptscounterchart(array $attemptsbytimerange) {
+        global $OUTPUT;
+        $counter = [];
+        $labels = [];
+        foreach ($attemptsbytimerange as $timestamp => $attempts) {
+            $counter[] = count($attempts);
+            $labels[] = (string)$timestamp;
+        }
+        $chart = new \core\chart_line();
+        $chart->set_smooth(true);
+
+        $series = new \core\chart_series(
+            get_string('numberofattempts', 'local_catquiz'),
+            $counter
+        );
+        $chart->add_series($series);
+        $chart->set_labels($labels);
+        $out = $OUTPUT->render($chart);
+
+        return [
+            'chart' => $out,
+            'charttitle' => get_string('numberofattempts', 'local_catquiz'),
+        ];
+    }
+
+    /**
+     * Chart grouping by date showing attempt results.
+     *
+     * @param array $attemptsbytimerange
+     * @param int $catscaleid
+     * @param array $attemptdata
+     *
+     * @return string
+     */
+    private function render_attemptresultstackchart(array $attemptsbytimerange, int $catscaleid, array $attemptdata) {
+        global $OUTPUT;
+        $series = [];
+        $labels = [];
+        $quizsettings = $attemptdata['quizsettings'];
+
+        foreach ($attemptsbytimerange as $timestamp => $attempts) {
+            $labels[] = (string)$timestamp;
+            foreach ($attempts as $attempt) {
+                $color = personabilities::get_color_for_personability((array)$quizsettings, $attempt, $catscaleid);
+
+                if (!isset($series[$timestamp][$color])) {
+                        $series[$timestamp][$color] = 1;
+                } else {
+                        $series[$timestamp][$color] += 1;
+                }
+            }
+        }
+
+        $chart = new \core\chart_bar();
+        $chart->set_stacked(true);
+
+        $colorsarray = $this->feedbacksettings->get_defined_feedbackcolors_for_scale((array)$quizsettings, $catscaleid);
+
+        foreach ($colorsarray as $colorcode => $rangesarray) {
+            $serie = [];
+            foreach ($series as $timestamp => $cc) {
+                $valuefound = false;
+                foreach ($cc as $cc => $elementscounter) {
+                    if ($colorcode != $cc) {
+                        continue;
+                    }
+                    $valuefound = true;
+                    $serie[] = $elementscounter;
+                }
+                if (!$valuefound) {
+                    $serie[] = 0;
+                }
+            }
+            $rangestart = $rangesarray['rangestart'];
+            $rangeend = $rangesarray['rangeend'];
+            $labelstring = get_string(
+                'personabilityrangestring',
+                'local_catquiz',
+                ['rangestart' => $rangestart, 'rangeend' => $rangeend]);
+            $s = new \core\chart_series(
+                $labelstring,
+                $serie
+            );
+            $s->set_colors([0 => $colorcode]);
+            $chart->add_series($s);
+        }
+
+        $chart->set_labels($labels);
+        $out = $OUTPUT->render($chart);
+
+        return [
+            'chart' => $out,
+            'charttitle' => get_string('numberofattempts', 'local_catquiz'),
+        ];
     }
 }

@@ -15,7 +15,7 @@ The plugin can be used with all question types in Moodle that allow automatic sc
 * Generalized Partial Credit Model
 
 In addition, the plug-in enables the creation, administration and modification of different scales on which measurements are taken. For this purpose, the plug-in creates a new role "Test Administrator", which is authorized to perform these administrative tasks for defined course areas.
- 
+
 The plugin is a central part of the CATQuiz plugin family. It is recommended to install the following plugins as well:
 * mod_adaptive - the activity from which a CAT test can be started
 * mod_catquizfeedbackgrouping - a text block that gives detailed feedback on a CAT test and optionally assigns users to groups according to this feedback
@@ -39,6 +39,7 @@ The following parameters can be defined:
     'personabilitychart',
     'progressindividual',
     'progresscomparison',
+    'abilityprofile',
 ];
 'comparetotestaverage' => [
     'comparisontext', // You performed better than ...

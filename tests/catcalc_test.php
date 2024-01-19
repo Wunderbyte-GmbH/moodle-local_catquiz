@@ -26,8 +26,13 @@
 namespace local_catquiz;
 
 use basic_testcase;
+use coding_exception;
+use Exception;
 use local_catquiz\local\model\model_item_param;
 use local_catquiz\local\model\model_item_param_list;
+use moodle_exception;
+use SebastianBergmann\RecursionContext\InvalidArgumentException;
+use PHPUnit\Framework\ExpectationFailedException;
 use UnexpectedValueException;
 
 defined('MOODLE_INTERNAL') || die();
@@ -46,150 +51,95 @@ require_once($CFG->dirroot . '/local/catquiz/tests/lib.php');
  *
  */
 class catcalc_test extends basic_testcase {
-
     /**
-     * Tests if the ability is calculated correctly
+     * Compares our results with the ones from the SimulatinoSteps radikaler CAT CSV
      *
-     * @param array                 $responses        The response pattern
-     * @param model_item_param_list $items            A list of item params
-     * @param float                 $expectedability  The expected ability.
+     * @param mixed $responses
+     * @param model_item_param_list $items
+     * @param float $expectedability
+     * @param float $startvalue
+     * @param float $mean
+     * @param float $sd
+     * @param string $personid
+     * @return void
+     * @throws coding_exception
+     * @throws Exception
+     * @throws moodle_exception
+     * @throws MatrixException
+     * @throws InvalidArgumentException
+     * @throws ExpectationFailedException
      *
-     * @dataProvider estimate_person_ability_provider
+     * @dataProvider simulation_steps_calculated_ability_provider
      */
-    public function test_estimate_person_ability($responses, model_item_param_list $items, float $expectedability) {
-        $ability = catcalc::estimate_person_ability($responses, $items);
-        // Remove the next line when ability calculation works.
-        $this->markTestIncomplete('The ability estimation does not yet calculate the expected values.');
-        $this->assertEquals($expectedability, sprintf('%.2f', $ability));
+    public function test_simulation_steps_calculated_ability(
+        $responses,
+        model_item_param_list $items,
+        float $expectedability,
+        float $startvalue,
+        float $mean,
+        float $sd,
+        string $personid
+    ) {
+        $ability = catcalc::estimate_person_ability($responses, $items, $startvalue, $mean, $sd);
+        if (abs($ability) > 10.0) {
+            $this->markTestSkipped('The ability is outside the trusted region.');
+            return;
+        }
+
+        // If the CATQUIZ_CREATE_TESTOUTPUT environment variable is set, write a
+        // CSV file with information about the test results.
+        if (getenv('CATQUIZ_CREATE_TESTOUTPUT')) {
+            $standarderror = catscale::get_standarderror($ability, $items);
+            $csv = implode(';', [
+                $personid,
+                count($items),
+                array_key_last($responses),
+                $items[array_key_last($responses)]->get_difficulty(),
+                $items[array_key_last($responses)]->get_params_array()['discrimination'],
+                $responses[array_key_last($responses)]['fraction'],
+                sprintf('%.2f (SE %.2f bei %d Fragen)', $ability, $standarderror, count($items)),
+                ($ability - $expectedability) <= 0.01
+                    ? 'match'
+                    : sprintf('mismatch: calculated %.2f but expected %.2f', $ability, $expectedability),
+            ]);
+
+            $file = '/tmp/testoutput.csv';
+            file_put_contents($file, $csv . PHP_EOL, FILE_APPEND | LOCK_EX);
+        }
+
+        $this->assertEqualsWithDelta($expectedability, $ability, 0.01);
     }
 
     /**
-     * Dataprovider for the associated test function.
+     * Data provider for test_simulation_steps_calculated_ability_is_correct()
      *
-     * Loads person responses and expected abilities from CSV files to create
-     * data expected by the test function.
+     * @return array
+     * @throws UnexpectedValueException
      */
-    public static function estimate_person_ability_provider(): array {
+    public static function simulation_steps_calculated_ability_provider(): array {
         global $CFG;
-        $person = 3;
-        $responses = loadresponsesdata($CFG->dirroot . '/local/catquiz/tests/fixtures/responses.2PL.csv', $person);
-        $abilities = self::loadabilities($CFG->dirroot . '/local/catquiz/tests/fixtures/persons.csv', $person);
-        foreach ($responses as $label => $correct) {
-            $responses[$label] = ['fraction' => floatval($correct)];
-        }
-        $items = self::parseitemparams($CFG->dirroot . '/local/catquiz/tests/fixtures/simulation.csv');
-        return [
-            'all' => [
-                $responses,
-                $items,
-                $abilities['Gesamt'],
-            ],
-            'A01' => [
-                self::filterforlabel('A01', $responses),
-                $items,
-                $abilities['A01'],
-            ],
-            'A02' => [
-                self::filterforlabel('A02', $responses),
-                $items,
-                $abilities['A02'],
-            ],
-            'A03' => [
-                self::filterforlabel('A03', $responses),
-                $items,
-                $abilities['A03'],
-            ],
-            'A04' => [
-                self::filterforlabel('A04', $responses),
-                $items,
-                $abilities['A04'],
-            ],
-            'A05' => [
-                self::filterforlabel('A05', $responses),
-                $items,
-                $abilities['A05'],
-            ],
-            'A06' => [
-                self::filterforlabel('A06', $responses),
-                $items,
-                $abilities['A06'],
-            ],
-            'A07' => [
-                self::filterforlabel('A07', $responses),
-                $items,
-                $abilities['A07'],
-            ],
-            'B01' => [
-                self::filterforlabel('B01', $responses),
-                $items,
-                $abilities['B01'],
-            ],
-            'B02' => [
-                self::filterforlabel('B02', $responses),
-                $items,
-                $abilities['B02'],
-            ],
-            'B03' => [
-                self::filterforlabel('B03', $responses),
-                $items,
-                $abilities['B03'],
-            ],
-            'B04' => [
-                self::filterforlabel('B04', $responses),
-                $items,
-                $abilities['B04'],
-            ],
-            'C01' => [
-                self::filterforlabel('C01', $responses),
-                $items,
-                $abilities['C01'],
-            ],
-            'C02' => [
-                self::filterforlabel('C02', $responses),
-                $items,
-                $abilities['C02'],
-            ],
-            'C03' => [
-                self::filterforlabel('C03', $responses),
-                $items,
-                $abilities['C03'],
-            ],
-            'C04' => [
-                self::filterforlabel('C04', $responses),
-                $items,
-                $abilities['C04'],
-            ],
-            'C05' => [
-                self::filterforlabel('C05', $responses),
-                $items,
-                $abilities['C05'],
-            ],
-            'C06' => [
-                self::filterforlabel('C06', $responses),
-                $items,
-                $abilities['C06'],
-            ],
-            'C07' => [
-                self::filterforlabel('C07', $responses),
-                $items,
-                $abilities['C07'],
-            ],
-            'C08' => [
-                self::filterforlabel('C08', $responses),
-                $items,
-                $abilities['C08'],
-            ],
-            'C09' => [
-                self::filterforlabel('C09', $responses),
-                $items,
-                $abilities['C09'],
-            ],
-            'C10' => [
-                self::filterforlabel('C10', $responses),
-                $items,
-                $abilities['C10'],
-            ],
-        ];
+        $radcatstd = self::parsesimulationsteps(
+            $CFG->dirroot . '/local/catquiz/tests/fixtures/SimulationSteps radCAT 2023-12-21 09-02-35_shortened.csv'
+        );
+        $radcatemp = self::parsesimulationsteps(
+            $CFG->dirroot . '/local/catquiz/tests/fixtures/SimulationSteps radCAT 2023-12-21 09-22-26_shortened.csv',
+            'raschbirnbaumb',
+            0.02,
+            2.97
+        );
+        $classiccat = self::parsesimulationsteps(
+            $CFG->dirroot . '/local/catquiz/tests/fixtures/SimulationSteps classTest emp. 2024-01-02 11-02-44_P000000.csv',
+            'raschbirnbaumb',
+            0.02,
+            2.97,
+            true
+        );
+        $data = array_merge(
+            $classiccat,
+            $radcatstd,
+            $radcatemp
+        );
+        return $data;
     }
 
     /**
@@ -200,6 +150,125 @@ class catcalc_test extends basic_testcase {
      */
     private static function filterforlabel(string $label, array $responses): array {
         return array_filter($responses, fn($l) => preg_match(sprintf('/^SIM%s\-/', $label), $l), ARRAY_FILTER_USE_KEY);
+    }
+
+    /**
+     * Parses the results for the step-wise calculation of person abilities from a CSV file
+     *
+     * @param string $filename
+     * @param string $modelname
+     * @param float $mean
+     * @param float $sd
+     * @param bool $fixedstartvalues
+     * @return array
+     * @throws UnexpectedValueException
+     */
+    private static function parsesimulationsteps(
+        string $filename,
+        $modelname = 'raschbirnbaumb',
+        float $mean = 0.0,
+        float $sd = 1.0,
+        bool $fixedstartvalues = false
+    ) {
+        $maxexpected = 0;
+        $minexpected = 0;
+        if (($handle = fopen($filename, "r")) === false) {
+            throw new UnexpectedValueException("Can not open file: " . $filename);
+        }
+
+        $row = 0;
+        $inpersonrange = false;
+        $steps = [];
+        $person = '';
+        while (($data = fgetcsv($handle, 0, ";")) !== false) {
+            $row++;
+            if ($row <= 5) {
+                // The first two row contains no relevant data.
+                continue;
+            }
+
+            if ($data[0] !== '' && empty($data[1])) {
+                $inpersonrange = true;
+                $person = $data[0];
+                continue;
+            }
+
+            if ($data[0] === "Time:") {
+                continue;
+            }
+
+            if ($inpersonrange) {
+                if ($data[0] === '' && $data[1] === ''
+                || $data[0] === $person && $data[1] !== '' && $data[2] === ''
+                || $data[0] === $person && ! is_numeric($data[1])
+                ) {
+                    $inpersonrange = false;
+                    $person = '';
+                    continue;
+                }
+
+                $step = $data[1];
+                $itemid = $data[2];
+                $difficulty = floatval($data[3]);
+                $discrimination = floatval($data[4]);
+                $fraction = floatval($data[5]);
+                $item = new model_item_param($itemid, $modelname);
+                $item->set_parameters([
+                    'difficulty' => $difficulty,
+                    'discrimination' => $discrimination,
+                ]);
+
+                if ($step > 1) {
+                    $items = clone($steps[$person][$step - 1]['items']);
+                    $items->add($item);
+                    $responses = $steps[$person][$step - 1]['responses'];
+                    $responses[$itemid] = ['fraction' => floatval($fraction)];
+                    $startvalue = $steps[$person][$step - 1]['expected_ability'];
+                } else {
+                    $items = (new model_item_param_list())->add($item);
+                    $responses = [$itemid => ['fraction' => floatval($fraction)]];
+                    $startvalue = $mean;
+                }
+                $steps[$person][$step]['items'] = $items;
+                $steps[$person][$step]['responses'] = $responses;
+                preg_match('/(.*)\s\(SE\s(.*)\sbei/', $data[6], $matches);
+                $steps[$person][$step]['expected_ability'] = floatval($matches[1]);
+                $steps[$person][$step]['standard_error'] = floatval($matches[2]);
+                $steps[$person][$step]['startvalue'] = $startvalue;
+            }
+        }
+        fclose($handle);
+
+        $result = [];
+        foreach ($steps as $personid => $persondata) {
+            foreach ($persondata as $stepnum => $stepdata) {
+                if ($stepdata['expected_ability'] > $maxexpected) {
+                    $maxexpected = $stepdata['expected_ability'];
+                }
+                if ($stepdata['expected_ability'] < $minexpected) {
+                    $minexpected = $stepdata['expected_ability'];
+                }
+
+                if ($fixedstartvalues) {
+                    $se = $sd;
+                    $personmean = $mean;
+                } else {
+                    // The standard error is 0 for the first question or the SE calculated after the last response.
+                    $se = $stepnum === 1 ? $sd : $persondata[$stepnum - 1]['standard_error'];
+                    $personmean = $stepnum === 1 ? $mean : $persondata[$stepnum - 1]['expected_ability'];
+                }
+                $result[sprintf('%s: %s Step %d', basename($filename), $personid, $stepnum)] = [
+                    'responses' => $stepdata['responses'],
+                    'items' => $stepdata['items'],
+                    'expected_ability' => $stepdata['expected_ability'],
+                    'startvalue' => $stepdata['startvalue'],
+                    'mean' => $personmean,
+                    'sd' => $se,
+                    'person' => $personid,
+                ];
+            }
+        }
+        return $result;
     }
 
     /**
@@ -224,9 +293,9 @@ class catcalc_test extends basic_testcase {
             }
             $item = new model_item_param($data[7], $data[3], [], 4);
             $item->set_parameters([
-                'difficulty' => $data[4],
-                'discrimination' => $data[5],
-                'guessing' => $data[6],
+                'difficulty' => floatval($data[4]),
+                'discrimination' => floatval($data[5]),
+                'guessing' => floatval($data[6]),
             ]);
             $itemparams->add($item);
         }
@@ -241,7 +310,7 @@ class catcalc_test extends basic_testcase {
      * @param string $filename The path to the CSV file.
      * @param int    $personnum If given, load abilities of the Nth person.
      */
-    public static function loadabilities($filename, $personnum = 1): array {
+    public static function loadabilities($filename, $personnum = 0): array {
         if (($handle = fopen($filename, "r")) === false) {
             throw new UnexpectedValueException("Can not open file: " . $filename);
         }
@@ -259,7 +328,7 @@ class catcalc_test extends basic_testcase {
                 );
                 continue;
             }
-            if ($row < $personnum + 1) {
+            if ($row < $personnum) {
                 continue;
             }
             $abilities = array_map(

@@ -80,7 +80,7 @@ class addscalestandarderror extends preselect_task implements wb_middleware {
         // maximum amount of remining questions.
         uasort($questions, fn ($q1, $q2) => $q2->fisherinformation <=> $q1->fisherinformation);
         $remainingperscale = [];
-        $playedquestionsperscale = $this->getplayedquestionsperscale();
+        $context['playedquestionsperscale'] = $this->getplayedquestionsperscale();
         $remainingperscale = $this->getnumberofremainingquestionsperscale();
         foreach ($questions as $q) {
             if (!array_key_exists($q->catscaleid, $scales)) {
@@ -109,7 +109,6 @@ class addscalestandarderror extends preselect_task implements wb_middleware {
             }
         }
 
-        $threshold = $context['standarderrorpersubscale'];
         $standarderrorperscale = [];
         foreach ($fisherinfoperscale as $catscaleid => $fisherinfo) {
             $fisherinfoplayed = $fisherinfoperscale[$catscaleid]['played'] ?? 0;
@@ -117,32 +116,8 @@ class addscalestandarderror extends preselect_task implements wb_middleware {
                 = ($fisherinfoperscale[$catscaleid]['played'] ?? 0) + ($fisherinfoperscale[$catscaleid]['remaining'] ?? 0);
             $standarderror['played'] = $fisherinfoplayed === 0 ? INF : (1 / sqrt($fisherinfoplayed));
             $standarderror['remaining'] = $fisherinfoall === 0 ? INF : (1 / sqrt($fisherinfoall));
-            $standarderrorperscale[$catscaleid] = $standarderror;
-
-            // If we already have enough information about that scale or if
-            // we can never get below the standarderror threshold for that
-            // scale, exclude it.
-            $attemptsinscale = empty($playedquestionsperscale[$catscaleid])
-                ? 0
-                : count($playedquestionsperscale[$catscaleid]);
-            if (
-                $attemptsinscale >= $context['min_attempts_per_scale']
-                && (
-                    $standarderror['played'] < $threshold
-                    || $standarderror['remaining'] > $threshold
-                )
-            ) {
-                // Questions of this scale will not be selected in this attempt.
-                $context['questions'] = array_filter($context['questions'], fn ($q) => $q->catscaleid != $catscaleid);
-            }
+            $context['standarderrorperscale'][$catscaleid] = $standarderror;
         }
-
-        // Handle case where no questions are left.
-        if ($context['questions'] === []) {
-            return result::err(status::ERROR_NO_REMAINING_QUESTIONS);
-        }
-
-        $context['standarderrorperscale'] = $standarderrorperscale;
 
         return $next($context);
     }
@@ -158,7 +133,6 @@ class addscalestandarderror extends preselect_task implements wb_middleware {
             'questions',
             'original_questions',
             'has_fisherinformation',
-            'standarderrorpersubscale',
         ];
     }
 
@@ -207,14 +181,17 @@ class addscalestandarderror extends preselect_task implements wb_middleware {
      * @return array
      */
     protected function getnumberofremainingquestionsperscale(): array {
+        $maxattemptsperscale = $this->context['max_attempts_per_scale'] === -1
+            ? INF
+            : $this->context['max_attempts_per_scale'];
         $pq = $this->getplayedquestionsperscale();
         $catscales = $this->get_with_child_scales($this->context['catscaleid']);
         foreach ($catscales as $scaleid) {
             if (!array_key_exists($scaleid, $pq)) {
-                $remainingperscale[$scaleid] = $this->context['max_attempts_per_scale'];
+                $remainingperscale[$scaleid] = $maxattemptsperscale;
                 continue;
             }
-            $remainingperscale[$scaleid] = $this->context['max_attempts_per_scale'] - count($pq[$scaleid]);
+            $remainingperscale[$scaleid] = $maxattemptsperscale - count($pq[$scaleid]);
         }
         return $remainingperscale;
     }

@@ -1462,6 +1462,7 @@ class catquiz {
         if ($existingrecord) {
             return 0;
         }
+        $catcontext = catscale::get_context_id($attemptdata['catscaleid']);
 
         // To query the db only once we fetch courseid und instanceid here.
         $courseandinstance = self::return_course_and_instance_id($attemptdata);
@@ -1469,7 +1470,7 @@ class catquiz {
         $data = new stdClass;
         $data->userid = $attemptdata['userid'];
         $data->scaleid = $attemptdata['catscaleid'];
-        $data->contextid = $attemptdata['contextid'];
+        $data->contextid = $catcontext;
         $data->courseid = $courseandinstance['courseid'];
         $data->attemptid = $attemptdata['attemptid'];
         $data->component = $attemptdata['quizsettings']->modulename;
@@ -1488,6 +1489,8 @@ class catquiz {
         $data->timecreated = $now;
 
         $attemptdata['courseid'] = $courseandinstance['courseid'];
+
+        self::replace_inf_with_minusone($attemptdata);
         $data->json = json_encode($attemptdata);
 
         $id = $DB->insert_record('local_catquiz_attempts', (object)$data);
@@ -1514,6 +1517,25 @@ class catquiz {
         return $id;
     }
 
+    /**
+     * Replace INF values in array with -1.
+     * @param mixed $array
+     *
+     * @return void
+     */
+    public static function replace_inf_with_minusone(&$array) {
+        foreach ($array as &$element) {
+            if (empty($element)) {
+                continue;
+            } else if (is_array($element)) {
+                self::replace_inf_with_minusone($element); // Recursively call the function for nested arrays.
+            } else {
+                if ($element === INF) {
+                    $element = -1;
+                }
+            }
+        }
+    }
     /** Fetch courseid and and instanceid from DB for attempt.
      * @param array $attemptdata
      * @return array

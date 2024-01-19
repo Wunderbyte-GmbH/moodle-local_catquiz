@@ -61,6 +61,7 @@ class feedbackclass {
 
         // Get all Values from the form.
         $data = $mform->getSubmitValues();
+        $defaultvalues = $mform->_defaultValues;
 
         // phpcs:ignore
         // TODO: Display Name of Teststrategy. $teststrategyid = intval($data['catquiz_selectteststrategy']);
@@ -150,19 +151,19 @@ class feedbackclass {
                 // Check for each feedback editor field, if there is content.
                 // This is the preparation for the header element (to be appended in the end) where we apply the distinction.
 
-                // TODO: Maybe find a better check if form is newly loaded or saved.
-                if (count($data) > 1) {
-                    $feedback = optional_param_array('feedbackeditor_scaleid_'  . $scale->id . '_' . $j, [], PARAM_RAW);
-                    if ($feedback != []) {
-                        $feedbacktext = $feedback['text'];
-                    }
-                } else {
-                    $feedback = optional_param('feedbackeditor_scaleid_'  . $scale->id . '_' . $j, "", PARAM_TEXT);
-                    if (!empty($feedback)) {
-                        $jsonobject = json_decode($feedback);
-                        $feedbacktext = strip_tags($jsonobject->text);
-                    }
+                // If reload was triggered (ie via nosubmitbutton), data is set in submitvalues.
+                if (isset($data['feedbackeditor_scaleid_'  . $scale->id . '_' . $j])) {
+                    $feedback = $data['feedbackeditor_scaleid_'  . $scale->id . '_' . $j];
+                } else if (isset($defaultvalues['feedbackeditor_scaleid_'  . $scale->id . '_' . $j])) {
+                    // If values of form where saved before, and form is loaded, data is in defaultvalues.
+                    $feedback = $defaultvalues['feedbackeditor_scaleid_'  . $scale->id . '_' . $j];
                 }
+                // Check type and value.
+                if (!empty($feedback)) {
+                    $feedbacktext = $feedback['text'];
+                    $feedbacktext = strip_tags($feedbacktext ?? '');
+                }
+
                 if (isset($feedbacktext) && strlen($feedbacktext) > 0) {
                     $numberoffeedbacksfilledout ++;
                 }
@@ -233,7 +234,14 @@ class feedbackclass {
                 );
                 // Preset selected color regarding order of feedbacks.
                 $sequencecolors = array_keys($coloroptions);
-                $mform->setDefault('wb_colourpicker_' .$scale->id . '_' . $j, $sequencecolors[$j - 1]);
+
+                $savedcolorvalue = $mform->_defaultValues['wb_colourpicker_' .$scale->id . '_' . $j]
+                    ?? $data['wb_colourpicker_' .$scale->id . '_' . $j]
+                    ?? 0;
+
+                if (empty($savedcolorvalue)) {
+                    $mform->setDefault('wb_colourpicker_' .$scale->id . '_' . $j, $sequencecolors[$j - 1]);
+                }
 
                 $subelements[] = $mform->addElement('hidden', 'selectedcolour', '', PARAM_TEXT);
                 $PAGE->requires->js_call_amd('local_catquiz/colourpicker', 'init');
@@ -316,7 +324,7 @@ class feedbackclass {
                 ]
             );
 
-            // Make the differnt feedback options nested.
+            // Make the different feedback options nested.
             $numberofclosinghtmls = 0;
             if (!isset($previousdepth) || !isset($previousparentscaleid)) {
                 $numberofclosinghtmls = 0;
@@ -327,8 +335,9 @@ class feedbackclass {
             } else if ($scale->parentid != $previousparentscaleid
             && $scale->depth < $previousdepth) {
                 $depthdifference = $previousdepth - $scale->depth;
-                $numberofclosinghtmls = $depthdifference * 2;
+                $numberofclosinghtmls = $depthdifference + 1;
             }
+
             $previousparentscaleid = $scale->parentid;
             $previousdepth = $scale->depth;
 
@@ -343,10 +352,10 @@ class feedbackclass {
                 'accordionid' => $accordionid,
             ];
 
-            $html1 = $OUTPUT->render_from_template('local_catquiz/feedback/feedbackform_collapsible_open', $headerdata);
-
             // Closing the elements.
             self::add_closing_html($numberofclosinghtmls, $scale->id, $mform, $elements, $html2);
+
+            $html1 = $OUTPUT->render_from_template('local_catquiz/feedback/feedbackform_collapsible_open', $headerdata);
 
             $element = $mform->createElement('html', $html1);
             $element->setName('header_accordion_start_scale_' . $scale->id);
@@ -388,10 +397,10 @@ class feedbackclass {
      *
      */
     public static function add_coloroption(string $color, array &$coloroptions) {
-        $colorname = get_string('colorpicker_color_'. $color, 'local_catquiz');
+        $colorname = get_string('color_' . $color . '_name', 'local_catquiz');
 
         $coloroptions[$color] = get_string(
-            'colorvalue_'. $color,
+            'color_' . $color . '_code',
             'local_catquiz'
         );
     }
@@ -407,67 +416,68 @@ class feedbackclass {
 
         $coloroptions = [];
         // Depending of the number of options, different colors will be chosen.
+        // See strings for colornames.
         switch ($numberoffeedbackspersubscale) {
             case 1:
-                self::add_coloroption("red", $coloroptions);
+                self::add_coloroption("3", $coloroptions);
                 break;
             case 2:
-                self::add_coloroption("red", $coloroptions);
-                self::add_coloroption("lightgreen", $coloroptions);
+                self::add_coloroption("3", $coloroptions);
+                self::add_coloroption("6", $coloroptions);
                 break;
             case 3:
-                self::add_coloroption("red", $coloroptions);
-                self::add_coloroption("yellow", $coloroptions);
-                self::add_coloroption("lightgreen", $coloroptions);
+                self::add_coloroption("3", $coloroptions);
+                self::add_coloroption("5", $coloroptions);
+                self::add_coloroption("6", $coloroptions);
                 break;
             case 4:
-                self::add_coloroption('red', $coloroptions);
-                self::add_coloroption('orange', $coloroptions);
-                self::add_coloroption('yellow', $coloroptions);
-                self::add_coloroption('lightgreen', $coloroptions);
+                self::add_coloroption('3', $coloroptions);
+                self::add_coloroption('4', $coloroptions);
+                self::add_coloroption('5', $coloroptions);
+                self::add_coloroption('6', $coloroptions);
                 break;
             case 5:
-                self::add_coloroption('red', $coloroptions);
-                self::add_coloroption('orange', $coloroptions);
-                self::add_coloroption('yellow', $coloroptions);
-                self::add_coloroption('lightgreen', $coloroptions);
-                self::add_coloroption('darkgreen', $coloroptions);
+                self::add_coloroption('3', $coloroptions);
+                self::add_coloroption('4', $coloroptions);
+                self::add_coloroption('5', $coloroptions);
+                self::add_coloroption('6', $coloroptions);
+                self::add_coloroption('7', $coloroptions);
                 break;
             case 6:
-                self::add_coloroption('darkred', $coloroptions);
-                self::add_coloroption('red', $coloroptions);
-                self::add_coloroption('orange', $coloroptions);
-                self::add_coloroption('yellow', $coloroptions);
-                self::add_coloroption('lightgreen', $coloroptions);
-                self::add_coloroption('darkgreen', $coloroptions);
+                self::add_coloroption('2', $coloroptions);
+                self::add_coloroption('3', $coloroptions);
+                self::add_coloroption('4', $coloroptions);
+                self::add_coloroption('5', $coloroptions);
+                self::add_coloroption('6', $coloroptions);
+                self::add_coloroption('7', $coloroptions);
                 break;
             case 7:
-                self::add_coloroption('black', $coloroptions);
-                self::add_coloroption('darkred', $coloroptions);
-                self::add_coloroption('red', $coloroptions);
-                self::add_coloroption('orange', $coloroptions);
-                self::add_coloroption('yellow', $coloroptions);
-                self::add_coloroption('lightgreen', $coloroptions);
-                self::add_coloroption('darkgreen', $coloroptions);
+                self::add_coloroption('1', $coloroptions);
+                self::add_coloroption('2', $coloroptions);
+                self::add_coloroption('3', $coloroptions);
+                self::add_coloroption('4', $coloroptions);
+                self::add_coloroption('5', $coloroptions);
+                self::add_coloroption('6', $coloroptions);
+                self::add_coloroption('7', $coloroptions);
                 break;
             case 7:
-                self::add_coloroption('black', $coloroptions);
-                self::add_coloroption('darkred', $coloroptions);
-                self::add_coloroption('red', $coloroptions);
-                self::add_coloroption('orange', $coloroptions);
-                self::add_coloroption('yellow', $coloroptions);
-                self::add_coloroption('lightgreen', $coloroptions);
-                self::add_coloroption('darkgreen', $coloroptions);
+                self::add_coloroption('1', $coloroptions);
+                self::add_coloroption('2', $coloroptions);
+                self::add_coloroption('3', $coloroptions);
+                self::add_coloroption('4', $coloroptions);
+                self::add_coloroption('5', $coloroptions);
+                self::add_coloroption('6', $coloroptions);
+                self::add_coloroption('7', $coloroptions);
                 break;
             case 8:
-                self::add_coloroption('black', $coloroptions);
-                self::add_coloroption('darkred', $coloroptions);
-                self::add_coloroption('red', $coloroptions);
-                self::add_coloroption('orange', $coloroptions);
-                self::add_coloroption('yellow', $coloroptions);
-                self::add_coloroption('lightgreen', $coloroptions);
-                self::add_coloroption('darkgreen', $coloroptions);
-                self::add_coloroption('white', $coloroptions);
+                self::add_coloroption('1', $coloroptions); // 1
+                self::add_coloroption('2', $coloroptions); // 2
+                self::add_coloroption('3', $coloroptions); // 3
+                self::add_coloroption('4', $coloroptions); // 4
+                self::add_coloroption('5', $coloroptions); // 5
+                self::add_coloroption('6', $coloroptions); // 6
+                self::add_coloroption('7', $coloroptions); // 7
+                self::add_coloroption('8', $coloroptions); // 8
                 break;
         }
 
@@ -591,14 +601,14 @@ class feedbackclass {
      * @param mixed $optioncounter
      * @param bool $lower
      *
-     * @return int
+     * @return float
      *
      */
     public static function return_limits_for_scale($nroptions, $optioncounter, bool $lower) {
 
         // Calculate equal default values for limits in scales.
         $sizeofrange = abs(LOCAL_CATQUIZ_PERSONABILITY_LOWER_LIMIT - LOCAL_CATQUIZ_PERSONABILITY_UPPER_LIMIT);
-        $increment = $sizeofrange / $nroptions;
+        $increment = round($sizeofrange / $nroptions, 2);
 
         if ($lower) {
             return LOCAL_CATQUIZ_PERSONABILITY_LOWER_LIMIT + ($optioncounter - 1) * $increment;

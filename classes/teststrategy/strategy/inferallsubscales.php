@@ -32,6 +32,7 @@ use local_catquiz\teststrategy\feedbackgenerator\personabilities;
 use local_catquiz\teststrategy\feedbackgenerator\questionssummary;
 use local_catquiz\teststrategy\feedbacksettings;
 use local_catquiz\teststrategy\preselect_task\addscalestandarderror;
+use local_catquiz\teststrategy\preselect_task\filterbystandarderror;
 use local_catquiz\teststrategy\preselect_task\firstquestionselector;
 use local_catquiz\teststrategy\preselect_task\fisherinformation;
 use local_catquiz\teststrategy\preselect_task\lasttimeplayedpenalty;
@@ -85,6 +86,7 @@ class inferallsubscales extends strategy {
             maybe_return_pilot::class,
             remove_uncalculated::class, // Remove items that do not have item parameters.
             addscalestandarderror::class,
+            filterbystandarderror::class,
             noremainingquestions::class, // Cancel quiz attempt if no questions are left.
             strategyfastestscore::class,
         ];

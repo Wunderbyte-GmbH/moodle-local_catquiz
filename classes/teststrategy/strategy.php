@@ -169,6 +169,7 @@ abstract class strategy {
         catscale::update_testitem(
             $context['contextid'],
             $selectedquestion,
+            $context['catscaleid'],
             $context['includesubscales']
         );
         return result::ok($selectedquestion);

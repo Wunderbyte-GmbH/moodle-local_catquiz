@@ -29,6 +29,7 @@ use Closure;
 use local_catquiz\local\model\model_item_param_list;
 use local_catquiz\local\model\model_item_response;
 use local_catquiz\local\model\model_model;
+use local_catquiz\local\model\model_raschmodel;
 use local_catquiz\local\model\model_strategy;
 use local_catquiz\mathcat;
 use moodle_exception;
@@ -86,6 +87,11 @@ class catcalc {
      * @param mixed $personresponses
      * @param model_item_param_list $items
      * @param float $startvalue
+     * @param float $mean The mean value of current abilities
+     * @param float $sd The standard deviation of current abilities
+     * @param float $trlowerlimit The lower limit of the trusted region
+     * @param float $trupperlimit The upper limit of the trusted region
+     * @param float $tr This factor is multiplied with $sd to determine if a value is trusted
      *
      * @return float
      *
@@ -93,7 +99,12 @@ class catcalc {
     public static function estimate_person_ability(
         $personresponses,
         model_item_param_list $items,
-        float $startvalue = 0.1
+        float $startvalue = 0.0,
+        float $mean = 0,
+        float $sd = 1,
+        float $trlowerlimit = -10.0,
+        float $trupperlimit = 10.0,
+        float $tr = 10.0
     ): float {
         $allmodels = model_strategy::get_installed_models();
 
@@ -126,12 +137,26 @@ class catcalc {
         $hessian = self::build_callable_array($hfuns);
         $hessian = fn ($pp) => matrixcat::multi_sum($hessian($pp));
 
+        $trustedregionsfunction = fn($ability) => model_raschmodel::get_ability_tr_jacobian($ability, $mean, $sd);
+        $trustedregionsderivate = fn($ability) => model_raschmodel::get_ability_tr_hessian($ability, $mean, $sd);
+        $trustedregionfilter = fn($ability) => model_raschmodel::restrict_to_trusted_region_pp(
+            $ability,
+            $trlowerlimit,
+            $trupperlimit,
+            $tr,
+            $mean,
+            $sd
+        );
+
         $result = mathcat::newton_raphson_multi_stable(
             $jacobian,
             $hessian,
             ['ability' => $startvalue],
             6,
-            50
+            500,
+            $trustedregionfilter,
+            $trustedregionsfunction,
+            $trustedregionsderivate
         );
 
         // The ability is wrapped inside an array.

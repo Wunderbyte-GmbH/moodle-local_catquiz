@@ -35,6 +35,8 @@ use local_catquiz\event\testiteminscale_updated;
 use local_catquiz\local\result;
 use local_catquiz\local\status;
 use context_system;
+use local_catquiz\local\model\model_item_param_list;
+use local_catquiz\local\model\model_strategy;
 use moodle_exception;
 use moodle_url;
 use stdClass;
@@ -82,7 +84,10 @@ class catscale {
         if ($catscale = $cache->get($catscaleid)) {
             return $catscale;
         }
-        $catscale = $DB->get_record('local_catquiz_catscales', ['id' => $catscaleid]) ?: null;
+        $catscale = $DB->get_record('local_catquiz_catscales', ['id' => $catscaleid]);
+        if (! $catscale) {
+            throw new \Exception(sprintf('Could not find a scale with ID %s', $catscaleid));
+        }
         $cache->set($catscaleid, $catscale);
         return $catscale;
     }
@@ -140,18 +145,16 @@ class catscale {
      */
     public static function return_default_contextid_of_catscale(int $catscaleid) {
 
-        $catscale = self::return_catscale_object($catscaleid);
-        if (!empty($catscale) && isset($catscale->contextid)) {
-            return intval($catscale->contextid);
-        } else {
+        try {
+            $catscale = self::return_catscale_object($catscaleid);
+            if (isset($catscale->contextid)) {
+                return intval($catscale->contextid);
+            } else {
+                return null;
+            }
+        } catch (\Exception $e) {
             return null;
         }
-
-        $catscale = self::return_catscale_object($catscaleid);
-        if (!$catscale) {
-            return null;
-        }
-        return $catscale->contextid;
     }
 
     /**
@@ -167,6 +170,9 @@ class catscale {
         $catscale = self::return_catscale_object($catscaleid);
         if ($catscale->contextid) {
             return $catscale->contextid;
+        }
+        if ($catscale->parentid === 0) {
+            return catquiz::get_default_context_id();
         }
         return self::get_context_id($catscale->parentid);
     }
@@ -562,18 +568,19 @@ class catscale {
      */
     public static function get_link_to_catscale(int $catscaleid, $url = '/local/catquiz/manage_catscales.php') {
 
-        $catscale = self::return_catscale_object($catscaleid);
-        if (!empty($catscale->name)) {
-            $catscalename = $catscale->name;
+        try {
+            $catscale = self::return_catscale_object($catscaleid);
+            if (!empty($catscale->name)) {
+                $catscalename = $catscale->name;
 
-            $url = new moodle_url($url, ['scaleid' => $catscaleid], 'lcq_catscales');
-            $linktoscale = html_writer::link($url, $catscalename);
+                $url = new moodle_url($url, ['scaleid' => $catscaleid], 'lcq_catscales');
+                $linktoscale = html_writer::link($url, $catscalename);
 
-            return $linktoscale;
-        } else {
+                return $linktoscale;
+            }
+        } catch (\Exception $e) {
             return get_string("deletedcatscale", "local_catquiz");
         }
-
     }
 
     /**
@@ -648,5 +655,32 @@ class catscale {
             unset($record->id);
             $DB->insert_record('local_catquiz_itemparams', $record);
         }
+    }
+
+    /**
+     * Returns the standard error for the given ability and items
+     *
+     * @param float $ability
+     * @param model_item_param_list $items
+     * @param float $default
+     * @return float
+     */
+    public static function get_standarderror(
+        float $ability,
+        model_item_param_list $items,
+        float $default = 1.0
+    ): float {
+        if (count($items) === 0) {
+            return $default;
+        }
+
+        $fisherinfo = 0.0;
+        $models = model_strategy::get_installed_models();
+        foreach ($items as $item) {
+            $fisherinfo += $models[$item->get_model_name()]::fisher_info(['ability' => $ability], $item->get_params_array());
+        }
+
+        $fisherinfo = max(10 ** -6, $fisherinfo);
+        return (1 / sqrt($fisherinfo));
     }
 }

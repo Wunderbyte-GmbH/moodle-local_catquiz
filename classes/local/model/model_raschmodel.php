@@ -266,4 +266,62 @@ abstract class model_raschmodel extends model_model implements catcalc_item_esti
      *
      */
     abstract public static function log_likelihood_p_p(array $x, array $itemparams, float $itemresponse);
+
+     /**
+      * Calculates the 1st derivative trusted regions for person ability
+      *
+      * @param array $pp - person parameter ('ability')
+      * @param float $mean - mean of the estimated destribution
+      * @param float $sd - standard deviation e.g. standard error of distribution
+      * @return float 1st derivative of TR function with respect to $pp
+      */
+    public static function get_ability_tr_jacobian(array $pp, float $mean = 0, float $sd = 1): float {
+        return
+            (($mean - $pp['ability']) / ($sd ** 2)); // The d/dpp .
+
+    }
+
+    /**
+     * Calculates the 2nd derivative trusted regions for person ability
+     *
+     * @param array $pp - person parameter ('ability')
+     * @param float $mean - mean of the estimated destribution
+     * @param float $sd - standard deviation e.g. standard error of distribution
+     * @return float 2nd derivative of TR function with respect to $ip
+     */
+    public static function get_ability_tr_hessian(array $pp, $mean = 0, float $sd = 1): float {
+
+        return
+            (- 1 / ($sd ** 2)); // Calculate d/dpp d/dpp.
+
+    }
+
+    /**
+     * Implements a Filter Function for trusted regions in the person ability parameter estimation
+     *
+     * @param array $pp - person parameter ('ability')
+     * @param float $ppmin
+     * @param float $ppmax
+     * @param float $pptr
+     * @param float $mean - mean of the estimated destribution
+     * @param float $sd - standard deviation e.g. standard error of distribution
+     * return array - chunked item parameter
+     */
+    public static function restrict_to_trusted_region_pp(
+        array $pp,
+        float $ppmin,
+        float $ppmax,
+        float $pptr,
+        $mean = 0,
+        float $sd = 1
+    ): array {
+        if (($pp['ability'] - $mean) < max(- ($pptr * $sd), $ppmin)) {
+            $pp['ability'] = max(- ($pptr * $sd), $ppmin);
+        }
+        if (($pp['ability'] - $mean) > min(($pptr * $sd), $ppmax)) {
+            $pp['ability'] = min(($pptr * $sd), $ppmax);
+        }
+
+        return $pp;
+    }
 }

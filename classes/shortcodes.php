@@ -78,6 +78,9 @@ class shortcodes {
             intval($args['courseid'] ?? 0),
             intval($userid ?? -1)
             );
+        if (count($records) < 1) {
+            return get_string('attemptfeedbacknotyetavailable', 'local_catquiz');
+        }
         $output = [
             'attempt' => [],
         ];
@@ -104,7 +107,7 @@ class shortcodes {
         }
 
         $hiddenareas = $args['hide'] ?? [];
-
+        // Find keys for areas to hide in the README documentation.
         if ($hiddenareas != []) {
             $areastohide = explode(',', $hiddenareas);
         } else {
@@ -123,10 +126,14 @@ class shortcodes {
 
         foreach ($records as $record) {
             $attemptfeedback = new attemptfeedback($record->attemptid, $record->contextid, $feedbacksettings);
+            $feedback = $attemptfeedback->get_feedback_for_attempt($record->attemptid) ?? "";
+            if (empty($feedback)) {
+                return get_string('attemptfeedbacknotavailable', 'local_catquiz');
+            }
 
             $headerstring = get_string('feedbacksheader', 'local_catquiz', $record->attemptid);
             $data = [
-                'feedback' => $attemptfeedback->get_feedback_for_attempt($record->attemptid),
+                'feedback' => $feedback,
                 'header' => $headerstring,
                 'attemptid' => $record->attemptid,
                 'active' => empty($output['attempt']) ? true : false,
