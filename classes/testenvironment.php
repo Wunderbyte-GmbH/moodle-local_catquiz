@@ -465,7 +465,8 @@ class testenvironment {
     public static function get_environments(
         string $component = 'mod_adaptivequiz',
         int $componentid = 0,
-        int $onlytemplates = LOCAL_CATQUIZ_TESTENVIRONMENT_ONLYTEMPLATES) {
+        int $onlytemplates = LOCAL_CATQUIZ_TESTENVIRONMENT_ONLYTEMPLATES,
+        bool $includecoursenames = false) {
         global $DB;
 
         $returnarray = [];
@@ -487,8 +488,15 @@ class testenvironment {
         }
 
         $sql = "SELECT *
-                FROM {local_catquiz_tests}
+                FROM {local_catquiz_tests} cat
                 $equal";
+
+        if ($includecoursenames) {
+            $sql = "SELECT cat.*, c.fullname
+                FROM {local_catquiz_tests} cat
+                LEFT JOIN {course} c ON c.id = cat.courseid
+                $equal";
+        }
 
         if (!$records = $DB->get_records_sql($sql, $params)) {
             return $returnarray;
