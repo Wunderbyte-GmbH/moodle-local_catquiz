@@ -82,13 +82,13 @@ class updatepersonabilitytesting extends updatepersonability {
     /**
      * Update person param.
      *
-     * @param mixed $a
-     * @param mixed $b
+     * @param int $a
+     * @param float $b
      *
-     * @return mixed
+     * @return void
      *
      */
-    protected function update_person_param($a, $b) {
+    protected function update_person_param(int $a, float $b): void {
     }
 
     /**
@@ -100,7 +100,7 @@ class updatepersonabilitytesting extends updatepersonability {
      * @return mixed
      *
      */
-    protected function get_item_param_list($responses, $catscaleid) {
+    protected function get_item_param_list($responses, $catscaleid): model_item_param_list {
         $itemparamlist = new model_item_param_list();
         if (! array_key_exists('fake_item_params', $this->context)) {
             return $itemparamlist;

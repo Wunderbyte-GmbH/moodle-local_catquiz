@@ -97,7 +97,7 @@ class questions_loader implements contextloaderinterface {
             $questionscales = [$scale, ...$ancestorscales[$scale]];
             foreach ($questionscales as $s) {
                 $questionsperscale[$s][$q->id] = $q;
-            } 
+            }
         }
         $context['questionsperscale'] = $questionsperscale;
 

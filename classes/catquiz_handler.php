@@ -808,10 +808,10 @@ class catquiz_handler {
             'standarderrorpersubscale' => empty($quizsettings->catquiz_standarderrorpersubscale)
                 ? null
                 : ($quizsettings->catquiz_standarderrorpersubscale / 100),
-            'se_max' => 1.0, // TODO set via config
-            'se_min' => 0.35, // TODO set via config
-            'initial_ability' => 0.02, // TODO set via config
-            'initial_se' => 2.97, // TODO set via config
+            'se_max' => 1.0, // TODO set via config.
+            'se_min' => 0.35, // TODO set via config.
+            'initial_ability' => 0.0, // 0.02, // TODO set via config.
+            'initial_se' => 1.0, // TODO set via config.
             // phpcs:disable
             // 'breakduration' => $quizsettings->catquiz_breakduration,
             // 'breakinfourl' => '/local/catquiz/breakinfo.php',

@@ -391,7 +391,7 @@ class strategy_test extends advanced_testcase {
                         'is_correct_response' => false,
                         'ability_before' => -3.41,
                         'ability_after' => -3.38,
-                    ]
+                    ],
                 ],
             ],
             // phpcs:disable

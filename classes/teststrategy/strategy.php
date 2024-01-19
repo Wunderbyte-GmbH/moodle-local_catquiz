@@ -240,7 +240,7 @@ abstract class strategy {
     ): array {
         $affectedscales = [
             $selectedquestion->catscaleid,
-            ...catscale::get_ancestors($selectedquestion->catscaleid)
+            ...catscale::get_ancestors($selectedquestion->catscaleid),
         ];
         foreach ($affectedscales as $scaleid) {
             if (!array_key_exists($scaleid, $playedquestionsperscale)) {
