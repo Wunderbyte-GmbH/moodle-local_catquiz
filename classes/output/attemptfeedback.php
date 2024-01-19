@@ -158,6 +158,10 @@ class attemptfeedback implements renderable, templatable {
         ];
 
         $feedbackdata = $this->load_data_from_generators($generators, $context);
+
+        // If courses or groups are selected, User is enroled to.
+        catquiz::enrole_user($USER->id, (array)$cache->get('quizsettings'), (array)$cache->get('personabilities'));
+
         if ($savetodb) {
             $id = catquiz::save_attempt_to_db($feedbackdata);
         }

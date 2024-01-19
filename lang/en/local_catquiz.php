@@ -209,6 +209,15 @@ $string['imported_testitem_description'] = '{$a} testitems were imported.';
 $string['messageprovider:catscaleupdate'] = 'Notification of CAT scale update';
 $string['catscaleupdatedtitle'] = 'A CAT scale was updated';
 $string['messageprovider:updatecatscale'] = 'Recieves notification on subscrition of catscale';
+$string['enroledtogroupfailedtitle'] = 'Enrolement to group "{$a->groupname}" failed.';
+$string['enroledtogroupfailedtext'] = 'Because of your test results in scale "{$a->catscalename}", you are supposed to be enroled in group: "{$a->groupname}". Enrolement failed. Maybe because you are already part of the group.';
+$string['enroledtogrouptitle'] = 'You are enroled to group "{$a->groupname}"';
+$string['enroledtogrouptext'] = 'Because of your test results in scale "{$a->catscalename}", you are now enroled in group "{$a->groupname}". Optional information about group: "{$a->groupdescription}".';
+$string['enroledtocoursefailedtitle'] = 'Enrolement to course "{$a->coursename}" failed.';
+$string['enroledtocoursefailedtext'] = 'Because of your test results in scale "{$a->catscalename}", you are supposed to be enroled in course: "{$a->coursename}". Enrolement failed. Maybe because you are already part of the course.';
+$string['enroledtocoursetitle'] = 'You are enroled to course "{$a->coursename}".';
+$string['enroledtocoursetext'] = 'Because of your test results in scale "{$a->catscalename}", you are now enroled in course "{$a->coursename}". Optional information about course: "{$a->coursesummary}".';
+$string['messageprovider:enrolementfeedback'] = "Automatical enrolement to courses and groups.";
 
 // Access.php.
 $string['catquiz:canmanage'] = 'Is allowed to manage Catquiz plugin';
