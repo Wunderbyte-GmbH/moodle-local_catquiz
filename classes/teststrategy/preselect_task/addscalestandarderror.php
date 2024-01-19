@@ -25,7 +25,6 @@
 namespace local_catquiz\teststrategy\preselect_task;
 
 use cache;
-use dml_exception;
 use local_catquiz\catscale;
 use local_catquiz\local\model\model_responses;
 use local_catquiz\local\result;
@@ -36,14 +35,9 @@ use local_catquiz\wb_middleware;
 /**
  * Calculates the standarderror for each available catscale.
  *
- * Note: adds two different arrays to the `$context`:
- *  1. 'standarderrorperscale[$scaleid]'
- *  2. 'se[$scaleid]'
+ * Note: adds the array 'se[$scaleid]' to the $context.
  *
- * The value in 'standarderrorperscale' is based on the fisherinformation (FI)
- * in the root scale. I.e., it is derived from the person ability in the root
- * scale.
- * The value in 'se' is based on the FI and hence ability in the respective
+ * The values in 'se' are based on the FI and hence ability in the respective
  * (sub)scale.
  *
  * @package local_catquiz
@@ -81,69 +75,8 @@ class addscalestandarderror extends preselect_task implements wb_middleware {
                 return result::err(status::ERROR_NO_REMAINING_QUESTIONS);
         }
 
-        if (! $context['has_fisherinformation']) {
-            return $next($context);
-        }
-
-        $fisherinfoperscale = [];
-        // Lists for each scale the IDs of the scale itself and its parent scales.
-        $scales = [];
         $cache = cache::make('local_catquiz', 'adaptivequizattempt');
-        $playedquestionids = array_keys($cache->get('playedquestions') ?: []);
-        // Questions that have no item parameters and hence fisher
-        // information are ignored here.
-        $questions = array_filter(
-            $context['original_questions'],
-            fn ($q) => ! empty($q->fisherinformation)
-        );
-        // Sort descending by fisher information. This way, we can calculate the
-        // maximum test information TI per subscale when including only the
-        // maximum amount of remining questions.
-        uasort(
-            $questions,
-            fn ($q1, $q2) =>
-                $q2->fisherinformation[$q1->catscaleid] <=> $q1->fisherinformation[$q2->catscaleid]
-            );
-        $remainingperscale = [];
         $context['playedquestionsperscale'] = $this->getplayedquestionsperscale();
-        $remainingperscale = $this->getnumberofremainingquestionsperscale();
-        foreach ($questions as $q) {
-            if (!array_key_exists($q->catscaleid, $scales)) {
-                $scales[$q->catscaleid] = $this->get_with_ancestor_scales($q->catscaleid);
-            }
-            foreach ($scales[$q->catscaleid] as $scaleid) {
-                $key = in_array($q->id, $playedquestionids) ? 'played' : 'remaining';
-                if ($key === 'remaining') {
-                    if ($remainingperscale[$scaleid] <= 0) {
-                        // Do not add the question to the list of remaining...
-                        // Questions if it can never be answered due to the...
-                        // Max_attempts_per_scale setting.
-                        continue;
-                    } else {
-                        $remainingperscale[$scaleid]--;
-                    }
-                }
-                if (!array_key_exists($scaleid, $fisherinfoperscale)) {
-                    $fisherinfoperscale[$scaleid] = [];
-                }
-                if (! array_key_exists($key, $fisherinfoperscale[$scaleid])) {
-                    $fisherinfoperscale[$scaleid][$key] = $q->fisherinformation[$scaleid];
-                    continue;
-                }
-                $fisherinfoperscale[$scaleid][$key] += $q->fisherinformation[$scaleid];
-            }
-        }
-
-        $standarderrorperscale = [];
-        foreach ($fisherinfoperscale as $catscaleid => $fisherinfo) {
-            $fisherinfoplayed = $fisherinfoperscale[$catscaleid]['played'] ?? 0;
-            $fisherinfoall
-                = ($fisherinfoperscale[$catscaleid]['played'] ?? 0) + ($fisherinfoperscale[$catscaleid]['remaining'] ?? 0);
-            $standarderror['played'] = $fisherinfoplayed === 0 ? INF : (1 / max(10 ** -6, sqrt($fisherinfoplayed)));
-            $standarderror['remaining'] = $fisherinfoall === 0 ? INF : (1 / max(10 ** -6, sqrt($fisherinfoall)));
-            $context['standarderrorperscale'][$catscaleid] = $standarderror;
-        }
-
         $cachedresponses = $cache->get('userresponses');
         if (! $cachedresponses) {
             // If we do not yet have a response, use a default value.
@@ -173,37 +106,10 @@ class addscalestandarderror extends preselect_task implements wb_middleware {
      */
     public function get_required_context_keys(): array {
         return [
+            'contextid',
             'questions',
-            'original_questions',
-            'has_fisherinformation',
             'initial_standarderror',
-        ];
-    }
-
-    /**
-     * Can be overwritten by a _testing class to prevent DB access.
-     *
-     * @param mixed $scaleid
-     * @return array
-     * @throws dml_exception
-     */
-    protected function get_with_ancestor_scales($scaleid): array {
-        return [
-            $scaleid,
-            ...catscale::get_ancestors($scaleid),
-        ];
-    }
-
-    /**
-     * Can be overwritten by a _testing class to prevent DB access.
-     *
-     * @param mixed $scaleid
-     * @return array
-     */
-    protected function get_with_child_scales($scaleid): array {
-        return [
-            $scaleid,
-            ...catscale::get_subscale_ids($scaleid),
+            'person_ability',
         ];
     }
     /**
@@ -218,25 +124,5 @@ class addscalestandarderror extends preselect_task implements wb_middleware {
         $cache = cache::make('local_catquiz', 'adaptivequizattempt');
         $this->playedquestionsperscale = $cache->get('playedquestionsperscale') ?: [];
         return $this->playedquestionsperscale;
-    }
-    /**
-     * Returns array with number of remaining questions per scale.
-     *
-     * @return array
-     */
-    protected function getnumberofremainingquestionsperscale(): array {
-        $maxattemptsperscale = $this->context['max_attempts_per_scale'] === -1
-            ? INF
-            : $this->context['max_attempts_per_scale'];
-        $pq = $this->getplayedquestionsperscale();
-        $catscales = $this->get_with_child_scales($this->context['catscaleid']);
-        foreach ($catscales as $scaleid) {
-            if (!array_key_exists($scaleid, $pq)) {
-                $remainingperscale[$scaleid] = $maxattemptsperscale;
-                continue;
-            }
-            $remainingperscale[$scaleid] = $maxattemptsperscale - count($pq[$scaleid]);
-        }
-        return $remainingperscale;
     }
 }
