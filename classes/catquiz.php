@@ -26,9 +26,7 @@
 namespace local_catquiz;
 
 use core\check\result;
-use core\output\notification;
 use dml_exception;
-use enrol_plugin;
 use local_catquiz\event\attempt_completed;
 use moodle_exception;
 use stdClass;
