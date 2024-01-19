@@ -136,8 +136,8 @@ class updatepersonability_test extends TestCase {
                             1 => ['difficulty' => 2.1],
                             2 => ['difficulty' => -1.4],
                     ],
-                'initial_ability' => 0.02,
-                'initial_se' => 2.97,
+                    'initial_ability' => 0.02,
+                    'initial_se' => 2.97,
                 ],
             ],
             'has_enough_responses' => [

@@ -617,10 +617,10 @@ class model_item_param_list implements ArrayAccess, IteratorAggregate, Countable
 
     /**
      * Converts the given data to a model_item_param_list
-     * 
-     * @param array $data 
-     * @return model_item_param_list 
-     * @throws UnexpectedValueException 
+     *
+     * @param array $data
+     * @return model_item_param_list
+     * @throws UnexpectedValueException
      */
     public static function from_array(array $data) {
         $items = new self();
