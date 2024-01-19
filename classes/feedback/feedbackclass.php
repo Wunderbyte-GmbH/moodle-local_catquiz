@@ -137,6 +137,13 @@ class feedbackclass {
         // We need this to close the collapsable header elements.
         $html2 = $OUTPUT->render_from_template('local_catquiz/feedback/feedbackform_collapsible_close', []);
 
+        // Some data needed below we can fetch one time for all settings.
+        $groups = groups_get_all_groups(intval($course->id));
+
+        $enroledcourses = enrol_get_my_courses();
+        $coursesfromtags = dataapi::get_courses_from_settings_tags() ?? [];
+        $courses = array_merge($enroledcourses, $coursesfromtags);
+
         foreach ($scales as $scale) {
             $subelements = [];
             $numberoffeedbacksfilledout = 0;
@@ -247,9 +254,8 @@ class feedbackclass {
                 $PAGE->requires->js_call_amd('local_catquiz/colourpicker', 'init');
 
                 // Enrole to a group.
-                $groups = groups_get_all_groups(intval($course->id));
                 $options = [
-                    'multiple' => false,
+                    'multiple' => true,
                     'noselectionstring' => get_string('groupselection', 'local_catquiz'),
                 ];
                 $select = [
@@ -269,12 +275,8 @@ class feedbackclass {
 
                 // Enrole to a group.
                 // Limit Courses - See GH-183.
-                $enroledcourses = enrol_get_my_courses();
-                $coursesfromtags = dataapi::get_courses_from_settings_tags() ?? [];
-                $courses = array_merge($enroledcourses, $coursesfromtags);
-
                 $options = [
-                    'multiple' => false,
+                    'multiple' => true,
                     'noselectionstring' => get_string('courseselection', 'local_catquiz'),
                 ];
                 $select = [
