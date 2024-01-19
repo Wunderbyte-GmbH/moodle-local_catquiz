@@ -26,7 +26,7 @@
 namespace local_catquiz\teststrategy\preselect_task;
 
 use local_catquiz\local\result;
-use local_catquiz\teststrategy\preselect_task\updatepersonabilitytesting;
+use local_catquiz\teststrategy\preselect_task\updatepersonability_testing;
 use PHPUnit\Framework\ExpectationFailedException;
 use PHPUnit\Framework\TestCase;
 use SebastianBergmann\RecursionContext\InvalidArgumentException;
@@ -61,7 +61,7 @@ class updatepersonability_test extends TestCase {
         // The updatepersonaiblitytesting class is a slightly modified version
         // of the updatepersonability class that just overrides parts that load
         // data from the DB or cache.
-        $updatepersonability = new updatepersonabilitytesting();
+        $updatepersonability = new updatepersonability_testing();
         $result = $updatepersonability->process($context, $returncontext);
         $this->assertEquals($expected, $result->unwrap()['skip_reason']);
     }
