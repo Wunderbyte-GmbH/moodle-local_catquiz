@@ -564,7 +564,7 @@ class catquiz_handler {
                 'feedback_scaleid_limit_upper_',
                 'wb_colourpicker_',
                 'feedbackeditor_scaleid_',
-                'catquiz_groups_',
+                'catquiz_group_',
                 'catquiz_courses_',
                 'enrolement_message_checkbox_',
                 'feedbacklegend_scaleid_',
