@@ -1654,15 +1654,15 @@ class catquiz {
                 $upperlimit = $quizsettings['feedback_scaleid_limit_upper_' . $catscaleid . '_'. $i];
 
                 if ($personability >= $lowerlimit && $personability <= $upperlimit) {
-                    $message = empty($quizsettings["enrolement_message_checkbox_" . $catscaleid . "_" . $i]) ? false : true;
-                    $groupstoenrole = $quizsettings['catquiz_group_' . $catscaleid . '_' . $i] ?? "";
+                    $message = empty($quizsettings["enrolment_message_checkbox_" . $catscaleid . "_" . $i]) ? false : true;
+                    $groupstoenrol = $quizsettings['catquiz_group_' . $catscaleid . '_' . $i] ?? "";
                     if (!empty($groupstoenrole)) {
                         $groupsarray = explode(",", $groupstoenrole);
                     } else {
                         $groupsarray = [];
                     }
-                    $coursestoenrole = $quizsettings['catquiz_courses_' . $catscaleid . '_' . $i] ?? [];
-                    foreach ($coursestoenrole as $courseid) {
+                    $coursestoenrol = $quizsettings['catquiz_courses_' . $catscaleid . '_' . $i] ?? [];
+                    foreach ($coursestoenrol as $courseid) {
                         $context = \context_course::instance($courseid);
                         $course = get_course($courseid);
                         $coursedata = [];
@@ -1675,16 +1675,16 @@ class catquiz {
                                 if ($message) {
                                     messages::send_message(
                                         $userid,
-                                        get_string('enroledtocoursefailedtitle', 'local_catquiz'),
-                                        get_string('enroledtocoursefailedtext', 'local_catquiz', $coursedata),
-                                        'enrolementfeedback');
+                                        get_string('enrolledtocoursefailedtitle', 'local_catquiz'),
+                                        get_string('enrolledtocoursefailedtext', 'local_catquiz', $coursedata),
+                                        'enrolmentfeedback');
                                 }
                             } else {
                                 messages::send_message(
                                     $userid,
-                                    get_string('enroledtocoursetitle', 'local_catquiz'),
-                                    get_string('enroledtocoursetext', 'local_catquiz', $coursedata),
-                                    'enrolementfeedback');
+                                    get_string('enrolledtocoursetitle', 'local_catquiz'),
+                                    get_string('enrolledtocoursetext', 'local_catquiz', $coursedata),
+                                    'enrolmentfeedback');
                             }
                         }
                         if (empty($groupsarray)) {
@@ -1705,15 +1705,15 @@ class catquiz {
                                             // Something went wrong.
                                             messages::send_message(
                                                 $userid,
-                                                get_string('enroledtogroupfailedtitle', 'local_catquiz', $data),
-                                                get_string('enroledtogroupfailedtext', 'local_catquiz', $data),
-                                                'enrolementfeedback');
+                                                get_string('enrolledtogroupfailedtitle', 'local_catquiz', $data),
+                                                get_string('enrolledtogroupfailedtext', 'local_catquiz', $data),
+                                                'enrolmentfeedback');
                                         } else {
                                             messages::send_message(
                                                 $userid,
-                                                get_string('enroledtogrouptitle', 'local_catquiz', $data),
-                                                get_string('enroledtogrouptext', 'local_catquiz', $data),
-                                                'enrolementfeedback');
+                                                get_string('enrolledtogrouptitle', 'local_catquiz', $data),
+                                                get_string('enrolledtogrouptext', 'local_catquiz', $data),
+                                                'enrolmentfeedback');
                                         }
                                     }
                                 }
