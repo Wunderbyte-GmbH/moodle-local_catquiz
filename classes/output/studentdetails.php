@@ -100,7 +100,7 @@ class studentdetails implements renderable, templatable {
             'name' => get_string('name'),
             'emailtitle' => get_string('email'),
             'userdetails' => get_string('userdetails'),
-            'enroledcoursestitle' => get_string('enroled_courses', 'local_catquiz'),
+            'enrolledcoursestitle' => get_string('enrolled_courses', 'local_catquiz'),
             'courses' => $displaycourses,
             'cards' => [
                 [
