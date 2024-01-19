@@ -137,9 +137,6 @@ class feedbackclass {
         // We need this to close the collapsable header elements.
         $html2 = $OUTPUT->render_from_template('local_catquiz/feedback/feedbackform_collapsible_close', []);
 
-        // Some data needed below we can fetch one time for all settings.
-        $groups = groups_get_all_groups(intval($course->id));
-
         $enroledcourses = enrol_get_my_courses();
         $coursesfromtags = dataapi::get_courses_from_settings_tags() ?? [];
         $courses = array_merge($enroledcourses, $coursesfromtags);
@@ -254,26 +251,6 @@ class feedbackclass {
                 $PAGE->requires->js_call_amd('local_catquiz/colourpicker', 'init');
 
                 // Enrole to a group.
-                $options = [
-                    'multiple' => true,
-                    'noselectionstring' => get_string('groupselection', 'local_catquiz'),
-                ];
-                $select = [
-                    0 => get_string('groupselection', 'local_catquiz'),
-                ];
-                foreach ($groups as $group) {
-                    $select[$group->id] = $group->name;
-                }
-                $subelements[] = $mform->addElement(
-                    'autocomplete',
-                    'catquiz_groups_' . $scale->id . '_'. $j,
-                    get_string('setgrouprenrolmentforscale', 'local_catquiz'),
-                    $select,
-                    $options
-                );
-                $mform->addHelpButton('catquiz_groups_' . $scale->id . '_'. $j, 'setgrouprenrolmentforscale', 'local_catquiz');
-
-                // Enrole to a group.
                 // Limit Courses - See GH-183.
                 $options = [
                     'multiple' => true,
@@ -294,12 +271,24 @@ class feedbackclass {
                 );
                 $mform->addHelpButton('catquiz_courses_' . $scale->id . '_' . $j, 'setcourseenrolmentforscale', 'local_catquiz');
 
-                // Checkbox dependent on groupselect and courseselect.
+                // Enrole to a group.
+
+                $element = $mform->addElement(
+                    'text',
+                    'catquiz_group_' . $scale->id . '_'. $j,
+                    get_string('setgrouprenrolmentforscale', 'local_catquiz')
+                );
+                // $element->setType('catquiz_group_' . $scale->id . '_'. $j, PARAM_TEXT);
+                $mform->addHelpButton('catquiz_group_' . $scale->id . '_' . $j, 'groupenrolementhelptext', 'local_catquiz');
+                $subelements[] = $element;
+
+                // Checkbox messaging of groupselect and courseselect.
                 $subelements[] = $mform->addElement('advcheckbox', 'enrolement_message_checkbox_' . $scale->id . '_'. $j,
                 get_string('setautonitificationonenrolmentforscale', 'local_catquiz'), null, null, [0, 1]);
-                $mform->setDefault('enrolement_message_checkbox_' . $scale->id . '_'. $j, 1);
+                if (!optional_param('enrolement_message_checkbox_' . $scale->id . '_'. $j, 1, PARAM_INT)) {
+                    $mform->setDefault('enrolement_message_checkbox_' . $scale->id . '_'. $j, 1);
+                }
 
-                // TODO: If none of both ('catquiz_groups_'... & 'catquiz_courses_'...) is selected, hide checkbox.
             }
 
             // Add a header for each scale.
