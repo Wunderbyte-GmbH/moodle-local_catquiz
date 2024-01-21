@@ -27,7 +27,7 @@ Feature: As a teacher I setup adaptive quiz with CATquiz Scales and Feedbacks.
 
   @javascript
   Scenario: CATquiz settings: teacher setup basic settings and student should access attempt
-    Given I log in as "admin"
+    Given I log in as "teacher1"
     And I am on "Course 1" course homepage with editing mode on
     And I add a "Adaptive Quiz" to section "1"
     And I set the following fields to these values:
@@ -47,3 +47,33 @@ Feature: As a teacher I setup adaptive quiz with CATquiz Scales and Feedbacks.
     And I log out
     And I am on the "adaptivecatquiz1" "Activity" page logged in as "student1"
     Then "Start attempt" "button" should exist
+
+  @javascript
+  Scenario: CATquiz settings: teacher setup basic feedback settings
+    Given I log in as "teacher1"
+    And I am on "Course 1" course homepage with editing mode on
+    And I add a "Adaptive Quiz" to section "1"
+    And I set the following fields to these values:
+      | Name      | Adaptive CATquiz  |
+      | ID number | adaptivecatquiz1  |
+      | catmodel  | Catquiz CAT model |
+    ## Delay required to settle CAT model
+    And I wait until the page is ready
+    And I set the field "Select CAT scale" to "Mathematik"
+    ## Delay required to settle CAT scale
+    And I wait until the page is ready
+    And the field "Number of ability ranges" matches value "2"
+    And I click on "Feedback for \"Mathematik\"" "text"
+    ## Check feedback defaults
+    And I should see "Feedback for range 1" in the "//div[contains(@aria-labelledby, 'catquiz_feedback_header_')]" "xpath_element"
+    And the field with xpath "//input[@data-name='feedback_scaleid_limit_lower_Mathematik_1']" matches value "-5"
+    And the field with xpath "//input[@data-name='feedback_scaleid_limit_upper_Mathematik_1']" matches value "0"
+    And I should see "Feedback for range 2" in the "//div[contains(@aria-labelledby, 'catquiz_feedback_header_')]" "xpath_element"
+    And the field with xpath "//input[@data-name='feedback_scaleid_limit_lower_Mathematik_2']" matches value "0"
+    And the field with xpath "//input[@data-name='feedback_scaleid_limit_upper_Mathematik_2']" matches value "5"
+    And I should not see "Feedback for range 3" in the "//div[contains(@aria-labelledby, 'catquiz_feedback_header_')]" "xpath_element"
+    And I should see "Feedback for \"A03\"" in the "//div[contains(@aria-labelledby, 'catquiz_feedback_header_')]" "xpath_element"
+    And I should see "Feedback for \"A02\"" in the "//div[contains(@aria-labelledby, 'catquiz_feedback_header_')]" "xpath_element"
+    ##And I click on "Save and return to course" "button"
+    ##And I wait until the page is ready
+    And I log out
