@@ -341,11 +341,14 @@ class feedbackclass {
             $headerid = 'catquiz_feedback_header_' . $scale->id;
             $collapseid = 'catquiz_feedback_collapse_' . $scale->id;
             $accordionid = 'accordion_header_scaleid_' . $scale->id;
+            $dataname = 'catquiz_feedback_header_' . $scale->name;
             $headerdata = [
                 'headername' => $headername,
                 'headerid' => $headerid,
                 'collapseid' => $collapseid,
                 'accordionid' => $accordionid,
+                'datadepth' => $previousdepth,
+                'dataname' => $dataname,
             ];
 
             // Closing the elements.
