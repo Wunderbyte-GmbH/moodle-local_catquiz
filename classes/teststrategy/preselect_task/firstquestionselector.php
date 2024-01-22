@@ -168,6 +168,9 @@ class firstquestionselector extends preselect_task implements wb_middleware {
      *
      */
     public function get_median_ability_of_test(array $personparams) {
+        if (!$personparams) {
+            return 0.0;
+        }
         $abilities = array_map(fn ($param) => floatval($param->ability), $personparams);
         sort($abilities);
         $index = count($abilities) / 2;
