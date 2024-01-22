@@ -689,6 +689,8 @@ class catquiz_handler {
             ->set_catcontextid($catcontext);
 
         $selectioncontext = self::get_strategy_selectcontext($quizsettings, $attemptdata);
+        $teststrategy = strategy::create_from_adaptivequiz($selectioncontext);
+
         $result = $teststrategy->return_next_testitem($selectioncontext);
         if (!$result->isOk()) {
             return [0, $result->getErrorMessage()];

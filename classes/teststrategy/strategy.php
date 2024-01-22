@@ -25,11 +25,15 @@
 namespace local_catquiz\teststrategy;
 
 use cache;
+use cache_session;
+use local_catquiz\catcontext;
 use local_catquiz\catquiz;
 use local_catquiz\catscale;
 use local_catquiz\local\result;
+use local_catquiz\local\status;
 use local_catquiz\teststrategy\info;
 use local_catquiz\teststrategy\preselect_task;
+use local_catquiz\teststrategy\preselect_task\updatepersonability;
 use local_catquiz\wb_middleware_runner;
 use moodle_exception;
 use stdClass;
@@ -67,6 +71,26 @@ abstract class strategy {
     public array $scoremodifiers;
 
     /**
+     * @var int $maximumquestions The maximum number of questions played per attempt.
+     */
+    public int $maximumquestions;
+
+    /**
+     * @var stdClass $lastquestion The previous question.
+     */
+    public stdClass $lastquestion;
+
+    /**
+     * @var int $userid The userid of the current user.
+     */
+    public int $userid;
+
+    /**
+     * @var cache_session $cache Holds data of the current quiz attempt.
+     */
+    public cache_session $cache;
+
+    /**
      * Instantioate parameters.
      */
     public function __construct() {
@@ -74,6 +98,9 @@ abstract class strategy {
         require_once($CFG->dirroot . '/local/catquiz/lib.php');
 
         $this->scoremodifiers = info::get_score_modifiers();
+    }
+
+    public static function create_from_adaptivequiz(array $settings): self {
     }
 
     /**
@@ -108,6 +135,26 @@ abstract class strategy {
      *
      */
     public function return_next_testitem(array $context) {
+        $this->cache = cache::make('local_catquiz', 'adaptivequizattempt');
+        $this->lastquestion = $this->cache->get('lastquestion') ?: null;
+
+        if ($this->reached_max_questions()) {
+            // Save the last response so that we can display it as feedback.
+            $lastresponse = catcontext::getresponsedatafromdb(
+                $context['contextid'],
+                [$this->lastquestion->catscaleid],
+                $this->lastquestion->id,
+                $this->userid
+            );
+            // TODO: Error handling if no question was answered.
+            //$context['lastresponse'] = $lastresponse[$context['userid']]['component'][$context['lastquestion']->id];
+
+            // Update the person ability and then end the quiz.
+            $next = fn () => result::err(status::ERROR_REACHED_MAXIMUM_QUESTIONS);
+            (new updatepersonability())->run($context, $next);
+            return $this->handle_result(result::err(status::ERROR_REACHED_MAXIMUM_QUESTIONS));
+        }
+
         foreach ($this->get_preselecttasks() as $modifier) {
             // When this is called for running tests, check if there is a
             // X_testing class and if so, use that one.
@@ -131,10 +178,12 @@ abstract class strategy {
 
         $result = wb_middleware_runner::run($middlewares, $context);
 
-        $cache = cache::make('local_catquiz', 'adaptivequizattempt');
+    }
+
+    public function handle_result(result $result) {
         if ($result->isErr()) {
-            $cache->set('stopreason', $result->get_status());
-            $cache->set('endtime', time());
+            $this->cache->set('stopreason', $result->get_status());
+            $this->cache->set('endtime', time());
             return $result;
         }
 
@@ -148,31 +197,43 @@ abstract class strategy {
         $selectedquestion->userlastattempttime = $now;
 
         // Keep track of which question was selected.
-        $playedquestions = $cache->get('playedquestions') ?: [];
+        $playedquestions = $this->cache->get('playedquestions') ?: [];
         $playedquestions[$selectedquestion->id] = $selectedquestion;
-        $cache->set('playedquestions', $playedquestions);
-        $cache->set('isfirstquestionofattempt', false);
-        $cache->set('lastquestionreturntime', $now);
+        $this->cache->set('playedquestions', $playedquestions);
+        $this->cache->set('isfirstquestionofattempt', false);
+        $this->cache->set('lastquestionreturntime', $now);
 
         if (! empty($selectedquestion->is_pilot)) {
-            $numpilotquestions = $cache->get('num_pilot_questions') ?: 0;
-            $cache->set('num_pilot_questions', ++$numpilotquestions);
+            $numpilotquestions = $this->cache->get('num_pilot_questions') ?: 0;
+            $this->cache->set('num_pilot_questions', ++$numpilotquestions);
         }
 
         // Keep track of the questions played per scale.
-        $playedquestionsperscale = $cache->get('playedquestionsperscale') ?: [];
+        $playedquestionsperscale = $this->cache->get('playedquestionsperscale') ?: [];
         $updated = $this->update_playedquestionsperscale($selectedquestion, $playedquestionsperscale);
-        $cache->set('playedquestionsperscale', $updated);
+        $this->cache->set('playedquestionsperscale', $updated);
 
-        $cache->set('lastquestion', $selectedquestion);
+        $this->cache->set('lastquestion', $selectedquestion);
 
         catscale::update_testitem(
-            $context['contextid'],
+            $this->contextid,
             $selectedquestion,
-            $context['catscaleid'],
-            $context['includesubscales']
+            $this->catscaleid,
+            $this->includesubscales
         );
         return result::ok($selectedquestion);
+
+    }
+
+    public function reached_max_questions(): bool {
+        if ($this->maxquestions === -1) {
+            return false;
+        }
+        if ($this->questionsattempted < $this->maxquestions) {
+            return false;
+        }
+
+        return true;
     }
 
     /**

@@ -129,6 +129,8 @@ class inferlowestskillgap extends strategy {
         if ($feedbacksettings->primaryscaleid == LOCAL_CATQUIZ_PRIMARYCATSCALE_DEFAULT) {
             $feedbacksettings->primaryscaleid = LOCAL_CATQUIZ_PRIMARYCATSCALE_LOWEST;
         }
+        
+        $feedbacksettings->scalestoenrol = [1];
 
         $this->feedbacksettings = $feedbacksettings;
     }
