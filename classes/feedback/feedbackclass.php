@@ -234,12 +234,7 @@ class feedbackclass {
                 );
                 // Preset selected color regarding order of feedbacks.
                 $sequencecolors = array_keys($coloroptions);
-                $savedcolorvalue = $mform->_defaultValues['wb_colourpicker_' .$scale->id . '_' . $j]
-                    ?? $data['wb_colourpicker_' .$scale->id . '_' . $j];
-
-                if (!isset($savedcolorvalue)) {
-                    $mform->setDefault('wb_colourpicker_' .$scale->id . '_' . $j, $sequencecolors[$j - 1]);
-                }
+                $mform->setDefault('wb_colourpicker_' .$scale->id . '_' . $j, $sequencecolors[$j - 1]);
 
                 $subelements[] = $mform->addElement('hidden', 'selectedcolour', '', PARAM_TEXT);
                 $PAGE->requires->js_call_amd('local_catquiz/colourpicker', 'init');
