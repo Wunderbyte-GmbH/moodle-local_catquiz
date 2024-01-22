@@ -82,9 +82,6 @@ class updatepersonability extends preselect_task implements wb_middleware {
      */
     private array $diverseanswers = [];
 
-    private float $parent_ability;
-    private float $parent_se;
-
     /**
      * Run preselect task.
      *
@@ -95,8 +92,6 @@ class updatepersonability extends preselect_task implements wb_middleware {
      *
      */
     public function run(array &$context, callable $next): result {
-        $this->parent_ability = $context['initial_ability'];
-        $this->parent_se = $context['initial_se'];
         $this->lastquestion = $context['lastquestion'];
         // If we do not know the answer to the last question, we do not have to
         // update the person ability. Also, pilot questions should not be used
@@ -174,16 +169,19 @@ class updatepersonability extends preselect_task implements wb_middleware {
         }
         $this->diverseanswers[$catscaleid] = $this->has_sufficient_responses($arrayresponsesforscale);
 
-        $parentability = $context['person_ability'][$parentscale] ?? $context['initial_ability'];
-        $startvalue = $context['person_ability'][$catscaleid] ?? $context['initial_ability'];
+        $parentability = $context['person_ability'][$parentscale] ?? 0.0;
+        $startvalue = $context['person_ability'][$catscaleid] ?? 0.0;
         if ($parentscale && $this->diverseanswers[$parentscale] ?? false) {
             $startvalue = $parentability;
         }
+        $sdability = $context['person_ability'][$catscaleid] ?? 0.0;
 
-        $mean = $this->parent_ability;
-        $sd = $this->parent_se;
+        // We use the standarderror that is calculated by the previous ability and the previous items.
+        $itemclone = clone($itemparamlist);
+        $itemclone->offsetUnset($context['lastquestion']->id);
+        $sd = catscale::get_standarderror($sdability, $itemclone);
 
-        $updatedability = catcalc::estimate_person_ability($this->arrayresponses, $itemparamlist, $startvalue, $mean, $sd);
+        $updatedability = catcalc::estimate_person_ability($this->arrayresponses, $itemparamlist, $startvalue, $startvalue, $sd);
 
         if (is_nan($updatedability)) {
             // In a production environment, we can use fallback values. However,
@@ -200,11 +198,6 @@ class updatepersonability extends preselect_task implements wb_middleware {
                 $context['person_ability'][$catscaleid] = 0;
                 return $context;
             }
-        }
-
-        if ($this->diverseanswers[$catscaleid] ?? false) {
-            $this->parent_ability = $updatedability;
-            $this->parent_se = catscale::get_standarderror($updatedability, $itemparamlist);
         }
 
         $this->update_person_param($context, $catscaleid, $updatedability);
