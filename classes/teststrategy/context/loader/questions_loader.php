@@ -85,22 +85,6 @@ class questions_loader implements contextloaderinterface {
             $cache->set('totalnumberoftestitems', count($context['questions']));
         }
 
-        // Store for each scaleid the questions associated with that scale or
-        // any of its subscales.
-        $ancestorscales = [];
-        $questionsperscale = [];
-        foreach ($context['questions'] as $q) {
-            $scale = $q->catscaleid;
-            if (!isset($ancestorscales[$scale])) {
-                $ancestorscales[$scale] = catscale::get_ancestors($scale);
-            }
-            $questionscales = [$scale, ...$ancestorscales[$scale]];
-            foreach ($questionscales as $s) {
-                $questionsperscale[$s][$q->id] = $q;
-            } 
-        }
-        $context['questionsperscale'] = $questionsperscale;
-
         return $context;
     }
 

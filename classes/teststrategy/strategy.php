@@ -238,17 +238,10 @@ abstract class strategy {
         stdClass $selectedquestion,
         array $playedquestionsperscale = []
     ): array {
-        $affectedscales = [
-            $selectedquestion->catscaleid,
-            ...catscale::get_ancestors($selectedquestion->catscaleid)
-        ];
-        foreach ($affectedscales as $scaleid) {
-            if (!array_key_exists($scaleid, $playedquestionsperscale)) {
-                $playedquestionsperscale[$scaleid] = [$selectedquestion];
-                continue;
-            }
-            $playedquestionsperscale[$scaleid][] = $selectedquestion;
+        if (!array_key_exists($selectedquestion->catscaleid, $playedquestionsperscale)) {
+            $playedquestionsperscale[$selectedquestion->catscaleid] = [];
         }
+        $playedquestionsperscale[$selectedquestion->catscaleid][] = $selectedquestion;
         return $playedquestionsperscale;
     }
 }

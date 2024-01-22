@@ -67,15 +67,8 @@ class wb_middleware_runner {
                 if ($cache) {
                     $cachedcontexts = $cache->get('context') ?: [];
                     $cachedcontexts[$context['questionsattempted']] = $context;
-                    self::removefromsavedcontext(
-                        $cachedcontexts[$context['questionsattempted']],
-                        [
-                            'original_questions',
-                            'questions',
-                            'questionsperscale',
-                            'playedquestionsperscale',
-                        ]
-                    );
+                    unset($cachedcontexts[$context['questionsattempted']]['original_questions']);
+                    unset($cachedcontexts[$context['questionsattempted']]['questions']);
                     $cache->set('context', $cachedcontexts);
                 }
                 return $result;
@@ -84,19 +77,6 @@ class wb_middleware_runner {
 
         return $action($context);
     }
-
-    /**
-     * Unsets the given elements
-     * 
-     * This is usually done to not exhaust the memory.
-     * @param array $keys 
-     * @return void 
-     */
-    private static function removefromsavedcontext(array &$cachedcontext, array $keys) {
-        foreach ($keys as $key) {
-            unset($cachedcontext[$key]);
-        }
-    } 
 
     /**
      * Get last action.
