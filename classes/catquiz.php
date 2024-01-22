@@ -1648,7 +1648,7 @@ class catquiz {
         foreach ($personabilities as $catscaleid => $personability) {
             $i = 1;
 
-            $rolestudent = $DB->get_record('role', ['shortname' => 'student']);
+            $roleidstudent = $DB->get_record('role', array('shortname' => 'student'));
             $catscale = catscale::return_catscale_object($catscaleid);
 
             while (isset($quizsettings['feedback_scaleid_limit_lower_' . $catscaleid . '_'. $i])) {
@@ -1657,22 +1657,42 @@ class catquiz {
 
                 if ($personability >= $lowerlimit && $personability <= $upperlimit) {
                     $message = empty($quizsettings["enrolement_message_checkbox_" . $catscaleid . "_" . $i]) ? false : true;
-                    $groupstoenrole = $quizsettings['catquiz_group_' . $catscaleid . '_' . $i] ?? "";
-                    if (!empty($groupstoenrole)) {
-                        $groupsarray = explode(",", $groupstoenrole);
-                    } else {
-                        $groupsarray = [];
-                    }
+                    $groupstoenrole = $quizsettings['catquiz_groups_' . $catscaleid . '_' . $i] ?? [];
                     $coursestoenrole = $quizsettings['catquiz_courses_' . $catscaleid . '_' . $i] ?? [];
+                    foreach ($groupstoenrole as $groupid) {
+                        $groupmember = groups_add_member($groupid, $userid);
+                        if ($message) {
+                            $group = groups_get_group($groupid) ?? $groupid;
+                            $data = [];
+                            $data['groupname'] = $group->name;
+                            $data['groupdescription'] = $group->description;
+                            $data['catscalename'] = $catscale->name;
+                            if (!$groupmember) {
+                                // Array only contains groups where enrolement took place.
+                                unset($groupstoenrole[$groupid]);
+                                messages::send_message(
+                                    $userid,
+                                    get_string('enroledtogroupfailedtitle', 'local_catquiz', $data),
+                                    get_string('enroledtogroupfailedtext', 'local_catquiz', $data),
+                                    'enrolementfeedback');
+                            } else {
+                                messages::send_message(
+                                    $userid,
+                                    get_string('enroledtogrouptitle', 'local_catquiz', $data),
+                                    get_string('enroledtogrouptext', 'local_catquiz', $data),
+                                    'enrolementfeedback');
+                            }
+                        }
+                    };
                     foreach ($coursestoenrole as $courseid) {
                         $context = \context_course::instance($courseid);
                         $course = get_course($courseid);
                         $coursedata = [];
-                        $coursedata['coursename'] = $course->name ?? "";
-                        $coursedata['coursesummary'] = $course->summary ?? "";
-                        $coursedata['catscalename'] = $catscale->name ?? "";
+                        $coursedata['coursename'] = $course->name;
+                        $coursedata['coursesummary'] = $course->summary;
+                        $coursedata['catscalename'] = $catscale->name;
                         if (!is_enrolled($context, $userid)) {
-                            if (!enrol_try_internal_enrol($courseid, $userid, $rolestudent->id)) {
+                            if (!enrol_try_internal_enrol($courseid, $userid, $roleidstudent)) {
                                 // There's a problem.
                                 if ($message) {
                                     messages::send_message(
@@ -1689,43 +1709,13 @@ class catquiz {
                                     'enrolementfeedback');
                             }
                         }
-                        if (empty($groupsarray)) {
-                            continue;
-                        }
-                        // Inscription only for existing groups.
-                        $groupsofcourse = groups_get_all_groups($courseid);
-                        foreach ($groupsofcourse as $existinggroup) {
-                            foreach ($groupsarray as $newgroup) {
-                                if ($existinggroup->name == $newgroup) {
-                                    $groupmember = groups_add_member($existinggroup->id, $userid);
-                                    if ($message) {
-                                        $data = [];
-                                        $data['groupname'] = $newgroup;
-                                        $data['groupdescription'] = $existinggroup->description ?? "";
-                                        $data['catscalename'] = $catscale->name ?? "";
-                                        if (!$groupmember) {
-                                            // Something went wrong.
-                                            messages::send_message(
-                                                $userid,
-                                                get_string('enroledtogroupfailedtitle', 'local_catquiz', $data),
-                                                get_string('enroledtogroupfailedtext', 'local_catquiz', $data),
-                                                'enrolementfeedback');
-                                        } else {
-                                            messages::send_message(
-                                                $userid,
-                                                get_string('enroledtogrouptitle', 'local_catquiz', $data),
-                                                get_string('enroledtogrouptext', 'local_catquiz', $data),
-                                                'enrolementfeedback');
-                                        }
-                                    }
-                                }
-                            }
-                        }
                     }
                 }
                 $i++;
             }
         }
+
+
         return true;
     }
 }
