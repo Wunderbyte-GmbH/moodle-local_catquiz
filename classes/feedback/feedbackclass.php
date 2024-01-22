@@ -140,6 +140,12 @@ class feedbackclass {
             }
 
             for ($j = 1; $j <= $numberoffeedbackspersubscale; $j++) {
+                // We need to create a div tag to "wrap" feedback range.
+                $element = $mform->createElement('html',
+                '<div data-name="feedback_scale_' . $scale->name . '_range_' . $j. '" data-depth="' . $scale->depth . '" >');
+                $element->setName('feedback_scale_' . $scale->id . '_rangestart_' . $j);
+                $subelements[] = $mform->addElement($element);
+
                 // Check for each feedback editor field, if there is content.
                 // This is the preparation for the header element (to be appended in the end) where we apply the distinction.
 
@@ -294,6 +300,10 @@ class feedbackclass {
                     $mform->setDefault('enrolment_message_checkbox_' . $scale->id . '_'. $j, 1);
                 }
 
+                // Close of feedback range HTML tag element.
+                $element = $mform->createElement('html', '</div>');
+                $element->setName('feedback_scale_' . $scale->id . '_rangeend_' . $j);
+                $subelements[] = $mform->addElement($element);
             }
 
             // Add a header for each scale.
