@@ -33,6 +33,7 @@ use local_catquiz\teststrategy\feedbackgenerator\questionssummary;
 use local_catquiz\teststrategy\feedbacksettings;
 use local_catquiz\teststrategy\preselect_task\addscalestandarderror;
 use local_catquiz\teststrategy\preselect_task\filterbystandarderror;
+use local_catquiz\teststrategy\preselect_task\filterforsubscale;
 use local_catquiz\teststrategy\preselect_task\firstquestionselector;
 use local_catquiz\teststrategy\preselect_task\fisherinformation;
 use local_catquiz\teststrategy\preselect_task\lasttimeplayedpenalty;
@@ -42,7 +43,7 @@ use local_catquiz\teststrategy\preselect_task\mayberemovescale;
 use local_catquiz\teststrategy\preselect_task\noremainingquestions;
 use local_catquiz\teststrategy\preselect_task\remove_uncalculated;
 use local_catquiz\teststrategy\preselect_task\removeplayedquestions;
-use local_catquiz\teststrategy\preselect_task\strategydeficitscore;
+use local_catquiz\teststrategy\preselect_task\strategyfastestscore;
 use local_catquiz\teststrategy\preselect_task\updatepersonability;
 use local_catquiz\teststrategy\strategy;
 
@@ -89,7 +90,8 @@ class inferlowestskillgap extends strategy {
             // Keep only questions that are assigned to the subscale where the user has the lowest ability.
             addscalestandarderror::class,
             filterbystandarderror::class,
-            strategydeficitscore::class,
+            filterforsubscale::class,
+            strategyfastestscore::class,
         ];
     }
 

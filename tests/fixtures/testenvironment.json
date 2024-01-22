@@ -65,7 +65,7 @@
     "catquiz_pilotattemptsthreshold": 250,
     "catquiz_selectfirstquestion": "startwithcurrentability",
     "catquiz_selectteststrategy": "5",
-    "catquiz_standarderrorpersubscale": "35",
+    "catquiz_standarderrorpersubscale": "5",
     "catquiz_timepacedtest": "0",
     "choosetemplate": "0",
     "cmidnumber": "",
