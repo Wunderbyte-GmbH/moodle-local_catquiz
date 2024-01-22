@@ -69,18 +69,6 @@ class feedbackclass {
                 get_string('catquiz_feedbackheader', 'local_catquiz'));
         $mform->setExpanded('catquiz_feedback');
 
-        // phpcs:ignore Squiz.PHP.CommentedOutCode.Found, moodle.Commenting.InlineComment.NotCapital
-        // $scaleids = catscale::get_subscale_ids(0);
-
-        $courses = get_courses("all", "c.sortorder ASC", "c.id, c.fullname");
-        $coursesarray = [];
-        foreach ($courses as $course) {
-            if ($course->id == 1) {
-                continue;
-            }
-            $coursesarray[$course->id] = $course->fullname;
-        }
-
         $options = [
             'multiple' => true,
             'noselectionstring' => get_string('noselection', 'local_catquiz'),
@@ -475,53 +463,6 @@ class feedbackclass {
     }
 
     /**
-     * Takes the result of a test and applies the after test actions.
-     * Right now, it's just very limited.
-     * As we don't have the correct structure, we assume the following:
-     *
-     * @param int $quizid
-     * @param array $result
-     * @param string $component
-     * @return void
-     */
-    public static function inscribe_users_to_failed_scales(
-        int $quizid,
-        array $result,
-        string $component = 'mod_adaptivequiz'
-        ) {
-
-        global $USER;
-
-        // First, we need to find out the settings for the current text.
-        // We use a function to extract the data from the stored json.
-        $settings = self::return_feedback_settings_from_json($quizid, $component);
-
-        // We run through all the scales we got feedback for.
-        foreach ($result['scales'] as $scaleid => $scale) {
-
-            // If we find settings for a scale...
-            if (isset($settings[$scaleid])) {
-                // We check if we are below the lower threshhold.
-                $personability = $scale['personability'];
-                $lowerlimit = (float)$settings[$scaleid]['lowerlimit'];
-                $courseids = $settings[$scaleid]["courseids"];
-
-                if ($personability < $lowerlimit
-                    && !empty($courseids)) {
-
-                    // Do the course inscription of the current user.
-                    foreach ($courseids as $courseid) {
-
-                        self::enrol_user($USER->id, $courseid);
-                    }
-                }
-            }
-
-        }
-
-    }
-
-    /**
      * Function to access test record and return the settings relevant for feedback.
      * @param int $quizid
      * @param string $component
@@ -547,40 +488,6 @@ class feedbackclass {
         }
 
         return $returnarray;
-    }
-
-    /**
-     * Function to enrol user to course.
-     * @param int $userid
-     * @param int $courseid
-     * @param int $roleid
-     * @return void
-     * @throws coding_exception
-     * @throws dml_exception
-     * @throws ddl_exception
-     * @throws moodle_exception
-     */
-    public static function enrol_user(int $userid, int $courseid, int $roleid = 0) {
-        global $DB;
-
-        if (!enrol_is_enabled('manual')) {
-            return; // Manual enrolment not enabled.
-        }
-
-        if (!$enrol = enrol_get_plugin('manual')) {
-            return; // No manual enrolment plugin.
-        }
-        if (!$instances = $DB->get_records(
-                'enrol',
-                ['enrol' => 'manual', 'courseid' => $courseid, 'status' => ENROL_INSTANCE_ENABLED],
-                'sortorder,id ASC'
-            )) {
-            return; // No manual enrolment instance on this course.
-        }
-
-        $instance = reset($instances); // Use the first manual enrolment plugin in the course.
-
-        $enrol->enrol_user($instance, $userid, ($roleid > 0 ? $roleid : $instance->roleid));
     }
 
 
