@@ -95,12 +95,4 @@ class updatepersonability_testing extends updatepersonability {
         }
         return $itemparamlist;
     }
-
-    protected function get_initial_ability() {
-        return floatval(getenv('CATQUIZ_TESTING_ABILITY', true) ?: 0.00);
-    }
-
-    protected function get_initial_standarderror() {
-        return floatval(getenv('CATQUIZ_TESTING_STANDARDERROR', true) ?: 1.0);
-    }
 }

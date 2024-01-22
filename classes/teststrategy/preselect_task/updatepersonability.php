@@ -89,16 +89,6 @@ class updatepersonability extends preselect_task implements wb_middleware {
     private float $parentse;
 
     /**
-     * @var float $initialability Initial ability
-     */
-    protected float $initialability;
-
-    /**
-     * @var float $initialse Initial standard error
-     */
-    protected float $initialse;
-
-    /**
      * @var array $scalestoupdate
      */
     private array $scalestoupdate;
@@ -113,10 +103,8 @@ class updatepersonability extends preselect_task implements wb_middleware {
      *
      */
     public function run(array &$context, callable $next): result {
-        $this->initialability = $this->get_initial_ability();
-        $this->initialse = $this->get_initial_standarderror();
-        $this->parentability = $this->initialability;
-        $this->parentse = $this->initialse;
+        $this->parentability = $context['initial_ability'];
+        $this->parentse = $context['initial_se'];
         $this->lastquestion = $context['lastquestion'];
         // If we do not know the answer to the last question, we do not have to
         // update the person ability. Also, pilot questions should not be used
@@ -194,19 +182,16 @@ class updatepersonability extends preselect_task implements wb_middleware {
         }
         $this->diverseanswers[$catscaleid] = $this->has_sufficient_responses($arrayresponsesforscale);
 
-        $parentability = $context['person_ability'][$parentscale] ?? $this->initialability;
-        $startvalue = $context['person_ability'][$catscaleid] ?? $this->initialability;
+        $parentability = $context['person_ability'][$parentscale] ?? $context['initial_ability'];
+        $startvalue = $context['person_ability'][$catscaleid] ?? $context['initial_ability'];
         if ($parentscale && $this->diverseanswers[$parentscale] ?? false) {
             $startvalue = $parentability;
         }
 
-        $updatedability = catcalc::estimate_person_ability(
-            $this->arrayresponses,
-            $itemparamlist,
-            $startvalue,
-            $this->parentability,
-            $this->parentse
-        );
+        $mean = $this->parentability;
+        $sd = $this->parentse;
+
+        $updatedability = catcalc::estimate_person_ability($this->arrayresponses, $itemparamlist, $startvalue, $mean, $sd);
 
         if (is_nan($updatedability)) {
             // In a production environment, we can use fallback values. However,
@@ -444,49 +429,5 @@ class updatepersonability extends preselect_task implements wb_middleware {
             ? -5 * (1 - $fraction)
             : 5 * $fraction;
         return ($this->context['person_ability'][$catscaleid] + $max) / 2;
-    }
-
-    /**
-     * Returns the mean value that is used for the ability estimation.
-     *
-     * @return float
-     */
-    protected function get_initial_ability() {
-        // If we already have a value, use that one.
-        if ($abilitymainscale = $this->context['person_ability'][$this->context['catscaleid']]) {
-            return $abilitymainscale;
-        }
-        // If we already have more than 30 abilities for this test, get the mean from there.
-        if ($mean = $this->calculate_mean_from_past_attempts()) {
-            return $mean;
-        }
-        return 0.0;
-    }
-
-    /**
-     * Returns the standarderror value that is used for the ability estimation.
-     *
-     * @return float
-     */
-    protected function get_initial_standarderror() {
-        // If we already have a value, use that one.
-        if ($semainscale = $this->context['se'][$this->context['catscaleid']] ?? null) {
-            return $semainscale;
-        }
-        // If we already have more than 30 abilities for this test, get the standarderror from there.
-        if ($se = $this->calculate_se_from_past_attempts()) {
-            return $se;
-        }
-        return 1.0;
-    }
-
-    private function calculate_mean_from_past_attempts() {
-        // TODO: Implement.
-        return null;
-    }
-
-    private function calculate_se_from_past_attempts() {
-        // TODO: Implement.
-        return null;
     }
 }

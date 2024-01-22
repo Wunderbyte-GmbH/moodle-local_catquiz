@@ -80,6 +80,8 @@ class updatepersonability_test extends TestCase {
                     'lastquestion' => null,
                     'contextid' => 1,
                     'catscaleid' => 1,
+                    'initial_ability' => 0.02,
+                    'initial_se' => 2.97,
                 ],
             ],
             'is_pilot_question' => [
@@ -91,6 +93,8 @@ class updatepersonability_test extends TestCase {
                     'userid' => 1,
                     // Can be null here, because for pilot questions the ability will not be updated.
                     'fake_response_data' => [],
+                    'initial_ability' => 0.02,
+                    'initial_se' => 2.97,
                 ],
             ],
             'not_enough_responses' => [
@@ -132,6 +136,8 @@ class updatepersonability_test extends TestCase {
                             1 => ['difficulty' => 2.1],
                             2 => ['difficulty' => -1.4],
                     ],
+                    'initial_ability' => 0.02,
+                    'initial_se' => 2.97,
                 ],
             ],
             'has_enough_responses' => [
@@ -174,6 +180,8 @@ class updatepersonability_test extends TestCase {
                     ],
                     'questionsattempted' => 0,
                     'minimumquestions' => 10,
+                    'initial_ability' => 0.02,
+                    'initial_se' => 2.97,
                 ],
             ],
         ];
