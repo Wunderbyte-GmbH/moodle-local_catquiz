@@ -35,10 +35,6 @@
          'callback' => 'local_catquiz_observer::catscale_updated',
         ],
     [
-         'eventname' => '\mod_adaptivequiz\event\attempt_completed',
-         'callback' => 'local_catquiz_observer::attempt_completed',
-        ],
-    [
         'eventname' => '\core\event\question_deleted',
         'callback' => 'local_catquiz_observer::question_deleted',
         ],
