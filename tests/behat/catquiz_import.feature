@@ -24,7 +24,7 @@ Feature: As an admin I perform import of catquiz alonf with questions to check S
       | admin    | local/catquiz/tests/fixtures/mathematik2scales.csv | mathematik2scales.csv |
 
   @javascript
-  Scenario: Catscales import: admin imports catscales for already imported questions and verified it
+  Scenario: CatQuiz Import: admin imports catscales for already imported questions and verified it
     Given I log in as "admin"
     And I press "Catquiz"
     And I wait until the page is ready

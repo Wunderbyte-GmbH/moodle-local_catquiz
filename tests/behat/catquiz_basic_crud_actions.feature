@@ -19,7 +19,7 @@ Feature: As an admin I perform basic catquiz actions - create, update, delete, s
       | teacher  | C1     | editingteacher |
 
   @javascript
-  Scenario: Catscales management: admin create a catscale, edit it, subscribe, unsubscribe, delete
+  Scenario: CatQuiz Management: admin create a catscale, edit it, subscribe, unsubscribe, delete
     Given I log in as "admin"
     And I press "Catquiz"
     And I wait until the page is ready
@@ -63,7 +63,7 @@ Feature: As an admin I perform basic catquiz actions - create, update, delete, s
     Then I should see "Create" in the ".grid .list-group-item" "css_element"
 
   @javascript
-  Scenario: Catscales management: admin create a catscale wiht subitems than edit, subscribe, unsubscribe, delete subitem
+  Scenario: CatQuiz Management: admin create a catscale wiht subitems than edit, subscribe, unsubscribe, delete subitem
     Given I log in as "admin"
     And I press "Catquiz"
     And I wait until the page is ready
