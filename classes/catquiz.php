@@ -1646,7 +1646,7 @@ class catquiz {
 
         // Enrolement is applied according to test strategy.
         $personabilities = feedbacksettings::return_scales_according_to_strategy(
-            $quizsettings['catquiz_selecttesty'],
+            $quizsettings['catquiz_selectteststrategy'],
             $personabilities);
 
         foreach ($personabilities as $catscaleid => $personability) {
