@@ -205,4 +205,28 @@ class feedbacksettings {
         }
         return $colors;
     }
+
+
+    /**
+     * Return array with catscaleids and personabilites according to teststrategy.
+     *
+     * @param int $teststrategy
+     * @param array $personabilities
+     *
+     * @return array
+     */
+    public static function return_scales_according_to_strategy(int $teststrategy, array $personabilities): array {
+
+        switch ($teststrategy) {
+            case LOCAL_CATQUIZ_STRATEGY_LOWESTSUB:
+                $minscale = array_search(min($personabilities), $personabilities);
+                return [$minscale => $personabilities[$minscale]];
+            case LOCAL_CATQUIZ_STRATEGY_HIGHESTSUB:
+                $maxscale = array_search(max($personabilities), $personabilities);
+                return [$maxscale => $personabilities[$maxscale]];
+            default:
+            return $personabilities;
+        }
+    }
 }
+
