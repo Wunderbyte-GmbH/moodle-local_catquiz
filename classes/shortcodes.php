@@ -32,6 +32,8 @@ use local_catquiz\output\catscalemanager\quizattempts\quizattemptsdisplay;
 use local_catquiz\teststrategy\feedbacksettings;
 use context_course;
 
+defined('MOODLE_INTERNAL') || die();
+
 global $CFG;
 require_once($CFG->dirroot . '/local/catquiz/lib.php');
 
