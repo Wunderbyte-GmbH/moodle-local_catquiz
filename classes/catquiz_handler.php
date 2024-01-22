@@ -808,7 +808,6 @@ class catquiz_handler {
             'standarderrorpersubscale' => empty($quizsettings->catquiz_standarderrorpersubscale)
                 ? null
                 : ($quizsettings->catquiz_standarderrorpersubscale / 100),
-            'se_max' => 1.0, // TODO set via config
             // phpcs:disable
             // 'breakduration' => $quizsettings->catquiz_breakduration,
             // 'breakinfourl' => '/local/catquiz/breakinfo.php',
