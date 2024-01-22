@@ -78,7 +78,7 @@ class addscalestandarderror extends preselect_task implements wb_middleware {
         // Sort descending by fisher information. This way, we can calculate the
         // maximum test information TI per subscale when including only the
         // maximum amount of remining questions.
-        uasort($questions, fn ($q1, $q2) => $q2->fisherinformation[$q1->catscaleid] <=> $q1->fisherinformation[$q2->catscaleid]);
+        uasort($questions, fn ($q1, $q2) => $q2->fisherinformation <=> $q1->fisherinformation);
         $remainingperscale = [];
         $context['playedquestionsperscale'] = $this->getplayedquestionsperscale();
         $remainingperscale = $this->getnumberofremainingquestionsperscale();
@@ -102,10 +102,10 @@ class addscalestandarderror extends preselect_task implements wb_middleware {
                     $fisherinfoperscale[$scaleid] = [];
                 }
                 if (! array_key_exists($key, $fisherinfoperscale[$scaleid])) {
-                    $fisherinfoperscale[$scaleid][$key] = $q->fisherinformation[$scaleid];
+                    $fisherinfoperscale[$scaleid][$key] = $q->fisherinformation;
                     continue;
                 }
-                $fisherinfoperscale[$scaleid][$key] += $q->fisherinformation[$scaleid];
+                $fisherinfoperscale[$scaleid][$key] += $q->fisherinformation;
             }
         }
 

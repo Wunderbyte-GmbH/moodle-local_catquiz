@@ -203,8 +203,7 @@ class graphicalsummary extends feedbackgenerator {
             $graphicalsummary[$index - 1]['questionscale_name'] = catscale::return_catscale_object(
                 $lastquestion->catscaleid
             )->name;
-            $graphicalsummary[$index - 1]['fisherinformation'] = $lastquestion
-                ->fisherinformation[$initialcontext['catscaleid']] ?? null;
+            $graphicalsummary[$index - 1]['fisherinformation'] = $lastquestion->fisherinformation ?? null;
             $graphicalsummary[$index - 1]['score'] = $lastquestion->score ?? null;
             $before = null;
             $after = null;
