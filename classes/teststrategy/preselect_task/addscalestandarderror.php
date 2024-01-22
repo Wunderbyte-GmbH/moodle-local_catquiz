@@ -130,18 +130,7 @@ class addscalestandarderror extends preselect_task implements wb_middleware {
             $context['standarderrorperscale'][$catscaleid] = $standarderror;
         }
 
-        $cachedresponses = $cache->get('userresponses');
-        if (! $cachedresponses) {
-            // If we do not yet have a response, use a default value.
-            $default = $context['initial_standarderror'];
-            foreach (array_keys($context['person_ability']) as $scaleid) {
-                $context['se'][$scaleid] = $default;
-            }
-
-            return $next($context);
-        }
-
-        $userresponses = (new model_responses())->setdata($cachedresponses, false);
+        $userresponses = (new model_responses())->setdata($cache->get('userresponses'), false);
         foreach ($context['person_ability'] as $catscaleid => $ability) {
             $items = $userresponses->get_items_for_scale($catscaleid, $context['contextid']);
             $se = catscale::get_standarderror($ability, $items, INF);
@@ -162,7 +151,6 @@ class addscalestandarderror extends preselect_task implements wb_middleware {
             'questions',
             'original_questions',
             'has_fisherinformation',
-            'initial_standarderror',
         ];
     }
 

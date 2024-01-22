@@ -785,7 +785,6 @@ class catquiz_handler {
             'maximumquestions' => $maxquestions,
             'minimumquestions' => $quizsettings->catquiz_minquestions,
             'penalty_threshold' => 60 * 60 * 24 * 30 - 90, // TODO: make dynamic.
-            'initial_standarderror' => 1.0, // TODO: make configurable.
             /*
                  * After this time, the penalty for a question goes back to 0
                  * Currently, it is set to 30 days
