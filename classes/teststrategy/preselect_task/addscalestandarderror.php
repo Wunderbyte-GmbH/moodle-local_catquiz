@@ -27,7 +27,6 @@ namespace local_catquiz\teststrategy\preselect_task;
 use cache;
 use dml_exception;
 use local_catquiz\catscale;
-use local_catquiz\local\model\model_responses;
 use local_catquiz\local\result;
 use local_catquiz\local\status;
 use local_catquiz\teststrategy\preselect_task;
@@ -35,16 +34,6 @@ use local_catquiz\wb_middleware;
 
 /**
  * Calculates the standarderror for each available catscale.
- *
- * Note: adds two different arrays to the `$context`:
- *  1. 'standarderrorperscale[$scaleid]'
- *  2. 'se[$scaleid]'
- *
- * The value in 'standarderrorperscale' is based on the fisherinformation (FI)
- * in the root scale. I.e., it is derived from the person ability in the root
- * scale.
- * The value in 'se' is based on the FI and hence ability in the respective
- * (sub)scale.
  *
  * @package local_catquiz
  * @copyright 2023 Wunderbyte GmbH
@@ -128,13 +117,6 @@ class addscalestandarderror extends preselect_task implements wb_middleware {
             $standarderror['played'] = $fisherinfoplayed === 0 ? INF : (1 / sqrt($fisherinfoplayed));
             $standarderror['remaining'] = $fisherinfoall === 0 ? INF : (1 / sqrt($fisherinfoall));
             $context['standarderrorperscale'][$catscaleid] = $standarderror;
-        }
-
-        $userresponses = (new model_responses())->setdata($cache->get('userresponses'), false);
-        foreach ($context['person_ability'] as $catscaleid => $ability) {
-            $items = $userresponses->get_items_for_scale($catscaleid, $context['contextid']);
-            $se = catscale::get_standarderror($ability, $items, INF);
-            $context['se'][$catscaleid] = $se;
         }
 
         return $next($context);
