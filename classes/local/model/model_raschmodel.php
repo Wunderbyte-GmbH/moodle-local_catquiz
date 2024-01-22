@@ -311,25 +311,17 @@ abstract class model_raschmodel extends model_model implements catcalc_item_esti
         array $pp,
         float $ppmin,
         float $ppmax,
-        float $pptr = 3,
+        float $pptr,
         $mean = 0,
         float $sd = 1
     ): array {
-        if ($pp['ability'] < max($mean - ($pptr * $sd), $ppmin)) {
-            $pp['ability'] = max($mean - ($pptr * $sd), $ppmin);
+        if (($pp['ability'] - $mean) < max(- ($pptr * $sd), $ppmin)) {
+            $pp['ability'] = max(- ($pptr * $sd), $ppmin);
         }
-        if ($pp['ability'] > min($pptr * $sd + $mean, $ppmax)) {
-            $pp['ability'] = min($pptr * $sd + $mean, $ppmax);
+        if (($pp['ability'] - $mean) > min(($pptr * $sd), $ppmax)) {
+            $pp['ability'] = min(($pptr * $sd), $ppmax);
         }
 
         return $pp;
     }
 }
-
-// unit tests:
-// mean: 0, -2, 2
-// pptr: 3
-// SD: 2
-// 
-// ability: 10, -10
-// maximal-werte: [-5, 5]
