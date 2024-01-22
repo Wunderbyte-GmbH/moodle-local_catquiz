@@ -126,7 +126,7 @@ class debuginfo extends feedbackgenerator {
                 $rowarr[] =
                 "id: " . $lastquestion['id']
                 .", score: " . $score
-                .", fisherinformation in root scale: " . $fisherinformation
+                .", fisherinformation: " . $fisherinformation
                 .", lasttimeplayedpenalty: " . $lasttimeplayedpenalty
                 .", difficulty: " . $difficulty
                 .", fraction: " . $fraction;
@@ -156,7 +156,20 @@ class debuginfo extends feedbackgenerator {
             $rowarr[] = $row['updateabilityfallback'];
             $rowarr[] = $row['excludedsubscales'];
             $rowarr[] = $row['lastresponse'];
-            $rowarr[] = 'NA';
+            $se = $row['standarderrorperscale'];
+            if (! $se) {
+                $rowarr[] = 'NA';
+            } else {
+                // Sort scales by name.
+                uasort($se, fn($a, $b) => $a['name'] <=> $b['name']);
+                $seinfo = array_map(fn($se) => sprintf(
+                    "%s: [played: %f, remaining: %f]",
+                    $se['name'],
+                    $se['se']['played'],
+                    $se['se']['remaining']
+                ), $se);
+                $rowarr[] = implode(', ', $seinfo);
+            }
 
             $rowarr[] = $row['numquestionsperscale'] ?? 'NA';
             $csvstring .= implode(';', $rowarr).PHP_EOL;
@@ -292,8 +305,24 @@ class debuginfo extends feedbackgenerator {
                 ? $data['lastresponse']['fraction']
                 : "NA";
 
-            if ($data['lastquestion']) {
-                $data['lastquestion']->fisherinformation = $data['lastquestion']->fisherinformation[$data['catscaleid']] ?? 'NA';
+            $standarderrorperscale = [];
+            if (array_key_exists('standarderrorperscale', $data)) {
+                foreach ($data['standarderrorperscale'] as $scaleid => $standarderror) {
+                    // Convert INF to string so that the data can be json
+                    // encoded and saved to the DB.
+                    foreach (['played', 'remaining'] as $region) {
+                        if (is_infinite($standarderror[$region])) {
+                            $standarderror[$region] = "INF";
+                        }
+                    }
+                    $standarderrorperscale[] = [
+                        'name' => $catscales[$scaleid]->name,
+                        'se' => $standarderror,
+                    ];
+                }
+            }
+            if ($standarderrorperscale) {
+                $standarderrorperscale[array_key_last($standarderrorperscale)]['last'] = true;
             }
 
             $debuginfo[] = [
@@ -313,6 +342,7 @@ class debuginfo extends feedbackgenerator {
                 'updateabilityfallback' => $data['updateabilityfallback'],
                 'excludedsubscales' => implode(',', $data['excludedsubscales']),
                 'lastresponse' => $lastresponse,
+                'standarderrorperscale' => $standarderrorperscale,
                 'numquestionsperscale' => '"'
                     . implode(", ", array_map(fn ($entry) => $entry['name'].": ".$entry['num'], $questionsperscale)) . '"',
             ];

@@ -82,8 +82,8 @@ class classicalcat extends strategy {
             mayberemovescale::class,
             firstquestionselector::class,
             fisherinformation::class,
-            updatepersonability::class,
             addscalestandarderror::class,
+            updatepersonability::class,
             strategyclassicscore::class,
         ];
     }
