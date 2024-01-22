@@ -483,15 +483,16 @@ class model_item_param_list implements ArrayAccess, IteratorAggregate, Countable
         ]);
 
         if (!$scalerecord) {
-            $columnstoinclude = ['componentname', 'componentid', 'catscaleid', 'lastupdated'];
+            $columnstoinclude = ['componentname', 'componentid', 'catscaleid', 'lastupdated', 'status'];
             $recordforquery = $newrecord;
             foreach ($recordforquery as $key => $value) {
                 if (!in_array($key, $columnstoinclude, true)) {
                     unset($recordforquery[$key]);
                 }
                 // If no activity status is given, set to active by default.
-                $recordforquery["status"] = LOCAL_CATQUIZ_TESTITEM_STATUS_ACTIVE;
-
+                if ($key == "status" && empty($value)) {
+                    $recordforquery["status"] = 0;
+                }
                 if ($key == "lastupdated" && empty($value)) {
                     $recordforquery["lastupdated"] = time();
                 }
