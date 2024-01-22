@@ -566,7 +566,7 @@ class catquiz_handler {
                 'feedbackeditor_scaleid_',
                 'catquiz_group_',
                 'catquiz_courses_',
-                'enrolment_message_checkbox_',
+                'enrolement_message_checkbox_',
                 'feedbacklegend_scaleid_',
             ];
             // Fetch standard values from the parentscale, we want to apply to all subscales.

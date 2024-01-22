@@ -250,7 +250,7 @@ class feedbackclass {
                 $subelements[] = $mform->addElement('hidden', 'selectedcolour', '', PARAM_TEXT);
                 $PAGE->requires->js_call_amd('local_catquiz/colourpicker', 'init');
 
-                // Enrol to a group.
+                // Enrole to a group.
                 // Limit Courses - See GH-183.
                 $options = [
                     'multiple' => true,
@@ -271,21 +271,21 @@ class feedbackclass {
                 );
                 $mform->addHelpButton('catquiz_courses_' . $scale->id . '_' . $j, 'setcourseenrolmentforscale', 'local_catquiz');
 
-                // Enrol to a group.
+                // Enrole to a group.
 
                 $element = $mform->addElement(
                     'text',
                     'catquiz_group_' . $scale->id . '_'. $j,
                     get_string('setgrouprenrolmentforscale', 'local_catquiz')
                 );
-                $mform->addHelpButton('catquiz_group_' . $scale->id . '_' . $j, 'groupenrolmenthelptext', 'local_catquiz');
+                $mform->addHelpButton('catquiz_group_' . $scale->id . '_' . $j, 'groupenrolementhelptext', 'local_catquiz');
                 $subelements[] = $element;
 
                 // Checkbox messaging of groupselect and courseselect.
-                $subelements[] = $mform->addElement('advcheckbox', 'enrolment_message_checkbox_' . $scale->id . '_'. $j,
+                $subelements[] = $mform->addElement('advcheckbox', 'enrolement_message_checkbox_' . $scale->id . '_'. $j,
                 get_string('setautonitificationonenrolmentforscale', 'local_catquiz'), null, null, [0, 1]);
-                if (!optional_param('enrolment_message_checkbox_' . $scale->id . '_'. $j, 1, PARAM_INT)) {
-                    $mform->setDefault('enrolment_message_checkbox_' . $scale->id . '_'. $j, 1);
+                if (!optional_param('enrolement_message_checkbox_' . $scale->id . '_'. $j, 1, PARAM_INT)) {
+                    $mform->setDefault('enrolement_message_checkbox_' . $scale->id . '_'. $j, 1);
                 }
 
             }
