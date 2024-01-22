@@ -86,37 +86,30 @@ class filterforsubscale_test extends basic_testcase {
      * @return array
      */
     public static function provider():array {
-        $fisherinformation = [
-            1 => 1,
-            2 => 1,
-            3 => 1,
-            4 => 1,
-        ];
-
         $context['questions'] = [
             '1' => (object) [
                 'id' => 1,
                 'catscaleid' => 1,
                 'lasttimeplayedpenalty' => 1,
-                'fisherinformation' => $fisherinformation,
+                'fisherinformation' => 1,
             ],
             '2' => (object) [
                 'id' => 2,
                 'catscaleid' => 2,
                 'lasttimeplayedpenalty' => 1,
-                'fisherinformation' => $fisherinformation,
+                'fisherinformation' => 1,
             ],
             '3' => (object) [
                 'id' => 3,
                 'catscaleid' => 3,
                 'lasttimeplayedpenalty' => 1,
-                'fisherinformation' => $fisherinformation,
+                'fisherinformation' => 1,
             ],
             '4' => (object) [
                 'id' => 4,
                 'catscaleid' => 4,
                 'lasttimeplayedpenalty' => 1,
-                'fisherinformation' => $fisherinformation,
+                'fisherinformation' => 1,
             ],
         ];
         $context['person_ability'] = [
