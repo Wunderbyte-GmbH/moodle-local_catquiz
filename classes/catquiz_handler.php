@@ -507,7 +507,7 @@ class catquiz_handler {
     public static function set_data_after_definition(MoodleQuickForm &$mform) {
 
         $values = $mform->getSubmitValues();
-        $keepselectedtemplate = false;
+        $keepseletedtemplate = false;
 
         // Check if button was triggered to copy values.
         foreach ($values as $key => $value) {
@@ -611,7 +611,7 @@ class catquiz_handler {
                 }
             }
             // In this case, we keep the selected template.
-            $keepselectedtemplate = true;
+            $keepseletedtemplate = true;
         } else if (!isset($values["submitcattestoption"])
         || $values["submitcattestoption"] != "cattestsubmit") {
             return;
@@ -624,7 +624,7 @@ class catquiz_handler {
         $test = new testenvironment($cattest);
         $test->apply_jsonsaved_values($values);
 
-        if ($keepselectedtemplate === false) {
+        if ($keepseletedtemplate === false) {
             // We only want to unset the values when we change the template.
             $overridevalues = [
                 'testenvironment_addoredittemplate' => '0',
