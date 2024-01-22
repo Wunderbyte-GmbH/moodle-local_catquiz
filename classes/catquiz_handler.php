@@ -224,16 +224,16 @@ class catquiz_handler {
 
         $data = $mform->getSubmitValues();
 
+        // We don't need the parent scale.
+        $parentscale = array_shift($subscales);
+
         if (empty($subscales)) {
             return;
         }
 
-        // We don't need the parent scale.
-        $parentscale = array_shift($subscales);
-
         foreach ($subscales as $subscale) {
-            $subscaledefined = optional_param('catquiz_subscalecheckbox_' . $subscale->id, -1, PARAM_INT);
-            if ($subscaledefined === -1) {
+            if (!isset($data['catquiz_subscalecheckbox_' . $subscale->id])
+                && !isset($mform->_defaultValues['catquiz_subscalecheckbox_113'])) {
                 $_POST['catquiz_subscalecheckbox_' . $subscale->id] = "1";
             }
 
