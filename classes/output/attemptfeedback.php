@@ -158,6 +158,9 @@ class attemptfeedback implements renderable, templatable {
         ];
 
         $feedbackdata = $this->load_data_from_generators($generators, $context);
+        if (!$feedbackdata) {
+            return [];
+        }
 
         // If courses or groups are selected, User is enrolled to.
         catquiz::enrol_user($USER->id, (array)$cache->get('quizsettings'), (array)$cache->get('personabilities'));
@@ -260,7 +263,9 @@ class attemptfeedback implements renderable, templatable {
      *
      */
     private function generate_feedback(array $generators, array $feedbackdata): array {
-
+        if (!$feedbackdata) {
+            return [];
+        }
         foreach ($generators as $generator) {
             $feedback = $generator->get_feedback($feedbackdata);
             // Loop over studentfeedback and teacherfeedback.
