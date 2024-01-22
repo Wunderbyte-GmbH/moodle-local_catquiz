@@ -55,7 +55,7 @@ class filterbystandarderror extends preselect_task implements wb_middleware {
      */
     public function run(array &$context, callable $next): result {
         $cache = cache::make('local_catquiz', 'adaptivequizattempt');
-        $activescales = $cache->get('active_scales');
+        $activescales = $cache->get('active_scales') ?: [];
 
         $lastquestion = $this->context['lastquestion'];
         if (!$lastquestion) {
