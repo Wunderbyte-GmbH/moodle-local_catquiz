@@ -26,9 +26,7 @@
 namespace local_catquiz;
 
 use core\check\result;
-use core\output\notification;
 use dml_exception;
-use enrol_plugin;
 use local_catquiz\event\attempt_completed;
 use moodle_exception;
 use stdClass;
@@ -1630,92 +1628,5 @@ class catquiz {
 
         $records = $DB->get_records_sql($sql, $params);
         return $records;
-    }
-
-    /** Get all quizattempts corresponding to given params.
-     * @param int $userid
-     * @param array $quizsettings
-     * @param array $personabilities
-     *
-     * @return bool
-     */
-    public static function enrole_user(
-        int $userid,
-        array $quizsettings,
-        array $personabilities) {
-        global $DB;
-
-        foreach ($personabilities as $catscaleid => $personability) {
-            $i = 1;
-
-            $roleidstudent = $DB->get_record('role', array('shortname' => 'student'));
-            $catscale = catscale::return_catscale_object($catscaleid);
-
-            while (isset($quizsettings['feedback_scaleid_limit_lower_' . $catscaleid . '_'. $i])) {
-                $lowerlimit = $quizsettings['feedback_scaleid_limit_lower_' . $catscaleid . '_'. $i];
-                $upperlimit = $quizsettings['feedback_scaleid_limit_upper_' . $catscaleid . '_'. $i];
-
-                if ($personability >= $lowerlimit && $personability <= $upperlimit) {
-                    $message = empty($quizsettings["enrolement_message_checkbox_" . $catscaleid . "_" . $i]) ? false : true;
-                    $groupstoenrole = $quizsettings['catquiz_groups_' . $catscaleid . '_' . $i] ?? [];
-                    $coursestoenrole = $quizsettings['catquiz_courses_' . $catscaleid . '_' . $i] ?? [];
-                    foreach ($groupstoenrole as $groupid) {
-                        $groupmember = groups_add_member($groupid, $userid);
-                        if ($message) {
-                            $group = groups_get_group($groupid) ?? $groupid;
-                            $data = [];
-                            $data['groupname'] = $group->name;
-                            $data['groupdescription'] = $group->description;
-                            $data['catscalename'] = $catscale->name;
-                            if (!$groupmember) {
-                                // Array only contains groups where enrolement took place.
-                                unset($groupstoenrole[$groupid]);
-                                messages::send_message(
-                                    $userid,
-                                    get_string('enroledtogroupfailedtitle', 'local_catquiz', $data),
-                                    get_string('enroledtogroupfailedtext', 'local_catquiz', $data),
-                                    'enrolementfeedback');
-                            } else {
-                                messages::send_message(
-                                    $userid,
-                                    get_string('enroledtogrouptitle', 'local_catquiz', $data),
-                                    get_string('enroledtogrouptext', 'local_catquiz', $data),
-                                    'enrolementfeedback');
-                            }
-                        }
-                    };
-                    foreach ($coursestoenrole as $courseid) {
-                        $context = \context_course::instance($courseid);
-                        $course = get_course($courseid);
-                        $coursedata = [];
-                        $coursedata['coursename'] = $course->name;
-                        $coursedata['coursesummary'] = $course->summary;
-                        $coursedata['catscalename'] = $catscale->name;
-                        if (!is_enrolled($context, $userid)) {
-                            if (!enrol_try_internal_enrol($courseid, $userid, $roleidstudent)) {
-                                // There's a problem.
-                                if ($message) {
-                                    messages::send_message(
-                                        $userid,
-                                        get_string('enroledtocoursefailedtitle', 'local_catquiz'),
-                                        get_string('enroledtocoursefailedtext', 'local_catquiz', $coursedata),
-                                        'enrolementfeedback');
-                                }
-                            } else {
-                                messages::send_message(
-                                    $userid,
-                                    get_string('enroledtocoursetitle', 'local_catquiz'),
-                                    get_string('enroledtocoursetext', 'local_catquiz', $coursedata),
-                                    'enrolementfeedback');
-                            }
-                        }
-                    }
-                }
-                $i++;
-            }
-        }
-
-
-        return true;
     }
 }

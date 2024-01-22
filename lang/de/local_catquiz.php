@@ -208,15 +208,6 @@ $string['imported_testitem_description'] = 'Es wurden {$a} Frage(n) importiert.'
 $string['messageprovider:catscaleupdate'] = 'Benachrichtung über eine Aktualisierung einer Skala.';
 $string['catscaleupdatedtitle'] = 'Eine Skala wurde aktualisiert';
 $string['messageprovider:updatecatscale'] = 'Erhält Benachrichtungung über Einschreibung in Skala';
-$string['enroledtogroupfailedtitle'] = 'Einschreibung zu Gruppe "{$a->groupname}" fehlgeschlagen.';
-$string['enroledtogroupfailedtext'] = 'Aufgrund Ihrer Ergebnisse in der Skala "{$a->catscalename}", sollten Sie in Gruppe "{$a->groupname}" eingeschrieben werden. Einschreibung fehlgeschlagen. Möglicherweise sind Sie bereits Teil dieser Gruppe.';
-$string['enroledtogrouptitle'] = 'Sie wurden in Gruppe "{$a->groupname}" eingeschrieben';
-$string['enroledtogrouptext'] = 'Aufgrund Ihrer Ergebnisse in der Skala "{$a->catscalename}", wurden Sie in Gruppe "{$a->groupname}" eingeschrieben. Optionale Information zu Gruppe: "{$a->groupdescription}".';
-$string['enroledtocoursefailedtitle'] = 'Einschreibung in Kurs "{$a->coursename}" fehlgeschlagen.';
-$string['enroledtocoursefailedtext'] = 'Aufgrund Ihrer Ergebnisse in der Skala "{$a->catscalename}", sollten Sie in folgenden Kurs eingeschrieben werden: "{$a->coursename}". Einschreibung fehlgeschlagen. Möglicherweise sind Sie bereits Teil dieses Kurses.';
-$string['enroledtocoursetitle'] = 'Sie wurden in Kurs "{$a->coursename}" eingeschrieben.';
-$string['enroledtocoursetext'] = 'Aufgrund Ihrer Ergebnisse in der Skala "{$a->catscalename}", sind Sie nun in Kurs "{$a->coursename}" eingeschrieben. Optionale Information zu Kurs: "{$a->coursesummary}".';
-$string['messageprovider:enrolementfeedback'] = "Automatische Einschreibung zu Kursen und Gruppen.";
 
 // Access.
 $string['catquiz:canmanage'] = 'Darf Catquiz Plugin verwalten';
