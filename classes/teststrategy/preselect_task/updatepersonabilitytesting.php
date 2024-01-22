@@ -84,11 +84,12 @@ class updatepersonabilitytesting extends updatepersonability {
      *
      * @param mixed $a
      * @param mixed $b
+     * @param mixed $c
      *
      * @return mixed
      *
      */
-    protected function update_person_param($a, $b) {
+    protected function update_person_param($a, $b, $c) {
     }
 
     /**

@@ -340,9 +340,9 @@ class updatepersonability extends preselect_task implements wb_middleware {
      * @return mixed
      *
      */
-    protected function update_person_param($catscaleid, $updatedability) {
+    protected function update_person_param($context, $catscaleid, $updatedability) {
         catquiz::update_person_param(
-            $this->context['userid'],
+            $context['userid'],
             catscale::get_context_id($catscaleid),
             $catscaleid,
             $updatedability
