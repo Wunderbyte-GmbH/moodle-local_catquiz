@@ -287,6 +287,10 @@ class comparetotestaverage extends feedbackgenerator {
     private function generate_feedback(array $initialcontext, object $quizsettings): ?array {
         $personabilities = $initialcontext['personabilities'];
 
+        if (!$personabilities) {
+            return [];
+        }
+
         $personparams = catquiz::get_person_abilities(
             $initialcontext['contextid'],
             array_keys($personabilities)
