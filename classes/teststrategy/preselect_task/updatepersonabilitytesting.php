@@ -39,8 +39,33 @@ use local_catquiz\teststrategy\preselect_task\updatepersonability;
  * @copyright 2023 Wunderbyte GmbH
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class updatepersonability_testing extends updatepersonability {
+class updatepersonabilitytesting extends updatepersonability {
 
+    /**
+     * Load responses.
+     *
+     * @param mixed $context
+     *
+     * @return mixed
+     *
+     */
+    protected function load_responses($context) {
+        $responses = new model_responses();
+        $responses = $responses->setdata(
+            $context['fake_response_data']
+        );
+        return $responses;
+    }
+
+    /**
+     * Load cached responses.
+     *
+     * @return mixed
+     *
+     */
+    protected function load_cached_responses() {
+        return [];
+    }
 
     /**
      * Update cached responses.
@@ -51,9 +76,6 @@ class updatepersonability_testing extends updatepersonability {
      *
      */
     protected function update_cached_responses($context) {
-        if (!array_key_exists('fake_response_data', $context)) {
-            return parent::update_cached_responses($context);
-        }
         return (new model_responses())->setdata($context['fake_response_data']);
     }
 
@@ -67,9 +89,6 @@ class updatepersonability_testing extends updatepersonability {
      *
      */
     protected function update_person_param(int $a, float $b): void {
-        if (! array_key_exists('fake_item_params', $this->context)) {
-            parent::update_person_param($a, $b);
-        }
     }
 
     /**
@@ -82,11 +101,11 @@ class updatepersonability_testing extends updatepersonability {
      *
      */
     protected function get_item_param_list($responses, $catscaleid): model_item_param_list {
+        $itemparamlist = new model_item_param_list();
         if (! array_key_exists('fake_item_params', $this->context)) {
-            return parent::get_item_param_list($responses, $catscaleid);
+            return $itemparamlist;
         }
 
-        $itemparamlist = new model_item_param_list();
         foreach ($this->context['fake_item_params'] as $id => $values) {
             $itemparamlist->add(
                 (new model_item_param($id, 'raschbirnbauma'))
