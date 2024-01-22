@@ -72,13 +72,14 @@ class shortcodes {
             $userid = $USER->id;
         }
 
+        $courseid = optional_param('id', 0, PARAM_INT);
         $records = catquiz::return_attempt_and_contextid_from_attemptstable(
             intval($args['numberofattempts'] ?? 1),
             intval($args['instanceid'] ?? 0),
-            intval($args['courseid'] ?? 0),
+            intval($args['courseid'] ?? $courseid),
             intval($userid ?? -1)
             );
-        if (count($records) < 1) {
+        if (!$records) {
             return get_string('attemptfeedbacknotyetavailable', 'local_catquiz');
         }
         $output = [
