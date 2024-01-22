@@ -53,7 +53,7 @@ abstract class preselect_task implements wb_middleware {
 
     /**
      * The next task
-     *
+     *  
      * @var callable
      */
     protected $nexttask;
@@ -62,7 +62,7 @@ abstract class preselect_task implements wb_middleware {
      * Process test strategy
      *
      * @param array $context
-     * @param callable $nexttask
+     * @param callable $next
      *
      * @return result
      *
@@ -80,9 +80,6 @@ abstract class preselect_task implements wb_middleware {
         return $this->run($context, $nexttask);
     }
 
-    /**
-     * Call the next preselect task with $this->context
-     */
     public function next() {
         return ($this->nexttask)($this->context);
     }

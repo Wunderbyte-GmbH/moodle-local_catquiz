@@ -74,23 +74,9 @@ class updatepersonability extends preselect_task implements wb_middleware {
      */
     private array $diverseanswers = [];
 
-    /**
-     * @var float $parentability
-     *
-     * Used to temporarily store the ability of a parent scale.
-     */
-    private float $parentability;
+    private float $parent_ability;
+    private float $parent_se;
 
-    /**
-     * @var float $parentse
-     *
-     * Used to temporarily store the standard error of a parent scale.
-     */
-    private float $parentse;
-
-    /**
-     * @var array $scalestoupdate
-     */
     private array $scalestoupdate;
 
     /**
@@ -103,8 +89,8 @@ class updatepersonability extends preselect_task implements wb_middleware {
      *
      */
     public function run(array &$context, callable $next): result {
-        $this->parentability = $context['initial_ability'];
-        $this->parentse = $context['initial_se'];
+        $this->parent_ability = $context['initial_ability'];
+        $this->parent_se = $context['initial_se'];
         $this->lastquestion = $context['lastquestion'];
         // If we do not know the answer to the last question, we do not have to
         // update the person ability. Also, pilot questions should not be used
@@ -188,8 +174,8 @@ class updatepersonability extends preselect_task implements wb_middleware {
             $startvalue = $parentability;
         }
 
-        $mean = $this->parentability;
-        $sd = $this->parentse;
+        $mean = $this->parent_ability;
+        $sd = $this->parent_se;
 
         $updatedability = catcalc::estimate_person_ability($this->arrayresponses, $itemparamlist, $startvalue, $mean, $sd);
 
@@ -211,11 +197,26 @@ class updatepersonability extends preselect_task implements wb_middleware {
         }
 
         if ($this->diverseanswers[$catscaleid] ?? false) {
-            $this->parentability = $updatedability;
-            $this->parentse = catscale::get_standarderror($updatedability, $itemparamlist);
+            $this->parent_ability = $updatedability;
+            $this->parent_se = catscale::get_standarderror($updatedability, $itemparamlist);
         }
 
         $this->update_person_param($catscaleid, $updatedability);
+        $hasminimumquestions = $context['questionsattempted'] >= $context['minimumquestions'];
+        //$abilitynotchanged = abs($context['person_ability'][$catscaleid] - $updatedability) < self::UPDATE_THRESHOLD;
+        //// We do not exclude questions of ancestor scales if the person ability in such a scale did not change.
+        //if (! $isancestor && $hasminimumquestions && $abilitynotchanged) {
+        //    // The questions of this scale should be excluded in the remaining quiz attempt.
+        //    $context['questions'] = array_filter(
+        //        $context['questions'],
+        //        fn ($q) => $q->catscaleid !== $catscaleid
+        //    );
+        //    if (count($context['questions']) === 0) {
+        //        throw new \Exception(status::ABORT_PERSONABILITY_NOT_CHANGED);
+        //    }
+        //    $this->mark_subscale_as_removed($catscaleid);
+        //    $context['excludedsubscales'][] = $catscaleid;
+        //}
 
         $context['prev_ability'][$catscaleid] = $context['person_ability'][$catscaleid];
         $context['person_ability'][$catscaleid] = $updatedability;
@@ -232,6 +233,7 @@ class updatepersonability extends preselect_task implements wb_middleware {
             );
             // Exclude scales that will be updated anyway.
             $scales = array_filter($scales, fn ($s) => !in_array($s, $this->scalestoupdate));
+            
             foreach ($scales as $scale) {
                 // Exclude scales that have wrong and right answers.
                 $itemparamlist = $this->userresponses->get_items_for_scale(
@@ -251,13 +253,13 @@ class updatepersonability extends preselect_task implements wb_middleware {
                 if ($this->diverseanswers[$scale]) {
                     continue;
                 }
-                $startvalue = $this->context['person_ability'][$scale] ?? $this->parentability;
+                $startvalue = $this->context['person_ability'][$scale] ?? $this->parent_ability;
                 $ability = catcalc::estimate_person_ability(
                     $arrayresponsesforscale,
                     $itemparamlist,
                     $startvalue,
-                    $this->parentability,
-                    $this->parentse
+                    $this->parent_ability,
+                    $this->parent_se
                 );
 
                 if (catscale::return_catscale_object($scale)->name == 'SimA06') {
@@ -351,7 +353,7 @@ class updatepersonability extends preselect_task implements wb_middleware {
      * @return model_item_param_list
      *
      */
-    protected function get_item_param_list($responses, $catscaleid): model_item_param_list {
+    protected function get_item_param_list($responses, $catscaleid) {
         // We will update the person ability. Select the correct model for each item.
         $modelstrategy = new model_strategy($responses);
         $catscalecontext = catscale::get_context_id($catscaleid);
@@ -375,13 +377,14 @@ class updatepersonability extends preselect_task implements wb_middleware {
     /**
      * Update person param.
      *
-     * @param int $catscaleid
-     * @param float $updatedability
+     * @param mixed $context
+     * @param mixed $catscaleid
+     * @param mixed $updatedability
      *
-     * @return void
+     * @return mixed
      *
      */
-    protected function update_person_param(int $catscaleid, float $updatedability): void {
+    protected function update_person_param($catscaleid, $updatedability) {
         catquiz::update_person_param(
             $this->context['userid'],
             catscale::get_context_id($catscaleid),

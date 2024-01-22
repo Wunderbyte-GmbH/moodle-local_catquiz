@@ -157,7 +157,7 @@ class catscale_test extends basic_testcase {
      * @param model_item_param_list $remainingitems
      * @param int $remaining
      * @param float $expected
-     * @dataProvider testpotential_returns_expected_value_provider
+     * @dataProvider testpotential_returns_expected_value
      */
     public function test_testpotential_returns_expected_value(
         float $ability,
@@ -169,12 +169,7 @@ class catscale_test extends basic_testcase {
         $this->assertEqualsWithDelta($expected, $tp, 0.01);
     }
 
-    /**
-     * Checks if the testpotential function works as expected
-     *
-     * @return array
-     */
-    public static function testpotential_returns_expected_value_provider(): array {
+    public static function testpotential_returns_expected_value() {
         global $CFG;
         global $items;
         if (! defined('TEST_ITEMS')) {
@@ -246,19 +241,14 @@ class catscale_test extends basic_testcase {
      * @param model_item_param_list $items
      * @param float $expected
      *
-     * @dataProvider testinformation_returns_expected_value_provider
+     * @dataProvider testinformation_returns_expected_value
      */
     public function test_testinformation_returns_expected_value(float $ability, model_item_param_list $items, float $expected) {
         $ti = catscale::get_testinformation($ability, $items);
         $this->assertEqualsWithDelta($expected, $ti, 0.01);
     }
 
-    /**
-     * Checks if the testinformation is calculated correctly
-     *
-     * @return array
-     */
-    public static function testinformation_returns_expected_value_provider(): array {
+    public static function testinformation_returns_expected_value() {
         global $CFG;
         global $items;
         if (! defined('TEST_ITEMS')) {
@@ -302,15 +292,7 @@ class catscale_test extends basic_testcase {
         ];
     }
 
-    /**
-     * Internal function to create an item list
-     *
-     * @param array $itemvalues
-     * @param string $model
-     *
-     * @return model_item_param_list
-     */
-    private static function builditemlist(array $itemvalues, string $model = 'raschbirnbaumb'): model_item_param_list {
+    private static function builditemlist(array $itemvalues, string $model = 'raschbirnbaumb') {
         $items = new model_item_param_list();
         foreach ($itemvalues as $label => $params) {
                 $items->add(

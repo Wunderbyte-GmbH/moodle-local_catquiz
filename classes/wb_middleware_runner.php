@@ -87,18 +87,16 @@ class wb_middleware_runner {
 
     /**
      * Unsets the given elements
-     *
+     * 
      * This is usually done to not exhaust the memory.
-     * @param array $cachedcontext
-     * @param array $keys
-     *
-     * @return void
+     * @param array $keys 
+     * @return void 
      */
-    private static function removefromsavedcontext(array &$cachedcontext, array $keys): void {
+    private static function removefromsavedcontext(array &$cachedcontext, array $keys) {
         foreach ($keys as $key) {
             unset($cachedcontext[$key]);
         }
-    }
+    } 
 
     /**
      * Get last action.

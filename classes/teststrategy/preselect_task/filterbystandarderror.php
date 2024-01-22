@@ -29,12 +29,11 @@ use local_catquiz\catquiz;
 use local_catquiz\catscale;
 use local_catquiz\local\model\model_item_param_list;
 use local_catquiz\local\result;
+use local_catquiz\local\status;
 use local_catquiz\teststrategy\preselect_task;
 use local_catquiz\wb_middleware;
 
 /**
- * Includes or excludes scales based on their information
- *
  * Modifies the $context['active_scales'] content depending on whether a scale
  * should be included or excluded.
  *
@@ -75,12 +74,12 @@ class filterbystandarderror extends preselect_task implements wb_middleware {
                 $this->context['playedquestionsperscale'][$scaleid]
             );
 
-            $hasmaxitems = $this->context['max_attempts_per_scale'] !== -1
+            $has_maxitems = $this->context['max_attempts_per_scale'] !== -1
                 && count($playeditems) >= $this->context['max_attempts_per_scale'];
-            $hasminse = $this->context['se'][$scaleid] <= $this->context['se_min'];
-            $abilitydeltabelow = isset($context['prev_ability'][$scaleid])
-                && abs($context['prev_ability'][$scaleid] - $context['person_ability'][$scaleid]) <= 0.1; // TODO configure.
-            $drop = $hasmaxitems || ($hasminse && $abilitydeltabelow);
+            $has_min_se = $this->context['se'][$scaleid] <= $this->context['se_min'];
+            $ability_delta_below = isset($context['prev_ability'][$scaleid])
+                && abs($context['prev_ability'][$scaleid] - $context['person_ability'][$scaleid]) <= 0.1; // TODO configure
+            $drop = $has_maxitems || ($has_min_se && $ability_delta_below);
             if ($drop && !in_array($scaleid, $activescales)) {
                 continue;
             }
@@ -109,30 +108,21 @@ class filterbystandarderror extends preselect_task implements wb_middleware {
             );
 
             if ($drop) {
-                getenv('CATQUIZ_CREATE_TESTOUTPUT') && printf(
-                    "drop %s%s",
-                    (catscale::return_catscale_object($scaleid))->name, PHP_EOL
-                );
+                getenv('CATQUIZ_CREATE_TESTOUTPUT') && printf("drop %s%s", (catscale::return_catscale_object($scaleid))->name, PHP_EOL);
                 unset($activescales[array_search($scaleid, $activescales)]);
                 // TODO subscales inherit values.
-                $inheritscales = array_filter(
-                    array_keys(catscale::get_next_level_subscales_ids_from_parent([$scaleid])),
-                    fn ($id) => $this->context['person_ability'][$id] === 0.0
-                );
-                $inheritval = $this->context['person_ability'][$scaleid] - $this->context['se'][$scaleid];
+                $inherit_scales = array_filter(array_keys(catscale::get_next_level_subscales_ids_from_parent([$scaleid])), fn ($id) => $this->context['person_ability'][$id] === 0.0);
+                $inherit_val = $this->context['person_ability'][$scaleid] - $this->context['se'][$scaleid];
                 $fisherinformation = new fisherinformation();
-                foreach ($inheritscales as $subscaleid) {
+                foreach ($inherit_scales as $subscaleid) {
                     catquiz::update_person_param(
                         $this->context['userid'],
                         $this->context['contextid'],
                         $subscaleid,
-                        $inheritval
+                        $inherit_val
                     );
-                    getenv('CATQUIZ_CREATE_TESTOUTPUT') && printf(
-                        "inhere %s%s",
-                        (catscale::return_catscale_object($subscaleid))->name, PHP_EOL
-                    );
-                    $this->context['person_ability'][$subscaleid] = $inheritval;
+                    getenv('CATQUIZ_CREATE_TESTOUTPUT') && printf("inhere %s%s", (catscale::return_catscale_object($subscaleid))->name, PHP_EOL);
+                    $this->context['person_ability'][$subscaleid] = $inherit_val;
                     // Now we need to update the fisher information for all questions of that scale.
                     foreach ($this->context['questions'] as $q) {
                         if (!array_key_exists($q->model, $this->context['installed_models'])) {
@@ -141,23 +131,21 @@ class filterbystandarderror extends preselect_task implements wb_middleware {
                         $model = $this->context['installed_models'][$q->model];
                         $q->fisherinformation[$subscaleid] = $fisherinformation->get_fisherinformation(
                             $q,
-                            $inheritval,
+                            $inherit_val,
                             $model
                         );
                     }
 
-                    // Check if it should be enabled.
+                    // Check if it should be enabled
                     $testpotential = catscale::get_testpotential(
-                        $inheritval,
+                        $inherit_val,
                         model_item_param_list::from_array($this->context['questionsperscale'][$subscaleid]),
                         count($this->context['questionsperscale'][$subscaleid])
                     );
                     if ($testpotential > 1 / $this->context['se_max'] ** 2) {
-                        // Enable the scale.
+                        // enable
                         $activescales[] = $subscaleid;
-                        getenv('CATQUIZ_CREATE_TESTOUTPUT') && printf(
-                            "enact %s%s", (catscale::return_catscale_object($subscaleid))->name, PHP_EOL
-                        );
+                        getenv('CATQUIZ_CREATE_TESTOUTPUT') && printf("enact %s%s", (catscale::return_catscale_object($subscaleid))->name, PHP_EOL);
                     }
                 }
                 continue;
@@ -166,15 +154,11 @@ class filterbystandarderror extends preselect_task implements wb_middleware {
             $exclude = $testpotential + $testinformation <= 1 / $this->context['se_max'] ** 2;
             if ($exclude && in_array($scaleid, $activescales)) {
                 unset($activescales[array_search($scaleid, $activescales)]);
-                getenv('CATQUIZ_CREATE_TESTOUTPUT') && printf(
-                    "deact %s%s", (catscale::return_catscale_object($scaleid))->name, PHP_EOL
-                );
+                getenv('CATQUIZ_CREATE_TESTOUTPUT') && printf("deact %s%s", (catscale::return_catscale_object($scaleid))->name, PHP_EOL);
             }
             if (!$exclude && !in_array($scaleid, $activescales)) {
                 $activescales[] = $scaleid;
-                getenv('CATQUIZ_CREATE_TESTOUTPUT') && printf(
-                    "enact %s%s", (catscale::return_catscale_object($scaleid))->name, PHP_EOL
-                );
+                getenv('CATQUIZ_CREATE_TESTOUTPUT') && printf("enact %s%s", (catscale::return_catscale_object($scaleid))->name, PHP_EOL);
             }
 
         }
@@ -195,7 +179,7 @@ class filterbystandarderror extends preselect_task implements wb_middleware {
         return [
             'questions',
             'playedquestionsperscale',
-            'se_max',
+            'se_max'
         ];
     }
 

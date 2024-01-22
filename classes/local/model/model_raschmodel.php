@@ -325,3 +325,11 @@ abstract class model_raschmodel extends model_model implements catcalc_item_esti
         return $pp;
     }
 }
+
+// unit tests:
+// mean: 0, -2, 2
+// pptr: 3
+// SD: 2
+// 
+// ability: 10, -10
+// maximal-werte: [-5, 5]
