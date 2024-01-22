@@ -109,8 +109,7 @@ class personability_loader implements contextloaderinterface {
             $context['contextid'],
             $catscaleids,
             $context['userid']
-        ) ?: [];
-
+        );
         // Index by catscale ID.
         $filteredparams = [];
         foreach (array_filter($personparams, fn ($pp) => in_array($pp->catscaleid, $catscaleids)) as $pp) {
