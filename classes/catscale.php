@@ -84,10 +84,7 @@ class catscale {
         if ($catscale = $cache->get($catscaleid)) {
             return $catscale;
         }
-        $catscale = $DB->get_record('local_catquiz_catscales', ['id' => $catscaleid]);
-        if (! $catscale) {
-            throw new \Exception(sprintf('Could not find a scale with ID %s', $catscaleid));
-        }
+        $catscale = $DB->get_record('local_catquiz_catscales', ['id' => $catscaleid]) ?: null;
         $cache->set($catscaleid, $catscale);
         return $catscale;
     }
@@ -145,16 +142,18 @@ class catscale {
      */
     public static function return_default_contextid_of_catscale(int $catscaleid) {
 
-        try {
-            $catscale = self::return_catscale_object($catscaleid);
-            if (isset($catscale->contextid)) {
-                return intval($catscale->contextid);
-            } else {
-                return null;
-            }
-        } catch (\Exception $e) {
+        $catscale = self::return_catscale_object($catscaleid);
+        if (!empty($catscale) && isset($catscale->contextid)) {
+            return intval($catscale->contextid);
+        } else {
             return null;
         }
+
+        $catscale = self::return_catscale_object($catscaleid);
+        if (!$catscale) {
+            return null;
+        }
+        return $catscale->contextid;
     }
 
     /**
@@ -568,19 +567,18 @@ class catscale {
      */
     public static function get_link_to_catscale(int $catscaleid, $url = '/local/catquiz/manage_catscales.php') {
 
-        try {
-            $catscale = self::return_catscale_object($catscaleid);
-            if (!empty($catscale->name)) {
-                $catscalename = $catscale->name;
+        $catscale = self::return_catscale_object($catscaleid);
+        if (!empty($catscale->name)) {
+            $catscalename = $catscale->name;
 
-                $url = new moodle_url($url, ['scaleid' => $catscaleid], 'lcq_catscales');
-                $linktoscale = html_writer::link($url, $catscalename);
+            $url = new moodle_url($url, ['scaleid' => $catscaleid], 'lcq_catscales');
+            $linktoscale = html_writer::link($url, $catscalename);
 
-                return $linktoscale;
-            }
-        } catch (\Exception $e) {
+            return $linktoscale;
+        } else {
             return get_string("deletedcatscale", "local_catquiz");
         }
+
     }
 
     /**
