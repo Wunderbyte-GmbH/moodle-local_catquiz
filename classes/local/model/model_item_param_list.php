@@ -489,7 +489,7 @@ class model_item_param_list implements ArrayAccess, IteratorAggregate, Countable
                 if (!in_array($key, $columnstoinclude, true)) {
                     unset($recordforquery[$key]);
                 }
-                // Default value for status is active.
+                // If no activity status is given, set to active by default.
                 $recordforquery["status"] = LOCAL_CATQUIZ_TESTITEM_STATUS_ACTIVE;
 
                 if ($key == "lastupdated" && empty($value)) {

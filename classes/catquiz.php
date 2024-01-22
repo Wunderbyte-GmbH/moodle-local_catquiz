@@ -1647,11 +1647,7 @@ class catquiz {
             $i = 1;
 
             $rolestudent = $DB->get_record('role', ['shortname' => 'student']);
-            try {
-                $catscale = catscale::return_catscale_object($catscaleid);
-            } catch (\Exception $e) {
-                $catscale = (object) ['name' => '']; // Create a dummy object.
-            }
+            $catscale = catscale::return_catscale_object($catscaleid);
 
             while (isset($quizsettings['feedback_scaleid_limit_lower_' . $catscaleid . '_'. $i])) {
                 $lowerlimit = $quizsettings['feedback_scaleid_limit_lower_' . $catscaleid . '_'. $i];
