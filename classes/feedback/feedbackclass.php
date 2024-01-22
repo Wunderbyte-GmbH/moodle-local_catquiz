@@ -278,6 +278,7 @@ class feedbackclass {
                     'catquiz_group_' . $scale->id . '_'. $j,
                     get_string('setgrouprenrolmentforscale', 'local_catquiz')
                 );
+                // $element->setType('catquiz_group_' . $scale->id . '_'. $j, PARAM_TEXT);
                 $mform->addHelpButton('catquiz_group_' . $scale->id . '_' . $j, 'groupenrolementhelptext', 'local_catquiz');
                 $subelements[] = $element;
 
