@@ -77,7 +77,7 @@ class filterbystandarderror extends preselect_task implements wb_middleware {
 
             $hasmaxitems = $this->context['max_attempts_per_scale'] !== -1
                 && count($playeditems) >= $this->context['max_attempts_per_scale'];
-            $hasminse = $this->context['se'][$scaleid] <= $this->context['standarderrorpersubscale'];
+            $hasminse = $this->context['se'][$scaleid] <= $this->context['se_min'];
             $abilitydeltabelow = isset($context['prev_ability'][$scaleid])
                 && abs($context['prev_ability'][$scaleid] - $context['person_ability'][$scaleid]) <= 0.1; // TODO configure.
             $drop = $hasmaxitems || ($hasminse && $abilitydeltabelow);
