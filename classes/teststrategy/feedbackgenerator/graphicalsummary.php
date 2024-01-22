@@ -109,8 +109,8 @@ class graphicalsummary extends feedbackgenerator {
         $data['strategyname'] = $feedbackdata['teststrategyname'] ?? "";
         $data['table'] = $table ?? "";
 
-        $data['attemptscounterchart'] = $participationcharts['attemptscounterchart']['chart'];
-        $data['attemptresultstackchart'] = $participationcharts['attemptresultstackchart']['chart'];
+        $data['attemptscounterchart'] = $participationcharts['attemptscounterchart']['chart'] ?? "";
+        $data['attemptresultstackchart'] = $participationcharts['attemptresultstackchart']['chart'] ?? "";
 
         $feedback = $OUTPUT->render_from_template(
             'local_catquiz/feedback/graphicalsummary',
