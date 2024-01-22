@@ -33,12 +33,8 @@ class behat_local_catquiz_generator extends behat_generator_base {
         return [
             'questions' => [
                 'datagenerator' => 'catquiz_questions',
-                'required' => ['filepath', 'filename', 'course'],
-                'switchids' => ['course' => 'courseid'],
-            ],
-            'importedcatscales' => [
-                'datagenerator' => 'catquiz_importedcatscales',
-                'required' => ['filepath', 'filename'],
+                'required' => ['user', 'filepath', 'filename', 'course'],
+                'switchids' => ['user' => 'userid', 'course' => 'courseid'],
             ],
         ];
     }

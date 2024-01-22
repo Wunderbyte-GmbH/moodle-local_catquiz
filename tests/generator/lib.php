@@ -14,8 +14,6 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
-use local_catquiz\importer\testitemimporter;
-
 defined('MOODLE_INTERNAL') || die();
 
 require_once($CFG->dirroot . '/question/format/xml/format.php');
@@ -31,14 +29,16 @@ require_once($CFG->dirroot . '/question/format/xml/format.php');
 class local_catquiz_generator extends testing_module_generator {
 
     /**
-     * Create course questions by importing from Moodle XML file.
+     * Create content in the given user's private files.
      *
      * @param array $data
      * @return void
      */
     public function create_catquiz_questions(array $data) {
-        global $CFG;
+        global $CFG, $DB;
 
+        $userid = $data['userid'];
+        $fs = get_file_storage();
         $filepath = "{$CFG->dirroot}/{$data['filepath']}";
 
         if (!file_exists($filepath)) {
@@ -71,24 +71,5 @@ class local_catquiz_generator extends testing_module_generator {
         if (!$qformat->importpostprocess()) {
             throw new moodle_exception('Cannot import {$filepath} (postprocessing)', '', '');
         }
-    }
-
-    /**
-     * Create catscale structure by importing from CSV file.
-     *
-     * @param array $data
-     * @return void
-     */
-    public function create_catquiz_importedcatscales(array $data) {
-        $importer = new testitemimporter();
-        $content = file_get_contents(__DIR__ . '/../fixtures/' . $data['filename']);
-        $importer->execute_testitems_csv_import(
-            (object) [
-                'delimiter_name' => 'semicolon',
-                'encoding' => null,
-                'dateparseformat' => null,
-            ],
-            $content
-        );
     }
 }
