@@ -208,7 +208,8 @@ $string['imported_testitem_description'] = '{$a} testitems were imported.';
 // Message.
 $string['messageprovider:catscaleupdate'] = 'Notification of CAT scale update';
 $string['catscaleupdatedtitle'] = 'A CAT scale was updated';
-$string['messageprovider:updatecatscale'] = 'Recieves notification on subscrition of catscale';
+$string['catscaleupdatedbody'] = 'A CAT scale was updated. TODO: more description.';
+$string['messageprovider:updatecatscale'] = 'Is allowed to update catscale';
 
 // Access.php.
 $string['catquiz:canmanage'] = 'Is allowed to manage Catquiz plugin';
