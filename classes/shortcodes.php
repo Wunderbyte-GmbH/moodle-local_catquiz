@@ -32,6 +32,9 @@ use local_catquiz\output\catscalemanager\quizattempts\quizattemptsdisplay;
 use local_catquiz\teststrategy\feedbacksettings;
 use context_course;
 
+global $CFG;
+require_once($CFG->dirroot . '/local/catquiz/lib.php');
+
 /**
  * Deals with local_shortcodes regarding catquiz.
  */
