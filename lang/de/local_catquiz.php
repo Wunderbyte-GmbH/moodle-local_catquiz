@@ -386,7 +386,7 @@ $string['emptyfirstquestionlist'] = "Kann keine Startfrage wählen da die Liste 
 
 // Quiz Feedback.
 $string['attemptfeedbacknotavailable'] = "Kein Feedback verfügbar";
-$string['attemptfeedbacknotyetavailable'] = "Feedback wird angezeigt sobald es verfügbar ist.";
+$string['attemptfeedbacknotyetavailable'] = "Feedback wird angezeigt, sobald es verfügbar ist.";
 $string['allquestionsincorrect'] = "Genauer Fähigkeits-Score kann nicht ermittelt werden, da alle Fragen falsch beantwortet wurden.";
 $string['allquestionscorrect'] = "Genauer Fähigkeits-Score kann nicht ermittelt werden, da alle Fragen richtig beantwortet wurden.";
 $string['feedbackcomparetoaverage'] = 'Sie sind besser in {$a->scaleinfo} als {$a->quantile}% aller Teilnehmenden.';
