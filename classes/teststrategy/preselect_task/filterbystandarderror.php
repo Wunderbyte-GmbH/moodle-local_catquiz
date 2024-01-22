@@ -108,7 +108,7 @@ class filterbystandarderror extends preselect_task implements wb_middleware {
             );
 
             if ($drop) {
-                getenv('CATQUIZ_CREATE_TESTOUTPUT') && printf("drop %s%s", (catscale::return_catscale_object($scaleid))->name, PHP_EOL);
+                echo "drop " . (catscale::return_catscale_object($scaleid))->name . PHP_EOL;
                 unset($activescales[array_search($scaleid, $activescales)]);
                 // TODO subscales inherit values.
                 $inherit_scales = array_filter(array_keys(catscale::get_next_level_subscales_ids_from_parent([$scaleid])), fn ($id) => $this->context['person_ability'][$id] === 0.0);
@@ -121,7 +121,7 @@ class filterbystandarderror extends preselect_task implements wb_middleware {
                         $subscaleid,
                         $inherit_val
                     );
-                    getenv('CATQUIZ_CREATE_TESTOUTPUT') && printf("inhere %s%s", (catscale::return_catscale_object($subscaleid))->name, PHP_EOL);
+                    echo "inhere " . (catscale::return_catscale_object($subscaleid))->name . PHP_EOL;
                     $this->context['person_ability'][$subscaleid] = $inherit_val;
                     // Now we need to update the fisher information for all questions of that scale.
                     foreach ($this->context['questions'] as $q) {
@@ -145,7 +145,7 @@ class filterbystandarderror extends preselect_task implements wb_middleware {
                     if ($testpotential > 1 / $this->context['se_max'] ** 2) {
                         // enable
                         $activescales[] = $subscaleid;
-                        getenv('CATQUIZ_CREATE_TESTOUTPUT') && printf("enact %s%s", (catscale::return_catscale_object($subscaleid))->name, PHP_EOL);
+                        echo "enact " . (catscale::return_catscale_object($subscaleid))->name . PHP_EOL;
                     }
                 }
                 continue;
@@ -154,11 +154,11 @@ class filterbystandarderror extends preselect_task implements wb_middleware {
             $exclude = $testpotential + $testinformation <= 1 / $this->context['se_max'] ** 2;
             if ($exclude && in_array($scaleid, $activescales)) {
                 unset($activescales[array_search($scaleid, $activescales)]);
-                getenv('CATQUIZ_CREATE_TESTOUTPUT') && printf("deact %s%s", (catscale::return_catscale_object($scaleid))->name, PHP_EOL);
+                echo "deact " . (catscale::return_catscale_object($scaleid))->name . PHP_EOL;
             }
             if (!$exclude && !in_array($scaleid, $activescales)) {
                 $activescales[] = $scaleid;
-                getenv('CATQUIZ_CREATE_TESTOUTPUT') && printf("enact %s%s", (catscale::return_catscale_object($scaleid))->name, PHP_EOL);
+                echo "enact " . (catscale::return_catscale_object($scaleid))->name . PHP_EOL;
             }
 
         }
