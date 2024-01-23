@@ -75,8 +75,9 @@ class inferlowestskillgap extends strategy {
      */
     public function get_preselecttasks(): array {
         return [
-            maximumquestionscheck::class, // Cancel quiz attempt if we reached maximum of questions.
             updatepersonability::class,
+            addscalestandarderror::class,
+            maximumquestionscheck::class, // Cancel quiz attempt if we reached maximum of questions.
             removeplayedquestions::class,
             noremainingquestions::class,
             fisherinformation::class, // Add the fisher information to each question.
@@ -86,8 +87,6 @@ class inferlowestskillgap extends strategy {
             maybe_return_pilot::class,
             remove_uncalculated::class, // Remove items that do not have item parameters.
             noremainingquestions::class, // Cancel quiz attempt if no questions are left.
-            // Keep only questions that are assigned to the subscale where the user has the lowest ability.
-            addscalestandarderror::class,
             filterbystandarderror::class,
             strategydeficitscore::class,
         ];

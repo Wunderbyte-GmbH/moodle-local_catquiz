@@ -75,8 +75,9 @@ class inferallsubscales extends strategy {
      */
     public function get_preselecttasks(): array {
         return [
-            maximumquestionscheck::class, // Cancel quiz attempt if we reached maximum of questions.
             updatepersonability::class,
+            addscalestandarderror::class,
+            maximumquestionscheck::class, // Cancel quiz attempt if we reached maximum of questions.
             removeplayedquestions::class,
             noremainingquestions::class,
             fisherinformation::class, // Add the fisher information to each question.
@@ -85,7 +86,6 @@ class inferallsubscales extends strategy {
             mayberemovescale::class, // Remove questions from excluded subscales.
             maybe_return_pilot::class,
             remove_uncalculated::class, // Remove items that do not have item parameters.
-            addscalestandarderror::class,
             filterbystandarderror::class,
             noremainingquestions::class, // Cancel quiz attempt if no questions are left.
             strategyfastestscore::class,

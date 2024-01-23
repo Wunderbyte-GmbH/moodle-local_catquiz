@@ -74,16 +74,16 @@ class teststrategy_fastest extends strategy {
      */
     public function get_preselecttasks(): array {
         return [
+            updatepersonability::class,
+            addscalestandarderror::class,
             maximumquestionscheck::class,
             removeplayedquestions::class,
             remove_uncalculated::class,
             noremainingquestions::class,
             mayberemovescale::class,
             firstquestionselector::class,
-            updatepersonability::class,
             lasttimeplayedpenalty::class,
             fisherinformation::class,
-            addscalestandarderror::class,
             strategyfastestscore::class,
         ];
     }
