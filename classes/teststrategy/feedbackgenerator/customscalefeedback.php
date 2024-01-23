@@ -156,10 +156,15 @@ class customscalefeedback extends feedbackgenerator {
             return null;
         }
 
+        // Make sure that only feedback for specific scale is rendered.
+        $personabilitiesfeedbackeditor = feedbacksettings::return_scales_according_to_strategy(
+            $initialcontext['teststrategy'],
+            (array)$personabilities);
+
         ($this->sortfun)($personabilities);
 
         $scalefeedback = [];
-        foreach ($personabilities as $catscaleid => $personability) {
+        foreach ($personabilitiesfeedbackeditor as $catscaleid => $personability) {
             for ($j = 1; $j <= $quizsettings->numberoffeedbackoptionsselect; $j++) {
                 $lowerlimitprop = sprintf('feedback_scaleid_limit_lower_%d_%d', $catscaleid, $j);
                 $lowerlimit = floatval($quizsettings->$lowerlimitprop);
@@ -206,10 +211,7 @@ class customscalefeedback extends feedbackgenerator {
      * @return ?string
      */
     private function getfeedbackforrange(int $catscaleid, int $groupnumber, object $quizsettings): ?string {
-        // TODO: Implement getting the feedback.
 
-        // Editor mit key scale und personability schauen.
-        // Und mit api abgleichen.
         $quizsettingskey = 'feedbackeditor_scaleid_' . $catscaleid . '_' . $groupnumber;
         return $quizsettings->$quizsettingskey->text;
 
