@@ -206,6 +206,7 @@ $string['imported_testitem_description'] = 'Es wurden {$a} Frage(n) importiert.'
 
 // Message.
 $string['messageprovider:catscaleupdate'] = 'Benachrichtung über eine Aktualisierung einer Skala.';
+$string['messageprovider:updatecatscale'] = 'Benachrichtung über eine Aktualisierung einer Skala.';
 $string['catscaleupdatedtitle'] = 'Eine Skala wurde aktualisiert';
 $string['messageprovider:updatecatscale'] = 'Erhält Benachrichtungung über Einschreibung in Skala';
 $string['enrolledtogroupfailedtitle'] = 'Einschreibung zu Gruppe "{$a->groupname}" fehlgeschlagen.';
