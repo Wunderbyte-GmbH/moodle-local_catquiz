@@ -71,13 +71,13 @@ class classicalcat extends strategy {
      */
     public function get_preselecttasks(): array {
         return [
+            updatepersonability::class,
+            addscalestandarderror::class,
             maximumquestionscheck::class,
             removeplayedquestions::class,
             noremainingquestions::class,
             mayberemovescale::class,
             fisherinformation::class,
-            updatepersonability::class,
-            addscalestandarderror::class,
             strategyclassicscore::class,
         ];
     }
