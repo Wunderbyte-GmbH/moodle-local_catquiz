@@ -124,7 +124,7 @@ class feedbackclass {
         $coloroptions = self::get_array_of_colors($numberoffeedbackspersubscale);
         // We need this to close the collapsable header elements.
         $html2 = $OUTPUT->render_from_template('local_catquiz/feedback/feedbackform_collapsible_close', []);
-
+        // Finds all courses user is enroled to.
         $enrolledcourses = enrol_get_my_courses();
         $coursesfromtags = dataapi::get_courses_from_settings_tags() ?? [];
         $courses = array_merge($enrolledcourses, $coursesfromtags);
@@ -247,6 +247,23 @@ class feedbackclass {
                 $select = [
                     0 => get_string('courseselection', 'local_catquiz'),
                 ];
+                // Check if courses were saved before (ie from other teacher, directly in db) and in this case allow them.
+                if ($preselectcourseids = $mform->_defaultValues['catquiz_courses_' . $scale->id . '_'. $j] ?? false) {
+                    $newcourses = [];
+                    foreach ($preselectcourseids as $preselectcourseid) {
+                        $foundcourse = false;
+                        foreach ($courses as $course) {
+                            if ($preselectcourseid == $course->id) {
+                                $foundcourse = true;
+                            }
+                        }
+                        if (!$foundcourse) {
+                            $newcourses[] = get_course((int)$preselectcourseid);
+                        }
+                    }
+                    $courses = array_merge($newcourses, $courses);
+                }
+
                 foreach ($courses as $course) {
                     $select[$course->id] = $course->fullname;
                 }
