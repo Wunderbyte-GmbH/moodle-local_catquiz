@@ -67,6 +67,7 @@ $string['pilotratio_help'] = 'Proportion of questions still to be piloted in the
 $string['pilotattemptsthreshold'] = 'Minimum number of adaptations';
 $string['pilotattemptsthreshold_help'] = 'Questions with less attempts will be considered pilot questions';
 $string['includepilotquestions'] = 'Activate pilot mode';
+$string['standarderror'] = 'Standarderror';
 $string['standarderrorpersubscale'] = 'Standarderror per subscale in percent';
 $string['standarderrorpersubscale_help'] = 'If the standard error for a scale drops below this value, it will no longer be tested.';
 $string['maxquestionspersubscale'] = 'Maximum number of questions returned per subscale';

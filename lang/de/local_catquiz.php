@@ -66,6 +66,7 @@ $string['pilotratio_help'] = 'Anteil von noch zu pilotierender Fragen an der Ges
 $string['pilotattemptsthreshold'] = 'Mindestanzahl an Bearbeitungen';
 $string['pilotattemptsthreshold_help'] = 'Fragen mit weniger Testversuchen werden als Pilotfragen klassifiziert';
 $string['includepilotquestions'] = 'Pilotierungsmodus aktivieren';
+$string['standarderror'] = 'Standardfehler';
 $string['standarderrorpersubscale'] = 'Standardfehler pro Skala in Prozent';
 $string['standarderrorpersubscale_help'] = 'Sobald der Standardfehler einer Skala unter diesen Wert fällt, wird sie nicht weiter getestet.';
 $string['maxquestionspersubscale'] = 'max. Frageanzahl pro Skala';

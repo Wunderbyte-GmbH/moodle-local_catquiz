@@ -24,6 +24,7 @@
         "abilities": [
             {
                 "ability": 1.23,
+                "standarderror": 3.21,
                 "name": "Mathematics",
                 "isselectedscale": 1,
                 "catscaleid": 3,
@@ -43,6 +44,7 @@
             },
             {
                 "ability": 3.21,
+                "standarderror": 1.23,
                 "name": "catscale2",
                 "isselectedscale": 0,
                 "catscaleid": 3,
@@ -76,26 +78,26 @@
     <div class="row">
     {{#numberofitemsplayed}}
         <div {{#isselectedscale}}
-                class="font-weight-bold col-6 text-right"
+                class="font-weight-bold col-4 text-right"
                 data-toggle="tooltip"
                 data-placement="top"
                 title="{{tooltiptitle}}"
             {{/isselectedscale}}
             {{^isselectedscale}}
-                class="font-weight-normal col-6 text-right"
+                class="font-weight-normal col-4 text-right"
             {{/isselectedscale}}>
             {{name}} :
         </div>
         <div {{#isselectedscale}}
-                class="font-weight-bold col-2 text-left"
+                class="font-weight-bold col-4 text-left"
                 data-toggle="tooltip"
                 data-placement="top"
                 title="{{tooltiptitle}}"
             {{/isselectedscale}}
             {{^isselectedscale}}
-                class="font-weight-normal col-2 text-left"
+                class="font-weight-normal col-4 text-left"
             {{/isselectedscale}}>
-            {{ability}}
+            {{ability}} ({{#str}}standarderror, local_catquiz{{/str}}: {{standarderror}})
         </div>
         {{#itemsplayed}}
             <div class="btn btn-light btn-sm col" data-toggle="modal" data-target=".catquizfeedbackabilitiesplayedquestions_{{catscaleid}}">

@@ -250,6 +250,7 @@ class personabilities extends feedbackgenerator {
 
         $catscales = catquiz::get_catscales(array_keys($personabilities));
         $data = [];
+        $lastcontext = end($cachedcontexts);
         foreach ($personabilities as $catscaleid => $ability) {
             if (abs(floatval($ability)) === abs(floatval(LOCAL_CATQUIZ_PERSONABILITY_MAX))) {
                 if ($ability < 0) {
@@ -280,6 +281,7 @@ class personabilities extends feedbackgenerator {
             }
 
             $data[] = [
+                'standarderror' => sprintf("%.2f", $lastcontext['se'][$catscaleid]),
                 'ability' => $ability,
                 'name' => $catscales[$catscaleid]->name,
                 'catscaleid' => $catscaleid,
