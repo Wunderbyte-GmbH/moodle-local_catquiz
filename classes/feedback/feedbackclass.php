@@ -248,7 +248,8 @@ class feedbackclass {
                     0 => get_string('courseselection', 'local_catquiz'),
                 ];
                 // Check if courses were saved before (ie from other teacher, directly in db) and in this case allow them.
-                if ($preselectcourseids = $mform->_defaultValues['catquiz_courses_' . $scale->id . '_'. $j] ?? false) {
+                $preselectcourseids = $mform->_defaultValues['catquiz_courses_' . $scale->id . '_'. $j] ?? [];
+                if (!empty($preselectcourseid)) {
                     $newcourses = [];
                     foreach ($preselectcourseids as $preselectcourseid) {
                         $foundcourse = false;
