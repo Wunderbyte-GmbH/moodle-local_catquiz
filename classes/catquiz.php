@@ -1679,7 +1679,7 @@ class catquiz {
                         $coursedata['coursename'] = $course->name ?? "";
                         $coursedata['coursesummary'] = $course->summary ?? "";
                         $coursedata['catscalename'] = $catscale->name ?? "";
-                        if (!is_enrolled($context, $userid)) {
+                        if (!is_enrolled($context, $userid) && $course) {
                             if (!enrol_try_internal_enrol($courseid, $userid, $rolestudent->id)) {
                                 // There's a problem.
                                 if ($message) {
