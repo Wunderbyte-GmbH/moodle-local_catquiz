@@ -22,6 +22,7 @@ use local_catquiz\feedback\feedbackclass;
 defined('MOODLE_INTERNAL') || die();
 
 require_once($CFG->dirroot.'/user/lib.php');
+require_once($CFG->dirroot.'/local/catquiz/lib.php');
 
 /**
  * Class feedbacksettings teststrategy and feedbackgenerator.

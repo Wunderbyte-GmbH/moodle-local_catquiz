@@ -32,6 +32,10 @@ use local_catquiz\teststrategy\feedbackgenerator;
 use local_catquiz\teststrategy\feedbacksettings;
 use local_catquiz\teststrategy\preselect_task\firstquestionselector;
 
+defined('MOODLE_INTERNAL') || die();
+
+require_once($CFG->dirroot.'/local/catquiz/lib.php');
+
 /**
  * Compare the ability of this attempt to the average abilities of other students that took this test.
  *
