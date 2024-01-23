@@ -114,10 +114,11 @@ class filterbystandarderror extends preselect_task implements wb_middleware {
                     (catscale::return_catscale_object($scaleid))->name, PHP_EOL
                 );
                 unset($activescales[array_search($scaleid, $activescales)]);
-                // TODO subscales inherit values.
+                // Subscales inherit values of parent when their ability wasn't calculated yet (is still 0.0).
                 $inheritscales = array_filter(
                     array_keys(catscale::get_next_level_subscales_ids_from_parent([$scaleid])),
-                    fn ($id) => $this->context['person_ability'][$id] === 0.0
+                    fn ($id) => isset($this->context['person_ability'][$id])
+                        && $this->context['person_ability'][$id] === 0.0
                 );
                 $inheritval = $this->context['person_ability'][$scaleid] - $this->context['se'][$scaleid];
                 $fisherinformation = new fisherinformation();
