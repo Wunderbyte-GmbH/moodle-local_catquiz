@@ -1674,8 +1674,8 @@ class catquiz {
                     $coursestoenrol = $quizsettings['catquiz_courses_' . $catscaleid . '_' . $i] ?? [];
                     // The first element at array key 0 is a dummy value to
                     // display some message like "please select course" in the
-                    // form.
-                    unset($coursestoenrol['0']);
+                    // form and has a course ID of 0.
+                    $coursestoenrol = array_filter($coursestoenrol, fn ($v) => $v != 0);
                     foreach ($coursestoenrol as $courseid) {
                         $context = \context_course::instance($courseid);
                         $course = get_course($courseid);
