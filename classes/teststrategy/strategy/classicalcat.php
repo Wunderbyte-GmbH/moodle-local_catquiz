@@ -32,7 +32,6 @@ use local_catquiz\teststrategy\feedbackgenerator\personabilities;
 use local_catquiz\teststrategy\feedbackgenerator\questionssummary;
 use local_catquiz\teststrategy\feedbacksettings;
 use local_catquiz\teststrategy\preselect_task\addscalestandarderror;
-use local_catquiz\teststrategy\preselect_task\firstquestionselector;
 use local_catquiz\teststrategy\preselect_task\fisherinformation;
 use local_catquiz\teststrategy\preselect_task\lasttimeplayedpenalty;
 use local_catquiz\teststrategy\preselect_task\maximumquestionscheck;
@@ -80,7 +79,6 @@ class classicalcat extends strategy {
             removeplayedquestions::class,
             noremainingquestions::class,
             mayberemovescale::class,
-            firstquestionselector::class,
             fisherinformation::class,
             updatepersonability::class,
             addscalestandarderror::class,

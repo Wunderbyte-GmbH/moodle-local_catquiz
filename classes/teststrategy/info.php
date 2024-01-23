@@ -217,6 +217,14 @@ class info {
                 'startwithcurrentability' => get_string('startwithcurrentability', 'local_catquiz'),
             ]
         );
+        // When a classical CAT is performed, we ignore the first-question
+        // option and display all questions ordered by their ID.
+        $mform->hideIf(
+            'catquiz_selectfirstquestion',
+            'catquiz_selectteststrategy',
+            'eq',
+            LOCAL_CATQUIZ_STRATEGY_CLASSIC
+        );
 
         $elements[] = $mform->addElement(
             'text',
