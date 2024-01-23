@@ -207,6 +207,7 @@ $string['imported_testitem_description'] = '{$a} testitems were imported.';
 
 // Message.
 $string['messageprovider:catscaleupdate'] = 'Notification of CAT scale update';
+$string['messageprovider:updatecatscale'] = 'Notification of CAT scale update';
 $string['catscaleupdatedtitle'] = 'A CAT scale was updated';
 $string['messageprovider:updatecatscale'] = 'Recieves notification on subscrition of catscale';
 $string['enrolledtogroupfailedtitle'] = 'Enrolment to group "{$a->groupname}" failed.';
