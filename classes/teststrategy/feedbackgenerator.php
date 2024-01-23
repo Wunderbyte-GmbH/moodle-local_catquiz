@@ -107,6 +107,9 @@ abstract class feedbackgenerator {
         }
 
         $feedbackdata = $this->apply_settings_to_feedbackdata($feedbackdata);
+        if (!$feedbackdata) {
+            return $this->no_data();
+        }
 
         $studentfeedback = $this->get_studentfeedback($feedbackdata);
         if (! $this->isvalidfeedback($studentfeedback)) {
