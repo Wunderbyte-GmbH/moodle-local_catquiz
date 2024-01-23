@@ -794,7 +794,7 @@ class catquiz_handler {
             'pilot_ratio' => $pilotratio ?? 0,
             'pilot_attempts_threshold' => intval($quizsettings->catquiz_pilotattemptsthreshold),
             'questionsattempted' => intval($attemptdata->questionsattempted),
-            'selectfirstquestion' => $quizsettings->catquiz_selectfirstquestion,
+            'selectfirstquestion' => $quizsettings->catquiz_selectfirstquestion ?? null,
             'skip_reason' => null,
             'userid' => $USER->id,
             'max_attempts_per_scale' => $maxquestionsperscale,
