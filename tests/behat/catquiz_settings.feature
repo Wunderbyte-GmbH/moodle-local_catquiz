@@ -63,8 +63,8 @@ Feature: As a teacher I setup adaptive quiz with CATquiz Scales and Feedbacks.
     ## Delay required to settle CAT scale
     And I wait until the page is ready
     And the field "Number of ability ranges" matches value "2"
-    And I click on "Feedback for \"Mathematik\"" "text"
     ## Update feedback defaults and chak it for root catscale, range 1
+    And I fill in the field number "2" with the dynamic identifier "id_feedbackeditor_scaleid_" with "mytextishere"
     And I should see "Feedback for range 1" in the "//div[@data-name='feedback_scale_Mathematik_range_1']" "xpath_element"
     And the field "Lower limit" in the "//div[@data-name='feedback_scale_Mathematik_range_1']" "xpath_element" matches value "-5"
     And the field "Upper limit" in the "//div[@data-name='feedback_scale_Mathematik_range_1']" "xpath_element" matches value "-0"
