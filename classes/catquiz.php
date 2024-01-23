@@ -1680,7 +1680,7 @@ class catquiz {
                         $context = \context_course::instance($courseid);
                         $course = get_course($courseid);
                         $coursedata = [];
-                        $coursedata['coursename'] = $course->name ?? "";
+                        $coursedata['coursename'] = $course->fullname ?? "";
                         $coursedata['coursesummary'] = $course->summary ?? "";
                         $coursedata['catscalename'] = $catscale->name ?? "";
                         if (!is_enrolled($context, $userid) && $course) {
@@ -1689,14 +1689,14 @@ class catquiz {
                                 if ($message) {
                                     messages::send_message(
                                         $userid,
-                                        get_string('enrolledtocoursefailedtitle', 'local_catquiz'),
+                                        get_string('enrolledtocoursefailedtitle', 'local_catquiz', $coursedata),
                                         get_string('enrolledtocoursefailedtext', 'local_catquiz', $coursedata),
                                         'enrolmentfeedback');
                                 }
                             } else {
                                 messages::send_message(
                                     $userid,
-                                    get_string('enrolledtocoursetitle', 'local_catquiz'),
+                                    get_string('enrolledtocoursetitle', 'local_catquiz', $coursedata),
                                     get_string('enrolledtocoursetext', 'local_catquiz', $coursedata),
                                     'enrolmentfeedback');
                             }
