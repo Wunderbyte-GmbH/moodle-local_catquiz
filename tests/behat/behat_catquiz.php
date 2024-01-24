@@ -55,10 +55,10 @@ class behat_catquiz extends behat_base {
         // Assuming you want to find an editor element related to the competency and fill it with the specified value
         $fields = $this->getSession()->getPage()->findAll('xpath', $xpathtarget);
 
-        $counter = 0;
+        $counter = 1;
         foreach ($fields as $field) {
             if ($field->isVisible()) {
-                if ($counter = $numberofitem) {
+                if ($counter == (int) $numberofitem) {
                     // Fill in the form field with the specified value.
                     $field->setValue($value);
                 }
