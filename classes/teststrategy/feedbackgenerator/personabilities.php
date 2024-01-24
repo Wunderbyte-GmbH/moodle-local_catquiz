@@ -108,7 +108,6 @@ class personabilities extends feedbackgenerator {
             [
                 'abilities' => $data['feedback_personabilities'],
                 'chartdisplay' => $data['personabilitychart'],
-                'standarderrorpersubscales' => $data['standarderrorpersubscales'],
                 'progressindividual' => $data['progressindividual'],
                 'progresscomparison' => $data['progresscomparison'],
                 'abilityprofile' => $data['abilityprofile'],
@@ -301,10 +300,8 @@ class personabilities extends feedbackgenerator {
             $catscales[$selectedscaleid]);
 
         $abilityprofile = $this->render_abilityprofile_chart((array)$initialcontext, $catscales[$selectedscaleid]);
-        $standarderrorpersubscales = $quizsettings->catquiz_standarderrorpersubscale ?? "";
         return [
             'feedback_personabilities' => $data,
-            'standarderrorpersubscales' => $standarderrorpersubscales,
             'personabilitychart' => $chart,
             'cached_contexts' => $cachedcontexts,
             'progressindividual' => $abilityprogress['individual'],
