@@ -29,11 +29,10 @@ require_once(__DIR__ . '/../../../../lib/behat/behat_base.php');
  * To create catquiz specific behat scearios.
  */
 class behat_catquiz extends behat_base {
-
     /**
-     * @When /^I fill in the field number "([^"]*)" with the dynamic identifier "([^"]*)" with "([^"]*)"$/
+     * @When /^I fill in the "([^"]*)" element number "([^"]*)" with the dynamic identifier "([^"]*)" with "([^"]*)"$/
      */
-    public function i_fill_in_the_field_with_dynamic_identifier($numberofitem, $dynamicidentifier, $value) {
+    public function i_fill_in_the_element_with_dynamic_identifier($fieldtype, $numberofitem, $dynamicidentifier, $value) {
         // Use $dynamicIdentifier to locate and fill in the corresponding form field.
         // Use $value to set the desired value in the form field.
 
@@ -44,15 +43,18 @@ class behat_catquiz extends behat_base {
 
         foreach ($fields as $field) {
             $id = $field->getAttribute('id');
-            // Use JavaScript to add the expected class to the element
+            // Use JavaScript to add the expected class to the element.
             $script = "document.getElementById('$id').classList.add('show');";
             $this->getSession()->executeScript($script);
             $this->getSession()->wait(500);
         }
-
         // Now we get all the editor fields by the identifier.
-        $xpathtarget = "//div[contains(@id, '" . $dynamicidentifier . "')][@contenteditable='true']";
-        // Assuming you want to find an editor element related to the competency and fill it with the specified value
+        if ($fieldtype == 'div') {
+            $xpathtarget = "//" . $fieldtype . "[contains(@id, '" . $dynamicidentifier . "')][@contenteditable='true']";
+        } else {
+            $xpathtarget = "//" . $fieldtype . "[contains(@id, '" . $dynamicidentifier . "')]";
+        }
+        // Assuming you want to find an editor element related to the competency and fill it with the specified value.
         $fields = $this->getSession()->getPage()->findAll('xpath', $xpathtarget);
 
         $counter = 1;
