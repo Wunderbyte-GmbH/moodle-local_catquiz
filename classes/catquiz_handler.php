@@ -792,7 +792,6 @@ class catquiz_handler {
                  */
             'penalty_time_range' => 60 * 60 * 24 * 30,
             'pilot_ratio' => $pilotratio ?? 0,
-            'pilot_attempts_threshold' => intval($quizsettings->catquiz_pilotattemptsthreshold),
             'questionsattempted' => intval($attemptdata->questionsattempted),
             'selectfirstquestion' => $quizsettings->catquiz_selectfirstquestion ?? null,
             'skip_reason' => null,
@@ -805,9 +804,6 @@ class catquiz_handler {
             'updateabilityfallback' => false,
             'excludedsubscales' => [],
             'has_fisherinformation' => false,
-            'standarderrorpersubscale' => empty($quizsettings->catquiz_standarderrorpersubscale)
-                ? null
-                : ($quizsettings->catquiz_standarderrorpersubscale / 100),
             'se_max' => 1.0, // TODO set via config.
             // phpcs:disable
             // 'breakduration' => $quizsettings->catquiz_breakduration,
