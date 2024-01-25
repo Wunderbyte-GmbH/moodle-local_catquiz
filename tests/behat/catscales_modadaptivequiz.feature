@@ -1,5 +1,5 @@
 @local @local_catquiz @javascript
-Feature: As an admin I perform import of catquiz alonf with questions to check Scales and Feedbacks.
+Feature: As a student i want to take adaptive quiz tests with catquiz functinality.
 
   Background:
     Given the following "users" exist:
