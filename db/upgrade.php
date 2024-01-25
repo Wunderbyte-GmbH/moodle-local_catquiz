@@ -398,5 +398,29 @@ function xmldb_local_catquiz_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2023110600, 'local', 'catquiz');
     }
 
+    if ($oldversion < 2024012500) {
+
+        // Define table local_catquiz_progress to be created.
+        $table = new xmldb_table('local_catquiz_progress');
+
+        // Adding fields to table local_catquiz_progress.
+        $table->add_field('id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, XMLDB_SEQUENCE, null);
+        $table->add_field('userid', XMLDB_TYPE_INTEGER, '10', null, null, null, null);
+        $table->add_field('component', XMLDB_TYPE_CHAR, '255', null, null, null, null);
+        $table->add_field('attemptid', XMLDB_TYPE_INTEGER, '10', null, null, null, null);
+        $table->add_field('json', XMLDB_TYPE_TEXT, null, null, null, null, null);
+
+        // Adding keys to table local_catquiz_progress.
+        $table->add_key('primary', XMLDB_KEY_PRIMARY, ['id']);
+
+        // Conditionally launch create table for local_catquiz_progress.
+        if (!$dbman->table_exists($table)) {
+            $dbman->create_table($table);
+        }
+
+        // Catquiz savepoint reached.
+        upgrade_plugin_savepoint(true, 2024012500, 'local', 'catquiz');
+    }
+
     return true;
 }
