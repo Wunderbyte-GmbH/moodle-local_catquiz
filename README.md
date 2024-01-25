@@ -35,7 +35,6 @@ The following parameters can be defined:
 
 'personabilities' => [
     'feedback_personabilities',
-    'standarderrorpersubscales',
     'personabilitychart',
     'progressindividual',
     'progresscomparison',
