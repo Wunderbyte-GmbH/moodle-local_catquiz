@@ -18,10 +18,10 @@ Feature: As a student i want to take adaptive quiz tests with catquiz functinali
       | teacher  | C1     | editingteacher |
     And the following "local_catquiz > questions" exist:
       | filepath                                           | filename              | course |
-      | local/catquiz/tests/fixtures/mathematik2scales.xml | mathematik2scales.xml | C1     |
+      | local/catquiz/tests/fixtures/quiz-adaptivetest-Simulation-20231116-0949.xml | quiz-adaptivetest-Simulation-20231116-0949.xml | C1     |
     And the following "local_catquiz > importedcatscales" exist:
       | filepath                                           | filename              |
-      | local/catquiz/tests/fixtures/mathematik2scales.csv | mathematik2scales.csv |
+      | local/catquiz/tests/fixtures/simulation_medium.csv | simulation_medium.csv |
     And I log in as "teacher"
     And I am on "Course 1" course homepage with editing mode on
     And I add a "Adaptive Quiz" to section "1"
@@ -29,7 +29,7 @@ Feature: As a student i want to take adaptive quiz tests with catquiz functinali
       | Name                         | Adaptive Quiz               |
       | Description                  | Adaptive quiz description.  |
       | catmodel                     | Catquiz CAT model           |
-      | Select CAT scale             | Mathematik                  |
+      | Select CAT scale             | Simulation                  |
       | Purpose of test              | Infer all subscales         |
       | Max. questions per test.     | 7                           |
 
@@ -42,7 +42,25 @@ Feature: As a student i want to take adaptive quiz tests with catquiz functinali
     And I am on "Course 1" course homepage
     And I follow "Adaptive Quiz"
     And I click on "Start attempt" "button"
-    And I click on "True" "radio"
+    And I should see "Question 1"
+    And I click on "richtige Antwort" "radio"
+    And I click on "Submit answer" "button"
+    And I should see "Question 2"
+    And I click on "richtige Antwort" "radio"
+    And I click on "Submit answer" "button"
+    And I should see "Question 3"
+    And I click on "richtige Antwort" "radio"
+    And I click on "Submit answer" "button"
+    And I should see "Question 4"
+    And I click on "richtige Antwort" "radio"
+    And I click on "Submit answer" "button"
+    And I should see "Question 5"
+    And I click on "richtige Antwort" "radio"
+    And I click on "Submit answer" "button"
+    And I should see "Question 6"
+    And I click on "richtige Antwort" "radio"
+    And I click on "Submit answer" "button"
+    And I should see "Question 7"
+    And I click on "richtige Antwort" "radio"
     And I click on "Submit answer" "button"
     And I wait "20" seconds
-    And I should see "Question 2"
