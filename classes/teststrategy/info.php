@@ -244,6 +244,35 @@ class info {
         // );
         // $mform->setDefault('catquiz_breakduration', 300);
         // phpcs:enable
+        $standarderrorgroup = [
+            $mform->createElement(
+                'static',
+                'catquiz_standarderror_label_min',
+                'catquiz_standarderror_label_min',
+                get_string('min', 'local_catquiz')
+            ),
+            $mform->createElement(
+                'text',
+                'catquiz_standarderror_min',
+                'min',
+                ['size'=>'2']
+            ),
+            $mform->createElement(
+                'static',
+                'catquiz_standarderror_label_max',
+                'catquiz_standarderror_label_max',
+                get_string('max', 'local_catquiz')
+            ),
+            $mform->createElement(
+                'text',
+                'catquiz_standarderror_max',
+                'max',
+                ['size'=>'2']
+            ),
+        ];
+
+        $elements[] = $mform->addGroup($standarderrorgroup, 'catquiz_standarderrorgroup', get_string('acceptedstandarderror', 'local_catquiz'), '', false);
+        $mform->addHelpButton('catquiz_standarderrorgroup', 'acceptedstandarderror', 'local_catquiz');
 
         feedbackclass::instance_form_definition($mform, $elements);
     }
