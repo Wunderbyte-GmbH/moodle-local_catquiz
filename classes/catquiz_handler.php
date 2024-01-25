@@ -804,7 +804,11 @@ class catquiz_handler {
             'updateabilityfallback' => false,
             'excludedsubscales' => [],
             'has_fisherinformation' => false,
-            'se_max' => 1.0, // TODO set via config.
+            'se_max' => $quizsettings->catquiz_standarderror_max,
+            'se_min' => $quizsettings->catquiz_standarderror_min,
+
+            // TODO: add duration range for attempt and item.
+
             // phpcs:disable
             // 'breakduration' => $quizsettings->catquiz_breakduration,
             // 'breakinfourl' => '/local/catquiz/breakinfo.php',
