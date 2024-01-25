@@ -895,7 +895,7 @@ class catquiz {
         $select = "ccc.*, s1.attempts";
         $from = "{local_catquiz_catcontext} ccc
                  LEFT JOIN (
-                        SELECT ccc1.id, COUNT(*) AS attempts
+                        SELECT ccc1.id, COUNT(ccc1.id) AS attempts
                           FROM {local_catquiz_catcontext} ccc1
                           JOIN {question_attempt_steps} qas
                             ON ccc1.starttimestamp < qas.timecreated AND ccc1.endtimestamp > qas.timecreated
