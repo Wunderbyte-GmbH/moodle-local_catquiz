@@ -30,6 +30,7 @@ Feature: As an admin I perform import of catquiz alonf with questions to check S
       | Description                  | Adaptive quiz description.  |
       | catmodel                     | Catquiz CAT model           |
       | Select CAT scale             | Mathematik                  |
+      | Purpose of test              | Infer all subscales         |
       | Max. questions per test.     | 7                           |
 
     And I click on "Save and return to course" "button"
