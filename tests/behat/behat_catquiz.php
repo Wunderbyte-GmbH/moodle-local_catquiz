@@ -29,8 +29,18 @@ require_once(__DIR__ . '/../../../../lib/behat/behat_base.php');
  * To create catquiz specific behat scearios.
  */
 class behat_catquiz extends behat_base {
+
     /**
+     * Fill specified HTMLQuickForm element by its number under goven xpath with a value.
      * @When /^I fill in the "([^"]*)" element number "([^"]*)" with the dynamic identifier "([^"]*)" with "([^"]*)"$/
+     *
+     * @param string $fieldtype
+     * @param string $numberofitem
+     * @param string $dynamicidentifier
+     * @param string $value
+     *
+     * @return void
+     *
      */
     public function i_fill_in_the_element_with_dynamic_identifier($fieldtype, $numberofitem, $dynamicidentifier, $value) {
         // Use $dynamicIdentifier to locate and fill in the corresponding form field.
@@ -48,47 +58,36 @@ class behat_catquiz extends behat_base {
             $this->getSession()->executeScript($script);
             $this->getSession()->wait(500);
         }
-        // Now we get all the editor fields by the identifier.
+        // Now we get the form element fields by the identifier and its number in DOM.
         switch ($fieldtype) {
             case 'editor':
-                $xpathtarget = "//div[contains(@id, '" . $dynamicidentifier . "')][@contenteditable='true']";
+                $xpathtarget = "(//div[contains(@id, '" . $dynamicidentifier . "')][@contenteditable='true'])
+                    [" . $numberofitem . "]";
                 break;
             case 'multiselect':
-                $xpathtarget = "//div[contains(@id, '" . $dynamicidentifier . "')]";
+                $xpathtarget = "(//div[contains(@id, '" . $dynamicidentifier . "')])
+                    [" . $numberofitem . "]//input[contains(@id, 'form_autocomplete_input-')]";
+                $xpathtarget1 = "(//div[contains(@id, '" . $dynamicidentifier . "')])
+                    [" . $numberofitem . "]//li[contains(@id, 'form_autocomplete_suggestions-')]";
                 break;
             default:
-                $xpathtarget = "//" . $fieldtype . "[contains(@id, '" . $dynamicidentifier . "')]";
+                $xpathtarget = "(//" . $fieldtype . "[contains(@id, '" . $dynamicidentifier . "')])[" . $numberofitem . "]";
         }
-        //if ($fieldtype == 'div') {
-        //    $xpathtarget = "//" . $fieldtype . "[contains(@id, '" . $dynamicidentifier . "')][@contenteditable='true']";
-        //} else {
-        //    $xpathtarget = "//" . $fieldtype . "[contains(@id, '" . $dynamicidentifier . "')]";
-        //}
+
         // Assuming you want to find an editor element related to the competency and fill it with the specified value.
-        $fields = $this->getSession()->getPage()->findAll('xpath', $xpathtarget);
-
-        $counter = 1;
-        foreach ($fields as $field) {
-            if ($field->isVisible()) {
-                if ($counter == (int) $numberofitem) {
-                    switch ($fieldtype) {
-                        case 'multiselect':
-                            // Search target for multiselect inside parent.
-                            //And I click on "NextMay (nextmay)" "text" in the "//div[contains(@id, 'id_datesheader_')]//ul[contains(@class, 'form-autocomplete-suggestions')]" "xpath_element"
-                            //$field->find('xpath', "//span[contains(@id, 'form_autocomplete_downarrow-')]");
-                            //$field->click();
-
-                            $field->find('xpath', "//input[contains(@id, 'form_autocomplete_input-')]");
-                            //var_dump($field->getHtml());
-                            $field->setValue($value);
-                            $field->keyPress(13); // Enter.
-                            break;
-                        default:
-                            // Fill in the form field with the specified value.
-                            $field->setValue($value);
-                    }
-                }
-                $counter++;
+        $field = $this->getSession()->getPage()->find('xpath', $xpathtarget);
+        if ($field->isVisible()) {
+            switch ($fieldtype) {
+                case 'multiselect':
+                    $field->setValue($value);
+                    $field->keyPress(13); // Enter.
+                    // Get selected option and click it.
+                    $field = $this->getSession()->getPage()->find('xpath', $xpathtarget1);
+                    $field->click();
+                    break;
+                default:
+                    // Fill in the form field with the specified value.
+                    $field->setValue($value);
             }
         }
     }
