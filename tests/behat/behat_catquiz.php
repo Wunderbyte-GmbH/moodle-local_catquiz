@@ -49,11 +49,21 @@ class behat_catquiz extends behat_base {
             $this->getSession()->wait(500);
         }
         // Now we get all the editor fields by the identifier.
-        if ($fieldtype == 'div') {
-            $xpathtarget = "//" . $fieldtype . "[contains(@id, '" . $dynamicidentifier . "')][@contenteditable='true']";
-        } else {
-            $xpathtarget = "//" . $fieldtype . "[contains(@id, '" . $dynamicidentifier . "')]";
+        switch ($fieldtype) {
+            case 'editor':
+                $xpathtarget = "//div[contains(@id, '" . $dynamicidentifier . "')][@contenteditable='true']";
+                break;
+            case 'multiselect':
+                $xpathtarget = "//div[contains(@id, '" . $dynamicidentifier . "')]";
+                break;
+            default:
+                $xpathtarget = "//" . $fieldtype . "[contains(@id, '" . $dynamicidentifier . "')]";
         }
+        //if ($fieldtype == 'div') {
+        //    $xpathtarget = "//" . $fieldtype . "[contains(@id, '" . $dynamicidentifier . "')][@contenteditable='true']";
+        //} else {
+        //    $xpathtarget = "//" . $fieldtype . "[contains(@id, '" . $dynamicidentifier . "')]";
+        //}
         // Assuming you want to find an editor element related to the competency and fill it with the specified value.
         $fields = $this->getSession()->getPage()->findAll('xpath', $xpathtarget);
 
@@ -61,8 +71,22 @@ class behat_catquiz extends behat_base {
         foreach ($fields as $field) {
             if ($field->isVisible()) {
                 if ($counter == (int) $numberofitem) {
-                    // Fill in the form field with the specified value.
-                    $field->setValue($value);
+                    switch ($fieldtype) {
+                        case 'multiselect':
+                            // Search target for multiselect inside parent.
+                            //And I click on "NextMay (nextmay)" "text" in the "//div[contains(@id, 'id_datesheader_')]//ul[contains(@class, 'form-autocomplete-suggestions')]" "xpath_element"
+                            //$field->find('xpath', "//span[contains(@id, 'form_autocomplete_downarrow-')]");
+                            //$field->click();
+
+                            $field->find('xpath', "//input[contains(@id, 'form_autocomplete_input-')]");
+                            //var_dump($field->getHtml());
+                            $field->setValue($value);
+                            $field->keyPress(13); // Enter.
+                            break;
+                        default:
+                            // Fill in the form field with the specified value.
+                            $field->setValue($value);
+                    }
                 }
                 $counter++;
             }
