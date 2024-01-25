@@ -65,7 +65,10 @@ Feature: As a teacher I setup adaptive quiz with CATquiz Scales and Feedbacks.
     And the field "Number of ability ranges" matches value "2"
     ## Update feedback defaults and chak it for root catscale, range 1
     And I fill in the "input" element number "2" with the dynamic identifier "id_feedback_scaleid_limit_lower_" with "-1"
-    And I fill in the "div" element number "2" with the dynamic identifier "id_feedbackeditor_scaleid_" with "my text is here"
+    And I fill in the "input" element number "2" with the dynamic identifier "id_enrolment_message_checkbox_" with "1"
+    And I fill in the "editor" element number "2" with the dynamic identifier "id_feedbackeditor_scaleid_" with "my text is here"
+    And I fill in the "multiselect" element number "2" with the dynamic identifier "fitem_id_catquiz_courses_" with "Course 1"
+    And I wait "21" seconds
     And I should see "Feedback for range 1" in the "//div[@data-name='feedback_scale_Mathematik_range_1']" "xpath_element"
     And the field "Lower limit" in the "//div[@data-name='feedback_scale_Mathematik_range_1']" "xpath_element" matches value "-5"
     And the field "Upper limit" in the "//div[@data-name='feedback_scale_Mathematik_range_1']" "xpath_element" matches value "-0"
