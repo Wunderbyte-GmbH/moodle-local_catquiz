@@ -68,7 +68,8 @@ Feature: As a teacher I setup adaptive quiz with CATquiz Scales and Feedbacks.
     And I fill in the "input" element number "2" with the dynamic identifier "id_feedback_scaleid_limit_lower_" with "-1"
     And I fill in the "input" element number "2" with the dynamic identifier "id_enrolment_message_checkbox_" with "1"
     And I fill in the "editor" element number "2" with the dynamic identifier "id_feedbackeditor_scaleid_" with "my text is here"
-    And I wait "2" seconds
+    And I fill in the "wb_colourpicker" element number "2" with the dynamic identifier "fitem_id_wb_colourpicker_" with "6"
+    And I wait "3" seconds
     And I should see "Feedback for range 1" in the "//div[@data-name='feedback_scale_Mathematik_range_1']" "xpath_element"
     And the field "Lower limit" in the "//div[@data-name='feedback_scale_Mathematik_range_1']" "xpath_element" matches value "-5"
     And the field "Upper limit" in the "//div[@data-name='feedback_scale_Mathematik_range_1']" "xpath_element" matches value "-0"
