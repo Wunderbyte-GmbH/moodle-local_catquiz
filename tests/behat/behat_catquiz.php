@@ -70,6 +70,10 @@ class behat_catquiz extends behat_base {
                 $xpathtarget1 = "(//div[contains(@id, '" . $dynamicidentifier . "')])
                     [" . $numberofitem . "]//li[contains(@id, 'form_autocomplete_suggestions-')]";
                 break;
+            case 'wb_colourpicker':
+                $xpathtarget = "(//div[contains(@id, '" . $dynamicidentifier . "')])
+                    [" . $numberofitem . "]//span[@data-colour=" . $value . "]";
+                break;
             default:
                 $xpathtarget = "(//" . $fieldtype . "[contains(@id, '" . $dynamicidentifier . "')])[" . $numberofitem . "]";
         }
@@ -83,6 +87,9 @@ class behat_catquiz extends behat_base {
                     $field->keyPress(13); // Enter.
                     // Get selected option and click it.
                     $field = $this->getSession()->getPage()->find('xpath', $xpathtarget1);
+                    $field->click();
+                    break;
+                case 'wb_colourpicker':
                     $field->click();
                     break;
                 default:
