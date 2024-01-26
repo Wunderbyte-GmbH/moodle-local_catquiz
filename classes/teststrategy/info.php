@@ -277,8 +277,8 @@ class info {
             $mform->createElement(
                 'text',
                 'catquiz_standarderror_min',
-                'min',
-                ['size'=>'2']
+                'catquiz_standarderror_min',
+                ['size' => '2']
             ),
             $mform->createElement(
                 'static',
@@ -289,12 +289,23 @@ class info {
             $mform->createElement(
                 'text',
                 'catquiz_standarderror_max',
-                'max',
-                ['size'=>'2']
+                'catquiz_standarderror_max',
+                ['size' => '2']
             ),
+            /* This will be needed in a later version.
+            $mform->createElement(
+                'submit',
+                'calculatestandarderror',
+                get_string('calculatefromvalues', 'local_catquiz'),
+                ['data-action' => 'submitCalcSE']
+            ),
+            */
         ];
 
-        $elements[] = $mform->addGroup($standarderrorgroup, 'catquiz_standarderrorgroup', get_string('acceptedstandarderror', 'local_catquiz'), '', false);
+        $elements[] = $mform->addGroup(
+            $standarderrorgroup,
+            'catquiz_standarderrorgroup',
+            get_string('acceptedstandarderror', 'local_catquiz'));
         $mform->addHelpButton('catquiz_standarderrorgroup', 'acceptedstandarderror', 'local_catquiz');
 
         $elements[] = $mform->addElement(
