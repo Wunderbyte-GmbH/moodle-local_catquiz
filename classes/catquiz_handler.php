@@ -178,27 +178,17 @@ class catquiz_handler {
         $mform->addHelpButton('catquiz_passinglevel', 'passinglevel', 'local_catquiz');
         $mform->setType('catquiz_passinglevel', PARAM_INT);
 
-        // Is it a time paced test?
-        $elements[] = $mform->addElement('advcheckbox', 'catquiz_timepacedtest',
-                get_string('timepacedtest', 'local_catquiz'), null, null, [0, 1]);
+        // // Is it a time paced test?
+        // $elements[] = $mform->addElement('advcheckbox', 'catquiz_timepacedtest',
+        //         get_string('timepacedtest', 'local_catquiz'), null, null, [0, 1]);
 
-        $elements[] = $mform->addElement('text', 'catquiz_maxtimeperitem', get_string('maxtimeperitem', 'local_catquiz'));
-        $mform->setType('catquiz_maxtimeperitem', PARAM_INT);
-        $mform->hideIf('catquiz_maxtimeperitem', 'catquiz_timepacedtest', 'neq', 1);
+        // $elements[] = $mform->addElement('text', 'catquiz_maxtimeperitem', get_string('maxtimeperitem', 'local_catquiz'));
+        // $mform->setType('catquiz_maxtimeperitem', PARAM_INT);
+        // $mform->hideIf('catquiz_maxtimeperitem', 'catquiz_timepacedtest', 'neq', 1);
 
-        $elements[] = $mform->addElement('text', 'catquiz_mintimeperitem', get_string('mintimeperitem', 'local_catquiz'));
-        $mform->setType('catquiz_mintimeperitem', PARAM_INT);
-        $mform->hideIf('catquiz_mintimeperitem', 'catquiz_timepacedtest', 'neq', 1);
-
-        $timeoutoptions = [
-            1 => get_string('timeoutfinishwithresult', 'local_catquiz'),
-            2 => get_string('timeoutabortresult', 'local_catquiz'),
-            3 => get_string('timeoutabortnoresult', 'local_catquiz'),
-        ];
-        // Choose a model for this instance.
-        $elements[] = $mform->addElement('select', 'catquiz_actontimeout',
-        get_string('actontimeout', 'local_catquiz'), $timeoutoptions);
-        $mform->hideIf('catquiz_actontimeout', 'catquiz_timepacedtest', 'neq', 1);
+        // $elements[] = $mform->addElement('text', 'catquiz_mintimeperitem', get_string('mintimeperitem', 'local_catquiz'));
+        // $mform->setType('catquiz_mintimeperitem', PARAM_INT);
+        // $mform->hideIf('catquiz_mintimeperitem', 'catquiz_timepacedtest', 'neq', 1);
 
         info::instance_form_definition($mform, $elements);
 
@@ -400,6 +390,16 @@ class catquiz_handler {
         return $errors;
     }
 
+    private function check_if_int(array $data, string $key, array &$errors) {
+
+        if (isset($data['maxquestionsgroup']["catquiz_maxquestionspersubscale"])) {
+            if (!is_int($data['maxquestionsgroup']["catquiz_maxquestionspersubscale"])) {
+                $errors['maxquestionsgroup']["catquiz_maxquestionspersubscale"] = get_string('errorhastobefloat', 'local_catquiz');
+            }
+        }
+
+        return $errors;
+    }
     /**
      * Save submitted data relevant to this plugin.
      *
@@ -773,6 +773,19 @@ class catquiz_handler {
         if (!$maxquestions) {
             $maxquestions = -1;
         }
+        if (!empty($quizsettings->catquiz_timelimitgroup->catquiz_maxtimeperattempt)
+            && !empty($quizsettings->catquiz_timelimitgroup->catquiz_timeselect_attempt)) {
+                $attemptseconds = self::get_number_of_seconds(
+                    $quizsettings->catquiz_timelimitgroup->catquiz_timeselect_attempt,
+                    (int)$quizsettings->catquiz_timelimitgroup->catquiz_maxtimeperattempt);
+        }
+
+        if (!empty($quizsettings->catquiz_timelimitgroup->catquiz_maxtimeperitem)
+        && !empty($quizsettings->catquiz_timelimitgroup->catquiz_timeselect_item)) {
+            $itemseconds = self::get_number_of_seconds(
+                $quizsettings->catquiz_timelimitgroup->catquiz_timeselect_item,
+                (int)$quizsettings->catquiz_timelimitgroup->catquiz_maxtimeperitem);
+        }
 
         // Get selected subscales from quizdata.
         $selectedsubscales = self::get_selected_subscales($quizsettings);
@@ -811,6 +824,8 @@ class catquiz_handler {
             'has_fisherinformation' => false,
             'se_max' => $quizsettings->catquiz_standarderror_max,
             'se_min' => $quizsettings->catquiz_standarderror_min,
+            'max_attempttime_in_sec' => $attemptseconds ?? "",
+            'max_itemtime_in_sec' => $itemseconds ?? "",
 
             // TODO: add duration range for attempt and item.
 
@@ -832,6 +847,25 @@ class catquiz_handler {
         );
     }
 
+    /**
+     * Returns number of seconds according to string from select.
+     * @param string $selectvalue
+     * @param int $time
+     *
+     * @return int
+     */
+    public static function get_number_of_seconds(string $selectvalue, int $time) {
+        switch ($selectvalue) {
+            case 'h':
+                return $time * 360;
+            case 'min':
+                return $time * 60;
+            case 'sec':
+                return $time * 1;
+            default:
+                return $time;
+        }
+    }
     /**
      * Gets selected subscales
      *
