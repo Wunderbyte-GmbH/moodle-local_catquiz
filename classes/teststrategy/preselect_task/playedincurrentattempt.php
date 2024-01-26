@@ -24,9 +24,9 @@
 
 namespace local_catquiz\teststrategy\preselect_task;
 
-use cache;
 use local_catquiz\local\result;
 use local_catquiz\teststrategy\preselect_task;
+use local_catquiz\teststrategy\progress;
 use local_catquiz\wb_middleware;
 
 /**
@@ -46,6 +46,11 @@ final class playedincurrentattempt extends preselect_task implements wb_middlewa
     const PENALTY = 100;
 
     /**
+     * @var progress
+     */
+    private progress $progress;
+
+    /**
      * Run preselect task.
      *
      * @param array $context
@@ -55,8 +60,8 @@ final class playedincurrentattempt extends preselect_task implements wb_middlewa
      *
      */
     public function run(array &$context, callable $next): result {
-        $cache = cache::make('local_catquiz', 'adaptivequizattempt');
-        $playedquestions = $cache->get('playedquestions') ?: [];
+        $this->progress = $context['progress'];
+        $playedquestions = $this->progress->get_playedquestions();
         foreach ($context['questions'] as $q) {
             if (array_key_exists($q->id, $playedquestions)) {
                 $context['questions'][$q->id]->playedinattemptpenalty = self::PENALTY;
