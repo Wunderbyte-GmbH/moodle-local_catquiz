@@ -17,11 +17,11 @@ Feature: As a student i want to take adaptive quiz tests with catquiz functinali
       | user2    | C1     | student        |
       | teacher  | C1     | editingteacher |
     And the following "local_catquiz > questions" exist:
-      | filepath                                                                    | filename                                       | course |
-      | local/catquiz/tests/fixtures/quiz-adaptivetest-Simulation-20231116-0949.xml | quiz-adaptivetest-Simulation-20231116-0949.xml | C1     |
+      | filepath                                                            | filename                               | course |
+      | local/catquiz/tests/fixtures/quiz-adaptivetest-Simulation-small.xml | quiz-adaptivetest-Simulation-small.xml | C1     |
     And the following "local_catquiz > importedcatscales" exist:
-      | filepath                                           | filename              |
-      | local/catquiz/tests/fixtures/simulation_medium.csv | simulation_medium.csv |
+      | filepath                                          | filename             |
+      | local/catquiz/tests/fixtures/simulation_small.csv | simulation_small.csv |
     And I log in as "teacher"
     And I am on "Course 1" course homepage with editing mode on
     And I add a "Adaptive Quiz" to section "1"
@@ -65,5 +65,5 @@ Feature: As a student i want to take adaptive quiz tests with catquiz functinali
     And I click on "Submit answer" "button"
     And I wait until the page is ready
     And I should see "Ability score"
-    And I should see "You performed better than 55.56% of your fellow students"
-    And I should see "-1.49" in the "[data-original-title=\"parent scale Simulation\"]" "css_element"
+    And I should see "You performed better than 75.00% of your fellow students"
+    And I should see "-1.28" in the "[data-original-title=\"parent scale Simulation\"]" "css_element"
