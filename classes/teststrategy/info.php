@@ -202,48 +202,71 @@ class info {
             LOCAL_CATQUIZ_STRATEGY_CLASSIC
         );
 
-        $elements[] = $mform->addElement(
-            'text',
-            'catquiz_maxquestionspersubscale',
-            get_string('maxquestionspersubscale', 'local_catquiz')
-        );
-        $mform->addHelpButton('catquiz_maxquestionspersubscale', 'maxquestionspersubscale', 'local_catquiz');
-        $elements[] = $mform->addElement(
-            'text',
-            'catquiz_minquestionspersubscale',
-            get_string('minquestionspersubscale', 'local_catquiz')
-        );
-        $mform->addHelpButton('catquiz_minquestionspersubscale', 'minquestionspersubscale', 'local_catquiz');
+        $maxquestionspertest = [
+            $mform->createElement(
+                'static',
+                'catquiz_standarderror_label_min',
+                'catquiz_standarderror_label_min',
+                get_string('min', 'local_catquiz')
+            ),
+            $mform->createElement(
+                'text',
+                'catquiz_minquestions',
+                'minquestions',
+                ['size' => '2']
+            ),
+            $mform->createElement(
+                'static',
+                'catquiz_standarderror_label_max',
+                'catquiz_standarderror_label_max',
+                get_string('max', 'local_catquiz')
+            ),
+            $mform->createElement(
+                'text',
+                'catquiz_maxquestions',
+                'maxquestions',
+                ['size' => '2']
+            )
+            ];
+        $elements[] = $mform->addGroup(
+            $maxquestionspertest,
+            'maxquestionsgroup',
+            get_string('numberofquestionspertest', 'local_catquiz'));
+        $mform->addHelpButton('maxquestionsgroup', 'numberofquestionspertest', 'local_catquiz');
 
-        $elements[] = $mform->addElement(
-            'text',
-            'catquiz_maxquestions',
-            get_string('maxquestions', 'local_catquiz')
-        );
-        $mform->addHelpButton('catquiz_maxquestions', 'maxquestions', 'local_catquiz');
-        $elements[] = $mform->addElement(
-            'text',
-            'catquiz_minquestions',
-            get_string('minquestions', 'local_catquiz')
-        );
-        $mform->addHelpButton('catquiz_minquestions', 'minquestions', 'local_catquiz');
+        $maxquestionsperscale = [
+            $mform->createElement(
+                'static',
+                'catquiz_questionsperscale_label_min',
+                'catquiz_questionsperscale_label_min',
+                get_string('min', 'local_catquiz')
+            ),
+            $mform->createElement(
+                'text',
+                'catquiz_minquestionspersubscale',
+                get_string('minquestionspersubscale', 'local_catquiz'),
+                ['size' => '2']
+            ),
+            $mform->createElement(
+                'static',
+                'catquiz_questionsperscale_label_max',
+                'catquiz_questionsperscale_label_max',
+                get_string('max', 'local_catquiz')
+            ),
+            $mform->createElement(
+                'text',
+                'catquiz_maxquestionspersubscale',
+                get_string('maxquestionspersubscale', 'local_catquiz'),
+                ['size' => '2']
+            )
+            ];
+        $elements[] = $mform->addGroup(
+            $maxquestionsperscale,
+            'maxquestionsscalegroup',
+            get_string('numberofquestionsperscale', 'local_catquiz'));
+        $mform->addHelpButton('maxquestionsscalegroup', 'numberofquestionsperscale', 'local_catquiz');
 
-        // phpcs:disable
-        // $elements[] = $mform->addElement(
-        // 'text',
-        // 'catquiz_maxtimeperquestion',
-        // get_string('maxtimeperquestion', 'local_catquiz')
-        // );
-        // $mform->setDefault('catquiz_maxtimeperquestion', 60);
-        // $mform->addHelpButton('catquiz_maxtimeperquestion', 'maxtimeperquestion', 'local_catquiz');
-
-        // $elements[] = $mform->addElement(
-        // 'text',
-        // 'catquiz_breakduration',
-        // get_string('breakduration', 'local_catquiz')
-        // );
-        // $mform->setDefault('catquiz_breakduration', 300);
-        // phpcs:enable
+        // $mform->registerNoSubmitButton('calculatestandarderror');
         $standarderrorgroup = [
             $mform->createElement(
                 'static',
