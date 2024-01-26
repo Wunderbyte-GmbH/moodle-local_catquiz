@@ -23,6 +23,7 @@ use local_catquiz\catscale;
 use local_catquiz\teststrategy\feedbackgenerator;
 use local_catquiz\teststrategy\feedbacksettings;
 use local_catquiz\teststrategy\info;
+use local_catquiz\teststrategy\progress;
 use templatable;
 use renderable;
 use stdClass;
@@ -134,6 +135,7 @@ class attemptfeedback implements renderable, templatable {
         if (!$this->teststrategy) {
             return '';
         }
+        $progress = progress::load($this->attemptid);
 
         $generators = $this->get_feedback_generators_for_teststrategy($this->teststrategy);
 
@@ -149,7 +151,7 @@ class attemptfeedback implements renderable, templatable {
             'starttime' => $cache->get('starttime'),
             'endtime' => $cache->get('endtime'),
             'total_number_of_testitems' => $cache->get('totalnumberoftestitems'),
-            'number_of_testitems_used' => empty($cache->get('playedquestions')) ? 0 : count($cache->get('playedquestions')),
+            'number_of_testitems_used' => empty($progress->get_playedquestions()) ? 0 : count($progress->get_playedquestions()),
             'ability_before_attempt' => $cache->get('abilitybeforeattempt'),
             'studentfeedback' => [],
             'teacherfeedback' => [],
