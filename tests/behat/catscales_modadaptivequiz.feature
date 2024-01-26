@@ -22,24 +22,37 @@ Feature: As a student i want to take adaptive quiz tests with catquiz functinali
     And the following "local_catquiz > importedcatscales" exist:
       | filepath                                          | filename             |
       | local/catquiz/tests/fixtures/simulation_small.csv | simulation_small.csv |
+    ## Unfortunately, in Moodle 4.3 TinyMCE has misbehavior which cause number of site-wide issues. So - we disable it.
+    And the following config values are set as admin:
+      | config      | value         |
+      | texteditors | atto,textarea |
     And I log in as "teacher"
     And I am on "Course 1" course homepage with editing mode on
     And I add a "Adaptive Quiz" to section "1"
     And I set the following fields to these values:
-      | Name                         | Adaptive Quiz               |
+      | Name                         | My Adaptive Quiz            |
       | Description                  | Adaptive quiz description.  |
       | catmodel                     | Catquiz CAT model           |
       | Select CAT scale             | Simulation                  |
-      | Purpose of test              | Infer all subscales         |
       | Max. questions per test.     | 7                           |
     And I click on "Save and return to course" "button"
     And I log out
 
   @javascript
-  Scenario: Start adaptive quiz attempt with catquiz model
-    Given I log in as "user1"
+  Scenario: Start adaptive quiz attempt with catquiz model and Infer all subscales purpose
+    Given I log in as "teacher"
     And I am on "Course 1" course homepage
-    And I follow "Adaptive Quiz"
+    ##And I follow "My Adaptive Quiz"
+    And I click on "My Adaptive Quiz" "link" in the "#section-1" "css_element"
+    And I wait until the page is ready
+    And I follow "Settings"
+    And I wait until the page is ready
+    And I set the field "Purpose of test" to "Infer all subscales"
+    And I click on "Save and return to course" "button"
+    And I log out
+    And I log in as "user1"
+    And I am on "Course 1" course homepage
+    And I follow "My Adaptive Quiz"
     And I click on "Start attempt" "button"
     And I wait until the page is ready
     And I should see "Question 1"
