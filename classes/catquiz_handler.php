@@ -679,7 +679,6 @@ class catquiz_handler {
         $quizsettings = $testenvironment->return_settings();
         $cache = cache::make('local_catquiz', 'adaptivequizattempt');
         $cache->set('quizsettings', $quizsettings);
-        $cache->set('attemptdata', $attemptdata);
 
         $catcontext = catscale::get_context_id($quizsettings->catquiz_catscales);
         $tsinfo = new info();
