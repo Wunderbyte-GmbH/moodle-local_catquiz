@@ -88,12 +88,15 @@ $string['defaultcontext'] = 'Neuer Standard Einsatz-Kontext für Skala';
 $string['moveitemtootherscale'] = 'Testitem(s) {$a} sind bereits einer anderen Skala des selben Baumes zugeordnet. Zuordnung ändern?';
 $string['pleasecheckorcancel'] = 'Bitte bestätigen oder abbrechen';
 $string['progress'] = 'Fortschritt';
-
 $string['timepacedtest'] = 'Zeitbeschränkungen für den Test aktivieren';
+$string['includetimelimit'] = 'Bearbeitung eines Testversuchs zeitlich begrenzen';
+$string['includetimelimit_help'] = 'Maximaldauer festlegen, die für die Durchführung des Tests gelten soll.';
 $string['maxtime'] = 'Maximale Dauer des Tests';
 $string['maxtimeperitem'] = 'Höchstzeit pro Frage in Sekunden';
 $string['mintimeperitem'] = 'Mindestzeit pro Frage in Sekunden';
 $string['actontimeout'] = 'Aktion nach Ablauf der Zeit';
+$string['perattempt'] = 'pro Versuch ';
+$string['peritem'] = 'pro Item ';
 
 $string['timeoutabortnoresult'] = 'Test wird sofort beendet und nicht abschließend bewertet';
 $string['timeoutabortresult'] = 'Test wird sofort beendet und abschließend bewertet';
@@ -105,6 +108,7 @@ $string['maxscalevalue'] = 'Maximalwert';
 $string['chooseparent'] = 'Wähle übergeordnete Scala';
 $string['errorminscalevalue'] = 'Der Minimalwert muss kleiner sein als der Maximalwert der Skala';
 $string['errorhastobefloat'] = 'Muss ein Dezimalwert sein';
+$string['errorhastobeint'] = 'Muss eine Ganzzahl sein';
 
 $string['addoredittemplate'] = "Einstellungs-Vorlage bearbeiten";
 
@@ -129,7 +133,7 @@ $string['startwithfirstofsecondquartil'] = "Starte mit der leichtesten Frage aus
 $string['startwithmostdifficultsecondquartil'] = "Starte mit der schwierigsten Frage aus dem zweiten Quartil";
 $string['startwithaverageabilityoftest'] = "Personenparamter entspricht Mittelwert der bisher im Test gemessenen Population";
 $string['startwithcurrentability'] = "Personenparameter aus vorherigem Testlauf nutzen";
-$string['maxtimeperquestion'] = "Erlaube Zeit pro Frage in Sekunden";
+$string['maxtimeperquestion'] = "Erlaubte Zeit";
 $string['maxtimeperquestion_help'] = "Falls die Beantwortung einer Frage länger dauert, wird eine Pause erzwungen";
 $string['breakduration'] = "Dauer der Pause in Sekunden";
 $string['min'] = "min:";

@@ -297,6 +297,64 @@ class info {
         $elements[] = $mform->addGroup($standarderrorgroup, 'catquiz_standarderrorgroup', get_string('acceptedstandarderror', 'local_catquiz'), '', false);
         $mform->addHelpButton('catquiz_standarderrorgroup', 'acceptedstandarderror', 'local_catquiz');
 
+        $elements[] = $mform->addElement(
+            'advcheckbox',
+            'catquiz_includetimelimit',
+            get_string('includetimelimit', 'local_catquiz'));
+        $mform->addHelpButton('catquiz_includetimelimit', 'includetimelimit', 'local_catquiz');
+
+        $timelimitgroup = [
+            $mform->createElement(
+                'static',
+                'catquiz_timelabel_attempt',
+                'catquiz_timelabel_attempt',
+                get_string('perattempt', 'local_catquiz')
+            ),
+            $mform->createElement(
+                'text',
+                'catquiz_maxtimeperattempt',
+                'catquiz_maxtimeperattempt',
+                ['size' => '2']
+            ),
+            $mform->createElement('select',
+                'catquiz_timeselect_attempt',
+                "string",
+                ['h' => "h", 'min' => 'min']),
+            $mform->createElement(
+                'static',
+                'catquiz_timelabel_item',
+                'catquiz_timelabel_item',
+                get_string('peritem', 'local_catquiz')
+            ),
+            $mform->createElement(
+                'text',
+                'catquiz_maxtimeperitem',
+                'catquiz_maxtimeperitem',
+                ['size' => '2']
+            ),
+            $mform->createElement('select',
+                'catquiz_timeselect_item',
+                "string",
+                ['min' => "min", 'sec' => 'sec']),
+        ];
+        $elements[] = $mform->addGroup(
+            $timelimitgroup,
+            'catquiz_timelimitgroup',
+            get_string('maxtimeperquestion', 'local_catquiz'));
+        $mform->setType('catquiz_maxtimeperattempt', PARAM_INT);
+        $mform->setType('catquiz_maxtimeperitem', PARAM_INT);
+        $mform->hideIf('catquiz_timelimitgroup', 'catquiz_includetimelimit', 'neq', 1);
+
+        $timeoutoptions = [
+            1 => get_string('timeoutfinishwithresult', 'local_catquiz'),
+            2 => get_string('timeoutabortresult', 'local_catquiz'),
+            3 => get_string('timeoutabortnoresult', 'local_catquiz'),
+        ];
+        // Choose a model for this instance.
+        $elements[] = $mform->addElement('select', 'catquiz_actontimeout',
+        get_string('actontimeout', 'local_catquiz'), $timeoutoptions);
+        $mform->hideIf('catquiz_actontimeout', 'catquiz_includetimelimit', 'neq', 1);
+
         feedbackclass::instance_form_definition($mform, $elements);
     }
 

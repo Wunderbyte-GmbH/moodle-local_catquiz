@@ -79,6 +79,8 @@ $string['numberofquestionspertest_help'] = 'Set max. value to 0 to play testatte
 $string['numberofquestionsperscale'] = 'Number of questions per scale';
 $string['numberofquestionsperscale_help'] = 'Set max. value to 0 to play testattempt without a limit.';
 $string['timepacedtest'] = 'Timepaced test';
+$string['includetimelimit'] = 'Limit time for attempt';
+$string['includetimelimit_help'] = 'Define a maximum duration for an attempt to be finished.';
 $string['maxtime'] = 'Max time for test';
 $string['maxtimeperitem'] = 'Max time per question in seconds';
 $string['mintimeperitem'] = 'Min time per question in seconds';
@@ -89,6 +91,8 @@ $string['defaultcontext'] = 'New default context for scale';
 $string['moveitemtootherscale'] = 'Testitem(s) {$a} already assigned to another (sub-)scale of the same tree. Modify assignment?';
 $string['pleasecheckorcancel'] = 'Please confirm or cancel';
 $string['progress'] = 'Progress';
+$string['perattempt'] = 'per attempt ';
+$string['peritem'] = 'per item ';
 
 $string['timeoutabortnoresult'] = 'Test aborted without result.';
 $string['timeoutabortresult'] = 'Test aborted with result.';
@@ -102,6 +106,7 @@ $string['max'] = 'max: ';
 $string['chooseparent'] = 'Choose parent scale';
 $string['errorminscalevalue'] = 'Min value has to be smaller than max value';
 $string['errorhastobefloat'] = 'Has to be a deciamal';
+$string['errorhastobeint'] = 'Has to be a number';
 
 $string['addoredittemplate'] = "Add or edit template";
 
@@ -127,7 +132,7 @@ $string['startwithmostdifficultsecondquartil'] = "Start with the most difficult 
 $string['startwithaverageabilityoftest'] = "Use the average ability score of the current test";
 $string['startwithcurrentability'] = "Use the person's current ability score to determine the first question";
 
-$string['maxtimeperquestion'] = "Maximum time per question in seconds";
+$string['maxtimeperquestion'] = "Maximum time";
 $string['maxtimeperquestion_help'] = "If the user takes longer to answer a question, a break will be enforced";
 $string['breakduration'] = "Duration of a forced break in seconds";
 
