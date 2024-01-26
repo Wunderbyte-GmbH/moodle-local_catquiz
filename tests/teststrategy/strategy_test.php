@@ -611,9 +611,9 @@ class strategy_test extends advanced_testcase {
         $jsondata->componentid = '1';
         $jsondata->component = 'mod_adaptivequiz';
         $jsondata->catquiz_selectteststrategy = $strategyid;
-        $jsondata->catquiz_maxquestions = 25;
-        $jsondata->catquiz_minquestions = 500;
-        $jsondata->catquiz_maxquestionspersubscale = 10;
+        $jsondata->maxquestionsgroup->catquiz_maxquestions = 25;
+        $jsondata->maxquestionsgroup->catquiz_minquestions = 500;
+        $jsondata->maxquestionsscalegroup->catquiz_maxquestionspersubscale = 10;
         $jsondata->json = json_encode($jsondata);
         $testenvironment = new testenvironment($jsondata);
         return $testenvironment;

@@ -76,6 +76,10 @@ $string['maxquestions'] = 'max. Frageanzahl pro Test';
 $string['maxquestions_help'] = 'Es werden nicht mehr Fragen pro Test angezeigt. 0 bedeutet keine Begrenzung.';
 $string['minquestions'] = 'Min. Frageanzahl pro Test';
 $string['minquestions_help'] = 'Es müssen mindestens so viele Fragen pro Test angezeigt werden.';
+$string['numberofquestionspertest'] = 'Anzahl der Fragen pro Test';
+$string['numberofquestionspertest_help'] = 'Setzen Sie den Maximalwert auf 0 um unbegrenzt Fragen auszuspielen.';
+$string['numberofquestionsperscale'] = 'Anzahl der Fragen pro Test';
+$string['numberofquestionsperscale_help'] = 'Setzen Sie den Maximalwert auf 0 um unbegrenzt Fragen auszuspielen.';
 $string['minquestionspersubscale'] = 'min. Frageanzahl pro Skala';
 $string['minquestionspersubscale_help'] = 'Eine Skala wird frühestens dann ausgeschlossen, wenn die Minimalanzahl an Fragen aus dieser Skala angezeigt wurden.';
 $string['contextidselect'] = 'Einsatz-Kontext - ohne Auswahl wird ein neuer Einsatz-Kontext erstellt';
@@ -128,6 +132,8 @@ $string['startwithcurrentability'] = "Personenparameter aus vorherigem Testlauf 
 $string['maxtimeperquestion'] = "Erlaube Zeit pro Frage in Sekunden";
 $string['maxtimeperquestion_help'] = "Falls die Beantwortung einer Frage länger dauert, wird eine Pause erzwungen";
 $string['breakduration'] = "Dauer der Pause in Sekunden";
+$string['min'] = "min:";
+$string['max'] = "max:";
 
 // Tests environment.
 $string['newcustomtest'] = 'Benutzerdefinierter Test';

@@ -390,6 +390,11 @@ class catquiz_handler {
 
         $errors = [];
 
+        if (isset($data['maxquestionsgroup']["catquiz_maxquestionspersubscale"])) {
+            if (!is_int($data['maxquestionsgroup']["catquiz_maxquestionspersubscale"])) {
+                $errors['maxquestionsgroup']["catquiz_maxquestionspersubscale"] = get_string('errorhastobefloat', 'local_catquiz');
+            }
+        }
         // Todo: Make a real validation of necessary fields.
 
         return $errors;
@@ -759,12 +764,12 @@ class catquiz_handler {
         }
 
         // Default is infinite represented by -1.
-        $maxquestionsperscale = intval($quizsettings->catquiz_maxquestionspersubscale);
+        $maxquestionsperscale = intval($quizsettings->maxquestionsgroup->catquiz_maxquestionspersubscale);
         if ($maxquestionsperscale == 0) {
             $maxquestionsperscale = -1;
         }
 
-        $maxquestions = $quizsettings->catquiz_maxquestions;
+        $maxquestions = $quizsettings->maxquestionsgroup->catquiz_maxquestions;
         if (!$maxquestions) {
             $maxquestions = -1;
         }
@@ -783,7 +788,7 @@ class catquiz_handler {
             'includesubscales' => true,
             'selectedsubscales' => $selectedsubscales,
             'maximumquestions' => $maxquestions,
-            'minimumquestions' => $quizsettings->catquiz_minquestions,
+            'minimumquestions' => $quizsettings->maxquestionsgroup->catquiz_minquestions,
             'penalty_threshold' => 60 * 60 * 24 * 30 - 90, // TODO: make dynamic.
             'initial_standarderror' => 1.0, // TODO: make configurable.
             /*
@@ -797,7 +802,7 @@ class catquiz_handler {
             'skip_reason' => null,
             'userid' => $USER->id,
             'max_attempts_per_scale' => $maxquestionsperscale,
-            'min_attempts_per_scale' => $quizsettings->catquiz_minquestionspersubscale,
+            'min_attempts_per_scale' => $quizsettings->maxquestionsgroup->catquiz_minquestionspersubscale,
             'teststrategy' => $quizsettings->catquiz_selectteststrategy,
             'timestamp' => time(),
             'attemptid' => intval($attemptdata->id),
