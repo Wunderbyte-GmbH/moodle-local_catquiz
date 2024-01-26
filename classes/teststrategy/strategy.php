@@ -30,6 +30,7 @@ use local_catquiz\catscale;
 use local_catquiz\local\result;
 use local_catquiz\teststrategy\info;
 use local_catquiz\teststrategy\preselect_task;
+use local_catquiz\teststrategy\progress;
 use local_catquiz\wb_middleware_runner;
 use moodle_exception;
 use stdClass;
@@ -65,6 +66,11 @@ abstract class strategy {
      * @var array<preselect_task>
      */
     public array $scoremodifiers;
+
+    /**
+     * @var progress
+     */
+    private progress $progress;
 
     /**
      * Instantioate parameters.
@@ -131,9 +137,10 @@ abstract class strategy {
 
         $result = wb_middleware_runner::run($middlewares, $context);
 
+        $this->progress = $context['progress'];
+
         $cache = cache::make('local_catquiz', 'adaptivequizattempt');
         if ($result->isErr()) {
-            $cache->set('stopreason', $result->get_status());
             $cache->set('endtime', time());
             $cache->set('catquizerror', $result->get_status());
             return $result;
@@ -148,10 +155,8 @@ abstract class strategy {
         $selectedquestion->lastattempttime = $now;
         $selectedquestion->userlastattempttime = $now;
 
-        // Keep track of which question was selected.
-        $playedquestions = $cache->get('playedquestions') ?: [];
-        $playedquestions[$selectedquestion->id] = $selectedquestion;
-        $cache->set('playedquestions', $playedquestions);
+        $this->progress->add_playedquestion($selectedquestion);
+
         $cache->set('isfirstquestionofattempt', false);
         $cache->set('lastquestionreturntime', $now);
 
@@ -167,6 +172,7 @@ abstract class strategy {
 
         $cache->set('lastquestion', $selectedquestion);
 
+        $progress->save();
         catscale::update_testitem(
             $context['contextid'],
             $selectedquestion,
