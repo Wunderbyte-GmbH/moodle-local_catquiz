@@ -802,6 +802,8 @@ class catquiz_handler {
             'teststrategy' => $quizsettings->catquiz_selectteststrategy,
             'timestamp' => time(),
             'attemptid' => intval($attemptdata->id),
+             // Hardcoded because this function already depends on mod_adaptivequiz attemptdata.
+            'component' => 'mod_adaptivequiz',
             'updateabilityfallback' => false,
             'excludedsubscales' => [],
             'has_fisherinformation' => false,
@@ -822,6 +824,7 @@ class catquiz_handler {
                 'contextid',
                 'questions',
                 'pilot_questions',
+                'progress',
             ],
             $initialcontext
         );
