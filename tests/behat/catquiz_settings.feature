@@ -15,11 +15,11 @@ Feature: As a teacher I setup adaptive quiz with CATquiz Scales and Feedbacks.
       | student1 | C1     | student        |
       | teacher1 | C1     | editingteacher |
     And the following "local_catquiz > questions" exist:
-      | filepath                                           | filename              | course |
-      | local/catquiz/tests/fixtures/mathematik2scales.xml | mathematik2scales.xml | C1     |
+      | filepath                                                            | filename                               | course |
+      | local/catquiz/tests/fixtures/quiz-adaptivetest-Simulation-small.xml | quiz-adaptivetest-Simulation-small.xml | C1     |
     And the following "local_catquiz > importedcatscales" exist:
-      | filepath                                           | filename              |
-      | local/catquiz/tests/fixtures/mathematik2scales.csv | mathematik2scales.csv |
+      | filepath                                          | filename             |
+      | local/catquiz/tests/fixtures/simulation_small.csv | simulation_small.csv |
     ## Required to avoid misbehaviour of TinyMCE under Moodle 4.3 (AXAX/JS errors)
     And the following config values are set as admin:
       | config      | value         |
@@ -31,18 +31,18 @@ Feature: As a teacher I setup adaptive quiz with CATquiz Scales and Feedbacks.
     And I am on "Course 1" course homepage with editing mode on
     And I add a "Adaptive Quiz" to section "1"
     And I set the following fields to these values:
-      | Name      | Adaptive CATquiz  |
-      | ID number | adaptivecatquiz1  |
-      | catmodel  | Catquiz CAT model |
-    ## Delay required to settle CAT model
-    And I wait until the page is ready
-    And I set the field "Select CAT scale" to "Mathematik"
-    ## Delay required to settle CAT scale
-    And I wait until the page is ready
-    And I should see "A03" in the "#id_catquiz_headercontainer" "css_element"
-    And I should see "A02" in the "#id_catquiz_headercontainer" "css_element"
-    And the field with xpath "//input[@data-name='A03']" matches value "checked"
-    And the field with xpath "//input[@data-name='A02']" matches value "checked"
+      | Name             | Adaptive CATquiz  |
+      | ID number        | adaptivecatquiz1  |
+      | catmodel         | Catquiz CAT model |
+      | Select CAT scale | Simulation        |
+    When I wait until the page is ready
+    ## Verify all root catscales active by default
+    Then I should see "SimA" in the "#id_catquiz_headercontainer" "css_element"
+    And I should see "SimB" in the "#id_catquiz_headercontainer" "css_element"
+    And I should see "SimC" in the "#id_catquiz_headercontainer" "css_element"
+    And the field with xpath "//input[@data-name='SimA']" matches value "checked"
+    And the field with xpath "//input[@data-name='SimB']" matches value "checked"
+    And the field with xpath "//input[@data-name='SimC']" matches value "checked"
     And I click on "Save and return to course" "button"
     And I log out
     And I am on the "adaptivecatquiz1" "Activity" page logged in as "student1"
@@ -54,14 +54,12 @@ Feature: As a teacher I setup adaptive quiz with CATquiz Scales and Feedbacks.
     And I am on "Course 1" course homepage with editing mode on
     And I add a "Adaptive Quiz" to section "1"
     And I set the following fields to these values:
-      | Name      | Adaptive CATquiz  |
-      | ID number | adaptivecatquiz1  |
-      | catmodel  | Catquiz CAT model |
-    ## Delay required to settle CAT model
-    And I wait until the page is ready
-    And I set the field "Select CAT scale" to "Mathematik"
+      | Name             | Adaptive CATquiz  |
+      | ID number        | adaptivecatquiz1  |
+      | catmodel         | Catquiz CAT model |
+      | Select CAT scale | Simulation        |
     ## Delay required to settle CAT scale
-    And I wait until the page is ready
+    When I wait until the page is ready
     And the field "Number of ability ranges" matches value "2"
     ## Update feedback defaults and chak it for root catscale, range 1
     And I fill in the "multiselect" element number "2" with the dynamic identifier "fitem_id_catquiz_courses_" with "Course 1"
@@ -70,38 +68,40 @@ Feature: As a teacher I setup adaptive quiz with CATquiz Scales and Feedbacks.
     And I fill in the "editor" element number "2" with the dynamic identifier "id_feedbackeditor_scaleid_" with "my text is here"
     And I fill in the "wb_colourpicker" element number "2" with the dynamic identifier "fitem_id_wb_colourpicker_" with "6"
     And I wait "3" seconds
-    And I should see "Feedback for range 1" in the "//div[@data-name='feedback_scale_Mathematik_range_1']" "xpath_element"
-    And the field "Lower limit" in the "//div[@data-name='feedback_scale_Mathematik_range_1']" "xpath_element" matches value "-5"
-    And the field "Upper limit" in the "//div[@data-name='feedback_scale_Mathematik_range_1']" "xpath_element" matches value "-0"
-    And I set the field "Feedback" in the "//div[@data-name='feedback_scale_Mathematik_range_1']" "xpath_element" to "Feedback-Mathematik_range_1"
-    And I set the field "Lower limit" in the "//div[@data-name='feedback_scale_Mathematik_range_1']" "xpath_element" to "-4"
-    And I set the field "Upper limit" in the "//div[@data-name='feedback_scale_Mathematik_range_1']" "xpath_element" to "-1"
-    And the field "Lower limit" in the "//div[@data-name='feedback_scale_Mathematik_range_1']" "xpath_element" matches value "-4"
-    And the field "Upper limit" in the "//div[@data-name='feedback_scale_Mathematik_range_1']" "xpath_element" matches value "-1"
+    And I should see "Feedback for range 1" in the "//div[@data-name='feedback_scale_Simulation_range_1']" "xpath_element"
+    And the field "Lower limit" in the "//div[@data-name='feedback_scale_Simulation_range_1']" "xpath_element" matches value "-5"
+    And the field "Upper limit" in the "//div[@data-name='feedback_scale_Simulation_range_1']" "xpath_element" matches value "-0"
+    And I set the field "Feedback" in the "//div[@data-name='feedback_scale_Simulation_range_1']" "xpath_element" to "Feedback-Simulation_range_1"
+    And I set the field "Lower limit" in the "//div[@data-name='feedback_scale_Simulation_range_1']" "xpath_element" to "-4"
+    And I set the field "Upper limit" in the "//div[@data-name='feedback_scale_Simulation_range_1']" "xpath_element" to "-1"
+    And the field "Lower limit" in the "//div[@data-name='feedback_scale_Simulation_range_1']" "xpath_element" matches value "-4"
+    And the field "Upper limit" in the "//div[@data-name='feedback_scale_Simulation_range_1']" "xpath_element" matches value "-1"
     ## Update feedback defaults and chak it for root catscale, range 2
-    And I should see "Feedback for range 2" in the "//div[@data-name='feedback_scale_Mathematik_range_2']" "xpath_element"
-    And I set the field "Feedback" in the "//div[@data-name='feedback_scale_Mathematik_range_2']" "xpath_element" to "Feedback-Mathematik_range_2"
-    And I set the field "Lower limit" in the "//div[@data-name='feedback_scale_Mathematik_range_2']" "xpath_element" to "1"
-    And I set the field "Upper limit" in the "//div[@data-name='feedback_scale_Mathematik_range_2']" "xpath_element" to "4"
-    And the field "Lower limit" in the "//div[@data-name='feedback_scale_Mathematik_range_2']" "xpath_element" matches value "1"
-    And the field "Upper limit" in the "//div[@data-name='feedback_scale_Mathematik_range_2']" "xpath_element" matches value "4"
+    And I should see "Feedback for range 2" in the "//div[@data-name='feedback_scale_Simulation_range_2']" "xpath_element"
+    And I set the field "Feedback" in the "//div[@data-name='feedback_scale_Simulation_range_2']" "xpath_element" to "Feedback-Simulation_range_2"
+    And I set the field "Lower limit" in the "//div[@data-name='feedback_scale_Simulation_range_2']" "xpath_element" to "1"
+    And I set the field "Upper limit" in the "//div[@data-name='feedback_scale_Simulation_range_2']" "xpath_element" to "4"
+    And the field "Lower limit" in the "//div[@data-name='feedback_scale_Simulation_range_2']" "xpath_element" matches value "1"
+    And the field "Upper limit" in the "//div[@data-name='feedback_scale_Simulation_range_2']" "xpath_element" matches value "4"
     And I should not see "Feedback for range 3" in the "//div[contains(@aria-labelledby, 'catquiz_feedback_header_')]" "xpath_element"
     ## Chack visibility of feedback form links for other catscales
-    And I should see "Feedback for \"A03\"" in the "//div[contains(@aria-labelledby, 'catquiz_feedback_header_')]" "xpath_element"
-    And I should see "Feedback for \"A02\"" in the "//div[contains(@aria-labelledby, 'catquiz_feedback_header_')]" "xpath_element"
+    And I should see "Feedback for \"SimA\"" in the "//div[contains(@aria-labelledby, 'catquiz_feedback_header_')]" "xpath_element"
+    And I should see "Feedback for \"SimB\"" in the "//div[contains(@aria-labelledby, 'catquiz_feedback_header_')]" "xpath_element"
+    And I should see "Feedback for \"SimC\"" in the "//div[contains(@aria-labelledby, 'catquiz_feedback_header_')]" "xpath_element"
     ## An attempt to save and verify fails by now
     ## It is not clear which values have to be saved "as is" and which should be validated / autofixed
     ## Below steps disabled because of it
-    ##And I click on "Save and return to course" "button"
-    ##And I wait until the page is ready
-    ##And I click on "Edit" "icon" in the "#action-menu-3-menubar" "css_element"
-    ##And I click on "Edit settings" "link" in the "#action-menu-3-menubar" "css_element"
-    ##And I wait until the page is ready
-    ##And I click on "Feedback for \"Mathematik\"" "text"
-    ##And I wait until the page is ready
+    And I click on "Save and return to course" "button"
+    And I am on the "adaptivecatquiz1" Activity page
+    And I follow "Settings"
+    And I wait until the page is ready
+    Then I click on "Feedback for \"Simulation\"" "text"
+    And I wait until the page is ready
     ## Lowest and highest limits looks like not saved...
-    ##Then the field "Lower limit" in the "//div[@data-name='feedback_scale_Mathematik_range_1']" "xpath_element" matches value "-4"
-    ##And the field "Upper limit" in the "//div[@data-name='feedback_scale_Mathematik_range_1']" "xpath_element" matches value "-1"
-    ##And the field "Lower limit" in the "//div[@data-name='feedback_scale_Mathematik_range_2']" "xpath_element" matches value "1"
-    ##And the field "Upper limit" in the "//div[@data-name='feedback_scale_Mathematik_range_2']" "xpath_element" matches value "4"
+    ##And the field "Lower limit" in the "//div[@data-name='feedback_scale_Simulation_range_1']" "xpath_element" matches value "-4"
+    ##And the field "Upper limit" in the "//div[@data-name='feedback_scale_Simulation_range_1']" "xpath_element" matches value "-1"
+    ##And the field "Lower limit" in the "//div[@data-name='feedback_scale_Simulation_range_2']" "xpath_element" matches value "1"
+    ##And the field "Upper limit" in the "//div[@data-name='feedback_scale_Simulation_range_2']" "xpath_element" matches value "4"
+    And the field "Feedback" in the "//div[@data-name='feedback_scale_Simulation_range_1']" "xpath_element" matches value "Feedback-Simulation_range_1"
+    And the field "Feedback" in the "//div[@data-name='feedback_scale_Simulation_range_2']" "xpath_element" matches value "Feedback-Simulation_range_2"
     And I log out
