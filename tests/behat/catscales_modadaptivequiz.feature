@@ -31,6 +31,7 @@ Feature: As a student i want to take adaptive quiz tests with catquiz functinali
     And I add a "Adaptive Quiz" to section "1"
     And I set the following fields to these values:
       | Name                         | My Adaptive Quiz            |
+      | ID number                    | adaptivecatquiz1            |
       | Description                  | Adaptive quiz description.  |
       | catmodel                     | Catquiz CAT model           |
       | Select CAT scale             | Simulation                  |
@@ -40,11 +41,7 @@ Feature: As a student i want to take adaptive quiz tests with catquiz functinali
 
   @javascript
   Scenario: Start adaptive quiz attempt with catquiz model and Infer all subscales purpose
-    Given I log in as "teacher"
-    And I am on "Course 1" course homepage
-    ##And I follow "My Adaptive Quiz"
-    And I click on "My Adaptive Quiz" "link" in the "#section-1" "css_element"
-    And I wait until the page is ready
+    Given I am on the "adaptivecatquiz1" Activity page logged in as teacher
     And I follow "Settings"
     And I wait until the page is ready
     And I set the field "Purpose of test" to "Infer all subscales"
@@ -83,11 +80,7 @@ Feature: As a student i want to take adaptive quiz tests with catquiz functinali
 
 @javascript
   Scenario: Start adaptive quiz attempt with catquiz model and Infer greatest strength purpose
-    Given I log in as "teacher"
-    And I am on "Course 1" course homepage
-    ##And I follow "My Adaptive Quiz"
-    And I click on "My Adaptive Quiz" "link" in the "#section-1" "css_element"
-    And I wait until the page is ready
+    Given I am on the "adaptivecatquiz1" Activity page logged in as teacher
     And I follow "Settings"
     And I wait until the page is ready
     And I set the field "Purpose of test" to "Infer greatest strength"
@@ -126,11 +119,7 @@ Feature: As a student i want to take adaptive quiz tests with catquiz functinali
 
 @javascript
   Scenario: Start adaptive quiz attempt with catquiz model and Infer lowest skill gap purpose
-    Given I log in as "teacher"
-    And I am on "Course 1" course homepage
-    ##And I follow "My Adaptive Quiz"
-    And I click on "My Adaptive Quiz" "link" in the "#section-1" "css_element"
-    And I wait until the page is ready
+    Given I am on the "adaptivecatquiz1" Activity page logged in as teacher
     And I follow "Settings"
     And I wait until the page is ready
     And I set the field "Purpose of test" to "Infer lowest skill gap"
@@ -169,11 +158,7 @@ Feature: As a student i want to take adaptive quiz tests with catquiz functinali
     And I should see "-2.18" in the "[data-original-title=\"parent scale Simulation\"]" "css_element"
 
   Scenario: Start adaptive quiz attempt with catquiz model and Classical test purpose
-    Given I log in as "teacher"
-    And I am on "Course 1" course homepage
-    ##And I follow "My Adaptive Quiz"
-    And I click on "My Adaptive Quiz" "link" in the "#section-1" "css_element"
-    And I wait until the page is ready
+    Given I am on the "adaptivecatquiz1" Activity page logged in as teacher
     And I follow "Settings"
     And I wait until the page is ready
     And I set the field "Purpose of test" to "Classical test"
@@ -211,11 +196,7 @@ Feature: As a student i want to take adaptive quiz tests with catquiz functinali
     And I should see "-4.07" in the "[data-original-title=\"parent scale Simulation\"]" "css_element"
 
   Scenario: Start adaptive quiz attempt with catquiz model and Moderate CAT purpose
-    Given I log in as "teacher"
-    And I am on "Course 1" course homepage
-    ##And I follow "My Adaptive Quiz"
-    And I click on "My Adaptive Quiz" "link" in the "#section-1" "css_element"
-    And I wait until the page is ready
+    Given I am on the "adaptivecatquiz1" Activity page logged in as teacher
     And I follow "Settings"
     And I wait until the page is ready
     And I set the field "Purpose of test" to "Moderate CAT"
@@ -254,11 +235,7 @@ Feature: As a student i want to take adaptive quiz tests with catquiz functinali
     And I should see "-3.86" in the "[data-original-title=\"parent scale Simulation\"]" "css_element"
 
   Scenario: Start adaptive quiz attempt with catquiz model and Radical CAT purpose
-    Given I log in as "teacher"
-    And I am on "Course 1" course homepage
-    ##And I follow "My Adaptive Quiz"
-    And I click on "My Adaptive Quiz" "link" in the "#section-1" "css_element"
-    And I wait until the page is ready
+    Given I am on the "adaptivecatquiz1" Activity page logged in as teacher
     And I follow "Settings"
     And I wait until the page is ready
     And I set the field "Purpose of test" to "Radical CAT"
