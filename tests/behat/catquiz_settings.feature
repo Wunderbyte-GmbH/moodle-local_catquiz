@@ -49,6 +49,52 @@ Feature: As a teacher I setup adaptive quiz with CATquiz Scales and Feedbacks.
     Then "Start attempt" "button" should exist
 
   @javascript
+  Scenario: CATquiz settings: teacher setup catscale usage in quiz and verify it
+    Given I log in as "teacher1"
+    And I am on "Course 1" course homepage with editing mode on
+    And I add a "Adaptive Quiz" to section "1"
+    And I set the following fields to these values:
+      | Name             | Adaptive CATquiz  |
+      | ID number        | adaptivecatquiz1  |
+      | catmodel         | Catquiz CAT model |
+      | Select CAT scale | Simulation        |
+    When I wait until the page is ready
+    ## Verify all root catscales active by default
+    Then I should see "SimA" in the "#id_catquiz_headercontainer" "css_element"
+    And I should see "SimA02" in the "#id_catquiz_headercontainer" "css_element"
+    And I should see "SimB" in the "#id_catquiz_headercontainer" "css_element"
+    And I should see "SimB03" in the "#id_catquiz_headercontainer" "css_element"
+    And I should see "SimC" in the "#id_catquiz_headercontainer" "css_element"
+    And I should see "SimC02" in the "#id_catquiz_headercontainer" "css_element"
+    And the field with xpath "//input[@data-name='SimA']" matches value "checked"
+    And the field with xpath "//input[@data-name='SimA02']" matches value "checked"
+    And the field with xpath "//input[@data-name='SimB']" matches value "checked"
+    And the field with xpath "//input[@data-name='SimB03']" matches value "checked"
+    And the field with xpath "//input[@data-name='SimC']" matches value "checked"
+    And the field with xpath "//input[@data-name='SimC02']" matches value "checked"
+    ## Disable scale and sub-scale
+    And I set the field with xpath "//input[@data-name='SimB03']" to ""
+    And I set the field with xpath "//input[@data-name='SimC']" to ""
+    ## Verify disabled scale and sub-scale
+    And I wait until the page is ready
+    And I should not see "SimC01" in the "#id_catquiz_headercontainer" "css_element"
+    And I should not see "SimC02" in the "#id_catquiz_headercontainer" "css_element"
+    And I click on "Save and display" "button"
+    And I wait until the page is ready
+    And I follow "Settings"
+    And I wait until the page is ready
+    ## Verify disabled scale and sub-scale after save
+    And the field with xpath "//input[@data-name='SimA']" matches value "checked"
+    And the field with xpath "//input[@data-name='SimA02']" matches value "checked"
+    And the field with xpath "//input[@data-name='SimB']" matches value "checked"
+    And the field with xpath "//input[@data-name='SimB02']" matches value "checked"
+    And the field with xpath "//input[@data-name='SimB03']" matches value ""
+    And the field with xpath "//input[@data-name='SimC']" matches value ""
+    And I should not see "SimC01" in the "#id_catquiz_headercontainer" "css_element"
+    And I should not see "SimC02" in the "#id_catquiz_headercontainer" "css_element"
+    And I log out
+
+  @javascript
   Scenario: CATquiz settings: teacher setup question settings and validate it
     Given I log in as "teacher1"
     And I am on "Course 1" course homepage with editing mode on
