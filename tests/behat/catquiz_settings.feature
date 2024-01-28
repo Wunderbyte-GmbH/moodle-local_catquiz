@@ -49,6 +49,64 @@ Feature: As a teacher I setup adaptive quiz with CATquiz Scales and Feedbacks.
     Then "Start attempt" "button" should exist
 
   @javascript
+  Scenario: CATquiz settings: teacher setup question settings and validate it
+    Given I log in as "teacher1"
+    And I am on "Course 1" course homepage with editing mode on
+    And I add a "Adaptive Quiz" to section "1"
+    And I set the following fields to these values:
+      | Name             | Adaptive CATquiz  |
+      | ID number        | adaptivecatquiz1  |
+      | catmodel         | Catquiz CAT model |
+      | Select CAT scale | Simulation        |
+      | Passing level in %| 500 |
+      | Timepaced test | 1 |
+      | Max time per question in seconds | 1 |
+      | Min time per question in seconds | 5 |
+      | Purpose of test | Infer all subscales |
+      | Activate pilot mode | 1 |
+      | Proportion of questions to be piloted in % | 20 |
+      | Minimum number of adaptations | 150 |
+      | Standarderror per subscale in percent | 60 |
+      | Start new CAT test with | Use the average ability score of the current test |
+      | Maximum number of questions returned per subscale | 1 |
+      | Minimum number of questions returned per subscale | 3 |
+      | Max. questions per test. | 10 |
+      | Min. number of questions per test. | 3 |
+    When I click on "Save and display" "button"
+    ## Errors validation
+    Then I should see "Input a positive number from 0 to 100" in the "#fitem_id_catquiz_passinglevel" "css_element"
+    And I should see "Minimum number of questions must be less than maximum number of questions" in the "#fitem_id_catquiz_minquestionspersubscale" "css_element"
+    And I should see "Minimum number of questions must be less than maximum number of questions" in the "#fitem_id_catquiz_mintimeperitem" "css_element"
+    And I set the following fields to these values:
+      | Passing level in %| 50 |
+      | Max time per question in seconds | 15 |
+      | Maximum number of questions returned per subscale |  |
+      | Minimum number of questions returned per subscale | 1 |
+    And I click on "Save and display" "button"
+    And I wait until the page is ready
+    And I follow "Settings"
+    ## Verify all root catscales active by default
+    And the following fields match these values:
+      | Name             | Adaptive CATquiz  |
+      | ID number        | adaptivecatquiz1  |
+      | catmodel         | Catquiz CAT model |
+      | Select CAT scale | Simulation        |
+      | Passing level in %| 50 |
+      | Max time per question in seconds | 15 |
+      | Min time per question in seconds | 5 |
+      | Purpose of test | Infer all subscales |
+      | Activate pilot mode | 1 |
+      | Proportion of questions to be piloted in % | 20 |
+      | Minimum number of adaptations | 150 |
+    ## | Standarderror per subscale in percent | 60 |
+      | Start new CAT test with | Use the average ability score of the current test |
+      | Maximum number of questions returned per subscale | |
+      | Minimum number of questions returned per subscale | 1 |
+      | Max. questions per test. | 10 |
+      | Min. number of questions per test. | 3 |
+    And I log out
+
+  @javascript
   Scenario: CATquiz settings: teacher setup basic feedback settings
     Given I log in as "teacher1"
     And I am on "Course 1" course homepage with editing mode on
