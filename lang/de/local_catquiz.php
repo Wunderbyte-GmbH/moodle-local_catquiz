@@ -110,6 +110,10 @@ $string['errorhastobeint'] = 'Muss eine Ganzzahl sein';
 
 $string['addoredittemplate'] = "Einstellungs-Vorlage bearbeiten";
 
+$string['formelementnegative'] = 'Input a positive number';
+$string['formelementwrongpercent'] = 'Input a positive number from 0 to 100';
+$string['formminquestgreaterthan'] = 'Minimum number of questions must be less than maximum number of questions';
+
 // Test Strategy.
 $string['catquiz_teststrategyheader'] = 'CAT-Einstellungen';
 $string['catquiz_selectteststrategy'] = 'Testzweck';

@@ -108,6 +108,10 @@ $string['errorhastobeint'] = 'Has to be a number';
 
 $string['addoredittemplate'] = "Add or edit template";
 
+$string['formelementnegative'] = 'Input a positive number';
+$string['formelementwrongpercent'] = 'Input a positive number from 0 to 100';
+$string['formminquestgreaterthan'] = 'Minimum number of questions must be less than maximum number of questions';
+
 // Test Strategy.
 $string['catquiz_teststrategyheader'] = 'CAT Settings';
 $string['catquiz_selectteststrategy'] = 'Purpose of test';
