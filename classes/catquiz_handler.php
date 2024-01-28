@@ -386,6 +386,66 @@ class catquiz_handler {
             }
         }
         // Todo: Make a real validation of necessary fields.
+        // Validate for positivity.
+        if (0 > (int) $data['catquiz_maxquestionspersubscale']) {
+            $errors['catquiz_maxquestionspersubscale'] = get_string('formelementnegative', 'local_catquiz');
+        }
+
+        if (0 > (int) $data['catquiz_minquestionspersubscale']) {
+            $errors['catquiz_minquestionspersubscale'] = get_string('formelementnegative', 'local_catquiz');
+        }
+
+        if (0 > (int) $data['catquiz_maxquestions']) {
+            $errors['catquiz_maxquestions'] = get_string('formelementnegative', 'local_catquiz');
+        }
+
+        if (0 > (int) $data['catquiz_minquestions']) {
+            $errors['catquiz_minquestions'] = get_string('formelementnegative', 'local_catquiz');
+        }
+
+        if (isset($data['catquiz_maxtimeperitem']) && 0 > (int) $data['catquiz_maxtimeperitem']) {
+            $errors['catquiz_maxtimeperitem'] = get_string('formelementnegative', 'local_catquiz');
+        }
+
+        if (isset($data['catquiz_mintimeperitem']) && 0 > (int) $data['catquiz_mintimeperitem']) {
+            $errors['catquiz_mintimeperitem'] = get_string('formelementnegative', 'local_catquiz');
+        }
+
+        if (isset($data['catquiz_pilotattemptsthreshold']) && 0 > (int) $data['catquiz_pilotattemptsthreshold']) {
+            $errors['catquiz_pilotattemptsthreshold'] = get_string('formelementnegative', 'local_catquiz');
+        }
+
+        // Validate higher and lower values.
+        if (0 > (int) $data['catquiz_passinglevel'] || 100 < (int) $data['catquiz_passinglevel']) {
+            $errors['catquiz_passinglevel'] = get_string('formelementwrongpercent', 'local_catquiz');
+        }
+
+        if (isset($data['catquiz_pilotratio'])
+                && (0 > (int) $data['catquiz_pilotratio'] || 100 < (int) $data['catquiz_pilotratio'])) {
+            $errors['catquiz_pilotratio'] = get_string('formelementwrongpercent', 'local_catquiz');
+        }
+
+        if (isset($data['catquiz_standarderrorpersubscale'])
+                && (0 > (int) $data['catquiz_standarderrorpersubscale'] || 100 < (int) $data['catquiz_standarderrorpersubscale'])) {
+            $errors['catquiz_standarderrorpersubscale'] = get_string('formelementwrongpercent', 'local_catquiz');
+        }
+
+        if (isset($data['catquiz_maxtimeperitem']) && isset($data['catquiz_mintimeperitem'])
+                && $data['catquiz_mintimeperitem'] >= $data['catquiz_maxtimeperitem']
+                && 0 != (int) $data['catquiz_maxtimeperitem']) {
+            $errors['catquiz_mintimeperitem'] = get_string('formminquestgreaterthan', 'local_catquiz');
+        }
+
+        if ($data['catquiz_minquestionspersubscale'] >= $data['catquiz_maxquestionspersubscale']
+                && 0 != (int) $data['catquiz_maxquestionspersubscale']) {
+            $errors['catquiz_minquestionspersubscale'] = get_string('formminquestgreaterthan', 'local_catquiz');
+        }
+
+        if ($data['catquiz_minquestions'] >= $data['catquiz_maxquestions'] && 0 != (int) $data['catquiz_maxquestions']) {
+            $errors['catquiz_minquestions'] = get_string('formminquestgreaterthan', 'local_catquiz');
+        }
+
+        // Todo: Make a real validation of necessary feedback fields.
 
         return $errors;
     }
