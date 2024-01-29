@@ -27,6 +27,7 @@ namespace local_catquiz\teststrategy\context\loader;
 use cache;
 use local_catquiz\catscale;
 use local_catquiz\teststrategy\context\contextloaderinterface;
+use local_catquiz\teststrategy\progress;
 
 /**
  * Loads questions for test strategies.
@@ -36,6 +37,11 @@ use local_catquiz\teststrategy\context\contextloaderinterface;
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class questions_loader implements contextloaderinterface {
+
+    /**
+     * @var progress $progress
+     */
+    private progress $progress;
 
     /**
      * Returns array of items.
@@ -58,6 +64,7 @@ class questions_loader implements contextloaderinterface {
             'catscaleid',
             'contextid',
             'includesubscales',
+            'progress',
         ];
     }
 
@@ -70,6 +77,7 @@ class questions_loader implements contextloaderinterface {
      *
      */
     public function load(array $context): array {
+        $this->progress = $context['progress'];
         $catscale = new catscale($context['catscaleid']);
         $context['questions'] = $catscale->get_testitems(
             $context['contextid'],
@@ -81,7 +89,7 @@ class questions_loader implements contextloaderinterface {
         $context['original_questions'] = $context['questions'];
 
         $cache = cache::make('local_catquiz', 'adaptivequizattempt');
-        if ($cache->get('isfirstquestionofattempt')) {
+        if ($this->progress->is_first_question()) {
             $cache->set('totalnumberoftestitems', count($context['questions']));
         }
 

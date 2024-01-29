@@ -155,7 +155,6 @@ abstract class strategy {
         $selectedquestion->lastattempttime = $now;
         $selectedquestion->userlastattempttime = $now;
 
-        $cache->set('isfirstquestionofattempt', false);
         $cache->set('lastquestionreturntime', $now);
 
         if (! empty($selectedquestion->is_pilot)) {
@@ -172,6 +171,7 @@ abstract class strategy {
 
         $this->progress
             ->add_playedquestion($selectedquestion)
+            ->set_first_question_played()
             ->save();
 
         catscale::update_testitem(

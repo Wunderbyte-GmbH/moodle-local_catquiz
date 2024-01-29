@@ -61,6 +61,11 @@ class progress implements JsonSerializable {
     private array $playedquestions;
 
     /**
+     * @var bool $isfirstquestion Indicates if this is the first question in the current attempt.
+     */
+    private bool $isfirstquestion;
+
+    /**
      * Returns a new progress instance.
      *
      * If we already have data in the cache or DB, the instance is populated with those data.
@@ -108,6 +113,7 @@ class progress implements JsonSerializable {
         $instance->attemptid = $cacheobject->attemptid;
         $data = json_decode($cacheobject->json);
         $instance->playedquestions = (array) $data->playedquestions;
+        $instance->isfirstquestion = $data->isfirstquestion;
         return $instance;
     }
 
@@ -125,6 +131,7 @@ class progress implements JsonSerializable {
         $instance->attemptid = $record->attemptid;
         $data = json_decode($record->json);
         $instance->playedquestions = (array) $data->playedquestions;
+        $instance->isfirstquestion = $data->isfirstquestion;
         return $instance;
     }
 
@@ -150,6 +157,7 @@ class progress implements JsonSerializable {
         $instance->attemptid = $attemptid;
 
         $instance->playedquestions = [];
+        $instance->isfirstquestion = true;
         return $instance;
     }
 
@@ -162,6 +170,7 @@ class progress implements JsonSerializable {
     public function jsonSerialize(): mixed {
         return [
             'playedquestions' => $this->playedquestions,
+            'isfirstquestion' => $this->isfirstquestion,
         ];
     }
 
@@ -258,6 +267,20 @@ class progress implements JsonSerializable {
      */
     public function get_playedquestions() {
         return $this->playedquestions;
+    }
+
+    /**
+     * Shows if this is the first question in the current attempt.
+     *
+     * @return bool
+     */
+    public function is_first_question() {
+        return $this->isfirstquestion;
+    }
+
+    public function set_first_question_played() {
+        $this->isfirstquestion = false;
+        return $this;
     }
 
     /**
