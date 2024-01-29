@@ -73,7 +73,6 @@ class wb_middleware_runner {
                             'original_questions',
                             'questions',
                             'questionsperscale',
-                            'playedquestionsperscale',
                         ]
                     );
                     $cache->set('context', $cachedcontexts);

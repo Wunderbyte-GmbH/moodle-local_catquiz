@@ -45,22 +45,6 @@ use local_catquiz\wb_middleware;
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class addscalestandarderror extends preselect_task implements wb_middleware {
-
-    /**
-     * Playes questions per scale.
-     *
-     * @var array|null
-     */
-    protected ?array $playedquestionsperscale = null;
-
-    /**
-     * Creates a new instance
-     * @return self
-     */
-    public function __construct() {
-        $this->playedquestionsperscale = null;
-    }
-
     /**
      * Run method.
      *
@@ -72,7 +56,6 @@ class addscalestandarderror extends preselect_task implements wb_middleware {
      */
     public function run(array &$context, callable $next): result {
         $cache = cache::make('local_catquiz', 'adaptivequizattempt');
-        $context['playedquestionsperscale'] = $this->getplayedquestionsperscale();
         $cachedresponses = $cache->get('userresponses');
         if (! $cachedresponses) {
             // If we do not yet have a response, use a default value.
@@ -107,18 +90,5 @@ class addscalestandarderror extends preselect_task implements wb_middleware {
             'initial_standarderror',
             'person_ability',
         ];
-    }
-    /**
-     * Returns array played questions per scale.
-     *
-     * @return array
-     */
-    protected function getplayedquestionsperscale(): array {
-        if (($pq = $this->playedquestionsperscale) !== null) {
-            return $pq;
-        }
-        $cache = cache::make('local_catquiz', 'adaptivequizattempt');
-        $this->playedquestionsperscale = $cache->get('playedquestionsperscale') ?: [];
-        return $this->playedquestionsperscale;
     }
 }

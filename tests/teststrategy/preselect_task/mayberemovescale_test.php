@@ -26,9 +26,9 @@
 namespace local_catquiz;
 
 use basic_testcase;
-use cache;
 use local_catquiz\local\result;
 use local_catquiz\teststrategy\preselect_task\mayberemovescale;
+use local_catquiz\teststrategy\progress;
 use PHPUnit\Framework\ExpectationFailedException;
 use SebastianBergmann\RecursionContext\InvalidArgumentException;
 
@@ -63,12 +63,17 @@ class mayberemovescale_test extends basic_testcase {
         $attemptcontext,
         $played
     ) {
-        $cache = cache::make('local_catquiz', 'adaptivequizattempt');
-        $cache->set('playedquestionsperscale', $played);
+        $progressstub = $this->createStub(progress::class);
+        $progressstub->method('get_playedquestions')
+            ->willReturn(
+                $played
+            );
+        $attemptcontext['progress'] = $progressstub;
+
         $returncontext = fn ($context) => result::ok($context);
         $mayberemovescale = new mayberemovescale();
         $result = $mayberemovescale->run($attemptcontext, $returncontext);
-        $this->assertEquals($expected, $result->unwrap());
+        $this->assertEquals($expected, $result->unwrap()['questions']);
     }
 
     /**
@@ -102,14 +107,13 @@ class mayberemovescale_test extends basic_testcase {
 
         return [
             'nothing to remove' => [
-                'expected' => $attemptcontext,
+                'expected' => $attemptcontext['questions'],
                 'attemptcontext' => $attemptcontext,
                 'played' => $played,
             ],
-            'all questions are removed' => [
+            'all questions of scale 1 are removed' => [
                 'expected' => [
-                    'max_attempts_per_scale' => 2,
-                    'questions' => [5 => (object)['catscaleid' => 2]],
+                   5 => (object)['catscaleid' => 2],
                 ],
                 'attemptcontext' => [
                     'max_attempts_per_scale' => 2,

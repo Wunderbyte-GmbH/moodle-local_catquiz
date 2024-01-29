@@ -30,6 +30,7 @@ use local_catquiz\catscale;
 use local_catquiz\local\model\model_item_param_list;
 use local_catquiz\local\result;
 use local_catquiz\teststrategy\preselect_task;
+use local_catquiz\teststrategy\progress;
 use local_catquiz\wb_middleware;
 
 /**
@@ -45,6 +46,11 @@ use local_catquiz\wb_middleware;
 class filterbystandarderror extends preselect_task implements wb_middleware {
 
     /**
+     * @var progress
+     */
+    private progress $progress;
+
+    /**
      * Run method.
      *
      * @param array $context
@@ -54,6 +60,7 @@ class filterbystandarderror extends preselect_task implements wb_middleware {
      *
      */
     public function run(array &$context, callable $next): result {
+        $this->progress = $context['progress'];
         $cache = cache::make('local_catquiz', 'adaptivequizattempt');
         $activescales = $cache->get('active_scales') ?: [];
 
@@ -72,7 +79,7 @@ class filterbystandarderror extends preselect_task implements wb_middleware {
         foreach ($updatedscales as $scaleid) {
             // All played items that belong to the scale or one of its ancestor scales.
             $playeditems = model_item_param_list::from_array(
-                $this->context['playedquestionsperscale'][$scaleid]
+                $this->progress->get_playedquestions(true)[$scaleid]
             );
 
             $hasmaxitems = $this->context['max_attempts_per_scale'] !== -1
@@ -195,7 +202,7 @@ class filterbystandarderror extends preselect_task implements wb_middleware {
     public function get_required_context_keys(): array {
         return [
             'questions',
-            'playedquestionsperscale',
+            'progress',
             'se_max',
         ];
     }

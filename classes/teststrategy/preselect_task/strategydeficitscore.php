@@ -28,6 +28,7 @@ use cache;
 use local_catquiz\catscale;
 use local_catquiz\local\result;
 use local_catquiz\teststrategy\preselect_task;
+use local_catquiz\teststrategy\progress;
 use local_catquiz\wb_middleware;
 
 /**
@@ -40,6 +41,11 @@ use local_catquiz\wb_middleware;
 final class strategydeficitscore extends preselect_task implements wb_middleware {
 
     /**
+     * @var progress
+     */
+    private progress $progress;
+
+    /**
      * Run preselect task.
      *
      * @param array $context
@@ -49,6 +55,7 @@ final class strategydeficitscore extends preselect_task implements wb_middleware
      *
      */
     public function run(array &$context, callable $next): result {
+        $this->progress = $context['progress'];
         global $USER;
         $cache = cache::make('local_catquiz', 'adaptivequizattempt');
         $userresponses = $cache->get('userresponses');
@@ -56,18 +63,17 @@ final class strategydeficitscore extends preselect_task implements wb_middleware
         $scalecount = [];
 
         foreach ($this->context['active_scales'] as $scaleid) {
-            $scalecount[$scaleid] = array_key_exists($scaleid, $context['playedquestionsperscale'])
-                ? count($context['playedquestionsperscale'][$scaleid])
-                : 0;
-            if (!array_key_exists($scaleid, $context['playedquestionsperscale'])) {
+            $played = $this->progress->get_playedquestions(true, $scaleid);
+            $scalecount[$scaleid] = count($played);
+            if ($scalecount[$scaleid] === 0) {
                 $scalefractions[$scaleid] = 0.5;
             } else {
                 $scalefractions[$scaleid] = array_sum(
                     array_map(
                         fn ($q) => $userresponses[$USER->id]['component'][$q->id]['fraction'],
-                        $context['playedquestionsperscale'][$scaleid]
+                        $played
                     )
-                ) / count($context['playedquestionsperscale'][$scaleid]);
+                ) / $scalecount[$scaleid];
             }
         }
 
@@ -125,6 +131,7 @@ final class strategydeficitscore extends preselect_task implements wb_middleware
         return [
             'penalty_threshold',
             'questions',
+            'progress',
         ];
     }
 }

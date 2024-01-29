@@ -151,7 +151,7 @@ class attemptfeedback implements renderable, templatable {
             'starttime' => $cache->get('starttime'),
             'endtime' => $cache->get('endtime'),
             'total_number_of_testitems' => $cache->get('totalnumberoftestitems'),
-            'number_of_testitems_used' => empty($progress->get_playedquestions()) ? 0 : count($progress->get_playedquestions()),
+            'number_of_testitems_used' => $progress->get_num_playedquestions(),
             'ability_before_attempt' => $cache->get('abilitybeforeattempt'),
             'catquizerror' => $cache->get('catquizerror'),
             'studentfeedback' => [],

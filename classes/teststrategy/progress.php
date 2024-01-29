@@ -26,6 +26,7 @@ namespace local_catquiz\teststrategy;
 
 use cache;
 use JsonSerializable;
+use local_catquiz\catscale;
 
 /**
  * Stores the progress of a catquiz attempt that is not yet finished.
@@ -59,6 +60,11 @@ class progress implements JsonSerializable {
      * @var array $playedquestions The questions that were already displayed to the user.
      */
     private array $playedquestions;
+
+    /**
+     * @var array $playedquestionsbyscale The questions that were already displayed to the user.
+     */
+    private array $playedquestionsbyscale;
 
     /**
      * @var bool $isfirstquestion Indicates if this is the first question in the current attempt.
@@ -113,6 +119,7 @@ class progress implements JsonSerializable {
         $instance->attemptid = $cacheobject->attemptid;
         $data = json_decode($cacheobject->json);
         $instance->playedquestions = (array) $data->playedquestions;
+        $instance->playedquestionsbyscale = (array) $data->playedquestionsbyscale;
         $instance->isfirstquestion = $data->isfirstquestion;
         return $instance;
     }
@@ -131,6 +138,7 @@ class progress implements JsonSerializable {
         $instance->attemptid = $record->attemptid;
         $data = json_decode($record->json);
         $instance->playedquestions = (array) $data->playedquestions;
+        $instance->playedquestionsbyscale = (array) $data->playedquestionsbyscale;
         $instance->isfirstquestion = $data->isfirstquestion;
         return $instance;
     }
@@ -157,6 +165,7 @@ class progress implements JsonSerializable {
         $instance->attemptid = $attemptid;
 
         $instance->playedquestions = [];
+        $instance->playedquestionsbyscale = [];
         $instance->isfirstquestion = true;
         return $instance;
     }
@@ -170,6 +179,7 @@ class progress implements JsonSerializable {
     public function jsonSerialize(): mixed {
         return [
             'playedquestions' => $this->playedquestions,
+            'playedquestionsbyscale' => $this->playedquestionsbyscale,
             'isfirstquestion' => $this->isfirstquestion,
         ];
     }
@@ -263,10 +273,33 @@ class progress implements JsonSerializable {
     /**
      * Returns the questions played in this attempt.
      *
+     * @param bool $byscale Return questions per scale.
+     * @param ?int $scaleid If given, only return questions from that scale.
      * @return array
      */
-    public function get_playedquestions() {
-        return $this->playedquestions;
+    public function get_playedquestions(bool $byscale = false, ?int $scaleid = null) {
+        if (! $byscale) {
+            return $this->playedquestions;
+        }
+
+        if (! $scaleid) {
+            return $this->playedquestionsbyscale;
+        }
+
+        if (! array_key_exists($scaleid, $this->playedquestionsbyscale)) {
+            return [];
+        }
+
+        return $this->playedquestionsbyscale[$scaleid];
+    }
+
+    /**
+     * Returns the number of questions played in this attempt.
+     *
+     * @return int
+     */
+    public function get_num_playedquestions() {
+        return count($this->playedquestions);
     }
 
     /**
@@ -291,6 +324,20 @@ class progress implements JsonSerializable {
      */
     public function add_playedquestion(\stdClass $q): self {
         $this->playedquestions[$q->id] = $q;
+
+        // Keep track of questions played per scale.
+        $affectedscales = [
+            $q->catscaleid,
+            ...catscale::get_ancestors($q->catscaleid),
+        ];
+        foreach ($affectedscales as $scaleid) {
+            if (!array_key_exists($scaleid, $this->playedquestionsbyscale)) {
+                $this->playedquestionsbyscale[$scaleid] = [$q];
+                continue;
+            }
+            $this->playedquestionsbyscale[$scaleid][] = $q;
+        }
+
         return $this;
     }
 
