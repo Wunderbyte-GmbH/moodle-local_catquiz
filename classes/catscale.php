@@ -518,7 +518,7 @@ class catscale {
      * @param int $catscaleid
      * @param int $returnnames
      *
-     * @return mixed
+     * @return array
      *
      */
     public static function get_ancestors(int $catscaleid, int $returnnames = 1) {
