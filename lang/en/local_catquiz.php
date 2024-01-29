@@ -104,7 +104,7 @@ $string['max'] = 'max: ';
 $string['chooseparent'] = 'Choose parent scale';
 $string['errorminscalevalue'] = 'Min value has to be smaller than max value';
 $string['errorhastobefloat'] = 'Has to be a decimal';
-$string['errorhastobeint'] = 'Has to be a number';
+$string['errorhastobeint'] = 'Has to be a whole number';
 
 $string['addoredittemplate'] = "Add or edit template";
 
