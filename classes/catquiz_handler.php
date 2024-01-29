@@ -394,17 +394,34 @@ class catquiz_handler {
             $errors['catquiz_passinglevel'] = get_string('formelementwrongpercent', 'local_catquiz');
         }
 
-        if (isset($data['catquiz_standarderrorgrop']['catquiz_standarderrorpersubscale'])
-                && (0 > (int) $data['catquiz_standarderrorgrop']['catquiz_standarderrorpersubscale']
-                || 100 < (int) $data['catquiz_standarderrorgrop']['catquiz_standarderrorpersubscale'])) {
-            $errors['catquiz_standarderrorgrop'] =
-                get_string('formelementwrongpercent', 'local_catquiz');
+        // Standarderror- values should be float between 0 and 1 with min lower than max.
+        if (!empty($data['catquiz_standarderrorgrop']['catquiz_standarderror_min'])) {
+            if (!is_numeric($data['catquiz_standarderrorgrop']['catquiz_standarderror_min'])) {
+                $errors['catquiz_standarderrorgrop'] =
+                get_string('errorhastobefloat', 'local_catquiz');
+            } else if (0 > (float)$data['catquiz_standarderrorgrop']['catquiz_standarderror_min']) {
+                get_string('formelementnegative', 'local_catquiz');
+            } else {
+                $semin = true;
+            }
+        }
+        if (!empty($data['catquiz_standarderrorgrop']['catquiz_standarderror_max'])) {
+            if (!is_numeric($data['catquiz_standarderrorgrop']['catquiz_standarderror_max'])) {
+                $errors['catquiz_standarderrorgrop'] =
+                get_string('errorhastobefloat', 'local_catquiz');
+            } else if (0 > (float)$data['catquiz_standarderrorgrop']['catquiz_standarderror_max']) {
+                get_string('formelementnegative', 'local_catquiz');
+            } else if ($semin && (float)$data['catquiz_standarderrorgrop']['catquiz_standarderror_min']
+                >= (float)$data['catquiz_standarderrorgrop']['catquiz_standarderror_max']) {
+                    $errors['maxquestionsscalegroup']
+                    = get_string('formminquestgreaterthan', 'local_catquiz');
+            }
         }
 
         if ($data['maxquestionsscalegroup']['catquiz_minquestionspersubscale']
             >= $data['maxquestionsscalegroup']['catquiz_maxquestionspersubscale']
                 && 0 != (int) $data['maxquestionsscalegroup']['catquiz_maxquestionspersubscale']) {
-            $errors['maxquestionsscalegroup']['catquiz_minquestionspersubscale']
+            $errors['maxquestionsscalegroup']
                 = get_string('formminquestgreaterthan', 'local_catquiz');
         }
 
