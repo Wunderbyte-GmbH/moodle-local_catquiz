@@ -78,7 +78,7 @@ class progress implements JsonSerializable {
     private ?stdClass $lastquestion;
 
     /**
-     * @var int $breakend If a user is forced to take a break, this stores the end of the break.
+     * @var ?int $breakend If a user is forced to take a break, this stores the end of the break.
      */
     private ?int $breakend;
 
@@ -139,6 +139,7 @@ class progress implements JsonSerializable {
         $instance->isfirstquestion = $data->isfirstquestion;
         $instance->lastquestion = $data->lastquestion;
         $instance->lastquestion->fisherinformation = (array) $instance->lastquestion->fisherinformation;
+        $instance->breakend = $data->breakend;
         $instance->activescales = (array) $data->activescales;
         return $instance;
     }
@@ -168,6 +169,7 @@ class progress implements JsonSerializable {
         $instance->playedquestionsbyscale = [];
         $instance->isfirstquestion = true;
         $instance->lastquestion = null;
+        $instance->breakend = null;
         $instance->activescales = [];
         return $instance;
     }
@@ -184,6 +186,7 @@ class progress implements JsonSerializable {
             'playedquestionsbyscale' => $this->playedquestionsbyscale,
             'isfirstquestion' => $this->isfirstquestion,
             'lastquestion' => $this->lastquestion,
+            'breakend' => $this->breakend,
             'activescales' => $this->activescales,
         ];
     }
@@ -356,7 +359,13 @@ class progress implements JsonSerializable {
         return $this->lastquestion;
     }
 
-    public function force_break($duration) {
+    /**
+     * Force user to take a break for $duration seconds.
+     *
+     * @param int $duration
+     * @return $this
+     */
+    public function force_break(int $duration) {
         $now = time();
         $this->breakend = $now + $duration;
         return $this;
