@@ -36,8 +36,7 @@ use local_catquiz\wb_middleware;
 /**
  * Includes or excludes scales based on their information
  *
- * Modifies the $context['active_scales'] content depending on whether a scale
- * should be included or excluded.
+ * Enables or disables scales depending on their standarderror and number of played questions.
  *
  * @package local_catquiz
  * @copyright 2023 Wunderbyte GmbH
@@ -62,15 +61,12 @@ class filterbystandarderror extends preselect_task implements wb_middleware {
     public function run(array &$context, callable $next): result {
         $this->progress = $context['progress'];
         $cache = cache::make('local_catquiz', 'adaptivequizattempt');
-        $activescales = $cache->get('active_scales') ?: [];
 
         $lastquestion = $this->progress->get_last_question();
         if (!$lastquestion) {
             // If this is the first question and the cache is not yet set, set the
             // root scale active.
-            $activescales = [$this->context['catscaleid']];
-            $this->context['active_scales'] = $activescales;
-            $cache->set('active_scales', $activescales);
+            $this->progress->set_active_scales([$this->context['catscaleid']]);
             return $this->next();
         }
 
@@ -88,7 +84,7 @@ class filterbystandarderror extends preselect_task implements wb_middleware {
             $abilitydeltabelow = isset($context['prev_ability'][$scaleid])
                 && abs($context['prev_ability'][$scaleid] - $context['person_ability'][$scaleid]) <= 0.1; // TODO configure.
             $drop = $hasmaxitems || ($hasminse && $abilitydeltabelow);
-            if ($drop && !in_array($scaleid, $activescales)) {
+            if ($drop && !in_array($scaleid, $this->progress->get_active_scales())) {
                 continue;
             }
 
@@ -120,7 +116,7 @@ class filterbystandarderror extends preselect_task implements wb_middleware {
                     "drop %s%s",
                     (catscale::return_catscale_object($scaleid))->name, PHP_EOL
                 );
-                unset($activescales[array_search($scaleid, $activescales)]);
+                $this->progress->drop_scale($scaleid);
                 // Subscales inherit values of parent when their ability wasn't calculated yet (is still 0.0).
                 $inheritscales = array_filter(
                     array_keys(catscale::get_next_level_subscales_ids_from_parent([$scaleid])),
@@ -162,7 +158,7 @@ class filterbystandarderror extends preselect_task implements wb_middleware {
                     );
                     if ($testpotential > 1 / $this->context['se_max'] ** 2) {
                         // Enable the scale.
-                        $activescales[] = $subscaleid;
+                        $this->progress->add_active_scale($subscaleid);
                         getenv('CATQUIZ_CREATE_TESTOUTPUT') && printf(
                             "enact %s%s", (catscale::return_catscale_object($subscaleid))->name, PHP_EOL
                         );
@@ -172,23 +168,20 @@ class filterbystandarderror extends preselect_task implements wb_middleware {
             }
 
             $exclude = $testpotential + $testinformation <= 1 / $this->context['se_max'] ** 2;
-            if ($exclude && in_array($scaleid, $activescales)) {
-                unset($activescales[array_search($scaleid, $activescales)]);
+            if ($exclude && $this->progress->is_active_scale($scaleid)) {
+                $this->progress->drop_scale($scaleid);
                 getenv('CATQUIZ_CREATE_TESTOUTPUT') && printf(
                     "deact %s%s", (catscale::return_catscale_object($scaleid))->name, PHP_EOL
                 );
             }
-            if (!$exclude && !in_array($scaleid, $activescales)) {
-                $activescales[] = $scaleid;
+            if (!$exclude && !$this->progress->is_active_scale($scaleid)) {
+                $this->progress->add_active_scale($scaleid);
                 getenv('CATQUIZ_CREATE_TESTOUTPUT') && printf(
                     "enact %s%s", (catscale::return_catscale_object($scaleid))->name, PHP_EOL
                 );
             }
 
         }
-        $activescales = array_unique($activescales);
-        $this->context['active_scales'] = $activescales;
-        $cache->set('active_scales', $activescales);
 
         return $this->next();
     }
@@ -204,6 +197,7 @@ class filterbystandarderror extends preselect_task implements wb_middleware {
             'questions',
             'progress',
             'se_max',
+            'progress',
         ];
     }
 

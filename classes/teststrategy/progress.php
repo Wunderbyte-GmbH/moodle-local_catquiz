@@ -80,7 +80,12 @@ class progress implements JsonSerializable {
     /**
      * @var int $breakend If a user is forced to take a break, this stores the end of the break.
      */
-    private int $breakend;
+    private ?int $breakend;
+
+    /**
+     * @var array $activescales;
+     */
+    private array $activescales;
 
     /**
      * Returns a new progress instance.
@@ -134,6 +139,7 @@ class progress implements JsonSerializable {
         $instance->isfirstquestion = $data->isfirstquestion;
         $instance->lastquestion = $data->lastquestion;
         $instance->lastquestion->fisherinformation = (array) $instance->lastquestion->fisherinformation;
+        $instance->activescales = (array) $data->activescales;
         return $instance;
     }
 
@@ -162,6 +168,7 @@ class progress implements JsonSerializable {
         $instance->playedquestionsbyscale = [];
         $instance->isfirstquestion = true;
         $instance->lastquestion = null;
+        $instance->activescales = [];
         return $instance;
     }
 
@@ -177,6 +184,7 @@ class progress implements JsonSerializable {
             'playedquestionsbyscale' => $this->playedquestionsbyscale,
             'isfirstquestion' => $this->isfirstquestion,
             'lastquestion' => $this->lastquestion,
+            'activescales' => $this->activescales,
         ];
     }
 
@@ -351,6 +359,57 @@ class progress implements JsonSerializable {
     public function force_break($duration) {
         $now = time();
         $this->breakend = $now + $duration;
+        return $this;
+    }
+
+    /**
+     * Returns the scales that are currently active
+     *
+     * This is not used by all teststrategies, but some strategies keep a list
+     * of scales from which they are returning questions.
+     *
+     * @return array
+     */
+    public function get_active_scales() {
+        return $this->activescales;
+    }
+
+    public function is_active_scale(int $scaleid) {
+        return in_array($scaleid, $this->activescales);
+    }
+
+    /**
+     * Adds the given scale to the list of active scales.
+     *
+     * @param int $scaleid The scale ID
+     * @return self
+     */
+    public function add_active_scale(int $scaleid) {
+        if (! in_array($scaleid, $this->activescales)) {
+            $this->activescales[] = $scaleid;
+        }
+        return $this;
+    }
+
+    /**
+     * This will mark the given scales as active.
+     *
+     * @param array $scales
+     * @return $this
+     */
+    public function set_active_scales(array $scales) {
+        $this->activescales = $scales;
+        return $this;
+    }
+
+    /**
+     * Removes the given scaleid from the list of active scales
+     *
+     * @param int $scaleid
+     * @return $this
+     */
+    public function drop_scale(int $scaleid) {
+        unset($this->activescales[array_search($scaleid, $this->activescales)]);
         return $this;
     }
 
