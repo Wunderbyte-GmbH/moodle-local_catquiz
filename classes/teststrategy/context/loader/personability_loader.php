@@ -28,6 +28,7 @@ use cache;
 use local_catquiz\catquiz;
 use local_catquiz\catscale;
 use local_catquiz\teststrategy\context\contextloaderinterface;
+use local_catquiz\teststrategy\progress;
 
 /**
  * Class pilotquestions_loader for test strategy.
@@ -39,6 +40,11 @@ use local_catquiz\teststrategy\context\contextloaderinterface;
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class personability_loader implements contextloaderinterface {
+
+    /**
+     * @var progress $progress
+     */
+    private progress $progress;
 
     /**
      * DEFAULT_ABILITY
@@ -69,6 +75,7 @@ class personability_loader implements contextloaderinterface {
             'catscaleid',
             'userid',
             'includesubscales',
+            'progress'
         ];
     }
 
@@ -81,9 +88,10 @@ class personability_loader implements contextloaderinterface {
      *
      */
     public function load(array $context): array {
+        $this->progress = $context['progress'];
         $personparams = $this->load_saved_personparams($context);
         $cache = cache::make('local_catquiz', 'adaptivequizattempt');
-        if ($cache->get('isfirstquestionofattempt')) {
+        if ($this->progress->is_first_question()) {
             $cache->set('abilitybeforeattempt', $personparams[$context['catscaleid']]);
         }
         $context['person_ability'] = $personparams;

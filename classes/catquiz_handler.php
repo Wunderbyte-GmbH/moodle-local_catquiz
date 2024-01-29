@@ -777,7 +777,6 @@ class catquiz_handler {
         global $USER;
         $cache = cache::make('local_catquiz', 'adaptivequizattempt');
         $cache->purge();
-        $cache->set('isfirstquestionofattempt', true);
         $cache->set('userresponses', [$USER->id => []]);
         $cache->set('starttime', time());
     }
@@ -900,12 +899,12 @@ class catquiz_handler {
         ];
         return $contextcreator->load(
             [
+                'progress',
                 'lastquestion',
                 'person_ability',
                 'contextid',
                 'questions',
                 'pilot_questions',
-                'progress',
             ],
             $initialcontext
         );

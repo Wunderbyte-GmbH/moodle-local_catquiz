@@ -29,6 +29,7 @@ use local_catquiz\catquiz;
 use local_catquiz\local\result;
 use local_catquiz\local\status;
 use local_catquiz\teststrategy\preselect_task;
+use local_catquiz\teststrategy\progress;
 use local_catquiz\wb_middleware;
 use moodle_exception;
 
@@ -84,6 +85,11 @@ class firstquestionselector extends preselect_task implements wb_middleware {
     const  STARTWITHCURRENTABILITY = 'startwithcurrentability';
 
     /**
+     * @var progress
+     */
+    private progress $progress;
+
+    /**
      * Run preselect task.
      *
      * @param array $context
@@ -93,9 +99,10 @@ class firstquestionselector extends preselect_task implements wb_middleware {
      *
      */
     public function run(array &$context, callable $next): result {
+        $this->progress = $context['progress'];
         // Don't do anything if this is not the first question of the current attempt.
         $cache = cache::make('local_catquiz', 'adaptivequizattempt');
-        if (!$cache->get('isfirstquestionofattempt')) {
+        if ($this->progress->is_first_question()) {
             return $next($context);
         }
 
@@ -156,6 +163,7 @@ class firstquestionselector extends preselect_task implements wb_middleware {
             'selectfirstquestion',
             'questions_ordered_by',
             'testid',
+            'progress',
         ];
     }
 
