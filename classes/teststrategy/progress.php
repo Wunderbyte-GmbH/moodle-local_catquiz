@@ -75,7 +75,7 @@ class progress implements JsonSerializable {
     /**
      * @var null|stdClass The previous question.
      */
-    private ?\stdClass $lastquestion;
+    private ?stdClass $lastquestion;
 
     /**
      * @var int $breakend If a user is forced to take a break, this stores the end of the break.
@@ -315,10 +315,10 @@ class progress implements JsonSerializable {
     /**
      * Adds a new question to the array of played questions.
      *
-     * @param \stdClass $q A question
+     * @param stdClass $q A question
      * @return self
      */
-    public function add_playedquestion(\stdClass $q): self {
+    public function add_playedquestion(stdClass $q): self {
         $this->playedquestions[$q->id] = $q;
 
         // Keep track of questions played per scale.
@@ -344,7 +344,7 @@ class progress implements JsonSerializable {
      *
      * @return null|stdClass
      */
-    public function get_last_question(): ?\stdClass {
+    public function get_last_question(): ?stdClass {
         return $this->lastquestion;
     }
 
