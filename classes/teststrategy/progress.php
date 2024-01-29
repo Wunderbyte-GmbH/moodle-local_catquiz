@@ -97,7 +97,7 @@ class progress implements JsonSerializable {
         $cachedata = $attemptcache->get($cachekey);
         $cacheisfresh = false;
         if ($cacheisfresh) {
-            $instance = self::populate_from_cache($cachedata);
+            $instance = self::populate_from_object($cachedata);
             return $instance;
         }
 
@@ -108,48 +108,27 @@ class progress implements JsonSerializable {
             '*'
         );
         if ($record) {
-            $instance = self::populate_from_db($record);
+            $instance = self::populate_from_object($record);
             return $instance;
         }
 
         // If we are here, this must be a new attempt.
-        return self::populate_new($attemptid, $component);
+        return self::create_new($attemptid, $component);
     }
 
     /**
-     * Populates the data from a cache object.
+     * Populates the data from an object.
      *
-     * @param \stdClass $cacheobject
+     * @param stdClass $object
      * @return self
      */
-    private static function populate_from_cache(\stdClass $cacheobject): self {
+    private static function populate_from_object(stdClass $object): self {
         $instance = new self();
-        $instance->id = $cacheobject->id;
-        $instance->userid = $cacheobject->userid;
-        $instance->component = $cacheobject->component;
-        $instance->attemptid = $cacheobject->attemptid;
-        $data = json_decode($cacheobject->json);
-        $instance->playedquestions = (array) $data->playedquestions;
-        $instance->playedquestionsbyscale = (array) $data->playedquestionsbyscale;
-        $instance->isfirstquestion = $data->isfirstquestion;
-        $instance->lastquestion = $data->lastquestion;
-        $instance->lastquestion->fisherinformation = (array) $instance->lastquestion->fisherinformation;
-        return $instance;
-    }
-
-    /**
-     * Populates the data from a database record.
-     *
-     * @param \stdClass $record A database record.
-     * @return self
-     */
-    private static function populate_from_db(\stdClass $record): self {
-        $instance = new self();
-        $instance->id = $record->id;
-        $instance->userid = $record->userid;
-        $instance->component = $record->component;
-        $instance->attemptid = $record->attemptid;
-        $data = json_decode($record->json);
+        $instance->id = $object->id;
+        $instance->userid = $object->userid;
+        $instance->component = $object->component;
+        $instance->attemptid = $object->attemptid;
+        $data = json_decode($object->json);
         $instance->playedquestions = (array) $data->playedquestions;
         $instance->playedquestionsbyscale = (array) $data->playedquestionsbyscale;
         $instance->isfirstquestion = $data->isfirstquestion;
@@ -165,7 +144,7 @@ class progress implements JsonSerializable {
      * @param ?string $component
      * @return self
      */
-    private static function populate_new(int $attemptid, ?string $component): self {
+    private static function create_new(int $attemptid, ?string $component): self {
         if (! $component) {
             throw new \Exception(
                 "Creating a new quiz progress failed due to missing component name"
