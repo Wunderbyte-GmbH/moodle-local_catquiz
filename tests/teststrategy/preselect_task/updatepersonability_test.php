@@ -27,6 +27,7 @@ namespace local_catquiz\teststrategy\preselect_task;
 
 use local_catquiz\local\result;
 use local_catquiz\teststrategy\preselect_task\updatepersonability_testing;
+use local_catquiz\teststrategy\progress;
 use PHPUnit\Framework\ExpectationFailedException;
 use PHPUnit\Framework\TestCase;
 use SebastianBergmann\RecursionContext\InvalidArgumentException;
@@ -49,6 +50,7 @@ class updatepersonability_test extends TestCase {
      * @dataProvider skippedprovider
      *
      * @param mixed $expected
+     * @param mixed $lastquestion
      * @param mixed $context
      *
      * @return mixed
@@ -56,7 +58,13 @@ class updatepersonability_test extends TestCase {
      * @throws ExpectationFailedException
      *
      */
-    public function test_ability_calculation_is_skipped_correctly($expected, $context) {
+    public function test_ability_calculation_is_skipped_correctly($expected, $lastquestion, $context) {
+        // We can not add a stub in the provider, so we do it here.
+        $progressstub = $this->createStub(progress::class);
+        $progressstub->method('get_last_question')
+            ->willReturn($lastquestion);
+        $context['progress'] = $progressstub;
+
         $returncontext = fn($context) => result::ok($context);
         // The updatepersonaiblitytesting class is a slightly modified version
         // of the updatepersonability class that just overrides parts that load
@@ -76,16 +84,16 @@ class updatepersonability_test extends TestCase {
         return [
             'last_question_is_null' => [
                 'expected' => 'lastquestionnull',
+                'lastquestion' => null,
                 'context' => [
-                    'lastquestion' => null,
                     'contextid' => 1,
                     'catscaleid' => 1,
                 ],
             ],
             'is_pilot_question' => [
                 'expected' => 'pilotquestion',
+                'lastquestion' => (object) ['is_pilot' => true],
                 'context' => [
-                    'lastquestion' => (object) ['is_pilot' => true],
                     'contextid' => 1,
                     'catscaleid' => 1,
                     'userid' => 1,
@@ -95,8 +103,8 @@ class updatepersonability_test extends TestCase {
             ],
             'not_enough_responses' => [
                 'expected' => 'notenoughdataforuser',
+                'lastquestion' => (object) ['catscaleid' => "1"],
                 'context' => [
-                    'lastquestion' => (object) ['catscaleid' => "1"],
                     'userid' => 1, // This user does not have enough responses.
                     'contextid' => 1,
                     'person_ability' => [
@@ -136,6 +144,7 @@ class updatepersonability_test extends TestCase {
             ],
             'has_enough_responses' => [
                 'expected' => 'not_skipped',
+                'lastquestion' => (object) ['catscaleid' => "2", "id" => "2"],
                 'context' => [
                     'skip_reason' => 'not_skipped',
                     'person_ability' => [
@@ -144,7 +153,6 @@ class updatepersonability_test extends TestCase {
                     ],
                     'contextid' => 1,
                     'catscaleid' => 1,
-                    'lastquestion' => (object) ['catscaleid' => "2", "id" => "2"],
                     'userid' => 1, // This user does not have enough responses.
                     'questions' => [
                         (object) ['catscaleid' => "1"],

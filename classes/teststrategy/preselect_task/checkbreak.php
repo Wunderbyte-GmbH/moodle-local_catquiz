@@ -27,6 +27,7 @@ namespace local_catquiz\teststrategy\preselect_task;
 use cache;
 use local_catquiz\local\result;
 use local_catquiz\teststrategy\preselect_task;
+use local_catquiz\teststrategy\progress;
 use local_catquiz\wb_middleware;
 use moodle_url;
 
@@ -43,6 +44,11 @@ use moodle_url;
 final class checkbreak extends preselect_task implements wb_middleware {
 
     /**
+     * @var progress $progress
+     */
+    private progress $progress;
+
+    /**
      * Run.
      *
      * @param array $context
@@ -52,6 +58,7 @@ final class checkbreak extends preselect_task implements wb_middleware {
      *
      */
     public function run(array &$context, callable $next): result {
+        $this->progress = $context['progress'];
         $now = time();
         $cache = cache::make('local_catquiz', 'adaptivequizattempt');
         $forcedbreakend = $cache->get('forcedbreakend');
@@ -72,9 +79,7 @@ final class checkbreak extends preselect_task implements wb_middleware {
         }
 
         // User should take a break.
-        $context['lastquestion'] = null; // Do not count the last answer.
-        $forcedbreakend = $now + $context['breakduration'];
-        $cache->set('forcedbreakend', $forcedbreakend);
+        $this->progress->force_break($context['breakduration']);
         $breakinfourl = $this->get_breakinfourl($context, $forcedbreakend);
         // Return forced break info page.
         redirect($breakinfourl);
@@ -91,6 +96,7 @@ final class checkbreak extends preselect_task implements wb_middleware {
             'breakduration',
             'breakinfourl',
             'maxtimeperquestion',
+            'progress',
         ];
     }
 

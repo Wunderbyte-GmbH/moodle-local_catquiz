@@ -64,7 +64,7 @@ class filterbystandarderror extends preselect_task implements wb_middleware {
         $cache = cache::make('local_catquiz', 'adaptivequizattempt');
         $activescales = $cache->get('active_scales') ?: [];
 
-        $lastquestion = $this->context['lastquestion'];
+        $lastquestion = $this->progress->get_last_question();
         if (!$lastquestion) {
             // If this is the first question and the cache is not yet set, set the
             // root scale active.

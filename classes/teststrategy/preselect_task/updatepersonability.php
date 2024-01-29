@@ -37,6 +37,7 @@ use local_catquiz\local\model\model_strategy;
 use local_catquiz\local\result;
 use local_catquiz\local\status;
 use local_catquiz\teststrategy\preselect_task;
+use local_catquiz\teststrategy\progress;
 use local_catquiz\wb_middleware;
 use moodle_exception;
 
@@ -60,12 +61,6 @@ class updatepersonability extends preselect_task implements wb_middleware {
      * @var mixed $arrayresponses
      */
     public $arrayresponses;
-
-    /**
-     *
-     * @var mixed $lastquestion
-     */
-    public $lastquestion;
 
     /**
      * Contains IDs of catscales that have at least two different (correct and
@@ -105,6 +100,11 @@ class updatepersonability extends preselect_task implements wb_middleware {
     private array $scalestoupdate;
 
     /**
+     * @var progress $progress
+     */
+    private progress $progress;
+
+    /**
      * Run preselect task.
      *
      * @param array $context
@@ -114,15 +114,15 @@ class updatepersonability extends preselect_task implements wb_middleware {
      *
      */
     public function run(array &$context, callable $next): result {
+        $this->progress = $context['progress'];
         $this->initialability = $this->get_initial_ability();
         $this->initialse = $this->get_initial_standarderror();
         $this->parentability = $this->initialability;
         $this->parentse = $this->initialse;
-        $this->lastquestion = $context['lastquestion'];
         // If we do not know the answer to the last question, we do not have to
         // update the person ability. Also, pilot questions should not be used
         // to update a student's ability.
-        if ($this->lastquestion === null) {
+        if ($this->progress->get_last_question() === null) {
             $context['skip_reason'] = 'lastquestionnull';
             return $next($context);
 
@@ -131,7 +131,7 @@ class updatepersonability extends preselect_task implements wb_middleware {
         $this->userresponses = $this->update_cached_responses($context);
         $context['lastresponse'] = $this->userresponses->get_last_response($context['userid']);
 
-        if (!empty($this->lastquestion->is_pilot)) {
+        if (!empty($this->progress->get_last_question()->is_pilot)) {
             $context['skip_reason'] = 'pilotquestion';
             return $next($context);
         }
@@ -147,7 +147,7 @@ class updatepersonability extends preselect_task implements wb_middleware {
         }
         $this->arrayresponses = reset($components);
 
-        $catscaleid = $this->lastquestion->catscaleid;
+        $catscaleid = $this->progress->get_last_question()->catscaleid;
         $this->scalestoupdate = array_reverse(
             [$catscaleid, ...catscale::get_ancestors($catscaleid)]
         );
@@ -304,7 +304,7 @@ class updatepersonability extends preselect_task implements wb_middleware {
         return [
             'contextid',
             'catscaleid',
-            'lastquestion',
+            'progress',
         ];
     }
 
@@ -343,19 +343,19 @@ class updatepersonability extends preselect_task implements wb_middleware {
         global $CFG;
         $cache = cache::make('local_catquiz', 'adaptivequizattempt');
         $userresponses = $cache->get('userresponses');
-        $this->lastquestion = $context['lastquestion'];
+        $lastquestion = $this->progress->get_last_question();
         $lastresponse = catcontext::getresponsedatafromdb(
             $context['contextid'],
-            [$this->lastquestion->catscaleid],
-            $this->lastquestion->id,
+            [$lastquestion->catscaleid],
+            $lastquestion->id,
             $context['userid']
         );
         if (! $lastresponse) {
             // TODO: This should not happen, so maybe log this as event somewhere?
             return (new model_responses())->setdata($userresponses, false);
         }
-        $userresponses[$context['userid']]['component'][$context['lastquestion']->id]
-            = $lastresponse[$context['userid']]['component'][$context['lastquestion']->id];
+        $userresponses[$context['userid']]['component'][$lastquestion->id]
+            = $lastresponse[$context['userid']]['component'][$lastquestion->id];
         $cache->set('userresponses', $userresponses);
 
         $userresponses = (new model_responses())->setdata($userresponses, false);
