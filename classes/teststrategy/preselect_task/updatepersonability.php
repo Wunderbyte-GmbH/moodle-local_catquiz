@@ -25,6 +25,7 @@
 namespace local_catquiz\teststrategy\preselect_task;
 
 use cache;
+use Exception;
 use local_catquiz\catcalc;
 use local_catquiz\catcontext;
 use local_catquiz\catquiz;
@@ -200,13 +201,24 @@ class updatepersonability extends preselect_task implements wb_middleware {
             $startvalue = $parentability;
         }
 
-        $updatedability = catcalc::estimate_person_ability(
-            $this->arrayresponses,
-            $itemparamlist,
-            $startvalue,
-            $this->parentability,
-            $this->parentse
-        );
+        try {
+            $updatedability = catcalc::estimate_person_ability(
+                $this->arrayresponses,
+                $itemparamlist,
+                $startvalue,
+                $this->parentability,
+                $this->parentse
+            );
+        } catch (moodle_exception $e) {
+            // If we get an excpetion, re-throw it with more information.
+            $message = sprintf(
+                'Can not update ability for scale %d in context %d: %s',
+                $catscaleid,
+                catscale::get_context_id($catscaleid),
+                $e->getMessage()
+            );
+            throw new Exception($message);
+        }
 
         if (is_nan($updatedability)) {
             // In a production environment, we can use fallback values. However,
