@@ -70,7 +70,7 @@ abstract class strategy {
     /**
      * @var progress
      */
-    private progress $progress;
+    protected progress $progress;
 
     /**
      * Instantioate parameters.
@@ -155,8 +155,6 @@ abstract class strategy {
         $selectedquestion->lastattempttime = $now;
         $selectedquestion->userlastattempttime = $now;
 
-        $this->progress->add_playedquestion($selectedquestion);
-
         $cache->set('isfirstquestionofattempt', false);
         $cache->set('lastquestionreturntime', $now);
 
@@ -172,7 +170,10 @@ abstract class strategy {
 
         $cache->set('lastquestion', $selectedquestion);
 
-        $progress->save();
+        $this->progress
+            ->add_playedquestion($selectedquestion)
+            ->save();
+
         catscale::update_testitem(
             $context['contextid'],
             $selectedquestion,
