@@ -526,9 +526,9 @@ class feedbackclass {
         $increment = round($sizeofrange / $nroptions, 2);
 
         if ($lower) {
-            return LOCAL_CATQUIZ_PERSONABILITY_LOWER_LIMIT + ($optioncounter - 1) * $increment;
+            return round(LOCAL_CATQUIZ_PERSONABILITY_LOWER_LIMIT + ($optioncounter - 1) * $increment, 2);
         } else {
-            return LOCAL_CATQUIZ_PERSONABILITY_LOWER_LIMIT + $optioncounter * $increment;
+            return round(LOCAL_CATQUIZ_PERSONABILITY_LOWER_LIMIT + $optioncounter * $increment, 2);
         }
     }
 }
