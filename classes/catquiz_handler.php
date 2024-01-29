@@ -380,81 +380,68 @@ class catquiz_handler {
 
         $errors = [];
 
-        if (isset($data['maxquestionsgroup']["catquiz_maxquestionspersubscale"])) {
-            if (!is_int($data['maxquestionsgroup']["catquiz_maxquestionspersubscale"])) {
-                $errors['maxquestionsgroup']["catquiz_maxquestionspersubscale"] = get_string('errorhastobefloat', 'local_catquiz');
-            }
-        }
-        // Todo: Make a real validation of necessary fields.
-        // Validate for positivity.
-        if (0 > (int) $data['catquiz_maxquestionspersubscale']) {
-            $errors['catquiz_maxquestionspersubscale'] = get_string('formelementnegative', 'local_catquiz');
-        }
+        self::check_if_positive_int($errors, $data, "catquiz_minquestions", 'maxquestionsgroup');
+        self::check_if_positive_int($errors, $data, "catquiz_maxquestions", 'maxquestionsgroup');
 
-        if (0 > (int) $data['catquiz_minquestionspersubscale']) {
-            $errors['catquiz_minquestionspersubscale'] = get_string('formelementnegative', 'local_catquiz');
-        }
+        self::check_if_positive_int($errors, $data, "catquiz_maxquestionspersubscale", 'maxquestionsscalegroup');
+        self::check_if_positive_int($errors, $data, "catquiz_minquestionspersubscale", 'maxquestionsscalegroup');
 
-        if (0 > (int) $data['catquiz_maxquestions']) {
-            $errors['catquiz_maxquestions'] = get_string('formelementnegative', 'local_catquiz');
-        }
-
-        if (0 > (int) $data['catquiz_minquestions']) {
-            $errors['catquiz_minquestions'] = get_string('formelementnegative', 'local_catquiz');
-        }
-
-        if (isset($data['catquiz_maxtimeperitem']) && 0 > (int) $data['catquiz_maxtimeperitem']) {
-            $errors['catquiz_maxtimeperitem'] = get_string('formelementnegative', 'local_catquiz');
-        }
-
-        if (isset($data['catquiz_mintimeperitem']) && 0 > (int) $data['catquiz_mintimeperitem']) {
-            $errors['catquiz_mintimeperitem'] = get_string('formelementnegative', 'local_catquiz');
-        }
-
-        if (isset($data['catquiz_pilotattemptsthreshold']) && 0 > (int) $data['catquiz_pilotattemptsthreshold']) {
-            $errors['catquiz_pilotattemptsthreshold'] = get_string('formelementnegative', 'local_catquiz');
-        }
+        self::check_if_positive_int($errors, $data, "catquiz_maxtimeperattempt", 'catquiz_timelimitgroup');
+        self::check_if_positive_int($errors, $data, "catquiz_maxtimeperitem", 'catquiz_timelimitgroup');
 
         // Validate higher and lower values.
         if (0 > (int) $data['catquiz_passinglevel'] || 100 < (int) $data['catquiz_passinglevel']) {
             $errors['catquiz_passinglevel'] = get_string('formelementwrongpercent', 'local_catquiz');
         }
 
-        if (isset($data['catquiz_pilotratio'])
-                && (0 > (int) $data['catquiz_pilotratio'] || 100 < (int) $data['catquiz_pilotratio'])) {
-            $errors['catquiz_pilotratio'] = get_string('formelementwrongpercent', 'local_catquiz');
+        if (isset($data['catquiz_standarderrorgrop']['catquiz_standarderrorpersubscale'])
+                && (0 > (int) $data['catquiz_standarderrorgrop']['catquiz_standarderrorpersubscale']
+                || 100 < (int) $data['catquiz_standarderrorgrop']['catquiz_standarderrorpersubscale'])) {
+            $errors['catquiz_standarderrorgrop'] =
+                get_string('formelementwrongpercent', 'local_catquiz');
         }
 
-        if (isset($data['catquiz_standarderrorpersubscale'])
-                && (0 > (int) $data['catquiz_standarderrorpersubscale'] || 100 < (int) $data['catquiz_standarderrorpersubscale'])) {
-            $errors['catquiz_standarderrorpersubscale'] = get_string('formelementwrongpercent', 'local_catquiz');
+        if ($data['maxquestionsscalegroup']['catquiz_minquestionspersubscale']
+            >= $data['maxquestionsscalegroup']['catquiz_maxquestionspersubscale']
+                && 0 != (int) $data['maxquestionsscalegroup']['catquiz_maxquestionspersubscale']) {
+            $errors['maxquestionsscalegroup']['catquiz_minquestionspersubscale']
+                = get_string('formminquestgreaterthan', 'local_catquiz');
         }
 
-        if (isset($data['catquiz_maxtimeperitem']) && isset($data['catquiz_mintimeperitem'])
-                && $data['catquiz_mintimeperitem'] >= $data['catquiz_maxtimeperitem']
-                && 0 != (int) $data['catquiz_maxtimeperitem']) {
-            $errors['catquiz_mintimeperitem'] = get_string('formminquestgreaterthan', 'local_catquiz');
+        if ($data['maxquestionsgroup']['catquiz_minquestions']
+            >= $data['maxquestionsgroup']['catquiz_maxquestions']
+            && 0 != (int) $data['maxquestionsgroup']['catquiz_maxquestions']) {
+            $errors['maxquestionsgroup'] = get_string('formminquestgreaterthan', 'local_catquiz');
         }
-
-        if ($data['catquiz_minquestionspersubscale'] >= $data['catquiz_maxquestionspersubscale']
-                && 0 != (int) $data['catquiz_maxquestionspersubscale']) {
-            $errors['catquiz_minquestionspersubscale'] = get_string('formminquestgreaterthan', 'local_catquiz');
-        }
-
-        if ($data['catquiz_minquestions'] >= $data['catquiz_maxquestions'] && 0 != (int) $data['catquiz_maxquestions']) {
-            $errors['catquiz_minquestions'] = get_string('formminquestgreaterthan', 'local_catquiz');
-        }
-
-        // Todo: Make a real validation of necessary feedback fields.
 
         return $errors;
     }
 
-    private function check_if_int(array $data, string $key, array &$errors) {
-
-        if (isset($data['maxquestionsgroup']["catquiz_maxquestionspersubscale"])) {
-            if (!is_int($data['maxquestionsgroup']["catquiz_maxquestionspersubscale"])) {
-                $errors['maxquestionsgroup']["catquiz_maxquestionspersubscale"] = get_string('errorhastobefloat', 'local_catquiz');
+    /**
+     * Check if a value in data is of type int and over 0 otherwise add error to validation.
+     * @param array $errors
+     * @param array $data
+     * @param string $key
+     * @param string $group
+     *
+     * @return [type]
+     */
+    private static function check_if_positive_int(array &$errors, array $data, string $key, string $group) {
+        if (!empty($group)) {
+            if (!empty($data[$group][$key])) {
+                if (!is_numeric($data[$group][$key]) || !is_int((int)$data[$group][$key])) {
+                    $errors[$group] = get_string('errorhastobeint', 'local_catquiz');
+                } else if (0 > (int) $data[$group][$key]) {
+                    $errors[$group] = get_string('formelementnegative', 'local_catquiz');
+                }
+            }
+        } else {
+            if (isset($data[$key])) {
+                if (!is_int($data[$key])) {
+                    $errors[$key] = get_string('errorhastobeint', 'local_catquiz');
+                } else if (0 > (int) $data[$key]) {
+                    $errors[$key] = get_string('formelementnegative', 'local_catquiz');
+                }
             }
         }
 
