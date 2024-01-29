@@ -62,7 +62,7 @@ final class strategydeficitscore extends preselect_task implements wb_middleware
         $scalefractions = [];
         $scalecount = [];
 
-        foreach ($this->context['active_scales'] as $scaleid) {
+        foreach ($this->progress->get_active_scales() as $scaleid) {
             $played = $this->progress->get_playedquestions(true, $scaleid);
             $scalecount[$scaleid] = count($played);
             if ($scalecount[$scaleid] === 0) {
@@ -82,7 +82,7 @@ final class strategydeficitscore extends preselect_task implements wb_middleware
             arsort($affectedscales); // Traverse from root to leave.
 
             foreach ($affectedscales as $scaleid) {
-                if (! in_array($scaleid, $this->context['active_scales'])) {
+                if (! $this->progress->is_active_scale($scaleid)) {
                     continue;
                 }
 
