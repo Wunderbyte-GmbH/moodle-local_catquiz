@@ -162,11 +162,6 @@ abstract class strategy {
             $cache->set('num_pilot_questions', ++$numpilotquestions);
         }
 
-        // Keep track of the questions played per scale.
-        $playedquestionsperscale = $cache->get('playedquestionsperscale') ?: [];
-        $updated = $this->update_playedquestionsperscale($selectedquestion, $playedquestionsperscale);
-        $cache->set('playedquestionsperscale', $updated);
-
         $cache->set('lastquestion', $selectedquestion);
 
         $this->progress
@@ -232,31 +227,4 @@ abstract class strategy {
      *
      */
     abstract public function apply_feedbacksettings(feedbacksettings $feedbacksettings);
-
-    /**
-     * Update played questions per scale.
-     *
-     * @param stdClass $selectedquestion
-     * @param array $playedquestionsperscale
-     *
-     * @return array
-     *
-     */
-    public function update_playedquestionsperscale(
-        stdClass $selectedquestion,
-        array $playedquestionsperscale = []
-    ): array {
-        $affectedscales = [
-            $selectedquestion->catscaleid,
-            ...catscale::get_ancestors($selectedquestion->catscaleid),
-        ];
-        foreach ($affectedscales as $scaleid) {
-            if (!array_key_exists($scaleid, $playedquestionsperscale)) {
-                $playedquestionsperscale[$scaleid] = [$selectedquestion];
-                continue;
-            }
-            $playedquestionsperscale[$scaleid][] = $selectedquestion;
-        }
-        return $playedquestionsperscale;
-    }
 }

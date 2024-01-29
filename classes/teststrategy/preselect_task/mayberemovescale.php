@@ -27,6 +27,7 @@ namespace local_catquiz\teststrategy\preselect_task;
 use cache;
 use local_catquiz\local\result;
 use local_catquiz\teststrategy\preselect_task;
+use local_catquiz\teststrategy\progress;
 use local_catquiz\wb_middleware;
 
 /**
@@ -37,6 +38,12 @@ use local_catquiz\wb_middleware;
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 final class mayberemovescale extends preselect_task implements wb_middleware {
+
+    /**
+     * @var progress
+     */
+    private progress $progress;
+
     /**
      * Run preselect task.
      *
@@ -47,8 +54,9 @@ final class mayberemovescale extends preselect_task implements wb_middleware {
      *
      */
     public function run(array &$context, callable $next): result {
+        $this->progress = $context['progress'];
         $cache = cache::make('local_catquiz', 'adaptivequizattempt');
-        $played = $cache->get('playedquestionsperscale') ?: [];
+        $played = $this->progress->get_playedquestions(true);
         if (count($played) === 0) {
             return $next($context);
         }
@@ -89,6 +97,7 @@ final class mayberemovescale extends preselect_task implements wb_middleware {
         return [
             'questions',
             'max_attempts_per_scale',
+            'progress',
         ];
     }
 }
