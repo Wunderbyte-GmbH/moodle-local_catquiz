@@ -66,6 +66,8 @@ class wb_middleware_runner {
                 $result = $middleware->process($context, $action);
                 if ($cache) {
                     $cachedcontexts = $cache->get('context') ?: [];
+                    $progress = $context['progress'];
+                    $context['lastquestion'] = $progress->get_last_question();
                     $cachedcontexts[$context['questionsattempted']] = $context;
                     self::removefromsavedcontext(
                         $cachedcontexts[$context['questionsattempted']],
