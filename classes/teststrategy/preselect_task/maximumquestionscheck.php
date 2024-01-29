@@ -28,6 +28,7 @@ use local_catquiz\catcontext;
 use local_catquiz\local\result;
 use local_catquiz\local\status;
 use local_catquiz\teststrategy\preselect_task;
+use local_catquiz\teststrategy\progress;
 use local_catquiz\wb_middleware;
 
 /**
@@ -40,6 +41,11 @@ use local_catquiz\wb_middleware;
 final class maximumquestionscheck extends preselect_task implements wb_middleware {
 
     /**
+     * @var progress $progress
+     */
+    private progress $progress;
+
+    /**
      * Run preselect task.
      *
      * @param array $context
@@ -49,10 +55,11 @@ final class maximumquestionscheck extends preselect_task implements wb_middlewar
      *
      */
     public function run(array &$context, callable $next): result {
+        $this->progress = $context['progress'];
         $maxquestions = $context['maximumquestions'];
         if (($maxquestions != -1) && ($context['questionsattempted'] >= $maxquestions)) {
             // Save the last response so that we can display it as feedback.
-            $lastquestion = $context['lastquestion'];
+            $lastquestion = $this->progress->get_last_question();
             $lastresponse = catcontext::getresponsedatafromdb(
                 $context['contextid'],
                 [$lastquestion->catscaleid],
@@ -60,7 +67,7 @@ final class maximumquestionscheck extends preselect_task implements wb_middlewar
                 $context['userid']
             );
             // TODO: Error handling if no question was answered.
-            $context['lastresponse'] = $lastresponse[$context['userid']]['component'][$context['lastquestion']->id];
+            $context['lastresponse'] = $lastresponse[$context['userid']]['component'][$lastquestion->id];
 
             // Update the person ability and then end the quiz.
             $next = fn () => result::err(status::ERROR_REACHED_MAXIMUM_QUESTIONS);
@@ -81,6 +88,7 @@ final class maximumquestionscheck extends preselect_task implements wb_middlewar
         return [
             'questionsattempted',
             'maximumquestions',
+            'progress',
         ];
     }
 }

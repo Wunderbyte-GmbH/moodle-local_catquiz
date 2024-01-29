@@ -900,7 +900,6 @@ class catquiz_handler {
         return $contextcreator->load(
             [
                 'progress',
-                'lastquestion',
                 'person_ability',
                 'contextid',
                 'questions',

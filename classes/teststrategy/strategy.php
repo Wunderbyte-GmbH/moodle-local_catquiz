@@ -162,11 +162,9 @@ abstract class strategy {
             $cache->set('num_pilot_questions', ++$numpilotquestions);
         }
 
-        $cache->set('lastquestion', $selectedquestion);
-
         $this->progress
             ->add_playedquestion($selectedquestion)
-            ->set_first_question_played()
+            ->set_first_question_played() // TODO: can be removed - implied when adding a played question.
             ->save();
 
         catscale::update_testitem(

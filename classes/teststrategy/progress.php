@@ -27,6 +27,7 @@ namespace local_catquiz\teststrategy;
 use cache;
 use JsonSerializable;
 use local_catquiz\catscale;
+use stdClass;
 
 /**
  * Stores the progress of a catquiz attempt that is not yet finished.
@@ -70,6 +71,16 @@ class progress implements JsonSerializable {
      * @var bool $isfirstquestion Indicates if this is the first question in the current attempt.
      */
     private bool $isfirstquestion;
+
+    /**
+     * @var null|stdClass The previous question.
+     */
+    private ?\stdClass $lastquestion;
+
+    /**
+     * @var int $breakend If a user is forced to take a break, this stores the end of the break.
+     */
+    private int $breakend;
 
     /**
      * Returns a new progress instance.
@@ -121,6 +132,8 @@ class progress implements JsonSerializable {
         $instance->playedquestions = (array) $data->playedquestions;
         $instance->playedquestionsbyscale = (array) $data->playedquestionsbyscale;
         $instance->isfirstquestion = $data->isfirstquestion;
+        $instance->lastquestion = $data->lastquestion;
+        $instance->lastquestion->fisherinformation = (array) $instance->lastquestion->fisherinformation;
         return $instance;
     }
 
@@ -140,6 +153,8 @@ class progress implements JsonSerializable {
         $instance->playedquestions = (array) $data->playedquestions;
         $instance->playedquestionsbyscale = (array) $data->playedquestionsbyscale;
         $instance->isfirstquestion = $data->isfirstquestion;
+        $instance->lastquestion = $data->lastquestion;
+        $instance->lastquestion->fisherinformation = (array) $instance->lastquestion->fisherinformation;
         return $instance;
     }
 
@@ -167,6 +182,7 @@ class progress implements JsonSerializable {
         $instance->playedquestions = [];
         $instance->playedquestionsbyscale = [];
         $instance->isfirstquestion = true;
+        $instance->lastquestion = null;
         return $instance;
     }
 
@@ -181,6 +197,7 @@ class progress implements JsonSerializable {
             'playedquestions' => $this->playedquestions,
             'playedquestionsbyscale' => $this->playedquestionsbyscale,
             'isfirstquestion' => $this->isfirstquestion,
+            'lastquestion' => $this->lastquestion,
         ];
     }
 
@@ -338,6 +355,23 @@ class progress implements JsonSerializable {
             $this->playedquestionsbyscale[$scaleid][] = $q;
         }
 
+        $this->lastquestion = $q;
+
+        return $this;
+    }
+
+    /**
+     * Returns the previous question.
+     *
+     * @return null|stdClass
+     */
+    public function get_last_question(): ?\stdClass {
+        return $this->lastquestion;
+    }
+
+    public function force_break($duration) {
+        $now = time();
+        $this->breakend = $now + $duration;
         return $this;
     }
 
