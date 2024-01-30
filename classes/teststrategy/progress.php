@@ -354,6 +354,10 @@ class progress implements JsonSerializable {
      * @return self
      */
     public function add_playedquestion(stdClass $q): self {
+        $now = time();
+        $q->lastattempttime = $now;
+        $q->userlastattempttime = $now;
+
         $this->playedquestions[$q->id] = $q;
 
         // Keep track of questions played per scale.

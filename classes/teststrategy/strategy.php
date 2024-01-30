@@ -151,12 +151,6 @@ abstract class strategy {
             return result::err();
         }
 
-        $now = time();
-        $selectedquestion->lastattempttime = $now;
-        $selectedquestion->userlastattempttime = $now;
-
-        $cache->set('lastquestionreturntime', $now);
-
         if (! empty($selectedquestion->is_pilot)) {
             $numpilotquestions = $cache->get('num_pilot_questions') ?: 0;
             $cache->set('num_pilot_questions', ++$numpilotquestions);
