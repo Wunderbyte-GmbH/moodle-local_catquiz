@@ -35,6 +35,9 @@ Feature: As a teacher I setup adaptive quiz with CATquiz Scales and Feedbacks.
       | ID number        | adaptivecatquiz1  |
       | catmodel         | Catquiz CAT model |
       | Select CAT scale | Simulation        |
+      ## Should we expect defaults?
+      | catquiz_standarderrorgroup[catquiz_standarderror_min] | 0.4 |
+      | catquiz_standarderrorgroup[catquiz_standarderror_max] | 0.6 |
     When I wait until the page is ready
     ## Verify all root catscales active by default
     Then I should see "SimA" in the "#id_catquiz_headercontainer" "css_element"
@@ -58,6 +61,9 @@ Feature: As a teacher I setup adaptive quiz with CATquiz Scales and Feedbacks.
       | ID number        | adaptivecatquiz1  |
       | catmodel         | Catquiz CAT model |
       | Select CAT scale | Simulation        |
+      ## Should we expect defaults?
+      | catquiz_standarderrorgroup[catquiz_standarderror_min] | 0.4 |
+      | catquiz_standarderrorgroup[catquiz_standarderror_max] | 0.6 |
     When I wait until the page is ready
     ## Verify all root catscales active by default
     Then I should see "SimA" in the "#id_catquiz_headercontainer" "css_element"
@@ -105,19 +111,19 @@ Feature: As a teacher I setup adaptive quiz with CATquiz Scales and Feedbacks.
       | catmodel         | Catquiz CAT model |
       | Select CAT scale | Simulation        |
       | Passing level in %| 500 |
-      | Timepaced test | 1 |
-      | Max time per question in seconds | 1 |
-      | Min time per question in seconds | 5 |
       | Purpose of test | Infer all subscales |
       | Activate pilot mode | 1 |
       | Proportion of questions to be piloted in % | 20 |
-      | Minimum number of adaptations | 150 |
-      | Standarderror per subscale in percent | 60 |
+      ## | Minimum number of adaptations | 150 |
       | Start new CAT test with | Use the average ability score of the current test |
       | Maximum number of questions returned per subscale | 1 |
       | Minimum number of questions returned per subscale | 3 |
       | Max. questions per test. | 10 |
       | Min. number of questions per test. | 3 |
+      | Standarderror per subscale in percent | 60 |
+      | Timepaced test | 1 |
+      | Max time per question in seconds | 1 |
+      | Min time per question in seconds | 5 |
     When I click on "Save and display" "button"
     ## Errors validation
     Then I should see "Input a positive number from 0 to 100" in the "#fitem_id_catquiz_passinglevel" "css_element"
@@ -162,6 +168,9 @@ Feature: As a teacher I setup adaptive quiz with CATquiz Scales and Feedbacks.
       | ID number        | adaptivecatquiz1  |
       | catmodel         | Catquiz CAT model |
       | Select CAT scale | Simulation        |
+      ## Should we expect defaults?
+      | catquiz_standarderrorgroup[catquiz_standarderror_min] | 0.4 |
+      | catquiz_standarderrorgroup[catquiz_standarderror_max] | 0.6 |
     ## Delay required to settle CAT scale
     When I wait until the page is ready
     And the field "Number of ability ranges" matches value "2"
