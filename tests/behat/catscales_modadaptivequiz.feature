@@ -35,7 +35,10 @@ Feature: As a student i want to take adaptive quiz tests with catquiz functinali
       | Description                  | Adaptive quiz description.  |
       | catmodel                     | Catquiz CAT model           |
       | Select CAT scale             | Simulation                  |
-      | Max. questions per test.     | 7                           |
+      | maxquestionsgroup[catquiz_maxquestions]     | 7            |
+      ## Should we expect defaults?
+      | catquiz_standarderrorgroup[catquiz_standarderror_min] | 0.4 |
+      | catquiz_standarderrorgroup[catquiz_standarderror_max] | 0.6 |
     And I click on "Save and return to course" "button"
     And I log out
 
