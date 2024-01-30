@@ -900,8 +900,8 @@ class catquiz_handler {
             'has_fisherinformation' => false,
             'se_max' => $quizsettings->catquiz_standarderror_max,
             'se_min' => $quizsettings->catquiz_standarderror_min,
-            'max_attempttime_in_sec' => $attemptseconds ?? "",
-            'max_itemtime_in_sec' => $itemseconds ?? "",
+            'max_attempttime_in_sec' => $attemptseconds ?? 0,
+            'max_itemtime_in_sec' => $itemseconds ?? 0,
 
             // TODO: add duration range for attempt and item.
 
@@ -933,7 +933,7 @@ class catquiz_handler {
     public static function get_number_of_seconds(string $selectvalue, int $time) {
         switch ($selectvalue) {
             case 'h':
-                return $time * 360;
+                return $time * 3600;
             case 'min':
                 return $time * 60;
             case 'sec':
