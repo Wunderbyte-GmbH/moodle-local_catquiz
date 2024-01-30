@@ -178,18 +178,6 @@ class catquiz_handler {
         $mform->addHelpButton('catquiz_passinglevel', 'passinglevel', 'local_catquiz');
         $mform->setType('catquiz_passinglevel', PARAM_INT);
 
-        // // Is it a time paced test?
-        // $elements[] = $mform->addElement('advcheckbox', 'catquiz_timepacedtest',
-        //         get_string('timepacedtest', 'local_catquiz'), null, null, [0, 1]);
-
-        // $elements[] = $mform->addElement('text', 'catquiz_maxtimeperitem', get_string('maxtimeperitem', 'local_catquiz'));
-        // $mform->setType('catquiz_maxtimeperitem', PARAM_INT);
-        // $mform->hideIf('catquiz_maxtimeperitem', 'catquiz_timepacedtest', 'neq', 1);
-
-        // $elements[] = $mform->addElement('text', 'catquiz_mintimeperitem', get_string('mintimeperitem', 'local_catquiz'));
-        // $mform->setType('catquiz_mintimeperitem', PARAM_INT);
-        // $mform->hideIf('catquiz_mintimeperitem', 'catquiz_timepacedtest', 'neq', 1);
-
         info::instance_form_definition($mform, $elements);
 
         return $elements;
