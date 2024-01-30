@@ -32,6 +32,7 @@ use local_catquiz\teststrategy\feedbackgenerator\personabilities;
 use local_catquiz\teststrategy\feedbackgenerator\questionssummary;
 use local_catquiz\teststrategy\feedbacksettings;
 use local_catquiz\teststrategy\preselect_task\addscalestandarderror;
+use local_catquiz\teststrategy\preselect_task\checkitemparams;
 use local_catquiz\teststrategy\preselect_task\fisherinformation;
 use local_catquiz\teststrategy\preselect_task\maximumquestionscheck;
 use local_catquiz\teststrategy\preselect_task\mayberemovescale;
@@ -71,6 +72,7 @@ class classicalcat extends strategy {
      */
     public function get_preselecttasks(): array {
         return [
+            checkitemparams::class,
             updatepersonability::class,
             addscalestandarderror::class,
             maximumquestionscheck::class,
