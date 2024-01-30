@@ -84,4 +84,13 @@ class status {
      * @var string
      */
     const ERROR_EMPTY_FIRST_QUESTION_LIST = 'emptyfirstquestionlist';
+
+    /**
+     * ERROR_NO_ITEMS
+     *
+     * There are no item params for the given context/catscale.
+     *
+     * @var string
+     */
+    const ERROR_NO_ITEMS = 'errornoitems';
 }

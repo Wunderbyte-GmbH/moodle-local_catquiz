@@ -32,6 +32,7 @@ use local_catquiz\teststrategy\feedbackgenerator\pilotquestions;
 use local_catquiz\teststrategy\feedbackgenerator\questionssummary;
 use local_catquiz\teststrategy\feedbacksettings;
 use local_catquiz\teststrategy\preselect_task\addscalestandarderror;
+use local_catquiz\teststrategy\preselect_task\checkitemparams;
 use local_catquiz\teststrategy\preselect_task\fisherinformation;
 use local_catquiz\teststrategy\preselect_task\lasttimeplayedpenalty;
 use local_catquiz\teststrategy\preselect_task\maximumquestionscheck;
@@ -72,6 +73,7 @@ class teststrategy_balanced extends strategy {
      */
     public function get_preselecttasks(): array {
         return [
+            checkitemparams::class,
             maximumquestionscheck::class,
             updatepersonability::class,
             mayberemovescale::class,
