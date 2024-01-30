@@ -135,6 +135,7 @@ abstract class strategy {
         if ($result->isErr()) {
             $cache->set('stopreason', $result->get_status());
             $cache->set('endtime', time());
+            $cache->set('catquizerror', $result->get_status());
             return $result;
         }
 
