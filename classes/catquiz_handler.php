@@ -840,7 +840,7 @@ class catquiz_handler {
         }
 
         // Default is infinite represented by -1.
-        $maxquestionsperscale = intval($quizsettings->maxquestionsgroup->catquiz_maxquestionspersubscale);
+        $maxquestionsperscale = intval($quizsettings->maxquestionsscalegroup->catquiz_maxquestionspersubscale);
         if ($maxquestionsperscale == 0) {
             $maxquestionsperscale = -1;
         }
@@ -891,17 +891,17 @@ class catquiz_handler {
             'skip_reason' => null,
             'userid' => $USER->id,
             'max_attempts_per_scale' => $maxquestionsperscale,
-            'min_attempts_per_scale' => $quizsettings->maxquestionsgroup->catquiz_minquestionspersubscale,
+            'min_attempts_per_scale' => $quizsettings->maxquestionsscalegroup->catquiz_minquestionspersubscale,
             'teststrategy' => $quizsettings->catquiz_selectteststrategy,
             'timestamp' => time(),
             'attemptid' => intval($attemptdata->id),
             'updateabilityfallback' => false,
             'excludedsubscales' => [],
             'has_fisherinformation' => false,
-            'se_max' => $quizsettings->catquiz_standarderror_max,
-            'se_min' => $quizsettings->catquiz_standarderror_min,
             'max_attempttime_in_sec' => $attemptseconds ?? 0,
             'max_itemtime_in_sec' => $itemseconds ?? 0,
+            'se_max' => $quizsettings->catquiz_standarderrorgroup->catquiz_standarderror_max,
+            'se_min' => $quizsettings->catquiz_standarderrorgroup->catquiz_standarderror_min,
 
             // TODO: add duration range for attempt and item.
 
@@ -933,7 +933,6 @@ class catquiz_handler {
     public static function get_number_of_seconds(string $selectvalue, int $time) {
         switch ($selectvalue) {
             case 'h':
-                return $time * 3600;
             case 'min':
                 return $time * 60;
             case 'sec':
