@@ -106,56 +106,87 @@ Feature: As a teacher I setup adaptive quiz with CATquiz Scales and Feedbacks.
     And I am on "Course 1" course homepage with editing mode on
     And I add a "Adaptive Quiz" to section "1"
     And I set the following fields to these values:
-      | Name             | Adaptive CATquiz  |
-      | ID number        | adaptivecatquiz1  |
-      | catmodel         | Catquiz CAT model |
-      | Select CAT scale | Simulation        |
-      | Passing level in %| 500 |
-      | Purpose of test | Infer all subscales |
-      | Activate pilot mode | 1 |
-      | Proportion of questions to be piloted in % | 20 |
-      ## | Minimum number of adaptations | 150 |
-      | Start new CAT test with | Use the average ability score of the current test |
-      | Maximum number of questions returned per subscale | 1 |
-      | Minimum number of questions returned per subscale | 3 |
-      | Max. questions per test. | 10 |
-      | Min. number of questions per test. | 3 |
-      | Standarderror per subscale in percent | 60 |
-      | Timepaced test | 1 |
-      | Max time per question in seconds | 1 |
-      | Min time per question in seconds | 5 |
+      | Name                                       | Adaptive CATquiz          |
+      | ID number                                  | adaptivecatquiz1          |
+      | catmodel                                   | Catquiz CAT model         |
+      | Select CAT scale                           | Simulation                |
+      | Passing level in %                         | 500                       |
+      | Purpose of test                            | Infer all subscales       |
+      | Activate pilot mode                        | 1                         |
+      | Proportion of questions to be piloted in % | 20                        |
+      | Start new CAT test with                    | Use the average ability score of the current test |
+      | Limit time for attempt                     | 1                         |
+      | Action on timeout                          | Test aborted with result. |
+      ## Intentional error - no time values
+      ## Intentional error min > max
+      | maxquestionsscalegroup[catquiz_minquestionspersubscale] | 3 |
+      | maxquestionsscalegroup[catquiz_maxquestionspersubscale] | 1 |
+      ## Intentional error min > max
+      | maxquestionsgroup[catquiz_minquestions] | 10 |
+      | maxquestionsgroup[catquiz_maxquestions] | 3  |
+      ## Intentional error - catquiz_standarderror_max out of range
+      | catquiz_standarderrorgroup[catquiz_standarderror_min] | 0.4 |
+      | catquiz_standarderrorgroup[catquiz_standarderror_max] | 2   |
     When I click on "Save and display" "button"
-    ## Errors validation
-    Then I should see "Input a positive number from 0 to 100" in the "#fitem_id_catquiz_passinglevel" "css_element"
-    And I should see "Minimum number of questions must be less than maximum number of questions" in the "#fitem_id_catquiz_minquestionspersubscale" "css_element"
-    And I should see "Minimum number of questions must be less than maximum number of questions" in the "#fitem_id_catquiz_mintimeperitem" "css_element"
+    ## Errors validation 1
+    Then I should see "Input a number from 0 to 100" in the "#fitem_id_catquiz_passinglevel" "css_element"
+    And I should see "Minimum must be less than maximum" in the "#fgroup_id_maxquestionsgroup" "css_element"
+    And I should see "Minimum must be less than maximum" in the "#fgroup_id_maxquestionsscalegroup" "css_element"
+    And I should see "Please enter values between 0 and 1." in the "#fgroup_id_catquiz_standarderrorgroup" "css_element"
+    ## Future validation for time - if checked but fields empty
+    ## And I should see "Input a number from 0 to 100" in the "fgroup_id_catquiz_timelimitgroup" "css_element"
     And I set the following fields to these values:
+      ## Fix errors
       | Passing level in %| 50 |
-      | Max time per question in seconds | 15 |
-      | Maximum number of questions returned per subscale |  |
-      | Minimum number of questions returned per subscale | 1 |
+      | catquiz_standarderrorgroup[catquiz_standarderror_min] | 0.4 |
+      | catquiz_standarderrorgroup[catquiz_standarderror_max] | 0.6 |
+      ## Intentional error catquiz_minquestionspersubscale > catquiz_maxquestions
+      | maxquestionsscalegroup[catquiz_minquestionspersubscale] | 15 |
+      | maxquestionsscalegroup[catquiz_maxquestionspersubscale] | 30 |
+      | maxquestionsgroup[catquiz_minquestions] | 3  |
+      | maxquestionsgroup[catquiz_maxquestions] | 10 |
+      ## Intentional error - incorrect time values
+      | catquiz_timelimitgroup[catquiz_maxtimeperattempt]  | 5   |
+      | catquiz_timelimitgroup[catquiz_timeselect_attempt] | min |
+      | catquiz_timelimitgroup[catquiz_maxtimeperitem]     | 15  |
+      | catquiz_timelimitgroup[catquiz_timeselect_item]    | min |
+    And I click on "Save and display" "button"
+    ## Errors validation 2 - not implemented yet
+    ## Future validation for
+    And I should see "Per scale minimum must be less than per test maximum" in the "#fgroup_id_maxquestionsscalegroup" "css_element"
+    ## Future validation for time - maximum time per attempt must be greater than maximum time per itemif
+    And I should see "Maximum time per attempt must be greater than maximum time per itemif" in the "#fgroup_id_catquiz_timelimitgroup" "css_element"
+    And I set the following fields to these values:
+      | maxquestionsscalegroup[catquiz_minquestionspersubscale] | 1 |
+      | maxquestionsscalegroup[catquiz_maxquestionspersubscale] | 3 |
+      | catquiz_timelimitgroup[catquiz_maxtimeperattempt] | 5 |
+      | catquiz_timelimitgroup[catquiz_maxtimeperitem] | 1 |
     And I click on "Save and display" "button"
     And I wait until the page is ready
     And I follow "Settings"
     ## Verify all root catscales active by default
     And the following fields match these values:
-      | Name             | Adaptive CATquiz  |
-      | ID number        | adaptivecatquiz1  |
-      | catmodel         | Catquiz CAT model |
-      | Select CAT scale | Simulation        |
-      | Passing level in %| 50 |
-      | Max time per question in seconds | 15 |
-      | Min time per question in seconds | 5 |
-      | Purpose of test | Infer all subscales |
-      | Activate pilot mode | 1 |
-      | Proportion of questions to be piloted in % | 20 |
-      | Minimum number of adaptations | 150 |
-    ## | Standarderror per subscale in percent | 60 |
-      | Start new CAT test with | Use the average ability score of the current test |
-      | Maximum number of questions returned per subscale | |
-      | Minimum number of questions returned per subscale | 1 |
-      | Max. questions per test. | 10 |
-      | Min. number of questions per test. | 3 |
+      | Name                                       | Adaptive CATquiz          |
+      | ID number                                  | adaptivecatquiz1          |
+      | catmodel                                   | Catquiz CAT model         |
+      | Select CAT scale                           | Simulation                |
+      | Passing level in %                         | 50                        |
+      | Purpose of test                            | Infer all subscales       |
+      | Activate pilot mode                        | 1                         |
+      | Proportion of questions to be piloted in % | 20                        |
+      | Start new CAT test with                    | Use the average ability score of the current test |
+      | catquiz_standarderrorgroup[catquiz_standarderror_min]   | 0.4 |
+      | catquiz_standarderrorgroup[catquiz_standarderror_max]   | 0.6 |
+      | maxquestionsscalegroup[catquiz_minquestionspersubscale] | 1   |
+      | maxquestionsscalegroup[catquiz_maxquestionspersubscale] | 3   |
+      | maxquestionsgroup[catquiz_minquestions]                 | 3   |
+      | maxquestionsgroup[catquiz_maxquestions]                 | 10  |
+      | Limit time for attempt                                  | 1   |
+      | Action on timeout                                       | Test aborted with result. |
+      | catquiz_timelimitgroup[catquiz_maxtimeperattempt]       | 5   |
+      | catquiz_timelimitgroup[catquiz_timeselect_attempt]      | min |
+      | catquiz_timelimitgroup[catquiz_maxtimeperitem]          | 1   |
+      | catquiz_timelimitgroup[catquiz_timeselect_item]         | min |
     And I log out
 
   @javascript
