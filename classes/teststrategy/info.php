@@ -266,7 +266,6 @@ class info {
             get_string('numberofquestionsperscale', 'local_catquiz'));
         $mform->addHelpButton('maxquestionsscalegroup', 'numberofquestionsperscale', 'local_catquiz');
 
-        // $mform->registerNoSubmitButton('calculatestandarderror');
         $standarderrorgroup = [
             $mform->createElement(
                 'static',
@@ -292,14 +291,6 @@ class info {
                 'catquiz_standarderror_max',
                 ['size' => '2']
             ),
-            /* This will be needed in a later version.
-            $mform->createElement(
-                'submit',
-                'calculatestandarderror',
-                get_string('calculatefromvalues', 'local_catquiz'),
-                ['data-action' => 'submitCalcSE']
-            ),
-            */
         ];
 
         $elements[] = $mform->addGroup(
