@@ -181,7 +181,6 @@ class info {
         $mform->setType('catquiz_pilotratio', PARAM_FLOAT);
         $mform->addHelpButton('catquiz_pilotratio', 'pilotratio', 'local_catquiz');
 
-
         $elements[] = $mform->addElement('select', 'catquiz_selectfirstquestion',
             get_string('catquiz_selectfirstquestion', 'local_catquiz'),
             [
@@ -226,7 +225,7 @@ class info {
                 'catquiz_maxquestions',
                 'maxquestions',
                 ['size' => '2']
-            )
+            ),
             ];
         $elements[] = $mform->addGroup(
             $maxquestionspertest,
@@ -258,7 +257,7 @@ class info {
                 'catquiz_maxquestionspersubscale',
                 get_string('maxquestionspersubscale', 'local_catquiz'),
                 ['size' => '2']
-            )
+            ),
             ];
         $elements[] = $mform->addGroup(
             $maxquestionsperscale,
