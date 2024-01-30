@@ -800,6 +800,11 @@ class catquiz_handler {
         global $OUTPUT, $COURSE;
         $contextid = optional_param('context', 0, PARAM_INT);
 
+        $cache = cache::make('local_catquiz', 'adaptivequizattempt');
+        if (($errormsg = $cache->get('catquizerror')) && $attemptrecord->questionsattempted == 0) {
+            return get_string($errormsg, 'local_catquiz');
+        }
+
         $attemptfeedback = new attemptfeedback($attemptrecord->id, $contextid, null, $COURSE->id);
         $data = $attemptfeedback->export_for_template($OUTPUT);
 
