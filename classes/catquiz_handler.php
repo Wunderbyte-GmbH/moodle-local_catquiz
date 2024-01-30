@@ -394,9 +394,9 @@ class catquiz_handler {
                 && !empty($data['catquiz_standarderrorgroup']['catquiz_standarderror_min'])) {
                 $errors['catquiz_standarderrorgroup'] =
                 get_string('errorhastobefloat', 'local_catquiz');
-            } else if (0.0 >= (float)$data['catquiz_standarderrorgroup']['catquiz_standarderror_min']) {
+            } else if (0.0 > (float)$data['catquiz_standarderrorgroup']['catquiz_standarderror_min']) {
                 $errors['catquiz_standarderrorgroup'] = get_string('formelementnegative', 'local_catquiz');
-            } else if (1.0 <= (float)$data['catquiz_standarderrorgroup']['catquiz_standarderror_min']) {
+            } else if (1.0 < (float)$data['catquiz_standarderrorgroup']['catquiz_standarderror_min']) {
                 $errors['catquiz_standarderrorgroup'] = get_string('formelementbetweenzeroandone', 'local_catquiz');
             } else {
                 $semin = true;
@@ -407,9 +407,9 @@ class catquiz_handler {
                 && !empty($data['catquiz_standarderrorgroup']['catquiz_standarderror_max'])) {
                 $errors['catquiz_standarderrorgroup'] =
                 get_string('errorhastobefloat', 'local_catquiz');
-            } else if (0.0 >= (float)$data['catquiz_standarderrorgroup']['catquiz_standarderror_max']) {
+            } else if (0.0 > (float)$data['catquiz_standarderrorgroup']['catquiz_standarderror_max']) {
                 $errors['catquiz_standarderrorgroup'] = get_string('formelementnegative', 'local_catquiz');
-            } else if (1.0 <= (float)$data['catquiz_standarderrorgroup']['catquiz_standarderror_max']) {
+            } else if (1.0 < (float)$data['catquiz_standarderrorgroup']['catquiz_standarderror_max']) {
                 $errors['catquiz_standarderrorgroup'] = get_string('formelementbetweenzeroandone', 'local_catquiz');
             } else if ($semin && !empty($data['catquiz_standarderrorgroup']['catquiz_standarderror_min']
                 >= (float)$data['catquiz_standarderrorgroup']['catquiz_standarderror_max'])) {
