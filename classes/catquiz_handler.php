@@ -774,10 +774,8 @@ class catquiz_handler {
      * @throws cache_exception
      */
     public static function prepare_attempt_caches() {
-        global $USER;
         $cache = cache::make('local_catquiz', 'adaptivequizattempt');
         $cache->purge();
-        $cache->set('userresponses', [$USER->id => []]);
         $cache->set('starttime', time());
     }
 

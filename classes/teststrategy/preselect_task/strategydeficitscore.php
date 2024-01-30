@@ -24,7 +24,6 @@
 
 namespace local_catquiz\teststrategy\preselect_task;
 
-use cache;
 use local_catquiz\catscale;
 use local_catquiz\local\result;
 use local_catquiz\teststrategy\preselect_task;
@@ -56,9 +55,7 @@ final class strategydeficitscore extends preselect_task implements wb_middleware
      */
     public function run(array &$context, callable $next): result {
         $this->progress = $context['progress'];
-        global $USER;
-        $cache = cache::make('local_catquiz', 'adaptivequizattempt');
-        $userresponses = $cache->get('userresponses');
+        $userresponses = $this->progress->get_user_responses();
         $scalefractions = [];
         $scalecount = [];
 
@@ -70,7 +67,7 @@ final class strategydeficitscore extends preselect_task implements wb_middleware
             } else {
                 $scalefractions[$scaleid] = array_sum(
                     array_map(
-                        fn ($q) => $userresponses[$USER->id]['component'][$q->id]['fraction'],
+                        fn ($q) => $userresponses[$q->id]['fraction'],
                         $played
                     )
                 ) / $scalecount[$scaleid];

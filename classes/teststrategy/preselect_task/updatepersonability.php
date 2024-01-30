@@ -128,7 +128,10 @@ class updatepersonability extends preselect_task implements wb_middleware {
 
         }
 
-        $this->userresponses = $this->update_cached_responses($context);
+        $this->userresponses = (new model_responses())->setdata(
+            $this->progress->get_user_responses(),
+            false
+        );
         $context['lastresponse'] = $this->userresponses->get_last_response($context['userid']);
 
         if (!empty($this->progress->get_last_question()->is_pilot)) {
@@ -141,11 +144,7 @@ class updatepersonability extends preselect_task implements wb_middleware {
             return $next($context);
         }
 
-        $components = ($this->userresponses->as_array())[$context['userid']];
-        if (count($components) > 1) {
-            throw new moodle_exception('User has answers to more than one component.');
-        }
-        $this->arrayresponses = reset($components);
+        $this->arrayresponses = ($this->userresponses->as_array())[$context['userid']]['component'];
 
         $catscaleid = $this->progress->get_last_question()->catscaleid;
         $this->scalestoupdate = array_reverse(
@@ -329,37 +328,6 @@ class updatepersonability extends preselect_task implements wb_middleware {
             }
         }
         return false;
-    }
-
-    /**
-     * Update cached responses.
-     *
-     * @param mixed $context
-     *
-     * @return mixed
-     *
-     */
-    protected function update_cached_responses($context) {
-        global $CFG;
-        $cache = cache::make('local_catquiz', 'adaptivequizattempt');
-        $userresponses = $cache->get('userresponses');
-        $lastquestion = $this->progress->get_last_question();
-        $lastresponse = catcontext::getresponsedatafromdb(
-            $context['contextid'],
-            [$lastquestion->catscaleid],
-            $lastquestion->id,
-            $context['userid']
-        );
-        if (! $lastresponse) {
-            // TODO: This should not happen, so maybe log this as event somewhere?
-            return (new model_responses())->setdata($userresponses, false);
-        }
-        $userresponses[$context['userid']]['component'][$lastquestion->id]
-            = $lastresponse[$context['userid']]['component'][$lastquestion->id];
-        $cache->set('userresponses', $userresponses);
-
-        $userresponses = (new model_responses())->setdata($userresponses, false);
-        return $userresponses;
     }
 
     /**

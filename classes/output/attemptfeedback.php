@@ -135,7 +135,7 @@ class attemptfeedback implements renderable, templatable {
         if (!$this->teststrategy) {
             return '';
         }
-        $progress = progress::load($this->attemptid);
+        $progress = progress::load($this->attemptid, 'mod_adaptivequiz', $this->contextid);
 
         $generators = $this->get_feedback_generators_for_teststrategy($this->teststrategy);
 

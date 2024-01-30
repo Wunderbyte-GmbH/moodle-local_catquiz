@@ -54,6 +54,7 @@ class progress_loader implements contextloaderinterface {
         return [
             'attemptid',
             'component',
+            'contextid',
         ];
     }
 
@@ -64,7 +65,7 @@ class progress_loader implements contextloaderinterface {
      * @return array
      */
     public function load(array $context): array {
-        $progress = progress::load($context['attemptid'], $context['component']);
+        $progress = progress::load($context['attemptid'], $context['component'], $context['contextid']);
         $context['progress'] = $progress;
         return $context;
     }

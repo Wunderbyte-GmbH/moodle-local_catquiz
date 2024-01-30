@@ -30,6 +30,7 @@ use local_catquiz\local\model\model_responses;
 use local_catquiz\local\result;
 use local_catquiz\local\status;
 use local_catquiz\teststrategy\preselect_task;
+use local_catquiz\teststrategy\progress;
 use local_catquiz\wb_middleware;
 
 /**
@@ -45,6 +46,12 @@ use local_catquiz\wb_middleware;
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class addscalestandarderror extends preselect_task implements wb_middleware {
+
+    /**
+     * @var progress $progress
+     */
+    private progress $progress;
+
     /**
      * Run method.
      *
@@ -55,9 +62,9 @@ class addscalestandarderror extends preselect_task implements wb_middleware {
      *
      */
     public function run(array &$context, callable $next): result {
-        $cache = cache::make('local_catquiz', 'adaptivequizattempt');
-        $cachedresponses = $cache->get('userresponses');
-        if (! $cachedresponses) {
+        $this->progress = $context['progress'];
+        $responses = $this->progress->get_user_responses();
+        if (! $responses) {
             // If we do not yet have a response, use a default value.
             $default = $context['initial_standarderror'];
             foreach (array_keys($context['person_ability']) as $scaleid) {
@@ -67,7 +74,7 @@ class addscalestandarderror extends preselect_task implements wb_middleware {
             return $next($context);
         }
 
-        $userresponses = (new model_responses())->setdata($cachedresponses, false);
+        $userresponses = (new model_responses())->setdata($responses, false);
         foreach ($context['person_ability'] as $catscaleid => $ability) {
             $items = $userresponses->get_items_for_scale($catscaleid, $context['contextid']);
             $se = catscale::get_standarderror($ability, $items, INF);
@@ -89,6 +96,7 @@ class addscalestandarderror extends preselect_task implements wb_middleware {
             'questions',
             'initial_standarderror',
             'person_ability',
+            'progress',
         ];
     }
 }

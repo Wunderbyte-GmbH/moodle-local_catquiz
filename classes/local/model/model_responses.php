@@ -154,7 +154,8 @@ class model_responses {
      *
      */
     public function setdata($data, bool $filter = true) {
-        $this->data = $data;
+        global $USER;
+        $this->data = [$USER->id => ['component' => $data]];
         if (! $filter) {
             return $this;
         }
