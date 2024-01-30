@@ -102,15 +102,17 @@ $string['maxscalevalue'] = 'Max value';
 $string['min'] = 'min: ';
 $string['max'] = 'max: ';
 $string['chooseparent'] = 'Choose parent scale';
+$string['addoredittemplate'] = "Add or edit template";
+
+// Validation.
 $string['errorminscalevalue'] = 'Min value has to be smaller than max value';
 $string['errorhastobefloat'] = 'Has to be a decimal';
 $string['errorhastobeint'] = 'Has to be a whole number';
-
-$string['addoredittemplate'] = "Add or edit template";
-
 $string['formelementnegative'] = 'Input a positive number';
 $string['formelementwrongpercent'] = 'Input a number from 0 to 100';
 $string['formminquestgreaterthan'] = 'Minimum must be less than maximum';
+$string['formelementbetweenzeroandone'] = 'Please enter values between 0 and 1.';
+
 
 // Test Strategy.
 $string['catquiz_teststrategyheader'] = 'CAT Settings';

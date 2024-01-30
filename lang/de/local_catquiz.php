@@ -100,6 +100,7 @@ $string['timeoutabortnoresult'] = 'Test wird sofort beendet und nicht abschließ
 $string['timeoutabortresult'] = 'Test wird sofort beendet und abschließend bewertet';
 $string['timeoutfinishwithresult'] = 'Nachfrist: angezeigte Items können beendet werden';
 
+// Validation.
 $string['minmaxgroup'] = 'Geben Sie Minimal und Maximal als Dezimalwert ein';
 $string['minscalevalue'] = 'Minimalwert';
 $string['maxscalevalue'] = 'Maximalwert';
@@ -107,12 +108,13 @@ $string['chooseparent'] = 'Wähle übergeordnete Scala';
 $string['errorminscalevalue'] = 'Der Minimalwert muss kleiner sein als der Maximalwert der Skala';
 $string['errorhastobefloat'] = 'Muss ein Dezimalwert sein';
 $string['errorhastobeint'] = 'Muss eine Ganzzahl sein';
-
-$string['addoredittemplate'] = "Einstellungs-Vorlage bearbeiten";
-
 $string['formelementnegative'] = 'Wert muss positiv (über 0) sein';
 $string['formelementwrongpercent'] = 'Prozentzahl zwischen 0 und 100 eingeben';
 $string['formminquestgreaterthan'] = 'Minimum muss kleiner als Maximum sein';
+$string['formelementbetweenzeroandone'] = 'Bitte Werte zwischen 0 und 1 eingeben.';
+
+$string['addoredittemplate'] = "Einstellungs-Vorlage bearbeiten";
+
 
 // Test Strategy.
 $string['catquiz_teststrategyheader'] = 'CAT-Einstellungen';
