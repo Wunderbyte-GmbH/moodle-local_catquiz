@@ -57,14 +57,28 @@
     "catquiz_group_8_2": "0",
     "catquiz_group_8_3": "0",
     "catquiz_includepilotquestions": "0",
-    "catquiz_maxquestions": "3",
-    "catquiz_maxquestionspersubscale": "",
-    "catquiz_minquestions": "3",
-    "catquiz_minquestionspersubscale": "1",
+    "maxquestionsgroup": {
+        "catquiz_minquestions": "3",
+        "catquiz_maxquestions": "3"
+    },
+    "maxquestionsscalegroup": {
+        "catquiz_minquestionspersubscale": "1",
+        "catquiz_maxquestionspersubscale": ""
+    },
+    "catquiz_standarderrorgroup": {
+        "catquiz_standarderror_min": "",
+        "catquiz_standarderror_max": ""
+    },
+    "catquiz_includetimelimit": "1",
+    "catquiz_timelimitgroup": {
+        "catquiz_maxtimeperattempt": "60",
+        "catquiz_timeselect_attempt": "min",
+        "catquiz_maxtimeperitem": "300",
+        "catquiz_timeselect_item": "sec"
+    },
     "catquiz_passinglevel": "",
     "catquiz_selectfirstquestion": "startwithcurrentability",
     "catquiz_selectteststrategy": "5",
-    "catquiz_timepacedtest": "0",
     "choosetemplate": "0",
     "cmidnumber": "",
     "competencies": [],
