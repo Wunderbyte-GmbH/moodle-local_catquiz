@@ -150,13 +150,13 @@ class datacard implements renderable {
 
         // Information about activity status...
         switch ($record->testitemstatus) {
-            case LOCAL_CATQUIZ_TESTITEM_STATUS_ACTIVE:
-                $closedeye = '';
-                $testitemstatus = get_string('active', 'core');
-                break;
             case LOCAL_CATQUIZ_TESTITEM_STATUS_INACTIVE:
                 $closedeye = '-slash';
                 $testitemstatus = get_string('inactive', 'core');
+                break;
+            default:
+                $closedeye = '';
+                $testitemstatus = get_string('active', 'core');
                 break;
         }
 

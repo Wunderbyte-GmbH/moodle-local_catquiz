@@ -37,6 +37,11 @@ use local_catquiz\teststrategy\feedbacksettings;
 use local_catquiz\local\model\model_strategy;
 use stdClass;
 
+defined('MOODLE_INTERNAL') || die();
+
+global $CFG;
+require_once($CFG->dirroot.'/local/catquiz/lib.php');
+
 /**
  * Returns rendered person abilities.
  *

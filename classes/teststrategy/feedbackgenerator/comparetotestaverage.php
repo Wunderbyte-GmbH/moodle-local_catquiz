@@ -34,6 +34,7 @@ use local_catquiz\teststrategy\preselect_task\firstquestionselector;
 
 defined('MOODLE_INTERNAL') || die();
 
+global $CFG;
 require_once($CFG->dirroot.'/local/catquiz/lib.php');
 
 /**
