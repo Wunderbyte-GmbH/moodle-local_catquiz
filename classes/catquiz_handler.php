@@ -394,23 +394,29 @@ class catquiz_handler {
             $errors['catquiz_passinglevel'] = get_string('formelementwrongpercent', 'local_catquiz');
         }
 
+        if (isset($data['catquiz_pilotratio'])) {
+            if (0 > (int) $data['catquiz_pilotratio'] || 100 < (int) $data['catquiz_pilotratio']) {
+                $errors['catquiz_pilotratio'] = get_string('formelementwrongpercent', 'local_catquiz');
+            }
+        }
+
         // Standarderror- values should be float between 0 and 1 with min lower than max.
-        if (!empty($data['catquiz_standarderrorgroup']['catquiz_standarderror_min'])) {
+        if (isset($data['catquiz_standarderrorgroup']['catquiz_standarderror_min'])) {
             if (!is_numeric($data['catquiz_standarderrorgroup']['catquiz_standarderror_min'])) {
                 $errors['catquiz_standarderrorgroup'] =
                 get_string('errorhastobefloat', 'local_catquiz');
             } else if (0 > (float)$data['catquiz_standarderrorgroup']['catquiz_standarderror_min']) {
-                get_string('formelementnegative', 'local_catquiz');
+                $errors['catquiz_standarderrorgroup'] = get_string('formelementnegative', 'local_catquiz');
             } else {
                 $semin = true;
             }
         }
-        if (!empty($data['catquiz_standarderrorgroup']['catquiz_standarderror_max'])) {
+        if (isset($data['catquiz_standarderrorgroup']['catquiz_standarderror_max'])) {
             if (!is_numeric($data['catquiz_standarderrorgroup']['catquiz_standarderror_max'])) {
                 $errors['catquiz_standarderrorgroup'] =
                 get_string('errorhastobefloat', 'local_catquiz');
             } else if (0 > (float)$data['catquiz_standarderrorgroup']['catquiz_standarderror_max']) {
-                get_string('formelementnegative', 'local_catquiz');
+                $errors['catquiz_standarderrorgroup'] = get_string('formelementnegative', 'local_catquiz');
             } else if ($semin && !empty($data['catquiz_standarderrorgroup']['catquiz_standarderror_min']
                 >= (float)$data['catquiz_standarderrorgroup']['catquiz_standarderror_max'])) {
                     $errors['catquiz_standarderrorgroup']
