@@ -402,7 +402,8 @@ class catquiz_handler {
 
         // Standarderror- values should be float between 0 and 1 with min lower than max.
         if (isset($data['catquiz_standarderrorgroup']['catquiz_standarderror_min'])) {
-            if (!is_numeric($data['catquiz_standarderrorgroup']['catquiz_standarderror_min'])) {
+            if (!is_numeric($data['catquiz_standarderrorgroup']['catquiz_standarderror_min'])
+                && !empty($data['catquiz_standarderrorgroup']['catquiz_standarderror_min'])) {
                 $errors['catquiz_standarderrorgroup'] =
                 get_string('errorhastobefloat', 'local_catquiz');
             } else if (0 > (float)$data['catquiz_standarderrorgroup']['catquiz_standarderror_min']) {
@@ -414,7 +415,8 @@ class catquiz_handler {
             }
         }
         if (isset($data['catquiz_standarderrorgroup']['catquiz_standarderror_max'])) {
-            if (!is_numeric($data['catquiz_standarderrorgroup']['catquiz_standarderror_max'])) {
+            if (!is_numeric($data['catquiz_standarderrorgroup']['catquiz_standarderror_max'])
+                && !empty($data['catquiz_standarderrorgroup']['catquiz_standarderror_max'])) {
                 $errors['catquiz_standarderrorgroup'] =
                 get_string('errorhastobefloat', 'local_catquiz');
             } else if (0 > (float)$data['catquiz_standarderrorgroup']['catquiz_standarderror_max']) {
