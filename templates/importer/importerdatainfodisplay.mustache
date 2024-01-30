@@ -20,8 +20,32 @@
     * none
     Context variables required for this template:
     Example context (json):
-    {
+{
+    "testitemsimporterdemodata": {
+        "title": "Sample Test Items Importer Data",
+        "columns": [
+            {
+                "name": "Question 1",
+                "mandatory": true,
+                "format": "Multiple Choice",
+                "importinstruction": "Provide options in CSV format"
+            },
+            {
+                "name": "Question 2",
+                "mandatory": false,
+                "format": "True/False",
+                "importinstruction": "Provide 'true' or 'false'"
+            },
+            {
+                "name": "Question 3",
+                "mandatory": true,
+                "format": null,
+                "importinstruction": "Provide answers in plain text"
+            }
+        ],
+        "demofileurl": "https://example.com/test_items_import_demo.csv"
     }
+}
 }}
 {{#testitemsimporterdemodata}}
     <h4>{{title}}</h4>
