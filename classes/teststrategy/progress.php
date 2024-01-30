@@ -25,7 +25,9 @@
 namespace local_catquiz\teststrategy;
 
 use cache;
+use Exception;
 use JsonSerializable;
+use local_catquiz\catcontext;
 use local_catquiz\catscale;
 use stdClass;
 
@@ -51,6 +53,11 @@ class progress implements JsonSerializable {
      * @var string $component The name of the component. E.g. mod_adaptivequiz.
      */
     private string $component;
+
+    /**
+     * @var int $contextid The context ID
+     */
+    private int $contextid;
 
     /**
      * @var int $attemptid ID to identify the quiz attempt.
@@ -83,9 +90,14 @@ class progress implements JsonSerializable {
     private ?int $breakend;
 
     /**
-     * @var array $activescales;
+     * @var array $activescales
      */
     private array $activescales;
+
+    /**
+     * @var array $responses
+     */
+    private array $responses;
 
     /**
      * Returns a new progress instance.
@@ -93,10 +105,11 @@ class progress implements JsonSerializable {
      * If we already have data in the cache or DB, the instance is populated with those data.
      *
      * @param int $attemptid
-     * @param ?string $component
+     * @param string $component
+     * @param int $contextid
      * @return progress
      */
-    public static function load(int $attemptid, ?string $component = null): self {
+    public static function load(int $attemptid, string $component, int $contextid): self {
         $attemptcache = cache::make('local_catquiz', 'adaptivequizattempt');
         $cachekey = self::get_cache_key($attemptid);
         $cachedata = $attemptcache->get($cachekey);
@@ -118,7 +131,7 @@ class progress implements JsonSerializable {
         }
 
         // If we are here, this must be a new attempt.
-        return self::create_new($attemptid, $component);
+        return self::create_new($attemptid, $component, $contextid);
     }
 
     /**
@@ -133,7 +146,10 @@ class progress implements JsonSerializable {
         $instance->userid = $object->userid;
         $instance->component = $object->component;
         $instance->attemptid = $object->attemptid;
+
+        // Set properties from json encoded data.
         $data = json_decode($object->json);
+        $instance->contextid = $data->contextid;
         $instance->playedquestions = (array) $data->playedquestions;
         $instance->playedquestionsbyscale = (array) $data->playedquestionsbyscale;
         $instance->isfirstquestion = $data->isfirstquestion;
@@ -141,6 +157,15 @@ class progress implements JsonSerializable {
         $instance->lastquestion->fisherinformation = (array) $instance->lastquestion->fisherinformation;
         $instance->breakend = $data->breakend;
         $instance->activescales = (array) $data->activescales;
+        $instance->responses = (array) $data->responses;
+        foreach ($instance->responses as $id => $val) {
+            $instance->responses[$id] = (array) $val;
+        }
+
+        // This has to happen now, because now we have the response to the last
+        // question.
+        $instance->update_cached_responses();
+
         return $instance;
     }
 
@@ -148,22 +173,18 @@ class progress implements JsonSerializable {
      * This sets default data for a new instance.
      *
      * @param int $attemptid
-     * @param ?string $component
+     * @param string $component
+     * @param int $contextid
      * @return self
      */
-    private static function create_new(int $attemptid, ?string $component): self {
-        if (! $component) {
-            throw new \Exception(
-                "Creating a new quiz progress failed due to missing component name"
-            );
-        }
-
+    private static function create_new(int $attemptid, string $component, int $contextid): self {
         global $USER;
         $instance = new self();
         $instance->id = null;
         $instance->userid = $USER->id;
         $instance->component = $component;
         $instance->attemptid = $attemptid;
+        $instance->contextid = $contextid;
 
         $instance->playedquestions = [];
         $instance->playedquestionsbyscale = [];
@@ -171,6 +192,7 @@ class progress implements JsonSerializable {
         $instance->lastquestion = null;
         $instance->breakend = null;
         $instance->activescales = [];
+        $instance->responses = [];
         return $instance;
     }
 
@@ -188,6 +210,8 @@ class progress implements JsonSerializable {
             'lastquestion' => $this->lastquestion,
             'breakend' => $this->breakend,
             'activescales' => $this->activescales,
+            'contextid' => $this->contextid,
+            'responses' => $this->responses,
         ];
     }
 
@@ -421,6 +445,40 @@ class progress implements JsonSerializable {
         unset($this->activescales[array_search($scaleid, $this->activescales)]);
         return $this;
     }
+
+    /**
+     * Returns the responses in this attempt.
+     * @return array
+     */
+    public function get_user_responses() {
+        return $this->responses;
+    }
+
+    /**
+     * Update cached responses.
+     *
+     * @return mixed
+     */
+    private function update_cached_responses() {
+        $lastresponse = catcontext::getresponsedatafromdb(
+            $this->contextid,
+            [$this->lastquestion->catscaleid],
+            $this->lastquestion->id,
+            $this->userid
+        );
+        if (! $lastresponse) {
+            throw new Exception(sprintf(
+                "Could not find the last response. user=%d lastquestion=%d contextid=%d",
+                $this->userid,
+                $this->lastquestion->id,
+                $this->contextid
+            ));
+        }
+        $this->responses[$this->lastquestion->id] = $lastresponse[$this->userid]['component'][$this->lastquestion->id];
+
+        return $this;
+    }
+
 
     /**
      * Returns the cache key.

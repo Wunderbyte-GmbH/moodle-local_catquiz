@@ -41,22 +41,6 @@ use local_catquiz\teststrategy\preselect_task\updatepersonability;
  */
 class updatepersonability_testing extends updatepersonability {
 
-
-    /**
-     * Update cached responses.
-     *
-     * @param mixed $context
-     *
-     * @return mixed
-     *
-     */
-    protected function update_cached_responses($context) {
-        if (!array_key_exists('fake_response_data', $context)) {
-            return parent::update_cached_responses($context);
-        }
-        return (new model_responses())->setdata($context['fake_response_data']);
-    }
-
     /**
      * Update person param.
      *
