@@ -73,7 +73,7 @@ final class checkbreak extends preselect_task implements wb_middleware {
             }
         }
 
-        $lastquestionreturntime = $cache->get('lastquestionreturntime');
+        $lastquestionreturntime = $this->progress->get_last_question()->userlastattempttime;
         if (!$lastquestionreturntime || $now - $lastquestionreturntime <= $context['maxtimeperquestion']) {
             return $next($context);
         }
