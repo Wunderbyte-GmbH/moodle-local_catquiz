@@ -66,8 +66,8 @@
         "catquiz_maxquestionspersubscale": ""
     },
     "catquiz_standarderrorgroup": {
-        "catquiz_standarderror_min": "",
-        "catquiz_standarderror_max": ""
+        "catquiz_standarderror_min": 0.35,
+        "catquiz_standarderror_max": 1.00
     },
     "catquiz_includetimelimit": "1",
     "catquiz_timelimitgroup": {
