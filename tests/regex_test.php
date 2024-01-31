@@ -4,19 +4,24 @@ use basic_testcase; // Moodle test class.
 use local_catquiz\regex;
 
 class regex_test extends basic_testcase {
-    public function test_regex_can_add_db_prefixes() {
+    /**
+     * @dataProvider regex_can_add_db_prefixes_provider
+     */
+    public function test_regex_can_add_db_prefixes(string $input, string $expected) {
         $regex = new regex();
-        $input = [
-            "{local_catquiz}",
-            "{local_catquiz} SOME SQL AND NOW ANOTHER {local_catquiz}",
+        $this->assertEquals($expected, $regex->add_db_prefixes($input, 'm_'));
+    }
+
+    public static function regex_can_add_db_prefixes_provider() {
+        return [
+            'simple' => [
+                'input' => '{local_catquiz}',
+                'expected' => 'm_local_catquiz',
+            ],
+            'two occurences' => [
+                'input' => "{local_catquiz} SOME SQL AND NOW ANOTHER {local_catquiz}",
+                'expected' => "m_local_catquiz SOME SQL AND NOW ANOTHER m_local_catquiz",
+            ],
         ];
-        $expected = [
-            "m_local_catquiz",
-            "m_local_catquiz SOME SQL AND NOW ANOTHER m_local_catquiz",
-        ]
-        ;
-        foreach ($input as $index => $value) {
-            $this->assertEquals($expected[$index], $regex->add_db_prefixes($value, 'm_'));
-        }
     }
 }
