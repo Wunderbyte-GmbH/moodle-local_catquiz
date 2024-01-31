@@ -22,7 +22,7 @@
 import DynamicForm from 'core_form/dynamicform';
 
 const SELECTORS = {
-    CONTEXTFORM: '#select_context_form',
+    CONTEXTFORM: "div[name='catmanagerquestions-contextselector']",
     CHECKBOXSELECTOR: 'input.integrate-subscales-checkbox',
     SCALEFORM: '#select_scale_form',
     SCALECONTAINER: "[id='catmanagerquestions-scaleselectors']", // Make sure to change in the code below.
@@ -37,7 +37,6 @@ const SELECTORS = {
 export const init = () => {
 
     const containers = document.querySelectorAll(SELECTORS.CONTAINERCLASSSELECTOR);
-
     containers.forEach(container => {
         initComponents(container);
     });
@@ -64,10 +63,18 @@ function initComponents(container) {
         });
     }
 
-    // Attach listener to contextselector
-    const contextselector = container.querySelector(SELECTORS.CONTEXTFORM);
-    if (contextselector) {
-        listenToSelect(contextselector, 'local_catquiz\\form\\contextselector', "contextid");
+    var contextcontainer = document.querySelector(SELECTORS.CONTEXTFORM);
+    if (contextcontainer) {
+        // Find the select element within each div.
+        var contextselector = contextcontainer.querySelector('select');
+        // Check if a select element was found.
+        if (contextselector) {
+            contextselector.addEventListener('change', function() {
+                let searchParams = new URLSearchParams(window.location.search);
+                searchParams.set('contextid', contextselector.value);
+                window.location.search = searchParams.toString();
+              });
+        }
     }
 
 
@@ -96,6 +103,8 @@ export function listenToSelect(element, location, paramname) {
             location
         );
 
+        // eslint-disable-next-line no-console
+        // console.log(element, location, paramname, dynamicForm);
         // If a user selects a context, redirect to a URL that includes the selected
         // context as `contextid` query parameter
         dynamicForm.addEventListener(dynamicForm.events.FORM_SUBMITTED, (e) => {
