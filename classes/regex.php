@@ -33,4 +33,13 @@ class regex {
         $text = preg_replace('/\}/', '', $text);
         return $text;
     }
+
+    /**
+     * Should convert something like m_local_catquiz_tablename to {local_catquiz_tablename}
+     *
+     * @return string
+     */
+    public function remove_db_prefixes(string $text): string {
+        return $text;
+    }
 }

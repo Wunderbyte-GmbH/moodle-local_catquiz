@@ -31,4 +31,28 @@ class regex_test extends basic_testcase {
             ],
         ];
     }
+
+    /**
+     * @dataProvider regex_can_remove_db_prefixes_provider
+     */
+    public function test_regex_can_remove_db_prefixes(string $input, string $expected) {
+        $this->assertEquals($expected, self::$regex->remove_db_prefixes($input));
+    }
+
+    public static function regex_can_remove_db_prefixes_provider() {
+        return [
+            'simple' => [
+                'input' => 'm_local_catquiz',
+                'expected' => '{local_catquiz}',
+            ],
+            'two occurences' => [
+                'input' => 'mdl_local_catquiz_bla',
+                'expected' => "{local_catquiz_bla}",
+            ],
+            'longer example' => [
+                'input' => 'SELECT * FROM m_local_catquiz_attempts a JOIN m_local_catquiz_bla b ON a.userid = b.userid',
+                'expected' => 'SELECT * FROM {local_catquiz_attempts} a JOIN {local_catquiz_bla} b ON a.userid = b.userid',
+            ]
+        ];
+    }
 }
