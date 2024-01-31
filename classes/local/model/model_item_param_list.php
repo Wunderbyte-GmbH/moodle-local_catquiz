@@ -467,13 +467,19 @@ class model_item_param_list implements ArrayAccess, IteratorAggregate, Countable
 
         // If we don't know the catscaleid we get it via the catscalename.
         if (empty($newrecord['catscaleid']) && !empty($newrecord['catscalename'])) {
-            $sql = "SELECT id
+            $sql = "SELECT *
                     FROM {local_catquiz_catscales}
                     WHERE name = :name";
-            $catscaleid = $DB->get_field_sql($sql, ['name' => $newrecord['catscalename']]);
-
-            if (!empty($catscaleid)) {
-                $newrecord['catscaleid'] = $catscaleid;
+            // Check if catscale with this name exisits.
+            // Check if parentscales are given in newrecord and if they match with the path of the found scale.
+            $catscale = $DB->get_record_sql($sql, ['name' => $newrecord['catscalename']]);
+            if ($catscale != false && !empty($newrecord['parentscalenames'])) {
+                $ancestorsfoundscale = catscale::get_ancestors($catscale->id, 2);
+                $ancestorsnewrecord = explode('|', $newrecord['parentscalenames']);
+                if ($ancestorsfoundscale == $ancestorsnewrecord) {
+                    $catscaleid = $catscale->id;
+                    $newrecord['catscaleid'] = $catscaleid;
+                }
             }
         }
         if (empty($newrecord['catscaleid'])) {
