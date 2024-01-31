@@ -40,6 +40,7 @@ class regex {
      * @return string
      */
     public function remove_db_prefixes(string $text): string {
+        $text = preg_replace('/[a-z]*?_([^\s]+)/', '{$1}', $text);
         return $text;
     }
 }
