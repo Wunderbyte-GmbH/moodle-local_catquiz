@@ -121,6 +121,9 @@ class catscaledashboard {
         global $OUTPUT;
 
         $data = $personparams->get_values(true);
+        if (empty($data)) {
+            return "";
+        }
         $chart = new \core\chart_line();
         $series = new \core\chart_series('Series 1 (Line)', array_values($data));
         $chart->set_smooth(true); // Calling set_smooth() passing true as parameter, will display smooth lines.

@@ -34,7 +34,12 @@
 <div class="catscales-dashboard grid">
   <div class="card">
       <div class="card-header">
-         Person abilities
+      {{#personabilities}}
+        {{#str}} personability, local_catquiz {{/str}}
+      {{/personabilities}}
+      {{^personabilities}}
+        {{#str}} personabilitiesnodata, local_catquiz {{/str}}
+      {{/personabilities}}
       </div>
       <div class="card-body">
         {{{personabilities}}}
