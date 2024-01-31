@@ -22,7 +22,7 @@
 import DynamicForm from 'core_form/dynamicform';
 
 const SELECTORS = {
-    CONTEXTFORM: "div[name='catmanagerquestions-contextselector']",
+    CONTEXTFORM: "div[id='lcq_select_context_form']",
     CHECKBOXSELECTOR: 'input.integrate-subscales-checkbox',
     SCALEFORM: '#select_scale_form',
     SCALECONTAINER: "[id='catmanagerquestions-scaleselectors']", // Make sure to change in the code below.
@@ -63,20 +63,21 @@ function initComponents(container) {
         });
     }
 
-    var contextcontainer = document.querySelector(SELECTORS.CONTEXTFORM);
-    if (contextcontainer) {
-        // Find the select element within each div.
-        var contextselector = contextcontainer.querySelector('select');
-        // Check if a select element was found.
-        if (contextselector) {
-            contextselector.addEventListener('change', function() {
-                let searchParams = new URLSearchParams(window.location.search);
-                searchParams.set('contextid', contextselector.value);
-                window.location.search = searchParams.toString();
-              });
+    var contextcontainer = document.querySelectorAll(SELECTORS.CONTEXTFORM);
+    contextcontainer.forEach(contextcontainer => {
+        if (contextcontainer) {
+            // Find the select element within each div.
+            var contextselector = contextcontainer.querySelector('select');
+            // Check if a select element was found.
+            if (contextselector) {
+                contextselector.addEventListener('change', function() {
+                    let searchParams = new URLSearchParams(window.location.search);
+                    searchParams.set('contextid', contextselector.value);
+                    window.location.search = searchParams.toString();
+                    });
+            }
         }
-    }
-
+    });
 
     // Attach listener to each scale select
     const selectcontainer = container.querySelector(SELECTORS.SCALECONTAINER);
