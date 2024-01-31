@@ -714,7 +714,10 @@ class catquiz {
         $params = [];
         $filter = '';
 
-        $select = "
+        $select = " * ";
+
+        $from = "
+        ( SELECT
             c.id,
             name,
             component,
@@ -728,10 +731,8 @@ class catquiz {
             c.timecreated,
             ct.catscaleid,
             numberofitems,
-            teachers";
-
-        $from = "
-        {local_catquiz_tests} ct
+            teachers
+        FROM {local_catquiz_tests} ct
         JOIN {course} c ON c.id = ct.courseid
         LEFT JOIN (SELECT catscaleid as itemcatscale, COUNT(*) AS numberofitems
            FROM {local_catquiz_items}
@@ -747,7 +748,8 @@ class catquiz {
             JOIN {role} r ON r.id = ra.roleid
             WHERE r.shortname IN ('teacher', 'editingteacher')
             GROUP BY c.id
-            ) s2 ON s2.courseid = ct.courseid";
+            ) s2 ON s2.courseid = ct.courseid
+            ) s3";
 
         return [$select, $from, $where, $filter, $params];
     }
@@ -1314,7 +1316,7 @@ class catquiz {
             throw new moodle_exception("Can not read test settings");
         }
 
-        $contextid = catscale::get_context_id($testsettings->catquiz_catscales);
+        $contextid = intval($testsettings->catquiz_catcontext);
         $catscaleids = explode(",", $testsettings->catquiz_catscales);
         [$insql, $inparams] = $DB->get_in_or_equal($catscaleids, SQL_PARAMS_NAMED, 'incatscales');
 
