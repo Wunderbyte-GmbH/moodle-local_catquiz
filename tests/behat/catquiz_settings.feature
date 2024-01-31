@@ -128,13 +128,12 @@ Feature: As a teacher I setup adaptive quiz with CATquiz Scales and Feedbacks.
       | catquiz_standarderrorgroup[catquiz_standarderror_min] | 0.4 |
       | catquiz_standarderrorgroup[catquiz_standarderror_max] | 2   |
     When I click on "Save and display" "button"
-    ## Errors validation 1
+    ## Errors validation 1: invalid numbers or min > max or no values
     Then I should see "Input a number from 0 to 100" in the "#fitem_id_catquiz_passinglevel" "css_element"
     And I should see "Minimum must be less than maximum" in the "#fgroup_id_maxquestionsgroup" "css_element"
     And I should see "Minimum must be less than maximum" in the "#fgroup_id_maxquestionsscalegroup" "css_element"
     And I should see "Please enter values between 0 and 1." in the "#fgroup_id_catquiz_standarderrorgroup" "css_element"
-    ## Future validation for time - if checked but fields empty
-    ## And I should see "Input a number from 0 to 100" in the "fgroup_id_catquiz_timelimitgroup" "css_element"
+    And I should see "Input at least one values of time limit" in the "#fgroup_id_catquiz_timelimitgroup" "css_element"
     And I set the following fields to these values:
       ## Fix errors
       | Passing level in %| 50 |
@@ -151,11 +150,11 @@ Feature: As a teacher I setup adaptive quiz with CATquiz Scales and Feedbacks.
       | catquiz_timelimitgroup[catquiz_maxtimeperitem]     | 15  |
       | catquiz_timelimitgroup[catquiz_timeselect_item]    | min |
     And I click on "Save and display" "button"
-    ## Errors validation 2 - not implemented yet
-    ## Future validation for
+    ## Errors validation 2
+    ## Validation for min questions per scale <= max questions per test.
     And I should see "Per scale minimum must be less than per test maximum" in the "#fgroup_id_maxquestionsscalegroup" "css_element"
-    ## Future validation for time - maximum time per attempt must be greater than maximum time per itemif
-    And I should see "Maximum time per attempt must be greater than maximum time per itemif" in the "#fgroup_id_catquiz_timelimitgroup" "css_element"
+    ## not implemented yet - validation for time - maximum time per attempt must be greater than maximum time per itemif
+    ## And I should see "Maximum time per attempt must be greater than maximum time per item" in the "#fgroup_id_catquiz_timelimitgroup" "css_element"
     And I set the following fields to these values:
       | maxquestionsscalegroup[catquiz_minquestionspersubscale] | 1 |
       | maxquestionsscalegroup[catquiz_maxquestionspersubscale] | 3 |
