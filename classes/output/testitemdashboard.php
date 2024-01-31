@@ -31,6 +31,7 @@ use local_catquiz\local\model\model_item_param;
 use local_catquiz\local\model\model_raschmodel;
 use local_catquiz\local\model\model_strategy;
 use local_catquiz\output\catscalemanager\questions\questiondetailview;
+use local_catquiz\output\catscalemanager\scaleandcontexselector;
 use local_catquiz\table\testitems_table;
 use moodle_url;
 use qbank_previewquestion\question_preview_options;
@@ -216,21 +217,6 @@ class testitemdashboard implements renderable, templatable {
     }
 
     /**
-     * Renders context selector.
-     *
-     * @return string
-     *
-     */
-    private function render_contextselector() {
-        $form = new \local_catquiz\form\contextselector(null, null, 'post', '', [], true, ['contextid' => $this->contextid]);
-        // Set the form data with the same method that is called when loaded from JS.
-        // It should correctly set the data for the supplied arguments.
-        $form->set_data_for_dynamic_submission();
-        // Render the form in a specific container, there should be nothing else in the same container.
-        return html_writer::div($form->render(), '', ['id' => 'lcq_select_context_form']);
-    }
-
-    /**
      * Gets item status.
      *
      * @return string
@@ -297,7 +283,7 @@ class testitemdashboard implements renderable, templatable {
             'returnurl' => $url->out(),
             'models' => $this->render_modelcards(),
             'statcards' => $this->get_testitems_stats_data(),
-            'contextselector' => $this->render_contextselector(),
+            'contextselector' => scaleandcontexselector::render_contextselector($this->contextid),
             'overridesforms' => $this->render_overrides_form(),
             'itemstatus' => $this->get_itemstatus(),
         ];

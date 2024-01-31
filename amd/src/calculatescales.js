@@ -21,7 +21,6 @@
 
 import {get_string as getString} from 'core/str';
 import Ajax from 'core/ajax';
-import DynamicForm from 'core_form/dynamicform';
 import Notification from 'core/notification';
 
 const SELECTORS = {
@@ -32,44 +31,12 @@ const SELECTORS = {
  * Add event listener to buttons.
  */
 export const init = () => {
-    // Initialize the form - pass the container element and the form class name.
-    const dynamicForm = new DynamicForm(document.querySelector(
-        SELECTORS.FORMCONTAINER),
-        'local_catquiz\\form\\contextselector'
-    );
 
     const calculateButton = document.querySelector(SELECTORS.CALCULATEBUTTON);
     const contextId = parseInt(calculateButton.dataset.contextid);
     calculateButton.onclick = () => {
         updateParameters(contextId);
     };
-
-    // If a user selects a context, redirect to a URL that includes the selected
-    // context as `contextid` query parameter
-    dynamicForm.addEventListener(dynamicForm.events.FORM_SUBMITTED, (e) => {
-        e.preventDefault();
-        const response = e.detail;
-
-        if (!response.contextid) {
-            return;
-        }
-
-        let searchParams = new URLSearchParams(window.location.search);
-        searchParams.set("contextid", response.contextid);
-        window.location.search = searchParams.toString();
-    });
-
-    // If a user selects a cat context, submit the form without waiting for the
-    // user to click the submit button
-    dynamicForm.addEventListener('change', (e) => {
-        e.preventDefault();
-
-        // We have to wait a little bit so that the data are included in the submit
-        // request
-        setTimeout(() => {
-            dynamicForm.submitFormAjax();
-        }, 500);
-    });
 
     const updateParameters = async(contextid) => {
         const urlParams = new URLSearchParams(window.location.search);
