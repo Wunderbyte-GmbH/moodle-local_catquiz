@@ -419,6 +419,7 @@ class catquiz_handler {
             }
         }
 
+        // Number of questions - validate higher and lower values.
         if ((int) $data['maxquestionsscalegroup']['catquiz_minquestionspersubscale']
             >= (int) $data['maxquestionsscalegroup']['catquiz_maxquestionspersubscale']
                 && 0 != (int) $data['maxquestionsscalegroup']['catquiz_maxquestionspersubscale']) {
@@ -429,6 +430,16 @@ class catquiz_handler {
             >= (int) $data['maxquestionsgroup']['catquiz_maxquestions']
             && 0 != (int) $data['maxquestionsgroup']['catquiz_maxquestions']) {
             $errors['maxquestionsgroup'] = get_string('formminquestgreaterthan', 'local_catquiz');
+        }
+
+        // Min questions per scale <= max questions per test.
+        if (0 != (int) $data['maxquestionsscalegroup']['catquiz_minquestionspersubscale']
+            && 0 != (int) $data['maxquestionsgroup']['catquiz_maxquestions']) {
+            if ((int) $data['maxquestionsscalegroup']['catquiz_minquestionspersubscale']
+                > (int) $data['maxquestionsgroup']['catquiz_maxquestions']) {
+                    $errors['maxquestionsgroup']
+                    = get_string('formmscalegreaterthantest', 'local_catquiz');
+            }
         }
 
         return $errors;
