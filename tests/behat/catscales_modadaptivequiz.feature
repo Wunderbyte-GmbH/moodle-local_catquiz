@@ -81,7 +81,7 @@ Feature: As a student i want to take adaptive quiz tests with catquiz functinali
     And I should see "You performed better than 75.00% of your fellow students"
     And I should see "-1.28" in the "[data-original-title=\"parent scale Simulation\"]" "css_element"
 
-@javascript
+  @javascript
   Scenario: Start adaptive quiz attempt with catquiz model and Infer greatest strength purpose
     Given I am on the "adaptivecatquiz1" Activity page logged in as teacher
     And I follow "Settings"
@@ -120,7 +120,7 @@ Feature: As a student i want to take adaptive quiz tests with catquiz functinali
     And I should see "You performed better than 75.00% of your fellow students"
     And I should see "-1.61" in the "[data-original-title=\"parent scale Simulation\"]" "css_element"
 
-@javascript
+  @javascript
   Scenario: Start adaptive quiz attempt with catquiz model and Infer lowest skill gap purpose
     Given I am on the "adaptivecatquiz1" Activity page logged in as teacher
     And I follow "Settings"
@@ -160,6 +160,7 @@ Feature: As a student i want to take adaptive quiz tests with catquiz functinali
     ## And I should see "You performed better than 75.00% of your fellow students"
     And I should see "-2.18" in the "[data-original-title=\"parent scale Simulation\"]" "css_element"
 
+  @javascript
   Scenario: Start adaptive quiz attempt with catquiz model and Classical test purpose
     Given I am on the "adaptivecatquiz1" Activity page logged in as teacher
     And I follow "Settings"
@@ -198,6 +199,7 @@ Feature: As a student i want to take adaptive quiz tests with catquiz functinali
     And I should see "You performed better than 75.00% of your fellow students"
     And I should see "-4.07" in the "[data-original-title=\"parent scale Simulation\"]" "css_element"
 
+  @javascript
   Scenario: Start adaptive quiz attempt with catquiz model and Moderate CAT purpose
     Given I am on the "adaptivecatquiz1" Activity page logged in as teacher
     And I follow "Settings"
@@ -237,6 +239,7 @@ Feature: As a student i want to take adaptive quiz tests with catquiz functinali
     ## And I should see "You performed better than 75.00% of your fellow students"
     And I should see "-3.86" in the "[data-original-title=\"parent scale Simulation\"]" "css_element"
 
+  @javascript
   Scenario: Start adaptive quiz attempt with catquiz model and Radical CAT purpose
     Given I am on the "adaptivecatquiz1" Activity page logged in as teacher
     And I follow "Settings"
