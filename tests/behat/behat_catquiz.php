@@ -86,6 +86,7 @@ class behat_catquiz extends behat_base {
                     $field->setValue($value);
                     $field->keyPress(13); // Enter.
                     // Get selected option and click it.
+                    $this->getSession()->wait(500); // Required for Moodle < 4.3.
                     $field = $this->getSession()->getPage()->find('xpath', $xpathtarget1);
                     $field->click();
                     break;
