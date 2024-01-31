@@ -113,6 +113,7 @@ $string['formelementwrongpercent'] = 'Input a number from 0 to 100';
 $string['formminquestgreaterthan'] = 'Minimum must be less than maximum';
 $string['formelementbetweenzeroandone'] = 'Please enter values between 0 and 1.';
 $string['formmscalegreaterthantest'] = 'Per scale minimum must be less than per test maximum';
+$string['formetimelimitnotprovided'] = 'Input at least one values of time limit';
 
 // Test Strategy.
 $string['catquiz_teststrategyheader'] = 'CAT Settings';

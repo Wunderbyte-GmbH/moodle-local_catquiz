@@ -442,6 +442,14 @@ class catquiz_handler {
             }
         }
 
+        // Validate time: at least on value must be provided if time limitation checked.
+        if (!empty($data['catquiz_includetimelimit'])) {
+            if (empty($data['catquiz_timelimitgroup']['catquiz_maxtimeperitem'])
+                && empty($data['catquiz_timelimitgroup']['catquiz_maxtimeperattempt'])) {
+                    $errors['catquiz_timelimitgroup'] = get_string('formetimelimitnotprovided', 'local_catquiz');
+            }
+        }
+
         return $errors;
     }
 
