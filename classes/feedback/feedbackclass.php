@@ -249,7 +249,7 @@ class feedbackclass {
                 ];
                 // Check if courses were saved before (ie from other teacher, directly in db) and in this case allow them.
                 $preselectcourseids = $mform->_defaultValues['catquiz_courses_' . $scale->id . '_'. $j] ?? [];
-                if (!empty($preselectcourseid)) {
+                if (!empty($preselectcourseids)) {
                     $newcourses = [];
                     foreach ($preselectcourseids as $preselectcourseid) {
                         $foundcourse = false;
