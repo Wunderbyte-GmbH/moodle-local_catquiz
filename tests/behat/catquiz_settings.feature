@@ -246,6 +246,7 @@ Feature: As a teacher I setup adaptive quiz with CATquiz Scales and Feedbacks.
     ##And the field "Upper limit" in the "//div[@data-name='feedback_scale_Simulation_range_1']" "xpath_element" matches value "-1"
     ##And the field "Lower limit" in the "//div[@data-name='feedback_scale_Simulation_range_2']" "xpath_element" matches value "1"
     ##And the field "Upper limit" in the "//div[@data-name='feedback_scale_Simulation_range_2']" "xpath_element" matches value "4"
+    And I should see "Course 1" in the "//div[@data-name='feedback_scale_Simulation_range_2']//div[contains(@id, 'form_autocomplete_selection-')]" "xpath_element"
     And the field "Feedback" in the "//div[@data-name='feedback_scale_Simulation_range_1']" "xpath_element" matches value "Feedback-Simulation_range_1"
     And the field "Feedback" in the "//div[@data-name='feedback_scale_Simulation_range_2']" "xpath_element" matches value "Feedback-Simulation_range_2"
     And I log out
