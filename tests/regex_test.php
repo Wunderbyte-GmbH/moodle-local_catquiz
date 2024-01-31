@@ -4,12 +4,18 @@ use basic_testcase; // Moodle test class.
 use local_catquiz\regex;
 
 class regex_test extends basic_testcase {
+
+    private $regex;
+
+    public function setUp(): void {
+        echo("setUp" . PHP_EOL);
+        $this->regex = new regex();
+    }
     /**
      * @dataProvider regex_can_add_db_prefixes_provider
      */
     public function test_regex_can_add_db_prefixes(string $input, string $expected) {
-        $regex = new regex();
-        $this->assertEquals($expected, $regex->add_db_prefixes($input, 'm_'));
+        $this->assertEquals($expected, $this->regex->add_db_prefixes($input, 'm_'));
     }
 
     public static function regex_can_add_db_prefixes_provider() {

@@ -29,8 +29,8 @@ namespace local_catquiz;
  */
 class regex {
     public function add_db_prefixes(string $text, string $prefix): string {
-        $text = preg_replace('/\{/', $prefix, $text, 1);
-        $text = preg_replace('/\}/', '', $text, 1);
+        $text = preg_replace('/\{/', $prefix, $text);
+        $text = preg_replace('/\}/', '', $text);
         return $text;
     }
 }
