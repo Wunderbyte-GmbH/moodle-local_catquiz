@@ -393,6 +393,7 @@ class catquiz_handler {
         }
 
         // Standarderror- values should be float with min lower than max.
+        $semin = false;
         if (isset($data['catquiz_standarderrorgroup']['catquiz_standarderror_min'])) {
             if (!is_numeric($data['catquiz_standarderrorgroup']['catquiz_standarderror_min'])
                 && !empty($data['catquiz_standarderrorgroup']['catquiz_standarderror_min'])) {
@@ -425,8 +426,7 @@ class catquiz_handler {
                 = get_string('formminquestgreaterthan', 'local_catquiz');
         }
 
-        if ($data['maxquestionsgroup']['catquiz_minquestions']
-            >= $data['maxquestionsgroup']['catquiz_maxquestions']
+            >= (int) $data['maxquestionsgroup']['catquiz_maxquestions']
             && 0 != (int) $data['maxquestionsgroup']['catquiz_maxquestions']) {
             $errors['maxquestionsgroup'] = get_string('formminquestgreaterthan', 'local_catquiz');
         }
