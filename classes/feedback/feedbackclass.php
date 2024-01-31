@@ -258,7 +258,7 @@ class feedbackclass {
                                 $foundcourse = true;
                             }
                         }
-                        if (!$foundcourse) {
+                        if (!$foundcourse && !empty($preselectcourseid)) {
                             $newcourses[] = get_course((int)$preselectcourseid);
                         }
                     }
