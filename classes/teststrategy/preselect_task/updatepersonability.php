@@ -129,7 +129,7 @@ class updatepersonability extends preselect_task implements wb_middleware {
         }
 
         $this->userresponses = (new model_responses())->setdata(
-            $this->progress->get_user_responses(),
+            [$context['userid'] => ['component' => $this->progress->get_user_responses()]],
             false
         );
         $context['lastresponse'] = $this->userresponses->get_last_response($context['userid']);
@@ -139,12 +139,7 @@ class updatepersonability extends preselect_task implements wb_middleware {
             return $next($context);
         }
 
-        if (in_array($context['userid'], $this->userresponses->get_excluded_users())) {
-            $context['skip_reason'] = 'notenoughdataforuser';
-            return $next($context);
-        }
-
-        $this->arrayresponses = ($this->userresponses->as_array())[$context['userid']]['component'];
+        $this->arrayresponses = reset(($this->userresponses->as_array())[$context['userid']]);
 
         $catscaleid = $this->progress->get_last_question()->catscaleid;
         $this->scalestoupdate = array_reverse(
