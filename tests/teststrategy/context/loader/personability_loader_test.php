@@ -25,6 +25,7 @@
 
 namespace local_catquiz\teststrategy\context\loader;
 
+use local_catquiz\teststrategy\progress;
 use PHPUnit\Framework\ExpectationFailedException;
 use PHPUnit\Framework\TestCase;
 use SebastianBergmann\RecursionContext\InvalidArgumentException;
@@ -53,10 +54,15 @@ class personability_loader_test extends TestCase {
         // just changes the part that retrieves the person abilities from the
         // database.
         $loader = new personability_loader_testing();
+
+        $progressstub = $this->createMock(progress::class);
+        $progressstub->method('is_first_question')
+            ->willReturn(false);
         $context = [
             'contextid' => 1,
             'catscaleid' => 10,
             'userid' => 2,
+            'progress' => $progressstub,
             'fake_personparams' => [
                 9 => 1.23,
                 10 => 1.1,
@@ -71,6 +77,7 @@ class personability_loader_test extends TestCase {
                 9 => 1.23,
                 10 => 1.1,
             ],
+            'progress' => $progressstub,
         ];
         $result = $loader->load($context);
         $this->assertEquals($expected, $result);
