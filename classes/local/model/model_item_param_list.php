@@ -481,7 +481,8 @@ class model_item_param_list implements ArrayAccess, IteratorAggregate, Countable
 
                     if (empty($newrecord['catscaleid'])) {
                         throw new moodle_exception('nocatscaleid', 'local_catquiz');
-                    } else if (catscale::is_assigned_to_parent_scale($catscaleid, $newrecord['componentid'])
+                    }
+                    if (catscale::is_assigned_to_parent_scale($catscaleid, $newrecord['componentid'])
                     || catscale::is_assigned_to_subscale($catscaleid, $newrecord['componentid'])) {
                         $infodata = new stdClass;
                         $infodata->newscalename = catscale::get_link_to_catscale($newrecord['catscaleid']);
