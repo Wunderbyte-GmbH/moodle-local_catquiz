@@ -75,7 +75,7 @@ class personability_loader implements contextloaderinterface {
             'catscaleid',
             'userid',
             'includesubscales',
-            'progress'
+            'progress',
         ];
     }
 
