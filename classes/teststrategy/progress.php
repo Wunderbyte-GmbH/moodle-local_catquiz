@@ -126,10 +126,8 @@ class progress implements JsonSerializable {
     public static function load(int $attemptid, string $component, int $contextid): self {
         $attemptcache = cache::make('local_catquiz', 'adaptivequizattempt');
         $cachekey = self::get_cache_key($attemptid);
-        $cachedata = $attemptcache->get($cachekey);
-        $cacheisfresh = false;
-        if ($cacheisfresh) {
-            $instance = self::populate_from_object($cachedata);
+        if ($instance = $attemptcache->get($cachekey)) {
+            $instance->update_cached_responses();
             return $instance;
         }
 
