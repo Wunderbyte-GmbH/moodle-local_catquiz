@@ -1280,6 +1280,22 @@ class catquiz {
     }
 
     /**
+     * Get all parent catscales.
+     *
+     * @return array
+     *
+     */
+    public static function get_all_parent_catscales() {
+        global $DB;
+        return $DB->get_records(
+            'local_catquiz_catscales',
+            ['parentid' => 0],
+            '',
+          'id, name'
+        );
+    }
+
+    /**
      * Get all catscales.
      *
      * @return array
