@@ -184,7 +184,7 @@ class personabilities extends feedbackgenerator {
      */
     public function load_data(int $attemptid, array $initialcontext): ?array {
         $cache = cache::make('local_catquiz', 'adaptivequizattempt');
-        $personabilities = $initialcontext['personabilities'] ?? $cache->get('personabilities') ?: [];
+        $personabilities = $initialcontext['personabilities'];
         if ($personabilities === []) {
             return null;
         }

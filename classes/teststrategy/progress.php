@@ -100,6 +100,11 @@ class progress implements JsonSerializable {
     private array $responses;
 
     /**
+     * @var array Holds the abilities indexed by catscale
+     */
+    private array $abilities;
+
+    /**
      * Returns a new progress instance.
      *
      * If we already have data in the cache or DB, the instance is populated with those data.
@@ -161,6 +166,7 @@ class progress implements JsonSerializable {
         foreach ($instance->responses as $id => $val) {
             $instance->responses[$id] = (array) $val;
         }
+        $instance->abilities = (array) $data->abilities;
 
         // This has to happen now, because now we have the response to the last
         // question.
@@ -193,6 +199,7 @@ class progress implements JsonSerializable {
         $instance->breakend = null;
         $instance->activescales = [];
         $instance->responses = [];
+        $instance->abilities = [];
         return $instance;
     }
 
@@ -212,6 +219,7 @@ class progress implements JsonSerializable {
             'activescales' => $this->activescales,
             'contextid' => $this->contextid,
             'responses' => $this->responses,
+            'abilities' => $this->abilities,
         ];
     }
 
@@ -467,6 +475,28 @@ class progress implements JsonSerializable {
             $this->playedquestions,
             fn ($q) => !empty($q->is_pilot)
         );
+    }
+
+    /**
+     * Returns the abilities calculated during the current attempt.
+     *
+     * @return array
+     */
+    public function get_abilities(): array {
+        return $this->abilities;
+    }
+
+    /**
+     * Sets the ability for the given CAT scale.
+     *
+     * @param float $ability
+     * @param int $catscaleid
+     *
+     * @return self
+     */
+    public function set_ability(float $ability, int $catscaleid): self {
+        $this->abilities[$catscaleid] = $ability;
+        return $this;
     }
 
     /**

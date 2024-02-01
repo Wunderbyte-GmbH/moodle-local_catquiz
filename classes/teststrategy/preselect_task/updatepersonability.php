@@ -245,10 +245,7 @@ class updatepersonability extends preselect_task implements wb_middleware {
 
         $context['prev_ability'][$catscaleid] = $context['person_ability'][$catscaleid];
         $context['person_ability'][$catscaleid] = $updatedability;
-        $cache = cache::make('local_catquiz', 'adaptivequizattempt');
-        $cachedabilities = $cache->get('personabilities') ?: [];
-        $cachedabilities[$catscaleid] = $updatedability;
-        $cache->set('personabilities', $cachedabilities);
+        $this->progress->set_ability($updatedability, $catscaleid);
 
         if ($this->diverseanswers[$catscaleid]) {
             // Get all scales that are a subscale of the current catscale.
