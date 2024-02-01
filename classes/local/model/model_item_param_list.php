@@ -462,9 +462,6 @@ class model_item_param_list implements ArrayAccess, IteratorAggregate, Countable
     private static function update_in_scale(array $newrecord) {
         global $DB;
 
-        // If at this point, the scale is still empty, we need to create it.
-        self::create_scales_for_new_record($newrecord);
-
         // If we don't know the catscaleid we get it via the catscalename.
         if (empty($newrecord['catscaleid']) && !empty($newrecord['catscalename'])) {
             $sql = "SELECT *
@@ -476,27 +473,35 @@ class model_item_param_list implements ArrayAccess, IteratorAggregate, Countable
             if ($catscale != false && !empty($newrecord['parentscalenames'])) {
                 $ancestorsfoundscale = catscale::get_ancestors($catscale->id, 2);
                 $ancestorsnewrecord = explode('|', $newrecord['parentscalenames']);
+                $ancestorsnewrecord = array_reverse($ancestorsnewrecord);
                 if ($ancestorsfoundscale == $ancestorsnewrecord) {
+                    // Same path, so we match.
                     $catscaleid = $catscale->id;
                     $newrecord['catscaleid'] = $catscaleid;
+
+                    if (empty($newrecord['catscaleid'])) {
+                        throw new moodle_exception('nocatscaleid', 'local_catquiz');
+                    } else if (catscale::is_assigned_to_parent_scale($catscaleid, $newrecord['componentid'])
+                    || catscale::is_assigned_to_subscale($catscaleid, $newrecord['componentid'])) {
+                        $infodata = new stdClass;
+                        $infodata->newscalename = catscale::get_link_to_catscale($newrecord['catscaleid']);
+                        $infodata->componentid = $newrecord['componentid'];
+                        $newrecord['error'] = get_string('itemassignedtoparentorsubscale', 'local_catquiz', $infodata);
+                    }
+                } else {
+                    // If at this point, the scale is still empty, we need to create and use it.
+                    self::create_scales_for_new_record($newrecord);
+
                 }
             }
-        }
-        if (empty($newrecord['catscaleid'])) {
-            throw new moodle_exception('nocatscaleid', 'local_catquiz');
-        }
-        if (catscale::is_assigned_to_parent_scale($catscaleid, $newrecord['componentid'])
-                || catscale::is_assigned_to_subscale($catscaleid, $newrecord['componentid'])) {
-                    $infodata = new stdClass;
-                    $infodata->newscalename = catscale::get_link_to_catscale($newrecord['catscaleid']);
-                    $infodata->componentid = $newrecord['componentid'];
-                    $newrecord['error'] = get_string('itemassignedtoparentorsubscale', 'local_catquiz', $infodata);
         }
         // See if the item already exists.
         $scalerecord = $DB->get_record("local_catquiz_items", [
             'componentid' => $newrecord['componentid'],
             'catscaleid' => $newrecord['catscaleid'],
         ]);
+
+        // Check if item is in scale otherwise add it.
 
         if (!$scalerecord) {
             $columnstoinclude = ['componentname', 'componentid', 'catscaleid', 'lastupdated'];
@@ -557,18 +562,26 @@ class model_item_param_list implements ArrayAccess, IteratorAggregate, Countable
         }
 
         $catscaleid = 0;
+        $matching = true;
+        // Store the records that were found to avoid duplications.
+        $records = [];
 
         foreach ($parents as $parent) {
 
             // Check if the scale exists.
             // We also need to look at the parentids.
+            // TODO: Check if parent is parent, in tree.
             $searcharray = [
                 'name' => $parent,
             ];
 
-            if ($record = $DB->get_record('local_catquiz_catscales', $searcharray)) {
+            $record = $DB->get_record('local_catquiz_catscales', $searcharray);
+            if ($record && $matching && !in_array($record, $records)) {
                 $catscaleid = $record->id;
+                $records[] = $record;
                 continue;
+            } else {
+                $matching = false;
             }
 
             $catscale = new catscale_structure([
@@ -580,6 +593,9 @@ class model_item_param_list implements ArrayAccess, IteratorAggregate, Countable
             ]);
 
             $catscaleid = dataapi::create_catscale($catscale);
+            if ($parent == $newrecord['catscalename']) {
+                $newrecord['catscaleid'] = $catscaleid;
+            }
 
         }
     }
