@@ -55,19 +55,9 @@ final class mayberemovescale extends preselect_task implements wb_middleware {
      */
     public function run(array &$context, callable $next): result {
         $this->progress = $context['progress'];
-        $cache = cache::make('local_catquiz', 'adaptivequizattempt');
         $played = $this->progress->get_playedquestions(true);
         if (count($played) === 0) {
             return $next($context);
-        }
-
-        // Remove catscale questions of scales that are marked as excluded in the cache.
-        $excludedscales = $cache->get('excludedscales') ?: [];
-        foreach ($excludedscales as $catscaleid) {
-            $context['questions'] = array_filter(
-                $context['questions'],
-                fn ($q) => $q->catscaleid != $catscaleid
-            );
         }
 
         if ($context['max_attempts_per_scale'] == -1) {
@@ -75,8 +65,7 @@ final class mayberemovescale extends preselect_task implements wb_middleware {
         }
 
         foreach ($played as $catscaleid => $questions) {
-            if (($context['max_attempts_per_scale'] != -1)
-                && (count($questions) >= $context['max_attempts_per_scale'])) {
+            if (count($questions) >= $context['max_attempts_per_scale']) {
                 $context['questions'] = array_filter(
                     $context['questions'],
                     fn ($q) => $q->catscaleid !== $catscaleid
