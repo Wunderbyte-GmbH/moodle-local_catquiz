@@ -213,10 +213,25 @@ class feedbacksettings {
      *
      * @param int $teststrategy
      * @param array $personabilities
+     * @param int $catscaleid
+     * @param bool $feedbackonlyfordefinedscaleid
      *
      * @return array
      */
-    public static function return_scales_according_to_strategy(int $teststrategy, array $personabilities): array {
+    public static function return_scales_according_to_strategy(
+        int $teststrategy,
+        array $personabilities,
+        int $catscaleid = 0,
+        bool $feedbackonlyfordefinedscaleid = false): array {
+
+        if ($feedbackonlyfordefinedscaleid) {
+            foreach ($personabilities as $key => $value) {
+                if ($key == $catscaleid) {
+                    $selectedscale[$key] = $value;
+                }
+            }
+            return $selectedscale;
+        }
 
         switch ($teststrategy) {
             case LOCAL_CATQUIZ_STRATEGY_LOWESTSUB:
