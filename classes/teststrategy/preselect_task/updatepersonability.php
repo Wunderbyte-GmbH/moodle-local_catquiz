@@ -376,25 +376,6 @@ class updatepersonability extends preselect_task implements wb_middleware {
     }
 
     /**
-     * Add the given catscaleid to the list of excluded catscales.
-     *
-     * By storing this information in the cache, we can remember excluded
-     * subscales for the whole quiz attempt.
-     *
-     * @param mixed $catscaleid
-     *
-     * @return mixed
-     *
-     */
-    protected function mark_subscale_as_removed($catscaleid) {
-        $cache = cache::make('local_catquiz', 'adaptivequizattempt');
-        $excludedscales = $cache->get('excludedscales') ?: [];
-        $excludedscales[] = $catscaleid;
-        $excludedscales = array_unique($excludedscales);
-        $cache->set('excludedscales', $excludedscales);
-    }
-
-    /**
      * If the last answer was correct, increase the ability to the halfway point
      * between the current ability and the maximum value.
      * If the last question is partly correct, e.g. the fraction is 0.6, then
