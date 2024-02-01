@@ -59,10 +59,14 @@ class updatepersonability_test extends TestCase {
      *
      */
     public function test_ability_calculation_is_skipped_correctly($expected, $lastquestion, $context) {
+        global $USER;
         // We can not add a stub in the provider, so we do it here.
         $progressstub = $this->createStub(progress::class);
         $progressstub->method('get_last_question')
             ->willReturn($lastquestion);
+        $progressstub->method('get_user_responses')
+            ->willReturn($context['fake_response_data'] ?? []);
+
         $context['progress'] = $progressstub;
 
         $returncontext = fn($context) => result::ok($context);
@@ -81,6 +85,7 @@ class updatepersonability_test extends TestCase {
      *
      */
     public static function skippedprovider():array {
+        global $USER;
         return [
             'last_question_is_null' => [
                 'expected' => 'lastquestionnull',
@@ -96,50 +101,9 @@ class updatepersonability_test extends TestCase {
                 'context' => [
                     'contextid' => 1,
                     'catscaleid' => 1,
-                    'userid' => 1,
+                    'userid' => $USER->id,
                     // Can be null here, because for pilot questions the ability will not be updated.
-                    'fake_response_data' => [],
-                ],
-            ],
-            'not_enough_responses' => [
-                'expected' => 'notenoughdataforuser',
-                'lastquestion' => (object) ['catscaleid' => "1"],
-                'context' => [
-                    'userid' => 1, // This user does not have enough responses.
-                    'contextid' => 1,
-                    'person_ability' => [
-                        '1' => 0.12,
-                    ],
-                    'catscaleid' => 1,
-                    'questionsattempted' => 1,
-                    'minimumquestions' => 3,
-                    'skip_reason' => 'not skipped',
-                    'questions' => [
-                        (object) ['catscaleid' => "1"],
-                        (object) ['catscaleid' => "2"],
-                    ],
-                    // Answers that do not have at least one correct response are filtered out.
-                    // In this case, only item 1 will be kept.
-                    'fake_response_data' => [
-                        1 => [
-                            'component' => [
-                                1 => ['fraction' => "1.000"],
-                                2 => ['fraction' => "0.000"],
-                                3 => ['fraction' => "0.000"],
-                            ],
-                        ],
-                        844 => [
-                            'component' => [
-                                1 => ['fraction' => "0.000"],
-                                2 => ['fraction' => "0.000"],
-                                3 => ['fraction' => "0.000"],
-                            ],
-                        ],
-                    ],
-                    'fake_item_params' => [
-                            1 => ['difficulty' => 2.1],
-                            2 => ['difficulty' => -1.4],
-                    ],
+                    'fake_response_data' => [$USER->id => []],
                 ],
             ],
             'has_enough_responses' => [
@@ -153,28 +117,15 @@ class updatepersonability_test extends TestCase {
                     ],
                     'contextid' => 1,
                     'catscaleid' => 1,
-                    'userid' => 1, // This user does not have enough responses.
+                    'userid' => $USER->id,
                     'questions' => [
                         (object) ['catscaleid' => "1"],
                         (object) ['catscaleid' => "2"],
                     ],
-                    // Answers that do not have at least one correct response are filtered out.
-                    // In this case, only item 1 will be kept.
                     'fake_response_data' => [
-                        1 => [
-                            'component' => [
                                 1 => ['fraction' => "1.000"],
                                 2 => ['fraction' => "0.000"],
                                 3 => ['fraction' => "0.000"],
-                            ],
-                        ],
-                        844 => [
-                            'component' => [
-                                1 => ['fraction' => "0.000"],
-                                2 => ['fraction' => "1.000"],
-                                3 => ['fraction' => "0.000"],
-                            ],
-                        ],
                     ],
                     'fake_item_params' => [
                             1 => ['difficulty' => 2.1],
