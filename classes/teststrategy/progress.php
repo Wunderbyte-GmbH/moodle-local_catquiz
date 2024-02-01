@@ -229,6 +229,7 @@ class progress implements JsonSerializable {
             'contextid' => $this->contextid,
             'responses' => $this->responses,
             'abilities' => $this->abilities,
+            'forcedbreakend' => $this->forcedbreakend,
         ];
     }
 
