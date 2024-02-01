@@ -363,7 +363,10 @@ class feedbackclass {
                 $elements[] = $element;
             }
         }
-        self::add_closing_html(1, $scale->id, $mform, $elements, $html2);
+        if (!empty($scale)) {
+            self::add_closing_html(1, $scale->id, $mform, $elements, $html2);
+        }
+
     }
 
     /**
