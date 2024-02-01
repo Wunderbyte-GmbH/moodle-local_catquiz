@@ -151,7 +151,7 @@ class customscalefeedback extends feedbackgenerator {
             return null;
         }
 
-        $personabilities = $initialcontext['personabilities'] ?? $cache->get('personabilities') ?: null;
+        $personabilities = $initialcontext['personabilities'] ?: null;
         if ($personabilities === null) {
             return null;
         }

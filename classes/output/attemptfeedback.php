@@ -157,7 +157,7 @@ class attemptfeedback implements renderable, templatable {
             'studentfeedback' => [],
             'teacherfeedback' => [],
             'quizsettings' => $cache->get('quizsettings'),
-            'personabilities' => $cache->get('personabilities'),
+            'personabilities' => $progress->get_abilities(),
             'num_pilot_questions' => count($progress->get_played_pilot_questions()) ?: null,
         ];
 
@@ -167,7 +167,7 @@ class attemptfeedback implements renderable, templatable {
         }
 
         // If courses or groups are selected, User is enrolled to.
-        catquiz::enrol_user($USER->id, (array)$cache->get('quizsettings'), (array)$cache->get('personabilities'));
+        catquiz::enrol_user($USER->id, (array)$cache->get('quizsettings'), $progress->get_abilities());
 
         if ($savetodb) {
             $id = catquiz::save_attempt_to_db($feedbackdata);
