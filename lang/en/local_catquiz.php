@@ -528,6 +528,7 @@ $string['updatedrecords'] = '{$a} record(s) updated.';
 $string['addedrecords'] = '{$a} record(s) added.';
 $string['itemassignedtosecondscale'] = 'Record with componentid {$a->componentid} is already assigned to scale {$a->scalelink}, now also assigned to {$a->newscalename}.';
 $string['itemassignedtoparentorsubscale'] = 'Record with componentid {$a->componentid} is already assigned to a parent or child scale of {$a->newscalename} and was not imported.';
+$string['noparentsgiven'] = 'Scale {$a->scalename} can not be localized, because there are no parent scales given. Record with componentid {$a->componentid} was not imported.';
 $string['callbackfunctionnotdefined'] = 'Callback function is not defined.';
 $string['callbackfunctionnotapplied'] = 'Callback function could not be applied.';
 $string['canbesetto0iflabelgiven'] = 'Can be 0 if matching of testitem is via label.';
@@ -542,7 +543,7 @@ $string['scaleinformation'] = 'The id of the CAT scale the item should be assign
 $string['scalenameinformation'] = 'The name of the CAT scale the item should be assigned to. If no catscale id given, matching is done via name.';
 $string['dataincomplete'] = 'Record with componentid {$a->id} is incomplete and could not be treated entirely. Check field "{$a->field}".';
 $string['modelinformation'] = 'This field is necessary to entirely treat the record. If it is empty, item can only be assigned to CAT scale.';
-$string['parentscalenamesinformation'] = 'To match the an item via the scalename, make sure to name all parent scales including root scale. For new - yet to be created - scales, you can enter parent scales for the defined scale. Start with the highest parent and separate all children with "|" (vertical line unicode U+007C - do not mistake for slash "/").';
+$string['parentscalenamesinformation'] = 'To match the an item via the scalename, make sure to name all parent scales including root scale. For new - yet to be created - scales, you can enter parent scales for the defined scale. Start with the highest parent and separate all children with "|" (vertical line unicode U+007C - do not mistake for slash "/"). To enable import to parent scales, set "0" here.';
 
 // Testenvironments table.
 $string['notifyallteachers'] = 'Notify all teachers';

@@ -526,8 +526,9 @@ $string['callbackfunctionnotapplied'] = 'Callback Funktion konnte nicht angewand
 $string['canbesetto0iflabelgiven'] = 'Kann 0 sein, wenn Abgleich über Label stattfindet.';
 $string['ifdefinedusedtomatch'] = 'Wenn angegeben findet der Abgleich über diesen Wert statt.';
 $string['fieldnamesdontmatch'] = 'Die importierten Spaltennamen entsprechen nicht der Vorgabe.';
-$string['itemassignedtosecondscale'] = 'Datensatz with componentid {$a->componentid} ist bereits in Skala {$a->scalelink} eingeschrieben und nun zusätzlich in {$a->newscalename}.';
-$string['itemassignedtoparentorsubscale'] = 'Datensatz with componentid {$a} ist bereits in einer über- oder untergeordneten Skala von {$a->newscalename} eingeschrieben und wird nicht importiert.';
+$string['itemassignedtosecondscale'] = 'Datensatz mit componentid {$a->componentid} ist bereits in Skala {$a->scalelink} eingeschrieben und nun zusätzlich in {$a->newscalename}.';
+$string['itemassignedtoparentorsubscale'] = 'Datensatz mit componentid {$a->componentid} ist bereits in einer über- oder untergeordneten Skala von {$a->newscalename} eingeschrieben und wird nicht importiert.';
+$string['noparentsgiven'] = 'Die Skala {$a->scalename} ist nicht eindeutig lokalisierbar, weil keine übergeordneten Skalen angegeben wurden. Datensatz mit componentid {$a->componentid} daher nicht importiert/aktualisiert.';
 $string['checkdelimiteroremptycontent'] = 'Überprüfen Sie ob Daten vorhanden und durch das angegebene Zeichen getrennt sind.';
 $string['wronglabels'] = 'Die importierten Spaltennamen entsprechen nicht der Vorgabe. {$a} kann nicht importiert werden.';
 $string['missinglabel'] = 'Im importierten File fehlt die verpflichtede Spalte {$a}. Daten können nicht importiert werden.';
@@ -537,7 +538,7 @@ $string['scaleinformation'] = 'Die ID der Skala der die Frage zugeordnet werden 
 $string['scalenameinformation'] = 'Der Name der Skala der die Frage zugeordnet werden soll. Falls keine ID angegeben, wird Matching über Name vorgenommen.';
 $string['dataincomplete'] = 'Der Datensatz mit "componentid" {$a->id} ist unvollständig und konnte nicht gänzlich eingefügt werden. Überprüfen Sie das Feld "{$a->field}".';
 $string['modelinformation'] = 'Dieses Feld ist notwendig, um Fragen vollständig zu erfassen. Ist das Feld leer, kann die Frage lediglich einer Skala zugeordnet werden.';
-$string['parentscalenamesinformation'] = 'Präzisieren Sie hier die übergeordneten Skalen der Skala um eine eindeutige Zuordnung zu ermöglichen. Übergeordnete Skalen können beim Import angelegt werden. Starten sie mit dem Namen der höchsten Skala und fügen sie alle Kinder mit "|" (Vertikaler String Unicode U+007C - nicht zu verwechseln mit "/" Slash) getrennt hinzu. Vergessen Sie dabei nicht die Globalskala.';
+$string['parentscalenamesinformation'] = 'Präzisieren Sie hier die übergeordneten Skalen der Skala um eine eindeutige Zuordnung zu ermöglichen. Übergeordnete Skalen können beim Import angelegt werden. Starten sie mit dem Namen der höchsten Skala und fügen sie alle Kinder mit "|" (Vertikaler String Unicode U+007C - nicht zu verwechseln mit "/" Slash) getrennt hinzu. Vergessen Sie dabei nicht die Globalskala. Für den Import von Items in die Globalskala, geben Sie bitte "0" in diesem Feld an.';
 
 // Testenvironments table.
 $string['notifyallteachers'] = 'Kursleiter der gewählten Kurse benachrichtigen';
