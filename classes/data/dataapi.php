@@ -225,10 +225,8 @@ class dataapi {
      */
     public static function create_catscale(catscale_structure $catscale): int {
         global $DB;
-        if (self::name_exists($catscale->name)) {
-            return 0;
-        }
-        $id = $DB->insert_record('local_catquiz_catscales', $catscale);
+
+        $id = $DB->insert_record('local_catquiz_catscales', $catscale, true);
 
         // For a new parent catscale, create new auto-context.
         if (intval($catscale->parentid) === 0
