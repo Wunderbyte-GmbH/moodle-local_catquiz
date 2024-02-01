@@ -209,7 +209,7 @@ class info {
                 get_string('min', 'local_catquiz')
             ),
             $mform->createElement(
-                'text',
+                'float',
                 'catquiz_minquestions',
                 'minquestions',
                 ['size' => '2']
@@ -221,7 +221,7 @@ class info {
                 get_string('max', 'local_catquiz')
             ),
             $mform->createElement(
-                'text',
+                'float',
                 'catquiz_maxquestions',
                 'maxquestions',
                 ['size' => '2']
@@ -241,7 +241,7 @@ class info {
                 get_string('min', 'local_catquiz')
             ),
             $mform->createElement(
-                'text',
+                'float',
                 'catquiz_minquestionspersubscale',
                 get_string('minquestionspersubscale', 'local_catquiz'),
                 ['size' => '2']
@@ -253,7 +253,7 @@ class info {
                 get_string('max', 'local_catquiz')
             ),
             $mform->createElement(
-                'text',
+                'float',
                 'catquiz_maxquestionspersubscale',
                 get_string('maxquestionspersubscale', 'local_catquiz'),
                 ['size' => '2']
@@ -273,7 +273,7 @@ class info {
                 get_string('min', 'local_catquiz')
             ),
             $mform->createElement(
-                'text',
+                'float',
                 'catquiz_standarderror_min',
                 'catquiz_standarderror_min',
                 ['size' => '2']
@@ -285,7 +285,7 @@ class info {
                 get_string('max', 'local_catquiz')
             ),
             $mform->createElement(
-                'text',
+                'float',
                 'catquiz_standarderror_max',
                 'catquiz_standarderror_max',
                 ['size' => '2']
@@ -312,7 +312,7 @@ class info {
                 get_string('perattempt', 'local_catquiz')
             ),
             $mform->createElement(
-                'text',
+                'float',
                 'catquiz_maxtimeperattempt',
                 'catquiz_maxtimeperattempt',
                 ['size' => '2']
@@ -328,7 +328,7 @@ class info {
                 get_string('peritem', 'local_catquiz')
             ),
             $mform->createElement(
-                'text',
+                'float',
                 'catquiz_maxtimeperitem',
                 'catquiz_maxtimeperitem',
                 ['size' => '2']

@@ -166,7 +166,7 @@ class feedbackclass {
 
                 // Define range.
                 $element = $mform->addElement(
-                    'text',
+                    'float',
                     'feedback_scaleid_limit_lower_'. $scale->id . '_' . $j,
                      get_string('lowerlimit', 'local_catquiz'
                 ));
@@ -182,7 +182,7 @@ class feedbackclass {
                 $subelements[] = $element;
 
                 $element = $mform->addElement(
-                    'text',
+                    'float',
                     'feedback_scaleid_limit_upper_'. $scale->id . '_' . $j,
                     get_string('upperlimit', 'local_catquiz'
                 ));

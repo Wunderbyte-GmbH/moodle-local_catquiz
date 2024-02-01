@@ -388,7 +388,7 @@ class catquiz_handler {
             }
         }
 
-        // Standarderror- values should be float between 0 and 1 with min lower than max.
+        // Standarderror- values should be float with min lower than max.
         if (isset($data['catquiz_standarderrorgroup']['catquiz_standarderror_min'])) {
             if (!is_numeric($data['catquiz_standarderrorgroup']['catquiz_standarderror_min'])
                 && !empty($data['catquiz_standarderrorgroup']['catquiz_standarderror_min'])) {
@@ -396,8 +396,6 @@ class catquiz_handler {
                 get_string('errorhastobefloat', 'local_catquiz');
             } else if (0.0 > (float)$data['catquiz_standarderrorgroup']['catquiz_standarderror_min']) {
                 $errors['catquiz_standarderrorgroup'] = get_string('formelementnegative', 'local_catquiz');
-            } else if (1.0 < (float)$data['catquiz_standarderrorgroup']['catquiz_standarderror_min']) {
-                $errors['catquiz_standarderrorgroup'] = get_string('formelementbetweenzeroandone', 'local_catquiz');
             } else {
                 $semin = true;
             }
@@ -409,8 +407,6 @@ class catquiz_handler {
                 get_string('errorhastobefloat', 'local_catquiz');
             } else if (0.0 > (float)$data['catquiz_standarderrorgroup']['catquiz_standarderror_max']) {
                 $errors['catquiz_standarderrorgroup'] = get_string('formelementnegative', 'local_catquiz');
-            } else if (1.0 < (float)$data['catquiz_standarderrorgroup']['catquiz_standarderror_max']) {
-                $errors['catquiz_standarderrorgroup'] = get_string('formelementbetweenzeroandone', 'local_catquiz');
             } else if ($semin && !empty($data['catquiz_standarderrorgroup']['catquiz_standarderror_min']
                 >= (float)$data['catquiz_standarderrorgroup']['catquiz_standarderror_max'])) {
                     $errors['catquiz_standarderrorgroup']
