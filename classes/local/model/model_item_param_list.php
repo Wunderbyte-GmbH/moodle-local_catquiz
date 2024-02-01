@@ -501,6 +501,8 @@ class model_item_param_list implements ArrayAccess, IteratorAggregate, Countable
             } else if ($catscale != false) {
                 $newrecord['error'] = get_string('noparentsgiven', 'local_catquiz', $newrecord);
                 return $newrecord;
+            } else {
+                self::create_scales_for_new_record($newrecord);
             }
         }
         // See if the item already exists.
@@ -567,6 +569,7 @@ class model_item_param_list implements ArrayAccess, IteratorAggregate, Countable
             $parents = array_map(fn($a) => trim($a), $parents);
         } else if (!empty($newrecord['catscalename'])) {
             $parents[] = $newrecord['catscalename'];
+            $noparents = true;
         }
 
         $catscaleid = 0;
@@ -581,14 +584,16 @@ class model_item_param_list implements ArrayAccess, IteratorAggregate, Countable
             $searcharray = [
                 'name' => $parent,
             ];
-
-            $record = $DB->get_record('local_catquiz_catscales', $searcharray);
-            if ($record && $matching && !in_array($record, $records)) {
-                $catscaleid = $record->id;
-                $records[] = $record;
-                continue;
-            } else {
-                $matching = false;
+            // Case where no parents are given, we know we want to create new root scale.
+            if (!$noparents) {
+                $record = $DB->get_record('local_catquiz_catscales', $searcharray);
+                if ($record && $matching && !in_array($record, $records)) {
+                    $catscaleid = $record->id;
+                    $records[] = $record;
+                    continue;
+                } else {
+                    $matching = false;
+                }
             }
 
             $catscale = new catscale_structure([
@@ -600,7 +605,7 @@ class model_item_param_list implements ArrayAccess, IteratorAggregate, Countable
             ]);
 
             $catscaleid = dataapi::create_catscale($catscale);
-            if ($parent == $newrecord['catscalename']) {
+            if ($parent == $newrecord['catscalename'] || $noparents) {
                 $newrecord['catscaleid'] = $catscaleid;
             }
 
