@@ -77,6 +77,7 @@ class teststrategy_fastest extends strategy {
         return [
             checkitemparams::class,
             updatepersonability::class,
+            fisherinformation::class,
             addscalestandarderror::class,
             maximumquestionscheck::class,
             removeplayedquestions::class,
@@ -85,7 +86,6 @@ class teststrategy_fastest extends strategy {
             mayberemovescale::class,
             firstquestionselector::class,
             lasttimeplayedpenalty::class,
-            fisherinformation::class,
             strategyfastestscore::class,
         ];
     }

@@ -83,13 +83,13 @@ class infergreateststrength extends strategy {
             updatepersonability::class,
             removeplayedquestions::class,
             noremainingquestions::class,
+            fisherinformation::class, // Add the fisher information to each question.
             firstquestionselector::class, // If this is the first question of this attempt, return it here.
             lasttimeplayedpenalty::class,
             mayberemovescale::class, // Remove questions from excluded subscales.
             maybe_return_pilot::class,
             remove_uncalculated::class, // Remove items that do not have item parameters.
             noremainingquestions::class, // Cancel quiz attempt if no questions are left.
-            fisherinformation::class, // Add the fisher information to each question.
             addscalestandarderror::class,
             filterbystandarderror::class,
              // Keep only questions that are assigned to the subscale where the user has the largest ability values.
