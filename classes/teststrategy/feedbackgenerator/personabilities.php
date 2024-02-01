@@ -193,7 +193,7 @@ class personabilities extends feedbackgenerator {
             return null;
         }
 
-        return $this->generate_feedback($initialcontext, $personabilities, $cachedcontexts);
+        return $this->generate_feedback($initialcontext, $personabilities, $cachedcontexts, true);
     }
 
     /**
@@ -202,11 +202,12 @@ class personabilities extends feedbackgenerator {
      * @param array $initialcontext
      * @param array $personabilities
      * @param array $cachedcontexts
+     * @param bool $dataonly
      *
      * @return array|null
      *
      */
-    public function generate_feedback(array $initialcontext, $personabilities, $cachedcontexts): ?array {
+    public function generate_feedback(array $initialcontext, $personabilities, $cachedcontexts, $dataonly = false): ?array {
         global $CFG;
         require_once($CFG->dirroot . '/local/catquiz/lib.php');
         $quizsettings = (object)$initialcontext['quizsettings'];
@@ -235,10 +236,12 @@ class personabilities extends feedbackgenerator {
                 $countscales[$scaleid]['count'] = 1;
             }
 
-            $questiondisplay = $this->render_questionpreview((object)$lastquestion);
-            $countscales[$scaleid]['questionpreviews'][] = [
-                'preview' => $questiondisplay['body']['question'],
-            ];
+            if (!$dataonly) {
+                $questiondisplay = $this->render_questionpreview((object)$lastquestion);
+                $countscales[$scaleid]['questionpreviews'][] = [
+                    'preview' => $questiondisplay['body']['question'],
+                ];
+            }
         }
         // Sort the array and put primary scale first.
         if ($this->feedbacksettings->sortorder == LOCAL_CATQUIZ_SORTORDER_ASC) {
