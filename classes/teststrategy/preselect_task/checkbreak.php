@@ -24,7 +24,6 @@
 
 namespace local_catquiz\teststrategy\preselect_task;
 
-use cache;
 use local_catquiz\local\result;
 use local_catquiz\teststrategy\preselect_task;
 use local_catquiz\teststrategy\progress;
@@ -60,17 +59,12 @@ final class checkbreak extends preselect_task implements wb_middleware {
     public function run(array &$context, callable $next): result {
         $this->progress = $context['progress'];
         $now = time();
-        $cache = cache::make('local_catquiz', 'adaptivequizattempt');
-        $forcedbreakend = $cache->get('forcedbreakend');
-        if ($forcedbreakend) {
-            // The user finished the break.
-            if ($forcedbreakend <= $now) {
-                $cache->set('forcedbreakend', false);
-                return $next($context);
-            } else {
-                $breakinfourl = $this->get_breakinfourl($context, $forcedbreakend);
-                redirect($breakinfourl);
-            }
+        if ($this->progress->break_completed()) {
+            return $next($context);
+        }
+        if ($this->progress->has_break()) {
+            $breakinfourl = $this->get_breakinfourl($context, $this->progress->get_forced_break_end());
+            redirect($breakinfourl);
         }
 
         $lastquestionreturntime = $this->progress->get_last_question()->userlastattempttime;
@@ -80,7 +74,7 @@ final class checkbreak extends preselect_task implements wb_middleware {
 
         // User should take a break.
         $this->progress->force_break($context['breakduration']);
-        $breakinfourl = $this->get_breakinfourl($context, $forcedbreakend);
+        $breakinfourl = $this->get_breakinfourl($context, $this->progress->get_forced_break_end());
         // Return forced break info page.
         redirect($breakinfourl);
     }

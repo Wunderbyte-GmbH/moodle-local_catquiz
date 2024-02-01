@@ -105,6 +105,15 @@ class progress implements JsonSerializable {
     private array $abilities;
 
     /**
+     * If the user is forced to take a break, this holds the timestamp of the end of the break.
+     *
+     * If no break is enforced, it has a value of null.
+     *
+     * @var ?int $forcedbreakend
+     */
+    private ?int $forcedbreakend;
+
+    /**
      * Returns a new progress instance.
      *
      * If we already have data in the cache or DB, the instance is populated with those data.
@@ -167,6 +176,7 @@ class progress implements JsonSerializable {
             $instance->responses[$id] = (array) $val;
         }
         $instance->abilities = (array) $data->abilities;
+        $instance->forcedbreakend = intval($data->forcedbreakend) ?: null;
 
         // This has to happen now, because now we have the response to the last
         // question.
@@ -200,6 +210,7 @@ class progress implements JsonSerializable {
         $instance->activescales = [];
         $instance->responses = [];
         $instance->abilities = [];
+        $instance->forcedbreakend = null;
         return $instance;
     }
 
@@ -497,6 +508,54 @@ class progress implements JsonSerializable {
     public function set_ability(float $ability, int $catscaleid): self {
         $this->abilities[$catscaleid] = $ability;
         return $this;
+    }
+
+    /**
+     * Returns the end of the user's break.
+     *
+     * If no break is enforced, returns null.
+     *
+     * @return ?int
+     */
+    public function get_forced_break_end(): ?int {
+        return $this->forcedbreakend;
+    }
+
+    /**
+     * Shows if a user just completed a break.
+     *
+     * @return bool
+     */
+    public function break_completed(): bool {
+        $now = time();
+
+        // User was not in a break.
+        if (!$this->forcedbreakend) {
+            return false;
+        }
+
+        // User did not end the break.
+        if ($this->forcedbreakend > $now) {
+            return false;
+        }
+
+        // Ok: reset breakend to null and indicate the break finished.
+        $this->forcedbreakend = null;
+        return true;
+    }
+
+    /**
+     * Shows if the user still has a break.
+     *
+     * @return bool
+     */
+    public function has_break(): bool {
+        $now = time();
+        if ($this->forcedbreakend && $this->forcedbreakend <= $now) {
+            $this->forcedbreakend = null;
+            return false;
+        }
+        return true;
     }
 
     /**
