@@ -104,8 +104,6 @@ export function listenToSelect(element, location, paramname) {
             location
         );
 
-        // eslint-disable-next-line no-console
-        // console.log(element, location, paramname, dynamicForm);
         // If a user selects a context, redirect to a URL that includes the selected
         // context as `contextid` query parameter
         dynamicForm.addEventListener(dynamicForm.events.FORM_SUBMITTED, (e) => {
