@@ -151,11 +151,6 @@ abstract class strategy {
             return result::err();
         }
 
-        if (! empty($selectedquestion->is_pilot)) {
-            $numpilotquestions = $cache->get('num_pilot_questions') ?: 0;
-            $cache->set('num_pilot_questions', ++$numpilotquestions);
-        }
-
         $this->progress
             ->add_playedquestion($selectedquestion)
             ->set_first_question_played() // TODO: can be removed - implied when adding a played question.

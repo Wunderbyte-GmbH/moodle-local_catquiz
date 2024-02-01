@@ -158,6 +158,7 @@ class attemptfeedback implements renderable, templatable {
             'teacherfeedback' => [],
             'quizsettings' => $cache->get('quizsettings'),
             'personabilities' => $cache->get('personabilities'),
+            'num_pilot_questions' => count($progress->get_played_pilot_questions()) ?: null,
         ];
 
         $feedbackdata = $this->load_data_from_generators($generators, $context);
