@@ -24,7 +24,6 @@
 
 namespace local_catquiz\teststrategy\feedbackgenerator;
 
-use cache;
 use local_catquiz\teststrategy\feedbackgenerator;
 use local_catquiz\teststrategy\feedbacksettings;
 
@@ -130,8 +129,7 @@ class pilotquestions extends feedbackgenerator {
      *
      */
     public function load_data(int $attemptid, array $initialcontext): ?array {
-        $cache = cache::make('local_catquiz', 'adaptivequizattempt');
-        $numpilotquestions = $initialcontext['num_pilot_questions'] ?? $cache->get('num_pilot_questions') ?? null;
+        $numpilotquestions = $initialcontext['num_pilot_questions'];
 
         if ($numpilotquestions === null) {
             return null;

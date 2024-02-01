@@ -459,6 +459,17 @@ class progress implements JsonSerializable {
     }
 
     /**
+     * Returns the pilot questions that were shown to the user.
+     * @return array
+     */
+    public function get_played_pilot_questions(): array {
+        return array_filter(
+            $this->playedquestions,
+            fn ($q) => !empty($q->is_pilot)
+        );
+    }
+
+    /**
      * Update cached responses.
      *
      * @return mixed
