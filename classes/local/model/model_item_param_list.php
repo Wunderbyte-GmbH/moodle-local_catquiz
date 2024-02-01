@@ -487,12 +487,20 @@ class model_item_param_list implements ArrayAccess, IteratorAggregate, Countable
                         $infodata->newscalename = catscale::get_link_to_catscale($newrecord['catscaleid']);
                         $infodata->componentid = $newrecord['componentid'];
                         $newrecord['error'] = get_string('itemassignedtoparentorsubscale', 'local_catquiz', $infodata);
+                        return $newrecord;
                     }
                 } else {
                     // If at this point, the scale is still empty, we need to create and use it.
                     self::create_scales_for_new_record($newrecord);
 
                 }
+            } else if ($catscale != false && $newrecord['parentscalenames'] == "0") {
+                // To enable import to parent scales, set 'parentscalenames' to "0".
+                unset($newrecord['parentscalenames']);
+                self::create_scales_for_new_record($newrecord);
+            } else if ($catscale != false) {
+                $newrecord['error'] = get_string('noparentsgiven', 'local_catquiz', $newrecord);
+                return $newrecord;
             }
         }
         // See if the item already exists.
@@ -570,7 +578,6 @@ class model_item_param_list implements ArrayAccess, IteratorAggregate, Countable
 
             // Check if the scale exists.
             // We also need to look at the parentids.
-            // TODO: Check if parent is parent, in tree.
             $searcharray = [
                 'name' => $parent,
             ];
