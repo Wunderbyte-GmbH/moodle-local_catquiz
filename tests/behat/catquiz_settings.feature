@@ -133,7 +133,7 @@ Feature: As a teacher I setup adaptive quiz with CATquiz Scales and Feedbacks.
     And I should see "Minimum must be less than maximum" in the "#fgroup_id_maxquestionsgroup" "css_element"
     And I should see "Minimum must be less than maximum" in the "#fgroup_id_maxquestionsscalegroup" "css_element"
     And I should see "Please enter values between 0 and 1." in the "#fgroup_id_catquiz_standarderrorgroup" "css_element"
-    And I should see "Input at least one values of time limit" in the "#fgroup_id_catquiz_timelimitgroup" "css_element"
+    And I should see "Input at least one value of time limit" in the "#fgroup_id_catquiz_timelimitgroup" "css_element"
     And I set the following fields to these values:
       ## Fix errors
       | Passing level in %| 50 |
