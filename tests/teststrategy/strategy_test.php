@@ -820,14 +820,16 @@ class strategy_test extends advanced_testcase {
         }
         $importer = new testitemimporter();
         $content = file_get_contents(__DIR__ . '/../fixtures/' . $filename);
-        $importer->execute_testitems_csv_import(
-            (object) [
-                'delimiter_name' => 'semicolon',
-                'encoding' => null,
-                'dateparseformat' => null,
-            ],
-            $content
-        );
+        $result = $importer->execute_testitems_csv_import(
+                (object) [
+                    'delimiter_name' => 'semicolon',
+                    'encoding' => null,
+                    'dateparseformat' => null,
+                ],
+                $content
+            );
+        // This is just for debugging.
+        $checkresult = true;
     }
 
     /**

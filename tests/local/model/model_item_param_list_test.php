@@ -36,14 +36,27 @@ use UnexpectedValueException;
  */
 class model_item_param_list_test extends basic_testcase {
 
-    public function test_save_or_update_testitem_in_db() {
-        $record = [];
+    public function test_save_or_update_testitem_in_db(array $record, array $expected) {
         $result = model_item_param_list::save_or_update_testitem_in_db($record);
-        $expected = [
-            'success' => 1, // Update successfully.
-            'message' => get_string('success', 'core'),
-            'recordid' => 1,
-         ];
+
         $this->assertEquals($expected, $result);
     }
+
+    public static function save_or_update_testitem_in_db_provider() : array {
+
+        return [
+            'idisset' => [
+                'record' => [],
+                'expected' => [
+                    'success' => 1, // Update successfully.
+                    'message' => get_string('success', 'core'),
+                    'recordid' => 1,
+                ],
+            ]
+        ];
+    }
+
+    //Test for update_in_scale!
 }
+
+
