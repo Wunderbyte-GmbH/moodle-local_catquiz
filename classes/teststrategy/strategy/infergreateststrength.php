@@ -81,6 +81,7 @@ class infergreateststrength extends strategy {
             checkitemparams::class,
             maximumquestionscheck::class, // Cancel quiz attempt if we reached maximum of questions.
             updatepersonability::class,
+            addscalestandarderror::class,
             removeplayedquestions::class,
             noremainingquestions::class,
             fisherinformation::class, // Add the fisher information to each question.
@@ -90,7 +91,6 @@ class infergreateststrength extends strategy {
             maybe_return_pilot::class,
             remove_uncalculated::class, // Remove items that do not have item parameters.
             noremainingquestions::class, // Cancel quiz attempt if no questions are left.
-            addscalestandarderror::class,
             filterbystandarderror::class,
              // Keep only questions that are assigned to the subscale where the user has the largest ability values.
             filterforsubscale::class,

@@ -76,13 +76,13 @@ class teststrategy_balanced extends strategy {
             checkitemparams::class,
             maximumquestionscheck::class,
             updatepersonability::class,
+            addscalestandarderror::class,
             mayberemovescale::class,
             noremainingquestions::class,
             lasttimeplayedpenalty::class,
             numberofgeneralattempts::class,
             maybe_return_pilot::class,
             fisherinformation::class,
-            addscalestandarderror::class,
             strategybalancedscore::class,
         ];
     }
