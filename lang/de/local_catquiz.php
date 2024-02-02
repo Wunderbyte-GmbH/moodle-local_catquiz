@@ -112,6 +112,8 @@ $string['formelementnegative'] = 'Wert muss positiv (über 0) sein';
 $string['formelementwrongpercent'] = 'Prozentzahl zwischen 0 und 100 eingeben';
 $string['formminquestgreaterthan'] = 'Minimum muss kleiner als Maximum sein';
 $string['formelementbetweenzeroandone'] = 'Bitte Werte zwischen 0 und 1 eingeben.';
+$string['formmscalegreaterthantest'] = 'Minimum pro Skala muss kleiner sein als Maximum des Tests';
+$string['formetimelimitnotprovided'] = 'Geben Sie zumindest einen Wert ein';
 
 $string['addoredittemplate'] = "Einstellungs-Vorlage bearbeiten";
 
