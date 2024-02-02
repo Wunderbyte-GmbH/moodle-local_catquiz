@@ -459,7 +459,7 @@ class model_item_param_list implements ArrayAccess, IteratorAggregate, Countable
      * @param array $newrecord
      * @return array
      */
-    private static function update_in_scale(array $newrecord) {
+    public static function update_in_scale(array $newrecord) {
         global $DB;
 
         // If we don't know the catscaleid we get it via the catscalename.
@@ -583,6 +583,7 @@ class model_item_param_list implements ArrayAccess, IteratorAggregate, Countable
         if (!empty($newrecord['parentscalenames'])) {
             $newrecord['parentscalenames'] .= "|" . $newrecord['catscalename'];
             $parents = explode('|', $newrecord['parentscalenames']);
+            $noparents = false;
             // Make sure there are no spaces around.
             $parents = array_map(fn($a) => trim($a), $parents);
             $parentsgiven = true;
