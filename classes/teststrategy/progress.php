@@ -218,7 +218,7 @@ class progress implements JsonSerializable {
      * This does not include all data, just the ones that will be saved to the
      * 'json' column in the database.
      */
-    public function jsonSerialize(): mixed {
+    public function jsonSerialize(): array {
         return [
             'playedquestions' => $this->playedquestions,
             'playedquestionsbyscale' => $this->playedquestionsbyscale,
