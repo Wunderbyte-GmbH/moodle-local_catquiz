@@ -568,6 +568,7 @@ class model_item_param_list implements ArrayAccess, IteratorAggregate, Countable
             $parents = explode('|', $newrecord['parentscalenames']);
             // Make sure there are no spaces around.
             $parents = array_map(fn($a) => trim($a), $parents);
+            $noparents = false;
         } else if (!empty($newrecord['catscalename'])) {
             $parents[] = $newrecord['catscalename'];
             $noparents = true;
