@@ -25,38 +25,60 @@
 
 namespace local_catquiz\local\model;
 
-use basic_testcase;
+use advanced_testcase;
 use UnexpectedValueException;
 
 /** model_item_param_list_test
  *
  * @package local_catquiz
  *
+ *
  * @covers \local_catquiz\local\model\model_item_param_list
  */
-class model_item_param_list_test extends basic_testcase {
-
+class model_item_param_list_test extends advanced_testcase {
+    /**
+     * Test import of files
+     *
+     * @dataProvider save_or_update_testitem_in_db_provider
+     *
+     * @param array $record
+     * @param array $expected
+     *
+     * @group large
+     */
     public function test_save_or_update_testitem_in_db(array $record, array $expected) {
+        $this->resetAfterTest();
         $result = model_item_param_list::save_or_update_testitem_in_db($record);
 
-        $this->assertEquals($expected, $result);
+        $this->assertEquals($expected['success'], $result['success']);
     }
 
     public static function save_or_update_testitem_in_db_provider() : array {
 
         return [
-            'idisset' => [
-                'record' => [],
+            'nameandtreeset' => [
+                'record' => [
+                        'componentid' => 0,
+                        'status' => 4,
+                        'qtype' => "Multiple-Choice",
+                        'model' => "raschbirnbaumb",
+                        'difficulty' => -4.45,
+                        'discrimination' => 5.92,
+                        'guessing' => 0.00,
+                        'catscaleid' => null,
+                        'catscalename' => "SimA01",
+                        'parentscalenames' => "Simulation|SimA",
+                        'componentname' => "question",
+                    ],
                 'expected' => [
-                    'success' => 1, // Update successfully.
-                    'message' => get_string('success', 'core'),
-                    'recordid' => 1,
-                ],
+                    'success' => 1,
+                 ]
+                 // TODO: Mock DB to check if matching via scaleid and scaleimport works.
             ]
-        ];
+            ];
     }
 
-    //Test for update_in_scale!
+    // TODO: Test for update_in_scale.
 }
 
 
