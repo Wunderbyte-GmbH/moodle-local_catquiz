@@ -132,13 +132,13 @@ Feature: As a teacher I setup adaptive quiz with CATquiz Scales and Feedbacks.
     Then I should see "Input a number from 0 to 100" in the "#fitem_id_catquiz_passinglevel" "css_element"
     And I should see "Minimum must be less than maximum" in the "#fgroup_id_maxquestionsgroup" "css_element"
     And I should see "Minimum must be less than maximum" in the "#fgroup_id_maxquestionsscalegroup" "css_element"
-    And I should see "Please enter values between 0 and 1." in the "#fgroup_id_catquiz_standarderrorgroup" "css_element"
+    ## Decision - larger than 1 values allowed somehow
+    ## And I should see "Please enter values between 0 and 1." in the "#fgroup_id_catquiz_standarderrorgroup" "css_element"
     And I should see "Input at least one value of time limit" in the "#fgroup_id_catquiz_timelimitgroup" "css_element"
     And I set the following fields to these values:
       ## Fix errors
       | Passing level in %| 50 |
-      | catquiz_standarderrorgroup[catquiz_standarderror_min] | 0.4 |
-      | catquiz_standarderrorgroup[catquiz_standarderror_max] | 0.6 |
+      ##| catquiz_standarderrorgroup[catquiz_standarderror_max] | 0.6 |
       ## Intentional error catquiz_minquestionspersubscale > catquiz_maxquestions
       | maxquestionsscalegroup[catquiz_minquestionspersubscale] | 15 |
       | maxquestionsscalegroup[catquiz_maxquestionspersubscale] | 30 |
@@ -151,7 +151,6 @@ Feature: As a teacher I setup adaptive quiz with CATquiz Scales and Feedbacks.
       | catquiz_timelimitgroup[catquiz_timeselect_item]    | min |
     And I click on "Save and display" "button"
     ## Errors validation 2
-    ##And I wait "30" seconds
     ## Validation for min questions per scale <= max questions per test.
     And I should see "Per scale minimum must be less than per test maximum" in the "#fgroup_id_maxquestionsgroup" "css_element"
     ## not implemented yet - validation for time - maximum time per attempt must be greater than maximum time per itemif
@@ -176,7 +175,8 @@ Feature: As a teacher I setup adaptive quiz with CATquiz Scales and Feedbacks.
       | Proportion of questions to be piloted in % | 20                        |
       | Start new CAT test with                    | Use the average ability score of the current test |
       | catquiz_standarderrorgroup[catquiz_standarderror_min]   | 0.4 |
-      | catquiz_standarderrorgroup[catquiz_standarderror_max]   | 0.6 |
+      ##| catquiz_standarderrorgroup[catquiz_standarderror_max] | 0.6 |
+      | catquiz_standarderrorgroup[catquiz_standarderror_max]   | 2   |
       | maxquestionsscalegroup[catquiz_minquestionspersubscale] | 1   |
       | maxquestionsscalegroup[catquiz_maxquestionspersubscale] | 3   |
       | maxquestionsgroup[catquiz_minquestions]                 | 3   |
