@@ -426,7 +426,7 @@ class catquiz_handler {
             $errors['maxquestionsscalegroup']
                 = get_string('formminquestgreaterthan', 'local_catquiz');
         }
-
+        if ((int) $data['maxquestionsscalegroup']['catquiz_maxquestionspersubscale']
             >= (int) $data['maxquestionsgroup']['catquiz_maxquestions']
             && 0 != (int) $data['maxquestionsgroup']['catquiz_maxquestions']) {
             $errors['maxquestionsgroup'] = get_string('formminquestgreaterthan', 'local_catquiz');
