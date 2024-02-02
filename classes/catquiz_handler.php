@@ -422,11 +422,10 @@ class catquiz_handler {
         // Number of questions - validate higher and lower values.
         if ((int) $data['maxquestionsscalegroup']['catquiz_minquestionspersubscale']
             >= (int) $data['maxquestionsscalegroup']['catquiz_maxquestionspersubscale']
-                && 0 != (int) $data['maxquestionsscalegroup']['catquiz_maxquestionspersubscale']) {
-            $errors['maxquestionsscalegroup']
-                = get_string('formminquestgreaterthan', 'local_catquiz');
+            && 0 != (int) $data['maxquestionsscalegroup']['catquiz_maxquestionspersubscale']) {
+            $errors['maxquestionsscalegroup'] = get_string('formminquestgreaterthan', 'local_catquiz');
         }
-        if ((int) $data['maxquestionsscalegroup']['catquiz_maxquestionspersubscale']
+        if ((int) $data['maxquestionsgroup']['catquiz_minquestions']
             >= (int) $data['maxquestionsgroup']['catquiz_maxquestions']
             && 0 != (int) $data['maxquestionsgroup']['catquiz_maxquestions']) {
             $errors['maxquestionsgroup'] = get_string('formminquestgreaterthan', 'local_catquiz');
