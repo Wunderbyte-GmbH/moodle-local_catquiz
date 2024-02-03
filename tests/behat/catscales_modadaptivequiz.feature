@@ -26,19 +26,17 @@ Feature: As a student i want to take adaptive quiz tests with catquiz functinali
     And the following config values are set as admin:
       | config      | value         |
       | texteditors | atto,textarea |
-    And I log in as "teacher"
-    And I am on "Course 1" course homepage with editing mode on
-    And I add a "Adaptive Quiz" to section "1"
+    And the following "activities" exist:
+      | activity     | name             | course | section | idnumber         |
+      | adaptivequiz | My Adaptive Quiz | C1     | 1       | adaptivecatquiz1 |
+    And I am on the "adaptivecatquiz1" Activity page logged in as teacher
+    And I follow "Settings"
     And I set the following fields to these values:
-      | Name                         | My Adaptive Quiz            |
-      | ID number                    | adaptivecatquiz1            |
-      | Description                  | Adaptive quiz description.  |
-      | catmodel                     | Catquiz CAT model           |
-      | Select CAT scale             | Simulation                  |
-      | maxquestionsgroup[catquiz_maxquestions]     | 7            |
-      ## Should we expect defaults?
-      | catquiz_standarderrorgroup[catquiz_standarderror_min] | 0.4 |
-      | catquiz_standarderrorgroup[catquiz_standarderror_max] | 0.6 |
+      | catmodel                                              | Catquiz CAT model |
+      | Select CAT scale                                      | Simulation        |
+      | maxquestionsgroup[catquiz_maxquestions]               | 7                 |
+      | catquiz_standarderrorgroup[catquiz_standarderror_min] | 0.4               |
+      | catquiz_standarderrorgroup[catquiz_standarderror_max] | 0.6               |
     And I click on "Save and return to course" "button"
     And I log out
 
