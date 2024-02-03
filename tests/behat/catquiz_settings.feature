@@ -53,15 +53,15 @@ Feature: As a teacher I setup adaptive quiz with CATquiz Scales and Feedbacks.
 
   @javascript
   Scenario: CATquiz settings: teacher setup catscale usage in quiz and verify it
-    Given I log in as "teacher1"
-    And I am on "Course 1" course homepage with editing mode on
-    And I add a "Adaptive Quiz" to section "1"
+    Given the following "activities" exist:
+      | activity     | name             | course | section | idnumber         |
+      | adaptivequiz | Adaptive CATquiz | C1     | 1       | adaptivecatquiz1 |
+    And I am on the "adaptivecatquiz1" Activity page logged in as teacher1
+    And I follow "Settings"
+    ## And I wait until the page is ready
     And I set the following fields to these values:
-      | Name             | Adaptive CATquiz  |
-      | ID number        | adaptivecatquiz1  |
       | catmodel         | Catquiz CAT model |
       | Select CAT scale | Simulation        |
-      ## Should we expect defaults?
       | catquiz_standarderrorgroup[catquiz_standarderror_min] | 0.4 |
       | catquiz_standarderrorgroup[catquiz_standarderror_max] | 0.6 |
     When I wait until the page is ready
@@ -86,9 +86,7 @@ Feature: As a teacher I setup adaptive quiz with CATquiz Scales and Feedbacks.
     And I should not see "SimC01" in the "#id_catquiz_headercontainer" "css_element"
     And I should not see "SimC02" in the "#id_catquiz_headercontainer" "css_element"
     And I click on "Save and display" "button"
-    And I wait until the page is ready
     And I follow "Settings"
-    And I wait until the page is ready
     ## Verify disabled scale and sub-scale after save
     And the field with xpath "//input[@data-name='SimA']" matches value "checked"
     And the field with xpath "//input[@data-name='SimA02']" matches value "checked"
@@ -98,16 +96,15 @@ Feature: As a teacher I setup adaptive quiz with CATquiz Scales and Feedbacks.
     And the field with xpath "//input[@data-name='SimC']" matches value ""
     And I should not see "SimC01" in the "#id_catquiz_headercontainer" "css_element"
     And I should not see "SimC02" in the "#id_catquiz_headercontainer" "css_element"
-    And I log out
 
   @javascript
   Scenario: CATquiz settings: teacher setup question settings and validate it
-    Given I log in as "teacher1"
-    And I am on "Course 1" course homepage with editing mode on
-    And I add a "Adaptive Quiz" to section "1"
+    Given the following "activities" exist:
+      | activity     | name             | course | section | idnumber         |
+      | adaptivequiz | Adaptive CATquiz | C1     | 1       | adaptivecatquiz1 |
+    And I am on the "adaptivecatquiz1" Activity page logged in as teacher1
+    And I follow "Settings"
     And I set the following fields to these values:
-      | Name                                       | Adaptive CATquiz          |
-      | ID number                                  | adaptivecatquiz1          |
       | catmodel                                   | Catquiz CAT model         |
       | Select CAT scale                           | Simulation                |
       | Passing level in %                         | 500                       |
@@ -137,18 +134,18 @@ Feature: As a teacher I setup adaptive quiz with CATquiz Scales and Feedbacks.
     And I should see "Input at least one value of time limit" in the "#fgroup_id_catquiz_timelimitgroup" "css_element"
     And I set the following fields to these values:
       ## Fix errors
-      | Passing level in %| 50 |
+      | Passing level in %                                      | 50 |
       ##| catquiz_standarderrorgroup[catquiz_standarderror_max] | 0.6 |
       ## Intentional error catquiz_minquestionspersubscale > catquiz_maxquestions
       | maxquestionsscalegroup[catquiz_minquestionspersubscale] | 15 |
       | maxquestionsscalegroup[catquiz_maxquestionspersubscale] | 30 |
-      | maxquestionsgroup[catquiz_minquestions] | 3  |
-      | maxquestionsgroup[catquiz_maxquestions] | 10 |
+      | maxquestionsgroup[catquiz_minquestions]                 | 3  |
+      | maxquestionsgroup[catquiz_maxquestions]                 | 10 |
       ## Intentional error - incorrect time values
-      | catquiz_timelimitgroup[catquiz_maxtimeperattempt]  | 5   |
-      | catquiz_timelimitgroup[catquiz_timeselect_attempt] | min |
-      | catquiz_timelimitgroup[catquiz_maxtimeperitem]     | 15  |
-      | catquiz_timelimitgroup[catquiz_timeselect_item]    | min |
+      | catquiz_timelimitgroup[catquiz_maxtimeperattempt]       | 5   |
+      | catquiz_timelimitgroup[catquiz_timeselect_attempt]      | min |
+      | catquiz_timelimitgroup[catquiz_maxtimeperitem]          | 15  |
+      | catquiz_timelimitgroup[catquiz_timeselect_item]         | min |
     And I click on "Save and display" "button"
     ## Errors validation 2
     ## Validation for min questions per scale <= max questions per test.
@@ -158,15 +155,12 @@ Feature: As a teacher I setup adaptive quiz with CATquiz Scales and Feedbacks.
     And I set the following fields to these values:
       | maxquestionsscalegroup[catquiz_minquestionspersubscale] | 1 |
       | maxquestionsscalegroup[catquiz_maxquestionspersubscale] | 3 |
-      | catquiz_timelimitgroup[catquiz_maxtimeperattempt] | 5 |
-      | catquiz_timelimitgroup[catquiz_maxtimeperitem] | 1 |
+      | catquiz_timelimitgroup[catquiz_maxtimeperattempt]       | 5 |
+      | catquiz_timelimitgroup[catquiz_maxtimeperitem]          | 1 |
     And I click on "Save and display" "button"
-    And I wait until the page is ready
     And I follow "Settings"
     ## Verify all root catscales active by default
     And the following fields match these values:
-      | Name                                       | Adaptive CATquiz          |
-      | ID number                                  | adaptivecatquiz1          |
       | catmodel                                   | Catquiz CAT model         |
       | Select CAT scale                           | Simulation                |
       | Passing level in %                         | 50                        |
@@ -187,21 +181,20 @@ Feature: As a teacher I setup adaptive quiz with CATquiz Scales and Feedbacks.
       | catquiz_timelimitgroup[catquiz_timeselect_attempt]      | min |
       | catquiz_timelimitgroup[catquiz_maxtimeperitem]          | 1   |
       | catquiz_timelimitgroup[catquiz_timeselect_item]         | min |
-    And I log out
 
   @javascript
   Scenario: CATquiz settings: teacher setup basic feedback settings
-    Given I log in as "teacher1"
-    And I am on "Course 1" course homepage with editing mode on
-    And I add a "Adaptive Quiz" to section "1"
+    Given the following "activities" exist:
+      | activity     | name             | course | section | idnumber         |
+      | adaptivequiz | Adaptive CATquiz | C1     | 1       | adaptivecatquiz1 |
+    And I am on the "adaptivecatquiz1" Activity page logged in as teacher1
+    And I follow "Settings"
+    ## And I wait until the page is ready
     And I set the following fields to these values:
-      | Name             | Adaptive CATquiz  |
-      | ID number        | adaptivecatquiz1  |
-      | catmodel         | Catquiz CAT model |
-      | Select CAT scale | Simulation        |
-      ## Should we expect defaults?
-      | catquiz_standarderrorgroup[catquiz_standarderror_min] | 0.4 |
-      | catquiz_standarderrorgroup[catquiz_standarderror_max] | 0.6 |
+      | catmodel                                              | Catquiz CAT model |
+      | Select CAT scale                                      | Simulation        |
+      | catquiz_standarderrorgroup[catquiz_standarderror_min] | 0.4               |
+      | catquiz_standarderrorgroup[catquiz_standarderror_max] | 0.6               |
     ## Delay required to settle CAT scale
     When I wait until the page is ready
     And the field "Number of ability ranges" matches value "2"
