@@ -64,7 +64,7 @@ class behat_catquiz extends behat_base {
                 $xpathtarget = "(//div[contains(@id, '" . $dynamicidentifier . "')][@contenteditable='true'])
                     [" . $numberofitem . "]";
                 break;
-            case 'multiselect':
+            case 'autocomplete':
                 $xpathtarget = "(//div[contains(@id, '" . $dynamicidentifier . "')])
                     [" . $numberofitem . "]//input[contains(@id, 'form_autocomplete_input-')]";
                 $xpathtarget1 = "(//div[contains(@id, '" . $dynamicidentifier . "')])
@@ -82,7 +82,7 @@ class behat_catquiz extends behat_base {
         $field = $this->getSession()->getPage()->find('xpath', $xpathtarget);
         if ($field->isVisible()) {
             switch ($fieldtype) {
-                case 'multiselect':
+                case 'autocomplete':
                     $field->setValue($value);
                     $field->keyPress(13); // Enter.
                     // Get selected option and click it.
