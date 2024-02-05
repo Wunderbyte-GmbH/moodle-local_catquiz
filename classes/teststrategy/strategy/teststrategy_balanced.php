@@ -74,9 +74,9 @@ class teststrategy_balanced extends strategy {
     public function get_preselecttasks(): array {
         return [
             checkitemparams::class,
-            maximumquestionscheck::class,
             updatepersonability::class,
             addscalestandarderror::class,
+            maximumquestionscheck::class,
             mayberemovescale::class,
             noremainingquestions::class,
             lasttimeplayedpenalty::class,
