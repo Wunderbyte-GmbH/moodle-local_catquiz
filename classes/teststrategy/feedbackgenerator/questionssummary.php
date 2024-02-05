@@ -126,12 +126,13 @@ class questionssummary extends feedbackgenerator {
      * Loads data.
      *
      * @param int $attemptid
-     * @param array $initialcontext
+     * @param array $existingdata
+     * @param array $newdata
      *
      * @return array|null
      *
      */
-    public function load_data(int $attemptid, array $initialcontext): ?array {
+    public function load_data(int $attemptid, array $existingdata, array $newdata): ?array {
         if (! $attempt = catquiz::get_attempt_statistics($attemptid)) {
             return null;
         }

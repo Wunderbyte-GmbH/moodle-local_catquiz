@@ -153,7 +153,7 @@ class quizattemptsdisplay {
      */
     public function render_attempt_details(int $attemptid) {
         $attemptfeedback = new attemptfeedback($attemptid);
-        $feedback = $attemptfeedback->get_feedback_for_attempt($attemptid);
+        $feedback = $attemptfeedback->get_feedback_for_attempt();
         return $feedback;
     }
 

@@ -17,9 +17,13 @@
 namespace local_catquiz\output;
 
 use cache;
+use coding_exception;
 use context_system;
+use Exception;
+use dml_exception;
 use local_catquiz\catquiz;
 use local_catquiz\catscale;
+use local_catquiz\event\attempt_completed;
 use local_catquiz\teststrategy\feedbackgenerator;
 use local_catquiz\teststrategy\feedbacksettings;
 use local_catquiz\teststrategy\info;
@@ -123,24 +127,47 @@ class attemptfeedback implements renderable, templatable {
     }
 
     /**
-     * Renders strategy feedback.
-     * In addition, it saves all feedback data to the database.
+     * Updates the data that is used to render the feedback
      *
-     * @param  bool $savetodb
-     * @return mixed
+     * This is called after each response of a user.
      *
+     * @param array $newdata
+     * @return void
+     * @throws coding_exception
+     * @throws Exception
+     * @throws dml_exception
      */
-    private function render_strategy_feedback($savetodb = true) {
-        global $USER;
-        if (!$this->teststrategy) {
-            return '';
+    public function update_feedbackdata(array $newdata = []) {
+        $existingdata = $this->load_feedbackdata();
+        $generators = $this->get_feedback_generators();
+        $updateddata = $this->load_data_from_generators($generators, $existingdata, $newdata);
+        catquiz::save_attempt_to_db($updateddata);
+    }
+
+    public function load_feedbackdata(): array {
+        global $DB;
+        $feedbackdata = json_decode(
+            $DB->get_field(
+                'local_catquiz_attempts',
+                'json',
+                ['attemptid' => $this->attemptid]
+            ),
+            true
+        );
+        if (empty($feedbackdata)) {
+            return $this->create_initial_data();
         }
-        $progress = progress::load($this->attemptid, 'mod_adaptivequiz', $this->contextid);
+        return $feedbackdata;
+    }
 
-        $generators = $this->get_feedback_generators_for_teststrategy($this->teststrategy);
+    public function get_feedback_generators() {
+        return $this->get_feedback_generators_for_teststrategy($this->teststrategy);
+    }
 
+    private function create_initial_data(): array {
+        global $USER;
         $cache = cache::make('local_catquiz', 'adaptivequizattempt');
-        $context = [
+        return [
             'attemptid' => $this->attemptid,
             'contextid' => $this->contextid,
             'courseid' => $this->courseid ?? 0,
@@ -151,43 +178,33 @@ class attemptfeedback implements renderable, templatable {
             'starttime' => $cache->get('starttime'),
             'endtime' => $cache->get('endtime'),
             'total_number_of_testitems' => $cache->get('totalnumberoftestitems'),
-            'number_of_testitems_used' => $progress->get_num_playedquestions(),
+            'number_of_testitems_used' => null,
             'ability_before_attempt' => $cache->get('abilitybeforeattempt'),
             'catquizerror' => $cache->get('catquizerror'),
             'studentfeedback' => [],
             'teacherfeedback' => [],
-            'quizsettings' => $cache->get('quizsettings'),
-            'personabilities' => $progress->get_abilities(),
-            'num_pilot_questions' => count($progress->get_played_pilot_questions()) ?: null,
+            'quizsettings' => (array) $cache->get('quizsettings'),
+            'personabilities' => null,
+            'num_pilot_questions' => null,
         ];
-
-        $feedbackdata = $this->load_data_from_generators($generators, $context);
-        if (!$feedbackdata) {
-            return [];
-        }
-
-        // If courses or groups are selected, User is enrolled to.
-        catquiz::enrol_user($USER->id, (array)$cache->get('quizsettings'), $progress->get_abilities());
-
-        if ($savetodb) {
-            $id = catquiz::save_attempt_to_db($feedbackdata);
-        }
-        return $this->generate_feedback($generators, $feedbackdata);
     }
 
     /**
      * Get the data from the feedbackgenerators.
      *
+     * Updates the $context with new data returned by the generators.
+     *
      * @param array $generators
-     * @param array $context
+     * @param array $existingdata
+     * @param array $newdata
      * @return array
      */
-    private function load_data_from_generators(array $generators, array $context): array {
+    private function load_data_from_generators(array $generators, array $existingdata, array $newdata): array {
         // Get the data required to generate the feedback. This can be saved to
         // the DB.
-        $feedbackdata = $context;
+        $feedbackdata = $existingdata;
         foreach ($generators as $generator) {
-            $generatordata = $generator->load_data($this->attemptid, $context);
+            $generatordata = $generator->load_data($this->attemptid, $existingdata, $newdata);
             if (! $generatordata) {
                 continue;
             }
@@ -220,24 +237,11 @@ class attemptfeedback implements renderable, templatable {
     /**
      * Gets feedback for attempt.
      *
-     * @param int $attemptid
-     *
      * @return array
      *
      */
-    public function get_feedback_for_attempt(int $attemptid): array {
-        global $DB;
-        $feedbackdata = json_decode(
-            $DB->get_field(
-                'local_catquiz_attempts',
-                'json',
-                ['attemptid' => $attemptid]
-            ),
-            true
-        );
-        if (empty($feedbackdata)) {
-            return [];
-        }
+    public function get_feedback_for_attempt(): array {
+        $feedbackdata = $this->load_feedbackdata();
         $generators = $this->get_feedback_generators_for_teststrategy($feedbackdata['teststrategy']);
         return $this->generate_feedback($generators, $feedbackdata);
     }
@@ -252,9 +256,45 @@ class attemptfeedback implements renderable, templatable {
      *
      */
     public function export_for_template(\renderer_base $output, $savetodb = true): array {
+        // 1. Perform attempt-finished tasks.
+        $this->attempt_finished_tasks();
+
+        // 2. Return the feedback.
         return [
-            'feedback' => $this->render_strategy_feedback($savetodb),
+            'feedback' => $this->get_feedback_for_attempt(),
         ];
+    }
+
+    private function attempt_finished_tasks() {
+        $finished = true; // TODO: add a check to see if the attempt is finished or move this somewhere else.
+        if (!$finished) {
+            return;
+        }
+
+        global $USER;
+        $progress = progress::load($this->attemptid, 'mod_adaptivequiz', $this->contextid);
+        catquiz::enrol_user($USER->id, (array) $this->quizsettings, $progress->get_abilities());
+        $courseandinstance = catquiz::return_course_and_instance_id(
+            $this->quizsettings->modulename,
+            $this->attemptid
+        );
+
+        // Trigger attempt_completed event.
+        $event = attempt_completed::create([
+            'objectid' => $this->attemptid,
+            'context' => context_system::instance(),
+            'other' => [
+                'attemptid' => $this->attemptid,
+                'catscaleid' => $this->catscaleid,
+                'userid' => $USER->id,
+                'contextid' => $this->contextid,
+                'component' => $this->quizsettings->modulename,
+                'instanceid' => $courseandinstance['instanceid'],
+                'teststrategy' => $this->teststrategy,
+                'status' => LOCAL_CATQUIZ_ATTEMPT_OK,
+            ],
+        ]);
+        $event->trigger();
     }
 
     /**

@@ -139,28 +139,29 @@ class customscalefeedback extends feedbackgenerator {
      * Load data.
      *
      * @param int $attemptid
-     * @param array $initialcontext
+     * @param array $existingdata
+     * @param array $newdata
      *
      * @return array|null
      *
      */
-    public function load_data(int $attemptid, array $initialcontext): ?array {
+    public function load_data(int $attemptid, array $existingdata, array $newdata): ?array {
         $cache = cache::make('local_catquiz', 'adaptivequizattempt');
-        $quizsettings = ($initialcontext['quizsettings'] ?? $cache->get('quizsettings')) ?: null;
+        $quizsettings = ($existingdata['quizsettings'] ?? $cache->get('quizsettings')) ?: null;
         if ($quizsettings === null) {
             return null;
         }
 
-        $personabilities = $initialcontext['personabilities'] ?: null;
+        $personabilities = $existingdata['personabilities'] ?: null;
         if ($personabilities === null) {
             return null;
         }
 
         // Make sure that only feedback for specific scale is rendered.
         $personabilitiesfeedbackeditor = feedbacksettings::return_scales_according_to_strategy(
-            $initialcontext['teststrategy'],
+            $existingdata['teststrategy'],
             (array)$personabilities,
-            $initialcontext['catscaleid']);
+            $existingdata['catscaleid']);
 
         ($this->sortfun)($personabilities);
 

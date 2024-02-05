@@ -177,40 +177,36 @@ class personabilities extends feedbackgenerator {
      * Loads data personability, number of items played per subscale and standarderrorpersubscale.
      *
      * @param int $attemptid
-     * @param array $initialcontext
+     * @param array $existingdata
+     * @param array $newdata
      *
      * @return array|null
      *
      */
-    public function load_data(int $attemptid, array $initialcontext): ?array {
-        $cache = cache::make('local_catquiz', 'adaptivequizattempt');
-        $personabilities = $initialcontext['personabilities'];
-        if ($personabilities === []) {
-            return null;
-        }
-        // Check how many questions have been played whithin each subscale.
-        if (! $cachedcontexts = $cache->get('context')) {
-            return null;
-        }
-
-        return $this->generate_feedback($initialcontext, $personabilities, $cachedcontexts, true);
+    public function load_data(int $attemptid, array $existingdata, array $newdata): ?array {
+        return $this->generate_feedback($existingdata, $newdata, true);
     }
 
     /**
      * Loads data personability, number of items played per subscale and standarderrorpersubscale.
      *
-     * @param array $initialcontext
-     * @param array $personabilities
-     * @param array $cachedcontexts
+     * @param array $existingdata
+     * @param array $newdata
      * @param bool $dataonly
      *
      * @return array|null
      *
      */
-    public function generate_feedback(array $initialcontext, $personabilities, $cachedcontexts, $dataonly = false): ?array {
+    public function generate_feedback(array $existingdata, $newdata, $dataonly = false): ?array {
+        $progress = $newdata['progress'];
+        $personabilities = $progress->get_abilities();
+        if ($personabilities === []) {
+            return null;
+        }
+
         global $CFG;
         require_once($CFG->dirroot . '/local/catquiz/lib.php');
-        $quizsettings = (object)$initialcontext['quizsettings'];
+        $quizsettings = (object) $existingdata['quizsettings'];
 
         $selectedscalearray = $this->feedbacksettings->get_scaleid_and_stringkey(
             $personabilities,
@@ -300,14 +296,14 @@ class personabilities extends feedbackgenerator {
             ];
         }
         // The chart showing all present personabilities in relation to each other.
-        $chart = $this->render_chart($personabilities, (array)$initialcontext['quizsettings'], $catscales[$selectedscaleid]);
+        $chart = $this->render_chart($personabilities, (array)$existingdata['quizsettings'], $catscales[$selectedscaleid]);
 
         // The charts showing past and present personabilities (in relation to peers).
         $abilityprogress = $this->render_abilitiyprogress(
-            (array)$initialcontext,
+            (array)$existingdata,
             $catscales[$selectedscaleid]);
 
-        $abilityprofile = $this->render_abilityprofile_chart((array)$initialcontext, $catscales[$selectedscaleid]);
+        $abilityprofile = $this->render_abilityprofile_chart((array)$existingdata, $catscales[$selectedscaleid]);
         return [
             'feedback_personabilities' => $data,
             'personabilitychart' => $chart,

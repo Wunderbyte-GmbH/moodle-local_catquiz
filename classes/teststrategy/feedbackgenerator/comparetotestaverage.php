@@ -267,18 +267,19 @@ class comparetotestaverage extends feedbackgenerator {
      * Load data.
      *
      * @param int $attemptid
-     * @param array $initialcontext
+     * @param array $existingdata
+     * @param array $newdata
      *
      * @return array|null
      *
      */
-    public function load_data(int $attemptid, array $initialcontext): ?array {
+    public function load_data(int $attemptid, array $existingdata, array $newdata): ?array {
         $cache = cache::make('local_catquiz', 'adaptivequizattempt');
         if (! $quizsettings = $cache->get('quizsettings')) {
             return null;
         }
 
-        return $this->generate_feedback($initialcontext, $quizsettings);
+        return $this->generate_feedback($existingdata, $quizsettings);
     }
 
 
