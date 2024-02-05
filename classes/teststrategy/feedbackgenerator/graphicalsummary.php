@@ -177,12 +177,13 @@ class graphicalsummary extends feedbackgenerator {
      * Load data.
      *
      * @param int $attemptid
-     * @param array $initialcontext
+     * @param array $existingdata
+     * @param array $newdata
      *
      * @return array|null
      *
      */
-    public function load_data(int $attemptid, array $initialcontext): ?array {
+    public function load_data(int $attemptid, array $existingdata, array $newdata): ?array {
         $cache = cache::make('local_catquiz', 'adaptivequizattempt');
         if (! $cachedcontexts = $cache->get('context')) {
             return null;
@@ -204,7 +205,7 @@ class graphicalsummary extends feedbackgenerator {
                 $lastquestion->catscaleid
             )->name;
             $graphicalsummary[$index - 1]['fisherinformation'] = $lastquestion
-                ->fisherinformation[$initialcontext['catscaleid']] ?? null;
+                ->fisherinformation[$existingdata['catscaleid']] ?? null;
             $graphicalsummary[$index - 1]['score'] = $lastquestion->score ?? null;
             $before = null;
             $after = null;
@@ -223,13 +224,14 @@ class graphicalsummary extends feedbackgenerator {
         $teststrategyname = get_string(
             'teststrategy',
             'local_catquiz',
-            info::get_teststrategy($initialcontext['teststrategy'])
+            info::get_teststrategy($existingdata['teststrategy'])
         ->get_description());
 
         return [
             'testprogresschart' => $graphicalsummary,
             'testresultstable' => $graphicalsummary,
             'teststrategyname' => $teststrategyname,
+            'personabilities' => $newdata['personabilities'],
         ];
     }
 

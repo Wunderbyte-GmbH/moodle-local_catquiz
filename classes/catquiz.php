@@ -1477,15 +1477,13 @@ class catquiz {
             return 0;
         }
 
-        // Ensure there is only one row per attempt.
-        $existingrecord = $DB->get_record('local_catquiz_attempts', ['attemptid' => $attemptdata['attemptid']]);
-        if ($existingrecord) {
-            return 0;
-        }
         $catcontext = catscale::get_context_id($attemptdata['catscaleid']);
 
         // To query the db only once we fetch courseid und instanceid here.
-        $courseandinstance = self::return_course_and_instance_id($attemptdata);
+        $courseandinstance = self::return_course_and_instance_id(
+            $attemptdata['quizsettings']['modulename'],
+            $attemptdata['attemptid']
+        );
 
         $data = new stdClass;
         $data->userid = $attemptdata['userid'];
@@ -1493,7 +1491,7 @@ class catquiz {
         $data->contextid = $catcontext;
         $data->courseid = $courseandinstance['courseid'];
         $data->attemptid = $attemptdata['attemptid'];
-        $data->component = $attemptdata['quizsettings']->modulename;
+        $data->component = $attemptdata['quizsettings']['modulename'];
         $data->instanceid = $courseandinstance['instanceid'];
         $data->teststrategy = $attemptdata['teststrategy'];
         $data->status = LOCAL_CATQUIZ_ATTEMPT_OK;
@@ -1513,26 +1511,15 @@ class catquiz {
         self::replace_inf_with_minusone($attemptdata);
         $data->json = json_encode($attemptdata);
 
-        $id = $DB->insert_record('local_catquiz_attempts', (object)$data);
-
-        if ($id) {
-            // Trigger attempt_completed event.
-            $event = attempt_completed::create([
-                'objectid' => $data->attemptid,
-                'context' => \context_system::instance(),
-                'other' => [
-                    'attemptid' => $data->attemptid,
-                    'catscaleid' => $data->scaleid,
-                    'userid' => $data->userid,
-                    'contextid' => $data->contextid,
-                    'component' => $data->component,
-                    'instanceid' => $data->instanceid,
-                    'teststrategy' => $data->teststrategy,
-                    'status' => $data->status,
-                ],
-                ]);
-            $event->trigger();
+        // Ensure there is only one row per attempt.
+        $existingrecord = $DB->get_record('local_catquiz_attempts', ['attemptid' => $attemptdata['attemptid']]);
+        if ($existingrecord) {
+            $data->id = $existingrecord->id;
+            $DB->update_record('local_catquiz_attempts', $data);
+            return $existingrecord->id;
         }
+
+        $id = $DB->insert_record('local_catquiz_attempts', (object) $data);
 
         return $id;
     }
@@ -1556,16 +1543,20 @@ class catquiz {
             }
         }
     }
-    /** Fetch courseid and and instanceid from DB for attempt.
-     * @param array $attemptdata
+
+    /**
+     * Fetch courseid and and instanceid from DB for attempt.
+     *
+     * @param string $modulename
+     * @param int    $attemptid
      * @return array
      * @throws dml_exception
      */
-    public static function return_course_and_instance_id(array $attemptdata) {
+    public static function return_course_and_instance_id(string $modulename, int $attemptid) {
         global $DB;
         $courseid = 0;
         $instanceid = 0;
-        if ($attemptdata['quizsettings']->modulename == 'adaptivequiz') {
+        if ($modulename == 'adaptivequiz') {
             $sql = "SELECT aq.id, aq.course
                     FROM {adaptivequiz_attempt} aqa
                     JOIN {adaptivequiz} aq
@@ -1573,7 +1564,7 @@ class catquiz {
                     WHERE aqa.id = :attemptid";
 
             $params = [
-                'attemptid' => $attemptdata['attemptid'],
+                'attemptid' => $attemptid,
             ];
             $record = $DB->get_record_sql($sql, $params);
             $courseid = $record->course;

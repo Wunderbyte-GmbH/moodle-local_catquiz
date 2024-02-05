@@ -123,13 +123,14 @@ class pilotquestions extends feedbackgenerator {
      * Loads data.
      *
      * @param int $attemptid
-     * @param array $initialcontext
+     * @param array $existingdata
+     * @param array $newdata
      *
      * @return array|null
      *
      */
-    public function load_data(int $attemptid, array $initialcontext): ?array {
-        $numpilotquestions = $initialcontext['num_pilot_questions'];
+    public function load_data(int $attemptid, array $existingdata, array $newdata): ?array {
+        $numpilotquestions = $existingdata['num_pilot_questions'];
 
         if ($numpilotquestions === null) {
             return null;

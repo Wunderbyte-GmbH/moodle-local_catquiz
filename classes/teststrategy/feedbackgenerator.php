@@ -78,10 +78,11 @@ abstract class feedbackgenerator {
      * Loads the data required to render the feedback.
      *
      * @param int $attemptid
-     * @param array $initialcontext
+     * @param array $existingdata
+     * @param array $newdata Data from the last attempt
      * @return ?array
      */
-    abstract public function load_data(int $attemptid, array $initialcontext): ?array;
+    abstract public function load_data(int $attemptid, array $existingdata, array $newdata): ?array;
 
     /**
      * To update feedbackdata (that will be rendered later) according to specific settings.

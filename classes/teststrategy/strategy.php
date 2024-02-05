@@ -28,6 +28,7 @@ use cache;
 use local_catquiz\catquiz;
 use local_catquiz\catscale;
 use local_catquiz\local\result;
+use local_catquiz\output\attemptfeedback;
 use local_catquiz\teststrategy\info;
 use local_catquiz\teststrategy\preselect_task;
 use local_catquiz\teststrategy\progress;
@@ -155,6 +156,10 @@ abstract class strategy {
             ->add_playedquestion($selectedquestion)
             ->set_first_question_played() // TODO: can be removed - implied when adding a played question.
             ->save();
+
+        // This should be executed after the progress was saved, because it depends on it.
+        $attemptfeedback = new attemptfeedback($context['attemptid'], $context['contextid']);
+        $attemptfeedback->update_feedbackdata($context);
 
         catscale::update_testitem(
             $context['contextid'],
