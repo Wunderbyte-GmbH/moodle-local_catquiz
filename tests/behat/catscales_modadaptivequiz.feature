@@ -119,8 +119,8 @@ Feature: As a student i want to take adaptive quiz tests with catquiz functinali
     And I should see "Ability score"
     ## And I should see "You performed better than 75.00% of your fellow students"
     ## And I should see "-1.61" in the "[data-original-title=\"parent scale Simulation\"]" "css_element"
-    And I should see "You performed better than 75.00% of your fellow students"
-    And I should see "-1.61"
+    And I should see "You performed better than 100.00% of your fellow students for your strongest scale SimB"
+    And I should see "0.46 (Standarderror: 3.21)"
 
   @javascript
   Scenario: Start adaptive quiz attempt with catquiz model and Infer lowest skill gap purpose
@@ -243,7 +243,7 @@ Feature: As a student i want to take adaptive quiz tests with catquiz functinali
     ## No scale bar?
     ## And I should see "You performed better than 75.00% of your fellow students"
     ##And I should see "-3.86" in the "[data-original-title=\"parent scale Simulation\"]" "css_element"
-    And I should see "-3.86"
+    And I should see "-4.25 (Standarderror: 0.68)"
 
   @javascript
   Scenario: Start adaptive quiz attempt with catquiz model and Radical CAT purpose
