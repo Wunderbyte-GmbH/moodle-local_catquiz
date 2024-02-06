@@ -82,11 +82,11 @@ class graphicalsummary extends feedbackgenerator {
     protected function get_teacherfeedback(array $feedbackdata): array {
         global $OUTPUT;
 
-        if (isset($feedbackdata['testprogresschart'])) {
-            $chart = $this->render_chart($feedbackdata['testprogresschart']);
+        if (isset($feedbackdata['graphicalsummary_data'])) {
+            $chart = $this->render_chart($feedbackdata['graphicalsummary_data']);
         }
-        if (isset($feedbackdata['testresultstable'])) {
-            $table = $this->render_table($feedbackdata['testresultstable']);
+        if (isset($feedbackdata['graphicalsummary_data'])) {
+            $table = $this->render_table($feedbackdata['graphicalsummary_data']);
         }
         if (isset($this->feedbacksettings->primaryscaleid)) {
             $selectedscalearray = $this->feedbacksettings->get_scaleid_and_stringkey(
@@ -167,9 +167,9 @@ class graphicalsummary extends feedbackgenerator {
      */
     public function get_required_context_keys(): array {
         return [
-            'testprogresschart',
-            'testresultstable',
+            'graphicalsummary_data',
             'teststrategyname',
+            'personabilities',
         ];
     }
 
@@ -184,43 +184,44 @@ class graphicalsummary extends feedbackgenerator {
      *
      */
     public function load_data(int $attemptid, array $existingdata, array $newdata): ?array {
-        $cache = cache::make('local_catquiz', 'adaptivequizattempt');
-        if (! $cachedcontexts = $cache->get('context')) {
+        $progress = $newdata['progress'];
+
+        // If we already have all the data, just return them instead of adding
+        // the last response again.
+        if (
+            array_key_exists('graphicalsummary_data', $existingdata)
+            && count($existingdata['graphicalsummary_data']) === count($progress->get_playedquestions())
+        ) {
+            return $existingdata;
+        }
+
+        if (!$lastresponse = $progress->get_last_response(true)) {
             return null;
         }
-        $graphicalsummary = [];
-        foreach ($cachedcontexts as $index => $data) {
-            if ($index === 0) {
-                continue;
-            }
+        $lastquestion = $progress->get_playedquestions()[$lastresponse['qid']];
 
-            $lastresponse = $data['lastresponse'];
-            $lastquestion = $data['lastquestion'];
-            $graphicalsummary[$index - 1]['id'] = $lastquestion->id;
-            $graphicalsummary[$index - 1]['questionname'] = $lastquestion->name;
-            $graphicalsummary[$index - 1]['lastresponse'] = $lastresponse['fraction'];
-            $graphicalsummary[$index - 1]['difficulty'] = $lastquestion->difficulty;
-            $graphicalsummary[$index - 1]['questionscale'] = $lastquestion->catscaleid;
-            $graphicalsummary[$index - 1]['questionscale_name'] = catscale::return_catscale_object(
+        // Append the data from the latest response to the existing graphical summary.
+        $graphicalsummary = $existingdata['graphicalsummary_data'] ?? [];
+        $new = [];
+            $new['id'] = $lastquestion->id;
+            $new['questionname'] = $lastquestion->name;
+            $new['lastresponse'] = $lastresponse['fraction'];
+            $new['difficulty'] = $lastquestion->difficulty;
+            $new['questionscale'] = $lastquestion->catscaleid;
+            $new['questionscale_name'] = catscale::return_catscale_object(
                 $lastquestion->catscaleid
             )->name;
-            $graphicalsummary[$index - 1]['fisherinformation'] = $lastquestion
+            $new['fisherinformation'] = $lastquestion
                 ->fisherinformation[$existingdata['catscaleid']] ?? null;
-            $graphicalsummary[$index - 1]['score'] = $lastquestion->score ?? null;
-            $before = null;
-            $after = null;
-            if (array_key_exists('questions', $cachedcontexts[$index - 1])) {
-                [$before, $after] = $this->getneighborquestions(
-                    $lastquestion,
-                    $cachedcontexts[$index - 1]['questions']
-                );
-            }
-            $graphicalsummary[$index - 1]['difficultynextbefore'] = $before->difficulty ?? null;
-            $graphicalsummary[$index - 1]['difficultynextafter'] = $after->difficulty ?? null;
-            $graphicalsummary[$index - 1]['personability_after'] = $data['person_ability'][$data['catscaleid']];
-            $graphicalsummary[$index - 1]['personability_before'] =
-                $cachedcontexts[$index - 1]['person_ability'][$data['catscaleid']];
-        }
+            $new['score'] = $lastquestion->score ?? null;
+            $new['difficultynextbefore'] = null;
+            $new['difficultynextafter'] = null;
+            $new['personability_after'] = $newdata['person_ability'][$newdata['catscaleid']];
+            $new['personability_before'] =
+                $existingdata['personabilities'][$existingdata['catscaleid']] ?? null;
+
+            $graphicalsummary[] = $new;
+
         $teststrategyname = get_string(
             'teststrategy',
             'local_catquiz',
@@ -228,8 +229,7 @@ class graphicalsummary extends feedbackgenerator {
         ->get_description());
 
         return [
-            'testprogresschart' => $graphicalsummary,
-            'testresultstable' => $graphicalsummary,
+            'graphicalsummary_data' => $graphicalsummary,
             'teststrategyname' => $teststrategyname,
             'personabilities' => $newdata['progress']->get_abilities(),
         ];

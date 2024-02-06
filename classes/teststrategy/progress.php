@@ -580,6 +580,24 @@ class progress implements JsonSerializable {
         return $this;
     }
 
+    /**
+     * Returns the last response, if available.
+     *
+     * Adds the question ID as 'qid' key.
+     *
+     * @return null|array
+     */
+    public function get_last_response(): ?array {
+        if (!$this->responses) {
+            return null;
+        }
+
+        $lastresponse = array_slice($this->responses, -1, 1, true);
+        $responseid = array_keys($lastresponse)[0];
+        $lastresponse[$responseid]['qid'] = $responseid;
+        return $lastresponse[$responseid];
+    }
+
 
     /**
      * Returns the cache key.
