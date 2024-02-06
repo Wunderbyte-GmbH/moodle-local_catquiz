@@ -138,14 +138,15 @@ abstract class strategy {
 
         $result = wb_middleware_runner::run($middlewares, $context);
 
+        $attemptfeedback = new attemptfeedback($context['attemptid'], $context['contextid']);
+        $attemptfeedback->update_feedbackdata($context);
+
         $this->progress = $context['progress'];
 
         $cache = cache::make('local_catquiz', 'adaptivequizattempt');
         if ($result->isErr()) {
             $cache->set('endtime', time());
             $cache->set('catquizerror', $result->get_status());
-            $attemptfeedback = new attemptfeedback($context['attemptid'], $context['contextid']);
-            $attemptfeedback->update_feedbackdata($context);
             return $result;
         }
 
@@ -156,12 +157,7 @@ abstract class strategy {
 
         $this->progress
             ->add_playedquestion($selectedquestion)
-            ->set_first_question_played() // TODO: can be removed - implied when adding a played question.
             ->save();
-
-        // This should be executed after the progress was saved, because it depends on it.
-        $attemptfeedback = new attemptfeedback($context['attemptid'], $context['contextid']);
-        $attemptfeedback->update_feedbackdata($context);
 
         catscale::update_testitem(
             $context['contextid'],
