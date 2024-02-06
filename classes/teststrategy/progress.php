@@ -162,6 +162,9 @@ class progress implements JsonSerializable {
         $data = json_decode($object->json);
         $instance->contextid = $data->contextid;
         $instance->playedquestions = (array) $data->playedquestions;
+        foreach ($instance->playedquestions as $pq) {
+            $pq->fisherinformation = (array) $pq->fisherinformation;
+        }
         $instance->playedquestionsbyscale = (array) $data->playedquestionsbyscale;
         $instance->isfirstquestion = $data->isfirstquestion;
         $instance->lastquestion = $data->lastquestion;
