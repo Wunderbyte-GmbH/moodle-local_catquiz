@@ -114,14 +114,10 @@ class comparetotestaverage extends feedbackgenerator {
      * @param array $feedbackdata
      */
     public function apply_settings_to_feedbackdata(array $feedbackdata) {
-        // In this case, the update is implemented in the generate feedback class.
-        if (!($updateddata = $this->generate_feedback($feedbackdata, (object)$feedbackdata['quizsettings']))) {
-            return $feedbackdata;
-        }
-
-        // Exclude feedbackkeys from feedbackdata.
-        $feedbackdata = $this->feedbacksettings->hide_defined_elements($updateddata, $this->get_generatorname());
-        return $feedbackdata;
+        return $this->feedbacksettings->hide_defined_elements(
+            $feedbackdata,
+            $this->get_generatorname()
+        );
     }
 
     /**
@@ -145,6 +141,7 @@ class comparetotestaverage extends feedbackgenerator {
             'comparisontext',
             'colorbar',
             'colorbarlegend',
+            'quizsettings',
         ];
     }
 
@@ -274,33 +271,16 @@ class comparetotestaverage extends feedbackgenerator {
      *
      */
     public function load_data(int $attemptid, array $existingdata, array $newdata): ?array {
-        $cache = cache::make('local_catquiz', 'adaptivequizattempt');
-        if (! $quizsettings = $cache->get('quizsettings')) {
-            return null;
-        }
+        $progress = $newdata['progress'];
+        $quizsettings = (object) $existingdata['quizsettings'];
+        $personabilities = $progress->get_abilities();
 
-        return $this->generate_feedback($existingdata, $quizsettings);
-    }
-
-
-    /**
-     * Generate feedbacks.
-     *
-     * @param array $initialcontext
-     * @param object $quizsettings
-     *
-     * @return array|null
-     *
-     */
-    private function generate_feedback(array $initialcontext, object $quizsettings): ?array {
-        $personabilities = $initialcontext['personabilities'];
-
-        if (!$personabilities) {
+        if (!$progress->get_abilities()) {
             return [];
         }
 
         $personparams = catquiz::get_person_abilities(
-            $initialcontext['contextid'],
+            $existingdata['contextid'],
             array_keys($personabilities)
         );
 
@@ -334,7 +314,7 @@ class comparetotestaverage extends feedbackgenerator {
                 'quantile' => sprintf('%.2f', $quantile),
                 'scaleinfo' => get_string($selectedscalestringkey, 'local_catquiz', $catscale->name),
             ]);
-        if ($needsimprovementthreshold = $initialcontext['needsimprovementthreshold']) {
+        if ($needsimprovementthreshold = $existingdata['needsimprovementthreshold']) {
             if ($quantile < $needsimprovementthreshold) {
                 $text .= " " . get_string('feedbackneedsimprovement', 'local_catquiz');
             }
@@ -343,8 +323,7 @@ class comparetotestaverage extends feedbackgenerator {
         $testaverage = (new firstquestionselector())->get_median_ability_of_test($personparams);
 
         return [
-            'contextid' => $initialcontext['contextid'],
-            'quizsettings' => $quizsettings,
+            'contextid' => $existingdata['contextid'],
             'needsimprovementthreshold' => $needsimprovementthreshold,
             'testaverageability' => sprintf('%.2f', $testaverage),
             'userability' => sprintf('%.2f', $ability),
