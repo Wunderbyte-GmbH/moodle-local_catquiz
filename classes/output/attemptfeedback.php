@@ -138,6 +138,10 @@ class attemptfeedback implements renderable, templatable {
      * @throws dml_exception
      */
     public function update_feedbackdata(array $newdata = []) {
+        $progress = $newdata['progress'];
+        if (!$progress->has_new_response()) {
+            return;
+        }
         $existingdata = $this->load_feedbackdata();
         $generators = $this->get_feedback_generators();
         $updateddata = $this->load_data_from_generators($generators, $existingdata, $newdata);
