@@ -28,6 +28,7 @@ use cache;
 use Exception;
 use JsonSerializable;
 use local_catquiz\catcontext;
+use local_catquiz\catquiz;
 use local_catquiz\catscale;
 use stdClass;
 
@@ -63,6 +64,11 @@ class progress implements JsonSerializable {
      * @var int $attemptid ID to identify the quiz attempt.
      */
     private int $attemptid;
+
+    /**
+     * @var ?int $usageid Used to find questions answered in the current attempt.
+     */
+    private ?int $usageid;
 
     /**
      * @var array $playedquestions The questions that were already displayed to the user.
@@ -114,6 +120,12 @@ class progress implements JsonSerializable {
     private ?int $forcedbreakend;
 
     /**
+     * Indicates if we have a new response and should update feedbackdata etc.
+     * @var bool
+     */
+    private bool $hasnewresponse;
+
+    /**
      * Returns a new progress instance.
      *
      * If we already have data in the cache or DB, the instance is populated with those data.
@@ -124,12 +136,44 @@ class progress implements JsonSerializable {
      * @return progress
      */
     public static function load(int $attemptid, string $component, int $contextid): self {
-        $attemptcache = cache::make('local_catquiz', 'adaptivequizattempt');
-        $cachekey = self::get_cache_key($attemptid);
-        if ($instance = $attemptcache->get($cachekey)) {
+        $instance = self::load_from_cache($attemptid)
+            ?: self::load_from_db($attemptid)
+            ?: self::create_new($attemptid, $component, $contextid);
+
+        if (!$instance->lastquestion) {
             return $instance;
         }
 
+        $lastresponse = $instance->get_last_response_for_attempt();
+        // If there is no response for the last question that was shown to the
+        // user, do not count that question as part of the attempt and remove it
+        // from the progress. This can happen if a page is reloaded.
+        if (!$lastresponse || $lastresponse->questionid !== $instance->lastquestion->id) {
+            $instance->playedquestions = array_filter(
+                $instance->playedquestions,
+                fn($q) => $q->id != $instance->lastquestion->id
+            );
+            foreach ($instance->playedquestionsbyscale as $scaleid => $qps) {
+                $instance->playedquestionsbyscale[$scaleid] = array_filter(
+                    $qps,
+                    fn($q) => $q->id != $instance->lastquestion->id
+                );
+                if (count($instance->playedquestionsbyscale[$scaleid]) === 0) {
+                    unset($instance->playedquestionsbyscale[$scaleid]);
+                }
+            }
+            $instance->lastquestion = null;
+        }
+        return $instance;
+    }
+
+    private static function load_from_cache($attemptid) {
+        $attemptcache = cache::make('local_catquiz', 'adaptivequizattempt');
+        $cachekey = self::get_cache_key($attemptid);
+        return $attemptcache->get($cachekey);
+    }
+
+    private static function load_from_db($attemptid) {
         global $DB;
         $record = $DB->get_record(
             'local_catquiz_progress',
@@ -140,9 +184,7 @@ class progress implements JsonSerializable {
             $instance = self::populate_from_object($record);
             return $instance;
         }
-
-        // If we are here, this must be a new attempt.
-        return self::create_new($attemptid, $component, $contextid);
+        return false;
     }
 
     /**
@@ -177,6 +219,7 @@ class progress implements JsonSerializable {
         }
         $instance->abilities = (array) $data->abilities;
         $instance->forcedbreakend = intval($data->forcedbreakend) ?: null;
+        $instance->usageid = $data->usageid;
 
         return $instance;
     }
@@ -207,6 +250,8 @@ class progress implements JsonSerializable {
         $instance->responses = [];
         $instance->abilities = [];
         $instance->forcedbreakend = null;
+        $instance->usageid = null;
+        $instance->hasnewresponse = false;
         return $instance;
     }
 
@@ -228,6 +273,7 @@ class progress implements JsonSerializable {
             'responses' => $this->responses,
             'abilities' => $this->abilities,
             'forcedbreakend' => $this->forcedbreakend,
+            'usageid' => $this->usageid,
         ];
     }
 
@@ -556,28 +602,34 @@ class progress implements JsonSerializable {
     }
 
     /**
-     * Update cached responses.
+     * Update responses.
      *
-     * @return mixed
+     * @return self
      */
     public function update_cached_responses() {
-        $lastresponse = catcontext::getresponsedatafromdb(
-            $this->contextid,
-            [$this->lastquestion->catscaleid],
-            $this->lastquestion->id,
-            $this->userid
-        );
-        if (! $lastresponse) {
-            throw new Exception(sprintf(
-                "Could not find the last response. user=%d lastquestion=%d contextid=%d",
-                $this->userid,
-                $this->lastquestion->id,
-                $this->contextid
-            ));
+        // No new response - maybe a page reload. Do not change anything.
+        if (!($lastresponse = $this->get_last_response_for_attempt())) {
+            return $this;
         }
-        $this->responses[$this->lastquestion->id] = $lastresponse[$this->userid]['component'][$this->lastquestion->id];
 
+        // Do not count a response to the same question twice.
+        if (array_key_exists($lastresponse->questionid, $this->responses)) {
+            return $this;
+        }
+
+        $this->responses[$lastresponse->questionid] = (array) $lastresponse;
         return $this;
+    }
+
+    private function get_last_response_for_attempt() {
+        $response = catquiz::get_last_response_for_attempt($this->get_usage_id());
+        if (!$response) {
+            $this->hasnewresponse = false;
+            return $response;
+        }
+
+        $this->hasnewresponse = true;
+        return $response;
     }
 
     /**
@@ -596,6 +648,25 @@ class progress implements JsonSerializable {
         $responseid = array_keys($lastresponse)[0];
         $lastresponse[$responseid]['qid'] = $responseid;
         return $lastresponse[$responseid];
+    }
+
+    public function get_usage_id() {
+        if ($usageid = $this->usageid) {
+            return $usageid;
+        }
+
+        global $DB;
+        $this->usageid = $DB->get_record(
+            'adaptivequiz_attempt',
+            ['id' => $this->attemptid],
+            'uniqueid',
+            MUST_EXIST
+        )->uniqueid;
+        return $this->usageid;
+    }
+
+    public function has_new_response() {
+        return $this->hasnewresponse;
     }
 
 
