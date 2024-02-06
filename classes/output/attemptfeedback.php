@@ -183,7 +183,7 @@ class attemptfeedback implements renderable, templatable {
             'catquizerror' => $cache->get('catquizerror'),
             'studentfeedback' => [],
             'teacherfeedback' => [],
-            'quizsettings' => (array) $cache->get('quizsettings'),
+            'quizsettings' => (array) $this->quizsettings,
             'personabilities' => null,
             'num_pilot_questions' => null,
         ];
