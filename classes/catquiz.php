@@ -1333,7 +1333,7 @@ class catquiz {
             throw new moodle_exception("Can not read test settings");
         }
 
-        $contextid = intval($testsettings->catquiz_catcontext);
+        $contextid = catscale::get_context_id($testsettings->catquiz_catscales);
         $catscaleids = explode(",", $testsettings->catquiz_catscales);
         [$insql, $inparams] = $DB->get_in_or_equal($catscaleids, SQL_PARAMS_NAMED, 'incatscales');
 
