@@ -212,7 +212,7 @@ class customscalefeedback extends feedbackgenerator {
     private function getfeedbackforrange(int $catscaleid, int $groupnumber, array $quizsettings): ?string {
 
         $quizsettingskey = 'feedbackeditor_scaleid_' . $catscaleid . '_' . $groupnumber;
-        return $quizsettings[$quizsettingskey]['text'];
+        return ((array) $quizsettings[$quizsettingskey])['text'];
 
     }
 }
