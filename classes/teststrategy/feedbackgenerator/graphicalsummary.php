@@ -231,7 +231,7 @@ class graphicalsummary extends feedbackgenerator {
             'testprogresschart' => $graphicalsummary,
             'testresultstable' => $graphicalsummary,
             'teststrategyname' => $teststrategyname,
-            'personabilities' => $newdata['personabilities'],
+            'personabilities' => $newdata['progress']->get_abilities(),
         ];
     }
 
