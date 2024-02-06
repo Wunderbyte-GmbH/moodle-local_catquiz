@@ -63,8 +63,8 @@ Feature: As a teacher I want to use shortcodes to display adaptive quiz test res
     And I should see "Ability score"
     And I should see "-0.28 (Standarderror: 2.27)"
     ## Verify feedback in label
-    And I follow "Adaptive Panel"
-    And I should see "Ability score"
+    When I am on "Course 1" course homepage
+    Then I should see "Ability score"
     And I should see "-0.28 (Standarderror: 2.27)"
     And I should see "You performed better than 60.00% of your fellow students for parent scale Simulation."
     And I log out
