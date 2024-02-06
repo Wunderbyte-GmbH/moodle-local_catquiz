@@ -146,14 +146,11 @@ class customscalefeedback extends feedbackgenerator {
      *
      */
     public function load_data(int $attemptid, array $existingdata, array $newdata): ?array {
-        $cache = cache::make('local_catquiz', 'adaptivequizattempt');
-        $quizsettings = ($existingdata['quizsettings'] ?? $cache->get('quizsettings')) ?: null;
-        if ($quizsettings === null) {
-            return null;
-        }
+        $quizsettings = $existingdata['quizsettings'];
+        $progress = $newdata['progress'];
 
-        $personabilities = $existingdata['personabilities'] ?: null;
-        if ($personabilities === null) {
+        $personabilities = $progress->get_abilities();
+        if (!$personabilities) {
             return null;
         }
 
@@ -167,11 +164,11 @@ class customscalefeedback extends feedbackgenerator {
 
         $scalefeedback = [];
         foreach ($personabilitiesfeedbackeditor as $catscaleid => $personability) {
-            for ($j = 1; $j <= $quizsettings->numberoffeedbackoptionsselect; $j++) {
+            for ($j = 1; $j <= $quizsettings['numberoffeedbackoptionsselect']; $j++) {
                 $lowerlimitprop = sprintf('feedback_scaleid_limit_lower_%d_%d', $catscaleid, $j);
-                $lowerlimit = floatval($quizsettings->$lowerlimitprop);
+                $lowerlimit = floatval($quizsettings[$lowerlimitprop]);
                 $upperlimitprop = sprintf('feedback_scaleid_limit_upper_%d_%d', $catscaleid, $j);
-                $upperlimit = floatval($quizsettings->$upperlimitprop);
+                $upperlimit = floatval($quizsettings[$upperlimitprop]);
                 if ($personability < $lowerlimit || $personability > $upperlimit) {
                     continue;
                 }
@@ -209,13 +206,13 @@ class customscalefeedback extends feedbackgenerator {
      *
      * @param int $catscaleid The CAT scale.
      * @param int $groupnumber Identifies the feedback within the scale.
-     * @param object $quizsettings Data from form.
+     * @param array $quizsettings Data from form.
      * @return ?string
      */
-    private function getfeedbackforrange(int $catscaleid, int $groupnumber, object $quizsettings): ?string {
+    private function getfeedbackforrange(int $catscaleid, int $groupnumber, array $quizsettings): ?string {
 
         $quizsettingskey = 'feedbackeditor_scaleid_' . $catscaleid . '_' . $groupnumber;
-        return $quizsettings->$quizsettingskey->text;
+        return $quizsettings[$quizsettingskey]['text'];
 
     }
 }
