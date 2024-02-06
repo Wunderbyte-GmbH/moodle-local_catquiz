@@ -127,7 +127,6 @@ class progress implements JsonSerializable {
         $attemptcache = cache::make('local_catquiz', 'adaptivequizattempt');
         $cachekey = self::get_cache_key($attemptid);
         if ($instance = $attemptcache->get($cachekey)) {
-            $instance->update_cached_responses();
             return $instance;
         }
 
@@ -175,10 +174,6 @@ class progress implements JsonSerializable {
         }
         $instance->abilities = (array) $data->abilities;
         $instance->forcedbreakend = intval($data->forcedbreakend) ?: null;
-
-        // This has to happen now, because now we have the response to the last
-        // question.
-        $instance->update_cached_responses();
 
         return $instance;
     }
@@ -562,7 +557,7 @@ class progress implements JsonSerializable {
      *
      * @return mixed
      */
-    private function update_cached_responses() {
+    public function update_cached_responses() {
         $lastresponse = catcontext::getresponsedatafromdb(
             $this->contextid,
             [$this->lastquestion->catscaleid],

@@ -55,6 +55,7 @@ class progress_loader implements contextloaderinterface {
             'attemptid',
             'component',
             'contextid',
+            'questionsattempted',
         ];
     }
 
@@ -66,6 +67,9 @@ class progress_loader implements contextloaderinterface {
      */
     public function load(array $context): array {
         $progress = progress::load($context['attemptid'], $context['component'], $context['contextid']);
+        if ($context['questionsattempted'] > 0) {
+            $progress->update_cached_responses();
+        }
         $context['progress'] = $progress;
         return $context;
     }
