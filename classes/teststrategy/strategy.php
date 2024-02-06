@@ -144,6 +144,8 @@ abstract class strategy {
         if ($result->isErr()) {
             $cache->set('endtime', time());
             $cache->set('catquizerror', $result->get_status());
+            $attemptfeedback = new attemptfeedback($context['attemptid'], $context['contextid']);
+            $attemptfeedback->update_feedbackdata($context);
             return $result;
         }
 
