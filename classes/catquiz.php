@@ -539,6 +539,30 @@ class catquiz {
     }
 
     /**
+     * Returns the last response for the given questionusageid
+     *
+     * If there is no response or the fraction is NULL, returns false
+     *
+     * @param int $questionusageid
+     * @return stdClass|bool
+     */
+    public static function get_last_response_for_attempt(int $questionusageid) {
+        global $DB;
+        $sql = <<<SQL
+            SELECT *
+            FROM {question_attempt_steps} qs
+            JOIN (SELECT max(id) lastattempt
+                FROM m_question_attempts
+                WHERE questionusageid = :questionusageid
+                GROUP BY questionusageid) s1
+                ON qs.questionattemptid = s1.lastattempt
+            JOIN (SELECT id, questionid FROM m_question_attempts) s2 ON s2.id = s1.lastattempt
+            WHERE fraction IS NOT NULL
+        SQL;
+        return $DB->get_record_sql($sql, ['questionusageid' => $questionusageid]);
+    }
+
+    /**
      * Returns the SQL to retrieve the number of new responses.
      *
      * Returns the number of new responses since $lastcalclation for a CAT
