@@ -214,7 +214,7 @@ Feature: As a teacher I setup adaptive quiz with CATquiz Scales and Feedbacks.
     And I set the field "Upper limit" in the "//div[@data-name='feedback_scale_Simulation_range_1']" "xpath_element" to "-1"
     And the field "Lower limit" in the "//div[@data-name='feedback_scale_Simulation_range_1']" "xpath_element" matches value "-4"
     And the field "Upper limit" in the "//div[@data-name='feedback_scale_Simulation_range_1']" "xpath_element" matches value "-1"
-    ## Update feedback defaults and chek it for root catscale, range 2
+    ## Update feedback defaults and check it for root catscale, range 2
     And I should see "Feedback for range 2" in the "//div[@data-name='feedback_scale_Simulation_range_2']" "xpath_element"
     And I set the field "Feedback" in the "//div[@data-name='feedback_scale_Simulation_range_2']" "xpath_element" to "Feedback-Simulation_range_2"
     And I set the field "Lower limit" in the "//div[@data-name='feedback_scale_Simulation_range_2']" "xpath_element" to "1"
