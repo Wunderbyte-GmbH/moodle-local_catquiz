@@ -513,7 +513,7 @@ class model_item_param_list implements ArrayAccess, IteratorAggregate, Countable
         // See if the item already exists.
         $scalerecord = $DB->get_record("local_catquiz_items", [
             'componentid' => $newrecord['componentid'],
-            'catscaleid' => $newrecord['catscaleid'],
+            'catscaleid' => (string)$newrecord['catscaleid'],
         ]);
 
         // Check if item is in scale otherwise add it.
@@ -586,10 +586,10 @@ class model_item_param_list implements ArrayAccess, IteratorAggregate, Countable
             $parents = explode('|', $newrecord['parentscalenames']);
             // Make sure there are no spaces around.
             $parents = array_map(fn($a) => trim($a), $parents);
-            $noparents = false;
+            $parentsgiven = true;
         } else if (!empty($newrecord['catscalename'])) {
             $parents[] = $newrecord['catscalename'];
-            $noparents = true;
+            $parentsgiven = false;
         }
 
         $catscaleid = 0;
@@ -604,12 +604,17 @@ class model_item_param_list implements ArrayAccess, IteratorAggregate, Countable
             $searcharray = [
                 'name' => $parent,
             ];
-            // Case where no parents are given, we know we want to create new root scale.
-            if (!$noparents) {
+            // Case where no parents are given, we know we want to create new root scale. // Case the scale exists but in a different directory: create i
+            if ($parentsgiven) {
                 $record = $DB->get_record('local_catquiz_catscales', $searcharray);
-                if ($record && $matching && !in_array($record, $records)) {
+                if ($record
+                    && $matching
+                    && !in_array($record, $records)
+                    //&& ($lastparent = end($records) && $record->parentid == $lastparent->id)
+                    ) {
                     $catscaleid = $record->id;
                     $records[] = $record;
+                    $newrecord['catscaleid'] = $catscaleid;
                     continue;
                 } else {
                     $matching = false;
@@ -625,7 +630,7 @@ class model_item_param_list implements ArrayAccess, IteratorAggregate, Countable
             ]);
 
             $catscaleid = dataapi::create_catscale($catscale);
-            if ($parent == $newrecord['catscalename'] || $noparents) {
+            if ($parent == $newrecord['catscalename'] || !$parentsgiven) {
                 $newrecord['catscaleid'] = $catscaleid;
             }
 
