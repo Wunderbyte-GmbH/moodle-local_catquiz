@@ -495,16 +495,20 @@ class model_item_param_list implements ArrayAccess, IteratorAggregate, Countable
                     self::create_scales_for_new_record($newrecord);
 
                 }
-            } else if ($catscale != false && $newrecord['parentscalenames'] == "0") {
+            } else if ($newrecord['parentscalenames'] == "0") {
                 // To enable import to parent scales, set 'parentscalenames' to "0".
-                unset($newrecord['parentscalenames']);
-                self::create_scales_for_new_record($newrecord);
-            } else if ($catscale != false) {
+                self::create_scales_for_new_record($newrecord, false);
+            } else if (!isset($newrecord['parentscalenames']) || $newrecord['parentscalenames'] === "") {
                 $newrecord['error'] = get_string('noparentsgiven', 'local_catquiz', $newrecord);
                 return $newrecord;
             } else {
                 self::create_scales_for_new_record($newrecord);
             }
+        } else {
+            self::create_scales_for_new_record($newrecord);
+        }
+        if (isset($newrecord['error'])) {
+            return $newrecord;
         }
         // See if the item already exists.
         $scalerecord = $DB->get_record("local_catquiz_items", [
@@ -513,7 +517,6 @@ class model_item_param_list implements ArrayAccess, IteratorAggregate, Countable
         ]);
 
         // Check if item is in scale otherwise add it.
-
         if (!$scalerecord) {
             $columnstoinclude = ['componentname', 'componentid', 'catscaleid', 'lastupdated'];
             $recordforquery = $newrecord;
@@ -552,15 +555,30 @@ class model_item_param_list implements ArrayAccess, IteratorAggregate, Countable
     /**
      * This function creates the catscale structure on the fly.
      * @param array $newrecord
+     * @param bool $createparents
      * @return void
      * @throws dml_exception
      * @throws coding_exception
      * @throws ddl_exception
      */
-    private static function create_scales_for_new_record(array &$newrecord) {
+    private static function create_scales_for_new_record(array &$newrecord, bool $createparents = true) {
 
         global $DB;
 
+        // Matching via scaleid is primary. If scale isn't found, write error.
+        if (isset($newrecord['catscaleid']) && !empty($newrecord['catscaleid'])) {
+            $record = $DB->get_record('local_catquiz_catscales', ['id' => $newrecord['catscaleid']]);
+            if (!$record) {
+                $newrecord['error'] = get_string('catscaleidnotmatching', 'local_catquiz', $newrecord);
+                return;
+            } else {
+                return;
+            }
+        }
+
+        if (!$createparents) {
+            unset($newrecord['parentscalenames']);
+        }
         // First check if there are parents.
         $parents = [];
         if (!empty($newrecord['parentscalenames'])) {
