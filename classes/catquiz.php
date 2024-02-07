@@ -524,7 +524,7 @@ class catquiz {
         list (, $from, $where, $params) = self::get_sql_for_stat_base_request($testitemids, [$contextid], $userids);
 
         $sql = "
-        SELECT qas.id, qas.userid, qa.questionid, qas.fraction, qa.minfraction, qa.maxfraction, q.qtype, qas.timecreated
+        SELECT " . $DB->sql_concat("qas.id", "'-'", "qas.userid","'-'", "q.id", "'-'", "lci.id") . " as uniqueid, qas.id, qas.userid, qa.questionid, qas.fraction, qa.minfraction, qa.maxfraction, q.qtype, qas.timecreated
         FROM $from
         JOIN {question} q
             ON qa.questionid = q.id
@@ -1375,7 +1375,7 @@ class catquiz {
         [$insql, $inparams] = $DB->get_in_or_equal($catscaleids, SQL_PARAMS_NAMED, 'incatscales');
 
         return $DB->get_records_sql(
-            "SELECT lcip.*
+            "SELECT lci.id as uniqueid, lcip.*
              FROM {local_catquiz_items} lci
              JOIN {local_catquiz_itemparams} lcip
                 ON lci.componentname = lcip.componentname
