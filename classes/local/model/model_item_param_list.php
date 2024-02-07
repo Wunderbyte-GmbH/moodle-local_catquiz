@@ -604,14 +604,12 @@ class model_item_param_list implements ArrayAccess, IteratorAggregate, Countable
             $searcharray = [
                 'name' => $parent,
             ];
-            // Case where no parents are given, we know we want to create new root scale. // Case the scale exists but in a different directory: create i
+            // Case where no parents are given, we know we want to create new root scale.
             if ($parentsgiven) {
                 $record = $DB->get_record('local_catquiz_catscales', $searcharray);
                 if ($record
                     && $matching
-                    && !in_array($record, $records)
-                    //&& ($lastparent = end($records) && $record->parentid == $lastparent->id)
-                    ) {
+                    && !in_array($record, $records)) {
                     $catscaleid = $record->id;
                     $records[] = $record;
                     $newrecord['catscaleid'] = $catscaleid;
