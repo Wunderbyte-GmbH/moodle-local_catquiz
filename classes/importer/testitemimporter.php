@@ -164,6 +164,7 @@ class testitemimporter {
                 'mandatory' => false,
                 'format' => PARAM_INT,
                 'defaultvalue' => 0,
+                'importinstruction' => get_string('statusactiveorinactive', 'local_catquiz'),
             ],
              [
                 'name' => 'discrimination',
