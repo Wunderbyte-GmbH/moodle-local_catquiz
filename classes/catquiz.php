@@ -524,7 +524,8 @@ class catquiz {
         list (, $from, $where, $params) = self::get_sql_for_stat_base_request($testitemids, [$contextid], $userids);
 
         $sql = "
-        SELECT " . $DB->sql_concat("qas.id", "'-'", "qas.userid","'-'", "q.id", "'-'", "lci.id") . " as uniqueid, qas.id, qas.userid, qa.questionid, qas.fraction, qa.minfraction, qa.maxfraction, q.qtype, qas.timecreated
+        SELECT " . $DB->sql_concat("qas.id", "'-'", "qas.userid", "'-'", "q.id", "'-'", "lci.id") .
+        " as uniqueid, qas.id, qas.userid, qa.questionid, qas.fraction, qa.minfraction, qa.maxfraction, q.qtype, qas.timecreated
         FROM $from
         JOIN {question} q
             ON qa.questionid = q.id
