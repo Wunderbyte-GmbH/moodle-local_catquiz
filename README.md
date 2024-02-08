@@ -21,7 +21,14 @@ The plugin is a central part of the CATQuiz plugin family. It is recommended to 
 * mod_catquizfeedbackgrouping - a text block that gives detailed feedback on a CAT test and optionally assigns users to groups according to this feedback
 * task_catquizparamest - a background task for calculating item parameters of deployed CAT test questions
 
-## Shortcodes
+## Contexts ##
+
+* On import a new context is created and all testitems of concerned parentscale are duplicated. Only those present in the import are updated.
+
+## Attempts ##
+* Attempts are calculated by the time of the context. Switching contexts only affects the number of attempts when the time includes or excludes responses.
+
+## Shortcodes ##
 
 Shortcodes can be added to a course in a Text and Media area.
 
