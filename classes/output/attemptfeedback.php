@@ -254,12 +254,11 @@ class attemptfeedback implements renderable, templatable {
      * Export for template.
      *
      * @param \renderer_base $output
-     * @param boolean $savetodb
      *
      * @return array
      *
      */
-    public function export_for_template(\renderer_base $output, $savetodb = true): array {
+    public function export_for_template(\renderer_base $output): array {
         // 1. Perform attempt-finished tasks.
         $this->attempt_finished_tasks();
 
@@ -270,11 +269,6 @@ class attemptfeedback implements renderable, templatable {
     }
 
     private function attempt_finished_tasks() {
-        $finished = true; // TODO: add a check to see if the attempt is finished or move this somewhere else.
-        if (!$finished) {
-            return;
-        }
-
         global $USER;
         $progress = progress::load($this->attemptid, 'mod_adaptivequiz', $this->contextid);
         catquiz::enrol_user($USER->id, (array) $this->quizsettings, $progress->get_abilities());
