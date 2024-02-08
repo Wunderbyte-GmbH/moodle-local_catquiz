@@ -328,6 +328,10 @@ $string['itemstatus_1'] = "Berechnet"; // LOCAL_CATQUIZ_STATUS_CALCULATED.
 $string['itemstatus_4'] = "Manuell gesetzt"; // LOCAL_CATQUIZ_STATUS_UPDATED_MANUALLY.
 $string['itemstatus_5'] = "Manuell bestätigt"; // LOCAL_CATQUIZ_STATUS_CONFIRMED_MANUALLY.
 
+// Form Validation
+$string['validateform:changevaluesorstatus'] = "Bitte geben Sie Werte ein oder ändern Sie den Status.";
+$string['validateform:onlyoneconfirmedstatusallowed'] = "Dieser Status ist nur für jeweils eine Strategie erlaubt.";
+
 // Student Details.
 $string['studentdetails'] = "Student details";
 $string['enrolled_courses'] = "Eingeschriebene Kurse";
