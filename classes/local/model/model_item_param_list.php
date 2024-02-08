@@ -513,7 +513,7 @@ class model_item_param_list implements ArrayAccess, IteratorAggregate, Countable
         // See if the item already exists.
         $scalerecord = $DB->get_record("local_catquiz_items", [
             'componentid' => $newrecord['componentid'],
-            'catscaleid' => (string)$newrecord['catscaleid'],
+            'catscaleid' => (string) $newrecord['catscaleid'],
         ]);
 
         // Check if item is in scale otherwise add it.
@@ -568,12 +568,11 @@ class model_item_param_list implements ArrayAccess, IteratorAggregate, Countable
         // Matching via scaleid is primary. If scale isn't found, write error.
         if (isset($newrecord['catscaleid']) && !empty($newrecord['catscaleid'])) {
             $record = $DB->get_record('local_catquiz_catscales', ['id' => $newrecord['catscaleid']]);
-            if (!$record) {
-                $newrecord['error'] = get_string('catscaleidnotmatching', 'local_catquiz', $newrecord);
-                return;
-            } else {
+            if ($record) {
                 return;
             }
+            $newrecord['error'] = get_string('catscaleidnotmatching', 'local_catquiz', $newrecord);
+            return;
         }
 
         if (!$createparents) {
