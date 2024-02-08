@@ -531,7 +531,7 @@ class catquiz {
 
         $sql = "
         SELECT " . $DB->sql_concat("qas.id", "'-'", "qas.userid", "'-'", "q.id", "'-'", "lci.id") .
-        " as uniqueid, qas.id, qas.userid, qa.questionid, qas.fraction, qa.minfraction, qa.maxfraction, q.qtype, qas.timecreated
+        " AS uniqueid, qas.id, qas.userid, qa.questionid, qas.fraction, qa.minfraction, qa.maxfraction, q.qtype, qas.timecreated
         FROM $from
         JOIN {question} q
             ON qa.questionid = q.id
