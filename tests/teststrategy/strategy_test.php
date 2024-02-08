@@ -30,6 +30,7 @@ use context_course;
 use context_module;
 use core_question\local\bank\question_edit_contexts;
 use local_catquiz\importer\testitemimporter;
+use mod_adaptivequiz\local\attempt\attempt;
 use mod_adaptivequiz\local\question\question_answer_evaluation;
 use question_bank;
 use question_engine;
@@ -126,6 +127,7 @@ class strategy_test extends advanced_testcase {
         putenv("CATQUIZ_TESTING_STANDARDERROR=$initialse");
         putenv("CATQUIZ_TESTING_SKIP_FEEDBACK=true");
         global $DB, $USER;
+        $hasqubaid = false;
         $this
             ->createtestenvironment($strategy)
             ->save_or_update();
@@ -134,12 +136,11 @@ class strategy_test extends advanced_testcase {
 
         // This is needed so that the responses to the questions are indeed saved to the database.
         $this->preventResetByRollback();
-        $attemptdata = (object)[
-            'instance' => 1,
-            'questionsattempted' => 0,
-            'id' => 1,
-        ];
+        $attempt = attempt::create(1, $USER->id);
+        $attemptid = $attempt->read_attempt_data()->id;
         foreach ($questions as $index => $expectedquestion) {
+            $attempt = attempt::get_by_id($attemptid);
+            $attemptdata = $attempt->read_attempt_data();
             $abilityrecord = $DB->get_record(
                 'local_catquiz_personparams',
                 ['userid' => $USER->id, 'catscaleid' => $this->catscaleid],
@@ -172,7 +173,11 @@ class strategy_test extends advanced_testcase {
             $question = question_bank::load_question($nextquestionid);
             $this->assertEquals($expectedquestion['label'], $question->idnumber);
             $this->createresponse($question, $expectedquestion['is_correct_response']);
-            $attemptdata->questionsattempted++;
+            $attempt->update_after_question_answered(time());
+            if (!$hasqubaid) {
+                $attempt->set_quba_id($this->quba->get_id());
+                $hasqubaid = true;
+            }
         }
     }
 
