@@ -25,6 +25,9 @@
 namespace local_catquiz\teststrategy;
 
 use cache;
+use coding_exception;
+use Exception;
+use dml_exception;
 use local_catquiz\catquiz;
 use local_catquiz\catscale;
 use local_catquiz\local\result;
@@ -138,8 +141,7 @@ abstract class strategy {
 
         $result = wb_middleware_runner::run($middlewares, $context);
 
-        $attemptfeedback = new attemptfeedback($context['attemptid'], $context['contextid']);
-        $attemptfeedback->update_feedbackdata($context);
+        $this->update_attempdfeedback($context);
 
         $this->progress = $context['progress'];
 
@@ -166,6 +168,23 @@ abstract class strategy {
             $context['includesubscales']
         );
         return result::ok($selectedquestion);
+    }
+
+    /**
+     * Helper method to update attempt feedback data
+     *
+     * @param mixed $context
+     * @return void
+     * @throws coding_exception
+     * @throws Exception
+     * @throws dml_exception
+     */
+    private function update_attempdfeedback($context) {
+        if (getenv('CATQUIZ_TESTING_SKIP_FEEDBACK')) {
+            return;
+        }
+        $attemptfeedback = new attemptfeedback($context['attemptid'], $context['contextid']);
+        $attemptfeedback->update_feedbackdata($context);
     }
 
     /**
