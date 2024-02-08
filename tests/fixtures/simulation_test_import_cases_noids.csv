@@ -1,0 +1,6 @@
+componentid;status;qtype;model;difficulty;discrimination;guessing;label;catscalename;parentscalenames;componentname;catscaleid
+0;0;Multiple-Choice;raschbirnbaumb;2;2;2;SIMA01-02;SimA07;Simulation|SimA;question;
+0;0;Multiple-Choice;raschbirnbaumb;2;2;2;SIMA01-03;SimA07;Simulation|SimNEU;question;
+0;0;Multiple-Choice;raschbirnbaumb;2;2;2;SIMA01-04;neueRoot;0;question;
+0;0;Multiple-Choice;raschbirnbaumb;2;2;2;SIMA01-05;errorRoot;;question;
+0;0;Multiple-Choice;raschbirnbaumb;2;2;2;;SimA;;question;

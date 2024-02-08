@@ -1,5 +1,5 @@
 @local @local_catquiz @javascript
-Feature: As an admin I perform import of catquiz alonf with questions to check Scales and Feedbacks.
+Feature: As an admin I perform import of catscales along with questions to check Scales and Feedbacks.
 
   Background:
     Given the following "users" exist:
