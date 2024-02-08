@@ -552,11 +552,11 @@ class catquiz {
             SELECT *
             FROM {question_attempt_steps} qs
             JOIN (SELECT max(id) lastattempt
-                FROM m_question_attempts
+                FROM {question_attempts}
                 WHERE questionusageid = :questionusageid
                 GROUP BY questionusageid) s1
                 ON qs.questionattemptid = s1.lastattempt
-            JOIN (SELECT id, questionid FROM m_question_attempts) s2 ON s2.id = s1.lastattempt
+            JOIN (SELECT id, questionid FROM {question_attempts}) s2 ON s2.id = s1.lastattempt
             WHERE fraction IS NOT NULL
         SQL;
         return $DB->get_record_sql($sql, ['questionusageid' => $questionusageid]);
