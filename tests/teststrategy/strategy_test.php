@@ -124,6 +124,7 @@ class strategy_test extends advanced_testcase {
         putenv('USE_TESTING_CLASS_FOR=local_catquiz\teststrategy\preselect_task\updatepersonability');
         putenv("CATQUIZ_TESTING_ABILITY=$initialability");
         putenv("CATQUIZ_TESTING_STANDARDERROR=$initialse");
+        putenv("CATQUIZ_TESTING_SKIP_FEEDBACK=true");
         global $DB, $USER;
         $this
             ->createtestenvironment($strategy)
