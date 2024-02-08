@@ -23,6 +23,7 @@
  */
 
 use local_catquiz\catquiz;
+use local_catquiz\catscale;
 use local_catquiz\output\catscalemanager\managecatscaledashboard;
 
 require_once('../../config.php');
@@ -36,6 +37,9 @@ $usesubs = optional_param('usesubs', 1, PARAM_INT);
 $testitemid = optional_param('id', 0, PARAM_INT);
 $componentname = optional_param('component', 'question', PARAM_TEXT);
 
+if ($catscale != -1 && empty($catcontextid)) {
+    $catcontextid = catscale::return_default_contextid_of_catscale($catscale);
+}
 if (empty($catcontextid)) {
     $catcontextid = catquiz::get_default_context_id();
 }
