@@ -1,4 +1,4 @@
-@local @local_catquiz @javascript
+@local @local_catquiz @local_catquiz_quiz_attempt @javascript
 Feature: As a student i want to take adaptive quiz tests with catquiz functinality.
 
   Background:
@@ -77,9 +77,8 @@ Feature: As a student i want to take adaptive quiz tests with catquiz functinali
     And I wait until the page is ready
     And I should see "Ability score"
     ## And I should see "-1.28" in the "[data-original-title=\"parent scale Simulation\"]" "css_element"
-    ## And I should see "You performed better than 75.00% of your fellow students"
-    And I should see "You performed better than 16.67% of your fellow students"
-    And I should see "-3.05 (Standarderror: 0.36)"
+    And I should see "You performed better than 50.00% of your fellow students"
+    And I should see "-2.56 (Standarderror: 0.36)"
 
   @javascript
   Scenario: Start adaptive quiz attempt with catquiz model and Infer greatest strength purpose
@@ -159,9 +158,9 @@ Feature: As a student i want to take adaptive quiz tests with catquiz functinali
     And I wait until the page is ready
     And I should see "Ability score"
     ## No scale bar?
-    ## And I should see "You performed better than 75.00% of your fellow students"
+    And I should see "You performed better than 33.33% of your fellow students"
     ##And I should see "-2.18" in the "[data-original-title=\"parent scale Simulation\"]" "css_element"
-    And I should see "-4.47 (Standarderror: 0.37)"
+    And I should see "-4.47 (Standarderror: 0.25)"
 
   @javascript
   Scenario: Start adaptive quiz attempt with catquiz model and Classical test purpose
@@ -202,7 +201,7 @@ Feature: As a student i want to take adaptive quiz tests with catquiz functinali
     ## And I should see "You performed better than 75.00% of your fellow students"
     ## And I should see "-4.07" in the "[data-original-title=\"parent scale Simulation\"]" "css_element"
     And I should see "You performed better than 25.00% of your fellow students"
-    And I should see "-4.25 (Standarderror: 0.68)"
+    And I should see "-3.86 (Standarderror: 0.68)"
 
   @javascript
   Scenario: Start adaptive quiz attempt with catquiz model and Moderate CAT purpose
@@ -243,7 +242,7 @@ Feature: As a student i want to take adaptive quiz tests with catquiz functinali
     ## No scale bar?
     ## And I should see "You performed better than 75.00% of your fellow students"
     ##And I should see "-3.86" in the "[data-original-title=\"parent scale Simulation\"]" "css_element"
-    And I should see "-4.25 (Standarderror: 0.68)"
+    And I should see "-3.86 (Standarderror: 0.68)"
 
   @javascript
   Scenario: Start adaptive quiz attempt with catquiz model and Radical CAT purpose
@@ -283,5 +282,5 @@ Feature: As a student i want to take adaptive quiz tests with catquiz functinali
     And I should see "Ability score"
     ## And I should see "You performed better than 75.00% of your fellow students"
     ## And I should see "-1.28" in the "[data-original-title=\"parent scale Simulation\"]" "css_element"
-    And I should see "You performed better than 16.67% of your fellow students"
-    And I should see "-3.05 (Standarderror: 0.36)"
+    And I should see "You performed better than 50.00% of your fellow students"
+    And I should see "-2.56 (Standarderror: 0.36)"
