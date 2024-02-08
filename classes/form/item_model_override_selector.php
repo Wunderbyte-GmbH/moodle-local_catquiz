@@ -87,6 +87,7 @@ class item_model_override_selector extends dynamic_form {
         ];
 
         foreach (array_keys($models) as $model) {
+            $paramnames = $models[$model]::get_parameter_names();
             $group = [];
             $id = sprintf('override_%s', $model);
             if (!empty($data->editing)) {
@@ -96,9 +97,9 @@ class item_model_override_selector extends dynamic_form {
             }
 
             $group[] = $select;
-            $this->add_element_to_group('difficulty', $id, $group, $mform, $data->editing ?? false);
-            $this->add_element_to_group('discrimination', $id, $group, $mform, $data->editing ?? false);
-            $this->add_element_to_group('guessing', $id, $group, $mform, $data->editing ?? false);
+            foreach($paramnames as $paramname) {
+                $this->add_element_to_group($paramname, $id, $group, $mform, $data->editing ?? false);
+            }
             $mform->addGroup($group, $id, get_string('pluginname', sprintf('catmodel_%s', $model)),
             );
         }
@@ -134,14 +135,14 @@ class item_model_override_selector extends dynamic_form {
 
         $type = ($editing) ? 'text' : 'static';
 
-        $label = $mform->createElement('static', sprintf('%s_%slabel', $id, $name), 'mylabel', 'static text');
-        $value = $mform->createElement($type, sprintf('%s_%s', $id, $name), 'mylabel', 'static text');
+        $label = $mform->createElement('static', sprintf('%s_%slabel', $id, $name), 'mylabel', '');
+        $value = $mform->createElement($type, sprintf('%s_%s', $id, $name), 'mylabel', '');
+
         if ($editing) {
             $value->setType(sprintf('%s_%s', $id, $name), PARAM_FLOAT);
         };
         $group[] = $label;
         $group[] = $value;
-
     }
 
     /**
@@ -158,7 +159,7 @@ class item_model_override_selector extends dynamic_form {
      *
      * This method can return scalar values or arrays that can be json-encoded, they will be passed to the caller JS.
      *
-     * Submission data can be accessed as: $this->get_data()
+     * Here we get the values set in the form.
      *
      * @return object
      */
@@ -177,14 +178,17 @@ class item_model_override_selector extends dynamic_form {
         $formitemparams = [];
         $models = model_strategy::get_installed_models();
         foreach (array_keys($models) as $model) {
+            $modelparams = $models[$model]::get_parameter_names();
             $fieldname = sprintf('override_%s', $model);
             $obj = new stdClass;
-            $obj->status = $data->{$fieldname[sprintf('%s_select', $fieldname)]};
-            $obj->difficulty = $data->{$fieldname[sprintf('%s_difficulty', $fieldname)]};
-            $obj->discrimination = $data->{$fieldname[sprintf('%s_discrimination', $fieldname)]};
-            $obj->guessing = $data->{$fieldname[sprintf('%s_guessing', $fieldname)]};
+            $statusstring = sprintf('%s_select', $fieldname);
+            $obj->status = $data->$fieldname[$statusstring];
+            foreach(array_values($modelparams) as $modelparam) {
+                $this->generate_model_fields($modelparam, $fieldname, $obj, $data);
+            }
             $formitemparams[$model] = $obj;
         }
+        $allformitems = $formitemparams;
         // Fetch record from db.
         $saveditemparams = $this->get_item_params(
             $data->testitemid,
@@ -194,7 +198,6 @@ class item_model_override_selector extends dynamic_form {
         $toupdate = [];
         $toinsert = [];
         foreach (array_keys($models) as $model) {
-
             // Check if model already exists in db.
             if (isset($saveditemparams[$model])) {
                 // Check for each model if there is a change.
@@ -215,7 +218,8 @@ class item_model_override_selector extends dynamic_form {
             if (!isset($formitemparams[$model])) {
                 continue;
             }
-            // If status is unchanged, change must be within values, so we set the new status to manually updated.
+            // If status is unchanged (and therefore deleted from the array)...
+            // ...change must be within values, so we set the new status to manually updated.
             if (!isset($formitemparams[$model]->status)) {
                 $formitemparams[$model]->status = LOCAL_CATQUIZ_STATUS_UPDATED_MANUALLY;
             }
@@ -229,37 +233,53 @@ class item_model_override_selector extends dynamic_form {
                 $this->update_item('discrimination', $update, $formitemparams, $model);
                 $this->update_item('guessing', $update, $formitemparams, $model);
                 $toupdate[] = $update;
+                $status = $formitemparams[$model]->status;
             } else {
+                foreach($formitemparams[$model] as $key => $value) {
+                    // If all param fields are empty, no insert into db except for status manually excluded.
+                    if ($value === ""
+                        || ($key == "status" && $value != LOCAL_CATQUIZ_STATUS_EXCLUDED_MANUALLY)) {
+                        $empty = true;
+                    } else {
+                        $empty = false;
+                    }
+                }
+                if ($empty) {
+                    continue;
+                }
+                $status = ($formitemparams[$model]->status == LOCAL_CATQUIZ_STATUS_NOT_CALCULATED)
+                    ? LOCAL_CATQUIZ_STATUS_CONFIRMED_MANUALLY : $formitemparams[$model]->status;
                 // If it's new, we prepare the insert.
                 $toinsert[] = [
-                    'status' => $formitemparams[$model]->status,
+                    'status' => $status,
                     'model' => $model,
-                    'difficulty' => $formitemparams[$model]->difficulty,
-                    'discrimination' => $formitemparams[$model]->discrimination,
-                    'guessing' => $formitemparams[$model]->guessing,
+                    'difficulty' => $formitemparams[$model]->difficulty ?? "",
+                    'discrimination' => $formitemparams[$model]->discrimination ?? "",
+                    'guessing' => $formitemparams[$model]->guessing ?? "",
                 ];
             }
 
             // There can only be one model with this status, so we have to make
             // sure all other models that have this status are set back to 0.
-            if (intval($formitemparams[$model]->status) === LOCAL_CATQUIZ_STATUS_CONFIRMED_MANUALLY) {
+            if (intval($status) === LOCAL_CATQUIZ_STATUS_CONFIRMED_MANUALLY) {
                 foreach (array_keys($models) as $m) {
                     if ($m === $model) {
                         // Do not check our current model.
                         continue;
                     }
-                    if (intval($formitemparams[$m]->status) !== LOCAL_CATQUIZ_STATUS_CONFIRMED_MANUALLY) {
+                    if (intval($allformitems[$m]->status) !== LOCAL_CATQUIZ_STATUS_CONFIRMED_MANUALLY) {
                         // Ignore models with other status.
                         continue;
                     }
                     // Reset back to 0.
                     $defaultstatus = strval(LOCAL_CATQUIZ_STATUS_NOT_CALCULATED);
-                    $formitemparams[$m]->status = $defaultstatus;
+                    $allformitems[$m]->status = $defaultstatus;
                     $fieldname = sprintf('override_%s', $m);
-                    $data->{$fieldname[sprintf('%s_select', $fieldname)]} = $defaultstatus;
+                    $string = sprintf('%s_select', $fieldname);
+                    $data->$fieldname[$string] = $defaultstatus;
                     $this->set_data($data);
                     $toupdate[] = [
-                        'status' => $formitemparams[$m]->status,
+                        'status' => $allformitems[$m]->status,
                         'id' => $saveditemparams[$m]->id,
                         'timemodified' => time(),
                     ];
@@ -290,10 +310,6 @@ class item_model_override_selector extends dynamic_form {
             $new['componentname'] = $data->componentname ?: self::DEFAULT_COMPONENT_NAME;
             $new['timecreated'] = time();
             $new['timemodified'] = time();
-            $new['status'] = !empty($new['discrimination']) &&
-                            !empty($new['difficulty']) &&
-                            !empty($new['guessing']) ?
-                            LOCAL_CATQUIZ_STATUS_UPDATED_MANUALLY : $new['status'];
             $DB->insert_record(
                 'local_catquiz_itemparams',
                 (object) $new
@@ -312,6 +328,19 @@ class item_model_override_selector extends dynamic_form {
         }
 
         return $data;
+    }
+    /**
+     * Create fields corresponding to model.
+     *
+     * @param string $paramname
+     * @param string $fieldname
+     * @param stdClass $obj
+     * @param stdClass $data
+     * @return void
+     */
+    private function generate_model_fields(string $paramname, string $fieldname, stdClass &$obj, stdClass $data) {
+        $param = sprintf('%s_'.$paramname, $fieldname);
+        $obj->$paramname = $data->$fieldname[$param];
     }
     /**
      * Copy changed values = existing params.
@@ -357,49 +386,78 @@ class item_model_override_selector extends dynamic_form {
         if (empty($data->testitemid)) {
             $data->testitemid = required_param('id', PARAM_INT);
         }
-
+        // Get data from db.
+        $itemparamsbymodel = $this->get_item_params($data->testitemid, $data->contextid);
         foreach (array_keys($models) as $model) {
             $field = sprintf('override_%s', $model);
-            $itemparamsbymodel = $this->get_item_params($data->testitemid, $data->contextid);
+            $specificmodelparams = $models[$model]::get_parameter_names();
+            $values = [];
             if (array_key_exists($model, $itemparamsbymodel)) {
                 $modelparams = $itemparamsbymodel[$model];
                 $modelstatus = $modelparams->status;
-                $modeldifficulty = $modelparams->difficulty;
-                $modelguessing = $modelparams->guessing;
-                $modeldiscrimination = $modelparams->discrimination;
+                foreach($specificmodelparams as $givenparam) {
+                    if (isset ($modelparams->$givenparam)) {
+                        $values[$givenparam] = $modelparams->$givenparam;
+                    }
+                }
                 if (empty($data->componentname)) {
                     $data->componentname = $modelparams->componentname;
                 }
             } else { // Set default data if there are no calculated data for the given model.
                 $modelstatus = LOCAL_CATQUIZ_STATUS_NOT_CALCULATED;
                 // Initial load.
-                $modeldifficulty = null;
-                $modelguessing = null;
-                $modeldiscrimination = null;
+                foreach($specificmodelparams as $givenparam) {
+                        $values[$givenparam] = null;
+                }
             }
-            $status = $modelstatus;
+            // We make a difference between the status as int and status as localized string.
+            $statusint = $modelstatus;
+            $dataarray = [];
             // In editing mode we want to display a string for status.
             if (empty($data->editing)) {
-                $status = empty($modelparams->status) ? $modelstatus : $modelparams->status;
+                if (isset($modelparams->model)
+                    && $modelparams->model == $model
+                    && isset($modelparams->status)) {
+                    $status = $modelparams->status;
+                } else {
+                    $status = $statusint;
+                }
+                // For editing mode, status needs to be the int, not the string.
                 $string = sprintf('itemstatus_%s', $status);
                 $modelstatus = get_string($string, 'local_catquiz');
+                $dataarray = [
+                    sprintf('%s_select', $field) => $modelstatus,
+                    sprintf('%s_status', $field) => $modelstatus,
+                ];
+            } else {
+                // In display mode we need the integer value for the select.
+                if (is_numeric($modelstatus)) {
+                    $string = sprintf('itemstatus_%s', $statusint);
+                    $modelstatus = get_string($string, 'local_catquiz');
+                }
+                $dataarray = [
+                    sprintf('%s_select', $field) => $statusint,
+                    sprintf('%s_status', $field) => $modelstatus,
+                ];
             }
-            $difficultytext =
-                get_string('itemdifficulty', 'local_catquiz') . ":";
-            $guessingtext =
-                get_string('guessing', 'local_catquiz') . ":";
-            $discriminationtext =
-                get_string('discrimination', 'local_catquiz') . ":";
-            $data->$field = [
-                sprintf('%s_select', $field) => $modelstatus,
-                sprintf('%s_status', $field) => $status,
-                sprintf('%s_difficultylabel', $field) => $difficultytext,
-                sprintf('%s_difficulty', $field) => $modeldifficulty,
-                sprintf('%s_guessinglabel', $field) => $guessingtext,
-                sprintf('%s_guessing', $field) => $modelguessing,
-                sprintf('%s_discriminationlabel', $field) => $discriminationtext,
-                sprintf('%s_discrimination', $field) => $modeldiscrimination,
-            ];
+
+            foreach ($values as $name => $value) {
+                if ($name === 'difficulty') {
+                    $dataarray[sprintf('%s_difficultylabel', $field)] = get_string('itemdifficulty', 'local_catquiz') . ":";
+                    $dataarray[sprintf('%s_difficulty', $field)] = $value;
+                    continue;
+                } else if ($name === 'guessing') {
+                    $dataarray[sprintf('%s_guessinglabel', $field)] = get_string('guessing', 'local_catquiz') . ":";
+                    $dataarray[sprintf('%s_guessing', $field)] = $value;
+                    continue;
+                } else if ($name === 'discrimination') {
+                    $dataarray[sprintf('%s_discriminationlabel', $field)] = get_string('discrimination', 'local_catquiz') . ":";
+                    $dataarray[sprintf('%s_discrimination', $field)] = $value;
+                    continue;
+                }
+            }
+
+            $data->$field = $dataarray;
         }
         $this->set_data($data);
     }
@@ -443,6 +501,41 @@ class item_model_override_selector extends dynamic_form {
     public function validation($data, $files): array {
         $errors = [];
 
+        $models = model_strategy::get_installed_models();
+        $counter = [];
+        foreach ($models as $modelname => $location) {
+            $modelparams = $location::get_parameter_names();
+            $field = sprintf('override_%s', $modelname);
+            $selectkey = sprintf('%s_select', $field);
+
+            // Values can not be empty with certain status.
+            if ($data[$field][$selectkey] == LOCAL_CATQUIZ_STATUS_CALCULATED
+                || $data[$field][$selectkey] == LOCAL_CATQUIZ_STATUS_UPDATED_MANUALLY
+                || $data[$field][$selectkey] == LOCAL_CATQUIZ_STATUS_CONFIRMED_MANUALLY) {
+
+                $empty = true;
+                foreach ($data[$field] as $key => $value) {
+                    foreach (array_values($modelparams) as $param) {
+                        if (strpos($key, $param) == false || $value == "") {
+                            continue;
+                        }
+                        $empty = false;
+                    }
+                }
+                if ($empty) {
+                    $errors[$field] = get_string("validateform:changevaluesorstatus", 'local_catquiz');
+                }
+            }
+            // There can only be 1 status confirmed manually.
+            if ($data[$field][$selectkey] == LOCAL_CATQUIZ_STATUS_CONFIRMED_MANUALLY) {
+                $counter[$field] = $selectkey;
+            }
+        }
+        if (count($counter) > 1) {
+            foreach($counter as $field => $selectkey) {
+                $errors[$field] = get_string("validateform:onlyoneconfirmedstatusallowed", 'local_catquiz');
+            }
+        }
         return $errors;
     }
 
