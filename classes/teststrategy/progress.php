@@ -140,30 +140,38 @@ class progress implements JsonSerializable {
             ?: self::load_from_db($attemptid)
             ?: self::create_new($attemptid, $component, $contextid);
 
+        $instance->hasnewresponse = false;
+
         if (!$instance->lastquestion) {
             return $instance;
         }
 
         $lastresponse = $instance->get_last_response_for_attempt();
+
+        // This is the expected default behaviour: the user answered the last
+        // question and now we'll return the next one.
+        if ($lastresponse && $lastresponse->questionid === $instance->lastquestion->id) {
+            $instance->hasnewresponse = true;
+            return $instance;
+        }
+
         // If there is no response for the last question that was shown to the
         // user, do not count that question as part of the attempt and remove it
         // from the progress. This can happen if a page is reloaded.
-        if (!$lastresponse || $lastresponse->questionid !== $instance->lastquestion->id) {
-            $instance->playedquestions = array_filter(
-                $instance->playedquestions,
+        $instance->playedquestions = array_filter(
+            $instance->playedquestions,
+            fn($q) => $q->id != $instance->lastquestion->id
+        );
+        foreach ($instance->playedquestionsbyscale as $scaleid => $qps) {
+            $instance->playedquestionsbyscale[$scaleid] = array_filter(
+                $qps,
                 fn($q) => $q->id != $instance->lastquestion->id
             );
-            foreach ($instance->playedquestionsbyscale as $scaleid => $qps) {
-                $instance->playedquestionsbyscale[$scaleid] = array_filter(
-                    $qps,
-                    fn($q) => $q->id != $instance->lastquestion->id
-                );
-                if (count($instance->playedquestionsbyscale[$scaleid]) === 0) {
-                    unset($instance->playedquestionsbyscale[$scaleid]);
-                }
+            if (count($instance->playedquestionsbyscale[$scaleid]) === 0) {
+                unset($instance->playedquestionsbyscale[$scaleid]);
             }
-            $instance->lastquestion = null;
         }
+
         return $instance;
     }
 
@@ -623,12 +631,6 @@ class progress implements JsonSerializable {
 
     private function get_last_response_for_attempt() {
         $response = catquiz::get_last_response_for_attempt($this->get_usage_id());
-        if (!$response) {
-            $this->hasnewresponse = false;
-            return $response;
-        }
-
-        $this->hasnewresponse = true;
         return $response;
     }
 
