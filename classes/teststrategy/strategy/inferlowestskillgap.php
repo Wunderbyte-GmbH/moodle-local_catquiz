@@ -33,6 +33,7 @@ use local_catquiz\teststrategy\feedbackgenerator\questionssummary;
 use local_catquiz\teststrategy\feedbacksettings;
 use local_catquiz\teststrategy\preselect_task\addscalestandarderror;
 use local_catquiz\teststrategy\preselect_task\checkitemparams;
+use local_catquiz\teststrategy\preselect_task\checkpagereload;
 use local_catquiz\teststrategy\preselect_task\filterbystandarderror;
 use local_catquiz\teststrategy\preselect_task\firstquestionselector;
 use local_catquiz\teststrategy\preselect_task\fisherinformation;
@@ -77,6 +78,7 @@ class inferlowestskillgap extends strategy {
     public function get_preselecttasks(): array {
         return [
             checkitemparams::class,
+            checkpagereload::class,
             updatepersonability::class,
             addscalestandarderror::class,
             maximumquestionscheck::class, // Cancel quiz attempt if we reached maximum of questions.
