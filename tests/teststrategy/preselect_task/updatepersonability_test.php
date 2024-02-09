@@ -103,7 +103,7 @@ class updatepersonability_test extends TestCase {
                 ],
                 'progress_fake_methods' => [
                     'is_first_question' => true,
-                ]
+                ],
             ],
             'is_pilot_question' => [
                 'expected' => 'pilotquestion',
@@ -115,7 +115,7 @@ class updatepersonability_test extends TestCase {
                     // Can be null here, because for pilot questions the ability will not be updated.
                     'fake_response_data' => [$USER->id => []],
                 ],
-                'progress_fake_methods' => []
+                'progress_fake_methods' => [],
             ],
             'has_enough_responses' => [
                 'expected' => 'not_skipped',
@@ -145,7 +145,7 @@ class updatepersonability_test extends TestCase {
                     'questionsattempted' => 0,
                     'minimumquestions' => 10,
                 ],
-                'progress_fake_methods' => []
+                'progress_fake_methods' => [],
             ],
         ];
     }
