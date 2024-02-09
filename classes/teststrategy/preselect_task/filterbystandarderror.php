@@ -60,16 +60,19 @@ class filterbystandarderror extends preselect_task implements wb_middleware {
      */
     public function run(array &$context, callable $next): result {
         $this->progress = $context['progress'];
-        $cache = cache::make('local_catquiz', 'adaptivequizattempt');
 
-        $lastquestion = $this->progress->get_last_question();
-        if (!$lastquestion) {
+        if ($this->progress->is_first_question()) {
             // If this is the first question and the cache is not yet set, set the
             // root scale active.
             $this->progress->set_active_scales([$this->context['catscaleid']]);
             return $this->next();
         }
 
+        if (!$this->progress->has_new_response()) {
+            return $this->next();
+        }
+
+        $lastquestion = $this->progress->get_last_question();
         $scaleid = $lastquestion->catscaleid;
         $updatedscales = [$scaleid, ...catscale::get_ancestors($scaleid)];
         foreach ($updatedscales as $scaleid) {

@@ -119,11 +119,12 @@ class updatepersonability extends preselect_task implements wb_middleware {
         $this->initialse = $this->get_initial_standarderror();
         $this->parentability = $this->initialability;
         $this->parentse = $this->initialse;
+
         // If we do not know the answer to the last question, we do not have to
         // update the person ability. Also, pilot questions should not be used
         // to update a student's ability.
         if ($this->progress->is_first_question()
-            || $this->progress->get_last_question() === null) {
+            || !$this->progress->has_new_response()) {
             $context['skip_reason'] = 'lastquestionnull';
             return $next($context);
 
