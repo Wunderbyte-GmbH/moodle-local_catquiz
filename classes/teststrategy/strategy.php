@@ -140,10 +140,9 @@ abstract class strategy {
         }
 
         $result = wb_middleware_runner::run($middlewares, $context);
+        $this->progress = $context['progress'];
 
         $this->update_attempdfeedback($context);
-
-        $this->progress = $context['progress'];
 
         $cache = cache::make('local_catquiz', 'adaptivequizattempt');
         if ($result->isErr()) {
@@ -183,6 +182,14 @@ abstract class strategy {
         if (getenv('CATQUIZ_TESTING_SKIP_FEEDBACK')) {
             return;
         }
+
+        // Do not update feedback data if the page was reloaded.
+        if (!$this->progress->is_first_question()
+            && !$this->progress->has_new_response()
+        ) {
+            return;
+        }
+
         $attemptfeedback = new attemptfeedback($context['attemptid'], $context['contextid']);
         $attemptfeedback->update_feedbackdata($context);
     }
