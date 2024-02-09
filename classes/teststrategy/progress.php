@@ -32,6 +32,10 @@ use local_catquiz\catquiz;
 use local_catquiz\catscale;
 use stdClass;
 
+defined('MOODLE_INTERNAL') || die();
+require_once(__DIR__ . '/../../../../config.php');
+require_login();
+
 /**
  * Stores the progress of a catquiz attempt that is not yet finished.
  *
@@ -124,6 +128,27 @@ class progress implements JsonSerializable {
      * @var bool
      */
     private bool $hasnewresponse;
+
+    /**
+     * Holds the session key of the session when the quiz was started
+     *
+     * @var string
+     */
+    private string $session;
+
+    /**
+     * Shows if a new question should be displayed even after a page reload.
+     *
+     * @var bool
+     */
+    private bool $forcenewquestion;
+
+    /**
+     * Holds a list of questions that should not be returned.
+     *
+     * @var array
+     */
+    private array $excludedquestions;
 
     /**
      * Returns a new progress instance.
@@ -228,6 +253,8 @@ class progress implements JsonSerializable {
         $instance->abilities = (array) $data->abilities;
         $instance->forcedbreakend = intval($data->forcedbreakend) ?: null;
         $instance->usageid = $data->usageid;
+        $instance->session = $data->session;
+        $instance->excludedquestions = $data->excludedquestions;
 
         return $instance;
     }
@@ -260,6 +287,8 @@ class progress implements JsonSerializable {
         $instance->forcedbreakend = null;
         $instance->usageid = null;
         $instance->hasnewresponse = false;
+        $instance->session = sesskey();
+        $instance->excludedquestions = [];
         return $instance;
     }
 
@@ -282,6 +311,8 @@ class progress implements JsonSerializable {
             'abilities' => $this->abilities,
             'forcedbreakend' => $this->forcedbreakend,
             'usageid' => $this->usageid,
+            'session' => $this->session,
+            'excludedquestions' => $this->excludedquestions,
         ];
     }
 
@@ -671,6 +702,55 @@ class progress implements JsonSerializable {
         return $this->hasnewresponse;
     }
 
+    /**
+     * Shows if the current session matches the one used to start the quiz
+     *
+     * @return bool
+     */
+    public function check_session() {
+        $currentsess = sesskey();
+        return $this->session === $currentsess;
+    }
+
+    /**
+     * Sets forcenewquestion to true
+     *
+     * @return self
+     */
+    public function force_new_question() {
+        $this->forcenewquestion = true;
+        $this->lastquestion = null; // TODO: Check what else needs to be changed!
+        return $this;
+    }
+
+    /**
+     * Show if a new question should be used
+     *
+     * @return bool
+     */
+    public function get_force_new_question() {
+        return $this->forcenewquestion;
+    }
+
+    /**
+     * Updates the list of question IDs that should be ignored.
+     *
+     * @param int $qid The ID of the question to exclude
+     * @return self
+     */
+    public function exclude_question(int $qid) {
+        $this->excludedquestions[] = $qid;
+        return $this;
+    }
+
+    /**
+     * Returns IDs of excluded questions
+     *
+     * @return array
+     */
+    public function get_excluded_questions() {
+        return $this->excludedquestions;
+    }
 
     /**
      * Returns the cache key.
