@@ -81,13 +81,6 @@ abstract class preselect_task implements wb_middleware {
     }
 
     /**
-     * Call the next preselect task with $this->context
-     */
-    public function next() {
-        return ($this->nexttask)($this->context);
-    }
-
-    /**
      * This is the function in which the $context can be modified.
      *
      * To return early and skip the rest of the middleware chain, return a result directly.

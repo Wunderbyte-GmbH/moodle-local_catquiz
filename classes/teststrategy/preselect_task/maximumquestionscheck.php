@@ -59,7 +59,7 @@ final class maximumquestionscheck extends preselect_task implements wb_middlewar
 
         // No need for this check after a page reload.
         if (!$this->progress->has_new_response()) {
-            return $this->next();
+            return $next($context);
         }
 
         $maxquestions = $context['maximumquestions'];
