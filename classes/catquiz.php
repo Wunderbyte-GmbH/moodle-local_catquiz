@@ -539,9 +539,7 @@ class catquiz {
     }
 
     /**
-     * Returns the last response for the given questionusageid
-     *
-     * If there is no response or the fraction is NULL, returns false
+     * Returns the last question that was answered in the current quiz attempt or false
      *
      * @param int $questionusageid
      * @return stdClass|bool
@@ -549,15 +547,18 @@ class catquiz {
     public static function get_last_response_for_attempt(int $questionusageid) {
         global $DB;
         $sql = <<<SQL
-            SELECT *
+        SELECT * FROM {question_attempt_steps} qs
+        JOIN {question_attempts} qa ON qs.questionattemptid = qa.id
+        AND qa.id = (
+            SELECT max(questionattemptid) maxwithresponse
             FROM {question_attempt_steps} qs
-            JOIN (SELECT max(id) lastattempt
-                FROM {question_attempts}
-                WHERE questionusageid = :questionusageid
-                GROUP BY questionusageid) s1
-                ON qs.questionattemptid = s1.lastattempt
-            JOIN (SELECT id, questionid FROM {question_attempts}) s2 ON s2.id = s1.lastattempt
+                     JOIN (SELECT *
+                           FROM {question_attempts}
+                           WHERE questionusageid = :questionusageid
+            ) sub1 ON qs.questionattemptid = sub1.id
             WHERE fraction IS NOT NULL
+            GROUP BY questionusageid
+        ) AND fraction IS NOT NULL
         SQL;
         return $DB->get_record_sql($sql, ['questionusageid' => $questionusageid]);
     }
