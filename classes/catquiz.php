@@ -1775,4 +1775,13 @@ class catquiz {
         }
         return true;
     }
+
+    /**
+     * Marks the given question as failed
+     *
+     * @param stdClass $question
+     */
+    public static function mark_question_failed(stdClass $question) {
+        throw new \Exception("Not yet implemented");
+    }
 }

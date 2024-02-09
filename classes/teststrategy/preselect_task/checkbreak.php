@@ -24,6 +24,7 @@
 
 namespace local_catquiz\teststrategy\preselect_task;
 
+use local_catquiz\catquiz;
 use local_catquiz\local\result;
 use local_catquiz\teststrategy\preselect_task;
 use local_catquiz\teststrategy\progress;
@@ -72,11 +73,19 @@ final class checkbreak extends preselect_task implements wb_middleware {
             return $next($context);
         }
 
-        // User should take a break.
-        $this->progress->force_break($context['breakduration']);
-        $breakinfourl = $this->get_breakinfourl($context, $this->progress->get_forced_break_end());
-        // Return forced break info page.
-        redirect($breakinfourl);
+        // If we are at this point, it means the maximum time was exceeded.
+        // Force a new question.
+        $this->progress->force_new_question();
+
+        // If the session is not the same as when the quiz was started, just ignore that last question.
+        if (!$this->progress->check_session()) {
+            $this->progress->exclude_question($this->progress->get_last_question()->id);
+            return $next($context);
+        }
+
+        // If the session is the same, mark the last question as failed.
+        catquiz::mark_question_failed($this->progress->get_last_question());
+        return $next($context);
     }
 
     /**

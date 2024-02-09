@@ -88,6 +88,11 @@ class questions_loader implements contextloaderinterface {
         $context['questions_ordered_by'] = 'difficulty';
         $context['original_questions'] = $context['questions'];
 
+        // Some questions can be manually excluded, e.g. when the time limit is exceeded.
+        foreach ($this->progress->get_excluded_questions() as $excludedqid) {
+            unset($context['questions'][$excludedqid]);
+        }
+
         $cache = cache::make('local_catquiz', 'adaptivequizattempt');
         if ($this->progress->is_first_question()) {
             $cache->set('totalnumberoftestitems', count($context['questions']));
