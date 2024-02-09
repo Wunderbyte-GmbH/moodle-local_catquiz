@@ -52,13 +52,14 @@ class updatepersonability_test extends TestCase {
      * @param mixed $expected
      * @param mixed $lastquestion
      * @param mixed $context
+     * @param array $progressfakes
      *
      * @return mixed
      * @throws InvalidArgumentException
      * @throws ExpectationFailedException
      *
      */
-    public function test_ability_calculation_is_skipped_correctly($expected, $lastquestion, $context) {
+    public function test_ability_calculation_is_skipped_correctly($expected, $lastquestion, $context, $progressfakes) {
         global $USER;
         // We can not add a stub in the provider, so we do it here.
         $progressstub = $this->createStub(progress::class);
@@ -66,6 +67,12 @@ class updatepersonability_test extends TestCase {
             ->willReturn($lastquestion);
         $progressstub->method('get_user_responses')
             ->willReturn($context['fake_response_data'] ?? []);
+        $progressstub->method('has_new_response')
+            ->willReturn(true);
+        foreach ($progressfakes as $methodname => $returnval) {
+            $progressstub->method($methodname)
+                ->willReturn($returnval);
+        }
 
         $context['progress'] = $progressstub;
 
@@ -94,6 +101,9 @@ class updatepersonability_test extends TestCase {
                     'contextid' => 1,
                     'catscaleid' => 1,
                 ],
+                'progress_fake_methods' => [
+                    'is_first_question' => true,
+                ]
             ],
             'is_pilot_question' => [
                 'expected' => 'pilotquestion',
@@ -105,6 +115,7 @@ class updatepersonability_test extends TestCase {
                     // Can be null here, because for pilot questions the ability will not be updated.
                     'fake_response_data' => [$USER->id => []],
                 ],
+                'progress_fake_methods' => []
             ],
             'has_enough_responses' => [
                 'expected' => 'not_skipped',
@@ -134,6 +145,7 @@ class updatepersonability_test extends TestCase {
                     'questionsattempted' => 0,
                     'minimumquestions' => 10,
                 ],
+                'progress_fake_methods' => []
             ],
         ];
     }
