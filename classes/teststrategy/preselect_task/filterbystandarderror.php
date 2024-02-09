@@ -65,11 +65,11 @@ class filterbystandarderror extends preselect_task implements wb_middleware {
             // If this is the first question and the cache is not yet set, set the
             // root scale active.
             $this->progress->set_active_scales([$this->context['catscaleid']]);
-            return $this->next();
+            return $next($context);
         }
 
         if (!$this->progress->has_new_response()) {
-            return $this->next();
+            return $next($context);
         }
 
         $lastquestion = $this->progress->get_last_question();
@@ -186,7 +186,7 @@ class filterbystandarderror extends preselect_task implements wb_middleware {
 
         }
 
-        return $this->next();
+        return $next($context);
     }
 
     /**
