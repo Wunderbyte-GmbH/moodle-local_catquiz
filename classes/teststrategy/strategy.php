@@ -184,8 +184,12 @@ abstract class strategy {
         }
 
         // Do not update feedback data if the page was reloaded.
-        if (!$this->progress->is_first_question()
-            && !$this->progress->has_new_response()
+        if (
+            $this->progress->get_ignore_last_response()
+            || (!$this->progress->is_first_question()
+                && !$this->progress->has_new_response()
+                && !$this->progress->get_force_new_question()
+            )
         ) {
             return;
         }

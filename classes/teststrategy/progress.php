@@ -30,11 +30,12 @@ use JsonSerializable;
 use local_catquiz\catcontext;
 use local_catquiz\catquiz;
 use local_catquiz\catscale;
+use Random\RandomException;
 use stdClass;
 
 defined('MOODLE_INTERNAL') || die();
 require_once(__DIR__ . '/../../../../config.php');
-require_login();
+// require_login();
 
 /**
  * Stores the progress of a catquiz attempt that is not yet finished.
@@ -151,6 +152,13 @@ class progress implements JsonSerializable {
     private array $excludedquestions;
 
     /**
+     * Shows if we should skip updating internal values based on the last response.
+     *
+     * @var bool
+     */
+    private bool $ignorelastresponse;
+
+    /**
      * Returns a new progress instance.
      *
      * If we already have data in the cache or DB, the instance is populated with those data.
@@ -166,6 +174,7 @@ class progress implements JsonSerializable {
             ?: self::create_new($attemptid, $component, $contextid);
 
         $instance->hasnewresponse = false;
+        $instance->ignorelastresponse = false;
 
         if (!$instance->lastquestion) {
             return $instance;
@@ -660,6 +669,15 @@ class progress implements JsonSerializable {
         return $this;
     }
 
+    public function mark_lastquestion_failed() {
+        $this->responses[$this->lastquestion->id] = [
+            'id' => $this->lastquestion->id,
+            'fraction' => 0.0,
+            'userlastattempttime' => time(),
+        ];
+        return $this;
+    }
+
     private function get_last_response_for_attempt() {
         $response = catquiz::get_last_response_for_attempt($this->get_usage_id());
         return $response;
@@ -698,6 +716,11 @@ class progress implements JsonSerializable {
         return $this->usageid;
     }
 
+    /**
+     * Shows if there is a new response.
+     *
+     * @return bool
+     */
     public function has_new_response() {
         return $this->hasnewresponse;
     }
@@ -713,13 +736,32 @@ class progress implements JsonSerializable {
     }
 
     /**
+     * Updates the session key of the attempt to the current session.
+     * @return self
+     * @throws RandomException
+     */
+    public function set_current_session() {
+        $currentsess = sesskey();
+        $this->session = $currentsess;
+        return $this;
+    }
+
+    /**
      * Sets forcenewquestion to true
      *
      * @return self
      */
     public function force_new_question() {
         $this->forcenewquestion = true;
-        $this->lastquestion = null; // TODO: Check what else needs to be changed!
+        // Exclude the last question.
+        if ($this->lastquestion) {
+            $this->exclude_question($this->lastquestion->id);
+        }
+        return $this;
+    }
+
+    public function unset_last_question() {
+        $this->lastquestion = null;
         return $this;
     }
 
@@ -729,7 +771,7 @@ class progress implements JsonSerializable {
      * @return bool
      */
     public function get_force_new_question() {
-        return $this->forcenewquestion;
+        return $this->forcenewquestion ?? false;
     }
 
     /**
@@ -750,6 +792,45 @@ class progress implements JsonSerializable {
      */
     public function get_excluded_questions() {
         return $this->excludedquestions;
+    }
+
+    /**
+     * Shows if the page was reloaded
+     *
+     * @return bool
+     */
+    public function page_was_reloaded() {
+        if ($this->is_first_question() && !$this->get_last_question()) {
+            return false;
+        }
+        if ($this->has_new_response()) {
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
+     * Set the value of ignorelastresponse
+     *
+     * @see get_ignore_last_response
+     * @param bool $val
+     * @return $this
+     */
+    public function set_ignore_last_response(bool $val) {
+        $this->ignorelastresponse = $val;
+        return $this;
+    }
+
+    /**
+     * Indicates if the last response should be ignored
+
+     * Can be used by preselect tasks to check if they can skip their calculations.
+     *
+     * @return bool
+     */
+    public function get_ignore_last_response() {
+        return $this->ignorelastresponse ?? false;
     }
 
     /**

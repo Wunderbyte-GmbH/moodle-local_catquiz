@@ -30,6 +30,12 @@ use dml_exception;
 use local_catquiz\event\attempt_completed;
 use local_catquiz\teststrategy\feedbacksettings;
 use moodle_exception;
+use question_attempt;
+use question_attempt_pending_step;
+use question_bank;
+use question_engine;
+use question_finder;
+use question_state_gradedwrong;
 use stdClass;
 
 /**
@@ -1779,9 +1785,33 @@ class catquiz {
     /**
      * Marks the given question as failed
      *
-     * @param stdClass $question
+     * @param int $questionid
      */
-    public static function mark_question_failed(stdClass $question) {
-        throw new \Exception("Not yet implemented");
+    public static function mark_question_failed(int $questionid, int $usageid)
+    {
+        global $DB;
+        $quba = question_engine::load_questions_usage_by_activity($usageid);
+        $slot = max($quba->get_slots());
+
+        // Choose another valid but incorrect response.
+        $correctresponse = $quba->get_correct_response($slot)['answer'];
+        if ($correctresponse >= 1) {
+            $response = $correctresponse - 1;
+        } else {
+            $response = $correctresponse + 1;
+        }
+
+        $qa = $quba->get_question_attempt($slot);
+        $qa->process_action(['answer' => $response]);
+        $qa->finish();
+        $quba->finish_question($slot);
+        question_engine::save_questions_usage_by_activity($quba);
+
+        // Increment questions attempted
+        $adqattempt = $DB->get_record('adaptivequiz_attempt', ['uniqueid' => $usageid]);
+        $now = time();
+        $adqattempt->timemodified = $now;
+        $adqattempt->questionsattempted++;
+        $DB->update_record('adaptivequiz_attempt', $adqattempt);
     }
 }
