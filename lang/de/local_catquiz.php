@@ -305,9 +305,9 @@ $string['questiontext'] = "Fragentext";
 $string['selectitem'] = "Keine Daten ausgewählt";
 
 // Testitem Dashboard.
-$string['testitemdashboard'] = "Testitem Dashboard";
-$string['itemdifficulty'] = "Item difficulty";
-$string['likelihood'] = "Likelihood";
+$string['testitemdashboard'] = "Fragen Ansicht";
+$string['itemdifficulty'] = "Schwierigkeit des Elements";
+$string['likelihood'] = "Wahrscheinlichkeit";
 
 $string['difficulty'] = "Schwierigkeit";
 $string['discrimination'] = "Diskriminierung";
