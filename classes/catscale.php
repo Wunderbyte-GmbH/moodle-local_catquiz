@@ -137,25 +137,6 @@ class catscale {
         }
 
     }
-    /**
-     * Static function to return the value of contextid of a catscale.
-     *
-     * @param int $catscaleid
-     * @return int|null
-     */
-    public static function return_default_contextid_of_catscale(int $catscaleid) {
-
-        try {
-            $catscale = self::return_catscale_object($catscaleid);
-            if (isset($catscale->contextid)) {
-                return intval($catscale->contextid);
-            } else {
-                return null;
-            }
-        } catch (\Exception $e) {
-            return null;
-        }
-    }
 
     /**
      * Returns the contextid associated with a catscale.

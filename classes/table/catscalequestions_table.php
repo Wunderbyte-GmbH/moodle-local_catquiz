@@ -168,7 +168,7 @@ class catscalequestions_table extends wunderbyte_table {
                 'component' => 'local_catquiz',
                 'model' => $values->model,
                 'componentid' => $values->componentid,
-                'contextid' => $this->contextid,
+                'contextid' => $values->contextid ?? $this->contextid,
                 'componentname' => $values->component,
             ],
         ];
