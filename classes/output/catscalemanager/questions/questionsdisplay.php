@@ -105,7 +105,10 @@ class questionsdisplay {
         $catcontext = empty($this->catcontextid) ? optional_param('contextid', 0, PARAM_INT) : $this->catcontextid;
         $catscale = empty($this->scale) ? optional_param('catscale', 0, PARAM_INT) : $this->scale;
 
-        $table = new catscalequestions_table('catscale_' . $catscale . 'context' . $catcontext . ' questionstable', $catscale, $catcontext);
+        $table = new catscalequestions_table(
+            'catscale_' . $catscale . 'context' . $catcontext . ' questionstable',
+            $catscale,
+            $catcontext);
 
         // If we integrate questions from subscales, we add different ids.
         if ($this->usesubs > 0) {

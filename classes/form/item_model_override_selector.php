@@ -97,7 +97,7 @@ class item_model_override_selector extends dynamic_form {
             }
 
             $group[] = $select;
-            foreach($paramnames as $paramname) {
+            foreach ($paramnames as $paramname) {
                 $this->add_element_to_group($paramname, $id, $group, $mform, $data->editing ?? false);
             }
             $mform->addGroup($group, $id, get_string('pluginname', sprintf('catmodel_%s', $model)),
@@ -182,8 +182,8 @@ class item_model_override_selector extends dynamic_form {
             $fieldname = sprintf('override_%s', $model);
             $obj = new stdClass;
             $statusstring = sprintf('%s_select', $fieldname);
-            $obj->status = $data->$fieldname[$statusstring];
-            foreach(array_values($modelparams) as $modelparam) {
+            $obj->status = $data->{$fieldname[$statusstring]};
+            foreach (array_values($modelparams) as $modelparam) {
                 $this->generate_model_fields($modelparam, $fieldname, $obj, $data);
             }
             $formitemparams[$model] = $obj;
@@ -276,7 +276,7 @@ class item_model_override_selector extends dynamic_form {
                     $allformitems[$m]->status = $defaultstatus;
                     $fieldname = sprintf('override_%s', $m);
                     $string = sprintf('%s_select', $fieldname);
-                    $data->$fieldname[$string] = $defaultstatus;
+                    $data->{$fieldname[$string]} = $defaultstatus;
                     $this->set_data($data);
                     $toupdate[] = [
                         'status' => $allformitems[$m]->status,
@@ -340,7 +340,7 @@ class item_model_override_selector extends dynamic_form {
      */
     private function generate_model_fields(string $paramname, string $fieldname, stdClass &$obj, stdClass $data) {
         $param = sprintf('%s_'.$paramname, $fieldname);
-        $obj->$paramname = $data->$fieldname[$param];
+        $obj->$paramname = $data->{$fieldname[$param]};
     }
     /**
      * Copy changed values = existing params.
@@ -395,7 +395,7 @@ class item_model_override_selector extends dynamic_form {
             if (array_key_exists($model, $itemparamsbymodel)) {
                 $modelparams = $itemparamsbymodel[$model];
                 $modelstatus = $modelparams->status;
-                foreach($specificmodelparams as $givenparam) {
+                foreach ($specificmodelparams as $givenparam) {
                     if (isset ($modelparams->$givenparam)) {
                         $values[$givenparam] = $modelparams->$givenparam;
                     }
@@ -406,7 +406,7 @@ class item_model_override_selector extends dynamic_form {
             } else { // Set default data if there are no calculated data for the given model.
                 $modelstatus = LOCAL_CATQUIZ_STATUS_NOT_CALCULATED;
                 // Initial load.
-                foreach($specificmodelparams as $givenparam) {
+                foreach ($specificmodelparams as $givenparam) {
                         $values[$givenparam] = null;
                 }
             }
@@ -532,7 +532,7 @@ class item_model_override_selector extends dynamic_form {
             }
         }
         if (count($counter) > 1) {
-            foreach($counter as $field => $selectkey) {
+            foreach ($counter as $field => $selectkey) {
                 $errors[$field] = get_string("validateform:onlyoneconfirmedstatusallowed", 'local_catquiz');
             }
         }
