@@ -95,7 +95,10 @@ $string['timeoutabortnoresult'] = 'Test aborted without result.';
 $string['timeoutabortresult'] = 'Test aborted with result.';
 $string['timeoutfinishwithresult'] = 'Test aborted after finished current question.';
 
-$string['minmaxgroup'] = 'Add min and max value as decimal';
+$string['minabilityscalevalue'] = 'Person ability minimum:';
+$string['minabilityscalevalue_help'] = 'Enter the smallest possible person ability of this scale as a negative decimal value. The mean is zero.';
+$string['maxabilityscalevalue'] = 'Person ability maximum:';
+$string['maxabilityscalevalue_help'] = 'Enter the largest possible person ability of this scale as a decimal value. The mean is zero.';
 $string['minscalevalue'] = 'Min value';
 $string['maxscalevalue'] = 'Max value';
 $string['min'] = 'min: ';

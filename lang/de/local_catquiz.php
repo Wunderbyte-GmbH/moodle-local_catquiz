@@ -100,7 +100,10 @@ $string['timeoutabortresult'] = 'Test wird sofort beendet und abschließend bewe
 $string['timeoutfinishwithresult'] = 'Nachfrist: angezeigte Items können beendet werden';
 
 // Validation.
-$string['minmaxgroup'] = 'Geben Sie Minimal und Maximal als Dezimalwert ein';
+$string['minabilityscalevalue'] = 'Minimale Personenfähigkeit:';
+$string['minabilityscalevalue_help'] = 'Geben Sie die kleinstmögliche Personenfähigkeit dieser Skala als negativen Dezimalwert an. Der Mittelwert ist null.';
+$string['maxabilityscalevalue'] = 'Maximale Personenfähigkeit:';
+$string['maxabilityscalevalue_help'] = 'Geben Sie die größtmögliche Personenfähigkeit dieser Skala als Dezimalwert an. Der Mittelwert ist null.';
 $string['minscalevalue'] = 'Minimalwert';
 $string['maxscalevalue'] = 'Maximalwert';
 $string['chooseparent'] = 'Wähle übergeordnete Scala';
