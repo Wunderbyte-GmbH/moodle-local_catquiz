@@ -324,7 +324,7 @@ $string['itemstatus_1'] = "Calculated"; // LOCAL_CATQUIZ_STATUS_CALCULATED.
 $string['itemstatus_4'] = "Manually updated"; // LOCAL_CATQUIZ_STATUS_UPDATED_MANUALLY.
 $string['itemstatus_5'] = "Manually confirmed"; // LOCAL_CATQUIZ_STATUS_CONFIRMED_MANUALLY.
 
-// Form Validation
+// Form Validation.
 $string['validateform:changevaluesorstatus'] = "Please enter values or change the status.";
 $string['validateform:onlyoneconfirmedstatusallowed'] = "This status is allowed for one strategy only.";
 
