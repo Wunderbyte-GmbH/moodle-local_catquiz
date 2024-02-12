@@ -35,6 +35,7 @@ use local_catquiz\event\testiteminscale_updated;
 use local_catquiz\local\result;
 use local_catquiz\local\status;
 use context_system;
+use Exception;
 use local_catquiz\local\model\model_item_param_list;
 use local_catquiz\local\model\model_strategy;
 use moodle_exception;
@@ -145,17 +146,21 @@ class catscale {
      * ancestor scale that has one.
      *
      * @param int $catscaleid
-     * @return int
+     * @return int|false
      */
     public static function get_context_id(int $catscaleid): int {
-        $catscale = self::return_catscale_object($catscaleid);
-        if ($catscale->contextid) {
-            return $catscale->contextid;
+        try {
+            $catscale = self::return_catscale_object($catscaleid);
+            if ($catscale->contextid) {
+                return $catscale->contextid;
+            }
+            if ($catscale->parentid === 0) {
+                return catquiz::get_default_context_id();
+            }
+            return self::get_context_id($catscale->parentid);
+        } catch (Exception $e) {
+            return false;
         }
-        if ($catscale->parentid === 0) {
-            return catquiz::get_default_context_id();
-        }
-        return self::get_context_id($catscale->parentid);
     }
 
     /**
