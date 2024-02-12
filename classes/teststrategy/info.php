@@ -346,16 +346,6 @@ class info {
         $mform->setType('catquiz_maxtimeperitem', PARAM_INT);
         $mform->hideIf('catquiz_timelimitgroup', 'catquiz_includetimelimit', 'neq', 1);
 
-        $timeoutoptions = [
-            1 => get_string('timeoutfinishwithresult', 'local_catquiz'),
-            2 => get_string('timeoutabortresult', 'local_catquiz'),
-            3 => get_string('timeoutabortnoresult', 'local_catquiz'),
-        ];
-        // Choose a model for this instance.
-        $elements[] = $mform->addElement('select', 'catquiz_actontimeout',
-        get_string('actontimeout', 'local_catquiz'), $timeoutoptions);
-        $mform->hideIf('catquiz_actontimeout', 'catquiz_includetimelimit', 'neq', 1);
-
         feedbackclass::instance_form_definition($mform, $elements);
     }
 
