@@ -100,10 +100,12 @@ class questionsdisplay {
         if ($this->scale === -1) {
             return $this->get_no_table_string();
         }
-        // If no context is set, get default context from DB.
-        $catcontext = empty($this->catcontextid) ? catquiz::get_default_context_id() : $this->catcontextid;
 
-        $table = new catscalequestions_table('catscale_' . $this->scale . ' questionstable', $this->scale, $catcontext);
+        // If no context is set, get context from url.
+        $catcontext = empty($this->catcontextid) ? optional_param('contextid', 0, PARAM_INT) : $this->catcontextid;
+        $catscale = empty($this->scale) ? optional_param('catscale', 0, PARAM_INT) : $this->scale;
+
+        $table = new catscalequestions_table('catscale_' . $catscale . 'context' . $catcontext . ' questionstable', $catscale, $catcontext);
 
         // If we integrate questions from subscales, we add different ids.
         if ($this->usesubs > 0) {

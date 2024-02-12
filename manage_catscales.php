@@ -38,7 +38,7 @@ $testitemid = optional_param('id', 0, PARAM_INT);
 $componentname = optional_param('component', 'question', PARAM_TEXT);
 
 if ($catscale != -1 && empty($catcontextid)) {
-    $catcontextid = catscale::return_default_contextid_of_catscale($catscale);
+    $catcontextid = catscale::get_context_id($catscale);
 }
 if (empty($catcontextid)) {
     $catcontextid = catquiz::get_default_context_id();
