@@ -91,16 +91,19 @@ class modal_manage_catscale extends dynamic_form {
         $mform->addElement('autocomplete', 'contextid', get_string('choosecontextid', 'local_catquiz'), $contextoptions);
         $mform->hideIf('contextid', 'parentid', 'neq', '0'); // Selector only for parent scales.
 
-        $group[] = $mform->createElement('text', 'catquiz_minscalevalue', get_string('minscalevalue', 'local_catquiz'));
+        $mform->addElement('text', 'catquiz_minscalevalue', get_string('minabilityscalevalue', 'local_catquiz'));
 
-        $group[] = $mform->createElement('text', 'catquiz_maxscalevalue', get_string('maxscalevalue', 'local_catquiz'));
+        $mform->addElement('text', 'catquiz_maxscalevalue', get_string('maxabilityscalevalue', 'local_catquiz'));
 
-        $mform->addGroup($group, 'minmaxgroup', get_string('minmaxgroup', 'local_catquiz'));
-        $mform->hideIf('minmaxgroup', 'parentid', 'neq', '0'); // Hide group when not parent.
-        $mform->setDefault('catquiz_maxscalevalue', 3);
+        $mform->hideIf('catquiz_minscalevalue', 'parentid', 'neq', '0'); // Hide group when not parent.
+        $mform->hideIf('catquiz_maxscalevalue', 'parentid', 'neq', '0'); // Hide group when not parent.
         $mform->setType('catquiz_maxscalevalue', PARAM_FLOAT);
-        $mform->setDefault('catquiz_minscalevalue', -3);
+        $mform->setDefault('catquiz_maxscalevalue', LOCAL_CATQUIZ_PERSONABILITY_UPPER_LIMIT);
+        $mform->addHelpButton('catquiz_maxscalevalue', 'maxabilityscalevalue', 'local_catquiz');
         $mform->setType('catquiz_minscalevalue', PARAM_FLOAT);
+        $mform->setDefault('catquiz_minscalevalue', LOCAL_CATQUIZ_PERSONABILITY_LOWER_LIMIT);
+        $mform->addHelpButton('catquiz_minscalevalue', 'minabilityscalevalue', 'local_catquiz');
+
     }
 
     /**
