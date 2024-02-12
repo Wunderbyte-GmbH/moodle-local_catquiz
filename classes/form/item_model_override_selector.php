@@ -235,7 +235,7 @@ class item_model_override_selector extends dynamic_form {
                 $toupdate[] = $update;
                 $status = $formitemparams[$model]->status;
             } else {
-                foreach($formitemparams[$model] as $key => $value) {
+                foreach ($formitemparams[$model] as $key => $value) {
                     // If all param fields are empty, no insert into db except for status manually excluded.
                     if ($value === ""
                         || ($key == "status" && $value != LOCAL_CATQUIZ_STATUS_EXCLUDED_MANUALLY)) {
