@@ -92,7 +92,6 @@ $string['includetimelimit_help'] = 'Maximaldauer festlegen, die für die Durchf�
 $string['maxtime'] = 'Maximale Dauer des Tests';
 $string['maxtimeperitem'] = 'Höchstzeit pro Frage in Sekunden';
 $string['mintimeperitem'] = 'Mindestzeit pro Frage in Sekunden';
-$string['actontimeout'] = 'Aktion nach Ablauf der Zeit';
 $string['perattempt'] = 'pro Versuch ';
 $string['peritem'] = 'pro Item ';
 

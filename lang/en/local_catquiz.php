@@ -82,7 +82,6 @@ $string['includetimelimit_help'] = 'Define a maximum duration for an attempt to 
 $string['maxtime'] = 'Max time for test';
 $string['maxtimeperitem'] = 'Max time per question in seconds';
 $string['mintimeperitem'] = 'Min time per question in seconds';
-$string['actontimeout'] = 'Action on timeout';
 $string['contextidselect'] = 'CAT context - without selection default context is created';
 $string['choosecontextid'] = 'Choose CAT context';
 $string['defaultcontext'] = 'New default context for scale';
