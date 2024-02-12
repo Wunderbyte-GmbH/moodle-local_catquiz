@@ -26,6 +26,7 @@ use context;
 use context_system;
 use core_form\dynamic_form;
 use local_catquiz\catcontext;
+use local_catquiz\catquiz;
 use local_catquiz\catscale;
 use moodle_url;
 use stdClass;
@@ -134,7 +135,9 @@ class contextselector extends dynamic_form {
         if (empty($contextidfromurl)) {
             // If we find a scaleid, we set the context to the contextid of the scale.
             $catscaleid = optional_param('scaleid', 0, PARAM_INT);
-            if (!empty(catscale::get_context_id($catscaleid))) {
+            if (empty($catscaleid)) {
+                $data->contextid = catquiz::get_default_context_id();
+            } else if (!empty(catscale::get_context_id($catscaleid))) {
                 $data->contextid = catscale::get_context_id($catscaleid);
             }
 
