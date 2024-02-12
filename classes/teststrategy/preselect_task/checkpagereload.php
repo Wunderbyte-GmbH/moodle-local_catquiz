@@ -56,6 +56,7 @@ final class checkpagereload extends preselect_task implements wb_middleware {
         $this->progress = $context['progress'];
         if (($this->progress->is_first_question() && !$this->progress->get_last_question())
             || $this->progress->has_new_response()
+            || $this->progress->get_force_new_question()
         ) {
             return $next($context);
         }

@@ -139,7 +139,10 @@ class attemptfeedback implements renderable, templatable {
      */
     public function update_feedbackdata(array $newdata = []) {
         $progress = $newdata['progress'];
-        if (!$progress->has_new_response()) {
+        if (
+            $progress->get_ignore_last_response()
+            || (!$progress->is_first_question() && !$progress->has_new_response() && !$progress->get_force_new_question())
+        ) {
             return;
         }
         $existingdata = $this->load_feedbackdata();

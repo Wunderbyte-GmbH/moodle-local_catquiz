@@ -57,10 +57,10 @@ final class maximumquestionscheck extends preselect_task implements wb_middlewar
     public function run(array &$context, callable $next): result {
         $this->progress = $context['progress'];
 
-        // No need for this check after a page reload.
-        if (!$this->progress->has_new_response()) {
-            return $next($context);
-        }
+        // // No need for this check after a page reload.
+        // if (!$this->progress->has_new_response()) {
+        //     return $next($context);
+        // }
 
         $maxquestions = $context['maximumquestions'];
         if (($maxquestions != -1) && ($context['questionsattempted'] >= $maxquestions)) {

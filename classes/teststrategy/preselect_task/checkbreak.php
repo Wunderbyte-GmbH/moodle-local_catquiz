@@ -60,32 +60,47 @@ final class checkbreak extends preselect_task implements wb_middleware {
     public function run(array &$context, callable $next): result {
         $this->progress = $context['progress'];
         $now = time();
-        if ($this->progress->break_completed()) {
-            return $next($context);
-        }
-        if ($this->progress->has_break()) {
-            $breakinfourl = $this->get_breakinfourl($context, $this->progress->get_forced_break_end());
-            redirect($breakinfourl);
-        }
-
         $lastquestion = $this->progress->get_last_question();
-        $lastquestionreturntime = $lastquestion->userlastattempttime;
+
+        $lastquestionreturntime = $lastquestion->userlastattempttime ?? false;
         if (!$lastquestionreturntime || $now - $lastquestionreturntime <= $context['max_itemtime_in_sec']) {
-            return $next($context);
+            if (!$this->progress->page_was_reloaded()) {
+                return $next($context);
+            }
+            return result::ok($lastquestion);
         }
 
         // If we are at this point, it means the maximum time was exceeded.
-        // Force a new question.
-        $this->progress->force_new_question();
-
-        // If the session is not the same as when the quiz was started, just ignore that last question.
+        // If the session is not the same as when the quiz was started, ignore
+        // that last question and present a new one.
         if (!$this->progress->check_session()) {
-            $this->progress->exclude_question($lastquestion->id);
+            $this->progress->set_current_session()
+                ->exclude_question($lastquestion->id)
+                ->force_new_question()
+                ->set_ignore_last_response(true);
             return $next($context);
         }
 
-        // If the session is the same, mark the last question as failed.
-        catquiz::mark_question_failed($this->progress->get_last_question());
+        // If the session is the same, mark the last question as failed if the page was reloaded.
+        if ($this->progress->page_was_reloaded()) {
+            catquiz::mark_question_failed($lastquestion->id, $this->progress->get_usage_id());
+            $this->progress
+                ->add_playedquestion($lastquestion)
+                ->mark_lastquestion_failed()
+                ->save();
+            redirect(
+                new moodle_url(
+                    '/mod/adaptivequiz/attempt.php',
+                    [
+                        'cmid' => $_REQUEST['cmid'],
+                    ]
+                )
+            );
+        }
+
+        // If the page was NOT reloaded but the timeout was exceeded, we can not
+        // do anything here because it is not possible to grade a response as
+        // wrong in hindsight.
         return $next($context);
     }
 
@@ -100,24 +115,5 @@ final class checkbreak extends preselect_task implements wb_middleware {
             'max_itemtime_in_sec',
             'progress',
         ];
-    }
-
-    /**
-     * Gets breakinfo url.
-     *
-     * @param mixed $context
-     * @param mixed $forcedbreakend
-     *
-     * @return mixed
-     *
-     */
-    private function get_breakinfourl($context, $forcedbreakend) {
-        return new moodle_url(
-            $context['breakinfourl'],
-            [
-                'cmid' => $_REQUEST['cmid'],
-                'breakend' => usertime($forcedbreakend),
-            ]
-        );
     }
 }
