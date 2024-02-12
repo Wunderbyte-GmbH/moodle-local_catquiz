@@ -137,15 +137,13 @@ class contextselector extends dynamic_form {
             $catscaleid = optional_param('scaleid', 0, PARAM_INT);
             if (empty($catscaleid)) {
                 $data->contextid = catquiz::get_default_context_id();
-                $this->set_data($data);
-                return;
             } else if (!empty(catscale::get_context_id($catscaleid))) {
                 $data->contextid = catscale::get_context_id($catscaleid);
-                $this->set_data($data);
-                return;
             }
 
         }
+
+        $this->set_data($data);
     }
 
     /**
