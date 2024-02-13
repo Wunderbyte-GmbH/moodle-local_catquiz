@@ -164,6 +164,36 @@ class catscale {
     }
 
     /**
+     * Returns the minscalevalue and maxscalevalue of ability associated with a catscale.
+     *
+     * If a catscale does not have min- and maxvalues, it returns the values of the
+     * ancestor scale that has one.
+     *
+     * @param int $catscaleid
+     * @return array|false
+     */
+    public static function get_ability_range(int $catscaleid): array {
+        try {
+            $catscale = self::return_catscale_object($catscaleid);
+            if ($catscale->minscalevalue && $catscale->maxscalevalue) {
+                return [
+                    'minscalevalue' => $catscale->minscalevalue,
+                    'maxscalevalue' => $catscale->maxscalevalue,
+                ];
+            }
+            if ($catscale->parentid === 0) {
+                return [
+                    'minscalevalue' => LOCAL_CATQUIZ_PERSONABILITY_LOWER_LIMIT,
+                    'maxscalevalue' => LOCAL_CATQUIZ_PERSONABILITY_UPPER_LIMIT,
+                ];
+            }
+            return self::get_ability_range($catscale->parentid);
+        } catch (Exception $e) {
+            return false;
+        }
+    }
+
+    /**
      * Adds or updates attribution of question to scale.
      *
      * @param int $catscaleid

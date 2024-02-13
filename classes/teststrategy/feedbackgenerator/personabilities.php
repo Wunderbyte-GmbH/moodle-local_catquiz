@@ -308,14 +308,14 @@ class personabilities extends feedbackgenerator {
         $abilitysteps = [];
         $abilitystep = 0.25;
         $interval = $abilitystep * 2;
-        $ul = LOCAL_CATQUIZ_PERSONABILITY_UPPER_LIMIT;
-        $ll = LOCAL_CATQUIZ_PERSONABILITY_LOWER_LIMIT;
+        $abilityrange = catscale::get_ability_range($primarycatscale->id);
+
+        $ul = $abilityrange['minscalevalue'];
+        $ll = $abilityrange['maxscalevalue'];
         for ($i = $ll + $abilitystep; $i <= $ul - $abilitystep; $i += $interval) {
             $abilitysteps[] = $i;
         }
-
         $catscale = new catscale($primarycatscale->id);
-
         // Prepare data for test information line.
         $items = $catscale->get_testitems($initialcontext['contextid'], true);
         $models = model_strategy::get_installed_models();
@@ -924,9 +924,10 @@ class personabilities extends feedbackgenerator {
      */
     public static function get_color_for_personability(array $quizsettings, float $personability, int $catscaleid): string {
         $default = "#878787";
+        $abilityrange = catscale::get_ability_range($catscaleid);
         if (!$quizsettings ||
-            $personability < LOCAL_CATQUIZ_PERSONABILITY_LOWER_LIMIT ||
-            $personability > LOCAL_CATQUIZ_PERSONABILITY_UPPER_LIMIT) {
+            $personability < $abilityrange['minscalevalue'] ||
+            $personability > $abilityrange['maxscalevalue']) {
             return $default;
         }
         $numberoffeedbackoptions = intval($quizsettings['numberoffeedbackoptionsselect']) ?? 8;
