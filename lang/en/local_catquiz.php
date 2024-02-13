@@ -105,6 +105,7 @@ $string['min'] = 'min: ';
 $string['max'] = 'max: ';
 $string['chooseparent'] = 'Choose parent scale';
 $string['addoredittemplate'] = "Add or edit template";
+$string['nogapallowed'] = "No gap in the feedbackrange allowed. Please start min in new range with max value of last range.";
 
 // Validation.
 $string['errorminscalevalue'] = 'Min value has to be smaller than max value';
