@@ -153,8 +153,8 @@ class modal_manage_catscale extends dynamic_form {
         if (!empty($data->id)) {
             if (!empty($rec = dataapi::get_catscale_by_id($data->id))) {
                 $data = $rec;
-                $data->minmaxgroup["catquiz_minscalevalue"] = $rec->minscalevalue;
-                $data->minmaxgroup["catquiz_maxscalevalue"] = $rec->maxscalevalue;
+                $data->catquiz_minscalevalue = $rec->minscalevalue;
+                $data->catquiz_maxscalevalue = $rec->maxscalevalue;
             }
         }
         $this->set_data($data);
@@ -201,16 +201,15 @@ class modal_manage_catscale extends dynamic_form {
         if (dataapi::name_exists($data['name']) && $data['id'] === 0) {
             $errors['name'] = get_string('catscalesname_exists', 'local_catquiz');
         }
-        if (isset($data["minmaxgroup"]["catquiz_minscalevalue"])) {
-            if ($data["minmaxgroup"]["catquiz_minscalevalue"] > $data["minmaxgroup"]["catquiz_maxscalevalue"]) {
-                $errors['minmaxgroup'] = get_string('errorminscalevalue', 'local_catquiz');
-            }
-            if (!is_numeric($data["minmaxgroup"]["catquiz_minscalevalue"])) {
-                $errors["minmaxgroup"] = get_string('errorhastobefloat', 'local_catquiz');
-            }
-            if (!is_numeric($data["minmaxgroup"]["catquiz_maxscalevalue"])) {
-                $errors["minmaxgroup"] = get_string('errorhastobefloat', 'local_catquiz');
-            }
+
+        if (isset($data["catquiz_minscalevalue"]) && (float) $data["catquiz_minscalevalue"] >= 0) {
+            $errors["catquiz_minscalevalue"] = get_string('formelementpositivefloat', 'local_catquiz');
+        }
+        if (isset($data["catquiz_maxscalevalue"]) && (float) $data["catquiz_maxscalevalue"] <= 0) {
+            $errors["catquiz_maxscalevalue"] = get_string('formelementnegativefloat', 'local_catquiz');
+        }
+        if ( (float)$data["catquiz_minscalevalue"] > (float) $data["catquiz_maxscalevalue"]) {
+            $errors['catquiz_minscalevalue'] = get_string('errorminscalevalue', 'local_catquiz');
         }
 
         return $errors;
@@ -223,10 +222,10 @@ class modal_manage_catscale extends dynamic_form {
     public function get_data() {
 
         $data = parent::get_data();
-        if (!empty($data->minmaxgroup["catquiz_minscalevalue"])) {
-            $data->minscalevalue = $data->minmaxgroup["catquiz_minscalevalue"];
-            $data->maxscalevalue = $data->minmaxgroup["catquiz_maxscalevalue"];
-        }
+
+        $data->maxscalevalue = ((float) $data->catquiz_minscalevalue) ?? LOCAL_CATQUIZ_PERSONABILITY_LOWER_LIMIT;
+        $data->maxscalevalue = ((float) $data->catquiz_maxscalevalue) ?? LOCAL_CATQUIZ_PERSONABILITY_UPPER_LIMIT;
+
         return $data;
     }
 }
