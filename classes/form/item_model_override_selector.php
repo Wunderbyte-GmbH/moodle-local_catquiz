@@ -79,11 +79,11 @@ class item_model_override_selector extends dynamic_form {
         $models = model_strategy::get_installed_models();
 
         $options = [
-            LOCAL_CATQUIZ_STATUS_EXCLUDED_MANUALLY => get_string('itemstatus_-5', 'local_catquiz'),
-            LOCAL_CATQUIZ_STATUS_CALCULATED => get_string('itemstatus_1', 'local_catquiz'),
-            LOCAL_CATQUIZ_STATUS_CONFIRMED_MANUALLY => get_string('itemstatus_5', 'local_catquiz'),
-            LOCAL_CATQUIZ_STATUS_UPDATED_MANUALLY => get_string('itemstatus_4', 'local_catquiz'),
             LOCAL_CATQUIZ_STATUS_NOT_CALCULATED => get_string('itemstatus_0', 'local_catquiz'),
+            LOCAL_CATQUIZ_STATUS_CALCULATED => get_string('itemstatus_1', 'local_catquiz'),
+            LOCAL_CATQUIZ_STATUS_EXCLUDED_MANUALLY => get_string('itemstatus_-5', 'local_catquiz'),
+            LOCAL_CATQUIZ_STATUS_UPDATED_MANUALLY => get_string('itemstatus_4', 'local_catquiz'),
+            LOCAL_CATQUIZ_STATUS_CONFIRMED_MANUALLY => get_string('itemstatus_5', 'local_catquiz'),
         ];
 
         foreach (array_keys($models) as $model) {
@@ -182,7 +182,8 @@ class item_model_override_selector extends dynamic_form {
             $fieldname = sprintf('override_%s', $model);
             $obj = new stdClass;
             $statusstring = sprintf('%s_select', $fieldname);
-            $obj->status = $data->{$fieldname[$statusstring]};
+            $array = $data->$fieldname;
+            $obj->status = $array[$statusstring];
             foreach (array_values($modelparams) as $modelparam) {
                 $this->generate_model_fields($modelparam, $fieldname, $obj, $data);
             }
@@ -276,7 +277,7 @@ class item_model_override_selector extends dynamic_form {
                     $allformitems[$m]->status = $defaultstatus;
                     $fieldname = sprintf('override_%s', $m);
                     $string = sprintf('%s_select', $fieldname);
-                    $data->{$fieldname[$string]} = $defaultstatus;
+                    $data->$fieldname[$string] = $defaultstatus;
                     $this->set_data($data);
                     $toupdate[] = [
                         'status' => $allformitems[$m]->status,
@@ -340,7 +341,8 @@ class item_model_override_selector extends dynamic_form {
      */
     private function generate_model_fields(string $paramname, string $fieldname, stdClass &$obj, stdClass $data) {
         $param = sprintf('%s_'.$paramname, $fieldname);
-        $obj->$paramname = $data->{$fieldname[$param]};
+        $array = $data->$fieldname;
+        $obj->$paramname = $array[$param];
     }
     /**
      * Copy changed values = existing params.
