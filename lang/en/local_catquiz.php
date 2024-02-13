@@ -138,8 +138,6 @@ $string['startwithcurrentability'] = "Use the person's current ability score to 
 
 $string['maxtimeperquestion'] = "Maximum time";
 $string['maxtimeperquestion_help'] = "If the user takes longer to answer a question, a break will be enforced";
-$string['breakduration'] = "Duration of a forced break in seconds";
-
 // Tests environment.
 $string['newcustomtest'] = 'Custom test';
 $string['lang'] = 'Language';

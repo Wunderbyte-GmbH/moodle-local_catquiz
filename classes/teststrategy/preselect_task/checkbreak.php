@@ -68,8 +68,9 @@ final class checkbreak extends preselect_task implements wb_middleware {
             redirect($breakinfourl);
         }
 
-        $lastquestionreturntime = $this->progress->get_last_question()->userlastattempttime;
-        if (!$lastquestionreturntime || $now - $lastquestionreturntime <= $context['maxtimeperquestion']) {
+        $lastquestion = $this->progress->get_last_question();
+        $lastquestionreturntime = $lastquestion->userlastattempttime;
+        if (!$lastquestionreturntime || $now - $lastquestionreturntime <= $context['max_itemtime_in_sec']) {
             return $next($context);
         }
 
@@ -79,7 +80,7 @@ final class checkbreak extends preselect_task implements wb_middleware {
 
         // If the session is not the same as when the quiz was started, just ignore that last question.
         if (!$this->progress->check_session()) {
-            $this->progress->exclude_question($this->progress->get_last_question()->id);
+            $this->progress->exclude_question($lastquestion->id);
             return $next($context);
         }
 
@@ -96,9 +97,7 @@ final class checkbreak extends preselect_task implements wb_middleware {
      */
     public function get_required_context_keys(): array {
         return [
-            'breakduration',
-            'breakinfourl',
-            'maxtimeperquestion',
+            'max_itemtime_in_sec',
             'progress',
         ];
     }
