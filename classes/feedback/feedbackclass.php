@@ -188,16 +188,16 @@ class feedbackclass {
                         'feedback_scaleid_limit_lower_'. $scale->id . '_' . $j,
                         get_string('lowerlimit', 'local_catquiz')
                         );
-                    $lowerlimit = optional_param('feedback_scaleid_limit_lower_'. $scale->id . '_' . $j, 0, PARAM_FLOAT);
-                    if ($lowerlimit === null) {
+                    $lowerlimit = optional_param('feedback_scaleid_limit_lower_'. $scale->id . '_' . $j, -12345, PARAM_FLOAT);
+                    if ($lowerlimit === -12345) {
                         $lowerlimit = self::return_limits_for_scale(
                             $numberoffeedbackspersubscale,
                             $j,
                             true,
                             $lowestability,
                             $highestability);
-                        $element->setValue($lowerlimit);
                     }
+                    $element->setValue($lowerlimit);
                 }
 
                 // If the Element is new, we set the default.
@@ -216,16 +216,17 @@ class feedbackclass {
                         'feedback_scaleid_limit_upper_'. $scale->id . '_' . $j,
                         get_string('upperlimit', 'local_catquiz'
                     ));
-                    $upperlimit = optional_param('feedback_scaleid_limit_upper_'. $scale->id . '_' . $j, 0, PARAM_FLOAT);
-                    if ($upperlimit === null) {
+                    $upperlimit = optional_param('feedback_scaleid_limit_upper_'. $scale->id . '_' . $j, -12345, PARAM_FLOAT);
+                    if ($upperlimit === -12345) {
                         $upperlimit = self::return_limits_for_scale(
                             $numberoffeedbackspersubscale,
                             $j,
                             false,
                             $lowestability,
                             $highestability);
-                        $element->setValue($upperlimit);
+
                     }
+                    $element->setValue($upperlimit);
                 }
 
                 // If the Element is new, we set the default.
