@@ -78,6 +78,7 @@ final class checkbreak extends preselect_task implements wb_middleware {
                 ->exclude_question($lastquestion->id)
                 ->force_new_question()
                 ->set_ignore_last_response(true);
+            unset($context['questions'][$lastquestion->id]);
             return $next($context);
         }
 
