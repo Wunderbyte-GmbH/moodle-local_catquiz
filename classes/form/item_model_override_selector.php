@@ -277,7 +277,7 @@ class item_model_override_selector extends dynamic_form {
                     $allformitems[$m]->status = $defaultstatus;
                     $fieldname = sprintf('override_%s', $m);
                     $string = sprintf('%s_select', $fieldname);
-                    $data->$fieldname[$string] = $defaultstatus;
+                    $data->{$fieldname}[$string] = $defaultstatus;
                     $this->set_data($data);
                     $toupdate[] = [
                         'status' => $allformitems[$m]->status,
