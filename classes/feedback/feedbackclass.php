@@ -190,17 +190,19 @@ class feedbackclass {
                         );
                     $lowerlimit = optional_param('feedback_scaleid_limit_lower_'. $scale->id . '_' . $j, 0, PARAM_FLOAT);
                     if ($lowerlimit === null) {
-                        $lowerlimit = self::return_limits_for_scale($numberoffeedbackspersubscale, $j, true, $lowestability, $highestability);
+                        $lowerlimit = self::return_limits_for_scale(
+                            $numberoffeedbackspersubscale,
+                            $j,
+                            true,
+                            $lowestability,
+                            $highestability);
                         $element->setValue($lowerlimit);
                     }
                 }
 
-
                 // If the Element is new, we set the default.
                 // If we get a value here, the overriding value is set in the set_data_after_definition function.
-
                 $subelements[] = $element;
-
                 if ($j === $numberoffeedbackspersubscale) {
                     $element = $mform->addElement(
                         'static',
@@ -216,7 +218,12 @@ class feedbackclass {
                     ));
                     $upperlimit = optional_param('feedback_scaleid_limit_upper_'. $scale->id . '_' . $j, 0, PARAM_FLOAT);
                     if ($upperlimit === null) {
-                        $upperlimit = self::return_limits_for_scale($numberoffeedbackspersubscale, $j, false, $lowestability, $highestability);
+                        $upperlimit = self::return_limits_for_scale(
+                            $numberoffeedbackspersubscale,
+                            $j,
+                            false,
+                            $lowestability,
+                            $highestability);
                         $element->setValue($upperlimit);
                     }
                 }
@@ -559,7 +566,12 @@ class feedbackclass {
      * @return float
      *
      */
-    public static function return_limits_for_scale($nroptions, $optioncounter, bool $lower, float $lowestlimit, float $highestlimit) {
+    public static function return_limits_for_scale(
+        $nroptions,
+        $optioncounter,
+        bool $lower,
+        float $lowestlimit,
+        float $highestlimit) {
 
         // Calculate equal default values for limits in scales.
         $sizeofrange = abs($lowestlimit - $highestlimit);
