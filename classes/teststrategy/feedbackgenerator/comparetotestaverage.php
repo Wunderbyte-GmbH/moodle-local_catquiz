@@ -231,12 +231,12 @@ class comparetotestaverage extends feedbackgenerator {
         $output = "";
 
         for ($i = 1; $i <= $numberoffeedbackoptions; $i++) {
+            // Keys of the lowest and highest values in range...
+            // Since it's already defined via scale min max range, no more need to sanitize here.
             $lowestlimitkey = "feedback_scaleid_limit_lower_" . $catscaleid . "_1";
             $highestlimitkey = "feedback_scaleid_limit_upper_" . $catscaleid . "_" . $numberoffeedbackoptions;
-            $rangestart = ($quizsettings->$lowestlimitkey >= LOCAL_CATQUIZ_PERSONABILITY_LOWER_LIMIT) ?
-                $quizsettings->$lowestlimitkey : LOCAL_CATQUIZ_PERSONABILITY_LOWER_LIMIT;
-            $rangeend = ($quizsettings->$highestlimitkey <= LOCAL_CATQUIZ_PERSONABILITY_UPPER_LIMIT) ?
-            $quizsettings->$highestlimitkey : LOCAL_CATQUIZ_PERSONABILITY_UPPER_LIMIT;
+            $rangestart = $quizsettings->$lowestlimitkey;
+            $rangeend = $quizsettings->$highestlimitkey;
 
             $lowerlimitkey = "feedback_scaleid_limit_lower_" . $catscaleid . "_" . $i;
             $upperlimitkey = "feedback_scaleid_limit_upper_" . $catscaleid . "_" . $i;
