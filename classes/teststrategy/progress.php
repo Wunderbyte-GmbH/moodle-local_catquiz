@@ -34,8 +34,9 @@ use Random\RandomException;
 use stdClass;
 
 defined('MOODLE_INTERNAL') || die();
+// No login check is expected here because this is already done in the
+// adaptivequiz attempt.php file. @codingStandardsIgnoreLine
 require_once(__DIR__ . '/../../../../config.php');
-// require_login();
 
 /**
  * Stores the progress of a catquiz attempt that is not yet finished.
