@@ -178,10 +178,14 @@ class feedbackclass {
                 if ($j === 1) {
                     $element = $mform->addElement(
                         'static',
-                        'feedback_scaleid_limit_lower_'. $scale->id . '_' . $j,
+                        'lowest_limit',
                         get_string('lowerlimit', 'local_catquiz'),
                         $lowestability
                         );
+                    $subelements[] = $mform->addElement(
+                        'hidden',
+                        'feedback_scaleid_limit_lower_'. $scale->id . '_' . $j,
+                        $lowestability);
                 } else {
                     $element = $mform->addElement(
                         'float',
@@ -206,10 +210,14 @@ class feedbackclass {
                 if ($j === $numberoffeedbackspersubscale) {
                     $element = $mform->addElement(
                         'static',
-                        'feedback_scaleid_limit_upper_'. $scale->id . '_' . $j,
+                        'highestvalue',
                         get_string('upperlimit', 'local_catquiz'),
                         $highestability
                         );
+                    $subelements[] = $mform->addElement(
+                        'hidden',
+                        'feedback_scaleid_limit_upper_'. $scale->id . '_' . $j,
+                        $highestability);
                 } else {
                     $element = $mform->addElement(
                         'float',

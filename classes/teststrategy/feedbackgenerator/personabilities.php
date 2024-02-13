@@ -310,9 +310,9 @@ class personabilities extends feedbackgenerator {
         $interval = $abilitystep * 2;
         $abilityrange = catscale::get_ability_range($primarycatscale->id);
 
-        $ul = $abilityrange['minscalevalue'];
-        $ll = $abilityrange['maxscalevalue'];
-        for ($i = $ll + $abilitystep; $i <= $ul - $abilitystep; $i += $interval) {
+        $ul = (float) $abilityrange['maxscalevalue'];
+        $ll = (float) $abilityrange['minscalevalue'];
+        for ($i = $ll + $abilitystep; $i <= ($ul - $abilitystep); $i += $interval) {
             $abilitysteps[] = $i;
         }
         $catscale = new catscale($primarycatscale->id);
@@ -926,8 +926,8 @@ class personabilities extends feedbackgenerator {
         $default = "#878787";
         $abilityrange = catscale::get_ability_range($catscaleid);
         if (!$quizsettings ||
-            $personability < $abilityrange['minscalevalue'] ||
-            $personability > $abilityrange['maxscalevalue']) {
+            $personability < (float) $abilityrange['minscalevalue'] ||
+            $personability > (float) $abilityrange['maxscalevalue']) {
             return $default;
         }
         $numberoffeedbackoptions = intval($quizsettings['numberoffeedbackoptionsselect']) ?? 8;
