@@ -86,13 +86,13 @@ class catscale_structure {
             $this->name = $data['name'];
             $this->description = $data['description'] ?? '';
             $this->minscalevalue
-                = empty($data["catquiz_minscalevalue"])
+                = empty($data["minscalevalue"])
                 ? LOCAL_CATQUIZ_PERSONABILITY_LOWER_LIMIT
-                : $data["catquiz_minscalevalue"];
+                : $data["minscalevalue"];
             $this->maxscalevalue
-                = empty($data["catquiz_maxscalevalue"])
+                = empty($data["maxscalevalue"])
                 ? LOCAL_CATQUIZ_PERSONABILITY_UPPER_LIMIT
-                : $data["catquiz_maxscalevalue"];
+                : $data["maxscalevalue"];
 
             if (!empty($data['id'])) {
                 $url = new moodle_url('/local/catquiz/manage_catscales.php', [
