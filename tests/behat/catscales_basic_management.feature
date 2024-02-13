@@ -26,11 +26,14 @@ Feature: As an admin I perform basic catquiz actions - create, update, delete, s
     ## And I follow "#catscales-tab"
     And I click on "CAT scales" "link" in the "#region-main" "css_element"
     And I follow "Create"
+    And the following fields match these values:
+      | Person ability minimum             | -5                |
+      | Person ability maximum:            | 5                 |
     And I set the following fields to these values:
       | Name                               | Math              |
       | Description                        | Description: Math |
-      | minmaxgroup[catquiz_minscalevalue] | 5                 |
-      | minmaxgroup[catquiz_maxscalevalue] | 15                |
+      | Person ability minimum             | -4                |
+      | Person ability maximum:            | 4                 |
     And I press "Save changes"
     ## And I wait "1" seconds
     And I wait until the page is ready
@@ -43,12 +46,10 @@ Feature: As an admin I perform basic catquiz actions - create, update, delete, s
     And the following fields match these values:
       | Name                               | Math              |
       | Description                        | Description: Math |
-      | minmaxgroup[catquiz_minscalevalue] | 5                 |
-      | minmaxgroup[catquiz_maxscalevalue] | 15                |
+      | Person ability minimum             | -4                |
+      | Person ability maximum:            | 4                 |
     And I set the following fields to these values:
-      | Name                               | Mathematics |
-      | minmaxgroup[catquiz_minscalevalue] | 6           |
-      | minmaxgroup[catquiz_maxscalevalue] | 16.5        |
+      | Name                               | Mathematics       |
     And I press "Save changes"
     ## And I wait "1" seconds
     And I wait until the page is ready
@@ -71,8 +72,8 @@ Feature: As an admin I perform basic catquiz actions - create, update, delete, s
     And I follow "Create"
     And I set the following fields to these values:
       | Name                               | Mathematics |
-      | minmaxgroup[catquiz_minscalevalue] | 5.5         |
-      | minmaxgroup[catquiz_maxscalevalue] | 20          |
+      | Person ability minimum             | -4          |
+      | Person ability maximum:            | 4           |
     And I press "Save changes"
     And I wait until the page is ready
     Then I should see "Mathematics" in the "[data-name=\"Mathematics\"]" "css_element"
