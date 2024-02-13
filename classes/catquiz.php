@@ -179,11 +179,10 @@ class catquiz {
         }
 
         $select = 'DISTINCT *';
-        $from = "( SELECT s1.id s1.*, s5.model, s5.difficulty, s5.discrimination, s5.guessing,
+        $from = "( SELECT s1.*, s5.model, s5.difficulty, s5.discrimination, s5.guessing,
                     s5.timecreated, s5.timemodified, s5.status
             FROM (
             SELECT
-                q.id id,
                 q.id,
                 lci.componentid,
                 qbe.idnumber as label,
