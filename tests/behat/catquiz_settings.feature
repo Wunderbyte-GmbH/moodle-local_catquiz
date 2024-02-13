@@ -113,7 +113,6 @@ Feature: As a teacher I setup adaptive quiz with CATquiz Scales and Feedbacks.
       | Proportion of questions to be piloted in % | 20                        |
       | Start new CAT test with                    | Use the average ability score of the current test |
       | Limit time for attempt                     | 1                         |
-      | Action on timeout                          | Test aborted with result. |
       ## Intentional error - no time values
       ## Intentional error min > max
       | maxquestionsscalegroup[catquiz_minquestionspersubscale] | 3 |
@@ -176,7 +175,6 @@ Feature: As a teacher I setup adaptive quiz with CATquiz Scales and Feedbacks.
       | maxquestionsgroup[catquiz_minquestions]                 | 3   |
       | maxquestionsgroup[catquiz_maxquestions]                 | 10  |
       | Limit time for attempt                                  | 1   |
-      | Action on timeout                                       | Test aborted with result. |
       | catquiz_timelimitgroup[catquiz_maxtimeperattempt]       | 5   |
       | catquiz_timelimitgroup[catquiz_timeselect_attempt]      | min |
       | catquiz_timelimitgroup[catquiz_maxtimeperitem]          | 1   |
