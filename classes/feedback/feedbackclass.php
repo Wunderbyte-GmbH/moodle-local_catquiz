@@ -128,7 +128,9 @@ class feedbackclass {
         $enrolledcourses = enrol_get_my_courses();
         $coursesfromtags = dataapi::get_courses_from_settings_tags() ?? [];
         $courses = array_merge($enrolledcourses, $coursesfromtags);
-
+        $parentscale = reset($scales);
+        $lowestability = $parentscale->minscalevalue;
+        $highestability = $parentscale->maxscalevalue;
         foreach ($scales as $scale) {
             $subelements = [];
             $numberoffeedbacksfilledout = 0;
@@ -171,36 +173,57 @@ class feedbackclass {
                 get_string('feedbacknumber', 'local_catquiz', $j));
 
                 // Define range.
-                $element = $mform->addElement(
-                    'float',
-                    'feedback_scaleid_limit_lower_'. $scale->id . '_' . $j,
-                     get_string('lowerlimit', 'local_catquiz'
-                ));
-                $mform->settype('feedback_scaleid_limit_lower_'. $scale->id . '_' . $j, PARAM_FLOAT);
+                // For the lowest range (first range, min) value should be set statically to min of scale ability.
+                // Max (last range, max) is set to max of scale.
+                if ($j === 1) {
+                    $element = $mform->addElement(
+                        'static',
+                        'feedback_scaleid_limit_lower_'. $scale->id . '_' . $j,
+                        get_string('lowerlimit', 'local_catquiz'),
+                        $lowestability
+                        );
+                } else {
+                    $element = $mform->addElement(
+                        'float',
+                        'feedback_scaleid_limit_lower_'. $scale->id . '_' . $j,
+                        get_string('lowerlimit', 'local_catquiz')
+                        );
+                    $lowerlimit = optional_param('feedback_scaleid_limit_lower_'. $scale->id . '_' . $j, 0, PARAM_FLOAT);
+                    if ($lowerlimit === null) {
+                        $lowerlimit = self::return_limits_for_scale($numberoffeedbackspersubscale, $j, true, $lowestability, $highestability);
+                        $element->setValue($lowerlimit);
+                    }
+                }
+
 
                 // If the Element is new, we set the default.
                 // If we get a value here, the overriding value is set in the set_data_after_definition function.
-                $lowerlimit = $data['feedback_scaleid_limit_lower_'. $scale->id . '_' . $j] ?? null;
-                if ($lowerlimit === null) {
-                    $lowerlimit = self::return_limits_for_scale($numberoffeedbackspersubscale, $j, true);
-                    $element->setValue($lowerlimit);
-                }
+
                 $subelements[] = $element;
 
-                $element = $mform->addElement(
-                    'float',
-                    'feedback_scaleid_limit_upper_'. $scale->id . '_' . $j,
-                    get_string('upperlimit', 'local_catquiz'
-                ));
-                $mform->settype('feedback_scaleid_limit_upper_' . $scale->id . '_' . $j, PARAM_FLOAT);
+                if ($j === $numberoffeedbackspersubscale) {
+                    $element = $mform->addElement(
+                        'static',
+                        'feedback_scaleid_limit_upper_'. $scale->id . '_' . $j,
+                        get_string('upperlimit', 'local_catquiz'),
+                        $highestability
+                        );
+                } else {
+                    $element = $mform->addElement(
+                        'float',
+                        'feedback_scaleid_limit_upper_'. $scale->id . '_' . $j,
+                        get_string('upperlimit', 'local_catquiz'
+                    ));
+                    $upperlimit = optional_param('feedback_scaleid_limit_upper_'. $scale->id . '_' . $j, 0, PARAM_FLOAT);
+                    if ($upperlimit === null) {
+                        $upperlimit = self::return_limits_for_scale($numberoffeedbackspersubscale, $j, false, $lowestability, $highestability);
+                        $element->setValue($upperlimit);
+                    }
+                }
 
                 // If the Element is new, we set the default.
                 // If we get a value here, the overriding value is set in the set_data_after_definition function.
-                $upperlimit = $data['feedback_scaleid_limit_upper_'. $scale->id . '_' . $j] ?? null;
-                if ($upperlimit === null) {
-                    $upperlimit = self::return_limits_for_scale($numberoffeedbackspersubscale, $j, false);
-                    $element->setValue($upperlimit);
-                }
+
                 $subelements[] = $element;
 
                 // Rich text field for subfeedback.
@@ -531,20 +554,22 @@ class feedbackclass {
      * @param mixed $nroptions
      * @param mixed $optioncounter
      * @param bool $lower
+     * @param float $lowestlimit
+     * @param float $highestlimit
      *
      * @return float
      *
      */
-    public static function return_limits_for_scale($nroptions, $optioncounter, bool $lower) {
+    public static function return_limits_for_scale($nroptions, $optioncounter, bool $lower, float $lowestlimit, float $highestlimit) {
 
         // Calculate equal default values for limits in scales.
-        $sizeofrange = abs(LOCAL_CATQUIZ_PERSONABILITY_LOWER_LIMIT - LOCAL_CATQUIZ_PERSONABILITY_UPPER_LIMIT);
+        $sizeofrange = abs($lowestlimit - $highestlimit);
         $increment = round($sizeofrange / $nroptions, 2);
 
         if ($lower) {
-            return round(LOCAL_CATQUIZ_PERSONABILITY_LOWER_LIMIT + ($optioncounter - 1) * $increment, 2);
+            return round($lowestlimit + ($optioncounter - 1) * $increment, 2);
         } else {
-            return round(LOCAL_CATQUIZ_PERSONABILITY_LOWER_LIMIT + $optioncounter * $increment, 2);
+            return round($lowestlimit + $optioncounter * $increment, 2);
         }
     }
 }
