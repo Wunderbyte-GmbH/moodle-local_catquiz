@@ -624,6 +624,8 @@ class model_item_param_list implements ArrayAccess, IteratorAggregate, Countable
                 'description' => '',
                 'timecreated' => time(),
                 'timemodified' => time(),
+                'minscalevalue' => LOCAL_CATQUIZ_PERSONABILITY_LOWER_LIMIT,
+                'maxscalevalue' => LOCAL_CATQUIZ_PERSONABILITY_UPPER_LIMIT,
             ]);
 
             $catscaleid = dataapi::create_catscale($catscale);
