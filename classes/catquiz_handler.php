@@ -908,8 +908,8 @@ class catquiz_handler {
             'updateabilityfallback' => false,
             'excludedsubscales' => [],
             'has_fisherinformation' => false,
-            'max_attempttime_in_sec' => $attemptseconds ?? 0,
-            'max_itemtime_in_sec' => $itemseconds ?? 0,
+            'max_attempttime_in_sec' => $attemptseconds ?? INF,
+            'max_itemtime_in_sec' => $itemseconds ?? INF,
             'se_max' => $quizsettings->catquiz_standarderrorgroup->catquiz_standarderror_max,
             'se_min' => $quizsettings->catquiz_standarderrorgroup->catquiz_standarderror_min,
         ];

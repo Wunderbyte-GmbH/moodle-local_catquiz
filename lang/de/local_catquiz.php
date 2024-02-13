@@ -140,7 +140,6 @@ $string['startwithaverageabilityoftest'] = "Personenparamter entspricht Mittelwe
 $string['startwithcurrentability'] = "Personenparameter aus vorherigem Testlauf nutzen";
 $string['maxtimeperquestion'] = "Erlaubte Zeit";
 $string['maxtimeperquestion_help'] = "Falls die Beantwortung einer Frage länger dauert, wird eine Pause erzwungen";
-$string['breakduration'] = "Dauer der Pause in Sekunden";
 $string['min'] = "min:";
 $string['max'] = "max:";
 
