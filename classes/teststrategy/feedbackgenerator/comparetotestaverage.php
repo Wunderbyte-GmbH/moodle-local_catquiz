@@ -235,14 +235,14 @@ class comparetotestaverage extends feedbackgenerator {
             // Since it's already defined via scale min max range, no more need to sanitize here.
             $lowestlimitkey = "feedback_scaleid_limit_lower_" . $catscaleid . "_1";
             $highestlimitkey = "feedback_scaleid_limit_upper_" . $catscaleid . "_" . $numberoffeedbackoptions;
-            $rangestart = $quizsettings->$lowestlimitkey;
-            $rangeend = $quizsettings->$highestlimitkey;
+            $rangestart = (float) $quizsettings->$lowestlimitkey;
+            $rangeend = (float) $quizsettings->$highestlimitkey;
 
             $lowerlimitkey = "feedback_scaleid_limit_lower_" . $catscaleid . "_" . $i;
             $upperlimitkey = "feedback_scaleid_limit_upper_" . $catscaleid . "_" . $i;
 
-            $lowerlimit = $quizsettings->$lowerlimitkey;
-            $upperlimit = $quizsettings->$upperlimitkey;
+            $lowerlimit = (float) $quizsettings->$lowerlimitkey;
+            $upperlimit = (float) $quizsettings->$upperlimitkey;
 
             $lowerpercentage = (($lowerlimit - $rangestart) / ($rangeend - $rangestart)) * 100 + $gradient;
             $upperpercentage = (($upperlimit - $rangestart) / ($rangeend - $rangestart)) * 100 - $gradient;
@@ -322,13 +322,26 @@ class comparetotestaverage extends feedbackgenerator {
 
         $testaverage = (new firstquestionselector())->get_median_ability_of_test($personparams);
 
+        $abilityrange = catscale::get_ability_range($catscaleid);
+        $middle = ($abilityrange['minscalevalue'] + $abilityrange['maxscalevalue']) / 2;
+
+        $testaverageinrange = feedbacksettings::sanitize_range_min_max(
+            $testaverage,
+            $abilityrange['minscalevalue'],
+            $abilityrange['maxscalevalue']);
+
+        $abilityinrange = feedbacksettings::sanitize_range_min_max(
+            $ability,
+            $abilityrange['minscalevalue'],
+            $abilityrange['maxscalevalue']);
+
         return [
             'contextid' => $existingdata['contextid'],
             'needsimprovementthreshold' => $needsimprovementthreshold,
-            'testaverageability' => sprintf('%.2f', $testaverage),
-            'userability' => sprintf('%.2f', $ability),
-            'testaverageposition' => ($testaverage + 5) * 10,
-            'userabilityposition' => ($ability + 5) * 10,
+            'testaverageability' => sprintf('%.2f', $testaverageinrange),
+            'userability' => sprintf('%.2f', $abilityinrange),
+            'testaverageposition' => ($testaverageinrange + $abilityrange['maxscalevalue']) * 10,
+            'userabilityposition' => ($abilityinrange + $abilityrange['maxscalevalue']) * 10,
             'comparisontext' => $text,
             'colorbar' => [
                 'colorgradestring' => $this->get_colorgradientstring($quizsettings, $catscaleid),
@@ -338,6 +351,9 @@ class comparetotestaverage extends feedbackgenerator {
             ],
             'currentability' => get_string('currentability', 'local_catquiz', $catscale->name),
             'currentabilityfellowstudents' => get_string('currentabilityfellowstudents', 'local_catquiz', $catscale->name),
+            'lowerscalelimit' => $abilityrange['minscalevalue'],
+            'upperscalelimit' => $abilityrange['maxscalevalue'],
+            'middle' => $middle,
         ];
     }
 }

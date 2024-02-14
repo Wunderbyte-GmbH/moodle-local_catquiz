@@ -244,5 +244,29 @@ class feedbacksettings {
             return $personabilities;
         }
     }
+
+    /**
+     * Check if a value is within a defined min max range and if not return border-value (min or max).
+     *
+     * @param float $value
+     * @param float $min
+     * @param float $max
+     *
+     * @return float
+     */
+    public static function sanitize_range_min_max(float $value, float $min, float $max): float {
+        if ($min > $max) {
+            throw new \moodle_exception('minmustbelowerthanmax', 'local_catquiz');
+        }
+
+        if ($value <= $min) {
+            return $min;
+        }
+        if ($value >= $max) {
+            return $max;
+        }
+        return $value;
+
+    }
 }
 
