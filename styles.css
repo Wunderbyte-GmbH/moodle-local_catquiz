@@ -79,7 +79,7 @@ span.wb_colourpick .colourpickercircle {
     border-radius: 50%;
     display: inline-block;
     margin: 0 5px 0 5px;
-    border: 1px solid;
+    border: 1px solid black;
 }
 
 span.wb_colourpick .colourpickercircle:hover,
@@ -88,5 +88,6 @@ span.wb_colourpick.colourpickercircle:hover {
 }
 span.wb_colourpick .colourpickercircle.selected,
 span.wb_colourpick.colourpickercircle.selected {
-    border: 3px solid;
+    border: 3px solid white;
+    outline: 5px solid black;
 }
