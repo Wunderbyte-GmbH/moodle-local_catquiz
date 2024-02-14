@@ -110,7 +110,7 @@ class local_catquiz_generator extends testing_module_generator {
         $DB->set_field('adaptivequiz', 'catmodel', $adaptivequiz->catmodel, ['id' => $adaptivequiz->adaptivecatquizid]);
 
         // TODO: create correct json somehow. One from phpunittests does not mutch dynamic IDs in behat.
-        $json = file_get_contents(__DIR__ . '/../fixtures/testenvironment.json');
+        $json = file_get_contents(__DIR__ . '/../fixtures/testenvironmentdummy.json');
         $jsondata = json_decode($json);
 
         $catscale = $DB->get_record('local_catquiz_catscales', ['id' => $adaptivequiz->catscalesid]);
