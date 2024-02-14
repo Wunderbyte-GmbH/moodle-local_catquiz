@@ -117,6 +117,11 @@ $string['formelementbetweenzeroandone'] = 'Bitte Werte zwischen 0 und 1 eingeben
 $string['formmscalegreaterthantest'] = 'Minimum pro Skala muss kleiner sein als Maximum des Tests';
 $string['formetimelimitnotprovided'] = 'Geben Sie zumindest einen Wert ein';
 $string['nogapallowed'] = "Keine Lücken in Personenfähigkeitsspanne erlaubt. Bitte beginnen setzen Sie als Mindestwert den Maximalwert des vorangegangenen Bereichs.";
+$string['formelementnegativefloat'] = 'Negative Dezimalzahl eingeben.';
+$string['formelementpositivefloat'] = 'Positive Dezimalzahl eingeben.';
+$string['formelementnegativefloatwithdefault'] = 'Negative Dezimalzahl eingeben. Standard wäre {$a}.';
+$string['formelementpositivefloatwithdefault'] = 'Positive Dezimalzahl eingeben. Standard wäre {$a}.';
+
 
 $string['addoredittemplate'] = "Einstellungs-Vorlage bearbeiten";
 

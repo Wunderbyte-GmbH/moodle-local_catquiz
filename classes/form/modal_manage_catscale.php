@@ -203,10 +203,16 @@ class modal_manage_catscale extends dynamic_form {
         }
 
         if (isset($data["catquiz_minscalevalue"]) && (float) $data["catquiz_minscalevalue"] >= 0) {
-            $errors["catquiz_minscalevalue"] = get_string('formelementpositivefloat', 'local_catquiz');
+            $errors["catquiz_minscalevalue"] = get_string(
+                'formelementnegativefloatwithdefault',
+                'local_catquiz',
+                LOCAL_CATQUIZ_PERSONABILITY_LOWER_LIMIT);
         }
         if (isset($data["catquiz_maxscalevalue"]) && (float) $data["catquiz_maxscalevalue"] <= 0) {
-            $errors["catquiz_maxscalevalue"] = get_string('formelementnegativefloat', 'local_catquiz');
+            $errors["catquiz_maxscalevalue"] = get_string(
+                'formelementpositivefloatwithdefault',
+                'local_catquiz',
+                LOCAL_CATQUIZ_PERSONABILITY_UPPER_LIMIT);
         }
         if ( (float)$data["catquiz_minscalevalue"] > (float) $data["catquiz_maxscalevalue"]) {
             $errors['catquiz_minscalevalue'] = get_string('errorminscalevalue', 'local_catquiz');
