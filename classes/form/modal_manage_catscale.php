@@ -229,7 +229,7 @@ class modal_manage_catscale extends dynamic_form {
 
         $data = parent::get_data();
 
-        $data->maxscalevalue = ((float) $data->catquiz_minscalevalue) ?? LOCAL_CATQUIZ_PERSONABILITY_LOWER_LIMIT;
+        $data->minscalevalue = ((float) $data->catquiz_minscalevalue) ?? LOCAL_CATQUIZ_PERSONABILITY_LOWER_LIMIT;
         $data->maxscalevalue = ((float) $data->catquiz_maxscalevalue) ?? LOCAL_CATQUIZ_PERSONABILITY_UPPER_LIMIT;
 
         return $data;
