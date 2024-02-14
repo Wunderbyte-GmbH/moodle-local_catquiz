@@ -22,7 +22,7 @@
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-$string['pluginname'] = '1PL Rasch-Birnbaum Modell';
+$string['pluginname'] = '1PL Rasch Modell';
 $string['trusted_region_min'] = 'Trusted Region Minimum';
 $string['trusted_region_min_desc'] = 'Trusted Region Minimum';
 $string['trusted_region_max'] = 'Trusted Region Maximum';

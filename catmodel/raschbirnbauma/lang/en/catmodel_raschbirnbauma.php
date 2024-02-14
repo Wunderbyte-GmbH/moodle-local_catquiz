@@ -15,14 +15,14 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * This file contains language strings for the 1plraschbirnbaum model catquiz plugin
+ * This file contains language strings for the 1plraschbaum model catquiz plugin
  *
  * @package catmodel_raschbirnbauma
  * @copyright  2022 Georg Maißer <info@wunderbyte.at>
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-$string['pluginname'] = '1PL Rasch-Birnbaum model';
+$string['pluginname'] = '1PL Rasch model';
 $string['trusted_region_min_a'] = 'Trusted Region Minimum';
 $string['trusted_region_min_a_desc'] = 'Trusted Region Minimum';
 $string['trusted_region_max_a'] = 'Trusted Region Maximum';
