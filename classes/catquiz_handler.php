@@ -629,9 +629,21 @@ class catquiz_handler {
                         $j = $matches[1];
 
                         if (strpos($k, '_lower')) {
-                            $value = feedbackclass::return_limits_for_scale($numberofoptions, $j, true, $parentscale->minscalevalue, $parentscale->maxscalevalue);
+                            $value = feedbackclass::return_limits_for_scale(
+                                $numberofoptions,
+                                $j,
+                                true,
+                                $parentscale->minscalevalue,
+                                $parentscale->maxscalevalue
+                            );
                         } else {
-                            $value = feedbackclass::return_limits_for_scale($numberofoptions, $j, false, $parentscale->minscalevalue, $parentscale->maxscalevalue);
+                            $value = feedbackclass::return_limits_for_scale(
+                                $numberofoptions,
+                                $j,
+                                false,
+                                $parentscale->minscalevalue,
+                                $parentscale->maxscalevalue
+                            );
                         }
 
                         if ($mform->elementExists($k)) {
