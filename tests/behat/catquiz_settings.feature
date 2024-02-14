@@ -203,22 +203,22 @@ Feature: As a teacher I setup adaptive quiz with CATquiz Scales and Feedbacks.
     And I fill in the "editor" element number "2" with the dynamic identifier "id_feedbackeditor_scaleid_" with "my text is here"
     And I fill in the "wb_colourpicker" element number "2" with the dynamic identifier "fitem_id_wb_colourpicker_" with "6"
     ## The data-attribute from form's custom 'div'-delimited group has been used
+    ## Lowest and highest limits are not editable
     ## Update feedback defaults and chek it for root catscale, range 1
     And I should see "Feedback for range 1" in the "//div[@data-name='feedback_scale_Simulation_range_1']" "xpath_element"
-    And the field "Lower limit" in the "//div[@data-name='feedback_scale_Simulation_range_1']" "xpath_element" matches value "-5"
+    And I should see "-5" in the "//div[@data-name='feedback_scale_Simulation_range_1']//div[@id='fitem_id_lowest_limit']" "xpath_element"
     And the field "Upper limit" in the "//div[@data-name='feedback_scale_Simulation_range_1']" "xpath_element" matches value "-0"
     And I set the field "Feedback" in the "//div[@data-name='feedback_scale_Simulation_range_1']" "xpath_element" to "Feedback-Simulation_range_1"
-    And I set the field "Lower limit" in the "//div[@data-name='feedback_scale_Simulation_range_1']" "xpath_element" to "-4"
     And I set the field "Upper limit" in the "//div[@data-name='feedback_scale_Simulation_range_1']" "xpath_element" to "-1"
-    And the field "Lower limit" in the "//div[@data-name='feedback_scale_Simulation_range_1']" "xpath_element" matches value "-4"
     And the field "Upper limit" in the "//div[@data-name='feedback_scale_Simulation_range_1']" "xpath_element" matches value "-1"
     ## Update feedback defaults and check it for root catscale, range 2
     And I should see "Feedback for range 2" in the "//div[@data-name='feedback_scale_Simulation_range_2']" "xpath_element"
     And I set the field "Feedback" in the "//div[@data-name='feedback_scale_Simulation_range_2']" "xpath_element" to "Feedback-Simulation_range_2"
+    ## Intentional error
     And I set the field "Lower limit" in the "//div[@data-name='feedback_scale_Simulation_range_2']" "xpath_element" to "1"
-    And I set the field "Upper limit" in the "//div[@data-name='feedback_scale_Simulation_range_2']" "xpath_element" to "4"
     And the field "Lower limit" in the "//div[@data-name='feedback_scale_Simulation_range_2']" "xpath_element" matches value "1"
-    And the field "Upper limit" in the "//div[@data-name='feedback_scale_Simulation_range_2']" "xpath_element" matches value "4"
+    And I should see "5" in the "//div[@data-name='feedback_scale_Simulation_range_2']//div[@id='fitem_id_highestvalue']" "xpath_element"
+
     And I should not see "Feedback for range 3" in the "//div[contains(@aria-labelledby, 'catquiz_feedback_header_')]" "xpath_element"
     ## Check visibility of feedback form links for other catscales
     And I should see "Feedback for \"SimA\"" in the "//div[contains(@aria-labelledby, 'catquiz_feedback_header_')]" "xpath_element"
@@ -226,6 +226,9 @@ Feature: As a teacher I setup adaptive quiz with CATquiz Scales and Feedbacks.
     And I should see "Feedback for \"SimC\"" in the "//div[contains(@aria-labelledby, 'catquiz_feedback_header_')]" "xpath_element"
     ## Save and verify feedback configuration
     And I click on "Save and return to course" "button"
+    ## Error "no gap" expected
+    ##And I wait "30" seconds
+    ##And I click on "Save and return to course" "button"
     And I am on the "adaptivecatquiz1" Activity page
     And I follow "Settings"
     And I wait until the page is ready
@@ -245,7 +248,7 @@ Feature: As a teacher I setup adaptive quiz with CATquiz Scales and Feedbacks.
     ## -native selection does not work with autocomplete
     ##And the field "Subscription to a course" in the "//div[@data-name='feedback_scale_Simulation_range_2']" "xpath_element" matches value "Course 1"
 
-    ## Ranges 1 nad 2 - other fields, mixed access:
+    ## Ranges 1 and 2 - other fields, mixed access:
     And the field "Inform participants about group or course enrollment using the standard text." in the "//div[@data-name='feedback_scale_Simulation_range_2']" "xpath_element" matches value "1"
     And the field "Feedback" in the "//div[@data-name='feedback_scale_Simulation_range_1']" "xpath_element" matches value "Feedback-Simulation_range_1"
     And the field "Feedback" in the "//div[@data-name='feedback_scale_Simulation_range_2']" "xpath_element" matches value "Feedback-Simulation_range_2"
