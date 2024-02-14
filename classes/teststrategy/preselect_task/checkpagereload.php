@@ -64,6 +64,11 @@ final class checkpagereload extends preselect_task implements wb_middleware {
         return result::ok($this->progress->get_last_question());
     }
 
+    /**
+     * Returns the context key.
+     *
+     * @return array
+     */
     public function get_required_context_keys(): array {
         return ['progress'];
     }

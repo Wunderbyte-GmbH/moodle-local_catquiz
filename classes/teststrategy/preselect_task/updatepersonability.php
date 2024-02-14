@@ -431,11 +431,19 @@ class updatepersonability extends preselect_task implements wb_middleware {
         return 1.0;
     }
 
+    /**
+     * Calculates Mean from past attempts.
+     * @return null
+     */
     private function calculate_mean_from_past_attempts() {
         // TODO: Implement.
         return null;
     }
 
+    /**
+     * Calculates Standard Error from past attempts.
+     * @return null
+     */
     private function calculate_se_from_past_attempts() {
         // TODO: Implement.
         return null;

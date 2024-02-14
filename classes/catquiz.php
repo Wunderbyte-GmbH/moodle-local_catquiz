@@ -1786,9 +1786,9 @@ class catquiz {
      * Marks the given question as failed
      *
      * @param int $questionid
+     * @param int $usageid
      */
-    public static function mark_question_failed(int $questionid, int $usageid)
-    {
+    public static function mark_question_failed(int $questionid, int $usageid) {
         global $DB;
         $quba = question_engine::load_questions_usage_by_activity($usageid);
         $slot = max($quba->get_slots());
@@ -1807,7 +1807,7 @@ class catquiz {
         $quba->finish_question($slot);
         question_engine::save_questions_usage_by_activity($quba);
 
-        // Increment questions attempted
+        // Increment questions attempted.
         $adqattempt = $DB->get_record('adaptivequiz_attempt', ['uniqueid' => $usageid]);
         $now = time();
         $adqattempt->timemodified = $now;

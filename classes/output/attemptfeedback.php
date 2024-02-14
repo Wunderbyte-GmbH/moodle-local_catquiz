@@ -151,6 +151,11 @@ class attemptfeedback implements renderable, templatable {
         catquiz::save_attempt_to_db($updateddata);
     }
 
+    /**
+     * Load feedbackdata
+     *
+     * @return array
+     */
     public function load_feedbackdata(): array {
         global $DB;
         $feedbackdata = json_decode(
@@ -167,10 +172,20 @@ class attemptfeedback implements renderable, templatable {
         return $feedbackdata;
     }
 
+    /**
+     * Get feedback generators of teststrategy
+     *
+     * @return array
+     */
     public function get_feedback_generators() {
         return $this->get_feedback_generators_for_teststrategy($this->teststrategy);
     }
 
+    /**
+     * Create initial data.
+     *
+     * @return array
+     */
     private function create_initial_data(): array {
         global $USER;
         $cache = cache::make('local_catquiz', 'adaptivequizattempt');
@@ -271,6 +286,9 @@ class attemptfeedback implements renderable, templatable {
         ];
     }
 
+    /**
+     * Triggers tasks when attempt finished
+     */
     private function attempt_finished_tasks() {
         global $USER;
         $progress = progress::load($this->attemptid, 'mod_adaptivequiz', $this->contextid);
