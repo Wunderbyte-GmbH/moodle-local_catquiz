@@ -192,7 +192,7 @@ class feedbackclass {
                         'feedback_scaleid_limit_lower_'. $scale->id . '_' . $j,
                         get_string('lowerlimit', 'local_catquiz')
                         );
-                    $lowerlimit =  $defaultvalues['feedback_scaleid_limit_lower_'. $scale->id . '_' . $j]
+                    $lowerlimit = $defaultvalues['feedback_scaleid_limit_lower_'. $scale->id . '_' . $j]
                         ?? optional_param('feedback_scaleid_limit_lower_'. $scale->id . '_' . $j, -12345, PARAM_FLOAT);
                     if ($lowerlimit === -12345) {
                         $lowerlimit = self::return_limits_for_scale(
