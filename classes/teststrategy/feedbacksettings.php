@@ -18,6 +18,7 @@ namespace local_catquiz\teststrategy;
 
 use local_catquiz\catscale;
 use local_catquiz\feedback\feedbackclass;
+use local_catquiz\output\attemptfeedback;
 
 defined('MOODLE_INTERNAL') || die();
 
@@ -216,14 +217,16 @@ class feedbacksettings {
      *
      * @param int $teststrategy
      * @param array $personabilities
+     * @param array $feedbackdata
      * @param int $catscaleid
      * @param bool $feedbackonlyfordefinedscaleid
      *
      * @return array
      */
     public static function return_scales_according_to_strategy(
-        int $teststrategy,
+        int $teststrategyid,
         array $personabilities,
+        array $feedbackdata,
         int $catscaleid = 0,
         bool $feedbackonlyfordefinedscaleid = false): array {
 
@@ -235,17 +238,25 @@ class feedbacksettings {
             }
             return $selectedscale;
         }
+        $teststrategy = info::get_teststrategy($teststrategyid);
+        $personabilities = $teststrategy->select_scales_for_report(
+            $personabilities,
+            $feedbackdata,
+            $catscaleid,
+            $feedbackonlyfordefinedscaleid
+        );
 
-        switch ($teststrategy) {
-            case LOCAL_CATQUIZ_STRATEGY_LOWESTSUB:
-                $minscale = array_search(min($personabilities), $personabilities);
-                return [$minscale => $personabilities[$minscale]];
-            case LOCAL_CATQUIZ_STRATEGY_HIGHESTSUB:
-                $maxscale = array_search(max($personabilities), $personabilities);
-                return [$maxscale => $personabilities[$maxscale]];
-            default:
-            return $personabilities;
-        }
+
+        // switch ($teststrategy) {
+        //     case LOCAL_CATQUIZ_STRATEGY_LOWESTSUB:
+        //         $minscale = array_search(min($personabilities), $personabilities);
+        //         return [$minscale => $personabilities[$minscale]];
+        //     case LOCAL_CATQUIZ_STRATEGY_HIGHESTSUB:
+        //         $maxscale = array_search(max($personabilities), $personabilities);
+        //         return [$maxscale => $personabilities[$maxscale]];
+        //     default:
+        //     return $personabilities;
+        // }
     }
 
     /**

@@ -291,6 +291,7 @@ class attemptfeedback implements renderable, templatable {
     private function attempt_finished_tasks() {
         global $USER;
         $progress = progress::load($this->attemptid, 'mod_adaptivequiz', $this->contextid);
+        // TODO: UPDATE params here!! we need all infos from attempt (=feedbackdata)
         catquiz::enrol_user($USER->id, (array) $this->quizsettings, $progress->get_abilities());
         $courseandinstance = catquiz::return_course_and_instance_id(
             $this->quizsettings->modulename,
