@@ -142,4 +142,22 @@ class inferlowestskillgap extends strategy {
 
         $this->feedbacksettings = $feedbacksettings;
     }
+
+    /**
+     * Gets predefined values and completes them with specific behaviour of strategy.
+     *
+     * @param array $personabilities
+     * @param array $feedbackdata
+     * @param int $catscaleid
+     * @param bool $feedbackonlyfordefinedscaleid
+     *
+     */
+    public function select_scales_for_report(
+        array &$personabilities,
+        array $feedbackdata,
+        int $catscaleid = 0,
+        bool $feedbackonlyfordefinedscaleid = false
+        ): array {
+        return $personabilities;
+    }
 }

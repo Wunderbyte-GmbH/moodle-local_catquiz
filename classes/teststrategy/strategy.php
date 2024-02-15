@@ -260,4 +260,11 @@ abstract class strategy {
      *
      */
     abstract public function apply_feedbacksettings(feedbacksettings $feedbacksettings);
+
+    abstract public function select_scales_for_report(
+        array &$personabilities,
+        array $feedbackdata,
+        int $catscaleid = 0,
+        bool $feedbackonlyfordefinedscaleid = false
+    ): array;
 }
