@@ -95,4 +95,24 @@ class updatepersonability_testing extends updatepersonability {
     protected function get_initial_standarderror() {
         return floatval(getenv('CATQUIZ_TESTING_STANDARDERROR', true) ?: 1.0);
     }
+
+    /**
+     * Overwrites the parent class for testing.
+     *
+     * @param int $scaleid Not used
+     * @return float
+     */
+    protected function get_min_ability_for_scale(int $scaleid): float {
+        return -10.0;
+    }
+
+    /**
+     * Overwrites the parent class for testing.
+     *
+     * @param int $scaleid Not used
+     * @return float
+     */
+    protected function get_max_ability_for_scale(int $scaleid): float {
+        return 10.0;
+    }
 }

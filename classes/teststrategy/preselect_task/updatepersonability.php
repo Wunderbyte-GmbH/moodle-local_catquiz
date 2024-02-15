@@ -465,7 +465,7 @@ class updatepersonability extends preselect_task implements wb_middleware {
      * @param int $catscaleid
      * @return float
      */
-    private function get_min_ability_for_scale(int $catscaleid):float {
+    protected function get_min_ability_for_scale(int $catscaleid): float {
         if (array_key_exists($catscaleid, $this->scaleabilityrange)) {
             return $this->scaleabilityrange[$catscaleid]['minscalevalue'];
         }
@@ -480,7 +480,7 @@ class updatepersonability extends preselect_task implements wb_middleware {
      * @param int $catscaleid
      * @return float
      */
-    private function get_max_ability_for_scale($catscaleid):float {
+    protected function get_max_ability_for_scale(int $catscaleid): float {
         if (array_key_exists($catscaleid, $this->scaleabilityrange)) {
             return $this->scaleabilityrange[$catscaleid]['maxscalevalue'];
         }
