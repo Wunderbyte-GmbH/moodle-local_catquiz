@@ -611,7 +611,7 @@ class feedbackclass {
             $numberoffeedbackspersubscale = ((int) $data['numberoffeedbackoptionsselect']) ?? 1;
             foreach ($scales as $scale) {
                 if (((int) $data["catquiz_catscales"]) === $scale->id ||
-                    !empty((int) $data["catquiz_subscalecheckbox_" . $scale->id])) {
+                    !empty($data["catquiz_subscalecheckbox_" . $scale->id])) {
                     for ($j = 2; $j <= $numberoffeedbackspersubscale; $j++) {
                         // Upper limit of previous range must be equal of lowest limit for current range.
                         if ((float) $data['feedback_scaleid_limit_upper_' . $scale->id . '_' . ($j - 1)] !==
