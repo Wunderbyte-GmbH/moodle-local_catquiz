@@ -224,9 +224,10 @@ Feature: As a teacher I setup adaptive quiz with CATquiz Scales and Feedbacks.
     ## Delay required to settle CAT scale
     When I wait until the page is ready
     And the field "Number of ability ranges" matches value "2"
-    ## Update feedback defaults and chak it for root catscale, range 1
+    ## Update feedback defaults and chak it for root catscale, range 2
     And I fill in the "autocomplete" element number "2" with the dynamic identifier "fitem_id_catquiz_courses_" with "Course 1"
-    And I fill in the "input" element number "2" with the dynamic identifier "id_feedback_scaleid_limit_lower_" with "-1"
+    ## No lower limit for range 1 so index is 1
+    And I fill in the "input" element number "1" with the dynamic identifier "id_feedback_scaleid_limit_lower_" with "-1"
     And I fill in the "input" element number "2" with the dynamic identifier "id_enrolment_message_checkbox_" with "1"
     And I fill in the "editor" element number "2" with the dynamic identifier "id_feedbackeditor_scaleid_" with "my text is here"
     And I fill in the "wb_colourpicker" element number "2" with the dynamic identifier "fitem_id_wb_colourpicker_" with "6"
@@ -241,11 +242,11 @@ Feature: As a teacher I setup adaptive quiz with CATquiz Scales and Feedbacks.
     And the field "Upper limit" in the "//div[@data-name='feedback_scale_Simulation_range_1']" "xpath_element" matches value "-1"
     ## Update feedback defaults and check it for root catscale, range 2
     And I should see "Feedback for range 2" in the "//div[@data-name='feedback_scale_Simulation_range_2']" "xpath_element"
+    And I should see "5" in the "//div[@data-name='feedback_scale_Simulation_range_2']//div[@id='fitem_id_highestvalue']" "xpath_element"
     And I set the field "Feedback" in the "//div[@data-name='feedback_scale_Simulation_range_2']" "xpath_element" to "Feedback-Simulation_range_2"
     ## Intentional error
     And I set the field "Lower limit" in the "//div[@data-name='feedback_scale_Simulation_range_2']" "xpath_element" to "1"
     And the field "Lower limit" in the "//div[@data-name='feedback_scale_Simulation_range_2']" "xpath_element" matches value "1"
-    And I should see "5" in the "//div[@data-name='feedback_scale_Simulation_range_2']//div[@id='fitem_id_highestvalue']" "xpath_element"
 
     And I should not see "Feedback for range 3" in the "//div[contains(@aria-labelledby, 'catquiz_feedback_header_')]" "xpath_element"
     ## Check visibility of feedback form links for other catscales
@@ -253,11 +254,13 @@ Feature: As a teacher I setup adaptive quiz with CATquiz Scales and Feedbacks.
     And I should see "Feedback for \"SimB\"" in the "//div[contains(@aria-labelledby, 'catquiz_feedback_header_')]" "xpath_element"
     And I should see "Feedback for \"SimC\"" in the "//div[contains(@aria-labelledby, 'catquiz_feedback_header_')]" "xpath_element"
     ## Save and verify feedback configuration
-    And I click on "Save and return to course" "button"
+    And I click on "Save and display" "button"
+    And I wait until the page is ready
+    And I click on "Feedback for \"Simulation\"" "text"
     ## Error "no gap" expected
-    ##And I wait "30" seconds
-    ##And I click on "Save and return to course" "button"
-    And I am on the "adaptivecatquiz1" Activity page
+    And I should see "No gap in the feedbackrange allowed. Please start min in new range with max value of last range." in the "//div[@data-name='feedback_scale_Simulation_range_2']" "xpath_element"
+    And I set the field "Lower limit" in the "//div[@data-name='feedback_scale_Simulation_range_2']" "xpath_element" to "-1"
+    And I click on "Save and display" "button"
     And I follow "Settings"
     And I wait until the page is ready
     Then I click on "Feedback for \"Simulation\"" "text"
@@ -281,8 +284,8 @@ Feature: As a teacher I setup adaptive quiz with CATquiz Scales and Feedbacks.
     And the field "Feedback" in the "//div[@data-name='feedback_scale_Simulation_range_1']" "xpath_element" matches value "Feedback-Simulation_range_1"
     And the field "Feedback" in the "//div[@data-name='feedback_scale_Simulation_range_2']" "xpath_element" matches value "Feedback-Simulation_range_2"
     ## Lowest and highest limits looks like not saved - calculated falues being forced...
-    ##And the field "Lower limit" in the "//div[@data-name='feedback_scale_Simulation_range_1']" "xpath_element" matches value "-4"
-    ##And the field "Upper limit" in the "//div[@data-name='feedback_scale_Simulation_range_1']" "xpath_element" matches value "-1"
-    ##And the field "Lower limit" in the "//div[@data-name='feedback_scale_Simulation_range_2']" "xpath_element" matches value "1"
-    ##And the field "Upper limit" in the "//div[@data-name='feedback_scale_Simulation_range_2']" "xpath_element" matches value "4"
+    And I should see "-5" in the "//div[@data-name='feedback_scale_Simulation_range_1']//div[@id='fitem_id_lowest_limit']" "xpath_element"
+    And the field "Upper limit" in the "//div[@data-name='feedback_scale_Simulation_range_1']" "xpath_element" matches value "-1"
+    And the field "Lower limit" in the "//div[@data-name='feedback_scale_Simulation_range_2']" "xpath_element" matches value "-1"
+    And I should see "5" in the "//div[@data-name='feedback_scale_Simulation_range_2']//div[@id='fitem_id_highestvalue']" "xpath_element"
     And I log out
