@@ -643,38 +643,6 @@ class catquiz {
     }
 
     /**
-     * Returns sql for student stats.
-     *
-     * @param int $contextid
-     *
-     * @return array
-     *
-     */
-    public static function return_sql_for_student_stats(int $contextid) {
-
-        list ($select, $from, $where, $params) = self::get_sql_for_stat_base_request([], [$contextid]);
-
-        $select = "*";
-        $from .= " JOIN {user} u ON qas.userid = u.id";
-
-        if ($where == "") {
-            $where .= "1=1";
-        }
-        $where .= " GROUP BY u.id, u.firstname, u.lastname, ccc1.id";
-
-        $from = " (SELECT u.id, u.firstname, u.lastname, ccc1.id AS contextid,
-                        COUNT(*) as studentattempts FROM $from WHERE $where) s1
-                    JOIN (
-                        SELECT userid, contextid, MAX(ability) as ability
-                        FROM {local_catquiz_personparams} cpp
-                        GROUP BY userid, contextid
-                    ) s2 ON s1.id = s2.userid AND s1.contextid = s2.contextid
-            ";
-
-        return [$select, $from, "1=1", "", $params];
-    }
-
-    /**
      * Basefunction to fetch all questions in context.
      *
      * @param array $testitemids
