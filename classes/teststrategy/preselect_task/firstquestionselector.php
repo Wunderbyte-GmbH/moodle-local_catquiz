@@ -102,7 +102,7 @@ class firstquestionselector extends preselect_task implements wb_middleware {
         $this->progress = $context['progress'];
         // Don't do anything if this is not the first question of the current attempt.
         $cache = cache::make('local_catquiz', 'adaptivequizattempt');
-        if ($this->progress->is_first_question()) {
+        if (!$this->progress->is_first_question()) {
             return $next($context);
         }
 

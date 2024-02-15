@@ -35,6 +35,7 @@ use local_catquiz\teststrategy\preselect_task\addscalestandarderror;
 use local_catquiz\teststrategy\preselect_task\checkbreak;
 use local_catquiz\teststrategy\preselect_task\checkitemparams;
 use local_catquiz\teststrategy\preselect_task\checkpagereload;
+use local_catquiz\teststrategy\preselect_task\filterbystandarderror;
 use local_catquiz\teststrategy\preselect_task\firstquestionselector;
 use local_catquiz\teststrategy\preselect_task\fisherinformation;
 use local_catquiz\teststrategy\preselect_task\lasttimeplayedpenalty;
@@ -90,6 +91,7 @@ class teststrategy_fastest extends strategy {
             mayberemovescale::class,
             firstquestionselector::class,
             lasttimeplayedpenalty::class,
+            filterbystandarderror::class,
             strategyfastestscore::class,
         ];
     }

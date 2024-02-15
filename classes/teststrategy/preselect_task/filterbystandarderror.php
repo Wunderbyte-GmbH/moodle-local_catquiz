@@ -29,6 +29,7 @@ use local_catquiz\catquiz;
 use local_catquiz\catscale;
 use local_catquiz\local\model\model_item_param_list;
 use local_catquiz\local\result;
+use local_catquiz\local\status;
 use local_catquiz\teststrategy\preselect_task;
 use local_catquiz\teststrategy\progress;
 use local_catquiz\wb_middleware;
@@ -75,6 +76,9 @@ class filterbystandarderror extends preselect_task implements wb_middleware {
         $lastquestion = $this->progress->get_last_question();
         $scaleid = $lastquestion->catscaleid;
         $updatedscales = [$scaleid, ...catscale::get_ancestors($scaleid)];
+        if ($context['teststrategy'] == LOCAL_CATQUIZ_STRATEGY_FASTEST) {
+            $updatedscales = [$context['catscaleid']];
+        }
         foreach ($updatedscales as $scaleid) {
             // All played items that belong to the scale or one of its ancestor scales.
             $playeditems = model_item_param_list::from_array(
@@ -87,6 +91,13 @@ class filterbystandarderror extends preselect_task implements wb_middleware {
             $abilitydeltabelow = isset($context['prev_ability'][$scaleid])
                 && abs($context['prev_ability'][$scaleid] - $context['person_ability'][$scaleid]) <= 0.1; // TODO configure.
             $drop = $hasmaxitems || ($hasminse && $abilitydeltabelow);
+
+            if ($context['teststrategy'] == LOCAL_CATQUIZ_STRATEGY_FASTEST) {
+                if ($drop) {
+                    return result::err(status::ERROR_NO_REMAINING_QUESTIONS);
+                }
+                return $next($context);
+            }
             if ($drop && !in_array($scaleid, $this->progress->get_active_scales())) {
                 continue;
             }
