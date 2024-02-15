@@ -93,6 +93,9 @@ define('LOCAL_CATQUIZ_TIMERANGE_WEEK', -1);
 define('LOCAL_CATQUIZ_TIMERANGE_MONTH', -2);
 define('LOCAL_CATQUIZ_TIMERANGE_QUARTEROFYEAR', -3);
 
+// Magic Number.
+define('LOCAL_CATQUIZ_MAGIC_NUMBER', -12345);
+
 /**
  * Renders the popup Link.
  *
