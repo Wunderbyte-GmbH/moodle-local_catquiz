@@ -195,8 +195,11 @@ class feedbackclass {
                         get_string('lowerlimit', 'local_catquiz')
                         );
                     $lowerlimit = $defaultvalues['feedback_scaleid_limit_lower_'. $scale->id . '_' . $j]
-                        ?? optional_param('feedback_scaleid_limit_lower_'. $scale->id . '_' . $j, -12345, PARAM_FLOAT);
-                    if ($lowerlimit === -12345) {
+                        ?? optional_param(
+                            'feedback_scaleid_limit_lower_'. $scale->id . '_' . $j,
+                            LOCAL_CATQUIZ_MAGIC_NUMBER,
+                            PARAM_FLOAT);
+                    if ($lowerlimit === LOCAL_CATQUIZ_MAGIC_NUMBER) {
                         $lowerlimit = self::return_limits_for_scale(
                             $nfeedbpersubscale,
                             $j,
@@ -228,8 +231,11 @@ class feedbackclass {
                         get_string('upperlimit', 'local_catquiz'
                     ));
                     $upperlimit = $defaultvalues['feedback_scaleid_limit_upper_'. $scale->id . '_' . $j]
-                        ?? optional_param('feedback_scaleid_limit_upper_'. $scale->id . '_' . $j, -12345, PARAM_FLOAT);
-                    if ($upperlimit === -12345) {
+                        ?? optional_param(
+                            'feedback_scaleid_limit_upper_'. $scale->id . '_' . $j,
+                            LOCAL_CATQUIZ_MAGIC_NUMBER,
+                            PARAM_FLOAT);
+                    if ($upperlimit === LOCAL_CATQUIZ_MAGIC_NUMBER) {
                         $upperlimit = self::return_limits_for_scale(
                             $nfeedbpersubscale,
                             $j,
