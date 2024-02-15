@@ -104,7 +104,7 @@ class catcalc {
         float $sd = 1,
         float $trlowerlimit = -10.0,
         float $trupperlimit = 10.0,
-        float $tr = 3.0
+        float $tr = 5.0
     ): float {
         $allmodels = model_strategy::get_installed_models();
 

@@ -169,6 +169,9 @@ class strategy_test extends advanced_testcase {
             if ($expectedquestion['label'] === 'FINISH') {
                 return;
             }
+            if ($nextquestionid == 0) {
+                throw new \Exception("Should not be 0");
+            }
 
             $question = question_bank::load_question($nextquestionid);
             $this->assertEquals($expectedquestion['label'], $question->idnumber);
@@ -189,7 +192,7 @@ class strategy_test extends advanced_testcase {
     public static function strategy_returns_expected_questions_provider(): array {
         return [
             // The expected values for the radical CAT dataset are confirmed.
-            'radical CAT' => [
+            'radical CAT 1' => [
                 'strategy' => LOCAL_CATQUIZ_STRATEGY_FASTEST,
                 'questions' => [
                     [
@@ -222,10 +225,106 @@ class strategy_test extends advanced_testcase {
                         'ability_before' => -1.07,
                         'ability_after' => -1.35,
                     ],
+                    [
+                        'label' => 'SIMA04-10',
+                        'is_correct_response' => false,
+                        'ability_before' => -1.35,
+                        'ability_after' => -1.54,
+                    ],
+                    [
+                        'label' => 'SIMA02-19',
+                        'is_correct_response' => false,
+                        'ability_before' => -1.54,
+                        'ability_after' => -1.77,
+                    ],
+                    [
+                        'label' => 'SIMA05-04',
+                        'is_correct_response' => false,
+                        'ability_before' => -1.77,
+                        'ability_after' => -1.99,
+                    ],
+                    [
+                        'label' => 'SIMA02-08',
+                        'is_correct_response' => false,
+                        'ability_before' => -1.99,
+                        'ability_after' => -2.25,
+                    ],
+                    [
+                        'label' => 'FINISH',
+                        'is_correct_response' => false,
+                        'ability_before' => -2.25,
+                        'ability_after' => -2.33,
+                    ],
                 ],
             ],
-            // phpcs:disable
-            //'moderate CAT' => [
+            'radical CAT 2' => [
+                'strategy' => LOCAL_CATQUIZ_STRATEGY_FASTEST,
+                'questions' => [
+                    ['label' => 'SIMB01-18', 'is_correct_response' => true, 'ability_before' => 0.00, 'ability_after' => 0.00],
+                    ['label' => 'SIMC03-15', 'is_correct_response' => true, 'ability_before' => 0.00, 'ability_after' => 0.46],
+                    ['label' => 'SIMB03-04', 'is_correct_response' => true, 'ability_before' => 0.46, 'ability_after' => 0.85],
+                    ['label' => 'SIMB03-06', 'is_correct_response' => true, 'ability_before' => 0.85, 'ability_after' => 1.22],
+                    ['label' => 'SIMB03-11', 'is_correct_response' => true, 'ability_before' => 1.22, 'ability_after' => 1.55],
+                    ['label' => 'SIMB02-12', 'is_correct_response' => true, 'ability_before' => 1.55, 'ability_after' => 1.64],
+                    ['label' => 'SIMB02-07', 'is_correct_response' => true, 'ability_before' => 1.64, 'ability_after' => 2.15],
+                    ['label' => 'SIMB04-03', 'is_correct_response' => true, 'ability_before' => 2.15, 'ability_after' => 2.59],
+                    ['label' => 'SIMB04-06', 'is_correct_response' => true, 'ability_before' => 2.59, 'ability_after' => 2.92],
+                    ['label' => 'SIMC10-09', 'is_correct_response' => true, 'ability_before' => 2.92, 'ability_after' => 3.14],
+                    ['label' => 'SIMC10-00', 'is_correct_response' => true, 'ability_before' => 3.14, 'ability_after' => 3.31],
+                    ['label' => 'SIMC10-01', 'is_correct_response' => true, 'ability_before' => 3.31, 'ability_after' => 3.46],
+                    ['label' => 'SIMC05-17', 'is_correct_response' => true, 'ability_before' => 3.46, 'ability_after' => 3.57],
+                    ['label' => 'SIMC06-14', 'is_correct_response' => true, 'ability_before' => 3.57, 'ability_after' => 3.70],
+                    ['label' => 'SIMC07-08', 'is_correct_response' => true, 'ability_before' => 3.70, 'ability_after' => 3.82],
+                    ['label' => 'SIMC05-03', 'is_correct_response' => true, 'ability_before' => 3.82, 'ability_after' => 3.93],
+                    ['label' => 'SIMC06-04', 'is_correct_response' => true, 'ability_before' => 3.93, 'ability_after' => 4.06],
+                    ['label' => 'SIMC06-17', 'is_correct_response' => true, 'ability_before' => 4.06, 'ability_after' => 4.20],
+                    ['label' => 'FINISH',    'is_correct_response' => true, 'ability_before' => 4.20, 'ability_after' => 4.28],
+                ],
+            ],
+            'radical CAT 3' => [
+                'strategy' => LOCAL_CATQUIZ_STRATEGY_FASTEST,
+                'questions' => [
+                    ['label' => 'SIMB01-18', 'is_correct_response' => true, 'ability_before' => 0.00, 'ability_after' => 0.00],
+                    ['label' => 'SIMC03-15', 'is_correct_response' => true, 'ability_before' => 0.00, 'ability_after' => 0.46],
+                    ['label' => 'SIMB03-04', 'is_correct_response' => false, 'ability_before' => 0.46, 'ability_after' => 0.85],
+                    ['label' => 'FINISH',    'is_correct_response' => false, 'ability_before' => 0.85, 'ability_after' => 0.76],
+                ],
+            ],
+            'radical CAT 4' => [
+                'strategy' => LOCAL_CATQUIZ_STRATEGY_FASTEST,
+                'questions' => [
+                    ['label' => 'SIMB01-18', 'is_correct_response' => true, 'ability_before' => 0.00, 'ability_after' => 0.00],
+                    ['label' => 'SIMC03-15', 'is_correct_response' => true, 'ability_before' => 0.00, 'ability_after' => 0.46],
+                    ['label' => 'SIMB03-04', 'is_correct_response' => true, 'ability_before' => 0.46, 'ability_after' => 0.85],
+                    ['label' => 'SIMB03-06', 'is_correct_response' => true, 'ability_before' => 0.85, 'ability_after' => 1.22],
+                    ['label' => 'SIMB03-11', 'is_correct_response' => true, 'ability_before' => 1.22, 'ability_after' => 1.55],
+                    ['label' => 'SIMB02-12', 'is_correct_response' => true, 'ability_before' => 1.55, 'ability_after' => 1.64],
+                    ['label' => 'SIMB02-07', 'is_correct_response' => true, 'ability_before' => 1.64, 'ability_after' => 2.15],
+                    ['label' => 'SIMB04-03', 'is_correct_response' => true, 'ability_before' => 2.15, 'ability_after' => 2.59],
+                    ['label' => 'SIMB04-06', 'is_correct_response' => true, 'ability_before' => 2.59, 'ability_after' => 2.92],
+                    ['label' => 'SIMC10-09', 'is_correct_response' => true, 'ability_before' => 2.92, 'ability_after' => 3.14],
+                    ['label' => 'SIMC10-00', 'is_correct_response' => true, 'ability_before' => 3.14, 'ability_after' => 3.31],
+                    ['label' => 'SIMC10-01', 'is_correct_response' => true, 'ability_before' => 3.31, 'ability_after' => 3.46],
+                    ['label' => 'SIMC05-17', 'is_correct_response' => false, 'ability_before' => 3.46, 'ability_after' => 3.57],
+                    ['label' => 'FINISH',    'is_correct_response' => false, 'ability_before' => 3.57, 'ability_after' => 3.60],
+                ]
+            ],
+            'radical CAT 5' => [
+                'strategy' => LOCAL_CATQUIZ_STRATEGY_FASTEST,
+                'questions' => [
+                    ['label' => 'SIMB01-18', 'is_correct_response' => false, 'ability_before' => 0.000, 'ability_after' => 0.000],
+                    ['label' => 'SIMB02-00', 'is_correct_response' => false, 'ability_before' => 0.000, 'ability_after' => -0.39],
+                    ['label' => 'SIMA06-09', 'is_correct_response' => false, 'ability_before' => -0.39, 'ability_after' => -0.71],
+                    ['label' => 'SIMA04-00', 'is_correct_response' => false, 'ability_before' => -0.71, 'ability_after' => -1.07],
+                    ['label' => 'SIMA02-02', 'is_correct_response' => false, 'ability_before' => -1.07, 'ability_after' => -1.35],
+                    ['label' => 'SIMA04-10', 'is_correct_response' => false, 'ability_before' => -1.35, 'ability_after' => -1.54],
+                    ['label' => 'SIMA02-19', 'is_correct_response' => false, 'ability_before' => -1.54, 'ability_after' => -1.77],
+                    ['label' => 'SIMA05-04', 'is_correct_response' => false, 'ability_before' => -1.77, 'ability_after' => -1.99],
+                    ['label' => 'SIMA02-08', 'is_correct_response' => false, 'ability_before' => -1.99, 'ability_after' => -2.25],
+                    ['label' => 'FINISH',    'is_correct_response' => false, 'ability_before' => -2.25,  'ability_after' => -2.33],
+                ]
+            ],
+            /* 'moderate CAT' => [
             //    'strategy' => LOCAL_CATQUIZ_STRATEGY_BALANCED,
             //    'questions' => [
             //        [
@@ -248,6 +347,7 @@ class strategy_test extends advanced_testcase {
             //        ],
             //    ],
             //],
+            */
             // phpcs:enable
             'Infer lowest skillgap' => [
                 'strategy' => LOCAL_CATQUIZ_STRATEGY_LOWESTSUB,
@@ -619,7 +719,7 @@ class strategy_test extends advanced_testcase {
         $jsondata->catquiz_selectteststrategy = $strategyid;
         $jsondata->maxquestionsgroup->catquiz_maxquestions = 25;
         $jsondata->maxquestionsgroup->catquiz_minquestions = 500;
-        $jsondata->maxquestionsscalegroup->catquiz_maxquestionspersubscale = 10;
+        $jsondata->maxquestionsscalegroup->catquiz_maxquestionspersubscale = 25;
         $jsondata->json = json_encode($jsondata);
         $testenvironment = new testenvironment($jsondata);
         return $testenvironment;
