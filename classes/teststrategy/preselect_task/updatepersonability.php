@@ -105,6 +105,12 @@ class updatepersonability extends preselect_task implements wb_middleware {
     private progress $progress;
 
     /**
+     * Shows the min- and max-ability for a catscale.
+     * @var array
+     */
+    private array $scaleabilityrange = [];
+
+    /**
      * Run preselect task.
      *
      * @param array $context
@@ -206,7 +212,9 @@ class updatepersonability extends preselect_task implements wb_middleware {
                 $itemparamlist,
                 $startvalue,
                 $this->parentability,
-                $this->parentse
+                $this->parentse,
+                $this->get_min_ability_for_scale($catscaleid),
+                $this->get_max_ability_for_scale($catscaleid)
             );
         } catch (moodle_exception $e) {
             // If we get an excpetion, re-throw it with more information.
@@ -280,7 +288,9 @@ class updatepersonability extends preselect_task implements wb_middleware {
                     $itemparamlist,
                     $startvalue,
                     $this->parentability,
-                    $this->parentse
+                    $this->parentse,
+                    $this->get_min_ability_for_scale($catscaleid),
+                    $this->get_max_ability_for_scale($catscaleid)
                 );
 
                 $this->update_person_param($scale, $ability);
@@ -447,5 +457,35 @@ class updatepersonability extends preselect_task implements wb_middleware {
     private function calculate_se_from_past_attempts() {
         // TODO: Implement.
         return null;
+    }
+
+    /**
+     * Returns the lower limit for the ability in the given scale.
+     *
+     * @param int $catscaleid
+     * @return float
+     */
+    private function get_min_ability_for_scale(int $catscaleid):float {
+        if (array_key_exists($catscaleid, $this->scaleabilityrange)) {
+            return $this->scaleabilityrange[$catscaleid]['minscalevalue'];
+        }
+
+        $this->scaleabilityrange[$catscaleid] = catscale::get_ability_range($catscaleid);
+        return $this->scaleabilityrange[$catscaleid]['minscalevalue'];
+    }
+
+    /**
+     * Returns the upper limit for the ability in the given scale.
+     *
+     * @param int $catscaleid
+     * @return float
+     */
+    private function get_max_ability_for_scale($catscaleid):float {
+        if (array_key_exists($catscaleid, $this->scaleabilityrange)) {
+            return $this->scaleabilityrange[$catscaleid]['maxscalevalue'];
+        }
+
+        $this->scaleabilityrange[$catscaleid] = catscale::get_ability_range($catscaleid);
+        return $this->scaleabilityrange[$catscaleid]['maxscalevalue'];
     }
 }
