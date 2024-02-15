@@ -170,27 +170,23 @@ class catscale {
      * ancestor scale that has one.
      *
      * @param int $catscaleid
-     * @return array|false
+     * @return array
      */
     public static function get_ability_range(int $catscaleid): array {
-        try {
-            $catscale = self::return_catscale_object($catscaleid);
-            if ($catscale->minscalevalue && $catscale->maxscalevalue) {
-                return [
-                    'minscalevalue' => $catscale->minscalevalue,
-                    'maxscalevalue' => $catscale->maxscalevalue,
-                ];
-            }
-            if ($catscale->parentid === 0) {
-                return [
-                    'minscalevalue' => LOCAL_CATQUIZ_PERSONABILITY_LOWER_LIMIT,
-                    'maxscalevalue' => LOCAL_CATQUIZ_PERSONABILITY_UPPER_LIMIT,
-                ];
-            }
-            return self::get_ability_range($catscale->parentid);
-        } catch (Exception $e) {
-            return false;
+        $catscale = self::return_catscale_object($catscaleid);
+        if ($catscale->minscalevalue && $catscale->maxscalevalue) {
+            return [
+                'minscalevalue' => $catscale->minscalevalue,
+                'maxscalevalue' => $catscale->maxscalevalue,
+            ];
         }
+        if ($catscale->parentid === 0) {
+            return [
+                'minscalevalue' => LOCAL_CATQUIZ_PERSONABILITY_LOWER_LIMIT,
+                'maxscalevalue' => LOCAL_CATQUIZ_PERSONABILITY_UPPER_LIMIT,
+            ];
+        }
+        return self::get_ability_range($catscale->parentid);
     }
 
     /**
