@@ -307,12 +307,12 @@ class personabilities extends feedbackgenerator {
 
         $abilitysteps = [];
         $abilitystep = 0.25;
-        $interval = $abilitystep * 2;
+        $interval = $abilitystep;
         $abilityrange = catscale::get_ability_range($primarycatscale->id);
 
         $ul = (float) $abilityrange['maxscalevalue'];
         $ll = (float) $abilityrange['minscalevalue'];
-        for ($i = $ll + $abilitystep; $i <= ($ul - $abilitystep); $i += $interval) {
+        for ($i = $ll; $i <= ($ul); $i += $interval) {
             $abilitysteps[] = $i;
         }
         $catscale = new catscale($primarycatscale->id);
