@@ -107,7 +107,6 @@ $string['min'] = 'min: ';
 $string['max'] = 'max: ';
 $string['chooseparent'] = 'Choose parent scale';
 $string['addoredittemplate'] = "Add or edit template";
-$string['nogapallowed'] = "No gap in the feedbackrange allowed. Please start min in new range with max value of last range.";
 
 // Validation.
 $string['errorminscalevalue'] = 'Min value has to be smaller than max value';
@@ -123,6 +122,8 @@ $string['formminquestgreaterthan'] = 'Minimum must be less than maximum';
 $string['formelementbetweenzeroandone'] = 'Please enter values between 0 and 1.';
 $string['formmscalegreaterthantest'] = 'Per scale minimum must be less than per test maximum';
 $string['formetimelimitnotprovided'] = 'Input at least one value of time limit';
+$string['nogapallowed'] = "No gap in the feedbackrange allowed. Please start min in new range with max value of last range.";
+$string['errorupperlimitvalue'] = 'Upper limit value has to be larger than lower limit value';
 
 // Test Strategy.
 $string['catquiz_teststrategyheader'] = 'CAT Settings';

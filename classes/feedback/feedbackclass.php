@@ -596,4 +596,38 @@ class feedbackclass {
             return round($lowestlimit + $optioncounter * $increment, 2);
         }
     }
+
+    /**
+     * Check if no gaps in limits of the feedback ranges.
+     *
+     * @param array $errors
+     * @param array $data
+     *
+     * @return [type]
+     */
+    public static function validation_range_limits_nogaps(array &$errors, array $data) {
+        if (!empty((int) $data["catquiz_catscales"])) {
+            $scales = dataapi::get_catscale_and_children((int) $data["catquiz_catscales"], true);
+            $numberoffeedbackspersubscale = ((int) $data['numberoffeedbackoptionsselect']) ?? 1;
+            foreach ($scales as $scale) {
+                if (((int) $data["catquiz_catscales"]) === $scale->id ||
+                    !empty((int) $data["catquiz_subscalecheckbox_" . $scale->id])) {
+                    for ($j = 2; $j <= $numberoffeedbackspersubscale; $j++) {
+                        // Upper limit of previous range must be equal of lowest limit for current range.
+                        if ((float) $data['feedback_scaleid_limit_upper_' . $scale->id . '_' . ($j - 1)] !==
+                            (float) $data['feedback_scaleid_limit_lower_' . $scale->id . '_' . $j]) {
+                            $errors['feedback_scaleid_limit_lower_' . $scale->id . '_' . $j] =
+                                get_string('nogapallowed', 'local_catquiz');
+                        }
+                        // Upper limit mus be always greater than lowest limit.
+                        if ((float) $data['feedback_scaleid_limit_upper_' . $scale->id . '_' . $j] <=
+                            (float) $data['feedback_scaleid_limit_lower_' . $scale->id . '_' . $j]) {
+                            $errors['feedback_scaleid_limit_upper_' . $scale->id . '_' . $j] =
+                                get_string('errorupperlimitvalue', 'local_catquiz');
+                        }
+                    }
+                }
+            }
+        }
+    }
 }

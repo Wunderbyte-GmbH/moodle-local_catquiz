@@ -449,6 +449,8 @@ class catquiz_handler {
             }
         }
 
+        feedbackclass::validation_range_limits_nogaps($errors, $data);
+
         return $errors;
     }
 
