@@ -60,7 +60,7 @@ class model_person_ability_estimator_catcalc_test extends basic_testcase {
     ) {
         foreach ($responses as $scaleid => $modelresponse) {
             $estimator = new model_person_ability_estimator_catcalc($modelresponse);
-            $result = $estimator->get_person_abilities($itemparams);
+            $result = $estimator->get_person_abilities($itemparams, intval($scaleid));
             $print = false;
             if ($print) {
                 $this->printascsv($result, $modelname, $scaleid);
