@@ -89,7 +89,7 @@ class filterbystandarderror extends preselect_task implements wb_middleware {
                 && count($playeditems) >= $this->context['max_attempts_per_scale'];
             $hasminse = $this->context['se'][$scaleid] <= $this->context['se_min'];
             $abilitydeltabelow = isset($context['prev_ability'][$scaleid])
-                && abs($context['prev_ability'][$scaleid] - $context['person_ability'][$scaleid]) <= 0.1; // TODO configure.
+                && abs($context['prev_ability'][$scaleid] - $context['person_ability'][$scaleid]) <= $context['pp_min_inc'];
             $drop = $hasmaxitems || ($hasminse && $abilitydeltabelow);
 
             if ($context['teststrategy'] == LOCAL_CATQUIZ_STRATEGY_FASTEST) {
@@ -212,6 +212,7 @@ class filterbystandarderror extends preselect_task implements wb_middleware {
             'progress',
             'se_max',
             'progress',
+            'pp_min_inc',
         ];
     }
 
