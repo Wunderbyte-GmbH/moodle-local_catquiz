@@ -205,7 +205,7 @@ abstract class strategy {
      * @param bool $includesubscales
      * @return array
      */
-    public function get_all_available_testitems(int $catscaleid, bool $includesubscales = false):array {
+    public function get_all_available_testitems(int $catscaleid, bool $includesubscales = false): array {
 
         $catscale = new catscale($catscaleid);
 

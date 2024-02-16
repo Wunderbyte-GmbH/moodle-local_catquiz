@@ -389,7 +389,7 @@ class matrix extends ArrayObject {
      *
      * return float
      */
-    public function rooted_summed_squares():float {
+    public function rooted_summed_squares(): float {
         $result = 0;
         for ($r = 0; $r < $this->_rows; $r++) {
             for ($c = 0; $c < $this->_cols; $c++) {
@@ -405,7 +405,7 @@ class matrix extends ArrayObject {
      *
      * return float
      */
-    public function max_absolute_element():float {
+    public function max_absolute_element(): float {
         $result = 0;
         for ($r = 0; $r < $this->_rows; $r++) {
             for ($c = 0; $c < $this->_cols; $c++) {

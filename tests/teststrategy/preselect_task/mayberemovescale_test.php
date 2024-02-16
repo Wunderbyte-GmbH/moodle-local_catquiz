@@ -82,7 +82,7 @@ class mayberemovescale_test extends basic_testcase {
      * @return array
      *
      */
-    public static function provider():array {
+    public static function provider(): array {
         // Create some dummy questions for testing.
         $questions = [
             1 => (object) ['catscaleid' => 1],

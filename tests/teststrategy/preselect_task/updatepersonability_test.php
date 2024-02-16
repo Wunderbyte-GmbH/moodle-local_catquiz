@@ -91,7 +91,7 @@ class updatepersonability_test extends TestCase {
      * @return array
      *
      */
-    public static function skippedprovider():array {
+    public static function skippedprovider(): array {
         global $USER;
         return [
             'last_question_is_null' => [

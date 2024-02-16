@@ -61,7 +61,7 @@ class model_item_response {
      * @return float
      *
      */
-    public function get_response() : float {
+    public function get_response(): float {
         return $this->response;
     }
 
@@ -71,7 +71,7 @@ class model_item_response {
      * @return float
      *
      */
-    public function get_personparams() : model_person_param {
+    public function get_personparams(): model_person_param {
         return $this->personparams;
     }
 }

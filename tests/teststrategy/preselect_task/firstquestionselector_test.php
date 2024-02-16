@@ -71,7 +71,7 @@ class firstquestionselector_test extends basic_testcase {
      * @return array
      *
      */
-    public static function median_ability_of_personparams_is_calculated_correctly_provider():array {
+    public static function median_ability_of_personparams_is_calculated_correctly_provider(): array {
         return [
             'single value 1' => [
                 'expected' => 0.0,

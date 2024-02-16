@@ -409,7 +409,7 @@ class testenvironment {
      *
      * @return boolean
      */
-    public function status_force():bool {
+    public function status_force(): bool {
 
         return $this->status === LOCAL_CATQUIZ_STATUS_TEST_FORCE ? true : false;
     }
@@ -419,7 +419,7 @@ class testenvironment {
      *
      * @return stdClass
      */
-    public function return_settings():stdClass {
+    public function return_settings(): stdClass {
         return json_decode($this->json);
     }
 

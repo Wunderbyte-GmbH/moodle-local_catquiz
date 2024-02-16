@@ -261,7 +261,7 @@ class dataapi {
      * @return array
      *
      */
-    public static function delete_catscale(int $catscaleid):array {
+    public static function delete_catscale(int $catscaleid): array {
         global $DB;
         $allcatscales = self::get_all_catscales();
         $catscaleids = [];

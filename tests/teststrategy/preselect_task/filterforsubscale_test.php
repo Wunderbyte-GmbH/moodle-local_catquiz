@@ -85,7 +85,7 @@ class filterforsubscale_test extends basic_testcase {
      *
      * @return array
      */
-    public static function provider():array {
+    public static function provider(): array {
         $fisherinformation = [
             1 => 1,
             2 => 1,

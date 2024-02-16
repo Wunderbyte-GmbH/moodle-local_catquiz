@@ -135,7 +135,7 @@ class raschbirnbaumb extends model_raschmodel {
      * @param float $k - answer category (0 or 1.0)
      * @return float - 1st derivative of log likelihood with respect to $pp
      */
-    public static function log_likelihood_p(array $pp, array $ip, float $k):float {
+    public static function log_likelihood_p(array $pp, array $ip, float $k): float {
         $pp = $pp['ability'];
         $a = $ip['difficulty'];
         $b = $ip['discrimination'];
@@ -155,7 +155,7 @@ class raschbirnbaumb extends model_raschmodel {
      * @param float $k - answer category (0 or 1.0)
      * @return float - 2nd derivative of log likelihood with respect to $pp
      */
-    public static function log_likelihood_p_p(array $pp, array $ip, float $k):float {
+    public static function log_likelihood_p_p(array $pp, array $ip, float $k): float {
         $pp = $pp['ability'];
         $a = $ip['difficulty'];
         $b = $ip['discrimination'];
@@ -171,7 +171,7 @@ class raschbirnbaumb extends model_raschmodel {
      * @param float $k - answer category (0 or 1.0)
      * @return array - jacobian vector
      */
-    public static function get_log_jacobian(array $pp, array $ip, float $k):array {
+    public static function get_log_jacobian(array $pp, array $ip, float $k): array {
         $pp = $pp['ability'];
         $a = $ip['difficulty'];
         $b = $ip['discrimination'];
@@ -240,7 +240,7 @@ class raschbirnbaumb extends model_raschmodel {
      * @param float $n - number of observations
      * @return float - weighted residuals
      */
-    public static function least_mean_squares(array $pp, array $ip, float $frac, float $n):float {
+    public static function least_mean_squares(array $pp, array $ip, float $frac, float $n): float {
         return $n * ($frac - self::likelihood($pp, $ip, 1.0)) ** 2;
     }
 
@@ -253,7 +253,7 @@ class raschbirnbaumb extends model_raschmodel {
      * @param float $n - number of observations
      * @return array - 1st derivative of lms with respect to $ip
      */
-    public static function least_mean_squares_1st_derivative_ip(array $pp, array $ip, float $frac, float $n):array {
+    public static function least_mean_squares_1st_derivative_ip(array $pp, array $ip, float $frac, float $n): array {
         $pp = $pp['ability'];
         $a = $ip['difficulty'];
         $b = $ip['discrimination'];
@@ -278,7 +278,7 @@ class raschbirnbaumb extends model_raschmodel {
      * @param float $n - number of observations
      * @return array - 2nd derivative of lms with respect to $ip
      */
-    public static function least_mean_squares_2nd_derivative_ip(array $pp, array $ip, float $frac, float $n):array {
+    public static function least_mean_squares_2nd_derivative_ip(array $pp, array $ip, float $frac, float $n): array {
         $pp = $pp['ability'];
         $a = $ip['difficulty'];
         $b = $ip['discrimination'];
@@ -319,7 +319,7 @@ class raschbirnbaumb extends model_raschmodel {
      * @param float $n - number of observations
      * @return float - weighted residuals
      */
-    public static function lors_residuals(array $pp, array $ip, float $or, float $n = 1):float {
+    public static function lors_residuals(array $pp, array $ip, float $or, float $n = 1): float {
         $pp = $pp['ability'];
         $a = $ip['difficulty'];
         $b = $ip['discrimination'];
@@ -475,7 +475,7 @@ class raschbirnbaumb extends model_raschmodel {
      *
      * @return array - 2nd derivative of TR function with respect to $ip
      */
-    public static function get_log_tr_hessian(array $ip):array {
+    public static function get_log_tr_hessian(array $ip): array {
         // Set values for difficulty parameter.
 
         // TODO: @DAVID: Diese Werte sollten dynamisch berechnet werden können.

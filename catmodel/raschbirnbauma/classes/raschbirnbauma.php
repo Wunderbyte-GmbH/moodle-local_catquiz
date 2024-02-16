@@ -234,7 +234,7 @@ class raschbirnbauma extends model_raschmodel {
      *
      * @return float - weighted residuals
      */
-    public static function least_mean_squares(array $pp, array $ip, float $frac, float $n):float {
+    public static function least_mean_squares(array $pp, array $ip, float $frac, float $n): float {
         return $n * ($frac - self::likelihood($pp, $ip, 1.0)) ** 2;
     }
 
@@ -248,7 +248,7 @@ class raschbirnbauma extends model_raschmodel {
      *
      * @return array - 1st derivative of lms with respect to $ip
      */
-    public static function least_mean_squares_1st_derivative_ip(array $pp, array $ip, float $frac, float $n):array {
+    public static function least_mean_squares_1st_derivative_ip(array $pp, array $ip, float $frac, float $n): array {
         $pp = $pp['ability'];
         $a = $ip['difficulty'];
 
@@ -272,7 +272,7 @@ class raschbirnbauma extends model_raschmodel {
      *
      * @return array - 2nd derivative of lms with respect to $ip
      */
-    public static function least_mean_squares_2nd_derivative_ip(array $pp, array $ip, float $frac, float $n):array {
+    public static function least_mean_squares_2nd_derivative_ip(array $pp, array $ip, float $frac, float $n): array {
         $pp = $pp['ability'];
         $a = $ip['difficulty'];
 
@@ -304,7 +304,7 @@ class raschbirnbauma extends model_raschmodel {
      *
      * @return float - weighted residuals
      */
-    public static function lors_residuals(array $pp, array $ip, float $or, float $n = 1):float {
+    public static function lors_residuals(array $pp, array $ip, float $or, float $n = 1): float {
         $pp = $pp['ability'];
         $a = $ip['difficulty'];
 

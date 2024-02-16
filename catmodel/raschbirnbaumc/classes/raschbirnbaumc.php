@@ -44,7 +44,7 @@ class raschbirnbaumc extends model_raschmodel {
      *
      * @return array of string
      */
-    public static function get_parameter_names():array {
+    public static function get_parameter_names(): array {
         return ['difficulty', 'discrimination', 'guessing'];
     }
 
@@ -53,7 +53,7 @@ class raschbirnbaumc extends model_raschmodel {
      *
      * @return int
      */
-    public static function get_model_dim():int {
+    public static function get_model_dim(): int {
         // Adds +1 for the person ability.
         return count (self::get_parameter_names()) + 1;
     }
@@ -63,7 +63,7 @@ class raschbirnbaumc extends model_raschmodel {
      *
      * @return model_item_param_list
      */
-    public static function get_item_parameters():model_item_param_list {
+    public static function get_item_parameters(): model_item_param_list {
         // TODO implement.
         return new model_item_param_list();
     }
@@ -73,7 +73,7 @@ class raschbirnbaumc extends model_raschmodel {
      *
      * @return model_person_param_list
      */
-    public static function get_person_abilities():model_person_param_list {
+    public static function get_person_abilities(): model_person_param_list {
         // TODO implement.
         return new model_person_param_list();
     }
@@ -86,7 +86,7 @@ class raschbirnbaumc extends model_raschmodel {
      * @return array
      *
      */
-    public function calculate_params($itemresponse):array {
+    public function calculate_params($itemresponse): array {
         return catcalc::estimate_item_params($itemresponse, $this);
     }
 
@@ -100,7 +100,7 @@ class raschbirnbaumc extends model_raschmodel {
      * @param float $k - answer category (0 or 1.0)
      * @return float
      */
-    public static function likelihood(array $pp, array $ip, float $k):float {
+    public static function likelihood(array $pp, array $ip, float $k): float {
         $ability = $pp['ability'];
         $a = $ip['difficulty'];
         $b = $ip['discrimination'];
@@ -123,7 +123,7 @@ class raschbirnbaumc extends model_raschmodel {
      * @param float $k - answer category (0 or 1.0)
      * @return float
      */
-    public static function log_likelihood(array $pp, array $ip, float $k):float {
+    public static function log_likelihood(array $pp, array $ip, float $k): float {
         return log(self::likelihood($pp, $ip, $k));
     }
 
@@ -135,7 +135,7 @@ class raschbirnbaumc extends model_raschmodel {
      * @param float $k - answer category (0 or 1.0)
      * @return float - 1st derivative of log likelihood with respect to $pp
      */
-    public static function log_likelihood_p(array $pp, array $ip, float $k):float {
+    public static function log_likelihood_p(array $pp, array $ip, float $k): float {
         $pp = $pp['ability'];
         $a = $ip['difficulty'];
         $b = $ip['discrimination'];
@@ -157,7 +157,7 @@ class raschbirnbaumc extends model_raschmodel {
      * @param float $k - answer category (0 or 1.0)
      * @return float - 2nd derivative of log likelihood with respect to $pp
      */
-    public static function log_likelihood_p_p(array $pp, array $ip, float $k):float {
+    public static function log_likelihood_p_p(array $pp, array $ip, float $k): float {
         $pp = $pp['ability'];
         $a = $ip['difficulty'];
         $b = $ip['discrimination'];
@@ -179,7 +179,7 @@ class raschbirnbaumc extends model_raschmodel {
      * @param float $k - answer category (0 or 1.0)
      * @return array - jacobian vector
      */
-    public static function get_log_jacobian($pp, $ip, float $k):array {
+    public static function get_log_jacobian($pp, $ip, float $k): array {
         $pp = $pp['ability'];
         $a = $ip['difficulty'];
         $b = $ip['discrimination'];
@@ -213,7 +213,7 @@ class raschbirnbaumc extends model_raschmodel {
      * @param float $k - answer category (0 or 1.0)
      * @return array - hessian matrx
      */
-    public static function get_log_hessian($pp, $ip, float $k):array {
+    public static function get_log_hessian($pp, $ip, float $k): array {
         $pp = $pp['ability'];
         $a = $ip['difficulty'];
         $b = $ip['discrimination'];
@@ -276,7 +276,7 @@ class raschbirnbaumc extends model_raschmodel {
      * @param float $n - number of observations
      * @return float - weighted residuals
      */
-    public static function least_mean_squares(array $pp, array $ip, float $frac, float $n):float {
+    public static function least_mean_squares(array $pp, array $ip, float $frac, float $n): float {
         return $n * ($frac - self::likelihood($pp, $ip, 1.0)) ** 2;
     }
 
@@ -289,7 +289,7 @@ class raschbirnbaumc extends model_raschmodel {
      * @param float $n - number of observations
      * @return array - 1st derivative of lms with respect to $ip
      */
-    public static function least_mean_squares_1st_derivative_ip(array $pp, array $ip, float $frac, float $n):array {
+    public static function least_mean_squares_1st_derivative_ip(array $pp, array $ip, float $frac, float $n): array {
         $pp = $pp['ability'];
         $a = $ip['difficulty'];
         $b = $ip['discrimination'];
@@ -320,7 +320,7 @@ class raschbirnbaumc extends model_raschmodel {
      * @param float $n - number of observations
      * @return array - 2nd derivative of lms with respect to $ip
      */
-    public static function least_mean_squares_2nd_derivative_ip(array $pp, array $ip, float $frac, float $n):array {
+    public static function least_mean_squares_2nd_derivative_ip(array $pp, array $ip, float $frac, float $n): array {
         $pp = $pp['ability'];
         $a = $ip['difficulty'];
         $b = $ip['discrimination'];
@@ -373,7 +373,7 @@ class raschbirnbaumc extends model_raschmodel {
      * @param float $n - number of observations
      * @return float - weighted residuals
      */
-    public static function lors_residuals(array $pp, array $ip, float $or, float $n = 1):float {
+    public static function lors_residuals(array $pp, array $ip, float $or, float $n = 1): float {
         $pp = $pp['ability'];
         $a = $ip['difficulty'];
         $b = $ip['discrimination'];
@@ -391,7 +391,7 @@ class raschbirnbaumc extends model_raschmodel {
      * @param float $n - number of observations
      * @return array - 1st derivative
      */
-    public static function lors_1st_derivative_ip(array $pp, array $ip, float $or, float $n = 1):array {
+    public static function lors_1st_derivative_ip(array $pp, array $ip, float $or, float $n = 1): array {
         $pp = $pp['ability'];
         $a = $ip['difficulty'];
         $b = $ip['discrimination'];
@@ -416,7 +416,7 @@ class raschbirnbaumc extends model_raschmodel {
      * @param float $n - number of observations
      * @return array - 1st derivative
      */
-    public static function lors_2nd_derivative_ip(array $pp, array $ip, float $or, float $n = 1):array {
+    public static function lors_2nd_derivative_ip(array $pp, array $ip, float $or, float $n = 1): array {
         $pp = $pp['ability'];
         $a = $ip['difficulty'];
         $b = $ip['discrimination'];
@@ -445,7 +445,7 @@ class raschbirnbaumc extends model_raschmodel {
      * @return float
      *
      */
-    public static function fisher_info(array $pp, array $ip):float {
+    public static function fisher_info(array $pp, array $ip): float {
         return $ip['difficulty'] ** 2 * (1 - $ip['guessing']) * self::likelihood($pp, $ip, 1.0) * (self::likelihood($pp, $ip, 0.0));
     }
 

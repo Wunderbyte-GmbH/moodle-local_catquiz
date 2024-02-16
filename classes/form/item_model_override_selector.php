@@ -354,7 +354,7 @@ class item_model_override_selector extends dynamic_form {
      *
      * @return void
      */
-    private function update_item(string $key, array &$update, array $formitemparams, string $model):void {
+    private function update_item(string $key, array &$update, array $formitemparams, string $model): void {
         if (isset($formitemparams[$model]->$key)) {
             $update[$key] = $formitemparams[$model]->$key;
         }

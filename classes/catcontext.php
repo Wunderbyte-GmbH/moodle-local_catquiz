@@ -212,7 +212,7 @@ class catcontext {
      * @return array
      *
      */
-    public static function return_all_catcontexts():array {
+    public static function return_all_catcontexts(): array {
         global $DB;
         // TODO Caching.
         $records = $DB->get_records('local_catquiz_catcontext');
@@ -273,7 +273,7 @@ class catcontext {
      *
      * @return array
      */
-    private static function db_to_modelinput($data):array {
+    private static function db_to_modelinput($data): array {
         $modelinput = [];
         // Check: use only most recent answer for each question.
 
@@ -459,7 +459,7 @@ class catcontext {
      * @return string
      *
      */
-    public function getname():string {
+    public function getname(): string {
         return $this->name;
     }
 

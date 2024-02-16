@@ -394,7 +394,7 @@ class catscale {
         int $contextid,
         bool $includesubscales = false,
         ?string $orderby = null,
-        array $selectedsubscales = []):array {
+        array $selectedsubscales = []): array {
 
         if (empty($this->catscale)) {
             return [];

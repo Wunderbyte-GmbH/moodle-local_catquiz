@@ -190,7 +190,7 @@ class testenvironments_table extends wunderbyte_table {
      * @param string $data
      * @return array
      */
-    public function action_deleteitem(int $id, string $data):array {
+    public function action_deleteitem(int $id, string $data): array {
 
         if (testenvironment::delete_testenvironment($id)) {
             $success = 1;

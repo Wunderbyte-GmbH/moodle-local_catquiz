@@ -844,7 +844,7 @@ class catquiz {
         int $numberofrecords = 1,
         int $instanceid = 0,
         int $courseid = 0,
-        int $userid = -1):array {
+        int $userid = -1): array {
 
         $sql = "SELECT
         attemptid, contextid FROM {local_catquiz_attempts} ";

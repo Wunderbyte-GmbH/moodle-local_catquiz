@@ -66,7 +66,7 @@ class strategyfastestscore_test extends basic_testcase {
      *
      * @return array
      */
-    public static function provider():array {
+    public static function provider(): array {
         $context['questions'] = [
             '1' => (object) [
                 'id' => 1,

@@ -397,7 +397,7 @@ class personabilities extends feedbackgenerator {
      *
      * @return float
      */
-    private function round_to_customsteps(float $number, float $step, float $interval):float {
+    private function round_to_customsteps(float $number, float $step, float $interval): float {
         $roundedvalue = round($number / $step) * $step;
 
         // Exclude rounding to steps defined in $interval.

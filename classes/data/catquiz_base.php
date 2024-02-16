@@ -41,7 +41,7 @@ class catquiz_base {
      * @param int $questionid
      * @return array
      */
-    public static function get_question_results(int $testid = 0, int $userid = 0, int $questionid = 0):array {
+    public static function get_question_results(int $testid = 0, int $userid = 0, int $questionid = 0): array {
 
         global $DB;
 
@@ -96,7 +96,7 @@ class catquiz_base {
      * @param int $questionid
      * @return array
      */
-    public static function get_question_results_by_person(int $testid = 0, int $userid = 0, int $questionid = 0):array {
+    public static function get_question_results_by_person(int $testid = 0, int $userid = 0, int $questionid = 0): array {
 
         $records = self::get_question_results($testid, $userid, $questionid);
 
