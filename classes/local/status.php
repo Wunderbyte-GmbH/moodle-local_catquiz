@@ -93,4 +93,11 @@ class status {
      * @var string
      */
     const ERROR_NO_ITEMS = 'errornoitems';
+
+    /**
+     * The maximum attempt time was exceeded.
+     *
+     * @var string
+     */
+    const EXCEEDED_MAX_ATTEMPT_TIME = 'exceededmaxattempttime';
 }
