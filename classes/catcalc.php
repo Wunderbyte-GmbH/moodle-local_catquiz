@@ -152,7 +152,7 @@ class catcalc {
             $jacobian,
             $hessian,
             ['ability' => $startvalue],
-            6,
+            3,
             500,
             $trustedregionfilter,
             $trustedregionsfunction,
