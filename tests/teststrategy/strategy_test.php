@@ -111,6 +111,7 @@ class strategy_test extends advanced_testcase {
      * @param array $questions The expected list of questions.
      * @param float $initialability The initial ability in the main scale.
      * @param float $initialse The initial standarderror in the main scale.
+     * @param array $settings Additional testsettings
      *
      * TODO: add group large?
      * TODO: Use different testenvironment.json files for different teststrategies.
@@ -120,7 +121,8 @@ class strategy_test extends advanced_testcase {
         int $strategy,
         array $questions,
         float $initialability = 0.0,
-        float $initialse = 1.0
+        float $initialse = 1.0,
+        array $settings = []
     ) {
         putenv('USE_TESTING_CLASS_FOR=local_catquiz\teststrategy\preselect_task\updatepersonability');
         putenv("CATQUIZ_TESTING_ABILITY=$initialability");
@@ -129,7 +131,7 @@ class strategy_test extends advanced_testcase {
         global $DB, $USER;
         $hasqubaid = false;
         $this
-            ->createtestenvironment($strategy)
+            ->createtestenvironment($strategy, $settings)
             ->save_or_update();
 
         catquiz_handler::prepare_attempt_caches();
@@ -222,6 +224,12 @@ class strategy_test extends advanced_testcase {
                     ['label' => 'SIMA01-06', 'is_correct_response' => true,  'ability_before' => -3.36, 'ability_after' => -3.33],
                     ['label' => 'FINISH',    'is_correct_response' => true,  'ability_before' => -3.33, 'ability_after' => -3.31],
                 ],
+                'initialability' => 0.0,
+                'initialse' => 1.0,
+                'settings' => [
+                    'maxquestions' => 25,
+                    'maxquestionspersubscale' => 25,
+                ],
             ],
             'radical CAT 2' => [
                 'strategy' => LOCAL_CATQUIZ_STRATEGY_FASTEST,
@@ -253,6 +261,12 @@ class strategy_test extends advanced_testcase {
                     ['label' => 'SIMC08-16', 'is_correct_response' => false, 'ability_before' => 4.70, 'ability_after' => 4.76],
                     ['label' => 'FINISH'   , 'is_correct_response' => false, 'ability_before' => 4.76, 'ability_after' => 4.73],
                 ],
+                'initialability' => 0.0,
+                'initialse' => 1.0,
+                'settings' => [
+                    'maxquestions' => 25,
+                    'maxquestionspersubscale' => 25,
+                ],
             ],
             'radical CAT 3' => [
                 'strategy' => LOCAL_CATQUIZ_STRATEGY_FASTEST,
@@ -276,6 +290,12 @@ class strategy_test extends advanced_testcase {
                     ['label' => 'SIMB03-08', 'is_correct_response' => false, 'ability_before' => 1.60, 'ability_after' => 1.61],
                     ['label' => 'SIMB03-16', 'is_correct_response' => true,  'ability_before' => 1.61, 'ability_after' => 1.56],
                     ['label' => 'FINISH',    'is_correct_response' => null,  'ability_before' => 1.56, 'ability_after' => 1.57],
+                ],
+                'initialability' => 0.0,
+                'initialse' => 1.0,
+                'settings' => [
+                    'maxquestions' => 25,
+                    'maxquestionspersubscale' => 25,
                 ],
             ],
             'radical CAT 4' => [
@@ -303,6 +323,12 @@ class strategy_test extends advanced_testcase {
                     ['label' => 'SIMB01-06', 'is_correct_response' => true,  'ability_before' => 0.87, 'ability_after' => 0.88],
                     ['label' => 'SIMB03-06', 'is_correct_response' => false, 'ability_before' => 0.88, 'ability_after' => 0.90],
                     ['label' => 'FINISH',    'is_correct_response' => null,  'ability_before' => 0.90, 'ability_after' => 0.90],
+                ],
+                'initialability' => 0.0,
+                'initialse' => 1.0,
+                'settings' => [
+                    'maxquestions' => 25,
+                    'maxquestionspersubscale' => 25,
                 ],
             ],
             'radical CAT 5' => [
@@ -334,6 +360,12 @@ class strategy_test extends advanced_testcase {
                     ['label' => 'SIMC05-03', 'is_correct_response' => false, 'ability_before' => 3.72, 'ability_after' => 3.77],
                     ['label' => 'SIMC06-09', 'is_correct_response' => false, 'ability_before' => 3.77, 'ability_after' => 3.75],
                     ['label' => 'FINISH',    'is_correct_response' => null,  'ability_before' => 3.75, 'ability_after' => 3.72],
+                ],
+                'initialability' => 0.0,
+                'initialse' => 1.0,
+                'settings' => [
+                    'maxquestions' => 25,
+                    'maxquestionspersubscale' => 25,
                 ],
             ],
             /* 'moderate CAT' => [
@@ -710,9 +742,10 @@ class strategy_test extends advanced_testcase {
      * Parse a json file to create a test environment that will be used for the attempt.
      *
      * @param int $strategyid
+     * @param array $settings Optional, additional test settings.
      * @return testenvironment
      */
-    private function createtestenvironment(int $strategyid): testenvironment {
+    private function createtestenvironment(int $strategyid, array $settings): testenvironment {
         global $DB;
         $catscale = $DB->get_record('local_catquiz_catscales', ['parentid' => 0]);
         $this->catscaleid = $catscale->id;
@@ -729,9 +762,9 @@ class strategy_test extends advanced_testcase {
         $jsondata->componentid = '1';
         $jsondata->component = 'mod_adaptivequiz';
         $jsondata->catquiz_selectteststrategy = $strategyid;
-        $jsondata->maxquestionsgroup->catquiz_maxquestions = 25;
+        $jsondata->maxquestionsgroup->catquiz_maxquestions = $settings['maxquestions'] ?? 25;
         $jsondata->maxquestionsgroup->catquiz_minquestions = 500;
-        $jsondata->maxquestionsscalegroup->catquiz_maxquestionspersubscale = 25;
+        $jsondata->maxquestionsscalegroup->catquiz_maxquestionspersubscale = $settings['maxquestionspersubscale'] ?? 10;
         $jsondata->json = json_encode($jsondata);
         $testenvironment = new testenvironment($jsondata);
         return $testenvironment;
