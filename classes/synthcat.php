@@ -159,7 +159,7 @@ class synthcat {
      * @return array
      *
      */
-    public static function generate_test_items_multi ($paramvec) {
+    public static function generate_test_items_multi($paramvec) {
 
         $testitems = [];
 
@@ -421,7 +421,7 @@ class synthcat2 {
      * @return array
      *
      */
-    public static function generate_test_items ($paramvec) {
+    public static function generate_test_items($paramvec) {
 
         $testitems = [];
 

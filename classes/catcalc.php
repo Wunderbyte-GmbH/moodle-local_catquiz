@@ -250,7 +250,7 @@ class catcalc {
      * @param array<callable> $functions
      * @return Closure(mixed $x): array
      */
-    public static function build_callable_array ($functions) {
+    public static function build_callable_array($functions) {
         return function($x) use ($functions) {
             $new = [];
             foreach ($functions as $key => $f) {

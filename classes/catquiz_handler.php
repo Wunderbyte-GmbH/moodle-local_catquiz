@@ -193,7 +193,7 @@ class catquiz_handler {
      *
      * @return void
      */
-    public static function generate_subscale_checkboxes (
+    public static function generate_subscale_checkboxes(
         array $subscales,
         array &$elements,
         $mform,

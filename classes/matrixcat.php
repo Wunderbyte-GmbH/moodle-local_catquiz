@@ -313,7 +313,7 @@ class matrixcat {
      * @param mixed ...$summands
      * @return mixed
      */
-    public static function multi_sum (...$summands) {
+    public static function multi_sum(...$summands) {
         // Test, if argument is given as packed array of arguments and unpack.
         if (is_array($summands[0])) {
             if (count($summands) == 1) {
@@ -358,7 +358,7 @@ class matrixcat {
      * @param array<callable> $fnfunction
      * @return callable<array>
      */
-    public static function build_callable_array ($fnfunction) {
+    public static function build_callable_array($fnfunction) {
         return function($x) use($fnfunction) {
             foreach ($fnfunction as $key => $f) {
                 $fnfunction[$key] = $f($x);
