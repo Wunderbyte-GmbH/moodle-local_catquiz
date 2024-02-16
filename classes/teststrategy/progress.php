@@ -166,6 +166,13 @@ class progress implements JsonSerializable {
     private array $gaveupquestions;
 
     /**
+     * Holds the starttime of the attempt.
+     *
+     * @var int
+     */
+    private int $starttime;
+
+    /**
      * Returns a new progress instance.
      *
      * If we already have data in the cache or DB, the instance is populated with those data.
@@ -293,6 +300,7 @@ class progress implements JsonSerializable {
         $instance->session = $data->session;
         $instance->excludedquestions = $data->excludedquestions;
         $instance->gaveupquestions = $data->gaveupquestions;
+        $instance->starttime = $data->starttime;
 
         return $instance;
     }
@@ -328,6 +336,7 @@ class progress implements JsonSerializable {
         $instance->session = sesskey();
         $instance->excludedquestions = [];
         $instance->gaveupquestions = [];
+        $instance->starttime = time();
         return $instance;
     }
 
@@ -353,6 +362,7 @@ class progress implements JsonSerializable {
             'session' => $this->session,
             'excludedquestions' => $this->excludedquestions,
             'gaveupquestions' => $this->gaveupquestions,
+            'starttime' => $this->starttime,
         ];
     }
 
@@ -906,6 +916,15 @@ class progress implements JsonSerializable {
      */
     public function get_ignore_last_response() {
         return $this->ignorelastresponse ?? false;
+    }
+
+    /**
+     * Returns the timestamp of the quiz start.
+     *
+     * @return int
+     */
+    public function get_starttime(): int {
+        return $this->starttime;
     }
 
     /**

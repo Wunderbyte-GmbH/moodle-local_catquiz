@@ -31,6 +31,7 @@ use dml_exception;
 use local_catquiz\catquiz;
 use local_catquiz\catscale;
 use local_catquiz\local\result;
+use local_catquiz\local\status;
 use local_catquiz\output\attemptfeedback;
 use local_catquiz\teststrategy\info;
 use local_catquiz\teststrategy\preselect_task;
@@ -124,6 +125,13 @@ abstract class strategy {
      *
      */
     public function return_next_testitem(array $context) {
+        $cache = cache::make('local_catquiz', 'adaptivequizattempt');
+        if (time() - $context['progress']->get_starttime() > $context['max_attempttime_in_sec']) {
+            $cache->set('endtime', time());
+            $cache->set('catquizerror', status::EXCEEDED_MAX_ATTEMPT_TIME);
+            return result::err(status::EXCEEDED_MAX_ATTEMPT_TIME);
+        }
+
         foreach ($this->get_preselecttasks() as $modifier) {
             // When this is called for running tests, check if there is a
             // X_testing class and if so, use that one.
@@ -150,7 +158,6 @@ abstract class strategy {
 
         $this->update_attempdfeedback($context);
 
-        $cache = cache::make('local_catquiz', 'adaptivequizattempt');
         if ($result->isErr()) {
             $cache->set('endtime', time());
             $cache->set('catquizerror', $result->get_status());
