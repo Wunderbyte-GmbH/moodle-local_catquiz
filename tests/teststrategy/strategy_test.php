@@ -555,6 +555,9 @@ class strategy_test extends advanced_testcase {
                 ],
                 'initial_ability' => 0.02,
                 'initial_se' => 2.97,
+                'settings' => [
+                    'pp_min_inc' => 0.1,
+                ],
             ],
             // phpcs:disable
             //'Infer greatest strength' => [
@@ -765,6 +768,7 @@ class strategy_test extends advanced_testcase {
         $jsondata->maxquestionsgroup->catquiz_maxquestions = $settings['maxquestions'] ?? 25;
         $jsondata->maxquestionsgroup->catquiz_minquestions = 500;
         $jsondata->maxquestionsscalegroup->catquiz_maxquestionspersubscale = $settings['maxquestionspersubscale'] ?? 10;
+        $jsondata->catquiz_pp_min_inc = $settings['pp_min_inc'] ?? 0.01;
         $jsondata->json = json_encode($jsondata);
         $testenvironment = new testenvironment($jsondata);
         return $testenvironment;

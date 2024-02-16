@@ -918,6 +918,7 @@ class catquiz_handler {
             'max_itemtime_in_sec' => $itemseconds ?? INF,
             'se_max' => $quizsettings->catquiz_standarderrorgroup->catquiz_standarderror_max,
             'se_min' => $quizsettings->catquiz_standarderrorgroup->catquiz_standarderror_min,
+            'pp_min_inc' => $quizsettings->catquiz_pp_min_inc ?? 0.01,
         ];
         return $contextcreator->load(
             [
