@@ -806,26 +806,53 @@ class catquiz_handler {
     }
 
     /**
-     * Attempt feedback.
+     * Callback for adaptivequiz
+     *
+     * This is called when the attempt is finished.
      *
      * @param stdClass $adaptivequiz
      * @param cm_info $cm
      * @param stdClass $attemptrecord
      *
      * @return string
-     *
      */
-    public static function attemptfeedback(
+    public static function attempt_finished(
         stdClass $adaptivequiz,
         cm_info $cm,
         stdClass $attemptrecord): string {
-        global $OUTPUT, $COURSE;
-        $contextid = optional_param('context', 0, PARAM_INT);
+        // Update the endtime and number of testitems used in the attempts table.
+        global $DB;
+        $id = $DB->get_record('local_catquiz_attempts', ['attemptid' => $attemptrecord->id], 'id')->id;
+        $data = (object) [
+            'id' => $id,
+            'number_of_testitems_used' => $attemptrecord->questionsattempted,
+            'endtime' => time(),
+        ];
+        $DB->update_record('local_catquiz_attempts', $data);
 
+        // If there was an error before the quiz could be started, return that.
         $cache = cache::make('local_catquiz', 'adaptivequizattempt');
         if (($errormsg = $cache->get('catquizerror')) && $attemptrecord->questionsattempted == 0) {
             return get_string($errormsg, 'local_catquiz');
         }
+
+        // If we are here, at least one question was played and we can provide feedback.
+        return self::attemptfeedback(
+            $attemptrecord
+        );
+    }
+
+    /**
+     * Attempt feedback.
+     *
+     * @param stdClass $attemptrecord
+     *
+     * @return string
+     *
+     */
+    private static function attemptfeedback(stdClass $attemptrecord): string {
+        global $OUTPUT, $COURSE;
+        $contextid = optional_param('context', 0, PARAM_INT);
 
         $attemptfeedback = new attemptfeedback($attemptrecord->id, $contextid, null, $COURSE->id);
         $data = $attemptfeedback->export_for_template($OUTPUT);
