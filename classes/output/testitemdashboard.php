@@ -32,7 +32,6 @@ use local_catquiz\local\model\model_raschmodel;
 use local_catquiz\local\model\model_strategy;
 use local_catquiz\output\catscalemanager\questions\questiondetailview;
 use local_catquiz\output\catscalemanager\scaleandcontexselector;
-use local_catquiz\table\testitems_table;
 use moodle_url;
 use qbank_previewquestion\question_preview_options;
 use question_bank;

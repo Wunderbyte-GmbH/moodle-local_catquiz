@@ -41,28 +41,13 @@ class quizattempts_table extends wunderbyte_table {
      *
      * @var mixed
      */
-    private $url;
+    private $url = null;
 
     /**
      * Acts like a cache and stores names of teststrategies.
      * @var array<string>
      */
-    private array $teststrategynames;
-
-    /**
-     * Constructor
-     * @param string $uniqueid all tables have to have a unique id, this is used
-     *      as a key when storing table properties like sort order in the session.
-     */
-    public function __construct(string $uniqueid) {
-        global $PAGE;
-
-        parent::__construct($uniqueid);
-        $this->teststrategynames = [];
-        $this->url = clone $PAGE->url;
-        $this->url->params($_GET);
-
-    }
+    private array $teststrategynames = [];
 
     /**
      * Shows the username.
@@ -139,6 +124,12 @@ class quizattempts_table extends wunderbyte_table {
      * @return string
      */
     public function col_action($values) {
+
+        global $PAGE;
+
+        $url = clone $PAGE->url;
+        $url->params($_GET);
+
         $url = clone $this->url;
         $url->params(['attemptid' => $values->attemptid]);
 

@@ -23,8 +23,6 @@ use local_catquiz\catquiz;
 use local_catquiz\importer\testitemimporter;
 use local_catquiz\local\model\model_person_param_list;
 use local_catquiz\output\catscalemanager\scaleandcontexselector;
-use local_catquiz\table\testitems_table;
-use local_catquiz\table\student_stats_table;
 use moodle_url;
 use stdClass;
 use templatable;

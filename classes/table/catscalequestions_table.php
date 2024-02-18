@@ -36,6 +36,7 @@ use html_writer;
 use local_catquiz\catscale;
 use local_wunderbyte_table\wunderbyte_table;
 use context_system;
+use dml_exception;
 use local_catquiz\catquiz;
 use local_catquiz\local\model\model_item_param;
 use local_wunderbyte_table\output\table;
@@ -57,22 +58,16 @@ class catscalequestions_table extends wunderbyte_table {
     private $contextid = 0;
 
     /**
-     * Constructor
-     * @param string $uniqueid all tables have to have a unique id, this is used
-     *      as a key when storing table properties like sort order in the session.
+     * As we don't allow the constructor anymore in wb table, we must set the values like this.
+     * But to avoid caching wrong values, they both must appear in the idstring.
      * @param int $catscaleid
      * @param int $contextid
+     * @return void
+     * @throws dml_exception
      */
-    public function __construct(string $uniqueid, int $catscaleid = 0, int $contextid = 0) {
-
+    public function set_catscaleid_and_contextid(int $catscaleid = 0, int $contextid = 0) {
         $this->catscaleid = $catscaleid;
-
-        if (empty($contextid)) {
-            $contextid = catquiz::get_default_context_id();
-        }
         $this->contextid = $contextid;
-
-        parent::__construct($uniqueid);
     }
 
     /**
