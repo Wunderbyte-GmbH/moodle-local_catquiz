@@ -148,16 +148,43 @@ class inferlowestskillgap extends strategy {
      *
      * @param array $personabilities
      * @param array $feedbackdata
+     * @param int $semax
+     * @param int $nmintest
+     * @param int $nminscale
+     * @param int $rootscale
+     * @param float $fraction
      * @param int $catscaleid
      * @param bool $feedbackonlyfordefinedscaleid
      *
      */
     public function select_scales_for_report(
-        array &$personabilities,
+        array $personabilities,
         array $feedbackdata,
+        int $semax,
+        int $nmintest,
+        int $nminscale,
+        int $rootscale,
+        float $fraction,
         int $catscaleid = 0,
         bool $feedbackonlyfordefinedscaleid = false
         ): array {
-        return $personabilities;
+
+        // First filter on all scales in personabilities for all settings, then get the minimum (sort).
+
+        // Force selected scale.
+        if ($feedbackonlyfordefinedscaleid && !empty($catscaleid)) {
+            $relevantscale = $personabilities[$catscaleid];
+        } else {
+            // TODO: Filter: It should not be root or parentscale.
+            $relevantscale = array_search(min($personabilities['values']), $personabilities['values']);
+            $personabilities[$relevantscale]['primary'] = true;
+        }
+        if (isset($nminscale) && $nminscale > $personabilities[$relevantscale]['value']) {
+            $personabilities[$relevantscale]['error'] = get_string('scalereporterror:nminscale', 'local_catquiz');
+        }
+        if ()
+
+        // Check if value <= se max;
+        return [$minscale => $personabilities[$minscale]];
     }
 }

@@ -218,6 +218,12 @@ class feedbacksettings {
      * @param int $teststrategy
      * @param array $personabilities
      * @param array $feedbackdata
+     * @param int $semax
+     * @param int $nmintest
+     * @param int $nminscale
+     * @param int $rootscale
+     * @param float $fraction
+     * @param array $quizsettings
      * @param int $catscaleid
      * @param bool $feedbackonlyfordefinedscaleid
      *
@@ -227,6 +233,7 @@ class feedbacksettings {
         int $teststrategyid,
         array $personabilities,
         array $feedbackdata,
+        array $quizsettings,
         int $catscaleid = 0,
         bool $feedbackonlyfordefinedscaleid = false): array {
 
@@ -238,15 +245,44 @@ class feedbacksettings {
             }
             return $selectedscale;
         }
+        $semax = (float) $quizsettings['catquiz_standarderrorgroup']['catquiz_standarderror_max'];
+        $nmintest = (int) $quizsettings['maxquestionsgroup']['catquiz_maxquestions'];
+        $nminscale = (int) $quizsettings['maxquestionsscalegroup']['catquiz_maxquestionspersubscale'];
+        $rootscale = (int) $quizsettings['catquiz_catscales'];
+
+        // Calculation fraction of all items.
+        $f = 0.0;
+        $counter = count($feedbackdata['responses']);
+        foreach ($feedbackdata['responses'] as $question) {
+            $f += $question['fraction'];
+        }
+        $fraction = $f / $counter;
+
         $teststrategy = info::get_teststrategy($teststrategyid);
+        // TODO: parameter richtig mitgeben
+        // TODO: in allen funktionen implementieren
+        // TODO: apply_feedbacksettings raus nehmen und funktionalität einbauen
+        // TODO: abgleich mit liste, stimmt das so?
+        // TODO: make sure, sorting is applied.
+        // In jedem relevanten Feedbackgenerator aufrufen. ? abstrakte methode?
+        // TODO: root / parentscale nicht anzeigen (? nirgends ?)
+
+        // Returns array with scales corresponding to settings of strategy.
+        // If scales do not meet all requirements, ['error'] will be returned.
+        // For scale selected for report, a key ['primary'] is added.
         $personabilities = $teststrategy->select_scales_for_report(
             $personabilities,
             $feedbackdata,
+            $semax,
+            $nmintest,
+            $nminscale,
+            $rootscale,
+            $fraction,
             $catscaleid,
             $feedbackonlyfordefinedscaleid
         );
 
-
+        return $personabilities;
         // switch ($teststrategy) {
         //     case LOCAL_CATQUIZ_STRATEGY_LOWESTSUB:
         //         $minscale = array_search(min($personabilities), $personabilities);
