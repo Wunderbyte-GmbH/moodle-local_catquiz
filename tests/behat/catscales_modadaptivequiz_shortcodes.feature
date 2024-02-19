@@ -61,10 +61,10 @@ Feature: As a teacher I want to use shortcodes to display adaptive quiz test res
     And I click on "Submit answer" "button"
     And I wait until the page is ready
     And I should see "Ability score"
-    And I should see "-2.81 (Standarderror: 2.27)"
+    And I should see "-1.35 (Standarderror: 0.51)"
     ## Verify feedback in label
     When I am on "Course 1" course homepage
     Then I should see "Ability score"
-    And I should see "-2.81 (Standarderror: 2.27)"
-    And I should see "You performed better than 40.00% of your fellow students for parent scale Simulation."
+    And I should see "-1.35 (Standarderror: 0.51)"
+    And I should see "You performed better than 50.00% of your fellow students for parent scale Simulation."
     And I log out
