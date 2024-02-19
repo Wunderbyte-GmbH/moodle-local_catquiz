@@ -459,9 +459,8 @@ class model_item_param_list implements ArrayAccess, IteratorAggregate, Countable
      * @param array $newrecord
      * @return array
      */
-    public static function update_in_scale(array $newrecord) {
+    private static function update_in_scale(array $newrecord) {
         global $DB;
-
         // If we don't know the catscaleid we get it via the catscalename.
         if (empty($newrecord['catscaleid']) && !empty($newrecord['catscalename'])) {
             $sql = "SELECT *

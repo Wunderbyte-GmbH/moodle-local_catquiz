@@ -18,8 +18,8 @@
  * Tests the person ability estimator that uses catcalc.
  *
  * @package    local_catquiz
- * @author     David Szkiba <david.szkiba@wunderbyte.at>
- * @copyright  2023 Georg Maißer <info@wunderbyte.at>
+ * @author     Magdalena Holczik <david.szkiba@wunderbyte.at>
+ * @copyright  2024 Wunderbyte <info@wunderbyte.at>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
