@@ -91,7 +91,6 @@ class catcalc {
      * @param float $sd The standard deviation of current abilities
      * @param float $trlowerlimit The lower limit of the trusted region
      * @param float $trupperlimit The upper limit of the trusted region
-     * @param float $tr This factor is multiplied with $sd to determine if a value is trusted
      *
      * @return float
      *
@@ -103,9 +102,9 @@ class catcalc {
         float $mean = 0,
         float $sd = 1,
         float $trlowerlimit = -10.0,
-        float $trupperlimit = 10.0,
-        float $tr = 5.0
+        float $trupperlimit = 10.0
     ): float {
+        $tr = get_config('local_catquiz', 'tr_sd_ratio');
         $allmodels = model_strategy::get_installed_models();
 
         $jfuns = [];
