@@ -80,4 +80,11 @@ if ($hassiteconfig) {
     );
     $settings->add(new admin_setting_description('cattagdisclaimer', '', get_string('choosetags:disclaimer', 'local_catquiz')));
     $settings->add($setting);
+    $settings->add(new admin_setting_configtext(
+        'local_catquiz/tr_sd_ratio',
+        get_string('tr_sd_ratio_name', 'local_catquiz'),
+        get_string('tr_sd_ratio_desc', 'local_catquiz'),
+        3.0,
+        PARAM_FLOAT)
+    );
 }
