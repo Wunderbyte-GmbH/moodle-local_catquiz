@@ -100,15 +100,4 @@ class behat_catquiz extends behat_base {
         }
     }
 
-    /**
-     * Waits a while, for debugging.
-     * @When I wait :seconds second(s)
-     *
-     * @param int $seconds How long to wait.
-     *
-     * @return void
-     */
-    public function wait($seconds) {
-        sleep($seconds);
-    }
 }
