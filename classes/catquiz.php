@@ -1679,9 +1679,18 @@ class catquiz {
         global $DB;
 
         // Enrolement is applied according to test strategy.
-        $personabilities = feedbacksettings::return_scales_according_to_strategy(
+        // TODO: Enrolement!!
+        /*$personabilities = feedbacksettings::return_scales_according_to_strategy(
             $quizsettings['catquiz_selectteststrategy'],
             $personabilities);
+            /*
+            int $teststrategyid,
+        array $personabilities,
+        array $feedbackdata,
+        array $quizsettings,
+        int $catscaleid = 0,
+        bool $feedbackonlyfordefinedscaleid = false
+            */
 
         foreach ($personabilities as $catscaleid => $personability) {
             $i = 1;
