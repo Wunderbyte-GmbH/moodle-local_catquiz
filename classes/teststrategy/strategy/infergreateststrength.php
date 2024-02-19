@@ -51,6 +51,11 @@ use local_catquiz\teststrategy\preselect_task\strategyfastestscore;
 use local_catquiz\teststrategy\preselect_task\updatepersonability;
 use local_catquiz\teststrategy\strategy;
 
+defined('MOODLE_INTERNAL') || die();
+
+global $CFG;
+require_once($CFG->dirroot . '/local/catquiz/lib.php');
+
 /**
  * This strategy will prefer questions from a CAT scale where the user has the largest person ability values.
  *
