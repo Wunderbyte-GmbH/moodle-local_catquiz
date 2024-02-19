@@ -129,8 +129,10 @@ class feedbackclass {
         $coursesfromtags = dataapi::get_courses_from_settings_tags() ?? [];
         $courses = array_merge($enrolledcourses, $coursesfromtags);
         $parentscale = reset($scales);
-        $lowestability = $parentscale->minscalevalue;
-        $highestability = $parentscale->maxscalevalue;
+        if ($parentscale) {
+            $lowestability = $parentscale->minscalevalue;
+            $highestability = $parentscale->maxscalevalue;
+        }
         foreach ($scales as $scale) {
             $subelements = [];
             $numberoffeedbacksfilledout = 0;
