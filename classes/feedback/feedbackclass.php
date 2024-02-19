@@ -603,7 +603,6 @@ class feedbackclass {
      * @param array $errors
      * @param array $data
      *
-     * @return [type]
      */
     public static function validation_range_limits_nogaps(array &$errors, array $data) {
         if (!empty((int) $data["catquiz_catscales"])) {
