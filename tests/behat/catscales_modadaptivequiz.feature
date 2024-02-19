@@ -29,14 +29,13 @@ Feature: As a student i want to take adaptive quiz tests with catquiz functinali
     And the following "activities" exist:
       | activity     | name             | course | section | idnumber         |
       | adaptivequiz | My Adaptive Quiz | C1     | 1       | adaptivecatquiz1 |
+    And the following "local_catquiz > testsettings" exist:
+      | course | adaptivecatquiz  | catmodel | catscales  | cateststrategy      | catquiz_selectfirstquestion | catquiz_maxquestions | catquiz_standarderror_min | catquiz_standarderror_max | numberoffeedbackoptions |
+      | C1     | adaptivecatquiz1 | catquiz  | Simulation | Infer all subscales | startwitheasiestquestion    | 7                    | 0.4                       | 0.6                       | 2                       |
+    ## Below steps are required to save a correct JSON settings
     And I am on the "adaptivecatquiz1" Activity page logged in as teacher
     And I follow "Settings"
-    And I set the following fields to these values:
-      | catmodel                                              | Catquiz CAT model |
-      | Select CAT scale                                      | Simulation        |
-      | maxquestionsgroup[catquiz_maxquestions]               | 7                 |
-      | catquiz_standarderrorgroup[catquiz_standarderror_min] | 0.4               |
-      | catquiz_standarderrorgroup[catquiz_standarderror_max] | 0.6               |
+    And I wait until the page is ready
     And I click on "Save and return to course" "button"
     And I log out
 
@@ -76,7 +75,6 @@ Feature: As a student i want to take adaptive quiz tests with catquiz functinali
     And I click on "Submit answer" "button"
     And I wait until the page is ready
     And I should see "Ability score"
-    ## And I should see "-1.28" in the "[data-original-title=\"parent scale Simulation\"]" "css_element"
     And I should see "You performed better than 75.00% of your fellow students"
     And I should see "-1.28 (Standarderror: 0.41)"
 
@@ -116,8 +114,6 @@ Feature: As a student i want to take adaptive quiz tests with catquiz functinali
     And I click on "Submit answer" "button"
     And I wait until the page is ready
     And I should see "Ability score"
-    ## And I should see "You performed better than 75.00% of your fellow students"
-    ## And I should see "-1.61" in the "[data-original-title=\"parent scale Simulation\"]" "css_element"
     And I should see "You performed better than 66.67% of your fellow students for your strongest scale SimB"
     And I should see "-1.93 (Standarderror: 2.79)"
 
@@ -159,7 +155,6 @@ Feature: As a student i want to take adaptive quiz tests with catquiz functinali
     And I should see "Ability score"
     ## No scale bar?
     And I should see "You performed better than 40.00% of your fellow students"
-    ##And I should see "-2.18" in the "[data-original-title=\"parent scale Simulation\"]" "css_element"
     And I should see "-2.18 (Standarderror: 7.96)"
 
   @javascript
@@ -198,8 +193,6 @@ Feature: As a student i want to take adaptive quiz tests with catquiz functinali
     And I click on "Submit answer" "button"
     And I wait until the page is ready
     And I should see "Ability score"
-    ## And I should see "You performed better than 75.00% of your fellow students"
-    ## And I should see "-4.07" in the "[data-original-title=\"parent scale Simulation\"]" "css_element"
     And I should see "You performed better than 25.00% of your fellow students"
     And I should see "-3.86 (Standarderror: 0.68)"
 
@@ -240,8 +233,6 @@ Feature: As a student i want to take adaptive quiz tests with catquiz functinali
     And I wait until the page is ready
     And I should see "Ability score"
     ## No scale bar?
-    ## And I should see "You performed better than 75.00% of your fellow students"
-    ##And I should see "-3.86" in the "[data-original-title=\"parent scale Simulation\"]" "css_element"
     And I should see "-3.86 (Standarderror: 0.68)"
 
   @javascript
@@ -280,7 +271,5 @@ Feature: As a student i want to take adaptive quiz tests with catquiz functinali
     And I click on "Submit answer" "button"
     And I wait until the page is ready
     And I should see "Ability score"
-    ## And I should see "You performed better than 75.00% of your fellow students"
-    ## And I should see "-1.28" in the "[data-original-title=\"parent scale Simulation\"]" "css_element"
     And I should see "You performed better than 75.00% of your fellow students"
     And I should see "-1.28 (Standarderror: 0.41)"
