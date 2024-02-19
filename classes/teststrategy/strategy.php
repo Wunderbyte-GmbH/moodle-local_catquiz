@@ -255,8 +255,13 @@ abstract class strategy {
     abstract public function apply_feedbacksettings(feedbacksettings $feedbacksettings);
 
     abstract public function select_scales_for_report(
-        array &$personabilities,
+        array $personabilities,
         array $feedbackdata,
+        int $semax,
+        int $nmintest,
+        int $nminscale,
+        int $rootscale,
+        float $fraction,
         int $catscaleid = 0,
         bool $feedbackonlyfordefinedscaleid = false
     ): array;

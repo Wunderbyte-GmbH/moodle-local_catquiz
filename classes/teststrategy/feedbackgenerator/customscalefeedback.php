@@ -157,11 +157,10 @@ class customscalefeedback extends feedbackgenerator {
         // Make sure that only feedback for specific scale is rendered.
         $personabilitiesfeedbackeditor = feedbacksettings::return_scales_according_to_strategy(
             $existingdata['teststrategy'],
-            (array)$personabilities,
-            (array) $existingdata,
+            (array) $personabilities,
+            (array) $progress,
+            (array) $quizsettings,
             $existingdata['catscaleid']);
-
-        ($this->sortfun)($personabilities);
 
         $scalefeedback = [];
         foreach ($personabilitiesfeedbackeditor as $catscaleid => $personability) {
