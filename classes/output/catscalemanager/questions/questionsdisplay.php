@@ -105,10 +105,6 @@ class questionsdisplay {
         $catcontext = empty($this->catcontextid) ? optional_param('contextid', 0, PARAM_INT) : $this->catcontextid;
         $catscale = empty($this->scale) ? optional_param('catscale', 0, PARAM_INT) : $this->scale;
 
-        if (empty($contextid)) {
-            $contextid = catquiz::get_default_context_id();
-        }
-
         $table = new catscalequestions_table(
             'catscale_' . $catscale . 'context' . $catcontext . ' questionstable');
         $table->set_catscaleid_and_contextid($catscale, $catcontext);
@@ -214,15 +210,13 @@ class questionsdisplay {
     private function render_addtestitems_table(int $catscaleid) {
         $id = $catscaleid > -1 ? $catscaleid : 0;
 
-        if (empty($this->catcontextid)) {
-            $this->catcontextid = catquiz::get_default_context_id();
-        }
+        $catcontextid = empty($this->catcontextid) ? optional_param('contextid', 0, PARAM_INT) : $this->catcontextid;
 
-        $table = new catscalequestions_table('catscaleid_' . $id . 'context' . $this->catcontextid . '_additems');
-        $table->set_catscaleid_and_contextid($id, $this->catcontextid);
+        $table = new catscalequestions_table('catscaleid_' . $id . 'context' . $catcontextid . '_additems');
+        $table->set_catscaleid_and_contextid($id, $catcontextid);
 
         list($select, $from, $where, $filter, $params)
-            = catquiz::return_sql_for_addcatscalequestions($catscaleid, $this->catcontextid);
+            = catquiz::return_sql_for_addcatscalequestions($catscaleid, $catcontextid);
 
         $table->set_filter_sql($select, $from, $where, $filter, $params);
 
