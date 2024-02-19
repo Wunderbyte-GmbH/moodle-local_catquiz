@@ -127,6 +127,7 @@ class local_catquiz_generator extends testing_module_generator {
         $jsondata->componentid = $adaptivequiz->adaptivecatquizid;
         $jsondata->component = 'mod_adaptivequiz';
         $jsondata->catquiz_selectteststrategy = $adaptivequiz->cateststrategyid;
+        $jsondata->catquiz_selectfirstquestion = $adaptivequiz->catquiz_selectfirstquestion ?? null;
         $jsondata->maxquestionsgroup->catquiz_maxquestions = $adaptivequiz->catquiz_maxquestions ?? null;
         $jsondata->maxquestionsgroup->catquiz_minquestions = $adaptivequiz->catquiz_minquestions ?? null;
         $jsondata->maxquestionsscalegroup->catquiz_minquestionspersubscale = $adaptivequiz->catquiz_minquestionspersubscale ?? null;
