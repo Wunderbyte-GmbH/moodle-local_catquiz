@@ -305,7 +305,8 @@ abstract class model_raschmodel extends model_model implements catcalc_item_esti
      * @param float $pptr
      * @param float $mean - mean of the estimated destribution
      * @param float $sd - standard deviation e.g. standard error of distribution
-     * return array - chunked item parameter
+     * @param bool $usetrfactor If not set, ignore the $tr factor and restrict to the whole range [ppmin, ppmax]
+     * @return array - chunked item parameter
      */
     public static function restrict_to_trusted_region_pp(
         array $pp,
@@ -313,8 +314,19 @@ abstract class model_raschmodel extends model_model implements catcalc_item_esti
         float $ppmax,
         float $pptr = 3,
         $mean = 0,
-        float $sd = 1
+        float $sd = 1,
+        bool $usetrfactor = false
     ): array {
+        if (!$usetrfactor) {
+            if ($pp['ability'] < $ppmin) {
+                $pp['ability'] = $ppmin;
+            }
+            if ($pp['ability'] > $ppmax) {
+                $pp['ability'] = $ppmax;
+            }
+            return $pp;
+        }
+
         if ($pp['ability'] < max($mean - ($pptr * $sd), $ppmin)) {
             $pp['ability'] = max($mean - ($pptr * $sd), $ppmin);
         }
