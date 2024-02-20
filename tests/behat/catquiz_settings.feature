@@ -98,6 +98,34 @@ Feature: As a teacher I setup adaptive quiz with CATquiz Scales and Feedbacks.
     And I should not see "SimC02" in the "#id_catquiz_headercontainer" "css_element"
 
   @javascript
+  Scenario: CATquiz settings: admin setup custom minmax abilities and teacher validate it
+    Given I log in as "admin"
+    And I press "Catquiz"
+    And I wait until the page is ready
+    And I click on "CAT scales" "link" in the "#region-main" "css_element"
+    And I click on "Edit" "link" in the "[data-name=\"Simulation\"]" "css_element"
+    And I set the following fields to these values:
+      | Person ability minimum: | -6 |
+      | Person ability maximum: | 6  |
+    And I press "Save changes"
+    And I log out
+    When the following "activities" exist:
+      | activity     | name             | course | section | idnumber         |
+      | adaptivequiz | Adaptive CATquiz | C1     | 1       | adaptivecatquiz1 |
+    And the following "local_catquiz > testsettings" exist:
+      | course | adaptivecatquiz  | catmodel | catscales  | cateststrategy      | catquiz_selectfirstquestion | catquiz_maxquestions | catquiz_standarderror_min | catquiz_standarderror_max | numberoffeedbackoptions |
+      | C1     | adaptivecatquiz1 | catquiz  | Simulation | Infer all subscales | startwitheasiestquestion    | 7                    | 0.4                       | 0.6                       | 3                       |
+    And I am on the "adaptivecatquiz1" Activity page logged in as teacher1
+    And I follow "Settings"
+    And I click on "Feedback for \"Simulation\"" "text"
+    Then I should see "-6" in the "//div[@data-name='feedback_scale_Simulation_range_1']//div[@id='fitem_id_lowest_limit']" "xpath_element"
+    And the field "Upper limit" in the "//div[@data-name='feedback_scale_Simulation_range_1']" "xpath_element" matches value "-2"
+    And the field "Lower limit" in the "//div[@data-name='feedback_scale_Simulation_range_2']" "xpath_element" matches value "-2"
+    And the field "Upper limit" in the "//div[@data-name='feedback_scale_Simulation_range_2']" "xpath_element" matches value "2"
+    And the field "Lower limit" in the "//div[@data-name='feedback_scale_Simulation_range_3']" "xpath_element" matches value "2"
+    And I should see "6" in the "//div[@data-name='feedback_scale_Simulation_range_3']//div[@id='fitem_id_highestvalue']" "xpath_element"
+
+  @javascript
   Scenario: CATquiz settings: teacher setup question settings and validate it
     Given the following "activities" exist:
       | activity     | name             | course | section | idnumber         |
