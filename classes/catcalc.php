@@ -91,6 +91,7 @@ class catcalc {
      * @param float $sd The standard deviation of current abilities
      * @param float $trlowerlimit The lower limit of the trusted region
      * @param float $trupperlimit The upper limit of the trusted region
+     * @param bool  $usetrfactor Specifies if the trusted region takes the $tr factor into account
      *
      * @return float
      *
@@ -102,7 +103,8 @@ class catcalc {
         float $mean = 0,
         float $sd = 1,
         float $trlowerlimit = -10.0,
-        float $trupperlimit = 10.0
+        float $trupperlimit = 10.0,
+        bool $usetrfactor = false
     ): float {
         $tr = get_config('local_catquiz', 'tr_sd_ratio');
         $allmodels = model_strategy::get_installed_models();
@@ -144,7 +146,8 @@ class catcalc {
             $trupperlimit,
             $tr,
             $mean,
-            $sd
+            $sd,
+            $usetrfactor
         );
 
         $result = mathcat::newton_raphson_multi_stable(

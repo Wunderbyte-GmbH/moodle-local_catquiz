@@ -59,15 +59,14 @@ class updatepersonability_testing extends updatepersonability {
     /**
      * Get item param list.
      *
-     * @param mixed $responses
      * @param mixed $catscaleid
      *
      * @return mixed
      *
      */
-    protected function get_item_param_list($responses, $catscaleid): model_item_param_list {
+    protected function get_item_param_list($catscaleid): model_item_param_list {
         if (! array_key_exists('fake_item_params', $this->context)) {
-            return parent::get_item_param_list($responses, $catscaleid);
+            return parent::get_item_param_list($catscaleid);
         }
 
         $itemparamlist = new model_item_param_list();
@@ -85,6 +84,10 @@ class updatepersonability_testing extends updatepersonability {
      * @return float
      */
     protected function get_initial_ability() {
+        // If we already have a value, use that one.
+        if ($abilitymainscale = $this->context['person_ability'][$this->context['catscaleid']]) {
+            return $abilitymainscale;
+        }
         return floatval(getenv('CATQUIZ_TESTING_ABILITY', true) ?: 0.00);
     }
 
