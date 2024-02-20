@@ -134,13 +134,14 @@ class updatepersonability_test extends TestCase {
                         (object) ['catscaleid' => "2"],
                     ],
                     'fake_response_data' => [
-                                1 => ['fraction' => "1.000"],
-                                2 => ['fraction' => "0.000"],
-                                3 => ['fraction' => "0.000"],
+                                1 => ['fraction' => "1.000", 'questionid' => 1],
+                                2 => ['fraction' => "0.000", 'questionid' => 2],
+                                3 => ['fraction' => "0.000", 'questionid' => 3],
                     ],
                     'fake_item_params' => [
                             1 => ['difficulty' => 2.1],
                             2 => ['difficulty' => -1.4],
+                            3 => ['difficulty' => 0.4],
                     ],
                     'questionsattempted' => 0,
                     'minimumquestions' => 10,

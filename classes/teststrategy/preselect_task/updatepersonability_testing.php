@@ -83,20 +83,22 @@ class updatepersonability_testing extends updatepersonability {
      * Get initial ability
      * @return float
      */
-    protected function get_initial_ability() {
-        // If we already have a value, use that one.
-        if ($abilitymainscale = $this->context['person_ability'][$this->context['catscaleid']]) {
-            return $abilitymainscale;
+    protected function set_initial_ability() {
+        if (($ab = parent::set_initial_ability()) === 0.0) {
+            return floatval(getenv('CATQUIZ_TESTING_ABILITY', true) ?: 0.00);
         }
-        return floatval(getenv('CATQUIZ_TESTING_ABILITY', true) ?: 0.00);
+        return $ab;
     }
 
     /**
      * Get initial standarderror
      * @return float
      */
-    protected function get_initial_standarderror() {
-        return floatval(getenv('CATQUIZ_TESTING_STANDARDERROR', true) ?: 1.0);
+    protected function set_initial_standarderror() {
+        if (($se = parent::set_initial_standarderror()) === 1.0) {
+            return floatval(getenv('CATQUIZ_TESTING_STANDARDERROR', true) ?: 1.0);
+        }
+        return $se;
     }
 
     /**
