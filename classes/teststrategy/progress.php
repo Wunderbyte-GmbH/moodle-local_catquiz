@@ -80,7 +80,7 @@ class progress implements JsonSerializable {
     /**
      * @var array $playedquestions The questions that were already displayed to the user.
      */
-    private array $playedquestions;
+    public array $playedquestions;
 
     /**
      * @var array $playedquestionsbyscale The questions that were already displayed to the user.

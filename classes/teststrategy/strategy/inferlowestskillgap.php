@@ -146,45 +146,55 @@ class inferlowestskillgap extends strategy {
     /**
      * Gets predefined values and completes them with specific behaviour of strategy.
      *
+     * @param object $feedbacksettings
      * @param array $personabilities
      * @param array $feedbackdata
-     * @param int $semax
-     * @param int $nmintest
-     * @param int $nminscale
-     * @param int $rootscale
-     * @param float $fraction
      * @param int $catscaleid
      * @param bool $feedbackonlyfordefinedscaleid
      *
      */
     public function select_scales_for_report(
+        object $feedbacksettings,
         array $personabilities,
         array $feedbackdata,
-        int $semax,
-        int $nmintest,
-        int $nminscale,
-        int $rootscale,
-        float $fraction,
         int $catscaleid = 0,
         bool $feedbackonlyfordefinedscaleid = false
         ): array {
 
-        // First filter on all scales in personabilities for all settings, then get the minimum (sort).
+        // Fraction can not be 1 (all answers correct).
+        if ($feedbacksettings->fraction >= 1) {
+            $returnarray = [];
+            foreach ($personabilities as $scaleid => $array) {
+                $returnarray[$scaleid] = [
+                    'value' => $array['value'],
+                    'excluded' => true,
+                    'error' => get_string('fractionerror:allanswerscorrect', 'local_catquiz'),
+                ];
+            }
+            return $returnarray;
+        }
+        // Exclude scales that don't meet minimum of items required in quizsettings.
+        $personabilities = $feedbacksettings->filter_nminscale($personabilities, $feedbackdata);
+        // Exclude scales where standarderror is not in range.
+        $personabilities = $feedbacksettings->filter_semax($personabilities, $feedbackdata);
 
-        // Force selected scale.
+        // Force selected scale. Will also be applied to excluded scales.
         if ($feedbackonlyfordefinedscaleid && !empty($catscaleid)) {
             $relevantscale = $personabilities[$catscaleid];
         } else {
-            // TODO: Filter: It should not be root or parentscale.
-            $relevantscale = array_search(min($personabilities['values']), $personabilities['values']);
-            $personabilities[$relevantscale]['primary'] = true;
+            $filterabilities = [];
+            foreach ($personabilities as $scaleid => $array) {
+                if (!isset($array['error']) && !isset($array['excluded'])) {
+                    $filterabilities[$scaleid] = $array['value'];
+                }
+            }
+            if (count($filterabilities) < 1) {
+                return $personabilities;
+            }
+            // In this strategy, the scale with lowest value is set primary.
+            $relevantscale = array_search(min($filterabilities), $filterabilities);
         }
-        if (isset($nminscale) && $nminscale > $personabilities[$relevantscale]['value']) {
-            $personabilities[$relevantscale]['error'] = get_string('scalereporterror:nminscale', 'local_catquiz');
-        }
-        if ()
-
-        // Check if value <= se max;
-        return [$minscale => $personabilities[$minscale]];
+        $personabilities[$relevantscale]['primary'] = true;
+        return $personabilities;
     }
 }
