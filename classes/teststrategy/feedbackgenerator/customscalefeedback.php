@@ -47,6 +47,11 @@ class customscalefeedback extends feedbackgenerator {
     private $sortfun;
 
     /**
+     * @var object $feedbacksettings
+     */
+    private $feedbacksettings;
+
+    /**
      * Creates a new customscale feedback generator.
      *
      * @param feedbacksettings $feedbacksettings
@@ -64,6 +69,7 @@ class customscalefeedback extends feedbackgenerator {
         } else {
             $this->sortfun = fn(&$x) => arsort($x);
         }
+        $this->feedbacksettings = $feedbacksettings;
 
     }
 
@@ -154,12 +160,13 @@ class customscalefeedback extends feedbackgenerator {
             return null;
         }
 
+        $feedbacksettings = $this->feedbacksettings;
         // Make sure that only feedback for specific scale is rendered.
-        $personabilitiesfeedbackeditor = feedbacksettings::return_scales_according_to_strategy(
-            $existingdata['teststrategy'],
+        $personabilitiesfeedbackeditor = $feedbacksettings->return_scales_according_to_strategy(
             (array) $personabilities,
-            (array) $progress,
+            (array) $newdata,
             (array) $quizsettings,
+            $existingdata['teststrategy'],
             $existingdata['catscaleid']);
 
         $scalefeedback = [];
