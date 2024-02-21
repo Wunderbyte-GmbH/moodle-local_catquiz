@@ -53,7 +53,7 @@ class model_item_param_list_test extends advanced_testcase {
         $this->assertEquals($expected['success'], $result['success']);
     }
 
-    public static function save_or_update_testitem_in_db_provider() : array {
+    public static function save_or_update_testitem_in_db_provider(): array {
 
         return [
             'nameandtreeset' => [
@@ -72,10 +72,10 @@ class model_item_param_list_test extends advanced_testcase {
                     ],
                 'expected' => [
                     'success' => 1,
-                 ]
+                ],
                  // TODO: Mock DB to check if matching via scaleid and scaleimport works.
-            ]
-            ];
+            ],
+        ];
     }
 
     // TODO: Test for update_in_scale.
