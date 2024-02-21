@@ -38,6 +38,11 @@ class feedbacksettings {
      */
     public $primaryscaleid;
 
+    /** The id of the teststrategy.
+     * @var int
+     */
+    public $strategyid;
+
     /**
      * @var boolean
      */
@@ -78,6 +83,8 @@ class feedbacksettings {
         $strategyid,
         $primaryscaleid = LOCAL_CATQUIZ_PRIMARYCATSCALE_DEFAULT
         ) {
+
+        $this->strategyid = $strategyid;
         $this->primaryscaleid = $primaryscaleid;
 
         // Default sortorder is descendent.
