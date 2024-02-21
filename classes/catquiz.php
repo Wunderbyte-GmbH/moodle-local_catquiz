@@ -842,7 +842,7 @@ class catquiz {
      * @return mixed
      *
      */
-    public static function return_attempt_and_contextid_from_attemptstable(
+    public static function return_data_from_attemptstable(
         int $numberofrecords = 1,
         int $instanceid = 0,
         int $courseid = 0,
@@ -850,7 +850,7 @@ class catquiz {
 
         global $DB;
 
-        $sqlarray = self::return_sql_for_attemptid_contextid($numberofrecords, $instanceid, $courseid, $userid);
+        $sqlarray = self::return_sql_for_attemptid_contextid_json($numberofrecords, $instanceid, $courseid, $userid);
 
         $recordsarray = $DB->get_records_sql($sqlarray[0], $sqlarray[1]);
 
@@ -858,21 +858,22 @@ class catquiz {
     }
 
     /**
-     * Summary of return_sql_for_attemptid_contextid
+     * Summary of return_sql_for_attemptid_contextid_json
      * @param int $numberofrecords
      * @param int $instanceid
      * @param int $courseid
      * @param int $userid
      * @return array
      */
-    private static function return_sql_for_attemptid_contextid(
+    private static function return_sql_for_attemptid_contextid_json(
         int $numberofrecords = 1,
         int $instanceid = 0,
         int $courseid = 0,
         int $userid = -1): array {
 
         $sql = "SELECT
-        attemptid, contextid FROM {local_catquiz_attempts} ";
+        attemptid, contextid, json
+        FROM {local_catquiz_attempts} ";
 
         $wherearray = [];
         $params = [];
