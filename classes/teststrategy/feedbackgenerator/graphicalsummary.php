@@ -218,7 +218,7 @@ class graphicalsummary extends feedbackgenerator {
             $new['difficultynextafter'] = null;
             $new['personability_after'] = $newdata['person_ability'][$newdata['catscaleid']];
             $new['personability_before'] =
-                $existingdata['personabilities'][$existingdata['catscaleid']] ?? null;
+                $existingdata['personabilities'][$existingdata['catscaleid']]['value'] ?? null;
 
             $graphicalsummary[] = $new;
 
