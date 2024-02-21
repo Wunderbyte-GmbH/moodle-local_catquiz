@@ -462,6 +462,7 @@ $string['lowestscaleselected'] = 'your lowest scale {$a}';
 $string['parentscaleselected'] = 'parent scale {$a}';
 $string['scaleselected'] = 'defined scale {$a}';
 $string['feedback_customscale_nofeedback'] = 'No feedback was provided for your test results';
+$string['reportscale'] = 'Include scale for report';
 
 // Personability & chart in Feedback.
 $string['chartlegendabilityrelative'] = '{$a->difference} (Compared to parentscale); {$a->ability} (ability score of scale)';
