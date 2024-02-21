@@ -112,7 +112,7 @@ class attemptfeedback implements renderable, templatable {
         $this->teststrategy = intval($settings->catquiz_selectteststrategy);
 
         if (!isset($feedbacksettings)) {
-            $this->feedbacksettings = new feedbacksettings();
+            $this->feedbacksettings = new feedbacksettings($this->teststrategy);
         } else {
             $this->feedbacksettings = $feedbacksettings;
         }
@@ -250,7 +250,7 @@ class attemptfeedback implements renderable, templatable {
         }
 
         if (!isset($this->feedbacksettings)) {
-            $this->feedbacksettings = new feedbacksettings();
+            $this->feedbacksettings = new feedbacksettings($strategyid);
         }
         return $attemptstrategy->get_feedbackgenerators($this->feedbacksettings);
     }
