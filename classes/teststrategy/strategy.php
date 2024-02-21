@@ -217,7 +217,10 @@ abstract class strategy {
      */
     private function restructure_abilities_array($context): array {
         $newarray = [];
-        foreach ($context['personabilites'] as $scaleid => $ability) {
+        if (empty($context['person_ability'])) {
+            return $newarray;
+        }
+        foreach ($context['person_ability'] as $scaleid => $ability) {
             $newarray[$scaleid] = [
                 'value' => $ability,
             ];
