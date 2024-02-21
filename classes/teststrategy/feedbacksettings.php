@@ -71,9 +71,13 @@ class feedbacksettings {
     /**
      * Constructor for feedbackclass.
      *
+     * @param int $strategyid
      * @param int $primaryscaleid
      */
-    public function __construct($primaryscaleid = LOCAL_CATQUIZ_PRIMARYCATSCALE_DEFAULT) {
+    public function __construct(
+        $strategyid,
+        $primaryscaleid = LOCAL_CATQUIZ_PRIMARYCATSCALE_DEFAULT
+        ) {
         $this->primaryscaleid = $primaryscaleid;
 
         // Default sortorder is descendent.

@@ -127,10 +127,15 @@ class shortcodes {
             $areastoshow = [];
         }
 
-        $feedbacksettings = new feedbacksettings(intval($primaryscale));
-        $feedbacksettings->set_hide_and_show_areas($areastohide, $areastoshow);
-
         foreach ($records as $record) {
+            // TODO: Testing!
+            if (!$attemptdata = json_decode($record->json)) {
+                throw new \moodle_exception("Can not read attempt data");
+            }
+            $strategyid = $attemptdata->teststrategy;
+            $feedbacksettings = new feedbacksettings($strategyid, intval($primaryscale));
+            $feedbacksettings->set_hide_and_show_areas($areastohide, $areastoshow);
+
             $attemptfeedback = new attemptfeedback($record->attemptid, $record->contextid, $feedbacksettings);
             $feedback = $attemptfeedback->get_feedback_for_attempt() ?? "";
             if (empty($feedback)) {
