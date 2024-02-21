@@ -514,6 +514,7 @@ $string['fisherinformation'] = 'Fisherinformation';
 $string['difficulty_next_easier'] = 'Nächstschwierigere Frage';
 $string['difficulty_next_more_difficult'] = 'Nächstleichtere Frage';
 $string['scaleiddisplay'] = ' (ID: {$a})';
+$string['reportscale'] = 'Skala für den Report der Ergebnisse berücksichtigen';
 
 // Quiz attempts.
 $string['catcontext'] = 'Einsatz-Kontext';
