@@ -78,7 +78,7 @@ class shortcodes {
         }
 
         $courseid = optional_param('id', 0, PARAM_INT);
-        $records = catquiz::return_attempt_and_contextid_from_attemptstable(
+        $records = catquiz::return_data_from_attemptstable(
             intval($args['numberofattempts'] ?? 1),
             intval($args['instanceid'] ?? 0),
             intval($args['courseid'] ?? $courseid),
@@ -128,7 +128,6 @@ class shortcodes {
         }
 
         foreach ($records as $record) {
-            // TODO: Testing!
             if (!$attemptdata = json_decode($record->json)) {
                 throw new \moodle_exception("Can not read attempt data");
             }
