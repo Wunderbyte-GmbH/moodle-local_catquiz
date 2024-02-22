@@ -292,7 +292,7 @@ class comparetotestaverage extends feedbackgenerator {
         $selectedscalestringkey = $selectedscalearray['selectedscalestringkey'];
 
         $catscale = catscale::return_catscale_object($catscaleid);
-        $ability = $personabilities[$catscaleid];
+        $ability = $personabilities[$catscaleid]['value'];
         if (! $ability) {
             return null;
         }

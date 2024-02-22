@@ -168,7 +168,10 @@ class inferlowestskillgap extends strategy {
                 $returnarray[$scaleid] = [
                     'value' => $array['value'],
                     'excluded' => true,
-                    'error' => get_string('fractionerror:allanswerscorrect', 'local_catquiz'),
+                    'error' => [
+                        'fraction' => $feedbacksettings->fraction,
+                        'expected' => '< 1',
+                    ],
                 ];
             }
             return $returnarray;

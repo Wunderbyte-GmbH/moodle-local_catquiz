@@ -399,10 +399,12 @@ class feedbacksettings {
         // Find average fraction.
         $f = 0.0;
         $i = 0;
-        $playedquestions = $newdata['progress']->playedquestions;
+        $progress = $newdata['progress'];
+        $playedquestions = $progress->get_playedquestions();
+        // TODO: Properties richtig ansprechen! Ist ein object und wahrscheinlich auch private.
         foreach ($playedquestions as $componentid => $questionclass) {
-            $fraction = $newdata['progress']['responses'][$componentid]['fraction'];
-            $f += (float) $fraction;
+            $fraction = $progress->get_fraction_of_question($componentid);
+            $f += $fraction;
             $i ++;
         }
         $this->fraction = $f / $i;

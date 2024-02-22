@@ -121,44 +121,35 @@ class classicalcat extends strategy {
     /**
      * Gets predefined values and completes them with specific behaviour of strategy.
      *
+     * @param object $feedbacksettings
      * @param array $personabilities
      * @param array $feedbackdata
-     * @param int $semax
-     * @param int $nmintest
-     * @param int $nminscale
-     * @param int $rootscale
-     * @param float $fraction
      * @param int $catscaleid
      * @param bool $feedbackonlyfordefinedscaleid
      *
      */
     public function select_scales_for_report(
+        object $feedbacksettings,
         array $personabilities,
         array $feedbackdata,
-        int $semax,
-        int $nmintest,
-        int $nminscale,
-        int $rootscale,
-        float $fraction,
         int $catscaleid = 0,
         bool $feedbackonlyfordefinedscaleid = false
         ): array {
-            // Force selected scale.
-            // if ($feedbackonlyfordefinedscaleid && !empty($catscaleid)) {
-            //     $rootscale = $catscaleid;
-            // }
-            if (!isset($personabilities[$rootscale])) {
-                return [];
-            }
-            if (isset($nmintest) &&
-            (float) $personabilities[$rootscale] < (float) ($nmintest)) {
-                $personabilities[$rootscale]['error'] = get_string('scalereporterror:minvaluepertest', 'local_catquiz');
-            }
-            if ($fraction == 0.0 || $fraction == 1.0) {
-                $personabilities[$rootscale]['error'] = get_string('scalereporterror:fraction', 'local_catquiz');
-            }
+        // Force selected scale.
+        // if ($feedbackonlyfordefinedscaleid && !empty($catscaleid)) {
+        //     $rootscale = $catscaleid;
+        // }
 
-
+        // if (!isset($personabilities[$rootscale])) {
+        //     return [];
+        // }
+        // if (isset($nmintest) &&
+        // (float) $personabilities[$rootscale] < (float) ($nmintest)) {
+        //     $personabilities[$rootscale]['error'] = get_string('scalereporterror:minvaluepertest', 'local_catquiz');
+        // }
+        // if ($fraction == 0.0 || $fraction == 1.0) {
+        //     $personabilities[$rootscale]['error'] = get_string('scalereporterror:fraction', 'local_catquiz');
+        // }
 
             // Look up fraction.
 
