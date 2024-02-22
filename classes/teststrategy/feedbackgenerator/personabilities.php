@@ -879,7 +879,7 @@ class personabilities extends feedbackgenerator {
         $chartseries['series'] = [];
         $chartseries['labels'] = [];
         foreach ($personabilities as $subscaleid => $ability) {
-            $subscaleability = $ability;
+            $subscaleability = $ability['value'];
             $subscale = catscale::return_catscale_object($subscaleid);
             $subscalename = $subscale->name;
             $difference = round($subscaleability - $primaryability, 2);

@@ -140,28 +140,20 @@ class inferallsubscales extends strategy {
     /**
      * Gets predefined values and completes them with specific behaviour of strategy.
      *
+     * @param object $feedbacksettings
      * @param array $personabilities
      * @param array $feedbackdata
-     * @param int $semax
-     * @param int $nmintest
-     * @param int $nminscale
-     * @param int $rootscale
-     * @param float $fraction
      * @param int $catscaleid
      * @param bool $feedbackonlyfordefinedscaleid
      *
      */
     public function select_scales_for_report(
+        object $feedbacksettings,
         array $personabilities,
         array $feedbackdata,
-        int $semax,
-        int $nmintest,
-        int $nminscale,
-        int $rootscale,
-        float $fraction,
         int $catscaleid = 0,
         bool $feedbackonlyfordefinedscaleid = false
         ): array {
-        return $personabilities;
+            return $personabilities;
     }
 }

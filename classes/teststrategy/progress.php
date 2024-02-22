@@ -78,7 +78,7 @@ class progress implements JsonSerializable {
     /**
      * @var array $playedquestions The questions that were already displayed to the user.
      */
-    public array $playedquestions;
+    private array $playedquestions;
 
     /**
      * @var array $playedquestionsbyscale The questions that were already displayed to the user.
@@ -653,7 +653,7 @@ class progress implements JsonSerializable {
      * @return self
      */
     public function set_ability(float $ability, int $catscaleid): self {
-        $this->abilities[$catscaleid] = $ability;
+        $this->abilities[$catscaleid]['value'] = $ability;
         return $this;
     }
 
@@ -917,5 +917,22 @@ class progress implements JsonSerializable {
     private static function get_cache_key(int $attemptid): string {
         global $USER;
         return sprintf('progress_user_%d_id_%d', $USER->id, $attemptid);
+    }
+
+    /**
+     * Returns the fraction of a question.
+     *
+     * @param int $componentid
+     *
+     * @return float
+     *
+     */
+    public function get_fraction_of_question(int $componentid): float {
+        try {
+            return $this->responses[$componentid]['fraction'];
+        } catch (Exception $e) {
+            // This should never happen.
+            throw new \moodle_exception('No response with this componentid found');
+        }
     }
 }
