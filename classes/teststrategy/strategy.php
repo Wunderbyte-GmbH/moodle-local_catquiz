@@ -278,14 +278,22 @@ abstract class strategy {
      */
     abstract public function apply_feedbacksettings(feedbacksettings $feedbacksettings);
 
+    /**
+     * Adapt personabilites array: add excluded, error and primary keys in case these cases apply.
+     *
+     * @param object $feedbacksettings
+     * @param array $personabilities
+     * @param array $feedbackdata
+     * @param int $catscaleid
+     * @param bool $feedbackonlyfordefinedscaleid
+     *
+     * @return array
+     *
+     */
     abstract public function select_scales_for_report(
+        object $feedbacksettings,
         array $personabilities,
         array $feedbackdata,
-        int $semax,
-        int $nmintest,
-        int $nminscale,
-        int $rootscale,
-        float $fraction,
         int $catscaleid = 0,
         bool $feedbackonlyfordefinedscaleid = false
     ): array;

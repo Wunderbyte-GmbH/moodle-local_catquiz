@@ -171,12 +171,15 @@ class customscalefeedback extends feedbackgenerator {
 
         $scalefeedback = [];
         foreach ($personabilitiesfeedbackeditor as $catscaleid => $personability) {
+            if ($personability['excluded']) {
+                continue;
+            }
             for ($j = 1; $j <= $quizsettings['numberoffeedbackoptionsselect']; $j++) {
                 $lowerlimitprop = sprintf('feedback_scaleid_limit_lower_%d_%d', $catscaleid, $j);
                 $lowerlimit = floatval($quizsettings[$lowerlimitprop]);
                 $upperlimitprop = sprintf('feedback_scaleid_limit_upper_%d_%d', $catscaleid, $j);
                 $upperlimit = floatval($quizsettings[$upperlimitprop]);
-                if ($personability < $lowerlimit || $personability > $upperlimit) {
+                if ($personability['value'] < $lowerlimit || $personability['value'] > $upperlimit) {
                     continue;
                 }
 
