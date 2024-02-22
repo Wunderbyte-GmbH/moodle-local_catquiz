@@ -29,22 +29,22 @@ Feature: As a teacher I want to use shortcodes to display adaptive quiz test res
     And the following "activities" exist:
       | activity     | name             | course | section | idnumber         | intro               |
       | adaptivequiz | My Adaptive Quiz | C1     | 1       | adaptivecatquiz1 | Adaptive Quiz Intro |
-      | label        | Adaptive Panel   | C1     | 1       | adaptivelabel1   | [catquizfeedback]   |
+    And the following "local_catquiz > testsettings" exist:
+      | course | adaptivecatquiz  | catmodel | catscales  | cateststrategy      | catquiz_selectfirstquestion | catquiz_maxquestions | catquiz_standarderror_min | catquiz_standarderror_max | numberoffeedbackoptions |
+      | C1     | adaptivecatquiz1 | catquiz  | Simulation | Infer all subscales | startwitheasiestquestion    | 4                    | 0.4                       | 0.6                       | 2                       |
+    ## Below steps are required to save a correct JSON settings
     And I am on the "adaptivecatquiz1" Activity page logged in as teacher
     And I follow "Settings"
-    And I set the following fields to these values:
-      | catmodel                                              | Catquiz CAT model   |
-      | Select CAT scale                                      | Simulation          |
-      | Purpose of test                                       | Infer all subscales |
-      | maxquestionsgroup[catquiz_maxquestions]               | 4                   |
-      | catquiz_standarderrorgroup[catquiz_standarderror_min] | 0.4                 |
-      | catquiz_standarderrorgroup[catquiz_standarderror_max] | 0.6                 |
+    And I wait until the page is ready
     And I click on "Save and return to course" "button"
     And I log out
 
   @javascript
   Scenario: CatQuiz: Pass adaptive quiz attempt and displaying feedback in a Page resource via the shortcode
-    Given I am on the "adaptivecatquiz1" Activity page logged in as student1
+    Given the following "activities" exist:
+      | activity     | name             | course | section | idnumber         | intro               |
+      | label        | Adaptive Panel   | C1     | 1       | adaptivelabel1   | [catquizfeedback]   |
+    And I am on the "adaptivecatquiz1" Activity page logged in as student1
     And I click on "Start attempt" "button"
     And I wait until the page is ready
     And I should see "Question 1"
