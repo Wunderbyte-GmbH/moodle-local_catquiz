@@ -171,7 +171,7 @@ class customscalefeedback extends feedbackgenerator {
 
         $scalefeedback = [];
         foreach ($personabilitiesfeedbackeditor as $catscaleid => $personability) {
-            if ($personability['excluded']) {
+            if (isset($personability['excluded']) && $personability['excluded']) {
                 continue;
             }
             for ($j = 1; $j <= $quizsettings['numberoffeedbackoptionsselect']; $j++) {
