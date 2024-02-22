@@ -289,7 +289,6 @@ class comparetotestaverage extends feedbackgenerator {
                 $this->primaryscaleid);
 
         $catscaleid = $selectedscalearray['selectedscaleid'];
-        $selectedscalestringkey = $selectedscalearray['selectedscalestringkey'];
 
         $catscale = catscale::return_catscale_object($catscaleid);
         $ability = $personabilities[$catscaleid]['value'];
@@ -311,7 +310,7 @@ class comparetotestaverage extends feedbackgenerator {
             'local_catquiz',
             [
                 'quantile' => sprintf('%.2f', $quantile),
-                'scaleinfo' => get_string($selectedscalestringkey, 'local_catquiz', $catscale->name),
+                'scaleinfo' => $catscale->name,
             ]);
 
         $testaverage = (new firstquestionselector())->get_median_ability_of_test($personparams);
@@ -329,12 +328,16 @@ class comparetotestaverage extends feedbackgenerator {
             $abilityrange['minscalevalue'],
             $abilityrange['maxscalevalue']);
 
+        $b = $middle - (float) $abilityrange['minscalevalue'];
+        $testaverageposition = ($b + $testaverageinrange) / $b * 50;
+        $userabilityposition = ($b + $abilityinrange) / $b * 50;
+
         return [
             'contextid' => $existingdata['contextid'],
             'testaverageability' => sprintf('%.2f', $testaverageinrange),
             'userability' => sprintf('%.2f', $abilityinrange),
-            'testaverageposition' => ($testaverageinrange + $abilityrange['maxscalevalue']) * 10,
-            'userabilityposition' => ($abilityinrange + $abilityrange['maxscalevalue']) * 10,
+            'testaverageposition' => $testaverageposition,
+            'userabilityposition' => $userabilityposition,
             'comparisontext' => $text,
             'colorbar' => [
                 'colorgradestring' => $this->get_colorgradientstring($quizsettings, $catscaleid),
