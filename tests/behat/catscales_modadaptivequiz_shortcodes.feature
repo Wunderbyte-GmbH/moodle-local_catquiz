@@ -42,8 +42,8 @@ Feature: As a teacher I want to use shortcodes to display adaptive quiz test res
   @javascript
   Scenario: CatQuiz: Pass adaptive quiz attempt and displaying feedback in a Page resource via the shortcode
     Given the following "activities" exist:
-      | activity     | name             | course | section | idnumber         | intro               |
-      | label        | Adaptive Panel   | C1     | 1       | adaptivelabel1   | [catquizfeedback]   |
+      | activity | name           | course | section | idnumber       | intro             |
+      | label    | Adaptive Panel | C1     | 1       | adaptivelabel1 | [catquizfeedback] |
     And I am on the "adaptivecatquiz1" Activity page logged in as student1
     And I click on "Start attempt" "button"
     And I wait until the page is ready
@@ -61,10 +61,40 @@ Feature: As a teacher I want to use shortcodes to display adaptive quiz test res
     And I click on "Submit answer" "button"
     And I wait until the page is ready
     And I should see "Ability score"
+    And I should see "Simulation" in the "[data-placement=\"top\"]" "css_element"
     And I should see "-1.35 (Standarderror: 0.51)"
     ## Verify feedback in label
     When I am on "Course 1" course homepage
     Then I should see "Ability score"
+    And I should see "Simulation" in the "[data-placement=\"top\"]" "css_element"
     And I should see "-1.35 (Standarderror: 0.51)"
-    And I should see "You performed better than 50.00% of your fellow students for parent scale Simulation."
-    And I log out
+
+  @javascript
+  Scenario: CatQuiz: Displaying feedback in a Page resource via the shortcode with primaryscale parameter
+    Given the following "activities" exist:
+      | activity | name           | course | section | idnumber       | intro                               |
+      | label    | Adaptive Panel | C1     | 1       | adaptivelabel1 | [catquizfeedback primaryscale=SimA] |
+    And I am on the "adaptivecatquiz1" Activity page logged in as student1
+    And I click on "Start attempt" "button"
+    And I wait until the page is ready
+    And I should see "Question 1"
+    And I click on "richtige Antwort" "text" in the "Question 1" "question"
+    And I click on "Submit answer" "button"
+    And I should see "Question 2"
+    And I click on "falsche Antwort 1" "text" in the "Question 2" "question"
+    And I click on "Submit answer" "button"
+    And I should see "Question 3"
+    And I click on "richtige Antwort" "text" in the "Question 3" "question"
+    And I click on "Submit answer" "button"
+    And I should see "Question 4"
+    And I click on "falsche Antwort 2" "text" in the "Question 4" "question"
+    And I click on "Submit answer" "button"
+    And I wait until the page is ready
+    And I should see "Ability score"
+    And I should see "SimA" in the "[data-placement=\"top\"]" "css_element"
+    And I should see "-0.81 (Standarderror: 3.12)"
+    ## Verify feedback in label
+    When I am on "Course 1" course homepage
+    Then I should see "Ability score"
+    And I should see "SimA" in the "[data-placement=\"top\"]" "css_element"
+    And I should see "-0.81 (Standarderror: 3.12)"
