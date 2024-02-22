@@ -66,6 +66,15 @@ $string['pilotratio_help'] = 'Anteil von noch zu pilotierender Fragen an der Ges
 $string['includepilotquestions'] = 'Pilotierungsmodus aktivieren';
 $string['standarderror'] = 'Standardfehler';
 $string['standarderrorpersubscale'] = 'Standardfehler pro Skala in Prozent';
+$string['tr_sd_ratio_name'] = 'Multiplikator für Vertrauensbereich';
+$string['tr_sd_ratio_desc'] = 'Der Multiplikator für den Vertrauensbereich gibt
+    das Vielfache der Standardabweichung um den Mittelwert an, um den eine
+    Parameterschätzung einer Person oder Item-Schwierigkeit erwartet wird. Wird
+    der Multiplikator für den Vertrauensbereich zu hoch gewählt, besteht die
+    Gefahr, dass der numerische Algorithmus instabil wird und bei schwieriger
+    Datenlage unzuverlässige Werte liefert. Default-Wert ist ein Multiplikator
+    von 3.0, was statistisch 99,9 Prozent aller zu erwartenden Fälle mit
+    einschließt einschließt.';
 $string['acceptedstandarderror'] = 'akzeptierter Standardfehler';
 $string['acceptedstandarderror_help'] = 'Sobald der Standardfehler einer Skala außerhalb dieser Werte fällt, wird sie nicht weiter getestet.';
 $string['maxquestionspersubscale'] = 'max. Frageanzahl pro Skala';
