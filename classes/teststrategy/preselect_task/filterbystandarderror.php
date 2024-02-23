@@ -24,7 +24,6 @@
 
 namespace local_catquiz\teststrategy\preselect_task;
 
-use cache;
 use local_catquiz\catquiz;
 use local_catquiz\catscale;
 use local_catquiz\local\model\model_item_param_list;
@@ -51,6 +50,11 @@ class filterbystandarderror extends preselect_task implements wb_middleware {
     private progress $progress;
 
     /**
+     * @var callable $next
+     */
+    private $next;
+
+    /**
      * Run method.
      *
      * @param array $context
@@ -60,6 +64,7 @@ class filterbystandarderror extends preselect_task implements wb_middleware {
      *
      */
     public function run(array &$context, callable $next): result {
+        $this->next = $next;
         $this->progress = $context['progress'];
 
         if ($this->progress->is_first_question()) {
@@ -77,27 +82,11 @@ class filterbystandarderror extends preselect_task implements wb_middleware {
         $scaleid = $lastquestion->catscaleid;
         $updatedscales = [$scaleid, ...catscale::get_ancestors($scaleid)];
         if ($context['teststrategy'] == LOCAL_CATQUIZ_STRATEGY_FASTEST) {
-            $updatedscales = [$context['catscaleid']];
+            return $this->filter_for_radical_cat($updatedscales);
         }
         foreach ($updatedscales as $scaleid) {
-            // All played items that belong to the scale or one of its ancestor scales.
-            $playeditems = model_item_param_list::from_array(
-                $this->progress->get_playedquestions(true)[$scaleid]
-            );
+            $drop = $this->check_scale_should_be_dropped($scaleid);
 
-            $hasmaxitems = $this->context['max_attempts_per_scale'] !== -1
-                && count($playeditems) >= $this->context['max_attempts_per_scale'];
-            $hasminse = $this->context['se'][$scaleid] <= $this->context['se_min'];
-            $abilitydeltabelow = isset($context['prev_ability'][$scaleid])
-                && abs($context['prev_ability'][$scaleid] - $context['person_ability'][$scaleid]) <= $context['pp_min_inc'];
-            $drop = $hasmaxitems || ($hasminse && $abilitydeltabelow);
-
-            if ($context['teststrategy'] == LOCAL_CATQUIZ_STRATEGY_FASTEST) {
-                if ($drop) {
-                    return result::err(status::ERROR_NO_REMAINING_QUESTIONS);
-                }
-                return $next($context);
-            }
             if ($drop && !in_array($scaleid, $this->progress->get_active_scales())) {
                 continue;
             }
@@ -106,6 +95,9 @@ class filterbystandarderror extends preselect_task implements wb_middleware {
                 $this->context['questionsperscale'][$scaleid]
             );
             $remainingitems = clone ($allitems);
+            $playeditems = model_item_param_list::from_array(
+                $this->progress->get_playedquestions(true)[$scaleid]
+            );
             foreach ($remainingitems as $i) {
                 if (in_array($i->get_id(), $playeditems->get_item_ids())) {
                     $remainingitems->offsetUnset($i->get_id());
@@ -131,12 +123,7 @@ class filterbystandarderror extends preselect_task implements wb_middleware {
                     (catscale::return_catscale_object($scaleid))->name, PHP_EOL
                 );
                 $this->progress->drop_scale($scaleid);
-                // Subscales inherit values of parent when their ability wasn't calculated yet (is still 0.0).
-                $inheritscales = array_filter(
-                    array_keys(catscale::get_next_level_subscales_ids_from_parent([$scaleid])),
-                    fn ($id) => isset($this->context['person_ability'][$id])
-                        && $this->context['person_ability'][$id] === 0.0
-                );
+                $inheritscales = $this->get_scale_heirs($scaleid);
                 $inheritval = $this->context['person_ability'][$scaleid] - $this->context['se'][$scaleid];
                 $fisherinformation = new fisherinformation();
                 foreach ($inheritscales as $subscaleid) {
@@ -216,4 +203,58 @@ class filterbystandarderror extends preselect_task implements wb_middleware {
         ];
     }
 
+    /**
+     * Returns the list of scales that should inherit from the given scale.
+     *
+     * @param int $scaleid
+     * @return array
+     */
+    private function get_scale_heirs($scaleid): array {
+        // Subscales inherit values of parent when their ability wasn't calculated yet (is still 0.0).
+        return array_filter(
+            array_keys(catscale::get_next_level_subscales_ids_from_parent([$scaleid])),
+            fn ($id) => isset($this->context['person_ability'][$id])
+            && $this->context['person_ability'][$id] === 0.0
+        );
+    }
+
+    private function filter_for_radical_cat(array $updatedscales): result {
+        $drop = false;
+        foreach (array_reverse($updatedscales) as $scaleid) {
+            if (!$this->check_scale_should_be_dropped($scaleid)) {
+                continue;
+            }
+            $drop = true;
+            $inheritval = $this->context['person_ability'][$scaleid];
+            $inheritscales = $this->get_scale_heirs($scaleid);
+            foreach ($inheritscales as $subscaleid) {
+                catquiz::update_person_param(
+                    $this->context['userid'],
+                    $this->context['contextid'],
+                    $subscaleid,
+                    $inheritval
+                );
+                $this->context['person_ability'][$subscaleid] = $inheritval;
+            }
+        }
+        if ($drop) {
+            return result::err(status::ERROR_NO_REMAINING_QUESTIONS);
+        }
+        return ($this->next)($this->context);
+    }
+
+    private function check_scale_should_be_dropped(int $scaleid): bool {
+        // All played items that belong to the scale or one of its ancestor scales.
+        $playeditems = model_item_param_list::from_array(
+            $this->progress->get_playedquestions(true)[$scaleid]
+        );
+
+        $hasmaxitems = $this->context['max_attempts_per_scale'] !== -1
+            && count($playeditems) >= $this->context['max_attempts_per_scale'];
+        $hasminse = $this->context['se'][$scaleid] <= $this->context['se_min'];
+        $abilitydifference = $this->context['prev_ability'][$scaleid] - $this->context['person_ability'][$scaleid];
+        $abilitydeltabelow = isset($this->context['prev_ability'][$scaleid])
+            && abs($abilitydifference) <= $this->context['pp_min_inc'];
+        return $hasmaxitems || ($hasminse && $abilitydeltabelow);
+    }
 }
