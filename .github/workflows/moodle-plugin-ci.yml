@@ -101,7 +101,7 @@ jobs:
       - name: Install moodle-plugin-ci
         run: |
           moodle-plugin-ci add-plugin --branch main Wunderbyte-GmbH/moodle-local_wunderbyte_table
-          moodle-plugin-ci add-plugin --branch catmodel_subplugins_with_mod_form_reload Wunderbyte-GmbH/moodle-mod_adaptivequiz
+          moodle-plugin-ci add-plugin --branch catmodel_subplugins_with_mod_form_reload_400 Wunderbyte-GmbH/moodle-mod_adaptivequiz
           moodle-plugin-ci add-plugin --branch master branchup/moodle-filter_shortcodes
           moodle-plugin-ci add-plugin --branch main Wunderbyte-GmbH/moodle-adaptivequizcatmodel_catquiz
 
