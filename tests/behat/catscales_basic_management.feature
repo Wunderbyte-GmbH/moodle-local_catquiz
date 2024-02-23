@@ -32,26 +32,23 @@ Feature: As an admin I perform basic catquiz actions - create, update, delete, s
     And I set the following fields to these values:
       | Name                               | Math              |
       | Description                        | Description: Math |
-      | Person ability minimum             | -4                |
-      | Person ability maximum:            | 4                 |
+      | Person ability minimum             | -4.4              |
+      | Person ability maximum:            | 4.3               |
     And I press "Save changes"
-    ## And I wait "1" seconds
     And I wait until the page is ready
     Then I should see "Math" in the "[data-name=\"Math\"]" "css_element"
-    ## And I follow "Subscribe"
-    ## Exact precise click
+    ## Exact precise click on "Subscribe"
     And I click on "Subscribe" "link" in the "[data-name=\"Math\"]" "css_element"
     Then I should see "Subscribed" in the "[data-name=\"Math\"]" "css_element"
     And I follow "Edit"
     And the following fields match these values:
       | Name                               | Math              |
       | Description                        | Description: Math |
-      | Person ability minimum             | -4                |
-      | Person ability maximum:            | 4                 |
+      | Person ability minimum             | -4.40             |
+      | Person ability maximum:            | 4.30              |
     And I set the following fields to these values:
       | Name                               | Mathematics       |
     And I press "Save changes"
-    ## And I wait "1" seconds
     And I wait until the page is ready
     ## TODO: should return to the same tab?
     And I click on "CAT scales" "link" in the "#region-main" "css_element"
@@ -80,6 +77,9 @@ Feature: As an admin I perform basic catquiz actions - create, update, delete, s
     And I follow "Create"
     And I set the field "Name" to "Arithmetics"
     And I set the field "Parent CAT scale - None if top level CAT scale" to "Mathematics"
+    ## No max / min fields in subscales
+    And I should not see "Person ability minimum" in the ".modal-dialog .modal-body" "css_element"
+    And I should not see "Person ability maximum" in the ".modal-dialog .modal-body" "css_element"
     And I press "Save changes"
     And I wait until the page is ready
     Then I should see "Arithmetics" in the "[data-name=\"Arithmetics\"]" "css_element"
