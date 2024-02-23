@@ -63,17 +63,25 @@ class local_catquiz_generator extends testing_module_generator {
         $qformat->setContextfromfile(false);
         $qformat->setStoponerror(true);
         // Do anything before that we need to.
+        ob_start();
         if (!$qformat->importpreprocess()) {
-            throw new moodle_exception('Cannot import {$filepath} (preprocessing)', '', '');
+            $output = ob_get_contents();
+            ob_end_clean();
+            throw new moodle_exception('Cannot import {$filepath} (preprocessing) Output: {$output}', 'local_catquiz', '');
         }
         // Process the uploaded file.
         if (!$qformat->importprocess()) {
-            throw new moodle_exception('Cannot import {$filepath} (processing)', '', '');
+            $output = ob_get_contents();
+            ob_end_clean();
+            throw new moodle_exception('Cannot import {$filepath} (processing) Output: {$output}', 'local_catquiz', '');
         }
         // In case anything needs to be done after.
         if (!$qformat->importpostprocess()) {
-            throw new moodle_exception('Cannot import {$filepath} (postprocessing)', '', '');
+            $output = ob_get_contents();
+            ob_end_clean();
+            throw new moodle_exception('Cannot import {$filepath} (postprocessing) Output: {$output}', 'local_catquiz', '');
         }
+        ob_end_clean();
     }
 
     /**
