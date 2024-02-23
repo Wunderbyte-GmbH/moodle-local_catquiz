@@ -112,6 +112,7 @@ class strategy_test extends advanced_testcase {
      * @param float $initialability The initial ability in the main scale.
      * @param float $initialse The initial standarderror in the main scale.
      * @param array $settings Additional testsettings
+     * @param array $finalabilities Array with abilities in all scales when the attempt finished.
      *
      * TODO: add group large?
      * TODO: Use different testenvironment.json files for different teststrategies.
@@ -122,7 +123,8 @@ class strategy_test extends advanced_testcase {
         array $questions,
         float $initialability = 0.0,
         float $initialse = 1.0,
-        array $settings = []
+        array $settings = [],
+        array $finalabilities = [],
     ) {
         putenv('USE_TESTING_CLASS_FOR=local_catquiz\teststrategy\preselect_task\updatepersonability');
         putenv("CATQUIZ_TESTING_ABILITY=$initialability");
@@ -169,6 +171,19 @@ class strategy_test extends advanced_testcase {
                 'Ability after fetch is not correct for question number ' . ($index + 1)
             );
             if ($expectedquestion['label'] === 'FINISH') {
+                if (!$finalabilities) {
+                    return;
+                }
+                foreach ($finalabilities as $scalename => $ability) {
+                    $scale = catscale::return_catscale_by_name($scalename);
+                    $pp = $DB->get_record('local_catquiz_personparams', ['catscaleid' => $scale->id]);
+                    $this->assertEqualsWithDelta(
+                        $ability,
+                        $pp->ability,
+                        0.01,
+                        "Ability for scale $scale->name is not correct for the end result"
+                    );
+                }
                 return;
             }
             if ($nextquestionid == 0) {
@@ -227,9 +242,23 @@ class strategy_test extends advanced_testcase {
                 'initialability' => 0.0,
                 'initialse' => 1.0,
                 'settings' => [
-                    'maxquestions' => 25,
+                    'maxquestions' => 250,
                     'maxquestionspersubscale' => 25,
                 ],
+                'final_abilities' => [
+                    'Simulation' => -3.31,
+                    'SimA' => -3.31,
+                    'SimA01' => -3.33,
+                    'SimA02' => -3.33,
+                    'SimA03' => -3.25,
+                    'SimA04' => -3.31,
+                    'SimA05' => -3.35,
+                    'SimA06' => -3.31,
+                    'SimB' => -3.31,
+                    'SimB01' => -3.31,
+                    'SimB02' => -3.31,
+                    'SimC' => -3.31, // Inherited from parent.
+                ]
             ],
             'radical CAT 2' => [
                 'strategy' => LOCAL_CATQUIZ_STRATEGY_FASTEST,
@@ -264,9 +293,26 @@ class strategy_test extends advanced_testcase {
                 'initialability' => 0.0,
                 'initialse' => 1.0,
                 'settings' => [
-                    'maxquestions' => 25,
+                    'maxquestions' => 250,
                     'maxquestionspersubscale' => 25,
                 ],
+                'final_abilities' => [
+                    'Simulation' => 4.73,
+                    'SimA' => 4.73,
+                    'SimB' => 4.73,
+                    'SimB01' => 4.73,
+                    'SimB02' => 4.73,
+                    'SimB03' => 4.73,
+                    'SimB04' => 4.73,
+                    'SimC' => 4.73,
+                    'SimC03' => 4.73,
+                    'SimC05' => 4.73,
+                    'SimC06' => 4.74,
+                    'SimC07' => 4.73,
+                    'SimC08' => 4.54,
+                    'SimC09' => 4.79,
+                    'SimC10' => 4.73,
+                ]
             ],
             'radical CAT 3' => [
                 'strategy' => LOCAL_CATQUIZ_STRATEGY_FASTEST,
@@ -294,9 +340,21 @@ class strategy_test extends advanced_testcase {
                 'initialability' => 0.0,
                 'initialse' => 1.0,
                 'settings' => [
-                    'maxquestions' => 25,
+                    'maxquestions' => 250,
                     'maxquestionspersubscale' => 25,
                 ],
+                'final_abilities' => [
+                    'Simulation' => 1.57,
+                    'SimA' => 1.58,
+                    'SimA02' => 1.58,
+                    'SimB' => 1.63,
+                    'SimB01' => 1.48,
+                    'SimB02' => 1.58,
+                    'SimB03' => 1.81,
+                    'SimB04' => 1.63,
+                    'SimC' => 1.16,
+                    'SimC03' => 1.16,
+                ]
             ],
             'radical CAT 4' => [
                 'strategy' => LOCAL_CATQUIZ_STRATEGY_FASTEST,
@@ -327,9 +385,21 @@ class strategy_test extends advanced_testcase {
                 'initialability' => 0.0,
                 'initialse' => 1.0,
                 'settings' => [
-                    'maxquestions' => 25,
+                    'maxquestions' => 250,
                     'maxquestionspersubscale' => 25,
                 ],
+                'final_abilities' => [
+                    'Simulation' => 0.9,
+                    'SimA' => 0.89,
+                    'SimA02' => 0.89,
+                    'SimB' => 0.83,
+                    'SimB01' => 0.97,
+                    'SimB02' => 0.8,
+                    'SimB03' => 0.62,
+                    'SimC' => 1.18,
+                    'SimC02' => 0.93,
+                    'SimC03' => 1.07,
+                ]
             ],
             'radical CAT 5' => [
                 'strategy' => LOCAL_CATQUIZ_STRATEGY_FASTEST,
@@ -364,9 +434,25 @@ class strategy_test extends advanced_testcase {
                 'initialability' => 0.0,
                 'initialse' => 1.0,
                 'settings' => [
-                    'maxquestions' => 25,
+                    'maxquestions' => 250,
                     'maxquestionspersubscale' => 25,
                 ],
+                'final_abilities' => [
+                    'Simulation' => 3.72,
+                    'SimA' => 3.72,
+                    'SimB' => 3.73,
+                    'SimB01' => 3.72,
+                    'SimB02' => 3.72,
+                    'SimB03' => 3.72,
+                    'SimB04' => 3.73,
+                    'SimC' => 3.7,
+                    'SimC03' => 3.7,
+                    'SimC04' => 3.74,
+                    'SimC05' => 3.61,
+                    'SimC06' => 3.62,
+                    'SimC07' => 3.78,
+                    'SimC10' => 3.71,
+                ]
             ],
             /* 'moderate CAT' => [
             //    'strategy' => LOCAL_CATQUIZ_STRATEGY_BALANCED,
@@ -428,6 +514,21 @@ class strategy_test extends advanced_testcase {
                 'settings' => [
                     'pp_min_inc' => 0.1,
                 ],
+                'final_abilities' => [
+                    'Simulation' => -3.38,
+                    'SimA' => -3.38,
+                    'SimA01' => -3.47,
+                    'SimA02' => -3.40,
+                    'SimA03' => -3.28,
+                    'SimA04' => -3.65,
+                    'SimA05' => -3.43,
+                    'SimA06' => -3.38,
+                    'SimA07' => -3.65, // Inherited from parent.
+                    'SimB' => -3.38,
+                    'SimB01' => -3.38,
+                    'SimB02' => -3.38,
+                    'SimC' => -4.19, // Inherited from parent.
+                ]
             ],
             // phpcs:disable
             //'Infer greatest strength' => [
