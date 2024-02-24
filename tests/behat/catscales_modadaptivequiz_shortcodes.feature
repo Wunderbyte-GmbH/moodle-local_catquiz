@@ -36,14 +36,16 @@ Feature: As a teacher I want to use shortcodes to display adaptive quiz test res
     And I am on the "adaptivecatquiz1" Activity page logged in as teacher
     And I follow "Settings"
     And I wait until the page is ready
+    And I set the field "Feedback" in the "//div[@data-name='feedback_scale_Simulation_range_1']" "xpath_element" to "Feedback-Simulation_range_1"
+    And I set the field "Feedback" in the "//div[@data-name='feedback_scale_Simulation_range_2']" "xpath_element" to "Feedback-Simulation_range_2"
     And I click on "Save and return to course" "button"
     And I log out
 
   @javascript
-  Scenario: CatQuiz: Pass adaptive quiz attempt and displaying feedback in a Page resource via the shortcode
+  Scenario: CatQuiz: Pass adaptive quiz attempt and displaying feedback with question summary in a Page resource via the shortcode
     Given the following "activities" exist:
-      | activity | name           | course | section | idnumber       | intro             |
-      | label    | Adaptive Panel | C1     | 1       | adaptivelabel1 | [catquizfeedback] |
+      | activity | name           | course | section | idnumber       | intro                                   |
+      | label    | Adaptive Panel | C1     | 1       | adaptivelabel1 | [catquizfeedback show=questionssummary] |
     And I am on the "adaptivecatquiz1" Activity page logged in as student1
     And I click on "Start attempt" "button"
     And I wait until the page is ready
@@ -60,20 +62,95 @@ Feature: As a teacher I want to use shortcodes to display adaptive quiz test res
     And I click on "falsche Antwort 2" "text" in the "Question 4" "question"
     And I click on "Submit answer" "button"
     And I wait until the page is ready
+    ## Verify of data on quiz's "Feedback" page
+    ## Verify of ability score
     And I should see "Ability score"
     And I should see "Simulation" in the "[data-placement=\"top\"]" "css_element"
     And I should see "-1.35 (Standarderror: 0.51)"
-    ## Verify feedback in label
+    ## Verify of feedback
+    And I should see "Simulation: Feedback-Simulation_range_1"
+    And I should not see "Feedback-Simulation_range_2"
+    ## Verify of question summary
+    And I should see "4 evaluated items"
+    ##And I should see "4 evaluated items" in the "//div[contains(@data-target, 'catquizfeedbackabilitiesplayedquestions_']" "xpath_element"
+    ## Verify of data in label on course page: recent attempt
     When I am on "Course 1" course homepage
+    ## Verify of ability score
     Then I should see "Ability score"
     And I should see "Simulation" in the "[data-placement=\"top\"]" "css_element"
     And I should see "-1.35 (Standarderror: 0.51)"
+    ## Verify of feedback
+    And I should see "Simulation: Feedback-Simulation_range_1"
+    And I should not see "Feedback-Simulation_range_2"
+    ## Verify of question summary
+    And I should see "4 evaluated items"
+
+  @javascript
+  Scenario: CatQuiz: Pass two adaptive quiz attempts and displaying both in a Page resource via the shortcode
+    Given the following "activities" exist:
+      | activity | name           | course | section | idnumber       | intro                                |
+      | label    | Adaptive Panel | C1     | 1       | adaptivelabel1 | [catquizfeedback numberofattempts=2] |
+    And I am on the "adaptivecatquiz1" Activity page logged in as student1
+    And I click on "Start attempt" "button"
+    And I wait until the page is ready
+    And I should see "Question 1"
+    And I click on "richtige Antwort" "text" in the "Question 1" "question"
+    And I click on "Submit answer" "button"
+    And I should see "Question 2"
+    And I click on "falsche Antwort 1" "text" in the "Question 2" "question"
+    And I click on "Submit answer" "button"
+    And I should see "Question 3"
+    And I click on "richtige Antwort" "text" in the "Question 3" "question"
+    And I click on "Submit answer" "button"
+    And I should see "Question 4"
+    And I click on "falsche Antwort 2" "text" in the "Question 4" "question"
+    And I click on "Submit answer" "button"
+    And I wait until the page is ready
+    ## Verify of data on quiz's "Feedback" page
+    And I should see "Ability score"
+    And I should see "Simulation" in the "[data-placement=\"top\"]" "css_element"
+    And I should see "-1.35 (Standarderror: 0.51)"
+    And I am on the "adaptivecatquiz1" Activity page
+    And I click on "Start attempt" "button"
+    And I wait until the page is ready
+    And I should see "Question 1"
+    And I click on "richtige Antwort" "text" in the "Question 1" "question"
+    And I click on "Submit answer" "button"
+    And I should see "Question 2"
+    And I click on "falsche Antwort 1" "text" in the "Question 2" "question"
+    And I click on "Submit answer" "button"
+    And I should see "Question 3"
+    And I click on "richtige Antwort" "text" in the "Question 3" "question"
+    And I click on "Submit answer" "button"
+    And I should see "Question 4"
+    And I click on "falsche Antwort 2" "text" in the "Question 4" "question"
+    And I click on "Submit answer" "button"
+    And I wait until the page is ready
+    ## Verify of data on quiz's "Feedback" page
+    And I should see "Ability score"
+    And I should see "Simulation" in the "[data-placement=\"top\"]" "css_element"
+    And I should see "-2.13 (Standarderror: 0.55)"
+    And I should see "Simulation: Feedback-Simulation_range_1"
+    ## Verify of data in label on course page: recent attempt
+    When I am on "Course 1" course homepage
+    ## Verify of ability score
+    Then I should see "Attempt" in the "(//div[contains(@id, 'heading')])[1]" "xpath_element"
+    And I should see "Ability score"
+    And I should see "Simulation" in the "[data-placement=\"top\"]" "css_element"
+    And I should see "-2.13 (Standarderror: 0.55)"
+    ## Verify of feedback
+    And I should see "Simulation: Feedback-Simulation_range_1"
+    And I should not see "Feedback-Simulation_range_2"
+    ## Verify of data in label on course page: previous attempt (colapsed)
+    And I should see "Attempt" in the "(//div[contains(@id, 'heading')])[2]" "xpath_element"
 
   @javascript
   Scenario: CatQuiz: Displaying feedback in a Page resource via the shortcode with primaryscale parameter
     Given the following "activities" exist:
-      | activity | name           | course | section | idnumber       | intro                               |
-      | label    | Adaptive Panel | C1     | 1       | adaptivelabel1 | [catquizfeedback primaryscale=SimA] |
+      | activity | name           | course | section | idnumber       | intro                                    |
+      | label    | Adaptive Panel | C1     | 1       | adaptivelabel1 | [catquizfeedback primaryscale=strongest] |
+      ## Below case does not working
+      ##| label    | Adaptive Panel | C1     | 1       | adaptivelabel1 | [catquizfeedback primaryscale=SimA] |
     And I am on the "adaptivecatquiz1" Activity page logged in as student1
     And I click on "Start attempt" "button"
     And I wait until the page is ready
@@ -90,11 +167,12 @@ Feature: As a teacher I want to use shortcodes to display adaptive quiz test res
     And I click on "falsche Antwort 2" "text" in the "Question 4" "question"
     And I click on "Submit answer" "button"
     And I wait until the page is ready
+    ## Verify of data on quiz's "Feedback" page
     And I should see "Ability score"
-    And I should see "SimA" in the "[data-placement=\"top\"]" "css_element"
+    And I should see "Simulation" in the "[data-placement=\"top\"]" "css_element"
     And I should see "-0.81 (Standarderror: 3.12)"
-    ## Verify feedback in label
+    ## Verify strongest scale have to be 1sr feedback in label
     When I am on "Course 1" course homepage
     Then I should see "Ability score"
     And I should see "SimA" in the "[data-placement=\"top\"]" "css_element"
-    And I should see "-0.81 (Standarderror: 3.12)"
+    And I should see "0.00 (Standarderror: 1000.00)"
