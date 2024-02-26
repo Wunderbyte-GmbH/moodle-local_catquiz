@@ -291,7 +291,7 @@ class comparetotestaverage extends feedbackgenerator {
         //     $quizsettings,
         //     $this->primaryscaleid);
 
-        // Make sure that only feedback for specific scale is rendered.
+        // Make sure that only feedback defined by strategy is rendered.
         $personabilitiesfeedbackeditor = $this->feedbacksettings->return_scales_according_to_strategy(
             (array) $personabilities,
             (array) $newdata,
