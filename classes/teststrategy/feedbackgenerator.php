@@ -85,7 +85,8 @@ abstract class feedbackgenerator {
     abstract public function load_data(int $attemptid, array $existingdata, array $newdata): ?array;
 
     /**
-     * To update feedbackdata (that will be rendered later) according to specific settings.
+     * To update feedbackdata (that will be rendered later)...
+     * ...according to specific settings defined by strategy and results.
      *
      * @param array $feedbackdata
      */

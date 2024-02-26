@@ -135,23 +135,6 @@ class classicalcat extends strategy {
         int $catscaleid = 0,
         bool $feedbackonlyfordefinedscaleid = false
         ): array {
-        // Force selected scale.
-        // if ($feedbackonlyfordefinedscaleid && !empty($catscaleid)) {
-        //     $rootscale = $catscaleid;
-        // }
-
-        // if (!isset($personabilities[$rootscale])) {
-        //     return [];
-        // }
-        // if (isset($nmintest) &&
-        // (float) $personabilities[$rootscale] < (float) ($nmintest)) {
-        //     $personabilities[$rootscale]['error'] = get_string('scalereporterror:minvaluepertest', 'local_catquiz');
-        // }
-        // if ($fraction == 0.0 || $fraction == 1.0) {
-        //     $personabilities[$rootscale]['error'] = get_string('scalereporterror:fraction', 'local_catquiz');
-        // }
-
-            // Look up fraction.
 
         return $personabilities;
     }
