@@ -283,18 +283,40 @@ class comparetotestaverage extends feedbackgenerator {
             array_keys($personabilities)
         );
 
-        $selectedscalearray = $this->feedbacksettings->get_scaleid_and_stringkey(
-                $personabilities,
-                $quizsettings,
-                $this->primaryscaleid);
+        // TODO: Selection of scales can be overruled by scale defined in shortcode.
+        // $this->primaryscale can be a scaleid or the constant defining which lowest/strongest etc.
 
-        $catscaleid = $selectedscalearray['selectedscaleid'];
+        // $selectedscalearray = $this->feedbacksettings->get_scaleid_and_stringkey(
+        //     $personabilities,
+        //     $quizsettings,
+        //     $this->primaryscaleid);
 
-        $catscale = catscale::return_catscale_object($catscaleid);
-        $ability = $personabilities[$catscaleid]['value'];
-        if (! $ability) {
-            return null;
+        // Make sure that only feedback for specific scale is rendered.
+        $personabilitiesfeedbackeditor = $this->feedbacksettings->return_scales_according_to_strategy(
+            (array) $personabilities,
+            (array) $newdata,
+            (array) $quizsettings,
+            $existingdata['teststrategy'],
+            $existingdata['catscaleid']);
+
+        $catscaleid = 0;
+        foreach ($personabilitiesfeedbackeditor as $catscale => $personability) {
+            if (isset($personability['excluded']) && $personability['excluded']) {
+                continue;
+            }
+            if (isset($personability['primary'])) {
+                $catscaleid = $catscale;
+                $ability = $personability['value'];
+                break;
+            }
         }
+
+        if (empty($catscaleid) || !isset($ability)) {
+            // TODO: Error for no scale found.
+            return null;
+        };
+        $catscale = catscale::return_catscale_object($catscaleid);
+
         $worseabilities = array_filter(
             $personparams,
             fn ($pp) => $pp->ability < $ability
