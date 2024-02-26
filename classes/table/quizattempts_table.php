@@ -130,9 +130,6 @@ class quizattempts_table extends wunderbyte_table {
         $url = clone $PAGE->url;
         $url->params($_GET);
 
-        $url = clone $this->url;
-        $url->params(['attemptid' => $values->attemptid]);
-
         return sprintf(
             '<a class="btn btn-plain btn-smaller"
                 href="%s#lcq_quizattempts"><i class="fa fa-cog" title="%s"></i>
