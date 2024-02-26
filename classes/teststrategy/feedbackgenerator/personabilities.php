@@ -103,33 +103,56 @@ class personabilities extends feedbackgenerator {
      */
     protected function get_studentfeedback(array $feedbackdata): array {
         global $OUTPUT;
-
         global $CFG;
         require_once($CFG->dirroot . '/local/catquiz/lib.php');
 
+        //TODO: Move this to load data?!
+
+        // TODO: force definition of selected scales.
         $selectedscalearray = $this->feedbacksettings->get_scaleid_and_stringkey(
             $feedbackdata['personabilities'],
             (object) $feedbackdata['quizsettings'],
             $this->primaryscaleid);
         $selectedscaleid = $selectedscalearray['selectedscaleid'];
         $selectedscalestringkey = $selectedscalearray['selectedscalestringkey'];
-        $catscales = catquiz::get_catscales(array_keys($feedbackdata['personabilities']));
 
-        $personabilities = $feedbackdata['personabilities'];
+        // Make sure that only feedback defined by strategy is rendered.
+        $personabilitiesfeedbackeditor = $this->feedbacksettings->return_scales_according_to_strategy(
+            (array) $personabilities,
+            (array) $newdata,
+            (array) $quizsettings,
+            $existingdata['teststrategy'],
+            $existingdata['catscaleid']);
+
+        $personabilities = [];
+        foreach ($personabilitiesfeedbackeditor as $catscale => $personability) {
+            if (isset($personability['excluded']) && $personability['excluded']) {
+                continue;
+            }
+            if (isset($personability['excluded'])) {
+                $selectedscaleid = $catscale;
+            }
+            $personabilities[$catscale] = $personability;
+        }
+
+        $catscales = catquiz::get_catscales(array_keys($personabilities));
+
+        // TODO: apply sorting from strategy.
         // Sort the array and put primary scale first.
         if ($this->feedbacksettings->sortorder == LOCAL_CATQUIZ_SORTORDER_ASC) {
             asort($personabilities);
         } else {
             arsort($personabilities);
         }
-        if (array_key_exists($selectedscaleid, $personabilities)) {
-            $value = $personabilities[$selectedscaleid];
-            unset($personabilities[$selectedscaleid]);
-            $personabilities = [$selectedscaleid => $value] + $personabilities;
-        }
+
+        // Put selected element first.
+        $value = $personabilities[$selectedscaleid];
+        unset($personabilities[$selectedscaleid]);
+        $personabilities = [$selectedscaleid => $value] + $personabilities;
 
         $data = [];
-        foreach ($personabilities as $catscaleid => $ability) {
+        foreach ($personabilities as $catscaleid => $abilityarray) {
+            $ability = $abilityarray['value'];
             if (abs(floatval($ability)) === abs(floatval(LOCAL_CATQUIZ_PERSONABILITY_MAX))) {
                 if ($ability < 0) {
                     $ability = get_string('allquestionsincorrect', 'local_catquiz');
