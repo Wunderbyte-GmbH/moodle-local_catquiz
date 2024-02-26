@@ -101,6 +101,21 @@ final class strategydeficitscore extends preselect_task implements wb_middleware
                 if (! property_exists($question, 'score') || $score > $question->score) {
                     $question->score = $score;
                 }
+                //$lastq = $this->progress->get_last_question();
+                //if ($lastq && $lastq->label === "SIMC06-04") {
+                //    $q = $question;
+                //    if (in_array($q->label, ['SIMC07-09', 'SIMC10-01'])) {
+                //        echo sprintf(
+                //            "%s: testinfo: %f, ability: %f, processterm: %f - scaleterm: %f - itemterm: %f\n",
+                //            $q->label,
+                //            $testinfo,
+                //            $scaleability,
+                //            $q->processterm,
+                //            $q->scaleterm,
+                //            $q->itemterm
+                //        );
+                //    }
+                //}
             }
         }
 
