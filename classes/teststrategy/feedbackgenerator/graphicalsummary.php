@@ -203,24 +203,25 @@ class graphicalsummary extends feedbackgenerator {
         // Append the data from the latest response to the existing graphical summary.
         $graphicalsummary = $existingdata['graphicalsummary_data'] ?? [];
         $new = [];
-            $new['id'] = $lastquestion->id;
-            $new['questionname'] = $lastquestion->name;
-            $new['lastresponse'] = $lastresponse['fraction'];
-            $new['difficulty'] = $lastquestion->difficulty;
-            $new['questionscale'] = $lastquestion->catscaleid;
-            $new['questionscale_name'] = catscale::return_catscale_object(
-                $lastquestion->catscaleid
-            )->name;
-            $new['fisherinformation'] = $lastquestion
-                ->fisherinformation[$existingdata['catscaleid']] ?? null;
-            $new['score'] = $lastquestion->score ?? null;
-            $new['difficultynextbefore'] = null;
-            $new['difficultynextafter'] = null;
-            $new['personability_after'] = $newdata['person_ability'][$newdata['catscaleid']];
-            $new['personability_before'] =
-                $existingdata['personabilities'][$existingdata['catscaleid']]['value'] ?? null;
+        $new['id'] = $lastquestion->id;
+        $new['questionname'] = $lastquestion->name;
+        $new['lastresponse'] = $lastresponse['fraction'];
+        $new['difficulty'] = $lastquestion->difficulty;
+        $new['questionscale'] = $lastquestion->catscaleid;
+        $new['questionscale_name'] = catscale::return_catscale_object(
+            $lastquestion->catscaleid
+        )->name;
+        $new['fisherinformation'] = $lastquestion
+            ->fisherinformation[$existingdata['catscaleid']] ?? null;
+        $new['score'] = $lastquestion->score ?? null;
+        $new['difficultynextbefore'] = null;
+        $new['difficultynextafter'] = null;
+        $new['personability_after'] = $newdata['person_ability'][$newdata['catscaleid']];
+        $new['personability_before'] =
+            $existingdata['personabilities'][$existingdata['catscaleid']]['value'] ?? null;
 
-            $graphicalsummary[] = $new;
+            // TODO: Here is always root scale reference. is this wanted?
+        $graphicalsummary[] = $new;
 
         $teststrategyname = get_string(
             'teststrategy',
@@ -433,7 +434,7 @@ class graphicalsummary extends feedbackgenerator {
             null,
             null);
         if (count($records) < 2) {
-            return "";
+            return [];
         }
         // Get all items of this catscale and catcontext.
         $startingrecord = reset($records);
@@ -490,7 +491,7 @@ class graphicalsummary extends feedbackgenerator {
      * @param int $catscaleid
      * @param array $attemptdata
      *
-     * @return string
+     * @return array
      */
     private function render_attemptresultstackchart(array $attemptsbytimerange, int $catscaleid, array $attemptdata) {
         global $OUTPUT;

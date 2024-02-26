@@ -38,7 +38,7 @@ class pilotquestions extends feedbackgenerator {
 
     /**
      *
-     * @var stdClass $feedbacksettings.
+     * @var object $feedbacksettings.
      */
     public feedbacksettings $feedbacksettings;
 
