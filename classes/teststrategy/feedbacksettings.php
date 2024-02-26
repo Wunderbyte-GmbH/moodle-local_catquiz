@@ -274,7 +274,7 @@ class feedbacksettings {
         if ($teststrategyid === LOCAL_CATQUIZ_DEFAULT_NONSENSE_TESTSTRATEGY) {
             $teststrategyid = $this->strategyid;
         }
-
+        // TODO: Check this below!
         if ($feedbackonlyfordefinedscaleid) {
             foreach ($personabilities as $key => $value) {
                 if ($key == $catscaleid) {
@@ -291,7 +291,7 @@ class feedbacksettings {
         // TODO: abgleich mit liste, stimmt das so?
         // TODO: make sure, sorting is applied.
         // In jedem relevanten Feedbackgenerator aufrufen. ? abstrakte methode?
-        // TODO: root / parentscale nicht anzeigen (? nirgends ?)
+        // TODO: setting from quizsetting: display root scale.
 
         // Returns array with scales corresponding to settings of strategy.
         // If scales do not meet all requirements, ['error'] will be returned.
