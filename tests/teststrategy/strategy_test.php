@@ -124,7 +124,7 @@ class strategy_test extends advanced_testcase {
         float $initialability = 0.0,
         float $initialse = 1.0,
         array $settings = [],
-        array $finalabilities = [],
+        array $finalabilities = []
     ) {
         putenv('USE_TESTING_CLASS_FOR=local_catquiz\teststrategy\preselect_task\updatepersonability');
         putenv("CATQUIZ_TESTING_ABILITY=$initialability");
@@ -479,7 +479,213 @@ class strategy_test extends advanced_testcase {
             //],
             */
             // phpcs:enable
-            'Infer lowest skillgap' => [
+            'Infer lowest skillgap P000000' => [
+                'strategy' => LOCAL_CATQUIZ_STRATEGY_LOWESTSUB,
+                'questions' => [
+                    [ 'label' => 'SIMB01-18', 'is_correct_response' => false, 'ability_before' => 0.00, 'ability_after' => 0.00],
+                    [ 'label' => 'SIMA06-15', 'is_correct_response' => false, 'ability_before' => 0.00, 'ability_after' => -0.67],
+                    [ 'label' => 'SIMA02-02', 'is_correct_response' => false, 'ability_before' => -0.67, 'ability_after' => -1.30],
+                    [ 'label' => 'SIMA02-19', 'is_correct_response' => false, 'ability_before' => -1.30, 'ability_after' => -1.86],
+                    [ 'label' => 'SIMA02-17', 'is_correct_response' => false, 'ability_before' => -1.86, 'ability_after' => -2.33],
+                    [ 'label' => 'SIMA06-02', 'is_correct_response' => false, 'ability_before' => -2.33, 'ability_after' => -3.06],
+                    [ 'label' => 'SIMB02-00', 'is_correct_response' => false, 'ability_before' => -3.06, 'ability_after' => -3.06],
+                    [ 'label' => 'SIMB01-17', 'is_correct_response' => false, 'ability_before' => -3.06, 'ability_after' => -3.06],
+                    [ 'label' => 'SIMB01-12', 'is_correct_response' => false, 'ability_before' => -3.06, 'ability_after' => -3.06],
+                    [ 'label' => 'SIMA02-04', 'is_correct_response' => false, 'ability_before' => -3.06, 'ability_after' => -3.06],
+                    [ 'label' => 'SIMB02-02', 'is_correct_response' => false, 'ability_before' => -3.06, 'ability_after' => -3.39],
+                    [ 'label' => 'SIMA01-13', 'is_correct_response' => true,  'ability_before' => -3.39, 'ability_after' => -3.39],
+                    [ 'label' => 'SIMA01-16', 'is_correct_response' => true,  'ability_before' => -3.39, 'ability_after' => -3.41],
+                    [ 'label' => 'SIMA01-19', 'is_correct_response' => false, 'ability_before' => -3.41, 'ability_after' => -3.24],
+                    [ 'label' => 'SIMA01-06', 'is_correct_response' => true,  'ability_before' => -3.24, 'ability_after' => -3.35],
+                    [ 'label' => 'SIMA03-13', 'is_correct_response' => true,  'ability_before' => -3.35, 'ability_after' => -3.31],
+                    [ 'label' => 'SIMA03-03', 'is_correct_response' => true,  'ability_before' => -3.31, 'ability_after' => -3.27],
+                    [ 'label' => 'SIMA03-16', 'is_correct_response' => true,  'ability_before' => -3.27, 'ability_after' => -3.21],
+                    [ 'label' => 'SIMA05-00', 'is_correct_response' => false, 'ability_before' => -3.21, 'ability_after' => -3.15],
+                    [ 'label' => 'SIMA05-07', 'is_correct_response' => false, 'ability_before' => -3.15, 'ability_after' => -3.21],
+                    [ 'label' => 'SIMA05-15', 'is_correct_response' => false, 'ability_before' => -3.21, 'ability_after' => -3.25],
+                    [ 'label' => 'SIMA01-07', 'is_correct_response' => false, 'ability_before' => -3.25, 'ability_after' => -3.29],
+                    [ 'label' => 'SIMA01-12', 'is_correct_response' => false, 'ability_before' => -3.29, 'ability_after' => -3.31],
+                    [ 'label' => 'SIMA01-14', 'is_correct_response' => true,  'ability_before' => -3.31, 'ability_after' => -3.45],
+                    [ 'label' => 'SIMA03-19', 'is_correct_response' => true,  'ability_before' => -3.45, 'ability_after' => -3.41],
+                    [ 'label' => 'FINISH',    'is_correct_response' => false, 'ability_before' => -3.41, 'ability_after' => -3.38],
+                ],
+                'initial_ability' => 0.02,
+                'initial_se' => 2.97,
+                'settings' => [
+                    'pp_min_inc' => 0.1,
+                ],
+                'final_abilities' => [
+                    'Simulation' => -3.38,
+                    'SimA' => -3.38,
+                    'SimA01' => -3.47,
+                    'SimA02' => -3.40,
+                    'SimA03' => -3.28,
+                    'SimA04' => -3.65,
+                    'SimA05' => -3.43,
+                    'SimA06' => -3.38,
+                    'SimA07' => -3.65, // Inherited from parent.
+                    'SimB' => -3.38,
+                    'SimB01' => -3.38,
+                    'SimB02' => -3.38,
+                    'SimC' => -4.19, // Inherited from parent.
+                ]
+            ],
+            'Infer lowest skillgap P000001' => [
+                'strategy' => LOCAL_CATQUIZ_STRATEGY_LOWESTSUB,
+                'questions' => [
+                    [ 'label' => 'SIMB01-18', 'is_correct_response' => true, 'ability_before' => 0.00, 'ability_after' => 0.00],
+                    [ 'label' => 'SIMB03-10', 'is_correct_response' => true, 'ability_before' => 0.00, 'ability_after' => 0.76],
+                    [ 'label' => 'SIMB03-06', 'is_correct_response' => true, 'ability_before' => 0.76, 'ability_after' => 1.32],
+                    [ 'label' => 'SIMB01-04', 'is_correct_response' => true, 'ability_before' => 1.32, 'ability_after' => 1.90],
+                    [ 'label' => 'SIMB01-01', 'is_correct_response' => true, 'ability_before' => 1.90, 'ability_after' => 1.94],
+                    [ 'label' => 'SIMB03-05', 'is_correct_response' => true, 'ability_before' => 1.94, 'ability_after' => 2.50],
+                    [ 'label' => 'SIMB04-03', 'is_correct_response' => true, 'ability_before' => 2.50, 'ability_after' => 2.55],
+                    [ 'label' => 'SIMB04-08', 'is_correct_response' => true, 'ability_before' => 2.55, 'ability_after' => 3.28],
+                    [ 'label' => 'SIMB04-10', 'is_correct_response' => true, 'ability_before' => 3.28, 'ability_after' => 3.86],
+                    [ 'label' => 'SIMB03-15', 'is_correct_response' => true, 'ability_before' => 3.86, 'ability_after' => 4.19],
+                    [ 'label' => 'SIMC10-00', 'is_correct_response' => true, 'ability_before' => 4.19, 'ability_after' => 4.21],
+                    [ 'label' => 'SIMC07-08', 'is_correct_response' => true, 'ability_before' => 4.21, 'ability_after' => 4.23],
+                    [ 'label' => 'SIMC10-15', 'is_correct_response' => true, 'ability_before' => 4.23, 'ability_after' => 4.38],
+                    [ 'label' => 'SIMC07-09', 'is_correct_response' => true, 'ability_before' => 4.38, 'ability_after' => 4.48],
+                    [ 'label' => 'SIMC10-08', 'is_correct_response' => true, 'ability_before' => 4.48, 'ability_after' => 4.61],
+                    [ 'label' => 'SIMC08-16', 'is_correct_response' => false,'ability_before' => 4.61, 'ability_after' => 4.84],
+                    [ 'label' => 'SIMC08-03', 'is_correct_response' => true, 'ability_before' => 4.84, 'ability_after' => 4.71],
+                    [ 'label' => 'SIMC09-16', 'is_correct_response' => true, 'ability_before' => 4.71, 'ability_after' => 4.79],
+                    [ 'label' => 'SIMC09-00', 'is_correct_response' => true, 'ability_before' => 4.79, 'ability_after' => 4.86],
+                    [ 'label' => 'SIMC04-00', 'is_correct_response' => false,'ability_before' => 4.86, 'ability_after' => 4.91],
+                    [ 'label' => 'SIMC04-15', 'is_correct_response' => false,'ability_before' => 4.91, 'ability_after' => 4.73],
+                    [ 'label' => 'SIMC09-11', 'is_correct_response' => true, 'ability_before' => 4.73, 'ability_after' => 4.66],
+                    [ 'label' => 'SIMC06-04', 'is_correct_response' => true, 'ability_before' => 4.66, 'ability_after' => 4.69],
+                    [ 'label' => 'SIMC06-10', 'is_correct_response' => true, 'ability_before' => 4.69, 'ability_after' => 4.70],
+                    [ 'label' => 'SIMC05-03', 'is_correct_response' => true, 'ability_before' => 4.70, 'ability_after' => 4.71],
+                    [ 'label' => 'FINISH', 'is_correct_respons' => null,     'ability_before' => 4.71, 'ability_after' => 4.71],
+                ],
+                'initial_ability' => 0.02,
+                'initial_se' => 2.97,
+                'settings' => [
+                    'pp_min_inc' => 0.1,
+                ],
+                'final_abilities' => [
+                    'Simulation' => 4.71,
+                    'SimB' => 4.72,
+                    'SimB01' => 4.71,
+                    'SimB03' => 4.71,
+                    'SimB04' => 4.72,
+                    'SimC' => 4.71,
+                    'SimC04' => 4.57,
+                    'SimC05' => 4.71,
+                    'SimC06' => 4.73,
+                    'SimC07' => 4.72,
+                    'SimC08' => 4.72,
+                    'SimC09' => 4.81,
+                    'SimC10' => 4.73,
+                ]
+            ],
+            'Infer lowest skillgap P00000X' => [
+                'strategy' => LOCAL_CATQUIZ_STRATEGY_LOWESTSUB,
+                'questions' => [
+                    [ 'label' => 'SIMB01-18', 'is_correct_response' => false, 'ability_before' => 0.00, 'ability_after' => 0.00],
+                    [ 'label' => 'SIMA06-15', 'is_correct_response' => false, 'ability_before' => 0.00, 'ability_after' => -0.67],
+                    [ 'label' => 'SIMA02-02', 'is_correct_response' => false, 'ability_before' => -0.67, 'ability_after' => -1.30],
+                    [ 'label' => 'SIMA02-19', 'is_correct_response' => false, 'ability_before' => -1.30, 'ability_after' => -1.86],
+                    [ 'label' => 'SIMA02-17', 'is_correct_response' => false, 'ability_before' => -1.86, 'ability_after' => -2.33],
+                    [ 'label' => 'SIMA06-02', 'is_correct_response' => false, 'ability_before' => -2.33, 'ability_after' => -3.06],
+                    [ 'label' => 'SIMB02-00', 'is_correct_response' => false, 'ability_before' => -3.06, 'ability_after' => -3.06],
+                    [ 'label' => 'SIMB01-17', 'is_correct_response' => false, 'ability_before' => -3.06, 'ability_after' => -3.06],
+                    [ 'label' => 'SIMB01-12', 'is_correct_response' => false, 'ability_before' => -3.06, 'ability_after' => -3.06],
+                    [ 'label' => 'SIMA02-04', 'is_correct_response' => false, 'ability_before' => -3.06, 'ability_after' => -3.06],
+                    [ 'label' => 'SIMB02-02', 'is_correct_response' => false, 'ability_before' => -3.06, 'ability_after' => -3.39],
+                    [ 'label' => 'SIMA01-13', 'is_correct_response' => true,  'ability_before' => -3.39, 'ability_after' => -3.39],
+                    [ 'label' => 'SIMA01-16', 'is_correct_response' => true,  'ability_before' => -3.39, 'ability_after' => -3.41],
+                    [ 'label' => 'SIMA01-19', 'is_correct_response' => false, 'ability_before' => -3.41, 'ability_after' => -3.24],
+                    [ 'label' => 'SIMA01-06', 'is_correct_response' => true,  'ability_before' => -3.24, 'ability_after' => -3.35],
+                    [ 'label' => 'SIMA03-13', 'is_correct_response' => true,  'ability_before' => -3.35, 'ability_after' => -3.31],
+                    [ 'label' => 'SIMA03-03', 'is_correct_response' => true,  'ability_before' => -3.31, 'ability_after' => -3.27],
+                    [ 'label' => 'SIMA03-16', 'is_correct_response' => true,  'ability_before' => -3.27, 'ability_after' => -3.21],
+                    [ 'label' => 'SIMA05-00', 'is_correct_response' => false, 'ability_before' => -3.21, 'ability_after' => -3.15],
+                    [ 'label' => 'SIMA05-07', 'is_correct_response' => false, 'ability_before' => -3.15, 'ability_after' => -3.21],
+                    [ 'label' => 'SIMA05-15', 'is_correct_response' => false, 'ability_before' => -3.21, 'ability_after' => -3.25],
+                    [ 'label' => 'SIMA01-07', 'is_correct_response' => false, 'ability_before' => -3.25, 'ability_after' => -3.29],
+                    [ 'label' => 'SIMA01-12', 'is_correct_response' => false, 'ability_before' => -3.29, 'ability_after' => -3.31],
+                    [ 'label' => 'SIMA01-14', 'is_correct_response' => true,  'ability_before' => -3.31, 'ability_after' => -3.45],
+                    [ 'label' => 'SIMA03-19', 'is_correct_response' => true,  'ability_before' => -3.45, 'ability_after' => -3.41],
+                    [ 'label' => 'FINISH',    'is_correct_response' => false, 'ability_before' => -3.41, 'ability_after' => -3.38],
+                ],
+                'initial_ability' => 0.02,
+                'initial_se' => 2.97,
+                'settings' => [
+                    'pp_min_inc' => 0.1,
+                ],
+                'final_abilities' => [
+                    'Simulation' => -3.38,
+                    'SimA' => -3.38,
+                    'SimA01' => -3.47,
+                    'SimA02' => -3.40,
+                    'SimA03' => -3.28,
+                    'SimA04' => -3.65,
+                    'SimA05' => -3.43,
+                    'SimA06' => -3.38,
+                    'SimA07' => -3.65, // Inherited from parent.
+                    'SimB' => -3.38,
+                    'SimB01' => -3.38,
+                    'SimB02' => -3.38,
+                    'SimC' => -4.19, // Inherited from parent.
+                ]
+            ],
+            'Infer lowest skillgap P000642' => [
+                'strategy' => LOCAL_CATQUIZ_STRATEGY_LOWESTSUB,
+                'questions' => [
+                    ['label' => 'SIMB01-18', 'is_correct_response' => true,  'ability_before' => 0.00, 'ability_after' => 0.00],
+                    ['label' => 'SIMB03-10', 'is_correct_response' => true,  'ability_before' => 0.00, 'ability_after' => 0.76],
+                    ['label' => 'SIMB03-06', 'is_correct_response' => true,  'ability_before' => 0.76, 'ability_after' => 1.32],
+                    ['label' => 'SIMB01-04', 'is_correct_response' => true,  'ability_before' => 1.32, 'ability_after' => 1.90],
+                    ['label' => 'SIMB01-01', 'is_correct_response' => false, 'ability_before' => 1.90, 'ability_after' => 1.94],
+                    ['label' => 'SIMB02-12', 'is_correct_response' => true,  'ability_before' => 1.94, 'ability_after' => 1.62],
+                    ['label' => 'SIMB02-07', 'is_correct_response' => true,  'ability_before' => 1.62, 'ability_after' => 2.11],
+                    ['label' => 'SIMB04-05', 'is_correct_response' => true,  'ability_before' => 2.11, 'ability_after' => 2.55],
+                    ['label' => 'SIMB04-08', 'is_correct_response' => true,  'ability_before' => 2.55, 'ability_after' => 3.06],
+                    ['label' => 'SIMC07-08', 'is_correct_response' => true,  'ability_before' => 3.06, 'ability_after' => 3.45],
+                    ['label' => 'SIMC06-04', 'is_correct_response' => false, 'ability_before' => 3.45, 'ability_after' => 3.82],
+                    ['label' => 'SIMC06-14', 'is_correct_response' => false, 'ability_before' => 3.82, 'ability_after' => 3.76],
+                    ['label' => 'SIMC07-09', 'is_correct_response' => false, 'ability_before' => 3.76, 'ability_after' => 3.61],
+                    ['label' => 'SIMB04-10', 'is_correct_response' => false, 'ability_before' => 3.61, 'ability_after' => 3.59],
+                    ['label' => 'SIMC05-17', 'is_correct_response' => false, 'ability_before' => 3.59, 'ability_after' => 3.52],
+                    ['label' => 'SIMC05-07', 'is_correct_response' => false, 'ability_before' => 3.52, 'ability_after' => 3.44],
+                    ['label' => 'SIMC05-12', 'is_correct_response' => false, 'ability_before' => 3.44, 'ability_after' => 3.31],
+                    ['label' => 'SIMC10-12', 'is_correct_response' => true,  'ability_before' => 3.31, 'ability_after' => 3.21],
+                    ['label' => 'SIMC10-16', 'is_correct_response' => false, 'ability_before' => 3.21, 'ability_after' => 3.33],
+                    ['label' => 'SIMC05-05', 'is_correct_response' => true,  'ability_before' => 3.33, 'ability_after' => 3.32],
+                    ['label' => 'SIMC04-17', 'is_correct_response' => false, 'ability_before' => 3.32, 'ability_after' => 3.35],
+                    ['label' => 'SIMC04-06', 'is_correct_response' => true,  'ability_before' => 3.35, 'ability_after' => 3.34],
+                    ['label' => 'SIMC04-01', 'is_correct_response' => true,  'ability_before' => 3.34, 'ability_after' => 3.36],
+                    ['label' => 'SIMC10-01', 'is_correct_response' => true,  'ability_before' => 3.36, 'ability_after' => 3.40],
+                    ['label' => 'SIMC04-04', 'is_correct_response' => false, 'ability_before' => 3.40, 'ability_after' => 3.44],
+                    ['label' => 'FINISH',    'is_correct_response' => null,  'ability_before' => 3.44, 'ability_after' => 3.43],
+                ],
+                'initial_ability' => 0.02,
+                'initial_se' => 2.97,
+                'settings' => [
+                    'pp_min_inc' => 0.1,
+                    'maxquestions' => 250,
+                ],
+                'final_abilities' => [
+                    'Simulation' => 3.43,
+                    'SimB' => 3.35,
+                    'SimB01' => 1.39,
+                    'SimB02' => 3.43,
+                    'SimB03' => 3.43,
+                    'SimB04' => 3.60,
+                    'SimB04' => 3.60,
+                    'SimC' => 3.45,
+                    'SimC04' => 3.58,
+                    'SimC05' => 2.96,
+                    'SimC06' => 3.43,
+                    'SimC07' => 3.90,
+                    'SimC10' => 3.71,
+
+                ]
+            ],
+            'Infer lowest skillgap P00000Z' => [
                 'strategy' => LOCAL_CATQUIZ_STRATEGY_LOWESTSUB,
                 'questions' => [
                     [ 'label' => 'SIMB01-18', 'is_correct_response' => false, 'ability_before' => 0.00, 'ability_after' => 0.00],
@@ -826,6 +1032,47 @@ class strategy_test extends advanced_testcase {
         $qformat->set_display_progress(false);
 
         return $qformat;
+    }
+
+    public function find_max_difference($path) {
+  //  if (($handle = fopen($path, "r")) === false) {
+  //      throw new \UnexpectedValueException("Can not open file: " . $path);
+  //  }
+
+  //  $row = 0;
+    $maxrow = 0;
+ //   $maxnegdiff = 0;
+ //   while (($data = fgetcsv($handle, 0, ";")) !== false) {
+ //       $row++;
+ //       if (count($data) < 6 || $data[5] != "pp") {
+ //           continue;
+ //       }
+ //       $mainvalue = floatval(str_replace(',', '.', $data[6]));
+
+ //       // Do not use too extreme values.
+ //       if (abs($mainvalue) > 5.0) {
+ //           continue;
+ //       }
+
+ //       for ($i = 7; $i < count($data); $i++) {
+ //           if ($data[$i] == "") {
+ //               continue;
+ //           }
+ //           $val = floatval(str_replace(',', '.', $data[$i]));
+ //           if (abs($val) > 5.0) {
+ //               continue;
+ //           }
+ //           if (($mainvalue - $val) > $maxnegdiff) {
+ //               $maxnegdiff = $mainvalue - $val;
+ //               $maxrow = $row; 
+ //           }
+ //       }
+ //   }
+
+ //   fclose($handle);
+//    echo "Maxrow: $maxrow";
+//    echo "Maxnegdiff: $maxnegdiff";
+    return $maxrow;
     }
 
 }

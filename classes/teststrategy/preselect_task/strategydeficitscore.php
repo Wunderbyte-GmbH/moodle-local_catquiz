@@ -25,6 +25,7 @@
 namespace local_catquiz\teststrategy\preselect_task;
 
 use local_catquiz\catscale;
+use local_catquiz\local\model\model_responses;
 use local_catquiz\local\result;
 use local_catquiz\teststrategy\preselect_task;
 use local_catquiz\teststrategy\progress;
@@ -83,11 +84,14 @@ final class strategydeficitscore extends preselect_task implements wb_middleware
                     continue;
                 }
 
+                $scaleability = $this->progress->get_abilities()[$scaleid];
                 $standarderrorplayed = $context['se'][$scaleid];
+                $ur = (new model_responses())->setdata([$context['userid'] => ['component' => $this->progress->get_user_responses()]], false);
+                $items = $ur->get_items_for_scale($scaleid, $context['contextid']);
+                $standarderrorplayed = catscale::get_standarderror($scaleability, $items, INF);
                 $testinfo = $standarderrorplayed === INF ? 0 : 1 / $standarderrorplayed ** 2;
                 $question->processterm = max(0.1, $testinfo) / max(1, $scalecount[$scaleid]);
-                $scaleability = $context['person_ability'][$scaleid];
-                $abilitydifference = ($scaleability - $context['person_ability'][$context['catscaleid']]);
+                $abilitydifference = ($scaleability - $this->progress->get_abilities()[$context['catscaleid']]);
                 $question->scaleterm = 1 / (1 + exp($testinfo * $abilitydifference));
                 $question->itemterm = (1 / (
                     1 + exp($testinfo * 2 * (0.5 - $scalefractions[$scaleid]) * ($question->difficulty - $scaleability))
@@ -100,6 +104,21 @@ final class strategydeficitscore extends preselect_task implements wb_middleware
 
                 if (! property_exists($question, 'score') || $score > $question->score) {
                     $question->score = $score;
+                }
+                $lastq = $this->progress->get_last_question();
+                if ($lastq && $lastq->label === "SIMC07-09") {
+                    $q = $question;
+                    if (in_array($q->label, ['SIMB04-10', 'SIMC06-09'])) {
+                        echo sprintf(
+                            "%s: testinfo: %f, ability: %f, processterm: %f - scaleterm: %f - itemterm: %f\n",
+                            $q->label,
+                            $testinfo,
+                            $scaleability,
+                            $q->processterm,
+                            $q->scaleterm,
+                            $q->itemterm
+                        );
+                    }
                 }
             }
         }
