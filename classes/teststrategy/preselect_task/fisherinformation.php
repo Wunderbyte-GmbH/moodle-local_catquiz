@@ -56,7 +56,7 @@ final class fisherinformation extends preselect_task implements wb_middleware {
             $model = $context['installed_models'][$item->model];
 
             $item->fisherinformation = [];
-            foreach ($context['person_ability'] as $catscaleid => $ability) {
+            foreach ($context['progress']->get_abilities() as $catscaleid => $ability) {
                 $fisherinformation = $this->get_fisherinformation($item, $ability, $model);
                 $item->fisherinformation[$catscaleid] = $fisherinformation;
                 // In order to calculate the standarderror per scale, we need the

@@ -285,6 +285,7 @@ class updatepersonability extends preselect_task implements wb_middleware {
                     $this->ability_was_calculated($this->context['catscaleid'])
                 );
 
+                $this->progress->set_ability($ability, $scale);
                 $this->update_person_param($scale, $ability);
             }
         }
