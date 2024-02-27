@@ -140,6 +140,9 @@ class info {
      * @return void
      */
     public static function instance_form_definition(MoodleQuickForm &$mform, array &$elements) {
+
+        $data = $mform->getSubmitValues();
+        $defaultvalues = $mform->_defaultValues;
         // Add a special header for catquiz.
         $elements[] = $mform->addElement('header', 'catquiz_teststrategy',
                 get_string('catquiz_teststrategyheader', 'local_catquiz'));
@@ -158,6 +161,7 @@ class info {
                     LOCAL_CATQUIZ_STRATEGY_LOWESTSUB,
                     LOCAL_CATQUIZ_STRATEGY_HIGHESTSUB,
                     LOCAL_CATQUIZ_STRATEGY_ALLSUBS,
+                    LOCAL_CATQUIZ_STRATEGY_FASTEST,
                     ])) {
                 $strategyhasstandarderrorperscale[] = $ts->id;
             }
@@ -204,27 +208,27 @@ class info {
         $maxquestionspertest = [
             $mform->createElement(
                 'static',
-                'catquiz_standarderror_label_min',
-                'catquiz_standarderror_label_min',
+                'catquiz_maxquestion_label_min',
+                'catquiz_maxquestion_label_min',
                 get_string('min', 'local_catquiz')
             ),
             $mform->createElement(
                 'float',
                 'catquiz_minquestions',
                 'minquestions',
-                ['size' => '2']
+                ['size' => '3']
             ),
             $mform->createElement(
                 'static',
-                'catquiz_standarderror_label_max',
-                'catquiz_standarderror_label_max',
+                'catquiz_maxquestion_label_max',
+                'catquiz_maxquestion_label_max',
                 get_string('max', 'local_catquiz')
             ),
             $mform->createElement(
                 'float',
                 'catquiz_maxquestions',
                 'maxquestions',
-                ['size' => '2']
+                ['size' => '3']
             ),
             ];
         $elements[] = $mform->addGroup(
@@ -244,7 +248,7 @@ class info {
                 'float',
                 'catquiz_minquestionspersubscale',
                 get_string('minquestionspersubscale', 'local_catquiz'),
-                ['size' => '2']
+                ['size' => '3']
             ),
             $mform->createElement(
                 'static',
@@ -256,7 +260,7 @@ class info {
                 'float',
                 'catquiz_maxquestionspersubscale',
                 get_string('maxquestionspersubscale', 'local_catquiz'),
-                ['size' => '2']
+                ['size' => '3']
             ),
             ];
         $elements[] = $mform->addGroup(
@@ -276,7 +280,7 @@ class info {
                 'float',
                 'catquiz_standarderror_min',
                 'catquiz_standarderror_min',
-                ['size' => '2']
+                ['size' => '3']
             ),
             $mform->createElement(
                 'static',
@@ -288,9 +292,20 @@ class info {
                 'float',
                 'catquiz_standarderror_max',
                 'catquiz_standarderror_max',
-                ['size' => '2']
+                ['size' => '3']
             ),
         ];
+
+        if (!optional_param('catquiz_standarderror_min', 0, PARAM_FLOAT) &&
+            !isset($defaultvalues['catquiz_standarderrorgroup']['catquiz_standarderror_min'])) {
+                $mform->_defaultValues['catquiz_standarderrorgroup']['catquiz_standarderror_min'] =
+                LOCAL_CATQUIZ_STANDARDERROR_DEFAULT_MIN;
+        }
+        if (!optional_param('catquiz_standarderror_max', 0, PARAM_FLOAT) &&
+            !isset($defaultvalues['catquiz_standarderrorgroup']['catquiz_standarderror_max'])) {
+                $mform->_defaultValues['catquiz_standarderrorgroup']['catquiz_standarderror_max'] =
+                LOCAL_CATQUIZ_STANDARDERROR_DEFAULT_MAX;
+        }
 
         $elements[] = $mform->addGroup(
             $standarderrorgroup,
@@ -315,7 +330,7 @@ class info {
                 'float',
                 'catquiz_maxtimeperattempt',
                 'catquiz_maxtimeperattempt',
-                ['size' => '2']
+                ['size' => '3']
             ),
             $mform->createElement('select',
                 'catquiz_timeselect_attempt',
@@ -331,7 +346,7 @@ class info {
                 'float',
                 'catquiz_maxtimeperitem',
                 'catquiz_maxtimeperitem',
-                ['size' => '2']
+                ['size' => '3']
             ),
             $mform->createElement('select',
                 'catquiz_timeselect_item',

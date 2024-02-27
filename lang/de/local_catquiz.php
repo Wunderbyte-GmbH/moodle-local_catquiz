@@ -131,6 +131,7 @@ $string['formelementnegativefloat'] = 'Negative Dezimalzahl eingeben.';
 $string['formelementpositivefloat'] = 'Positive Dezimalzahl eingeben.';
 $string['formelementnegativefloatwithdefault'] = 'Negative Dezimalzahl eingeben. Standard wäre {$a}.';
 $string['formelementpositivefloatwithdefault'] = 'Positive Dezimalzahl eingeben. Standard wäre {$a}.';
+$string['setsevalue'] = 'Bitte Werte angeben. Standard: Min={$a->min} Max={$a->max}';
 
 
 $string['addoredittemplate'] = "Einstellungs-Vorlage bearbeiten";

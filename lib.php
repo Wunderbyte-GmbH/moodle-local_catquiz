@@ -96,6 +96,10 @@ define('LOCAL_CATQUIZ_TIMERANGE_QUARTEROFYEAR', -3);
 // Magic Number.
 define('LOCAL_CATQUIZ_MAGIC_NUMBER', -12345);
 
+// Standarderror defaults.
+define('LOCAL_CATQUIZ_STANDARDERROR_DEFAULT_MIN', 0.35);
+define('LOCAL_CATQUIZ_STANDARDERROR_DEFAULT_MAX', 1);
+
 /**
  * Renders the popup Link.
  *

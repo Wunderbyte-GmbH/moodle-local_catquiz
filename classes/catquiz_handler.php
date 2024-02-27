@@ -418,6 +418,14 @@ class catquiz_handler {
                     = get_string('formminquestgreaterthan', 'local_catquiz');
             }
         }
+        $sevalues = new stdClass;
+        $sevalues->min = LOCAL_CATQUIZ_STANDARDERROR_DEFAULT_MIN;
+        $sevalues->max = LOCAL_CATQUIZ_STANDARDERROR_DEFAULT_MAX;
+        if (!isset($data['catquiz_standarderrorgroup']['catquiz_standarderror_max']) ||
+            !isset($data['catquiz_standarderrorgroup']['catquiz_standarderror_min'])) {
+            $errors['catquiz_standarderrorgroup']
+            = get_string('setsevalue', 'local_catquiz', $sevalues);
+        }
 
         // Number of questions - validate higher and lower values.
         if ((int) $data['maxquestionsscalegroup']['catquiz_minquestionspersubscale']

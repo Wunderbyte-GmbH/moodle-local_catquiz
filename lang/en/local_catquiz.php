@@ -124,6 +124,7 @@ $string['formmscalegreaterthantest'] = 'Per scale minimum must be less than per 
 $string['formetimelimitnotprovided'] = 'Input at least one value of time limit';
 $string['nogapallowed'] = "No gap in the feedbackrange allowed. Please start min in new range with max value of last range.";
 $string['errorupperlimitvalue'] = 'Upper limit value has to be larger than lower limit value';
+$string['setsevalue'] = 'Please define values. Standard: min={$a->min} max={$a->max}';
 
 // Test Strategy.
 $string['catquiz_teststrategyheader'] = 'CAT Settings';
