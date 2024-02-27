@@ -148,6 +148,9 @@ class feedbacksettings {
      */
     public function get_scaleid_and_stringkey(array $personabilities, object $quizsettings, int $catscaleid) {
 
+        if (empty($personabilities)) {
+            return [];
+        }
         switch ($catscaleid) {
             // Default is parent.
             case LOCAL_CATQUIZ_PRIMARYCATSCALE_DEFAULT:

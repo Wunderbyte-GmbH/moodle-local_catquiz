@@ -88,7 +88,7 @@ class graphicalsummary extends feedbackgenerator {
         if (isset($feedbackdata['graphicalsummary_data'])) {
             $table = $this->render_table($feedbackdata['graphicalsummary_data']);
         }
-        if (isset($this->feedbacksettings->primaryscaleid)) {
+        if (isset($this->feedbacksettings->primaryscaleid) && !empty($feedbackdata['personabilities'])) {
             $selectedscalearray = $this->feedbacksettings->get_scaleid_and_stringkey(
                 $feedbackdata['personabilities'],
                 (object)$feedbackdata['quizsettings'],
@@ -456,7 +456,7 @@ class graphicalsummary extends feedbackgenerator {
      *
      * @param array $attemptsbytimerange
      *
-     * @return string
+     * @return array
      */
     private function render_attemptscounterchart(array $attemptsbytimerange) {
         global $OUTPUT;
@@ -501,7 +501,13 @@ class graphicalsummary extends feedbackgenerator {
         foreach ($attemptsbytimerange as $timestamp => $attempts) {
             $labels[] = (string)$timestamp;
             foreach ($attempts as $attempt) {
-                $color = personabilities::get_color_for_personability((array)$quizsettings, $attempt, $catscaleid);
+                if (is_object($attempt)) {
+                    $a = (float) $attempt->value;
+                    $color = personabilities::get_color_for_personability((array)$quizsettings, $a, $catscaleid);
+                } else {
+                    // This is to stay backwards compatible.
+                    $color = personabilities::get_color_for_personability((array)$quizsettings, $attempt, $catscaleid);
+                }
 
                 if (!isset($series[$timestamp][$color])) {
                         $series[$timestamp][$color] = 1;
