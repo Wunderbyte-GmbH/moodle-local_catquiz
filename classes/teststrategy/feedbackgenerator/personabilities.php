@@ -116,24 +116,25 @@ class personabilities extends feedbackgenerator {
         $selectedscaleid = $selectedscalearray['selectedscaleid'];
         $selectedscalestringkey = $selectedscalearray['selectedscalestringkey'];
 
+        $personabilities = $feedbackdata['personabilities'];
         // Make sure that only feedback defined by strategy is rendered.
-        $personabilitiesfeedbackeditor = $this->feedbacksettings->return_scales_according_to_strategy(
-            (array) $personabilities,
-            (array) $newdata,
-            (array) $quizsettings,
-            $existingdata['teststrategy'],
-            $existingdata['catscaleid']);
+        // $personabilitiesfeedbackeditor = $this->feedbacksettings->return_scales_according_to_strategy(
+        //     (array) $personabilities,
+        //     (array) $newdata,
+        //     (array) $quizsettings,
+        //     $existingdata['teststrategy'],
+        //     $existingdata['catscaleid']);
 
-        $personabilities = [];
-        foreach ($personabilitiesfeedbackeditor as $catscale => $personability) {
-            if (isset($personability['excluded']) && $personability['excluded']) {
-                continue;
-            }
-            if (isset($personability['excluded'])) {
-                $selectedscaleid = $catscale;
-            }
-            $personabilities[$catscale] = $personability;
-        }
+        // $personabilities = [];
+        // foreach ($personabilitiesfeedbackeditor as $catscale => $personability) {
+        //     if (isset($personability['excluded']) && $personability['excluded']) {
+        //         continue;
+        //     }
+        //     if (isset($personability['excluded'])) {
+        //         $selectedscaleid = $catscale;
+        //     }
+        //     $personabilities[$catscale] = $personability;
+        // }
 
         $catscales = catquiz::get_catscales(array_keys($personabilities));
 
