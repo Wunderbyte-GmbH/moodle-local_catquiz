@@ -178,12 +178,11 @@ class catquiz {
             $insql = " WHERE catscaleid $insql ";
         }
 
-        $sqlconcat = $DB->sql_concat("lci.catscaleid", "'_'", "lci.componentid");
         $select = 'DISTINCT *';
         $from = "( SELECT s1.*, s5.model, s5.difficulty, s5.discrimination, s5.guessing,
                     s5.timecreated, s5.timemodified, s5.status
             FROM (
-            SELECT $sqlconcat as scaleid_component,
+            SELECT
                 q.id,
                 lci.componentid,
                 qbe.idnumber as label,
