@@ -147,7 +147,7 @@ class feedbackclass {
                 'catquiz_scalereportcheckbox_' . $scale->id,
                 get_string('reportscale', 'local_catquiz'));
 
-            if (!optional_param('catquiz_scalereportcheckbox_' . $scale->id, 1, PARAM_INT)) {
+            if (!optional_param('catquiz_scalereportcheckbox_' . $scale->id, 0, PARAM_INT)) {
                 $mform->setDefault('catquiz_scalereportcheckbox_' . $scale->id, 1);
             }
 
