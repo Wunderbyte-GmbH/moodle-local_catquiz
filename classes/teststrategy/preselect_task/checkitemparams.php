@@ -66,6 +66,7 @@ final class checkitemparams extends preselect_task implements wb_middleware {
                 ));
             }
             if (array_sum($itemparamlists) === 0) {
+                // TODO: Maybe unset this $catscaleid from list, when there are no items found.
                 return result::err(status::ERROR_NO_ITEMS);
             }
         }
