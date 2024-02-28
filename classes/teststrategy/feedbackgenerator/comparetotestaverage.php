@@ -313,7 +313,10 @@ class comparetotestaverage extends feedbackgenerator {
 
         if (empty($catscaleid) || !isset($ability)) {
             // TODO: Error for no scale found.
-            return null;
+            return [
+                'contextid' => $existingdata['contextid'],
+                'errortext' => 'getstringerrortext',
+            ];
         };
         $catscale = catscale::return_catscale_object($catscaleid);
 
