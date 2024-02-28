@@ -102,11 +102,99 @@ class personabilities extends feedbackgenerator {
      *
      */
     protected function get_studentfeedback(array $feedbackdata): array {
+
+        $feedback = $feedbackdata['personabilitiesfeedback'];
+        if (empty($feedback)) {
+            return [];
+        } else {
+            return [
+                'heading' => $this->get_heading(),
+                'content' => $feedback,
+            ];
+        }
+    }
+
+    /**
+     * Get teacher feedback.
+     *
+     * @param array $data
+     *
+     * @return array
+     *
+     */
+    protected function get_teacherfeedback(array $data): array {
+        return [];
+    }
+
+    /**
+     * Get required context keys.
+     *
+     * @return array
+     *
+     */
+    public function get_required_context_keys(): array {
+        return [
+            'personabilitiesfeedback',
+            'personabilities',
+            'se',
+            'playedquestions',
+        ];
+    }
+
+    /**
+     * Get heading.
+     *
+     * @return string
+     *
+     */
+    public function get_heading(): string {
+        return get_string('personability', 'local_catquiz');
+    }
+
+    /**
+     * Get generatorname.
+     *
+     * @return string
+     *
+     */
+    public function get_generatorname(): string {
+        return 'personabilities';
+    }
+
+    /**
+     * Loads data personability, number of items played per subscale and standarderrorpersubscale.
+     *
+     * @param int $attemptid
+     * @param array $existingdata
+     * @param array $newdata
+     *
+     * @return array|null
+     *
+     */
+    public function load_data(int $attemptid, array $existingdata, array $newdata): ?array {
+        return $this->generate_feedback($existingdata, $newdata, true);
+    }
+
+    /**
+     * Loads data personability, number of items played per subscale and standarderrorpersubscale.
+     *
+     * @param array $existingdata
+     * @param array $newdata
+     * @param bool $dataonly
+     *
+     * @return array|null
+     *
+     */
+    private function generate_feedback(array $existingdata, $newdata, $dataonly = false): ?array {
         global $OUTPUT;
         global $CFG;
         require_once($CFG->dirroot . '/local/catquiz/lib.php');
 
-        //TODO: Move this to load data?!
+        $progress = $newdata['progress'];
+        $personabilities = $progress->get_abilities();
+        if ($personabilities === []) {
+            return null;
+        }
 
         // TODO: force definition of selected scales.
         $selectedscalearray = $this->feedbacksettings->get_scaleid_and_stringkey(
@@ -223,94 +311,9 @@ class personabilities extends feedbackgenerator {
             ]
         );
 
-        if (empty($feedback)) {
-            return [];
-        } else {
-            return [
-                'heading' => $this->get_heading(),
-                'content' => $feedback,
-            ];
-        }
-    }
-
-    /**
-     * Get teacher feedback.
-     *
-     * @param array $data
-     *
-     * @return array
-     *
-     */
-    protected function get_teacherfeedback(array $data): array {
-        return [];
-    }
-
-    /**
-     * Get required context keys.
-     *
-     * @return array
-     *
-     */
-    public function get_required_context_keys(): array {
         return [
-            'personabilities',
-            'se',
-            'playedquestions',
-        ];
-    }
-
-    /**
-     * Get heading.
-     *
-     * @return string
-     *
-     */
-    public function get_heading(): string {
-        return get_string('personability', 'local_catquiz');
-    }
-
-    /**
-     * Get generatorname.
-     *
-     * @return string
-     *
-     */
-    public function get_generatorname(): string {
-        return 'personabilities';
-    }
-
-    /**
-     * Loads data personability, number of items played per subscale and standarderrorpersubscale.
-     *
-     * @param int $attemptid
-     * @param array $existingdata
-     * @param array $newdata
-     *
-     * @return array|null
-     *
-     */
-    public function load_data(int $attemptid, array $existingdata, array $newdata): ?array {
-        return $this->generate_feedback($existingdata, $newdata, true);
-    }
-
-    /**
-     * Loads data personability, number of items played per subscale and standarderrorpersubscale.
-     *
-     * @param array $existingdata
-     * @param array $newdata
-     * @param bool $dataonly
-     *
-     * @return array|null
-     *
-     */
-    public function generate_feedback(array $existingdata, $newdata, $dataonly = false): ?array {
-        $progress = $newdata['progress'];
-        if (!$progress->get_playedquestions()) {
-            return null;
-        }
-
-        return [
-            'personabilities' => $progress->get_abilities(),
+            'personabilitiesfeedback' => $feedback,
+            'personabilities' => $personabilities,
             'se' => $newdata['se'],
             'playedquestions' => $progress->get_playedquestions(true),
         ];
