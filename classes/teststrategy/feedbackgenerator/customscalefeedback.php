@@ -170,10 +170,12 @@ class customscalefeedback extends feedbackgenerator {
             $existingdata['catscaleid']);
 
         $scalefeedback = [];
+        $relevantscalesfound = false;
         foreach ($personabilitiesfeedbackeditor as $catscaleid => $personability) {
             if (isset($personability['excluded']) && $personability['excluded']) {
                 continue;
             }
+            $relevantscalesfound = true;
             for ($j = 1; $j <= $quizsettings['numberoffeedbackoptionsselect']; $j++) {
                 $lowerlimitprop = sprintf('feedback_scaleid_limit_lower_%d_%d', $catscaleid, $j);
                 $lowerlimit = floatval($quizsettings[$lowerlimitprop]);
@@ -194,7 +196,14 @@ class customscalefeedback extends feedbackgenerator {
         }
 
         if (! $scalefeedback) {
-            return ['customscalefeedback' => get_string('feedback_customscale_nofeedback', 'local_catquiz')];
+            if (!$relevantscalesfound) {
+                return [
+                    'customscalefeedback' => get_string('noscalesfound', 'local_catquiz'),
+                ];
+            }
+            return [
+                'customscalefeedback' => get_string('nofeedback', 'local_catquiz'),
+            ];
         }
 
         $catscales = catquiz::get_catscales(array_keys($scalefeedback));

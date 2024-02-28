@@ -269,6 +269,7 @@ class personabilities extends feedbackgenerator {
             }
             // If defined in settings, display only feedbacks if items were played...
             // ...and parentscale and primaryscale.
+            $questionpreviews = "";
             if (isset($newdata['progress']->playedquestionsbyscale[$catscaleid])) {
                 $numberofitems = ['itemsplayed' => count($feedbackdata['playedquestions'][$catscaleid])];
                 $questionpreviews = array_map(fn($q) => [
@@ -296,6 +297,8 @@ class personabilities extends feedbackgenerator {
         }
 
         $catscales = catquiz::get_catscales(array_keys($personabilities));
+        // TODO: In which cases should there be no charts?
+
         // The chart showing all present personabilities in relation to each other.
         $chart = $this->render_chart(
             $personabilities,
@@ -482,6 +485,12 @@ class personabilities extends feedbackgenerator {
      */
     private function render_abilitiyprogress(array $initialcontext, $primarycatscale) {
         $userid = $initialcontext['userid'];
+        if (!isset($initialcontext['endtime'])) {
+            return [
+                'individual' => '',
+                'comparison' => '',
+            ];
+        }
         $endtime = intval($initialcontext['endtime']);
         $courseid = empty($initialcontext['courseid']) ? null : $initialcontext['courseid'];
 
