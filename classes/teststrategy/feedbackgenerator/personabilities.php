@@ -224,6 +224,14 @@ class personabilities extends feedbackgenerator {
             $personabilities[$catscale] = $personability;
         }
 
+        if ($personabilities === []) {
+            return [
+                'personabilitiesfeedback' => "nofeedbackstring",
+                'personabilities' => $personabilities,
+                'se' => $newdata['se'],
+                'playedquestions' => $progress->get_playedquestions(true),
+            ];
+        }
         $catscales = catquiz::get_catscales(array_keys($personabilities));
 
         // TODO: apply sorting from strategy.
@@ -253,15 +261,20 @@ class personabilities extends feedbackgenerator {
             }
             if ($catscaleid == $selectedscaleid) {
                 $isselectedscale = true;
-                $tooltiptitle = get_string($selectedscalestringkey, 'local_catquiz', $catscales[$catscaleid]->name);
+                // TODO: Title explaining why this scale was selected (i.e. lowest result).
+                $tooltiptitle = $catscales[$catscaleid]->name;
             } else {
                 $isselectedscale = false;
                 $tooltiptitle = $catscales[$catscaleid]->name;
             }
             // If defined in settings, display only feedbacks if items were played...
             // ...and parentscale and primaryscale.
-            if (isset($feedbackdata['playedquestions'][$catscaleid])) {
+            if (isset($newdata['progress']->playedquestionsbyscale[$catscaleid])) {
                 $numberofitems = ['itemsplayed' => count($feedbackdata['playedquestions'][$catscaleid])];
+                $questionpreviews = array_map(fn($q) => [
+                    'preview' => $this->render_questionpreview((object) $q)['body']['question']],
+                    $newdata['progress']->playedquestionsbyscale[$catscaleid]
+                );
             } else if ($this->feedbacksettings->displayscaleswithoutitemsplayed
                 || $catscaleid == $selectedscaleid
                 || $catscales[$catscaleid]->parentid == 0) {
@@ -269,13 +282,9 @@ class personabilities extends feedbackgenerator {
             } else if ($catscaleid != $selectedscaleid) {
                 $numberofitems = "";
             }
-            $questionpreviews = array_map(fn($q) => [
-                'preview' => $this->render_questionpreview((object) $q)['body']['question']],
-                $feedbackdata['playedquestions'][$catscaleid]
-            );
 
             $data[] = [
-                'standarderror' => sprintf("%.2f", $feedbackdata['se'][$catscaleid]),
+                'standarderror' => sprintf("%.2f", $newdata['se'][$catscaleid]),
                 'ability' => $ability,
                 'name' => $catscales[$catscaleid]->name,
                 'catscaleid' => $catscaleid,
@@ -290,14 +299,14 @@ class personabilities extends feedbackgenerator {
         // The chart showing all present personabilities in relation to each other.
         $chart = $this->render_chart(
             $personabilities,
-            (array) $feedbackdata['quizsettings'],
+            (array) $quizsettings,
             $catscales[$selectedscaleid]
         );
-        $abilityprofile = $this->render_abilityprofile_chart((array) $feedbackdata, $catscales[$selectedscaleid]);
+        $abilityprofile = $this->render_abilityprofile_chart((array) $newdata, $quizsettings, $catscales[$selectedscaleid]);
 
         // The charts showing past and present personabilities (in relation to peers).
         $abilityprogress = $this->render_abilitiyprogress(
-            (array) $feedbackdata,
+            (array) $newdata,
             $catscales[$selectedscaleid]);
 
         $feedback = $OUTPUT->render_from_template(
@@ -323,12 +332,13 @@ class personabilities extends feedbackgenerator {
      * Render chart for histogram of personabilities.
      *
      * @param array $initialcontext
+     * @param array $quizsettings
      * @param stdClass $primarycatscale
      *
      * @return array
      *
      */
-    private function render_abilityprofile_chart(array $initialcontext, $primarycatscale) {
+    private function render_abilityprofile_chart(array $initialcontext, array $quizsettings, $primarycatscale) {
         global $OUTPUT, $DB;
 
         $abilitysteps = [];
@@ -383,7 +393,7 @@ class personabilities extends feedbackgenerator {
                 }
             }
             $colorvalue = $this->get_color_for_personability(
-                (array)$initialcontext['quizsettings'],
+                $quizsettings,
                 $as,
                 intval($primarycatscale->id)
                 );
