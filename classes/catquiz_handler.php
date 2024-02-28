@@ -673,12 +673,24 @@ class catquiz_handler {
                 'enrolment_message_checkbox_',
                 'feedbacklegend_scaleid_',
             ];
+
+            $feedbackvaluekeysonceperscale = [
+                'catquiz_scalereportcheckbox_',
+            ];
+            $feedbackvaluekeys = array_merge($feedbackvaluekeys, $feedbackvaluekeysonceperscale);
+
             // Fetch standard values from the parentscale, we want to apply to all subscales.
-            for ($j = 1; $j <= $numberoffeedbackoptions; $j++) {
-                foreach ($feedbackvaluekeys as $feedbackvaluekey) {
-                    if (!isset($standardvalues[$feedbackvaluekey])) {
-                        $standardvalues[$feedbackvaluekey] = [];
-                    }
+
+            foreach ($feedbackvaluekeys as $feedbackvaluekey) {
+                if (!isset($standardvalues[$feedbackvaluekey])) {
+                    $standardvalues[$feedbackvaluekey] = [];
+                }
+                if (in_array($feedbackvaluekey, $feedbackvaluekeysonceperscale)) {
+                    $keyname = $feedbackvaluekey . $scaleidofcopyvalue;
+                    $standardvalues[$feedbackvaluekey] = $values[$keyname] ?? null;
+                    continue;
+                }
+                for ($j = 1; $j <= $numberoffeedbackoptions; $j++) {
                     $keyname = $feedbackvaluekey . $scaleidofcopyvalue . '_' . $j;
                     $standardvalues[$feedbackvaluekey][$j] = $values[$keyname] ?? null;
                 }
@@ -697,6 +709,11 @@ class catquiz_handler {
             // For all keys (in array) with all subscales (in array) for required number of feedbackoptions.
             foreach ($feedbackvaluekeys as $feedbackvaluekey) {
                 foreach ($subscaleids as $subscaleid) {
+                    if (in_array($feedbackvaluekey, $feedbackvaluekeysonceperscale)) {
+                        $subscalekey = $feedbackvaluekey . $subscaleid;
+                        $values[$subscalekey] = $standardvalues[$feedbackvaluekey] ?? "0";
+                        continue;
+                    }
                     for ($j = 1; $j <= $numberoffeedbackoptions; $j++) {
                         $subscalekey = $feedbackvaluekey . $subscaleid . '_' . $j;
                         $values[$subscalekey] = $standardvalues[$feedbackvaluekey][$j];
