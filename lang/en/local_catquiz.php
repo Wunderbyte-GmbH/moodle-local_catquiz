@@ -464,6 +464,7 @@ $string['scaleselected'] = 'defined scale {$a}';
 $string['feedback_customscale_nofeedback'] = 'No feedback was provided for your test results';
 $string['reportscale'] = 'Include scale for report';
 $string['noscalesfound'] = 'There were no scales with valid feedback found.';
+$string['nofeedback'] = 'No feedback defined.';
 
 // Personability & chart in Feedback.
 $string['chartlegendabilityrelative'] = '{$a->difference} (Compared to parentscale); {$a->ability} (ability score of scale)';

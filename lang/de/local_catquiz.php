@@ -469,6 +469,7 @@ $string['scaleselected'] = 'Skala "{$a}"';
 $string['abilityprofile'] = 'Fähigkeits-Score Profil in "{$a}"';
 $string['feedback_customscale_nofeedback'] = 'Es wurde kein Feedback für ihre Ergebnisse angegeben';
 $string['noscalesfound'] = 'Es konnte zu keiner Skala ein valides Ergebnis gefunden werden.';
+$string['nofeedback'] = 'Kein Feedback angegeben.';
 
 // Chart in Feedback.
 $string['chartlegendabilityrelative'] = '{$a->difference} Unterschied zur Vergleichsskala (Fähigkeits-Score in dieser Skala: {$a->ability})';
@@ -478,6 +479,7 @@ $string['itemsplayed'] = 'ausgewertete Fragen:';
 $string['personabilityinscale'] = 'Fähigkeits-Score für Skala "{$a}"';
 $string['yourscorein'] = 'Ihre durchschnittlichen "{$a}"-Ergebnisse';
 $string['scoreofpeers'] = 'Mittelwert Ihrer Mit-Studierenden';
+$string['abilityprofile'] = 'Fähigkeitsprofil in "{$a}"';
 $string['numberofattempts'] = 'Anzahl der Testversuche';
 $string['attemptchartstitle'] = 'Anzahl und Ergebnisse der Testversuche für Skala "{$a}"';
 $string['labelforrelativepersonabilitychart'] = 'Relative Fähigkeit';

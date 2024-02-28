@@ -1694,9 +1694,10 @@ class catquiz {
         bool $feedbackonlyfordefinedscaleid = false
             */
 
-        foreach ($personabilities as $catscaleid => $personability) {
+        foreach ($personabilities as $catscaleid => $personabilityarray) {
             $i = 1;
 
+            $personability = (float) $personabilityarray->value;
             $rolestudent = $DB->get_record('role', ['shortname' => 'student']);
             try {
                 $catscale = catscale::return_catscale_object($catscaleid);
