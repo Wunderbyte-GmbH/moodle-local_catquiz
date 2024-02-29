@@ -655,7 +655,11 @@ class progress implements JsonSerializable {
      * @return self
      */
     public function set_ability(float $ability, int $catscaleid): self {
+        if (!isset($this->abilities[$catscaleid])) {
+            $this->abilities[$catscaleid] = [];
+        }
         $this->abilities[$catscaleid]['value'] = $ability;
+
         return $this;
     }
 

@@ -105,7 +105,8 @@ class personabilities extends feedbackgenerator {
 
         $feedback = $feedbackdata['personabilitiesfeedback'];
         if (empty($feedback)) {
-            return [];
+            return [
+            ];
         } else {
             return [
                 'heading' => $this->get_heading(),
@@ -195,15 +196,7 @@ class personabilities extends feedbackgenerator {
         if ($personabilities === []) {
             return null;
         }
-
         $quizsettings = $existingdata['quizsettings'];
-        // TODO: force definition of selected scales.
-        // $selectedscalearray = $this->feedbacksettings->get_scaleid_and_stringkey(
-        //     $feedbackdata['personabilities'],
-        //     (object) $feedbackdata['quizsettings'],
-        //     $this->primaryscaleid);
-        // $selectedscaleid = $selectedscalearray['selectedscaleid'];
-        // $selectedscalestringkey = $selectedscalearray['selectedscalestringkey'];
 
         // Make sure that only feedback defined by strategy is rendered.
         $personabilitiesfeedbackeditor = $this->feedbacksettings->return_scales_according_to_strategy(
@@ -213,25 +206,34 @@ class personabilities extends feedbackgenerator {
             $existingdata['teststrategy'],
             $existingdata['catscaleid']);
 
-        $personabilities = [];
-        foreach ($personabilitiesfeedbackeditor as $catscale => $personability) {
-            if (isset($personability['excluded']) && $personability['excluded']) {
-                continue;
+        if ($personabilitiesfeedbackeditor == $personabilities) {
+            // In case the feedbacksettings /strategy didn't change anything...
+            // ...temporarly use the old method to select primary scale.
+            $personabilities = $progress->get_abilities();
+            // TODO: force definition of selected scales.
+            $selectedscalearray = $this->feedbacksettings->get_scaleid_and_stringkey(
+                $personabilities,
+                (object) $quizsettings,
+                $this->primaryscaleid);
+            $selectedscaleid = $selectedscalearray['selectedscaleid'];
+            $selectedscalestringkey = $selectedscalearray['selectedscalestringkey'];
+        } else {
+            $personabilities = [];
+            foreach ($personabilitiesfeedbackeditor as $catscale => $personability) {
+                if (isset($personability['excluded']) && $personability['excluded']) {
+                    continue;
+                }
+                if (isset($personability['primary'])) {
+                    $selectedscaleid = $catscale;
+                }
+                $personabilities[$catscale] = $personability;
             }
-            if (isset($personability['primary'])) {
-                $selectedscaleid = $catscale;
+            if ($personabilities === []) {
+                return [
+                ];
             }
-            $personabilities[$catscale] = $personability;
         }
 
-        if ($personabilities === []) {
-            return [
-                'personabilitiesfeedback' => "nofeedbackstring",
-                'personabilities' => $personabilities,
-                'se' => $newdata['se'],
-                'playedquestions' => $progress->get_playedquestions(true),
-            ];
-        }
         $catscales = catquiz::get_catscales(array_keys($personabilities));
 
         // TODO: apply sorting from strategy.
@@ -914,9 +916,11 @@ class personabilities extends feedbackgenerator {
         $primarycatscaleid = $primarycatscale->id;
         $primaryability = 0;
         // First we get the personability of the primaryscale.
-        foreach ($personabilities as $subscaleid => $ability) {
+        foreach ($personabilities as $subscaleid => $abilityarray) {
+            $ability = $abilityarray['value'];
             if ($subscaleid == $primarycatscaleid) {
                 $primaryability = floatval($ability);
+                break;
             }
         }
         $chart = new chart_bar();
@@ -924,8 +928,8 @@ class personabilities extends feedbackgenerator {
         $chartseries = [];
         $chartseries['series'] = [];
         $chartseries['labels'] = [];
-        foreach ($personabilities as $subscaleid => $ability) {
-            $subscaleability = $ability['value'];
+        foreach ($personabilities as $subscaleid => $abilityarray) {
+            $subscaleability = (float) $abilityarray['value'];
             $subscale = catscale::return_catscale_object($subscaleid);
             $subscalename = $subscale->name;
             $difference = round($subscaleability - $primaryability, 2);

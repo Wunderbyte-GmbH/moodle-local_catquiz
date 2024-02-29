@@ -1679,25 +1679,21 @@ class catquiz {
         array $personabilities) {
         global $DB;
 
+        // $personabilitiesfeedbackeditor = $this->feedbacksettings->return_scales_according_to_strategy(
+        //     (array) $personabilities,
+        //     (array) $newdata,
+        //     (array) $quizsettings,
+        //     $existingdata['teststrategy'],
+        //     $existingdata['catscaleid']);
         // Enrolement is applied according to test strategy.
         // TODO: Enrolement!!
         /*
-        $personabilities = feedbacksettings::return_scales_according_to_strategy(
-        $quizsettings['catquiz_selectteststrategy'],
-        $personabilities);
-        /*
-        int $teststrategyid,
-        array $personabilities,
-        array $feedbackdata,
-        array $quizsettings,
-        int $catscaleid = 0,
-        bool $feedbackonlyfordefinedscaleid = false
             */
 
         foreach ($personabilities as $catscaleid => $personabilityarray) {
             $i = 1;
-
-            $personability = (float) $personabilityarray->value;
+            $personabilityarray = (array) $personabilityarray;
+            $personability = (float) $personabilityarray['value'];
             $rolestudent = $DB->get_record('role', ['shortname' => 'student']);
             try {
                 $catscale = catscale::return_catscale_object($catscaleid);
