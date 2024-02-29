@@ -51,6 +51,7 @@ final class checkitemparams extends preselect_task implements wb_middleware {
      *
      */
     public function run(array &$context, callable $next): result {
+        $selectedscales = $context['selectedsubscales'];
         foreach ($context['selectedsubscales'] as $catscaleid) {
             $catscalecontext = catscale::get_context_id($catscaleid);
             $catscaleids = [
@@ -66,10 +67,16 @@ final class checkitemparams extends preselect_task implements wb_middleware {
                 ));
             }
             if (array_sum($itemparamlists) === 0) {
-                // TODO: Maybe unset this $catscaleid from list, when there are no items found.
-                return result::err(status::ERROR_NO_ITEMS);
+                $context['progress']->drop_scale($catscaleid);
+                unset($selectedscales[array_search($catscaleid, $selectedscales)]);
             }
         }
+
+        // If there are no active scales left, show a message that the quiz can not be started.
+        if (!$selectedscales) {
+                return result::err(status::ERROR_NO_ITEMS);
+        }
+
         return $next($context);
     }
 
