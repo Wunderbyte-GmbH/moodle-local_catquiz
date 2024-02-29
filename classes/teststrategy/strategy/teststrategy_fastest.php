@@ -146,6 +146,44 @@ class teststrategy_fastest extends strategy {
         int $catscaleid = 0,
         bool $feedbackonlyfordefinedscaleid = false
         ): array {
-            return $personabilities;
+
+        $newabilities = [];
+        $rootscaleid = (int) $feedbackdata['catscaleid'];
+
+        // Only parentscale to be selected.
+        foreach ($personabilities as $scaleid => $abilityvalue) {
+            if ($scaleid != $rootscaleid) {
+                $newabilities[$scaleid] = [
+                    'value' => $abilityvalue['value'],
+                    'excluded' => true,
+                    ];
+                $newabilities[$scaleid]['error']['rootonly'] = [
+                        'rootscaleid' => $rootscaleid,
+                        'currentscaleid' => $scaleid,
+                ];
+                continue;
+            }
+            $newabilities[$scaleid] = [
+                'value' => $abilityvalue['value'],
+                'primary' => true,
+            ];
+        };
+        // Minimum of questions per test applied.
+        $newabilities = $feedbacksettings->filter_nmintest($newabilities, $feedbackdata);
+
+        // Fraction can not be 1 (all answers correct) or 0 (all answers incorrect).
+        if ($feedbacksettings->fraction >= 1 || $feedbacksettings->fraction <= 0) {
+            foreach ($personabilities as $scaleid => $abilityvalue) {
+                $newabilities[$scaleid] = [
+                    'value' => $abilityvalue['value'],
+                    'excluded' => true,
+                    ];
+                $newabilities[$scaleid]['error']['fraction'] = [
+                        'fraction' => $feedbacksettings->fraction,
+                        'expected' => '0 < f < 1',
+                ];
+            }
+        }
+        return $newabilities;
     }
 }
