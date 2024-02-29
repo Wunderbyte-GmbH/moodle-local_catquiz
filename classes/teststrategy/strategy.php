@@ -156,7 +156,7 @@ abstract class strategy {
         $result = wb_middleware_runner::run($middlewares, $context);
         $this->progress = $context['progress'];
 
-        $this->update_attempdfeedback($context);
+        $this->update_attemptfeedback($context);
 
         if ($result->isErr()) {
             $cache->set('endtime', time());
@@ -191,7 +191,7 @@ abstract class strategy {
      * @throws Exception
      * @throws dml_exception
      */
-    private function update_attempdfeedback($context) {
+    private function update_attemptfeedback($context) {
         if (getenv('CATQUIZ_TESTING_SKIP_FEEDBACK')) {
             return;
         }
