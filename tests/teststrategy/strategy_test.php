@@ -579,7 +579,7 @@ class strategy_test extends advanced_testcase {
                     'SimC08' => 4.72,
                     'SimC09' => 4.81,
                     'SimC10' => 4.73,
-                ]
+                ],
             ],
             'Infer lowest skillgap P000407' => [
                 'strategy' => LOCAL_CATQUIZ_STRATEGY_LOWESTSUB,
