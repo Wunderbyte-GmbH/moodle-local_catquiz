@@ -126,7 +126,6 @@ class strategy_test extends advanced_testcase {
         array $settings = [],
         array $finalabilities = []
     ) {
-        //$this->find_max_difference("/var/www/html/local/catquiz/CAT-Simulation/Ergebnisse/SimulationSteps defCAT 2024-01-12 12-32-52.csv");
         putenv('USE_TESTING_CLASS_FOR=local_catquiz\teststrategy\preselect_task\updatepersonability');
         putenv("CATQUIZ_TESTING_ABILITY=$initialability");
         putenv("CATQUIZ_TESTING_STANDARDERROR=$initialse");
@@ -259,7 +258,7 @@ class strategy_test extends advanced_testcase {
                     'SimB01' => -3.31,
                     'SimB02' => -3.31,
                     'SimC' => -3.31, // Inherited from parent.
-                ]
+                ],
             ],
             'radical CAT 2' => [
                 'strategy' => LOCAL_CATQUIZ_STRATEGY_FASTEST,
@@ -313,7 +312,7 @@ class strategy_test extends advanced_testcase {
                     'SimC08' => 4.54,
                     'SimC09' => 4.79,
                     'SimC10' => 4.73,
-                ]
+                ],
             ],
             'radical CAT 3' => [
                 'strategy' => LOCAL_CATQUIZ_STRATEGY_FASTEST,
@@ -355,7 +354,7 @@ class strategy_test extends advanced_testcase {
                     'SimB04' => 1.63,
                     'SimC' => 1.16,
                     'SimC03' => 1.16,
-                ]
+                ],
             ],
             'radical CAT 4' => [
                 'strategy' => LOCAL_CATQUIZ_STRATEGY_FASTEST,
@@ -400,7 +399,7 @@ class strategy_test extends advanced_testcase {
                     'SimC' => 1.18,
                     'SimC02' => 0.93,
                     'SimC03' => 1.07,
-                ]
+                ],
             ],
             'radical CAT 5' => [
                 'strategy' => LOCAL_CATQUIZ_STRATEGY_FASTEST,
@@ -453,7 +452,7 @@ class strategy_test extends advanced_testcase {
                     'SimC06' => 3.62,
                     'SimC07' => 3.78,
                     'SimC10' => 3.71,
-                ]
+                ],
             ],
             /* 'moderate CAT' => [
             //    'strategy' => LOCAL_CATQUIZ_STRATEGY_BALANCED,
@@ -529,7 +528,7 @@ class strategy_test extends advanced_testcase {
                     'SimB01' => -3.38,
                     'SimB02' => -3.38,
                     'SimC' => -4.19, // Inherited from parent.
-                ]
+                ],
             ],
             'Infer lowest skillgap P000001' => [
                 'strategy' => LOCAL_CATQUIZ_STRATEGY_LOWESTSUB,
@@ -549,12 +548,12 @@ class strategy_test extends advanced_testcase {
                     [ 'label' => 'SIMC10-15', 'is_correct_response' => true, 'ability_before' => 4.23, 'ability_after' => 4.38],
                     [ 'label' => 'SIMC07-09', 'is_correct_response' => true, 'ability_before' => 4.38, 'ability_after' => 4.48],
                     [ 'label' => 'SIMC10-08', 'is_correct_response' => true, 'ability_before' => 4.48, 'ability_after' => 4.61],
-                    [ 'label' => 'SIMC08-16', 'is_correct_response' => false,'ability_before' => 4.61, 'ability_after' => 4.84],
+                    [ 'label' => 'SIMC08-16', 'is_correct_response' => false, 'ability_before' => 4.61, 'ability_after' => 4.84],
                     [ 'label' => 'SIMC08-03', 'is_correct_response' => true, 'ability_before' => 4.84, 'ability_after' => 4.71],
                     [ 'label' => 'SIMC09-16', 'is_correct_response' => true, 'ability_before' => 4.71, 'ability_after' => 4.79],
                     [ 'label' => 'SIMC09-00', 'is_correct_response' => true, 'ability_before' => 4.79, 'ability_after' => 4.86],
-                    [ 'label' => 'SIMC04-00', 'is_correct_response' => false,'ability_before' => 4.86, 'ability_after' => 4.91],
-                    [ 'label' => 'SIMC04-15', 'is_correct_response' => false,'ability_before' => 4.91, 'ability_after' => 4.73],
+                    [ 'label' => 'SIMC04-00', 'is_correct_response' => false, 'ability_before' => 4.86, 'ability_after' => 4.91],
+                    [ 'label' => 'SIMC04-15', 'is_correct_response' => false, 'ability_before' => 4.91, 'ability_after' => 4.73],
                     [ 'label' => 'SIMC09-11', 'is_correct_response' => true, 'ability_before' => 4.73, 'ability_after' => 4.66],
                     [ 'label' => 'SIMC06-04', 'is_correct_response' => true, 'ability_before' => 4.66, 'ability_after' => 4.69],
                     [ 'label' => 'SIMC06-10', 'is_correct_response' => true, 'ability_before' => 4.69, 'ability_after' => 4.70],
@@ -585,8 +584,8 @@ class strategy_test extends advanced_testcase {
             'Infer lowest skillgap P000407' => [
                 'strategy' => LOCAL_CATQUIZ_STRATEGY_LOWESTSUB,
                 'questions' => [
-                    ['label' => 'SIMB01-18', 'is_correct_response' => false, 'ability_before' =>  0.00, 'ability_after' => 0.00],
-                    ['label' => 'SIMA06-15', 'is_correct_response' => false, 'ability_before' =>  0.00, 'ability_after' => -0.67],
+                    ['label' => 'SIMB01-18', 'is_correct_response' => false, 'ability_before' => 0.00, 'ability_after' => 0.00],
+                    ['label' => 'SIMA06-15', 'is_correct_response' => false, 'ability_before' => 0.00, 'ability_after' => -0.67],
                     ['label' => 'SIMA02-02', 'is_correct_response' => false, 'ability_before' => -0.67, 'ability_after' => -1.30],
                     ['label' => 'SIMA02-19', 'is_correct_response' => false, 'ability_before' => -1.30, 'ability_after' => -1.86],
                     ['label' => 'SIMA02-17', 'is_correct_response' => false, 'ability_before' => -1.86, 'ability_after' => -2.33],
@@ -628,7 +627,7 @@ class strategy_test extends advanced_testcase {
                     'SimB' => -3.71,
                     'SimB01' => -3.71,
                     'SimB02' => -3.71,
-                ]
+                ],
             ],
             'Infer lowest skillgap P000642' => [
                 'strategy' => LOCAL_CATQUIZ_STRATEGY_LOWESTSUB,
@@ -673,15 +672,13 @@ class strategy_test extends advanced_testcase {
                     'SimB02' => 3.43,
                     'SimB03' => 3.43,
                     'SimB04' => 3.60,
-                    'SimB04' => 3.60,
                     'SimC' => 3.45,
                     'SimC04' => 3.58,
                     'SimC05' => 2.96,
                     'SimC06' => 3.43,
                     'SimC07' => 3.90,
                     'SimC10' => 3.71,
-
-                ]
+                ],
             ],
             'Infer lowest skillgap P000184' => [
                 'strategy' => LOCAL_CATQUIZ_STRATEGY_LOWESTSUB,
@@ -728,7 +725,7 @@ class strategy_test extends advanced_testcase {
                     'SimB' => -4.85,
                     'SimB01' => -4.85,
                     'SimB02' => -4.85,
-                ]
+                ],
             ],
             // phpcs:disable
             //'Infer greatest strength' => [
@@ -1027,48 +1024,4 @@ class strategy_test extends advanced_testcase {
 
         return $qformat;
     }
-
-    public function find_max_difference($path) {
-    if (($handle = fopen($path, "r")) === false) {
-        throw new \UnexpectedValueException("Can not open file: " . $path);
-    }
-
-    $row = 0;
-    $maxrow = 0;
-    while (($data = fgetcsv($handle, 0, ";")) !== false) {
-        $row++;
-        if (count($data) < 6 || $data[5] != "pp") {
-            continue;
-        }
-        $mainvalue = floatval(str_replace(',', '.', $data[6]));
-
-        // Do not use too extreme values.
-        if (abs($mainvalue) > 5.0) {
-            continue;
-        }
-
-        $maxnegdiff = 0;
-        for ($i = 7; $i < count($data); $i++) {
-            if ($data[$i] == "") {
-                continue;
-            }
-            $val = floatval(str_replace(',', '.', $data[$i]));
-            if (abs($val) > 5.0) {
-                continue;
-            }
-            if ($val < $mainvalue && ($mainvalue - $val) > $maxnegdiff) {
-                $maxnegdiff = $mainvalue - $val;
-                $maxrow = $row;
-            }
-        }
-        echo "row: $row - maxdiff: $maxnegdiff\n";
-    }
-
-    fclose($handle);
-    echo "Maxrow: $maxrow";
-    echo "Maxnegdiff: $maxnegdiff";
-    exit(0);
-    return $maxrow;
-    }
-
 }
