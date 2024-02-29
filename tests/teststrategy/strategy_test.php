@@ -675,9 +675,9 @@ class strategy_test extends advanced_testcase {
                     'SimC' => 3.45,
                     'SimC04' => 3.58,
                     'SimC05' => 2.96,
-                    'SimC06' => 3.43,
+                    'SimC06' => 3.43, // TODO: Check why this differs from new 07_teststrategie_tester.php output.
                     'SimC07' => 3.90,
-                    'SimC10' => 3.71,
+                    'SimC10' => 3.71, // TODO: Check why this differs from new 07_teststrategie_tester.php output.
                 ],
             ],
             'Infer lowest skillgap P000184' => [
