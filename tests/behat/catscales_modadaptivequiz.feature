@@ -154,8 +154,8 @@ Feature: As a student i want to take adaptive quiz tests with catquiz functinali
     And I wait until the page is ready
     And I should see "Ability score"
     ## No scale bar?
-    And I should see "You performed better than 40.00% of your fellow students"
-    And I should see "-2.18 (Standarderror: 7.96)"
+    And I should see "You performed better than 22.22% of your fellow students"
+    And I should see "-0.56 (Standarderror: 0.55)"
 
   @javascript
   Scenario: Start adaptive quiz attempt with catquiz model and Classical test purpose

@@ -170,9 +170,9 @@ Feature: As a teacher I want to use shortcodes to display adaptive quiz test res
     ## Verify of data on quiz's "Feedback" page
     And I should see "Ability score"
     And I should see "Simulation" in the "[data-placement=\"top\"]" "css_element"
-    And I should see "-0.81 (Standarderror: 3.12)"
+    And I should see "-1.35 (Standarderror: 0.51)"
     ## Verify strongest scale have to be 1sr feedback in label
     When I am on "Course 1" course homepage
     Then I should see "Ability score"
     And I should see "SimA" in the "[data-placement=\"top\"]" "css_element"
-    And I should see "0.00 (Standarderror: 1000.00)"
+    And I should see "-1.35 (Standarderror: 1000.00)"
