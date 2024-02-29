@@ -29,6 +29,7 @@ use local_catquiz\local\result;
 use local_catquiz\teststrategy\preselect_task;
 use local_catquiz\teststrategy\progress;
 use local_catquiz\wb_middleware;
+use stdClass;
 
 /**
  * Add a score to each question and sort questions descending by score
@@ -101,21 +102,13 @@ final class strategydeficitscore extends preselect_task implements wb_middleware
                 if (! property_exists($question, 'score') || $score > $question->score) {
                     $question->score = $score;
                 }
-                $lastq = $this->progress->get_last_question();
-                if ($lastq && $lastq->label === "SIMC07-09") {
-                    $q = $question;
-                    if (in_array($q->label, ['SIMB04-10', 'SIMC06-09'])) {
-                        echo sprintf(
-                            "%s: testinfo: %f, ability: %f, processterm: %f - scaleterm: %f - itemterm: %f\n",
-                            $q->label,
-                            $testinfo,
-                            $scaleability,
-                            $q->processterm,
-                            $q->scaleterm,
-                            $q->itemterm
-                        );
-                    }
-                }
+                getenv('CATQUIZ_CREATE_TESTOUTPUT') && $this->print_debug_info(
+                    'SIMC07-09',
+                    $question,
+                    ['SIMB04-10', 'SIMC06-09'],
+                    $testinfo,
+                    $scaleability
+                );
             }
         }
 
@@ -145,5 +138,37 @@ final class strategydeficitscore extends preselect_task implements wb_middleware
             'questions',
             'progress',
         ];
+    }
+
+    /**
+     * Helper function for debugging
+     *
+     * @param string $lastquestionlabel Only print if the last question has that label
+     * @param stdClass $question The current question
+     * @param array $debuglabels Only print output for questions with that label
+     * @param float $testinfo Testinfo for the selected question's scale
+     * @param float $scaleability Ability for the selected question's scale
+     */
+    private function print_debug_info(
+        string $lastquestionlabel,
+        stdClass $question,
+        array $debuglabels,
+        float $testinfo,
+        float $scaleability
+    ) {
+        $lastq = $this->progress->get_last_question();
+        if ($lastq && $lastq->label === $lastquestionlabel) {
+            if (in_array($question->label, $debuglabels)) {
+                printf(
+                    "%s: testinfo: %f, ability: %f, processterm: %f - scaleterm: %f - itemterm: %f\n",
+                    $question->label,
+                    $testinfo,
+                    $scaleability,
+                    $question->processterm,
+                    $question->scaleterm,
+                    $question->itemterm
+                );
+            }
+        }
     }
 }
