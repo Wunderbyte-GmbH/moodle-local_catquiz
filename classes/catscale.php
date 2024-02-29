@@ -166,21 +166,20 @@ class catscale {
     /**
      * Returns the minscalevalue and maxscalevalue of ability associated with a catscale.
      *
-     * If a catscale does not have min- and maxvalues, it returns the values of the
-     * ancestor scale that has one.
+     * This returns the values of the main ancestor scale.
      *
      * @param int $catscaleid
      * @return array
      */
     public static function get_ability_range(int $catscaleid): array {
         $catscale = self::return_catscale_object($catscaleid);
-        if ($catscale->minscalevalue && $catscale->maxscalevalue) {
+        if ($catscale->minscalevalue && $catscale->maxscalevalue && $catscale->parentid == 0 ) {
             return [
                 'minscalevalue' => $catscale->minscalevalue,
                 'maxscalevalue' => $catscale->maxscalevalue,
             ];
         }
-        if ($catscale->parentid === 0) {
+        if ($catscale->parentid == 0) {
             return [
                 'minscalevalue' => LOCAL_CATQUIZ_PERSONABILITY_LOWER_LIMIT,
                 'maxscalevalue' => LOCAL_CATQUIZ_PERSONABILITY_UPPER_LIMIT,
