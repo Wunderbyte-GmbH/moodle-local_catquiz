@@ -1675,7 +1675,7 @@ class catquiz {
         // Enrolement is applied according to test strategy.
         // TODO: Enrolement!!
         /*
-            */
+        */
 
         foreach ($personabilities as $catscaleid => $personabilityarray) {
             $i = 1;

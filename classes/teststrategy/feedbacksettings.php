@@ -313,7 +313,7 @@ class feedbacksettings {
             $catscaleid,
             $feedbackonlyfordefinedscaleid
         );
-
+        // TODO: Use singleton or caching here!
         return $personabilities;
     }
 
