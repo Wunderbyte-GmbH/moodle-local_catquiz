@@ -29,7 +29,8 @@ require_once($CFG->dirroot.'/local/catquiz/lib.php');
  * Class feedbacksettings teststrategy and feedbackgenerator.
  *
  * @package    local_catquiz
- * @copyright  2023 Wunderbyte GmbH <georg.maisser@wunderbyte.at>
+ * @copyright  2024 Wunderbyte GmbH <georg.maisser@wunderbyte.at>
+ * @author     Magdalena Holczik
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class feedbacksettings {
@@ -343,6 +344,31 @@ class feedbacksettings {
     }
 
     /**
+     * Exclude scales that don't meet minimum of items required in quizsettings.
+     *
+     * @param mixed $personabilities
+     * @param mixed $feedbackdata
+     *
+     * @return array
+     *
+     */
+    public function filter_nmintest($personabilities, $feedbackdata): array {
+        $nmintest = $this->nmintest;
+        if (!empty($nmintest)) {
+            $nintest = $feedbackdata['progress']->get_num_playedquestions();
+            if ($nintest < $nmintest) {
+                foreach ($personabilities as $scaleid => $scalearray) {
+                    $personabilities[$scaleid]['error']['nminscale'] = [
+                        'nmintestdefined' => $nmintest,
+                        'ntestcurrent' => $nintest,
+                    ];
+                    $personabilities[$scaleid]['excluded'] = true;
+                }
+            }
+        }
+        return $personabilities;
+    }
+    /**
      * Exclude scales where standarderror is not in range.
      *
      * @param mixed $personabilities
@@ -424,7 +450,7 @@ class feedbacksettings {
     private function set_params_from_attempt(array $newdata, array $quizsettings): void {
         $this->semax = (float) $newdata['se_max'];
         $this->semin = (float) $newdata['se_min'];
-        $this->nmintest = (int) $quizsettings['maxquestionsgroup']['catquiz_maxquestions'];
+        $this->nmintest = (int) $quizsettings['maxquestionsgroup']['catquiz_minquestions'];
         $this->nminscale = (int) $quizsettings['maxquestionsscalegroup']['catquiz_maxquestionspersubscale'];
         $this->rootscale = (int) $quizsettings['catquiz_catscales'];
         // Find average fraction.
