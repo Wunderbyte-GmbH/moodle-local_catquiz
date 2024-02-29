@@ -96,6 +96,11 @@ class feedbacksettings {
     /**
      * @var ?float
      */
+    public $semin;
+
+    /**
+     * @var ?float
+     */
     public $fraction;
 
     /**
@@ -364,6 +369,31 @@ class feedbacksettings {
     }
 
     /**
+     * Exclude scales where standarderror is not in range.
+     *
+     * @param mixed $personabilities
+     * @param mixed $feedbackdata
+     *
+     * @return array
+     *
+     */
+    public function filter_semin($personabilities, $feedbackdata): array {
+        $semin = $this->semax;
+        if (!empty($semin)) {
+            foreach ($personabilities as $scaleid => $array) {
+                $se = $feedbackdata['se'][$scaleid];
+                if ($se < $semin) {
+                    $personabilities[$scaleid]['error']['se'] = [
+                        'semindefined' => $semin,
+                        'securrent' => $se,
+                    ];
+                    $personabilities[$scaleid]['excluded'] = true;
+                }
+            }
+        }
+        return $personabilities;
+    }
+    /**
      * Filter the results to check if reporting is enabled in quizsettings.
      *
      * @param array $personabilities
@@ -393,6 +423,7 @@ class feedbacksettings {
      */
     private function set_params_from_attempt(array $newdata, array $quizsettings): void {
         $this->semax = (float) $newdata['se_max'];
+        $this->semin = (float) $newdata['se_min'];
         $this->nmintest = (int) $quizsettings['maxquestionsgroup']['catquiz_maxquestions'];
         $this->nminscale = (int) $quizsettings['maxquestionsscalegroup']['catquiz_maxquestionspersubscale'];
         $this->rootscale = (int) $quizsettings['catquiz_catscales'];
