@@ -160,6 +160,13 @@ class progress implements JsonSerializable {
     private bool $ignorelastresponse;
 
     /**
+     * Contains question IDs that the user did not answer.
+     *
+     * @var array
+     */
+    private array $gaveupquestions;
+
+    /**
      * Returns a new progress instance.
      *
      * If we already have data in the cache or DB, the instance is populated with those data.
@@ -186,6 +193,14 @@ class progress implements JsonSerializable {
         // This is the expected default behaviour: the user answered the last
         // question and now we'll return the next one.
         if ($lastresponse && $lastresponse->questionid === $instance->lastquestion->id) {
+            $instance->hasnewresponse = true;
+            return $instance;
+        }
+
+        // If the user gave up, count it as negative response.
+        if ($instance->user_gave_up_last_question()) {
+            $instance->gaveupquestions[] = $instance->lastquestion->id;
+            $instance->mark_lastquestion_failed();
             $instance->hasnewresponse = true;
             return $instance;
         }
@@ -265,6 +280,7 @@ class progress implements JsonSerializable {
         $instance->usageid = $data->usageid;
         $instance->session = $data->session;
         $instance->excludedquestions = $data->excludedquestions;
+        $instance->gaveupquestions = $data->gaveupquestions;
 
         return $instance;
     }
@@ -299,6 +315,7 @@ class progress implements JsonSerializable {
         $instance->hasnewresponse = false;
         $instance->session = sesskey();
         $instance->excludedquestions = [];
+        $instance->gaveupquestions = [];
         return $instance;
     }
 
@@ -323,6 +340,7 @@ class progress implements JsonSerializable {
             'usageid' => $this->usageid,
             'session' => $this->session,
             'excludedquestions' => $this->excludedquestions,
+            'gaveupquestions' => $this->gaveupquestions,
         ];
     }
 
@@ -672,7 +690,7 @@ class progress implements JsonSerializable {
 
     public function mark_lastquestion_failed() {
         $this->responses[$this->lastquestion->id] = [
-            'id' => $this->lastquestion->id,
+            'questionid' => $this->lastquestion->id,
             'fraction' => 0.0,
             'userlastattempttime' => time(),
         ];
@@ -682,6 +700,10 @@ class progress implements JsonSerializable {
     private function get_last_response_for_attempt() {
         $response = catquiz::get_last_response_for_attempt($this->get_usage_id());
         return $response;
+    }
+
+    private function user_gave_up_last_question(): bool {
+        return catquiz::user_gave_up_question($this->get_usage_id(), $this->lastquestion->id);
     }
 
     /**
