@@ -78,6 +78,10 @@ class filterbystandarderror extends preselect_task implements wb_middleware {
             return $next($context);
         }
 
+        if ($this->progress->get_last_question()->is_pilot) {
+            return $next($context);
+        }
+
         $lastquestion = $this->progress->get_last_question();
         $scaleid = $lastquestion->catscaleid;
         $updatedscales = [$scaleid, ...catscale::get_ancestors($scaleid)];
@@ -194,8 +198,9 @@ class filterbystandarderror extends preselect_task implements wb_middleware {
 
     private function check_scale_should_be_dropped(int $scaleid): bool {
         // All played items that belong to the scale or one of its ancestor scales.
+        
         $playeditems = model_item_param_list::from_array(
-            $this->progress->get_playedquestions(true)[$scaleid]
+            $this->progress->without_pilots()->get_playedquestions(true)[$scaleid]
         );
 
         $hasmaxitems = $this->context['max_attempts_per_scale'] !== -1

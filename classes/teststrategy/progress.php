@@ -453,6 +453,14 @@ class progress implements JsonSerializable {
         return $this->playedquestionsbyscale[$scaleid];
     }
 
+    public function without_pilots() {
+        foreach ($this->playedquestionsbyscale as $scaleid => $questions) {
+            $this->playedquestionsbyscale[$scaleid] = array_filter($questions, fn ($q) => !$q->is_pilot);
+        }
+        $this->playedquestions = array_filter($this->playedquestions, fn ($q) => !$q->is_pilot);
+        return $this;
+    }
+
     /**
      * Returns the number of questions played in this attempt.
      *
