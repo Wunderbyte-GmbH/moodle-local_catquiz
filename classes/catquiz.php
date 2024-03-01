@@ -570,6 +570,31 @@ class catquiz {
     }
 
     /**
+     * Shows if a user gave up a question
+     *
+     * @param int $questionusageid
+     * @param int $questionid
+     * @return bool
+     */
+    public static function user_gave_up_question(int $questionusageid, int $questionid): bool {
+        global $DB;
+        $sql = <<<SQL
+        SELECT * FROM {question_attempts} qa
+        JOIN {question_attempt_steps} qas ON qa.id = qas.questionattemptid
+        WHERE qa.questionusageid = :questionusageid
+        AND qa.questionid = :questionid
+        AND qas.state = 'gaveup'
+        SQL;
+        return $DB->record_exists_sql(
+            $sql,
+            [
+                'questionusageid' => $questionusageid,
+                'questionid' => $questionid,
+            ]
+        );
+    }
+
+    /**
      * Returns the SQL to retrieve the number of new responses.
      *
      * Returns the number of new responses since $lastcalclation for a CAT
