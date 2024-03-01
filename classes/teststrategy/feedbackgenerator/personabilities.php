@@ -281,13 +281,12 @@ class personabilities extends feedbackgenerator {
      */
     public function generate_feedback(array $existingdata, $newdata, $dataonly = false): ?array {
         $progress = $newdata['progress'];
-        $personabilities = $progress->get_abilities();
-        if ($personabilities === []) {
+        if (!$progress->get_playedquestions()) {
             return null;
         }
 
         return [
-            'personabilities' => $personabilities,
+            'personabilities' => $progress->get_abilities(),
             'se' => $newdata['se'],
             'playedquestions' => $progress->get_playedquestions(true),
         ];
