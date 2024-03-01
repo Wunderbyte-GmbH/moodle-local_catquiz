@@ -41,6 +41,7 @@ use local_catquiz\teststrategy\preselect_task\fisherinformation;
 use local_catquiz\teststrategy\preselect_task\lasttimeplayedpenalty;
 use local_catquiz\teststrategy\preselect_task\maximumquestionscheck;
 use local_catquiz\teststrategy\preselect_task\mayberemovescale;
+use local_catquiz\teststrategy\preselect_task\maybe_return_pilot;
 use local_catquiz\teststrategy\preselect_task\noremainingquestions;
 use local_catquiz\teststrategy\preselect_task\remove_uncalculated;
 use local_catquiz\teststrategy\preselect_task\removeplayedquestions;
@@ -86,6 +87,7 @@ class teststrategy_fastest extends strategy {
             addscalestandarderror::class,
             maximumquestionscheck::class,
             removeplayedquestions::class,
+            maybe_return_pilot::class,
             remove_uncalculated::class,
             noremainingquestions::class,
             mayberemovescale::class,

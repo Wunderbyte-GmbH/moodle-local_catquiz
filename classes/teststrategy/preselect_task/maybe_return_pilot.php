@@ -67,7 +67,9 @@ final class maybe_return_pilot extends preselect_task implements wb_middleware {
         $shouldreturnpilot = rand(0, 100) <= $context['pilot_ratio'];
         if ($shouldreturnpilot) {
             $context['questions'] = $pilotquestions;
-            return (new strategybalancedscore())->run($context, fn () => "nevercalled");
+            $addattemptstask = new numberofgeneralattempts();
+            $scoretask = new strategybalancedscore();
+            return $addattemptstask->run($context, fn($context) => $scoretask->run($context, fn () => 'nevercalled'));
         } else {
             $context['questions'] = $nonpilotquestions;
         }
