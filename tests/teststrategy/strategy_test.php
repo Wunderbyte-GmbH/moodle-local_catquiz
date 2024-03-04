@@ -137,8 +137,10 @@ class strategy_test extends advanced_testcase {
             ->save_or_update();
 
         if ($settings['pilot_ratio'] ?? false) {
-            // Delete item params for  the first 50 questions.
-            $firstquestions = $DB->get_records('question', null, '', 'id', 0, 50);
+            // Delete item params for the last $numpilots questions.
+            $numpilots = 50;
+            $questioncount = $DB->count_records('question');
+            $firstquestions = $DB->get_records('question', null, '', 'id', $questioncount - $numpilots + 1, $numpilots);
             $DB->delete_records_list('local_catquiz_itemparams', 'componentid', array_keys($firstquestions));
             // Set the random number seed to get reproducible results.
             srand(1);
@@ -267,27 +269,43 @@ class strategy_test extends advanced_testcase {
                     'SimC' => -3.31, // Inherited from parent.
                 ],
             ],
+            // The first 50 questions (SIMA01-00 until SIMA03-09) are considered pilot questions.
+            // After a pilot question, the ability is not changed.
             'radical CAT 1 piloting mode' => [
                 'strategy' => LOCAL_CATQUIZ_STRATEGY_FASTEST,
                 'questions' => [
-                    ['label' => 'SIMA01-00', 'is_correct_response' => false, 'ability_before' => 0.00, 'ability_after' => 0.00],
+                    ['label' => 'SIMC08-11', 'is_correct_response' => false, 'ability_before' => 0.00, 'ability_after' => 0.00], // Pilot.
                     ['label' => 'SIMB01-18', 'is_correct_response' => false, 'ability_before' => 0.00, 'ability_after' => 0.00],
                     ['label' => 'SIMB02-00', 'is_correct_response' => false, 'ability_before' => 0.00, 'ability_after' => -0.39],
                     ['label' => 'SIMA06-09', 'is_correct_response' => false, 'ability_before' => -0.39, 'ability_after' => -0.71],
-                    ['label' => 'SIMA04-00', 'is_correct_response' => false, 'ability_before' => -0.71, 'ability_after' => -1.07],
-                    ['label' => 'SIMA02-02', 'is_correct_response' => false, 'ability_before' => -1.07, 'ability_after' => -1.35],
+                    ['label' => 'SIMC08-12', 'is_correct_response' => false, 'ability_before' => -0.71, 'ability_after' => -1.07], // Pilot.
+                    ['label' => 'SIMC08-13', 'is_correct_response' => false, 'ability_before' => -1.07, 'ability_after' => -1.07], // Pilot.
+                    ['label' => 'SIMA04-00', 'is_correct_response' => false, 'ability_before' => -1.07, 'ability_after' => -1.07],
+                    ['label' => 'SIMC08-14', 'is_correct_response' => false, 'ability_before' => -1.07, 'ability_after' => -1.35], // Pilot.
+                    ['label' => 'SIMA02-02', 'is_correct_response' => false, 'ability_before' => -1.35, 'ability_after' => -1.35],
                     ['label' => 'SIMA04-10', 'is_correct_response' => false, 'ability_before' => -1.35, 'ability_after' => -1.54],
                     ['label' => 'SIMA02-19', 'is_correct_response' => false, 'ability_before' => -1.54, 'ability_after' => -1.77],
                     ['label' => 'SIMA05-04', 'is_correct_response' => false, 'ability_before' => -1.77, 'ability_after' => -1.99],
-                    ['label' => 'SIMA02-08', 'is_correct_response' => false, 'ability_before' => -1.99, 'ability_after' => -2.25],
+                    ['label' => 'SIMC08-15', 'is_correct_response' => false, 'ability_before' => -1.99, 'ability_after' => -2.25], // Pilot.
+                    ['label' => 'SIMC08-16', 'is_correct_response' => false, 'ability_before' => -2.25, 'ability_after' => -2.25], // Pilot.
+                    ['label' => 'SIMC08-17', 'is_correct_response' => false, 'ability_before' => -2.25, 'ability_after' => -2.25], // Pilot.
+                    ['label' => 'SIMA02-08', 'is_correct_response' => false, 'ability_before' => -2.25, 'ability_after' => -2.25],
                     ['label' => 'SIMA02-17', 'is_correct_response' => false, 'ability_before' => -2.25, 'ability_after' => -2.33],
-                    ['label' => 'SIMA05-03', 'is_correct_response' => false, 'ability_before' => -2.33, 'ability_after' => -2.61],
-                    ['label' => 'SIMA05-07', 'is_correct_response' => false, 'ability_before' => -2.61, 'ability_after' => -2.81],
+                    ['label' => 'SIMA05-03', 'is_correct_response' => false, 'ability_before' => -2.33, 'ability_after' => -2.61], // Pilot.
+                    ['label' => 'SIMC08-18', 'is_correct_response' => false, 'ability_before' => -2.61, 'ability_after' => -2.81], // Pilot.
+                    ['label' => 'SIMC08-19', 'is_correct_response' => false, 'ability_before' => -2.81, 'ability_after' => -2.81], // Pilot.
+                    ['label' => 'SIMA05-07', 'is_correct_response' => false, 'ability_before' => -2.81, 'ability_after' => -2.81],
                     ['label' => 'SIMA02-04', 'is_correct_response' => false, 'ability_before' => -2.81, 'ability_after' => -2.97],
-                    ['label' => 'SIMA05-00', 'is_correct_response' => false, 'ability_before' => -2.97, 'ability_after' => -3.07],
-                    ['label' => 'SIMA01-19', 'is_correct_response' => false, 'ability_before' => -3.07, 'ability_after' => -3.14],
-                    ['label' => 'SIMA01-16', 'is_correct_response' => true,  'ability_before' => -3.14, 'ability_after' => -3.22],
-                    ['label' => 'SIMA01-12', 'is_correct_response' => false, 'ability_before' => -3.22, 'ability_after' => -3.48],
+                    ['label' => 'SIMA05-00', 'is_correct_response' => false, 'ability_before' => -2.97, 'ability_after' => -3.07], // Pilot.
+                    ['label' => 'SIMC09-00', 'is_correct_response' => false, 'ability_before' => -3.07, 'ability_after' => -3.14], // Pilot.
+                    ['label' => 'SIMC09-01', 'is_correct_response' => false, 'ability_before' => -3.14, 'ability_after' => -3.14], // Pilot.
+                    ['label' => 'SIMA01-19', 'is_correct_response' => false, 'ability_before' => -3.14, 'ability_after' => -3.14],
+                    ['label' => 'SIMC09-02', 'is_correct_response' => true,  'ability_before' => -3.14, 'ability_after' => -3.22], // Pilot.
+                    ['label' => 'SIMC09-03', 'is_correct_response' => true,  'ability_before' => -3.22, 'ability_after' => -3.22], // Pilot.
+                    ['label' => 'SIMA01-16', 'is_correct_response' => true,  'ability_before' => -3.22, 'ability_after' => -3.22],
+                    ['label' => 'SIMC09-04', 'is_correct_response' => true,  'ability_before' => -3.22, 'ability_after' => -3.48], // Pilot.
+                    ['label' => 'SIMC09-05', 'is_correct_response' => true,  'ability_before' => -3.48, 'ability_after' => -3.48], // Pilot.
+                    ['label' => 'SIMA01-12', 'is_correct_response' => false, 'ability_before' => -3.48, 'ability_after' => -3.48],
                     ['label' => 'SIMA01-13', 'is_correct_response' => true,  'ability_before' => -3.48, 'ability_after' => -3.69],
                     ['label' => 'SIMA01-18', 'is_correct_response' => true,  'ability_before' => -3.69, 'ability_after' => -3.61],
                     ['label' => 'SIMA01-14', 'is_correct_response' => true,  'ability_before' => -3.61, 'ability_after' => -3.54],
@@ -318,7 +336,6 @@ class strategy_test extends advanced_testcase {
                     'SimB' => -3.31,
                     'SimB01' => -3.31,
                     'SimB02' => -3.31,
-                    'SimC' => -3.31, // Inherited from parent.
                 ],
             ],
             'radical CAT 2' => [
