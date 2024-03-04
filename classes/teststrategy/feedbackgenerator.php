@@ -156,7 +156,7 @@ abstract class feedbackgenerator {
         ): array {
 
         $progress = $newdata['progress'];
-        $transformedpersonabilities = self::create_feedbackabilities($progress->get_abilities());
+        $transformedpersonabilities = $newdata['updated_personabilties'];
 
         // TODO: Check this, coming from shortcode.
         if ($feedbackonlyfordefinedscaleid) {
@@ -188,32 +188,6 @@ abstract class feedbackgenerator {
                 $transformedpersonabilities,
                 $newdata
             );
-    }
-
-    /**
-     * Convert personabilities array to more complex structure for filtering.
-     * @param array $simpleabilities
-     *
-     * @return array
-     */
-    public static function create_feedbackabilities(array $simpleabilities): array {
-        $newarray = [];
-        foreach ($simpleabilities as $scaleid => $abilityfloat) {
-            $newarray[$scaleid]['value'] = $abilityfloat;
-        }
-        return $newarray;
-    }
-
-    /**
-     * For testing, this will be overwritten. Returns array of catscales
-     *
-     * @param array $catscaleids
-     *
-     * @return array
-     *
-     */
-    public function get_catscales(array $catscaleids): array {
-        return catquiz::get_catscales($catscaleids);
     }
 
     /**

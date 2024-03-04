@@ -273,15 +273,14 @@ class comparetotestaverage extends feedbackgenerator {
     public function load_data(int $attemptid, array $existingdata, array $newdata): ?array {
         $progress = $newdata['progress'];
         $quizsettings = $existingdata['quizsettings'];
-        $personabilities = $progress->get_abilities();
 
-        if (!$progress->get_abilities()) {
+        if (!$progress->get_playedquestions()) {
             return [];
         }
 
         $personparams = catquiz::get_person_abilities(
             $existingdata['contextid'],
-            array_keys($personabilities)
+            array_keys($newdata['updated_personabilties'])
         );
 
         $personabilitiesfeedbackeditor = $this->select_scales_for_report(

@@ -47,7 +47,6 @@ class customscalefeedback_test extends basic_testcase {
     /**
      * Test that questions of subscales are removed as needed.
      *
-     * @param array $catscales
      * @param array $feedbackdata
      * @param array $expected
      *
@@ -56,19 +55,10 @@ class customscalefeedback_test extends basic_testcase {
      * @throws ExpectationFailedException
      * @dataProvider get_studentfeedback_provider
      */
-    public function test_get_studentfeedback(array $catscales, array $feedbackdata, array $expected) {
+    public function test_get_studentfeedback(array $feedbackdata, array $expected) {
 
         $feedbacksettings = new feedbacksettings(LOCAL_CATQUIZ_STRATEGY_LOWESTSUB);
-        $customscalefeedback = $this->getMockBuilder(customscalefeedback::class)
-            ->onlyMethods([
-                'get_catscales',
-            ])
-            ->setConstructorArgs([$feedbacksettings])
-            ->getMock();
-
-        // Configure the stub.
-        $customscalefeedback->method('get_catscales')
-            ->willReturn($catscales);
+        $customscalefeedback = new customscalefeedback($feedbacksettings);
 
         $output = $customscalefeedback->get_studentfeedback($feedbackdata);
         $this->assertEquals($expected, $output);
@@ -76,41 +66,41 @@ class customscalefeedback_test extends basic_testcase {
 
     public static function get_studentfeedback_provider() {
         return [
-            'lowestskillgap' => [
-                'catscales' => [ '272' => (object) [
-                    'name' => 'Skala 272',
-                    ],
-                ],
-                'feedbackdata' => [
-                    'customscalefeedback_abilities' => [
-                        '272' => [
-                            'value' => "1.5"
+                'lowestskillgap' => [
+                    'feedbackdata' => [
+                        'catscales' => [ '272' => (object) [
+                            'name' => 'Skala 272',
+                            ],
+                        ],
+                        'customscalefeedback_abilities' => [
+                            '272' => [
+                                'value' => "1.5"
+                            ],
+                        ],
+                        'quizsettings' => [
+                            "numberoffeedbackoptionsselect" => "2",
+                            "feedback_scaleid_limit_lower_272_1" => "-3",
+                            "feedback_scaleid_limit_upper_272_1" => "0",
+                            "feedbackeditor_scaleid_272_1" => (object) [
+                                "text" => "<p dir=\"ltr\" style=\"text-align: left;\">adsfafs<\/p>",
+                                "format" => "1",
+                                "itemid" => "903590937",
+                            ],
+                            "feedback_scaleid_limit_lower_272_2" => "0",
+                            "feedback_scaleid_limit_upper_272_2" => "3",
+                            "feedbackeditor_scaleid_272_2" => (object) [
+                                "text" => "<p dir=\"ltr\" style=\"text-align: left;\">adsfafs<\/p>",
+                                "format" => "1",
+                                "itemid" => "903590937",
+                            ],
                         ],
                     ],
-                    'quizsettings' => [
-                        "numberoffeedbackoptionsselect" => "2",
-                        "feedback_scaleid_limit_lower_272_1" => "-3",
-                        "feedback_scaleid_limit_upper_272_1" => "0",
-                        "feedbackeditor_scaleid_272_1" => (object) [
-                            "text" => "<p dir=\"ltr\" style=\"text-align: left;\">adsfafs<\/p>",
-                            "format" => "1",
-                            "itemid" => "903590937",
-                        ],
-                        "feedback_scaleid_limit_lower_272_2" => "0",
-                        "feedback_scaleid_limit_upper_272_2" => "3",
-                        "feedbackeditor_scaleid_272_2" => (object) [
-                            "text" => "<p dir=\"ltr\" style=\"text-align: left;\">adsfafs<\/p>",
-                            "format" => "1",
-                            "itemid" => "903590937",
-                        ],
+                    'expected' => [
+                        'heading' => 'Feedback',
+                        'content' => 'Skala 272: <p dir="ltr" style="text-align: left;">adsfafs<\/p><br/>'
                     ],
-                ],
-                'expected' => [
-                    'heading' => 'Feedback',
-                    'content' => 'Skala 272: <p dir="ltr" style="text-align: left;">adsfafs<\/p><br/>'
                 ]
-            ]
-                ];
+            ];
     }
 
 }
