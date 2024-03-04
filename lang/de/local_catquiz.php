@@ -143,7 +143,7 @@ $string['catquiz_selectteststrategy'] = 'Testzweck';
 
 $string['teststrategy_base'] = 'Basisklase der Teststrategien';
 $string['teststrategy_info'] = 'Info Klasse für Teststrategien';
-$string['teststrategy_fastest'] = 'Radikaler CAT';
+$string['teststrategy_fastest'] = 'CAT';
 $string['teststrategy_balanced'] = 'Moderater CAT';
 $string['pilot_questions'] = 'Pilotfragen';
 $string['inferlowestskillgap'] = 'Unterste Kompetenzlücke diagnostizieren';
