@@ -458,7 +458,6 @@ class feedbacksettings {
         $i = 0;
         $progress = $newdata['progress'];
         $playedquestions = $progress->get_playedquestions();
-        // TODO: Properties richtig ansprechen! Ist ein object und wahrscheinlich auch private.
         foreach ($playedquestions as $componentid => $questionclass) {
             $fraction = $progress->get_fraction_of_question($componentid);
             $f += $fraction;

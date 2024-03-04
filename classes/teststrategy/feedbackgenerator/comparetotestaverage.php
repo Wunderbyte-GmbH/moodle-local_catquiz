@@ -219,7 +219,7 @@ class comparetotestaverage extends feedbackgenerator {
      * @return string
      *
      */
-    private function get_colorgradientstring($quizsettings, $catscaleid): string {
+    private function get_colorgradientstring(object $quizsettings, $catscaleid): string {
         if (!$quizsettings) {
             return "";
         }
@@ -272,7 +272,7 @@ class comparetotestaverage extends feedbackgenerator {
      */
     public function load_data(int $attemptid, array $existingdata, array $newdata): ?array {
         $progress = $newdata['progress'];
-        $quizsettings = (object) $existingdata['quizsettings'];
+        $quizsettings = $existingdata['quizsettings'];
         $personabilities = $progress->get_abilities();
 
         if (!$progress->get_abilities()) {
@@ -367,10 +367,10 @@ class comparetotestaverage extends feedbackgenerator {
             'userabilityposition' => $userabilityposition,
             'comparisontext' => $text,
             'colorbar' => [
-                'colorgradestring' => $this->get_colorgradientstring($quizsettings, $catscaleid),
+                'colorgradestring' => $this->get_colorgradientstring((object) $quizsettings, $catscaleid),
             ],
             'colorbarlegend' => [
-                'feedbackbarlegend' => $this->get_colorbarlegend($quizsettings, $catscaleid),
+                'feedbackbarlegend' => $this->get_colorbarlegend((object) $quizsettings, $catscaleid),
             ],
             'currentability' => get_string('currentability', 'local_catquiz', $catscale->name),
             'currentabilityfellowstudents' => get_string('currentabilityfellowstudents', 'local_catquiz', $catscale->name),
