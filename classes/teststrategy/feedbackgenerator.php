@@ -26,6 +26,7 @@ namespace local_catquiz\teststrategy;
 
 use coding_exception;
 use context_system;
+use local_catquiz\catquiz;
 use UnexpectedValueException;
 
 /**
@@ -201,6 +202,18 @@ abstract class feedbackgenerator {
             $newarray[$scaleid]['value'] = $abilityfloat;
         }
         return $newarray;
+    }
+
+    /**
+     * For testing, this will be overwritten. Returns array of catscales
+     *
+     * @param array $catscaleids
+     *
+     * @return array
+     *
+     */
+    public function get_catscales(array $catscaleids): array {
+        return catquiz::get_catscales($catscaleids);
     }
 
     /**

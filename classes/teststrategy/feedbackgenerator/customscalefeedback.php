@@ -236,18 +236,6 @@ class customscalefeedback extends feedbackgenerator {
         return $text;
     }
 
-
-    /**
-     * For testing, this will be overwritten. Returns array of catscales
-     *
-     * @param array $catscaleids
-     *
-     * @return array
-     *
-     */
-    public function get_catscales(array $catscaleids): array {
-        return catquiz::get_catscales($catscaleids);
-    }
     /**
      * Gets the feedback for the given scale and range.
      *

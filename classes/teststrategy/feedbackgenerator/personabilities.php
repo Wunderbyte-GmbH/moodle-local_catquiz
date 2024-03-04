@@ -198,7 +198,7 @@ class personabilities extends feedbackgenerator {
             return null;
         }
         $quizsettings = $existingdata['quizsettings'];
-        $catscales = catquiz::get_catscales(array_keys($personabilities));
+        $catscales = $this->get_catscales(array_keys($personabilities));
 
         // Make sure that only feedback defined by strategy is rendered.
         $personabilitiesfeedbackeditor = $this->select_scales_for_report(
