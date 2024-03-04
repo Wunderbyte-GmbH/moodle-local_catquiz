@@ -160,14 +160,12 @@ class customscalefeedback extends feedbackgenerator {
             return null;
         }
 
-        $feedbacksettings = $this->feedbacksettings;
-        // Make sure that only feedback for specific scale is rendered.
-        $personabilitiesfeedbackeditor = $feedbacksettings->return_scales_according_to_strategy(
-            (array) $personabilities,
-            (array) $newdata,
-            (array) $quizsettings,
-            $existingdata['teststrategy'],
-            $existingdata['catscaleid']);
+        $personabilitiesfeedbackeditor = $this->select_scales_for_report(
+            $newdata,
+            $this->feedbacksettings,
+            $quizsettings,
+            $existingdata['teststrategy']
+        );
 
         $scalefeedback = [];
         $relevantscalesfound = false;

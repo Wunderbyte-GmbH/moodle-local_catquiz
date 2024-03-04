@@ -133,6 +133,61 @@ abstract class feedbackgenerator {
     }
 
     /**
+     * Set new keys in personabilities array to define scales selected and excluded for report.
+     *
+     * @param array $newdata
+     * @param feedbacksettings $feedbacksettings
+     * @param object $quizsettings
+     * @param int $strategyid
+     * @param int $forcedscaleid
+     * @param bool $feedbackonlyfordefinedscaleid
+     *
+     * @return array
+     *
+     */
+    public function select_scales_for_report(
+        array $newdata,
+        feedbacksettings $feedbacksettings,
+        object $quizsettings,
+        int $strategyid,
+        int $forcedscaleid = 0,
+        bool $feedbackonlyfordefinedscaleid = false
+        ): array {
+
+        $progress = $newdata['progress'];
+        $personabilities = $progress->get_abilities();
+
+        if ($feedbackonlyfordefinedscaleid) {
+            $selectedscale = [];
+            foreach ($personabilities as $catscaleid => $value) {
+                if ($catscaleid == $forcedscaleid) {
+                    $selectedscale[$catscaleid]['value'] = $value;
+                    $selectedscale[$catscaleid]['primary'] = true;
+                } else {
+                    $selectedscale[$catscaleid]['value'] = $value;
+                    $selectedscale[$catscaleid]['excluded'] = true;
+                    $selectedscale[$catscaleid]['error']['otherscaleforced'] = [
+                        'currentscale' => $catscaleid,
+                        'selectedscale' => $forcedscaleid,
+                    ];
+
+                }
+            }
+            return $selectedscale;
+        }
+
+        $personabilities = $feedbacksettings->filter_excluded_scales($personabilities, (array) $quizsettings);
+
+        $feedbacksettings->set_params_from_attempt($newdata, (array) $quizsettings);
+        return info::get_teststrategy($strategyid)
+            ->select_scales_for_report(
+                $feedbacksettings,
+                (array) $personabilities,
+                $newdata
+            );
+    }
+
+    /**
      * Returns a fallback if no feedback can be generated.
      *
      * @return array
