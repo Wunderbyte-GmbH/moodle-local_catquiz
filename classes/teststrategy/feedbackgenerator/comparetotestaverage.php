@@ -284,16 +284,6 @@ class comparetotestaverage extends feedbackgenerator {
             array_keys($personabilities)
         );
 
-        // TODO: Selection of scales can be overruled by scale defined in shortcode.
-        // $this->primaryscale can be a scaleid or the constant defining which lowest/strongest etc.
-
-        // $selectedscalearray = $this->feedbacksettings->get_scaleid_and_stringkey(
-        //     $personabilities,
-        //     $quizsettings,
-        //     $this->primaryscaleid);
-
-        // Make sure that only feedback defined by strategy is rendered.
-
         $personabilitiesfeedbackeditor = $this->select_scales_for_report(
             $newdata,
             $this->feedbacksettings,
@@ -315,10 +305,7 @@ class comparetotestaverage extends feedbackgenerator {
         }
 
         if (empty($catscaleid) || !isset($ability)) {
-            // TODO: Error for no scale found?
-            return [
-                'contextid' => $existingdata['contextid'],
-            ];
+            return [];
         };
         $catscale = catscale::return_catscale_object($catscaleid);
 
