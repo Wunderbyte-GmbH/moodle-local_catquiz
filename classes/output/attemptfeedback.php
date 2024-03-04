@@ -224,6 +224,7 @@ class attemptfeedback implements renderable, templatable {
         // Get the data required to generate the feedback. This can be saved to
         // the DB.
         $feedbackdata = $existingdata;
+        $newdata = $this->add_default_data($newdata);
         foreach ($generators as $generator) {
             $generatordata = $generator->load_data($this->attemptid, $existingdata, $newdata);
             if (! $generatordata) {
@@ -237,6 +238,25 @@ class attemptfeedback implements renderable, templatable {
 
         return $feedbackdata;
     }
+
+    /**
+     * Change format of personabilities.
+     *
+     * @param array $newdata
+     *
+     * @return array
+     *
+     */
+    private function add_default_data(array $newdata): array {
+        $newarray = [];
+        foreach ($newdata['personabilties'] as $scaleid => $abilityfloat) {
+            $newarray[$scaleid]['value'] = $abilityfloat;
+        };
+        $newdata['updated_personabilties'] = $newarray;
+        $newdata['catscales'] = catquiz::get_catscales(array_keys($newarray));
+        return $newdata;
+    }
+
 
     /**
      * Gets feedback generators for teststrategy.

@@ -88,7 +88,8 @@ class customscalefeedback extends feedbackgenerator {
         }
         $customscalefeedback = $this->get_customscalefeedback_for_abilities_in_range(
             $data['customscalefeedback_abilities'],
-            $data['quizsettings']
+            $data['quizsettings'],
+            $data['catscales']
         );
 
         if (empty($customscalefeedback)) {
@@ -190,7 +191,8 @@ class customscalefeedback extends feedbackgenerator {
      */
     private function get_customscalefeedback_for_abilities_in_range(
         array $personabilities,
-        array $quizsettings
+        array $quizsettings,
+        array $catscales
         ): string {
         $scalefeedback = [];
         $relevantscalesfound = false;
@@ -227,11 +229,11 @@ class customscalefeedback extends feedbackgenerator {
             return get_string('nofeedback', 'local_catquiz');
         }
 
-        $catscales = $this->get_catscales(array_keys($scalefeedback));
         $text = "";
 
         foreach ($scalefeedback as $scaleid => $value) {
-            $text .= $catscales[$scaleid]->name . ': ' . $value . '<br/>';
+            $scale = (array) $catscales[$scaleid];
+            $text .= $scale['name'] . ': ' . $value . '<br/>';
         }
         return $text;
     }
