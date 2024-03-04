@@ -179,6 +179,15 @@ class customscalefeedback extends feedbackgenerator {
         ];
     }
 
+    /**
+     * Customscalefeedback defined in quizsettings will be returned if ability is within defined range.
+     *
+     * @param array $personabilities
+     * @param array $quizsettings
+     *
+     * @return string
+     *
+     */
     private function get_customscalefeedback_for_abilities_in_range(
         array $personabilities,
         array $quizsettings

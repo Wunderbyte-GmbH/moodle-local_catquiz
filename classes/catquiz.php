@@ -15,11 +15,10 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Entities Class to display list of entity records.
+ * Catquiz class.
  *
  * @package local_catquiz
- * @author Thomas Winkler
- * @copyright 2021 Wunderbyte GmbH
+ * @copyright 2024 Wunderbyte GmbH
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 

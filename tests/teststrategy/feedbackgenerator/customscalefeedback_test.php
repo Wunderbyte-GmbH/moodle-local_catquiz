@@ -33,7 +33,7 @@ use SebastianBergmann\RecursionContext\InvalidArgumentException;
 use UnexpectedValueException;
 
 /**
- * Tests the filterforsubscale class.
+ * Tests the feedbackgenerator customscalefeedback.
  *
  * @package    local_catquiz
  * @author     David Szkiba, Magdalena Holczik
