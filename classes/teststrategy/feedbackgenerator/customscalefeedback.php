@@ -81,16 +81,22 @@ class customscalefeedback extends feedbackgenerator {
      * @return array
      *
      */
-    protected function get_studentfeedback(array $data): array {
+    public function get_studentfeedback(array $data): array {
 
-        $feedback = $data['customscalefeedback'];
+        if (!$data['customscalefeedback_abilities'] ?? false) {
+            return [];
+        }
+        $customscalefeedback = $this->get_customscalefeedback_for_abilities_in_range(
+            $data['customscalefeedback_abilities'],
+            $data['quizsettings']
+        );
 
-        if (empty($feedback)) {
+        if (empty($customscalefeedback)) {
             return [];
         } else {
             return [
                 'heading' => $this->get_heading(),
-                'content' => $feedback,
+                'content' => $customscalefeedback,
             ];
         }
     }
@@ -116,8 +122,7 @@ class customscalefeedback extends feedbackgenerator {
     public function get_required_context_keys(): array {
         return [
             'quizsettings',
-            'personabilities',
-            'customscalefeedback',
+            'customscalefeedback_abilities',
         ];
     }
 
@@ -167,9 +172,22 @@ class customscalefeedback extends feedbackgenerator {
             $existingdata['teststrategy']
         );
 
+        return [
+            'quizsettings' => $quizsettings,
+            'personabilities' => $personabilities,
+            'customscalefeedback_abilities' => $personabilitiesfeedbackeditor,
+        ];
+    }
+
+    private function get_customscalefeedback_for_abilities_in_range(
+        array $personabilities,
+        array $quizsettings
+        ): string {
         $scalefeedback = [];
         $relevantscalesfound = false;
-        foreach ($personabilitiesfeedbackeditor as $catscaleid => $personability) {
+        // Feedback for all scales is reported here, except for excluded scales.
+        // Feedback for primary scale is handled equally.
+        foreach ($personabilities as $catscaleid => $personability) {
             if (isset($personability['excluded']) && $personability['excluded']) {
                 continue;
             }
@@ -195,29 +213,32 @@ class customscalefeedback extends feedbackgenerator {
 
         if (! $scalefeedback) {
             if (!$relevantscalesfound) {
-                return [
-                    'customscalefeedback' => get_string('noscalesfound', 'local_catquiz'),
-                ];
+                return  get_string('noscalesfound', 'local_catquiz');
             }
-            return [
-                'customscalefeedback' => get_string('nofeedback', 'local_catquiz'),
-            ];
+            return get_string('nofeedback', 'local_catquiz');
         }
 
-        $catscales = catquiz::get_catscales(array_keys($scalefeedback));
+        $catscales = $this->get_catscales(array_keys($scalefeedback));
         $text = "";
 
         foreach ($scalefeedback as $scaleid => $value) {
             $text .= $catscales[$scaleid]->name . ': ' . $value . '<br/>';
         }
-
-        return [
-            'customscalefeedback' => $text,
-            'quizsettings' => $quizsettings,
-            'personabilities' => $personabilities,
-        ];
+        return $text;
     }
 
+
+    /**
+     * For testing, this will be overwritten. Returns array of catscales
+     *
+     * @param array $catscaleids
+     *
+     * @return array
+     *
+     */
+    public function get_catscales(array $catscaleids): array {
+        return catquiz::get_catscales($catscaleids);
+    }
     /**
      * Gets the feedback for the given scale and range.
      *

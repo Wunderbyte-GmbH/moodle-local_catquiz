@@ -61,7 +61,7 @@ class questionssummary extends feedbackgenerator {
      * @return array
      *
      */
-    protected function get_studentfeedback(array $data): array {
+    public function get_studentfeedback(array $data): array {
         global $OUTPUT;
         $feedback = $OUTPUT->render_from_template('local_catquiz/feedback/questionssummary', $data);
 
