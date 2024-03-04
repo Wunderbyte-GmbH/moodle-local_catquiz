@@ -280,7 +280,7 @@ class feedbacksettings {
         if ($teststrategyid === LOCAL_CATQUIZ_DEFAULT_NONSENSE_TESTSTRATEGY) {
             $teststrategyid = $this->strategyid;
         }
-        // TODO: Check this below!
+        // TODO: Shortcode logic!
         if ($feedbackonlyfordefinedscaleid) {
             foreach ($personabilities as $key => $value) {
                 if ($key == $catscaleid) {
