@@ -428,7 +428,7 @@ class feedbacksettings {
      * @return array
      *
      */
-    private function filter_excluded_scales(array $personabilities, array $quizsettings): array {
+    public function filter_excluded_scales(array $personabilities, array $quizsettings): array {
         foreach ($personabilities as $catscale => $array) {
             if (empty($quizsettings['catquiz_scalereportcheckbox_' . $catscale])) {
                 $personabilities[$catscale]['excluded'] = true;
@@ -447,7 +447,7 @@ class feedbacksettings {
      * @return void
      *
      */
-    private function set_params_from_attempt(array $newdata, array $quizsettings): void {
+    public function set_params_from_attempt(array $newdata, array $quizsettings): void {
         $this->semax = (float) $newdata['se_max'];
         $this->semin = (float) $newdata['se_min'];
         $this->nmintest = (int) $quizsettings['maxquestionsgroup']['catquiz_minquestions'];
