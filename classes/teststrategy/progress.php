@@ -453,12 +453,18 @@ class progress implements JsonSerializable {
         return $this->playedquestionsbyscale[$scaleid];
     }
 
+    /**
+     * Returns a clone of the progress class with pilot questions removed
+     *
+     * @return self
+     */
     public function without_pilots() {
-        foreach ($this->playedquestionsbyscale as $scaleid => $questions) {
-            $this->playedquestionsbyscale[$scaleid] = array_filter($questions, fn ($q) => !$q->is_pilot);
+        $filteredprogress = clone $this;
+        foreach ($filteredprogress->playedquestionsbyscale as $scaleid => $questions) {
+            $filteredprogress->playedquestionsbyscale[$scaleid] = array_filter($questions, fn ($q) => !$q->is_pilot);
         }
-        $this->playedquestions = array_filter($this->playedquestions, fn ($q) => !$q->is_pilot);
-        return $this;
+        $filteredprogress->playedquestions = array_filter($filteredprogress->playedquestions, fn ($q) => !$q->is_pilot);
+        return $filteredprogress;
     }
 
     /**
