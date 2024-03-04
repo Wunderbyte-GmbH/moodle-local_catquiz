@@ -102,7 +102,7 @@ class personabilities extends feedbackgenerator {
      * @return array
      *
      */
-    protected function get_studentfeedback(array $feedbackdata): array {
+    public function get_studentfeedback(array $feedbackdata): array {
 
         $feedback = $feedbackdata['personabilitiesfeedback'];
         if (empty($feedback)) {
