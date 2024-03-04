@@ -30,6 +30,7 @@ use local_catquiz\catscale;
 use local_catquiz\feedback\feedbackclass;
 use local_catquiz\teststrategy\feedbackgenerator;
 use local_catquiz\teststrategy\feedbacksettings;
+use local_catquiz\teststrategy\info;
 use local_catquiz\teststrategy\preselect_task\firstquestionselector;
 
 defined('MOODLE_INTERNAL') || die();
@@ -292,14 +293,16 @@ class comparetotestaverage extends feedbackgenerator {
         //     $this->primaryscaleid);
 
         // Make sure that only feedback defined by strategy is rendered.
-        $personabilitiesfeedbackeditor = $this->feedbacksettings->return_scales_according_to_strategy(
-            (array) $personabilities,
-            (array) $newdata,
-            (array) $quizsettings,
-            $existingdata['teststrategy'],
-            $existingdata['catscaleid']);
+
+        $personabilitiesfeedbackeditor = $this->select_scales_for_report(
+            $newdata,
+            $this->feedbacksettings,
+            $quizsettings,
+            $existingdata['teststrategy']
+        );
 
         $catscaleid = 0;
+        // Maybe move this to parent class.
         foreach ($personabilitiesfeedbackeditor as $catscale => $personability) {
             if (isset($personability['excluded']) && $personability['excluded']) {
                 continue;
