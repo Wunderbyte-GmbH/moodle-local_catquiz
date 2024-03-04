@@ -472,6 +472,7 @@ $string['abilityprofile'] = 'Fähigkeits-Score Profil in "{$a}"';
 $string['feedback_customscale_nofeedback'] = 'Es wurde kein Feedback für ihre Ergebnisse angegeben';
 $string['noscalesfound'] = 'Es konnte zu keiner Skala ein valides Ergebnis gefunden werden.';
 $string['noscalesfound'] = 'Es konnte zu kein valides Ergebnis gefunden werden.';
+$string['noscalesfound'] = 'Es konnte kein valides Ergebnis gefunden werden.';
 $string['nofeedback'] = 'Kein Feedback angegeben.';
 
 // Chart in Feedback.
