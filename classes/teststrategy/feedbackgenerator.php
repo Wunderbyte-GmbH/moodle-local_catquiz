@@ -137,7 +137,7 @@ abstract class feedbackgenerator {
      *
      * @param array $newdata
      * @param feedbacksettings $feedbacksettings
-     * @param object $quizsettings
+     * @param array $quizsettings
      * @param int $strategyid
      * @param int $forcedscaleid
      * @param bool $feedbackonlyfordefinedscaleid
@@ -148,7 +148,7 @@ abstract class feedbackgenerator {
     public function select_scales_for_report(
         array $newdata,
         feedbacksettings $feedbacksettings,
-        object $quizsettings,
+        array $quizsettings,
         int $strategyid,
         int $forcedscaleid = 0,
         bool $feedbackonlyfordefinedscaleid = false
