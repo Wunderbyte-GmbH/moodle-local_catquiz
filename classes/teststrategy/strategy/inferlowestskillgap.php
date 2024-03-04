@@ -168,10 +168,10 @@ class inferlowestskillgap extends strategy {
                 $returnarray[$scaleid] = [
                     'value' => $array['value'],
                     'excluded' => true,
-                    'error' => [
-                        'fraction' => $feedbacksettings->fraction,
-                        'expected' => '< 1',
-                    ],
+                ];
+                $returnarray[$scaleid]['error']['fraction'] = [
+                    'fraction' => $feedbacksettings->fraction,
+                    'expected' => '< 1',
                 ];
             }
             return $returnarray;
