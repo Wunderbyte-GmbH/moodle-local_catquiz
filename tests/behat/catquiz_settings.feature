@@ -113,8 +113,8 @@ Feature: As a teacher I setup adaptive quiz with CATquiz Scales and Feedbacks.
       | activity     | name             | course | section | idnumber         |
       | adaptivequiz | Adaptive CATquiz | C1     | 1       | adaptivecatquiz1 |
     And the following "local_catquiz > testsettings" exist:
-      | course | adaptivecatquiz  | catmodel | catscales  | cateststrategy      | catquiz_selectfirstquestion | catquiz_maxquestions | catquiz_standarderror_min | catquiz_standarderror_max | numberoffeedbackoptions |
-      | C1     | adaptivecatquiz1 | catquiz  | Simulation | Infer all subscales | startwitheasiestquestion    | 7                    | 0.4                       | 0.6                       | 3                       |
+      | course | adaptivecatquiz  | catmodel | catscales  | cateststrategy         | catquiz_selectfirstquestion | catquiz_maxquestions | catquiz_standarderror_min | catquiz_standarderror_max | numberoffeedbackoptions |
+      | C1     | adaptivecatquiz1 | catquiz  | Simulation | Infer lowest skill gap | startwitheasiestquestion    | 7                    | 0.4                       | 0.6                       | 3                       |
     And I am on the "adaptivecatquiz1" Activity page logged in as teacher1
     And I follow "Settings"
     And I click on "Feedback for \"Simulation\"" "text"
@@ -136,7 +136,7 @@ Feature: As a teacher I setup adaptive quiz with CATquiz Scales and Feedbacks.
       | catmodel                                   | Catquiz CAT model         |
       | Select CAT scale                           | Simulation                |
       | Passing level in %                         | 500                       |
-      | Purpose of test                            | Infer all subscales       |
+      | Purpose of test                            | Infer lowest skill gap    |
       | Activate pilot mode                        | 1                         |
       | Proportion of questions to be piloted in % | 20                        |
       | Start new CAT test with                    | Use the average ability score of the current test |
@@ -191,7 +191,7 @@ Feature: As a teacher I setup adaptive quiz with CATquiz Scales and Feedbacks.
       | catmodel                                   | Catquiz CAT model         |
       | Select CAT scale                           | Simulation                |
       | Passing level in %                         | 50                        |
-      | Purpose of test                            | Infer all subscales       |
+      | Purpose of test                            | Infer lowest skill gap    |
       | Activate pilot mode                        | 1                         |
       | Proportion of questions to be piloted in % | 20                        |
       | Start new CAT test with                    | Use the average ability score of the current test |

@@ -30,8 +30,8 @@ Feature: As a admin I want to manage CAT scales along with obtained attempts dat
       | activity     | name             | course | section | idnumber         | intro               |
       | adaptivequiz | My Adaptive Quiz | C1     | 1       | adaptivecatquiz1 | Adaptive Quiz Intro |
     And the following "local_catquiz > testsettings" exist:
-      | course | adaptivecatquiz  | catmodel | catscales  | cateststrategy      | catquiz_selectfirstquestion | catquiz_maxquestions | catquiz_standarderror_min | catquiz_standarderror_max | numberoffeedbackoptions |
-      | C1     | adaptivecatquiz1 | catquiz  | Simulation | Infer all subscales | startwitheasiestquestion    | 4                    | 0.4                       | 0.6                       | 2                       |
+      | course | adaptivecatquiz  | catmodel | catscales  | cateststrategy         | catquiz_selectfirstquestion | catquiz_maxquestions | catquiz_standarderror_min | catquiz_standarderror_max | numberoffeedbackoptions |
+      | C1     | adaptivecatquiz1 | catquiz  | Simulation | Infer lowest skill gap | startwitheasiestquestion    | 4                    | 0.4                       | 0.6                       | 2                       |
     ## Below steps are required to save a correct JSON settings
     And I am on the "adaptivecatquiz1" Activity page logged in as teacher
     And I follow "Settings"
@@ -91,4 +91,4 @@ Feature: As a admin I want to manage CAT scales along with obtained attempts dat
     And I should see "Course 1" in the "#quizattemptstable_r1" "css_element"
     And I should see "adaptivequiz" in the "#quizattemptstable_r1" "css_element"
     And I should see "Dummy Quiz" in the "#quizattemptstable_r1" "css_element"
-    And I should see "Infer all subscales" in the "#quizattemptstable_r1" "css_element"
+    And I should see "Infer lowest skill gap" in the "#quizattemptstable_r1" "css_element"

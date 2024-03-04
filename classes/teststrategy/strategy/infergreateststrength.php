@@ -66,6 +66,11 @@ require_once($CFG->dirroot . '/local/catquiz/lib.php');
 class infergreateststrength extends strategy {
 
     /**
+     * Hide until tested.
+     */
+    public const ACTIVE = false;
+
+    /**
      *
      * @var int $id // strategy id defined in lib.
      */
