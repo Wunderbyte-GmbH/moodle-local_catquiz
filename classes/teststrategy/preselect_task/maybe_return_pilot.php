@@ -68,8 +68,13 @@ final class maybe_return_pilot extends preselect_task implements wb_middleware {
         if ($shouldreturnpilot) {
             $context['questions'] = $pilotquestions;
             $addattemptstask = new numberofgeneralattempts();
+            $lasttimeplayedpenaltytask = new lasttimeplayedpenalty();
             $scoretask = new strategybalancedscore();
-            return $addattemptstask->run($context, fn($context) => $scoretask->run($context, fn () => 'nevercalled'));
+            return $addattemptstask->run(
+                $context, fn($context) => $lasttimeplayedpenaltytask->run(
+                    $context, fn($context) => $scoretask->run($context, fn () => 'nevercalled')
+                    )
+            );
         } else {
             $context['questions'] = $nonpilotquestions;
         }
