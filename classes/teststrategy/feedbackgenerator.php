@@ -42,7 +42,7 @@ abstract class feedbackgenerator {
      * @param array $data
      * @return array
      */
-    abstract protected function get_studentfeedback(array $data): array;
+    abstract public function get_studentfeedback(array $data): array;
 
     /**
      * Returns an array with two keys 'heading' and 'context'.

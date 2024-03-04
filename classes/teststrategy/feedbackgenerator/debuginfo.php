@@ -63,7 +63,7 @@ class debuginfo extends feedbackgenerator {
      * @return array
      *
      */
-    protected function get_studentfeedback(array $data): array {
+    public function get_studentfeedback(array $data): array {
         return [];
     }
 
