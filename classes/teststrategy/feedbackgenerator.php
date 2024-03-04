@@ -155,11 +155,12 @@ abstract class feedbackgenerator {
         ): array {
 
         $progress = $newdata['progress'];
-        $personabilities = $progress->get_abilities();
+        $transformedpersonabilities = self::create_feedbackabilities($progress->get_abilities());
 
+        // TODO: Check this, coming from shortcode.
         if ($feedbackonlyfordefinedscaleid) {
             $selectedscale = [];
-            foreach ($personabilities as $catscaleid => $value) {
+            foreach ($transformedpersonabilities as $catscaleid => $value) {
                 if ($catscaleid == $forcedscaleid) {
                     $selectedscale[$catscaleid]['value'] = $value;
                     $selectedscale[$catscaleid]['primary'] = true;
@@ -176,15 +177,30 @@ abstract class feedbackgenerator {
             return $selectedscale;
         }
 
-        $personabilities = $feedbacksettings->filter_excluded_scales($personabilities, (array) $quizsettings);
+        $transformedpersonabilities = $feedbacksettings->filter_excluded_scales($transformedpersonabilities, $quizsettings);
 
-        $feedbacksettings->set_params_from_attempt($newdata, (array) $quizsettings);
+        $feedbacksettings->set_params_from_attempt($newdata, $quizsettings);
+
         return info::get_teststrategy($strategyid)
             ->select_scales_for_report(
                 $feedbacksettings,
-                (array) $personabilities,
+                $transformedpersonabilities,
                 $newdata
             );
+    }
+
+    /**
+     * Convert personabilities array to more complex structure for filtering.
+     * @param array $simpleabilities
+     *
+     * @return array
+     */
+    public static function create_feedbackabilities(array $simpleabilities): array {
+        $newarray = [];
+        foreach ($simpleabilities as $scaleid => $abilityfloat) {
+            $newarray[$scaleid]['value'] = $abilityfloat;
+        }
+        return $newarray;
     }
 
     /**
