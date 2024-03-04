@@ -666,7 +666,7 @@ class progress implements JsonSerializable {
         if (!isset($this->abilities[$catscaleid])) {
             $this->abilities[$catscaleid] = [];
         }
-        $this->abilities[$catscaleid]['value'] = $ability;
+        $this->abilities[$catscaleid] = $ability;
 
         return $this;
     }
