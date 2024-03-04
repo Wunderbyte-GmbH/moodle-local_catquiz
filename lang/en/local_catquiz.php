@@ -133,7 +133,7 @@ $string['catquiz_selectteststrategy'] = 'Purpose of test';
 
 $string['teststrategy_base'] = 'Base class for test strategies';
 $string['teststrategy_info'] = 'Info class for test strategies';
-$string['teststrategy_fastest'] = 'Radical CAT';
+$string['teststrategy_fastest'] = 'CAT';
 $string['teststrategy_balanced'] = 'Moderate CAT';
 $string['pilot_questions'] = 'Pilot questions';
 $string['inferlowestskillgap'] = 'Infer lowest skill gap';
