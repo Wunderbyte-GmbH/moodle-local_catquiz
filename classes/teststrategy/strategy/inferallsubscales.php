@@ -59,6 +59,11 @@ use local_catquiz\teststrategy\strategy;
 class inferallsubscales extends strategy {
 
     /**
+     * Hide until tested.
+     */
+    public const ACTIVE = false;
+
+    /**
      *
      * @var int $id // strategy id defined in lib.
      */

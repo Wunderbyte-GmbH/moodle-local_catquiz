@@ -100,6 +100,7 @@ class info {
         $classnames = array_keys($strategies);
 
         $strategies = array_map(fn($x) => new $x(), $classnames);
+        $strategies = array_filter($strategies, fn ($strategy) => $strategy::ACTIVE);
 
         $cache->set('all', $strategies);
         foreach ($strategies as $strategy) {

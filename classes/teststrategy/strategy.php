@@ -49,6 +49,12 @@ use stdClass;
 abstract class strategy {
 
     /**
+     * This can be overwritten by strategies to make them unavailable.
+     */
+    public const ACTIVE = true;
+
+
+    /**
      *
      * @var int $id // strategy id defined in lib.
      */
