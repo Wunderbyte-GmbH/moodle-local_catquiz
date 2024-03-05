@@ -75,11 +75,14 @@ class filterbytestinfo extends preselect_task implements wb_middleware {
             }
 
             $allitems = model_item_param_list::from_array(
-                $this->context['questionsperscale'][$scaleid]
+                array_filter(
+                    $this->context['questionsperscale'][$scaleid],
+                    fn ($q) => !$q->is_pilot
+                )
             );
             $remainingitems = clone ($allitems);
             $playeditems = model_item_param_list::from_array(
-                $this->progress->get_playedquestions(true, $scaleid)
+                $this->progress->without_pilots()->get_playedquestions(true, $scaleid)
             );
             foreach ($remainingitems as $i) {
                 if (in_array($i->get_id(), $playeditems->get_item_ids())) {
