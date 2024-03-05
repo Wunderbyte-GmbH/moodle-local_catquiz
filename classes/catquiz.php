@@ -1716,7 +1716,7 @@ class catquiz {
                     // The first element at array key 0 is a dummy value to
                     // display some message like "please select course" in the
                     // form and has a course ID of 0.
-                    $coursestoenrol = array_filter($coursestoenrol, fn ($v) => $v != 0);
+                    $coursestoenrol = array_filter($coursestoenrol, fn ($v) => $v);
                     foreach ($coursestoenrol as $courseid) {
                         $context = \context_course::instance($courseid);
                         $course = get_course($courseid);
