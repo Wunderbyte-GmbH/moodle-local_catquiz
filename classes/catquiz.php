@@ -1665,18 +1665,12 @@ class catquiz {
         array $personabilities) {
         global $DB;
 
-        // $personabilitiesfeedbackeditor = $this->feedbacksettings->return_scales_according_to_strategy(
-        //     (array) $personabilities,
-        //     (array) $newdata,
-        //     (array) $quizsettings,
-        //     $existingdata['teststrategy'],
-        //     $existingdata['catscaleid']);
-        // Enrolement is applied according to test strategy.
-        // TODO: Enrolement!!
-        /*
-        */
+        // Filter for scales that are selected for enrolement.
 
         foreach ($personabilities as $catscaleid => $personabilityarray) {
+            if (!isset($personabilityarray['primary'])) {
+                continue;
+            }
             $i = 1;
             $personabilityarray = (array) $personabilityarray;
             $personability = (float) $personabilityarray['value'];
