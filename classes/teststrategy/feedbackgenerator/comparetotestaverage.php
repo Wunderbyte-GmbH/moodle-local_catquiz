@@ -280,7 +280,7 @@ class comparetotestaverage extends feedbackgenerator {
 
         $personparams = catquiz::get_person_abilities(
             $existingdata['contextid'],
-            array_keys($newdata['updated_personabilties'])
+            array_keys($newdata['updated_personabilities'])
         );
 
         $personabilitiesfeedbackeditor = $this->select_scales_for_report(
