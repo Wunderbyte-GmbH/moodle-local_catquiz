@@ -161,6 +161,7 @@ abstract class strategy {
         if ($result->isErr()) {
             $cache->set('endtime', time());
             $cache->set('catquizerror', $result->get_status());
+            $this->progress->save();
             return $result;
         }
 
