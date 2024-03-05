@@ -847,7 +847,7 @@ class catquiz_handler {
         cm_info $cm,
         stdClass $attemptrecord): string {
         // Update the endtime and number of testitems used in the attempts table.
-        global $DB;
+        global $DB, $COURSE;
         $id = $DB->get_record('local_catquiz_attempts', ['attemptid' => $attemptrecord->id], 'id')->id;
         $data = (object) [
             'id' => $id,
@@ -861,10 +861,14 @@ class catquiz_handler {
         if (($errormsg = $cache->get('catquizerror')) && $attemptrecord->questionsattempted == 0) {
             return get_string($errormsg, 'local_catquiz');
         }
-
         // If we are here, at least one question was played and we can provide feedback.
-        return self::attemptfeedback(
-            $attemptrecord
+        $contextid = optional_param('context', 0, PARAM_INT);
+        $attemptfeedback = new attemptfeedback($attemptrecord->id, $contextid, null, $COURSE->id);
+        $attemptfeedback->attempt_finished_tasks();
+
+        return self::render_attemptfeedback(
+            $attemptrecord,
+            $attemptfeedback
         );
     }
 
@@ -872,15 +876,14 @@ class catquiz_handler {
      * Attempt feedback.
      *
      * @param stdClass $attemptrecord
+     * @param attemptfeedback $attemptfeedback
      *
      * @return string
      *
      */
-    private static function attemptfeedback(stdClass $attemptrecord): string {
-        global $OUTPUT, $COURSE;
-        $contextid = optional_param('context', 0, PARAM_INT);
+    private static function render_attemptfeedback(stdClass $attemptrecord, attemptfeedback $attemptfeedback): string {
+        global $OUTPUT;
 
-        $attemptfeedback = new attemptfeedback($attemptrecord->id, $contextid, null, $COURSE->id);
         $data = $attemptfeedback->export_for_template($OUTPUT);
 
         // We need to delete caches.

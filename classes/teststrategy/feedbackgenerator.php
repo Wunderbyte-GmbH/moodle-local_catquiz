@@ -155,7 +155,6 @@ abstract class feedbackgenerator {
         bool $feedbackonlyfordefinedscaleid = false
         ): array {
 
-        $progress = $newdata['progress'];
         $transformedpersonabilities = $newdata['updated_personabilities'];
 
         // TODO: Check this, coming from shortcode.
