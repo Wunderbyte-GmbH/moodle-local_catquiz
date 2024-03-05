@@ -394,8 +394,11 @@ class feedbacksettings {
         // Find average fraction.
         $f = 0.0;
         $i = 0;
-
-        $progress = progress::load($newdata['attemptid'], $newdata['component'], $newdata['contextid']);
+        if ($newdata['progress'] instanceof progress) {
+            $progress = $newdata['progress'];
+        } else {
+            $progress = progress::load($newdata['attemptid'], $newdata['component'], $newdata['contextid']);
+        }
         $playedquestions = $progress->get_playedquestions();
         foreach ($playedquestions as $componentid => $questionclass) {
             $fraction = $progress->get_fraction_of_question($componentid);
