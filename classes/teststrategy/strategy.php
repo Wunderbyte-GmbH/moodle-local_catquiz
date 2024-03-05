@@ -202,30 +202,7 @@ abstract class strategy {
 
         $attemptfeedback = new attemptfeedback($context['attemptid'], $context['contextid']);
 
-        $context['personabilites'] = $this->restructure_abilities_array($context);
-
         $attemptfeedback->update_feedbackdata($context);
-    }
-
-    /**
-     * Restructures array of personabilites to be compatible with feedbackgenerators.
-     *
-     * @param array $context
-     *
-     * @return array
-     *
-     */
-    private function restructure_abilities_array($context): array {
-        $newarray = [];
-        if (empty($context['person_ability'])) {
-            return $newarray;
-        }
-        foreach ($context['person_ability'] as $scaleid => $ability) {
-            $newarray[$scaleid] = [
-                'value' => $ability,
-            ];
-        }
-        return $newarray;
     }
 
     /**
