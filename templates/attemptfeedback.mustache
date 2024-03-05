@@ -39,17 +39,28 @@
         }
     }
 }}
+
+
 {{#feedback}}
     {{#studentfeedback}}
-        {{#frontpage}}
-            <h3>{{heading}}</h3>
-            <div>{{{content}}}</div>
-        {{/frontpage}}
-        {{#othertabs}}
-            <div id="catquiz_othertabs" style="display:none">
-                <h3>{{heading}}</h3>
-                <div>{{{content}}}</div>
+    {{#frontpage}}
+        <h3>{{heading}}</h3>
+        <div>{{{content}}}</div>
+    {{/frontpage}}
+    {{^frontpage}}
+        <ul class="nav nav-tabs" id="myTab" role="tablist">
+            <li class="nav-item">
+                <a class="nav-link active" id="{{generatorname}}-tab" data-toggle="tab" href="#lcq_{{generatorname}}" role="tab" aria-controls="lcq_{{generatorname}}">
+                {{heading}}</a>
+            </li>
+        </ul>
+
+        <div class="tab-content" id="myTabContent">
+            <div class="tab-pane fade show active" id="lcq_{{generatorname}}" role="tabpanel" aria-labelledby="{{generatorname}}-tab">
+                {{{content}}}
             </div>
-        {{/othertabs}}
+        </div>
+    {{/frontpage}}
     {{/studentfeedback}}
+    {{#teacherfeedback.0}}
 {{/feedback}}
