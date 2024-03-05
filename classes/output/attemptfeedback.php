@@ -336,7 +336,6 @@ class attemptfeedback implements renderable, templatable {
      */
     public function export_for_template(\renderer_base $output): array {
 
-        // 2. Return the feedback.
         return [
             'feedback' => $this->get_feedback_for_attempt(),
         ];
@@ -349,8 +348,6 @@ class attemptfeedback implements renderable, templatable {
         global $USER;
         $progress = progress::load($this->attemptid, 'mod_adaptivequiz', $this->contextid);
         $personabilities = $this->add_additional_infos_to_personabilities($progress->get_abilities());
-        // TODO: UPDATE params here!! we need all infos from attempt (=newdata) to select scale for enrolement.
-        // ... and use transformed abilities!
         catquiz::enrol_user($USER->id, (array) $this->quizsettings, $personabilities);
         $courseandinstance = catquiz::return_course_and_instance_id(
             $this->quizsettings->modulename,
