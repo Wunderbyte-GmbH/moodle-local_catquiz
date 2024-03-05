@@ -386,13 +386,16 @@ class feedbacksettings {
     public function set_params_from_attempt(array $newdata, array $quizsettings): void {
         $this->semax = (float) $newdata['se_max'];
         $this->semin = (float) $newdata['se_min'];
-        $this->nmintest = (int) $quizsettings['maxquestionsgroup']['catquiz_minquestions'];
-        $this->nminscale = (int) $quizsettings['maxquestionsscalegroup']['catquiz_maxquestionspersubscale'];
+        $maxquestiongroup = (array) $quizsettings['maxquestionsgroup'];
+        $maxquestionsscalegroup = (array) $quizsettings['maxquestionsscalegroup'];
+        $this->nmintest = (int) $maxquestiongroup['catquiz_minquestions'];
+        $this->nminscale = (int) $maxquestionsscalegroup['catquiz_maxquestionspersubscale'];
         $this->rootscale = (int) $quizsettings['catquiz_catscales'];
         // Find average fraction.
         $f = 0.0;
         $i = 0;
-        $progress = $newdata['progress'];
+
+        $progress = progress::load($newdata['attemptid'], $newdata['component'], $newdata['contextid']);
         $playedquestions = $progress->get_playedquestions();
         foreach ($playedquestions as $componentid => $questionclass) {
             $fraction = $progress->get_fraction_of_question($componentid);

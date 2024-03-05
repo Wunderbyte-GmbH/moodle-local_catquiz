@@ -263,6 +263,39 @@ class attemptfeedback implements renderable, templatable {
         return $newdata;
     }
 
+    /**
+     * Change format of personabilities.
+     *
+     * @param array $personabilities
+     *
+     * @return array
+     *
+     */
+    private function add_additional_infos_to_personabilities(array $personabilities): array {
+
+        if (!is_array($personabilities[array_key_first($personabilities)])) {
+            // It's the float value of ability.
+            foreach ($personabilities as $scaleid => $abilityfloat) {
+                $newarray[$scaleid]['value'] = $abilityfloat;
+            };
+            $personabilities = $newarray;
+        }
+        $quizsettings = (array) $this->quizsettings;
+        $feedbacksettings = $this->feedbacksettings;
+        $feedbackdata = (array) $this->load_feedbackdata();
+
+        $personabilities = $feedbacksettings->filter_excluded_scales($personabilities, $quizsettings);
+        $feedbacksettings->set_params_from_attempt($feedbackdata, $quizsettings);
+
+        return info::get_teststrategy($this->teststrategy)
+            ->select_scales_for_report(
+                $feedbacksettings,
+                $personabilities,
+                $feedbackdata
+            );
+
+    }
+
 
     /**
      * Gets feedback generators for teststrategy.
@@ -302,8 +335,6 @@ class attemptfeedback implements renderable, templatable {
      *
      */
     public function export_for_template(\renderer_base $output): array {
-        // 1. Perform attempt-finished tasks.
-        $this->attempt_finished_tasks();
 
         // 2. Return the feedback.
         return [
@@ -314,12 +345,13 @@ class attemptfeedback implements renderable, templatable {
     /**
      * Triggers tasks when attempt finished
      */
-    private function attempt_finished_tasks() {
+    public function attempt_finished_tasks() {
         global $USER;
         $progress = progress::load($this->attemptid, 'mod_adaptivequiz', $this->contextid);
+        $personabilities = $this->add_additional_infos_to_personabilities($progress->get_abilities());
         // TODO: UPDATE params here!! we need all infos from attempt (=newdata) to select scale for enrolement.
         // ... and use transformed abilities!
-        catquiz::enrol_user($USER->id, (array) $this->quizsettings, $progress->get_abilities());
+        catquiz::enrol_user($USER->id, (array) $this->quizsettings, $personabilities);
         $courseandinstance = catquiz::return_course_and_instance_id(
             $this->quizsettings->modulename,
             $this->attemptid
