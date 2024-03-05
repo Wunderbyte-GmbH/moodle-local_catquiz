@@ -232,6 +232,7 @@ class attemptfeedback implements renderable, templatable {
             }
             $feedbackdata = array_merge(
                 $feedbackdata,
+                $newdata,
                 $generatordata
             );
         }
@@ -249,10 +250,15 @@ class attemptfeedback implements renderable, templatable {
      */
     private function add_default_data(array $newdata): array {
         $newarray = [];
-        foreach ($newdata['personabilties'] as $scaleid => $abilityfloat) {
+        $progress = $newdata['progress'];
+        $personabilities = $progress->get_abilities();
+        if (!$personabilities) {
+            return $newdata;
+        }
+        foreach ($personabilities as $scaleid => $abilityfloat) {
             $newarray[$scaleid]['value'] = $abilityfloat;
         };
-        $newdata['updated_personabilties'] = $newarray;
+        $newdata['updated_personabilities'] = $newarray;
         $newdata['catscales'] = catquiz::get_catscales(array_keys($newarray));
         return $newdata;
     }
@@ -311,9 +317,9 @@ class attemptfeedback implements renderable, templatable {
     private function attempt_finished_tasks() {
         global $USER;
         $progress = progress::load($this->attemptid, 'mod_adaptivequiz', $this->contextid);
-        $transformedabilities = feedbackgenerator::create_feedbackabilities($progress->get_abilities());
         // TODO: UPDATE params here!! we need all infos from attempt (=newdata) to select scale for enrolement.
-        catquiz::enrol_user($USER->id, (array) $this->quizsettings, $transformedabilities);
+        // ... and use transformed abilities!
+        catquiz::enrol_user($USER->id, (array) $this->quizsettings, $progress->get_abilities());
         $courseandinstance = catquiz::return_course_and_instance_id(
             $this->quizsettings->modulename,
             $this->attemptid
