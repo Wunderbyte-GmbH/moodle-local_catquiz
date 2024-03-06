@@ -64,7 +64,13 @@ class customscalefeedback_test extends basic_testcase {
         $this->assertEquals($expected, $output);
     }
 
-    public static function get_studentfeedback_provider() {
+    /**
+     * Data provider for test_get_studentfeedback.
+     *
+     * @return array
+     *
+     */
+    public static function get_studentfeedback_provider(): array {
         return [
                 'lowestskillgap' => [
                     'feedbackdata' => [
@@ -74,7 +80,7 @@ class customscalefeedback_test extends basic_testcase {
                         ],
                         'customscalefeedback_abilities' => [
                             '272' => [
-                                'value' => "1.5"
+                                'value' => "1.5",
                             ],
                         ],
                         'quizsettings' => [
@@ -97,9 +103,9 @@ class customscalefeedback_test extends basic_testcase {
                     ],
                     'expected' => [
                         'heading' => 'Feedback',
-                        'content' => 'Skala 272: <p dir="ltr" style="text-align: left;">adsfafs<\/p><br/>'
+                        'content' => 'Skala 272: <p dir="ltr" style="text-align: left;">adsfafs<\/p><br/>',
                     ],
-                ]
+                ],
             ];
     }
 
