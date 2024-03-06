@@ -199,6 +199,7 @@ class inferlowestskillgap extends strategy {
         }
         $personabilities[$relevantscale]['primary'] = true;
         $personabilities[$relevantscale]['toreport'] = true;
+        $personabilities[$relevantscale]['primarybecause'] = 'lowestskill';
 
         return $personabilities;
     }
