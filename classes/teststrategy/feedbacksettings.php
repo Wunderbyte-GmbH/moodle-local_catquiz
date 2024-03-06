@@ -396,12 +396,12 @@ class feedbacksettings {
         $i = 0;
         if ($newdata['progress'] instanceof progress) {
             $progress = $newdata['progress'];
+            $responses = $progress->get_responses();
         } else {
-            $progress = progress::load($newdata['attemptid'], $newdata['component'], $newdata['contextid']);
+            $responses = $newdata['progress']['responses'];
         }
-        $playedquestions = $progress->get_playedquestions();
-        foreach ($playedquestions as $componentid => $questionclass) {
-            $fraction = $progress->get_fraction_of_question($componentid);
+        foreach ($responses as $responsearray) {
+            $fraction = (float) $responsearray['fraction'];
             $f += $fraction;
             $i ++;
         }
