@@ -81,6 +81,7 @@ class customscalefeedback_test extends basic_testcase {
                         'customscalefeedback_abilities' => [
                             '272' => [
                                 'value' => "1.5",
+                                'toreport' => "true",
                             ],
                         ],
                         'quizsettings' => [
@@ -104,6 +105,41 @@ class customscalefeedback_test extends basic_testcase {
                     'expected' => [
                         'heading' => 'Feedback',
                         'content' => 'Skala 272: <p dir="ltr" style="text-align: left;">adsfafs<\/p><br/>',
+                    ],
+                ],
+                'noscalestoreport' => [
+                    'feedbackdata' => [
+                        'catscales' => [ '272' => (object) [
+                            'name' => 'Skala 272',
+                            ],
+                        ],
+                        'customscalefeedback_abilities' => [
+                            '272' => [
+                                'value' => "1.5",
+                                'primary' => "true",
+                            ],
+                        ],
+                        'quizsettings' => [
+                            "numberoffeedbackoptionsselect" => "2",
+                            "feedback_scaleid_limit_lower_272_1" => "-3",
+                            "feedback_scaleid_limit_upper_272_1" => "0",
+                            "feedbackeditor_scaleid_272_1" => (object) [
+                                "text" => "<p dir=\"ltr\" style=\"text-align: left;\">adsfafs<\/p>",
+                                "format" => "1",
+                                "itemid" => "903590937",
+                            ],
+                            "feedback_scaleid_limit_lower_272_2" => "0",
+                            "feedback_scaleid_limit_upper_272_2" => "3",
+                            "feedbackeditor_scaleid_272_2" => (object) [
+                                "text" => "<p dir=\"ltr\" style=\"text-align: left;\">adsfafs<\/p>",
+                                "format" => "1",
+                                "itemid" => "903590937",
+                            ],
+                        ],
+                    ],
+                    'expected' => [
+                        'heading' => 'Feedback',
+                        'content' => 'There was no valid feedback found.',
                     ],
                 ],
             ];
