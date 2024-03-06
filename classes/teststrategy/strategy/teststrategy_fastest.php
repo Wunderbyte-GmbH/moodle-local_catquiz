@@ -167,6 +167,7 @@ class teststrategy_fastest extends strategy {
                 'value' => $abilityvalue['value'],
                 'primary' => true,
                 'toreport' => true,
+                'primarybecause' => 'rootscale',
             ];
         };
         // Minimum of questions per test applied.
