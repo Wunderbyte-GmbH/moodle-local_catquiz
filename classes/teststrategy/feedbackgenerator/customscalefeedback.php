@@ -199,7 +199,7 @@ class customscalefeedback extends feedbackgenerator {
         $relevantscalesfound = false;
 
         // Filter for scales to be reported.
-        $personabilities = array_filter($personabilities, fn($a) => $a['toreport']);
+        $personabilities = array_filter($personabilities, fn($a) => isset($a['toreport']));
         foreach ($personabilities as $catscaleid => $personability) {
             if (isset($personability['excluded']) && $personability['excluded']) {
                 continue;
