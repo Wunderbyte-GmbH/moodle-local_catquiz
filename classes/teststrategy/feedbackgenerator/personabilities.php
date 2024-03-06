@@ -103,8 +103,39 @@ class personabilities extends feedbackgenerator {
      *
      */
     public function get_studentfeedback(array $feedbackdata): array {
+        global $OUTPUT;
 
-        $feedback = $feedbackdata['personabilitiesfeedback'];
+        $abilitieschart = $this->render_chart(
+            $feedbackdata['personabilities_abilities'],
+            $feedbackdata['quizsettings'],
+            $feedbackdata['primaryscale'],
+        );
+
+        // TODO: In which cases should there be no charts?
+        // The chart showing all present personabilities in relation to each other.
+
+        $abilityprofilechart = $this->render_abilityprofile_chart(
+            (array) $feedbackdata,
+            $feedbackdata['primaryscale']
+        );
+
+        // The charts showing past and present personabilities (in relation to peers).
+        $abilityprogress = $this->render_abilitiyprogress(
+            (array) $feedbackdata,
+            $feedbackdata['primaryscale']
+        );
+        // TODO: Transfer all rendering in get_studentfeedback.
+        $feedback = $OUTPUT->render_from_template(
+        'local_catquiz/feedback/personabilities',
+            [
+            'abilities' => $feedbackdata['abilitieslist'],
+            'progressindividual' => $abilityprogress['individual'],
+            'progresscomparison' => $abilityprogress['comparison'],
+            'abilityprofile' => $abilityprofilechart,
+            'chartdisplay' => $abilitieschart,
+            ]
+        );
+
         if (empty($feedback)) {
             return [
             ];
@@ -208,84 +239,45 @@ class personabilities extends feedbackgenerator {
             $existingdata['teststrategy']
         );
 
-        if ($personabilitiesfeedbackeditor == $personabilities) {
-            // In case the feedbacksettings /strategy didn't change anything...
-            // ... use the old method to select primary scale.
-            $personabilities = $progress->get_abilities();
-            $selectedscalearray = $this->feedbacksettings->get_scaleid_and_stringkey(
-                $personabilities,
-                (object) $quizsettings,
-                $this->primaryscaleid);
-            $selectedscaleid = $selectedscalearray['selectedscaleid'];
-            $selectedscalestringkey = $selectedscalearray['selectedscalestringkey'];
-        } else {
             // TODO: force definition of selected scales via shortcode.
-            $personabilities = [];
-            foreach ($personabilitiesfeedbackeditor as $catscale => $personability) {
-                if (isset($personability['excluded']) && $personability['excluded']) {
-                    continue;
-                }
-                if (isset($personability['primary'])) {
-                    $selectedscaleid = $catscale;
-                }
-                $personabilities[$catscale] = $personability;
+        $personabilities = [];
+        foreach ($personabilitiesfeedbackeditor as $catscale => $personability) {
+            if (isset($personability['excluded']) && $personability['excluded']) {
+                continue;
             }
-            if ($personabilities === []) {
-                return [
-                ];
+            if (isset($personability['primary'])) {
+                $selectedscaleid = $catscale;
             }
+            $personabilities[$catscale] = $personability;
+        }
+        if ($personabilities === []) {
+            return [
+            ];
         }
 
         // TODO: Improve code architecture sorting in feedbacksetting.
         $this->apply_sorting($personabilities, $selectedscaleid);
 
-        $data = [];
+        $abilitieslist = [];
+        // TODO: Check if this is working correctly!
         foreach ($personabilities as $catscaleid => $abilityarray) {
-            $this->generate_data_for_scale(
-                $data,
-                $catscaleid,
-                $selectedscaleid,
-                $abilityarray,
-                $catscales,
-                $newdata
-            );
+            $abilitieslist[] = $this->generate_data_for_scale(
+                    $abilitieslist,
+                    $catscaleid,
+                    $selectedscaleid,
+                    $abilityarray,
+                    $catscales,
+                    $newdata
+                );
         }
 
-        // TODO: In which cases should there be no charts?
-        // The chart showing all present personabilities in relation to each other.
-        $chart = $this->render_chart(
-                    $personabilities,
-                    (array) $quizsettings,
-                    $catscales[$selectedscaleid]
-                );
-        $abilityprofile = $this->render_abilityprofile_chart(
-                            (array) $newdata,
-                            $quizsettings,
-                            $catscales[$selectedscaleid]
-                        );
-
-        // The charts showing past and present personabilities (in relation to peers).
-        $abilityprogress = $this->render_abilitiyprogress(
-                                (array) $newdata,
-                                $catscales[$selectedscaleid]
-                            );
-        // TODO: Transfer all rendering in get_studentfeedback.
-        $feedback = $OUTPUT->render_from_template(
-            'local_catquiz/feedback/personabilities',
-            [
-                'abilities' => $data,
-                'progressindividual' => $abilityprogress['individual'],
-                'progresscomparison' => $abilityprogress['comparison'],
-                'abilityprofile' => $abilityprofile,
-                'chartdisplay' => $chart,
-            ]
-        );
-
         return [
-            'personabilitiesfeedback' => $feedback,
-            'personabilities' => $personabilities,
+            'quizsettings' => (array) $quizsettings,
+            'primaryscale' => $catscales[$selectedscaleid],
+            'personabilities_abilities' => $personabilities,
             'se' => $newdata['se'],
             'playedquestions' => $progress->get_playedquestions(true),
+            'abilitieslist' => $abilitieslist,
         ];
     }
     /**
@@ -365,7 +357,7 @@ class personabilities extends feedbackgenerator {
             $numberofitems = "";
         }
 
-        $data[] = [
+        return [
             'standarderror' => sprintf("%.2f", $newdata['se'][$catscaleid]),
             'ability' => $ability,
             'name' => $catscales[$catscaleid]->name,
@@ -381,26 +373,26 @@ class personabilities extends feedbackgenerator {
      * Render chart for histogram of personabilities.
      *
      * @param array $initialcontext
-     * @param array $quizsettings
-     * @param stdClass $primarycatscale
+     * @param array $primarycatscale
+     *
      *
      * @return array
      *
      */
-    private function render_abilityprofile_chart(array $initialcontext, array $quizsettings, $primarycatscale) {
+    private function render_abilityprofile_chart(array $initialcontext, array $primarycatscale) {
         global $OUTPUT, $DB;
 
         $abilitysteps = [];
         $abilitystep = 0.25;
         $interval = $abilitystep * 2;
-        $abilityrange = catscale::get_ability_range($primarycatscale->id);
+        $abilityrange = catscale::get_ability_range($primarycatscale['id']);
 
         $ul = (float) $abilityrange['maxscalevalue'];
         $ll = (float) $abilityrange['minscalevalue'];
         for ($i = $ll + $abilitystep; $i <= ($ul - $abilitystep); $i += $interval) {
             $abilitysteps[] = $i;
         }
-        $catscale = new catscale($primarycatscale->id);
+        $catscale = new catscale($primarycatscale['id']);
         // Prepare data for test information line.
         $items = $catscale->get_testitems($initialcontext['contextid'], true);
         $models = model_strategy::get_installed_models();
@@ -428,7 +420,7 @@ class personabilities extends feedbackgenerator {
         }
 
         // Prepare data for scorecounter bars.
-        $abilityrecords = $DB->get_records('local_catquiz_personparams', ['catscaleid' => $primarycatscale->id]);
+        $abilityrecords = $DB->get_records('local_catquiz_personparams', ['catscaleid' => $primarycatscale['id']]);
         $abilityseries = [];
         foreach ($abilitysteps as $as) {
             $counter = 0;
@@ -442,9 +434,9 @@ class personabilities extends feedbackgenerator {
                 }
             }
             $colorvalue = $this->get_color_for_personability(
-                $quizsettings,
+                (array)$initialcontext['quizsettings'],
                 $as,
-                intval($primarycatscale->id)
+                intval($primarycatscale['id'])
                 );
             $abilitystring = strval($as);
             $abilityseries['counter'][$abilitystring] = $counter;
@@ -459,7 +451,7 @@ class personabilities extends feedbackgenerator {
 
         $testinfolabel = get_string('testinfolabel', 'local_catquiz');
         $tiseries = new chart_series($testinfolabel, $scaledtiseries);
-        $tiseries->set_type(\core\chart_series::TYPE_LINE);
+        $tiseries->set_type(chart_series::TYPE_LINE);
 
         $chart = new chart_bar();
         $chart->add_series($tiseries);
@@ -469,7 +461,7 @@ class personabilities extends feedbackgenerator {
         $out = $OUTPUT->render($chart);
         return [
             'chart' => $out,
-            'charttitle' => get_string('abilityprofile', 'local_catquiz', $primarycatscale->name),
+            'charttitle' => get_string('abilityprofile', 'local_catquiz', $primarycatscale['name']),
         ];
     }
 
@@ -791,7 +783,7 @@ class personabilities extends feedbackgenerator {
      * @param array $attemptswithnulls
      * @param string $key
      *
-     * @return float
+     * @return array
      *
      */
     private function find_non_nullable_value(array $keys, array $attemptswithnulls, string $key) {
@@ -949,15 +941,15 @@ class personabilities extends feedbackgenerator {
      *
      * @param array $personabilities
      * @param array $quizsettings
-     * @param stdClass $primarycatscale
+     * @param array $primarycatscale
      *
      * @return array
      *
      */
-    private function render_chart(array $personabilities, array $quizsettings, $primarycatscale) {
+    private function render_chart(array $personabilities, array $quizsettings, array $primarycatscale) {
         global $OUTPUT;
 
-        $primarycatscaleid = $primarycatscale->id;
+        $primarycatscaleid = $primarycatscale['id'];
         $primaryability = 0;
         // First we get the personability of the primaryscale.
         foreach ($personabilities as $subscaleid => $abilityarray) {
@@ -969,9 +961,6 @@ class personabilities extends feedbackgenerator {
         }
         $chart = new chart_bar();
         $chart->set_horizontal(true);
-        $chartseries = [];
-        $chartseries['series'] = [];
-        $chartseries['labels'] = [];
         foreach ($personabilities as $subscaleid => $abilityarray) {
             $subscaleability = (float) $abilityarray['value'];
             $subscale = catscale::return_catscale_object($subscaleid);
@@ -1001,7 +990,7 @@ class personabilities extends feedbackgenerator {
 
         return [
             'chart' => $out,
-            'charttitle' => get_string('personabilitycharttitle', 'local_catquiz', $primarycatscale->name),
+            'charttitle' => get_string('personabilitycharttitle', 'local_catquiz', $primarycatscale['name']),
         ];
 
     }
