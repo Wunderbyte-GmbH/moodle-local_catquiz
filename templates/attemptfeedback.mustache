@@ -43,24 +43,37 @@
 
 {{#feedback}}
     {{#studentfeedback}}
-    {{#frontpage}}
-        <h3>{{heading}}</h3>
-        <div>{{{content}}}</div>
-    {{/frontpage}}
-    {{^frontpage}}
-        <ul class="nav nav-tabs" id="myTab" role="tablist">
-            <li class="nav-item">
-                <a class="nav-link active" id="{{generatorname}}-tab" data-toggle="tab" href="#lcq_{{generatorname}}" role="tab" aria-controls="lcq_{{generatorname}}">
-                {{heading}}</a>
-            </li>
-        </ul>
-
-        <div class="tab-content" id="myTabContent">
-            <div class="tab-pane fade show active" id="lcq_{{generatorname}}" role="tabpanel" aria-labelledby="{{generatorname}}-tab">
-                {{{content}}}
-            </div>
-        </div>
-    {{/frontpage}}
+        {{#frontpage}}
+            <h3>{{heading}}</h3>
+            <div>{{{content}}}</div>
+        {{/frontpage}}
     {{/studentfeedback}}
+    {{#studentfeedback.0}}
+            <button type="button" class="btn btn-secondary" data-toggle="modal" data-target=".bd-example-modal-xl">{{#str}}moreinformation, local_catquiz{{/str}}</button>
+
+            <div class="modal fade bd-example-modal-xl" tabindex="-1" role="dialog" aria-label="myLargeModalLabel" aria-hidden="true">
+                <div class="modal-dialog modal-xl">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title">Feedback</h5>
+                        </div>
+    {{/studentfeedback.0}}
+    {{#studentfeedback}}
+            {{#inmodal}}
+                <h2>{{heading}}</h2>
+                <div>{{{content}}}</div>
+            {{/inmodal}}
+    {{/studentfeedback}}
+                            <!--in modal rein: lehrendenfeedback quizverlauf-->
+    {{#studentfeedback.0}}
+
+
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">{{#str}}close, local_catquiz{{/str}}</button>
+                    </div>
+                </div>
+            </div>
+    {{/studentfeedback.0}}
     {{#teacherfeedback.0}}
 {{/feedback}}
