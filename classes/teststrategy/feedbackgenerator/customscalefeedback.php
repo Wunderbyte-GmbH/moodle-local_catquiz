@@ -185,6 +185,7 @@ class customscalefeedback extends feedbackgenerator {
      *
      * @param array $personabilities
      * @param array $quizsettings
+     * @param array $catscales
      *
      * @return string
      *
