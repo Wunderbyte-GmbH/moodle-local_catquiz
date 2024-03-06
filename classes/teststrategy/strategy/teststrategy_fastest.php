@@ -166,6 +166,7 @@ class teststrategy_fastest extends strategy {
             $newabilities[$scaleid] = [
                 'value' => $abilityvalue['value'],
                 'primary' => true,
+                'toreport' => true,
             ];
         };
         // Minimum of questions per test applied.
