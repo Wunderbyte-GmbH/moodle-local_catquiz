@@ -248,6 +248,9 @@ class personabilities extends feedbackgenerator {
                 $selectedscaleid = $catscale;
             }
             $personabilities[$catscale] = $personability;
+            $catscaleobject = catscale::return_catscale_object($catscale);
+            $personabilities[$catscale]['name'] = $catscaleobject->name;
+
         }
         if ($personabilities === []) {
             return [
@@ -969,8 +972,7 @@ class personabilities extends feedbackgenerator {
         $chart->set_horizontal(true);
         foreach ($personabilities as $subscaleid => $abilityarray) {
             $subscaleability = (float) $abilityarray['value'];
-            $subscale = catscale::return_catscale_object($subscaleid);
-            $subscalename = $subscale->name;
+            $subscalename = $abilityarray['name'];
             $difference = round($subscaleability - $primaryability, 2);
             $series = new chart_series($subscalename, [0 => $difference]);
 
