@@ -57,17 +57,33 @@
                         <div class="modal-header">
                             <h5 class="modal-title">Feedback</h5>
                         </div>
+                        <div class="modal-body">
+                        <ul class="nav nav-tabs" id="myTab" role="tablist">
+                          <li class="nav-item">
+                    <a class="nav-link" id="fix-tab" data-toggle="tab" href="#fix" role="tab" aria-controls="fix" aria-selected="true">fix</a>
+  </li>
     {{/studentfeedback.0}}
     {{#studentfeedback}}
-            {{#inmodal}}
-                <h2>{{heading}}</h2>
+  <li class="nav-item">
+    <a class="nav-link" id="{{generatorname}}-tab" data-toggle="tab" href="#{{generatorname}}" role="tab" aria-controls="{{generatorname}}" aria-selected="false">{{generatorname}}</a>
+  </li>
+  {{/studentfeedback}}
+{{#studentfeedback.0}}
+</ul>
+<div class="tab-content" id="myTabContent">
+<div class="tab-pane fade show active" id="fix" role="tabpanel" aria-labelledby="fix-tab">{{generatorname}}</div>
+{{/studentfeedback.0}}
+{{#studentfeedback}}
+  <div class="{{generatorname}}-pane fade" id="{{generatorname}}" role="tabpanel" aria-labelledby="{{generatorname}}-tab">
+                  <h2>{{heading}}</h2>
                 <div>{{{content}}}</div>
-            {{/inmodal}}
-    {{/studentfeedback}}
-                            <!--in modal rein: lehrendenfeedback quizverlauf-->
-    {{#studentfeedback.0}}
+  </div>
+{{/studentfeedback}}
+{{#studentfeedback.0}}
+</div>
+<!--in modal rein: lehrendenfeedback quizverlauf-->
 
-
+                    </div>
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-dismiss="modal">{{#str}}close, local_catquiz{{/str}}</button>
