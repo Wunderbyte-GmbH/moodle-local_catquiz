@@ -1681,7 +1681,7 @@ class catquiz {
         // Filter for scales that are selected for enrolement.
 
         foreach ($personabilities as $catscaleid => $personabilityarray) {
-            if (!isset($personabilityarray['primary'])) {
+            if (!isset($personabilityarray['toreport'])) {
                 continue;
             }
             $i = 1;

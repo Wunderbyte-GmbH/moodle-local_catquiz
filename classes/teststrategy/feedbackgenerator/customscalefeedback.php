@@ -197,8 +197,9 @@ class customscalefeedback extends feedbackgenerator {
         ): string {
         $scalefeedback = [];
         $relevantscalesfound = false;
-        // Feedback for all scales is reported here, except for excluded scales.
-        // Feedback for primary scale is handled equally.
+
+        // Filter for scales to be reported.
+        $personabilities = array_filter($personabilities, fn($a) => $a['toreport']);
         foreach ($personabilities as $catscaleid => $personability) {
             if (isset($personability['excluded']) && $personability['excluded']) {
                 continue;

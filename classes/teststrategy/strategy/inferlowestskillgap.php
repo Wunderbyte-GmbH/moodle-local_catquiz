@@ -181,8 +181,8 @@ class inferlowestskillgap extends strategy {
         // Exclude scales where standarderror is not in range.
         $personabilities = $feedbacksettings->filter_semax($personabilities, $feedbackdata);
 
-        // Force selected scale. Will also be applied to excluded scales.
         if ($feedbackonlyfordefinedscaleid && !empty($catscaleid)) {
+            // Force selected scale. Will also be applied to excluded scales.
             $relevantscale = $personabilities[$catscaleid];
         } else {
             $filterabilities = [];
@@ -198,6 +198,8 @@ class inferlowestskillgap extends strategy {
             $relevantscale = array_search(min($filterabilities), $filterabilities);
         }
         $personabilities[$relevantscale]['primary'] = true;
+        $personabilities[$relevantscale]['toreport'] = true;
+
         return $personabilities;
     }
 }
