@@ -332,8 +332,15 @@ class personabilities extends feedbackgenerator {
         }
         if ($catscaleid == $selectedscaleid) {
             $isselectedscale = true;
-            // TODO: Title explaining why this scale was selected (i.e. lowest result).
             $tooltiptitle = $catscales[$catscaleid]->name;
+            if (isset($abilityarray['primarybecause'])) {
+                $tooltiptitle = get_string(
+                    $abilityarray['primarybecause'] . ':tooltiptitle',
+                    'local_catquiz',
+                    $catscales[$catscaleid]->name
+                ) ?? $catscales[$catscaleid]->name;
+            };
+
         } else {
             $isselectedscale = false;
             $tooltiptitle = $catscales[$catscaleid]->name;
