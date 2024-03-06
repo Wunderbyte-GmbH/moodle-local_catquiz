@@ -152,7 +152,7 @@ class comparetotestaverage extends feedbackgenerator {
      *
      */
     public function get_heading(): string {
-        return get_string('personability', 'local_catquiz');
+        return get_string('comparetotestaverage', 'local_catquiz');
     }
 
     /**

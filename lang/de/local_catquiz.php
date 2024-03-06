@@ -472,6 +472,9 @@ $string['noscalesfound'] = 'Es konnte zu keiner Skala ein valides Ergebnis gefun
 $string['noscalesfound'] = 'Es konnte zu kein valides Ergebnis gefunden werden.';
 $string['noscalesfound'] = 'Es konnte kein valides Ergebnis gefunden werden.';
 $string['nofeedback'] = 'Kein Feedback angegeben.';
+$string['moreinformation'] = 'Weitere Informationen';
+$string['comparetotestaverage'] = 'Übersicht im Vergleich';
+$string['personabilityfeedbacktitle'] = "Fähigkeitsprofil";
 
 // Chart in Feedback.
 $string['chartlegendabilityrelative'] = '{$a->difference} Unterschied zur Vergleichsskala (Fähigkeits-Score in dieser Skala: {$a->ability})';
