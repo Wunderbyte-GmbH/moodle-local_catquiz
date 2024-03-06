@@ -124,7 +124,6 @@ class personabilities extends feedbackgenerator {
             (array) $feedbackdata,
             $feedbackdata['primaryscale']
         );
-        // TODO: Transfer all rendering in get_studentfeedback.
         $feedback = $OUTPUT->render_from_template(
         'local_catquiz/feedback/personabilities',
             [
@@ -259,7 +258,7 @@ class personabilities extends feedbackgenerator {
         $this->apply_sorting($personabilities, $selectedscaleid);
 
         $abilitieslist = [];
-        // TODO: Check if this is working correctly!
+
         foreach ($personabilities as $catscaleid => $abilityarray) {
             $abilitieslist[] = $this->generate_data_for_scale(
                     $abilitieslist,
