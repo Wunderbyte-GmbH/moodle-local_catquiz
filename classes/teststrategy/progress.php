@@ -108,7 +108,7 @@ class progress implements JsonSerializable {
     /**
      * @var array $responses
      */
-    private array $responses;
+    public array $responses;
 
     /**
      * @var array Holds the abilities indexed by catscale
@@ -440,6 +440,15 @@ class progress implements JsonSerializable {
      */
     public function get_attemptid() {
         return $this->attemptid;
+    }
+
+    /**
+     * Returns the responses.
+     *
+     * @return array
+     */
+    public function get_responses() {
+        return $this->responses;
     }
 
     /**
@@ -923,20 +932,4 @@ class progress implements JsonSerializable {
         return sprintf('progress_user_%d_id_%d', $USER->id, $attemptid);
     }
 
-    /**
-     * Returns the fraction of a question.
-     *
-     * @param int $componentid
-     *
-     * @return float
-     *
-     */
-    public function get_fraction_of_question(int $componentid): float {
-        try {
-            return $this->responses[$componentid]['fraction'];
-        } catch (Exception $e) {
-            // This should never happen.
-            throw new \moodle_exception('No response with this componentid found');
-        }
-    }
 }
