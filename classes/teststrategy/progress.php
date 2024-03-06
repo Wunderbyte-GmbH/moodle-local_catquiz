@@ -841,6 +841,12 @@ class progress implements JsonSerializable {
         return $this;
     }
 
+    /**
+     * Uset last question.
+     *
+     * @return progress
+     *
+     */
     public function unset_last_question() {
         $this->lastquestion = null;
         return $this;
