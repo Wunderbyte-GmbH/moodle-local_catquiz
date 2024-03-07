@@ -159,26 +159,7 @@ abstract class feedbackgenerator {
 
         $transformedpersonabilities = $newdata['updated_personabilities'];
 
-        // TODO: Check this, coming from shortcode.
-        // if ($feedbackonlyfordefinedscaleid) {
-        //     $selectedscale = [];
-        //     foreach ($transformedpersonabilities as $catscaleid => $value) {
-        //         if ($catscaleid == $forcedscaleid) {
-        //             $selectedscale[$catscaleid]['value'] = $value;
-        //             $selectedscale[$catscaleid]['primary'] = true;
-        // toreport !
-        //         } else {
-        //             $selectedscale[$catscaleid]['value'] = $value;
-        //             $selectedscale[$catscaleid]['excluded'] = true;
-        //             $selectedscale[$catscaleid]['error']['otherscaleforced'] = [
-        //                 'currentscale' => $catscaleid,
-        //                 'selectedscale' => $forcedscaleid,
-        //             ];
-
-        //         }
-        //     }
-        //     return $selectedscale;
-        // }
+        // TODO: Overwrite primaryscale (and sortorder?) via shortcode.
 
         $transformedpersonabilities = $feedbacksettings->filter_excluded_scales($transformedpersonabilities, $quizsettings);
 
