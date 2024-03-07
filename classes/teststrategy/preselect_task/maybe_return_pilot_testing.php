@@ -35,9 +35,20 @@ use local_catquiz\wb_middleware;
  */
 final class maybe_return_pilot_testing extends maybe_return_pilot implements wb_middleware {
 
+    /**
+     * This value is used to return a pilot question.
+     */
     private const PILOT = 0;
+
+    /**
+     * This value is used to return a question with item params.
+     */
     private const NO_PILOT = 100;
 
+    /**
+     * Indicates for each question number whether it should be a pilot or not.
+     * @var int[]
+     */
     private $pseudorandom = [
         self::NO_PILOT,
         self::NO_PILOT,
@@ -76,6 +87,11 @@ final class maybe_return_pilot_testing extends maybe_return_pilot implements wb_
         self::PILOT,
     ];
 
+    /**
+     * Returns a bool indicating whether a pilot question should be returned.
+     * 
+     * @return bool
+     */
     protected function should_return_pilot(): bool {
         $rand = $this->pseudorandom[$this->context['questionsattempted']] ?? 100;
         $shouldreturnpilot = $rand <= $this->context['pilot_ratio'];

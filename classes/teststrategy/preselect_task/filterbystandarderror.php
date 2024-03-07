@@ -32,6 +32,7 @@ use local_catquiz\local\status;
 use local_catquiz\teststrategy\preselect_task;
 use local_catquiz\teststrategy\progress;
 use local_catquiz\wb_middleware;
+use UnexpectedValueException;
 
 /**
  * Includes or excludes scales based on their information
@@ -86,7 +87,7 @@ class filterbystandarderror extends preselect_task implements wb_middleware {
         $scaleid = $lastquestion->catscaleid;
         $updatedscales = [$scaleid, ...catscale::get_ancestors($scaleid)];
         if ($context['teststrategy'] == LOCAL_CATQUIZ_STRATEGY_FASTEST) {
-            return $this->filter_for_radical_cat($updatedscales);
+            return $this->filter_for_cat($updatedscales);
         }
         foreach ($updatedscales as $scaleid) {
             $drop = $this->check_scale_should_be_dropped($scaleid);
@@ -171,7 +172,14 @@ class filterbystandarderror extends preselect_task implements wb_middleware {
         );
     }
 
-    private function filter_for_radical_cat(array $updatedscales): result {
+    /**
+     * Contains the filtering logic for the CAT test strategy
+     *
+     * @param array $updatedscales 
+     * @return result 
+     * @throws UnexpectedValueException 
+     */
+    private function filter_for_cat(array $updatedscales): result {
         $drop = false;
         foreach (array_reverse($updatedscales) as $scaleid) {
             if (!$this->check_scale_should_be_dropped($scaleid)) {
@@ -196,6 +204,13 @@ class filterbystandarderror extends preselect_task implements wb_middleware {
         return ($this->next)($this->context);
     }
 
+    /**
+     * Checks if a scale should be dropped.
+     * 
+     * @param int $scaleid 
+     * @return bool 
+     * @throws UnexpectedValueException 
+     */
     private function check_scale_should_be_dropped(int $scaleid): bool {
         // All played items that belong to the scale or one of its ancestor scales.
 

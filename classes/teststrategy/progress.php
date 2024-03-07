@@ -25,6 +25,7 @@
 namespace local_catquiz\teststrategy;
 
 use cache;
+use coding_exception;
 use Exception;
 use JsonSerializable;
 use local_catquiz\catcontext;
@@ -225,13 +226,26 @@ class progress implements JsonSerializable {
         return $instance;
     }
 
+    /**
+     * Try to load a progress object from the cache.
+     *  
+     * @param int $attemptid 
+     * @return progress 
+     * @throws coding_exception 
+     */
     private static function load_from_cache($attemptid) {
         $attemptcache = cache::make('local_catquiz', 'adaptivequizattempt');
         $cachekey = self::get_cache_key($attemptid);
         return $attemptcache->get($cachekey);
     }
 
-    private static function load_from_db($attemptid) {
+    /**
+     * Try to load a progress object from the database.
+     * 
+     * @param int $attemptid 
+     * @return progress|false 
+     */
+    private static function load_from_db(int $attemptid) {
         global $DB;
         $record = $DB->get_record(
             'local_catquiz_progress',
@@ -485,6 +499,11 @@ class progress implements JsonSerializable {
         return $this->isfirstquestion;
     }
 
+    /**
+     * Marks, that the first question was already played.
+     * 
+     * @return $this
+     */
     public function set_first_question_played() {
         $this->isfirstquestion = false;
         return $this;
@@ -554,6 +573,12 @@ class progress implements JsonSerializable {
         return $this->activescales;
     }
 
+    /**
+     * Shows if the given scale is active.
+     * 
+     * @param int $scaleid 
+     * @return bool 
+     */
     public function is_active_scale(int $scaleid) {
         return in_array($scaleid, $this->activescales);
     }
@@ -702,6 +727,11 @@ class progress implements JsonSerializable {
         return $this;
     }
 
+    /**
+     * Marks the last question as failed
+     * 
+     * @return $this
+     */
     public function mark_lastquestion_failed() {
         $this->responses[$this->lastquestion->id] = [
             'questionid' => $this->lastquestion->id,
@@ -711,6 +741,11 @@ class progress implements JsonSerializable {
         return $this;
     }
 
+    /**
+     * Returns the last response for the current attempt.
+     * 
+     * @return stdClass|bool
+     */
     private function get_last_response_for_attempt() {
         $response = catquiz::get_last_response_for_attempt($this->get_usage_id());
         return $response;
@@ -738,6 +773,11 @@ class progress implements JsonSerializable {
         return $lastresponse[$responseid];
     }
 
+    /**
+     * Returns the usage id for the current attempt.
+     * 
+     * @return null|int
+     */
     public function get_usage_id() {
         if ($usageid = $this->usageid) {
             return $usageid;
