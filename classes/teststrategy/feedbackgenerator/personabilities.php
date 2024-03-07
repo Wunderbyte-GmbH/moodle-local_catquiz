@@ -166,10 +166,13 @@ class personabilities extends feedbackgenerator {
      */
     public function get_required_context_keys(): array {
         return [
-            'personabilitiesfeedback',
-            'personabilities',
+            'quizsettings',
+            'primaryscale',
+            'personabilities_abilities',
             'se',
             'playedquestions',
+            'abilitieslist',
+            'models',
         ];
     }
 
@@ -240,6 +243,8 @@ class personabilities extends feedbackgenerator {
 
             // TODO: force definition of selected scales via shortcode.
         $personabilities = [];
+        // Ability range is the same for all scales with same root scale.
+        $abiltiyrange = $this->get_ability_range(array_key_first($catscales));
         foreach ($personabilitiesfeedbackeditor as $catscale => $personability) {
             if (isset($personability['excluded']) && $personability['excluded']) {
                 continue;
@@ -250,6 +255,8 @@ class personabilities extends feedbackgenerator {
             $personabilities[$catscale] = $personability;
             $catscaleobject = catscale::return_catscale_object($catscale);
             $personabilities[$catscale]['name'] = $catscaleobject->name;
+            $cs = new catscale($catscale);
+            $personabilities[$catscale]['abilityrange'] = $abiltiyrange;
 
         }
         if ($personabilities === []) {
@@ -272,7 +279,7 @@ class personabilities extends feedbackgenerator {
                     $newdata
                 );
         }
-
+        $models = model_strategy::get_installed_models();
         return [
             'quizsettings' => (array) $quizsettings,
             'primaryscale' => $catscales[$selectedscaleid],
@@ -280,8 +287,10 @@ class personabilities extends feedbackgenerator {
             'se' => $newdata['se'],
             'playedquestions' => $progress->get_playedquestions(true),
             'abilitieslist' => $abilitieslist,
+            'models' => $models,
         ];
     }
+
     /**
      * Sort personabilites array according to feedbacksettings.
      *
@@ -394,7 +403,11 @@ class personabilities extends feedbackgenerator {
         $abilitysteps = [];
         $abilitystep = 0.25;
         $interval = $abilitystep * 2;
-        $abilityrange = catscale::get_ability_range($primarycatscale['id']);
+        if (isset($initialcontext['personabilities_abilities'][$primarycatscale['id']]['abilityrange'])) {
+            $abilityrange = $initialcontext['personabilities_abilities'][$primarycatscale['id']]['abilityrange'];
+        } else {
+            $abilityrange = $this->get_ability_range($primarycatscale['id']);
+        };
 
         $ul = (float) $abilityrange['maxscalevalue'];
         $ll = (float) $abilityrange['minscalevalue'];
@@ -428,6 +441,8 @@ class personabilities extends feedbackgenerator {
 
         }
 
+        $fisherinfos = $this->get_fisherinfos_of_items($items, $models, $abilitysteps);
+        $fi = json_encode($fisherinfos);
         // Prepare data for scorecounter bars.
         $abilityrecords = $DB->get_records('local_catquiz_personparams', ['catscaleid' => $primarycatscale['id']]);
         $abilityseries = [];
@@ -454,7 +469,8 @@ class personabilities extends feedbackgenerator {
         // Scale the values of $fisherinfos before creating chart series.
         $scaledtiseries = $this->scalevalues(array_values($fisherinfos), array_values($abilityseries['counter']));
 
-        $aserieslabel = get_string('scalescorechartlabel', 'local_catquiz', $catscale->catscale->name);
+        $scalename = $initialcontext['personabilities_abilities'][$primarycatscale['id']]['name'];
+        $aserieslabel = get_string('scalescorechartlabel', 'local_catquiz', $scalename);
         $aseries = new chart_series($aserieslabel, array_values($abilityseries['counter']));
         $aseries->set_colors(array_values($abilityseries['colors']));
 
@@ -472,6 +488,58 @@ class personabilities extends feedbackgenerator {
             'chart' => $out,
             'charttitle' => get_string('abilityprofile', 'local_catquiz', $primarycatscale['name']),
         ];
+    }
+
+    /**
+     * Get fisherinfos of item for each abilitystep.
+     *
+     * @param array $items
+     * @param array $models
+     * @param array $abilitysteps
+     *
+     * @return array
+     *
+     */
+    public function get_fisherinfos_of_items(array $items, array $models, array $abilitysteps): array {
+        $fisherinfos = [];
+        foreach ($items as $item) {
+            $key = $item->model;
+            $model = $models[$key] ?? $models['raschbirnbaumb'];
+            foreach ($model::get_parameter_names() as $paramname) {
+                $params[$paramname] = floatval($item->$paramname);
+            }
+            foreach ($abilitysteps as $ability) {
+                $fisherinformation = $model::fisher_info(
+                    ['ability' => $ability],
+                    $params
+                );
+                $stringkey = strval($ability);
+
+                if (!isset($fisherinfos[$stringkey])) {
+                    $fisherinfos[$stringkey] = $fisherinformation;
+                } else {
+                    $fisherinfos[$stringkey] += $fisherinformation;
+                }
+            }
+
+        }
+        return $fisherinfos;
+    }
+
+    /**
+     * For testing, this is called here.
+     *
+     * @param int $catscaleid
+     * @param int $contextid
+     * @param bool $includesubscales
+     *
+     * @return array
+     *
+     */
+    public function get_testitems_for_catscale (int $catscaleid, int $contextid, bool $includesubscales) {
+        $catscale = new catscale($catscaleid);
+        // Prepare data for test information line.
+        return $catscale->get_testitems($contextid, $includesubscales);
     }
 
     /**
@@ -985,7 +1053,7 @@ class personabilities extends feedbackgenerator {
                 ]);
             $series->set_labels([0 => $stringforchartlegend]);
 
-            $colorvalue = self::get_color_for_personability(
+            $colorvalue = $this->get_color_for_personability(
                 $quizsettings,
                 floatval($subscaleability),
                 intval($primarycatscaleid)
@@ -1001,42 +1069,6 @@ class personabilities extends feedbackgenerator {
             'charttitle' => get_string('personabilitycharttitle', 'local_catquiz', $primarycatscale['name']),
         ];
 
-    }
-
-    /**
-     * Write information about colorgradient for colorbar.
-     *
-     * @param array $quizsettings
-     * @param float $personability
-     * @param int $catscaleid
-     * @return string
-     *
-     */
-    public static function get_color_for_personability(array $quizsettings, float $personability, int $catscaleid): string {
-        $default = "#878787";
-        $abilityrange = catscale::get_ability_range($catscaleid);
-        if (!$quizsettings ||
-            $personability < (float) $abilityrange['minscalevalue'] ||
-            $personability > (float) $abilityrange['maxscalevalue']) {
-            return $default;
-        }
-        $numberoffeedbackoptions = intval($quizsettings['numberoffeedbackoptionsselect']) ?? 8;
-        $colorarray = feedbackclass::get_array_of_colors($numberoffeedbackoptions);
-
-        for ($i = 1; $i <= $numberoffeedbackoptions; $i++) {
-            $rangestartkey = "feedback_scaleid_limit_lower_" . $catscaleid . "_" . $i;
-            $rangeendkey = "feedback_scaleid_limit_upper_" . $catscaleid . "_" . $i;
-            $rangestart = floatval($quizsettings[$rangestartkey]);
-            $rangeend = floatval($quizsettings[$rangeendkey]);
-
-            if ($personability >= $rangestart && $personability <= $rangeend) {
-                $colorkey = 'wb_colourpicker_' . $catscaleid . '_' . $i;
-                $colorname = $quizsettings[$colorkey];
-                return $colorarray[$colorname];
-            }
-
-        }
-        return $default;
     }
 
     /**
