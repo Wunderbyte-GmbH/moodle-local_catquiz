@@ -131,7 +131,7 @@ class strategy_test extends advanced_testcase {
                 'USE_TESTING_CLASS_FOR=%s',
                 implode(',', [
                     'local_catquiz\teststrategy\preselect_task\updatepersonability',
-                    'local_catquiz\teststrategy\preselect_task\maybe_return_pilot'
+                    'local_catquiz\teststrategy\preselect_task\maybe_return_pilot',
                 ])
             )
         );
@@ -1075,6 +1075,7 @@ class strategy_test extends advanced_testcase {
      * @return void
      */
     private function import(string $questionsfile, string $itemparamsfile): void {
+        global $DB;
         $this->resetAfterTest(true);
 
         // Import questions.
@@ -1099,8 +1100,6 @@ class strategy_test extends advanced_testcase {
 
         $this->import_itemparams($itemparamsfile);
 
-        // 
-        global $DB;
         $catscale = $DB->get_record('local_catquiz_catscales', ['parentid' => 0]);
         $this->catscaleid = $catscale->id;
 

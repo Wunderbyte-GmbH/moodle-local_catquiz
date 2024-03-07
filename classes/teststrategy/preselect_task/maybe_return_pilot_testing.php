@@ -89,7 +89,7 @@ final class maybe_return_pilot_testing extends maybe_return_pilot implements wb_
 
     /**
      * Returns a bool indicating whether a pilot question should be returned.
-     * 
+     *
      * @return bool
      */
     protected function should_return_pilot(): bool {

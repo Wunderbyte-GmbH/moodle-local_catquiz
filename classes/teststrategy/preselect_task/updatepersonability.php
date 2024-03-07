@@ -448,13 +448,13 @@ class updatepersonability extends preselect_task implements wb_middleware {
 
     /**
      * Shows if the ability for the given scale was calculated or just estimated.
-     * 
-     * @param int $catscaleid 
-     * @param bool $includelastresponse 
+     *
+     * @param int $catscaleid
+     * @param bool $includelastresponse
      * @return bool
-     * @throws dml_exception 
-     * @throws coding_exception 
-     * @throws Exception 
+     * @throws dml_exception
+     * @throws coding_exception
+     * @throws Exception
      */
     private function ability_was_calculated(int $catscaleid, bool $includelastresponse = true) {
         // If we have not at least one previous response, the ability was not calculated.
