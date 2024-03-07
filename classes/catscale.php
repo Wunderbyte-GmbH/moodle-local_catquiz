@@ -70,7 +70,8 @@ class catscale {
 
         $catscale = self::return_catscale_object($catscaleid);
         $this->catscale = $catscale;
-        return $catscale;
+        $this->catscaleid = $catscaleid;
+
     }
 
     /**
@@ -171,7 +172,10 @@ class catscale {
      * @param int $catscaleid
      * @return array
      */
-    public static function get_ability_range(int $catscaleid): array {
+    public function get_ability_range(int $catscaleid = 0): array {
+        if (empty($catscaleid)) {
+            $catscaleid = $this->catscaleid;
+        }
         $catscale = self::return_catscale_object($catscaleid);
         if ($catscale->minscalevalue && $catscale->maxscalevalue && $catscale->parentid == 0 ) {
             return [
@@ -185,7 +189,7 @@ class catscale {
                 'maxscalevalue' => LOCAL_CATQUIZ_PERSONABILITY_UPPER_LIMIT,
             ];
         }
-        return self::get_ability_range($catscale->parentid);
+        return $this->get_ability_range($catscale->parentid);
     }
 
     /**
