@@ -36,7 +36,7 @@ use local_catquiz\wb_middleware;
  * @copyright 2023 Wunderbyte GmbH
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-final class maybe_return_pilot extends preselect_task implements wb_middleware {
+class maybe_return_pilot extends preselect_task implements wb_middleware {
 
     /**
      * Run preselect task.
@@ -64,8 +64,7 @@ final class maybe_return_pilot extends preselect_task implements wb_middleware {
             return $next($context);
         }
 
-        $shouldreturnpilot = rand(0, 100) <= $context['pilot_ratio'];
-        if ($shouldreturnpilot) {
+        if ($this->should_return_pilot()) {
             $context['questions'] = $pilotquestions;
             $addattemptstask = new numberofgeneralattempts();
             $lasttimeplayedpenaltytask = new lasttimeplayedpenalty();
@@ -79,6 +78,18 @@ final class maybe_return_pilot extends preselect_task implements wb_middleware {
             $context['questions'] = $nonpilotquestions;
         }
         return $next($context);
+    }
+
+    /**
+     * Indicates if a pilot question should be returned.
+     * 
+     * This can be overwritten for testing.
+     * @return bool 
+     */
+    protected function should_return_pilot(): bool {
+        $rand = rand(0, 100);
+        $shouldreturnpilot = $rand <= $this->context['pilot_ratio'];
+        return $shouldreturnpilot;
     }
 
     /**

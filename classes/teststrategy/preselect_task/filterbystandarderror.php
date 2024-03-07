@@ -198,7 +198,7 @@ class filterbystandarderror extends preselect_task implements wb_middleware {
 
     private function check_scale_should_be_dropped(int $scaleid): bool {
         // All played items that belong to the scale or one of its ancestor scales.
-        
+
         $playeditems = model_item_param_list::from_array(
             $this->progress->without_pilots()->get_playedquestions(true)[$scaleid]
         );

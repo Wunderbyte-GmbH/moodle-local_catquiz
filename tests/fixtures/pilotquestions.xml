@@ -1,0 +1,3072 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<quiz>
+  <question type="category">
+    <category>
+      <text>$system$/top/Standard für System</text>
+    </category>
+    <info format="html">
+      <text>Standardkategorie für Fragen, die im Kontext 'System' freigegeben sind.</text>
+    </info>
+    <idnumber></idnumber>
+  </question>
+
+  <question type="category">
+    <category>
+      <text>$system$/top/Standard für System/Simulation</text>
+    </category>
+    <info format="html">
+      <text></text>
+    </info>
+    <idnumber></idnumber>
+  </question>
+
+  <question type="multichoice">
+    <name>
+      <text>Pilotfrage 1</text>
+    </name>
+    <questiontext format="html">
+      <text>Pilotfrage 1</text>
+    </questiontext>
+    <generalfeedback format="html">
+      <text></text>
+    </generalfeedback>
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <hidden>0</hidden>
+    <idnumber>Pilotfrage-1</idnumber>
+    <single>true</single>
+    <shuffleanswers>true</shuffleanswers>
+    <answernumbering>none</answernumbering>
+    <showstandardinstruction>0</showstandardinstruction>
+    <correctfeedback format="html">
+      <text>Die Antwort ist richtig.</text>
+    </correctfeedback>
+    <partiallycorrectfeedback format="html">
+      <text>Die Antwort ist teilweise richtig.</text>
+    </partiallycorrectfeedback>
+    <incorrectfeedback format="html">
+      <text>Die Antwort ist falsch.</text>
+    </incorrectfeedback>
+    <shownumcorrect/>
+    <answer fraction="100" format="html">
+      <text><![CDATA[<p dir="ltr" style="text-align: left;">richtige Antwort</p>]]></text>
+      <feedback format="html">
+        <text></text>
+      </feedback>
+    </answer>
+    <answer fraction="0" format="html">
+      <text><![CDATA[<p dir="ltr" style="text-align: left;">falsche Antwort 1</p>]]></text>
+      <feedback format="html">
+        <text></text>
+      </feedback>
+    </answer>
+    <answer fraction="0" format="html">
+      <text><![CDATA[<p dir="ltr" style="text-align: left;">falsche Antwort 2</p>]]></text>
+      <feedback format="html">
+        <text></text>
+      </feedback>
+    </answer>
+    <answer fraction="0" format="html">
+      <text><![CDATA[<p dir="ltr" style="text-align: left;">falsche Antwort 3</p>]]></text>
+      <feedback format="html">
+        <text></text>
+      </feedback>
+    </answer>
+    <tags>
+      <tag><text>Simulation</text>
+      </tag>
+      <tag><text>SC</text>
+      </tag>
+    </tags>
+  </question>
+
+
+  <question type="multichoice">
+    <name>
+      <text>Pilotfrage 1</text>
+    </name>
+    <questiontext format="html">
+      <text>Pilotfrage 1</text>
+    </questiontext>
+    <generalfeedback format="html">
+      <text></text>
+    </generalfeedback>
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <hidden>0</hidden>
+    <idnumber>Pilotfrage-2</idnumber>
+    <single>true</single>
+    <shuffleanswers>true</shuffleanswers>
+    <answernumbering>none</answernumbering>
+    <showstandardinstruction>0</showstandardinstruction>
+    <correctfeedback format="html">
+      <text>Die Antwort ist richtig.</text>
+    </correctfeedback>
+    <partiallycorrectfeedback format="html">
+      <text>Die Antwort ist teilweise richtig.</text>
+    </partiallycorrectfeedback>
+    <incorrectfeedback format="html">
+      <text>Die Antwort ist falsch.</text>
+    </incorrectfeedback>
+    <shownumcorrect/>
+    <answer fraction="100" format="html">
+      <text><![CDATA[<p dir="ltr" style="text-align: left;">richtige Antwort</p>]]></text>
+      <feedback format="html">
+        <text></text>
+      </feedback>
+    </answer>
+    <answer fraction="0" format="html">
+      <text><![CDATA[<p dir="ltr" style="text-align: left;">falsche Antwort 1</p>]]></text>
+      <feedback format="html">
+        <text></text>
+      </feedback>
+    </answer>
+    <answer fraction="0" format="html">
+      <text><![CDATA[<p dir="ltr" style="text-align: left;">falsche Antwort 2</p>]]></text>
+      <feedback format="html">
+        <text></text>
+      </feedback>
+    </answer>
+    <answer fraction="0" format="html">
+      <text><![CDATA[<p dir="ltr" style="text-align: left;">falsche Antwort 3</p>]]></text>
+      <feedback format="html">
+        <text></text>
+      </feedback>
+    </answer>
+    <tags>
+      <tag><text>Simulation</text>
+      </tag>
+      <tag><text>SC</text>
+      </tag>
+    </tags>
+  </question>
+
+
+  <question type="multichoice">
+    <name>
+      <text>Pilotfrage 1</text>
+    </name>
+    <questiontext format="html">
+      <text>Pilotfrage 1</text>
+    </questiontext>
+    <generalfeedback format="html">
+      <text></text>
+    </generalfeedback>
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <hidden>0</hidden>
+    <idnumber>Pilotfrage-3</idnumber>
+    <single>true</single>
+    <shuffleanswers>true</shuffleanswers>
+    <answernumbering>none</answernumbering>
+    <showstandardinstruction>0</showstandardinstruction>
+    <correctfeedback format="html">
+      <text>Die Antwort ist richtig.</text>
+    </correctfeedback>
+    <partiallycorrectfeedback format="html">
+      <text>Die Antwort ist teilweise richtig.</text>
+    </partiallycorrectfeedback>
+    <incorrectfeedback format="html">
+      <text>Die Antwort ist falsch.</text>
+    </incorrectfeedback>
+    <shownumcorrect/>
+    <answer fraction="100" format="html">
+      <text><![CDATA[<p dir="ltr" style="text-align: left;">richtige Antwort</p>]]></text>
+      <feedback format="html">
+        <text></text>
+      </feedback>
+    </answer>
+    <answer fraction="0" format="html">
+      <text><![CDATA[<p dir="ltr" style="text-align: left;">falsche Antwort 1</p>]]></text>
+      <feedback format="html">
+        <text></text>
+      </feedback>
+    </answer>
+    <answer fraction="0" format="html">
+      <text><![CDATA[<p dir="ltr" style="text-align: left;">falsche Antwort 2</p>]]></text>
+      <feedback format="html">
+        <text></text>
+      </feedback>
+    </answer>
+    <answer fraction="0" format="html">
+      <text><![CDATA[<p dir="ltr" style="text-align: left;">falsche Antwort 3</p>]]></text>
+      <feedback format="html">
+        <text></text>
+      </feedback>
+    </answer>
+    <tags>
+      <tag><text>Simulation</text>
+      </tag>
+      <tag><text>SC</text>
+      </tag>
+    </tags>
+  </question>
+
+
+  <question type="multichoice">
+    <name>
+      <text>Pilotfrage 1</text>
+    </name>
+    <questiontext format="html">
+      <text>Pilotfrage 1</text>
+    </questiontext>
+    <generalfeedback format="html">
+      <text></text>
+    </generalfeedback>
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <hidden>0</hidden>
+    <idnumber>Pilotfrage-4</idnumber>
+    <single>true</single>
+    <shuffleanswers>true</shuffleanswers>
+    <answernumbering>none</answernumbering>
+    <showstandardinstruction>0</showstandardinstruction>
+    <correctfeedback format="html">
+      <text>Die Antwort ist richtig.</text>
+    </correctfeedback>
+    <partiallycorrectfeedback format="html">
+      <text>Die Antwort ist teilweise richtig.</text>
+    </partiallycorrectfeedback>
+    <incorrectfeedback format="html">
+      <text>Die Antwort ist falsch.</text>
+    </incorrectfeedback>
+    <shownumcorrect/>
+    <answer fraction="100" format="html">
+      <text><![CDATA[<p dir="ltr" style="text-align: left;">richtige Antwort</p>]]></text>
+      <feedback format="html">
+        <text></text>
+      </feedback>
+    </answer>
+    <answer fraction="0" format="html">
+      <text><![CDATA[<p dir="ltr" style="text-align: left;">falsche Antwort 1</p>]]></text>
+      <feedback format="html">
+        <text></text>
+      </feedback>
+    </answer>
+    <answer fraction="0" format="html">
+      <text><![CDATA[<p dir="ltr" style="text-align: left;">falsche Antwort 2</p>]]></text>
+      <feedback format="html">
+        <text></text>
+      </feedback>
+    </answer>
+    <answer fraction="0" format="html">
+      <text><![CDATA[<p dir="ltr" style="text-align: left;">falsche Antwort 3</p>]]></text>
+      <feedback format="html">
+        <text></text>
+      </feedback>
+    </answer>
+    <tags>
+      <tag><text>Simulation</text>
+      </tag>
+      <tag><text>SC</text>
+      </tag>
+    </tags>
+  </question>
+
+
+  <question type="multichoice">
+    <name>
+      <text>Pilotfrage 1</text>
+    </name>
+    <questiontext format="html">
+      <text>Pilotfrage 1</text>
+    </questiontext>
+    <generalfeedback format="html">
+      <text></text>
+    </generalfeedback>
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <hidden>0</hidden>
+    <idnumber>Pilotfrage-5</idnumber>
+    <single>true</single>
+    <shuffleanswers>true</shuffleanswers>
+    <answernumbering>none</answernumbering>
+    <showstandardinstruction>0</showstandardinstruction>
+    <correctfeedback format="html">
+      <text>Die Antwort ist richtig.</text>
+    </correctfeedback>
+    <partiallycorrectfeedback format="html">
+      <text>Die Antwort ist teilweise richtig.</text>
+    </partiallycorrectfeedback>
+    <incorrectfeedback format="html">
+      <text>Die Antwort ist falsch.</text>
+    </incorrectfeedback>
+    <shownumcorrect/>
+    <answer fraction="100" format="html">
+      <text><![CDATA[<p dir="ltr" style="text-align: left;">richtige Antwort</p>]]></text>
+      <feedback format="html">
+        <text></text>
+      </feedback>
+    </answer>
+    <answer fraction="0" format="html">
+      <text><![CDATA[<p dir="ltr" style="text-align: left;">falsche Antwort 1</p>]]></text>
+      <feedback format="html">
+        <text></text>
+      </feedback>
+    </answer>
+    <answer fraction="0" format="html">
+      <text><![CDATA[<p dir="ltr" style="text-align: left;">falsche Antwort 2</p>]]></text>
+      <feedback format="html">
+        <text></text>
+      </feedback>
+    </answer>
+    <answer fraction="0" format="html">
+      <text><![CDATA[<p dir="ltr" style="text-align: left;">falsche Antwort 3</p>]]></text>
+      <feedback format="html">
+        <text></text>
+      </feedback>
+    </answer>
+    <tags>
+      <tag><text>Simulation</text>
+      </tag>
+      <tag><text>SC</text>
+      </tag>
+    </tags>
+  </question>
+
+
+  <question type="multichoice">
+    <name>
+      <text>Pilotfrage 1</text>
+    </name>
+    <questiontext format="html">
+      <text>Pilotfrage 1</text>
+    </questiontext>
+    <generalfeedback format="html">
+      <text></text>
+    </generalfeedback>
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <hidden>0</hidden>
+    <idnumber>Pilotfrage-6</idnumber>
+    <single>true</single>
+    <shuffleanswers>true</shuffleanswers>
+    <answernumbering>none</answernumbering>
+    <showstandardinstruction>0</showstandardinstruction>
+    <correctfeedback format="html">
+      <text>Die Antwort ist richtig.</text>
+    </correctfeedback>
+    <partiallycorrectfeedback format="html">
+      <text>Die Antwort ist teilweise richtig.</text>
+    </partiallycorrectfeedback>
+    <incorrectfeedback format="html">
+      <text>Die Antwort ist falsch.</text>
+    </incorrectfeedback>
+    <shownumcorrect/>
+    <answer fraction="100" format="html">
+      <text><![CDATA[<p dir="ltr" style="text-align: left;">richtige Antwort</p>]]></text>
+      <feedback format="html">
+        <text></text>
+      </feedback>
+    </answer>
+    <answer fraction="0" format="html">
+      <text><![CDATA[<p dir="ltr" style="text-align: left;">falsche Antwort 1</p>]]></text>
+      <feedback format="html">
+        <text></text>
+      </feedback>
+    </answer>
+    <answer fraction="0" format="html">
+      <text><![CDATA[<p dir="ltr" style="text-align: left;">falsche Antwort 2</p>]]></text>
+      <feedback format="html">
+        <text></text>
+      </feedback>
+    </answer>
+    <answer fraction="0" format="html">
+      <text><![CDATA[<p dir="ltr" style="text-align: left;">falsche Antwort 3</p>]]></text>
+      <feedback format="html">
+        <text></text>
+      </feedback>
+    </answer>
+    <tags>
+      <tag><text>Simulation</text>
+      </tag>
+      <tag><text>SC</text>
+      </tag>
+    </tags>
+  </question>
+
+
+  <question type="multichoice">
+    <name>
+      <text>Pilotfrage 1</text>
+    </name>
+    <questiontext format="html">
+      <text>Pilotfrage 1</text>
+    </questiontext>
+    <generalfeedback format="html">
+      <text></text>
+    </generalfeedback>
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <hidden>0</hidden>
+    <idnumber>Pilotfrage-7</idnumber>
+    <single>true</single>
+    <shuffleanswers>true</shuffleanswers>
+    <answernumbering>none</answernumbering>
+    <showstandardinstruction>0</showstandardinstruction>
+    <correctfeedback format="html">
+      <text>Die Antwort ist richtig.</text>
+    </correctfeedback>
+    <partiallycorrectfeedback format="html">
+      <text>Die Antwort ist teilweise richtig.</text>
+    </partiallycorrectfeedback>
+    <incorrectfeedback format="html">
+      <text>Die Antwort ist falsch.</text>
+    </incorrectfeedback>
+    <shownumcorrect/>
+    <answer fraction="100" format="html">
+      <text><![CDATA[<p dir="ltr" style="text-align: left;">richtige Antwort</p>]]></text>
+      <feedback format="html">
+        <text></text>
+      </feedback>
+    </answer>
+    <answer fraction="0" format="html">
+      <text><![CDATA[<p dir="ltr" style="text-align: left;">falsche Antwort 1</p>]]></text>
+      <feedback format="html">
+        <text></text>
+      </feedback>
+    </answer>
+    <answer fraction="0" format="html">
+      <text><![CDATA[<p dir="ltr" style="text-align: left;">falsche Antwort 2</p>]]></text>
+      <feedback format="html">
+        <text></text>
+      </feedback>
+    </answer>
+    <answer fraction="0" format="html">
+      <text><![CDATA[<p dir="ltr" style="text-align: left;">falsche Antwort 3</p>]]></text>
+      <feedback format="html">
+        <text></text>
+      </feedback>
+    </answer>
+    <tags>
+      <tag><text>Simulation</text>
+      </tag>
+      <tag><text>SC</text>
+      </tag>
+    </tags>
+  </question>
+
+
+  <question type="multichoice">
+    <name>
+      <text>Pilotfrage 1</text>
+    </name>
+    <questiontext format="html">
+      <text>Pilotfrage 1</text>
+    </questiontext>
+    <generalfeedback format="html">
+      <text></text>
+    </generalfeedback>
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <hidden>0</hidden>
+    <idnumber>Pilotfrage-8</idnumber>
+    <single>true</single>
+    <shuffleanswers>true</shuffleanswers>
+    <answernumbering>none</answernumbering>
+    <showstandardinstruction>0</showstandardinstruction>
+    <correctfeedback format="html">
+      <text>Die Antwort ist richtig.</text>
+    </correctfeedback>
+    <partiallycorrectfeedback format="html">
+      <text>Die Antwort ist teilweise richtig.</text>
+    </partiallycorrectfeedback>
+    <incorrectfeedback format="html">
+      <text>Die Antwort ist falsch.</text>
+    </incorrectfeedback>
+    <shownumcorrect/>
+    <answer fraction="100" format="html">
+      <text><![CDATA[<p dir="ltr" style="text-align: left;">richtige Antwort</p>]]></text>
+      <feedback format="html">
+        <text></text>
+      </feedback>
+    </answer>
+    <answer fraction="0" format="html">
+      <text><![CDATA[<p dir="ltr" style="text-align: left;">falsche Antwort 1</p>]]></text>
+      <feedback format="html">
+        <text></text>
+      </feedback>
+    </answer>
+    <answer fraction="0" format="html">
+      <text><![CDATA[<p dir="ltr" style="text-align: left;">falsche Antwort 2</p>]]></text>
+      <feedback format="html">
+        <text></text>
+      </feedback>
+    </answer>
+    <answer fraction="0" format="html">
+      <text><![CDATA[<p dir="ltr" style="text-align: left;">falsche Antwort 3</p>]]></text>
+      <feedback format="html">
+        <text></text>
+      </feedback>
+    </answer>
+    <tags>
+      <tag><text>Simulation</text>
+      </tag>
+      <tag><text>SC</text>
+      </tag>
+    </tags>
+  </question>
+
+
+  <question type="multichoice">
+    <name>
+      <text>Pilotfrage 1</text>
+    </name>
+    <questiontext format="html">
+      <text>Pilotfrage 1</text>
+    </questiontext>
+    <generalfeedback format="html">
+      <text></text>
+    </generalfeedback>
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <hidden>0</hidden>
+    <idnumber>Pilotfrage-9</idnumber>
+    <single>true</single>
+    <shuffleanswers>true</shuffleanswers>
+    <answernumbering>none</answernumbering>
+    <showstandardinstruction>0</showstandardinstruction>
+    <correctfeedback format="html">
+      <text>Die Antwort ist richtig.</text>
+    </correctfeedback>
+    <partiallycorrectfeedback format="html">
+      <text>Die Antwort ist teilweise richtig.</text>
+    </partiallycorrectfeedback>
+    <incorrectfeedback format="html">
+      <text>Die Antwort ist falsch.</text>
+    </incorrectfeedback>
+    <shownumcorrect/>
+    <answer fraction="100" format="html">
+      <text><![CDATA[<p dir="ltr" style="text-align: left;">richtige Antwort</p>]]></text>
+      <feedback format="html">
+        <text></text>
+      </feedback>
+    </answer>
+    <answer fraction="0" format="html">
+      <text><![CDATA[<p dir="ltr" style="text-align: left;">falsche Antwort 1</p>]]></text>
+      <feedback format="html">
+        <text></text>
+      </feedback>
+    </answer>
+    <answer fraction="0" format="html">
+      <text><![CDATA[<p dir="ltr" style="text-align: left;">falsche Antwort 2</p>]]></text>
+      <feedback format="html">
+        <text></text>
+      </feedback>
+    </answer>
+    <answer fraction="0" format="html">
+      <text><![CDATA[<p dir="ltr" style="text-align: left;">falsche Antwort 3</p>]]></text>
+      <feedback format="html">
+        <text></text>
+      </feedback>
+    </answer>
+    <tags>
+      <tag><text>Simulation</text>
+      </tag>
+      <tag><text>SC</text>
+      </tag>
+    </tags>
+  </question>
+
+
+  <question type="multichoice">
+    <name>
+      <text>Pilotfrage 1</text>
+    </name>
+    <questiontext format="html">
+      <text>Pilotfrage 1</text>
+    </questiontext>
+    <generalfeedback format="html">
+      <text></text>
+    </generalfeedback>
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <hidden>0</hidden>
+    <idnumber>Pilotfrage-10</idnumber>
+    <single>true</single>
+    <shuffleanswers>true</shuffleanswers>
+    <answernumbering>none</answernumbering>
+    <showstandardinstruction>0</showstandardinstruction>
+    <correctfeedback format="html">
+      <text>Die Antwort ist richtig.</text>
+    </correctfeedback>
+    <partiallycorrectfeedback format="html">
+      <text>Die Antwort ist teilweise richtig.</text>
+    </partiallycorrectfeedback>
+    <incorrectfeedback format="html">
+      <text>Die Antwort ist falsch.</text>
+    </incorrectfeedback>
+    <shownumcorrect/>
+    <answer fraction="100" format="html">
+      <text><![CDATA[<p dir="ltr" style="text-align: left;">richtige Antwort</p>]]></text>
+      <feedback format="html">
+        <text></text>
+      </feedback>
+    </answer>
+    <answer fraction="0" format="html">
+      <text><![CDATA[<p dir="ltr" style="text-align: left;">falsche Antwort 1</p>]]></text>
+      <feedback format="html">
+        <text></text>
+      </feedback>
+    </answer>
+    <answer fraction="0" format="html">
+      <text><![CDATA[<p dir="ltr" style="text-align: left;">falsche Antwort 2</p>]]></text>
+      <feedback format="html">
+        <text></text>
+      </feedback>
+    </answer>
+    <answer fraction="0" format="html">
+      <text><![CDATA[<p dir="ltr" style="text-align: left;">falsche Antwort 3</p>]]></text>
+      <feedback format="html">
+        <text></text>
+      </feedback>
+    </answer>
+    <tags>
+      <tag><text>Simulation</text>
+      </tag>
+      <tag><text>SC</text>
+      </tag>
+    </tags>
+  </question>
+
+
+  <question type="multichoice">
+    <name>
+      <text>Pilotfrage 1</text>
+    </name>
+    <questiontext format="html">
+      <text>Pilotfrage 1</text>
+    </questiontext>
+    <generalfeedback format="html">
+      <text></text>
+    </generalfeedback>
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <hidden>0</hidden>
+    <idnumber>Pilotfrage-11</idnumber>
+    <single>true</single>
+    <shuffleanswers>true</shuffleanswers>
+    <answernumbering>none</answernumbering>
+    <showstandardinstruction>0</showstandardinstruction>
+    <correctfeedback format="html">
+      <text>Die Antwort ist richtig.</text>
+    </correctfeedback>
+    <partiallycorrectfeedback format="html">
+      <text>Die Antwort ist teilweise richtig.</text>
+    </partiallycorrectfeedback>
+    <incorrectfeedback format="html">
+      <text>Die Antwort ist falsch.</text>
+    </incorrectfeedback>
+    <shownumcorrect/>
+    <answer fraction="100" format="html">
+      <text><![CDATA[<p dir="ltr" style="text-align: left;">richtige Antwort</p>]]></text>
+      <feedback format="html">
+        <text></text>
+      </feedback>
+    </answer>
+    <answer fraction="0" format="html">
+      <text><![CDATA[<p dir="ltr" style="text-align: left;">falsche Antwort 1</p>]]></text>
+      <feedback format="html">
+        <text></text>
+      </feedback>
+    </answer>
+    <answer fraction="0" format="html">
+      <text><![CDATA[<p dir="ltr" style="text-align: left;">falsche Antwort 2</p>]]></text>
+      <feedback format="html">
+        <text></text>
+      </feedback>
+    </answer>
+    <answer fraction="0" format="html">
+      <text><![CDATA[<p dir="ltr" style="text-align: left;">falsche Antwort 3</p>]]></text>
+      <feedback format="html">
+        <text></text>
+      </feedback>
+    </answer>
+    <tags>
+      <tag><text>Simulation</text>
+      </tag>
+      <tag><text>SC</text>
+      </tag>
+    </tags>
+  </question>
+
+
+  <question type="multichoice">
+    <name>
+      <text>Pilotfrage 1</text>
+    </name>
+    <questiontext format="html">
+      <text>Pilotfrage 1</text>
+    </questiontext>
+    <generalfeedback format="html">
+      <text></text>
+    </generalfeedback>
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <hidden>0</hidden>
+    <idnumber>Pilotfrage-12</idnumber>
+    <single>true</single>
+    <shuffleanswers>true</shuffleanswers>
+    <answernumbering>none</answernumbering>
+    <showstandardinstruction>0</showstandardinstruction>
+    <correctfeedback format="html">
+      <text>Die Antwort ist richtig.</text>
+    </correctfeedback>
+    <partiallycorrectfeedback format="html">
+      <text>Die Antwort ist teilweise richtig.</text>
+    </partiallycorrectfeedback>
+    <incorrectfeedback format="html">
+      <text>Die Antwort ist falsch.</text>
+    </incorrectfeedback>
+    <shownumcorrect/>
+    <answer fraction="100" format="html">
+      <text><![CDATA[<p dir="ltr" style="text-align: left;">richtige Antwort</p>]]></text>
+      <feedback format="html">
+        <text></text>
+      </feedback>
+    </answer>
+    <answer fraction="0" format="html">
+      <text><![CDATA[<p dir="ltr" style="text-align: left;">falsche Antwort 1</p>]]></text>
+      <feedback format="html">
+        <text></text>
+      </feedback>
+    </answer>
+    <answer fraction="0" format="html">
+      <text><![CDATA[<p dir="ltr" style="text-align: left;">falsche Antwort 2</p>]]></text>
+      <feedback format="html">
+        <text></text>
+      </feedback>
+    </answer>
+    <answer fraction="0" format="html">
+      <text><![CDATA[<p dir="ltr" style="text-align: left;">falsche Antwort 3</p>]]></text>
+      <feedback format="html">
+        <text></text>
+      </feedback>
+    </answer>
+    <tags>
+      <tag><text>Simulation</text>
+      </tag>
+      <tag><text>SC</text>
+      </tag>
+    </tags>
+  </question>
+
+
+  <question type="multichoice">
+    <name>
+      <text>Pilotfrage 1</text>
+    </name>
+    <questiontext format="html">
+      <text>Pilotfrage 1</text>
+    </questiontext>
+    <generalfeedback format="html">
+      <text></text>
+    </generalfeedback>
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <hidden>0</hidden>
+    <idnumber>Pilotfrage-13</idnumber>
+    <single>true</single>
+    <shuffleanswers>true</shuffleanswers>
+    <answernumbering>none</answernumbering>
+    <showstandardinstruction>0</showstandardinstruction>
+    <correctfeedback format="html">
+      <text>Die Antwort ist richtig.</text>
+    </correctfeedback>
+    <partiallycorrectfeedback format="html">
+      <text>Die Antwort ist teilweise richtig.</text>
+    </partiallycorrectfeedback>
+    <incorrectfeedback format="html">
+      <text>Die Antwort ist falsch.</text>
+    </incorrectfeedback>
+    <shownumcorrect/>
+    <answer fraction="100" format="html">
+      <text><![CDATA[<p dir="ltr" style="text-align: left;">richtige Antwort</p>]]></text>
+      <feedback format="html">
+        <text></text>
+      </feedback>
+    </answer>
+    <answer fraction="0" format="html">
+      <text><![CDATA[<p dir="ltr" style="text-align: left;">falsche Antwort 1</p>]]></text>
+      <feedback format="html">
+        <text></text>
+      </feedback>
+    </answer>
+    <answer fraction="0" format="html">
+      <text><![CDATA[<p dir="ltr" style="text-align: left;">falsche Antwort 2</p>]]></text>
+      <feedback format="html">
+        <text></text>
+      </feedback>
+    </answer>
+    <answer fraction="0" format="html">
+      <text><![CDATA[<p dir="ltr" style="text-align: left;">falsche Antwort 3</p>]]></text>
+      <feedback format="html">
+        <text></text>
+      </feedback>
+    </answer>
+    <tags>
+      <tag><text>Simulation</text>
+      </tag>
+      <tag><text>SC</text>
+      </tag>
+    </tags>
+  </question>
+
+
+  <question type="multichoice">
+    <name>
+      <text>Pilotfrage 1</text>
+    </name>
+    <questiontext format="html">
+      <text>Pilotfrage 1</text>
+    </questiontext>
+    <generalfeedback format="html">
+      <text></text>
+    </generalfeedback>
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <hidden>0</hidden>
+    <idnumber>Pilotfrage-14</idnumber>
+    <single>true</single>
+    <shuffleanswers>true</shuffleanswers>
+    <answernumbering>none</answernumbering>
+    <showstandardinstruction>0</showstandardinstruction>
+    <correctfeedback format="html">
+      <text>Die Antwort ist richtig.</text>
+    </correctfeedback>
+    <partiallycorrectfeedback format="html">
+      <text>Die Antwort ist teilweise richtig.</text>
+    </partiallycorrectfeedback>
+    <incorrectfeedback format="html">
+      <text>Die Antwort ist falsch.</text>
+    </incorrectfeedback>
+    <shownumcorrect/>
+    <answer fraction="100" format="html">
+      <text><![CDATA[<p dir="ltr" style="text-align: left;">richtige Antwort</p>]]></text>
+      <feedback format="html">
+        <text></text>
+      </feedback>
+    </answer>
+    <answer fraction="0" format="html">
+      <text><![CDATA[<p dir="ltr" style="text-align: left;">falsche Antwort 1</p>]]></text>
+      <feedback format="html">
+        <text></text>
+      </feedback>
+    </answer>
+    <answer fraction="0" format="html">
+      <text><![CDATA[<p dir="ltr" style="text-align: left;">falsche Antwort 2</p>]]></text>
+      <feedback format="html">
+        <text></text>
+      </feedback>
+    </answer>
+    <answer fraction="0" format="html">
+      <text><![CDATA[<p dir="ltr" style="text-align: left;">falsche Antwort 3</p>]]></text>
+      <feedback format="html">
+        <text></text>
+      </feedback>
+    </answer>
+    <tags>
+      <tag><text>Simulation</text>
+      </tag>
+      <tag><text>SC</text>
+      </tag>
+    </tags>
+  </question>
+
+
+  <question type="multichoice">
+    <name>
+      <text>Pilotfrage 1</text>
+    </name>
+    <questiontext format="html">
+      <text>Pilotfrage 1</text>
+    </questiontext>
+    <generalfeedback format="html">
+      <text></text>
+    </generalfeedback>
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <hidden>0</hidden>
+    <idnumber>Pilotfrage-15</idnumber>
+    <single>true</single>
+    <shuffleanswers>true</shuffleanswers>
+    <answernumbering>none</answernumbering>
+    <showstandardinstruction>0</showstandardinstruction>
+    <correctfeedback format="html">
+      <text>Die Antwort ist richtig.</text>
+    </correctfeedback>
+    <partiallycorrectfeedback format="html">
+      <text>Die Antwort ist teilweise richtig.</text>
+    </partiallycorrectfeedback>
+    <incorrectfeedback format="html">
+      <text>Die Antwort ist falsch.</text>
+    </incorrectfeedback>
+    <shownumcorrect/>
+    <answer fraction="100" format="html">
+      <text><![CDATA[<p dir="ltr" style="text-align: left;">richtige Antwort</p>]]></text>
+      <feedback format="html">
+        <text></text>
+      </feedback>
+    </answer>
+    <answer fraction="0" format="html">
+      <text><![CDATA[<p dir="ltr" style="text-align: left;">falsche Antwort 1</p>]]></text>
+      <feedback format="html">
+        <text></text>
+      </feedback>
+    </answer>
+    <answer fraction="0" format="html">
+      <text><![CDATA[<p dir="ltr" style="text-align: left;">falsche Antwort 2</p>]]></text>
+      <feedback format="html">
+        <text></text>
+      </feedback>
+    </answer>
+    <answer fraction="0" format="html">
+      <text><![CDATA[<p dir="ltr" style="text-align: left;">falsche Antwort 3</p>]]></text>
+      <feedback format="html">
+        <text></text>
+      </feedback>
+    </answer>
+    <tags>
+      <tag><text>Simulation</text>
+      </tag>
+      <tag><text>SC</text>
+      </tag>
+    </tags>
+  </question>
+
+
+  <question type="multichoice">
+    <name>
+      <text>Pilotfrage 1</text>
+    </name>
+    <questiontext format="html">
+      <text>Pilotfrage 1</text>
+    </questiontext>
+    <generalfeedback format="html">
+      <text></text>
+    </generalfeedback>
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <hidden>0</hidden>
+    <idnumber>Pilotfrage-16</idnumber>
+    <single>true</single>
+    <shuffleanswers>true</shuffleanswers>
+    <answernumbering>none</answernumbering>
+    <showstandardinstruction>0</showstandardinstruction>
+    <correctfeedback format="html">
+      <text>Die Antwort ist richtig.</text>
+    </correctfeedback>
+    <partiallycorrectfeedback format="html">
+      <text>Die Antwort ist teilweise richtig.</text>
+    </partiallycorrectfeedback>
+    <incorrectfeedback format="html">
+      <text>Die Antwort ist falsch.</text>
+    </incorrectfeedback>
+    <shownumcorrect/>
+    <answer fraction="100" format="html">
+      <text><![CDATA[<p dir="ltr" style="text-align: left;">richtige Antwort</p>]]></text>
+      <feedback format="html">
+        <text></text>
+      </feedback>
+    </answer>
+    <answer fraction="0" format="html">
+      <text><![CDATA[<p dir="ltr" style="text-align: left;">falsche Antwort 1</p>]]></text>
+      <feedback format="html">
+        <text></text>
+      </feedback>
+    </answer>
+    <answer fraction="0" format="html">
+      <text><![CDATA[<p dir="ltr" style="text-align: left;">falsche Antwort 2</p>]]></text>
+      <feedback format="html">
+        <text></text>
+      </feedback>
+    </answer>
+    <answer fraction="0" format="html">
+      <text><![CDATA[<p dir="ltr" style="text-align: left;">falsche Antwort 3</p>]]></text>
+      <feedback format="html">
+        <text></text>
+      </feedback>
+    </answer>
+    <tags>
+      <tag><text>Simulation</text>
+      </tag>
+      <tag><text>SC</text>
+      </tag>
+    </tags>
+  </question>
+
+
+  <question type="multichoice">
+    <name>
+      <text>Pilotfrage 1</text>
+    </name>
+    <questiontext format="html">
+      <text>Pilotfrage 1</text>
+    </questiontext>
+    <generalfeedback format="html">
+      <text></text>
+    </generalfeedback>
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <hidden>0</hidden>
+    <idnumber>Pilotfrage-17</idnumber>
+    <single>true</single>
+    <shuffleanswers>true</shuffleanswers>
+    <answernumbering>none</answernumbering>
+    <showstandardinstruction>0</showstandardinstruction>
+    <correctfeedback format="html">
+      <text>Die Antwort ist richtig.</text>
+    </correctfeedback>
+    <partiallycorrectfeedback format="html">
+      <text>Die Antwort ist teilweise richtig.</text>
+    </partiallycorrectfeedback>
+    <incorrectfeedback format="html">
+      <text>Die Antwort ist falsch.</text>
+    </incorrectfeedback>
+    <shownumcorrect/>
+    <answer fraction="100" format="html">
+      <text><![CDATA[<p dir="ltr" style="text-align: left;">richtige Antwort</p>]]></text>
+      <feedback format="html">
+        <text></text>
+      </feedback>
+    </answer>
+    <answer fraction="0" format="html">
+      <text><![CDATA[<p dir="ltr" style="text-align: left;">falsche Antwort 1</p>]]></text>
+      <feedback format="html">
+        <text></text>
+      </feedback>
+    </answer>
+    <answer fraction="0" format="html">
+      <text><![CDATA[<p dir="ltr" style="text-align: left;">falsche Antwort 2</p>]]></text>
+      <feedback format="html">
+        <text></text>
+      </feedback>
+    </answer>
+    <answer fraction="0" format="html">
+      <text><![CDATA[<p dir="ltr" style="text-align: left;">falsche Antwort 3</p>]]></text>
+      <feedback format="html">
+        <text></text>
+      </feedback>
+    </answer>
+    <tags>
+      <tag><text>Simulation</text>
+      </tag>
+      <tag><text>SC</text>
+      </tag>
+    </tags>
+  </question>
+
+
+  <question type="multichoice">
+    <name>
+      <text>Pilotfrage 1</text>
+    </name>
+    <questiontext format="html">
+      <text>Pilotfrage 1</text>
+    </questiontext>
+    <generalfeedback format="html">
+      <text></text>
+    </generalfeedback>
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <hidden>0</hidden>
+    <idnumber>Pilotfrage-18</idnumber>
+    <single>true</single>
+    <shuffleanswers>true</shuffleanswers>
+    <answernumbering>none</answernumbering>
+    <showstandardinstruction>0</showstandardinstruction>
+    <correctfeedback format="html">
+      <text>Die Antwort ist richtig.</text>
+    </correctfeedback>
+    <partiallycorrectfeedback format="html">
+      <text>Die Antwort ist teilweise richtig.</text>
+    </partiallycorrectfeedback>
+    <incorrectfeedback format="html">
+      <text>Die Antwort ist falsch.</text>
+    </incorrectfeedback>
+    <shownumcorrect/>
+    <answer fraction="100" format="html">
+      <text><![CDATA[<p dir="ltr" style="text-align: left;">richtige Antwort</p>]]></text>
+      <feedback format="html">
+        <text></text>
+      </feedback>
+    </answer>
+    <answer fraction="0" format="html">
+      <text><![CDATA[<p dir="ltr" style="text-align: left;">falsche Antwort 1</p>]]></text>
+      <feedback format="html">
+        <text></text>
+      </feedback>
+    </answer>
+    <answer fraction="0" format="html">
+      <text><![CDATA[<p dir="ltr" style="text-align: left;">falsche Antwort 2</p>]]></text>
+      <feedback format="html">
+        <text></text>
+      </feedback>
+    </answer>
+    <answer fraction="0" format="html">
+      <text><![CDATA[<p dir="ltr" style="text-align: left;">falsche Antwort 3</p>]]></text>
+      <feedback format="html">
+        <text></text>
+      </feedback>
+    </answer>
+    <tags>
+      <tag><text>Simulation</text>
+      </tag>
+      <tag><text>SC</text>
+      </tag>
+    </tags>
+  </question>
+
+
+  <question type="multichoice">
+    <name>
+      <text>Pilotfrage 1</text>
+    </name>
+    <questiontext format="html">
+      <text>Pilotfrage 1</text>
+    </questiontext>
+    <generalfeedback format="html">
+      <text></text>
+    </generalfeedback>
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <hidden>0</hidden>
+    <idnumber>Pilotfrage-19</idnumber>
+    <single>true</single>
+    <shuffleanswers>true</shuffleanswers>
+    <answernumbering>none</answernumbering>
+    <showstandardinstruction>0</showstandardinstruction>
+    <correctfeedback format="html">
+      <text>Die Antwort ist richtig.</text>
+    </correctfeedback>
+    <partiallycorrectfeedback format="html">
+      <text>Die Antwort ist teilweise richtig.</text>
+    </partiallycorrectfeedback>
+    <incorrectfeedback format="html">
+      <text>Die Antwort ist falsch.</text>
+    </incorrectfeedback>
+    <shownumcorrect/>
+    <answer fraction="100" format="html">
+      <text><![CDATA[<p dir="ltr" style="text-align: left;">richtige Antwort</p>]]></text>
+      <feedback format="html">
+        <text></text>
+      </feedback>
+    </answer>
+    <answer fraction="0" format="html">
+      <text><![CDATA[<p dir="ltr" style="text-align: left;">falsche Antwort 1</p>]]></text>
+      <feedback format="html">
+        <text></text>
+      </feedback>
+    </answer>
+    <answer fraction="0" format="html">
+      <text><![CDATA[<p dir="ltr" style="text-align: left;">falsche Antwort 2</p>]]></text>
+      <feedback format="html">
+        <text></text>
+      </feedback>
+    </answer>
+    <answer fraction="0" format="html">
+      <text><![CDATA[<p dir="ltr" style="text-align: left;">falsche Antwort 3</p>]]></text>
+      <feedback format="html">
+        <text></text>
+      </feedback>
+    </answer>
+    <tags>
+      <tag><text>Simulation</text>
+      </tag>
+      <tag><text>SC</text>
+      </tag>
+    </tags>
+  </question>
+
+
+  <question type="multichoice">
+    <name>
+      <text>Pilotfrage 1</text>
+    </name>
+    <questiontext format="html">
+      <text>Pilotfrage 1</text>
+    </questiontext>
+    <generalfeedback format="html">
+      <text></text>
+    </generalfeedback>
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <hidden>0</hidden>
+    <idnumber>Pilotfrage-20</idnumber>
+    <single>true</single>
+    <shuffleanswers>true</shuffleanswers>
+    <answernumbering>none</answernumbering>
+    <showstandardinstruction>0</showstandardinstruction>
+    <correctfeedback format="html">
+      <text>Die Antwort ist richtig.</text>
+    </correctfeedback>
+    <partiallycorrectfeedback format="html">
+      <text>Die Antwort ist teilweise richtig.</text>
+    </partiallycorrectfeedback>
+    <incorrectfeedback format="html">
+      <text>Die Antwort ist falsch.</text>
+    </incorrectfeedback>
+    <shownumcorrect/>
+    <answer fraction="100" format="html">
+      <text><![CDATA[<p dir="ltr" style="text-align: left;">richtige Antwort</p>]]></text>
+      <feedback format="html">
+        <text></text>
+      </feedback>
+    </answer>
+    <answer fraction="0" format="html">
+      <text><![CDATA[<p dir="ltr" style="text-align: left;">falsche Antwort 1</p>]]></text>
+      <feedback format="html">
+        <text></text>
+      </feedback>
+    </answer>
+    <answer fraction="0" format="html">
+      <text><![CDATA[<p dir="ltr" style="text-align: left;">falsche Antwort 2</p>]]></text>
+      <feedback format="html">
+        <text></text>
+      </feedback>
+    </answer>
+    <answer fraction="0" format="html">
+      <text><![CDATA[<p dir="ltr" style="text-align: left;">falsche Antwort 3</p>]]></text>
+      <feedback format="html">
+        <text></text>
+      </feedback>
+    </answer>
+    <tags>
+      <tag><text>Simulation</text>
+      </tag>
+      <tag><text>SC</text>
+      </tag>
+    </tags>
+  </question>
+
+
+  <question type="multichoice">
+    <name>
+      <text>Pilotfrage 1</text>
+    </name>
+    <questiontext format="html">
+      <text>Pilotfrage 1</text>
+    </questiontext>
+    <generalfeedback format="html">
+      <text></text>
+    </generalfeedback>
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <hidden>0</hidden>
+    <idnumber>Pilotfrage-21</idnumber>
+    <single>true</single>
+    <shuffleanswers>true</shuffleanswers>
+    <answernumbering>none</answernumbering>
+    <showstandardinstruction>0</showstandardinstruction>
+    <correctfeedback format="html">
+      <text>Die Antwort ist richtig.</text>
+    </correctfeedback>
+    <partiallycorrectfeedback format="html">
+      <text>Die Antwort ist teilweise richtig.</text>
+    </partiallycorrectfeedback>
+    <incorrectfeedback format="html">
+      <text>Die Antwort ist falsch.</text>
+    </incorrectfeedback>
+    <shownumcorrect/>
+    <answer fraction="100" format="html">
+      <text><![CDATA[<p dir="ltr" style="text-align: left;">richtige Antwort</p>]]></text>
+      <feedback format="html">
+        <text></text>
+      </feedback>
+    </answer>
+    <answer fraction="0" format="html">
+      <text><![CDATA[<p dir="ltr" style="text-align: left;">falsche Antwort 1</p>]]></text>
+      <feedback format="html">
+        <text></text>
+      </feedback>
+    </answer>
+    <answer fraction="0" format="html">
+      <text><![CDATA[<p dir="ltr" style="text-align: left;">falsche Antwort 2</p>]]></text>
+      <feedback format="html">
+        <text></text>
+      </feedback>
+    </answer>
+    <answer fraction="0" format="html">
+      <text><![CDATA[<p dir="ltr" style="text-align: left;">falsche Antwort 3</p>]]></text>
+      <feedback format="html">
+        <text></text>
+      </feedback>
+    </answer>
+    <tags>
+      <tag><text>Simulation</text>
+      </tag>
+      <tag><text>SC</text>
+      </tag>
+    </tags>
+  </question>
+
+
+  <question type="multichoice">
+    <name>
+      <text>Pilotfrage 1</text>
+    </name>
+    <questiontext format="html">
+      <text>Pilotfrage 1</text>
+    </questiontext>
+    <generalfeedback format="html">
+      <text></text>
+    </generalfeedback>
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <hidden>0</hidden>
+    <idnumber>Pilotfrage-22</idnumber>
+    <single>true</single>
+    <shuffleanswers>true</shuffleanswers>
+    <answernumbering>none</answernumbering>
+    <showstandardinstruction>0</showstandardinstruction>
+    <correctfeedback format="html">
+      <text>Die Antwort ist richtig.</text>
+    </correctfeedback>
+    <partiallycorrectfeedback format="html">
+      <text>Die Antwort ist teilweise richtig.</text>
+    </partiallycorrectfeedback>
+    <incorrectfeedback format="html">
+      <text>Die Antwort ist falsch.</text>
+    </incorrectfeedback>
+    <shownumcorrect/>
+    <answer fraction="100" format="html">
+      <text><![CDATA[<p dir="ltr" style="text-align: left;">richtige Antwort</p>]]></text>
+      <feedback format="html">
+        <text></text>
+      </feedback>
+    </answer>
+    <answer fraction="0" format="html">
+      <text><![CDATA[<p dir="ltr" style="text-align: left;">falsche Antwort 1</p>]]></text>
+      <feedback format="html">
+        <text></text>
+      </feedback>
+    </answer>
+    <answer fraction="0" format="html">
+      <text><![CDATA[<p dir="ltr" style="text-align: left;">falsche Antwort 2</p>]]></text>
+      <feedback format="html">
+        <text></text>
+      </feedback>
+    </answer>
+    <answer fraction="0" format="html">
+      <text><![CDATA[<p dir="ltr" style="text-align: left;">falsche Antwort 3</p>]]></text>
+      <feedback format="html">
+        <text></text>
+      </feedback>
+    </answer>
+    <tags>
+      <tag><text>Simulation</text>
+      </tag>
+      <tag><text>SC</text>
+      </tag>
+    </tags>
+  </question>
+
+
+  <question type="multichoice">
+    <name>
+      <text>Pilotfrage 1</text>
+    </name>
+    <questiontext format="html">
+      <text>Pilotfrage 1</text>
+    </questiontext>
+    <generalfeedback format="html">
+      <text></text>
+    </generalfeedback>
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <hidden>0</hidden>
+    <idnumber>Pilotfrage-23</idnumber>
+    <single>true</single>
+    <shuffleanswers>true</shuffleanswers>
+    <answernumbering>none</answernumbering>
+    <showstandardinstruction>0</showstandardinstruction>
+    <correctfeedback format="html">
+      <text>Die Antwort ist richtig.</text>
+    </correctfeedback>
+    <partiallycorrectfeedback format="html">
+      <text>Die Antwort ist teilweise richtig.</text>
+    </partiallycorrectfeedback>
+    <incorrectfeedback format="html">
+      <text>Die Antwort ist falsch.</text>
+    </incorrectfeedback>
+    <shownumcorrect/>
+    <answer fraction="100" format="html">
+      <text><![CDATA[<p dir="ltr" style="text-align: left;">richtige Antwort</p>]]></text>
+      <feedback format="html">
+        <text></text>
+      </feedback>
+    </answer>
+    <answer fraction="0" format="html">
+      <text><![CDATA[<p dir="ltr" style="text-align: left;">falsche Antwort 1</p>]]></text>
+      <feedback format="html">
+        <text></text>
+      </feedback>
+    </answer>
+    <answer fraction="0" format="html">
+      <text><![CDATA[<p dir="ltr" style="text-align: left;">falsche Antwort 2</p>]]></text>
+      <feedback format="html">
+        <text></text>
+      </feedback>
+    </answer>
+    <answer fraction="0" format="html">
+      <text><![CDATA[<p dir="ltr" style="text-align: left;">falsche Antwort 3</p>]]></text>
+      <feedback format="html">
+        <text></text>
+      </feedback>
+    </answer>
+    <tags>
+      <tag><text>Simulation</text>
+      </tag>
+      <tag><text>SC</text>
+      </tag>
+    </tags>
+  </question>
+
+
+  <question type="multichoice">
+    <name>
+      <text>Pilotfrage 1</text>
+    </name>
+    <questiontext format="html">
+      <text>Pilotfrage 1</text>
+    </questiontext>
+    <generalfeedback format="html">
+      <text></text>
+    </generalfeedback>
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <hidden>0</hidden>
+    <idnumber>Pilotfrage-24</idnumber>
+    <single>true</single>
+    <shuffleanswers>true</shuffleanswers>
+    <answernumbering>none</answernumbering>
+    <showstandardinstruction>0</showstandardinstruction>
+    <correctfeedback format="html">
+      <text>Die Antwort ist richtig.</text>
+    </correctfeedback>
+    <partiallycorrectfeedback format="html">
+      <text>Die Antwort ist teilweise richtig.</text>
+    </partiallycorrectfeedback>
+    <incorrectfeedback format="html">
+      <text>Die Antwort ist falsch.</text>
+    </incorrectfeedback>
+    <shownumcorrect/>
+    <answer fraction="100" format="html">
+      <text><![CDATA[<p dir="ltr" style="text-align: left;">richtige Antwort</p>]]></text>
+      <feedback format="html">
+        <text></text>
+      </feedback>
+    </answer>
+    <answer fraction="0" format="html">
+      <text><![CDATA[<p dir="ltr" style="text-align: left;">falsche Antwort 1</p>]]></text>
+      <feedback format="html">
+        <text></text>
+      </feedback>
+    </answer>
+    <answer fraction="0" format="html">
+      <text><![CDATA[<p dir="ltr" style="text-align: left;">falsche Antwort 2</p>]]></text>
+      <feedback format="html">
+        <text></text>
+      </feedback>
+    </answer>
+    <answer fraction="0" format="html">
+      <text><![CDATA[<p dir="ltr" style="text-align: left;">falsche Antwort 3</p>]]></text>
+      <feedback format="html">
+        <text></text>
+      </feedback>
+    </answer>
+    <tags>
+      <tag><text>Simulation</text>
+      </tag>
+      <tag><text>SC</text>
+      </tag>
+    </tags>
+  </question>
+
+
+  <question type="multichoice">
+    <name>
+      <text>Pilotfrage 1</text>
+    </name>
+    <questiontext format="html">
+      <text>Pilotfrage 1</text>
+    </questiontext>
+    <generalfeedback format="html">
+      <text></text>
+    </generalfeedback>
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <hidden>0</hidden>
+    <idnumber>Pilotfrage-25</idnumber>
+    <single>true</single>
+    <shuffleanswers>true</shuffleanswers>
+    <answernumbering>none</answernumbering>
+    <showstandardinstruction>0</showstandardinstruction>
+    <correctfeedback format="html">
+      <text>Die Antwort ist richtig.</text>
+    </correctfeedback>
+    <partiallycorrectfeedback format="html">
+      <text>Die Antwort ist teilweise richtig.</text>
+    </partiallycorrectfeedback>
+    <incorrectfeedback format="html">
+      <text>Die Antwort ist falsch.</text>
+    </incorrectfeedback>
+    <shownumcorrect/>
+    <answer fraction="100" format="html">
+      <text><![CDATA[<p dir="ltr" style="text-align: left;">richtige Antwort</p>]]></text>
+      <feedback format="html">
+        <text></text>
+      </feedback>
+    </answer>
+    <answer fraction="0" format="html">
+      <text><![CDATA[<p dir="ltr" style="text-align: left;">falsche Antwort 1</p>]]></text>
+      <feedback format="html">
+        <text></text>
+      </feedback>
+    </answer>
+    <answer fraction="0" format="html">
+      <text><![CDATA[<p dir="ltr" style="text-align: left;">falsche Antwort 2</p>]]></text>
+      <feedback format="html">
+        <text></text>
+      </feedback>
+    </answer>
+    <answer fraction="0" format="html">
+      <text><![CDATA[<p dir="ltr" style="text-align: left;">falsche Antwort 3</p>]]></text>
+      <feedback format="html">
+        <text></text>
+      </feedback>
+    </answer>
+    <tags>
+      <tag><text>Simulation</text>
+      </tag>
+      <tag><text>SC</text>
+      </tag>
+    </tags>
+  </question>
+
+
+  <question type="multichoice">
+    <name>
+      <text>Pilotfrage 1</text>
+    </name>
+    <questiontext format="html">
+      <text>Pilotfrage 1</text>
+    </questiontext>
+    <generalfeedback format="html">
+      <text></text>
+    </generalfeedback>
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <hidden>0</hidden>
+    <idnumber>Pilotfrage-26</idnumber>
+    <single>true</single>
+    <shuffleanswers>true</shuffleanswers>
+    <answernumbering>none</answernumbering>
+    <showstandardinstruction>0</showstandardinstruction>
+    <correctfeedback format="html">
+      <text>Die Antwort ist richtig.</text>
+    </correctfeedback>
+    <partiallycorrectfeedback format="html">
+      <text>Die Antwort ist teilweise richtig.</text>
+    </partiallycorrectfeedback>
+    <incorrectfeedback format="html">
+      <text>Die Antwort ist falsch.</text>
+    </incorrectfeedback>
+    <shownumcorrect/>
+    <answer fraction="100" format="html">
+      <text><![CDATA[<p dir="ltr" style="text-align: left;">richtige Antwort</p>]]></text>
+      <feedback format="html">
+        <text></text>
+      </feedback>
+    </answer>
+    <answer fraction="0" format="html">
+      <text><![CDATA[<p dir="ltr" style="text-align: left;">falsche Antwort 1</p>]]></text>
+      <feedback format="html">
+        <text></text>
+      </feedback>
+    </answer>
+    <answer fraction="0" format="html">
+      <text><![CDATA[<p dir="ltr" style="text-align: left;">falsche Antwort 2</p>]]></text>
+      <feedback format="html">
+        <text></text>
+      </feedback>
+    </answer>
+    <answer fraction="0" format="html">
+      <text><![CDATA[<p dir="ltr" style="text-align: left;">falsche Antwort 3</p>]]></text>
+      <feedback format="html">
+        <text></text>
+      </feedback>
+    </answer>
+    <tags>
+      <tag><text>Simulation</text>
+      </tag>
+      <tag><text>SC</text>
+      </tag>
+    </tags>
+  </question>
+
+
+  <question type="multichoice">
+    <name>
+      <text>Pilotfrage 1</text>
+    </name>
+    <questiontext format="html">
+      <text>Pilotfrage 1</text>
+    </questiontext>
+    <generalfeedback format="html">
+      <text></text>
+    </generalfeedback>
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <hidden>0</hidden>
+    <idnumber>Pilotfrage-27</idnumber>
+    <single>true</single>
+    <shuffleanswers>true</shuffleanswers>
+    <answernumbering>none</answernumbering>
+    <showstandardinstruction>0</showstandardinstruction>
+    <correctfeedback format="html">
+      <text>Die Antwort ist richtig.</text>
+    </correctfeedback>
+    <partiallycorrectfeedback format="html">
+      <text>Die Antwort ist teilweise richtig.</text>
+    </partiallycorrectfeedback>
+    <incorrectfeedback format="html">
+      <text>Die Antwort ist falsch.</text>
+    </incorrectfeedback>
+    <shownumcorrect/>
+    <answer fraction="100" format="html">
+      <text><![CDATA[<p dir="ltr" style="text-align: left;">richtige Antwort</p>]]></text>
+      <feedback format="html">
+        <text></text>
+      </feedback>
+    </answer>
+    <answer fraction="0" format="html">
+      <text><![CDATA[<p dir="ltr" style="text-align: left;">falsche Antwort 1</p>]]></text>
+      <feedback format="html">
+        <text></text>
+      </feedback>
+    </answer>
+    <answer fraction="0" format="html">
+      <text><![CDATA[<p dir="ltr" style="text-align: left;">falsche Antwort 2</p>]]></text>
+      <feedback format="html">
+        <text></text>
+      </feedback>
+    </answer>
+    <answer fraction="0" format="html">
+      <text><![CDATA[<p dir="ltr" style="text-align: left;">falsche Antwort 3</p>]]></text>
+      <feedback format="html">
+        <text></text>
+      </feedback>
+    </answer>
+    <tags>
+      <tag><text>Simulation</text>
+      </tag>
+      <tag><text>SC</text>
+      </tag>
+    </tags>
+  </question>
+
+
+  <question type="multichoice">
+    <name>
+      <text>Pilotfrage 1</text>
+    </name>
+    <questiontext format="html">
+      <text>Pilotfrage 1</text>
+    </questiontext>
+    <generalfeedback format="html">
+      <text></text>
+    </generalfeedback>
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <hidden>0</hidden>
+    <idnumber>Pilotfrage-28</idnumber>
+    <single>true</single>
+    <shuffleanswers>true</shuffleanswers>
+    <answernumbering>none</answernumbering>
+    <showstandardinstruction>0</showstandardinstruction>
+    <correctfeedback format="html">
+      <text>Die Antwort ist richtig.</text>
+    </correctfeedback>
+    <partiallycorrectfeedback format="html">
+      <text>Die Antwort ist teilweise richtig.</text>
+    </partiallycorrectfeedback>
+    <incorrectfeedback format="html">
+      <text>Die Antwort ist falsch.</text>
+    </incorrectfeedback>
+    <shownumcorrect/>
+    <answer fraction="100" format="html">
+      <text><![CDATA[<p dir="ltr" style="text-align: left;">richtige Antwort</p>]]></text>
+      <feedback format="html">
+        <text></text>
+      </feedback>
+    </answer>
+    <answer fraction="0" format="html">
+      <text><![CDATA[<p dir="ltr" style="text-align: left;">falsche Antwort 1</p>]]></text>
+      <feedback format="html">
+        <text></text>
+      </feedback>
+    </answer>
+    <answer fraction="0" format="html">
+      <text><![CDATA[<p dir="ltr" style="text-align: left;">falsche Antwort 2</p>]]></text>
+      <feedback format="html">
+        <text></text>
+      </feedback>
+    </answer>
+    <answer fraction="0" format="html">
+      <text><![CDATA[<p dir="ltr" style="text-align: left;">falsche Antwort 3</p>]]></text>
+      <feedback format="html">
+        <text></text>
+      </feedback>
+    </answer>
+    <tags>
+      <tag><text>Simulation</text>
+      </tag>
+      <tag><text>SC</text>
+      </tag>
+    </tags>
+  </question>
+
+
+  <question type="multichoice">
+    <name>
+      <text>Pilotfrage 1</text>
+    </name>
+    <questiontext format="html">
+      <text>Pilotfrage 1</text>
+    </questiontext>
+    <generalfeedback format="html">
+      <text></text>
+    </generalfeedback>
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <hidden>0</hidden>
+    <idnumber>Pilotfrage-29</idnumber>
+    <single>true</single>
+    <shuffleanswers>true</shuffleanswers>
+    <answernumbering>none</answernumbering>
+    <showstandardinstruction>0</showstandardinstruction>
+    <correctfeedback format="html">
+      <text>Die Antwort ist richtig.</text>
+    </correctfeedback>
+    <partiallycorrectfeedback format="html">
+      <text>Die Antwort ist teilweise richtig.</text>
+    </partiallycorrectfeedback>
+    <incorrectfeedback format="html">
+      <text>Die Antwort ist falsch.</text>
+    </incorrectfeedback>
+    <shownumcorrect/>
+    <answer fraction="100" format="html">
+      <text><![CDATA[<p dir="ltr" style="text-align: left;">richtige Antwort</p>]]></text>
+      <feedback format="html">
+        <text></text>
+      </feedback>
+    </answer>
+    <answer fraction="0" format="html">
+      <text><![CDATA[<p dir="ltr" style="text-align: left;">falsche Antwort 1</p>]]></text>
+      <feedback format="html">
+        <text></text>
+      </feedback>
+    </answer>
+    <answer fraction="0" format="html">
+      <text><![CDATA[<p dir="ltr" style="text-align: left;">falsche Antwort 2</p>]]></text>
+      <feedback format="html">
+        <text></text>
+      </feedback>
+    </answer>
+    <answer fraction="0" format="html">
+      <text><![CDATA[<p dir="ltr" style="text-align: left;">falsche Antwort 3</p>]]></text>
+      <feedback format="html">
+        <text></text>
+      </feedback>
+    </answer>
+    <tags>
+      <tag><text>Simulation</text>
+      </tag>
+      <tag><text>SC</text>
+      </tag>
+    </tags>
+  </question>
+
+
+  <question type="multichoice">
+    <name>
+      <text>Pilotfrage 1</text>
+    </name>
+    <questiontext format="html">
+      <text>Pilotfrage 1</text>
+    </questiontext>
+    <generalfeedback format="html">
+      <text></text>
+    </generalfeedback>
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <hidden>0</hidden>
+    <idnumber>Pilotfrage-30</idnumber>
+    <single>true</single>
+    <shuffleanswers>true</shuffleanswers>
+    <answernumbering>none</answernumbering>
+    <showstandardinstruction>0</showstandardinstruction>
+    <correctfeedback format="html">
+      <text>Die Antwort ist richtig.</text>
+    </correctfeedback>
+    <partiallycorrectfeedback format="html">
+      <text>Die Antwort ist teilweise richtig.</text>
+    </partiallycorrectfeedback>
+    <incorrectfeedback format="html">
+      <text>Die Antwort ist falsch.</text>
+    </incorrectfeedback>
+    <shownumcorrect/>
+    <answer fraction="100" format="html">
+      <text><![CDATA[<p dir="ltr" style="text-align: left;">richtige Antwort</p>]]></text>
+      <feedback format="html">
+        <text></text>
+      </feedback>
+    </answer>
+    <answer fraction="0" format="html">
+      <text><![CDATA[<p dir="ltr" style="text-align: left;">falsche Antwort 1</p>]]></text>
+      <feedback format="html">
+        <text></text>
+      </feedback>
+    </answer>
+    <answer fraction="0" format="html">
+      <text><![CDATA[<p dir="ltr" style="text-align: left;">falsche Antwort 2</p>]]></text>
+      <feedback format="html">
+        <text></text>
+      </feedback>
+    </answer>
+    <answer fraction="0" format="html">
+      <text><![CDATA[<p dir="ltr" style="text-align: left;">falsche Antwort 3</p>]]></text>
+      <feedback format="html">
+        <text></text>
+      </feedback>
+    </answer>
+    <tags>
+      <tag><text>Simulation</text>
+      </tag>
+      <tag><text>SC</text>
+      </tag>
+    </tags>
+  </question>
+
+
+  <question type="multichoice">
+    <name>
+      <text>Pilotfrage 1</text>
+    </name>
+    <questiontext format="html">
+      <text>Pilotfrage 1</text>
+    </questiontext>
+    <generalfeedback format="html">
+      <text></text>
+    </generalfeedback>
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <hidden>0</hidden>
+    <idnumber>Pilotfrage-31</idnumber>
+    <single>true</single>
+    <shuffleanswers>true</shuffleanswers>
+    <answernumbering>none</answernumbering>
+    <showstandardinstruction>0</showstandardinstruction>
+    <correctfeedback format="html">
+      <text>Die Antwort ist richtig.</text>
+    </correctfeedback>
+    <partiallycorrectfeedback format="html">
+      <text>Die Antwort ist teilweise richtig.</text>
+    </partiallycorrectfeedback>
+    <incorrectfeedback format="html">
+      <text>Die Antwort ist falsch.</text>
+    </incorrectfeedback>
+    <shownumcorrect/>
+    <answer fraction="100" format="html">
+      <text><![CDATA[<p dir="ltr" style="text-align: left;">richtige Antwort</p>]]></text>
+      <feedback format="html">
+        <text></text>
+      </feedback>
+    </answer>
+    <answer fraction="0" format="html">
+      <text><![CDATA[<p dir="ltr" style="text-align: left;">falsche Antwort 1</p>]]></text>
+      <feedback format="html">
+        <text></text>
+      </feedback>
+    </answer>
+    <answer fraction="0" format="html">
+      <text><![CDATA[<p dir="ltr" style="text-align: left;">falsche Antwort 2</p>]]></text>
+      <feedback format="html">
+        <text></text>
+      </feedback>
+    </answer>
+    <answer fraction="0" format="html">
+      <text><![CDATA[<p dir="ltr" style="text-align: left;">falsche Antwort 3</p>]]></text>
+      <feedback format="html">
+        <text></text>
+      </feedback>
+    </answer>
+    <tags>
+      <tag><text>Simulation</text>
+      </tag>
+      <tag><text>SC</text>
+      </tag>
+    </tags>
+  </question>
+
+
+  <question type="multichoice">
+    <name>
+      <text>Pilotfrage 1</text>
+    </name>
+    <questiontext format="html">
+      <text>Pilotfrage 1</text>
+    </questiontext>
+    <generalfeedback format="html">
+      <text></text>
+    </generalfeedback>
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <hidden>0</hidden>
+    <idnumber>Pilotfrage-32</idnumber>
+    <single>true</single>
+    <shuffleanswers>true</shuffleanswers>
+    <answernumbering>none</answernumbering>
+    <showstandardinstruction>0</showstandardinstruction>
+    <correctfeedback format="html">
+      <text>Die Antwort ist richtig.</text>
+    </correctfeedback>
+    <partiallycorrectfeedback format="html">
+      <text>Die Antwort ist teilweise richtig.</text>
+    </partiallycorrectfeedback>
+    <incorrectfeedback format="html">
+      <text>Die Antwort ist falsch.</text>
+    </incorrectfeedback>
+    <shownumcorrect/>
+    <answer fraction="100" format="html">
+      <text><![CDATA[<p dir="ltr" style="text-align: left;">richtige Antwort</p>]]></text>
+      <feedback format="html">
+        <text></text>
+      </feedback>
+    </answer>
+    <answer fraction="0" format="html">
+      <text><![CDATA[<p dir="ltr" style="text-align: left;">falsche Antwort 1</p>]]></text>
+      <feedback format="html">
+        <text></text>
+      </feedback>
+    </answer>
+    <answer fraction="0" format="html">
+      <text><![CDATA[<p dir="ltr" style="text-align: left;">falsche Antwort 2</p>]]></text>
+      <feedback format="html">
+        <text></text>
+      </feedback>
+    </answer>
+    <answer fraction="0" format="html">
+      <text><![CDATA[<p dir="ltr" style="text-align: left;">falsche Antwort 3</p>]]></text>
+      <feedback format="html">
+        <text></text>
+      </feedback>
+    </answer>
+    <tags>
+      <tag><text>Simulation</text>
+      </tag>
+      <tag><text>SC</text>
+      </tag>
+    </tags>
+  </question>
+
+
+  <question type="multichoice">
+    <name>
+      <text>Pilotfrage 1</text>
+    </name>
+    <questiontext format="html">
+      <text>Pilotfrage 1</text>
+    </questiontext>
+    <generalfeedback format="html">
+      <text></text>
+    </generalfeedback>
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <hidden>0</hidden>
+    <idnumber>Pilotfrage-33</idnumber>
+    <single>true</single>
+    <shuffleanswers>true</shuffleanswers>
+    <answernumbering>none</answernumbering>
+    <showstandardinstruction>0</showstandardinstruction>
+    <correctfeedback format="html">
+      <text>Die Antwort ist richtig.</text>
+    </correctfeedback>
+    <partiallycorrectfeedback format="html">
+      <text>Die Antwort ist teilweise richtig.</text>
+    </partiallycorrectfeedback>
+    <incorrectfeedback format="html">
+      <text>Die Antwort ist falsch.</text>
+    </incorrectfeedback>
+    <shownumcorrect/>
+    <answer fraction="100" format="html">
+      <text><![CDATA[<p dir="ltr" style="text-align: left;">richtige Antwort</p>]]></text>
+      <feedback format="html">
+        <text></text>
+      </feedback>
+    </answer>
+    <answer fraction="0" format="html">
+      <text><![CDATA[<p dir="ltr" style="text-align: left;">falsche Antwort 1</p>]]></text>
+      <feedback format="html">
+        <text></text>
+      </feedback>
+    </answer>
+    <answer fraction="0" format="html">
+      <text><![CDATA[<p dir="ltr" style="text-align: left;">falsche Antwort 2</p>]]></text>
+      <feedback format="html">
+        <text></text>
+      </feedback>
+    </answer>
+    <answer fraction="0" format="html">
+      <text><![CDATA[<p dir="ltr" style="text-align: left;">falsche Antwort 3</p>]]></text>
+      <feedback format="html">
+        <text></text>
+      </feedback>
+    </answer>
+    <tags>
+      <tag><text>Simulation</text>
+      </tag>
+      <tag><text>SC</text>
+      </tag>
+    </tags>
+  </question>
+
+
+  <question type="multichoice">
+    <name>
+      <text>Pilotfrage 1</text>
+    </name>
+    <questiontext format="html">
+      <text>Pilotfrage 1</text>
+    </questiontext>
+    <generalfeedback format="html">
+      <text></text>
+    </generalfeedback>
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <hidden>0</hidden>
+    <idnumber>Pilotfrage-34</idnumber>
+    <single>true</single>
+    <shuffleanswers>true</shuffleanswers>
+    <answernumbering>none</answernumbering>
+    <showstandardinstruction>0</showstandardinstruction>
+    <correctfeedback format="html">
+      <text>Die Antwort ist richtig.</text>
+    </correctfeedback>
+    <partiallycorrectfeedback format="html">
+      <text>Die Antwort ist teilweise richtig.</text>
+    </partiallycorrectfeedback>
+    <incorrectfeedback format="html">
+      <text>Die Antwort ist falsch.</text>
+    </incorrectfeedback>
+    <shownumcorrect/>
+    <answer fraction="100" format="html">
+      <text><![CDATA[<p dir="ltr" style="text-align: left;">richtige Antwort</p>]]></text>
+      <feedback format="html">
+        <text></text>
+      </feedback>
+    </answer>
+    <answer fraction="0" format="html">
+      <text><![CDATA[<p dir="ltr" style="text-align: left;">falsche Antwort 1</p>]]></text>
+      <feedback format="html">
+        <text></text>
+      </feedback>
+    </answer>
+    <answer fraction="0" format="html">
+      <text><![CDATA[<p dir="ltr" style="text-align: left;">falsche Antwort 2</p>]]></text>
+      <feedback format="html">
+        <text></text>
+      </feedback>
+    </answer>
+    <answer fraction="0" format="html">
+      <text><![CDATA[<p dir="ltr" style="text-align: left;">falsche Antwort 3</p>]]></text>
+      <feedback format="html">
+        <text></text>
+      </feedback>
+    </answer>
+    <tags>
+      <tag><text>Simulation</text>
+      </tag>
+      <tag><text>SC</text>
+      </tag>
+    </tags>
+  </question>
+
+
+  <question type="multichoice">
+    <name>
+      <text>Pilotfrage 1</text>
+    </name>
+    <questiontext format="html">
+      <text>Pilotfrage 1</text>
+    </questiontext>
+    <generalfeedback format="html">
+      <text></text>
+    </generalfeedback>
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <hidden>0</hidden>
+    <idnumber>Pilotfrage-35</idnumber>
+    <single>true</single>
+    <shuffleanswers>true</shuffleanswers>
+    <answernumbering>none</answernumbering>
+    <showstandardinstruction>0</showstandardinstruction>
+    <correctfeedback format="html">
+      <text>Die Antwort ist richtig.</text>
+    </correctfeedback>
+    <partiallycorrectfeedback format="html">
+      <text>Die Antwort ist teilweise richtig.</text>
+    </partiallycorrectfeedback>
+    <incorrectfeedback format="html">
+      <text>Die Antwort ist falsch.</text>
+    </incorrectfeedback>
+    <shownumcorrect/>
+    <answer fraction="100" format="html">
+      <text><![CDATA[<p dir="ltr" style="text-align: left;">richtige Antwort</p>]]></text>
+      <feedback format="html">
+        <text></text>
+      </feedback>
+    </answer>
+    <answer fraction="0" format="html">
+      <text><![CDATA[<p dir="ltr" style="text-align: left;">falsche Antwort 1</p>]]></text>
+      <feedback format="html">
+        <text></text>
+      </feedback>
+    </answer>
+    <answer fraction="0" format="html">
+      <text><![CDATA[<p dir="ltr" style="text-align: left;">falsche Antwort 2</p>]]></text>
+      <feedback format="html">
+        <text></text>
+      </feedback>
+    </answer>
+    <answer fraction="0" format="html">
+      <text><![CDATA[<p dir="ltr" style="text-align: left;">falsche Antwort 3</p>]]></text>
+      <feedback format="html">
+        <text></text>
+      </feedback>
+    </answer>
+    <tags>
+      <tag><text>Simulation</text>
+      </tag>
+      <tag><text>SC</text>
+      </tag>
+    </tags>
+  </question>
+
+
+  <question type="multichoice">
+    <name>
+      <text>Pilotfrage 1</text>
+    </name>
+    <questiontext format="html">
+      <text>Pilotfrage 1</text>
+    </questiontext>
+    <generalfeedback format="html">
+      <text></text>
+    </generalfeedback>
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <hidden>0</hidden>
+    <idnumber>Pilotfrage-36</idnumber>
+    <single>true</single>
+    <shuffleanswers>true</shuffleanswers>
+    <answernumbering>none</answernumbering>
+    <showstandardinstruction>0</showstandardinstruction>
+    <correctfeedback format="html">
+      <text>Die Antwort ist richtig.</text>
+    </correctfeedback>
+    <partiallycorrectfeedback format="html">
+      <text>Die Antwort ist teilweise richtig.</text>
+    </partiallycorrectfeedback>
+    <incorrectfeedback format="html">
+      <text>Die Antwort ist falsch.</text>
+    </incorrectfeedback>
+    <shownumcorrect/>
+    <answer fraction="100" format="html">
+      <text><![CDATA[<p dir="ltr" style="text-align: left;">richtige Antwort</p>]]></text>
+      <feedback format="html">
+        <text></text>
+      </feedback>
+    </answer>
+    <answer fraction="0" format="html">
+      <text><![CDATA[<p dir="ltr" style="text-align: left;">falsche Antwort 1</p>]]></text>
+      <feedback format="html">
+        <text></text>
+      </feedback>
+    </answer>
+    <answer fraction="0" format="html">
+      <text><![CDATA[<p dir="ltr" style="text-align: left;">falsche Antwort 2</p>]]></text>
+      <feedback format="html">
+        <text></text>
+      </feedback>
+    </answer>
+    <answer fraction="0" format="html">
+      <text><![CDATA[<p dir="ltr" style="text-align: left;">falsche Antwort 3</p>]]></text>
+      <feedback format="html">
+        <text></text>
+      </feedback>
+    </answer>
+    <tags>
+      <tag><text>Simulation</text>
+      </tag>
+      <tag><text>SC</text>
+      </tag>
+    </tags>
+  </question>
+
+
+  <question type="multichoice">
+    <name>
+      <text>Pilotfrage 1</text>
+    </name>
+    <questiontext format="html">
+      <text>Pilotfrage 1</text>
+    </questiontext>
+    <generalfeedback format="html">
+      <text></text>
+    </generalfeedback>
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <hidden>0</hidden>
+    <idnumber>Pilotfrage-37</idnumber>
+    <single>true</single>
+    <shuffleanswers>true</shuffleanswers>
+    <answernumbering>none</answernumbering>
+    <showstandardinstruction>0</showstandardinstruction>
+    <correctfeedback format="html">
+      <text>Die Antwort ist richtig.</text>
+    </correctfeedback>
+    <partiallycorrectfeedback format="html">
+      <text>Die Antwort ist teilweise richtig.</text>
+    </partiallycorrectfeedback>
+    <incorrectfeedback format="html">
+      <text>Die Antwort ist falsch.</text>
+    </incorrectfeedback>
+    <shownumcorrect/>
+    <answer fraction="100" format="html">
+      <text><![CDATA[<p dir="ltr" style="text-align: left;">richtige Antwort</p>]]></text>
+      <feedback format="html">
+        <text></text>
+      </feedback>
+    </answer>
+    <answer fraction="0" format="html">
+      <text><![CDATA[<p dir="ltr" style="text-align: left;">falsche Antwort 1</p>]]></text>
+      <feedback format="html">
+        <text></text>
+      </feedback>
+    </answer>
+    <answer fraction="0" format="html">
+      <text><![CDATA[<p dir="ltr" style="text-align: left;">falsche Antwort 2</p>]]></text>
+      <feedback format="html">
+        <text></text>
+      </feedback>
+    </answer>
+    <answer fraction="0" format="html">
+      <text><![CDATA[<p dir="ltr" style="text-align: left;">falsche Antwort 3</p>]]></text>
+      <feedback format="html">
+        <text></text>
+      </feedback>
+    </answer>
+    <tags>
+      <tag><text>Simulation</text>
+      </tag>
+      <tag><text>SC</text>
+      </tag>
+    </tags>
+  </question>
+
+
+  <question type="multichoice">
+    <name>
+      <text>Pilotfrage 1</text>
+    </name>
+    <questiontext format="html">
+      <text>Pilotfrage 1</text>
+    </questiontext>
+    <generalfeedback format="html">
+      <text></text>
+    </generalfeedback>
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <hidden>0</hidden>
+    <idnumber>Pilotfrage-38</idnumber>
+    <single>true</single>
+    <shuffleanswers>true</shuffleanswers>
+    <answernumbering>none</answernumbering>
+    <showstandardinstruction>0</showstandardinstruction>
+    <correctfeedback format="html">
+      <text>Die Antwort ist richtig.</text>
+    </correctfeedback>
+    <partiallycorrectfeedback format="html">
+      <text>Die Antwort ist teilweise richtig.</text>
+    </partiallycorrectfeedback>
+    <incorrectfeedback format="html">
+      <text>Die Antwort ist falsch.</text>
+    </incorrectfeedback>
+    <shownumcorrect/>
+    <answer fraction="100" format="html">
+      <text><![CDATA[<p dir="ltr" style="text-align: left;">richtige Antwort</p>]]></text>
+      <feedback format="html">
+        <text></text>
+      </feedback>
+    </answer>
+    <answer fraction="0" format="html">
+      <text><![CDATA[<p dir="ltr" style="text-align: left;">falsche Antwort 1</p>]]></text>
+      <feedback format="html">
+        <text></text>
+      </feedback>
+    </answer>
+    <answer fraction="0" format="html">
+      <text><![CDATA[<p dir="ltr" style="text-align: left;">falsche Antwort 2</p>]]></text>
+      <feedback format="html">
+        <text></text>
+      </feedback>
+    </answer>
+    <answer fraction="0" format="html">
+      <text><![CDATA[<p dir="ltr" style="text-align: left;">falsche Antwort 3</p>]]></text>
+      <feedback format="html">
+        <text></text>
+      </feedback>
+    </answer>
+    <tags>
+      <tag><text>Simulation</text>
+      </tag>
+      <tag><text>SC</text>
+      </tag>
+    </tags>
+  </question>
+
+
+  <question type="multichoice">
+    <name>
+      <text>Pilotfrage 1</text>
+    </name>
+    <questiontext format="html">
+      <text>Pilotfrage 1</text>
+    </questiontext>
+    <generalfeedback format="html">
+      <text></text>
+    </generalfeedback>
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <hidden>0</hidden>
+    <idnumber>Pilotfrage-39</idnumber>
+    <single>true</single>
+    <shuffleanswers>true</shuffleanswers>
+    <answernumbering>none</answernumbering>
+    <showstandardinstruction>0</showstandardinstruction>
+    <correctfeedback format="html">
+      <text>Die Antwort ist richtig.</text>
+    </correctfeedback>
+    <partiallycorrectfeedback format="html">
+      <text>Die Antwort ist teilweise richtig.</text>
+    </partiallycorrectfeedback>
+    <incorrectfeedback format="html">
+      <text>Die Antwort ist falsch.</text>
+    </incorrectfeedback>
+    <shownumcorrect/>
+    <answer fraction="100" format="html">
+      <text><![CDATA[<p dir="ltr" style="text-align: left;">richtige Antwort</p>]]></text>
+      <feedback format="html">
+        <text></text>
+      </feedback>
+    </answer>
+    <answer fraction="0" format="html">
+      <text><![CDATA[<p dir="ltr" style="text-align: left;">falsche Antwort 1</p>]]></text>
+      <feedback format="html">
+        <text></text>
+      </feedback>
+    </answer>
+    <answer fraction="0" format="html">
+      <text><![CDATA[<p dir="ltr" style="text-align: left;">falsche Antwort 2</p>]]></text>
+      <feedback format="html">
+        <text></text>
+      </feedback>
+    </answer>
+    <answer fraction="0" format="html">
+      <text><![CDATA[<p dir="ltr" style="text-align: left;">falsche Antwort 3</p>]]></text>
+      <feedback format="html">
+        <text></text>
+      </feedback>
+    </answer>
+    <tags>
+      <tag><text>Simulation</text>
+      </tag>
+      <tag><text>SC</text>
+      </tag>
+    </tags>
+  </question>
+
+
+  <question type="multichoice">
+    <name>
+      <text>Pilotfrage 1</text>
+    </name>
+    <questiontext format="html">
+      <text>Pilotfrage 1</text>
+    </questiontext>
+    <generalfeedback format="html">
+      <text></text>
+    </generalfeedback>
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <hidden>0</hidden>
+    <idnumber>Pilotfrage-40</idnumber>
+    <single>true</single>
+    <shuffleanswers>true</shuffleanswers>
+    <answernumbering>none</answernumbering>
+    <showstandardinstruction>0</showstandardinstruction>
+    <correctfeedback format="html">
+      <text>Die Antwort ist richtig.</text>
+    </correctfeedback>
+    <partiallycorrectfeedback format="html">
+      <text>Die Antwort ist teilweise richtig.</text>
+    </partiallycorrectfeedback>
+    <incorrectfeedback format="html">
+      <text>Die Antwort ist falsch.</text>
+    </incorrectfeedback>
+    <shownumcorrect/>
+    <answer fraction="100" format="html">
+      <text><![CDATA[<p dir="ltr" style="text-align: left;">richtige Antwort</p>]]></text>
+      <feedback format="html">
+        <text></text>
+      </feedback>
+    </answer>
+    <answer fraction="0" format="html">
+      <text><![CDATA[<p dir="ltr" style="text-align: left;">falsche Antwort 1</p>]]></text>
+      <feedback format="html">
+        <text></text>
+      </feedback>
+    </answer>
+    <answer fraction="0" format="html">
+      <text><![CDATA[<p dir="ltr" style="text-align: left;">falsche Antwort 2</p>]]></text>
+      <feedback format="html">
+        <text></text>
+      </feedback>
+    </answer>
+    <answer fraction="0" format="html">
+      <text><![CDATA[<p dir="ltr" style="text-align: left;">falsche Antwort 3</p>]]></text>
+      <feedback format="html">
+        <text></text>
+      </feedback>
+    </answer>
+    <tags>
+      <tag><text>Simulation</text>
+      </tag>
+      <tag><text>SC</text>
+      </tag>
+    </tags>
+  </question>
+
+
+  <question type="multichoice">
+    <name>
+      <text>Pilotfrage 1</text>
+    </name>
+    <questiontext format="html">
+      <text>Pilotfrage 1</text>
+    </questiontext>
+    <generalfeedback format="html">
+      <text></text>
+    </generalfeedback>
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <hidden>0</hidden>
+    <idnumber>Pilotfrage-41</idnumber>
+    <single>true</single>
+    <shuffleanswers>true</shuffleanswers>
+    <answernumbering>none</answernumbering>
+    <showstandardinstruction>0</showstandardinstruction>
+    <correctfeedback format="html">
+      <text>Die Antwort ist richtig.</text>
+    </correctfeedback>
+    <partiallycorrectfeedback format="html">
+      <text>Die Antwort ist teilweise richtig.</text>
+    </partiallycorrectfeedback>
+    <incorrectfeedback format="html">
+      <text>Die Antwort ist falsch.</text>
+    </incorrectfeedback>
+    <shownumcorrect/>
+    <answer fraction="100" format="html">
+      <text><![CDATA[<p dir="ltr" style="text-align: left;">richtige Antwort</p>]]></text>
+      <feedback format="html">
+        <text></text>
+      </feedback>
+    </answer>
+    <answer fraction="0" format="html">
+      <text><![CDATA[<p dir="ltr" style="text-align: left;">falsche Antwort 1</p>]]></text>
+      <feedback format="html">
+        <text></text>
+      </feedback>
+    </answer>
+    <answer fraction="0" format="html">
+      <text><![CDATA[<p dir="ltr" style="text-align: left;">falsche Antwort 2</p>]]></text>
+      <feedback format="html">
+        <text></text>
+      </feedback>
+    </answer>
+    <answer fraction="0" format="html">
+      <text><![CDATA[<p dir="ltr" style="text-align: left;">falsche Antwort 3</p>]]></text>
+      <feedback format="html">
+        <text></text>
+      </feedback>
+    </answer>
+    <tags>
+      <tag><text>Simulation</text>
+      </tag>
+      <tag><text>SC</text>
+      </tag>
+    </tags>
+  </question>
+
+
+  <question type="multichoice">
+    <name>
+      <text>Pilotfrage 1</text>
+    </name>
+    <questiontext format="html">
+      <text>Pilotfrage 1</text>
+    </questiontext>
+    <generalfeedback format="html">
+      <text></text>
+    </generalfeedback>
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <hidden>0</hidden>
+    <idnumber>Pilotfrage-42</idnumber>
+    <single>true</single>
+    <shuffleanswers>true</shuffleanswers>
+    <answernumbering>none</answernumbering>
+    <showstandardinstruction>0</showstandardinstruction>
+    <correctfeedback format="html">
+      <text>Die Antwort ist richtig.</text>
+    </correctfeedback>
+    <partiallycorrectfeedback format="html">
+      <text>Die Antwort ist teilweise richtig.</text>
+    </partiallycorrectfeedback>
+    <incorrectfeedback format="html">
+      <text>Die Antwort ist falsch.</text>
+    </incorrectfeedback>
+    <shownumcorrect/>
+    <answer fraction="100" format="html">
+      <text><![CDATA[<p dir="ltr" style="text-align: left;">richtige Antwort</p>]]></text>
+      <feedback format="html">
+        <text></text>
+      </feedback>
+    </answer>
+    <answer fraction="0" format="html">
+      <text><![CDATA[<p dir="ltr" style="text-align: left;">falsche Antwort 1</p>]]></text>
+      <feedback format="html">
+        <text></text>
+      </feedback>
+    </answer>
+    <answer fraction="0" format="html">
+      <text><![CDATA[<p dir="ltr" style="text-align: left;">falsche Antwort 2</p>]]></text>
+      <feedback format="html">
+        <text></text>
+      </feedback>
+    </answer>
+    <answer fraction="0" format="html">
+      <text><![CDATA[<p dir="ltr" style="text-align: left;">falsche Antwort 3</p>]]></text>
+      <feedback format="html">
+        <text></text>
+      </feedback>
+    </answer>
+    <tags>
+      <tag><text>Simulation</text>
+      </tag>
+      <tag><text>SC</text>
+      </tag>
+    </tags>
+  </question>
+
+
+  <question type="multichoice">
+    <name>
+      <text>Pilotfrage 1</text>
+    </name>
+    <questiontext format="html">
+      <text>Pilotfrage 1</text>
+    </questiontext>
+    <generalfeedback format="html">
+      <text></text>
+    </generalfeedback>
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <hidden>0</hidden>
+    <idnumber>Pilotfrage-43</idnumber>
+    <single>true</single>
+    <shuffleanswers>true</shuffleanswers>
+    <answernumbering>none</answernumbering>
+    <showstandardinstruction>0</showstandardinstruction>
+    <correctfeedback format="html">
+      <text>Die Antwort ist richtig.</text>
+    </correctfeedback>
+    <partiallycorrectfeedback format="html">
+      <text>Die Antwort ist teilweise richtig.</text>
+    </partiallycorrectfeedback>
+    <incorrectfeedback format="html">
+      <text>Die Antwort ist falsch.</text>
+    </incorrectfeedback>
+    <shownumcorrect/>
+    <answer fraction="100" format="html">
+      <text><![CDATA[<p dir="ltr" style="text-align: left;">richtige Antwort</p>]]></text>
+      <feedback format="html">
+        <text></text>
+      </feedback>
+    </answer>
+    <answer fraction="0" format="html">
+      <text><![CDATA[<p dir="ltr" style="text-align: left;">falsche Antwort 1</p>]]></text>
+      <feedback format="html">
+        <text></text>
+      </feedback>
+    </answer>
+    <answer fraction="0" format="html">
+      <text><![CDATA[<p dir="ltr" style="text-align: left;">falsche Antwort 2</p>]]></text>
+      <feedback format="html">
+        <text></text>
+      </feedback>
+    </answer>
+    <answer fraction="0" format="html">
+      <text><![CDATA[<p dir="ltr" style="text-align: left;">falsche Antwort 3</p>]]></text>
+      <feedback format="html">
+        <text></text>
+      </feedback>
+    </answer>
+    <tags>
+      <tag><text>Simulation</text>
+      </tag>
+      <tag><text>SC</text>
+      </tag>
+    </tags>
+  </question>
+
+
+  <question type="multichoice">
+    <name>
+      <text>Pilotfrage 1</text>
+    </name>
+    <questiontext format="html">
+      <text>Pilotfrage 1</text>
+    </questiontext>
+    <generalfeedback format="html">
+      <text></text>
+    </generalfeedback>
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <hidden>0</hidden>
+    <idnumber>Pilotfrage-44</idnumber>
+    <single>true</single>
+    <shuffleanswers>true</shuffleanswers>
+    <answernumbering>none</answernumbering>
+    <showstandardinstruction>0</showstandardinstruction>
+    <correctfeedback format="html">
+      <text>Die Antwort ist richtig.</text>
+    </correctfeedback>
+    <partiallycorrectfeedback format="html">
+      <text>Die Antwort ist teilweise richtig.</text>
+    </partiallycorrectfeedback>
+    <incorrectfeedback format="html">
+      <text>Die Antwort ist falsch.</text>
+    </incorrectfeedback>
+    <shownumcorrect/>
+    <answer fraction="100" format="html">
+      <text><![CDATA[<p dir="ltr" style="text-align: left;">richtige Antwort</p>]]></text>
+      <feedback format="html">
+        <text></text>
+      </feedback>
+    </answer>
+    <answer fraction="0" format="html">
+      <text><![CDATA[<p dir="ltr" style="text-align: left;">falsche Antwort 1</p>]]></text>
+      <feedback format="html">
+        <text></text>
+      </feedback>
+    </answer>
+    <answer fraction="0" format="html">
+      <text><![CDATA[<p dir="ltr" style="text-align: left;">falsche Antwort 2</p>]]></text>
+      <feedback format="html">
+        <text></text>
+      </feedback>
+    </answer>
+    <answer fraction="0" format="html">
+      <text><![CDATA[<p dir="ltr" style="text-align: left;">falsche Antwort 3</p>]]></text>
+      <feedback format="html">
+        <text></text>
+      </feedback>
+    </answer>
+    <tags>
+      <tag><text>Simulation</text>
+      </tag>
+      <tag><text>SC</text>
+      </tag>
+    </tags>
+  </question>
+
+
+  <question type="multichoice">
+    <name>
+      <text>Pilotfrage 1</text>
+    </name>
+    <questiontext format="html">
+      <text>Pilotfrage 1</text>
+    </questiontext>
+    <generalfeedback format="html">
+      <text></text>
+    </generalfeedback>
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <hidden>0</hidden>
+    <idnumber>Pilotfrage-45</idnumber>
+    <single>true</single>
+    <shuffleanswers>true</shuffleanswers>
+    <answernumbering>none</answernumbering>
+    <showstandardinstruction>0</showstandardinstruction>
+    <correctfeedback format="html">
+      <text>Die Antwort ist richtig.</text>
+    </correctfeedback>
+    <partiallycorrectfeedback format="html">
+      <text>Die Antwort ist teilweise richtig.</text>
+    </partiallycorrectfeedback>
+    <incorrectfeedback format="html">
+      <text>Die Antwort ist falsch.</text>
+    </incorrectfeedback>
+    <shownumcorrect/>
+    <answer fraction="100" format="html">
+      <text><![CDATA[<p dir="ltr" style="text-align: left;">richtige Antwort</p>]]></text>
+      <feedback format="html">
+        <text></text>
+      </feedback>
+    </answer>
+    <answer fraction="0" format="html">
+      <text><![CDATA[<p dir="ltr" style="text-align: left;">falsche Antwort 1</p>]]></text>
+      <feedback format="html">
+        <text></text>
+      </feedback>
+    </answer>
+    <answer fraction="0" format="html">
+      <text><![CDATA[<p dir="ltr" style="text-align: left;">falsche Antwort 2</p>]]></text>
+      <feedback format="html">
+        <text></text>
+      </feedback>
+    </answer>
+    <answer fraction="0" format="html">
+      <text><![CDATA[<p dir="ltr" style="text-align: left;">falsche Antwort 3</p>]]></text>
+      <feedback format="html">
+        <text></text>
+      </feedback>
+    </answer>
+    <tags>
+      <tag><text>Simulation</text>
+      </tag>
+      <tag><text>SC</text>
+      </tag>
+    </tags>
+  </question>
+
+
+  <question type="multichoice">
+    <name>
+      <text>Pilotfrage 1</text>
+    </name>
+    <questiontext format="html">
+      <text>Pilotfrage 1</text>
+    </questiontext>
+    <generalfeedback format="html">
+      <text></text>
+    </generalfeedback>
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <hidden>0</hidden>
+    <idnumber>Pilotfrage-46</idnumber>
+    <single>true</single>
+    <shuffleanswers>true</shuffleanswers>
+    <answernumbering>none</answernumbering>
+    <showstandardinstruction>0</showstandardinstruction>
+    <correctfeedback format="html">
+      <text>Die Antwort ist richtig.</text>
+    </correctfeedback>
+    <partiallycorrectfeedback format="html">
+      <text>Die Antwort ist teilweise richtig.</text>
+    </partiallycorrectfeedback>
+    <incorrectfeedback format="html">
+      <text>Die Antwort ist falsch.</text>
+    </incorrectfeedback>
+    <shownumcorrect/>
+    <answer fraction="100" format="html">
+      <text><![CDATA[<p dir="ltr" style="text-align: left;">richtige Antwort</p>]]></text>
+      <feedback format="html">
+        <text></text>
+      </feedback>
+    </answer>
+    <answer fraction="0" format="html">
+      <text><![CDATA[<p dir="ltr" style="text-align: left;">falsche Antwort 1</p>]]></text>
+      <feedback format="html">
+        <text></text>
+      </feedback>
+    </answer>
+    <answer fraction="0" format="html">
+      <text><![CDATA[<p dir="ltr" style="text-align: left;">falsche Antwort 2</p>]]></text>
+      <feedback format="html">
+        <text></text>
+      </feedback>
+    </answer>
+    <answer fraction="0" format="html">
+      <text><![CDATA[<p dir="ltr" style="text-align: left;">falsche Antwort 3</p>]]></text>
+      <feedback format="html">
+        <text></text>
+      </feedback>
+    </answer>
+    <tags>
+      <tag><text>Simulation</text>
+      </tag>
+      <tag><text>SC</text>
+      </tag>
+    </tags>
+  </question>
+
+
+  <question type="multichoice">
+    <name>
+      <text>Pilotfrage 1</text>
+    </name>
+    <questiontext format="html">
+      <text>Pilotfrage 1</text>
+    </questiontext>
+    <generalfeedback format="html">
+      <text></text>
+    </generalfeedback>
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <hidden>0</hidden>
+    <idnumber>Pilotfrage-47</idnumber>
+    <single>true</single>
+    <shuffleanswers>true</shuffleanswers>
+    <answernumbering>none</answernumbering>
+    <showstandardinstruction>0</showstandardinstruction>
+    <correctfeedback format="html">
+      <text>Die Antwort ist richtig.</text>
+    </correctfeedback>
+    <partiallycorrectfeedback format="html">
+      <text>Die Antwort ist teilweise richtig.</text>
+    </partiallycorrectfeedback>
+    <incorrectfeedback format="html">
+      <text>Die Antwort ist falsch.</text>
+    </incorrectfeedback>
+    <shownumcorrect/>
+    <answer fraction="100" format="html">
+      <text><![CDATA[<p dir="ltr" style="text-align: left;">richtige Antwort</p>]]></text>
+      <feedback format="html">
+        <text></text>
+      </feedback>
+    </answer>
+    <answer fraction="0" format="html">
+      <text><![CDATA[<p dir="ltr" style="text-align: left;">falsche Antwort 1</p>]]></text>
+      <feedback format="html">
+        <text></text>
+      </feedback>
+    </answer>
+    <answer fraction="0" format="html">
+      <text><![CDATA[<p dir="ltr" style="text-align: left;">falsche Antwort 2</p>]]></text>
+      <feedback format="html">
+        <text></text>
+      </feedback>
+    </answer>
+    <answer fraction="0" format="html">
+      <text><![CDATA[<p dir="ltr" style="text-align: left;">falsche Antwort 3</p>]]></text>
+      <feedback format="html">
+        <text></text>
+      </feedback>
+    </answer>
+    <tags>
+      <tag><text>Simulation</text>
+      </tag>
+      <tag><text>SC</text>
+      </tag>
+    </tags>
+  </question>
+
+
+  <question type="multichoice">
+    <name>
+      <text>Pilotfrage 1</text>
+    </name>
+    <questiontext format="html">
+      <text>Pilotfrage 1</text>
+    </questiontext>
+    <generalfeedback format="html">
+      <text></text>
+    </generalfeedback>
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <hidden>0</hidden>
+    <idnumber>Pilotfrage-48</idnumber>
+    <single>true</single>
+    <shuffleanswers>true</shuffleanswers>
+    <answernumbering>none</answernumbering>
+    <showstandardinstruction>0</showstandardinstruction>
+    <correctfeedback format="html">
+      <text>Die Antwort ist richtig.</text>
+    </correctfeedback>
+    <partiallycorrectfeedback format="html">
+      <text>Die Antwort ist teilweise richtig.</text>
+    </partiallycorrectfeedback>
+    <incorrectfeedback format="html">
+      <text>Die Antwort ist falsch.</text>
+    </incorrectfeedback>
+    <shownumcorrect/>
+    <answer fraction="100" format="html">
+      <text><![CDATA[<p dir="ltr" style="text-align: left;">richtige Antwort</p>]]></text>
+      <feedback format="html">
+        <text></text>
+      </feedback>
+    </answer>
+    <answer fraction="0" format="html">
+      <text><![CDATA[<p dir="ltr" style="text-align: left;">falsche Antwort 1</p>]]></text>
+      <feedback format="html">
+        <text></text>
+      </feedback>
+    </answer>
+    <answer fraction="0" format="html">
+      <text><![CDATA[<p dir="ltr" style="text-align: left;">falsche Antwort 2</p>]]></text>
+      <feedback format="html">
+        <text></text>
+      </feedback>
+    </answer>
+    <answer fraction="0" format="html">
+      <text><![CDATA[<p dir="ltr" style="text-align: left;">falsche Antwort 3</p>]]></text>
+      <feedback format="html">
+        <text></text>
+      </feedback>
+    </answer>
+    <tags>
+      <tag><text>Simulation</text>
+      </tag>
+      <tag><text>SC</text>
+      </tag>
+    </tags>
+  </question>
+
+
+  <question type="multichoice">
+    <name>
+      <text>Pilotfrage 1</text>
+    </name>
+    <questiontext format="html">
+      <text>Pilotfrage 1</text>
+    </questiontext>
+    <generalfeedback format="html">
+      <text></text>
+    </generalfeedback>
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <hidden>0</hidden>
+    <idnumber>Pilotfrage-49</idnumber>
+    <single>true</single>
+    <shuffleanswers>true</shuffleanswers>
+    <answernumbering>none</answernumbering>
+    <showstandardinstruction>0</showstandardinstruction>
+    <correctfeedback format="html">
+      <text>Die Antwort ist richtig.</text>
+    </correctfeedback>
+    <partiallycorrectfeedback format="html">
+      <text>Die Antwort ist teilweise richtig.</text>
+    </partiallycorrectfeedback>
+    <incorrectfeedback format="html">
+      <text>Die Antwort ist falsch.</text>
+    </incorrectfeedback>
+    <shownumcorrect/>
+    <answer fraction="100" format="html">
+      <text><![CDATA[<p dir="ltr" style="text-align: left;">richtige Antwort</p>]]></text>
+      <feedback format="html">
+        <text></text>
+      </feedback>
+    </answer>
+    <answer fraction="0" format="html">
+      <text><![CDATA[<p dir="ltr" style="text-align: left;">falsche Antwort 1</p>]]></text>
+      <feedback format="html">
+        <text></text>
+      </feedback>
+    </answer>
+    <answer fraction="0" format="html">
+      <text><![CDATA[<p dir="ltr" style="text-align: left;">falsche Antwort 2</p>]]></text>
+      <feedback format="html">
+        <text></text>
+      </feedback>
+    </answer>
+    <answer fraction="0" format="html">
+      <text><![CDATA[<p dir="ltr" style="text-align: left;">falsche Antwort 3</p>]]></text>
+      <feedback format="html">
+        <text></text>
+      </feedback>
+    </answer>
+    <tags>
+      <tag><text>Simulation</text>
+      </tag>
+      <tag><text>SC</text>
+      </tag>
+    </tags>
+  </question>
+
+
+  <question type="multichoice">
+    <name>
+      <text>Pilotfrage 1</text>
+    </name>
+    <questiontext format="html">
+      <text>Pilotfrage 1</text>
+    </questiontext>
+    <generalfeedback format="html">
+      <text></text>
+    </generalfeedback>
+    <defaultgrade>1.0000000</defaultgrade>
+    <penalty>0.3333333</penalty>
+    <hidden>0</hidden>
+    <idnumber>Pilotfrage-50</idnumber>
+    <single>true</single>
+    <shuffleanswers>true</shuffleanswers>
+    <answernumbering>none</answernumbering>
+    <showstandardinstruction>0</showstandardinstruction>
+    <correctfeedback format="html">
+      <text>Die Antwort ist richtig.</text>
+    </correctfeedback>
+    <partiallycorrectfeedback format="html">
+      <text>Die Antwort ist teilweise richtig.</text>
+    </partiallycorrectfeedback>
+    <incorrectfeedback format="html">
+      <text>Die Antwort ist falsch.</text>
+    </incorrectfeedback>
+    <shownumcorrect/>
+    <answer fraction="100" format="html">
+      <text><![CDATA[<p dir="ltr" style="text-align: left;">richtige Antwort</p>]]></text>
+      <feedback format="html">
+        <text></text>
+      </feedback>
+    </answer>
+    <answer fraction="0" format="html">
+      <text><![CDATA[<p dir="ltr" style="text-align: left;">falsche Antwort 1</p>]]></text>
+      <feedback format="html">
+        <text></text>
+      </feedback>
+    </answer>
+    <answer fraction="0" format="html">
+      <text><![CDATA[<p dir="ltr" style="text-align: left;">falsche Antwort 2</p>]]></text>
+      <feedback format="html">
+        <text></text>
+      </feedback>
+    </answer>
+    <answer fraction="0" format="html">
+      <text><![CDATA[<p dir="ltr" style="text-align: left;">falsche Antwort 3</p>]]></text>
+      <feedback format="html">
+        <text></text>
+      </feedback>
+    </answer>
+    <tags>
+      <tag><text>Simulation</text>
+      </tag>
+      <tag><text>SC</text>
+      </tag>
+    </tags>
+  </question>
+
+  </quiz>
