@@ -25,6 +25,7 @@ use local_catquiz\catquiz;
 use local_catquiz\catscale;
 use local_catquiz\event\attempt_completed;
 use local_catquiz\teststrategy\feedbackgenerator;
+use local_catquiz\teststrategy\feedbackgenerator\customscalefeedback;
 use local_catquiz\teststrategy\feedbacksettings;
 use local_catquiz\teststrategy\info;
 use local_catquiz\teststrategy\progress;
@@ -385,6 +386,8 @@ class attemptfeedback implements renderable, templatable {
         if (!$feedbackdata) {
             return [];
         }
+        // TODO: Set primary generator element (customscalefeedback) first.
+
         foreach ($generators as $generator) {
             $feedbacks = $generator->get_feedback($feedbackdata);
             // Loop over studentfeedback and teacherfeedback.

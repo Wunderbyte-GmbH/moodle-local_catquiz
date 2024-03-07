@@ -117,8 +117,8 @@ class inferlowestskillgap extends strategy {
         $this->apply_feedbacksettings($feedbacksettings);
 
         return [
-            new comparetotestaverage($this->feedbacksettings),
             new customscalefeedback($this->feedbacksettings),
+            new comparetotestaverage($this->feedbacksettings),
             new debuginfo($this->feedbacksettings),
             new personabilities($this->feedbacksettings),
             new questionssummary($this->feedbacksettings),
