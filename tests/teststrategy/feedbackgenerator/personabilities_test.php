@@ -1,7 +1,7 @@
 <?php
-// This file is part of Moodle - http =>//moodle.org/
+// This file is part of Moodle - http://moodle.org/
 //
-// Moodle is free software => you can redistribute it and/or modify
+// Moodle is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
@@ -12,7 +12,7 @@
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-// along with Moodle.  If not, see <http =>//www.gnu.org/licenses/>.
+// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
  * Tests the feedbackgenerator personability.
@@ -51,6 +51,9 @@ class personabilities_test extends advanced_testcase {
      *
      * @param array $feedbackdata
      * @param array $expected
+     * @param array $abilityrange
+     * @param array $testitemsforcatscale
+     * @param array $fisherinfo
      *
      * @return void
      * @throws InvalidArgumentException
@@ -106,7 +109,7 @@ class personabilities_test extends advanced_testcase {
                         "raschbirnbauma" => "catmodel_raschbirnbauma\raschbirnbauma",
                         "raschbirnbaumb" => "catmodel_raschbirnbaumb\raschbirnbaumb",
                         "raschbirnbaumc" => "catmodel_raschbirnbaumc\raschbirnbaumc",
-                        "web_raschbirnbauma" => "catmodel_web_raschbirnbauma\\web_raschbirnbauma"
+                        "web_raschbirnbauma" => "catmodel_web_raschbirnbauma\\web_raschbirnbauma",
                     ],
                     'contextid' => '1817',
                     'personabilities_abilities' => [
@@ -138,11 +141,11 @@ class personabilities_test extends advanced_testcase {
                             "name" => "SimB04",
                             "catscaleid" => 284,
                             "numberofitemsplayed" => [
-                                "noplayed" => 0
+                                "noplayed" => 0,
                             ],
                             "questionpreviews" => "",
                             "isselectedscale" => true,
-                            "tooltiptitle" => "[[lowestskill =>tooltiptitle]]"
+                            "tooltiptitle" => "[[lowestskill =>tooltiptitle]]",
                         ],
                         [
                             "standarderror" => "0.26",
@@ -152,7 +155,7 @@ class personabilities_test extends advanced_testcase {
                             "numberofitemsplayed" => "",
                             "questionpreviews" => "",
                             "isselectedscale" => false,
-                            "tooltiptitle" => "SimB"
+                            "tooltiptitle" => "SimB",
                         ],
                         [
                             "standarderror" => "0.11",
@@ -160,11 +163,11 @@ class personabilities_test extends advanced_testcase {
                             "name" => "Simulation",
                             "catscaleid" => 271,
                             "numberofitemsplayed" => [
-                                "noplayed" => 0
+                                "noplayed" => 0,
                             ],
                             "questionpreviews" => "",
                             "isselectedscale" => false,
-                            "tooltiptitle" => "Simulation"
+                            "tooltiptitle" => "Simulation",
                         ],
                         [
                             "standarderror" => "0.13",
@@ -174,7 +177,7 @@ class personabilities_test extends advanced_testcase {
                             "numberofitemsplayed" => "",
                             "questionpreviews" => "",
                             "isselectedscale" => false,
-                            "tooltiptitle" => "SimA"
+                            "tooltiptitle" => "SimA",
                         ],
                         [
                             "standarderror" => "0.13",
@@ -184,7 +187,7 @@ class personabilities_test extends advanced_testcase {
                             "numberofitemsplayed" => "",
                             "questionpreviews" => "",
                             "isselectedscale" => false,
-                            "tooltiptitle" => "SimA01"
+                            "tooltiptitle" => "SimA01",
                         ],
                         [
                             "standarderror" => "0.47",
@@ -194,8 +197,8 @@ class personabilities_test extends advanced_testcase {
                             "numberofitemsplayed" => "",
                             "questionpreviews" => "",
                             "isselectedscale" => false,
-                            "tooltiptitle" => "SimB02"
-                        ]
+                            "tooltiptitle" => "SimB02",
+                        ],
                     ],
                 ],
                 'expected' => [
@@ -332,10 +335,16 @@ class personabilities_test extends advanced_testcase {
                     "1.75" => 2.5218760624002234,
                     "2.25" => 9.5792619084903645,
                     "2.75" => 36.639597288816844],
-            ]
+                ],
         ];
     }
 
+    /**
+     * Return testitem for scale.
+     *
+     * @return array
+     *
+     */
     private static function return_testitemsforscale(): array {
         return [
             "10728" => [
@@ -344,7 +353,9 @@ class personabilities_test extends advanced_testcase {
                 "label" => "SIMA05-00",
                 "idnumber" => "SIMA05-00",
                 "name" => "Testfrage SIMA05-00",
-                "questiontext" => "<p dir=\"ltr\" style=\"text-align=> left;\">Schwierigkeit=> -2.8<\/p><p>Trennsch\u00e4rtfe=> 3.46<\/p><p><b>Skala=> A\/A05<\/b><\/p>",
+                "questiontext" =>
+                "<p dir=\"ltr\" style=\"text-align=> left;\">Schwierigkeit=> -2.8<\/p>
+                <p>Trennsch\u00e4rtfe=> 3.46<\/p><p><b>Skala=> A\/A05<\/b><\/p>",
                 "qtype" => "multichoice",
                 "categoryname" => "Simulation",
                 "catscaleid" => "277",
@@ -362,7 +373,7 @@ class personabilities_test extends advanced_testcase {
                 "guessing" => "0.0000",
                 "timecreated" => "1707311393",
                 "timemodified" => "1707311393",
-                "status" => "4"
+                "status" => "4",
             ],
             "10729" => [
                 "id" => "10729",
@@ -370,7 +381,9 @@ class personabilities_test extends advanced_testcase {
                 "label" => "SIMA05-01",
                 "idnumber" => "SIMA05-01",
                 "name" => "Testfrage SIMA05-01",
-                "questiontext" => "<p dir=\"ltr\" style=\"text-align=> left;\">Schwierigkeit=> -2.17<\/p><p>Trennsch\u00e4rtfe=> 0.42<\/p><p><b>Skala=> A\/A05<\/b><\/p>",
+                "questiontext" =>
+                "<p dir=\"ltr\" style=\"text-align=> left;\">Schwierigkeit=> -2.17<\/p><p>Trennsch\u00e4rtfe=> 0.42<\/p>
+                <p><b>Skala=> A\/A05<\/b><\/p>",
                 "qtype" => "multichoice",
                 "categoryname" => "Simulation",
                 "catscaleid" => "277",
@@ -388,7 +401,7 @@ class personabilities_test extends advanced_testcase {
                 "guessing" => "0.0000",
                 "timecreated" => "1707311393",
                 "timemodified" => "1707311393",
-                "status" => "4"
+                "status" => "4",
             ],
             "10730" => [
                 "id" => "10730",
@@ -396,7 +409,9 @@ class personabilities_test extends advanced_testcase {
                 "label" => "SIMA05-02",
                 "idnumber" => "SIMA05-02",
                 "name" => "Testfrage SIMA05-02",
-                "questiontext" => "<p dir=\"ltr\" style=\"text-align=> left;\">Schwierigkeit=> -2.64<\/p><p>Trennsch\u00e4rtfe=> 4.98<\/p><p><b>Skala=> A\/A05<\/b><\/p>",
+                "questiontext" =>
+                "<p dir=\"ltr\" style=\"text-align=> left;\">Schwierigkeit=> -2.64<\/p><p>Trennsch\u00e4rtfe=> 4.98<\/p>
+                <p><b>Skala=> A\/A05<\/b><\/p>",
                 "qtype" => "multichoice",
                 "categoryname" => "Simulation",
                 "catscaleid" => "277",
@@ -414,7 +429,7 @@ class personabilities_test extends advanced_testcase {
                 "guessing" => "0.0000",
                 "timecreated" => "1707311393",
                 "timemodified" => "1707311393",
-                "status" => "4"
+                "status" => "4",
             ],
             "10731" => [
                 "id" => "10731",
@@ -440,7 +455,7 @@ class personabilities_test extends advanced_testcase {
                 "guessing" => "0.0000",
                 "timecreated" => "1707311393",
                 "timemodified" => "1707311393",
-                "status" => "4"
+                "status" => "4",
             ],
             "10732" => [
                 "id" => "10732",
@@ -466,7 +481,7 @@ class personabilities_test extends advanced_testcase {
                 "guessing" => "0.0000",
                 "timecreated" => "1707311393",
                 "timemodified" => "1707311393",
-                "status" => "4"
+                "status" => "4",
             ],
             "10733" => [
                 "id" => "10733",
@@ -492,7 +507,7 @@ class personabilities_test extends advanced_testcase {
                 "guessing" => "0.0000",
                 "timecreated" => "1707311393",
                 "timemodified" => "1707311393",
-                "status" => "4"
+                "status" => "4",
             ],
             "10734" => [
                 "id" => "10734",
@@ -518,7 +533,7 @@ class personabilities_test extends advanced_testcase {
                 "guessing" => "0.0000",
                 "timecreated" => "1707311393",
                 "timemodified" => "1707311393",
-                "status" => "4"
+                "status" => "4",
             ],
             "10735" => [
                 "id" => "10735",
@@ -544,7 +559,7 @@ class personabilities_test extends advanced_testcase {
                 "guessing" => "0.0000",
                 "timecreated" => "1707311393",
                 "timemodified" => "1707311393",
-                "status" => "4"
+                "status" => "4",
             ],
             "10736" => [
                 "id" => "10736",
@@ -570,7 +585,7 @@ class personabilities_test extends advanced_testcase {
                 "guessing" => "0.0000",
                 "timecreated" => "1707311393",
                 "timemodified" => "1707311393",
-                "status" => "4"
+                "status" => "4",
             ],
             "10737" => [
                 "id" => "10737",
@@ -596,7 +611,7 @@ class personabilities_test extends advanced_testcase {
                 "guessing" => "0.0000",
                 "timecreated" => "1707311393",
                 "timemodified" => "1707311393",
-                "status" => "4"
+                "status" => "4",
             ],
             "10738" => [
                 "id" => "10738",
@@ -622,7 +637,7 @@ class personabilities_test extends advanced_testcase {
                 "guessing" => "0.0000",
                 "timecreated" => "1707311393",
                 "timemodified" => "1707311393",
-                "status" => "4"
+                "status" => "4",
             ],
             "10739" => [
                 "id" => "10739",
@@ -648,7 +663,7 @@ class personabilities_test extends advanced_testcase {
                 "guessing" => "0.0000",
                 "timecreated" => "1707311393",
                 "timemodified" => "1707311393",
-                "status" => "4"
+                "status" => "4",
             ],
             "10740" => [
                 "id" => "10740",
@@ -674,7 +689,7 @@ class personabilities_test extends advanced_testcase {
                 "guessing" => "0.0000",
                 "timecreated" => "1707311393",
                 "timemodified" => "1707311393",
-                "status" => "4"
+                "status" => "4",
             ],
             "10741" => [
                 "id" => "10741",
@@ -700,7 +715,7 @@ class personabilities_test extends advanced_testcase {
                 "guessing" => "0.0000",
                 "timecreated" => "1707311393",
                 "timemodified" => "1707311393",
-                "status" => "4"
+                "status" => "4",
             ],
             "10742" => [
                 "id" => "10742",
@@ -726,7 +741,7 @@ class personabilities_test extends advanced_testcase {
                 "guessing" => "0.0000",
                 "timecreated" => "1707311393",
                 "timemodified" => "1707311393",
-                "status" => "4"
+                "status" => "4",
             ],
             "10743" => [
                 "id" => "10743",
@@ -752,7 +767,7 @@ class personabilities_test extends advanced_testcase {
                 "guessing" => "0.0000",
                 "timecreated" => "1707311393",
                 "timemodified" => "1707311393",
-                "status" => "4"
+                "status" => "4",
             ],
             "10744" => [
                 "id" => "10744",
@@ -778,7 +793,7 @@ class personabilities_test extends advanced_testcase {
                 "guessing" => "0.0000",
                 "timecreated" => "1707311393",
                 "timemodified" => "1707311393",
-                "status" => "4"
+                "status" => "4",
             ],
             "10745" => [
                 "id" => "10745",
@@ -804,7 +819,7 @@ class personabilities_test extends advanced_testcase {
                 "guessing" => "0.0000",
                 "timecreated" => "1707311393",
                 "timemodified" => "1707311393",
-                "status" => "4"
+                "status" => "4",
             ],
             "10746" => [
                 "id" => "10746",
@@ -830,7 +845,7 @@ class personabilities_test extends advanced_testcase {
                 "guessing" => "0.0000",
                 "timecreated" => "1707311393",
                 "timemodified" => "1707311393",
-                "status" => "4"
+                "status" => "4",
             ],
             "10747" => [
                 "id" => "10747",
@@ -856,8 +871,8 @@ class personabilities_test extends advanced_testcase {
                 "guessing" => "0.0000",
                 "timecreated" => "1707311393",
                 "timemodified" => "1707311393",
-                "status" => "4"
-            ]
+                "status" => "4",
+            ],
         ];
     }
 

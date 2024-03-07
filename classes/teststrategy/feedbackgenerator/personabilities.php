@@ -536,7 +536,7 @@ class personabilities extends feedbackgenerator {
      * @return array
      *
      */
-    public function get_testitems_for_catscale (int $catscaleid, int $contextid, bool $includesubscales) {
+    public function get_testitems_for_catscale(int $catscaleid, int $contextid, bool $includesubscales) {
         $catscale = new catscale($catscaleid);
         // Prepare data for test information line.
         return $catscale->get_testitems($contextid, $includesubscales);
