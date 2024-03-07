@@ -25,6 +25,7 @@
 
 namespace local_catquiz;
 
+use advanced_testcase;
 use basic_testcase;
 use local_catquiz\teststrategy\feedbackgenerator\customscalefeedback;
 use local_catquiz\teststrategy\feedbackgenerator\personabilities;
@@ -43,7 +44,7 @@ use UnexpectedValueException;
  *
  * @covers \local_catquiz\teststrategy\preselect_task\filterforsubscale
  */
-class personabilities_test extends basic_testcase {
+class personabilities_test extends advanced_testcase {
 
     /**
      * Test that questions of subscales are removed as needed.
@@ -56,12 +57,37 @@ class personabilities_test extends basic_testcase {
      * @throws ExpectationFailedException
      * @dataProvider get_studentfeedback_provider
      */
-    public function test_get_studentfeedback(array $feedbackdata, array $expected) {
+    public function test_get_studentfeedback(
+        array $feedbackdata,
+        array $expected,
+        array $abilityrange,
+        array $testitemsforcatscale,
+        array $fisherinfo) {
 
         $feedbacksettings = new feedbacksettings(LOCAL_CATQUIZ_STRATEGY_LOWESTSUB);
-        $personabilities = new personabilities($feedbacksettings);
+        $personabilities = $this->getMockBuilder(personabilities::class)
+            ->onlyMethods([
+                'get_ability_range',
+                'get_testitems_for_catscale',
+                'get_fisherinfos_of_items',
+            ])
+            ->setConstructorArgs([$feedbacksettings])
+            ->getMock();
+
+        // Configure the stub.
+        $personabilities
+            ->method('get_ability_range')
+            ->willReturn($abilityrange);
+        $personabilities
+            ->method('get_testitems_for_catscale')
+            ->willReturn($testitemsforcatscale);
+        $personabilities
+            ->method('get_fisherinfos_of_items')
+            ->willReturn($fisherinfo);
+
         $output = $personabilities->get_studentfeedback($feedbackdata);
-        $this->assertEquals($expected, $output);
+        // TODO: Test whole array once template is finalized.
+        $this->assertEquals($expected['heading'], $output['heading']);
     }
 
     /**
@@ -75,6 +101,14 @@ class personabilities_test extends basic_testcase {
         return [
             'lowestskillgap' => [
                 'feedbackdata' => [
+                    'userid' => '2',
+                    'models' => [
+                        "raschbirnbauma" => "catmodel_raschbirnbauma\raschbirnbauma",
+                        "raschbirnbaumb" => "catmodel_raschbirnbaumb\raschbirnbaumb",
+                        "raschbirnbaumc" => "catmodel_raschbirnbaumc\raschbirnbaumc",
+                        "web_raschbirnbauma" => "catmodel_web_raschbirnbauma\\web_raschbirnbauma"
+                    ],
+                    'contextid' => '1817',
                     'personabilities_abilities' => [
                         '271' => [
                             'value' => "-2.5175",
@@ -84,9 +118,11 @@ class personabilities_test extends basic_testcase {
                         ],
                         '272' => [
                             'value' => "-2.51755",
+                            'name' => "Skala2",
                         ],
                         '273' => [
                             'value' => "-2.51755",
+                            'name' => "Skala1",
                         ],
                     ],
                     'primaryscale' => [
@@ -95,12 +131,733 @@ class personabilities_test extends basic_testcase {
                         'parentid' => '0',
                     ],
                     'quizsettings' => self::return_quizsettings(),
+                    'abilitieslist' => [
+                        [
+                            "standarderror" => "0.38",
+                            "ability" => "2.42",
+                            "name" => "SimB04",
+                            "catscaleid" => 284,
+                            "numberofitemsplayed" => [
+                                "noplayed" => 0
+                            ],
+                            "questionpreviews" => "",
+                            "isselectedscale" => true,
+                            "tooltiptitle" => "[[lowestskill =>tooltiptitle]]"
+                        ],
+                        [
+                            "standarderror" => "0.26",
+                            "ability" => "2.53",
+                            "name" => "SimB",
+                            "catscaleid" => 280,
+                            "numberofitemsplayed" => "",
+                            "questionpreviews" => "",
+                            "isselectedscale" => false,
+                            "tooltiptitle" => "SimB"
+                        ],
+                        [
+                            "standarderror" => "0.11",
+                            "ability" => "2.54",
+                            "name" => "Simulation",
+                            "catscaleid" => 271,
+                            "numberofitemsplayed" => [
+                                "noplayed" => 0
+                            ],
+                            "questionpreviews" => "",
+                            "isselectedscale" => false,
+                            "tooltiptitle" => "Simulation"
+                        ],
+                        [
+                            "standarderror" => "0.13",
+                            "ability" => "2.76",
+                            "name" => "SimA",
+                            "catscaleid" => 272,
+                            "numberofitemsplayed" => "",
+                            "questionpreviews" => "",
+                            "isselectedscale" => false,
+                            "tooltiptitle" => "SimA"
+                        ],
+                        [
+                            "standarderror" => "0.13",
+                            "ability" => "2.76",
+                            "name" => "SimA01",
+                            "catscaleid" => 273,
+                            "numberofitemsplayed" => "",
+                            "questionpreviews" => "",
+                            "isselectedscale" => false,
+                            "tooltiptitle" => "SimA01"
+                        ],
+                        [
+                            "standarderror" => "0.47",
+                            "ability" => "2.78",
+                            "name" => "SimB02",
+                            "catscaleid" => 282,
+                            "numberofitemsplayed" => "",
+                            "questionpreviews" => "",
+                            "isselectedscale" => false,
+                            "tooltiptitle" => "SimB02"
+                        ]
+                    ],
                 ],
                 'expected' => [
-                    'heading' => 'Feedback',
-                    'content' => 'There was no valid feedback found.',
+                    'heading' => 'Ability score',
+                    'content' => '<h5>Ability score in subscales</h5>
+                    <div class="container">
+                        <div class="row">
+                            <div
+                                    class="font-weight-bold col-4 text-right"
+                                    data-toggle="tooltip"
+                                    data-placement="top"
+                                    title="[[lowestskill =&gt;tooltiptitle]]"
+                    >
+                                SimB04 :
+                            </div>
+                            <div
+                                    class="font-weight-bold col-4 text-left"
+                                    data-toggle="tooltip"
+                                    data-placement="top"
+                                    title="[[lowestskill =&gt;tooltiptitle]]"
+                    >
+                                2.42 (Standarderror: 0.38)
+                            </div>
+                            <div class="modal fade bd-example-modal-xl
+                            catquizfeedbackabilitiesplayedquestions_284" tabindex="-1" role="dialog" aria-hidden="true">
+                            <div class="modal-dialog modal-xl">
+                                <div class="modal-content">
+                                </div>
+                            </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="modal fade bd-example-modal-xl
+                            catquizfeedbackabilitiesplayedquestions_280" tabindex="-1" role="dialog" aria-hidden="true">
+                            <div class="modal-dialog modal-xl">
+                                <div class="modal-content">
+                                </div>
+                            </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div                 class="font-weight-normal col-4 text-right"
+                                >
+                                Simulation :
+                            </div>
+                            <div                 class="font-weight-normal col-4 text-left"
+                                >
+                                2.54 (Standarderror: 0.11)
+                            </div>
+                            <div class="modal fade bd-example-modal-xl
+                            catquizfeedbackabilitiesplayedquestions_271" tabindex="-1" role="dialog" aria-hidden="true">
+                            <div class="modal-dialog modal-xl">
+                                <div class="modal-content">
+                                </div>
+                            </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="modal fade bd-example-modal-xl
+                            catquizfeedbackabilitiesplayedquestions_272" tabindex="-1" role="dialog" aria-hidden="true">
+                            <div class="modal-dialog modal-xl">
+                                <div class="modal-content">
+                                </div>
+                            </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="modal fade bd-example-modal-xl
+                            catquizfeedbackabilitiesplayedquestions_273" tabindex="-1" role="dialog" aria-hidden="true">
+                            <div class="modal-dialog modal-xl">
+                                <div class="modal-content">
+                                </div>
+                            </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="modal fade bd-example-modal-xl
+                            catquizfeedbackabilitiesplayedquestions_282" tabindex="-1" role="dialog" aria-hidden="true">
+                            <div class="modal-dialog modal-xl">
+                                <div class="modal-content">
+                                </div>
+                            </div>
+                            </div>
+                        </div>
+                    </div>
+                        <h5>
+                        Relative ability score in subscales compared to Simulation
+                        </h5>
+                        <div class="chart-area" id="chart-area-65e9d27ff251a65e9d27ff251e1">
+                        <div class="chart-image" role="presentation"
+                        aria-describedby="chart-table-data-65e9d27ff251a65e9d27ff251e1"></div>
+                        <div class="chart-table ">
+                            <p class="chart-table-expand">
+                                <a href="#" aria-controls="chart-table-data-65e9d27ff251a65e9d27ff251e1" role="button">
+                                    Show chart data
+                                </a>
+                            </p>
+                            <div class="chart-table-data" id="chart-table-data-65e9d27ff251a65e9d27ff251e1"
+                            role="complementary" aria-expanded="false"></div>
+                        </div>
+                    </div>
+                        <h5>
+                        Ability score profile in &quot;Simulation&quot;
+                        </h5>
+                        <div class="chart-area" id="chart-area-65e9d28333bf265e9d27ff251e2">
+                        <div class="chart-image" role="presentation"
+                        aria-describedby="chart-table-data-65e9d28333bf265e9d27ff251e2"></div>
+                        <div class="chart-table ">
+                            <p class="chart-table-expand">
+                                <a href="#" aria-controls="chart-table-data-65e9d28333bf265e9d27ff251e2" role="button">
+                                    Show chart data
+                                </a>
+                            </p>
+                            <div class="chart-table-data" id="chart-table-data-65e9d28333bf265e9d27ff251e2"
+                            role="complementary" aria-expanded="false"></div>
+                        </div>
+                    </div>',
                 ],
+                'abilityrange' => [
+                    'minscalevalue' => -3,
+                    'maxscalevalue' => 3,
+                ],
+                'testitemsforscale' => self::return_testitemsforscale(),
+                'fisherinfos' => [
+                    "-2.75" => 0.053868579223771237,
+                    "-2.25" => 0.073312336374749279,
+                    "-1.75" => 0.10032462382790783,
+                    "-1.25" => 0.13812600089502194,
+                    "-0.75" => 0.19163446614525015,
+                    "-0.25" => 0.26912623945535352,
+                    "0.25" => 0.38739080216675159,
+                    "0.75" => 0.59133863637170458,
+                    "1.25" => 1.0436635576797371,
+                    "1.75" => 2.5218760624002234,
+                    "2.25" => 9.5792619084903645,
+                    "2.75" => 36.639597288816844],
+            ]
+        ];
+    }
+
+    private static function return_testitemsforscale(): array {
+        return [
+            "10728" => [
+                "id" => "10728",
+                "componentid" => "10728",
+                "label" => "SIMA05-00",
+                "idnumber" => "SIMA05-00",
+                "name" => "Testfrage SIMA05-00",
+                "questiontext" => "<p dir=\"ltr\" style=\"text-align=> left;\">Schwierigkeit=> -2.8<\/p><p>Trennsch\u00e4rtfe=> 3.46<\/p><p><b>Skala=> A\/A05<\/b><\/p>",
+                "qtype" => "multichoice",
+                "categoryname" => "Simulation",
+                "catscaleid" => "277",
+                "testitemstatus" => "0",
+                "component" => "question",
+                "itemid" => "5219",
+                "catscalename" => "SimA05",
+                "attempts" => "1",
+                "lastattempttime" => "1709211291",
+                "userattempts" => "1",
+                "userlastattempttime" => "1709211291",
+                "model" => "raschbirnbaumb",
+                "difficulty" => "-2.8000",
+                "discrimination" => "3.4600",
+                "guessing" => "0.0000",
+                "timecreated" => "1707311393",
+                "timemodified" => "1707311393",
+                "status" => "4"
             ],
+            "10729" => [
+                "id" => "10729",
+                "componentid" => "10729",
+                "label" => "SIMA05-01",
+                "idnumber" => "SIMA05-01",
+                "name" => "Testfrage SIMA05-01",
+                "questiontext" => "<p dir=\"ltr\" style=\"text-align=> left;\">Schwierigkeit=> -2.17<\/p><p>Trennsch\u00e4rtfe=> 0.42<\/p><p><b>Skala=> A\/A05<\/b><\/p>",
+                "qtype" => "multichoice",
+                "categoryname" => "Simulation",
+                "catscaleid" => "277",
+                "testitemstatus" => "0",
+                "component" => "question",
+                "itemid" => "5220",
+                "catscalename" => "SimA05",
+                "attempts" => null,
+                "lastattempttime" => "0",
+                "userattempts" => null,
+                "userlastattempttime" => "0",
+                "model" => "raschbirnbaumb",
+                "difficulty" => "-2.1700",
+                "discrimination" => "0.4200",
+                "guessing" => "0.0000",
+                "timecreated" => "1707311393",
+                "timemodified" => "1707311393",
+                "status" => "4"
+            ],
+            "10730" => [
+                "id" => "10730",
+                "componentid" => "10730",
+                "label" => "SIMA05-02",
+                "idnumber" => "SIMA05-02",
+                "name" => "Testfrage SIMA05-02",
+                "questiontext" => "<p dir=\"ltr\" style=\"text-align=> left;\">Schwierigkeit=> -2.64<\/p><p>Trennsch\u00e4rtfe=> 4.98<\/p><p><b>Skala=> A\/A05<\/b><\/p>",
+                "qtype" => "multichoice",
+                "categoryname" => "Simulation",
+                "catscaleid" => "277",
+                "testitemstatus" => "0",
+                "component" => "question",
+                "itemid" => "5221",
+                "catscalename" => "SimA05",
+                "attempts" => "1",
+                "lastattempttime" => "1709208924",
+                "userattempts" => "1",
+                "userlastattempttime" => "1709208924",
+                "model" => "raschbirnbaumb",
+                "difficulty" => "-2.6400",
+                "discrimination" => "4.9800",
+                "guessing" => "0.0000",
+                "timecreated" => "1707311393",
+                "timemodified" => "1707311393",
+                "status" => "4"
+            ],
+            "10731" => [
+                "id" => "10731",
+                "componentid" => "10731",
+                "label" => "SIMA05-03",
+                "idnumber" => "SIMA05-03",
+                "name" => "Testfrage SIMA05-03",
+                "questiontext" => "<p dir=\"ltr\" style=\"text-align=> left;\">Schwierigkeit=> -2.65<\/p><p>Trennsch\u00e4rtfe=> 5.76<\/p><p><b>Skala=> A\/A05<\/b><\/p>",
+                "qtype" => "multichoice",
+                "categoryname" => "Simulation",
+                "catscaleid" => "277",
+                "testitemstatus" => "0",
+                "component" => "question",
+                "itemid" => "5222",
+                "catscalename" => "SimA05",
+                "attempts" => "2",
+                "lastattempttime" => "1709807631",
+                "userattempts" => "2",
+                "userlastattempttime" => "1709807631",
+                "model" => "raschbirnbaumb",
+                "difficulty" => "-2.6500",
+                "discrimination" => "5.7600",
+                "guessing" => "0.0000",
+                "timecreated" => "1707311393",
+                "timemodified" => "1707311393",
+                "status" => "4"
+            ],
+            "10732" => [
+                "id" => "10732",
+                "componentid" => "10732",
+                "label" => "SIMA05-04",
+                "idnumber" => "SIMA05-04",
+                "name" => "Testfrage SIMA05-04",
+                "questiontext" => "<p dir=\"ltr\" style=\"text-align=> left;\">Schwierigkeit=> -2.1<\/p><p>Trennsch\u00e4rtfe=> 5.98<\/p><p><b>Skala=> A\/A05<\/b><\/p>",
+                "qtype" => "multichoice",
+                "categoryname" => "Simulation",
+                "catscaleid" => "277",
+                "testitemstatus" => "0",
+                "component" => "question",
+                "itemid" => "5223",
+                "catscalename" => "SimA05",
+                "attempts" => "5",
+                "lastattempttime" => "1709653764",
+                "userattempts" => "5",
+                "userlastattempttime" => "1709653764",
+                "model" => "raschbirnbaumb",
+                "difficulty" => "-2.1000",
+                "discrimination" => "5.9800",
+                "guessing" => "0.0000",
+                "timecreated" => "1707311393",
+                "timemodified" => "1707311393",
+                "status" => "4"
+            ],
+            "10733" => [
+                "id" => "10733",
+                "componentid" => "10733",
+                "label" => "SIMA05-05",
+                "idnumber" => "SIMA05-05",
+                "name" => "Testfrage SIMA05-05",
+                "questiontext" => "<p dir=\"ltr\" style=\"text-align=> left;\">Schwierigkeit=> -2.46<\/p><p>Trennsch\u00e4rtfe=> 2.67<\/p><p><b>Skala=> A\/A05<\/b><\/p>",
+                "qtype" => "multichoice",
+                "categoryname" => "Simulation",
+                "catscaleid" => "277",
+                "testitemstatus" => "0",
+                "component" => "question",
+                "itemid" => "5224",
+                "catscalename" => "SimA05",
+                "attempts" => "1",
+                "lastattempttime" => "1709211692",
+                "userattempts" => "1",
+                "userlastattempttime" => "1709211692",
+                "model" => "raschbirnbaumb",
+                "difficulty" => "-2.4600",
+                "discrimination" => "2.6700",
+                "guessing" => "0.0000",
+                "timecreated" => "1707311393",
+                "timemodified" => "1707311393",
+                "status" => "4"
+            ],
+            "10734" => [
+                "id" => "10734",
+                "componentid" => "10734",
+                "label" => "SIMA05-06",
+                "idnumber" => "SIMA05-06",
+                "name" => "Testfrage SIMA05-06",
+                "questiontext" => "<p dir=\"ltr\" style=\"text-align=> left;\">Schwierigkeit=> -2.48<\/p><p>Trennsch\u00e4rtfe=> 3.65<\/p><p><b>Skala=> A\/A05<\/b><\/p>",
+                "qtype" => "multichoice",
+                "categoryname" => "Simulation",
+                "catscaleid" => "277",
+                "testitemstatus" => "0",
+                "component" => "question",
+                "itemid" => "5225",
+                "catscalename" => "SimA05",
+                "attempts" => "1",
+                "lastattempttime" => "1709211300",
+                "userattempts" => "1",
+                "userlastattempttime" => "1709211300",
+                "model" => "raschbirnbaumb",
+                "difficulty" => "-2.4800",
+                "discrimination" => "3.6500",
+                "guessing" => "0.0000",
+                "timecreated" => "1707311393",
+                "timemodified" => "1707311393",
+                "status" => "4"
+            ],
+            "10735" => [
+                "id" => "10735",
+                "componentid" => "10735",
+                "label" => "SIMA05-07",
+                "idnumber" => "SIMA05-07",
+                "name" => "Testfrage SIMA05-07",
+                "questiontext" => "<p dir=\"ltr\" style=\"text-align=> left;\">Schwierigkeit=> -2.84<\/p><p>Trennsch\u00e4rtfe=> 4.57<\/p><p><b>Skala=> A\/A05<\/b><\/p>",
+                "qtype" => "multichoice",
+                "categoryname" => "Simulation",
+                "catscaleid" => "277",
+                "testitemstatus" => "0",
+                "component" => "question",
+                "itemid" => "5226",
+                "catscalename" => "SimA05",
+                "attempts" => "3",
+                "lastattempttime" => "1709807640",
+                "userattempts" => "3",
+                "userlastattempttime" => "1709807640",
+                "model" => "raschbirnbaumb",
+                "difficulty" => "-2.8400",
+                "discrimination" => "4.5700",
+                "guessing" => "0.0000",
+                "timecreated" => "1707311393",
+                "timemodified" => "1707311393",
+                "status" => "4"
+            ],
+            "10736" => [
+                "id" => "10736",
+                "componentid" => "10736",
+                "label" => "SIMA05-08",
+                "idnumber" => "SIMA05-08",
+                "name" => "Testfrage SIMA05-08",
+                "questiontext" => "<p dir=\"ltr\" style=\"text-align=> left;\">Schwierigkeit=> -2.5<\/p><p>Trennsch\u00e4rtfe=> 0.43<\/p><p><b>Skala=> A\/A05<\/b><\/p>",
+                "qtype" => "multichoice",
+                "categoryname" => "Simulation",
+                "catscaleid" => "277",
+                "testitemstatus" => "0",
+                "component" => "question",
+                "itemid" => "5227",
+                "catscalename" => "SimA05",
+                "attempts" => null,
+                "lastattempttime" => "0",
+                "userattempts" => null,
+                "userlastattempttime" => "0",
+                "model" => "raschbirnbaumb",
+                "difficulty" => "-2.5000",
+                "discrimination" => "0.4300",
+                "guessing" => "0.0000",
+                "timecreated" => "1707311393",
+                "timemodified" => "1707311393",
+                "status" => "4"
+            ],
+            "10737" => [
+                "id" => "10737",
+                "componentid" => "10737",
+                "label" => "SIMA05-09",
+                "idnumber" => "SIMA05-09",
+                "name" => "Testfrage SIMA05-09",
+                "questiontext" => "<p dir=\"ltr\" style=\"text-align=> left;\">Schwierigkeit=> -2.55<\/p><p>Trennsch\u00e4rtfe=> 1.49<\/p><p><b>Skala=> A\/A05<\/b><\/p>",
+                "qtype" => "multichoice",
+                "categoryname" => "Simulation",
+                "catscaleid" => "277",
+                "testitemstatus" => "0",
+                "component" => "question",
+                "itemid" => "5228",
+                "catscalename" => "SimA05",
+                "attempts" => null,
+                "lastattempttime" => "0",
+                "userattempts" => null,
+                "userlastattempttime" => "0",
+                "model" => "raschbirnbaumb",
+                "difficulty" => "-2.5500",
+                "discrimination" => "1.4900",
+                "guessing" => "0.0000",
+                "timecreated" => "1707311393",
+                "timemodified" => "1707311393",
+                "status" => "4"
+            ],
+            "10738" => [
+                "id" => "10738",
+                "componentid" => "10738",
+                "label" => "SIMA05-10",
+                "idnumber" => "SIMA05-10",
+                "name" => "Testfrage SIMA05-10",
+                "questiontext" => "<p dir=\"ltr\" style=\"text-align=> left;\">Schwierigkeit=> -2.42<\/p><p>Trennsch\u00e4rtfe=> 3.93<\/p><p><b>Skala=> A\/A05<\/b><\/p>",
+                "qtype" => "multichoice",
+                "categoryname" => "Simulation",
+                "catscaleid" => "277",
+                "testitemstatus" => "0",
+                "component" => "question",
+                "itemid" => "5229",
+                "catscalename" => "SimA05",
+                "attempts" => "6",
+                "lastattempttime" => "1709807627",
+                "userattempts" => "6",
+                "userlastattempttime" => "1709807627",
+                "model" => "raschbirnbaumb",
+                "difficulty" => "-2.4200",
+                "discrimination" => "3.9300",
+                "guessing" => "0.0000",
+                "timecreated" => "1707311393",
+                "timemodified" => "1707311393",
+                "status" => "4"
+            ],
+            "10739" => [
+                "id" => "10739",
+                "componentid" => "10739",
+                "label" => "SIMA05-11",
+                "idnumber" => "SIMA05-11",
+                "name" => "Testfrage SIMA05-11",
+                "questiontext" => "<p dir=\"ltr\" style=\"text-align=> left;\">Schwierigkeit=> -2.53<\/p><p>Trennsch\u00e4rtfe=> 4.81<\/p><p><b>Skala=> A\/A05<\/b><\/p>",
+                "qtype" => "multichoice",
+                "categoryname" => "Simulation",
+                "catscaleid" => "277",
+                "testitemstatus" => "0",
+                "component" => "question",
+                "itemid" => "5230",
+                "catscalename" => "SimA05",
+                "attempts" => "1",
+                "lastattempttime" => "1709211295",
+                "userattempts" => "1",
+                "userlastattempttime" => "1709211295",
+                "model" => "raschbirnbaumb",
+                "difficulty" => "-2.5300",
+                "discrimination" => "4.8100",
+                "guessing" => "0.0000",
+                "timecreated" => "1707311393",
+                "timemodified" => "1707311393",
+                "status" => "4"
+            ],
+            "10740" => [
+                "id" => "10740",
+                "componentid" => "10740",
+                "label" => "SIMA05-12",
+                "idnumber" => "SIMA05-12",
+                "name" => "Testfrage SIMA05-12",
+                "questiontext" => "<p dir=\"ltr\" style=\"text-align=> left;\">Schwierigkeit=> -2.13<\/p><p>Trennsch\u00e4rtfe=> 2.09<\/p><p><b>Skala=> A\/A05<\/b><\/p>",
+                "qtype" => "multichoice",
+                "categoryname" => "Simulation",
+                "catscaleid" => "277",
+                "testitemstatus" => "0",
+                "component" => "question",
+                "itemid" => "5231",
+                "catscalename" => "SimA05",
+                "attempts" => "1",
+                "lastattempttime" => "1709212179",
+                "userattempts" => "1",
+                "userlastattempttime" => "1709212179",
+                "model" => "raschbirnbaumb",
+                "difficulty" => "-2.1300",
+                "discrimination" => "2.0900",
+                "guessing" => "0.0000",
+                "timecreated" => "1707311393",
+                "timemodified" => "1707311393",
+                "status" => "4"
+            ],
+            "10741" => [
+                "id" => "10741",
+                "componentid" => "10741",
+                "label" => "SIMA05-13",
+                "idnumber" => "SIMA05-13",
+                "name" => "Testfrage SIMA05-13",
+                "questiontext" => "<p dir=\"ltr\" style=\"text-align=> left;\">Schwierigkeit=> -2.39<\/p><p>Trennsch\u00e4rtfe=> 2.94<\/p><p><b>Skala=> A\/A05<\/b><\/p>",
+                "qtype" => "multichoice",
+                "categoryname" => "Simulation",
+                "catscaleid" => "277",
+                "testitemstatus" => "0",
+                "component" => "question",
+                "itemid" => "5232",
+                "catscalename" => "SimA05",
+                "attempts" => "1",
+                "lastattempttime" => "1709211418",
+                "userattempts" => "1",
+                "userlastattempttime" => "1709211418",
+                "model" => "raschbirnbaumb",
+                "difficulty" => "-2.3900",
+                "discrimination" => "2.9400",
+                "guessing" => "0.0000",
+                "timecreated" => "1707311393",
+                "timemodified" => "1707311393",
+                "status" => "4"
+            ],
+            "10742" => [
+                "id" => "10742",
+                "componentid" => "10742",
+                "label" => "SIMA05-14",
+                "idnumber" => "SIMA05-14",
+                "name" => "Testfrage SIMA05-14",
+                "questiontext" => "<p dir=\"ltr\" style=\"text-align=> left;\">Schwierigkeit=> -2.55<\/p><p>Trennsch\u00e4rtfe=> 2.32<\/p><p><b>Skala=> A\/A05<\/b><\/p>",
+                "qtype" => "multichoice",
+                "categoryname" => "Simulation",
+                "catscaleid" => "277",
+                "testitemstatus" => "0",
+                "component" => "question",
+                "itemid" => "5233",
+                "catscalename" => "SimA05",
+                "attempts" => "1",
+                "lastattempttime" => "1709211696",
+                "userattempts" => "1",
+                "userlastattempttime" => "1709211696",
+                "model" => "raschbirnbaumb",
+                "difficulty" => "-2.5500",
+                "discrimination" => "2.3200",
+                "guessing" => "0.0000",
+                "timecreated" => "1707311393",
+                "timemodified" => "1707311393",
+                "status" => "4"
+            ],
+            "10743" => [
+                "id" => "10743",
+                "componentid" => "10743",
+                "label" => "SIMA05-15",
+                "idnumber" => "SIMA05-15",
+                "name" => "Testfrage SIMA05-15",
+                "questiontext" => "<p dir=\"ltr\" style=\"text-align=> left;\">Schwierigkeit=> -2.85<\/p><p>Trennsch\u00e4rtfe=> 1.91<\/p><p><b>Skala=> A\/A05<\/b><\/p>",
+                "qtype" => "multichoice",
+                "categoryname" => "Simulation",
+                "catscaleid" => "277",
+                "testitemstatus" => "0",
+                "component" => "question",
+                "itemid" => "5234",
+                "catscalename" => "SimA05",
+                "attempts" => "1",
+                "lastattempttime" => "1709212024",
+                "userattempts" => "1",
+                "userlastattempttime" => "1709212024",
+                "model" => "raschbirnbaumb",
+                "difficulty" => "-2.8500",
+                "discrimination" => "1.9100",
+                "guessing" => "0.0000",
+                "timecreated" => "1707311393",
+                "timemodified" => "1707311393",
+                "status" => "4"
+            ],
+            "10744" => [
+                "id" => "10744",
+                "componentid" => "10744",
+                "label" => "SIMA05-16",
+                "idnumber" => "SIMA05-16",
+                "name" => "Testfrage SIMA05-16",
+                "questiontext" => "<p dir=\"ltr\" style=\"text-align=> left;\">Schwierigkeit=> -2.2<\/p><p>Trennsch\u00e4rtfe=> 4.35<\/p><p><b>Skala=> A\/A05<\/b><\/p>",
+                "qtype" => "multichoice",
+                "categoryname" => "Simulation",
+                "catscaleid" => "277",
+                "testitemstatus" => "0",
+                "component" => "question",
+                "itemid" => "5235",
+                "catscalename" => "SimA05",
+                "attempts" => "5",
+                "lastattempttime" => "1709653762",
+                "userattempts" => "5",
+                "userlastattempttime" => "1709653762",
+                "model" => "raschbirnbaumb",
+                "difficulty" => "-2.2000",
+                "discrimination" => "4.3500",
+                "guessing" => "0.0000",
+                "timecreated" => "1707311393",
+                "timemodified" => "1707311393",
+                "status" => "4"
+            ],
+            "10745" => [
+                "id" => "10745",
+                "componentid" => "10745",
+                "label" => "SIMA05-17",
+                "idnumber" => "SIMA05-17",
+                "name" => "Testfrage SIMA05-17",
+                "questiontext" => "<p dir=\"ltr\" style=\"text-align=> left;\">Schwierigkeit=> -2.12<\/p><p>Trennsch\u00e4rtfe=> 1.27<\/p><p><b>Skala=> A\/A05<\/b><\/p>",
+                "qtype" => "multichoice",
+                "categoryname" => "Simulation",
+                "catscaleid" => "277",
+                "testitemstatus" => "0",
+                "component" => "question",
+                "itemid" => "5236",
+                "catscalename" => "SimA05",
+                "attempts" => null,
+                "lastattempttime" => "0",
+                "userattempts" => null,
+                "userlastattempttime" => "0",
+                "model" => "raschbirnbaumb",
+                "difficulty" => "-2.1200",
+                "discrimination" => "1.2700",
+                "guessing" => "0.0000",
+                "timecreated" => "1707311393",
+                "timemodified" => "1707311393",
+                "status" => "4"
+            ],
+            "10746" => [
+                "id" => "10746",
+                "componentid" => "10746",
+                "label" => "SIMA05-18",
+                "idnumber" => "SIMA05-18",
+                "name" => "Testfrage SIMA05-18",
+                "questiontext" => "<p dir=\"ltr\" style=\"text-align=> left;\">Schwierigkeit=> -3.16<\/p><p>Trennsch\u00e4rtfe=> 0.56<\/p><p><b>Skala=> A\/A05<\/b><\/p>",
+                "qtype" => "multichoice",
+                "categoryname" => "Simulation",
+                "catscaleid" => "277",
+                "testitemstatus" => "0",
+                "component" => "question",
+                "itemid" => "5237",
+                "catscalename" => "SimA05",
+                "attempts" => null,
+                "lastattempttime" => "0",
+                "userattempts" => null,
+                "userlastattempttime" => "0",
+                "model" => "raschbirnbaumb",
+                "difficulty" => "-3.1600",
+                "discrimination" => "0.5600",
+                "guessing" => "0.0000",
+                "timecreated" => "1707311393",
+                "timemodified" => "1707311393",
+                "status" => "4"
+            ],
+            "10747" => [
+                "id" => "10747",
+                "componentid" => "10747",
+                "label" => "SIMA05-19",
+                "idnumber" => "SIMA05-19",
+                "name" => "Testfrage SIMA05-19",
+                "questiontext" => "<p dir=\"ltr\" style=\"text-align=> left;\">Schwierigkeit=> -2.41<\/p><p>Trennsch\u00e4rtfe=> 0.6<\/p><p><b>Skala=> A\/A05<\/b><\/p>",
+                "qtype" => "multichoice",
+                "categoryname" => "Simulation",
+                "catscaleid" => "277",
+                "testitemstatus" => "0",
+                "component" => "question",
+                "itemid" => "5238",
+                "catscalename" => "SimA05",
+                "attempts" => null,
+                "lastattempttime" => "0",
+                "userattempts" => null,
+                "userlastattempttime" => "0",
+                "model" => "raschbirnbaumb",
+                "difficulty" => "-2.4100",
+                "discrimination" => "0.6000",
+                "guessing" => "0.0000",
+                "timecreated" => "1707311393",
+                "timemodified" => "1707311393",
+                "status" => "4"
+            ]
         ];
     }
 

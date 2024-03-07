@@ -27,6 +27,8 @@ namespace local_catquiz\teststrategy;
 use coding_exception;
 use context_system;
 use local_catquiz\catquiz;
+use local_catquiz\catscale;
+use local_catquiz\feedback\feedbackclass;
 use UnexpectedValueException;
 
 /**
@@ -191,6 +193,56 @@ abstract class feedbackgenerator {
     }
 
     /**
+     * Write information about colorgradient for colorbar.
+     *
+     * @param array $quizsettings
+     * @param float $personability
+     * @param int $catscaleid
+     * @return string
+     *
+     */
+    public function get_color_for_personability(array $quizsettings, float $personability, int $catscaleid): string {
+        $default = "#878787";
+        $abilityrange = $this->get_ability_range($catscaleid);
+        if (!$quizsettings ||
+            $personability < (float) $abilityrange['minscalevalue'] ||
+            $personability > (float) $abilityrange['maxscalevalue']) {
+            return $default;
+        }
+        $numberoffeedbackoptions = intval($quizsettings['numberoffeedbackoptionsselect']) ?? 8;
+        $colorarray = feedbackclass::get_array_of_colors($numberoffeedbackoptions);
+
+        for ($i = 1; $i <= $numberoffeedbackoptions; $i++) {
+            $rangestartkey = "feedback_scaleid_limit_lower_" . $catscaleid . "_" . $i;
+            $rangeendkey = "feedback_scaleid_limit_upper_" . $catscaleid . "_" . $i;
+            $rangestart = floatval($quizsettings[$rangestartkey]);
+            $rangeend = floatval($quizsettings[$rangeendkey]);
+
+            if ($personability >= $rangestart && $personability <= $rangeend) {
+                $colorkey = 'wb_colourpicker_' . $catscaleid . '_' . $i;
+                $colorname = $quizsettings[$colorkey];
+                return $colorarray[$colorname];
+            }
+
+        }
+        return $default;
+    }
+
+    /**
+     * For testing this is called in seperate function.
+     *
+     * @param mixed $catscaleid
+     *
+     * @return array
+     *
+     */
+    public function get_ability_range($catscaleid): array {
+        $cs = new catscale($catscaleid);
+        // Ability range is the same for all scales with same root scale.
+        return $cs->get_ability_range();
+    }
+
+    /**
      * Returns a fallback if no feedback can be generated.
      *
      * @return array
@@ -216,7 +268,7 @@ abstract class feedbackgenerator {
             if (!array_key_exists($key, $context)) {
                 global $CFG;
                 if ($CFG->debug > 0) {
-                    echo "missing contextkey" . $key;
+                    echo "missing contextkey " . $key;
                 }
                 return false;
             }

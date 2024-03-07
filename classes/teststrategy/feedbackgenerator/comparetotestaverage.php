@@ -328,7 +328,8 @@ class comparetotestaverage extends feedbackgenerator {
 
         $testaverage = (new firstquestionselector())->get_median_ability_of_test($personparams);
 
-        $abilityrange = catscale::get_ability_range($catscaleid);
+        $catscaleclass = new catscale($catscaleid);
+        $abilityrange = $catscaleclass->get_ability_range();
         $middle = ($abilityrange['minscalevalue'] + $abilityrange['maxscalevalue']) / 2;
 
         $testaverageinrange = feedbacksettings::sanitize_range_min_max(
