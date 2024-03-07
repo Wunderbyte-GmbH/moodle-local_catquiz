@@ -175,9 +175,9 @@ class filterbystandarderror extends preselect_task implements wb_middleware {
     /**
      * Contains the filtering logic for the CAT test strategy
      *
-     * @param array $updatedscales 
-     * @return result 
-     * @throws UnexpectedValueException 
+     * @param array $updatedscales
+     * @return result
+     * @throws UnexpectedValueException
      */
     private function filter_for_cat(array $updatedscales): result {
         $drop = false;
@@ -206,10 +206,10 @@ class filterbystandarderror extends preselect_task implements wb_middleware {
 
     /**
      * Checks if a scale should be dropped.
-     * 
-     * @param int $scaleid 
-     * @return bool 
-     * @throws UnexpectedValueException 
+     *
+     * @param int $scaleid
+     * @return bool
+     * @throws UnexpectedValueException
      */
     private function check_scale_should_be_dropped(int $scaleid): bool {
         // All played items that belong to the scale or one of its ancestor scales.

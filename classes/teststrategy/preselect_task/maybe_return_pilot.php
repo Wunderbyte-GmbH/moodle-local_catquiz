@@ -82,9 +82,9 @@ class maybe_return_pilot extends preselect_task implements wb_middleware {
 
     /**
      * Indicates if a pilot question should be returned.
-     * 
+     *
      * This can be overwritten for testing.
-     * @return bool 
+     * @return bool
      */
     protected function should_return_pilot(): bool {
         $rand = rand(0, 100);

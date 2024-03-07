@@ -228,10 +228,10 @@ class progress implements JsonSerializable {
 
     /**
      * Try to load a progress object from the cache.
-     *  
-     * @param int $attemptid 
-     * @return progress 
-     * @throws coding_exception 
+     *
+     * @param int $attemptid
+     * @return progress
+     * @throws coding_exception
      */
     private static function load_from_cache($attemptid) {
         $attemptcache = cache::make('local_catquiz', 'adaptivequizattempt');
@@ -241,9 +241,9 @@ class progress implements JsonSerializable {
 
     /**
      * Try to load a progress object from the database.
-     * 
-     * @param int $attemptid 
-     * @return progress|false 
+     *
+     * @param int $attemptid
+     * @return progress|false
      */
     private static function load_from_db(int $attemptid) {
         global $DB;
@@ -501,7 +501,7 @@ class progress implements JsonSerializable {
 
     /**
      * Marks, that the first question was already played.
-     * 
+     *
      * @return $this
      */
     public function set_first_question_played() {
@@ -575,9 +575,9 @@ class progress implements JsonSerializable {
 
     /**
      * Shows if the given scale is active.
-     * 
-     * @param int $scaleid 
-     * @return bool 
+     *
+     * @param int $scaleid
+     * @return bool
      */
     public function is_active_scale(int $scaleid) {
         return in_array($scaleid, $this->activescales);
@@ -729,7 +729,7 @@ class progress implements JsonSerializable {
 
     /**
      * Marks the last question as failed
-     * 
+     *
      * @return $this
      */
     public function mark_lastquestion_failed() {
@@ -743,7 +743,7 @@ class progress implements JsonSerializable {
 
     /**
      * Returns the last response for the current attempt.
-     * 
+     *
      * @return stdClass|bool
      */
     private function get_last_response_for_attempt() {
@@ -775,7 +775,7 @@ class progress implements JsonSerializable {
 
     /**
      * Returns the usage id for the current attempt.
-     * 
+     *
      * @return null|int
      */
     public function get_usage_id() {
