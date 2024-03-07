@@ -126,7 +126,15 @@ class strategy_test extends advanced_testcase {
         array $settings = [],
         array $finalabilities = []
     ) {
-        putenv('USE_TESTING_CLASS_FOR=local_catquiz\teststrategy\preselect_task\updatepersonability');
+        putenv(
+            sprintf(
+                'USE_TESTING_CLASS_FOR=%s',
+                implode(',', [
+                    'local_catquiz\teststrategy\preselect_task\updatepersonability',
+                    'local_catquiz\teststrategy\preselect_task\maybe_return_pilot'
+                ])
+            )
+        );
         putenv("CATQUIZ_TESTING_ABILITY=$initialability");
         putenv("CATQUIZ_TESTING_STANDARDERROR=$initialse");
         putenv("CATQUIZ_TESTING_SKIP_FEEDBACK=true");
@@ -136,15 +144,6 @@ class strategy_test extends advanced_testcase {
             ->createtestenvironment($strategy, $settings)
             ->save_or_update();
 
-        if ($settings['pilot_ratio'] ?? false) {
-            // Delete item params for the last $numpilots questions.
-            $numpilots = 50;
-            $questioncount = $DB->count_records('question');
-            $firstquestions = $DB->get_records('question', null, '', 'id', $questioncount - $numpilots + 1, $numpilots);
-            $DB->delete_records_list('local_catquiz_itemparams', 'componentid', array_keys($firstquestions));
-            // Set the random number seed to get reproducible results.
-            srand(1);
-        }
         catquiz_handler::prepare_attempt_caches();
 
         // This is needed so that the responses to the questions are indeed saved to the database.
@@ -274,39 +273,42 @@ class strategy_test extends advanced_testcase {
             'radical CAT 1 piloting mode' => [
                 'strategy' => LOCAL_CATQUIZ_STRATEGY_FASTEST,
                 'questions' => [
-                    ['label' => 'SIMC08-11', 'is_correct_response' => false, 'ability_before' => 0.00, 'ability_after' => 0.00], // Pilot.
                     ['label' => 'SIMB01-18', 'is_correct_response' => false, 'ability_before' => 0.00, 'ability_after' => 0.00],
                     ['label' => 'SIMB02-00', 'is_correct_response' => false, 'ability_before' => 0.00, 'ability_after' => -0.39],
-                    ['label' => 'SIMA06-09', 'is_correct_response' => false, 'ability_before' => -0.39, 'ability_after' => -0.71],
-                    ['label' => 'SIMC08-12', 'is_correct_response' => false, 'ability_before' => -0.71, 'ability_after' => -1.07], // Pilot.
-                    ['label' => 'SIMC08-13', 'is_correct_response' => false, 'ability_before' => -1.07, 'ability_after' => -1.07], // Pilot.
+                    ['label' => 'Pilotfrage-1', 'is_correct_response' => false, 'ability_before' => -0.39, 'ability_after' => -0.71],
+                    ['label' => 'SIMA06-09', 'is_correct_response' => false, 'ability_before' => -0.71, 'ability_after' => -0.71],
+                    ['label' => 'Pilotfrage-2', 'is_correct_response' => false, 'ability_before' => -0.71, 'ability_after' => -1.07],
                     ['label' => 'SIMA04-00', 'is_correct_response' => false, 'ability_before' => -1.07, 'ability_after' => -1.07],
-                    ['label' => 'SIMC08-14', 'is_correct_response' => false, 'ability_before' => -1.07, 'ability_after' => -1.35], // Pilot.
-                    ['label' => 'SIMA02-02', 'is_correct_response' => false, 'ability_before' => -1.35, 'ability_after' => -1.35],
+                    ['label' => 'SIMA02-02', 'is_correct_response' => false, 'ability_before' => -1.07, 'ability_after' => -1.35],
                     ['label' => 'SIMA04-10', 'is_correct_response' => false, 'ability_before' => -1.35, 'ability_after' => -1.54],
-                    ['label' => 'SIMA02-19', 'is_correct_response' => false, 'ability_before' => -1.54, 'ability_after' => -1.77],
+                    ['label' => 'Pilotfrage-3', 'is_correct_response' => false, 'ability_before' => -1.54, 'ability_after' => -1.77],
+                    ['label' => 'Pilotfrage-4', 'is_correct_response' => false, 'ability_before' => -1.77, 'ability_after' => -1.77],
+                    ['label' => 'Pilotfrage-5', 'is_correct_response' => false, 'ability_before' => -1.77, 'ability_after' => -1.77],
+                    ['label' => 'Pilotfrage-6', 'is_correct_response' => false, 'ability_before' => -1.77, 'ability_after' => -1.77],
+                    ['label' => 'Pilotfrage-7', 'is_correct_response' => false, 'ability_before' => -1.77, 'ability_after' => -1.77],
+                    ['label' => 'Pilotfrage-8', 'is_correct_response' => false, 'ability_before' => -1.77, 'ability_after' => -1.77],
+                    ['label' => 'Pilotfrage-9', 'is_correct_response' => false, 'ability_before' => -1.77, 'ability_after' => -1.77],
+                    ['label' => 'SIMA02-19', 'is_correct_response' => false, 'ability_before' => -1.77, 'ability_after' => -1.77],
                     ['label' => 'SIMA05-04', 'is_correct_response' => false, 'ability_before' => -1.77, 'ability_after' => -1.99],
-                    ['label' => 'SIMC08-15', 'is_correct_response' => false, 'ability_before' => -1.99, 'ability_after' => -2.25], // Pilot.
-                    ['label' => 'SIMC08-16', 'is_correct_response' => false, 'ability_before' => -2.25, 'ability_after' => -2.25], // Pilot.
-                    ['label' => 'SIMC08-17', 'is_correct_response' => false, 'ability_before' => -2.25, 'ability_after' => -2.25], // Pilot.
-                    ['label' => 'SIMA02-08', 'is_correct_response' => false, 'ability_before' => -2.25, 'ability_after' => -2.25],
-                    ['label' => 'SIMA02-17', 'is_correct_response' => false, 'ability_before' => -2.25, 'ability_after' => -2.33],
-                    ['label' => 'SIMA05-03', 'is_correct_response' => false, 'ability_before' => -2.33, 'ability_after' => -2.61], // Pilot.
-                    ['label' => 'SIMC08-18', 'is_correct_response' => false, 'ability_before' => -2.61, 'ability_after' => -2.81], // Pilot.
-                    ['label' => 'SIMC08-19', 'is_correct_response' => false, 'ability_before' => -2.81, 'ability_after' => -2.81], // Pilot.
+                    ['label' => 'SIMA02-08', 'is_correct_response' => false, 'ability_before' => -1.99, 'ability_after' => -2.25],
+                    ['label' => 'Pilotfrage-10', 'is_correct_response' => false, 'ability_before' => -2.25, 'ability_after' => -2.33],
+                    ['label' => 'Pilotfrage-11', 'is_correct_response' => false, 'ability_before' => -2.33, 'ability_after' => -2.33],
+                    ['label' => 'SIMA02-17', 'is_correct_response' => false, 'ability_before' => -2.33, 'ability_after' => -2.33],
+                    ['label' => 'Pilotfrage-12', 'is_correct_response' => false, 'ability_before' => -2.33, 'ability_after' => -2.61],
+                    ['label' => 'SIMA05-03', 'is_correct_response' => false, 'ability_before' => -2.61, 'ability_after' => -2.61],
+                    ['label' => 'Pilotfrage-13', 'is_correct_response' => false, 'ability_before' => -2.61, 'ability_after' => -2.81],
+                    ['label' => 'Pilotfrage-14', 'is_correct_response' => false, 'ability_before' => -2.81, 'ability_after' => -2.81],
                     ['label' => 'SIMA05-07', 'is_correct_response' => false, 'ability_before' => -2.81, 'ability_after' => -2.81],
                     ['label' => 'SIMA02-04', 'is_correct_response' => false, 'ability_before' => -2.81, 'ability_after' => -2.97],
-                    ['label' => 'SIMA05-00', 'is_correct_response' => false, 'ability_before' => -2.97, 'ability_after' => -3.07], // Pilot.
-                    ['label' => 'SIMC09-00', 'is_correct_response' => false, 'ability_before' => -3.07, 'ability_after' => -3.14], // Pilot.
-                    ['label' => 'SIMC09-01', 'is_correct_response' => false, 'ability_before' => -3.14, 'ability_after' => -3.14], // Pilot.
+                    ['label' => 'SIMA05-00', 'is_correct_response' => false, 'ability_before' => -2.97, 'ability_after' => -3.07],
+                    ['label' => 'Pilotfrage-15', 'is_correct_response' => false, 'ability_before' => -3.07, 'ability_after' => -3.14],
+                    ['label' => 'Pilotfrage-16', 'is_correct_response' => false, 'ability_before' => -3.14, 'ability_after' => -3.14],
                     ['label' => 'SIMA01-19', 'is_correct_response' => false, 'ability_before' => -3.14, 'ability_after' => -3.14],
-                    ['label' => 'SIMC09-02', 'is_correct_response' => true,  'ability_before' => -3.14, 'ability_after' => -3.22], // Pilot.
-                    ['label' => 'SIMC09-03', 'is_correct_response' => true,  'ability_before' => -3.22, 'ability_after' => -3.22], // Pilot.
-                    ['label' => 'SIMA01-16', 'is_correct_response' => true,  'ability_before' => -3.22, 'ability_after' => -3.22],
-                    ['label' => 'SIMC09-04', 'is_correct_response' => true,  'ability_before' => -3.22, 'ability_after' => -3.48], // Pilot.
-                    ['label' => 'SIMC09-05', 'is_correct_response' => true,  'ability_before' => -3.48, 'ability_after' => -3.48], // Pilot.
-                    ['label' => 'SIMA01-12', 'is_correct_response' => false, 'ability_before' => -3.48, 'ability_after' => -3.48],
-                    ['label' => 'SIMA01-13', 'is_correct_response' => true,  'ability_before' => -3.48, 'ability_after' => -3.69],
+                    ['label' => 'SIMA01-16', 'is_correct_response' => true,  'ability_before' => -3.14, 'ability_after' => -3.22],
+                    ['label' => 'SIMA01-12', 'is_correct_response' => false, 'ability_before' => -3.22, 'ability_after' => -3.48],
+                    ['label' => 'Pilotfrage-17', 'is_correct_response' => false, 'ability_before' => -3.48, 'ability_after' => -3.69],
+                    ['label' => 'Pilotfrage-18', 'is_correct_response' => false, 'ability_before' => -3.69, 'ability_after' => -3.69],
+                    ['label' => 'SIMA01-13', 'is_correct_response' => true,  'ability_before' => -3.69, 'ability_after' => -3.69],
                     ['label' => 'SIMA01-18', 'is_correct_response' => true,  'ability_before' => -3.69, 'ability_after' => -3.61],
                     ['label' => 'SIMA01-14', 'is_correct_response' => true,  'ability_before' => -3.61, 'ability_after' => -3.54],
                     ['label' => 'SIMA03-03', 'is_correct_response' => true,  'ability_before' => -3.54, 'ability_after' => -3.48],
@@ -606,6 +608,44 @@ class strategy_test extends advanced_testcase {
                     'SimB01' => -3.38,
                     'SimB02' => -3.38,
                     'SimC' => -4.19, // Inherited from parent.
+                ],
+            ],
+            'Infer lowest skillgap P000000 piloting mode' => [
+                'strategy' => LOCAL_CATQUIZ_STRATEGY_LOWESTSUB,
+                'questions' => [
+                    [ 'label' => 'SIMB01-18', 'is_correct_response' => false, 'ability_before' => 0.00, 'ability_after' => 0.00],
+                    [ 'label' => 'SIMA06-15', 'is_correct_response' => false, 'ability_before' => 0.00, 'ability_after' => -0.67],
+                    [ 'label' => 'Pilotfrage-1', 'is_correct_response' => false, 'ability_before' => -0.67, 'ability_after' => -1.30],
+                    [ 'label' => 'SIMA02-02', 'is_correct_response' => false, 'ability_before' => -1.30, 'ability_after' => -1.30],
+                    [ 'label' => 'Pilotfrage-2', 'is_correct_response' => false, 'ability_before' => -1.30, 'ability_after' => -1.86],
+                    [ 'label' => 'SIMA02-19', 'is_correct_response' => false, 'ability_before' => -1.86, 'ability_after' => -1.86],
+                    [ 'label' => 'SIMA02-17', 'is_correct_response' => false, 'ability_before' => -1.86, 'ability_after' => -2.33],
+                    [ 'label' => 'SIMA06-02', 'is_correct_response' => false, 'ability_before' => -2.33, 'ability_after' => -3.06],
+                    [ 'label' => 'Pilotfrage-3', 'is_correct_response' => false, 'ability_before' => -3.06, 'ability_after' => -3.06],
+                    [ 'label' => 'Pilotfrage-4', 'is_correct_response' => false, 'ability_before' => -3.06, 'ability_after' => -3.06],
+                    [ 'label' => 'Pilotfrage-5', 'is_correct_response' => false, 'ability_before' => -3.06, 'ability_after' => -3.06],
+                    [ 'label' => 'Pilotfrage-6', 'is_correct_response' => false, 'ability_before' => -3.06, 'ability_after' => -3.06],
+                    [ 'label' => 'Pilotfrage-7', 'is_correct_response' => false, 'ability_before' => -3.06, 'ability_after' => -3.06],
+                    [ 'label' => 'Pilotfrage-8', 'is_correct_response' => false, 'ability_before' => -3.06, 'ability_after' => -3.06],
+                    [ 'label' => 'Pilotfrage-9', 'is_correct_response' => false, 'ability_before' => -3.06, 'ability_after' => -3.06],
+                    [ 'label' => 'SIMB02-00', 'is_correct_response' => false, 'ability_before' => -3.06, 'ability_after' => -3.06],
+                    [ 'label' => 'SIMB01-17', 'is_correct_response' => false, 'ability_before' => -3.06, 'ability_after' => -3.06],
+                    [ 'label' => 'SIMB01-12', 'is_correct_response' => false, 'ability_before' => -3.06, 'ability_after' => -3.06],
+                    [ 'label' => 'Pilotfrage-10', 'is_correct_response' => false, 'ability_before' => -3.06, 'ability_after' => -3.06],
+                    [ 'label' => 'Pilotfrage-11', 'is_correct_response' => false, 'ability_before' => -3.06, 'ability_after' => -3.06],
+                    [ 'label' => 'SIMA02-04', 'is_correct_response' => false, 'ability_before' => -3.06, 'ability_after' => -3.06],
+                    [ 'label' => 'Pilotfrage-12', 'is_correct_response' => false, 'ability_before' => -3.06, 'ability_after' => -3.39],
+                    [ 'label' => 'SIMB02-02', 'is_correct_response' => false, 'ability_before' => -3.39, 'ability_after' => -3.39],
+                    [ 'label' => 'Pilotfrage-13', 'is_correct_response' => false, 'ability_before' => -3.39, 'ability_after' => -3.39],
+                    [ 'label' => 'Pilotfrage-14', 'is_correct_response' => false, 'ability_before' => -3.39, 'ability_after' => -3.39],
+                    [ 'label' => 'FINISH',    'is_correct_response' => false, 'ability_before' => -3.39, 'ability_after' => -3.39],
+                ],
+                'initial_ability' => 0.02,
+                'initial_se' => 2.97,
+                'settings' => [
+                    'pp_min_inc' => 0.1,
+                    'pilot_ratio' => 50,
+                    'pilot_attempts_threshold' => 0,
                 ],
             ],
             'Infer lowest skillgap P000001' => [
@@ -1051,7 +1091,21 @@ class strategy_test extends advanced_testcase {
         $imported = $qformat->importprocess();
         $this->assertTrue($imported);
 
+        $qformat = $this->create_qformat('pilotquestions.xml', $this->course);
+        $imported = $qformat->importprocess();
+        $this->assertTrue($imported);
+
         $this->import_itemparams($itemparamsfile);
+
+        // 
+        global $DB;
+        $catscale = $DB->get_record('local_catquiz_catscales', ['parentid' => 0]);
+        $this->catscaleid = $catscale->id;
+
+        // Include all subscales in the test.
+        $scales = catscale::get_subscale_ids($catscale->id);
+        $lastscale = end($scales);
+
     }
 
 
