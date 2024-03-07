@@ -25,6 +25,8 @@
 namespace local_catquiz\teststrategy\preselect_task;
 
 use cache;
+use dml_exception;
+use coding_exception;
 use Exception;
 use local_catquiz\catcalc;
 use local_catquiz\catcontext;
@@ -315,7 +317,7 @@ class updatepersonability extends preselect_task implements wb_middleware {
      * per-scale basis if we have enough answers in that scale.
      *
      * @param array $arrayresponses
-     * @return mixed
+     * @return bool
      */
     private function has_sufficient_responses($arrayresponses) {
         if (! $arrayresponses) {
@@ -444,7 +446,17 @@ class updatepersonability extends preselect_task implements wb_middleware {
         return 1.0;
     }
 
-    private function ability_was_calculated($catscaleid, $includelastresponse = true) {
+    /**
+     * Shows if the ability for the given scale was calculated or just estimated.
+     * 
+     * @param int $catscaleid 
+     * @param bool $includelastresponse 
+     * @return bool
+     * @throws dml_exception 
+     * @throws coding_exception 
+     * @throws Exception 
+     */
+    private function ability_was_calculated(int $catscaleid, bool $includelastresponse = true) {
         // If we have not at least one previous response, the ability was not calculated.
         if (!$lastresponse = $this->userresponses->get_last_response($this->context['userid'])) {
             return false;
