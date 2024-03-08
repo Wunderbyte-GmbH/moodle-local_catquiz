@@ -17,7 +17,7 @@
 /**
  * Code to be executed after the plugin's database scheme has been installed is defined here.
  *
- * @package     catmodel_raschbirnbaumc
+ * @package     catmodel_mixedraschbirnbaum
  * @category    upgrade
  * @copyright   2023 Georg Maißer Wunderbyte GmbH<info@wunderbyte.at>
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
@@ -26,7 +26,7 @@
 /**
  * Custom code to be run on installing the plugin.
  */
-function xmldb_catmodel_raschbirnbaumc_install() {
+function xmldb_catmodel_mixedraschbirnbaum_install() {
     global $DB;
     $dbman = $DB->get_manager();
 

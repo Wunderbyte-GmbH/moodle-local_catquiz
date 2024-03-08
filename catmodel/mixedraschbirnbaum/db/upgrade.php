@@ -17,7 +17,7 @@
 /**
  * Plugin upgrade steps are defined here.
  *
- * @package     catmodel_raschbirnbaumc
+ * @package     catmodel_mixedraschbirnbaum
  * @category    upgrade
  * @copyright   2023 Wunderbyte GmbH <info@wunderbyte.at>
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
@@ -28,12 +28,12 @@ defined('MOODLE_INTERNAL') || die();
 require_once(__DIR__.'/../../../db/upgradelib.php');
 
 /**
- * Execute raschbirnbaumc upgrade from the given old version.
+ * Execute mixedraschbirnbaum upgrade from the given old version.
  *
  * @param int $oldversion
  * @return bool
  */
-function xmldb_catmodel_raschbirnbaumc_upgrade($oldversion) {
+function xmldb_catmodel_mixedraschbirnbaum_upgrade($oldversion) {
     global $DB;
 
     $dbman = $DB->get_manager();
@@ -55,7 +55,7 @@ function xmldb_catmodel_raschbirnbaumc_upgrade($oldversion) {
         }
 
         // Catquiz savepoint reached.
-        upgrade_plugin_savepoint(true, 2023061500, 'local', 'catmodel_raschbirnbaumc');
+        upgrade_plugin_savepoint(true, 2023061500, 'local', 'catmodel_mixedraschbirnbaum');
     }
 
     return true;

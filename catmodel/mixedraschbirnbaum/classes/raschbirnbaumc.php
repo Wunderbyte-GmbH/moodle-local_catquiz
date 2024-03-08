@@ -15,14 +15,14 @@
 // along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
 
 /**
- * Class raschbirnbaumc.
+ * Class mixedraschbirnbaum.
  *
- * @package  catmodel_raschbirnbaumc
+ * @package  catmodel_mixedraschbirnbaum
  * @copyright 2023 Wunderbyte GmbH <georg.maisser@wunderbyte.at>
  * @license  http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-namespace catmodel_raschbirnbaumc;
+namespace catmodel_mixedraschbirnbaum;
 
 use local_catquiz\catcalc;
 use local_catquiz\local\model\model_item_param_list;
@@ -30,12 +30,12 @@ use local_catquiz\local\model\model_person_param_list;
 use local_catquiz\local\model\model_raschmodel;
 
 /**
- * Class raschbirnbaumc of catmodels.
+ * Class mixedraschbirnbaum of catmodels.
  *
  * @copyright 2023 Wunderbyte GmbH <georg.maisser@wunderbyte.at>
  * @license  http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class raschbirnbaumc extends model_raschmodel {
+class mixedraschbirnbaum extends model_raschmodel {
 
     // Definitions and Dimensions.
 
@@ -463,27 +463,27 @@ class raschbirnbaumc extends model_raschmodel {
         $as = 2; // Standard derivation of difficulty.
 
         // Use 3 times of SD as range of trusted regions.
-        $atr = floatval(get_config('catmodel_raschbirnbaumc', 'trusted_region_factor_sd_a'));
-        $amin = floatval(get_config('catmodel_raschbirnbaumc', 'trusted_region_min_a'));
-        $amax = floatval(get_config('catmodel_raschbirnbaumc', 'trusted_region_max_a'));
+        $atr = floatval(get_config('catmodel_mixedraschbirnbaum', 'trusted_region_factor_sd_a'));
+        $amin = floatval(get_config('catmodel_mixedraschbirnbaum', 'trusted_region_min_a'));
+        $amax = floatval(get_config('catmodel_mixedraschbirnbaum', 'trusted_region_max_a'));
 
         // Set values for disrciminatory parameter.
         $b = $ip['discrimination'];
 
         // Placement of the discriminatory parameter.
-        $bp = floatval(get_config('catmodel_raschbirnbaumc', 'trusted_region_placement_b'));
+        $bp = floatval(get_config('catmodel_mixedraschbirnbaum', 'trusted_region_placement_b'));
         // Slope of the discriminatory parameter.
-        $bs = floatval(get_config('catmodel_raschbirnbaumc', 'trusted_region_slope_b'));
+        $bs = floatval(get_config('catmodel_mixedraschbirnbaum', 'trusted_region_slope_b'));
         // Use 5 times of placement as maximal value of trusted region.
-        $btr = floatval(get_config('catmodel_raschbirnbaumc', 'trusted_region_factor_max_b'));
+        $btr = floatval(get_config('catmodel_mixedraschbirnbaum', 'trusted_region_factor_max_b'));
 
-        $bmin = floatval(get_config('catmodel_raschbirnbaumc', 'trusted_region_min_b'));
-        $bmax = floatval(get_config('catmodel_raschbirnbaumc', 'trusted_region_max_b'));
+        $bmin = floatval(get_config('catmodel_mixedraschbirnbaum', 'trusted_region_min_b'));
+        $bmax = floatval(get_config('catmodel_mixedraschbirnbaum', 'trusted_region_max_b'));
 
         // Set values for guessing parameter.
         $c = $ip['guessing'];
 
-        $cmax = floatval(get_config('catmodel_raschbirnbaumc', 'trusted_region_max_c'));
+        $cmax = floatval(get_config('catmodel_mixedraschbirnbaum', 'trusted_region_max_c'));
 
         // Test TR for difficulty.
         if (($a - $am) < max(-($atr * $as), $amin)) {
@@ -530,9 +530,9 @@ class raschbirnbaumc extends model_raschmodel {
         $as = 2; // Standard derivation of difficulty.
 
         // Placement of the discriminatory parameter.
-        $bp = floatval(get_config('catmodel_raschbirnbaumc', 'trusted_region_placement_b'));
+        $bp = floatval(get_config('catmodel_mixedraschbirnbaum', 'trusted_region_placement_b'));
         // Slope of the discriminatory parameter.
-        $bs = floatval(get_config('catmodel_raschbirnbaumc', 'trusted_region_slope_b'));
+        $bs = floatval(get_config('catmodel_mixedraschbirnbaum', 'trusted_region_slope_b'));
 
         return [
             // Calculate d/da.
@@ -557,9 +557,9 @@ class raschbirnbaumc extends model_raschmodel {
         $as = 2; // Standard derivation of difficulty.
 
         // Placement of the discriminatory parameter.
-        $bp = floatval(get_config('catmodel_raschbirnbaumc', 'trusted_region_placement_b'));
+        $bp = floatval(get_config('catmodel_mixedraschbirnbaum', 'trusted_region_placement_b'));
         // Slope of the discriminatory parameter.
-        $bs = floatval(get_config('catmodel_raschbirnbaumc', 'trusted_region_slope_b'));
+        $bs = floatval(get_config('catmodel_mixedraschbirnbaum', 'trusted_region_slope_b'));
 
         return [
             [
