@@ -1,2 +1,2 @@
 componentid;status;qtype;model;difficulty;discrimination;guessing;label;catscalename;parentscalenames;componentname
-0;4;Multiple-Choice;raschbirnbaumb;-4.45;5.92;0.0000;SIMA01-00;SimA01;Simulation|SimA;question
+0;4;Multiple-Choice;raschbirnbaum;-4.45;5.92;0.0000;SIMA01-00;SimA01;Simulation|SimA;question

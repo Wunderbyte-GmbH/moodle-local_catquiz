@@ -67,7 +67,7 @@ class model_item_param_list_test extends advanced_testcase {
                         'componentid' => 0,
                         'status' => 4,
                         'qtype' => "Multiple-Choice",
-                        'model' => "raschbirnbaumb",
+                        'model' => "raschbirnbaum",
                         'difficulty' => -4.45,
                         'discrimination' => 5.92,
                         'guessing' => 0.00,

@@ -30,7 +30,7 @@ use local_catquiz\local\model\model_person_param_list;
 use local_catquiz\local\model\model_raschmodel;
 
 /**
- * Class raschbirnbauma of catmodels.
+ * Class rasch of catmodels.
  *
  * @package    catmodel_raschbirnbaum
  * @copyright  2023 Wunderbyte GmbH <georg.maisser@wunderbyte.at>

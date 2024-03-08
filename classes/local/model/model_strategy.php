@@ -407,7 +407,7 @@ class model_strategy {
     private function create_installed_models(): array {
         /** @var array<model_model> $instances */
         $instances = [];
-        $ignorelist = ['raschbirnbaumc'];
+        $ignorelist = ['mixedraschbirnbaum'];
 
         foreach (self::get_installed_models() as $name => $classname) {
             $modelclass = new $classname($this->responses, $name);

@@ -24,7 +24,7 @@
 
 namespace catmodel_raschbirnbaum;
 
-use catmodel_raschbirnbauma\raschbirnbauma;
+use catmodel_rasch\rasch;
 use PHPUnit\Framework\ExpectationFailedException;
 use PHPUnit\Framework\TestCase;
 use SebastianBergmann\RecursionContext\InvalidArgumentException;
