@@ -17,12 +17,12 @@
 /**
  * Tests for core_message_inbound to test Variable Envelope Return Path functionality.
  *
- * @package    catmodel_raschbirnbaumb
+ * @package    catmodel_raschbirnbaum
  * @copyright  2023 Georg Maißer <info@wunderbyte.at>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-namespace catmodel_raschbirnbaumb;
+namespace catmodel_raschbirnbaum;
 
 use catmodel_raschbirnbauma\raschbirnbauma;
 use PHPUnit\Framework\ExpectationFailedException;
@@ -33,12 +33,12 @@ use local_catquiz\local\model\model_responses;
 /**
  * Tests for core_message_inbound to test Variable Envelope Return Path functionality.
  *
- * @package    catmodel_raschbirnbaumb
+ * @package    catmodel_raschbirnbaum
  * @copyright  2023 Georg Maißer <info@wunderbyte.at>
  *
- * @covers \catmodel_raschbirnbaumb\raschbirnbaumb
+ * @covers \catmodel_raschbirnbaum\raschbirnbaum
  */
-class raschbirnbaumb_test extends TestCase {
+class raschbirnbaum_test extends TestCase {
 
     /**
      * This test calls the get_log_jacobain function with the model and test its output with verified data.
@@ -58,7 +58,7 @@ class raschbirnbaumb_test extends TestCase {
     public function test_get_log_jacobian(array $pp, float $k, array $ip, array $expected) {
 
         $result = [];
-        $result = raschbirnbaumb::get_log_jacobian($pp, $ip, $k);
+        $result = raschbirnbaum::get_log_jacobian($pp, $ip, $k);
 
         $result = array_map(fn ($a) => (float)sprintf("%.6f", $a), $result);
 
@@ -86,7 +86,7 @@ class raschbirnbaumb_test extends TestCase {
     public function test_get_log_hessian(array $pp, float $k, array $ip, array $expected) {
 
         $result = [];
-        $resultmatrix = raschbirnbaumb::get_log_hessian($pp, $ip, $k);
+        $resultmatrix = raschbirnbaum::get_log_hessian($pp, $ip, $k);
 
         foreach ($resultmatrix as $results) {
             $result[] = array_map(fn ($a) => (float)sprintf("%.6f", $a), $results);
@@ -111,7 +111,7 @@ class raschbirnbaumb_test extends TestCase {
      * @return void
      */
     public function test_log_likelihood_p(array $pp, float $k, array $ip, float $expected) {
-        $result = raschbirnbaumb::log_likelihood_p($pp, $ip, $k);
+        $result = raschbirnbaum::log_likelihood_p($pp, $ip, $k);
 
         // We only verify for four commas after the dot.
         $expected = (float)sprintf("%.6f", $expected);
@@ -130,7 +130,7 @@ class raschbirnbaumb_test extends TestCase {
      * @return void
      */
     public function test_log_likelihood_p_p(array $pp, float $k, array $ip, float $expected) {
-        $result = raschbirnbaumb::log_likelihood_p_p($pp, $ip, $k);
+        $result = raschbirnbaum::log_likelihood_p_p($pp, $ip, $k);
 
         // We only verify for four commas after the dot.
         $expected = (float)sprintf("%.6f", $expected);
@@ -937,11 +937,11 @@ class raschbirnbaumb_test extends TestCase {
     /**
      * Get model.
      *
-     * @return raschbirnbaumb
+     * @return raschbirnbaum
      *
      */
-    private function getmodel(): raschbirnbaumb {
+    private function getmodel(): raschbirnbaum {
         $mr = new model_responses();
-        return new raschbirnbaumb($mr, 'raschbirnbaumb');
+        return new raschbirnbaum($mr, 'raschbirnbaum');
     }
 }

@@ -17,7 +17,7 @@
 /**
  * Plugin administration pages are defined here.
  *
- * @package     catmodel_raschbirnbaumb
+ * @package     catmodel_raschbirnbaum
  * @category    admin
  * @copyright   Wunderbyte Gmbh 2023 <info@wunderbyte.at>
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
@@ -25,7 +25,7 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-$componentname = 'catmodel_raschbirnbaumb';
+$componentname = 'catmodel_raschbirnbaum';
 
 if ($hassiteconfig) {
     if ($ADMIN->fulltree) {
