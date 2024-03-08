@@ -158,7 +158,7 @@ class strategy_test extends advanced_testcase {
                 ['userid' => $USER->id, 'catscaleid' => $this->catscaleid],
                 'ability'
             );
-            $ability = $abilityrecord ? $abilityrecord->ability : 0;
+            $ability = $abilityrecord ? $abilityrecord->ability : ($initialability ?: 0);
             if (array_key_exists('ability_before', $expectedquestion)) {
                 $this->assertEqualsWithDelta(
                     $expectedquestion['ability_before'],
@@ -173,7 +173,7 @@ class strategy_test extends advanced_testcase {
                 ['userid' => $USER->id, 'catscaleid' => $this->catscaleid],
                 'ability'
             );
-            $ability = $abilityrecord ? $abilityrecord->ability : 0;
+            $ability = $abilityrecord ? $abilityrecord->ability : ($initialability ?: 0);
             $this->assertEqualsWithDelta(
                 $expectedquestion['ability_after'],
                 $ability,
@@ -564,7 +564,7 @@ class strategy_test extends advanced_testcase {
             'Infer lowest skillgap P000000' => [
                 'strategy' => LOCAL_CATQUIZ_STRATEGY_LOWESTSUB,
                 'questions' => [
-                    [ 'label' => 'SIMB01-18', 'is_correct_response' => false, 'ability_before' => 0.00, 'ability_after' => 0.00],
+                    [ 'label' => 'SIMB01-18', 'is_correct_response' => false, 'ability_before' => 0.02, 'ability_after' => 0.02],
                     [ 'label' => 'SIMA06-15', 'is_correct_response' => false, 'ability_after' => -0.67],
                     [ 'label' => 'SIMA02-02', 'is_correct_response' => false, 'ability_after' => -1.30],
                     [ 'label' => 'SIMA02-19', 'is_correct_response' => false, 'ability_after' => -1.86],
@@ -615,7 +615,7 @@ class strategy_test extends advanced_testcase {
             'Infer lowest skillgap P000000 piloting mode' => [
                 'strategy' => LOCAL_CATQUIZ_STRATEGY_LOWESTSUB,
                 'questions' => [
-                    [ 'label' => 'SIMB01-18', 'is_correct_response' => false, 'ability_before' => 0.00, 'ability_after' => 0.00],
+                    [ 'label' => 'SIMB01-18', 'is_correct_response' => false, 'ability_before' => 0.02, 'ability_after' => 0.02],
                     [ 'label' => 'SIMA06-15', 'is_correct_response' => false, 'ability_after' => -0.67],
                     [ 'label' => 'Pilotfrage-1', 'is_correct_response' => false, 'ability_after' => -1.30],
                     [ 'label' => 'SIMA02-02', 'is_correct_response' => false, 'ability_after' => -1.30],
@@ -654,7 +654,7 @@ class strategy_test extends advanced_testcase {
             'Infer lowest skillgap P000001' => [
                 'strategy' => LOCAL_CATQUIZ_STRATEGY_LOWESTSUB,
                 'questions' => [
-                    [ 'label' => 'SIMB01-18', 'is_correct_response' => true, 'ability_before' => 0.00, 'ability_after' => 0.00],
+                    [ 'label' => 'SIMB01-18', 'is_correct_response' => true, 'ability_before' => 0.02, 'ability_after' => 0.02],
                     [ 'label' => 'SIMB03-10', 'is_correct_response' => true, 'ability_after' => 0.76],
                     [ 'label' => 'SIMB03-06', 'is_correct_response' => true, 'ability_after' => 1.32],
                     [ 'label' => 'SIMB01-04', 'is_correct_response' => true, 'ability_after' => 1.90],
@@ -705,7 +705,7 @@ class strategy_test extends advanced_testcase {
             'Infer lowest skillgap P000407' => [
                 'strategy' => LOCAL_CATQUIZ_STRATEGY_LOWESTSUB,
                 'questions' => [
-                    ['label' => 'SIMB01-18', 'is_correct_response' => false, 'ability_before' => 0.00, 'ability_after' => 0.00],
+                    ['label' => 'SIMB01-18', 'is_correct_response' => false, 'ability_before' => 0.02, 'ability_after' => 0.02],
                     ['label' => 'SIMA06-15', 'is_correct_response' => false, 'ability_after' => -0.67],
                     ['label' => 'SIMA02-02', 'is_correct_response' => false, 'ability_after' => -1.30],
                     ['label' => 'SIMA02-19', 'is_correct_response' => false, 'ability_after' => -1.86],
@@ -753,7 +753,7 @@ class strategy_test extends advanced_testcase {
             'Infer lowest skillgap P000642' => [
                 'strategy' => LOCAL_CATQUIZ_STRATEGY_LOWESTSUB,
                 'questions' => [
-                    ['label' => 'SIMB01-18', 'is_correct_response' => true,  'ability_before' => 0.00, 'ability_after' => 0.00],
+                    ['label' => 'SIMB01-18', 'is_correct_response' => true,  'ability_before' => 0.02, 'ability_after' => 0.02],
                     ['label' => 'SIMB03-10', 'is_correct_response' => true,  'ability_after' => 0.76],
                     ['label' => 'SIMB03-06', 'is_correct_response' => true,  'ability_after' => 1.32],
                     ['label' => 'SIMB01-04', 'is_correct_response' => true,  'ability_after' => 1.90],
@@ -804,7 +804,7 @@ class strategy_test extends advanced_testcase {
             'Infer lowest skillgap P000184' => [
                 'strategy' => LOCAL_CATQUIZ_STRATEGY_LOWESTSUB,
                 'questions' => [
-                    ['label' => 'SIMB01-18', 'is_correct_response' => false, 'ability_before' => 0.00,  'ability_after' => 0.00],
+                    ['label' => 'SIMB01-18', 'is_correct_response' => false, 'ability_before' => 0.02,  'ability_after' => 0.02],
                     ['label' => 'SIMA06-15', 'is_correct_response' => false, 'ability_after' => -0.67],
                     ['label' => 'SIMA02-02', 'is_correct_response' => false, 'ability_after' => -1.30],
                     ['label' => 'SIMA02-19', 'is_correct_response' => false, 'ability_after' => -1.86],
