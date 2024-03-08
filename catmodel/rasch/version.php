@@ -15,17 +15,16 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * This file contains language strings for the 1plraschbaum model catquiz plugin
+ * This file contains the version information for the 1plraschbirnbaum model catquiz plugin
  *
- * @package catmodel_raschbirnbauma
+ * @package catmodel_rasch
  * @copyright  2022 Georg Maißer <info@wunderbyte.at>
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-$string['pluginname'] = '1PL Rasch model';
-$string['trusted_region_min_a'] = 'Trusted Region Minimum';
-$string['trusted_region_min_a_desc'] = 'Trusted Region Minimum';
-$string['trusted_region_max_a'] = 'Trusted Region Maximum';
-$string['trusted_region_max_a_desc'] = 'Trusted Region Maximum';
-$string['trusted_region_factor_sd_a'] = 'Trusted Region Factor SD a';
-$string['trusted_region_factor_sd_a_desc'] = 'Use x times of SD as range of trusted regions';
+defined('MOODLE_INTERNAL') || die();
+
+$plugin->version   = 2024030800;
+$plugin->requires  = 2022041900;
+$plugin->component = 'catmodel_rasch';
+
