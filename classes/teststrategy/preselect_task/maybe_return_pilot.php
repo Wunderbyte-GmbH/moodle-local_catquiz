@@ -52,6 +52,11 @@ class maybe_return_pilot extends preselect_task implements wb_middleware {
             return $next($context);
         }
 
+        // TODO: Replace with check: if fraction in current attempt is 0 or 1, skip.
+        if ($this->context['progress']->is_first_question()) {
+            return $next($context);
+        }
+
         $pilotquestions = array_filter($context['questions'], fn($q) => $q->is_pilot);
         $nonpilotquestions = array_udiff($context['questions'], $pilotquestions, fn($a, $b) => $a->id - $b->id);
         // If there are no pilot questions, then return a random productive question.
