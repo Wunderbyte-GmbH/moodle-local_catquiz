@@ -648,6 +648,7 @@ class strategy_test extends advanced_testcase {
                     'pp_min_inc' => 0.1,
                     'pilot_ratio' => 50,
                     'pilot_attempts_threshold' => 0,
+                    'maxquestionspersubscale' => 25,
                 ],
             ],
             'Infer lowest skillgap P000001' => [
