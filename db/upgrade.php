@@ -436,5 +436,25 @@ function xmldb_local_catquiz_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2024021500, 'local', 'catquiz');
     }
 
+    if ($oldversion < 2024030800) {
+        // The subplugin names changed, so we need to change the value in the itemparams table.
+        $updatednames = [
+            'raschbirnbauma' => 'rasch',
+            'raschbirnbaumb' => 'raschbirnbaum',
+            'raschbirnbaumc' => 'mixedraschbirnbaum',
+            'web_raschbirnbauam' => 'web_rasch',
+        ];
+        foreach ($updatednames as $oldmodel => $newmodel) {
+            $itemparams = $DB->get_records('local_catquiz_itemparams', ['model' => $oldmodel]);
+            foreach ($itemparams as $ip) {
+                $ip->model = $newmodel;
+                $DB->update_record('local_catquiz_itemparams', $ip, true);
+            }
+        }
+
+        // Catquiz savepoint reached.
+        upgrade_plugin_savepoint(true, 2024030800, 'local', 'catquiz');
+    }
+
     return true;
 }

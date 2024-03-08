@@ -15,15 +15,15 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * This file contains language strings for the 1plraschbirnbaum model catquiz plugin
+ * This file contains the version information for the 1plraschbirnbaum model catquiz plugin
  *
- * @package catmodel_web_raschbirnbauma
+ * @package catmodel_web_rasch
  * @copyright  2022 Georg Maißer <info@wunderbyte.at>
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-$string['pluginname'] = 'Web-Rasch-Birnbaum 1PL';
-$string['hostname'] = 'Hostname/IP';
-$string['hostname_desc'] = 'The hostname or IP address of the server exposing the web API';
-$string['port'] = 'Port';
-$string['port_desc'] = 'Port';
+defined('MOODLE_INTERNAL') || die();
+
+$plugin->version   = 2024030800;
+$plugin->requires  = 2022041900;
+$plugin->component = 'catmodel_web_rasch';

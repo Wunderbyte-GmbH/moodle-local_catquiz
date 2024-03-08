@@ -123,13 +123,13 @@ class catcalc_test extends basic_testcase {
         );
         $radcatemp = self::parsesimulationsteps(
             $CFG->dirroot . '/local/catquiz/tests/fixtures/SimulationSteps radCAT 2023-12-21 09-22-26_shortened.csv',
-            'raschbirnbaumb',
+            'raschbirnbaum',
             0.02,
             2.97
         );
         $classiccat = self::parsesimulationsteps(
             $CFG->dirroot . '/local/catquiz/tests/fixtures/SimulationSteps classTest emp. 2024-01-02 11-02-44_P000000.csv',
-            'raschbirnbaumb',
+            'raschbirnbaum',
             0.02,
             2.97,
             true
@@ -165,7 +165,7 @@ class catcalc_test extends basic_testcase {
      */
     private static function parsesimulationsteps(
         string $filename,
-        $modelname = 'raschbirnbaumb',
+        $modelname = 'raschbirnbaum',
         float $mean = 0.0,
         float $sd = 1.0,
         bool $fixedstartvalues = false

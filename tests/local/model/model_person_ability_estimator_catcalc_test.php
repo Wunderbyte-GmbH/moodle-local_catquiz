@@ -81,20 +81,20 @@ class model_person_ability_estimator_catcalc_test extends basic_testcase {
             [
                 'expected' => 1,
                 'modelname' => '1PL',
-                'responses' => self::createmodelresponse('raschbirnbauma'),
-                'itemparams' => self::createitemparams('raschbirnbauma'),
+                'responses' => self::createmodelresponse('rasch'),
+                'itemparams' => self::createitemparams('rasch'),
             ],
             [
                 'expected' => 1,
                 'modelname' => '2PL',
-                'responses' => self::createmodelresponse('raschbirnbaumb'),
-                'itemparams' => self::createitemparams('raschbirnbaumb'),
+                'responses' => self::createmodelresponse('raschbirnbaum'),
+                'itemparams' => self::createitemparams('raschbirnbaum'),
             ],
             [
             'expected' => 1,
             'modelname' => '3PL',
-            'responses' => self::createmodelresponse('raschbirnbaumc'),
-            'itemparams' => self::createitemparams('raschbirnbaumc'),
+            'responses' => self::createmodelresponse('mixedraschbirnbaum'),
+            'itemparams' => self::createitemparams('mixedraschbirnbaum'),
             ],
         ];
     }
@@ -106,13 +106,13 @@ class model_person_ability_estimator_catcalc_test extends basic_testcase {
     private static function createmodelresponse($modelname) {
         global $CFG;
         switch ($modelname) {
-            case 'raschbirnbauma':
+            case 'rasch':
                 $data = self::loadresponsesdata($CFG->dirroot . '/local/catquiz/tests/fixtures/responses.1PL.csv');
                 break;
-            case 'raschbirnbaumb':
+            case 'raschbirnbaum':
                 $data = self::loadresponsesdata($CFG->dirroot . '/local/catquiz/tests/fixtures/responses.2PL.csv');
                 break;
-            case 'raschbirnbaumc':
+            case 'mixedraschbirnbaum':
                 $data = self::loadresponsesdata($CFG->dirroot . '/local/catquiz/tests/fixtures/responses.3PL.csv');
                 break;
 

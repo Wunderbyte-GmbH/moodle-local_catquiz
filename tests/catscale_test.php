@@ -66,7 +66,7 @@ class catscale_test extends basic_testcase {
             [
                 'items' => (new model_item_param_list())
                     ->add(
-                        (new model_item_param('B01-18', 'raschbirnbaumb'))
+                        (new model_item_param('B01-18', 'raschbirnbaum'))
                         ->set_parameters([
                             'difficulty' => 0.05,
                             'discrimination' => 5.95,
@@ -78,13 +78,13 @@ class catscale_test extends basic_testcase {
             [
                 'items' => (new model_item_param_list())
                     ->add(
-                        (new model_item_param('B01-18', 'raschbirnbaumb'))
+                        (new model_item_param('B01-18', 'raschbirnbaum'))
                         ->set_parameters([
                             'difficulty' => 0.05,
                             'discrimination' => 5.95,
                         ])
                     )->add(
-                        (new model_item_param('B02-00', 'raschbirnbaumb'))
+                        (new model_item_param('B02-00', 'raschbirnbaum'))
                         ->set_parameters([
                             'difficulty' => -0.35,
                             'discrimination' => 5.94,
@@ -96,19 +96,19 @@ class catscale_test extends basic_testcase {
             [
                 'items' => (new model_item_param_list())
                     ->add(
-                        (new model_item_param('B01-18', 'raschbirnbaumb'))
+                        (new model_item_param('B01-18', 'raschbirnbaum'))
                         ->set_parameters([
                             'difficulty' => 0.05,
                             'discrimination' => 5.95,
                         ])
                     )->add(
-                        (new model_item_param('B02-00', 'raschbirnbaumb'))
+                        (new model_item_param('B02-00', 'raschbirnbaum'))
                         ->set_parameters([
                             'difficulty' => -0.35,
                             'discrimination' => 5.94,
                         ])
                     )->add(
-                        (new model_item_param('A06-09', 'raschbirnbaumb'))
+                        (new model_item_param('A06-09', 'raschbirnbaum'))
                         ->set_parameters([
                             'difficulty' => -0.8,
                             'discrimination' => 5.78,
@@ -120,25 +120,25 @@ class catscale_test extends basic_testcase {
             [
                 'items' => (new model_item_param_list())
                     ->add(
-                        (new model_item_param('B01-18', 'raschbirnbaumb'))
+                        (new model_item_param('B01-18', 'raschbirnbaum'))
                         ->set_parameters([
                             'difficulty' => 0.05,
                             'discrimination' => 5.95,
                         ])
                     )->add(
-                        (new model_item_param('B02-00', 'raschbirnbaumb'))
+                        (new model_item_param('B02-00', 'raschbirnbaum'))
                         ->set_parameters([
                             'difficulty' => -0.35,
                             'discrimination' => 5.94,
                         ])
                     )->add(
-                        (new model_item_param('A06-09', 'raschbirnbaumb'))
+                        (new model_item_param('A06-09', 'raschbirnbaum'))
                         ->set_parameters([
                             'difficulty' => -0.8,
                             'discrimination' => 5.78,
                         ])
                     )->add(
-                        (new model_item_param('A04-00', 'raschbirnbaumb'))
+                        (new model_item_param('A04-00', 'raschbirnbaum'))
                         ->set_parameters([
                             'difficulty' => -1.1,
                             'discrimination' => 6.0,
@@ -310,7 +310,7 @@ class catscale_test extends basic_testcase {
      *
      * @return model_item_param_list
      */
-    private static function builditemlist(array $itemvalues, string $model = 'raschbirnbaumb'): model_item_param_list {
+    private static function builditemlist(array $itemvalues, string $model = 'raschbirnbaum'): model_item_param_list {
         $items = new model_item_param_list();
         foreach ($itemvalues as $label => $params) {
                 $items->add(

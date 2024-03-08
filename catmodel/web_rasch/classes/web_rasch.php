@@ -15,16 +15,16 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Class web_raschbirnbauma.
+ * Class web_rasch.
  *
- * @package catmodel_web_raschbirnbauma
+ * @package catmodel_web_rasch
  * @copyright  2022 Georg Maißer <info@wunderbyte.at>
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-namespace catmodel_web_raschbirnbauma;
+namespace catmodel_web_rasch;
 
-use catmodel_raschbirnbauma\raschbirnbauma;
+use catmodel_rasch\rasch;
 use local_catquiz\catcalc_ability_estimator;
 use local_catquiz\local\model\model_item_param;
 use local_catquiz\local\model\model_item_param_list;
@@ -33,13 +33,13 @@ use local_catquiz\local\model\model_person_param_list;
 use local_catquiz\local\model\model_responses;
 
 /**
- * Class web_raschbirnbauma uses a webservice to calculate the parameters.
+ * Class web_rasch uses a webservice to calculate the parameters.
  *
- * @package catmodel_web_raschbirnbauma
+ * @package catmodel_web_rasch
  * @copyright 2023 Wunderbyte GmbH <georg.maisser@wunderbyte.at>
  * @license  http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class web_raschbirnbauma extends model_model implements catcalc_ability_estimator {
+class web_rasch extends model_model implements catcalc_ability_estimator {
 
     /**
      * Get information criterion.
@@ -106,8 +106,8 @@ class web_raschbirnbauma extends model_model implements catcalc_ability_estimato
             }
             $data[] = $dataobj;
         }
-        $host = get_config('catmodel_web_raschbirnbauma', 'hostname');
-        $port = get_config('catmodel_web_raschbirnbauma', 'port');
+        $host = get_config('catmodel_web_rasch', 'hostname');
+        $port = get_config('catmodel_web_rasch', 'port');
         $path = '/RM';
         $url = sprintf('%s:%s%s', $host, $port, $path);
         $ch = curl_init($url);
@@ -190,7 +190,7 @@ class web_raschbirnbauma extends model_model implements catcalc_ability_estimato
      *
      */
     public static function log_likelihood_p($p, array $params, float $itemresponse): float {
-        return raschbirnbauma::log_likelihood_p($p, $params, $itemresponse);
+        return rasch::log_likelihood_p($p, $params, $itemresponse);
     }
 
     /**
@@ -204,7 +204,7 @@ class web_raschbirnbauma extends model_model implements catcalc_ability_estimato
      *
      */
     public static function likelihood($p, array $params, float $itemresponse) {
-        return raschbirnbauma::likelihood($p, $params, $itemresponse);
+        return rasch::likelihood($p, $params, $itemresponse);
     }
 
     /**
@@ -218,7 +218,7 @@ class web_raschbirnbauma extends model_model implements catcalc_ability_estimato
      *
      */
     public static function log_likelihood($p, array $params, float $itemresponse) {
-        return raschbirnbauma::log_likelihood($p, $params, $itemresponse);
+        return rasch::log_likelihood($p, $params, $itemresponse);
     }
 
     /**
@@ -232,6 +232,6 @@ class web_raschbirnbauma extends model_model implements catcalc_ability_estimato
      *
      */
     public static function log_likelihood_p_p($p, array $params, float $itemresponse): float {
-        return raschbirnbauma::log_likelihood_p_p($p, $params, $itemresponse);
+        return rasch::log_likelihood_p_p($p, $params, $itemresponse);
     }
 }

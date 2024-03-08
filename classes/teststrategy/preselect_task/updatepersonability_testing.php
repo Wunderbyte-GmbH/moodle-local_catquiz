@@ -72,7 +72,7 @@ class updatepersonability_testing extends updatepersonability {
         $itemparamlist = new model_item_param_list();
         foreach ($this->context['fake_item_params'] as $id => $values) {
             $itemparamlist->add(
-                (new model_item_param($id, 'raschbirnbauma'))
+                (new model_item_param($id, 'rasch'))
                     ->set_difficulty($values['difficulty'])
             );
         }
