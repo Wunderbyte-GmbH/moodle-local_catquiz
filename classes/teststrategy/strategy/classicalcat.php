@@ -37,6 +37,7 @@ use local_catquiz\teststrategy\preselect_task\checkitemparams;
 use local_catquiz\teststrategy\preselect_task\checkpagereload;
 use local_catquiz\teststrategy\preselect_task\fisherinformation;
 use local_catquiz\teststrategy\preselect_task\maximumquestionscheck;
+use local_catquiz\teststrategy\preselect_task\maybe_return_pilot;
 use local_catquiz\teststrategy\preselect_task\mayberemovescale;
 use local_catquiz\teststrategy\preselect_task\noremainingquestions;
 use local_catquiz\teststrategy\preselect_task\removeplayedquestions;
@@ -84,6 +85,7 @@ class classicalcat extends strategy {
             noremainingquestions::class,
             mayberemovescale::class,
             fisherinformation::class,
+            maybe_return_pilot::class,
             strategyclassicscore::class,
         ];
     }
