@@ -15,14 +15,14 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Class raschbirnbauma.
+ * Class rasch.
  *
- * @package    catmodel_raschbirnbauma
+ * @package    catmodel_rasch
  * @copyright  2023 Wunderbyte GmbH <georg.maisser@wunderbyte.at>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-namespace catmodel_raschbirnbauma;
+namespace catmodel_rasch;
 
 use local_catquiz\catcalc;
 use local_catquiz\local\model\model_item_param_list;
@@ -30,13 +30,13 @@ use local_catquiz\local\model\model_person_param_list;
 use local_catquiz\local\model\model_raschmodel;
 
 /**
- * Class raschbirnbauma of catmodels.
+ * Class rasch of catmodels.
  *
- * @package    catmodel_raschbirnbauma
+ * @package    catmodel_rasch
  * @copyright 2023 Wunderbyte GmbH <georg.maisser@wunderbyte.at>
  * @license  http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class raschbirnbauma extends model_raschmodel {
+class rasch extends model_raschmodel {
 
     // Definitions and Dimensions.
 
@@ -383,9 +383,9 @@ class raschbirnbauma extends model_raschmodel {
         $as = 2; // Standard derivation of difficulty.
 
         // Use x times of SD as range of trusted regions.
-        $atr = floatval(get_config('catmodel_raschbirnbauma', 'trusted_region_factor_sd_a'));
-        $amin = floatval(get_config('catmodel_raschbirnbauma', 'trusted_region_min_a'));
-        $amax = floatval(get_config('catmodel_raschbirnbauma', 'trusted_region_max_a'));
+        $atr = floatval(get_config('catmodel_rasch', 'trusted_region_factor_sd_a'));
+        $amin = floatval(get_config('catmodel_rasch', 'trusted_region_min_a'));
+        $amax = floatval(get_config('catmodel_rasch', 'trusted_region_max_a'));
 
         // Test TR for difficulty.
         if (($a - $am) < max(- ($atr * $as), $amin)) {
@@ -412,7 +412,7 @@ class raschbirnbauma extends model_raschmodel {
         $am = 0; // Mean of difficulty.
         $as = 2; // Standard derivation of difficulty.
 
-        $atr = floatval(get_config('catmodel_raschbirnbauma', 'trusted_region_factor_sd_a'));
+        $atr = floatval(get_config('catmodel_rasch', 'trusted_region_factor_sd_a'));
 
         return [
             ($am - $ip['difficulty']) / ($as ** 2), // The d/da .
