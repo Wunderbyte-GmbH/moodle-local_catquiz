@@ -119,8 +119,8 @@ class inferallsubscales extends strategy {
             new questionssummary($this->feedbacksettings),
             new personabilities($this->feedbacksettings),
             new comparetotestaverage($this->feedbacksettings),
-            new debuginfo($this->feedbacksettings),
             new graphicalsummary($this->feedbacksettings),
+            new debuginfo($this->feedbacksettings),
         ];
     }
 

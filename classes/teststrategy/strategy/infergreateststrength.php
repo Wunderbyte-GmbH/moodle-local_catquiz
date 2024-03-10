@@ -128,8 +128,8 @@ class infergreateststrength extends strategy {
             new personabilities($this->feedbacksettings),
             new pilotquestions($this->feedbacksettings),
             new comparetotestaverage($this->feedbacksettings),
-            new debuginfo($this->feedbacksettings),
             new graphicalsummary($this->feedbacksettings),
+            new debuginfo($this->feedbacksettings),
         ];
     }
     /**
