@@ -504,10 +504,10 @@ class graphicalsummary extends feedbackgenerator {
             foreach ($attempts as $attempt) {
                 if (is_object($attempt)) {
                     $a = (float) $attempt->value;
-                    $color = personabilities::get_color_for_personability((array)$quizsettings, $a, $catscaleid);
+                    $color = $this->get_color_for_personability((array)$quizsettings, $a, $catscaleid);
                 } else {
                     // This is to stay backwards compatible.
-                    $color = personabilities::get_color_for_personability((array)$quizsettings, $attempt, $catscaleid);
+                    $color = $this->get_color_for_personability((array)$quizsettings, $attempt, $catscaleid);
                 }
 
                 if (!isset($series[$timestamp][$color])) {
