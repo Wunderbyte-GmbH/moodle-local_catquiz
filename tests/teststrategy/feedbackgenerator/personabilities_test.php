@@ -437,7 +437,8 @@ class personabilities_test extends advanced_testcase {
                 "label" => "SIMA05-03",
                 "idnumber" => "SIMA05-03",
                 "name" => "Testfrage SIMA05-03",
-                "questiontext" => "<p dir=\"ltr\" style=\"text-align=> left;\">Schwierigkeit=> -2.65<\/p><p>Trennsch\u00e4rtfe=> 5.76<\/p><p><b>Skala=> A\/A05<\/b><\/p>",
+                "questiontext" => "<p dir=\"ltr\" style=\"text-align=> left;\">Schwierigkeit=> -2.65<\/p>
+                <p>Trennsch\u00e4rtfe=> 5.76<\/p><p><b>Skala=> A\/A05<\/b><\/p>",
                 "qtype" => "multichoice",
                 "categoryname" => "Simulation",
                 "catscaleid" => "277",
@@ -463,7 +464,8 @@ class personabilities_test extends advanced_testcase {
                 "label" => "SIMA05-04",
                 "idnumber" => "SIMA05-04",
                 "name" => "Testfrage SIMA05-04",
-                "questiontext" => "<p dir=\"ltr\" style=\"text-align=> left;\">Schwierigkeit=> -2.1<\/p><p>Trennsch\u00e4rtfe=> 5.98<\/p><p><b>Skala=> A\/A05<\/b><\/p>",
+                "questiontext" => "<p dir=\"ltr\" style=\"text-align=> left;\">Schwierigkeit=> -2.1<\/p>
+                <p>Trennsch\u00e4rtfe=> 5.98<\/p><p><b>Skala=> A\/A05<\/b><\/p>",
                 "qtype" => "multichoice",
                 "categoryname" => "Simulation",
                 "catscaleid" => "277",
@@ -489,7 +491,8 @@ class personabilities_test extends advanced_testcase {
                 "label" => "SIMA05-05",
                 "idnumber" => "SIMA05-05",
                 "name" => "Testfrage SIMA05-05",
-                "questiontext" => "<p dir=\"ltr\" style=\"text-align=> left;\">Schwierigkeit=> -2.46<\/p><p>Trennsch\u00e4rtfe=> 2.67<\/p><p><b>Skala=> A\/A05<\/b><\/p>",
+                "questiontext" => "<p dir=\"ltr\" style=\"text-align=> left;\">Schwierigkeit=> -2.46<\/p>
+                <p>Trennsch\u00e4rtfe=> 2.67<\/p><p><b>Skala=> A\/A05<\/b><\/p>",
                 "qtype" => "multichoice",
                 "categoryname" => "Simulation",
                 "catscaleid" => "277",
@@ -515,7 +518,8 @@ class personabilities_test extends advanced_testcase {
                 "label" => "SIMA05-06",
                 "idnumber" => "SIMA05-06",
                 "name" => "Testfrage SIMA05-06",
-                "questiontext" => "<p dir=\"ltr\" style=\"text-align=> left;\">Schwierigkeit=> -2.48<\/p><p>Trennsch\u00e4rtfe=> 3.65<\/p><p><b>Skala=> A\/A05<\/b><\/p>",
+                "questiontext" => "<p dir=\"ltr\" style=\"text-align=> left;\">Schwierigkeit=> -2.48<\/p>
+                <p>Trennsch\u00e4rtfe=> 3.65<\/p><p><b>Skala=> A\/A05<\/b><\/p>",
                 "qtype" => "multichoice",
                 "categoryname" => "Simulation",
                 "catscaleid" => "277",
@@ -541,7 +545,8 @@ class personabilities_test extends advanced_testcase {
                 "label" => "SIMA05-07",
                 "idnumber" => "SIMA05-07",
                 "name" => "Testfrage SIMA05-07",
-                "questiontext" => "<p dir=\"ltr\" style=\"text-align=> left;\">Schwierigkeit=> -2.84<\/p><p>Trennsch\u00e4rtfe=> 4.57<\/p><p><b>Skala=> A\/A05<\/b><\/p>",
+                "questiontext" => "<p dir=\"ltr\" style=\"text-align=> left;\">Schwierigkeit=> -2.84<\/p>
+                <p>Trennsch\u00e4rtfe=> 4.57<\/p><p><b>Skala=> A\/A05<\/b><\/p>",
                 "qtype" => "multichoice",
                 "categoryname" => "Simulation",
                 "catscaleid" => "277",
@@ -567,7 +572,8 @@ class personabilities_test extends advanced_testcase {
                 "label" => "SIMA05-08",
                 "idnumber" => "SIMA05-08",
                 "name" => "Testfrage SIMA05-08",
-                "questiontext" => "<p dir=\"ltr\" style=\"text-align=> left;\">Schwierigkeit=> -2.5<\/p><p>Trennsch\u00e4rtfe=> 0.43<\/p><p><b>Skala=> A\/A05<\/b><\/p>",
+                "questiontext" => "<p dir=\"ltr\" style=\"text-align=> left;\">Schwierigkeit=> -2.5<\/p>
+                <p>Trennsch\u00e4rtfe=> 0.43<\/p><p><b>Skala=> A\/A05<\/b><\/p>",
                 "qtype" => "multichoice",
                 "categoryname" => "Simulation",
                 "catscaleid" => "277",
@@ -593,7 +599,8 @@ class personabilities_test extends advanced_testcase {
                 "label" => "SIMA05-09",
                 "idnumber" => "SIMA05-09",
                 "name" => "Testfrage SIMA05-09",
-                "questiontext" => "<p dir=\"ltr\" style=\"text-align=> left;\">Schwierigkeit=> -2.55<\/p><p>Trennsch\u00e4rtfe=> 1.49<\/p><p><b>Skala=> A\/A05<\/b><\/p>",
+                "questiontext" => "<p dir=\"ltr\" style=\"text-align=> left;\">Schwierigkeit=> -2.55<\/p>
+                <p>Trennsch\u00e4rtfe=> 1.49<\/p><p><b>Skala=> A\/A05<\/b><\/p>",
                 "qtype" => "multichoice",
                 "categoryname" => "Simulation",
                 "catscaleid" => "277",
@@ -619,7 +626,8 @@ class personabilities_test extends advanced_testcase {
                 "label" => "SIMA05-10",
                 "idnumber" => "SIMA05-10",
                 "name" => "Testfrage SIMA05-10",
-                "questiontext" => "<p dir=\"ltr\" style=\"text-align=> left;\">Schwierigkeit=> -2.42<\/p><p>Trennsch\u00e4rtfe=> 3.93<\/p><p><b>Skala=> A\/A05<\/b><\/p>",
+                "questiontext" => "<p dir=\"ltr\" style=\"text-align=> left;\">Schwierigkeit=> -2.42<\/p>
+                <p>Trennsch\u00e4rtfe=> 3.93<\/p><p><b>Skala=> A\/A05<\/b><\/p>",
                 "qtype" => "multichoice",
                 "categoryname" => "Simulation",
                 "catscaleid" => "277",
@@ -645,7 +653,8 @@ class personabilities_test extends advanced_testcase {
                 "label" => "SIMA05-11",
                 "idnumber" => "SIMA05-11",
                 "name" => "Testfrage SIMA05-11",
-                "questiontext" => "<p dir=\"ltr\" style=\"text-align=> left;\">Schwierigkeit=> -2.53<\/p><p>Trennsch\u00e4rtfe=> 4.81<\/p><p><b>Skala=> A\/A05<\/b><\/p>",
+                "questiontext" => "<p dir=\"ltr\" style=\"text-align=> left;\">Schwierigkeit=> -2.53<\/p>
+                <p>Trennsch\u00e4rtfe=> 4.81<\/p><p><b>Skala=> A\/A05<\/b><\/p>",
                 "qtype" => "multichoice",
                 "categoryname" => "Simulation",
                 "catscaleid" => "277",
@@ -671,7 +680,8 @@ class personabilities_test extends advanced_testcase {
                 "label" => "SIMA05-12",
                 "idnumber" => "SIMA05-12",
                 "name" => "Testfrage SIMA05-12",
-                "questiontext" => "<p dir=\"ltr\" style=\"text-align=> left;\">Schwierigkeit=> -2.13<\/p><p>Trennsch\u00e4rtfe=> 2.09<\/p><p><b>Skala=> A\/A05<\/b><\/p>",
+                "questiontext" => "<p dir=\"ltr\" style=\"text-align=> left;\">Schwierigkeit=> -2.13<\/p>
+                <p>Trennsch\u00e4rtfe=> 2.09<\/p><p><b>Skala=> A\/A05<\/b><\/p>",
                 "qtype" => "multichoice",
                 "categoryname" => "Simulation",
                 "catscaleid" => "277",
@@ -697,7 +707,8 @@ class personabilities_test extends advanced_testcase {
                 "label" => "SIMA05-13",
                 "idnumber" => "SIMA05-13",
                 "name" => "Testfrage SIMA05-13",
-                "questiontext" => "<p dir=\"ltr\" style=\"text-align=> left;\">Schwierigkeit=> -2.39<\/p><p>Trennsch\u00e4rtfe=> 2.94<\/p><p><b>Skala=> A\/A05<\/b><\/p>",
+                "questiontext" => "<p dir=\"ltr\" style=\"text-align=> left;\">Schwierigkeit=> -2.39<\/p>
+                <p>Trennsch\u00e4rtfe=> 2.94<\/p><p><b>Skala=> A\/A05<\/b><\/p>",
                 "qtype" => "multichoice",
                 "categoryname" => "Simulation",
                 "catscaleid" => "277",
@@ -723,7 +734,8 @@ class personabilities_test extends advanced_testcase {
                 "label" => "SIMA05-14",
                 "idnumber" => "SIMA05-14",
                 "name" => "Testfrage SIMA05-14",
-                "questiontext" => "<p dir=\"ltr\" style=\"text-align=> left;\">Schwierigkeit=> -2.55<\/p><p>Trennsch\u00e4rtfe=> 2.32<\/p><p><b>Skala=> A\/A05<\/b><\/p>",
+                "questiontext" => "<p dir=\"ltr\" style=\"text-align=> left;\">Schwierigkeit=> -2.55<\/p>
+                <p>Trennsch\u00e4rtfe=> 2.32<\/p><p><b>Skala=> A\/A05<\/b><\/p>",
                 "qtype" => "multichoice",
                 "categoryname" => "Simulation",
                 "catscaleid" => "277",
@@ -749,7 +761,8 @@ class personabilities_test extends advanced_testcase {
                 "label" => "SIMA05-15",
                 "idnumber" => "SIMA05-15",
                 "name" => "Testfrage SIMA05-15",
-                "questiontext" => "<p dir=\"ltr\" style=\"text-align=> left;\">Schwierigkeit=> -2.85<\/p><p>Trennsch\u00e4rtfe=> 1.91<\/p><p><b>Skala=> A\/A05<\/b><\/p>",
+                "questiontext" => "<p dir=\"ltr\" style=\"text-align=> left;\">Schwierigkeit=> -2.85<\/p>
+                <p>Trennsch\u00e4rtfe=> 1.91<\/p><p><b>Skala=> A\/A05<\/b><\/p>",
                 "qtype" => "multichoice",
                 "categoryname" => "Simulation",
                 "catscaleid" => "277",
@@ -775,7 +788,8 @@ class personabilities_test extends advanced_testcase {
                 "label" => "SIMA05-16",
                 "idnumber" => "SIMA05-16",
                 "name" => "Testfrage SIMA05-16",
-                "questiontext" => "<p dir=\"ltr\" style=\"text-align=> left;\">Schwierigkeit=> -2.2<\/p><p>Trennsch\u00e4rtfe=> 4.35<\/p><p><b>Skala=> A\/A05<\/b><\/p>",
+                "questiontext" => "<p dir=\"ltr\" style=\"text-align=> left;\">Schwierigkeit=> -2.2<\/p>
+                <p>Trennsch\u00e4rtfe=> 4.35<\/p><p><b>Skala=> A\/A05<\/b><\/p>",
                 "qtype" => "multichoice",
                 "categoryname" => "Simulation",
                 "catscaleid" => "277",
@@ -801,7 +815,8 @@ class personabilities_test extends advanced_testcase {
                 "label" => "SIMA05-17",
                 "idnumber" => "SIMA05-17",
                 "name" => "Testfrage SIMA05-17",
-                "questiontext" => "<p dir=\"ltr\" style=\"text-align=> left;\">Schwierigkeit=> -2.12<\/p><p>Trennsch\u00e4rtfe=> 1.27<\/p><p><b>Skala=> A\/A05<\/b><\/p>",
+                "questiontext" => "<p dir=\"ltr\" style=\"text-align=> left;\">Schwierigkeit=> -2.12<\/p>
+                <p>Trennsch\u00e4rtfe=> 1.27<\/p><p><b>Skala=> A\/A05<\/b><\/p>",
                 "qtype" => "multichoice",
                 "categoryname" => "Simulation",
                 "catscaleid" => "277",
@@ -827,7 +842,8 @@ class personabilities_test extends advanced_testcase {
                 "label" => "SIMA05-18",
                 "idnumber" => "SIMA05-18",
                 "name" => "Testfrage SIMA05-18",
-                "questiontext" => "<p dir=\"ltr\" style=\"text-align=> left;\">Schwierigkeit=> -3.16<\/p><p>Trennsch\u00e4rtfe=> 0.56<\/p><p><b>Skala=> A\/A05<\/b><\/p>",
+                "questiontext" => "<p dir=\"ltr\" style=\"text-align=> left;\">Schwierigkeit=> -3.16<\/p>
+                <p>Trennsch\u00e4rtfe=> 0.56<\/p><p><b>Skala=> A\/A05<\/b><\/p>",
                 "qtype" => "multichoice",
                 "categoryname" => "Simulation",
                 "catscaleid" => "277",
@@ -853,7 +869,8 @@ class personabilities_test extends advanced_testcase {
                 "label" => "SIMA05-19",
                 "idnumber" => "SIMA05-19",
                 "name" => "Testfrage SIMA05-19",
-                "questiontext" => "<p dir=\"ltr\" style=\"text-align=> left;\">Schwierigkeit=> -2.41<\/p><p>Trennsch\u00e4rtfe=> 0.6<\/p><p><b>Skala=> A\/A05<\/b><\/p>",
+                "questiontext" => "<p dir=\"ltr\" style=\"text-align=> left;\">Schwierigkeit=> -2.41<\/p>
+                <p>Trennsch\u00e4rtfe=> 0.6<\/p><p><b>Skala=> A\/A05<\/b><\/p>",
                 "qtype" => "multichoice",
                 "categoryname" => "Simulation",
                 "catscaleid" => "277",
@@ -1604,7 +1621,7 @@ class personabilities_test extends advanced_testcase {
             "intro" => "",
             "introformat" => "1",
             "timemodified" => 1709737727,
-            "showabilitymeasure" => 0
+            "showabilitymeasure" => 0,
         ];
     }
 
