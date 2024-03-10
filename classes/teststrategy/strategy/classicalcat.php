@@ -102,10 +102,10 @@ class classicalcat extends strategy {
         return [
             new customscalefeedback($this->feedbacksettings),
             new comparetotestaverage($this->feedbacksettings),
-            new debuginfo($this->feedbacksettings),
             new personabilities($this->feedbacksettings),
             new questionssummary($this->feedbacksettings),
             new graphicalsummary($this->feedbacksettings),
+            new debuginfo($this->feedbacksettings),
         ];
     }
     /**
