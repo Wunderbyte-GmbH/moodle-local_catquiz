@@ -154,6 +154,28 @@ class inferallsubscales extends strategy {
         int $catscaleid = 0,
         bool $feedbackonlyfordefinedscaleid = false
         ): array {
-            return $personabilities;
+
+        // If Fraction is 1 (all answers correct) or 0 (all answers wrong) mark abilities as estimated.
+        if ($feedbacksettings->fraction == 1 || $feedbacksettings->fraction == 0 ) {
+            $estimated = true;
+        }
+        $rootscaleid = $feedbackdata['catscaleid'];
+
+        // Exclude scales that don't meet minimum of items required in quizsettings.
+        $personabilities = $feedbacksettings->filter_nminscale($personabilities, $feedbackdata);
+
+        foreach ($personabilities as $scaleid => $abilitiesarray) {
+            $personabilities[$scaleid]['toreport'] = true;
+            if ($estimated) {
+                $personabilities[$scaleid]['estimated'] = true;
+                $personabilities[$scaleid]['fraction'] = $feedbacksettings->fraction;
+            }
+            if ($scaleid == $rootscaleid) {
+                $personabilities[$scaleid]['primary'] = true;
+            }
+
+        }
+
+        return $personabilities;
     }
 }
