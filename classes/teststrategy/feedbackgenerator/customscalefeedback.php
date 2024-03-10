@@ -91,12 +91,29 @@ class customscalefeedback extends feedbackgenerator {
             $data['quizsettings'],
             $data['catscales']
         );
+        $firstelement = $data['customscalefeedback_abilities'][array_key_first($data['customscalefeedback_abilities'])];
+        if (!empty($firstelement['estimated'])) {
+            if (!isset($firstelement['fraction'])) {
+                $comment = $comment = get_string('estimatedbecause:default', 'local_catquiz');
+            } else {
+                switch ((int) $firstelement['fraction']) {
+                    case 1 :
+                        $comment = get_string('estimatedbecause:allanswerscorrect', 'local_catquiz');
+                    case 0 :
+                        $comment = get_string('estimatedbecause:allanswerinscorrect', 'local_catquiz');
+                    default :
+                        $comment = get_string('estimatedbecause:default', 'local_catquiz');
+
+                }
+            }
+        }
 
         if (empty($customscalefeedback)) {
             return [];
         } else {
             return [
                 'heading' => $this->get_heading(),
+                'comment' => $comment ?? "",
                 'content' => $customscalefeedback,
             ];
         }
