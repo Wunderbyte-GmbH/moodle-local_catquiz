@@ -477,6 +477,9 @@ $string['nofeedback'] = 'Kein Feedback angegeben.';
 $string['moreinformation'] = 'Weitere Informationen';
 $string['comparetotestaverage'] = 'Übersicht im Vergleich';
 $string['personabilityfeedbacktitle'] = "Fähigkeitsprofil";
+$string['estimatedbecause:allanswerscorrect'] = "Ihre Ergebnisse konnten nicht zuverlässig errechnet werden und wurden geschätzt, weil Sie alle Fragen richtig beantwortet haben.";
+$string['estimatedbecause:allanswersincorrect'] = "Ihre Ergebnisse konnten nicht zuverlässig errechnet werden und wurden geschätzt, weil Sie alle Fragen falsch beantwortet haben.";
+$string['estimatedbecause:default'] = "Ihre Ergebnisse konnten nicht zuverlässig errechnet werden und wurden geschätzt.";
 
 // Chart in Feedback.
 $string['chartlegendabilityrelative'] = '{$a->difference} Unterschied zur Vergleichsskala (Fähigkeits-Score in dieser Skala: {$a->ability})';
