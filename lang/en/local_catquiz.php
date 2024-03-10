@@ -470,6 +470,9 @@ $string['nofeedback'] = 'No feedback defined.';
 $string['moreinformation'] = 'More Information';
 $string['comparetotestaverage'] = 'Overview in Comparison';
 $string['personabilityfeedbacktitle'] = "Personability Profile";
+$string['estimatedbecause:allanswerscorrect'] = "Your results could not be calculated reliably and were estimated, because you answered all questions correctly.";
+$string['estimatedbecause:allanswersincorrect'] = "Your results could not be calculated reliably and were estimated, because you answered all questions incorrectly.";
+$string['estimatedbecause:default'] = "Your results could not be calculated reliably and were estimated.";
 
 // Personability & chart in Feedback.
 $string['chartlegendabilityrelative'] = '{$a->difference} (Compared to parentscale); {$a->ability} (ability score of scale)';
