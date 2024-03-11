@@ -193,7 +193,6 @@ class attemptfeedback implements renderable, templatable {
             'attemptid' => $this->attemptid,
             'contextid' => $this->contextid,
             'courseid' => $this->courseid ?? 0,
-            'needsimprovementthreshold' => 0, // TODO: Get the quantile threshold from the quiz settings.
             'userid' => $USER->id,
             'catscaleid' => $this->catscaleid,
             'teststrategy' => $this->teststrategy,
