@@ -125,10 +125,13 @@ class quizattempts_table extends wunderbyte_table {
      */
     public function col_action($values) {
 
+        // TODO: Add back to table overview button/link in detailview triggered here.
+
         global $PAGE;
 
         $url = clone $PAGE->url;
         $url->params($_GET);
+        $url->params(['attemptid' => $values->attemptid]);
 
         return sprintf(
             '<a class="btn btn-plain btn-smaller"
