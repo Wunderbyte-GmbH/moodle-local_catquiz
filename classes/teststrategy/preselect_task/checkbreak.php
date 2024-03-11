@@ -93,7 +93,7 @@ final class checkbreak extends preselect_task implements wb_middleware {
                 new moodle_url(
                     '/mod/adaptivequiz/attempt.php',
                     [
-                        'cmid' => $_REQUEST['cmid'],
+                        'cmid' => required_param('cmid', PARAM_INT),
                     ]
                 )
             );
