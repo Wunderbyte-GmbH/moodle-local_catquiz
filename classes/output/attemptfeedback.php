@@ -333,15 +333,7 @@ class attemptfeedback implements renderable, templatable {
             $feedbacks = $generator->get_feedback($feedbackdata);
             // Loop over studentfeedback and teacherfeedback.
             foreach ($feedbacks as $fbtype => $feedback) {
-                if (!$feedback) {
-                    continue;
-                }
-                if (!is_array($feedback)) {
-                    // TODO: Check handling of hidden feedback.
-                    // Questionssummary Feedback is hidden by default.
-                    // The generator returns a string (not an array).
-                    // Will be ignored.
-                    $generatorname = $generator->get_generatorname();
+                if (!$feedback || !is_array($feedback)) {
                     continue;
                 }
 
