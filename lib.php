@@ -100,6 +100,9 @@ define('LOCAL_CATQUIZ_MAGIC_NUMBER', -12345);
 define('LOCAL_CATQUIZ_STANDARDERROR_DEFAULT_MIN', 0.35);
 define('LOCAL_CATQUIZ_STANDARDERROR_DEFAULT_MAX', 1);
 
+// Fallback for item model.
+define('LOCAL_CATQUIZ_FALLBACK_MODEL', 'catmodel_raschbirnbaum\raschbirnbaum');
+
 /**
  * Renders the popup Link.
  *

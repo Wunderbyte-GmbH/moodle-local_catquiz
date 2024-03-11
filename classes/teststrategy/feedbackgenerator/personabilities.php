@@ -321,7 +321,7 @@ class personabilities extends feedbackgenerator {
         $fisherinfos = [];
         foreach ($items as $item) {
             $key = $item->model;
-            $model = $models[$key] ?? $models['raschbirnbaumb'];
+            $model = $models[$key] ?? LOCAL_CATQUIZ_FALLBACK_MODEL;
             foreach ($model::get_parameter_names() as $paramname) {
                 $params[$paramname] = floatval($item->$paramname);
             }
