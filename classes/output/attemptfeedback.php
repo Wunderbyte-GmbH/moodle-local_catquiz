@@ -330,11 +330,27 @@ class attemptfeedback implements renderable, templatable {
             return [];
         }
         foreach ($generators as $generator) {
-            $feedback = $generator->get_feedback($feedbackdata);
+            $feedbacks = $generator->get_feedback($feedbackdata);
             // Loop over studentfeedback and teacherfeedback.
-            foreach ($feedback as $fbtype => $feedback) {
+            foreach ($feedbacks as $fbtype => $feedback) {
                 if (!$feedback) {
                     continue;
+                }
+                if (!is_array($feedback)) {
+                    // TODO: Check handling of hidden feedback.
+                    // Questionssummary Feedback is hidden by default.
+                    // The generator returns a string (not an array).
+                    // Will be ignored.
+                    $generatorname = $generator->get_generatorname();
+                    continue;
+                }
+
+                $feedback['generatorname'] = $generator->get_generatorname();
+                $primaryfeedbackname = 'customscalefeedback';
+                if ($generator->get_generatorname() === $primaryfeedbackname) {
+                    $feedback['frontpage'] = "1";
+                } else {
+                    $feedback['othertabs'] = "1";
                 }
                 $context[$fbtype][] = $feedback;
             }
