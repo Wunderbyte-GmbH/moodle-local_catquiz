@@ -18,20 +18,17 @@ The plugin makes use of the mod_adaptive plugin. It is therefore required to ins
 The plugin tries to present questions matching the ability of the student. To assign parameters like difficulty to each question, questions and params are grouped as items.
 
 * Items: Question with parameters
-* Parameters: Describe the difficulty of a question with one or more values.
-* Models: Models provide the functionality to identify a question that is the best match to a given ability.
-* Scales: Items are grouped in scales (and subscales) for example you could have a parentscale "mathematics" with subscales "algebra" and "geometry".
-* Contexts: Contexts allow you to reuse the same question with different params without overwriting the item. This could be useful if e.g. the question is part of different quizzes.
-* Importer: The best way to import items, params and scales is to use the plugins csv importer.
+* Parameters: characteristics of a question (e.g. difficulty, discrimination, guessing probability).
+* Models: model the charcteristics of an item by a specified set of parameters.
+* Scales: Items are grouped in scales (and subscales) according to the construct they are measuring. For example you may have a parentscale "mathematics" that measures a general construct "mathematical abilities" with subscales "algebra" and "geometry" that contain items of the field of algebra or geometry each.
+* Contexts: allow you to reuse the same question within different time periods or usage frames without loosing or confusing its paramtesters and attempt data each. This could be useful if e.g. the question is part of different quizzes or for managing data of different years.
+* Importer: imports items, params and scales from a csv file.
 
 ## CSV Importer ##
-The csv importer accepts different formats of separators and encodings. Some columns are mandatory whereas others are optional. Find detailed descriptions of all columns next to the importer. A demo csv file can be found in: local/catquiz/classes/importer/demo.csv
+The csv importer accepts different formats of separators and encodings. Some columns are mandatory whereas others are optional. Find detailed descriptions of all columns are explained on the same page, also the demo csv file can be found in: local/catquiz/classes/importer/demo.csv
 
 ## Contexts ##
-* On import a new context is created and all testitems of concerned parentscale are duplicated. Only those present in the import are updated.
-
-## Attempts ##
-* Attempts are calculated by the time of the context. Switching contexts only affects the number of attempts when the time includes or excludes responses.
+* When importing with the csv importer, a new context is created automatically. With respect to the new context, new items from the import csv file are added to the corresponding scales whereas existing items are updated with idata from the import file.
 
 ## Shortcodes ##
 To use the shortcode functionality, use plugin filter_shortcodes: https://moodle.org/plugins/filter_shortcodes
