@@ -39,14 +39,9 @@
 }}
 {{#feedback}}
     {{#studentfeedback}}
-        <h3>{{heading}}</h3>
-        <div>{{{content}}}</div>
+        {{#frontpage}}
+            <h3>{{heading}}</h3>
+            <div>{{{content}}}</div>
+        {{/frontpage}}
     {{/studentfeedback}}
-    {{#teacherfeedback.0}}
-        <h2>{{#str}}teacherfeedback, local_catquiz{{/str}}</h2>
-    {{/teacherfeedback.0}}
-    {{#teacherfeedback}}
-        <h3>{{heading}}</h3>
-        <div>{{{content}}}</div>
-    {{/teacherfeedback}}
 {{/feedback}}
