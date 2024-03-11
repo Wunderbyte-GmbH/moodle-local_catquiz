@@ -227,6 +227,18 @@ class testitemimporter {
                 'name' => 'lastattempttime',
                 'mandatory' => false,
             ],
+            [
+                'name' => 'minability',
+                'mandatory' => false,
+                'format' => PARAM_TEXT,
+                'importinstruction' => get_string('minscalevalueinformation', 'local_catquiz'),
+            ],
+            [
+                'name' => 'maxability',
+                'mandatory' => false,
+                'format' => PARAM_TEXT,
+                'importinstruction' => get_string('maxscalevalueinformation', 'local_catquiz'),
+            ],
             ];
         return $columnssequential;
     }
