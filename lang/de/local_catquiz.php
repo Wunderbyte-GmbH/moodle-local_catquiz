@@ -65,7 +65,6 @@ $string['pilotratio'] = 'Anteil zu pilotierender Fragen in %';
 $string['pilotratio_help'] = 'Anteil von noch zu pilotierender Fragen an der Gesamtfragezahl in einem Test-Versuch. Die Angabe 20% führt beispielsweise dazu, dass eine von fünf Fragen  eines Test-Versuches eine zu pilotierende Frage sein wird.';
 $string['includepilotquestions'] = 'Pilotierungsmodus aktivieren';
 $string['standarderror'] = 'Standardfehler';
-$string['standarderrorpersubscale'] = 'Standardfehler pro Skala in Prozent';
 $string['tr_sd_ratio_name'] = 'Multiplikator für Vertrauensbereich';
 $string['tr_sd_ratio_desc'] = 'Der Multiplikator für den Vertrauensbereich gibt
     das Vielfache der Standardabweichung um den Mittelwert an, um den eine
@@ -79,10 +78,7 @@ $string['acceptedstandarderror'] = 'akzeptierter Standardfehler';
 $string['acceptedstandarderror_help'] = 'Sobald der Standardfehler einer Skala außerhalb dieser Werte fällt, wird sie nicht weiter getestet.';
 $string['maxquestionspersubscale'] = 'max. Frageanzahl pro Skala';
 $string['maxquestionspersubscale_help'] = 'Wenn von einer Skala so viele Fragen angezeigt wurden, werden keine weiteren Fragen dieser Skala mehr ausgespielt. Wenn auf 0 gesetzt, dann gibt es kein Limit.';
-$string['maxquestions'] = 'max. Frageanzahl pro Test';
-$string['maxquestions_help'] = 'Es werden nicht mehr Fragen pro Test angezeigt. 0 bedeutet keine Begrenzung.';
-$string['minquestions'] = 'Min. Frageanzahl pro Test';
-$string['minquestions_help'] = 'Es müssen mindestens so viele Fragen pro Test angezeigt werden.';
+
 $string['numberofquestionspertest'] = 'Anzahl der Fragen pro Test';
 $string['numberofquestionspertest_help'] = 'Setzen Sie den Maximalwert auf 0 um unbegrenzt Fragen auszuspielen.';
 $string['numberofquestionsperscale'] = 'Anzahl der Fragen pro Skala';
@@ -223,9 +219,9 @@ $string['testitem_status_updated_description'] = 'Der neue Status der {$a->testi
 $string['catscale_created'] = 'Skala erzeugt';
 $string['create_catscale_description'] = 'Skala "{$a->catscalelink}" mit der ID {$a->objectid} erzeugt.';
 $string['context_updated'] = 'Einsatz-Kontext aktualisiert';
-$string['update_catscale_description'] = 'Einsatz-Kontext {$a} aktualisiert.';
+$string['update_context_description'] = 'Einsatz-Kontext {$a} aktualisiert.';
 $string['context_created'] = 'Einsatz-Kontext erzeugt';
-$string['created_catscale_description'] = 'Einsatz-Kontext {$a} erzeugt.';
+$string['create_context_description'] = 'Einsatz-Kontext {$a} erzeugt.';
 $string['logsafter'] = 'Einträge vor';
 $string['logsbefore'] = 'Einträge nach';
 $string['calculation_executed'] = 'Berechnung durchgeführt.';
@@ -448,7 +444,6 @@ $string['setcoursesforscaletext'] = 'Legen Sie das Feedback (schriftlichen Rück
 $string['catcatscaleprime'] = 'Inhaltsbereich (Globalskala)';
 $string['catcatscaleprime_help'] = 'Wählen Sie den für Sie relevanten Inhaltsbereich aus. Inhaltsbereche werden als Skala durch eine*n CAT-Manager*in angelegt und verwaltet. Falls Sie eigene Inhalts- und Unterbereiche wünschen, wenden Sie sich bitte an den oder die CAT-Manager*in oder den bzw. die Adminstrator*in Ihrer Moodle-Instanz.';
 $string['catcatscales_selectall'] = 'Alle untergeordneten Skalen auswählen';
-$string['catcatscaleprime_help'] = 'Wählen Sie den für Sie relevanten Inhaltsbereich aus. Inhaltsbereche werden als Skala durch eine*n CAT-Manager*in angelegt und verwaltet. Falls Sie eigene Inhalts- und Unterbereiche wünschen, wenden Sie sich bitte an den oder die CAT-Manager*in oder den bzw. die Adminstrator*in Ihrer Moodle-Instanz.';
 $string['selectcatcontext_help'] = 'Einsatz-Kontexte differenzieren die Daten hinsichtlich Zielgruppe, Einsatzzweck oder Zeit/Kohorte. Der Einsatz-Kontext wird durch den bzw. die CAT-Manager*in verwaltet. Falls Sie für Ihren Einsatzzweck einen eigenen Einsatz-Kontext wünschen, wenden Sie sich bitte an den oder die CAT-Manager*in oder den bzw. die Adminstrator*in Ihrer Moodle-Instanz.';
 $string['includepilotquestions_help'] = 'Im Pilotierungsmodus werden jedem Testversuch eine festzulegende Anzahl an Fragen beigemischt, deren Fragen-Parameter (z.B. Schwierigkeit, Trennschärfe) noch nicht bestimmt sind. Diese tragen nicht zum Test-Ergebnis bei, die durch die Bearbeitungen angefallenen Daten können jedoch durch eine*n CAT-Manager*in zu einem späteren Zeitpunkt zur Bestimmung der Fragen-Parameter statistisch ausgewertet und so der aktuelle Fragen-Pool fortlaufend erweitert werden. (empfohlen)';
 $string['catquiz_selectfirstquestion_help'] = 'Dieser Einstellung legt fest, mit welcher Frage ein Testversuch gestartet wird.';
@@ -471,6 +466,7 @@ $string['strongestscaleselected'] = 'Ihre stärkste Skala {$a}';
 $string['lowestscaleselected'] = 'Ihre schwächste Skala {$a}';
 $string['parentscaleselected'] = 'Globalskala "{$a}"';
 $string['scaleselected'] = 'Skala "{$a}"';
+$string['abilityprofile'] = 'Fähigkeits-Score Profil in "{$a}"';
 
 // Chart in Feedback.
 $string['chartlegendabilityrelative'] = '{$a->difference} Unterschied zur Vergleichsskala (Fähigkeits-Score in dieser Skala: {$a->ability})';
