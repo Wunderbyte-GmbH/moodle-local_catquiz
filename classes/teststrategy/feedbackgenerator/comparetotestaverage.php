@@ -131,7 +131,6 @@ class comparetotestaverage extends feedbackgenerator {
             'contextid',
             'personabilities',
             'quizsettings',
-            'needsimprovementthreshold',
             'testaverageability',
             'userability',
             // Used for positioning in the progress bar. 0 is left, 50 middle and 100 right.
@@ -314,11 +313,6 @@ class comparetotestaverage extends feedbackgenerator {
                 'quantile' => sprintf('%.2f', $quantile),
                 'scaleinfo' => get_string($selectedscalestringkey, 'local_catquiz', $catscale->name),
             ]);
-        if ($needsimprovementthreshold = $existingdata['needsimprovementthreshold']) {
-            if ($quantile < $needsimprovementthreshold) {
-                $text .= " " . get_string('feedbackneedsimprovement', 'local_catquiz');
-            }
-        }
 
         $testaverage = (new firstquestionselector())->get_median_ability_of_test($personparams);
 
@@ -337,7 +331,6 @@ class comparetotestaverage extends feedbackgenerator {
 
         return [
             'contextid' => $existingdata['contextid'],
-            'needsimprovementthreshold' => $needsimprovementthreshold,
             'testaverageability' => sprintf('%.2f', $testaverageinrange),
             'userability' => sprintf('%.2f', $abilityinrange),
             'testaverageposition' => ($testaverageinrange + $abilityrange['maxscalevalue']) * 10,
