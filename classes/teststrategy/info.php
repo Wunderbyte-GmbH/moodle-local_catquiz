@@ -152,7 +152,11 @@ class info {
         $teststrategies = self::return_available_strategies();
 
         $teststrategiesoptions = [];
-        $strategieswithoutpilotquestions = [];
+        $strategieswithoutpilotquestions = [LOCAL_CATQUIZ_STRATEGY_CLASSIC];
+        $strategieswithoutquestionsperscale = [
+            LOCAL_CATQUIZ_STRATEGY_FASTEST,
+            LOCAL_CATQUIZ_STRATEGY_CLASSIC,
+        ];
         $strategyhasstandarderrorperscale = [];
         foreach ($teststrategies as $ts) {
             $teststrategiesoptions[$ts->id] = $ts->get_description();
@@ -178,7 +182,7 @@ class info {
             'advcheckbox',
             'catquiz_includepilotquestions',
             get_string('includepilotquestions', 'local_catquiz'));
-        $mform->hideIf('catquiz_includepilotquestions', 'catquiz_selectteststrategy', 'eq', $strategieswithoutpilotquestions);
+        $mform->hideIf('catquiz_includepilotquestions', 'catquiz_selectteststrategy', 'in', $strategieswithoutpilotquestions);
         // Add ratio of pilot questions.
         $elements[] = $mform->addElement('text', 'catquiz_pilotratio', get_string('pilotratio', 'local_catquiz'));
         $mform->hideIf('catquiz_pilotratio', 'catquiz_includepilotquestions', 'neq', 1);
@@ -269,6 +273,12 @@ class info {
             'maxquestionsscalegroup',
             get_string('numberofquestionsperscale', 'local_catquiz'));
         $mform->addHelpButton('maxquestionsscalegroup', 'numberofquestionsperscale', 'local_catquiz');
+        $mform->hideIf(
+            'maxquestionsscalegroup',
+            'catquiz_selectteststrategy',
+            'in',
+            $strategieswithoutquestionsperscale
+        );
 
         $standarderrorgroup = [
             $mform->createElement(
@@ -313,6 +323,12 @@ class info {
             'catquiz_standarderrorgroup',
             get_string('acceptedstandarderror', 'local_catquiz'));
         $mform->addHelpButton('catquiz_standarderrorgroup', 'acceptedstandarderror', 'local_catquiz');
+        $mform->hideIf(
+            'catquiz_standarderrorgroup',
+            'catquiz_selectteststrategy',
+            'in',
+            $strategyhasstandarderrorperscale
+        );
 
         $elements[] = $mform->addElement(
             'advcheckbox',
