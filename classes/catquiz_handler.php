@@ -426,20 +426,24 @@ class catquiz_handler {
             = get_string('setsevalue', 'local_catquiz', $sevalues);
         }
 
+        $hasmaxquestionsperscale = array_key_exists('maxquestionsscalegroup', $data);
         // Number of questions - validate higher and lower values.
-        if ((int) $data['maxquestionsscalegroup']['catquiz_minquestionspersubscale']
+        if ($hasmaxquestionsperscale
+            && (int) $data['maxquestionsscalegroup']['catquiz_minquestionspersubscale']
             >= (int) $data['maxquestionsscalegroup']['catquiz_maxquestionspersubscale']
             && 0 != (int) $data['maxquestionsscalegroup']['catquiz_maxquestionspersubscale']) {
             $errors['maxquestionsscalegroup'] = get_string('formminquestgreaterthan', 'local_catquiz');
         }
-        if ((int) $data['maxquestionsgroup']['catquiz_minquestions']
+        if ($hasmaxquestionsperscale
+            && (int) $data['maxquestionsgroup']['catquiz_minquestions']
             >= (int) $data['maxquestionsgroup']['catquiz_maxquestions']
             && 0 != (int) $data['maxquestionsgroup']['catquiz_maxquestions']) {
             $errors['maxquestionsgroup'] = get_string('formminquestgreaterthan', 'local_catquiz');
         }
 
         // Min questions per scale <= max questions per test.
-        if (0 != (int) $data['maxquestionsscalegroup']['catquiz_minquestionspersubscale']
+        if ($hasmaxquestionsperscale
+            && 0 != (int) $data['maxquestionsscalegroup']['catquiz_minquestionspersubscale']
             && 0 != (int) $data['maxquestionsgroup']['catquiz_maxquestions']) {
             if ((int) $data['maxquestionsscalegroup']['catquiz_minquestionspersubscale']
                 > (int) $data['maxquestionsgroup']['catquiz_maxquestions']) {
@@ -889,7 +893,11 @@ class catquiz_handler {
         }
 
         // Default is infinite represented by -1.
-        $maxquestionsperscale = intval($quizsettings->maxquestionsscalegroup->catquiz_maxquestionspersubscale);
+        $maxquestionsperscale = 0;
+        $hasmaxquestionsperscale = property_exists($quizsettings, 'maxquestionsscalegroup');
+        $maxquestionsperscale = $hasmaxquestionsperscale
+            ? intval($quizsettings->maxquestionsscalegroup->catquiz_maxquestionspersubscale)
+            : $maxquestionsperscale;
         if ($maxquestionsperscale == 0) {
             $maxquestionsperscale = -1;
         }
@@ -941,7 +949,7 @@ class catquiz_handler {
             'skip_reason' => null,
             'userid' => $USER->id,
             'max_attempts_per_scale' => $maxquestionsperscale,
-            'min_attempts_per_scale' => $quizsettings->maxquestionsscalegroup->catquiz_minquestionspersubscale,
+            'min_attempts_per_scale' => $quizsettings->maxquestionsscalegroup->catquiz_minquestionspersubscale ?? 0,
             'teststrategy' => $quizsettings->catquiz_selectteststrategy,
             'timestamp' => time(),
             'attemptid' => intval($attemptdata->id),
