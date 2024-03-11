@@ -18,7 +18,7 @@
  * The dataapi class.
  *
  * @package local_catquiz
- * @copyright 2023 Georg Maißer, <info@wunderbyte.at>
+ * @copyright 2024 Georg Maißer, <info@wunderbyte.at>
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
@@ -38,7 +38,7 @@ use stdClass;
  * Get and store data from db.
  *
  * @package local_catquiz
- * @copyright 2023 Georg Maißer, <info@wunderbyte.at>
+ * @copyright 2024 Georg Maißer, <info@wunderbyte.at>
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class dataapi {

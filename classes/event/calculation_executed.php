@@ -17,7 +17,7 @@
 /**
  * The calculation_executed event.
  * @package local_catquiz
- * @copyright 2023 Wunderbyte <info@wunderbyte.at>
+ * @copyright 2024 Wunderbyte <info@wunderbyte.at>
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
@@ -35,7 +35,7 @@ require_once($CFG->dirroot . '/local/catquiz/lib.php');
  * The calculation_executed event class.
  *
  * @property-read array $other { Extra information about event. Acesss an instance of the booking module }
- * @copyright 2023 Wunderbyte <info@wunderbyte.at>
+ * @copyright 2024 Wunderbyte <info@wunderbyte.at>
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class calculation_executed extends \core\event\base {

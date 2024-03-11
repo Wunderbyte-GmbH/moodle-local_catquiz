@@ -45,7 +45,7 @@ require_once($CFG->dirroot . '/local/catquiz/lib.php');
  *  - Time (start date and end date)
  *
  * @author Georg Maißer
- * @copyright 2023 Wunderbyte GmbH
+ * @copyright 2024 Wunderbyte GmbH
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class catcontext {

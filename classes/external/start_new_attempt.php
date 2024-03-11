@@ -42,7 +42,7 @@ require_once($CFG->libdir . '/externallib.php');
  * External Service for local catquiz.
  *
  * @package   local_catquiz
- * @copyright 2022 Wunderbyte GmbH {@link http://www.wunderbyte.at}
+ * @copyright 2024 Wunderbyte GmbH {@link http://www.wunderbyte.at}
  * @author    Georg Maißer
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */

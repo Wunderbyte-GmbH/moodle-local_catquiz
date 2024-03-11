@@ -18,7 +18,7 @@
  * Class filterbystandarderror.
  *
  * @package local_catquiz
- * @copyright 2023 Wunderbyte GmbH
+ * @copyright 2024 Wunderbyte GmbH
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
@@ -39,7 +39,7 @@ use local_catquiz\wb_middleware;
  * Enables or disables scales depending on their standarderror and number of played questions.
  *
  * @package local_catquiz
- * @copyright 2023 Wunderbyte GmbH
+ * @copyright 2024 Wunderbyte GmbH
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class filterbytestinfo extends preselect_task implements wb_middleware {

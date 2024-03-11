@@ -28,7 +28,7 @@ require_once($CFG->dirroot . '/question/format/xml/format.php');
  *
  * @package local_catquiz
  * @category test
- * @copyright 2023 Andrii Semenets
+ * @copyright 2024 Andrii Semenets
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class local_catquiz_generator extends testing_module_generator {

@@ -33,7 +33,7 @@ use local_catquiz\local\model\model_raschmodel;
  * Class rasch of catmodels.
  *
  * @package    catmodel_rasch
- * @copyright 2023 Wunderbyte GmbH <georg.maisser@wunderbyte.at>
+ * @copyright 2024 Wunderbyte GmbH <georg.maisser@wunderbyte.at>
  * @license  http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class rasch extends model_raschmodel {

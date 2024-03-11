@@ -42,7 +42,7 @@ use stdClass;
  * Class catquiz
  *
  * @author Georg Maißer
- * @copyright 2022 Wunderbyte GmbH
+ * @copyright 2024 Wunderbyte GmbH
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class catquiz {

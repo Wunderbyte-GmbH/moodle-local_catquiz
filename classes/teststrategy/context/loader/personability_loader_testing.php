@@ -18,7 +18,7 @@
  * Class personability_loader_testing just overrides the part that retrieves data from the database.
  *
  * @package local_catquiz
- * @copyright 2023 Wunderbyte GmbH
+ * @copyright 2024 Wunderbyte GmbH
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
@@ -28,7 +28,7 @@ namespace local_catquiz\teststrategy\context\loader;
  * Class pilotquestions_loader for test strategy.
  *
  * @package local_catquiz
- * @copyright 2023 Wunderbyte GmbH
+ * @copyright 2024 Wunderbyte GmbH
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class personability_loader_testing extends personability_loader {

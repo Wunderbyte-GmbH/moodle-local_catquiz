@@ -18,7 +18,7 @@
  * The catscale_structure class.
  *
  * @package local_catquiz
- * @copyright 2023 Georg Maißer, <info@wunderbyte.at>
+ * @copyright 2024 Georg Maißer, <info@wunderbyte.at>
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
@@ -30,7 +30,7 @@ use moodle_url;
  * Simple data structure reflecting the db table scheme. Should be same as in install.xml.
  *
  * @package local_catquiz
- * @copyright 2023 Georg Maißer, <info@wunderbyte.at>
+ * @copyright 2024 Georg Maißer, <info@wunderbyte.at>
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class catscale_structure {

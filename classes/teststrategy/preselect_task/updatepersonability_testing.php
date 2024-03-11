@@ -36,7 +36,7 @@ use local_catquiz\teststrategy\preselect_task\updatepersonability;
  * Update person ability testing.
  *
  * @package local_catquiz
- * @copyright 2023 Wunderbyte GmbH
+ * @copyright 2024 Wunderbyte GmbH
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class updatepersonability_testing extends updatepersonability {

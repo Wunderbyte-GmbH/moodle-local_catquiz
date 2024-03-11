@@ -18,7 +18,7 @@
  * Abstract class strategy.
  *
  * @package local_catquiz
- * @copyright 2023 Wunderbyte GmbH
+ * @copyright 2024 Wunderbyte GmbH
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
@@ -43,7 +43,7 @@ use stdClass;
  * Base class for test strategies.
  *
  * @package local_catquiz
- * @copyright 2023 Wunderbyte GmbH
+ * @copyright 2024 Wunderbyte GmbH
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 abstract class strategy {

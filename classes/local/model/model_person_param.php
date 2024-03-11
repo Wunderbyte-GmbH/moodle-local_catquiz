@@ -18,7 +18,7 @@
  * Entities Class to display list of entity records.
  *
  * @package local_catquiz
- * @copyright 2023 Wunderbyte GmbH <info@wunderbyte.at>
+ * @copyright 2024 Wunderbyte GmbH <info@wunderbyte.at>
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
@@ -30,7 +30,7 @@ namespace local_catquiz\local\model;
  * This is one of the return values from a model param estimation.
  *
  * @package local_catquiz
- * @copyright 2023 Wunderbyte GmbH <info@wunderbyte.at>
+ * @copyright 2024 Wunderbyte GmbH <info@wunderbyte.at>
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class model_person_param implements \ArrayAccess {

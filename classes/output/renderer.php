@@ -18,7 +18,7 @@
  * Plugin event observers are registered here.
  *
  * @package local_catquiz
- * @copyright 2023 Wunderbyte Gmbh <info@wunderbyte.at>
+ * @copyright 2024 Wunderbyte Gmbh <info@wunderbyte.at>
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 

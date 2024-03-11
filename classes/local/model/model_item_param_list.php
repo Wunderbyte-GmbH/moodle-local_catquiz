@@ -18,7 +18,7 @@
  * Entities Class to display list of entity records.
  *
  * @package local_catquiz
- * @copyright 2023 Wunderbyte GmbH <info@wunderbyte.at>
+ * @copyright 2024 Wunderbyte GmbH <info@wunderbyte.at>
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
@@ -50,7 +50,7 @@ require_once($CFG->dirroot . '/local/catquiz/lib.php');
  * This is one of the return values from a model param estimation.
  *
  * @package local_catquiz
- * @copyright 2023 Wunderbyte GmbH <info@wunderbyte.at>
+ * @copyright 2024 Wunderbyte GmbH <info@wunderbyte.at>
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class model_item_param_list implements ArrayAccess, IteratorAggregate, Countable {

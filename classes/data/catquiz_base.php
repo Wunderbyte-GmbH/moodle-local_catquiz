@@ -18,7 +18,7 @@
  * The catquiz_base class.
  *
  * @package local_catquiz
- * @copyright 2023 Georg Maißer, <info@wunderbyte.at>
+ * @copyright 2024 Georg Maißer, <info@wunderbyte.at>
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
@@ -28,7 +28,7 @@ namespace local_catquiz\data;
  * Get and store data from db.
  *
  * @package local_catquiz
- * @copyright 2023 Georg Maißer, <info@wunderbyte.at>
+ * @copyright 2024 Georg Maißer, <info@wunderbyte.at>
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class catquiz_base {

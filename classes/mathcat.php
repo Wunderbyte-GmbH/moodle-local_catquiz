@@ -19,7 +19,7 @@
  *
  * @package local_catquiz
  * @author Daniel Pasterk
- * @copyright 2023 Wunderbyte GmbH
+ * @copyright 2024 Wunderbyte GmbH
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
@@ -30,7 +30,7 @@ namespace local_catquiz;
  *
  * @package local_catquiz
  * @author Daniel Pasterk
- * @copyright 2023 Wunderbyte GmbH
+ * @copyright 2024 Wunderbyte GmbH
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class mathcat {

@@ -18,7 +18,7 @@
  * Interface wb_middleware.
  *
  * @package local_catquiz
- * @copyright 2023 Wunderbyte GmbH
+ * @copyright 2024 Wunderbyte GmbH
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
@@ -30,7 +30,7 @@ use local_catquiz\local\result;
  * Interface for middleware classes
  *
  * @package local_catquiz
- * @copyright 2023 Wunderbyte GmbH
+ * @copyright 2024 Wunderbyte GmbH
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 interface wb_middleware {

@@ -18,7 +18,7 @@
  * The attempt_completed event.
  *
  * @package local_catquiz
- * @copyright 2023 Georg Maißer, <info@wunderbyte.at>
+ * @copyright 2024 Georg Maißer, <info@wunderbyte.at>
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
@@ -31,7 +31,7 @@ use moodle_url;
  * The attempt_completed event class.
  *
  * @property-read array $other { Extra information about event. Acesss an instance of the booking module }
- * @copyright 2023 Georg Maißer
+ * @copyright 2024 Georg Maißer
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class attempt_completed extends \core\event\base {

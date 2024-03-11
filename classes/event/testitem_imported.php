@@ -18,7 +18,7 @@
  * The testiteminscale_added event.
  *
  * @package local_catquiz
- * @copyright 2023 Wunderbyte <info@wunderbyte.at>
+ * @copyright 2024 Wunderbyte <info@wunderbyte.at>
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
@@ -29,7 +29,7 @@ use moodle_url;
  * The catscale_updated event class.
  *
  * @property-read array $other { Extra information about event. Acesss an instance of the booking module }
- * @copyright 2023 Wunderbyte <info@wunderbyte.at>
+ * @copyright 2024 Wunderbyte <info@wunderbyte.at>
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class testitem_imported extends \core\event\base {

@@ -19,7 +19,7 @@
  *
  * @package local_catquiz
  * @category external
- * @copyright 2023 Wunderbyte GmbH (info@wunderbyte.at)
+ * @copyright 2024 Wunderbyte GmbH (info@wunderbyte.at)
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  * @since Moodle 4.0
  */

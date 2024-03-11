@@ -18,7 +18,7 @@
  * Class mixedraschbirnbaum.
  *
  * @package  catmodel_mixedraschbirnbaum
- * @copyright 2023 Wunderbyte GmbH <georg.maisser@wunderbyte.at>
+ * @copyright 2024 Wunderbyte GmbH <georg.maisser@wunderbyte.at>
  * @license  http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
@@ -32,7 +32,7 @@ use local_catquiz\local\model\model_raschmodel;
 /**
  * Class mixedraschbirnbaum of catmodels.
  *
- * @copyright 2023 Wunderbyte GmbH <georg.maisser@wunderbyte.at>
+ * @copyright 2024 Wunderbyte GmbH <georg.maisser@wunderbyte.at>
  * @license  http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class mixedraschbirnbaum extends model_raschmodel {

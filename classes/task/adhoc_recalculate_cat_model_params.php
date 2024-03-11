@@ -19,7 +19,7 @@
  *
  * @package local_catquiz
  * @author David Szkiba <david.szkiba@wunderbyte.at>
- * @copyright 2023 Wunderbyte GmbH
+ * @copyright 2024 Wunderbyte GmbH
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
@@ -32,7 +32,7 @@ use local_catquiz\catmodel_info;
  *
  * @package local_catquiz
  * @author David Szkiba <david.szkiba@wunderbyte.at>
- * @copyright 2023 Wunderbyte GmbH
+ * @copyright 2024 Wunderbyte GmbH
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class adhoc_recalculate_cat_model_params extends \core\task\adhoc_task {

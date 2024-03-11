@@ -20,7 +20,7 @@
  * @package local_catquiz
  * @subpackage db
  * @since Moodle 3.11
- * @copyright 2023 Wunderbyte GmbH
+ * @copyright 2024 Wunderbyte GmbH
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 

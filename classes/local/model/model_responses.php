@@ -18,7 +18,7 @@
  * Entities Class to display list of entity records.
  *
  * @package local_catquiz
- * @copyright 2023 Wunderbyte GmbH <info@wunderbyte.at>
+ * @copyright 2024 Wunderbyte GmbH <info@wunderbyte.at>
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
@@ -36,7 +36,7 @@ use local_catquiz\local\model\model_person_param_list;
  * E.g.: which users took part, how did they answer the questions, etc.
  *
  * @package local_catquiz
- * @copyright 2023 Wunderbyte GmbH <info@wunderbyte.at>
+ * @copyright 2024 Wunderbyte GmbH <info@wunderbyte.at>
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class model_responses {

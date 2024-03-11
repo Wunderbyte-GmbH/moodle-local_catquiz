@@ -18,7 +18,7 @@
  * Class pilotquestions_loader.
  *
  * @package local_catquiz
- * @copyright 2023 Wunderbyte GmbH
+ * @copyright 2024 Wunderbyte GmbH
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
@@ -29,7 +29,7 @@ use local_catquiz\teststrategy\context\contextloaderinterface;
  * Moves pilot questions to a separate context key `pilot_questions` and removes them from the `questions` key.
  *
  * @package local_catquiz
- * @copyright 2023 Wunderbyte GmbH
+ * @copyright 2024 Wunderbyte GmbH
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class pilotquestions_loader implements contextloaderinterface {

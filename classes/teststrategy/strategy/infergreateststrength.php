@@ -18,7 +18,7 @@
  * Class infergreateststrength.
  *
  * @package local_catquiz
- * @copyright 2023 Wunderbyte GmbH
+ * @copyright 2024 Wunderbyte GmbH
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
@@ -60,7 +60,7 @@ require_once($CFG->dirroot . '/local/catquiz/lib.php');
  * This strategy will prefer questions from a CAT scale where the user has the largest person ability values.
  *
  * @package local_catquiz
- * @copyright 2023 Wunderbyte GmbH
+ * @copyright 2024 Wunderbyte GmbH
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class infergreateststrength extends strategy {

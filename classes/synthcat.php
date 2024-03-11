@@ -19,7 +19,7 @@
  *
  * @package local_catquiz
  * @author Daniel Pasterk
- * @copyright 2023 Wunderbyte GmbH
+ * @copyright 2024 Wunderbyte GmbH
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
@@ -33,7 +33,7 @@ defined('MOODLE_INTERNAL') || die();
  *
  * @package local_catquiz
  * @author Daniel Pasterk
- * @copyright 2023 Wunderbyte GmbH
+ * @copyright 2024 Wunderbyte GmbH
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class synthcat {
@@ -368,7 +368,7 @@ class synthcat {
  *
  * @package local_catquiz
  * @author Daniel Pasterk
- * @copyright 2023 Wunderbyte GmbH
+ * @copyright 2024 Wunderbyte GmbH
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class mytestclass {
@@ -388,7 +388,7 @@ class mytestclass {
  *
  * @package local_catquiz
  * @author Daniel Pasterk
- * @copyright 2023 Wunderbyte GmbH
+ * @copyright 2024 Wunderbyte GmbH
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class synthcat2 {

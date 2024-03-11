@@ -18,7 +18,7 @@
  * Class numberofgeneralattempts_testing.
  *
  * @package local_catquiz
- * @copyright 2023 Wunderbyte GmbH
+ * @copyright 2024 Wunderbyte GmbH
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
@@ -28,7 +28,7 @@ namespace local_catquiz\teststrategy\preselect_task;
  * Overwrites the method to get the attempts to prevent DB access.
  *
  * @package local_catquiz
- * @copyright 2023 Wunderbyte GmbH
+ * @copyright 2024 Wunderbyte GmbH
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 final class numberofgeneralattempts_testing extends numberofgeneralattempts {

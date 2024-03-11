@@ -18,7 +18,7 @@
  * Class comparetotestaverage.
  *
  * @package local_catquiz
- * @copyright 2023 Wunderbyte GmbH
+ * @copyright 2024 Wunderbyte GmbH
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
@@ -41,7 +41,7 @@ require_once($CFG->dirroot.'/local/catquiz/lib.php');
  * Compare the ability of this attempt to the average abilities of other students that took this test.
  *
  * @package local_catquiz
- * @copyright 2023 Wunderbyte GmbH
+ * @copyright 2024 Wunderbyte GmbH
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class comparetotestaverage extends feedbackgenerator {

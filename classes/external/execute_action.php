@@ -43,7 +43,7 @@ require_once($CFG->libdir . '/externallib.php');
  * External Service for local wunderbyte_table to (re)load data.
  *
  * @package   local_catquiz
- * @copyright 2023 Wunderbyte GmbH {@link http://www.wunderbyte.at}
+ * @copyright 2024 Wunderbyte GmbH {@link http://www.wunderbyte.at}
  * @author    Georg Maißer
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
