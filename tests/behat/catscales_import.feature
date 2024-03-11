@@ -45,6 +45,11 @@ Feature: As an admin I perform import of catscales along with questions to check
     And I should see "Mathematik"
     And I should see "A03"
     And I should see "A02"
+    And I click on "Edit" "link" in the "[data-name=\"Mathematik\"]" "css_element"
+    And the following fields match these values:
+      | Name                               | Mathematik        |
+      | Person ability minimum             | -2.00             |
+      | Person ability maximum:            | 2.00              |
     And I click on "Questions" "link" in the "#region-main" "css_element"
     And I set the field "Scale" to "Mathematik"
     And I should see "3 of 3 records found"
