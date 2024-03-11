@@ -433,7 +433,7 @@ class raschbirnbaum extends model_raschmodel {
     public static function get_log_tr_jacobian($ip): array {
         // Set values for difficulty parameter.
 
-        // TODO: @DAVID: Diese Werte sollten dynamisch berechnet werden können.
+        // TODO: @DAVID: We should be able to calculate these values dynamically.
         $am = 0; // Mean of difficulty.
         $as = 2; // Standard derivation of difficulty.
 
@@ -458,7 +458,7 @@ class raschbirnbaum extends model_raschmodel {
     public static function get_log_tr_hessian(array $ip): array {
         // Set values for difficulty parameter.
 
-        // TODO: @DAVID: Diese Werte sollten dynamisch berechnet werden können.
+        // TODO: @DAVID: We should be able to calculate these values dynamically.
         $am = 0; // Mean of difficulty.
         $as = 2; // Standard derivation of difficulty.
 

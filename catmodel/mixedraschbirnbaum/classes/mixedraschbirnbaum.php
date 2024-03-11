@@ -379,7 +379,7 @@ class mixedraschbirnbaum extends model_raschmodel {
 
         $derivative = [];
 
-        // TODO: @RALF: Korrekte Formeln für 3PL implementieren!
+        // TODO: @RALF: Implement formulas for 3PL.
 
         $derivative[0] = $n * 2 * $b * ($b * ($a - $pp) + log($or)); // Calculate d/da.
         $derivative[1] = $n * 2 * ($a - $pp) * ($b * ($a - $pp) + log($or)); // Calculate d/db.
@@ -404,7 +404,7 @@ class mixedraschbirnbaum extends model_raschmodel {
 
         $derivative = [[]];
 
-        // TODO: @RALF: Korrekte Formeln für 3PL implementieren!
+        // TODO: @RALF: Implement formulas for 3PL.
 
         $derivative[0][0]  = $n * 2 * $b ** 2; // Calculate d²2/da².
         $derivative[0][1]  = 0; // TODO: $n * 2 * (2 * $b * ($a - $pp) + log($or)); // Calculate d/da d/db.
