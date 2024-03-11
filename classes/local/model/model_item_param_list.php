@@ -618,15 +618,28 @@ class model_item_param_list implements ArrayAccess, IteratorAggregate, Countable
                 }
             }
 
-            $catscale = new catscale_structure([
-                'name' => $parent,
-                'parentid' => $catscaleid,
-                'description' => '',
-                'timecreated' => time(),
-                'timemodified' => time(),
-                'minscalevalue' => LOCAL_CATQUIZ_PERSONABILITY_LOWER_LIMIT,
-                'maxscalevalue' => LOCAL_CATQUIZ_PERSONABILITY_UPPER_LIMIT,
-            ]);
+            // For new rootscales, add min & max scalevalue.
+            if ($catscaleid == 0
+                && (isset($newrecord['minscalevalue'])
+                    || isset($newrecord['maxscalevalue']))) {
+                $catscale = new catscale_structure([
+                    'name' => $parent,
+                    'parentid' => $catscaleid,
+                    'description' => '',
+                    'timecreated' => time(),
+                    'timemodified' => time(),
+                    'minscalevalue' => $newrecord['minscalevalue'] ?? LOCAL_CATQUIZ_PERSONABILITY_LOWER_LIMIT,
+                    'maxscalevalue' => $newrecord['maxscalevalue'] ?? LOCAL_CATQUIZ_PERSONABILITY_UPPER_LIMIT,
+                ]);
+            } else {
+                $catscale = new catscale_structure([
+                    'name' => $parent,
+                    'parentid' => $catscaleid,
+                    'description' => '',
+                    'timecreated' => time(),
+                    'timemodified' => time(),
+                ]);
+            }
 
             $catscaleid = dataapi::create_catscale($catscale);
             if ($parent == $newrecord['catscalename'] || !$parentsgiven) {

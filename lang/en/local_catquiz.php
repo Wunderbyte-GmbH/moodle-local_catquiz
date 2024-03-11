@@ -227,6 +227,8 @@ $string['eventtime'] = 'Event time';
 $string['eventname'] = 'Event name';
 $string['testitem_imported'] = 'Testitem(s) imported';
 $string['imported_testitem_description'] = '{$a} testitems were imported.';
+$string['minscalevalueinformation'] = 'Minimum value of person ability. Will only be set when creating a new root scale and then applies to all sub-scales. Values in existing scales cannot be changed via import. If you want to change the values of an existing scale, please switch to the "Scales" tab.';
+$string['maxscalevalueinformation'] = 'Maximum value of person ability. Will only be set when creating a new root scale and then applies to all sub-scales. Values in existing scales cannot be changed via import. If you want to change the values of an existing scale, please switch to the "Scales" tab.';
 
 // Message.
 $string['messageprovider:catscaleupdate'] = 'Notification of CAT scale update';

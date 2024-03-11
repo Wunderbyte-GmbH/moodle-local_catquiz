@@ -563,6 +563,8 @@ $string['dataincomplete'] = 'Der Datensatz mit "componentid" {$a->id} ist unvoll
 $string['modelinformation'] = 'Dieses Feld ist notwendig, um Fragen vollständig zu erfassen. Ist das Feld leer, kann die Frage lediglich einer Skala zugeordnet werden.';
 $string['parentscalenamesinformation'] = 'Präzisieren Sie hier die übergeordneten Skalen der Skala um eine eindeutige Zuordnung zu ermöglichen. Übergeordnete Skalen können beim Import angelegt werden. Starten sie mit dem Namen der höchsten Skala und fügen sie alle Kinder mit "|" (Vertikaler String Unicode U+007C - nicht zu verwechseln mit "/" Slash) getrennt hinzu. Vergessen Sie dabei nicht die Globalskala. Für den Import von Items in die Globalskala, geben Sie bitte "0" in diesem Feld an.';
 $string['statusactiveorinactive'] = 'Der Aktivitätsstatus. Geben Sie "1" an um sicher zu stellen, um den Datensatz von der Verwendung auszuschließen. Lassen Sie das Feld leer oder setzen "0", gilt der Datensatz als aktiv.';
+$string['minscalevalueinformation'] = 'Minimalwert der Personenfähigkeit. Wird nur bei Erzeugung einer neuen Globalskala gesetzt und gilt für alle Sub-Skalen. Werte in bestehenden Skalen können nicht via Import verändert werden. Möchten Sie die Werte einer bereits bestehenden Skala ändern, bitte auf das "Skalen"-Tab wechseln.';
+$string['maxscalevalueinformation'] = 'Maximalwert der Personenfähigkeit. Wird nur bei Erzeugung einer neuen Globalskala gesetzt und gilt für alle Sub-Skalen. Werte in bestehenden Skalen können nicht via Import verändert werden. Möchten Sie die Werte einer bereits bestehenden Skala ändern, bitte auf das "Skalen"-Tab wechseln.';
 
 // Testenvironments table.
 $string['notifyallteachers'] = 'Kursleiter der gewählten Kurse benachrichtigen';
