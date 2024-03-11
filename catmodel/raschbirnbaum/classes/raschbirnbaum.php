@@ -60,26 +60,6 @@ class raschbirnbaum extends model_raschmodel {
     }
 
     /**
-     * Get item parameters.
-     *
-     * @return model_item_param_list
-     */
-    public static function get_item_parameters(): model_item_param_list {
-        // TODO implement.
-        return new model_item_param_list();
-    }
-
-    /**
-     * Get person abilities.
-     *
-     * @return model_person_param_list
-     */
-    public static function get_person_abilities(): model_person_param_list {
-        // TODO implement.
-        return new model_person_param_list();
-    }
-
-    /**
      * Estimate item parameters
      *
      * @param mixed $itemresponse
