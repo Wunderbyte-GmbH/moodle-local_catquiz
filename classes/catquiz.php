@@ -1479,10 +1479,10 @@ class catquiz {
 
         $sql = "SELECT *
                 FROM {user}
-                WHERE id = $userid AND 1=1
+                WHERE id = :userid
                 ";
 
-        $record = $DB->get_record_sql($sql);
+        $record = $DB->get_record_sql($sql, ['userid' => $userid]);
 
         return $record;
     }
