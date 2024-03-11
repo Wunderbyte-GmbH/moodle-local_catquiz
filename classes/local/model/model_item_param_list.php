@@ -622,14 +622,20 @@ class model_item_param_list implements ArrayAccess, IteratorAggregate, Countable
             if ($catscaleid == 0
                 && (isset($newrecord['minscalevalue'])
                     || isset($newrecord['maxscalevalue']))) {
+                if (isset($newrecord['minscalevalue']) && (float) $newrecord['minscalevalue'] <= 0) {
+                    $minscalevalue = $newrecord['minscalevalue'];
+                }
+                if (isset($newrecord['maxscalevalue']) && (float) $newrecord['maxscalevalue'] >= 0) {
+                    $maxscalevalue = $newrecord['maxscalevalue'];
+                }
                 $catscale = new catscale_structure([
                     'name' => $parent,
                     'parentid' => $catscaleid,
                     'description' => '',
                     'timecreated' => time(),
                     'timemodified' => time(),
-                    'minscalevalue' => $newrecord['minscalevalue'] ?? LOCAL_CATQUIZ_PERSONABILITY_LOWER_LIMIT,
-                    'maxscalevalue' => $newrecord['maxscalevalue'] ?? LOCAL_CATQUIZ_PERSONABILITY_UPPER_LIMIT,
+                    'minscalevalue' => $minscalevalue ?? LOCAL_CATQUIZ_PERSONABILITY_LOWER_LIMIT,
+                    'maxscalevalue' => $maxscalevalue ?? LOCAL_CATQUIZ_PERSONABILITY_UPPER_LIMIT,
                 ]);
             } else {
                 $catscale = new catscale_structure([
