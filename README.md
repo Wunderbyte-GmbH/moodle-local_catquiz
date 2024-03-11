@@ -1,18 +1,33 @@
-# ALiSe CAT Quiz #
+# Adaptive Quiz - Advanced CAT Module #
 
 ## Short description ##
-The plugin local_catquiz implements Computer Adaptive Testing (CAT) in Moodle. Using static Item Response Theory (IRT) models, test takers are presented only with questions that fall within their identified ability range, based on the answers they give. This shortens the required test length and increases test accuracy.
-The plugin is a central part of the CATQuiz plugin family.
+The plugin local_catquiz implements full Computer Adaptive Testing (CAT) capabilities in Moodle. Using common one-dimensional Item Response Theory (IRT) models, test takers are presented only with questions that fall within their identified ability range, based on the answers they give.
 
 ## Detailed description ##
-The plugin can be used with dichotomous question types in Moodle that allow automatic scoring (e.g. multiple choice or cloze text). Depending on the question format, the plugin provides different IRT models:
-* Rasch-Model (1 parametric logistic model)
-* 2PL-Rasch-Birnbaum
-* 3PL-Mixed-Rasch-Birnbaum
+The plugin can be used with all types of questions in Moodle that allow for automatic scoring (e.g. multiple choice or cloze text). The plugin provides different IRT models:
+* dichotomous questions (only account for right or wrong answers)
+    * Rasch-Model (1 parametric logistic model)
+    * 2PL-Rasch-Birnbaum
+    * 3PL-Mixed-Rasch-Birnbaum
+* polytomous questions (account for right, wrong and partially correct answers)
+    * models will be realized in upcoming versions
 
-In addition, the plug-in enables the creation, administration and modification of different scales on which measurements are taken. For this purpose, the plug-in creates a new role "catquiz Manager", who is authorized to perform these administrative tasks for defined course areas.
+The plugin enables the creation, administration and modification of different scales on which measurements are taken. For this purpose, the plug-in creates a new role "CAT Manager", which is authorized to perform these administrative tasks.
 
-The plugin makes use of the mod_adaptive plugin. It is therefore required to install that as well.
+Furthermore, the plugin allows to pursuit different test strategies:
+* running a normal CAT
+* adaptive diagnose for weakest/strongest ability in selected (sub-)scales
+* adaptive diagnose for all given (sub-)scales
+* run a classical test (ask all questions), but evaluate by using IRT
+
+For using this plugin, you are required to install the following plugins:
+* mod_adaptivequiz - the activity from which a CAT test can be started (vers 3.1 onwards)
+* adaptivequizcatmodel_catquiz - which serves as a bridge between mod_adaptivequiz and local_adaptivequiz
+* local_wunderbyte_table - database and tables handling
+
+It is recommended to install the following plugins as well:
+* local_shortcodes - helps to render results at any point in yout courses
+* local_adaptivelearningpaths - adds the possibility to define learning paths based on quiz and adaptive quiz results (to be released soon)
 
 ## Core concepts & Terminology ##
 The plugin tries to present questions matching the ability of the student. To assign parameters like difficulty to each question, questions and params are grouped as items.
@@ -33,7 +48,7 @@ The csv importer accepts different formats of separators and encodings. Some col
 ## Shortcodes ##
 To use the shortcode functionality, use plugin filter_shortcodes: https://moodle.org/plugins/filter_shortcodes
 
-Shortcodes can be added to a course in a Text and Media area.
+Shortcodes can be added in any text area and label via editor, e.g. in the course.
 
 1. To display feedbacks of the past quiz attempts use [catquizfeedback].
 
