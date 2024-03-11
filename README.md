@@ -1,34 +1,40 @@
 # ALiSe CAT Quiz #
 
 ## Short description ##
-The plugin local_catquiz implements Computer Adaptive Testing (CAT) in Moodle. Using static Item Response Theory (IRT) models, test takers are presented only with questions that fall within their identified ability range, based on the answers they give.
+The plugin local_catquiz implements Computer Adaptive Testing (CAT) in Moodle. Using static Item Response Theory (IRT) models, test takers are presented only with questions that fall within their identified ability range, based on the answers they give. This shortens the required test length and increases test accuracy.
 The plugin is a central part of the CATQuiz plugin family.
 
 ## Detailed description ##
-
-The plugin local_catquiz implements Computer Adaptive Testing (CAT) in Moodle. Using static Item Response Theory (IRT) models, test takers are presented only with questions that fall within their identified ability range, based on the answers they give. This shortens the required test length and increases test accuracy.
-The plugin can be used with all question types in Moodle that allow automatic scoring (e.g. multiple choice or cloze text). Depending on the question format, the plugin provides different IRT models:
+The plugin can be used with dichotomous question types in Moodle that allow automatic scoring (e.g. multiple choice or cloze text). Depending on the question format, the plugin provides different IRT models:
 * Rasch-Model (1 parametric logistic model)
 * 2PL-Rasch-Birnbaum
 * 3PL-Mixed-Rasch-Birnbaum
-* Graded Response Model
-* Generalized Partial Credit Model
 
-In addition, the plug-in enables the creation, administration and modification of different scales on which measurements are taken. For this purpose, the plug-in creates a new role "Test Administrator", which is authorized to perform these administrative tasks for defined course areas.
+In addition, the plug-in enables the creation, administration and modification of different scales on which measurements are taken. For this purpose, the plug-in creates a new role "catquiz Manager", who is authorized to perform these administrative tasks for defined course areas.
 
-The plugin is a central part of the CATQuiz plugin family. It is recommended to install the following plugins as well:
-* mod_adaptive - the activity from which a CAT test can be started
-* mod_catquizfeedbackgrouping - a text block that gives detailed feedback on a CAT test and optionally assigns users to groups according to this feedback
-* task_catquizparamest - a background task for calculating item parameters of deployed CAT test questions
+The plugin makes use of the mod_adaptive plugin. It is therefore required to install that as well.
+
+## Core concepts & Terminology ##
+The plugin tries to present questions matching the ability of the student. To assign parameters like difficulty to each question, questions and params are grouped as items.
+
+* Items: Question with parameters
+* Parameters: Describe the difficulty of a question with one or more values.
+* Models: Models provide the functionality to identify a question that is the best match to a given ability.
+* Scales: Items are grouped in scales (and subscales) for example you could have a parentscale "mathematics" with subscales "algebra" and "geometry".
+* Contexts: Contexts allow you to reuse the same question with different params without overwriting the item. This could be useful if e.g. the question is part of different quizzes.
+* Importer: The best way to import items, params and scales is to use the plugins csv importer.
+
+## CSV Importer ##
+The csv importer accepts different formats of separators and encodings. Some columns are mandatory whereas others are optional. Find detailed descriptions of all columns next to the importer. A demo csv file can be found in: local/catquiz/classes/importer/demo.csv
 
 ## Contexts ##
-
 * On import a new context is created and all testitems of concerned parentscale are duplicated. Only those present in the import are updated.
 
 ## Attempts ##
 * Attempts are calculated by the time of the context. Switching contexts only affects the number of attempts when the time includes or excludes responses.
 
 ## Shortcodes ##
+To use the shortcode functionality, use plugin filter_shortcodes: https://moodle.org/plugins/filter_shortcodes
 
 Shortcodes can be added to a course in a Text and Media area.
 
@@ -90,7 +96,7 @@ to complete the installation from the command line.
 
 ## License ##
 
-2022 Wunderbyte GmbH <info@wunderbyte.at>
+2024 Wunderbyte GmbH <info@wunderbyte.at>
 
 This program is free software: you can redistribute it and/or modify it under
 the terms of the GNU General Public License as published by the Free Software
