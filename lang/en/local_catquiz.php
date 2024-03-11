@@ -99,9 +99,9 @@ $string['timeoutabortresult'] = 'Test aborted with result.';
 $string['timeoutfinishwithresult'] = 'Test aborted after finished current question.';
 
 $string['minabilityscalevalue'] = 'Person ability minimum:';
-$string['minabilityscalevalue_help'] = 'Enter the smallest possible person ability of this scale as a negative decimal value. The mean is zero.';
+$string['minabilityscalevalue_help'] = 'Enter the lowest possible person ability of this scale as a negative decimal value. The mean is zero.';
 $string['maxabilityscalevalue'] = 'Person ability maximum:';
-$string['maxabilityscalevalue_help'] = 'Enter the largest possible person ability of this scale as a decimal value. The mean is zero.';
+$string['maxabilityscalevalue_help'] = 'Enter the highest possible person ability of this scale as a positive decimal value. The mean is zero.';
 $string['minscalevalue'] = 'Min value';
 $string['maxscalevalue'] = 'Max value';
 $string['min'] = 'min: ';
@@ -227,8 +227,8 @@ $string['eventtime'] = 'Event time';
 $string['eventname'] = 'Event name';
 $string['testitem_imported'] = 'Testitem(s) imported';
 $string['imported_testitem_description'] = '{$a} testitems were imported.';
-$string['minscalevalueinformation'] = 'Minimum value of person ability. Will only be set when creating a new root scale and then applies to all sub-scales. To do so, define values (at least) in first dataset. Values in existing scales cannot be changed via import. If you want to change the values of an existing scale, please switch to the "Scales" tab.';
-$string['maxscalevalueinformation'] = 'Maximum value of person ability. Will only be set when creating a new root scale and then applies to all sub-scales. To do so, define values (at least) in first dataset. Values in existing scales cannot be changed via import. If you want to change the values of an existing scale, please switch to the "Scales" tab.';
+$string['minscalevalueinformation'] = 'Enter the lowest possible person ability of this scale as a negative decimal value. The mean is zero. Will only be set when creating a new root scale and then applies to all sub-scales. To do so, define values (at least) in first dataset. Values in existing scales cannot be changed via import. If you want to change the values of an existing scale, please switch to the "Scales" tab.';
+$string['maxscalevalueinformation'] = 'Enter the highest possible person ability of this scale as a positive decimal value. The mean is zero. Will only be set when creating a new root scale and then applies to all sub-scales. To do so, define values (at least) in first dataset. Values in existing scales cannot be changed via import. If you want to change the values of an existing scale, please switch to the "Scales" tab.';
 
 // Message.
 $string['messageprovider:catscaleupdate'] = 'Notification of CAT scale update';
