@@ -824,7 +824,7 @@ class catquiz {
                 JOIN {local_catquiz_catscales} lcc ON lca.scaleid = lcc.id
                 JOIN {local_catquiz_catcontext} lccc ON lca.contextid = lccc.id
                 JOIN {course} c ON lca.courseid = c.id
-                JOIN {local_catquiz_tests} lct ON lca.instanceid = lct.componentid -- TODO: not sure about this
+                JOIN {local_catquiz_tests} lct ON lca.instanceid = lct.componentid
             ) as s1
         ";
 

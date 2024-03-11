@@ -251,7 +251,6 @@ class catquiz_handler {
      * @return void
      */
     public static function instance_form_before_set_data(stdClass &$data) {
-        // Todo: We might rather use data_preprocessing.
     }
 
     /**
