@@ -27,6 +27,7 @@ require_once(__DIR__ . '/../../../../lib/behat/behat_base.php');
 
 /**
  * To create catquiz specific behat scearios.
+ * @package local_catquiz
  */
 class behat_catquiz extends behat_base {
 
