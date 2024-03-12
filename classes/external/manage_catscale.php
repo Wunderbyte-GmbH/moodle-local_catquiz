@@ -55,9 +55,9 @@ class manage_catscale extends external_api {
                 [
                         'name' => new external_value(PARAM_TEXT, 'The name of the catscale', VALUE_REQUIRED),
                         'description' => new external_value(PARAM_RAW, 'The description of the catscale', VALUE_REQUIRED),
-                        'minscalevalue' => new external_value(PARAM_FLOAT, 'Min scale value', VALUE_REQUIRED),
-                        'maxscalevalue' => new external_value(PARAM_FLOAT, 'Max scale value', VALUE_REQUIRED),
                         'action' => new external_value(PARAM_ALPHA, 'update or create', VALUE_REQUIRED),
+                        'minscalevalue' => new external_value(PARAM_FLOAT, 'Min scale value', VALUE_OPTIONAL),
+                        'maxscalevalue' => new external_value(PARAM_FLOAT, 'Max scale value', VALUE_OPTIONAL),
                         'parentid' => new external_value(PARAM_INT, 'The parent ID of the catscale', VALUE_DEFAULT, 0),
                         'id' => new external_value(PARAM_INT, 'The id of the catscale', VALUE_DEFAULT, 0),
                 ]
@@ -69,9 +69,9 @@ class manage_catscale extends external_api {
      *
      * @param string $name
      * @param string $description
-     * @param float $minscalevalue
-     * @param float $maxscalevalue
      * @param string $action
+     * @param float|null $minscalevalue
+     * @param float|null $maxscalevalue
      * @param int|null $parentid
      * @param int|null $id
      *
@@ -80,9 +80,9 @@ class manage_catscale extends external_api {
     public static function execute(
                                 string $name,
                                 string $description,
-                                float $minscalevalue,
-                                float $maxscalevalue,
                                 string $action,
+                                float $minscalevalue = null,
+                                float $maxscalevalue = null,
                                 int $parentid = null,
                                 int $id = null
                                 ): array {

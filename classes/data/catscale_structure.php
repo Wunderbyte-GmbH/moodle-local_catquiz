@@ -45,10 +45,10 @@ class catscale_structure {
     public string $description;
 
     /** @var float $minscalevalue */
-    public float $minscalevalue = 0;
+    public float $minscalevalue;
 
     /** @var float $maxscalevalue */
-    public float $maxscalevalue = 0;
+    public float $maxscalevalue;
 
     /** @var int $timecreated */
     public int $timecreated;
@@ -74,6 +74,8 @@ class catscale_structure {
      * @param array $data
      */
     public function __construct(array $data) {
+        global $CFG;
+        require_once($CFG->dirroot . '/local/catquiz/lib.php');
         if (!empty($data)) {
             // ID is only known after object has been saved to db.
             if (!empty($data['id'])) {
@@ -85,14 +87,15 @@ class catscale_structure {
             $this->timecreated = $data['timecreated'];
             $this->name = $data['name'];
             $this->description = $data['description'] ?? '';
-            $this->minscalevalue
-                = empty($data["minscalevalue"])
-                ? LOCAL_CATQUIZ_PERSONABILITY_LOWER_LIMIT
-                : $data["minscalevalue"];
-            $this->maxscalevalue
-                = empty($data["maxscalevalue"])
-                ? LOCAL_CATQUIZ_PERSONABILITY_UPPER_LIMIT
-                : $data["maxscalevalue"];
+
+            if ($data['parentid'] == 0) {
+                $this->minscalevalue = isset($data["minscalevalue"]) ?
+                    $data["minscalevalue"] : LOCAL_CATQUIZ_PERSONABILITY_LOWER_LIMIT;
+            }
+            if ($data['parentid'] == 0) {
+                $this->maxscalevalue = isset($data["maxscalevalue"]) ?
+                    $data["maxscalevalue"] : LOCAL_CATQUIZ_PERSONABILITY_UPPER_LIMIT;
+            }
 
             if (!empty($data['id'])) {
                 $url = new moodle_url('/local/catquiz/manage_catscales.php', [
