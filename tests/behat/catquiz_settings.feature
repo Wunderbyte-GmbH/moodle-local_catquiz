@@ -34,6 +34,7 @@ Feature: As a teacher I setup adaptive quiz with CATquiz Scales and Feedbacks.
       | Name             | Adaptive CATquiz  |
       | ID number        | adaptivecatquiz1  |
       | catmodel         | Catquiz CAT model |
+      | catquiz_selectteststrategy | 1 |
       | Select CAT scale | Simulation        |
       ## Should we expect defaults?
       | catquiz_standarderrorgroup[catquiz_standarderror_min] | 0.4 |
@@ -60,10 +61,11 @@ Feature: As a teacher I setup adaptive quiz with CATquiz Scales and Feedbacks.
     And I follow "Settings"
     ## And I wait until the page is ready
     And I set the following fields to these values:
-      | catmodel         | Catquiz CAT model |
-      | Select CAT scale | Simulation        |
-      | catquiz_standarderrorgroup[catquiz_standarderror_min] | 0.4 |
-      | catquiz_standarderrorgroup[catquiz_standarderror_max] | 0.6 |
+      | catmodel                                              | Catquiz CAT model |
+      | Select CAT scale                                      | Simulation        |
+      | catquiz_selectteststrategy                            | 1                 |
+      | catquiz_standarderrorgroup[catquiz_standarderror_min] | 0.4               |
+      | catquiz_standarderrorgroup[catquiz_standarderror_max] | 0.6               |
     When I wait until the page is ready
     ## Verify all root catscales active by default
     Then I should see "SimA" in the "#id_catquiz_headercontainer" "css_element"
@@ -219,6 +221,7 @@ Feature: As a teacher I setup adaptive quiz with CATquiz Scales and Feedbacks.
     And I set the following fields to these values:
       | catmodel                                              | Catquiz CAT model |
       | Select CAT scale                                      | Simulation        |
+      | catquiz_selectteststrategy                            | 1                 |
       | catquiz_standarderrorgroup[catquiz_standarderror_min] | 0.4               |
       | catquiz_standarderrorgroup[catquiz_standarderror_max] | 0.6               |
     ## Delay required to settle CAT scale
