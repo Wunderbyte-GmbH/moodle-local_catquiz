@@ -31,8 +31,6 @@ use cache_helper;
 use cm_info;
 use coding_exception;
 use context_system;
-use core_plugin_manager;
-use Exception;
 use local_catquiz\feedback\feedbackclass;
 use local_catquiz\local\model\model_strategy;
 use local_catquiz\output\attemptfeedback;
