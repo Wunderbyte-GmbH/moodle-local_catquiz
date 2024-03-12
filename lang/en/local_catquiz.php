@@ -622,3 +622,13 @@ $string['stringdate:month:11'] = 'November';
 $string['stringdate:month:12'] = 'December';
 $string['stringdate:quarter'] = 'Q{$a}';
 
+// Cache Definitions.
+$string['cachedef_adaptivequizattempt'] = 'Adaptive quiz attempt';
+$string['cachedef_catcontexts'] = 'Contexts of catquiz';
+$string['cachedef_eventlogtable'] = 'Logs of events';
+$string['cachedef_quizattempts'] = 'Quizattempt';
+$string['cachedef_studentstatstable'] = 'Data of students in table';
+$string['cachedef_testenvironments'] = 'Testenvironments';
+$string['cachedef_testitemstable'] = 'Data of testitem in table';
+$string['cachedef_teststrategies'] = 'Teststrategies';
+
