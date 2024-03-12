@@ -467,6 +467,7 @@ $string['lowestscaleselected'] = 'Ihre schwächste Skala {$a}';
 $string['parentscaleselected'] = 'Globalskala "{$a}"';
 $string['scaleselected'] = 'Skala "{$a}"';
 $string['abilityprofile'] = 'Fähigkeits-Score Profil in "{$a}"';
+$string['feedback_customscale_nofeedback'] = 'Es wurde kein Feedback für ihre Ergebnisse angegeben';
 
 // Chart in Feedback.
 $string['chartlegendabilityrelative'] = '{$a->difference} Unterschied zur Vergleichsskala (Fähigkeits-Score in dieser Skala: {$a->ability})';

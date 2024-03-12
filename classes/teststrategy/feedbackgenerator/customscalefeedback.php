@@ -184,7 +184,9 @@ class customscalefeedback extends feedbackgenerator {
         }
 
         if (! $scalefeedback) {
-            return null;
+            return [
+                'customscalefeedback' => get_string('feedback_customscale_nofeedback', 'local_catquiz')
+            ];
         }
 
         $catscales = catquiz::get_catscales(array_keys($scalefeedback));
