@@ -435,18 +435,6 @@ function xmldb_local_catquiz_upgrade($oldversion) {
         // Catquiz savepoint reached.
         upgrade_plugin_savepoint(true, 2024021500, 'local', 'catquiz');
     }
-    if ($oldversion < 2024031200) {
-
-        // Changing the default of field minscalevalue on table local_catquiz_catscales to drop it.
-        $table = new xmldb_table('local_catquiz_catscales');
-        $field = new xmldb_field('minscalevalue', XMLDB_TYPE_NUMBER, '10, 2', null, null, null, null, 'description');
-
-        // Launch change of default for field minscalevalue.
-        $dbman->change_field_default($table, $field);
-
-        // Catquiz savepoint reached.
-        upgrade_plugin_savepoint(true, 2024031200, 'local', 'catquiz');
-    }
 
     if ($oldversion < 2024030800) {
         // The subplugin names changed, so we need to change the value in the itemparams table.
@@ -466,6 +454,19 @@ function xmldb_local_catquiz_upgrade($oldversion) {
 
         // Catquiz savepoint reached.
         upgrade_plugin_savepoint(true, 2024030800, 'local', 'catquiz');
+    }
+
+    if ($oldversion < 2024031200) {
+
+        // Changing the default of field minscalevalue on table local_catquiz_catscales to drop it.
+        $table = new xmldb_table('local_catquiz_catscales');
+        $field = new xmldb_field('minscalevalue', XMLDB_TYPE_NUMBER, '10, 2', null, null, null, null, 'description');
+
+        // Launch change of default for field minscalevalue.
+        $dbman->change_field_default($table, $field);
+
+        // Catquiz savepoint reached.
+        upgrade_plugin_savepoint(true, 2024031200, 'local', 'catquiz');
     }
 
     return true;
