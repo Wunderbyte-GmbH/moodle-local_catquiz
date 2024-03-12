@@ -620,13 +620,13 @@ class model_item_param_list implements ArrayAccess, IteratorAggregate, Countable
 
             // For new rootscales, add min & max scalevalue.
             if ($catscaleid == 0
-                && (isset($newrecord['minscalevalue'])
-                    || isset($newrecord['maxscalevalue']))) {
-                if (isset($newrecord['minscalevalue']) && (float) $newrecord['minscalevalue'] <= 0) {
-                    $minscalevalue = $newrecord['minscalevalue'];
+                && (isset($newrecord['minability'])
+                    || isset($newrecord['maxability']))) {
+                if (isset($newrecord['minability']) && (float) $newrecord['minability'] <= 0) {
+                    $minscalevalue = $newrecord['minability'];
                 }
-                if (isset($newrecord['maxscalevalue']) && (float) $newrecord['maxscalevalue'] >= 0) {
-                    $maxscalevalue = $newrecord['maxscalevalue'];
+                if (isset($newrecord['maxability']) && (float) $newrecord['maxability'] >= 0) {
+                    $maxscalevalue = $newrecord['maxability'];
                 }
                 $catscale = new catscale_structure([
                     'name' => $parent,
