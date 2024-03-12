@@ -309,7 +309,7 @@ class questionsdisplay {
     }
     /**
      * Check if we display a table or a detailview of a specific item.
-     * @return string
+     * @return array
      */
     private function check_tabledisplay() {
 
