@@ -26,6 +26,7 @@ namespace local_catquiz\table;
 
 use local_catquiz\teststrategy\info;
 use local_wunderbyte_table\wunderbyte_table;
+use moodle_url;
 
 /**
  * Lists catquiz attempts.
@@ -127,15 +128,16 @@ class quizattempts_table extends wunderbyte_table {
 
         // TODO: Add back to table overview button/link in detailview triggered here.
 
-        global $PAGE;
-
-        $url = clone $PAGE->url;
-        $url->params($_GET);
-        $url->params(['attemptid' => $values->attemptid]);
+        // Append attemptid to the existing parameters.
+        $url = new moodle_url(
+            'manage_catscales.php',
+            array_merge($_GET, ['attemptid' => $values->attemptid]),
+            'lcq_questions'
+        );
 
         return sprintf(
             '<a class="btn btn-plain btn-smaller"
-                href="%s#lcq_quizattempts"><i class="fa fa-cog" title="%s"></i>
+                href="%s"><i class="fa fa-cog" title="%s"></i>
             </a>',
             $url,
             get_string('cogwheeltitle', 'local_catquiz')
