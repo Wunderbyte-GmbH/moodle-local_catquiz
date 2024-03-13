@@ -203,6 +203,7 @@ class personabilities_test extends advanced_testcase {
                 ],
                 'expected' => [
                     'heading' => 'Ability score',
+                    'comment' => '',
                     'content' => '<h5>Ability score in subscales</h5>
                     <div class="container">
                         <div class="row">
@@ -347,7 +348,7 @@ class personabilities_test extends advanced_testcase {
      */
     private static function return_testitemsforscale(): array {
         return [
-            "10728" => [
+            "10728" => (object) [
                 "id" => "10728",
                 "componentid" => "10728",
                 "label" => "SIMA05-00",
@@ -375,7 +376,7 @@ class personabilities_test extends advanced_testcase {
                 "timemodified" => "1707311393",
                 "status" => "4",
             ],
-            "10729" => [
+            "10729" => (object) [
                 "id" => "10729",
                 "componentid" => "10729",
                 "label" => "SIMA05-01",
@@ -403,7 +404,7 @@ class personabilities_test extends advanced_testcase {
                 "timemodified" => "1707311393",
                 "status" => "4",
             ],
-            "10730" => [
+            "10730" => (object) [
                 "id" => "10730",
                 "componentid" => "10730",
                 "label" => "SIMA05-02",
@@ -431,7 +432,7 @@ class personabilities_test extends advanced_testcase {
                 "timemodified" => "1707311393",
                 "status" => "4",
             ],
-            "10731" => [
+            "10731" => (object) [
                 "id" => "10731",
                 "componentid" => "10731",
                 "label" => "SIMA05-03",
@@ -458,7 +459,7 @@ class personabilities_test extends advanced_testcase {
                 "timemodified" => "1707311393",
                 "status" => "4",
             ],
-            "10732" => [
+            "10732" => (object) [
                 "id" => "10732",
                 "componentid" => "10732",
                 "label" => "SIMA05-04",
@@ -485,7 +486,7 @@ class personabilities_test extends advanced_testcase {
                 "timemodified" => "1707311393",
                 "status" => "4",
             ],
-            "10733" => [
+            "10733" => (object) [
                 "id" => "10733",
                 "componentid" => "10733",
                 "label" => "SIMA05-05",
@@ -512,7 +513,7 @@ class personabilities_test extends advanced_testcase {
                 "timemodified" => "1707311393",
                 "status" => "4",
             ],
-            "10734" => [
+            "10734" => (object) [
                 "id" => "10734",
                 "componentid" => "10734",
                 "label" => "SIMA05-06",
@@ -539,7 +540,7 @@ class personabilities_test extends advanced_testcase {
                 "timemodified" => "1707311393",
                 "status" => "4",
             ],
-            "10735" => [
+            "10735" => (object) [
                 "id" => "10735",
                 "componentid" => "10735",
                 "label" => "SIMA05-07",
@@ -566,7 +567,7 @@ class personabilities_test extends advanced_testcase {
                 "timemodified" => "1707311393",
                 "status" => "4",
             ],
-            "10736" => [
+            "10736" => (object) [
                 "id" => "10736",
                 "componentid" => "10736",
                 "label" => "SIMA05-08",
@@ -593,7 +594,7 @@ class personabilities_test extends advanced_testcase {
                 "timemodified" => "1707311393",
                 "status" => "4",
             ],
-            "10737" => [
+            "10737" => (object) [
                 "id" => "10737",
                 "componentid" => "10737",
                 "label" => "SIMA05-09",
@@ -620,7 +621,7 @@ class personabilities_test extends advanced_testcase {
                 "timemodified" => "1707311393",
                 "status" => "4",
             ],
-            "10738" => [
+            "10738" => (object) [
                 "id" => "10738",
                 "componentid" => "10738",
                 "label" => "SIMA05-10",
@@ -647,7 +648,7 @@ class personabilities_test extends advanced_testcase {
                 "timemodified" => "1707311393",
                 "status" => "4",
             ],
-            "10739" => [
+            "10739" => (object) [
                 "id" => "10739",
                 "componentid" => "10739",
                 "label" => "SIMA05-11",
@@ -674,7 +675,7 @@ class personabilities_test extends advanced_testcase {
                 "timemodified" => "1707311393",
                 "status" => "4",
             ],
-            "10740" => [
+            "10740" => (object) [
                 "id" => "10740",
                 "componentid" => "10740",
                 "label" => "SIMA05-12",
@@ -701,7 +702,7 @@ class personabilities_test extends advanced_testcase {
                 "timemodified" => "1707311393",
                 "status" => "4",
             ],
-            "10741" => [
+            "10741" => (object) [
                 "id" => "10741",
                 "componentid" => "10741",
                 "label" => "SIMA05-13",
@@ -728,7 +729,7 @@ class personabilities_test extends advanced_testcase {
                 "timemodified" => "1707311393",
                 "status" => "4",
             ],
-            "10742" => [
+            "10742" => (object) [
                 "id" => "10742",
                 "componentid" => "10742",
                 "label" => "SIMA05-14",
@@ -755,7 +756,7 @@ class personabilities_test extends advanced_testcase {
                 "timemodified" => "1707311393",
                 "status" => "4",
             ],
-            "10743" => [
+            "10743" => (object) [
                 "id" => "10743",
                 "componentid" => "10743",
                 "label" => "SIMA05-15",
@@ -782,7 +783,7 @@ class personabilities_test extends advanced_testcase {
                 "timemodified" => "1707311393",
                 "status" => "4",
             ],
-            "10744" => [
+            "10744" => (object) [
                 "id" => "10744",
                 "componentid" => "10744",
                 "label" => "SIMA05-16",
@@ -809,7 +810,7 @@ class personabilities_test extends advanced_testcase {
                 "timemodified" => "1707311393",
                 "status" => "4",
             ],
-            "10745" => [
+            "10745" => (object) [
                 "id" => "10745",
                 "componentid" => "10745",
                 "label" => "SIMA05-17",
@@ -836,7 +837,7 @@ class personabilities_test extends advanced_testcase {
                 "timemodified" => "1707311393",
                 "status" => "4",
             ],
-            "10746" => [
+            "10746" => (object) [
                 "id" => "10746",
                 "componentid" => "10746",
                 "label" => "SIMA05-18",
@@ -863,7 +864,7 @@ class personabilities_test extends advanced_testcase {
                 "timemodified" => "1707311393",
                 "status" => "4",
             ],
-            "10747" => [
+            "10747" => (object) [
                 "id" => "10747",
                 "componentid" => "10747",
                 "label" => "SIMA05-19",
@@ -891,6 +892,7 @@ class personabilities_test extends advanced_testcase {
                 "status" => "4",
             ],
         ];
+
     }
 
     /**
