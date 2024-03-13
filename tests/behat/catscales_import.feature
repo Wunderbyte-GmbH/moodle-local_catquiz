@@ -50,6 +50,7 @@ Feature: As an admin I perform import of catscales along with questions to check
       | Name                               | Mathematik        |
       | Person ability minimum             | -2.00             |
       | Person ability maximum:            | 2.00              |
+    And I press "Save changes"
     And I click on "Questions" "link" in the "#region-main" "css_element"
     And I set the field "Scale" to "Mathematik"
     And I should see "3 of 3 records found"
