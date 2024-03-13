@@ -171,7 +171,7 @@ class customscalefeedback extends feedbackgenerator {
      * @param array $existingdata
      * @param array $newdata
      *
-     * @return array|null
+     * @return array
      *
      */
     public function load_data(int $attemptid, array $existingdata, array $newdata): ?array {
@@ -180,7 +180,7 @@ class customscalefeedback extends feedbackgenerator {
 
         $personabilities = $progress->get_abilities();
         if (!$personabilities) {
-            return null;
+            return [];
         }
 
         $personabilitiesfeedbackeditor = $this->select_scales_for_report(
@@ -243,7 +243,7 @@ class customscalefeedback extends feedbackgenerator {
 
         if (! $scalefeedback) {
             if (!$relevantscalesfound) {
-                return  get_string('noscalesfound', 'local_catquiz');
+                return get_string('noscalesfound', 'local_catquiz');
             }
             return get_string('nofeedback', 'local_catquiz');
         }

@@ -368,6 +368,9 @@ class feedbacksettings {
         foreach ($personabilities as $catscale => $array) {
             if (empty($quizsettings['catquiz_scalereportcheckbox_' . $catscale])) {
                 $personabilities[$catscale]['excluded'] = true;
+                $personabilities[$catscale]['error'] = [
+                    'scalereportcheckboxinquizsettings' => false,
+                ];
             }
         }
         return $personabilities;
@@ -405,7 +408,12 @@ class feedbacksettings {
             $f += $fraction;
             $i ++;
         }
-        $this->fraction = $f / $i;
+        if (!empty($i)) {
+            $this->fraction = $f / $i;
+        } else {
+            $this->fraction = $f;
+        }
+
     }
 
     /**
