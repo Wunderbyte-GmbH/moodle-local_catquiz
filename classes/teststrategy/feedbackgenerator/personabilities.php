@@ -414,9 +414,9 @@ class personabilities extends feedbackgenerator {
         for ($i = $ll + $abilitystep; $i <= ($ul - $abilitystep); $i += $interval) {
             $abilitysteps[] = $i;
         }
-        $catscale = new catscale($primarycatscale['id']);
+        $items = $this->get_testitems_for_catscale($primarycatscale['id'], $initialcontext['contextid'], true);
         // Prepare data for test information line.
-        $items = $catscale->get_testitems($initialcontext['contextid'], true);
+
         $models = model_strategy::get_installed_models();
         $fisherinfos = [];
         foreach ($items as $item) {

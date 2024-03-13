@@ -105,6 +105,7 @@ class customscalefeedback_test extends basic_testcase {
                     'expected' => [
                         'heading' => 'Feedback',
                         'content' => 'Skala 272: <p dir="ltr" style="text-align: left;">adsfafs<\/p><br/>',
+                        'comment' => '',
                     ],
                 ],
                 'noscalestoreport' => [
@@ -140,6 +141,7 @@ class customscalefeedback_test extends basic_testcase {
                     'expected' => [
                         'heading' => 'Feedback',
                         'content' => 'There was no valid feedback found.',
+                        'comment' => '',
                     ],
                 ],
             ];
