@@ -45,19 +45,12 @@
 
 {{#feedback}}
     {{#studentfeedback.0}}
-        <ul class="nav nav-tabs" id="myTab" role="tablist">
+        <ul class="nav nav-tabs" id="myTab" role="tablist" style="list-style: none">
     {{/studentfeedback.0}}
     {{#studentfeedback}}
-        {{#frontpage}}
-            <li class="nav-item">
-                <a class="nav-link active" id="{{generatorname}}-tab" data-toggle="tab" href="#{{generatorname}}_feedbacktab" role="tab" aria-controls="{{generatorname}}_feedbacktab" aria-selected="true">{{heading}}</a>
-            </li>
-        {{/frontpage}}
-        {{#othertabs}}
-            <li class="nav-item">
-                <a class="nav-link" id="{{generatorname}}-tab" data-toggle="tab" href="#{{generatorname}}_feedbacktab" role="tab" aria-controls="{{generatorname}}_feedbacktab" aria-selected="false">{{heading}}</a>
-            </li>
-        {{/othertabs}}
+        <li class="nav-item">
+            <a class="nav-link {{#frontpage}}active{{/frontpage}}" id="{{generatorname}}-tab" data-toggle="tab" href="#{{generatorname}}_feedbacktab" role="tab" aria-controls="{{generatorname}}_feedbacktab" aria-selected="true">{{heading}}</a>
+        </li>
     {{/studentfeedback}}
     {{#teacherfeedback}}
             <li class="nav-item">
@@ -66,26 +59,17 @@
     {{/teacherfeedback}}
     {{#studentfeedback.0}}
         </ul>
-        <div class="tab-content" id="myTabContent">
+        <div class="tab-content" id="myTabContent" style="margin:20px">
     {{/studentfeedback.0}}
 
     {{#studentfeedback}}
-        {{#frontpage}}
-            <div class="tab-pane fade show active" id="{{generatorname}}_feedbacktab" role="tabpanel" aria-labelledby="{{generatorname}}-tab">
-                <h5 id= "feedback-generator-heading-{{generatorname}}"> {{{heading}}} </h5>
-                <i id= "feedback-generator-comment-{{generatorname}}"> {{{comment}}} </i>
-                <div id= "feedback-generator-content-{{generatorname}}"> {{{content}}} </div>
-            </div>
-        {{/frontpage}}
-        {{#othertabs}}
-            <div class="tab-pane fade" id="{{generatorname}}_feedbacktab" role="tabpanel" aria-labelledby="{{generatorname}}-tab">
+            <div class="tab-pane fade {{#frontpage}}show active{{/frontpage}}" id="{{generatorname}}_feedbacktab" role="tabpanel" aria-labelledby="{{generatorname}}-tab">
                 <div id="feedbackcontent-{{generatorname}}">
                     <h5 id= "feedback-generator-heading-{{generatorname}}"> {{{heading}}} </h5>
                     <i id= "feedback-generator-comment-{{generatorname}}"> {{{comment}}} </i>
                     <div id= "feedback-generator-content-{{generatorname}}"> {{{content}}} </div>
                 </div>
             </div>
-        {{/othertabs}}
     {{/studentfeedback}}
     {{#teacherfeedback}}
             <div class="tab-pane fade" id="{{generatorname}}_feedbacktab" role="tabpanel" aria-labelledby="{{generatorname}}-tab">
