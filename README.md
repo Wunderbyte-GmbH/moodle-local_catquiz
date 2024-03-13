@@ -26,24 +26,24 @@ For using this plugin, you are required to install the following plugins:
 * local_wunderbyte_table - database and tables handling
 
 It is recommended to install the following plugins as well:
-* local_shortcodes - helps to render results at any point in yout courses
+* local_shortcodes - helps to render results at any point in your courses
 * local_adaptivelearningpaths - adds the possibility to define learning paths based on quiz and adaptive quiz results (to be released soon)
 
 ## Core concepts & Terminology ##
 The plugin tries to present questions matching the ability of the student. To assign parameters like difficulty to each question, questions and params are grouped as items.
 
-* Items: Question with parameters
+* Items: question with parameters
 * Parameters: characteristics of a question (e.g. difficulty, discrimination, guessing probability).
 * Models: model the charcteristics of an item by a specified set of parameters.
-* Scales: Items are grouped in scales (and subscales) according to the construct they are measuring. For example you may have a parentscale "mathematics" that measures a general construct "mathematical abilities" with subscales "algebra" and "geometry" that contain items of the field of algebra or geometry each.
-* Contexts: allow you to reuse the same question within different time periods or usage frames without loosing or confusing its paramtesters and attempt data each. This could be useful if e.g. the question is part of different quizzes or for managing data of different years.
+* Scales: items are grouped in scales (and subscales) according to the construct they are measuring. For example you may have a parentscale "mathematics" that measures a general construct "mathematical abilities" with subscales "algebra" and "geometry" that contain items of the field of algebra or geometry each.
+* Contexts: allow you to reuse the same question within different time periods or usage frames without loosing or confusing its parameters and attempt data. This could be useful if e.g. the question is part of different quizzes or for managing data of different years.
 * Importer: imports items, params and scales from a csv file.
 
 ## CSV Importer ##
-The csv importer accepts different formats of separators and encodings. Some columns are mandatory whereas others are optional. Find detailed descriptions of all columns are explained on the same page, also the demo csv file can be found in: local/catquiz/classes/importer/demo.csv
+The csv importer accepts different formats of separators and encodings. Some columns are mandatory whereas others are optional. Find detailed descriptions of all columns on the same page, also the demo csv file can be found in: local/catquiz/classes/importer/demo.csv
 
 ## Contexts ##
-* When importing with the csv importer, a new context is created automatically. With respect to the new context, new items from the import csv file are added to the corresponding scales whereas existing items are updated with idata from the import file.
+* When importing with the csv importer, a new context is created automatically. With respect to the new context, new items from the import csv file are added to the corresponding scales whereas existing items are updated with data from the import file.
 
 ## Shortcodes ##
 To use the shortcode functionality, use plugin filter_shortcodes: https://moodle.org/plugins/filter_shortcodes
