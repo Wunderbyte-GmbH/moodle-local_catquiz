@@ -134,8 +134,6 @@ class comparetotestaverage extends feedbackgenerator {
             'quizsettings',
             'testaverageability',
             'userability',
-            // Used for positioning in the progress bar. 0 is left, 50 middle and 100 right.
-            // This assumes that all values are in the range [-5, 5].
             'testaverageposition',
             'userabilityposition',
             'comparisontext',
@@ -314,7 +312,7 @@ class comparetotestaverage extends feedbackgenerator {
         );
 
         if (!$worseabilities) {
-            return null;
+            return [];
         }
 
         $quantile = (count($worseabilities) / count($personparams)) * 100;
