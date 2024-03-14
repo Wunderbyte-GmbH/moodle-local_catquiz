@@ -142,7 +142,6 @@ class fileparser {
      *
      */
     private function apply_settings($settings) {
-        global $DB;
         $this->settings = $settings;
 
         if (!empty($this->settings->columns)) {
@@ -579,13 +578,13 @@ class fileparser {
 
     /**
      * Trigger event for testitem imported.
-     * @param int $numberofimporteditems
+     * @param int $nimporteditems
      */
-    private function trigger_testitem_imported_event($numberofimporteditems) {
+    private function trigger_testitem_imported_event($nimporteditems) {
         $event = testitem_imported::create([
             'context' => \context_system::instance(),
             'other' => [
-                'itemcount' => $numberofimporteditems,
+                'itemcount' => $nimporteditems,
             ],
             ]);
         $event->trigger();

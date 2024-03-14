@@ -582,7 +582,6 @@ class model_item_param_list implements ArrayAccess, IteratorAggregate, Countable
         if (!empty($newrecord['parentscalenames'])) {
             $newrecord['parentscalenames'] .= "|" . $newrecord['catscalename'];
             $parents = explode('|', $newrecord['parentscalenames']);
-            $noparents = false;
             // Make sure there are no spaces around.
             $parents = array_map(fn($a) => trim($a), $parents);
             $parentsgiven = true;
@@ -661,7 +660,6 @@ class model_item_param_list implements ArrayAccess, IteratorAggregate, Countable
      * @return void
      */
     private static function assign_catcontext(&$newrecord) {
-        global $DB;
         // Check if context if empty. If so, create new context for this scale.
         // Make sure, the following lines with the same scale use the same context.
         if (!empty($newrecord['contextid'])) {

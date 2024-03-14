@@ -266,9 +266,9 @@ class mathcat {
      * @param array $parameterstart - Parameter-set to start with (should be near zero point)
      * @param int $precission - Accuracy to how many decimal places
      * @param int $maxiterations - Maximum number of iterations
-     * @param callable|null $fntrustedregionsfilter - Parameter-check for trusted Region
-     * @param callable|null $fntrustedregionsfunction - Trusted Region modelling function
-     * @param callable|null $fntrustedregionsderivative - Deriavative of $fn_trusted_regions_function
+     * @param callable|null $fntrfilter - Parameter-check for trusted Region
+     * @param callable|null $fntrfunction - Trusted Region modelling function
+     * @param callable|null $fntrderivative - Deriavative of $fn_trusted_regions_function
      *
      * @return array
      *
@@ -279,9 +279,9 @@ class mathcat {
         array $parameterstart,
         int $precission = 6,
         int $maxiterations = 500,
-        callable $fntrustedregionsfilter = null,
-        callable $fntrustedregionsfunction = null,
-        callable $fntrustedregionsderivative = null): array {
+        callable $fntrfilter = null,
+        callable $fntrfunction = null,
+        callable $fntrderivative = null): array {
 
         // Set initial values.
         $parameter = $parameterstart;
@@ -340,25 +340,25 @@ class mathcat {
             $parameter = array_combine($parameternames, ($mxparameter->transpose())[0]);
 
             // If Trusted Region filter is provided, check for being still in Trusted Regions.
-            if (isset($fntrustedregionsfilter)) {
+            if (isset($fntrfilter)) {
                 // Check for glitches within the calculated result.
                 if (count(array_filter($parameter, fn ($x) => is_nan($x))) > 0) {
-                    $parameter = $fntrustedregionsfilter($parameter); // DAVID: Darüber sollten wir noch einmal nachdenken.
+                    $parameter = $fntrfilter($parameter); // DAVID: Darüber sollten wir noch einmal nachdenken.
                     $iscritical = true;
                     return array_combine($parameternames, $parameter);
                 }
 
                 // Check if $parameter is still in the Trusted Region.
-                if ($fntrustedregionsfilter($parameter) !== $parameter) {
-                    $parameter = $fntrustedregionsfilter($parameter);
+                if ($fntrfilter($parameter) !== $parameter) {
+                    $parameter = $fntrfilter($parameter);
                     // DAVID: Sollte serialisiert werden für den Fall genesteter Arrays.
                     $mxparameter = new matrix(is_array($parameter) ? [$parameter] : [[$parameter]]);
                     $mxparameter = $mxparameter->transpose();
 
                     // If Trusted Region function and its derivative are provided, add them to $fn_function and $fn_derivative.
-                    if (isset($fntrustedregionsfunction) && isset($fntrustedregionsderivative) && ! $usegauss) {
-                        $fnfunction = fn($x) => matrixcat::multi_sum($fntrustedregionsfunction($x), $fnfunction($x));
-                        $fnderivative = fn($x) => matrixcat::multi_sum($fntrustedregionsderivative($x), $fnderivative($x));
+                    if (isset($fntrfunction) && isset($fntrderivative) && ! $usegauss) {
+                        $fnfunction = fn($x) => matrixcat::multi_sum($fntrfunction($x), $fnfunction($x));
+                        $fnderivative = fn($x) => matrixcat::multi_sum($fntrderivative($x), $fnderivative($x));
                         $usegauss = true;
                     }
 

@@ -18,7 +18,7 @@
  * Class model_strategy.
  *
  * @package    local_catquiz
- * @copyright  2023 Wunderbyte GmbH <georg.maisser@wunderbyte.at>
+ * @copyright  2024 Wunderbyte GmbH <georg.maisser@wunderbyte.at>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
@@ -156,9 +156,6 @@ class model_strategy {
         $this->maxiterations = array_key_exists('max_iterations', $options)
             ? $options['max_iterations']
             : self::MAX_ITERATIONS;
-        $strategyoptions = array_key_exists('strategy', $options)
-            ? $options['strategy']
-            : [];
 
         $this->modeloverride = array_key_exists('model_override', $options)
             ? $options['model_override']
@@ -218,20 +215,20 @@ class model_strategy {
                     ->estimate_item_params($personabilities, $oldmodelparams);
             }
 
-            $filtereditemdifficulties = $this->select_item_model($itemdifficulties, $personabilities);
+            $filtereddiffi = $this->select_item_model($itemdifficulties, $personabilities);
             $personabilities = $this
                 ->abilityestimator
-                ->get_person_abilities($filtereditemdifficulties, $catscaleid);
+                ->get_person_abilities($filtereddiffi, $catscaleid);
 
             $this->iterations++;
         }
 
-        $itemdifficultieswithstatus = $this->set_status(
+        $itemdiffiwstatus = $this->set_status(
             $itemdifficulties,
-            $filtereditemdifficulties
+            $filtereddiffi
         );
 
-        return [$itemdifficultieswithstatus, $personabilities];
+        return [$itemdiffiwstatus, $personabilities];
     }
 
     /**
@@ -240,33 +237,33 @@ class model_strategy {
      * In the filtered items, the status is set to "SET_BY_STRATEGY". Here, this
      * status is copied back to the corresponding calculated items.
      *
-     * @param model_item_param_list[] $calculateditemdifficulties
-     * @param model_item_param_list $selecteditemdifficulties
+     * @param model_item_param_list[] $calcdifficulties
+     * @param model_item_param_list $selecteddiffic
      * @return model_item_param_list[]
      */
     private function set_status(
-        array $calculateditemdifficulties,
-        model_item_param_list $selecteditemdifficulties
+        array $calcdifficulties,
+        model_item_param_list $selecteddiffic
     ) {
-        foreach ($selecteditemdifficulties as $selecteditem) {
+        foreach ($selecteddiffic as $selecteditem) {
             $model = $selecteditem->get_model_name();
             $id = $selecteditem->get_id();
-            $calculateditemdifficulties[$model][$id]->set_status($selecteditem->get_status());
+            $calcdifficulties[$model][$id]->set_status($selecteditem->get_status());
         }
-        return $calculateditemdifficulties;
+        return $calcdifficulties;
     }
 
     /**
      * For each item, selects the model that should be used
      *
-     * @param array $itemdifficultieslists List of calculated item difficulties, one for each model
+     * @param array $itemdifflists List of calculated item difficulties, one for each model
      * @param model_person_param_list $personabilities A single list of item difficulties that is a combination of the input lists
      *
      * @return model_item_param_list
      *
      */
     public function select_item_model(
-        array $itemdifficultieslists,
+        array $itemdifflists,
         model_person_param_list $personabilities): model_item_param_list {
         $newitemdifficulties = new model_item_param_list();
         $itemids = $this->responses->get_item_ids();
@@ -280,21 +277,21 @@ class model_strategy {
          * 2. Otherwise, use the model that maximizes the given information criterium
          */
         foreach ($itemids as $itemid) {
-            $item = $this->select_item_from_override($itemid, $itemdifficultieslists);
+            $item = $this->select_item_from_override($itemid, $itemdifflists);
             if (! is_null($item)) {
                 $newitemdifficulties->add($item);
                 continue;
             }
             foreach ($this->models as $model) {
                 /** @var ?model_item_param $item */
-                $item = $itemdifficultieslists[$model->get_model_name()][$itemid];
+                $item = $itemdifflists[$model->get_model_name()][$itemid];
                 if (!$item) {
                     continue;
                 }
                 $val = $model->get_information_criterion($informationcriterium, $personabilities, $item, $this->responses);
                 $infocriteriapermodel[$itemid][$model->get_model_name()] = $val;
                 $maxmodelname = array_keys($infocriteriapermodel[$itemid], min($infocriteriapermodel[$itemid]))[0];
-                $selecteditem = $itemdifficultieslists[$maxmodelname][$itemid];
+                $selecteditem = $itemdifflists[$maxmodelname][$itemid];
                 $selecteditem->set_status(LOCAL_CATQUIZ_STATUS_CALCULATED);
                 $newitemdifficulties->add($selecteditem);
             }
@@ -307,14 +304,14 @@ class model_strategy {
      * Return item override.
      *
      * @param int $itemid
-     * @param array $itemdifficultieslists
+     * @param array $itemdifflists
      *
      * @return model_item_param|null
      *
      */
-    private function get_item_override(int $itemid, array $itemdifficultieslists): ?model_item_param {
+    private function get_item_override(int $itemid, array $itemdifflists): ?model_item_param {
         $items = [];
-        foreach ($itemdifficultieslists as $model => $itemparams) {
+        foreach ($itemdifflists as $itemparams) {
             if (! $itemparams[$itemid]) {
                 continue;
             }
@@ -361,14 +358,14 @@ class model_strategy {
         $models = $this->get_installed_models();
         $catscaleids = [$catscaleid, ...catscale::get_subscale_ids($catscaleid)];
         foreach (array_keys($models) as $modelname) {
-            $estimateditemdifficulties[$modelname] = model_item_param_list::load_from_db(
+            $estdifficulties[$modelname] = model_item_param_list::load_from_db(
                 $contextid,
                 $modelname,
                 $catscaleids
             );
         }
         $personabilities = model_person_param_list::load_from_db($contextid, $catscaleids);
-        return [$estimateditemdifficulties, $personabilities];
+        return [$estdifficulties, $personabilities];
     }
 
     /**
@@ -423,20 +420,20 @@ class model_strategy {
      * Select item from override.
      *
      * @param int $itemid
-     * @param array $itemdifficultieslists
+     * @param array $itemdifflists
      *
      * @return mixed
      *
      */
-    private function select_item_from_override(int $itemid, array $itemdifficultieslists) {
+    private function select_item_from_override(int $itemid, array $itemdifflists) {
         global $CFG;
-        if ($item = $this->get_item_override($itemid, $itemdifficultieslists)) {
+        if ($item = $this->get_item_override($itemid, $itemdifflists)) {
             return $item;
         }
 
         $item = null;
         if ($model = $this->get_model_override()) {
-            $item = $itemdifficultieslists[$model][$itemid];
+            $item = $itemdifflists[$model][$itemid];
         }
 
         // If there are no data for an item override, fail with an

@@ -25,8 +25,6 @@ require_once("$CFG->libdir/formslib.php");
 use context;
 use context_system;
 use core_form\dynamic_form;
-use local_catquiz\data\dataapi;
-use local_catquiz\data\catscale_structure;
 use moodle_url;
 use stdClass;
 
