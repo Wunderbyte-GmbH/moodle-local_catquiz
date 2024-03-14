@@ -1768,11 +1768,11 @@ class catquiz {
     }
 
     /**
-     * Marks the given question as failed
+     * Marks the last question as failed
      *
      * @param int $usageid
      */
-    public static function mark_question_failed(int $usageid) {
+    public static function mark_last_question_failed(int $usageid) {
         global $DB;
         $quba = question_engine::load_questions_usage_by_activity($usageid);
         $slot = max($quba->get_slots());
