@@ -86,7 +86,7 @@ class submit_result extends external_api {
         }
 
         // The transformation of the userid will be done in the start_new_attempt function.
-        return catquiz::submit_result($params['attemptid'], $params['questionid'], $params['score']);
+        return catquiz::submit_result();
     }
 
     /**

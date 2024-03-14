@@ -121,7 +121,7 @@ class questionsdisplay {
         }
 
         list($select, $from, $where, $filter, $params)
-            = catquiz::return_sql_for_catscalequestions($idsforquery, $catcontext, [], []);
+            = catquiz::return_sql_for_catscalequestions($idsforquery, $catcontext, []);
 
         $table->set_filter_sql($select, $from, $where, $filter, $params);
 

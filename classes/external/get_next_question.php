@@ -84,7 +84,7 @@ class get_next_question extends external_api {
         }
 
         // The transformation of the userid will be done in the start_new_attempt function.
-        return catquiz::get_next_question($params['attemptid'], $params['quizid'], $params['component']);
+        return catquiz::get_next_question();
     }
 
     /**
