@@ -25,8 +25,6 @@
 namespace catmodel_raschbirnbaum;
 
 use local_catquiz\catcalc;
-use local_catquiz\local\model\model_item_param_list;
-use local_catquiz\local\model\model_person_param_list;
 use local_catquiz\local\model\model_raschmodel;
 
 /**
@@ -393,8 +391,6 @@ class raschbirnbaum extends model_raschmodel {
 
         // Placement of the discriminatory parameter.
         $bp = floatval(get_config('catmodel_raschbirnbaum', 'trusted_region_placement_b'));
-        // Slope of the discriminatory parameter.
-        $bs = floatval(get_config('catmodel_raschbirnbaum', 'trusted_region_slope_b'));
         // Use x times of placement as maximal value of trusted region.
         $btr = floatval(get_config('catmodel_raschbirnbaum', 'trusted_region_factor_max_b'));
 
@@ -459,7 +455,6 @@ class raschbirnbaum extends model_raschmodel {
         // Set values for difficulty parameter.
 
         // TODO: @DAVID: We should be able to calculate these values dynamically.
-        $am = 0; // Mean of difficulty.
         $as = 2; // Standard derivation of difficulty.
 
         // Placement of the discriminatory parameter.

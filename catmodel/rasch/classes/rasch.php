@@ -259,8 +259,6 @@ class rasch extends model_raschmodel {
         $derivative = [[]];
 
         // Pre-Calculate high frequently used exp-terms.
-        $expbap1 = exp($a + $pp);
-        $expbap0 = exp($a - $pp);
         $expa = exp($a);
         $expp = exp($pp);
 
@@ -324,7 +322,6 @@ class rasch extends model_raschmodel {
      */
     public static function lors_2nd_derivative_ip(array $pp, array $ip, float $or, float $n = 1): array {
         $pp = $pp['ability'];
-        $a = $ip['difficulty'];
 
         $derivative = [[]];
 
@@ -392,8 +389,6 @@ class rasch extends model_raschmodel {
         $am = 0; // Mean of difficulty.
         $as = 2; // Standard derivation of difficulty.
 
-        $atr = floatval(get_config('catmodel_rasch', 'trusted_region_factor_sd_a'));
-
         return [
             ($am - $ip['difficulty']) / ($as ** 2), // The d/da .
         ];
@@ -408,7 +403,6 @@ class rasch extends model_raschmodel {
      */
     public static function get_log_tr_hessian(array $ip): array {
         // Set values for difficulty parameter.
-        $am = 0; // Mean of difficulty.
         $as = 2; // Standard derivation of difficulty.
 
         // Calculate d/da d/da.
