@@ -45,7 +45,6 @@ class eventlogtableinstance {
      * @return ?string
      */
     public function render_event_log_table() {
-        global $DB;
 
         $table = new event_log_table('eventlogtable');
 

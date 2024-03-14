@@ -45,11 +45,6 @@ class questionsdisplay {
     /**
      * @var integer
      */
-    private int $detailsscale = 0; // The most detailed child of scale.
-
-    /**
-     * @var integer
-     */
     private int $usesubs = 1; // If subscales should be integrated in question display, value is 1.
 
     /**

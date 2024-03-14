@@ -44,7 +44,6 @@ class calculationsdisplay {
      * @return ?string
      */
     public function render_calculations_log_table() {
-        global $DB;
 
         $table = new event_log_table('eventlogtable_calculations');
 
@@ -106,7 +105,7 @@ class calculationsdisplay {
 
         $table->define_baseurl(new moodle_url('/local/catquiz/downloads/download.php'));
 
-        list($idstring, $encodedtable, $html) = $table->lazyouthtml(10, true);
+        list(, , $html) = $table->lazyouthtml(10, true);
         return $html;
     }
 
