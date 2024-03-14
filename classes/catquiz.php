@@ -1692,7 +1692,7 @@ class catquiz {
                 $lowerlimit = $quizsettings['feedback_scaleid_limit_lower_' . $catscaleid . '_'. $i];
                 $upperlimit = $quizsettings['feedback_scaleid_limit_upper_' . $catscaleid . '_'. $i];
 
-                if ($personability >= $lowerlimit && $personability <= $upperlimit) {
+                if ($personability >= (float) $lowerlimit && $personability <= (float) $upperlimit) {
                     $message = empty($quizsettings["enrolment_message_checkbox_" . $catscaleid . "_" . $i]) ? false : true;
                     $groupstoenrol = $quizsettings['catquiz_group_' . $catscaleid . '_' . $i] ?? "";
                     if (!empty($groupstoenrol)) {
@@ -1701,6 +1701,10 @@ class catquiz {
                         $groupsarray = [];
                     }
                     $coursestoenrol = $quizsettings['catquiz_courses_' . $catscaleid . '_' . $i] ?? [];
+                    if (empty($coursestoenrol) && empty($groupsarray)) {
+                        // No courses and groups to enrol.
+                        continue;
+                    }
                     // The first element at array key 0 is a dummy value to
                     // display some message like "please select course" in the
                     // form and has a course ID of 0.
@@ -1711,23 +1715,21 @@ class catquiz {
                         $coursedata = [];
                         $coursedata['coursename'] = $course->fullname ?? "";
                         $coursedata['coursesummary'] = $course->summary ?? "";
+                        $coursedata['courseurl'] = $course->get_url() ?? "";
                         $coursedata['catscalename'] = $catscale->name ?? "";
                         if (!is_enrolled($context, $userid) && $course) {
                             if (!enrol_try_internal_enrol($courseid, $userid, $rolestudent->id)) {
                                 // There's a problem.
                                 if ($message) {
-                                    messages::send_message(
-                                        $userid,
-                                        get_string('enrolledtocoursefailedtitle', 'local_catquiz', $coursedata),
-                                        get_string('enrolledtocoursefailedtext', 'local_catquiz', $coursedata),
-                                        'enrolmentfeedback');
+                                    $messageelements['course'][] = [
+                                        'course' => $coursedata,
+                                        'failed' => true,
+                                    ];
                                 }
                             } else {
-                                messages::send_message(
-                                    $userid,
-                                    get_string('enrolledtocoursetitle', 'local_catquiz', $coursedata),
-                                    get_string('enrolledtocoursetext', 'local_catquiz', $coursedata),
-                                    'enrolmentfeedback');
+                                $messageelements['course'][] = [
+                                    'course' => $coursedata,
+                                ];
                             }
                         }
                         if (empty($groupsarray)) {
@@ -1743,20 +1745,18 @@ class catquiz {
                                         $data = [];
                                         $data['groupname'] = $newgroup;
                                         $data['groupdescription'] = $existinggroup->description ?? "";
+                                        $data['coursename'] = $course->fullname ?? "";
                                         $data['catscalename'] = $catscale->name ?? "";
                                         if (!$groupmember) {
                                             // Something went wrong.
-                                            messages::send_message(
-                                                $userid,
-                                                get_string('enrolledtogroupfailedtitle', 'local_catquiz', $data),
-                                                get_string('enrolledtogroupfailedtext', 'local_catquiz', $data),
-                                                'enrolmentfeedback');
+                                            $messageelements['group'][] = [
+                                                'group' => $data,
+                                                'failed' => true,
+                                            ];
                                         } else {
-                                            messages::send_message(
-                                                $userid,
-                                                get_string('enrolledtogrouptitle', 'local_catquiz', $data),
-                                                get_string('enrolledtogrouptext', 'local_catquiz', $data),
-                                                'enrolmentfeedback');
+                                            $messageelements['group'][] = [
+                                                'group' => $data,
+                                            ];
                                         }
                                     }
                                 }
@@ -1767,6 +1767,36 @@ class catquiz {
                 $i++;
             }
         }
+        if (!empty($messageelements)) {
+            $messagebody = "";
+            foreach ($messageelements as $type => $dataarray) {
+                // Proceed only with the messages that are successfull.
+                $successful = array_filter($dataarray, fn($e) => !$e['failed']);
+                // If there is only one element, message is different.
+                if (count($successful) === 1 && $type === "course") {
+                    $message = get_string('onecourseenroled', 'local_catquiz', $successful[0]);
+                    continue;
+                }
+                if (count($successful) === 1 && $type === "group") {
+                    $message = get_string('onegroupenroled', 'local_catquiz', $successful[0]);
+                    continue;
+                }
+                foreach ($successful as $messageinfo) {
+                    // TODO: message for course, message for group.
+                    // Sie wurden  auf Grundlage Ihres Ergebnisses in die Kurse <a href="{URL_1}">{Kursname_1}</a>, <a href="{URL_2}">{Kursname_2}</a>, ... und <a href="{URL_n}">{Kursname_n}</a> eingeschrieben.
+                    // Sie sind auf Grundlage Ihres Ergebnisses nun Mitglied der Gruppen {Gruppenname_1}, {Gruppenname_2}, ... und {Gruppenname_n}.
+                }
+
+                $messagebody .= $messageelement['title'];
+                $messagebody .= $messageelement['text'];
+            }
+            messages::send_message(
+                $userid,
+                get_string('enrolementmessagetitle', 'local_catquiz'), //Benachrichtigung über neue Kurseinschreibung(en) / Gruppenmitgliedschaft(en).
+                $messagebody,
+                'enrolmentfeedback');
+        }
+
         return true;
     }
 
