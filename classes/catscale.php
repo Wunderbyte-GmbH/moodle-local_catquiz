@@ -413,10 +413,9 @@ class catscale {
             $scaleids = array_merge($scaleids, $subscaleids);
         }
 
-        list($select, $from, $where, $filter, $params) = catquiz::return_sql_for_catscalequestions(
+        list($select, $from, $where, , $params) = catquiz::return_sql_for_catscalequestions(
             $scaleids,
             $contextid,
-            [],
             [],
             $USER->id,
             $orderby

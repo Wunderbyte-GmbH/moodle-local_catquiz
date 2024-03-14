@@ -71,12 +71,9 @@ class catquiz {
     /**
      * Deal with result from the answered question.
      *
-     * @param int $attemptid
-     * @param int $questionid
-     * @param int $score
      * @return array
      */
-    public static function submit_result(int $attemptid, int $questionid, int $score) {
+    public static function submit_result() {
 
         return [];
     }
@@ -84,12 +81,9 @@ class catquiz {
     /**
      * Deliver next questionid for attempt.
      *
-     * @param int $attemptid
-     * @param int $quizid
-     * @param string $component
      * @return array
      */
-    public static function get_next_question(int $attemptid, int $quizid, string $component) {
+    public static function get_next_question() {
 
         global $DB;
 
@@ -109,7 +103,7 @@ class catquiz {
      * @param array $filterarray
      * @return array
      */
-    public static function return_sql_for_addquestions(array $wherearray = [], array $filterarray = []) {
+    public static function return_sql_for_addquestions(array $wherearray = []) {
 
         global $DB;
 
@@ -148,7 +142,6 @@ class catquiz {
         array $catscaleids,
         int $contextid,
         array $wherearray = [],
-        array $filterarray = [],
         int $userid = 0,
         ?string $orderby = null
     ) {
@@ -164,7 +157,6 @@ class catquiz {
             'contextid2' => $contextid,
         ];
 
-        $restrictforuser = "";
         // If we fetch only for a given user, we need to add this to the sql.
         if (!empty($userid)) {
             $restrictforuser = " AND qas.userid = :userid ";
@@ -308,15 +300,14 @@ class catquiz {
     public static function return_sql_for_addcatscalequestions(
         int $catscaleid,
         int $contextid,
-        array $wherearray = [],
-        array $filterarray = []
+        array $wherearray = []
     ) {
         global $DB;
         $contextfilter = $contextid === 0
             ? $DB->sql_like('ccc1.json', ':default')
             : "ccc1.id = :contextid";
 
-        list(, $contextfrom, $contextwhere, $contextparams) = self::get_sql_for_stat_base_request();
+        list(, $contextfrom, , ) = self::get_sql_for_stat_base_request();
         $params = [];
         $select = '
             DISTINCT
@@ -382,7 +373,7 @@ class catquiz {
         array $contextids = [],
         array $studentids = []
         ) {
-        list ($select, $from, $where, $params) = self::get_sql_for_stat_base_request($testitemids, $contextids, $studentids);
+        list (, $from, $where, $params) = self::get_sql_for_stat_base_request($testitemids, $contextids, $studentids);
 
         $sql = "SELECT COUNT(qas.id)
         FROM $from
@@ -401,7 +392,7 @@ class catquiz {
      *
      */
     public static function get_sql_for_questions_average(array $testitemids = [], array $contextids = []) {
-        list ($select, $from, $where, $params) = self::get_sql_for_stat_base_request($testitemids, $contextids);
+        list (, $from, $where, $params) = self::get_sql_for_stat_base_request($testitemids, $contextids);
 
         $sql = "SELECT AVG(qas.fraction)
         FROM $from
@@ -425,7 +416,7 @@ class catquiz {
         array $contextids = [],
         array $studentids = []
     ) {
-        list($select, $from, $where, $params) = self::get_sql_for_stat_base_request($testitemids, $contextids, $studentids);
+        list(, $from, $where, $params) = self::get_sql_for_stat_base_request($testitemids, $contextids, $studentids);
 
         $sql = "SELECT COUNT(qas.id)
         FROM $from
@@ -470,7 +461,7 @@ class catquiz {
      *
      */
     public static function get_sql_for_questions_answered_partlycorrect(array $testitemids = [], array $contextids = []) {
-        list ($select, $from, $where, $params) = self::get_sql_for_stat_base_request($testitemids, $contextids);
+        list (, $from, $where, $params) = self::get_sql_for_stat_base_request($testitemids, $contextids);
 
         $sql = "SELECT COUNT(qas.id)
         FROM $from
@@ -492,8 +483,7 @@ class catquiz {
      */
     public static function get_sql_for_questions_answered_by_distinct_persons(array $testitemids = [], array $contextids = []) {
 
-        $param = empty($testitemid) ? [] : [$testitemid];
-        list ($select, $from, $where, $params) = self::get_sql_for_stat_base_request($testitemids, $contextids);
+        list (, $from, $where, $params) = self::get_sql_for_stat_base_request($testitemids, $contextids);
 
         $sql = "SELECT COUNT(s1.questionid)
         FROM (
@@ -652,7 +642,7 @@ class catquiz {
         array $contextids = [],
         array $studentids = []
     ) {
-        list($select, $from, $where, $params) = self::get_sql_for_stat_base_request($testitemids, $contextids, $studentids);
+        list(, $from, $where, $params) = self::get_sql_for_stat_base_request($testitemids, $contextids, $studentids);
 
         $sql = "SELECT COUNT(s1.questionid)
         FROM (
@@ -796,10 +786,7 @@ class catquiz {
      * @return array
      *
      */
-    public static function return_sql_for_quizattempts(
-        string $where = "1=1",
-        array $filterarray = []) {
-        global $DB;
+    public static function return_sql_for_quizattempts() {
         $params = [];
         $filter = '';
 
@@ -836,7 +823,7 @@ class catquiz {
             ) as s1
         ";
 
-        return [$select, $from, $where, $filter, $params];
+        return [$select, $from, "1=1", $filter, $params];
     }
 
     /**
@@ -912,14 +899,12 @@ class catquiz {
     /**
      * Return sql to render all or a subset of testenvironments
      *
-     * @param array $wherearray
      * @param array $filterarray
      *
      * @return array
      *
      */
     public static function return_sql_for_catcontexts(
-        array $wherearray = [],
         array $filterarray = []) {
 
         $params = [];
@@ -1063,10 +1048,9 @@ class catquiz {
     /**
      * Returns the timestamp of the most recent calculation across all contexts
      *
-     * @param int $userid
      * @return array
      */
-    public static function get_sql_for_last_calculation_time(int $userid) {
+    public static function get_sql_for_last_calculation_time() {
         $sql = "
             SELECT max(timecalculated)
             FROM {local_catquiz_catcontext}
@@ -1786,10 +1770,9 @@ class catquiz {
     /**
      * Marks the given question as failed
      *
-     * @param int $questionid
      * @param int $usageid
      */
-    public static function mark_question_failed(int $questionid, int $usageid) {
+    public static function mark_question_failed(int $usageid) {
         global $DB;
         $quba = question_engine::load_questions_usage_by_activity($usageid);
         $slot = max($quba->get_slots());

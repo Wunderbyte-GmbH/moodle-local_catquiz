@@ -75,7 +75,7 @@ class catscalestats {
         $this->numassignedtests = $DB->count_records_sql($sql, $params);
         list($sql, $params) = catquiz::get_sql_for_number_of_assigned_questions($USER->id);
         $this->numassignedquestions = $DB->count_records_sql($sql, $params);
-        list($sql, $params) = catquiz::get_sql_for_last_calculation_time($USER->id);
+        list($sql, $params) = catquiz::get_sql_for_last_calculation_time();
         $number = $DB->get_field_sql($sql, $params);
         $this->lastcalculated = userdate($number, get_string('strftimedatetime', 'core_langconfig'));
     }

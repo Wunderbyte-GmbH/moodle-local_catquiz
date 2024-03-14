@@ -99,9 +99,9 @@ class datacard implements renderable {
         $catcontext = empty($this->contextid) ? catquiz::get_default_context_id() : $this->contextid;
 
         // Get the record for the specific userid (fetched from optional param).
-        list($select, $from, $where, $filter, $params) = catquiz::return_sql_for_catscalequestions([$this->catscaleid],
+        list($select, $from, $where, , $params) = catquiz::return_sql_for_catscalequestions([$this->catscaleid],
                                                                                                     $catcontext,
-                                                                                                    [], [],
+                                                                                                    [],
                                                                                                     $this->testitemid);
         $idcheck = "id=:userid";
         $sql = "SELECT $select FROM $from WHERE $where AND $idcheck";

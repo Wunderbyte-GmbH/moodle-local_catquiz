@@ -84,7 +84,7 @@ final class checkbreak extends preselect_task implements wb_middleware {
 
         // If the session is the same, mark the last question as failed if the page was reloaded.
         if ($this->progress->page_was_reloaded()) {
-            catquiz::mark_question_failed($lastquestion->id, $this->progress->get_usage_id());
+            catquiz::mark_question_failed($this->progress->get_usage_id());
             $this->progress
                 ->add_playedquestion($lastquestion)
                 ->mark_lastquestion_failed()
