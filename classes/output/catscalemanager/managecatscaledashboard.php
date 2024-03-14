@@ -26,7 +26,6 @@ use local_catquiz\output\catscalestats;
 use local_catquiz\output\catscalemanager\questions\questionsdisplay;
 use local_catquiz\output\catscalemanager\quizattempts\quizattemptsdisplay;
 use local_catquiz\output\catscalemanager\testsandtemplates\testsandtemplatesdisplay;
-use local_catquiz\output\testenvironmentdashboard;
 use templatable;
 use renderable;
 

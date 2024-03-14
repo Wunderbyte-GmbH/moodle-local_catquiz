@@ -88,7 +88,7 @@ class questiondetailview {
         $catcontext = empty($this->contextid) ? catquiz::get_default_context_id() : $this->contextid;
 
         // Get the record for the specific userid (fetched from optional param).
-        list($select, $from, $where, $filter, $params) = catquiz::return_sql_for_catscalequestions([$this->catscaleid],
+        list($select, $from, $where, , $params) = catquiz::return_sql_for_catscalequestions([$this->catscaleid],
                                                                                                     $catcontext,
                                                                                                     [],
                                                                                                     $this->testitemid);
@@ -103,11 +103,11 @@ class questiondetailview {
 
         // Output for testitem details card.
         $datacardoutput = $this->render_datacard_of_testitem($record); // Return array.
-        $questionpreviewoutput = $this->render_questionpreview($record); // Return array.
+        $qpreview = $this->render_questionpreview($record); // Return array.
 
         return [
             'datacard' => $datacardoutput,
-            'questionpreview' => $questionpreviewoutput,
+            'questionpreview' => $qpreview,
         ];
     }
 
@@ -120,7 +120,6 @@ class questiondetailview {
      *
      */
     private function render_datacard_of_testitem(object $record) {
-        global $OUTPUT;
 
         $datacard = new datacard(
             $this->testitemid,
