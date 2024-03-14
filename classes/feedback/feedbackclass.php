@@ -514,15 +514,6 @@ class feedbackclass {
                 self::add_coloroption('6', $coloroptions);
                 self::add_coloroption('7', $coloroptions);
                 break;
-            case 7:
-                self::add_coloroption('1', $coloroptions);
-                self::add_coloroption('2', $coloroptions);
-                self::add_coloroption('3', $coloroptions);
-                self::add_coloroption('4', $coloroptions);
-                self::add_coloroption('5', $coloroptions);
-                self::add_coloroption('6', $coloroptions);
-                self::add_coloroption('7', $coloroptions);
-                break;
             case 8:
                 self::add_coloroption('1', $coloroptions); // 1
                 self::add_coloroption('2', $coloroptions); // 2
