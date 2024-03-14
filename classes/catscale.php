@@ -548,6 +548,8 @@ class catscale {
                     'catscaleids' => $ancestorsintarray,
                     'mainscale' => reset($parentscales),
                 ];
+            default:
+                return $ancestorsintarray;
         }
     }
 

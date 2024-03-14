@@ -17,6 +17,7 @@
 namespace local_catquiz\output;
 
 use local_catquiz\catquiz;
+use local_catquiz\catscale;
 use local_catquiz\table\testenvironments_table;
 use moodle_url;
 use templatable;
@@ -51,15 +52,14 @@ class testenvironmentdashboard implements renderable, templatable {
      * @param ?int $catscaleid If given, only return test environments that use the given cat scale.
      * @return string
      */
-    public function testenvironmenttable($catscaleid = null) {
+    public function testenvironmenttable($catscaleid = 0) {
 
         $tablesuffix = $catscaleid < 1 ? "" : $catscaleid;
 
         $table = new testenvironments_table('testenvironmentstable' . $tablesuffix);
 
-        list($select, $from, $where, $filter, $params) = $catscaleid
-        ? catquiz::return_sql_for_testenvironments("catscaleid=$catscaleid")
-        : catquiz::return_sql_for_testenvironments();
+        list($select, $from, $where, $filter, $params) =
+            catquiz::return_sql_for_testenvironments($catscaleid);
 
         $table->set_filter_sql($select, $from, $where, $filter, $params);
 
@@ -100,37 +100,45 @@ class testenvironmentdashboard implements renderable, templatable {
         ]);
 
         $table->define_filtercolumns(
-            ['name' => [
-                'localizedname' => get_string('name', 'core'),
-            ], 'component' => [
-                'localizedname' => get_string('component', 'local_catquiz'),
-            ], 'visible' => [
-                'localizedname' => get_string('visible', 'core'),
-                '1' => get_string('visible', 'core'),
-                '0' => get_string('invisible', 'local_catquiz'),
-            ], 'status' => [
-                'localizedname' => get_string('status'),
-                '2' => get_string('force', 'local_catquiz'),
-                '1' => get_string('active', 'core'),
-                '0' => get_string('inactive', 'core'),
-            ], 'lang' => [
-                'localizedname' => get_string('lang', 'local_catquiz'),
-            ],
+            [
+                'id' => 'id',
+                'name' => [
+                    'localizedname' => get_string('name', 'core'),
+                ],
+                'component' => [
+                    'localizedname' => get_string('component', 'local_catquiz'),
+                ],
+                'visible' => [
+                    'localizedname' => get_string('visible', 'core'),
+                    '1' => get_string('visible', 'core'),
+                    '0' => get_string('invisible', 'local_catquiz'),
+                ],
+                'status' => [
+                    'localizedname' => get_string('status'),
+                    '2' => get_string('force', 'local_catquiz'),
+                    '1' => get_string('active', 'core'),
+                    '0' => get_string('inactive', 'core'),
+                ],
+                'lang' => [
+                    'localizedname' => get_string('lang', 'local_catquiz'),
+                ],
             ]);
         $table->define_fulltextsearchcolumns(['name', 'component', 'description']);
-        $table->define_sortablecolumns([
-            'name',
-            'component',
-            'visible',
-            'availability',
-            'lang',
-            'status',
-            'parentid',
-            'timemodified',
-            'timecreated',
-            'action',
-            'course',
-        ]);
+        $table->define_sortablecolumns(
+            [
+                'name',
+                'component',
+                'visible',
+                'availability',
+                'lang',
+                'status',
+                'parentid',
+                'timemodified',
+                'timecreated',
+                'action',
+                'course',
+            ]
+        );
 
         $table->sort_default_column = 'timemodified';
         $table->sort_default_order = SORT_DESC;

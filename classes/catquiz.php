@@ -726,14 +726,14 @@ class catquiz {
     /**
      * Return sql to render all or a subset of testenvironments
      *
-     * @param string $where
+     * @param int $catscaleid
      * @param array $filterarray
      *
      * @return array
      *
      */
     public static function return_sql_for_testenvironments(
-        string $where = "1=1",
+        int $catscaleid = 0,
         array $filterarray = []) {
         global $DB;
         $params = [];
@@ -743,7 +743,7 @@ class catquiz {
 
         $from = "
         ( SELECT
-            c.id,
+            ct.id,
             name,
             component,
             c.visible,
@@ -775,6 +775,14 @@ class catquiz {
             GROUP BY c.id
             ) s2 ON s2.courseid = ct.courseid
             ) s3";
+
+        $where = "1=1";
+        $filter = '';
+
+        if (!empty($catscaleid)) {
+            $where .= ' AND catscaleid =:catscaleid';
+            $params['catscaleid'] = $catscaleid;
+        }
 
         return [$select, $from, $where, $filter, $params];
     }
