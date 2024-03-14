@@ -201,10 +201,6 @@ class mixedraschbirnbaum extends model_raschmodel {
 
         $hessian = [[]];
 
-        // Pre-Calculate high frequently used exp-terms.
-        $expab = exp($a * $b);
-        $expbp = exp($b * $pp);
-
         if ($k >= 1.0) {
             // Calculate d²/ da².
             $hessian[0][0] = -($b ** 2 * ($c - 1) * exp($b * ($a + $pp)) * ($c * exp(2 * $a * $b) - exp(2 * $b * $pp))) /
@@ -357,7 +353,6 @@ class mixedraschbirnbaum extends model_raschmodel {
         $pp = $pp['ability'];
         $a = $ip['difficulty'];
         $b = $ip['discrimination'];
-        $c = $ip['guessing'];
 
         return $n * (log($or) + $b * ($a - $pp)) ** 2;
     }
@@ -375,7 +370,6 @@ class mixedraschbirnbaum extends model_raschmodel {
         $pp = $pp['ability'];
         $a = $ip['difficulty'];
         $b = $ip['discrimination'];
-        $c = $ip['guessing'];
 
         $derivative = [];
 
@@ -400,7 +394,6 @@ class mixedraschbirnbaum extends model_raschmodel {
         $pp = $pp['ability'];
         $a = $ip['difficulty'];
         $b = $ip['discrimination'];
-        $c = $ip['guessing'];
 
         $derivative = [[]];
 
@@ -452,8 +445,6 @@ class mixedraschbirnbaum extends model_raschmodel {
 
         // Placement of the discriminatory parameter.
         $bp = floatval(get_config('catmodel_mixedraschbirnbaum', 'trusted_region_placement_b'));
-        // Slope of the discriminatory parameter.
-        $bs = floatval(get_config('catmodel_mixedraschbirnbaum', 'trusted_region_slope_b'));
         // Use 5 times of placement as maximal value of trusted region.
         $btr = floatval(get_config('catmodel_mixedraschbirnbaum', 'trusted_region_factor_max_b'));
 
@@ -533,7 +524,6 @@ class mixedraschbirnbaum extends model_raschmodel {
      */
     public static function get_log_tr_hessian(array $ip): array {
         // Set values for difficulty parameter.
-        $am = 0; // Mean of difficulty.
         $as = 2; // Standard derivation of difficulty.
 
         // Placement of the discriminatory parameter.
