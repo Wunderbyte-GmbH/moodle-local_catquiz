@@ -33,7 +33,7 @@ use renderable;
  * Renderable class for the catscalemanagers
  *
  * @package    local_catquiz
- * @copyright  2023 Wunderbyte GmbH
+ * @copyright  2024 Wunderbyte GmbH
  * @author     Georg Maißer, Magdalena Holczik
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
