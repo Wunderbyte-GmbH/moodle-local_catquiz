@@ -252,7 +252,7 @@ class testitemdashboard implements renderable, templatable {
     /**
      * Renders button to get back to testitem overview table.
      *
-     * @return string
+     * @return array
      *
      */
     private function get_back_to_table_button() {
