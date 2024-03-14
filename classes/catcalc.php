@@ -138,8 +138,8 @@ class catcalc {
         $hessian = self::build_callable_array($hfuns);
         $hessian = fn ($pp) => matrixcat::multi_sum($hessian($pp));
 
-        $trustedregionsfunction = fn($ability) => model_raschmodel::get_ability_tr_jacobian($ability, $mean, $sd);
-        $trustedregionsderivate = fn($ability) => model_raschmodel::get_ability_tr_hessian($ability, $mean, $sd);
+        $trfunction = fn($ability) => model_raschmodel::get_ability_tr_jacobian($ability, $mean, $sd);
+        $trderivate = fn($ability) => model_raschmodel::get_ability_tr_hessian($ability, $mean, $sd);
         $trustedregionfilter = fn($ability) => model_raschmodel::restrict_to_trusted_region_pp(
             $ability,
             $trlowerlimit,
@@ -157,8 +157,8 @@ class catcalc {
             3,
             500,
             $trustedregionfilter,
-            $trustedregionsfunction,
-            $trustedregionsderivate
+            $trfunction,
+            $trderivate
         );
 
         // The ability is wrapped inside an array.
