@@ -195,10 +195,7 @@ class catquiz_handler {
         array $subscales,
         array &$elements,
         $mform,
-        string $elementadded = '',
-        $parentscalename = '') {
-
-        $data = $mform->getSubmitValues();
+        string $elementadded = '') {
 
         if (empty($subscales)) {
             return;
@@ -362,10 +359,9 @@ class catquiz_handler {
      * Validate the submitted fields relevant to this plugin.
      *
      * @param array $data
-     * @param array $files
      * @return array
      */
-    public static function instance_form_validation(array $data, array $files) {
+    public static function instance_form_validation(array $data) {
 
         $errors = [];
 
@@ -424,15 +420,15 @@ class catquiz_handler {
             = get_string('setsevalue', 'local_catquiz', $sevalues);
         }
 
-        $hasmaxquestionsperscale = array_key_exists('maxquestionsscalegroup', $data);
+        $hasmaxqpscale = array_key_exists('maxquestionsscalegroup', $data);
         // Number of questions - validate higher and lower values.
-        if ($hasmaxquestionsperscale
+        if ($hasmaxqpscale
             && (int) $data['maxquestionsscalegroup']['catquiz_minquestionspersubscale']
             >= (int) $data['maxquestionsscalegroup']['catquiz_maxquestionspersubscale']
             && 0 != (int) $data['maxquestionsscalegroup']['catquiz_maxquestionspersubscale']) {
             $errors['maxquestionsscalegroup'] = get_string('formminquestgreaterthan', 'local_catquiz');
         }
-        if ($hasmaxquestionsperscale
+        if ($hasmaxqpscale
             && (int) $data['maxquestionsgroup']['catquiz_minquestions']
             >= (int) $data['maxquestionsgroup']['catquiz_maxquestions']
             && 0 != (int) $data['maxquestionsgroup']['catquiz_maxquestions']) {
@@ -440,7 +436,7 @@ class catquiz_handler {
         }
 
         // Min questions per scale <= max questions per test.
-        if ($hasmaxquestionsperscale
+        if ($hasmaxqpscale
             && 0 != (int) $data['maxquestionsscalegroup']['catquiz_minquestionspersubscale']
             && 0 != (int) $data['maxquestionsgroup']['catquiz_maxquestions']) {
             if ((int) $data['maxquestionsscalegroup']['catquiz_minquestionspersubscale']
@@ -661,7 +657,7 @@ class catquiz_handler {
             return;
         } else if (isset($scaleidofcopyvalue) && !empty($subscaleids)) {
             // Copy values from a parent scale to all other subscale elements.
-            $numberoffeedbackoptions = intval($values['numberoffeedbackoptionsselect']);
+            $nfeedbackoptions = intval($values['numberoffeedbackoptionsselect']);
             $standardvalues = [];
             $feedbackvaluekeys = [
                 'feedback_scaleid_limit_lower_',
@@ -674,7 +670,7 @@ class catquiz_handler {
                 'feedbacklegend_scaleid_',
             ];
             // Fetch standard values from the parentscale, we want to apply to all subscales.
-            for ($j = 1; $j <= $numberoffeedbackoptions; $j++) {
+            for ($j = 1; $j <= $nfeedbackoptions; $j++) {
                 foreach ($feedbackvaluekeys as $feedbackvaluekey) {
                     if (!isset($standardvalues[$feedbackvaluekey])) {
                         $standardvalues[$feedbackvaluekey] = [];
@@ -697,7 +693,7 @@ class catquiz_handler {
             // For all keys (in array) with all subscales (in array) for required number of feedbackoptions.
             foreach ($feedbackvaluekeys as $feedbackvaluekey) {
                 foreach ($subscaleids as $subscaleid) {
-                    for ($j = 1; $j <= $numberoffeedbackoptions; $j++) {
+                    for ($j = 1; $j <= $nfeedbackoptions; $j++) {
                         $subscalekey = $feedbackvaluekey . $subscaleid . '_' . $j;
                         $values[$subscalekey] = $standardvalues[$feedbackvaluekey][$j];
                     }
@@ -819,15 +815,11 @@ class catquiz_handler {
      *
      * This is called when the attempt is finished.
      *
-     * @param stdClass $adaptivequiz
-     * @param cm_info $cm
      * @param stdClass $attemptrecord
      *
      * @return string
      */
     public static function attempt_finished(
-        stdClass $adaptivequiz,
-        cm_info $cm,
         stdClass $attemptrecord): string {
         // Update the endtime and number of testitems used in the attempts table.
         global $DB;
@@ -892,8 +884,8 @@ class catquiz_handler {
 
         // Default is infinite represented by -1.
         $maxquestionsperscale = 0;
-        $hasmaxquestionsperscale = property_exists($quizsettings, 'maxquestionsscalegroup');
-        $maxquestionsperscale = $hasmaxquestionsperscale
+        $hasmaxqpscale = property_exists($quizsettings, 'maxquestionsscalegroup');
+        $maxquestionsperscale = $hasmaxqpscale
             ? intval($quizsettings->maxquestionsscalegroup->catquiz_maxquestionspersubscale)
             : $maxquestionsperscale;
         if ($maxquestionsperscale == 0) {
