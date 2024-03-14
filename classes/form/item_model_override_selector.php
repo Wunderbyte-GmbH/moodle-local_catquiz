@@ -368,8 +368,12 @@ class item_model_override_selector extends dynamic_form {
      *
      * Example:
      *     $this->set_data(get_entity($this->_ajaxformdata['cmid']));
+     * @param int $contextid
+     *
+     * @return void
+     *
      */
-    public function set_data_for_dynamic_submission(): void {
+    public function set_data_for_dynamic_submission($contextid = 0): void {
 
         $data = (object) $this->_ajaxformdata;
         $models = model_strategy::get_installed_models();
@@ -383,7 +387,7 @@ class item_model_override_selector extends dynamic_form {
         }
 
         if (empty($data->contextid)) {
-            $data->contextid = required_param('contextid', PARAM_INT);
+            $data->contextid = $contextid ?? required_param('contextid', PARAM_INT);
         }
         if (empty($data->testitemid)) {
             $data->testitemid = required_param('id', PARAM_INT);

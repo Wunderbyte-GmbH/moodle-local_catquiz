@@ -210,7 +210,7 @@ class testitemdashboard implements renderable, templatable {
      */
     private function render_overrides_form() {
         $form = new item_model_override_selector();
-        $form->set_data_for_dynamic_submission();
+        $form->set_data_for_dynamic_submission($this->contextid);
 
         return html_writer::div($form->render(), '', ['id' => 'lcq_model_override_form']);
     }
