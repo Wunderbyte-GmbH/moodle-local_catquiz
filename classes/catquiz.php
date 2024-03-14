@@ -498,7 +498,7 @@ class catquiz {
 
 
     /**
-     * Returns the sql that can be used to get input data for the helpercat::get_item_list($data) function.
+     * Returns the sql that can be used to get input data to get item list.
      *
      * @param mixed $contextid
      * @param array $catscaleids

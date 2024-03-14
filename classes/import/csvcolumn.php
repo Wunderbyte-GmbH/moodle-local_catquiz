@@ -148,28 +148,4 @@ class csvcolumn {
             return false;
         }
     }
-
-    /**
-     * Transform a date object to a string in the defined format.
-     * @param mixed $date
-     * @param string $format
-     * @return string
-     */
-    public function date_to_string($date, $format) {
-
-        // Input is date return string in defined format.
-        return "";
-    }
-
-    /**
-     * Transform a string to an object in the defined format.
-     * @param mixed $date
-     * @param string $format
-     * @return mixed
-     */
-    public function string_to_date($date, $format) {
-
-        // Input is string return date in defined format.
-        return "";
-    }
 }

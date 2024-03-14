@@ -55,8 +55,6 @@ class item_model_override_selector extends dynamic_form {
      */
     public function definition() {
 
-        global $CFG, $DB, $PAGE;
-
         $mform = $this->_form;
         $data = (object) $this->_ajaxformdata;
 
@@ -506,7 +504,7 @@ class item_model_override_selector extends dynamic_form {
      */
     public function validation($data, $files): array {
         $errors = [];
-
+        $data = (array) $data;
         $models = model_strategy::get_installed_models();
         $counter = [];
         foreach ($models as $modelname => $location) {

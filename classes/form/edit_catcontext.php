@@ -46,8 +46,6 @@ class edit_catcontext extends dynamic_form {
      */
     public function definition() {
 
-        global $CFG;
-
         $mform = $this->_form;
         $data = (object) $this->_ajaxformdata;
 

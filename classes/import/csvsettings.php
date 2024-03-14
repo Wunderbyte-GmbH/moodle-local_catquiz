@@ -18,7 +18,7 @@
  * Class csvsettings.
  *
  * @package    local_catquiz
- * @copyright  2023 Wunderbyte GmbH <georg.maisser@wunderbyte.at>
+ * @copyright  2024 Wunderbyte GmbH <georg.maisser@wunderbyte.at>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
@@ -60,7 +60,7 @@ class csvsettings {
     /**
      * @var boolean
      */
-    public $columnsarrayisassociative = false;
+    public $isassociative = false;
 
     /**
      * @var boolean
@@ -98,7 +98,7 @@ class csvsettings {
         // Check if columns array is sequential or associative.
         $keys = array_keys($columns);
         if ($keys !== array_keys($keys)) {
-            $this->columnsarrayisassociative = true;
+            $this->isassociative = true;
             foreach ($columns as $ckey => $cvalue) {
                 $this->columns[$ckey] = new csvcolumn(
                 $ckey,

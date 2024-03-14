@@ -78,16 +78,16 @@ class testitemactivitystatus_updated extends \core\event\base {
             !empty($otherarray->context) &&
             !empty($otherarray->component)
         ) {
-            $linktotestitemdetailview = catscale::get_link_to_testitem(
+            $linktotidetailview = catscale::get_link_to_testitem(
                 $data['objectid'],
                 $otherarray->catscaleid,
                 $otherarray->context,
                 $otherarray->component);
         } else {
-            $linktotestitemdetailview = get_string('testitem', 'local_catquiz', $data['objectid']);
+            $linktotidetailview = get_string('testitem', 'local_catquiz', $data['objectid']);
         }
 
-        $data['testitemlink'] = $linktotestitemdetailview;
+        $data['testitemlink'] = $linktotidetailview;
 
         $testitemstring = get_string('update_testitem_activity_status', 'local_catquiz', $data);
 

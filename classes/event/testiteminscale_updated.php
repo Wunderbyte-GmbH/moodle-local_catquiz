@@ -74,16 +74,16 @@ class testiteminscale_updated extends \core\event\base {
             !empty($otherarray->context) &&
             !empty($otherarray->component)
         ) {
-            $linktotestitemdetailview = catscale::get_link_to_testitem(
+            $linktotidetailview = catscale::get_link_to_testitem(
                 $testitemid,
                 $otherarray->catscaleid,
                 $otherarray->context,
                 $otherarray->component);
         } else {
-            $linktotestitemdetailview = get_string('testitem', 'local_catquiz', $testitemid);
+            $linktotidetailview = get_string('testitem', 'local_catquiz', $testitemid);
         }
 
-        $data['testitemlink'] = $linktotestitemdetailview;
+        $data['testitemlink'] = $linktotidetailview;
 
         $catscaleid = $otherarray->catscaleid;
         $linktoscale = catscale::get_link_to_catscale($catscaleid);
