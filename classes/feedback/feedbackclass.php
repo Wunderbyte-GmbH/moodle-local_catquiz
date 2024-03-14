@@ -89,10 +89,10 @@ class feedbackclass {
             $options[$i] = $i;
         }
 
-        $numberoffeedbackspersubscale = $data['numberoffeedbackoptionsselect']
+        $nfeedbpersubscale = $data['numberoffeedbackoptionsselect']
             ?? optional_param('numberoffeedbackoptionsselect', 0, PARAM_INT);
-        $numberoffeedbackspersubscale = empty($numberoffeedbackspersubscale)
-            ? LOCAL_CATQUIZ_DEFAULT_NUMBER_OF_FEEDBACKS_PER_SCALE : intval($numberoffeedbackspersubscale);
+        $nfeedbpersubscale = empty($nfeedbpersubscale)
+            ? LOCAL_CATQUIZ_DEFAULT_NUMBER_OF_FEEDBACKS_PER_SCALE : intval($nfeedbpersubscale);
 
         $element = $mform->addElement(
             'static',
@@ -109,7 +109,7 @@ class feedbackclass {
             $options,
             ['data-on-change-action' => 'numberOfFeedbacksSubmit'],
         );
-        $element->setValue($numberoffeedbackspersubscale);
+        $element->setValue($nfeedbpersubscale);
         $mform->addHelpButton('numberoffeedbackoptionsselect', 'numberoffeedbackoptionpersubscale', 'local_catquiz');
         $elements[] = $element;
 
@@ -121,7 +121,7 @@ class feedbackclass {
             'data-action' => 'submitNumberOfFeedbackOptions',
         ]);
         // Generate the options for the colors. Same values are applied to all subscales and subfeedbacks.
-        $coloroptions = self::get_array_of_colors($numberoffeedbackspersubscale);
+        $coloroptions = self::get_array_of_colors($nfeedbpersubscale);
         // We need this to close the collapsable header elements.
         $html2 = $OUTPUT->render_from_template('local_catquiz/feedback/feedbackform_collapsible_close', []);
         // Finds all courses user is enroled to.
@@ -135,7 +135,7 @@ class feedbackclass {
         }
         foreach ($scales as $scale) {
             $subelements = [];
-            $numberoffeedbacksfilledout = 0;
+            $nfeedbacksgiven = 0;
 
             // Only for parentscales and selected scales we display the feedbackoptions.
             $checkboxchecked = optional_param('catquiz_subscalecheckbox_' . $scale->id, 0, PARAM_INT);
@@ -143,7 +143,7 @@ class feedbackclass {
                 continue;
             }
 
-            for ($j = 1; $j <= $numberoffeedbackspersubscale; $j++) {
+            for ($j = 1; $j <= $nfeedbpersubscale; $j++) {
                 // We need to create a div tag to "wrap" feedback range.
                 $element = $mform->createElement('html',
                 '<div data-name="feedback_scale_' . $scale->name . '_range_' . $j. '" data-depth="' . $scale->depth . '" >');
@@ -167,7 +167,7 @@ class feedbackclass {
                 }
 
                 if (isset($feedbacktext) && strlen($feedbacktext) > 0) {
-                    $numberoffeedbacksfilledout ++;
+                    $nfeedbacksgiven ++;
                 }
 
                 // Header for Subfeedback.
@@ -198,7 +198,7 @@ class feedbackclass {
                         ?? optional_param('feedback_scaleid_limit_lower_'. $scale->id . '_' . $j, -12345, PARAM_FLOAT);
                     if ($lowerlimit === -12345) {
                         $lowerlimit = self::return_limits_for_scale(
-                            $numberoffeedbackspersubscale,
+                            $nfeedbpersubscale,
                             $j,
                             true,
                             $lowestability,
@@ -210,7 +210,7 @@ class feedbackclass {
                 // If the Element is new, we set the default.
                 // If we get a value here, the overriding value is set in the set_data_after_definition function.
                 $subelements[] = $element;
-                if ($j === $numberoffeedbackspersubscale) {
+                if ($j === $nfeedbpersubscale) {
                     $element = $mform->addElement(
                         'static',
                         'highestvalue',
@@ -231,7 +231,7 @@ class feedbackclass {
                         ?? optional_param('feedback_scaleid_limit_upper_'. $scale->id . '_' . $j, -12345, PARAM_FLOAT);
                     if ($upperlimit === -12345) {
                         $upperlimit = self::return_limits_for_scale(
-                            $numberoffeedbackspersubscale,
+                            $nfeedbpersubscale,
                             $j,
                             false,
                             $lowestability,
@@ -350,15 +350,15 @@ class feedbackclass {
 
             // Add a header for each scale.
             // We check if feedbacks completed partially, entirely or not at all.
-            if ($numberoffeedbacksfilledout == 0) {
+            if ($nfeedbacksgiven == 0) {
                 // No feedback entries saved in editor.
                 $headersuffix = "";
-            } else if ($numberoffeedbacksfilledout == $j - 1) {
+            } else if ($nfeedbacksgiven == $j - 1) {
                 // All feedback entries saved in editor.
                 $headersuffix = ' : ' . get_string('feedbackcompletedentirely', 'local_catquiz');
             } else {
                 // Partially submitted feedback.
-                $statusofcompletion = strval($numberoffeedbacksfilledout) . "/" . strval($j - 1);
+                $statusofcompletion = strval($nfeedbacksgiven) . "/" . strval($j - 1);
                 $headersuffix = ' : ' . get_string('feedbackcompletedpartially', 'local_catquiz', $statusofcompletion);
             }
 
@@ -374,19 +374,19 @@ class feedbackclass {
 
             // Make the different feedback options nested.
             $numberofclosinghtmls = 0;
-            if (!isset($previousdepth) || !isset($previousparentscaleid)) {
+            if (!isset($previousdepth) || !isset($prevparentscaleid)) {
                 $numberofclosinghtmls = 0;
                 // If it's the first scale, don't close the html.
             } else if ($scale->depth == $previousdepth) {
                 $numberofclosinghtmls = 1;
                 // Element on the same level.
-            } else if ($scale->parentid != $previousparentscaleid
+            } else if ($scale->parentid != $prevparentscaleid
             && $scale->depth < $previousdepth) {
                 $depthdifference = $previousdepth - $scale->depth;
                 $numberofclosinghtmls = $depthdifference + 1;
             }
 
-            $previousparentscaleid = $scale->parentid;
+            $prevparentscaleid = $scale->parentid;
             $previousdepth = $scale->depth;
 
             $headername = get_string('catquizfeedbackheader', 'local_catquiz', $scale->name) . $headersuffix;
@@ -451,8 +451,6 @@ class feedbackclass {
      *
      */
     public static function add_coloroption(string $color, array &$coloroptions) {
-        $colorname = get_string('color_' . $color . '_name', 'local_catquiz');
-
         $coloroptions[$color] = get_string(
             'color_' . $color . '_code',
             'local_catquiz'
@@ -462,16 +460,16 @@ class feedbackclass {
     /**
      * Get right number and type of colors.
      *
-     * @param int $numberoffeedbackspersubscale
+     * @param int $nfeedbpersubscale
      * @return array $coloroptions
      *
      */
-    public static function get_array_of_colors($numberoffeedbackspersubscale) {
+    public static function get_array_of_colors($nfeedbpersubscale) {
 
         $coloroptions = [];
         // Depending of the number of options, different colors will be chosen.
         // See strings for colornames.
-        switch ($numberoffeedbackspersubscale) {
+        switch ($nfeedbpersubscale) {
             case 1:
                 self::add_coloroption("3", $coloroptions);
                 break;
@@ -530,35 +528,6 @@ class feedbackclass {
     }
 
     /**
-     * Function to access test record and return the settings relevant for feedback.
-     * @param int $quizid
-     * @param string $component
-     * @return array
-     */
-    private static function return_feedback_settings_from_json(int $quizid, string $component) {
-
-        global $DB;
-
-        $test = $DB->get_record('local_catquiz_tests', ['componentid' => $quizid, 'component' => $component]);
-
-        $settings = json_decode($test->json);
-
-        $returnarray = [];
-        foreach ($settings as $key => $value) {
-            if (strpos($key, 'feedback_scaleid_') === 0) {
-
-                list($a, $b, $scaleid, $field) = explode('_', $key);
-
-                $returnarray[$scaleid][$field] = $value;
-
-            }
-        }
-
-        return $returnarray;
-    }
-
-
-    /**
      * Returns lower or upper value for scales, depending on bool.
      *
      * @param mixed $nroptions
@@ -598,11 +567,11 @@ class feedbackclass {
     public static function validation_range_limits_nogaps(array &$errors, array $data) {
         if (!empty((int) $data["catquiz_catscales"])) {
             $scales = dataapi::get_catscale_and_children((int) $data["catquiz_catscales"], true);
-            $numberoffeedbackspersubscale = ((int) $data['numberoffeedbackoptionsselect']) ?? 1;
+            $nfeedbpersubscale = ((int) $data['numberoffeedbackoptionsselect']) ?? 1;
             foreach ($scales as $scale) {
                 if (((int) $data["catquiz_catscales"]) === $scale->id ||
                     !empty($data["catquiz_subscalecheckbox_" . $scale->id])) {
-                    for ($j = 2; $j <= $numberoffeedbackspersubscale; $j++) {
+                    for ($j = 2; $j <= $nfeedbpersubscale; $j++) {
                         // Upper limit of previous range must be equal of lowest limit for current range.
                         if ((float) $data['feedback_scaleid_limit_upper_' . $scale->id . '_' . ($j - 1)] !==
                             (float) $data['feedback_scaleid_limit_lower_' . $scale->id . '_' . $j]) {
