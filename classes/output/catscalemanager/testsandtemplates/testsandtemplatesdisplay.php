@@ -28,7 +28,7 @@ use moodle_url;
  * Renderable class for the catscalemanagers
  *
  * @package    local_catquiz
- * @copyright  2023 Wunderbyte GmbH
+ * @copyright  2024 Wunderbyte GmbH
  * @author     Magdalena Holczik
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -82,11 +82,9 @@ class testsandtemplatesdisplay {
      */
     public function export_data_array(): array {
 
+        $selector = scaleandcontexselector::render_rootscaleselector($this->scaleid);
         $data = [
-            'scaleselectors' =>
-                empty(scaleandcontexselector::render_scaleselectors($this->scaleid))
-                ? "" : scaleandcontexselector::render_scaleselectors($this->scaleid),
-            'checkbox' => scaleandcontexselector::render_subscale_checkbox($this->usesubs),
+            'scaleselectors' => $selector ?? "",
             'table' => $this->render_table(),
 
         ];

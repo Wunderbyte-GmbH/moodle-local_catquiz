@@ -55,6 +55,8 @@ class testenvironmentdashboard implements renderable, templatable {
     public function testenvironmenttable($catscaleid = 0) {
 
         $tablesuffix = $catscaleid < 1 ? "" : $catscaleid;
+        $catscaleancestors = catscale::get_ancestors($catscaleid);
+        $catscaleid = end($catscaleancestors) ?: $catscaleid;
 
         $table = new testenvironments_table('testenvironmentstable' . $tablesuffix);
 

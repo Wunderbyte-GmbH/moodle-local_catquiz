@@ -83,6 +83,21 @@ class scaleandcontexselector {
     /**
      * Renders the scale selector.
      *
+     * @param int $scale
+     *
+     * @return string
+     *
+     */
+    public static function render_rootscaleselector(int $scale) {
+        $ancestorids = catscale::get_ancestors($scale);
+        $catscaleid = end($ancestorids) ?: $scale;
+        $selector = self::render_selector($catscaleid);
+        return $selector;
+    }
+
+    /**
+     * Renders the scale selector.
+     *
      * @param mixed $scaleid
      * @param bool $noselection
      * @param string $label
