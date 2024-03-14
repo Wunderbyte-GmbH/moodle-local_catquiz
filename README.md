@@ -21,7 +21,7 @@ Furthermore, the plugin allows to pursuit different test strategies:
 * run a classical test (ask all questions), but evaluate by using IRT
 
 For using this plugin, you are required to install the following plugins:
-* mod_adaptivequiz - the activity from which a CAT test can be started (vers 3.1 onwards). Please use the [catmodel_subplugins_with_mod_form_reload_400 branch in the wunderbyte fork](https://github.com/Wunderbyte-GmbH/moodle-mod_adaptivequiz/tree/catmodel_subplugins_with_mod_form_reload_400) until our changes are integrated into the [upstream plugin](https://github.com/vtos/moodle-mod_adaptivequiz).
+* mod_adaptivequiz - the activity from which a CAT test can be started (vers 3.1 onwards). Please use the [wb_0.9.0 release in the wunderbyte fork](https://github.com/Wunderbyte-GmbH/moodle-mod_adaptivequiz/releases/tag/wb_0.9.0) until our changes are integrated into the [upstream plugin](https://github.com/vtos/moodle-mod_adaptivequiz) (in progress).
 * adaptivequizcatmodel_catquiz - which serves as a bridge between mod_adaptivequiz and local_adaptivequiz
 * local_wunderbyte_table - database and tables handling
 
