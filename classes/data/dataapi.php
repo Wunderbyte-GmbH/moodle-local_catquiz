@@ -205,16 +205,16 @@ class dataapi {
             }
         }
 
-        if ($returnasarray) {
-            $returndata = [];
-            foreach ($returnarray as $catscalestructure) {
-                $catscale = get_object_vars($catscalestructure);
-                $returndata[] = $catscale;
-            }
-            return $returndata;
-        } else {
+        if (!$returnasarray) {
             return $returnarray;
         }
+
+        $returndata = [];
+        foreach ($returnarray as $catscalestructure) {
+            $catscale = get_object_vars($catscalestructure);
+            $returndata[] = $catscale;
+        }
+        return $returndata;
     }
 
     /**
