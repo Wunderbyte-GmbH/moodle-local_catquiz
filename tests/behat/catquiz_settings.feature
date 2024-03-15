@@ -31,6 +31,9 @@ Feature: As a teacher I setup adaptive quiz with CATquiz Scales and Feedbacks.
     And I am on "Course 1" course homepage with editing mode on
     And I add a "Adaptive Quiz" to section "1"
     And I set the following fields to these values:
+      | catmodel                                              | empty |
+    And I wait until the page is ready
+    And I set the following fields to these values:
       | Name             | Adaptive CATquiz  |
       | ID number        | adaptivecatquiz1  |
       | catmodel         | Catquiz CAT model |
@@ -60,6 +63,9 @@ Feature: As a teacher I setup adaptive quiz with CATquiz Scales and Feedbacks.
     And I am on the "adaptivecatquiz1" Activity page logged in as teacher1
     And I follow "Settings"
     ## And I wait until the page is ready
+    And I set the following fields to these values:
+      | catmodel                                              | empty |
+    And I wait until the page is ready
     And I set the following fields to these values:
       | catmodel                                              | Catquiz CAT model |
       | Select CAT scale                                      | Simulation        |
@@ -134,6 +140,9 @@ Feature: As a teacher I setup adaptive quiz with CATquiz Scales and Feedbacks.
       | adaptivequiz | Adaptive CATquiz | C1     | 1       | adaptivecatquiz1 |
     And I am on the "adaptivecatquiz1" Activity page logged in as teacher1
     And I follow "Settings"
+    And I set the following fields to these values:
+      | catmodel                                              | empty |
+    And I wait until the page is ready
     And I set the following fields to these values:
       | catmodel                                   | Catquiz CAT model         |
       | Select CAT scale                           | Simulation                |
@@ -218,6 +227,9 @@ Feature: As a teacher I setup adaptive quiz with CATquiz Scales and Feedbacks.
     And I am on the "adaptivecatquiz1" Activity page logged in as teacher1
     And I follow "Settings"
     ## And I wait until the page is ready
+    And I set the following fields to these values:
+      | catmodel                                              | empty |
+    And I wait until the page is ready
     And I set the following fields to these values:
       | catmodel                                              | Catquiz CAT model |
       | Select CAT scale                                      | Simulation        |
