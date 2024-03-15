@@ -100,7 +100,6 @@ class catquiz {
     /**
      * Returns the sql to get all the questions wanted.
      * @param array $wherearray
-     * @param array $filterarray
      * @return array
      */
     public static function return_sql_for_addquestions(array $wherearray = []) {
@@ -131,9 +130,8 @@ class catquiz {
      * @param array $catscaleids
      * @param int $contextid
      * @param array $wherearray
-     * @param array $filterarray
      * @param int $userid
-     * @param string|null $orderby If given, order by the given field in ascending order
+     * @param ?string $orderby If given, order by the given field in ascending order
      *
      * @return array
      *
@@ -292,7 +290,6 @@ class catquiz {
      * @param int $catscaleid
      * @param int $contextid
      * @param array $wherearray
-     * @param array $filterarray
      *
      * @return array
      *
@@ -780,8 +777,6 @@ class catquiz {
     /**
      * Return sql to render quiz attempts.
      *
-     * @param string $where
-     * @param array $filterarray
      *
      * @return array
      *

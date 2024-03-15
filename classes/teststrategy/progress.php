@@ -751,6 +751,12 @@ class progress implements JsonSerializable {
         return $response;
     }
 
+    /**
+     * Check if user gave up last question.
+     *
+     * @return bool
+     *
+     */
     private function user_gave_up_last_question(): bool {
         return catquiz::user_gave_up_question($this->get_usage_id(), $this->lastquestion->id);
     }
@@ -837,6 +843,12 @@ class progress implements JsonSerializable {
         return $this;
     }
 
+    /**
+     * Unset question
+     *
+     * @return progress
+     *
+     */
     public function unset_last_question() {
         $this->lastquestion = null;
         return $this;

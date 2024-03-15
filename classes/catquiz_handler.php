@@ -187,7 +187,6 @@ class catquiz_handler {
      * @param array $elements
      * @param mixed $mform
      * @param string $elementadded
-     * @param string $parentscalename
      *
      * @return void
      */

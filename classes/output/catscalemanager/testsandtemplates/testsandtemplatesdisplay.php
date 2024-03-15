@@ -16,8 +16,13 @@
 
 namespace local_catquiz\output\catscalemanager\testsandtemplates;
 
+use html_writer;
+use local_catquiz\catquiz;
+use local_catquiz\catscale;
 use local_catquiz\output\catscalemanager\scaleandcontexselector;
 use local_catquiz\output\testenvironmentdashboard;
+use local_catquiz\table\catscalequestions_table;
+use moodle_url;
 
 /**
  * Renderable class for the catscalemanagers
