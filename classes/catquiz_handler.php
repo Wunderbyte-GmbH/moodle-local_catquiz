@@ -815,11 +815,16 @@ class catquiz_handler {
      * This is called when the attempt is finished.
      *
      * @param stdClass $attemptrecord
+     * @param stdClass $adaptivequiz
+     * @param cm_info $cm
      *
      * @return string
      */
     public static function attempt_finished(
-        stdClass $attemptrecord): string {
+        stdClass $adaptivequiz,
+        cm_info $cm,
+        stdClass $attemptrecord
+        ): string {
         // Update the endtime and number of testitems used in the attempts table.
         global $DB;
         $id = $DB->get_record('local_catquiz_attempts', ['attemptid' => $attemptrecord->id], 'id')->id;
