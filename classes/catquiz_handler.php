@@ -814,11 +814,12 @@ class catquiz_handler {
      *
      * This is called when the attempt is finished.
      *
-     * @param stdClass $attemptrecord
      * @param stdClass $adaptivequiz
      * @param cm_info $cm
+     * @param stdClass $attemptrecord
      *
      * @return string
+     *
      */
     public static function attempt_finished(
         stdClass $adaptivequiz,
