@@ -86,3 +86,32 @@ Feature: As an admin I perform import of catscales along with questions to check
     And I should see "-2.8624" in the "[data-label=\"difficulty\"]" "css_element"
     And I should see "1.0814" in the "[data-label=\"discrimination\"]" "css_element"
     And I should see "0.0000" in the "[data-label=\"guessing\"]" "css_element"
+
+  @javascript
+  Scenario: Catscales import: admin toggle status and disable imported questions
+    Given the following "local_catquiz > importedcatscales" exist:
+      | filepath                                           | filename              |
+      | local/catquiz/tests/fixtures/mathematik2scales.csv | mathematik2scales.csv |
+    And I log in as "admin"
+    And I press "Catquiz"
+    And I wait until the page is ready
+    And I click on "Questions" "link" in the "#region-main" "css_element"
+    And I set the field "Scale" to "Mathematik"
+    And I should see "3 of 3 records found"
+    ## Disable 1st question
+    And I should see "42.8047" in the "//tr[contains(@id, 'questionstable_r1')]" "xpath_element"
+    And the "class" attribute of "//div[contains(@class, 'questionstable')]//tr[contains(@id, 'questionstable_r1')]//i[@title='Activate/Disable']" "xpath_element" should not contain "fa-eye-slash"
+    And I click on "togglestatus-" "link" in the "//div[contains(@class, 'questionstable')]//tr[contains(@id, 'questionstable_r1')]" "xpath_element"
+    And I wait "1" seconds
+    And I should see "You are about to change the activity status of the following item" in the ".modal.show" "css_element"
+    And I click on "Confirm" "button" in the ".modal.show" "css_element"
+    And I wait "1" seconds
+    And the "class" attribute of "//div[contains(@class, 'questionstable')]//tr[contains(@id, 'questionstable_r1')]//i[@title='Activate/Disable']" "xpath_element" should contain "fa-eye-slash"
+    ## Delete 3rd question
+    And I should see "0.5201" in the "//tr[contains(@id, 'questionstable_r3')]" "xpath_element"
+    And I click on "removetestitem-" "link" in the "//div[contains(@class, 'questionstable')]//tr[contains(@id, 'questionstable_r3')]" "xpath_element"
+    And I wait "1" seconds
+    And I should see "You are about to delete the following item:" in the ".modal.show" "css_element"
+    And I click on "Confirm" "button" in the ".modal.show" "css_element"
+    And I wait "1" seconds
+    And "//tr[contains(@id, 'questionstable_r3')]" "xpath_element" should not exist
