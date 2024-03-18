@@ -20,10 +20,12 @@ Furthermore, the plugin allows to pursuit different test strategies:
 * adaptive diagnose for all given (sub-)scales
 * run a classical test (ask all questions), but evaluate by using IRT
 
+### Dependencies
+
 For using this plugin, you are required to install the following plugins:
 * mod_adaptivequiz - the activity from which a CAT test can be started (vers 3.1 onwards). Please use the [wb-0.9.0-rc2 release in the wunderbyte fork](https://github.com/Wunderbyte-GmbH/moodle-mod_adaptivequiz/releases/tag/wb-0.9.0-rc2) until our changes are integrated into the [upstream plugin](https://github.com/vtos/moodle-mod_adaptivequiz) (in progress).
-* adaptivequizcatmodel_catquiz - which serves as a bridge between mod_adaptivequiz and local_adaptivequiz
-* local_wunderbyte_table - database and tables handling
+* [adaptivequizcatmodel_catquiz](https://github.com/Wunderbyte-GmbH/moodle-adaptivequizcatmodel_catquiz/releases/tag/1.0.0) - which serves as a bridge between mod_adaptivequiz and local_adaptivequiz
+* [local_wunderbyte_table](https://github.com/Wunderbyte-GmbH/moodle-local_wunderbyte_table) - database and tables handling
 
 It is recommended to install the following plugins as well:
 * local_shortcodes - helps to render results at any point in your courses
@@ -85,6 +87,7 @@ The following parameters can be defined:
 
 ## Installing via uploaded ZIP file ##
 
+1. Make sure to install the dependencies as described in [dependencies](#dependencies)
 1. Log in to your Moodle site as an admin and go to _Site administration >
    Plugins > Install plugins_.
 2. Upload the ZIP file with the plugin code. You should only be prompted to add
@@ -93,7 +96,9 @@ The following parameters can be defined:
 
 ## Installing manually ##
 
-The plugin can be also installed by putting the contents of this directory to
+Make sure to install the dependencies as described in the [dependencies](#dependencies).
+
+The plugin can then be installed by putting the contents of this directory to
 
     {your/moodle/dirroot}/local/catquiz
 
