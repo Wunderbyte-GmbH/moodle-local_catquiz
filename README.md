@@ -111,6 +111,24 @@ Alternatively, you can run
 
 to complete the installation from the command line.
 
+## Setup with sample data
+
+### Import sample data
+
+You can follow these steps to setup a quiz with sample data. This assumes that you've already installed the required plugins and created a course.
+
+1. Import questions to the course. You can use the [simulation.xml](https://github.com/Wunderbyte-GmbH/moodle-local_catquiz/blob/main/tests/fixtures/simulation.xml) file from the `tests/fixtures` directory.
+2. Import item parameters and create CAT scales: Click on the "Catquiz" link in the main menu and select the "Import" tab. You can use the [simulation.csv](https://github.com/Wunderbyte-GmbH/moodle-local_catquiz/blob/main/tests/fixtures/simulation.csv) file from the `tests/fixtures` directory. Select `;` as CSV separator. When you press import, this will automatically create new CAT scales. There will be warnings about missing labels for pilot questions, but you can ignore these.
+3. If you navigate to the CAT manager via the "Catquiz" link in the main menu, you can check the different tabs and see that items were imported.
+
+### Setup a quiz
+
+1. Navigate to your course, activate the edit mode, and add a new activity "Adaptive Quiz".
+2. After entering a name, in the "CAT model" section select Catquiz CAT model.
+3. Under "Purpose of test" you can select a teststrategy. Here we will use "CAT".
+4. You can check "Active pilot mode" to include questions without item parameters in the quiz. When value of 25 is used, on average 25% of the displayed questions will be pilot questions.
+5.  Additionally, you can choose what question the attempt should be started with, set a minimum and maximum number of questions per attempt (maybe for testing set the maximum to a low value like e.g. 8) and choose at which standard error the test should abort.
+
 ## License ##
 
 2024 Wunderbyte GmbH <info@wunderbyte.at>
@@ -126,3 +144,4 @@ PARTICULAR PURPOSE.  See the GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License along with
 this program.  If not, see <https://www.gnu.org/licenses/>.
+
