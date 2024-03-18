@@ -21,6 +21,7 @@ use local_catquiz\catquiz;
 use local_catquiz\catscale;
 use local_catquiz\output\catscalemanager\scaleandcontexselector;
 use local_catquiz\table\catscalequestions_table;
+use local_wunderbyte_table\filters\types\standardfilter;
 use moodle_url;
 
 /**
@@ -147,14 +148,12 @@ class questionsdisplay {
         $sortcolumns = $columnsarray;
         unset($sortcolumns['action']);
         $table->define_sortablecolumns(array_keys($sortcolumns));
-        $table->define_filtercolumns([
-            'qtype' => [
-                'localizedname' => get_string('questiontype', 'local_catquiz'),
-            ],
-            'model' => [
-                'localizedname' => get_string('model', 'local_catquiz'),
-            ],
-        ]);
+
+        $standardfilter = new standardfilter('qtype', get_string('questiontype', 'local_catquiz'));
+        $table->add_filter($standardfilter);
+
+        $standardfilter = new standardfilter('model', get_string('model', 'local_catquiz'));
+        $table->add_filter($standardfilter);
 
         $table->addcheckboxes = true;
 
@@ -232,22 +231,22 @@ class questionsdisplay {
             get_string('view', 'core'),
         ]);
 
-        $table->define_filtercolumns([
-            'categoryname' => [
-                    'localizedname' => get_string('questioncategories', 'local_catquiz'),
-            ],
-            'qtype' => [
-                'localizedname' => get_string('questiontype', 'local_catquiz'),
-                'ddimageortext' => get_string('pluginname', 'qtype_ddimageortext'),
-                'essay' => get_string('pluginname', 'qtype_essay'),
-                'gapselect' => get_string('pluginname', 'qtype_gapselect'),
-                'multianswer' => get_string('pluginname', 'qtype_multianswer'),
-                'multichoice' => get_string('pluginname', 'qtype_multichoice'),
-                'numerical' => get_string('pluginname', 'qtype_numerical'),
-                'shortanswer' => get_string('pluginname', 'qtype_shortanswer'),
-                'truefalse' => get_string('pluginname', 'qtype_truefalse'),
-            ],
+        $standardfilter = new standardfilter('categoryname', get_string('questioncategories', 'local_catquiz'));
+        $table->add_filter($standardfilter);
+
+        $standardfilter = new standardfilter('qtype', get_string('questiontype', 'local_catquiz'));
+        $standardfilter->add_options([
+            'ddimageortext' => get_string('pluginname', 'qtype_ddimageortext'),
+            'essay' => get_string('pluginname', 'qtype_essay'),
+            'gapselect' => get_string('pluginname', 'qtype_gapselect'),
+            'multianswer' => get_string('pluginname', 'qtype_multianswer'),
+            'multichoice' => get_string('pluginname', 'qtype_multichoice'),
+            'numerical' => get_string('pluginname', 'qtype_numerical'),
+            'shortanswer' => get_string('pluginname', 'qtype_shortanswer'),
+            'truefalse' => get_string('pluginname', 'qtype_truefalse'),
         ]);
+        $table->add_filter($standardfilter);
+
         $table->define_fulltextsearchcolumns(['idnumber', 'name', 'questiontext', 'qtype']);
         $table->define_sortablecolumns([
             'idnunber',

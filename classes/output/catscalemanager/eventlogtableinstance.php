@@ -19,6 +19,8 @@ namespace local_catquiz\output\catscalemanager;
 use html_writer;
 use local_catquiz\catquiz;
 use local_catquiz\table\event_log_table;
+use local_wunderbyte_table\filters\types\datepicker;
+use local_wunderbyte_table\filters\types\standardfilter;
 use moodle_url;
 
 /**
@@ -65,45 +67,44 @@ class eventlogtableinstance {
         $table->sort_default_column = 'timecreated';
         $table->sort_default_order = SORT_DESC;
 
-        $filtercolumns = [
-            'username' => [
-                'localizedname' => get_string('user', 'core'),
-            ],
-            'eventname' => [
-                'localizedname' => get_string('eventname', 'local_catquiz'),
-                '\local_catquiz\event\attempt_completed' => get_string('attempt_completed', 'local_catquiz'),
-                '\local_catquiz\event\calculation_executed' => get_string('calculation_executed', 'local_catquiz'),
-                '\local_catquiz\event\catscale_created' => get_string('catscale_created', 'local_catquiz'),
-                '\local_catquiz\event\catscale_updated' => get_string('catscale_updated', 'local_catquiz'),
-                '\local_catquiz\event\context_created' => get_string('context_created', 'local_catquiz'),
-                '\local_catquiz\event\context_updated' => get_string('context_updated', 'local_catquiz'),
-                '\local_catquiz\event\testitemactivitystatus_updated' =>
-                    get_string('testitemactivitystatus_updated', 'local_catquiz'),
-                '\local_catquiz\event\testiteminscale_added' => get_string('testiteminscale_added', 'local_catquiz'),
-                '\local_catquiz\event\testiteminscale_updated' => get_string('testiteminscale_updated', 'local_catquiz'),
-                '\local_catquiz\event\testitemstatus_updated' => get_string('testitemstatus_updated', 'local_catquiz'),
-                '\local_catquiz\event\testitem_imported' => get_string('testitem_imported', 'local_catquiz'),
+        $standardfilter = new standardfilter('username', get_string('user', 'core'));
+        $table->add_filter($standardfilter);
 
-            ],
-            'timecreated' => [ // Columns containing Unix timestamps can be filtered.
-                'localizedname' => get_string('eventtime', 'local_catquiz'),
-                'datepicker' => [
-                    get_string('logsafter', 'local_catquiz') => [ // Can be localized and like "Courses starting after:".
-                        'operator' => '>', // Must be defined, can be any SQL comparison operator.
-                        'defaultvalue' => 'now', // Can also be Unix timestamp or string "now".
-                        // Can be localized and will be displayed next to the filter checkbox (ie 'apply filter').
-                        'checkboxlabel' => get_string('apply_filter', 'local_wunderbyte_table'),
-                    ],
-                    get_string('logsbefore', 'local_catquiz') => [ // Can be localized and like "Courses starting after:".
-                        'operator' => '<',
-                        'defaultvalue' => 'now', // Can also be Unix timestamp or string "now".
-                        // Can be localized and will be displayed next to the filter checkbox (ie 'apply filter').
-                        'checkboxlabel' => get_string('apply_filter', 'local_wunderbyte_table'),
-                    ],
-                ],
-            ],
-        ];
-        $table->define_filtercolumns($filtercolumns);
+        $standardfilter = new standardfilter('eventname', get_string('eventname', 'local_catquiz'));
+        $standardfilter->add_options([
+            '\local_catquiz\event\attempt_completed' => get_string('attempt_completed', 'local_catquiz'),
+            '\local_catquiz\event\calculation_executed' => get_string('calculation_executed', 'local_catquiz'),
+            '\local_catquiz\event\catscale_created' => get_string('catscale_created', 'local_catquiz'),
+            '\local_catquiz\event\catscale_updated' => get_string('catscale_updated', 'local_catquiz'),
+            '\local_catquiz\event\context_created' => get_string('context_created', 'local_catquiz'),
+            '\local_catquiz\event\context_updated' => get_string('context_updated', 'local_catquiz'),
+            '\local_catquiz\event\testitemactivitystatus_updated' =>
+                get_string('testitemactivitystatus_updated', 'local_catquiz'),
+            '\local_catquiz\event\testiteminscale_added' => get_string('testiteminscale_added', 'local_catquiz'),
+            '\local_catquiz\event\testiteminscale_updated' => get_string('testiteminscale_updated', 'local_catquiz'),
+            '\local_catquiz\event\testitemstatus_updated' => get_string('testitemstatus_updated', 'local_catquiz'),
+            '\local_catquiz\event\testitem_imported' => get_string('testitem_imported', 'local_catquiz'),
+
+        ]);
+        $table->add_filter($standardfilter);
+
+        $datepicker = new datepicker('timecreated', get_string('logsafter', 'local_catquiz'));
+        $datepicker->add_options(
+            'standard',
+            '>',
+            get_string('apply_filter', 'local_wunderbyte_table'),
+            'now',
+        );
+        $table->add_filter($datepicker);
+
+        $datepicker = new datepicker('timecreated', get_string('logsbefore', 'local_catquiz'));
+        $datepicker->add_options(
+            'standard',
+            '<',
+            get_string('apply_filter', 'local_wunderbyte_table'),
+            'now'
+        );
+        $table->add_filter($datepicker);
 
         $table->tabletemplate = 'local_wunderbyte_table/twtable_list';
         $table->define_cache('local_catquiz', 'eventlogtable');

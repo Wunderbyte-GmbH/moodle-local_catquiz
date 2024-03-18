@@ -19,6 +19,7 @@ namespace local_catquiz\output;
 use local_catquiz\catquiz;
 use local_catquiz\catscale;
 use local_catquiz\table\testenvironments_table;
+use local_wunderbyte_table\filters\types\standardfilter;
 use moodle_url;
 use templatable;
 use renderable;
@@ -101,30 +102,30 @@ class testenvironmentdashboard implements renderable, templatable {
             get_string('teachers', 'core'),
         ]);
 
-        $table->define_filtercolumns(
-            [
-                'id' => 'id',
-                'name' => [
-                    'localizedname' => get_string('name', 'core'),
-                ],
-                'component' => [
-                    'localizedname' => get_string('component', 'local_catquiz'),
-                ],
-                'visible' => [
-                    'localizedname' => get_string('visible', 'core'),
-                    '1' => get_string('visible', 'core'),
-                    '0' => get_string('invisible', 'local_catquiz'),
-                ],
-                'status' => [
-                    'localizedname' => get_string('status'),
-                    '2' => get_string('force', 'local_catquiz'),
-                    '1' => get_string('active', 'core'),
-                    '0' => get_string('inactive', 'core'),
-                ],
-                'lang' => [
-                    'localizedname' => get_string('lang', 'local_catquiz'),
-                ],
-            ]);
+        $standardfilter = new standardfilter('name', get_string('name', 'core'));
+        $table->add_filter($standardfilter);
+
+        $standardfilter = new standardfilter('component', get_string('component', 'local_catquiz'));
+        $table->add_filter($standardfilter);
+
+        $standardfilter = new standardfilter('visible', get_string('visible', 'core'));
+        $standardfilter->add_options([
+            '1' => get_string('visible', 'core'),
+            '0' => get_string('invisible', 'local_catquiz'),
+        ]);
+        $table->add_filter($standardfilter);
+
+        $standardfilter = new standardfilter('status', get_string('status', 'core'));
+        $standardfilter->add_options([
+            '2' => get_string('force', 'local_catquiz'),
+            '1' => get_string('active', 'core'),
+            '0' => get_string('inactive', 'core'),
+        ]);
+        $table->add_filter($standardfilter);
+
+        $standardfilter = new standardfilter('lang', get_string('lang', 'local_catquiz'));
+        $table->add_filter($standardfilter);
+
         $table->define_fulltextsearchcolumns(['name', 'component', 'description']);
         $table->define_sortablecolumns(
             [

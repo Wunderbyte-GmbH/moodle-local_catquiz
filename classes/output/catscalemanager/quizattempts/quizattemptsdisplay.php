@@ -20,6 +20,7 @@ use local_catquiz\catquiz;
 use local_catquiz\output\attemptfeedback;
 use local_catquiz\table\quizattempts_table;
 use local_catquiz\teststrategy\info;
+use local_wunderbyte_table\filters\types\standardfilter;
 
 /**
  * Renderable class for the catscalemanagers
@@ -83,40 +84,35 @@ class quizattemptsdisplay {
             get_string('action', 'core'),
         ]);
 
-        $teststrategyfilter = [
-            'localizedname' => get_string('teststrategy', 'local_catquiz'),
-        ];
+        $standardfilter = new standardfilter('username', get_string('username', 'core'));
+        $table->add_filter($standardfilter);
+
+        $standardfilter = new standardfilter('component', get_string('component', 'local_catquiz'));
+        $table->add_filter($standardfilter);
+
+        $standardfilter = new standardfilter('status', get_string('status'));
+        $table->add_filter($standardfilter);
+
+        $standardfilter = new standardfilter('instance', get_string('instance', 'local_catquiz'));
+        $table->add_filter($standardfilter);
+
+        $standardfilter = new standardfilter('teststrategy', get_string('teststrategy', 'local_catquiz'));
+        $teststrategyfilter = [];
         foreach (info::return_available_strategies() as $strategy) {
             $classname = substr(strrchr(get_class($strategy), '\\'), 1);
             $teststrategyfilter["$strategy->id"] = get_string($classname, 'local_catquiz');
         }
+        $standardfilter->add_options($teststrategyfilter);
+        $table->add_filter($standardfilter);
 
-        $table->define_filtercolumns(
-            [
-                'username' => [
-                    'localizedname' => get_string('username', 'core'),
-                ],
-                'component' => [
-                    'localizedname' => get_string('component', 'local_catquiz'),
-                ],
-                'status' => [
-                    'localizedname' => get_string('status'),
-                ],
-                'instance' => [
-                    'localizedname' => get_string('instance', 'local_catquiz'),
-                ],
-                'teststrategy' => $teststrategyfilter,
-                'course' => [
-                    'localizedname' => get_string('course'),
-                ],
-                'catscale' => [
-                    'localizedname' => get_string('catscale', 'local_catquiz'),
-                ],
-                'catcontext' => [
-                    'localizedname' => get_string('catcontext', 'local_catquiz'),
-                ],
-            ]
-        );
+        $standardfilter = new standardfilter('course', get_string('course'));
+        $table->add_filter($standardfilter);
+
+        $standardfilter = new standardfilter('catscale', get_string('catscale', 'local_catquiz'));
+        $table->add_filter($standardfilter);
+
+        $standardfilter = new standardfilter('catcontext', get_string('catcontext', 'local_catquiz'));
+        $table->add_filter($standardfilter);
 
         $table->define_fulltextsearchcolumns([
             'username',
