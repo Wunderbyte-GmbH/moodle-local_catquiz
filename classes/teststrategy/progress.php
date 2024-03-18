@@ -26,9 +26,7 @@ namespace local_catquiz\teststrategy;
 
 use cache;
 use coding_exception;
-use Exception;
 use JsonSerializable;
-use local_catquiz\catcontext;
 use local_catquiz\catquiz;
 use local_catquiz\catscale;
 use Random\RandomException;
@@ -752,10 +750,9 @@ class progress implements JsonSerializable {
     }
 
     /**
-     * Check if user gave up last question.
+     * Show if the last question was answered.
      *
      * @return bool
-     *
      */
     private function user_gave_up_last_question(): bool {
         return catquiz::user_gave_up_question($this->get_usage_id(), $this->lastquestion->id);
@@ -840,17 +837,6 @@ class progress implements JsonSerializable {
         if ($this->lastquestion) {
             $this->exclude_question($this->lastquestion->id);
         }
-        return $this;
-    }
-
-    /**
-     * Unset question
-     *
-     * @return progress
-     *
-     */
-    public function unset_last_question() {
-        $this->lastquestion = null;
         return $this;
     }
 
