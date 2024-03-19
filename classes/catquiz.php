@@ -29,6 +29,7 @@ use dml_exception;
 use local_catquiz\event\attempt_completed;
 use local_catquiz\teststrategy\feedbacksettings;
 use moodle_exception;
+use moodle_url;
 use question_attempt;
 use question_attempt_pending_step;
 use question_bank;
@@ -1664,19 +1665,19 @@ class catquiz {
      * @param array $quizsettings
      * @param array $personabilities
      *
-     * @return bool
+     * @return string
      */
     public static function enrol_user(
         int $userid,
         array $quizsettings,
-        array $personabilities) {
+        array $personabilities):string {
 
         // Filter for scales that are selected for enrolement.
 
         $enrolementarray = [];
 
         foreach ($personabilities as $catscaleid => $personability) {
-            $enrolementarray = self::create_enrolement_array(
+            $enrolementarray = self::enrol_and_create_message_array(
                 $enrolementarray,
                 $quizsettings,
                 $catscaleid,
@@ -1685,16 +1686,19 @@ class catquiz {
             );
         }
 
-        list($messagetitle, $messageheader) = self::create_strings_for_enrolement_notification($enrolementarray);
+        $enrolementstrings = self::create_strings_for_enrolement_notification($enrolementarray);
 
-        //Benachrichtigung über neue Kurseinschreibung(en) / Gruppenmitgliedschaft(en).
+        if (empty($enrolementstrings['messagetitle']) && empty($enrolementstrings['messagebody'])) {
+            return "";
+        }
+
         messages::send_message(
             $userid,
-            $messagetitle,
-            $messageheader,
+            $enrolementstrings['messagetitle'] ?? "",
+            $enrolementstrings['messagebody'] ?? "",
             'enrolmentfeedback'
         );
-        return true;
+        return $enrolementstrings['messagebody'];
     }
 
     /**
@@ -1709,7 +1713,7 @@ class catquiz {
      * @return array
      *
      */
-    public static function create_enrolement_array(
+    public static function enrol_and_create_message_array(
         array $enrolementarray,
         array $quizsettings,
         int $catscaleid,
@@ -1742,6 +1746,7 @@ class catquiz {
                 $coursestoenrol = $quizsettings['catquiz_courses_' . $catscaleid . '_' . $i] ?? [];
                 if (empty($coursestoenrol) && empty($groupsarray)) {
                     // No courses and groups to enrol.
+                    $i ++;
                     continue;
                 }
                 // The first element at array key 0 is a dummy value to
@@ -1751,13 +1756,17 @@ class catquiz {
                 foreach ($coursestoenrol as $courseid) {
                     $context = \context_course::instance($courseid);
                     $course = get_course($courseid);
+                    $url = new moodle_url('/course/view.php', ['id' => $courseid]);
+
                     $coursedata = [];
                     $coursedata['coursename'] = $course->fullname ?? "";
                     $coursedata['coursesummary'] = $course->summary ?? "";
-                    $coursedata['courseurl'] = $course->get_url() ?? "";
+                    $coursedata['courseurl'] = $url->out() ?? "";
                     $coursedata['catscalename'] = $catscale->name ?? "";
-                    if (!is_enrolled($context, $userid) &&$course) {
-                        if (!enrol_try_internal_enrol($courseid, $userid, $rolestudent->id)) {
+                    // TODO: Delete this is only for testing!
+                    $userid = 20;
+                    if (!is_enrolled($context, $userid) && $course) {
+                        if (enrol_try_internal_enrol($courseid, $userid, $rolestudent->id)) {
                             $enrolementarray['course'][] = $coursedata;
                         }
                     }
@@ -1770,12 +1779,13 @@ class catquiz {
                         foreach ($groupsarray as $newgroup) {
                             if ($existinggroup->name == $newgroup) {
                                 $groupmember = groups_add_member($existinggroup->id, $userid);
-                                if ($message) {
+                                if ($message && $groupmember) {
                                     $data = [];
                                     $data['groupname'] = $newgroup;
                                     $data['groupdescription'] = $existinggroup->description ?? "";
                                     $data['coursename'] = $course->fullname ?? "";
-                                    $data['courseurl'] = $course->get_url() ?? "";
+                                    $url = new moodle_url('/course/view.php', ['id' => $course->id]);
+                                    $data['courseurl'] = $url->out();
                                     $data['catscalename'] = $catscale->name ?? "";
                                     $enrolementarray['group'][] = $data;
                                 }
@@ -1803,58 +1813,66 @@ class catquiz {
         $messagetitle = get_string('enrolmentmessagetitle', 'local_catquiz');
         $messagebody = "";
 
-        if (!empty($enrolementarray)) {
-            $messagebody = "";
-            if (count(array_values($enrolementarray)) === 1) {
-                // If there is only one element, message is different.
-                $type = array_keys($enrolementarray)[0];
+        if (empty($enrolementarray)) {
+            return [
+                'messagetitle' => "",
+                'messagebody' => "",
+            ];
+        }
 
-                if ($type === 'course') {
-                    $message = get_string('onecourseenroled', 'local_catquiz', $enrolementarray['course']);
-                } else if ($type === 'group') {
-                    $message = get_string('onegroupenroled', 'local_catquiz', $enrolementarray['group']);
-                }
+        $messagebody = "";
+        // If there is only one element, message is different. So we count.
+        $sum = 0;
+        foreach ($enrolementarray as $subarray) {
+            $sum += count($subarray);
+        }
 
-                return [
-                    'messagetitle' => $messagetitle,
-                    'messagebody' => $message ?? "",
-
-                ];
+        if ($sum == 1) {
+            $type = array_keys($enrolementarray)[0];
+            if ($type === 'course') {
+                $message = get_string('onecourseenroled', 'local_catquiz', $enrolementarray['course']);
+            } else if ($type === 'group') {
+                $message = get_string('onegroupenroled', 'local_catquiz', $enrolementarray['group']);
             }
-            $coursestring = "";
-            $groupstring = "";
-            foreach ($enrolementarray as $type => $dataarray) {
-                foreach ($dataarray as $messageinfo) {
-                    if ($type === "course") {
-                        // Mit sprintf hier arbeiten.
-                        $coursestring .= $messageinfo['courseurl'] . $messageinfo['coursename'] . ", ";
-                    };
-                    if ($type === "group") {
-                        $groupstring .= $messageinfo['groupname'] . ", ";
-                    }
-
-                }
-            }
-            $coursemessage = "";
-            $groupmessage = "";
-            // Unset last ", " from string.
-            if (strlen($coursestring) > 0) {
-                $coursestring = preg_replace('/, $/', '', $coursestring);
-                $coursemessage = get_string('courseenrolementstring', 'local_catquiz', $coursestring);
-            }
-            if (strlen($groupstring) > 0) {
-                $groupstring = preg_replace('/, $/', '', $groupstring);
-                $groupmessage = get_string('groupenrolementstring', 'local_catquiz', $groupstring);
-            }
-
-            $messagebody = $coursemessage . "<br>" . $groupmessage;
             return [
                 'messagetitle' => $messagetitle,
-                'messagebody' => $messagebody,
+                'messagebody' => $message ?? "",
 
             ];
         }
-        return [];
+
+        $coursestring = "";
+        $groupstring = "";
+        foreach ($enrolementarray as $type => $dataarray) {
+            foreach ($dataarray as $messageinfo) {
+                if ($type === "course") {
+                    // Mit sprintf hier arbeiten.
+                    $coursestring .= "<a href=" . $messageinfo['courseurl'] . ">" . $messageinfo['coursename'] . "</a>, ";
+                };
+                if ($type === "group") {
+                    $groupstring .= $messageinfo['groupname'] . ", ";
+                }
+
+            }
+        }
+        $coursemessage = "";
+        $groupmessage = "";
+        // Unset last ", " from string.
+        if (strlen($coursestring) > 0) {
+            $coursestring = preg_replace('/, $/', '', $coursestring);
+            $coursemessage = get_string('courseenrolementstring', 'local_catquiz', $coursestring);
+        }
+        if (strlen($groupstring) > 0) {
+            $groupstring = preg_replace('/, $/', '', $groupstring);
+            $groupmessage = get_string('groupenrolementstring', 'local_catquiz', $groupstring);
+        }
+
+        $messagebody = $coursemessage . "<br>" . $groupmessage;
+        return [
+            'messagetitle' => $messagetitle,
+            'messagebody' => $messagebody,
+
+        ];
     }
 
     /**
