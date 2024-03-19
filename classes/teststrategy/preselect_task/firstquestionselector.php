@@ -317,7 +317,7 @@ class firstquestionselector extends preselect_task implements wb_middleware {
             self::LEVEL_EASY,
             self::LEVEL_NORMAL,
             self::LEVEL_DIFFICULT,
-            self::LEVEL_VERYDIFFICULT
+            self::LEVEL_VERYDIFFICULT,
         ];
         if (!in_array($option, $knownlevels)) {
             throw new \Exception(sprintf("Unknown option to select first question: %s"), $option);
