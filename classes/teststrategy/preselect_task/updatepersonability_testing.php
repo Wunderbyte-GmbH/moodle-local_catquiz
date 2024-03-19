@@ -29,7 +29,6 @@ namespace local_catquiz\teststrategy\preselect_task;
 
 use local_catquiz\local\model\model_item_param;
 use local_catquiz\local\model\model_item_param_list;
-use local_catquiz\local\model\model_responses;
 use local_catquiz\teststrategy\preselect_task\updatepersonability;
 
 /**
@@ -83,8 +82,8 @@ class updatepersonability_testing extends updatepersonability {
      * Get initial ability
      * @return float
      */
-    protected function set_initial_ability() {
-        if (($ab = parent::set_initial_ability()) === 0.0) {
+    public function get_initial_ability() {
+        if (($ab = parent::get_initial_ability()) === 0.0) {
             return floatval(getenv('CATQUIZ_TESTING_ABILITY', true) ?: 0.00);
         }
         return $ab;
@@ -119,5 +118,28 @@ class updatepersonability_testing extends updatepersonability {
      */
     protected function get_max_ability_for_scale(int $scaleid): float {
         return 10.0;
+    }
+
+    /**
+     * Returns the fake abilities from the context.
+     *
+     * @return array
+     */
+    protected function get_existing_personparams(): array {
+        return $this->context['fake_existing_abilities'] ?? parent::get_existing_personparams();
+    }
+
+    /**
+     * Shows if the ability for the given scale was calculated or just estimated.
+     *
+     * @param int $catscaleid
+     * @param bool $includelastresponse
+     * @return bool
+     * @throws dml_exception
+     * @throws coding_exception
+     * @throws \Exception
+     */
+    protected function ability_was_calculated(int $catscaleid, bool $includelastresponse = true) {
+        return $this->context['fake_ability_was_calculated'] ?? parent::ability_was_calculated($catscaleid, $includelastresponse);
     }
 }

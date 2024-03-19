@@ -77,7 +77,8 @@
         "catquiz_timeselect_item": "sec"
     },
     "catquiz_passinglevel": "",
-    "catquiz_selectfirstquestion": "startwithcurrentability",
+    "catquiz_selectfirstquestion": "0",
+    "catquiz_firstquestionreuseexistingdata": "1",
     "catquiz_selectteststrategy": "5",
     "choosetemplate": "0",
     "cmidnumber": "",

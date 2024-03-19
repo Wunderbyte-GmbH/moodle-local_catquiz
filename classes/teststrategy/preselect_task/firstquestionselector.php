@@ -24,8 +24,13 @@
 
 namespace local_catquiz\teststrategy\preselect_task;
 
-use cache;
+use local_catquiz\catcontext;
 use local_catquiz\catquiz;
+use local_catquiz\catscale;
+use local_catquiz\local\model\model_item_param_list;
+use local_catquiz\local\model\model_person_param_list;
+use local_catquiz\local\model\model_responses;
+use local_catquiz\local\model\model_strategy;
 use local_catquiz\local\result;
 use local_catquiz\local\status;
 use local_catquiz\teststrategy\preselect_task;
@@ -43,46 +48,35 @@ use moodle_exception;
 class firstquestionselector extends preselect_task implements wb_middleware {
 
     /**
-     * STARTWITHEASIESTQUESTION
-     *
-     * @var string
+     * @var int
      */
-    const STARTWITHEASIESTQUESTION = 'startwitheasiestquestion';
+    const MINIMUM_PARAMS_FOR_ESTIMATE = 50;
 
     /**
-     * STARTWITHFIRSTOFSECONDQUINTIL
-     *
-     * @var string
+     * @var int
      */
-    const  STARTWITHFIRSTOFSECONDQUINTIL = 'startwithfirstofsecondquintil';
+    const LEVEL_VERYEASY = -2;
 
     /**
-     * STARTWITHFIRSTOFSECONDQUARTIL
-     *
-     * @var string
+     * @var int
      */
-    const  STARTWITHFIRSTOFSECONDQUARTIL = 'startwithfirstofsecondquartil';
+    const LEVEL_EASY = -1;
 
     /**
-     * STARTWITHMOSTDIFFICULTSECONDQUARTIL
-     *
-     * @var string
+     * @var int
      */
-    const  STARTWITHMOSTDIFFICULTSECONDQUARTIL = 'startwithmostdifficultsecondquartil';
+    const LEVEL_NORMAL = 0;
 
     /**
-     * STARTWITHAVERAGEABILITYOFTEST
-     *
-     * @var string
+     * @var int
      */
-    const  STARTWITHAVERAGEABILITYOFTEST = 'startwithaverageabilityoftest';
+    const LEVEL_DIFFICULT = 1;
 
     /**
-     * STARTWITHCURRENTABILITY
-     *
-     * @var string
+     * @var int
      */
-    const  STARTWITHCURRENTABILITY = 'startwithcurrentability';
+    const LEVEL_VERYDIFFICULT = 2;
+
 
     /**
      * @var progress
@@ -101,8 +95,12 @@ class firstquestionselector extends preselect_task implements wb_middleware {
     public function run(array &$context, callable $next): result {
         $this->progress = $context['progress'];
         // Don't do anything if this is not the first question of the current attempt.
-        $cache = cache::make('local_catquiz', 'adaptivequizattempt');
         if (!$this->progress->is_first_question()) {
+            return $next($context);
+        }
+
+        // In the classic test, we do not change how the first question is selected.
+        if ($context['teststrategy'] == LOCAL_CATQUIZ_STRATEGY_CLASSIC) {
             return $next($context);
         }
 
@@ -120,36 +118,33 @@ class firstquestionselector extends preselect_task implements wb_middleware {
         }
         $context['questions'] = $questionswithdifficulty;
 
-        switch ($context['selectfirstquestion']) {
-            case self::STARTWITHEASIESTQUESTION:
-                // We expect the questions to be already sorted in ascending
-                // order of difficulty, so the first one is the easiest one
-                // Check it is sorted.
-                $question = $this->get_easiest_question($context['questions']);
-                return result::ok($question);
-
-            case self::STARTWITHFIRSTOFSECONDQUINTIL:
-                $question = $this->get_first_question_of_second_quintile($context['questions']);
-                return result::ok($question);
-            case self::STARTWITHFIRSTOFSECONDQUARTIL:
-                $question = $this->get_first_question_of_second_quartile($context['questions']);
-                return result::ok($question);
-            case self::STARTWITHMOSTDIFFICULTSECONDQUARTIL:
-                $question = $this->get_last_question_of_second_quartile($context['questions']);
-                return result::ok($question);
-            case self::STARTWITHAVERAGEABILITYOFTEST:
-                $personparams = $this->get_personparams_for_adaptivequiz_test($context);
-                $averageability = $this->get_median_ability_of_test($personparams);
-                foreach (array_keys($context['person_ability']) as $catscaleid) {
-                    $context['person_ability'][$catscaleid] = $averageability;
-                }
+        if ($context['firstquestion_use_existing_data']) {
+            // We already have a person param for this user, so use it.
+            if ($this->has_ability()) {
                 return $next($context);
-            case self::STARTWITHCURRENTABILITY:
-                return $next($context);
-
-            default:
-                throw new \Exception(sprintf("Unknown option to select first question: %s"), $context['selectfirstquestion']);
+            }
         }
+
+        // User does not have an ability yet, so we try to take the average ability.
+        $meanability = $this->get_mean_ability();
+
+        if ($meanability === null) {
+            $startability = $this->set_start_ability($context['selectfirstquestion'], 0.0, 1.0);
+            $context['person_ability'][$this->context['catscaleid']] = $startability;
+            $context['progress']->set_ability($startability, $context['catscaleid']);
+            $context['se'][$this->context['catscaleid']] = 1.0;
+            return $next($context);
+        }
+
+        $items = $this->get_items();
+        $se = catscale::get_standarderror($meanability, $items, 1.0);
+        $context['person_ability'][$this->context['catscaleid']] = $this->set_start_ability(
+            $context['selectfirstquestion'],
+            $meanability,
+            $se
+        );
+        $context['se'][$this->context['catscaleid']] = $se;
+        return $next($context);
     }
 
     /**
@@ -273,5 +268,85 @@ class firstquestionselector extends preselect_task implements wb_middleware {
      */
     protected function get_personparams_for_adaptivequiz_test(array $context) {
         return catquiz::get_personparams_for_adaptivequiz_test($context['testid']);
+    }
+
+    /**
+     * Helper to get the user ability in the main scale
+     *
+     * @return bool
+     */
+    protected function has_ability() {
+        boolval(catquiz::get_person_abilities(
+            $this->context['contextid'],
+            [$this->context['catscaleid']],
+            $this->context['userid']
+        ));
+    }
+
+    /**
+     * Helper function to calculate the mean ability.
+     *
+     * If there are not enough abilities for a good estimate, returns null
+     */
+    protected function get_mean_ability() {
+        $abilities = catquiz::get_person_abilities(
+            $this->context['contextid'],
+            [$this->context['catscaleid']]
+        );
+
+        if (!$abilities || count($abilities) < self::MINIMUM_PARAMS_FOR_ESTIMATE) {
+            return null;
+        }
+
+        $meanability = array_sum(array_map(fn ($pp) => floatval($pp->ability), $abilities)) / count($abilities);
+        return $meanability;
+    }
+
+    /**
+     * Helper function to calculate the start ability
+     *
+     * @param string $option
+     * @param float $mean
+     * @param float $se
+     *
+     * @return float
+     */
+    private function set_start_ability(string $option, float $mean, float $se) {
+        $knownlevels = [
+            self::LEVEL_VERYEASY,
+            self::LEVEL_EASY,
+            self::LEVEL_NORMAL,
+            self::LEVEL_DIFFICULT,
+            self::LEVEL_VERYDIFFICULT
+        ];
+        if (!in_array($option, $knownlevels)) {
+            throw new \Exception(sprintf("Unknown option to select first question: %s"), $option);
+        }
+        return $mean + intval($option) * $se;
+    }
+
+    /**
+     * Helper function to return the item list for the main scale
+     *
+     * @return model_item_param_list
+     */
+    private function get_items() {
+        // Create item list.
+        $catscaleids = [$this->context['catscaleid'], ...catscale::get_subscale_ids($this->context['catscaleid'])];
+        $responsedata = catcontext::getresponsedatafromdb($this->context['contextid'], $catscaleids);
+        $responses = (new model_responses())->setdata($responsedata);
+        $modelstrategy = new model_strategy($responses);
+        $catscalecontext = catscale::get_context_id($this->context['catscaleid']);
+        $itemparamlists = [];
+        $personparams = model_person_param_list::load_from_db($catscalecontext, $catscaleids);
+        foreach (array_keys($modelstrategy->get_installed_models()) as $model) {
+            $itemparamlists[$model] = model_item_param_list::load_from_db(
+                $catscalecontext,
+                $model,
+                $catscaleids
+            );
+        }
+        $items = $modelstrategy->select_item_model($itemparamlists, $personparams);
+        return $items;
     }
 }

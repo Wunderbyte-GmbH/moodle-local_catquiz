@@ -24,7 +24,6 @@
 
 namespace local_catquiz\teststrategy\preselect_task;
 
-use cache;
 use dml_exception;
 use coding_exception;
 use Exception;
@@ -51,6 +50,16 @@ use moodle_exception;
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class updatepersonability extends preselect_task implements wb_middleware {
+
+    /**
+     * Threshold for calculating a mean ability
+     *
+     * If we have at least that many abilities, we can use them to calculate a mean.
+     * Otherwise, we fallback to a default ability of 0.
+     *
+     * @var int
+     */
+    const NUM_ESTIMATION_THRESHOLD = 50;
 
     /**
      *
@@ -115,6 +124,18 @@ class updatepersonability extends preselect_task implements wb_middleware {
     private array $itemparamlists = [];
 
     /**
+     * Stores the mean ability in case it is calculated
+     *
+     * @var ?float
+     */
+    private ?float $meanability = null;
+
+    public function set_context(array $context): self {
+        $this->context = $context;
+        return $this;
+    }
+
+    /**
      * Run preselect task.
      *
      * @param array $context
@@ -152,8 +173,8 @@ class updatepersonability extends preselect_task implements wb_middleware {
 
         $this->arrayresponses = reset(($this->userresponses->as_array())[$context['userid']]);
 
+        $this->parentability = $this->get_initial_ability();
         $this->initialse = $this->set_initial_standarderror();
-        $this->parentability = $this->set_initial_ability();
         $this->parentse = $this->initialse;
 
         $catscaleid = $this->progress->get_last_question()->catscaleid;
@@ -410,7 +431,7 @@ class updatepersonability extends preselect_task implements wb_middleware {
      *
      * @return float
      */
-    protected function set_initial_ability() {
+    public function get_initial_ability() {
         // If we already have a value based on a real calculation, use that one.
         if ($this->ability_was_calculated($this->context['catscaleid'], false)) {
             return $this->context['person_ability'][$this->context['catscaleid']];
@@ -418,8 +439,10 @@ class updatepersonability extends preselect_task implements wb_middleware {
 
         // If we already have more than 50 abilities for this test, get the mean from there.
         if ($mean = $this->calculate_mean_from_past_attempts()) {
+            $this->meanability = $mean;
             return $mean;
         }
+
         return 0.0;
     }
 
@@ -429,21 +452,25 @@ class updatepersonability extends preselect_task implements wb_middleware {
      * @return float
      */
     protected function set_initial_standarderror() {
-        // Check if the last ability was estimated or calculated.
-        if ($this->ability_was_calculated($this->context['catscaleid'], false)) {
-            $lastquestionid = $this->userresponses->get_last_response($this->context['userid'])['questionid'];
-            $items = clone($this->get_item_param_list($this->context['catscaleid']));
-            $items->offsetUnset($lastquestionid);
-            return catscale::get_standarderror(
-                $this->context['person_ability'][$this->context['catscaleid']],
-                $items
-            );
+        $abilitywascalculated = $this->ability_was_calculated($this->context['catscaleid'], false);
+        // If we can not calculate or estimate the standard error, return a default value.
+        if (!$abilitywascalculated && !$this->meanability) {
+            return 1.0;
         }
-        // If we already have more than 50 abilities for this test, get the standarderror from there.
-        if ($se = $this->calculate_se_from_past_attempts()) {
-            return $se;
-        }
-        return 1.0;
+
+        // If possible, use the calculated ability. Otherwise, use the estimated one.
+        $ability = $abilitywascalculated
+            ? $this->context['person_ability'][$this->context['catscaleid']]
+            : $this->meanability;
+
+        $lastquestionid = $this->userresponses->get_last_response($this->context['userid'])['questionid'];
+        $items = clone ($this->get_item_param_list($this->context['catscaleid']));
+        $items->offsetUnset($lastquestionid);
+
+        return catscale::get_standarderror(
+            $ability,
+            $items
+        );
     }
 
     /**
@@ -456,7 +483,7 @@ class updatepersonability extends preselect_task implements wb_middleware {
      * @throws coding_exception
      * @throws Exception
      */
-    private function ability_was_calculated(int $catscaleid, bool $includelastresponse = true) {
+    protected function ability_was_calculated(int $catscaleid, bool $includelastresponse = true) {
         // If we have not at least one previous response, the ability was not calculated.
         if (!$lastresponse = $this->userresponses->get_last_response($this->context['userid'])) {
             return false;
@@ -478,20 +505,33 @@ class updatepersonability extends preselect_task implements wb_middleware {
 
     /**
      * Calculates Mean from past attempts.
-     * @return null
+     * @return ?float
      */
     private function calculate_mean_from_past_attempts() {
-        // TODO: Implement.
-        return null;
+        $existingabilities = $this->get_existing_personparams();
+        if (count($existingabilities) < self::NUM_ESTIMATION_THRESHOLD) {
+            return null;
+        }
+
+        $sum = 0.0;
+        foreach ($existingabilities as $pp) {
+            $sum += floatval($pp->ability);
+        }
+        $mean = $sum / count($existingabilities);
+        $this->meanability = $mean;
+        return $mean;
     }
 
     /**
-     * Calculates Standard Error from past attempts.
-     * @return null
+     * Returns the person params for the selected context in the main scale.
+     *
+     * @return array
      */
-    private function calculate_se_from_past_attempts() {
-        // TODO: Implement.
-        return null;
+    protected function get_existing_personparams(): array {
+        return catquiz::get_person_abilities(
+            $this->context['contextid'],
+            [$this->context['catscaleid']]
+        );
     }
 
     /**

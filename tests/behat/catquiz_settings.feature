@@ -144,14 +144,15 @@ Feature: As a teacher I setup adaptive quiz with CATquiz Scales and Feedbacks.
       | catmodel                                              | empty |
     And I wait until the page is ready
     And I set the following fields to these values:
-      | catmodel                                   | Catquiz CAT model         |
-      | Select CAT scale                           | Simulation                |
-      | Passing level in %                         | 500                       |
-      | Purpose of test                            | Infer lowest skill gap    |
-      | Activate pilot mode                        | 1                         |
-      | Proportion of questions to be piloted in % | 20                        |
-      | Start new CAT test with                    | Use the average ability score of the current test |
-      | Limit time for attempt                     | 1                         |
+      | catmodel                                   | Catquiz CAT model                |
+      | Select CAT scale                           | Simulation                       |
+      | Passing level in %                         | 500                              |
+      | Purpose of test                            | Infer lowest skill gap           |
+      | Activate pilot mode                        | 1                                |
+      | Proportion of questions to be piloted in % | 20                               |
+      | Start new test                             | 1                                |
+      | Otherwise start                            | with a medium difficult question |
+      | Limit time for attempt                     | 1                                |
       ## Intentional error - no time values
       ## Intentional error min > max
       | maxquestionsscalegroup[catquiz_minquestionspersubscale] | 3 |
@@ -205,7 +206,7 @@ Feature: As a teacher I setup adaptive quiz with CATquiz Scales and Feedbacks.
       | Purpose of test                            | Infer lowest skill gap    |
       | Activate pilot mode                        | 1                         |
       | Proportion of questions to be piloted in % | 20                        |
-      | Start new CAT test with                    | Use the average ability score of the current test |
+      | Start new test                             | 1                         |
       | catquiz_standarderrorgroup[catquiz_standarderror_min]   | 0.4 |
       ##| catquiz_standarderrorgroup[catquiz_standarderror_max] | 0.6 |
       | catquiz_standarderrorgroup[catquiz_standarderror_max]   | 2   |
