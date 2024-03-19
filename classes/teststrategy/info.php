@@ -28,6 +28,7 @@ use cache;
 use core_component;
 use local_catquiz\feedback\feedbackclass;
 use local_catquiz\teststrategy\context\contextcreator;
+use local_catquiz\teststrategy\preselect_task\firstquestionselector;
 use MoodleQuickForm;
 
 /**
@@ -190,19 +191,31 @@ class info {
         $mform->setType('catquiz_pilotratio', PARAM_FLOAT);
         $mform->addHelpButton('catquiz_pilotratio', 'pilotratio', 'local_catquiz');
 
+        $elements[] = $mform->addElement(
+            'advcheckbox',
+            'catquiz_firstquestionreuseexistingdata',
+            get_string('firstquestion_startnewtest', 'local_catquiz'),
+            get_string('firstquestionreuseexistingdata', 'local_catquiz')
+        );
+        $mform->setDefault('catquiz_firstquestionreuseexistingdata', 1);
         $elements[] = $mform->addElement('select', 'catquiz_selectfirstquestion',
             get_string('catquiz_selectfirstquestion', 'local_catquiz'),
             [
-                'startwitheasiestquestion' => get_string('startwitheasiestquestion', 'local_catquiz'),
-                'startwithfirstofsecondquintil' => get_string('startwithfirstofsecondquintil', 'local_catquiz'),
-                'startwithfirstofsecondquartil' => get_string('startwithfirstofsecondquartil', 'local_catquiz'),
-                'startwithmostdifficultsecondquartil' => get_string('startwithmostdifficultsecondquartil', 'local_catquiz'),
-                'startwithaverageabilityoftest' => get_string('startwithaverageabilityoftest', 'local_catquiz'),
-                'startwithcurrentability' => get_string('startwithcurrentability', 'local_catquiz'),
+                firstquestionselector::LEVEL_VERYEASY => get_string('startwithveryeasyquestion', 'local_catquiz'),
+                firstquestionselector::LEVEL_EASY => get_string('startwitheasyquestion', 'local_catquiz'),
+                firstquestionselector::LEVEL_NORMAL => get_string('startwithmediumquestion', 'local_catquiz'),
+                firstquestionselector::LEVEL_DIFFICULT => get_string('startwithdifficultquestion', 'local_catquiz'),
+                firstquestionselector::LEVEL_VERYDIFFICULT => get_string('startwithverydifficultquestion', 'local_catquiz'),
             ]
         );
         // When a classical CAT is performed, we ignore the first-question
         // option and display all questions ordered by their ID.
+        $mform->hideIf(
+            'catquiz_firstquestionreuseexistingdata',
+            'catquiz_selectteststrategy',
+            'eq',
+            LOCAL_CATQUIZ_STRATEGY_CLASSIC
+        );
         $mform->hideIf(
             'catquiz_selectfirstquestion',
             'catquiz_selectteststrategy',

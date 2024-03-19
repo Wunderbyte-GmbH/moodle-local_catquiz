@@ -915,6 +915,11 @@ class catquiz_handler {
                 (int)$quizsettings->catquiz_timelimitgroup->catquiz_maxtimeperitem);
         }
 
+        $firstuseexistingdata = false;
+        if (property_exists($quizsettings, 'catquiz_firstquestionreuseexistingdata')) {
+            $firstuseexistingdata = $quizsettings->catquiz_firstquestionreuseexistingdata == "1";
+        }
+
         // Get selected subscales from quizdata.
         $selectedsubscales = self::get_selected_subscales($quizsettings);
 
@@ -940,6 +945,7 @@ class catquiz_handler {
             'pilot_ratio' => $pilotratio ?? 0,
             'pilot_attempts_threshold' => LOCAL_CATQUIZ_THRESHOLD_DEFAULT,
             'questionsattempted' => intval($attemptdata->questionsattempted),
+            'firstquestion_use_existing_data' => $firstuseexistingdata,
             'selectfirstquestion' => $quizsettings->catquiz_selectfirstquestion ?? null,
             'skip_reason' => null,
             'userid' => $USER->id,

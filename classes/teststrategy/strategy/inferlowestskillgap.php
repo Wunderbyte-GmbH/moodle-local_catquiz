@@ -87,13 +87,13 @@ class inferlowestskillgap extends strategy {
             checkitemparams::class,
             checkbreak::class,
             updatepersonability::class,
+            firstquestionselector::class, // If this is the first question of this attempt, return it here.
             addscalestandarderror::class,
             maximumquestionscheck::class, // Cancel quiz attempt if we reached maximum of questions.
             checkpagereload::class, // This must be after maximumquestionscheck, so that the quiz ends.
             removeplayedquestions::class,
             noremainingquestions::class,
             fisherinformation::class, // Add the fisher information to each question.
-            firstquestionselector::class, // If this is the first question of this attempt, return it here.
             lasttimeplayedpenalty::class,
             mayberemovescale::class, // Remove questions from excluded subscales.
             maybe_return_pilot::class,
