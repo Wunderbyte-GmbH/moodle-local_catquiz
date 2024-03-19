@@ -1670,134 +1670,191 @@ class catquiz {
         int $userid,
         array $quizsettings,
         array $personabilities) {
-        global $DB;
 
         // Filter for scales that are selected for enrolement.
 
-        foreach ($personabilities as $catscaleid => $personabilityarray) {
-            if (!isset($personabilityarray['toreport'])) {
-                continue;
-            }
-            $i = 1;
-            $personabilityarray = (array) $personabilityarray;
-            $personability = (float) $personabilityarray['value'];
-            $rolestudent = $DB->get_record('role', ['shortname' => 'student']);
-            try {
-                $catscale = catscale::return_catscale_object($catscaleid);
-            } catch (\Exception $e) {
-                $catscale = (object) ['name' => '']; // Create a dummy object.
-            }
+        $enrolementarray = [];
 
-            while (isset($quizsettings['feedback_scaleid_limit_lower_' . $catscaleid . '_'. $i])) {
-                $lowerlimit = $quizsettings['feedback_scaleid_limit_lower_' . $catscaleid . '_'. $i];
-                $upperlimit = $quizsettings['feedback_scaleid_limit_upper_' . $catscaleid . '_'. $i];
+        foreach ($personabilities as $catscaleid => $personability) {
+            $enrolementarray = self::create_enrolement_array(
+                $enrolementarray,
+                $quizsettings,
+                $catscaleid,
+                $personability,
+                $userid
+            );
+        }
 
-                if ($personability >= (float) $lowerlimit && $personability <= (float) $upperlimit) {
-                    $message = empty($quizsettings["enrolment_message_checkbox_" . $catscaleid . "_" . $i]) ? false : true;
-                    $groupstoenrol = $quizsettings['catquiz_group_' . $catscaleid . '_' . $i] ?? "";
-                    if (!empty($groupstoenrol)) {
-                        $groupsarray = explode(",", $groupstoenrol);
-                    } else {
-                        $groupsarray = [];
+        list($messagetitle, $messageheader) = self::create_strings_for_enrolement_notification($enrolementarray);
+
+        //Benachrichtigung über neue Kurseinschreibung(en) / Gruppenmitgliedschaft(en).
+        messages::send_message(
+            $userid,
+            $messagetitle,
+            $messageheader,
+            'enrolmentfeedback'
+        );
+        return true;
+    }
+
+    /**
+     * Creates array with courses and groups to enrole to.
+     *
+     * @param array $enrolementarray
+     * @param array $quizsettings
+     * @param int $catscaleid
+     * @param float $personability
+     * @param int $userid
+     *
+     * @return array
+     *
+     */
+    public static function create_enrolement_array(
+        array $enrolementarray,
+        array $quizsettings,
+        int $catscaleid,
+        float $personability,
+        int $userid
+        ): array {
+        global $DB;
+        $i = 1;
+
+        $rolestudent = $DB->get_record('role', ['shortname' => 'student']);
+        try {
+            $catscale = catscale::return_catscale_object($catscaleid);
+        } catch (\Exception $e) {
+            $catscale = (object) ['name' => '']; // Create a dummy object.
+        }
+
+        while (isset($quizsettings['feedback_scaleid_limit_lower_' . $catscaleid . '_'. $i])) {
+
+            $lowerlimit = $quizsettings['feedback_scaleid_limit_lower_' . $catscaleid . '_'. $i];
+            $upperlimit = $quizsettings['feedback_scaleid_limit_upper_' . $catscaleid . '_'. $i];
+
+            if ($personability >= (float) $lowerlimit && $personability <= (float) $upperlimit) {
+                $message = empty($quizsettings["enrolment_message_checkbox_" . $catscaleid . "_" . $i]) ? false : true;
+                $groupstoenrol = $quizsettings['catquiz_group_' . $catscaleid . '_' . $i] ?? "";
+                if (!empty($groupstoenrol)) {
+                    $groupsarray = explode(",", $groupstoenrol);
+                } else {
+                    $groupsarray = [];
+                }
+                $coursestoenrol = $quizsettings['catquiz_courses_' . $catscaleid . '_' . $i] ?? [];
+                if (empty($coursestoenrol) && empty($groupsarray)) {
+                    // No courses and groups to enrol.
+                    continue;
+                }
+                // The first element at array key 0 is a dummy value to
+                // display some message like "please select course" in the
+                // form and has a course ID of 0.
+                $coursestoenrol = array_filter($coursestoenrol, fn ($v) => $v != 0);
+                foreach ($coursestoenrol as $courseid) {
+                    $context = \context_course::instance($courseid);
+                    $course = get_course($courseid);
+                    $coursedata = [];
+                    $coursedata['coursename'] = $course->fullname ?? "";
+                    $coursedata['coursesummary'] = $course->summary ?? "";
+                    $coursedata['courseurl'] = $course->get_url() ?? "";
+                    $coursedata['catscalename'] = $catscale->name ?? "";
+                    if (!is_enrolled($context, $userid) &&$course) {
+                        if (!enrol_try_internal_enrol($courseid, $userid, $rolestudent->id)) {
+                            $enrolementarray['course'][] = $coursedata;
+                        }
                     }
-                    $coursestoenrol = $quizsettings['catquiz_courses_' . $catscaleid . '_' . $i] ?? [];
-                    if (empty($coursestoenrol) && empty($groupsarray)) {
-                        // No courses and groups to enrol.
+                    if (empty($groupsarray)) {
                         continue;
                     }
-                    // The first element at array key 0 is a dummy value to
-                    // display some message like "please select course" in the
-                    // form and has a course ID of 0.
-                    $coursestoenrol = array_filter($coursestoenrol, fn ($v) => $v);
-                    foreach ($coursestoenrol as $courseid) {
-                        $context = \context_course::instance($courseid);
-                        $course = get_course($courseid);
-                        $coursedata = [];
-                        $coursedata['coursename'] = $course->fullname ?? "";
-                        $coursedata['coursesummary'] = $course->summary ?? "";
-                        $coursedata['courseurl'] = $course->get_url() ?? "";
-                        $coursedata['catscalename'] = $catscale->name ?? "";
-                        if (!is_enrolled($context, $userid) && $course) {
-                            if (!enrol_try_internal_enrol($courseid, $userid, $rolestudent->id)) {
-                                // There's a problem.
+                    // Inscription only for existing groups.
+                    $groupsofcourse = groups_get_all_groups($courseid);
+                    foreach ($groupsofcourse as $existinggroup) {
+                        foreach ($groupsarray as $newgroup) {
+                            if ($existinggroup->name == $newgroup) {
+                                $groupmember = groups_add_member($existinggroup->id, $userid);
                                 if ($message) {
-                                    $messageelements['course'][] = [
-                                        'course' => $coursedata,
-                                        'failed' => true,
-                                    ];
-                                }
-                            } else {
-                                $messageelements['course'][] = [
-                                    'course' => $coursedata,
-                                ];
-                            }
-                        }
-                        if (empty($groupsarray)) {
-                            continue;
-                        }
-                        // Inscription only for existing groups.
-                        $groupsofcourse = groups_get_all_groups($courseid);
-                        foreach ($groupsofcourse as $existinggroup) {
-                            foreach ($groupsarray as $newgroup) {
-                                if ($existinggroup->name == $newgroup) {
-                                    $groupmember = groups_add_member($existinggroup->id, $userid);
-                                    if ($message) {
-                                        $data = [];
-                                        $data['groupname'] = $newgroup;
-                                        $data['groupdescription'] = $existinggroup->description ?? "";
-                                        $data['coursename'] = $course->fullname ?? "";
-                                        $data['catscalename'] = $catscale->name ?? "";
-                                        if (!$groupmember) {
-                                            // Something went wrong.
-                                            $messageelements['group'][] = [
-                                                'group' => $data,
-                                                'failed' => true,
-                                            ];
-                                        } else {
-                                            $messageelements['group'][] = [
-                                                'group' => $data,
-                                            ];
-                                        }
-                                    }
+                                    $data = [];
+                                    $data['groupname'] = $newgroup;
+                                    $data['groupdescription'] = $existinggroup->description ?? "";
+                                    $data['coursename'] = $course->fullname ?? "";
+                                    $data['courseurl'] = $course->get_url() ?? "";
+                                    $data['catscalename'] = $catscale->name ?? "";
+                                    $enrolementarray['group'][] = $data;
                                 }
                             }
                         }
                     }
                 }
-                $i++;
             }
+            $i++;
         }
-        if (!empty($messageelements)) {
+
+        return $enrolementarray;
+
+    }
+
+    /**
+     * Create strings for enrolement notifications.
+     *
+     * @param array $enrolementarray
+     *
+     * @return array
+     *
+     */
+    public static function create_strings_for_enrolement_notification(array $enrolementarray):array {
+        $messagetitle = get_string('enrolmentmessagetitle', 'local_catquiz');
+        $messagebody = "";
+
+        if (!empty($enrolementarray)) {
             $messagebody = "";
-            foreach ($messageelements as $type => $dataarray) {
-                // Proceed only with the messages that are successfull.
-                $successful = array_filter($dataarray, fn($e) => !$e['failed']);
+            if (count(array_values($enrolementarray)) === 1) {
                 // If there is only one element, message is different.
-                if (count($successful) === 1 && $type === "course") {
-                    $message = get_string('onecourseenroled', 'local_catquiz', $successful[0]);
-                    continue;
-                }
-                if (count($successful) === 1 && $type === "group") {
-                    $message = get_string('onegroupenroled', 'local_catquiz', $successful[0]);
-                    continue;
-                }
-                foreach ($successful as $messageinfo) {
-                    // TODO: message for course, message for group.
-                    // Sie wurden  auf Grundlage Ihres Ergebnisses in die Kurse <a href="{URL_1}">{Kursname_1}</a>, <a href="{URL_2}">{Kursname_2}</a>, ... und <a href="{URL_n}">{Kursname_n}</a> eingeschrieben.
-                    // Sie sind auf Grundlage Ihres Ergebnisses nun Mitglied der Gruppen {Gruppenname_1}, {Gruppenname_2}, ... und {Gruppenname_n}.
+                $type = array_keys($enrolementarray)[0];
+
+                if ($type === 'course') {
+                    $message = get_string('onecourseenroled', 'local_catquiz', $enrolementarray['course']);
+                } else if ($type === 'group') {
+                    $message = get_string('onegroupenroled', 'local_catquiz', $enrolementarray['group']);
                 }
 
-                $messagebody .= $messageelement['title'];
-                $messagebody .= $messageelement['text'];
+                return [
+                    'messagetitle' => $messagetitle,
+                    'messagebody' => $message ?? "",
+
+                ];
             }
-            messages::send_message(
-                $userid,
-                get_string('enrolementmessagetitle', 'local_catquiz'), //Benachrichtigung über neue Kurseinschreibung(en) / Gruppenmitgliedschaft(en).
-                $messagebody,
-                'enrolmentfeedback');
-        }
+            $coursestring = "";
+            $groupstring = "";
+            foreach ($enrolementarray as $type => $dataarray) {
+                foreach ($dataarray as $messageinfo) {
+                    if ($type === "course") {
+                        // Mit sprintf hier arbeiten.
+                        $coursestring .= $messageinfo['courseurl'] . $messageinfo['coursename'] . ", ";
+                    };
+                    if ($type === "group") {
+                        $groupstring .= $messageinfo['groupname'] . ", ";
+                    }
 
-        return true;
+                }
+            }
+            $coursemessage = "";
+            $groupmessage = "";
+            // Unset last ", " from string.
+            if (strlen($coursestring) > 0) {
+                $coursestring = preg_replace('/, $/', '', $coursestring);
+                $coursemessage = get_string('courseenrolementstring', 'local_catquiz', $coursestring);
+            }
+            if (strlen($groupstring) > 0) {
+                $groupstring = preg_replace('/, $/', '', $groupstring);
+                $groupmessage = get_string('groupenrolementstring', 'local_catquiz', $groupstring);
+            }
+
+            $messagebody = $coursemessage . "<br>" . $groupmessage;
+            return [
+                'messagetitle' => $messagetitle,
+                'messagebody' => $messagebody,
+
+            ];
+        }
+        return [];
     }
 
     /**

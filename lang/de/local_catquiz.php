@@ -243,12 +243,12 @@ $string['messageprovider:catscaleupdate'] = 'Benachrichtung über eine Aktualisi
 $string['messageprovider:updatecatscale'] = 'Benachrichtung über eine Aktualisierung einer Skala.';
 $string['catscaleupdatedtitle'] = 'Eine Skala wurde aktualisiert';
 $string['messageprovider:updatecatscale'] = 'Erhält Benachrichtungung über Einschreibung in Skala';
-$string['enrolledtogrouptitle'] = 'Sie wurden in Gruppe "{$a->groupname}" eingeschrieben';
 $string['onegroupenroled'] = 'Sie sind auf Grundlage Ihres Ergebnisses in "{$a->catscalename}" nun Mitglied der Gruppe "{$a->groupname}".';
 $string['onecourseenroled'] = 'Sie wurden auf Grundlage Ihres Ergebnisses in "{$a->catscalename}" in den Kurs <a href="{$a->courseurl}">{$a->coursename}</a> eingeschrieben.';
-$string['enrolledtocoursetext'] = 'Aufgrund Ihrer Ergebnisse in "{$a->catscalename}", sind Sie nun in Kurs "{$a->coursename}" eingeschrieben. Optionale Information zu Kurs: "{$a->coursesummary}".';
 $string['messageprovider:enrolmentfeedback'] = "Automatische Einschreibung zu Kursen und Gruppen.";
-$string['enrolementmessagetitle'] = "Benachrichtigung über neue Kurseinschreibung(en) / Gruppenmitgliedschaft(en)";
+$string['enrolmentmessagetitle'] = "Benachrichtigung über neue Kurseinschreibung(en) / Gruppenmitgliedschaft(en)";
+$string['courseenrolementstring'] = 'Sie wurden  auf Grundlage Ihres Ergebnisses in den Kurs/ die Kurse {$a} eingeschrieben. Viel Erfolg beim Lernen!';
+$string['groupenrolementstring'] = 'Sie sind auf Grundlage Ihres Ergebnisses nun Mitglied der Gruppe(n) {$a}. Viel Erfolg beim Lernen!';
 
 // Access.
 $string['catquiz:canmanage'] = 'Darf Catquiz Plugin verwalten';
