@@ -130,6 +130,14 @@ class updatepersonability extends preselect_task implements wb_middleware {
      */
     private ?float $meanability = null;
 
+    /**
+     * Helper function to set the context.
+     *
+     * Used for setting the context in tests.
+     *
+     * @param array $context
+     * @return self
+     */
     public function set_context(array $context): self {
         $this->context = $context;
         return $this;

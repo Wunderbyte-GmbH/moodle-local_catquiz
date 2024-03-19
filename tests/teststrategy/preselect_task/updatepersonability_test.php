@@ -151,9 +151,21 @@ class updatepersonability_test extends TestCase {
     }
 
     /**
+     * Data provider
+     *
+     * @param float $expected
+     * @param bool $wascalculated
+     * @param array $fakeabilities
+     * @param ?float $abilitymainscale
+     *
      * @dataProvider we_use_the_correct_initial_ability_provider
      */
-    public function test_we_use_the_correct_initial_ability($expected, $wascalculated, $fakeabilities, $abilitymainscale = null) {
+    public function test_we_use_the_correct_initial_ability(
+        float $expected,
+        bool $wascalculated,
+        array $fakeabilities,
+        ?float $abilitymainscale = null
+    ) {
         /*
          * The updatepersonaiblity_testing class is a slightly modified version
          * of the updatepersonability class that makes testing easier.
@@ -168,7 +180,12 @@ class updatepersonability_test extends TestCase {
         $this->assertEquals($expected, $updatepersonability->get_initial_ability());
     }
 
-    public static function we_use_the_correct_initial_ability_provider() {
+    /**
+     * Checks that the initial ability is correct.
+     *
+     * @return array
+     */
+    public static function we_use_the_correct_initial_ability_provider(): array {
         return [
             'Initial ability is estimated' => [
                     'expected' => -1.0,
@@ -203,7 +220,7 @@ class updatepersonability_test extends TestCase {
                 'expected' => 0.0,
                 'ability_was_calculated_returns' => false,
                 'fake_existing_abilities_main_scale' => [],
-            ]
+            ],
         ];
     }
 
