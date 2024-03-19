@@ -145,30 +145,8 @@ class catscalequestions_table extends wunderbyte_table {
                 'labelcolumn' => 'name', // Verify value of record that will be deleted.
             ],
         ];
-        $data['showactionbuttons'][] = [
-            'class' => 'btn btn-plain btn-smaller',
-            'iclass' => 'fa fa-edit',
-            'arialabel' => 'edit pen',
-            'title' => get_string('edititemparams', 'local_catquiz'),
-            'id' => $values->id,
-            'href' => '#',
-            'formname' => 'local_catquiz\form\change_itemparams',
-            'nomodal' => false,
-            'data' => [ // Will be added eg as data-id = $values->id, so values can be transmitted to the method above.
-                'questionid' => $values->id,
-                'id' => $values->id,
-                'catscaleid' => $values->catscaleid ?? $this->catscaleid,
-                'titlestring' => 'deletedatatitle', // Will be shown in modal title.
-                'bodystring' => 'confirmdeletion', // Will be shown in modal body in case elements are selected.
-                'component' => 'local_catquiz',
-                'model' => $values->model,
-                'componentid' => $values->componentid,
-                'contextid' => $values->contextid ?? $this->contextid,
-                'componentname' => $values->component,
-            ],
-        ];
-            table::transform_actionbuttons_array($data['showactionbuttons']);
-            return $OUTPUT->render_from_template('local_wunderbyte_table/component_actionbutton', $data);
+        table::transform_actionbuttons_array($data['showactionbuttons']);
+        return $OUTPUT->render_from_template('local_wunderbyte_table/component_actionbutton', $data);
     }
 
 
