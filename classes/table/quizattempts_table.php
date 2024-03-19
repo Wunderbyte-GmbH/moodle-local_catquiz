@@ -131,8 +131,8 @@ class quizattempts_table extends wunderbyte_table {
         // Append attemptid to the existing parameters.
         $url = new moodle_url(
             'manage_catscales.php',
-            array_merge($_GET, ['attemptid' => $values->attemptid]),
-            'lcq_questions'
+            ['attemptid' => $values->attemptid],
+            'lcq_quizattempts'
         );
 
         return sprintf(
