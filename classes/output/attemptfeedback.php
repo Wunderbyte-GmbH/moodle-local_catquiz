@@ -342,20 +342,21 @@ class attemptfeedback implements renderable, templatable {
      *
      */
     public function export_for_template(\renderer_base $output): array {
+        // 1. Perform attempt-finished tasks.
+        $msg = $this->attempt_finished_tasks();
 
         return [
             'feedback' => $this->get_feedback_for_attempt(),
+            'enrolementmessage' => $msg,
         ];
     }
 
     /**
      * Triggers tasks when attempt finished
      */
-    public function attempt_finished_tasks() {
-        global $USER;
         $progress = progress::load($this->attemptid, 'mod_adaptivequiz', $this->contextid);
         $personabilities = $this->add_additional_infos_to_personabilities($progress->get_abilities());
-        catquiz::enrol_user($USER->id, (array) $this->quizsettings, $personabilities);
+        $enrolementmsg = catquiz::enrol_user($USER->id, (array) $this->quizsettings, $progress->get_abilities());
         $courseandinstance = catquiz::return_course_and_instance_id(
             $this->quizsettings->modulename,
             $this->attemptid
@@ -377,6 +378,7 @@ class attemptfeedback implements renderable, templatable {
             ],
         ]);
         $event->trigger();
+        return $enrolementmsg;
     }
 
     /**
