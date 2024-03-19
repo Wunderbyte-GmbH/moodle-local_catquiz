@@ -44,6 +44,7 @@ $PAGE->set_url(new moodle_url('/local/catquiz/show_attemptfeedback.php', []));
 echo $OUTPUT->header();
 
 $data = $attemptfeedback->export_for_template($OUTPUT);
+// Hier einhängen??
 
 echo $OUTPUT->render_from_template('local_catquiz/attemptfeedback', $data);
 
