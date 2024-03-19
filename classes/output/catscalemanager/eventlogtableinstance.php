@@ -97,15 +97,6 @@ class eventlogtableinstance {
         );
         $table->add_filter($datepicker);
 
-        $datepicker = new datepicker('timecreated', get_string('logsbefore', 'local_catquiz'));
-        $datepicker->add_options(
-            'standard',
-            '<',
-            get_string('apply_filter', 'local_wunderbyte_table'),
-            'now'
-        );
-        $table->add_filter($datepicker);
-
         $table->tabletemplate = 'local_wunderbyte_table/twtable_list';
         $table->define_cache('local_catquiz', 'eventlogtable');
 
