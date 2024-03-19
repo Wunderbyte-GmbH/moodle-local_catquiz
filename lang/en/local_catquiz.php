@@ -237,15 +237,13 @@ $string['messageprovider:catscaleupdate'] = 'Notification of CAT scale update';
 $string['messageprovider:updatecatscale'] = 'Notification of CAT scale update';
 $string['catscaleupdatedtitle'] = 'A CAT scale was updated';
 $string['messageprovider:updatecatscale'] = 'Recieves notification on subscrition of catscale';
-$string['enrolledtogroupfailedtitle'] = 'Enrolment to group "{$a->groupname}" failed.';
-$string['enrolledtogroupfailedtext'] = 'Because of your test results in scale "{$a->catscalename}", you are supposed to be enrolled in group: "{$a->groupname}". Enrolment failed. Maybe because you are already part of the group.';
-$string['enrolledtogrouptitle'] = 'You are enrolled to group "{$a->groupname}"';
-$string['enrolledtogrouptext'] = 'Because of your test results in scale "{$a->catscalename}", you are now enrolled in group "{$a->groupname}". Optional information about group: "{$a->groupdescription}".';
-$string['enrolledtocoursefailedtitle'] = 'Enrolment to course "{$a->coursename}" failed.';
-$string['enrolledtocoursefailedtext'] = 'Because of your test results in scale "{$a->catscalename}", you are supposed to be enrolled in course: "{$a->coursename}". Enrolment failed. Maybe because you are already part of the course.';
-$string['enrolledtocoursetitle'] = 'You are enrolled to course "{$a->coursename}".';
-$string['enrolledtocoursetext'] = 'Because of your test results in scale "{$a->catscalename}", you are now enrolled in course "{$a->coursename}". Optional information about course: "{$a->coursesummary}".';
+$string['onegroupenroled'] = 'Because of your test results in scale "{$a->catscalename}", you are now enrolled in group "{$a->groupname}".';
+$string['onecourseenroled'] = 'Because of your test results in scale "{$a->catscalename}", you are now enrolled in course "{$a->coursename}". Optional information about course: "{$a->coursesummary}".';
 $string['messageprovider:enrolmentfeedback'] = "Automatical enrolment to courses and groups.";
+$string['enrolmentmessagetitle'] = "Notification about new course / group enrolments";
+$string['courseenrolementstring'] = 'Because of your test results, you are now enroled in course(s) {$a}. Good luck with your studies.';
+$string['groupenrolementstring'] = 'Because of your test results, you are now enroled in group(s) {$a}. Good luck with your studies.';
+
 
 // Access.php.
 $string['catquiz:canmanage'] = 'Is allowed to manage Catquiz plugin';
