@@ -22,6 +22,7 @@
     Example context (json):
     {
         "feedback": {
+            "enrolementmessage" : "String, <ul>...</ul>",
             "studentfeedback": [
                 {
                     "heading": "Student Feedback 1",
@@ -39,7 +40,7 @@
         }
     }
 }}
-{{{enrolementmessage}}}
+
 {{#feedback}}
     {{#studentfeedback}}
         {{#frontpage}}
@@ -54,3 +55,11 @@
         {{/othertabs}}
     {{/studentfeedback}}
 {{/feedback}}
+{{#enrolementmessage}}
+<div class="container mt-5">
+  <div class="alert alert-info" role="alert">
+    <h4 class="alert-heading">{{#str}} enrolmentmessagetitle, local_catquiz {{/str}}</h4>
+    {{{enrolementmessage}}}
+  </div>
+</div>
+{{/enrolementmessage}}
