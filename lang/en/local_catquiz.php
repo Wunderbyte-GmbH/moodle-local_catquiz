@@ -237,12 +237,18 @@ $string['messageprovider:catscaleupdate'] = 'Notification of CAT scale update';
 $string['messageprovider:updatecatscale'] = 'Notification of CAT scale update';
 $string['catscaleupdatedtitle'] = 'A CAT scale was updated';
 $string['messageprovider:updatecatscale'] = 'Recieves notification on subscrition of catscale';
-$string['onegroupenroled'] = 'Because of your test results in scale "{$a->catscalename}", you are now enrolled in group "{$a->groupname}".';
-$string['onecourseenroled'] = 'Because of your test results in scale "{$a->catscalename}", you are now enrolled in course "{$a->coursename}". Optional information about course: "{$a->coursesummary}".';
+$string['onegroupenroled'] = 'Because of your test results in "{$a->catscalename}", you are now enrolled in group "{$a->groupname}" in course <a href={$a->courseurl}>{$a->coursename}</a>.';
+$string['onecourseenroled'] = 'Because of your test results in "{$a->catscalename}", you are now enrolled in course <a href={$a->courseurl}>{$a->coursename}</a>.';
 $string['messageprovider:enrolmentfeedback'] = "Automatical enrolment to courses and groups.";
 $string['enrolmentmessagetitle'] = "Notification about new course / group enrolments";
 $string['courseenrolementstring'] = 'Because of your test results, you are now enroled in course(s) {$a}. Good luck with your studies.';
-$string['groupenrolementstring'] = 'Because of your test results, you are now enroled in group(s) {$a}. Good luck with your studies.';
+$string['groupenrolementstring'] = '{$a->groupname} in course <a href={$a->courseurl}>{$a->coursename}</a>';
+$string['enrolementstringstart'] = 'Based on your results in test {$a->testname} in course {$a->coursename} you are now...<br>';
+$string['followingcourses'] = 'subscribed in the following course(s):<br>';
+$string['followinggroups'] = 'member of the following group(s):<br>';
+$string['enrolementstringstartforfeedback'] = 'Based on your results you are now...<br>';
+$string['enrolementstringend'] = 'Good luck with your studies!';
+
 
 
 // Access.php.

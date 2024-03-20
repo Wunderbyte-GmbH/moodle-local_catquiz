@@ -77,6 +77,41 @@ class messages {
     }
 
     /**
+     * Generic send message function for catquiz.
+     *
+     * @param int $recepientid
+     * @param string $messagesubject
+     * @param string $messagetext
+     * @param string $messagename
+     *
+     * @return void
+     *
+     */
+    public static function send_html_message(int $recepientid, string $messagesubject, string $messagetext, string $messagename) {
+
+        global $CFG;
+        require_once($CFG->dirroot . '/user/lib.php');
+
+        $users = user_get_users_by_id([$recepientid]);
+
+        $user = reset($users);
+
+        $message = new \core\message\message();
+        $message->component = 'local_catquiz'; // Your plugin's name.
+        $message->name = $messagename; // Your notification name from message.php.
+        $message->userfrom = core_user::get_noreply_user(); // If the message is 'from' a specific user you can set them here.
+        $message->userto = $user;
+        $message->subject = $messagesubject;
+        $message->fullmessage = $messagetext;
+        $message->fullmessagehtml = $messagetext;
+        $message->fullmessageformat = FORMAT_HTML;
+        $message->notification = 1; // Because this is a notification generated from Moodle, not a user-to-user message.
+
+        // Actually send the message.
+        $messageid = message_send($message);
+    }
+
+    /**
      * Notifiy all subscribed users of an update of a catscale.
      *
      * @param stdClass $catscale
