@@ -91,7 +91,7 @@ class catquiz_test extends TestCase {
                             'coursesummary' => 'Ein toller Einführungskurs!',
                             'courseurl' => 'http://10.111.0.2:8000/course/view.php?id=17',
                             'catscalename' => 'Skala 2',
-                            'testname' => 'Testname'
+                            'testname' => 'Testname',
                             ],
                         ],
                     'group' => [
@@ -109,7 +109,7 @@ class catquiz_test extends TestCase {
                             'coursename' => 'Kurs 2',
                             'courseurl' => 'http://10.111.0.2:8000/course/view.php?id=17',
                             'catscalename' => 'Skala 2',
-                            'testname' => 'Testname'
+                            'testname' => 'Testname',
                             ],
                         '2' => [
                             'groupname' => 'Gruppe 3',
@@ -117,7 +117,7 @@ class catquiz_test extends TestCase {
                             'coursename' => 'Kurs 2',
                             'courseurl' => 'http://10.111.0.2:8000/course/view.php?id=17',
                             'catscalename' => 'Skala 2',
-                            'testname' => 'Testname'
+                            'testname' => 'Testname',
                             ],
                     ],
                 ],
@@ -192,7 +192,7 @@ class catquiz_test extends TestCase {
                             'coursesummary' => 'Ein toller Einführungskurs!',
                             'courseurl' => 'http://10.111.0.2:8000/course/view.php?id=17',
                             'catscalename' => 'Skala 2',
-                            'testname' => 'Testname'
+                            'testname' => 'Testname',
                             ],
                         ],
                     ],
@@ -225,7 +225,7 @@ class catquiz_test extends TestCase {
                             'coursename' => 'Kurs 2',
                             'courseurl' => 'http://10.111.0.2:8000/course/view.php?id=17',
                             'catscalename' => 'Skala 2',
-                            'testname' => 'Testname'
+                            'testname' => 'Testname',
                             ],
                         '2' => [
                             'groupname' => 'Gruppe 3',
@@ -233,7 +233,7 @@ class catquiz_test extends TestCase {
                             'coursename' => 'Kurs 3',
                             'courseurl' => 'http://10.111.0.2:8000/course/view.php?id=17',
                             'catscalename' => 'Skala 2',
-                            'testname' => 'Testname'
+                            'testname' => 'Testname',
                             ],
                     ],
                 ],
