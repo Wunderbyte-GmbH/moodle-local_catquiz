@@ -19,7 +19,7 @@
  *
  * @package     local_catquiz
  * @category    string
- * @copyright   2022 Wunderbyte GmbH <info@wunderbyte.at>
+ * @copyright   2022 onwards Wunderbyte GmbH <info@wunderbyte.at>
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
@@ -29,7 +29,7 @@ global $CFG;
 
 require_once($CFG->dirroot . '/local/catquiz/lib.php');
 
-$string['pluginname'] = 'ALiSe CAT Quiz';
+$string['pluginname'] = 'Adaptive Quiz - Advanced CAT Module';
 $string['catquiz'] = 'Catquiz';
 
 // Catquiz handler.
