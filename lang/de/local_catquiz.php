@@ -243,12 +243,18 @@ $string['messageprovider:catscaleupdate'] = 'Benachrichtung über eine Aktualisi
 $string['messageprovider:updatecatscale'] = 'Benachrichtung über eine Aktualisierung einer Skala.';
 $string['catscaleupdatedtitle'] = 'Eine Skala wurde aktualisiert';
 $string['messageprovider:updatecatscale'] = 'Erhält Benachrichtungung über Einschreibung in Skala';
-$string['onegroupenroled'] = 'Sie sind auf Grundlage Ihres Ergebnisses in "{$a->catscalename}" nun Mitglied der Gruppe "{$a->groupname}".';
+$string['onegroupenroled'] = 'Sie sind auf Grundlage Ihres Ergebnisses in "{$a->catscalename}" nun Mitglied der Gruppe "{$a->groupname}" im Kurs <a href="{$a->courseurl}">{$a->coursename}</a>.';
 $string['onecourseenroled'] = 'Sie wurden auf Grundlage Ihres Ergebnisses in "{$a->catscalename}" in den Kurs <a href="{$a->courseurl}">{$a->coursename}</a> eingeschrieben.';
 $string['messageprovider:enrolmentfeedback'] = "Automatische Einschreibung zu Kursen und Gruppen.";
 $string['enrolmentmessagetitle'] = "Benachrichtigung über neue Kurseinschreibung(en) / Gruppenmitgliedschaft(en)";
-$string['courseenrolementstring'] = 'Sie wurden  auf Grundlage Ihres Ergebnisses in den Kurs/ die Kurse {$a} eingeschrieben. Viel Erfolg beim Lernen!';
-$string['groupenrolementstring'] = 'Sie sind auf Grundlage Ihres Ergebnisses nun Mitglied der Gruppe(n) {$a}. Viel Erfolg beim Lernen!';
+
+// $string['courseenrolementstring1'] = 'Sie wurden  auf Grundlage Ihres Ergebnisses in den Kurs/ die Kurse {$a} eingeschrieben. Viel Erfolg beim Lernen!';
+$string['groupenrolementstring'] = '{$a->groupname} in Kurs <a href={$a->courseurl}>{$a->coursename}</a>';
+$string['enrolementstringstart'] = 'Auf Grundlage Ihres Ergebnisses im Test {$a->testname} im Kurs {$a->coursename} sind Sie fortan...';
+$string['followingcourses'] = 'eingeschrieben in folgenden Kurs bzw. folgende Kurse:<br>';
+$string['followinggroups'] = 'Mitglied in folgender Gruppe bzw. folgenden Gruppen:<br>';
+$string['enrolementstringstartforfeedback'] = 'Auf Grundlage Ihres Ergebnisses sind Sie fortan...<br>';
+$string['enrolementstringend'] = 'Wir wünschen Ihnen viel Erfolg beim weiteren Lernen!';
 
 // Access.
 $string['catquiz:canmanage'] = 'Darf Catquiz Plugin verwalten';

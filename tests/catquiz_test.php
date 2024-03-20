@@ -77,18 +77,21 @@ class catquiz_test extends TestCase {
                             'coursesummary' => 'Ein toller Einführungskurs!',
                             'courseurl' => 'http://10.111.0.2:8000/course/view.php?id=17',
                             'catscalename' => 'Skala 1',
+                            'testname' => 'Testname',
                         ],
                         '1' => [
                             'coursename' => 'Kurs 2',
                             'coursesummary' => 'Ein toller Einführungskurs!',
                             'courseurl' => 'http://10.111.0.2:8000/course/view.php?id=17',
                             'catscalename' => 'Skala 2',
+                            'testname' => 'Testname',
                             ],
                         '2' => [
                             'coursename' => 'Kurs 3',
                             'coursesummary' => 'Ein toller Einführungskurs!',
                             'courseurl' => 'http://10.111.0.2:8000/course/view.php?id=17',
                             'catscalename' => 'Skala 2',
+                            'testname' => 'Testname'
                             ],
                         ],
                     'group' => [
@@ -98,6 +101,7 @@ class catquiz_test extends TestCase {
                             'courseurl' => 'http://10.111.0.2:8000/course/view.php?id=17',
                             'catscalename' => 'Skala 1',
                             'coursename' => 'Kurs 1',
+                            'testname' => 'Testname',
                         ],
                         '1' => [
                             'groupname' => 'Gruppe 2',
@@ -105,6 +109,7 @@ class catquiz_test extends TestCase {
                             'coursename' => 'Kurs 2',
                             'courseurl' => 'http://10.111.0.2:8000/course/view.php?id=17',
                             'catscalename' => 'Skala 2',
+                            'testname' => 'Testname'
                             ],
                         '2' => [
                             'groupname' => 'Gruppe 3',
@@ -112,12 +117,130 @@ class catquiz_test extends TestCase {
                             'coursename' => 'Kurs 2',
                             'courseurl' => 'http://10.111.0.2:8000/course/view.php?id=17',
                             'catscalename' => 'Skala 2',
+                            'testname' => 'Testname'
                             ],
                     ],
                 ],
                 'expected' => [
                     'messagetitle' => "Notification about new course / group enrolments",
-                    'messagebody' => "Because of your test results, you are now enroled in course(s) http://10.111.0.2:8000/course/view.php?id=17Kurs 1, http://10.111.0.2:8000/course/view.php?id=17Kurs 2, http://10.111.0.2:8000/course/view.php?id=17Kurs 3. Good luck with your studies.<br>Because of your test results, you are now enroled in group(s) Gruppe 1, Gruppe 2, Gruppe 3. Good luck with your studies.",
+                    'messagebody' => "Based on your results in test Testname in course Kurs 1 you are now...<br><br>subscribed in the following course(s):<br><br><ul><li> <a href=http://10.111.0.2:8000/course/view.php?id=17>Kurs 1</a>
+                    </li><li> <a href=http://10.111.0.2:8000/course/view.php?id=17>Kurs 2</a>
+                    </li><li> <a href=http://10.111.0.2:8000/course/view.php?id=17>Kurs 3</a>
+                    </li></ul><br>member of the following group(s):<br><br><ul><li>Gruppe 1 in course <a href=http://10.111.0.2:8000/course/view.php?id=17>Kurs 1</a></li><li>Gruppe 2 in course <a href=http://10.111.0.2:8000/course/view.php?id=17>Kurs 2</a></li><li>Gruppe 3 in course <a href=http://10.111.0.2:8000/course/view.php?id=17>Kurs 2</a></li></ul>Good luck with your studies!",
+                    'messageforfeedback' => "Based on your results you are now...<br><br>subscribed in the following course(s):<br><br><ul><li> <a href=http://10.111.0.2:8000/course/view.php?id=17>Kurs 1</a>
+                    </li><li> <a href=http://10.111.0.2:8000/course/view.php?id=17>Kurs 2</a>
+                    </li><li> <a href=http://10.111.0.2:8000/course/view.php?id=17>Kurs 3</a>
+                    </li></ul><br>member of the following group(s):<br><br><ul><li>Gruppe 1 in course <a href=http://10.111.0.2:8000/course/view.php?id=17>Kurs 1</a></li><li>Gruppe 2 in course <a href=http://10.111.0.2:8000/course/view.php?id=17>Kurs 2</a></li><li>Gruppe 3 in course <a href=http://10.111.0.2:8000/course/view.php?id=17>Kurs 2</a></li></ul>Good luck with your studies!",
+                ],
+            ],
+            'singlecourse' => [
+                'enrolementarray' => [
+                    'course' => [
+                        '0' => [
+                            'coursename' => 'Kurs 1',
+                            'coursesummary' => 'Ein toller Einführungskurs!',
+                            'courseurl' => 'http://10.111.0.2:8000/course/view.php?id=17',
+                            'catscalename' => 'Skala 1',
+                            'testname' => 'Testname',
+                        ],
+                    ],
+                ],
+                'expected' => [
+                    'messagetitle' => "Notification about new course / group enrolments",
+                    'messagebody' => 'Because of your test results in "Skala 1", you are now enrolled in course <a href=http://10.111.0.2:8000/course/view.php?id=17>Kurs 1</a>.',
+                    'messageforfeedback' => 'Because of your test results in "Skala 1", you are now enrolled in course <a href=http://10.111.0.2:8000/course/view.php?id=17>Kurs 1</a>.',
+                ],
+            ],
+            'singlegroup' => [
+                'enrolementarray' => [
+                    'group' => [
+                        '0' => [
+                            'groupname' => 'Gruppe 1',
+                            'groupdescription' => 'Eine tolle Gruppe!',
+                            'courseurl' => 'http://10.111.0.2:8000/course/view.php?id=17',
+                            'catscalename' => 'Skala 1',
+                            'coursename' => 'Kurs 1',
+                            'testname' => 'Testname',
+                        ],
+                    ],
+                ],
+                'expected' => [
+                    'messagetitle' => "Notification about new course / group enrolments",
+                    'messagebody' => 'Because of your test results in "Skala 1", you are now enrolled in group "Gruppe 1" in course <a href=http://10.111.0.2:8000/course/view.php?id=17>Kurs 1</a>.',
+                    'messageforfeedback' => 'Because of your test results in "Skala 1", you are now enrolled in group "Gruppe 1" in course <a href=http://10.111.0.2:8000/course/view.php?id=17>Kurs 1</a>.',
+                ],
+            ],
+            'onlycourses' => [
+                'enrolementarray' => [
+                    'course' => [
+                        '0' => [
+                            'coursename' => 'Kurs 1',
+                            'coursesummary' => 'Ein toller Einführungskurs!',
+                            'courseurl' => 'http://10.111.0.2:8000/course/view.php?id=17',
+                            'catscalename' => 'Skala 1',
+                            'testname' => 'Testname',
+                        ],
+                        '1' => [
+                            'coursename' => 'Kurs 2',
+                            'coursesummary' => 'Ein toller Einführungskurs!',
+                            'courseurl' => 'http://10.111.0.2:8000/course/view.php?id=17',
+                            'catscalename' => 'Skala 2',
+                            'testname' => 'Testname',
+                            ],
+                        '2' => [
+                            'coursename' => 'Kurs 3',
+                            'coursesummary' => 'Ein toller Einführungskurs!',
+                            'courseurl' => 'http://10.111.0.2:8000/course/view.php?id=17',
+                            'catscalename' => 'Skala 2',
+                            'testname' => 'Testname'
+                            ],
+                        ],
+                    ],
+                'expected' => [
+                    'messagetitle' => "Notification about new course / group enrolments",
+                    'messagebody' => "Based on your results in test Testname in course Kurs 1 you are now...<br><br>subscribed in the following course(s):<br><br><ul><li> <a href=http://10.111.0.2:8000/course/view.php?id=17>Kurs 1</a>
+                    </li><li> <a href=http://10.111.0.2:8000/course/view.php?id=17>Kurs 2</a>
+                    </li><li> <a href=http://10.111.0.2:8000/course/view.php?id=17>Kurs 3</a>
+                    </li></ul><br>Good luck with your studies!",
+                    'messageforfeedback' => "Based on your results you are now...<br><br>subscribed in the following course(s):<br><br><ul><li> <a href=http://10.111.0.2:8000/course/view.php?id=17>Kurs 1</a>
+                    </li><li> <a href=http://10.111.0.2:8000/course/view.php?id=17>Kurs 2</a>
+                    </li><li> <a href=http://10.111.0.2:8000/course/view.php?id=17>Kurs 3</a>
+                    </li></ul><br>Good luck with your studies!",
+                ],
+            ],
+            'onlygroups' => [
+                'enrolementarray' => [
+                    'group' => [
+                        '0' => [
+                            'groupname' => 'Gruppe 1',
+                            'groupdescription' => 'Eine tolle Gruppe!',
+                            'courseurl' => 'http://10.111.0.2:8000/course/view.php?id=17',
+                            'catscalename' => 'Skala 1',
+                            'coursename' => 'Kurs 1',
+                            'testname' => 'Testname',
+                        ],
+                        '1' => [
+                            'groupname' => 'Gruppe 2',
+                            'groupdescription' => 'Eine tolle Gruppe!',
+                            'coursename' => 'Kurs 2',
+                            'courseurl' => 'http://10.111.0.2:8000/course/view.php?id=17',
+                            'catscalename' => 'Skala 2',
+                            'testname' => 'Testname'
+                            ],
+                        '2' => [
+                            'groupname' => 'Gruppe 3',
+                            'groupdescription' => 'Eine tolle Gruppe!',
+                            'coursename' => 'Kurs 3',
+                            'courseurl' => 'http://10.111.0.2:8000/course/view.php?id=17',
+                            'catscalename' => 'Skala 2',
+                            'testname' => 'Testname'
+                            ],
+                    ],
+                ],
+                'expected' => [
+                    'messagetitle' => "Notification about new course / group enrolments",
+                    'messagebody' => "Based on your results in test Testname in course Kurs 1 you are now...<br><br>member of the following group(s):<br><br><ul><li>Gruppe 1 in course <a href=http://10.111.0.2:8000/course/view.php?id=17>Kurs 1</a></li><li>Gruppe 2 in course <a href=http://10.111.0.2:8000/course/view.php?id=17>Kurs 2</a></li><li>Gruppe 3 in course <a href=http://10.111.0.2:8000/course/view.php?id=17>Kurs 3</a></li></ul>Good luck with your studies!",
+                    'messageforfeedback' => "Based on your results you are now...<br><br>member of the following group(s):<br><br><ul><li>Gruppe 1 in course <a href=http://10.111.0.2:8000/course/view.php?id=17>Kurs 1</a></li><li>Gruppe 2 in course <a href=http://10.111.0.2:8000/course/view.php?id=17>Kurs 2</a></li><li>Gruppe 3 in course <a href=http://10.111.0.2:8000/course/view.php?id=17>Kurs 3</a></li></ul>Good luck with your studies!",
                 ],
             ],
         ];

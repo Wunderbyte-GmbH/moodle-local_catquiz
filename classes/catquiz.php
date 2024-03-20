@@ -1692,13 +1692,13 @@ class catquiz {
             return "";
         }
 
-        messages::send_message(
+        messages::send_html_message(
             $userid,
             $enrolementstrings['messagetitle'] ?? "",
             $enrolementstrings['messagebody'] ?? "",
             'enrolmentfeedback'
         );
-        return $enrolementstrings['messagebody'];
+        return $enrolementstrings['messageforfeedback'] ?? "";
     }
 
     /**
@@ -1759,12 +1759,11 @@ class catquiz {
                     $url = new moodle_url('/course/view.php', ['id' => $courseid]);
 
                     $coursedata = [];
+                    $coursedata['testname'] = $quizsettings['name'];
                     $coursedata['coursename'] = $course->fullname ?? "";
                     $coursedata['coursesummary'] = $course->summary ?? "";
                     $coursedata['courseurl'] = $url->out() ?? "";
                     $coursedata['catscalename'] = $catscale->name ?? "";
-                    // TODO: Delete this is only for testing!
-                    $userid = 20;
                     if (!is_enrolled($context, $userid) && $course) {
                         if (enrol_try_internal_enrol($courseid, $userid, $rolestudent->id)) {
                             $enrolementarray['course'][] = $coursedata;
@@ -1781,6 +1780,7 @@ class catquiz {
                                 $groupmember = groups_add_member($existinggroup->id, $userid);
                                 if ($message && $groupmember) {
                                     $data = [];
+                                    $data['testname'] = $quizsettings['name'];
                                     $data['groupname'] = $newgroup;
                                     $data['groupdescription'] = $existinggroup->description ?? "";
                                     $data['coursename'] = $course->fullname ?? "";
@@ -1830,47 +1830,62 @@ class catquiz {
         if ($sum == 1) {
             $type = array_keys($enrolementarray)[0];
             if ($type === 'course') {
-                $message = get_string('onecourseenroled', 'local_catquiz', $enrolementarray['course']);
+                $message = get_string('onecourseenroled', 'local_catquiz', $enrolementarray['course'][0]);
             } else if ($type === 'group') {
-                $message = get_string('onegroupenroled', 'local_catquiz', $enrolementarray['group']);
+                $message = get_string('onegroupenroled', 'local_catquiz', $enrolementarray['group'][0]);
             }
             return [
                 'messagetitle' => $messagetitle,
                 'messagebody' => $message ?? "",
+                'messageforfeedback' => $message ?? "",
 
             ];
         }
 
-        $coursestring = "";
-        $groupstring = "";
+        $coursestring = "<br>" . get_string('followingcourses', 'local_catquiz') . "<br><ul>";
+        $groupstring = get_string('followinggroups', 'local_catquiz') . "<br><ul>";
         foreach ($enrolementarray as $type => $dataarray) {
             foreach ($dataarray as $messageinfo) {
                 if ($type === "course") {
-                    // Mit sprintf hier arbeiten.
-                    $coursestring .= "<a href=" . $messageinfo['courseurl'] . ">" . $messageinfo['coursename'] . "</a>, ";
+                    $coursestring .= "<li> <a href=" . $messageinfo['courseurl'] . ">" . $messageinfo['coursename'] . "</a>
+                    </li>";
                 };
                 if ($type === "group") {
-                    $groupstring .= $messageinfo['groupname'] . ", ";
+                    $groupstring .= '<li>' . get_string('groupenrolementstring', 'local_catquiz', $messageinfo) . '</li>';
                 }
-
             }
         }
-        $coursemessage = "";
-        $groupmessage = "";
-        // Unset last ", " from string.
-        if (strlen($coursestring) > 0) {
-            $coursestring = preg_replace('/, $/', '', $coursestring);
-            $coursemessage = get_string('courseenrolementstring', 'local_catquiz', $coursestring);
+        // Check if something was appended to the string.
+        if (substr($coursestring, -4) != "<ul>") {
+            $coursestring .= "</ul>";
+        } else {
+            $coursestring = "";
         }
-        if (strlen($groupstring) > 0) {
-            $groupstring = preg_replace('/, $/', '', $groupstring);
-            $groupmessage = get_string('groupenrolementstring', 'local_catquiz', $groupstring);
+        if (substr($groupstring, -4) != "<ul>") {
+            $groupstring .= "</ul>";
+        } else {
+            $groupstring = "";
         }
+        $startstring = get_string('enrolementstringstart', 'local_catquiz', $dataarray[0]);
+        $startstringforfeedback = get_string('enrolementstringstartforfeedback', 'local_catquiz', $dataarray[0]);
+        $endstring = get_string('enrolementstringend', 'local_catquiz', $dataarray[0]);
 
-        $messagebody = $coursemessage . "<br>" . $groupmessage;
+        $messagebody =
+            $startstring .
+            $coursestring .
+            "<br>" .
+            $groupstring .
+            $endstring;
+        $messageforfeedback =
+            $startstringforfeedback .
+            $coursestring .
+            "<br>" .
+            $groupstring .
+            $endstring;
         return [
             'messagetitle' => $messagetitle,
             'messagebody' => $messagebody,
+            'messageforfeedback' => $messageforfeedback,
 
         ];
     }
