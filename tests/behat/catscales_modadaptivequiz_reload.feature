@@ -53,10 +53,42 @@ Feature: As a teacher I want to ensure a correct behavior of an adaptive quiz at
     And I click on "Start attempt" "button"
     And I wait until the page is ready
     And I should see "Question 1"
+    ## Expecting all times the same question for the same settings
     And I should see "Skala: A/A01"
     And I should see "Schwierigkeit: -4.45"
     And I should see "Trennschärtfe: 5.92"
     And I reload the page
+    ## Expecting all times the same question for the same settings
     And I should see "Skala: A/A01"
     And I should see "Schwierigkeit: -4.45"
     And I should see "Trennschärtfe: 5.92"
+
+  @javascript
+  Scenario: Start adaptive quiz attempt wait max item time and reload the first question page
+    Given I am on the "adaptivecatquiz1" Activity page logged in as teacher
+    And I follow "Settings"
+    And I wait until the page is ready
+    And I set the field "Purpose of test" to "Classical test"
+    And I set the following fields to these values:
+      | Purpose of test                                 | Classical test |
+      | Limit time for attempt                          | 1              |
+      | catquiz_timelimitgroup[catquiz_maxtimeperitem]  | 1              |
+      | catquiz_timelimitgroup[catquiz_timeselect_item] | sec            |
+    And I click on "Save and display" "button"
+    And I log out
+    And I log in as "user1"
+    And I am on "Course 1" course homepage
+    And I follow "My Adaptive Quiz"
+    And I click on "Start attempt" "button"
+    And I wait until the page is ready
+    And I should see "Question 1"
+    ## Expecting all times the same question for the same settings
+    And I should see "Skala: A/A01"
+    And I should see "Schwierigkeit: -4.45"
+    And I should see "Trennschärtfe: 5.92"
+    And I wait "1" seconds
+    And I reload the page
+    ## Expecting all times the same question for the same settings
+    And I should see "Skala: A/A01"
+    And I should see "Schwierigkeit: -4.57"
+    And I should see "Trennschärtfe: 5.22"
