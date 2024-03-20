@@ -1670,7 +1670,7 @@ class catquiz {
     public static function enrol_user(
         int $userid,
         array $quizsettings,
-        array $personabilities):string {
+        array $personabilities): string {
 
         // Filter for scales that are selected for enrolement.
 
@@ -1809,7 +1809,7 @@ class catquiz {
      * @return array
      *
      */
-    public static function create_strings_for_enrolement_notification(array $enrolementarray):array {
+    public static function create_strings_for_enrolement_notification(array $enrolementarray): array {
         $messagetitle = get_string('enrolmentmessagetitle', 'local_catquiz');
         $messagebody = "";
 
