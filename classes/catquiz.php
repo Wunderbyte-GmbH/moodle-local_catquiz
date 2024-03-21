@@ -30,6 +30,7 @@ use dml_exception;
 use local_catquiz\event\attempt_completed;
 use local_catquiz\teststrategy\feedbacksettings;
 use moodle_exception;
+use moodle_url;
 use question_attempt;
 use question_attempt_pending_step;
 use question_bank;
@@ -1657,109 +1658,231 @@ class catquiz {
      * @param array $quizsettings
      * @param array $personabilities
      *
-     * @return bool
+     * @return string
      */
     public static function enrol_user(
         int $userid,
         array $quizsettings,
-        array $personabilities) {
-        global $DB;
+        array $personabilities): string {
 
         // Enrolement is applied according to test strategy.
         $personabilities = feedbacksettings::return_scales_according_to_strategy(
             $quizsettings['catquiz_selectteststrategy'],
             $personabilities);
 
+        $enrolementarray = [];
+
         foreach ($personabilities as $catscaleid => $personability) {
-            $i = 1;
+            $enrolementarray = self::enrol_and_create_message_array(
+                $enrolementarray,
+                $quizsettings,
+                $catscaleid,
+                $personability,
+                $userid
+            );
+        }
 
-            $rolestudent = $DB->get_record('role', ['shortname' => 'student']);
-            try {
-                $catscale = catscale::return_catscale_object($catscaleid);
-            } catch (\Exception $e) {
-                $catscale = (object) ['name' => '']; // Create a dummy object.
-            }
+        $enrolementstrings = self::create_strings_for_enrolement_notification($enrolementarray);
 
-            while (isset($quizsettings['feedback_scaleid_limit_lower_' . $catscaleid . '_'. $i])) {
-                $lowerlimit = $quizsettings['feedback_scaleid_limit_lower_' . $catscaleid . '_'. $i];
-                $upperlimit = $quizsettings['feedback_scaleid_limit_upper_' . $catscaleid . '_'. $i];
+        if (empty($enrolementstrings['messagetitle']) && empty($enrolementstrings['messagebody'])) {
+            return "";
+        }
 
-                if ($personability >= $lowerlimit && $personability <= $upperlimit) {
-                    $message = empty($quizsettings["enrolment_message_checkbox_" . $catscaleid . "_" . $i]) ? false : true;
-                    $groupstoenrol = $quizsettings['catquiz_group_' . $catscaleid . '_' . $i] ?? "";
-                    if (!empty($groupstoenrol)) {
-                        $groupsarray = explode(",", $groupstoenrol);
-                    } else {
-                        $groupsarray = [];
+        messages::send_html_message(
+            $userid,
+            $enrolementstrings['messagetitle'] ?? "",
+            $enrolementstrings['messagebody'] ?? "",
+            'enrolmentfeedback'
+        );
+        return $enrolementstrings['messageforfeedback'] ?? "";
+    }
+
+    /**
+     * Creates array with courses and groups to enrole to.
+     *
+     * @param array $enrolementarray
+     * @param array $quizsettings
+     * @param int $catscaleid
+     * @param float $personability
+     * @param int $userid
+     *
+     * @return array
+     *
+     */
+    public static function enrol_and_create_message_array(
+        array $enrolementarray,
+        array $quizsettings,
+        int $catscaleid,
+        float $personability,
+        int $userid
+        ): array {
+        global $DB;
+
+        $rolestudent = $DB->get_record('role', ['shortname' => 'student']);
+        try {
+            $catscale = catscale::return_catscale_object($catscaleid);
+        } catch (\Exception $e) {
+            $catscale = (object) ['name' => '']; // Create a dummy object.
+        }
+        $i = 1;
+        while (isset($quizsettings['feedback_scaleid_limit_lower_' . $catscaleid . '_'. $i])) {
+
+            $lowerlimit = $quizsettings['feedback_scaleid_limit_lower_' . $catscaleid . '_'. $i];
+            $upperlimit = $quizsettings['feedback_scaleid_limit_upper_' . $catscaleid . '_'. $i];
+
+            if ($personability >= (float) $lowerlimit && $personability <= (float) $upperlimit) {
+                $message = !empty($quizsettings["enrolment_message_checkbox_" . $catscaleid . "_" . $i]);
+                $groupstoenrol = $quizsettings['catquiz_group_' . $catscaleid . '_' . $i] ?? "";
+                if (!empty($groupstoenrol)) {
+                    $groupsarray = explode(",", $groupstoenrol);
+                } else {
+                    $groupsarray = [];
+                }
+                $coursestoenrol = $quizsettings['catquiz_courses_' . $catscaleid . '_' . $i] ?? [];
+                if (empty($coursestoenrol) && empty($groupsarray)) {
+                    // No courses and groups to enrol.
+                    $i++;
+                    continue;
+                }
+                // The first element at array key 0 is a dummy value to
+                // display some message like "please select course" in the
+                // form and has a course ID of 0.
+                $coursestoenrol = array_filter($coursestoenrol, fn ($v) => $v != 0);
+                foreach ($coursestoenrol as $courseid) {
+                    $context = \context_course::instance($courseid);
+                    $course = get_course($courseid);
+                    $url = new moodle_url('/course/view.php', ['id' => $courseid]);
+
+                    $coursedata = [];
+                    $coursedata['testname'] = $quizsettings['name'];
+                    $coursedata['coursename'] = $course->fullname ?? "";
+                    $coursedata['coursesummary'] = $course->summary ?? "";
+                    $coursedata['courseurl'] = $url->out() ?? "";
+                    $coursedata['catscalename'] = $catscale->name ?? "";
+                    if (!is_enrolled($context, $userid) && $course) {
+                        if (enrol_try_internal_enrol($courseid, $userid, $rolestudent->id)) {
+                            $enrolementarray['course'][] = $coursedata;
+                        }
                     }
-                    $coursestoenrol = $quizsettings['catquiz_courses_' . $catscaleid . '_' . $i] ?? [];
-                    // The first element at array key 0 is a dummy value to
-                    // display some message like "please select course" in the
-                    // form and has a course ID of 0.
-                    $coursestoenrol = array_filter($coursestoenrol, fn ($v) => $v != 0);
-                    foreach ($coursestoenrol as $courseid) {
-                        $context = \context_course::instance($courseid);
-                        $course = get_course($courseid);
-                        $coursedata = [];
-                        $coursedata['coursename'] = $course->fullname ?? "";
-                        $coursedata['coursesummary'] = $course->summary ?? "";
-                        $coursedata['catscalename'] = $catscale->name ?? "";
-                        if (!is_enrolled($context, $userid) && $course) {
-                            if (!enrol_try_internal_enrol($courseid, $userid, $rolestudent->id)) {
-                                // There's a problem.
-                                if ($message) {
-                                    messages::send_message(
-                                        $userid,
-                                        get_string('enrolledtocoursefailedtitle', 'local_catquiz', $coursedata),
-                                        get_string('enrolledtocoursefailedtext', 'local_catquiz', $coursedata),
-                                        'enrolmentfeedback');
-                                }
-                            } else {
-                                messages::send_message(
-                                    $userid,
-                                    get_string('enrolledtocoursetitle', 'local_catquiz', $coursedata),
-                                    get_string('enrolledtocoursetext', 'local_catquiz', $coursedata),
-                                    'enrolmentfeedback');
-                            }
-                        }
-                        if (empty($groupsarray)) {
-                            continue;
-                        }
-                        // Inscription only for existing groups.
-                        $groupsofcourse = groups_get_all_groups($courseid);
-                        foreach ($groupsofcourse as $existinggroup) {
-                            foreach ($groupsarray as $newgroup) {
-                                if ($existinggroup->name == $newgroup) {
-                                    $groupmember = groups_add_member($existinggroup->id, $userid);
-                                    if ($message) {
-                                        $data = [];
-                                        $data['groupname'] = $newgroup;
-                                        $data['groupdescription'] = $existinggroup->description ?? "";
-                                        $data['catscalename'] = $catscale->name ?? "";
-                                        if (!$groupmember) {
-                                            // Something went wrong.
-                                            messages::send_message(
-                                                $userid,
-                                                get_string('enrolledtogroupfailedtitle', 'local_catquiz', $data),
-                                                get_string('enrolledtogroupfailedtext', 'local_catquiz', $data),
-                                                'enrolmentfeedback');
-                                        } else {
-                                            messages::send_message(
-                                                $userid,
-                                                get_string('enrolledtogrouptitle', 'local_catquiz', $data),
-                                                get_string('enrolledtogrouptext', 'local_catquiz', $data),
-                                                'enrolmentfeedback');
-                                        }
-                                    }
+                    if (empty($groupsarray)) {
+                        continue;
+                    }
+                    // Inscription only for existing groups.
+                    $groupsofcourse = groups_get_all_groups($courseid);
+                    foreach ($groupsofcourse as $existinggroup) {
+                        foreach ($groupsarray as $newgroup) {
+                            if ($existinggroup->name == $newgroup) {
+                                $groupmember = groups_add_member($existinggroup->id, $userid);
+                                if ($message && $groupmember) {
+                                    $data = [];
+                                    $data['testname'] = $quizsettings['name'];
+                                    $data['groupname'] = $newgroup;
+                                    $data['groupdescription'] = $existinggroup->description ?? "";
+                                    $data['coursename'] = $course->fullname ?? "";
+                                    $url = new moodle_url('/course/view.php', ['id' => $course->id]);
+                                    $data['courseurl'] = $url->out();
+                                    $data['catscalename'] = $catscale->name ?? "";
+                                    $enrolementarray['group'][] = $data;
                                 }
                             }
                         }
                     }
                 }
-                $i++;
+            }
+            $i++;
+        }
+
+        return $enrolementarray;
+
+    }
+
+    /**
+     * Create strings for enrolement notifications.
+     *
+     * @param array $enrolementarray
+     *
+     * @return array
+     *
+     */
+    public static function create_strings_for_enrolement_notification(array $enrolementarray): array {
+        $messagetitle = get_string('enrolmentmessagetitle', 'local_catquiz');
+        $messagebody = "";
+
+        if (empty($enrolementarray)) {
+            return [
+                'messagetitle' => "",
+                'messagebody' => "",
+            ];
+        }
+
+        $messagebody = "";
+        // If there is only one element, message is different. So we count.
+        $sum = 0;
+        foreach ($enrolementarray as $subarray) {
+            $sum += count($subarray);
+        }
+
+        if ($sum == 1) {
+            $type = array_keys($enrolementarray)[0];
+            if ($type === 'course') {
+                $message = get_string('onecourseenroled', 'local_catquiz', $enrolementarray['course'][0]);
+            } else if ($type === 'group') {
+                $message = get_string('onegroupenroled', 'local_catquiz', $enrolementarray['group'][0]);
+            }
+            return [
+                'messagetitle' => $messagetitle,
+                'messagebody' => $message ?? "",
+                'messageforfeedback' => $message ?? "",
+
+            ];
+        }
+
+        $coursestring = "<br>" . get_string('followingcourses', 'local_catquiz') . "<br><ul>";
+        $groupstring = get_string('followinggroups', 'local_catquiz') . "<br><ul>";
+        foreach ($enrolementarray as $type => $dataarray) {
+            foreach ($dataarray as $messageinfo) {
+                if ($type === "course") {
+                    $coursestring .= "<li> <a href=" . $messageinfo['courseurl'] . ">" . $messageinfo['coursename'] . "</a>
+                    </li>";
+                };
+                if ($type === "group") {
+                    $groupstring .= '<li>' . get_string('groupenrolementstring', 'local_catquiz', $messageinfo) . '</li>';
+                }
             }
         }
-        return true;
+        // Check if something was appended to the string.
+        if (substr($coursestring, -4) != "<ul>") {
+            $coursestring .= "</ul>";
+        } else {
+            $coursestring = "";
+        }
+        if (substr($groupstring, -4) != "<ul>") {
+            $groupstring .= "</ul>";
+        } else {
+            $groupstring = "";
+        }
+        $startstring = get_string('enrolementstringstart', 'local_catquiz', $dataarray[0]);
+        $startstringforfeedback = get_string('enrolementstringstartforfeedback', 'local_catquiz', $dataarray[0]);
+        $endstring = get_string('enrolementstringend', 'local_catquiz', $dataarray[0]);
+
+        $messagebody =
+            $startstring .
+            $coursestring .
+            "<br>" .
+            $groupstring .
+            $endstring;
+        $messageforfeedback =
+            $startstringforfeedback .
+            $coursestring .
+            "<br>" .
+            $groupstring .
+            $endstring;
+        return [
+            'messagetitle' => $messagetitle,
+            'messagebody' => $messagebody,
+            'messageforfeedback' => $messageforfeedback,
+
+        ];
     }
 
     /**

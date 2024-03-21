@@ -243,15 +243,16 @@ $string['messageprovider:catscaleupdate'] = 'Benachrichtung über eine Aktualisi
 $string['messageprovider:updatecatscale'] = 'Benachrichtung über eine Aktualisierung einer Skala.';
 $string['catscaleupdatedtitle'] = 'Eine Skala wurde aktualisiert';
 $string['messageprovider:updatecatscale'] = 'Erhält Benachrichtungung über Einschreibung in Skala';
-$string['enrolledtogroupfailedtitle'] = 'Einschreibung zu Gruppe "{$a->groupname}" fehlgeschlagen.';
-$string['enrolledtogroupfailedtext'] = 'Aufgrund Ihrer Ergebnisse in der Skala "{$a->catscalename}", sollten Sie in Gruppe "{$a->groupname}" eingeschrieben werden. Einschreibung fehlgeschlagen. Möglicherweise sind Sie bereits Teil dieser Gruppe.';
-$string['enrolledtogrouptitle'] = 'Sie wurden in Gruppe "{$a->groupname}" eingeschrieben';
-$string['enrolledtogrouptext'] = 'Aufgrund Ihrer Ergebnisse in der Skala "{$a->catscalename}", wurden Sie in Gruppe "{$a->groupname}" eingeschrieben. Optionale Information zu Gruppe: "{$a->groupdescription}".';
-$string['enrolledtocoursefailedtitle'] = 'Einschreibung in Kurs "{$a->coursename}" fehlgeschlagen.';
-$string['enrolledtocoursefailedtext'] = 'Aufgrund Ihrer Ergebnisse in der Skala "{$a->catscalename}", sollten Sie in folgenden Kurs eingeschrieben werden: "{$a->coursename}". Einschreibung fehlgeschlagen. Möglicherweise sind Sie bereits Teil dieses Kurses.';
-$string['enrolledtocoursetitle'] = 'Sie wurden in Kurs "{$a->coursename}" eingeschrieben.';
-$string['enrolledtocoursetext'] = 'Aufgrund Ihrer Ergebnisse in der Skala "{$a->catscalename}", sind Sie nun in Kurs "{$a->coursename}" eingeschrieben. Optionale Information zu Kurs: "{$a->coursesummary}".';
+$string['onegroupenroled'] = 'Sie sind auf Grundlage Ihres Ergebnisses in "{$a->catscalename}" nun Mitglied der Gruppe "{$a->groupname}" im Kurs <a href="{$a->courseurl}">{$a->coursename}</a>.';
+$string['onecourseenroled'] = 'Sie wurden auf Grundlage Ihres Ergebnisses in "{$a->catscalename}" in den Kurs <a href="{$a->courseurl}">{$a->coursename}</a> eingeschrieben.';
 $string['messageprovider:enrolmentfeedback'] = "Automatische Einschreibung zu Kursen und Gruppen.";
+$string['enrolmentmessagetitle'] = "Benachrichtigung über neue Kurseinschreibung(en) / Gruppenmitgliedschaft(en)";
+$string['groupenrolementstring'] = '{$a->groupname} in Kurs <a href={$a->courseurl}>{$a->coursename}</a>';
+$string['enrolementstringstart'] = 'Auf Grundlage Ihres Ergebnisses im Test {$a->testname} im Kurs {$a->coursename} sind Sie fortan...';
+$string['followingcourses'] = 'eingeschrieben in folgenden Kurs bzw. folgende Kurse:<br>';
+$string['followinggroups'] = 'Mitglied in folgender Gruppe bzw. folgenden Gruppen:<br>';
+$string['enrolementstringstartforfeedback'] = 'Auf Grundlage Ihres Ergebnisses sind Sie fortan...<br>';
+$string['enrolementstringend'] = 'Wir wünschen Ihnen viel Erfolg beim weiteren Lernen!';
 
 // Access.
 $string['catquiz:canmanage'] = 'Darf Catquiz Plugin verwalten';
