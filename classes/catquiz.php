@@ -1721,7 +1721,6 @@ class catquiz {
         int $userid
         ): array {
         global $DB;
-        $i = 1;
 
         $rolestudent = $DB->get_record('role', ['shortname' => 'student']);
         try {
@@ -1729,14 +1728,14 @@ class catquiz {
         } catch (\Exception $e) {
             $catscale = (object) ['name' => '']; // Create a dummy object.
         }
-
+        $i = 1;
         while (isset($quizsettings['feedback_scaleid_limit_lower_' . $catscaleid . '_'. $i])) {
 
             $lowerlimit = $quizsettings['feedback_scaleid_limit_lower_' . $catscaleid . '_'. $i];
             $upperlimit = $quizsettings['feedback_scaleid_limit_upper_' . $catscaleid . '_'. $i];
 
             if ($personability >= (float) $lowerlimit && $personability <= (float) $upperlimit) {
-                $message = empty($quizsettings["enrolment_message_checkbox_" . $catscaleid . "_" . $i]) ? false : true;
+                $message = !empty($quizsettings["enrolment_message_checkbox_" . $catscaleid . "_" . $i]);
                 $groupstoenrol = $quizsettings['catquiz_group_' . $catscaleid . '_' . $i] ?? "";
                 if (!empty($groupstoenrol)) {
                     $groupsarray = explode(",", $groupstoenrol);
@@ -1746,7 +1745,7 @@ class catquiz {
                 $coursestoenrol = $quizsettings['catquiz_courses_' . $catscaleid . '_' . $i] ?? [];
                 if (empty($coursestoenrol) && empty($groupsarray)) {
                     // No courses and groups to enrol.
-                    $i ++;
+                    $i++;
                     continue;
                 }
                 // The first element at array key 0 is a dummy value to
