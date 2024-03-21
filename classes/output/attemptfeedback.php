@@ -392,7 +392,18 @@ class attemptfeedback implements renderable, templatable {
         if (!$feedbackdata) {
             return [];
         }
-        // TODO: Set primary generator element (customscalefeedback) first.
+        $primaryfeedbackname = 'customscalefeedback';
+
+        // Set primary generator element (customscalefeedback) first.
+        usort($generators, function($a, $b) use ($primaryfeedbackname) {
+            if ($a->get_generatorname() == $primaryfeedbackname) {
+                return -1;
+            } else if ($b->get_generatorname() == $primaryfeedbackname) {
+                return 1;
+            } else {
+                return 0;
+            }
+        });
 
         foreach ($generators as $generator) {
             $feedbacks = $generator->get_feedback($feedbackdata);
@@ -403,7 +414,6 @@ class attemptfeedback implements renderable, templatable {
                 }
 
                 $feedback['generatorname'] = $generator->get_generatorname();
-                $primaryfeedbackname = 'customscalefeedback';
                 if ($generator->get_generatorname() === $primaryfeedbackname) {
                     $feedback['frontpage'] = "1";
                 } else {
