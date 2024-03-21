@@ -685,7 +685,7 @@ class catquiz_handler {
                     $standardvalues[$feedbackvaluekey] = $values[$keyname] ?? null;
                     continue;
                 }
-                for ($j = 1; $j <= $numberoffeedbackoptions; $j++) {
+                for ($j = 1; $j <= $nfeedbackoptions; $j++) {
                     $keyname = $feedbackvaluekey . $scaleidofcopyvalue . '_' . $j;
                     $standardvalues[$feedbackvaluekey][$j] = $values[$keyname] ?? null;
                 }
@@ -709,7 +709,7 @@ class catquiz_handler {
                         $values[$subscalekey] = $standardvalues[$feedbackvaluekey] ?? "0";
                         continue;
                     }
-                    for ($j = 1; $j <= $numberoffeedbackoptions; $j++) {
+                    for ($j = 1; $j <= $nfeedbackoptions; $j++) {
                         $subscalekey = $feedbackvaluekey . $subscaleid . '_' . $j;
                         $values[$subscalekey] = $standardvalues[$feedbackvaluekey][$j];
                     }
