@@ -439,5 +439,69 @@ class feedbacksettings {
         return $value;
 
     }
+
+    /**
+     * Checks if scales settings should be overwritten for example a different scale to be set primary.
+     *
+     * @param array $selectedscales
+     * @param array $quizsettings
+     *
+     * @return array
+     *
+     */
+    public function apply_selection_of_scales(array $selectedscales, array $quizsettings): array {
+
+        // 1. Find the ID of primary scale.
+        switch ($this->primaryscaleid) {
+            case LOCAL_CATQUIZ_PRIMARYCATSCALE_DEFAULT:
+                // Default means no change.
+                return $selectedscales;
+            case LOCAL_CATQUIZ_PRIMARYCATSCALE_PARENT:
+                $id = $quizsettings['catquiz_catscales'];
+                break;
+            case LOCAL_CATQUIZ_PRIMARYCATSCALE_LOWEST:
+                $filterabilities = [];
+                foreach ($selectedscales as $scaleid => $array) {
+                        $filterabilities[$scaleid] = $array['value'];
+                }
+                if (count($filterabilities) < 1) {
+                    return $selectedscales;
+                }
+                $id = array_search(min($filterabilities), $filterabilities);
+                break;
+            case LOCAL_CATQUIZ_PRIMARYCATSCALE_STRONGEST:
+                $filterabilities = [];
+                foreach ($selectedscales as $scaleid => $array) {
+                        $filterabilities[$scaleid] = $array['value'];
+                }
+                if (count($filterabilities) < 1) {
+                    return $selectedscales;
+                }
+                $id = array_search(max($filterabilities), $filterabilities);
+                break;
+            default:
+                // Default means no change.
+                return $selectedscales;
+        }
+
+        // 2. Set this ID primary and unset primary key from other scales.
+        // If excluded isset -> unset. Add warning.
+        // All other excluded and toreport properties remain.
+        foreach ($selectedscales as $scaleid => $infoarray) {
+            if ($scaleid == $id) {
+                $selectedscales[$scaleid]['primary'] = true;
+                if (!empty($selectedscales[$scaleid]['error']) || !empty($selectedscales[$scaleid]['excluded'])) {
+                    $selectedscales[$scaleid]['comment'] = $selectedscales[$scaleid]['error'] ?? true;
+                    $selectedscales[$scaleid]['excluded'] = false;
+                }
+                continue;
+            }
+            if (isset($selectedscales[$scaleid]['primary'])) {
+                unset($selectedscales[$scaleid]['primary']);
+            }
+        }
+
+        return $selectedscales;
+    }
 }
 

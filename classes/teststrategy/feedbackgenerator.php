@@ -159,18 +159,18 @@ abstract class feedbackgenerator {
 
         $transformedpersonabilities = $newdata['updated_personabilities'];
 
-        // TODO: Overwrite primaryscale (and sortorder?) via shortcode.
-
         $transformedpersonabilities = $feedbacksettings->filter_excluded_scales($transformedpersonabilities, $quizsettings);
 
         $feedbacksettings->set_params_from_attempt($newdata, $quizsettings);
 
-        return info::get_teststrategy($strategyid)
-            ->select_scales_for_report(
-                $feedbacksettings,
-                $transformedpersonabilities,
-                $newdata
-            );
+        $selectedscales = info::get_teststrategy($strategyid)
+        ->select_scales_for_report(
+            $feedbacksettings,
+            $transformedpersonabilities,
+            $newdata
+        );
+        $selectedscales = $feedbacksettings->apply_selection_of_scales($selectedscales, $quizsettings);
+        return $selectedscales;
     }
 
     /**
