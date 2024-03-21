@@ -227,7 +227,8 @@ class graphicalsummary extends feedbackgenerator {
         $new['personability_before'] =
             $existingdata['personabilities'][$existingdata['catscaleid']]['value'] ?? null;
 
-            // TODO: Here is always root scale reference. is this wanted?
+            // TODO: Here is always root scale reference for comparison is this wanted?
+            // Or should it be compared to same scale?
         $graphicalsummary[] = $new;
 
         $teststrategyname = get_string(
