@@ -272,7 +272,8 @@ class comparetotestaverage extends feedbackgenerator {
         $progress = $newdata['progress'];
         $quizsettings = $existingdata['quizsettings'];
 
-        if (!$progress->get_playedquestions()) {
+        if ((is_array($progress) && empty($progress['playedquestions']))
+            || (is_object($progress) && !$progress->get_playedquestions())) {
             return [];
         }
 
@@ -312,6 +313,8 @@ class comparetotestaverage extends feedbackgenerator {
         );
 
         if (!$worseabilities) {
+            // TODO: Is this really a valid check?
+            // Should it maybe be the check $pp->ability <= $ability in case ability is minimum value of abilityrange?
             return [];
         }
 
