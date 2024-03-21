@@ -43,7 +43,7 @@ use SebastianBergmann\RecursionContext\InvalidArgumentException;
 class catquiz_test extends TestCase {
 
     /**
-     * Tests that the ability is not updated in cases where it should not be updated.
+     * Tests the return value supposed to be a human readable information about course & group enrolment.
      *
      * @dataProvider create_strings_for_enrolement_notification_provider
      *
@@ -62,7 +62,7 @@ class catquiz_test extends TestCase {
     }
 
     /**
-     * Data provider for test_simulation_steps_calculated_ability_is_correct()
+     * Data provider for test_create_strings_for_enrolement_notification()
      *
      * @return array
      */
@@ -123,14 +123,26 @@ class catquiz_test extends TestCase {
                 ],
                 'expected' => [
                     'messagetitle' => "Notification about new course / group enrolments",
-                    'messagebody' => "Based on your results in test Testname in course Kurs 1 you are now...<br><br>subscribed in the following course(s):<br><br><ul><li> <a href=http://10.111.0.2:8000/course/view.php?id=17>Kurs 1</a>
+                    'messagebody' => "Based on your results in test Testname in course Kurs 1 you are now...<br><br>"
+                    . "subscribed in the following course(s):<br><br><ul><li> "
+                    . "<a href=http://10.111.0.2:8000/course/view.php?id=17>Kurs 1</a>
                     </li><li> <a href=http://10.111.0.2:8000/course/view.php?id=17>Kurs 2</a>
                     </li><li> <a href=http://10.111.0.2:8000/course/view.php?id=17>Kurs 3</a>
-                    </li></ul><br>member of the following group(s):<br><br><ul><li>Gruppe 1 in course <a href=http://10.111.0.2:8000/course/view.php?id=17>Kurs 1</a></li><li>Gruppe 2 in course <a href=http://10.111.0.2:8000/course/view.php?id=17>Kurs 2</a></li><li>Gruppe 3 in course <a href=http://10.111.0.2:8000/course/view.php?id=17>Kurs 2</a></li></ul>Good luck with your studies!",
-                    'messageforfeedback' => "Based on your results you are now...<br><br>subscribed in the following course(s):<br><br><ul><li> <a href=http://10.111.0.2:8000/course/view.php?id=17>Kurs 1</a>
+                    </li></ul><br>member of the following group(s):<br><br>"
+                    . "<ul><li>Gruppe 1 in course <a href=http://10.111.0.2:8000/course/view.php?id=17>Kurs 1</a></li>"
+                    . "<li>Gruppe 2 in course <a href=http://10.111.0.2:8000/course/view.php?id=17>Kurs 2</a></li>"
+                    . "<li>Gruppe 3 in course <a href=http://10.111.0.2:8000/course/view.php?id=17>Kurs 2</a></li>"
+                    . "</ul>Good luck with your studies!",
+                    'messageforfeedback' => "Based on your results you are now...<br><br>"
+                    . "subscribed in the following course(s):<br><br>"
+                    . "<ul><li> <a href=http://10.111.0.2:8000/course/view.php?id=17>Kurs 1</a>
                     </li><li> <a href=http://10.111.0.2:8000/course/view.php?id=17>Kurs 2</a>
                     </li><li> <a href=http://10.111.0.2:8000/course/view.php?id=17>Kurs 3</a>
-                    </li></ul><br>member of the following group(s):<br><br><ul><li>Gruppe 1 in course <a href=http://10.111.0.2:8000/course/view.php?id=17>Kurs 1</a></li><li>Gruppe 2 in course <a href=http://10.111.0.2:8000/course/view.php?id=17>Kurs 2</a></li><li>Gruppe 3 in course <a href=http://10.111.0.2:8000/course/view.php?id=17>Kurs 2</a></li></ul>Good luck with your studies!",
+                    </li></ul><br>member of the following group(s):<br><br><ul>"
+                    . "<li>Gruppe 1 in course <a href=http://10.111.0.2:8000/course/view.php?id=17>Kurs 1</a></li>"
+                    . "<li>Gruppe 2 in course <a href=http://10.111.0.2:8000/course/view.php?id=17>Kurs 2</a></li>"
+                    . "<li>Gruppe 3 in course <a href=http://10.111.0.2:8000/course/view.php?id=17>Kurs 2</a></li>"
+                    . "</ul>Good luck with your studies!",
                 ],
             ],
             'singlecourse' => [
@@ -147,8 +159,12 @@ class catquiz_test extends TestCase {
                 ],
                 'expected' => [
                     'messagetitle' => "Notification about new course / group enrolments",
-                    'messagebody' => 'Because of your test results in "Skala 1", you are now enrolled in course <a href=http://10.111.0.2:8000/course/view.php?id=17>Kurs 1</a>.',
-                    'messageforfeedback' => 'Because of your test results in "Skala 1", you are now enrolled in course <a href=http://10.111.0.2:8000/course/view.php?id=17>Kurs 1</a>.',
+                    'messagebody' => 'Because of your test results in "Skala 1", '
+                    . 'you are now enrolled in course '
+                    . '<a href=http://10.111.0.2:8000/course/view.php?id=17>Kurs 1</a>.',
+                    'messageforfeedback' => 'Because of your test results in "Skala 1", '
+                    . 'you are now enrolled in course '
+                    . '<a href=http://10.111.0.2:8000/course/view.php?id=17>Kurs 1</a>.',
                 ],
             ],
             'singlegroup' => [
@@ -166,8 +182,11 @@ class catquiz_test extends TestCase {
                 ],
                 'expected' => [
                     'messagetitle' => "Notification about new course / group enrolments",
-                    'messagebody' => 'Because of your test results in "Skala 1", you are now enrolled in group "Gruppe 1" in course <a href=http://10.111.0.2:8000/course/view.php?id=17>Kurs 1</a>.',
-                    'messageforfeedback' => 'Because of your test results in "Skala 1", you are now enrolled in group "Gruppe 1" in course <a href=http://10.111.0.2:8000/course/view.php?id=17>Kurs 1</a>.',
+                    'messagebody' => 'Because of your test results in "Skala 1", you are now enrolled in group "Gruppe 1" in course'
+                    . ' <a href=http://10.111.0.2:8000/course/view.php?id=17>Kurs 1</a>.',
+                    'messageforfeedback' => 'Because of your test results in "Skala 1", '
+                    . 'you are now enrolled in group "Gruppe 1" in course '
+                    . '<a href=http://10.111.0.2:8000/course/view.php?id=17>Kurs 1</a>.',
                 ],
             ],
             'onlycourses' => [
@@ -198,11 +217,14 @@ class catquiz_test extends TestCase {
                     ],
                 'expected' => [
                     'messagetitle' => "Notification about new course / group enrolments",
-                    'messagebody' => "Based on your results in test Testname in course Kurs 1 you are now...<br><br>subscribed in the following course(s):<br><br><ul><li> <a href=http://10.111.0.2:8000/course/view.php?id=17>Kurs 1</a>
+                    'messagebody' => "Based on your results in test Testname in course Kurs 1 you are now...<br>"
+                    . "<br>subscribed in the following course(s):<br><br><ul><li> "
+                    . "<a href=http://10.111.0.2:8000/course/view.php?id=17>Kurs 1</a>
                     </li><li> <a href=http://10.111.0.2:8000/course/view.php?id=17>Kurs 2</a>
                     </li><li> <a href=http://10.111.0.2:8000/course/view.php?id=17>Kurs 3</a>
                     </li></ul><br>Good luck with your studies!",
-                    'messageforfeedback' => "Based on your results you are now...<br><br>subscribed in the following course(s):<br><br><ul><li> <a href=http://10.111.0.2:8000/course/view.php?id=17>Kurs 1</a>
+                    'messageforfeedback' => "Based on your results you are now...<br><br>subscribed in the following course(s):<br><br>"
+                    . "<ul><li> <a href=http://10.111.0.2:8000/course/view.php?id=17>Kurs 1</a>
                     </li><li> <a href=http://10.111.0.2:8000/course/view.php?id=17>Kurs 2</a>
                     </li><li> <a href=http://10.111.0.2:8000/course/view.php?id=17>Kurs 3</a>
                     </li></ul><br>Good luck with your studies!",
@@ -239,8 +261,18 @@ class catquiz_test extends TestCase {
                 ],
                 'expected' => [
                     'messagetitle' => "Notification about new course / group enrolments",
-                    'messagebody' => "Based on your results in test Testname in course Kurs 1 you are now...<br><br>member of the following group(s):<br><br><ul><li>Gruppe 1 in course <a href=http://10.111.0.2:8000/course/view.php?id=17>Kurs 1</a></li><li>Gruppe 2 in course <a href=http://10.111.0.2:8000/course/view.php?id=17>Kurs 2</a></li><li>Gruppe 3 in course <a href=http://10.111.0.2:8000/course/view.php?id=17>Kurs 3</a></li></ul>Good luck with your studies!",
-                    'messageforfeedback' => "Based on your results you are now...<br><br>member of the following group(s):<br><br><ul><li>Gruppe 1 in course <a href=http://10.111.0.2:8000/course/view.php?id=17>Kurs 1</a></li><li>Gruppe 2 in course <a href=http://10.111.0.2:8000/course/view.php?id=17>Kurs 2</a></li><li>Gruppe 3 in course <a href=http://10.111.0.2:8000/course/view.php?id=17>Kurs 3</a></li></ul>Good luck with your studies!",
+                    'messagebody' => "Based on your results in test Testname in course Kurs 1 you are now...<br>"
+                        . "<br>member of the following group(s):<br><br>"
+                        . "<ul><li>Gruppe 1 in course <a href=http://10.111.0.2:8000/course/view.php?id=17>Kurs 1</a></li>"
+                        . "<li>Gruppe 2 in course <a href=http://10.111.0.2:8000/course/view.php?id=17>Kurs 2</a></li>"
+                        . "<li>Gruppe 3 in course <a href=http://10.111.0.2:8000/course/view.php?id=17>Kurs 3</a></li>"
+                        . "</ul>Good luck with your studies!",
+                    'messageforfeedback' => "Based on your results you are now...<br><br>"
+                        . "member of the following group(s):<br><br>"
+                        . "<ul><li>Gruppe 1 in course <a href=http://10.111.0.2:8000/course/view.php?id=17>Kurs 1</a></li>"
+                        . "<li>Gruppe 2 in course <a href=http://10.111.0.2:8000/course/view.php?id=17>Kurs 2</a></li>"
+                        . "<li>Gruppe 3 in course <a href=http://10.111.0.2:8000/course/view.php?id=17>Kurs 3</a></li></ul>"
+                        . "Good luck with your studies!",
                 ],
             ],
         ];
