@@ -241,7 +241,6 @@ class personabilities extends feedbackgenerator {
             $existingdata['teststrategy']
         );
 
-            // TODO: force definition of selected scales via shortcode.
         $personabilities = [];
         // Ability range is the same for all scales with same root scale.
         $abiltiyrange = $this->get_ability_range(array_key_first($catscales));

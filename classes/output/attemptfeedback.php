@@ -252,7 +252,12 @@ class attemptfeedback implements renderable, templatable {
     private function add_default_data(array $newdata): array {
         $newarray = [];
         $progress = $newdata['progress'];
-        $personabilities = $progress->get_abilities();
+        if (is_array($progress)) {
+            $personabilities = $progress['abilities'];
+        } else {
+            $personabilities = $progress->get_abilities();
+        }
+
         if (!$personabilities) {
             return $newdata;
         }
@@ -324,7 +329,8 @@ class attemptfeedback implements renderable, templatable {
     public function get_feedback_for_attempt(): array {
         $feedbackdata = $this->load_feedbackdata();
         $generators = $this->get_feedback_generators_for_teststrategy($feedbackdata['teststrategy']);
-        return $this->generate_feedback($generators, $feedbackdata);
+        $updatedfeedbackdata = $this->update_feedbackdata_according_to_settings($feedbackdata, $generators);
+        return $this->generate_feedback($generators, $updatedfeedbackdata);
     }
 
     /**
@@ -407,5 +413,25 @@ class attemptfeedback implements renderable, templatable {
             }
         }
         return $context;
+    }
+
+    /**
+     * Getter for the integer defining which kind of primary scale is selected.
+     * Integers are defined constants in lib.php.
+     * @param array $feedbackdata
+     * @param array<feedbackgenerator> $generators
+     *
+     * @return array
+     *
+     */
+    private function update_feedbackdata_according_to_settings(array $feedbackdata, array $generators): array {
+
+        if ($this->feedbacksettings->primaryscaleid == LOCAL_CATQUIZ_PRIMARYCATSCALE_DEFAULT) {
+            return $feedbackdata;
+        }
+
+        $feedbackdata = $this->load_data_from_generators($generators, $feedbackdata, $feedbackdata);
+        return $feedbackdata;
+
     }
 }
