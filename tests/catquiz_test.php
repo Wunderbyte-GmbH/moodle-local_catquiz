@@ -223,7 +223,8 @@ class catquiz_test extends TestCase {
                     </li><li> <a href=http://10.111.0.2:8000/course/view.php?id=17>Kurs 2</a>
                     </li><li> <a href=http://10.111.0.2:8000/course/view.php?id=17>Kurs 3</a>
                     </li></ul><br>Good luck with your studies!",
-                    'messageforfeedback' => "Based on your results you are now...<br><br>subscribed in the following course(s):<br><br>"
+                    'messageforfeedback' => "Based on your results you are now...<br>"
+                    . "<br>subscribed in the following course(s):<br><br>"
                     . "<ul><li> <a href=http://10.111.0.2:8000/course/view.php?id=17>Kurs 1</a>
                     </li><li> <a href=http://10.111.0.2:8000/course/view.php?id=17>Kurs 2</a>
                     </li><li> <a href=http://10.111.0.2:8000/course/view.php?id=17>Kurs 3</a>
