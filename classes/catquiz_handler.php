@@ -419,15 +419,15 @@ class catquiz_handler {
             = get_string('setsevalue', 'local_catquiz', $sevalues);
         }
 
-        $hasmaxquestionsperscale = array_key_exists('maxquestionsscalegroup', $data);
+        $hasmaxqpscale = array_key_exists('maxquestionsscalegroup', $data);
         // Number of questions - validate higher and lower values.
-        if ($hasmaxquestionsperscale
+        if ($hasmaxqpscale
             && (int) $data['maxquestionsscalegroup']['catquiz_minquestionspersubscale']
             >= (int) $data['maxquestionsscalegroup']['catquiz_maxquestionspersubscale']
             && 0 != (int) $data['maxquestionsscalegroup']['catquiz_maxquestionspersubscale']) {
             $errors['maxquestionsscalegroup'] = get_string('formminquestgreaterthan', 'local_catquiz');
         }
-        if ($hasmaxquestionsperscale
+        if ($hasmaxqpscale
             && (int) $data['maxquestionsgroup']['catquiz_minquestions']
             >= (int) $data['maxquestionsgroup']['catquiz_maxquestions']
             && 0 != (int) $data['maxquestionsgroup']['catquiz_maxquestions']) {
@@ -435,7 +435,7 @@ class catquiz_handler {
         }
 
         // Min questions per scale <= max questions per test.
-        if ($hasmaxquestionsperscale
+        if ($hasmaxqpscale
             && 0 != (int) $data['maxquestionsscalegroup']['catquiz_minquestionspersubscale']
             && 0 != (int) $data['maxquestionsgroup']['catquiz_maxquestions']) {
             if ((int) $data['maxquestionsscalegroup']['catquiz_minquestionspersubscale']
@@ -909,8 +909,8 @@ class catquiz_handler {
 
         // Default is infinite represented by -1.
         $maxquestionsperscale = 0;
-        $hasmaxquestionsperscale = property_exists($quizsettings, 'maxquestionsscalegroup');
-        $maxquestionsperscale = $hasmaxquestionsperscale
+        $hasmaxqpscale = property_exists($quizsettings, 'maxquestionsscalegroup');
+        $maxquestionsperscale = $hasmaxqpscale
             ? intval($quizsettings->maxquestionsscalegroup->catquiz_maxquestionspersubscale)
             : $maxquestionsperscale;
         if ($maxquestionsperscale == 0) {
