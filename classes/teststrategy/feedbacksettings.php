@@ -37,72 +37,72 @@ class feedbacksettings {
     /** The scale for which detailed feedback will be displayed. Can be a single scaleid or an array of scales.
      * @var int
      */
-    public $primaryscaleid;
+    public int $primaryscaleid;
 
     /** The id of the teststrategy.
      * @var int
      */
-    public $strategyid;
+    public int $strategyid;
 
     /**
      * @var boolean
      */
-    public $displayscaleswithoutitemsplayed = false;
+    public bool $displayscaleswithoutitemsplayed = false;
 
     /**
      * @var boolean
      */
-    public $overridesettings = true;
+    public bool $overridesettings = true;
 
     /**
      * @var int
      */
-    public $sortorder;
+    public int $sortorder;
 
     /**
      * @var ?array
      */
-    public $areastohide = [];
+    public ?array $areastohide = [];
 
     /**
      * @var ?array
      */
-    public $areashiddenbydefault = [];
+    public ?array $areashiddenbydefault = [];
 
     /**
      * @var ?array
      */
-    public $definedareastohidekeys;
+    public ?array $definedareastohidekeys;
 
     /**
      * @var ?int
      */
-    public $nmintest;
+    public ?int $nmintest;
 
     /**
      * @var ?int
      */
-    public $nminscale;
+    public ?int $nminscale;
 
     /**
      * @var ?int
      */
-    public $rootscale;
+    public ?int $rootscale;
 
     /**
      * @var ?float
      */
-    public $semax;
+    public ?float $semax;
 
     /**
      * @var ?float
      */
-    public $semin;
+    public ?float $semin;
 
     /**
      * @var ?float
      */
-    public $fraction;
+    public ?float $fraction;
 
     /**
      * Constructor for feedbackclass.
@@ -387,13 +387,13 @@ class feedbacksettings {
      *
      */
     public function set_params_from_attempt(array $newdata, array $quizsettings): void {
-        $this->semax = (float) $newdata['se_max'] ?? null;
-        $this->semin = (float) $newdata['se_min'] ?? null;
-        $maxquestiongroup = (array) $quizsettings['maxquestionsgroup'] ?? null;
-        $maxquestionsscalegroup = (array) $quizsettings['maxquestionsscalegroup'] ?? null;
-        $this->nmintest = (int) $maxquestiongroup['catquiz_minquestions'] ?? null;
-        $this->nminscale = (int) $maxquestionsscalegroup['catquiz_maxquestionspersubscale'] ?? null;
-        $this->rootscale = (int) $quizsettings['catquiz_catscales'] ?? null;
+        $this->semax = $newdata['se_max'] ?? null;
+        $this->semin = $newdata['se_min'] ?? null;
+        $maxquestiongroup = $quizsettings['maxquestionsgroup'] ?? null;
+        $maxquestionsscalegroup = $quizsettings['maxquestionsscalegroup'] ?? null;
+        $this->nmintest = $maxquestiongroup['catquiz_minquestions'] ?? null;
+        $this->nminscale = $maxquestionsscalegroup['catquiz_minquestionspersubscale'] ?? null;
+        $this->rootscale = $quizsettings['catquiz_catscales'] ?? null;
         // Find average fraction.
         $f = 0.0;
         $i = 0;
@@ -490,14 +490,17 @@ class feedbacksettings {
         foreach ($selectedscales as $scaleid => $infoarray) {
             if ($scaleid == $id) {
                 $selectedscales[$scaleid]['primary'] = true;
+                $selectedscales[$scaleid]['toreport'] = true;
                 if (!empty($selectedscales[$scaleid]['error']) || !empty($selectedscales[$scaleid]['excluded'])) {
                     $selectedscales[$scaleid]['comment'] = $selectedscales[$scaleid]['error'] ?? true;
                     $selectedscales[$scaleid]['excluded'] = false;
+                    $selectedscales[$scaleid]['primarybecause'] = 'primaryscaletype_'. (string) $this->primaryscaleid;
                 }
                 continue;
             }
             if (isset($selectedscales[$scaleid]['primary'])) {
                 unset($selectedscales[$scaleid]['primary']);
+                unset($selectedscales[$scaleid]['toreport']);
             }
         }
 
