@@ -137,9 +137,7 @@ class classicalcat extends strategy {
         ): array {
 
         // If Fraction is 1 (all answers correct) or 0 (all answers wrong) mark abilities as estimated.
-        if ($feedbacksettings->fraction == 1 || $feedbacksettings->fraction == 0 ) {
-            $estimated = true;
-        }
+        $estimated = $feedbacksettings->fraction == 1 || $feedbacksettings->fraction == 0;
         $rootscaleid = $feedbackdata['catscaleid'];
         foreach ($personabilities as $scaleid => $abilitiesarray) {
             $personabilities[$scaleid]['toreport'] = true;

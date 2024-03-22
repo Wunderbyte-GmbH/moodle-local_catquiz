@@ -389,11 +389,11 @@ class feedbacksettings {
     public function set_params_from_attempt(array $newdata, array $quizsettings): void {
         $this->semax = $newdata['se_max'] ?? null;
         $this->semin = $newdata['se_min'] ?? null;
-        $maxquestiongroup = $quizsettings['maxquestionsgroup'] ?? null;
-        $maxquestionsscalegroup = $quizsettings['maxquestionsscalegroup'] ?? null;
-        $this->nmintest = $maxquestiongroup['catquiz_minquestions'] ?? null;
-        $this->nminscale = $maxquestionsscalegroup['catquiz_minquestionspersubscale'] ?? null;
-        $this->rootscale = $quizsettings['catquiz_catscales'] ?? null;
+        $maxquestiongroup = (array) $quizsettings['maxquestionsgroup'] ?? null;
+        $maxquestionsscalegroup = (array) $quizsettings['maxquestionsscalegroup'] ?? null;
+        $this->nmintest = (int) $maxquestiongroup['catquiz_minquestions'] ?? null;
+        $this->nminscale = (int) $maxquestionsscalegroup['catquiz_minquestionspersubscale'] ?? null;
+        $this->rootscale = (int) $quizsettings['catquiz_catscales'] ?? null;
         // Find average fraction.
         $f = 0.0;
         $i = 0;
