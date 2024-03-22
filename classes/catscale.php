@@ -62,6 +62,12 @@ class catscale {
     public ?stdClass $catscale = null;
 
     /**
+     *
+     * @var int $catscaleid.
+     */
+    public ?int $catscaleid = null;
+
+    /**
      * Catscale constructor.
      *
      * @param int $catscaleid
