@@ -68,7 +68,7 @@ class model_item_response {
     /**
      * Return ability.
      *
-     * @return float
+     * @return model_person_param
      *
      */
     public function get_personparams(): model_person_param {
