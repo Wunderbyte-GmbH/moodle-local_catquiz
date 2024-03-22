@@ -429,7 +429,7 @@ class attemptfeedback implements renderable, templatable {
      * Getter for the integer defining which kind of primary scale is selected.
      * Integers are defined constants in lib.php.
      * @param array $feedbackdata
-     * @param array<feedbackgenerator> $generators
+     * @param array $generators
      *
      * @return array
      *
