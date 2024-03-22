@@ -237,7 +237,7 @@ class attemptfeedback implements renderable, templatable {
                 $generatordata
             );
         }
-
+        // Data is not merged correctly into feedbackdata at this point.
         return $feedbackdata;
     }
 
