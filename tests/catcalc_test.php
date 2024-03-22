@@ -26,10 +26,12 @@
 namespace local_catquiz;
 
 use basic_testcase;
+use catmodel_raschbirnbaum\raschbirnbaum;
 use coding_exception;
 use Exception;
 use local_catquiz\local\model\model_item_param;
 use local_catquiz\local\model\model_item_param_list;
+use local_catquiz\local\model\model_responses;
 use moodle_exception;
 use SebastianBergmann\RecursionContext\InvalidArgumentException;
 use PHPUnit\Framework\ExpectationFailedException;
@@ -140,6 +142,13 @@ class catcalc_test extends basic_testcase {
             $radcatemp
         );
         return $data;
+    }
+
+    public function test_build_item_param_jacobian() {
+        $itemresponse = [];
+        $mr = new model_responses();
+        $model = new raschbirnbaum($mr, 'raschbirnbaum');
+        $this->assertEquals(fn () => 'b', catcalc::build_itemparam_jacobian($itemresponse, $model));
     }
 
     /**

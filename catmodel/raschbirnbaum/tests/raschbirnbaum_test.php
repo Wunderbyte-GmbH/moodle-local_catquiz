@@ -24,7 +24,8 @@
 
 namespace catmodel_raschbirnbaum;
 
-use catmodel_rasch\rasch;
+use local_catquiz\local\model\model_item_response;
+use local_catquiz\local\model\model_person_param;
 use PHPUnit\Framework\ExpectationFailedException;
 use PHPUnit\Framework\TestCase;
 use SebastianBergmann\RecursionContext\InvalidArgumentException;
@@ -39,6 +40,30 @@ use local_catquiz\local\model\model_responses;
  * @covers \catmodel_raschbirnbaum\raschbirnbaum
  */
 class raschbirnbaum_test extends TestCase {
+
+    /**
+     * Tests that the model calculates the item parameters correctly.
+     *
+     * @dataProvider calculate_params_returns_expected_values_provider
+     *
+     * @param array $itemresponse
+     * @param array $expected
+     */
+    public function test_calculate_params_returns_expected_values($itemresponse, array $expected) {
+        $raschbirnbaum = $this->getmodel();
+        $result = $raschbirnbaum->calculate_params($itemresponse);
+        $this->assertEqualsWithDelta($expected['difficulty'], $result['difficulty'], 0.0001);
+        $this->assertEqualsWithDelta($expected['discrimination'], $result['discrimination'], 0.0001);
+    }
+
+    public static function calculate_params_returns_expected_values_provider(): array {
+        return [
+                [
+                    'itemresponse' => [new model_item_response(0.3, (new model_person_param(1))->set_ability(0.2))],
+                    'expected' => ['difficulty' => 1.4974, 'discrimination' => 3.0],
+                ]
+        ];
+    }
 
     /**
      * This test calls the get_log_jacobain function with the model and test its output with verified data.
