@@ -51,12 +51,15 @@ class feedbacksettings_test extends advanced_testcase {
      * @dataProvider apply_selection_of_scales_provider
      *
      */
-    public function test_apply_selection_of_scales(array $selectedscales, array $quizsettings, int $primaryscaleidint, array $expected) {
+    public function test_apply_selection_of_scales(
+        array $selectedscales,
+        array $quizsettings,
+        int $primaryscaleidint,
+        array $expected) {
 
         $feedbacksettings = new feedbacksettings($quizsettings['teststrategy'], $primaryscaleidint);
         $output = $feedbacksettings->apply_selection_of_scales($selectedscales, $quizsettings);
 
-        // $output = $customscalefeedback->get_studentfeedback($feedbackdata);
         $this->assertEquals($expected, $output);
     }
 
