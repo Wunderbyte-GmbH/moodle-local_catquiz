@@ -240,7 +240,8 @@ Feature: As a teacher I setup adaptive quiz with CATquiz Scales and Feedbacks.
     ## Delay required to settle CAT scale
     When I wait until the page is ready
     And the field "Number of ability ranges" matches value "2"
-    ## Update feedback defaults and chak it for root catscale, range 2
+    And I fill in the "input" element number "1" with the dynamic identifier "id_catquiz_scalereportcheckbox_" with "1"
+    ## Update feedback defaults and chek it for root catscale, range 2
     And I fill in the "autocomplete" element number "2" with the dynamic identifier "fitem_id_catquiz_courses_" with "Course 1"
     ## No lower limit for range 1 so index is 1
     And I fill in the "input" element number "1" with the dynamic identifier "id_feedback_scaleid_limit_lower_" with "-1"
