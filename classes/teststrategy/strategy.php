@@ -259,7 +259,7 @@ abstract class strategy {
     /**
      * Adapt personabilites array: add excluded, error and primary keys in case these cases apply.
      *
-     * @param object $feedbacksettings
+     * @param feedbacksettings $feedbacksettings
      * @param array $personabilities
      * @param array $feedbackdata
      * @param int $catscaleid
@@ -269,7 +269,7 @@ abstract class strategy {
      *
      */
     abstract public function select_scales_for_report(
-        object $feedbacksettings,
+        feedbacksettings $feedbacksettings,
         array $personabilities,
         array $feedbackdata,
         int $catscaleid = 0,

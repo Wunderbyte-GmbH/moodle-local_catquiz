@@ -290,7 +290,6 @@ class comparetotestaverage extends feedbackgenerator {
         );
 
         $catscaleid = 0;
-        // Maybe move this to parent class.
         foreach ($personabilitiesfeedbackeditor as $catscale => $personability) {
             if (isset($personability['excluded']) && $personability['excluded']) {
                 continue;
