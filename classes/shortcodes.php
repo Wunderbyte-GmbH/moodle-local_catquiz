@@ -112,28 +112,12 @@ class shortcodes {
                 ? intval(catscale::return_catscale_by_name($primaryscale)->id) : LOCAL_CATQUIZ_PRIMARYCATSCALE_DEFAULT;
         }
 
-        $hiddenareas = $args['hide'] ?? [];
-        // Find keys for areas to hide in the README documentation.
-        if ($hiddenareas != []) {
-            $areastohide = explode(',', $hiddenareas);
-        } else {
-            $areastohide = [];
-        }
-        // Some areas are hidden by default. They can be displayed via shortcode.
-        $showareas = $args['show'] ?? [];
-        if ($showareas != []) {
-            $areastoshow = explode(',', $showareas);
-        } else {
-            $areastoshow = [];
-        }
-
         foreach ($records as $record) {
             if (!$attemptdata = json_decode($record->json)) {
                 throw new \moodle_exception("Can not read attempt data");
             }
             $strategyid = $attemptdata->teststrategy;
             $feedbacksettings = new feedbacksettings($strategyid, intval($primaryscale));
-            $feedbacksettings->set_hide_and_show_areas($areastohide, $areastoshow);
 
             $attemptfeedback = new attemptfeedback($record->attemptid, $record->contextid, $feedbacksettings);
             $feedback = $attemptfeedback->get_feedback_for_attempt() ?? "";
