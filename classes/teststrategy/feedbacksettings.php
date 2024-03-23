@@ -34,10 +34,6 @@ require_once($CFG->dirroot.'/local/catquiz/lib.php');
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class feedbacksettings {
-    /** The scale for which detailed feedback will be displayed. Can be a single scaleid or an array of scales.
-     * @var int
-     */
-    public int $primaryscaleid;
 
     /** The id of the teststrategy.
      * @var int
@@ -108,15 +104,12 @@ class feedbacksettings {
      * Constructor for feedbackclass.
      *
      * @param int $strategyid
-     * @param int $primaryscaleid
      */
     public function __construct(
         int $strategyid,
-        int $primaryscaleid = LOCAL_CATQUIZ_PRIMARYCATSCALE_DEFAULT
-        ) {
+    ) {
 
         $this->strategyid = $strategyid;
-        $this->primaryscaleid = $primaryscaleid;
 
         // Default sortorder is descendent.
         $this->sortorder = LOCAL_CATQUIZ_SORTORDER_DESC;
@@ -440,71 +433,5 @@ class feedbacksettings {
 
     }
 
-    /**
-     * Checks if scales settings should be overwritten for example a different scale to be set primary.
-     *
-     * @param array $selectedscales
-     * @param array $quizsettings
-     *
-     * @return array
-     *
-     */
-    public function apply_selection_of_scales(array $selectedscales, array $quizsettings): array {
-
-        // 1. Find the ID of primary scale.
-        switch ($this->primaryscaleid) {
-            case LOCAL_CATQUIZ_PRIMARYCATSCALE_DEFAULT:
-                // Default means no change.
-                return $selectedscales;
-            case LOCAL_CATQUIZ_PRIMARYCATSCALE_PARENT:
-                $id = $quizsettings['catquiz_catscales'];
-                break;
-            case LOCAL_CATQUIZ_PRIMARYCATSCALE_LOWEST:
-                $filterabilities = [];
-                foreach ($selectedscales as $scaleid => $array) {
-                        $filterabilities[$scaleid] = $array['value'];
-                }
-                if (count($filterabilities) < 1) {
-                    return $selectedscales;
-                }
-                $id = array_search(min($filterabilities), $filterabilities);
-                break;
-            case LOCAL_CATQUIZ_PRIMARYCATSCALE_STRONGEST:
-                $filterabilities = [];
-                foreach ($selectedscales as $scaleid => $array) {
-                        $filterabilities[$scaleid] = $array['value'];
-                }
-                if (count($filterabilities) < 1) {
-                    return $selectedscales;
-                }
-                $id = array_search(max($filterabilities), $filterabilities);
-                break;
-            default:
-                // Default means no change.
-                return $selectedscales;
-        }
-
-        // 2. Set this ID primary and unset primary key from other scales.
-        // If excluded isset -> unset. Add warning.
-        // All other excluded and toreport properties remain.
-        foreach ($selectedscales as $scaleid => $infoarray) {
-            if ($scaleid == $id) {
-                $selectedscales[$scaleid]['primary'] = true;
-                $selectedscales[$scaleid]['toreport'] = true;
-                if (!empty($selectedscales[$scaleid]['error']) || !empty($selectedscales[$scaleid]['excluded'])) {
-                    $selectedscales[$scaleid]['comment'] = $selectedscales[$scaleid]['error'] ?? true;
-                    $selectedscales[$scaleid]['excluded'] = false;
-                    $selectedscales[$scaleid]['primarybecause'] = 'primaryscaletype_'. (string) $this->primaryscaleid;
-                }
-                continue;
-            }
-            if (isset($selectedscales[$scaleid]['primary'])) {
-                unset($selectedscales[$scaleid]['primary']);
-                unset($selectedscales[$scaleid]['toreport']);
-            }
-        }
-
-        return $selectedscales;
-    }
 }
 

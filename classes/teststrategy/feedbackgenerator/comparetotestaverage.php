@@ -66,12 +66,6 @@ class comparetotestaverage extends feedbackgenerator {
      */
     public function __construct(feedbacksettings $feedbacksettings) {
 
-        // Will be 0 if no scale set correctly.
-        if (isset($feedbacksettings->primaryscaleid)) {
-            $this->primaryscaleid = $feedbacksettings->primaryscaleid;
-        } else {
-            $this->primaryscaleid = LOCAL_CATQUIZ_PRIMARYCATSCALE_DEFAULT;
-        }
         $this->feedbacksettings = $feedbacksettings;
     }
 

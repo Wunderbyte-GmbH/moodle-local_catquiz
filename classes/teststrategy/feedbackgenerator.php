@@ -163,14 +163,12 @@ abstract class feedbackgenerator {
 
         $feedbacksettings->set_params_from_attempt($newdata, $quizsettings);
 
-        $selectedscales = info::get_teststrategy($strategyid)
+        return info::get_teststrategy($strategyid)
         ->select_scales_for_report(
             $feedbacksettings,
             $transformedpersonabilities,
             $newdata
         );
-        $selectedscales = $feedbacksettings->apply_selection_of_scales($selectedscales, $quizsettings);
-        return $selectedscales;
     }
 
     /**

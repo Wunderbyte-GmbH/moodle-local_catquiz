@@ -91,33 +91,12 @@ class shortcodes {
             'attempt' => [],
         ];
 
-        // Get scaleid, it is possible to apply name of catscale, catscaleid or predefined strings (see switch).
-        $primaryscale = $args['primaryscale'] ?? LOCAL_CATQUIZ_PRIMARYCATSCALE_DEFAULT;
-        switch ($primaryscale) {
-            case 'lowest':
-                $primaryscale = LOCAL_CATQUIZ_PRIMARYCATSCALE_LOWEST;
-                break;
-            case 'strongest':
-                $primaryscale = LOCAL_CATQUIZ_PRIMARYCATSCALE_STRONGEST;
-                break;
-            case 'highest':
-                $primaryscale = LOCAL_CATQUIZ_PRIMARYCATSCALE_STRONGEST;
-                break;
-            case 'parent':
-                $primaryscale = LOCAL_CATQUIZ_PRIMARYCATSCALE_PARENT;
-                break;
-        }
-        if (isset($primaryscale) && !is_numeric($primaryscale)) {
-            $primaryscale = !empty(catscale::return_catscale_by_name($primaryscale))
-                ? intval(catscale::return_catscale_by_name($primaryscale)->id) : LOCAL_CATQUIZ_PRIMARYCATSCALE_DEFAULT;
-        }
-
         foreach ($records as $record) {
             if (!$attemptdata = json_decode($record->json)) {
                 throw new \moodle_exception("Can not read attempt data");
             }
             $strategyid = $attemptdata->teststrategy;
-            $feedbacksettings = new feedbacksettings($strategyid, intval($primaryscale));
+            $feedbacksettings = new feedbacksettings($strategyid);
 
             $attemptfeedback = new attemptfeedback($record->attemptid, $record->contextid, $feedbacksettings);
             $feedback = $attemptfeedback->get_feedback_for_attempt() ?? "";
