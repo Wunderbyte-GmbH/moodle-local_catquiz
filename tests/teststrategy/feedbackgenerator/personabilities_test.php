@@ -18,21 +18,18 @@
  * Tests the feedbackgenerator personability.
  *
  * @package    local_catquiz
- * @author David Szkiba <david.szkiba@wunderbyte.at>
- * @copyright  2023 Georg Maißer <info@wunderbyte.at>
+ * @author     Magdalena Holczik
+ * @copyright  2023 onwards Georg Maißer <info@wunderbyte.at>
  * @license    http =>//www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 namespace local_catquiz;
 
 use advanced_testcase;
-use basic_testcase;
-use local_catquiz\teststrategy\feedbackgenerator\customscalefeedback;
 use local_catquiz\teststrategy\feedbackgenerator\personabilities;
 use local_catquiz\teststrategy\feedbacksettings;
 use PHPUnit\Framework\ExpectationFailedException;
 use SebastianBergmann\RecursionContext\InvalidArgumentException;
-use UnexpectedValueException;
 
 /**
  * Tests the feedbackgenerator personability.

@@ -18,7 +18,7 @@
  * Tests the filterforsubscale class.
  *
  * @package    local_catquiz
- * @author David Szkiba <david.szkiba@wunderbyte.at>
+ * @author     David Szkiba, Magdalena Holczik
  * @copyright  2023 Georg Maißer <info@wunderbyte.at>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */

@@ -263,7 +263,6 @@ class personabilities extends feedbackgenerator {
             ];
         }
 
-        // TODO: Improve code architecture sorting in feedbacksetting.
         $this->apply_sorting($personabilities, $selectedscaleid);
 
         $abilitieslist = [];
