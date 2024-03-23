@@ -382,14 +382,14 @@ class feedbacksettings {
     public function set_params_from_attempt(array $newdata, array $quizsettings): void {
         $this->semax = $newdata['se_max'] ?? null;
         $this->semin = $newdata['se_min'] ?? null;
-        $maxquestiongroup = !empty($quizsettings['maxquestionsgroup']) ? (array) $quizsettings['maxquestionsgroup'] : null;
+        $maxquestiongroup = isset($quizsettings['maxquestionsgroup']) ? (array) $quizsettings['maxquestionsgroup'] : null;
         $maxquestionsscalegroup = !empty($quizsettings['maxquestionsscalegroup']) ?
             (array) $quizsettings['maxquestionsscalegroup'] : null;
-        $this->nmintest = !empty($maxquestiongroup['catquiz_minquestions']) ?
+        $this->nmintest = isset($maxquestiongroup['catquiz_minquestions']) ?
             (int) $maxquestiongroup['catquiz_minquestions'] : null;
-        $this->nminscale = !empty($maxquestionsscalegroup['catquiz_minquestionspersubscale']) ?
+        $this->nminscale = isset($maxquestionsscalegroup['catquiz_minquestionspersubscale']) ?
             (int) $maxquestionsscalegroup['catquiz_minquestionspersubscale'] : null;
-        $this->rootscale = !empty($quizsettings['catquiz_catscales']) ? (int) $quizsettings['catquiz_catscales'] : null;
+        $this->rootscale = isset($quizsettings['catquiz_catscales']) ? (int) $quizsettings['catquiz_catscales'] : null;
         // Find average fraction.
         $f = 0.0;
         $i = 0;
