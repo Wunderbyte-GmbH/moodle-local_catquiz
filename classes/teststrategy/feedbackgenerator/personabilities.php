@@ -288,7 +288,7 @@ class personabilities extends feedbackgenerator {
             'quizsettings' => (array) $quizsettings,
             'primaryscale' => $catscales[$selectedscaleid],
             'personabilities_abilities' => $personabilities,
-            'se' => $newdata['se'],
+            'se' => isset($newdata['se']) ? $newdata['se'] : null,
             'playedquestions' => $playedquestions,
             'abilitieslist' => $abilitieslist,
             'models' => $models,
@@ -378,9 +378,14 @@ class personabilities extends feedbackgenerator {
         } else if ($catscaleid != $selectedscaleid) {
             $numberofitems = "";
         }
+        if (isset($newdata['se'][$catscaleid])) {
+            $standarderror = sprintf("%.2f", $newdata['se'][$catscaleid]);
+        } else {
+            $standarderror = "";
+        }
 
         return [
-            'standarderror' => sprintf("%.2f", $newdata['se'][$catscaleid]),
+            'standarderror' => $standarderror,
             'ability' => $ability,
             'name' => $catscales[$catscaleid]->name,
             'catscaleid' => $catscaleid,
