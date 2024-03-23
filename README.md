@@ -56,31 +56,6 @@ Shortcodes can be added in any text area and label via editor, e.g. in the cours
 
 The following parameters can be defined:
 * numberofattempts=3 // Defined the number of feedbacks displayed in collapsables. Starting with the newest.
-* primaryscale=parent // Each strategy defines a scale that is be primary for the feedback. It is used as comparison to averagevalues and values  from other scales. If you display a feedback via shortcode, you can change this primaryscale. You can either choose a specific scale via ID or name, or choose "parent", "lowest", "strongest", "highest" (the second two pointing to the same scale).
-* show=questionssummary // Parts of the feedback that are hidden by default can be displayed with the show attribute.
-* hide=comparetotestaverage,chart,pilotquestions // Parts of the feedbacks can be hidden. Either the enitre feedback of a section or keys for certain parts. Generators and subkeys are:
-
-'personabilities' => [
-    'feedback_personabilities',
-    'personabilitychart',
-    'progressindividual',
-    'progresscomparison',
-    'abilityprofile',
-];
-'comparetotestaverage' => [
-    'comparisontext', // You performed better than ...
-    'colorbar',
-    'colorbarlegend', // Legend of the colorbar.
-];
-'customscalefeedback' => [];
-'debuginfo' => [];
-'graphicalsummary' => [
-    'teststrategyname',
-    'testprogresschart',
-    'testresultstable',
-];
-'pilotquestions' => [];
-'questionssummary' => []; // This part is hidden by default.
 
 2. To display an overview table of all scales use [catscalesoverview].
 
