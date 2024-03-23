@@ -329,8 +329,7 @@ class attemptfeedback implements renderable, templatable {
     public function get_feedback_for_attempt(): array {
         $feedbackdata = $this->load_feedbackdata();
         $generators = $this->get_feedback_generators_for_teststrategy($feedbackdata['teststrategy']);
-        $updatedfeedbackdata = $this->update_feedbackdata_according_to_settings($feedbackdata, $generators);
-        return $this->generate_feedback($generators, $updatedfeedbackdata);
+        return $this->generate_feedback($generators, $feedbackdata);
     }
 
     /**
@@ -423,27 +422,5 @@ class attemptfeedback implements renderable, templatable {
             }
         }
         return $context;
-    }
-
-    /**
-     * Getter for the integer defining which kind of primary scale is selected.
-     *
-     * Integers are defined constants in lib.php.
-     *
-     * @param array $feedbackdata
-     * @param array $generators
-     *
-     * @return array
-     *
-     */
-    private function update_feedbackdata_according_to_settings(array $feedbackdata, array $generators): array {
-
-        if ($this->feedbacksettings->primaryscaleid == LOCAL_CATQUIZ_PRIMARYCATSCALE_DEFAULT) {
-            return $feedbackdata;
-        }
-
-        $feedbackdata = $this->load_data_from_generators($generators, $feedbackdata, $feedbackdata);
-        return $feedbackdata;
-
     }
 }

@@ -88,15 +88,9 @@ class graphicalsummary extends feedbackgenerator {
         if (isset($feedbackdata['graphicalsummary_data'])) {
             $table = $this->render_table($feedbackdata['graphicalsummary_data']);
         }
-        if (isset($this->feedbacksettings->primaryscaleid) && !empty($feedbackdata['personabilities'])) {
-            $selectedscalearray = $this->feedbacksettings->get_scaleid_and_stringkey(
-                $feedbackdata['personabilities'],
-                (object)$feedbackdata['quizsettings'],
-                $this->feedbacksettings->primaryscaleid);
-            $catscaleid = $selectedscalearray['selectedscaleid'];
-        } else {
-            $catscaleid = $feedbackdata['catscaleid'];
-        }
+
+        $catscaleid = $feedbackdata['catscaleid'];
+
         $catscale = catscale::return_catscale_object($catscaleid);
 
         $participationcharts = $this->render_participationcharts(
