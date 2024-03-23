@@ -183,14 +183,15 @@ abstract class feedbackgenerator {
      *
      */
     public function get_color_for_personability(array $quizsettings, float $personability, int $catscaleid): string {
-        $default = "#878787";
+        $default = LOCAL_CATQUIZ_DEFAULT_GREY;
         $abilityrange = $this->get_ability_range($catscaleid);
         if (!$quizsettings ||
             $personability < (float) $abilityrange['minscalevalue'] ||
             $personability > (float) $abilityrange['maxscalevalue']) {
             return $default;
         }
-        $numberoffeedbackoptions = intval($quizsettings['numberoffeedbackoptionsselect']) ?? 8;
+        $numberoffeedbackoptions = intval($quizsettings['numberoffeedbackoptionsselect'])
+            ?? LOCAL_CATQUIZ_MAX_SCALERANGE;
         $colorarray = feedbackclass::get_array_of_colors($numberoffeedbackoptions);
 
         for ($i = 1; $i <= $numberoffeedbackoptions; $i++) {

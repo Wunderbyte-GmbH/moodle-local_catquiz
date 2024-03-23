@@ -288,7 +288,7 @@ class attemptfeedback implements renderable, templatable {
         }
         $quizsettings = (array) $this->quizsettings;
         $feedbacksettings = $this->feedbacksettings;
-        $feedbackdata = (array) $this->load_feedbackdata();
+        $feedbackdata = $this->load_feedbackdata();
 
         $personabilities = $feedbacksettings->filter_excluded_scales($personabilities, $quizsettings);
         $feedbacksettings->set_params_from_attempt($feedbackdata, $quizsettings);
@@ -427,7 +427,9 @@ class attemptfeedback implements renderable, templatable {
 
     /**
      * Getter for the integer defining which kind of primary scale is selected.
+     *
      * Integers are defined constants in lib.php.
+     *
      * @param array $feedbackdata
      * @param array $generators
      *

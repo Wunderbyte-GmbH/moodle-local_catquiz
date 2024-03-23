@@ -47,7 +47,7 @@ class customscalefeedback extends feedbackgenerator {
     private $sortfun;
 
     /**
-     * @var object $feedbacksettings
+     * @var feedbacksettings $feedbacksettings
      */
     private $feedbacksettings;
 
@@ -94,15 +94,18 @@ class customscalefeedback extends feedbackgenerator {
         $firstelement = $data['customscalefeedback_abilities'][array_key_first($data['customscalefeedback_abilities'])];
         if (!empty($firstelement['estimated'])) {
             if (!isset($firstelement['fraction'])) {
-                $comment = $comment = get_string('estimatedbecause:default', 'local_catquiz');
+                $comment = get_string('estimatedbecause:default', 'local_catquiz');
             } else {
                 switch ((int) $firstelement['fraction']) {
                     case 1 :
                         $comment = get_string('estimatedbecause:allanswerscorrect', 'local_catquiz');
+                        break;
                     case 0 :
                         $comment = get_string('estimatedbecause:allanswerinscorrect', 'local_catquiz');
+                        break;
                     default :
                         $comment = get_string('estimatedbecause:default', 'local_catquiz');
+                        break;
 
                 }
             }

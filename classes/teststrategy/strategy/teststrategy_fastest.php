@@ -132,7 +132,7 @@ class teststrategy_fastest extends strategy {
     /**
      * Gets predefined values and completes them with specific behaviour of strategy.
      *
-     * @param object $feedbacksettings
+     * @param feedbacksettings $feedbacksettings
      * @param array $personabilities
      * @param array $feedbackdata
      * @param int $catscaleid
@@ -140,7 +140,7 @@ class teststrategy_fastest extends strategy {
      *
      */
     public function select_scales_for_report(
-        object $feedbacksettings,
+        feedbacksettings $feedbacksettings,
         array $personabilities,
         array $feedbackdata,
         int $catscaleid = 0,

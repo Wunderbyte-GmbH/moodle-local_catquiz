@@ -85,7 +85,7 @@ class feedbackclass {
 
         // Select to set number of feedback options per subscale.
         $options = [];
-        for ($i = 1; $i <= 8; $i++) {
+        for ($i = 1; $i <= LOCAL_CATQUIZ_MAX_SCALERANGE; $i++) {
             $options[$i] = $i;
         }
 
@@ -205,9 +205,9 @@ class feedbackclass {
                     $lowerlimit = $defaultvalues['feedback_scaleid_limit_lower_'. $scale->id . '_' . $j]
                         ?? optional_param(
                             'feedback_scaleid_limit_lower_'. $scale->id . '_' . $j,
-                            LOCAL_CATQUIZ_MAGIC_NUMBER,
+                            LOCAL_CATQUIZ_RANDOM_DEFAULT,
                             PARAM_FLOAT);
-                    if ($lowerlimit === LOCAL_CATQUIZ_MAGIC_NUMBER) {
+                    if ($lowerlimit === LOCAL_CATQUIZ_RANDOM_DEFAULT) {
                         $lowerlimit = self::return_limits_for_scale(
                             $nfeedbpersubscale,
                             $j,
@@ -246,9 +246,9 @@ class feedbackclass {
                     $upperlimit = $defaultvalues['feedback_scaleid_limit_upper_'. $scale->id . '_' . $j]
                         ?? optional_param(
                             'feedback_scaleid_limit_upper_'. $scale->id . '_' . $j,
-                            LOCAL_CATQUIZ_MAGIC_NUMBER,
+                            LOCAL_CATQUIZ_RANDOM_DEFAULT,
                             PARAM_FLOAT);
-                    if ($upperlimit === LOCAL_CATQUIZ_MAGIC_NUMBER) {
+                    if ($upperlimit === LOCAL_CATQUIZ_RANDOM_DEFAULT) {
                         $upperlimit = self::return_limits_for_scale(
                             $nfeedbpersubscale,
                             $j,

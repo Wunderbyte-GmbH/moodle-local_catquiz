@@ -111,8 +111,8 @@ class feedbacksettings {
      * @param int $primaryscaleid
      */
     public function __construct(
-        $strategyid,
-        $primaryscaleid = LOCAL_CATQUIZ_PRIMARYCATSCALE_DEFAULT
+        int $strategyid,
+        int $primaryscaleid = LOCAL_CATQUIZ_PRIMARYCATSCALE_DEFAULT
         ) {
 
         $this->strategyid = $strategyid;

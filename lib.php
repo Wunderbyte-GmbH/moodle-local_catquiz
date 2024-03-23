@@ -91,7 +91,7 @@ define('LOCAL_CATQUIZ_TIMERANGE_MONTH', -2);
 define('LOCAL_CATQUIZ_TIMERANGE_QUARTEROFYEAR', -3);
 
 // Magic Number.
-define('LOCAL_CATQUIZ_MAGIC_NUMBER', -12345);
+define('LOCAL_CATQUIZ_RANDOM_DEFAULT', -12345);
 define('LOCAL_CATQUIZ_DEFAULT_NONSENSE_TESTSTRATEGY', -1);
 
 // Standarderror defaults.
@@ -100,6 +100,8 @@ define('LOCAL_CATQUIZ_STANDARDERROR_DEFAULT_MAX', 1);
 // Fallback for item model.
 define('LOCAL_CATQUIZ_FALLBACK_MODEL', 'catmodel_raschbirnbaum\raschbirnbaum');
 
+define('LOCAL_CATQUIZ_DEFAULT_GREY', "#878787");
+define('LOCAL_CATQUIZ_MAX_SCALERANGE', 8);
 /**
  * Renders the popup Link.
  *
