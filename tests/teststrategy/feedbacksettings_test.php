@@ -106,7 +106,6 @@ class feedbacksettings_test extends advanced_testcase {
                     'expected' => [
                         '271' => [
                             'value' => -3,
-                            'toreport' => true,
                             'primarybecause' => 'lowestskill',
                         ],
                         '272' => [
@@ -127,6 +126,7 @@ class feedbacksettings_test extends advanced_testcase {
                         '277' => [
                             'value' => 3,
                             'primary' => true,
+                            'toreport' => true,
                         ],
                     ],
                 ],
