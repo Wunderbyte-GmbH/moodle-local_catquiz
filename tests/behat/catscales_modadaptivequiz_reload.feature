@@ -86,7 +86,7 @@ Feature: As a teacher I want to ensure a correct behavior of an adaptive quiz at
     And I should see "Skala: A/A01"
     And I should see "Schwierigkeit: -4.45"
     And I should see "Trennschärtfe: 5.92"
-    And I wait "1" seconds
+    And I wait "2" seconds
     And I reload the page
     ## Expecting all times the same question for the same settings
     And I should see "Skala: A/A01"
