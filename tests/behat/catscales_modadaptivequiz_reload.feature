@@ -126,3 +126,38 @@ Feature: As a teacher I want to ensure a correct behavior of an adaptive quiz at
     And I should see "Skala: A/A01"
     And I should see "Schwierigkeit: -4.57"
     And I should see "Trennschärtfe: 5.22"
+
+  @javascript
+  Scenario: Start adaptive quiz attempt and relogin on second page with item timeout
+    Given I am on the "adaptivecatquiz1" Activity page logged in as teacher
+    And I follow "Settings"
+    And I wait until the page is ready
+    And I set the field "Purpose of test" to "Classical test"
+    And I set the following fields to these values:
+      | Purpose of test                                 | Classical test |
+      | Limit time for attempt                          | 1              |
+      | catquiz_timelimitgroup[catquiz_maxtimeperitem]  | 1              |
+      | catquiz_timelimitgroup[catquiz_timeselect_item] | sec            |
+    And I click on "Save and display" "button"
+    And I log out
+    And I am on the "adaptivecatquiz1" Activity page logged in as user1
+    And I click on "Start attempt" "button"
+    And I wait until the page is ready
+    And I should see "Question 1"
+    And I click on "richtige Antwort" "text" in the "Question 1" "question"
+    And I click on "Submit answer" "button"
+    ## Verification of Question 2 - expecting all times the same question for the same settings
+    And I should see "Question 2"
+    And I should see "Skala: A/A01"
+    And I should see "Schwierigkeit: -4.57"
+    And I should see "Trennschärtfe: 5.22"
+    And I log out
+    And I wait "2" seconds
+    And I am on the "adaptivecatquiz1" Activity page logged in as user1
+    And I click on "Start attempt" "button"
+    And I wait until the page is ready
+    ## Expecting all times see another but the same question for the same settings even after relogin
+    And I should see "Question 2"
+    And I should see "Skala: A/A01"
+    And I should see "Schwierigkeit: -3.86"
+    And I should see "Trennschärtfe: 0.99"
