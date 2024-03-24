@@ -105,9 +105,7 @@ class feedbacksettings {
      *
      * @param int $strategyid
      */
-    public function __construct(
-        int $strategyid,
-    ) {
+    public function __construct(int $strategyid) {
 
         $this->strategyid = $strategyid;
 
