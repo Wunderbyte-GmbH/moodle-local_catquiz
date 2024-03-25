@@ -30,6 +30,7 @@ use context_course;
 use context_module;
 use core_question\local\bank\question_edit_contexts;
 use local_catquiz\importer\testitemimporter;
+use local_catquiz\local\model\model_strategy;
 use mod_adaptivequiz\local\attempt\attempt;
 use mod_adaptivequiz\local\question\question_answer_evaluation;
 use question_bank;
@@ -1022,7 +1023,7 @@ class strategy_test extends advanced_testcase {
      */
     public static function given_responses_lead_to_expected_abilities_provider(): array {
         global $CFG;
-        $responsepattern = loadresponsesdata(
+        $responsepattern = loadresponsesforperson(
             $CFG->dirroot . '/local/catquiz/tests/fixtures/responses.2PL.csv'
         );
         return [
@@ -1032,6 +1033,20 @@ class strategy_test extends advanced_testcase {
                 'ability_after' => 0.123,
             ],
         ];
+    }
+
+    public function test_responses_lead_to_expected_item_parameters() {
+        global $CFG;
+        $responses = loadresponsesforitem(
+            $CFG->dirroot . '/local/catquiz/tests/fixtures/responses.2PL.csv',
+            'A01-00'
+        );
+        $initialabilities = loadpersonparams(
+            $CFG->dirroot . '/local/catquiz/tests/fixtures/persons.csv', 'Gesamt'
+        );
+        $strategy = new model_strategy($responses, [], $initialabilities);
+        $result = $strategy->run_estimation('12345');
+        $this->assertEquals(true, false);
     }
 
     /**

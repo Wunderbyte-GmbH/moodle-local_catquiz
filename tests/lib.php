@@ -21,6 +21,11 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+use local_catquiz\local\model\model_item_response;
+use local_catquiz\local\model\model_person_param;
+use local_catquiz\local\model\model_person_param_list;
+use local_catquiz\local\model\model_responses;
+
 /**
  * Loads the responses from the first person of a CSV file.
  *
@@ -28,7 +33,7 @@
  * @param int    $person   Optional. If given, the Nth person will be loaded.
  * @return array
  */
-function loadresponsesdata($filename, $person = 0) {
+function loadresponsesforperson($filename, $person = 0) {
     if (($handle = fopen($filename, "r")) === false) {
         throw new UnexpectedValueException("Can not open file: " . $filename);
     }
@@ -57,4 +62,71 @@ function loadresponsesdata($filename, $person = 0) {
 
     fclose($handle);
     return array_combine($questionids, $responses);
+}
+
+/**
+ * Parses a CSV and returns a model_response object for the given item.
+ *
+ * @param string $filename The file to load the responses from.
+ * @param string $label  The label of the item.
+ * @return model_responses
+ */
+function loadresponsesforitem($filename, $label, $scale = 'Gesamt'): model_responses {
+    global $CFG;
+    if (($handle = fopen($filename, "r")) === false) {
+        throw new UnexpectedValueException("Can not open file: " . $filename);
+    }
+
+    $row = 0;
+    $responses = [];
+    $labelindex = null;
+    $personparams = loadpersonparams($CFG->dirroot . '/local/catquiz/tests/fixtures/persons.csv', $scale);
+    $arr = [];
+    while (($data = fgetcsv($handle, 0, ";")) !== false) {
+        $row++;
+        if ($row == 1) {
+            $labelindex = array_search($label, $data);
+            continue;
+        }
+        $personid = $row - 2;
+        $pp = $personparams[$personid];
+        $response = $data[$labelindex];
+        $responses[] = new model_item_response($response, $pp);
+        $catscaleid = 1; // TODO: At the moment they do not have a scale id.
+        $arr[$personid] = ['question' => [$catscaleid => ['fraction' => $response]]];
+    }
+    fclose($handle);
+    $mr = model_responses::create_from_array($arr);
+    return $mr;
+}
+
+/**
+ * Returns personparams for each person and each scale in the given file
+ *
+ * This returns a two-dimensional array. The first key is the personid, the second one is the name of the scale. The value is a
+ * model_person_param object.
+ *
+ * @param string $filename
+ * @return model_person_param_list
+ * @throws UnexpectedValueException
+ */
+function loadpersonparams(string $filename, string $scale): model_person_param_list {
+    if (($handle = fopen($filename, "r")) === false) {
+        throw new UnexpectedValueException("Can not open file: " . $filename);
+    }
+
+    $row = 0;
+    $personparams = new model_person_param_list();
+    $labelindex = null;
+    while (($data = fgetcsv($handle, 0, ";")) !== false) {
+        $row++;
+        if ($row === 1) {
+            $labelindex = array_search($scale, $data);
+            continue;
+        }
+        $pp = (new model_person_param($row - 2))->set_ability($data[$labelindex]); // Use $row as personid.
+        $personparams->add($pp);
+    }
+    fclose($handle);
+    return $personparams;
 }
