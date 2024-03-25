@@ -53,6 +53,11 @@ require_once($CFG->dirroot.'/local/catquiz/lib.php');
 class personabilities extends feedbackgenerator {
 
     /**
+     * @var string
+     */
+    const FALLBACK_MODEL = 'mixedraschbirnbaum';
+
+    /**
      *
      * @var stdClass $feedbacksettings.
      */
@@ -513,7 +518,7 @@ class personabilities extends feedbackgenerator {
         $fisherinfos = [];
         foreach ($items as $item) {
             $key = $item->model;
-            $model = $models[$key] ?? $models['raschbirnbaumb'];
+            $model = $models[$key] ?? $models[self::FALLBACK_MODEL];
             foreach ($model::get_parameter_names() as $paramname) {
                 $params[$paramname] = floatval($item->$paramname);
             }
