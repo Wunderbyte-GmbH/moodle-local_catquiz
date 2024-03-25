@@ -63,7 +63,7 @@ class catscale {
 
     /**
      *
-     * @var int $catscaleid.
+     * @var ?int $catscaleid.
      */
     public ?int $catscaleid = null;
 
