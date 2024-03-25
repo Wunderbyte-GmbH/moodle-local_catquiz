@@ -276,7 +276,6 @@ class model_strategy {
                 continue;
             }
             foreach ($this->models as $model) {
-                /** @var ?model_item_param $item */
                 $item = $itemdifflists[$model->get_model_name()][$itemid];
                 if (!$item) {
                     continue;
@@ -291,41 +290,6 @@ class model_strategy {
         }
 
         return $newitemdifficulties;
-    }
-
-    /**
-     * Return item override.
-     *
-     * @param int $itemid
-     * @param array $itemdifflists
-     *
-     * @return model_item_param|null
-     *
-     */
-    private function get_item_override(int $itemid, array $itemdifflists): ?model_item_param {
-        $items = [];
-        foreach ($itemdifflists as $itemparams) {
-            if (! $itemparams[$itemid]) {
-                continue;
-            }
-            $items[] = $itemparams[$itemid];
-        }
-
-        if (! $items) {
-            return null;
-        }
-
-        $manuallyconfirmed = array_filter($items, fn ($ip) =>  $ip->get_status() === LOCAL_CATQUIZ_STATUS_CONFIRMED_MANUALLY);
-        if ($manuallyconfirmed) {
-            return reset($manuallyconfirmed);
-        }
-
-        $manuallyupdated = array_filter($items, fn ($ip) => $ip->get_status() === LOCAL_CATQUIZ_STATUS_UPDATED_MANUALLY);
-        if ($manuallyupdated) {
-            return reset($manuallyupdated);
-        }
-
-        return null;
     }
 
     /**
@@ -428,7 +392,7 @@ class model_strategy {
      */
     private function select_item_from_override(int $itemid, array $itemdifflists) {
         global $CFG;
-        if ($item = $this->get_item_override($itemid, $itemdifflists)) {
+        if ($item = model_item_param_list::get_item_override($itemid, $itemdifflists)) {
             return $item;
         }
 

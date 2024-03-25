@@ -518,6 +518,42 @@ class model_item_param_list implements ArrayAccess, IteratorAggregate, Countable
     }
 
     /**
+     * Return item override.
+     *
+     * If the item has a manual override in one of the given lists, return that one.
+     *
+     * @param int $itemid
+     * @param array<model_item_param_list> $itemparamlists
+     *
+     * @return ?model_item_param
+     */
+    public static function get_item_override(int $itemid, array $itemparamlists): ?model_item_param {
+        $items = [];
+        foreach ($itemparamlists as $itemparams) {
+            if (! $itemparams[$itemid]) {
+                continue;
+            }
+            $items[] = $itemparams[$itemid];
+        }
+
+        if (! $items) {
+            return null;
+        }
+
+        $manuallyconfirmed = array_filter($items, fn ($ip) =>  $ip->get_status() === LOCAL_CATQUIZ_STATUS_CONFIRMED_MANUALLY);
+        if ($manuallyconfirmed) {
+            return reset($manuallyconfirmed);
+        }
+
+        $manuallyupdated = array_filter($items, fn ($ip) => $ip->get_status() === LOCAL_CATQUIZ_STATUS_UPDATED_MANUALLY);
+        if ($manuallyupdated) {
+            return reset($manuallyupdated);
+        }
+
+        return null;
+    }
+
+    /**
      * Gets scaleid and updates scaleid of record.
      * @param array $newrecord
      * @return array
