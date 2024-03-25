@@ -293,7 +293,7 @@ class personabilities extends feedbackgenerator {
             'quizsettings' => (array) $quizsettings,
             'primaryscale' => $catscales[$selectedscaleid],
             'personabilities_abilities' => $personabilities,
-            'se' => isset($newdata['se']) ? $newdata['se'] : null,
+            'se' => $newdata['se'] ?? null,
             'playedquestions' => $playedquestions,
             'abilitieslist' => $abilitieslist,
             'models' => $models,
