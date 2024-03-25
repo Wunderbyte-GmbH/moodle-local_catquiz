@@ -198,10 +198,9 @@ class model_strategy {
     /**
      * Starts the estimation process
      *
-     * @param int $catscaleid
      * @return array<model_item_param_list, model_person_param_list>
      */
-    public function run_estimation(int $catscaleid): array {
+    public function run_estimation(): array {
         $personabilities = $this->initialpersonabilities;
 
         /** @var array<model_item_param_list> $itemdifficulties */
@@ -217,7 +216,7 @@ class model_strategy {
             $filtereddiffi = $this->select_item_model($itemdifficulties, $personabilities);
             $personabilities = $this
                 ->abilityestimator
-                ->get_person_abilities($filtereddiffi, $catscaleid);
+                ->get_person_abilities($filtereddiffi);
 
             $this->iterations++;
         }

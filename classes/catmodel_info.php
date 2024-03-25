@@ -104,7 +104,7 @@ class catmodel_info {
             return;
         }
         $strategy = $context->get_strategy($catscaleid);
-        list($itemdifficulties, $personabilities) = $strategy->run_estimation($catscaleid);
+        list($itemdifficulties, $personabilities) = $strategy->run_estimation();
         $updatedmodels = [];
         foreach ($itemdifficulties as $modelname => $itemparamlist) {
             $itemcounter = 0;
