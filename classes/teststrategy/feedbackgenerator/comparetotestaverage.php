@@ -30,6 +30,7 @@ use local_catquiz\catscale;
 use local_catquiz\feedback\feedbackclass;
 use local_catquiz\teststrategy\feedbackgenerator;
 use local_catquiz\teststrategy\feedbacksettings;
+use local_catquiz\teststrategy\info;
 use local_catquiz\teststrategy\preselect_task\firstquestionselector;
 
 defined('MOODLE_INTERNAL') || die();
@@ -65,12 +66,6 @@ class comparetotestaverage extends feedbackgenerator {
      */
     public function __construct(feedbacksettings $feedbacksettings) {
 
-        // Will be 0 if no scale set correctly.
-        if (isset($feedbacksettings->primaryscaleid)) {
-            $this->primaryscaleid = $feedbacksettings->primaryscaleid;
-        } else {
-            $this->primaryscaleid = LOCAL_CATQUIZ_PRIMARYCATSCALE_DEFAULT;
-        }
         $this->feedbacksettings = $feedbacksettings;
     }
 
@@ -82,7 +77,7 @@ class comparetotestaverage extends feedbackgenerator {
      * @return array
      *
      */
-    protected function get_studentfeedback(array $data): array {
+    public function get_studentfeedback(array $data): array {
         global $OUTPUT;
         $feedback = $OUTPUT->render_from_template('local_catquiz/feedback/comparetotestaverage', $data);
 
@@ -133,8 +128,6 @@ class comparetotestaverage extends feedbackgenerator {
             'quizsettings',
             'testaverageability',
             'userability',
-            // Used for positioning in the progress bar. 0 is left, 50 middle and 100 right.
-            // This assumes that all values are in the range [-5, 5].
             'testaverageposition',
             'userabilityposition',
             'comparisontext',
@@ -151,7 +144,7 @@ class comparetotestaverage extends feedbackgenerator {
      *
      */
     public function get_heading(): string {
-        return get_string('personability', 'local_catquiz');
+        return get_string('comparetotestaverage', 'local_catquiz');
     }
 
     /**
@@ -218,7 +211,7 @@ class comparetotestaverage extends feedbackgenerator {
      * @return string
      *
      */
-    private function get_colorgradientstring($quizsettings, $catscaleid): string {
+    private function get_colorgradientstring(object $quizsettings, $catscaleid): string {
         if (!$quizsettings) {
             return "";
         }
@@ -271,38 +264,51 @@ class comparetotestaverage extends feedbackgenerator {
      */
     public function load_data(int $attemptid, array $existingdata, array $newdata): ?array {
         $progress = $newdata['progress'];
-        $quizsettings = (object) $existingdata['quizsettings'];
-        $personabilities = $progress->get_abilities();
+        $quizsettings = $existingdata['quizsettings'];
 
-        if (!$progress->get_abilities()) {
+        if ((is_array($progress) && empty($progress['playedquestions']))
+            || (is_object($progress) && !$progress->get_playedquestions())) {
             return [];
         }
 
         $personparams = catquiz::get_person_abilities(
             $existingdata['contextid'],
-            array_keys($personabilities)
+            array_keys($newdata['updated_personabilities'])
         );
 
-        $selectedscalearray = $this->feedbacksettings->get_scaleid_and_stringkey(
-                $personabilities,
-                $quizsettings,
-                $this->primaryscaleid);
+        $personabilitiesfeedbackeditor = $this->select_scales_for_report(
+            $newdata,
+            $this->feedbacksettings,
+            $quizsettings,
+            $existingdata['teststrategy']
+        );
 
-        $catscaleid = $selectedscalearray['selectedscaleid'];
-        $selectedscalestringkey = $selectedscalearray['selectedscalestringkey'];
-
-        $catscale = catscale::return_catscale_object($catscaleid);
-        $ability = $personabilities[$catscaleid];
-        if (! $ability) {
-            return null;
+        $catscaleid = 0;
+        foreach ($personabilitiesfeedbackeditor as $catscale => $personability) {
+            if (isset($personability['excluded']) && $personability['excluded']) {
+                continue;
+            }
+            if (isset($personability['primary'])) {
+                $catscaleid = $catscale;
+                $ability = $personability['value'];
+                break;
+            }
         }
+
+        if (empty($catscaleid) || !isset($ability)) {
+            return [];
+        };
+        $catscale = catscale::return_catscale_object($catscaleid);
+
         $worseabilities = array_filter(
             $personparams,
             fn ($pp) => $pp->ability < $ability
         );
 
         if (!$worseabilities) {
-            return null;
+            // TODO: Is this really a valid check?
+            // Should it maybe be the check $pp->ability <= $ability in case ability is minimum value of abilityrange?
+            return [];
         }
 
         $quantile = (count($worseabilities) / count($personparams)) * 100;
@@ -311,12 +317,13 @@ class comparetotestaverage extends feedbackgenerator {
             'local_catquiz',
             [
                 'quantile' => sprintf('%.2f', $quantile),
-                'scaleinfo' => get_string($selectedscalestringkey, 'local_catquiz', $catscale->name),
+                'scaleinfo' => $catscale->name,
             ]);
 
         $testaverage = (new firstquestionselector())->get_median_ability_of_test($personparams);
 
-        $abilityrange = catscale::get_ability_range($catscaleid);
+        $catscaleclass = new catscale($catscaleid);
+        $abilityrange = $catscaleclass->get_ability_range();
         $middle = ($abilityrange['minscalevalue'] + $abilityrange['maxscalevalue']) / 2;
 
         $testaverageinrange = feedbacksettings::sanitize_range_min_max(
@@ -329,18 +336,22 @@ class comparetotestaverage extends feedbackgenerator {
             $abilityrange['minscalevalue'],
             $abilityrange['maxscalevalue']);
 
+        $b = $middle - (float) $abilityrange['minscalevalue'];
+        $testaverageposition = ($b + $testaverageinrange) / $b * 50;
+        $userabilityposition = ($b + $abilityinrange) / $b * 50;
+
         return [
             'contextid' => $existingdata['contextid'],
             'testaverageability' => sprintf('%.2f', $testaverageinrange),
             'userability' => sprintf('%.2f', $abilityinrange),
-            'testaverageposition' => ($testaverageinrange + $abilityrange['maxscalevalue']) * 10,
-            'userabilityposition' => ($abilityinrange + $abilityrange['maxscalevalue']) * 10,
+            'testaverageposition' => $testaverageposition,
+            'userabilityposition' => $userabilityposition,
             'comparisontext' => $text,
             'colorbar' => [
-                'colorgradestring' => $this->get_colorgradientstring($quizsettings, $catscaleid),
+                'colorgradestring' => $this->get_colorgradientstring((object) $quizsettings, $catscaleid),
             ],
             'colorbarlegend' => [
-                'feedbackbarlegend' => $this->get_colorbarlegend($quizsettings, $catscaleid),
+                'feedbackbarlegend' => $this->get_colorbarlegend((object) $quizsettings, $catscaleid),
             ],
             'currentability' => get_string('currentability', 'local_catquiz', $catscale->name),
             'currentabilityfellowstudents' => get_string('currentabilityfellowstudents', 'local_catquiz', $catscale->name),

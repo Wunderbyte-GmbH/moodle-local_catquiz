@@ -668,12 +668,24 @@ class catquiz_handler {
                 'enrolment_message_checkbox_',
                 'feedbacklegend_scaleid_',
             ];
+
+            $feedbackvaluekeysonceperscale = [
+                'catquiz_scalereportcheckbox_',
+            ];
+            $feedbackvaluekeys = array_merge($feedbackvaluekeys, $feedbackvaluekeysonceperscale);
+
             // Fetch standard values from the parentscale, we want to apply to all subscales.
-            for ($j = 1; $j <= $nfeedbackoptions; $j++) {
-                foreach ($feedbackvaluekeys as $feedbackvaluekey) {
-                    if (!isset($standardvalues[$feedbackvaluekey])) {
-                        $standardvalues[$feedbackvaluekey] = [];
-                    }
+
+            foreach ($feedbackvaluekeys as $feedbackvaluekey) {
+                if (!isset($standardvalues[$feedbackvaluekey])) {
+                    $standardvalues[$feedbackvaluekey] = [];
+                }
+                if (in_array($feedbackvaluekey, $feedbackvaluekeysonceperscale)) {
+                    $keyname = $feedbackvaluekey . $scaleidofcopyvalue;
+                    $standardvalues[$feedbackvaluekey] = $values[$keyname] ?? null;
+                    continue;
+                }
+                for ($j = 1; $j <= $nfeedbackoptions; $j++) {
                     $keyname = $feedbackvaluekey . $scaleidofcopyvalue . '_' . $j;
                     $standardvalues[$feedbackvaluekey][$j] = $values[$keyname] ?? null;
                 }
@@ -692,6 +704,11 @@ class catquiz_handler {
             // For all keys (in array) with all subscales (in array) for required number of feedbackoptions.
             foreach ($feedbackvaluekeys as $feedbackvaluekey) {
                 foreach ($subscaleids as $subscaleid) {
+                    if (in_array($feedbackvaluekey, $feedbackvaluekeysonceperscale)) {
+                        $subscalekey = $feedbackvaluekey . $subscaleid;
+                        $values[$subscalekey] = $standardvalues[$feedbackvaluekey] ?? "0";
+                        continue;
+                    }
                     for ($j = 1; $j <= $nfeedbackoptions; $j++) {
                         $subscalekey = $feedbackvaluekey . $subscaleid . '_' . $j;
                         $values[$subscalekey] = $standardvalues[$feedbackvaluekey][$j];
@@ -827,7 +844,7 @@ class catquiz_handler {
         stdClass $attemptrecord
         ): string {
         // Update the endtime and number of testitems used in the attempts table.
-        global $DB;
+        global $DB, $COURSE;
         $id = $DB->get_record('local_catquiz_attempts', ['attemptid' => $attemptrecord->id], 'id')->id;
         $data = (object) [
             'id' => $id,
@@ -841,10 +858,14 @@ class catquiz_handler {
         if (($errormsg = $cache->get('catquizerror')) && $attemptrecord->questionsattempted == 0) {
             return get_string($errormsg, 'local_catquiz');
         }
-
         // If we are here, at least one question was played and we can provide feedback.
-        return self::attemptfeedback(
-            $attemptrecord
+        $contextid = optional_param('context', 0, PARAM_INT);
+        $attemptfeedback = new attemptfeedback($attemptrecord->id, $contextid, null, $COURSE->id);
+        $attemptfeedback->attempt_finished_tasks();
+
+        return self::render_attemptfeedback(
+            $attemptrecord,
+            $attemptfeedback
         );
     }
 
@@ -852,15 +873,14 @@ class catquiz_handler {
      * Attempt feedback.
      *
      * @param stdClass $attemptrecord
+     * @param attemptfeedback $attemptfeedback
      *
      * @return string
      *
      */
-    private static function attemptfeedback(stdClass $attemptrecord): string {
-        global $OUTPUT, $COURSE;
-        $contextid = optional_param('context', 0, PARAM_INT);
+    private static function render_attemptfeedback(stdClass $attemptrecord, attemptfeedback $attemptfeedback): string {
+        global $OUTPUT;
 
-        $attemptfeedback = new attemptfeedback($attemptrecord->id, $contextid, null, $COURSE->id);
         $data = $attemptfeedback->export_for_template($OUTPUT);
 
         // We need to delete caches.

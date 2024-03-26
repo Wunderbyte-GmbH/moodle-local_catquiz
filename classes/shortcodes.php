@@ -78,7 +78,7 @@ class shortcodes {
         }
 
         $courseid = optional_param('id', 0, PARAM_INT);
-        $records = catquiz::return_attempt_and_contextid_from_attemptstable(
+        $records = catquiz::return_data_from_attemptstable(
             intval($args['numberofattempts'] ?? 1),
             intval($args['instanceid'] ?? 0),
             intval($args['courseid'] ?? $courseid),
@@ -91,46 +91,13 @@ class shortcodes {
             'attempt' => [],
         ];
 
-        // Get scaleid, it is possible to apply name of catscale, catscaleid or predefined strings (see switch).
-        $primaryscale = $args['primaryscale'] ?? LOCAL_CATQUIZ_PRIMARYCATSCALE_DEFAULT;
-        switch ($primaryscale) {
-            case 'lowest':
-                $primaryscale = LOCAL_CATQUIZ_PRIMARYCATSCALE_LOWEST;
-                break;
-            case 'strongest':
-                $primaryscale = LOCAL_CATQUIZ_PRIMARYCATSCALE_STRONGEST;
-                break;
-            case 'highest':
-                $primaryscale = LOCAL_CATQUIZ_PRIMARYCATSCALE_STRONGEST;
-                break;
-            case 'parent':
-                $primaryscale = LOCAL_CATQUIZ_PRIMARYCATSCALE_PARENT;
-                break;
-        }
-        if (isset($primaryscale) && !is_numeric($primaryscale)) {
-            $primaryscale = !empty(catscale::return_catscale_by_name($primaryscale))
-                ? intval(catscale::return_catscale_by_name($primaryscale)->id) : LOCAL_CATQUIZ_PRIMARYCATSCALE_DEFAULT;
-        }
-
-        $hiddenareas = $args['hide'] ?? [];
-        // Find keys for areas to hide in the README documentation.
-        if ($hiddenareas != []) {
-            $areastohide = explode(',', $hiddenareas);
-        } else {
-            $areastohide = [];
-        }
-        // Some areas are hidden by default. They can be displayed via shortcode.
-        $showareas = $args['show'] ?? [];
-        if ($showareas != []) {
-            $areastoshow = explode(',', $showareas);
-        } else {
-            $areastoshow = [];
-        }
-
-        $feedbacksettings = new feedbacksettings(intval($primaryscale));
-        $feedbacksettings->set_hide_and_show_areas($areastohide, $areastoshow);
-
         foreach ($records as $record) {
+            if (!$attemptdata = json_decode($record->json)) {
+                throw new \moodle_exception("Can not read attempt data");
+            }
+            $strategyid = $attemptdata->teststrategy;
+            $feedbacksettings = new feedbacksettings($strategyid);
+
             $attemptfeedback = new attemptfeedback($record->attemptid, $record->contextid, $feedbacksettings);
             $feedback = $attemptfeedback->get_feedback_for_attempt() ?? "";
             if (empty($feedback)) {

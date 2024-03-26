@@ -38,7 +38,7 @@ class pilotquestions extends feedbackgenerator {
 
     /**
      *
-     * @var stdClass $feedbacksettings.
+     * @var feedbacksettings $feedbacksettings.
      */
     public feedbacksettings $feedbacksettings;
 
@@ -60,7 +60,7 @@ class pilotquestions extends feedbackgenerator {
      * @return array
      *
      */
-    protected function get_studentfeedback(array $data): array {
+    public function get_studentfeedback(array $data): array {
         return [];
     }
 

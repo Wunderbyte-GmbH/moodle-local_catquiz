@@ -26,6 +26,9 @@ namespace local_catquiz\teststrategy;
 
 use coding_exception;
 use context_system;
+use local_catquiz\catquiz;
+use local_catquiz\catscale;
+use local_catquiz\feedback\feedbackclass;
 use UnexpectedValueException;
 
 /**
@@ -42,7 +45,7 @@ abstract class feedbackgenerator {
      * @param array $data
      * @return array
      */
-    abstract protected function get_studentfeedback(array $data): array;
+    abstract public function get_studentfeedback(array $data): array;
 
     /**
      * Returns an array with two keys 'heading' and 'context'.
@@ -85,7 +88,8 @@ abstract class feedbackgenerator {
     abstract public function load_data(int $attemptid, array $existingdata, array $newdata): ?array;
 
     /**
-     * To update feedbackdata (that will be rendered later) according to specific settings.
+     * To update feedbackdata (that will be rendered later)...
+     * ...according to specific settings defined by strategy and results.
      *
      * @param array $feedbackdata
      */
@@ -132,6 +136,93 @@ abstract class feedbackgenerator {
     }
 
     /**
+     * Set new keys in personabilities array to define scales selected and excluded for report.
+     *
+     * @param array $newdata
+     * @param feedbacksettings $feedbacksettings
+     * @param array $quizsettings
+     * @param int $strategyid
+     * @param int $forcedscaleid
+     * @param bool $feedbackonlyfordefinedscaleid
+     *
+     * @return array
+     *
+     */
+    public function select_scales_for_report(
+        array $newdata,
+        feedbacksettings $feedbacksettings,
+        array $quizsettings,
+        int $strategyid,
+        int $forcedscaleid = 0,
+        bool $feedbackonlyfordefinedscaleid = false
+        ): array {
+
+        $transformedpersonabilities = $newdata['updated_personabilities'];
+
+        $transformedpersonabilities = $feedbacksettings->filter_excluded_scales($transformedpersonabilities, $quizsettings);
+
+        $feedbacksettings->set_params_from_attempt($newdata, $quizsettings);
+
+        return info::get_teststrategy($strategyid)
+        ->select_scales_for_report(
+            $feedbacksettings,
+            $transformedpersonabilities,
+            $newdata
+        );
+    }
+
+    /**
+     * Write information about colorgradient for colorbar.
+     *
+     * @param array $quizsettings
+     * @param float $personability
+     * @param int $catscaleid
+     * @return string
+     *
+     */
+    public function get_color_for_personability(array $quizsettings, float $personability, int $catscaleid): string {
+        $default = LOCAL_CATQUIZ_DEFAULT_GREY;
+        $abilityrange = $this->get_ability_range($catscaleid);
+        if (!$quizsettings ||
+            $personability < (float) $abilityrange['minscalevalue'] ||
+            $personability > (float) $abilityrange['maxscalevalue']) {
+            return $default;
+        }
+        $numberoffeedbackoptions = intval($quizsettings['numberoffeedbackoptionsselect'])
+            ?? LOCAL_CATQUIZ_MAX_SCALERANGE;
+        $colorarray = feedbackclass::get_array_of_colors($numberoffeedbackoptions);
+
+        for ($i = 1; $i <= $numberoffeedbackoptions; $i++) {
+            $rangestartkey = "feedback_scaleid_limit_lower_" . $catscaleid . "_" . $i;
+            $rangeendkey = "feedback_scaleid_limit_upper_" . $catscaleid . "_" . $i;
+            $rangestart = floatval($quizsettings[$rangestartkey]);
+            $rangeend = floatval($quizsettings[$rangeendkey]);
+
+            if ($personability >= $rangestart && $personability <= $rangeend) {
+                $colorkey = 'wb_colourpicker_' . $catscaleid . '_' . $i;
+                $colorname = $quizsettings[$colorkey];
+                return $colorarray[$colorname];
+            }
+
+        }
+        return $default;
+    }
+
+    /**
+     * For testing this is called in seperate function.
+     *
+     * @param mixed $catscaleid
+     *
+     * @return array
+     *
+     */
+    public function get_ability_range($catscaleid): array {
+        $cs = new catscale($catscaleid);
+        // Ability range is the same for all scales with same root scale.
+        return $cs->get_ability_range();
+    }
+
+    /**
      * Returns a fallback if no feedback can be generated.
      *
      * @return array
@@ -155,6 +246,10 @@ abstract class feedbackgenerator {
     private function has_required_context_keys($context) {
         foreach ($this->get_required_context_keys() as $key) {
             if (!array_key_exists($key, $context)) {
+                global $CFG;
+                if ($CFG->debug > 0) {
+                    echo "missing contextkey " . $key;
+                }
                 return false;
             }
         }

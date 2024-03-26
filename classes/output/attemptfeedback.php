@@ -25,6 +25,7 @@ use local_catquiz\catquiz;
 use local_catquiz\catscale;
 use local_catquiz\event\attempt_completed;
 use local_catquiz\teststrategy\feedbackgenerator;
+use local_catquiz\teststrategy\feedbackgenerator\customscalefeedback;
 use local_catquiz\teststrategy\feedbacksettings;
 use local_catquiz\teststrategy\info;
 use local_catquiz\teststrategy\progress;
@@ -112,7 +113,7 @@ class attemptfeedback implements renderable, templatable {
         $this->teststrategy = intval($settings->catquiz_selectteststrategy);
 
         if (!isset($feedbacksettings)) {
-            $this->feedbacksettings = new feedbacksettings();
+            $this->feedbacksettings = new feedbacksettings($this->teststrategy);
         } else {
             $this->feedbacksettings = $feedbacksettings;
         }
@@ -224,6 +225,7 @@ class attemptfeedback implements renderable, templatable {
         // Get the data required to generate the feedback. This can be saved to
         // the DB.
         $feedbackdata = $existingdata;
+        $newdata = $this->add_default_data($newdata);
         foreach ($generators as $generator) {
             $generatordata = $generator->load_data($this->attemptid, $existingdata, $newdata);
             if (! $generatordata) {
@@ -231,12 +233,75 @@ class attemptfeedback implements renderable, templatable {
             }
             $feedbackdata = array_merge(
                 $feedbackdata,
+                $newdata,
                 $generatordata
             );
         }
-
+        // Data is not merged correctly into feedbackdata at this point.
         return $feedbackdata;
     }
+
+    /**
+     * Change format of personabilities.
+     *
+     * @param array $newdata
+     *
+     * @return array
+     *
+     */
+    private function add_default_data(array $newdata): array {
+        $newarray = [];
+        $progress = $newdata['progress'];
+        if (is_array($progress)) {
+            $personabilities = $progress['abilities'];
+        } else {
+            $personabilities = $progress->get_abilities();
+        }
+
+        if (!$personabilities) {
+            return $newdata;
+        }
+        foreach ($personabilities as $scaleid => $abilityfloat) {
+            $newarray[$scaleid]['value'] = $abilityfloat;
+        };
+        $newdata['updated_personabilities'] = $newarray;
+        $newdata['catscales'] = catquiz::get_catscales(array_keys($newarray));
+        return $newdata;
+    }
+
+    /**
+     * Change format of personabilities.
+     *
+     * @param array $personabilities
+     *
+     * @return array
+     *
+     */
+    private function add_additional_infos_to_personabilities(array $personabilities): array {
+
+        if (!is_array($personabilities[array_key_first($personabilities)])) {
+            // It's the float value of ability.
+            foreach ($personabilities as $scaleid => $abilityfloat) {
+                $newarray[$scaleid]['value'] = $abilityfloat;
+            };
+            $personabilities = $newarray;
+        }
+        $quizsettings = (array) $this->quizsettings;
+        $feedbacksettings = $this->feedbacksettings;
+        $feedbackdata = $this->load_feedbackdata();
+
+        $personabilities = $feedbacksettings->filter_excluded_scales($personabilities, $quizsettings);
+        $feedbacksettings->set_params_from_attempt($feedbackdata, $quizsettings);
+
+        return info::get_teststrategy($this->teststrategy)
+            ->select_scales_for_report(
+                $feedbacksettings,
+                $personabilities,
+                $feedbackdata
+            );
+
+    }
+
 
     /**
      * Gets feedback generators for teststrategy.
@@ -250,7 +315,7 @@ class attemptfeedback implements renderable, templatable {
         }
 
         if (!isset($this->feedbacksettings)) {
-            $this->feedbacksettings = new feedbacksettings();
+            $this->feedbacksettings = new feedbacksettings($strategyid);
         }
         return $attemptstrategy->get_feedbackgenerators($this->feedbacksettings);
     }
@@ -276,10 +341,7 @@ class attemptfeedback implements renderable, templatable {
      *
      */
     public function export_for_template(\renderer_base $output): array {
-        // 1. Perform attempt-finished tasks.
-        $this->attempt_finished_tasks();
 
-        // 2. Return the feedback.
         return [
             'feedback' => $this->get_feedback_for_attempt(),
         ];
@@ -288,10 +350,11 @@ class attemptfeedback implements renderable, templatable {
     /**
      * Triggers tasks when attempt finished
      */
-    private function attempt_finished_tasks() {
+    public function attempt_finished_tasks() {
         global $USER;
         $progress = progress::load($this->attemptid, 'mod_adaptivequiz', $this->contextid);
-        catquiz::enrol_user($USER->id, (array) $this->quizsettings, $progress->get_abilities());
+        $personabilities = $this->add_additional_infos_to_personabilities($progress->get_abilities());
+        catquiz::enrol_user($USER->id, (array) $this->quizsettings, $personabilities);
         $courseandinstance = catquiz::return_course_and_instance_id(
             $this->quizsettings->modulename,
             $this->attemptid
@@ -328,6 +391,19 @@ class attemptfeedback implements renderable, templatable {
         if (!$feedbackdata) {
             return [];
         }
+        $primaryfeedbackname = 'customscalefeedback';
+
+        // Set primary generator element (customscalefeedback) first.
+        usort($generators, function($a, $b) use ($primaryfeedbackname) {
+            if ($a->get_generatorname() == $primaryfeedbackname) {
+                return -1;
+            } else if ($b->get_generatorname() == $primaryfeedbackname) {
+                return 1;
+            } else {
+                return 0;
+            }
+        });
+
         foreach ($generators as $generator) {
             $feedbacks = $generator->get_feedback($feedbackdata);
             // Loop over studentfeedback and teacherfeedback.
@@ -337,7 +413,6 @@ class attemptfeedback implements renderable, templatable {
                 }
 
                 $feedback['generatorname'] = $generator->get_generatorname();
-                $primaryfeedbackname = 'customscalefeedback';
                 if ($generator->get_generatorname() === $primaryfeedbackname) {
                     $feedback['frontpage'] = "1";
                 } else {

@@ -110,12 +110,12 @@ class teststrategy_fastest extends strategy {
         $this->apply_feedbacksettings($feedbacksettings);
 
         return [
+            new customscalefeedback($this->feedbacksettings),
             new questionssummary($this->feedbacksettings),
             new personabilities($this->feedbacksettings),
             new comparetotestaverage($this->feedbacksettings),
-            new customscalefeedback($this->feedbacksettings),
-            new debuginfo($this->feedbacksettings),
             new graphicalsummary($this->feedbacksettings),
+            new debuginfo($this->feedbacksettings),
         ];
     }
 
@@ -127,5 +127,65 @@ class teststrategy_fastest extends strategy {
      */
     public function apply_feedbacksettings(feedbacksettings $feedbacksettings) {
         $this->feedbacksettings = $feedbacksettings;
+    }
+
+    /**
+     * Gets predefined values and completes them with specific behaviour of strategy.
+     *
+     * @param feedbacksettings $feedbacksettings
+     * @param array $personabilities
+     * @param array $feedbackdata
+     * @param int $catscaleid
+     * @param bool $feedbackonlyfordefinedscaleid
+     *
+     */
+    public function select_scales_for_report(
+        feedbacksettings $feedbacksettings,
+        array $personabilities,
+        array $feedbackdata,
+        int $catscaleid = 0,
+        bool $feedbackonlyfordefinedscaleid = false
+        ): array {
+
+        $newabilities = [];
+        $rootscaleid = (int) $feedbackdata['catscaleid'];
+
+        // Only parentscale to be selected.
+        foreach ($personabilities as $scaleid => $abilityvalue) {
+            if ($scaleid != $rootscaleid) {
+                $newabilities[$scaleid] = [
+                    'value' => $abilityvalue['value'],
+                    'excluded' => true,
+                    ];
+                $newabilities[$scaleid]['error']['rootonly'] = [
+                        'rootscaleid' => $rootscaleid,
+                        'currentscaleid' => $scaleid,
+                ];
+                continue;
+            }
+            $newabilities[$scaleid] = [
+                'value' => $abilityvalue['value'],
+                'primary' => true,
+                'toreport' => true,
+                'primarybecause' => 'rootscale',
+            ];
+        };
+        // Minimum of questions per test applied.
+        $newabilities = $feedbacksettings->filter_nmintest($newabilities, $feedbackdata);
+
+        // Fraction can not be 1 (all answers correct) or 0 (all answers incorrect).
+        if ($feedbacksettings->fraction >= 1 || $feedbacksettings->fraction <= 0) {
+            foreach ($personabilities as $scaleid => $abilityvalue) {
+                $newabilities[$scaleid] = [
+                    'value' => $abilityvalue['value'],
+                    'excluded' => true,
+                    ];
+                $newabilities[$scaleid]['error']['fraction'] = [
+                        'fraction' => $feedbacksettings->fraction,
+                        'expected' => '0 < f < 1',
+                ];
+            }
+        }
+        return $newabilities;
     }
 }

@@ -117,12 +117,12 @@ class inferlowestskillgap extends strategy {
         $this->apply_feedbacksettings($feedbacksettings);
 
         return [
-            new comparetotestaverage($this->feedbacksettings),
             new customscalefeedback($this->feedbacksettings),
-            new debuginfo($this->feedbacksettings),
+            new comparetotestaverage($this->feedbacksettings),
             new personabilities($this->feedbacksettings),
             new questionssummary($this->feedbacksettings),
             new graphicalsummary($this->feedbacksettings),
+            new debuginfo($this->feedbacksettings),
         ];
     }
 
@@ -133,13 +133,68 @@ class inferlowestskillgap extends strategy {
      *
      */
     public function apply_feedbacksettings(feedbacksettings $feedbacksettings) {
-        if ($feedbacksettings->overridesettings) {
-            $feedbacksettings->sortorder = LOCAL_CATQUIZ_SORTORDER_ASC;
-        }
-        if ($feedbacksettings->primaryscaleid == LOCAL_CATQUIZ_PRIMARYCATSCALE_DEFAULT) {
-            $feedbacksettings->primaryscaleid = LOCAL_CATQUIZ_PRIMARYCATSCALE_LOWEST;
-        }
 
         $this->feedbacksettings = $feedbacksettings;
+    }
+
+    /**
+     * Gets predefined values and completes them with specific behaviour of strategy.
+     *
+     * @param feedbacksettings $feedbacksettings
+     * @param array $personabilities
+     * @param array $feedbackdata
+     * @param int $catscaleid
+     * @param bool $feedbackonlyfordefinedscaleid
+     *
+     */
+    public function select_scales_for_report(
+        feedbacksettings $feedbacksettings,
+        array $personabilities,
+        array $feedbackdata,
+        int $catscaleid = 0,
+        bool $feedbackonlyfordefinedscaleid = false
+        ): array {
+
+        // Fraction can not be 1 (all answers correct).
+        if ($feedbacksettings->fraction >= 1) {
+            $returnarray = [];
+            foreach ($personabilities as $scaleid => $array) {
+                $returnarray[$scaleid] = [
+                    'value' => $array['value'],
+                    'excluded' => true,
+                ];
+                $returnarray[$scaleid]['error']['fraction'] = [
+                    'fraction' => $feedbacksettings->fraction,
+                    'expected' => '< 1',
+                ];
+            }
+            return $returnarray;
+        }
+        // Exclude scales that don't meet minimum of items required in quizsettings.
+        $personabilities = $feedbacksettings->filter_nminscale($personabilities, $feedbackdata);
+        // Exclude scales where standarderror is not in range.
+        $personabilities = $feedbacksettings->filter_semax($personabilities, $feedbackdata);
+
+        if ($feedbackonlyfordefinedscaleid && !empty($catscaleid)) {
+            // Force selected scale. Will also be applied to excluded scales.
+            $relevantscale = $personabilities[$catscaleid];
+        } else {
+            $filterabilities = [];
+            foreach ($personabilities as $scaleid => $array) {
+                if (!isset($array['error']) && !isset($array['excluded'])) {
+                    $filterabilities[$scaleid] = $array['value'];
+                }
+            }
+            if (count($filterabilities) < 1) {
+                return $personabilities;
+            }
+            // In this strategy, the scale with lowest value is set primary.
+            $relevantscale = array_search(min($filterabilities), $filterabilities);
+        }
+        $personabilities[$relevantscale]['primary'] = true;
+        $personabilities[$relevantscale]['toreport'] = true;
+        $personabilities[$relevantscale]['primarybecause'] = 'lowestskill';
+
+        return $personabilities;
     }
 }

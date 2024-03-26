@@ -15,11 +15,10 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Entities Class to display list of entity records.
+ * Catquiz class.
  *
  * @package local_catquiz
- * @author Thomas Winkler
- * @copyright 2021 Wunderbyte GmbH
+ * @copyright 2024 Wunderbyte GmbH
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
@@ -832,7 +831,7 @@ class catquiz {
      * @return mixed
      *
      */
-    public static function return_attempt_and_contextid_from_attemptstable(
+    public static function return_data_from_attemptstable(
         int $numberofrecords = 1,
         int $instanceid = 0,
         int $courseid = 0,
@@ -840,7 +839,7 @@ class catquiz {
 
         global $DB;
 
-        $sqlarray = self::return_sql_for_attemptid_contextid($numberofrecords, $instanceid, $courseid, $userid);
+        $sqlarray = self::return_sql_for_attemptid_contextid_json($numberofrecords, $instanceid, $courseid, $userid);
 
         $recordsarray = $DB->get_records_sql($sqlarray[0], $sqlarray[1]);
 
@@ -848,21 +847,22 @@ class catquiz {
     }
 
     /**
-     * Summary of return_sql_for_attemptid_contextid
+     * Summary of return_sql_for_attemptid_contextid_json
      * @param int $numberofrecords
      * @param int $instanceid
      * @param int $courseid
      * @param int $userid
      * @return array
      */
-    private static function return_sql_for_attemptid_contextid(
+    private static function return_sql_for_attemptid_contextid_json(
         int $numberofrecords = 1,
         int $instanceid = 0,
         int $courseid = 0,
         int $userid = -1): array {
 
         $sql = "SELECT
-        attemptid, contextid FROM {local_catquiz_attempts} ";
+        attemptid, contextid, json
+        FROM {local_catquiz_attempts} ";
 
         $wherearray = [];
         $params = [];
@@ -1509,7 +1509,7 @@ class catquiz {
         $data->total_number_of_testitems = $attemptdata['total_number_of_testitems'];
         $data->number_of_testitems_used = $attemptdata['number_of_testitems_used'];
         $data->personability_before_attempt = $attemptdata['ability_before_attempt'];
-        $data->personability_after_attempt = $attemptdata['personabilities'][$attemptdata['catscaleid']] ?? null;
+        $data->personability_after_attempt = $attemptdata['personabilities'][$attemptdata['catscaleid']]['value'] ?? null;
         $data->starttime = $attemptdata['starttime'] ?? null;
         $data->endtime = $attemptdata['endtime'] ?? time();
 
@@ -1665,14 +1665,15 @@ class catquiz {
         array $personabilities) {
         global $DB;
 
-        // Enrolement is applied according to test strategy.
-        $personabilities = feedbacksettings::return_scales_according_to_strategy(
-            $quizsettings['catquiz_selectteststrategy'],
-            $personabilities);
+        // Filter for scales that are selected for enrolement.
 
-        foreach ($personabilities as $catscaleid => $personability) {
+        foreach ($personabilities as $catscaleid => $personabilityarray) {
+            if (!isset($personabilityarray['toreport'])) {
+                continue;
+            }
             $i = 1;
-
+            $personabilityarray = (array) $personabilityarray;
+            $personability = (float) $personabilityarray['value'];
             $rolestudent = $DB->get_record('role', ['shortname' => 'student']);
             try {
                 $catscale = catscale::return_catscale_object($catscaleid);
@@ -1696,7 +1697,7 @@ class catquiz {
                     // The first element at array key 0 is a dummy value to
                     // display some message like "please select course" in the
                     // form and has a course ID of 0.
-                    $coursestoenrol = array_filter($coursestoenrol, fn ($v) => $v != 0);
+                    $coursestoenrol = array_filter($coursestoenrol, fn ($v) => $v);
                     foreach ($coursestoenrol as $courseid) {
                         $context = \context_course::instance($courseid);
                         $course = get_course($courseid);

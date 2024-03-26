@@ -115,12 +115,12 @@ class inferallsubscales extends strategy {
         $this->apply_feedbacksettings($feedbacksettings);
 
         return [
+            new customscalefeedback($this->feedbacksettings),
             new questionssummary($this->feedbacksettings),
             new personabilities($this->feedbacksettings),
             new comparetotestaverage($this->feedbacksettings),
-            new customscalefeedback($this->feedbacksettings),
-            new debuginfo($this->feedbacksettings),
             new graphicalsummary($this->feedbacksettings),
+            new debuginfo($this->feedbacksettings),
         ];
     }
 
@@ -135,5 +135,47 @@ class inferallsubscales extends strategy {
             $feedbacksettings->displayscaleswithoutitemsplayed = true;
         }
         $this->feedbacksettings = $feedbacksettings;
+    }
+
+    /**
+     * Gets predefined values and completes them with specific behaviour of strategy.
+     *
+     * @param feedbacksettings $feedbacksettings
+     * @param array $personabilities
+     * @param array $feedbackdata
+     * @param int $catscaleid
+     * @param bool $feedbackonlyfordefinedscaleid
+     *
+     */
+    public function select_scales_for_report(
+        feedbacksettings $feedbacksettings,
+        array $personabilities,
+        array $feedbackdata,
+        int $catscaleid = 0,
+        bool $feedbackonlyfordefinedscaleid = false
+        ): array {
+
+        // If Fraction is 1 (all answers correct) or 0 (all answers wrong) mark abilities as estimated.
+        if ($feedbacksettings->fraction == 1 || $feedbacksettings->fraction == 0 ) {
+            $estimated = true;
+        }
+        $rootscaleid = $feedbackdata['catscaleid'];
+
+        // Exclude scales that don't meet minimum of items required in quizsettings.
+        $personabilities = $feedbacksettings->filter_nminscale($personabilities, $feedbackdata);
+
+        foreach ($personabilities as $scaleid => $abilitiesarray) {
+            $personabilities[$scaleid]['toreport'] = true;
+            if ($estimated) {
+                $personabilities[$scaleid]['estimated'] = true;
+                $personabilities[$scaleid]['fraction'] = $feedbacksettings->fraction;
+            }
+            if ($scaleid == $rootscaleid) {
+                $personabilities[$scaleid]['primary'] = true;
+            }
+
+        }
+
+        return $personabilities;
     }
 }

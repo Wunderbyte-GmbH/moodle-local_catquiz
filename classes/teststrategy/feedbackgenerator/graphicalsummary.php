@@ -67,7 +67,7 @@ class graphicalsummary extends feedbackgenerator {
      * @return array
      *
      */
-    protected function get_studentfeedback(array $data): array {
+    public function get_studentfeedback(array $data): array {
         return [];
     }
 
@@ -88,15 +88,9 @@ class graphicalsummary extends feedbackgenerator {
         if (isset($feedbackdata['graphicalsummary_data'])) {
             $table = $this->render_table($feedbackdata['graphicalsummary_data']);
         }
-        if (isset($this->feedbacksettings->primaryscaleid) && !empty($feedbackdata['personabilities'])) {
-            $selectedscalearray = $this->feedbacksettings->get_scaleid_and_stringkey(
-                $feedbackdata['personabilities'],
-                (object)$feedbackdata['quizsettings'],
-                $this->feedbacksettings->primaryscaleid);
-            $catscaleid = $selectedscalearray['selectedscaleid'];
-        } else {
-            $catscaleid = $feedbackdata['catscaleid'];
-        }
+
+        $catscaleid = $feedbackdata['catscaleid'];
+
         $catscale = catscale::return_catscale_object($catscaleid);
 
         $participationcharts = $this->render_participationcharts(
@@ -188,9 +182,16 @@ class graphicalsummary extends feedbackgenerator {
 
         // If we already have all the data, just return them instead of adding
         // the last response again.
+
+        if (is_array($progress)) {
+            $playedquestions = $progress['playedquestions'];
+        } else {
+            $playedquestions = $progress->get_playedquestions(true);
+        }
+
         if (
             array_key_exists('graphicalsummary_data', $existingdata)
-            && count($existingdata['graphicalsummary_data']) === count($progress->get_playedquestions())
+            && count($existingdata['graphicalsummary_data']) === count($playedquestions)
         ) {
             return $existingdata;
         }
@@ -203,24 +204,26 @@ class graphicalsummary extends feedbackgenerator {
         // Append the data from the latest response to the existing graphical summary.
         $graphicalsummary = $existingdata['graphicalsummary_data'] ?? [];
         $new = [];
-            $new['id'] = $lastquestion->id;
-            $new['questionname'] = $lastquestion->name;
-            $new['lastresponse'] = $lastresponse['fraction'];
-            $new['difficulty'] = $lastquestion->difficulty;
-            $new['questionscale'] = $lastquestion->catscaleid;
-            $new['questionscale_name'] = catscale::return_catscale_object(
-                $lastquestion->catscaleid
-            )->name;
-            $new['fisherinformation'] = $lastquestion
-                ->fisherinformation[$existingdata['catscaleid']] ?? null;
-            $new['score'] = $lastquestion->score ?? null;
-            $new['difficultynextbefore'] = null;
-            $new['difficultynextafter'] = null;
-            $new['personability_after'] = $newdata['person_ability'][$newdata['catscaleid']];
-            $new['personability_before'] =
-                $existingdata['personabilities'][$existingdata['catscaleid']] ?? null;
+        $new['id'] = $lastquestion->id;
+        $new['questionname'] = $lastquestion->name;
+        $new['lastresponse'] = $lastresponse['fraction'];
+        $new['difficulty'] = $lastquestion->difficulty;
+        $new['questionscale'] = $lastquestion->catscaleid;
+        $new['questionscale_name'] = catscale::return_catscale_object(
+            $lastquestion->catscaleid
+        )->name;
+        $new['fisherinformation'] = $lastquestion
+            ->fisherinformation[$existingdata['catscaleid']] ?? null;
+        $new['score'] = $lastquestion->score ?? null;
+        $new['difficultynextbefore'] = null;
+        $new['difficultynextafter'] = null;
+        $new['personability_after'] = $newdata['person_ability'][$newdata['catscaleid']];
+        $new['personability_before'] =
+            $existingdata['personabilities'][$existingdata['catscaleid']]['value'] ?? null;
 
-            $graphicalsummary[] = $new;
+            // TODO: Here is always root scale reference for comparison is this wanted?
+            // Or should it be compared to same scale?
+        $graphicalsummary[] = $new;
 
         $teststrategyname = get_string(
             'teststrategy',
@@ -433,7 +436,7 @@ class graphicalsummary extends feedbackgenerator {
             null,
             null);
         if (count($records) < 2) {
-            return "";
+            return [];
         }
         // Get all items of this catscale and catcontext.
         $startingrecord = reset($records);
@@ -490,7 +493,7 @@ class graphicalsummary extends feedbackgenerator {
      * @param int $catscaleid
      * @param array $attemptdata
      *
-     * @return string
+     * @return array
      */
     private function render_attemptresultstackchart(array $attemptsbytimerange, int $catscaleid, array $attemptdata) {
         global $OUTPUT;
@@ -503,10 +506,10 @@ class graphicalsummary extends feedbackgenerator {
             foreach ($attempts as $attempt) {
                 if (is_object($attempt)) {
                     $a = (float) $attempt->value;
-                    $color = personabilities::get_color_for_personability((array)$quizsettings, $a, $catscaleid);
+                    $color = $this->get_color_for_personability((array)$quizsettings, $a, $catscaleid);
                 } else {
                     // This is to stay backwards compatible.
-                    $color = personabilities::get_color_for_personability((array)$quizsettings, $attempt, $catscaleid);
+                    $color = $this->get_color_for_personability((array)$quizsettings, $attempt, $catscaleid);
                 }
 
                 if (!isset($series[$timestamp][$color])) {

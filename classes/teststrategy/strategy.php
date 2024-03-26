@@ -156,11 +156,12 @@ abstract class strategy {
         $result = wb_middleware_runner::run($middlewares, $context);
         $this->progress = $context['progress'];
 
-        $this->update_attempdfeedback($context);
+        $this->update_attemptfeedback($context);
 
         if ($result->isErr()) {
             $cache->set('endtime', time());
             $cache->set('catquizerror', $result->get_status());
+            $this->progress->save();
             return $result;
         }
 
@@ -191,7 +192,7 @@ abstract class strategy {
      * @throws Exception
      * @throws dml_exception
      */
-    private function update_attempdfeedback($context) {
+    private function update_attemptfeedback($context) {
         if (getenv('CATQUIZ_TESTING_SKIP_FEEDBACK')) {
             return;
         }
@@ -208,6 +209,7 @@ abstract class strategy {
         }
 
         $attemptfeedback = new attemptfeedback($context['attemptid'], $context['contextid']);
+
         $attemptfeedback->update_feedbackdata($context);
     }
 
@@ -260,4 +262,24 @@ abstract class strategy {
      *
      */
     abstract public function apply_feedbacksettings(feedbacksettings $feedbacksettings);
+
+    /**
+     * Adapt personabilites array: add excluded, error and primary keys in case these cases apply.
+     *
+     * @param feedbacksettings $feedbacksettings
+     * @param array $personabilities
+     * @param array $feedbackdata
+     * @param int $catscaleid
+     * @param bool $feedbackonlyfordefinedscaleid
+     *
+     * @return array
+     *
+     */
+    abstract public function select_scales_for_report(
+        feedbacksettings $feedbacksettings,
+        array $personabilities,
+        array $feedbackdata,
+        int $catscaleid = 0,
+        bool $feedbackonlyfordefinedscaleid = false
+    ): array;
 }

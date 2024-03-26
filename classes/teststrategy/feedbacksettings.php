@@ -18,6 +18,7 @@ namespace local_catquiz\teststrategy;
 
 use local_catquiz\catscale;
 use local_catquiz\feedback\feedbackclass;
+use local_catquiz\output\attemptfeedback;
 
 defined('MOODLE_INTERNAL') || die();
 
@@ -28,52 +29,85 @@ require_once($CFG->dirroot.'/local/catquiz/lib.php');
  * Class feedbacksettings teststrategy and feedbackgenerator.
  *
  * @package    local_catquiz
- * @copyright  2023 Wunderbyte GmbH <georg.maisser@wunderbyte.at>
+ * @copyright  2024 Wunderbyte GmbH <georg.maisser@wunderbyte.at>
+ * @author     Magdalena Holczik
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class feedbacksettings {
-    /** The scale for which detailed feedback will be displayed. Can be a single scaleid or an array of scales.
+
+    /** The id of the teststrategy.
      * @var int
      */
-    public $primaryscaleid;
+    public int $strategyid;
 
     /**
      * @var boolean
      */
-    public $displayscaleswithoutitemsplayed = false;
+    public bool $displayscaleswithoutitemsplayed = false;
 
     /**
      * @var boolean
      */
-    public $overridesettings = true;
+    public bool $overridesettings = true;
 
     /**
      * @var int
      */
-    public $sortorder;
+    public int $sortorder;
 
     /**
      * @var ?array
      */
-    public $areastohide = [];
+    public ?array $areastohide = [];
 
     /**
      * @var ?array
      */
-    public $areashiddenbydefault = [];
+    public ?array $areashiddenbydefault = [];
 
     /**
      * @var ?array
      */
-    public $definedareastohidekeys;
+    public ?array $definedareastohidekeys;
+
+    /**
+     * @var ?int
+     */
+    public ?int $nmintest;
+
+    /**
+     * @var ?int
+     */
+    public ?int $nminscale;
+
+    /**
+     * @var ?int
+     */
+    public ?int $rootscale;
+
+    /**
+     * @var ?float
+     */
+    public ?float $semax;
+
+    /**
+     * @var ?float
+     */
+    public ?float $semin;
+
+    /**
+     * @var ?float
+     */
+    public ?float $fraction;
 
     /**
      * Constructor for feedbackclass.
      *
-     * @param int $primaryscaleid
+     * @param int $strategyid
      */
-    public function __construct($primaryscaleid = LOCAL_CATQUIZ_PRIMARYCATSCALE_DEFAULT) {
-        $this->primaryscaleid = $primaryscaleid;
+    public function __construct(int $strategyid) {
+
+        $this->strategyid = $strategyid;
 
         // Default sortorder is descendent.
         $this->sortorder = LOCAL_CATQUIZ_SORTORDER_DESC;
@@ -210,42 +244,170 @@ class feedbacksettings {
         return $colors;
     }
 
-
     /**
-     * Return array with catscaleids and personabilites according to teststrategy.
+     * Exclude scales that don't meet minimum of items required in quizsettings.
      *
-     * @param int $teststrategy
-     * @param array $personabilities
-     * @param int $catscaleid
-     * @param bool $feedbackonlyfordefinedscaleid
+     * @param mixed $personabilities
+     * @param mixed $feedbackdata
      *
      * @return array
+     *
      */
-    public static function return_scales_according_to_strategy(
-        int $teststrategy,
-        array $personabilities,
-        int $catscaleid = 0,
-        bool $feedbackonlyfordefinedscaleid = false): array {
-
-        if ($feedbackonlyfordefinedscaleid) {
-            foreach ($personabilities as $key => $value) {
-                if ($key == $catscaleid) {
-                    $selectedscale[$key] = $value;
+    public function filter_nminscale($personabilities, $feedbackdata): array {
+        $nminscale = $this->nminscale;
+        if (!empty($nminscale)) {
+            foreach ($personabilities as $scaleid => $array) {
+                $ninscale = count($feedbackdata['questionsperscale'][$scaleid]);
+                if ($ninscale < $nminscale) {
+                    $personabilities[$scaleid]['error']['nminscale'] = [
+                        'nminscaledefined' => $nminscale,
+                        'nscalecurrent' => $ninscale,
+                    ];
+                    $personabilities[$scaleid]['excluded'] = true;
                 }
             }
-            return $selectedscale;
+        }
+        return $personabilities;
+    }
+
+    /**
+     * Exclude scales that don't meet minimum of items required in quizsettings.
+     *
+     * @param mixed $personabilities
+     * @param mixed $feedbackdata
+     *
+     * @return array
+     *
+     */
+    public function filter_nmintest($personabilities, $feedbackdata): array {
+        $nmintest = $this->nmintest;
+        if (!empty($nmintest)) {
+            $nintest = $feedbackdata['progress']->get_num_playedquestions();
+            if ($nintest < $nmintest) {
+                foreach ($personabilities as $scaleid => $scalearray) {
+                    $personabilities[$scaleid]['error']['nminscale'] = [
+                        'nmintestdefined' => $nmintest,
+                        'ntestcurrent' => $nintest,
+                    ];
+                    $personabilities[$scaleid]['excluded'] = true;
+                }
+            }
+        }
+        return $personabilities;
+    }
+    /**
+     * Exclude scales where standarderror is not in range.
+     *
+     * @param mixed $personabilities
+     * @param mixed $feedbackdata
+     *
+     * @return array
+     *
+     */
+    public function filter_semax($personabilities, $feedbackdata): array {
+        $semax = $this->semax;
+        if (!empty($semax)) {
+            foreach ($personabilities as $scaleid => $array) {
+                $se = $feedbackdata['se'][$scaleid];
+                if ($se > $semax) {
+                    $personabilities[$scaleid]['error']['se'] = [
+                        'semaxdefined' => $semax,
+                        'securrent' => $se,
+                    ];
+                    $personabilities[$scaleid]['excluded'] = true;
+                }
+            }
+        }
+        return $personabilities;
+    }
+
+    /**
+     * Exclude scales where standarderror is not in range.
+     *
+     * @param mixed $personabilities
+     * @param mixed $feedbackdata
+     *
+     * @return array
+     *
+     */
+    public function filter_semin($personabilities, $feedbackdata): array {
+        $semin = $this->semax;
+        if (!empty($semin)) {
+            foreach ($personabilities as $scaleid => $array) {
+                $se = $feedbackdata['se'][$scaleid];
+                if ($se < $semin) {
+                    $personabilities[$scaleid]['error']['se'] = [
+                        'semindefined' => $semin,
+                        'securrent' => $se,
+                    ];
+                    $personabilities[$scaleid]['excluded'] = true;
+                }
+            }
+        }
+        return $personabilities;
+    }
+    /**
+     * Filter the results to check if reporting is enabled in quizsettings.
+     *
+     * @param array $personabilities
+     * @param array $quizsettings
+     *
+     * @return array
+     *
+     */
+    public function filter_excluded_scales(array $personabilities, array $quizsettings): array {
+        foreach ($personabilities as $catscale => $array) {
+            if (empty($quizsettings['catquiz_scalereportcheckbox_' . $catscale])) {
+                $personabilities[$catscale]['excluded'] = true;
+                $personabilities[$catscale]['error'] = [
+                    'scalereportcheckboxinquizsettings' => false,
+                ];
+            }
+        }
+        return $personabilities;
+    }
+
+
+    /**
+     * Set params defined in quizsettings and attemptdata.
+     *
+     * @param array $newdata
+     * @param array $quizsettings
+     *
+     * @return void
+     *
+     */
+    public function set_params_from_attempt(array $newdata, array $quizsettings): void {
+        $this->semax = $newdata['se_max'] ?? null;
+        $this->semin = $newdata['se_min'] ?? null;
+        $maxquestiongroup = isset($quizsettings['maxquestionsgroup']) ? (array) $quizsettings['maxquestionsgroup'] : null;
+        $maxquestionsscalegroup = !empty($quizsettings['maxquestionsscalegroup']) ?
+            (array) $quizsettings['maxquestionsscalegroup'] : null;
+        $this->nmintest = isset($maxquestiongroup['catquiz_minquestions']) ?
+            (int) $maxquestiongroup['catquiz_minquestions'] : null;
+        $this->nminscale = isset($maxquestionsscalegroup['catquiz_minquestionspersubscale']) ?
+            (int) $maxquestionsscalegroup['catquiz_minquestionspersubscale'] : null;
+        $this->rootscale = isset($quizsettings['catquiz_catscales']) ? (int) $quizsettings['catquiz_catscales'] : null;
+        // Find average fraction.
+        $f = 0.0;
+        $i = 0;
+        if ($newdata['progress'] instanceof progress) {
+            $progress = $newdata['progress'];
+            $responses = $progress->get_responses();
+        } else {
+            $responses = $newdata['progress']['responses'];
+        }
+        foreach ($responses as $responsearray) {
+            $fraction = (float) $responsearray['fraction'];
+            $f += $fraction;
+            $i ++;
+        }
+        if (!empty($i)) {
+            $this->fraction = $f / $i;
+        } else {
+            $this->fraction = $f;
         }
 
-        switch ($teststrategy) {
-            case LOCAL_CATQUIZ_STRATEGY_LOWESTSUB:
-                $minscale = array_search(min($personabilities), $personabilities);
-                return [$minscale => $personabilities[$minscale]];
-            case LOCAL_CATQUIZ_STRATEGY_HIGHESTSUB:
-                $maxscale = array_search(max($personabilities), $personabilities);
-                return [$maxscale => $personabilities[$maxscale]];
-            default:
-            return $personabilities;
-        }
     }
 
     /**
@@ -271,5 +433,6 @@ class feedbacksettings {
         return $value;
 
     }
+
 }
 

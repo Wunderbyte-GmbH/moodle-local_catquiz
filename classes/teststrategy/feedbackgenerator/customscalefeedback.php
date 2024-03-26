@@ -47,6 +47,11 @@ class customscalefeedback extends feedbackgenerator {
     private $sortfun;
 
     /**
+     * @var feedbacksettings $feedbacksettings
+     */
+    private $feedbacksettings;
+
+    /**
      * Creates a new customscale feedback generator.
      *
      * @param feedbacksettings $feedbacksettings
@@ -64,6 +69,7 @@ class customscalefeedback extends feedbackgenerator {
         } else {
             $this->sortfun = fn(&$x) => arsort($x);
         }
+        $this->feedbacksettings = $feedbacksettings;
 
     }
 
@@ -75,16 +81,43 @@ class customscalefeedback extends feedbackgenerator {
      * @return array
      *
      */
-    protected function get_studentfeedback(array $data): array {
+    public function get_studentfeedback(array $data): array {
 
-        $feedback = $data['customscalefeedback'];
+        if (!$data['customscalefeedback_abilities'] ?? false) {
+            return [];
+        }
+        $customscalefeedback = $this->get_customscalefeedback_for_abilities_in_range(
+            $data['customscalefeedback_abilities'],
+            $data['quizsettings'],
+            $data['catscales']
+        );
+        $firstelement = $data['customscalefeedback_abilities'][array_key_first($data['customscalefeedback_abilities'])];
+        if (!empty($firstelement['estimated'])) {
+            if (!isset($firstelement['fraction'])) {
+                $comment = get_string('estimatedbecause:default', 'local_catquiz');
+            } else {
+                switch ((int) $firstelement['fraction']) {
+                    case 1 :
+                        $comment = get_string('estimatedbecause:allanswerscorrect', 'local_catquiz');
+                        break;
+                    case 0 :
+                        $comment = get_string('estimatedbecause:allanswerinscorrect', 'local_catquiz');
+                        break;
+                    default :
+                        $comment = get_string('estimatedbecause:default', 'local_catquiz');
+                        break;
 
-        if (empty($feedback)) {
+                }
+            }
+        }
+
+        if (empty($customscalefeedback)) {
             return [];
         } else {
             return [
                 'heading' => $this->get_heading(),
-                'content' => $feedback,
+                'comment' => $comment ?? "",
+                'content' => $customscalefeedback,
             ];
         }
     }
@@ -110,8 +143,7 @@ class customscalefeedback extends feedbackgenerator {
     public function get_required_context_keys(): array {
         return [
             'quizsettings',
-            'personabilities',
-            'customscalefeedback',
+            'customscalefeedback_abilities',
         ];
     }
 
@@ -142,34 +174,67 @@ class customscalefeedback extends feedbackgenerator {
      * @param array $existingdata
      * @param array $newdata
      *
-     * @return array|null
+     * @return array
      *
      */
     public function load_data(int $attemptid, array $existingdata, array $newdata): ?array {
         $quizsettings = $existingdata['quizsettings'];
         $progress = $newdata['progress'];
-
-        $personabilities = $progress->get_abilities();
-        if (!$personabilities) {
-            return null;
+        if (is_array($progress)) {
+            $personabilities = $progress['abilities'];
+        } else {
+            $personabilities = $progress->get_abilities();
         }
 
-        // Make sure that only feedback for specific scale is rendered.
-        $personabilitiesfeedbackeditor = feedbacksettings::return_scales_according_to_strategy(
-            $existingdata['teststrategy'],
-            (array)$personabilities,
-            $existingdata['catscaleid']);
+        if (!$personabilities) {
+            return [];
+        }
 
-        ($this->sortfun)($personabilities);
+        $personabilitiesfeedbackeditor = $this->select_scales_for_report(
+            $newdata,
+            $this->feedbacksettings,
+            $quizsettings,
+            $existingdata['teststrategy']
+        );
 
+        return [
+            'quizsettings' => $quizsettings,
+            'personabilities' => $personabilities,
+            'customscalefeedback_abilities' => $personabilitiesfeedbackeditor,
+        ];
+    }
+
+    /**
+     * Customscalefeedback defined in quizsettings will be returned if ability is within defined range.
+     *
+     * @param array $personabilities
+     * @param array $quizsettings
+     * @param array $catscales
+     *
+     * @return string
+     *
+     */
+    private function get_customscalefeedback_for_abilities_in_range(
+        array $personabilities,
+        array $quizsettings,
+        array $catscales
+        ): string {
         $scalefeedback = [];
-        foreach ($personabilitiesfeedbackeditor as $catscaleid => $personability) {
+        $relevantscalesfound = false;
+
+        // Filter for scales to be reported.
+        $personabilities = array_filter($personabilities, fn($a) => isset($a['toreport']));
+        foreach ($personabilities as $catscaleid => $personability) {
+            if (isset($personability['excluded']) && $personability['excluded']) {
+                continue;
+            }
+            $relevantscalesfound = true;
             for ($j = 1; $j <= $quizsettings['numberoffeedbackoptionsselect']; $j++) {
                 $lowerlimitprop = sprintf('feedback_scaleid_limit_lower_%d_%d', $catscaleid, $j);
                 $lowerlimit = floatval($quizsettings[$lowerlimitprop]);
                 $upperlimitprop = sprintf('feedback_scaleid_limit_upper_%d_%d', $catscaleid, $j);
                 $upperlimit = floatval($quizsettings[$upperlimitprop]);
-                if ($personability < $lowerlimit || $personability > $upperlimit) {
+                if ($personability['value'] < $lowerlimit || $personability['value'] > $upperlimit) {
                     continue;
                 }
 
@@ -184,21 +249,19 @@ class customscalefeedback extends feedbackgenerator {
         }
 
         if (! $scalefeedback) {
-            return ['customscalefeedback' => get_string('feedback_customscale_nofeedback', 'local_catquiz')];
+            if (!$relevantscalesfound) {
+                return get_string('noscalesfound', 'local_catquiz');
+            }
+            return get_string('nofeedback', 'local_catquiz');
         }
 
-        $catscales = catquiz::get_catscales(array_keys($scalefeedback));
         $text = "";
 
         foreach ($scalefeedback as $scaleid => $value) {
-            $text .= $catscales[$scaleid]->name . ': ' . $value . '<br/>';
+            $scale = (array) $catscales[$scaleid];
+            $text .= $scale['name'] . ': ' . $value . '<br/>';
         }
-
-        return [
-            'customscalefeedback' => $text,
-            'quizsettings' => $quizsettings,
-            'personabilities' => $personabilities,
-        ];
+        return $text;
     }
 
     /**

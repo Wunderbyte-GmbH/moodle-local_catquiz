@@ -108,7 +108,7 @@ class progress implements JsonSerializable {
     /**
      * @var array $responses
      */
-    private array $responses;
+    public array $responses;
 
     /**
      * @var array Holds the abilities indexed by catscale
@@ -453,6 +453,15 @@ class progress implements JsonSerializable {
     }
 
     /**
+     * Returns the responses.
+     *
+     * @return array
+     */
+    public function get_responses() {
+        return $this->responses;
+    }
+
+    /**
      * Returns the questions played in this attempt.
      *
      * @param bool $byscale Return questions per scale.
@@ -663,7 +672,11 @@ class progress implements JsonSerializable {
      * @return self
      */
     public function set_ability(float $ability, int $catscaleid): self {
+        if (!isset($this->abilities[$catscaleid])) {
+            $this->abilities[$catscaleid] = [];
+        }
         $this->abilities[$catscaleid] = $ability;
+
         return $this;
     }
 
@@ -937,4 +950,5 @@ class progress implements JsonSerializable {
         global $USER;
         return sprintf('progress_user_%d_id_%d', $USER->id, $attemptid);
     }
+
 }

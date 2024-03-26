@@ -418,7 +418,7 @@ $string['error'] = "An error occured";
 $string['id'] = "ID";
 $string['abortpersonabilitynotchanged'] = "Person parameter did not change";
 $string['emptyfirstquestionlist'] = "Can't select a start question because the list is empty";
-$string['feedbackcomparetoaverage'] = 'You performed better than {$a->quantile}% of your fellow students for {$a->scaleinfo}.';
+$string['feedbackcomparetoaverage'] = 'You performed better than {$a->quantile}% of your fellow students in "{$a->scaleinfo}".';
 $string['errornoitems'] = "The quiz can not be started with the given settings. Please contact your CAT manager.";
 $string['exceededmaxattempttime'] = "The maximum attempt time has been exceeded.";
 
@@ -459,11 +459,20 @@ $string['feedback_table_answerpartlycorrect'] = "partly correct";
 $string['parentscale'] = "Parentscale";
 $string['seeitemsplayed'] = "Display items played";
 $string['subfeedbackrange'] = '({$a->lowerlimit} to {$a->upperlimit})';
-$string['strongestscaleselected'] = 'your strongest scale {$a}';
-$string['lowestscaleselected'] = 'your lowest scale {$a}';
-$string['parentscaleselected'] = 'parent scale {$a}';
+$string['greateststrenght:tooltiptitle'] = 'your strongest scale {$a}';
+$string['lowestskill:tooltiptitle'] = 'your lowest scale {$a}';
+$string['rootscale:tooltiptitle'] = 'root scale {$a}';
 $string['scaleselected'] = 'defined scale {$a}';
 $string['feedback_customscale_nofeedback'] = 'No feedback was provided for your test results';
+$string['reportscale'] = 'Include scale for report';
+$string['noscalesfound'] = 'There was no valid feedback found.';
+$string['nofeedback'] = 'No feedback defined.';
+$string['moreinformation'] = 'More Information';
+$string['comparetotestaverage'] = 'Overview in Comparison';
+$string['personabilityfeedbacktitle'] = "Personability Profile";
+$string['estimatedbecause:allanswerscorrect'] = "Your results could not be calculated reliably and were estimated, because you answered all questions correctly.";
+$string['estimatedbecause:allanswersincorrect'] = "Your results could not be calculated reliably and were estimated, because you answered all questions incorrectly.";
+$string['estimatedbecause:default'] = "Your results could not be calculated reliably and were estimated.";
 
 // Personability & chart in Feedback.
 $string['chartlegendabilityrelative'] = '{$a->difference} (Compared to parentscale); {$a->ability} (ability score of scale)';
