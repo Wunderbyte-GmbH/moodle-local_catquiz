@@ -59,17 +59,6 @@ final class maximumquestionscheck extends preselect_task implements wb_middlewar
 
         $maxquestions = $context['maximumquestions'];
         if (($maxquestions != -1) && ($context['questionsattempted'] >= $maxquestions)) {
-            // Save the last response so that we can display it as feedback.
-            $lastquestion = $this->progress->get_last_question();
-            $lastresponse = catcontext::getresponsedatafromdb(
-                $context['contextid'],
-                [$lastquestion->catscaleid],
-                $lastquestion->id,
-                $context['userid']
-            );
-            // TODO: Error handling if no question was answered.
-            $context['lastresponse'] = $lastresponse[$context['userid']]['component'][$lastquestion->id];
-
             // Update the person ability and then end the quiz.
             $next = fn () => result::err(status::ERROR_REACHED_MAXIMUM_QUESTIONS);
             $updatepersonability = new updatepersonability();
