@@ -24,13 +24,11 @@
 
 namespace local_catquiz\teststrategy\feedbackgenerator;
 
-use cache;
 use local_catquiz\catquiz;
 use local_catquiz\catscale;
 use local_catquiz\feedback\feedbackclass;
 use local_catquiz\teststrategy\feedbackgenerator;
 use local_catquiz\teststrategy\feedbacksettings;
-use local_catquiz\teststrategy\info;
 use local_catquiz\teststrategy\preselect_task\firstquestionselector;
 
 defined('MOODLE_INTERNAL') || die();
