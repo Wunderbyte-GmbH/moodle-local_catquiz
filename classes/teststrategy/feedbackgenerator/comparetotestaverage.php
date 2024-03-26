@@ -58,6 +58,13 @@ class comparetotestaverage extends feedbackgenerator {
     public feedbacksettings $feedbacksettings;
 
     /**
+     * We only show a graph if we have results for at least that many users.
+     *
+     * @var int
+     */
+    const MIN_USERS = 3;
+
+    /**
      * Creates a new customscale feedback generator.
      *
      * @param feedbacksettings $feedbacksettings
@@ -132,6 +139,8 @@ class comparetotestaverage extends feedbackgenerator {
             'colorbar',
             'colorbarlegend',
             'quizsettings',
+            'comparetotestaverage_has_worse',
+            'comparetotestaverage_has_enough_peers',
         ];
     }
 
@@ -295,20 +304,28 @@ class comparetotestaverage extends feedbackgenerator {
         if (empty($catscaleid) || !isset($ability)) {
             return [];
         };
+
+        // Just keep the parameters for the primary scale, because that's the one we want to compare.
+        $personparams = array_filter($personparams, fn ($pp) => $pp->catscaleid == $catscaleid);
+
+        // If we do not have enough data to show a meaningful comparison, don't display this feedback.
+        $distinctusers = array_unique(
+            array_map(
+                fn ($pp) => $pp->userid,
+                $personparams
+            )
+        );
+
         $catscale = catscale::return_catscale_object($catscaleid);
 
         $worseabilities = array_filter(
             $personparams,
-            fn ($pp) => $pp->ability < $ability
+            fn ($pp) => $pp->ability < round($ability, 4)
         );
 
-        if (!$worseabilities) {
-            // TODO: Is this really a valid check?
-            // Should it maybe be the check $pp->ability <= $ability in case ability is minimum value of abilityrange?
-            return [];
-        }
-
-        $quantile = (count($worseabilities) / count($personparams)) * 100;
+        $quantile = count($personparams) <= 1
+            ? 0
+            : (count($worseabilities) / (count($personparams) - 1)) * 100;
         $text = get_string(
             'feedbackcomparetoaverage',
             'local_catquiz',
@@ -317,7 +334,7 @@ class comparetotestaverage extends feedbackgenerator {
                 'scaleinfo' => $catscale->name,
             ]);
 
-        $testaverage = (new firstquestionselector())->get_median_ability_of_test($personparams);
+        $testaverage = array_sum(array_map(fn ($pp) => $pp->ability, $personparams)) / count($personparams);
 
         $catscaleclass = new catscale($catscaleid);
         $abilityrange = $catscaleclass->get_ability_range();
@@ -355,6 +372,8 @@ class comparetotestaverage extends feedbackgenerator {
             'lowerscalelimit' => $abilityrange['minscalevalue'],
             'upperscalelimit' => $abilityrange['maxscalevalue'],
             'middle' => $middle,
+            'comparetotestaverage_has_worse' => count($worseabilities) > 0,
+            'comparetotestaverage_has_enough_peers' => count($distinctusers) >= self::MIN_USERS,
         ];
     }
 }
