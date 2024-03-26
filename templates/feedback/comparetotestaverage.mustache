@@ -38,7 +38,9 @@
         "subfeedbackrange": "3.3-0"
     }
 }}
-{{comparisontext}}
+{{#comparetotestaverage_has_worse}}
+    {{comparisontext}}
+{{/comparetotestaverage_has_worse}}
 {{#colorbar}}
     <div class="catquiz-feedbackbar">
         <div class="catquiz-feedbackbar-bar" style="background: linear-gradient(to right, {{colorgradestring}});">
@@ -61,6 +63,7 @@
                     <span style="position: absolute; left: 50%; margin-left: -0.25em;">{{middle}}</span>
                     <span style="position: absolute; right: -0.5em">{{upperscalelimit}}</span>
                 </div>
+                {{#comparetotestaverage_has_enough_peers}}
                 <span style="position: absolute; left: {{testaverageposition}}%; margin-left: -15px; top: 0.8em;">{{testaverageability}}</span>
                 <span style="position: absolute; left: {{testaverageposition}}%; margin-left: -15px; top: -1em;">
                     <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" fill="currentColor" class="bi bi-triangle-fill" viewBox="0 0 16 16">
@@ -68,6 +71,7 @@
                     </svg>
                 </span>
                 <div style="position: absolute; top: 2em; width: 100%;">{{currentabilityfellowstudents}}</div>
+                {{/comparetotestaverage_has_enough_peers}}
             </div>
         </div>
     </div>
