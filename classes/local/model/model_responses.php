@@ -15,7 +15,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Entities Class to display list of entity records.
+ * This class facilitates working with responses of a CAT test
  *
  * @package local_catquiz
  * @copyright 2024 Wunderbyte GmbH <info@wunderbyte.at>
@@ -40,17 +40,12 @@ use local_catquiz\local\model\model_person_param_list;
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class model_responses {
-    /**
-     * @var mixed data
-     */
-    private $data;
+    private $byperson = [];
 
-    /**
-     *
-     * @var array $canbecalculated True for a componentid with correct and
-     * incorrect answers.
-     */
-    private array $canbecalculated = [];
+    private $byitem = [];
+
+    private $sumbyperson = [];
+    private $sumbyitem = [];
 
     /**
      * @var array $excludeditems Componentids of items that can not be calculated.
@@ -74,167 +69,139 @@ class model_responses {
      *
      */
     public function get_item_ids(): array {
-        $userids = array_keys($this->data);
-        $questionids = [];
+        return array_keys($this->byitem);
+    }
 
-        foreach ($userids as $userid) {
-            $components = [];
-            $components = array_merge($components, array_keys($this->data[$userid]));
-            foreach ($components as $component) {
-                $questionids = array_merge(
-                    $questionids, array_keys($this->data[$userid][$component])
-                );
-            }
-        }
-
-        return array_unique($questionids);
+    public function get_person_ids(): array {
+        return array_keys($this->byperson);
     }
 
     /**
-     * Create item form array.
+     * Create from array.
      *
      * @param array $data
      *
-     * @return mixed
+     * @return self
      *
      */
-    public static function create_from_array(array $data) {
-        return (new self)->setData($data);
+    public static function create_from_array(array $data): self {
+        $object = new self();
+        foreach ($data as $userid => $components) {
+            foreach ($components as $component) {
+                foreach ($component as $componentid => $results) {
+                    $object->set($userid, $componentid, $results['fraction']);
+                }
+            }
+        }
+
+        return $object;
     }
 
-    /**
-     * Helper function to get the person IDs from the response.
-     *
-     * @return array
-     *
-     */
-    public function get_user_ids(): array {
-        return array_keys($this->data);
+    public function get_item_fraction($itemid): ?float {
+        if (!array_key_exists($itemid, $this->byitem)) {
+            return null;
+        }
+        return $this->sumbyitem[$itemid] / count($this->byitem[$itemid]);
+    }
+
+    // Limit to users: remove responses from users that are not in the given list
+    // Check again if an item is valid or not.
+    public function limit_to_users(array $personids, bool $clone = false): self {
+
+        // Instead of modifying the existing object, create a copy and modify that.
+        if ($clone) {
+            $copy = clone($this);
+            return $copy->limit_to_users($personids);
+        }
+
+        $this->byperson = array_filter($this->byperson, fn ($pid) => in_array($pid, $personids), ARRAY_FILTER_USE_KEY);
+        $this->sumbyperson = array_filter($this->sumbyperson, fn ($pid) => in_array($pid, $personids), ARRAY_FILTER_USE_KEY);
+
+        foreach ($personids as $pid) {
+            $this->recalculate_person_sum($pid);
+        }
+        foreach ($this->byitem as $itemid => $responses) {
+            $this->byitem[$itemid] = array_filter($responses, fn ($pid) => in_array($pid, $personids), ARRAY_FILTER_USE_KEY);
+            $this->recalculate_item_sum($itemid);
+
+            // Remove items that have no responses for the limited list of users.
+            if ($this->sumbyitem[$itemid] == 0.0) {
+                unset($this->byitem[$itemid]);
+                unset($this->sumbyitem[$itemid]);
+            }
+        }
+        return $this;
+    }
+
+    private function recalculate_item_sum($itemid) {
+        $this->sumbyitem[$itemid] = array_sum(array_map(fn ($r) => $r->get_response(), $this->byitem[$itemid]));
+    }
+
+    private function recalculate_person_sum(string $personid) {
+        $this->sumbyperson[$personid] = array_sum(array_map(fn ($r) => $r->get_response(), $this->byperson[$personid]));
     }
 
     /**
      * Returns an array of arrays of item responses indexed by question id.
      * So for each question ID, there is an array of model_item_response entries
      *
-     * @param model_person_param_list $personparamlist
-     *
      * @return array
      *
      */
-    public function get_item_response(model_person_param_list $personparamlist): array {
-        $itemresponse = [];
+    public function get_item_response(): array {
+        return $this->byitem;
+    }
 
-        // Restructure the data
-        // From:
-        // $data[PERSONID] -> [All responses to different items by this user]
-        // To:
-        // $data[QUESTIONID] -> [All responses to this question by different users].
-        foreach ($personparamlist->get_person_params() as $pp) {
-            $components = [];
-            if (!array_key_exists($pp->get_userid(), $this->data)) {
-                continue;
-            }
-            $responsesbyuser = $this->data[$pp->get_userid()];
-            $components = array_merge($components, $responsesbyuser);
-            foreach (array_keys($components) as $component) {
-                $questionids = array_keys($this->data[$pp->get_userid()][$component]);
-                foreach ($questionids as $questionid) {
-                    $fraction = $this->data[$pp->get_userid()][$component][$questionid]['fraction'];
-                    $itemresponse[$questionid][] = new model_item_response(
-                        $fraction, $pp
-                    );
-                }
-            }
-        }
-        return $itemresponse;
+    public function get_for_user($personid): ?array {
+        return $this->byperson[$personid] ?? null;
     }
 
     /**
-     * Set item data.
+     * Add a new user response
      *
-     * @param mixed $data
-     * @param bool $filter
-     *
-     * @return mixed
-     *
+     * @param string $personid
+     * @param string $itemid
+     * @param float $response
+     * @param ?float $ability
+     * @param string $component
+     * @return void
      */
-    public function setdata($data, bool $filter = true) {
-        $this->data = $data;
-        if (! $filter) {
-            return $this;
+    public function set(string $personid, string $itemid, float $response, ?float $ability = null, string $component = 'question') {
+        $oldresponse = 0.0;
+        if (!empty($this->byitem[$itemid][$personid])) {
+            $oldresponse = $this->byitem[$itemid][$personid]->get_response();
         }
 
-        $hascorrectanswer = [];
-        $haswronganswer = [];
-        foreach ($this->data as $userid => $components) {
-            foreach ($components as $component) {
-
-                // If the user has only correct or incorrect answers, no ability can
-                // be caluclated and the user will be filtered out.
-                $sumoffractions = array_reduce(
-                    $component,
-                    fn ($carry, $item) => $carry + floatval($item['fraction']),
-                    0.0
-                );
-                if (
-                    $sumoffractions === 0.0
-                    || intval($sumoffractions) === count($component)
-                ) {
-                    $this->removeuser($userid);
-                    continue;
-                }
-
-                foreach ($component as $componentid => $results) {
-                    if (floatval($results['fraction']) === 1.0) { // TODO: might need to be updated.
-                        $hascorrectanswer[] = $componentid;
-                    } else if (floatval($results['fraction']) === 0.0) {
-                        $haswronganswer[] = $componentid;
-                    }
-                }
-            }
+        $personparam = new model_person_param($personid);
+        if ($ability) {
+            $personparam->set_ability($ability);
         }
 
-        // Filter out items that do not have a single correct answer.
-        $hascorrectanswer = array_unique($hascorrectanswer);
-        $haswronganswer = array_unique($haswronganswer);
-        $this->canbecalculated = array_intersect($hascorrectanswer, $haswronganswer);
-        $this->excludeditems = array_diff(
-            array_unique(array_merge($hascorrectanswer, $haswronganswer)),
-            $this->canbecalculated
-        );
-
-        foreach ($this->data as $userid => $components) {
-            foreach ($components as $componentname => $component) {
-                foreach (array_keys($component) as $componentid) {
-                    if (!in_array($componentid, $this->canbecalculated)) {
-                        unset($this->data[$userid][$componentname][$componentid]);
-
-                        // If that was the only question in that component, remove the component.
-                        if (count($this->data[$userid][$componentname]) === 0) {
-                            unset($this->data[$userid][$componentname]);
-
-                            // If there are no data left for this user, remove that entry.
-                            if (count($this->data[$userid]) === 0) {
-                                $this->removeuser($userid);
-                            }
-                        }
-                    }
-                }
-            }
+        $newresponse = new model_item_response($itemid, $response, $personparam);
+        $this->byperson[$personid][$itemid] = $newresponse;
+        $this->sumbyperson[$personid] = array_key_exists($personid, $this->sumbyperson)
+            ? $this->sumbyperson[$personid] + ($response - $oldresponse)
+            : $response;
+        $this->byitem[$itemid][$personid] = $newresponse;
+        $this->sumbyitem[$itemid] = array_key_exists($itemid, $this->sumbyitem)
+            ? $this->sumbyitem[$itemid] + ($response - $oldresponse)
+            : $response;
+        // If the user has only correct or incorrect answers and is not excluded -> exclude.
+        $excludeuser = $this->sumbyperson[$personid] == 0 || $this->sumbyperson[$personid] == count($this->byperson[$personid]);
+        if ($excludeuser) {
+            $this->excludedusers[$personid] = true;
+        } else {
+            unset($this->excludedusers[$personid]);
         }
-        $this->data = $data;
 
-        return $this;
-    }
-
-    /**
-     * Return item as_array.
-     *
-     * @return array
-     *
-     */
-    public function as_array() {
-        return (array) $this->data;
+        // If the item has only correct or incorrect answers and is not excluded -> exclude.
+        $itemsum = $this->sumbyitem[$itemid];
+        $excludeitem = $itemsum == 0 || $itemsum == count($this->byitem[$itemid]);
+        if ($excludeitem) {
+            $this->excludeditems[$itemid] = true;
+        } else {
+            unset($this->excludeditems[$itemid]);
+        }
     }
 
     /**
@@ -245,7 +212,7 @@ class model_responses {
      */
     public function get_initial_person_abilities() {
         $personparamlist = new model_person_param_list();
-        foreach (array_keys($this->as_array()) as $userid) {
+        foreach (array_keys($this->byperson) as $userid) {
             $p = new model_person_param($userid);
             $personparamlist->add($p);
         }
@@ -255,17 +222,17 @@ class model_responses {
     /**
      * Get item response for person.
      *
-     * @param int $itemid
-     * @param int $personid
+     * @param string $itemid
+     * @param string $personid
      *
-     * @return mixed
+     * @return ?float
      *
      */
-    public function get_item_response_for_person(int $itemid, int $personid) {
-        if (empty($this->data[$personid]['component'][$itemid])) {
+    public function get_item_response_for_person(string $itemid, string $personid) {
+        if (empty($this->byperson[$personid][$itemid])) {
             return null;
         }
-        return floatval($this->data[$personid]['component'][$itemid]['fraction']);
+        return $this->byperson[$personid][$itemid]->get_response();
     }
 
     /**
@@ -275,30 +242,12 @@ class model_responses {
      * @return ?mixed
      */
     public function get_last_response(int $userid) {
-        if (! array_key_exists($userid, $this->data)
-            || ! array_key_exists('component', $this->data[$userid])
+        if (! array_key_exists($userid, $this->byperson)
         ) {
             return null;
         }
 
-        $responsesbyuser = $this->data[$userid]['component'];
-        return $responsesbyuser[array_key_last($responsesbyuser)];
-    }
-
-    /**
-     * Returns the itemids for which no difficulty can be calculated.
-     * @return array
-     */
-    public function get_excluded_items() {
-        return $this->excludeditems;
-    }
-
-    /**
-     * Returns the userids for which no ability can be calculated.
-     * @return array
-     */
-    public function get_excluded_users() {
-        return $this->excludedusers;
+        return $this->byperson[$userid][array_key_last($this->byperson[$userid])];
     }
 
     /**
@@ -327,18 +276,6 @@ class model_responses {
         }
         $itemparamlist = $modelstrategy->select_item_model($itemparamlists, $personparams);
         return $itemparamlist;
-    }
-
-    /**
-     * Removes the user and associated responses.
-     *
-     * @param string $userid
-     *
-     * @return void
-     */
-    private function removeuser(string $userid): void {
-        unset($this->data[$userid]);
-        $this->excludedusers[] = $userid;
     }
 
     /**
