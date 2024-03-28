@@ -101,7 +101,7 @@ class customscalefeedback extends feedbackgenerator {
                         $comment = get_string('estimatedbecause:allanswerscorrect', 'local_catquiz');
                         break;
                     case 0 :
-                        $comment = get_string('estimatedbecause:allanswerinscorrect', 'local_catquiz');
+                        $comment = get_string('estimatedbecause:allanswersincorrect', 'local_catquiz');
                         break;
                     default :
                         $comment = get_string('estimatedbecause:default', 'local_catquiz');
