@@ -68,7 +68,7 @@ class addscalestandarderror extends preselect_task implements wb_middleware {
             return $next($context);
         }
 
-        $userresponses = (new model_responses())->setdata([$context['userid'] => ['component' => $responses]], false);
+        $userresponses = model_responses::create_from_array([$context['userid'] => ['component' => $responses]]);
         foreach ($context['person_ability'] as $catscaleid => $ability) {
             $items = $userresponses->get_items_for_scale($catscaleid, $context['contextid']);
             $se = catscale::get_standarderror($ability, $items, INF);
