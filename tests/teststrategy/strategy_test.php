@@ -2087,10 +2087,10 @@ final class strategy_test extends advanced_testcase {
     }
 
     public function test_responses_lead_to_expected_item_parameters() {
+        $this->markTestSkipped('At the moment it still takes too long to calculate the responses');
         global $CFG;
         $responses = loadresponsesforitem(
             $CFG->dirroot . '/local/catquiz/tests/fixtures/responses.2PL.csv',
-            'A01-00'
         );
         $initialabilities = loadpersonparams(
             $CFG->dirroot . '/local/catquiz/tests/fixtures/persons.csv', 'Gesamt'

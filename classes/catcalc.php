@@ -125,8 +125,8 @@ class catcalc {
                 throw new \Exception(sprintf("The given model %s can not be used with the catcalc class", $item->get_model_name()));
             }
 
-            $jfuns[] = fn ($pp) => $model::log_likelihood_p($pp, $itemparams, $qresponse['fraction']);
-            $hfuns[] = fn($pp) => $model::log_likelihood_p_p($pp, $itemparams, $qresponse['fraction']);
+            $jfuns[] = fn ($pp) => $model::log_likelihood_p($pp, $itemparams, $qresponse->get_response());
+            $hfuns[] = fn($pp) => $model::log_likelihood_p_p($pp, $itemparams, $qresponse->get_response());
         }
 
         if ($jfuns === [] || $hfuns === []) {
@@ -190,7 +190,8 @@ class catcalc {
         $hessian = self::build_itemparam_hessian($itemresponse, $model);
 
         // Estimate item parameters via Newton-Raphson algorithm.
-        return mathcat::newton_raphson_multi_stable(
+        $starttime = microtime(true);
+        $result = mathcat::newton_raphson_multi_stable(
             $jacobian,
             $hessian,
             $z0,
@@ -198,6 +199,9 @@ class catcalc {
             50,
             fn ($ip) => $model::restrict_to_trusted_region($ip)
         );
+        $duration = microtime(true) - $starttime;
+        echo "Duration in newton raphson: $duration" . PHP_EOL;
+        return $result;
     }
 
     /**

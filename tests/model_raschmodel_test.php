@@ -85,8 +85,8 @@ final class model_raschmodel_test extends basic_testcase {
     public static function can_calculate_information_criteria_provider(): array {
         $personabilities = self::create_person_param_list([1 => 1, 2 => 0, 3 => -1]);
         $item = new model_item_param(1, 'XXX');
-        $responses = (new model_responses())
-            ->setdata([
+        $responses = model_responses::create_from_array(
+            [
                 '1' => [ // The personid is 1.
                     'component' => [
                         '1' => [ // The question is 1.

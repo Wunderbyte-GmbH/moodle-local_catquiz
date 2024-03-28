@@ -34,6 +34,11 @@ namespace local_catquiz\local\model;
 class model_item_response {
 
     /**
+     * @var string
+     */
+    private string $itemid;
+
+    /**
      * @var float response
      */
     private float $response;
@@ -50,9 +55,19 @@ class model_item_response {
      * @param model_person_param $personparams
      *
      */
-    public function __construct(float $response, model_person_param $personparams) {
+    public function __construct(string $itemid, float $response, model_person_param $personparams) {
+        $this->itemid = $itemid;
         $this->response = $response;
         $this->personparams = $personparams;
+    }
+
+    /**
+     * Returns the item ID.
+     *
+     * @return string
+     */
+    public function get_id(): string {
+        return $this->itemid;
     }
 
     /**
