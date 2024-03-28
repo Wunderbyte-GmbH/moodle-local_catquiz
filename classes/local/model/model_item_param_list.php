@@ -459,12 +459,12 @@ class model_item_param_list implements ArrayAccess, IteratorAggregate, Countable
      *
      * If the item has a manual override in one of the given lists, return that one.
      *
-     * @param int $itemid
+     * @param string $itemid
      * @param array<model_item_param_list> $itemparamlists
      *
      * @return ?model_item_param
      */
-    public static function get_item_override(int $itemid, array $itemparamlists): ?model_item_param {
+    public static function get_item_override(string $itemid, array $itemparamlists): ?model_item_param {
         $items = [];
         foreach ($itemparamlists as $itemparams) {
             if (! $itemparams[$itemid]) {

@@ -413,7 +413,7 @@ class catcontext {
     public function get_strategy(int $catscaleid): model_strategy {
         $catscaleids = [$catscaleid, ...catscale::get_subscale_ids($catscaleid)];
         $responsedata = self::getresponsedatafromdb($this->id, $catscaleids);
-        $responses = (new model_responses())->setdata($responsedata);
+        $responses = model_responses::create_from_array($responsedata);
         $options = json_decode($this->json, true) ?? [];
         $savedabilities = model_person_param_list::load_from_db($this->id, $catscaleids);
         $installedmodels = model_strategy::get_installed_models();

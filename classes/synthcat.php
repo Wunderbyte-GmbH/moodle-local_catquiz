@@ -291,14 +291,14 @@ class synthcat {
 
         for ($i = 1; $i <= $numpos; $i++) {
 
-            $tmpitemresponse = new model_item_response(1, $personability);
+            $tmpitemresponse = new model_item_response("correct_$i", 1, $personability);
             array_push($list, $tmpitemresponse);
 
         }
 
         for ($i = 1; $i <= $numneg; $i++) {
 
-            $tmpitemresponse = new model_item_response(0, $personability);
+            $tmpitemresponse = new model_item_response("incorrect_$i", 0, $personability);
             array_push($list, $tmpitemresponse);
 
         }

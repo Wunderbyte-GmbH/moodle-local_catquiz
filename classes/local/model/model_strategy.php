@@ -92,7 +92,7 @@ class model_strategy {
     /**
      * @var int iterations
      */
-    private int $iterations = 0;
+    private int $iterations = 2;
 
     /**
      * @var string|null modeloverride
@@ -381,13 +381,13 @@ class model_strategy {
     /**
      * Select item from override.
      *
-     * @param int $itemid
+     * @param string $itemid
      * @param array $itemdifflists
      *
      * @return mixed
      *
      */
-    private function select_item_from_override(int $itemid, array $itemdifflists) {
+    private function select_item_from_override(string $itemid, array $itemdifflists) {
         global $CFG;
         if ($item = model_item_param_list::get_item_override($itemid, $itemdifflists)) {
             return $item;

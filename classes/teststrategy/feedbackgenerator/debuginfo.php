@@ -290,7 +290,7 @@ class debuginfo extends feedbackgenerator {
                 : "NA";
 
             $lastresponse = isset($data['lastresponse'])
-                ? $data['lastresponse']['fraction']
+                ? $data['lastresponse']->get_response()
                 : "NA";
 
             if ($data['lastquestion']) {

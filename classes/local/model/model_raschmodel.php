@@ -201,7 +201,15 @@ abstract class model_raschmodel extends model_model implements catcalc_item_esti
         model_person_param_list $personparams,
         ?model_item_param_list $olditemparams = null): model_item_param_list {
         $estimateditemparams = new model_item_param_list();
-        foreach ($this->responses->get_item_response($personparams) as $itemid => $itemresponse) {
+        $estimationstart = microtime(true);
+        $personids = array_keys($personparams->get_person_params());
+        $testcount = 0;
+        foreach ($this->responses->limit_to_users($personids, true)->get_item_response() as $itemid => $itemresponse) {
+            $testcount++;
+            if ($testcount > 25) {
+                break;
+            }
+            $itemstart = microtime(true);
             $oldparam = $olditemparams[$itemid] ?? null;
             if ($oldparam && $oldparam->get_status() >= LOCAL_CATQUIZ_STATUS_CALCULATED) {
                 $estimateditemparams->add($oldparam);
@@ -219,7 +227,11 @@ abstract class model_raschmodel extends model_model implements catcalc_item_esti
             }
             // ... and append it to the list of calculated item difficulties
             $estimateditemparams->add($param);
+            $itemduration = microtime(true) - $itemstart;
+            echo "Duration for item $itemid: $itemduration" . PHP_EOL;
         }
+        $totalduration = microtime(true) - $estimationstart;
+        echo "Duration for whole calculation: $totalduration" . PHP_EOL;
         return $estimateditemparams;
     }
 

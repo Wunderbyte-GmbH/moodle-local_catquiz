@@ -46,18 +46,21 @@ class model_person_ability_estimator_catcalc extends model_person_ability_estima
      */
     public function get_person_abilities(model_item_param_list $itemparamlist): model_person_param_list {
         $personparamlist = new model_person_param_list();
-        $responses = $this->responses->as_array();
-        foreach ($responses as $userid => $itemresponse) {
-            foreach (array_keys($itemresponse) as $component) {
-                $ability = catcalc::estimate_person_ability(
-                    $itemresponse[$component],
-                    $itemparamlist
-                );
-                $p = new model_person_param($userid);
-                $p->set_ability($ability);
-                $personparamlist->add($p);
-            }
+        $estimationstart = microtime(true);
+        foreach ($this->responses->get_person_ids() as $personid) {
+            $personstart = microtime(true);
+            $ability = catcalc::estimate_person_ability(
+                $this->responses->get_for_user($personid),
+                $itemparamlist
+            );
+            $p = new model_person_param($personid);
+            $p->set_ability($ability);
+            $personparamlist->add($p);
+            $personduration = microtime(true) - $personstart;
+            echo "Estimation time for ability for person $personid: $personduration" . PHP_EOL;
         }
+        $timeestimation = microtime(true) - $estimationstart;
+        echo "Total estimation time for person abilities in one iteration: $timeestimation" . PHP_EOL;
         return $personparamlist;
     }
 }

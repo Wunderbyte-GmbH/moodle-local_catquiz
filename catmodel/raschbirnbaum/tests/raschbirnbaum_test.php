@@ -59,7 +59,7 @@ class raschbirnbaum_test extends TestCase {
     public static function calculate_params_returns_expected_values_provider(): array {
         return [
                 [
-                    'itemresponse' => [new model_item_response(0.3, (new model_person_param(1))->set_ability(0.2))],
+                    'itemresponse' => [new model_item_response('Item1', 0.3, (new model_person_param(1))->set_ability(0.2))],
                     'expected' => ['difficulty' => 1.4974, 'discrimination' => 3.0],
                 ]
         ];

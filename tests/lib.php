@@ -68,35 +68,51 @@ function loadresponsesforperson($filename, $person = 0) {
  * Parses a CSV and returns a model_response object for the given item.
  *
  * @param string $filename The file to load the responses from.
- * @param string $label  The label of the item.
  * @return model_responses
  */
-function loadresponsesforitem($filename, $label, $scale = 'Gesamt'): model_responses {
+function loadresponsesforitem(string $filename): model_responses {
     global $CFG;
     if (($handle = fopen($filename, "r")) === false) {
         throw new UnexpectedValueException("Can not open file: " . $filename);
     }
 
     $row = 0;
-    $responses = [];
-    $labelindex = null;
-    $personparams = loadpersonparams($CFG->dirroot . '/local/catquiz/tests/fixtures/persons.csv', $scale);
-    $arr = [];
+    $labels = [];
+    $astart = microtime(true);
+    $mr2 = new model_responses();
     while (($data = fgetcsv($handle, 0, ";")) !== false) {
         $row++;
         if ($row == 1) {
-            $labelindex = array_search($label, $data);
+            $labels = array_slice($data, 1);
             continue;
         }
-        $personid = $row - 2;
-        $pp = $personparams[$personid];
-        $response = $data[$labelindex];
-        $responses[] = new model_item_response($response, $pp);
-        $catscaleid = 1; // TODO: At the moment they do not have a scale id.
-        $arr[$personid] = ['question' => [$catscaleid => ['fraction' => $response]]];
+        $personid = $data[0];
+        foreach (array_slice($data, 1) as $index => $response) {
+            $mr2->set($personid, $labels[$index], $response);
+        }
     }
-    fclose($handle);
+    $aend = microtime(true);
+    echo $aend - $astart . PHP_EOL;
+    rewind($handle);
+    $row = 0;
+    $arr = [];
+    $labels = [];
+    $bstart = microtime(true);
+    while (($data = fgetcsv($handle, 0, ";")) !== false) {
+        $row++;
+        if ($row == 1) {
+            $labels = array_slice($data, 1);
+            continue;
+        }
+        $personid = $data[0];
+        foreach (array_slice($data, 1) as $index => $response) {
+            $arr[$personid]['question'][$labels[$index]] = ['fraction' => $response];
+        }
+    }
     $mr = model_responses::create_from_array($arr);
+    $bend = microtime(true);
+    echo $bend - $bstart . PHP_EOL;
+    fclose($handle);
     return $mr;
 }
 
@@ -124,7 +140,8 @@ function loadpersonparams(string $filename, string $scale): model_person_param_l
             $labelindex = array_search($scale, $data);
             continue;
         }
-        $pp = (new model_person_param($row - 2))->set_ability($data[$labelindex]); // Use $row as personid.
+        $personid = $data[0];
+        $pp = (new model_person_param($personid))->set_ability($data[$labelindex]);
         $personparams->add($pp);
     }
     fclose($handle);
