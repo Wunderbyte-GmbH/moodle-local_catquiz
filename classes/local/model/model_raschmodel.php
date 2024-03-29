@@ -317,7 +317,7 @@ abstract class model_raschmodel extends model_model implements catcalc_item_esti
                 $estimateditemparams->add($oldparam);
                 continue;
             }
-            $parameters = $this->calculate_params($itemresponse);
+            $parameters = $this->calculate_params($itemresponse, $oldparam);
             // Now create a new item difficulty object (param).
             $param = $this
                 ->create_item_param($itemid)
@@ -341,9 +341,10 @@ abstract class model_raschmodel extends model_model implements catcalc_item_esti
      * Returns the item parameters as associative array, with the parameter name as key.
      *
      * @param mixed $itemresponse
+     * @param ?model_item_param_list $startvalue
      * @return array
      */
-    abstract protected function calculate_params($itemresponse): array;
+    abstract protected function calculate_params($itemresponse, ?model_item_param_list $startvalue = null): array;
 
     /**
      * Likelihood.
