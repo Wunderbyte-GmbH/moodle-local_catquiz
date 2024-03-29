@@ -168,15 +168,15 @@ class updatepersonability extends preselect_task implements wb_middleware {
             return $next($context);
         }
 
-        $this->userresponses = model_responses::create_from_array(
-            [$context['userid'] => ['component' => $this->progress->get_user_responses()]]
-        );
-        $context['lastresponse'] = $this->userresponses->get_last_response($context['userid']);
-
         if (!empty($this->progress->get_last_question()->is_pilot)) {
             $context['skip_reason'] = 'pilotquestion';
             return $next($context);
         }
+
+        $this->userresponses = model_responses::create_from_array(
+            [$context['userid'] => ['component' => $this->progress->get_user_responses()]]
+        );
+        $context['lastresponse'] = $this->userresponses->get_last_response($context['userid']);
 
         $this->arrayresponses = $this->userresponses->get_for_user($context['userid']);
 

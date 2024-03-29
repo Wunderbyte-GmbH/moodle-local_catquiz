@@ -31,6 +31,8 @@ use coding_exception;
 use Exception;
 use local_catquiz\local\model\model_item_param;
 use local_catquiz\local\model\model_item_param_list;
+use local_catquiz\local\model\model_item_response;
+use local_catquiz\local\model\model_person_param;
 use local_catquiz\local\model\model_responses;
 use moodle_exception;
 use SebastianBergmann\RecursionContext\InvalidArgumentException;
@@ -231,11 +233,13 @@ class catcalc_test extends basic_testcase {
                     $items = clone($steps[$person][$step - 1]['items']);
                     $items->add($item);
                     $responses = $steps[$person][$step - 1]['responses'];
-                    $responses[$itemid] = ['fraction' => floatval($fraction)];
+                    $responses[$itemid] = new model_item_response($itemid, floatval($fraction), new model_person_param($person));
                     $startvalue = $steps[$person][$step - 1]['expected_ability'];
                 } else {
                     $items = (new model_item_param_list())->add($item);
-                    $responses = [$itemid => ['fraction' => floatval($fraction)]];
+                    $responses = [
+                        $itemid => new model_item_response($itemid, floatval($fraction), new model_person_param($person))
+                    ];
                     $startvalue = $mean;
                 }
                 $steps[$person][$step]['items'] = $items;
