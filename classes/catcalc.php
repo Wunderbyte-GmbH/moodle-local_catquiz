@@ -211,7 +211,7 @@ class catcalc {
     /**
      * Builds the jacobian function for item params and the given model.
      *
-     * @param array<model_item_response> $itemresponse
+     * @param array $itemresponse
      * @param catcalc_item_estimator $model
      *
      * @return Closure
