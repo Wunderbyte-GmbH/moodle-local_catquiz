@@ -132,13 +132,12 @@ class model_responses {
     /**
      * Remove responses from users that are not in the given list
      *
-     * @param array $personids Array if person IDs.
+     * @param array $personids Array of person IDs.
      * @param bool $clone If true, do not modify the existing object but return a copy instead.
      *
      * @return self
      */
     public function limit_to_users(array $personids, bool $clone = false): self {
-
         // Instead of modifying the existing object, create a copy and modify that.
         if ($clone) {
             $copy = clone($this);
@@ -148,9 +147,6 @@ class model_responses {
         $this->byperson = array_filter($this->byperson, fn ($pid) => in_array($pid, $personids), ARRAY_FILTER_USE_KEY);
         $this->sumbyperson = array_filter($this->sumbyperson, fn ($pid) => in_array($pid, $personids), ARRAY_FILTER_USE_KEY);
 
-        foreach ($personids as $pid) {
-            $this->recalculate_person_sum($pid);
-        }
         foreach ($this->byitem as $itemid => $responses) {
             $this->byitem[$itemid] = array_filter($responses, fn ($pid) => in_array($pid, $personids), ARRAY_FILTER_USE_KEY);
             $this->recalculate_item_sum($itemid);
@@ -159,6 +155,37 @@ class model_responses {
             if ($this->sumbyitem[$itemid] == 0.0) {
                 unset($this->byitem[$itemid]);
                 unset($this->sumbyitem[$itemid]);
+            }
+        }
+        return $this;
+    }
+
+    /**
+     * Remove responses from items that are not in the given list
+     *
+     * @param array $itemids Array of item IDs.
+     * @param bool $clone If true, do not modify the existing object but return a copy instead.
+     *
+     * @return self
+     */
+    public function limit_to_items(array $itemids, bool $clone = false): self {
+        // Instead of modifying the existing object, create a copy and modify that.
+        if ($clone) {
+            $copy = clone($this);
+            return $copy->limit_to_items($itemids);
+        }
+
+        $this->byitem = array_filter($this->byitem, fn ($iid) => in_array($iid, $itemids), ARRAY_FILTER_USE_KEY);
+        $this->sumbyitem = array_filter($this->sumbyitem, fn ($iid) => in_array($iid, $itemids), ARRAY_FILTER_USE_KEY);
+
+        foreach ($this->byperson as $pid => $responses) {
+            $this->byperson[$pid] = array_filter($responses, fn ($iid) => in_array($iid, $itemids), ARRAY_FILTER_USE_KEY);
+            $this->recalculate_person_sum($pid);
+
+            // Remove persons that have no responses for the limited list of items.
+            if ($this->sumbyperson[$pid] == 0.0) {
+                unset($this->byperson[$pid]);
+                unset($this->sumbyperson[$pid]);
             }
         }
         return $this;
