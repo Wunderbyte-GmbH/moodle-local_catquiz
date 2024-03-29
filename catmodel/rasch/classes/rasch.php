@@ -53,12 +53,13 @@ class rasch extends model_raschmodel {
      * Estimate item parameters
      *
      * @param mixed $itemresponse
+     * @param ?model_item_param_list $startvalue
      *
      * @return array
      *
      */
-    public function calculate_params($itemresponse): array {
-        return catcalc::estimate_item_params($itemresponse, $this);
+    public function calculate_params($itemresponse, ?model_item_param_list $startvalue = null): array {
+        return catcalc::estimate_item_params($itemresponse, $this, $startvalue);
     }
 
     /**
