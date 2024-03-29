@@ -164,7 +164,7 @@ class rasch_test extends TestCase {
     /**
      * Test least_mean_squares_1st_derivative_ip function.
      *
-     * @dataProvider least_mean_squares_1st_derivative_ip_provider
+     * @dataProvider least_mean_squares_2nd_derivative_ip_provider
      *
      * @param int $n
      * @param array $pp
@@ -218,7 +218,7 @@ class rasch_test extends TestCase {
                 'ip' => [
                     "difficulty" => -2.5,
                 ],
-                'expected' => 0.5968974,
+                'expected' => -4.092074,
             ],
             "testcase4" => [
                 'n' => 27,
@@ -227,7 +227,7 @@ class rasch_test extends TestCase {
                 'ip' => [
                     "difficulty" => -2.5,
                 ],
-                'expected' => 0.2227782,
+                'expected' => 4.156557,
             ],
             "testcase5" => [
                 'n' => 3,
@@ -295,7 +295,7 @@ class rasch_test extends TestCase {
             "testcase1" => [
                 'n' => 5,
                 'pp' => ['ability' => -3],
-                'k' => 1,
+                'k' => 0.3,
                 'ip' => [
                     "difficulty" => -2.5,
                 ],
@@ -317,7 +317,7 @@ class rasch_test extends TestCase {
                 'ip' => [
                     "difficulty" => -2.5,
                 ],
-                'expected' => 0.5968974,
+                'expected' => 1.980019,
             ],
             "testcase4" => [
                 'n' => 27,
@@ -326,7 +326,7 @@ class rasch_test extends TestCase {
                 'ip' => [
                     "difficulty" => -2.5,
                 ],
-                'expected' => 0.2227782,
+                'expected' => 4.000263,
             ],
             "testcase5" => [
                 'n' => 3,
