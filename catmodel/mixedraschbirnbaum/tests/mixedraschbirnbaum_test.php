@@ -56,12 +56,17 @@ final class mixedraschbirnbaum_test extends TestCase {
         $this->assertEqualsWithDelta($expected['guessing'], $result['guessing'], 0.0001);
     }
 
+    /**
+     * Provider for test_calculate_params_returns_expected_values
+     *
+     * @return array
+     */
     public static function calculate_params_returns_expected_values_provider(): array {
         return [
                 [
                     'itemresponse' => [new model_item_response('Item1', 0.3, (new model_person_param(1))->set_ability(0.2))],
                     'expected' => ['difficulty' => 1.2041, 'discrimination' => 3.0, 'guessing' => 0.0],
-                ]
+                ],
         ];
     }
 
