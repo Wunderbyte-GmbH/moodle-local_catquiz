@@ -51,6 +51,7 @@ class model_item_response {
     /**
      * Set parameters for class instance.
      *
+     * @param string $itemid
      * @param float $response
      * @param model_person_param $personparams
      *
