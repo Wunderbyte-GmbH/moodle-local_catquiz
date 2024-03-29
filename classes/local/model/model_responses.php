@@ -160,28 +160,6 @@ class model_responses {
     }
 
     /**
-     * Recalculate the internal sumbyitem counter for the item with the given ID.
-     *
-     * @param string $itemid
-     *
-     * @return void
-     */
-    private function recalculate_item_sum(string $itemid) {
-        $this->sumbyitem[$itemid] = array_sum(array_map(fn ($r) => $r->get_response(), $this->byitem[$itemid]));
-    }
-
-    /**
-     * Recalculate the internal sumbyperson counter for the person with the given ID.
-     *
-     * @param string $personid
-     *
-     * @return void
-     */
-    private function recalculate_person_sum(string $personid) {
-        $this->sumbyperson[$personid] = array_sum(array_map(fn ($r) => $r->get_response(), $this->byperson[$personid]));
-    }
-
-    /**
      * Returns an array of arrays of item responses indexed by question id.
      * So for each question ID, there is an array of model_item_response entries
      *
@@ -325,4 +303,27 @@ class model_responses {
         $itemparamlist = $modelstrategy->select_item_model($itemparamlists, $personparams);
         return $itemparamlist;
     }
+
+    /**
+     * Recalculate the internal sumbyitem counter for the item with the given ID.
+     *
+     * @param string $itemid
+     *
+     * @return void
+     */
+    private function recalculate_item_sum(string $itemid) {
+        $this->sumbyitem[$itemid] = array_sum(array_map(fn ($r) => $r->get_response(), $this->byitem[$itemid]));
+    }
+
+    /**
+     * Recalculate the internal sumbyperson counter for the person with the given ID.
+     *
+     * @param string $personid
+     *
+     * @return void
+     */
+    private function recalculate_person_sum(string $personid) {
+        $this->sumbyperson[$personid] = array_sum(array_map(fn ($r) => $r->get_response(), $this->byperson[$personid]));
+    }
+
 }
