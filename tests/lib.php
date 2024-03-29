@@ -123,6 +123,7 @@ function loadresponsesforitem(string $filename): model_responses {
  * model_person_param object.
  *
  * @param string $filename
+ * @param string $scale
  * @return model_person_param_list
  * @throws UnexpectedValueException
  */

@@ -40,11 +40,24 @@ use local_catquiz\local\model\model_person_param_list;
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class model_responses {
-    private $byperson = [];
+    /**
+     * @var array $byperson holds the responses indexed by person IDs.
+     */
+    private array $byperson = [];
 
-    private $byitem = [];
+    /**
+     * @var array $byitem Holds the responses indexed by item IDs.
+     */
+    private array $byitem = [];
 
-    private $sumbyperson = [];
+    /**
+     * @var array $sumbyperson Sum of responses indexed by person IDs.
+     */
+    private array $sumbyperson = [];
+
+    /**
+     * @var array $sumbyitem Sum of responses indexed by item IDs.
+     */
     private $sumbyitem = [];
 
     /**
@@ -67,6 +80,9 @@ class model_responses {
         return array_keys($this->byitem);
     }
 
+    /**
+     * Return the person IDs of the saved responses
+     */
     public function get_person_ids(): array {
         return array_keys($this->byperson);
     }
@@ -92,15 +108,30 @@ class model_responses {
         return $object;
     }
 
-    public function get_item_fraction($itemid): ?float {
+    /**
+     * Return the fraction of the item with the given ID.
+     *
+     * Returns null if that item is not found.
+     *
+     * @param string $itemid
+     *
+     * @return ?float
+     */
+    public function get_item_fraction(string $itemid): ?float {
         if (!array_key_exists($itemid, $this->byitem)) {
             return null;
         }
         return $this->sumbyitem[$itemid] / count($this->byitem[$itemid]);
     }
 
-    // Limit to users: remove responses from users that are not in the given list
-    // Check again if an item is valid or not.
+    /**
+     * Remove responses from users that are not in the given list
+     *
+     * @param array $personids Array if person IDs.
+     * @param bool $clone If true, do not modify the existing object but return a copy instead.
+     *
+     * @return self
+     */
     public function limit_to_users(array $personids, bool $clone = false): self {
 
         // Instead of modifying the existing object, create a copy and modify that.
@@ -128,10 +159,24 @@ class model_responses {
         return $this;
     }
 
-    private function recalculate_item_sum($itemid) {
+    /**
+     * Recalculate the internal sumbyitem counter for the item with the given ID.
+     *
+     * @param string $itemid
+     *
+     * @return void
+     */
+    private function recalculate_item_sum(string $itemid) {
         $this->sumbyitem[$itemid] = array_sum(array_map(fn ($r) => $r->get_response(), $this->byitem[$itemid]));
     }
 
+    /**
+     * Recalculate the internal sumbyperson counter for the person with the given ID.
+     *
+     * @param string $personid
+     *
+     * @return void
+     */
     private function recalculate_person_sum(string $personid) {
         $this->sumbyperson[$personid] = array_sum(array_map(fn ($r) => $r->get_response(), $this->byperson[$personid]));
     }
@@ -141,13 +186,21 @@ class model_responses {
      * So for each question ID, there is an array of model_item_response entries
      *
      * @return array
-     *
      */
     public function get_item_response(): array {
         return $this->byitem;
     }
 
-    public function get_for_user($personid): ?array {
+    /**
+     * Returns the responses for the user with the given person ID.
+     *
+     * If the person is not found, returns null.
+     *
+     * @param string $personid
+     *
+     * @return ?array
+     */
+    public function get_for_user(string $personid): ?array {
         return $this->byperson[$personid] ?? null;
     }
 

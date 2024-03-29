@@ -62,7 +62,7 @@ class raschbirnbaum extends model_raschmodel {
      * Estimate item parameters
      *
      * @param mixed $itemresponse
-     * @param ?model_item_param_list $startvalues
+     * @param ?model_item_param_list $startvalue
      *
      * @return array
      *

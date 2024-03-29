@@ -28,10 +28,9 @@ namespace local_catquiz\local\model;
 use basic_testcase;
 
 /**
+ * Contains tests for the model_responses class.
  *
  * @package local_catquiz
- *
- *
  * @covers \local_catquiz\local\model\model_item_param_list
  */
 class model_responses_test extends basic_testcase {
