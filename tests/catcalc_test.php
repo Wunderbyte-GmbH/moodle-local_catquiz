@@ -238,7 +238,7 @@ class catcalc_test extends basic_testcase {
                 } else {
                     $items = (new model_item_param_list())->add($item);
                     $responses = [
-                        $itemid => new model_item_response($itemid, floatval($fraction), new model_person_param($person))
+                        $itemid => new model_item_response($itemid, floatval($fraction), new model_person_param($person)),
                     ];
                     $startvalue = $mean;
                 }
