@@ -140,7 +140,7 @@ class mixedraschbirnbaum_test extends TestCase {
     }
 
     /**
-     * Test least_mean_squares_1st_derivative_ip function.
+     * Test least_mean_squares_2nd_derivative_ip function.
      * @dataProvider least_mean_squares_2nd_derivative_ip_provider
      * @param int $n
      * @param array $pp
@@ -173,7 +173,7 @@ class mixedraschbirnbaum_test extends TestCase {
                 'ip' => [
                     "difficulty" => -2.5,
                     "discrimination" => 0.7,
-                    "guessing" => 1.181301,
+                    "guessing" => 0.15,
                 ],
                 'expected' => [-0.2905559, -0.2075399, 1.181301],
             ],
@@ -184,7 +184,7 @@ class mixedraschbirnbaum_test extends TestCase {
                 'ip' => [
                     "difficulty" => -2.5,
                     "discrimination" => 0.7,
-                    "guessing" => 1.181301,
+                    "guessing" => 0.15,
                 ],
                 'expected' => [0.6473028, 0.4623591, -2.631713],
             ],
@@ -195,7 +195,7 @@ class mixedraschbirnbaum_test extends TestCase {
                 'ip' => [
                     "difficulty" => -2.5,
                     "discrimination" => 2.0,
-                    "guessing" => 1.181301,
+                    "guessing" => 0.25,
                 ],
                 'expected' => [-7.935613, 1.983903, 7.236641],
             ],
@@ -206,7 +206,7 @@ class mixedraschbirnbaum_test extends TestCase {
                 'ip' => [
                     "difficulty" => -2.5,
                     "discrimination" => 2.0,
-                    "guessing" => 1.181301,
+                    "guessing" => 0.25,
                 ],
                 'expected' => [2.416005, -0.6040013, -2.203202],
             ],
@@ -217,7 +217,7 @@ class mixedraschbirnbaum_test extends TestCase {
                 'ip' => [
                     "difficulty" => 0.5,
                     "discrimination" => 2.5,
-                    "guessing" => 1.181301,
+                    "guessing" => 0.35,
                 ],
                 'expected' => [-0.9140625, -9.167132e-13, 1.125],
             ],
@@ -228,9 +228,9 @@ class mixedraschbirnbaum_test extends TestCase {
                 'ip' => [
                     "difficulty" => 0.5,
                     "discrimination" => 2.5,
-                    "guessing" => 1.181301,
+                    "guessing" => 0.35,
                 ],
-                'expected' => [2.416005, -0.6040013, -2.203202],
+                'expected' => [0.6703125, -2.291783e-13, -0.825],
             ],
             "testcase7" => [
                 'n' => 1,
@@ -239,7 +239,7 @@ class mixedraschbirnbaum_test extends TestCase {
                 'ip' => [
                     "difficulty" => -1,
                     "discrimination" => 2,
-                    "guessing" => 1.181301,
+                    "guessing" => 0.05,
                 ],
                 'expected' => [-0.01752321, 0.02190401, 0.009284882],
             ],
@@ -250,7 +250,7 @@ class mixedraschbirnbaum_test extends TestCase {
                 'ip' => [
                     "difficulty" => -1,
                     "discrimination" => 2,
-                    "guessing" => 1.181301,
+                    "guessing" => 0.05,
                 ],
                 'expected' => [-0.001102506, 0.001378132, 0.000584176],
             ],
@@ -261,7 +261,7 @@ class mixedraschbirnbaum_test extends TestCase {
                 'ip' => [
                     "difficulty" => 1.5,
                     "discrimination" => 1.5,
-                    "guessing" => 1.181301,
+                    "guessing" => 0.25,
                 ],
                 'expected' => [-6.75377, 9.005026, 6.30224],
             ],
@@ -272,7 +272,7 @@ class mixedraschbirnbaum_test extends TestCase {
                 'ip' => [
                     "difficulty" => 1.5,
                     "discrimination" => 1.5,
-                    "guessing" => 1.181301,
+                    "guessing" => 0.25,
                 ],
                 'expected' => [-0.1466834, 0.1955778, 0.1368767],
             ],
@@ -280,7 +280,7 @@ class mixedraschbirnbaum_test extends TestCase {
     }
 
     /**
-     * Provider function for least_mean_squares_1st_derivative_ip
+     * Provider function for least_mean_squares_2nd_derivative_ip
      * @return array
      */
     public static function least_mean_squares_2nd_derivative_ip_provider():array {
@@ -322,7 +322,7 @@ class mixedraschbirnbaum_test extends TestCase {
                 'ip' => [
                     "difficulty" => -2.5,
                     "discrimination" => 2.0,
-                    "guessing" => 0.15,
+                    "guessing" => 0.25,
                 ],
                 'expected' => [
                     [-2.637631, -3.308399, 6.297773],
@@ -337,7 +337,7 @@ class mixedraschbirnbaum_test extends TestCase {
                 'ip' => [
                     "difficulty" => -2.5,
                     "discrimination" => 2.0,
-                    "guessing" => 0.15,
+                    "guessing" => 0.25,
                 ],
                 'expected' => [
                     [6.9296894, -0.5244198, -7.504385],
@@ -355,9 +355,9 @@ class mixedraschbirnbaum_test extends TestCase {
                     "guessing" => 0.35,
                 ],
                 'expected' => [
-                    [2.34375, -0.30000, 0.1875000],
-                    [-0.30000, 1.833426e-13, -3.552714e-15],
-                    [0.1875000, -3.552714e-15, 1.500000e+00],
+                    [ 0.9902344, -3.656250e-01,  1.875000e-01],
+                    [-0.3656250, -3.666853e-13, -3.552714e-15],
+                    [ 0.1875000, -3.552714e-15,  1.500000e+00],
                 ],
             ],
             "testcase6" => [
@@ -370,9 +370,9 @@ class mixedraschbirnbaum_test extends TestCase {
                     "guessing" => 0.35,
                 ],
                 'expected' => [
-                    [2.34375, 0.67500, 1.500000e+00],
-                    [0.67500, -1.833426e-12, 1.500000e+00],
-                    [1.500000e+00, 1.500000e+00, 1.500000e+00],
+                    [ 0.9902344,  2.681250e-01, -2.250000e+00],
+                    [ 0.2681250, -8.250419e-13,  3.552714e-15],
+                    [-2.2500000,  3.552714e-15,  1.500000e+00],
                 ],
             ],
             "testcase7" => [
@@ -385,9 +385,9 @@ class mixedraschbirnbaum_test extends TestCase {
                     "guessing" => 0.05,
                 ],
                 'expected' => [
-                    [-0.03602602, 0.03581423, 0.03581423],
-                    [0.03581423, -0.05629065, -0.05629065],
-                    [0.03581423, -0.05629065, -0.05629065],
+                    [-0.03425819,  0.03406114,  1.827640e-02],
+                    [ 0.03406114, -0.05352842, -2.284550e-02],
+                    [ 0.01827640, -0.02284550,  8.954913e-05],
                 ],
             ],
             "testcase8" => [
@@ -400,9 +400,9 @@ class mixedraschbirnbaum_test extends TestCase {
                     "guessing" => 0.05,
                 ],
                 'expected' => [
-                    [-0.001918863, 0.001822762, 0.001822762],
-                    [0.001822762, -0.002998223, -0.002998223],
-                    [0.001822762, -0.002998223, -0.002998223],
+                    [-0.0018563961,  0.001769242,  9.914535e-04],
+                    [ 0.0017692422, -0.002900619, -1.239317e-03],
+                    [ 0.0009914535, -0.001239317,  8.958843e-05],
                 ],
             ],
             "testcase9" => [
@@ -415,9 +415,9 @@ class mixedraschbirnbaum_test extends TestCase {
                     "guessing" => 0.25,
                 ],
                 'expected' => [
-                    [0.3174553, -0.5210626, -0.2864942],
-                    [-0.5210626, 0.5643649, 0.3819923],
-                    [-0.2864942, 0.3819923, 0.4498427],
+                    [-8.653134,   7.034999,   8.5229544],
+                    [ 7.034999, -15.383349, -11.3639392],
+                    [ 8.522954, -11.363939,   0.4498426],
                 ],
             ],
             "testcase10" => [
@@ -430,9 +430,9 @@ class mixedraschbirnbaum_test extends TestCase {
                     "guessing" => 0.25,
                 ],
                 'expected' => [
-                    [0.8710517, -1.184660, -1.1846604],
-                    [-1.184660, 1.548536, 1.548536],
-                    [-1.1846604, 1.548536, 1.548536],
+                    [ 0.3174553, -0.5210626, -0.2864942],
+                    [-0.5210626,  0.5643649,  0.3819923],
+                    [-0.2864942,  0.3819923,  0.4498427],
                 ],
             ],
         ];
@@ -684,7 +684,7 @@ class mixedraschbirnbaum_test extends TestCase {
             ],
             // Add the remaining test cases...
             "testcase 3" => [
-                'pp' => ['ability' => 0.5],
+                'pp' => ['ability' => -2.0],
                 'k' => 1,
                 'ip' => [
                     "difficulty" => -2.5,
@@ -694,7 +694,7 @@ class mixedraschbirnbaum_test extends TestCase {
                 'expected' => [-0.3694352, 0.09235881, 0.3368952],
             ],
             "testcase 4" => [
-                'pp' => ['ability' => 0.5],
+                'pp' => ['ability' => -2.0],
                 'k' => 0,
                 'ip' => [
                     "difficulty" => -2.5,
@@ -745,24 +745,24 @@ class mixedraschbirnbaum_test extends TestCase {
             ],
             // Add the remaining test cases...
             "testcase 9" => [
-                'pp' => ['ability' => 4.5],
+                'pp' => ['ability' => 3.5],
                 'k' => 1,
                 'ip' => [
-                    "difficulty" => 0.00,
-                    "discrimination" => 1.00,
-                    "guessing" => 0.10,
+                    "difficulty" => 1.5,
+                    "discrimination" => 1.5,
+                    "guessing" => 0.25,
                 ],
-                'expected' => [0.06338283, 0.02728076, -0.02040469],
+                'expected' => [-0.05269819, 0.07026425, 0.049175],
             ],
             "testcase 10" => [
-                'pp' => ['ability' => 4.5],
+                'pp' => ['ability' => 3.5],
                 'k' => 0,
                 'ip' => [
-                    "difficulty" => 0.00,
-                    "discrimination" => 1.00,
-                    "guessing" => 0.10,
+                    "difficulty" => 1.5,
+                    "discrimination" => 1.5,
+                    "guessing" => 0.25,
                 ],
-                'expected' => [0.06338283, 0.02728076, -0.02040469],
+                'expected' => [1.428861, -1.905148, -1.333333],
             ],
         ];
     }
@@ -803,7 +803,7 @@ class mixedraschbirnbaum_test extends TestCase {
                 ],
             ],
             "testcase 3" => [
-                'pp' => ['ability' => 0.5],
+                'pp' => ['ability' => -2.0],
                 'k' => 1,
                 'ip' => [
                     "difficulty" => -2.5,
@@ -817,7 +817,7 @@ class mixedraschbirnbaum_test extends TestCase {
                 ],
             ],
             "testcase 4" => [
-                'pp' => ['ability' => 0.5],
+                'pp' => ['ability' => -2.0],
                 'k' => 0,
                 'ip' => [
                     "difficulty" => -2.5,
@@ -825,9 +825,9 @@ class mixedraschbirnbaum_test extends TestCase {
                     "guessing" => 0.25,
                 ],
                 'expected' => [
-                    [-2.659223e-02, 1.026547e+00, -2.186663e-08],
-                    [1.026547e+00, -4.155035e-02, -1.338774e-08],
-                    [-2.186663e-08, -1.338774e-08, -1.108033e+00],
+                    [-7.864477e-01,  9.276705e-01, -1.999467e-11],
+                    [ 9.276705e-01, -4.915298e-02,  3.759126e-11],
+                    [-1.999467e-11,  3.759126e-11, -1.777778e+00],
                 ],
             ],
             "testcase 5" => [
@@ -888,31 +888,31 @@ class mixedraschbirnbaum_test extends TestCase {
             ],
             // Add the remaining test cases...
             "testcase 9" => [
-                'pp' => ['ability' => 4.5],
+                'pp' => ['ability' => 3.5],
                 'k' => 1,
                 'ip' => [
-                    "difficulty" => 0.00,
-                    "discrimination" => 1.00,
-                    "guessing" => 0.10,
+                    "difficulty" => 1.50,
+                    "discrimination" => 1.50,
+                    "guessing" => 0.25,
                 ],
                 'expected' => [
-                    [0.03519739, -0.02254274, -0.02163859],
-                    [-0.02254274, -0.03207032, -0.02379477],
-                    [-0.02163859, -0.02379477, -0.00700323],
+                    [-0.07432660,  0.06397002,  0.07285568],
+                    [ 0.06397002, -0.13213619, -0.09714091],
+                    [ 0.07285568, -0.09714091, -0.00241818],
                 ],
             ],
             "testcase 10" => [
-                'pp' => ['ability' => 4.5],
+                'pp' => ['ability' => 3.5],
                 'k' => 0,
                 'ip' => [
-                    "difficulty" => 0.00,
-                    "discrimination" => 1.00,
-                    "guessing" => 0.10,
+                    "difficulty" => 1.50,
+                    "discrimination" => 1.50,
+                    "guessing" => 0.25,
                 ],
                 'expected' => [
-                    [0.03519739, -0.02254274, -0.02163859],
-                    [-0.02254274, -0.03207032, -0.02379477],
-                    [-0.02163859, -0.02379477, -0.00700323],
+                    [-1.016475e-01,  1.088104e+00, -4.171454e-10],
+                    [ 1.088104e+00, -1.807066e-01, -7.032597e-11],
+                    [-4.171454e-10, -7.032597e-11, -1.777778e+00],
                 ],
             ],
         ];
