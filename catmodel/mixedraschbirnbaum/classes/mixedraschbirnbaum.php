@@ -102,12 +102,12 @@ class mixedraschbirnbaum extends model_raschmodel {
      * Estimate item parameters
      *
      * @param mixed $itemresponse
-     * @param ?model_item_param_list $startvalue
+     * @param ?model_item_param $startvalue
      *
      * @return array
      *
      */
-    public function calculate_params($itemresponse, ?model_item_param_list $startvalue = null): array {
+    public function calculate_params($itemresponse, ?model_item_param $startvalue = null): array {
         return catcalc::estimate_item_params($itemresponse, $this, $startvalue);
     }
 
