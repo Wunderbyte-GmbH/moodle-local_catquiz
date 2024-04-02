@@ -604,13 +604,10 @@ class personabilities extends feedbackgenerator {
      */
     private function render_abilitiyprogress(array $initialcontext, $primarycatscale) {
         $userid = $initialcontext['userid'];
-        if (!isset($initialcontext['endtime'])) {
-            return [
-                'individual' => '',
-                'comparison' => '',
-            ];
-        }
-        $endtime = intval($initialcontext['endtime']);
+
+        // If there is no endtime, use timestamp.
+        $endtime = empty($initialcontext['endtime']) ?
+            intval($initialcontext['timestamp']) : intval($initialcontext['endtime']);
         $courseid = empty($initialcontext['courseid']) ? null : $initialcontext['courseid'];
 
         $day = userdate($endtime, '%d');
@@ -642,7 +639,7 @@ class personabilities extends feedbackgenerator {
         $attemptsofuser = array_filter($records, fn($r) => $r->userid == $userid);
         $attemptsofpeers = array_filter($records, fn($r) => $r->userid != $userid);
 
-        $progressindividual = $this->render_chart_for_individual_user($attemptsofuser, $primarycatscale);
+        $progressindividual = $this->render_chart_for_individual_user($attemptsofuser, (array) $primarycatscale);
         if (count($attemptsofpeers) < 3) {
             return [
                 'individual' => $progressindividual,
@@ -652,7 +649,7 @@ class personabilities extends feedbackgenerator {
         $progresscomparison = $this->render_chart_for_comparison(
                 $attemptsofuser,
                 $attemptsofpeers,
-                $primarycatscale,
+                (array) $primarycatscale,
                 $timerange,
                 [$beginningoftimerange, $endtime]);
         return [
@@ -691,15 +688,15 @@ class personabilities extends feedbackgenerator {
      * Render chart for individual progress.
      *
      * @param array $attemptsofuser
-     * @param stdClass $primarycatscale
+     * @param array $primarycatscale
      *
      * @return array
      *
      */
-    private function render_chart_for_individual_user(array $attemptsofuser, stdClass $primarycatscale) {
+    private function render_chart_for_individual_user(array $attemptsofuser, array $primarycatscale) {
         global $OUTPUT;
-        $scalename = $primarycatscale->name;
-        $scaleid = $primarycatscale->id;
+        $scalename = $primarycatscale['name'];
+        $scaleid = $primarycatscale['id'];
 
         $chart = new chart_line();
         $chart->set_smooth(true); // Calling set_smooth() passing true as parameter, will display smooth lines.
@@ -738,7 +735,7 @@ class personabilities extends feedbackgenerator {
      *
      * @param array $attemptsofuser
      * @param array $attemptsofpeers
-     * @param stdClass $primarycatscale
+     * @param array $primarycatscale
      * @param int $timerange
      * @param array $beginningandendofrange
      *
@@ -748,12 +745,12 @@ class personabilities extends feedbackgenerator {
     private function render_chart_for_comparison(
         array $attemptsofuser,
         array $attemptsofpeers,
-        stdClass $primarycatscale,
+        array $primarycatscale,
         int $timerange,
         array $beginningandendofrange) {
         global $OUTPUT;
-        $scalename = $primarycatscale->name;
-        $scaleid = $primarycatscale->id;
+        $scalename = $primarycatscale['name'];
+        $scaleid = $primarycatscale['id'];
 
         $chart = new chart_line();
         $chart->set_smooth(true); // Calling set_smooth() passing true as parameter, will display smooth lines.
@@ -791,13 +788,13 @@ class personabilities extends feedbackgenerator {
         $peerattempts = $this->fill_empty_values_with_average($peerattemptsbydate);
         $userattempts = $this->fill_empty_values_with_average($userattemptsbydate);
 
-        $peerattempts = new \core\chart_series(
+        $peerattempts = new chart_series(
             get_string('scoreofpeers', 'local_catquiz'),
             array_values($peerattempts)
         );
         $peerattempts->set_labels(array_values($peerattemptsbydate));
 
-        $userattempts = new \core\chart_series(
+        $userattempts = new chart_series(
             get_string('yourscorein', 'local_catquiz', $scalename),
             array_values($userattempts)
         );
@@ -929,8 +926,13 @@ class personabilities extends feedbackgenerator {
                 break;
         }
 
+        // Create new array with endtime and sort. Create entry for each day.
+
         foreach ($attempts as $attempt) {
             $data = json_decode($attempt->json);
+            if (empty($attempt->endtime)) {
+                continue;
+            }
             $date = userdate($attempt->endtime, $dateformat);
             if ($timerange === LOCAL_CATQUIZ_TIMERANGE_QUARTEROFYEAR) {
                 $date = ceil($date / 3);
