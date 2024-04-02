@@ -108,7 +108,7 @@ class progress implements JsonSerializable {
     /**
      * @var array $responses
      */
-    public array $responses;
+    private array $responses;
 
     /**
      * @var array Holds the abilities indexed by catscale

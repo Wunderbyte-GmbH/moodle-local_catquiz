@@ -392,12 +392,12 @@ class feedbacksettings {
         // Find average fraction.
         $f = 0.0;
         $i = 0;
-        if ($newdata['progress'] instanceof progress) {
-            $progress = $newdata['progress'];
-            $responses = $progress->get_responses();
-        } else {
-            $responses = $newdata['progress']['responses'];
+        if (!($newdata['progress'] instanceof progress)) {
+            $progress = progress::load($newdata['attemptid'], $newdata['component'], $newdata['contextid']);
+            $newdata['progress'] = $progress;
         }
+        $progress = $newdata['progress'];
+        $responses = $progress->get_responses();
         foreach ($responses as $responsearray) {
             $fraction = (float) $responsearray['fraction'];
             $f += $fraction;
