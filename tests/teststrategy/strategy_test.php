@@ -2087,16 +2087,21 @@ final class strategy_test extends advanced_testcase {
     }
 
     public function test_responses_lead_to_expected_item_parameters() {
-        $this->markTestSkipped('At the moment it still takes too long to calculate the responses');
+        // $this->markTestSkipped('At the moment it still takes too long to calculate the responses');
         global $CFG;
         $responses = loadresponsesforitem(
-            $CFG->dirroot . '/local/catquiz/tests/fixtures/responses.2PL.csv',
+            $CFG->dirroot . '/local/catquiz/tests/fixtures/responses.1PL.csv',
         );
         $initialabilities = loadpersonparams(
             $CFG->dirroot . '/local/catquiz/tests/fixtures/persons.csv', 'Gesamt'
         );
-        $strategy = new model_strategy($responses, []);
-        $result = $strategy->run_estimation('1', $initialabilities);
+        $responses->set_person_abilities($initialabilities);
+        $userlist = array_slice($responses->get_person_ids(), 0, 300);
+        $responses->limit_to_users($userlist);
+        $itemlist = array_slice($responses->get_item_ids(), 0, 70);
+        $responses->limit_to_items($itemlist);
+        $strategy = new model_strategy($responses, [], $initialabilities);
+        list($calculatedabilities, $calculateditemparams) = $strategy->run_estimation();
         $this->assertEquals(true, false);
     }
 

@@ -293,7 +293,7 @@ abstract class model_raschmodel extends model_model implements catcalc_item_esti
      *
      * @param model_responses $responses
      * @param model_person_param_list $personparams
-     * @param model_item_param_list|null $olditemparams
+     * @param model_item_param_list|null $startvalues
      *
      * @return model_item_param_list
      *
@@ -301,39 +301,19 @@ abstract class model_raschmodel extends model_model implements catcalc_item_esti
     public function estimate_item_params(
         model_responses $responses,
         model_person_param_list $personparams,
-        ?model_item_param_list $olditemparams = null): model_item_param_list {
+        ?model_item_param_list $startvalues = null): model_item_param_list {
         $estimateditemparams = new model_item_param_list();
-        $estimationstart = microtime(true);
         $personids = array_keys($personparams->get_person_params());
-        $testcount = 0;
-        foreach ($this->responses->limit_to_users($personids, true)->get_item_response() as $itemid => $itemresponse) {
-            $testcount++;
-            if ($testcount > 25) {
-                break;
-            }
-            $itemstart = microtime(true);
-            $oldparam = $olditemparams[$itemid] ?? null;
-            if ($oldparam && $oldparam->get_status() >= LOCAL_CATQUIZ_STATUS_CALCULATED) {
-                $estimateditemparams->add($oldparam);
-                continue;
-            }
-            $parameters = $this->calculate_params($itemresponse, $oldparam);
+        foreach ($responses->limit_to_users($personids, true)->get_item_response() as $itemid => $itemresponse) {
+            $parameters = $this->calculate_params($itemresponse, $startvalues[$itemid] ?? null);
             // Now create a new item difficulty object (param).
             $param = $this
                 ->create_item_param($itemid)
                 ->set_parameters($parameters)
                 ->set_status(LOCAL_CATQUIZ_STATUS_CALCULATED);
-
-            if ($oldparam) {
-                $param->set_status($olditemparams[$itemid]->get_status());
-            }
             // ... and append it to the list of calculated item difficulties
             $estimateditemparams->add($param);
-            $itemduration = microtime(true) - $itemstart;
-            echo "Duration for item $itemid: $itemduration" . PHP_EOL;
         }
-        $totalduration = microtime(true) - $estimationstart;
-        echo "Duration for whole calculation: $totalduration" . PHP_EOL;
         return $estimateditemparams;
     }
 
@@ -341,10 +321,10 @@ abstract class model_raschmodel extends model_model implements catcalc_item_esti
      * Returns the item parameters as associative array, with the parameter name as key.
      *
      * @param mixed $itemresponse
-     * @param ?model_item_param_list $startvalue
+     * @param ?model_item_param $startvalue
      * @return array
      */
-    abstract protected function calculate_params($itemresponse, ?model_item_param_list $startvalue = null): array;
+    abstract protected function calculate_params($itemresponse, ?model_item_param $startvalue = null): array;
 
     /**
      * Likelihood.
