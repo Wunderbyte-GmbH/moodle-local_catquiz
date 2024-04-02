@@ -78,8 +78,7 @@ function loadresponsesforitem(string $filename): model_responses {
 
     $row = 0;
     $labels = [];
-    $astart = microtime(true);
-    $mr2 = new model_responses();
+    $mr = new model_responses();
     while (($data = fgetcsv($handle, 0, ";")) !== false) {
         $row++;
         if ($row == 1) {
@@ -88,30 +87,9 @@ function loadresponsesforitem(string $filename): model_responses {
         }
         $personid = $data[0];
         foreach (array_slice($data, 1) as $index => $response) {
-            $mr2->set($personid, $labels[$index], $response);
+            $mr->set($personid, $labels[$index], $response);
         }
     }
-    $aend = microtime(true);
-    echo $aend - $astart . PHP_EOL;
-    rewind($handle);
-    $row = 0;
-    $arr = [];
-    $labels = [];
-    $bstart = microtime(true);
-    while (($data = fgetcsv($handle, 0, ";")) !== false) {
-        $row++;
-        if ($row == 1) {
-            $labels = array_slice($data, 1);
-            continue;
-        }
-        $personid = $data[0];
-        foreach (array_slice($data, 1) as $index => $response) {
-            $arr[$personid]['question'][$labels[$index]] = ['fraction' => $response];
-        }
-    }
-    $mr = model_responses::create_from_array($arr);
-    $bend = microtime(true);
-    echo $bend - $bstart . PHP_EOL;
     fclose($handle);
     return $mr;
 }

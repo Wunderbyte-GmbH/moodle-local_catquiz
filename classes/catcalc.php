@@ -187,13 +187,12 @@ class catcalc {
         // Defines the starting point.
         $defaultstart = ['difficulty' => 0.50, 'discrimination' => 1.0, 'guessing' => 0.25];
         $startvalue = $startvalue ? $startvalue->get_params_array() : [];
-        $z0 = array_slice(array_merge($startvalue, $defaultstart), 0, $modeldim - 1);
+        $z0 = array_slice(array_merge($defaultstart, $startvalue), 0, $modeldim - 1);
 
         $jacobian = self::build_itemparam_jacobian($itemresponse, $model);
         $hessian = self::build_itemparam_hessian($itemresponse, $model);
 
         // Estimate item parameters via Newton-Raphson algorithm.
-        $starttime = microtime(true);
         $result = mathcat::newton_raphson_multi_stable(
             $jacobian,
             $hessian,
@@ -202,9 +201,6 @@ class catcalc {
             50,
             fn ($ip) => $model::restrict_to_trusted_region($ip)
         );
-        $duration = microtime(true) - $starttime;
-        // phpcs:ignore
-        // echo "Duration in newton raphson: $duration" . PHP_EOL;
         return $result;
     }
 
