@@ -225,11 +225,7 @@ class personabilities extends feedbackgenerator {
         require_once($CFG->dirroot . '/local/catquiz/lib.php');
 
         $progress = $newdata['progress'];
-        if (is_array($progress)) {
-            $personabilities = $progress['abilities'];
-        } else {
-            $personabilities = $progress->get_abilities();
-        }
+        $personabilities = $progress->get_abilities();
 
         if ($personabilities === []) {
             return null;
@@ -281,11 +277,8 @@ class personabilities extends feedbackgenerator {
                 );
         }
         $models = model_strategy::get_installed_models();
-        if (is_array($progress)) {
-            $playedquestions = $progress['playedquestions'];
-        } else {
-            $playedquestions = $progress->get_playedquestions(true);
-        }
+
+        $playedquestions = $progress->get_playedquestions(true);
 
         return [
             'quizsettings' => (array) $quizsettings,

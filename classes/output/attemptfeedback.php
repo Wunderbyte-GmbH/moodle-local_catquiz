@@ -226,6 +226,10 @@ class attemptfeedback implements renderable, templatable {
         // the DB.
         $feedbackdata = $existingdata;
         $newdata = $this->add_default_data($newdata);
+        if (!($newdata['progress'] instanceof progress)) {
+            $progessobject = progress::load($newdata['attemptid'], $newdata['component'], $newdata['contextid']);
+            $newdata['progress'] = $progessobject;
+        }
         foreach ($generators as $generator) {
             $generatordata = $generator->load_data($this->attemptid, $existingdata, $newdata);
             if (! $generatordata) {
@@ -252,11 +256,8 @@ class attemptfeedback implements renderable, templatable {
     private function add_default_data(array $newdata): array {
         $newarray = [];
         $progress = $newdata['progress'];
-        if (is_array($progress)) {
-            $personabilities = $progress['abilities'];
-        } else {
-            $personabilities = $progress->get_abilities();
-        }
+
+        $personabilities = $progress->get_abilities();
 
         if (!$personabilities) {
             return $newdata;

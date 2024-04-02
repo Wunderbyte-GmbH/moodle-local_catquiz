@@ -266,8 +266,7 @@ class comparetotestaverage extends feedbackgenerator {
         $progress = $newdata['progress'];
         $quizsettings = $existingdata['quizsettings'];
 
-        if ((is_array($progress) && empty($progress['playedquestions']))
-            || (is_object($progress) && !$progress->get_playedquestions())) {
+        if (!$progress->get_playedquestions()) {
             return [];
         }
 

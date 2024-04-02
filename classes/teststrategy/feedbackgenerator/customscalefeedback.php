@@ -180,11 +180,7 @@ class customscalefeedback extends feedbackgenerator {
     public function load_data(int $attemptid, array $existingdata, array $newdata): ?array {
         $quizsettings = $existingdata['quizsettings'];
         $progress = $newdata['progress'];
-        if (is_array($progress)) {
-            $personabilities = $progress['abilities'];
-        } else {
-            $personabilities = $progress->get_abilities();
-        }
+        $personabilities = $progress->get_abilities();
 
         if (!$personabilities) {
             return [];
