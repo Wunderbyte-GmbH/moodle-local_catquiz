@@ -48,7 +48,7 @@ class catscaledashboard {
     /**
      * If set to true, we execute the CAT parameter estimation algorithm.
      *
-     * @var boolean
+     * @var bool
      */
     private bool $triggercalculation;
 

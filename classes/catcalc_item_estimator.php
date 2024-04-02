@@ -24,7 +24,14 @@
  */
 
 namespace local_catquiz;
-
+/**
+ * Models that implement this interface can use the catcalc class to estimate their parameters
+ *
+ * @package local_catquiz
+ * @author David Szkiba
+ * @copyright 2024 Wunderbyte GmbH
+ * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
 interface catcalc_item_estimator {
 
     /**

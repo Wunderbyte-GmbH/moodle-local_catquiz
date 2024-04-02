@@ -37,16 +37,16 @@ require_once($CFG->libdir . '/questionlib.php');
  */
 class questiondetailview {
 
-    /** @var integer of testitemid */
+    /** @var int of testitemid */
     public int $testitemid = 0;
 
     /**
-     * @var integer
+     * @var int
      */
     private int $contextid = 0;
 
     /**
-     * @var integer
+     * @var int
      */
     private int $catscaleid = 0;
 

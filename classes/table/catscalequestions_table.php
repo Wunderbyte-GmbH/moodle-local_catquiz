@@ -51,10 +51,10 @@ use moodle_url;
  */
 class catscalequestions_table extends wunderbyte_table {
 
-    /** @var integer $catscaleid */
+    /** @var int $catscaleid */
     private $catscaleid = 0;
 
-    /** @var integer */
+    /** @var int */
     private $contextid = 0;
 
     /**

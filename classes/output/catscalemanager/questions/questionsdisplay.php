@@ -34,27 +34,27 @@ use moodle_url;
  */
 class questionsdisplay {
     /**
-     * @var integer
+     * @var int
      */
     private int $catcontextid = 0; // Selected context.
 
     /**
-     * @var integer
+     * @var int
      */
     private int $scale = 0; // The selected scale.
 
     /**
-     * @var integer
+     * @var int
      */
     private int $usesubs = 1; // If subscales should be integrated in question display, value is 1.
 
     /**
-     * @var integer
+     * @var int
      */
     private int $numberofrecords = 0; // Records found in table query.
 
     /**
-     * @var integer
+     * @var int
      */
     private ?int $testitemid = null; // ID of testitem.
 

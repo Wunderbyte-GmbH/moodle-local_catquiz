@@ -41,12 +41,12 @@ class feedbacksettings {
     public int $strategyid;
 
     /**
-     * @var boolean
+     * @var bool
      */
     public bool $displayscaleswithoutitemsplayed = false;
 
     /**
-     * @var boolean
+     * @var bool
      */
     public bool $overridesettings = true;
 

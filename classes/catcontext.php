@@ -53,7 +53,7 @@ class catcontext {
     /**
      * $id
      *
-     * @var integer
+     * @var int
      */
     public ?int $id = null;
 
@@ -74,7 +74,7 @@ class catcontext {
     /**
      * $description format
      *
-     * @var integer
+     * @var int
      */
     private int $descriptionformat = 1;
 
@@ -88,35 +88,35 @@ class catcontext {
     /**
      * $starttimestamp
      *
-     * @var integer
+     * @var int
      */
     private int $starttimestamp = 0;
 
     /**
      * $endtimestamp
      *
-     * @var integer
+     * @var int
      */
     private int $endtimestamp = 0;
 
     /**
      * $usermodified
      *
-     * @var integer
+     * @var int
      */
     private int $usermodified = 0;
 
     /**
      * $timecreated
      *
-     * @var integer
+     * @var int
      */
     private int $timecreated = 0;
 
     /**
      * $timemodified
      *
-     * @var integer
+     * @var int
      */
     private int $timemodified = 0;
 
@@ -126,7 +126,7 @@ class catcontext {
      * The last time that item parameters and person abilities were calculated
      * for this context
      *
-     * @var integer
+     * @var int
      */
     private int $timecalculated = 0;
 

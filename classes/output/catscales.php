@@ -44,17 +44,17 @@ class catscales implements renderable, templatable {
     /** @var array $branchitems */
     public array $branchitems;
     /**
-     * @var integer
+     * @var int
      */
     private int $catscaleid = 0;
 
     /** If set to 1, detailview of selected scale will be rendered.
-     * @var integer
+     * @var int
      */
     private int $scaledetailview = 0;
 
     /**
-     * @var integer
+     * @var int
      */
     private int $contextid = 0;
 
