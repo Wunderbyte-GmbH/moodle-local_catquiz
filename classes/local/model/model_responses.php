@@ -272,6 +272,16 @@ class model_responses {
         return $personparamlist;
     }
 
+    public function set_person_abilities(model_person_param_list $pplist) {
+        // Iterates over all responses and their personparams to update the ability there. Note: the personparams in $this->byitem[]
+        // are also updated because they reference the same personparam object.
+        foreach ($pplist as $pp) {
+            foreach ($this->byperson[$pp->get_id()] as $itemresponse) {
+                $itemresponse->get_personparams()->set_ability($pp->get_ability());
+            }
+        }
+    }
+
     /**
      * Get item response for person.
      *

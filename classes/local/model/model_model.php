@@ -33,11 +33,6 @@ namespace local_catquiz\local\model;
 abstract class model_model {
 
     /**
-     * @var model_responses Contains necessary data for estimation
-     */
-    protected model_responses $responses;
-
-    /**
      * @var string Name of model
      */
     protected string $modelname;
@@ -49,8 +44,7 @@ abstract class model_model {
      * @param string $modelname
      *
      */
-    public function __construct(model_responses $responses, string $modelname) {
-        $this->responses = $responses;
+    public function __construct(string $modelname) {
         $this->modelname = $modelname;
     }
 
@@ -78,11 +72,13 @@ abstract class model_model {
      * Executes the model-specific code to estimate item-parameters based
      * on the given person abilities.
      *
+     * @param model_responses $responses
      * @param model_person_param_list $personparams
      * @param ?model_item_param_list $olditemparams
      * @return model_item_param_list
      */
     abstract public function estimate_item_params(
+        model_responses $responses,
         model_person_param_list $personparams,
         ?model_item_param_list $olditemparams = null): model_item_param_list;
 
