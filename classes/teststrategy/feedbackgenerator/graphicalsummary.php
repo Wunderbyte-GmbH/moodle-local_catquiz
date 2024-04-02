@@ -182,12 +182,7 @@ class graphicalsummary extends feedbackgenerator {
 
         // If we already have all the data, just return them instead of adding
         // the last response again.
-
-        if (is_array($progress)) {
-            $playedquestions = $progress['playedquestions'];
-        } else {
-            $playedquestions = $progress->get_playedquestions(true);
-        }
+        $playedquestions = $progress->get_playedquestions(true);
 
         if (
             array_key_exists('graphicalsummary_data', $existingdata)
