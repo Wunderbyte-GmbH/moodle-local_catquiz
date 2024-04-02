@@ -34,17 +34,17 @@ use renderable;
 class catscalestats {
 
     /**
-     * @var integer
+     * @var int
      */
     private int $numassignedcatscales = 0;
 
     /**
-     * @var integer
+     * @var int
      */
     private int $numassignedtests = 0;
 
     /**
-     * @var integer
+     * @var int
      */
     private int $numassignedquestions = 0;
 

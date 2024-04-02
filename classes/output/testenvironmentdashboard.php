@@ -34,7 +34,7 @@ use renderable;
  */
 class testenvironmentdashboard implements renderable, templatable {
     /**
-     * @var integer
+     * @var int
      */
     private ?int $catscaleid = null;
 

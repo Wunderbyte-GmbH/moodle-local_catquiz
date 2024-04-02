@@ -39,16 +39,16 @@ use renderable;
  */
 class managecatscaledashboard implements renderable, templatable {
 
-    /** @var integer of testitemid */
+    /** @var int of testitemid */
     public int $testitemid = 0;
 
     /**
-     * @var integer
+     * @var int
      */
     private int $contextid = 0;
 
     /**
-     * @var integer
+     * @var int
      */
     private int $catscaleid = 0;
 
@@ -58,7 +58,7 @@ class managecatscaledashboard implements renderable, templatable {
     private array $catscalesdetailview = [];
 
     /**
-     * @var integer
+     * @var int
      */
     private int $usesubs = 1;
 

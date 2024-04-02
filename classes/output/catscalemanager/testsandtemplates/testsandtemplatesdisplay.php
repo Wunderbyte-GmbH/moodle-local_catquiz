@@ -36,12 +36,12 @@ class testsandtemplatesdisplay {
 
 
     /**
-     * @var integer
+     * @var int
      */
     private int $scaleid = 0; // The selected scale.
 
     /**
-     * @var integer
+     * @var int
      */
     private int $usesubs = 1; // If subscales should be integrated in question display, value is 1.
 

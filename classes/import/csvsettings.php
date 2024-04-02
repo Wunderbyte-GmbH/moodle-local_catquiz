@@ -58,12 +58,12 @@ class csvsettings {
     public $columns = [];
 
     /**
-     * @var boolean
+     * @var bool
      */
     public $isassociative = false;
 
     /**
-     * @var boolean
+     * @var bool
      */
     public $acceptunknowncolumn = false;
 

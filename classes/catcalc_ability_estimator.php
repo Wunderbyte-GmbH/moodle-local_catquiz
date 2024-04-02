@@ -24,7 +24,14 @@
  */
 
 namespace local_catquiz;
-
+/**
+ * Models that implement this interface can be used by the catcalc class to estimate the person ability
+ *
+ * @package local_catquiz
+ * @author David Szkiba
+ * @copyright 2024 Wunderbyte GmbH
+ * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
 interface catcalc_ability_estimator {
 
     /**

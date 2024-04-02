@@ -47,7 +47,7 @@ class testenvironment {
     /**
      * $id
      *
-     * @var integer
+     * @var int
      */
     public string $id;
 
@@ -68,7 +68,7 @@ class testenvironment {
     /**
      * $description format
      *
-     * @var integer
+     * @var int
      */
     private int $descriptionformat;
 
@@ -87,21 +87,21 @@ class testenvironment {
     private string $component;
 
     /**
-     * @var integer
+     * @var int
      */
     private ?int $catscaleid;
 
     /**
      * $componentid
      *
-     * @var integer
+     * @var int
      */
     private int $componentid;
 
     /**
      * $visible
      *
-     * @var integer
+     * @var int
      */
     private int $visible;
 
@@ -122,14 +122,14 @@ class testenvironment {
     /**
      * $status
      *
-     * @var integer
+     * @var int
      */
     private int $status;
 
     /**
      * $parentid
      *
-     * @var integer
+     * @var int
      */
     private int $parentid;
 
