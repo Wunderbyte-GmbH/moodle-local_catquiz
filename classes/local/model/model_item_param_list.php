@@ -553,6 +553,23 @@ class model_item_param_list implements ArrayAccess, IteratorAggregate, Countable
         return null;
     }
 
+    public function confirmed(): array {
+        $ids = array_map(
+            fn ($ip) => $ip->get_status() > LOCAL_CATQUIZ_STATUS_CALCULATED,
+            $this->itemparams
+        );
+        return $ids;
+    }
+
+    public function without(array $itemids, bool $clone = true): self {
+        if ($clone) {
+            $obj = clone($this);
+            return $obj->without($itemids, false);
+        }
+        $this->itemparams = array_filter($this->itemparams, fn ($ip) => !in_array($ip->get_id(), $itemids));
+        return $this;
+    }
+
     /**
      * Gets scaleid and updates scaleid of record.
      * @param array $newrecord

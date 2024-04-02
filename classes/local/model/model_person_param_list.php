@@ -184,6 +184,10 @@ class model_person_param_list implements ArrayAccess, IteratorAggregate, Countab
         return $this->personparams;
     }
 
+    public function get_ids(): array {
+        return array_keys($this->personparams);
+    }
+
     /**
      * Returns the person abilities as a float array.
      *

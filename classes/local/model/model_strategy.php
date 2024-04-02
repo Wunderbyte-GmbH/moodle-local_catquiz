@@ -92,7 +92,7 @@ class model_strategy {
     /**
      * @var int iterations
      */
-    private int $iterations = 2;
+    private int $iterations = 0;
 
     /**
      * @var string|null modeloverride
@@ -116,6 +116,20 @@ class model_strategy {
      */
     private int $catscaleid;
 
+    /*
+     * Tracks the parameters calculated by iteration round and model.
+     * 
+     * @var array<array<model_item_param_list>> $calculatedparams
+     */
+    private array $calculatedparams;
+
+    /**
+     * Tracks the abilites calculated by iteration round.
+     * 
+     * @var array<model_person_param_list>
+     */
+    private array $calculatedabilities;
+
     /**
      * Model-specific instantiation can go here.
      *
@@ -134,6 +148,22 @@ class model_strategy {
         $this->abilityestimator = new model_person_ability_estimator_catcalc($this->responses);
         $this->set_options($options);
         $this->olditemparams = $olditemparams;
+
+        if ($savedpersonabilities === null || count($savedpersonabilities) === 0) {
+            $savedpersonabilities = $responses->get_initial_person_abilities();
+        } else if (count($savedpersonabilities) < count($initial = $responses->get_initial_person_abilities())) {
+            $newusers = array_diff(
+                array_keys($initial->get_person_params()),
+                array_keys($savedpersonabilities->get_person_params()));
+            foreach ($newusers as $userid) {
+                $savedpersonabilities->add(new model_person_param($userid));
+            }
+        }
+        $this->initialpersonabilities = $savedpersonabilities;
+
+        foreach (array_keys($this->models) as $model) {
+            $this->set_calculated_progress($model, null);
+        }
     }
 
     /**
@@ -204,20 +234,28 @@ class model_strategy {
         while (!$this->should_stop()) {
             foreach ($this->models as $name => $model) {
                 $oldmodelparams = $this->olditemparams[$name] ?? null;
+                $startvalues = $this->get_startvalues_for_model($name) ?? null;
+                if ($startvalues && $oldmodelparams) {
+                    $startvalues->without($oldmodelparams->confirmed(), false);
+                }
                 $itemdifficulties[$name] = $model
-                    ->estimate_item_params($this->responses, $personabilities, $oldmodelparams);
+                    ->estimate_item_params($this->responses, $personabilities, $startvalues);
+                $this->set_calculated_progress($name, $itemdifficulties[$name]);
             }
+
+            // Keep track of calculated item parameters
 
             $filtereddiffi = $this->select_item_model($itemdifficulties, $personabilities);
             $personabilities = $this
                 ->abilityestimator
-                ->get_person_abilities($filtereddiffi, $catscaleid);
-
+                ->get_person_abilities($filtereddiffi);
+            $this->set_calculated_abilities_progress($personabilities);
+            $this->responses->set_person_abilities($personabilities);
             $this->iterations++;
         }
 
         $itemdiffiwstatus = $this->set_status(
-            $itemdifficulties,
+            $itemdifficulties, // TODO: merge again with oldparams that are manually confirmed and set the correct status for each model
             $filtereddiffi
         );
 
@@ -408,5 +446,40 @@ class model_strategy {
             throw new \Exception("Item override to a model that has no data");
         }
         return $item;
+    }
+
+    private function set_calculated_progress(string $modelname, ?model_item_param_list $itemparams) {
+        $this->calculatedparams[$modelname][$this->iterations] = $itemparams;
+    }
+
+    private function get_last_calculated_for_model(string $modelname): ?model_item_param_list {
+        return end($this->calculatedparams[$modelname]) ?? null;
+    }
+
+    private function get_startvalues_for_model(string $modelname): ?model_item_param_list {
+        switch ($modelname) {
+            case 'rasch':
+                return $this->get_last_calculated_for_model('rasch');
+            case 'raschbirnbaum':
+                return $this->get_last_calculated_for_model('raschbirnbaum')
+                    ?? $this->get_last_calculated_for_model('rasch');
+            case 'mixedraschbirnbaum':
+                return $this->get_last_calculated_for_model('mixedraschbirnbaum')
+                    ?? $this->get_last_calculated_for_model('raschbirnbaum');
+            default:
+                throw new \Exception ("Unknown model $modelname");
+        }
+    }
+
+    private function set_calculated_abilities_progress(model_person_param_list $abilities) {
+        $this->calculatedabilities[$this->iterations] = $abilities;
+    }
+
+    private function get_param_progress(string $modelname, string $itemid): array {
+        return array_map(fn ($paramlist) => $paramlist->offsetGet($itemid)->get_params_array(), $this->calculatedparams[$modelname]);
+    }
+
+    private function get_ability_progress(string $personid): array {
+        return array_map(fn ($paramlist) => $paramlist->offsetGet($personid)->get_ability(), $this->calculatedabilities);
     }
 }
