@@ -136,8 +136,7 @@ class personabilities extends feedbackgenerator {
         );
 
         if (empty($feedback)) {
-            return [
-            ];
+            return [];
         } else {
             return [
                 'heading' => $this->get_heading(),
@@ -264,8 +263,7 @@ class personabilities extends feedbackgenerator {
 
         }
         if ($personabilities === []) {
-            return [
-            ];
+            return [];
         }
 
         $this->apply_sorting($personabilities, $selectedscaleid);
@@ -512,7 +510,6 @@ class personabilities extends feedbackgenerator {
      * @param array $abilitysteps
      *
      * @return array
-     *
      */
     public function get_fisherinfos_of_items(array $items, array $models, array $abilitysteps): array {
         $fisherinfos = [];

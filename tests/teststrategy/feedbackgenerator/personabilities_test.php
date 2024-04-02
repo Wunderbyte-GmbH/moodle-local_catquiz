@@ -86,7 +86,7 @@ class personabilities_test extends advanced_testcase {
             ->willReturn($fisherinfo);
 
         $output = $personabilities->get_studentfeedback($feedbackdata);
-        // TODO: Test whole array once template is finalized.
+        // For the moment, this tests only the heading, not the whole rendered data.
         $this->assertEquals($expected['heading'], $output['heading']);
     }
 
