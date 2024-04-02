@@ -389,74 +389,7 @@ class personabilities extends feedbackgenerator {
         ];
 
     }
-    /**
-     * Generate data array for values of each catsacle.
-     *
-     * @param array $data
-     * @param int $catscaleid
-     * @param int $selectedscaleid
-     * @param array $abilityarray
-     * @param array $catscales
-     * @param array $newdata
-     *
-     *
-     */
-    private function generate_data_for_scale(
-        array &$data,
-        int $catscaleid,
-        int $selectedscaleid,
-        array $abilityarray,
-        array $catscales,
-        array $newdata
-    ) {
-        $ability = $abilityarray['value'];
-        if (abs(floatval($ability)) === abs(floatval(LOCAL_CATQUIZ_PERSONABILITY_MAX))) {
-            if ($ability < 0) {
-                $ability = get_string('allquestionsincorrect', 'local_catquiz');
-            } else {
-                $ability = get_string('allquestionscorrect', 'local_catquiz');
-            }
-        } else {
-            $ability = sprintf("%.2f", $ability);
-        }
-        if ($catscaleid == $selectedscaleid) {
-            $isselectedscale = true;
-            // TODO: Title explaining why this scale was selected (i.e. lowest result).
-            $tooltiptitle = $catscales[$catscaleid]->name;
-        } else {
-            $isselectedscale = false;
-            $tooltiptitle = $catscales[$catscaleid]->name;
-        }
-        // If defined in settings, display only feedbacks if items were played...
-        // ...and parentscale and primaryscale.
-        $questionpreviews = "";
-        if (isset($newdata['progress']->playedquestionsbyscale[$catscaleid])) {
-            $questionsinscale = $newdata['progress']->playedquestionsbyscale[$catscaleid];
-            $numberofitems = ['itemsplayed' => count($questionsinscale)];
-            $questionpreviews = array_map(fn($q) => [
-                'preview' => $this->render_questionpreview((object) $q)['body']['question']],
-                $questionsinscale
-            );
-        } else if ($this->feedbacksettings->displayscaleswithoutitemsplayed
-            || $catscaleid == $selectedscaleid
-            || $catscales[$catscaleid]->parentid == 0) {
-            $numberofitems = ['noplayed' => 0];
-        } else if ($catscaleid != $selectedscaleid) {
-            $numberofitems = "";
-        }
 
-        $data[] = [
-            'standarderror' => sprintf("%.2f", $newdata['se'][$catscaleid]),
-            'ability' => $ability,
-            'name' => $catscales[$catscaleid]->name,
-            'catscaleid' => $catscaleid,
-            'numberofitemsplayed' => $numberofitems,
-            'questionpreviews' => $questionpreviews ?: "",
-            'isselectedscale' => $isselectedscale,
-            'tooltiptitle' => $tooltiptitle,
-        ];
-
-    }
     /**
      * Render chart for histogram of personabilities.
      *
