@@ -247,13 +247,13 @@ class feedbacksettings {
     /**
      * Exclude scales that don't meet minimum of items required in quizsettings.
      *
-     * @param mixed $personabilities
-     * @param mixed $feedbackdata
+     * @param array $personabilities
+     * @param array $feedbackdata
      *
      * @return array
      *
      */
-    public function filter_nminscale($personabilities, $feedbackdata): array {
+    public function filter_nminscale(array $personabilities, array $feedbackdata): array {
         $nminscale = $this->nminscale;
         if (!empty($nminscale)) {
             foreach ($personabilities as $scaleid => $array) {
@@ -273,13 +273,13 @@ class feedbacksettings {
     /**
      * Exclude scales that don't meet minimum of items required in quizsettings.
      *
-     * @param mixed $personabilities
-     * @param mixed $feedbackdata
+     * @param array $personabilities
+     * @param array $feedbackdata
      *
      * @return array
      *
      */
-    public function filter_nmintest($personabilities, $feedbackdata): array {
+    public function filter_nmintest(array $personabilities, array $feedbackdata): array {
         $nmintest = $this->nmintest;
         if (!empty($nmintest)) {
             $nintest = $feedbackdata['progress']->get_num_playedquestions();
@@ -298,13 +298,13 @@ class feedbacksettings {
     /**
      * Exclude scales where standarderror is not in range.
      *
-     * @param mixed $personabilities
-     * @param mixed $feedbackdata
+     * @param array $personabilities
+     * @param array $feedbackdata
      *
      * @return array
      *
      */
-    public function filter_semax($personabilities, $feedbackdata): array {
+    public function filter_semax(array $personabilities, array $feedbackdata): array {
         $semax = $this->semax;
         if (!empty($semax)) {
             foreach ($personabilities as $scaleid => $array) {
@@ -324,24 +324,25 @@ class feedbacksettings {
     /**
      * Exclude scales where standarderror is not in range.
      *
-     * @param mixed $personabilities
-     * @param mixed $feedbackdata
+     * @param array $personabilities
+     * @param array $feedbackdata
      *
      * @return array
      *
      */
-    public function filter_semin($personabilities, $feedbackdata): array {
-        $semin = $this->semax;
-        if (!empty($semin)) {
-            foreach ($personabilities as $scaleid => $array) {
-                $se = $feedbackdata['se'][$scaleid];
-                if ($se < $semin) {
-                    $personabilities[$scaleid]['error']['se'] = [
-                        'semindefined' => $semin,
-                        'securrent' => $se,
-                    ];
-                    $personabilities[$scaleid]['excluded'] = true;
-                }
+    public function filter_semin(array $personabilities, array $feedbackdata): array {
+        $semin = $this->semin;
+        if (empty($semin)) {
+            return $personabilities;
+        }
+        foreach ($personabilities as $scaleid => $array) {
+            $se = $feedbackdata['se'][$scaleid];
+            if ($se < $semin) {
+                $personabilities[$scaleid]['error']['se'] = [
+                    'semindefined' => $semin,
+                    'securrent' => $se,
+                ];
+                $personabilities[$scaleid]['excluded'] = true;
             }
         }
         return $personabilities;
