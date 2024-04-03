@@ -106,7 +106,6 @@ class model_strategy {
 
     /**
      * @var array<model_item_param_list> $olditemparams
-     * @var array
      */
     private array $olditemparams;
 

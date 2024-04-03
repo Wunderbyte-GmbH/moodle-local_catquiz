@@ -1588,7 +1588,9 @@ class catquiz {
         ];
     }
 
-    /** Takes an array of ids and returns an array of the questions with these ids.
+    /**
+     * Takes an array of ids and returns an array of the questions with these ids.
+     *
      * @param array $questionids
      * @return array
      */
@@ -1600,13 +1602,16 @@ class catquiz {
         return $questions;
     }
 
-    /** Get all quizattempts corresponding to given params.
+    /**
+     * Get all quizattempts corresponding to given params.
+     *
      * @param int $userid
      * @param int $catscaleid
      * @param int $courseid
      * @param int $contextid
      * @param int $starttime
      * @param int $endtime
+     *
      * @return array
      */
     public static function get_attempts(
@@ -1652,7 +1657,9 @@ class catquiz {
         return $records;
     }
 
-    /** Get all quizattempts corresponding to given params.
+    /**
+     * Enrol user to courses or groups.
+     *
      * @param int $userid
      * @param array $quizsettings
      * @param array $personabilities
