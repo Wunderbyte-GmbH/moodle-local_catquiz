@@ -1841,28 +1841,26 @@ class catquiz {
             ];
         }
 
-        $coursestring = "<br>" . get_string('followingcourses', 'local_catquiz') . "<br><ul>";
-        $groupstring = get_string('followinggroups', 'local_catquiz') . "<br><ul>";
+        $coursestring = "<br>" . get_string('followingcourses', 'local_catquiz');
+        $originalcs = $coursestring;
+        $groupstring = get_string('followinggroups', 'local_catquiz');
+        $originalgs = $groupstring;
         foreach ($enrolementarray as $type => $dataarray) {
             foreach ($dataarray as $messageinfo) {
                 if ($type === "course") {
-                    $coursestring .= "<li> <a href=" . $messageinfo['courseurl'] . ">" . $messageinfo['coursename'] . "</a>
-                    </li>";
+                    $coursestring .= "<div> - <a href=" . $messageinfo['courseurl'] . ">" . $messageinfo['coursename'] . "</a>
+                    </div>";
                 };
                 if ($type === "group") {
-                    $groupstring .= '<li>' . get_string('groupenrolementstring', 'local_catquiz', $messageinfo) . '</li>';
+                    $groupstring .= "<div> - "  . get_string('groupenrolementstring', 'local_catquiz', $messageinfo) ."</div>";
                 }
             }
         }
         // Check if something was appended to the string.
-        if (substr($coursestring, -4) != "<ul>") {
-            $coursestring .= "</ul>";
-        } else {
+        if ($coursestring === $originalcs) {
             $coursestring = "";
         }
-        if (substr($groupstring, -4) != "<ul>") {
-            $groupstring .= "</ul>";
-        } else {
+        if ($groupstring === $originalgs) {
             $groupstring = "";
         }
         $startstring = get_string('enrolementstringstart', 'local_catquiz', $dataarray[0]);
