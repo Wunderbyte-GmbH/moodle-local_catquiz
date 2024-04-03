@@ -117,7 +117,7 @@ class personabilities extends feedbackgenerator {
         );
 
         // The charts showing past and present personabilities (in relation to peers).
-        $abilityprogress = $this->render_abilitiyprogress(
+        $abilityprogress = $this->render_abilityprogress(
             (array) $feedbackdata,
             $feedbackdata['primaryscale']
         );
@@ -600,7 +600,7 @@ class personabilities extends feedbackgenerator {
      * @return array
      *
      */
-    public function render_abilitiyprogress(array $initialcontext, $primarycatscale) {
+    public function render_abilityprogress(array $initialcontext, $primarycatscale) {
         $userid = $initialcontext['userid'];
 
         // If there is no endtime, use timestamp.
