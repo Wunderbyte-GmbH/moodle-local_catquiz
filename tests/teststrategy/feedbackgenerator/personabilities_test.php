@@ -84,6 +84,12 @@ class personabilities_test extends advanced_testcase {
         $personabilities
             ->method('get_fisherinfos_of_items')
             ->willReturn($fisherinfo);
+        $personabilities
+            ->method('render_abilitiyprogress')
+            ->willReturn([
+                'individual' => '',
+                'comparison' => '',
+            ]);
 
         $output = $personabilities->get_studentfeedback($feedbackdata);
         // For the moment, this tests only the heading, not the whole rendered data.

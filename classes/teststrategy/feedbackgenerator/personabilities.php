@@ -111,9 +111,6 @@ class personabilities extends feedbackgenerator {
             $feedbackdata['primaryscale'],
         );
 
-        // TODO: In which cases should there be no charts?
-        // The chart showing all present personabilities in relation to each other.
-
         $abilityprofilechart = $this->render_abilityprofile_chart(
             (array) $feedbackdata,
             $feedbackdata['primaryscale']
@@ -602,7 +599,7 @@ class personabilities extends feedbackgenerator {
      * @return array
      *
      */
-    private function render_abilitiyprogress(array $initialcontext, $primarycatscale) {
+    public function render_abilitiyprogress(array $initialcontext, $primarycatscale) {
         $userid = $initialcontext['userid'];
 
         // If there is no endtime, use timestamp.
