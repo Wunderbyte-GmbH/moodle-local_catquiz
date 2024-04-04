@@ -124,25 +124,25 @@ class catquiz_test extends TestCase {
                 'expected' => [
                     'messagetitle' => "Notification about new course / group enrolments",
                     'messagebody' => "Based on your results in test Testname in course Kurs 1 you are now...<br><br>"
-                    . "subscribed in the following course(s):<br><br><ul><li> "
-                    . "<a href=http://10.111.0.2:8000/course/view.php?id=17>Kurs 1</a>
-                    </li><li> <a href=http://10.111.0.2:8000/course/view.php?id=17>Kurs 2</a>
-                    </li><li> <a href=http://10.111.0.2:8000/course/view.php?id=17>Kurs 3</a>
-                    </li></ul><br>member of the following group(s):<br><br>"
-                    . "<ul><li>Gruppe 1 in course <a href=http://10.111.0.2:8000/course/view.php?id=17>Kurs 1</a></li>"
-                    . "<li>Gruppe 2 in course <a href=http://10.111.0.2:8000/course/view.php?id=17>Kurs 2</a></li>"
-                    . "<li>Gruppe 3 in course <a href=http://10.111.0.2:8000/course/view.php?id=17>Kurs 2</a></li>"
-                    . "</ul>Good luck with your studies!",
+                    . "subscribed in the following course(s):<br><div>"
+                    . " - <a href=http://10.111.0.2:8000/course/view.php?id=17>Kurs 1</a>
+                    </div><div> - <a href=http://10.111.0.2:8000/course/view.php?id=17>Kurs 2</a>
+                    </div><div> - <a href=http://10.111.0.2:8000/course/view.php?id=17>Kurs 3</a>
+                    </div><br>member of the following group(s):<br>"
+                    . "<div> - Gruppe 1 in course <a href=http://10.111.0.2:8000/course/view.php?id=17>Kurs 1</a></div>"
+                    . "<div> - Gruppe 2 in course <a href=http://10.111.0.2:8000/course/view.php?id=17>Kurs 2</a></div>"
+                    . "<div> - Gruppe 3 in course <a href=http://10.111.0.2:8000/course/view.php?id=17>Kurs 2</a></div>"
+                    . "Good luck with your studies!",
                     'messageforfeedback' => "Based on your results you are now...<br><br>"
-                    . "subscribed in the following course(s):<br><br>"
-                    . "<ul><li> <a href=http://10.111.0.2:8000/course/view.php?id=17>Kurs 1</a>
-                    </li><li> <a href=http://10.111.0.2:8000/course/view.php?id=17>Kurs 2</a>
-                    </li><li> <a href=http://10.111.0.2:8000/course/view.php?id=17>Kurs 3</a>
-                    </li></ul><br>member of the following group(s):<br><br><ul>"
-                    . "<li>Gruppe 1 in course <a href=http://10.111.0.2:8000/course/view.php?id=17>Kurs 1</a></li>"
-                    . "<li>Gruppe 2 in course <a href=http://10.111.0.2:8000/course/view.php?id=17>Kurs 2</a></li>"
-                    . "<li>Gruppe 3 in course <a href=http://10.111.0.2:8000/course/view.php?id=17>Kurs 2</a></li>"
-                    . "</ul>Good luck with your studies!",
+                    . "subscribed in the following course(s):<br>"
+                    . "<div> - <a href=http://10.111.0.2:8000/course/view.php?id=17>Kurs 1</a>
+                    </div><div> - <a href=http://10.111.0.2:8000/course/view.php?id=17>Kurs 2</a>
+                    </div><div> - <a href=http://10.111.0.2:8000/course/view.php?id=17>Kurs 3</a>
+                    </div><br>member of the following group(s):<br>"
+                    . "<div> - Gruppe 1 in course <a href=http://10.111.0.2:8000/course/view.php?id=17>Kurs 1</a></div>"
+                    . "<div> - Gruppe 2 in course <a href=http://10.111.0.2:8000/course/view.php?id=17>Kurs 2</a></div>"
+                    . "<div> - Gruppe 3 in course <a href=http://10.111.0.2:8000/course/view.php?id=17>Kurs 2</a></div>"
+                    . "Good luck with your studies!",
                 ],
             ],
             'singlecourse' => [
@@ -218,17 +218,17 @@ class catquiz_test extends TestCase {
                 'expected' => [
                     'messagetitle' => "Notification about new course / group enrolments",
                     'messagebody' => "Based on your results in test Testname in course Kurs 1 you are now...<br>"
-                    . "<br>subscribed in the following course(s):<br><br><ul><li> "
-                    . "<a href=http://10.111.0.2:8000/course/view.php?id=17>Kurs 1</a>
-                    </li><li> <a href=http://10.111.0.2:8000/course/view.php?id=17>Kurs 2</a>
-                    </li><li> <a href=http://10.111.0.2:8000/course/view.php?id=17>Kurs 3</a>
-                    </li></ul><br>Good luck with your studies!",
+                    . "<br>subscribed in the following course(s):<br><div>"
+                    . " - <a href=http://10.111.0.2:8000/course/view.php?id=17>Kurs 1</a>
+                    </div><div> - <a href=http://10.111.0.2:8000/course/view.php?id=17>Kurs 2</a>
+                    </div><div> - <a href=http://10.111.0.2:8000/course/view.php?id=17>Kurs 3</a>
+                    </div><br>Good luck with your studies!",
                     'messageforfeedback' => "Based on your results you are now...<br>"
-                    . "<br>subscribed in the following course(s):<br><br>"
-                    . "<ul><li> <a href=http://10.111.0.2:8000/course/view.php?id=17>Kurs 1</a>
-                    </li><li> <a href=http://10.111.0.2:8000/course/view.php?id=17>Kurs 2</a>
-                    </li><li> <a href=http://10.111.0.2:8000/course/view.php?id=17>Kurs 3</a>
-                    </li></ul><br>Good luck with your studies!",
+                    . "<br>subscribed in the following course(s):<br>"
+                    . "<div> - <a href=http://10.111.0.2:8000/course/view.php?id=17>Kurs 1</a>
+                    </div><div> - <a href=http://10.111.0.2:8000/course/view.php?id=17>Kurs 2</a>
+                    </div><div> - <a href=http://10.111.0.2:8000/course/view.php?id=17>Kurs 3</a>
+                    </div><br>Good luck with your studies!",
                 ],
             ],
             'onlygroups' => [
@@ -263,16 +263,16 @@ class catquiz_test extends TestCase {
                 'expected' => [
                     'messagetitle' => "Notification about new course / group enrolments",
                     'messagebody' => "Based on your results in test Testname in course Kurs 1 you are now...<br>"
-                        . "<br>member of the following group(s):<br><br>"
-                        . "<ul><li>Gruppe 1 in course <a href=http://10.111.0.2:8000/course/view.php?id=17>Kurs 1</a></li>"
-                        . "<li>Gruppe 2 in course <a href=http://10.111.0.2:8000/course/view.php?id=17>Kurs 2</a></li>"
-                        . "<li>Gruppe 3 in course <a href=http://10.111.0.2:8000/course/view.php?id=17>Kurs 3</a></li>"
-                        . "</ul>Good luck with your studies!",
+                        . "<br>member of the following group(s):<br>"
+                        . "<div> - Gruppe 1 in course <a href=http://10.111.0.2:8000/course/view.php?id=17>Kurs 1</a></div>"
+                        . "<div> - Gruppe 2 in course <a href=http://10.111.0.2:8000/course/view.php?id=17>Kurs 2</a></div>"
+                        . "<div> - Gruppe 3 in course <a href=http://10.111.0.2:8000/course/view.php?id=17>Kurs 3</a></div>"
+                        . "Good luck with your studies!",
                     'messageforfeedback' => "Based on your results you are now...<br><br>"
-                        . "member of the following group(s):<br><br>"
-                        . "<ul><li>Gruppe 1 in course <a href=http://10.111.0.2:8000/course/view.php?id=17>Kurs 1</a></li>"
-                        . "<li>Gruppe 2 in course <a href=http://10.111.0.2:8000/course/view.php?id=17>Kurs 2</a></li>"
-                        . "<li>Gruppe 3 in course <a href=http://10.111.0.2:8000/course/view.php?id=17>Kurs 3</a></li></ul>"
+                        . "member of the following group(s):<br>"
+                        . "<div> - Gruppe 1 in course <a href=http://10.111.0.2:8000/course/view.php?id=17>Kurs 1</a></div>"
+                        . "<div> - Gruppe 2 in course <a href=http://10.111.0.2:8000/course/view.php?id=17>Kurs 2</a></div>"
+                        . "<div> - Gruppe 3 in course <a href=http://10.111.0.2:8000/course/view.php?id=17>Kurs 3</a></div>"
                         . "Good luck with your studies!",
                 ],
             ],
