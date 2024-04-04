@@ -143,4 +143,12 @@ class model_responses_test extends basic_testcase {
         $mr->set('P3', 'A1', 0.0);
         $this->assertEquals(2 / 3, $mr->get_item_fraction('A1'));
     }
+
+    public function test_personparam_can_be_updated() {
+        $mr = new model_responses();
+        $mr->set('P1', 'A1', 1.0);
+        $mr->set_person_abilities((new model_person_param_list())->add((new model_person_param('P1'))->set_ability(1.2)));
+        $userresponse = $mr->get_for_user('P1')['A1'];
+        $this->assertEquals(1.2, $userresponse->get_personparams()->get_ability());
+    }
 }
