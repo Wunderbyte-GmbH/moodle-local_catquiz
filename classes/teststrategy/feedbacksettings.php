@@ -305,6 +305,9 @@ class feedbacksettings {
      *
      */
     public function filter_semax(array $personabilities, array $feedbackdata): array {
+        if (!isset($this->semax)) {
+            return $personabilities;
+        }
         $semax = $this->semax;
         if (!empty($semax)) {
             foreach ($personabilities as $scaleid => $array) {

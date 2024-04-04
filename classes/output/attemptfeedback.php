@@ -405,7 +405,7 @@ class attemptfeedback implements renderable, templatable {
                 return 0;
             }
         });
-
+        $context = [];
         foreach ($generators as $generator) {
             $feedbacks = $generator->get_feedback($feedbackdata);
             // Loop over studentfeedback and teacherfeedback.
