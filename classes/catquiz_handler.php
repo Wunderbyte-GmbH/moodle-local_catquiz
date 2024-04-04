@@ -386,7 +386,8 @@ class catquiz_handler {
 
         // Standarderror- values should be float with min lower than max.
         $semin = false;
-        if (isset($data['catquiz_standarderrorgroup']['catquiz_standarderror_min'])) {
+        if (isset($data['catquiz_standarderrorgroup']['catquiz_standarderror_min'])
+            && $data['catquiz_standarderrorgroup']['catquiz_standarderror_min'] !== "") {
             if (!is_numeric($data['catquiz_standarderrorgroup']['catquiz_standarderror_min'])
                 && !empty($data['catquiz_standarderrorgroup']['catquiz_standarderror_min'])) {
                 $errors['catquiz_standarderrorgroup'] =
@@ -413,8 +414,8 @@ class catquiz_handler {
         $sevalues = new stdClass;
         $sevalues->min = LOCAL_CATQUIZ_STANDARDERROR_DEFAULT_MIN;
         $sevalues->max = LOCAL_CATQUIZ_STANDARDERROR_DEFAULT_MAX;
-        if (!isset($data['catquiz_standarderrorgroup']['catquiz_standarderror_max']) ||
-            !isset($data['catquiz_standarderrorgroup']['catquiz_standarderror_min'])) {
+        if (!$semin ||
+            empty($data['catquiz_standarderrorgroup']['catquiz_standarderror_min'])) {
             $errors['catquiz_standarderrorgroup']
             = get_string('setsevalue', 'local_catquiz', $sevalues);
         }
