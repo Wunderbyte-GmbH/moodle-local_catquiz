@@ -342,12 +342,9 @@ class attemptfeedback implements renderable, templatable {
      *
      */
     public function export_for_template(\renderer_base $output): array {
-        // 1. Perform attempt-finished tasks.
-        $msg = $this->attempt_finished_tasks();
 
         return [
             'feedback' => $this->get_feedback_for_attempt(),
-            'enrolementmessage' => $msg,
         ];
     }
 

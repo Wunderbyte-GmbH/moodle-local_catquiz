@@ -1763,7 +1763,8 @@ class catquiz {
                     $coursedata['coursesummary'] = $course->summary ?? "";
                     $coursedata['courseurl'] = $url->out() ?? "";
                     $coursedata['catscalename'] = $catscale->name ?? "";
-                    if (!is_enrolled($context, $userid) && $course) {
+
+                    if (!is_enrolled($context, $userid) && !empty($course)) {
                         if (enrol_try_internal_enrol($courseid, $userid, $rolestudent->id)) {
                             $enrolementarray['course'][] = $coursedata;
                         }

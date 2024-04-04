@@ -862,11 +862,12 @@ class catquiz_handler {
         // If we are here, at least one question was played and we can provide feedback.
         $contextid = optional_param('context', 0, PARAM_INT);
         $attemptfeedback = new attemptfeedback($attemptrecord->id, $contextid, null, $COURSE->id);
-        $attemptfeedback->attempt_finished_tasks();
+        $enrolmentmessage = $attemptfeedback->attempt_finished_tasks();
 
         return self::render_attemptfeedback(
             $attemptrecord,
-            $attemptfeedback
+            $attemptfeedback,
+            $enrolmentmessage
         );
     }
 
@@ -875,15 +876,20 @@ class catquiz_handler {
      *
      * @param stdClass $attemptrecord
      * @param attemptfeedback $attemptfeedback
+     * @param string $enrolmentmessage
      *
      * @return string
      *
      */
-    private static function render_attemptfeedback(stdClass $attemptrecord, attemptfeedback $attemptfeedback): string {
+    private static function render_attemptfeedback(
+        stdClass $attemptrecord,
+        attemptfeedback $attemptfeedback,
+        string $enrolmentmessage
+        ): string {
         global $OUTPUT;
 
         $data = $attemptfeedback->export_for_template($OUTPUT);
-
+        $data['enrolementmessage'] = $enrolmentmessage;
         // We need to delete caches.
         cache_helper::purge_by_event('changesinquizattempts');
 
