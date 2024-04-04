@@ -1045,10 +1045,10 @@ class strategy_test extends advanced_testcase {
             $CFG->dirroot . '/local/catquiz/tests/fixtures/persons.csv', 'Gesamt'
         );
         $responses->set_person_abilities($initialabilities);
-        $userlist = array_slice($responses->get_person_ids(), 0, 300);
-        $responses->limit_to_users($userlist);
-        $itemlist = array_slice($responses->get_item_ids(), 0, 70);
-        $responses->limit_to_items($itemlist);
+       // $userlist = array_slice($responses->get_person_ids(), 0, 300);
+       // $responses->limit_to_users($userlist);
+        //$itemlist = array_slice($responses->get_item_ids(), 0, 70);
+        //$responses->limit_to_items($itemlist);
         $strategy = new model_strategy($responses, [], $initialabilities);
         list($calculatedabilities, $calculateditemparams) = $strategy->run_estimation();
         $this->assertEquals(true, false);

@@ -263,7 +263,7 @@ class model_responses {
      *
      * @return model_person_param_list
      */
-    public function get_initial_person_abilities() {
+    public function get_person_abilities() {
         $personparamlist = new model_person_param_list();
         foreach (array_keys($this->byperson) as $userid) {
             $p = new model_person_param($userid);

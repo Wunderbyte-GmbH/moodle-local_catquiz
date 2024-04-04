@@ -59,7 +59,7 @@ class model_strategy {
      *
      * @var int
      */
-    const MAX_ITERATIONS = 5; // TODO: get value from DB?
+    const MAX_ITERATIONS = 4; // TODO: get value from DB?
 
     /**
      * @var model_responses Contains necessary data for estimation
@@ -145,8 +145,8 @@ class model_strategy {
         $this->olditemparams = $olditemparams;
 
         if ($savedpersonabilities === null || count($savedpersonabilities) === 0) {
-            $savedpersonabilities = $responses->get_initial_person_abilities();
-        } else if (count($savedpersonabilities) < count($initial = $responses->get_initial_person_abilities())) {
+            $savedpersonabilities = $responses->get_person_abilities();
+        } else if (count($savedpersonabilities) < count($initial = $responses->get_person_abilities())) {
             $newusers = array_diff(
                 array_keys($initial->get_person_params()),
                 array_keys($savedpersonabilities->get_person_params()));
@@ -219,7 +219,7 @@ class model_strategy {
      * @return array<model_item_param_list, model_person_param_list>
      */
     public function run_estimation(): array {
-        $personabilities = $this->initialpersonabilities;
+        $personabilities = $this->responses->get_person_abilities();
 
         /** @var array<model_item_param_list> $itemdifficulties */
         $itemdifficulties = [];
