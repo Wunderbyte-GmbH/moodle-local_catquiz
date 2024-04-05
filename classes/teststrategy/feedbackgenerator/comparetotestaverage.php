@@ -30,6 +30,7 @@ use local_catquiz\feedback\feedbackclass;
 use local_catquiz\teststrategy\feedbackgenerator;
 use local_catquiz\teststrategy\feedbacksettings;
 use local_catquiz\teststrategy\preselect_task\firstquestionselector;
+use local_catquiz\teststrategy\progress;
 
 defined('MOODLE_INTERNAL') || die();
 
@@ -270,7 +271,7 @@ class comparetotestaverage extends feedbackgenerator {
      *
      */
     public function load_data(int $attemptid, array $existingdata, array $newdata): ?array {
-        $progress = $newdata['progress'];
+        $progress = progress::load($attemptid, 'mod_adaptivequiz', $existingdata['contextid']);
         $quizsettings = $existingdata['quizsettings'];
 
         if (!$progress->get_playedquestions()) {

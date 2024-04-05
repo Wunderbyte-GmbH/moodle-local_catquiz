@@ -254,10 +254,15 @@ class feedbacksettings {
      *
      */
     public function filter_nminscale(array $personabilities, array $feedbackdata): array {
+        $progress = progress::load(
+            $feedbackdata['attemptid'],
+            'mod_adaptivequiz',
+            $feedbackdata['contextid']
+        );
         $nminscale = $this->nminscale;
         if (!empty($nminscale)) {
             foreach ($personabilities as $scaleid => $array) {
-                $ninscale = count($feedbackdata['questionsperscale'][$scaleid]);
+                $ninscale = count($progress->get_playedquestions(true, $scaleid));
                 if ($ninscale < $nminscale) {
                     $personabilities[$scaleid]['error']['nminscale'] = [
                         'nminscaledefined' => $nminscale,
@@ -395,11 +400,7 @@ class feedbacksettings {
         // Find average fraction.
         $f = 0.0;
         $i = 0;
-        if (!($newdata['progress'] instanceof progress)) {
-            $progress = progress::load($newdata['attemptid'], $newdata['component'], $newdata['contextid']);
-            $newdata['progress'] = $progress;
-        }
-        $progress = $newdata['progress'];
+        $progress = progress::load($newdata['attemptid'], $newdata['component'], $newdata['contextid']);
         $responses = $progress->get_responses();
         foreach ($responses as $responsearray) {
             $fraction = (float) $responsearray['fraction'];

@@ -194,6 +194,7 @@ class attemptfeedback implements renderable, templatable {
             'attemptid' => $this->attemptid,
             'contextid' => $this->contextid,
             'courseid' => $this->courseid ?? 0,
+            'component' => 'mod_adaptivequiz',
             'userid' => $USER->id,
             'catscaleid' => $this->catscaleid,
             'teststrategy' => $this->teststrategy,
@@ -225,11 +226,10 @@ class attemptfeedback implements renderable, templatable {
         // Get the data required to generate the feedback. This can be saved to
         // the DB.
         $feedbackdata = $existingdata;
+        // Remove extra keys that we do not want to store.
+        $excludekeys = ['questions', 'original_questions', 'questionsperscale'];
+        $newdata = array_filter($newdata, fn ($k) => !in_array($k, $excludekeys), ARRAY_FILTER_USE_KEY);
         $newdata = $this->add_default_data($newdata);
-        if (!($newdata['progress'] instanceof progress)) {
-            $progessobject = progress::load($newdata['attemptid'], $newdata['component'], $newdata['contextid']);
-            $newdata['progress'] = $progessobject;
-        }
         foreach ($generators as $generator) {
             $generatordata = $generator->load_data($this->attemptid, $existingdata, $newdata);
             if (! $generatordata) {
@@ -255,7 +255,7 @@ class attemptfeedback implements renderable, templatable {
      */
     private function add_default_data(array $newdata): array {
         $newarray = [];
-        $progress = $newdata['progress'];
+        $progress = progress::load($newdata['attemptid'], $newdata['component'], $newdata['contextid']);
 
         $personabilities = $progress->get_abilities();
 

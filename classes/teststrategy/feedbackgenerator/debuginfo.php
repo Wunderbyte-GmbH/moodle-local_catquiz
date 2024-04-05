@@ -132,7 +132,7 @@ class debuginfo extends feedbackgenerator {
                 .", fraction: " . $fraction;
             }
 
-            $questions = $row['questions'];
+            $questions = $row['questions'] ?? [];
             if (! $questions) {
                 $rowarr[] = 'NA';
             } else {

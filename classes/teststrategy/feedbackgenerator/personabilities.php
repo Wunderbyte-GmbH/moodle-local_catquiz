@@ -36,6 +36,7 @@ use local_catquiz\output\catscalemanager\questions\cards\questionpreview;
 use local_catquiz\teststrategy\feedbackgenerator;
 use local_catquiz\teststrategy\feedbacksettings;
 use local_catquiz\local\model\model_strategy;
+use local_catquiz\teststrategy\progress;
 use stdClass;
 
 defined('MOODLE_INTERNAL') || die();
@@ -166,7 +167,6 @@ class personabilities extends feedbackgenerator {
             'primaryscale',
             'personabilities_abilities',
             'se',
-            'playedquestions',
             'abilitieslist',
             'models',
         ];
@@ -221,7 +221,7 @@ class personabilities extends feedbackgenerator {
         global $CFG;
         require_once($CFG->dirroot . '/local/catquiz/lib.php');
 
-        $progress = $newdata['progress'];
+        $progress = progress::load($existingdata['attemptid'], 'mod_adaptivequiz', $existingdata['contextid']);
         $personabilities = $progress->get_abilities();
 
         if ($personabilities === []) {
@@ -275,14 +275,11 @@ class personabilities extends feedbackgenerator {
         }
         $models = model_strategy::get_installed_models();
 
-        $playedquestions = $progress->get_playedquestions(true);
-
         return [
             'quizsettings' => (array) $quizsettings,
             'primaryscale' => $catscales[$selectedscaleid],
             'personabilities_abilities' => $personabilities,
             'se' => $newdata['se'] ?? null,
-            'playedquestions' => $playedquestions,
             'abilitieslist' => $abilitieslist,
             'models' => $models,
         ];

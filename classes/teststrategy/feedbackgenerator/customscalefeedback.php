@@ -28,6 +28,7 @@ use cache;
 use local_catquiz\catquiz;
 use local_catquiz\teststrategy\feedbackgenerator;
 use local_catquiz\teststrategy\feedbacksettings;
+use local_catquiz\teststrategy\progress;
 
 /**
  * Returns a custom feedback for each scale.
@@ -179,7 +180,7 @@ class customscalefeedback extends feedbackgenerator {
      */
     public function load_data(int $attemptid, array $existingdata, array $newdata): ?array {
         $quizsettings = $existingdata['quizsettings'];
-        $progress = $newdata['progress'];
+        $progress = progress::load($attemptid, 'mod_adaptivequiz', $existingdata['contextid']);
         $personabilities = $progress->get_abilities();
 
         if (!$personabilities) {

@@ -33,6 +33,7 @@ use local_catquiz\feedback\feedbackclass;
 use local_catquiz\teststrategy\feedbackgenerator;
 use local_catquiz\teststrategy\feedbacksettings;
 use local_catquiz\teststrategy\info;
+use local_catquiz\teststrategy\progress;
 
 /**
  * Compare the ability of this attempt to the average abilities of other students that took this test.
@@ -178,7 +179,7 @@ class graphicalsummary extends feedbackgenerator {
      *
      */
     public function load_data(int $attemptid, array $existingdata, array $newdata): ?array {
-        $progress = $newdata['progress'];
+        $progress = progress::load($attemptid, 'mod_adaptivequiz', $existingdata['contextid']);
 
         // If we already have all the data, just return them instead of adding
         // the last response again.
@@ -224,10 +225,11 @@ class graphicalsummary extends feedbackgenerator {
             info::get_teststrategy($existingdata['teststrategy'])
         ->get_description());
 
+        $progress = progress::load($attemptid, 'mod_adaptivequiz', $existingdata['contextid']);
         return [
             'graphicalsummary_data' => $graphicalsummary,
             'teststrategyname' => $teststrategyname,
-            'personabilities' => $newdata['progress']->get_abilities(),
+            'personabilities' => $progress->get_abilities(),
         ];
     }
 
