@@ -631,6 +631,9 @@ class progress implements JsonSerializable {
      * @return $this
      */
     public function drop_scale(int $scaleid) {
+        if (!in_array($scaleid, $this->activescales)) {
+            return $this;
+        }
         unset($this->activescales[array_search($scaleid, $this->activescales)]);
         return $this;
     }
