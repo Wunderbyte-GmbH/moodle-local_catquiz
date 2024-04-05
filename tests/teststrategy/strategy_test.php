@@ -1091,7 +1091,7 @@ class strategy_test extends advanced_testcase {
         $jsondata->component = 'mod_adaptivequiz';
         $jsondata->catquiz_selectteststrategy = $strategyid;
         $jsondata->maxquestionsgroup->catquiz_maxquestions = $settings['maxquestions'] ?? 25;
-        $jsondata->maxquestionsgroup->catquiz_minquestions = 500;
+        $jsondata->maxquestionsgroup->catquiz_minquestions = 0;
         $jsondata->maxquestionsscalegroup->catquiz_maxquestionspersubscale = $settings['maxquestionspersubscale'] ?? 10;
         $jsondata->catquiz_pp_min_inc = $settings['pp_min_inc'] ?? 0.01;
         if ($pilotratio = $settings['pilot_ratio'] ?? null) {
