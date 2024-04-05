@@ -218,6 +218,18 @@ class filterbystandarderror extends preselect_task implements wb_middleware {
             $this->progress->without_pilots()->get_playedquestions(true)[$scaleid]
         );
 
+        // Special treatment for the main scale: exclude it only, if the minimum number of questions
+        // per attempt AND questions per scale have been played.
+        $ismainscale = $scaleid === intval($this->context['catscaleid']);
+        if ($ismainscale
+            && (
+                count($this->progress->get_playedquestions()) < $this->context['minimumquestions']
+                || count($playeditems) < $this->context['min_attempts_per_scale']
+            )
+        ) {
+            return false;
+        }
+
         $hasmaxitems = $this->context['max_attempts_per_scale'] !== -1
             && count($playeditems) >= $this->context['max_attempts_per_scale'];
         $hasminse = $this->context['se'][$scaleid] <= $this->context['se_min'];
