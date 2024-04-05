@@ -155,13 +155,13 @@ abstract class strategy {
 
         $result = wb_middleware_runner::run($middlewares, $context);
         $this->progress = $context['progress'];
+        $this->progress->save();
 
         $this->update_attemptfeedback($context);
 
         if ($result->isErr()) {
             $cache->set('endtime', time());
             $cache->set('catquizerror', $result->get_status());
-            $this->progress->save();
             return $result;
         }
 
