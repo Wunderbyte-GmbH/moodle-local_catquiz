@@ -192,7 +192,7 @@ class graphicalsummary extends feedbackgenerator {
             return $existingdata;
         }
 
-        if (!$lastresponse = $progress->get_last_response(true)) {
+        if (!$lastresponse = $progress->get_last_response()) {
             return null;
         }
         $lastquestion = $progress->get_playedquestions()[$lastresponse['qid']];

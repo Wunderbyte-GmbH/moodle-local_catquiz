@@ -226,7 +226,7 @@ class attemptfeedback implements renderable, templatable {
         // Get the data required to generate the feedback. This can be saved to
         // the DB.
         $feedbackdata = $existingdata;
-        // Remove extra keys that we do not want to store.
+        // Remove extra keys that we do not want to store because that can make this too large.
         $excludekeys = ['questions', 'original_questions', 'questionsperscale'];
         $newdata = array_filter($newdata, fn ($k) => !in_array($k, $excludekeys), ARRAY_FILTER_USE_KEY);
         $newdata = $this->add_default_data($newdata);
