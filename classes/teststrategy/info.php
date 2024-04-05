@@ -249,6 +249,7 @@ class info {
                 ['size' => '3']
             ),
             ];
+        $mform->_defaultValues['maxquestionsgroup']['catquiz_minquestions'] = get_config('local_catquiz', 'minquestions_default');
         $elements[] = $mform->addGroup(
             $maxquestionspertest,
             'maxquestionsgroup',

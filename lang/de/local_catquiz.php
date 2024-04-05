@@ -77,6 +77,8 @@ $string['tr_sd_ratio_desc'] = 'Der Multiplikator für den Vertrauensbereich gibt
     Datenlage unzuverlässige Werte liefert. Default-Wert ist ein Multiplikator
     von 3.0, was statistisch 99,9 Prozent aller zu erwartenden Fälle mit
     einschließt einschließt.';
+$string['minquestions_default_name'] = 'Standardwert für die Mindestanzahl an Fragen pro Versuch';
+$string['minquestions_default_desc'] = 'Dieser Wert wird standardmässig gesetzt, kann jedoch in den Quizsettings überschrieben werden';
 $string['acceptedstandarderror'] = 'akzeptierter Standardfehler';
 $string['acceptedstandarderror_help'] = 'Sobald der Standardfehler einer Skala außerhalb dieser Werte fällt, wird sie nicht weiter getestet.';
 $string['maxquestionspersubscale'] = 'max. Frageanzahl pro Skala';

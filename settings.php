@@ -19,7 +19,7 @@
  *
  * @package     local_catquiz
  * @category    admin
- * @copyright   2022 Wunderbyte GmbH <info@wunderbyte.at>
+ * @copyright   2024 Wunderbyte GmbH <info@wunderbyte.at>
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
@@ -86,5 +86,13 @@ if ($hassiteconfig) {
         get_string('tr_sd_ratio_desc', 'local_catquiz'),
         3.0,
         PARAM_FLOAT)
+    );
+    $settings->add(new admin_setting_configtext(
+        'local_catquiz/minquestions_default',
+        get_string('minquestions_default_name', 'local_catquiz'),
+        get_string('minquestions_default_desc', 'local_catquiz'),
+        3,
+        '/^\d+$/'
+        )
     );
 }
