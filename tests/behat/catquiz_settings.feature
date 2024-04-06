@@ -161,20 +161,21 @@ Feature: As a teacher I setup adaptive quiz with CATquiz Scales and Feedbacks.
       | maxquestionsgroup[catquiz_minquestions] | 10 |
       | maxquestionsgroup[catquiz_maxquestions] | 3  |
       ## Intentional error - catquiz_standarderror_max out of range
-      | catquiz_standarderrorgroup[catquiz_standarderror_min] | 0.4 |
-      | catquiz_standarderrorgroup[catquiz_standarderror_max] | 2   |
+      | catquiz_standarderrorgroup[catquiz_standarderror_min] | -0.4 |
+      | catquiz_standarderrorgroup[catquiz_standarderror_max] | 2    |
     When I click on "Save and display" "button"
     ## Errors validation 1: invalid numbers or min > max or no values
     Then I should see "Input a number from 0 to 100" in the "#fitem_id_catquiz_passinglevel" "css_element"
     And I should see "Minimum must be less than maximum" in the "#fgroup_id_maxquestionsgroup" "css_element"
     And I should see "Minimum must be less than maximum" in the "#fgroup_id_maxquestionsscalegroup" "css_element"
-    ## Decision - larger than 1 values allowed somehow
-    ## And I should see "Please enter values between 0 and 1." in the "#fgroup_id_catquiz_standarderrorgroup" "css_element"
     And I should see "Input at least one value of time limit" in the "#fgroup_id_catquiz_timelimitgroup" "css_element"
+    ## Errors validation 1: SE min must be positive
+    And I should see "Input a positive number" in the "#fgroup_id_catquiz_standarderrorgroup" "css_element"
     And I set the following fields to these values:
       ## Fix errors
       | Passing level in %                                      | 50 |
-      ##| catquiz_standarderrorgroup[catquiz_standarderror_max] | 0.6 |
+      ## Intentional error - empty catquiz_standarderror_min
+      | catquiz_standarderrorgroup[catquiz_standarderror_min] |  |
       ## Intentional error catquiz_minquestionspersubscale > catquiz_maxquestions
       | maxquestionsscalegroup[catquiz_minquestionspersubscale] | 15 |
       | maxquestionsscalegroup[catquiz_maxquestionspersubscale] | 30 |
@@ -191,11 +192,28 @@ Feature: As a teacher I setup adaptive quiz with CATquiz Scales and Feedbacks.
     And I should see "Per scale minimum must be less than per test maximum" in the "#fgroup_id_maxquestionsgroup" "css_element"
     ## not implemented yet - validation for time - maximum time per attempt must be greater than maximum time per itemif
     ## And I should see "Maximum time per attempt must be greater than maximum time per item" in the "#fgroup_id_catquiz_timelimitgroup" "css_element"
+    ## Errors validation 2: SE min cannot be empty
+    And I should see "Please define values. Standard: min=0.35 max=1" in the "#fgroup_id_catquiz_standarderrorgroup" "css_element"
     And I set the following fields to these values:
       | maxquestionsscalegroup[catquiz_minquestionspersubscale] | 1 |
       | maxquestionsscalegroup[catquiz_maxquestionspersubscale] | 3 |
       | catquiz_timelimitgroup[catquiz_maxtimeperattempt]       | 5 |
       | catquiz_timelimitgroup[catquiz_maxtimeperitem]          | 1 |
+      ## Intentional error - catquiz_standarderror_max empty
+      | catquiz_standarderrorgroup[catquiz_standarderror_min] | 0.4 |
+      | catquiz_standarderrorgroup[catquiz_standarderror_max] |     |
+    And I click on "Save and display" "button"
+    ## Errors validation 3: SE max cannot be empty
+    And I should see "Please define values. Standard: min=0.35 max=1" in the "#fgroup_id_catquiz_standarderrorgroup" "css_element"
+    And I set the following fields to these values:
+    ## Intentional error - catquiz_standarderror_max < catquiz_standarderror_min
+      | catquiz_standarderrorgroup[catquiz_standarderror_min] | 0.4 |
+      | catquiz_standarderrorgroup[catquiz_standarderror_max] | 0.2 |
+    And I click on "Save and display" "button"
+    ## Errors validation 4: SE max cannot be less than SE min
+    And I should see "Minimum must be less than maximum" in the "#fgroup_id_catquiz_standarderrorgroup" "css_element"
+    And I set the following fields to these values:
+      | catquiz_standarderrorgroup[catquiz_standarderror_max] | 2 |
     And I click on "Save and display" "button"
     And I follow "Settings"
     ## Verify all root catscales active by default
@@ -208,7 +226,6 @@ Feature: As a teacher I setup adaptive quiz with CATquiz Scales and Feedbacks.
       | Proportion of questions to be piloted in % | 20                        |
       | Start new test                             | 1                         |
       | catquiz_standarderrorgroup[catquiz_standarderror_min]   | 0.4 |
-      ##| catquiz_standarderrorgroup[catquiz_standarderror_max] | 0.6 |
       | catquiz_standarderrorgroup[catquiz_standarderror_max]   | 2   |
       | maxquestionsscalegroup[catquiz_minquestionspersubscale] | 1   |
       | maxquestionsscalegroup[catquiz_maxquestionspersubscale] | 3   |
