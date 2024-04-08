@@ -481,7 +481,7 @@ class testenvironment {
             case LOCAL_CATQUIZ_TESTENVIRONMENT_ALL:
                 break;
             case LOCAL_CATQUIZ_TESTENVIRONMENT_ONLYTEMPLATES:
-                $equal = " WHERE 'componentid' = :componentid";
+                $equal = " WHERE componentid = :componentid";
                 break;
             case LOCAL_CATQUIZ_TESTENVIRONMENT_NOTEMPLATES:
                 $equal = "WHERE componentid <> :componentid";
