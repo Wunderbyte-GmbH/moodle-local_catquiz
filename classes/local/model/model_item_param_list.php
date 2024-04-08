@@ -873,4 +873,26 @@ class model_item_param_list implements ArrayAccess, IteratorAggregate, Countable
         }
         return $this;
     }
+
+    /**
+     * Returns the item params as CSV rows
+     *
+     * @param bool $header
+     * @return array
+     */
+    public function as_csv(bool $header = false): array {
+        if ($header) {
+            $rows[] = implode(
+                ';',
+                array_merge(
+                    array_keys(reset($this->itemparams)->get_params_array()),
+                    ['model']
+                )
+            );
+        }
+        foreach ($this->itemparams as $ip) {
+            $rows[] = implode(';', array_merge([$ip->get_id()], $ip->get_params_array(), [$ip->get_model_name()]));
+        }
+        return $rows;
+    }
 }
