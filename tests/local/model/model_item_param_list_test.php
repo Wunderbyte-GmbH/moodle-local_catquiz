@@ -26,6 +26,8 @@
 namespace local_catquiz\local\model;
 
 use advanced_testcase;
+use SebastianBergmann\RecursionContext\InvalidArgumentException;
+use PHPUnit\Framework\ExpectationFailedException;
 use UnexpectedValueException;
 
 /** model_item_param_list_test
@@ -85,6 +87,39 @@ class model_item_param_list_test extends advanced_testcase {
     }
 
     // TODO: Test for update_in_scale.
+
+    /**
+     * Checks if we get the expected CSV row strings.
+     *
+     * @return void
+     * @throws InvalidArgumentException
+     * @throws ExpectationFailedException
+     */
+    public function test_can_be_printed_as_csv() {
+        $ipl = new model_item_param_list();
+        $ipl->add(
+            (new model_item_param('A01', 'mixedraschbirnbaum'))
+                ->set_parameters(
+                    ['difficulty' => 1.2, 'guessing' => 2.3, 'discrimination' => 3.4]
+                    )
+                );
+        $rows = $ipl->as_csv(true);
+
+        $this->assertEquals('difficulty;guessing;discrimination;model', $rows[0]);
+        $this->assertEquals('1.2;2.3;3.4;mixedraschbirnbaum', $rows[1]);
+
+        $ipl2 = new model_item_param_list();
+        $ipl2->add(
+            (new model_item_param('A01', 'rasch'))
+                ->set_parameters(
+                    ['difficulty' => 1.8]
+                    )
+                );
+        $rows = $ipl2->as_csv(true);
+
+        $this->assertEquals('difficulty;model', $rows[0]);
+        $this->assertEquals('1.8;rasch', $rows[1]);
+    }
 }
 
 
