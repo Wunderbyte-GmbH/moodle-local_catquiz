@@ -27,8 +27,6 @@ use context_system;
 use core_form\dynamic_form;
 use local_catquiz\catquiz;
 use local_catquiz\event\testitemstatus_updated;
-use local_catquiz\local\model\model_item_param;
-use local_catquiz\local\model\model_item_param_list;
 use local_catquiz\local\model\model_strategy;
 use moodle_url;
 use stdClass;
@@ -468,17 +466,9 @@ class item_model_override_selector extends dynamic_form {
             }
 
             foreach ($values as $name => $value) {
-                if ($name === 'difficulty') {
-                    $dataarray[sprintf('%s_difficultylabel', $field)] = get_string('itemdifficulty', 'local_catquiz') . ":";
-                    $dataarray[sprintf('%s_difficulty', $field)] = $value;
-                    continue;
-                } else if ($name === 'guessing') {
-                    $dataarray[sprintf('%s_guessinglabel', $field)] = get_string('guessing', 'local_catquiz') . ":";
-                    $dataarray[sprintf('%s_guessing', $field)] = $value;
-                    continue;
-                } else if ($name === 'discrimination') {
-                    $dataarray[sprintf('%s_discriminationlabel', $field)] = get_string('discrimination', 'local_catquiz') . ":";
-                    $dataarray[sprintf('%s_discrimination', $field)] = $value;
+                if (in_array($name, ['difficulty', 'guessing', 'discrimination'])) {
+                    $dataarray[sprintf('%s_%slabel', $field, $name)] = get_string($name, 'local_catquiz') . ":";
+                    $dataarray[sprintf('%s_%s', $field, $name)] = $value;
                     continue;
                 }
             }
