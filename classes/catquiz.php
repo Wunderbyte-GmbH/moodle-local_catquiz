@@ -731,7 +731,7 @@ class catquiz {
         $from = "
         ( SELECT
             ct.id,
-            name,
+            aq.name,
             component,
             c.visible,
             availability,
@@ -743,25 +743,24 @@ class catquiz {
             c.timecreated,
             ct.catscaleid,
             numberofitems,
-            teachers
+            users
         FROM {local_catquiz_tests} ct
         JOIN {course} c ON c.id = ct.courseid
+        JOIN {adaptivequiz} aq ON ct.componentid = aq.id
         LEFT JOIN (SELECT catscaleid as itemcatscale, COUNT(*) AS numberofitems
            FROM {local_catquiz_items}
            GROUP BY catscaleid
         ) s1 ON ct.catscaleid = s1.itemcatscale
         LEFT JOIN (
-            SELECT c.id AS courseid, " .
-                $DB->sql_group_concat($DB->sql_concat_join("' '", ['u.firstname', 'u.lastname']), ', ') . " AS teachers
-            FROM {user} u
-            JOIN {role_assignments} ra ON ra.userid = u.id
-            JOIN {context} ct ON ct.id = ra.contextid
-            JOIN {course} c ON c.id = ct.instanceid
-            JOIN {role} r ON r.id = ra.roleid
-            WHERE r.shortname IN ('teacher', 'editingteacher')
-            GROUP BY c.id
-            ) s2 ON s2.courseid = ct.courseid
-            ) s3";
+            SELECT instance, COUNT(*) as users
+            FROM (
+                SELECT instance, userid
+                FROM {adaptivequiz_attempt} at
+                GROUP BY at.instance, at.userid
+            ) s4
+            GROUP BY s4.instance
+        ) s2 ON s2.instance = ct.componentid
+        ) s3";
 
         $where = "1=1";
         $filter = '';
