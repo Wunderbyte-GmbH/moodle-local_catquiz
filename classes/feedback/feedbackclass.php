@@ -474,7 +474,7 @@ class feedbackclass {
         if (!empty($scale)) {
             self::add_closing_html(1, $scale->id, $mform, $elements, $html2);
         }
-
+        $PAGE->requires->js_call_amd('local_catquiz/quizsettingsexpandcollapisble', 'init');
     }
 
     /**
@@ -631,7 +631,7 @@ class feedbackclass {
                             $errors['feedback_scaleid_limit_lower_' . $scale->id . '_' . $j] =
                                 get_string('nogapallowed', 'local_catquiz');
                         }
-                        // Upper limit mus be always greater than lowest limit.
+                        // Upper limit must be always greater than lowest limit.
                         if ((float) $data['feedback_scaleid_limit_upper_' . $scale->id . '_' . $j] <=
                             (float) $data['feedback_scaleid_limit_lower_' . $scale->id . '_' . $j]) {
                             $errors['feedback_scaleid_limit_upper_' . $scale->id . '_' . $j] =
