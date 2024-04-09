@@ -26,8 +26,8 @@ namespace local_catquiz;
 
 use core\check\result;
 use dml_exception;
-use local_catquiz\event\attempt_completed;
-use local_catquiz\teststrategy\feedbacksettings;
+use local_catquiz\event\usertocourse_enroled;
+use local_catquiz\event\usertogroup_enroled;
 use moodle_exception;
 use moodle_url;
 use question_attempt;
@@ -1781,6 +1781,7 @@ class catquiz {
                     if (!is_enrolled($context, $userid) && !empty($course)) {
                         if (enrol_try_internal_enrol($courseid, $userid, $rolestudent->id)) {
                             $enrolementarray['course'][] = $coursedata;
+                            self::course_enrolment_event($coursedata, $userid);
                         }
                     }
                     if (empty($groupsarray)) {
@@ -1792,7 +1793,7 @@ class catquiz {
                         foreach ($groupsarray as $newgroup) {
                             if ($existinggroup->name == $newgroup) {
                                 $groupmember = groups_add_member($existinggroup->id, $userid);
-                                if ($message && $groupmember) {
+                                if ($groupmember) {
                                     $data = [];
                                     $data['testname'] = $quizsettings['name'];
                                     $data['groupname'] = $newgroup;
@@ -1802,6 +1803,7 @@ class catquiz {
                                     $data['courseurl'] = $url->out();
                                     $data['catscalename'] = $catscale->name ?? "";
                                     $enrolementarray['group'][] = $data;
+                                    self::group_enrolment_event($data, $userid);
                                 }
                             }
                         }
@@ -1811,7 +1813,67 @@ class catquiz {
             $i++;
         }
 
+
+        if (!$message) {
+            return [];
+        }
+
         return $enrolementarray;
+
+    }
+
+    /**
+     * Send event for user enrolement to course.
+     *
+     * @param array $coursedata
+     * @param int $userid
+     *
+     * @return void
+     *
+     */
+    public static function course_enrolment_event(array $coursedata, int $userid) {
+
+        // Trigger user_enroled event.
+        $event = usertocourse_enroled::create([
+            'objectid' => $userid,
+            'context' => \context_system::instance(),
+            'other' => [
+                'coursename' => $coursedata['coursename'],
+                'courseurl' => $coursedata['courseurl'],
+                'userid' => $userid,
+                'testname' => $coursedata['testname'],
+                'catscalename' => $coursedata['catscalename'],
+            ],
+        ]);
+        $event->trigger();
+
+    }
+
+    /**
+     * Send event for user enrolement to group.
+     *
+     * @param array $data
+     * @param int $userid
+     *
+     * @return void
+     *
+     */
+    public static function group_enrolment_event(array $data, int $userid) {
+
+        // Trigger user_enroled event.
+        $event = usertogroup_enroled::create([
+            'objectid' => $userid,
+            'context' => \context_system::instance(),
+            'other' => [
+                'groupname' => $data['groupname'],
+                'coursename' => $data['coursename'],
+                'courseurl' => $data['courseurl'],
+                'userid' => $userid,
+                'testname' => $data['testname'],
+                'catscalename' => $data['catscalename'],
+            ],
+        ]);
+        $event->trigger();
 
     }
 
