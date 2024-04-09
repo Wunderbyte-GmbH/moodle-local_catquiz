@@ -200,7 +200,7 @@ $string['timemodified'] = 'Time modified';
 
 // Events and Event Logs.
 $string['target'] = 'Target';
-$string['userupdatedcatscale'] = 'User with id {$a->userid} updated {$a->catscalelink}';
+$string['userupdatedcatscale'] = 'User with ID {$a->userid} updated {$a->catscalelink}';
 $string['catscale_updated'] = 'CAT scale updated';
 $string['testitem'] = 'Testitem with id {$a}';
 $string['add_testitem_to_scale'] = '{$a->testitemlink} added to {$a->catscalelink}';
@@ -226,6 +226,10 @@ $string['executed_calculation_description'] = 'A calculation was executed of cat
 $string['automaticallygeneratedbycron'] = 'Cron Job (automatically executed)';
 $string['deletedcatscale'] = "catscale that doesn't exist anymore";
 $string['attempt_completed'] = 'Attempt completed';
+$string['usertocourse_enroled'] = 'User enroled to course';
+$string['usertogroup_enroled'] = 'User enroled to group';
+$string['usertocourse_enroled_description'] = 'User with ID {$a->userid} was enroled to course <a href={$a->courseurl}>{$a->coursename}</a>';
+$string['usertogroup_enroled_description'] = 'User with ID {$a->userid} was enroled to group {$a->groupname} in course <a href={$a->courseurl}>{$a->coursename}</a>‚';
 $string['complete_attempt_description'] = 'Attempt with id {$a->attemptid} in CAT scale {$a->catscalelink} completed by user {$a->userid}.';
 $string['eventtime'] = 'Event time';
 $string['eventname'] = 'Event name';
