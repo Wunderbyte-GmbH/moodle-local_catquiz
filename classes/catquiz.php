@@ -951,9 +951,9 @@ class catquiz {
      * @param int $contextid
      * @return array
      */
-    public static function get_sql_for_max_status_for_item(int $testitemid, int $contextid) {
+    public static function get_sql_for_max_status_for_item(int $testitemid, int $contextid, bool $withmodel = false) {
         $sql = "
-            SELECT max(status)
+            SELECT max(status) as status
             FROM {local_catquiz_itemparams}
             WHERE componentid = :itemid
               AND contextid = :contextid
@@ -963,6 +963,19 @@ class catquiz {
             'itemid' => $testitemid,
             'contextid' => $contextid,
         ];
+
+        if ($withmodel) {
+            $sql = "
+            SELECT ip.model, ip.status
+            FROM {local_catquiz_itemparams} ip
+            INNER JOIN ( $sql )
+            s1 ON ip.status = s1.status
+            WHERE ip.componentid = :itemid2
+                AND ip.contextid = :contextid2
+            ";
+            $params['itemid2'] = $testitemid;
+            $params['contextid2'] = $contextid;
+        }
 
         return [$sql, $params];
     }
