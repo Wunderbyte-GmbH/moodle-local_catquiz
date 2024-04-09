@@ -16,7 +16,7 @@
 /**
  * Function for mod_form to expand elements when they are not validated.
  *
- * @module     local_catquiz/quizsettingsexpandcollapisble
+ * @module     local_catquiz/quizsettingsexpandcollapsible
  * @copyright  2024 Wunderbyte GmbH <info@wunderbyte.at>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
