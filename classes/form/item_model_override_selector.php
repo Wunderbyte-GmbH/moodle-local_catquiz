@@ -22,6 +22,7 @@ global $CFG;
 require_once("$CFG->libdir/formslib.php");
 require_once($CFG->dirroot . "/local/catquiz/lib.php");
 
+use cache_helper;
 use context;
 use context_system;
 use core_form\dynamic_form;
@@ -320,6 +321,7 @@ class item_model_override_selector extends dynamic_form {
             ],
             ]);
             $event->trigger();
+            cache_helper::purge_by_event('changesintestitems');
         }
 
         foreach ($toinsert as $new) {
