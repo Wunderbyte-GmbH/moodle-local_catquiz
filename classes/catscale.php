@@ -29,6 +29,7 @@ use cache;
 use cache_helper;
 use dml_exception;
 use html_writer;
+use local_catquiz\event\testitem_deleted;
 use local_catquiz\event\testitemactivitystatus_updated;
 use local_catquiz\event\testiteminscale_added;
 use local_catquiz\event\testiteminscale_updated;
@@ -385,6 +386,21 @@ class catscale {
         ];
 
         $DB->delete_records('local_catquiz_items', $data);
+        unset($data['catscaleid']);
+        $DB->delete_records('local_catquiz_itemparams', $data);
+
+        // Trigger testitem deleted event.
+        $event = testitem_deleted::create([
+            'objectid' => $testidemid,
+            'context' => context_system::instance(),
+            'other' => [
+                'componentid' => $testidemid,
+                'catscaleid' => $catscaleid,
+                'componentname' => $component,
+            ],
+        ]);
+        $event->trigger();
+
         cache_helper::purge_by_event('changesintestitems');
     }
 
