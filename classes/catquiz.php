@@ -949,6 +949,7 @@ class catquiz {
      * Returns the highest status for the given item in the given context
      * @param int $testitemid
      * @param int $contextid
+     * @param bool $withmodel If true, also the model name is returned
      * @return array
      */
     public static function get_sql_for_max_status_for_item(int $testitemid, int $contextid, bool $withmodel = false) {
