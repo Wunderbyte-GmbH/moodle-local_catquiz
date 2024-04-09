@@ -239,6 +239,8 @@ $string['eventtime'] = 'Zeitpunkt des Ereignisses';
 $string['eventname'] = 'Name des Ereignisses';
 $string['testitem_imported'] = 'Frage(n) importiert';
 $string['imported_testitem_description'] = 'Es wurden {$a} Frage(n) importiert.';
+$string['testitem_deleted'] = 'Frage gelöscht';
+$string['testitem_deleted_description'] = 'Es wurde die Frage mit ID {$a->testitemid} gelöscht.';
 
 // Message.
 $string['messageprovider:catscaleupdate'] = 'Benachrichtung über eine Aktualisierung einer Skala.';

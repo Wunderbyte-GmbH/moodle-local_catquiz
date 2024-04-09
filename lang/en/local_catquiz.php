@@ -233,6 +233,8 @@ $string['testitem_imported'] = 'Testitem(s) imported';
 $string['imported_testitem_description'] = '{$a} testitems were imported.';
 $string['minscalevalueinformation'] = 'Enter the lowest possible person ability of this scale as a negative decimal value. The mean is zero. Will only be set when creating a new root scale and then applies to all sub-scales. To do so, define values (at least) in first dataset. Values in existing scales cannot be changed via import. If you want to change the values of an existing scale, please switch to the "Scales" tab.';
 $string['maxscalevalueinformation'] = 'Enter the highest possible person ability of this scale as a positive decimal value. The mean is zero. Will only be set when creating a new root scale and then applies to all sub-scales. To do so, define values (at least) in first dataset. Values in existing scales cannot be changed via import. If you want to change the values of an existing scale, please switch to the "Scales" tab.';
+$string['testitem_deleted'] = 'Testitem deleted';
+$string['testitem_deleted_description'] = 'Testitem with ID {$a->testitemid} deleted.';
 
 // Message.
 $string['messageprovider:catscaleupdate'] = 'Notification of CAT scale update';
