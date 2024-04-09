@@ -46,8 +46,11 @@
       {{#str}} status, core {{/str}}
       <a href="javascript:void(0);" onclick="window.location.reload();"> <i class="fa fa-refresh float-right"></i> </a>
     </div>
-    <div class="card-body" style="display: flex; justify-content: center; align-items: center;">
-      <h3>{{itemstatus}}</h3>
+    <div class="card-body" style="display: flex; justify-content: center; align-items: center; flex-direction: column;">
+    {{#itemstatus}}
+      <h3>{{status}}</h3>
+      <h4>{{model}}</h4>
+    {{/itemstatus}}
     </div>
   </div>
   {{#models}}

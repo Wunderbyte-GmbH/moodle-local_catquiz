@@ -218,27 +218,39 @@ class testitemdashboard implements renderable, templatable {
     /**
      * Gets item status.
      *
-     * @return string
+     * @return array
      * @throws coding_exception
      */
-    private function get_itemstatus() {
+    private function get_itemstatus(): array {
         global $DB;
-        list ($sql, $params) = catquiz::get_sql_for_max_status_for_item($this->testitemid, $this->contextid);
-        $maxstatus = intval($DB->get_field_sql($sql, $params));
+        list ($sql, $params) = catquiz::get_sql_for_max_status_for_item($this->testitemid, $this->contextid, true);
+        $result = $DB->get_record_sql($sql, $params);
+        $maxstatus = $result->status;
+        $modelname = get_string('pluginname', sprintf('catmodel_%s', $result->model));
         switch ($maxstatus) {
             case LOCAL_CATQUIZ_STATUS_EXCLUDED_MANUALLY:
-                return get_string('itemstatus_-5', 'local_catquiz');
+                $statusstring = get_string('itemstatus_-5', 'local_catquiz');
+                break;
             case LOCAL_CATQUIZ_STATUS_NOT_CALCULATED:
-                return get_string('itemstatus_0', 'local_catquiz');
+                $statusstring = get_string('itemstatus_0', 'local_catquiz');
+                break;
             case LOCAL_CATQUIZ_STATUS_CALCULATED:
-                return get_string('itemstatus_1', 'local_catquiz');
+                $statusstring = get_string('itemstatus_1', 'local_catquiz');
+                break;
             case LOCAL_CATQUIZ_STATUS_CONFIRMED_MANUALLY:
-                return get_string('itemstatus_5', 'local_catquiz');
+                $statusstring = get_string('itemstatus_5', 'local_catquiz');
+                break;
             case LOCAL_CATQUIZ_STATUS_UPDATED_MANUALLY:
-                return get_string('itemstatus_4', 'local_catquiz');
+                $statusstring = get_string('itemstatus_4', 'local_catquiz');
+                break;
             default:
-                return get_string('notavailable', 'core');
+                $statusstring = get_string('notavailable', 'core');
         }
+
+        return [
+            'model' => $modelname,
+            'status' => $statusstring,
+        ];
     }
     /**
      * Check if we display a table or a detailview of a specific item.
