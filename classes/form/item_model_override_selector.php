@@ -89,17 +89,40 @@ class item_model_override_selector extends dynamic_form {
             $group = [];
             $id = sprintf('override_%s', $model);
             if (!empty($data->editing)) {
-                $select = $mform->createElement('select', sprintf('%s_select', $id), $model, $options, ['multiple' => false]);
+                $select = $mform->createElement(
+                    'select',
+                    sprintf('%s_select', $id),
+                    get_string('pluginname', sprintf('catmodel_%s', $model)),
+                    $options,
+                    ['multiple' => false]
+                );
             } else {
-                $select = $mform->createElement('static', sprintf('%s_select', $id), $model);
+                $select = $mform->createElement(
+                    'static',
+                    sprintf('%s_select', $id),
+                    get_string('pluginname', sprintf('catmodel_%s', $model))
+                );
             }
 
-            $group[] = $select;
+            $mform->addElement($select);
+            if (empty($data->editing)) {
+                $group[] = $mform->createElement(
+                    'static',
+                    sprintf('override_%s_statuslabel', $model),
+                    '',
+                    get_string('status', 'core').":"
+                );
+                $group[] = $mform->createElement('static', sprintf('override_%s_status', $model), 'mylabel', 'status');
+            }
             foreach ($paramnames as $paramname) {
                 $this->add_element_to_group($paramname, $id, $group, $mform, $data->editing ?? false);
             }
-            $mform->addGroup($group, $id, get_string('pluginname', sprintf('catmodel_%s', $model)),
-            );
+            $mform->addGroup($group, $id, '');
+            $mform->hideIf($id, sprintf('override_%s_select', $model), 'in', [
+                LOCAL_CATQUIZ_STATUS_NOT_CALCULATED,
+                LOCAL_CATQUIZ_STATUS_EXCLUDED_MANUALLY
+            ]);
+            $mform->disabledIf($id, sprintf('override_%s_select', $model), 'eq', LOCAL_CATQUIZ_STATUS_CALCULATED);
         }
 
         if (!empty($data->editing)) {
@@ -180,8 +203,7 @@ class item_model_override_selector extends dynamic_form {
             $fieldname = sprintf('override_%s', $model);
             $obj = new stdClass;
             $statusstring = sprintf('%s_select', $fieldname);
-            $array = $data->$fieldname;
-            $obj->status = $array[$statusstring];
+            $obj->status = $data->$statusstring;
             foreach (array_values($modelparams) as $modelparam) {
                 $this->generate_model_fields($modelparam, $fieldname, $obj, $data);
             }
@@ -273,9 +295,8 @@ class item_model_override_selector extends dynamic_form {
                     // Reset back to 0.
                     $defaultstatus = strval(LOCAL_CATQUIZ_STATUS_NOT_CALCULATED);
                     $allformitems[$m]->status = $defaultstatus;
-                    $fieldname = sprintf('override_%s', $m);
-                    $string = sprintf('%s_select', $fieldname);
-                    $data->{$fieldname}[$string] = $defaultstatus;
+                    $fieldname = sprintf('override_%s_select', $m);
+                    $data->{$fieldname} = $defaultstatus;
                     $this->set_data($data);
                     $toupdate[] = [
                         'status' => $allformitems[$m]->status,
@@ -439,8 +460,9 @@ class item_model_override_selector extends dynamic_form {
                     $string = sprintf('itemstatus_%s', $statusint);
                     $modelstatus = get_string($string, 'local_catquiz');
                 }
+                $modelselectname = sprintf('%s_select', $field);
+                $data->$modelselectname = $statusint;
                 $dataarray = [
-                    sprintf('%s_select', $field) => $statusint,
                     sprintf('%s_status', $field) => $modelstatus,
                 ];
             }
@@ -513,9 +535,9 @@ class item_model_override_selector extends dynamic_form {
             $selectkey = sprintf('%s_select', $field);
 
             // Values can not be empty with certain status.
-            if ($data[$field][$selectkey] == LOCAL_CATQUIZ_STATUS_CALCULATED
-                || $data[$field][$selectkey] == LOCAL_CATQUIZ_STATUS_UPDATED_MANUALLY
-                || $data[$field][$selectkey] == LOCAL_CATQUIZ_STATUS_CONFIRMED_MANUALLY) {
+            if ($data[$selectkey] == LOCAL_CATQUIZ_STATUS_CALCULATED
+                || $data[$selectkey] == LOCAL_CATQUIZ_STATUS_UPDATED_MANUALLY
+                || $data[$selectkey] == LOCAL_CATQUIZ_STATUS_CONFIRMED_MANUALLY) {
 
                 $empty = true;
                 foreach ($data[$field] as $key => $value) {
@@ -531,7 +553,7 @@ class item_model_override_selector extends dynamic_form {
                 }
             }
             // There can only be 1 status confirmed manually.
-            if ($data[$field][$selectkey] == LOCAL_CATQUIZ_STATUS_CONFIRMED_MANUALLY) {
+            if ($data[$selectkey] == LOCAL_CATQUIZ_STATUS_CONFIRMED_MANUALLY) {
                 $counter[$field] = $selectkey;
             }
         }
