@@ -1813,7 +1813,6 @@ class catquiz {
             $i++;
         }
 
-
         if (!$message) {
             return [];
         }

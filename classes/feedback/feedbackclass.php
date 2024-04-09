@@ -474,7 +474,7 @@ class feedbackclass {
         if (!empty($scale)) {
             self::add_closing_html(1, $scale->id, $mform, $elements, $html2);
         }
-        $PAGE->requires->js_call_amd('local_catquiz/quizsettingsexpandcollapisble', 'init');
+        $PAGE->requires->js_call_amd('local_catquiz/quizsettingsexpandcollapsible', 'init');
     }
 
     /**
