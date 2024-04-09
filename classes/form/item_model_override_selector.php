@@ -118,7 +118,7 @@ class item_model_override_selector extends dynamic_form {
             $mform->addGroup($group, $id, '');
             $mform->hideIf($id, sprintf('override_%s_select', $model), 'in', [
                 LOCAL_CATQUIZ_STATUS_NOT_CALCULATED,
-                LOCAL_CATQUIZ_STATUS_EXCLUDED_MANUALLY
+                LOCAL_CATQUIZ_STATUS_EXCLUDED_MANUALLY,
             ]);
             $mform->disabledIf($id, sprintf('override_%s_select', $model), 'eq', LOCAL_CATQUIZ_STATUS_CALCULATED);
         }
