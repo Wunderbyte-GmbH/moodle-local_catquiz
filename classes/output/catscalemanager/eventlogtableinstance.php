@@ -84,6 +84,8 @@ class eventlogtableinstance {
             '\local_catquiz\event\testiteminscale_updated' => get_string('testiteminscale_updated', 'local_catquiz'),
             '\local_catquiz\event\testitemstatus_updated' => get_string('testitemstatus_updated', 'local_catquiz'),
             '\local_catquiz\event\testitem_imported' => get_string('testitem_imported', 'local_catquiz'),
+            '\local_catquiz\event\usertogroup_enroled' => get_string('usertogroup_enroled', 'local_catquiz'),
+            '\local_catquiz\event\usertocourse_enroled' => get_string('usertocourse_enroled', 'local_catquiz'),
 
         ]);
         $table->add_filter($standardfilter);

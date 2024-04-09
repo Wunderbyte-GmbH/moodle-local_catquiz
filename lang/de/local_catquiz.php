@@ -234,6 +234,10 @@ $string['executed_calculation_description'] =
 $string['automaticallygeneratedbycron'] = 'Cron Job (automatisch durchgeführt)';
 $string['deletedcatscale'] = 'Skala die nicht mehr exisitiert';
 $string['attempt_completed'] = 'Testversuch abgeschlossen';
+$string['usertocourse_enroled'] = 'NutzerIn in Kurs eingeschrieben';
+$string['usertogroup_enroled'] = 'NutzerIn in Gruppe eingeschrieben';
+$string['usertocourse_enroled_description'] = 'NutzerIn mit ID {$a->userid} wurde in folgenden Kurs eingeschrieben: <a href="{$a->courseurl}">{$a->coursename}</a>';
+$string['usertogroup_enroled_description'] = 'NutzerIn mit ID {$a->userid} wurde in die Gruppe {$a->groupname} in diesem Kurs eingeschrieben: <a href="{$a->courseurl}">{$a->coursename}</a>';
 $string['complete_attempt_description'] = 'Testversuch mit ID {$a->attemptid} in Skala {$a->catscalelink} durchgeführt von User {$a->userid}.';
 $string['eventtime'] = 'Zeitpunkt des Ereignisses';
 $string['eventname'] = 'Name des Ereignisses';
