@@ -25,14 +25,11 @@
 
 namespace local_catquiz\teststrategy\feedbackgenerator;
 
-use cache;
 use core\chart_bar;
 use core\chart_line;
 use core\chart_series;
 use local_catquiz\catquiz;
 use local_catquiz\catscale;
-use local_catquiz\feedback\feedbackclass;
-use local_catquiz\output\catscalemanager\questions\cards\questionpreview;
 use local_catquiz\teststrategy\feedbackgenerator;
 use local_catquiz\teststrategy\feedbacksettings;
 use local_catquiz\local\model\model_strategy;
@@ -353,14 +350,9 @@ class personabilities extends feedbackgenerator {
         }
         // If defined in settings, display only feedbacks if items were played...
         // ...and parentscale and primaryscale.
-        $questionpreviews = "";
         if (isset($newdata['progress']->playedquestionsbyscale[$catscaleid])) {
             $questionsinscale = $newdata['progress']->playedquestionsbyscale[$catscaleid];
             $numberofitems = ['itemsplayed' => count($questionsinscale)];
-            $questionpreviews = array_map(fn($q) => [
-                'preview' => $this->render_questionpreview((object) $q)['body']['question']],
-                $questionsinscale
-            );
         } else if ($this->feedbacksettings->displayscaleswithoutitemsplayed
             || $catscaleid == $selectedscaleid
             || $catscales[$catscaleid]->parentid == 0) {
@@ -380,7 +372,6 @@ class personabilities extends feedbackgenerator {
             'name' => $catscales[$catscaleid]->name,
             'catscaleid' => $catscaleid,
             'numberofitemsplayed' => $numberofitems,
-            'questionpreviews' => $questionpreviews ?: "",
             'isselectedscale' => $isselectedscale,
             'tooltiptitle' => $tooltiptitle,
         ];
@@ -1072,16 +1063,4 @@ class personabilities extends feedbackgenerator {
 
     }
 
-    /**
-     * Renders preview of testitem (question).
-     *
-     * @param object $record
-     *
-     * @return array
-     *
-     */
-    private function render_questionpreview(object $record) {
-        $questionpreview = new questionpreview($record);
-        return $questionpreview->render_questionpreview();
-    }
 }
