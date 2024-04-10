@@ -292,7 +292,7 @@ Feature: As a teacher I setup adaptive quiz with CATquiz Scales and Feedbacks.
     And I wait until the page is ready
     And I click on "Feedback for \"Simulation\"" "text"
     ## Error "no gap" expected
-    And I should see "No gap in the feedbackrange allowed. Please start min in new range with max value of last range." in the "//div[@data-name='feedback_scale_Simulation_range_2']" "xpath_element"
+    And I should see "No gap in the feedbackrange allowed. Please make sure that upper limit of former range is equivalent to lower limit of next range." in the "//div[@data-name='feedback_scale_Simulation_range_2']" "xpath_element"
     And I set the field "Lower limit" in the "//div[@data-name='feedback_scale_Simulation_range_2']" "xpath_element" to "-1"
     And I click on "Save and display" "button"
     And I follow "Settings"
