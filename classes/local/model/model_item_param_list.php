@@ -386,6 +386,14 @@ class model_item_param_list implements ArrayAccess, IteratorAggregate, Countable
 
             return $returnarray;
         }
+        $modelcheck = self::check_model($newrecord);
+        if (!$modelcheck['success']) {
+            return [
+                'success' => 0, // Update not successful.
+                'message' => get_string('modelnamenotinlist', 'local_catquiz', $modelcheck),
+             ];
+        }
+
         // We only run this once we have the component id.
         $newrecord = self::update_in_scale($newrecord);
 
@@ -454,6 +462,33 @@ class model_item_param_list implements ArrayAccess, IteratorAggregate, Countable
 
     }
 
+    /**
+     * Check if modelname in newrecord is part of existing models.
+     *
+     * @param array $newrecord
+     *
+     * @return boolean
+     *
+     */
+    private static function check_model(array $newrecord): array {
+        if (!isset($newrecord['model'])) {
+            return [
+                'success' => true,
+            ];
+        }
+        $models = model_strategy::get_installed_models();
+        $ismodel = in_array($newrecord['model'], array_keys($models));
+        if (!$ismodel) {
+            return [
+                'success' => false,
+                'importedmodel' => $newrecord['model'],
+                'existingmodels' => implode(", ", array_keys($models)),
+            ];
+        }
+        return [
+            'success' => true,
+        ];;
+    }
     /**
      * Gets scaleid and updates scaleid of record.
      * @param array $newrecord

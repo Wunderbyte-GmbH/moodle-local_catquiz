@@ -587,6 +587,7 @@ $string['dataincomplete'] = 'Record with componentid {$a->id} is incomplete and 
 $string['modelinformation'] = 'This field is necessary to entirely treat the record. If it is empty, item can only be assigned to CAT scale.';
 $string['parentscalenamesinformation'] = 'To match the an item via the scalename, make sure to name all parent scales including root scale. For new - yet to be created - scales, you can enter parent scales for the defined scale. Start with the highest parent and separate all children with "|" (vertical line unicode U+007C - do not mistake for slash "/"). To enable import to parent scales, set "0" here.';
 $string['statusactiveorinactive'] = 'The activity status of the item. Set to "1" to make sure, item will not be used. Leave empty or set "0" for "active".';
+$string['modelnamenotinlist'] = 'The imported model name {$a->importedmodel} does not correspond to the given model names: {$a->existingmodels}. Item not imported.';
 
 // Testenvironments table.
 $string['notifyallteachers'] = 'Notify all teachers';

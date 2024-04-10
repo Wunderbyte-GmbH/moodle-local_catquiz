@@ -588,6 +588,7 @@ $string['parentscalenamesinformation'] = 'Präzisieren Sie hier die übergeordne
 $string['statusactiveorinactive'] = 'Der Aktivitätsstatus. Geben Sie "1" an um sicher zu stellen, um den Datensatz von der Verwendung auszuschließen. Lassen Sie das Feld leer oder setzen "0", gilt der Datensatz als aktiv.';
 $string['minscalevalueinformation'] = 'Geben Sie die kleinstmögliche Personenfähigkeit der Skalen als negativen Dezimalwert an. Der Mittelwert ist null. Wert wird nur bei Erzeugung einer neuen Globalskala gesetzt und gilt für alle Sub-Skalen. Hierfür (mind.) im ersten Datensatz angeben. Werte in bestehenden Skalen können nicht via Import verändert werden. Möchten Sie die Werte einer bereits bestehenden Skala ändern, bitte auf das "Skalen"-Tab wechseln.';
 $string['maxscalevalueinformation'] = 'Geben Sie die größtmögliche Personenfähigkeit der Skalen als positiven Dezimalwert an. Der Mittelwert ist null. Wert wird nur bei Erzeugung einer neuen Globalskala gesetzt und gilt für alle Sub-Skalen. Hierfür (mind.) im ersten Datensatz angeben. Werte in bestehenden Skalen können nicht via Import verändert werden. Möchten Sie die Werte einer bereits bestehenden Skala ändern, bitte auf das "Skalen"-Tab wechseln.';
+$string['modelnamenotinlist'] = 'Der angegebene Modell-Name {$a->importedmodel} stimmt nicht mit den gegebenen Modell-Namen überein: {$a->existingmodels}. Der Datensatz wurde nicht importiert.';
 
 // Testenvironments table.
 $string['notifyallteachers'] = 'Kursleiter der gewählten Kurse benachrichtigen';
