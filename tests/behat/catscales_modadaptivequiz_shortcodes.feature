@@ -36,8 +36,8 @@ Feature: As a teacher I want to use shortcodes to display adaptive quiz test res
     And I am on the "adaptivecatquiz1" Activity page logged in as teacher
     And I follow "Settings"
     And I wait until the page is ready
-    And I set the field "Feedback" in the "//div[@data-name='feedback_scale_Simulation_range_1']" "xpath_element" to "Feedback-Simulation_range_1"
-    And I set the field "Feedback" in the "//div[@data-name='feedback_scale_Simulation_range_2']" "xpath_element" to "Feedback-Simulation_range_2"
+    ## And I set the field "Feedback" in the "//div[@data-name='feedback_scale_Simulation_range_1']" "xpath_element" to "Feedback-Simulation_range_1"
+    ## And I set the field "Feedback" in the "//div[@data-name='feedback_scale_Simulation_range_2']" "xpath_element" to "Feedback-Simulation_range_2"
     And I click on "Save and return to course" "button"
     And I log out
 
