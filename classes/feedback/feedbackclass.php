@@ -154,7 +154,7 @@ class feedbackclass {
             for ($j = 1; $j <= $nfeedbpersubscale; $j++) {
                 // We need to create a div tag to "wrap" feedback range.
                 $element = $mform->createElement('html',
-                '<div data-name="feedback_scale_' . $scale->id . '_range_' . $j. '" data-depth="' . $scale->depth . '" >');
+                '<div data-name="feedback_scale_' . $scale->name . '_range_' . $j. '" data-depth="' . $scale->depth . '" >');
                 $element->setName('feedback_scale_' . $scale->id . '_rangestart_' . $j);
                 $subelements[] = $mform->addElement($element);
 
