@@ -281,7 +281,6 @@ Feature: As a teacher I setup adaptive quiz with CATquiz Scales and Feedbacks.
     ## Intentional error
     And I set the field "Lower limit" in the "//div[@data-name='feedback_scale_Simulation_range_2']" "xpath_element" to "1"
     And the field "Lower limit" in the "//div[@data-name='feedback_scale_Simulation_range_2']" "xpath_element" matches value "1"
-
     And I should not see "Feedback for range 3" in the "//div[contains(@aria-labelledby, 'catquiz_feedback_header_')]" "xpath_element"
     ## Check visibility of feedback form links for other catscales
     And I should see "Feedback for \"SimA\"" in the "//div[contains(@aria-labelledby, 'catquiz_feedback_header_')]" "xpath_element"
@@ -290,7 +289,6 @@ Feature: As a teacher I setup adaptive quiz with CATquiz Scales and Feedbacks.
     ## Save and verify feedback configuration
     And I click on "Save and display" "button"
     And I wait until the page is ready
-    And I click on "Feedback for \"Simulation\"" "text"
     ## Error "no gap" expected
     And I should see "No gap in the feedbackrange allowed. Please make sure that upper limit of former range is equivalent to lower limit of next range." in the "//div[@data-name='feedback_scale_Simulation_range_2']" "xpath_element"
     And I set the field "Lower limit" in the "//div[@data-name='feedback_scale_Simulation_range_2']" "xpath_element" to "-1"
