@@ -69,6 +69,7 @@ class testenvironmentdashboard implements renderable, templatable {
         $table->define_columns([
             'name',
             'component',
+            'istest',
             'visible',
             'availability',
             'lang',
@@ -87,6 +88,7 @@ class testenvironmentdashboard implements renderable, templatable {
         $table->define_headers([
             get_string('name', 'core'),
             get_string('component', 'local_catquiz'),
+            get_string('type', 'local_catquiz'),
             get_string('visible', 'core'),
             get_string('availability', 'core'),
             get_string('lang', 'local_catquiz'),
@@ -124,6 +126,13 @@ class testenvironmentdashboard implements renderable, templatable {
         $table->add_filter($standardfilter);
 
         $standardfilter = new standardfilter('lang', get_string('lang', 'local_catquiz'));
+        $table->add_filter($standardfilter);
+
+        $standardfilter = new standardfilter('istest', get_string('type', 'local_catquiz'));
+        $standardfilter->add_options([
+                '1' => get_string('testtype', 'local_catquiz'),
+                '0' => get_string('templatetype', 'local_catquiz'),
+            ]);
         $table->add_filter($standardfilter);
 
         $table->define_fulltextsearchcolumns(['name', 'component', 'description']);

@@ -53,6 +53,19 @@ use stdClass;
 class testenvironments_table extends wunderbyte_table {
 
     /**
+     * Return value for type column.
+     *
+     * @param stdClass $values
+     * @return string
+     */
+    public function col_istest(stdClass $values) {
+        if ($values->istest) {
+            return get_string('testtype', 'local_catquiz');
+        }
+        return get_string('templatetype', 'local_catquiz');
+    }
+
+    /**
      * Return value for visible column.
      *
      * @param stdClass $values

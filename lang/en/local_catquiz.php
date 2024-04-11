@@ -170,6 +170,9 @@ $string['force'] = 'Force values';
 $string['catscaleid'] = 'CAT scale ID';
 $string['numberofquestions'] = '# questions';
 $string['numberofusers'] = '# users';
+$string['type'] = 'Type';
+$string['testtype'] = 'Test';
+$string['templatetype'] = 'Template';
 
 // Cat contexts.
 $string['addcontext'] = 'Add CAT context';
