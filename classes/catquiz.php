@@ -733,6 +733,7 @@ class catquiz {
             ct.id,
             aq.name,
             component,
+            componentid,
             c.visible,
             availability,
             c.lang,
