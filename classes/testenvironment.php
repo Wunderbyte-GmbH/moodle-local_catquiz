@@ -241,39 +241,6 @@ class testenvironment {
     }
 
     /**
-     * Function to save current instance as template.
-     *
-     * @param int $templateidid
-     * @param string $templatename
-     *
-     * @return void
-     *
-     */
-    public function save_as_template(int $templateidid, string $templatename) {
-
-        // We use negative componentids for templates.
-        // Therefore, we need to retrieve them.
-
-        // We make this template as a copy of an actual test.
-        // So we just change the test for the durartion of the template saving.
-        $name = $this->name;
-        $componentid = $this->componentid;
-        $id = $this->id;
-
-        $this->name = $templatename;
-        $this->componentid = 0;
-        $this->id = $templateidid;
-
-        $parentid = $this->save_or_update($templatename);
-
-        // After Saving as template, we revert to the original name.
-        $this->id = $id;
-        $this->name = $name;
-        $this->componentid = $componentid;
-        $this->parentid = $parentid;
-    }
-
-    /**
      * This function will recreate the saved array in order to
      *
      * @param array $formdefaultvalues
