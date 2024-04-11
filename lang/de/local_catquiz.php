@@ -179,6 +179,9 @@ $string['force'] = 'Erzwinge Werte';
 $string['catscaleid'] = 'Skala ID';
 $string['numberofquestions'] = '# Fragen';
 $string['numberofusers'] = '# Studierende';
+$string['type'] = 'Typ';
+$string['testtype'] = 'Test';
+$string['templatetype'] = 'Template';
 
 // Cat contexts.
 $string['addcontext'] = 'Einsatz-Kontext hinzufügen';
