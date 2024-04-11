@@ -477,14 +477,21 @@ $string['rootscale:tooltiptitle'] = 'root scale {$a}';
 $string['scaleselected'] = 'defined scale {$a}';
 $string['feedback_customscale_nofeedback'] = 'No feedback was provided for your test results';
 $string['reportscale'] = 'Include scale for report';
-$string['noscalesfound'] = 'There was no valid feedback found.';
+$string['noscalesfound'] = 'No valid feedback could be generated.';
 $string['nofeedback'] = 'No feedback defined.';
 $string['moreinformation'] = 'More Information';
 $string['comparetotestaverage'] = 'Overview in Comparison';
 $string['personabilityfeedbacktitle'] = "Personability Profile";
-$string['estimatedbecause:allanswerscorrect'] = "Your results could not be calculated reliably and were estimated, because you answered all questions correctly.";
+$string['estimatedbecause:allanswerscorrect'] = "Congratulations! You answered all question correctly! Unfortunately, your results could therefore not be calculated reliably and were estimated.";
 $string['estimatedbecause:allanswersincorrect'] = "Your results could not be calculated reliably and were estimated, because you answered all questions incorrectly.";
 $string['estimatedbecause:default'] = "Your results could not be calculated reliably and were estimated.";
+$string['error:nminscale'] = "It is unfortunately not possible to provide valid feedback, because the quiz didn't include enough questions.";
+$string['error:fraction1'] = "Congratulations! You answered all question correctly! Unfortunately, it is therefore not possible to provide valid feedback.";
+$string['error:fraction0'] = "Cecause you answered all questions incorrectly, it is unfortunately not possible to provide valid feedback.";
+$string['error:rootonly'] = ""; // Maybe too complicated to explain / no relevant reason for students.
+$string['error:semin'] = ""; // Maybe too complicated to explain / no relevant reason for students.
+$string['error:semax'] = ""; // Maybe too complicated to explain / no relevant reason for students.
+$string['error:noscalestoreport'] = "There is no feedback available because no tested scale was selected to be reported.";
 
 // Personability & chart in Feedback.
 $string['chartlegendabilityrelative'] = '{$a->difference} (Compared to parentscale); {$a->ability} (ability score of scale)';

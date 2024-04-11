@@ -478,17 +478,23 @@ $string['lowestskill:tooltiptitle'] = 'Ihre schwächste Skala {$a}';
 $string['rootscale:tooltiptitle'] = 'Globalskala "{$a}"';
 $string['scaleselected'] = 'Skala "{$a}"';
 $string['abilityprofile'] = 'Fähigkeits-Score Profil in "{$a}"';
-$string['feedback_customscale_nofeedback'] = 'Es wurde kein Feedback für ihre Ergebnisse angegeben';
-$string['noscalesfound'] = 'Es konnte zu keiner Skala ein valides Ergebnis gefunden werden.';
-$string['noscalesfound'] = 'Es konnte zu kein valides Ergebnis gefunden werden.';
-$string['noscalesfound'] = 'Es konnte kein valides Ergebnis gefunden werden.';
+$string['feedback_customscale_nofeedback'] = 'Es wurde kein Feedback für ihre Ergebnisse angegeben.';
+$string['noscalesfound'] = 'Es konnte zu keiner Skala ein valides Ergebnis ermittelt werden.';
 $string['nofeedback'] = 'Kein Feedback angegeben.';
 $string['moreinformation'] = 'Weitere Informationen';
 $string['comparetotestaverage'] = 'Übersicht im Vergleich';
 $string['personabilityfeedbacktitle'] = "Fähigkeitsprofil";
-$string['estimatedbecause:allanswerscorrect'] = "Ihre Ergebnisse konnten nicht zuverlässig errechnet werden und wurden geschätzt, weil Sie alle Fragen richtig beantwortet haben.";
-$string['estimatedbecause:allanswersincorrect'] = "Ihre Ergebnisse konnten nicht zuverlässig errechnet werden und wurden geschätzt, weil Sie alle Fragen falsch beantwortet haben.";
+$string['estimatedbecause:allanswerscorrect'] = "Sie haben alle Fragen richtig beantwortet! Toll! Leider konnten deshalb Ihre Ergebnisse nicht zuverlässig errechnet werden und wurden geschätzt.";
+$string['estimatedbecause:allanswersincorrect'] = "Leider haben Sie alle Fragen falsch beantwortet. Ihre Ergebnisse konnten deshalb nicht zuverlässig errechnet werden und wurden geschätzt.";
 $string['estimatedbecause:default'] = "Ihre Ergebnisse konnten nicht zuverlässig errechnet werden und wurden geschätzt.";
+$string['error:nminscale'] = "Es konnte leider kein valides Ergebnis ermittelt werden, weil nicht genügend Fragen gespielt wurden.";
+$string['error:fraction1'] = "Sie haben alle Fragen richtig beantwortet! Toll! Leider konnte deshalb kein valides Ergebnis ermittelt werden.";
+$string['error:fraction0'] = "Leider haben Sie alle Fragen falsch beantwortet. Deshalb kann leider kein valides Ergebnis ermittelt werden.";
+$string['error:rootonly'] = ""; // Maybe too complicated to explain / no relevant reason for students.
+$string['error:semin'] = ""; // Maybe too complicated to explain / no relevant reason for students.
+$string['error:semax'] = ""; // Maybe too complicated to explain / no relevant reason for students.
+$string['error:noscalestoreport'] = "Es konnte kein Feedback ermittelt werden, weil kein getesteter Teilbereich für die Berechnung angegewählt wurde."; // Maybe too complicated to explain / no relevant reason for students.
+
 
 // Chart in Feedback.
 $string['chartlegendabilityrelative'] = '{$a->difference} Unterschied zur Vergleichsskala (Fähigkeits-Score in dieser Skala: {$a->ability})';
