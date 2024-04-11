@@ -743,16 +743,12 @@ class catquiz {
             c.timemodified,
             c.timecreated,
             ct.catscaleid,
-            numberofitems,
+            json,
             users,
             (CASE WHEN componentid <> 0 THEN 1 ELSE 0 END) AS istest
         FROM {local_catquiz_tests} ct
         LEFT JOIN {course} c ON c.id = ct.courseid
         LEFT JOIN {adaptivequiz} aq ON ct.componentid = aq.id
-        LEFT JOIN (SELECT catscaleid as itemcatscale, COUNT(*) AS numberofitems
-           FROM {local_catquiz_items}
-           GROUP BY catscaleid
-        ) s1 ON ct.catscaleid = s1.itemcatscale
         LEFT JOIN (
             SELECT instance, COUNT(*) as users
             FROM (
