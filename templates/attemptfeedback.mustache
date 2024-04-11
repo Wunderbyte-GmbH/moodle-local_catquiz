@@ -60,13 +60,13 @@
     {{#studentfeedback}}
         {{#othertabs}}
         <li class="nav-item">
-            <a class="nav-link" id="{{generatorname}}-othertabs" data-toggle="tab" href="#{{generatorname}}_feedbacktab" role="tab" aria-controls="{{generatorname}}_feedbacktab" aria-selected="true">{{heading}}</a>
+            <a class="nav-link" id="{{generatorname}}-othertabs--{{heading}}" data-toggle="tab" href="#{{generatorname}}_feedbacktab--{{attemptid}}" role="tab" aria-controls="{{generatorname}}_feedbacktab" aria-selected="true">{{heading}}</a>
         </li>
         {{/othertabs}}
     {{/studentfeedback}}
     {{#teacherfeedback}}
             <li class="nav-item">
-                <a class="nav-link" id="{{generatorname}}-teacherfeedback" data-toggle="tab" href="#{{generatorname}}_feedbacktab" role="tab" aria-controls="{{generatorname}}_feedbacktab" aria-selected="false">{{heading}}</a>
+                <a class="nav-link" id="{{generatorname}}-teacherfeedback" data-toggle="tab" href="#{{generatorname}}_feedbacktab--{{attemptid}}" role="tab" aria-controls="{{generatorname}}_feedbacktab" aria-selected="false">{{heading}}</a>
             </li>
     {{/teacherfeedback}}
     {{#studentfeedback.0}}
@@ -76,7 +76,7 @@
 
     {{#studentfeedback}}
         {{#othertabs}}
-            <div class="tab-pane fade" id="{{generatorname}}_feedbacktab" role="tabpanel" aria-labelledby="{{generatorname}}-othertabs">
+            <div class="tab-pane fade" id="{{generatorname}}_feedbacktab--{{attemptid}}" role="tabpanel" aria-labelledby="{{generatorname}}-othertabs">
                 <div id="feedbackcontent-{{generatorname}}">
                     <h5 id= "feedback-generator-heading-othertabs-{{generatorname}}"> {{{heading}}} </h5>
                     <i id= "feedback-generator-comment-othertabs-{{generatorname}}"> {{{comment}}} </i>
@@ -86,7 +86,7 @@
         {{/othertabs}}
     {{/studentfeedback}}
     {{#teacherfeedback}}
-            <div class="tab-pane fade" id="{{generatorname}}_feedbacktab" role="tabpanel" aria-labelledby="{{generatorname}}-teacherfeedback">
+            <div class="tab-pane fade" id="{{generatorname}}_feedbacktab--{{attemptid}}" role="tabpanel" aria-labelledby="{{generatorname}}-teacherfeedback">
                 <div id="feedbackcontent-{{generatorname}}">
                     <h5 id= "feedback-generator-heading-teacherfb-{{generatorname}}"> {{{heading}}} </h5>
                     <i id= "feedback-generator-comment-teacherfb-{{generatorname}}"> {{{comment}}} </i>
