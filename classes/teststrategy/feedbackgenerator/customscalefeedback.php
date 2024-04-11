@@ -220,8 +220,12 @@ class customscalefeedback extends feedbackgenerator {
         $relevantscalesfound = false;
 
         // Filter for scales to be reported.
-        $personabilities = array_filter($personabilities, fn($a) => isset($a['toreport']));
-        foreach ($personabilities as $catscaleid => $personability) {
+        $personabilitiestoreport = array_filter($personabilities, fn($a) => isset($a['toreport']));
+        if (empty($personabilitiestoreport)) {
+            // If no scale is to be reported, return reason.
+            return $this->get_exclusion_reason_string($personabilities);
+        }
+        foreach ($personabilitiestoreport as $catscaleid => $personability) {
             if (isset($personability['excluded']) && $personability['excluded']) {
                 continue;
             }
@@ -245,9 +249,9 @@ class customscalefeedback extends feedbackgenerator {
             }
         }
 
-        if (! $scalefeedback) {
+        if (!$scalefeedback) {
             if (!$relevantscalesfound) {
-                return get_string('noscalesfound', 'local_catquiz');
+                return $this->get_exclusion_reason_string($personabilitiestoreport);
             }
             return get_string('nofeedback', 'local_catquiz');
         }
@@ -259,6 +263,53 @@ class customscalefeedback extends feedbackgenerator {
             $text .= $scale['name'] . ': ' . $value . '<br/>';
         }
         return $text;
+    }
+
+    /**
+     * Check in personabilities array for the reason feedback was excluded and return reason as readable string.
+     *
+     * @param array $personabilities
+     *
+     * @return string
+     *
+     */
+    private function get_exclusion_reason_string(array $personabilities):string {
+
+        $returnstring = "";
+        foreach ($personabilities as $personability) {
+            if (!isset($personability['excluded'])) {
+                continue;
+            }
+            $errorcode = array_keys($personability['error'])[0];
+            $errorarray = $personability['error'][$errorcode];
+
+            switch ($errorcode) {
+                case "rootonly": // Uses default string because information might be to complicated for users.
+                    $returnstring = get_string('error:rootonly', 'local_catquiz', $errorarray);
+                    break;
+                case "se": // Uses default string because information might be to complicated for users.
+                    if (isset($errorarray['semindefined'])) {
+                        $returnstring = get_string('error:semin', 'local_catquiz', $errorarray) . "</ br>";
+                    } else if (isset($errorarray['semaxdefined'])) {
+                        $returnstring = get_string('error:semax', 'local_catquiz', $errorarray) . "</ br>";
+                    }
+                    break;
+                case "nminscale":
+                    $returnstring = get_string('error:nminscale', 'local_catquiz', $errorarray) . "</ br>";
+                    break;
+                case "fraction":
+                    if ($errorarray['fraction'] == 1) {
+                        $returnstring = get_string('error:fraction1', 'local_catquiz') . "</ br>";
+                    } else if ($errorarray['fraction'] == 0) {
+                        $returnstring = get_string('error:fraction0', 'local_catquiz') . "</ br>";
+                    }
+                    break;
+            }
+            if (!empty($returnstring)) {
+                return $returnstring;
+            }
+        }
+        return get_string('noscalesfound', 'local_catquiz'); // Default.
     }
 
     /**
