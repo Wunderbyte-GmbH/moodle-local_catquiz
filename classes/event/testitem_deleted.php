@@ -24,13 +24,12 @@
 
 namespace local_catquiz\event;
 
-use local_catquiz\catscale;
 use moodle_url;
 
 /**
- * The catscale_updated event class.
+ * The testitem_deletedevent event class.
  *
- * @property-read array $other { Extra information about event. Acesss an instance of the booking module }
+ * @property-read array $other
  * @copyright 2024 Wunderbyte <info@wunderbyte.at>
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
