@@ -246,10 +246,6 @@ abstract class feedbackgenerator {
     private function has_required_context_keys($context) {
         foreach ($this->get_required_context_keys() as $key) {
             if (!array_key_exists($key, $context)) {
-                global $CFG;
-                if ($CFG->debug > 0) {
-                    echo "missing contextkey " . $key;
-                }
                 return false;
             }
         }
