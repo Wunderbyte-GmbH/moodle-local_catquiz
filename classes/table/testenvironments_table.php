@@ -150,7 +150,6 @@ class testenvironments_table extends wunderbyte_table {
 
         global $OUTPUT;
 
-        $url = new moodle_url('/course/view.php', ['id' => $values->id]);
         $data['showactionbuttons'][] = [
             'label' => get_string('edit', 'core'), // Name of your action button.
             'class' => 'btn btn-blank',
@@ -184,6 +183,7 @@ class testenvironments_table extends wunderbyte_table {
                 ],
         ];
 
+        $url = new moodle_url('/mod/adaptivequiz/view.php', ['n' => $values->componentid]);
         $data['showactionbuttons'][] = [
             'label' => get_string('show', 'core'), // Name of your action button.
             'class' => 'btn btn-blank',
