@@ -1859,7 +1859,6 @@ class catquiz {
             ],
         ]);
         $event->trigger();
-
     }
 
     /**

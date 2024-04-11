@@ -31,6 +31,5 @@ export const init = () => {
             parent.classList.add("show");
             parent = parent.parentNode.closest('[data-name^="catquiz_feedback_header"]');
         }
-        }
-    );
+    });
 };

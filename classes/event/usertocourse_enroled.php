@@ -18,20 +18,19 @@
  * The usertocourse_enroled event.
  *
  * @package local_catquiz
- * @copyright 2024 Georg Maißer, <info@wunderbyte.at>
+ * @copyright 2024 Wunderbyte <info@wunderbyte.at>
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 namespace local_catquiz\event;
 
-use local_catquiz\catscale;
 use moodle_url;
 
 /**
  * The usertocourse_enroled event class.
  *
- * @property-read array $other { Extra information about event. Acesss an instance of the booking module }
- * @copyright 2024 Magdalena Holczik
+ * @property-read array $other
+ * @copyright 2024 Wunderbyte
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class usertocourse_enroled extends \core\event\base {
