@@ -41,7 +41,8 @@
                     "content": "This is the content of teacher feedback 1."
                 }
             ]
-        }
+        },
+        "attemptid" : "111"
     }
 }}
 
@@ -60,7 +61,7 @@
     {{#studentfeedback}}
         {{#othertabs}}
         <li class="nav-item">
-            <a class="nav-link" id="{{generatorname}}-othertabs--{{heading}}" data-toggle="tab" href="#{{generatorname}}_feedbacktab--{{attemptid}}" role="tab" aria-controls="{{generatorname}}_feedbacktab" aria-selected="true">{{heading}}</a>
+            <a class="nav-link" id="{{generatorname}}-othertabs" data-toggle="tab" href="#{{generatorname}}_feedbacktab--{{attemptid}}" role="tab" aria-controls="{{generatorname}}_feedbacktab" aria-selected="true">{{heading}}</a>
         </li>
         {{/othertabs}}
     {{/studentfeedback}}
