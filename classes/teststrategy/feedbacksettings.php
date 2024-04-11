@@ -368,7 +368,7 @@ class feedbacksettings {
         foreach ($personabilities as $catscale => $array) {
             if (empty($quizsettings['catquiz_scalereportcheckbox_' . $catscale])) {
                 $personabilities[$catscale]['excluded'] = true;
-                $personabilities[$catscale]['error'] = [
+                $personabilities[$catscale]['error']['checkbox'] = [
                     'scalereportcheckboxinquizsettings' => false,
                 ];
             }
