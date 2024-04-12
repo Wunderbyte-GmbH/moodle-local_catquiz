@@ -275,7 +275,6 @@ class customscalefeedback extends feedbackgenerator {
      */
     private function get_exclusion_reason_string(array $personabilities): string {
 
-        $returnstring = "";
         foreach ($personabilities as $personability) {
             if (!isset($personability['excluded'])) {
                 continue;
@@ -304,6 +303,7 @@ class customscalefeedback extends feedbackgenerator {
                     return get_string('noscalesfound', 'local_catquiz');
             }
         }
+        return get_string('noscalesfound', 'local_catquiz');
     }
 
     /**
