@@ -203,23 +203,7 @@ class testenvironments_table extends wunderbyte_table {
      * @return mixed
      */
     public function col_numberofitems(stdClass $values) {
-        global $DB;
-        $json = json_decode($values->json);
-        $activescales = [];
-        foreach ($json as $property => $value) {
-            if (!preg_match('/^catquiz_subscalecheckbox_(\d+)/', $property, $matches)) {
-                continue;
-            }
-            $activescales[] = intval($matches[1]);
-        }
-
-        [$insql, $inparams] = $DB->get_in_or_equal(
-            $activescales,
-            SQL_PARAMS_NAMED,
-            'incatscales'
-        );
-        $numquestions = $DB->count_records_select('local_catquiz_items', "catscaleid $insql", $inparams);
-        return $numquestions;
+        return testenvironment::get_num_items_for_test($values->id);
     }
 
     /**
