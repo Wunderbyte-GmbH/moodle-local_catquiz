@@ -273,7 +273,7 @@ class customscalefeedback extends feedbackgenerator {
      * @return string
      *
      */
-    private function get_exclusion_reason_string(array $personabilities):string {
+    private function get_exclusion_reason_string(array $personabilities): string {
 
         $returnstring = "";
         foreach ($personabilities as $personability) {
