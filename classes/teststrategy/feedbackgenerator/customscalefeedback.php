@@ -285,31 +285,25 @@ class customscalefeedback extends feedbackgenerator {
 
             switch ($errorcode) {
                 case "rootonly": // Uses default string because information might be to complicated for users.
-                    $returnstring = get_string('error:rootonly', 'local_catquiz', $errorarray);
-                    break;
+                    return get_string('error:rootonly', 'local_catquiz', $errorarray);
                 case "se": // Uses default string because information might be to complicated for users.
                     if (isset($errorarray['semindefined'])) {
-                        $returnstring = get_string('error:semin', 'local_catquiz', $errorarray) . "</ br>";
+                        return get_string('error:semin', 'local_catquiz', $errorarray);
                     } else if (isset($errorarray['semaxdefined'])) {
-                        $returnstring = get_string('error:semax', 'local_catquiz', $errorarray) . "</ br>";
+                        return get_string('error:semax', 'local_catquiz', $errorarray);
                     }
-                    break;
                 case "nminscale":
-                    $returnstring = get_string('error:nminscale', 'local_catquiz', $errorarray) . "</ br>";
-                    break;
+                    return get_string('error:nminscale', 'local_catquiz', $errorarray);
                 case "fraction":
                     if ($errorarray['fraction'] == 1) {
-                        $returnstring = get_string('error:fraction1', 'local_catquiz') . "</ br>";
+                        return get_string('error:fraction1', 'local_catquiz');
                     } else if ($errorarray['fraction'] == 0) {
-                        $returnstring = get_string('error:fraction0', 'local_catquiz') . "</ br>";
+                        return get_string('error:fraction0', 'local_catquiz');
                     }
-                    break;
-            }
-            if (!empty($returnstring)) {
-                return $returnstring;
+                default:
+                    return get_string('noscalesfound', 'local_catquiz');
             }
         }
-        return get_string('noscalesfound', 'local_catquiz'); // Default.
     }
 
     /**
