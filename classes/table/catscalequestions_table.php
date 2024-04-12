@@ -32,12 +32,14 @@ require_once($CFG->libdir.'/tablelib.php');
 require_once($CFG->dirroot . '/question/engine/lib.php');
 require_once($CFG->dirroot . '/local/catquiz/lib.php');
 
+use cache_helper;
 use html_writer;
 use local_catquiz\catscale;
 use local_wunderbyte_table\wunderbyte_table;
 use context_system;
 use dml_exception;
 use local_catquiz\catquiz;
+use local_catquiz\event\catscale_updated;
 use local_catquiz\local\model\model_item_param;
 use local_wunderbyte_table\output\table;
 use moodle_url;
@@ -298,6 +300,7 @@ class catscalequestions_table extends wunderbyte_table {
      * @return array
      */
     public function action_removetestitem(int $testitemid, string $data) {
+        global $USER;
 
         $jsonobject = json_decode($data);
 
@@ -320,6 +323,16 @@ class catscalequestions_table extends wunderbyte_table {
         foreach ($idarray as $id) {
             catscale::remove_testitem_from_scale($catscaleid, $id);
         }
+
+        $event = catscale_updated::create([
+            'objectid' => $catscaleid,
+            'context' => $context = context_system::instance(),
+            'userid' => $USER->id, // The user who did cancel.
+            'other' => [
+                'catscaleid' => $catscaleid,
+            ],
+        ]);
+        $event->trigger();
 
         return [
             'success' => 1,

@@ -93,10 +93,10 @@ $definitions = [
         'simplekeys' => true,
         'staticacceleration' => true,
         'staticaccelerationsize' => 1,
-        'invalidationevents' => [ // TODO: check if these events are sufficient or maybe too much.
+        'invalidationevents' => [
             'changesincatscales',
             'changesinquizsettings',
-            'questiondeleted',
+            'changesintestitems',
             ],
     ],
     'catscales_num_items' => [
@@ -104,12 +104,10 @@ $definitions = [
         'simplekeys' => true,
         'staticacceleration' => true,
         'staticaccelerationsize' => 1,
-        // TODO: ensure this cache is purged when quiz settings for the given instance are changed
-        // and when items are added/removed from a scale.
         'invalidationevents' => [
             'changesincatscales',
             'changesinquizsettings',
-            'questiondeleted',
+            'changesintestitems',
             ],
     ],
 ];
