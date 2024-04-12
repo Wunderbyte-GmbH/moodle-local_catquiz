@@ -496,6 +496,13 @@ class testenvironment {
         return $returnvalue;
     }
 
+    /**
+     * Returns the active scales for the given test id
+     *
+     * @param int $id The test id
+     *
+     * @return array
+     */
     public static function get_active_scales(int $id): array {
         global $DB;
         $cache = cache::make('local_catquiz', 'cattest_active_scales');
@@ -526,6 +533,12 @@ class testenvironment {
         return $activescales;
     }
 
+    /**
+     * Returns the number of items for the given test
+     *
+     * @param int $id The test id
+     * @return int
+     */
     public static function get_num_items_for_test(int $id): int {
         global $DB;
         $activescales = self::get_active_scales($id);
