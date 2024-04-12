@@ -140,7 +140,7 @@ class customscalefeedback_test extends basic_testcase {
                     ],
                     'expected' => [
                         'heading' => 'Feedback',
-                        'content' => 'There was no valid feedback found.',
+                        'content' => 'No valid feedback could be generated.',
                         'comment' => '',
                     ],
                 ],
