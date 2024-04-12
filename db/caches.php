@@ -88,5 +88,28 @@ $definitions = [
         'staticaccelerationsize' => 1,
         'invalidationevents' => ['changesinteststrategies'],
     ],
-
+    'cattest_active_scales' => [
+        'mode' => cache_store::MODE_APPLICATION,
+        'simplekeys' => true,
+        'staticacceleration' => true,
+        'staticaccelerationsize' => 1,
+        'invalidationevents' => [ // TODO: check if these events are sufficient or maybe too much.
+            'changesincatscales',
+            'changesinquizsettings',
+            'questiondeleted',
+            ],
+    ],
+    'catscales_num_items' => [
+        'mode' => cache_store::MODE_APPLICATION,
+        'simplekeys' => true,
+        'staticacceleration' => true,
+        'staticaccelerationsize' => 1,
+        // TODO: ensure this cache is purged when quiz settings for the given instance are changed
+        // and when items are added/removed from a scale.
+        'invalidationevents' => [
+            'changesincatscales',
+            'changesinquizsettings',
+            'questiondeleted',
+            ],
+    ],
 ];

@@ -25,6 +25,8 @@
 
 namespace local_catquiz;
 
+use cache;
+use cache_helper;
 use moodle_exception;
 use stdClass;
 
@@ -212,6 +214,7 @@ class testenvironment {
             if (empty($templatename) || ($record->name == $templatename)) {
                 $this->update_object($record);
                 $DB->update_record('local_catquiz_tests', $record);
+                cache_helper::purge_by_event('changesinquizsettings');
 
                 return $this->id;
             }
@@ -491,5 +494,56 @@ class testenvironment {
         }
 
         return $returnvalue;
+    }
+
+    public static function get_active_scales(int $id): array {
+        global $DB;
+        $cache = cache::make('local_catquiz', 'cattest_active_scales');
+        if ($activescales = $cache->get($id)) {
+            return $activescales;
+        }
+
+        $record = $DB->get_record('local_catquiz_tests', ['id' => $id], 'json');
+        $json = json_decode($record->json);
+        $activescales = [];
+        foreach ($json as $property => $value) {
+            if (!preg_match('/^catquiz_subscalecheckbox_(\d+)/', $property, $matches)) {
+                continue;
+            }
+            // If it is not checked, it is not active.
+            if ($value === "0") {
+                continue;
+            }
+            $activescales[] = intval($matches[1]);
+        }
+
+        [$insql, $inparams] = $DB->get_in_or_equal(
+            $activescales,
+            SQL_PARAMS_NAMED,
+            'incatscales'
+        );
+        $cache->set($id, $activescales);
+        return $activescales;
+    }
+
+    public static function get_num_items_for_test(int $id): int {
+        global $DB;
+        $activescales = self::get_active_scales($id);
+        // The cache key consists of the active scales, so that we can re-use the same cache if multiple tests have the same set of
+        // active scales. Scales have to be separated so that active scales 1 and 2 are not considered the same as active scale 12.
+        $cachekey = implode('_', $activescales);
+        $cache = cache::make('local_catquiz', 'catscales_num_items');
+        if ($numquestions = $cache->get($cachekey)) {
+            return $numquestions;
+        }
+
+        [$insql, $inparams] = $DB->get_in_or_equal(
+            $activescales,
+            SQL_PARAMS_NAMED,
+            'incatscales'
+        );
+        $numquestions = $DB->count_records_select('local_catquiz_items', "catscaleid $insql", $inparams);
+        $cache->set($cachekey, $numquestions);
+        return $numquestions;
     }
 }
