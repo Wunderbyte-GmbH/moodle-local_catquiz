@@ -66,24 +66,6 @@ class testenvironments_table extends wunderbyte_table {
     }
 
     /**
-     * Return value for visible column.
-     *
-     * @param stdClass $values
-     * @return string
-     */
-    public function col_visible(stdClass $values) {
-
-        switch ($values->visible) {
-            case '1':
-                return get_string('visible', 'core');
-            case '0':
-                return get_string('invisible', 'local_catquiz');
-            default:
-                return get_string('invisible', 'local_catquiz');
-        }
-    }
-
-    /**
      * Return value for status column.
      *
      * @param stdClass $values
@@ -103,20 +85,6 @@ class testenvironments_table extends wunderbyte_table {
         }
     }
 
-    /**
-     * Return value for visible column.
-     *
-     * @param stdClass $values
-     * @return mixed
-     */
-    public function col_availability(stdClass $values) {
-
-        if (empty($values->availability)) {
-            return '';
-        } else {
-            return $values->availability;
-        }
-    }
 
     /**
      * Return value for timecreated column.

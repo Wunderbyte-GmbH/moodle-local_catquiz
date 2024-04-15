@@ -70,9 +70,6 @@ class testenvironmentdashboard implements renderable, templatable {
             'name',
             'component',
             'istest',
-            'visible',
-            'availability',
-            'lang',
             'status',
             'parentid',
             'timemodified',
@@ -89,9 +86,6 @@ class testenvironmentdashboard implements renderable, templatable {
             get_string('name', 'core'),
             get_string('component', 'local_catquiz'),
             get_string('type', 'local_catquiz'),
-            get_string('visible', 'core'),
-            get_string('availability', 'core'),
-            get_string('lang', 'local_catquiz'),
             get_string('status'),
             get_string('parentid', 'local_catquiz'),
             get_string('timemodified', 'local_catquiz'),
@@ -110,22 +104,12 @@ class testenvironmentdashboard implements renderable, templatable {
         $standardfilter = new standardfilter('component', get_string('component', 'local_catquiz'));
         $table->add_filter($standardfilter);
 
-        $standardfilter = new standardfilter('visible', get_string('visible', 'core'));
-        $standardfilter->add_options([
-            '1' => get_string('visible', 'core'),
-            '0' => get_string('invisible', 'local_catquiz'),
-        ]);
-        $table->add_filter($standardfilter);
-
         $standardfilter = new standardfilter('status', get_string('status', 'core'));
         $standardfilter->add_options([
             '2' => get_string('force', 'local_catquiz'),
             '1' => get_string('active', 'core'),
             '0' => get_string('inactive', 'core'),
         ]);
-        $table->add_filter($standardfilter);
-
-        $standardfilter = new standardfilter('lang', get_string('lang', 'local_catquiz'));
         $table->add_filter($standardfilter);
 
         $standardfilter = new standardfilter('istest', get_string('type', 'local_catquiz'));
@@ -140,9 +124,6 @@ class testenvironmentdashboard implements renderable, templatable {
             [
                 'name',
                 'component',
-                'visible',
-                'availability',
-                'lang',
                 'status',
                 'parentid',
                 'timemodified',
