@@ -34,6 +34,7 @@ defined('MOODLE_INTERNAL') || die();
 define('LOCAL_CATQUIZ_TESTENVIRONMENT_ALL', 0);
 define('LOCAL_CATQUIZ_TESTENVIRONMENT_ONLYTEMPLATES', 1);
 define('LOCAL_CATQUIZ_TESTENVIRONMENT_NOTEMPLATES', 2);
+define('LOCAL_CATQUIZ_TESTENVIRONMENT_ONLYACTIVETEMPLATES', 3);
 
 require_once($CFG->dirroot . '/local/catquiz/lib.php');
 
@@ -455,6 +456,9 @@ class testenvironment {
                 break;
             case LOCAL_CATQUIZ_TESTENVIRONMENT_NOTEMPLATES:
                 $equal = "WHERE componentid <> :componentid";
+                break;
+            case LOCAL_CATQUIZ_TESTENVIRONMENT_ONLYACTIVETEMPLATES:
+                $equal = "WHERE status > 0 AND componentid = :componentid";
                 break;
         }
 

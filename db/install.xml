@@ -74,9 +74,6 @@
           <FIELD NAME="description" TYPE="text" NOTNULL="false" SEQUENCE="false" COMMENT="Description of the test environment"/>
           <FIELD NAME="descriptionformat" TYPE="int" LENGTH="2" NOTNULL="false" DEFAULT="1" SEQUENCE="false" COMMENT="Description format"/>
           <FIELD NAME="json" TYPE="text" NOTNULL="false" SEQUENCE="false" COMMENT="Actual test settings in json format"/>
-          <FIELD NAME="visible" TYPE="int" LENGTH="2" NOTNULL="false" DEFAULT="1" SEQUENCE="false" COMMENT="If visible only for managers"/>
-          <FIELD NAME="availability" TYPE="char" LENGTH="255" NOTNULL="false" DEFAULT="" SEQUENCE="false" COMMENT="Define availability like user role or course categories."/>
-          <FIELD NAME="lang" TYPE="char" LENGTH="30" NOTNULL="false" DEFAULT="" SEQUENCE="false" COMMENT="Language for the environment"/>
           <FIELD NAME="status" TYPE="int" LENGTH="2" NOTNULL="true" DEFAULT="1" SEQUENCE="false" COMMENT="Any state like active, deleted, to be reviewed etc, as int. 1 is active, 0, is deleted."/>
           <FIELD NAME="parentid" TYPE="int" LENGTH="10" NOTNULL="false" DEFAULT="0" SEQUENCE="false" COMMENT="A record from this table as parent."/>
           <FIELD NAME="timecreated" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>

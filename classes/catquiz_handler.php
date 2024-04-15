@@ -73,7 +73,11 @@ class catquiz_handler {
 
         $elements = [];
 
-        $testtemplates = testenvironment::get_environments_as_array();
+        // no inactive templates
+        $testtemplates = testenvironment::get_environments_as_array(
+            'mod_adaptivequiz',
+            0,
+            LOCAL_CATQUIZ_TESTENVIRONMENT_ONLYACTIVETEMPLATES);
 
         // We introduce the option of a custom test environment.
         $testtemplates[0] = get_string('newcustomtest', 'local_catquiz');

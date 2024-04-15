@@ -158,6 +158,7 @@ $string['startwithverydifficultquestion'] = "with a very difficult question";
 
 $string['maxtimeperquestion'] = "Maximum time";
 $string['maxtimeperquestion_help'] = "If the user takes longer to answer a question, a break will be enforced";
+
 // Tests environment.
 $string['newcustomtest'] = 'Custom test';
 $string['lang'] = 'Language';

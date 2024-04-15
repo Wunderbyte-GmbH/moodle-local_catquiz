@@ -66,19 +66,6 @@ class edit_testenvironment extends dynamic_form {
         $mform->addElement('editor', 'description', get_string('description', 'core'));
         $mform->setType('description', PARAM_RAW);
 
-        $mform->addElement('advcheckbox', 'visible', get_string('visible', 'core'));
-        $mform->setType('visible', PARAM_INT);
-
-        $mform->addElement('advcheckbox', 'availability', get_string('availability', 'core'));
-        $mform->setType('availability', PARAM_TEXT);
-
-        $stringman = get_string_manager();
-        $languages = $stringman->get_list_of_languages();
-
-        $mform->addElement('select', 'lang', get_string('lang', 'local_catquiz'), $languages);
-        $mform->setType('lang', PARAM_TEXT);
-        $mform->setDefault('lang', $CFG->lang);
-
         $statusarray = [
             LOCAL_CATQUIZ_STATUS_TEST_INACTIVE => get_string('inactive', 'core'),
             LOCAL_CATQUIZ_STATUS_TEST_ACTIVE => get_string('active', 'core'),
