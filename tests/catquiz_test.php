@@ -26,10 +26,13 @@
 namespace local_catquiz;
 
 use advanced_testcase;
+use coding_exception;
+use dml_exception;
 use local_catquiz\catquiz;
 use local_catquiz\data\catscale_structure;
 use local_catquiz\data\dataapi;
 use local_catquiz\external\manage_catscale;
+use moodle_exception;
 use PHPUnit\Framework\ExpectationFailedException;
 use SebastianBergmann\RecursionContext\InvalidArgumentException;
 
@@ -282,58 +285,85 @@ class catquiz_test extends advanced_testcase {
         ];
     }
 
-    public function test_user_enrolment_works_as_expected() {
+    /**
+     * Checks that a user is enrolled in a course and added to a group according to person ability values
+     *
+     * @dataProvider user_is_enrolled_according_to_ability_and_scale_setting_provider
+     */
+    public function test_user_is_enrolled_according_to_ability_and_scale_settings(
+        array $quizsettings,
+        array $personabilities,
+        int $catscaleid,
+        bool $isenrolled
+    ) {
+        global $USER;
+        // This is necessary so that phpunit does not throw an error if the database is changed.
         $this->resetAfterTest();
-        global $DB, $USER;
-        self::setUser(1);
+
+        // Create a course, group and catscale.
+        self::setUser($this->getDataGenerator()->create_user());
         $course = $this->getDataGenerator()->create_course();
-        $quizsettings = $this->get_default_quizsettings();
-        $personabilities = [];
+        $group = $this->getDataGenerator()->create_group(['courseid' => $course->id]);
+        self::create_dummy_catscale($catscaleid);
 
-        // Create catscale.
-        $catscalestructure = new catscale_structure([
-            'name' => 'Testscale',
-            'description' => 'Testscale',
-            'action' => 'create',
-            'minscalevalue' => -5.0,
-            'maxscalevalue' => 5.0,
-            'parentid' => 0,
-            'id' => 1,
-            'timecreated' => time(),
-            'timemodified' => time(),
-            ]
-        );
-        $catscaleid = dataapi::create_catscale($catscalestructure);
-
+        // Create settings so that the user is really enrolled.
         $quizsettings[sprintf('catquiz_courses_%s_1', $catscaleid)] = [$course->id];
-        $quizsettings[sprintf('enrolment_message_checkbox%s_1', $catscaleid)] = '1';
-        $quizsettings[sprintf('feedback_scaleid_limit_lower_%s_1', $catscaleid)] = -5;
-        $quizsettings[sprintf('feedback_scaleid_limit_upper_%s_1', $catscaleid)] = -1.666;
-        $personabilities[$catscaleid] = -2;
+        $quizsettings[sprintf('catquiz_group_%s_1', $catscaleid)] = $group->name;
 
-        // Ensure user is not yet enrolled - there are no enrolments yet.
-        $enrolments = $DB->get_records(
-            'enrol',
-            ['courseid' => $course->id, 'enrol' => 'manual', 'status' => ENROL_INSTANCE_ENABLED]
-        );
-        $this->assertIsArray($enrolments);
-        $this->assertEquals(1, count($enrolments));
-        $enrolment = reset($enrolments);
-        $this->assertIsObject($enrolment);
-        $userenrolments = $DB->get_records('user_enrolments', ['enrolid' => $enrolment->id, 'userid' => $USER->id]);
-        $this->assertEmpty($userenrolments);
+        // Check pre-conditions: the user is not enrolled to the course and not a member of the specified group.
+        $this->assertEmpty(groups_get_members($group->id));
+        $this->assertEmpty($this->get_user_enrolment($course));
 
+        // This is the function we want to test. After this call, the user should be added to the given group and enrolled to the
+        // given course depending on the person ability of the user.
         catquiz::enrol_user($USER->id, $quizsettings, $personabilities);
 
-        // Get the enrolid for the course.
-        $enrolments = $DB->get_records(
-            'enrol',
-            ['courseid' => $course->id, 'enrol' => 'manual', 'status' => ENROL_INSTANCE_ENABLED]
-        );
-        $enrolment = reset($enrolments);
-        $this->assertIsObject($enrolment);
-        $userenrolments = $DB->get_records('user_enrolments', ['enrolid' => $enrolment->id, 'userid' => $USER->id]);
-        $this->assertNotEmpty($userenrolments);
+        // Check post-conditions.
+        $groupmembers = groups_get_members($group->id);
+        if ($isenrolled) {
+            $this->assertNotEmpty($this->get_user_enrolment($course));
+            $this->assertArrayHasKey($USER->id, $groupmembers);
+        } else {
+            $this->assertEmpty($this->get_user_enrolment($course));
+            $this->assertEmpty($groupmembers);
+        }
+    }
+
+    /**
+     * Dataprovider for the corresponding test function.
+     * @return (int|true)[][]
+     */
+    public static function user_is_enrolled_according_to_ability_and_scale_setting_provider() {
+        $catscaleid = 1;
+        // Set quiz settings in a way so that only if the ability is in the lowest third range [-5, -1.66], the user is enroled to
+        // the newly created course.
+        $quizsettings = self::get_default_quizsettings();
+        $quizsettings[sprintf('catquiz_courses_%s_2', $catscaleid)] = [];
+        $quizsettings[sprintf('catquiz_courses_%s_3', $catscaleid)] = [];
+        $quizsettings[sprintf('enrolment_message_checkbox%s_1', $catscaleid)] = '1';
+        $quizsettings[sprintf('feedback_scaleid_limit_lower_%s_1', $catscaleid)] = -5.0;
+        $quizsettings[sprintf('feedback_scaleid_limit_upper_%s_1', $catscaleid)] = -1.666;
+        $quizsettings[sprintf('feedback_scaleid_limit_lower_%s_2', $catscaleid)] = -1.666;
+        $quizsettings[sprintf('feedback_scaleid_limit_upper_%s_2', $catscaleid)] = 1.666;
+        $quizsettings[sprintf('feedback_scaleid_limit_lower_%s_3', $catscaleid)] = 1.666;
+        $quizsettings[sprintf('feedback_scaleid_limit_upper_%s_3', $catscaleid)] = 5.0;
+        $quizsettings[sprintf('catquiz_group_%s_2', $catscaleid)] = "";
+        $quizsettings[sprintf('catquiz_group_%s_3', $catscaleid)] = "";
+
+        return [
+            'is enrolled' => [
+                'quizsettings' => $quizsettings,
+                'personabilities' => [$catscaleid => -2],
+                'catscaleid' => $catscaleid,
+                'is enrolled' => true,
+            ],
+            'is not enrolled' => [
+                'quizsettings' => $quizsettings,
+                'personabilities' => [$catscaleid => 0],
+                'catscaleid' => $catscaleid,
+                'is enrolled' => false,
+            ],
+        ];
     }
 
     /**
@@ -341,8 +371,50 @@ class catquiz_test extends advanced_testcase {
      *
      * @return mixed
      */
-    private function get_default_quizsettings() {
+    private static function get_default_quizsettings() {
         $json = file_get_contents(__DIR__ . '/fixtures/testenvironment.json');
         return json_decode($json, true);
+    }
+
+    /**
+     * Creates a new catscale with the given ID and defaul tsettings
+     * @param int $id
+     * @return int
+     * @throws coding_exception
+     * @throws dml_exception
+     * @throws moodle_exception
+     */
+    private static function create_dummy_catscale(int $id): int {
+        $catscalestructure = new catscale_structure([
+            'name' => 'Dummy',
+            'description' => 'Just for testing',
+            'action' => 'create',
+            'minscalevalue' => -5.0,
+            'maxscalevalue' => 5.0,
+            'parentid' => 0,
+            'id' => $id,
+            'timecreated' => time(),
+            'timemodified' => time(),
+            ]
+        );
+        $catscaleid = dataapi::create_catscale($catscalestructure);
+        return $catscaleid;
+    }
+
+    /**
+     * Return the user enrolments for the given course and the current user
+     *
+     * @param mixed $course
+     * @return array
+     */
+    private function get_user_enrolment($course): array {
+        global $DB, $USER;
+
+        $enrolments = $DB->get_records(
+            'enrol',
+            ['courseid' => $course->id, 'enrol' => 'manual', 'status' => ENROL_INSTANCE_ENABLED]
+        );
+        $enrolment = reset($enrolments);
+        return $DB->get_records('user_enrolments', ['enrolid' => $enrolment->id, 'userid' => $USER->id]);
     }
 }
