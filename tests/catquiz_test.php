@@ -25,9 +25,12 @@
 
 namespace local_catquiz;
 
+use advanced_testcase;
 use local_catquiz\catquiz;
+use local_catquiz\data\catscale_structure;
+use local_catquiz\data\dataapi;
+use local_catquiz\external\manage_catscale;
 use PHPUnit\Framework\ExpectationFailedException;
-use PHPUnit\Framework\TestCase;
 use SebastianBergmann\RecursionContext\InvalidArgumentException;
 
 /**
@@ -40,7 +43,7 @@ use SebastianBergmann\RecursionContext\InvalidArgumentException;
  *
  * @covers \local_catquiz\catquiz
  */
-class catquiz_test extends TestCase {
+class catquiz_test extends advanced_testcase {
 
     /**
      * Tests the return value supposed to be a human readable information about course & group enrolment.
@@ -277,5 +280,64 @@ class catquiz_test extends TestCase {
                 ],
             ],
         ];
+    }
+
+    public function test_user_enrolment_works_as_expected() {
+        $this->resetAfterTest();
+        global $DB, $USER;
+        self::setUser(1);
+        $course = $this->getDataGenerator()->create_course();
+        $quizsettings = $this->get_default_quizsettings();
+        $personabilities = [];
+
+        // Create catscale.
+        $catscalestructure = new catscale_structure([
+            'name' => 'Testscale',
+            'description' => 'Testscale',
+            'action' => 'create',
+            'minscalevalue' => -5.0,
+            'maxscalevalue' => 5.0,
+            'parentid' => 0,
+            'id' => 1,
+            'timecreated' => time(),
+            'timemodified' => time(),
+            ]
+        );
+        $catscaleid = dataapi::create_catscale($catscalestructure);
+
+        $quizsettings[sprintf('catquiz_courses_%s_1', $catscaleid)] = [$course->id];
+        $quizsettings[sprintf('enrolment_message_checkbox%s_1', $catscaleid)] = '1';
+        $quizsettings[sprintf('feedback_scaleid_limit_lower_%s_1', $catscaleid)] = -5;
+        $quizsettings[sprintf('feedback_scaleid_limit_upper_%s_1', $catscaleid)] = -1.666;
+        $personabilities[$catscaleid] = -2;
+
+        // Ensure user is not yet enrolled - there are no enrolments yet.
+        $enrolments = $DB->get_records(
+            'enrol',
+            ['courseid' => $course->id, 'enrol' => 'manual', 'status' => ENROL_INSTANCE_ENABLED]
+        );
+        $this->assertIsArray($enrolments);
+        $this->assertEquals(1, count($enrolments));
+        $enrolment = reset($enrolments);
+        $this->assertIsObject($enrolment);
+        $userenrolments = $DB->get_records('user_enrolments', ['enrolid' => $enrolment->id, 'userid' => $USER->id]);
+        $this->assertEmpty($userenrolments);
+
+        catquiz::enrol_user($USER->id, $quizsettings, $personabilities);
+
+        // Get the enrolid for the course.
+        $enrolments = $DB->get_records(
+            'enrol',
+            ['courseid' => $course->id, 'enrol' => 'manual', 'status' => ENROL_INSTANCE_ENABLED]
+        );
+        $enrolment = reset($enrolments);
+        $this->assertIsObject($enrolment);
+        $userenrolments = $DB->get_records('user_enrolments', ['enrolid' => $enrolment->id, 'userid' => $USER->id]);
+        $this->assertNotEmpty($userenrolments);
+    }
+
+    private function get_default_quizsettings() {
+        $json = file_get_contents(__DIR__ . '/fixtures/testenvironment.json');
+        return json_decode($json, true);
     }
 }
