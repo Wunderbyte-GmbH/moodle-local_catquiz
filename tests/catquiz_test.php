@@ -288,6 +288,11 @@ class catquiz_test extends advanced_testcase {
     /**
      * Checks that a user is enrolled in a course and added to a group according to person ability values
      *
+     * @param array $quizsettings
+     * @param array $personabiliti
+     * @param int $catscaleid
+     * @param bool $isenrolled
+     *
      * @dataProvider user_is_enrolled_according_to_ability_and_scale_setting_provider
      */
     public function test_user_is_enrolled_according_to_ability_and_scale_settings(
@@ -331,9 +336,9 @@ class catquiz_test extends advanced_testcase {
 
     /**
      * Dataprovider for the corresponding test function.
-     * @return (int|true)[][]
+     * @return array
      */
-    public static function user_is_enrolled_according_to_ability_and_scale_setting_provider() {
+    public static function user_is_enrolled_according_to_ability_and_scale_setting_provider(): array {
         $catscaleid = 1;
         // Set quiz settings in a way so that only if the ability is in the lowest third range [-5, -1.66], the user is enroled to
         // the newly created course.
