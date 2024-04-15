@@ -120,7 +120,7 @@ class catscalequestions_table extends wunderbyte_table {
                 'arialabel' => 'cogwheel',
                 'title' => get_string('cogwheeltitle', 'local_catquiz'),
                 'href' => $url->out(false),
-                'methodname' => '',
+                'methodname' => 'managedetails',
                 'nomodal' => true,
                 'data' => [ // Will be added eg as data-id = $values->id, so values can be transmitted to the method above.
                     'id' => 'id',
