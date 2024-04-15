@@ -731,7 +731,7 @@ class catquiz {
         $from = "
         ( SELECT
             ct.id,
-            name,
+            ct.name,
             component,
             componentid,
             c.visible,
