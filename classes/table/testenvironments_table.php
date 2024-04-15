@@ -183,17 +183,19 @@ class testenvironments_table extends wunderbyte_table {
                 ],
         ];
 
-        $url = new moodle_url('/mod/adaptivequiz/view.php', ['n' => $values->componentid]);
-        $data['showactionbuttons'][] = [
-            'label' => get_string('show', 'core'), // Name of your action button.
-            'class' => 'btn btn-blank',
-            'href' => $url->out(),
-            'iclass' => 'fa fa-eye', // Add an icon before the label.
-            'id' => $values->id,
-        ];
+        // For templates we can not link to a quiz instance, so display the show action just for tests.
+        if ($values->istest) {
+            $url = new moodle_url('/mod/adaptivequiz/view.php', ['n' => $values->componentid]);
+            $data['showactionbuttons'][] = [
+                'label' => get_string('show', 'core'), // Name of your action button.
+                'class' => 'btn btn-blank',
+                'href' => $url->out(),
+                'iclass' => 'fa fa-eye', // Add an icon before the label.
+                'id' => $values->id,
+            ];
+        }
 
         return $OUTPUT->render_from_template('local_wunderbyte_table/component_actionbutton', $data);;
-
     }
 
     /**
