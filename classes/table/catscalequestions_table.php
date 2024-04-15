@@ -326,8 +326,8 @@ class catscalequestions_table extends wunderbyte_table {
 
         $event = catscale_updated::create([
             'objectid' => $catscaleid,
-            'context' => $context = context_system::instance(),
-            'userid' => $USER->id, // The user who did cancel.
+            'context' => context_system::instance(),
+            'userid' => $USER->id,
             'other' => [
                 'catscaleid' => $catscaleid,
             ],
