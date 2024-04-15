@@ -469,5 +469,25 @@ function xmldb_local_catquiz_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2024031200, 'local', 'catquiz');
     }
 
+    if ($oldversion < 2024041500) {
+
+        // Define field model to be dropped from local_catquiz_tests.
+        $table = new xmldb_table('local_catquiz_tests');
+        $fields = [];
+        $fields[] = new xmldb_field('visible');
+        $fields[] = new xmldb_field('availability');
+        $fields[] = new xmldb_field('lang');
+
+        foreach ($fields as $field) {
+            // Conditionally launch drop field model.
+            if ($dbman->field_exists($table, $field)) {
+                $dbman->drop_field($table, $field);
+            }
+        }
+
+        // Catquiz savepoint reached.
+        upgrade_plugin_savepoint(true, 2024041500, 'local', 'catquiz');
+    }
+
     return true;
 }
