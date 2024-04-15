@@ -73,7 +73,6 @@ class catquiz_handler {
 
         $elements = [];
 
-        // no inactive templates
         $testtemplates = testenvironment::get_environments_as_array(
             'mod_adaptivequiz',
             0,
