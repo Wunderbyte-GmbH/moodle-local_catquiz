@@ -336,6 +336,11 @@ class catquiz_test extends advanced_testcase {
         $this->assertNotEmpty($userenrolments);
     }
 
+    /**
+     * Parse the testsettings from the test fixtures folder
+     *
+     * @return mixed
+     */
     private function get_default_quizsettings() {
         $json = file_get_contents(__DIR__ . '/fixtures/testenvironment.json');
         return json_decode($json, true);
