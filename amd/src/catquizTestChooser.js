@@ -25,6 +25,7 @@ const SELECTORS = {
     CATTESTCHOOSER: '[data-on-change-action]',
     CATTESTSUBMIT: '[data-action="submitCatTest"]',
     CATSCALESUBMIT: '[data-action="submitCatScale"]',
+    CATSCALESUBMITCONTAINER: '[id="fitem_id_submitcatscaleoption"]',
     CATTESTCHECKBOXES: 'input[name^="catquiz_subscalecheckbox"]',
     NUMBEROFFEEDBACKSSUBMIT: '[data-action="submitNumberOfFeedbackOptions"]'
 };
@@ -50,6 +51,17 @@ export const init = () => {
     }
     elements.forEach(selector =>
         selector.addEventListener('change', e => {
+            // Setting defines if reload should be triggered automatically.
+            if (e.target.dataset.manualreload) {
+                let submitbuttoncontainer = document.querySelector(SELECTORS.CATSCALESUBMITCONTAINER);
+                submitbuttoncontainer.classList.remove('hidden');
+
+                let submitbutton = document.querySelector(SELECTORS.CATSCALESUBMIT);
+                submitbutton.classList.remove('btn-primary');
+                submitbutton.classList.add('btn-danger');
+                submitbutton.classList.remove('hidden');
+                return;
+            }
 
             switch (e.target.dataset.onChangeAction) {
                 case 'reloadTestForm':
