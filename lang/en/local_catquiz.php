@@ -98,6 +98,9 @@ $string['pleasecheckorcancel'] = 'Please confirm or cancel';
 $string['progress'] = 'Progress';
 $string['perattempt'] = 'per attempt ';
 $string['peritem'] = 'per item ';
+$string['applychanges'] = 'Apply Changes';
+$string['automatic_reload_on_scale_selection'] = 'Form reload on scale selection';
+$string['automatic_reload_on_scale_selection_description'] = 'Reload quizsettings form automatically on (sub-)scale selection';
 
 $string['timeoutabortnoresult'] = 'Test aborted without result.';
 $string['timeoutabortresult'] = 'Test aborted with result.';

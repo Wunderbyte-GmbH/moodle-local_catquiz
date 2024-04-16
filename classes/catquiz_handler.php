@@ -166,9 +166,9 @@ class catquiz_handler {
 
         // Button to attach JavaScript to reload the form.
         $mform->registerNoSubmitButton('submitcatscaleoption');
-        $elements[] = $mform->addElement('submit', 'submitcatscaleoption', 'catscalesubmit',
+        $elements[] = $mform->addElement('submit', 'submitcatscaleoption', get_string('applychanges', 'local_catquiz'),
             [
-            'class' => 'd-none',
+            'class' => 'hidden',
             'data-action' => 'submitCatScale',
         ]);
 
@@ -221,16 +221,22 @@ class catquiz_handler {
 
             $scaleiddisplay = get_string('scaleiddisplay', 'local_catquiz', $subscale->id);
 
+            $dataarray = [
+                'data-on-change-action' => 'reloadFormFromScaleSelect',
+                'data-name' => $subscale->name,
+                'data-depth' => $subscale->depth,
+            ];
+
+            $config = get_config('local_catquiz', 'automatic_reload_on_scale_selection');
+            if (!$config) {
+                $dataarray['data-manualreload'] = true;
+            }
             $elements[] = $mform->addElement(
                 'advcheckbox',
                 'catquiz_subscalecheckbox_' . $subscale->id,
                 $elementadded . $subscale->name . $scaleiddisplay,
                 null,
-                [
-                    'data-on-change-action' => 'reloadFormFromScaleSelect',
-                    'data-name' => $subscale->name,
-                    'data-depth' => $subscale->depth,
-                ],
+                $dataarray,
                 [0, 1]
             );
             $value = optional_param('catquiz_subscalecheckbox_' . $subscale->id, 0, PARAM_INT);

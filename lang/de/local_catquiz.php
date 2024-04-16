@@ -104,6 +104,9 @@ $string['maxtimeperitem'] = 'Höchstzeit pro Frage in Sekunden';
 $string['mintimeperitem'] = 'Mindestzeit pro Frage in Sekunden';
 $string['perattempt'] = 'pro Versuch ';
 $string['peritem'] = 'pro Item ';
+$string['applychanges'] = 'Änderungen übernehmen';
+$string['automatic_reload_on_scale_selection'] = 'Bei (Sub-)Skalenauswahl Formular neu laden';
+$string['automatic_reload_on_scale_selection_description'] = 'Bei (Sub-)Skalenauswahl automatisch das Quizsettings-Formular neu laden';
 
 $string['timeoutabortnoresult'] = 'Test wird sofort beendet und nicht abschließend bewertet';
 $string['timeoutabortresult'] = 'Test wird sofort beendet und abschließend bewertet';

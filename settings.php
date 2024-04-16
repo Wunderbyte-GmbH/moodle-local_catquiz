@@ -95,4 +95,11 @@ if ($hassiteconfig) {
         '/^\d+$/'
         )
     );
+
+    $settings->add(
+        new admin_setting_configcheckbox(
+            'local_catquiz/automatic_reload_on_scale_selection',
+            get_string('automatic_reload_on_scale_selection', 'local_catquiz'),
+            get_string('automatic_reload_on_scale_selection_description', 'local_catquiz'),
+            1));
 }
