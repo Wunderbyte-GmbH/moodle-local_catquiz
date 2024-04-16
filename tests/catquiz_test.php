@@ -289,7 +289,7 @@ class catquiz_test extends advanced_testcase {
      * Checks that a user is enrolled in a course and added to a group according to person ability values
      *
      * @param array $quizsettings
-     * @param array $personabiliti
+     * @param array $personabilities
      * @param int $catscaleid
      * @param bool $isenrolled
      *
