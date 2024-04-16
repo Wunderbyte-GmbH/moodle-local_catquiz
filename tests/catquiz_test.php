@@ -315,9 +315,10 @@ class catquiz_test extends advanced_testcase {
         $quizsettings[sprintf('catquiz_courses_%s_1', $catscaleid)] = [$course->id];
         $quizsettings[sprintf('catquiz_group_%s_1', $catscaleid)] = $group->name;
 
-        // Check pre-conditions: the user is not enrolled to the course and not a member of the specified group.
+        // Check pre-conditions: the user is not enrolled to the course, not a member of the specified group and has no messages.
         $this->assertEmpty(groups_get_members($group->id));
         $this->assertEmpty($this->get_user_enrolment($course));
+        $this->assertEmpty(message_get_messages($USER->id, 0, -1, MESSAGE_GET_READ_AND_UNREAD));
 
         // This is the function we want to test. After this call, the user should be added to the given group and enrolled to the
         // given course depending on the person ability of the user.
@@ -328,9 +329,11 @@ class catquiz_test extends advanced_testcase {
         if ($isenrolled) {
             $this->assertNotEmpty($this->get_user_enrolment($course));
             $this->assertArrayHasKey($USER->id, $groupmembers);
+            $this->assertNotEmpty(message_get_messages($USER->id, 0, -1, MESSAGE_GET_READ_AND_UNREAD));
         } else {
             $this->assertEmpty($this->get_user_enrolment($course));
             $this->assertEmpty($groupmembers);
+            $this->assertEmpty(message_get_messages($USER->id, 0, -1, MESSAGE_GET_READ_AND_UNREAD));
         }
     }
 
@@ -345,7 +348,7 @@ class catquiz_test extends advanced_testcase {
         $quizsettings = self::get_default_quizsettings();
         $quizsettings[sprintf('catquiz_courses_%s_2', $catscaleid)] = [];
         $quizsettings[sprintf('catquiz_courses_%s_3', $catscaleid)] = [];
-        $quizsettings[sprintf('enrolment_message_checkbox%s_1', $catscaleid)] = '1';
+        $quizsettings[sprintf('enrolment_message_checkbox_%s_1', $catscaleid)] = '1';
         $quizsettings[sprintf('feedback_scaleid_limit_lower_%s_1', $catscaleid)] = -5.0;
         $quizsettings[sprintf('feedback_scaleid_limit_upper_%s_1', $catscaleid)] = -1.666;
         $quizsettings[sprintf('feedback_scaleid_limit_lower_%s_2', $catscaleid)] = -1.666;
