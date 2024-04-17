@@ -552,7 +552,8 @@ $string['instance'] = "Test";
 $string['teststrategy'] = 'Teststrategie';
 $string['starttime'] = "Beginn";
 $string['endtime'] = "Ende";
-$string['feedbacksheader'] = 'Testversuch {$a}';
+$string['ownfeedbacksheader'] = 'Mein Testversuch von {$a}';
+$string['userfeedbacksheader'] = 'Testversuch {$a->attemptid} von {$a->time}, vorgenommen durch {$a->firstname} {$a->lastname} (Userid: {$a->userid})';
 $string['attemptscollapsableheading'] = 'Feedback für Ihre Testversuche:';
 
 // CSV Import Form.

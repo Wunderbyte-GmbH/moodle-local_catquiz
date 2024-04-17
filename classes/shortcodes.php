@@ -67,7 +67,7 @@ class shortcodes {
      * @return string
      */
     public static function catquizfeedback($shortcode, $args, $content, $env, $next) {
-        global $OUTPUT, $COURSE, $USER;
+        global $OUTPUT, $COURSE, $USER, $DB;
 
         // Students get to see only feedback for their own attempts, teacher see all attempts of this course.
         $context = context_course::instance($COURSE->id);
@@ -103,8 +103,31 @@ class shortcodes {
             if (empty($feedback)) {
                 return get_string('attemptfeedbacknotavailable', 'local_catquiz');
             }
+            $timestamp = !empty($record->endtime) ? intval($record->endtime) : intval($record->timemodified);
+            $timeofattempt = userdate($timestamp, get_string('strftimedatetime', 'core_langconfig'));
+            if ($record->userid == $USER->id) {
+                $headerstring = get_string(
+                    'ownfeedbacksheader',
+                    'local_catquiz',
+                    $timeofattempt);
+            } else if (isset($record->userid)) {
+                $userrecord = $DB->get_record('user', ['id' => $record->userid], 'firstname, lastname', IGNORE_MISSING);
 
-            $headerstring = get_string('feedbacksheader', 'local_catquiz', $record->attemptid);
+                $headerstring = get_string(
+                    'userfeedbacksheader',
+                    'local_catquiz',
+                    [
+                        'attemptid' => $record->attemptid,
+                        'time' => $timeofattempt,
+                        'firstname' => $userrecord->firstname,
+                        'lastname' => $userrecord->lastname,
+                        'userid' => $record->userid,
+
+                    ]);
+            } else {
+                $headerstring = "";
+            }
+
             $data = [
                 'feedback' => $feedback,
                 'header' => $headerstring,
