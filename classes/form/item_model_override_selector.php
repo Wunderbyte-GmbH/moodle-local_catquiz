@@ -242,8 +242,7 @@ class item_model_override_selector extends dynamic_form {
             }
             // If status is unchanged (and therefore deleted from the array)...
             // ...change must be within values, so we set the new status to manually updated.
-            if (!isset($formitemparams[$model]->status)
-                && isset($formitemparams[$model]->paramname)) {
+            if (!isset($formitemparams[$model]->status)) {
                 $formitemparams[$model]->status = LOCAL_CATQUIZ_STATUS_UPDATED_MANUALLY;
             }
 
@@ -365,7 +364,7 @@ class item_model_override_selector extends dynamic_form {
      *
      */
     private function generate_model_fields(string $paramname, string $fieldname, ?stdClass $obj, stdClass $data): ?stdClass {
-        // If there are no data for the given fieldname, set the value to null.
+        // If there are no data for the given fieldname, return null.
         if (!$obj || !property_exists($data, $fieldname)) {
             return null;
         }
