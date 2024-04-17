@@ -225,8 +225,9 @@ class catquiz {
             ON q.id = s2.questionid
 
             LEFT JOIN (
-                SELECT ccc1.id AS contextid,
+                SELECT
                     qa.questionid,
+                    ccc1.id AS contextid
                     COUNT(*) AS userattempts,
                     MAX(qas.timecreated) as userlastattempttime
                 FROM {local_catquiz_catcontext} ccc1
