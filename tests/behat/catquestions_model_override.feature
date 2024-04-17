@@ -48,10 +48,10 @@ Feature: As an admin I perfrom model settings customizations over an imported of
       | override_raschbirnbaum[override_raschbirnbaum_discrimination] | 0.3100 |
     And I should see "Manually updated" in the ".tab-model-status" "css_element"
     And I should see "2PL Rasch-Birnbaum model" in the ".tab-model-status" "css_element"
-    ## Verify hiddent elements in case of "Not yet calculated" settings
+    ## Verify hidden elements in case of "Not yet calculated" settings
     And the "hidden" attribute of "//div[contains(@id, 'fgroup_id_override_mixedraschbirnbaum_')]" "xpath_element" should contain "true"
     And the "hidden" attribute of "//div[contains(@id, 'group_id_override_rasch_')]" "xpath_element" should contain "true"
-    ## Verify of statis update for the "2PL Rasch-Birnbaum" model
+    ## Verify of status update for the "2PL Rasch-Birnbaum" model
     And I set the field "2PL Rasch-Birnbaum model" to "Calculated"
     And the "override_raschbirnbaum[override_raschbirnbaum_difficulty]" "field" should be disabled
     And the "override_raschbirnbaum[override_raschbirnbaum_discrimination]" "field" should be disabled

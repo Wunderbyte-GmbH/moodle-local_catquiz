@@ -204,9 +204,11 @@ class item_model_override_selector extends dynamic_form {
             $statusstring = sprintf('%s_select', $fieldname);
             $obj->status = $data->$statusstring;
             foreach (array_values($modelparams) as $modelparam) {
-                $this->generate_model_fields($modelparam, $fieldname, $obj, $data);
+                $obj = $this->generate_model_fields($modelparam, $fieldname, $obj, $data);
             }
-            $formitemparams[$model] = $obj;
+            if ($obj) {
+                $formitemparams[$model] = $obj;
+            }
         }
         $allformitems = $formitemparams;
         // Fetch record from db.
@@ -240,7 +242,8 @@ class item_model_override_selector extends dynamic_form {
             }
             // If status is unchanged (and therefore deleted from the array)...
             // ...change must be within values, so we set the new status to manually updated.
-            if (!isset($formitemparams[$model]->status)) {
+            if (!isset($formitemparams[$model]->status)
+                && isset($formitemparams[$model]->paramname)) {
                 $formitemparams[$model]->status = LOCAL_CATQUIZ_STATUS_UPDATED_MANUALLY;
             }
 
@@ -357,18 +360,18 @@ class item_model_override_selector extends dynamic_form {
      * @param string $fieldname
      * @param stdClass $obj
      * @param stdClass $data
-     * @return void
+     * @return ?stdClass
      */
-    private function generate_model_fields(string $paramname, string $fieldname, stdClass &$obj, stdClass $data) {
+    private function generate_model_fields(string $paramname, string $fieldname, ?stdClass $obj, stdClass $data): ?stdClass {
         // If there are no data for the given fieldname, set the value to null.
-        if (!property_exists($data, $fieldname)) {
-            $obj->paramname = null;
-            return;
+        if (!$obj || !property_exists($data, $fieldname)) {
+            return null;
         }
 
         $param = sprintf('%s_'.$paramname, $fieldname);
         $array = $data->$fieldname;
         $obj->$paramname = $array[$param];
+        return $obj;
     }
     /**
      * Copy changed values = existing params.
