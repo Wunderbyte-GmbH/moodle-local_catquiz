@@ -413,7 +413,6 @@ class feedbackclass {
                     'catquiz_scalereportcheckbox_' . $scale->id,
                     'notchecked'
                 );
-
                 // Close of feedback range HTML tag element.
                 $element = $mform->createElement('html', '</div>');
                 $element->setName('feedback_scale_' . $scale->id . '_rangeend_' . $j);
