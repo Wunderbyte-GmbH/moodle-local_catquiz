@@ -143,11 +143,17 @@ class feedbackclass {
                 continue;
             }
             $subelements[] = $mform->addElement(
-                'checkbox',
+                'advcheckbox',
                 'catquiz_scalereportcheckbox_' . $scale->id,
-                get_string('reportscale', 'local_catquiz'));
+                get_string('reportscale', 'local_catquiz'),
+                );
 
-            if (!optional_param('catquiz_scalereportcheckbox_' . $scale->id, 0, PARAM_INT)) {
+            $scalereportcheckbox = isset($defaultvalues['catquiz_scalereportcheckbox_' . $scale->id])
+                ? $defaultvalues['catquiz_scalereportcheckbox_' . $scale->id] : optional_param(
+                'catquiz_scalereportcheckbox_' . $scale->id,
+                LOCAL_CATQUIZ_RANDOM_DEFAULT,
+                PARAM_INT);
+            if ($scalereportcheckbox == LOCAL_CATQUIZ_RANDOM_DEFAULT) {
                 $mform->setDefault('catquiz_scalereportcheckbox_' . $scale->id, 1);
             }
 
@@ -385,11 +391,23 @@ class feedbackclass {
                 $subelements[] = $element;
 
                 // Checkbox messaging of groupselect and courseselect.
-                $subelements[] = $mform->addElement('advcheckbox', 'enrolment_message_checkbox_' . $scale->id . '_'. $j,
-                get_string('setautonitificationonenrolmentforscale', 'local_catquiz'), null, null, [0, 1]);
-                if (!optional_param('enrolment_message_checkbox_' . $scale->id . '_'. $j, 1, PARAM_INT)) {
+                $subelements[] = $mform->addElement(
+                    'advcheckbox',
+                    'enrolment_message_checkbox_' . $scale->id . '_'. $j,
+                    get_string('setautonitificationonenrolmentforscale', 'local_catquiz'), null, null, [0, 1]);
+
+
+
+                $enrolmentcheckbox = isset($defaultvalues['enrolment_message_checkbox_' . $scale->id . '_'. $j])
+                    ? $defaultvalues['enrolment_message_checkbox_' . $scale->id . '_'. $j]
+                    : optional_param(
+                    'catquiz_scalereportcheckbox_' . $scale->id,
+                    LOCAL_CATQUIZ_RANDOM_DEFAULT,
+                    PARAM_INT);
+                if ($enrolmentcheckbox == LOCAL_CATQUIZ_RANDOM_DEFAULT) {
                     $mform->setDefault('enrolment_message_checkbox_' . $scale->id . '_'. $j, 1);
                 }
+
                 $mform->hideIf(
                     'enrolment_message_checkbox_' . $scale->id . '_'. $j,
                     'catquiz_scalereportcheckbox_' . $scale->id,
