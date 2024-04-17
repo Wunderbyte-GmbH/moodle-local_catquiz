@@ -330,9 +330,10 @@ class item_model_override_selector extends dynamic_form {
             $new['componentname'] = $data->componentname ?: self::DEFAULT_COMPONENT_NAME;
             $new['timecreated'] = time();
             $new['timemodified'] = time();
-            $DB->insert_record(
+            $new['id'] = $DB->insert_record(
                 'local_catquiz_itemparams',
-                (object) $new
+                (object) $new,
+                true
             );
 
             // Trigger status changed event.
@@ -359,6 +360,12 @@ class item_model_override_selector extends dynamic_form {
      * @return void
      */
     private function generate_model_fields(string $paramname, string $fieldname, stdClass &$obj, stdClass $data) {
+        // If there are no data for the given fieldname, set the value to null.
+        if (!property_exists($data, $fieldname)) {
+            $obj->paramname = null;
+            return;
+        }
+
         $param = sprintf('%s_'.$paramname, $fieldname);
         $array = $data->$fieldname;
         $obj->$paramname = $array[$param];
