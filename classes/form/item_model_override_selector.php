@@ -358,9 +358,11 @@ class item_model_override_selector extends dynamic_form {
      *
      * @param string $paramname
      * @param string $fieldname
-     * @param stdClass $obj
+     * @param stdClass|null $obj
      * @param stdClass $data
-     * @return ?stdClass
+     *
+     * @return stdClass|null
+     *
      */
     private function generate_model_fields(string $paramname, string $fieldname, ?stdClass $obj, stdClass $data): ?stdClass {
         // If there are no data for the given fieldname, set the value to null.
