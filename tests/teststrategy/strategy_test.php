@@ -913,53 +913,68 @@ class strategy_test extends advanced_testcase {
                     'maxquestionspersubscale' => -1,
                 ],
             ],
+            'Infer greatest strength P000000' => [
+                'strategy' => LOCAL_CATQUIZ_STRATEGY_HIGHESTSUB,
+                'questions' => [
+                    ['label' => 'SIMB01-18', 'is_correct_response' => false, 'ability_before' => 0.02, 'ability_after' => 0.02],
+                    ['label' => 'SIMA06-15', 'is_correct_response' => false, 'ability_after'  => -0.67],
+                    ['label' => 'SIMA02-02', 'is_correct_response' => false, 'ability_after'  => -1.3],
+                    ['label' => 'SIMA02-19', 'is_correct_response' => false, 'ability_after'  => -1.86],
+                    ['label' => 'SIMA06-02', 'is_correct_response' => false, 'ability_after'  => -2.33],
+                    ['label' => 'SIMA02-17', 'is_correct_response' => false, 'ability_after'  => -2.34],
+                    ['label' => 'SIMB02-00', 'is_correct_response' => false, 'ability_after'  => -3.06],
+                    ['label' => 'SIMB01-17', 'is_correct_response' => false, 'ability_after'  => -3.06],
+                    ['label' => 'SIMB01-12', 'is_correct_response' => false, 'ability_after'  => -3.06],
+                    ['label' => 'SIMA02-04', 'is_correct_response' => false, 'ability_after'  => -3.06],
+                    ['label' => 'SIMB02-02', 'is_correct_response' => false, 'ability_after'  => -3.39],
+                    ['label' => 'SIMB01-13', 'is_correct_response' => false, 'ability_after'  => -3.39],
+                    ['label' => 'SIMA06-12', 'is_correct_response' => false, 'ability_after'  => -3.39],
+                    ['label' => 'SIMA01-16', 'is_correct_response' => true,  'ability_after'  => -3.41],
+                    ['label' => 'SIMA01-19', 'is_correct_response' => false, 'ability_after'  => -3.28],
+                    ['label' => 'SIMA01-12', 'is_correct_response' => false, 'ability_after'  => -3.4, ],
+                    ['label' => 'SIMA01-13', 'is_correct_response' => true,  'ability_after'  => -3.66],
+                    ['label' => 'SIMA03-03', 'is_correct_response' => true,  'ability_after'  => -3.58],
+                    ['label' => 'SIMA03-16', 'is_correct_response' => true,  'ability_after'  => -3.5],
+                    ['label' => 'SIMA03-13', 'is_correct_response' => true,  'ability_after'  => -3.42],
+                    ['label' => 'SIMA03-19', 'is_correct_response' => true,  'ability_after'  => -3.39],
+                    ['label' => 'SIMA05-07', 'is_correct_response' => false, 'ability_after'  => -3.36],
+                    ['label' => 'SIMA05-00', 'is_correct_response' => false, 'ability_after'  => -3.38],
+                    ['label' => 'SIMA05-15', 'is_correct_response' => false, 'ability_after'  => -3.4],
+                    ['label' => 'SIMA05-14', 'is_correct_response' => false, 'ability_after'  => -3.42],
+                    ['label' => 'FINISH',    'is_correct_response' => false, 'ability_after'  => -3.44],
+                ],
+                'initial_ability' => 0.02,
+                'initial_se' => 2.97,
+                'settings' => [
+                    'pp_min_inc' => 0.1,
+                    'maxquestions' => 25,
+                    'maxquestionspersubscale' => 10,
+                ],
+            ],
             // phpcs:disable
-            //'Infer greatest strength' => [
-            //    'strategy' => LOCAL_CATQUIZ_STRATEGY_HIGHESTSUB,
-            //    'questions' => [
-            //        [
-            //            'label' => 'SIMB01-18',
-            //            'is_correct_response' => true,
-            //            'ability_before' => 0,
-            //            'ability_after' => 0.0,
-            //        ],
-            //        [
-            //            'label' => 'SIMA01-15',
-            //            'is_correct_response' => false,
-            //            'ability_before' => 0,
-            //            'ability_after' => 2.5,
-            //        ],
-            //        [
-            //            'label' => 'SIMA02-03',
-            //            'is_correct_response' => true,
-            //            'ability_before' => 2.5,
-            //            'ability_after' => 0.5539,
-            //        ],
-            //    ],
-            //],
-            //'Infer all subscales' => [
-            //    'strategy' => LOCAL_CATQUIZ_STRATEGY_ALLSUBS,
-            //    'questions' => [
-            //        [
-            //            'label' => 'SIMB01-18',
-            //            'is_correct_response' => true,
-            //            'ability_before' => 0,
-            //            'ability_after' => 0.0,
-            //        ],
-            //        [
-            //            'label' => 'SIMB02-07',
-            //            'is_correct_response' => false,
-            //            'ability_before' => 0,
-            //            'ability_after' => 2.5,
-            //        ],
-            //        [
-            //            'label' => 'SIMB03-06',
-            //            'is_correct_response' => true,
-            //            'ability_before' => 2.5,
-            //            'ability_after' => 1.1569,
-            //        ],
-            //    ],
-            //],
+            // 'Infer all subscales' => [
+            // 'strategy' => LOCAL_CATQUIZ_STRATEGY_ALLSUBS,
+            // 'questions' => [
+            // [
+            // 'label' => 'SIMB01-18',
+            // 'is_correct_response' => true,
+            // 'ability_before' => 0,
+            // 'ability_after' => 0.0,
+            // ],
+            // [
+            // 'label' => 'SIMB02-07',
+            // 'is_correct_response' => false,
+            // 'ability_before' => 0,
+            // 'ability_after' => 2.5,
+            // ],
+            // [
+            // 'label' => 'SIMB03-06',
+            // 'is_correct_response' => true,
+            // 'ability_before' => 2.5,
+            // 'ability_after' => 1.1569,
+            // ],
+            // ],
+            // ],
             // phpcs:enable
         ];
     }
