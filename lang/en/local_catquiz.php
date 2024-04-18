@@ -514,6 +514,7 @@ $string['scoreofpeers'] = 'Average of your peers';
 $string['numberofattempts'] = 'Number of attempts';
 $string['abilityprofile'] = 'Ability score profile in "{$a}"';
 $string['labelforrelativepersonabilitychart'] = 'Relative Ability';
+$string['nothingtocompare'] = 'There are not enough valid results available for a comparison.';
 $string['attemptchartstitle'] = 'Number and results of attempts in scale "{$a}"';
 $string['personabilityrangestring'] = '{$a->rangestart} - {$a->rangeend}';
 $string['testinfolabel'] = 'Test information';

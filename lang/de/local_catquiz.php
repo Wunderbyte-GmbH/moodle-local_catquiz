@@ -517,6 +517,7 @@ $string['abilityprofile'] = 'Fähigkeitsprofil in "{$a}"';
 $string['numberofattempts'] = 'Anzahl der Testversuche';
 $string['attemptchartstitle'] = 'Anzahl und Ergebnisse der Testversuche für Skala "{$a}"';
 $string['labelforrelativepersonabilitychart'] = 'Relative Fähigkeit';
+$string['nothingtocompare'] = 'Es sind nicht ausreichend valide Ergebnisse für einen Vergleich vorhanden.';
 $string['personabilityrangestring'] = '{$a->rangestart} - {$a->rangeend}';
 $string['testinfolabel'] = 'Testinformation';
 $string['scalescorechartlabel'] = '{$a}-Score';
