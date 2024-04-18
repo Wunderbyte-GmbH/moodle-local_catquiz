@@ -1024,9 +1024,15 @@ class personabilities extends feedbackgenerator {
      * @return array
      *
      */
-    private function render_chart(array $personabilities, array $quizsettings, array $primarycatscale) {
+    private function render_chart(array $personabilities, array $quizsettings, array $primarycatscale): array {
         global $OUTPUT;
 
+        if (count($personabilities) < 2) {
+            return [
+                'chart' => get_string('nothingtocompare', 'local_catquiz'),
+                'charttitle' => '',
+            ];
+        }
         $primarycatscaleid = $primarycatscale['id'];
         $primaryability = 0;
         // First we get the personability of the primaryscale.
