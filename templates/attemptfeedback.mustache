@@ -61,13 +61,33 @@
     {{#studentfeedback}}
         {{#othertabs}}
         <li class="nav-item">
-            <a class="nav-link" id="{{generatorname}}-othertabs" data-toggle="tab" href="#{{generatorname}}_feedbacktab--{{attemptid}}" role="tab" aria-controls="{{generatorname}}_feedbacktab--{{attemptid}}" aria-selected="true">{{heading}}</a>
+            <a class="nav-link"
+                id="{{generatorname}}-othertabs"
+                data-toggle="tab"
+                data-attemptid="{{attemptid}}"
+                data-feedbackname={{generatorname}}
+                data-feedbackname-translated="{{heading}}"
+                href="#{{generatorname}}_feedbacktab--{{attemptid}}"
+                role="tab"
+                aria-controls="{{generatorname}}_feedbacktab--{{attemptid}}"
+                aria-selected="true">{{heading}}
+            </a>
         </li>
         {{/othertabs}}
     {{/studentfeedback}}
     {{#teacherfeedback}}
             <li class="nav-item">
-                <a class="nav-link" id="{{generatorname}}-teacherfeedback" data-toggle="tab" href="#{{generatorname}}_feedbacktab--{{attemptid}}" role="tab" aria-controls="{{generatorname}}_feedbacktab--{{attemptid}}" aria-selected="false">{{heading}}</a>
+                <a class="nav-link"
+                    id="{{generatorname}}-teacherfeedback"
+                    data-toggle="tab"
+                    data-attemptid="{{attemptid}}"
+                    data-feedbackname="{{generatorname}}"
+                    data-feedbackname-translated="{{heading}}"
+                    href="#{{generatorname}}_feedbacktab--{{attemptid}}"
+                    role="tab"
+                    aria-controls="{{generatorname}}_feedbacktab--{{attemptid}}"
+                    aria-selected="false">{{heading}}
+                </a>
             </li>
     {{/teacherfeedback}}
     {{#studentfeedback.0}}
@@ -108,3 +128,9 @@
   </div>
 </div>
 {{/enrolementmessage}}
+
+{{#js}}
+    require(['local_catquiz/feedback'], function(init) {
+      init.init();
+  });
+{{/js}}
