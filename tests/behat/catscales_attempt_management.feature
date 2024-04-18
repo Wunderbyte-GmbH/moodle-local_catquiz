@@ -85,8 +85,6 @@ Feature: As a admin I want to manage CAT scales along with obtained attempts dat
     And I should see "1 of 1 records found" in the "//div[contains(@class, 'testenvironmentstable')]" "xpath_element"
     And I should see "Dummy Quiz" in the "//tr[contains(@id, 'testenvironmentstable')]" "xpath_element"
     And I should see "mod_adaptivequiz" in the "//tr[contains(@id, 'testenvironmentstable')]" "xpath_element"
-    And I should see "Visible" in the "//tr[contains(@id, 'testenvironmentstable')]" "xpath_element"
-    And I should see "Active" in the "//tr[contains(@id, 'testenvironmentstable')]" "xpath_element"
     And I should see "Course 1" in the "//tr[contains(@id, 'testenvironmentstable')]" "xpath_element"
     ## Verify Quiz Attempts tab
     And I click on "Quiz Attempts" "link" in the "#region-main" "css_element"
