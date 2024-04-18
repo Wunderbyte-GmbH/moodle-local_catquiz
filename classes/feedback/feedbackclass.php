@@ -396,8 +396,6 @@ class feedbackclass {
                     'enrolment_message_checkbox_' . $scale->id . '_'. $j,
                     get_string('setautonitificationonenrolmentforscale', 'local_catquiz'), null, null, [0, 1]);
 
-
-
                 $enrolmentcheckbox = isset($defaultvalues['enrolment_message_checkbox_' . $scale->id . '_'. $j])
                     ? $defaultvalues['enrolment_message_checkbox_' . $scale->id . '_'. $j]
                     : optional_param(
