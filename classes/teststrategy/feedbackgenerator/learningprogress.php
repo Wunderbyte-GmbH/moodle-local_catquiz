@@ -45,13 +45,13 @@ global $CFG;
 require_once($CFG->dirroot.'/local/catquiz/lib.php');
 
 /**
- * Returns rendered person abilities.
+ * Returns rendered learning progress.
  *
  * @package local_catquiz
  * @copyright 2024 Wunderbyte GmbH
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class personabilities extends feedbackgenerator {
+class learningprogress extends feedbackgenerator {
 
     /**
      * @var string
@@ -106,17 +106,22 @@ class personabilities extends feedbackgenerator {
     public function get_studentfeedback(array $feedbackdata): array {
         global $OUTPUT;
 
-        $abilitieschart = $this->render_chart(
-            $feedbackdata['personabilities_abilities'],
-            $feedbackdata['quizsettings'],
-            $feedbackdata['primaryscale'],
+        $abilityprofilechart = $this->render_abilityprofile_chart(
+            (array) $feedbackdata,
+            $feedbackdata['primaryscale']
         );
 
+        // The charts showing past and present personabilities (in relation to peers).
+        $abilityprogress = $this->render_abilityprogress(
+            (array) $feedbackdata,
+            $feedbackdata['primaryscale']
+        );
         $feedback = $OUTPUT->render_from_template(
-        'local_catquiz/feedback/personabilities',
+        'local_catquiz/feedback/learningprogress',
             [
-            'abilities' => $feedbackdata['abilitieslist'],
-            'chartdisplay' => $abilitieschart,
+            'progressindividual' => $abilityprogress['individual'],
+            'progresscomparison' => $abilityprogress['comparison'],
+            'abilityprofile' => $abilityprofilechart,
             ]
         );
 
@@ -153,9 +158,6 @@ class personabilities extends feedbackgenerator {
             'quizsettings',
             'primaryscale',
             'personabilities_abilities',
-            'se',
-            'abilitieslist',
-            'models',
         ];
     }
 
@@ -166,7 +168,7 @@ class personabilities extends feedbackgenerator {
      *
      */
     public function get_heading(): string {
-        return get_string('personabilitytitletab', 'local_catquiz');
+        return get_string('learningprogresstitle', 'local_catquiz');
     }
 
     /**
@@ -176,7 +178,7 @@ class personabilities extends feedbackgenerator {
      *
      */
     public function get_generatorname(): string {
-        return 'personabilities';
+        return 'learningprogress';
     }
 
     /**
@@ -246,29 +248,10 @@ class personabilities extends feedbackgenerator {
             return [];
         }
 
-        $this->apply_sorting($personabilities, $selectedscaleid);
-
-        $abilitieslist = [];
-
-        foreach ($personabilities as $catscaleid => $abilityarray) {
-            $abilitieslist[] = $this->generate_data_for_scale(
-                    $abilitieslist,
-                    $catscaleid,
-                    $selectedscaleid,
-                    $abilityarray,
-                    $catscales,
-                    $newdata
-                );
-        }
-        $models = model_strategy::get_installed_models();
-
         return [
             'quizsettings' => (array) $quizsettings,
             'primaryscale' => $catscales[$selectedscaleid],
             'personabilities_abilities' => $personabilities,
-            'se' => $newdata['se'] ?? null,
-            'abilitieslist' => $abilitieslist,
-            'models' => $models,
         ];
     }
 

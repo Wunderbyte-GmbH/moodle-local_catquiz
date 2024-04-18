@@ -28,6 +28,7 @@ use local_catquiz\teststrategy\feedbackgenerator\comparetotestaverage;
 use local_catquiz\teststrategy\feedbackgenerator\customscalefeedback;
 use local_catquiz\teststrategy\feedbackgenerator\debuginfo;
 use local_catquiz\teststrategy\feedbackgenerator\graphicalsummary;
+use local_catquiz\teststrategy\feedbackgenerator\learningprogress;
 use local_catquiz\teststrategy\feedbackgenerator\personabilities;
 use local_catquiz\teststrategy\feedbackgenerator\questionssummary;
 use local_catquiz\teststrategy\feedbacksettings;
@@ -120,6 +121,7 @@ class inferlowestskillgap extends strategy {
             new customscalefeedback($this->feedbacksettings),
             new comparetotestaverage($this->feedbacksettings),
             new personabilities($this->feedbacksettings),
+            new learningprogress($this->feedbacksettings),
             new questionssummary($this->feedbacksettings),
             new graphicalsummary($this->feedbacksettings),
             new debuginfo($this->feedbacksettings),
