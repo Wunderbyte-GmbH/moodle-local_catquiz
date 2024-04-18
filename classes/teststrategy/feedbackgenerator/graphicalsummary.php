@@ -63,24 +63,12 @@ class graphicalsummary extends feedbackgenerator {
     /**
      * Get student feedback.
      *
-     * @param array $data
-     *
-     * @return array
-     *
-     */
-    public function get_studentfeedback(array $data): array {
-        return [];
-    }
-
-    /**
-     * Get teacher feedback.
-     *
      * @param array $feedbackdata
      *
      * @return array
      *
      */
-    protected function get_teacherfeedback(array $feedbackdata): array {
+    public function get_studentfeedback(array $feedbackdata): array {
         global $OUTPUT;
 
         if (isset($feedbackdata['graphicalsummary_data'])) {
@@ -120,6 +108,18 @@ class graphicalsummary extends feedbackgenerator {
                 'content' => $feedback,
             ];
         }
+    }
+
+    /**
+     * Get teacher feedback.
+     *
+     * @param array $feedbackdata
+     *
+     * @return array
+     *
+     */
+    protected function get_teacherfeedback(array $feedbackdata): array {
+        return [];
     }
 
     /**
