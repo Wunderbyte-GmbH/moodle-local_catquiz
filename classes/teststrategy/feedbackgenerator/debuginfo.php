@@ -186,7 +186,7 @@ class debuginfo extends feedbackgenerator {
      *
      */
     public function get_heading(): string {
-        return 'debug info';
+        return 'Export';
     }
 
     /**
