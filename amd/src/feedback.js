@@ -25,8 +25,12 @@ import Ajax from 'core/ajax';
  * Add event listeners to feedback tabs in order to call a webservice.
  */
 export const init = () => {
-    const tabs = document.querySelectorAll('a[role="tab"]');
+    const tabs = document.querySelectorAll('a.feedbacktab');
     tabs.forEach(tab => {
+        if (tab.initialized) {
+            return;
+        }
+        tab.initialized = true;
 
         tab.addEventListener('click', e => {
             e.preventDefault();
