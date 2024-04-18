@@ -256,6 +256,8 @@ $string['followingcourses'] = 'subscribed in the following course(s):<br>';
 $string['followinggroups'] = 'member of the following group(s):<br>';
 $string['enrolementstringstartforfeedback'] = 'Based on your results you are now...<br>';
 $string['enrolementstringend'] = 'Good luck with your studies!';
+$string['feedback_tab_clicked'] = 'Click on feedback tab';
+$string['feedback_tab_clicked_description'] = 'User {$a->userid} clicked the "{$a->feedback_translated}" tab in {$a->attemptlink}';
 
 
 

@@ -113,4 +113,10 @@ $functions = [
                 'ajax' => true,
                 'loginrequired' => true,
         ],
+        'local_catquiz_feedback_tab_clicked' => [
+                'classname' => 'local_catquiz\external\feedback_tab_clicked',
+                'description' => 'Sends an event about a clicked feedback tab',
+                'type' => 'write',
+                'ajax' => 1,
+        ],
 ];
