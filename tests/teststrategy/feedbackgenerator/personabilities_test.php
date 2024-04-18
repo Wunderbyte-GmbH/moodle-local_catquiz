@@ -206,9 +206,9 @@ class personabilities_test extends advanced_testcase {
                     ],
                 ],
                 'expected' => [
-                    'heading' => 'Ability score',
+                    'heading' => "Details of results",
                     'comment' => '',
-                    'content' => '<h5>Ability score in subscales</h5>
+                    'content' => '<h5>Details of results</h5>
                     <div class="container">
                         <div class="row">
                             <div
@@ -302,22 +302,6 @@ class personabilities_test extends advanced_testcase {
                                 </a>
                             </p>
                             <div class="chart-table-data" id="chart-table-data-65e9d27ff251a65e9d27ff251e1"
-                            role="complementary" aria-expanded="false"></div>
-                        </div>
-                    </div>
-                        <h5>
-                        Ability score profile in &quot;Simulation&quot;
-                        </h5>
-                        <div class="chart-area" id="chart-area-65e9d28333bf265e9d27ff251e2">
-                        <div class="chart-image" role="presentation"
-                        aria-describedby="chart-table-data-65e9d28333bf265e9d27ff251e2"></div>
-                        <div class="chart-table ">
-                            <p class="chart-table-expand">
-                                <a href="#" aria-controls="chart-table-data-65e9d28333bf265e9d27ff251e2" role="button">
-                                    Show chart data
-                                </a>
-                            </p>
-                            <div class="chart-table-data" id="chart-table-data-65e9d28333bf265e9d27ff251e2"
                             role="complementary" aria-expanded="false"></div>
                         </div>
                     </div>',
