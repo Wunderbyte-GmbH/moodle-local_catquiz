@@ -1524,7 +1524,7 @@ class catquiz {
         $data->total_number_of_testitems = $attemptdata['total_number_of_testitems'];
         $data->number_of_testitems_used = $attemptdata['number_of_testitems_used'];
         $data->personability_before_attempt = $attemptdata['ability_before_attempt'];
-        $data->personability_after_attempt = $attemptdata['personabilities'][$attemptdata['catscaleid']]['value'] ?? null;
+        $data->personability_after_attempt = $attemptdata['progress']->get_abilities()[$attemptdata['catscaleid']] ?? null;
         $data->starttime = $attemptdata['starttime'] ?? null;
         $data->endtime = $attemptdata['endtime'] ?? time();
 
