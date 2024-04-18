@@ -394,7 +394,11 @@ class feedbackclass {
                 $subelements[] = $mform->addElement(
                     'advcheckbox',
                     'enrolment_message_checkbox_' . $scale->id . '_'. $j,
-                    get_string('setautonitificationonenrolmentforscale', 'local_catquiz'), null, null, [0, 1]);
+                    get_string('setautonitificationonenrolmentforscale', 'local_catquiz'),
+                    null,
+                    null,
+                    [0, 1]
+                );
 
                 $enrolmentcheckbox = isset($defaultvalues['enrolment_message_checkbox_' . $scale->id . '_'. $j])
                     ? $defaultvalues['enrolment_message_checkbox_' . $scale->id . '_'. $j]
