@@ -28,6 +28,7 @@ use local_catquiz\teststrategy\feedbackgenerator\comparetotestaverage;
 use local_catquiz\teststrategy\feedbackgenerator\customscalefeedback;
 use local_catquiz\teststrategy\feedbackgenerator\debuginfo;
 use local_catquiz\teststrategy\feedbackgenerator\graphicalsummary;
+use local_catquiz\teststrategy\feedbackgenerator\learningprogress;
 use local_catquiz\teststrategy\feedbackgenerator\personabilities;
 use local_catquiz\teststrategy\feedbackgenerator\pilotquestions;
 use local_catquiz\teststrategy\feedbackgenerator\questionssummary;
@@ -127,6 +128,7 @@ class infergreateststrength extends strategy {
             new comparetotestaverage($this->feedbacksettings),
             new questionssummary($this->feedbacksettings),
             new personabilities($this->feedbacksettings),
+            new learningprogress($this->feedbacksettings),
             new pilotquestions($this->feedbacksettings),
             new graphicalsummary($this->feedbacksettings),
             new debuginfo($this->feedbacksettings),
