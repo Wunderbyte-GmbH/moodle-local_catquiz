@@ -326,6 +326,7 @@ $string['models'] = "Modelle";
 $string['previewquestion'] = "Fragen Vorschau";
 $string['personability'] = "Fähigkeits-Score";
 $string['personabilities'] = "Fähigkeits-Scores";
+$string['personabilitytitle'] = "Ergebnis-Details";
 $string['personabilitiesnodata'] = "Es konnte kein Fähigkeits-Score errechnet werden";
 $string['itemdifficulties'] = "Item difficulties";
 $string['itemdifficultiesnodata'] = "Es konnte keine Schwierigkeit berechnet werden.";

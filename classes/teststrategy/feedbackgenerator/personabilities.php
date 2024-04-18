@@ -179,7 +179,7 @@ class personabilities extends feedbackgenerator {
      *
      */
     public function get_heading(): string {
-        return get_string('personability', 'local_catquiz');
+        return get_string('personabilitytitle', 'local_catquiz');
     }
 
     /**
