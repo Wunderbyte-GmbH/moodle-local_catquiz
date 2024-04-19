@@ -61,7 +61,7 @@ class filterbytestinfo extends preselect_task implements wb_middleware {
     public function run(array &$context, callable $next): result {
         $this->progress = $context['progress'];
 
-        if ($context['teststrategy'] != LOCAL_CATQUIZ_STRATEGY_LOWESTSUB) {
+        if (!in_array($context['teststrategy'], [LOCAL_CATQUIZ_STRATEGY_LOWESTSUB, LOCAL_CATQUIZ_STRATEGY_HIGHESTSUB])) {
             return $next($context);
         }
 
