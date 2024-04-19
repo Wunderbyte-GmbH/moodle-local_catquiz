@@ -1987,4 +1987,41 @@ class catquiz {
         $adqattempt->questionsattempted++;
         $DB->update_record('adaptivequiz_attempt', $adqattempt);
     }
+
+    /**
+     * Get number of correctly answered questions by scale from quizattempt.
+     *
+     * @param array $catscaleids
+     * @param stdClass $attemptrecord
+     */
+    public static function get_number_of_right_answers_by_scale(array $catscaleids, stdClass $attemptrecord): array {
+        $quizdata = json_decode($attemptrecord->json);
+        $correctanswersperscale = [];
+        foreach ($catscaleids as $catscaleid) {
+            if (!isset($quizdata->progress->playedquestionsbyscale->$catscaleid)) {
+                continue;
+            }
+            $correct = 0;
+            $questionsperscale = $quizdata->progress->playedquestionsbyscale->$catscaleid;
+            if (empty($questionsperscale)) {
+                continue;
+            }
+            $playedqids = [];
+            foreach ($questionsperscale as $question) {
+                $playedqids[] = $question->componentid;
+            }
+            $responses = $quizdata->progress->responses;
+            foreach ($responses as $componentid => $data) {
+                if (!in_array($componentid, $playedqids)) {
+                    continue;
+                }
+                if ($data->fraction == 1) {
+                    $correct ++;
+                }
+            }
+            $correctanswersperscale[$catscaleid] = $correct;
+        }
+
+        return $correctanswersperscale;
+    }
 }
