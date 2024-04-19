@@ -38,7 +38,7 @@ use local_catquiz\teststrategy\preselect_task\checkbreak;
 use local_catquiz\teststrategy\preselect_task\checkitemparams;
 use local_catquiz\teststrategy\preselect_task\checkpagereload;
 use local_catquiz\teststrategy\preselect_task\filterbystandarderror;
-use local_catquiz\teststrategy\preselect_task\filterforsubscale;
+use local_catquiz\teststrategy\preselect_task\filterbytestinfo;
 use local_catquiz\teststrategy\preselect_task\firstquestionselector;
 use local_catquiz\teststrategy\preselect_task\fisherinformation;
 use local_catquiz\teststrategy\preselect_task\lasttimeplayedpenalty;
@@ -48,7 +48,7 @@ use local_catquiz\teststrategy\preselect_task\maybe_return_pilot;
 use local_catquiz\teststrategy\preselect_task\noremainingquestions;
 use local_catquiz\teststrategy\preselect_task\remove_uncalculated;
 use local_catquiz\teststrategy\preselect_task\removeplayedquestions;
-use local_catquiz\teststrategy\preselect_task\strategyfastestscore;
+use local_catquiz\teststrategy\preselect_task\strategystrengthscore;
 use local_catquiz\teststrategy\preselect_task\updatepersonability;
 use local_catquiz\teststrategy\strategy;
 
@@ -69,7 +69,7 @@ class infergreateststrength extends strategy {
     /**
      * Hide until tested.
      */
-    public const ACTIVE = false;
+    public const ACTIVE = true;
 
     /**
      *
@@ -93,23 +93,22 @@ class infergreateststrength extends strategy {
         return [
             checkitemparams::class,
             checkbreak::class,
-            checkpagereload::class,
             updatepersonability::class,
+            firstquestionselector::class, // If this is the first question of this attempt, return it here.
             addscalestandarderror::class,
             maximumquestionscheck::class, // Cancel quiz attempt if we reached maximum of questions.
+            checkpagereload::class, // This must be after maximumquestionscheck, so that the quiz ends.
             removeplayedquestions::class,
             noremainingquestions::class,
             fisherinformation::class, // Add the fisher information to each question.
-            firstquestionselector::class, // If this is the first question of this attempt, return it here.
             lasttimeplayedpenalty::class,
             mayberemovescale::class, // Remove questions from excluded subscales.
             maybe_return_pilot::class,
             remove_uncalculated::class, // Remove items that do not have item parameters.
             noremainingquestions::class, // Cancel quiz attempt if no questions are left.
             filterbystandarderror::class,
-             // Keep only questions that are assigned to the subscale where the user has the largest ability values.
-            filterforsubscale::class,
-            strategyfastestscore::class,
+            filterbytestinfo::class,
+            strategystrengthscore::class,
         ];
     }
 
