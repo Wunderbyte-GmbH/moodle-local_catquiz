@@ -1999,6 +1999,8 @@ class catquiz {
      *
      * @param array $catscaleids
      * @param stdClass $attemptrecord
+     *
+     * @return array
      */
     public static function get_number_of_right_answers_by_scale(array $catscaleids, stdClass $attemptrecord): array {
         $quizdata = json_decode($attemptrecord->json);
@@ -2029,5 +2031,17 @@ class catquiz {
         }
 
         return $correctanswersperscale;
+    }
+
+    /**
+     * Get number personability results per scale of quizattempt .
+     *
+     * @param stdClass $attemptrecord
+     *
+     * @return object
+     */
+    public static function get_personabilityresults_of_quizattempt(stdClass $attemptrecord): object {
+        $quizdata = json_decode($attemptrecord->json);
+        return $quizdata->personabilities;
     }
 }
