@@ -310,13 +310,17 @@ class feedbacksettings {
      *
      */
     public function filter_semax(array $personabilities, array $feedbackdata): array {
+        global $CFG;
         if (!isset($this->semax)) {
             return $personabilities;
         }
         $semax = $this->semax;
         if (!empty($semax)) {
             foreach ($personabilities as $scaleid => $array) {
-                $se = $feedbackdata['se'][$scaleid];
+                $se = $feedbackdata['se'][$scaleid] ?? INF;
+                if ($se === INF && $CFG->debug > 0) {
+                    throw new \Exception(sprintf('No standarderror is set for scale %s', $scaleid));
+                }
                 if ($se > $semax) {
                     $personabilities[$scaleid]['error']['se'] = [
                         'semaxdefined' => $semax,
@@ -364,9 +368,10 @@ class feedbacksettings {
      * @return array
      *
      */
-    public function filter_excluded_scales(array $personabilities, array $quizsettings): array {
+    public function filter_excluded_scales(array $personabilities, \stdClass $quizsettings): array {
         foreach ($personabilities as $catscale => $array) {
-            if (empty($quizsettings['catquiz_scalereportcheckbox_' . $catscale])) {
+            $propertyname = sprintf('catquiz_scalereportcheckbox_%s', $catscale);
+            if (empty($quizsettings->$propertyname)) {
                 $personabilities[$catscale]['excluded'] = true;
                 $personabilities[$catscale]['error']['checkbox'] = [
                     'scalereportcheckboxinquizsettings' => false,
@@ -386,17 +391,17 @@ class feedbacksettings {
      * @return void
      *
      */
-    public function set_params_from_attempt(array $newdata, array $quizsettings): void {
+    public function set_params_from_attempt(array $newdata, \stdClass $quizsettings): void {
         $this->semax = $newdata['se_max'] ?? null;
         $this->semin = $newdata['se_min'] ?? null;
-        $maxquestiongroup = isset($quizsettings['maxquestionsgroup']) ? (array) $quizsettings['maxquestionsgroup'] : null;
-        $maxquestionsscalegroup = !empty($quizsettings['maxquestionsscalegroup']) ?
-            (array) $quizsettings['maxquestionsscalegroup'] : null;
+        $maxquestiongroup = isset($quizsettings->maxquestionsgroup) ? (array) $quizsettings->maxquestionsgroup : null;
+        $maxquestionsscalegroup = !empty($quizsettings->maxquestionsscalegroup) ?
+            (array) $quizsettings->maxquestionsscalegroup : null;
         $this->nmintest = isset($maxquestiongroup['catquiz_minquestions']) ?
             (int) $maxquestiongroup['catquiz_minquestions'] : null;
         $this->nminscale = isset($maxquestionsscalegroup['catquiz_minquestionspersubscale']) ?
             (int) $maxquestionsscalegroup['catquiz_minquestionspersubscale'] : null;
-        $this->rootscale = isset($quizsettings['catquiz_catscales']) ? (int) $quizsettings['catquiz_catscales'] : null;
+        $this->rootscale = isset($quizsettings->catquiz_catscales) ? (int) $quizsettings->catquiz_catscales : null;
         // Find average fraction.
         $f = 0.0;
         $i = 0;

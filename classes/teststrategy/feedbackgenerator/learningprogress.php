@@ -155,7 +155,7 @@ class learningprogress extends feedbackgenerator {
      */
     public function get_required_context_keys(): array {
         return [
-            'quizsettings',
+            'progress',
             'primaryscale',
             'personabilities_abilities',
         ];
@@ -210,20 +210,19 @@ class learningprogress extends feedbackgenerator {
         global $CFG;
         require_once($CFG->dirroot . '/local/catquiz/lib.php');
 
-        $progress = progress::load($existingdata['attemptid'], 'mod_adaptivequiz', $existingdata['contextid']);
+        $progress = $this->get_progress();
         $personabilities = $progress->get_abilities();
 
         if ($personabilities === []) {
             return null;
         }
-        $quizsettings = $existingdata['quizsettings'];
+        $quizsettings = $progress->get_quiz_settings();
         $catscales = $newdata['catscales'];
 
         // Make sure that only feedback defined by strategy is rendered.
         $personabilitiesfeedbackeditor = $this->select_scales_for_report(
             $newdata,
             $this->feedbacksettings,
-            $quizsettings,
             $existingdata['teststrategy']
         );
 
@@ -249,7 +248,6 @@ class learningprogress extends feedbackgenerator {
         }
 
         return [
-            'quizsettings' => (array) $quizsettings,
             'primaryscale' => $catscales[$selectedscaleid],
             'personabilities_abilities' => $personabilities,
         ];
@@ -428,7 +426,7 @@ class learningprogress extends feedbackgenerator {
                 }
             }
             $colorvalue = $this->get_color_for_personability(
-                (array)$initialcontext['quizsettings'],
+                (array) $this->get_progress()->get_quiz_settings(),
                 $as,
                 intval($primarycatscale['id'])
                 );

@@ -39,6 +39,19 @@ use UnexpectedValueException;
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 abstract class feedbackgenerator {
+    private int $attemptid;
+    private string $component = 'mod_adaptivequiz';
+    private int $contextid;
+
+    /**
+     * Returns the progress for the current attempt, component and contextid.
+     *
+     * @return progress
+     */
+    protected function get_progress(): progress {
+        return progress::load($this->attemptid, $this->component, $this->contextid);
+    }
+
     /**
      * Returns an array with two keys 'heading' and 'context'.
      *
@@ -77,6 +90,12 @@ abstract class feedbackgenerator {
      */
     abstract public function get_generatorname(): string;
 
+    public function update_data(int $attemptid, array $existingdata, array $newdata): ?array {
+        $this->attemptid = $attemptid;
+        $this->contextid = $newdata['contextid'];
+        return $this->load_data($attemptid, $existingdata, $newdata);
+    }
+
     /**
      * Loads the data required to render the feedback.
      *
@@ -106,6 +125,8 @@ abstract class feedbackgenerator {
      * @throws UnexpectedValueException
      */
     public function get_feedback(array $feedbackdata): array {
+        $this->attemptid = $feedbackdata['attemptid'];
+        $this->contextid = $feedbackdata['contextid'];
         // Check if all required data are provided. If not, load them.
         if (!$this->has_required_context_keys($feedbackdata)) {
             return $this->no_data();
@@ -151,11 +172,11 @@ abstract class feedbackgenerator {
     public function select_scales_for_report(
         array $newdata,
         feedbacksettings $feedbacksettings,
-        array $quizsettings,
         int $strategyid,
         int $forcedscaleid = 0,
         bool $feedbackonlyfordefinedscaleid = false
         ): array {
+            $quizsettings = $newdata['progress']->get_quiz_settings();
 
         $transformedpersonabilities = $newdata['updated_personabilities'];
 

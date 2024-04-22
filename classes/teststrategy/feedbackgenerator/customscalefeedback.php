@@ -87,9 +87,10 @@ class customscalefeedback extends feedbackgenerator {
         if (!$data['customscalefeedback_abilities'] ?? false) {
             return [];
         }
+        $progress = $this->get_progress();
         $customscalefeedback = $this->get_customscalefeedback_for_abilities_in_range(
             $data['customscalefeedback_abilities'],
-            $data['quizsettings'],
+            (array) $progress->get_quiz_settings(),
             $data['catscales']
         );
         $firstelement = $data['customscalefeedback_abilities'][array_key_first($data['customscalefeedback_abilities'])];
@@ -143,8 +144,8 @@ class customscalefeedback extends feedbackgenerator {
      */
     public function get_required_context_keys(): array {
         return [
-            'quizsettings',
             'customscalefeedback_abilities',
+            'progress',
         ];
     }
 
@@ -179,8 +180,8 @@ class customscalefeedback extends feedbackgenerator {
      *
      */
     public function load_data(int $attemptid, array $existingdata, array $newdata): ?array {
-        $quizsettings = $existingdata['quizsettings'];
-        $progress = progress::load($attemptid, 'mod_adaptivequiz', $existingdata['contextid']);
+        $progress = $this->get_progress();
+        $quizsettings = $progress->get_quiz_settings();
         $personabilities = $progress->get_abilities();
 
         if (!$personabilities) {
@@ -190,12 +191,10 @@ class customscalefeedback extends feedbackgenerator {
         $personabilitiesfeedbackeditor = $this->select_scales_for_report(
             $newdata,
             $this->feedbacksettings,
-            $quizsettings,
             $existingdata['teststrategy']
         );
 
         return [
-            'quizsettings' => $quizsettings,
             'personabilities' => $personabilities,
             'customscalefeedback_abilities' => $personabilitiesfeedbackeditor,
         ];
