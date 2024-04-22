@@ -969,9 +969,7 @@ class progress implements JsonSerializable {
     /**
      * Gets selected subscales
      *
-     * @param stdClass $quizsettings
      * @return array
-     *
      */
     public function get_selected_subscales() {
         // Get selected subscales from quizdata.
