@@ -1501,7 +1501,7 @@ class catquiz {
 
         // To query the db only once we fetch courseid und instanceid here.
         $courseandinstance = self::return_course_and_instance_id(
-            $attemptdata['quizsettings']['modulename'],
+            $attemptdata['quizsettings']->modulename,
             $attemptdata['attemptid']
         );
 
@@ -1511,7 +1511,7 @@ class catquiz {
         $data->contextid = $catcontext;
         $data->courseid = $courseandinstance['courseid'];
         $data->attemptid = $attemptdata['attemptid'];
-        $data->component = $attemptdata['quizsettings']['modulename'];
+        $data->component = $attemptdata['quizsettings']->modulename;
         $data->instanceid = $courseandinstance['instanceid'];
         $data->teststrategy = $attemptdata['teststrategy'];
         $data->status = LOCAL_CATQUIZ_ATTEMPT_OK;
