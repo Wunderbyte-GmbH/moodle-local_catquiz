@@ -55,6 +55,7 @@ final class strategydeficitscore extends preselect_task implements wb_middleware
      *
      */
     public function run(array &$context, callable $next): result {
+        global $CFG;
         $this->progress = $context['progress'];
         $userresponses = $this->progress->get_user_responses();
         $scalefractions = [];
@@ -86,6 +87,19 @@ final class strategydeficitscore extends preselect_task implements wb_middleware
 
                 $scaleability = $this->progress->get_abilities()[$scaleid];
                 $standarderrorplayed = $context['se'][$scaleid];
+                // In development environments, throw an exception if the standarderror is not set. In production, use INF as
+                // fallback value.
+                if (!$standarderrorplayed) {
+                    if ($CFG->debug > 0) {
+                        var_dump($this->progress->get_active_scales());
+                        var_dump($this->progress->get_quiz_settings());
+                        var_dump($context);
+                        throw new \Exception(
+                            sprintf('Standarderror is not set for scale %s', $scaleid)
+                        );
+                    }
+                    $standarderrorplayed = INF;
+                }
                 $testinfo = $standarderrorplayed === INF ? 0 : 1 / $standarderrorplayed ** 2;
                 $question->processterm = max(0.1, $testinfo) / max(1, $scalecount[$scaleid]);
                 $abilitydifference = ($scaleability - $this->progress->get_abilities()[$context['catscaleid']]);
