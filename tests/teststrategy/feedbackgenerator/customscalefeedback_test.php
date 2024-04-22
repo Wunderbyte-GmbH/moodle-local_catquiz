@@ -28,6 +28,7 @@ namespace local_catquiz;
 use basic_testcase;
 use local_catquiz\teststrategy\feedbackgenerator\customscalefeedback;
 use local_catquiz\teststrategy\feedbacksettings;
+use local_catquiz\teststrategy\progress;
 use PHPUnit\Framework\ExpectationFailedException;
 use SebastianBergmann\RecursionContext\InvalidArgumentException;
 use UnexpectedValueException;
@@ -58,9 +59,29 @@ class customscalefeedback_test extends basic_testcase {
     public function test_get_studentfeedback(array $feedbackdata, array $expected) {
 
         $feedbacksettings = new feedbacksettings(LOCAL_CATQUIZ_STRATEGY_LOWESTSUB);
-        $customscalefeedback = new customscalefeedback($feedbacksettings);
 
-        $output = $customscalefeedback->get_studentfeedback($feedbackdata);
+        $progressmock = $this->getMockBUilder(progress::class)
+            ->onlyMethods([
+                'get_quiz_settings'
+            ])
+            ->getMock();
+        $progressmock
+            ->method('get_quiz_settings')
+            ->willReturn((object) $feedbackdata['quizsettings']);
+
+        $customscalefeedback = $this->getMockBuilder(customscalefeedback::class)
+            ->onlyMethods([
+                'get_progress',
+            ])
+            ->setConstructorArgs([$feedbacksettings])
+            ->getMock();
+
+        // Configure the stub.
+        $customscalefeedback
+            ->method('get_progress')
+            ->willReturn($progressmock);
+
+        $output = $customscalefeedback->get_feedback($feedbackdata)['studentfeedback'];
         $this->assertEquals($expected, $output);
     }
 
@@ -74,6 +95,9 @@ class customscalefeedback_test extends basic_testcase {
         return [
                 'lowestskillgap' => [
                     'feedbackdata' => [
+                        'progress' => 'empty',
+                        'attemptid' => '1',
+                        'contextid' => '2',
                         'catscales' => [ '272' => (object) [
                             'name' => 'Skala 272',
                             ],
@@ -110,6 +134,9 @@ class customscalefeedback_test extends basic_testcase {
                 ],
                 'noscalestoreport' => [
                     'feedbackdata' => [
+                        'progress' => 'empty',
+                        'attemptid' => '1',
+                        'contextid' => '2',
                         'catscales' => [ '272' => (object) [
                             'name' => 'Skala 272',
                             ],

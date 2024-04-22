@@ -28,6 +28,7 @@ namespace local_catquiz;
 use advanced_testcase;
 use local_catquiz\teststrategy\feedbackgenerator\personabilities;
 use local_catquiz\teststrategy\feedbacksettings;
+use local_catquiz\teststrategy\progress;
 use PHPUnit\Framework\ExpectationFailedException;
 use SebastianBergmann\RecursionContext\InvalidArgumentException;
 
@@ -64,6 +65,16 @@ class personabilities_test extends advanced_testcase {
         array $testitemsforcatscale,
         array $fisherinfo) {
 
+        $progressmock = $this->getMockBUilder(progress::class)
+            ->onlyMethods([
+                'get_quiz_settings'
+            ])
+            ->getMock();
+
+        $progressmock
+            ->method('get_quiz_settings')
+            ->willReturn((object) $feedbackdata['quizsettings']);
+
         $feedbacksettings = new feedbacksettings(LOCAL_CATQUIZ_STRATEGY_LOWESTSUB);
         $personabilities = $this->getMockBuilder(personabilities::class)
             ->onlyMethods([
@@ -71,6 +82,7 @@ class personabilities_test extends advanced_testcase {
                 'get_testitems_for_catscale',
                 'get_fisherinfos_of_items',
                 'render_abilityprogress',
+                'get_progress',
             ])
             ->setConstructorArgs([$feedbacksettings])
             ->getMock();
@@ -91,8 +103,11 @@ class personabilities_test extends advanced_testcase {
                 'individual' => '',
                 'comparison' => '',
             ]);
+        $personabilities
+            ->method('get_progress')
+            ->willReturn($progressmock);
 
-        $output = $personabilities->get_studentfeedback($feedbackdata);
+        $output = $personabilities->get_feedback($feedbackdata)['studentfeedback'];
         // For the moment, this tests only the heading, not the whole rendered data.
         $this->assertEquals($expected['heading'], $output['heading']);
     }
@@ -108,6 +123,9 @@ class personabilities_test extends advanced_testcase {
         return [
             'lowestskillgap' => [
                 'feedbackdata' => [
+                    'attemptid' => 1,
+                    'se' => [],
+                    'progress' => [],
                     'userid' => '2',
                     'models' => [
                         "raschbirnbauma" => "catmodel_raschbirnbauma\raschbirnbauma",
