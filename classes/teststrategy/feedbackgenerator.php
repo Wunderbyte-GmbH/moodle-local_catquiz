@@ -107,6 +107,14 @@ abstract class feedbackgenerator {
      */
     abstract public function get_generatorname(): string;
 
+    /**
+     * Update the feedback data that is stored in the DB to render the feedback
+     *
+     * @param int $attemptid
+     * @param array $existingdata
+     * @param array $newdata
+     * @return null|array
+     */
     public function update_data(int $attemptid, array $existingdata, array $newdata): ?array {
         $this->attemptid = $attemptid;
         $this->contextid = $newdata['contextid'];
