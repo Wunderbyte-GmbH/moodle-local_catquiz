@@ -16,7 +16,7 @@
 
 namespace local_catquiz\teststrategy;
 
-use \stdClass;
+use stdClass;
 use local_catquiz\catscale;
 use local_catquiz\feedback\feedbackclass;
 use local_catquiz\output\attemptfeedback;

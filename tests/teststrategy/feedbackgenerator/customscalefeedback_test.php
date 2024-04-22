@@ -62,7 +62,7 @@ class customscalefeedback_test extends basic_testcase {
 
         $progressmock = $this->getMockBUilder(progress::class)
             ->onlyMethods([
-                'get_quiz_settings'
+                'get_quiz_settings',
             ])
             ->getMock();
         $progressmock
