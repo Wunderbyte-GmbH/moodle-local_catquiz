@@ -173,6 +173,14 @@ class progress implements JsonSerializable {
     private int $starttime;
 
     /**
+     * Holds the quizsetting
+     *
+     * This holds the settings as given when the attempt was started.
+     * @var stdClass
+     */
+    private stdClass $quizsettings;
+
+    /**
      * Returns a new progress instance.
      *
      * If we already have data in the cache or DB, the instance is populated with those data.
@@ -180,12 +188,13 @@ class progress implements JsonSerializable {
      * @param int $attemptid
      * @param string $component
      * @param int $contextid
+     * @param ?stdClass $quizsettings
      * @return progress
      */
-    public static function load(int $attemptid, string $component, int $contextid): self {
+    public static function load(int $attemptid, string $component, int $contextid, ?stdClass $quizsettings = null): self {
         $instance = self::load_from_cache($attemptid)
             ?: self::load_from_db($attemptid)
-            ?: self::create_new($attemptid, $component, $contextid);
+            ?: self::create_new($attemptid, $component, $contextid, $quizsettings);
 
         $instance->hasnewresponse = false;
         $instance->ignorelastresponse = false;
@@ -301,6 +310,7 @@ class progress implements JsonSerializable {
         $instance->excludedquestions = $data->excludedquestions;
         $instance->gaveupquestions = $data->gaveupquestions;
         $instance->starttime = $data->starttime;
+        $instance->quizsettings = $data->quizsettings;
 
         return $instance;
     }
@@ -311,9 +321,10 @@ class progress implements JsonSerializable {
      * @param int $attemptid
      * @param string $component
      * @param int $contextid
+     * @param stdClass $quizsettings
      * @return self
      */
-    private static function create_new(int $attemptid, string $component, int $contextid): self {
+    private static function create_new(int $attemptid, string $component, int $contextid, stdClass $quizsettings): self {
         global $USER;
         $instance = new self();
         $instance->id = null;
@@ -337,6 +348,7 @@ class progress implements JsonSerializable {
         $instance->excludedquestions = [];
         $instance->gaveupquestions = [];
         $instance->starttime = time();
+        $instance->quizsettings = $quizsettings;
         return $instance;
     }
 
@@ -363,6 +375,7 @@ class progress implements JsonSerializable {
             'excludedquestions' => $this->excludedquestions,
             'gaveupquestions' => $this->gaveupquestions,
             'starttime' => $this->starttime,
+            'quizsettings' => $this->quizsettings,
         ];
     }
 
@@ -941,6 +954,36 @@ class progress implements JsonSerializable {
      */
     public function get_starttime(): int {
         return $this->starttime;
+    }
+
+    /**
+     * Returns the quiz settings
+     *
+     * The settings are given as defined at the beginning of the attempt.
+     * @return stdClass
+     */
+    public function get_quiz_settings(): stdClass {
+        return $this->quizsettings;
+    }
+
+    /**
+     * Gets selected subscales
+     *
+     * @param stdClass $quizsettings
+     * @return array
+     *
+     */
+    public function get_selected_subscales() {
+        // Get selected subscales from quizdata.
+        $selectedsubscales = [];
+        foreach ($this->quizsettings as $key => $value) {
+            if (strpos($key, 'catquiz_subscalecheckbox_') !== false
+                && $value == "1") {
+                    $catscaleid = substr_replace($key, '', 0, 25);
+                    $selectedsubscales[] = $catscaleid;
+            }
+        };
+        return $selectedsubscales;
     }
 
     /**

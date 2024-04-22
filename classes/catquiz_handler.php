@@ -35,6 +35,7 @@ use local_catquiz\feedback\feedbackclass;
 use local_catquiz\local\model\model_strategy;
 use local_catquiz\output\attemptfeedback;
 use local_catquiz\teststrategy\info;
+use local_catquiz\teststrategy\progress;
 use MoodleQuickForm;
 use stdClass;
 
@@ -920,6 +921,15 @@ class catquiz_handler {
     private static function get_strategy_selectcontext(stdClass $quizsettings, stdClass $attemptdata) {
         global $USER;
         $contextcreator = info::get_contextcreator();
+        // If this is not the first question, load the quiz settings that were used for the first question.
+        if ($attemptdata->questionsattempted > 0) {
+            $quizsettings = progress::load(
+                intval($attemptdata->id),
+                'mod_adaptivequiz',
+                $quizsettings->catquiz_catscales
+                )
+                ->get_quiz_settings();
+        }
 
         if ($quizsettings->catquiz_includepilotquestions) {
             $pilotratio = floatval($quizsettings->catquiz_pilotratio);
@@ -958,19 +968,16 @@ class catquiz_handler {
             $firstuseexistingdata = $quizsettings->catquiz_firstquestionreuseexistingdata == "1";
         }
 
-        // Get selected subscales from quizdata.
-        $selectedsubscales = self::get_selected_subscales($quizsettings);
-
         $catcontext = catscale::get_context_id($quizsettings->catquiz_catscales);
         $initialcontext = [
             'testid' => intval($attemptdata->instance),
             'contextid' => $catcontext,
+            'quizsettings' => $quizsettings,
             'catscaleid' => $quizsettings->catquiz_catscales,
             'installed_models' => model_strategy::get_installed_models(),
             // When selecting questions from a scale, also include questions from its subscales.
             // This option is required by the questions_loader context loader.
             'includesubscales' => true,
-            'selectedsubscales' => $selectedsubscales,
             'maximumquestions' => $maxquestions,
             'minimumquestions' => $quizsettings->maxquestionsgroup->catquiz_minquestions,
             'penalty_threshold' => 60 * 60 * 24 * 30 - 90, // TODO: make dynamic.
@@ -1033,25 +1040,5 @@ class catquiz_handler {
             default:
                 return $time;
         }
-    }
-    /**
-     * Gets selected subscales
-     *
-     *
-     * @param stdClass $quizsettings
-     * @return array
-     *
-     */
-    public static function get_selected_subscales(stdClass $quizsettings) {
-        // Get selected subscales from quizdata.
-        $selectedsubscales = [];
-        foreach ($quizsettings as $key => $value) {
-            if (strpos($key, 'catquiz_subscalecheckbox_') !== false
-                && $value == "1") {
-                    $catscaleid = substr_replace($key, '', 0, 25);
-                    $selectedsubscales[] = $catscaleid;
-            }
-        };
-        return $selectedsubscales;
     }
 }

@@ -51,8 +51,8 @@ final class checkitemparams extends preselect_task implements wb_middleware {
      *
      */
     public function run(array &$context, callable $next): result {
-        $selectedscales = $context['selectedsubscales'];
-        foreach ($context['selectedsubscales'] as $catscaleid) {
+        $selectedscales = [$context['catscaleid'], ...$context['progress']->get_selected_subscales()];
+        foreach ($selectedscales as $catscaleid) {
             $catscalecontext = catscale::get_context_id($catscaleid);
             $catscaleids = [
                 $catscaleid,
@@ -88,7 +88,7 @@ final class checkitemparams extends preselect_task implements wb_middleware {
      */
     public function get_required_context_keys(): array {
         return [
-            'selectedsubscales',
+            'progress',
         ];
     }
 }

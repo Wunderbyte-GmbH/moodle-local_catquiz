@@ -83,7 +83,7 @@ class questions_loader implements contextloaderinterface {
             $context['contextid'],
             $context['includesubscales'],
             'difficulty',
-            $context['selectedsubscales'],
+            $context['progress']->get_selected_subscales(),
         );
         $context['questions_ordered_by'] = 'difficulty';
         $context['original_questions'] = $context['questions'];
