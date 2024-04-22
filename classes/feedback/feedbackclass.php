@@ -342,8 +342,6 @@ class feedbackclass {
                     0 => get_string('courseselection', 'local_catquiz'),
                 ];
                 // Check if courses were saved before (ie from other teacher, directly in db) and in this case allow them.
-                // Erste Runde aufrufen, ist es in preselect, wird dann angezeigt
-                // Zweite Runde ist es dann in presaved -> muss man noch speichern!
                 $preselectcourseids = $mform->_defaultValues['catquiz_courses_' . $scale->id . '_'. $j] ?? [];
                 $presavedcourseids = $data['catquiz_courses_' . $scale->id . '_'. $j] ?? [];
                 $precourses = empty($preselectcourseids) ? $presavedcourseids : $preselectcourseids;
