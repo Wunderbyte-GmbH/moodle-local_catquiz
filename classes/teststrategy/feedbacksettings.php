@@ -16,6 +16,7 @@
 
 namespace local_catquiz\teststrategy;
 
+use \stdClass;
 use local_catquiz\catscale;
 use local_catquiz\feedback\feedbackclass;
 use local_catquiz\output\attemptfeedback;
@@ -363,12 +364,11 @@ class feedbacksettings {
      * Filter the results to check if reporting is enabled in quizsettings.
      *
      * @param array $personabilities
-     * @param array $quizsettings
+     * @param stdClass $quizsettings
      *
      * @return array
-     *
      */
-    public function filter_excluded_scales(array $personabilities, \stdClass $quizsettings): array {
+    public function filter_excluded_scales(array $personabilities, stdClass $quizsettings): array {
         foreach ($personabilities as $catscale => $array) {
             $propertyname = sprintf('catquiz_scalereportcheckbox_%s', $catscale);
             if (empty($quizsettings->$propertyname)) {
@@ -386,12 +386,11 @@ class feedbacksettings {
      * Set params defined in quizsettings and attemptdata.
      *
      * @param array $newdata
-     * @param array $quizsettings
+     * @param stdClass $quizsettings
      *
      * @return void
-     *
      */
-    public function set_params_from_attempt(array $newdata, \stdClass $quizsettings): void {
+    public function set_params_from_attempt(array $newdata, stdClass $quizsettings): void {
         $this->semax = $newdata['se_max'] ?? null;
         $this->semin = $newdata['se_min'] ?? null;
         $maxquestiongroup = isset($quizsettings->maxquestionsgroup) ? (array) $quizsettings->maxquestionsgroup : null;

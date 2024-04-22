@@ -39,8 +39,25 @@ use UnexpectedValueException;
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 abstract class feedbackgenerator {
+    /**
+     * Attempt ID
+     *
+     * @var int
+     */
     private int $attemptid;
+
+    /**
+     * Component ID
+     *
+     * @var string
+     */
     private string $component = 'mod_adaptivequiz';
+
+    /**
+     * Context ID
+     *
+     * @var int
+     */
     private int $contextid;
 
     /**
@@ -161,7 +178,6 @@ abstract class feedbackgenerator {
      *
      * @param array $newdata
      * @param feedbacksettings $feedbacksettings
-     * @param array $quizsettings
      * @param int $strategyid
      * @param int $forcedscaleid
      * @param bool $feedbackonlyfordefinedscaleid
