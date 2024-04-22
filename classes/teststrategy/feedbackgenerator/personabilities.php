@@ -108,7 +108,7 @@ class personabilities extends feedbackgenerator {
 
         $abilitieschart = $this->render_chart(
             $feedbackdata['personabilities_abilities'],
-            $feedbackdata['quizsettings'],
+            (array) $this->get_progress()->get_quiz_settings(),
             $feedbackdata['primaryscale'],
         );
 
@@ -150,12 +150,12 @@ class personabilities extends feedbackgenerator {
      */
     public function get_required_context_keys(): array {
         return [
-            'quizsettings',
             'primaryscale',
             'personabilities_abilities',
             'se',
             'abilitieslist',
             'models',
+            'progress',
         ];
     }
 
@@ -208,20 +208,19 @@ class personabilities extends feedbackgenerator {
         global $CFG;
         require_once($CFG->dirroot . '/local/catquiz/lib.php');
 
-        $progress = progress::load($existingdata['attemptid'], 'mod_adaptivequiz', $existingdata['contextid']);
+        $progress = $this->get_progress();
         $personabilities = $progress->get_abilities();
 
         if ($personabilities === []) {
             return null;
         }
-        $quizsettings = $existingdata['quizsettings'];
+        $quizsettings = $progress->get_quiz_settings();
         $catscales = $newdata['catscales'];
 
         // Make sure that only feedback defined by strategy is rendered.
         $personabilitiesfeedbackeditor = $this->select_scales_for_report(
             $newdata,
             $this->feedbacksettings,
-            $quizsettings,
             $existingdata['teststrategy']
         );
 
@@ -263,7 +262,6 @@ class personabilities extends feedbackgenerator {
         $models = model_strategy::get_installed_models();
 
         return [
-            'quizsettings' => (array) $quizsettings,
             'primaryscale' => $catscales[$selectedscaleid],
             'personabilities_abilities' => $personabilities,
             'se' => $newdata['se'] ?? null,
@@ -445,7 +443,7 @@ class personabilities extends feedbackgenerator {
                 }
             }
             $colorvalue = $this->get_color_for_personability(
-                (array)$initialcontext['quizsettings'],
+                (array)$initialcontext['progress']->get_quiz_settings(),
                 $as,
                 intval($primarycatscale['id'])
                 );

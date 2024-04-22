@@ -109,7 +109,6 @@ class attemptfeedback implements renderable, templatable {
         }
 
         $settings = json_decode($testenvironment->json);
-        $this->quizsettings = $settings;
         $this->teststrategy = intval($settings->catquiz_selectteststrategy);
 
         if (!isset($feedbacksettings)) {
@@ -117,12 +116,10 @@ class attemptfeedback implements renderable, templatable {
         } else {
             $this->feedbacksettings = $feedbacksettings;
         }
-        $catscaleid = intval($this->quizsettings->catquiz_catscales);
-        $this->catscaleid = $catscaleid;
 
         if ($contextid === 0) {
             // Get the contextid of the catscale.
-            $contextid = catscale::get_context_id($catscaleid);
+            $contextid = catscale::get_context_id(intval($settings->catquiz_catscales));
         }
         $this->contextid = $contextid;
     }
@@ -196,7 +193,6 @@ class attemptfeedback implements renderable, templatable {
             'courseid' => $this->courseid ?? 0,
             'component' => 'mod_adaptivequiz',
             'userid' => $USER->id,
-            'catscaleid' => $this->catscaleid,
             'teststrategy' => $this->teststrategy,
             'starttime' => $cache->get('starttime'),
             'endtime' => $cache->get('endtime'),
@@ -206,7 +202,6 @@ class attemptfeedback implements renderable, templatable {
             'catquizerror' => $cache->get('catquizerror'),
             'studentfeedback' => [],
             'teacherfeedback' => [],
-            'quizsettings' => (array) $this->quizsettings,
             'personabilities' => null,
             'num_pilot_questions' => null,
         ];
@@ -231,7 +226,7 @@ class attemptfeedback implements renderable, templatable {
         $newdata = array_filter($newdata, fn ($k) => !in_array($k, $excludekeys), ARRAY_FILTER_USE_KEY);
         $newdata = $this->add_default_data($newdata);
         foreach ($generators as $generator) {
-            $generatordata = $generator->load_data($this->attemptid, $existingdata, $newdata);
+            $generatordata = $generator->update_data($this->attemptid, $existingdata, $newdata);
             if (! $generatordata) {
                 continue;
             }
@@ -266,7 +261,8 @@ class attemptfeedback implements renderable, templatable {
             $newarray[$scaleid]['value'] = $abilityfloat;
         };
         $newdata['updated_personabilities'] = $newarray;
-        $newdata['catscales'] = catquiz::get_catscales(array_keys($newarray));
+        $newdata['catscaleid'] = intval($progress->get_quiz_settings()->catquiz_catscales);
+        $newdata['catscales'] = catquiz::get_catscales([$newdata['catscaleid'], ...$progress->get_selected_subscales()]);
         return $newdata;
     }
 
@@ -355,9 +351,10 @@ class attemptfeedback implements renderable, templatable {
         global $USER;
 
         $progress = progress::load($this->attemptid, 'mod_adaptivequiz', $this->contextid);
-        $enrolementmsg = catquiz::enrol_user($USER->id, (array) $this->quizsettings, $progress->get_abilities());
+        $quizsettings = $progress->get_quiz_settings();
+        $enrolementmsg = catquiz::enrol_user($USER->id, (array) $quizsettings, $progress->get_abilities());
         $courseandinstance = catquiz::return_course_and_instance_id(
-            $this->quizsettings->modulename,
+            $quizsettings->modulename,
             $this->attemptid
         );
 
@@ -367,10 +364,10 @@ class attemptfeedback implements renderable, templatable {
             'context' => context_system::instance(),
             'other' => [
                 'attemptid' => $this->attemptid,
-                'catscaleid' => $this->catscaleid,
+                'catscaleid' => $quizsettings->catquiz_catscales,
                 'userid' => $USER->id,
                 'contextid' => $this->contextid,
-                'component' => $this->quizsettings->modulename,
+                'component' => $quizsettings->modulename,
                 'instanceid' => $courseandinstance['instanceid'],
                 'teststrategy' => $this->teststrategy,
                 'status' => LOCAL_CATQUIZ_ATTEMPT_OK,

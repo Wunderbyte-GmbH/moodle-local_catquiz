@@ -179,7 +179,7 @@ class graphicalsummary extends feedbackgenerator {
      *
      */
     public function load_data(int $attemptid, array $existingdata, array $newdata): ?array {
-        $progress = progress::load($attemptid, 'mod_adaptivequiz', $existingdata['contextid']);
+        $progress = $this->get_progress();
 
         // If we already have all the data, just return them instead of adding
         // the last response again.
@@ -225,7 +225,7 @@ class graphicalsummary extends feedbackgenerator {
             info::get_teststrategy($existingdata['teststrategy'])
         ->get_description());
 
-        $progress = progress::load($attemptid, 'mod_adaptivequiz', $existingdata['contextid']);
+        $progress = $this->get_progress();
         return [
             'graphicalsummary_data' => $graphicalsummary,
             'teststrategyname' => $teststrategyname,
@@ -494,7 +494,7 @@ class graphicalsummary extends feedbackgenerator {
         global $OUTPUT;
         $series = [];
         $labels = [];
-        $quizsettings = $attemptdata['quizsettings'];
+        $quizsettings = $this->get_progress()->get_quiz_settings();
 
         foreach ($attemptsbytimerange as $timestamp => $attempts) {
             $labels[] = (string)$timestamp;

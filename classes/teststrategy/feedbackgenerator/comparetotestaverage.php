@@ -131,7 +131,6 @@ class comparetotestaverage extends feedbackgenerator {
         return [
             'contextid',
             'personabilities',
-            'quizsettings',
             'testaverageability',
             'userability',
             'testaverageposition',
@@ -139,7 +138,6 @@ class comparetotestaverage extends feedbackgenerator {
             'comparisontext',
             'colorbar',
             'colorbarlegend',
-            'quizsettings',
             'comparetotestaverage_has_worse',
             'comparetotestaverage_has_enough_peers',
         ];
@@ -271,8 +269,8 @@ class comparetotestaverage extends feedbackgenerator {
      *
      */
     public function load_data(int $attemptid, array $existingdata, array $newdata): ?array {
-        $progress = progress::load($attemptid, 'mod_adaptivequiz', $existingdata['contextid']);
-        $quizsettings = $existingdata['quizsettings'];
+        $progress = $this->get_progress();
+        $quizsettings = $progress->get_quiz_settings();
 
         if (!$progress->get_playedquestions()) {
             return [];
@@ -286,7 +284,6 @@ class comparetotestaverage extends feedbackgenerator {
         $personabilitiesfeedbackeditor = $this->select_scales_for_report(
             $newdata,
             $this->feedbacksettings,
-            $quizsettings,
             $existingdata['teststrategy']
         );
 
