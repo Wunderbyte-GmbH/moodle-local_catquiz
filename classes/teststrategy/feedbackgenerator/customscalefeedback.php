@@ -145,7 +145,6 @@ class customscalefeedback extends feedbackgenerator {
     public function get_required_context_keys(): array {
         return [
             'customscalefeedback_abilities',
-            'progress',
         ];
     }
 
