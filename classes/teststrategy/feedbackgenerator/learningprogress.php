@@ -155,7 +155,6 @@ class learningprogress extends feedbackgenerator {
      */
     public function get_required_context_keys(): array {
         return [
-            'progress',
             'primaryscale',
             'personabilities_abilities',
         ];
@@ -322,8 +321,7 @@ class learningprogress extends feedbackgenerator {
         // If defined in settings, display only feedbacks if items were played...
         // ...and parentscale and primaryscale.
         $questionpreviews = "";
-        if (isset($newdata['progress']->playedquestionsbyscale[$catscaleid])) {
-            $questionsinscale = $newdata['progress']->playedquestionsbyscale[$catscaleid];
+        if ($questionsinscale = $this->get_progress()->get_playedquestions(true, $catscaleid)) {
             $numberofitems = ['itemsplayed' => count($questionsinscale)];
             $questionpreviews = array_map(fn($q) => [
                 'preview' => $this->render_questionpreview((object) $q)['body']['question']],

@@ -155,7 +155,6 @@ class personabilities extends feedbackgenerator {
             'se',
             'abilitieslist',
             'models',
-            'progress',
         ];
     }
 
@@ -339,8 +338,7 @@ class personabilities extends feedbackgenerator {
         // If defined in settings, display only feedbacks if items were played...
         // ...and parentscale and primaryscale.
         $questionpreviews = "";
-        if (isset($newdata['progress']->playedquestionsbyscale[$catscaleid])) {
-            $questionsinscale = $newdata['progress']->playedquestionsbyscale[$catscaleid];
+        if ($questionsinscale = $this->get_progress()->get_playedquestions(true, $catscaleid)) {
             $numberofitems = ['itemsplayed' => count($questionsinscale)];
             $questionpreviews = array_map(fn($q) => [
                 'preview' => $this->render_questionpreview((object) $q)['body']['question']],
@@ -443,7 +441,7 @@ class personabilities extends feedbackgenerator {
                 }
             }
             $colorvalue = $this->get_color_for_personability(
-                (array)$initialcontext['progress']->get_quiz_settings(),
+                (array) $this->get_progress()->get_quiz_settings(),
                 $as,
                 intval($primarycatscale['id'])
                 );
