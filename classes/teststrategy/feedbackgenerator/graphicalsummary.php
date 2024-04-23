@@ -359,11 +359,11 @@ class graphicalsummary extends feedbackgenerator {
                 );
             }
             $tabledata[] = [
-                $index,
+                $index + 1,
                 $values['questionname'],
                 $responsestring,
                 $values['questionscale_name'],
-                $values['personability_after'],
+                sprintf('%.2f', $values['personability_after']),
             ];
         }
         $table->data = $tabledata;
