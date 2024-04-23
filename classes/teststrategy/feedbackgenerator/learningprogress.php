@@ -974,15 +974,17 @@ class learningprogress extends feedbackgenerator {
                 $date = ceil($date / 3);
             };
             if ($timerange === LOCAL_CATQUIZ_TIMERANGE_MONTH) {
-                $result[] = get_string('stringdate:month:' . $date, 'local_catquiz');
+                $val = get_string('stringdate:month:' . $date, 'local_catquiz');
+                $result[$val] = $val;
             } else {
-                $result[] = get_string('stringdate:' . $stringfordate, 'local_catquiz', $date);
+                $val = get_string('stringdate:' . $stringfordate, 'local_catquiz', $date);
+                $result[$val] = $val;
             }
 
             $currenttimestamp = strtotime('+1 day', $currenttimestamp);
         }
 
-        return array_unique($result);
+        return $result;
     }
 
     /**
