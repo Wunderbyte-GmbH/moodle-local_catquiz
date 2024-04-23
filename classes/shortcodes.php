@@ -99,7 +99,11 @@ class shortcodes {
             $feedbacksettings = new feedbacksettings($strategyid);
 
             $attemptfeedback = new attemptfeedback($record->attemptid, $record->contextid, $feedbacksettings);
-            $feedback = $attemptfeedback->get_feedback_for_attempt() ?? "";
+            try {
+                $feedback = $attemptfeedback->get_feedback_for_attempt() ?? "";
+            } catch (\Throwable $t) {
+                return get_string('attemptfeedbacknotavailable', 'local_catquiz');
+            }
             if (empty($feedback)) {
                 return get_string('attemptfeedbacknotavailable', 'local_catquiz');
             }

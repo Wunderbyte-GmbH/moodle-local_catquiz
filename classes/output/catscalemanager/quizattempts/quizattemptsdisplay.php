@@ -158,14 +158,17 @@ class quizattemptsdisplay {
      * @return array
      */
     public function export_data_array(): array {
+        try {
+            $attemptid = optional_param('attemptid', 0, PARAM_INT);
+            if ($attemptid) {
+                return ['feedback' => $this->render_attempt_details($attemptid)];
+            }
 
-        $attemptid = optional_param('attemptid', 0, PARAM_INT);
-        if ($attemptid) {
-            return ['feedback' => $this->render_attempt_details($attemptid)];
+            return [
+                'table' => $this->render_table(),
+            ];
+        } catch (\Throwable $t) {
+            return ['error' => get_string('attemptfeedbacknotavailable', 'local_catquiz')];
         }
-
-        return [
-            'table' => $this->render_table(),
-        ];
     }
 }
