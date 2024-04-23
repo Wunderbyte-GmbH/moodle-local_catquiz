@@ -330,13 +330,14 @@ abstract class feedbackgenerator {
         }
         return true;
     }
+
     /**
      * Has teacherfeedbackpermission.
      *
      * @return bool
      *
      */
-    private function has_teacherfeedbackpermission(): bool {
+    protected function has_teacherfeedbackpermission(): bool {
         return has_capability(
             'local/catquiz:view_teacher_feedback', context_system::instance()
         );
