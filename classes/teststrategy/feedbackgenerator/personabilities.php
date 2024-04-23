@@ -25,18 +25,15 @@
 
 namespace local_catquiz\teststrategy\feedbackgenerator;
 
-use cache;
 use core\chart_bar;
 use core\chart_line;
 use core\chart_series;
 use local_catquiz\catquiz;
 use local_catquiz\catscale;
-use local_catquiz\feedback\feedbackclass;
 use local_catquiz\output\catscalemanager\questions\cards\questionpreview;
 use local_catquiz\teststrategy\feedbackgenerator;
 use local_catquiz\teststrategy\feedbacksettings;
 use local_catquiz\local\model\model_strategy;
-use local_catquiz\teststrategy\progress;
 use stdClass;
 
 defined('MOODLE_INTERNAL') || die();
