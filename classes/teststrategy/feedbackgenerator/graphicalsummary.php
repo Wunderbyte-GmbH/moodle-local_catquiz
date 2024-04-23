@@ -271,7 +271,7 @@ class graphicalsummary extends feedbackgenerator {
 
             $abilitiesafter = array_map(fn($round) => $round['personability_after'] ?? null, $data);
             $abilitiesafterchart = new \core\chart_series(
-                get_string('abilityintestedscale_after', 'local_catquiz'),
+                get_string('abilityinglobalscale', 'local_catquiz'),
                 $abilitiesafter
             );
             $chart->add_series($abilitiesafterchart);
