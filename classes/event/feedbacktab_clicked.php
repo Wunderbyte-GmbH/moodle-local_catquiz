@@ -67,7 +67,7 @@ class feedbacktab_clicked extends \core\event\base {
         ], 'lcq_quizattempts');
         $attemptlink = html_writer::link(
             $url,
-            get_string('userfeedbacksheader', 'local_catquiz', $otherarray->attemptid),
+            get_string('feedbacksheader', 'local_catquiz', $otherarray->attemptid),
             // Open the attempt in a new tab, otherwise the link does not work because it just appends an anchor.
             ['target' => '_blank']
         );

@@ -566,6 +566,7 @@ $string['instance'] = "Test";
 $string['teststrategy'] = 'Teststrategy';
 $string['starttime'] = "Start";
 $string['endtime'] = "End";
+$string['feedbacksheader'] = 'Attempt {$a}';
 $string['ownfeedbacksheader'] = 'My Attempt from {$a}';
 $string['userfeedbacksheader'] = 'Attempt {$a->attemptid} from {$a->time}, by {$a->firstname} {$a->lastname} (userid: {$a->userid})';
 $string['attemptscollapsableheading'] = 'Feedback for your attempts:';
