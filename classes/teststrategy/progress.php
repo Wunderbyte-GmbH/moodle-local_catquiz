@@ -29,6 +29,7 @@ use coding_exception;
 use JsonSerializable;
 use local_catquiz\catquiz;
 use local_catquiz\catscale;
+use local_catquiz\testenvironment;
 use Random\RandomException;
 use stdClass;
 
@@ -280,6 +281,7 @@ class progress implements JsonSerializable {
      * @return self
      */
     private static function populate_from_object(stdClass $object): self {
+        global $DB;
         $instance = new self();
         $instance->id = $object->id;
         $instance->userid = $object->userid;
@@ -310,6 +312,26 @@ class progress implements JsonSerializable {
         $instance->excludedquestions = $data->excludedquestions;
         $instance->gaveupquestions = $data->gaveupquestions;
         $instance->starttime = $data->starttime;
+
+        // Fallback for old attempts that did not store the quizsettings: use the current ones.
+        if (!property_exists($data, 'quizsettings')) {
+            $attemptjson = $DB->get_record('local_catquiz_attempts', ['attemptid' => $instance->attemptid], 'json')->json;
+            $attemptdata = json_decode($attemptjson);
+            $quizsettings = $attemptdata->quizsettings;
+            // If not even the attempt has quizsettings, get them from the test table.
+            if (!$quizsettings) {
+                $componentid = $DB->get_record('adaptivequiz_attempt', ['id' => $instance->attemptid], 'instance')->instance;
+                $component = $instance->component;
+                $data = (object)['componentid' => $componentid, 'component' => $component];
+                $testenvironment = new testenvironment($data);
+                $quizsettings = $testenvironment->return_settings();
+            }
+            $data->quizsettings = $quizsettings;
+
+            // Save the quiz settings so that in the future we do not have to use the fallback anymore.
+            $instance->quizsettings = $quizsettings;
+            $instance->save();
+        }
         $instance->quizsettings = $data->quizsettings;
 
         return $instance;
