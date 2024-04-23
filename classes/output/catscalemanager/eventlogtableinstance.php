@@ -86,7 +86,7 @@ class eventlogtableinstance {
             '\local_catquiz\event\testitem_imported' => get_string('testitem_imported', 'local_catquiz'),
             '\local_catquiz\event\usertogroup_enroled' => get_string('usertogroup_enroled', 'local_catquiz'),
             '\local_catquiz\event\usertocourse_enroled' => get_string('usertocourse_enroled', 'local_catquiz'),
-
+            '\local_catquiz\event\feedbacktab_clicked' => get_string('feedback_tab_clicked', 'local_catquiz'),
         ]);
         $table->add_filter($standardfilter);
 
