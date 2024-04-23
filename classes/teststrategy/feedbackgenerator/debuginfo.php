@@ -25,6 +25,7 @@
 namespace local_catquiz\teststrategy\feedbackgenerator;
 
 use cache;
+use context_system;
 use local_catquiz\catquiz;
 use local_catquiz\teststrategy\feedbackgenerator;
 use local_catquiz\teststrategy\feedbacksettings;
@@ -319,5 +320,16 @@ class debuginfo extends feedbackgenerator {
             ];
         }
         return ['debuginfo' => $debuginfo];
+    }
+
+    /**
+     * Overwrite the inherited method to allow access only to CAT managers.
+     *
+     * @return bool
+     */
+    protected function has_teacherfeedbackpermission(): bool {
+        return has_capability(
+            'local/catquiz:canmanage', context_system::instance()
+        );
     }
 }
