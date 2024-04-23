@@ -338,19 +338,6 @@ class personabilities extends feedbackgenerator {
         // If defined in settings, display only feedbacks if items were played...
         // ...and parentscale and primaryscale.
         $questionpreviews = "";
-        if ($questionsinscale = $this->get_progress()->get_playedquestions(true, $catscaleid)) {
-            $numberofitems = ['itemsplayed' => count($questionsinscale)];
-            $questionpreviews = array_map(fn($q) => [
-                'preview' => $this->render_questionpreview((object) $q)['body']['question']],
-                $questionsinscale
-            );
-        } else if ($this->feedbacksettings->displayscaleswithoutitemsplayed
-            || $catscaleid == $selectedscaleid
-            || $catscales[$catscaleid]->parentid == 0) {
-            $numberofitems = ['noplayed' => 0];
-        } else if ($catscaleid != $selectedscaleid) {
-            $numberofitems = "";
-        }
         if (isset($newdata['se'][$catscaleid])) {
             $standarderror = sprintf("%.2f", $newdata['se'][$catscaleid]);
         } else {
@@ -362,7 +349,7 @@ class personabilities extends feedbackgenerator {
             'ability' => $ability,
             'name' => $catscales[$catscaleid]->name,
             'catscaleid' => $catscaleid,
-            'numberofitemsplayed' => $numberofitems,
+            'numberofitemsplayed' => "",
             'questionpreviews' => $questionpreviews ?: "",
             'isselectedscale' => $isselectedscale,
             'tooltiptitle' => $tooltiptitle,
