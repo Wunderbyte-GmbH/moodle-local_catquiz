@@ -61,12 +61,22 @@ abstract class feedbackgenerator {
     private int $contextid;
 
     /**
+     * @var ?progress
+     */
+    private ?progress $progress = null;
+
+    /**
      * Returns the progress for the current attempt, component and contextid.
      *
      * @return progress
      */
     protected function get_progress(): progress {
-        return progress::load($this->attemptid, $this->component, $this->contextid);
+        if ($this->progress) {
+            return $this->progress;
+        }
+
+        $this->progress = progress::load($this->attemptid, $this->component, $this->contextid);
+        return $this->progress;
     }
 
     /**
