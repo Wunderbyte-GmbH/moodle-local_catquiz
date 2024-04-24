@@ -1627,6 +1627,7 @@ class catquiz {
             int $userid = null,
             int $catscaleid = null,
             int $courseid = null,
+            int $testid = null,
             int $contextid = null,
             int $starttime = null,
             int $endtime = null) {
@@ -1643,6 +1644,9 @@ class catquiz {
         if (!is_null($courseid)) {
             $sql .= " AND courseid = :courseid";
         }
+        if (!is_null($testid)) {
+            $sql .= " AND instanceid = :instanceid";
+        }
         if (!is_null($contextid)) {
             $sql .= " AND contextid = :contextid";
         }
@@ -1657,6 +1661,7 @@ class catquiz {
             'userid' => $userid,
             'catscaleid' => $catscaleid,
             'courseid' => $courseid,
+            'instanceid' => $testid,
             'contextid' => $contextid,
             'starttime' => $starttime,
             'endtime' => $endtime,

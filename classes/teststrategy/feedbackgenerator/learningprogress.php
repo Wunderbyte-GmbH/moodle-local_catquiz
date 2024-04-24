@@ -583,6 +583,7 @@ class learningprogress extends feedbackgenerator {
                 null,
                 $initialcontext['catscaleid'],
                 $courseid,
+                $initialcontext['testid'],
                 $initialcontext['contextid'],
                 null,
                 $end);

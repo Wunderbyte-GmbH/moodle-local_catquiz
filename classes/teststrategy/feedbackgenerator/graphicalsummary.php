@@ -427,6 +427,7 @@ class graphicalsummary extends feedbackgenerator {
             null,
             $parentscaleid,
             $data['courseid'],
+            $data['testid'],
             $contextid,
             null,
             null);
