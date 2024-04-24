@@ -893,6 +893,7 @@ class learningprogress extends feedbackgenerator {
                 break;
             case LOCAL_CATQUIZ_TIMERANGE_QUARTEROFYEAR:
                 $dateformat = '%m';
+                $year = '%Y';
                 $stringfordate = 'quarter';
                 break;
         }
@@ -905,10 +906,18 @@ class learningprogress extends feedbackgenerator {
                 continue;
             }
             $date = userdate($attempt->endtime, $dateformat);
+
             if ($timerange === LOCAL_CATQUIZ_TIMERANGE_QUARTEROFYEAR) {
                 $date = ceil($date / 3);
-            };
-            if ($timerange === LOCAL_CATQUIZ_TIMERANGE_MONTH) {
+                $year = userdate($attempt->endtime, $year);
+                $datestring = get_string(
+                    'stringdate:quarter',
+                    'local_catquiz',
+                    [
+                        'q' => $date,
+                        'y' => $year,
+                    ]); // Divides the number of the month (4 for april) in order to get the quarter.
+            } else if ($timerange === LOCAL_CATQUIZ_TIMERANGE_MONTH) {
                 $datestring = get_string('stringdate:month:' . $date, 'local_catquiz');
             } else {
                 $datestring = get_string('stringdate:' . $stringfordate, 'local_catquiz', $date);
@@ -964,6 +973,7 @@ class learningprogress extends feedbackgenerator {
                 break;
             case LOCAL_CATQUIZ_TIMERANGE_QUARTEROFYEAR:
                 $dateformat = '%m';
+                $year = '%Y';
                 $stringfordate = 'quarter';
                 break;
         }
@@ -977,8 +987,16 @@ class learningprogress extends feedbackgenerator {
 
             if ($timerange === LOCAL_CATQUIZ_TIMERANGE_QUARTEROFYEAR) {
                 $date = ceil($date / 3);
-            };
-            if ($timerange === LOCAL_CATQUIZ_TIMERANGE_MONTH) {
+                $year = userdate($currenttimestamp, $year);
+                $val = get_string(
+                    'stringdate:quarter',
+                    'local_catquiz',
+                    [
+                        'q' => $date,
+                        'y' => $year,
+                    ]);
+				$result[$val] = $val;
+            } else if ($timerange === LOCAL_CATQUIZ_TIMERANGE_MONTH) {
                 $val = get_string('stringdate:month:' . $date, 'local_catquiz');
                 $result[$val] = $val;
             } else {

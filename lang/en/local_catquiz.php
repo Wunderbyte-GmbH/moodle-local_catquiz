@@ -666,7 +666,7 @@ $string['stringdate:month:9'] = 'September';
 $string['stringdate:month:10'] = 'October';
 $string['stringdate:month:11'] = 'November';
 $string['stringdate:month:12'] = 'December';
-$string['stringdate:quarter'] = 'Q{$a}';
+$string['stringdate:quarter'] = 'Q{$a->q} {$a->y}';
 
 // Cache Definitions.
 $string['cachedef_adaptivequizattempt'] = 'Adaptive quiz attempt';
