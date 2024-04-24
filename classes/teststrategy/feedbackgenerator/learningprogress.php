@@ -878,6 +878,34 @@ class learningprogress extends feedbackgenerator {
 
         $attemptsbytimerange = [];
 
+        // Create new array with endtime and sort. Create entry for each day.
+        foreach ($attempts as $attempt) {
+            $data = json_decode($attempt->json);
+            if (empty($attempt->endtime)) {
+                continue;
+            }
+            $datestring = self::return_datestring_label($timerange, $attempt->endtime);
+
+            if (!empty($data->personabilities->$scaleid)) {
+                if (!isset($attemptsbytimerange[$datestring])) {
+                    $attemptsbytimerange[$datestring] = [];
+                }
+                $attemptsbytimerange[$datestring][] = $data->personabilities->$scaleid;
+            }
+        }
+        return $attemptsbytimerange;
+    }
+
+    /**
+     * Returns the label for the given date according to format defined in timerange constant.
+     *
+     * @param int $timerange
+     * @param int $timestamp
+     *
+     * @return string
+     *
+     */
+    private static function return_datestring_label(int $timerange, int $timestamp): string {
         switch ($timerange) {
             case LOCAL_CATQUIZ_TIMERANGE_DAY:
                 $dateformat = '%d.%m.%Y';
@@ -898,39 +926,23 @@ class learningprogress extends feedbackgenerator {
                 break;
         }
 
-        // Create new array with endtime and sort. Create entry for each day.
+        $date = userdate($timestamp, $dateformat);
 
-        foreach ($attempts as $attempt) {
-            $data = json_decode($attempt->json);
-            if (empty($attempt->endtime)) {
-                continue;
-            }
-            $date = userdate($attempt->endtime, $dateformat);
-
-            if ($timerange === LOCAL_CATQUIZ_TIMERANGE_QUARTEROFYEAR) {
-                $date = ceil($date / 3);
-                $year = userdate($attempt->endtime, $year);
-                $datestring = get_string(
-                    'stringdate:quarter',
-                    'local_catquiz',
-                    [
-                        'q' => $date,
-                        'y' => $year,
-                    ]); // Divides the number of the month (4 for april) in order to get the quarter.
-            } else if ($timerange === LOCAL_CATQUIZ_TIMERANGE_MONTH) {
-                $datestring = get_string('stringdate:month:' . $date, 'local_catquiz');
-            } else {
-                $datestring = get_string('stringdate:' . $stringfordate, 'local_catquiz', $date);
-            }
-
-            if (!empty($data->personabilities->$scaleid)) {
-                if (!isset($attemptsbytimerange[$datestring])) {
-                    $attemptsbytimerange[$datestring] = [];
-                }
-                $attemptsbytimerange[$datestring][] = $data->personabilities->$scaleid;
-            }
+        if ($timerange === LOCAL_CATQUIZ_TIMERANGE_QUARTEROFYEAR) {
+            $date = ceil($date / 3);
+            $year = userdate($timestamp, $year);
+            return get_string(
+                'stringdate:quarter',
+                'local_catquiz',
+                [
+                    'q' => $date,
+                    'y' => $year,
+                ]); // Divides the number of the month (4 for april) in order to get the quarter.
+        } else if ($timerange === LOCAL_CATQUIZ_TIMERANGE_MONTH) {
+            return get_string('stringdate:month:' . $date, 'local_catquiz');
+        } else {
+            return get_string('stringdate:' . $stringfordate, 'local_catquiz', $date);
         }
-        return $attemptsbytimerange;
     }
 
     /**
@@ -958,52 +970,13 @@ class learningprogress extends feedbackgenerator {
      *
      */
     public static function get_timerangekeys($timerange, $beginningandendofrange) {
-        switch ($timerange) {
-            case LOCAL_CATQUIZ_TIMERANGE_DAY:
-                $dateformat = '%d.%m.%Y';
-                $stringfordate = 'day';
-                break;
-            case LOCAL_CATQUIZ_TIMERANGE_WEEK:
-                $dateformat = '%W';
-                $stringfordate = 'week';
-                break;
-            case LOCAL_CATQUIZ_TIMERANGE_MONTH:
-                $dateformat = '%m';
-                $stringfordate = 'month';
-                break;
-            case LOCAL_CATQUIZ_TIMERANGE_QUARTEROFYEAR:
-                $dateformat = '%m';
-                $year = '%Y';
-                $stringfordate = 'quarter';
-                break;
-        }
-
         $result = [];
         $currenttimestamp = $beginningandendofrange[0];
         $endtimestamp = $beginningandendofrange[1];
 
         while ($currenttimestamp <= $endtimestamp) {
-            $date = userdate($currenttimestamp, $dateformat);
-
-            if ($timerange === LOCAL_CATQUIZ_TIMERANGE_QUARTEROFYEAR) {
-                $date = ceil($date / 3);
-                $year = userdate($currenttimestamp, $year);
-                $val = get_string(
-                    'stringdate:quarter',
-                    'local_catquiz',
-                    [
-                        'q' => $date,
-                        'y' => $year,
-                    ]);
-				$result[$val] = $val;
-            } else if ($timerange === LOCAL_CATQUIZ_TIMERANGE_MONTH) {
-                $val = get_string('stringdate:month:' . $date, 'local_catquiz');
-                $result[$val] = $val;
-            } else {
-                $val = get_string('stringdate:' . $stringfordate, 'local_catquiz', $date);
-                $result[$val] = $val;
-            }
-
+            $val = self::return_datestring_label($timerange, $currenttimestamp);
+            $result[$val] = $val;
             $currenttimestamp = strtotime('+1 day', $currenttimestamp);
         }
 
