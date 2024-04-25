@@ -1529,6 +1529,10 @@ class catquiz {
         $attemptdata['courseid'] = $courseandinstance['courseid'];
 
         self::replace_inf_with_minusone($attemptdata);
+        // Do not save the quiz settings here - we get them from the progress class.
+        unset($attemptdata['quizsettings']);
+        // The progress data are saved in their own table - we do not need to save them here.
+        unset($attemptdata['progress']);
         $data->json = json_encode($attemptdata);
 
         // Ensure there is only one row per attempt.
