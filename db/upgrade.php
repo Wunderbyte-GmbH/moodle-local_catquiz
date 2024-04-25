@@ -489,5 +489,20 @@ function xmldb_local_catquiz_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2024041500, 'local', 'catquiz');
     }
 
+    if ($oldversion < 2024042501) {
+
+        // Define field quizsettings to be added to local_catquiz_progress.
+        $table = new xmldb_table('local_catquiz_progress');
+        $field = new xmldb_field('quizsettings', XMLDB_TYPE_TEXT, null, null, null, null, null, 'json');
+
+        // Conditionally launch add field quizsettings.
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        // Catquiz savepoint reached.
+        upgrade_plugin_savepoint(true, 2024042501, 'local', 'catquiz');
+    }
+
     return true;
 }
