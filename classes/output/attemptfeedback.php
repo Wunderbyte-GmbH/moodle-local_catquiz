@@ -72,11 +72,6 @@ class attemptfeedback implements renderable, templatable {
     public feedbacksettings $feedbacksettings;
 
     /**
-     * @var ?object
-     */
-    public stdClass $quizsettings;
-
-    /**
      * Constructor of class.
      *
      * @param int $attemptid
