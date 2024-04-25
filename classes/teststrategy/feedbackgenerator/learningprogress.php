@@ -905,7 +905,7 @@ class learningprogress extends feedbackgenerator {
      * @return string
      *
      */
-    private static function return_datestring_label(int $timerange, int $timestamp): string {
+    public static function return_datestring_label(int $timerange, int $timestamp): string {
         switch ($timerange) {
             case LOCAL_CATQUIZ_TIMERANGE_DAY:
                 $dateformat = '%d.%m.%Y';
