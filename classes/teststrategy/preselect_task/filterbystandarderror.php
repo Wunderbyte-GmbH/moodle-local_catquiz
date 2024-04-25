@@ -104,7 +104,17 @@ class filterbystandarderror extends preselect_task implements wb_middleware {
                 );
                 $this->progress->drop_scale($scaleid);
                 $inheritscales = $this->get_scale_heirs($scaleid);
-                $inheritval = $this->context['person_ability'][$scaleid] - $this->context['se'][$scaleid];
+                switch ($this->context['teststrategy']) {
+                    case LOCAL_CATQUIZ_STRATEGY_LOWESTSUB:
+                        $inheritval = $this->context['person_ability'][$scaleid] - $this->context['se'][$scaleid];
+                        break;
+                    case LOCAL_CATQUIZ_STRATEGY_HIGHESTSUB:
+                        $inheritval = $this->context['person_ability'][$scaleid] + $this->context['se'][$scaleid];
+                        break;
+                    default:
+                        $inheritval = $this->context['person_ability'][$scaleid];
+                        break;
+                }
                 $fisherinformation = new fisherinformation();
                 foreach ($inheritscales as $subscaleid) {
                     catquiz::update_person_param(
