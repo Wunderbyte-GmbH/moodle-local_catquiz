@@ -267,40 +267,6 @@ class attemptfeedback implements renderable, templatable {
     }
 
     /**
-     * Change format of personabilities.
-     *
-     * @param array $personabilities
-     *
-     * @return array
-     *
-     */
-    private function add_additional_infos_to_personabilities(array $personabilities): array {
-
-        if (!is_array($personabilities[array_key_first($personabilities)])) {
-            // It's the float value of ability.
-            foreach ($personabilities as $scaleid => $abilityfloat) {
-                $newarray[$scaleid]['value'] = $abilityfloat;
-            };
-            $personabilities = $newarray;
-        }
-        $quizsettings = (array) $this->quizsettings;
-        $feedbacksettings = $this->feedbacksettings;
-        $feedbackdata = $this->load_feedbackdata();
-
-        $personabilities = $feedbacksettings->filter_excluded_scales($personabilities, $quizsettings);
-        $feedbacksettings->set_params_from_attempt($feedbackdata, $quizsettings);
-
-        return info::get_teststrategy($this->teststrategy)
-            ->select_scales_for_report(
-                $feedbacksettings,
-                $personabilities,
-                $feedbackdata
-            );
-
-    }
-
-
-    /**
      * Gets feedback generators for teststrategy.
      *
      * @param int $strategyid
