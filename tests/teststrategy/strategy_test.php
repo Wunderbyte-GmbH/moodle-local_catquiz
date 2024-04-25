@@ -950,6 +950,18 @@ class strategy_test extends advanced_testcase {
                     'maxquestions' => 25,
                     'maxquestionspersubscale' => 10,
                 ],
+                'final_abilities' => [
+                    'Simulation' => -3.44,
+                    'SimA' => -3.44,
+                    'SimA01' => -3.56,
+                    'SimA02' => -3.45,
+                    'SimA03' => -3.32,
+                    'SimA05' => -3.49,
+                    'SimA06' => -3.44,
+                    'SimB' => -3.44,
+                    'SimB01' => -3.44,
+                    'SimB02' => -3.44,
+                ],
             ],
             // phpcs:disable
             // 'Infer all subscales' => [
