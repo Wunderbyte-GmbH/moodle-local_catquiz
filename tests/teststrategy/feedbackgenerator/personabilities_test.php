@@ -81,7 +81,6 @@ class personabilities_test extends advanced_testcase {
                 'get_ability_range',
                 'get_testitems_for_catscale',
                 'get_fisherinfos_of_items',
-                'render_abilityprogress',
                 'get_progress',
             ])
             ->setConstructorArgs([$feedbacksettings])
@@ -97,12 +96,6 @@ class personabilities_test extends advanced_testcase {
         $personabilities
             ->method('get_fisherinfos_of_items')
             ->willReturn($fisherinfo);
-        $personabilities
-            ->method('render_abilityprogress')
-            ->willReturn([
-                'individual' => '',
-                'comparison' => '',
-            ]);
         $personabilities
             ->method('get_progress')
             ->willReturn($progressmock);
