@@ -81,32 +81,32 @@ class learningprogress_test extends advanced_testcase {
             'day' => [
                 'timerange' => LOCAL_CATQUIZ_TIMERANGE_DAY,
                 'timestamp' => 1714030970,
-                'expected' => "25.04.2024"
+                'expected' => "25.04.2024",
                 ],
             'week' => [
                 'timerange' => LOCAL_CATQUIZ_TIMERANGE_WEEK,
                 'timestamp' => 1708843353,
-                'expected' => "week 08"
+                'expected' => "week 08",
                 ],
             'week17' => [
                 'timerange' => LOCAL_CATQUIZ_TIMERANGE_WEEK,
                 'timestamp' => 1714030970,
-                'expected' => "week 17"
+                'expected' => "week 17",
                 ],
             'month' => [
                 'timerange' => LOCAL_CATQUIZ_TIMERANGE_MONTH,
                 'timestamp' => 1714030970,
-                'expected' => "April"
+                'expected' => "April",
                 ],
             'quarter1' => [
                 'timerange' => LOCAL_CATQUIZ_TIMERANGE_QUARTEROFYEAR,
                 'timestamp' => 1708843353,
-                'expected' => "Q1 2024"
+                'expected' => "Q1 2024",
                 ],
             'quarter2' => [
                 'timerange' => LOCAL_CATQUIZ_TIMERANGE_QUARTEROFYEAR,
                 'timestamp' => 1714030970,
-                'expected' => "Q2 2024"
+                'expected' => "Q2 2024",
                 ],
         ];
     }
