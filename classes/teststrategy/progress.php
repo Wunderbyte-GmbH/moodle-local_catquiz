@@ -317,7 +317,7 @@ class progress implements JsonSerializable {
         $instance->starttime = $data->starttime;
 
         // Fallback for old attempts that did not store the quizsettings: use the current ones.
-        if (!property_exists($data, 'quizsettings')) {
+        if (!property_exists($object, 'quizsettings')) {
             $attemptjson = $DB->get_record('local_catquiz_attempts', ['attemptid' => $instance->attemptid], 'json')->json;
             $attemptdata = json_decode($attemptjson);
             $quizsettings = $attemptdata->quizsettings ?? false;
@@ -329,13 +329,13 @@ class progress implements JsonSerializable {
                 $testenvironment = new testenvironment($data);
                 $quizsettings = $testenvironment->return_settings();
             }
-            $data->quizsettings = $quizsettings;
+            $object->quizsettings = json_encode($quizsettings);
 
             // Save the quiz settings so that in the future we do not have to use the fallback anymore.
             $instance->quizsettings = $quizsettings;
             $instance->save();
         }
-        $instance->quizsettings = $data->quizsettings;
+        $instance->quizsettings = json_decode($object->quizsettings);
 
         return $instance;
     }
@@ -400,7 +400,6 @@ class progress implements JsonSerializable {
             'excludedquestions' => $this->excludedquestions,
             'gaveupquestions' => $this->gaveupquestions,
             'starttime' => $this->starttime,
-            'quizsettings' => $this->quizsettings,
         ];
     }
 
@@ -438,6 +437,7 @@ class progress implements JsonSerializable {
 
         // If it does not exist yet, insert a new record.
         if (! $this->id) {
+            $record->quizsettings = json_encode($this->quizsettings);
             $id = $DB->insert_record('local_catquiz_progress', $record);
             if (! is_int($id)) {
                 throw new \Exception(sprintf("Could not save quiz progress of attempt %d to the database", $this->attemptid));
