@@ -154,6 +154,7 @@ class catquiz {
         $params = [
             'contextid' => $contextid,
             'contextid2' => $contextid,
+            'contextid3' => $contextid,
         ];
 
         // If we fetch only for a given user, we need to add this to the sql.
@@ -260,6 +261,7 @@ class catquiz {
                         componentname ORDER BY lcip.status DESC,
                         lcip.timecreated DESC) AS n
                     FROM {local_catquiz_itemparams} lcip
+                    WHERE lcip.contextid = :contextid3
                 ) AS s4
                 JOIN {local_catquiz_itemparams} maxlcip
                 ON s4.id = maxlcip.id
