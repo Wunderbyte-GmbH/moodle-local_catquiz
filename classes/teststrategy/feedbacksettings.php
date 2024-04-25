@@ -318,10 +318,13 @@ class feedbacksettings {
         $semax = $this->semax;
         if (!empty($semax)) {
             foreach ($personabilities as $scaleid => $array) {
-                $se = $feedbackdata['se'][$scaleid] ?? INF;
-                if ($se === INF && $CFG->debug > 0) {
-                    throw new \Exception(sprintf('No standarderror is set for scale %s', $scaleid));
+                if (!array_key_exists($scaleid, $feedbackdata['se'])) {
+                    $feedbackdata['se'][$scaleid] = INF;
+                    if ($CFG->debug > 0) {
+                        throw new \Exception(sprintf('No standarderror is set for scale %s', $scaleid));
+                    }
                 }
+                $se = $feedbackdata['se'][$scaleid];
                 if ($se > $semax) {
                     $personabilities[$scaleid]['error']['se'] = [
                         'semaxdefined' => $semax,
