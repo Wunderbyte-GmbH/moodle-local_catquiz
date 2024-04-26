@@ -25,6 +25,7 @@
 namespace local_catquiz\teststrategy\preselect_task;
 
 use local_catquiz\catscale;
+use local_catquiz\local\model\model_responses;
 use local_catquiz\local\result;
 use local_catquiz\teststrategy\preselect_task;
 use local_catquiz\teststrategy\progress;
@@ -85,7 +86,8 @@ final class strategystrengthscore extends preselect_task implements wb_middlewar
                 }
 
                 $scaleability = $this->progress->get_abilities()[$scaleid];
-                $standarderrorplayed = $context['se'][$scaleid];
+                $myitems = (new model_responses())->setdata([$context['userid'] => ['component' => $this->progress->get_user_responses()]])->get_items_for_scale($scaleid, $context['contextid']);
+                $standarderrorplayed = catscale::get_standarderror($scaleability, $myitems, INF);
                 $testinfo = $standarderrorplayed === INF ? 0 : 1 / $standarderrorplayed ** 2;
                 $question->processterm = max(0.1, $testinfo) / max(1, $scalecount[$scaleid]);
                 $abilitydifference = ($scaleability - $this->progress->get_abilities()[$context['catscaleid']]);
@@ -104,8 +106,8 @@ final class strategystrengthscore extends preselect_task implements wb_middlewar
                 }
                 if (
                 getenv('CATQUIZ_CREATE_TESTOUTPUT')
-                && count($this->progress->get_playedquestions()) > 8
-                && $question->label === 'SIMB02-02'
+                && count($this->progress->get_playedquestions()) > 23 
+                && in_array($question->label, ['SIMA03-14', 'SIMC02-08'])
                 ) {
                         printf(
                             "%s%14d -> sc: %f - se: %f - pt: %f - st: %f - it: %f - pp: %f - ti: %f - sf: %f - sc: %d",
