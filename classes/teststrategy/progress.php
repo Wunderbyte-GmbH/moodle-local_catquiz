@@ -298,7 +298,10 @@ class progress implements JsonSerializable {
         $instance->playedquestionsbyscale = (array) $data->playedquestionsbyscale;
         $instance->isfirstquestion = $data->isfirstquestion;
         $instance->lastquestion = $data->lastquestion;
-        $instance->lastquestion->fisherinformation = (array) $instance->lastquestion->fisherinformation;
+        if ($instance->playedquestions) {
+            $instance->lastquestion->fisherinformation = (array) $data->lastquestion->fisherinformation;
+        }
+
         $instance->breakend = $data->breakend;
         $instance->activescales = (array) $data->activescales;
         $instance->responses = (array) $data->responses;

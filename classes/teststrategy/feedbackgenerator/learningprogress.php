@@ -596,6 +596,14 @@ class learningprogress extends feedbackgenerator {
             ];
         }
         $startingrecord = reset($records);
+        if (empty($startingrecord->endtime)) {
+            foreach ($records as $record) {
+                if (isset($record->endtime) && !empty($record->endtime)) {
+                    $startingrecord = $record;
+                    break;
+                }
+            }
+        }
         $beginningoftimerange = intval($startingrecord->endtime);
         $timerange = $this->get_timerange_for_attempts($beginningoftimerange, $endtime);
 

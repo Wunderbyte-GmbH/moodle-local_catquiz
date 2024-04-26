@@ -436,9 +436,19 @@ class graphicalsummary extends feedbackgenerator {
         }
         // Get all items of this catscale and catcontext.
         $startingrecord = reset($records);
+        if (empty($startingrecord->endtime)) {
+            foreach ($records as $record) {
+                if (isset($record->endtime) && !empty($record->endtime)) {
+                    $startingrecord = $record;
+                    break;
+                }
+            }
+        }
+        $endtime = empty($data['endtime']) ?
+            intval($data['timestamp']) : intval($data['endtime']);
         $beginningoftimerange = intval($startingrecord->endtime);
-        $timerange = personabilities::get_timerange_for_attempts($beginningoftimerange, $data['endtime']);
-        $attemptsbytimerange = personabilities::order_attempts_by_timerange($records, $primarycatscaleid, $timerange);
+        $timerange = learningprogress::get_timerange_for_attempts($beginningoftimerange, $endtime);
+        $attemptsbytimerange = learningprogress::order_attempts_by_timerange($records, $primarycatscaleid, $timerange);
         $attemptscounterchart = $this->render_attemptscounterchart($attemptsbytimerange);
         $attemptresultstackchart = $this->render_attemptresultstackchart($attemptsbytimerange, $primarycatscaleid, $data);
 

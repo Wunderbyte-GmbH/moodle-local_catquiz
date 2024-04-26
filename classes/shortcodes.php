@@ -102,11 +102,9 @@ class shortcodes {
             try {
                 $feedback = $attemptfeedback->get_feedback_for_attempt() ?? "";
             } catch (\Throwable $t) {
-                return get_string('attemptfeedbacknotavailable', 'local_catquiz');
+                $feedback = get_string('attemptfeedbacknotavailable', 'local_catquiz');
             }
-            if (empty($feedback)) {
-                return get_string('attemptfeedbacknotavailable', 'local_catquiz');
-            }
+
             $timestamp = !empty($record->endtime) ? intval($record->endtime) : intval($record->timemodified);
             $timeofattempt = userdate($timestamp, get_string('strftimedatetime', 'core_langconfig'));
             if ($record->userid == $USER->id) {
