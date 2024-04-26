@@ -929,7 +929,7 @@ class learningprogress extends feedbackgenerator {
         $date = userdate($timestamp, $dateformat);
 
         if ($timerange === LOCAL_CATQUIZ_TIMERANGE_QUARTEROFYEAR) {
-            $date = ceil($date / 3);
+            $date = ceil($date / 3); // Divides the number of the month (4 for april) in order to get the quarter.
             $year = userdate($timestamp, $year);
             return get_string(
                 'stringdate:quarter',
@@ -937,7 +937,7 @@ class learningprogress extends feedbackgenerator {
                 [
                     'q' => $date,
                     'y' => $year,
-                ]); // Divides the number of the month (4 for april) in order to get the quarter.
+                ]);
         } else if ($timerange === LOCAL_CATQUIZ_TIMERANGE_MONTH) {
             return get_string('stringdate:month:' . $date, 'local_catquiz');
         } else {
