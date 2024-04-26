@@ -2001,7 +2001,7 @@ class catquiz {
      *
      * @return array
      */
-    public static function get_number_of_right_answers_by_scale(array $catscaleids, stdClass $attemptrecord): array {
+    public static function get_percentage_of_right_answers_by_scale(array $catscaleids, stdClass $attemptrecord): array {
         $quizdata = json_decode($attemptrecord->json);
         $correctanswersperscale = [];
         foreach ($catscaleids as $catscaleid) {
@@ -2013,6 +2013,7 @@ class catquiz {
             if (empty($questionsperscale)) {
                 continue;
             }
+            $nquestions = count($questionsperscale);
             $playedqids = [];
             foreach ($questionsperscale as $question) {
                 $playedqids[] = $question->componentid;
@@ -2026,7 +2027,12 @@ class catquiz {
                     $correct ++;
                 }
             }
-            $correctanswersperscale[$catscaleid] = $correct;
+            $percentage = round(($correct / $nquestions) * 100);
+            $correctanswersperscale[$catscaleid] = [
+                'correct' => $correct,
+                'total' => $nquestions,
+                'percentage' => $percentage,
+            ];
         }
 
         return $correctanswersperscale;
