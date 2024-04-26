@@ -103,7 +103,11 @@ class customscalefeedback extends feedbackgenerator {
                         $comment = get_string('estimatedbecause:allanswerscorrect', 'local_catquiz');
                         break;
                     case 0 :
-                        $comment = get_string('estimatedbecause:allanswersincorrect', 'local_catquiz');
+                        if (count($this->get_progress()->get_playedquestions()) === 0) {
+                            $comment = get_string('error:nminscale', 'local_catquiz');
+                        } else {
+                            $comment = get_string('estimatedbecause:allanswersincorrect', 'local_catquiz');
+                        }
                         break;
                     default :
                         $comment = get_string('estimatedbecause:default', 'local_catquiz');
