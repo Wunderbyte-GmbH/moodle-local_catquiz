@@ -37,7 +37,7 @@ use SebastianBergmann\RecursionContext\InvalidArgumentException;
  * Tests the feedbackgenerator learningprogress.
  *
  * @package    local_catquiz
- * @author     David Szkiba, Magdalena Holczik
+ * @author     Magdalena Holczik
  * @copyright  2024 Wunderbyte GmbH <info@wunderbyte.at>
  * @license    http =>//www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  *
