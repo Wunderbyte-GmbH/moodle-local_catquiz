@@ -1617,6 +1617,7 @@ class catquiz {
      * @param int $userid
      * @param int $catscaleid
      * @param int $courseid
+     * @param int $testid
      * @param int $contextid
      * @param int $starttime
      * @param int $endtime
