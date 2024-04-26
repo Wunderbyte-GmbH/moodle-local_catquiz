@@ -963,6 +963,111 @@ class strategy_test extends advanced_testcase {
                     'SimB02' => -3.44,
                 ],
             ],
+            'Infer greatest strength with low ability' => [
+                'strategy' => LOCAL_CATQUIZ_STRATEGY_HIGHESTSUB,
+                'questions' => [
+                    ['label' => 'SIMB01-18', 'is_correct_response' => false, 'ability_before' => 0.02, 'ability_after' => 0.02],
+                    ['label' => 'SIMA06-15', 'is_correct_response' => false, 'ability_after' => -0.67],
+                    ['label' => 'SIMA02-02', 'is_correct_response' => false, 'ability_after' => -1.3],
+                    ['label' => 'SIMA02-19', 'is_correct_response' => false, 'ability_after' => -1.86],
+                    ['label' => 'SIMA06-02', 'is_correct_response' => false, 'ability_after' => -2.33],
+                    ['label' => 'SIMA02-17', 'is_correct_response' => false, 'ability_after' => -2.34],
+                    ['label' => 'SIMB02-00', 'is_correct_response' => false, 'ability_after' => -3.06],
+                    ['label' => 'SIMB01-17', 'is_correct_response' => false, 'ability_after' => -3.06],
+                    ['label' => 'SIMB01-12', 'is_correct_response' => false, 'ability_after' => -3.06],
+                    ['label' => 'SIMA02-04', 'is_correct_response' => false, 'ability_after' => -3.06],
+                    ['label' => 'SIMB02-02', 'is_correct_response' => false, 'ability_after' => -3.39],
+                    ['label' => 'SIMB01-13', 'is_correct_response' => false, 'ability_after' => -3.39],
+                    ['label' => 'SIMA06-12', 'is_correct_response' => false, 'ability_after' => -3.39],
+                    ['label' => 'SIMA01-16', 'is_correct_response' => false, 'ability_after' => -3.41],
+                    ['label' => 'SIMA01-00', 'is_correct_response' => false, 'ability_after' => -4.16],
+                    ['label' => 'SIMA01-01', 'is_correct_response' => false, 'ability_after' => -4.84],
+                    ['label' => 'SIMA03-00', 'is_correct_response' => false, 'ability_after' => -5.05],
+                    ['label' => 'SIMA03-08', 'is_correct_response' => false, 'ability_after' => -5.09],
+                    ['label' => 'SIMA01-09', 'is_correct_response' => true,  'ability_after' => -5.13],
+                    ['label' => 'SIMA03-01', 'is_correct_response' => false,'ability_after' => -4.87],
+                    ['label' => 'SIMA03-05', 'is_correct_response' => false, 'ability_after' => -4.91],
+                    ['label' => 'SIMC01-16', 'is_correct_response' => false, 'ability_after' => -4.95],
+                    ['label' => 'SIMA03-06', 'is_correct_response' => false, 'ability_after' => -4.95],
+                    ['label' => 'SIMA01-10', 'is_correct_response' => false, 'ability_after' => -4.96],
+                    ['label' => 'SIMC02-08', 'is_correct_response' => false, 'ability_after' => -4.97],
+                    ['label' => 'FINISH', 'is_correct_response' => null, 'ability_after' => -4.98],
+                ],
+                'initial_ability' => 0.02,
+                'initial_se' => 2.97,
+                'settings' => [
+                    'pp_min_inc' => 0.1,
+                    'maxquestions' => 25,
+                    'maxquestionspersubscale' => 10,
+                ],
+                'final_abilities' => [
+                    'Simulation' => -3.44,
+                    'SimA' => -3.44,
+                    'SimA01' => -3.56,
+                    'SimA02' => -3.45,
+                    'SimA03' => -3.32,
+                    'SimA05' => -3.49,
+                    'SimA06' => -3.44,
+                    'SimB' => -3.44,
+                    'SimB01' => -3.44,
+                    'SimB02' => -3.44,
+                ],
+            ],
+// P000970
+// P000970;1;B01-18;"0,05";"5,95";"1";"0,76 (SE 1,42 bei 1 Fragen mit R/W-Rate 1)";"";"";"";"";"";"";"";"";"0,76 (SE 1,42 bei 1 Fragen mit R/W-Rate 1)";"0,76 (SE 1,42 bei 1 Fragen mit R/W-Rate 1)";"";"";"";"";"";"";"";"";"";"";"";"";"";""
+// P000970;enact;Sim/B;TP+TI:;41,110175452158; >=1
+// P000970;enact;Sim/B/B01;TP+TI:;14,256090342932; >=1
+// P000970;2;B03-10;"0,68";"5,75";"1";"1,32 (SE 1,1 bei 2 Fragen mit R/W-Rate 1)";"";"";"";"";"";"";"";"";"1,32 (SE 1,1 bei 2 Fragen mit R/W-Rate 1)";"";"";"1,31 (SE 1,1 bei 1 Fragen mit R/W-Rate 1)";"";"";"";"";"";"";"";"";"";"";"";""
+// P000970;enact;Sim/B/B03;TP+TI:;31,968214676712; >=1
+// P000970;3;B03-06;"1,34";"5,94";"1";"1,9 (SE 0,91 bei 3 Fragen mit R/W-Rate 1)";"";"";"";"";"";"";"";"";"1,9 (SE 0,91 bei 3 Fragen mit R/W-Rate 1)";"";"";"1,9 (SE 0,91 bei 2 Fragen mit R/W-Rate 1)";"";"";"";"";"";"";"";"";"";"";"";""
+// P000970;4;B02-12;"2,06";"5,24";"1";"2,6 (SE 0,83 bei 4 Fragen mit R/W-Rate 1)";"";"";"";"";"";"";"";"";"2,6 (SE 0,83 bei 4 Fragen mit R/W-Rate 1)";"";"2,6 (SE 0,83 bei 1 Fragen mit R/W-Rate 1)";"";"";"";"";"";"";"";"";"";"";"";"";""
+// P000970;enact;Sim/B/B02;TP+TI:;8,0092228024158; >=1
+// P000970;5;B02-07;"2,61";"4,31";"1";"3,18 (SE 0,83 bei 5 Fragen mit R/W-Rate 1)";"";"";"";"";"";"";"";"";"3,18 (SE 0,83 bei 5 Fragen mit R/W-Rate 1)";"";"3,18 (SE 0,83 bei 2 Fragen mit R/W-Rate 1)";"";"";"";"";"";"";"";"";"";"";"";"";""
+// P000970;6;B01-04;"1,05";"5,22";"1";"3,18 (SE 0,83 bei 6 Fragen mit R/W-Rate 1)";"";"";"";"";"";"";"";"";"3,18 (SE 0,83 bei 6 Fragen mit R/W-Rate 1)";"1,68 (SE 1,03 bei 2 Fragen mit R/W-Rate 1)";"";"";"";"";"";"";"";"";"";"";"";"";"";""
+// P000970;7;B01-01;"1,74";"3,07";"1";"3,2 (SE 0,84 bei 7 Fragen mit R/W-Rate 1)";"";"";"";"";"";"";"";"";"3,2 (SE 0,84 bei 7 Fragen mit R/W-Rate 1)";"2,49 (SE 1,13 bei 3 Fragen mit R/W-Rate 1)";"";"";"";"";"";"";"";"";"";"";"";"";"";""
+// P000970;8;C10-00;"3,33";"5,95";"1";"3,78 (SE 0,66 bei 8 Fragen mit R/W-Rate 1)";"";"";"";"";"";"";"";"";"";"";"";"";"";"3,76 (SE 0,65 bei 1 Fragen mit R/W-Rate 1)";"";"";"";"";"";"";"";"";"";"3,76 (SE 0,65 bei 1 Fragen mit R/W-Rate 1)"
+// P000970;enact;Sim/C;TP+TI:;61,281797389755; >=1
+// P000970;enact;Sim/C/C10;TP+TI:;34,414385114518; >=1
+// P000970;9;C07-08;"3,78";"5,42";"1";"4,23 (SE 0,65 bei 9 Fragen mit R/W-Rate 1)";"";"";"";"";"";"";"";"";"";"";"";"";"";"4,22 (SE 0,65 bei 2 Fragen mit R/W-Rate 1)";"";"";"";"";"";"";"4,21 (SE 0,65 bei 1 Fragen mit R/W-Rate 1)";"";"";""
+// P000970;enact;Sim/C/C07;TP+TI:;16,74653762511; >=1
+// P000970;10;C07-09;"4,02";"5,23";"1";"4,5 (SE 0,63 bei 10 Fragen mit R/W-Rate 1)";"";"";"";"";"";"";"";"";"";"";"";"";"";"4,5 (SE 0,63 bei 3 Fragen mit R/W-Rate 1)";"";"";"";"";"";"";"4,5 (SE 0,63 bei 2 Fragen mit R/W-Rate 1)";"";"";""
+// P000970;drop;Sim;N_scale:;10; >=10
+// P000970;inhere;Sim/A;pp:;5,1308842331384;from:;Sim:;4,499953483169
+// P000970;11;C09-16;"4,54";"5,87";"1";"4,94 (SE 0,58 bei 11 Fragen mit R/W-Rate 1)";"";"";"";"";"";"";"";"";"";"";"";"";"";"4,94 (SE 0,58 bei 4 Fragen mit R/W-Rate 1)";"";"";"";"";"";"";"";"";"4,92 (SE 0,58 bei 1 Fragen mit R/W-Rate 1)";""
+// P000970;enact;Sim/C/C09;TP+TI:;23,754204669252; >=1
+// P000970;12;C09-00;"4,59";"4,36";"1";"5,13 (SE 0,62 bei 12 Fragen mit R/W-Rate 1)";"";"";"";"";"";"";"";"";"";"";"";"";"";"5,13 (SE 0,62 bei 5 Fragen mit R/W-Rate 1)";"";"";"";"";"";"";"";"";"5,12 (SE 0,62 bei 2 Fragen mit R/W-Rate 1)";""
+// P000970;13;C10-15;"3,79";"4,83";"1";"5,13 (SE 0,62 bei 13 Fragen mit R/W-Rate 1)";"";"";"";"";"";"";"";"";"";"";"";"";"";"5,13 (SE 0,62 bei 6 Fragen mit R/W-Rate 1)";"";"";"";"";"";"";"";"";"";"4,26 (SE 0,68 bei 2 Fragen mit R/W-Rate 1)"
+// P000970;14;C10-08;"4,25";"3,88";"1";"5,17 (SE 0,62 bei 14 Fragen mit R/W-Rate 1)";"";"";"";"";"";"";"";"";"";"";"";"";"";"5,17 (SE 0,62 bei 7 Fragen mit R/W-Rate 1)";"";"";"";"";"";"";"";"";"";"4,75 (SE 0,73 bei 3 Fragen mit R/W-Rate 1)"
+// P000970;15;C09-06;"4,65";"3,34";"1";"5,33 (SE 0,67 bei 15 Fragen mit R/W-Rate 1)";"";"";"";"";"";"";"";"";"";"";"";"";"";"5,33 (SE 0,67 bei 8 Fragen mit R/W-Rate 1)";"";"";"";"";"";"";"";"";"5,3 (SE 0,67 bei 3 Fragen mit R/W-Rate 1)";""
+// P000970;16;C09-11;"4,75";"2,23";"1";"5,53 (SE 0,77 bei 16 Fragen mit R/W-Rate 1)";"";"";"";"";"";"";"";"";"";"";"";"";"";"5,53 (SE 0,77 bei 9 Fragen mit R/W-Rate 1)";"";"";"";"";"";"";"";"";"5,51 (SE 0,77 bei 4 Fragen mit R/W-Rate 1)";""
+// P000970;17;C07-04;"3,90";"2,55";"0";"5,05 (SE 0,36 bei 17 Fragen mit R/W-Rate 0,94)";"";"";"";"";"";"";"";"";"";"";"";"";"";"5,05 (SE 0,36 bei 10 Fragen mit R/W-Rate 0,9)";"";"";"";"";"";"";"4,23 (SE 0,34 bei 3 Fragen mit R/W-Rate 0,67)";"";"";""
+// P000970;drop;Sim/C;N_scale:;10; >=10
+// P000970;inhere;Sim/C/C01;pp:;5,4186259581408;from:;Sim/C:;5,0544756049622
+// P000970;inhere;Sim/C/C02;pp:;5,4186259581408;from:;Sim/C:;5,0544756049622
+// P000970;inhere;Sim/C/C03;pp:;5,4186259581408;from:;Sim/C:;5,0544756049622
+// P000970;inhere;Sim/C/C04;pp:;5,4186259581408;from:;Sim/C:;5,0544756049622
+// P000970;inhere;Sim/C/C05;pp:;5,4186259581408;from:;Sim/C:;5,0544756049622
+// P000970;inhere;Sim/C/C06;pp:;5,4186259581408;from:;Sim/C:;5,0544756049622
+// P000970;inhere;Sim/C/C08;pp:;5,4186259581408;from:;Sim/C:;5,0544756049622
+// P000970;deact;Sim/B;TP+TI:;0,37114230383602; <1
+// P000970;deact;Sim/B/B01;TP+TI:;0,046514302866121; <1
+// P000970;enact;Sim/C/C04;TP+TI:;2,0468161296363; >=1
+// P000970;enact;Sim/C/C06;TP+TI:;1,0796789943892; >=1
+// P000970;enact;Sim/C/C08;TP+TI:;8,7324293545496; >=1
+// P000970;18;C08-16;"5,00";"6,00";"0";"4,87 (SE 0,22 bei 18 Fragen mit R/W-Rate 0,89)";"";"";"";"";"";"";"";"";"";"";"";"";"";"4,87 (SE 0,22 bei 11 Fragen mit R/W-Rate 0,82)";"";"";"";"";"";"";"";"4,8 (SE 0,39 bei 1 Fragen mit R/W-Rate 0)";"";""
+// P000970;19;C08-12;"4,76";"5,70";"1";"4,94 (SE 0,2 bei 19 Fragen mit R/W-Rate 0,89)";"";"";"";"";"";"";"";"";"";"";"";"";"";"4,94 (SE 0,2 bei 12 Fragen mit R/W-Rate 0,83)";"";"";"";"";"";"";"";"4,88 (SE 0,26 bei 2 Fragen mit R/W-Rate 0,5)";"";""
+// P000970;drop;Sim/C/C08;se_scale:;0,25684558049124; <=0,35;delta (pp):0,075456292233326; <=0,1
+// P000970;20;C04-15;"4,58";"3,54";"1";"4,97 (SE 0,19 bei 20 Fragen mit R/W-Rate 0,9)";"";"";"";"";"";"";"";"";"";"";"";"";"";"4,97 (SE 0,19 bei 13 Fragen mit R/W-Rate 0,85)";"";"";"";"5 (SE 0,73 bei 1 Fragen mit R/W-Rate 1)";"";"";"";"";"";""
+// P000970;21;C04-00;"4,44";"4,72";"1";"4,98 (SE 0,19 bei 21 Fragen mit R/W-Rate 0,9)";"";"";"";"";"";"";"";"";"";"";"";"";"";"4,98 (SE 0,19 bei 14 Fragen mit R/W-Rate 0,86)";"";"";"";"5,02 (SE 0,57 bei 2 Fragen mit R/W-Rate 1)";"";"";"";"";"";""
+// P000970;22;C04-14;"4,08";"1,97";"1";"4,99 (SE 0,19 bei 22 Fragen mit R/W-Rate 0,91)";"";"";"";"";"";"";"";"";"";"";"";"";"";"4,99 (SE 0,19 bei 15 Fragen mit R/W-Rate 0,87)";"";"";"";"5,04 (SE 0,54 bei 3 Fragen mit R/W-Rate 1)";"";"";"";"";"";""
+// P000970;23;C10-06;"3,87";"2,90";"1";"5 (SE 0,19 bei 23 Fragen mit R/W-Rate 0,91)";"";"";"";"";"";"";"";"";"";"";"";"";"";"5 (SE 0,19 bei 16 Fragen mit R/W-Rate 0,88)";"";"";"";"";"";"";"";"";"";"5,01 (SE 0,97 bei 4 Fragen mit R/W-Rate 1)"
+// P000970;24;C04-18;"4,03";"1,97";"1";"5,01 (SE 0,19 bei 24 Fragen mit R/W-Rate 0,92)";"";"";"";"";"";"";"";"";"";"";"";"";"";"5,01 (SE 0,19 bei 17 Fragen mit R/W-Rate 0,88)";"";"";"";"5,05 (SE 0,53 bei 4 Fragen mit R/W-Rate 1)";"";"";"";"";"";""
+// P000970;25;C09-14;"4,68";"2,49";"0";"4,95 (SE 0,18 bei 25 Fragen mit R/W-Rate 0,88)";"";"";"";"";"";"";"";"";"";"";"";"";"";"4,95 (SE 0,18 bei 18 Fragen mit R/W-Rate 0,83)";"";"";"";"";"";"";"";"";"5,12 (SE 0,39 bei 5 Fragen mit R/W-Rate 0,8)";""
+// P000970;RESULT;;;;pp;4,95;"";"";"";"";"";"";"";"";4,95;4,95;4,95;4,95;"";4,95;"";"";"";5;"";"";4,23;4,88;5,12;4,96
+// ;;;;;se;0,18;"";"";"";"";"";"";"";"";28;44,97;35,79;7481,41;"";0,18;"";"";"";0,49;"";"";0,34;0,26;0,39;0,89
+// ;;;;;frac;0,88;"";"";"";"";"";"";"";"";1;1;1;1;"";0,83;"";"";"";1;"";"";0,67;0,5;0,8;1
+// ;;;;;N;25;"";"";"";"";"";"";"";"";7;3;2;2;"";18;"";"";"";4;"";"";3;2;5;4
+
             // phpcs:disable
             // 'Infer all subscales' => [
             // 'strategy' => LOCAL_CATQUIZ_STRATEGY_ALLSUBS,
