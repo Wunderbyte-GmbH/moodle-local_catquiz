@@ -949,6 +949,7 @@ class strategy_test extends advanced_testcase {
                     'pp_min_inc' => 0.1,
                     'maxquestions' => 25,
                     'maxquestionspersubscale' => 10,
+                    'minquestionspersubscale' => 3,
                 ],
                 'final_abilities' => [
                     'Simulation' => -3.44,
@@ -999,21 +1000,21 @@ class strategy_test extends advanced_testcase {
                     'pp_min_inc' => 0.1,
                     'maxquestions' => 25,
                     'maxquestionspersubscale' => 10,
+                    'minquestionspersubscale' => 3,
                 ],
                 'final_abilities' => [
-                    'Simulation' => -3.44,
-                    'SimA' => -3.44,
-                    'SimA01' => -3.56,
-                    'SimA02' => -3.45,
-                    'SimA03' => -3.32,
-                    'SimA05' => -3.49,
-                    'SimA06' => -3.44,
-                    'SimB' => -3.44,
-                    'SimB01' => -3.44,
-                    'SimB02' => -3.44,
+                    'Simulation' => -4.98,
+                    'SimA' => -4.97,
+                    'SimA01' => -4.81,
+                    'SimA02' => -4.98,
+                    'SimA03' => -5.08,
+                    'SimA06' => -4.98,
+                    'SimB' => -4.98,
+                    'SimB01' => -4.98,
+                    'SimB02' => -4.98,
                 ],
             ],
-            'Infer greatest strength with high ability' => [
+            'Infer greatest strength with high ability P000970' => [
                 'strategy' => LOCAL_CATQUIZ_STRATEGY_HIGHESTSUB,
                 'questions' => [
                     ['label' => 'SIMB01-18', 'is_correct_response' => true, 'ability_before' => 0.02, 'ability_after' => 0.02],
@@ -1049,18 +1050,20 @@ class strategy_test extends advanced_testcase {
                     'pp_min_inc' => 0.1,
                     'maxquestions' => 25,
                     'maxquestionspersubscale' => 10,
+                    'minquestionspersubscale' => 3,
                 ],
                 'final_abilities' => [
                     'Simulation' => 4.95,
-                    'SimA' => -3.44,
-                    'SimA01' => -3.56,
-                    'SimA02' => -3.45,
-                    'SimA03' => -3.32,
-                    'SimA05' => -3.49,
-                    'SimA06' => -3.44,
-                    'SimB' => -3.44,
-                    'SimB01' => -3.44,
-                    'SimB02' => -3.44,
+                    'SimB' => 4.95,
+                    'SimB01' => 4.95,
+                    'SimB02' => 4.95,
+                    'SimB03' => 4.95,
+                    'SimC' => 4.95,
+                    'SimC04' => 5.00,
+                    'SimC07' => 4.23,
+                    'SimC08' => 4.88,
+                    'SimC09' => 5.12,
+                    'SimC10' => 4.96,
                 ],
             ],
             // phpcs:disable
@@ -1203,6 +1206,12 @@ class strategy_test extends advanced_testcase {
     private function createtestenvironment(int $strategyid, array $settings): testenvironment {
         global $DB;
         $catscale = $DB->get_record('local_catquiz_catscales', ['parentid' => 0]);
+
+        // Update allowed min/max ability values for tests.
+        $catscale->minscalevalue = -10.0;
+        $catscale->maxscalevalue = 10.0;
+        $DB->update_record('local_catquiz_catscales', $catscale);
+
         $this->catscaleid = $catscale->id;
         $json = file_get_contents(__DIR__ . '/../fixtures/testenvironment.json');
         $jsondata = json_decode($json);
@@ -1220,6 +1229,7 @@ class strategy_test extends advanced_testcase {
         $jsondata->maxquestionsgroup->catquiz_maxquestions = $settings['maxquestions'] ?? 25;
         $jsondata->maxquestionsgroup->catquiz_minquestions = 0;
         $jsondata->maxquestionsscalegroup->catquiz_maxquestionspersubscale = $settings['maxquestionspersubscale'] ?? 10;
+        $jsondata->maxquestionsscalegroup->catquiz_minquestionspersubscale = $settings['minquestionspersubscale'] ?? 1;
         $jsondata->catquiz_pp_min_inc = $settings['pp_min_inc'] ?? 0.01;
         if ($pilotratio = $settings['pilot_ratio'] ?? null) {
             $jsondata->catquiz_includepilotquestions = true;
