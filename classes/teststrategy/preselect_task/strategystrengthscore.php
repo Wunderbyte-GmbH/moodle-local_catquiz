@@ -30,7 +30,6 @@ use local_catquiz\local\result;
 use local_catquiz\teststrategy\preselect_task;
 use local_catquiz\teststrategy\progress;
 use local_catquiz\wb_middleware;
-use stdClass;
 
 /**
  * Add a score to each question and sort questions descending by score
@@ -86,7 +85,9 @@ final class strategystrengthscore extends preselect_task implements wb_middlewar
                 }
 
                 $scaleability = $this->progress->get_abilities()[$scaleid];
-                $myitems = (new model_responses())->setdata([$context['userid'] => ['component' => $this->progress->get_user_responses()]])->get_items_for_scale($scaleid, $context['contextid']);
+                $myitems = (new model_responses())
+                    ->setdata([$context['userid'] => ['component' => $this->progress->get_user_responses()]])
+                    ->get_items_for_scale($scaleid, $context['contextid']);
                 $standarderrorplayed = catscale::get_standarderror($scaleability, $myitems, INF);
                 $testinfo = $standarderrorplayed === INF ? 0 : 1 / $standarderrorplayed ** 2;
                 $question->processterm = max(0.1, $testinfo) / max(1, $scalecount[$scaleid]);
@@ -103,26 +104,6 @@ final class strategystrengthscore extends preselect_task implements wb_middlewar
 
                 if (! property_exists($question, 'score') || $score > $question->score) {
                     $question->score = $score;
-                }
-                if (
-                getenv('CATQUIZ_CREATE_TESTOUTPUT')
-                && count($this->progress->get_playedquestions()) > 23 
-                && in_array($question->label, ['SIMA03-14', 'SIMC02-08'])
-                ) {
-                        printf(
-                            "%s%14d -> sc: %f - se: %f - pt: %f - st: %f - it: %f - pp: %f - ti: %f - sf: %f - sc: %d",
-                            PHP_EOL,
-                            $scaleid,
-                            $score,
-                            $standarderrorplayed,
-                            $question->processterm,
-                            $question->scaleterm,
-                            $question->itemterm,
-                            $scaleability,
-                            $testinfo,
-                            $scalefractions[$scaleid],
-                            $scalecount[$scaleid]
-                        );
                 }
             }
         }
@@ -153,37 +134,5 @@ final class strategystrengthscore extends preselect_task implements wb_middlewar
             'questions',
             'progress',
         ];
-    }
-
-    /**
-     * Helper function for debugging
-     *
-     * @param string $lastquestionlabel Only print if the last question has that label
-     * @param stdClass $question The current question
-     * @param array $debuglabels Only print output for questions with that label
-     * @param float $testinfo Testinfo for the selected question's scale
-     * @param float $scaleability Ability for the selected question's scale
-     */
-    private function print_debug_info(
-        string $lastquestionlabel,
-        stdClass $question,
-        array $debuglabels,
-        float $testinfo,
-        float $scaleability
-    ) {
-        $lastq = $this->progress->get_last_question();
-        if ($lastq && $lastq->label === $lastquestionlabel) {
-            if (in_array($question->label, $debuglabels)) {
-                printf(
-                    "%s: testinfo: %f, ability: %f, processterm: %f - scaleterm: %f - itemterm: %f\n",
-                    $question->label,
-                    $testinfo,
-                    $scaleability,
-                    $question->processterm,
-                    $question->scaleterm,
-                    $question->itemterm
-                );
-            }
-        }
     }
 }
