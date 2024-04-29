@@ -136,7 +136,7 @@ class inferlowestskillgap extends strategy {
      */
     public function apply_feedbacksettings(feedbacksettings $feedbacksettings) {
 
-        $this->feedbacksettings = $feedbacksettings;
+        $this->feedbacksettings = $feedbacksettings->set_sort_ascending();
     }
 
     /**
