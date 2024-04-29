@@ -24,16 +24,13 @@
 
 namespace local_catquiz\teststrategy\feedbackgenerator;
 
-use cache;
 use html_table;
 use html_writer;
 use local_catquiz\catquiz;
 use local_catquiz\catscale;
-use local_catquiz\feedback\feedbackclass;
 use local_catquiz\teststrategy\feedbackgenerator;
 use local_catquiz\teststrategy\feedbacksettings;
 use local_catquiz\teststrategy\info;
-use local_catquiz\teststrategy\progress;
 
 /**
  * Compare the ability of this attempt to the average abilities of other students that took this test.
