@@ -210,7 +210,6 @@ class personabilities extends feedbackgenerator {
         if ($personabilities === []) {
             return null;
         }
-        $quizsettings = $progress->get_quiz_settings();
         $catscales = $newdata['catscales'];
 
         // Make sure that only feedback defined by strategy is rendered.
@@ -233,7 +232,6 @@ class personabilities extends feedbackgenerator {
             $personabilities[$catscale] = $personability;
             $catscaleobject = catscale::return_catscale_object($catscale);
             $personabilities[$catscale]['name'] = $catscaleobject->name;
-            $cs = new catscale($catscale);
             $personabilities[$catscale]['abilityrange'] = $abiltiyrange;
 
         }
