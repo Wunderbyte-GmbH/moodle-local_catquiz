@@ -273,7 +273,7 @@ class personabilities extends feedbackgenerator {
      */
     private function apply_sorting(array &$personabilities, int $selectedscaleid) {
         // Sort the array and put primary scale first.
-        if ($this->feedbacksettings->sortorder == LOCAL_CATQUIZ_SORTORDER_ASC) {
+        if ($this->feedbacksettings->is_sorted_ascending()) {
             asort($personabilities);
         } else {
             arsort($personabilities);
@@ -578,8 +578,8 @@ class personabilities extends feedbackgenerator {
             ];
         }
 
-        $primarycatscaleid = intval($quizsettings['catquiz_catscales']);
-        $primaryability = $this->get_progress()->get_abilities()[$primarycatscaleid];
+        $primarycatscaleid = intval($primarycatscale['id']);
+        $primaryability = $this->get_progress()->get_abilities()[$quizsettings['catquiz_catscales']];
 
         $chart = new chart_bar();
         $chart->set_horizontal(true);
