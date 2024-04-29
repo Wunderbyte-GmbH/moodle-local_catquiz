@@ -579,19 +579,14 @@ class personabilities extends feedbackgenerator {
                 'charttitle' => '',
             ];
         }
-        $primarycatscaleid = $primarycatscale['id'];
-        $primaryability = 0;
-        // First we get the personability of the primaryscale.
-        foreach ($personabilities as $subscaleid => $abilityarray) {
-            $ability = $abilityarray['value'];
-            if ($subscaleid == $primarycatscaleid) {
-                $primaryability = floatval($ability);
-                break;
-            }
-        }
+
+        $primarycatscaleid = intval($quizsettings['catquiz_catscales']);
+        $primaryability = $this->get_progress()->get_abilities()[$primarycatscaleid];
+
         $chart = new chart_bar();
         $chart->set_horizontal(true);
-        foreach ($personabilities as $subscaleid => $abilityarray) {
+        $this->apply_sorting($personabilities, $primarycatscaleid);
+        foreach ($personabilities as $abilityarray) {
             $subscaleability = (float) $abilityarray['value'];
             $subscalename = $abilityarray['name'];
             $difference = round($subscaleability - $primaryability, 2);
