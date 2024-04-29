@@ -320,7 +320,7 @@ class progress implements JsonSerializable {
         if (!property_exists($data, 'quizsettings')) {
             $attemptjson = $DB->get_record('local_catquiz_attempts', ['attemptid' => $instance->attemptid], 'json')->json;
             $attemptdata = json_decode($attemptjson);
-            $quizsettings = $attemptdata->quizsettings;
+            $quizsettings = $attemptdata->quizsettings ?? false;
             // If not even the attempt has quizsettings, get them from the test table.
             if (!$quizsettings) {
                 $componentid = $DB->get_record('adaptivequiz_attempt', ['id' => $instance->attemptid], 'instance')->instance;
