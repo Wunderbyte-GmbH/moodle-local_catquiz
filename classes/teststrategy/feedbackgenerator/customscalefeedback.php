@@ -65,7 +65,7 @@ class customscalefeedback extends feedbackgenerator {
 
         // Order the feedbacks by their scale ability.
         // If none is given, the feedbacks are displayed in descending order of their ability.
-        if ($feedbacksettings->sortorder == LOCAL_CATQUIZ_SORTORDER_ASC) {
+        if ($feedbacksettings->is_sorted_ascending()) {
             $this->sortfun = fn(&$x) => asort($x);
         } else {
             $this->sortfun = fn(&$x) => arsort($x);

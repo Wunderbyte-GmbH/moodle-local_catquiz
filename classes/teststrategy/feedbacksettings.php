@@ -452,5 +452,32 @@ class feedbacksettings {
 
     }
 
+    /**
+     * Returns if sortorder is set to ascending
+     *
+     * @return bool
+     */
+    public function is_sorted_ascending() {
+        return $this->sortorder === LOCAL_CATQUIZ_SORTORDER_ASC;
+    }
+
+    /**
+     * Returns if sortorder is set to descending
+     *
+     * @return bool
+     */
+    public function is_sorted_descending() {
+        return $this->sortorder === LOCAL_CATQUIZ_SORTORDER_DESC;
+    }
+
+    /**
+     * Set sort order to ascending
+     *
+     * @return self
+     */
+    public function set_sort_ascending() {
+        $this->sortorder = LOCAL_CATQUIZ_SORTORDER_ASC;
+        return $this;
+    }
 }
 

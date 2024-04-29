@@ -261,7 +261,7 @@ class learningprogress extends feedbackgenerator {
      */
     private function apply_sorting(array &$personabilities, int $selectedscaleid) {
         // Sort the array and put primary scale first.
-        if ($this->feedbacksettings->sortorder == LOCAL_CATQUIZ_SORTORDER_ASC) {
+        if ($this->feedbacksettings->is_sorted_ascending()) {
             asort($personabilities);
         } else {
             arsort($personabilities);
