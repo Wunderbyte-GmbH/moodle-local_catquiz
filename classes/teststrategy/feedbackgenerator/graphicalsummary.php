@@ -69,7 +69,11 @@ class graphicalsummary extends feedbackgenerator {
         global $OUTPUT;
 
         if (isset($feedbackdata['graphicalsummary_data'])) {
-            $chart = $this->render_chart($feedbackdata['graphicalsummary_data']);
+            $chart = $this->render_chart(
+                $feedbackdata['graphicalsummary_data'],
+                array_key_first($feedbackdata['graphicalsummary_primaryscale']),
+                $feedbackdata['graphicalsummary_otherscales']
+            );
         }
         if (isset($feedbackdata['graphicalsummary_data'])) {
             $table = $this->render_table($feedbackdata['graphicalsummary_data']);
@@ -194,6 +198,9 @@ class graphicalsummary extends feedbackgenerator {
         }
         $lastquestion = $progress->get_playedquestions()[$lastresponse['qid']];
 
+        $abilitieslist = $this->select_scales_for_report($newdata, $this->feedbacksettings, $existingdata['teststrategy']);
+        $primaryscale = array_filter($abilitieslist, fn ($a) => array_key_exists('primary', $a) && $a['primary'] === true);
+
         // Append the data from the latest response to the existing graphical summary.
         $graphicalsummary = $existingdata['graphicalsummary_data'] ?? [];
         $new = [];
@@ -215,6 +222,10 @@ class graphicalsummary extends feedbackgenerator {
             $existingdata['personabilities'][$existingdata['catscaleid']]['value'] ?? null;
 
         $graphicalsummary[] = $new;
+        $otherscales = $existingdata['graphicalsummary_otherscales'] ?? [];
+        foreach ($this->get_progress()->get_abilities() as $scaleid => $value) {
+            $otherscales[$scaleid][] = $value;
+        }
 
         $teststrategyname = get_string(
             'teststrategy',
@@ -227,6 +238,8 @@ class graphicalsummary extends feedbackgenerator {
             'graphicalsummary_data' => $graphicalsummary,
             'teststrategyname' => $teststrategyname,
             'personabilities' => $progress->get_abilities(),
+            'graphicalsummary_primaryscale' => $primaryscale,
+            'graphicalsummary_otherscales' => $otherscales,
         ];
     }
 
@@ -234,38 +247,19 @@ class graphicalsummary extends feedbackgenerator {
      * Render the moodle charts.
      *
      * @param array $data
+     * @param ?int $primaryscaleid
+     * @param array $otherscales
      *
      * @return string
      */
-    private function render_chart(array $data) {
+    private function render_chart(array $data, ?int $primaryscaleid, array $otherscales) {
         global $OUTPUT;
 
         $chart = new \core\chart_line();
         $chart->set_smooth(true); // Calling set_smooth() passing true as parameter, will display smooth lines.
 
-        $difficulties = array_map(fn($round) => $round['difficulty'] ?? null, $data);
-        $difficultieschart = new \core\chart_series(
-            get_string('difficulty', 'local_catquiz'),
-            $difficulties
-        );
-        $chart->add_series($difficultieschart);
-
-        $fractions = array_map(fn($round) => $round['lastresponse'] ?? null, $data);
-        $fractionschart = new \core\chart_series(
-            get_string('response', 'local_catquiz'),
-            $fractions
-        );
-        $chart->add_series($fractionschart);
-
-        $hasnewabilities = array_key_exists('personability_after', $data[0]) && array_key_exists('personability_before', $data[0]);
+        $hasnewabilities = array_key_exists('personability_after', $data[0]);
         if ($hasnewabilities) {
-            $abilitiesbefore = array_map(fn($round) => $round['personability_before'] ?? null, $data);
-            $abilitiesbeforechart = new \core\chart_series(
-                get_string('abilityintestedscale_before', 'local_catquiz'),
-                $abilitiesbefore
-            );
-            $chart->add_series($abilitiesbeforechart);
-
             $abilitiesafter = array_map(fn($round) => $round['personability_after'] ?? null, $data);
             $abilitiesafterchart = new \core\chart_series(
                 get_string('abilityinglobalscale', 'local_catquiz'),
@@ -281,38 +275,20 @@ class graphicalsummary extends feedbackgenerator {
             $chart->add_series($abilitieschart);
         }
 
-        $fisherinfo = array_map(fn($round) => $round['fisherinformation'] ?? null, $data);
-        $fisherinfochart = new \core\chart_series(
-            get_string('fisherinformation', 'local_catquiz'),
-            $fisherinfo
-        );
-        $chart->add_series($fisherinfochart);
-
-        $diffnextbefore = array_map(fn($round) => $round['difficultynextbefore'] ?? null, $data);
-        $diffnextbeforechart = new \core\chart_series(
-            get_string('difficulty_next_more_difficult', 'local_catquiz'),
-            $diffnextbefore
-        );
-        $chart->add_series($diffnextbeforechart);
-
-        $diffnextafter = array_map(fn($round) => $round['difficultynextafter'] ?? null, $data);
-        $diffnextafterchart = new \core\chart_series(
-            get_string('difficulty_next_easier', 'local_catquiz'),
-            $diffnextafter
-        );
-        $chart->add_series($diffnextafterchart);
-
-        $score = array_map(fn($round) => $round['score'] ?? null, $data);
-        $scorechart = new \core\chart_series(
-            get_string('score', 'local_catquiz'),
-            $score
-        );
-        $chart->add_series($scorechart);
+        if ($primaryscaleid && array_key_exists($primaryscaleid, $otherscales)) {
+            // Fill the missing values from the start with null values.
+            $primaryvalues = array_pad($otherscales[$primaryscaleid], -count($data), null);
+            $primarychart = new \core\chart_series(
+                'primaryvalues',
+                $primaryvalues
+            );
+            $chart->add_series($primarychart);
+        }
 
         if (array_key_exists('id', $data[0])) {
             $chart->set_labels(array_map(fn($round) => $round['id'], $data));
         } else {
-            $chart->set_labels(range(0, count($difficulties) - 1));
+            $chart->set_labels(range(0, count($abilitiesafter) - 1));
         }
 
         return html_writer::tag('div', $OUTPUT->render($chart), ['dir' => 'ltr']);
