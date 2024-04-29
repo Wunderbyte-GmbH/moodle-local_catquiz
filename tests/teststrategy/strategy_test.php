@@ -931,7 +931,7 @@ class strategy_test extends advanced_testcase {
                     ['label' => 'SIMA06-12', 'is_correct_response' => false, 'ability_after'  => -3.39],
                     ['label' => 'SIMA01-16', 'is_correct_response' => true,  'ability_after'  => -3.41],
                     ['label' => 'SIMA01-19', 'is_correct_response' => false, 'ability_after'  => -3.28],
-                    ['label' => 'SIMA01-12', 'is_correct_response' => false, 'ability_after'  => -3.4, ],
+                    ['label' => 'SIMA01-12', 'is_correct_response' => false, 'ability_after'  => -3.40],
                     ['label' => 'SIMA01-13', 'is_correct_response' => true,  'ability_after'  => -3.66],
                     ['label' => 'SIMA03-03', 'is_correct_response' => true,  'ability_after'  => -3.58],
                     ['label' => 'SIMA03-16', 'is_correct_response' => true,  'ability_after'  => -3.5],
