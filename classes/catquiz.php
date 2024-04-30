@@ -1520,7 +1520,7 @@ class catquiz {
         $data->personability_before_attempt = $attemptdata['ability_before_attempt'];
         $data->personability_after_attempt = $attemptdata['progress']->get_abilities()[$attemptdata['catscaleid']] ?? null;
         $data->starttime = $attemptdata['starttime'] ?? null;
-        $data->endtime = $attemptdata['endtime'] ?? time();
+        $data->endtime = $attemptdata['endtime'] ?: time();
 
         $now = time();
         $data->timemodified = $now;

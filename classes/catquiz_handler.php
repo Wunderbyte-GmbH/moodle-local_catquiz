@@ -858,11 +858,13 @@ class catquiz_handler {
         ): string {
         // Update the endtime and number of testitems used in the attempts table.
         global $DB, $COURSE;
+        $cache = cache::make('local_catquiz', 'adaptivequizattempt');
         $id = $DB->get_record('local_catquiz_attempts', ['attemptid' => $attemptrecord->id], 'id')->id;
         $data = (object) [
             'id' => $id,
             'number_of_testitems_used' => $attemptrecord->questionsattempted,
-            'endtime' => time(),
+            'endtime' => $cache->get('endtime'),
+            'timemodified' => time(),
         ];
         $DB->update_record('local_catquiz_attempts', $data);
 
