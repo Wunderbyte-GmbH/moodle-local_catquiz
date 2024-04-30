@@ -26,9 +26,7 @@
 namespace local_catquiz\teststrategy\feedbackgenerator;
 
 use core\chart_bar;
-use core\chart_line;
 use core\chart_series;
-use local_catquiz\catquiz;
 use local_catquiz\catscale;
 use local_catquiz\output\catscalemanager\questions\cards\questionpreview;
 use local_catquiz\teststrategy\feedbackgenerator;
