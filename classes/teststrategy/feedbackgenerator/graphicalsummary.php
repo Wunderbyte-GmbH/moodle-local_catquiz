@@ -275,7 +275,11 @@ class graphicalsummary extends feedbackgenerator {
             $chart->add_series($abilitieschart);
         }
 
-        if ($primaryscaleid && array_key_exists($primaryscaleid, $otherscales)) {
+        $globalscaleid = $this->get_progress()->get_quiz_settings()->catquiz_catscales;
+        $addprimary = $primaryscaleid
+            && array_key_exists($primaryscaleid, $otherscales)
+            && $primaryscaleid != $globalscaleid;
+        if ($addprimary) {
             // Fill the missing values from the start with null values.
             $primaryvalues = array_pad($otherscales[$primaryscaleid], -count($data), null);
             $primarychart = new \core\chart_series(
