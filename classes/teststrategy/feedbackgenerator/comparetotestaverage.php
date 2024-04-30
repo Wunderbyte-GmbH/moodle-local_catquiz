@@ -29,8 +29,6 @@ use local_catquiz\catscale;
 use local_catquiz\feedback\feedbackclass;
 use local_catquiz\teststrategy\feedbackgenerator;
 use local_catquiz\teststrategy\feedbacksettings;
-use local_catquiz\teststrategy\preselect_task\firstquestionselector;
-use local_catquiz\teststrategy\progress;
 
 defined('MOODLE_INTERNAL') || die();
 
