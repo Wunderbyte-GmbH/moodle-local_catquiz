@@ -489,7 +489,7 @@ function xmldb_local_catquiz_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2024041500, 'local', 'catquiz');
     }
 
-    if ($oldversion < 2024042501) {
+    if ($oldversion < 2024043001) {
 
         // Define field quizsettings to be added to local_catquiz_progress.
         $table = new xmldb_table('local_catquiz_progress');
@@ -501,7 +501,7 @@ function xmldb_local_catquiz_upgrade($oldversion) {
         }
 
         // Catquiz savepoint reached.
-        upgrade_plugin_savepoint(true, 2024042501, 'local', 'catquiz');
+        upgrade_plugin_savepoint(true, 2024043001, 'local', 'catquiz');
     }
 
     return true;
