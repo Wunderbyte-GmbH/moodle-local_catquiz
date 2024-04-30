@@ -325,6 +325,8 @@ class feedbacksettings {
                 ) {
                     $feedbackdata['se'][$scaleid] = INF;
                     if ($CFG->debug > 0) {
+                        var_dump($feedbackdata);
+                        var_dump($personabilities);
                         throw new \Exception(sprintf('No standarderror is set for scale %s', $scaleid));
                     }
                 }

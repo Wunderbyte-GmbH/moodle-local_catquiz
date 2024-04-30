@@ -65,16 +65,6 @@ class addscalestandarderror extends preselect_task implements wb_middleware {
         $this->progress = $context['progress'];
         $responses = $this->progress->get_user_responses();
         if (! $responses) {
-            // If we do not yet have a response, use a default value.
-            $default = $context['initial_standarderror'];
-            foreach (array_keys($context['person_ability']) as $scaleid) {
-                // If this value was already set via the firstquestionselector, do not change it here.
-                if (!empty($context['se'][$scaleid])) {
-                    continue;
-                }
-                $context['se'][$scaleid] = $default;
-            }
-
             return $next($context);
         }
 

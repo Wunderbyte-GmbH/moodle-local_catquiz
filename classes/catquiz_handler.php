@@ -1017,6 +1017,7 @@ class catquiz_handler {
                 'contextid',
                 'questions',
                 'pilot_questions',
+                'se',
             ],
             $initialcontext
         );
