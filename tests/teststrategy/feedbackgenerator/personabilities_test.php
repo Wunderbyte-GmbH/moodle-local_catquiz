@@ -68,12 +68,19 @@ class personabilities_test extends advanced_testcase {
         $progressmock = $this->getMockBUilder(progress::class)
             ->onlyMethods([
                 'get_quiz_settings',
+                'get_abilities',
             ])
             ->getMock();
 
         $progressmock
             ->method('get_quiz_settings')
             ->willReturn((object) $feedbackdata['quizsettings']);
+
+        $primaryscaleid = $feedbackdata['primaryscale']['id'];
+        $primaryscalevalue = $feedbackdata['personabilities_abilities'][$primaryscaleid]['value'];
+        $progressmock
+            ->method('get_abilities')
+            ->willReturn([$primaryscaleid => $primaryscalevalue]);
 
         $feedbacksettings = new feedbacksettings(LOCAL_CATQUIZ_STRATEGY_LOWESTSUB);
         $personabilities = $this->getMockBuilder(personabilities::class)
