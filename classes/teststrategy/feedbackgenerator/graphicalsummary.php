@@ -279,7 +279,7 @@ class graphicalsummary extends feedbackgenerator {
             // Fill the missing values from the start with null values.
             $primaryvalues = array_pad($otherscales[$primaryscaleid], -count($data), null);
             $primarychart = new \core\chart_series(
-                'primaryvalues',
+                catscale::return_catscale_object($primaryscaleid)->name,
                 $primaryvalues
             );
             $chart->add_series($primarychart);
