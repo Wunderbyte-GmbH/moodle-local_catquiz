@@ -31,14 +31,51 @@ use local_catquiz\teststrategy\feedbackgenerator\learningprogress;
  */
 class catquizstatistics {
 
+    /**
+     * @var int $parentscaleid
+     */
     private int $parentscaleid;
+
+    /**
+     * @var int $courseid
+     */
     private int $courseid;
+
+    /**
+     * @var int $parentscaleid
+     */
     private int $testid;
+
+    /**
+     * @var ?int $contextid
+     */
     private ?int $contextid;
+
+    /**
+     * @var int $quizsettings
+     */
     private object $quizsettings;
+
+    /**
+     * @var ?int $endtime
+     */
     private ?int $endtime;
+
+    /**
+     * @var array $attemptsbytimerange
+     */
     private array $attemptsbytimerange = [];
 
+    /**
+     * Create a new catquizstatistics object
+     *
+     * @param int $testid
+     * @param ?int $contextid
+     * @param ?int $endtime
+     * @param ?int $parentscaleid
+     *
+     * @return self
+     */
     public function __construct(int $testid, ?int $contextid, ?int $endtime, ?int $parentscaleid) {
         global $DB;
 
@@ -165,6 +202,11 @@ class catquizstatistics {
         ];
     }
 
+    /**
+     * Return attempts for the time range of this object
+     *
+     * @return array
+     */
     private function get_attempts_by_timerange(): array {
         if ($this->attemptsbytimerange) {
             return $this->attemptsbytimerange;

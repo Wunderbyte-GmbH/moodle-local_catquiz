@@ -42,5 +42,5 @@ $shortcodes = [
     'catquizstatistics' => [
         'callback' => 'local_catquiz\shortcodes::catquizstatistics',
         'description' => 'shortcodescatquizstatistics',
-    ]
+    ],
 ];
