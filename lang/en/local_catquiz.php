@@ -629,6 +629,7 @@ $string['shortcodeslistofquizattempts'] = 'Returns a table of quiz attempts.';
 $string['catquizfeedback'] = 'Returns an overview of the last quiz attempts.';
 $string['shortcodescatquizfeedback'] = 'Display feedback for quiz attempts';
 $string['shortcodescatscalesoverview'] = 'Display catscales overview.';
+$string['shortcodescatquizstatistics'] = 'Display statistics for a CAT test';
 
 // Validation.
 $string['valuemustbegreaterzero'] = 'Value must be greater than zero.';

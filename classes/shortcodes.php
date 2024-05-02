@@ -31,6 +31,7 @@ use local_catquiz\output\attemptfeedback;
 use local_catquiz\output\catscalemanager\quizattempts\quizattemptsdisplay;
 use local_catquiz\teststrategy\feedbacksettings;
 use context_course;
+use local_catquiz\output\catquizstatistics;
 
 defined('MOODLE_INTERNAL') || die();
 
@@ -166,5 +167,22 @@ class shortcodes {
         ];
 
         return $OUTPUT->render_from_template('local_catquiz/catscaleshortcodes/catscaleshortcodetable', $data);
+    }
+
+    /**
+     * Prints catquiz statistics.
+     *
+     * @param string $shortcode
+     * @param array $args
+     * @param string|null $content
+     * @param object $env
+     * @param Closure $next
+     * @return string
+     */
+    public static function catquizstatistics($shortcode, $args, $content, $env, $next) {
+        global $OUTPUT;
+        $data = (new catquizstatistics())->export_for_template($OUTPUT);
+
+        return $OUTPUT->render_from_template('local_catquiz/catscaleshortcodes/catscalestatistics', $data);
     }
 }
