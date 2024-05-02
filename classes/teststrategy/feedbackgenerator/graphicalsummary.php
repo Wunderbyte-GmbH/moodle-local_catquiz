@@ -430,47 +430,13 @@ class graphicalsummary extends feedbackgenerator {
         $beginningoftimerange = intval($startingrecord->endtime);
         $timerange = learningprogress::get_timerange_for_attempts($beginningoftimerange, $endtime);
         $attemptsbytimerange = learningprogress::order_attempts_by_timerange($records, $primarycatscaleid, $timerange);
-        $attemptscounterchart = $this->render_attemptscounterchart($attemptsbytimerange);
         $attemptresultstackchart = $this->render_attemptresultstackchart($attemptsbytimerange, $primarycatscaleid, $data);
 
         return [
-            'attemptscounterchart' => $attemptscounterchart,
             'attemptresultstackchart' => $attemptresultstackchart,
             'attemptchartstitle' => get_string('attemptchartstitle', 'local_catquiz', $catscalename),
         ];
 
-    }
-
-    /**
-     * Chart grouping by date and counting attempts.
-     *
-     * @param array $attemptsbytimerange
-     *
-     * @return array
-     */
-    private function render_attemptscounterchart(array $attemptsbytimerange) {
-        global $OUTPUT;
-        $counter = [];
-        $labels = [];
-        foreach ($attemptsbytimerange as $timestamp => $attempts) {
-            $counter[] = count($attempts);
-            $labels[] = (string)$timestamp;
-        }
-        $chart = new \core\chart_line();
-        $chart->set_smooth(true);
-
-        $series = new \core\chart_series(
-            get_string('numberofattempts', 'local_catquiz'),
-            $counter
-        );
-        $chart->add_series($series);
-        $chart->set_labels($labels);
-        $out = $OUTPUT->render($chart);
-
-        return [
-            'chart' => $out,
-            'charttitle' => get_string('numberofattempts', 'local_catquiz'),
-        ];
     }
 
     /**

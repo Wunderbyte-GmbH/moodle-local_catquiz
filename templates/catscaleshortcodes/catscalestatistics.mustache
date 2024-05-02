@@ -24,4 +24,9 @@
         "chart": "<div>...chart...</div>"
     }
 }}
-{{{chart}}}
+{{#error}}
+    {{error}}
+{{/error}}
+{{^error}}
+    {{{chart}}}
+{{/error}}

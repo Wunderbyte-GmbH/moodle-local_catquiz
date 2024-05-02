@@ -181,7 +181,26 @@ class shortcodes {
      */
     public static function catquizstatistics($shortcode, $args, $content, $env, $next) {
         global $OUTPUT;
-        $data = (new catquizstatistics())->export_for_template($OUTPUT);
+        if (!array_key_exists('catscaleid', $args)) {
+            return $OUTPUT->render_from_template(
+                'local_catquiz/catscaleshortcodes/catscalestatistics',
+                ['error' => 'Please provide the catscaleid Parameter']
+            );
+        }
+
+        $catscaleid = $args['catscaleid'];
+        $courseid = $args['courseid'] ?? null;
+        $testid = $args['testid'] ?? null;
+        $contextid = $args['contextid'] ?? null;
+        $endtime = $args['endtime'] ?? null;
+        $catquizstatistics = new catquizstatistics();
+        $data = $catquizstatistics->render_attemptscounterchart(
+            $catscaleid,
+            $courseid,
+            $testid,
+            $contextid,
+            $endtime
+        );
 
         return $OUTPUT->render_from_template('local_catquiz/catscaleshortcodes/catscalestatistics', $data);
     }
