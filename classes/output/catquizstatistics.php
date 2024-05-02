@@ -16,8 +16,8 @@
 
 namespace local_catquiz\output;
 
-use templatable;
-use renderable;
+use local_catquiz\catquiz;
+use local_catquiz\teststrategy\feedbackgenerator\learningprogress;
 
 /**
  * Renderable class for the catquizstatistics shortcode
@@ -27,19 +27,64 @@ use renderable;
  * @author     David Bogner
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class catquizstatistics implements renderable, templatable {
+class catquizstatistics {
 
     /**
-     * Return the chart
+     * Chart grouping by date and counting attempts.
      *
-     * @param \renderer_base $output
+     * @param array $attemptsbytimerange
      *
      * @return array
-     *
      */
-    public function export_for_template(\renderer_base $output): array {
+    public function render_attemptscounterchart($catscaleid, ?int $courseid, ?int $testid, ?int $contextid, ?int $endtime = null) {
+        global $OUTPUT;
+
+        $records = catquiz::get_attempts(
+            null,
+            $catscaleid,
+            $courseid,
+            $testid,
+            $contextid,
+            null,
+            null);
+        if (count($records) < 2) {
+            return [];
+        }
+        // Get all items of this catscale and catcontext.
+        $startingrecord = reset($records);
+        if (empty($startingrecord->endtime)) {
+            foreach ($records as $record) {
+                if (isset($record->endtime) && !empty($record->endtime)) {
+                    $startingrecord = $record;
+                    break;
+                }
+            }
+        }
+
+        $endtime = $endtime ?? time();
+        $beginningoftimerange = intval($startingrecord->endtime);
+        $timerange = learningprogress::get_timerange_for_attempts($beginningoftimerange, $endtime);
+        $attemptsbytimerange = learningprogress::order_attempts_by_timerange($records, $catscaleid, $timerange);
+        $counter = [];
+        $labels = [];
+        foreach ($attemptsbytimerange as $timestamp => $attempts) {
+            $counter[] = count($attempts);
+            $labels[] = (string)$timestamp;
+        }
+        $chart = new \core\chart_line();
+        $chart->set_smooth(true);
+
+        $series = new \core\chart_series(
+            get_string('numberofattempts', 'local_catquiz'),
+            $counter
+        );
+        $chart->add_series($series);
+        $chart->set_labels($labels);
+        $out = $OUTPUT->render($chart);
+
         return [
-            'chart' => '<div>Test 2</div>',
+            'chart' => $out,
+            'charttitle' => get_string('numberofattempts', 'local_catquiz'),
         ];
     }
 }
