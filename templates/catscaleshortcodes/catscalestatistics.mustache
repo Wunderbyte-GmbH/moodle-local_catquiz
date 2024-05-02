@@ -28,5 +28,11 @@
     {{error}}
 {{/error}}
 {{^error}}
-    {{{chart}}}
+    <h2>{{charttitle}}</h2>
+    {{#numberchart}}
+        <div>{{{chart}}}</div>
+    {{/numberchart}}
+    {{#stackchart}}
+        <div>{{{chart}}}</div>
+    {{/stackchart}}
 {{/error}}

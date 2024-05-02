@@ -26,7 +26,6 @@ namespace local_catquiz\teststrategy\feedbackgenerator;
 
 use html_table;
 use html_writer;
-use local_catquiz\catquiz;
 use local_catquiz\catscale;
 use local_catquiz\teststrategy\feedbackgenerator;
 use local_catquiz\teststrategy\feedbacksettings;
@@ -83,22 +82,9 @@ class graphicalsummary extends feedbackgenerator {
             $table = $this->render_table($feedbackdata['graphicalsummary_data']);
         }
 
-        $catscaleid = $feedbackdata['catscaleid'];
-
-        $catscale = catscale::return_catscale_object($catscaleid);
-
-        $participationcharts = $this->render_participationcharts(
-            $feedbackdata,
-            $catscaleid,
-            $feedbackdata['catscaleid'],
-            $catscale->name);
-
         $data['chart'] = $chart ?? "";
         $data['strategyname'] = $feedbackdata['teststrategyname'] ?? "";
         $data['table'] = $table ?? "";
-
-        $data['attemptscounterchart'] = $participationcharts['attemptscounterchart']['chart'] ?? "";
-        $data['attemptresultstackchart'] = $participationcharts['attemptresultstackchart']['chart'] ?? "";
 
         $feedback = $OUTPUT->render_from_template(
             'local_catquiz/feedback/graphicalsummary',
@@ -349,168 +335,5 @@ class graphicalsummary extends feedbackgenerator {
         }
         $table->data = $tabledata;
         return html_writer::table($table);
-    }
-
-    /**
-     * Returns the next-more-difficult and next-easier questions surounding the
-     * selected question.
-     *
-     * @param mixed $selectedquestion
-     * @param array $questionpool
-     * @param string $property Sort by this property before finding the neighbor questions.
-     * @return array
-     */
-    private function getneighborquestions($selectedquestion, $questionpool, $property = "difficulty") {
-        uasort($questionpool, fn($q1, $q2) => $q1->$property <=> $q2->$property);
-        if (count($questionpool) === 1) {
-            return [reset($questionpool), reset($questionpool)];
-        }
-
-        // We find the position of the selected question within the
-        // $property-sorted question list, so that we can find the
-        // neighboring questions.
-        $pos = array_search($selectedquestion->id, array_keys($questionpool));
-
-        $afterindex = $pos === count($questionpool) - 1 ? $pos : $pos + 1;
-        [$after] = array_slice($questionpool, $afterindex, 1);
-
-        $beforeindex = $pos === 0 ? 0 : $pos - 1;
-        [$before] = array_slice($questionpool, $beforeindex, 1);
-
-        return [$before, $after];
-    }
-
-
-    /**
-     * Render the charts with data about participation by day.
-     *
-     * @param array $data
-     * @param int $primarycatscaleid
-     * @param int $parentscaleid
-     * @param string $catscalename
-     * @param int $contextid
-     *
-     * @return array
-     */
-    private function render_participationcharts(
-        array $data,
-        int $primarycatscaleid,
-        int $parentscaleid,
-        string $catscalename,
-        int $contextid = 0) {
-
-        // In case you want to make context a changeable param of feedbacksettings, apply logic here.
-        if (empty($contextid)) {
-            $contextid = $data['contextid'];
-        }
-
-        $records = catquiz::get_attempts(
-            null,
-            $parentscaleid,
-            $data['courseid'],
-            $data['testid'],
-            $contextid,
-            null,
-            null);
-        if (count($records) < 2) {
-            return [];
-        }
-        // Get all items of this catscale and catcontext.
-        $startingrecord = reset($records);
-        if (empty($startingrecord->endtime)) {
-            foreach ($records as $record) {
-                if (isset($record->endtime) && !empty($record->endtime)) {
-                    $startingrecord = $record;
-                    break;
-                }
-            }
-        }
-        $endtime = empty($data['endtime']) ?
-            intval($data['timestamp']) : intval($data['endtime']);
-        $beginningoftimerange = intval($startingrecord->endtime);
-        $timerange = learningprogress::get_timerange_for_attempts($beginningoftimerange, $endtime);
-        $attemptsbytimerange = learningprogress::order_attempts_by_timerange($records, $primarycatscaleid, $timerange);
-        $attemptresultstackchart = $this->render_attemptresultstackchart($attemptsbytimerange, $primarycatscaleid, $data);
-
-        return [
-            'attemptresultstackchart' => $attemptresultstackchart,
-            'attemptchartstitle' => get_string('attemptchartstitle', 'local_catquiz', $catscalename),
-        ];
-
-    }
-
-    /**
-     * Chart grouping by date showing attempt results.
-     *
-     * @param array $attemptsbytimerange
-     * @param int $catscaleid
-     * @param array $attemptdata
-     *
-     * @return array
-     */
-    private function render_attemptresultstackchart(array $attemptsbytimerange, int $catscaleid, array $attemptdata) {
-        global $OUTPUT;
-        $series = [];
-        $labels = [];
-        $quizsettings = $this->get_progress()->get_quiz_settings();
-
-        foreach ($attemptsbytimerange as $timestamp => $attempts) {
-            $labels[] = (string)$timestamp;
-            foreach ($attempts as $attempt) {
-                if (is_object($attempt)) {
-                    // This is to stay backwards compatible.
-                    $attempt = (float) $attempt->value;
-                }
-                $color = $this->get_color_for_personability((array)$quizsettings, $attempt, $catscaleid);
-
-                if (!isset($series[$timestamp][$color])) {
-                        $series[$timestamp][$color] = 1;
-                } else {
-                        $series[$timestamp][$color] += 1;
-                }
-            }
-        }
-
-        $chart = new \core\chart_bar();
-        $chart->set_stacked(true);
-
-        $colorsarray = $this->feedbacksettings->get_defined_feedbackcolors_for_scale((array)$quizsettings, $catscaleid);
-
-        foreach ($colorsarray as $colorcode => $rangesarray) {
-            $serie = [];
-            foreach ($series as $timestamp => $cc) {
-                $valuefound = false;
-                foreach ($cc as $cc => $elementscounter) {
-                    if ($colorcode != $cc) {
-                        continue;
-                    }
-                    $valuefound = true;
-                    $serie[] = $elementscounter;
-                }
-                if (!$valuefound) {
-                    $serie[] = 0;
-                }
-            }
-            $rangestart = $rangesarray['rangestart'];
-            $rangeend = $rangesarray['rangeend'];
-            $labelstring = get_string(
-                'personabilityrangestring',
-                'local_catquiz',
-                ['rangestart' => $rangestart, 'rangeend' => $rangeend]);
-            $s = new \core\chart_series(
-                $labelstring,
-                $serie
-            );
-            $s->set_colors([0 => $colorcode]);
-            $chart->add_series($s);
-        }
-
-        $chart->set_labels($labels);
-        $out = $OUTPUT->render($chart);
-
-        return [
-            'chart' => $out,
-            'charttitle' => get_string('numberofattempts', 'local_catquiz'),
-        ];
     }
 }
