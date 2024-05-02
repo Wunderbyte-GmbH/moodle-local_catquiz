@@ -31,6 +31,7 @@ use local_catquiz\output\attemptfeedback;
 use local_catquiz\output\catscalemanager\quizattempts\quizattemptsdisplay;
 use local_catquiz\teststrategy\feedbacksettings;
 use context_course;
+use dml_missing_record_exception;
 use local_catquiz\output\catquizstatistics;
 
 defined('MOODLE_INTERNAL') || die();
@@ -181,26 +182,42 @@ class shortcodes {
      */
     public static function catquizstatistics($shortcode, $args, $content, $env, $next) {
         global $OUTPUT;
-        if (!array_key_exists('catscaleid', $args)) {
+
+        $missing = [];
+        $required = ['testid', 'parentscaleid'];
+        foreach ($required as $req) {
+            if (!array_key_exists($req, $args)) {
+                $missing[] = $req;
+            }
+        }
+
+        if ($missing) {
+            $message = sprintf('Please provide the following shortcode parameters: %s', implode(', ', $missing));
             return $OUTPUT->render_from_template(
                 'local_catquiz/catscaleshortcodes/catscalestatistics',
-                ['error' => 'Please provide the catscaleid Parameter']
+                ['error' => $message]
             );
         }
 
-        $catscaleid = $args['catscaleid'];
-        $courseid = $args['courseid'] ?? null;
-        $testid = $args['testid'] ?? null;
+        $catscaleid = $args['parentscaleid'];
+        $testid = $args['testid'];
         $contextid = $args['contextid'] ?? null;
         $endtime = $args['endtime'] ?? null;
-        $catquizstatistics = new catquizstatistics();
-        $data = $catquizstatistics->render_attemptscounterchart(
-            $catscaleid,
-            $courseid,
-            $testid,
-            $contextid,
-            $endtime
-        );
+
+        try {
+            $catquizstatistics = new catquizstatistics($testid, $contextid, $endtime, $catscaleid);
+        } catch (dml_missing_record_exception $e) {
+            return $OUTPUT->render_from_template(
+                'local_catquiz/catscaleshortcodes/catscalestatistics',
+                ['error' => 'Can not find a test with the given testid']
+            );
+        }
+
+        $data = [
+            'charttitle' => get_string('numberofattempts', 'local_catquiz'),
+            'numberchart' => $catquizstatistics->render_attemptscounterchart(),
+            'stackchart' => $catquizstatistics->render_attemptresultstackchart($catscaleid),
+        ];
 
         return $OUTPUT->render_from_template('local_catquiz/catscaleshortcodes/catscalestatistics', $data);
     }

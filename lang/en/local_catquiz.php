@@ -630,6 +630,7 @@ $string['catquizfeedback'] = 'Returns an overview of the last quiz attempts.';
 $string['shortcodescatquizfeedback'] = 'Display feedback for quiz attempts';
 $string['shortcodescatscalesoverview'] = 'Display catscales overview.';
 $string['shortcodescatquizstatistics'] = 'Display statistics for a CAT test';
+$string['catquizstatisticsnodata'] = 'No attempt data available for the given settings';
 
 // Validation.
 $string['valuemustbegreaterzero'] = 'Value must be greater than zero.';

@@ -235,9 +235,9 @@ abstract class feedbackgenerator {
      * @return string
      *
      */
-    public function get_color_for_personability(array $quizsettings, float $personability, int $catscaleid): string {
+    public static function get_color_for_personability(array $quizsettings, float $personability, int $catscaleid): string {
         $default = LOCAL_CATQUIZ_DEFAULT_GREY;
-        $abilityrange = $this->get_ability_range($catscaleid);
+        $abilityrange = self::get_ability_range($catscaleid);
         if (!$quizsettings ||
             $personability < (float) $abilityrange['minscalevalue'] ||
             $personability > (float) $abilityrange['maxscalevalue']) {
@@ -271,7 +271,7 @@ abstract class feedbackgenerator {
      * @return array
      *
      */
-    public function get_ability_range($catscaleid): array {
+    public static function get_ability_range($catscaleid): array {
         $cs = new catscale($catscaleid);
         // Ability range is the same for all scales with same root scale.
         return $cs->get_ability_range();
