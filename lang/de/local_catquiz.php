@@ -628,6 +628,7 @@ $string['shortcodeslistofquizattempts'] = 'Gibt eine Tabelle mit Testversuchen z
 $string['catquizfeedback'] = 'Zeigt eine Übersicht zu den letzten Testversuchen.';
 $string['shortcodescatquizfeedback'] = 'Zeige Feedback zu Versuchen an.';
 $string['shortcodescatscalesoverview'] = 'Zeige Übersicht zu CAT-Skalen an.';
+$string['shortcodescatquizstatistics'] = 'Zeige Statistiken zu einem CAT Test an';
 
 // Validation.
 $string['valuemustbegreaterzero'] = 'Wert muss höher als 0 sein.';
