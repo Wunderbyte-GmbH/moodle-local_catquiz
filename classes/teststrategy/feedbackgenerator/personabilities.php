@@ -423,92 +423,6 @@ class personabilities extends feedbackgenerator {
      * @return array
      *
      */
-    private function fill_empty_values_with_average(array $attemptswithnulls) {
-        $result = [];
-
-        $keys = array_keys($attemptswithnulls);
-
-        foreach ($keys as $key) {
-            // If the current value is null.
-            if ($attemptswithnulls[$key] === null) {
-                $neighborvalues = $this->find_non_nullable_value($keys, $attemptswithnulls, $key);
-                $prevvalue = $neighborvalues['prevvalue'];
-                $nextvalue = $neighborvalues['nextvalue'];
-
-                $average = null;
-                if ($prevvalue !== null && $nextvalue !== null) {
-                    $average = ($prevvalue + $nextvalue) / 2;
-                } else if ($prevvalue !== null) {
-                    $average = $prevvalue;
-                } else if ($nextvalue !== null) {
-                    $average = $nextvalue;
-                }
-
-                // Replace the null value with the calculated average.
-                $result[$key] = $average;
-            } else {
-                // If the current value is not null, keep it unchanged.
-                $result[$key] = $attemptswithnulls[$key];
-            }
-        }
-        return $result;
-
-    }
-
-    /**
-     * Return average of personabilities ordered by date of quizattempt.
-     *
-     * @param array $keys
-     * @param array $attemptswithnulls
-     * @param string $key
-     *
-     * @return array
-     *
-     */
-    private function find_non_nullable_value(array $keys, array $attemptswithnulls, string $key) {
-
-        if (!empty($attemptswithnulls[$key])) {
-            return $attemptswithnulls[$key];
-        }
-        $prevkey = null;
-        $nextkey = null;
-        $stop = false;
-        foreach ($keys as $k) {
-            if (!empty($attemptswithnulls[$k])) {
-                $pk = $k;
-            }
-            if ($key == $k) {
-                $prevkey = $pk ?? null;
-                $stop = true;
-                continue;
-            }
-            if ($stop) {
-                $nextkey = $k;
-                break;
-            }
-        }
-
-        return [
-            'prevvalue' => $attemptswithnulls[$prevkey] ?? null,
-            'nextvalue' => $attemptswithnulls[$nextkey] ?? null,
-        ];
-    }
-
-    /**
-     * Assign average of result for each period.
-     * @param array $attemptsbytimerange
-     *
-     * @return array
-     */
-    private function assign_average_result_to_timerange(array $attemptsbytimerange) {
-        // Calculate average personability of this period.
-        foreach ($attemptsbytimerange as $date => $attempt) {
-            $floats = array_map('floatval', $attempt);
-            $average = count($floats) > 0 ? array_sum($floats) / count($floats) : $attempt;
-            $attemptsbytimerange[$date] = $average;
-        }
-        return $attemptsbytimerange;
-    }
 
     /**
      * Render chart for personabilities.
@@ -567,18 +481,5 @@ class personabilities extends feedbackgenerator {
             'charttitle' => get_string('personabilitycharttitle', 'local_catquiz', $primarycatscale['name']),
         ];
 
-    }
-
-    /**
-     * Renders preview of testitem (question).
-     *
-     * @param object $record
-     *
-     * @return array
-     *
-     */
-    private function render_questionpreview(object $record) {
-        $questionpreview = new questionpreview($record);
-        return $questionpreview->render_questionpreview();
     }
 }
