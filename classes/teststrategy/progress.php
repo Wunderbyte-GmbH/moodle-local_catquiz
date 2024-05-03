@@ -317,7 +317,7 @@ class progress implements JsonSerializable {
         $instance->starttime = $data->starttime;
 
         // Fallback for old attempts that did not store the quizsettings: use the current ones.
-        if (!property_exists($object, 'quizsettings')) {
+        if (!property_exists($object, 'quizsettings') || $object->quizsettings === null) {
             $attemptjson = $DB->get_record('local_catquiz_attempts', ['attemptid' => $instance->attemptid], 'json')->json;
             $attemptdata = json_decode($attemptjson);
             $quizsettings = $attemptdata->quizsettings ?? false;
