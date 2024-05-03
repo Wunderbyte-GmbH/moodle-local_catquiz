@@ -28,11 +28,8 @@ namespace local_catquiz\teststrategy\feedbackgenerator;
 use core\chart_bar;
 use core\chart_series;
 use local_catquiz\catscale;
-use local_catquiz\output\catscalemanager\questions\cards\questionpreview;
 use local_catquiz\teststrategy\feedbackgenerator;
-use local_catquiz\teststrategy\feedbacksettings;
 use local_catquiz\local\model\model_strategy;
-use stdClass;
 
 defined('MOODLE_INTERNAL') || die();
 
@@ -50,29 +47,9 @@ class personabilities extends feedbackgenerator {
 
     /**
      *
-     * @var stdClass $feedbacksettings.
-     */
-    public feedbacksettings $feedbacksettings;
-
-    /**
-     *
      * @var int $primaryscaleid // The scale to be displayed in detail in the colorbar.
      */
     public int $primaryscaleid;
-
-    /**
-     * Creates a new personabilities feedback generator.
-     *
-     * @param feedbacksettings $feedbacksettings
-     */
-    public function __construct(feedbacksettings $feedbacksettings) {
-
-        if (!isset($feedbacksettings)) {
-            return;
-        }
-
-        $this->feedbacksettings = $feedbacksettings;
-    }
 
     /**
      * For specific feedbackdata defined in generators.
@@ -214,7 +191,7 @@ class personabilities extends feedbackgenerator {
 
         $personabilities = [];
         // Ability range is the same for all scales with same root scale.
-        $abiltiyrange = $this->get_ability_range(array_key_first($catscales));
+        $abiltiyrange = $this->feedbackhelper->get_ability_range(array_key_first($catscales));
         foreach ($personabilitiesfeedbackeditor as $catscale => $personability) {
             if (isset($personability['excluded']) && $personability['excluded']) {
                 continue;
@@ -465,7 +442,7 @@ class personabilities extends feedbackgenerator {
                 ]);
             $series->set_labels([0 => $stringforchartlegend]);
 
-            $colorvalue = $this->get_color_for_personability(
+            $colorvalue = $this->feedbackhelper->get_color_for_personability(
                 $quizsettings,
                 floatval($subscaleability),
                 intval($primarycatscaleid)

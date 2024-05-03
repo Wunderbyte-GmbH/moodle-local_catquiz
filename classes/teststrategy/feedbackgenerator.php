@@ -65,6 +65,13 @@ abstract class feedbackgenerator {
      */
     private ?progress $progress = null;
 
+    protected feedbacksettings $feedbacksettings;
+    protected feedback_helper $feedbackhelper;
+
+    public function __construct(feedbacksettings $feedbacksettings, feedback_helper $feedbackhelper) {
+        $this->feedbacksettings = $feedbacksettings;
+        $this->feedbackhelper = $feedbackhelper;
+    }
     /**
      * Returns the progress for the current attempt, component and contextid.
      *
@@ -224,57 +231,6 @@ abstract class feedbackgenerator {
             $transformedpersonabilities,
             $newdata
         );
-    }
-
-    /**
-     * Write information about colorgradient for colorbar.
-     *
-     * @param array $quizsettings
-     * @param float $personability
-     * @param int $catscaleid
-     * @return string
-     *
-     */
-    public static function get_color_for_personability(array $quizsettings, float $personability, int $catscaleid): string {
-        $default = LOCAL_CATQUIZ_DEFAULT_GREY;
-        $abilityrange = self::get_ability_range($catscaleid);
-        if (!$quizsettings ||
-            $personability < (float) $abilityrange['minscalevalue'] ||
-            $personability > (float) $abilityrange['maxscalevalue']) {
-            return $default;
-        }
-        $numberoffeedbackoptions = intval($quizsettings['numberoffeedbackoptionsselect'])
-            ?? LOCAL_CATQUIZ_MAX_SCALERANGE;
-        $colorarray = feedbackclass::get_array_of_colors($numberoffeedbackoptions);
-
-        for ($i = 1; $i <= $numberoffeedbackoptions; $i++) {
-            $rangestartkey = "feedback_scaleid_limit_lower_" . $catscaleid . "_" . $i;
-            $rangeendkey = "feedback_scaleid_limit_upper_" . $catscaleid . "_" . $i;
-            $rangestart = floatval($quizsettings[$rangestartkey]);
-            $rangeend = floatval($quizsettings[$rangeendkey]);
-
-            if ($personability >= $rangestart && $personability <= $rangeend) {
-                $colorkey = 'wb_colourpicker_' . $catscaleid . '_' . $i;
-                $colorname = $quizsettings[$colorkey];
-                return $colorarray[$colorname];
-            }
-
-        }
-        return $default;
-    }
-
-    /**
-     * For testing this is called in seperate function.
-     *
-     * @param mixed $catscaleid
-     *
-     * @return array
-     *
-     */
-    public static function get_ability_range($catscaleid): array {
-        $cs = new catscale($catscaleid);
-        // Ability range is the same for all scales with same root scale.
-        return $cs->get_ability_range();
     }
 
     /**
