@@ -65,7 +65,14 @@ abstract class feedbackgenerator {
      */
     private ?progress $progress = null;
 
+    /**
+     * @var feedbacksettings
+     */
     protected feedbacksettings $feedbacksettings;
+
+    /**
+     * @var feedback_helper
+     */
     protected feedback_helper $feedbackhelper;
 
     public function __construct(feedbacksettings $feedbacksettings, feedback_helper $feedbackhelper) {
