@@ -26,6 +26,7 @@
 namespace local_catquiz;
 
 use advanced_testcase;
+use local_catquiz\teststrategy\feedback_helper;
 use local_catquiz\teststrategy\feedbackgenerator\learningprogress;
 use local_catquiz\teststrategy\feedbackgenerator\personabilities;
 use local_catquiz\teststrategy\feedbacksettings;
@@ -62,7 +63,8 @@ class learningprogress_test extends advanced_testcase {
         int $timestamp,
         string $expected) {
         $feedbacksettings = new feedbacksettings(LOCAL_CATQUIZ_STRATEGY_LOWESTSUB);
-        $learningprogress = new learningprogress($feedbacksettings);
+        $feedbackhelper = new feedback_helper();
+        $learningprogress = new learningprogress($feedbacksettings, $feedbackhelper);
 
         $datestringlabel = $learningprogress->return_datestring_label($timerange, $timestamp);
 

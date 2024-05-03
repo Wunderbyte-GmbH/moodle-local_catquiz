@@ -41,22 +41,6 @@ use local_catquiz\teststrategy\info;
 class graphicalsummary extends feedbackgenerator {
 
     /**
-     *
-     * @var stdClass $feedbacksettings.
-     */
-    public feedbacksettings $feedbacksettings;
-
-    /**
-     * Creates a new customscale feedback generator.
-     *
-     * @param feedbacksettings $feedbacksettings
-     */
-    public function __construct(feedbacksettings $feedbacksettings) {
-
-        $this->feedbacksettings = $feedbacksettings;
-    }
-
-    /**
      * Get student feedback.
      *
      * @param array $feedbackdata

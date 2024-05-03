@@ -28,7 +28,6 @@ use cache;
 use context_system;
 use local_catquiz\catquiz;
 use local_catquiz\teststrategy\feedbackgenerator;
-use local_catquiz\teststrategy\feedbacksettings;
 use local_catquiz\teststrategy\info;
 
 /**
@@ -39,22 +38,6 @@ use local_catquiz\teststrategy\info;
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class debuginfo extends feedbackgenerator {
-
-    /**
-     *
-     * @var stdClass $feedbacksettings.
-     */
-    public feedbacksettings $feedbacksettings;
-
-    /**
-     * Creates a new customscale feedback generator.
-     *
-     * @param feedbacksettings $feedbacksettings
-     */
-    public function __construct(feedbacksettings $feedbacksettings) {
-
-        $this->feedbacksettings = $feedbacksettings;
-    }
 
     /**
      * Get student feedback.

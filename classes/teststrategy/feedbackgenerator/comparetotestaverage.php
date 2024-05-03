@@ -51,27 +51,11 @@ class comparetotestaverage extends feedbackgenerator {
     public int $primaryscaleid;
 
     /**
-     *
-     * @var stdClass $feedbacksettings.
-     */
-    public feedbacksettings $feedbacksettings;
-
-    /**
      * We only show a graph if we have results for at least that many users.
      *
      * @var int
      */
     const MIN_USERS = 3;
-
-    /**
-     * Creates a new customscale feedback generator.
-     *
-     * @param feedbacksettings $feedbacksettings
-     */
-    public function __construct(feedbacksettings $feedbacksettings) {
-
-        $this->feedbacksettings = $feedbacksettings;
-    }
 
     /**
      * Get student feedback.

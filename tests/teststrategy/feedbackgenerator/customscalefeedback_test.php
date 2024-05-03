@@ -26,6 +26,7 @@
 namespace local_catquiz;
 
 use basic_testcase;
+use local_catquiz\teststrategy\feedback_helper;
 use local_catquiz\teststrategy\feedbackgenerator\customscalefeedback;
 use local_catquiz\teststrategy\feedbacksettings;
 use local_catquiz\teststrategy\progress;
@@ -73,7 +74,7 @@ class customscalefeedback_test extends basic_testcase {
             ->onlyMethods([
                 'get_progress',
             ])
-            ->setConstructorArgs([$feedbacksettings])
+            ->setConstructorArgs([$feedbacksettings, new feedback_helper()])
             ->getMock();
 
         // Configure the stub.

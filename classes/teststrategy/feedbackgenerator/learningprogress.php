@@ -25,7 +25,6 @@
 
 namespace local_catquiz\teststrategy\feedbackgenerator;
 
-use cache;
 use core\chart_bar;
 use core\chart_line;
 use core\chart_series;
@@ -35,9 +34,7 @@ use local_catquiz\feedback\feedbackclass;
 use local_catquiz\local\model\model_model;
 use local_catquiz\output\catscalemanager\questions\cards\questionpreview;
 use local_catquiz\teststrategy\feedbackgenerator;
-use local_catquiz\teststrategy\feedbacksettings;
 use local_catquiz\local\model\model_strategy;
-use local_catquiz\teststrategy\progress;
 use stdClass;
 
 defined('MOODLE_INTERNAL') || die();
@@ -56,29 +53,9 @@ class learningprogress extends feedbackgenerator {
 
     /**
      *
-     * @var stdClass $feedbacksettings.
-     */
-    public feedbacksettings $feedbacksettings;
-
-    /**
-     *
      * @var int $primaryscaleid // The scale to be displayed in detail in the colorbar.
      */
     public int $primaryscaleid;
-
-    /**
-     * Creates a new personabilities feedback generator.
-     *
-     * @param feedbacksettings $feedbacksettings
-     */
-    public function __construct(feedbacksettings $feedbacksettings) {
-
-        if (!isset($feedbacksettings)) {
-            return;
-        }
-
-        $this->feedbacksettings = $feedbacksettings;
-    }
 
     /**
      * For specific feedbackdata defined in generators.
@@ -223,7 +200,7 @@ class learningprogress extends feedbackgenerator {
 
         $personabilities = [];
         // Ability range is the same for all scales with same root scale.
-        $abiltiyrange = $this->get_ability_range(array_key_first($catscales));
+        $abiltiyrange = $this->feedbackhelper->get_ability_range(array_key_first($catscales));
         foreach ($personabilitiesfeedbackeditor as $catscale => $personability) {
             if (isset($personability['excluded']) && $personability['excluded']) {
                 continue;
@@ -368,7 +345,7 @@ class learningprogress extends feedbackgenerator {
         if (isset($initialcontext['personabilities_abilities'][$primarycatscale['id']]['abilityrange'])) {
             $abilityrange = $initialcontext['personabilities_abilities'][$primarycatscale['id']]['abilityrange'];
         } else {
-            $abilityrange = $this->get_ability_range($primarycatscale['id']);
+            $abilityrange = $this->feedbackhelper->get_ability_range($primarycatscale['id']);
         };
 
         $ul = (float) $abilityrange['maxscalevalue'];
@@ -422,7 +399,7 @@ class learningprogress extends feedbackgenerator {
                     $counter ++;
                 }
             }
-            $colorvalue = $this->get_color_for_personability(
+            $colorvalue = $this->feedbackhelper->get_color_for_personability(
                 (array) $this->get_progress()->get_quiz_settings(),
                 $as,
                 intval($primarycatscale['id'])

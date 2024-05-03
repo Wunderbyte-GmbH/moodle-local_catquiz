@@ -18,6 +18,7 @@ namespace local_catquiz\output;
 
 use local_catquiz\catquiz;
 use local_catquiz\feedback\feedbackclass;
+use local_catquiz\teststrategy\feedback_helper;
 use local_catquiz\teststrategy\feedbackgenerator;
 use local_catquiz\teststrategy\feedbackgenerator\learningprogress;
 
@@ -128,7 +129,6 @@ class catquizstatistics {
     /**
      * Chart grouping by date showing attempt results.
      *
-     * @param array $attemptsbytimerange
      * @param int $catscaleid
      *
      * @return array
@@ -150,7 +150,8 @@ class catquizstatistics {
                     // This is to stay backwards compatible.
                     $attempt = (float) $attempt->value;
                 }
-                $color = feedbackgenerator::get_color_for_personability((array)$this->quizsettings, $attempt, $catscaleid);
+                $fh = new feedback_helper();
+                $color = $fh->get_color_for_personability((array)$this->quizsettings, $attempt, $catscaleid);
 
                 if (!isset($series[$timestamp][$color])) {
                         $series[$timestamp][$color] = 1;

@@ -26,6 +26,7 @@
 namespace local_catquiz;
 
 use advanced_testcase;
+use local_catquiz\teststrategy\feedback_helper;
 use local_catquiz\teststrategy\feedbackgenerator\personabilities;
 use local_catquiz\teststrategy\feedbacksettings;
 use local_catquiz\teststrategy\progress;
@@ -82,20 +83,26 @@ class personabilities_test extends advanced_testcase {
             ->method('get_abilities')
             ->willReturn([$primaryscaleid => $primaryscalevalue]);
 
+        $feedbackhelpermock = $this->getMockBUilder(feedback_helper::class)
+            ->disableOriginalConstructor()
+            ->onlyMethods([
+                'get_ability_range',
+            ])
+            ->getMock();
+
+        $feedbackhelpermock
+            ->method('get_ability_range')
+            ->willReturn($abilityrange);
         $feedbacksettings = new feedbacksettings(LOCAL_CATQUIZ_STRATEGY_LOWESTSUB);
         $personabilities = $this->getMockBuilder(personabilities::class)
             ->onlyMethods([
-                'get_ability_range',
                 'get_testitems_for_catscale',
                 'get_progress',
             ])
-            ->setConstructorArgs([$feedbacksettings])
+            ->setConstructorArgs([$feedbacksettings, $feedbackhelpermock])
             ->getMock();
 
         // Configure the stub.
-        $personabilities
-            ->method('get_ability_range')
-            ->willReturn($abilityrange);
         $personabilities
             ->method('get_testitems_for_catscale')
             ->willReturn($testitemsforcatscale);
