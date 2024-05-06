@@ -400,12 +400,9 @@ class attemptfeedback implements renderable, templatable {
         $quizsettings = (array) $this->get_quiz_settings();
         $feedbackdata = $this->load_feedbackdata();
 
-        // TODO: make sure that we can re-use the existing logic of inscribing
-        // to all scales and not only primary scales. Use a plugin setting for
-        // this.
-        $inscribetoallscales = true;
+        $enrolonlyprimaryscale = get_config('local_catquiz', 'enrol_only_to_primary_scale');
         $candidatescales = $feedbackdata['personabilities_abilities'];
-        if (!$inscribetoallscales) {
+        if ($enrolonlyprimaryscale) {
             // Use only the primary scale.
             $candidatescales = array_filter(
                 $feedbackdata['personabilities_abilities'],
