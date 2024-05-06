@@ -28,6 +28,8 @@ use local_catquiz\teststrategy\feedbackgenerator;
 use local_catquiz\teststrategy\feedbacksettings;
 use local_catquiz\teststrategy\info;
 use local_catquiz\teststrategy\progress;
+use local_catquiz\teststrategy\strategy;
+use local_catquiz\teststrategy\strategy\inferlowestskillgap;
 use templatable;
 use renderable;
 use stdClass;
@@ -65,6 +67,16 @@ class attemptfeedback implements renderable, templatable {
      * @var ?int
      */
     public int $teststrategy;
+
+    /**
+     * @var ?progress
+     */
+    private ?progress $progress = null;
+
+    /**
+     * @var ?stdClass
+     */
+    private ?stdClass $quizsettings = null;
 
     /**
      * @var ?object
@@ -116,6 +128,27 @@ class attemptfeedback implements renderable, templatable {
             $contextid = catscale::get_context_id(intval($settings->catquiz_catscales));
         }
         $this->contextid = $contextid;
+    }
+
+    /**
+     * Returns the progress object for this attempt
+     *
+     * @return progress
+     * @throws coding_exception
+     * @throws Exception
+     */
+    public function get_progress(): progress {
+        if (!$this->progress) {
+            $this->progress = progress::load($this->attemptid, 'mod_adaptivequiz', $this->contextid);
+        }
+        return $this->progress;
+    }
+
+    public function get_quiz_settings() {
+        if (!$this->quizsettings) {
+            $this->quizsettings = $this->get_progress()->get_quiz_settings();
+        }
+        return $this->quizsettings;
     }
 
     /**
@@ -311,10 +344,13 @@ class attemptfeedback implements renderable, templatable {
         global $USER;
 
         $progress = progress::load($this->attemptid, 'mod_adaptivequiz', $this->contextid);
-        $quizsettings = $progress->get_quiz_settings();
-        $enrolementmsg = catquiz::enrol_user($USER->id, (array) $quizsettings, $progress->get_abilities());
+        $quizsettings = (array) $progress->get_quiz_settings();
+        $feedbackdata = $this->load_feedbackdata();
+        $coursestoenrol = $this->get_courses_to_enrol($feedbackdata, $quizsettings);
+        $groupstoenrol = $this->get_groups_to_enrol($feedbackdata, $quizsettings);
+        $enrolementmsg = catquiz::enrol_user($quizsettings, $coursestoenrol, $groupstoenrol);
         $courseandinstance = catquiz::return_course_and_instance_id(
-            $quizsettings->modulename,
+            $quizsettings['modulename'],
             $this->attemptid
         );
 
@@ -324,10 +360,10 @@ class attemptfeedback implements renderable, templatable {
             'context' => context_system::instance(),
             'other' => [
                 'attemptid' => $this->attemptid,
-                'catscaleid' => $quizsettings->catquiz_catscales,
+                'catscaleid' => $quizsettings['catquiz_catscales'],
                 'userid' => $USER->id,
                 'contextid' => $this->contextid,
-                'component' => $quizsettings->modulename,
+                'component' => $quizsettings['modulename'],
                 'instanceid' => $courseandinstance['instanceid'],
                 'teststrategy' => $this->teststrategy,
                 'status' => LOCAL_CATQUIZ_ATTEMPT_OK,
@@ -335,6 +371,125 @@ class attemptfeedback implements renderable, templatable {
         ]);
         $event->trigger();
         return $enrolementmsg;
+    }
+
+    /**
+     * Returns the courses that the user shoule be enrolled to, indexed by scale ID.
+     *
+     * This depends on both the quiz settings, that contain the information about which ranges in which scales should trigger an
+     * inscription to a course.
+     * It also depends on the feedbackdata, which contain information about the abilities in the different scales and (depending on
+     * the teststrategy) which of the scales was selected as the primary scale.
+     *
+     * Example return values:
+     *
+     * [
+     *  '1' => [
+     *      'range' => 2,
+     *      'show_message' => true,
+     *      'course_ids' => [1002, 1003]
+     *      ]
+     * ]
+     *
+     * @return array
+     */
+    public function get_courses_to_enrol(
+    ): array {
+        $quizsettings = (array) $this->get_quiz_settings();
+        $feedbackdata = $this->load_feedbackdata();
+
+        // TODO: make sure that we can re-use the existing logic of inscribing
+        // to all scales and not only primary scales. Use a plugin setting for
+        // this.
+        $inscribetoallscales = true;
+        $candidatescales = $feedbackdata['personabilities_abilities'];
+        if (!$inscribetoallscales) {
+            // Use only the primary scale.
+            $candidatescales = array_filter(
+                $feedbackdata['personabilities_abilities'],
+                fn($v) => array_key_exists('primary', $v) && $v['primary'] === true
+            );
+        }
+
+        $coursestoenrol = [];
+        foreach ($candidatescales as $scaleid => $data) {
+            $i = 0;
+            $coursestoenrol[$scaleid] = [
+                'course_ids' => []
+            ];
+            while (isset($quizsettings['feedback_scaleid_limit_lower_' . $scaleid . '_'. ++$i])) {
+                $lowerlimit = $quizsettings['feedback_scaleid_limit_lower_' . $scaleid . '_'. $i];
+                $upperlimit = $quizsettings['feedback_scaleid_limit_upper_' . $scaleid. '_'. $i];
+                if ($data['value'] < (float) $lowerlimit || $data['value'] > (float) $upperlimit) {
+                    continue;
+                }
+                if (!($courses = $quizsettings['catquiz_courses_' . $scaleid . '_' . $i] ?? [])) {
+                    continue;
+                }
+                // The first element at array key 0 is a dummy value to
+                // display some message like "please select course" in the
+                // form and has a course ID of 0.
+                $courses = array_filter($courses, fn ($v) => $v != 0);
+                $showenrolmentmessage = !empty($quizsettings["enrolment_message_checkbox_" . $scaleid . "_" . $i]);
+                $coursestoenrol[$scaleid] = [
+                    'range' => $i,
+                    'show_message' => $showenrolmentmessage,
+                    'course_ids' => $courses,
+                ];
+            }
+        }
+        return $coursestoenrol;
+    }
+
+    /**
+     * Returns the groups that the user should be enrolled to, indexed by scale ID.
+     *
+     * Example:
+     * [
+     *     '1' => [2,3]
+     * ]
+     *
+     * @param array $feedbackdata
+     * @param array $quizsettings
+     * @return array
+     */
+    public function get_groups_to_enrol(
+    ): array {
+        $quizsettings = (array) $this->get_quiz_settings();
+        $feedbackdata = $this->load_feedbackdata();
+
+        // TODO: make sure that we can re-use the existing logic of inscribing
+        // to all scales and not only primary scales. Use a plugin setting for
+        // this.
+        $inscribetoallscales = true;
+        $candidatescales = $feedbackdata['personabilities_abilities'];
+        if (!$inscribetoallscales) {
+            // Use only the primary scale.
+            $candidatescales = array_filter(
+                $feedbackdata['personabilities_abilities'],
+                fn($v) => array_key_exists('primary', $v) && $v['primary'] === true
+            );
+        }
+
+        // Check if there is a course associated with that value and if so, return it.
+        $groupstoenrol = [];
+        $i = 0;
+        foreach ($candidatescales as $scaleid => $data) {
+            $groupstoenrol[$scaleid] = [];
+            while (isset($quizsettings['feedback_scaleid_limit_lower_' . $scaleid . '_' . ++$i])) {
+                $lowerlimit = $quizsettings['feedback_scaleid_limit_lower_' . $scaleid . '_' . $i];
+                $upperlimit = $quizsettings['feedback_scaleid_limit_upper_' . $scaleid . '_' . $i];
+                if ($data['value'] < (float) $lowerlimit || $data['value'] > (float) $upperlimit) {
+                    continue;
+                }
+                if (!($groups = $quizsettings['catquiz_group_' . $scaleid . '_' . $i] ?? "")) {
+                    continue;
+                }
+                $groups = explode(",", $groups);
+                array_push($groupstoenrol[$scaleid], ...$groups);
+            }
+        }
+        return $groupstoenrol;
     }
 
     /**
