@@ -26,9 +26,6 @@ namespace local_catquiz\teststrategy;
 
 use coding_exception;
 use context_system;
-use local_catquiz\catquiz;
-use local_catquiz\catscale;
-use local_catquiz\feedback\feedbackclass;
 use UnexpectedValueException;
 
 /**
@@ -75,6 +72,14 @@ abstract class feedbackgenerator {
      */
     protected feedback_helper $feedbackhelper;
 
+    /**
+     * Create a new feedback generator
+     *
+     * @param feedbacksettings $feedbacksettings
+     * @param feedback_helper $feedbackhelper
+     *
+     * @return self
+     */
     public function __construct(feedbacksettings $feedbacksettings, feedback_helper $feedbackhelper) {
         $this->feedbacksettings = $feedbacksettings;
         $this->feedbackhelper = $feedbackhelper;
