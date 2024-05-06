@@ -982,13 +982,12 @@ class catquiz_handler {
             'includesubscales' => true,
             'maximumquestions' => $maxquestions,
             'minimumquestions' => $quizsettings->maxquestionsgroup->catquiz_minquestions,
-            'penalty_threshold' => 60 * 60 * 24 * 30 - 90, // TODO: make dynamic.
-            'initial_standarderror' => 1.0, // TODO: make configurable.
             /*
-                 * After this time, the penalty for a question goes back to 0
-                 * Currently, it is set to 30 days
-                 */
-            'penalty_time_range' => 60 * 60 * 24 * 30,
+             * After this time, the penalty for a question goes back to 0
+             * Currently, it is set to 30 days
+             */
+            'penalty_threshold' => 60 * 60 * 24 * 30, // TODO: make dynamic.
+            'initial_standarderror' => 1.0, // TODO: make configurable.
             'pilot_ratio' => $pilotratio ?? 0,
             'pilot_attempts_threshold' => LOCAL_CATQUIZ_THRESHOLD_DEFAULT,
             'questionsattempted' => intval($attemptdata->questionsattempted),

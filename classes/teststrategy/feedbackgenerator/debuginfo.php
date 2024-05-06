@@ -121,7 +121,7 @@ class debuginfo extends feedbackgenerator {
             } else {
                 $score = $lastquestion['score'] ?? 'NA';
                 $fisherinformation = $lastquestion['fisherinformation'] ?? 'NA';
-                $lasttimeplayedpenalty = $lastquestion['lasttimeplayedpenalty'] ?? 'NA';
+                $lasttimeplayedpenalty = $lastquestion['lasttimeplayedpenaltyfactor'] ?? 'NA';
                 $difficulty = $lastquestion['difficulty'] ?? 'NA';
                 $fraction = $lastquestion['fraction'] ?? 'NA';
                 $rowarr[] =

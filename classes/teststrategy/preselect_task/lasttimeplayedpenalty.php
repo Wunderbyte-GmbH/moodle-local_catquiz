@@ -25,9 +25,9 @@
 namespace local_catquiz\teststrategy\preselect_task;
 
 use local_catquiz\local\result;
-use local_catquiz\local\status;
 use local_catquiz\teststrategy\preselect_task;
 use local_catquiz\wb_middleware;
+use stdClass;
 
 /**
  * Test strategy lasttimeplayedpenalty.
@@ -50,7 +50,7 @@ final class lasttimeplayedpenalty extends preselect_task implements wb_middlewar
     public function run(array &$context, callable $next): result {
         $now = time();
         $context['questions'] = array_map(function($q) use ($now, $context) {
-            $q->lasttimeplayedpenalty = $this->get_penalty($q, $now, $context['penalty_time_range']);
+            $q->lasttimeplayedpenaltyfactor = $this->get_penalty_factor($q, $now, $context['penalty_threshold']);
             return $q;
         }, $context['questions']);
 
@@ -67,27 +67,23 @@ final class lasttimeplayedpenalty extends preselect_task implements wb_middlewar
         return [
             'questions',
             'penalty_threshold',
-            'penalty_time_range',
+            'penalty_threshold',
         ];
     }
 
     /**
-     * Calculates the penalty for the given question according to the time it was played.
-     *
-     * The penalty should decline linearly with the time that passed since the last attempt.
-     * After 30 days, the penalty should be 0 again.
+     * Calculates the penalty factor for the given question according to the time it was last played.
      *
      * For performance reasons, $now is passed as parameter
      *
-     * @param mixed $question
-     * @param mixed $now
-     * @param mixed $penaltytimerange
+     * @param stdClass $question
+     * @param int $currenttime
+     * @param float $penaltytimerange
      *
-     * @return int
-     *
+     * @return float
      */
-    private function get_penalty($question, $now, $penaltytimerange): int {
-        $secondspassed = $now - $question->userlastattempttime;
-        return max(0, $penaltytimerange - $secondspassed);
+    public function get_penalty_factor($question, int $currenttime, float $penaltytimerange): float {
+        $lastplayed = $question->userlastattempttime;
+        return 1 / (1 + exp(4.6 * (1 - ($currenttime - $lastplayed) / $penaltytimerange)));
     }
 }
