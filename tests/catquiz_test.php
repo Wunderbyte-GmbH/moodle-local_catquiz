@@ -320,9 +320,15 @@ class catquiz_test extends advanced_testcase {
         $this->assertEmpty($this->get_user_enrolment($course));
         $this->assertEmpty(message_get_messages($USER->id, 0, -1, MESSAGE_GET_READ_AND_UNREAD));
 
+        $coursestoenrol = [];
+        $groupstoenrol = [];
+        if ($isenrolled) {
+            $coursestoenrol = [$catscaleid => ['show_message' => true, 'range' => 1, 'course_ids' => [$course->id]]];
+            $groupstoenrol = [$catscaleid => [$group->id]];
+        }
         // This is the function we want to test. After this call, the user should be added to the given group and enrolled to the
         // given course depending on the person ability of the user.
-        catquiz::enrol_user($USER->id, $quizsettings, $personabilities);
+        catquiz::enrol_user($quizsettings, $coursestoenrol, $groupstoenrol);
 
         // Check post-conditions.
         $groupmembers = groups_get_members($group->id);
