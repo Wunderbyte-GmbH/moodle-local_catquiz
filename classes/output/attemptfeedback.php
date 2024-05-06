@@ -28,8 +28,6 @@ use local_catquiz\teststrategy\feedbackgenerator;
 use local_catquiz\teststrategy\feedbacksettings;
 use local_catquiz\teststrategy\info;
 use local_catquiz\teststrategy\progress;
-use local_catquiz\teststrategy\strategy;
-use local_catquiz\teststrategy\strategy\inferlowestskillgap;
 use templatable;
 use renderable;
 use stdClass;
@@ -144,6 +142,11 @@ class attemptfeedback implements renderable, templatable {
         return $this->progress;
     }
 
+    /**
+     * Returns the quiz settings for this attempt
+     *
+     * @return stdClass
+     */
     public function get_quiz_settings() {
         if (!$this->quizsettings) {
             $this->quizsettings = $this->get_progress()->get_quiz_settings();
@@ -277,7 +280,7 @@ class attemptfeedback implements renderable, templatable {
      */
     private function add_default_data(array $newdata): array {
         $newarray = [];
-        $progress = progress::load($newdata['attemptid'], $newdata['component'], $newdata['contextid']);
+        $progress = $this->get_progress();
 
         $personabilities = $progress->get_abilities();
 
@@ -288,7 +291,7 @@ class attemptfeedback implements renderable, templatable {
             $newarray[$scaleid]['value'] = $abilityfloat;
         };
         $newdata['updated_personabilities'] = $newarray;
-        $newdata['catscaleid'] = intval($progress->get_quiz_settings()->catquiz_catscales);
+        $newdata['catscaleid'] = intval($this->get_quiz_settings()->catquiz_catscales);
         $newdata['catscales'] = catquiz::get_catscales([$newdata['catscaleid'], ...$progress->get_selected_subscales()]);
         return $newdata;
     }
@@ -343,12 +346,11 @@ class attemptfeedback implements renderable, templatable {
     public function attempt_finished_tasks() {
         global $USER;
 
-        $progress = progress::load($this->attemptid, 'mod_adaptivequiz', $this->contextid);
-        $quizsettings = (array) $progress->get_quiz_settings();
+        $quizsettings = $this->get_quiz_settings();
         $feedbackdata = $this->load_feedbackdata();
         $coursestoenrol = $this->get_courses_to_enrol($feedbackdata, $quizsettings);
         $groupstoenrol = $this->get_groups_to_enrol($feedbackdata, $quizsettings);
-        $enrolementmsg = catquiz::enrol_user($quizsettings, $coursestoenrol, $groupstoenrol);
+        $enrolementmsg = catquiz::enrol_user((array) $quizsettings, $coursestoenrol, $groupstoenrol);
         $courseandinstance = catquiz::return_course_and_instance_id(
             $quizsettings['modulename'],
             $this->attemptid
