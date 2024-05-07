@@ -97,25 +97,25 @@ class filterforsubscale_test extends basic_testcase {
             '1' => (object) [
                 'id' => 1,
                 'catscaleid' => 1,
-                'lasttimeplayedpenalty' => 1,
+                'lasttimeplayedpenaltyfactor' => 1,
                 'fisherinformation' => $fisherinformation,
             ],
             '2' => (object) [
                 'id' => 2,
                 'catscaleid' => 2,
-                'lasttimeplayedpenalty' => 1,
+                'lasttimeplayedpenaltyfactor' => 1,
                 'fisherinformation' => $fisherinformation,
             ],
             '3' => (object) [
                 'id' => 3,
                 'catscaleid' => 3,
-                'lasttimeplayedpenalty' => 1,
+                'lasttimeplayedpenaltyfactor' => 1,
                 'fisherinformation' => $fisherinformation,
             ],
             '4' => (object) [
                 'id' => 4,
                 'catscaleid' => 4,
-                'lasttimeplayedpenalty' => 1,
+                'lasttimeplayedpenaltyfactor' => 1,
                 'fisherinformation' => $fisherinformation,
             ],
         ];
