@@ -352,7 +352,7 @@ class attemptfeedback implements renderable, templatable {
         $groupstoenrol = $this->get_groups_to_enrol($feedbackdata, $quizsettings);
         $enrolementmsg = catquiz::enrol_user((array) $quizsettings, $coursestoenrol, $groupstoenrol);
         $courseandinstance = catquiz::return_course_and_instance_id(
-            $quizsettings['modulename'],
+            $quizsettings->modulename,
             $this->attemptid
         );
 
@@ -362,10 +362,10 @@ class attemptfeedback implements renderable, templatable {
             'context' => context_system::instance(),
             'other' => [
                 'attemptid' => $this->attemptid,
-                'catscaleid' => $quizsettings['catquiz_catscales'],
+                'catscaleid' => $quizsettings->catquiz_catscales,
                 'userid' => $USER->id,
                 'contextid' => $this->contextid,
-                'component' => $quizsettings['modulename'],
+                'component' => $quizsettings->modulename,
                 'instanceid' => $courseandinstance['instanceid'],
                 'teststrategy' => $this->teststrategy,
                 'status' => LOCAL_CATQUIZ_ATTEMPT_OK,
@@ -414,7 +414,7 @@ class attemptfeedback implements renderable, templatable {
         foreach ($candidatescales as $scaleid => $data) {
             $i = 0;
             $coursestoenrol[$scaleid] = [
-                'course_ids' => []
+                'course_ids' => [],
             ];
             while (isset($quizsettings['feedback_scaleid_limit_lower_' . $scaleid . '_'. ++$i])) {
                 $lowerlimit = $quizsettings['feedback_scaleid_limit_lower_' . $scaleid . '_'. $i];
@@ -448,12 +448,9 @@ class attemptfeedback implements renderable, templatable {
      *     '1' => [2,3]
      * ]
      *
-     * @param array $feedbackdata
-     * @param array $quizsettings
      * @return array
      */
-    public function get_groups_to_enrol(
-    ): array {
+    public function get_groups_to_enrol(): array {
         $quizsettings = (array) $this->get_quiz_settings();
         $feedbackdata = $this->load_feedbackdata();
 
