@@ -69,10 +69,14 @@ class graphicalsummary extends feedbackgenerator {
         global $OUTPUT;
 
         if (isset($feedbackdata['graphicalsummary_data'])) {
+            $primaryscaleid = null;
+            if (array_key_exists('graphicalsummary_primaryscale', $feedbackdata)) {
+                $primaryscaleid = array_key_first($feedbackdata['graphicalsummary_primaryscale']);
+            }
             $chart = $this->render_chart(
                 $feedbackdata['graphicalsummary_data'],
-                array_key_first($feedbackdata['graphicalsummary_primaryscale']),
-                $feedbackdata['graphicalsummary_otherscales']
+                $primaryscaleid,
+                $feedbackdata['graphicalsummary_otherscales'] ?? []
             );
         }
         if (isset($feedbackdata['graphicalsummary_data'])) {
