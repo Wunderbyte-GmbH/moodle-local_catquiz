@@ -44,12 +44,16 @@ class attemptfeedback_test extends basic_testcase {
     /**
      * Checks if the attemptfeedback class returns the correct course enrolment data.
      *
+     * @param array $expected
+     * @param array $feedbackdata
+     * @param array $quizsettings
+     *
      * @return void
      * @throws InvalidArgumentException
      * @throws ExpectationFailedException
      * @dataProvider strategy_returns_expected_courses_to_enrol_provider
      */
-    public function test_it_returns_expected_courses_to_enrol($expected, $feedbackdata, $quizsettings) {
+    public function test_it_returns_expected_courses_to_enrol(array $expected, array $feedbackdata, array $quizsettings) {
         // We use a mock object so that we can work with the quiz settings and feedbackdata that we get from the data provider.
         // The rest of the attemptfeedback class is unchanged.
         $attemptfeedback = $this->getMockBuilder(attemptfeedback::class)
@@ -107,31 +111,36 @@ class attemptfeedback_test extends basic_testcase {
             'Should enrol to no course' => [
                 'expected' => [
                     $scaleid => [
-                        'course_ids' => []
-                    ]
+                        'course_ids' => [],
+                    ],
                 ],
                 [
                     'personabilities_abilities' => [
                         1 => [
                             'value' => 6.0,
                             'name' => 'Simulation',
-                        ]
+                        ],
                     ],
                 ],
                 'quizsettings' => $quizsettings,
-            ]
+            ],
         ];
     }
 
     /**
      * Checks if the the attemptfeedback class returns the correct group enrolment data.
      *
+     * @param array $expected
+     * @param array $feedbackdata
+     * @param array $quizsettings
+     *
      * @return void
+     *
      * @throws InvalidArgumentException
      * @throws ExpectationFailedException
      * @dataProvider strategy_returns_expected_groups_to_enrol_provider
      */
-    public function test_it_returns_expected_groups_to_enrol($expected, $feedbackdata, $quizsettings) {
+    public function test_it_returns_expected_groups_to_enrol(array $expected, array $feedbackdata, array $quizsettings) {
         // We use a mock object so that we can work with the quiz settings and feedbackdata that we get from the data provider.
         // The rest of the attemptfeedback class is unchanged.
         $attemptfeedback = $this->getMockBuilder(attemptfeedback::class)
@@ -174,7 +183,7 @@ class attemptfeedback_test extends basic_testcase {
         return [
             'Should enrol to two groups' => [
                 'expected' => [
-                    1 => [2, 4]
+                    1 => [2, 4],
                 ],
                 'feedbackdata' => $feedbackdata,
                 'quizsettings' => $quizsettings,
@@ -189,11 +198,11 @@ class attemptfeedback_test extends basic_testcase {
                         1 => [
                             'value' => 6.0,
                             'name' => 'Simulation',
-                        ]
+                        ],
                     ],
                 ],
                 'quizsettings' => $quizsettings,
-            ]
+            ],
         ];
     }
 }
