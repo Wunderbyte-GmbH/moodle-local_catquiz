@@ -102,4 +102,13 @@ if ($hassiteconfig) {
             get_string('automatic_reload_on_scale_selection', 'local_catquiz'),
             get_string('automatic_reload_on_scale_selection_description', 'local_catquiz'),
             1));
+
+    $settings->add(new admin_setting_configtext(
+        'local_catquiz/time_penalty_threshold',
+        get_string('time_penalty_threshold_name', 'local_catquiz'),
+        get_string('time_penalty_threshold_desc', 'local_catquiz'),
+        10,
+        '/^\d+$/'
+        )
+    );
 }
