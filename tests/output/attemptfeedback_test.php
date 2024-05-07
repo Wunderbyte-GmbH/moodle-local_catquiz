@@ -67,7 +67,7 @@ class attemptfeedback_test extends basic_testcase {
             ->method('get_quiz_settings')
             ->willReturn($quizsettings);
 
-        $result = $attemptfeedback->get_courses_to_enrol($feedbackdata, $quizsettings);
+        $result = $attemptfeedback->get_courses_to_enrol();
         $this->assertEquals($expected, $result);
     }
 
@@ -154,7 +154,7 @@ class attemptfeedback_test extends basic_testcase {
             ->method('get_quiz_settings')
             ->willReturn($quizsettings);
 
-        $result = $attemptfeedback->get_groups_to_enrol($feedbackdata, $quizsettings);
+        $result = $attemptfeedback->get_groups_to_enrol();
         $this->assertEquals($expected, $result);
     }
 
