@@ -104,6 +104,9 @@ $string['automatic_reload_on_scale_selection_description'] = 'Reload quizsetting
 $string['enrol_only_to_reported_scales'] = 'Enrol users only to courses of detected primary scale(s).';
 $string['enrol_only_to_reported_scales_help'] = 'Standard would be to enrol users according to results in areas detected according to the purpose of the test.
 If you uncheck this option, users will be enroled according to all other valid results as well.'; // TODO: get translation.
+$string['time_penalty_threshold_name'] = 'Time penalty in days for already played questions'; // TODO: get translation string.
+$string['time_penalty_threshold_desc'] = 'If a question was last played within
+    the given number of days, its score is lowered via a time penalty.'; // TODO: get translation string.
 
 $string['timeoutabortnoresult'] = 'Test aborted without result.';
 $string['timeoutabortresult'] = 'Test aborted with result.';
