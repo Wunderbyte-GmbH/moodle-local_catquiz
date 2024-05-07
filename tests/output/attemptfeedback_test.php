@@ -114,7 +114,7 @@ class attemptfeedback_test extends advanced_testcase {
                         2 => [
                             'value' => 1.2,
                             'name' => 'Another scale with courses',
-                        ]
+                        ],
                     ],
                 ],
                 'quizsettings' => array_merge(
@@ -155,7 +155,7 @@ class attemptfeedback_test extends advanced_testcase {
                         'range' => 1,
                         'show_message' => false,
                         'course_ids' => [3, 4],
-                    ]
+                    ],
                 ],
                 'feedbackdata' => [
                     'personabilities_abilities' => [
@@ -167,7 +167,7 @@ class attemptfeedback_test extends advanced_testcase {
                         2 => [
                             'value' => 1.2,
                             'name' => 'Another scale with courses',
-                        ]
+                        ],
                     ],
                 ],
                 'quizsettings' => array_merge(
