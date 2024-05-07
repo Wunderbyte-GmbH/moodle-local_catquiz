@@ -412,10 +412,10 @@ class attemptfeedback implements renderable, templatable {
 
         $coursestoenrol = [];
         foreach ($candidatescales as $scaleid => $data) {
-            $i = 0;
             $coursestoenrol[$scaleid] = [
                 'course_ids' => [],
             ];
+            $i = 0;
             while (isset($quizsettings['feedback_scaleid_limit_lower_' . $scaleid . '_'. ++$i])) {
                 $lowerlimit = $quizsettings['feedback_scaleid_limit_lower_' . $scaleid . '_'. $i];
                 $upperlimit = $quizsettings['feedback_scaleid_limit_upper_' . $scaleid. '_'. $i];
@@ -454,12 +454,9 @@ class attemptfeedback implements renderable, templatable {
         $quizsettings = (array) $this->get_quiz_settings();
         $feedbackdata = $this->load_feedbackdata();
 
-        // TODO: make sure that we can re-use the existing logic of inscribing
-        // to all scales and not only primary scales. Use a plugin setting for
-        // this.
-        $inscribetoallscales = true;
+        $enrolonlyprimaryscale = get_config('local_catquiz', 'enrol_only_to_primary_scale');
         $candidatescales = $feedbackdata['personabilities_abilities'];
-        if (!$inscribetoallscales) {
+        if ($enrolonlyprimaryscale) {
             // Use only the primary scale.
             $candidatescales = array_filter(
                 $feedbackdata['personabilities_abilities'],
@@ -469,9 +466,9 @@ class attemptfeedback implements renderable, templatable {
 
         // Check if there is a course associated with that value and if so, return it.
         $groupstoenrol = [];
-        $i = 0;
         foreach ($candidatescales as $scaleid => $data) {
             $groupstoenrol[$scaleid] = [];
+            $i = 0;
             while (isset($quizsettings['feedback_scaleid_limit_lower_' . $scaleid . '_' . ++$i])) {
                 $lowerlimit = $quizsettings['feedback_scaleid_limit_lower_' . $scaleid . '_' . $i];
                 $upperlimit = $quizsettings['feedback_scaleid_limit_upper_' . $scaleid . '_' . $i];
