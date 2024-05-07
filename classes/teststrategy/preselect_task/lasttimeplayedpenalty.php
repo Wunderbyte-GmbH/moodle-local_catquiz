@@ -67,7 +67,6 @@ final class lasttimeplayedpenalty extends preselect_task implements wb_middlewar
         return [
             'questions',
             'penalty_threshold',
-            'penalty_threshold',
         ];
     }
 
