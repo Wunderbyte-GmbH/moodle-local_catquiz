@@ -37,9 +37,9 @@ use local_catquiz\local\status;
 class result {
 
     /**
-     * @var mixed status
+     * @var string status
      */
-    protected $status;
+    protected string $status;
     /**
      * @var mixed value
      */
@@ -49,10 +49,10 @@ class result {
      * Result-specific instantiation can go here.
      *
      * @param mixed|null $value
-     * @param mixed|status $status
+     * @param string $status
      *
      */
-    public function __construct($value = null, $status = status::OK) {
+    public function __construct($value = null, string $status = status::OK) {
         $this->value  = $value;
         $this->status = $status;
     }
@@ -60,13 +60,13 @@ class result {
     /**
      * Returns error.
      *
-     * @param mixed|status $status
+     * @param string $status
      * @param mixed|null $value
      *
      * @return result
      *
      */
-    public static function err($status = status::ERROR_GENERAL, $value = null) {
+    public static function err(string $status = status::ERROR_GENERAL, $value = null) {
         return new result($value, $status);
     }
 
@@ -85,7 +85,7 @@ class result {
     /**
      * Returns status.
      *
-     * @return mixed
+     * @return string
      *
      */
     public function get_status() {
