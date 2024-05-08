@@ -819,6 +819,7 @@ class catquiz_handler {
         $selectioncontext = self::get_strategy_selectcontext($quizsettings, $attemptdata);
         $result = $teststrategy->return_next_testitem($selectioncontext);
         if (!$result->isOk()) {
+            catquiz::set_final_attempt_status($attemptdata->id, $result->get_status());
             return [0, $result->getErrorMessage()];
         }
 
