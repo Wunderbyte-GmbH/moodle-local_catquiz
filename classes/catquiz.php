@@ -28,6 +28,7 @@ use core\check\result;
 use dml_exception;
 use local_catquiz\event\usertocourse_enroled;
 use local_catquiz\event\usertogroup_enroled;
+use local_catquiz\local\status;
 use moodle_exception;
 use moodle_url;
 use question_attempt;
@@ -1546,6 +1547,27 @@ class catquiz {
         $id = $DB->insert_record('local_catquiz_attempts', (object) $data);
 
         return $id;
+    }
+
+    /**
+     * Set the status in the attempts table.
+     *
+     * @param int $attemptid
+     * @param string $status
+     *
+     * @return void
+     */
+    public static function set_final_attempt_status(int $attemptid, string $status) {
+        global $DB;
+        $statusnumber = status::to_int($status);
+        if (!$existingrecord = $DB->get_record('local_catquiz_attempts', ['attemptid' => $attemptid])) {
+            return;
+        }
+        $data = (object) [
+            'id' => $existingrecord->id,
+            'status' => $statusnumber,
+        ];
+        $DB->update_record('local_catquiz_attempts', $data);
     }
 
     /**

@@ -100,4 +100,36 @@ class status {
      * @var string
      */
     const EXCEEDED_MAX_ATTEMPT_TIME = 'exceededmaxattempttime';
+
+    /**
+     * Assigns each status an int value that can be saved in the attempts database table
+     *
+     * @param string $status
+     *
+     * @return int
+     */
+    public static function to_int(string $status): int {
+        switch ($status) {
+            case 'ok':
+                return 0;
+            case 'noremainingquestions':
+                return 1;
+            case 'testiteminrelatedscale':
+                return 2;
+            case 'errorfetchnextquestion':
+                return 3;
+            case 'reachedmaximumquestions':
+                return 4;
+            case 'abortpersonabilitynotchanged':
+                return 5;
+            case 'emptyfirstquestionlist':
+                return 6;
+            case 'errornoitems':
+                return 7;
+            case 'exceededmaxattempttime':
+                return 8;
+            default:
+                return -1;
+        }
+    }
 }
