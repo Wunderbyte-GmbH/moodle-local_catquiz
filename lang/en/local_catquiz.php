@@ -101,10 +101,9 @@ $string['peritem'] = 'per item ';
 $string['applychanges'] = 'Apply Changes';
 $string['automatic_reload_on_scale_selection'] = 'Form reload on scale selection';
 $string['automatic_reload_on_scale_selection_description'] = 'Reload quizsettings form automatically on (sub-)scale selection';
-$string['enrol_only_to_reported_scales'] = 'Enrol users only to courses of detected scales.';
-$string['enrol_only_to_reported_scales_help'] = 'If the user could be
-enroled to different courses according to the quiz settings, only enrol to the
-courses associated with the detected scale'; // TODO: get translation.
+$string['enrol_only_to_reported_scales'] = 'Enrol users only to courses of detected primary scale(s).';
+$string['enrol_only_to_reported_scales_help'] = 'Standard would be to enrol users according to results in areas detected according to the purpose of the test.
+If you uncheck this option, users will be enroled according to all other valid results as well.'; // TODO: get translation.
 
 $string['timeoutabortnoresult'] = 'Test aborted without result.';
 $string['timeoutabortresult'] = 'Test aborted with result.';
