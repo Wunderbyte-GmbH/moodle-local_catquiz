@@ -52,6 +52,7 @@ class grmgeneralized extends model_raschmodel {
     /**
      * Defines names if item parameter list
      *
+     * @param array $ip
      * @return array of string
      */
     public static function get_fractions (array $ip): array {
@@ -68,6 +69,9 @@ class grmgeneralized extends model_raschmodel {
 
     /**
      * Defines names if item parameter list
+     *
+     * @param float $frac
+     * @param array $fractions
      *
      * @return array of string
      */
