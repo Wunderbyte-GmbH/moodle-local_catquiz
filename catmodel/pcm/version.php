@@ -26,5 +26,5 @@ defined('MOODLE_INTERNAL') || die();
 
 $plugin->version   = 2022122000;
 $plugin->requires  = 2022041900;
-$plugin->component = 'catmodel_gradedresponsec';
+$plugin->component = 'catmodel_pcm';
 
