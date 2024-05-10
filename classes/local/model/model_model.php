@@ -104,7 +104,7 @@ abstract class model_model {
      * @return mixed
      *
      */
-    abstract public static function fisher_info(array $personability, array $params);
+    abstract public function fisher_info(array $personability, array $params);
 
     /**
      * Get information criterion

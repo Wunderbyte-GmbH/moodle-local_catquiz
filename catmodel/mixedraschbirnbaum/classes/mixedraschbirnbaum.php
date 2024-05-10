@@ -427,7 +427,7 @@ class mixedraschbirnbaum extends model_raschmodel {
      * @return float
      *
      */
-    public static function fisher_info(array $pp, array $ip): float {
+    public function fisher_info(array $pp, array $ip): float {
         return $ip['difficulty'] ** 2 * (1 - $ip['guessing']) * self::likelihood($pp, $ip, 1.0) * (self::likelihood($pp, $ip, 0.0));
     }
 

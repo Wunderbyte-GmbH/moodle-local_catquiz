@@ -348,7 +348,7 @@ class rasch extends model_raschmodel {
      * @return mixed
      *
      */
-    public static function fisher_info(array $pp, array $ip) {
+    public function fisher_info(array $pp, array $ip) {
         return (self::likelihood($pp, $ip, 0) * self::likelihood($pp, $ip, 1.0));
     }
 
