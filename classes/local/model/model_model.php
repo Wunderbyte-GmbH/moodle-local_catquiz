@@ -32,6 +32,30 @@ namespace local_catquiz\local\model;
  */
 abstract class model_model {
 
+    private static $models = [];
+    /**
+     * Make constructor private to force usage of get_instance()
+     */
+    protected function __construct() {
+    }
+
+    /**
+     * Return an instance of the model with the given name
+     *
+     * @param string $name
+     * @return self
+     */
+    public static function get_instance(string $name): model_model {
+        if (!array_key_exists($name, self::$models)) {
+            $classname = sprintf('catmodel_%s\%s', $name, $name);
+            if (!class_exists($classname)) {
+                return null;
+            }
+            self::$models[$name] = new $classname();
+        }
+        return self::$models[$name];
+    }
+
     /**
      * Return the name of the current model
      *
