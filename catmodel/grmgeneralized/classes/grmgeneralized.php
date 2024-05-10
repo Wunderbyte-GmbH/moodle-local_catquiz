@@ -36,7 +36,7 @@ use local_catquiz\local\model\model_raschmodel;
  * @copyright  2023 Wunderbyte GmbH <georg.maisser@wunderbyte.at>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class raschbirnbaumb extends model_raschmodel {
+class grmgeneralized extends model_raschmodel {
 
     // Definitions and Dimensions.
 
