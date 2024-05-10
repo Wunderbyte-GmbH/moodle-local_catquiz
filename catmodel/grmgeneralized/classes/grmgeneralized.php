@@ -53,7 +53,7 @@ class grmgeneralized extends model_raschmodel {
                 $frac[] = $fraction;
             }
         }
-        usort ($fraction)   
+        usort ($fraction);
         return $frac;
     }
     
@@ -78,7 +78,7 @@ class grmgeneralized extends model_raschmodel {
     public static function convert_vector_to_ip (array $vector): array {
         
         // TODO: This is very dirty and needs more attention on length / dimensionality
-        return ['difficulty' => array_combine(this->$fractions, array_splice($vector, count($vector)-1)), 'discrimination' => $vector[count($vector)-1])];
+        return ['difficulty' => array_combine($fractions, array_splice($vector, count($vector)-1)), 'discrimination' => $vector[count($vector)-1]];
     }
     //<=
     
@@ -296,7 +296,7 @@ class grmgeneralized extends model_raschmodel {
         return self::item_information($pp, $ip);
     }
 
-    public static function category_information(array $pp, array $ip; float $frac): float {
+    public static function category_information(array $pp, array $ip, float $frac): float {
         return -(self::log_likelihood_p_p($pp, $ip, $frac));
     }
     
