@@ -92,7 +92,7 @@ class attemptfeedback_test extends advanced_testcase {
             sprintf('enrolment_message_checkbox_%s_2', $scaleid) => false,
         ];
         return [
-            'Only primary: should enrol to two courses' => [
+            'Should enrol to two courses' => [
                 'expected' => [
                     $scaleid => [
                         'range' => 2,
@@ -123,7 +123,7 @@ class attemptfeedback_test extends advanced_testcase {
                 ),
             ],
             // The ability is outside the defined ranges.
-            'Only primary: should enrol to no course' => [
+            'Should enrol to no course' => [
                 'expected' => [
                     $scaleid => [
                         'course_ids' => [],
@@ -139,42 +139,6 @@ class attemptfeedback_test extends advanced_testcase {
                     ],
                 ],
                 'quizsettings' => $quizsettings,
-            ],
-            'All scales: should enrol to multiple courses from different scales' => [
-                'expected' => [
-                    $scaleid => [
-                        'range' => 2,
-                        'show_message' => false,
-                        'course_ids' => [2, 4],
-                    ],
-                    2 => [
-                        'range' => 1,
-                        'show_message' => false,
-                        'course_ids' => [3, 4],
-                    ],
-                ],
-                'feedbackdata' => [
-                    'personabilities_abilities' => [
-                        1 => [
-                            'value' => 1.2,
-                            'name' => 'Simulation',
-                            'toreport' => true,
-                        ],
-                        2 => [
-                            'value' => 1.2,
-                            'name' => 'Another scale with courses',
-                        ],
-                    ],
-                ],
-                'quizsettings' => array_merge(
-                    $quizsettings,
-                    [
-                        'feedback_scaleid_limit_lower_2_1' => 0,
-                        'feedback_scaleid_limit_upper_2_1' => 5,
-                        'catquiz_courses_2_1' => [3, 4],
-                        'catquiz_enrol_only_reported_scales' => "0",
-                    ]
-                ),
             ],
         ];
     }
@@ -229,7 +193,7 @@ class attemptfeedback_test extends advanced_testcase {
             sprintf('catquiz_group_%s_2', $scaleid) => "2,4",
         ];
         return [
-            'Only primary: should enrol to two groups' => [
+            'Should enrol to two groups' => [
                 'expected' => [
                     1 => [2, 4],
                 ],
@@ -245,7 +209,7 @@ class attemptfeedback_test extends advanced_testcase {
                 'quizsettings' => $quizsettings,
             ],
             // The ability is outside the defined ranges.
-            'Only primary: should enrol to no group' => [
+            'Should enrol to no group' => [
                 'expected' => [
                     1 => [],
                 ],
@@ -259,34 +223,6 @@ class attemptfeedback_test extends advanced_testcase {
                     ],
                 ],
                 'quizsettings' => $quizsettings,
-            ],
-            'All scales: should enrol to multiple groups' => [
-                'expected' => [
-                    1 => [2, 4],
-                    2 => [3, 4, 5],
-                ],
-                'feedbackdata' => [
-                    'personabilities_abilities' => [
-                        1 => [
-                            'value' => 1.2,
-                            'name' => 'Simulation',
-                            'toreport' => true,
-                        ],
-                        2 => [
-                            'value' => 1.3,
-                            'name' => 'Another scale',
-                        ],
-                    ],
-                ],
-                'quizsettings' => array_merge(
-                    $quizsettings,
-                    [
-                        'feedback_scaleid_limit_lower_2_1' => 0,
-                        'feedback_scaleid_limit_upper_2_1' => 5,
-                        'catquiz_group_2_1' => "3,4,5",
-                        'catquiz_enrol_only_reported_scales' => "0",
-                    ]
-                ),
             ],
         ];
     }

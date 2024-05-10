@@ -400,15 +400,11 @@ class attemptfeedback implements renderable, templatable {
         $quizsettings = (array) $this->get_quiz_settings();
         $feedbackdata = $this->load_feedbackdata();
 
-        $enrolonlytoreportedscales = $quizsettings['catquiz_enrol_only_reported_scales'] ?? true;
-        $candidatescales = $feedbackdata['personabilities_abilities'];
-        if ($enrolonlytoreportedscales) {
-            // Use only the toreport scale.
-            $candidatescales = array_filter(
-                $feedbackdata['personabilities_abilities'],
-                fn($v) => array_key_exists('toreport', $v) && $v['toreport'] === true
-            );
-        }
+        // Use only the toreport scale.
+        $candidatescales = array_filter(
+            $feedbackdata['personabilities_abilities'],
+            fn($v) => array_key_exists('toreport', $v) && $v['toreport'] === true
+        );
 
         $coursestoenrol = [];
         foreach ($candidatescales as $scaleid => $data) {
@@ -454,15 +450,11 @@ class attemptfeedback implements renderable, templatable {
         $quizsettings = (array) $this->get_quiz_settings();
         $feedbackdata = $this->load_feedbackdata();
 
-        $enrolonlytoreportedscales = $quizsettings['catquiz_enrol_only_reported_scales'] ?? true;
-        $candidatescales = $feedbackdata['personabilities_abilities'];
-        if ($enrolonlytoreportedscales) {
-            // Use only the toreport scale.
-            $candidatescales = array_filter(
-                $feedbackdata['personabilities_abilities'],
-                fn($v) => array_key_exists('toreport', $v) && $v['toreport'] === true
-            );
-        }
+        // Use only the toreport scale.
+        $candidatescales = array_filter(
+            $feedbackdata['personabilities_abilities'],
+            fn($v) => array_key_exists('toreport', $v) && $v['toreport'] === true
+        );
 
         // Check if there is a course associated with that value and if so, return it.
         $groupstoenrol = [];
