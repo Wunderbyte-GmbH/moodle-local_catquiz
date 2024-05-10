@@ -400,13 +400,13 @@ class attemptfeedback implements renderable, templatable {
         $quizsettings = (array) $this->get_quiz_settings();
         $feedbackdata = $this->load_feedbackdata();
 
-        $enrolonlyprimaryscale = get_config('local_catquiz', 'enrol_only_to_primary_scale');
+        $enrolonlytoreportedscales = $quizsettings['catquiz_enrol_only_reported_scales'] ?? true;
         $candidatescales = $feedbackdata['personabilities_abilities'];
-        if ($enrolonlyprimaryscale) {
-            // Use only the primary scale.
+        if ($enrolonlytoreportedscales) {
+            // Use only the toreport scale.
             $candidatescales = array_filter(
                 $feedbackdata['personabilities_abilities'],
-                fn($v) => array_key_exists('primary', $v) && $v['primary'] === true
+                fn($v) => array_key_exists('toreport', $v) && $v['toreport'] === true
             );
         }
 
@@ -454,13 +454,13 @@ class attemptfeedback implements renderable, templatable {
         $quizsettings = (array) $this->get_quiz_settings();
         $feedbackdata = $this->load_feedbackdata();
 
-        $enrolonlyprimaryscale = get_config('local_catquiz', 'enrol_only_to_primary_scale');
+        $enrolonlytoreportedscales = $quizsettings['catquiz_enrol_only_reported_scales'] ?? true;
         $candidatescales = $feedbackdata['personabilities_abilities'];
-        if ($enrolonlyprimaryscale) {
-            // Use only the primary scale.
+        if ($enrolonlytoreportedscales) {
+            // Use only the toreport scale.
             $candidatescales = array_filter(
                 $feedbackdata['personabilities_abilities'],
-                fn($v) => array_key_exists('primary', $v) && $v['primary'] === true
+                fn($v) => array_key_exists('toreport', $v) && $v['toreport'] === true
             );
         }
 
