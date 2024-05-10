@@ -81,7 +81,7 @@ final class fisherinformation extends preselect_task implements wb_middleware {
      * @return ?float
      */
     public function get_fisherinformation(\stdClass $question, float $ability, string $modelname): ?float {
-        $model = model_model::get_instance($modelname);
+        $model = model_model::get_instance($question->model);
         foreach ($model::get_parameter_names() as $paramname) {
             $params[$paramname] = floatval($question->$paramname);
         }
