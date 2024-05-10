@@ -231,7 +231,7 @@ class grmgeneralized extends model_raschmodel {
      * @param float $frac - answer fraction (0 ... 1.0)
      * @return float - 2nd derivative of log likelihood with respect to $pp
      */
-    public function log_likelihood_p_p(array $pp, array $ip, float $frac): float {
+    public static function log_likelihood_p_p(array $pp, array $ip, float $frac): float {
         $ability = $pp['ability'];
 
         $a = $ip['difficulty'];
@@ -239,13 +239,14 @@ class grmgeneralized extends model_raschmodel {
         
         // make sure $frac is between 0.0 and 1.0
         $frac = min(1.0, max(0.0, $frac));
-        $k_max = max(array_keys($this->$fractions));
+        $fractions = self::get_fractions($ip);
+        $k_max = max(array_keys($fractions));
         
         switch ($frac) {
             case 0.0:
                 return -($b**2 * exp($b * ($a[0] - $ability))) / (exp($b * ($a[0] - $ability)) + 1)**2;
                 break;
-            case $this->$fractions[$k_max]:
+            case $fractions[$k_max]:
                 return -($b**2 * exp($a[$k_max] * $b + $b * $ability)) / (exp($a[$k_max] * $b) + exp($b * $ability))**2;
                 break;
             default:
@@ -292,17 +293,17 @@ class grmgeneralized extends model_raschmodel {
      
     // TOOO: renam fisher_info into item_information, until than this acts as an alias
     public static function fisher_info(array $pp, array $ip): float {
-        return $this->item_information($pp, $ip);
+        return self::item_information($pp, $ip);
     }
 
-    public function category_information(array $pp, array $ip; float $frac): float {
-        return -($this->log_likelihood_p_p($pp, $ip, $frac));
+    public static function category_information(array $pp, array $ip; float $frac): float {
+        return -(self::log_likelihood_p_p($pp, $ip, $frac));
     }
     
-    public function item_information(array $pp, array $ip): float {
-        $iif = $this->category_information($pp, $ip, 0.0) * $this->likelihood($pp, $ip, 0.0);
+    public static function item_information(array $pp, array $ip): float {
+        $iif = self::category_information($pp, $ip, 0.0) * self::likelihood($pp, $ip, 0.0);
         foreach $ip['difficuölty'] AS $f => $val {
-            $iif += $this->category_information($pp, $ip, $f) * $this->likelihood($pp, $ip, $f);
+            $iif += self::category_information($pp, $ip, $f) * self::likelihood($pp, $ip, $f);
         }
         return $iif;
     }
