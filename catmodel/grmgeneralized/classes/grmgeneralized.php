@@ -310,7 +310,7 @@ class grmgeneralized extends model_raschmodel {
      */
 
     // TOOO: renam fisher_info into item_information, until than this acts as an alias.
-    public static function fisher_info(array $pp, array $ip): float {
+    public function fisher_info(array $pp, array $ip): float {
         return self::item_information($pp, $ip);
     }
 
