@@ -136,7 +136,7 @@ class raschbirnbaumb extends model_raschmodel {
      * @param float $frac - answer fraction (0 ... 1.0)
      * @return float
      */
-    public static function likelihood(array $pp, array $ip, float $frac): float {
+    public function likelihood(array $pp, array $ip, float $frac): float {
         $ability = $pp['ability'];
         
         $a = $ip['difficulty'];
@@ -183,7 +183,7 @@ class raschbirnbaumb extends model_raschmodel {
      * @param float $frac - answer fraction (0 ... 1.0)
      * @return float - 1st derivative of log likelihood with respect to $pp
      */
-    public static function log_likelihood_p(array $pp, array $ip, float $frac): float {
+    public function log_likelihood_p(array $pp, array $ip, float $frac): float {
         $ability = $pp['ability'];
 
         $a = $ip['difficulty'];
@@ -216,7 +216,7 @@ class raschbirnbaumb extends model_raschmodel {
      * @param float $frac - answer fraction (0 ... 1.0)
      * @return float - 2nd derivative of log likelihood with respect to $pp
      */
-    public static function log_likelihood_p_p(array $pp, array $ip, float $frac): float {
+    public function log_likelihood_p_p(array $pp, array $ip, float $frac): float {
         $ability = $pp['ability'];
 
         $a = $ip['difficulty'];
@@ -281,13 +281,13 @@ class raschbirnbaumb extends model_raschmodel {
     }
 
     public function category_information(array $pp, array $ip; float $frac): float {
-        return -(log_likelihood_p_p($pp, $ip, $frac));
+        return -($this->log_likelihood_p_p($pp, $ip, $frac));
     }
     
     public function item_information(array $pp, array $ip): float {
-        $iif = category_information($pp, $ip, 0.0) * likelihood($pp, $ip, 0.0);
+        $iif = $this->category_information($pp, $ip, 0.0) * $this->likelihood($pp, $ip, 0.0);
         foreach $ip['difficuölty'] AS $f => $val {
-            $iif += category_information($pp, $ip, $f) * likelihood($pp, $ip, $f);
+            $iif += $this->category_information($pp, $ip, $f) * $this->likelihood($pp, $ip, $f);
         }
         return $iif;
     }
