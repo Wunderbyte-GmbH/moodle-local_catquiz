@@ -42,16 +42,19 @@ class raschbirnbaumb extends model_raschmodel {
 
     // TODO: We will need:
     // private array $categories;
-    // private array $fractions;
+    private $fractions = array();
     // ggf. auch private array $fractions_to_categories;
     
     public function set_categories (array $ip) {
-        
-        // build array with fractions, no entries for 0 or smaller and greater than 1.0 
-        
-        // sort array asc
-        
-        // make it $fractions and ggf. $fractions_to_categories
+        $frac = [];
+
+        foreach ($ip['difficulty'] AS $fraction => $val) {
+            if ($fraction > 0 && $fraction<=1) {
+                $frac[] = $fraction;
+            }
+        }
+        usort ($fraction)   
+        $fractions = $frac;
     }
         
     public function convert_ip_to_vector (array $ip): array {
