@@ -58,6 +58,15 @@ class raschbirnbaum extends model_raschmodel {
     }
 
     /**
+     * Returns the name of this model.
+     *
+     * @return string
+     */
+    public function get_model_name(): string {
+        return 'raschbirnbaum';
+    }
+
+    /**
      * Estimate item parameters
      *
      * @param mixed $itemresponse
