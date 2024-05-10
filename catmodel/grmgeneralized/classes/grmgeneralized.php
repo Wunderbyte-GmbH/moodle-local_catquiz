@@ -302,7 +302,7 @@ class grmgeneralized extends model_raschmodel {
     
     public static function item_information(array $pp, array $ip): float {
         $iif = self::category_information($pp, $ip, 0.0) * self::likelihood($pp, $ip, 0.0);
-        foreach $ip['difficuölty'] AS $f => $val {
+        foreach ($ip['difficuölty'] AS $f => $val) {
             $iif += self::category_information($pp, $ip, $f) * self::likelihood($pp, $ip, $f);
         }
         return $iif;
