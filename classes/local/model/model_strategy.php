@@ -211,7 +211,7 @@ class model_strategy {
             foreach ($this->models as $name => $model) {
                 $oldmodelparams = $this->olditemparams[$name] ?? null;
                 $itemdifficulties[$name] = $model
-                    ->estimate_item_params($personabilities, $oldmodelparams);
+                    ->estimate_item_params($this->responses, $personabilities, $oldmodelparams);
             }
 
             $filtereddiffi = $this->select_item_model($itemdifficulties, $personabilities);
@@ -406,7 +406,7 @@ class model_strategy {
         $ignorelist = ['mixedraschbirnbaum'];
 
         foreach (self::get_installed_models() as $name => $classname) {
-            $modelclass = new $classname($this->responses, $name);
+            $modelclass = new $classname();
             if (in_array($name, $ignorelist)) {
                 continue;
             }

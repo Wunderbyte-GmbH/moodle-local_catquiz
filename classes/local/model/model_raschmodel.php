@@ -191,6 +191,7 @@ abstract class model_raschmodel extends model_model implements catcalc_item_esti
     /**
      * Estimate item params.
      *
+     * @param model_responses $responses
      * @param model_person_param_list $personparams
      * @param model_item_param_list|null $olditemparams
      *
@@ -198,10 +199,11 @@ abstract class model_raschmodel extends model_model implements catcalc_item_esti
      *
      */
     public function estimate_item_params(
+        model_responses $responses,
         model_person_param_list $personparams,
         ?model_item_param_list $olditemparams = null): model_item_param_list {
         $estimateditemparams = new model_item_param_list();
-        foreach ($this->responses->get_item_response($personparams) as $itemid => $itemresponse) {
+        foreach ($responses->get_item_response($personparams) as $itemid => $itemresponse) {
             $oldparam = $olditemparams[$itemid] ?? null;
             if ($oldparam && $oldparam->get_status() >= LOCAL_CATQUIZ_STATUS_CALCULATED) {
                 $estimateditemparams->add($oldparam);

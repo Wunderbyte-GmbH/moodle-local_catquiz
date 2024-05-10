@@ -38,6 +38,15 @@ use local_catquiz\local\model\model_raschmodel;
  */
 class rasch extends model_raschmodel {
 
+    /**
+     * Returns the name of this model.
+     *
+     * @return string
+     */
+    public function get_model_name(): string {
+        return 'rasch';
+    }
+
     // Definitions and Dimensions.
 
     /**
