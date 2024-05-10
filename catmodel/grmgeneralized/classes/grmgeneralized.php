@@ -39,11 +39,11 @@ use local_catquiz\local\model\model_raschmodel;
 class grmgeneralized extends model_raschmodel {
 
     /**
-     * Return the model name.
+     * Returns the name of this model.
      *
      * @return string
      */
-    public function get_model_name() {
+    public function get_model_name(): string {
         return 'grmgeneralized';
     }
 
