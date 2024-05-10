@@ -32,6 +32,11 @@ namespace local_catquiz\local\model;
  */
 abstract class model_model {
 
+    /**
+     * Holds model instances.
+     *
+     * @var array $models
+     */
     private static $models = [];
     /**
      * Make constructor private to force usage of get_instance()
