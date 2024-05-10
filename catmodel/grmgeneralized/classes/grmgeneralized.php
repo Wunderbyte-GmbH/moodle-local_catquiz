@@ -55,7 +55,7 @@ class grmgeneralized extends model_raschmodel {
      * @param array $ip
      * @return array of string
      */
-    public static function get_fractions (array $ip): array {
+    public static function get_fractions(array $ip): array {
         $frac = [];
 
         foreach ($ip['difficulty'] as $fraction => $val) {
@@ -75,25 +75,39 @@ class grmgeneralized extends model_raschmodel {
      *
      * @return array of string
      */
-    public static function get_category (float $frac, array $fractions):int {
+    public static function get_category(float $frac, array $fractions): int {
         // TODO: Auf die systemweit eingestellte Precission abrunden, mit Nullen auffüllen, auf nächst-klieinere fraction abrunden.
 
         return $k = array_search($frac, $fractions);
     }
 
-    // Goes modified to mathcat.php.
-    public static function convert_ip_to_vector (array $ip): array {
+    /**
+     * Goes modified to mathcat.php.
+     *
+     * @param array $ip
+     *
+     * @return array
+     */
+    public static function convert_ip_to_vector(array $ip): array {
 
         // TODO: This is very dirty and needs more attention on length / dimensionality.
         return array_merge($ip['difficulty'], [$ip['discrimination']]);
     }
 
-    public static function convert_vector_to_ip (array $vector, $fractions): array {
+    /**
+     * Convert vector to item param
+     *
+     * @param array $vector
+     * @param mixed $fractions
+     *
+     * @return array
+     */
+    public static function convert_vector_to_ip(array $vector, $fractions): array {
 
         // TODO: This is very dirty and needs more attention on length / dimensionality.
         return [
             'difficulty' => array_combine($fractions, array_splice($vector, count($vector) - 1)),
-            'discrimination' => $vector[count($vector) - 1]
+            'discrimination' => $vector[count($vector) - 1],
         ];
     }
 
@@ -108,17 +122,20 @@ class grmgeneralized extends model_raschmodel {
      * @return array of string
      */
 
-     // NOTE @David: Die folgende Funktion kann nicht mehr static sein, da diese auf $categories zugreifen muss.
+    /**
+     * Get parameter names
+     *
+     * This will have the following structure.
+     * [
+     *   'difficultiy': [fraction1: difficulty1, fraction2: difficulty2, ..., fractionk: difficultyk],
+     *   'discrimination': discrimination
+     * ]
+     *
+     * @return array
+     */
     public static function get_parameter_names(): array {
         return ['difficulty', 'discrimination'];
 
-        // This will have the following structure.
-        // phpcs:disable
-        // [
-        //   'difficultiy': [fraction1: difficulty1, fraction2: difficulty2, ..., fractionk: difficultyk],
-        //   'discrimination': discrimination
-        // ]
-        // phpcs:enable
     }
 
     /**
@@ -318,15 +335,41 @@ class grmgeneralized extends model_raschmodel {
      *
      */
 
-    // TOOO: renam fisher_info into item_information, until than this acts as an alias.
+
+    /**
+     * Return the fisher information
+     *
+     * @param array $pp
+     * @param array $ip
+     *
+     * @return float
+     * TOOO: renam fisher_info into item_information, until than this acts as an alias.
+     */
     public function fisher_info(array $pp, array $ip): float {
         return self::item_information($pp, $ip);
     }
 
+    /**
+     * Return category information
+     *
+     * @param array $pp
+     * @param array $ip
+     * @param float $frac
+     *
+     * @return float
+     */
     public static function category_information(array $pp, array $ip, float $frac): float {
         return -(self::log_likelihood_p_p($pp, $ip, $frac));
     }
 
+    /**
+     * Return item information
+     *
+     * @param array $pp
+     * @param array $ip
+     *
+     * @return float
+     */
     public static function item_information(array $pp, array $ip): float {
         $iif = self::category_information($pp, $ip, 0.0) * self::likelihood($pp, $ip, 0.0);
         foreach ($ip['difficuölty'] as $f => $val) {
