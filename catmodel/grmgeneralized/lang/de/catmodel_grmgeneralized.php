@@ -17,7 +17,7 @@
 /**
  * This file contains language strings for the 1plraschbirnbaum model catquiz plugin
  *
- * @package catmodel_gradedresponseb
+ * @package catmodel_grmgeneralized
  * @copyright  2022 Georg Maißer <info@wunderbyte.at>
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */

@@ -96,6 +96,11 @@ class grmgeneralized extends model_raschmodel {
     /**
      * Defines names if item parameter list
      *
+     * The parameters have the following structure.
+     * [
+     *   'difficultiy': [fraction1: difficulty1, fraction2: difficulty2, ..., fractionk: difficultyk],
+     *   'discrimination': discrimination
+     * ]
      * @return array of string
      */
 
