@@ -388,7 +388,7 @@ class learningprogress extends feedbackgenerator {
         $fisherinfos = [];
         foreach ($items as $item) {
             $key = $item->model;
-            $model = model_model::get_instance($models[$key]);
+            $model = model_model::get_instance($item->model);
             foreach ($model::get_parameter_names() as $paramname) {
                 $params[$paramname] = floatval($item->$paramname);
             }
@@ -471,7 +471,7 @@ class learningprogress extends feedbackgenerator {
         $fisherinfos = [];
         foreach ($items as $item) {
             $key = $item->model;
-            $model = model_model::get_instance($models[$key]);
+            $model = model_model::get_instance($item->model);
             foreach ($model::get_parameter_names() as $paramname) {
                 $params[$paramname] = floatval($item->$paramname);
             }
