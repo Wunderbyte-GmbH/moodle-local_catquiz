@@ -38,6 +38,7 @@ use local_catquiz\local\status;
 use context_system;
 use Exception;
 use local_catquiz\local\model\model_item_param_list;
+use local_catquiz\local\model\model_model;
 use local_catquiz\local\model\model_strategy;
 use moodle_exception;
 use moodle_url;
@@ -712,9 +713,9 @@ class catscale {
         }
 
         $fisherinfo = 0.0;
-        $models = model_strategy::get_installed_models();
         foreach ($items as $item) {
-            $fisherinfo += $models[$item->get_model_name()]::fisher_info(['ability' => $ability], $item->get_params_array());
+            $fisherinfo += model_model::get_instance($item->get_model_name())
+                ->fisher_info(['ability' => $ability], $item->get_params_array());
         }
 
         $fisherinfo = max(10 ** -6, $fisherinfo);
@@ -738,10 +739,10 @@ class catscale {
             return 0.0;
         }
 
-        $models = model_strategy::get_installed_models();
         $fi = [];
         foreach ($items as $item) {
-            $fi[] = $models[$item->get_model_name()]::fisher_info(['ability' => $ability], $item->get_params_array());
+            $fi[] = model_model::get_instance($item->get_model_name())
+                ->fisher_info(['ability' => $ability], $item->get_params_array());
         }
         rsort($fi, SORT_NUMERIC);
         $mostinformative = array_slice($fi, 0, $remaining);
@@ -758,10 +759,9 @@ class catscale {
      * @return float
      */
     public static function get_testinformation(float $ability, model_item_param_list $items): float {
-        $models = model_strategy::get_installed_models();
         $fi = [];
         foreach ($items as $item) {
-            $fi[] = $models[$item->get_model_name()]::fisher_info(
+            $fi[] = model_model::get_instance($item->get_model_name())->fisher_info(
                 ['ability' => $ability],
                 $item->get_params_array()
             );

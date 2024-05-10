@@ -32,6 +32,7 @@ use core\chart_series;
 use local_catquiz\catquiz;
 use local_catquiz\catscale;
 use local_catquiz\feedback\feedbackclass;
+use local_catquiz\local\model\model_model;
 use local_catquiz\output\catscalemanager\questions\cards\questionpreview;
 use local_catquiz\teststrategy\feedbackgenerator;
 use local_catquiz\teststrategy\feedbacksettings;
@@ -387,12 +388,12 @@ class learningprogress extends feedbackgenerator {
         $fisherinfos = [];
         foreach ($items as $item) {
             $key = $item->model;
-            $model = $models[$key] ?? LOCAL_CATQUIZ_FALLBACK_MODEL;
+            $model = model_model::get_instance($models[$key]);
             foreach ($model::get_parameter_names() as $paramname) {
                 $params[$paramname] = floatval($item->$paramname);
             }
             foreach ($abilitysteps as $ability) {
-                $fisherinformation = $model::fisher_info(
+                $fisherinformation = $model->fisher_info(
                     ['ability' => $ability],
                     $params
                 );
@@ -470,12 +471,12 @@ class learningprogress extends feedbackgenerator {
         $fisherinfos = [];
         foreach ($items as $item) {
             $key = $item->model;
-            $model = $models[$key] ?? $models[self::FALLBACK_MODEL];
+            $model = model_model::get_instance($models[$key]);
             foreach ($model::get_parameter_names() as $paramname) {
                 $params[$paramname] = floatval($item->$paramname);
             }
             foreach ($abilitysteps as $ability) {
-                $fisherinformation = $model::fisher_info(
+                $fisherinformation = $model->fisher_info(
                     ['ability' => $ability],
                     $params
                 );

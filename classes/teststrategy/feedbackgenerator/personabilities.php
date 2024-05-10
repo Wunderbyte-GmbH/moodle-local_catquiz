@@ -375,7 +375,7 @@ class personabilities extends feedbackgenerator {
                 $params[$paramname] = floatval($item->$paramname);
             }
             foreach ($abilitysteps as $ability) {
-                $fisherinformation = $model::fisher_info(
+                $fisherinformation = $model->fisher_info(
                     ['ability' => $ability],
                     $params
                 );
