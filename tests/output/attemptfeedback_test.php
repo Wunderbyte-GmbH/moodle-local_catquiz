@@ -47,7 +47,6 @@ class attemptfeedback_test extends advanced_testcase {
      * @param array $expected
      * @param array $feedbackdata
      * @param array $quizsettings
-     * @param bool $onlyprimary
      *
      * @return void
      * @throws InvalidArgumentException
@@ -57,11 +56,8 @@ class attemptfeedback_test extends advanced_testcase {
     public function test_it_returns_expected_courses_to_enrol(
         array $expected,
         array $feedbackdata,
-        array $quizsettings,
-        bool $onlyprimary = true
+        array $quizsettings
     ) {
-        $this->resetAfterTest(true);
-        set_config('enrol_only_to_primary_scale', $onlyprimary, 'local_catquiz');
         // We use a mock object so that we can work with the quiz settings and feedbackdata that we get from the data provider.
         // The rest of the attemptfeedback class is unchanged.
         $attemptfeedback = $this->getMockBuilder(attemptfeedback::class)
@@ -109,7 +105,7 @@ class attemptfeedback_test extends advanced_testcase {
                         1 => [
                             'value' => 1.2,
                             'name' => 'Simulation',
-                            'primary' => true,
+                            'toreport' => true,
                         ],
                         2 => [
                             'value' => 1.2,
@@ -138,7 +134,7 @@ class attemptfeedback_test extends advanced_testcase {
                         1 => [
                             'value' => 6.0,
                             'name' => 'Simulation',
-                            'primary' => true,
+                            'toreport' => true,
                         ],
                     ],
                 ],
@@ -162,7 +158,7 @@ class attemptfeedback_test extends advanced_testcase {
                         1 => [
                             'value' => 1.2,
                             'name' => 'Simulation',
-                            'primary' => true,
+                            'toreport' => true,
                         ],
                         2 => [
                             'value' => 1.2,
@@ -176,9 +172,9 @@ class attemptfeedback_test extends advanced_testcase {
                         'feedback_scaleid_limit_lower_2_1' => 0,
                         'feedback_scaleid_limit_upper_2_1' => 5,
                         'catquiz_courses_2_1' => [3, 4],
+                        'catquiz_enrol_only_reported_scales' => "0",
                     ]
                 ),
-                'onlyprimary' => false,
             ],
         ];
     }
@@ -189,7 +185,6 @@ class attemptfeedback_test extends advanced_testcase {
      * @param array $expected
      * @param array $feedbackdata
      * @param array $quizsettings
-     * @param bool $onlyprimary
      *
      * @return void
      *
@@ -200,11 +195,8 @@ class attemptfeedback_test extends advanced_testcase {
     public function test_it_returns_expected_groups_to_enrol(
         array $expected,
         array $feedbackdata,
-        array $quizsettings,
-        bool $onlyprimary = true
+        array $quizsettings
     ) {
-        $this->resetAfterTest(true);
-        set_config('enrol_only_to_primary_scale', $onlyprimary, 'local_catquiz');
         // We use a mock object so that we can work with the quiz settings and feedbackdata that we get from the data provider.
         // The rest of the attemptfeedback class is unchanged.
         $attemptfeedback = $this->getMockBuilder(attemptfeedback::class)
@@ -246,7 +238,7 @@ class attemptfeedback_test extends advanced_testcase {
                         1 => [
                             'value' => 1.2,
                             'name' => 'Simulation',
-                            'primary' => true,
+                            'toreport' => true,
                         ],
                     ],
                 ],
@@ -262,7 +254,7 @@ class attemptfeedback_test extends advanced_testcase {
                         1 => [
                             'value' => 6.0,
                             'name' => 'Simulation',
-                            'primary' => true,
+                            'toreport' => true,
                         ],
                     ],
                 ],
@@ -278,7 +270,7 @@ class attemptfeedback_test extends advanced_testcase {
                         1 => [
                             'value' => 1.2,
                             'name' => 'Simulation',
-                            'primary' => true,
+                            'toreport' => true,
                         ],
                         2 => [
                             'value' => 1.3,
@@ -292,9 +284,9 @@ class attemptfeedback_test extends advanced_testcase {
                         'feedback_scaleid_limit_lower_2_1' => 0,
                         'feedback_scaleid_limit_upper_2_1' => 5,
                         'catquiz_group_2_1' => "3,4,5",
+                        'catquiz_enrol_only_reported_scales' => "0",
                     ]
                 ),
-                'onlyprimary' => false,
             ],
         ];
     }

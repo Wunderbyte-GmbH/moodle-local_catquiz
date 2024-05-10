@@ -107,8 +107,8 @@ $string['peritem'] = 'pro Item ';
 $string['applychanges'] = 'Änderungen übernehmen';
 $string['automatic_reload_on_scale_selection'] = 'Bei (Sub-)Skalenauswahl Formular neu laden';
 $string['automatic_reload_on_scale_selection_description'] = 'Bei (Sub-)Skalenauswahl automatisch das Quizsettings-Formular neu laden';
-$string['enrol_only_to_primary_scale'] = 'Benutzer nur in Kurse von detektierter Skala einschreiben';
-$string['enrol_only_to_primary_scale_description'] = 'Falls es mehrere Kurse
+$string['enrol_only_to_reported_scales'] = 'Benutzer nur in Kurse von detektierter Skala einschreiben';
+$string['enrol_only_to_reported_scales_help'] = 'Falls es mehrere Kurse
 gibt, in die ein Benutzer laut Einstellungen und Ergebnis eingeschrieben werden
 kann, wird er nur in den Kurs mit der detektierten Skala eingeschrieben.'; // TODO: get translation.
 
