@@ -55,11 +55,6 @@ require_once($CFG->dirroot.'/local/catquiz/lib.php');
 class learningprogress extends feedbackgenerator {
 
     /**
-     * @var string
-     */
-    const FALLBACK_MODEL = 'mixedraschbirnbaum';
-
-    /**
      *
      * @var stdClass $feedbacksettings.
      */
@@ -387,7 +382,10 @@ class learningprogress extends feedbackgenerator {
         $models = model_strategy::get_installed_models();
         $fisherinfos = [];
         foreach ($items as $item) {
-            $key = $item->model;
+            // We can not calculate the fisher information for items without a model.
+            if (!$item->model) {
+                continue;
+            }
             $model = model_model::get_instance($item->model);
             foreach ($model::get_parameter_names() as $paramname) {
                 $params[$paramname] = floatval($item->$paramname);
@@ -470,7 +468,10 @@ class learningprogress extends feedbackgenerator {
     public function get_fisherinfos_of_items(array $items, array $models, array $abilitysteps): array {
         $fisherinfos = [];
         foreach ($items as $item) {
-            $key = $item->model;
+            // We can not calculate the fisher information for items without a model.
+            if (!$item->model) {
+                continue;
+            }
             $model = model_model::get_instance($item->model);
             foreach ($model::get_parameter_names() as $paramname) {
                 $params[$paramname] = floatval($item->$paramname);
