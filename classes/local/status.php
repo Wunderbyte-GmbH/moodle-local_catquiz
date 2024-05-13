@@ -110,23 +110,23 @@ class status {
      */
     public static function to_int(string $status): int {
         switch ($status) {
-            case 'ok':
+            case self::OK:
                 return 0;
-            case 'noremainingquestions':
+            case self::ERROR_NO_REMAINING_QUESTIONS:
                 return 1;
-            case 'testiteminrelatedscale':
+            case self::ERROR_TESTITEM_ALREADY_IN_RELATED_SCALE:
                 return 2;
-            case 'errorfetchnextquestion':
+            case self::ERROR_FETCH_NEXT_QUESTION:
                 return 3;
-            case 'reachedmaximumquestions':
+            case self::ERROR_REACHED_MAXIMUM_QUESTIONS:
                 return 4;
-            case 'abortpersonabilitynotchanged':
+            case self::ABORT_PERSONABILITY_NOT_CHANGED:
                 return 5;
-            case 'emptyfirstquestionlist':
+            case self::ERROR_EMPTY_FIRST_QUESTION_LIST:
                 return 6;
-            case 'errornoitems':
+            case self::ERROR_NO_ITEMS:
                 return 7;
-            case 'exceededmaxattempttime':
+            case self::EXCEEDED_MAX_ATTEMPT_TIME:
                 return 8;
             default:
                 return -1;
