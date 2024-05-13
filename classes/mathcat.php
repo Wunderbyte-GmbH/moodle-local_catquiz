@@ -341,6 +341,7 @@ class mathcat {
             if (isset($fntrfilter)) {
                 // Check for glitches within the calculated result.
                 if (count(array_filter($parameter, fn ($x) => is_nan($x))) > 0) {
+
                     // Set to predefined values.
                     $parameter = $fntrfilter($parameter);
                     $iscritical = true;
@@ -366,6 +367,7 @@ class mathcat {
                     }
 
                     // Re-serialize the parameter vector, as $parameter has been changed.
+                    $parameterserialized = $parameter;
                     self::array_to_vector($parameterserialized);
                     $mxparameter = new matrix($parameterserialized);
                     $mxparameter = $mxparameter->transpose();
@@ -478,13 +480,13 @@ class mathcat {
      * Converts item parameters from an array to a vector
      *
      * @param array|float $data - array or float to be transformed into a serialized vevtor
-     * @param int $n - just ignore that, it's for the recursion 
+     * @param int $n - just ignore that, it's for the recursion
      *
      * @return array - structure of the given array, needed for restoring by vector_to_array
-     *
-     * NOTE: The operation will be done directly on $data, so work with a copy!
      */
-    public static function array_to_vector(mixed $data, int &$n = null): array {
+    public static function array_to_vector($data, int &$n = null): array {
+        // NOTE: The operation will be done directly on $data, so work with a copy!
+
         if (is_null($n)) {
             $n = 0;
         }
