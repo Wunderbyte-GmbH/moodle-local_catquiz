@@ -285,10 +285,7 @@ class mathcat {
 
         // Set initial values.
         $parameter = $parameterstart;
-        $parameterserialized = $parameter;
-        // Note: Please check for yourself...
-        // ... that the order of your parameters in your array corresponds to the order of $fn_function!
-        $parameterstructure = self::array_to_vector($parameterserialized);
+        
         $iscritical = false;
         $maxsteplength = 0.1;
         $usegauss = false;
@@ -296,7 +293,12 @@ class mathcat {
         // Begin with numerical iteration.
         for ($i = 0; $i < $maxiterations; $i++) {
 
-            // DAVID: Sollte serialisiert werden für den Fall genesteter Arrays.
+            // Serialize parameters and store structure of parameter array
+            $parameterserialized = $parameter;
+            // Note: Please check for yourself...
+            // ... that the order of your parameters in your array corresponds to the order of $fn_function!
+            $parameterstructure = self::array_to_vector($parameterserialized);
+
             $mxparameter = new matrix($parameterserialized);
             $mxparameter = $mxparameter->transpose();
 
@@ -338,22 +340,29 @@ class mathcat {
             }
 
             $mxparameter = $mxparameter->subtract($mxdelta);
+            
+            // Reconstruct the parameters from matrix calculus and store them in original structure
             $parameter = self::vector_to_array(($mxparameter->transpose())[0], $parameterstructure);
 
             // If Trusted Region filter is provided, check for being still in Trusted Regions.
             if (isset($fntrfilter)) {
                 // Check for glitches within the calculated result.
                 if (count(array_filter($parameter, fn ($x) => is_nan($x))) > 0) {
-                    $parameter = $fntrfilter($parameter); // DAVID: Darüber sollten wir noch einmal nachdenken.
+                    // Set to predefined values
+                    $parameter = $fntrfilter($parameter); 
                     $iscritical = true;
-                    return self::vector_to_array($parameter, $parameterstructure);
+                    return $parameter;
                 }
 
                 // Check if $parameter is still in the Trusted Region.
                 if ($fntrfilter($parameter) !== $parameter) {
+                    // Set to predefined values
                     $parameter = $fntrfilter($parameter);
-                    // DAVID: Sollte serialisiert werden für den Fall genesteter Arrays.
-                    $mxparameter = new matrix(is_array($parameter) ? [$parameter] : [[$parameter]]);
+                    
+                    // Serialize parameters and store structure of parameter array
+                    $parameterserialized = $parameter;
+                    self::array_to_vector($parameterserialized);
+                    $mxparameter = new matrix($parameterserialized);
                     $mxparameter = $mxparameter->transpose();
 
                     // If Trusted Region function and its derivative are provided, add them to $fn_function and $fn_derivative.
@@ -370,8 +379,8 @@ class mathcat {
                         // TODO !!! array_to_vector nutzen!
 
                         $parameter = $parameterstart;
-                        // DAVID: Sollte serialisiert werden für den Fall genesteter Arrays.
-                        $mxparameter = new matrix(is_array($parameter) ? [$parameter] : [[$parameter]]);
+                        self::array_to_vector($parameterserialized);
+                        $mxparameter = new matrix($parameterserialized);
                         $mxparameter = $mxparameter->transpose();
                     }
                 } else {
