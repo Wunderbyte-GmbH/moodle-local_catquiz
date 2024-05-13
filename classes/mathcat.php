@@ -515,18 +515,16 @@ class mathcat {
                     // Perpare results.
                     $structure[$key] = $structuretmp;
                     $datatmp = array_merge($datatmp, $val);
-                }
-                else if (is_float(floatval($val))) {
+                } else if (is_float(floatval($val))) {
 
                     // Give back part of the array and structure, also increment $n.
                     $datatmp[$n] = floatval($val);
                     $structure[$key] = $n;
                     $n += 1;
-                }
-                else {
+                } else {
 
                     // Handle any other cases, like strings or objects.
-                    // TODO: Throw error warning and exit with null;
+                    // TODO: Throw error warning and exit with null.
                     return null;
                 }
             }
@@ -534,8 +532,7 @@ class mathcat {
             // Overwrite $data and return $structure.
             $data = $datatmp;
             return $structure;
-        }
-        else if (is_float(floatval($data))) {
+        } else if (is_float(floatval($data))) {
 
             // Handle the case that something like a float is given instead.
             $structure = $n;
@@ -572,16 +569,14 @@ class mathcat {
                 // TODO Error-Warning bei allem anderen.
             }
             return $datatmp;
-        }
-        else if (is_int($structure)) {
+        } else if (is_int($structure)) {
 
             // Handle floats or anything like it.
             if (array_key_exists($structure, $data)) {
 
                 // Give back just the value.
                 return $data[$structure];
-            }
-            else {
+            } else {
 
                 // Handle all forbidden cases.
                 // TODO: throw error/warning: $key not in $data.
