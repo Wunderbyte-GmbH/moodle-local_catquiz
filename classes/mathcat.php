@@ -561,12 +561,14 @@ class mathcat {
             // Handle arrays.
             $datatmp = [];
             foreach ($structure as $key => $val) {
+
                 if (is_array($val)) {
+
                     $datatmp[$key] = self::vector_to_array($data, $val);
                 } else if (is_int($val)) {
+
                     $datatmp[$key] = $data[$val];
                 }
-                // TODO Error-Warning bei allem anderen.
             }
             return $datatmp;
         } else if (is_int($structure)) {
