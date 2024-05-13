@@ -349,14 +349,14 @@ class mathcat {
                 // Check for glitches within the calculated result.
                 if (count(array_filter($parameter, fn ($x) => is_nan($x))) > 0) {
                     // Set to predefined values.
-                    $parameter = $fntrfilter($parameter); 
+                    $parameter = $fntrfilter($parameter);
                     $iscritical = true;
                     return $parameter;
                 }
 
                 // Check if $parameter is still in the Trusted Region.
                 if ($fntrfilter($parameter) !== $parameter) {
-                    // Set to predefined values
+                    // Set to predefined values.
                     $parameter = $fntrfilter($parameter);
 
                     // Serialize parameters and store structure of parameter array.
