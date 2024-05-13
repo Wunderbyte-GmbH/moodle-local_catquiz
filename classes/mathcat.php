@@ -301,11 +301,11 @@ class mathcat {
         // Begin with numerical iteration.
         for ($i = 0; $i < $maxiterations; $i++) {
 
-            // Calculate the function and derivative values from  $fn_function and $fn_derivative at point $parameter.
+            // Calculate the function and derivative values from  $fnfunction and $fnderivative for $parameter.
             $valfunction = $fnfunction($parameter);
             $valderivative = $fnderivative($parameter);
 
-            // Throws error Object of class Closure can not be converted to float.
+            // Create matrix with the value of the function and its first derivative.
             $mxfunction = new matrix($valfunction);
             $mxderivative = new matrix($valderivative);
             $mxfunction = $mxfunction->transpose();
@@ -320,13 +320,14 @@ class mathcat {
             $mxdelta = $mxderivativeinv->multiply($mxfunction);
             $distance = $mxdelta->rooted_summed_squares();
 
+            // Adjust step size dynamically by enforced convergence.
             if ($distance >= $maxsteplength) {
 
-                // Shorten step matrix $mx_delta to concurrent step length.
+                // Shorten step matrix $mxdelta to concurrent step length.
                 $mxdelta = $mxdelta->multiply($maxsteplength / $distance);
             } else {
 
-                // Set new $max_step_length.
+                // Adjust $maxsteplength to shorter distance.
                 $maxsteplength = $distance;
             }
 
@@ -352,7 +353,7 @@ class mathcat {
                     // Set to predefined values.
                     $parameter = $fntrfilter($parameter);
 
-                    // If Trusted Region function and its derivative are provided, add them to $fn_function and $fn_derivative.
+                    // If Trusted Region function and its derivative are provided, add them to $fnfunction and $fnderivative.
                     if (isset($fntrfunction) && isset($fntrderivative) && ! $usegauss) {
                         $fnfunction = fn($x) => matrixcat::multi_sum($fntrfunction($x), $fnfunction($x));
                         $fnderivative = fn($x) => matrixcat::multi_sum($fntrderivative($x), $fnderivative($x));
@@ -360,7 +361,7 @@ class mathcat {
                     }
 
                     // If the problem occurs a second time in a row...
-                    // ... additionally reset the parameter $parameter to $parameter_start.
+                    // ... additionally reset the parameter $parameter to $parameterstart.
                     if ($iscritical) {
                         $parameter = $parameterstart;
                     }
@@ -372,7 +373,7 @@ class mathcat {
                     $mxparameter = $mxparameter->transpose();
                 } else {
 
-                    // If everything went fine, keep/reset $is_critical as FALSE.
+                    // If everything went fine, keep/reset $iscritical as FALSE.
                     $iscritical = false;
                 }
             }
@@ -488,38 +489,64 @@ class mathcat {
         // NOTE: The operation will be done directly on $data, so work with a copy!
 
         if (is_null($n)) {
+
+            // If there is no $n given, create one for having an adress to work with.
             $n = 0;
         }
-        if (is_float($data)) {
-            $structure = $n;
-            $data = [$n => $data];
-            $n += 1;
-            return $structure;
-        } else if (is_array($data)) {
+
+        if (is_array($data)) {
+
+            // Handle all arrays given.
             $datatmp = [];
             $structure = [];
             foreach ($data as $key => $val) {
+
                 if (is_array($val)) {
+
+                    // Analyse further recursively.
                     $structuretmp = self::array_to_vector($val, $n);
-                    // TODO: teste, ob legid.
+
+                    // Test if result is legid.
+                    if (is_null($structuretmp) {
+                        // TODO: Here should be some error/warning handling be done.
+                        return null;
+                    }
+
+                    // Perpare results.
                     $structure[$key] = $structuretmp;
                     $datatmp = array_merge($datatmp, $val);
-                } else if (is_float(floatval($val))) {
+                }
+                else if (is_float(floatval($val))) {
+
+                    // Give back part of the array and structure, also increment $n.
                     $datatmp[$n] = floatval($val);
                     $structure[$key] = $n;
                     $n += 1;
                 }
+                else {
+
+                    // Handle any other cases, like strings or objects.
+                    // TODO: Throw error warning and exit with null;
+                    return null;
+                }
             }
+
+            // Overwrite $data and return $structure.
             $data = $datatmp;
-            // Gebe $structure aus.
             return $structure;
-        } else {
-            // TODO: throw error/warning: not float or array, also give $data.
-            echo "Fehler!";
-            return null;
         }
-        // TODO: This is very dirty and needs more attention on length / dimensionality.
-        return array_merge($ip['difficulty'], [$ip['discrimination']]);
+        else if (is_float(floatval($data))) {
+
+            // Handle the case that something like a float is given instead.
+            $structure = $n;
+            $data = [$n => $data];
+            $n += 1;
+            return $structure;
+        }
+
+        // Handle any other cases, like strings or objects. 
+        // TODO: throw error/warning: not float or array, also give $data.
+        return null;
     }
 
     /**
@@ -531,10 +558,10 @@ class mathcat {
      * @return array - the restored array or float
      */
     public static function vector_to_array(array $data, $structure): array {
-        if (is_int($structure)) {
-            // TODO: has to be proven first, if existing, otherwise error.
-            return $data[$structure];
-        } else if (is_array($structure)) {
+
+        if (is_array($structure)) {
+
+            // Handle arrays.
             $datatmp = [];
             foreach ($structure as $key => $val) {
                 if (is_array($val)) {
@@ -546,7 +573,24 @@ class mathcat {
             }
             return $datatmp;
         }
-        // TODO Error-Warning bei allem anderen.
+        else if (is_int($structure)) {
+
+            // Handle floats or anything like it.
+            if (array_key_exists($structure, $data)) {
+
+                // Give back just the value.
+                return $data[$structure];
+            }
+            else {
+
+                // Handle all forbidden cases.
+                // TODO: throw error/warning: $key not in $data.
+                return null;
+            }
+        }
+
+        // Handle any other cases, like strings or objects. 
+        // TODO: throw error/warning: not float or array, also give $data.
         return null;
     }
 }
