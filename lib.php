@@ -97,8 +97,6 @@ define('LOCAL_CATQUIZ_DEFAULT_NONSENSE_TESTSTRATEGY', -1);
 // Standarderror defaults.
 define('LOCAL_CATQUIZ_STANDARDERROR_DEFAULT_MIN', 0.35);
 define('LOCAL_CATQUIZ_STANDARDERROR_DEFAULT_MAX', 1);
-// Fallback for item model.
-define('LOCAL_CATQUIZ_FALLBACK_MODEL', 'catmodel_raschbirnbaum\raschbirnbaum');
 
 define('LOCAL_CATQUIZ_DEFAULT_GREY', "#878787");
 define('LOCAL_CATQUIZ_MAX_SCALERANGE', 8);
