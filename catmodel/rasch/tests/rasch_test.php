@@ -24,6 +24,7 @@
 
  namespace catmodel_rasch;
 
+use local_catquiz\local\model\model_model;
 use PHPUnit\Framework\ExpectationFailedException;
 use PHPUnit\Framework\TestCase;
 use SebastianBergmann\RecursionContext\InvalidArgumentException;
@@ -769,7 +770,6 @@ class rasch_test extends TestCase {
      *
      */
     private function getmodel(): rasch {
-        $mr = new model_responses();
-        return new rasch($mr, 'rasch');
+        return model_model::get_instance('rasch');
     }
 }

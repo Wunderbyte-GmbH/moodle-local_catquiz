@@ -17,7 +17,7 @@
 /**
  * This file contains the version information for the 1plraschbirnbaum model catquiz plugin
  *
- * @package catmodel_gradedresponsec
+ * @package catmodel_pcm
  * @copyright  2022 Georg Maißer <info@wunderbyte.at>
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */

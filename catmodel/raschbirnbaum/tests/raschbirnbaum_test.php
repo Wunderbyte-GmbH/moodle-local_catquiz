@@ -25,6 +25,7 @@
 namespace catmodel_raschbirnbaum;
 
 use catmodel_rasch\rasch;
+use local_catquiz\local\model\model_model;
 use PHPUnit\Framework\ExpectationFailedException;
 use PHPUnit\Framework\TestCase;
 use SebastianBergmann\RecursionContext\InvalidArgumentException;
@@ -938,10 +939,8 @@ class raschbirnbaum_test extends TestCase {
      * Get model.
      *
      * @return raschbirnbaum
-     *
      */
     private function getmodel(): raschbirnbaum {
-        $mr = new model_responses();
-        return new raschbirnbaum($mr, 'raschbirnbaum');
+        return model_model::get_instance('raschbirnbaum');
     }
 }

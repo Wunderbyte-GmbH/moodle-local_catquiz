@@ -49,11 +49,6 @@ require_once($CFG->dirroot.'/local/catquiz/lib.php');
 class personabilities extends feedbackgenerator {
 
     /**
-     * @var string
-     */
-    const FALLBACK_MODEL = 'mixedraschbirnbaum';
-
-    /**
      *
      * @var stdClass $feedbacksettings.
      */
@@ -355,41 +350,6 @@ class personabilities extends feedbackgenerator {
             'tooltiptitle' => $tooltiptitle,
         ];
 
-    }
-
-    /**
-     * Get fisherinfos of item for each abilitystep.
-     *
-     * @param array $items
-     * @param array $models
-     * @param array $abilitysteps
-     *
-     * @return array
-     */
-    public function get_fisherinfos_of_items(array $items, array $models, array $abilitysteps): array {
-        $fisherinfos = [];
-        foreach ($items as $item) {
-            $key = $item->model;
-            $model = $models[$key] ?? $models[self::FALLBACK_MODEL];
-            foreach ($model::get_parameter_names() as $paramname) {
-                $params[$paramname] = floatval($item->$paramname);
-            }
-            foreach ($abilitysteps as $ability) {
-                $fisherinformation = $model::fisher_info(
-                    ['ability' => $ability],
-                    $params
-                );
-                $stringkey = strval($ability);
-
-                if (!isset($fisherinfos[$stringkey])) {
-                    $fisherinfos[$stringkey] = $fisherinformation;
-                } else {
-                    $fisherinfos[$stringkey] += $fisherinformation;
-                }
-            }
-
-        }
-        return $fisherinfos;
     }
 
     /**

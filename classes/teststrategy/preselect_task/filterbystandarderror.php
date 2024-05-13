@@ -126,11 +126,9 @@ class filterbystandarderror extends preselect_task implements wb_middleware {
                         if (!array_key_exists($q->model, $this->context['installed_models'])) {
                             continue;
                         }
-                        $model = $this->context['installed_models'][$q->model];
                         $q->fisherinformation[$subscaleid] = $fisherinformation->get_fisherinformation(
                             $q,
-                            $inheritval,
-                            $model
+                            $inheritval
                         );
                     }
                 }

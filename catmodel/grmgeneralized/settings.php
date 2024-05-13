@@ -17,7 +17,7 @@
 /**
  * Plugin administration pages are defined here.
  *
- * @package     catmodel_raschbirnbaumb
+ * @package     catmodel_grmgeneralized
  * @category    admin
  * @copyright   Wunderbyte Gmbh 2023 <info@wunderbyte.at>
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later

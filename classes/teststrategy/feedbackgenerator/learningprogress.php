@@ -32,6 +32,7 @@ use core\chart_series;
 use local_catquiz\catquiz;
 use local_catquiz\catscale;
 use local_catquiz\feedback\feedbackclass;
+use local_catquiz\local\model\model_model;
 use local_catquiz\output\catscalemanager\questions\cards\questionpreview;
 use local_catquiz\teststrategy\feedbackgenerator;
 use local_catquiz\teststrategy\feedbacksettings;
@@ -52,11 +53,6 @@ require_once($CFG->dirroot.'/local/catquiz/lib.php');
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class learningprogress extends feedbackgenerator {
-
-    /**
-     * @var string
-     */
-    const FALLBACK_MODEL = 'mixedraschbirnbaum';
 
     /**
      *
@@ -386,13 +382,16 @@ class learningprogress extends feedbackgenerator {
         $models = model_strategy::get_installed_models();
         $fisherinfos = [];
         foreach ($items as $item) {
-            $key = $item->model;
-            $model = $models[$key] ?? LOCAL_CATQUIZ_FALLBACK_MODEL;
+            // We can not calculate the fisher information for items without a model.
+            if (!$item->model) {
+                continue;
+            }
+            $model = model_model::get_instance($item->model);
             foreach ($model::get_parameter_names() as $paramname) {
                 $params[$paramname] = floatval($item->$paramname);
             }
             foreach ($abilitysteps as $ability) {
-                $fisherinformation = $model::fisher_info(
+                $fisherinformation = $model->fisher_info(
                     ['ability' => $ability],
                     $params
                 );
@@ -469,13 +468,16 @@ class learningprogress extends feedbackgenerator {
     public function get_fisherinfos_of_items(array $items, array $models, array $abilitysteps): array {
         $fisherinfos = [];
         foreach ($items as $item) {
-            $key = $item->model;
-            $model = $models[$key] ?? $models[self::FALLBACK_MODEL];
+            // We can not calculate the fisher information for items without a model.
+            if (!$item->model) {
+                continue;
+            }
+            $model = model_model::get_instance($item->model);
             foreach ($model::get_parameter_names() as $paramname) {
                 $params[$paramname] = floatval($item->$paramname);
             }
             foreach ($abilitysteps as $ability) {
-                $fisherinformation = $model::fisher_info(
+                $fisherinformation = $model->fisher_info(
                     ['ability' => $ability],
                     $params
                 );

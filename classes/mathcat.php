@@ -287,7 +287,7 @@ class mathcat {
         $parameter = $parameterstart;
         // Note: Please check for yourself...
         // ... that the order of your parameters in your array corresponds to the order of $fn_function!
-        $parameter_structure = self::array_to_vector($parameter);
+        $parameterstructure = self::array_to_vector($parameter);
         $iscritical = false;
         $maxsteplength = 0.1;
         $usegauss = false;
@@ -337,7 +337,7 @@ class mathcat {
             }
 
             $mxparameter = $mxparameter->subtract($mxdelta);
-            $parameter = self::vector_to_array($parameter_structure, ($mxparameter->transpose())[0]);
+            $parameter = self::vector_to_array($parameterstructure, ($mxparameter->transpose())[0]);
 
             // If Trusted Region filter is provided, check for being still in Trusted Regions.
             if (isset($fntrfilter)) {
@@ -345,7 +345,7 @@ class mathcat {
                 if (count(array_filter($parameter, fn ($x) => is_nan($x))) > 0) {
                     $parameter = $fntrfilter($parameter); // DAVID: Darüber sollten wir noch einmal nachdenken.
                     $iscritical = true;
-                    return self::vector_to_array($parameter_structure, $parameter);
+                    return self::vector_to_array($parameterstructure, $parameter);
                 }
 
                 // Check if $parameter is still in the Trusted Region.
@@ -365,9 +365,9 @@ class mathcat {
                     // If the problem occurs a second time in a row...
                     // ... additionally reset the parameter $parameter to $parameter_start.
                     if ($iscritical) {
-                        
+
                         // TODO !!! array_to_vector nutzen!
-                        
+
                         $parameter = $parameterstart;
                         // DAVID: Sollte serialisiert werden für den Fall genesteter Arrays.
                         $mxparameter = new matrix(is_array($parameter) ? [$parameter] : [[$parameter]]);
@@ -474,41 +474,45 @@ class mathcat {
         };
         return $returnfn;
     }
-    
-    
-    function array_to_vector(float|array &$data, int &$n = null): array {
 
+
+    /**
+     * Converts item parameters from an array to a vector
+     *
+     * @param float|array $data
+     * @param int $n
+     *
+     * @return array
+     */
+    public static function array_to_vector(float|array &$data, int &$n = null): array {
         if (is_null($n)) {
             $n = 0;
-        } 
+        }
         if (is_float($data)) {
             $structure = $n;
             $data = [$n => $data];
             $n += 1;
             return $structure;
-        }
-        else if (is_array($data)) {
-            $data_tmp = [];
+        } else if (is_array($data)) {
+            $datatmp = [];
             $structure = [];
             foreach ($data as $key => $val) {
-                
-                if (is_array($val)) { 
-                    $structure_tmp = self::array_to_vector($val, $n);
-                    // TODO: teste, ob legid
-                    $structure [$key] = $structure_tmp;
-                    $data_tmp = array_merge($data_tmp, $val);
-                }
-                else if (is_float(floatval($val))) {
-                    $data_tmp [$n] = floatval($val);
-                    $structure [$key] = $n;
+                if (is_array($val)) {
+                    $structuretmp = self::array_to_vector($val, $n);
+                    // TODO: teste, ob legid.
+                    $structure[$key] = $structuretmp;
+                    $datatmp = array_merge($datatmp, $val);
+                } else if (is_float(floatval($val))) {
+                    $datatmp[$n] = floatval($val);
+                    $structure[$key] = $n;
                     $n += 1;
                 }
             }
-            $data = $data_tmp;
-            // gebe $structure aus
+            $data = $datatmp;
+            // Gebe $structure aus.
             return $structure;
         } else {
-            // TODO: throw error/warning: not float or array, also give $data 
+            // TODO: throw error/warning: not float or array, also give $data.
             echo "Fehler!";
             return null;
         }
@@ -516,27 +520,31 @@ class mathcat {
         return array_merge($ip['difficulty'], [$ip['discrimination']]);
     }
 
-    function vector_to_array (array $data, array $structure): float|array {
-
+    /**
+     * Converts item parameters from a vector to an array or float
+     *
+     * @param array $data
+     * @param array $structure
+     *
+     * @return float|array
+     */
+    public static function vector_to_array (array $data, array $structure): float|array {
         if (is_int($structure)) {
-            
-            // TODO: has to be proven first, if existing, otherwise error
+            // TODO: has to be proven first, if existing, otherwise error.
             return $data[$structure];
-        }
-        else if (is_array($structure)) {
-            $data_tmp = [];
-            foreach ($structure AS $key => $val) {
+        } else if (is_array($structure)) {
+            $datatmp = [];
+            foreach ($structure as $key => $val) {
                 if (is_array($val)) {
-                    $data_tmp[$key] = self::vector_to_array($data, $val);
+                    $datatmp[$key] = self::vector_to_array($data, $val);
+                } else if (is_int($val)) {
+                    $datatmp[$key] = $data[$val];
                 }
-                else if (is_int($val)) {
-                    $data_tmp[$key] = $data[$val];
-                }
-                // TODO Error-Warning bei allem anderen
+                // TODO Error-Warning bei allem anderen.
             }
-            return $data_tmp;
+            return $datatmp;
         }
-        // TODO Error-Warning bei allem anderen
+        // TODO Error-Warning bei allem anderen.
         return null;
     }
 }
