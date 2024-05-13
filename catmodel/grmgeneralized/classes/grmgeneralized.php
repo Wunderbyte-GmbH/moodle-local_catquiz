@@ -71,10 +71,10 @@ class grmgeneralized extends model_raschmodel {
      *
      * @return array of string
      */
-    public static function get_category (float $frac, array $fractions):int {
+    public static function get_category (float $frac, array $fractions): int {
         // TODO: Auf die systemweit eingestellte Precission abrunden, mit Nullen auffüllen, auf nächst-klieinere fraction abrunden.
 
-        return $k = array_search($frac, $fractions);
+        return array_search($frac, $fractions);
     }
 
     // Goes modified to mathcat.php.
