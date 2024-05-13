@@ -285,9 +285,10 @@ class mathcat {
 
         // Set initial values.
         $parameter = $parameterstart;
+        $parameterserialized = $parameter;
         // Note: Please check for yourself...
         // ... that the order of your parameters in your array corresponds to the order of $fn_function!
-        $parameterstructure = self::array_to_vector($parameter);
+        $parameterstructure = self::array_to_vector($parameterserialized);
         $iscritical = false;
         $maxsteplength = 0.1;
         $usegauss = false;
@@ -296,7 +297,7 @@ class mathcat {
         for ($i = 0; $i < $maxiterations; $i++) {
 
             // DAVID: Sollte serialisiert werden für den Fall genesteter Arrays.
-            $mxparameter = new matrix($parameter);
+            $mxparameter = new matrix($parameterserialized);
             $mxparameter = $mxparameter->transpose();
 
             // Calculate the function and derivative values from  $fn_function and $fn_derivative at point $parameter.
@@ -311,7 +312,7 @@ class mathcat {
 
             // If the determinant is null, we already found the value.
             if ($mxderivative->determinant() == 0) {
-                return array_combine($parameternames, $parameter);
+                return $parameter;
             }
 
             $mxderivativeinv = $mxderivative->inverse();
@@ -337,7 +338,7 @@ class mathcat {
             }
 
             $mxparameter = $mxparameter->subtract($mxdelta);
-            $parameter = self::vector_to_array($parameterstructure, ($mxparameter->transpose())[0]);
+            $parameter = self::vector_to_array(($mxparameter->transpose())[0], $parameterstructure);
 
             // If Trusted Region filter is provided, check for being still in Trusted Regions.
             if (isset($fntrfilter)) {
@@ -345,7 +346,7 @@ class mathcat {
                 if (count(array_filter($parameter, fn ($x) => is_nan($x))) > 0) {
                     $parameter = $fntrfilter($parameter); // DAVID: Darüber sollten wir noch einmal nachdenken.
                     $iscritical = true;
-                    return self::vector_to_array($parameterstructure, $parameter);
+                    return self::vector_to_array($parameter, $parameterstructure);
                 }
 
                 // Check if $parameter is still in the Trusted Region.
@@ -524,11 +525,11 @@ class mathcat {
      * Converts item parameters from a vector to an array or float
      *
      * @param array $data
-     * @param array $structure
+     * @param array|int $structure
      *
      * @return float|array
      */
-    public static function vector_to_array(array $data, array $structure): float|array {
+    public static function vector_to_array (array $data, mixed $structure): float|array {
         if (is_int($structure)) {
             // TODO: has to be proven first, if existing, otherwise error.
             return $data[$structure];
