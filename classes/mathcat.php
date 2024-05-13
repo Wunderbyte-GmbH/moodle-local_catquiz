@@ -541,7 +541,7 @@ class mathcat {
             return $structure;
         }
 
-        // Handle any other cases, like strings or objects. 
+        // Handle any other cases, like strings or objects.
         // TODO: throw error/warning: not float or array, also give $data.
         return null;
     }
@@ -586,7 +586,7 @@ class mathcat {
             }
         }
 
-        // Handle any other cases, like strings or objects. 
+        // Handle any other cases, like strings or objects.
         // TODO: throw error/warning: not float or array, also give $data.
         return null;
     }
