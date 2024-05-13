@@ -528,7 +528,7 @@ class mathcat {
      *
      * @return float|array
      */
-    public static function vector_to_array (array $data, array $structure): float|array {
+    public static function vector_to_array(array $data, array $structure): float|array {
         if (is_int($structure)) {
             // TODO: has to be proven first, if existing, otherwise error.
             return $data[$structure];
