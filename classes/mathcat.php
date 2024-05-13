@@ -480,12 +480,12 @@ class mathcat {
     /**
      * Converts item parameters from an array to a vector
      *
-     * @param float|array $data
+     * @param $data
      * @param int $n
      *
      * @return array
      */
-    public static function array_to_vector(float|array &$data, int &$n = null): array {
+    public static function array_to_vector($data, int &$n = null): array {
         if (is_null($n)) {
             $n = 0;
         }
@@ -525,11 +525,11 @@ class mathcat {
      * Converts item parameters from a vector to an array or float
      *
      * @param array $data
-     * @param array|int $structure
+     * @param $structure
      *
-     * @return float|array
+     * @return array
      */
-    public static function vector_to_array (array $data, mixed $structure): float|array {
+    public static function vector_to_array(array $data, $structure): array {
         if (is_int($structure)) {
             // TODO: has to be proven first, if existing, otherwise error.
             return $data[$structure];
