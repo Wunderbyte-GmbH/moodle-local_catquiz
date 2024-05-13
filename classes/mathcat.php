@@ -285,7 +285,7 @@ class mathcat {
 
         // Set initial values.
         $parameter = $parameterstart;
-        
+
         $iscritical = false;
         $maxsteplength = 0.1;
         $usegauss = false;
@@ -293,7 +293,7 @@ class mathcat {
         // Begin with numerical iteration.
         for ($i = 0; $i < $maxiterations; $i++) {
 
-            // Serialize parameters and store structure of parameter array
+            // Serialize parameters and store structure of parameter array.
             $parameterserialized = $parameter;
             // Note: Please check for yourself...
             // ... that the order of your parameters in your array corresponds to the order of $fn_function!
@@ -340,15 +340,15 @@ class mathcat {
             }
 
             $mxparameter = $mxparameter->subtract($mxdelta);
-            
-            // Reconstruct the parameters from matrix calculus and store them in original structure
+
+            // Reconstruct the parameters from matrix calculus and store them in original structure.
             $parameter = self::vector_to_array(($mxparameter->transpose())[0], $parameterstructure);
 
             // If Trusted Region filter is provided, check for being still in Trusted Regions.
             if (isset($fntrfilter)) {
                 // Check for glitches within the calculated result.
                 if (count(array_filter($parameter, fn ($x) => is_nan($x))) > 0) {
-                    // Set to predefined values
+                    // Set to predefined values.
                     $parameter = $fntrfilter($parameter); 
                     $iscritical = true;
                     return $parameter;
@@ -358,8 +358,8 @@ class mathcat {
                 if ($fntrfilter($parameter) !== $parameter) {
                     // Set to predefined values
                     $parameter = $fntrfilter($parameter);
-                    
-                    // Serialize parameters and store structure of parameter array
+
+                    // Serialize parameters and store structure of parameter array.
                     $parameterserialized = $parameter;
                     self::array_to_vector($parameterserialized);
                     $mxparameter = new matrix($parameterserialized);
