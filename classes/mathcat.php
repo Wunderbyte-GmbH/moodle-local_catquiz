@@ -287,7 +287,7 @@ class mathcat {
         $parameter = $parameterstart;
         // Note: Please check for yourself...
         // ... that the order of your parameters in your array corresponds to the order of $fn_function!
-        $parameternames = array_keys($parameterstart);
+        $parameter_structure = self::array_to_vector($parameter);
         $iscritical = false;
         $maxsteplength = 0.1;
         $usegauss = false;
@@ -337,7 +337,7 @@ class mathcat {
             }
 
             $mxparameter = $mxparameter->subtract($mxdelta);
-            $parameter = array_combine($parameternames, ($mxparameter->transpose())[0]);
+            $parameter = self::vector_to_array($parameter_structure, ($mxparameter->transpose())[0]);
 
             // If Trusted Region filter is provided, check for being still in Trusted Regions.
             if (isset($fntrfilter)) {
@@ -345,7 +345,7 @@ class mathcat {
                 if (count(array_filter($parameter, fn ($x) => is_nan($x))) > 0) {
                     $parameter = $fntrfilter($parameter); // DAVID: Darüber sollten wir noch einmal nachdenken.
                     $iscritical = true;
-                    return array_combine($parameternames, $parameter);
+                    return self::vector_to_array($parameter_structure, $parameter);
                 }
 
                 // Check if $parameter is still in the Trusted Region.
@@ -365,6 +365,9 @@ class mathcat {
                     // If the problem occurs a second time in a row...
                     // ... additionally reset the parameter $parameter to $parameter_start.
                     if ($iscritical) {
+                        
+                        // TODO !!! array_to_vector nutzen!
+                        
                         $parameter = $parameterstart;
                         // DAVID: Sollte serialisiert werden für den Fall genesteter Arrays.
                         $mxparameter = new matrix(is_array($parameter) ? [$parameter] : [[$parameter]]);
@@ -470,5 +473,70 @@ class mathcat {
             return $function1($function2);
         };
         return $returnfn;
+    }
+    
+    
+    function array_to_vector(float|array &$data, int &$n = null): array {
+
+        if (is_null($n)) {
+            $n = 0;
+        } 
+        if (is_float($data)) {
+            $structure = $n;
+            $data = [$n => $data];
+            $n += 1;
+            return $structure;
+        }
+        else if (is_array($data)) {
+            $data_tmp = [];
+            $structure = [];
+            foreach ($data as $key => $val) {
+                
+                if (is_array($val)) { 
+                    $structure_tmp = self::array_to_vector($val, $n);
+                    // TODO: teste, ob legid
+                    $structure [$key] = $structure_tmp;
+                    $data_tmp = array_merge($data_tmp, $val);
+                }
+                else if (is_float(floatval($val))) {
+                    $data_tmp [$n] = floatval($val);
+                    $structure [$key] = $n;
+                    $n += 1;
+                }
+            }
+            $data = $data_tmp;
+            // gebe $structure aus
+            return $structure;
+        } else {
+            // TODO: throw error/warning: not float or array, also give $data 
+            echo "Fehler!";
+            return null;
+        }
+        // TODO: This is very dirty and needs more attention on length / dimensionality.
+        return array_merge($ip['difficulty'], [$ip['discrimination']]);
+    }
+
+    function vector_to_array (array $data, array $structure): float|array {
+
+        if (is_int($structure)) {
+            
+            // TODO: has to be proven first, if existing, otherwise error
+            return $data[$structure];
+        }
+        else if (is_array($structure)) {
+            $data_tmp = [];
+            foreach ($structure AS $key => $val) {
+                if (is_array($val)) {
+                    $data_tmp[$key] = self::vector_to_array($data, $val);
+                }
+                else if (is_int($val)) {
+                    $data_tmp[$key] = $data[$val];
+                }
+                // TODO Error-Warning bei allem anderen
+            }
+            return $data_tmp;
+        }
+        // TODO Error-Warning bei allem anderen
+        return null;
     }
 }
