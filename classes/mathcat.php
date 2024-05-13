@@ -480,7 +480,7 @@ class mathcat {
     /**
      * Converts item parameters from an array to a vector
      *
-     * @param $data
+     * @param mixed $data
      * @param int $n
      *
      * @return array
@@ -525,7 +525,7 @@ class mathcat {
      * Converts item parameters from a vector to an array or float
      *
      * @param array $data
-     * @param $structure
+     * @param mixed $structure
      *
      * @return array
      */
