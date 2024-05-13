@@ -507,7 +507,7 @@ class mathcat {
                     $structuretmp = self::array_to_vector($val, $n);
 
                     // Test if result is legid.
-                    if (is_null($structuretmp) {
+                    if (is_null($structuretmp)) {
                         // TODO: Here should be some error/warning handling be done.
                         return null;
                     }
