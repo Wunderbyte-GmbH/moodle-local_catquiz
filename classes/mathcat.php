@@ -308,7 +308,6 @@ class mathcat {
             // Throws error Object of class Closure can not be converted to float.
             $mxfunction = new matrix($valfunction);
             $mxderivative = new matrix($valderivative);
-
             $mxfunction = $mxfunction->transpose();
 
             // If the determinant is null, we already found the value.
@@ -371,12 +370,13 @@ class mathcat {
                     self::array_to_vector($parameterserialized);
                     $mxparameter = new matrix($parameterserialized);
                     $mxparameter = $mxparameter->transpose();
-                    
                 } else {
+
                     // If everything went fine, keep/reset $is_critical as FALSE.
                     $iscritical = false;
                 }
             }
+
             // Test if precisiion criteria for stopping iterations has been reached.
             if ($mxdelta->max_absolute_element() < 10 ** (-$precission)) {
                 return $parameter;
