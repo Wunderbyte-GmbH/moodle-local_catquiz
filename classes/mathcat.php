@@ -476,6 +476,14 @@ class mathcat {
     }
 
 
+    /**
+     * Converts item parameters from an array to a vector
+     *
+     * @param float|array $data
+     * @param int $n
+     *
+     * @return array
+     */
     public static function array_to_vector(float|array &$data, int &$n = null): array {
         if (is_null($n)) {
             $n = 0;
@@ -512,6 +520,14 @@ class mathcat {
         return array_merge($ip['difficulty'], [$ip['discrimination']]);
     }
 
+    /**
+     * Converts item parameters from a vector to an array or float
+     *
+     * @param array $data
+     * @param array $structure
+     *
+     * @return float|array
+     */
     public static function vector_to_array (array $data, array $structure): float|array {
         if (is_int($structure)) {
             // TODO: has to be proven first, if existing, otherwise error.
