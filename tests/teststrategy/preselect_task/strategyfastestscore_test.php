@@ -29,14 +29,14 @@ use basic_testcase;
 use local_catquiz\teststrategy\preselect_task\strategyfastestscore;
 
 /**
- * Tests the filterforsubscale class.
+ * Tests the strategyfastestscore class.
  *
  * @package    local_catquiz
  * @author David Szkiba <david.szkiba@wunderbyte.at>
  * @copyright  2023 Georg Maißer <info@wunderbyte.at>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  *
- * @covers \local_catquiz\teststrategy\preselect_task\filterforsubscale
+ * @covers \local_catquiz\teststrategy\preselect_task\strategyfastestscore
  */
 class strategyfastestscore_test extends basic_testcase {
 
