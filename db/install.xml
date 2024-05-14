@@ -155,6 +155,7 @@
         <FIELD NAME="starttime" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false" COMMENT="start of attempt as unix timestamp"/>
         <FIELD NAME="endtime" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false" COMMENT="the moment the attempt was completed as unix timestamp"/>
         <FIELD NAME="json" TYPE="text" NOTNULL="false" SEQUENCE="false" COMMENT="all data concerning attempt including specific data parsed as json"/>
+        <FIELD NAME="debug_info" TYPE="text" NOTNULL="false" SEQUENCE="false" COMMENT="Additional information about the attempt in JSON format"/>
       </FIELDS>
       <KEYS>
         <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
