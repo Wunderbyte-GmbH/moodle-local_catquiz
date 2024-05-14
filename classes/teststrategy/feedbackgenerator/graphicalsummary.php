@@ -180,25 +180,22 @@ class graphicalsummary extends feedbackgenerator {
         $new = [];
         $new['id'] = $lastquestion->id;
         $new['questionname'] = $lastquestion->name;
-        $new['lastresponse'] = $lastresponse['fraction'];
+        $new['lastresponse'] = round($lastresponse['fraction'], self::PRECISION);
         $new['difficulty'] = $lastquestion->difficulty;
         $new['questionscale'] = $lastquestion->catscaleid;
         $new['questionscale_name'] = catscale::return_catscale_object(
             $lastquestion->catscaleid
         )->name;
-        $new['fisherinformation'] = $lastquestion
-            ->fisherinformation[$existingdata['catscaleid']] ?? null;
-        $new['score'] = $lastquestion->score ?? null;
-        $new['difficultynextbefore'] = null;
-        $new['difficultynextafter'] = null;
-        $new['personability_after'] = $newdata['person_ability'][$newdata['catscaleid']];
-        $new['personability_before'] =
-            $existingdata['personabilities'][$existingdata['catscaleid']]['value'] ?? null;
+        $new['fisherinformation'] = $this->get_rounded_or_null(
+            $lastquestion->fisherinformation,
+            $existingdata['catscaleid']
+        );
+        $new['personability_after'] = round($newdata['person_ability'][$newdata['catscaleid']], self::PRECISION);
 
         $graphicalsummary[] = $new;
         $otherscales = $existingdata['graphicalsummary_otherscales'] ?? [];
         foreach ($this->get_progress()->get_abilities() as $scaleid => $value) {
-            $otherscales[$scaleid][] = $value;
+            $otherscales[$scaleid][] = round($value, self::PRECISION);
         }
 
         $teststrategyname = get_string(
@@ -211,7 +208,7 @@ class graphicalsummary extends feedbackgenerator {
         return [
             'graphicalsummary_data' => $graphicalsummary,
             'teststrategyname' => $teststrategyname,
-            'personabilities' => $progress->get_abilities(),
+            'personabilities' => $progress->get_abilities(true),
             'graphicalsummary_primaryscale' => $primaryscale,
             'graphicalsummary_otherscales' => $otherscales,
         ];

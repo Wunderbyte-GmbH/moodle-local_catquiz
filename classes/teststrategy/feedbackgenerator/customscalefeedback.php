@@ -174,7 +174,7 @@ class customscalefeedback extends feedbackgenerator {
      */
     public function load_data(int $attemptid, array $existingdata, array $newdata): ?array {
         $progress = $this->get_progress();
-        $personabilities = $progress->get_abilities();
+        $personabilities = $progress->get_abilities(true);
 
         if (!$personabilities) {
             return [];

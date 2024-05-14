@@ -299,7 +299,7 @@ class attemptfeedback implements renderable, templatable {
         $newarray = [];
         $progress = $this->get_progress();
 
-        $personabilities = $progress->get_abilities();
+        $personabilities = $progress->get_abilities(true);
 
         if (!$personabilities) {
             return $newdata;
@@ -309,7 +309,19 @@ class attemptfeedback implements renderable, templatable {
         };
         $newdata['updated_personabilities'] = $newarray;
         $newdata['catscaleid'] = intval($this->get_quiz_settings()->catquiz_catscales);
-        $newdata['catscales'] = catquiz::get_catscales([$newdata['catscaleid'], ...$progress->get_selected_subscales()]);
+        $catscales = catquiz::get_catscales([$newdata['catscaleid'], ...$progress->get_selected_subscales()]);
+        // Remove unneeded data from the catscales array.
+        $newdata['catscales'] = array_map(
+            function ($cs) {
+                unset($cs->timecreated);
+                unset($cs->timemodified);
+                unset($cs->parentid);
+                unset($cs->contextid);
+                return $cs;
+            },
+            $catscales
+        );
+
         return $newdata;
     }
 
