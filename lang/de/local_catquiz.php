@@ -110,11 +110,13 @@ $string['automatic_reload_on_scale_selection_description'] = 'Bei (Sub-)Skalenau
 $string['enrol_only_to_reported_scales'] = 'Benutzer nur in Kurse von detektierter Skala einschreiben';
 $string['enrol_only_to_reported_scales_help'] = 'Standardmäßig werden die Benutzer nach den Ergebnissen in den Bereichen eingeschrieben, die entsprechend dem Zweck des Tests ermittelt wurden.
 Wenn Sie diese Option deaktivieren, werden die Benutzer auch entsprechend aller anderen gültigen Ergebnissen eingeschrieben.'; // TODO: get translation.
-$string['time_penalty_threshold_name'] = 'Penalty Zeitraum in Tagen'; // TODO: get translation string.
-$string['time_penalty_threshold_desc'] = 'Wenn eine Frage im angegebenen
-    Zeitraum bereits einmal von einem User beantwortet wurde, wird der
-    Fragen-Score vermindert'; // TODO: get translation string.
-
+$string['time_penalty_threshold_name'] = 'Wiederholungsverzögerung in Tagen';
+$string['time_penalty_threshold_desc'] = 'Eine Frage, die durch einen User in
+    einem früheren Testversuch bereits beantwortet wurde, wird nur mit
+    verringerter Wahrscheinlichkeit erneut gestellt. Die Wahrscheinlichkeit ist
+    abhängig vom der Dauer zwischen dem früheren und dem aktuellen Versuch. Je
+    höher die eingestellte Dauer, desto länger ist dieser Schutz vor wiederholt
+    gestellten Fragen wirksam.';
 $string['timeoutabortnoresult'] = 'Test wird sofort beendet und nicht abschließend bewertet';
 $string['timeoutabortresult'] = 'Test wird sofort beendet und abschließend bewertet';
 $string['timeoutfinishwithresult'] = 'Nachfrist: angezeigte Items können beendet werden';
