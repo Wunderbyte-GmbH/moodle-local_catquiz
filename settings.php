@@ -108,7 +108,7 @@ if ($hassiteconfig) {
         get_string('time_penalty_threshold_name', 'local_catquiz'),
         get_string('time_penalty_threshold_desc', 'local_catquiz'),
         10,
-        '/^\d+$/'
+        '/^[1-9]\d*$/'
         )
     );
 }
