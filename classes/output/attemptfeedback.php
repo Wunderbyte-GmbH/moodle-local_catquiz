@@ -197,6 +197,23 @@ class attemptfeedback implements renderable, templatable {
         if (empty($feedbackdata)) {
             return $this->create_initial_data();
         }
+
+        // If this is an old version where feedbackdata are stored in the JSON column,
+        // then just return it.
+        if (array_key_exists('debuginfo', $feedbackdata)) {
+            return $feedbackdata;
+        }
+
+        // In newer versions, the debuginfo data are stored in a separate column that can be emptied in case it takes up too much
+        // space.
+        $debugdata = $DB->get_field(
+                'local_catquiz_attempts',
+                'debug_info',
+                ['attemptid' => $this->attemptid]
+        );
+        $debuginfo = json_decode( $debugdata, true) ?? [];
+        $feedbackdata['debuginfo'] = $debuginfo;
+
         return $feedbackdata;
     }
 
