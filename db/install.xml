@@ -134,7 +134,7 @@
         <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
       </KEYS>
     </TABLE>
-    <TABLE NAME="local_catquiz_attempts" COMMENT="Table to save all relevant data about attempts of adaptive quiz instances. ">
+    <TABLE NAME="local_catquiz_attempts" COMMENT="Table to save all relevant data about attempts of adaptive quiz instances.">
       <FIELDS>
         <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
         <FIELD NAME="userid" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
@@ -160,8 +160,8 @@
       <KEYS>
         <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
       </KEYS>
-</TABLE>
-<TABLE NAME="local_catquiz_progress" COMMENT="Stores the progress of attempts that are not yet finished.">
+    </TABLE>
+    <TABLE NAME="local_catquiz_progress" COMMENT="Stores the progress of attempts that are not yet finished.">
       <FIELDS>
         <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
         <FIELD NAME="userid" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false"/>
@@ -173,6 +173,6 @@
       <KEYS>
         <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
       </KEYS>
-</TABLE>
+    </TABLE>
   </TABLES>
 </XMLDB>
