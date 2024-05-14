@@ -188,7 +188,6 @@ class learningprogress extends feedbackgenerator {
         if ($personabilities === []) {
             return null;
         }
-        $quizsettings = $progress->get_quiz_settings();
         $catscales = $newdata['catscales'];
 
         // Make sure that only feedback defined by strategy is rendered.

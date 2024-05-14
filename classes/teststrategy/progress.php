@@ -702,10 +702,17 @@ class progress implements JsonSerializable {
     /**
      * Returns the abilities calculated during the current attempt.
      *
+     * @param bool $rounded Round the abilities
+     * @param int $precision Desired precision
+     *
      * @return array
      */
-    public function get_abilities(): array {
-        return $this->abilities;
+    public function get_abilities(bool $rounded = false, int $precision = 2): array {
+        if (!$rounded) {
+            return $this->abilities;
+        }
+        $roundedabilities = array_map(fn($ab) => round($ab, $precision), $this->abilities);
+        return $roundedabilities;
     }
 
     /**

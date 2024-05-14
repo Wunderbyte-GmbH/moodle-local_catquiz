@@ -1525,6 +1525,19 @@ class catquiz {
         $data->debug_info = json_encode($attemptdata['debuginfo']);
         unset($attemptdata['debuginfo']);
 
+        // These values are not needed to render a feedback.
+        $excluded = [
+            'person_ability',
+            'installed_models',
+            'lastquestion',
+            'lastresponse',
+            'models',
+            'prev_ability',
+        ];
+        foreach ($excluded as $key) {
+            unset($attemptdata[$key]);
+        }
+
         $now = time();
         $data->timemodified = $now;
         $data->timecreated = $now;

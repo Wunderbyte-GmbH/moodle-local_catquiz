@@ -121,7 +121,6 @@ class personabilities extends feedbackgenerator {
             'personabilities_abilities',
             'se',
             'abilitieslist',
-            'models',
         ];
     }
 
@@ -223,14 +222,12 @@ class personabilities extends feedbackgenerator {
                     $newdata
                 );
         }
-        $models = model_strategy::get_installed_models();
 
         return [
             'primaryscale' => $catscales[$selectedscaleid],
             'personabilities_abilities' => $personabilities,
             'se' => $newdata['se'] ?? null,
             'abilitieslist' => $abilitieslist,
-            'models' => $models,
         ];
     }
 

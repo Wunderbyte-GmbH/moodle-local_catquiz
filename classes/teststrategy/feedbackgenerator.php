@@ -36,6 +36,12 @@ use UnexpectedValueException;
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 abstract class feedbackgenerator {
+
+    /**
+     * The precision used to store float values.
+     */
+    protected const PRECISION = 2;
+
     /**
      * Attempt ID
      *
@@ -309,6 +315,20 @@ abstract class feedbackgenerator {
         return has_capability(
             'local/catquiz:view_teacher_feedback', context_system::instance()
         );
+    }
+
+    /**
+     * Helper function to round floats or return null if not set
+     *
+     * @param array $array
+     * @param string $key
+     * @return ?float
+     */
+    protected function get_rounded_or_null(array $array, string $key) {
+        if (!array_key_exists($key, $array)) {
+            return null;
+        }
+        return round($array[$key], self::PRECISION);
     }
 
 }
