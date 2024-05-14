@@ -15,7 +15,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Tests the filterforsubscale class.
+ * Tests the customscalefeedback class.
  *
  * @package    local_catquiz
  * @author     David Szkiba, Magdalena Holczik
@@ -42,7 +42,7 @@ use UnexpectedValueException;
  * @copyright  2024 Wunderbyte GmbH <info@wunderbyte.at>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  *
- * @covers \local_catquiz\teststrategy\preselect_task\filterforsubscale
+ * @covers \local_catquiz\teststrategy\preselect_task\customscalefeedback
  */
 class customscalefeedback_test extends basic_testcase {
 

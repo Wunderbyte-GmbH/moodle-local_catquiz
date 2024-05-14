@@ -42,7 +42,7 @@ use SebastianBergmann\RecursionContext\InvalidArgumentException;
  * @copyright  2024 Wunderbyte GmbH <info@wunderbyte.at>
  * @license    http =>//www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  *
- * @covers \local_catquiz\teststrategy\preselect_task\filterforsubscale
+ * @covers \local_catquiz\teststrategy\feedbackgenerator\learningprogress
  */
 class learningprogress_test extends advanced_testcase {
 
