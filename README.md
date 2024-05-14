@@ -10,7 +10,8 @@ The plugin can be used with all types of questions in Moodle that allow for auto
     * 2PL-Rasch-Birnbaum
     * 3PL-Mixed-Rasch-Birnbaum
 * polytomous questions (account for right, wrong and partially correct answers)
-    * models will be realized in upcoming versions
+    * Graded Response Model and Generalized Graded Response Model
+    * further models will be realized in upcoming versions
 
 The plugin enables the creation, administration and modification of different scales on which measurements are taken. For this purpose, the plug-in creates a new role "CAT Manager", which is authorized to perform these administrative tasks.
 
