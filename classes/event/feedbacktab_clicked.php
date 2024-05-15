@@ -60,14 +60,13 @@ class feedbacktab_clicked extends \core\event\base {
      * @return string
      */
     public function get_description() {
-        $data = $this->data;
-        $otherarray = json_decode($data['other']);
+        $other = $this->get_other_data();
         $url = new moodle_url('manage_catscales.php', [
-            'attemptid' => $otherarray->attemptid,
+            'attemptid' => $other->attemptid,
         ], 'lcq_quizattempts');
         $attemptlink = html_writer::link(
             $url,
-            get_string('feedbacksheader', 'local_catquiz', $otherarray->attemptid),
+            get_string('feedbacksheader', 'local_catquiz', $other->attemptid),
             // Open the attempt in a new tab, otherwise the link does not work because it just appends an anchor.
             ['target' => '_blank']
         );
@@ -75,8 +74,8 @@ class feedbacktab_clicked extends \core\event\base {
             'feedback_tab_clicked_description',
             'local_catquiz',
             [
-                'userid' => $otherarray->userid,
-                'feedback_translated' => $otherarray->feedback_translated,
+                'userid' => $other->userid,
+                'feedback_translated' => $other->feedback_translated,
                 'attemptlink' => $attemptlink,
             ]
         );
@@ -88,10 +87,22 @@ class feedbacktab_clicked extends \core\event\base {
      * @return object
      */
     public function get_url() {
-        $data = $this->data;
-        $otherarray = json_decode($data['other']);
         return new moodle_url('manage_catscales.php', [
-            'attemptid' => $otherarray->attemptid,
+            'attemptid' => $this->get_other_data()->attemptid,
         ], 'lcq_quizattempts');
+    }
+
+    /**
+     * Returns the 'other' data as object
+     * @return mixed
+     */
+    private function get_other_data() {
+        if (is_array($this->data['other'])) {
+            return (object) $this->data['other'];
+        }
+        if (is_string($this->data['other'])) {
+            return json_decode($this->data['other']);
+        }
+        return $this->data['other'];
     }
 }

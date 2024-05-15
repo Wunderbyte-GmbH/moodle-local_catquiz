@@ -66,14 +66,14 @@ class attempt_completed extends \core\event\base {
      */
     public function get_description() {
         $data = $this->data;
-        $otherarray = json_decode($data['other']);
+        $other = $this->get_other_data();
 
-        $catscaleid = $otherarray->catscaleid;
+        $catscaleid = $other->catscaleid;
         $linktoscale = catscale::get_link_to_catscale($catscaleid);
         $data['catscalelink'] = $linktoscale;
 
-        $data['attemptid'] = $otherarray->attemptid;
-        $data['userid'] = $otherarray->userid;
+        $data['attemptid'] = $other->attemptid;
+        $data['userid'] = $other->userid;
         $data['catscalelink'] = $linktoscale;
         return get_string('complete_attempt_description', 'local_catquiz', $data);
     }
@@ -86,5 +86,19 @@ class attempt_completed extends \core\event\base {
      */
     public function get_url() {
         return new moodle_url('');
+    }
+
+    /**
+     * Returns the 'other' data as object
+     * @return mixed
+     */
+    private function get_other_data() {
+        if (is_array($this->data['other'])) {
+            return (object) $this->data['other'];
+        }
+        if (is_string($this->data['other'])) {
+            return json_decode($this->data['other']);
+        }
+        return $this->data['other'];
     }
 }
