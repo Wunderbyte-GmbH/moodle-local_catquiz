@@ -95,7 +95,7 @@ class shortcodes {
 
         foreach ($records as $record) {
             if (!$attemptdata = json_decode($record->json)) {
-                throw new \moodle_exception("Can not read attempt data");
+                throw new \moodle_exception(sprintf('Can not read attempt data of attempt %d', $record->attemptid));
             }
             $strategyid = $attemptdata->teststrategy;
             $feedbacksettings = new feedbacksettings($strategyid);
