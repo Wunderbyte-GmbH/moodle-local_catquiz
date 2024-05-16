@@ -857,7 +857,7 @@ class catquiz {
         int $userid = -1): array {
 
         $sql = "SELECT
-        attemptid, contextid, userid, endtime, timemodified, json
+        attemptid, contextid, userid, endtime, timemodified, json, debug_info
         FROM {local_catquiz_attempts} ";
 
         $wherearray = [];

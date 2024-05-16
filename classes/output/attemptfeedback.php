@@ -184,16 +184,21 @@ class attemptfeedback implements renderable, templatable {
      *
      * @return array
      */
-    public function load_feedbackdata(): array {
+    public function load_feedbackdata($feedbackdata = null, $debugdata = null): array {
         global $DB;
-        $feedbackdata = json_decode(
-            $DB->get_field(
-                'local_catquiz_attempts',
-                'json',
-                ['attemptid' => $this->attemptid]
-            ),
-            true
-        );
+        if (!$feedbackdata) {
+            $feedbackdata = json_decode(
+                $DB->get_field(
+                    'local_catquiz_attempts',
+                    'json',
+                    ['attemptid' => $this->attemptid]
+                ),
+                true
+            );
+        } else {
+            $feedbackdata = json_decode($feedbackdata, true);
+        }
+
         if (empty($feedbackdata)) {
             return $this->create_initial_data();
         }
@@ -210,7 +215,7 @@ class attemptfeedback implements renderable, templatable {
 
         // In newer versions, the debuginfo data are stored in a separate column that can be emptied in case it takes up too much
         // space.
-        if (!$debugdata = $DB->get_field(
+        if (!$debugdata || !$debugdata = $DB->get_field(
                 'local_catquiz_attempts',
                 'debug_info',
                 ['attemptid' => $this->attemptid]
@@ -355,8 +360,8 @@ class attemptfeedback implements renderable, templatable {
      * @return array
      *
      */
-    public function get_feedback_for_attempt(): array {
-        $feedbackdata = $this->load_feedbackdata();
+    public function get_feedback_for_attempt($feedbackdata = null, $debuginfo = null): array {
+        $feedbackdata = $this->load_feedbackdata($feedbackdata, $debuginfo);
         $generators = $this->get_feedback_generators_for_teststrategy($feedbackdata['teststrategy']);
         return $this->generate_feedback($generators, $feedbackdata);
     }
@@ -556,6 +561,7 @@ class attemptfeedback implements renderable, templatable {
                 $context[$fbtype][] = $feedback;
             }
         }
+
         return $context;
     }
 }

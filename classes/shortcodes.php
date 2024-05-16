@@ -102,7 +102,7 @@ class shortcodes {
 
             $attemptfeedback = new attemptfeedback($record->attemptid, $record->contextid, $feedbacksettings);
             try {
-                $feedback = $attemptfeedback->get_feedback_for_attempt() ?? "";
+                $feedback = $attemptfeedback->get_feedback_for_attempt($record->json, $record->debug_info) ?? "";
             } catch (\Throwable $t) {
                 $feedback = get_string('attemptfeedbacknotavailable', 'local_catquiz');
             }

@@ -317,7 +317,7 @@ class progress implements JsonSerializable {
         $instance->usageid = $data->usageid;
         $instance->session = $data->session;
         $instance->excludedquestions = $data->excludedquestions;
-        $instance->gaveupquestions = $data->gaveupquestions ?? null;
+        $instance->gaveupquestions = $data->gaveupquestions ?? [];
         $instance->starttime = $data->starttime ?? 0;
 
         // Fallback for old attempts that did not store the quizsettings: use the current ones.
