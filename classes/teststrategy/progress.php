@@ -316,7 +316,7 @@ class progress implements JsonSerializable {
         $instance->forcedbreakend = intval($data->forcedbreakend) ?: null;
         $instance->usageid = $data->usageid;
         $instance->session = $data->session ?? null;
-        $instance->excludedquestions = $data->excludedquestions;
+        $instance->excludedquestions = $data->excludedquestions ?? [];
         $instance->gaveupquestions = $data->gaveupquestions ?? [];
         $instance->starttime = $data->starttime ?? 0;
 
