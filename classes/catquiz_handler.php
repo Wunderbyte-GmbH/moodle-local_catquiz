@@ -999,8 +999,6 @@ class catquiz_handler {
             'attemptid' => intval($attemptdata->id),
              // Hardcoded because this function already depends on mod_adaptivequiz attemptdata.
             'component' => 'mod_adaptivequiz',
-            'updateabilityfallback' => false,
-            'excludedsubscales' => [],
             'has_fisherinformation' => false,
             'max_attempttime_in_sec' => $attemptseconds ?? INF,
             'max_itemtime_in_sec' => $itemseconds ?? INF,
