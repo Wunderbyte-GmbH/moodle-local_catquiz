@@ -65,19 +65,8 @@ class wb_middleware_runner {
             $action = function (array &$context) use ($action, $middleware, $cache): result {
                 $result = $middleware->process($context, $action);
                 if ($cache) {
-                    $cachedcontexts = $cache->get('context') ?: [];
                     $progress = $context['progress'];
                     $context['lastquestion'] = $progress->get_last_question();
-                    $cachedcontexts[$context['questionsattempted']] = $context;
-                    self::removefromsavedcontext(
-                        $cachedcontexts[$context['questionsattempted']],
-                        [
-                            'original_questions',
-                            'questions',
-                            'questionsperscale',
-                        ]
-                    );
-                    $cache->set('context', $cachedcontexts);
                 }
                 return $result;
             };
@@ -109,8 +98,6 @@ class wb_middleware_runner {
      */
     private static function get_last_action() {
         return function (array $context): result {
-            $cache = cache::make('local_catquiz', 'adaptivequizattempt');
-            $cache->set('context', $context);
             return result::ok($context);
         };
     }
