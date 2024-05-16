@@ -110,6 +110,10 @@ $string['time_penalty_threshold_desc'] = 'A question that has already been
     reduced probability. The probability depends on the duration between the
     previous and the current attempt. The longer the given recurrence delay,
     the longer this protection against repeated questions is effective.';
+$string['store_debug_info_name'] = 'Stelle debug Informationen zur Verfügung';
+$string['store_debug_info_desc'] = 'Wenn diese Option aktiviert ist, werden
+    zusätzliche Daten gespeichert und als CSV Datei zur Verfügung gestellt.
+    Dadurch steigt der benötigte Speicherplatz.';
 
 $string['timeoutabortnoresult'] = 'Test aborted without result.';
 $string['timeoutabortresult'] = 'Test aborted with result.';

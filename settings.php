@@ -111,4 +111,11 @@ if ($hassiteconfig) {
         '/^[1-9]\d*$/'
         )
     );
+
+    $settings->add(
+        new admin_setting_configcheckbox(
+            'local_catquiz/store_debug_info',
+            get_string('store_debug_info_name', 'local_catquiz'),
+            get_string('store_debug_info_desc', 'local_catquiz'),
+            0));
 }

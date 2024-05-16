@@ -65,6 +65,10 @@ class debuginfo extends feedbackgenerator {
     protected function get_teacherfeedback(array $data): array {
         global $OUTPUT;
 
+        if (!get_config('local_catquiz', 'store_debug_info')) {
+            return [];
+        }
+
         $columnames = [
             'questionsattempted',
             'timestamp',
@@ -203,6 +207,9 @@ class debuginfo extends feedbackgenerator {
      *
      */
     public function load_data(int $attemptid, array $existingdata, array $newdata): ?array {
+        if (!get_config('local_catquiz', 'store_debug_info')) {
+            return null;
+        }
         $teststrategy = $this->get_progress()->get_quiz_settings()->catquiz_selectteststrategy;
 
         $teststrategies = info::return_available_strategies();

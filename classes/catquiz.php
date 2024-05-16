@@ -1522,8 +1522,11 @@ class catquiz {
         $data->personability_after_attempt = $attemptdata['progress']->get_abilities()[$attemptdata['catscaleid']] ?? null;
         $data->starttime = $attemptdata['starttime'] ?? null;
         $data->endtime = $attemptdata['endtime'] ?: time();
-        $data->debug_info = json_encode($attemptdata['debuginfo']);
-        unset($attemptdata['debuginfo']);
+
+        if (get_config('local_catquiz', 'store_debug_info')) {
+            $data->debug_info = json_encode($attemptdata['debuginfo']);
+            unset($attemptdata['debuginfo']);
+        }
 
         // These values are not needed to render a feedback.
         $excluded = [
