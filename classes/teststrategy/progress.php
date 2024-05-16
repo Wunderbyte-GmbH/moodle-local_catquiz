@@ -134,9 +134,9 @@ class progress implements JsonSerializable {
     /**
      * Holds the session key of the session when the quiz was started
      *
-     * @var string
+     * @var ?string
      */
-    private string $session;
+    private ?string $session;
 
     /**
      * Shows if a new question should be displayed even after a page reload.
@@ -315,7 +315,7 @@ class progress implements JsonSerializable {
         $instance->abilities = (array) $data->abilities;
         $instance->forcedbreakend = intval($data->forcedbreakend) ?: null;
         $instance->usageid = $data->usageid;
-        $instance->session = $data->session;
+        $instance->session = $data->session ?? null;
         $instance->excludedquestions = $data->excludedquestions;
         $instance->gaveupquestions = $data->gaveupquestions ?? [];
         $instance->starttime = $data->starttime ?? 0;
