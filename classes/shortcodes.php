@@ -69,7 +69,7 @@ class shortcodes {
      * @return string
      */
     public static function catquizfeedback($shortcode, $args, $content, $env, $next) {
-        global $OUTPUT, $COURSE, $USER, $DB;
+        global $OUTPUT, $COURSE, $USER, $DB, $CFG;
 
         // Students get to see only feedback for their own attempts, teacher see all attempts of this course.
         $context = context_course::instance($COURSE->id);
@@ -95,7 +95,11 @@ class shortcodes {
 
         foreach ($records as $record) {
             if (!$attemptdata = json_decode($record->json)) {
-                throw new \moodle_exception(sprintf('Can not read attempt data of attempt %d', $record->attemptid));
+                if ($CFG->debug > 0) {
+                    throw new \moodle_exception(sprintf('Can not read attempt data of attempt %d', $record->attemptid));
+                } else {
+                    continue;
+                }
             }
             $strategyid = $attemptdata->teststrategy;
             $feedbacksettings = new feedbacksettings($strategyid);
