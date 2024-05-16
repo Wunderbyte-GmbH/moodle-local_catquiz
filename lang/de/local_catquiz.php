@@ -120,6 +120,10 @@ $string['time_penalty_threshold_desc'] = 'Eine Frage, die durch einen User in
 $string['timeoutabortnoresult'] = 'Test wird sofort beendet und nicht abschließend bewertet';
 $string['timeoutabortresult'] = 'Test wird sofort beendet und abschließend bewertet';
 $string['timeoutfinishwithresult'] = 'Nachfrist: angezeigte Items können beendet werden';
+$string['store_debug_info_name'] = 'Create quiz feedback with debug information';
+$string['store_debug_info_desc'] = 'When set, additional data for each quiz
+    attempt are saved and provided as CSV download. This can take up a lot of
+    space.';
 
 // Validation.
 $string['minabilityscalevalue'] = 'Minimale Personenfähigkeit:';
