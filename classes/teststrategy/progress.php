@@ -293,13 +293,17 @@ class progress implements JsonSerializable {
         $instance->contextid = $data->contextid;
         $instance->playedquestions = (array) $data->playedquestions;
         foreach ($instance->playedquestions as $pq) {
-            $pq->fisherinformation = (array) $pq->fisherinformation;
+            if (!$pq->is_pilot) {
+                $pq->fisherinformation = (array) $pq->fisherinformation;
+            }
         }
         $instance->playedquestionsbyscale = (array) $data->playedquestionsbyscale;
         $instance->isfirstquestion = $data->isfirstquestion;
         $instance->lastquestion = $data->lastquestion;
         if ($instance->playedquestions) {
-            $instance->lastquestion->fisherinformation = (array) $data->lastquestion->fisherinformation;
+            if (!$instance->lastquestion->is_pilot) {
+                $instance->lastquestion->fisherinformation = (array) $data->lastquestion->fisherinformation;
+            }
         }
 
         $instance->breakend = $data->breakend;
@@ -313,8 +317,8 @@ class progress implements JsonSerializable {
         $instance->usageid = $data->usageid;
         $instance->session = $data->session;
         $instance->excludedquestions = $data->excludedquestions;
-        $instance->gaveupquestions = $data->gaveupquestions;
-        $instance->starttime = $data->starttime;
+        $instance->gaveupquestions = $data->gaveupquestions ?? null;
+        $instance->starttime = $data->starttime ?? 0;
 
         // Fallback for old attempts that did not store the quizsettings: use the current ones.
         if (!property_exists($object, 'quizsettings') || $object->quizsettings === null) {
