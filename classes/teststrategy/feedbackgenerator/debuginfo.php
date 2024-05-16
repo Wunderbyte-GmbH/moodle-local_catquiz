@@ -127,7 +127,7 @@ class debuginfo extends feedbackgenerator {
                 $rowarr[] = $questionsstr;
             }
 
-            $rowarr[] = $row['activescales'];
+            $rowarr[] = $row['activescales'] ?? 'NA';
             $rowarr[] = $row['selectedscale'];
             $rowarr[] = $row['lastmiddleware'];
             $rowarr[] = $row['lastresponse'];
