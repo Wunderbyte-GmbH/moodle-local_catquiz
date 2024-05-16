@@ -198,6 +198,10 @@ class attemptfeedback implements renderable, templatable {
             return $this->create_initial_data();
         }
 
+        if (!get_config('local_catquiz', 'store_debug_info')) {
+            return $feedbackdata;
+        }
+
         // If this is an old version where feedbackdata are stored in the JSON column,
         // then just return it.
         if (array_key_exists('debuginfo', $feedbackdata)) {
