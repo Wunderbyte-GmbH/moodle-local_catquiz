@@ -28,6 +28,10 @@
     {{error}}
 {{/error}}
 {{^error}}
+    {{#heading}}
+    <h2>{{title}}</h2>
+    <h4>{{{description}}}</h4>
+    {{/heading}}
     <h2>{{charttitle}}</h2>
     {{#numberchart}}
         <div>{{{chart}}}</div>
@@ -35,4 +39,8 @@
     {{#stackchart}}
         <div>{{{chart}}}</div>
     {{/stackchart}}
+    {{#abilityprofilechart}}
+        {{charttitle}}
+        {{{chart}}}
+    {{/abilityprofilechart}}
 {{/error}}

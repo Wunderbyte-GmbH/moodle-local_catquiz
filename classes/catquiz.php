@@ -1194,18 +1194,18 @@ class catquiz {
     }
 
     /**
-     * Return the person ability for the given user in the given context
+     * Return the person abilities for the given parameters
      *
      * @param int $contextid
      * @param array $catscaleids
-     * @param int|null $userid
+     * @param array|null $userids
      *
      * @return mixed
      *
      */
-    public static function get_person_abilities(int $contextid, array $catscaleids, ?int $userid = null) {
+    public static function get_person_abilities(int $contextid, array $catscaleids, array $userids = []) {
         global $DB;
-        [$insql, $inparams] = $DB->get_in_or_equal(
+        [$inscalesql, $inscaleparams] = $DB->get_in_or_equal(
             $catscaleids,
             SQL_PARAMS_NAMED,
             'incatscales'
@@ -1215,15 +1215,20 @@ class catquiz {
             SELECT *
             FROM {local_catquiz_personparams}
             WHERE contextid = :contextid
-                AND catscaleid $insql
+                AND catscaleid $inscalesql
         ";
         $params = array_merge([
             'contextid' => $contextid,
-        ], $inparams);
+        ], $inscaleparams);
 
-        if ($userid) {
-            $sql .= " AND userid = :userid";
-            $params['userid'] = $userid;
+        if ($userids) {
+            [$inuseridssql, $inuseridsparams] = $DB->get_in_or_equal(
+                $userids,
+                SQL_PARAMS_NAMED,
+                'inuserids'
+            );
+            $sql .= " AND userid $inuseridssql";
+            $params = array_merge($params, $inuseridsparams);
         }
 
         return $DB->get_records_sql(
@@ -2072,5 +2077,39 @@ class catquiz {
     public static function get_personabilityresults_of_quizattempt(stdClass $attemptrecord): object {
         $quizdata = json_decode($attemptrecord->json);
         return $quizdata->personabilities;
+    }
+
+    /**
+     * Returns all CAT tests for a given course ID.
+     *
+     * @param int $courseid
+     * @return mixed
+     */
+    public static function get_tests_for_course(int $courseid) {
+        global $DB;
+        return $DB->get_records('local_catquiz_tests', ['courseid' => $courseid]);
+    }
+
+    /**
+     * Returns all CAT tests for the given scale in the given course
+     *
+     * @param int $courseid
+     * @param int $scaleid
+     * @return mixed
+     */
+    public static function get_tests_for_scale(int $courseid, int $scaleid) {
+        global $DB;
+        return $DB->get_records('local_catquiz_tests', ['courseid' => $courseid, 'catscaleid' => $scaleid]);
+    }
+
+    /**
+     * Returns a single CAT test record.
+     *
+     * @param int $testid
+     * @return mixed
+     */
+    public static function get_test_by_id(int $testid) {
+        global $DB;
+        return $DB->get_record('local_catquiz_tests', ['id' => $testid], '*', MUST_EXIST);
     }
 }
