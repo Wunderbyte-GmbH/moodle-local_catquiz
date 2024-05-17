@@ -218,7 +218,7 @@ class attemptfeedback implements renderable, templatable {
 
         // In newer versions, the debuginfo data are stored in a separate column that can be emptied in case it takes up too much
         // space.
-        if (!$debugdata || !$debugdata = $DB->get_field(
+        if (!$debugdata && !$debugdata = $DB->get_field(
                 'local_catquiz_attempts',
                 'debug_info',
                 ['attemptid' => $this->attemptid]
