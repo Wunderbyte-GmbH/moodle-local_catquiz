@@ -182,9 +182,12 @@ class attemptfeedback implements renderable, templatable {
     /**
      * Load feedbackdata
      *
+     * @param ?string $feedbackdata
+     * @param ?string $debugdata
+     *
      * @return array
      */
-    public function load_feedbackdata($feedbackdata = null, $debugdata = null): array {
+    public function load_feedbackdata(?string $feedbackdata = null, ?string $debugdata = null): array {
         global $DB;
         if (!$feedbackdata) {
             $feedbackdata = json_decode(
@@ -357,10 +360,13 @@ class attemptfeedback implements renderable, templatable {
     /**
      * Gets feedback for attempt.
      *
+     * @param ?string $feedbackdata
+     * @param ?string $debuginfo
+     *
      * @return array
      *
      */
-    public function get_feedback_for_attempt($feedbackdata = null, $debuginfo = null): array {
+    public function get_feedback_for_attempt(?string $feedbackdata = null, ?string $debuginfo = null): array {
         $feedbackdata = $this->load_feedbackdata($feedbackdata, $debuginfo);
         $generators = $this->get_feedback_generators_for_teststrategy($feedbackdata['teststrategy']);
         return $this->generate_feedback($generators, $feedbackdata);
