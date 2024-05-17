@@ -33,6 +33,7 @@ use local_catquiz\catscale;
 use local_catquiz\feedback\feedbackclass;
 use local_catquiz\local\model\model_model;
 use local_catquiz\output\catscalemanager\questions\cards\questionpreview;
+use local_catquiz\teststrategy\feedback_helper;
 use local_catquiz\teststrategy\feedbackgenerator;
 use local_catquiz\local\model\model_strategy;
 use stdClass;
@@ -352,7 +353,7 @@ class learningprogress extends feedbackgenerator {
         for ($i = $ll + $abilitystep; $i <= ($ul - $abilitystep); $i += $interval) {
             $abilitysteps[] = $i;
         }
-        $items = $this->get_testitems_for_catscale($primarycatscale['id'], $initialcontext['contextid'], true);
+        $items = $this->feedbackhelper->get_testitems_for_catscale($primarycatscale['id'], $initialcontext['contextid'], true);
         // Prepare data for test information line.
 
         $models = model_strategy::get_installed_models();
@@ -382,7 +383,7 @@ class learningprogress extends feedbackgenerator {
 
         }
 
-        $fisherinfos = $this->get_fisherinfos_of_items($items, $models, $abilitysteps);
+        $fisherinfos = $this->feedbackhelper->get_fisherinfos_of_items($items, $models, $abilitysteps);
         $fi = json_encode($fisherinfos);
         // Prepare data for scorecounter bars.
         $abilityrecords = $DB->get_records('local_catquiz_personparams', ['catscaleid' => $primarycatscale['id']]);
@@ -391,7 +392,7 @@ class learningprogress extends feedbackgenerator {
             $counter = 0;
             foreach ($abilityrecords as $record) {
                 $a = floatval($record->ability);
-                $ability = $this->round_to_customsteps($a, $abilitystep, $interval);
+                $ability = $this->feedbackhelper->round_to_customsteps($a, $abilitystep, $interval);
                 if ($ability != $as) {
                     continue;
                 } else {
@@ -408,7 +409,7 @@ class learningprogress extends feedbackgenerator {
             $abilityseries['colors'][$abilitystring] = $colorvalue;
         }
         // Scale the values of $fisherinfos before creating chart series.
-        $scaledtiseries = $this->scalevalues(array_values($fisherinfos), array_values($abilityseries['counter']));
+        $scaledtiseries = $this->feedbackhelper->scalevalues(array_values($fisherinfos), array_values($abilityseries['counter']));
 
         $scalename = $initialcontext['personabilities_abilities'][$primarycatscale['id']]['name'];
         $aserieslabel = get_string('scalescorechartlabel', 'local_catquiz', $scalename);
@@ -430,107 +431,6 @@ class learningprogress extends feedbackgenerator {
             'chart' => $out,
             'charttitle' => get_string('abilityprofile', 'local_catquiz', $primarycatscale['name']),
         ];
-    }
-
-    /**
-     * Get fisherinfos of item for each abilitystep.
-     *
-     * @param array $items
-     * @param array $models
-     * @param array $abilitysteps
-     *
-     * @return array
-     */
-    public function get_fisherinfos_of_items(array $items, array $models, array $abilitysteps): array {
-        $fisherinfos = [];
-        foreach ($items as $item) {
-            // We can not calculate the fisher information for items without a model.
-            if (!$item->model) {
-                continue;
-            }
-            $model = model_model::get_instance($item->model);
-            foreach ($model::get_parameter_names() as $paramname) {
-                $params[$paramname] = floatval($item->$paramname);
-            }
-            foreach ($abilitysteps as $ability) {
-                $fisherinformation = $model->fisher_info(
-                    ['ability' => $ability],
-                    $params
-                );
-                $stringkey = strval($ability);
-
-                if (!isset($fisherinfos[$stringkey])) {
-                    $fisherinfos[$stringkey] = $fisherinformation;
-                } else {
-                    $fisherinfos[$stringkey] += $fisherinformation;
-                }
-            }
-
-        }
-        return $fisherinfos;
-    }
-
-    /**
-     * For testing, this is called here.
-     *
-     * @param int $catscaleid
-     * @param int $contextid
-     * @param bool $includesubscales
-     *
-     * @return array
-     *
-     */
-    public function get_testitems_for_catscale(int $catscaleid, int $contextid, bool $includesubscales) {
-        $catscale = new catscale($catscaleid);
-        // Prepare data for test information line.
-        return $catscale->get_testitems($contextid, $includesubscales);
-    }
-
-    /**
-     * Round float to steps as defined.
-     *
-     * @param float $number
-     * @param float $step
-     * @param float $interval
-     *
-     * @return float
-     */
-    private function round_to_customsteps(float $number, float $step, float $interval): float {
-        $roundedvalue = round($number / $step) * $step;
-
-        // Exclude rounding to steps defined in $interval.
-        if ($roundedvalue - floor($roundedvalue) == $interval) {
-            $roundedvalue = floor($roundedvalue) + $step;
-        }
-
-        return $roundedvalue;
-    }
-
-    /**
-     * Scale values of testinfo (sum of fisherinfos) for better display in chart.
-     *
-     * @param array $fisherinfos
-     * @param array $attemptscounter
-     *
-     * @return array
-     */
-    private function scalevalues($fisherinfos, $attemptscounter) {
-        // Find the maximum values in arrays.
-        $maxattempts = max($attemptscounter);
-        $maxfisherinfo = max($fisherinfos);
-
-        // Avoid division by zero.
-        if ($maxfisherinfo == 0 || $maxattempts == 0) {
-            return $fisherinfos;
-        }
-
-        $scalingfactor = $maxattempts / $maxfisherinfo;
-
-        // Scale the values in $fisherinfos based on the scaling factor.
-        foreach ($fisherinfos as &$value) {
-            $value *= $scalingfactor;
-        }
-        return $fisherinfos;
     }
 
     /**

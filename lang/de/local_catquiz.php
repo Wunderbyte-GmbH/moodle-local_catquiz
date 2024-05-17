@@ -634,6 +634,13 @@ $string['shortcodescatquizfeedback'] = 'Zeige Feedback zu Versuchen an.';
 $string['shortcodescatscalesoverview'] = 'Zeige Übersicht zu CAT-Skalen an.';
 $string['shortcodescatquizstatistics'] = 'Zeige Statistiken zu einem CAT Test an';
 $string['catquizstatisticsnodata'] = 'Für die angegebenen Paramter können keine Daten gefunden werden';
+$string['catquizstatistics_h1_single'] = 'Statistik zu Test {$a}';
+$string['catquizstatistics_h2_single'] = 'Die folgenden Daten beziehen sich auf den Test {$a->link}, in dem die Skala {$a->scale} verwendet wird.';
+$string['catquizstatistics_h1_scale'] = 'Statistik zu Skale {$a} in diesem Kurs';
+$string['catquizstatistics_h2_scale'] = 'Die folgenden Daten beziehen sich auf die Tests {$a->linkedcourses} in diesem Kurs, in denen die Skala {$a->scale} verwendet wird.';
+$string['catquizstatistics_h1_global'] = 'Statistik zu Skala {$a} in allen Kursen';
+$string['catquizstatistics_h2_global'] = 'Die folgenden Daten beziehen sich auf alle Nutzer dieses Kurses, die auf dieser
+    Moodle-Plattform an Tests teilgenommen haben, in denen die Skala {$a} verwendet wird.';
 
 // Validation.
 $string['valuemustbegreaterzero'] = 'Wert muss höher als 0 sein.';

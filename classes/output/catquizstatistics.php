@@ -16,8 +16,14 @@
 
 namespace local_catquiz\output;
 
+use core\chart_bar;
+use core\chart_series;
 use local_catquiz\catquiz;
+use local_catquiz\catscale;
 use local_catquiz\feedback\feedbackclass;
+use local_catquiz\local\model\model_item_param_list;
+use local_catquiz\local\model\model_model;
+use local_catquiz\local\model\model_strategy;
 use local_catquiz\teststrategy\feedback_helper;
 use local_catquiz\teststrategy\feedbackgenerator;
 use local_catquiz\teststrategy\feedbackgenerator\learningprogress;
@@ -33,34 +39,34 @@ use local_catquiz\teststrategy\feedbackgenerator\learningprogress;
 class catquizstatistics {
 
     /**
-     * @var int $parentscaleid
+     * @var ?int $courseid
      */
-    private int $parentscaleid;
+    private ?int $courseid;
 
     /**
-     * @var int $courseid
+     * @var ?int $testid
      */
-    private int $courseid;
+    private ?int $testid;
 
     /**
-     * @var int $parentscaleid
+     * @var ?int $scaleid
      */
-    private int $testid;
-
-    /**
-     * @var ?int $contextid
-     */
-    private ?int $contextid;
-
-    /**
-     * @var int $quizsettings
-     */
-    private object $quizsettings;
+    private ?int $scaleid;
 
     /**
      * @var ?int $endtime
      */
     private ?int $endtime;
+
+    /**
+     * @var null|int $contextid
+     */
+    private ?int $contextid;
+
+    /**
+     * @var array $quizsettings
+     */
+    private array $quizsettings;
 
     /**
      * @var array $attemptsbytimerange
@@ -70,24 +76,35 @@ class catquizstatistics {
     /**
      * Create a new catquizstatistics object
      *
-     * @param int $testid
-     * @param ?int $contextid
+     * @param ?int $courseid
+     * @param ?int $testid
+     * @param int $scaleid
      * @param ?int $endtime
-     * @param ?int $parentscaleid
      *
      * @return self
      */
-    public function __construct(int $testid, ?int $contextid, ?int $endtime, ?int $parentscaleid) {
+    public function __construct(?int $courseid, ?int $testid, int $scaleid, ?int $endtime = null) {
         global $DB;
 
+        $this->courseid = $courseid;
         $this->testid = $testid;
-        $this->contextid = $contextid;
         $this->endtime = $endtime ?? time();
-        $this->parentscaleid = $parentscaleid;
+        $this->scaleid = $scaleid;
+        $this->courseid = intval($courseid);
+        $scale = catscale::return_catscale_object($this->scaleid);
+        $this->contextid = $scale->contextid;
 
-        $test = $DB->get_record('local_catquiz_tests', ['componentid' => $testid], 'json, courseid', MUST_EXIST);
-        $this->quizsettings = json_decode($test->json);
-        $this->courseid = intval($test->courseid);
+        if ($testid) {
+            $tests = $DB->get_records('local_catquiz_tests', ['componentid' => $testid]);
+        } else if ($scaleid) {
+            $tests = $DB->get_records('local_catquiz_tests', ['catscaleid' => $scaleid]);
+        } else if ($courseid) {
+            $tests = $DB->get_records('local_catquiz_tests', ['courseid' => $courseid]);
+        }
+
+        foreach ($tests as $testid => $test) {
+            $this->quizsettings[$testid] = json_decode($test->json);
+        }
     }
 
     /**
@@ -163,43 +180,93 @@ class catquizstatistics {
 
         $chart = new \core\chart_bar();
         $chart->set_stacked(true);
-
-        $colorsarray = $this->get_defined_feedbackcolors_for_scale($catscaleid);
-
-        foreach ($colorsarray as $colorcode => $rangesarray) {
-            $serie = [];
-            foreach ($series as $timestamp => $cc) {
-                $valuefound = false;
-                foreach ($cc as $cc => $elementscounter) {
-                    if ($colorcode != $cc) {
-                        continue;
-                    }
-                    $valuefound = true;
-                    $serie[] = $elementscounter;
-                }
-                if (!$valuefound) {
-                    $serie[] = 0;
-                }
-            }
-            $rangestart = $rangesarray['rangestart'];
-            $rangeend = $rangesarray['rangeend'];
-            $labelstring = get_string(
-                'personabilityrangestring',
-                'local_catquiz',
-                ['rangestart' => $rangestart, 'rangeend' => $rangeend]);
-            $s = new \core\chart_series(
-                $labelstring,
-                $serie
-            );
-            $s->set_colors([0 => $colorcode]);
-            $chart->add_series($s);
-        }
-
         $chart->set_labels($labels);
         $out = $OUTPUT->render($chart);
 
         return [
             'chart' => $out,
+        ];
+    }
+
+    /**
+     * Render chart for histogram of person abilities
+     *
+     * @return array
+     */
+    public function render_abilityprofilechart() {
+        global $OUTPUT, $DB;
+
+        $abilitysteps = [];
+        $stepsize = 0.25;
+        $interval = $stepsize * 2;
+        $feedbackhelper = new feedback_helper();
+        $abilityrange = $feedbackhelper->get_ability_range($this->scaleid);
+
+        $ul = (float) $abilityrange['maxscalevalue'];
+        $ll = (float) $abilityrange['minscalevalue'];
+        for ($i = $ll + $stepsize; $i <= ($ul - $stepsize); $i += $interval) {
+            $abilitysteps[] = $i;
+        }
+        $items = $feedbackhelper->get_testitems_for_catscale($this->scaleid, $this->contextid, true);
+        // Prepare data for test information line.
+
+        $models = model_strategy::get_installed_models();
+        $fisherinfos = $feedbackhelper->get_fisherinfos_of_items($items, $models, $abilitysteps);
+        // Prepare data for scorecounter bars.
+        // TODO: get the correct records: If testid is given, only for the given test. If scaleid is given, only for that scale.
+        $attempts = catquiz::get_attempts(
+            null,
+            $this->scaleid,
+            $this->courseid,
+            $this->testid,
+            $this->contextid,
+            null, // TODO: add starttime.
+            $this->endtime);
+        $userids = array_unique(array_map(fn ($attempt) => $attempt->userid, $attempts));
+        $abilityrecords = catquiz::get_person_abilities($this->contextid, [$this->scaleid], $userids);
+        $abilityseries = [];
+        $quizsettings = reset($this->quizsettings); // TODO: check if the settings match for all tests.
+        foreach ($abilitysteps as $as) {
+            $counter = 0;
+            foreach ($abilityrecords as $record) {
+                $a = floatval($record->ability);
+                if ($a <= $as - $stepsize || $a > $as + $stepsize) {
+                    continue;
+                }
+                $counter++;
+            }
+
+            $colorvalue = $feedbackhelper->get_color_for_personability(
+                (array) $quizsettings,
+                $as,
+                intval($this->scaleid)
+                );
+            $abilitystring = strval($as);
+            $abilityseries['counter'][$abilitystring] = $counter;
+            $abilityseries['colors'][$abilitystring] = $colorvalue;
+        }
+        // Scale the values of $fisherinfos before creating chart series.
+        $scaledtiseries = $feedbackhelper->scalevalues(array_values($fisherinfos), array_values($abilityseries['counter']));
+
+        $scalename = catscale::return_catscale_object($this->scaleid)->name;
+        $aserieslabel = get_string('scalescorechartlabel', 'local_catquiz', $scalename);
+        $aseries = new chart_series($aserieslabel, array_values($abilityseries['counter']));
+        $aseries->set_colors(array_values($abilityseries['colors']));
+
+        $testinfolabel = get_string('testinfolabel', 'local_catquiz');
+        $tiseries = new chart_series($testinfolabel, $scaledtiseries);
+        $tiseries->set_type(chart_series::TYPE_LINE);
+        $tiseries->set_smooth(true);
+
+        $chart = new chart_bar();
+        $chart->add_series($tiseries);
+        $chart->add_series($aseries);
+        $chart->set_labels(array_keys($fisherinfos));
+
+        $out = $OUTPUT->render($chart);
+        return [
+            'chart' => $out,
+            'charttitle' => get_string('abilityprofile', 'local_catquiz', $scalename),
         ];
     }
 
@@ -215,7 +282,7 @@ class catquizstatistics {
 
         $records = catquiz::get_attempts(
             null,
-            $this->parentscaleid,
+            $this->scaleid,
             $this->courseid,
             $this->testid,
             $this->contextid,
@@ -237,7 +304,7 @@ class catquizstatistics {
 
         $beginningoftimerange = intval($startingrecord->endtime);
         $timerange = learningprogress::get_timerange_for_attempts($beginningoftimerange, $this->endtime);
-        $this->attemptsbytimerange = learningprogress::order_attempts_by_timerange($records, $this->parentscaleid, $timerange);
+        $this->attemptsbytimerange = learningprogress::order_attempts_by_timerange($records, $this->scaleid, $timerange);
         return $this->attemptsbytimerange;
     }
 
@@ -248,20 +315,24 @@ class catquizstatistics {
      * @return array
      */
     private function get_defined_feedbackcolors_for_scale() {
-
         $colors = [];
 
-        $numberoffeedbackoptions = intval($this->quizsettings->numberoffeedbackoptionsselect) ?? 8;
+        // TODO: handle case with multiple tests.
+        if (count($this->quizsettings) > 1) {
+            throw new \Exception('Not yet implemented');
+        }
+        $quizsettings = reset($this->quizsettings);
+        $numberoffeedbackoptions = intval($quizsettings->numberoffeedbackoptionsselect) ?? 8;
         $colorarray = feedbackclass::get_array_of_colors($numberoffeedbackoptions);
 
         for ($i = 1; $i <= $numberoffeedbackoptions; $i++) {
-            $colorkey = 'wb_colourpicker_' . $this->parentscaleid . '_' . $i;
-            $rangestartkey = "feedback_scaleid_limit_lower_" . $this->parentscaleid . "_" . $i;
-            $rangeendkey = "feedback_scaleid_limit_upper_" . $this->parentscaleid . "_" . $i;
-            $colorname = $this->quizsettings->$colorkey;
+            $colorkey = 'wb_colourpicker_' . $this->scaleid . '_' . $i;
+            $rangestartkey = "feedback_scaleid_limit_lower_" . $this->scaleid . "_" . $i;
+            $rangeendkey = "feedback_scaleid_limit_upper_" . $this->scaleid . "_" . $i;
+            $colorname = $quizsettings->$colorkey;
             if (isset($colorarray[$colorname])) {
-                    $colors[$colorarray[$colorname]]['rangestart'] = $this->quizsettings->$rangestartkey;
-                    $colors[$colorarray[$colorname]]['rangeend'] = $this->quizsettings->$rangeendkey;
+                    $colors[$colorarray[$colorname]]['rangestart'] = $quizsettings->$rangestartkey;
+                    $colors[$colorarray[$colorname]]['rangeend'] = $quizsettings->$rangeendkey;
             }
 
         }
