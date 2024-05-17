@@ -341,6 +341,10 @@ class progress implements JsonSerializable {
         }
         $instance->quizsettings = json_decode($object->quizsettings);
 
+        // Save to the cache.
+        $cache = cache::make('local_catquiz', 'adaptivequizattempt');
+        $cache->set(self::get_cache_key($instance->attemptid), $instance);
+
         return $instance;
     }
 
