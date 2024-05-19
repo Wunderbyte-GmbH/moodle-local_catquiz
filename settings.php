@@ -55,7 +55,7 @@ if ($hassiteconfig) {
         )
         );
 
-    $sql = "SELECT t.id, t.name
+    $sql = "SELECT DISTINCT t.id, t.name
             FROM {tag} t
             LEFT JOIN {tag_instance} ti ON t.id=ti.tagid
             WHERE ti.component=:component AND ti.itemtype=:itemtype AND t.isstandard=1";
