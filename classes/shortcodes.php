@@ -230,7 +230,7 @@ class shortcodes {
             $cmid = $args['testid'];
             // The 'testid' is actually the cmid. But we want the id of our test instance.
             $testid = self::get_test_id($cmid);
-            $test = catquiz::get_test_by_id($testid);
+            $test = catquiz::get_test_by_component_id($testid);
             $courseid = $test->courseid;
             if ($args['course'] ?? null && $args['course'] != $courseid) {
                 throw new Exception("The testid is not in the given course");
@@ -332,7 +332,7 @@ class shortcodes {
     private static function get_heading(?int $courseid, ?int $scaleid, ?int $testid) {
         $test = null;
         if ($testid) {
-            $test = catquiz::get_test_by_id($testid);
+            $test = catquiz::get_test_by_component_id($testid);
         }
         if ($test) {
             $testname = json_decode($test->json)->name;
