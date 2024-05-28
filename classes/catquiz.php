@@ -1663,6 +1663,8 @@ class catquiz {
     /**
      * Get all quizattempts corresponding to given params.
      *
+     * The returned attempts are sorted by endtime in ascending order.
+     *
      * @param int $userid
      * @param int $catscaleid
      * @param int $courseid
