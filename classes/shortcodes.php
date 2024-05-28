@@ -236,7 +236,7 @@ class shortcodes {
                 throw new Exception("The testid is not in the given course");
             }
             $globalscale = $test->catscaleid;
-            if ($globalscale && $args['globalscale'] != $globalscale) {
+            if ($globalscale && array_key_exists('globalscale', $args) && $args['globalscale'] != $globalscale) {
                 throw new Exception("The testid is not using the given global scale");
             }
             return ['course' => $courseid, 'globalscale' => $globalscale, 'testid' => $testid];
