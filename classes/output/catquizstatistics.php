@@ -262,7 +262,7 @@ class catquizstatistics {
         $tiseries->set_smooth(true);
 
         $chart = new chart_bar();
-        $isteacher = false; // TOOD: check if user is teacher.
+        $isteacher = true; // TOOD: check if user is teacher.
         if ($isteacher) {
             $chart->add_series($tiseries);
         }
