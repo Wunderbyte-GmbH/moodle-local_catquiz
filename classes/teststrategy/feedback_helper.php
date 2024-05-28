@@ -48,19 +48,15 @@ class feedback_helper {
      */
     public function get_color_for_personability(array $quizsettings, float $personability, int $catscaleid): string {
         $default = LOCAL_CATQUIZ_DEFAULT_GREY;
+        return $default; // TODO: Remove.
         $abilityrange = $this->get_ability_range($catscaleid);
         if (!$quizsettings ||
             $personability < (float) $abilityrange['minscalevalue'] ||
             $personability > (float) $abilityrange['maxscalevalue']) {
             return $default;
         }
-
-        if (array_key_exists('numberoffeedbackoptionsselect', $quizsettings)) {
-            $numberoffeedbackoptions = intval($quizsettings['numberoffeedbackoptionsselect']);
-        } else {
-            $numberoffeedbackoptions = LOCAL_CATQUIZ_MAX_SCALERANGE;
-        }
-
+        $numberoffeedbackoptions = intval($quizsettings['numberoffeedbackoptionsselect'])
+            ?? LOCAL_CATQUIZ_MAX_SCALERANGE;
         $colorarray = feedbackclass::get_array_of_colors($numberoffeedbackoptions);
 
         for ($i = 1; $i <= $numberoffeedbackoptions; $i++) {
