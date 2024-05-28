@@ -2110,8 +2110,8 @@ class catquiz {
      * @param int $testid
      * @return mixed
      */
-    public static function get_test_by_id(int $testid) {
+    public static function get_test_by_component_id(int $testid) {
         global $DB;
-        return $DB->get_record('local_catquiz_tests', ['id' => $testid], '*', MUST_EXIST);
+        return $DB->get_record('local_catquiz_tests', ['componentid' => $testid], '*', MUST_EXIST);
     }
 }
