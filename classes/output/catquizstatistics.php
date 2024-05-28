@@ -59,6 +59,11 @@ class catquizstatistics {
     private ?int $endtime;
 
     /**
+     * @var ?int $starttime
+     */
+    private ?int $starttime;
+
+    /**
      * @var null|int $contextid
      */
     private ?int $contextid;
@@ -74,6 +79,11 @@ class catquizstatistics {
     private array $attemptsbytimerange = [];
 
     /**
+     * @var array $attempts
+     */
+    private array $attempts = [];
+
+    /**
      * Create a new catquizstatistics object
      *
      * @param ?int $courseid
@@ -83,12 +93,13 @@ class catquizstatistics {
      *
      * @return self
      */
-    public function __construct(?int $courseid, ?int $testid, int $scaleid, ?int $endtime = null) {
+    public function __construct(?int $courseid, ?int $testid, int $scaleid, ?int $endtime = null, ?int $starttime = null) {
         global $DB;
 
         $this->courseid = $courseid;
         $this->testid = $testid;
         $this->endtime = $endtime ?? time();
+        $this->starttime = $starttime;
         $this->scaleid = $scaleid;
         $this->courseid = intval($courseid);
         $scale = catscale::return_catscale_object($this->scaleid);
@@ -212,16 +223,8 @@ class catquizstatistics {
 
         $models = model_strategy::get_installed_models();
         $fisherinfos = $feedbackhelper->get_fisherinfos_of_items($items, $models, $abilitysteps);
+        $attempts = $this->get_attempts();
         // Prepare data for scorecounter bars.
-        // TODO: get the correct records: If testid is given, only for the given test. If scaleid is given, only for that scale.
-        $attempts = catquiz::get_attempts(
-            null,
-            $this->scaleid,
-            $this->courseid,
-            $this->testid,
-            $this->contextid,
-            null, // TODO: add starttime.
-            $this->endtime);
         $userids = array_unique(array_map(fn ($attempt) => $attempt->userid, $attempts));
         $abilityrecords = catquiz::get_person_abilities($this->contextid, [$this->scaleid], $userids);
         $abilityseries = [];
@@ -259,7 +262,10 @@ class catquizstatistics {
         $tiseries->set_smooth(true);
 
         $chart = new chart_bar();
-        $chart->add_series($tiseries);
+        $isteacher = false; // TOOD: check if user is teacher.
+        if ($isteacher) {
+            $chart->add_series($tiseries);
+        }
         $chart->add_series($aseries);
         $chart->set_labels(array_keys($fisherinfos));
 
@@ -268,6 +274,105 @@ class catquizstatistics {
             'chart' => $out,
             'charttitle' => get_string('abilityprofile', 'local_catquiz', $scalename),
         ];
+    }
+
+    /**
+     * Returns a chart that shows how often a scale was selected as primary scale
+     *
+     * Selects only the last relevant attempts (i.e. according to testid,
+     * courseid, etc). For each scale that was selected as primary scale in
+     * those attempts, it indicates for how many users this scale was selected
+     * and what ability those users had when the scale was selected.
+     *
+     * Returns an array with a 'title' and 'chart' element.
+     *
+     * @return array
+     */
+    public function render_selected_scales_chart(): array {
+        global $OUTPUT;
+
+        $attempts = $this->get_attempts();
+        $latestattempts = [];
+        foreach ($attempts as $attempt) {
+            $latestattempts[$attempt->userid] = $attempt;
+        }
+        $chartdata = [];
+        $quizsettings = reset($this->quizsettings); // TODO: fix for multiple.
+        foreach ($latestattempts as $userid => $attempt) {
+            // Skip old attempts that do not yet have the personabilities_abilities property.
+            $json = json_decode($attempt->json);
+            if (!property_exists($json, 'personabilities_abilities')) {
+                continue;
+            }
+            $primaryscale = array_filter((array) $json->personabilities_abilities, fn ($scale) => $scale->primary ?? false);
+            if (count($primaryscale) != 1) {
+                continue;
+            }
+            $primaryscaleid = array_key_first($primaryscale);
+            $value = $primaryscale[$primaryscaleid]->value;
+
+            // Get the range of the selected value.
+            $i = 0;
+            do {
+                $i++;
+                $ranglow = sprintf('feedback_scaleid_limit_lower_%d_%d', $primaryscaleid, $i);
+                $rangup = sprintf('feedback_scaleid_limit_upper_%d_%d', $primaryscaleid, $i);
+
+            } while (!($quizsettings->$ranglow < $value && $quizsettings->$rangup > $value));
+            $range = $i;
+            $chartdata[$primaryscaleid][$range][] = $userid;
+        }
+
+        $chart = new chart_bar();
+        $chart->set_stacked(true);
+        $chart->set_horizontal(true);
+        // Add each range as separate chart series.
+        foreach (range(1, $quizsettings->numberoffeedbackoptionsselect) as $range) {
+            $counts = [];
+            foreach (array_keys($chartdata) as $scaleid) {
+                $counts[$scaleid] = 0;
+                if (array_key_exists($range, $chartdata[$scaleid])) {
+                    $counts[$scaleid] = count($chartdata[$scaleid][$range]);
+                }
+            }
+            $series = new chart_series(sprintf("Range %d", $range), $counts);
+            $chart->add_series($series);
+        }
+
+        foreach (array_keys($chartdata) as $scaleid) {
+            $labels[$scaleid] = sprintf("scale %d", $scaleid);
+        }
+        $chart->set_labels($labels);
+
+        $out = $OUTPUT->render($chart);
+
+        return [
+            'title' => 'TITLE', // TODO: translate.
+            'chart' => $out,
+        ];
+    }
+
+    /**
+     * Returns the attempts for the given parameters (courseid, scaleid, testid, starttime, endtime)
+     *
+     * @return array
+     */
+    private function get_attempts(): array {
+        if ($this->attempts) {
+            return $this->attempts;
+        }
+
+        $attempts = catquiz::get_attempts(
+            null,
+            $this->scaleid,
+            $this->courseid,
+            $this->testid,
+            $this->contextid,
+            $this->starttime,
+            $this->endtime
+        );
+        $this->attempts = $attempts;
+        return $attempts;
     }
 
     /**
