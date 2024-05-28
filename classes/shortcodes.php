@@ -336,7 +336,7 @@ class shortcodes {
         }
         if ($test) {
             $testname = json_decode($test->json)->name;
-            list($course, $cm) = get_course_and_cm_from_instance($test->id, 'adaptivequiz');
+            list($course, $cm) = get_course_and_cm_from_instance($test->componentid, 'adaptivequiz');
             $testurl = new moodle_url(
                 '/mod/adaptivequiz/view.php',
                 ['id' => $cm->id]
