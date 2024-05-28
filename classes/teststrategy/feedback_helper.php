@@ -54,8 +54,13 @@ class feedback_helper {
             $personability > (float) $abilityrange['maxscalevalue']) {
             return $default;
         }
-        $numberoffeedbackoptions = intval($quizsettings['numberoffeedbackoptionsselect'])
-            ?? LOCAL_CATQUIZ_MAX_SCALERANGE;
+
+        if (array_key_exists('numberoffeedbackoptionsselect', $quizsettings)) {
+            $numberoffeedbackoptions = intval($quizsettings['numberoffeedbackoptionsselect']);
+        } else {
+            $numberoffeedbackoptions = LOCAL_CATQUIZ_MAX_SCALERANGE;
+        }
+
         $colorarray = feedbackclass::get_array_of_colors($numberoffeedbackoptions);
 
         for ($i = 1; $i <= $numberoffeedbackoptions; $i++) {
