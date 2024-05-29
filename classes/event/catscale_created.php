@@ -15,7 +15,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * The bookingoption_updated event.
+ * The catscale_created event.
  *
  * @package local_catquiz
  * @copyright 2024 Georg Maißer, <info@wunderbyte.at>
@@ -28,7 +28,7 @@ use local_catquiz\catscale;
 use moodle_url;
 
 /**
- * The catscale_updated event class.
+ * The catscale_created event class.
  *
  * @property-read array $other { Extra information about event. Acesss an instance of the booking module }
  * @copyright 2024 Georg Maißer
