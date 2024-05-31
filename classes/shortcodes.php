@@ -282,7 +282,8 @@ class shortcodes {
 
         if (count($cats) === 1) {
             // Just one course. We use the global scale of this one.
-            $globalscale = json_decode($cats[0]->json)->catquiz_catscales;
+            $cat = reset($cats);
+            $globalscale = json_decode($cat->json)->catquiz_catscales;
             return $globalscale;
         }
 
