@@ -21,11 +21,8 @@ use core\chart_series;
 use local_catquiz\catquiz;
 use local_catquiz\catscale;
 use local_catquiz\feedback\feedbackclass;
-use local_catquiz\local\model\model_item_param_list;
-use local_catquiz\local\model\model_model;
 use local_catquiz\local\model\model_strategy;
 use local_catquiz\teststrategy\feedback_helper;
-use local_catquiz\teststrategy\feedbackgenerator;
 use local_catquiz\teststrategy\feedbackgenerator\learningprogress;
 
 defined('MOODLE_INTERNAL') || die();
@@ -516,36 +513,5 @@ class catquizstatistics {
         }
         $this->maxrange = $maxrange;
         return $this->maxrange;
-    }
-
-
-    /**
-     * Return all colors defined in feedbacksettings for this scale.
-     *
-     * @return array
-     */
-    private function get_defined_feedbackcolors_for_scale() {
-        $colors = [];
-
-        // TODO: handle case with multiple tests.
-        if (count($this->quizsettings) > 1) {
-            throw new \Exception('Not yet implemented');
-        }
-        $quizsettings = reset($this->quizsettings);
-        $numberoffeedbackoptions = intval($quizsettings->numberoffeedbackoptionsselect) ?? 8;
-        $colorarray = feedbackclass::get_array_of_colors($numberoffeedbackoptions);
-
-        for ($i = 1; $i <= $numberoffeedbackoptions; $i++) {
-            $colorkey = 'wb_colourpicker_' . $this->scaleid . '_' . $i;
-            $rangestartkey = "feedback_scaleid_limit_lower_" . $this->scaleid . "_" . $i;
-            $rangeendkey = "feedback_scaleid_limit_upper_" . $this->scaleid . "_" . $i;
-            $colorname = $quizsettings->$colorkey;
-            if (isset($colorarray[$colorname])) {
-                    $colors[$colorarray[$colorname]]['rangestart'] = $quizsettings->$rangestartkey;
-                    $colors[$colorarray[$colorname]]['rangeend'] = $quizsettings->$rangeendkey;
-            }
-
-        }
-        return $colors;
     }
 }
