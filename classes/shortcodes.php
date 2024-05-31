@@ -250,12 +250,10 @@ class shortcodes {
         }
 
         $globalscale = $args['globalscale'] ?? null;
+        $courseid = optional_param('id', $args['courseid'] ?? 0, PARAM_INT);
         if (!$globalscale) {
-            $courseid = optional_param('id', 0, PARAM_INT);
             if ($courseid == 0) {
-                if (!($courseid = $args['courseid'] ?? null)) {
-                    throw new Exception('Please provide either a "globalscale" or "course" parameter');
-                }
+                throw new Exception('Please provide either a "globalscale" or "course" parameter');
             }
             $globalscale = self::get_global_scale($courseid);
         }
