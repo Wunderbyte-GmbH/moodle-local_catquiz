@@ -28,6 +28,11 @@ use local_catquiz\teststrategy\feedback_helper;
 use local_catquiz\teststrategy\feedbackgenerator;
 use local_catquiz\teststrategy\feedbackgenerator\learningprogress;
 
+defined('MOODLE_INTERNAL') || die();
+
+global $CFG;
+require_once($CFG->dirroot . '/local/catquiz/lib.php');
+
 /**
  * Renderable class for the catquizstatistics shortcode
  *
@@ -82,6 +87,16 @@ class catquizstatistics {
      * @var array $attempts
      */
     private array $attempts = [];
+
+    /**
+     * @var bool $quizsettingcompatibility
+     */
+    private bool $quizsettingcompatibility;
+
+    /**
+     * @var int $maxrange
+     */
+    private int $maxrange;
 
     /**
      * Create a new catquizstatistics object
@@ -326,17 +341,27 @@ class catquizstatistics {
         $chart = new chart_bar();
         $chart->set_stacked(true);
         $chart->set_horizontal(true);
-        // We use array_values so that the index starts at 0.
-        $colors = array_values(feedbackclass::get_array_of_colors($quizsettings->numberoffeedbackoptionsselect));
         // Add each range as separate chart series.
-        foreach (range(1, $quizsettings->numberoffeedbackoptionsselect) as $range) {
+        if ($this->check_quizsettings_are_compatible()) {
+            $colors = array_values(feedbackclass::get_array_of_colors($this->get_max_range()));
+            foreach (range(1, $this->get_max_range()) as $range) {
+                $counts = [];
+                foreach (array_keys($chartdata) as $scaleid) {
+                    $counts[] = count($chartdata[$scaleid][$range] ?? []);
+                }
+                $series = new chart_series(get_string('feedbackrange', 'local_catquiz', $range), $counts);
+                $color = $colors[$range - 1];
+                $series->set_color($color);
+                $chart->add_series($series);
+            }
+        } else {
+            // If the quiz settings are not compatible (e.g. different scale ranges), show the total numbers without range info.
             $counts = [];
             foreach (array_keys($chartdata) as $scaleid) {
-                $counts[] = count($chartdata[$scaleid][$range] ?? []);
+                $counts[] = array_sum(array_map(fn ($range) => count($range), $chartdata[$scaleid]));
             }
-            $series = new chart_series(get_string('feedbackrange', 'local_catquiz', $range), $counts);
-            $color = $colors[$range - 1];
-            $series->set_color($color);
+            $series = new chart_series(get_string('selected_scales_all_ranges_label', 'local_catquiz'), $counts);
+            $series->set_color(LOCAL_CATQUIZ_DEFAULT_GREY);
             $chart->add_series($series);
         }
 
@@ -410,6 +435,87 @@ class catquizstatistics {
         $timerange = learningprogress::get_timerange_for_attempts($beginningoftimerange, $this->endtime);
         $this->attemptsbytimerange = learningprogress::order_attempts_by_timerange($records, $this->scaleid, $timerange);
         return $this->attemptsbytimerange;
+    }
+
+    /**
+     * If rendering statistics for multiple tests, check whether their settings are compatible
+     *
+     * @return bool
+     */
+    private function check_quizsettings_are_compatible(): bool {
+        if (isset($this->quizsettingcompatibility)) {
+            return $this->quizsettingcompatibility;
+        }
+
+        if (count($this->quizsettings) === 1) {
+            $this->quizsettingcompatibility = true;
+            return true;
+        }
+
+        // Check if the ranges match.
+        $lastranges = null;
+        foreach ($this->quizsettings as $qs) {
+            if ($lastranges === null) {
+                $lastranges = $qs->numberoffeedbackoptionsselect;
+                continue;
+            }
+            if ($qs->numberoffeedbackoptionsselect !== $lastranges) {
+                $this->quizsettingcompatibility = false;
+                return false;
+            }
+        }
+
+        // If we are here, there are multiple tests and they all have the same number of ranges.
+        // Now we need to check if the ranges have the same limits.
+        foreach (range(1, $lastranges) as $r) {
+            $rangestart = null;
+            $rangeend = null;
+            foreach ($this->quizsettings as $qs) {
+                $startkey = sprintf("feedback_scaleid_limit_lower_%d_%d", $this->scaleid, $r);
+                $endkey = sprintf("feedback_scaleid_limit_upper_%d_%d", $this->scaleid, $r);
+                // Check if we are in the first iteration of the loop.
+                if ($rangestart === null) {
+                    $rangestart = $qs->$startkey;
+                    $rangeend = $qs->$endkey;
+                }
+                if ($qs->$startkey !== $rangestart || $qs->$endkey !== $rangeend) {
+                    $this->quizsettingcompatibility = false;
+                    return false;
+                }
+            }
+        }
+
+        $this->quizsettingcompatibility = true;
+        return true;
+    }
+
+    /**
+     * Returns the largest number of ranges of all the selected tests
+     *
+     * Each quizsettings defines a number of ranges. When we have multiple settings, they might differ.
+     * Here, the largest range is returned.
+     *
+     * @return int
+     */
+    private function get_max_range(): int {
+        if (isset($this->maxrange)) {
+            return $this->maxrange;
+        }
+        if (count($this->quizsettings) === 1 || $this->check_quizsettings_are_compatible()) {
+            $qs = reset($this->quizsettings);
+            $this->maxrange = $qs->numberoffeedbackoptionsselect;
+            return $this->maxrange;
+        }
+
+        // When we are here, there are multiple tests with incompatible quiz settings.
+        $maxrange = 0;
+        foreach ($this->quizsettings as $qs) {
+            if (($m = $qs->numberoffeedbackoptionsselect) > $maxrange) {
+                $maxrange = $m;
+            }
+        }
+        $this->maxrange = $maxrange;
+        return $this->maxrange;
     }
 
 

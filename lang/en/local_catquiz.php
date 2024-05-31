@@ -472,6 +472,7 @@ $string['catquiz_feedbackheader'] = "Feedback";
 $string['catquizfeedbackheader'] = 'Feedback for "{$a}"';
 $string['feedbacknumber'] = 'Feedback for range {$a}';
 $string['feedbackrange'] = 'Ability level {$a}';
+$string['selected_scales_all_ranges_label'] = 'Number of participants';
 $string['noselection'] = "No selection";
 $string['lowerlimit'] = "Lower limit";
 $string['upperlimit'] = "Upper limit";
