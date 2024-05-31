@@ -638,12 +638,13 @@ $string['shortcodescatscalesoverview'] = 'Display catscales overview.';
 $string['shortcodescatquizstatistics'] = 'Display statistics for a CAT test';
 $string['catquizstatisticsnodata'] = 'No attempt data available for the given settings';
 $string['catquizstatistics_h1_single'] = 'Statistik zu Test {$a}';
-$string['catquizstatistics_h2_single'] = 'Die folgenden Daten beziehen sich auf den Test {$a->link}, in dem die Skala {$a->scale} verwendet wird.';
-$string['catquizstatistics_h1_scale'] = 'Statistik zu Skala {$a} in diesem Kurs';
-$string['catquizstatistics_h2_scale'] = 'Die folgenden Daten beziehen sich auf die Tests {$a->linkedcourses} in diesem Kurs, in denen die Skala {$a->scale} verwendet wird.';
-$string['catquizstatistics_h1_global'] = 'Statistik zu Skala {$a} in allen Kursen';
-$string['catquizstatistics_h2_global'] = 'Die folgenden Daten beziehen sich auf alle Nutzer dieses Kurses, die auf dieser
-    Moodle-Plattform an Tests teilgenommen haben, in denen die Skala {$a} verwendet wird.';
+$string['catquizstatistics_h2_single'] = 'The following data are from test {$a->link} that uses the scale {$a->scale}.';
+$string['catquizstatistics_h1_scale'] = 'Statistics for scale {$a} in this course.';
+$string['catquizstatistics_h2_scale'] = 'The following data are from tests {$a->linkedcourses} in this course. They use the scale {$a->scale}.';
+$string['catquizstatistics_h1_global'] = 'Statistics of scale {$a} in all courses.';
+$string['catquizstatistics_h2_global'] = 'The following data are from all users
+    in this course that participated in tests on this moodle instance using
+    scale {$a} as main scale.';
 
 // Validation.
 $string['valuemustbegreaterzero'] = 'Value must be greater than zero.';
