@@ -288,7 +288,7 @@ class catquizstatistics {
      *
      * @return array
      */
-    public function render_selected_scales_chart(): array {
+    public function render_detected_scales_chart(): array {
         global $OUTPUT;
 
         $attempts = $this->get_attempts();
@@ -326,28 +326,27 @@ class catquizstatistics {
         $chart = new chart_bar();
         $chart->set_stacked(true);
         $chart->set_horizontal(true);
+        // We use array_values so that the index starts at 0.
+        $colors = array_values(feedbackclass::get_array_of_colors($quizsettings->numberoffeedbackoptionsselect));
         // Add each range as separate chart series.
         foreach (range(1, $quizsettings->numberoffeedbackoptionsselect) as $range) {
             $counts = [];
             foreach (array_keys($chartdata) as $scaleid) {
-                $counts[$scaleid] = 0;
-                if (array_key_exists($range, $chartdata[$scaleid])) {
-                    $counts[$scaleid] = count($chartdata[$scaleid][$range]);
-                }
+                $counts[] = count($chartdata[$scaleid][$range] ?? []);
             }
-            $series = new chart_series(sprintf("Range %d", $range), $counts);
+            $series = new chart_series(get_string('feedbackrange', 'local_catquiz', $range), $counts);
+            $color = $colors[$range - 1];
+            $series->set_color($color);
             $chart->add_series($series);
         }
 
-        foreach (array_keys($chartdata) as $scaleid) {
-            $labels[$scaleid] = sprintf("scale %d", $scaleid);
-        }
+        $labels = array_map(fn ($scaleid) => catscale::return_catscale_object($scaleid)->name, array_keys($chartdata));
         $chart->set_labels($labels);
 
         $out = $OUTPUT->render($chart);
 
         return [
-            'title' => 'TITLE', // TODO: translate.
+            'title' => get_string('chart_detectedscales_title', 'local_catquiz'),
             'chart' => $out,
         ];
     }

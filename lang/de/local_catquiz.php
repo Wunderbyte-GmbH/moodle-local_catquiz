@@ -483,6 +483,7 @@ $string['includepilotquestions_help'] = 'Im Pilotierungsmodus werden jedem Testv
 $string['catquiz_selectfirstquestion_help'] = 'Dieser Einstellung legt fest, mit welcher Frage ein Testversuch gestartet wird.';
 $string['numberoffeedbackoptionpersubscale'] = 'Anzahl der Fähigkeits-Stufen';
 $string['feedbacknumber'] = 'Feedback für Fähigkeits-Stufe "{$a}"';
+$string['feedbackrange'] = 'Fähigkeits-Stufe {$a}';
 $string['numberoffeedbackoptionpersubscale_help'] = 'Wählen Sie aus, in wievielen Fähigkeits-Stufen Sie Ihr Feedback differenzieren möchten. Mithilfe der Fähigkeits-Stufen können Sie in Abhängigkeit der ermittelten Fähigkeit für jede Skala Ihren Teilnehmenden unterschiedliche schriftliche Rückmeldungen erteilen, diese in unterschiedliche Kurse einschreiben oder diese unterschiedlichen Gruppen zuordnen.';
 $string['choosesubscaleforfeedback'] = 'Skala wählen';
 $string['feedbackcompletedpartially'] = '{$a} Feedbacks für diese Skala eingestellt.';
@@ -535,6 +536,7 @@ $string['nothingtocompare'] = 'Es sind nicht ausreichend valide Ergebnisse für 
 $string['personabilityrangestring'] = '{$a->rangestart} - {$a->rangeend}';
 $string['testinfolabel'] = 'Testinformation';
 $string['scalescorechartlabel'] = '{$a}-Score';
+$string['chart_detectedscales_title'] = 'Detektierte Skalen';
 
 // Check display line breaks etc.
 $string['choosesubscaleforfeedback_help'] = 'Für die angezeigten Skalen können Sie nun {$a} Feedback-Angaben hinterlegen. Wählen Sie die jeweilige (Sub-)Skala an, um Ihr Feedback einzugeben. Die farbigen Symbole zeigen Ihnen den aktuellen Stand der Bearbeitung an, gemessen an den vor Ihnen hinterlegten Anzahl an Feedback-Optionen:
