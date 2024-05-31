@@ -212,7 +212,7 @@ class shortcodes {
             'abilityprofilechart' => $catquizstatistics->render_abilityprofilechart(),
             'numberchart' => $catquizstatistics->render_attemptscounterchart(),
             'stackchart' => $catquizstatistics->render_attemptresultstackchart($globalscale),
-            'selectedscales' => $catquizstatistics->render_selected_scales_chart(),
+            'detectedscales' => $catquizstatistics->render_detected_scales_chart(),
         ];
 
         return $OUTPUT->render_from_template('local_catquiz/catscaleshortcodes/catscalestatistics', $data);
