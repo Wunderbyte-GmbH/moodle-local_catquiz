@@ -373,10 +373,18 @@ class shortcodes {
                 return $link;
             }, $tests);
             $h1 = get_string('catquizstatistics_h1_scale', 'local_catquiz', $scale->name);
-            $h2 = get_string('catquizstatistics_h2_scale', 'local_catquiz', (object) [
-                'linkedcourses' => implode(', ', $linkedcourses),
-                'scale' => $scale->name,
-            ]);
+            if (count($linkedcourses) > 1) {
+                $h2 = get_string('catquizstatistics_h2_scale', 'local_catquiz', (object) [
+                    'linkedcourses' => implode(', ', $linkedcourses),
+                    'scale' => $scale->name,
+                ]);
+            } else {
+                $link = reset($linkedcourses);
+                $h2 = get_string('catquizstatistics_h2_single', 'local_catquiz', (object) [
+                    'link' => $link,
+                    'scale' => $scale->name,
+                ]);
+            }
             return [
                 'title' => $h1,
                 'description' => $h2,
