@@ -189,7 +189,14 @@ class shortcodes {
     public static function catquizstatistics($shortcode, $args, $content, $env, $next) {
         global $OUTPUT;
 
-        $populated = self::populate_arguments($args);
+        try {
+            $populated = self::populate_arguments($args);
+        } catch (\Exception $e) {
+            $data = [
+                'error' => $e->getMessage(),
+            ];
+            return $OUTPUT->render_from_template('local_catquiz/catscaleshortcodes/catscalestatistics', $data);
+        }
         $courseid = $populated['course'];
         $globalscale = $populated['globalscale'];
         $testid = $populated['testid'];
@@ -291,6 +298,7 @@ class shortcodes {
             $globalscale = json_decode($cat->json)->catquiz_catscales;
             $globalscales[$globalscale] = true;
         }
+
         if (count($globalscales) === 1) {
             // All courses use the same global scale, so no problem.
             $first = reset($cats);
@@ -303,7 +311,7 @@ class shortcodes {
         throw new Exception(
             sprintf(
                 'please select one of the following global scales: %s',
-                implode(', ', array_keys($globalscale))
+                implode(', ', array_keys($globalscales))
             )
         );
     }
