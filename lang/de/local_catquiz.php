@@ -484,6 +484,7 @@ $string['catquiz_selectfirstquestion_help'] = 'Dieser Einstellung legt fest, mit
 $string['numberoffeedbackoptionpersubscale'] = 'Anzahl der Fähigkeits-Stufen';
 $string['feedbacknumber'] = 'Feedback für Fähigkeits-Stufe "{$a}"';
 $string['feedbackrange'] = 'Fähigkeits-Stufe {$a}';
+$string['selected_scales_all_ranges_label'] = 'Anzahl der Teilnehmenden';
 $string['numberoffeedbackoptionpersubscale_help'] = 'Wählen Sie aus, in wievielen Fähigkeits-Stufen Sie Ihr Feedback differenzieren möchten. Mithilfe der Fähigkeits-Stufen können Sie in Abhängigkeit der ermittelten Fähigkeit für jede Skala Ihren Teilnehmenden unterschiedliche schriftliche Rückmeldungen erteilen, diese in unterschiedliche Kurse einschreiben oder diese unterschiedlichen Gruppen zuordnen.';
 $string['choosesubscaleforfeedback'] = 'Skala wählen';
 $string['feedbackcompletedpartially'] = '{$a} Feedbacks für diese Skala eingestellt.';
