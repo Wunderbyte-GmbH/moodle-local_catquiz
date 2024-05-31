@@ -105,6 +105,7 @@ class catquizstatistics {
      * @param ?int $testid
      * @param int $scaleid
      * @param ?int $endtime
+     * @param ?int $starttime
      *
      * @return self
      */
@@ -153,8 +154,7 @@ class catquizstatistics {
             $counter[] = count($attempts);
             $labels[] = (string)$timestamp;
         }
-        $chart = new \core\chart_line();
-        $chart->set_smooth(true);
+        $chart = new \core\chart_bar();
 
         $series = new \core\chart_series(
             get_string('numberofattempts', 'local_catquiz'),
@@ -181,6 +181,8 @@ class catquizstatistics {
         $series = [];
         $labels = [];
         $attemptsbytimerange = $this->get_attempts_by_timerange();
+        $fh = new feedback_helper();
+        $chart = new \core\chart_bar();
         if (!$attemptsbytimerange) {
             return [
                 'chart' => get_string('catquizstatisticsnodata', 'local_catquiz'),
@@ -193,7 +195,6 @@ class catquizstatistics {
                     // This is to stay backwards compatible.
                     $attempt = (float) $attempt->value;
                 }
-                $fh = new feedback_helper();
                 $color = $fh->get_color_for_personability((array)$this->quizsettings, $attempt, $catscaleid);
 
                 if (!isset($series[$timestamp][$color])) {
@@ -204,7 +205,6 @@ class catquizstatistics {
             }
         }
 
-        $chart = new \core\chart_bar();
         $chart->set_stacked(true);
         $chart->set_labels($labels);
         $out = $OUTPUT->render($chart);
