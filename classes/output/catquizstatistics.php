@@ -120,12 +120,13 @@ class catquizstatistics {
 
         if ($testid) {
             $tests = $DB->get_records('local_catquiz_tests', ['componentid' => $testid]);
-        } else if ($scaleid) {
-            $tests = $DB->get_records('local_catquiz_tests', ['catscaleid' => $scaleid]);
-        } else if ($courseid) {
-            $tests = $DB->get_records('local_catquiz_tests', ['courseid' => $courseid]);
+        } else {
+            $params = ['catscaleid' => $scaleid];
+            if ($courseid) {
+                $params['courseid'] = $courseid;
+            }
+            $tests = $DB->get_records('local_catquiz_tests', $params);
         }
-
         foreach ($tests as $test) {
             $this->quizsettings[$test->componentid] = json_decode($test->json);
         }
