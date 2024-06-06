@@ -336,7 +336,7 @@ class catquizstatistics {
                 $rangup = sprintf('feedback_scaleid_limit_upper_%d_%d', $primaryscaleid, $i);
 
             } while (
-                !($quizsettings->$ranglow < $value && $quizsettings->$rangup > $value)
+                !($quizsettings->$ranglow <= $value && $quizsettings->$rangup >= $value)
                 && $i <= $quizsettings->numberoffeedbackoptionsselect
             );
             if ($i >= $quizsettings->numberoffeedbackoptionsselect) {
