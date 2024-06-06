@@ -301,7 +301,7 @@ class catquizstatistics {
      * @return array
      */
     public function render_detected_scales_chart(): array {
-        global $OUTPUT;
+        global $CFG, $OUTPUT;
 
         if (!$attempts = $this->get_attempts()) {
             return [
@@ -335,7 +335,13 @@ class catquizstatistics {
                 $ranglow = sprintf('feedback_scaleid_limit_lower_%d_%d', $primaryscaleid, $i);
                 $rangup = sprintf('feedback_scaleid_limit_upper_%d_%d', $primaryscaleid, $i);
 
-            } while (!($quizsettings->$ranglow < $value && $quizsettings->$rangup > $value));
+            } while (
+                !($quizsettings->$ranglow < $value && $quizsettings->$rangup > $value)
+                && $i <= $quizsettings->numberoffeedbackoptionsselect
+            );
+            if ($i >= $quizsettings->numberoffeedbackoptionsselect) {
+                    continue;
+            }
             $range = $i;
             $chartdata[$primaryscaleid][$range][] = $userid;
         }
