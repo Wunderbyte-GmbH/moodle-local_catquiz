@@ -115,11 +115,11 @@ class infergreateststrength extends strategy {
 
     /**
      * Get feedback generators.
-     * @param feedbacksettings $feedbacksettings
+     * @param feedbacksettings|null $feedbacksettings
      * @return array
      *
      */
-    public function get_feedbackgenerators(feedbacksettings $feedbacksettings = null): array {
+    public function get_feedbackgenerators(?feedbacksettings $feedbacksettings = null): array {
 
         $this->apply_feedbacksettings($feedbacksettings);
         $feedbackhelper = new feedback_helper();

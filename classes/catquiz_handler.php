@@ -264,7 +264,7 @@ class catquiz_handler {
      * @param MoodleQuickForm|null $mform
      * @return void
      */
-    public static function data_preprocessing(array &$formdefaultvalues, MoodleQuickForm &$mform = null) {
+    public static function data_preprocessing(array &$formdefaultvalues, ?MoodleQuickForm &$mform = null) {
 
         if (!isset($formdefaultvalues['instance'])) {
             return;

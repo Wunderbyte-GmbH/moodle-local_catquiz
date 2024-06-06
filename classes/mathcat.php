@@ -279,9 +279,9 @@ class mathcat {
         array $parameterstart,
         int $precission = 6,
         int $maxiterations = 500,
-        callable $fntrfilter = null,
-        callable $fntrfunction = null,
-        callable $fntrderivative = null): array {
+        ?callable $fntrfilter = null,
+        ?callable $fntrfunction = null,
+        ?callable $fntrderivative = null): array {
 
         // Set initial values.
         $parameter = $parameterstart;

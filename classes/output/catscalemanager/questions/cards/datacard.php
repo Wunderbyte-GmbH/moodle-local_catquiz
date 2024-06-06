@@ -73,7 +73,7 @@ class datacard implements renderable {
         int $contextid,
         int $catscaleid,
         string $component,
-        object $record = null) {
+        ?object $record = null) {
 
         $this->testitemid = $testitemid;
         $this->contextid = $contextid;
