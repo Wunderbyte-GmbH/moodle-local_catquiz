@@ -17,6 +17,7 @@
 namespace local_catquiz\output;
 
 use core\chart_bar;
+use core\chart_line;
 use core\chart_series;
 use local_catquiz\catquiz;
 use local_catquiz\catscale;
@@ -56,9 +57,9 @@ class catquizstatistics {
     private ?int $scaleid;
 
     /**
-     * @var ?int $endtime
+     * @var int $endtime
      */
-    private ?int $endtime;
+    private int $endtime;
 
     /**
      * @var ?int $starttime
@@ -340,8 +341,8 @@ class catquizstatistics {
                 !($quizsettings->$ranglow <= $value && $quizsettings->$rangup >= $value)
                 && $i <= $quizsettings->numberoffeedbackoptionsselect
             );
-            if ($i >= $quizsettings->numberoffeedbackoptionsselect) {
-                    continue;
+            if ($i > $quizsettings->numberoffeedbackoptionsselect) {
+                continue;
             }
             $range = $i;
             $chartdata[$primaryscaleid][$range][] = $userid;
@@ -382,6 +383,56 @@ class catquizstatistics {
         return [
             'title' => get_string('chart_detectedscales_title', 'local_catquiz'),
             'chart' => $out,
+        ];
+    }
+
+    public function render_learning_progress() {
+        global $USER;
+
+        $userid = $USER->id;
+
+        // Compare to other courses.
+        // Find all courses before the end of the day of this attempt.
+        $records = $this->get_attempts();
+        // Compare records to define range for average.
+        // Minimum 3 records required to display progress charts.
+        if (count($records) < 3) {
+            return [
+                'individual' => '',
+                'comparison' => '',
+            ];
+        }
+        $startingrecord = reset($records);
+        if (empty($startingrecord->endtime)) {
+            foreach ($records as $record) {
+                if (isset($record->endtime) && !empty($record->endtime)) {
+                    $startingrecord = $record;
+                    break;
+                }
+            }
+        }
+        $beginningoftimerange = intval($startingrecord->endtime);
+        $timerange = feedback_helper::get_timerange_for_attempts($beginningoftimerange, $this->endtime);
+        $attemptsofuser = array_filter($records, fn($r) => $r->userid == $userid);
+        $attemptsofpeers = array_filter($records, fn($r) => $r->userid != $userid);
+
+        $progressindividual = $this->render_chart_for_individual_user($attemptsofuser, (array) $this->scaleid);
+        if (count($attemptsofpeers) < 3) {
+            return [
+                'individual' => $progressindividual,
+                'comparison' => '',
+            ];
+        }
+        $progresscomparison = $this->render_chart_for_comparison(
+                $attemptsofuser,
+                $attemptsofpeers,
+                (array) $this->scaleid,
+                $timerange,
+                [$beginningoftimerange, $this->endtime]);
+
+        return [
+            'individual' => $progressindividual,
+            'comparison' => $progresscomparison,
         ];
     }
 
@@ -441,8 +492,8 @@ class catquizstatistics {
         }
 
         $beginningoftimerange = intval($startingrecord->endtime);
-        $timerange = learningprogress::get_timerange_for_attempts($beginningoftimerange, $this->endtime);
-        $this->attemptsbytimerange = learningprogress::order_attempts_by_timerange($records, $this->scaleid, $timerange);
+        $timerange = feedback_helper::get_timerange_for_attempts($beginningoftimerange, $this->endtime);
+        $this->attemptsbytimerange = feedback_helper::order_attempts_by_timerange($records, $this->scaleid, $timerange);
         return $this->attemptsbytimerange;
     }
 
@@ -542,4 +593,200 @@ class catquizstatistics {
         $this->maxrange = $maxrange;
         return $this->maxrange;
     }
+
+    /**
+     * Render chart for individual progress.
+     *
+     * @param array $attemptsofuser
+     * @param array $primarycatscale
+     *
+     * @return array
+     *
+     */
+    private function render_chart_for_individual_user(array $attemptsofuser, array $primarycatscale) {
+        global $OUTPUT;
+        $scaleid = $this->scaleid;
+        $scalename = catscale::return_catscale_object($this->scaleid)->name;
+
+        $chart = new chart_line();
+        $chart->set_smooth(true); // Calling set_smooth() passing true as parameter, will display smooth lines.
+
+        $personabilities = [];
+        foreach ($attemptsofuser as $attempt) {
+            $data = json_decode($attempt->json);
+            if (isset($data->personabilities->$scaleid)) {
+                $personabilities[] = $data->personabilities->$scaleid;
+            }
+        }
+        if (count($personabilities) < 2) {
+            return '';
+        }
+
+        $chartserie = new \core\chart_series(
+            get_string('personabilityinscale', 'local_catquiz', $scalename),
+            $personabilities
+        );
+
+        $labels = range(1, count($personabilities));
+
+        $chart->add_series($chartserie);
+        $chart->set_labels($labels);
+        $out = $OUTPUT->render($chart);
+
+        return [
+            'chart' => $out,
+            'charttitle' => get_string('progress', 'local_catquiz'),
+        ];
+    }
+
+    /**
+     * Render chart for progress compared to peers and grouped by date.
+     *
+     * @param array $attemptsofuser
+     * @param array $attemptsofpeers
+     * @param array $primarycatscale
+     * @param int $timerange
+     * @param array $beginningandendofrange
+     *
+     * @return array
+     *
+     */
+    private function render_chart_for_comparison(
+        array $attemptsofuser,
+        array $attemptsofpeers,
+        array $primarycatscale,
+        int $timerange,
+        array $beginningandendofrange
+    ) {
+        global $OUTPUT;
+        $scalename = catscale::return_catscale_object($this->scaleid)->name;
+
+        $chart = new chart_line();
+        $chart->set_smooth(true); // Calling set_smooth() passing true as parameter, will display smooth lines.
+
+        $orderedattemptspeers = feedback_helper::order_attempts_by_timerange($attemptsofpeers, $this->scaleid, $timerange);
+        $pa = $this->assign_average_result_to_timerange($orderedattemptspeers);
+        $orderedattemptsuser = feedback_helper::order_attempts_by_timerange($attemptsofuser, $this->scaleid, $timerange);
+        $ua = $this->assign_average_result_to_timerange($orderedattemptsuser);
+
+        // If we do not have enough data, return.
+        $numpeervalues = count(array_filter($pa, fn ($v) => $v !== null));
+        $numuservalues = count(array_filter($ua, fn ($v) => $v !== null));
+        if ($numpeervalues === 0 && $numuservalues === 0) {
+            return [
+                'chart' => '',
+                'charttitle' => '',
+            ];
+        }
+
+        $alldates = feedback_helper::get_timerangekeys($timerange, $beginningandendofrange);
+        $peerattemptsbydate = [];
+        $userattemptsbydate = [];
+        $firstvalue = true;
+        foreach ($alldates as $index => $key) {
+
+            if (!isset($pa[$key]) && !isset($ua[$key]) && $firstvalue) {
+                unset($alldates[$index]);
+                continue;
+            }
+            $firstvalue = false;
+            if (isset($pa[$key])) {
+                $peerattemptsbydate[$key] = $pa[$key];
+            } else {
+                $peerattemptsbydate[$key] = null;
+            }
+
+            if (isset($ua[$key])) {
+                $userattemptsbydate[$key] = $ua[$key];
+            } else {
+                $userattemptsbydate[$key] = null;
+            }
+        }
+
+        $peerattempts = new chart_series(
+            get_string('scoreofpeers', 'local_catquiz'),
+            array_values($peerattemptsbydate)
+        );
+        $peerattempts->set_labels(array_values($peerattemptsbydate));
+
+        $userattempts = new chart_series(
+            get_string('yourscorein', 'local_catquiz', $scalename),
+            array_values($userattemptsbydate)
+        );
+        $userattempts->set_labels(array_values($userattemptsbydate));
+
+        $labels = array_values($alldates);
+
+        $chart->add_series($userattempts);
+        $chart->add_series($peerattempts);
+        $chart->set_labels($labels);
+        $out = $OUTPUT->render($chart);
+
+        return [
+            'chart' => $out,
+            'charttitle' => get_string('progress', 'local_catquiz'),
+        ];
+    }
+
+    /**
+     * Assign average of result for each period.
+     * @param array $attemptsbytimerange
+     * @param int   $min The minimum number of results required to calculate the average.
+     *
+     * @return array
+     */
+    private function assign_average_result_to_timerange(array $attemptsbytimerange, int $min = 3) {
+        // Calculate average personability of this period.
+        foreach ($attemptsbytimerange as $date => $attempt) {
+            if (count($attempt) < $min) {
+                $attemptsbytimerange[$date] = null;
+                continue;
+            }
+            $floats = array_map('floatval', $attempt);
+            $average = array_sum($floats) / count($floats);
+            $attemptsbytimerange[$date] = $average;
+        }
+        return $attemptsbytimerange;
+    }
+
+    /**
+     * In order to make the chartvalues connected, we need to calculate averages between entries, if there are no values set.
+     *
+     * @param array $attemptswithnulls
+     *
+     * @return array
+     *
+     */
+    private function fill_empty_values_with_average(array $attemptswithnulls) {
+        $result = [];
+
+        $keys = array_keys($attemptswithnulls);
+
+        foreach ($keys as $key) {
+            // If the current value is null.
+            if ($attemptswithnulls[$key] === null) {
+                $neighborvalues = $this->find_non_nullable_value($keys, $attemptswithnulls, $key);
+                $prevvalue = $neighborvalues['prevvalue'];
+                $nextvalue = $neighborvalues['nextvalue'];
+
+                $average = null;
+                if ($prevvalue !== null && $nextvalue !== null) {
+                    $average = ($prevvalue + $nextvalue) / 2;
+                } else if ($prevvalue !== null) {
+                    $average = $prevvalue;
+                } else if ($nextvalue !== null) {
+                    $average = $nextvalue;
+                }
+
+                // Replace the null value with the calculated average.
+                $result[$key] = $average;
+            } else {
+                // If the current value is not null, keep it unchanged.
+                $result[$key] = $attemptswithnulls[$key];
+            }
+        }
+        return $result;
+
+    }
+
 }
