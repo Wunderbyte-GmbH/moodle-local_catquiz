@@ -451,6 +451,8 @@ class catquizstatistics {
      * @return bool
      */
     private function check_quizsettings_are_compatible(): bool {
+        global $CFG;
+
         if (isset($this->quizsettingcompatibility)) {
             return $this->quizsettingcompatibility;
         }
@@ -462,13 +464,21 @@ class catquizstatistics {
 
         // Check if the ranges match.
         $lastranges = null;
-        foreach ($this->quizsettings as $qs) {
+        foreach ($this->quizsettings as $testid => $qs) {
             if ($lastranges === null) {
                 $lastranges = $qs->numberoffeedbackoptionsselect;
                 continue;
             }
             if ($qs->numberoffeedbackoptionsselect !== $lastranges) {
                 $this->quizsettingcompatibility = false;
+                if ($CFG->debug > 0) {
+                    echo sprintf(
+                        "Quiz settings are not compatible: different number of ranges in test %d. Has %d but previous has %d",
+                        $testid,
+                        $qs->numberoffeedbackoptionsselect,
+                        $lastranges
+                    );
+                }
                 return false;
             }
         }
@@ -478,9 +488,9 @@ class catquizstatistics {
         foreach (range(1, $lastranges) as $r) {
             $rangestart = null;
             $rangeend = null;
-            foreach ($this->quizsettings as $qs) {
-                $startkey = sprintf("feedback_scaleid_limit_lower_%d_%d", $this->scaleid, $r);
-                $endkey = sprintf("feedback_scaleid_limit_upper_%d_%d", $this->scaleid, $r);
+            $startkey = sprintf("feedback_scaleid_limit_lower_%d_%d", $this->scaleid, $r);
+            $endkey = sprintf("feedback_scaleid_limit_upper_%d_%d", $this->scaleid, $r);
+            foreach ($this->quizsettings as $testid => $qs) {
                 // Check if we are in the first iteration of the loop.
                 if ($rangestart === null) {
                     $rangestart = $qs->$startkey;
@@ -488,6 +498,12 @@ class catquizstatistics {
                 }
                 if ($qs->$startkey !== $rangestart || $qs->$endkey !== $rangeend) {
                     $this->quizsettingcompatibility = false;
+                    if ($CFG->debug > 0) {
+                        echo sprintf(
+                            "Quiz settings are not compatible: different range values [%f, %f] for test %d",
+                            $qs->$startkey, $qs->$endkey, $testid
+                        );
+                    }
                     return false;
                 }
             }
