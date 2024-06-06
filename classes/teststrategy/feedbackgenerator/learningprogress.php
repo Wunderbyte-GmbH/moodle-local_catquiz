@@ -483,7 +483,7 @@ class learningprogress extends feedbackgenerator {
             }
         }
         $beginningoftimerange = intval($startingrecord->endtime);
-        $timerange = $this->get_timerange_for_attempts($beginningoftimerange, $endtime);
+        $timerange = feedback_helper::get_timerange_for_attempts($beginningoftimerange, $endtime);
 
         $attemptsofuser = array_filter($records, fn($r) => $r->userid == $userid);
         $attemptsofpeers = array_filter($records, fn($r) => $r->userid != $userid);
@@ -506,31 +506,6 @@ class learningprogress extends feedbackgenerator {
             'comparison' => $progresscomparison,
         ];
 
-    }
-    /**
-     * Return value to define range of time average.
-     *
-     * @param int $beginningoftimerange
-     * @param int $endtime
-     *
-     * @return int
-     *
-     */
-    public static function get_timerange_for_attempts(int $beginningoftimerange, int $endtime) {
-        $differenceindays = ($endtime - $beginningoftimerange) / (60 * 60 * 24);
-        $range = LOCAL_CATQUIZ_TIMERANGE_DAY;
-
-        if ($differenceindays <= 30) {
-            $range = LOCAL_CATQUIZ_TIMERANGE_DAY;
-        } else if ($differenceindays > 30 && $differenceindays <= 183) {
-            $range = LOCAL_CATQUIZ_TIMERANGE_WEEK;
-        } else if ($differenceindays > 183 && $differenceindays <= 730) {
-            $range = LOCAL_CATQUIZ_TIMERANGE_MONTH;
-        } else {
-            $range = LOCAL_CATQUIZ_TIMERANGE_QUARTEROFYEAR;
-        }
-
-         return $range;
     }
 
     /**
@@ -604,12 +579,12 @@ class learningprogress extends feedbackgenerator {
         $chart = new chart_line();
         $chart->set_smooth(true); // Calling set_smooth() passing true as parameter, will display smooth lines.
 
-        $orderedattemptspeers = self::order_attempts_by_timerange($attemptsofpeers, $scaleid, $timerange);
+        $orderedattemptspeers = feedback_helper::order_attempts_by_timerange($attemptsofpeers, $scaleid, $timerange);
         $pa = $this->assign_average_result_to_timerange($orderedattemptspeers);
-        $orderedattemptsuser = self::order_attempts_by_timerange($attemptsofuser, $scaleid, $timerange);
+        $orderedattemptsuser = feedback_helper::order_attempts_by_timerange($attemptsofuser, $scaleid, $timerange);
         $ua = $this->assign_average_result_to_timerange($orderedattemptsuser);
 
-        $alldates = self::get_timerangekeys($timerange, $beginningandendofrange);
+        $alldates = feedback_helper::get_timerangekeys($timerange, $beginningandendofrange);
         $peerattemptsbydate = [];
         $userattemptsbydate = [];
         $firstvalue = true;
@@ -743,87 +718,6 @@ class learningprogress extends feedbackgenerator {
     }
 
     /**
-     * Return average of personabilities ordered by date of quizattempt.
-     *
-     * @param array $attempts
-     * @param int $scaleid
-     * @param int $timerange
-     *
-     * @return array
-     *
-     */
-    public static function order_attempts_by_timerange(array $attempts, int $scaleid, int $timerange) {
-
-        $attemptsbytimerange = [];
-
-        // Create new array with endtime and sort. Create entry for each day.
-        foreach ($attempts as $attempt) {
-            $data = json_decode($attempt->json);
-            if (empty($attempt->endtime)) {
-                continue;
-            }
-            $datestring = self::return_datestring_label($timerange, $attempt->endtime);
-
-            if (!empty($data->personabilities->$scaleid)) {
-                if (!isset($attemptsbytimerange[$datestring])) {
-                    $attemptsbytimerange[$datestring] = [];
-                }
-                $attemptsbytimerange[$datestring][] = $data->personabilities->$scaleid;
-            }
-        }
-        return $attemptsbytimerange;
-    }
-
-    /**
-     * Returns the label for the given date according to format defined in timerange constant.
-     *
-     * @param int $timerange
-     * @param int $timestamp
-     *
-     * @return string
-     *
-     */
-    public static function return_datestring_label(int $timerange, int $timestamp): string {
-        switch ($timerange) {
-            case LOCAL_CATQUIZ_TIMERANGE_DAY:
-                $dateformat = '%d.%m.%Y';
-                $stringfordate = 'day';
-                break;
-            case LOCAL_CATQUIZ_TIMERANGE_WEEK:
-                $dateformat = '%W';
-                $stringfordate = 'week';
-                break;
-            case LOCAL_CATQUIZ_TIMERANGE_MONTH:
-                $dateformat = '%m';
-                $stringfordate = 'month';
-                break;
-            case LOCAL_CATQUIZ_TIMERANGE_QUARTEROFYEAR:
-                $dateformat = '%m';
-                $year = '%Y';
-                $stringfordate = 'quarter';
-                break;
-        }
-
-        $date = userdate($timestamp, $dateformat);
-
-        if ($timerange === LOCAL_CATQUIZ_TIMERANGE_QUARTEROFYEAR) {
-            $date = ceil($date / 3); // Divides the number of the month (4 for april) in order to get the quarter.
-            $year = userdate($timestamp, $year);
-            return get_string(
-                'stringdate:quarter',
-                'local_catquiz',
-                [
-                    'q' => $date,
-                    'y' => $year,
-                ]);
-        } else if ($timerange === LOCAL_CATQUIZ_TIMERANGE_MONTH) {
-            return get_string('stringdate:month:' . $date, 'local_catquiz');
-        } else {
-            return get_string('stringdate:' . $stringfordate, 'local_catquiz', $date);
-        }
-    }
-
-    /**
      * Assign average of result for each period.
      * @param array $attemptsbytimerange
      *
@@ -837,28 +731,6 @@ class learningprogress extends feedbackgenerator {
             $attemptsbytimerange[$date] = $average;
         }
         return $attemptsbytimerange;
-    }
-    /**
-     * Return keys for all moments in defined timerange.
-     *
-     * @param int $timerange
-     * @param array $beginningandendofrange
-     *
-     * @return array
-     *
-     */
-    public static function get_timerangekeys($timerange, $beginningandendofrange) {
-        $result = [];
-        $currenttimestamp = $beginningandendofrange[0];
-        $endtimestamp = $beginningandendofrange[1];
-
-        while ($currenttimestamp <= $endtimestamp) {
-            $val = self::return_datestring_label($timerange, $currenttimestamp);
-            $result[$val] = $val;
-            $currenttimestamp = strtotime('+1 day', $currenttimestamp);
-        }
-
-        return $result;
     }
 
     /**
