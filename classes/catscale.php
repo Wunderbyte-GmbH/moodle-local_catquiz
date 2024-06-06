@@ -490,7 +490,7 @@ class catscale {
      * @return array
      *
      */
-    public static function get_subscale_ids(int $catscaleid = null): array {
+    public static function get_subscale_ids(?int $catscaleid = null): array {
         global $DB;
 
         $all = $DB->get_records("local_catquiz_catscales", null, "", "id, parentid");

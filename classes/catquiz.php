@@ -1676,13 +1676,13 @@ class catquiz {
      * @return array
      */
     public static function get_attempts(
-            int $userid = null,
-            int $catscaleid = null,
-            int $courseid = null,
-            int $testid = null,
-            int $contextid = null,
-            int $starttime = null,
-            int $endtime = null) {
+            ?int $userid = null,
+            ?int $catscaleid = null,
+            ?int $courseid = null,
+            ?int $testid = null,
+            ?int $contextid = null,
+            ?int $starttime = null,
+            ?int $endtime = null) {
         global $DB;
 
         $sql = "SELECT * FROM {local_catquiz_attempts} WHERE 1=1";

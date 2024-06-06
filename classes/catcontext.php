@@ -141,9 +141,9 @@ class catcontext {
 
     /**
      * Catcontext constructor.
-     * @param stdClass $newrecord
+     * @param ?stdClass $newrecord
      */
-    public function __construct(stdClass $newrecord = null) {
+    public function __construct(?stdClass $newrecord = null) {
 
         global $DB;
 
@@ -310,7 +310,7 @@ class catcontext {
      * @param stdClass $newrecord
      * @return void
      */
-    public function save_or_update(stdClass $newrecord = null) {
+    public function save_or_update(?stdClass $newrecord = null) {
 
         global $DB, $USER;
 

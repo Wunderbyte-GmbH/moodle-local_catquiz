@@ -97,10 +97,10 @@ class testitemimporter {
      */
     private static function define_settings(
         array $definedcolumns,
-        string $callbackfunction = null,
-        string $delimiter = null,
-        string $encoding = null,
-        string $dateformat = null
+        ?string $callbackfunction = null,
+        ?string $delimiter = null,
+        ?string $encoding = null,
+        ?string $dateformat = null
         ) {
 
         $settings = new csvsettings($definedcolumns);
