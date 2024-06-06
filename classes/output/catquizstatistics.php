@@ -126,8 +126,8 @@ class catquizstatistics {
             $tests = $DB->get_records('local_catquiz_tests', ['courseid' => $courseid]);
         }
 
-        foreach ($tests as $testid => $test) {
-            $this->quizsettings[$testid] = json_decode($test->json);
+        foreach ($tests as $test) {
+            $this->quizsettings[$test->componentid] = json_decode($test->json);
         }
     }
 
