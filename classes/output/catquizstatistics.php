@@ -303,7 +303,12 @@ class catquizstatistics {
     public function render_detected_scales_chart(): array {
         global $OUTPUT;
 
-        $attempts = $this->get_attempts();
+        if (!$attempts = $this->get_attempts()) {
+            return [
+            'title' => get_string('catquizstatisticsnodata', 'local_catquiz'),
+            'chart' => '',
+            ];
+        }
         $latestattempts = [];
         foreach ($attempts as $attempt) {
             $latestattempts[$attempt->userid] = $attempt;
