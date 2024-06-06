@@ -436,6 +436,14 @@ class catquizstatistics {
         ];
     }
 
+    public function render_responses_by_users_chart() {
+        global $DB;
+        list($sql, $params) = catquiz::get_sql_for_questions_answered_per_person($this->contextid);
+        $questions = $DB->get_records_sql($sql, $params);
+
+        return '';
+    }
+
     /**
      * Returns the attempts for the given parameters (courseid, scaleid, testid, starttime, endtime)
      *

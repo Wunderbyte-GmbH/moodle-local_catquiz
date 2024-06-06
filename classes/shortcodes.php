@@ -221,6 +221,7 @@ class shortcodes {
             'stackchart' => $catquizstatistics->render_attemptresultstackchart($globalscale),
             'detectedscales' => $catquizstatistics->render_detected_scales_chart(),
             'learningprogress' => $catquizstatistics->render_learning_progress(),
+            'numresponsesbyusers' => $catquizstatistics->render_responses_by_users_chart(),
         ];
 
         return $OUTPUT->render_from_template('local_catquiz/catscaleshortcodes/catscalestatistics', $data);

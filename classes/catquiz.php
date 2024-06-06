@@ -670,14 +670,23 @@ class catquiz {
         array $contextids = [],
         array $studentids = []
     ): array {
+        global $DB;
+        [$unfinishedstatessql, $unfinishedstatesparams] = $DB->get_in_or_equal(
+            ['notstarted', 'unprocessed', 'todo', 'invalid', 'complete'],
+            SQL_PARAMS_NAMED,
+            'unfinishedstates'
+        );
+
         $select = '*';
-        $from = '{local_catquiz_catcontext} ccc1
+        $from = "{local_catquiz_catcontext} ccc1
                 JOIN {question_attempt_steps} qas
                     ON ccc1.starttimestamp < qas.timecreated
                     AND ccc1.endtimestamp > qas.timecreated
-                    AND qas.fraction IS NOT NULL
+                    AND qas.state NOT $unfinishedstatessql
+
                 JOIN {question_attempts} qa
-                    ON qas.questionattemptid = qa.id';
+                    ON qas.questionattemptid = qa.id";
+        ;
         $where = !empty($testitemids) ? 'qa.questionid IN (:testitemids)' : '1=1';
         $where .= !empty($contextids) ? ' AND ccc1.id IN (:contextids)' : '';
         $where .= !empty($studentids) ? ' AND userid IN (:studentids)' : '';
@@ -689,6 +698,7 @@ class catquiz {
         $params = self::set_optional_param([], 'testitemids', $testitemids, $testitemidstring);
         $params = self::set_optional_param($params, 'contextids', $contextids, $contextidstring);
         $params = self::set_optional_param($params, 'studentids', $studentids, $studentidstring);
+        $params = array_merge($params, $unfinishedstatesparams);
 
         return [$select, $from, $where, $params];
     }
@@ -2114,4 +2124,30 @@ class catquiz {
         global $DB;
         return $DB->get_record('local_catquiz_tests', ['componentid' => $testid], '*', MUST_EXIST);
     }
+
+    /**
+     * Return the sql for questions answered per person.
+     *
+     * @param array $contextid
+     *
+     * @return array
+     *
+     */
+    public static function get_sql_for_questions_answered_per_person(int $contextid, array $catscaleids = []) {
+
+        // Get questions answered for the given context.
+        list (, $from, $where, $params) = self::get_sql_for_stat_base_request([], [$contextid]);
+
+        $sql = "SELECT userid, COUNT(*)
+        FROM (
+            SELECT qas.id, qas.userid, qa.questionid
+            FROM $from
+            WHERE $where
+        ) s1
+        JOIN {local_catquiz_items} lci ON lci.componentname = 'question' AND s1.questionid = lci.componentid
+        GROUP BY s1.userid";
+
+        return [$sql, $params];
+    }
+
 }
