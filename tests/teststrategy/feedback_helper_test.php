@@ -15,7 +15,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Tests the feedbackgenerator learningprogress.
+ * Tests the feedback_helper.
  *
  * @package    local_catquiz
  * @author     Magdalena Holczik
@@ -27,24 +27,20 @@ namespace local_catquiz;
 
 use advanced_testcase;
 use local_catquiz\teststrategy\feedback_helper;
-use local_catquiz\teststrategy\feedbackgenerator\learningprogress;
-use local_catquiz\teststrategy\feedbackgenerator\personabilities;
-use local_catquiz\teststrategy\feedbacksettings;
-use local_catquiz\teststrategy\progress;
 use PHPUnit\Framework\ExpectationFailedException;
 use SebastianBergmann\RecursionContext\InvalidArgumentException;
 
 /**
- * Tests the feedbackgenerator learningprogress.
+ * Tests the feedback_helper.
  *
  * @package    local_catquiz
  * @author     Magdalena Holczik
  * @copyright  2024 Wunderbyte GmbH <info@wunderbyte.at>
  * @license    http =>//www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  *
- * @covers \local_catquiz\teststrategy\feedbackgenerator\learningprogress
+ * @covers \local_catquiz\teststrategy\feedback_helper
  */
-class learningprogress_test extends advanced_testcase {
+class feedback_helper_test extends advanced_testcase {
 
     /**
      * Test if correct string (label for chart) is returned correctly according to defined timerange and timestamp.
@@ -61,13 +57,9 @@ class learningprogress_test extends advanced_testcase {
     public function test_return_datestring_label(
         int $timerange,
         int $timestamp,
-        string $expected) {
-        $feedbacksettings = new feedbacksettings(LOCAL_CATQUIZ_STRATEGY_LOWESTSUB);
-        $feedbackhelper = new feedback_helper();
-        $learningprogress = new learningprogress($feedbacksettings, $feedbackhelper);
-
-        $datestringlabel = $learningprogress->return_datestring_label($timerange, $timestamp);
-
+        string $expected
+    ) {
+        $datestringlabel = feedback_helper::return_datestring_label($timerange, $timestamp);
         $this->assertEquals($expected, $datestringlabel);
     }
 
@@ -75,10 +67,8 @@ class learningprogress_test extends advanced_testcase {
      * Data provider for test_datestring_label_provider.
      *
      * @return array
-     *
      */
     public static function return_datestring_label_provider(): array {
-
         return [
             'day' => [
                 'timerange' => LOCAL_CATQUIZ_TIMERANGE_DAY,
@@ -112,5 +102,4 @@ class learningprogress_test extends advanced_testcase {
                 ],
         ];
     }
-
 }
