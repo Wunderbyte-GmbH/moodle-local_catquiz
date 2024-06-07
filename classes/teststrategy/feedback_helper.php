@@ -27,6 +27,7 @@ namespace local_catquiz\teststrategy;
 use local_catquiz\catscale;
 use local_catquiz\feedback\feedbackclass;
 use local_catquiz\local\model\model_model;
+use stdClass;
 
 /**
  * Contains helper functions for quiz feedback.
@@ -322,5 +323,32 @@ class feedback_helper {
         } while ($key != $lastkey);
 
         return $result;
+    }
+
+    /**
+     * Returns the 1-based range index of an ability
+     *
+     * If the value is outside the range, returns null.
+     *
+     * @param stdClass $quizsettings
+     * @param float $value
+     */
+    public static function get_range_of_value(stdClass $quizsettings, $scaleid, float $value): ?int {
+        // Get the range of the selected value.
+        $i = 0;
+        do {
+            $i++;
+            $ranglow = sprintf('feedback_scaleid_limit_lower_%d_%d', $scaleid, $i);
+            $rangup = sprintf('feedback_scaleid_limit_upper_%d_%d', $scaleid, $i);
+
+        } while (
+            !($quizsettings->$ranglow <= $value && $quizsettings->$rangup >= $value)
+            && $i <= $quizsettings->numberoffeedbackoptionsselect
+        );
+        if ($i > $quizsettings->numberoffeedbackoptionsselect) {
+            return null;
+        }
+
+        return $i;
     }
 }
