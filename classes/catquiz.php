@@ -2128,7 +2128,8 @@ class catquiz {
     /**
      * Return the sql for questions answered per person.
      *
-     * @param array $contextid
+     * @param int $contextid
+     * @param array $catscaleids
      *
      * @return array
      *
