@@ -351,4 +351,18 @@ class feedback_helper {
 
         return $i;
     }
+
+    /**
+     * Returns the bin number for a given value
+     *
+     * @param float $value
+     * @param float $classwidth
+     * @return int
+     */
+    public static function get_histogram_bin($value, $classwidth): int {
+        if ($value == 0) {
+            return 0;
+        }
+        return intval(ceil($value / $classwidth) - 1);
+    }
 }
