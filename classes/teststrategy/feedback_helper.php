@@ -331,9 +331,11 @@ class feedback_helper {
      * If the value is outside the range, returns null.
      *
      * @param stdClass $quizsettings
+     * @param int $scaleid
      * @param float $value
+     * @return ?int
      */
-    public static function get_range_of_value(stdClass $quizsettings, $scaleid, float $value): ?int {
+    public static function get_range_of_value(stdClass $quizsettings, int $scaleid, float $value): ?int {
         // Get the range of the selected value.
         $i = 0;
         do {

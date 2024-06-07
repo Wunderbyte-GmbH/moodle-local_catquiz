@@ -41,8 +41,14 @@ require_once($CFG->dirroot . '/local/catquiz/lib.php');
  */
 class catquizstatistics {
 
+    /**
+     * @var int
+     */
     const ATTEMPTS_PER_PERSON_CLASSES = 7;
-    // For incompatible quiz settings, set this as the detected range.
+    /**
+     * For incompatible quiz settings, set this as the detected range.
+     * @var int
+     */
     const FALLBACK_RANGE = 1;
 
     /**
