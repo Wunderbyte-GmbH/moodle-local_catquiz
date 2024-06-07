@@ -24,7 +24,7 @@ use local_catquiz\catscale;
 use local_catquiz\feedback\feedbackclass;
 use local_catquiz\local\model\model_strategy;
 use local_catquiz\teststrategy\feedback_helper;
-use local_catquiz\teststrategy\feedbackgenerator\learningprogress;
+use stdClass;
 
 defined('MOODLE_INTERNAL') || die();
 
@@ -40,6 +40,10 @@ require_once($CFG->dirroot . '/local/catquiz/lib.php');
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class catquizstatistics {
+
+    const ATTEMPTS_PER_PERSON_CLASSES = 7;
+    // For incompatible quiz settings, set this as the detected range.
+    const FALLBACK_RANGE = 1;
 
     /**
      * @var ?int $courseid
@@ -331,20 +335,9 @@ class catquizstatistics {
             $value = $primaryscale[$primaryscaleid]->value;
 
             // Get the range of the selected value.
-            $i = 0;
-            do {
-                $i++;
-                $ranglow = sprintf('feedback_scaleid_limit_lower_%d_%d', $primaryscaleid, $i);
-                $rangup = sprintf('feedback_scaleid_limit_upper_%d_%d', $primaryscaleid, $i);
-
-            } while (
-                !($quizsettings->$ranglow <= $value && $quizsettings->$rangup >= $value)
-                && $i <= $quizsettings->numberoffeedbackoptionsselect
-            );
-            if ($i > $quizsettings->numberoffeedbackoptionsselect) {
+            if (!$range = feedback_helper::get_range_of_value($quizsettings, $primaryscaleid, $value)) {
                 continue;
             }
-            $range = $i;
             $chartdata[$primaryscaleid][$range][] = $userid;
         }
 
@@ -447,11 +440,81 @@ class catquizstatistics {
      * @return array
      */
     public function render_responses_by_users_chart() {
-        global $DB;
+        global $DB, $OUTPUT;
         list($sql, $params) = catquiz::get_sql_for_questions_answered_per_person($this->contextid, $this->scaleid, $this->courseid);
-        $questions = $DB->get_records_sql($sql, $params);
+        $results = $DB->get_records_sql($sql, $params);
+        $maxattempts = 0;
+        foreach ($results as $r) {
+            if ($r->total_answered > $maxattempts) {
+                $maxattempts = $r->total_answered;
+            }
+        }
+        $classwidth = ceil($maxattempts / self::ATTEMPTS_PER_PERSON_CLASSES);
 
-        return [];
+        if (!$qs = $this->get_quizsettings()) {
+            $numranges = 1;
+        } else {
+            $numranges = $qs->numberoffeedbackoptionsselect;
+        }
+
+        // Initialize the data to 0 for all ranges and bins.
+        for ($i = 0; $i <= $numranges; $i++) {
+            for ($j = 0; $j < self::ATTEMPTS_PER_PERSON_CLASSES; $j++) {
+                $data[$i][$j] = [];
+            }
+        }
+        foreach ($results as $r) {
+            $bin = floor(($r->total_answered / $classwidth));
+            if (!$r->ability) {
+                $data[0][$bin][] = $r;
+            } else {
+                // If we have incompatible quiz settings, assing all values to the fallback range.
+                $range = $qs
+                    ? feedback_helper::get_range_of_value($qs, $this->scaleid, $r->ability)
+                    : self::FALLBACK_RANGE;
+                if (!$range) {
+                    // Ability is outside defined range. TODO: how to handle?
+                    continue;
+                }
+                $data[$range][$bin][] = $r;
+            }
+        }
+
+        $chart = new \core\chart_bar();
+        $chart->set_stacked(true);
+
+        $colors = $qs ? array_values(feedbackclass::get_array_of_colors($numranges)) : [LOCAL_CATQUIZ_DEFAULT_BLACK];
+        $colors['-1'] = LOCAL_CATQUIZ_DEFAULT_GREY;
+        for ($range = 0; $range <= $numranges; $range++) {
+            if ($range == 0) {
+                $serieslabel = get_string('noresult', 'local_catquiz');
+            } else {
+                $serieslabel = $qs
+                    ? get_string('feedbackrange', 'local_catquiz', $range)
+                    : get_string('hasability', 'local_catquiz');
+            }
+            $color = $colors[$range - 1];
+            $series = new \core\chart_series(
+                $serieslabel,
+                array_map(fn ($x) => count($x), $data[$range])
+            );
+            $series->set_color($color);
+            $chart->add_series($series);
+        }
+
+        $labels = [];
+        for ($i = 0; $i < self::ATTEMPTS_PER_PERSON_CLASSES; $i++) {
+            $labels[$i] = sprintf("%d..%d", $i * $classwidth, $i * $classwidth + $classwidth - 1);
+        }
+        $chart->set_labels($labels);
+
+        $out = $OUTPUT->render($chart);
+
+        return [
+            'title' => get_string('responsesbyusercharttitle', 'local_catquiz'),
+            'chart' => $out,
+
+        ];
     }
 
     /**
@@ -807,4 +870,22 @@ class catquizstatistics {
 
     }
 
+    /**
+     * Get quiz settings
+     *
+     * When rendering charts for multiple quizzes, we have multiple quiz settings.
+     * There could be conflicts between those quiz settings.
+     *
+     * If the quiz settings are compatible, it returns one of them.
+     * Otherwise, null is returned.
+     *
+     * @return ?stdClass
+     */
+    private function get_quizsettings(): ?stdClass {
+        if ($this->check_quizsettings_are_compatible()) {
+            $first = reset($this->quizsettings);
+            return $first;
+        }
+        return null;
+    }
 }
