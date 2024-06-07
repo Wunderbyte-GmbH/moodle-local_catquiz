@@ -1665,13 +1665,13 @@ class catquiz {
      *
      * The returned attempts are sorted by endtime in ascending order.
      *
-     * @param int $userid
-     * @param int $catscaleid
-     * @param int $courseid
-     * @param int $testid
-     * @param int $contextid
-     * @param int $starttime
-     * @param int $endtime
+     * @param ?int $userid
+     * @param ?int $catscaleid
+     * @param ?int $courseid
+     * @param ?int $testid
+     * @param ?int $contextid
+     * @param ?int $starttime
+     * @param ?int $endtime
      *
      * @return array
      */

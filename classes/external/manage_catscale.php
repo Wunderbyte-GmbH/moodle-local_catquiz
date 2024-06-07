@@ -70,10 +70,10 @@ class manage_catscale extends external_api {
      * @param string $name
      * @param string $description
      * @param string $action
-     * @param ?float|null $minscalevalue
-     * @param ?float|null $maxscalevalue
-     * @param ?int|null $parentid
-     * @param ?int|null $id
+     * @param ?float $minscalevalue
+     * @param ?float $maxscalevalue
+     * @param ?int $parentid
+     * @param ?int $id
      *
      * @return array
      */

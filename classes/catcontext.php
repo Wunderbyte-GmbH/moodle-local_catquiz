@@ -307,7 +307,7 @@ class catcontext {
     /**
      * Save or update catcontext class.
      *
-     * @param stdClass $newrecord
+     * @param ?stdClass $newrecord
      * @return void
      */
     public function save_or_update(?stdClass $newrecord = null) {
