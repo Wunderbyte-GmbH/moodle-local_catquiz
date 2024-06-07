@@ -2164,6 +2164,7 @@ class catquiz {
         $sql = "SELECT ue.userid, COALESCE(answercount, 0) total_answered, lcp.ability
                 FROM {enrol} e
                 JOIN {user_enrolments} ue ON e.id = ue.enrolid
+                JOIN {role} r ON e.roleid = r.id AND r.shortname = 'student'
                 LEFT JOIN (
                     SELECT s1.userid, COUNT(*) as answercount
                     FROM (
