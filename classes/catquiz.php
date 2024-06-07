@@ -2128,27 +2128,60 @@ class catquiz {
     /**
      * Return the sql for questions answered per person.
      *
+     * For each user, this returns the number of questions answered in the
+     * given scale (or any of its subscales).
+     * When a courseid is given, all participants of the course are listed.
+     * Otherwise, all users enrolled into any course are listed.
+     *
+     * Note that the courseid parameter just changes the list of selected
+     * users. The number of answers will be the same, as this depends only on
+     * the selected scale.
+     *
      * @param int $contextid
-     * @param array $catscaleids
+     * @param int $scaleid
+     * @param ?int $courseid
      *
      * @return array
      *
      */
-    public static function get_sql_for_questions_answered_per_person(int $contextid, array $catscaleids = []) {
+    public static function get_sql_for_questions_answered_per_person(int $contextid, int $scaleid, ?int $courseid = null) {
+        global $DB;
+
+        $catscaleids = [$scaleid, ...catscale::get_subscale_ids($scaleid)];
 
         // Get questions answered for the given context.
         list (, $from, $where, $params) = self::get_sql_for_stat_base_request([], [$contextid]);
+        [$insql, $inparams] = $DB->get_in_or_equal($catscaleids, SQL_PARAMS_NAMED, 'incatscales');
+        $params = array_merge($params, $inparams, ['catscaleid' => $scaleid]);
+        $where2 = '1=1';
+        $where3 = "lci.catscaleid $insql";
+        if ($courseid) {
+            $where2 .= ' AND e.courseid = :courseid';
+            $where3 .= ' AND a.course = :courseid2';
+            $params = array_merge($params, ['courseid' => $courseid, 'courseid2' => $courseid]);
+        }
 
-        $sql = "SELECT userid, COUNT(*)
-        FROM (
-            SELECT qas.id, qas.userid, qa.questionid
-            FROM $from
-            WHERE $where
-        ) s1
-        JOIN {local_catquiz_items} lci ON lci.componentname = 'question' AND s1.questionid = lci.componentid
-        GROUP BY s1.userid";
-
+        $sql = "SELECT ue.userid, COALESCE(answercount, 0) total_answered, lcp.ability
+                FROM m_enrol e
+                JOIN m_user_enrolments ue ON e.id = ue.enrolid
+                LEFT JOIN (
+                    SELECT s1.userid, COUNT(*) as answercount
+                    FROM (
+                        SELECT qas.id, qas.userid, qa.questionid, qa.questionusageid
+                        FROM $from
+                        WHERE $where
+                    ) s1
+                    JOIN {local_catquiz_items} lci ON lci.componentname = 'question' AND s1.questionid = lci.componentid
+                    -- Only select questions that have item params.
+                    JOIN {local_catquiz_itemparams} lcip ON lcip.componentname = 'question' AND s1.questionid = lcip.componentid
+                    -- Make sure we only get responses from the quizzes in the given course.
+                    JOIN m_adaptivequiz_attempt aa ON aa.uniqueid = s1.questionusageid
+                    JOIN m_adaptivequiz a ON a.id = aa.instance
+                    WHERE $where3
+                    GROUP BY s1.userid
+                ) s2 ON ue.userid = s2.userid
+                LEFT JOIN m_local_catquiz_personparams lcp ON ue.userid = lcp.userid AND lcp.catscaleid = :catscaleid
+                WHERE $where2";
         return [$sql, $params];
     }
-
 }
