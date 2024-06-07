@@ -2162,8 +2162,8 @@ class catquiz {
         }
 
         $sql = "SELECT ue.userid, COALESCE(answercount, 0) total_answered, lcp.ability
-                FROM m_enrol e
-                JOIN m_user_enrolments ue ON e.id = ue.enrolid
+                FROM {enrol} e
+                JOIN {user_enrolments} ue ON e.id = ue.enrolid
                 LEFT JOIN (
                     SELECT s1.userid, COUNT(*) as answercount
                     FROM (
@@ -2175,12 +2175,12 @@ class catquiz {
                     -- Only select questions that have item params.
                     JOIN {local_catquiz_itemparams} lcip ON lcip.componentname = 'question' AND s1.questionid = lcip.componentid
                     -- Make sure we only get responses from the quizzes in the given course.
-                    JOIN m_adaptivequiz_attempt aa ON aa.uniqueid = s1.questionusageid
-                    JOIN m_adaptivequiz a ON a.id = aa.instance
+                    JOIN {adaptivequiz_attempt} aa ON aa.uniqueid = s1.questionusageid
+                    JOIN {adaptivequiz} a ON a.id = aa.instance
                     WHERE $where3
                     GROUP BY s1.userid
                 ) s2 ON ue.userid = s2.userid
-                LEFT JOIN m_local_catquiz_personparams lcp ON ue.userid = lcp.userid AND lcp.catscaleid = :catscaleid
+                LEFT JOIN {local_catquiz_personparams} lcp ON ue.userid = lcp.userid AND lcp.catscaleid = :catscaleid
                 WHERE $where2";
         return [$sql, $params];
     }
