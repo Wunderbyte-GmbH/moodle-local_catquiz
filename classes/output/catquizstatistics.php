@@ -463,8 +463,9 @@ class catquizstatistics {
                 $data[$i][$j] = [];
             }
         }
+
         foreach ($results as $r) {
-            $bin = floor(($r->total_answered / $classwidth));
+            $bin = feedback_helper::get_histogram_bin($r->total_answered, $classwidth);
             if (!$r->ability) {
                 $data[0][$bin][] = $r;
             } else {

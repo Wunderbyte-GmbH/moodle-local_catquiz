@@ -102,4 +102,38 @@ class feedback_helper_test extends advanced_testcase {
                 ],
         ];
     }
+
+    /**
+     * Test if the correct bin is calculated
+     *
+     * @param float $value
+     * @param int $classwidth
+     * @param int $expected
+     *
+     * @return void
+     * @throws InvalidArgumentException
+     * @throws ExpectationFailedException
+     * @dataProvider get_histogram_bin_provider
+     */
+    public function test_get_histogram_bin(
+        float $value,
+        int $classwidth,
+        int $expected
+    ) {
+        $this->assertEquals($expected, feedback_helper::get_histogram_bin($value, $classwidth));
+    }
+
+    /**
+     * Data provider for histogram bin test
+     *
+     * @return array
+     */
+    public static function get_histogram_bin_provider(): array {
+        return [
+            '0 is assigned bin 0' => [0, 87, 0],
+            'classwidth is assigned to bin 0' => [87, 87, 0],
+            'classwidth plus 1 is assigned to bin 1' => [88, 87, 1],
+            'class width times n is assigned bin n-1' => [609, 87, 6],
+        ];
+    }
 }
