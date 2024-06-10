@@ -201,7 +201,9 @@ class catquizstatistics {
                         $countsbyrange[0][$timestamp]++;
                         continue;
                     }
-                    $range = feedback_helper::get_range_of_value($this->get_quizsettings(), $this->scaleid, $attempt);
+                    if (!$range = feedback_helper::get_range_of_value($this->get_quizsettings(), $this->scaleid, $attempt)) {
+                        continue;
+                    }
                     $countsbyrange[$range][$timestamp]++;
                 }
             }
