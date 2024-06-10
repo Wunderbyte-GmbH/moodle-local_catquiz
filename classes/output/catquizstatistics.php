@@ -657,18 +657,21 @@ class catquizstatistics {
 
         // Check if the ranges match.
         $lastranges = null;
+        $prevtestid = null;
         foreach ($this->quizsettings as $testid => $qs) {
             if ($lastranges === null) {
                 $lastranges = $qs->numberoffeedbackoptionsselect;
+                $prevtestid = $testid;
                 continue;
             }
             if ($qs->numberoffeedbackoptionsselect !== $lastranges) {
                 $this->quizsettingcompatibility = false;
                 if ($CFG->debug > 0) {
                     echo sprintf(
-                        "Quiz settings are not compatible: different number of ranges in test %d. Has %d but previous has %d",
+                        "Quiz settings are not compatible: different number of ranges in test %d. Has %d but first test %d has %d",
                         $testid,
                         $qs->numberoffeedbackoptionsselect,
+                        $prevtestid,
                         $lastranges
                     );
                 }
