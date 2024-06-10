@@ -211,6 +211,11 @@ class shortcodes {
                 'local_catquiz/catscaleshortcodes/catscalestatistics',
                 ['error' => 'Can not find a test with the given testid']
             );
+        } catch (\Exception $e) {
+            return $OUTPUT->render_from_template(
+                'local_catquiz/catscaleshortcodes/catscalestatistics',
+                ['error' => $e->getMessage()]
+            );
         }
 
         $data = [

@@ -224,12 +224,17 @@ class feedback_helper {
      * @param array $attempts
      * @param int $scaleid
      * @param int $timerange
+     * @param bool $allowempty If set to yes, missing abilities are returned as null.
      *
      * @return array
      *
      */
-    public static function order_attempts_by_timerange(array $attempts, int $scaleid, int $timerange) {
-
+    public static function order_attempts_by_timerange(
+        array $attempts,
+        int $scaleid,
+        int $timerange,
+        bool $allowempty = false
+    ) {
         $attemptsbytimerange = [];
 
         // Create new array with endtime and sort. Create entry for each day.
@@ -240,11 +245,11 @@ class feedback_helper {
             }
             $datestring = self::return_datestring_label($timerange, $attempt->endtime);
 
-            if (!empty($data->personabilities->$scaleid)) {
+            if (!empty($data->personabilities->$scaleid) || $allowempty) {
                 if (!isset($attemptsbytimerange[$datestring])) {
                     $attemptsbytimerange[$datestring] = [];
                 }
-                $attemptsbytimerange[$datestring][] = $data->personabilities->$scaleid;
+                $attemptsbytimerange[$datestring][] = $data->personabilities->$scaleid ?? null;
             }
         }
         return $attemptsbytimerange;
