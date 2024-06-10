@@ -2185,4 +2185,24 @@ class catquiz {
                 WHERE $where2";
         return [$sql, $params];
     }
+
+    /**
+     * Return the number of attempts per person
+     *
+     * @param int $contextid
+     * @param int $scaleid
+     * @param ?int $courseid
+     */
+    public static function get_sql_for_attempts_per_person(int $contextid, int $scaleid, ?int $courseid) {
+        $sql = "SELECT ue.userid, COALESCE(attemptcount, 0) attemptcount, lcp.ability
+            FROM m_enrol e
+            JOIN m_user_enrolments ue ON e.id = ue.enrolid
+            LEFT JOIN (SELECT a.userid, COUNT(*) as attemptcount
+            FROM m_local_catquiz_attempts a
+            WHERE a.courseid = 10
+            GROUP BY a.userid
+                    ) s1 ON ue.userid = s1.userid
+                    LEFT JOIN m_local_catquiz_personparams lcp ON ue.userid = lcp.userid AND lcp.catscaleid = 1
+                    WHERE e.courseid = 10;";
+    }
 }
