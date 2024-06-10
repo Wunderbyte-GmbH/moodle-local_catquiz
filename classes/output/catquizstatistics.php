@@ -107,6 +107,11 @@ class catquizstatistics {
     private int $maxrange;
 
     /**
+     * @var array $timerangekeys
+     */
+    private array $timerangekeys;
+
+    /**
      * Create a new catquizstatistics object
      *
      * @param ?int $courseid
@@ -581,6 +586,7 @@ class catquizstatistics {
 
         $beginningoftimerange = intval($startingrecord->endtime);
         $timerange = feedback_helper::get_timerange_for_attempts($beginningoftimerange, $this->endtime);
+        $this->timerangekeys = feedback_helper::get_timerangekeys($timerange, [$beginningoftimerange, $this->endtime]);
         $this->attemptsbytimerange = feedback_helper::order_attempts_by_timerange($records, $this->scaleid, $timerange);
         return $this->attemptsbytimerange;
     }
