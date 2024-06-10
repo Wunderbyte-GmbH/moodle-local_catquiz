@@ -66,6 +66,8 @@ class catquizstatistics {
      */
     private ?int $scaleid;
 
+    private ?int $rootscaleid;
+
     /**
      * @var int $endtime
      */
@@ -130,18 +132,25 @@ class catquizstatistics {
         $this->endtime = $endtime ?? time();
         $this->starttime = $starttime;
         $this->scaleid = $scaleid;
-        $this->courseid = intval($courseid);
         $scale = catscale::return_catscale_object($this->scaleid);
-        $this->contextid = $scale->contextid;
+        $this->rootscaleid = $scale->parentid == 0
+            ? $scale->id
+            : catscale::get_ancestors($this->scaleid, 3)['mainscale'];
+        $this->courseid = intval($courseid);
+        $this->contextid = catscale::get_context_id($this->scaleid);
 
         if ($testid) {
             $tests = $DB->get_records('local_catquiz_tests', ['componentid' => $testid]);
         } else {
-            $params = ['catscaleid' => $scaleid];
+            // If a subscale is given as scaleid, we still need the root scale to get the associated tests.
+            $params = ['catscaleid' => $this->rootscaleid];
             if ($courseid) {
                 $params['courseid'] = $courseid;
             }
             $tests = $DB->get_records('local_catquiz_tests', $params);
+        }
+        if (count($tests) === 0) {
+            throw new \Exception('catquizstatistics shortcode: no tests can be found for the given arguments');
         }
         foreach ($tests as $test) {
             $this->quizsettings[$test->componentid] = json_decode($test->json);
@@ -156,7 +165,7 @@ class catquizstatistics {
     public function render_attemptscounterchart() {
         global $OUTPUT;
 
-        $attemptsbytimerange = $this->get_attempts_by_timerange();
+        $attemptsbytimerange = $this->get_attempts_by_timerange(true);
         if (!$attemptsbytimerange) {
             return [
                 'chart' => get_string('catquizstatisticsnodata', 'local_catquiz'),
@@ -166,11 +175,17 @@ class catquizstatistics {
             // We use only one range '1' if the quizsettings do not match between different quizzes.
             $colors = [LOCAL_CATQUIZ_DEFAULT_BLACK];
             foreach ($this->timerangekeys as $timepoint) {
+                $countsbyrange[0][$timepoint] = 0;
                 $countsbyrange[1][$timepoint] = 0;
             }
             foreach ($attemptsbytimerange as $timestamp => $attempts) {
                 foreach ($attempts as $attempt) {
-                    $countsbyrange[1][$timestamp]++;
+                    if ($attempt) {
+                        $countsbyrange[1][$timestamp]++;
+                        continue;
+                    }
+                    // We do not have a value.
+                    $countsbyrange[0][$timestamp]++;
                 }
             }
         } else {
@@ -182,6 +197,9 @@ class catquizstatistics {
             }
             foreach ($attemptsbytimerange as $timestamp => $attempts) {
                 foreach ($attempts as $attempt) {
+                    if (is_null($attempt)) {
+                        $countsbyrange[0][$timestamp]++;
+                    }
                     $range = feedback_helper::get_range_of_value($this->get_quizsettings(), $this->scaleid, $attempt);
                     $countsbyrange[$range][$timestamp]++;
                 }
@@ -190,6 +208,7 @@ class catquizstatistics {
         $chart = new chart_bar();
         $chart->set_stacked(true);
         $chart->set_labels($this->timerangekeys);
+        $colors[-1] = LOCAL_CATQUIZ_DEFAULT_GREY;
         foreach ($countsbyrange as $range => $counts) {
             $series = new chart_series(
                 get_string('feedbackrange', 'local_catquiz', $range),
@@ -577,16 +596,17 @@ class catquizstatistics {
     /**
      * Return attempts for the time range of this object
      *
+     * @param bool $allowempty
      * @return array
      */
-    private function get_attempts_by_timerange(): array {
-        if ($this->attemptsbytimerange) {
-            return $this->attemptsbytimerange;
+    private function get_attempts_by_timerange(bool $allowempty = false): array {
+        if (isset($this->attemptsbytimerange[$allowempty])) {
+            return $this->attemptsbytimerange[$allowempty];
         }
 
         $records = catquiz::get_attempts(
             null,
-            $this->scaleid,
+            $this->rootscaleid,
             $this->courseid,
             $this->testid,
             $this->contextid,
@@ -609,8 +629,13 @@ class catquizstatistics {
         $beginningoftimerange = intval($startingrecord->endtime);
         $timerange = feedback_helper::get_timerange_for_attempts($beginningoftimerange, $this->endtime);
         $this->timerangekeys = feedback_helper::get_timerangekeys($timerange, [$beginningoftimerange, $this->endtime]);
-        $this->attemptsbytimerange = feedback_helper::order_attempts_by_timerange($records, $this->scaleid, $timerange);
-        return $this->attemptsbytimerange;
+        $this->attemptsbytimerange[$allowempty] = feedback_helper::order_attempts_by_timerange(
+            $records,
+            $this->scaleid,
+            $timerange,
+            $allowempty
+        );
+        return $this->attemptsbytimerange[$allowempty];
     }
 
     /**
