@@ -341,6 +341,12 @@ class feedback_helper {
      * @return ?int
      */
     public static function get_range_of_value(stdClass $quizsettings, int $scaleid, float $value): ?int {
+        // If the value is outside the defined range, return null.
+        $lowest = sprintf('feedback_scaleid_limit_lower_%d_1', $scaleid);
+        $highest = sprintf('feedback_scaleid_limit_upper_%d_%d', $scaleid, $quizsettings->numberoffeedbackoptionsselect);
+        if ($value < $quizsettings->$lowest || $value > $quizsettings->$highest) {
+            return null;
+        }
         // Get the range of the selected value.
         $i = 0;
         do {
