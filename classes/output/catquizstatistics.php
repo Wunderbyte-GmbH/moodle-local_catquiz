@@ -190,7 +190,7 @@ class catquizstatistics {
             }
         } else {
             $colors = array_values(feedbackclass::get_array_of_colors($qs->numberoffeedbackoptionsselect));
-            for ($i = 1; $i <= $qs->numberoffeedbackoptionsselect; $i++) {
+            for ($i = 0; $i <= $qs->numberoffeedbackoptionsselect; $i++) {
                 foreach ($this->timerangekeys as $timepoint) {
                     $countsbyrange[$i][$timepoint] = 0;
                 }
@@ -199,6 +199,7 @@ class catquizstatistics {
                 foreach ($attempts as $attempt) {
                     if (is_null($attempt)) {
                         $countsbyrange[0][$timestamp]++;
+                        continue;
                     }
                     $range = feedback_helper::get_range_of_value($this->get_quizsettings(), $this->scaleid, $attempt);
                     $countsbyrange[$range][$timestamp]++;
