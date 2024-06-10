@@ -219,7 +219,7 @@ class feedback_helper {
     }
 
     /**
-     * Return average of personabilities ordered by date of quizattempt.
+     * Returns an array of personabilities, indexed by timerange (day, week, ...).
      *
      * @param array $attempts
      * @param int $scaleid
