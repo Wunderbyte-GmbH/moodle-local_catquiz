@@ -156,26 +156,48 @@ class catquizstatistics {
     public function render_attemptscounterchart() {
         global $OUTPUT;
 
-        $counter = [];
-        $labels = [];
         $attemptsbytimerange = $this->get_attempts_by_timerange();
         if (!$attemptsbytimerange) {
             return [
                 'chart' => get_string('catquizstatisticsnodata', 'local_catquiz'),
             ];
         }
-        foreach ($attemptsbytimerange as $timestamp => $attempts) {
-            $counter[] = count($attempts);
-            $labels[] = (string)$timestamp;
+        if (!$qs = $this->get_quizsettings()) {
+            // We use only one range '1' if the quizsettings do not match between different quizzes.
+            $colors = [LOCAL_CATQUIZ_DEFAULT_BLACK];
+            foreach ($this->timerangekeys as $timepoint) {
+                $countsbyrange[1][$timepoint] = 0;
+            }
+            foreach ($attemptsbytimerange as $timestamp => $attempts) {
+                foreach ($attempts as $attempt) {
+                    $countsbyrange[1][$timestamp]++;
+                }
+            }
+        } else {
+            $colors = array_values(feedbackclass::get_array_of_colors($qs->numberoffeedbackoptionsselect));
+            for ($i = 1; $i <= $qs->numberoffeedbackoptionsselect; $i++) {
+                foreach ($this->timerangekeys as $timepoint) {
+                    $countsbyrange[$i][$timepoint] = 0;
+                }
+            }
+            foreach ($attemptsbytimerange as $timestamp => $attempts) {
+                foreach ($attempts as $attempt) {
+                    $range = feedback_helper::get_range_of_value($this->get_quizsettings(), $this->scaleid, $attempt);
+                    $countsbyrange[$range][$timestamp]++;
+                }
+            }
         }
-        $chart = new \core\chart_bar();
-
-        $series = new \core\chart_series(
-            get_string('numberofattempts', 'local_catquiz'),
-            $counter
-        );
-        $chart->add_series($series);
-        $chart->set_labels($labels);
+        $chart = new chart_bar();
+        $chart->set_stacked(true);
+        $chart->set_labels($this->timerangekeys);
+        foreach ($countsbyrange as $range => $counts) {
+            $series = new chart_series(
+                get_string('feedbackrange', 'local_catquiz', $range),
+                $counts
+            );
+            $series->set_color($colors[$range - 1]);
+            $chart->add_series($series);
+        }
         $out = $OUTPUT->render($chart);
 
         return [
