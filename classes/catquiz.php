@@ -2207,16 +2207,16 @@ class catquiz {
         $sql = "SELECT s2.userid, s2.ability, SUM(attemptcount) attempts
                 FROM (
                     SELECT ue.userid, lcp.ability, s1.courseid, COALESCE(attemptcount, 0) attemptcount
-                    FROM m_enrol e
-                    JOIN m_user_enrolments ue ON e.id = ue.enrolid
-                    JOIN m_role r ON e.roleid = r.id AND r.shortname = 'student'
+                    FROM {enrol} e
+                    JOIN {user_enrolments} ue ON e.id = ue.enrolid
+                    JOIN {role} r ON e.roleid = r.id AND r.shortname = 'student'
                     LEFT JOIN (
                         SELECT a.userid, a.contextid, a.courseid, COUNT(*) as attemptcount
-                        FROM m_local_catquiz_attempts a
+                        FROM {local_catquiz_attempts} a
                         WHERE a.contextid = :contextid
                         GROUP BY a.userid, a.contextid, a.courseid
                     ) s1 ON ue.userid = s1.userid AND e.courseid = s1.courseid
-                    LEFT JOIN m_local_catquiz_personparams lcp ON
+                    LEFT JOIN {local_catquiz_personparams} lcp ON
                         ue.userid = lcp.userid
                         AND lcp.catscaleid = :catscaleid
                         AND lcp.contextid = s1.contextid
