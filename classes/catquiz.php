@@ -2161,7 +2161,7 @@ class catquiz {
             $params = array_merge($params, ['courseid' => $courseid, 'courseid2' => $courseid]);
         }
 
-        $sql = "SELECT ue.userid, COALESCE(answercount, 0) total_answered, lcp.ability
+        $sql = "SELECT DISTINCT ue.userid, COALESCE(answercount, 0) total_answered, lcp.ability
                 FROM {enrol} e
                 JOIN {user_enrolments} ue ON e.id = ue.enrolid
                 JOIN {role} r ON e.roleid = r.id AND r.shortname = 'student'
