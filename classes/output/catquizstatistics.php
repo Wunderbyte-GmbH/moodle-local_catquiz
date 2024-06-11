@@ -66,7 +66,14 @@ class catquizstatistics {
      */
     private ?int $scaleid;
 
-    private ?int $rootscaleid;
+    /**
+     * The root scale of the provided scaleid.
+     *
+     * If the provided scaleid is the root scale, this has the same value.
+     *
+     * @var int $rootscaleid
+     */
+    private int $rootscaleid;
 
     /**
      * @var int $endtime
