@@ -221,12 +221,10 @@ class shortcodes {
 
         $data = [
             'heading' => $heading,
-            'charttitle' => get_string('numberofattempts', 'local_catquiz'),
             'abilityprofilechart' => $catquizstatistics->render_abilityprofilechart(),
+            'detectedscales' => $catquizstatistics->render_detected_scales_chart(),
             'attemptspertimerangechart' => $catquizstatistics->render_attempts_per_timerange_chart(),
             'attemptsperpersonchart' => $catquizstatistics->render_attempts_per_person_chart(),
-            'stackchart' => $catquizstatistics->render_attemptresultstackchart($globalscale),
-            'detectedscales' => $catquizstatistics->render_detected_scales_chart(),
             'learningprogress' => $catquizstatistics->render_learning_progress(),
             'numresponsesbyusers' => $catquizstatistics->render_responses_by_users_chart(),
         ];

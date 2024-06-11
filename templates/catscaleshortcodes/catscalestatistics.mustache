@@ -30,34 +30,30 @@
 {{^error}}
     {{#heading}}
     <h2>{{title}}</h2>
-    <h4>{{{description}}}</h4>
+    <h4 style="margin-bottom: 1em">{{{description}}}</h4>
     {{/heading}}
     {{#abilityprofilechart}}
-        {{charttitle}}
+        <h5>{{charttitle}}</h5>
         {{{chart}}}
     {{/abilityprofilechart}}
     {{#detectedscales}}
-        {{title}}
+        <h5>{{charttitle}}</h5>
         {{{chart}}}
     {{/detectedscales}}
     {{#attemptspertimerangechart}}
+        <h5>{{charttitle}}</h5>
         <div>{{{chart}}}</div>
     {{/attemptspertimerangechart}}
     {{#attemptsperpersonchart}}
+        <h5>{{charttitle}}</h5>
         <div>{{{chart}}}</div>
     {{/attemptsperpersonchart}}
     {{#learningprogress}}
-        {{#comparison}}
-          {{charttitle}}
-          {{{chart}}}
-        {{/comparison}}
-        {{#individual}}
-          {{charttitle}}
-          {{{chart}}}
-        {{/individual}}
+       <h5>{{charttitle}}</h5>
+      {{{chart}}}
     {{/learningprogress}}
     {{#numresponsesbyusers}}
-        {{title}}
+        <h5>{{charttitle}}</h5>
         {{{chart}}}
     {{/numresponsesbyusers}}
 {{/error}}
