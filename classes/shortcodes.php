@@ -376,6 +376,7 @@ class shortcodes {
 
         if ($courseid) {
             $tests = catquiz::get_tests_for_scale($courseid, $scaleid);
+            $course = get_course($courseid);
             $linkedcourses = array_map(function ($test) {
                 $testname = json_decode($test->json)->name;
                 list($course, $cm) = get_course_and_cm_from_instance($test->componentid, 'adaptivequiz');
@@ -386,11 +387,15 @@ class shortcodes {
                 $link = sprintf('<a href="%s">%s</a>', $testurl->out(), $testname);
                 return $link;
             }, $tests);
-            $h1 = get_string('catquizstatistics_h1_scale', 'local_catquiz', $scale->name);
+            $h1 = get_string('catquizstatistics_h1_scale', 'local_catquiz', (object) [
+                'scalename' => $scale->name,
+                'coursename' => $course->fullname,
+            ]);
             if (count($linkedcourses) > 1) {
                 $h2 = get_string('catquizstatistics_h2_scale', 'local_catquiz', (object) [
                     'linkedcourses' => implode(', ', $linkedcourses),
                     'scale' => $scale->name,
+                    'coursename' => $course->fullname,
                 ]);
             } else {
                 $link = reset($linkedcourses);
