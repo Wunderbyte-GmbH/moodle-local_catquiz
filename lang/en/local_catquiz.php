@@ -645,9 +645,9 @@ $string['catquizstatistics_h1_single'] = 'Statistik zu Test {$a}';
 $string['catquizstatistics_h2_single'] = 'The following data are from test {$a->link} that uses the scale {$a->scale}.';
 $string['catquizstatistics_h1_scale'] = 'Statistics for scale {$a->scalename} in course {$a->coursename}.';
 $string['catquizstatistics_h2_scale'] = 'The following data are from tests {$a->linkedcourses} in course {$a->coursename}. They use the scale {$a->scale}.';
-$string['catquizstatistics_h1_global'] = 'Statistics of scale {$a} in all courses.';
+$string['catquizstatistics_h1_global'] = 'Statistics of scale {$a} in moodle instance';
 $string['catquizstatistics_h2_global'] = 'The following data are from all users
-    in this course that participated in tests on this moodle instance using
+    that participated in tests on this moodle instance using
     scale {$a} as main scale.';
 
 // Validation.
