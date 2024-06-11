@@ -620,8 +620,8 @@ class catquizstatistics {
             $this->courseid,
             $this->testid,
             $this->contextid,
-            null,
-            null);
+            $this->starttime,
+            $this->endtime);
         if (count($records) < 2) {
             return [];
         }

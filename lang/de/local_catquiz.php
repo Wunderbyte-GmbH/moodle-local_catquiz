@@ -647,6 +647,9 @@ $string['catquizstatistics_h2_scale'] = 'Die folgenden Daten beziehen sich auf d
 $string['catquizstatistics_h1_global'] = 'Statistik zu Skala {$a} auf der gesamten moodle Instanz';
 $string['catquizstatistics_h2_global'] = 'Die folgenden Daten beziehen sich auf alle Nutzer, die auf dieser
     Moodle-Plattform an Tests teilgenommen haben, in denen die Skala {$a} verwendet wird.';
+$string['catquizstatistics_timerange_both'] = 'Nur Daten von {$a->starttime} bis {$a->endtime} werden berücksichtigt.';
+$string['catquizstatistics_timerange_start'] = 'Nur Daten ab {$a->starttime} werden berücksichtigt.';
+$string['catquizstatistics_timerange_end'] = 'Nur Daten bis {$a->endtime} werden berücksichtigt.';
 
 // Validation.
 $string['valuemustbegreaterzero'] = 'Wert muss höher als 0 sein.';

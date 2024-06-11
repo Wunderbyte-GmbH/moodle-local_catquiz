@@ -649,6 +649,9 @@ $string['catquizstatistics_h1_global'] = 'Statistics of scale {$a} in moodle ins
 $string['catquizstatistics_h2_global'] = 'The following data are from all users
     that participated in tests on this moodle instance using
     scale {$a} as main scale.';
+$string['catquizstatistics_timerange_both'] = 'Only data between {$a->starttime} and {$a->endtime} are used.';
+$string['catquizstatistics_timerange_start'] = 'Only data after {$a->starttime} are used.';
+$string['catquizstatistics_timerange_end'] = 'Only data before {$a->endtime} are used.';
 
 // Validation.
 $string['valuemustbegreaterzero'] = 'Value must be greater than zero.';
