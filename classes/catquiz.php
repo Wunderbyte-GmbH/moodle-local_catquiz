@@ -2194,15 +2194,37 @@ class catquiz {
      * @param ?int $courseid
      */
     public static function get_sql_for_attempts_per_person(int $contextid, int $scaleid, ?int $courseid) {
-        $sql = "SELECT ue.userid, COALESCE(attemptcount, 0) attemptcount, lcp.ability
-            FROM m_enrol e
-            JOIN m_user_enrolments ue ON e.id = ue.enrolid
-            LEFT JOIN (SELECT a.userid, COUNT(*) as attemptcount
-            FROM m_local_catquiz_attempts a
-            WHERE a.courseid = 10
-            GROUP BY a.userid
-                    ) s1 ON ue.userid = s1.userid
-                    LEFT JOIN m_local_catquiz_personparams lcp ON ue.userid = lcp.userid AND lcp.catscaleid = 1
-                    WHERE e.courseid = 10;";
+        $where = "1 = 1";
+        $params = [
+            'catscaleid' => $scaleid,
+            'contextid' => $contextid,
+        ];
+        if ($courseid) {
+            $where = "e.courseid = :courseid";
+            $params = array_merge($params, ['courseid' => $courseid]);
+        }
+
+        $sql = "SELECT s2.userid, s2.ability, SUM(attemptcount) attempts
+                FROM (
+                    SELECT ue.userid, lcp.ability, s1.courseid, COALESCE(attemptcount, 0) attemptcount
+                    FROM m_enrol e
+                    JOIN m_user_enrolments ue ON e.id = ue.enrolid
+                    JOIN m_role r ON e.roleid = r.id AND r.shortname = 'student'
+                    LEFT JOIN (
+                        SELECT a.userid, a.contextid, a.courseid, COUNT(*) as attemptcount
+                        FROM m_local_catquiz_attempts a
+                        WHERE a.contextid = :contextid
+                        GROUP BY a.userid, a.contextid, a.courseid
+                    ) s1 ON ue.userid = s1.userid AND e.courseid = s1.courseid
+                    LEFT JOIN m_local_catquiz_personparams lcp ON
+                        ue.userid = lcp.userid
+                        AND lcp.catscaleid = :catscaleid
+                        AND lcp.contextid = s1.contextid
+                    WHERE $where
+                ) s2
+                GROUP BY s2.userid, s2.ability
+                ORDER BY attempts ASC";
+
+        return [$sql, $params];
     }
 }
