@@ -201,11 +201,12 @@ class shortcodes {
         $globalscale = $populated['globalscale'];
         $testid = $populated['testid'];
         $endtime = $args['endtime'] ?? null;
+        $starttime = $args['starttime'] ?? null;
 
-        $heading = self::get_heading($courseid, $globalscale, $testid);
+        $heading = self::get_heading($courseid, $globalscale, $testid, $starttime, $endtime);
 
         try {
-            $catquizstatistics = new catquizstatistics($courseid, $testid, $globalscale, $endtime);
+            $catquizstatistics = new catquizstatistics($courseid, $testid, $globalscale, $endtime, $starttime);
         } catch (dml_missing_record_exception $e) {
             return $OUTPUT->render_from_template(
                 'local_catquiz/catscaleshortcodes/catscalestatistics',
@@ -342,10 +343,28 @@ class shortcodes {
      * @param ?int $courseid
      * @param ?int $scaleid
      * @param ?int $testid
+     * @param ?int $starttime
+     * @param ?int $endtime
      * @return array
      */
-    private static function get_heading(?int $courseid, ?int $scaleid, ?int $testid) {
+    private static function get_heading(?int $courseid, ?int $scaleid, ?int $testid, ?int $starttime, ?int $endtime) {
         $test = null;
+        if ($starttime && $endtime) {
+            $start = userdate($starttime, get_string('strftimedatetime', 'core_langconfig'));
+            $end = userdate($endtime, get_string('strftimedatetime', 'core_langconfig'));
+            $timerangeaddition = get_string(
+                'catquizstatistics_timerange_both',
+                'local_catquiz',
+                (object) ['starttime' => $start, 'endtime' => $end]);
+        } else if ($starttime) {
+            $start = userdate($starttime, get_string('strftimedatetime', 'core_langconfig'));
+            $timerangeaddition = get_string('catquizstatistics_timerange_start', 'local_catquiz', (object) ['starttime' => $start]);
+        } else if ($endtime) {
+            $end = userdate($endtime, get_string('strftimedatetime', 'core_langconfig'));
+            $timerangeaddition = get_string('catquizstatistics_timerange_end', 'local_catquiz', (object) ['endtime' => $end]);
+        } else {
+            $timerangeaddition = "";
+        }
         if ($testid) {
             $test = catquiz::get_test_by_component_id($testid);
         }
@@ -361,6 +380,7 @@ class shortcodes {
             $scale = catscale::return_catscale_object($test->catscaleid);
             $h1 = get_string('catquizstatistics_h1_single', 'local_catquiz', $testname);
             $h2 = get_string('catquizstatistics_h2_single', 'local_catquiz', ['link' => $link, 'scale' => $scale->name]);
+            $h2 .= ' ' . $timerangeaddition;
             return [
                 'title' => $h1,
                 'description' => $h2,
@@ -403,6 +423,7 @@ class shortcodes {
                     'link' => $link,
                     'scale' => $scale->name,
                 ]);
+                $h2 .= ' ' . $timerangeaddition;
             }
             return [
                 'title' => $h1,
@@ -413,6 +434,7 @@ class shortcodes {
         // This is the global case.
         $h1 = get_string('catquizstatistics_h1_global', 'local_catquiz', $scale->name);
         $h2 = get_string('catquizstatistics_h2_global', 'local_catquiz', $scale->name);
+        $h2 .= ' ' . $timerangeaddition;
 
         return [
             'title' => $h1,
