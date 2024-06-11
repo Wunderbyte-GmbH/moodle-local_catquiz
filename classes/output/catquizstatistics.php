@@ -143,7 +143,6 @@ class catquizstatistics {
         $this->rootscaleid = $scale->parentid == 0
             ? $scale->id
             : catscale::get_ancestors($this->scaleid, 3)['mainscale'];
-        $this->courseid = intval($courseid);
         $this->contextid = catscale::get_context_id($this->scaleid);
 
         if ($testid) {
