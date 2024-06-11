@@ -162,7 +162,7 @@ class catquizstatistics {
      *
      * @return array
      */
-    public function render_attemptscounterchart() {
+    public function render_attempts_per_timerange_chart() {
         global $OUTPUT;
 
         $attemptsbytimerange = $this->get_attempts_by_timerange(true);
@@ -872,6 +872,71 @@ class catquizstatistics {
         return [
             'chart' => $out,
             'charttitle' => get_string('progress', 'local_catquiz'),
+        ];
+    }
+
+    /**
+     * Returns an array of with the chart in the 'chart' key.
+     *
+     * The chart displays how many students made X attempts and the corresponding ability range.
+     * It displays the number of students having 1 attempt, the number of students having 2 attempts, etc.
+     *
+     * @return array
+     */
+    public function render_attempts_per_person_chart(): array {
+        global $DB, $OUTPUT;
+        list($sql, $params) = catquiz::get_sql_for_attempts_per_person($this->contextid, $this->scaleid, $this->courseid);
+        if (!$records = $DB->get_records_sql($sql, $params)) {
+            return [
+                'chart' => get_string('catquizstatisticsnodata', 'local_catquiz'),
+            ];
+        }
+
+        $chartdata = [];
+        if (!$qs = $this->get_quizsettings()) {
+            // Use range 0 for missing person ability and range 1 for everything else.
+            $maxrange = 1;
+            $colors = [LOCAL_CATQUIZ_DEFAULT_BLACK];
+        } else {
+            $maxrange = $qs->numberoffeedbackoptionsselect;
+            $colors = array_values(feedbackclass::get_array_of_colors($qs->numberoffeedbackoptionsselect));
+        }
+        $colors[-1] = LOCAL_CATQUIZ_DEFAULT_GREY;
+        $maxattempts = $records[array_key_last($records)]->attempts;
+
+        // Initialize all ranges of all possible attempt counts to 0.
+        for ($i = 0; $i <= $maxrange; $i++) {
+            for ($j = 0; $j <= $maxattempts; $j++) {
+                $chartdata[$i][$j] = 0;
+            }
+        }
+
+        // Set the number of attempts per range.
+        foreach ($records as $r) {
+            if (!$qs) {
+                $range = $r->ability ? 1 : 0;
+            } else if (!$range = feedback_helper::get_range_of_value($this->get_quizsettings(), $this->scaleid, $r->ability)) {
+                $range = 0;
+            }
+            $chartdata[$range][$r->attempts]++;
+        }
+
+        $labels = is_null($qs)
+            ? [get_string('noresult', 'local_catquiz'), get_string('hasability', 'local_catquiz')]
+            : array_map(fn ($r) => get_string('feedbackrange', 'local_catquiz', $r), array_keys($chartdata));
+        $chart = new chart_bar();
+        $chart->set_stacked(true);
+        $chart->set_labels(range(0, $maxattempts));
+
+        foreach (array_keys($chartdata) as $range) {
+            $series = new chart_series($labels[$range], $chartdata[$range]);
+            $series->set_color($colors[$range - 1]);
+            $chart->add_series($series);
+        }
+
+        $out = $OUTPUT->render($chart);
+        return [
+            'chart' => $out,
         ];
     }
 
