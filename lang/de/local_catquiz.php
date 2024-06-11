@@ -650,6 +650,8 @@ $string['catquizstatistics_h2_global'] = 'Die folgenden Daten beziehen sich auf 
 $string['catquizstatistics_timerange_both'] = 'Nur Daten von {$a->starttime} bis {$a->endtime} werden berücksichtigt.';
 $string['catquizstatistics_timerange_start'] = 'Nur Daten ab {$a->starttime} werden berücksichtigt.';
 $string['catquizstatistics_timerange_end'] = 'Nur Daten bis {$a->endtime} werden berücksichtigt.';
+$string['catquizstatistics_numattempts_title'] = 'Anzahl von Testversuchen';
+$string['catquizstatistics_numattemptsperperson_title'] = 'Testversuche pro Person';
 
 // Validation.
 $string['valuemustbegreaterzero'] = 'Wert muss höher als 0 sein.';

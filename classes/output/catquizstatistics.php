@@ -175,7 +175,8 @@ class catquizstatistics {
         $attemptsbytimerange = $this->get_attempts_by_timerange(true);
         if (!$attemptsbytimerange) {
             return [
-                'chart' => get_string('catquizstatisticsnodata', 'local_catquiz'),
+                'charttitle' => get_string('catquizstatistics_numattempts_title', 'local_catquiz'),
+                'chart' => $this->get_nodata_body(),
             ];
         }
         if (!$qs = $this->get_quizsettings()) {
@@ -230,6 +231,7 @@ class catquizstatistics {
         $out = $OUTPUT->render($chart);
 
         return [
+            'charttitle' => get_string('catquizstatistics_numattempts_title', 'local_catquiz'),
             'chart' => $out,
         ];
     }
@@ -250,7 +252,7 @@ class catquizstatistics {
         $chart = new \core\chart_bar();
         if (!$attemptsbytimerange) {
             return [
-                'chart' => get_string('catquizstatisticsnodata', 'local_catquiz'),
+                'chart' => '',
             ];
         }
         foreach ($this->get_attempts_by_timerange() as $timestamp => $attempts) {
@@ -373,8 +375,8 @@ class catquizstatistics {
 
         if (!$attempts = $this->get_attempts()) {
             return [
-            'title' => get_string('catquizstatisticsnodata', 'local_catquiz'),
-            'chart' => '',
+                'charttitle' => get_string('chart_detectedscales_title', 'local_catquiz'),
+                'chart' => $this->get_nodata_body(),
             ];
         }
         $latestattempts = [];
@@ -436,7 +438,7 @@ class catquizstatistics {
         $out = $OUTPUT->render($chart);
 
         return [
-            'title' => get_string('chart_detectedscales_title', 'local_catquiz'),
+            'charttitle' => get_string('chart_detectedscales_title', 'local_catquiz'),
             'chart' => $out,
         ];
     }
@@ -476,11 +478,10 @@ class catquizstatistics {
         $attemptsofuser = array_filter($records, fn($r) => $r->userid == $userid);
         $attemptsofpeers = array_filter($records, fn($r) => $r->userid != $userid);
 
-        $progressindividual = $this->render_chart_for_individual_user($attemptsofuser, (array) $this->scaleid);
         if (count($attemptsofpeers) < 3) {
             return [
-                'individual' => $progressindividual,
-                'comparison' => '',
+                'charttitle' => get_string('progress', 'local_catquiz'),
+                'chart' => get_string('catquizstatisticsnodata', 'local_catquiz'),
             ];
         }
         $progresscomparison = $this->render_chart_for_comparison(
@@ -491,8 +492,8 @@ class catquizstatistics {
                 [$beginningoftimerange, $this->endtime]);
 
         return [
-            'individual' => $progressindividual,
-            'comparison' => $progresscomparison,
+            'charttitle' => get_string('progress', 'local_catquiz'),
+            'chart' => $progresscomparison,
         ];
     }
 
@@ -574,7 +575,7 @@ class catquizstatistics {
         $out = $OUTPUT->render($chart);
 
         return [
-            'title' => get_string('responsesbyusercharttitle', 'local_catquiz'),
+            'charttitle' => get_string('responsesbyusercharttitle', 'local_catquiz'),
             'chart' => $out,
 
         ];
@@ -827,10 +828,7 @@ class catquizstatistics {
         $numpeervalues = count(array_filter($pa, fn ($v) => $v !== null));
         $numuservalues = count(array_filter($ua, fn ($v) => $v !== null));
         if ($numpeervalues === 0 && $numuservalues === 0) {
-            return [
-                'chart' => '',
-                'charttitle' => '',
-            ];
+                return get_string('catquizstatisticsnodata', 'local_catquiz');
         }
 
         $alldates = feedback_helper::get_timerangekeys($timerange, $beginningandendofrange);
@@ -875,11 +873,7 @@ class catquizstatistics {
         $chart->add_series($peerattempts);
         $chart->set_labels($labels);
         $out = $OUTPUT->render($chart);
-
-        return [
-            'chart' => $out,
-            'charttitle' => get_string('progress', 'local_catquiz'),
-        ];
+        return $out;
     }
 
     /**
@@ -895,6 +889,7 @@ class catquizstatistics {
         list($sql, $params) = catquiz::get_sql_for_attempts_per_person($this->contextid, $this->scaleid, $this->courseid);
         if (!$records = $DB->get_records_sql($sql, $params)) {
             return [
+                'charttitle' => get_string('catquizstatistics_numattemptsperperson_title', 'local_catquiz'),
                 'chart' => get_string('catquizstatisticsnodata', 'local_catquiz'),
             ];
         }
@@ -943,6 +938,7 @@ class catquizstatistics {
 
         $out = $OUTPUT->render($chart);
         return [
+            'charttitle' => get_string('catquizstatistics_numattemptsperperson_title', 'local_catquiz'),
             'chart' => $out,
         ];
     }
@@ -954,7 +950,7 @@ class catquizstatistics {
      *
      * @return array
      */
-    private function assign_average_result_to_timerange(array $attemptsbytimerange, int $min = 3) {
+    private function assign_average_result_to_timerange(array $attemptsbytimerange, int $min = 0) {
         // Calculate average personability of this period.
         foreach ($attemptsbytimerange as $date => $attempt) {
             if (count($attempt) < $min) {
@@ -1025,5 +1021,22 @@ class catquizstatistics {
             return $first;
         }
         return null;
+    }
+
+    private function get_nodata_body() {
+        global $CFG;
+
+        if ($CFG->debug > 0) {
+            return sprintf(
+                'DEBUG info: courseid: %d, scaleid: %d, contextid: %d, starttime: %d, endtime: %d, num attempts: %d',
+                $this->courseid,
+                $this->scaleid,
+                $this->contextid,
+                $this->starttime,
+                $this->endtime,
+                count($this->get_attempts())
+            );
+        }
+        return '';
     }
 }

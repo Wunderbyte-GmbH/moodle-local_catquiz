@@ -652,6 +652,8 @@ $string['catquizstatistics_h2_global'] = 'The following data are from all users
 $string['catquizstatistics_timerange_both'] = 'Only data between {$a->starttime} and {$a->endtime} are used.';
 $string['catquizstatistics_timerange_start'] = 'Only data after {$a->starttime} are used.';
 $string['catquizstatistics_timerange_end'] = 'Only data before {$a->endtime} are used.';
+$string['catquizstatistics_numattempts_title'] = 'Number of attempts';
+$string['catquizstatistics_numattemptsperperson_title'] = 'Attempts per person';
 
 // Validation.
 $string['valuemustbegreaterzero'] = 'Value must be greater than zero.';
