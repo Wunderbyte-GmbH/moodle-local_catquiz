@@ -2204,25 +2204,30 @@ class catquiz {
             $params = array_merge($params, ['courseid' => $courseid]);
         }
 
-        $sql = "SELECT s2.userid, s2.ability, SUM(attemptcount) attempts
+        $sql = "SELECT s3.userid, MAX(s3.ability) ability, SUM(attemptcount) attempts
                 FROM (
-                    SELECT ue.userid, lcp.ability, s1.courseid, COALESCE(attemptcount, 0) attemptcount
-                    FROM {enrol} e
-                    JOIN {user_enrolments} ue ON e.id = ue.enrolid
-                    JOIN {role} r ON e.roleid = r.id AND r.shortname = 'student'
-                    LEFT JOIN (
-                        SELECT a.userid, a.contextid, a.courseid, COUNT(*) as attemptcount
-                        FROM {local_catquiz_attempts} a
-                        WHERE a.contextid = :contextid
-                        GROUP BY a.userid, a.contextid, a.courseid
-                    ) s1 ON ue.userid = s1.userid AND e.courseid = s1.courseid
-                    LEFT JOIN {local_catquiz_personparams} lcp ON
-                        ue.userid = lcp.userid
-                        AND lcp.catscaleid = :catscaleid
-                        AND lcp.contextid = s1.contextid
-                    WHERE $where
-                ) s2
-                GROUP BY s2.userid, s2.ability
+                    SELECT s2.userid, s2.ability, SUM(attemptcount) attemptcount
+                    FROM (
+                        SELECT ue.userid, lcp.ability, s1.courseid, COALESCE(attemptcount, 0) attemptcount
+                        FROM {enrol} e
+                        JOIN {user_enrolments} ue ON e.id = ue.enrolid
+                        JOIN {role} r ON e.roleid = r.id AND r.shortname = 'student'
+                        LEFT JOIN (
+                            SELECT a.userid, a.contextid, a.courseid, COUNT(*) as attemptcount
+                            FROM {local_catquiz_attempts} a
+                            WHERE a.contextid = :contextid
+                            GROUP BY a.userid, a.contextid, a.courseid
+                        ) s1 ON ue.userid = s1.userid AND e.courseid = s1.courseid
+                        LEFT JOIN {local_catquiz_personparams} lcp ON
+                            ue.userid = lcp.userid
+                            AND lcp.catscaleid = :catscaleid
+                            AND lcp.contextid = s1.contextid
+                        WHERE $where
+                    ) s2
+                    GROUP BY s2.userid, s2.ability
+                    ORDER BY attemptcount ASC
+                ) s3
+                GROUP BY s3.userid
                 ORDER BY attempts ASC";
 
         return [$sql, $params];
