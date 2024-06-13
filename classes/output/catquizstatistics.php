@@ -1123,7 +1123,7 @@ class catquizstatistics {
         if (array_key_exists($id, $this->teststrategynames)) {
             return $this->teststrategynames[$id];
         }
-        if (!$teststrategy = info::get_teststrategy($id)) {
+        if (!$teststrategy = info::get_teststrategy($id, false)) {
             throw new \Exception(sprintf('Unknown teststrategy %d', $id));
         }
         // Gets the unqualified classname without namespace.
