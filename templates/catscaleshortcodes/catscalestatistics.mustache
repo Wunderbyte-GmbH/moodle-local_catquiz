@@ -44,9 +44,11 @@
           <li class="nav-item">
             <a class="nav-link" data-toggle="tab" href="#learningprogress-{{shortcodeid}}" role="tab" aria-expanded="false">{{#str}}learningprogresstitle, local_catquiz{{/str}}</a>
           </li>
+          {{#exportbutton}}
           <li class="nav-item">
             <a class="nav-link" data-toggle="tab" href="#export-{{shortcodeid}}" role="tab" aria-expanded="false">Export</a>
           </li>
+          {{/exportbutton}}
         </ul>
     {{/heading}}
         <!-- Tab panes -------------- -->
@@ -82,7 +84,10 @@
             {{/learningprogress}}
           </div>
           <div class="tab-pane" id="export-{{shortcodeid}}" role="tabpanel" aria-expanded="false">
-            TODO export button
+            <div style="display: flex; align-items: center; flex-direction: column;" class="flex-wrapper">
+                <h5 style="margin: 1em 0;">{{#str}}catquizstatistics_exportcsv_heading, local_catquiz{{/str}}</h5>
+                <a class="btn btn-info" id="download-link" href="{{exportbutton}}">{{#str}}download, admin{{/str}}</a>
+            </div>
           </div>
         </div>
 {{/error}}

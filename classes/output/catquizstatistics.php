@@ -25,19 +25,23 @@ use local_catquiz\catscale;
 use local_catquiz\feedback\feedbackclass;
 use local_catquiz\local\model\model_strategy;
 use local_catquiz\teststrategy\feedback_helper;
+use local_catquiz\teststrategy\info;
+use moodle_url;
 use stdClass;
 
 defined('MOODLE_INTERNAL') || die();
 
 global $CFG;
 require_once($CFG->dirroot . '/local/catquiz/lib.php');
+require_once($CFG->libdir . '/csvlib.class.php');
+
 
 /**
  * Renderable class for the catquizstatistics shortcode
  *
  * @package    local_catquiz
- * @copyright  2023 Wunderbyte GmbH
- * @author     David Bogner
+ * @copyright  2024 Wunderbyte GmbH
+ * @author     David Szkiba
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class catquizstatistics {
@@ -120,6 +124,11 @@ class catquizstatistics {
      * @var array $timerangekeys
      */
     private array $timerangekeys;
+
+    /**
+     * @var array Stores the names of teststrategies
+     */
+    private array $teststrategynames = [];
 
     /**
      * Create a new catquizstatistics object
@@ -1006,6 +1015,63 @@ class catquizstatistics {
             'charttitle' => get_string('catquizstatistics_numattemptsperperson_title', 'local_catquiz'),
             'chart' => $out,
         ];
+    }
+
+    /**
+     * Returns an URL to download a CSV.
+     *
+     * If the user does not have the catquiz 'canmanage' capability, an empty
+     * string is returned instead of an URL.
+     *
+     * @return string
+     */
+    public function render_export_button(): string {
+        if (!has_capability('local/catquiz:canmanage', context_system::instance())) {
+            return '';
+        }
+
+        $params = [
+            'scaleid' => $this->scaleid,
+            'courseid' => $this->courseid,
+            'testid' => $this->testid,
+            'starttime' => $this->starttime,
+            'endtime' => $this->endtime,
+        ];
+        return new moodle_url('/local/catquiz/export_shortcode_csv.php', $params);
+    }
+
+    /**
+     * Returns the data that can be downloaded as csv.
+     *
+     * @return array
+     */
+    public function get_export_data(): array {
+        global $DB;
+
+        if (!has_capability('local/catquiz:canmanage', context_system::instance())) {
+            return [];
+        }
+
+        list ($sql, $params) = catquiz::get_sql_for_csv_export(
+            $this->contextid,
+            $this->scaleid,
+            $this->courseid,
+            $this->testid,
+            $this->starttime,
+            $this->endtime
+        );
+
+        $records = $DB->get_records_sql($sql, $params);
+        $enriched = array_map(
+            function ($r) {
+                $r->starttime = userdate($r->starttime, get_string('strftimedatetime', 'core_langconfig'));
+                $r->endtime = userdate($r->endtime, get_string('strftimedatetime', 'core_langconfig'));
+                $r->teststrategy = $this->get_teststrategy_name($r->teststrategy);
+                return $r;
+            },
+            $records
+        );
+        return $enriched;
     }
 
     /**
