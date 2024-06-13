@@ -344,7 +344,7 @@ class feedback_helper {
         if (!$quizsettings) {
             return null;
         }
-        if (!$value) {
+        if ($value === null) {
             return null;
         }
 
