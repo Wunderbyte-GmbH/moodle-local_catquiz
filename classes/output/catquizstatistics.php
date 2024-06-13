@@ -1112,4 +1112,24 @@ class catquizstatistics {
         }
         return get_string('catquizstatisticsnodata', 'local_catquiz');
     }
+
+    /**
+     * Retrieves the name of a teststrategy
+     *
+     * @param int
+     * @return string
+     */
+    private function get_teststrategy_name(int $id): string {
+        if (array_key_exists($id, $this->teststrategynames)) {
+            return $this->teststrategynames[$id];
+        }
+        if (!$teststrategy = info::get_teststrategy($id)) {
+            throw new \Exception(sprintf('Unknown teststrategy %d', $id));
+        }
+        // Gets the unqualified classname without namespace.
+        // See https://stackoverflow.com/a/27457689.
+        $classname = substr(strrchr(get_class($teststrategy), '\\'), 1);
+        $this->teststrategynames[$id] = get_string($classname, 'local_catquiz');
+        return $this->teststrategynames[$id];
+    }
 }
