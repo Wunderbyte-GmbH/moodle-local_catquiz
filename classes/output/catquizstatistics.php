@@ -535,13 +535,19 @@ class catquizstatistics {
 
         // Initialize the data to 0 for all ranges and bins.
         for ($i = 0; $i <= $numranges; $i++) {
-            for ($j = 0; $j < self::ATTEMPTS_PER_PERSON_CLASSES; $j++) {
+            for ($j = 0; $j <= self::ATTEMPTS_PER_PERSON_CLASSES; $j++) {
                 $data[$i][$j] = [];
             }
         }
 
         foreach ($results as $r) {
-            $bin = feedback_helper::get_histogram_bin($r->total_answered, $classwidth);
+            if ($r->total_answered === 0) {
+                $bin = 0;
+            } else {
+                $bin = feedback_helper::get_histogram_bin($r->total_answered, $classwidth);
+                // Bar 0 is reserved for 0 answers. Spread the rest across bin 1 ... n.
+                $bin = $bin + 1;
+            }
             if (!$r->ability) {
                 $data[0][$bin][] = $r;
             } else {
@@ -580,8 +586,9 @@ class catquizstatistics {
         }
 
         $labels = [];
-        for ($i = 0; $i < self::ATTEMPTS_PER_PERSON_CLASSES; $i++) {
-            $labels[$i] = sprintf("%d..%d", $i * $classwidth, $i * $classwidth + $classwidth - 1);
+        $labels[0] = get_string('notyetattempted', 'local_catquiz');
+        for ($i = 1; $i <= self::ATTEMPTS_PER_PERSON_CLASSES; $i++) {
+            $labels[$i] = sprintf("%d..%d", $i * $classwidth - $classwidth + 1, $i * $classwidth);
         }
         $chart->set_labels($labels);
         $chart->get_xaxis(0, true)->set_label(get_string('catquizstatistics_numberofresponses', 'local_catquiz'));
