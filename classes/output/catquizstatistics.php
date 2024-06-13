@@ -504,7 +504,12 @@ class catquizstatistics {
     public function render_responses_by_users_chart() {
         global $DB, $OUTPUT;
         list($sql, $params) = catquiz::get_sql_for_questions_answered_per_person($this->contextid, $this->scaleid, $this->courseid);
-        $results = $DB->get_records_sql($sql, $params);
+        if (!$results = $DB->get_records_sql($sql, $params)) {
+            return [
+                'charttitle' => get_string('responsesbyusercharttitle', 'local_catquiz'),
+                'chart' => $this->get_nodata_body(),
+            ];
+        }
         $maxattempts = 0;
         foreach ($results as $r) {
             if ($r->total_answered > $maxattempts) {
