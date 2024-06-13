@@ -657,6 +657,7 @@ $string['catquizstatistics_testusage'] = 'Testnutzung';
 $string['catquizstatistics_progress_peers_title'] = 'Mittelwert der Ergebnisse in "{$a}"';
 $string['catquizstatistics_progress_personal_title'] = 'Ihre persönlichen Ergebnisse in dieser Skala';
 $string['catquizstatistics_numberofresponses'] = 'Anzahl der gegebenen Antworten';
+$string['catquizstatistics_exportcsv_heading'] = 'Daten der ausgewählten Testversuche als CSV Datei exportieren';
 
 // Validation.
 $string['valuemustbegreaterzero'] = 'Wert muss höher als 0 sein.';

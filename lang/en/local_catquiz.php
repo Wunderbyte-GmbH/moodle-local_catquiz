@@ -659,6 +659,7 @@ $string['catquizstatistics_testusage'] = 'Testusage';
 $string['catquizstatistics_progress_peers_title'] = 'Average result of your peers in scale "{$a}"';
 $string['catquizstatistics_progress_personal_title'] = 'Your personal results for that scale';
 $string['catquizstatistics_numberofresponses'] = 'Number of responses';
+$string['catquizstatistics_exportcsv_heading'] = 'Export data of selected attempts as CSV';
 
 // Validation.
 $string['valuemustbegreaterzero'] = 'Value must be greater than zero.';
