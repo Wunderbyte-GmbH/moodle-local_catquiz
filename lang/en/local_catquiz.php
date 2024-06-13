@@ -654,6 +654,8 @@ $string['catquizstatistics_timerange_start'] = 'Only data after {$a->starttime} 
 $string['catquizstatistics_timerange_end'] = 'Only data before {$a->endtime} are used.';
 $string['catquizstatistics_numattempts_title'] = 'Number of attempts';
 $string['catquizstatistics_numattemptsperperson_title'] = 'Attempts per person';
+$string['catquizstatistics_overview'] = 'Overview';
+$string['catquizstatistics_testusage'] = 'Testusage';
 
 // Validation.
 $string['valuemustbegreaterzero'] = 'Value must be greater than zero.';

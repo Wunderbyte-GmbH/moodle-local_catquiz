@@ -652,6 +652,8 @@ $string['catquizstatistics_timerange_start'] = 'Nur Daten ab {$a->starttime} wer
 $string['catquizstatistics_timerange_end'] = 'Nur Daten bis {$a->endtime} werden berücksichtigt.';
 $string['catquizstatistics_numattempts_title'] = 'Anzahl von Testversuchen';
 $string['catquizstatistics_numattemptsperperson_title'] = 'Testversuche pro Person';
+$string['catquizstatistics_overview'] = 'Überblick';
+$string['catquizstatistics_testusage'] = 'Testnutzung';
 
 // Validation.
 $string['valuemustbegreaterzero'] = 'Wert muss höher als 0 sein.';
