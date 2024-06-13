@@ -905,9 +905,13 @@ class catquizstatistics {
         $colors[-1] = LOCAL_CATQUIZ_DEFAULT_GREY;
         $maxattempts = $records[array_key_last($records)]->attempts;
 
+        // Display a maximum of self::ATTEMPTS_PER_PERSON_CLASSES bars. This
+        // means, that each bar covers a range of $classwidth attempts.
+        $classwidth = ceil($maxattempts / self::ATTEMPTS_PER_PERSON_CLASSES);
+
         // Initialize all ranges of all possible attempt counts to 0.
         for ($i = 0; $i <= $maxrange; $i++) {
-            for ($j = 0; $j <= $maxattempts; $j++) {
+            for ($j = 0; $j <= self::ATTEMPTS_PER_PERSON_CLASSES; $j++) {
                 $chartdata[$i][$j] = 0;
             }
         }
@@ -919,18 +923,32 @@ class catquizstatistics {
             } else if (!$range = feedback_helper::get_range_of_value($this->get_quizsettings(), $this->scaleid, $r->ability)) {
                 $range = 0;
             }
-            $chartdata[$range][$r->attempts]++;
+            if ($r->attempts == 0) {
+                $chartdata[$range][0]++;
+            } else {
+                $bin = feedback_helper::get_histogram_bin($r->attempts, $classwidth);
+                $chartdata[$range][$bin + 1]++;
+            }
         }
 
-        $labels = is_null($qs)
+        $serieslabels = is_null($qs)
             ? [get_string('noresult', 'local_catquiz'), get_string('hasability', 'local_catquiz')]
             : array_map(fn ($r) => get_string('feedbackrange', 'local_catquiz', $r), array_keys($chartdata));
+        $serieslabels[0] = get_string('noresult', 'local_catquiz');
         $chart = new chart_bar();
         $chart->set_stacked(true);
-        $chart->set_labels(range(0, $maxattempts));
+        $chartlabels[0] = get_string('notyetattempted', 'local_catquiz');
+        for ($i = 1; $i <= self::ATTEMPTS_PER_PERSON_CLASSES; $i++) {
+            $chartlabels[$i] = sprintf(
+                '%d .. %d',
+                $i * $classwidth - $classwidth + 1,
+                $i * $classwidth
+            );
+        }
+        $chart->set_labels($chartlabels);
 
         foreach (array_keys($chartdata) as $range) {
-            $series = new chart_series($labels[$range], $chartdata[$range]);
+            $series = new chart_series($serieslabels[$range], $chartdata[$range]);
             $series->set_color($colors[$range - 1]);
             $chart->add_series($series);
         }
