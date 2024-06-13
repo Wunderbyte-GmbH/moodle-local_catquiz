@@ -16,6 +16,7 @@
 
 namespace local_catquiz\output;
 
+use context_system;
 use core\chart_bar;
 use core\chart_line;
 use core\chart_series;
@@ -973,6 +974,27 @@ class catquizstatistics {
         $chart->get_xaxis(0, true)->set_label(get_string('numberofattempts', 'local_catquiz'));
         $chart->get_yaxis(0, true)->set_label(sprintf('# %s', get_string('students')));
         $out = $OUTPUT->render($chart);
+
+        if (
+            optional_param('debug', false, PARAM_BOOL)
+            && has_capability('local/catquiz:manage_catscales', context_system::instance())
+        ) {
+            $thead = "
+                <thead>
+                  <tr>
+                    <th>userid</th>
+                    <th>ability</th>
+                    <th>attempts</th>
+                  </tr>
+                </thead>";
+            $tr = "";
+            foreach ($records as $r) {
+                $ability = $r->ability ?? '-';
+                $tr .= "<tr><td>$r->userid</td><td>$ability</td><td>$r->attempts</td></tr>";
+            }
+            $table = "<table class=\"table\">$thead<tbody>$tr</tbody></table>";
+            $out .= $table;
+        }
         return [
             'charttitle' => get_string('catquizstatistics_numattemptsperperson_title', 'local_catquiz'),
             'chart' => $out,
