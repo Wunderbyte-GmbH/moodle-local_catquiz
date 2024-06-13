@@ -473,7 +473,7 @@ $string['catquizfeedbackheader'] = 'Feedback for "{$a}"';
 $string['feedbacknumber'] = 'Feedback for range {$a}';
 $string['feedbackrange'] = 'Ability level {$a}';
 $string['hasability'] = 'Ability was calculated';
-$string['responsesbyusercharttitle'] = 'Total number of questions answered per person';
+$string['responsesbyusercharttitle'] = 'Total number of responses per person';
 $string['noresult'] = 'No ability was calculated';
 $string['selected_scales_all_ranges_label'] = 'Number of participants';
 $string['noselection'] = "No selection";
@@ -656,6 +656,9 @@ $string['catquizstatistics_numattempts_title'] = 'Number of attempts';
 $string['catquizstatistics_numattemptsperperson_title'] = 'Attempts per person';
 $string['catquizstatistics_overview'] = 'Overview';
 $string['catquizstatistics_testusage'] = 'Testusage';
+$string['catquizstatistics_progress_peers_title'] = 'Average result of your peers in scale "{$a}"';
+$string['catquizstatistics_progress_personal_title'] = 'Your personal results for that scale';
+$string['catquizstatistics_numberofresponses'] = 'Number of responses';
 
 // Validation.
 $string['valuemustbegreaterzero'] = 'Value must be greater than zero.';

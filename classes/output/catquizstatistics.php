@@ -219,14 +219,20 @@ class catquizstatistics {
         $chart->set_stacked(true);
         $chart->set_labels($this->timerangekeys);
         $colors[-1] = LOCAL_CATQUIZ_DEFAULT_GREY;
+        $serieslabels = is_null($qs)
+            ? [get_string('noresult', 'local_catquiz'), get_string('hasability', 'local_catquiz')]
+            : array_map(fn ($r) => get_string('feedbackrange', 'local_catquiz', $r), array_keys($countsbyrange));
+        $serieslabels[0] = get_string('noresult', 'local_catquiz');
         foreach ($countsbyrange as $range => $counts) {
             $series = new chart_series(
-                get_string('feedbackrange', 'local_catquiz', $range),
+                $serieslabels[$range],
                 $counts
             );
             $series->set_color($colors[$range - 1]);
             $chart->add_series($series);
         }
+        $chart->get_xaxis(0, true)->set_label(get_string('date'));
+        $chart->get_yaxis(0, true)->set_label(get_string('numberofattempts', 'local_catquiz'));
         $out = $OUTPUT->render($chart);
 
         return [
@@ -349,6 +355,7 @@ class catquizstatistics {
         }
         $chart->add_series($aseries);
         $chart->set_labels(array_keys($fisherinfos));
+        $chart->get_xaxis(0, true)->set_label(get_string('personability', 'local_catquiz'));
 
         $out = $OUTPUT->render($chart);
         return [
@@ -433,6 +440,7 @@ class catquizstatistics {
 
         $labels = array_map(fn ($scaleid) => catscale::return_catscale_object($scaleid)->name, array_keys($chartdata));
         $chart->set_labels($labels);
+        $chart->get_xaxis(0, true)->set_label(sprintf('# %s', get_string('users')));
 
         $out = $OUTPUT->render($chart);
 
@@ -575,6 +583,8 @@ class catquizstatistics {
             $labels[$i] = sprintf("%d..%d", $i * $classwidth, $i * $classwidth + $classwidth - 1);
         }
         $chart->set_labels($labels);
+        $chart->get_xaxis(0, true)->set_label(get_string('catquizstatistics_numberofresponses', 'local_catquiz'));
+        $chart->get_yaxis(0, true)->set_label(sprintf('# %s', get_string('students')));
 
         $out = $OUTPUT->render($chart);
 
@@ -860,22 +870,24 @@ class catquizstatistics {
         }
 
         $peerattempts = new chart_series(
-            get_string('scoreofpeers', 'local_catquiz'),
+            get_string('catquizstatistics_progress_peers_title', 'local_catquiz', $scalename),
             array_values($peerattemptsbydate)
         );
         $peerattempts->set_labels(array_values($peerattemptsbydate));
 
         $userattempts = new chart_series(
-            get_string('yourscorein', 'local_catquiz', $scalename),
+            get_string('catquizstatistics_progress_personal_title', 'local_catquiz'),
             array_values($userattemptsbydate)
         );
         $userattempts->set_labels(array_values($userattemptsbydate));
 
         $labels = array_values($alldates);
 
-        $chart->add_series($userattempts);
         $chart->add_series($peerattempts);
+        $chart->add_series($userattempts);
         $chart->set_labels($labels);
+        $chart->get_xaxis(0, true)->set_label(get_string('date'));
+        $chart->get_yaxis(0, true)->set_label(get_string('personability', 'local_catquiz'));
         $out = $OUTPUT->render($chart);
         return $out;
     }
@@ -958,6 +970,8 @@ class catquizstatistics {
             $chart->add_series($series);
         }
 
+        $chart->get_xaxis(0, true)->set_label(get_string('numberofattempts', 'local_catquiz'));
+        $chart->get_yaxis(0, true)->set_label(sprintf('# %s', get_string('students')));
         $out = $OUTPUT->render($chart);
         return [
             'charttitle' => get_string('catquizstatistics_numattemptsperperson_title', 'local_catquiz'),
