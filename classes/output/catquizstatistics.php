@@ -1040,6 +1040,14 @@ class catquizstatistics {
         return null;
     }
 
+    /**
+     * Returns a replacement for the chart, if there are not enough data
+     *
+     * Usually, this just returns a string to indicate that there are not enough data.
+     * In debug mode, it returns more information about the given shortcode parameters.
+     *
+     * @return string
+     */
     private function get_nodata_body() {
         global $CFG;
 
@@ -1054,6 +1062,6 @@ class catquizstatistics {
                 count($this->get_attempts())
             );
         }
-        return '';
+        return get_string('catquizstatisticsnodata', 'local_catquiz');
     }
 }
