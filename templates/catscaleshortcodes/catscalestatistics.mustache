@@ -36,22 +36,22 @@
         <!-- Nav tabs -------------- -->
         <ul style="list-style: outside none none;" class="nav nav-tabs" role="tablist">
           <li class="nav-item">
-            <a class="nav-link active" data-toggle="tab" href="#overview" role="tab" aria-expanded="true">{{#str}}catquizstatistics_overview, local_catquiz{{/str}}</a>
+            <a class="nav-link active" data-toggle="tab" href="#overview-{{shortcodeid}}" role="tab" aria-expanded="true">{{#str}}catquizstatistics_overview, local_catquiz{{/str}}</a>
           </li>
           <li class="nav-item">
-            <a class="nav-link" data-toggle="tab" href="#testusage" role="tab" aria-expanded="false">{{#str}}catquizstatistics_testusage, local_catquiz{{/str}}</a>
+            <a class="nav-link" data-toggle="tab" href="#testusage-{{shortcodeid}}" role="tab" aria-expanded="false">{{#str}}catquizstatistics_testusage, local_catquiz{{/str}}</a>
           </li>
           <li class="nav-item">
-            <a class="nav-link" data-toggle="tab" href="#learningprogress" role="tab" aria-expanded="false">{{#str}}learningprogresstitle, local_catquiz{{/str}}</a>
+            <a class="nav-link" data-toggle="tab" href="#learningprogress-{{shortcodeid}}" role="tab" aria-expanded="false">{{#str}}learningprogresstitle, local_catquiz{{/str}}</a>
           </li>
           <li class="nav-item">
-            <a class="nav-link" data-toggle="tab" href="#export" role="tab" aria-expanded="false">Export</a>
+            <a class="nav-link" data-toggle="tab" href="#export-{{shortcodeid}}" role="tab" aria-expanded="false">Export</a>
           </li>
         </ul>
     {{/heading}}
         <!-- Tab panes -------------- -->
         <div class="tab-content">
-          <div class="tab-pane active" id="overview" role="tabpanel" aria-expanded="true">
+          <div class="tab-pane active" id="overview-{{shortcodeid}}" role="tabpanel" aria-expanded="true">
             {{#abilityprofilechart}}
                 <h5>{{charttitle}}</h5>
                 {{{chart}}}
@@ -61,7 +61,7 @@
                 {{{chart}}}
             {{/detectedscales}}
           </div>
-          <div class="tab-pane" id="testusage" role="tabpanel" aria-expanded="false">
+          <div class="tab-pane" id="testusage-{{shortcodeid}}" role="tabpanel" aria-expanded="false">
             {{#attemptspertimerangechart}}
                 <h5>{{charttitle}}</h5>
                 <div>{{{chart}}}</div>
@@ -75,13 +75,13 @@
                 {{{chart}}}
             {{/numresponsesbyusers}}
           </div>
-          <div class="tab-pane" id="learningprogress" role="tabpanel" aria-expanded="false">
+          <div class="tab-pane" id="learningprogress-{{shortcodeid}}" role="tabpanel" aria-expanded="false">
             {{#learningprogress}}
                <h5>{{charttitle}}</h5>
               {{{chart}}}
             {{/learningprogress}}
           </div>
-          <div class="tab-pane" id="export" role="tabpanel" aria-expanded="false">
+          <div class="tab-pane" id="export-{{shortcodeid}}" role="tabpanel" aria-expanded="false">
             TODO export button
           </div>
         </div>

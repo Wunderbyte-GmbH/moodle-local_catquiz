@@ -31,6 +31,7 @@ use local_catquiz\output\attemptfeedback;
 use local_catquiz\output\catscalemanager\quizattempts\quizattemptsdisplay;
 use local_catquiz\teststrategy\feedbacksettings;
 use context_course;
+use core\uuid;
 use dml_missing_record_exception;
 use Exception;
 use local_catquiz\output\catquizstatistics;
@@ -227,6 +228,9 @@ class shortcodes {
             'attemptsperpersonchart' => $catquizstatistics->render_attempts_per_person_chart(),
             'learningprogress' => $catquizstatistics->render_learning_progress(),
             'numresponsesbyusers' => $catquizstatistics->render_responses_by_users_chart(),
+            // This ID will be appended to the navigation tab links, so that
+            // those links are unique for shortcodes with different arguments.
+            'shortcodeid' => implode('-', $args),
         ];
 
         return $OUTPUT->render_from_template('local_catquiz/catscaleshortcodes/catscalestatistics', $data);
