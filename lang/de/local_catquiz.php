@@ -654,6 +654,9 @@ $string['catquizstatistics_numattempts_title'] = 'Anzahl von Testversuchen';
 $string['catquizstatistics_numattemptsperperson_title'] = 'Testversuche pro Person';
 $string['catquizstatistics_overview'] = 'Überblick';
 $string['catquizstatistics_testusage'] = 'Testnutzung';
+$string['catquizstatistics_progress_peers_title'] = 'Mittelwert der Ergebnisse in "{$a}"';
+$string['catquizstatistics_progress_personal_title'] = 'Ihre persönlichen Ergebnisse in dieser Skala';
+$string['catquizstatistics_numberofresponses'] = 'Anzahl der gegebenen Antworten';
 
 // Validation.
 $string['valuemustbegreaterzero'] = 'Wert muss höher als 0 sein.';
