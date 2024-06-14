@@ -658,6 +658,10 @@ $string['catquizstatistics_progress_peers_title'] = 'Mittelwert der Ergebnisse i
 $string['catquizstatistics_progress_personal_title'] = 'Ihre persönlichen Ergebnisse in dieser Skala';
 $string['catquizstatistics_numberofresponses'] = 'Anzahl der gegebenen Antworten';
 $string['catquizstatistics_exportcsv_heading'] = 'Daten der ausgewählten Testversuche als CSV Datei exportieren';
+$string['catquizstatistics_nodataforcourse'] = 'Für den angegebenen Kurs können keine CAT Tests gefunden werden.';
+$string['catquizstatistics_askforparams'] = 'Bitte geben Sie einen "globalscale" oder "courseid" Parameter an';
+$string['catquizstatistics_scale_testid_conflict'] = 'Der Test zur angegebenen testid verwendet nicht die angegebene Skala';
+$string['catquizstatistics_scale_course_conflict'] = 'Die angegebene testid ist nicht im angegebenen Kurs enthalten.';
 
 // Validation.
 $string['valuemustbegreaterzero'] = 'Wert muss höher als 0 sein.';
