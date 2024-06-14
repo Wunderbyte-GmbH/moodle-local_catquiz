@@ -235,7 +235,7 @@ class catquizstatistics {
         }
         $chart = new chart_bar();
         $chart->set_stacked(true);
-        $chart->set_labels($this->timerangekeys);
+        $chart->set_labels(array_values($this->timerangekeys));
         $colors[-1] = LOCAL_CATQUIZ_DEFAULT_GREY;
         $serieslabels = is_null($qs)
             ? [get_string('noresult', 'local_catquiz'), get_string('hasability', 'local_catquiz')]
@@ -244,7 +244,7 @@ class catquizstatistics {
         foreach ($countsbyrange as $range => $counts) {
             $series = new chart_series(
                 $serieslabels[$range],
-                $counts
+                array_values($counts)
             );
             $series->set_color($colors[$range - 1]);
             $chart->add_series($series);
