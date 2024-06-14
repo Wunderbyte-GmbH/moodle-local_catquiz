@@ -60,6 +60,15 @@ The following parameters can be defined:
 
 2. To display an overview table of all scales use [catscalesoverview].
 
+3. To display statistics for a group of attempts, use [catquizstatistics]
+
+The following parameters can be defined:
+
+* globalscale // Display only attempts for this scale.
+* testid      // Display only attempts of the given test.
+* courseid    // Display only attempts of tests in the given course.
+* starttime   // Display only attempts that were started after this timestamp. Should be a unix timestamp.
+* endtime   // Display only attempts that were started before this timestamp. Should be a unix timestamp.
 
 ## Installing via uploaded ZIP file ##
 
