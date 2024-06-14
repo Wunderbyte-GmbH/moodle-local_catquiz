@@ -1,0 +1,93 @@
+{{!
+    This file is part of Moodle - http://moodle.org/
+    Moodle is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+    Moodle is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+    You should have received a copy of the GNU General Public License
+    along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+}}
+{{!
+    @template local_catquiz
+    Template which defines a entities view page.
+    Classes required for JS:
+    * none
+    Data attributes required for JS:
+    * none
+    Context variables required for this template:
+    Example context (json):
+    {
+        "chart": "<div>...chart...</div>"
+    }
+}}
+{{#error}}
+    {{error}}
+{{/error}}
+{{^error}}
+
+
+    {{#heading}}
+        <h2>{{title}}</h2>
+        <h4 style="margin-bottom: 1em">{{{description}}}</h4>
+        <!-- Nav tabs -------------- -->
+        <ul style="list-style: outside none none;" class="nav nav-tabs" role="tablist">
+          <li class="nav-item">
+            <a class="nav-link active" data-toggle="tab" href="#overview-{{shortcodeid}}" role="tab" aria-expanded="true">{{#str}}catquizstatistics_overview, local_catquiz{{/str}}</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" data-toggle="tab" href="#testusage-{{shortcodeid}}" role="tab" aria-expanded="false">{{#str}}catquizstatistics_testusage, local_catquiz{{/str}}</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" data-toggle="tab" href="#learningprogress-{{shortcodeid}}" role="tab" aria-expanded="false">{{#str}}learningprogresstitle, local_catquiz{{/str}}</a>
+          </li>
+          {{#exportbutton}}
+          <li class="nav-item">
+            <a class="nav-link" data-toggle="tab" href="#export-{{shortcodeid}}" role="tab" aria-expanded="false">Export</a>
+          </li>
+          {{/exportbutton}}
+        </ul>
+    {{/heading}}
+        <!-- Tab panes -------------- -->
+        <div class="tab-content">
+          <div class="tab-pane active" id="overview-{{shortcodeid}}" role="tabpanel" aria-expanded="true">
+            {{#abilityprofilechart}}
+                <h5>{{charttitle}}</h5>
+                {{{chart}}}
+            {{/abilityprofilechart}}
+            {{#detectedscales}}
+                <h5>{{charttitle}}</h5>
+                {{{chart}}}
+            {{/detectedscales}}
+          </div>
+          <div class="tab-pane" id="testusage-{{shortcodeid}}" role="tabpanel" aria-expanded="false">
+            {{#attemptspertimerangechart}}
+                <h5>{{charttitle}}</h5>
+                <div>{{{chart}}}</div>
+            {{/attemptspertimerangechart}}
+            {{#attemptsperpersonchart}}
+                <h5>{{charttitle}}</h5>
+                <div>{{{chart}}}</div>
+            {{/attemptsperpersonchart}}
+            {{#numresponsesbyusers}}
+                <h5>{{charttitle}}</h5>
+                {{{chart}}}
+            {{/numresponsesbyusers}}
+          </div>
+          <div class="tab-pane" id="learningprogress-{{shortcodeid}}" role="tabpanel" aria-expanded="false">
+            {{#learningprogress}}
+               <h5>{{charttitle}}</h5>
+              {{{chart}}}
+            {{/learningprogress}}
+          </div>
+          <div class="tab-pane" id="export-{{shortcodeid}}" role="tabpanel" aria-expanded="false">
+            <div style="display: flex; align-items: center; flex-direction: column;" class="flex-wrapper">
+                <h5 style="margin: 1em 0;">{{#str}}catquizstatistics_exportcsv_heading, local_catquiz{{/str}}</h5>
+                <a class="btn btn-info" id="download-link" href="{{exportbutton}}">{{#str}}download, admin{{/str}}</a>
+            </div>
+          </div>
+        </div>
+{{/error}}

@@ -33,25 +33,32 @@ namespace local_catquiz\local\model;
 abstract class model_model {
 
     /**
-     * @var model_responses Contains necessary data for estimation
+     * Holds model instances.
+     *
+     * @var array $models
      */
-    protected model_responses $responses;
+    private static $models = [];
+    /**
+     * Make constructor private to force usage of get_instance()
+     */
+    protected function __construct() {
+    }
 
     /**
-     * @var string Name of model
-     */
-    protected string $modelname;
-
-    /**
-     * Model-specific instantiation can go here.
+     * Return an instance of the model with the given name
      *
-     * @param model_responses $responses
-     * @param string $modelname
-     *
+     * @param string $name
+     * @return self
      */
-    public function __construct(model_responses $responses, string $modelname) {
-        $this->responses = $responses;
-        $this->modelname = $modelname;
+    public static function get_instance(string $name): model_model {
+        if (!array_key_exists($name, self::$models)) {
+            $classname = sprintf('catmodel_%s\%s', $name, $name);
+            if (!class_exists($classname)) {
+                return null;
+            }
+            self::$models[$name] = new $classname();
+        }
+        return self::$models[$name];
     }
 
     /**
@@ -59,9 +66,7 @@ abstract class model_model {
      *
      * @return string
      */
-    public function get_model_name() {
-        return $this->modelname;
-    }
+    abstract public function get_model_name();
 
     /**
      * Helper to create a new item param
@@ -78,11 +83,13 @@ abstract class model_model {
      * Executes the model-specific code to estimate item-parameters based
      * on the given person abilities.
      *
+     * @param model_responses $responses
      * @param model_person_param_list $personparams
      * @param ?model_item_param_list $olditemparams
      * @return model_item_param_list
      */
     abstract public function estimate_item_params(
+        model_responses $responses,
         model_person_param_list $personparams,
         ?model_item_param_list $olditemparams = null): model_item_param_list;
 
@@ -102,7 +109,7 @@ abstract class model_model {
      * @return mixed
      *
      */
-    abstract public static function fisher_info(array $personability, array $params);
+    abstract public function fisher_info(array $personability, array $params);
 
     /**
      * Get information criterion

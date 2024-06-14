@@ -26,7 +26,6 @@ namespace local_catquiz\teststrategy\feedbackgenerator;
 
 use local_catquiz\catquiz;
 use local_catquiz\teststrategy\feedbackgenerator;
-use local_catquiz\teststrategy\feedbacksettings;
 
 /**
  * Returns rendered attempt statistics.
@@ -36,22 +35,6 @@ use local_catquiz\teststrategy\feedbacksettings;
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class questionssummary extends feedbackgenerator {
-
-    /**
-     *
-     * @var feedbacksettings $feedbacksettings.
-     */
-    public feedbacksettings $feedbacksettings;
-
-    /**
-     * Creates a new customscale feedback generator.
-     *
-     * @param feedbacksettings $feedbacksettings
-     */
-    public function __construct(feedbacksettings $feedbacksettings) {
-
-        $this->feedbacksettings = $feedbacksettings;
-    }
 
     /**
      * Get student feedback.

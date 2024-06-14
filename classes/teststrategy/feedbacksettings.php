@@ -217,35 +217,6 @@ class feedbacksettings {
     }
 
     /**
-     * Return all colors defined in feedbacksettings for this scale.
-     *
-     * @param array $quizsettings
-     * @param int $catscaleid
-     *
-     * @return array
-     */
-    public function get_defined_feedbackcolors_for_scale(array $quizsettings, int $catscaleid) {
-
-        $colors = [];
-
-        $numberoffeedbackoptions = intval($quizsettings['numberoffeedbackoptionsselect']) ?? 8;
-        $colorarray = feedbackclass::get_array_of_colors($numberoffeedbackoptions);
-
-        for ($i = 1; $i <= $numberoffeedbackoptions; $i++) {
-            $colorkey = 'wb_colourpicker_' . $catscaleid . '_' . $i;
-            $rangestartkey = "feedback_scaleid_limit_lower_" . $catscaleid . "_" . $i;
-            $rangeendkey = "feedback_scaleid_limit_upper_" . $catscaleid . "_" . $i;
-            $colorname = $quizsettings[$colorkey];
-            if (isset($colorarray[$colorname])) {
-                    $colors[$colorarray[$colorname]]['rangestart'] = $quizsettings[$rangestartkey];
-                    $colors[$colorarray[$colorname]]['rangeend'] = $quizsettings[$rangeendkey];
-            }
-
-        }
-        return $colors;
-    }
-
-    /**
      * Exclude scales that don't meet minimum of items required in quizsettings.
      *
      * @param array $personabilities
@@ -452,5 +423,32 @@ class feedbacksettings {
 
     }
 
+    /**
+     * Returns if sortorder is set to ascending
+     *
+     * @return bool
+     */
+    public function is_sorted_ascending() {
+        return $this->sortorder === LOCAL_CATQUIZ_SORTORDER_ASC;
+    }
+
+    /**
+     * Returns if sortorder is set to descending
+     *
+     * @return bool
+     */
+    public function is_sorted_descending() {
+        return $this->sortorder === LOCAL_CATQUIZ_SORTORDER_DESC;
+    }
+
+    /**
+     * Set sort order to ascending
+     *
+     * @return self
+     */
+    public function set_sort_ascending() {
+        $this->sortorder = LOCAL_CATQUIZ_SORTORDER_ASC;
+        return $this;
+    }
 }
 

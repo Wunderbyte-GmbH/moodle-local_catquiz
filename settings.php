@@ -55,7 +55,7 @@ if ($hassiteconfig) {
         )
         );
 
-    $sql = "SELECT t.id, t.name
+    $sql = "SELECT DISTINCT t.id, t.name
             FROM {tag} t
             LEFT JOIN {tag_instance} ti ON t.id=ti.tagid
             WHERE ti.component=:component AND ti.itemtype=:itemtype AND t.isstandard=1";
@@ -102,4 +102,20 @@ if ($hassiteconfig) {
             get_string('automatic_reload_on_scale_selection', 'local_catquiz'),
             get_string('automatic_reload_on_scale_selection_description', 'local_catquiz'),
             1));
+
+    $settings->add(new admin_setting_configtext(
+        'local_catquiz/time_penalty_threshold',
+        get_string('time_penalty_threshold_name', 'local_catquiz'),
+        get_string('time_penalty_threshold_desc', 'local_catquiz'),
+        10,
+        '/^[1-9]\d*$/'
+        )
+    );
+
+    $settings->add(
+        new admin_setting_configcheckbox(
+            'local_catquiz/store_debug_info',
+            get_string('store_debug_info_name', 'local_catquiz'),
+            get_string('store_debug_info_desc', 'local_catquiz'),
+            0));
 }

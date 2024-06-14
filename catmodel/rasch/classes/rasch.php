@@ -38,6 +38,15 @@ use local_catquiz\local\model\model_raschmodel;
  */
 class rasch extends model_raschmodel {
 
+    /**
+     * Returns the name of this model.
+     *
+     * @return string
+     */
+    public function get_model_name(): string {
+        return 'rasch';
+    }
+
     // Definitions and Dimensions.
 
     /**
@@ -339,7 +348,7 @@ class rasch extends model_raschmodel {
      * @return mixed
      *
      */
-    public static function fisher_info(array $pp, array $ip) {
+    public function fisher_info(array $pp, array $ip) {
         return (self::likelihood($pp, $ip, 0) * self::likelihood($pp, $ip, 1.0));
     }
 

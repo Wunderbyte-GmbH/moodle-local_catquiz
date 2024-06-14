@@ -26,9 +26,6 @@ namespace local_catquiz\teststrategy;
 
 use coding_exception;
 use context_system;
-use local_catquiz\catquiz;
-use local_catquiz\catscale;
-use local_catquiz\feedback\feedbackclass;
 use UnexpectedValueException;
 
 /**
@@ -39,6 +36,12 @@ use UnexpectedValueException;
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 abstract class feedbackgenerator {
+
+    /**
+     * The precision used to store float values.
+     */
+    protected const PRECISION = 2;
+
     /**
      * Attempt ID
      *
@@ -65,6 +68,28 @@ abstract class feedbackgenerator {
      */
     private ?progress $progress = null;
 
+    /**
+     * @var feedbacksettings
+     */
+    protected feedbacksettings $feedbacksettings;
+
+    /**
+     * @var feedback_helper
+     */
+    protected feedback_helper $feedbackhelper;
+
+    /**
+     * Create a new feedback generator
+     *
+     * @param feedbacksettings $feedbacksettings
+     * @param feedback_helper $feedbackhelper
+     *
+     * @return self
+     */
+    public function __construct(feedbacksettings $feedbacksettings, feedback_helper $feedbackhelper) {
+        $this->feedbacksettings = $feedbacksettings;
+        $this->feedbackhelper = $feedbackhelper;
+    }
     /**
      * Returns the progress for the current attempt, component and contextid.
      *
@@ -227,57 +252,6 @@ abstract class feedbackgenerator {
     }
 
     /**
-     * Write information about colorgradient for colorbar.
-     *
-     * @param array $quizsettings
-     * @param float $personability
-     * @param int $catscaleid
-     * @return string
-     *
-     */
-    public function get_color_for_personability(array $quizsettings, float $personability, int $catscaleid): string {
-        $default = LOCAL_CATQUIZ_DEFAULT_GREY;
-        $abilityrange = $this->get_ability_range($catscaleid);
-        if (!$quizsettings ||
-            $personability < (float) $abilityrange['minscalevalue'] ||
-            $personability > (float) $abilityrange['maxscalevalue']) {
-            return $default;
-        }
-        $numberoffeedbackoptions = intval($quizsettings['numberoffeedbackoptionsselect'])
-            ?? LOCAL_CATQUIZ_MAX_SCALERANGE;
-        $colorarray = feedbackclass::get_array_of_colors($numberoffeedbackoptions);
-
-        for ($i = 1; $i <= $numberoffeedbackoptions; $i++) {
-            $rangestartkey = "feedback_scaleid_limit_lower_" . $catscaleid . "_" . $i;
-            $rangeendkey = "feedback_scaleid_limit_upper_" . $catscaleid . "_" . $i;
-            $rangestart = floatval($quizsettings[$rangestartkey]);
-            $rangeend = floatval($quizsettings[$rangeendkey]);
-
-            if ($personability >= $rangestart && $personability <= $rangeend) {
-                $colorkey = 'wb_colourpicker_' . $catscaleid . '_' . $i;
-                $colorname = $quizsettings[$colorkey];
-                return $colorarray[$colorname];
-            }
-
-        }
-        return $default;
-    }
-
-    /**
-     * For testing this is called in seperate function.
-     *
-     * @param mixed $catscaleid
-     *
-     * @return array
-     *
-     */
-    public function get_ability_range($catscaleid): array {
-        $cs = new catscale($catscaleid);
-        // Ability range is the same for all scales with same root scale.
-        return $cs->get_ability_range();
-    }
-
-    /**
      * Returns a fallback if no feedback can be generated.
      *
      * @return array
@@ -341,6 +315,20 @@ abstract class feedbackgenerator {
         return has_capability(
             'local/catquiz:view_teacher_feedback', context_system::instance()
         );
+    }
+
+    /**
+     * Helper function to round floats or return null if not set
+     *
+     * @param array $array
+     * @param string $key
+     * @return ?float
+     */
+    protected function get_rounded_or_null(array $array, string $key) {
+        if (!array_key_exists($key, $array)) {
+            return null;
+        }
+        return round($array[$key], self::PRECISION);
     }
 
 }

@@ -107,10 +107,23 @@ $string['peritem'] = 'pro Item ';
 $string['applychanges'] = 'Änderungen übernehmen';
 $string['automatic_reload_on_scale_selection'] = 'Bei (Sub-)Skalenauswahl Formular neu laden';
 $string['automatic_reload_on_scale_selection_description'] = 'Bei (Sub-)Skalenauswahl automatisch das Quizsettings-Formular neu laden';
-
+$string['enrol_only_to_reported_scales'] = 'Benutzer nur in Kurse von detektierter Skala einschreiben';
+$string['enrol_only_to_reported_scales_help'] = 'Standardmäßig werden die Benutzer nach den Ergebnissen in den Bereichen eingeschrieben, die entsprechend dem Zweck des Tests ermittelt wurden.
+Wenn Sie diese Option deaktivieren, werden die Benutzer auch entsprechend aller anderen gültigen Ergebnissen eingeschrieben.'; // TODO: get translation.
+$string['time_penalty_threshold_name'] = 'Wiederholungsverzögerung in Tagen';
+$string['time_penalty_threshold_desc'] = 'Eine Frage, die durch einen User in
+    einem früheren Testversuch bereits beantwortet wurde, wird nur mit
+    verringerter Wahrscheinlichkeit erneut gestellt. Die Wahrscheinlichkeit ist
+    abhängig vom der Dauer zwischen dem früheren und dem aktuellen Versuch. Je
+    höher die eingestellte Dauer, desto länger ist dieser Schutz vor wiederholt
+    gestellten Fragen wirksam.';
 $string['timeoutabortnoresult'] = 'Test wird sofort beendet und nicht abschließend bewertet';
 $string['timeoutabortresult'] = 'Test wird sofort beendet und abschließend bewertet';
 $string['timeoutfinishwithresult'] = 'Nachfrist: angezeigte Items können beendet werden';
+$string['store_debug_info_name'] = 'Create quiz feedback with debug information';
+$string['store_debug_info_desc'] = 'When set, additional data for each quiz
+    attempt are saved and provided as CSV download. This can take up a lot of
+    space.';
 
 // Validation.
 $string['minabilityscalevalue'] = 'Minimale Personenfähigkeit:';
@@ -470,6 +483,11 @@ $string['includepilotquestions_help'] = 'Im Pilotierungsmodus werden jedem Testv
 $string['catquiz_selectfirstquestion_help'] = 'Dieser Einstellung legt fest, mit welcher Frage ein Testversuch gestartet wird.';
 $string['numberoffeedbackoptionpersubscale'] = 'Anzahl der Fähigkeits-Stufen';
 $string['feedbacknumber'] = 'Feedback für Fähigkeits-Stufe "{$a}"';
+$string['feedbackrange'] = 'Fähigkeits-Stufe {$a}';
+$string['hasability'] = 'Fähigkeit wurde berechnet';
+$string['responsesbyusercharttitle'] = 'Gesamtanzahl der gegebenen Antworten pro Person';
+$string['noresult'] = 'Es wurde noch keine Fähigkeit berechnet';
+$string['selected_scales_all_ranges_label'] = 'Anzahl der Teilnehmenden';
 $string['numberoffeedbackoptionpersubscale_help'] = 'Wählen Sie aus, in wievielen Fähigkeits-Stufen Sie Ihr Feedback differenzieren möchten. Mithilfe der Fähigkeits-Stufen können Sie in Abhängigkeit der ermittelten Fähigkeit für jede Skala Ihren Teilnehmenden unterschiedliche schriftliche Rückmeldungen erteilen, diese in unterschiedliche Kurse einschreiben oder diese unterschiedlichen Gruppen zuordnen.';
 $string['choosesubscaleforfeedback'] = 'Skala wählen';
 $string['feedbackcompletedpartially'] = '{$a} Feedbacks für diese Skala eingestellt.';
@@ -522,6 +540,7 @@ $string['nothingtocompare'] = 'Es sind nicht ausreichend valide Ergebnisse für 
 $string['personabilityrangestring'] = '{$a->rangestart} - {$a->rangeend}';
 $string['testinfolabel'] = 'Testinformation';
 $string['scalescorechartlabel'] = '{$a}-Score';
+$string['chart_detectedscales_title'] = 'Detektierte Skalen';
 
 // Check display line breaks etc.
 $string['choosesubscaleforfeedback_help'] = 'Für die angezeigten Skalen können Sie nun {$a} Feedback-Angaben hinterlegen. Wählen Sie die jeweilige (Sub-)Skala an, um Ihr Feedback einzugeben. Die farbigen Symbole zeigen Ihnen den aktuellen Stand der Bearbeitung an, gemessen an den vor Ihnen hinterlegten Anzahl an Feedback-Optionen:
@@ -619,6 +638,30 @@ $string['shortcodeslistofquizattempts'] = 'Gibt eine Tabelle mit Testversuchen z
 $string['catquizfeedback'] = 'Zeigt eine Übersicht zu den letzten Testversuchen.';
 $string['shortcodescatquizfeedback'] = 'Zeige Feedback zu Versuchen an.';
 $string['shortcodescatscalesoverview'] = 'Zeige Übersicht zu CAT-Skalen an.';
+$string['shortcodescatquizstatistics'] = 'Zeige Statistiken zu einem CAT Test an';
+$string['catquizstatisticsnodata'] = 'Für die angegebenen Paramter können keine Daten gefunden werden';
+$string['catquizstatistics_h1_single'] = 'Statistik zu Test {$a}';
+$string['catquizstatistics_h2_single'] = 'Die folgenden Daten beziehen sich auf den Test {$a->link}, in dem die Skala {$a->scale} verwendet wird.';
+$string['catquizstatistics_h1_scale'] = 'Statistik zu Skala {$a->scalename} in Kurs {$a->coursename}';
+$string['catquizstatistics_h2_scale'] = 'Die folgenden Daten beziehen sich auf die Tests {$a->linkedcourses} in Kurs {$a->coursename}, in denen die Skala {$a->scale} verwendet wird.';
+$string['catquizstatistics_h1_global'] = 'Statistik zu Skala {$a} auf der gesamten moodle Instanz';
+$string['catquizstatistics_h2_global'] = 'Die folgenden Daten beziehen sich auf alle Nutzer, die auf dieser
+    Moodle-Plattform an Tests teilgenommen haben, in denen die Skala {$a} verwendet wird.';
+$string['catquizstatistics_timerange_both'] = 'Nur Daten von {$a->starttime} bis {$a->endtime} werden berücksichtigt.';
+$string['catquizstatistics_timerange_start'] = 'Nur Daten ab {$a->starttime} werden berücksichtigt.';
+$string['catquizstatistics_timerange_end'] = 'Nur Daten bis {$a->endtime} werden berücksichtigt.';
+$string['catquizstatistics_numattempts_title'] = 'Anzahl von Testversuchen';
+$string['catquizstatistics_numattemptsperperson_title'] = 'Testversuche pro Person';
+$string['catquizstatistics_overview'] = 'Überblick';
+$string['catquizstatistics_testusage'] = 'Testnutzung';
+$string['catquizstatistics_progress_peers_title'] = 'Mittelwert der Ergebnisse in "{$a}"';
+$string['catquizstatistics_progress_personal_title'] = 'Ihre persönlichen Ergebnisse in dieser Skala';
+$string['catquizstatistics_numberofresponses'] = 'Anzahl der gegebenen Antworten';
+$string['catquizstatistics_exportcsv_heading'] = 'Daten der ausgewählten Testversuche als CSV Datei exportieren';
+$string['catquizstatistics_nodataforcourse'] = 'Für den angegebenen Kurs können keine CAT Tests gefunden werden.';
+$string['catquizstatistics_askforparams'] = 'Bitte geben Sie einen "globalscale" oder "courseid" Parameter an';
+$string['catquizstatistics_scale_testid_conflict'] = 'Der Test zur angegebenen testid verwendet nicht die angegebene Skala';
+$string['catquizstatistics_scale_course_conflict'] = 'Die angegebene testid ist nicht im angegebenen Kurs enthalten.';
 
 // Validation.
 $string['valuemustbegreaterzero'] = 'Wert muss höher als 0 sein.';

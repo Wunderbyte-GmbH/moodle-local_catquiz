@@ -118,7 +118,7 @@ class personability_loader implements contextloaderinterface {
         $personparams = catquiz::get_person_abilities(
             $context['contextid'],
             $catscaleids,
-            $context['userid']
+            [$context['userid']]
         ) ?: [];
 
         // Index by catscale ID.

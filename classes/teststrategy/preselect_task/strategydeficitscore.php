@@ -111,7 +111,8 @@ final class strategydeficitscore extends preselect_task implements wb_middleware
                 $score = $question->fisherinformation[$scaleid]
                     * $question->processterm
                     * $question->scaleterm
-                    * $question->itemterm;
+                    * $question->itemterm
+                    * $question->lasttimeplayedpenaltyfactor;
 
                 if (! property_exists($question, 'score') || $score > $question->score) {
                     $question->score = $score;
@@ -148,7 +149,6 @@ final class strategydeficitscore extends preselect_task implements wb_middleware
      */
     public function get_required_context_keys(): array {
         return [
-            'penalty_threshold',
             'questions',
             'progress',
         ];

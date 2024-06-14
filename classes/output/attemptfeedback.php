@@ -25,7 +25,6 @@ use local_catquiz\catquiz;
 use local_catquiz\catscale;
 use local_catquiz\event\attempt_completed;
 use local_catquiz\teststrategy\feedbackgenerator;
-use local_catquiz\teststrategy\feedbackgenerator\customscalefeedback;
 use local_catquiz\teststrategy\feedbacksettings;
 use local_catquiz\teststrategy\info;
 use local_catquiz\teststrategy\progress;
@@ -68,14 +67,19 @@ class attemptfeedback implements renderable, templatable {
     public int $teststrategy;
 
     /**
-     * @var ?object
+     * @var ?progress
      */
-    public feedbacksettings $feedbacksettings;
+    private ?progress $progress = null;
+
+    /**
+     * @var ?stdClass
+     */
+    private ?stdClass $quizsettings = null;
 
     /**
      * @var ?object
      */
-    public stdClass $quizsettings;
+    public feedbacksettings $feedbacksettings;
 
     /**
      * Constructor of class.
@@ -125,6 +129,32 @@ class attemptfeedback implements renderable, templatable {
     }
 
     /**
+     * Returns the progress object for this attempt
+     *
+     * @return progress
+     * @throws coding_exception
+     * @throws Exception
+     */
+    public function get_progress(): progress {
+        if (!$this->progress) {
+            $this->progress = progress::load($this->attemptid, 'mod_adaptivequiz', $this->contextid);
+        }
+        return $this->progress;
+    }
+
+    /**
+     * Returns the quiz settings for this attempt
+     *
+     * @return stdClass
+     */
+    public function get_quiz_settings() {
+        if (!$this->quizsettings) {
+            $this->quizsettings = $this->get_progress()->get_quiz_settings();
+        }
+        return $this->quizsettings;
+    }
+
+    /**
      * Updates the data that is used to render the feedback
      *
      * This is called after each response of a user.
@@ -152,21 +182,53 @@ class attemptfeedback implements renderable, templatable {
     /**
      * Load feedbackdata
      *
+     * @param ?string $feedbackdata
+     * @param ?string $debugdata
+     *
      * @return array
      */
-    public function load_feedbackdata(): array {
+    public function load_feedbackdata(?string $feedbackdata = null, ?string $debugdata = null): array {
         global $DB;
-        $feedbackdata = json_decode(
-            $DB->get_field(
-                'local_catquiz_attempts',
-                'json',
-                ['attemptid' => $this->attemptid]
-            ),
-            true
-        );
+        if (!$feedbackdata) {
+            $feedbackdata = json_decode(
+                $DB->get_field(
+                    'local_catquiz_attempts',
+                    'json',
+                    ['attemptid' => $this->attemptid]
+                ),
+                true
+            );
+        } else {
+            $feedbackdata = json_decode($feedbackdata, true);
+        }
+
         if (empty($feedbackdata)) {
             return $this->create_initial_data();
         }
+
+        if (!get_config('local_catquiz', 'store_debug_info')) {
+            return $feedbackdata;
+        }
+
+        // If this is an old version where feedbackdata are stored in the JSON column,
+        // then just return it.
+        if (array_key_exists('debuginfo', $feedbackdata)) {
+            return $feedbackdata;
+        }
+
+        // In newer versions, the debuginfo data are stored in a separate column that can be emptied in case it takes up too much
+        // space.
+        if (!$debugdata && !$debugdata = $DB->get_field(
+                'local_catquiz_attempts',
+                'debug_info',
+                ['attemptid' => $this->attemptid]
+        )) {
+            return $feedbackdata;
+        }
+
+        $debuginfo = json_decode( $debugdata, true) ?? [];
+        $feedbackdata['debuginfo'] = $debuginfo;
+
         return $feedbackdata;
     }
 
@@ -250,9 +312,9 @@ class attemptfeedback implements renderable, templatable {
      */
     private function add_default_data(array $newdata): array {
         $newarray = [];
-        $progress = progress::load($newdata['attemptid'], $newdata['component'], $newdata['contextid']);
+        $progress = $this->get_progress();
 
-        $personabilities = $progress->get_abilities();
+        $personabilities = $progress->get_abilities(true);
 
         if (!$personabilities) {
             return $newdata;
@@ -261,44 +323,22 @@ class attemptfeedback implements renderable, templatable {
             $newarray[$scaleid]['value'] = $abilityfloat;
         };
         $newdata['updated_personabilities'] = $newarray;
-        $newdata['catscaleid'] = intval($progress->get_quiz_settings()->catquiz_catscales);
-        $newdata['catscales'] = catquiz::get_catscales([$newdata['catscaleid'], ...$progress->get_selected_subscales()]);
+        $newdata['catscaleid'] = intval($this->get_quiz_settings()->catquiz_catscales);
+        $catscales = catquiz::get_catscales([$newdata['catscaleid'], ...$progress->get_selected_subscales()]);
+        // Remove unneeded data from the catscales array.
+        $newdata['catscales'] = array_map(
+            function ($cs) {
+                unset($cs->timecreated);
+                unset($cs->timemodified);
+                unset($cs->parentid);
+                unset($cs->contextid);
+                return $cs;
+            },
+            $catscales
+        );
+
         return $newdata;
     }
-
-    /**
-     * Change format of personabilities.
-     *
-     * @param array $personabilities
-     *
-     * @return array
-     *
-     */
-    private function add_additional_infos_to_personabilities(array $personabilities): array {
-
-        if (!is_array($personabilities[array_key_first($personabilities)])) {
-            // It's the float value of ability.
-            foreach ($personabilities as $scaleid => $abilityfloat) {
-                $newarray[$scaleid]['value'] = $abilityfloat;
-            };
-            $personabilities = $newarray;
-        }
-        $quizsettings = (array) $this->quizsettings;
-        $feedbacksettings = $this->feedbacksettings;
-        $feedbackdata = $this->load_feedbackdata();
-
-        $personabilities = $feedbacksettings->filter_excluded_scales($personabilities, $quizsettings);
-        $feedbacksettings->set_params_from_attempt($feedbackdata, $quizsettings);
-
-        return info::get_teststrategy($this->teststrategy)
-            ->select_scales_for_report(
-                $feedbacksettings,
-                $personabilities,
-                $feedbackdata
-            );
-
-    }
-
 
     /**
      * Gets feedback generators for teststrategy.
@@ -320,11 +360,14 @@ class attemptfeedback implements renderable, templatable {
     /**
      * Gets feedback for attempt.
      *
+     * @param ?string $feedbackdata
+     * @param ?string $debuginfo
+     *
      * @return array
      *
      */
-    public function get_feedback_for_attempt(): array {
-        $feedbackdata = $this->load_feedbackdata();
+    public function get_feedback_for_attempt(?string $feedbackdata = null, ?string $debuginfo = null): array {
+        $feedbackdata = $this->load_feedbackdata($feedbackdata, $debuginfo);
         $generators = $this->get_feedback_generators_for_teststrategy($feedbackdata['teststrategy']);
         return $this->generate_feedback($generators, $feedbackdata);
     }
@@ -350,9 +393,11 @@ class attemptfeedback implements renderable, templatable {
     public function attempt_finished_tasks() {
         global $USER;
 
-        $progress = progress::load($this->attemptid, 'mod_adaptivequiz', $this->contextid);
-        $quizsettings = $progress->get_quiz_settings();
-        $enrolementmsg = catquiz::enrol_user($USER->id, (array) $quizsettings, $progress->get_abilities());
+        $quizsettings = $this->get_quiz_settings();
+        $feedbackdata = $this->load_feedbackdata();
+        $coursestoenrol = $this->get_courses_to_enrol($feedbackdata, $quizsettings);
+        $groupstoenrol = $this->get_groups_to_enrol($feedbackdata, $quizsettings);
+        $enrolementmsg = catquiz::enrol_user((array) $quizsettings, $coursestoenrol, $groupstoenrol);
         $courseandinstance = catquiz::return_course_and_instance_id(
             $quizsettings->modulename,
             $this->attemptid
@@ -375,6 +420,108 @@ class attemptfeedback implements renderable, templatable {
         ]);
         $event->trigger();
         return $enrolementmsg;
+    }
+
+    /**
+     * Returns the courses that the user shoule be enrolled to, indexed by scale ID.
+     *
+     * This depends on both the quiz settings, that contain the information about which ranges in which scales should trigger an
+     * inscription to a course.
+     * It also depends on the feedbackdata, which contain information about the abilities in the different scales and (depending on
+     * the teststrategy) which of the scales was selected as the primary scale.
+     *
+     * Example return values:
+     *
+     * [
+     *  '1' => [
+     *      'range' => 2,
+     *      'show_message' => true,
+     *      'course_ids' => [1002, 1003]
+     *      ]
+     * ]
+     *
+     * @return array
+     */
+    public function get_courses_to_enrol(
+    ): array {
+        $quizsettings = (array) $this->get_quiz_settings();
+        $feedbackdata = $this->load_feedbackdata();
+
+        // Use only the toreport scale.
+        $candidatescales = array_filter(
+            $feedbackdata['personabilities_abilities'],
+            fn($v) => array_key_exists('toreport', $v) && $v['toreport'] === true
+        );
+
+        $coursestoenrol = [];
+        foreach ($candidatescales as $scaleid => $data) {
+            $coursestoenrol[$scaleid] = [
+                'course_ids' => [],
+            ];
+            $i = 0;
+            while (isset($quizsettings['feedback_scaleid_limit_lower_' . $scaleid . '_'. ++$i])) {
+                $lowerlimit = $quizsettings['feedback_scaleid_limit_lower_' . $scaleid . '_'. $i];
+                $upperlimit = $quizsettings['feedback_scaleid_limit_upper_' . $scaleid. '_'. $i];
+                if ($data['value'] < (float) $lowerlimit || $data['value'] > (float) $upperlimit) {
+                    continue;
+                }
+                if (!($courses = $quizsettings['catquiz_courses_' . $scaleid . '_' . $i] ?? [])) {
+                    continue;
+                }
+                // The first element at array key 0 is a dummy value to
+                // display some message like "please select course" in the
+                // form and has a course ID of 0.
+                $courses = array_filter($courses, fn ($v) => $v != 0);
+                $showenrolmentmessage = !empty($quizsettings["enrolment_message_checkbox_" . $scaleid . "_" . $i]);
+                $coursestoenrol[$scaleid] = [
+                    'range' => $i,
+                    'show_message' => $showenrolmentmessage,
+                    'course_ids' => $courses,
+                ];
+            }
+        }
+        return $coursestoenrol;
+    }
+
+    /**
+     * Returns the groups that the user should be enrolled to, indexed by scale ID.
+     *
+     * Example:
+     * [
+     *     '1' => [2,3]
+     * ]
+     *
+     * @return array
+     */
+    public function get_groups_to_enrol(): array {
+        $quizsettings = (array) $this->get_quiz_settings();
+        $feedbackdata = $this->load_feedbackdata();
+
+        // Use only the toreport scale.
+        $candidatescales = array_filter(
+            $feedbackdata['personabilities_abilities'],
+            fn($v) => array_key_exists('toreport', $v) && $v['toreport'] === true
+        );
+
+        // Check if there is a course associated with that value and if so, return it.
+        $groupstoenrol = [];
+        foreach ($candidatescales as $scaleid => $data) {
+            $groupstoenrol[$scaleid] = [];
+            $i = 0;
+            while (isset($quizsettings['feedback_scaleid_limit_lower_' . $scaleid . '_' . ++$i])) {
+                $lowerlimit = $quizsettings['feedback_scaleid_limit_lower_' . $scaleid . '_' . $i];
+                $upperlimit = $quizsettings['feedback_scaleid_limit_upper_' . $scaleid . '_' . $i];
+                if ($data['value'] < (float) $lowerlimit || $data['value'] > (float) $upperlimit) {
+                    continue;
+                }
+                if (!($groups = $quizsettings['catquiz_group_' . $scaleid . '_' . $i] ?? "")) {
+                    continue;
+                }
+                $groups = explode(",", $groups);
+                array_push($groupstoenrol[$scaleid], ...$groups);
+            }
+        }
+        return $groupstoenrol;
     }
 
     /**
@@ -420,6 +567,7 @@ class attemptfeedback implements renderable, templatable {
                 $context[$fbtype][] = $feedback;
             }
         }
+
         return $context;
     }
 }

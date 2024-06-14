@@ -26,6 +26,7 @@
 namespace local_catquiz;
 
 use advanced_testcase;
+use local_catquiz\teststrategy\feedback_helper;
 use local_catquiz\teststrategy\feedbackgenerator\personabilities;
 use local_catquiz\teststrategy\feedbacksettings;
 use local_catquiz\teststrategy\progress;
@@ -40,7 +41,7 @@ use SebastianBergmann\RecursionContext\InvalidArgumentException;
  * @copyright  2024 Wunderbyte GmbH <info@wunderbyte.at>
  * @license    http =>//www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  *
- * @covers \local_catquiz\teststrategy\preselect_task\filterforsubscale
+ * @covers \local_catquiz\teststrategy\feedbackgenerator\personabilities
  */
 class personabilities_test extends advanced_testcase {
 
@@ -68,6 +69,7 @@ class personabilities_test extends advanced_testcase {
         $progressmock = $this->getMockBUilder(progress::class)
             ->onlyMethods([
                 'get_quiz_settings',
+                'get_abilities',
             ])
             ->getMock();
 
@@ -75,27 +77,35 @@ class personabilities_test extends advanced_testcase {
             ->method('get_quiz_settings')
             ->willReturn((object) $feedbackdata['quizsettings']);
 
+        $primaryscaleid = $feedbackdata['primaryscale']['id'];
+        $primaryscalevalue = $feedbackdata['personabilities_abilities'][$primaryscaleid]['value'];
+        $progressmock
+            ->method('get_abilities')
+            ->willReturn([$primaryscaleid => $primaryscalevalue]);
+
+        $feedbackhelpermock = $this->getMockBUilder(feedback_helper::class)
+            ->disableOriginalConstructor()
+            ->onlyMethods([
+                'get_ability_range',
+            ])
+            ->getMock();
+
+        $feedbackhelpermock
+            ->method('get_ability_range')
+            ->willReturn($abilityrange);
         $feedbacksettings = new feedbacksettings(LOCAL_CATQUIZ_STRATEGY_LOWESTSUB);
         $personabilities = $this->getMockBuilder(personabilities::class)
             ->onlyMethods([
-                'get_ability_range',
                 'get_testitems_for_catscale',
-                'get_fisherinfos_of_items',
                 'get_progress',
             ])
-            ->setConstructorArgs([$feedbacksettings])
+            ->setConstructorArgs([$feedbacksettings, $feedbackhelpermock])
             ->getMock();
 
         // Configure the stub.
         $personabilities
-            ->method('get_ability_range')
-            ->willReturn($abilityrange);
-        $personabilities
             ->method('get_testitems_for_catscale')
             ->willReturn($testitemsforcatscale);
-        $personabilities
-            ->method('get_fisherinfos_of_items')
-            ->willReturn($fisherinfo);
         $personabilities
             ->method('get_progress')
             ->willReturn($progressmock);
@@ -158,7 +168,6 @@ class personabilities_test extends advanced_testcase {
                             "numberofitemsplayed" => [
                                 "noplayed" => 0,
                             ],
-                            "questionpreviews" => "",
                             "isselectedscale" => true,
                             "tooltiptitle" => "[[lowestskill =>tooltiptitle]]",
                         ],
@@ -168,7 +177,6 @@ class personabilities_test extends advanced_testcase {
                             "name" => "SimB",
                             "catscaleid" => 280,
                             "numberofitemsplayed" => "",
-                            "questionpreviews" => "",
                             "isselectedscale" => false,
                             "tooltiptitle" => "SimB",
                         ],
@@ -180,7 +188,6 @@ class personabilities_test extends advanced_testcase {
                             "numberofitemsplayed" => [
                                 "noplayed" => 0,
                             ],
-                            "questionpreviews" => "",
                             "isselectedscale" => false,
                             "tooltiptitle" => "Simulation",
                         ],
@@ -190,7 +197,6 @@ class personabilities_test extends advanced_testcase {
                             "name" => "SimA",
                             "catscaleid" => 272,
                             "numberofitemsplayed" => "",
-                            "questionpreviews" => "",
                             "isselectedscale" => false,
                             "tooltiptitle" => "SimA",
                         ],
@@ -200,7 +206,6 @@ class personabilities_test extends advanced_testcase {
                             "name" => "SimA01",
                             "catscaleid" => 273,
                             "numberofitemsplayed" => "",
-                            "questionpreviews" => "",
                             "isselectedscale" => false,
                             "tooltiptitle" => "SimA01",
                         ],
@@ -210,7 +215,6 @@ class personabilities_test extends advanced_testcase {
                             "name" => "SimB02",
                             "catscaleid" => 282,
                             "numberofitemsplayed" => "",
-                            "questionpreviews" => "",
                             "isselectedscale" => false,
                             "tooltiptitle" => "SimB02",
                         ],

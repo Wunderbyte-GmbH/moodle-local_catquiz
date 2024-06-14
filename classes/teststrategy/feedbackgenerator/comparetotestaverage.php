@@ -29,8 +29,6 @@ use local_catquiz\catscale;
 use local_catquiz\feedback\feedbackclass;
 use local_catquiz\teststrategy\feedbackgenerator;
 use local_catquiz\teststrategy\feedbacksettings;
-use local_catquiz\teststrategy\preselect_task\firstquestionselector;
-use local_catquiz\teststrategy\progress;
 
 defined('MOODLE_INTERNAL') || die();
 
@@ -53,27 +51,11 @@ class comparetotestaverage extends feedbackgenerator {
     public int $primaryscaleid;
 
     /**
-     *
-     * @var stdClass $feedbacksettings.
-     */
-    public feedbacksettings $feedbacksettings;
-
-    /**
      * We only show a graph if we have results for at least that many users.
      *
      * @var int
      */
     const MIN_USERS = 3;
-
-    /**
-     * Creates a new customscale feedback generator.
-     *
-     * @param feedbacksettings $feedbacksettings
-     */
-    public function __construct(feedbacksettings $feedbacksettings) {
-
-        $this->feedbacksettings = $feedbacksettings;
-    }
 
     /**
      * Get student feedback.
@@ -281,29 +263,14 @@ class comparetotestaverage extends feedbackgenerator {
             array_keys($newdata['updated_personabilities'])
         );
 
-        $personabilitiesfeedbackeditor = $this->select_scales_for_report(
-            $newdata,
-            $this->feedbacksettings,
-            $existingdata['teststrategy']
-        );
-
-        $catscaleid = 0;
-        foreach ($personabilitiesfeedbackeditor as $catscale => $personability) {
-            if (isset($personability['excluded']) && $personability['excluded']) {
-                continue;
-            }
-            if (isset($personability['primary'])) {
-                $catscaleid = $catscale;
-                $ability = $personability['value'];
-                break;
-            }
-        }
-
-        if (empty($catscaleid) || !isset($ability)) {
+        $catscaleid = $quizsettings->catquiz_catscales;
+        $abilities = $progress->get_abilities();
+        if (!array_key_exists($catscaleid, $abilities)) {
             return [];
-        };
+        }
+        $ability = $abilities[$catscaleid];
 
-        // Just keep the parameters for the primary scale, because that's the one we want to compare.
+        // Just keep the parameters for the global scale, because that's the one we want to compare.
         $personparams = array_filter($personparams, fn ($pp) => $pp->catscaleid == $catscaleid);
 
         // If we do not have enough data to show a meaningful comparison, don't display this feedback.

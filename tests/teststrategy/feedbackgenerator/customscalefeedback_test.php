@@ -15,7 +15,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Tests the filterforsubscale class.
+ * Tests the customscalefeedback class.
  *
  * @package    local_catquiz
  * @author     David Szkiba, Magdalena Holczik
@@ -26,6 +26,7 @@
 namespace local_catquiz;
 
 use basic_testcase;
+use local_catquiz\teststrategy\feedback_helper;
 use local_catquiz\teststrategy\feedbackgenerator\customscalefeedback;
 use local_catquiz\teststrategy\feedbacksettings;
 use local_catquiz\teststrategy\progress;
@@ -41,7 +42,7 @@ use UnexpectedValueException;
  * @copyright  2024 Wunderbyte GmbH <info@wunderbyte.at>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  *
- * @covers \local_catquiz\teststrategy\preselect_task\filterforsubscale
+ * @covers \local_catquiz\teststrategy\preselect_task\customscalefeedback
  */
 class customscalefeedback_test extends basic_testcase {
 
@@ -73,7 +74,7 @@ class customscalefeedback_test extends basic_testcase {
             ->onlyMethods([
                 'get_progress',
             ])
-            ->setConstructorArgs([$feedbacksettings])
+            ->setConstructorArgs([$feedbacksettings, new feedback_helper()])
             ->getMock();
 
         // Configure the stub.

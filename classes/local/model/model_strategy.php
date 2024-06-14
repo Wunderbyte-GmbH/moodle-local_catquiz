@@ -211,7 +211,7 @@ class model_strategy {
             foreach ($this->models as $name => $model) {
                 $oldmodelparams = $this->olditemparams[$name] ?? null;
                 $itemdifficulties[$name] = $model
-                    ->estimate_item_params($personabilities, $oldmodelparams);
+                    ->estimate_item_params($this->responses, $personabilities, $oldmodelparams);
             }
 
             $filtereddiffi = $this->select_item_model($itemdifficulties, $personabilities);
@@ -403,14 +403,13 @@ class model_strategy {
     private function create_installed_models(): array {
         /** @var array<model_model> $instances */
         $instances = [];
-        $ignorelist = ['mixedraschbirnbaum'];
+        $ignorelist = ['mixedraschbirnbaum', 'grmgeneralized'];
 
         foreach (self::get_installed_models() as $name => $classname) {
-            $modelclass = new $classname($this->responses, $name);
             if (in_array($name, $ignorelist)) {
                 continue;
             }
-            $instances[$name] = $modelclass;
+            $instances[$name] = model_model::get_instance($name);
         }
         return $instances;
     }

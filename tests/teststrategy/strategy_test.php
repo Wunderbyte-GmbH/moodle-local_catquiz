@@ -30,11 +30,14 @@ use context_course;
 use context_module;
 use core_question\local\bank\question_edit_contexts;
 use local_catquiz\importer\testitemimporter;
+use local_catquiz\teststrategy\strategy;
 use mod_adaptivequiz\local\attempt\attempt;
 use mod_adaptivequiz\local\question\question_answer_evaluation;
+use PHPUnit\Framework\ExpectationFailedException;
 use question_bank;
 use question_engine;
 use question_usage_by_activity;
+use SebastianBergmann\RecursionContext\InvalidArgumentException;
 
 defined('MOODLE_INTERNAL') || die();
 global $CFG;
@@ -913,53 +916,183 @@ class strategy_test extends advanced_testcase {
                     'maxquestionspersubscale' => -1,
                 ],
             ],
+            'Infer greatest strength P000000' => [
+                'strategy' => LOCAL_CATQUIZ_STRATEGY_HIGHESTSUB,
+                'questions' => [
+                    ['label' => 'SIMB01-18', 'is_correct_response' => false, 'ability_before' => 0.02, 'ability_after' => 0.02],
+                    ['label' => 'SIMA06-15', 'is_correct_response' => false, 'ability_after'  => -0.67],
+                    ['label' => 'SIMA02-02', 'is_correct_response' => false, 'ability_after'  => -1.3],
+                    ['label' => 'SIMA02-19', 'is_correct_response' => false, 'ability_after'  => -1.86],
+                    ['label' => 'SIMA06-02', 'is_correct_response' => false, 'ability_after'  => -2.33],
+                    ['label' => 'SIMA02-17', 'is_correct_response' => false, 'ability_after'  => -2.34],
+                    ['label' => 'SIMB02-00', 'is_correct_response' => false, 'ability_after'  => -3.06],
+                    ['label' => 'SIMB01-17', 'is_correct_response' => false, 'ability_after'  => -3.06],
+                    ['label' => 'SIMB01-12', 'is_correct_response' => false, 'ability_after'  => -3.06],
+                    ['label' => 'SIMA02-04', 'is_correct_response' => false, 'ability_after'  => -3.06],
+                    ['label' => 'SIMB02-02', 'is_correct_response' => false, 'ability_after'  => -3.39],
+                    ['label' => 'SIMB01-13', 'is_correct_response' => false, 'ability_after'  => -3.39],
+                    ['label' => 'SIMA06-12', 'is_correct_response' => false, 'ability_after'  => -3.39],
+                    ['label' => 'SIMA01-16', 'is_correct_response' => true,  'ability_after'  => -3.41],
+                    ['label' => 'SIMA01-19', 'is_correct_response' => false, 'ability_after'  => -3.28],
+                    ['label' => 'SIMA01-12', 'is_correct_response' => false, 'ability_after'  => -3.40],
+                    ['label' => 'SIMA01-13', 'is_correct_response' => true,  'ability_after'  => -3.66],
+                    ['label' => 'SIMA03-03', 'is_correct_response' => true,  'ability_after'  => -3.58],
+                    ['label' => 'SIMA03-16', 'is_correct_response' => true,  'ability_after'  => -3.5],
+                    ['label' => 'SIMA03-13', 'is_correct_response' => true,  'ability_after'  => -3.42],
+                    ['label' => 'SIMA03-19', 'is_correct_response' => true,  'ability_after'  => -3.39],
+                    ['label' => 'SIMA05-07', 'is_correct_response' => false, 'ability_after'  => -3.36],
+                    ['label' => 'SIMA05-00', 'is_correct_response' => false, 'ability_after'  => -3.38],
+                    ['label' => 'SIMA05-15', 'is_correct_response' => false, 'ability_after'  => -3.4],
+                    ['label' => 'SIMA05-14', 'is_correct_response' => false, 'ability_after'  => -3.42],
+                    ['label' => 'FINISH',    'is_correct_response' => false, 'ability_after'  => -3.44],
+                ],
+                'initial_ability' => 0.02,
+                'initial_se' => 2.97,
+                'settings' => [
+                    'pp_min_inc' => 0.1,
+                    'maxquestions' => 25,
+                    'maxquestionspersubscale' => 10,
+                    'minquestionspersubscale' => 3,
+                ],
+                'final_abilities' => [
+                    'Simulation' => -3.44,
+                    'SimA' => -3.44,
+                    'SimA01' => -3.56,
+                    'SimA02' => -3.45,
+                    'SimA03' => -3.32,
+                    'SimA05' => -3.49,
+                    'SimA06' => -3.44,
+                    'SimB' => -3.44,
+                    'SimB01' => -3.44,
+                    'SimB02' => -3.44,
+                ],
+            ],
+            'Infer greatest strength with low ability' => [
+                'strategy' => LOCAL_CATQUIZ_STRATEGY_HIGHESTSUB,
+                'questions' => [
+                    ['label' => 'SIMB01-18', 'is_correct_response' => false, 'ability_before' => 0.02, 'ability_after' => 0.02],
+                    ['label' => 'SIMA06-15', 'is_correct_response' => false, 'ability_after' => -0.67],
+                    ['label' => 'SIMA02-02', 'is_correct_response' => false, 'ability_after' => -1.3],
+                    ['label' => 'SIMA02-19', 'is_correct_response' => false, 'ability_after' => -1.86],
+                    ['label' => 'SIMA06-02', 'is_correct_response' => false, 'ability_after' => -2.33],
+                    ['label' => 'SIMA02-17', 'is_correct_response' => false, 'ability_after' => -2.34],
+                    ['label' => 'SIMB02-00', 'is_correct_response' => false, 'ability_after' => -3.06],
+                    ['label' => 'SIMB01-17', 'is_correct_response' => false, 'ability_after' => -3.06],
+                    ['label' => 'SIMB01-12', 'is_correct_response' => false, 'ability_after' => -3.06],
+                    ['label' => 'SIMA02-04', 'is_correct_response' => false, 'ability_after' => -3.06],
+                    ['label' => 'SIMB02-02', 'is_correct_response' => false, 'ability_after' => -3.39],
+                    ['label' => 'SIMB01-13', 'is_correct_response' => false, 'ability_after' => -3.39],
+                    ['label' => 'SIMA06-12', 'is_correct_response' => false, 'ability_after' => -3.39],
+                    ['label' => 'SIMA01-16', 'is_correct_response' => false, 'ability_after' => -3.41],
+                    ['label' => 'SIMA01-00', 'is_correct_response' => false, 'ability_after' => -4.16],
+                    ['label' => 'SIMA01-01', 'is_correct_response' => false, 'ability_after' => -4.84],
+                    ['label' => 'SIMA03-00', 'is_correct_response' => false, 'ability_after' => -5.05],
+                    ['label' => 'SIMA03-08', 'is_correct_response' => false, 'ability_after' => -5.09],
+                    ['label' => 'SIMA01-09', 'is_correct_response' => true,  'ability_after' => -5.13],
+                    ['label' => 'SIMA03-01', 'is_correct_response' => false, 'ability_after' => -4.87],
+                    ['label' => 'SIMA03-05', 'is_correct_response' => false, 'ability_after' => -4.91],
+                    ['label' => 'SIMC01-16', 'is_correct_response' => false, 'ability_after' => -4.95],
+                    ['label' => 'SIMA03-06', 'is_correct_response' => false, 'ability_after' => -4.95],
+                    ['label' => 'SIMA01-10', 'is_correct_response' => false, 'ability_after' => -4.96],
+                    ['label' => 'SIMC02-08', 'is_correct_response' => false, 'ability_after' => -4.97],
+                    ['label' => 'FINISH', 'is_correct_response' => null, 'ability_after' => -4.98],
+                ],
+                'initial_ability' => 0.02,
+                'initial_se' => 2.97,
+                'settings' => [
+                    'pp_min_inc' => 0.1,
+                    'maxquestions' => 25,
+                    'maxquestionspersubscale' => 10,
+                    'minquestionspersubscale' => 3,
+                ],
+                'final_abilities' => [
+                    'Simulation' => -4.98,
+                    'SimA' => -4.97,
+                    'SimA01' => -4.81,
+                    'SimA02' => -4.98,
+                    'SimA03' => -5.08,
+                    'SimA06' => -4.98,
+                    'SimB' => -4.98,
+                    'SimB01' => -4.98,
+                    'SimB02' => -4.98,
+                ],
+            ],
+            'Infer greatest strength with high ability P000970' => [
+                'strategy' => LOCAL_CATQUIZ_STRATEGY_HIGHESTSUB,
+                'questions' => [
+                    ['label' => 'SIMB01-18', 'is_correct_response' => true, 'ability_before' => 0.02, 'ability_after' => 0.02],
+                    ['label' => 'SIMB03-10', 'is_correct_response' => true, 'ability_after' => 0.76],
+                    ['label' => 'SIMB03-06', 'is_correct_response' => true, 'ability_after' => 1.32],
+                    ['label' => 'SIMB02-12', 'is_correct_response' => true, 'ability_after' => 1.9],
+                    ['label' => 'SIMB02-07', 'is_correct_response' => true, 'ability_after' => 2.6],
+                    ['label' => 'SIMB01-04', 'is_correct_response' => true, 'ability_after' => 3.18],
+                    ['label' => 'SIMB01-01', 'is_correct_response' => true, 'ability_after' => 3.18],
+                    ['label' => 'SIMC10-00', 'is_correct_response' => true, 'ability_after' => 3.2],
+                    ['label' => 'SIMC07-08', 'is_correct_response' => true, 'ability_after' => 3.78],
+                    ['label' => 'SIMC07-09', 'is_correct_response' => true, 'ability_after' => 4.23],
+                    ['label' => 'SIMC09-16', 'is_correct_response' => true, 'ability_after' => 4.5],
+                    ['label' => 'SIMC09-00', 'is_correct_response' => true, 'ability_after' => 4.94],
+                    ['label' => 'SIMC10-15', 'is_correct_response' => true, 'ability_after' => 5.13],
+                    ['label' => 'SIMC10-08', 'is_correct_response' => true, 'ability_after' => 5.13],
+                    ['label' => 'SIMC09-06', 'is_correct_response' => true, 'ability_after' => 5.17],
+                    ['label' => 'SIMC09-11', 'is_correct_response' => true, 'ability_after' => 5.33],
+                    ['label' => 'SIMC07-04', 'is_correct_response' => false, 'ability_after' => 5.53],
+                    ['label' => 'SIMC08-16', 'is_correct_response' => false, 'ability_after' => 5.05],
+                    ['label' => 'SIMC08-12', 'is_correct_response' => true,  'ability_after' => 4.87],
+                    ['label' => 'SIMC04-15', 'is_correct_response' => true, 'ability_after' => 4.94],
+                    ['label' => 'SIMC04-00', 'is_correct_response' => true, 'ability_after' => 4.97],
+                    ['label' => 'SIMC04-14', 'is_correct_response' => true, 'ability_after' => 4.98],
+                    ['label' => 'SIMC10-06', 'is_correct_response' => true, 'ability_after' => 4.99],
+                    ['label' => 'SIMC04-18', 'is_correct_response' => true, 'ability_after' => 5.00],
+                    ['label' => 'SIMC09-14', 'is_correct_response' => false, 'ability_after' => 5.01],
+                    ['label' => 'FINISH', 'is_correct_response' => null, 'ability_after' => 4.95],
+                ],
+                'initial_ability' => 0.02,
+                'initial_se' => 2.97,
+                'settings' => [
+                    'pp_min_inc' => 0.1,
+                    'maxquestions' => 25,
+                    'maxquestionspersubscale' => 10,
+                    'minquestionspersubscale' => 3,
+                ],
+                'final_abilities' => [
+                    'Simulation' => 4.95,
+                    'SimB' => 4.95,
+                    'SimB01' => 4.95,
+                    'SimB02' => 4.95,
+                    'SimB03' => 4.95,
+                    'SimC' => 4.95,
+                    'SimC04' => 5.00,
+                    'SimC07' => 4.23,
+                    'SimC08' => 4.88,
+                    'SimC09' => 5.12,
+                    'SimC10' => 4.96,
+                ],
+            ],
             // phpcs:disable
-            //'Infer greatest strength' => [
-            //    'strategy' => LOCAL_CATQUIZ_STRATEGY_HIGHESTSUB,
-            //    'questions' => [
-            //        [
-            //            'label' => 'SIMB01-18',
-            //            'is_correct_response' => true,
-            //            'ability_before' => 0,
-            //            'ability_after' => 0.0,
-            //        ],
-            //        [
-            //            'label' => 'SIMA01-15',
-            //            'is_correct_response' => false,
-            //            'ability_before' => 0,
-            //            'ability_after' => 2.5,
-            //        ],
-            //        [
-            //            'label' => 'SIMA02-03',
-            //            'is_correct_response' => true,
-            //            'ability_before' => 2.5,
-            //            'ability_after' => 0.5539,
-            //        ],
-            //    ],
-            //],
-            //'Infer all subscales' => [
-            //    'strategy' => LOCAL_CATQUIZ_STRATEGY_ALLSUBS,
-            //    'questions' => [
-            //        [
-            //            'label' => 'SIMB01-18',
-            //            'is_correct_response' => true,
-            //            'ability_before' => 0,
-            //            'ability_after' => 0.0,
-            //        ],
-            //        [
-            //            'label' => 'SIMB02-07',
-            //            'is_correct_response' => false,
-            //            'ability_before' => 0,
-            //            'ability_after' => 2.5,
-            //        ],
-            //        [
-            //            'label' => 'SIMB03-06',
-            //            'is_correct_response' => true,
-            //            'ability_before' => 2.5,
-            //            'ability_after' => 1.1569,
-            //        ],
-            //    ],
-            //],
+            // 'Infer all subscales' => [
+            // 'strategy' => LOCAL_CATQUIZ_STRATEGY_ALLSUBS,
+            // 'questions' => [
+            // [
+            // 'label' => 'SIMB01-18',
+            // 'is_correct_response' => true,
+            // 'ability_before' => 0,
+            // 'ability_after' => 0.0,
+            // ],
+            // [
+            // 'label' => 'SIMB02-07',
+            // 'is_correct_response' => false,
+            // 'ability_before' => 0,
+            // 'ability_after' => 2.5,
+            // ],
+            // [
+            // 'label' => 'SIMB03-06',
+            // 'is_correct_response' => true,
+            // 'ability_before' => 2.5,
+            // 'ability_after' => 1.1569,
+            // ],
+            // ],
+            // ],
             // phpcs:enable
         ];
     }
@@ -1076,6 +1209,12 @@ class strategy_test extends advanced_testcase {
     private function createtestenvironment(int $strategyid, array $settings): testenvironment {
         global $DB;
         $catscale = $DB->get_record('local_catquiz_catscales', ['parentid' => 0]);
+
+        // Update allowed min/max ability values for tests.
+        $catscale->minscalevalue = -10.0;
+        $catscale->maxscalevalue = 10.0;
+        $DB->update_record('local_catquiz_catscales', $catscale);
+
         $this->catscaleid = $catscale->id;
         $json = file_get_contents(__DIR__ . '/../fixtures/testenvironment.json');
         $jsondata = json_decode($json);
@@ -1093,6 +1232,7 @@ class strategy_test extends advanced_testcase {
         $jsondata->maxquestionsgroup->catquiz_maxquestions = $settings['maxquestions'] ?? 25;
         $jsondata->maxquestionsgroup->catquiz_minquestions = 0;
         $jsondata->maxquestionsscalegroup->catquiz_maxquestionspersubscale = $settings['maxquestionspersubscale'] ?? 10;
+        $jsondata->maxquestionsscalegroup->catquiz_minquestionspersubscale = $settings['minquestionspersubscale'] ?? 1;
         $jsondata->catquiz_pp_min_inc = $settings['pp_min_inc'] ?? 0.01;
         if ($pilotratio = $settings['pilot_ratio'] ?? null) {
             $jsondata->catquiz_includepilotquestions = true;

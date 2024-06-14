@@ -101,6 +101,19 @@ $string['peritem'] = 'per item ';
 $string['applychanges'] = 'Apply Changes';
 $string['automatic_reload_on_scale_selection'] = 'Form reload on scale selection';
 $string['automatic_reload_on_scale_selection_description'] = 'Reload quizsettings form automatically on (sub-)scale selection';
+$string['enrol_only_to_reported_scales'] = 'Enrol users only to courses of detected primary scale(s).';
+$string['enrol_only_to_reported_scales_help'] = 'Standard would be to enrol users according to results in areas detected according to the purpose of the test.
+If you uncheck this option, users will be enroled according to all other valid results as well.'; // TODO: get translation.
+$string['time_penalty_threshold_name'] = 'Recurrence delay in days';
+$string['time_penalty_threshold_desc'] = 'A question that has already been
+    answered by a user in a previous test attempt is only asked again with a
+    reduced probability. The probability depends on the duration between the
+    previous and the current attempt. The longer the given recurrence delay,
+    the longer this protection against repeated questions is effective.';
+$string['store_debug_info_name'] = 'Stelle debug Informationen zur Verfügung';
+$string['store_debug_info_desc'] = 'Wenn diese Option aktiviert ist, werden
+    zusätzliche Daten gespeichert und als CSV Datei zur Verfügung gestellt.
+    Dadurch steigt der benötigte Speicherplatz.';
 
 $string['timeoutabortnoresult'] = 'Test aborted without result.';
 $string['timeoutabortresult'] = 'Test aborted with result.';
@@ -458,6 +471,11 @@ $string['teacherfeedback'] = "Feedback for teachers";
 $string['catquiz_feedbackheader'] = "Feedback";
 $string['catquizfeedbackheader'] = 'Feedback for "{$a}"';
 $string['feedbacknumber'] = 'Feedback for range {$a}';
+$string['feedbackrange'] = 'Ability level {$a}';
+$string['hasability'] = 'Ability was calculated';
+$string['responsesbyusercharttitle'] = 'Total number of responses per person';
+$string['noresult'] = 'No ability was calculated';
+$string['selected_scales_all_ranges_label'] = 'Number of participants';
 $string['noselection'] = "No selection";
 $string['lowerlimit'] = "Lower limit";
 $string['upperlimit'] = "Upper limit";
@@ -508,7 +526,7 @@ $string['error:noscalestoreport'] = "There is no feedback available because no t
 $string['chartlegendabilityrelative'] = '{$a->difference} (Compared to parentscale); {$a->ability} (ability score of scale)';
 $string['personabilitycharttitle'] = 'Relative ability score in subscales compared to {$a}';
 $string['personabilitytitle'] = 'Ability score in subscales';
-$string['itemsplayed'] = 'evaluated items:';
+$string['itemsplayed'] = 'evaluated items';
 $string['personabilityinscale'] = 'Ability score in scale "{$a}"';
 $string['yourscorein'] = 'Your average scores in "{$a}"';
 $string['scoreofpeers'] = 'Average of your peers';
@@ -520,6 +538,7 @@ $string['attemptchartstitle'] = 'Number and results of attempts in scale "{$a}"'
 $string['personabilityrangestring'] = '{$a->rangestart} - {$a->rangeend}';
 $string['testinfolabel'] = 'Test information';
 $string['scalescorechartlabel'] = '{$a}-Score';
+$string['chart_detectedscales_title'] = 'Detected scales';
 
 // Check display line breaks etc.
 $string['choosesubscaleforfeedback_help'] = 'You can now store <number of options> feedback informations for the subscales displayed. Select a (sub-)scale to enter your feedback. The colored symbols indicate the current status of processing, measured by the number of feedback options you entered:
@@ -620,6 +639,31 @@ $string['shortcodeslistofquizattempts'] = 'Returns a table of quiz attempts.';
 $string['catquizfeedback'] = 'Returns an overview of the last quiz attempts.';
 $string['shortcodescatquizfeedback'] = 'Display feedback for quiz attempts';
 $string['shortcodescatscalesoverview'] = 'Display catscales overview.';
+$string['shortcodescatquizstatistics'] = 'Display statistics for a CAT test';
+$string['catquizstatisticsnodata'] = 'No attempt data available for the given settings';
+$string['catquizstatistics_h1_single'] = 'Statistik zu Test {$a}';
+$string['catquizstatistics_h2_single'] = 'The following data are from test {$a->link} that uses the scale {$a->scale}.';
+$string['catquizstatistics_h1_scale'] = 'Statistics for scale {$a->scalename} in course {$a->coursename}.';
+$string['catquizstatistics_h2_scale'] = 'The following data are from tests {$a->linkedcourses} in course {$a->coursename}. They use the scale {$a->scale}.';
+$string['catquizstatistics_h1_global'] = 'Statistics of scale {$a} in moodle instance';
+$string['catquizstatistics_h2_global'] = 'The following data are from all users
+    that participated in tests on this moodle instance using
+    scale {$a} as main scale.';
+$string['catquizstatistics_timerange_both'] = 'Only data between {$a->starttime} and {$a->endtime} are used.';
+$string['catquizstatistics_timerange_start'] = 'Only data after {$a->starttime} are used.';
+$string['catquizstatistics_timerange_end'] = 'Only data before {$a->endtime} are used.';
+$string['catquizstatistics_numattempts_title'] = 'Number of attempts';
+$string['catquizstatistics_numattemptsperperson_title'] = 'Attempts per person';
+$string['catquizstatistics_overview'] = 'Overview';
+$string['catquizstatistics_testusage'] = 'Testusage';
+$string['catquizstatistics_progress_peers_title'] = 'Average result of your peers in scale "{$a}"';
+$string['catquizstatistics_progress_personal_title'] = 'Your personal results for that scale';
+$string['catquizstatistics_numberofresponses'] = 'Number of responses';
+$string['catquizstatistics_exportcsv_heading'] = 'Export data of selected attempts as CSV';
+$string['catquizstatistics_nodataforcourse'] = 'There are no CAT tests for the given courseid';
+$string['catquizstatistics_askforparams'] = 'Please provide a "globalscale" or "courseid" parameter';
+$string['catquizstatistics_scale_testid_conflict'] = 'The test for the given testid is not using the provided scale';
+$string['catquizstatistics_scale_course_conflict'] = 'The given testid is not part of the given course';
 
 // Validation.
 $string['valuemustbegreaterzero'] = 'Value must be greater than zero.';

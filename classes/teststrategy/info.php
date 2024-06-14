@@ -82,9 +82,11 @@ class info {
     /**
      * Returns all test strategies
      *
+     * @param bool $onlyactive Only return strategies that are marked as active
+     *
      * @return strategy[]
      */
-    public static function return_available_strategies() {
+    public static function return_available_strategies(bool $onlyactive = true) {
         global $CFG;
         require_once($CFG->dirroot . '/local/catquiz/lib.php');
 
@@ -101,7 +103,9 @@ class info {
         $classnames = array_keys($strategies);
 
         $strategies = array_map(fn($x) => new $x(), $classnames);
-        $strategies = array_filter($strategies, fn ($strategy) => $strategy::ACTIVE);
+        if ($onlyactive) {
+            $strategies = array_filter($strategies, fn ($strategy) => $strategy::ACTIVE);
+        }
 
         $cache->set('all', $strategies);
         foreach ($strategies as $strategy) {
@@ -114,11 +118,12 @@ class info {
      * Get test strategy.
      *
      * @param int $id
+     * @param bool $onlyactive Return only strategies marked as active
      *
      * @return mixed
      *
      */
-    public static function get_teststrategy(int $id) {
+    public static function get_teststrategy(int $id, bool $onlyactive = true) {
         global $CFG;
         require_once($CFG->dirroot . '/local/catquiz/lib.php');
 
@@ -128,7 +133,7 @@ class info {
         }
 
         $strategy = array_filter(
-                self::return_available_strategies(),
+                self::return_available_strategies($onlyactive),
                 fn ($strategy) => $strategy->id == $id
         );
         return reset($strategy);

@@ -25,18 +25,17 @@
 
 namespace local_catquiz\teststrategy\feedbackgenerator;
 
-use cache;
 use core\chart_bar;
 use core\chart_line;
 use core\chart_series;
 use local_catquiz\catquiz;
 use local_catquiz\catscale;
 use local_catquiz\feedback\feedbackclass;
+use local_catquiz\local\model\model_model;
 use local_catquiz\output\catscalemanager\questions\cards\questionpreview;
+use local_catquiz\teststrategy\feedback_helper;
 use local_catquiz\teststrategy\feedbackgenerator;
-use local_catquiz\teststrategy\feedbacksettings;
 use local_catquiz\local\model\model_strategy;
-use local_catquiz\teststrategy\progress;
 use stdClass;
 
 defined('MOODLE_INTERNAL') || die();
@@ -54,35 +53,10 @@ require_once($CFG->dirroot.'/local/catquiz/lib.php');
 class learningprogress extends feedbackgenerator {
 
     /**
-     * @var string
-     */
-    const FALLBACK_MODEL = 'mixedraschbirnbaum';
-
-    /**
-     *
-     * @var stdClass $feedbacksettings.
-     */
-    public feedbacksettings $feedbacksettings;
-
-    /**
      *
      * @var int $primaryscaleid // The scale to be displayed in detail in the colorbar.
      */
     public int $primaryscaleid;
-
-    /**
-     * Creates a new personabilities feedback generator.
-     *
-     * @param feedbacksettings $feedbacksettings
-     */
-    public function __construct(feedbacksettings $feedbacksettings) {
-
-        if (!isset($feedbacksettings)) {
-            return;
-        }
-
-        $this->feedbacksettings = $feedbacksettings;
-    }
 
     /**
      * For specific feedbackdata defined in generators.
@@ -215,7 +189,6 @@ class learningprogress extends feedbackgenerator {
         if ($personabilities === []) {
             return null;
         }
-        $quizsettings = $progress->get_quiz_settings();
         $catscales = $newdata['catscales'];
 
         // Make sure that only feedback defined by strategy is rendered.
@@ -227,7 +200,7 @@ class learningprogress extends feedbackgenerator {
 
         $personabilities = [];
         // Ability range is the same for all scales with same root scale.
-        $abiltiyrange = $this->get_ability_range(array_key_first($catscales));
+        $abiltiyrange = $this->feedbackhelper->get_ability_range(array_key_first($catscales));
         foreach ($personabilitiesfeedbackeditor as $catscale => $personability) {
             if (isset($personability['excluded']) && $personability['excluded']) {
                 continue;
@@ -261,7 +234,7 @@ class learningprogress extends feedbackgenerator {
      */
     private function apply_sorting(array &$personabilities, int $selectedscaleid) {
         // Sort the array and put primary scale first.
-        if ($this->feedbacksettings->sortorder == LOCAL_CATQUIZ_SORTORDER_ASC) {
+        if ($this->feedbacksettings->is_sorted_ascending()) {
             asort($personabilities);
         } else {
             arsort($personabilities);
@@ -372,7 +345,7 @@ class learningprogress extends feedbackgenerator {
         if (isset($initialcontext['personabilities_abilities'][$primarycatscale['id']]['abilityrange'])) {
             $abilityrange = $initialcontext['personabilities_abilities'][$primarycatscale['id']]['abilityrange'];
         } else {
-            $abilityrange = $this->get_ability_range($primarycatscale['id']);
+            $abilityrange = $this->feedbackhelper->get_ability_range($primarycatscale['id']);
         };
 
         $ul = (float) $abilityrange['maxscalevalue'];
@@ -380,19 +353,22 @@ class learningprogress extends feedbackgenerator {
         for ($i = $ll + $abilitystep; $i <= ($ul - $abilitystep); $i += $interval) {
             $abilitysteps[] = $i;
         }
-        $items = $this->get_testitems_for_catscale($primarycatscale['id'], $initialcontext['contextid'], true);
+        $items = $this->feedbackhelper->get_testitems_for_catscale($primarycatscale['id'], $initialcontext['contextid'], true);
         // Prepare data for test information line.
 
         $models = model_strategy::get_installed_models();
         $fisherinfos = [];
         foreach ($items as $item) {
-            $key = $item->model;
-            $model = $models[$key] ?? LOCAL_CATQUIZ_FALLBACK_MODEL;
+            // We can not calculate the fisher information for items without a model.
+            if (!$item->model) {
+                continue;
+            }
+            $model = model_model::get_instance($item->model);
             foreach ($model::get_parameter_names() as $paramname) {
                 $params[$paramname] = floatval($item->$paramname);
             }
             foreach ($abilitysteps as $ability) {
-                $fisherinformation = $model::fisher_info(
+                $fisherinformation = $model->fisher_info(
                     ['ability' => $ability],
                     $params
                 );
@@ -407,7 +383,7 @@ class learningprogress extends feedbackgenerator {
 
         }
 
-        $fisherinfos = $this->get_fisherinfos_of_items($items, $models, $abilitysteps);
+        $fisherinfos = $this->feedbackhelper->get_fisherinfos_of_items($items, $models, $abilitysteps);
         $fi = json_encode($fisherinfos);
         // Prepare data for scorecounter bars.
         $abilityrecords = $DB->get_records('local_catquiz_personparams', ['catscaleid' => $primarycatscale['id']]);
@@ -416,14 +392,14 @@ class learningprogress extends feedbackgenerator {
             $counter = 0;
             foreach ($abilityrecords as $record) {
                 $a = floatval($record->ability);
-                $ability = $this->round_to_customsteps($a, $abilitystep, $interval);
+                $ability = $this->feedbackhelper->round_to_customsteps($a, $abilitystep, $interval);
                 if ($ability != $as) {
                     continue;
                 } else {
                     $counter ++;
                 }
             }
-            $colorvalue = $this->get_color_for_personability(
+            $colorvalue = $this->feedbackhelper->get_color_for_personability(
                 (array) $this->get_progress()->get_quiz_settings(),
                 $as,
                 intval($primarycatscale['id'])
@@ -433,7 +409,7 @@ class learningprogress extends feedbackgenerator {
             $abilityseries['colors'][$abilitystring] = $colorvalue;
         }
         // Scale the values of $fisherinfos before creating chart series.
-        $scaledtiseries = $this->scalevalues(array_values($fisherinfos), array_values($abilityseries['counter']));
+        $scaledtiseries = $this->feedbackhelper->scalevalues(array_values($fisherinfos), array_values($abilityseries['counter']));
 
         $scalename = $initialcontext['personabilities_abilities'][$primarycatscale['id']]['name'];
         $aserieslabel = get_string('scalescorechartlabel', 'local_catquiz', $scalename);
@@ -455,104 +431,6 @@ class learningprogress extends feedbackgenerator {
             'chart' => $out,
             'charttitle' => get_string('abilityprofile', 'local_catquiz', $primarycatscale['name']),
         ];
-    }
-
-    /**
-     * Get fisherinfos of item for each abilitystep.
-     *
-     * @param array $items
-     * @param array $models
-     * @param array $abilitysteps
-     *
-     * @return array
-     */
-    public function get_fisherinfos_of_items(array $items, array $models, array $abilitysteps): array {
-        $fisherinfos = [];
-        foreach ($items as $item) {
-            $key = $item->model;
-            $model = $models[$key] ?? $models[self::FALLBACK_MODEL];
-            foreach ($model::get_parameter_names() as $paramname) {
-                $params[$paramname] = floatval($item->$paramname);
-            }
-            foreach ($abilitysteps as $ability) {
-                $fisherinformation = $model::fisher_info(
-                    ['ability' => $ability],
-                    $params
-                );
-                $stringkey = strval($ability);
-
-                if (!isset($fisherinfos[$stringkey])) {
-                    $fisherinfos[$stringkey] = $fisherinformation;
-                } else {
-                    $fisherinfos[$stringkey] += $fisherinformation;
-                }
-            }
-
-        }
-        return $fisherinfos;
-    }
-
-    /**
-     * For testing, this is called here.
-     *
-     * @param int $catscaleid
-     * @param int $contextid
-     * @param bool $includesubscales
-     *
-     * @return array
-     *
-     */
-    public function get_testitems_for_catscale(int $catscaleid, int $contextid, bool $includesubscales) {
-        $catscale = new catscale($catscaleid);
-        // Prepare data for test information line.
-        return $catscale->get_testitems($contextid, $includesubscales);
-    }
-
-    /**
-     * Round float to steps as defined.
-     *
-     * @param float $number
-     * @param float $step
-     * @param float $interval
-     *
-     * @return float
-     */
-    private function round_to_customsteps(float $number, float $step, float $interval): float {
-        $roundedvalue = round($number / $step) * $step;
-
-        // Exclude rounding to steps defined in $interval.
-        if ($roundedvalue - floor($roundedvalue) == $interval) {
-            $roundedvalue = floor($roundedvalue) + $step;
-        }
-
-        return $roundedvalue;
-    }
-
-    /**
-     * Scale values of testinfo (sum of fisherinfos) for better display in chart.
-     *
-     * @param array $fisherinfos
-     * @param array $attemptscounter
-     *
-     * @return array
-     */
-    private function scalevalues($fisherinfos, $attemptscounter) {
-        // Find the maximum values in arrays.
-        $maxattempts = max($attemptscounter);
-        $maxfisherinfo = max($fisherinfos);
-
-        // Avoid division by zero.
-        if ($maxfisherinfo == 0 || $maxattempts == 0) {
-            return $fisherinfos;
-        }
-
-        $scalingfactor = $maxattempts / $maxfisherinfo;
-
-        // Scale the values in $fisherinfos based on the scaling factor.
-        foreach ($fisherinfos as &$value) {
-            $value *= $scalingfactor;
-        }
-        return $fisherinfos;
     }
 
     /**
@@ -605,7 +483,7 @@ class learningprogress extends feedbackgenerator {
             }
         }
         $beginningoftimerange = intval($startingrecord->endtime);
-        $timerange = $this->get_timerange_for_attempts($beginningoftimerange, $endtime);
+        $timerange = feedback_helper::get_timerange_for_attempts($beginningoftimerange, $endtime);
 
         $attemptsofuser = array_filter($records, fn($r) => $r->userid == $userid);
         $attemptsofpeers = array_filter($records, fn($r) => $r->userid != $userid);
@@ -628,31 +506,6 @@ class learningprogress extends feedbackgenerator {
             'comparison' => $progresscomparison,
         ];
 
-    }
-    /**
-     * Return value to define range of time average.
-     *
-     * @param int $beginningoftimerange
-     * @param int $endtime
-     *
-     * @return int
-     *
-     */
-    public static function get_timerange_for_attempts(int $beginningoftimerange, int $endtime) {
-        $differenceindays = ($endtime - $beginningoftimerange) / (60 * 60 * 24);
-        $range = LOCAL_CATQUIZ_TIMERANGE_DAY;
-
-        if ($differenceindays <= 30) {
-            $range = LOCAL_CATQUIZ_TIMERANGE_DAY;
-        } else if ($differenceindays > 30 && $differenceindays <= 183) {
-            $range = LOCAL_CATQUIZ_TIMERANGE_WEEK;
-        } else if ($differenceindays > 183 && $differenceindays <= 730) {
-            $range = LOCAL_CATQUIZ_TIMERANGE_MONTH;
-        } else {
-            $range = LOCAL_CATQUIZ_TIMERANGE_QUARTEROFYEAR;
-        }
-
-         return $range;
     }
 
     /**
@@ -726,12 +579,12 @@ class learningprogress extends feedbackgenerator {
         $chart = new chart_line();
         $chart->set_smooth(true); // Calling set_smooth() passing true as parameter, will display smooth lines.
 
-        $orderedattemptspeers = self::order_attempts_by_timerange($attemptsofpeers, $scaleid, $timerange);
+        $orderedattemptspeers = feedback_helper::order_attempts_by_timerange($attemptsofpeers, $scaleid, $timerange);
         $pa = $this->assign_average_result_to_timerange($orderedattemptspeers);
-        $orderedattemptsuser = self::order_attempts_by_timerange($attemptsofuser, $scaleid, $timerange);
+        $orderedattemptsuser = feedback_helper::order_attempts_by_timerange($attemptsofuser, $scaleid, $timerange);
         $ua = $this->assign_average_result_to_timerange($orderedattemptsuser);
 
-        $alldates = self::get_timerangekeys($timerange, $beginningandendofrange);
+        $alldates = feedback_helper::get_timerangekeys($timerange, $beginningandendofrange);
         $peerattemptsbydate = [];
         $userattemptsbydate = [];
         $firstvalue = true;
@@ -865,87 +718,6 @@ class learningprogress extends feedbackgenerator {
     }
 
     /**
-     * Return average of personabilities ordered by date of quizattempt.
-     *
-     * @param array $attempts
-     * @param int $scaleid
-     * @param int $timerange
-     *
-     * @return array
-     *
-     */
-    public static function order_attempts_by_timerange(array $attempts, int $scaleid, int $timerange) {
-
-        $attemptsbytimerange = [];
-
-        // Create new array with endtime and sort. Create entry for each day.
-        foreach ($attempts as $attempt) {
-            $data = json_decode($attempt->json);
-            if (empty($attempt->endtime)) {
-                continue;
-            }
-            $datestring = self::return_datestring_label($timerange, $attempt->endtime);
-
-            if (!empty($data->personabilities->$scaleid)) {
-                if (!isset($attemptsbytimerange[$datestring])) {
-                    $attemptsbytimerange[$datestring] = [];
-                }
-                $attemptsbytimerange[$datestring][] = $data->personabilities->$scaleid;
-            }
-        }
-        return $attemptsbytimerange;
-    }
-
-    /**
-     * Returns the label for the given date according to format defined in timerange constant.
-     *
-     * @param int $timerange
-     * @param int $timestamp
-     *
-     * @return string
-     *
-     */
-    public static function return_datestring_label(int $timerange, int $timestamp): string {
-        switch ($timerange) {
-            case LOCAL_CATQUIZ_TIMERANGE_DAY:
-                $dateformat = '%d.%m.%Y';
-                $stringfordate = 'day';
-                break;
-            case LOCAL_CATQUIZ_TIMERANGE_WEEK:
-                $dateformat = '%W';
-                $stringfordate = 'week';
-                break;
-            case LOCAL_CATQUIZ_TIMERANGE_MONTH:
-                $dateformat = '%m';
-                $stringfordate = 'month';
-                break;
-            case LOCAL_CATQUIZ_TIMERANGE_QUARTEROFYEAR:
-                $dateformat = '%m';
-                $year = '%Y';
-                $stringfordate = 'quarter';
-                break;
-        }
-
-        $date = userdate($timestamp, $dateformat);
-
-        if ($timerange === LOCAL_CATQUIZ_TIMERANGE_QUARTEROFYEAR) {
-            $date = ceil($date / 3); // Divides the number of the month (4 for april) in order to get the quarter.
-            $year = userdate($timestamp, $year);
-            return get_string(
-                'stringdate:quarter',
-                'local_catquiz',
-                [
-                    'q' => $date,
-                    'y' => $year,
-                ]);
-        } else if ($timerange === LOCAL_CATQUIZ_TIMERANGE_MONTH) {
-            return get_string('stringdate:month:' . $date, 'local_catquiz');
-        } else {
-            return get_string('stringdate:' . $stringfordate, 'local_catquiz', $date);
-        }
-    }
-
-    /**
      * Assign average of result for each period.
      * @param array $attemptsbytimerange
      *
@@ -959,28 +731,6 @@ class learningprogress extends feedbackgenerator {
             $attemptsbytimerange[$date] = $average;
         }
         return $attemptsbytimerange;
-    }
-    /**
-     * Return keys for all moments in defined timerange.
-     *
-     * @param int $timerange
-     * @param array $beginningandendofrange
-     *
-     * @return array
-     *
-     */
-    public static function get_timerangekeys($timerange, $beginningandendofrange) {
-        $result = [];
-        $currenttimestamp = $beginningandendofrange[0];
-        $endtimestamp = $beginningandendofrange[1];
-
-        while ($currenttimestamp <= $endtimestamp) {
-            $val = self::return_datestring_label($timerange, $currenttimestamp);
-            $result[$val] = $val;
-            $currenttimestamp = strtotime('+1 day', $currenttimestamp);
-        }
-
-        return $result;
     }
 
     /**

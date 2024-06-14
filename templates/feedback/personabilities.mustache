@@ -32,14 +32,6 @@
                     {
                         "noplayed": "0"
                     }
-                ],
-                "questionpreviews": [
-                    {
-                        "preview": "<div>...</div>"
-                    },
-                    {
-                        "preview": "<div>...</div>"
-                    }
                 ]
             },
             {
@@ -51,14 +43,6 @@
                 "numberofitemsplayed": [
                     {
                         "itemsplayed": "3"
-                    }
-                ],
-                "questionpreviews": [
-                    {
-                        "preview": "<div>...</div>"
-                    },
-                    {
-                        "preview": "<div>...</div>"
                     }
                 ]
             }
@@ -99,20 +83,11 @@
             {{ability}} ({{#str}}standarderror, local_catquiz{{/str}}: {{standarderror}})
         </div>
         {{#itemsplayed}}
-            <div class="btn btn-light btn-sm col" data-toggle="modal" data-target=".catquizfeedbackabilitiesplayedquestions_{{catscaleid}}">
+            <span>
                 {{itemsplayed}} {{#str}}itemsplayed, local_catquiz{{/str}}
-            </div>
+            </span>
         {{/itemsplayed}}
         {{/numberofitemsplayed}}
-        <div class="modal fade bd-example-modal-xl catquizfeedbackabilitiesplayedquestions_{{catscaleid}}" tabindex="-1" role="dialog" aria-hidden="true">
-        <div class="modal-dialog modal-xl">
-            <div class="modal-content">
-                {{#questionpreviews}}
-                    <br> {{{preview}}} <br>
-                {{/questionpreviews}}
-            </div>
-        </div>
-        </div>
     </div>
     {{/abilities}}
 </div>

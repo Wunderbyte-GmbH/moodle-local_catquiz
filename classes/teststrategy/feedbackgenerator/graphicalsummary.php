@@ -24,16 +24,12 @@
 
 namespace local_catquiz\teststrategy\feedbackgenerator;
 
-use cache;
 use html_table;
 use html_writer;
-use local_catquiz\catquiz;
 use local_catquiz\catscale;
-use local_catquiz\feedback\feedbackclass;
 use local_catquiz\teststrategy\feedbackgenerator;
 use local_catquiz\teststrategy\feedbacksettings;
 use local_catquiz\teststrategy\info;
-use local_catquiz\teststrategy\progress;
 
 /**
  * Compare the ability of this attempt to the average abilities of other students that took this test.
@@ -43,22 +39,6 @@ use local_catquiz\teststrategy\progress;
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class graphicalsummary extends feedbackgenerator {
-
-    /**
-     *
-     * @var stdClass $feedbacksettings.
-     */
-    public feedbacksettings $feedbacksettings;
-
-    /**
-     * Creates a new customscale feedback generator.
-     *
-     * @param feedbacksettings $feedbacksettings
-     */
-    public function __construct(feedbacksettings $feedbacksettings) {
-
-        $this->feedbacksettings = $feedbacksettings;
-    }
 
     /**
      * Get student feedback.
@@ -72,28 +52,23 @@ class graphicalsummary extends feedbackgenerator {
         global $OUTPUT;
 
         if (isset($feedbackdata['graphicalsummary_data'])) {
-            $chart = $this->render_chart($feedbackdata['graphicalsummary_data']);
+            $primaryscaleid = null;
+            if (array_key_exists('graphicalsummary_primaryscale', $feedbackdata)) {
+                $primaryscaleid = array_key_first($feedbackdata['graphicalsummary_primaryscale']);
+            }
+            $chart = $this->render_chart(
+                $feedbackdata['graphicalsummary_data'],
+                $primaryscaleid,
+                $feedbackdata['graphicalsummary_otherscales'] ?? []
+            );
         }
         if (isset($feedbackdata['graphicalsummary_data'])) {
             $table = $this->render_table($feedbackdata['graphicalsummary_data']);
         }
 
-        $catscaleid = $feedbackdata['catscaleid'];
-
-        $catscale = catscale::return_catscale_object($catscaleid);
-
-        $participationcharts = $this->render_participationcharts(
-            $feedbackdata,
-            $catscaleid,
-            $feedbackdata['catscaleid'],
-            $catscale->name);
-
         $data['chart'] = $chart ?? "";
         $data['strategyname'] = $feedbackdata['teststrategyname'] ?? "";
         $data['table'] = $table ?? "";
-
-        $data['attemptscounterchart'] = $participationcharts['attemptscounterchart']['chart'] ?? "";
-        $data['attemptresultstackchart'] = $participationcharts['attemptresultstackchart']['chart'] ?? "";
 
         $feedback = $OUTPUT->render_from_template(
             'local_catquiz/feedback/graphicalsummary',
@@ -197,27 +172,30 @@ class graphicalsummary extends feedbackgenerator {
         }
         $lastquestion = $progress->get_playedquestions()[$lastresponse['qid']];
 
+        $abilitieslist = $this->select_scales_for_report($newdata, $this->feedbacksettings, $existingdata['teststrategy']);
+        $primaryscale = array_filter($abilitieslist, fn ($a) => array_key_exists('primary', $a) && $a['primary'] === true);
+
         // Append the data from the latest response to the existing graphical summary.
         $graphicalsummary = $existingdata['graphicalsummary_data'] ?? [];
         $new = [];
         $new['id'] = $lastquestion->id;
         $new['questionname'] = $lastquestion->name;
-        $new['lastresponse'] = $lastresponse['fraction'];
+        $new['lastresponse'] = round($lastresponse['fraction'], self::PRECISION);
         $new['difficulty'] = $lastquestion->difficulty;
         $new['questionscale'] = $lastquestion->catscaleid;
         $new['questionscale_name'] = catscale::return_catscale_object(
             $lastquestion->catscaleid
         )->name;
-        $new['fisherinformation'] = $lastquestion
-            ->fisherinformation[$existingdata['catscaleid']] ?? null;
-        $new['score'] = $lastquestion->score ?? null;
-        $new['difficultynextbefore'] = null;
-        $new['difficultynextafter'] = null;
-        $new['personability_after'] = $newdata['person_ability'][$newdata['catscaleid']];
-        $new['personability_before'] =
-            $existingdata['personabilities'][$existingdata['catscaleid']]['value'] ?? null;
+        $new['fisherinformation'] = $lastquestion->is_pilot
+            ? null
+            : $this->get_rounded_or_null($lastquestion->fisherinformation, $existingdata['catscaleid']);
+        $new['personability_after'] = round($newdata['person_ability'][$newdata['catscaleid']], self::PRECISION);
 
         $graphicalsummary[] = $new;
+        $otherscales = $existingdata['graphicalsummary_otherscales'] ?? [];
+        foreach ($this->get_progress()->get_abilities() as $scaleid => $value) {
+            $otherscales[$scaleid][] = round($value, self::PRECISION);
+        }
 
         $teststrategyname = get_string(
             'teststrategy',
@@ -229,7 +207,9 @@ class graphicalsummary extends feedbackgenerator {
         return [
             'graphicalsummary_data' => $graphicalsummary,
             'teststrategyname' => $teststrategyname,
-            'personabilities' => $progress->get_abilities(),
+            'personabilities' => $progress->get_abilities(true),
+            'graphicalsummary_primaryscale' => $primaryscale,
+            'graphicalsummary_otherscales' => $otherscales,
         ];
     }
 
@@ -237,38 +217,19 @@ class graphicalsummary extends feedbackgenerator {
      * Render the moodle charts.
      *
      * @param array $data
+     * @param ?int $primaryscaleid
+     * @param array $otherscales
      *
      * @return string
      */
-    private function render_chart(array $data) {
+    private function render_chart(array $data, ?int $primaryscaleid, array $otherscales) {
         global $OUTPUT;
 
         $chart = new \core\chart_line();
         $chart->set_smooth(true); // Calling set_smooth() passing true as parameter, will display smooth lines.
 
-        $difficulties = array_map(fn($round) => $round['difficulty'] ?? null, $data);
-        $difficultieschart = new \core\chart_series(
-            get_string('difficulty', 'local_catquiz'),
-            $difficulties
-        );
-        $chart->add_series($difficultieschart);
-
-        $fractions = array_map(fn($round) => $round['lastresponse'] ?? null, $data);
-        $fractionschart = new \core\chart_series(
-            get_string('response', 'local_catquiz'),
-            $fractions
-        );
-        $chart->add_series($fractionschart);
-
-        $hasnewabilities = array_key_exists('personability_after', $data[0]) && array_key_exists('personability_before', $data[0]);
+        $hasnewabilities = array_key_exists('personability_after', $data[0]);
         if ($hasnewabilities) {
-            $abilitiesbefore = array_map(fn($round) => $round['personability_before'] ?? null, $data);
-            $abilitiesbeforechart = new \core\chart_series(
-                get_string('abilityintestedscale_before', 'local_catquiz'),
-                $abilitiesbefore
-            );
-            $chart->add_series($abilitiesbeforechart);
-
             $abilitiesafter = array_map(fn($round) => $round['personability_after'] ?? null, $data);
             $abilitiesafterchart = new \core\chart_series(
                 get_string('abilityinglobalscale', 'local_catquiz'),
@@ -284,38 +245,24 @@ class graphicalsummary extends feedbackgenerator {
             $chart->add_series($abilitieschart);
         }
 
-        $fisherinfo = array_map(fn($round) => $round['fisherinformation'] ?? null, $data);
-        $fisherinfochart = new \core\chart_series(
-            get_string('fisherinformation', 'local_catquiz'),
-            $fisherinfo
-        );
-        $chart->add_series($fisherinfochart);
-
-        $diffnextbefore = array_map(fn($round) => $round['difficultynextbefore'] ?? null, $data);
-        $diffnextbeforechart = new \core\chart_series(
-            get_string('difficulty_next_more_difficult', 'local_catquiz'),
-            $diffnextbefore
-        );
-        $chart->add_series($diffnextbeforechart);
-
-        $diffnextafter = array_map(fn($round) => $round['difficultynextafter'] ?? null, $data);
-        $diffnextafterchart = new \core\chart_series(
-            get_string('difficulty_next_easier', 'local_catquiz'),
-            $diffnextafter
-        );
-        $chart->add_series($diffnextafterchart);
-
-        $score = array_map(fn($round) => $round['score'] ?? null, $data);
-        $scorechart = new \core\chart_series(
-            get_string('score', 'local_catquiz'),
-            $score
-        );
-        $chart->add_series($scorechart);
+        $globalscaleid = $this->get_progress()->get_quiz_settings()->catquiz_catscales;
+        $addprimary = $primaryscaleid
+            && array_key_exists($primaryscaleid, $otherscales)
+            && $primaryscaleid != $globalscaleid;
+        if ($addprimary) {
+            // Fill the missing values from the start with null values.
+            $primaryvalues = array_pad($otherscales[$primaryscaleid], -count($data), null);
+            $primarychart = new \core\chart_series(
+                catscale::return_catscale_object($primaryscaleid)->name,
+                $primaryvalues
+            );
+            $chart->add_series($primarychart);
+        }
 
         if (array_key_exists('id', $data[0])) {
             $chart->set_labels(array_map(fn($round) => $round['id'], $data));
         } else {
-            $chart->set_labels(range(0, count($difficulties) - 1));
+            $chart->set_labels(range(0, count($abilitiesafter) - 1));
         }
 
         return html_writer::tag('div', $OUTPUT->render($chart), ['dir' => 'ltr']);
@@ -368,202 +315,5 @@ class graphicalsummary extends feedbackgenerator {
         }
         $table->data = $tabledata;
         return html_writer::table($table);
-    }
-
-    /**
-     * Returns the next-more-difficult and next-easier questions surounding the
-     * selected question.
-     *
-     * @param mixed $selectedquestion
-     * @param array $questionpool
-     * @param string $property Sort by this property before finding the neighbor questions.
-     * @return array
-     */
-    private function getneighborquestions($selectedquestion, $questionpool, $property = "difficulty") {
-        uasort($questionpool, fn($q1, $q2) => $q1->$property <=> $q2->$property);
-        if (count($questionpool) === 1) {
-            return [reset($questionpool), reset($questionpool)];
-        }
-
-        // We find the position of the selected question within the
-        // $property-sorted question list, so that we can find the
-        // neighboring questions.
-        $pos = array_search($selectedquestion->id, array_keys($questionpool));
-
-        $afterindex = $pos === count($questionpool) - 1 ? $pos : $pos + 1;
-        [$after] = array_slice($questionpool, $afterindex, 1);
-
-        $beforeindex = $pos === 0 ? 0 : $pos - 1;
-        [$before] = array_slice($questionpool, $beforeindex, 1);
-
-        return [$before, $after];
-    }
-
-
-    /**
-     * Render the charts with data about participation by day.
-     *
-     * @param array $data
-     * @param int $primarycatscaleid
-     * @param int $parentscaleid
-     * @param string $catscalename
-     * @param int $contextid
-     *
-     * @return array
-     */
-    private function render_participationcharts(
-        array $data,
-        int $primarycatscaleid,
-        int $parentscaleid,
-        string $catscalename,
-        int $contextid = 0) {
-
-        // In case you want to make context a changeable param of feedbacksettings, apply logic here.
-        if (empty($contextid)) {
-            $contextid = $data['contextid'];
-        }
-
-        $records = catquiz::get_attempts(
-            null,
-            $parentscaleid,
-            $data['courseid'],
-            $data['testid'],
-            $contextid,
-            null,
-            null);
-        if (count($records) < 2) {
-            return [];
-        }
-        // Get all items of this catscale and catcontext.
-        $startingrecord = reset($records);
-        if (empty($startingrecord->endtime)) {
-            foreach ($records as $record) {
-                if (isset($record->endtime) && !empty($record->endtime)) {
-                    $startingrecord = $record;
-                    break;
-                }
-            }
-        }
-        $endtime = empty($data['endtime']) ?
-            intval($data['timestamp']) : intval($data['endtime']);
-        $beginningoftimerange = intval($startingrecord->endtime);
-        $timerange = learningprogress::get_timerange_for_attempts($beginningoftimerange, $endtime);
-        $attemptsbytimerange = learningprogress::order_attempts_by_timerange($records, $primarycatscaleid, $timerange);
-        $attemptscounterchart = $this->render_attemptscounterchart($attemptsbytimerange);
-        $attemptresultstackchart = $this->render_attemptresultstackchart($attemptsbytimerange, $primarycatscaleid, $data);
-
-        return [
-            'attemptscounterchart' => $attemptscounterchart,
-            'attemptresultstackchart' => $attemptresultstackchart,
-            'attemptchartstitle' => get_string('attemptchartstitle', 'local_catquiz', $catscalename),
-        ];
-
-    }
-
-    /**
-     * Chart grouping by date and counting attempts.
-     *
-     * @param array $attemptsbytimerange
-     *
-     * @return array
-     */
-    private function render_attemptscounterchart(array $attemptsbytimerange) {
-        global $OUTPUT;
-        $counter = [];
-        $labels = [];
-        foreach ($attemptsbytimerange as $timestamp => $attempts) {
-            $counter[] = count($attempts);
-            $labels[] = (string)$timestamp;
-        }
-        $chart = new \core\chart_line();
-        $chart->set_smooth(true);
-
-        $series = new \core\chart_series(
-            get_string('numberofattempts', 'local_catquiz'),
-            $counter
-        );
-        $chart->add_series($series);
-        $chart->set_labels($labels);
-        $out = $OUTPUT->render($chart);
-
-        return [
-            'chart' => $out,
-            'charttitle' => get_string('numberofattempts', 'local_catquiz'),
-        ];
-    }
-
-    /**
-     * Chart grouping by date showing attempt results.
-     *
-     * @param array $attemptsbytimerange
-     * @param int $catscaleid
-     * @param array $attemptdata
-     *
-     * @return array
-     */
-    private function render_attemptresultstackchart(array $attemptsbytimerange, int $catscaleid, array $attemptdata) {
-        global $OUTPUT;
-        $series = [];
-        $labels = [];
-        $quizsettings = $this->get_progress()->get_quiz_settings();
-
-        foreach ($attemptsbytimerange as $timestamp => $attempts) {
-            $labels[] = (string)$timestamp;
-            foreach ($attempts as $attempt) {
-                if (is_object($attempt)) {
-                    // This is to stay backwards compatible.
-                    $attempt = (float) $attempt->value;
-                }
-                $color = $this->get_color_for_personability((array)$quizsettings, $attempt, $catscaleid);
-
-                if (!isset($series[$timestamp][$color])) {
-                        $series[$timestamp][$color] = 1;
-                } else {
-                        $series[$timestamp][$color] += 1;
-                }
-            }
-        }
-
-        $chart = new \core\chart_bar();
-        $chart->set_stacked(true);
-
-        $colorsarray = $this->feedbacksettings->get_defined_feedbackcolors_for_scale((array)$quizsettings, $catscaleid);
-
-        foreach ($colorsarray as $colorcode => $rangesarray) {
-            $serie = [];
-            foreach ($series as $timestamp => $cc) {
-                $valuefound = false;
-                foreach ($cc as $cc => $elementscounter) {
-                    if ($colorcode != $cc) {
-                        continue;
-                    }
-                    $valuefound = true;
-                    $serie[] = $elementscounter;
-                }
-                if (!$valuefound) {
-                    $serie[] = 0;
-                }
-            }
-            $rangestart = $rangesarray['rangestart'];
-            $rangeend = $rangesarray['rangeend'];
-            $labelstring = get_string(
-                'personabilityrangestring',
-                'local_catquiz',
-                ['rangestart' => $rangestart, 'rangeend' => $rangeend]);
-            $s = new \core\chart_series(
-                $labelstring,
-                $serie
-            );
-            $s->set_colors([0 => $colorcode]);
-            $chart->add_series($s);
-        }
-
-        $chart->set_labels($labels);
-        $out = $OUTPUT->render($chart);
-
-        return [
-            'chart' => $out,
-            'charttitle' => get_string('numberofattempts', 'local_catquiz'),
-        ];
     }
 }

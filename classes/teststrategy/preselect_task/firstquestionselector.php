@@ -279,7 +279,7 @@ class firstquestionselector extends preselect_task implements wb_middleware {
         boolval(catquiz::get_person_abilities(
             $this->context['contextid'],
             [$this->context['catscaleid']],
-            $this->context['userid']
+            [$this->context['userid']]
         ));
     }
 

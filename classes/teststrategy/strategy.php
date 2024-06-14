@@ -126,8 +126,13 @@ abstract class strategy {
      */
     public function return_next_testitem(array $context) {
         $cache = cache::make('local_catquiz', 'adaptivequizattempt');
-        if (time() - $context['progress']->get_starttime() > $context['max_attempttime_in_sec']) {
-            $cache->set('endtime', time());
+        $maxtime = $context['progress']->get_starttime() + $context['max_attempttime_in_sec'];
+        if (time() > $maxtime) {
+            // The 'endtime' holds the last timepoint that is relevant for the
+            // result. So if a student tries to answer a question after the
+            // time limit, this value is set to the time limit (starttime + max
+            // attempt time).
+            $cache->set('endtime', $maxtime);
             $cache->set('catquizerror', status::EXCEEDED_MAX_ATTEMPT_TIME);
             return result::err(status::EXCEEDED_MAX_ATTEMPT_TIME);
         }
@@ -250,11 +255,11 @@ abstract class strategy {
 
     /**
      * Get feedback generators.
-     * @param feedbacksettings $feedbacksettings
+     * @param feedbacksettings|null $feedbacksettings
      * @return array
      *
      */
-    abstract public function get_feedbackgenerators(feedbacksettings $feedbacksettings): array;
+    abstract public function get_feedbackgenerators(?feedbacksettings $feedbacksettings): array;
 
     /**
      * Check defined settings and apply specific settings strategy.
