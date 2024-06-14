@@ -252,11 +252,11 @@ class shortcodes {
             $test = catquiz::get_test_by_component_id($testid);
             $courseid = $test->courseid;
             if ($args['course'] ?? null && $args['course'] != $courseid) {
-                throw new Exception("The testid is not in the given course");
+                throw new Exception(get_string('catquizstatistics_scale_course_conflict', 'local_catquiz'));
             }
             $globalscale = $test->catscaleid;
             if ($globalscale && array_key_exists('globalscale', $args) && $args['globalscale'] != $globalscale) {
-                throw new Exception("The testid is not using the given global scale");
+                throw new Exception(get_string('catquizstatistics_scale_testid_conflict', 'local_catquiz'));
             }
             return ['course' => $courseid, 'globalscale' => $globalscale, 'testid' => $testid];
         }
@@ -265,7 +265,7 @@ class shortcodes {
         $courseid = optional_param('id', $args['courseid'] ?? 0, PARAM_INT);
         if (!$globalscale) {
             if ($courseid == 0) {
-                throw new Exception('Please provide either a "globalscale" or "course" parameter');
+                throw new Exception(get_string('catquizstatistics_askforparams', 'local_catquiz'));
             }
             $globalscale = self::get_global_scale($courseid);
         }
@@ -294,7 +294,7 @@ class shortcodes {
 
         // If there is only one CAT in that course, use the cmid of that course.
         if (!$cats = catquiz::get_tests_for_course($courseid)) {
-            throw new Exception('no CAT tests for the given course'); // TODO: translate or handle.
+            throw new Exception(get_string('catquizstatistics_nodataforcourse', 'local_catquiz'));
         }
 
         if (count($cats) === 1) {
