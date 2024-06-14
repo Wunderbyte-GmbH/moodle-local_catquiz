@@ -16,6 +16,15 @@
 //
 // Based on <https://gist.github.com/kralo/293dbc07b9b318eabe43>.
 
+/**
+ * Attempts CSV export
+ *
+ * @package    local_catquiz
+ * @copyright  2024 Wunderbyte GmbH
+ * @author     David Szkiba
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
+
 use local_catquiz\output\catquizstatistics;
 
 require_once('../../config.php');

@@ -1182,7 +1182,7 @@ class catquizstatistics {
     /**
      * Retrieves the name of a teststrategy
      *
-     * @param int
+     * @param int $id
      * @return string
      */
     private function get_teststrategy_name(int $id): string {

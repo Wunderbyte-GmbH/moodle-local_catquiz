@@ -2236,21 +2236,22 @@ class catquiz {
     /**
      * Returns the data for the CSV export of caquiz attempts.
      *
-     * @param int $contextid,
-     * @param int $scaleid,
-     * @param ?int $courseid,
-     * @param ?int $testid,
-     * @param ?int $starttime,
+     * @param int $contextid
+     * @param int $scaleid
+     * @param ?int $courseid
+     * @param ?int $testid
+     * @param ?int $starttime
      * @param ?int $endtime
+     *
      * @return array
      */
     public static function get_sql_for_csv_export(
-            int $contextid,
-            int $scaleid,
-            ?int $courseid,
-            ?int $testid,
-            ?int $starttime,
-            ?int $endtime
+        int $contextid,
+        int $scaleid,
+        ?int $courseid,
+        ?int $testid,
+        ?int $starttime,
+        ?int $endtime
     ): array {
         $params = [
             'contextid' => $contextid,
@@ -2265,20 +2266,20 @@ class catquiz {
             $where .= " AND a.courseid = :courseid";
         }
         $sql = "SELECT a.attemptid,
-                    a.userid,
-                    u.username,
-                    u.email,
-                    a.starttime,
-                    a.endtime,
-                    a.teststrategy,
-                    a.status,
-                    a.number_of_testitems_used,
-                    a.personability_after_attempt,
-                    a.json
-                FROM {local_catquiz_attempts} a
-                JOIN {user} u ON a.userid = u.id
-                WHERE $where
-                ORDER BY attemptid DESC";
+            a.userid,
+            u.username,
+            u.email,
+            a.starttime,
+            a.endtime,
+            a.teststrategy,
+            a.status,
+            a.number_of_testitems_used,
+            a.personability_after_attempt,
+            a.json
+            FROM {local_catquiz_attempts} a
+            JOIN {user} u ON a.userid = u.id
+            WHERE $where
+            ORDER BY attemptid DESC";
         return [$sql, $params];
     }
 }
