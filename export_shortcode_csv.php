@@ -69,13 +69,13 @@ $exporttitle = [
 // -- [x] Strategie,
 // -- [x] Status Testresult (Maximalanzahl Fragen erreicht, keine Fragen, SE unterschritten, Zeit überschritten etc.),
 // -- [x] Anz. Fragen gesamt (auch nicht-gewertete und Pilotierungsfragen),
-// -- [/] Ergebnis-Range,
-// -- [/] PP global,
+// -- [x] Ergebnis-Range,
+// -- [x] PP global,
 // -- [ ] SE global,
 // -- [/] N global,
 // -- [/] frac global,
 // -- [/] Ergebnis-Skala (je Strategie),
-// -- [/] PP Ergebnisskala,o
+// -- [/] PP Ergebnisskala,
 // -- [/] SE Ergebnisskala,
 // -- [/] N Ergebnisskala,
 // -- [/] frac Ergebnisskala,
@@ -89,6 +89,9 @@ $exporttitle = [
     'Strategie',
     'Status Testresult',
     'Anz. Fragen gesamt',
+    'Ergebnis-Range',
+    'PP global',
+    'PP Ergebnisskala',
 ];
 
 $csvexport->add_data($exporttitle);
@@ -104,6 +107,9 @@ foreach ($data as $row) {
             $row->teststrategy,
             $row->status,
             $row->number_of_testitems_used,
+            $row->range,
+            $row->globalability,
+            $row->primaryability,
         ]
     );
 }

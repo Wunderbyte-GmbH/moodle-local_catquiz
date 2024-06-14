@@ -1063,13 +1063,38 @@ class catquizstatistics {
         );
 
         $records = $DB->get_records_sql($sql, $params);
+        $qs = $this->get_quizsettings();
         $enriched = array_map(
-            function ($r) {
+            function ($r) use ($qs) {
+                $json = json_decode($r->json);
+
+                // In some strategies (lowest skillgap, highest skillgap, ...), the detected scale
+                // might not be the root scale. For those, we want to know the ability and range in
+                // the detected scale as well. For the other strategies, this is the same as the
+                // ability and range in the global scale.
+                $primaryscale = $this->rootscaleid;
+                if (
+                    in_array($r->teststrategy, [LOCAL_CATQUIZ_STRATEGY_LOWESTSUB, LOCAL_CATQUIZ_STRATEGY_HIGHESTSUB])
+                    && property_exists($json, 'personabilities_abilities')
+                    && property_exists($json, 'se')
+                ) {
+                    $primaryscale = array_filter((array) $json->personabilities_abilities, fn ($scale) => $scale->primary ?? false);
+                    $primaryscaleid = array_key_first($primaryscale);
+                    $primaryability = $primaryscale[$primaryscaleid]->value;
+                    $primaryrange = feedback_helper::get_range_of_value($qs, $primaryscaleid, $primaryability);
+                    $primaryse = $json->se->$primaryscaleid;
+                }
+
                 $r->starttime = userdate($r->starttime, get_string('strftimedatetime', 'core_langconfig'));
                 $r->endtime = userdate($r->endtime, get_string('strftimedatetime', 'core_langconfig'));
                 $r->teststrategy = $this->get_teststrategy_name($r->teststrategy);
                 $statusstring = status::to_string($r->status) ?? 'status_unknown';
                 $r->status = get_string($statusstring, 'local_catquiz');
+                $r->range = $primaryrange ?? '-';
+                $r->globalability = $r->personability_after_attempt;
+                $r->primaryability = $primaryability ?? '-';
+                $r->primaryse = $primaryse ?? '-';
+                $r->globalse = $json->se->${this->rootscaleid};
                 return $r;
             },
             $records
