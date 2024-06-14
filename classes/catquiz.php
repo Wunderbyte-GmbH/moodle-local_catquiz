@@ -1592,7 +1592,7 @@ class catquiz {
      */
     public static function set_final_attempt_status(int $attemptid, string $status) {
         global $DB;
-        $statusnumber = status::to_int($status);
+        $statusnumber = status::to_int($status) ?? -1;
         if (!$existingrecord = $DB->get_record('local_catquiz_attempts', ['attemptid' => $attemptid])) {
             return;
         }

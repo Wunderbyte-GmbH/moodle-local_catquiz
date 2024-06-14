@@ -457,6 +457,8 @@ $string['abortpersonabilitynotchanged'] = "Personenparameter unverändert";
 $string['emptyfirstquestionlist'] = "Kann keine Startfrage wählen da die Liste leer ist";
 $string['errornoitems'] = "Für die angegebenen Settings kann das Quiz nicht ausgeführt werden. Bitte kontaktieren sie Ihren CAT Manager.";
 $string['exceededmaxattempttime'] = "Die erlaubte Zeit für den Versuch wurde überschritten";
+$string['status_ok'] = "Noch nicht beendet";
+$string['status_unknown'] = "Unbekannter Status";
 
 // Quiz Feedback.
 $string['attemptfeedbacknotavailable'] = "Kein Feedback verfügbar";

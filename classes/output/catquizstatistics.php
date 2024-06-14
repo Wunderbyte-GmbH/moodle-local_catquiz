@@ -24,6 +24,7 @@ use local_catquiz\catquiz;
 use local_catquiz\catscale;
 use local_catquiz\feedback\feedbackclass;
 use local_catquiz\local\model\model_strategy;
+use local_catquiz\local\status;
 use local_catquiz\teststrategy\feedback_helper;
 use local_catquiz\teststrategy\info;
 use moodle_url;
@@ -1067,6 +1068,8 @@ class catquizstatistics {
                 $r->starttime = userdate($r->starttime, get_string('strftimedatetime', 'core_langconfig'));
                 $r->endtime = userdate($r->endtime, get_string('strftimedatetime', 'core_langconfig'));
                 $r->teststrategy = $this->get_teststrategy_name($r->teststrategy);
+                $statusstring = status::to_string($r->status) ?? 'status_unknown';
+                $r->status = get_string($statusstring, 'local_catquiz');
                 return $r;
             },
             $records

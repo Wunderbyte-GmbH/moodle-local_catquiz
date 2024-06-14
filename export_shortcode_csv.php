@@ -66,8 +66,8 @@ $exporttitle = [
 // -- [x] UserE-Mail,
 // -- [x] Startzeit,
 // -- [x] Endzeit,
-// -- [/] Strategie,
-// -- [/] Status Testresult (Maximalanzahl Fragen erreicht, keine Fragen, SE unterschritten, Zeit überschritten etc.),
+// -- [x] Strategie,
+// -- [x] Status Testresult (Maximalanzahl Fragen erreicht, keine Fragen, SE unterschritten, Zeit überschritten etc.),
 // -- [x] Anz. Fragen gesamt (auch nicht-gewertete und Pilotierungsfragen),
 // -- [/] Ergebnis-Range,
 // -- [/] PP global,
@@ -87,6 +87,7 @@ $exporttitle = [
     'Startzeit',
     'Endzeit',
     'Strategie',
+    'Status Testresult',
     'Anz. Fragen gesamt',
 ];
 
@@ -101,6 +102,7 @@ foreach ($data as $row) {
             $row->starttime,
             $row->endtime,
             $row->teststrategy,
+            $row->status,
             $row->number_of_testitems_used,
         ]
     );

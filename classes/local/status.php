@@ -41,7 +41,7 @@ class status {
      *
      * @var string
      */
-    const OK = 'ok';
+    const OK = 'status_ok';
     /**
      * ERROR_GENERAL
      *
@@ -102,34 +102,45 @@ class status {
     const EXCEEDED_MAX_ATTEMPT_TIME = 'exceededmaxattempttime';
 
     /**
-     * Assigns each status an int value that can be saved in the attempts database table
+     * Holds mapping of int values to status strings
+     *
+     * @var array
+     */
+    const MAPPING = [
+        0 => self::OK,
+        1 => self::ERROR_NO_REMAINING_QUESTIONS,
+        2 => self::ERROR_TESTITEM_ALREADY_IN_RELATED_SCALE,
+        3 => self::ERROR_FETCH_NEXT_QUESTION,
+        4 => self::ERROR_REACHED_MAXIMUM_QUESTIONS,
+        5 => self::ABORT_PERSONABILITY_NOT_CHANGED,
+        6 => self::ERROR_EMPTY_FIRST_QUESTION_LIST,
+        7 => self::ERROR_NO_ITEMS,
+        8 => self::EXCEEDED_MAX_ATTEMPT_TIME,
+    ];
+
+    /**
+     * Returns the int value of the given status or null if it does not exist
      *
      * @param string $status
-     *
-     * @return int
+     * @return ?int
      */
-    public static function to_int(string $status): int {
-        switch ($status) {
-            case self::OK:
-                return 0;
-            case self::ERROR_NO_REMAINING_QUESTIONS:
-                return 1;
-            case self::ERROR_TESTITEM_ALREADY_IN_RELATED_SCALE:
-                return 2;
-            case self::ERROR_FETCH_NEXT_QUESTION:
-                return 3;
-            case self::ERROR_REACHED_MAXIMUM_QUESTIONS:
-                return 4;
-            case self::ABORT_PERSONABILITY_NOT_CHANGED:
-                return 5;
-            case self::ERROR_EMPTY_FIRST_QUESTION_LIST:
-                return 6;
-            case self::ERROR_NO_ITEMS:
-                return 7;
-            case self::EXCEEDED_MAX_ATTEMPT_TIME:
-                return 8;
-            default:
-                return -1;
+    public static function to_int(string $status): ?int {
+        if (!$int = array_search($status, self::MAPPING)) {
+            return null;
         }
+        return $int;
+    }
+
+    /**
+     * Returns the string of the given status or null if it does not exist
+     *
+     * @param int $status
+     * @return ?string
+     */
+    public static function to_string(int $status): ?string {
+        if (!array_key_exists($status, self::MAPPING)) {
+            return null;
+        }
+        return self::MAPPING[$status];
     }
 }

@@ -457,6 +457,8 @@ $string['emptyfirstquestionlist'] = "Can't select a start question because the l
 $string['feedbackcomparetoaverage'] = 'You performed better than {$a->quantile}% of your fellow students in "{$a->scaleinfo}".';
 $string['errornoitems'] = "The quiz can not be started with the given settings. Please contact your CAT manager.";
 $string['exceededmaxattempttime'] = "The maximum attempt time has been exceeded.";
+$string['status_ok'] = "Not finished";
+$string['status_unknown'] = "Unknown status";
 
 // Quiz Feedback.
 $string['attemptfeedbacknotavailable'] = "No feedback available";
