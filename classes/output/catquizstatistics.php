@@ -1196,13 +1196,14 @@ class catquizstatistics {
 
         if ($CFG->debug > 0) {
             return sprintf(
-                'DEBUG info: courseid: %d, scaleid: %d, contextid: %d, starttime: %d, endtime: %d, num attempts: %d',
+                'DEBUG info: courseid: %d, scaleid: %d, contextid: %d, starttime: %d, endtime: %d, num attempts: %d <br/><br/>%s',
                 $this->courseid,
                 $this->scaleid,
                 $this->contextid,
                 $this->starttime,
                 $this->endtime,
-                count($this->get_attempts())
+                count($this->get_attempts()),
+                get_string('catquizstatisticsnodata', 'local_catquiz')
             );
         }
         return get_string('catquizstatisticsnodata', 'local_catquiz');
