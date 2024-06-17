@@ -878,7 +878,7 @@ class catquizstatistics {
         $numpeervalues = count(array_filter($pa, fn ($v) => $v !== null));
         $numuservalues = count(array_filter($ua, fn ($v) => $v !== null));
         if ($numpeervalues === 0 && $numuservalues === 0) {
-                return get_string('catquizstatisticsnodata', 'local_catquiz');
+                return $this->get_nodata_body();
         }
 
         $alldates = feedback_helper::get_timerangekeys($timerange, $beginningandendofrange);
@@ -942,7 +942,7 @@ class catquizstatistics {
         if (!$records = $DB->get_records_sql($sql, $params)) {
             return [
                 'charttitle' => get_string('catquizstatistics_numattemptsperperson_title', 'local_catquiz'),
-                'chart' => get_string('catquizstatisticsnodata', 'local_catquiz'),
+                'chart' => $this->get_nodata_body(),
             ];
         }
 
