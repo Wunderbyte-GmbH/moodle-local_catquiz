@@ -49,7 +49,6 @@ class feedback_helper {
      */
     public function get_color_for_personability(array $quizsettings, float $personability, int $catscaleid): string {
         $default = LOCAL_CATQUIZ_DEFAULT_GREY;
-        return $default; // TODO: Remove.
         $abilityrange = $this->get_ability_range($catscaleid);
         if (!$quizsettings ||
             $personability < (float) $abilityrange['minscalevalue'] ||
