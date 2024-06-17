@@ -553,7 +553,7 @@ class catquizstatistics {
         }
 
         foreach ($results as $r) {
-            if ($r->total_answered === 0) {
+            if (intval($r->total_answered) === 0) {
                 $bin = 0;
             } else {
                 $bin = feedback_helper::get_histogram_bin($r->total_answered, $classwidth);
