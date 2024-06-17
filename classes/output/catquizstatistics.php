@@ -323,7 +323,10 @@ class catquizstatistics {
         $attempts = $this->get_attempts();
         // Prepare data for scorecounter bars.
         $userids = array_unique(array_map(fn ($attempt) => $attempt->userid, $attempts));
-        $abilityrecords = catquiz::get_person_abilities($this->contextid, [$this->scaleid], $userids);
+        $abilityrecords = [];
+        if ($userids) {
+            $abilityrecords = catquiz::get_person_abilities($this->contextid, [$this->scaleid], $userids);
+        }
         $abilityseries = [];
         $quizsettings = reset($this->quizsettings); // TODO: check if the settings match for all tests.
         foreach ($abilitysteps as $as) {
