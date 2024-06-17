@@ -488,8 +488,8 @@ class catquizstatistics {
         // Minimum 3 records required to display progress charts.
         if (count($records) < 3) {
             return [
-                'individual' => '',
-                'comparison' => '',
+                'charttitle' => get_string('progress', 'local_catquiz'),
+                'chart' => $this->get_nodata_body(),
             ];
         }
         $startingrecord = reset($records);
@@ -509,7 +509,7 @@ class catquizstatistics {
         if (count($attemptsofpeers) < 3) {
             return [
                 'charttitle' => get_string('progress', 'local_catquiz'),
-                'chart' => get_string('catquizstatisticsnodata', 'local_catquiz'),
+                'chart' => $this->get_nodata_body(),
             ];
         }
         $progresscomparison = $this->render_chart_for_comparison(
