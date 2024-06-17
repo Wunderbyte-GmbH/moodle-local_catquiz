@@ -188,7 +188,7 @@ class shortcodes {
      * @return string
      */
     public static function catquizstatistics($shortcode, $args, $content, $env, $next) {
-        global $OUTPUT;
+        global $CFG, $OUTPUT;
 
         try {
             $populated = self::populate_arguments($args);
@@ -217,6 +217,20 @@ class shortcodes {
             return $OUTPUT->render_from_template(
                 'local_catquiz/catscaleshortcodes/catscalestatistics',
                 ['error' => $e->getMessage()]
+            );
+        } catch (\Throwable $t) {
+            $errormsg = 'Catquizstatistics can not be displayed due to an internal error';
+            if ($CFG->debug > 0) {
+                $errormsg = sprintf(
+                    'Catquizstatistics can not be displayed due to an internal error: "%s" at %s:%d',
+                    $t->getMessage(),
+                    $t->getFile(),
+                    $t->getLine()
+                );
+            }
+            return $OUTPUT->render_from_template(
+                'local_catquiz/catscaleshortcodes/catscalestatistics',
+                ['error' => $errormsg]
             );
         }
 
