@@ -50,11 +50,19 @@ class catquizstatistics {
      * @var int
      */
     const ATTEMPTS_PER_PERSON_CLASSES = 7;
+
     /**
      * For incompatible quiz settings, set this as the detected range.
      * @var int
      */
     const FALLBACK_RANGE = 1;
+
+    /**
+     * This is used as fallback if there are no attempts yet to make the histogram legend look ok.
+     *
+     * @var int
+     */
+    const DEFAULT_MAX_ATTEMPTS = 7;
 
     /**
      * @var ?int $courseid
@@ -537,6 +545,10 @@ class catquizstatistics {
                 $maxattempts = $r->total_answered;
             }
         }
+
+        if ($maxattempts === 0) {
+            $maxattempts = self::DEFAULT_MAX_ATTEMPTS;
+        }
         $classwidth = ceil($maxattempts / self::ATTEMPTS_PER_PERSON_CLASSES);
 
         if (!$qs = $this->get_quizsettings()) {
@@ -600,7 +612,11 @@ class catquizstatistics {
         $labels = [];
         $labels[0] = get_string('notyetattempted', 'local_catquiz');
         for ($i = 1; $i <= self::ATTEMPTS_PER_PERSON_CLASSES; $i++) {
-            $labels[$i] = sprintf("%d..%d", $i * $classwidth - $classwidth + 1, $i * $classwidth);
+            if ($classwidth == 1) {
+                $labels[$i] = sprintf("%d", $i * $classwidth);
+            } else {
+                $labels[$i] = sprintf("%d .. %d", $i * $classwidth - $classwidth + 1, $i * $classwidth);
+            }
         }
         $chart->set_labels($labels);
         $chart->get_xaxis(0, true)->set_label(get_string('catquizstatistics_numberofresponses', 'local_catquiz'));
@@ -941,6 +957,9 @@ class catquizstatistics {
         }
         $colors[-1] = LOCAL_CATQUIZ_DEFAULT_GREY;
         $maxattempts = $records[array_key_last($records)]->attempts;
+        if ($maxattempts == 0) {
+            $maxattempts = self::DEFAULT_MAX_ATTEMPTS;
+        }
 
         // Display a maximum of self::ATTEMPTS_PER_PERSON_CLASSES bars. This
         // means, that each bar covers a range of $classwidth attempts.
@@ -976,11 +995,18 @@ class catquizstatistics {
         $chart->set_stacked(true);
         $chartlabels[0] = get_string('notyetattempted', 'local_catquiz');
         for ($i = 1; $i <= self::ATTEMPTS_PER_PERSON_CLASSES; $i++) {
-            $chartlabels[$i] = sprintf(
-                '%d .. %d',
-                $i * $classwidth - $classwidth + 1,
-                $i * $classwidth
-            );
+            if ($classwidth == 1) {
+                $chartlabels[$i] = sprintf(
+                    '%d',
+                    $i * $classwidth
+                );
+            } else {
+                $chartlabels[$i] = sprintf(
+                    '%d .. %d',
+                    $i * $classwidth - $classwidth + 1,
+                    $i * $classwidth
+                );
+            }
         }
         $chart->set_labels($chartlabels);
 
