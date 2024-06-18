@@ -641,7 +641,8 @@ class catquizstatistics {
             return $this->attempts;
         }
 
-        $attempts = catquiz::get_attempts(
+        $attempts = [];
+        foreach (catquiz::get_attempts(
             null,
             $this->scaleid,
             $this->courseid,
@@ -649,7 +650,15 @@ class catquizstatistics {
             $this->contextid,
             $this->starttime,
             $this->endtime
-        );
+        ) as $record) {
+            $json = json_decode($record->json);
+            $prunedrecord = $record;
+            $prunedrecord->json = json_encode((object) [
+                'personabilities_abilities' => $json->personabilities_abilities ?? null,
+                'personabilities' => $json->personabilities ?? null,
+            ]);
+            $attempts[] = $prunedrecord;
+        }
         $this->attempts = $attempts;
         return $attempts;
     }
@@ -665,14 +674,24 @@ class catquizstatistics {
             return $this->attemptsbytimerange[$allowempty];
         }
 
-        $records = catquiz::get_attempts(
+        $records = [];
+        foreach (catquiz::get_attempts(
             null,
             $this->rootscaleid,
             $this->courseid,
             $this->testid,
             $this->contextid,
             $this->starttime,
-            $this->endtime);
+            $this->endtime) as $record) {
+            // Store a subset of the json to save memory.
+            $json = json_decode($record->json);
+            $prunedrecord = $record;
+            $prunedrecord->json = json_encode((object) [
+                'personabilities' => $json->personabilities,
+            ]);
+            $records[] = $prunedrecord;
+        }
+
         if (count($records) < 2) {
             return [];
         }
@@ -1090,17 +1109,15 @@ class catquizstatistics {
             $this->endtime
         );
 
-        $records = $DB->get_records_sql($sql, $params);
-        $enriched = array_map(
-            function ($r) {
-                $r->starttime = userdate($r->starttime, get_string('strftimedatetime', 'core_langconfig'));
-                $r->endtime = userdate($r->endtime, get_string('strftimedatetime', 'core_langconfig'));
-                $r->teststrategy = $this->get_teststrategy_name($r->teststrategy);
-                return $r;
-            },
-            $records
-        );
-        return $enriched;
+        $data = [];
+        foreach ($DB->get_recordset_sql($sql, $params) as $r) {
+            unset($r->json);
+            $r->starttime = userdate($r->starttime, get_string('strftimedatetime', 'core_langconfig'));
+            $r->endtime = userdate($r->endtime, get_string('strftimedatetime', 'core_langconfig'));
+            $r->teststrategy = $this->get_teststrategy_name($r->teststrategy);
+            $data[] = $r;
+        }
+        return $data;
     }
 
     /**

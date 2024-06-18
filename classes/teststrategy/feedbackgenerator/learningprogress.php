@@ -457,14 +457,24 @@ class learningprogress extends feedbackgenerator {
 
         // Compare to other courses.
         // Find all courses before the end of the day of this attempt.
-        $records = catquiz::get_attempts(
+        $records = [];
+        foreach (catquiz::get_attempts(
                 null,
                 $initialcontext['catscaleid'],
                 $courseid,
                 $initialcontext['testid'],
                 $initialcontext['contextid'],
                 null,
-                $end);
+                $end
+        ) as $record) {
+            $json = json_decode($record->json);
+            $prunedrecord = $record;
+            $prunedrecord->json = json_encode((object) [
+                'personabilities_abilities' => $json->personabilities_abilities ?? null,
+                'personabilities' => $json->personabilities ?? null,
+            ]);
+            $records[] = $prunedrecord;
+        }
         // Compare records to define range for average.
         // Minimum 3 records required to display progress charts.
         if (count($records) < 3) {

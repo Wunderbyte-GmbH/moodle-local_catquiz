@@ -1729,8 +1729,7 @@ class catquiz {
             'endtime' => $endtime,
         ];
 
-        $records = $DB->get_records_sql($sql, $params);
-        return $records;
+        return $DB->get_recordset_sql($sql, $params);
     }
 
     /**
