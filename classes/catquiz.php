@@ -1682,6 +1682,7 @@ class catquiz {
      * @param ?int $contextid
      * @param ?int $starttime
      * @param ?int $endtime
+     * @param bool $enrolled
      *
      * @return array
      */
@@ -1692,10 +1693,22 @@ class catquiz {
             ?int $testid = null,
             ?int $contextid = null,
             ?int $starttime = null,
-            ?int $endtime = null) {
+            ?int $endtime = null,
+            bool $enrolled = true) {
         global $DB;
 
-        $sql = "SELECT * FROM {local_catquiz_attempts} WHERE 1=1";
+        // Select only attempts of courses, where the user of the attempt is
+        // enrolled as student.
+        $join = "";
+        if ($enrolled) {
+            $join = <<<SQL
+                JOIN {user_enrolments} ue ON a.userid = ue.userid
+                JOIN {enrol} e ON ue.enrolid = e.id AND a.courseid = e.courseid
+                JOIN {role} r ON e.roleid = r.id AND r.shortname = 'student'
+            SQL;
+        }
+
+        $sql = "SELECT * FROM {local_catquiz_attempts} a $join WHERE 1=1";
 
         if (!is_null($userid)) {
             $sql .= " AND userid = :userid";
@@ -1704,7 +1717,7 @@ class catquiz {
             $sql .= " AND scaleid = :catscaleid";
         }
         if (!is_null($courseid)) {
-            $sql .= " AND courseid = :courseid";
+            $sql .= " AND a.courseid = :courseid";
         }
         if (!is_null($testid)) {
             $sql .= " AND instanceid = :instanceid";
@@ -1713,12 +1726,12 @@ class catquiz {
             $sql .= " AND contextid = :contextid";
         }
         if (!is_null($starttime)) {
-            $sql .= " AND timecreated >= :starttime";
+            $sql .= " AND a.timecreated >= :starttime";
         }
         if (!is_null($endtime)) {
-            $sql .= " AND timecreated <= :endtime";
+            $sql .= " AND a.timecreated <= :endtime";
         }
-        $sql .= " ORDER BY endtime ASC";
+        $sql .= " ORDER BY a.endtime ASC";
         $params = [
             'userid' => $userid,
             'catscaleid' => $catscaleid,
@@ -2241,6 +2254,7 @@ class catquiz {
      * @param ?int $testid
      * @param ?int $starttime
      * @param ?int $endtime
+     * @param bool $enrolled
      *
      * @return array
      */
@@ -2250,7 +2264,8 @@ class catquiz {
         ?int $courseid,
         ?int $testid,
         ?int $starttime,
-        ?int $endtime
+        ?int $endtime,
+        bool $enrolled = true
     ): array {
         $params = [
             'contextid' => $contextid,
@@ -2261,8 +2276,16 @@ class catquiz {
             'endtime' => $endtime,
         ];
         $where = "a.contextid = :contextid AND a.scaleid = :scaleid";
+        $join = "";
         if ($courseid) {
             $where .= " AND a.courseid = :courseid";
+            if ($enrolled) {
+                $join = <<<SQL
+                    JOIN {user_enrolments} ue ON a.userid = ue.userid
+                    JOIN {enrol} e ON ue.enrolid = e.id AND a.courseid = e.courseid
+                    JOIN {role} r ON e.roleid = r.id AND r.shortname = 'student'
+                SQL;
+            }
         }
         $sql = "SELECT a.attemptid,
             a.userid,
@@ -2277,6 +2300,7 @@ class catquiz {
             a.json
             FROM {local_catquiz_attempts} a
             JOIN {user} u ON a.userid = u.id
+            $join
             WHERE $where
             ORDER BY attemptid DESC";
         return [$sql, $params];
