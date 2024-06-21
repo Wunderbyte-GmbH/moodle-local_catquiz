@@ -427,7 +427,8 @@ class catscale {
         }
 
         $cache = cache::make('local_catquiz', 'adaptivequizattempt');
-        $cachekey = sprintf('testitems_%s_%s_%s', $contextid, $includesubscales, $this->catscale->id);
+        $selectedscaleshash = hash('crc32', implode('_', $selectedsubscales));
+        $cachekey = sprintf('testitems_%s_%s_%s_%s', $contextid, $includesubscales, $this->catscale->id, $selectedscaleshash);
         if ($testitems = $cache->get($cachekey)) {
             return $testitems;
         }
