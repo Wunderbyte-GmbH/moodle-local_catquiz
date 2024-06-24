@@ -13,11 +13,11 @@
 //
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
-//
-// Based on <https://gist.github.com/kralo/293dbc07b9b318eabe43>.
 
 /**
  * Attempts CSV export
+ *
+ * Based on https://gist.github.com/kralo/293dbc07b9b318eabe43.
  *
  * @package    local_catquiz
  * @copyright  2024 Wunderbyte GmbH
