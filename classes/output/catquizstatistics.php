@@ -411,7 +411,7 @@ class catquizstatistics {
             $latestattempts[$attempt->userid] = $attempt;
         }
         $chartdata = [];
-        $quizsettings = reset($this->quizsettings); // TODO: fix for multiple.
+        $quizsettings = $this->get_quizsettings();
         foreach ($latestattempts as $userid => $attempt) {
             // Skip old attempts that do not yet have the personabilities_abilities property.
             $json = json_decode($attempt->json);
@@ -427,7 +427,7 @@ class catquizstatistics {
 
             // Get the range of the selected value.
             if (!$range = feedback_helper::get_range_of_value($quizsettings, $primaryscaleid, $value)) {
-                continue;
+                $range = self::FALLBACK_RANGE;
             }
             $chartdata[$primaryscaleid][$range][] = $userid;
         }
