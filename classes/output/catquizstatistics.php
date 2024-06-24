@@ -746,15 +746,6 @@ class catquizstatistics {
             }
             if ($qs->numberoffeedbackoptionsselect !== $lastranges) {
                 $this->quizsettingcompatibility = false;
-                if ($CFG->debug > 0) {
-                    echo sprintf(
-                        "Quiz settings are not compatible: different number of ranges in test %d. Has %d but first test %d has %d",
-                        $testid,
-                        $qs->numberoffeedbackoptionsselect,
-                        $prevtestid,
-                        $lastranges
-                    );
-                }
                 return false;
             }
         }
