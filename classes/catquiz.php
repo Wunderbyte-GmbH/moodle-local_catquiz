@@ -1699,19 +1699,22 @@ class catquiz {
 
         // Select only attempts of courses, where the user of the attempt is
         // enrolled as student.
+        $with = "";
         $join = "";
         if ($enrolled && $courseid) {
-            $join = <<<SQL
-                JOIN (
+            $with = <<<SQL
+                WITH EnrolledUsers AS (
                     SELECT DISTINCT ue.userid
                     FROM {user_enrolments} ue
                     JOIN {enrol} e ON ue.enrolid = e.id AND e.courseid = :courseid2
-                    JOIN {role} r ON e.roleid = r.id AND r.shortname = 'student'
-                ) s1 ON a.userid = s1.userid
+                )
+            SQL;
+            $join = <<<SQL
+                JOIN EnrolledUsers s1 ON a.userid = s1.userid
             SQL;
         }
 
-        $sql = "SELECT * FROM {local_catquiz_attempts} a $join WHERE 1=1";
+        $sql = "$with SELECT * FROM {local_catquiz_attempts} a $join WHERE 1=1";
 
         if (!is_null($userid)) {
             $sql .= " AND userid = :userid";
