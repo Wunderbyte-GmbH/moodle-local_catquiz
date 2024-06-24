@@ -1700,11 +1700,14 @@ class catquiz {
         // Select only attempts of courses, where the user of the attempt is
         // enrolled as student.
         $join = "";
-        if ($enrolled) {
+        if ($enrolled && $courseid) {
             $join = <<<SQL
-                JOIN {user_enrolments} ue ON a.userid = ue.userid
-                JOIN {enrol} e ON ue.enrolid = e.id AND a.courseid = e.courseid
-                JOIN {role} r ON e.roleid = r.id AND r.shortname = 'student'
+                JOIN (
+                    SELECT DISTINCT ue.userid
+                    FROM {user_enrolments} ue
+                    JOIN {enrol} e ON ue.enrolid = e.id AND e.courseid = :courseid2
+                    JOIN {role} r ON e.roleid = r.id AND r.shortname = 'student'
+                ) s1 ON a.userid = s1.userid
             SQL;
         }
 
@@ -1736,6 +1739,7 @@ class catquiz {
             'userid' => $userid,
             'catscaleid' => $catscaleid,
             'courseid' => $courseid,
+            'courseid2' => $courseid,
             'instanceid' => $testid,
             'contextid' => $contextid,
             'starttime' => $starttime,
