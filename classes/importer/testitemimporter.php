@@ -146,7 +146,7 @@ class testitemimporter {
                 'name' => 'contextid',
                 'mandatory' => false,
                 'format' => PARAM_INT,
-                // We could set the selected cat context (optional_param id) as default.
+                'importinstruction' => get_string('importcontextinfo', 'local_catquiz'),
             ],
             [
                 'name' => 'model',
