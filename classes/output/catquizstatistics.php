@@ -436,6 +436,17 @@ class catquizstatistics {
             $chartdata[$primaryscaleid][$range][] = $userid;
         }
 
+        // Sort the chart in descending order of attempts across all ranges.
+        $tmp = [];
+        foreach ($chartdata as $scaleid => $rangearray) {
+            $num = array_sum(array_map(fn ($range) => count($range), $rangearray));
+            $tmp[$scaleid] = $num;
+        }
+        arsort($tmp);
+        foreach (array_keys($tmp) as $scaleid) {
+            $chartdatasorted[$scaleid] = $chartdata[$scaleid];
+        }
+
         $chart = new chart_bar();
         $chart->set_stacked(true);
         $chart->set_horizontal(true);
@@ -444,8 +455,8 @@ class catquizstatistics {
             $colors = array_values(feedbackclass::get_array_of_colors($this->get_max_range()));
             foreach (range(1, $this->get_max_range()) as $range) {
                 $counts = [];
-                foreach (array_keys($chartdata) as $scaleid) {
-                    $counts[] = count($chartdata[$scaleid][$range] ?? []);
+                foreach (array_keys($chartdatasorted) as $scaleid) {
+                    $counts[] = count($chartdatasorted[$scaleid][$range] ?? []);
                 }
                 $series = new chart_series(get_string('feedbackrange', 'local_catquiz', $range), $counts);
                 $color = $colors[$range - 1];
@@ -455,15 +466,15 @@ class catquizstatistics {
         } else {
             // If the quiz settings are not compatible (e.g. different scale ranges), show the total numbers without range info.
             $counts = [];
-            foreach (array_keys($chartdata) as $scaleid) {
-                $counts[] = array_sum(array_map(fn ($range) => count($range), $chartdata[$scaleid]));
+            foreach (array_keys($chartdatasorted) as $scaleid) {
+                $counts[] = array_sum(array_map(fn ($range) => count($range), $chartdatasorted[$scaleid]));
             }
             $series = new chart_series(get_string('selected_scales_all_ranges_label', 'local_catquiz'), $counts);
             $series->set_color(LOCAL_CATQUIZ_DEFAULT_GREY);
             $chart->add_series($series);
         }
 
-        $labels = array_map(fn ($scaleid) => catscale::return_catscale_object($scaleid)->name, array_keys($chartdata));
+        $labels = array_map(fn ($scaleid) => catscale::return_catscale_object($scaleid)->name, array_keys($chartdatasorted));
         $chart->set_labels($labels);
         $chart->get_xaxis(0, true)->set_label(sprintf('# %s', get_string('users')));
 
