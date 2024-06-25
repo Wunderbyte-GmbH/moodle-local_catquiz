@@ -1825,6 +1825,7 @@ class catquiz {
 
         $rolestudent = $DB->get_record('role', ['shortname' => 'student']);
         $enrolmentarray = [];
+        $message = false;
         foreach ($coursestoenrol as $catscaleid => $data) {
             $message = $data['show_message'] ?? false;
             $courseids = $data['course_ids'] ?? [];
