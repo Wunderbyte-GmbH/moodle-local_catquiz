@@ -418,12 +418,16 @@ class catquizstatistics {
             if (!property_exists($json, 'personabilities_abilities')) {
                 continue;
             }
-            $primaryscale = array_filter((array) $json->personabilities_abilities, fn ($scale) => $scale->primary ?? false);
-            if (count($primaryscale) != 1) {
+            $primaryscalearray = array_filter((array) $json->personabilities_abilities, fn ($scale) => $scale->primary ?? false);
+            if (count($primaryscalearray) != 1) {
                 continue;
             }
-            $primaryscaleid = array_key_first($primaryscale);
-            $value = $primaryscale[$primaryscaleid]->value;
+            $primaryscaleid = array_key_first($primaryscalearray);
+            $primaryscale = $primaryscalearray[$primaryscaleid];
+            if (!property_exists($primaryscale, 'toreport') || !$primaryscale->toreport) {
+                continue;
+            }
+            $value = $primaryscale->value;
 
             // Get the range of the selected value.
             if (!$range = feedback_helper::get_range_of_value($quizsettings, $primaryscaleid, $value)) {
