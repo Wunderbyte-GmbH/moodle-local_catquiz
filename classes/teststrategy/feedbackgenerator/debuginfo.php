@@ -76,7 +76,6 @@ class debuginfo extends feedbackgenerator {
             'lastquestion',
             'questions',
             'activescales',
-            'selectedscale',
             'lastmiddleware',
             'excluded subscales',
             'lastresponse',
@@ -128,7 +127,6 @@ class debuginfo extends feedbackgenerator {
             }
 
             $rowarr[] = $row['activescales'] ?? 'NA';
-            $rowarr[] = $row['selectedscale'];
             $rowarr[] = $row['lastmiddleware'];
             $rowarr[] = $row['lastresponse'];
             $rowarr[] = 'NA';
@@ -234,10 +232,6 @@ class debuginfo extends feedbackgenerator {
             $questions = [];
             $questionsperscale = [];
 
-            $selectedscale = isset($data['selected_catscale'])
-                ? $catscales[$data['selected_catscale']]->name
-                : "NA";
-
             $lastresponse = isset($newdata['lastresponse'])
                 ? $newdata['lastresponse']['fraction']
                 : "NA";
@@ -259,7 +253,6 @@ class debuginfo extends feedbackgenerator {
                 'questions' => $questions,
                 'activescales' => '"' . implode(", ", $activescales) . '"',
                 'lastquestion' => (array) $newdata['lastquestion'],
-                'selectedscale' => $selectedscale,
                 'lastmiddleware' => $newdata['lastmiddleware'],
                 'lastresponse' => $lastresponse,
                 'numquestionsperscale' => '"'
