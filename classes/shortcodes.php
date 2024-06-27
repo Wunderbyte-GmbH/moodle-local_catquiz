@@ -414,14 +414,16 @@ class shortcodes {
         if ($courseid) {
             $tests = catquiz::get_tests_for_scale($courseid, $scaleid);
             $course = get_course($courseid);
-            $linkedcourses = array_map(function ($test) {
+            $leftquote = get_string('catquiz_left_quote', 'local_catquiz');
+            $rightquote = '&rdquo;';
+            $linkedcourses = array_map(function ($test) use ($leftquote, $rightquote) {
                 $testname = json_decode($test->json)->name;
                 list($course, $cm) = get_course_and_cm_from_instance($test->componentid, 'adaptivequiz');
                 $testurl = new moodle_url(
                     '/mod/adaptivequiz/view.php',
                     ['id' => $cm->id]
                 );
-                $link = sprintf('<a href="%s">%s</a>', $testurl->out(), $testname);
+                $link = sprintf('<a href="%s">%s%s%s</a>', $testurl->out(), $leftquote, $testname, $rightquote);
                 return $link;
             }, $tests);
             $h1 = get_string('catquizstatistics_h1_scale', 'local_catquiz', (object) [
