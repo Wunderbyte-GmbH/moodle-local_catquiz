@@ -144,9 +144,9 @@ class edit_catcontext extends dynamic_form {
             ];
 
             $jsonobj = json_decode($storeddata['json']);
-            $storeddata['max_iterations'] = $jsonobj->max_iterations;
-            $storeddata['model_override'] = $jsonobj->strategy->model_override;
-            $storeddata['default'] = $jsonobj->default;
+            $storeddata['max_iterations'] = $jsonobj->max_iterations ?? '';
+            $storeddata['model_override'] = $jsonobj->strategy->model_override ?? '';
+            $storeddata['default'] = $jsonobj->default ?? false;
 
             foreach ($storeddata as $key => $value) {
                 $data->$key = $value;
