@@ -273,7 +273,8 @@ class catquizstatistics {
         }
         $chart->get_xaxis(0, true)->set_label(get_string('date'));
         $chart->get_yaxis(0, true)->set_label(get_string('numberofattempts', 'local_catquiz'));
-        $out = $OUTPUT->render($chart);
+        $chart->set_legend_options(['display' => false]);
+        $out = $OUTPUT->render_chart($chart, false);
 
         return [
             'charttitle' => get_string('catquizstatistics_numattempts_title', 'local_catquiz'),
@@ -316,10 +317,10 @@ class catquizstatistics {
                 }
             }
         }
-
         $chart->set_stacked(true);
         $chart->set_labels($labels);
-        $out = $OUTPUT->render($chart);
+        $chart->set_legend_options(['display' => false]);
+        $out = $OUTPUT->render_chart($chart, false);
 
         return [
             'chart' => $out,
@@ -682,8 +683,9 @@ class catquizstatistics {
         $chart->set_labels($labels);
         $chart->get_xaxis(0, true)->set_label(get_string('catquizstatistics_numberofresponses', 'local_catquiz'));
         $chart->get_yaxis(0, true)->set_label(sprintf('# %s', get_string('students')));
+        $chart->set_legend_options(['display' => false]);
 
-        $out = $OUTPUT->render($chart);
+        $out = $OUTPUT->render_chart($chart, false);
 
         return [
             'charttitle' => get_string('responsesbyusercharttitle', 'local_catquiz'),
@@ -1096,7 +1098,8 @@ class catquizstatistics {
 
         $chart->get_xaxis(0, true)->set_label(get_string('numberofattempts', 'local_catquiz'));
         $chart->get_yaxis(0, true)->set_label(sprintf('# %s', get_string('students')));
-        $out = $OUTPUT->render($chart);
+        $chart->set_legend_options(['display' => false]);
+        $out = $OUTPUT->render_chart($chart, false);
 
         if (
             optional_param('debug', false, PARAM_BOOL)
@@ -1118,7 +1121,19 @@ class catquizstatistics {
             $table = "<table class=\"table\">$thead<tbody>$tr</tbody></table>";
             $out .= $table;
         }
+
+        $colorbarlegend = false;
+        if ($this->get_quizsettings()) {
+            $legend = feedback_helper::get_colorbarlegend(
+                    $this->get_quizsettings(),
+                    $this->scaleid,
+                    $this->check_quizsettings_are_compatible(self::COMPATIBILITY_LEVEL_DESCRIPTION),
+                    true
+                );
+            $colorbarlegend = ['feedbackbarlegend' => $legend];
+        }
         return [
+            'colorbarlegend' => $colorbarlegend,
             'charttitle' => get_string('catquizstatistics_numattemptsperperson_title', 'local_catquiz'),
             'chart' => $out,
         ];
