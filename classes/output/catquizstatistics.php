@@ -381,7 +381,7 @@ class catquizstatistics {
         $out = $OUTPUT->render($chart);
         return [
             'chart' => $out,
-            'charttitle' => get_string('abilityprofile', 'local_catquiz', $scalename),
+            'charttitle' => get_string('abilityprofile', 'local_catquiz', feedback_helper::add_quotes($scalename)),
         ];
     }
 
