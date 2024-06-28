@@ -541,7 +541,7 @@ $string['nothingtocompare'] = 'Es sind nicht ausreichend valide Ergebnisse für 
 $string['personabilityrangestring'] = '{$a->rangestart} - {$a->rangeend}';
 $string['testinfolabel'] = 'Testinformation';
 $string['scalescorechartlabel'] = '{$a}-Score';
-$string['chart_detectedscales_title'] = 'Detektierte Skalen';
+$string['chart_detectedscales_title'] = 'Aktuelle Detail-Ergebnisse (Top {$a})';
 
 // Check display line breaks etc.
 $string['choosesubscaleforfeedback_help'] = 'Für die angezeigten Skalen können Sie nun {$a} Feedback-Angaben hinterlegen. Wählen Sie die jeweilige (Sub-)Skala an, um Ihr Feedback einzugeben. Die farbigen Symbole zeigen Ihnen den aktuellen Stand der Bearbeitung an, gemessen an den vor Ihnen hinterlegten Anzahl an Feedback-Optionen:
