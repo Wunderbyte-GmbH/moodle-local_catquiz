@@ -402,10 +402,11 @@ class feedback_helper {
      * @param object $quizsettings
      * @param string|int $catscaleid
      * @param bool $customlabels Use the labels defined in the settings instead of default labels
+     * @param bool $withuncalculated Include the color and description for the "not yet calculated" range
      * @return array
      *
      */
-    public static function get_colorbarlegend($quizsettings, $catscaleid, $customlabels = true): array {
+    public static function get_colorbarlegend($quizsettings, $catscaleid, $customlabels = true, $withuncalculated = false): array {
         if (!$quizsettings) {
             return [];
         }
@@ -440,6 +441,14 @@ class feedback_helper {
                 'subcolorcode' => $colorvalue,
                 'subfeedbacktext' => $text,
                 'subfeedbackrange' => $feedbackrangestring,
+            ];
+        }
+
+        if ($withuncalculated) {
+            $feedbacks[] = [
+                'subcolorcode' => LOCAL_CATQUIZ_DEFAULT_GREY,
+                'subfeedbacktext' => get_string('noresult', 'local_catquiz'),
+                'subfeedbackrange' => '',
             ];
         }
 
