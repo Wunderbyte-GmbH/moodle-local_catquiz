@@ -73,6 +73,20 @@ class catquizstatistics {
     const MAX_DETECTED_SCALES = 10;
 
     /**
+     * Require ranges to be the same to consider quiz settings as compatible
+     *
+     * @var string
+     */
+    const COMPATIBILITY_LEVEL_DEFAULT = 'default';
+
+    /**
+     * Require range descriptions to be the same to consider quiz settings as compatible
+     *
+     * @var string
+     */
+    const COMPATIBILITY_LEVEL_DESCRIPTION = 'description';
+
+    /**
      * @var ?int $courseid
      */
     private ?int $courseid;
@@ -127,9 +141,9 @@ class catquizstatistics {
     private array $attempts = [];
 
     /**
-     * @var bool $quizsettingcompatibility
+     * @var array $quizsettingcompatibility
      */
-    private bool $quizsettingcompatibility;
+    private array $quizsettingcompatibility;
 
     /**
      * @var int $maxrange
@@ -484,6 +498,13 @@ class catquizstatistics {
                 $series->set_color($color);
                 $chart->add_series($series);
             }
+
+            $legend = feedback_helper::get_colorbarlegend(
+                    $this->get_quizsettings(),
+                    $this->scaleid,
+                    $this->check_quizsettings_are_compatible(self::COMPATIBILITY_LEVEL_DESCRIPTION)
+                );
+            $colorbarlegend = ['feedbackbarlegend' => $legend];
         } else {
             // If the quiz settings are not compatible (e.g. different scale ranges), show the total numbers without range info.
             $counts = [];
@@ -493,6 +514,7 @@ class catquizstatistics {
             $series = new chart_series(get_string('selected_scales_all_ranges_label', 'local_catquiz'), $counts);
             $series->set_color(LOCAL_CATQUIZ_DEFAULT_GREY);
             $chart->add_series($series);
+            $colorbarlegend = false;
         }
 
         $labels = array_map(fn ($scaleid) => catscale::return_catscale_object($scaleid)->name, array_keys($chartdatasorted));
@@ -504,6 +526,7 @@ class catquizstatistics {
         $out = $OUTPUT->render_chart($chart, false);
 
         return [
+            'colorbarlegend' => $colorbarlegend,
             'charttitle' => get_string('chart_detectedscales_title', 'local_catquiz', self::MAX_DETECTED_SCALES),
             'chart' => $out,
         ];
@@ -759,17 +782,19 @@ class catquizstatistics {
     /**
      * If rendering statistics for multiple tests, check whether their settings are compatible
      *
+     * @param string $level Controls how strict the compatibility check is.
+     *
      * @return bool
      */
-    private function check_quizsettings_are_compatible(): bool {
+    private function check_quizsettings_are_compatible(string $level = self::COMPATIBILITY_LEVEL_DEFAULT): bool {
         global $CFG;
 
-        if (isset($this->quizsettingcompatibility)) {
-            return $this->quizsettingcompatibility;
+        if (isset($this->quizsettingcompatibility[$level])) {
+            return $this->quizsettingcompatibility[$level];
         }
 
         if (count($this->quizsettings) === 1) {
-            $this->quizsettingcompatibility = true;
+            $this->quizsettingcompatibility[$level] = true;
             return true;
         }
 
@@ -783,26 +808,31 @@ class catquizstatistics {
                 continue;
             }
             if ($qs->numberoffeedbackoptionsselect !== $lastranges) {
-                $this->quizsettingcompatibility = false;
+                $this->quizsettingcompatibility[$level] = false;
                 return false;
             }
         }
 
-        // If we are here, there are multiple tests and they all have the same number of ranges.
-        // Now we need to check if the ranges have the same limits.
+        // If we are here, there are multiple tests and they all have the same
+        // number of ranges. Now we need to check if the ranges have the same
+        // limits and, depending on the $level, descriptions.
         foreach (range(1, $lastranges) as $r) {
             $rangestart = null;
             $rangeend = null;
             $startkey = sprintf("feedback_scaleid_limit_lower_%d_%d", $this->scaleid, $r);
             $endkey = sprintf("feedback_scaleid_limit_upper_%d_%d", $this->scaleid, $r);
+            $textkey = sprintf('feedbacklegend_scaleid_%d_%d', $this->scaleid, $r);
             foreach ($this->quizsettings as $testid => $qs) {
                 // Check if we are in the first iteration of the loop.
                 if ($rangestart === null) {
                     $rangestart = $qs->$startkey;
                     $rangeend = $qs->$endkey;
+                    $rangetext = $qs->$textkey;
                 }
-                if ($qs->$startkey !== $rangestart || $qs->$endkey !== $rangeend) {
-                    $this->quizsettingcompatibility = false;
+                if ($qs->$startkey !== $rangestart || $qs->$endkey !== $rangeend
+                    || ($level === self::COMPATIBILITY_LEVEL_DESCRIPTION && $qs->$textkey !== $rangetext)
+                ) {
+                    $this->quizsettingcompatibility[$level] = false;
                     if ($CFG->debug > 0) {
                         echo sprintf(
                             "Quiz settings are not compatible: different range values [%f, %f] for test %d",
@@ -814,7 +844,7 @@ class catquizstatistics {
             }
         }
 
-        $this->quizsettingcompatibility = true;
+        $this->quizsettingcompatibility[$level] = true;
         return true;
     }
 
