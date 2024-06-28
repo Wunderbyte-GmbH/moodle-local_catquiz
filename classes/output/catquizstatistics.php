@@ -16,6 +16,7 @@
 
 namespace local_catquiz\output;
 
+use context_course;
 use context_system;
 use core\chart_bar;
 use core\chart_line;
@@ -370,15 +371,25 @@ class catquizstatistics {
         $tiseries->set_smooth(true);
 
         $chart = new chart_bar();
-        $isteacher = true; // TOOD: check if user is teacher.
-        if ($isteacher) {
+
+        // Teachers and CAT managers can see the test information in addition to the ability.
+        $canviewcourse = false;
+        if ($this->courseid) {
+            $context = context_course::instance($this->courseid);
+            $canviewcourse = has_capability('local/catquiz:view_users_feedback', $context);
+        }
+        $ismanager = has_capability('local/catquiz:canmanage', context_system::instance());
+        $canviewall = $ismanager || $canviewcourse;
+        if ($canviewall) {
             $chart->add_series($tiseries);
         }
+
+        $chart->set_legend_options(['display' => $canviewall]);
         $chart->add_series($aseries);
         $chart->set_labels(array_keys($fisherinfos));
         $chart->get_xaxis(0, true)->set_label(get_string('personability', 'local_catquiz'));
 
-        $out = $OUTPUT->render($chart);
+        $out = $OUTPUT->render_chart($chart, false);
         return [
             'chart' => $out,
             'charttitle' => get_string('abilityprofile', 'local_catquiz', feedback_helper::add_quotes($scalename)),
