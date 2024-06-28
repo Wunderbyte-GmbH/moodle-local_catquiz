@@ -659,7 +659,10 @@ $string['catquizstatistics_testusage'] = 'Testnutzung';
 $string['catquizstatistics_progress_peers_title'] = 'Durchschnitt';
 $string['catquizstatistics_progress_personal_title'] = 'Ihr Fähigkeitswert';
 $string['catquizstatistics_numberofresponses'] = 'Anzahl der gegebenen Antworten';
-$string['catquizstatistics_exportcsv_heading'] = 'Daten der ausgewählten Testversuche als CSV Datei exportieren';
+$string['catquizstatistics_exportcsv_heading'] = 'Export der Testversuche';
+$string['catquizstatistics_exportcsv_description'] = 'Hier können Sie als
+    Nutzer mit Berechtigung zum Download eines Exports die Ergebnisse aller Versuche als CSV-Datei
+    exportieren.';
 $string['catquizstatistics_nodataforcourse'] = 'Für den angegebenen Kurs können keine CAT Tests gefunden werden.';
 $string['catquizstatistics_askforparams'] = 'Bitte geben Sie einen "globalscale" oder "courseid" Parameter an';
 $string['catquizstatistics_scale_testid_conflict'] = 'Der Test zur angegebenen testid verwendet nicht die angegebene Skala';
