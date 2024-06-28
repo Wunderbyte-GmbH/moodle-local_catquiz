@@ -325,7 +325,7 @@ $string['questioncontextattempts'] = '# Testversuche im ausgewählten Einsatz-Ko
 
 $string['studentstats'] = 'Studierende';
 $string['notyetcalculated'] = 'Noch nicht berechnet';
-$string['notyetattempted'] = 'Noch keine Testversuche';
+$string['notyetattempted'] = 'Ohne Versuch';
 
 // Email Templates.
 $string['notificationcatscalechange'] = 'Hallo {$a->firstname} {$a->lastname},
@@ -487,7 +487,7 @@ $string['feedbacknumber'] = 'Feedback für Fähigkeits-Stufe "{$a}"';
 $string['feedbackrange'] = 'Fähigkeits-Stufe {$a}';
 $string['hasability'] = 'Fähigkeit wurde berechnet';
 $string['responsesbyusercharttitle'] = 'Gesamtanzahl der gegebenen Antworten pro Person';
-$string['noresult'] = 'Es wurde noch keine Fähigkeit berechnet';
+$string['noresult'] = 'kein Fähigkeitswert ermittelt';
 $string['selected_scales_all_ranges_label'] = 'Anzahl der Teilnehmenden';
 $string['numberoffeedbackoptionpersubscale_help'] = 'Wählen Sie aus, in wievielen Fähigkeits-Stufen Sie Ihr Feedback differenzieren möchten. Mithilfe der Fähigkeits-Stufen können Sie in Abhängigkeit der ermittelten Fähigkeit für jede Skala Ihren Teilnehmenden unterschiedliche schriftliche Rückmeldungen erteilen, diese in unterschiedliche Kurse einschreiben oder diese unterschiedlichen Gruppen zuordnen.';
 $string['choosesubscaleforfeedback'] = 'Skala wählen';
@@ -652,7 +652,7 @@ $string['catquizstatistics_h2_global'] = 'Die folgenden Daten beziehen sich auf 
 $string['catquizstatistics_timerange_both'] = 'Nur Daten von {$a->starttime} bis {$a->endtime} werden berücksichtigt.';
 $string['catquizstatistics_timerange_start'] = 'Nur Daten ab {$a->starttime} werden berücksichtigt.';
 $string['catquizstatistics_timerange_end'] = 'Nur Daten bis {$a->endtime} werden berücksichtigt.';
-$string['catquizstatistics_numattempts_title'] = 'Anzahl von Testversuchen';
+$string['catquizstatistics_numattempts_title'] = 'Anzahl an Testversuchen';
 $string['catquizstatistics_numattemptsperperson_title'] = 'Testversuche pro Person';
 $string['catquizstatistics_overview'] = 'Überblick';
 $string['catquizstatistics_testusage'] = 'Testnutzung';

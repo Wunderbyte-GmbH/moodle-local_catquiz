@@ -242,7 +242,6 @@ class shortcodes {
             'attemptspertimerangechart' => $catquizstatistics->render_attempts_per_timerange_chart(),
             'attemptsperpersonchart' => $catquizstatistics->render_attempts_per_person_chart(),
             'learningprogress' => $catquizstatistics->render_learning_progress(),
-            'numresponsesbyusers' => $catquizstatistics->render_responses_by_users_chart(),
             'exportbutton' => $catquizstatistics->render_export_button() ?: false,
             // This ID will be appended to the navigation tab links, so that
             // those links are unique for shortcodes with different arguments.
