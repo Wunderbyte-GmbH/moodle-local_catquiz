@@ -61,6 +61,18 @@
             {{#detectedscales}}
                 <h5>{{charttitle}}</h5>
                 {{{chart}}}
+                {{#colorbarlegend}}
+                    <div class="catquiz-legend">
+                        <h4>{{#str}}feedbackbarlegend, local_catquiz{{/str}}</h4>
+                        {{#feedbackbarlegend}}
+                            <div>
+                                <span class="catquiz-legend-symbol" style="background: {{subcolorcode}};"></span>
+                                <span class="catquiz-legend-description">{{subfeedbacktext}}</span>
+                                <span class="catquiz-legend-range">{{subfeedbackrange}}</span>
+                            </div>
+                        {{/feedbackbarlegend}}
+                    </div>
+                {{/colorbarlegend}}
             {{/detectedscales}}
           </div>
           <div class="tab-pane" id="testusage-{{shortcodeid}}" role="tabpanel" aria-expanded="false">

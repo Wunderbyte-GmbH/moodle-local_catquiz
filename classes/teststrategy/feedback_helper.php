@@ -395,4 +395,54 @@ class feedback_helper {
         $rightquote = '&rdquo;';
         return sprintf('%s%s%s', $leftquote, $string, $rightquote);
     }
+
+    /**
+     * Write string to define color gradiant bar.
+     *
+     * @param object $quizsettings
+     * @param string|int $catscaleid
+     * @param bool $customlabels Use the labels defined in the settings instead of default labels
+     * @return array
+     *
+     */
+    public static function get_colorbarlegend($quizsettings, $catscaleid, $customlabels = true): array {
+        if (!$quizsettings) {
+            return [];
+        }
+        // We collect the feedbackdata only for the parentscale.
+        $feedbacks = [];
+        $numberoffeedbackoptions = intval($quizsettings->numberoffeedbackoptionsselect);
+        $colorarray = feedbackclass::get_array_of_colors($numberoffeedbackoptions);
+
+        for ($j = 1; $j <= $numberoffeedbackoptions; $j++) {
+            $colorkey = 'wb_colourpicker_' . $catscaleid . '_' . $j;
+            $feedbacktextkey = 'feedbacklegend_scaleid_' . $catscaleid . '_' . $j;
+            $lowerlimitkey = "feedback_scaleid_limit_lower_" . $catscaleid . "_" . $j;
+            $upperlimitkey = "feedback_scaleid_limit_upper_" . $catscaleid . "_" . $j;
+
+            $feedbackrangestring = get_string(
+                'subfeedbackrange',
+                'local_catquiz',
+                [
+                    'upperlimit' => round($quizsettings->$upperlimitkey, 2),
+                    'lowerlimit' => round($quizsettings->$lowerlimitkey, 2),
+                ]);
+
+            $text = get_string('feedbackrange', 'local_catquiz', $j);
+            if ($customlabels && property_exists($quizsettings, $feedbacktextkey)) {
+                $text = $quizsettings->$feedbacktextkey;
+            }
+
+            $colorname = $quizsettings->$colorkey;
+            $colorvalue = $colorarray[$colorname];
+
+            $feedbacks[] = [
+                'subcolorcode' => $colorvalue,
+                'subfeedbacktext' => $text,
+                'subfeedbackrange' => $feedbackrangestring,
+            ];
+        }
+
+        return $feedbacks;
+    }
 }
