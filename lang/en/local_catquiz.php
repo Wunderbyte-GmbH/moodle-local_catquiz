@@ -660,6 +660,7 @@ $string['catquizstatistics_progress_peers_title'] = 'Average result of your peer
 $string['catquizstatistics_progress_personal_title'] = 'Your personal results for that scale';
 $string['catquizstatistics_numberofresponses'] = 'Number of responses';
 $string['catquizstatistics_exportcsv_heading'] = 'Export data of selected attempts as CSV';
+$string['catquizstatistics_exportcsv_description'] = 'As user with permission to download exports, here you can export results of all attempts as a CSV file';
 $string['catquizstatistics_nodataforcourse'] = 'There are no CAT tests for the given courseid';
 $string['catquizstatistics_askforparams'] = 'Please provide a "globalscale" or "courseid" parameter';
 $string['catquizstatistics_scale_testid_conflict'] = 'The test for the given testid is not using the provided scale';

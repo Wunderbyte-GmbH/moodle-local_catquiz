@@ -1105,7 +1105,12 @@ class catquizstatistics {
      * @return string
      */
     public function render_export_button(): string {
-        if (!has_capability('local/catquiz:canmanage', context_system::instance())) {
+        $hasglobalaccess = has_capability('local/catquiz:canmanage', context_system::instance());
+        $haslocalaccess = $this->courseid && has_capability(
+            'local/catquiz:view_users_feedback',
+            context_course::instance($this->courseid)
+        );
+        if (!$hasglobalaccess && !$haslocalaccess) {
             return '';
         }
 
