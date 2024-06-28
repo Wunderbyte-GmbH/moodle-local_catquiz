@@ -66,6 +66,13 @@ class catquizstatistics {
     const DEFAULT_MAX_ATTEMPTS = 7;
 
     /**
+     * Display at most this number of detected scales.
+     *
+     * @var int
+     */
+    const MAX_DETECTED_SCALES = 10;
+
+    /**
      * @var ?int $courseid
      */
     private ?int $courseid;
@@ -458,6 +465,9 @@ class catquizstatistics {
             $chartdatasorted[$scaleid] = $chartdata[$scaleid];
         }
 
+        // Keep only the top 10.
+        $chartdatasorted = array_slice($chartdatasorted, 0, self::MAX_DETECTED_SCALES, true);
+
         $chart = new chart_bar();
         $chart->set_stacked(true);
         $chart->set_horizontal(true);
@@ -488,11 +498,13 @@ class catquizstatistics {
         $labels = array_map(fn ($scaleid) => catscale::return_catscale_object($scaleid)->name, array_keys($chartdatasorted));
         $chart->set_labels($labels);
         $chart->get_xaxis(0, true)->set_label(sprintf('# %s', get_string('users')));
+        // Hide the legend.
+        $chart->set_legend_options(['display' => false]);
 
-        $out = $OUTPUT->render($chart);
+        $out = $OUTPUT->render_chart($chart, false);
 
         return [
-            'charttitle' => get_string('chart_detectedscales_title', 'local_catquiz'),
+            'charttitle' => get_string('chart_detectedscales_title', 'local_catquiz', self::MAX_DETECTED_SCALES),
             'chart' => $out,
         ];
     }

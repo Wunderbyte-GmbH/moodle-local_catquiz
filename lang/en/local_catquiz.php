@@ -537,7 +537,7 @@ $string['attemptchartstitle'] = 'Number and results of attempts in scale "{$a}"'
 $string['personabilityrangestring'] = '{$a->rangestart} - {$a->rangeend}';
 $string['testinfolabel'] = 'Test information';
 $string['scalescorechartlabel'] = '{$a}-Score';
-$string['chart_detectedscales_title'] = 'Detected scales';
+$string['chart_detectedscales_title'] = 'Detected scales (Top {$a})';
 
 // Check display line breaks etc.
 $string['choosesubscaleforfeedback_help'] = 'You can now store <number of options> feedback informations for the subscales displayed. Select a (sub-)scale to enter your feedback. The colored symbols indicate the current status of processing, measured by the number of feedback options you entered:
