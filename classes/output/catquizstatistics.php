@@ -546,11 +546,12 @@ class catquizstatistics {
         // Compare to other courses.
         // Find all courses before the end of the day of this attempt.
         $records = $this->get_attempts();
+        $scalename = catscale::return_catscale_object($this->scaleid)->name;
         // Compare records to define range for average.
         // Minimum 3 records required to display progress charts.
         if (count($records) < 3) {
             return [
-                'charttitle' => get_string('progress', 'local_catquiz'),
+                'charttitle' => get_string('progress', 'local_catquiz', feedback_helper::add_quotes($scalename)),
                 'chart' => $this->get_nodata_body(),
             ];
         }
@@ -567,10 +568,11 @@ class catquizstatistics {
         $timerange = feedback_helper::get_timerange_for_attempts($beginningoftimerange, $this->endtime);
         $attemptsofuser = array_filter($records, fn($r) => $r->userid == $userid);
         $attemptsofpeers = array_filter($records, fn($r) => $r->userid != $userid);
+        $scalename = catscale::return_catscale_object($this->scaleid)->name;
 
         if (count($attemptsofpeers) < 3) {
             return [
-                'charttitle' => get_string('progress', 'local_catquiz'),
+                'charttitle' => get_string('progress', 'local_catquiz', feedback_helper::add_quotes($scalename)),
                 'chart' => $this->get_nodata_body(),
             ];
         }
@@ -582,7 +584,7 @@ class catquizstatistics {
                 [$beginningoftimerange, $this->endtime]);
 
         return [
-            'charttitle' => get_string('progress', 'local_catquiz'),
+            'charttitle' => get_string('progress', 'local_catquiz', feedback_helper::add_quotes($scalename)),
             'chart' => $progresscomparison,
         ];
     }
@@ -880,51 +882,6 @@ class catquizstatistics {
     }
 
     /**
-     * Render chart for individual progress.
-     *
-     * @param array $attemptsofuser
-     * @param array $primarycatscale
-     *
-     * @return array
-     *
-     */
-    private function render_chart_for_individual_user(array $attemptsofuser, array $primarycatscale) {
-        global $OUTPUT;
-        $scaleid = $this->scaleid;
-        $scalename = catscale::return_catscale_object($this->scaleid)->name;
-
-        $chart = new chart_line();
-        $chart->set_smooth(true); // Calling set_smooth() passing true as parameter, will display smooth lines.
-
-        $personabilities = [];
-        foreach ($attemptsofuser as $attempt) {
-            $data = json_decode($attempt->json);
-            if (isset($data->personabilities->$scaleid)) {
-                $personabilities[] = $data->personabilities->$scaleid;
-            }
-        }
-        if (count($personabilities) < 2) {
-            return '';
-        }
-
-        $chartserie = new \core\chart_series(
-            get_string('personabilityinscale', 'local_catquiz', $scalename),
-            $personabilities
-        );
-
-        $labels = range(1, count($personabilities));
-
-        $chart->add_series($chartserie);
-        $chart->set_labels($labels);
-        $out = $OUTPUT->render($chart);
-
-        return [
-            'chart' => $out,
-            'charttitle' => get_string('progress', 'local_catquiz'),
-        ];
-    }
-
-    /**
      * Render chart for progress compared to peers and grouped by date.
      *
      * @param array $attemptsofuser
@@ -986,7 +943,7 @@ class catquizstatistics {
         }
 
         $peerattempts = new chart_series(
-            get_string('catquizstatistics_progress_peers_title', 'local_catquiz', $scalename),
+            get_string('catquizstatistics_progress_peers_title', 'local_catquiz'),
             array_values($peerattemptsbydate)
         );
         $peerattempts->set_labels(array_values($peerattemptsbydate));
@@ -1004,7 +961,7 @@ class catquizstatistics {
         $chart->set_labels($labels);
         $chart->get_xaxis(0, true)->set_label(get_string('date'));
         $chart->get_yaxis(0, true)->set_label(get_string('personability', 'local_catquiz'));
-        $out = $OUTPUT->render($chart);
+        $out = $OUTPUT->render_chart($chart, false);
         return $out;
     }
 
