@@ -435,7 +435,7 @@ class catquizstatistics {
 
         if (!$attempts = $this->get_attempts()) {
             return [
-                'charttitle' => get_string('chart_detectedscales_title', 'local_catquiz'),
+                'charttitle' => get_string('chart_detectedscales_title', 'local_catquiz', self::MAX_DETECTED_SCALES),
                 'chart' => $this->get_nodata_body(),
             ];
         }
@@ -467,6 +467,13 @@ class catquizstatistics {
                 $range = self::FALLBACK_RANGE;
             }
             $chartdata[$primaryscaleid][$range][] = $userid;
+        }
+
+        if (!$chartdata) {
+            return [
+                'charttitle' => get_string('chart_detectedscales_title', 'local_catquiz', self::MAX_DETECTED_SCALES),
+                'chart' => $this->get_nodata_body(),
+            ];
         }
 
         // Sort the chart in descending order of attempts across all ranges.
