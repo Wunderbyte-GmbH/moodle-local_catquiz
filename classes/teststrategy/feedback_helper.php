@@ -381,4 +381,18 @@ class feedback_helper {
         }
         return intval(ceil($value / $classwidth) - 1);
     }
+
+    /**
+     * Puts the given string in localized quotes
+     *
+     * E.g., in German, the left quote is a lower quote whereas in English its an upper quote.
+     *
+     * @param string $string
+     * @return string
+     */
+    public static function add_quotes(string $string) {
+        $leftquote = get_string('catquiz_left_quote', 'local_catquiz');
+        $rightquote = '&rdquo;';
+        return sprintf('%s%s%s', $leftquote, $string, $rightquote);
+    }
 }
