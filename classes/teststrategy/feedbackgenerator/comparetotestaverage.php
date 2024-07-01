@@ -366,7 +366,6 @@ class comparetotestaverage extends feedbackgenerator {
         }
 
         $fisherinfos = $this->feedbackhelper->get_fisherinfos_of_items($items, $models, $abilitysteps);
-        $fi = json_encode($fisherinfos);
         // Prepare data for scorecounter bars.
         $abilityrecords = $DB->get_records('local_catquiz_personparams', ['catscaleid' => $primarycatscale['id']]);
         $abilityseries = [];
@@ -397,21 +396,23 @@ class comparetotestaverage extends feedbackgenerator {
         $aserieslabel = get_string('scalescorechartlabel', 'local_catquiz', $scalename);
         $aseries = new chart_series($aserieslabel, array_values($abilityseries['counter']));
         $aseries->set_colors(array_values($abilityseries['colors']));
-
-        $testinfolabel = get_string('testinfolabel', 'local_catquiz');
-        $tiseries = new chart_series($testinfolabel, $scaledtiseries);
-        $tiseries->set_type(chart_series::TYPE_LINE);
-        $tiseries->set_smooth(true);
-
         $chart = new chart_bar();
-        $chart->add_series($tiseries);
         $chart->add_series($aseries);
+
+        if ($this->has_extended_view_permissions()) {
+            $testinfolabel = get_string('testinfolabel', 'local_catquiz');
+            $tiseries = new chart_series($testinfolabel, $scaledtiseries);
+            $tiseries->set_type(chart_series::TYPE_LINE);
+            $tiseries->set_smooth(true);
+            $chart->add_series($tiseries);
+        }
+
         $chart->set_labels(array_keys($fisherinfos));
 
-        $out = $OUTPUT->render($chart);
+        $out = $OUTPUT->render_chart($chart, $this->has_extended_view_permissions());
         return [
             'chart' => $out,
-            'charttitle' => get_string('abilityprofile', 'local_catquiz', feedback_helper::add_quotes($scalename)),
+            'charttitle' => get_string('abilityprofile_title', 'local_catquiz'),
         ];
     }
 

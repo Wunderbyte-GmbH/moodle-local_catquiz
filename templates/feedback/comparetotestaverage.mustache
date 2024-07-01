@@ -79,7 +79,7 @@
 {{/colorbar}}
 {{#colorbarlegend}}
     <div class="catquiz-legend">
-        <h4>{{#str}}feedbackbarlegend, local_catquiz{{/str}}</h4>
+        <h6>{{#str}}feedbackbarlegend, local_catquiz{{/str}}</h6>
         {{#feedbackbarlegend}}
             <div>
                 <span class="catquiz-legend-symbol" style="background: {{subcolorcode}};"></span>
@@ -90,8 +90,8 @@
     </div>
 {{/colorbarlegend}}
 {{#abilityprofile}}
-    <h6>
-    {{charttitle}}
-    </h6>
+    <h5 style="margin-top: 1em">
+    {{{charttitle}}}
+    </h5>
     {{{chart}}}
 {{/abilityprofile}}

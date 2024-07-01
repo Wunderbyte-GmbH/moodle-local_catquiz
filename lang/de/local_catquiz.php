@@ -543,6 +543,7 @@ $string['personabilityinscale'] = 'Fähigkeits-Score für Skala "{$a}"';
 $string['yourscorein'] = 'Ihre durchschnittlichen "{$a}"-Ergebnisse';
 $string['scoreofpeers'] = 'Mittelwert Ihrer Mit-Studierenden';
 $string['abilityprofile'] = 'Aktuelle Ergebnisse in {$a}';
+$string['abilityprofile_title'] = 'Aktuelle Ergebnisse im Test';
 $string['numberofattempts'] = 'Anzahl der Testversuche';
 $string['attemptchartstitle'] = 'Anzahl und Ergebnisse der Testversuche für Skala "{$a}"';
 $string['labelforrelativepersonabilitychart'] = 'Relative Fähigkeit';
