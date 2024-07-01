@@ -343,6 +343,13 @@ $string['previewquestion'] = "Fragen Vorschau";
 $string['personability'] = "Fähigkeits-Score";
 $string['personabilities'] = "Fähigkeits-Scores";
 $string['personabilitytitletab'] = "Ergebnis-Details";
+$string['feedback_details_heading'] = "Details zu Ihrem Ergebnis";
+$string['feedback_details_description'] = 'Die folgende Tabelle listet alle
+    Aspekte (Skalen) von {$a} auf, für die der Test ein verlässliches Ergebnis
+    ermitteln konnte';
+$string['feedback_details_lowestskill'] = 'Die Skala {$a->name} wurde mit einem
+    persönlichen Fähigkeitswert {$a->value} (± {$a->se}) als Ihr größtes
+    Defizit ermittelt.';
 $string['learningprogresstitle'] = "Lernfortschritt";
 $string['personabilitiesnodata'] = "Es konnte kein Fähigkeits-Score errechnet werden";
 $string['itemdifficulties'] = "Item difficulties";

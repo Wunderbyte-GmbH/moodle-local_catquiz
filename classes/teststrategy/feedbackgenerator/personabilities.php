@@ -30,6 +30,7 @@ use core\chart_series;
 use local_catquiz\catscale;
 use local_catquiz\teststrategy\feedbackgenerator;
 use local_catquiz\local\model\model_strategy;
+use local_catquiz\teststrategy\feedback_helper;
 
 defined('MOODLE_INTERNAL') || die();
 
@@ -73,15 +74,40 @@ class personabilities extends feedbackgenerator {
     public function get_studentfeedback(array $feedbackdata): array {
         global $OUTPUT;
 
+        $primaryscaleid = $feedbackdata['primaryscale']['id'];
         $abilitieschart = $this->render_chart(
             $feedbackdata['personabilities_abilities'],
             (array) $this->get_progress()->get_quiz_settings(),
             $feedbackdata['primaryscale'],
         );
 
+        $globalscalename = catscale::return_catscale_object($feedbackdata['catscaleid'])->name;
+        $description = get_string(
+            'feedback_details_description',
+            'local_catquiz',
+            feedback_helper::add_quotes($globalscalename)
+        );
+        $scaleinfo = false;
+        if (array_key_exists($primaryscaleid, $feedbackdata['personabilities_abilities'])) {
+            $primaryscale = $feedbackdata['personabilities_abilities'][$primaryscaleid];
+            if ($primaryscale['primarybecause'] === 'lowestskill') {
+                $scaleinfo = get_string(
+                    'feedback_details_lowestskill',
+                    'local_catquiz',
+                    [
+                        'name' => feedback_helper::add_quotes($primaryscale['name']),
+                        'value' => feedback_helper::localize_float($primaryscale['value']),
+                        'se' => feedback_helper::localize_float($feedbackdata['se'][$primaryscaleid]),
+                    ]
+                );
+            }
+        }
+
         $feedback = $OUTPUT->render_from_template(
         'local_catquiz/feedback/personabilities',
             [
+            'feedback_details_description' => $description,
+            'scale_info' => $scaleinfo,
             'abilities' => $feedbackdata['abilitieslist'],
             'chartdisplay' => $abilitieschart,
             ]
@@ -131,7 +157,7 @@ class personabilities extends feedbackgenerator {
      *
      */
     public function get_heading(): string {
-        return get_string('personabilitytitletab', 'local_catquiz');
+        return get_string('feedback_details_heading', 'local_catquiz');
     }
 
     /**
