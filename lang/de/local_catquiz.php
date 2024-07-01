@@ -120,10 +120,10 @@ $string['time_penalty_threshold_desc'] = 'Eine Frage, die durch einen User in
 $string['timeoutabortnoresult'] = 'Test wird sofort beendet und nicht abschließend bewertet';
 $string['timeoutabortresult'] = 'Test wird sofort beendet und abschließend bewertet';
 $string['timeoutfinishwithresult'] = 'Nachfrist: angezeigte Items können beendet werden';
-$string['store_debug_info_name'] = 'Create quiz feedback with debug information';
-$string['store_debug_info_desc'] = 'When set, additional data for each quiz
-    attempt are saved and provided as CSV download. This can take up a lot of
-    space.';
+$string['store_debug_info_name'] = 'Stelle debug Informationen zur Verfügung';
+$string['store_debug_info_desc'] = 'Wenn diese Option aktiviert ist, werden
+    zusätzliche Daten gespeichert und als CSV Datei zur Verfügung gestellt.
+    Dadurch steigt der benötigte Speicherplatz.';
 
 // Validation.
 $string['minabilityscalevalue'] = 'Minimale Personenfähigkeit:';
@@ -219,6 +219,7 @@ $string['notpositive'] = 'Bitte geben Sie eine positive Zahl ein';
 $string['strategy'] = 'Strategie';
 $string['max_iterations'] = 'Maximale Anzahl an Iterationen';
 $string['model_override'] = 'Nur dieses Modell verwenden';
+$string['importcontextinfo'] = 'Die Kontextid sollte gesetzt werden, wenn bestehende Items bearbeitet werden, damit die eindeutige Zuordnung gelingt. Für den Import von neuen Items, empfiehlt es sich, den Kontext leer zu lassen. Es wird dann ein neuer Kontext automatisch generiert, welcher die Items aus dem Standardkontext plus die neu importierten enthält. Falls beim Import neuer Items ein Kontext angegeben wird, muss der Kontext der entsprechenden obersten Skala umgestellt werden (im CAT-Manager Dashboard, Skalen-Bereich), damit diese Items zum Einsatz kommen.';
 
 // Buttons.
 $string['subscribe'] = 'Abonniere';

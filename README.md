@@ -46,7 +46,9 @@ The plugin tries to present questions matching the ability of the student. To as
 The csv importer accepts different formats of separators and encodings. Some columns are mandatory whereas others are optional. Find detailed descriptions of all columns on the same page, also the demo csv file can be found in: local/catquiz/classes/importer/demo.csv
 
 ## Contexts ##
-* When importing with the csv importer, a new context is created automatically. With respect to the new context, new items from the import csv file are added to the corresponding scales whereas existing items are updated with data from the import file.
+* When importing with the csv importer, and no context is defined, a new context is created automatically. It contains the items from the default context plus the newly imported items.
+If a context is specified when importing new items, the context of the corresponding root scale has to be changed (in the CAT Manager dashboard, Scales tab) so that these items are used.
+For items to be updated via importer, the context id should be defined to enable matching with existing items.
 
 ## Shortcodes ##
 To use the shortcode functionality, use plugin filter_shortcodes: https://moodle.org/plugins/filter_shortcodes

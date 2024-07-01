@@ -33,7 +33,7 @@ use moodle_url;
  * @copyright 2024 Wunderbyte
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class usertocourse_enroled extends \core\event\base {
+class usertocourse_enroled extends catquiz_event_base {
 
     /**
      * Init parameters.
@@ -64,13 +64,11 @@ class usertocourse_enroled extends \core\event\base {
      *
      */
     public function get_description() {
-        $data = $this->data;
+        $other = $this->get_other_data();
 
-        $otherarray = json_decode($data['other']);
-
-        $stringdata['coursename'] = $otherarray->coursename;
-        $stringdata['userid'] = $otherarray->userid;
-        $stringdata['courseurl'] = $otherarray->courseurl;
+        $stringdata['coursename'] = $other->coursename;
+        $stringdata['userid'] = $other->userid;
+        $stringdata['courseurl'] = $other->courseurl;
         return get_string('usertocourse_enroled_description', 'local_catquiz', $stringdata);
     }
 

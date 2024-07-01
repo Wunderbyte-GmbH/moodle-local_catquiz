@@ -130,6 +130,12 @@ class catcontext_table extends wunderbyte_table {
 
         global $OUTPUT;
 
+        // Extract info about default context from json.
+        if (isset($values->json)) {
+            $jsondta = json_decode($values->json);
+            $values->default = $jsondta->default ?? false;
+        }
+
         $data['showactionbuttons'][] = [
             'label' => get_string('edit', 'core'), // Name of your action button.
             'class' => 'btn btn-blank',
@@ -138,8 +144,18 @@ class catcontext_table extends wunderbyte_table {
             'id' => $values->id,
             'formname' => 'local_catquiz\\form\\edit_catcontext',
             'data' => [
-                'id' => $values->id,
-                'labelcolumn' => 'name',
+                [ // Will be added eg as data-id = $values->id, so values can be transmitted to the method above.
+                    'key' => 'id',
+                    'value' => $values->id,
+                ],
+                [
+                    'key' => 'default',
+                    'value' => $values->default,
+                ],
+                [
+                    'key' => 'labelcolumn',
+                    'value' => 'name',
+                ],
                 ],
         ];
 

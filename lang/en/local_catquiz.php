@@ -110,10 +110,10 @@ $string['time_penalty_threshold_desc'] = 'A question that has already been
     reduced probability. The probability depends on the duration between the
     previous and the current attempt. The longer the given recurrence delay,
     the longer this protection against repeated questions is effective.';
-$string['store_debug_info_name'] = 'Stelle debug Informationen zur Verfügung';
-$string['store_debug_info_desc'] = 'Wenn diese Option aktiviert ist, werden
-    zusätzliche Daten gespeichert und als CSV Datei zur Verfügung gestellt.
-    Dadurch steigt der benötigte Speicherplatz.';
+$string['store_debug_info_name'] = 'Create quiz feedback with debug information';
+$string['store_debug_info_desc'] = 'When set, additional data for each quiz
+    attempt are saved and provided as CSV download. This can take up a lot of
+    space.';
 
 $string['timeoutabortnoresult'] = 'Test aborted without result.';
 $string['timeoutabortresult'] = 'Test aborted with result.';
@@ -209,6 +209,7 @@ $string['notpositive'] = 'Please enter a positive number';
 $string['strategy'] = 'Strategy';
 $string['max_iterations'] = 'Maximum number of iterations';
 $string['model_override'] = 'Only use this model';
+$string['importcontextinfo'] = 'The context id should be set when existing items are updated for unambiguous matching with exisiting items. When importing new items, it is advisable to leave the context field empty. A new context is then generated automatically, which contains the items from the default context plus the newly imported items. If a context is defined when importing new items, the context of the corresponding top scale must be changed (in the CAT Manager dashboard, Scales area) in order to use these items during quiz.';
 
 $string['starttimestamp'] = 'Starttime';
 $string['endtimestamp'] = 'Endtime';
@@ -278,8 +279,6 @@ $string['enrolementstringstartforfeedback'] = 'Based on your results you are now
 $string['enrolementstringend'] = 'Good luck with your studies!';
 $string['feedback_tab_clicked'] = 'Click on feedback tab';
 $string['feedback_tab_clicked_description'] = 'User {$a->userid} clicked the "{$a->feedback_translated}" tab in {$a->attemptlink}';
-
-
 
 // Access.php.
 $string['catquiz:canmanage'] = 'Is allowed to manage Catquiz plugin';

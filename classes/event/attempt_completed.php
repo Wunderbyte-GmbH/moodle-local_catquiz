@@ -34,7 +34,7 @@ use moodle_url;
  * @copyright 2024 Georg Maißer
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class attempt_completed extends \core\event\base {
+class attempt_completed extends catquiz_event_base {
 
     /**
      * Init parameters.
@@ -86,19 +86,5 @@ class attempt_completed extends \core\event\base {
      */
     public function get_url() {
         return new moodle_url('');
-    }
-
-    /**
-     * Returns the 'other' data as object
-     * @return mixed
-     */
-    private function get_other_data() {
-        if (is_array($this->data['other'])) {
-            return (object) $this->data['other'];
-        }
-        if (is_string($this->data['other'])) {
-            return json_decode($this->data['other']);
-        }
-        return $this->data['other'];
     }
 }

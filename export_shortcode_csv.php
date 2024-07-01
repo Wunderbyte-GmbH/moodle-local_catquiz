@@ -13,11 +13,11 @@
 //
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
-//
-// Based on <https://gist.github.com/kralo/293dbc07b9b318eabe43>.
 
 /**
  * Attempts CSV export
+ *
+ * Based on https://gist.github.com/kralo/293dbc07b9b318eabe43.
  *
  * @package    local_catquiz
  * @copyright  2024 Wunderbyte GmbH
@@ -57,8 +57,6 @@ $downloadfilename = clean_filename ( $filename );
 $csvexport = new csv_export_writer ( 'semicolon' );
 $csvexport->set_filename ( $downloadfilename );
 
-$data = $catquizstatistics->get_export_data();
-
 $exporttitle = [
 // phpcs:disable
 // -- [x] UserID,
@@ -89,10 +87,9 @@ $exporttitle = [
     'Strategie',
     'Anz. Fragen gesamt',
 ];
-
 $csvexport->add_data($exporttitle);
 
-foreach ($data as $row) {
+foreach ($catquizstatistics->get_export_data() as $row) {
     $csvexport->add_data(
         [
             $row->userid,

@@ -427,7 +427,8 @@ class catscale {
         }
 
         $cache = cache::make('local_catquiz', 'adaptivequizattempt');
-        $cachekey = sprintf('testitems_%s_%s_%s', $contextid, $includesubscales, $this->catscale->id);
+        $selectedscaleshash = hash('crc32', implode('_', $selectedsubscales));
+        $cachekey = sprintf('testitems_%s_%s_%s_%s', $contextid, $includesubscales, $this->catscale->id, $selectedscaleshash);
         if ($testitems = $cache->get($cachekey)) {
             return $testitems;
         }
@@ -462,13 +463,21 @@ class catscale {
      * @param mixed $question
      * @param mixed $catscaleid
      * @param bool $includesubscales
+     * @param array $selectedsubscales
      *
      * @return void
      *
      */
-    public static function update_testitem(int $contextid, $question, $catscaleid, $includesubscales = false) {
+    public static function update_testitem(
+        int $contextid,
+        $question,
+        $catscaleid,
+        $includesubscales = false,
+        array $selectedsubscales = []
+    ) {
         $cache = cache::make('local_catquiz', 'adaptivequizattempt');
-        $cachekey = sprintf('testitems_%s_%s_%s', $contextid, $includesubscales, $catscaleid);
+        $selectedscaleshash = hash('crc32', implode('_', $selectedsubscales));
+        $cachekey = sprintf('testitems_%s_%s_%s_%s', $contextid, $includesubscales, $catscaleid, $selectedscaleshash);
         // This should never happen...
         if (!$testitems = $cache->get($cachekey)) {
             throw new moodle_exception(

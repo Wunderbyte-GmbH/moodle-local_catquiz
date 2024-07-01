@@ -635,6 +635,7 @@ class model_item_param_list implements ArrayAccess, IteratorAggregate, Countable
                     'timemodified' => time(),
                     'minscalevalue' => $minscalevalue ?? LOCAL_CATQUIZ_PERSONABILITY_LOWER_LIMIT,
                     'maxscalevalue' => $maxscalevalue ?? LOCAL_CATQUIZ_PERSONABILITY_UPPER_LIMIT,
+                    'contextid' => !empty($newrecord['contextid']) ? $newrecord['contextid'] : null,
                 ]);
             } else {
                 $catscale = new catscale_structure([
