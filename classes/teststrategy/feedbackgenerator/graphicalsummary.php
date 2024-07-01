@@ -259,11 +259,7 @@ class graphicalsummary extends feedbackgenerator {
             $chart->add_series($primarychart);
         }
 
-        if (array_key_exists('id', $data[0])) {
-            $chart->set_labels(array_map(fn($round) => $round['id'], $data));
-        } else {
-            $chart->set_labels(range(0, count($abilitiesafter) - 1));
-        }
+        $chart->set_labels(range(1, count($abilitiesafter)));
 
         return html_writer::tag('div', $OUTPUT->render($chart), ['dir' => 'ltr']);
     }

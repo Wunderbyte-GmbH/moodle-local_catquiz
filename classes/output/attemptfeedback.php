@@ -394,9 +394,8 @@ class attemptfeedback implements renderable, templatable {
         global $USER;
 
         $quizsettings = $this->get_quiz_settings();
-        $feedbackdata = $this->load_feedbackdata();
-        $coursestoenrol = $this->get_courses_to_enrol($feedbackdata, $quizsettings);
-        $groupstoenrol = $this->get_groups_to_enrol($feedbackdata, $quizsettings);
+        $coursestoenrol = $this->get_courses_to_enrol();
+        $groupstoenrol = $this->get_groups_to_enrol();
         $enrolementmsg = catquiz::enrol_user((array) $quizsettings, $coursestoenrol, $groupstoenrol);
         $courseandinstance = catquiz::return_course_and_instance_id(
             $quizsettings->modulename,
@@ -447,6 +446,12 @@ class attemptfeedback implements renderable, templatable {
         $quizsettings = (array) $this->get_quiz_settings();
         $feedbackdata = $this->load_feedbackdata();
 
+        if (!array_key_exists('personabilities_abilities', $feedbackdata)
+            || !$feedbackdata['personabilities_abilities']
+        ) {
+            return [];
+        }
+
         // Use only the toreport scale.
         $candidatescales = array_filter(
             $feedbackdata['personabilities_abilities'],
@@ -496,6 +501,12 @@ class attemptfeedback implements renderable, templatable {
     public function get_groups_to_enrol(): array {
         $quizsettings = (array) $this->get_quiz_settings();
         $feedbackdata = $this->load_feedbackdata();
+
+        if (!array_key_exists('personabilities_abilities', $feedbackdata)
+            || !$feedbackdata['personabilities_abilities']
+        ) {
+            return [];
+        }
 
         // Use only the toreport scale.
         $candidatescales = array_filter(

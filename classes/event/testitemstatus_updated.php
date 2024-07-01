@@ -38,7 +38,7 @@ require_once($CFG->dirroot . '/local/catquiz/lib.php');
  * @copyright 2024 Wunderbyte <info@wunderbyte.at>
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class testitemstatus_updated extends \core\event\base {
+class testitemstatus_updated extends catquiz_event_base {
 
     /**
      * Init parameters.

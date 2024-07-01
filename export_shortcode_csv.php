@@ -57,8 +57,6 @@ $downloadfilename = clean_filename ( $filename );
 $csvexport = new csv_export_writer ( 'semicolon' );
 $csvexport->set_filename ( $downloadfilename );
 
-$data = $catquizstatistics->get_export_data();
-
 $exporttitle = [
 // phpcs:disable
 // -- [x] UserID,
@@ -89,10 +87,9 @@ $exporttitle = [
     'Strategie',
     'Anz. Fragen gesamt',
 ];
-
 $csvexport->add_data($exporttitle);
 
-foreach ($data as $row) {
+foreach ($catquizstatistics->get_export_data() as $row) {
     $csvexport->add_data(
         [
             $row->userid,

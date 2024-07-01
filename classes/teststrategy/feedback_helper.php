@@ -49,7 +49,6 @@ class feedback_helper {
      */
     public function get_color_for_personability(array $quizsettings, float $personability, int $catscaleid): string {
         $default = LOCAL_CATQUIZ_DEFAULT_GREY;
-        return $default; // TODO: Remove.
         $abilityrange = $this->get_ability_range($catscaleid);
         if (!$quizsettings ||
             $personability < (float) $abilityrange['minscalevalue'] ||
@@ -203,19 +202,16 @@ class feedback_helper {
      */
     public static function get_timerange_for_attempts(int $beginningoftimerange, int $endtime) {
         $differenceindays = ($endtime - $beginningoftimerange) / (60 * 60 * 24);
-        $range = LOCAL_CATQUIZ_TIMERANGE_DAY;
 
         if ($differenceindays <= 30) {
-            $range = LOCAL_CATQUIZ_TIMERANGE_DAY;
-        } else if ($differenceindays > 30 && $differenceindays <= 183) {
-            $range = LOCAL_CATQUIZ_TIMERANGE_WEEK;
-        } else if ($differenceindays > 183 && $differenceindays <= 730) {
-            $range = LOCAL_CATQUIZ_TIMERANGE_MONTH;
+            return LOCAL_CATQUIZ_TIMERANGE_DAY;
+        } else if ($differenceindays <= 183) {
+            return LOCAL_CATQUIZ_TIMERANGE_WEEK;
+        } else if ($differenceindays <= 730) {
+            return LOCAL_CATQUIZ_TIMERANGE_MONTH;
         } else {
-            $range = LOCAL_CATQUIZ_TIMERANGE_QUARTEROFYEAR;
+            return LOCAL_CATQUIZ_TIMERANGE_QUARTEROFYEAR;
         }
-
-         return $range;
     }
 
     /**

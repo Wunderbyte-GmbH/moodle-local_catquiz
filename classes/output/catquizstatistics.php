@@ -50,11 +50,19 @@ class catquizstatistics {
      * @var int
      */
     const ATTEMPTS_PER_PERSON_CLASSES = 7;
+
     /**
      * For incompatible quiz settings, set this as the detected range.
      * @var int
      */
     const FALLBACK_RANGE = 1;
+
+    /**
+     * This is used as fallback if there are no attempts yet to make the histogram legend look ok.
+     *
+     * @var int
+     */
+    const DEFAULT_MAX_ATTEMPTS = 7;
 
     /**
      * @var ?int $courseid
@@ -227,7 +235,7 @@ class catquizstatistics {
         }
         $chart = new chart_bar();
         $chart->set_stacked(true);
-        $chart->set_labels($this->timerangekeys);
+        $chart->set_labels(array_values($this->timerangekeys));
         $colors[-1] = LOCAL_CATQUIZ_DEFAULT_GREY;
         $serieslabels = is_null($qs)
             ? [get_string('noresult', 'local_catquiz'), get_string('hasability', 'local_catquiz')]
@@ -236,7 +244,7 @@ class catquizstatistics {
         foreach ($countsbyrange as $range => $counts) {
             $series = new chart_series(
                 $serieslabels[$range],
-                $counts
+                array_values($counts)
             );
             $series->set_color($colors[$range - 1]);
             $chart->add_series($series);
@@ -323,7 +331,10 @@ class catquizstatistics {
         $attempts = $this->get_attempts();
         // Prepare data for scorecounter bars.
         $userids = array_unique(array_map(fn ($attempt) => $attempt->userid, $attempts));
-        $abilityrecords = catquiz::get_person_abilities($this->contextid, [$this->scaleid], $userids);
+        $abilityrecords = [];
+        if ($userids) {
+            $abilityrecords = catquiz::get_person_abilities($this->contextid, [$this->scaleid], $userids);
+        }
         $abilityseries = [];
         $quizsettings = reset($this->quizsettings); // TODO: check if the settings match for all tests.
         foreach ($abilitysteps as $as) {
@@ -400,25 +411,40 @@ class catquizstatistics {
             $latestattempts[$attempt->userid] = $attempt;
         }
         $chartdata = [];
-        $quizsettings = reset($this->quizsettings); // TODO: fix for multiple.
+        $quizsettings = $this->get_quizsettings();
         foreach ($latestattempts as $userid => $attempt) {
             // Skip old attempts that do not yet have the personabilities_abilities property.
             $json = json_decode($attempt->json);
             if (!property_exists($json, 'personabilities_abilities')) {
                 continue;
             }
-            $primaryscale = array_filter((array) $json->personabilities_abilities, fn ($scale) => $scale->primary ?? false);
-            if (count($primaryscale) != 1) {
+            $primaryscalearray = array_filter((array) $json->personabilities_abilities, fn ($scale) => $scale->primary ?? false);
+            if (count($primaryscalearray) != 1) {
                 continue;
             }
-            $primaryscaleid = array_key_first($primaryscale);
-            $value = $primaryscale[$primaryscaleid]->value;
+            $primaryscaleid = array_key_first($primaryscalearray);
+            $primaryscale = $primaryscalearray[$primaryscaleid];
+            if (!property_exists($primaryscale, 'toreport') || !$primaryscale->toreport) {
+                continue;
+            }
+            $value = $primaryscale->value;
 
             // Get the range of the selected value.
             if (!$range = feedback_helper::get_range_of_value($quizsettings, $primaryscaleid, $value)) {
-                continue;
+                $range = self::FALLBACK_RANGE;
             }
             $chartdata[$primaryscaleid][$range][] = $userid;
+        }
+
+        // Sort the chart in descending order of attempts across all ranges.
+        $tmp = [];
+        foreach ($chartdata as $scaleid => $rangearray) {
+            $num = array_sum(array_map(fn ($range) => count($range), $rangearray));
+            $tmp[$scaleid] = $num;
+        }
+        arsort($tmp);
+        foreach (array_keys($tmp) as $scaleid) {
+            $chartdatasorted[$scaleid] = $chartdata[$scaleid];
         }
 
         $chart = new chart_bar();
@@ -429,8 +455,8 @@ class catquizstatistics {
             $colors = array_values(feedbackclass::get_array_of_colors($this->get_max_range()));
             foreach (range(1, $this->get_max_range()) as $range) {
                 $counts = [];
-                foreach (array_keys($chartdata) as $scaleid) {
-                    $counts[] = count($chartdata[$scaleid][$range] ?? []);
+                foreach (array_keys($chartdatasorted) as $scaleid) {
+                    $counts[] = count($chartdatasorted[$scaleid][$range] ?? []);
                 }
                 $series = new chart_series(get_string('feedbackrange', 'local_catquiz', $range), $counts);
                 $color = $colors[$range - 1];
@@ -440,15 +466,15 @@ class catquizstatistics {
         } else {
             // If the quiz settings are not compatible (e.g. different scale ranges), show the total numbers without range info.
             $counts = [];
-            foreach (array_keys($chartdata) as $scaleid) {
-                $counts[] = array_sum(array_map(fn ($range) => count($range), $chartdata[$scaleid]));
+            foreach (array_keys($chartdatasorted) as $scaleid) {
+                $counts[] = array_sum(array_map(fn ($range) => count($range), $chartdatasorted[$scaleid]));
             }
             $series = new chart_series(get_string('selected_scales_all_ranges_label', 'local_catquiz'), $counts);
             $series->set_color(LOCAL_CATQUIZ_DEFAULT_GREY);
             $chart->add_series($series);
         }
 
-        $labels = array_map(fn ($scaleid) => catscale::return_catscale_object($scaleid)->name, array_keys($chartdata));
+        $labels = array_map(fn ($scaleid) => catscale::return_catscale_object($scaleid)->name, array_keys($chartdatasorted));
         $chart->set_labels($labels);
         $chart->get_xaxis(0, true)->set_label(sprintf('# %s', get_string('users')));
 
@@ -477,8 +503,8 @@ class catquizstatistics {
         // Minimum 3 records required to display progress charts.
         if (count($records) < 3) {
             return [
-                'individual' => '',
-                'comparison' => '',
+                'charttitle' => get_string('progress', 'local_catquiz'),
+                'chart' => $this->get_nodata_body(),
             ];
         }
         $startingrecord = reset($records);
@@ -498,7 +524,7 @@ class catquizstatistics {
         if (count($attemptsofpeers) < 3) {
             return [
                 'charttitle' => get_string('progress', 'local_catquiz'),
-                'chart' => get_string('catquizstatisticsnodata', 'local_catquiz'),
+                'chart' => $this->get_nodata_body(),
             ];
         }
         $progresscomparison = $this->render_chart_for_comparison(
@@ -534,6 +560,10 @@ class catquizstatistics {
                 $maxattempts = $r->total_answered;
             }
         }
+
+        if ($maxattempts === 0) {
+            $maxattempts = self::DEFAULT_MAX_ATTEMPTS;
+        }
         $classwidth = ceil($maxattempts / self::ATTEMPTS_PER_PERSON_CLASSES);
 
         if (!$qs = $this->get_quizsettings()) {
@@ -550,7 +580,7 @@ class catquizstatistics {
         }
 
         foreach ($results as $r) {
-            if ($r->total_answered === 0) {
+            if (intval($r->total_answered) === 0) {
                 $bin = 0;
             } else {
                 $bin = feedback_helper::get_histogram_bin($r->total_answered, $classwidth);
@@ -597,7 +627,11 @@ class catquizstatistics {
         $labels = [];
         $labels[0] = get_string('notyetattempted', 'local_catquiz');
         for ($i = 1; $i <= self::ATTEMPTS_PER_PERSON_CLASSES; $i++) {
-            $labels[$i] = sprintf("%d..%d", $i * $classwidth - $classwidth + 1, $i * $classwidth);
+            if ($classwidth == 1) {
+                $labels[$i] = sprintf("%d", $i * $classwidth);
+            } else {
+                $labels[$i] = sprintf("%d .. %d", $i * $classwidth - $classwidth + 1, $i * $classwidth);
+            }
         }
         $chart->set_labels($labels);
         $chart->get_xaxis(0, true)->set_label(get_string('catquizstatistics_numberofresponses', 'local_catquiz'));
@@ -622,7 +656,8 @@ class catquizstatistics {
             return $this->attempts;
         }
 
-        $attempts = catquiz::get_attempts(
+        $attempts = [];
+        foreach (catquiz::get_attempts(
             null,
             $this->scaleid,
             $this->courseid,
@@ -630,7 +665,15 @@ class catquizstatistics {
             $this->contextid,
             $this->starttime,
             $this->endtime
-        );
+        ) as $record) {
+            $json = json_decode($record->json);
+            $prunedrecord = $record;
+            $prunedrecord->json = json_encode((object) [
+                'personabilities_abilities' => $json->personabilities_abilities ?? null,
+                'personabilities' => $json->personabilities ?? null,
+            ]);
+            $attempts[] = $prunedrecord;
+        }
         $this->attempts = $attempts;
         return $attempts;
     }
@@ -646,14 +689,24 @@ class catquizstatistics {
             return $this->attemptsbytimerange[$allowempty];
         }
 
-        $records = catquiz::get_attempts(
+        $records = [];
+        foreach (catquiz::get_attempts(
             null,
             $this->rootscaleid,
             $this->courseid,
             $this->testid,
             $this->contextid,
             $this->starttime,
-            $this->endtime);
+            $this->endtime) as $record) {
+            // Store a subset of the json to save memory.
+            $json = json_decode($record->json);
+            $prunedrecord = $record;
+            $prunedrecord->json = json_encode((object) [
+                'personabilities' => $json->personabilities,
+            ]);
+            $records[] = $prunedrecord;
+        }
+
         if (count($records) < 2) {
             return [];
         }
@@ -708,15 +761,6 @@ class catquizstatistics {
             }
             if ($qs->numberoffeedbackoptionsselect !== $lastranges) {
                 $this->quizsettingcompatibility = false;
-                if ($CFG->debug > 0) {
-                    echo sprintf(
-                        "Quiz settings are not compatible: different number of ranges in test %d. Has %d but first test %d has %d",
-                        $testid,
-                        $qs->numberoffeedbackoptionsselect,
-                        $prevtestid,
-                        $lastranges
-                    );
-                }
                 return false;
             }
         }
@@ -859,7 +903,7 @@ class catquizstatistics {
         $numpeervalues = count(array_filter($pa, fn ($v) => $v !== null));
         $numuservalues = count(array_filter($ua, fn ($v) => $v !== null));
         if ($numpeervalues === 0 && $numuservalues === 0) {
-                return get_string('catquizstatisticsnodata', 'local_catquiz');
+                return $this->get_nodata_body();
         }
 
         $alldates = feedback_helper::get_timerangekeys($timerange, $beginningandendofrange);
@@ -923,7 +967,7 @@ class catquizstatistics {
         if (!$records = $DB->get_records_sql($sql, $params)) {
             return [
                 'charttitle' => get_string('catquizstatistics_numattemptsperperson_title', 'local_catquiz'),
-                'chart' => get_string('catquizstatisticsnodata', 'local_catquiz'),
+                'chart' => $this->get_nodata_body(),
             ];
         }
 
@@ -938,6 +982,9 @@ class catquizstatistics {
         }
         $colors[-1] = LOCAL_CATQUIZ_DEFAULT_GREY;
         $maxattempts = $records[array_key_last($records)]->attempts;
+        if ($maxattempts == 0) {
+            $maxattempts = self::DEFAULT_MAX_ATTEMPTS;
+        }
 
         // Display a maximum of self::ATTEMPTS_PER_PERSON_CLASSES bars. This
         // means, that each bar covers a range of $classwidth attempts.
@@ -973,11 +1020,18 @@ class catquizstatistics {
         $chart->set_stacked(true);
         $chartlabels[0] = get_string('notyetattempted', 'local_catquiz');
         for ($i = 1; $i <= self::ATTEMPTS_PER_PERSON_CLASSES; $i++) {
-            $chartlabels[$i] = sprintf(
-                '%d .. %d',
-                $i * $classwidth - $classwidth + 1,
-                $i * $classwidth
-            );
+            if ($classwidth == 1) {
+                $chartlabels[$i] = sprintf(
+                    '%d',
+                    $i * $classwidth
+                );
+            } else {
+                $chartlabels[$i] = sprintf(
+                    '%d .. %d',
+                    $i * $classwidth - $classwidth + 1,
+                    $i * $classwidth
+                );
+            }
         }
         $chart->set_labels($chartlabels);
 
@@ -1037,7 +1091,7 @@ class catquizstatistics {
             'starttime' => $this->starttime,
             'endtime' => $this->endtime,
         ];
-        return new moodle_url('/local/catquiz/export_shortcode_csv.php', $params);
+        return (new moodle_url('/local/catquiz/export_shortcode_csv.php', $params))->out(false);
     }
 
     /**
@@ -1061,17 +1115,15 @@ class catquizstatistics {
             $this->endtime
         );
 
-        $records = $DB->get_records_sql($sql, $params);
-        $enriched = array_map(
-            function ($r) {
-                $r->starttime = userdate($r->starttime, get_string('strftimedatetime', 'core_langconfig'));
-                $r->endtime = userdate($r->endtime, get_string('strftimedatetime', 'core_langconfig'));
-                $r->teststrategy = $this->get_teststrategy_name($r->teststrategy);
-                return $r;
-            },
-            $records
-        );
-        return $enriched;
+        $data = [];
+        foreach ($DB->get_recordset_sql($sql, $params) as $r) {
+            unset($r->json);
+            $r->starttime = userdate($r->starttime, get_string('strftimedatetime', 'core_langconfig'));
+            $r->endtime = userdate($r->endtime, get_string('strftimedatetime', 'core_langconfig'));
+            $r->teststrategy = $this->get_teststrategy_name($r->teststrategy);
+            $data[] = $r;
+        }
+        return $data;
     }
 
     /**
@@ -1155,27 +1207,11 @@ class catquizstatistics {
     }
 
     /**
-     * Returns a replacement for the chart, if there are not enough data
-     *
-     * Usually, this just returns a string to indicate that there are not enough data.
-     * In debug mode, it returns more information about the given shortcode parameters.
+     * Returns a string that explains there are not enough data to display the chart
      *
      * @return string
      */
     private function get_nodata_body() {
-        global $CFG;
-
-        if ($CFG->debug > 0) {
-            return sprintf(
-                'DEBUG info: courseid: %d, scaleid: %d, contextid: %d, starttime: %d, endtime: %d, num attempts: %d',
-                $this->courseid,
-                $this->scaleid,
-                $this->contextid,
-                $this->starttime,
-                $this->endtime,
-                count($this->get_attempts())
-            );
-        }
         return get_string('catquizstatisticsnodata', 'local_catquiz');
     }
 

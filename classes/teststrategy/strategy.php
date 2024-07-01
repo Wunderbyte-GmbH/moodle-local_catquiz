@@ -183,7 +183,8 @@ abstract class strategy {
             $context['contextid'],
             $selectedquestion,
             $context['catscaleid'],
-            $context['includesubscales']
+            $context['includesubscales'],
+            $context['progress']->get_selected_subscales()
         );
         return result::ok($selectedquestion);
     }
