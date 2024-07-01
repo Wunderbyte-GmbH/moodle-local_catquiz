@@ -466,10 +466,17 @@ $string['attemptfeedbacknotavailable'] = "Kein Feedback verfügbar";
 $string['attemptfeedbacknotyetavailable'] = "Feedback wird angezeigt, sobald es verfügbar ist.";
 $string['allquestionsincorrect'] = "Genauer Fähigkeits-Score kann nicht ermittelt werden, da alle Fragen falsch beantwortet wurden.";
 $string['allquestionscorrect'] = "Genauer Fähigkeits-Score kann nicht ermittelt werden, da alle Fragen richtig beantwortet wurden.";
-$string['feedbackcomparetoaverage'] = 'Sie sind besser in "{$a->scaleinfo}" als {$a->quantile}% aller Teilnehmenden.';
+$string['feedbackcomparetoaverage'] = 'Der Test misst Ihr Wissen und Können in {$a->quotedscale} in Form eines Fähigkeitswertes zwischen
+{$a->scale_min} und {$a->scale_max}. Je höher Ihr Fähigkeitswert ausfällt, desto besser ist Ihr Wissen und Ihr
+Können in der Skala.
+Ihr erreichter Fähigkeitswert ist {$a->ability_global} (mit einem Standardfehler von ± {$a->se_global}). Der aktuelle
+durchschnittliche Fähigkeitswert aller Teilnehmenden an dem Test beträgt {$a->average_ability}. Mit
+Ihrem Ergebnis sind Sie momentan besser als {$a->quantile}% aller anderen Test-Teilnehmenden.
+Die folgende Graﬁk stellt Ihren Fähigkeitswert (obere Markierung) und den aktuellen
+Durchschnitt (untere Markierung) dar:';
 $string['questionssummary'] = "Zusammenfassung";
-$string['currentability'] = 'Ihr momentaner Fähigkeits-Score in der Skala "{$a}"';
-$string['currentabilityfellowstudents'] = 'Aktueller Mittelwert aller Fähigkeits-Scores aller Teilnehmenden in der Skala "{$a}"';
+$string['currentability'] = 'Ihr Fähigkeitswert';
+$string['currentabilityfellowstudents'] = 'Durchschnitt';
 $string['feedbackbarlegend'] = "Bedeutung der Farben";
 $string['teacherfeedback'] = "Feedback für Lehrende";
 $string['catquiz_feedbackheader'] = "Feedback";
@@ -513,7 +520,7 @@ $string['feedback_customscale_nofeedback'] = 'Es wurde kein Feedback für ihre E
 $string['noscalesfound'] = 'Es konnte zu keiner Skala ein valides Ergebnis ermittelt werden.';
 $string['nofeedback'] = 'Kein Feedback angegeben.';
 $string['moreinformation'] = 'Weitere Informationen';
-$string['comparetotestaverage'] = 'Überblick';
+$string['comparetotestaverage'] = 'Ihr Ergebnis';
 $string['personabilityfeedbacktitle'] = "Fähigkeitsprofil";
 $string['estimatedbecause:allanswerscorrect'] = "Sie haben alle Fragen richtig beantwortet! Toll! Leider konnten deshalb Ihre Ergebnisse nicht zuverlässig errechnet werden und wurden geschätzt.";
 $string['estimatedbecause:allanswersincorrect'] = "Leider haben Sie alle Fragen falsch beantwortet. Ihre Ergebnisse konnten deshalb nicht zuverlässig errechnet werden und wurden geschätzt.";

@@ -39,6 +39,13 @@ use stdClass;
 class feedback_helper {
 
     /**
+     * The precision to use when rounding numbers.
+     *
+     * @var int
+     */
+    const PRECISION = 2;
+
+    /**
      * Write information about colorgradient for colorbar.
      *
      * @param array $quizsettings
@@ -425,8 +432,8 @@ class feedback_helper {
                 'subfeedbackrange',
                 'local_catquiz',
                 [
-                    'upperlimit' => round($quizsettings->$upperlimitkey, 2),
-                    'lowerlimit' => round($quizsettings->$lowerlimitkey, 2),
+                    'upperlimit' => self::localize_float($quizsettings->$upperlimitkey),
+                    'lowerlimit' => self::localize_float($quizsettings->$lowerlimitkey),
                 ]);
 
             $text = get_string('feedbackrange', 'local_catquiz', $j);
@@ -453,5 +460,19 @@ class feedback_helper {
         }
 
         return $feedbacks;
+    }
+
+    /**
+     * Returns a localzed, rounded number as string.
+     *
+     * @return string
+     */
+    public static function localize_float(float $number): string {
+        $locale = localeconv();
+        return number_format(
+            $number,
+            self::PRECISION,
+            $locale['decimal_point'],
+            $locale['thousands_sep']);
     }
 }
