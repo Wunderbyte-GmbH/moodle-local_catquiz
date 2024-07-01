@@ -340,6 +340,12 @@ $string['previewquestion'] = "Preview question";
 $string['personability'] = "Ability score";
 $string['personabilities'] = "Ability scores";
 $string['personabilitytitletab'] = "Details of results";
+$string['feedback_details_heading'] = "Details of your result";
+$string['feedback_details_description'] = 'Following table lists all aspects
+    (scales) of {$a}, for which a reliable result could be calculated.';
+$string['feedback_details_lowestskill'] = 'Scale {$a->name} with an ability
+    score of {$a->value} (± {$a->se}) was found to be the scale with the
+    largest deficit.';
 $string['learningprogresstitle'] = "Progress";
 $string['personabilitiesnodata'] = "No ability scores were calculated";
 $string['itemdifficulties'] = "Item difficulties";
