@@ -25,6 +25,7 @@
 namespace local_catquiz\teststrategy;
 
 use coding_exception;
+use context_course;
 use context_system;
 use UnexpectedValueException;
 
@@ -315,6 +316,27 @@ abstract class feedbackgenerator {
         return has_capability(
             'local/catquiz:view_teacher_feedback', context_system::instance()
         );
+    }
+
+    /**
+     * Shows if the current user can see more information than a normal student.
+     *
+     * @return bool
+     */
+    protected function has_extended_view_permissions(): bool {
+        global $COURSE;
+
+        if ($COURSE) {
+            $context = context_course::instance($COURSE->id);
+            if (has_capability('local/catquiz:view_users_feedback', $context)) {
+                return true;
+            }
+        }
+        if (has_capability('local/catquiz:canmanage', context_system::instance())) {
+            return true;
+        }
+
+        return false;
     }
 
     /**
