@@ -330,5 +330,4 @@ abstract class feedbackgenerator {
         }
         return round($array[$key], self::PRECISION);
     }
-
 }

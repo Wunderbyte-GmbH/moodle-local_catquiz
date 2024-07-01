@@ -455,7 +455,10 @@ $string['error'] = "An error occured";
 $string['id'] = "ID";
 $string['abortpersonabilitynotchanged'] = "Person parameter did not change";
 $string['emptyfirstquestionlist'] = "Can't select a start question because the list is empty";
-$string['feedbackcomparetoaverage'] = 'You performed better than {$a->quantile}% of your fellow students in "{$a->scaleinfo}".';
+$string['feedbackcomparetoaverage'] = 'The test measures your ability in {$a->quotedscale} by calculating an ability score in the range between
+{$a->scale_min} and {$a->scale_max}. A higher value indicates a better ability.
+You reached a score of {$a->ability_global} (with a standard error of ± {$a->se_global}). The average score of all participants is {$a->average_ability}. Your score is better than {$a->quantile}% of all other participants.
+The following chart displays your personal score (upper mark) and the current average score (lower mark):';
 $string['errornoitems'] = "The quiz can not be started with the given settings. Please contact your CAT manager.";
 $string['exceededmaxattempttime'] = "The maximum attempt time has been exceeded.";
 

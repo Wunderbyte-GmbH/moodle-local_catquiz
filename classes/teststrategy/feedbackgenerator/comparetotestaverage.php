@@ -27,6 +27,7 @@ namespace local_catquiz\teststrategy\feedbackgenerator;
 use local_catquiz\catquiz;
 use local_catquiz\catscale;
 use local_catquiz\feedback\feedbackclass;
+use local_catquiz\teststrategy\feedback_helper;
 use local_catquiz\teststrategy\feedbackgenerator;
 use local_catquiz\teststrategy\feedbacksettings;
 
@@ -146,52 +147,6 @@ class comparetotestaverage extends feedbackgenerator {
     }
 
     /**
-     * Write string to define color gradiant bar.
-     *
-     * @param object $quizsettings
-     * @param string|int $catscaleid
-     * @return array
-     *
-     */
-    private function get_colorbarlegend($quizsettings, $catscaleid): array {
-        if (!$quizsettings) {
-            return [];
-        }
-        // We collect the feedbackdata only for the parentscale.
-        $feedbacks = [];
-        $numberoffeedbackoptions = intval($quizsettings->numberoffeedbackoptionsselect);
-        $colorarray = feedbackclass::get_array_of_colors($numberoffeedbackoptions);
-
-        for ($j = 1; $j <= $numberoffeedbackoptions; $j++) {
-            $colorkey = 'wb_colourpicker_' . $catscaleid . '_' . $j;
-            $feedbacktextkey = 'feedbacklegend_scaleid_' . $catscaleid . '_' . $j;
-            $lowerlimitkey = "feedback_scaleid_limit_lower_" . $catscaleid . "_" . $j;
-            $upperlimitkey = "feedback_scaleid_limit_upper_" . $catscaleid . "_" . $j;
-
-            $feedbackrangestring = get_string(
-                'subfeedbackrange',
-                'local_catquiz',
-                [
-                    'upperlimit' => round($quizsettings->$upperlimitkey, 2),
-                    'lowerlimit' => round($quizsettings->$lowerlimitkey, 2),
-                ]);
-
-            $text = $quizsettings->$feedbacktextkey ?? "";
-
-            $colorname = $quizsettings->$colorkey;
-            $colorvalue = $colorarray[$colorname];
-
-            $feedbacks[] = [
-                'subcolorcode' => $colorvalue,
-                'subfeedbacktext' => $text,
-                'subfeedbackrange' => $feedbackrangestring,
-            ];
-        }
-
-        return $feedbacks;
-    }
-
-    /**
      * Write information about colorgradient for colorbar.
      *
      * @param object $quizsettings
@@ -291,14 +246,6 @@ class comparetotestaverage extends feedbackgenerator {
         $quantile = count($personparams) <= 1
             ? 0
             : (count($worseabilities) / (count($personparams) - 1)) * 100;
-        $text = get_string(
-            'feedbackcomparetoaverage',
-            'local_catquiz',
-            [
-                'quantile' => sprintf('%.2f', $quantile),
-                'scaleinfo' => $catscale->name,
-            ]);
-
         $testaverage = array_sum(array_map(fn ($pp) => $pp->ability, $personparams)) / count($personparams);
 
         $catscaleclass = new catscale($catscaleid);
@@ -319,6 +266,19 @@ class comparetotestaverage extends feedbackgenerator {
         $testaverageposition = ($b + $testaverageinrange) / $b * 50;
         $userabilityposition = ($b + $abilityinrange) / $b * 50;
 
+        $text = get_string(
+            'feedbackcomparetoaverage',
+            'local_catquiz',
+            [
+                'quantile' => round($quantile, 0),
+                'quotedscale' => feedback_helper::add_quotes($catscale->name),
+                'ability_global' => feedback_helper::localize_float($abilityinrange),
+                'se_global' => feedback_helper::localize_float($newdata['se'][$catscaleid]),
+                'average_ability' => feedback_helper::localize_float($testaverageinrange),
+                'scale_min' => feedback_helper::localize_float($abilityrange['minscalevalue']),
+                'scale_max' => feedback_helper::localize_float($abilityrange['maxscalevalue']),
+            ]);
+
         return [
             'contextid' => $existingdata['contextid'],
             'testaverageability' => sprintf('%.2f', $testaverageinrange),
@@ -330,7 +290,7 @@ class comparetotestaverage extends feedbackgenerator {
                 'colorgradestring' => $this->get_colorgradientstring((object) $quizsettings, $catscaleid),
             ],
             'colorbarlegend' => [
-                'feedbackbarlegend' => $this->get_colorbarlegend((object) $quizsettings, $catscaleid),
+                'feedbackbarlegend' => feedback_helper::get_colorbarlegend((object) $quizsettings, $catscaleid),
             ],
             'currentability' => get_string('currentability', 'local_catquiz', $catscale->name),
             'currentabilityfellowstudents' => get_string('currentabilityfellowstudents', 'local_catquiz', $catscale->name),
