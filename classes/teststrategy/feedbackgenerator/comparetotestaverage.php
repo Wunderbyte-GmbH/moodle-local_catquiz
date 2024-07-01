@@ -24,9 +24,13 @@
 
 namespace local_catquiz\teststrategy\feedbackgenerator;
 
+use core\chart_bar;
+use core\chart_series;
 use local_catquiz\catquiz;
 use local_catquiz\catscale;
 use local_catquiz\feedback\feedbackclass;
+use local_catquiz\local\model\model_model;
+use local_catquiz\local\model\model_strategy;
 use local_catquiz\teststrategy\feedback_helper;
 use local_catquiz\teststrategy\feedbackgenerator;
 use local_catquiz\teststrategy\feedbacksettings;
@@ -68,16 +72,18 @@ class comparetotestaverage extends feedbackgenerator {
      */
     public function get_studentfeedback(array $data): array {
         global $OUTPUT;
+
+        $abilityprofilechart = $this->render_abilityprofile_chart(
+            (array) $data,
+            ['id' => $data['catscaleid']]
+        );
+        $data['abilityprofile'] = $abilityprofilechart;
         $feedback = $OUTPUT->render_from_template('local_catquiz/feedback/comparetotestaverage', $data);
 
-        if (empty($feedback)) {
-            return [];
-        } else {
-            return [
-                'heading' => $this->get_heading(),
-                'content' => $feedback,
-            ];
-        }
+        return [
+            'heading' => $this->get_heading(),
+            'content' => $feedback,
+        ];
     }
 
     /**
@@ -301,4 +307,112 @@ class comparetotestaverage extends feedbackgenerator {
             'comparetotestaverage_has_enough_peers' => count($distinctusers) >= self::MIN_USERS,
         ];
     }
+
+    /**
+     * Render chart for histogram of personabilities.
+     *
+     * @param array $initialcontext
+     * @param array $primarycatscale
+     *
+     *
+     * @return array
+     *
+     */
+    private function render_abilityprofile_chart(array $initialcontext, array $primarycatscale) {
+        global $OUTPUT, $DB;
+
+        $abilitysteps = [];
+        $abilitystep = 0.25;
+        $interval = $abilitystep * 2;
+        if (isset($initialcontext['personabilities_abilities'][$primarycatscale['id']]['abilityrange'])) {
+            $abilityrange = $initialcontext['personabilities_abilities'][$primarycatscale['id']]['abilityrange'];
+        } else {
+            $abilityrange = $this->feedbackhelper->get_ability_range($primarycatscale['id']);
+        };
+
+        $ul = (float) $abilityrange['maxscalevalue'];
+        $ll = (float) $abilityrange['minscalevalue'];
+        for ($i = $ll + $abilitystep; $i <= ($ul - $abilitystep); $i += $interval) {
+            $abilitysteps[] = $i;
+        }
+        $items = $this->feedbackhelper->get_testitems_for_catscale($primarycatscale['id'], $initialcontext['contextid'], true);
+        // Prepare data for test information line.
+
+        $models = model_strategy::get_installed_models();
+        $fisherinfos = [];
+        foreach ($items as $item) {
+            // We can not calculate the fisher information for items without a model.
+            if (!$item->model) {
+                continue;
+            }
+            $model = model_model::get_instance($item->model);
+            foreach ($model::get_parameter_names() as $paramname) {
+                $params[$paramname] = floatval($item->$paramname);
+            }
+            foreach ($abilitysteps as $ability) {
+                $fisherinformation = $model->fisher_info(
+                    ['ability' => $ability],
+                    $params
+                );
+                $stringkey = strval($ability);
+
+                if (!isset($fisherinfos[$stringkey])) {
+                    $fisherinfos[$stringkey] = $fisherinformation;
+                } else {
+                    $fisherinfos[$stringkey] += $fisherinformation;
+                }
+            }
+
+        }
+
+        $fisherinfos = $this->feedbackhelper->get_fisherinfos_of_items($items, $models, $abilitysteps);
+        $fi = json_encode($fisherinfos);
+        // Prepare data for scorecounter bars.
+        $abilityrecords = $DB->get_records('local_catquiz_personparams', ['catscaleid' => $primarycatscale['id']]);
+        $abilityseries = [];
+        foreach ($abilitysteps as $as) {
+            $counter = 0;
+            foreach ($abilityrecords as $record) {
+                $a = floatval($record->ability);
+                $ability = $this->feedbackhelper->round_to_customsteps($a, $abilitystep, $interval);
+                if ($ability != $as) {
+                    continue;
+                } else {
+                    $counter ++;
+                }
+            }
+            $colorvalue = $this->feedbackhelper->get_color_for_personability(
+                (array) $this->get_progress()->get_quiz_settings(),
+                $as,
+                intval($primarycatscale['id'])
+                );
+            $abilitystring = strval($as);
+            $abilityseries['counter'][$abilitystring] = $counter;
+            $abilityseries['colors'][$abilitystring] = $colorvalue;
+        }
+        // Scale the values of $fisherinfos before creating chart series.
+        $scaledtiseries = $this->feedbackhelper->scalevalues(array_values($fisherinfos), array_values($abilityseries['counter']));
+
+        $scalename = $initialcontext['personabilities_abilities'][$primarycatscale['id']]['name'];
+        $aserieslabel = get_string('scalescorechartlabel', 'local_catquiz', $scalename);
+        $aseries = new chart_series($aserieslabel, array_values($abilityseries['counter']));
+        $aseries->set_colors(array_values($abilityseries['colors']));
+
+        $testinfolabel = get_string('testinfolabel', 'local_catquiz');
+        $tiseries = new chart_series($testinfolabel, $scaledtiseries);
+        $tiseries->set_type(chart_series::TYPE_LINE);
+        $tiseries->set_smooth(true);
+
+        $chart = new chart_bar();
+        $chart->add_series($tiseries);
+        $chart->add_series($aseries);
+        $chart->set_labels(array_keys($fisherinfos));
+
+        $out = $OUTPUT->render($chart);
+        return [
+            'chart' => $out,
+            'charttitle' => get_string('abilityprofile', 'local_catquiz', feedback_helper::add_quotes($scalename)),
+        ];
+    }
+
 }
