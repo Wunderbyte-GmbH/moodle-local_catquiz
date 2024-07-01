@@ -35,7 +35,13 @@
         },
         "subcolorcode": "#ff00f0",
         "subfeedbacktext": "Very good result",
-        "subfeedbackrange": "3.3-0"
+        "abilityprofile": [
+            {
+                "charttitle": "Person ability relative to parentscale",
+                "chart": "<div>...</div>"
+            }
+        ],
+       "subfeedbackrange": "3.3-0"
     }
 }}
 {{#comparetotestaverage_has_worse}}
@@ -83,3 +89,9 @@
         {{/feedbackbarlegend}}
     </div>
 {{/colorbarlegend}}
+{{#abilityprofile}}
+    <h6>
+    {{charttitle}}
+    </h6>
+    {{{chart}}}
+{{/abilityprofile}}
