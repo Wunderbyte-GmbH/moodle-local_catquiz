@@ -249,9 +249,8 @@ class customscalefeedback extends feedbackgenerator {
 
         $text = "";
 
-        foreach ($scalefeedback as $scaleid => $value) {
-            $scale = (array) $catscales[$scaleid];
-            $text .= $scale['name'] . ': ' . $value . '<br/>';
+        foreach ($scalefeedback as $value) {
+            $text .= $value . '<br/>';
         }
         return $text;
     }
