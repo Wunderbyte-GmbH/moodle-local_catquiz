@@ -64,12 +64,14 @@ canvas {
     position: absolute;
     width: 100%;
     top: -3em;
+    text-align: center;
 }
 
 .catquiz-feedbackbar-lowertext {
     position: absolute;
     width: 100%;
     top: 4em;
+    text-align: center;
 }
 
 span.wb_colourpick .colourpickercircle,
@@ -90,4 +92,8 @@ span.wb_colourpick .colourpickercircle.selected,
 span.wb_colourpick.colourpickercircle.selected {
     border: 3px solid white;
     outline: 5px solid black;
+}
+
+.catquiz_feedback {
+    text-align: left;
 }
