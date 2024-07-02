@@ -104,6 +104,13 @@ $string['learningprogress_description'] = 'Wie hat sich Ihr Fähigkeitswert übe
     folgende Grafik zeigt Ihnen die Entwicklung Ihres (allgemeinen)
     Fähigkeitswertes in {$a} im Vergleich zum Durchschnittswert aller
     Testversuche:';
+$string['graphicalsummary_description'] = 'Während des Verlaufs des Testversuchs wird Ihrer Fähigkeitswert mit jeder Antwort neu
+berechnet und aktualisiert. Die folgende Grafik zeigt Ihnen, wie sich die Einschätzung
+Ihres Fähigkeitswertes in {$a} über den Verlauf des Testversuchs hinweg
+verändert hat.';
+$string['graphicalsummary_description_lowest'] = 'Zusätzlich ist auch die
+    Entwicklung Ihres Fähigkeitswertes bezüglich der als Defizit
+    identifizierten Skala {$a} dargestellt:';
 $string['timepacedtest'] = 'Zeitbeschränkungen für den Test aktivieren';
 $string['includetimelimit'] = 'Bearbeitung eines Testversuchs zeitlich begrenzen';
 $string['includetimelimit_help'] = 'Maximaldauer festlegen, die für die Durchführung des Tests gelten soll.';

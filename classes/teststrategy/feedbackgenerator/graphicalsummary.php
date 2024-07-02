@@ -27,6 +27,7 @@ namespace local_catquiz\teststrategy\feedbackgenerator;
 use html_table;
 use html_writer;
 use local_catquiz\catscale;
+use local_catquiz\teststrategy\feedback_helper;
 use local_catquiz\teststrategy\feedbackgenerator;
 use local_catquiz\teststrategy\feedbacksettings;
 use local_catquiz\teststrategy\info;
@@ -65,10 +66,26 @@ class graphicalsummary extends feedbackgenerator {
         if (isset($feedbackdata['graphicalsummary_data'])) {
             $table = $this->render_table($feedbackdata['graphicalsummary_data']);
         }
+        $globalscale = catscale::return_catscale_object($this->get_progress()->get_quiz_settings()->catquiz_catscales);
+        $globalscalename = $globalscale->name;
 
         $data['chart'] = $chart ?? "";
-        $data['strategyname'] = $feedbackdata['teststrategyname'] ?? "";
         $data['table'] = $table ?? "";
+        $data['description'] = get_string(
+            'graphicalsummary_description',
+            'local_catquiz',
+            feedback_helper::add_quotes($globalscalename)
+        );
+        // If this is a deficit strategy, display more info.
+        $additionalinfo = false;
+        if (array_key_exists('graphicalsummary_primaryscale', $feedbackdata)) {
+            $primaryscale = reset ($feedbackdata['graphicalsummary_primaryscale']);
+            $quoteddeficitscale = feedback_helper::add_quotes($feedbackdata['primaryscale']['name']);
+            if ($primaryscale['primarybecause'] == 'lowestskill') {
+                $additionalinfo = get_string('graphicalsummary_description_lowest', 'local_catquiz', $quoteddeficitscale);
+            }
+        }
+        $data['additional_info'] = $additionalinfo;
 
         $feedback = $OUTPUT->render_from_template(
             'local_catquiz/feedback/graphicalsummary',
@@ -267,7 +284,7 @@ class graphicalsummary extends feedbackgenerator {
 
         $chart->set_labels(range(1, count($abilitiesafter)));
 
-        return html_writer::tag('div', $OUTPUT->render($chart), ['dir' => 'ltr']);
+        return html_writer::tag('div', $OUTPUT->render_chart($chart, false), ['dir' => 'ltr']);
     }
 
     /**
