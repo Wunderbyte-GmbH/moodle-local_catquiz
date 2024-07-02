@@ -542,6 +542,7 @@ $string['error:noscalestoreport'] = "Es konnte kein Feedback ermittelt werden, w
 
 
 // Chart in Feedback.
+$string['global_scale'] = 'Globalskala';
 $string['chartlegendabilityrelative'] = '{$a->difference} Unterschied zur Vergleichsskala (Fähigkeits-Score in dieser Skala: {$a->ability})';
 $string['detected_scales_reference'] = 'Vergleichsbasis';
 $string['detected_scales_scalename'] = 'Name der Skala';

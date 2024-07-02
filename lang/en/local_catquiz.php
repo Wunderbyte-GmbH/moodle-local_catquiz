@@ -533,6 +533,7 @@ $string['error:semax'] = ""; // Maybe too complicated to explain / no relevant r
 $string['error:noscalestoreport'] = "There is no feedback available because no tested scale was selected to be reported.";
 
 // Personability & chart in Feedback.
+$string['global_scale'] = 'Global scale';
 $string['chartlegendabilityrelative'] = '{$a->difference} (Compared to parentscale); {$a->ability} (ability score of scale)';
 $string['detected_scales_reference'] = 'Reference scale';
 $string['detected_scales_scalename'] = 'Scale';

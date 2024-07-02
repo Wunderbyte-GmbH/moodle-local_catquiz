@@ -129,7 +129,7 @@ class customscalefeedback_test extends basic_testcase {
                     ],
                     'expected' => [
                         'heading' => 'Feedback',
-                        'content' => 'Skala 272: <p dir="ltr" style="text-align: left;">adsfafs<\/p><br/>',
+                        'content' => '<p dir="ltr" style="text-align: left;">adsfafs<\/p><br/>',
                         'comment' => '',
                     ],
                 ],
