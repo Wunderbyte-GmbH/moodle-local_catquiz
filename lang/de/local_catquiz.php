@@ -543,9 +543,16 @@ $string['error:noscalestoreport'] = "Es konnte kein Feedback ermittelt werden, w
 
 // Chart in Feedback.
 $string['chartlegendabilityrelative'] = '{$a->difference} Unterschied zur Vergleichsskala (Fähigkeits-Score in dieser Skala: {$a->ability})';
-$string['personabilitycharttitle'] = 'Unterschied beim Fähigkeits-Score im Vergleich zu "{$a}"';
-$string['personabilitytitle'] = 'Fähigkeits-Scores in den einzelnen Skalen';
+$string['detected_scales_reference'] = 'Vergleichsbasis';
+$string['detected_scales_scalename'] = 'Name der Skala';
+$string['detected_scales_ability'] = 'Fähigkeitswert';
+$string['detected_scales_number_questions'] = 'Anzahl Fragen';
+$string['personabilitycharttitle'] = 'Differenz Ihrer Fähigkeitswerte im Vergleich zu {$a}';
 $string['itemsplayed'] = 'ausgewertete Fragen:';
+$string['detected_scales_chart_description'] = 'Die folgende Grafik stellt die
+    Werte im Vergleich zu Ihrem allgemeinen Fähigkeitswert in {$a} dar. Durch
+    Anklicken des entsprechenden Balkens können Sie die Werte und Skalen-Namen
+    einsehen.';
 $string['personabilityinscale'] = 'Fähigkeits-Score für Skala "{$a}"';
 $string['yourscorein'] = 'Ihre durchschnittlichen "{$a}"-Ergebnisse';
 $string['scoreofpeers'] = 'Mittelwert Ihrer Mit-Studierenden';

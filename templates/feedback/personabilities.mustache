@@ -59,45 +59,55 @@
 {{#scale_info}}
     <p>{{{scale_info}}}</p>
 {{/scale_info}}
-<h6>{{#str}}personabilitytitle, local_catquiz{{/str}}</h6>
-<div class="container">
-    {{#abilities}}
-    <div class="row">
-        <div {{#isselectedscale}}
-                class="font-weight-bold col-4 text-right"
-                data-toggle="tooltip"
-                data-placement="top"
-                title="{{tooltiptitle}}"
-            {{/isselectedscale}}
-            {{^isselectedscale}}
-                class="font-weight-normal col-4 text-right"
-            {{/isselectedscale}}>
-            {{name}} :
-        </div>
-        <div {{#isselectedscale}}
-                class="font-weight-bold col-4 text-left"
-                data-toggle="tooltip"
-                data-placement="top"
-                title="{{tooltiptitle}}"
-            {{/isselectedscale}}
-            {{^isselectedscale}}
-                class="font-weight-normal col-4 text-left"
-            {{/isselectedscale}}>
-            {{ability}} ({{#str}}standarderror, local_catquiz{{/str}}: {{standarderror}})
-        </div>
-        {{#numberofitemsplayed}}
-        {{#itemsplayed}}
-            <span>
-                {{itemsplayed}} {{#str}}itemsplayed, local_catquiz{{/str}}
-            </span>
-        {{/itemsplayed}}
-        {{/numberofitemsplayed}}
-    </div>
-    {{/abilities}}
-</div>
+<table style="margin: 1em 0" class="table table-striped">
+    <thead>
+        <tr>
+            <th scope="col">#</th>
+            <th scope="col">{{#str}} detected_scales_scalename, local_catquiz {{/str}}</th>
+            <th scope="col">{{#str}} detected_scales_ability, local_catquiz{{/str}}</th>
+            <th scope="col">{{#str}} detected_scales_number_questions, local_catquiz {{/str}}</th>
+        </tr>
+    </thead>
+    <tbody>
+        {{#abilities}}
+        {{^is_global}}
+        <tr>
+            <td>{{pseudo_index}}</td>
+            <td>{{name}}</td>
+            <td>{{ability}} (±{{standarderror}})</td>
+            <td>{{#numberofitemsplayed}}{{itemsplayed}}{{/numberofitemsplayed}}</td>
+        </tr>
+        {{/is_global}}
+        {{/abilities}}
+        <tr><td>{{#str}} detected_scales_reference, local_catquiz {{/str}}:</td><td></td><td></td><td></td></tr>
+        {{#abilities}}
+        {{#is_global}}
+        <tr>
+            <td></td>
+            <td>{{name}}</td>
+            <td>{{ability}} (±{{standarderror}})</td>
+            <td>{{#numberofitemsplayed}}{{itemsplayed}}{{/numberofitemsplayed}}</td>
+        </tr>
+        {{/is_global}}
+        {{/abilities}}
+    </tbody>
+</table>
+<p>{{{chart_description}}}</p>
 {{#chartdisplay}}
-    <h6>
-    {{charttitle}}
-    </h6>
+    <h6>{{{charttitle}}}</h6>
     {{{chart}}}
+    <div style="margin: 1em 0">
+{{#colorbar_legend}}
+    <div class="catquiz-legend">
+        <h6>{{#str}}feedbackbarlegend, local_catquiz{{/str}}</h6>
+        {{#feedbackbarlegend}}
+            <div>
+                <span class="catquiz-legend-symbol" style="background: {{subcolorcode}};"></span>
+                <span class="catquiz-legend-description">{{subfeedbacktext}}</span>
+                <span class="catquiz-legend-range">{{subfeedbackrange}}</span>
+            </div>
+        {{/feedbackbarlegend}}
+    </div>
+{{/colorbar_legend}}
+</div>
 {{/chartdisplay}}
