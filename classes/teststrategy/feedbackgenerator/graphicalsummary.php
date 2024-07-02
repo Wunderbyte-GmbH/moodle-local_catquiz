@@ -186,9 +186,15 @@ class graphicalsummary extends feedbackgenerator {
         $new['questionscale_name'] = catscale::return_catscale_object(
             $lastquestion->catscaleid
         )->name;
-        $new['fisherinformation'] = $lastquestion->is_pilot
-            ? null
-            : $this->get_rounded_or_null($lastquestion->fisherinformation, $existingdata['catscaleid']);
+        if (property_exists($lastquestion, 'fisherinformation')
+            && is_float($lastquestion->fisherinformation)
+        ) {
+            $new['fisherinformation'] = sprintf('%.2f', $lastquestion->fisherinformation);
+        } else {
+            $new['fisherinformation'] = $lastquestion->is_pilot
+                ? null
+                : $this->get_rounded_or_null($lastquestion->fisherinformation, $existingdata['catscaleid']);
+        }
         $new['personability_after'] = round($newdata['person_ability'][$newdata['catscaleid']], self::PRECISION);
 
         $graphicalsummary[] = $new;
