@@ -126,6 +126,7 @@ class personabilities_test extends advanced_testcase {
         return [
             'lowestskillgap' => [
                 'feedbackdata' => [
+                    'catscaleid' => 271,
                     'attemptid' => 1,
                     'se' => [],
                     'progress' => [],
@@ -221,9 +222,9 @@ class personabilities_test extends advanced_testcase {
                     ],
                 ],
                 'expected' => [
-                    'heading' => "Details of results",
+                    'heading' => "Details of your result",
                     'comment' => '',
-                    'content' => '<h5>Details of results</h5>
+                    'content' => '<h5>Details of your results</h5>
                     <div class="container">
                         <div class="row">
                             <div

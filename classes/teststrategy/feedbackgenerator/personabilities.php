@@ -81,16 +81,12 @@ class personabilities extends feedbackgenerator {
             $feedbackdata['primaryscale'],
         );
 
-        $globalscalename = catscale::return_catscale_object($feedbackdata['catscaleid'])->name;
-        $description = get_string(
-            'feedback_details_description',
-            'local_catquiz',
-            feedback_helper::add_quotes($globalscalename)
-        );
         $scaleinfo = false;
         if (array_key_exists($primaryscaleid, $feedbackdata['personabilities_abilities'])) {
             $primaryscale = $feedbackdata['personabilities_abilities'][$primaryscaleid];
-            if ($primaryscale['primarybecause'] === 'lowestskill') {
+            if (array_key_exists('primarybecause', $primaryscale)
+                && $primaryscale['primarybecause'] === 'lowestskill'
+            ) {
                 $scaleinfo = get_string(
                     'feedback_details_lowestskill',
                     'local_catquiz',
@@ -104,18 +100,24 @@ class personabilities extends feedbackgenerator {
         }
 
         $pseudoindex = 0;
+        $globalscalename = get_string('global_scale', 'local_catquiz');
         foreach ($feedbackdata['abilitieslist'] as $key => $v) {
-            if ($v['is_global']) {
+            if ($v['catscaleid'] == $feedbackdata['catscaleid']) {
+                $globalscalename = $v['name'];
+                $feedbackdata['abilitieslist'][$key]['is_global'] = true;
                 continue;
             }
             $pseudoindex++;
             $feedbackdata['abilitieslist'][$key]['pseudo_index'] = $pseudoindex;
+            $feedbackdata['abilitieslist'][$key]['is_global'] = false;
         }
-        $globalscalename = catscale::return_catscale_object(
-            $this->get_progress()->get_quiz_settings()->catquiz_catscales
-        )->name;
         $chartdescription = get_string(
             'detected_scales_chart_description',
+            'local_catquiz',
+            feedback_helper::add_quotes($globalscalename)
+        );
+        $description = get_string(
+            'feedback_details_description',
             'local_catquiz',
             feedback_helper::add_quotes($globalscalename)
         );
