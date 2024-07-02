@@ -103,6 +103,10 @@ $string['learningprogress_description'] = 'How did your ability score change
     over time? Did you improve?<br/>The following chart displays the progress
     of your (general) ability score in {$a} in comparison to the average of all
     test attempts:';
+$string['graphicalsummary_description'] = 'During an attempt your ability is recalculated after each response. The following chart shows how your estimated ability in {$a} changed';
+$string['graphicalsummary_description_lowest'] = 'Zusätzlich ist auch die
+    Entwicklung Ihres Fähigkeitswertes bezüglich der als Defizit
+    identifizierten Skala {$a} dargestellt:';
 $string['perattempt'] = 'per attempt ';
 $string['peritem'] = 'per item ';
 $string['applychanges'] = 'Apply Changes';
