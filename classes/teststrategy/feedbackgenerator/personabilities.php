@@ -498,8 +498,7 @@ class personabilities extends feedbackgenerator {
         $chart->set_legend_options(['display' => false]);
         $out = $OUTPUT->render_chart($chart, false);
         $quizsettings = $this->get_progress()->get_quiz_settings();
-        $globalscale = catscale::return_catscale_object($quizsettings->catquiz_catscales);
-        $globalscalename = $globalscale->name;
+        $globalscalename = $personabilities[$quizsettings->catquiz_catscales]['name'];
         return [
             'chart' => $out,
             'charttitle' => get_string(
