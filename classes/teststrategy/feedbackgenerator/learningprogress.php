@@ -85,9 +85,17 @@ class learningprogress extends feedbackgenerator {
             (array) $feedbackdata,
             $feedbackdata['primaryscale']
         );
+        $globalscale = catscale::return_catscale_object($this->get_progress()->get_quiz_settings()->catquiz_catscales);
+        $globalscalename = $globalscale->name;
         $feedback = $OUTPUT->render_from_template(
         'local_catquiz/feedback/learningprogress',
             [
+            'title' => get_string('learningprogress_title', 'local_catquiz'),
+            'description' => get_string(
+                'learningprogress_description',
+                'local_catquiz',
+                feedback_helper::add_quotes($globalscalename)
+            ),
             'progressindividual' => $abilityprogress['individual'],
             'progresscomparison' => $abilityprogress['comparison'],
             ]
@@ -442,11 +450,11 @@ class learningprogress extends feedbackgenerator {
 
         $chart->add_series($chartserie);
         $chart->set_labels($labels);
-        $out = $OUTPUT->render($chart);
+        $out = $OUTPUT->render_chart($chart, false);
 
         return [
             'chart' => $out,
-            'charttitle' => get_string('progress', 'local_catquiz', feedback_helper::add_quotes($scalename)),
+            'charttitle' => get_string('learningprogress_title', 'local_catquiz', feedback_helper::add_quotes($scalename)),
         ];
 
     }

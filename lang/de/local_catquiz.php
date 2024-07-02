@@ -98,6 +98,12 @@ $string['defaultcontext'] = 'Neuer Standard Einsatz-Kontext für Skala';
 $string['moveitemtootherscale'] = 'Testitem(s) {$a} sind bereits einer anderen Skala des selben Baumes zugeordnet. Zuordnung ändern?';
 $string['pleasecheckorcancel'] = 'Bitte bestätigen oder abbrechen';
 $string['progress'] = 'Entwicklung Fähigkeitswert in {$a}';
+$string['learningprogress_title'] = 'Ihr Lernfortschritt';
+$string['learningprogress_description'] = 'Wie hat sich Ihr Fähigkeitswert über
+    die letzten Versuche hin entwickelt? Haben Sie sich verbessert?<br/> Die
+    folgende Grafik zeigt Ihnen die Entwicklung Ihres (allgemeinen)
+    Fähigkeitswertes in {$a} im Vergleich zum Durchschnittswert aller
+    Testversuche:';
 $string['timepacedtest'] = 'Zeitbeschränkungen für den Test aktivieren';
 $string['includetimelimit'] = 'Bearbeitung eines Testversuchs zeitlich begrenzen';
 $string['includetimelimit_help'] = 'Maximaldauer festlegen, die für die Durchführung des Tests gelten soll.';
