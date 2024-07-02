@@ -30,6 +30,8 @@ require_once($CFG->dirroot . '/local/catquiz/lib.php');
 
 $string['pluginname'] = 'Adaptive Quiz - Advanced CAT Module';
 $string['catquiz'] = 'Catquiz';
+$string['subplugintype_catmodel'] = 'CAT Modell';
+$string['subplugintype_catmodel_plural'] = 'CAT Modelle';
 
 // Catquiz handler.
 $string['catscale'] = 'Skala';
