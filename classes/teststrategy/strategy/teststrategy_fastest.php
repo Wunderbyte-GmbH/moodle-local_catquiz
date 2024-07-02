@@ -116,7 +116,6 @@ class teststrategy_fastest extends strategy {
             new customscalefeedback($this->feedbacksettings, $feedbackhelper),
             new comparetotestaverage($this->feedbacksettings, $feedbackhelper),
             new questionssummary($this->feedbacksettings, $feedbackhelper),
-            new personabilities($this->feedbacksettings, $feedbackhelper),
             new learningprogress($this->feedbacksettings, $feedbackhelper),
             new graphicalsummary($this->feedbacksettings, $feedbackhelper),
             new debuginfo($this->feedbacksettings, $feedbackhelper),
