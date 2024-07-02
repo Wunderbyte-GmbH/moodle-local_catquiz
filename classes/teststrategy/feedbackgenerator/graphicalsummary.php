@@ -81,7 +81,9 @@ class graphicalsummary extends feedbackgenerator {
         if (array_key_exists('graphicalsummary_primaryscale', $feedbackdata)) {
             $primaryscale = reset ($feedbackdata['graphicalsummary_primaryscale']);
             $quoteddeficitscale = feedback_helper::add_quotes($feedbackdata['primaryscale']['name']);
-            if ($primaryscale['primarybecause'] == 'lowestskill') {
+            if (array_key_exists('primarybecause', $primaryscale)
+                && $primaryscale['primarybecause'] == 'lowestskill'
+            ) {
                 $additionalinfo = get_string('graphicalsummary_description_lowest', 'local_catquiz', $quoteddeficitscale);
             }
         }
