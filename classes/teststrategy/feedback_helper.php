@@ -465,6 +465,7 @@ class feedback_helper {
     /**
      * Returns a localzed, rounded number as string.
      *
+     * @param float $number
      * @return string
      */
     public static function localize_float(float $number): string {
