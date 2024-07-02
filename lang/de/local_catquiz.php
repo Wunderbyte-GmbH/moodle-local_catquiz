@@ -111,6 +111,8 @@ verändert hat.';
 $string['graphicalsummary_description_lowest'] = 'Zusätzlich ist auch die
     Entwicklung Ihres Fähigkeitswertes bezüglich der als Defizit
     identifizierten Skala {$a} dargestellt:';
+$string['debuginfo_desc_title'] = 'Export des Testversuchs Nr. {$a}';
+$string['debuginfo_desc'] = 'Hier können Sie als Nutzer mit Berechtigung zum Download eines Exports den Versuchsverlauf als CSV-Datei exportieren.';
 $string['timepacedtest'] = 'Zeitbeschränkungen für den Test aktivieren';
 $string['includetimelimit'] = 'Bearbeitung eines Testversuchs zeitlich begrenzen';
 $string['includetimelimit_help'] = 'Maximaldauer festlegen, die für die Durchführung des Tests gelten soll.';

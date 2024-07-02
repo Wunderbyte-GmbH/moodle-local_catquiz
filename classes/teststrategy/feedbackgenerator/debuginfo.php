@@ -134,11 +134,15 @@ class debuginfo extends feedbackgenerator {
             $rowarr[] = $row['numquestionsperscale'] ?? 'NA';
             $csvstring .= implode(';', $rowarr).PHP_EOL;
         }
+        $descriptionheading = get_string('debuginfo_desc_title', 'local_catquiz', $this->get_progress()->get_attemptid());
+        $description = get_string('debuginfo_desc', 'local_catquiz');
         $feedback = $OUTPUT->render_from_template(
             'local_catquiz/feedback/debuginfo',
             [
                 'data' => rawurlencode($csvstring),
                 'attemptid' => $data['debuginfo'][0]['attemptid'] ?? 'nan',
+                'description_heading' => $descriptionheading,
+                'description' => $description,
             ]
         );
 
