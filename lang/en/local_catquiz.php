@@ -104,6 +104,8 @@ $string['learningprogress_description'] = 'How did your ability score change
     of your (general) ability score in {$a} in comparison to the average of all
     test attempts:';
 $string['graphicalsummary_description'] = 'During an attempt your ability is recalculated after each response. The following chart shows how your estimated ability in {$a} changed';
+$string['debuginfo_desc_title'] = 'Export attempt # {$a}';
+$string['debuginfo_desc'] = 'As a user with permission to export attempts, you can download the attempt as CSV file here';
 $string['graphicalsummary_description_lowest'] = 'Zusätzlich ist auch die
     Entwicklung Ihres Fähigkeitswertes bezüglich der als Defizit
     identifizierten Skala {$a} dargestellt:';
