@@ -103,6 +103,23 @@ class personabilities extends feedbackgenerator {
             }
         }
 
+        $pseudoindex = 0;
+        foreach ($feedbackdata['abilitieslist'] as $key => $v) {
+            if ($v['is_global']) {
+                continue;
+            }
+            $pseudoindex++;
+            $feedbackdata['abilitieslist'][$key]['pseudo_index'] = $pseudoindex;
+        }
+        $globalscalename = catscale::return_catscale_object(
+            $this->get_progress()->get_quiz_settings()->catquiz_catscales
+        )->name;
+        $chartdescription = get_string(
+            'detected_scales_chart_description',
+            'local_catquiz',
+            feedback_helper::add_quotes($globalscalename)
+        );
+
         $feedback = $OUTPUT->render_from_template(
         'local_catquiz/feedback/personabilities',
             [
@@ -110,6 +127,7 @@ class personabilities extends feedbackgenerator {
             'scale_info' => $scaleinfo,
             'abilities' => $feedbackdata['abilitieslist'],
             'chartdisplay' => $abilitieschart,
+            'chart_description' => $chartdescription,
             ]
         );
 
@@ -306,7 +324,7 @@ class personabilities extends feedbackgenerator {
                 $ability = get_string('allquestionscorrect', 'local_catquiz');
             }
         } else {
-            $ability = sprintf("%.2f", $ability);
+            $ability = feedback_helper::localize_float($ability);
         }
         if ($catscaleid == $selectedscaleid) {
             $isselectedscale = true;
@@ -335,7 +353,7 @@ class personabilities extends feedbackgenerator {
             $numberofitems = "";
         }
         if (isset($newdata['se'][$catscaleid])) {
-            $standarderror = sprintf("%.2f", $newdata['se'][$catscaleid]);
+            $standarderror = feedback_helper::localize_float($newdata['se'][$catscaleid]);
         } else {
             $standarderror = "";
         }
@@ -348,6 +366,7 @@ class personabilities extends feedbackgenerator {
             'numberofitemsplayed' => $numberofitems,
             'isselectedscale' => $isselectedscale,
             'tooltiptitle' => $tooltiptitle,
+            'is_global' => $catscaleid == $this->get_progress()->get_quiz_settings()->catquiz_catscales,
         ];
 
     }
@@ -474,11 +493,19 @@ class personabilities extends feedbackgenerator {
             $chart->add_series($series);
             $chart->set_labels([0 => get_string('labelforrelativepersonabilitychart', 'local_catquiz')]);
         };
-        $out = $OUTPUT->render($chart);
-
+        $chart->set_legend_options(['display' => false]);
+        $out = $OUTPUT->render_chart($chart, false);
+        $quizsettings = $this->get_progress()->get_quiz_settings();
         return [
             'chart' => $out,
-            'charttitle' => get_string('personabilitycharttitle', 'local_catquiz', $primarycatscale['name']),
+            'charttitle' => get_string(
+                'personabilitycharttitle',
+                'local_catquiz',
+                feedback_helper::add_quotes($primarycatscale['name'])
+            ),
+            'colorbar_legend' => [
+                'feedbackbarlegend' => feedback_helper::get_colorbarlegend($quizsettings, $quizsettings->catquiz_catscales),
+            ],
         ];
 
     }

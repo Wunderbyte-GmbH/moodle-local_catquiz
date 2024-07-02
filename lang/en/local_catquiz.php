@@ -474,8 +474,8 @@ $string['attemptfeedbacknotyetavailable'] = "Feedback for attempts will be displ
 $string['allquestionsincorrect'] = "Not available - all questions were answered incorrectly";
 $string['allquestionscorrect'] = "Not available- all questions were answered correctly";
 $string['questionssummary'] = "Summary";
-$string['currentability'] = 'Your current ability score for scale "{$a}"';
-$string['currentabilityfellowstudents'] = 'Current ability score of your fellow students for scale "{$a}"';
+$string['currentability'] = 'Your ability score';
+$string['currentabilityfellowstudents'] = 'Average';
 $string['feedbackbarlegend'] = "Color code";
 $string['teacherfeedback'] = "Feedback for teachers";
 $string['catquiz_feedbackheader'] = "Feedback";
@@ -534,9 +534,15 @@ $string['error:noscalestoreport'] = "There is no feedback available because no t
 
 // Personability & chart in Feedback.
 $string['chartlegendabilityrelative'] = '{$a->difference} (Compared to parentscale); {$a->ability} (ability score of scale)';
+$string['detected_scales_reference'] = 'Reference scale';
+$string['detected_scales_scalename'] = 'Scale';
+$string['detected_scales_ability'] = 'Ability score';
+$string['detected_scales_number_questions'] = 'Played questions';
 $string['personabilitycharttitle'] = 'Relative ability score in subscales compared to {$a}';
-$string['personabilitytitle'] = 'Ability score in subscales';
 $string['itemsplayed'] = 'evaluated items';
+$string['detected_scales_chart_description'] = 'The following chart displays
+    the values in comparison with your ability score in {$a}. Click the bar to
+    see the scale name and value';
 $string['personabilityinscale'] = 'Ability score in scale "{$a}"';
 $string['yourscorein'] = 'Your average scores in "{$a}"';
 $string['scoreofpeers'] = 'Average of your peers';
