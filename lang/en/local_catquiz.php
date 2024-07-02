@@ -98,6 +98,11 @@ $string['defaultcontext'] = 'New default context for scale';
 $string['moveitemtootherscale'] = 'Testitem(s) {$a} already assigned to another (sub-)scale of the same tree. Modify assignment?';
 $string['pleasecheckorcancel'] = 'Please confirm or cancel';
 $string['progress'] = 'Progress';
+$string['learningprogress_title'] = 'Your progress';
+$string['learningprogress_description'] = 'How did your ability score change
+    over time? Did you improve?<br/>The following chart displays the progress
+    of your (general) ability score in {$a} in comparison to the average of all
+    test attempts:';
 $string['perattempt'] = 'per attempt ';
 $string['peritem'] = 'per item ';
 $string['applychanges'] = 'Apply Changes';
