@@ -424,6 +424,8 @@ abstract class feedbackgenerator {
     /**
      * Returns the primary scale or null
      *
+     * @param array $existingdata
+     * @param array $newdata
      * @return ?stdClass
      */
     public function get_primary_scale($existingdata, $newdata): ?stdClass {
