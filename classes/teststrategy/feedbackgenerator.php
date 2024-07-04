@@ -459,4 +459,17 @@ abstract class feedbackgenerator {
         $personabilities = [$selectedscaleid => $value] + $personabilities;
     }
 
+    /**
+     * Returns the global scale according to the quiz settings
+     *
+     * @return stdClass
+     */
+    public function get_global_scale() {
+        $globalscaleid = $this
+            ->get_progress()
+            ->get_quiz_settings()
+            ->catquiz_catscales;
+        return catscale::return_catscale_object($globalscaleid);
+    }
+
 }

@@ -98,6 +98,7 @@ class personabilities_test extends advanced_testcase {
             ->onlyMethods([
                 'get_testitems_for_catscale',
                 'get_progress',
+                'get_global_scale',
             ])
             ->setConstructorArgs([$feedbacksettings, $feedbackhelpermock])
             ->getMock();
@@ -109,6 +110,9 @@ class personabilities_test extends advanced_testcase {
         $personabilities
             ->method('get_progress')
             ->willReturn($progressmock);
+        $personabilities
+            ->method('get_global_scale')
+            ->willReturn((object)['name' => 'Global scale name']);
 
         $output = $personabilities->get_feedback($feedbackdata)['studentfeedback'];
         // For the moment, this tests only the heading, not the whole rendered data.
