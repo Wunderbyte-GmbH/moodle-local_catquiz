@@ -27,6 +27,8 @@ namespace local_catquiz\teststrategy;
 use coding_exception;
 use context_course;
 use context_system;
+use local_catquiz\catscale;
+use stdClass;
 use UnexpectedValueException;
 
 /**
@@ -78,6 +80,16 @@ abstract class feedbackgenerator {
      * @var feedback_helper
      */
     protected feedback_helper $feedbackhelper;
+
+    /**
+     * @var array $structuredabilities
+     */
+    protected array $structuredabilities;
+
+    /**
+     * @var ?stdClass $primaryscale
+     */
+    protected ?stdClass $primaryscale;
 
     /**
      * Create a new feedback generator
@@ -352,4 +364,97 @@ abstract class feedbackgenerator {
         }
         return round($array[$key], self::PRECISION);
     }
+
+    /**
+     * Returns the `personabilites_abilities` data
+     *
+     * Should be called from the load_data().
+     *
+     * @param array $existingdata
+     * @param array $newdata
+     * @return array
+     */
+    protected function get_restructured_abilities($existingdata, $newdata) {
+        if (isset($this->structuredabilities)) {
+            return $this->structuredabilities;
+        }
+        $progress = $this->get_progress();
+        $personabilities = $progress->get_abilities();
+
+        if ($personabilities === []) {
+            $this->structuredabilities = [];
+            return [];
+        }
+        $catscales = $newdata['catscales'];
+
+        // Make sure that only feedback defined by strategy is rendered.
+        $personabilitiesfeedbackeditor = $this->select_scales_for_report(
+            $newdata,
+            $this->feedbacksettings,
+            $existingdata['teststrategy']
+        );
+
+        $personabilities = [];
+        // Ability range is the same for all scales with same root scale.
+        $abiltiyrange = $this->feedbackhelper->get_ability_range(array_key_first($catscales));
+        foreach ($personabilitiesfeedbackeditor as $catscale => $personability) {
+            if (isset($personability['excluded']) && $personability['excluded']) {
+                continue;
+            }
+            if (isset($personability['primary'])) {
+                $selectedscaleid = $catscale;
+                $this->primaryscale = $newdata['catscales'][$selectedscaleid];
+            }
+            $personabilities[$catscale] = $personability;
+            $catscaleobject = catscale::return_catscale_object($catscale);
+            $personabilities[$catscale]['name'] = $catscaleobject->name;
+            $personabilities[$catscale]['abilityrange'] = $abiltiyrange;
+        }
+        if ($personabilities === []) {
+            $this->structuredabilities = [];
+            return [];
+        }
+
+        $this->apply_sorting($personabilities, $selectedscaleid);
+
+        $this->structuredabilities = $personabilities;
+        return $personabilities;
+    }
+
+    /**
+     * Returns the primary scale or null
+     *
+     * @return ?stdClass
+     */
+    public function get_primary_scale($existingdata, $newdata): ?stdClass {
+        if (!isset($this->structuredabilities)) {
+            $this->get_restructured_abilities($existingdata, $newdata);
+        }
+        if (!isset($this->primaryscale)) {
+            return null;
+        }
+        return $this->primaryscale;
+    }
+
+    /**
+     * Sort personabilites array according to feedbacksettings.
+     *
+     * @param array $personabilities
+     * @param int $selectedscaleid
+     *
+     */
+    protected function apply_sorting(array &$personabilities, int $selectedscaleid) {
+        // Sort the array and put primary scale first.
+        if ($this->feedbacksettings->is_sorted_ascending()) {
+            asort($personabilities);
+        } else {
+            arsort($personabilities);
+        }
+
+        // Put selected element first.
+        $value = $personabilities[$selectedscaleid];
+        unset($personabilities[$selectedscaleid]);
+        $personabilities = [$selectedscaleid => $value] + $personabilities;
+    }
+
 }

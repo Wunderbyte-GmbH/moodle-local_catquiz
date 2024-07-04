@@ -220,44 +220,18 @@ class personabilities extends feedbackgenerator {
         require_once($CFG->dirroot . '/local/catquiz/lib.php');
 
         $progress = $this->get_progress();
-        $personabilities = $progress->get_abilities();
-
-        if ($personabilities === []) {
+        if ($progress->get_abilities() === []) {
             return null;
         }
+
         $catscales = $newdata['catscales'];
 
         // Make sure that only feedback defined by strategy is rendered.
-        $personabilitiesfeedbackeditor = $this->select_scales_for_report(
-            $newdata,
-            $this->feedbacksettings,
-            $existingdata['teststrategy']
-        );
-
-        $personabilities = [];
-        // Ability range is the same for all scales with same root scale.
-        $abiltiyrange = $this->feedbackhelper->get_ability_range(array_key_first($catscales));
-        foreach ($personabilitiesfeedbackeditor as $catscale => $personability) {
-            if (isset($personability['excluded']) && $personability['excluded']) {
-                continue;
-            }
-            if (isset($personability['primary'])) {
-                $selectedscaleid = $catscale;
-            }
-            $personabilities[$catscale] = $personability;
-            $catscaleobject = catscale::return_catscale_object($catscale);
-            $personabilities[$catscale]['name'] = $catscaleobject->name;
-            $personabilities[$catscale]['abilityrange'] = $abiltiyrange;
-
-        }
-        if ($personabilities === []) {
+        if (!$personabilities = $this->get_restructured_abilities($existingdata, $newdata)) {
             return [];
         }
-
-        $this->apply_sorting($personabilities, $selectedscaleid);
-
         $abilitieslist = [];
-
+        $selectedscaleid = $this->get_primary_scale($existingdata, $newdata)->id;
         foreach ($personabilities as $catscaleid => $abilityarray) {
             $abilitieslist[] = $this->generate_data_for_scale(
                     $abilitieslist,
@@ -270,32 +244,11 @@ class personabilities extends feedbackgenerator {
         }
 
         return [
-            'primaryscale' => $catscales[$selectedscaleid],
+            'primaryscale' => $this->get_primary_scale($existingdata, $newdata),
             'personabilities_abilities' => $personabilities,
             'se' => $newdata['se'] ?? null,
             'abilitieslist' => $abilitieslist,
         ];
-    }
-
-    /**
-     * Sort personabilites array according to feedbacksettings.
-     *
-     * @param array $personabilities
-     * @param int $selectedscaleid
-     *
-     */
-    private function apply_sorting(array &$personabilities, int $selectedscaleid) {
-        // Sort the array and put primary scale first.
-        if ($this->feedbacksettings->is_sorted_ascending()) {
-            asort($personabilities);
-        } else {
-            arsort($personabilities);
-        }
-
-        // Put selected element first.
-        $value = $personabilities[$selectedscaleid];
-        unset($personabilities[$selectedscaleid]);
-        $personabilities = [$selectedscaleid => $value] + $personabilities;
     }
 
     /**

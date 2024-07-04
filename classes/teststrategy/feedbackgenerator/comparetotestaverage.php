@@ -305,6 +305,7 @@ class comparetotestaverage extends feedbackgenerator {
             'middle' => $middle,
             'comparetotestaverage_has_worse' => count($worseabilities) > 0,
             'comparetotestaverage_has_enough_peers' => count($distinctusers) >= self::MIN_USERS,
+            'personabilities_abilities' => $this->get_restructured_abilities($existingdata, $newdata),
         ];
     }
 
