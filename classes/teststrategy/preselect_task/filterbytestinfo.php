@@ -74,6 +74,12 @@ class filterbytestinfo extends preselect_task implements wb_middleware {
                 continue;
             }
 
+            // We could have an ability for a scale that is not longer active
+            // in this attempt.
+            if (!array_key_exists($scaleid, $this->context['questionsperscale'])) {
+                continue;
+            }
+
             $allitems = model_item_param_list::from_array(
                 array_filter(
                     $this->context['questionsperscale'][$scaleid],
