@@ -288,7 +288,7 @@ class attemptfeedback implements renderable, templatable {
         $newdata = array_filter($newdata, fn ($k) => !in_array($k, $excludekeys), ARRAY_FILTER_USE_KEY);
         $newdata = $this->add_default_data($newdata);
         foreach ($generators as $generator) {
-            $generatordata = $generator->update_data($this->attemptid, $existingdata, $newdata);
+            $generatordata = $generator->update_data($this->attemptid, $feedbackdata, $newdata);
             if (! $generatordata) {
                 continue;
             }
