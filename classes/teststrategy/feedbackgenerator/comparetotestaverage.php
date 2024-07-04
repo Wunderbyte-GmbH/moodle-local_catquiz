@@ -393,8 +393,11 @@ class comparetotestaverage extends feedbackgenerator {
         // Scale the values of $fisherinfos before creating chart series.
         $scaledtiseries = $this->feedbackhelper->scalevalues(array_values($fisherinfos), array_values($abilityseries['counter']));
 
-        $scalename = $initialcontext['personabilities_abilities'][$primarycatscale['id']]['name'];
-        $aserieslabel = get_string('scalescorechartlabel', 'local_catquiz', $scalename);
+        $aserieslabel = "";
+        if (array_key_exists('personabilities_abilities', $initialcontext)) {
+            $scalename = $initialcontext['personabilities_abilities'][$primarycatscale['id']]['name'];
+            $aserieslabel = get_string('scalescorechartlabel', 'local_catquiz', $scalename);
+        }
         $aseries = new chart_series($aserieslabel, array_values($abilityseries['counter']));
         $aseries->set_colors(array_values($abilityseries['colors']));
         $chart = new chart_bar();

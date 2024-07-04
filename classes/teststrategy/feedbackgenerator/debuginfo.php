@@ -99,8 +99,9 @@ class debuginfo extends feedbackgenerator {
                 $lasttimeplayedpenalty = $lastquestion['lasttimeplayedpenaltyfactor'] ?? 'NA';
                 $difficulty = $lastquestion['difficulty'] ?? 'NA';
                 $fraction = $lastquestion['fraction'] ?? 'NA';
+                $id = $lastquestion['id'] ?? 'NA';
                 $rowarr[] =
-                "id: " . $lastquestion['id']
+                "id: " . $id
                 .", score: " . $score
                 .", fisherinformation in root scale: " . $fisherinformation
                 .", lasttimeplayedpenalty: " . $lasttimeplayedpenalty

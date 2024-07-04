@@ -74,7 +74,6 @@ class personabilities extends feedbackgenerator {
     public function get_studentfeedback(array $feedbackdata): array {
         global $OUTPUT;
 
-        $primaryscaleid = $feedbackdata['primaryscale']['id'];
         $abilitieschart = $this->render_chart(
             $feedbackdata['personabilities_abilities'],
             (array) $this->get_progress()->get_quiz_settings(),
@@ -82,7 +81,10 @@ class personabilities extends feedbackgenerator {
         );
 
         $scaleinfo = false;
-        if (array_key_exists($primaryscaleid, $feedbackdata['personabilities_abilities'])) {
+        $primaryscaleid = isset($feedbackdata['primaryscale'])
+            ? $feedbackdata['primaryscale']['id']
+            : false;
+        if ($primaryscaleid && array_key_exists($primaryscaleid, $feedbackdata['personabilities_abilities'])) {
             $primaryscale = $feedbackdata['personabilities_abilities'][$primaryscaleid];
             if (array_key_exists('primarybecause', $primaryscale)
                 && $primaryscale['primarybecause'] === 'lowestskill'
@@ -403,12 +405,12 @@ class personabilities extends feedbackgenerator {
      *
      * @param array $personabilities
      * @param array $quizsettings
-     * @param array $primarycatscale
+     * @param ?array $primarycatscale
      *
      * @return array
      *
      */
-    private function render_chart(array $personabilities, array $quizsettings, array $primarycatscale): array {
+    private function render_chart(array $personabilities, array $quizsettings, ?array $primarycatscale): array {
         global $OUTPUT;
 
         if (count($personabilities) < 2) {
@@ -417,8 +419,13 @@ class personabilities extends feedbackgenerator {
                 'charttitle' => '',
             ];
         }
+        foreach ($personabilities as $id => $pa) {
+            if (isset($pa['primary']) && $pa['primary']) {
+                $primarycatscaleid = intval($id);
+                break;
+            }
+        }
 
-        $primarycatscaleid = intval($primarycatscale['id']);
         $primaryability = $this->get_progress()->get_abilities()[$quizsettings['catquiz_catscales']];
 
         $chart = new chart_bar();
