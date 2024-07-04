@@ -78,7 +78,9 @@ class graphicalsummary extends feedbackgenerator {
         );
         // If this is a deficit strategy, display more info.
         $additionalinfo = false;
-        if (array_key_exists('graphicalsummary_primaryscale', $feedbackdata)) {
+        if (array_key_exists('graphicalsummary_primaryscale', $feedbackdata)
+            && isset($feedbackdata['primaryscale'])
+        ) {
             $primaryscale = reset ($feedbackdata['graphicalsummary_primaryscale']);
             $quoteddeficitscale = feedback_helper::add_quotes($feedbackdata['primaryscale']['name']);
             if (array_key_exists('primarybecause', $primaryscale)
@@ -235,6 +237,7 @@ class graphicalsummary extends feedbackgenerator {
             'personabilities' => $progress->get_abilities(true),
             'graphicalsummary_primaryscale' => $primaryscale,
             'graphicalsummary_otherscales' => $otherscales,
+            'primaryscale' => $this->get_primary_scale($existingdata, $newdata),
         ];
     }
 
