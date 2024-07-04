@@ -451,7 +451,7 @@ class personabilities extends feedbackgenerator {
         $chart->set_legend_options(['display' => false]);
         $out = $OUTPUT->render_chart($chart, false);
         $quizsettings = $this->get_progress()->get_quiz_settings();
-        $globalscale = catscale::return_catscale_object($quizsettings->catquiz_catscales);
+        $globalscale = $this->get_global_scale();
         $globalscalename = $globalscale->name;
         return [
             'chart' => $out,
@@ -464,6 +464,5 @@ class personabilities extends feedbackgenerator {
                 'feedbackbarlegend' => feedback_helper::get_colorbarlegend($quizsettings, $quizsettings->catquiz_catscales),
             ],
         ];
-
     }
 }
