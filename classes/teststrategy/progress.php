@@ -828,6 +828,9 @@ class progress implements JsonSerializable {
      */
     private function get_last_response_for_attempt() {
         $response = catquiz::get_last_response_for_attempt($this->get_usage_id());
+        if ($response->state === 'gaveup') {
+            $response->fraction = 0.0;
+        }
         return $response;
     }
 
