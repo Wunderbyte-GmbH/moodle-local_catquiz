@@ -810,11 +810,14 @@ class progress implements JsonSerializable {
      * @return $this
      */
     public function mark_lastquestion_failed() {
-        $this->responses[$this->lastquestion->id] = [
-            'questionid' => $this->lastquestion->id,
-            'fraction' => 0.0,
-            'userlastattempttime' => time(),
-        ];
+        $this->responses[$this->lastquestion->id] = array_merge(
+            $this->responses[$this->lastquestion->id] ?? [],
+            [
+                'questionid' => $this->lastquestion->id,
+                'fraction' => 0.0,
+                'userlastattempttime' => time(),
+            ],
+        );
         return $this;
     }
 
