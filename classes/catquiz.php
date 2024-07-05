@@ -542,6 +542,13 @@ class catquiz {
      */
     public static function get_last_response_for_attempt(int $questionusageid) {
         global $DB;
+
+        [$unfinishedstatessql, $unfinishedstatesparams] = $DB->get_in_or_equal(
+            self::get_unfinished_question_states(),
+            SQL_PARAMS_NAMED,
+            'unfinishedstates'
+        );
+
         $sql = <<<SQL
         SELECT
             qs.id,
@@ -566,11 +573,16 @@ class catquiz {
                            FROM {question_attempts}
                            WHERE questionusageid = :questionusageid
             ) sub1 ON qs.questionattemptid = sub1.id
-            WHERE fraction IS NOT NULL
             GROUP BY questionusageid
-        ) AND fraction IS NOT NULL
+        ) AND state NOT $unfinishedstatessql
         SQL;
-        return $DB->get_record_sql($sql, ['questionusageid' => $questionusageid]);
+
+        $params = $unfinishedstatesparams;
+        $params['questionusageid'] = $questionusageid;
+        return $DB->get_record_sql(
+            $sql,
+            $params
+        );
     }
 
     /**
@@ -688,7 +700,7 @@ class catquiz {
     ): array {
         global $DB;
         [$unfinishedstatessql, $unfinishedstatesparams] = $DB->get_in_or_equal(
-            ['notstarted', 'unprocessed', 'todo', 'invalid', 'complete'],
+            self::get_unfinished_question_states(),
             SQL_PARAMS_NAMED,
             'unfinishedstates'
         );
@@ -2328,5 +2340,20 @@ class catquiz {
             WHERE $where
             ORDER BY attemptid DESC";
         return [$sql, $params];
+    }
+
+    /**
+     * Returns the state of questions that we will not consider as completed
+     *
+     * @return array
+     */
+    private static function get_unfinished_question_states() {
+        return [
+            'notstarted',
+            'unprocessed',
+            'todo',
+            'invalid',
+            'complete',
+        ];
     }
 }
