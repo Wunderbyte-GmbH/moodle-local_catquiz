@@ -543,7 +543,20 @@ class catquiz {
     public static function get_last_response_for_attempt(int $questionusageid) {
         global $DB;
         $sql = <<<SQL
-        SELECT * FROM {question_attempt_steps} qs
+        SELECT
+            qs.id,
+            questionattemptid,
+            state,
+            ROUND(fraction, 3) as fraction,
+            timecreated,
+            userid,
+            questionusageid,
+            questionid,
+            questionsummary,
+            rightanswer,
+            responsesummary,
+            timemodified
+        FROM {question_attempt_steps} qs
         JOIN {question_attempts} qa ON qs.questionattemptid = qa.id
         AND qa.id = (
             SELECT max(questionattemptid) maxwithresponse
