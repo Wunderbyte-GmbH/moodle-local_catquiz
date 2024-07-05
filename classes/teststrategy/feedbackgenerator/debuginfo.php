@@ -48,6 +48,8 @@ class debuginfo extends feedbackgenerator {
     /**
      * Temporarily holds the data of the next row
      *
+     * When full, will be added as a CSV styled row.
+     *
      * @var array
      */
     private array $row = [];
@@ -59,6 +61,13 @@ class debuginfo extends feedbackgenerator {
      */
     private array $columns = [];
 
+    /**
+     * The data for the next row
+     *
+     * This contains the pool of data that can be used to build the next row.
+     *
+     * @var array
+     */
     private array $rowdata = [];
 
     /**
