@@ -24,7 +24,6 @@
 
 namespace local_catquiz\teststrategy\feedbackgenerator;
 
-use cache;
 use context_system;
 use local_catquiz\catquiz;
 use local_catquiz\teststrategy\feedbackgenerator;
@@ -38,6 +37,29 @@ use local_catquiz\teststrategy\info;
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class debuginfo extends feedbackgenerator {
+
+    /**
+     * Default string for missing data
+     *
+     * @var string NA
+     */
+    const NA = 'NA';
+
+    /**
+     * Temporarily holds the data of the next row
+     *
+     * @var array
+     */
+    private array $row = [];
+
+    /**
+     * Holds the column values
+     *
+     * @var array
+     */
+    private array $columns = [];
+
+    private array $rowdata = [];
 
     /**
      * Get student feedback.
@@ -68,73 +90,28 @@ class debuginfo extends feedbackgenerator {
         if (!get_config('local_catquiz', 'store_debug_info')) {
             return [];
         }
-
-        $columnames = [
-            'questionsattempted',
-            'timestamp',
-            'personabilities',
-            'lastquestion',
-            'questions',
-            'activescales',
-            'lastmiddleware',
-            'excluded subscales',
-            'lastresponse',
-            'standard error',
-            'num questions per scale',
-        ];
-        $csvstring = implode(';', $columnames).PHP_EOL;
+        $csvstring = "";
 
         foreach ($data['debuginfo'] as $row) {
-            $rowarr = [];
-            $rowarr[] = $row['questionsattempted'];
-            $rowarr[] = $row['timestamp'];
-            $rowarr[] = $row['personabilities'];
-
-            $lastquestion = $row['lastquestion'];
-            if (! $lastquestion) {
-                $rowarr[] = 'NA';
-            } else {
-                $score = $lastquestion['score'] ?? 'NA';
-                $fisherinformation = $lastquestion['fisherinformation'] ?? 'NA';
-                $lasttimeplayedpenalty = $lastquestion['lasttimeplayedpenaltyfactor'] ?? 'NA';
-                $difficulty = $lastquestion['difficulty'] ?? 'NA';
-                $fraction = $lastquestion['fraction'] ?? 'NA';
-                $id = $lastquestion['id'] ?? 'NA';
-                $rowarr[] =
-                "id: " . $id
-                .", score: " . $score
-                .", fisherinformation in root scale: " . $fisherinformation
-                .", lasttimeplayedpenalty: " . $lasttimeplayedpenalty
-                .", difficulty: " . $difficulty
-                .", fraction: " . $fraction;
-            }
-
-            $questions = $row['questions'] ?? [];
-            if (! $questions) {
-                $rowarr[] = 'NA';
-            } else {
-                $questionsstr = "";
-                foreach ($questions as $question) {
-                    $questionsstr .= sprintf(
-                       "id: %s, type: %s, fisherinformation: %s, score: %s%s",
-                       $question['id'],
-                       $question['type'],
-                       $question['fisherinformation'],
-                       $question['score'],
-                       isset($question['last']) ? "" : ","
-                    );
-                }
-                $rowarr[] = $questionsstr;
-            }
-
-            $rowarr[] = $row['activescales'] ?? 'NA';
-            $rowarr[] = $row['lastmiddleware'];
-            $rowarr[] = $row['lastresponse'];
-            $rowarr[] = 'NA';
-
-            $rowarr[] = $row['numquestionsperscale'] ?? 'NA';
-            $csvstring .= implode(';', $rowarr).PHP_EOL;
+            $csvstring .= $this
+                ->set_row_data($row)
+                ->add_column_value('questionsattempted')
+                ->add_column_value('timestamp')
+                ->add_column_value('personabilities')
+                ->add_column_value('activescales')
+                ->add_column_value('lastmiddleware')
+                ->add_column_value('lastresponse')
+                ->add_column_value('state')
+                ->add_column_value('rightanswer')
+                ->add_column_value('responsesummary')
+                ->add_column_value('originalfraction')
+                ->add_column_value('fraction')
+                ->add_column_value('questionattemptid')
+                ->as_csv_string();
         }
+        $heading = implode(';', $this->columns).PHP_EOL;
+        $csvstring = $heading . $csvstring;
+
         $descriptionheading = get_string('debuginfo_desc_title', 'local_catquiz', $this->get_progress()->get_attemptid());
         $description = get_string('debuginfo_desc', 'local_catquiz');
         $feedback = $OUTPUT->render_from_template(
@@ -155,6 +132,43 @@ class debuginfo extends feedbackgenerator {
                 'content' => $feedback,
             ];
         }
+    }
+
+    /**
+     * Sets the data for the current row
+     *
+     * Used by add_column_value()
+     *
+     * @param array $row
+     * @return self
+     */
+    private function set_row_data(array $row): self {
+        $this->rowdata = $row;
+        $this->row = [];
+        return $this;
+    }
+
+    /**
+     * Adds a value to the current row
+     *
+     * @param string $key
+     * @return $this
+     */
+    private function add_column_value(string $key): self {
+        if (!in_array($key, $this->columns)) {
+            $this->columns[] = $key;
+        }
+        $this->row[] = $this->rowdata[$key] ?? self::NA;
+        return $this;
+    }
+
+    /**
+     * Implodes the current row by semicolon
+     *
+     * @return string
+     */
+    private function as_csv_string(): string {
+        return implode(';', $this->row).PHP_EOL;
     }
 
     /**
@@ -237,10 +251,6 @@ class debuginfo extends feedbackgenerator {
             $questions = [];
             $questionsperscale = [];
 
-            $lastresponse = isset($newdata['lastresponse'])
-                ? $newdata['lastresponse']['fraction']
-                : "NA";
-
         if ($newdata['lastquestion']) {
             $newdata['lastquestion']
                 ->fisherinformation = $newdata['lastquestion']->fisherinformation[$newdata['catscaleid']]
@@ -251,6 +261,7 @@ class debuginfo extends feedbackgenerator {
                 fn ($scaleid) => $catscales[$scaleid]->name,
                 $this->get_progress()->get_active_scales()
             );
+            $lastresponse = $this->get_progress()->get_last_response();
             $debuginfo[] = [
                 'questionsattempted' => count($this->get_progress()->get_playedquestions()),
                 'timestamp' => time(),
@@ -259,9 +270,15 @@ class debuginfo extends feedbackgenerator {
                 'activescales' => '"' . implode(", ", $activescales) . '"',
                 'lastquestion' => (array) $newdata['lastquestion'],
                 'lastmiddleware' => $newdata['lastmiddleware'],
-                'lastresponse' => $lastresponse,
+                'lastresponse' => isset($lastresponse) ? $lastresponse['fraction'] : self::NA,
                 'numquestionsperscale' => '"'
                     . implode(", ", array_map(fn ($entry) => $entry['name'].": ".$entry['num'], $questionsperscale)) . '"',
+                'state' => isset($lastresponse['state']) ? $lastresponse['state'] : self::NA,
+                'rightanswer' => isset($lastresponse['rightanswer']) ? trim($lastresponse['rightanswer']) : self::NA,
+                'responsesummary' => isset($lastresponse['responsesummary']) ? trim($lastresponse['responsesummary']) : self::NA,
+                'originalfraction' => isset($lastresponse['originalfraction']) ? $lastresponse['originalfraction'] : self::NA,
+                'fraction' => isset($lastresponse['fraction']) ? $lastresponse['fraction'] : self::NA,
+                'questionattemptid' => isset($lastresponse['questionattemptid']) ? $lastresponse['questionattemptid'] : self::NA,
             ];
             return ['debuginfo' => $debuginfo];
     }
