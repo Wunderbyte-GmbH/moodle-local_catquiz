@@ -248,7 +248,7 @@ class debuginfo extends feedbackgenerator {
         $catscales = catquiz::get_catscales(array_keys($newdata['person_ability']));
         $teststrategy = get_string($reflect->getShortName(), 'local_catquiz');
 
-            $personabilities = [];
+        $personabilities = [];
         foreach ($newdata['person_ability'] as $catscaleid => $pp) {
             if (empty($catscales[$catscaleid])) {
                 continue;
@@ -259,12 +259,6 @@ class debuginfo extends feedbackgenerator {
 
             $questions = [];
             $questionsperscale = [];
-
-        if ($newdata['lastquestion']) {
-            $newdata['lastquestion']
-                ->fisherinformation = $newdata['lastquestion']->fisherinformation[$newdata['catscaleid']]
-            ?? 'NA';
-        }
 
             $activescales = array_map(
                 fn ($scaleid) => $catscales[$scaleid]->name,
