@@ -67,6 +67,9 @@ class catscale_created extends \core\event\base {
     public function get_description() {
         $data = $this->data;
         $otherarray = json_decode($data['other']);
+        if (!isset($otherarray->catscaleid)) {
+            return "";
+        }
         $catscaleid = $otherarray->catscaleid;
         $linktoscale = catscale::get_link_to_catscale($catscaleid);
         $data['catscalelink'] = $linktoscale;
