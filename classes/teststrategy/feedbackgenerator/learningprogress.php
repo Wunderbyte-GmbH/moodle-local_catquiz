@@ -369,6 +369,10 @@ class learningprogress extends feedbackgenerator {
      */
     private function render_chart_for_individual_user(array $attemptsofuser, array $primarycatscale) {
         global $OUTPUT;
+        if (!isset($primarycatscale['name'])) {
+            return '';
+        }
+
         $scalename = $primarycatscale['name'];
         $scaleid = $primarycatscale['id'];
 

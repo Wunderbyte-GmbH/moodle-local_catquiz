@@ -394,7 +394,7 @@ class comparetotestaverage extends feedbackgenerator {
         $scaledtiseries = $this->feedbackhelper->scalevalues(array_values($fisherinfos), array_values($abilityseries['counter']));
 
         $aserieslabel = "";
-        if (array_key_exists('personabilities_abilities', $initialcontext)) {
+        if (isset($initialcontext['personabilities_abilities'][$primarycatscale['id']]['name'])) {
             $scalename = $initialcontext['personabilities_abilities'][$primarycatscale['id']]['name'];
             $aserieslabel = get_string('scalescorechartlabel', 'local_catquiz', $scalename);
         }
