@@ -102,8 +102,9 @@ class debuginfo extends feedbackgenerator {
         $csvstring = "";
 
         foreach ($data['debuginfo'] as $row) {
+            $newrow = $this->convert($row);
             $csvstring .= $this
-                ->set_row_data($row)
+                ->set_row_data($newrow)
                 ->add_column_value('questionsattempted')
                 ->add_column_value('timestamp')
                 ->add_column_value('personabilities')
@@ -141,6 +142,20 @@ class debuginfo extends feedbackgenerator {
                 'content' => $feedback,
             ];
         }
+    }
+
+    /**
+     * Converts from a possible old format to a new one.
+     *
+     * @param array $row The current row
+     * @return array
+     */
+    private function convert(array $row): array {
+        $updated = $row;
+        if (is_array($row['lastresponse']) && array_key_exists('fraction', $row['lastresponse'])) {
+            $updated['lastresponse'] = $row['lastresponse']['fraction'];
+        }
+        return $updated;
     }
 
     /**
