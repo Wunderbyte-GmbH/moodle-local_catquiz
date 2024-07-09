@@ -34,7 +34,7 @@ use moodle_url;
  * @copyright 2024 Georg Maißer
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class catscale_created extends \core\event\base {
+class catscale_created extends catquiz_event_base {
 
     /**
      * Init parameters.
@@ -66,11 +66,11 @@ class catscale_created extends \core\event\base {
      */
     public function get_description() {
         $data = $this->data;
-        $otherarray = json_decode($data['other']);
-        if (!isset($otherarray->catscaleid)) {
+        $other = $this->get_other_data();
+        if (!isset($other->catscaleid)) {
             return "";
         }
-        $catscaleid = $otherarray->catscaleid;
+        $catscaleid = $other->catscaleid;
         $linktoscale = catscale::get_link_to_catscale($catscaleid);
         $data['catscalelink'] = $linktoscale;
         return get_string('create_catscale_description', 'local_catquiz', $data);

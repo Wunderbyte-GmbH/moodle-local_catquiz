@@ -33,7 +33,7 @@ use moodle_url;
  * @copyright 2024 Georg Maißer
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class feedbacktab_clicked extends \core\event\base {
+class feedbacktab_clicked extends catquiz_event_base {
 
     /**
      * Init parameters.
@@ -90,19 +90,5 @@ class feedbacktab_clicked extends \core\event\base {
         return new moodle_url('manage_catscales.php', [
             'attemptid' => $this->get_other_data()->attemptid,
         ], 'lcq_quizattempts');
-    }
-
-    /**
-     * Returns the 'other' data as object
-     * @return mixed
-     */
-    private function get_other_data() {
-        if (is_array($this->data['other'])) {
-            return (object) $this->data['other'];
-        }
-        if (is_string($this->data['other'])) {
-            return json_decode($this->data['other']);
-        }
-        return $this->data['other'];
     }
 }

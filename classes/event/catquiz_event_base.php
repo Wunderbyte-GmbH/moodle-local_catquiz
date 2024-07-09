@@ -24,6 +24,8 @@
 
 namespace local_catquiz\event;
 
+use stdClass;
+
 /**
  * Extends the event base with utility methods.
  *
@@ -33,9 +35,9 @@ namespace local_catquiz\event;
 abstract class catquiz_event_base extends \core\event\base {
     /**
      * Returns the 'other' data as object
-     * @return mixed
+     * @return stdClass
      */
-    protected function get_other_data() {
+    protected function get_other_data(): stdClass {
         if (is_array($this->data['other'])) {
             return (object) $this->data['other'];
         }
