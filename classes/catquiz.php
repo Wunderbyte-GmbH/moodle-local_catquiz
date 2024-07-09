@@ -2252,6 +2252,12 @@ class catquiz {
             $params = array_merge($params, ['courseid' => $courseid]);
         }
 
+        // Subquery s3  summarizes the attempts for multiple courses. This is
+        // used, if the shortcode is used outside a course and we want to know
+        // all attempt across all courses.
+        // Subquery s2 gets the number of attempts per course/context combination for all users
+        // The outermost query takes the highest (MAX) ability in case we have
+        // multiple abilities for the given user.
         $sql = "SELECT s3.userid, MAX(s3.ability) ability, SUM(attemptcount) attempts
                 FROM (
                     SELECT s2.userid, s2.ability, SUM(attemptcount) attemptcount
