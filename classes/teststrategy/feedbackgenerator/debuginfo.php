@@ -281,6 +281,7 @@ class debuginfo extends feedbackgenerator {
             );
             $lastresponse = $this->get_progress()->get_last_response();
             $debuginfo[] = [
+                'pluginversion' => get_config('local_catquiz')->version ?? self::NA,
                 'questionsattempted' => count($this->get_progress()->get_playedquestions()),
                 'timestamp' => time(),
                 'personabilities' => $personabilities,
