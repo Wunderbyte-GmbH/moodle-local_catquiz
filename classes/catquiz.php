@@ -2265,7 +2265,7 @@ class catquiz {
                         SELECT ue.userid, lcp.ability, s1.courseid, COALESCE(attemptcount, 0) attemptcount
                         FROM {enrol} e
                         JOIN {user_enrolments} ue ON e.id = ue.enrolid
-                        JOIN {role} r ON e.roleid = r.id AND r.shortname = 'student'
+                        JOIN {role} r ON e.roleid = r.id
                         LEFT JOIN (
                             SELECT a.userid, a.contextid, a.courseid, COUNT(*) as attemptcount
                             FROM {local_catquiz_attempts} a
