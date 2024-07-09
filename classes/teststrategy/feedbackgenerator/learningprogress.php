@@ -85,6 +85,9 @@ class learningprogress extends feedbackgenerator {
             (array) $feedbackdata,
             $feedbackdata['primaryscale']
         );
+        if (!$abilityprogress) {
+            return [];
+        }
         $globalscale = catscale::return_catscale_object($this->get_progress()->get_quiz_settings()->catquiz_catscales);
         $globalscalename = $globalscale->name;
         $feedback = $OUTPUT->render_from_template(
@@ -283,6 +286,9 @@ class learningprogress extends feedbackgenerator {
      *
      */
     public function render_abilityprogress(array $initialcontext, $primarycatscale) {
+        if (!$primarycatscale) {
+            return [];
+        }
         $userid = $initialcontext['userid'];
 
         // If there is no endtime, use timestamp.
@@ -427,6 +433,10 @@ class learningprogress extends feedbackgenerator {
         int $timerange,
         array $beginningandendofrange) {
         global $OUTPUT;
+
+        if (!isset($primarycatscale['name']) || !isset($primarycatscale['id'])) {
+            return [];
+        }
         $scalename = $primarycatscale['name'];
         $scaleid = $primarycatscale['id'];
 
