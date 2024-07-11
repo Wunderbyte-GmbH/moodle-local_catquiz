@@ -97,3 +97,10 @@ span.wb_colourpick.colourpickercircle.selected {
 .catquiz_feedback {
     text-align: left;
 }
+
+input.disabled {
+    cursor: not-allowed;
+    background-color: #e9ecef;
+    opacity: 1;
+    pointer-events: none;
+}
