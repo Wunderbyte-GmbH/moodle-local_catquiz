@@ -104,10 +104,12 @@ input.disabled {
     opacity: 1;
     pointer-events: none;
 }
-.card-body,.card-header {
+.card-body,
+.card-header {
     cursor: initial;
 }
-.card-body-disabled, div[contenteditable="false"] {
+.card-body-disabled,
+div[contenteditable="false"] {
     cursor: not-allowed;
     background-color: #e9ecef;
     opacity: 1;
