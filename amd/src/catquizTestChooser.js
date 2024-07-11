@@ -27,6 +27,7 @@ const SELECTORS = {
     CATSCALESUBMIT: '[data-action="submitCatScale"]',
     CATSCALESUBMITCONTAINER: '[id="fitem_id_submitcatscaleoption"]',
     CATTESTCHECKBOXES: 'input[name^="catquiz_subscalecheckbox"]',
+    REPORTSCALECHECKBOXES: 'input[id^="id_catquiz_scalereportcheckbox"]',
     NUMBEROFFEEDBACKSSUBMIT: '[data-action="submitNumberOfFeedbackOptions"]'
 };
 
@@ -37,6 +38,7 @@ export const init = () => {
 
     const selectors = document.querySelectorAll(SELECTORS.CATTESTCHOOSER);
     const checkboxes = document.querySelectorAll(SELECTORS.CATTESTCHECKBOXES);
+    const reportscalecheckboxes = document.querySelectorAll(SELECTORS.REPORTSCALECHECKBOXES);
 
     var elements = new Set([
         ...selectors,
@@ -78,7 +80,57 @@ export const init = () => {
         })
     );
 
+    // Add a listener to the report checkboxes
+    var checkboxelements = new Set([
+        ...reportscalecheckboxes
+    ]);
+    if (!checkboxelements || checkboxelements.length == 0) {
+        return;
+    }
+
+    checkboxelements.forEach(selector => {
+        setCardDisabledStatus(selector);
+        selector.addEventListener('change', e => setCardDisabledStatus(e.target));
+    });
 };
+
+/**
+ * Checks the report scale checkbox and disables/enables the input fields accordingly
+ *
+ * @param {HTMLElement} element
+ */
+function setCardDisabledStatus(element) {
+    let reportScale = element.checked;
+    let ownId = element.id || element.name;
+    // Get the closest parent.
+    let cardBody = element.closest('.card-body');
+    // We want to just disable the form fields for the currently selected scale, not the nested scales.
+    let currentScaleFields = [...cardBody.children].filter(c => !c.id.match(/^accordion/));
+
+    currentScaleFields.forEach(element => {
+
+        // Add or remove a 'disabled' class to all child input elements.
+        element
+            .getElementsByTagName('input')
+            .forEach((i) => {
+                if (i.id == ownId) {
+                    return;
+                }
+                if (!reportScale) {
+                    i.classList.add('disabled');
+                } else {
+                    i.classList.remove('disabled');
+                }
+            });
+
+        // Set the 'contenteditable' attribute of the text editor to disable/enable editing.
+        element
+            .getElementsByClassName('editor_atto_content')
+            .forEach((el) => {
+                el.setAttribute('contenteditable', reportScale);
+            });
+    });
+}
 
 /**
  * No Submit Button triggered.
