@@ -104,6 +104,9 @@ input.disabled {
     opacity: 1;
     pointer-events: none;
 }
+.card-body {
+    cursor: initial;
+}
 .card-body-disabled, div[contenteditable="false"] {
     cursor: not-allowed;
     background-color: #e9ecef;
