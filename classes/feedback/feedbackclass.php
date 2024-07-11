@@ -24,17 +24,7 @@
 
 namespace local_catquiz\feedback;
 
-use cache;
-use coding_exception;
-use dml_exception;
-use ddl_exception;
-use local_catquiz\catscale;
 use local_catquiz\data\dataapi;
-use local_catquiz\local\result;
-use local_catquiz\feedback\info;
-use local_catquiz\feedback\preselect_task;
-use local_catquiz\wb_middleware_runner;
-use moodle_exception;
 use MoodleQuickForm;
 use stdClass;
 
