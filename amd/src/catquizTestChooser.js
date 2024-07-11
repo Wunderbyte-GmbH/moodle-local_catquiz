@@ -104,6 +104,11 @@ function setCardDisabledStatus(element) {
     let ownId = element.id || element.name;
     // Get the closest parent.
     let cardBody = element.closest('.card-body');
+    if (!reportScale) {
+        cardBody.classList.add('card-body-disabled');
+    } else {
+        cardBody.classList.remove('card-body-disabled');
+    }
     // We want to just disable the form fields for the currently selected scale, not the nested scales.
     let currentScaleFields = [...cardBody.children].filter(c => !c.id.match(/^accordion/));
 
