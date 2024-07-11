@@ -123,6 +123,16 @@ class personabilities extends feedbackgenerator {
             'local_catquiz',
             feedback_helper::add_quotes($globalscalename)
         );
+        $referencescale = [
+            'name' => $globalscalename,
+            'ability' => feedback_helper::localize_float(
+                $this->get_progress()->get_abilities()[$feedbackdata['catscaleid']]
+            ),
+            'standarderror' => feedback_helper::localize_float(
+                $feedbackdata['se'][$feedbackdata['catscaleid']]
+            ),
+            'itemsplayed' => $this->get_progress()->get_num_playedquestions(),
+        ];
 
         $feedback = $OUTPUT->render_from_template(
         'local_catquiz/feedback/personabilities',
@@ -130,6 +140,7 @@ class personabilities extends feedbackgenerator {
             'feedback_details_description' => $description,
             'scale_info' => $scaleinfo,
             'abilities' => $feedbackdata['abilitieslist'],
+            'referencescale' => $referencescale,
             'chartdisplay' => $abilitieschart,
             'chart_description' => $chartdescription,
             ]

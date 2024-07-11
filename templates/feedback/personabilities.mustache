@@ -80,16 +80,14 @@
         {{/is_global}}
         {{/abilities}}
         <tr><td>{{#str}} detected_scales_reference, local_catquiz {{/str}}:</td><td></td><td></td><td></td></tr>
-        {{#abilities}}
-        {{#is_global}}
+        {{#referencescale}}
         <tr>
             <td></td>
             <td>{{name}}</td>
             <td>{{ability}} (±{{standarderror}})</td>
-            <td>{{#numberofitemsplayed}}{{itemsplayed}}{{/numberofitemsplayed}}</td>
+            <td>{{itemsplayed}}</td>
         </tr>
-        {{/is_global}}
-        {{/abilities}}
+        {{/referencescale}}
     </tbody>
 </table>
 <p>{{{chart_description}}}</p>
