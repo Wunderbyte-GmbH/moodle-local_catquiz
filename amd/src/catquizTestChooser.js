@@ -88,6 +88,8 @@ export const init = () => {
         return;
     }
 
+    // On the first run when the page is loaded set the status according to
+    // saved fields and add event listeners.
     checkboxelements.forEach(selector => {
         setCardDisabledStatus(selector);
         selector.addEventListener('change', e => setCardDisabledStatus(e.target));
@@ -113,7 +115,6 @@ function setCardDisabledStatus(element) {
     let currentScaleFields = [...cardBody.children].filter(c => !c.id.match(/^accordion/));
 
     currentScaleFields.forEach(element => {
-
         // Add or remove a 'disabled' class to all child input elements.
         element
             .getElementsByTagName('input')
