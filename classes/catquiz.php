@@ -26,6 +26,7 @@ namespace local_catquiz;
 
 use core\check\result;
 use dml_exception;
+use local_catquiz\data\dataapi;
 use local_catquiz\event\usertocourse_enroled;
 use local_catquiz\event\usertogroup_enroled;
 use local_catquiz\local\status;
@@ -1474,12 +1475,12 @@ class catquiz {
      * @return mixed
      */
     public static function get_catscales(array $catscaleids) {
-        global $DB;
-        return $DB->get_records_list(
-            "local_catquiz_catscales",
-            'id',
-            $catscaleids
+        $all = dataapi::get_all_catscales();
+        $filtered = array_filter(
+            $all,
+            fn ($scale) => in_array($scale->id, $catscaleids)
         );
+        return $filtered;
     }
 
     /**

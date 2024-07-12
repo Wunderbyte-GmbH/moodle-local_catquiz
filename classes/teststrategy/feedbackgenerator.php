@@ -28,6 +28,7 @@ use coding_exception;
 use context_course;
 use context_system;
 use local_catquiz\catscale;
+use local_catquiz\data\catscale_structure;
 use stdClass;
 use UnexpectedValueException;
 
@@ -89,7 +90,7 @@ abstract class feedbackgenerator {
     /**
      * @var ?stdClass $primaryscale
      */
-    protected ?stdClass $primaryscale;
+    protected ?catscale_structure $primaryscale;
 
     /**
      * Create a new feedback generator
@@ -428,7 +429,7 @@ abstract class feedbackgenerator {
      * @param array $newdata
      * @return ?stdClass
      */
-    public function get_primary_scale($existingdata, $newdata): ?stdClass {
+    public function get_primary_scale($existingdata, $newdata): ?catscale_structure {
         if (!isset($this->structuredabilities)) {
             $this->get_restructured_abilities($existingdata, $newdata);
         }

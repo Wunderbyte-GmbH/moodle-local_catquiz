@@ -174,6 +174,16 @@ class attemptfeedback implements renderable, templatable {
             return;
         }
         $existingdata = $this->load_feedbackdata();
+        if (isset($newdata['catscaleid']) && !isset($existingdata['catscaleid'])) {
+            $existingdata['catscaleid'] = $newdata['catscaleid'];
+        }
+        $existingdata['attemptid'] = $progress->get_attemptid();
+        if (!isset($existingdata['quizsettings'])) {
+            $existingdata['quizsettings'] = $progress->get_quiz_settings();
+        }
+        if (!isset($existingdata['progress'])) {
+            $existingdata['progress'] = $progress;
+        }
         $generators = $this->get_feedback_generators();
         $updateddata = $this->load_data_from_generators($generators, $existingdata, $newdata);
         catquiz::save_attempt_to_db($updateddata);

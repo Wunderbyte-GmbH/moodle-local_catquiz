@@ -37,6 +37,7 @@ use local_catquiz\local\result;
 use local_catquiz\local\status;
 use context_system;
 use Exception;
+use local_catquiz\data\dataapi;
 use local_catquiz\local\model\model_item_param_list;
 use local_catquiz\local\model\model_model;
 use local_catquiz\local\model\model_strategy;
@@ -500,10 +501,7 @@ class catscale {
      *
      */
     public static function get_subscale_ids(?int $catscaleid = null): array {
-        global $DB;
-
-        $all = $DB->get_records("local_catquiz_catscales", null, "", "id, parentid");
-
+        $all = dataapi::get_all_catscales();
         return self::add_subscales($catscaleid, $all);
     }
 
@@ -567,8 +565,7 @@ class catscale {
      *
      */
     public static function get_ancestors(int $catscaleid, int $returnnames = 1) {
-        global $DB;
-        $all = $DB->get_records("local_catquiz_catscales", null, "", "id, parentid, name");
+        $all = dataapi::get_all_catscales();
         $ancestorsintarray = self::add_parentscales($catscaleid, $all);
         switch ($returnnames) {
             case 1:
