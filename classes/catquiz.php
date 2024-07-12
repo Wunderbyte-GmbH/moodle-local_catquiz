@@ -1244,21 +1244,23 @@ class catquiz {
      */
     public static function get_person_abilities(int $contextid, array $catscaleids, array $userids = []) {
         global $DB;
-        [$inscalesql, $inscaleparams] = $DB->get_in_or_equal(
-            $catscaleids,
-            SQL_PARAMS_NAMED,
-            'incatscales'
-        );
+        $where = "contextid = :contextid";
+        $params = ['contextid' => $contextid];
+
+        if ($catscaleids) {
+            [$inscalesql, $inscaleparams] = $DB->get_in_or_equal(
+                $catscaleids,
+                SQL_PARAMS_NAMED,
+                'incatscales'
+            );
+            $where .= "AND catscaleid " . $inscalesql;
+            $params = array_merge($params, $inscaleparams);
+        }
 
         $sql = "
             SELECT *
             FROM {local_catquiz_personparams}
-            WHERE contextid = :contextid
-                AND catscaleid $inscalesql
-        ";
-        $params = array_merge([
-            'contextid' => $contextid,
-        ], $inscaleparams);
+            WHERE $where";
 
         if ($userids) {
             [$inuseridssql, $inuseridsparams] = $DB->get_in_or_equal(

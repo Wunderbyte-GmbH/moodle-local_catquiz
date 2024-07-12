@@ -63,16 +63,18 @@ class model_person_param_list implements ArrayAccess, IteratorAggregate, Countab
      *
      * @param int $contextid
      * @param array $catscaleids
+     * @param array $userids
      * @return self
      * @throws dml_exception
      */
-    public static function load_from_db(int $contextid, array $catscaleids): self {
-        $personrows = catquiz::get_person_abilities($contextid, $catscaleids);
+    public static function load_from_db(int $contextid, array $catscaleids, array $userids = []): self {
+        $personrows = catquiz::get_person_abilities($contextid, $catscaleids, $userids);
 
         $personabilities = new model_person_param_list();
         foreach ($personrows as $r) {
             $p = new model_person_param($r->userid);
-            $p->set_ability($r->ability);
+            $p->set_ability($r->ability)
+                ->set_catscaleid($r->catscaleid);
             $personabilities->add($p);
         }
 
@@ -278,5 +280,16 @@ class model_person_param_list implements ArrayAccess, IteratorAggregate, Countab
         foreach ($updatedrecords as $r) {
             $DB->update_record('local_catquiz_personparams', $r, true);
         }
+    }
+
+    public function filter(callable $fun) {
+        $filtered = new self();
+        foreach ($this->personparams as $pp) {
+            if (!$fun($pp)) {
+                continue;
+            }
+            $filtered->add($pp);
+        }
+        return $filtered;
     }
 }
