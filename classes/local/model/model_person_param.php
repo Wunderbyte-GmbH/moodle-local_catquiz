@@ -110,6 +110,11 @@ class model_person_param implements \ArrayAccess {
     private array $params;
 
     /**
+     * @var int $catscaleid
+     */
+    private int $catscaleid;
+
+    /**
      * Instantiate parameter.
      *
      * @param string $userid
@@ -213,6 +218,15 @@ class model_person_param implements \ArrayAccess {
      */
     public function set_ability(float $ability): self {
         $this->ability = $ability;
+        return $this;
+    }
+
+    public function get_catscaleid(): int {
+        return $this->catscaleid;
+    }
+
+    public function set_catscaleid(int $catscaleid): self {
+        $this->catscaleid = $catscaleid;
         return $this;
     }
 
