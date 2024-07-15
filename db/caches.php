@@ -118,6 +118,7 @@ $definitions = [
         'invalidationevents' => [
             'changesincatscales',
             'changesintestitems',
+            'changesinitemparams',
             ],
     ],
 ];
