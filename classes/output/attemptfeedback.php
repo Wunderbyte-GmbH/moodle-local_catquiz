@@ -381,6 +381,12 @@ class attemptfeedback implements renderable, templatable {
      *
      */
     public function export_for_template(\renderer_base $output): array {
+        // If the minimum number of questions was not reached, we do not display feedback.
+        $numplayed = $this->get_progress()->get_num_playedquestions();
+        $minquestions = $this->get_progress()->get_quiz_settings()->maxquestionsgroup->catquiz_minquestions ?? 0;
+        if ($numplayed < $minquestions) {
+            return ['nofeedback' => true];
+        }
 
         return [
             'feedback' => $this->get_feedback_for_attempt(),
