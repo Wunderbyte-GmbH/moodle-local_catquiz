@@ -63,6 +63,16 @@ class comparetotestaverage extends feedbackgenerator {
     const MIN_USERS = 3;
 
     /**
+     * Limit to show comparison text
+     *
+     * We only show the comparison text "you are better than XX percent of
+     * users" if XX is greater than this value.
+     *
+     * @var int
+     */
+    const MIN_BETTER_THAN_LIMIT = 15;
+
+    /**
      * Get student feedback.
      *
      * @param array $data
@@ -271,12 +281,16 @@ class comparetotestaverage extends feedbackgenerator {
         $b = $middle - (float) $abilityrange['minscalevalue'];
         $testaverageposition = ($b + $testaverageinrange) / $b * 50;
         $userabilityposition = ($b + $abilityinrange) / $b * 50;
+        $betterthan = '';
+        if (round($quantile, 0) >= self::MIN_BETTER_THAN_LIMIT) {
+            $betterthan = get_string('feedbackcomparison_betterthan', 'local_catquiz', ['quantile' => round($quantile, 0)]);
+        }
 
         $text = get_string(
             'feedbackcomparetoaverage',
             'local_catquiz',
             [
-                'quantile' => round($quantile, 0),
+                'betterthan' => $betterthan,
                 'quotedscale' => feedback_helper::add_quotes($catscale->name),
                 'ability_global' => feedback_helper::localize_float($abilityinrange),
                 'se_global' => feedback_helper::localize_float($newdata['se'][$catscaleid]),
