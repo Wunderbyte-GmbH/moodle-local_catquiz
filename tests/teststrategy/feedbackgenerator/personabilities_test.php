@@ -70,6 +70,7 @@ class personabilities_test extends advanced_testcase {
             ->onlyMethods([
                 'get_quiz_settings',
                 'get_abilities',
+                'get_num_playedquestions',
             ])
             ->getMock();
 
@@ -82,6 +83,9 @@ class personabilities_test extends advanced_testcase {
         $progressmock
             ->method('get_abilities')
             ->willReturn([$primaryscaleid => $primaryscalevalue]);
+        $progressmock
+            ->method('get_num_playedquestions')
+            ->willReturn(1);
 
         $feedbackhelpermock = $this->getMockBUilder(feedback_helper::class)
             ->disableOriginalConstructor()
@@ -132,7 +136,7 @@ class personabilities_test extends advanced_testcase {
                 'feedbackdata' => [
                     'catscaleid' => 271,
                     'attemptid' => 1,
-                    'se' => [],
+                    'se' => [271 => 0.12345],
                     'progress' => [],
                     'userid' => '2',
                     'models' => [
