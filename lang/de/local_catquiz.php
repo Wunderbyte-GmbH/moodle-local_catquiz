@@ -489,14 +489,14 @@ $string['attemptfeedbacknotyetavailable'] = "Feedback wird angezeigt, sobald es 
 $string['allquestionsincorrect'] = "Genauer Fähigkeits-Score kann nicht ermittelt werden, da alle Fragen falsch beantwortet wurden.";
 $string['allquestionscorrect'] = "Genauer Fähigkeits-Score kann nicht ermittelt werden, da alle Fragen richtig beantwortet wurden.";
 $string['minquestionsnotreached'] = 'Es konnte kein Testergebnis ermittelt werden, da die Mindestanzahl an zu beantortenden Fragen nicht erreicht wurde.';
-$string['feedbackcomparetoaverage'] = 'Der Test misst Ihr Wissen und Können in {$a->quotedscale} in Form eines Fähigkeitswertes zwischen
+$string['feedbackcomparetoaverage'] = '<p>Der Test misst Ihr Wissen und Können in {$a->quotedscale} in Form eines Fähigkeitswertes zwischen
 {$a->scale_min} und {$a->scale_max}. Je höher Ihr Fähigkeitswert ausfällt, desto besser ist Ihr Wissen und Ihr
-Können in der Skala.
-Ihr erreichter Fähigkeitswert ist {$a->ability_global} (mit einem Standardfehler von ± {$a->se_global}). Der aktuelle
-durchschnittliche Fähigkeitswert aller Teilnehmenden an dem Test beträgt {$a->average_ability}. Mit
-Ihrem Ergebnis sind Sie momentan besser als {$a->quantile}% aller anderen Test-Teilnehmenden.
-Die folgende Graﬁk stellt Ihren Fähigkeitswert (obere Markierung) und den aktuellen
-Durchschnitt (untere Markierung) dar:';
+Können in der Skala.</p>
+<p>Ihr erreichter Fähigkeitswert ist {$a->ability_global} (mit einem Standardfehler von ± {$a->se_global}). Der aktuelle
+durchschnittliche Fähigkeitswert aller Teilnehmenden an dem Test beträgt {$a->average_ability}. {$a->betterthan}</p>
+<p>Die folgende Graﬁk stellt Ihren Fähigkeitswert (obere Markierung) und den aktuellen
+Durchschnitt (untere Markierung) dar:</p>';
+$string['feedbackcomparison_betterthan'] = 'Mit Ihrem Ergebnis sind Sie momentan besser als {$a->quantile}% aller anderen Test-Teilnehmenden.';
 $string['questionssummary'] = "Zusammenfassung";
 $string['currentability'] = 'Ihr Fähigkeitswert';
 $string['currentabilityfellowstudents'] = 'Durchschnitt';
