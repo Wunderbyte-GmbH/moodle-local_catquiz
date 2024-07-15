@@ -415,13 +415,12 @@ class catcontext {
         $responsedata = self::getresponsedatafromdb($this->id, $catscaleids);
         $responses = (new model_responses())->setdata($responsedata);
         $options = json_decode($this->json, true) ?? [];
-        $savedabilities = model_person_param_list::load_from_db($this->id, $catscaleids);
         $installedmodels = model_strategy::get_installed_models();
         $olditemparams = [];
         foreach (array_keys($installedmodels) as $model) {
             $olditemparams[$model] = model_item_param_list::load_from_db($this->id, $model, $catscaleids);
         }
-        return new model_strategy($responses, $options, $savedabilities, $olditemparams);
+        return new model_strategy($responses, $options, $olditemparams);
     }
 
     /**
