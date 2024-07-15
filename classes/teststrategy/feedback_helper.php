@@ -354,6 +354,11 @@ class feedback_helper {
         // If the value is outside the defined range, return null.
         $lowest = sprintf('feedback_scaleid_limit_lower_%d_1', $scaleid);
         $highest = sprintf('feedback_scaleid_limit_upper_%d_%d', $scaleid, $quizsettings->numberoffeedbackoptionsselect);
+        if (!isset($quizsettings->$lowest)
+            || !isset($quizsettings->$highest)
+        ) {
+            return null;
+        }
         if ($value < $quizsettings->$lowest || $value > $quizsettings->$highest) {
             return null;
         }
