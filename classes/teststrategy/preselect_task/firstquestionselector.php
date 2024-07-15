@@ -340,7 +340,7 @@ class firstquestionselector extends preselect_task implements wb_middleware {
         $itemparamlists = [];
         $personparams = model_person_param_list::load_from_db($catscalecontext, $catscaleids);
         foreach (array_keys($modelstrategy->get_installed_models()) as $model) {
-            $itemparamlists[$model] = model_item_param_list::load_from_db(
+            $itemparamlists[$model] = model_item_param_list::get(
                 $catscalecontext,
                 $model,
                 $catscaleids

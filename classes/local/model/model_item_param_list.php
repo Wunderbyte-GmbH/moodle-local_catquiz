@@ -26,6 +26,7 @@ namespace local_catquiz\local\model;
 use ArrayAccess;
 use ArrayIterator;
 use cache;
+use cache_helper;
 use coding_exception;
 use Countable;
 use ddl_exception;
@@ -77,6 +78,13 @@ class model_item_param_list implements ArrayAccess, IteratorAggregate, Countable
         return count($this->itemparams);
     }
 
+    /**
+     * @param int $contextid
+     * @param string $modelname
+     * @param array $catscaleids
+     * @return model_item_param_list
+     * @throws coding_exception
+     */
     public static function get(int $contextid, string $modelname, array $catscaleids = []): self {
         // Try to get the item params from the cache.
         $cache = cache::make('local_catquiz', 'catquiz_item_params');
@@ -341,6 +349,7 @@ class model_item_param_list implements ArrayAccess, IteratorAggregate, Countable
         foreach ($updatedrecords as $r) {
             $DB->update_record('local_catquiz_itemparams', $r, true);
         }
+        cache_helper::purge_by_event('changesinitemparams');
     }
 
     /**
@@ -454,6 +463,7 @@ class model_item_param_list implements ArrayAccess, IteratorAggregate, Countable
                 $id = $newrecord['id'];
             }
         }
+        cache_helper::purge_by_event('changesinitemparams');
         if (!empty($newrecord['warning'])) {
             return [
                 'success' => 2, // Update successfull with warning.
