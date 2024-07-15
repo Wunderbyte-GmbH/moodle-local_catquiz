@@ -488,6 +488,7 @@ $string['attemptfeedbacknotavailable'] = "Kein Feedback verfügbar";
 $string['attemptfeedbacknotyetavailable'] = "Feedback wird angezeigt, sobald es verfügbar ist.";
 $string['allquestionsincorrect'] = "Genauer Fähigkeits-Score kann nicht ermittelt werden, da alle Fragen falsch beantwortet wurden.";
 $string['allquestionscorrect'] = "Genauer Fähigkeits-Score kann nicht ermittelt werden, da alle Fragen richtig beantwortet wurden.";
+$string['minquestionsnotreached'] = 'Es konnte kein Testergebnis ermittelt werden, da die Mindestanzahl an zu beantortenden Fragen nicht erreicht wurde.';
 $string['feedbackcomparetoaverage'] = 'Der Test misst Ihr Wissen und Können in {$a->quotedscale} in Form eines Fähigkeitswertes zwischen
 {$a->scale_min} und {$a->scale_max}. Je höher Ihr Fähigkeitswert ausfällt, desto besser ist Ihr Wissen und Ihr
 Können in der Skala.

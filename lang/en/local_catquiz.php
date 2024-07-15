@@ -484,6 +484,7 @@ $string['attemptfeedbacknotavailable'] = "No feedback available";
 $string['attemptfeedbacknotyetavailable'] = "Feedback for attempts will be displayed when available.";
 $string['allquestionsincorrect'] = "Not available - all questions were answered incorrectly";
 $string['allquestionscorrect'] = "Not available- all questions were answered correctly";
+$string['minquestionsnotreached'] = 'Test result can not be calculated because minimum number of questions was not reached';
 $string['questionssummary'] = "Summary";
 $string['currentability'] = 'Your ability score';
 $string['currentabilityfellowstudents'] = 'Average';
