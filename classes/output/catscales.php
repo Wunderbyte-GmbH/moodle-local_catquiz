@@ -19,7 +19,6 @@ namespace local_catquiz\output;
 use html_writer;
 use local_catquiz\catquiz;
 use local_catquiz\data\dataapi;
-use local_catquiz\local\model\model_person_param_list;
 use local_catquiz\output\catscaledashboard;
 use local_catquiz\subscription;
 use templatable;

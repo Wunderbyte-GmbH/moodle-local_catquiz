@@ -31,6 +31,7 @@ use local_catquiz\event\calculation_executed;
 use local_catquiz\task\adhoc_recalculate_cat_model_params;
 use local_catquiz\task\recalculate_cat_model_params;
 use local_catquiz\local\model\model_item_param_list;
+use local_catquiz\local\model\model_person_param_list;
 use moodle_exception;
 use moodle_url;
 
@@ -104,7 +105,11 @@ class catmodel_info {
             return;
         }
         $strategy = $context->get_strategy($catscaleid);
-        list($itemdifficulties, $personabilities) = $strategy->run_estimation($catscaleid);
+        $catscaleids = [$catscaleid, ...catscale::get_subscale_ids($catscaleid)];
+        $initialabilities = model_person_param_list::load_from_db($contextid, $catscaleids);
+        $userswithresponse = $strategy->get_responses()->get_user_ids();
+        $initialabilities->add_missing_users($userswithresponse, $catscaleid);
+        list($itemdifficulties, $personabilities) = $strategy->run_estimation($catscaleid, $initialabilities);
         $updatedmodels = [];
         foreach ($itemdifficulties as $modelname => $itemparamlist) {
             $itemcounter = 0;
