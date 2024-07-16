@@ -77,8 +77,7 @@ class personabilities extends feedbackgenerator {
 
         $abilitieschart = $this->render_chart(
             $feedbackdata['personabilities_abilities'],
-            (array) $this->get_progress()->get_quiz_settings(),
-            $feedbackdata['primaryscale'],
+            (array) $this->get_progress()->get_quiz_settings()
         );
 
         $scaleinfo = false;
@@ -417,12 +416,10 @@ class personabilities extends feedbackgenerator {
      *
      * @param array $personabilities
      * @param array $quizsettings
-     * @param ?array $primarycatscale
      *
      * @return array
-     *
      */
-    private function render_chart(array $personabilities, array $quizsettings, ?catscale_structure $primarycatscale): array {
+    private function render_chart(array $personabilities, array $quizsettings): array {
         global $OUTPUT;
 
         if (count($personabilities) < 2) {
