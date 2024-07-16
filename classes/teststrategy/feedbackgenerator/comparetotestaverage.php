@@ -382,7 +382,10 @@ class comparetotestaverage extends feedbackgenerator {
 
         $fisherinfos = $this->feedbackhelper->get_fisherinfos_of_items($items, $models, $abilitysteps);
         // Prepare data for scorecounter bars.
-        $abilityrecords = $DB->get_records('local_catquiz_personparams', ['catscaleid' => $primarycatscale['id']]);
+        $abilityrecords = catquiz::get_person_abilities(
+            $this->get_context_id(),
+            [$primarycatscale['id']]
+        );
         $abilityseries = [];
         foreach ($abilitysteps as $as) {
             $counter = 0;

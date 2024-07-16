@@ -24,6 +24,9 @@
 
 namespace local_catquiz;
 
+use cache;
+use cache_application;
+use cache_helper;
 use core\check\result;
 use dml_exception;
 use local_catquiz\data\dataapi;
@@ -1206,11 +1209,13 @@ class catquiz {
                 'local_catquiz_personparams',
                 $record
             );
+            cache_helper::purge_by_event('changesinpersonparams');
             return;
         }
 
         $record->id = $existingrecord->id;
         $DB->update_record('local_catquiz_personparams', $record);
+        cache_helper::purge_by_event('changesinpersonparams');
     }
 
     /**
@@ -1244,6 +1249,13 @@ class catquiz {
      */
     public static function get_person_abilities(int $contextid, array $catscaleids, array $userids = []) {
         global $DB;
+        $selectedscaleshash = hash('crc32', implode('_', $catscaleids));
+        $selectedusershash = hash('crc32', implode('_', $userids));
+        $cachekey = sprintf('personparams_%d_%s_%s', $contextid, $selectedscaleshash, $selectedusershash);
+        $cache = cache::make('local_catquiz', 'catquiz_person_params');
+        if ($abilities = $cache->get($cachekey)) {
+            return $abilities;
+        }
         $where = "contextid = :contextid";
         $params = ['contextid' => $contextid];
 
@@ -1272,10 +1284,12 @@ class catquiz {
             $params = array_merge($params, $inuseridsparams);
         }
 
-        return $DB->get_records_sql(
+        $result = $DB->get_records_sql(
             $sql,
             $params
           );
+        $cache->set($cachekey, $result);
+        return $result;
     }
 
     /**
@@ -1303,29 +1317,47 @@ class catquiz {
     }
 
     /**
+     * Returns the instance ID for a given attempt ID.
+     *
+     * @param int $attemptid
+     * @param ?cache_application $cache
+     * @return int
+     */
+    public static function get_attempt_instance(int $attemptid, ?cache_application $cache = null): int {
+        global $DB;
+
+        if (!$cache) {
+            $cache = cache::make('local_catquiz', 'testenvironment');
+        }
+
+        $cachekey = sprintf('attempt_instance_%d', $attemptid);
+        if ($instanceid = $cache->get($cachekey)) {
+            return $instanceid;
+        }
+        $sql = <<<SQL
+            SELECT instance
+            FROM {adaptivequiz_attempt} aa
+            WHERE id = :attemptid
+        SQL;
+        $params = ['attemptid' => $attemptid];
+
+        $record = $DB->get_record_sql($sql, $params);
+        $instanceid = $record->instance;
+        $cache->set($cachekey, $instanceid);
+        return $instanceid;
+    }
+
+    /**
      * Get testenvironment by attemptid.
      *
      * @param int $attemptid
      *
      * @return object
-     *
      */
     public static function get_testenvironment_by_attemptid(int $attemptid) {
-        global $DB;
-
-        return $DB->get_record_sql(
-            "SELECT lct.*
-             FROM {adaptivequiz_attempt} aa
-             JOIN {local_catquiz_tests} lct
-                ON aa.instance = lct.componentid
-                AND component = :component
-             WHERE aa.id = :id
-            ",
-            [
-                'component' => 'mod_adaptivequiz',
-                'id' => $attemptid,
-            ]
-            );
+        $cache = cache::make('local_catquiz', 'testenvironment');
+        $instanceid = self::get_attempt_instance($attemptid, $cache);
+        return self::get_test_by_component_id($instanceid, $cache);
     }
 
     /**
@@ -2156,13 +2188,24 @@ class catquiz {
     /**
      * Returns all CAT tests for the given scale in the given course
      *
-     * @param int $courseid
      * @param int $scaleid
+     * @param ?int $courseid
      * @return mixed
      */
-    public static function get_tests_for_scale(int $courseid, int $scaleid) {
+    public static function get_tests_for_scale(int $scaleid, ?int $courseid) {
         global $DB;
-        return $DB->get_records('local_catquiz_tests', ['courseid' => $courseid, 'catscaleid' => $scaleid]);
+        $cache = cache::make('local_catquiz', 'testenvironment');
+        $cachekey = sprintf('testenv_course_%d_scale_%d', $courseid, $scaleid);
+        if ($tests = $cache->get($cachekey)) {
+            return $tests;
+        }
+        $params = ['catscaleid' => $scaleid];
+        if ($courseid) {
+            $params['courseid'] = $courseid;
+        }
+        $tests = $DB->get_records('local_catquiz_tests', $params);
+        $cache->set($cachekey, $tests);
+        return $tests;
     }
 
     /**
@@ -2171,9 +2214,18 @@ class catquiz {
      * @param int $testid
      * @return mixed
      */
-    public static function get_test_by_component_id(int $testid) {
+    public static function get_test_by_component_id(int $testid, ?cache_application $cache = null) {
         global $DB;
-        return $DB->get_record('local_catquiz_tests', ['componentid' => $testid], '*', MUST_EXIST);
+        if (!$cache) {
+            $cache = cache::make('local_catquiz', 'testenvironment');
+        }
+        $cachekey = sprintf('testenvironment_by_instance', $testid);
+        if ($testenvironment = $cache->get($cachekey)) {
+            return $testenvironment;
+        }
+        $result = $DB->get_record('local_catquiz_tests', ['componentid' => $testid], '*', MUST_EXIST);
+        $cache->set($cachekey, $result);
+        return $result;
     }
 
     /**

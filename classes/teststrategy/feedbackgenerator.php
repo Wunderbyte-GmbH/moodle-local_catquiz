@@ -119,6 +119,15 @@ abstract class feedbackgenerator {
     }
 
     /**
+     * Returns the current context id
+     *
+     * @return int
+     */
+    protected function get_context_id(): int {
+        return $this->contextid;
+    }
+
+    /**
      * Returns an array with two keys 'heading' and 'context'.
      *
      * @param array $data

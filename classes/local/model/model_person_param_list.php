@@ -280,6 +280,7 @@ class model_person_param_list implements ArrayAccess, IteratorAggregate, Countab
         foreach ($updatedrecords as $r) {
             $DB->update_record('local_catquiz_personparams', $r, true);
         }
+        cache_helper::purge_by_event('changesinpersonparams');
     }
 
     /**

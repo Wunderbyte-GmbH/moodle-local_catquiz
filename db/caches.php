@@ -121,4 +121,22 @@ $definitions = [
             'changesinitemparams',
             ],
     ],
+    'catquiz_person_params' => [
+        'mode' => cache_store::MODE_APPLICATION,
+        'simplekeys' => true,
+        'staticacceleration' => true,
+        'staticaccelerationsize' => 1,
+        'invalidationevents' => [
+            'changesinpersonparams',
+            ],
+    ],
+    'testenvironment' => [
+        'mode' => cache_store::MODE_APPLICATION,
+        'simplekeys' => true,
+        'staticacceleration' => true,
+        'staticaccelerationsize' => 1,
+        'invalidationevents' => [
+            'changesintestenvironment',
+            ],
+    ],
 ];

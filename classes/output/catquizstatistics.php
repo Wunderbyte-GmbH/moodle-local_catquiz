@@ -186,14 +186,10 @@ class catquizstatistics {
         $this->contextid = catscale::get_context_id($this->scaleid);
 
         if ($testid) {
-            $tests = $DB->get_records('local_catquiz_tests', ['componentid' => $testid]);
+            $tests = [catquiz::get_test_by_component_id($testid)];
         } else {
             // If a subscale is given as scaleid, we still need the root scale to get the associated tests.
-            $params = ['catscaleid' => $this->rootscaleid];
-            if ($courseid) {
-                $params['courseid'] = $courseid;
-            }
-            $tests = $DB->get_records('local_catquiz_tests', $params);
+            $tests = catquiz::get_tests_for_scale($this->rootscaleid, $params['courseid'] ?? null);
         }
         if (count($tests) === 0) {
             throw new \Exception('catquizstatistics shortcode: no tests can be found for the given arguments');
