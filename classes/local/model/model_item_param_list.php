@@ -79,6 +79,8 @@ class model_item_param_list implements ArrayAccess, IteratorAggregate, Countable
     }
 
     /**
+     * Returns an item parameter list for the given arguments.
+     *
      * @param int $contextid
      * @param string $modelname
      * @param array $catscaleids
