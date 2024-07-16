@@ -282,6 +282,12 @@ class model_person_param_list implements ArrayAccess, IteratorAggregate, Countab
         }
     }
 
+    /**
+     * Filters the person parameters according to the passed filter function
+     *
+     * @param callable $fun
+     * @return self
+     */
     public function filter(callable $fun) {
         $filtered = new self();
         foreach ($this->personparams as $pp) {

@@ -62,6 +62,9 @@ class model_responses {
      */
     private array $excludedusers = [];
 
+    /**
+     * @var ?model_person_param_list A list of person parameters
+     */
     private ?model_person_param_list $personparams = null;
 
     /**
@@ -338,10 +341,16 @@ class model_responses {
         $this->excludedusers[] = $userid;
     }
 
+    /**
+     * Returns the person parameters for the stored responses
+     *
+     * @param int $contextid
+     * @param array $catscaleids
+     * @return model_person_param_list
+     */
     private function get_personparams(int $contextid, array $catscaleids): model_person_param_list {
-        global $USER;
         if (!$this->personparams) {
-            $this->personparams = model_person_param_list::load_from_db($contextid, [], [$USER->id]);
+            $this->personparams = model_person_param_list::load_from_db($contextid, [], $this->get_user_ids());
         }
         $filterfun = function (model_person_param $pp) use ($catscaleids) {
             return in_array($pp->get_catscaleid(), $catscaleids);

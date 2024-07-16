@@ -26,6 +26,7 @@
 namespace local_catquiz;
 
 use advanced_testcase;
+use local_catquiz\data\catscale_structure;
 use local_catquiz\teststrategy\feedback_helper;
 use local_catquiz\teststrategy\feedbackgenerator\personabilities;
 use local_catquiz\teststrategy\feedbacksettings;
@@ -78,7 +79,7 @@ class personabilities_test extends advanced_testcase {
             ->method('get_quiz_settings')
             ->willReturn((object) $feedbackdata['quizsettings']);
 
-        $primaryscaleid = $feedbackdata['primaryscale']['id'];
+        $primaryscaleid = $feedbackdata['primaryscale']->id;
         $primaryscalevalue = $feedbackdata['personabilities_abilities'][$primaryscaleid]['value'];
         $progressmock
             ->method('get_abilities')
@@ -162,11 +163,11 @@ class personabilities_test extends advanced_testcase {
                             'name' => "Skala1",
                         ],
                     ],
-                    'primaryscale' => [
+                    'primaryscale' => new catscale_structure([
                         'id' => '271',
                         'name' => 'Simulation',
                         'parentid' => '0',
-                    ],
+                    ]),
                     'quizsettings' => self::return_quizsettings(),
                     'abilitieslist' => [
                         [
