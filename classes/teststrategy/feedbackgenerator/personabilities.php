@@ -28,6 +28,7 @@ namespace local_catquiz\teststrategy\feedbackgenerator;
 use core\chart_bar;
 use core\chart_series;
 use local_catquiz\catscale;
+use local_catquiz\data\catscale_structure;
 use local_catquiz\teststrategy\feedbackgenerator;
 use local_catquiz\local\model\model_strategy;
 use local_catquiz\teststrategy\feedback_helper;
@@ -82,7 +83,7 @@ class personabilities extends feedbackgenerator {
 
         $scaleinfo = false;
         $primaryscaleid = isset($feedbackdata['primaryscale'])
-            ? $feedbackdata['primaryscale']['id']
+            ? $feedbackdata['primaryscale']->id
             : false;
         if ($primaryscaleid && array_key_exists($primaryscaleid, $feedbackdata['personabilities_abilities'])) {
             $primaryscale = $feedbackdata['personabilities_abilities'][$primaryscaleid];
@@ -421,7 +422,7 @@ class personabilities extends feedbackgenerator {
      * @return array
      *
      */
-    private function render_chart(array $personabilities, array $quizsettings, ?array $primarycatscale): array {
+    private function render_chart(array $personabilities, array $quizsettings, ?catscale_structure $primarycatscale): array {
         global $OUTPUT;
 
         if (count($personabilities) < 2) {
