@@ -370,17 +370,7 @@ class attemptfeedback implements renderable, templatable {
         $newdata['catscaleid'] = intval($this->get_quiz_settings()->catquiz_catscales);
         $catscales = catquiz::get_catscales([$newdata['catscaleid'], ...$progress->get_selected_subscales()]);
         // Remove unneeded data from the catscales array.
-        $newdata['catscales'] = array_map(
-            function ($cs) {
-                unset($cs->timecreated);
-                unset($cs->timemodified);
-                unset($cs->parentid);
-                unset($cs->contextid);
-                return $cs;
-            },
-            $catscales
-        );
-
+        $newdata['catscales'] = $catscales;
         return $newdata;
     }
 
