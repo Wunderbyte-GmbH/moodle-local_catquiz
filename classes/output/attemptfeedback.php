@@ -210,13 +210,15 @@ class attemptfeedback implements renderable, templatable {
         $cache = cache::make('local_catquiz', 'adaptivequizattempt');
         $cachekey = $this->get_feedback_cache_key();
         if ($feedbackdata = $cache->get($cachekey)) {
-            // Release the cache for the last number of questions played.
-            $previouskey = sprintf(
-                'feedbackdata_%d_%d',
-                $this->attemptid,
-                $this->get_progress()->get_num_playedquestions() - 1
-            );
-            $cache->delete($previouskey);
+            if ($numplayed = $this->get_progress()->get_num_playedquestions() >= 1) {
+                // Release the cache for the last number of questions played.
+                $previouskey = sprintf(
+                    'feedbackdata_%d_%d',
+                    $this->attemptid,
+                    $numplayed - 1
+                );
+                $cache->delete($previouskey);
+            }
 
             return $feedbackdata;
         }
