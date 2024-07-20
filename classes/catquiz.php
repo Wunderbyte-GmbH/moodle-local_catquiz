@@ -611,6 +611,9 @@ class catquiz {
         array $contextids = [],
         array $studentids = []
     ): array {
+        
+        // TODO: That way of determine the catcontext by the timestamp of an attempt_step is unreliable and will deliver also ANY attempt made outside catquiz as well (eg. the "standard"-adaptivequiz oder moodle quiz). It should be fixed ASAP by a proper way via the catquiz_attempt table
+        
         $select = '*';
         $from = '{local_catquiz_catcontext} ccc1
                 JOIN {question_attempt_steps} qas
