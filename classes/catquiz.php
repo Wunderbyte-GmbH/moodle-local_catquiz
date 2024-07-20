@@ -244,31 +244,7 @@ class catquiz {
             ON q.id = s3.questionid
 
             ) as s1
-            LEFT JOIN (
-                SELECT
-                    maxlcip.componentid,
-                    maxlcip.componentname,
-                    maxlcip.model,
-                    maxlcip.difficulty,
-                    maxlcip.discrimination,
-                    maxlcip.guessing,
-                    s4.timecreated,
-                    maxlcip.timemodified,
-                    s4.status
-                FROM (
-                    SELECT lcip.*,
-                        ROW_NUMBER() OVER (PARTITION BY componentid,
-                        componentname ORDER BY lcip.status DESC,
-                        lcip.timecreated DESC) AS n
-                    FROM {local_catquiz_itemparams} lcip
-                    WHERE lcip.contextid = :contextid3
-                ) AS s4
-                JOIN {local_catquiz_itemparams} maxlcip
-                ON s4.id = maxlcip.id
-                WHERE n = 1
-            ) AS s5
-            ON s5.componentid = s1.id
-            AND s5.componentname = s1.component
+            LEFT JOIN mdl_local_catquiz_itemparams s5 ON s5.contextid = :contextid3 AND s5.componentid = s1.id AND s5.componentname = s1.component
             $insql
         ) AS s6";
 
