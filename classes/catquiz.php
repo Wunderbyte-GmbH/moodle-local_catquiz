@@ -751,7 +751,7 @@ class catquiz {
                 JOIN {local_catquiz_catscales} lcc ON lca.scaleid = lcc.id
                 JOIN {local_catquiz_catcontext} lccc ON lca.contextid = lccc.id
                 JOIN {course} c ON lca.courseid = c.id
-                JOIN {local_catquiz_tests} lct ON lca.instanceid = lct.componentid -- TODO: not sure about this
+                JOIN {local_catquiz_tests} lct ON lca.instanceid = lct.componentid
             ) as s1
         ";
 
@@ -841,6 +841,8 @@ class catquiz {
         array $wherearray = [],
         array $filterarray = []) {
 
+        // TODO: That way of determine the catcontext by the timestamp of an attempt_step is unreliable and will deliver also ANY attempt made outside catquiz as well (eg. the "standard"-adaptivequiz oder moodle quiz). It should be fixed ASAP by a proper way via the catquiz_attempt table
+        
         $params = [];
         $where = [];
         $filter = '';
