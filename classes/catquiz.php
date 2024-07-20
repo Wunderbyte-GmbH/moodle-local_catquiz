@@ -1314,7 +1314,7 @@ class catquiz {
             "SELECT lcip.*
              FROM {local_catquiz_items} lci
              JOIN {local_catquiz_itemparams} lcip
-                ON lci.componentname = lcip.componentname
+                ON lcip.itemid = lci.id
                     AND lci.componentid = lcip.componentid
                     AND lcip.contextid = :contextid
                     AND lcip.model = :model
