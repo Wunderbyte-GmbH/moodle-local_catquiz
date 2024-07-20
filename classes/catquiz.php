@@ -157,7 +157,6 @@ class catquiz {
             'contextid' => $contextid,
         ];
 
-        $restrictforuser = "";
         // If we fetch only for a given user, we need to add this to the sql.
         $restrictforuser = "";
         if (!empty($userid)) {
@@ -167,6 +166,9 @@ class catquiz {
 
         $insql = '';
         if (!empty($catscaleids) && $catscaleids[0] > 0) {
+            
+            // TODO: Require Globalscales of given catscales!
+            
             [$insql, $inparams] = $DB->get_in_or_equal($catscaleids, SQL_PARAMS_NAMED, 'incatscales');
             $params = array_merge($params, $inparams);
             $insql = " WHERE catscaleid $insql ";
