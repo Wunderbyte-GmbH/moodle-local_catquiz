@@ -244,7 +244,7 @@ class catquiz {
             ON q.id = s3.questionid
 
             ) as s1
-            LEFT JOIN mdl_local_catquiz_itemparams s5 ON s5.contextid = :contextid3 AND s5.componentid = s1.id AND s5.componentname = s1.component
+            LEFT JOIN {local_catquiz_itemparams} s5 ON s5.contextid = :contextid3 AND s5.componentid = s1.id AND s5.componentname = s1.component
             $insql
         ) AS s6";
 
