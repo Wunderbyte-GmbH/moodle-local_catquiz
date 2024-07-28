@@ -24,11 +24,9 @@
 
 namespace local_catquiz\teststrategy\feedbackgenerator;
 
-use cache;
 use context_system;
 use local_catquiz\catquiz;
 use local_catquiz\teststrategy\feedbackgenerator;
-use local_catquiz\teststrategy\feedbacksettings;
 use local_catquiz\teststrategy\info;
 
 /**
@@ -41,20 +39,36 @@ use local_catquiz\teststrategy\info;
 class debuginfo extends feedbackgenerator {
 
     /**
+     * Default string for missing data
      *
-     * @var stdClass $feedbacksettings.
+     * @var string NA
      */
-    public feedbacksettings $feedbacksettings;
+    const NA = 'NA';
 
     /**
-     * Creates a new customscale feedback generator.
+     * Temporarily holds the data of the next row
      *
-     * @param feedbacksettings $feedbacksettings
+     * When full, will be added as a CSV styled row.
+     *
+     * @var array
      */
-    public function __construct(feedbacksettings $feedbacksettings) {
+    private array $row = [];
 
-        $this->feedbacksettings = $feedbacksettings;
-    }
+    /**
+     * Holds the column values
+     *
+     * @var array
+     */
+    private array $columns = [];
+
+    /**
+     * The data for the next row
+     *
+     * This contains the pool of data that can be used to build the next row.
+     *
+     * @var array
+     */
+    private array $rowdata = [];
 
     /**
      * Get student feedback.
@@ -82,91 +96,41 @@ class debuginfo extends feedbackgenerator {
     protected function get_teacherfeedback(array $data): array {
         global $OUTPUT;
 
-        $columnames = [
-            'userid',
-            'attemptid',
-            'questionsattempted',
-            'timestamp',
-            'contextid',
-            'catscale',
-            'teststrategy',
-            'personabilities',
-            'lastquestion',
-            'questions',
-            'active_scales',
-            'selectedscale',
-            'lastmiddleware',
-            'updateabilityfallback',
-            'excluded subscales',
-            'lastresponse',
-            'standard error',
-            'num questions per scale',
-        ];
-        $csvstring = implode(';', $columnames).PHP_EOL;
+        if (!get_config('local_catquiz', 'store_debug_info')) {
+            return [];
+        }
+        $csvstring = "";
 
         foreach ($data['debuginfo'] as $row) {
-            $rowarr = [];
-            $rowarr[] = $row['userid'];
-            $rowarr[] = $row['attemptid'];
-            $rowarr[] = $row['questionsattempted'];
-            $rowarr[] = $row['timestamp'];
-            $rowarr[] = $row['contextid'];
-            $rowarr[] = $row['catscale'];
-            $rowarr[] = $row['teststrategy'];
-            $rowarr[] = $row['personabilities'];
-
-            $lastquestion = $row['lastquestion'];
-            if (! $lastquestion) {
-                $rowarr[] = 'NA';
-            } else {
-                $score = $lastquestion['score'] ?? 'NA';
-                $fisherinformation = $lastquestion['fisherinformation'] ?? 'NA';
-                $lasttimeplayedpenalty = $lastquestion['lasttimeplayedpenalty'] ?? 'NA';
-                $difficulty = $lastquestion['difficulty'] ?? 'NA';
-                $fraction = $lastquestion['fraction'] ?? 'NA';
-                $rowarr[] =
-                "id: " . $lastquestion['id']
-                .", score: " . $score
-                .", fisherinformation in root scale: " . $fisherinformation
-                .", lasttimeplayedpenalty: " . $lasttimeplayedpenalty
-                .", difficulty: " . $difficulty
-                .", fraction: " . $fraction;
-            }
-
-            $questions = $row['questions'] ?? [];
-            if (! $questions) {
-                $rowarr[] = 'NA';
-            } else {
-                $questionsstr = "";
-                foreach ($questions as $question) {
-                    $questionsstr .= sprintf(
-                       "id: %s, type: %s, fisherinformation: %s, score: %s%s",
-                       $question['id'],
-                       $question['type'],
-                       $question['fisherinformation'],
-                       $question['score'],
-                       isset($question['last']) ? "" : ","
-                    );
-                }
-                $rowarr[] = $questionsstr;
-            }
-
-            $rowarr[] = $row['active_scales'];
-            $rowarr[] = $row['selectedscale'];
-            $rowarr[] = $row['lastmiddleware'];
-            $rowarr[] = $row['updateabilityfallback'];
-            $rowarr[] = $row['excludedsubscales'];
-            $rowarr[] = $row['lastresponse'];
-            $rowarr[] = 'NA';
-
-            $rowarr[] = $row['numquestionsperscale'] ?? 'NA';
-            $csvstring .= implode(';', $rowarr).PHP_EOL;
+            $newrow = $this->convert($row);
+            $csvstring .= $this
+                ->set_row_data($newrow)
+                ->add_column_value('questionsattempted')
+                ->add_column_value('timestamp')
+                ->add_column_value('personabilities')
+                ->add_column_value('activescales')
+                ->add_column_value('lastmiddleware')
+                ->add_column_value('lastresponse')
+                ->add_column_value('state')
+                ->add_column_value('rightanswer')
+                ->add_column_value('responsesummary')
+                ->add_column_value('originalfraction')
+                ->add_column_value('fraction')
+                ->add_column_value('questionattemptid')
+                ->as_csv_string();
         }
+        $heading = implode(';', $this->columns).PHP_EOL;
+        $csvstring = $heading . $csvstring;
+
+        $descriptionheading = get_string('debuginfo_desc_title', 'local_catquiz', $this->get_progress()->get_attemptid());
+        $description = get_string('debuginfo_desc', 'local_catquiz');
         $feedback = $OUTPUT->render_from_template(
             'local_catquiz/feedback/debuginfo',
             [
                 'data' => rawurlencode($csvstring),
                 'attemptid' => $data['debuginfo'][0]['attemptid'] ?? 'nan',
+                'description_heading' => $descriptionheading,
+                'description' => $description,
             ]
         );
 
@@ -178,6 +142,57 @@ class debuginfo extends feedbackgenerator {
                 'content' => $feedback,
             ];
         }
+    }
+
+    /**
+     * Converts from a possible old format to a new one.
+     *
+     * @param array $row The current row
+     * @return array
+     */
+    private function convert(array $row): array {
+        $updated = $row;
+        if (is_array($row['lastresponse']) && array_key_exists('fraction', $row['lastresponse'])) {
+            $updated['lastresponse'] = $row['lastresponse']['fraction'];
+        }
+        return $updated;
+    }
+
+    /**
+     * Sets the data for the current row
+     *
+     * Used by add_column_value()
+     *
+     * @param array $row
+     * @return self
+     */
+    private function set_row_data(array $row): self {
+        $this->rowdata = $row;
+        $this->row = [];
+        return $this;
+    }
+
+    /**
+     * Adds a value to the current row
+     *
+     * @param string $key
+     * @return $this
+     */
+    private function add_column_value(string $key): self {
+        if (!in_array($key, $this->columns)) {
+            $this->columns[] = $key;
+        }
+        $this->row[] = $this->rowdata[$key] ?? self::NA;
+        return $this;
+    }
+
+    /**
+     * Implodes the current row by semicolon
+     *
+     * @return string
+     */
+    private function as_csv_string(): string {
+        return implode(';', $this->row).PHP_EOL;
     }
 
     /**
@@ -233,93 +248,58 @@ class debuginfo extends feedbackgenerator {
      *
      */
     public function load_data(int $attemptid, array $existingdata, array $newdata): ?array {
-        $cache = cache::make('local_catquiz', 'adaptivequizattempt');
-        if (! $cachedcontexts = $cache->get('context')) {
+        if (!get_config('local_catquiz', 'store_debug_info')) {
             return null;
         }
+        $teststrategy = $this->get_progress()->get_quiz_settings()->catquiz_selectteststrategy;
 
         $teststrategies = info::return_available_strategies();
         $teststrategy = array_filter(
             $teststrategies,
-            fn ($t) => $t->id == $cachedcontexts[array_key_first($cachedcontexts)]['teststrategy']);
+            fn ($t) => $t->id == $teststrategy);
         $reflect = new \ReflectionClass($teststrategy[array_key_first($teststrategy)]);
 
-        // Each cachedcontext corresponds to one question attempt.
-        $debuginfo = [];
-        $catscales = catquiz::get_catscales(array_keys($cachedcontexts[array_key_first($cachedcontexts)]['person_ability']));
+        $debuginfo = $existingdata['debuginfo'] ?? [];
+        $catscales = catquiz::get_catscales(array_keys($newdata['person_ability']));
         $teststrategy = get_string($reflect->getShortName(), 'local_catquiz');
 
-        foreach ($cachedcontexts as $data) {
-
-            $personabilities = [];
-            foreach ($data['person_ability'] as $catscaleid => $pp) {
-                if (empty($catscales[$catscaleid])) {
-                    continue;
-                }
-                $personabilities[] = $catscales[$catscaleid]->name . ": " . $pp;
+        $personabilities = [];
+        foreach ($newdata['person_ability'] as $catscaleid => $pp) {
+            if (empty($catscales[$catscaleid])) {
+                continue;
             }
+            $personabilities[] = $catscales[$catscaleid]->name . ": " . $pp;
+        }
             $personabilities = '"' . implode(", ", $personabilities) . '"';
 
             $questions = [];
             $questionsperscale = [];
-            if (array_key_exists('questions', $data)) {
-                foreach ($data['questions'] as $qid => $question) {
-                    $fisherinformation = $question->fisherinformation[$data['catscaleid']] ?? "NA";
-                    $score = $question->score ?? "NA";
-                    $questions[] = [
-                        'id' => $qid,
-                        'text' => $question->questiontext,
-                        'type' => $question->qtype,
-                        'fisherinformation' => $fisherinformation,
-                        'score' => $score,
-                    ];
-                    if (! array_key_exists($question->catscaleid, $questionsperscale)) {
-                        $questionsperscale[$question->catscaleid] = [
-                            'num' => 0,
-                            'name' => $catscales[$question->catscaleid]->name,
-                        ];
-                    }
-                    $questionsperscale[$question->catscaleid]['num'] = $questionsperscale[$question->catscaleid]['num'] + 1;
-                }
-            }
-            if ($questions) {
-                $questions[array_key_last($questions)]['last'] = true;
-            }
 
-            $selectedscale = isset($data['selected_catscale'])
-                ? $catscales[$data['selected_catscale']]->name
-                : "NA";
-
-            $lastresponse = isset($data['lastresponse'])
-                ? $data['lastresponse']['fraction']
-                : "NA";
-
-            if ($data['lastquestion']) {
-                $data['lastquestion']->fisherinformation = $data['lastquestion']->fisherinformation[$data['catscaleid']] ?? 'NA';
-            }
-
+            $activescales = array_map(
+                fn ($scaleid) => $catscales[$scaleid]->name,
+                $this->get_progress()->get_active_scales()
+            );
+            $lastresponse = $this->get_progress()->get_last_response();
             $debuginfo[] = [
-                'userid' => $data['userid'],
-                'attemptid' => $data['attemptid'],
-                'questionsattempted' => $data['questionsattempted'],
-                'timestamp' => $data['timestamp'],
-                'contextid' => $data['contextid'],
-                'catscale' => !empty($catscales[$data['catscaleid']]->name) ? $catscales[$data['catscaleid']]->name : "no catscale",
-                'teststrategy' => $teststrategy,
+                'pluginversion' => get_config('local_catquiz')->version ?? self::NA,
+                'questionsattempted' => count($this->get_progress()->get_playedquestions()),
+                'timestamp' => time(),
                 'personabilities' => $personabilities,
                 'questions' => $questions,
-                'active_scales' => '"' . implode(", ", array_map(fn ($catscale) => $catscale->name, $catscales)) . '"',
-                'lastquestion' => (array) $data['lastquestion'],
-                'selectedscale' => $selectedscale,
-                'lastmiddleware' => $data['lastmiddleware'],
-                'updateabilityfallback' => $data['updateabilityfallback'],
-                'excludedsubscales' => implode(',', $data['excludedsubscales']),
-                'lastresponse' => $lastresponse,
+                'activescales' => '"' . implode(", ", $activescales) . '"',
+                'lastquestion' => (array) $newdata['lastquestion'],
+                'lastmiddleware' => $newdata['lastmiddleware'],
+                'lastresponse' => isset($lastresponse) ? $lastresponse['fraction'] : self::NA,
                 'numquestionsperscale' => '"'
                     . implode(", ", array_map(fn ($entry) => $entry['name'].": ".$entry['num'], $questionsperscale)) . '"',
+                'state' => isset($lastresponse['state']) ? $lastresponse['state'] : self::NA,
+                'rightanswer' => isset($lastresponse['rightanswer']) ? trim($lastresponse['rightanswer']) : self::NA,
+                'responsesummary' => isset($lastresponse['responsesummary']) ? trim($lastresponse['responsesummary']) : self::NA,
+                'originalfraction' => isset($lastresponse['originalfraction']) ? $lastresponse['originalfraction'] : self::NA,
+                'fraction' => isset($lastresponse['fraction']) ? $lastresponse['fraction'] : self::NA,
+                'questionattemptid' => isset($lastresponse['questionattemptid']) ? $lastresponse['questionattemptid'] : self::NA,
             ];
-        }
-        return ['debuginfo' => $debuginfo];
+            return ['debuginfo' => $debuginfo];
     }
 
     /**

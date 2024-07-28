@@ -97,10 +97,10 @@ class testitemimporter {
      */
     private static function define_settings(
         array $definedcolumns,
-        string $callbackfunction = null,
-        string $delimiter = null,
-        string $encoding = null,
-        string $dateformat = null
+        ?string $callbackfunction = null,
+        ?string $delimiter = null,
+        ?string $encoding = null,
+        ?string $dateformat = null
         ) {
 
         $settings = new csvsettings($definedcolumns);
@@ -146,7 +146,7 @@ class testitemimporter {
                 'name' => 'contextid',
                 'mandatory' => false,
                 'format' => PARAM_INT,
-                // We could set the selected cat context (optional_param id) as default.
+                'importinstruction' => get_string('importcontextinfo', 'local_catquiz'),
             ],
             [
                 'name' => 'model',

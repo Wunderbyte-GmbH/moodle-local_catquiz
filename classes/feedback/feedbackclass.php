@@ -24,17 +24,7 @@
 
 namespace local_catquiz\feedback;
 
-use cache;
-use coding_exception;
-use dml_exception;
-use ddl_exception;
-use local_catquiz\catscale;
 use local_catquiz\data\dataapi;
-use local_catquiz\local\result;
-use local_catquiz\feedback\info;
-use local_catquiz\feedback\preselect_task;
-use local_catquiz\wb_middleware_runner;
-use moodle_exception;
 use MoodleQuickForm;
 use stdClass;
 
@@ -223,11 +213,6 @@ class feedbackclass {
                             $highestability);
                     }
                     $element->setValue($lowerlimit);
-                    $mform->disabledIf(
-                        'feedback_scaleid_limit_lower_'. $scale->id . '_' . $j,
-                        'catquiz_scalereportcheckbox_' . $scale->id,
-                        'notchecked'
-                    );
                 }
 
                 // If the Element is new, we set the default.
@@ -265,11 +250,6 @@ class feedbackclass {
 
                     }
                     $element->setValue($upperlimit);
-                    $mform->disabledIf(
-                        'feedback_scaleid_limit_upper_'. $scale->id . '_' . $j,
-                        'catquiz_scalereportcheckbox_' . $scale->id,
-                        'notchecked'
-                    );
                 }
 
                 // If the Element is new, we set the default.
@@ -289,11 +269,6 @@ class feedbackclass {
                         'subdirs' => true,
                     ]);
                 $mform->setType('feedbackeditor_scaleid_' . $scale->id . '_' . $j, PARAM_RAW);
-                $mform->hideIf(
-                    'feedbackeditor_scaleid_' . $scale->id . '_' . $j,
-                    'catquiz_scalereportcheckbox_' . $scale->id,
-                    'notchecked'
-                );
 
                 // Text field for feedback legend. Displayed only for parentscale.
                 $subelements[] = $mform->addElement(
@@ -302,22 +277,12 @@ class feedbackclass {
                     get_string('feedbacklegend', 'local_catquiz'),
                     'size="80"',
                 );
-                $mform->hideIf(
-                    'feedbacklegend_scaleid_' . $scale->id . '_' . $j,
-                    'catquiz_scalereportcheckbox_' . $scale->id,
-                    'notchecked'
-                );
 
                 $subelements[] = $mform->addElement(
                     'select',
                     'wb_colourpicker_' .$scale->id . '_' . $j,
                     get_string('feedback_colorrange', 'local_catquiz'),
                     $coloroptions,
-                );
-                $mform->hideIf(
-                    'wb_colourpicker_' .$scale->id . '_' . $j,
-                    'catquiz_scalereportcheckbox_' . $scale->id,
-                    'notchecked'
                 );
                 // Preset selected color regarding order of feedbacks.
                 $sequencecolors = array_keys($coloroptions);
@@ -373,11 +338,6 @@ class feedbackclass {
                     $options
                 );
                 $mform->addHelpButton('catquiz_courses_' . $scale->id . '_' . $j, 'setcourseenrolmentforscale', 'local_catquiz');
-                $mform->hideIf(
-                    'catquiz_courses_' . $scale->id . '_'. $j,
-                    'catquiz_scalereportcheckbox_' . $scale->id,
-                    'notchecked'
-                );
 
                 // Enrol to a group.
                 $element = $mform->addElement(
@@ -386,11 +346,6 @@ class feedbackclass {
                     get_string('setgrouprenrolmentforscale', 'local_catquiz')
                 );
                 $mform->addHelpButton('catquiz_group_' . $scale->id . '_' . $j, 'groupenrolmenthelptext', 'local_catquiz');
-                $mform->hideIf(
-                    'catquiz_group_' . $scale->id . '_'. $j,
-                    'catquiz_scalereportcheckbox_' . $scale->id,
-                    'notchecked'
-                );
                 $subelements[] = $element;
 
                 // Checkbox messaging of groupselect and courseselect.
@@ -413,11 +368,6 @@ class feedbackclass {
                     $mform->setDefault('enrolment_message_checkbox_' . $scale->id . '_'. $j, 1);
                 }
 
-                $mform->hideIf(
-                    'enrolment_message_checkbox_' . $scale->id . '_'. $j,
-                    'catquiz_scalereportcheckbox_' . $scale->id,
-                    'notchecked'
-                );
                 // Close of feedback range HTML tag element.
                 $element = $mform->createElement('html', '</div>');
                 $element->setName('feedback_scale_' . $scale->id . '_rangeend_' . $j);

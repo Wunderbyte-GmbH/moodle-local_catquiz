@@ -24,9 +24,14 @@
 
 namespace local_catquiz\teststrategy\feedbackgenerator;
 
+use core\chart_bar;
+use core\chart_series;
 use local_catquiz\catquiz;
 use local_catquiz\catscale;
 use local_catquiz\feedback\feedbackclass;
+use local_catquiz\local\model\model_model;
+use local_catquiz\local\model\model_strategy;
+use local_catquiz\teststrategy\feedback_helper;
 use local_catquiz\teststrategy\feedbackgenerator;
 use local_catquiz\teststrategy\feedbacksettings;
 
@@ -51,12 +56,6 @@ class comparetotestaverage extends feedbackgenerator {
     public int $primaryscaleid;
 
     /**
-     *
-     * @var stdClass $feedbacksettings.
-     */
-    public feedbacksettings $feedbacksettings;
-
-    /**
      * We only show a graph if we have results for at least that many users.
      *
      * @var int
@@ -64,14 +63,14 @@ class comparetotestaverage extends feedbackgenerator {
     const MIN_USERS = 3;
 
     /**
-     * Creates a new customscale feedback generator.
+     * Limit to show comparison text
      *
-     * @param feedbacksettings $feedbacksettings
+     * We only show the comparison text "you are better than XX percent of
+     * users" if XX is greater than this value.
+     *
+     * @var int
      */
-    public function __construct(feedbacksettings $feedbacksettings) {
-
-        $this->feedbacksettings = $feedbacksettings;
-    }
+    const MIN_BETTER_THAN_LIMIT = 15;
 
     /**
      * Get student feedback.
@@ -83,16 +82,18 @@ class comparetotestaverage extends feedbackgenerator {
      */
     public function get_studentfeedback(array $data): array {
         global $OUTPUT;
+
+        $abilityprofilechart = $this->render_abilityprofile_chart(
+            (array) $data,
+            ['id' => $data['catscaleid']]
+        );
+        $data['abilityprofile'] = $abilityprofilechart;
         $feedback = $OUTPUT->render_from_template('local_catquiz/feedback/comparetotestaverage', $data);
 
-        if (empty($feedback)) {
-            return [];
-        } else {
-            return [
-                'heading' => $this->get_heading(),
-                'content' => $feedback,
-            ];
-        }
+        return [
+            'heading' => $this->get_heading(),
+            'content' => $feedback,
+        ];
     }
 
     /**
@@ -159,52 +160,6 @@ class comparetotestaverage extends feedbackgenerator {
      */
     public function get_generatorname(): string {
         return 'comparetotestaverage';
-    }
-
-    /**
-     * Write string to define color gradiant bar.
-     *
-     * @param object $quizsettings
-     * @param string|int $catscaleid
-     * @return array
-     *
-     */
-    private function get_colorbarlegend($quizsettings, $catscaleid): array {
-        if (!$quizsettings) {
-            return [];
-        }
-        // We collect the feedbackdata only for the parentscale.
-        $feedbacks = [];
-        $numberoffeedbackoptions = intval($quizsettings->numberoffeedbackoptionsselect);
-        $colorarray = feedbackclass::get_array_of_colors($numberoffeedbackoptions);
-
-        for ($j = 1; $j <= $numberoffeedbackoptions; $j++) {
-            $colorkey = 'wb_colourpicker_' . $catscaleid . '_' . $j;
-            $feedbacktextkey = 'feedbacklegend_scaleid_' . $catscaleid . '_' . $j;
-            $lowerlimitkey = "feedback_scaleid_limit_lower_" . $catscaleid . "_" . $j;
-            $upperlimitkey = "feedback_scaleid_limit_upper_" . $catscaleid . "_" . $j;
-
-            $feedbackrangestring = get_string(
-                'subfeedbackrange',
-                'local_catquiz',
-                [
-                    'upperlimit' => round($quizsettings->$upperlimitkey, 2),
-                    'lowerlimit' => round($quizsettings->$lowerlimitkey, 2),
-                ]);
-
-            $text = $quizsettings->$feedbacktextkey ?? "";
-
-            $colorname = $quizsettings->$colorkey;
-            $colorvalue = $colorarray[$colorname];
-
-            $feedbacks[] = [
-                'subcolorcode' => $colorvalue,
-                'subfeedbacktext' => $text,
-                'subfeedbackrange' => $feedbackrangestring,
-            ];
-        }
-
-        return $feedbacks;
     }
 
     /**
@@ -307,14 +262,6 @@ class comparetotestaverage extends feedbackgenerator {
         $quantile = count($personparams) <= 1
             ? 0
             : (count($worseabilities) / (count($personparams) - 1)) * 100;
-        $text = get_string(
-            'feedbackcomparetoaverage',
-            'local_catquiz',
-            [
-                'quantile' => sprintf('%.2f', $quantile),
-                'scaleinfo' => $catscale->name,
-            ]);
-
         $testaverage = array_sum(array_map(fn ($pp) => $pp->ability, $personparams)) / count($personparams);
 
         $catscaleclass = new catscale($catscaleid);
@@ -334,6 +281,23 @@ class comparetotestaverage extends feedbackgenerator {
         $b = $middle - (float) $abilityrange['minscalevalue'];
         $testaverageposition = ($b + $testaverageinrange) / $b * 50;
         $userabilityposition = ($b + $abilityinrange) / $b * 50;
+        $betterthan = '';
+        if (round($quantile, 0) >= self::MIN_BETTER_THAN_LIMIT) {
+            $betterthan = get_string('feedbackcomparison_betterthan', 'local_catquiz', ['quantile' => round($quantile, 0)]);
+        }
+
+        $text = get_string(
+            'feedbackcomparetoaverage',
+            'local_catquiz',
+            [
+                'betterthan' => $betterthan,
+                'quotedscale' => feedback_helper::add_quotes($catscale->name),
+                'ability_global' => feedback_helper::localize_float($abilityinrange),
+                'se_global' => feedback_helper::localize_float($newdata['se'][$catscaleid]),
+                'average_ability' => feedback_helper::localize_float($testaverageinrange),
+                'scale_min' => feedback_helper::localize_float($abilityrange['minscalevalue']),
+                'scale_max' => feedback_helper::localize_float($abilityrange['maxscalevalue']),
+            ]);
 
         return [
             'contextid' => $existingdata['contextid'],
@@ -346,7 +310,7 @@ class comparetotestaverage extends feedbackgenerator {
                 'colorgradestring' => $this->get_colorgradientstring((object) $quizsettings, $catscaleid),
             ],
             'colorbarlegend' => [
-                'feedbackbarlegend' => $this->get_colorbarlegend((object) $quizsettings, $catscaleid),
+                'feedbackbarlegend' => feedback_helper::get_colorbarlegend((object) $quizsettings, $catscaleid),
             ],
             'currentability' => get_string('currentability', 'local_catquiz', $catscale->name),
             'currentabilityfellowstudents' => get_string('currentabilityfellowstudents', 'local_catquiz', $catscale->name),
@@ -355,6 +319,119 @@ class comparetotestaverage extends feedbackgenerator {
             'middle' => $middle,
             'comparetotestaverage_has_worse' => count($worseabilities) > 0,
             'comparetotestaverage_has_enough_peers' => count($distinctusers) >= self::MIN_USERS,
+            'personabilities_abilities' => $this->get_restructured_abilities($existingdata, $newdata),
         ];
     }
+
+    /**
+     * Render chart for histogram of personabilities.
+     *
+     * @param array $initialcontext
+     * @param array $primarycatscale
+     *
+     *
+     * @return array
+     *
+     */
+    private function render_abilityprofile_chart(array $initialcontext, array $primarycatscale) {
+        global $OUTPUT, $DB;
+
+        $abilitysteps = [];
+        $abilitystep = 0.25;
+        $interval = $abilitystep * 2;
+        if (isset($initialcontext['personabilities_abilities'][$primarycatscale['id']]['abilityrange'])) {
+            $abilityrange = $initialcontext['personabilities_abilities'][$primarycatscale['id']]['abilityrange'];
+        } else {
+            $abilityrange = $this->feedbackhelper->get_ability_range($primarycatscale['id']);
+        };
+
+        $ul = (float) $abilityrange['maxscalevalue'];
+        $ll = (float) $abilityrange['minscalevalue'];
+        for ($i = $ll + $abilitystep; $i <= ($ul - $abilitystep); $i += $interval) {
+            $abilitysteps[] = $i;
+        }
+        $items = $this->feedbackhelper->get_testitems_for_catscale($primarycatscale['id'], $initialcontext['contextid'], true);
+        // Prepare data for test information line.
+
+        $models = model_strategy::get_installed_models();
+        $fisherinfos = [];
+        foreach ($items as $item) {
+            // We can not calculate the fisher information for items without a model.
+            if (!$item->model) {
+                continue;
+            }
+            $model = model_model::get_instance($item->model);
+            foreach ($model::get_parameter_names() as $paramname) {
+                $params[$paramname] = floatval($item->$paramname);
+            }
+            foreach ($abilitysteps as $ability) {
+                $fisherinformation = $model->fisher_info(
+                    ['ability' => $ability],
+                    $params
+                );
+                $stringkey = strval($ability);
+
+                if (!isset($fisherinfos[$stringkey])) {
+                    $fisherinfos[$stringkey] = $fisherinformation;
+                } else {
+                    $fisherinfos[$stringkey] += $fisherinformation;
+                }
+            }
+
+        }
+
+        $fisherinfos = $this->feedbackhelper->get_fisherinfos_of_items($items, $models, $abilitysteps);
+        // Prepare data for scorecounter bars.
+        $abilityrecords = $DB->get_records('local_catquiz_personparams', ['catscaleid' => $primarycatscale['id']]);
+        $abilityseries = [];
+        foreach ($abilitysteps as $as) {
+            $counter = 0;
+            foreach ($abilityrecords as $record) {
+                $a = floatval($record->ability);
+                $ability = $this->feedbackhelper->round_to_customsteps($a, $abilitystep, $interval);
+                if ($ability != $as) {
+                    continue;
+                } else {
+                    $counter ++;
+                }
+            }
+            $colorvalue = $this->feedbackhelper->get_color_for_personability(
+                (array) $this->get_progress()->get_quiz_settings(),
+                $as,
+                intval($primarycatscale['id'])
+                );
+            $abilitystring = strval($as);
+            $abilityseries['counter'][$abilitystring] = $counter;
+            $abilityseries['colors'][$abilitystring] = $colorvalue;
+        }
+        // Scale the values of $fisherinfos before creating chart series.
+        $scaledtiseries = $this->feedbackhelper->scalevalues(array_values($fisherinfos), array_values($abilityseries['counter']));
+
+        $aserieslabel = "";
+        if (isset($initialcontext['personabilities_abilities'][$primarycatscale['id']]['name'])) {
+            $scalename = $initialcontext['personabilities_abilities'][$primarycatscale['id']]['name'];
+            $aserieslabel = get_string('scalescorechartlabel', 'local_catquiz', $scalename);
+        }
+        $aseries = new chart_series($aserieslabel, array_values($abilityseries['counter']));
+        $aseries->set_colors(array_values($abilityseries['colors']));
+        $chart = new chart_bar();
+        $chart->add_series($aseries);
+
+        if ($this->has_extended_view_permissions()) {
+            $testinfolabel = get_string('testinfolabel', 'local_catquiz');
+            $tiseries = new chart_series($testinfolabel, $scaledtiseries);
+            $tiseries->set_type(chart_series::TYPE_LINE);
+            $tiseries->set_smooth(true);
+            $chart->add_series($tiseries);
+        }
+
+        $chart->set_labels(array_keys($fisherinfos));
+
+        $out = $OUTPUT->render_chart($chart, $this->has_extended_view_permissions());
+        return [
+            'chart' => $out,
+            'charttitle' => get_string('abilityprofile_title', 'local_catquiz'),
+        ];
+    }
+
 }

@@ -15,42 +15,35 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Class filterforsubscaletesting.
- *
- * Overwrites just a small part to facilitate testing.
+ * The attempt_completed event.
  *
  * @package local_catquiz
  * @copyright 2024 Wunderbyte GmbH
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-namespace local_catquiz\teststrategy\preselect_task;
+namespace local_catquiz\event;
 
-use local_catquiz\catscale;
-use local_catquiz\local\result;
-use local_catquiz\teststrategy\context\loader\personability_loader;
-use local_catquiz\teststrategy\preselect_task;
-use local_catquiz\wb_middleware;
+use stdClass;
 
 /**
- * Overwrites some protected methods to facilitate testing.
+ * Extends the event base with utility methods.
  *
- * @package local_catquiz
  * @copyright 2024 Wunderbyte GmbH
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-final class filterforsubscaletesting extends filterforsubscale {
-
+abstract class catquiz_event_base extends \core\event\base {
     /**
-     * Get subscale ids.
-     *
-     * @param mixed $catscaleid
-     * @param mixed $context
-     *
-     * @return mixed
-     *
+     * Returns the 'other' data as object
+     * @return stdClass
      */
-    protected function getsubscaleids($catscaleid, $context) {
-        return $context['fake_subscaleids'][$catscaleid];
+    protected function get_other_data(): stdClass {
+        if (is_array($this->data['other'])) {
+            return (object) $this->data['other'];
+        }
+        if (is_string($this->data['other'])) {
+            return json_decode($this->data['other']);
+        }
+        return $this->data['other'];
     }
 }

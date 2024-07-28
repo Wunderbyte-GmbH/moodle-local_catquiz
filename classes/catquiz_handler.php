@@ -264,7 +264,7 @@ class catquiz_handler {
      * @param MoodleQuickForm|null $mform
      * @return void
      */
-    public static function data_preprocessing(array &$formdefaultvalues, MoodleQuickForm &$mform = null) {
+    public static function data_preprocessing(array &$formdefaultvalues, ?MoodleQuickForm &$mform = null) {
 
         if (!isset($formdefaultvalues['instance'])) {
             return;
@@ -819,6 +819,7 @@ class catquiz_handler {
         $selectioncontext = self::get_strategy_selectcontext($quizsettings, $attemptdata);
         $result = $teststrategy->return_next_testitem($selectioncontext);
         if (!$result->isOk()) {
+            catquiz::set_final_attempt_status($attemptdata->id, $result->get_status());
             return [0, $result->getErrorMessage()];
         }
 
@@ -982,13 +983,8 @@ class catquiz_handler {
             'includesubscales' => true,
             'maximumquestions' => $maxquestions,
             'minimumquestions' => $quizsettings->maxquestionsgroup->catquiz_minquestions,
-            'penalty_threshold' => 60 * 60 * 24 * 30 - 90, // TODO: make dynamic.
+            'penalty_threshold' => 60 * 60 * 24 * intval(get_config('local_catquiz', 'time_penalty_threshold')),
             'initial_standarderror' => 1.0, // TODO: make configurable.
-            /*
-                 * After this time, the penalty for a question goes back to 0
-                 * Currently, it is set to 30 days
-                 */
-            'penalty_time_range' => 60 * 60 * 24 * 30,
             'pilot_ratio' => $pilotratio ?? 0,
             'pilot_attempts_threshold' => LOCAL_CATQUIZ_THRESHOLD_DEFAULT,
             'questionsattempted' => intval($attemptdata->questionsattempted),
@@ -1003,8 +999,6 @@ class catquiz_handler {
             'attemptid' => intval($attemptdata->id),
              // Hardcoded because this function already depends on mod_adaptivequiz attemptdata.
             'component' => 'mod_adaptivequiz',
-            'updateabilityfallback' => false,
-            'excludedsubscales' => [],
             'has_fisherinformation' => false,
             'max_attempttime_in_sec' => $attemptseconds ?? INF,
             'max_itemtime_in_sec' => $itemseconds ?? INF,

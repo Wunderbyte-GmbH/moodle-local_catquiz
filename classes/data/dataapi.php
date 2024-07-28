@@ -218,7 +218,7 @@ class dataapi {
     }
 
     /**
-     * Save a new catscale and invalidate cache. Checks if name is unique
+     * Save a new catscale and invalidate cache. Checks if name is unique.
      *
      * @param catscale_structure $catscale
      * @return int 0 if name already exists
@@ -230,7 +230,7 @@ class dataapi {
 
         // For a new parent catscale, create new auto-context.
         if (intval($catscale->parentid) === 0
-        && $catscale->contextid == 0) {
+            && $catscale->contextid == 0) {
             $catcontext = self::create_new_context_for_scale($id, $catscale->name);
         }
 

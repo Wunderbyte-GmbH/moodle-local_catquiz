@@ -15,7 +15,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * The bookingoption_updated event.
+ * The context_created event.
  *
  * @package local_catquiz
  * @copyright 2024 Georg Maißer, <info@wunderbyte.at>
@@ -28,13 +28,13 @@ use html_writer;
 use moodle_url;
 
 /**
- * The catscale_updated event class.
+ * The context_created event class.
  *
  * @property-read array $other { Extra information about event. Acesss an instance of the booking module }
  * @copyright 2024 Georg Maißer
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class context_created extends \core\event\base {
+class context_created extends catquiz_event_base {
 
     /**
      * Init parameters.
@@ -65,9 +65,8 @@ class context_created extends \core\event\base {
      *
      */
     public function get_description() {
-        $data = $this->data;
-        $otherarray = json_decode($data['other']);
-        $contextnamelink = html_writer::link('local/catquiz/manage_catcontexts.php', $otherarray->contextname);
+        $other = $this->get_other_data();
+        $contextnamelink = html_writer::link('local/catquiz/manage_catcontexts.php', $other->contextname);
         return get_string('create_context_description', 'local_catquiz', $contextnamelink);
     }
 

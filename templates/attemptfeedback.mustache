@@ -47,78 +47,83 @@
 }}
 
 
+<div class="catquiz_feedback">
+{{#nofeedback}}
+    {{#str}} minquestionsnotreached, local_catquiz{{/str}}
+{{/nofeedback}}
 {{#feedback}}
-    {{#studentfeedback}}
-        {{#frontpage}}
-            <h5 id= "feedback-generator-heading-frontpage-{{generatorname}}"> {{{heading}}} </h5>
-            <i id= "feedback-generator-comment-frontpage-{{generatorname}}"> {{{comment}}} </i>
-            <div id= "feedback-generator-content-frontpage-{{generatorname}}"> {{{content}}} </div>
-        {{/frontpage}}
-    {{/studentfeedback}}
-    {{#studentfeedback.0}}
-        <ul class="nav nav-tabs" id="myTab" role="tablist" style="list-style: none">
-    {{/studentfeedback.0}}
-    {{#studentfeedback}}
-        {{#othertabs}}
-        <li class="nav-item">
-            <a class="nav-link feedbacktab"
-                id="{{generatorname}}-othertabs"
-                data-toggle="tab"
-                data-attemptid="{{attemptid}}"
-                data-feedbackname={{generatorname}}
-                data-feedbackname-translated="{{heading}}"
-                href="#{{generatorname}}_feedbacktab--{{attemptid}}"
-                role="tab"
-                aria-controls="{{generatorname}}_feedbacktab--{{attemptid}}"
-                aria-selected="true">{{heading}}
-            </a>
-        </li>
-        {{/othertabs}}
-    {{/studentfeedback}}
-    {{#teacherfeedback}}
-            <li class="nav-item">
-                <a class="nav-link feedbacktab"
-                    id="{{generatorname}}-teacherfeedback"
-                    data-toggle="tab"
-                    data-attemptid="{{attemptid}}"
-                    data-feedbackname="{{generatorname}}"
-                    data-feedbackname-translated="{{heading}}"
-                    href="#{{generatorname}}_feedbacktab--{{attemptid}}"
-                    role="tab"
-                    aria-controls="{{generatorname}}_feedbacktab--{{attemptid}}"
-                    aria-selected="false">{{heading}}
-                </a>
-            </li>
-    {{/teacherfeedback}}
-    {{#studentfeedback.0}}
-        </ul>
-        <div class="tab-content" id="myTabContent" style="margin:20px">
-    {{/studentfeedback.0}}
+<div class="catquiz_feedback">
+  {{#studentfeedback}}
+      {{#frontpage}}
+          <h5 id= "feedback-generator-heading-frontpage-{{generatorname}}"> {{{heading}}} </h5>
+          <i id= "feedback-generator-comment-frontpage-{{generatorname}}"> {{{comment}}} </i>
+          <div id= "feedback-generator-content-frontpage-{{generatorname}}"> {{{content}}} </div>
+      {{/frontpage}}
+  {{/studentfeedback}}
+      <ul class="nav nav-tabs" id="myTab" role="tablist" style="list-style: none">
+  {{#studentfeedback}}
+      {{#othertabs}}
+      <li class="nav-item">
+          <a class="nav-link feedbacktab"
+              id="{{generatorname}}-othertabs"
+              data-toggle="tab"
+              data-attemptid="{{attemptid}}"
+              data-feedbackname={{generatorname}}
+              data-feedbackname-translated="{{heading}}"
+              href="#{{generatorname}}_feedbacktab--{{attemptid}}"
+              role="tab"
+              aria-controls="{{generatorname}}_feedbacktab--{{attemptid}}"
+              aria-selected="true">{{heading}}
+          </a>
+      </li>
+      {{/othertabs}}
+  {{/studentfeedback}}
+  {{#teacherfeedback}}
+          <li class="nav-item">
+              <a class="nav-link feedbacktab"
+                  id="{{generatorname}}-teacherfeedback"
+                  data-toggle="tab"
+                  data-attemptid="{{attemptid}}"
+                  data-feedbackname="{{generatorname}}"
+                  data-feedbackname-translated="{{heading}}"
+                  href="#{{generatorname}}_feedbacktab--{{attemptid}}"
+                  role="tab"
+                  aria-controls="{{generatorname}}_feedbacktab--{{attemptid}}"
+                  aria-selected="false">{{heading}}
+              </a>
+          </li>
+  {{/teacherfeedback}}
+  {{#studentfeedback.0}}
+      </ul>
+      <div class="tab-content" id="myTabContent" style="margin:20px">
+  {{/studentfeedback.0}}
 
-    {{#studentfeedback}}
-        {{#othertabs}}
-            <div class="tab-pane fade" id="{{generatorname}}_feedbacktab--{{attemptid}}" role="tabpanel" aria-labelledby="{{generatorname}}-othertabs">
-                <div id="feedbackcontent-{{generatorname}}">
-                    <h5 id= "feedback-generator-heading-othertabs-{{generatorname}}"> {{{heading}}} </h5>
-                    <i id= "feedback-generator-comment-othertabs-{{generatorname}}"> {{{comment}}} </i>
-                    <div id= "feedback-generator-content-othertabs-{{generatorname}}"> {{{content}}} </div>
-                </div>
-            </div>
-        {{/othertabs}}
-    {{/studentfeedback}}
-    {{#teacherfeedback}}
-            <div class="tab-pane fade" id="{{generatorname}}_feedbacktab--{{attemptid}}" role="tabpanel" aria-labelledby="{{generatorname}}-teacherfeedback">
-                <div id="feedbackcontent-{{generatorname}}">
-                    <h5 id= "feedback-generator-heading-teacherfb-{{generatorname}}"> {{{heading}}} </h5>
-                    <i id= "feedback-generator-comment-teacherfb-{{generatorname}}"> {{{comment}}} </i>
-                    <div id= "feedback-generator-content-teacherfb-{{generatorname}}"> {{{content}}} </div>
-                </div>
-            </div>
-    {{/teacherfeedback}}
-    {{#studentfeedback.0}}
-        </div>
-    {{/studentfeedback.0}}
+  {{#studentfeedback}}
+      {{#othertabs}}
+          <div class="tab-pane fade" id="{{generatorname}}_feedbacktab--{{attemptid}}" role="tabpanel" aria-labelledby="{{generatorname}}-othertabs">
+              <div id="feedbackcontent-{{generatorname}}">
+                  <h5 id= "feedback-generator-heading-othertabs-{{generatorname}}"> {{{heading}}} </h5>
+                  <i id= "feedback-generator-comment-othertabs-{{generatorname}}"> {{{comment}}} </i>
+                  <div id= "feedback-generator-content-othertabs-{{generatorname}}"> {{{content}}} </div>
+              </div>
+          </div>
+      {{/othertabs}}
+  {{/studentfeedback}}
+  {{#teacherfeedback}}
+          <div class="tab-pane fade" id="{{generatorname}}_feedbacktab--{{attemptid}}" role="tabpanel" aria-labelledby="{{generatorname}}-teacherfeedback">
+              <div id="feedbackcontent-{{generatorname}}">
+                  <h5 id= "feedback-generator-heading-teacherfb-{{generatorname}}"> {{{heading}}} </h5>
+                  <i id= "feedback-generator-comment-teacherfb-{{generatorname}}"> {{{comment}}} </i>
+                  <div id= "feedback-generator-content-teacherfb-{{generatorname}}"> {{{content}}} </div>
+              </div>
+          </div>
+  {{/teacherfeedback}}
+  {{#studentfeedback.0}}
+      </div>
+  {{/studentfeedback.0}}
+</div>
 {{/feedback}}
+</div>
 
 {{#enrolementmessage}}
 <div class="container mt-5">

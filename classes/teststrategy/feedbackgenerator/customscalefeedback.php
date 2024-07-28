@@ -24,11 +24,9 @@
 
 namespace local_catquiz\teststrategy\feedbackgenerator;
 
-use cache;
-use local_catquiz\catquiz;
+use local_catquiz\teststrategy\feedback_helper;
 use local_catquiz\teststrategy\feedbackgenerator;
 use local_catquiz\teststrategy\feedbacksettings;
-use local_catquiz\teststrategy\progress;
 
 /**
  * Returns a custom feedback for each scale.
@@ -48,20 +46,13 @@ class customscalefeedback extends feedbackgenerator {
     private $sortfun;
 
     /**
-     * @var feedbacksettings $feedbacksettings
-     */
-    private $feedbacksettings;
-
-    /**
      * Creates a new customscale feedback generator.
      *
      * @param feedbacksettings $feedbacksettings
+     * @param feedback_helper $feedbackhelper
      */
-    public function __construct(feedbacksettings $feedbacksettings) {
-
-        if (!isset($feedbacksettings)) {
-            return;
-        }
+    public function __construct(feedbacksettings $feedbacksettings, feedback_helper $feedbackhelper) {
+        parent::__construct($feedbacksettings, $feedbackhelper);
 
         // Order the feedbacks by their scale ability.
         // If none is given, the feedbacks are displayed in descending order of their ability.
@@ -71,7 +62,6 @@ class customscalefeedback extends feedbackgenerator {
             $this->sortfun = fn(&$x) => arsort($x);
         }
         $this->feedbacksettings = $feedbacksettings;
-
     }
 
     /**
@@ -184,7 +174,7 @@ class customscalefeedback extends feedbackgenerator {
      */
     public function load_data(int $attemptid, array $existingdata, array $newdata): ?array {
         $progress = $this->get_progress();
-        $personabilities = $progress->get_abilities();
+        $personabilities = $progress->get_abilities(true);
 
         if (!$personabilities) {
             return [];
@@ -259,9 +249,8 @@ class customscalefeedback extends feedbackgenerator {
 
         $text = "";
 
-        foreach ($scalefeedback as $scaleid => $value) {
-            $scale = (array) $catscales[$scaleid];
-            $text .= $scale['name'] . ': ' . $value . '<br/>';
+        foreach ($scalefeedback as $value) {
+            $text .= $value . '<br/>';
         }
         return $text;
     }

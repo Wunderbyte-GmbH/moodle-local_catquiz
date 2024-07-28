@@ -29,14 +29,14 @@ use basic_testcase;
 use local_catquiz\teststrategy\preselect_task\strategyfastestscore;
 
 /**
- * Tests the filterforsubscale class.
+ * Tests the strategyfastestscore class.
  *
  * @package    local_catquiz
  * @author David Szkiba <david.szkiba@wunderbyte.at>
  * @copyright  2023 Georg Maißer <info@wunderbyte.at>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  *
- * @covers \local_catquiz\teststrategy\preselect_task\filterforsubscale
+ * @covers \local_catquiz\teststrategy\preselect_task\strategyfastestscore
  */
 class strategyfastestscore_test extends basic_testcase {
 
@@ -71,28 +71,28 @@ class strategyfastestscore_test extends basic_testcase {
             '1' => (object) [
                 'id' => 1,
                 'catscaleid' => 1,
-                'lasttimeplayedpenalty' => 1,
+                'lasttimeplayedpenaltyfactor' => 1,
                 'fisherinformation' => [1 => 0],
                 'difficulty' => -1,
             ],
             '2' => (object) [
                 'id' => 2,
                 'catscaleid' => 1,
-                'lasttimeplayedpenalty' => 1,
+                'lasttimeplayedpenaltyfactor' => 1,
                 'fisherinformation' => [1 => 1],
                 'difficulty' => 0,
             ],
             '3' => (object) [
                 'id' => 3,
                 'catscaleid' => 1,
-                'lasttimeplayedpenalty' => 0,
-                'fisherinformation' => [1 => 0],
+                'lasttimeplayedpenaltyfactor' => 0,
+                'fisherinformation' => [1 => 1],
                 'difficulty' => 1,
             ],
             '4' => (object) [
                 'id' => 4,
                 'catscaleid' => 1,
-                'lasttimeplayedpenalty' => 0,
+                'lasttimeplayedpenaltyfactor' => 0,
                 'fisherinformation' => [1 => 0],
                 'difficulty' => 2,
             ],

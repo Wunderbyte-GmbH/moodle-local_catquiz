@@ -61,7 +61,7 @@ class filterbytestinfo extends preselect_task implements wb_middleware {
     public function run(array &$context, callable $next): result {
         $this->progress = $context['progress'];
 
-        if ($context['teststrategy'] != LOCAL_CATQUIZ_STRATEGY_LOWESTSUB) {
+        if (!in_array($context['teststrategy'], [LOCAL_CATQUIZ_STRATEGY_LOWESTSUB, LOCAL_CATQUIZ_STRATEGY_HIGHESTSUB])) {
             return $next($context);
         }
 
@@ -71,6 +71,12 @@ class filterbytestinfo extends preselect_task implements wb_middleware {
             }
 
             if (!$ability) {
+                continue;
+            }
+
+            // We could have an ability for a scale that is not longer active
+            // in this attempt.
+            if (!array_key_exists($scaleid, $this->context['questionsperscale'])) {
                 continue;
             }
 
@@ -104,7 +110,8 @@ class filterbytestinfo extends preselect_task implements wb_middleware {
             );
 
             $enable = $testpotential > 1 / $this->context['se_max'] ** 2;
-            $exclude = $testpotential + $testinformation <= 1 / $this->context['se_max'] ** 2;
+            $exclude = $testpotential + $testinformation <= 1 / $this->context['se_max'] ** 2
+                && count($this->progress->get_playedquestions(true, $scaleid)) >= $this->context['min_attempts_per_scale'];
             if ($exclude && $this->progress->is_active_scale($scaleid)) {
                 $this->progress->drop_scale($scaleid);
                 getenv('CATQUIZ_CREATE_TESTOUTPUT') && printf(

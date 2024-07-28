@@ -24,6 +24,7 @@
 
 namespace local_catquiz\teststrategy\strategy;
 
+use local_catquiz\teststrategy\feedback_helper;
 use local_catquiz\teststrategy\feedbackgenerator\comparetotestaverage;
 use local_catquiz\teststrategy\feedbackgenerator\customscalefeedback;
 use local_catquiz\teststrategy\feedbackgenerator\debuginfo;
@@ -93,21 +94,22 @@ class classicalcat extends strategy {
     /**
      * Returns feedback generators.
      *
-     * @param feedbacksettings $feedbacksettings
+     * @param feedbacksettings|null $feedbacksettings
      * @return array
      */
-    public function get_feedbackgenerators(feedbacksettings $feedbacksettings = null): array {
+    public function get_feedbackgenerators(?feedbacksettings $feedbacksettings = null): array {
 
         $this->apply_feedbacksettings($feedbacksettings);
+        $feedbackhelper = new feedback_helper();
 
         return [
-            new customscalefeedback($this->feedbacksettings),
-            new comparetotestaverage($this->feedbacksettings),
-            new personabilities($this->feedbacksettings),
-            new learningprogress($this->feedbacksettings),
-            new questionssummary($this->feedbacksettings),
-            new graphicalsummary($this->feedbacksettings),
-            new debuginfo($this->feedbacksettings),
+            new customscalefeedback($this->feedbacksettings, $feedbackhelper),
+            new comparetotestaverage($this->feedbacksettings, $feedbackhelper),
+            new personabilities($this->feedbacksettings, $feedbackhelper),
+            new learningprogress($this->feedbacksettings, $feedbackhelper),
+            new questionssummary($this->feedbacksettings, $feedbackhelper),
+            new graphicalsummary($this->feedbacksettings, $feedbackhelper),
+            new debuginfo($this->feedbacksettings, $feedbackhelper),
         ];
     }
     /**

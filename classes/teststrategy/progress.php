@@ -134,9 +134,9 @@ class progress implements JsonSerializable {
     /**
      * Holds the session key of the session when the quiz was started
      *
-     * @var string
+     * @var ?string
      */
-    private string $session;
+    private ?string $session;
 
     /**
      * Shows if a new question should be displayed even after a page reload.
@@ -293,13 +293,17 @@ class progress implements JsonSerializable {
         $instance->contextid = $data->contextid;
         $instance->playedquestions = (array) $data->playedquestions;
         foreach ($instance->playedquestions as $pq) {
-            $pq->fisherinformation = (array) $pq->fisherinformation;
+            if (!$pq->is_pilot) {
+                $pq->fisherinformation = (array) $pq->fisherinformation;
+            }
         }
         $instance->playedquestionsbyscale = (array) $data->playedquestionsbyscale;
         $instance->isfirstquestion = $data->isfirstquestion;
         $instance->lastquestion = $data->lastquestion;
         if ($instance->playedquestions) {
-            $instance->lastquestion->fisherinformation = (array) $data->lastquestion->fisherinformation;
+            if (!$instance->lastquestion->is_pilot) {
+                $instance->lastquestion->fisherinformation = (array) $data->lastquestion->fisherinformation;
+            }
         }
 
         $instance->breakend = $data->breakend;
@@ -311,10 +315,10 @@ class progress implements JsonSerializable {
         $instance->abilities = (array) $data->abilities;
         $instance->forcedbreakend = intval($data->forcedbreakend) ?: null;
         $instance->usageid = $data->usageid;
-        $instance->session = $data->session;
-        $instance->excludedquestions = $data->excludedquestions;
-        $instance->gaveupquestions = $data->gaveupquestions;
-        $instance->starttime = $data->starttime;
+        $instance->session = $data->session ?? null;
+        $instance->excludedquestions = $data->excludedquestions ?? [];
+        $instance->gaveupquestions = $data->gaveupquestions ?? [];
+        $instance->starttime = $data->starttime ?? 0;
 
         // Fallback for old attempts that did not store the quizsettings: use the current ones.
         if (!property_exists($object, 'quizsettings') || $object->quizsettings === null) {
@@ -336,6 +340,10 @@ class progress implements JsonSerializable {
             $instance->save();
         }
         $instance->quizsettings = json_decode($object->quizsettings);
+
+        // Save to the cache.
+        $cache = cache::make('local_catquiz', 'adaptivequizattempt');
+        $cache->set(self::get_cache_key($instance->attemptid), $instance);
 
         return $instance;
     }
@@ -698,10 +706,17 @@ class progress implements JsonSerializable {
     /**
      * Returns the abilities calculated during the current attempt.
      *
+     * @param bool $rounded Round the abilities
+     * @param int $precision Desired precision
+     *
      * @return array
      */
-    public function get_abilities(): array {
-        return $this->abilities;
+    public function get_abilities(bool $rounded = false, int $precision = 2): array {
+        if (!$rounded) {
+            return $this->abilities;
+        }
+        $roundedabilities = array_map(fn($ab) => round($ab, $precision), $this->abilities);
+        return $roundedabilities;
     }
 
     /**
@@ -795,11 +810,14 @@ class progress implements JsonSerializable {
      * @return $this
      */
     public function mark_lastquestion_failed() {
-        $this->responses[$this->lastquestion->id] = [
-            'questionid' => $this->lastquestion->id,
-            'fraction' => 0.0,
-            'userlastattempttime' => time(),
-        ];
+        $this->responses[$this->lastquestion->id] = array_merge(
+            $this->responses[$this->lastquestion->id] ?? [],
+            [
+                'questionid' => $this->lastquestion->id,
+                'fraction' => 0.0,
+                'userlastattempttime' => time(),
+            ],
+        );
         return $this;
     }
 
@@ -810,6 +828,9 @@ class progress implements JsonSerializable {
      */
     private function get_last_response_for_attempt() {
         $response = catquiz::get_last_response_for_attempt($this->get_usage_id());
+        if ($response && $response->state === 'gaveup') {
+            $response->fraction = 0.0;
+        }
         return $response;
     }
 

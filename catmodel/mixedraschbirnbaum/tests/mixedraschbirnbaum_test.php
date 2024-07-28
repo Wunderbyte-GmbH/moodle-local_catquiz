@@ -24,6 +24,7 @@
 
  namespace catmodel_mixedraschbirnbaum;
 
+use local_catquiz\local\model\model_model;
 use PHPUnit\Framework\ExpectationFailedException;
 use PHPUnit\Framework\TestCase;
 use SebastianBergmann\RecursionContext\InvalidArgumentException;
@@ -927,7 +928,6 @@ class mixedraschbirnbaum_test extends TestCase {
      *
      */
     private function getmodel(): mixedraschbirnbaum {
-        $mr = new model_responses();
-        return new mixedraschbirnbaum($mr, 'mixedraschbirnbaum');
+        return model_model::get_instance('mixedraschbirnbaum');
     }
 }

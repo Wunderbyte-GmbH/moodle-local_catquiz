@@ -15,7 +15,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * The bookingoption_updated event.
+ * The catscale_updated event.
  *
  * @package local_catquiz
  * @copyright 2024 Georg Maißer, <info@wunderbyte.at>

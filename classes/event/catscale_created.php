@@ -15,7 +15,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * The bookingoption_updated event.
+ * The catscale_created event.
  *
  * @package local_catquiz
  * @copyright 2024 Georg Maißer, <info@wunderbyte.at>
@@ -28,13 +28,13 @@ use local_catquiz\catscale;
 use moodle_url;
 
 /**
- * The catscale_updated event class.
+ * The catscale_created event class.
  *
  * @property-read array $other { Extra information about event. Acesss an instance of the booking module }
  * @copyright 2024 Georg Maißer
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class catscale_created extends \core\event\base {
+class catscale_created extends catquiz_event_base {
 
     /**
      * Init parameters.
@@ -66,8 +66,11 @@ class catscale_created extends \core\event\base {
      */
     public function get_description() {
         $data = $this->data;
-        $otherarray = json_decode($data['other']);
-        $catscaleid = $otherarray->catscaleid;
+        $other = $this->get_other_data();
+        if (!isset($other->catscaleid)) {
+            return "";
+        }
+        $catscaleid = $other->catscaleid;
         $linktoscale = catscale::get_link_to_catscale($catscaleid);
         $data['catscalelink'] = $linktoscale;
         return get_string('create_catscale_description', 'local_catquiz', $data);

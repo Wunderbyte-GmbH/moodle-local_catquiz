@@ -33,6 +33,7 @@ require_once($CFG->dirroot . '/question/engine/lib.php');
 require_once($CFG->dirroot . '/local/catquiz/lib.php');
 
 use cache_helper;
+use coding_exception;
 use html_writer;
 use local_catquiz\catscale;
 use local_wunderbyte_table\wunderbyte_table;
@@ -435,6 +436,20 @@ class catscalequestions_table extends wunderbyte_table {
      */
     public function col_questioncontextattempts($values) {
         return $values->questioncontextattempts;
+    }
+
+    /**
+     * Override the model value to set a string for missing values.
+     *
+     * @param mixed $values
+     * @return string
+     * @throws coding_exception
+     */
+    public function col_model($values): string {
+        if (!$values->model) {
+            return get_string('notavailable', 'core');
+        }
+        return $values->model;
     }
 
     /**

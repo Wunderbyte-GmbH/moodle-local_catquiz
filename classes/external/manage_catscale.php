@@ -81,10 +81,10 @@ class manage_catscale extends external_api {
                                 string $name,
                                 string $description,
                                 string $action,
-                                float $minscalevalue = null,
-                                float $maxscalevalue = null,
-                                int $parentid = null,
-                                int $id = null
+                                ?float $minscalevalue = null,
+                                ?float $maxscalevalue = null,
+                                ?int $parentid = null,
+                                ?int $id = null
                                 ): array {
 
         $params = self::validate_parameters(self::execute_parameters(), [

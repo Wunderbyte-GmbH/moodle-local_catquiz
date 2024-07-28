@@ -29,6 +29,7 @@ use basic_testcase;
 use catmodel_rasch\rasch;
 use catmodel_raschbirnbaum\raschbirnbaum;
 use local_catquiz\local\model\model_item_param;
+use local_catquiz\local\model\model_model;
 use local_catquiz\local\model\model_person_param;
 use local_catquiz\local\model\model_person_param_list;
 use local_catquiz\local\model\model_raschmodel;
@@ -108,8 +109,8 @@ class model_raschmodel_test extends basic_testcase {
                     ],
                 ],
             ]);
-            $rasch = new rasch($responses, 'rasch');
-            $raschbirnbaum = new raschbirnbaum($responses, 'raschbirnbaum');
+            $rasch = model_model::get_instance('rasch');
+            $raschbirnbaum = model_model::get_instance('raschbirnbaum');
 
         return [
             'rasch with aic' => [

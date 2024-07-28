@@ -548,9 +548,10 @@ class testenvironment {
         $activescales = self::get_active_scales($id);
         // The cache key consists of the active scales, so that we can re-use the same cache if multiple tests have the same set of
         // active scales. Scales have to be separated so that active scales 1 and 2 are not considered the same as active scale 12.
-        $cachekey = implode('_', $activescales);
+        // Update: Since the cash key might get too long, we use the hashed value as key.
+        $hashedkey = hash('crc32', implode('_', $activescales));
         $cache = cache::make('local_catquiz', 'catscales_num_items');
-        if ($numquestions = $cache->get($cachekey)) {
+        if ($numquestions = $cache->get($hashedkey)) {
             return $numquestions;
         }
 
@@ -560,7 +561,7 @@ class testenvironment {
             'incatscales'
         );
         $numquestions = $DB->count_records_select('local_catquiz_items', "catscaleid $insql", $inparams);
-        $cache->set($cachekey, $numquestions);
+        $cache->set($hashedkey, $numquestions);
         return $numquestions;
     }
 }

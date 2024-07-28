@@ -31,6 +31,8 @@ require_once($CFG->dirroot . '/local/catquiz/lib.php');
 
 $string['pluginname'] = 'Adaptive Quiz - Advanced CAT Module';
 $string['catquiz'] = 'Catquiz';
+$string['subplugintype_catmodel'] = 'CAT model';
+$string['subplugintype_catmodel_plural'] = 'CAT models';
 
 // Catquiz handler.
 $string['catscale'] = 'CAT scale';
@@ -96,11 +98,35 @@ $string['defaultcontext'] = 'New default context for scale';
 $string['moveitemtootherscale'] = 'Testitem(s) {$a} already assigned to another (sub-)scale of the same tree. Modify assignment?';
 $string['pleasecheckorcancel'] = 'Please confirm or cancel';
 $string['progress'] = 'Progress';
+$string['learningprogress_title'] = 'Your progress';
+$string['learningprogress_description'] = 'How did your ability score change
+    over time? Did you improve?<br/>The following chart displays the progress
+    of your (general) ability score in {$a} in comparison to the average of all
+    test attempts:';
+$string['graphicalsummary_description'] = 'During an attempt your ability is recalculated after each response. The following chart shows how your estimated ability in {$a} changed';
+$string['debuginfo_desc_title'] = 'Export attempt # {$a}';
+$string['debuginfo_desc'] = 'As a user with permission to export attempts, you can download the attempt as CSV file here';
+$string['graphicalsummary_description_lowest'] = 'Zusätzlich ist auch die
+    Entwicklung Ihres Fähigkeitswertes bezüglich der als Defizit
+    identifizierten Skala {$a} dargestellt:';
 $string['perattempt'] = 'per attempt ';
 $string['peritem'] = 'per item ';
 $string['applychanges'] = 'Apply Changes';
 $string['automatic_reload_on_scale_selection'] = 'Form reload on scale selection';
 $string['automatic_reload_on_scale_selection_description'] = 'Reload quizsettings form automatically on (sub-)scale selection';
+$string['enrol_only_to_reported_scales'] = 'Enrol users only to courses of detected primary scale(s).';
+$string['enrol_only_to_reported_scales_help'] = 'Standard would be to enrol users according to results in areas detected according to the purpose of the test.
+If you uncheck this option, users will be enroled according to all other valid results as well.'; // TODO: get translation.
+$string['time_penalty_threshold_name'] = 'Recurrence delay in days';
+$string['time_penalty_threshold_desc'] = 'A question that has already been
+    answered by a user in a previous test attempt is only asked again with a
+    reduced probability. The probability depends on the duration between the
+    previous and the current attempt. The longer the given recurrence delay,
+    the longer this protection against repeated questions is effective.';
+$string['store_debug_info_name'] = 'Create quiz feedback with debug information';
+$string['store_debug_info_desc'] = 'When set, additional data for each quiz
+    attempt are saved and provided as CSV download. This can take up a lot of
+    space.';
 
 $string['timeoutabortnoresult'] = 'Test aborted without result.';
 $string['timeoutabortresult'] = 'Test aborted with result.';
@@ -196,6 +222,7 @@ $string['notpositive'] = 'Please enter a positive number';
 $string['strategy'] = 'Strategy';
 $string['max_iterations'] = 'Maximum number of iterations';
 $string['model_override'] = 'Only use this model';
+$string['importcontextinfo'] = 'The context id should be set when existing items are updated for unambiguous matching with exisiting items. When importing new items, it is advisable to leave the context field empty. A new context is then generated automatically, which contains the items from the default context plus the newly imported items. If a context is defined when importing new items, the context of the corresponding top scale must be changed (in the CAT Manager dashboard, Scales area) in order to use these items during quiz.';
 
 $string['starttimestamp'] = 'Starttime';
 $string['endtimestamp'] = 'Endtime';
@@ -266,8 +293,6 @@ $string['enrolementstringend'] = 'Good luck with your studies!';
 $string['feedback_tab_clicked'] = 'Click on feedback tab';
 $string['feedback_tab_clicked_description'] = 'User {$a->userid} clicked the "{$a->feedback_translated}" tab in {$a->attemptlink}';
 
-
-
 // Access.php.
 $string['catquiz:canmanage'] = 'Is allowed to manage Catquiz plugin';
 $string['catquiz:subscribecatscales'] = 'Is allowed to subscribe to Catquiz CAT scales';
@@ -326,6 +351,12 @@ $string['previewquestion'] = "Preview question";
 $string['personability'] = "Ability score";
 $string['personabilities'] = "Ability scores";
 $string['personabilitytitletab'] = "Details of results";
+$string['feedback_details_heading'] = "Details of your result";
+$string['feedback_details_description'] = 'Following table lists all aspects
+    (scales) of {$a}, for which a reliable result could be calculated.';
+$string['feedback_details_lowestskill'] = 'Scale {$a->name} with an ability
+    score of {$a->value} (± {$a->se}) was found to be the scale with the
+    largest deficit.';
 $string['learningprogresstitle'] = "Progress";
 $string['personabilitiesnodata'] = "No ability scores were calculated";
 $string['itemdifficulties'] = "Item difficulties";
@@ -441,7 +472,11 @@ $string['error'] = "An error occured";
 $string['id'] = "ID";
 $string['abortpersonabilitynotchanged'] = "Person parameter did not change";
 $string['emptyfirstquestionlist'] = "Can't select a start question because the list is empty";
-$string['feedbackcomparetoaverage'] = 'You performed better than {$a->quantile}% of your fellow students in "{$a->scaleinfo}".';
+$string['feedbackcomparetoaverage'] = '<p>The test measures your ability in {$a->quotedscale} by calculating an ability score in the range between
+{$a->scale_min} and {$a->scale_max}. A higher value indicates a better ability.</p>
+<p>You reached a score of {$a->ability_global} (with a standard error of ± {$a->se_global}). The average score of all participants is {$a->average_ability}. {$a->betterthan}</p>
+<p>The following chart displays your personal score (upper mark) and the current average score (lower mark):</p>';
+$string['feedbackcomparison_betterthan'] = 'Your score is better than {$a->quantile}% of all other participants.';
 $string['errornoitems'] = "The quiz can not be started with the given settings. Please contact your CAT manager.";
 $string['exceededmaxattempttime'] = "The maximum attempt time has been exceeded.";
 
@@ -450,14 +485,20 @@ $string['attemptfeedbacknotavailable'] = "No feedback available";
 $string['attemptfeedbacknotyetavailable'] = "Feedback for attempts will be displayed when available.";
 $string['allquestionsincorrect'] = "Not available - all questions were answered incorrectly";
 $string['allquestionscorrect'] = "Not available- all questions were answered correctly";
+$string['minquestionsnotreached'] = 'Test result can not be calculated because minimum number of questions was not reached';
 $string['questionssummary'] = "Summary";
-$string['currentability'] = 'Your current ability score for scale "{$a}"';
-$string['currentabilityfellowstudents'] = 'Current ability score of your fellow students for scale "{$a}"';
+$string['currentability'] = 'Your ability score';
+$string['currentabilityfellowstudents'] = 'Average';
 $string['feedbackbarlegend'] = "Color code";
 $string['teacherfeedback'] = "Feedback for teachers";
 $string['catquiz_feedbackheader'] = "Feedback";
 $string['catquizfeedbackheader'] = 'Feedback for "{$a}"';
 $string['feedbacknumber'] = 'Feedback for range {$a}';
+$string['feedbackrange'] = 'Ability level {$a}';
+$string['hasability'] = 'Ability was calculated';
+$string['responsesbyusercharttitle'] = 'Total number of responses per person';
+$string['noresult'] = 'No ability was calculated';
+$string['selected_scales_all_ranges_label'] = 'Number of participants';
 $string['noselection'] = "No selection";
 $string['lowerlimit'] = "Lower limit";
 $string['upperlimit'] = "Upper limit";
@@ -505,21 +546,30 @@ $string['error:semax'] = ""; // Maybe too complicated to explain / no relevant r
 $string['error:noscalestoreport'] = "There is no feedback available because no tested scale was selected to be reported.";
 
 // Personability & chart in Feedback.
+$string['global_scale'] = 'Global scale';
 $string['chartlegendabilityrelative'] = '{$a->difference} (Compared to parentscale); {$a->ability} (ability score of scale)';
+$string['detected_scales_reference'] = 'Reference scale';
+$string['detected_scales_scalename'] = 'Scale';
+$string['detected_scales_ability'] = 'Ability score';
+$string['detected_scales_number_questions'] = 'Played questions';
 $string['personabilitycharttitle'] = 'Relative ability score in subscales compared to {$a}';
-$string['personabilitytitle'] = 'Ability score in subscales';
 $string['itemsplayed'] = 'evaluated items';
+$string['detected_scales_chart_description'] = 'The following chart displays
+    the values in comparison with your ability score in {$a}. Click the bar to
+    see the scale name and value';
 $string['personabilityinscale'] = 'Ability score in scale "{$a}"';
 $string['yourscorein'] = 'Your average scores in "{$a}"';
 $string['scoreofpeers'] = 'Average of your peers';
 $string['numberofattempts'] = 'Number of attempts';
-$string['abilityprofile'] = 'Ability score profile in "{$a}"';
+$string['abilityprofile'] = 'Ability score profile in {$a}';
+$string['abilityprofile_title'] = 'Ability score in test';
 $string['labelforrelativepersonabilitychart'] = 'Relative Ability';
 $string['nothingtocompare'] = 'There are not enough valid results available for a comparison.';
 $string['attemptchartstitle'] = 'Number and results of attempts in scale "{$a}"';
 $string['personabilityrangestring'] = '{$a->rangestart} - {$a->rangeend}';
 $string['testinfolabel'] = 'Test information';
 $string['scalescorechartlabel'] = '{$a}-Score';
+$string['chart_detectedscales_title'] = 'Detected scales (Top {$a})';
 
 // Check display line breaks etc.
 $string['choosesubscaleforfeedback_help'] = 'You can now store <number of options> feedback informations for the subscales displayed. Select a (sub-)scale to enter your feedback. The colored symbols indicate the current status of processing, measured by the number of feedback options you entered:
@@ -620,6 +670,33 @@ $string['shortcodeslistofquizattempts'] = 'Returns a table of quiz attempts.';
 $string['catquizfeedback'] = 'Returns an overview of the last quiz attempts.';
 $string['shortcodescatquizfeedback'] = 'Display feedback for quiz attempts';
 $string['shortcodescatscalesoverview'] = 'Display catscales overview.';
+$string['shortcodescatquizstatistics'] = 'Display statistics for a CAT test';
+$string['catquizstatisticsnodata'] = 'No attempt data available for the given settings';
+$string['catquizstatistics_h1_single'] = 'Statistik zu Test {$a}';
+$string['catquizstatistics_h2_single'] = 'The following data are from test {$a->link} that uses the scale {$a->scale}.';
+$string['catquizstatistics_h1_scale'] = 'Statistics for scale {$a->scalename} in course {$a->coursename}.';
+$string['catquizstatistics_h2_scale'] = 'The following data are from tests {$a->linkedcourses} in course {$a->coursename}. They use the scale {$a->scale}.';
+$string['catquiz_left_quote'] = '&ldquo;';
+$string['catquizstatistics_h1_global'] = 'Statistics of scale {$a} in moodle instance';
+$string['catquizstatistics_h2_global'] = 'The following data are from all users
+    that participated in tests on this moodle instance using
+    scale {$a} as main scale.';
+$string['catquizstatistics_timerange_both'] = 'Only data between {$a->starttime} and {$a->endtime} are used.';
+$string['catquizstatistics_timerange_start'] = 'Only data after {$a->starttime} are used.';
+$string['catquizstatistics_timerange_end'] = 'Only data before {$a->endtime} are used.';
+$string['catquizstatistics_numattempts_title'] = 'Number of attempts';
+$string['catquizstatistics_numattemptsperperson_title'] = 'Attempts per person';
+$string['catquizstatistics_overview'] = 'Overview';
+$string['catquizstatistics_testusage'] = 'Testusage';
+$string['catquizstatistics_progress_peers_title'] = 'Average result of your peers in scale "{$a}"';
+$string['catquizstatistics_progress_personal_title'] = 'Your personal results for that scale';
+$string['catquizstatistics_numberofresponses'] = 'Number of responses';
+$string['catquizstatistics_exportcsv_heading'] = 'Export data of selected attempts as CSV';
+$string['catquizstatistics_exportcsv_description'] = 'As user with permission to download exports, here you can export results of all attempts as a CSV file';
+$string['catquizstatistics_nodataforcourse'] = 'There are no CAT tests for the given courseid';
+$string['catquizstatistics_askforparams'] = 'Please provide a "globalscale" or "courseid" parameter';
+$string['catquizstatistics_scale_testid_conflict'] = 'The test for the given testid is not using the provided scale';
+$string['catquizstatistics_scale_course_conflict'] = 'The given testid is not part of the given course';
 
 // Validation.
 $string['valuemustbegreaterzero'] = 'Value must be greater than zero.';

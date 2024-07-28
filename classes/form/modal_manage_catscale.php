@@ -129,7 +129,7 @@ class modal_manage_catscale extends dynamic_form {
         $data->timecreated = time();
         $data->timemodified = time();
         $catscale = new catscale_structure((array) $data);
-        if ($data->id > 0) {
+        if (!empty($data->id)) {
             dataapi::update_catscale($catscale);
             $catscaleid = $data->id;
         } else {

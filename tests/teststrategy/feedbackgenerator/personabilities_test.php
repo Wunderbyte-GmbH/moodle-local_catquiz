@@ -26,6 +26,7 @@
 namespace local_catquiz;
 
 use advanced_testcase;
+use local_catquiz\teststrategy\feedback_helper;
 use local_catquiz\teststrategy\feedbackgenerator\personabilities;
 use local_catquiz\teststrategy\feedbacksettings;
 use local_catquiz\teststrategy\progress;
@@ -40,7 +41,7 @@ use SebastianBergmann\RecursionContext\InvalidArgumentException;
  * @copyright  2024 Wunderbyte GmbH <info@wunderbyte.at>
  * @license    http =>//www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  *
- * @covers \local_catquiz\teststrategy\preselect_task\filterforsubscale
+ * @covers \local_catquiz\teststrategy\feedbackgenerator\personabilities
  */
 class personabilities_test extends advanced_testcase {
 
@@ -69,6 +70,7 @@ class personabilities_test extends advanced_testcase {
             ->onlyMethods([
                 'get_quiz_settings',
                 'get_abilities',
+                'get_num_playedquestions',
             ])
             ->getMock();
 
@@ -81,31 +83,40 @@ class personabilities_test extends advanced_testcase {
         $progressmock
             ->method('get_abilities')
             ->willReturn([$primaryscaleid => $primaryscalevalue]);
+        $progressmock
+            ->method('get_num_playedquestions')
+            ->willReturn(1);
 
+        $feedbackhelpermock = $this->getMockBUilder(feedback_helper::class)
+            ->disableOriginalConstructor()
+            ->onlyMethods([
+                'get_ability_range',
+            ])
+            ->getMock();
+
+        $feedbackhelpermock
+            ->method('get_ability_range')
+            ->willReturn($abilityrange);
         $feedbacksettings = new feedbacksettings(LOCAL_CATQUIZ_STRATEGY_LOWESTSUB);
         $personabilities = $this->getMockBuilder(personabilities::class)
             ->onlyMethods([
-                'get_ability_range',
                 'get_testitems_for_catscale',
-                'get_fisherinfos_of_items',
                 'get_progress',
+                'get_global_scale',
             ])
-            ->setConstructorArgs([$feedbacksettings])
+            ->setConstructorArgs([$feedbacksettings, $feedbackhelpermock])
             ->getMock();
 
         // Configure the stub.
         $personabilities
-            ->method('get_ability_range')
-            ->willReturn($abilityrange);
-        $personabilities
             ->method('get_testitems_for_catscale')
             ->willReturn($testitemsforcatscale);
         $personabilities
-            ->method('get_fisherinfos_of_items')
-            ->willReturn($fisherinfo);
-        $personabilities
             ->method('get_progress')
             ->willReturn($progressmock);
+        $personabilities
+            ->method('get_global_scale')
+            ->willReturn((object)['name' => 'Global scale name']);
 
         $output = $personabilities->get_feedback($feedbackdata)['studentfeedback'];
         // For the moment, this tests only the heading, not the whole rendered data.
@@ -123,8 +134,9 @@ class personabilities_test extends advanced_testcase {
         return [
             'lowestskillgap' => [
                 'feedbackdata' => [
+                    'catscaleid' => 271,
                     'attemptid' => 1,
-                    'se' => [],
+                    'se' => [271 => 0.12345],
                     'progress' => [],
                     'userid' => '2',
                     'models' => [
@@ -218,9 +230,9 @@ class personabilities_test extends advanced_testcase {
                     ],
                 ],
                 'expected' => [
-                    'heading' => "Details of results",
+                    'heading' => "Details of your result",
                     'comment' => '',
-                    'content' => '<h5>Details of results</h5>
+                    'content' => '<h5>Details of your results</h5>
                     <div class="container">
                         <div class="row">
                             <div

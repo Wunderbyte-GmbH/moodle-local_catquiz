@@ -183,7 +183,8 @@ abstract class strategy {
             $context['contextid'],
             $selectedquestion,
             $context['catscaleid'],
-            $context['includesubscales']
+            $context['includesubscales'],
+            $context['progress']->get_selected_subscales()
         );
         return result::ok($selectedquestion);
     }
@@ -255,11 +256,11 @@ abstract class strategy {
 
     /**
      * Get feedback generators.
-     * @param feedbacksettings $feedbacksettings
+     * @param feedbacksettings|null $feedbacksettings
      * @return array
      *
      */
-    abstract public function get_feedbackgenerators(feedbacksettings $feedbacksettings): array;
+    abstract public function get_feedbackgenerators(?feedbacksettings $feedbacksettings): array;
 
     /**
      * Check defined settings and apply specific settings strategy.
