@@ -49,6 +49,60 @@ class catquiz {
     }
 
     /**
+     * Give back the global (parent) scale id of a given catscale id or an array of catscale ids.
+     *
+     * @param int|array $catscaleids
+     * @param bool $assoc_array
+     * @return int|array
+     */
+    public static function get_global_scale(int|array $catscaleids, bool $assoc_asrray = FALSE) {
+      
+      global $DB;
+      
+      $where = '';
+      if (!empty($catscaleids) && $catscaleids[0] > 0) {
+        [$insql, $inparams] = $DB->get_in_or_equal($catscaleids);
+        $where = "WHERE scaleid $insql";
+      }
+      else {
+        // NOTE: If no $catscaleids are given, then return ALL associations
+        $assoc_array = TRUE;
+      }
+
+      $sql = "WITH RECURSIVE globalscale (scaleid, globalid) AS (
+              SELECT id, id
+                FROM {local_catquiz_catscales}
+                WHERE parentid=0
+              UNION ALL
+              SELECT ccs.id, gs.globalid
+                FROM globalscale AS gs
+                LEFT JOIN {local_catquiz_catscales} as ccs ON ccs.parentid = gs.scaleid
+            )
+            SELECT scaleid, globalid
+              FROM globalscale
+              $where";
+      
+      if (is_int($catscaleids) && !($assoc_array)) {
+        $sql_result = $DB->get_record_sql($sql, $inparams);
+        $result = intval($sql_result->globalid);
+      }
+      elseif (!($assoc_array)) {
+        $sql_result = $DB->get_records_sql($sql, $inparams);
+        $result = [];
+        foreach ($sql_result as $record) {
+          $result[] = intval($record->globalid);
+        }
+      else {
+        $sql_result = $DB->get_records_sql($sql, $inparams);
+        $result = [];
+        foreach ($sql_result as $record) {
+          $result[intval($record->scaleid)] = intval($record->globalid);
+        }
+      }  
+      return $result;
+    }
+    
+    /**
      * Start a new attempt for a user.
      *
      * @param int $userid
@@ -107,13 +161,11 @@ class catquiz {
 
         global $DB;
 
-        $select = '*';
-        $from = "( SELECT q.id, q.name, q.questiontext, q.qtype, qc.name as categoryname
-            FROM {question} q
+        $select = 'q.id AS id, q.name AS name, q.questiontext AS questiontext, q.qtype AS qtype, qc.name AS categoryname';
+        $from = "{question} q
                 JOIN {question_versions} qv ON q.id=qv.questionid
                 JOIN {question_bank_entries} qbe ON qv.questionbankentryid=qbe.id
-                JOIN {question_categories} qc ON qc.id=qbe.questioncategoryid
-            ) as s1";
+                JOIN {question_categories} qc ON qc.id=qbe.questioncategoryid";
         
         $where = '1=1';
         $filter = '';
@@ -166,6 +218,7 @@ class catquiz {
 
         $insql = '';
         if (!empty($catscaleids) && $catscaleids[0] > 0) {
+            
             
             // TODO: Require Globalscales of given catscales!
             
