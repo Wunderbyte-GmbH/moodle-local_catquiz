@@ -47,7 +47,7 @@ function xmldb_local_catquiz_upgrade($oldversion) {
         // Define field itemid to be added to local_catquiz_itemparams.
         $table = new xmldb_table('local_catquiz_itemparams');
 
-        $field = new xmldb_field('itemid', XMLDB_TYPE_NUMBER, '10, 2', null, null, null, 0, null);
+        $field = new xmldb_field('itemid', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null, 0);
         // Conditionally launch add fields min scale value.
         if (!$dbman->field_exists($table, $field)) {
             $dbman->add_field($table, $field);
