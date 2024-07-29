@@ -2210,8 +2210,5 @@ class catquiz {
             'invalid',
             'complete',
         ];
-=======
-        return true;
->>>>>>> Stashed changes
     }
 }
