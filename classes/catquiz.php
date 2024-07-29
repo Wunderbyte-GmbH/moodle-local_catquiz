@@ -92,6 +92,7 @@ class catquiz {
         foreach ($sql_result as $record) {
           $result[] = intval($record->globalid);
         }
+      }
       else {
         $sql_result = $DB->get_records_sql($sql, $inparams);
         $result = [];
@@ -209,13 +210,13 @@ class catquiz {
             'contextid' => $contextid,
         ]; 
         
-        $wherearray['lcip.contextid'] => $contextid;
+        $wherearray['lcip.contextid'] = $contextid;
 
         // If we fetch only for a given user, we need to add this to the sql.
         if (!empty($userid)) {
             $params['userid'] = $userid;
             [$insql, $inparams] = $DB->get_in_or_equal($userid);
-            $wherearray['ustat.userid'] => $insql;
+            $wherearray['ustat.userid'] = $insql;
         }
 
         $insql = '';
@@ -228,7 +229,7 @@ class catquiz {
             
             [$insql, $inparams] = $DB->get_in_or_equal($catscaleids, SQL_PARAMS_NAMED, 'incatscales');
             $params = array_merge($params, $inparams);
-            $wherearray['lccs.id'] => $insql;
+            $wherearray['lccs.id'] = $insql;
         }
        
         $select = "-- Information about the question
