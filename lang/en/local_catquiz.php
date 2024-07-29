@@ -251,7 +251,7 @@ $string['catscale_created'] = 'CAT scale created';
 $string['create_catscale_description'] = 'CAT scale {$a->catscalelink} with id {$a->objectid} created.';
 $string['context_created'] = 'CAT context created.';
 $string['create_context_description'] = 'CAT context {$a} created.';
-$string['context_updated'] = 'CAT Context updated';
+$string['context_updated'] = 'CAT context updated';
 $string['update_context_description'] = 'CAT context {$a} updated.';
 $string['logsafter'] = 'Logs after';
 $string['logsbefore'] = 'Logs before';
@@ -607,7 +607,7 @@ $string['scaleiddisplay'] = ' (ID: {$a})';
 
 
 // Quiz attempts.
-$string['catcontext'] = 'CAT Context';
+$string['catcontext'] = 'CAT context';
 $string['totalnumberoftestitems'] = "Total number of questions";
 $string['numberoftestitemsused'] = "Number of displayed questions";
 $string['personabilitybeforeattempt'] = "Ability score before attempt";
