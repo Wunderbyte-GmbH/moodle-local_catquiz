@@ -116,6 +116,9 @@
         <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
         <KEY NAME="usermodified" TYPE="foreign" FIELDS="usermodified" REFTABLE="user" REFFIELDS="id"/>
       </KEYS>
+      <INDEXES>
+        <INDEX NAME="catcontext_starttimestamp-endtimestamp" UNIQUE="false" FIELDS="starttimestamp, endtimestamp"/>
+      </INDEXES>
     </TABLE>
     <TABLE NAME="local_catquiz_itemparams" COMMENT="Store cat item parameters">
       <FIELDS>

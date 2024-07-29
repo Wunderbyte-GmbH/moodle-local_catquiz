@@ -519,5 +519,24 @@ function xmldb_local_catquiz_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2024051401, 'local', 'catquiz');
     }
 
+    if ($oldversion < 2024072901) {
+
+        // Define index catcontext_starttimestamp-endtimestamp (not unique) to be added to local_catquiz_catcontext.
+        $table = new xmldb_table('local_catquiz_catcontext');
+        $index = new xmldb_index(
+            'catcontext_starttimestamp-endtimestamp',
+            XMLDB_INDEX_NOTUNIQUE,
+            ['starttimestamp', 'endtimestamp']
+        );
+
+        // Conditionally launch add index catcontext_starttimestamp-endtimestamp.
+        if (!$dbman->index_exists($table, $index)) {
+            $dbman->add_index($table, $index);
+        }
+
+        // Catquiz savepoint reached.
+        upgrade_plugin_savepoint(true, 2024072901, 'local', 'catquiz');
+    }
+
     return true;
 }
