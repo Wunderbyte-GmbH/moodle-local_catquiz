@@ -272,6 +272,7 @@ class model_item_param_list implements ArrayAccess, IteratorAggregate, Countable
             function ($param) use ($contextid) {
                 $record = [
                     'componentid' => $param->get_id(),
+                    'itemid' => 1, // TODO: Find the id of the item in local_catquiz_items
                     'componentname' => 'question',
                     'model' => $param->get_model_name(),
                     'contextid' => $contextid,
@@ -350,7 +351,7 @@ class model_item_param_list implements ArrayAccess, IteratorAggregate, Countable
 
         // Scale logic is in this function: get scale id and update in table.
         if ($label = $newrecord['label'] ?? false) {
-            $sql = "SELECT qv.questionid, qv.questionbankentryid as qbeid
+            $sql = "SELECT qv.questionid, qv.questionbankentryid AS qbeid, lci.id AS itemid
             FROM {question_bank_entries} qbe
 
             JOIN {question_versions} qv
@@ -380,6 +381,7 @@ class model_item_param_list implements ArrayAccess, IteratorAggregate, Countable
             $record = reset($records);
             unset($newrecord['label']);
             $newrecord['componentid'] = $record->questionid;
+            $newrecord['itemid'] = $record->itemid;
 
             // We call the same function again, now with the componentid and without the label id.
             $returnarray = self::save_or_update_testitem_in_db($newrecord);
