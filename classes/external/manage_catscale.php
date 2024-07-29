@@ -35,6 +35,10 @@ use external_single_structure;
 use local_catquiz\data\dataapi;
 use local_catquiz\data\catscale_structure;
 
+defined('MOODLE_INTERNAL') || die();
+
+require_once($CFG->libdir . '/externallib.php');
+
 /**
  * External Service for local catquiz.
  *
