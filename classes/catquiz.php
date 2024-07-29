@@ -186,7 +186,7 @@ class catquiz {
      * @param int $contextid
      * @param array $wherearray
      * @param int $userid
-     * @param ?string $orderby If given, order by the given field in ascending order
+     * @param string|null $orderby If given, order by the given field in ascending order
      *
      * @return array
      *
@@ -207,125 +207,75 @@ class catquiz {
         // Start the params array.
         $params = [
             'contextid' => $contextid,
-            'contextid2' => $contextid,
-            'contextid3' => $contextid,
-        ];
+        ]; 
+        
+        $wherearray['lcip.contextid'] = $contextid;
 
         // If we fetch only for a given user, we need to add this to the sql.
         if (!empty($userid)) {
-            $restrictforuser = " AND qas.userid = :userid ";
             $params['userid'] = $userid;
+            [$insql, $inparams] = $DB->get_in_or_equal($userid);
+            $wherearray['ustat.userid'] = $insql;
         }
 
         $insql = '';
         if (!empty($catscaleids) && $catscaleids[0] > 0) {
+            
+            $globalscaleids = self::get_global_scale($catscaleids);
+            
+            [$insql, $inparams] = $DB->get_in_or_equal($globalscaleids);
+            $parentscales = $insql;
+            
             [$insql, $inparams] = $DB->get_in_or_equal($catscaleids, SQL_PARAMS_NAMED, 'incatscales');
             $params = array_merge($params, $inparams);
-            $insql = " WHERE catscaleid $insql ";
+            $wherearray['lccs.id'] = $insql;
         }
+       
+        $select = "-- Information about the question
+            q.id, lci.componentid, qbe.idnumber as label, IFNULL (qbe.idnumber, qbe.id) AS idnumber, q.name, q.questiontext, q.qtype, qc.name as categoryname,
+          -- Information about CAT scales, parameters and contexts
+            lci.catscaleid AS catscaleid, lci.status testitemstatus, lci.componentname component, lci.id as itemid, lccs.name as catscalename, lcip.model, lcip.difficulty, lcip.discrimination, lcip.guessing, lcip.timecreated, lcip.timemodified, lcip.status,  lcip.contextid,
+          -- Information about usage statisitcs
+            COALESCE(astat.numberattempts,0) AS attempts, COALESCE(astat.lastattempt,0) as lastattempttime, 
+            ustat.userid, COALESCE(ustat.numberattempts,0) AS userattempts, COALESCE(ustat.lastattempt,0) as userlastattempttime";
+                
+        $from = "{local_catquiz_catscales} AS lccs
+          -- Get all corresponding items of those scales, skip if not existent (INNER JOIN)
+            JOIN {local_catquiz_items} AS lci ON lci.catscaleid=lccs.id AND lci.componentname='question'
 
-        $select = 'DISTINCT *';
-        $from = "( SELECT s1.*, s5.model, s5.difficulty, s5.discrimination, s5.guessing,
-                    s5.timecreated, s5.timemodified, s5.status
-            FROM (
-            SELECT
-                q.id,
-                lci.componentid,
-                qbe.idnumber as label,
-                qbe.idnumber,
-                q.name,
-                q.questiontext,
-                q.qtype,
-                qc.name as categoryname,
-                lci.catscaleid catscaleid,
-                lci.status testitemstatus,
-                lci.componentname component,
-                lci.id as itemid,
-                lccs.name as catscalename,
-                s2.attempts,
-                COALESCE(s2.lastattempttime,0) as lastattempttime,
-                s3.userattempts,
-                COALESCE(s3.userlastattempttime,0) as userlastattempttime
-            FROM {question} q
+          -- Get all the item parameter for the question for the given context(s), skip if not existent
+            JOIN {local_catquiz_itemparams} AS lcip ON lcip.itemid = lci.id
 
-            JOIN {question_versions} qv
-            ON q.id=qv.questionid
+          -- Get all information about the question from the questionbank itself
+            JOIN {question} AS q ON q.id=lci.componentid
+            JOIN {question_versions} AS qv ON qv.questionid=q.id
+            JOIN {question_bank_entries} AS qbe ON qbe.id=qv.questionbankentryid
+            JOIN {question_categories} AS qc ON qc.id=qbe.questioncategoryid
 
-            LEFT JOIN {question_bank_entries} qbe
-            ON qv.questionbankentryid=qbe.id
-
-            LEFT JOIN {question_categories} qc
-            ON qc.id=qbe.questioncategoryid
-
-            RIGHT JOIN {local_catquiz_items} lci
-            ON lci.componentid=q.id AND lci.componentname='question'
-
-            LEFT JOIN {local_catquiz_catscales} lccs
-            ON lci.catscaleid = lccs.id
-
-            LEFT JOIN (
-                SELECT ccc1.id AS contextid, qa.questionid, COUNT(*) AS attempts, MAX(qas.timecreated) as lastattempttime
-                FROM {local_catquiz_catcontext} ccc1
-
-                JOIN {question_attempt_steps} qas
-                ON ccc1.starttimestamp < qas.timecreated
-                AND ccc1.endtimestamp > qas.timecreated
-                AND qas.fraction IS NOT NULL
-
-                JOIN {question_attempts} qa
-                ON qas.questionattemptid = qa.id
-
-                WHERE ccc1.id = :contextid
-                GROUP BY ccc1.id, qa.questionid
-            ) s2
-            ON q.id = s2.questionid
-
-            LEFT JOIN (
-                SELECT ccc1.id AS contextid,
-                    qa.questionid,
-                    COUNT(*) AS userattempts,
-                    MAX(qas.timecreated) as userlastattempttime
-                FROM {local_catquiz_catcontext} ccc1
-                        JOIN {question_attempt_steps} qas
-                            ON ccc1.starttimestamp < qas.timecreated AND ccc1.endtimestamp > qas.timecreated
-                                AND qas.fraction IS NOT NULL
-
-                        JOIN {question_attempts} qa
-                            ON qas.questionattemptid = qa.id
-                WHERE ccc1.id = :contextid2
-                GROUP BY ccc1.id, qa.questionid
-            ) s3
-            ON q.id = s3.questionid
-
-            ) as s1
-            LEFT JOIN (
-                SELECT
-                    maxlcip.componentid,
-                    maxlcip.componentname,
-                    maxlcip.model,
-                    maxlcip.difficulty,
-                    maxlcip.discrimination,
-                    maxlcip.guessing,
-                    s4.timecreated,
-                    maxlcip.timemodified,
-                    s4.status
-                FROM (
-                    SELECT lcip.*,
-                        ROW_NUMBER() OVER (PARTITION BY componentid,
-                        componentname ORDER BY lcip.status DESC,
-                        lcip.timecreated DESC) AS n
-                    FROM {local_catquiz_itemparams} lcip
-                    WHERE lcip.contextid = :contextid3
-                ) AS s4
-                JOIN {local_catquiz_itemparams} maxlcip
-                ON s4.id = maxlcip.id
-                WHERE n = 1
-            ) AS s5
-            ON s5.componentid = s1.id
-            AND s5.componentname = s1.component
-            $insql
-        ) AS s6";
-
+          -- Get all information about the attempts in the scale(s) and context(s) in general and for specific user(s)
+            LEFT JOIN (SELECT lca.scaleid, lca.contextid, qa.questionid, COUNT(qa.id) AS numberattempts, MAX(qas.timecreated) as lastattempt
+              FROM {local_catquiz_attempts} AS lca
+              JOIN {adaptivequiz_attempt} AS aqa ON lca.attemptid = aqa.id
+              JOIN {question_attempts} AS qa ON qa.questionusageid = aqa.uniqueid
+              JOIN {question_attempt_steps} AS qas ON qas.questionattemptid = qa.id AND qas.fraction IS NOT NULL
+              GROUP BY lca.scaleid, lca.contextid, qa.questionid
+            ) AS astat ON astat.contextid = lcip.contextid AND astat.questionid = q.id AND astat.scaleid $parentscales";
+    
+        if (!empty($userid)) {
+          $from .= "
+            LEFT JOIN (SELECT lca.scaleid, lca.contextid, qa.questionid, lca.userid, COUNT(qa.id) AS numberattempts, MAX(qas.timecreated) as lastattempt
+              FROM {local_catquiz_attempts} AS lca
+              JOIN {adaptivequiz_attempt} AS aqa ON lca.attemptid = aqa.id
+              JOIN {question_attempts} AS qa ON qa.questionusageid = aqa.uniqueid
+              JOIN {question_attempt_steps} AS qas ON qas.questionattemptid = qa.id AND qas.fraction IS NOT NULL
+              GROUP BY lca.scaleid, lca.contextid, qa.questionusageid, lca.userid
+            ) AS ustat ON ustat.contextid = lcip.contextid AND ustat.questionid = q.id AND ustat.scaleid $parentscales";
+        }
+        else {
+          $from .= "
+            LEFT JOIN (SELECT NULL AS userid, NULL AS numberattempts, NULL AS lastattempt) as ustat ON 1=1";
+        }
+              
         $where = '1=1';
 
         $filter = '';
@@ -340,7 +290,7 @@ class catquiz {
 
         return [$select, $from, $where, $filter, $params];
     }
-
+    
     /**
      * Returns the sql to get all the questions wanted.
      *
