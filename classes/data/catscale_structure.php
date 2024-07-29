@@ -88,11 +88,11 @@ class catscale_structure {
             $this->name = $data['name'];
             $this->description = $data['description'] ?? '';
 
-            if ($data['parentid'] == 0) {
+            if (array_key_exists('parentid', $data) && $data['parentid'] == 0) {
                 $this->minscalevalue = isset($data["minscalevalue"]) ?
                     $data["minscalevalue"] : LOCAL_CATQUIZ_PERSONABILITY_LOWER_LIMIT;
             }
-            if ($data['parentid'] == 0) {
+            if (array_key_exists('parentid', $data) && $data['parentid'] == 0) {
                 $this->maxscalevalue = isset($data["maxscalevalue"]) ?
                     $data["maxscalevalue"] : LOCAL_CATQUIZ_PERSONABILITY_UPPER_LIMIT;
             }
