@@ -310,24 +310,24 @@ class catquiz {
         array $wherearray = []
     ) {
         global $DB;
+        
+        // TODO @DAVID: Re-Construct the SQL-Statemente as this contains all problematic patterns that has been fixed above as well
+      
         $contextfilter = $contextid === 0
             ? $DB->sql_like('ccc1.json', ':default')
             : "ccc1.id = :contextid";
 
         list(, $contextfrom, , ) = self::get_sql_for_stat_base_request();
         $params = [];
-        $select = '
-            DISTINCT
-                id,
+        $select = "id,
                 idnumber,
                 name,
                 questiontext,
                 qtype,
                 categoryname,
-                \'question\' as component,
+                question as component,
                 contextattempts as questioncontextattempts,
-                catscaleids
-            ';
+                catscaleids";
         $from = "( SELECT q.id, qbe.idnumber, q.name, q.questiontext, q.qtype, qc.name as categoryname, s2.contextattempts," .
              $DB->sql_group_concat($DB->sql_concat("'-'", 'lci.catscaleid', "'-'")) ." as catscaleids
             FROM {question} q
@@ -708,31 +708,35 @@ class catquiz {
      * @return array
      *
      */
-    private static function get_sql_for_stat_base_request(
+private static function get_sql_for_stat_base_request(
         array $testitemids = [],
         array $contextids = [],
-        array $studentids = []
+        array $studentids = [],
+        int $starttime = NULL,
+        int $endtime = NULL
     ): array {
+              
         global $DB;
         [$unfinishedstatessql, $unfinishedstatesparams] = $DB->get_in_or_equal(
             self::get_unfinished_question_states(),
             SQL_PARAMS_NAMED,
             'unfinishedstates'
         );
-
-        $select = '*';
-        $from = "{local_catquiz_catcontext} ccc1
-                JOIN {question_attempt_steps} qas
-                    ON ccc1.starttimestamp < qas.timecreated
-                    AND ccc1.endtimestamp > qas.timecreated
-                    AND qas.state NOT $unfinishedstatessql
-
-                JOIN {question_attempts} qa
-                    ON qas.questionattemptid = qa.id";
-        ;
-        $where = !empty($testitemids) ? 'qa.questionid IN (:testitemids)' : '1=1';
-        $where .= !empty($contextids) ? ' AND ccc1.id IN (:contextids)' : '';
-        $where .= !empty($studentids) ? ' AND userid IN (:studentids)' : '';
+        
+        $select = "ccc.*, COUNT(DISTINCT qas.id) AS attempts";
+        
+        $from = "{local_catquiz_catcontext} AS ccc
+          LEFT JOIN {local_catquiz_attempts} as lca ON ccc.id = lca.contextid
+          LEFT JOIN {adaptivequiz_attempt} AS aqa ON lca.attemptid = aqa.id
+          LEFT JOIN {question_attempts} AS qa ON qa.questionusageid = aqa.uniqueid
+          LEFT JOIN {question_attempt_steps} AS qas ON qas.questionattemptid = qa.id AND NOT $unfinishedstatessql";
+          
+        $where = !empty($testitemids) ? "qa.questionid IN (:testitemids)" : '1=1'; // @DAVID: Kein get_in_or_equal?
+        $where .= !empty($contextids) ? ' AND ccc.id IN (:contextids)' : '';
+        $where .= !empty($studentids) ? ' AND aqa.userid IN (:studentids)' : '';
+        $where .= !empty($starttime) ? ' AND :starttime <= qas.timecreated' : '';
+        $where .= !empty($endtime) ? ' AND :endtime >= qas.timecreated' : '';
+        $where .= "GROUP BY ccc.id";
 
         $testitemidstring = sprintf("%s", implode(',', $testitemids));
         $contextidstring = sprintf("%s", implode(',', $contextids));
@@ -741,7 +745,8 @@ class catquiz {
         $params = self::set_optional_param([], 'testitemids', $testitemids, $testitemidstring);
         $params = self::set_optional_param($params, 'contextids', $contextids, $contextidstring);
         $params = self::set_optional_param($params, 'studentids', $studentids, $studentidstring);
-        $params = array_merge($params, $unfinishedstatesparams);
+        $params = self::set_optional_param($params, 'starttime', $starttime, $starttime);
+        $params = self::set_optional_param($params, 'endtime', $endtime, $endtime);
 
         return [$select, $from, $where, $params];
     }
@@ -779,6 +784,45 @@ class catquiz {
         global $DB;
         $params = [];
         $filter = '';
+
+        // TODO: SQL vereinfachen!
+        // @DAVID: Werden die ehemaogen Angaben noch gebraucht?
+/*
+$select = "
+            c.id,
+            name,
+            component,
+            c.visible,
+            availability,
+            c.lang,
+            status,
+            parentid,
+            fullname,
+            c.timemodified,
+            c.timecreated,
+            ct.catscaleid,
+            numberofitems,
+            teachers";
+
+        $from = "
+        {local_catquiz_tests} ct
+        JOIN {course} c ON c.id = ct.courseid
+        LEFT JOIN (SELECT catscaleid as itemcatscale, COUNT(*) AS numberofitems
+           FROM {local_catquiz_items}
+           GROUP BY catscaleid
+        ) s1 ON ct.catscaleid = s1.itemcatscale
+        LEFT JOIN (
+            SELECT c.id AS courseid, " .
+                $DB->sql_group_concat($DB->sql_concat_join("' '", ['u.firstname', 'u.lastname']), ', ') . " AS teachers
+            FROM {user} u
+            JOIN {role_assignments} ra ON ra.userid = u.id
+            JOIN {context} ct ON ct.id = ra.contextid
+            JOIN {course} c ON c.id = ct.instanceid
+            JOIN {role} r ON r.id = ra.roleid
+            WHERE r.shortname IN ('teacher', 'editingteacher')
+            GROUP BY c.id
+            ) s2 ON s2.courseid = ct.courseid";
+*/
 
         $select = " * ";
 
@@ -833,13 +877,7 @@ class catquiz {
         $params = [];
         $filter = '';
 
-        $select = "
-            *
-        ";
-
-        $from = "(
-            SELECT
-                lca.id AS id,
+        $select = "lca.id AS id,
                 lca.attemptid as attemptid,
                 lca.timecreated AS timecreated,
                 lca.timemodified AS timemodified,
@@ -856,15 +894,14 @@ class catquiz {
                 lca.personability_before_attempt,
                 lca.personability_after_attempt,
                 lca.starttime,
-                lca.endtime
-                FROM {local_catquiz_attempts} lca
+                lca.endtime";
+
+        $from = "{local_catquiz_attempts} lca
                 JOIN {user} u ON lca.userid = u.id
                 JOIN {local_catquiz_catscales} lcc ON lca.scaleid = lcc.id
                 JOIN {local_catquiz_catcontext} lccc ON lca.contextid = lccc.id
                 JOIN {course} c ON lca.courseid = c.id
-                JOIN {local_catquiz_tests} lct ON lca.instanceid = lct.componentid
-            ) as s1
-        ";
+                JOIN {local_catquiz_tests} lct ON lca.instanceid = lct.componentid";
 
         return [$select, $from, "1=1", $filter, $params];
     }
@@ -951,6 +988,10 @@ class catquiz {
     public static function return_sql_for_catcontexts(
         array $filterarray = []) {
 
+        // TODO: That way of determine the catcontext by the timestamp of an attempt_step is unreliable and will deliver also ANY attempt made outside catquiz as well (eg. the "standard"-adaptivequiz oder moodle quiz). It should be fixed ASAP by a proper way via the catquiz_attempt table
+        
+        // @DAVID: Was ist der Unterschied zu get_sql_for_stat_base_request, aber ohne Parameter? Wofür erwartet die Funktion Parameter, wenn diese nicht verwendet werden?
+       
         $params = [];
         $where = [];
         $filter = '';
