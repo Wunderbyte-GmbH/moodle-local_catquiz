@@ -18,7 +18,7 @@
  * catquiz catscales view page
  * @package    local_catquiz
  * @copyright  2024 Wunderbyte GmbH
- * @author     David Bogner
+ * @author     David Bogner, et al.
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 

@@ -2094,11 +2094,11 @@ class catquiz {
         $quizdata = json_decode($attemptrecord->json);
         $correctanswersperscale = [];
         foreach ($catscaleids as $catscaleid) {
-            if (!isset($quizdata->progress->playedquestionsbyscale->$catscaleid)) {
+            if (!isset($quizdata->playedquestionsbyscale->$catscaleid)) {
                 continue;
             }
             $correct = 0;
-            $questionsperscale = $quizdata->progress->playedquestionsbyscale->$catscaleid;
+            $questionsperscale = $quizdata->playedquestionsbyscale->$catscaleid;
             if (empty($questionsperscale)) {
                 continue;
             }
