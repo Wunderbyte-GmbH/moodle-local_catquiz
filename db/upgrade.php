@@ -530,10 +530,11 @@ function xmldb_local_catquiz_upgrade($oldversion) {
         }
 
         // Make sure the database has updated the itemid in the catquiz_itemparams table.
-        $sql = "UPDATE {local_catquiz_itemparams}
-                SET itemid = (SELECT id 
-                  FROM {local_catquiz_items} lci 
-                  WHERE lci.componentid = componentid LIMIT 1);";
+        $sql = "
+          UPDATE {local_catquiz_itemparams}
+            SET itemid = (SELECT id
+              FROM {local_catquiz_items} lci
+              WHERE lci.componentid = componentid LIMIT 1);";
         $update = $DB->execute($sql, []);
 
         // Catquiz savepoint reached.
