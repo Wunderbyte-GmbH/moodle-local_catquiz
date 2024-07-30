@@ -538,5 +538,39 @@ function xmldb_local_catquiz_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2024072901, 'local', 'catquiz');
     }
 
+    if ($oldversion < 2024073000) {
+
+        // Define index local_catquiz_items-catscaleid (not unique) to be added to local_catquiz_items.
+        $table = new xmldb_table('local_catquiz_items');
+        $index = new xmldb_index('local_catquiz_items-catscaleid', XMLDB_INDEX_NOTUNIQUE, ['catscaleid']);
+
+        // Conditionally launch add index local_catquiz_items-catscaleid.
+        if (!$dbman->index_exists($table, $index)) {
+            $dbman->add_index($table, $index);
+        }
+
+        // Catquiz savepoint reached.
+        upgrade_plugin_savepoint(true, 2024073000, 'local', 'catquiz');
+    }
+
+    if ($oldversion < 2024073001) {
+
+        // Define index local_catquiz_items-componentid-componentname (not unique) to be added to local_catquiz_items.
+        $table = new xmldb_table('local_catquiz_items');
+        $index = new xmldb_index(
+            'local_catquiz_items-componentid-componentname',
+            XMLDB_INDEX_NOTUNIQUE,
+            ['componentid', 'componentname']
+        );
+
+        // Conditionally launch add index local_catquiz_items-componentid-componentname.
+        if (!$dbman->index_exists($table, $index)) {
+            $dbman->add_index($table, $index);
+        }
+
+        // Catquiz savepoint reached.
+        upgrade_plugin_savepoint(true, 2024073001, 'local', 'catquiz');
+    }
+
     return true;
 }

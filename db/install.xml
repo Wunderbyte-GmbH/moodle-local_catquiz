@@ -46,6 +46,10 @@
       <KEYS>
         <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
       </KEYS>
+      <INDEXES>
+        <INDEX NAME="local_catquiz_items-catscaleid" UNIQUE="false" FIELDS="catscaleid"/>
+        <INDEX NAME="local_catquiz_items-componentid-componentname" UNIQUE="false" FIELDS="componentid, componentname"/>
+      </INDEXES>
     </TABLE>
     <TABLE NAME="local_catquiz_subscriptions" COMMENT="Handle subscriptions to different data records in catquiz">
       <FIELDS>
