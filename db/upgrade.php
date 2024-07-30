@@ -43,24 +43,6 @@ function xmldb_local_catquiz_upgrade($oldversion) {
     // You will also have to create the db/install.xml file by using the XMLDB Editor.
     // Documentation for the XMLDB Editor can be found at {@link https://docs.moodle.org/dev/XMLDB_editor}.
 
-    if ($oldversion < 2024072000) {
-        // Define field itemid to be added to local_catquiz_itemparams.
-        $table = new xmldb_table('local_catquiz_itemparams');
-
-        $field = new xmldb_field('itemid', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null, 0);
-        // Conditionally launch add fields min scale value.
-        if (!$dbman->field_exists($table, $field)) {
-            $dbman->add_field($table, $field);
-        }
-        
-        // Make sure the database has updated the itemid in the catquiz_itemparams table
-        $sql = "UPDATE {local_catquiz_itemparams} SET itemid = (SELECT id FROM {local_catquiz_items} AS lci WHERE lci.componentid = componentid LIMIT 1);";
-        $update = $DB->execute($sql, []);
-
-        // Catquiz savepoint reached.
-        upgrade_plugin_savepoint(true, 2024072000, 'local', 'catquiz');
-    }
-    
     if ($oldversion < 2023012504) {
 
         // Define field min / max scalevalue to be added to local_catquiz_catscales.
@@ -535,6 +517,27 @@ function xmldb_local_catquiz_upgrade($oldversion) {
 
         // Catquiz savepoint reached.
         upgrade_plugin_savepoint(true, 2024051401, 'local', 'catquiz');
+    }
+
+    if ($oldversion < 2024072000) {
+        // Define field itemid to be added to local_catquiz_itemparams.
+        $table = new xmldb_table('local_catquiz_itemparams');
+
+        $field = new xmldb_field('itemid', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null, 0);
+        // Conditionally launch add fields min scale value.
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        // Make sure the database has updated the itemid in the catquiz_itemparams table.
+        $sql = "UPDATE {local_catquiz_itemparams}
+                SET itemid = (SELECT id 
+                  FROM {local_catquiz_items} lci 
+                  WHERE lci.componentid = componentid LIMIT 1);";
+        $update = $DB->execute($sql, []);
+
+        // Catquiz savepoint reached.
+        upgrade_plugin_savepoint(true, 2024072000, 'local', 'catquiz');
     }
 
     return true;
