@@ -272,7 +272,8 @@ class model_item_param_list implements ArrayAccess, IteratorAggregate, Countable
             function ($param) use ($contextid) {
                 $record = [
                     'componentid' => $param->get_id(),
-                    'itemid' => 1, // TODO: Find the id of the item in local_catquiz_items
+                    'itemid' => 1, 
+                    // TODO: Find the id of the item in local_catquiz_items.
                     'componentname' => 'question',
                     'model' => $param->get_model_name(),
                     'contextid' => $contextid,
