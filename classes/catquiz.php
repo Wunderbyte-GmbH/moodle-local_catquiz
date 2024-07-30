@@ -338,7 +338,7 @@ class catquiz {
                 ON q.id=qv.questionid
                 JOIN {question_bank_entries} qbe ON qv.questionbankentryid=qbe.id
                 JOIN {question_categories} qc ON qc.id=qbe.questioncategoryid
-                LEFT JOIN {local_catquiz_items} lci ON lci.componentid=q.id AND lci.componentname='question'
+                LEFT JOIN {local_catquiz_items} lci ON lci.componentid = q.id AND lci.componentname='question'
                 LEFT JOIN (
                     SELECT ccc1.id contextid, qa.questionid, COUNT(*) contextattempts
                     FROM $contextfrom

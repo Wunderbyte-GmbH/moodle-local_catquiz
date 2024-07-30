@@ -272,7 +272,7 @@ class model_item_param_list implements ArrayAccess, IteratorAggregate, Countable
             function ($param) use ($contextid) {
                 $record = [
                     'componentid' => $param->get_id(),
-                    'itemid' => 1, 
+                    'itemid' => 1,
                     // TODO: Find the id of the item in local_catquiz_items.
                     'componentname' => 'question',
                     'model' => $param->get_model_name(),
@@ -358,8 +358,11 @@ class model_item_param_list implements ArrayAccess, IteratorAggregate, Countable
             JOIN {question_versions} qv
             ON qbe.id = qv.questionbankentryid
 
+            JOIN {question} q
+            ON qv.questionid = q.id
+
             LEFT JOIN {local_catquiz_items} lci
-            ON lci.componentid=qv.questionid
+            ON lci.componentid = q.id
 
             WHERE qbe.idnumber LIKE :label
             GROUP BY qv.questionid, qv.questionbankentryid";
