@@ -807,6 +807,8 @@ class catquiz {
             parentid,
             fullname,
             c.timemodified,
+            */
+            /* And it continues.
             c.timecreated,
             ct.catscaleid,
             numberofitems,
@@ -817,16 +819,22 @@ class catquiz {
         JOIN {course} c ON c.id = ct.courseid
         LEFT JOIN (SELECT catscaleid as itemcatscale, COUNT(*) numberofitems
            FROM {local_catquiz_items}
+           */
+            /* And it continues.
            GROUP BY catscaleid
         ) s1 ON ct.catscaleid = s1.itemcatscale
         LEFT JOIN (
             SELECT c.id courseid, " .
+            */
+            /* And it continues.
                 $DB->sql_group_concat($DB->sql_concat_join("' '", ['u.firstname', 'u.lastname']), ', ') . " teachers
             FROM {user} u
             JOIN {role_assignments} ra ON ra.userid = u.id
             JOIN {context} ct ON ct.id = ra.contextid
             JOIN {course} c ON c.id = ct.instanceid
             JOIN {role} r ON r.id = ra.roleid
+            */
+            /* And it continues.
             WHERE r.shortname IN ('teacher', 'editingteacher')
             GROUP BY c.id
             ) s2 ON s2.courseid = ct.courseid";
