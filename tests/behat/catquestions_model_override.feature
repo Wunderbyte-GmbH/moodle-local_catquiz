@@ -55,7 +55,6 @@ Feature: As an admin I perfrom model settings customizations over an imported of
     And I set the field "2PL Rasch-Birnbaum model" to "Calculated"
     And the "override_raschbirnbaum[override_raschbirnbaum_difficulty]" "field" should be disabled
     And the "override_raschbirnbaum[override_raschbirnbaum_discrimination]" "field" should be disabled
-    ## And I wait "31" seconds
     And I click on "Save changes" "button" in the "#lcq_model_override_form" "css_element"
     And I reload the page
     And I wait "1" seconds
@@ -80,4 +79,3 @@ Feature: As an admin I perfrom model settings customizations over an imported of
     And I reload the page
     And I should see "Manually confirmed" in the ".tab-model-status" "css_element"
     And I should see "3PL mixed Rasch-Birnbaum model" in the ".tab-model-status" "css_element"
-    ## And I wait "31" seconds
