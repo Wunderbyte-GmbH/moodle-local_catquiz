@@ -278,6 +278,9 @@ class catcontext {
         // Check: use only most recent answer for each question.
 
         foreach ($data as $row) {
+            if ($row->state === 'gaveup') {
+                $row->fraction = 0.0;
+            }
             $entry = [
                 'fraction' => $row->fraction,
                 'max_fraction' => $row->maxfraction,
