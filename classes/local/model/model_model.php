@@ -76,7 +76,7 @@ abstract class model_model {
      * @return model_item_param
      */
     protected function create_item_param(int $itemid, array $metadata = []): model_item_param {
-        return new model_item_param($itemid, $this->modelname, $metadata);
+        return new model_item_param($itemid, $this->get_model_name(), $metadata);
     }
 
     /**
