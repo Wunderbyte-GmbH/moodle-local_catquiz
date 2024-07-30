@@ -29,6 +29,7 @@ use dml_exception;
 use local_catquiz\event\usertocourse_enroled;
 use local_catquiz\event\usertogroup_enroled;
 use local_catquiz\local\status;
+use local_catquiz\teststrategy\progress;
 use moodle_exception;
 use moodle_url;
 use question_attempt;
@@ -2154,12 +2155,14 @@ $select = "
     public static function get_percentage_of_right_answers_by_scale(array $catscaleids, stdClass $attemptrecord): array {
         $quizdata = json_decode($attemptrecord->json);
         $correctanswersperscale = [];
+        $progress = progress::load($attemptrecord->attemptid, 'mod_adaptivequiz', $quizdata->contextid);
         foreach ($catscaleids as $catscaleid) {
-            if (!isset($quizdata->playedquestionsbyscale->$catscaleid)) {
+            $questionsperscale = $progress->get_playedquestions(true, $catscaleid);
+            if (!$questionsperscale) {
                 continue;
             }
             $correct = 0;
-            $questionsperscale = $quizdata->playedquestionsbyscale->$catscaleid;
+
             if (empty($questionsperscale)) {
                 continue;
             }
@@ -2168,12 +2171,12 @@ $select = "
             foreach ($questionsperscale as $question) {
                 $playedqids[] = $question->componentid;
             }
-            $responses = $quizdata->progress->responses;
+            $responses = $progress->get_responses();
             foreach ($responses as $componentid => $data) {
                 if (!in_array($componentid, $playedqids)) {
                     continue;
                 }
-                if ($data->fraction == 1) {
+                if ($data['fraction'] == 1) {
                     $correct ++;
                 }
             }

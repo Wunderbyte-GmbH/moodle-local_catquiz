@@ -36,16 +36,16 @@ $string['subplugintype_catmodel_plural'] = 'CAT Modelle';
 // Catquiz handler.
 $string['catscale'] = 'Skala';
 $string['catquizsettings'] = 'Test-Inhalt und Einsatz-Kontext';
-$string['selectmodel'] = 'Wähle ein Modell';
+$string['selectmodel'] = 'Wähle Modell';
 $string['model'] = 'Modell';
 $string['modeldeactivated'] = 'Deaktiviere CAT engine';
 $string['usecatquiz'] = 'Verwende die Catquiz Engine für dieses Quiz.';
 $string['catscales'] = 'CAT quiz Dimensionen verwalten';
 $string['catscales:information'] = 'Verwalte CAT Test Skalen: {$a->link}';
 $string['cattags'] = 'Kurs Tags verwalten';
-$string['cattags:information'] = 'Diese Tags kennzeichnen Kurse, zu denen Lehrende Studierende einschreiben können, unabhängig davon, ob sie Teil des Kurses sind.';
+$string['cattags:information'] = 'Diese Tags kennzeichnen Kurse, zu denen Nutzende einschreiben können, unabhängig davon, ob sie Teil des Kurses sind.';
 $string['choosetags'] = 'Tag(s) auswählen';
-$string['choosetags:disclaimer'] = 'Mehrfachauswahl mit "⌘ command" (Apple) oder "Ctrl" (Windows, Linux)';
+$string['choosetags:disclaimer'] = 'Mehrfachauswahl mit „⌘ command“ (Apple) oder „Ctrl“ (Windows, Linux)';
 $string['catscalesname_exists'] = 'Der Name wird bereits verwendet';
 $string['cachedef_catscales'] = 'Speichert (Cache) die Skalen von catquiz';
 $string['catcatscales'] = 'Auswahl untergeordnete Skalen';
@@ -56,9 +56,9 @@ $string['createnewcatscale'] = 'Neue Skala erstellen';
 $string['parent'] = 'Übergeordnete Skala - keine Auswahl falls Top-Level Skala';
 $string['managecatscale'] = 'Skalen verwalten';
 $string['managetestenvironments'] = 'Testumgebungen verwalten';
-$string['showlistofcatscalemanagers'] = "Catscale Managers";
-$string['addcategory'] = "Kategorie hinzufügen";
-$string['documentation'] = "Dokumentation";
+$string['showlistofcatscalemanagers'] = 'Catscale Managers';
+$string['addcategory'] = 'Kategorie hinzufügen';
+$string['documentation'] = 'Dokumentation';
 $string['createcatscale'] = 'Erstellen Sie eine Skala';
 $string['cannotdeletescalewithchildren'] = 'Skalen mit Unterskalen können nicht gelöscht werden.';
 $string['passinglevel'] = 'Bestehensgrenze in %';
@@ -97,19 +97,19 @@ $string['choosecontextid'] = 'Einsatz-Kontext auswählen';
 $string['defaultcontext'] = 'Neuer Standard Einsatz-Kontext für Skala';
 $string['moveitemtootherscale'] = 'Testitem(s) {$a} sind bereits einer anderen Skala des selben Baumes zugeordnet. Zuordnung ändern?';
 $string['pleasecheckorcancel'] = 'Bitte bestätigen oder abbrechen';
-$string['progress'] = 'Entwicklung Fähigkeitswert in {$a}';
+$string['progress'] = 'Entwicklung Fähigkeits-Wert in {$a}';
 $string['learningprogress_title'] = 'Ihr Lernfortschritt';
-$string['learningprogress_description'] = 'Wie hat sich Ihr Fähigkeitswert über
+$string['learningprogress_description'] = 'Wie hat sich Ihr Fähigkeits-Wert über
     die letzten Versuche hin entwickelt? Haben Sie sich verbessert?<br/> Die
     folgende Grafik zeigt Ihnen die Entwicklung Ihres (allgemeinen)
-    Fähigkeitswertes in {$a} im Vergleich zum Durchschnittswert aller
+    Fähigkeits-Wertes in {$a} im Vergleich zum Durchschnittswert aller
     Testversuche:';
-$string['graphicalsummary_description'] = 'Während des Verlaufs des Testversuchs wird Ihrer Fähigkeitswert mit jeder Antwort neu
+$string['graphicalsummary_description'] = 'Während des Verlaufs des Testversuchs wird Ihrer Fähigkeits-Wert mit jeder Antwort neu
 berechnet und aktualisiert. Die folgende Grafik zeigt Ihnen, wie sich die Einschätzung
-Ihres Fähigkeitswertes in {$a} über den Verlauf des Testversuchs hinweg
+Ihres Fähigkeits-Wertes in {$a} über den Verlauf des Testversuchs hinweg
 verändert hat.';
 $string['graphicalsummary_description_lowest'] = 'Zusätzlich ist auch die
-    Entwicklung Ihres Fähigkeitswertes bezüglich der als Defizit
+    Entwicklung Ihres Fähigkeits-Wertes bezüglich der als Defizit
     identifizierten Skala {$a} dargestellt:';
 $string['debuginfo_desc_title'] = 'Export des Testversuchs Nr. {$a}';
 $string['debuginfo_desc'] = 'Hier können Sie als Nutzer mit Berechtigung zum Download eines Exports den Versuchsverlauf als CSV-Datei exportieren.';
@@ -208,7 +208,7 @@ $string['parentid'] = 'Übergeordnete ID';
 $string['force'] = 'Erzwinge Werte';
 $string['catscaleid'] = 'Skala ID';
 $string['numberofquestions'] = '# Fragen';
-$string['numberofusers'] = '# Studierende';
+$string['numberofusers'] = '# Nutzende';
 $string['type'] = 'Typ';
 $string['testtype'] = 'Test';
 $string['templatetype'] = 'Template';
@@ -258,7 +258,7 @@ $string['activitystatussetactive'] = 'Die Frage ist jetzt aktiviert.';
 $string['testitemstatus_updated'] = 'Status der Frage aktualisiert.';
 $string['testitem_status_updated_description'] = 'Der neue Status der {$a->testitemlink} ist nun: {$a->statusstring}';
 $string['catscale_created'] = 'Skala erzeugt';
-$string['create_catscale_description'] = 'Skala "{$a->catscalelink}" mit der ID {$a->objectid} erzeugt.';
+$string['create_catscale_description'] = 'Skala „{$a->catscalelink}“ mit der ID {$a->objectid} erzeugt.';
 $string['context_updated'] = 'Einsatz-Kontext aktualisiert';
 $string['update_context_description'] = 'Einsatz-Kontext {$a} aktualisiert.';
 $string['context_created'] = 'Einsatz-Kontext erzeugt';
@@ -267,14 +267,14 @@ $string['logsafter'] = 'Einträge vor';
 $string['logsbefore'] = 'Einträge nach';
 $string['calculation_executed'] = 'Berechnung durchgeführt.';
 $string['executed_calculation_description'] =
-    'Es wurde eine Berechnung der Skala {$a->catscalename} mit der ID {$a->catscaleid} im Kontext {$a->contextid} durchgeführt von {$a->user}. In folgenden Modellen wurden Fragen neu berechnet: {$a->updatedmodels}';
+    'Es wurde eine Berechnung der Skala „{$a->catscalename}“ mit der ID {$a->catscaleid} im Kontext {$a->contextid} durchgeführt von {$a->user}. In folgenden Modellen wurden Fragen neu berechnet: {$a->updatedmodels}';
 $string['automaticallygeneratedbycron'] = 'Cron Job (automatisch durchgeführt)';
 $string['deletedcatscale'] = 'Skala die nicht mehr exisitiert';
 $string['attempt_completed'] = 'Testversuch abgeschlossen';
 $string['usertocourse_enroled'] = 'NutzerIn in Kurs eingeschrieben';
 $string['usertogroup_enroled'] = 'NutzerIn in Gruppe eingeschrieben';
-$string['usertocourse_enroled_description'] = 'NutzerIn mit ID {$a->userid} wurde in folgenden Kurs eingeschrieben: <a href="{$a->courseurl}">{$a->coursename}</a>';
-$string['usertogroup_enroled_description'] = 'NutzerIn mit ID {$a->userid} wurde in die Gruppe {$a->groupname} in diesem Kurs eingeschrieben: <a href="{$a->courseurl}">{$a->coursename}</a>';
+$string['usertocourse_enroled_description'] = 'NutzerIn mit ID {$a->userid} wurde in folgenden Kurs eingeschrieben: „<a href="{$a->courseurl}">{$a->coursename}</a>“';
+$string['usertogroup_enroled_description'] = 'NutzerIn mit ID {$a->userid} wurde in die Gruppe {$a->groupname} in diesem Kurs eingeschrieben: „<a href="{$a->courseurl}">{$a->coursename}</a>“';
 $string['complete_attempt_description'] = 'Testversuch mit ID {$a->attemptid} in Skala {$a->catscalelink} durchgeführt von User {$a->userid}.';
 $string['eventtime'] = 'Zeitpunkt des Ereignisses';
 $string['eventname'] = 'Name des Ereignisses';
@@ -283,19 +283,19 @@ $string['imported_testitem_description'] = 'Es wurden {$a} Frage(n) importiert.'
 $string['testitem_deleted'] = 'Frage gelöscht';
 $string['testitem_deleted_description'] = 'Es wurde die Frage mit ID {$a->testitemid} gelöscht.';
 $string['feedback_tab_clicked'] = 'Klick auf Feedback Tab';
-$string['feedback_tab_clicked_description'] = 'User {$a->userid} hat auf feedback {$a->feedback_translated} in {$a->attemptlink} geklickt';
+$string['feedback_tab_clicked_description'] = 'Nutzer {$a->userid} hat auf Feedback {$a->feedback_translated} in {$a->attemptlink} geklickt';
 
 // Message.
 $string['messageprovider:catscaleupdate'] = 'Benachrichtung über eine Aktualisierung einer Skala.';
 $string['messageprovider:updatecatscale'] = 'Benachrichtung über eine Aktualisierung einer Skala.';
 $string['catscaleupdatedtitle'] = 'Eine Skala wurde aktualisiert';
 $string['messageprovider:updatecatscale'] = 'Erhält Benachrichtungung über Einschreibung in Skala';
-$string['onegroupenroled'] = 'Sie sind auf Grundlage Ihres Ergebnisses in "{$a->catscalename}" nun Mitglied der Gruppe "{$a->groupname}" im Kurs <a href="{$a->courseurl}">{$a->coursename}</a>.';
-$string['onecourseenroled'] = 'Sie wurden auf Grundlage Ihres Ergebnisses in "{$a->catscalename}" in den Kurs <a href="{$a->courseurl}">{$a->coursename}</a> eingeschrieben.';
-$string['messageprovider:enrolmentfeedback'] = "Automatische Einschreibung zu Kursen und Gruppen.";
-$string['enrolmentmessagetitle'] = "Benachrichtigung über neue Kurseinschreibung(en) / Gruppenmitgliedschaft(en)";
-$string['groupenrolementstring'] = '{$a->groupname} in Kurs <a href={$a->courseurl}>{$a->coursename}</a>';
-$string['enrolementstringstart'] = 'Auf Grundlage Ihres Ergebnisses im Test {$a->testname} im Kurs {$a->coursename} sind Sie fortan...';
+$string['onegroupenroled'] = 'Sie sind auf Grundlage Ihres Ergebnisses in „{$a->catscalename}“ nun Mitglied der Gruppe „{$a->groupname}“ im Kurs „<a href="{$a->courseurl}">{$a->coursename}</a>“.';
+$string['onecourseenroled'] = 'Sie wurden auf Grundlage Ihres Ergebnisses in „{$a->catscalename}“ in den Kurs „<a href="{$a->courseurl}">{$a->coursename}</a>“ eingeschrieben.';
+$string['messageprovider:enrolmentfeedback'] = 'Automatische Einschreibung zu Kursen und Gruppen.';
+$string['enrolmentmessagetitle'] = 'Benachrichtigung über neue Kurseinschreibung(en) / Gruppenmitgliedschaft(en)';
+$string['groupenrolementstring'] = '„{$a->groupname}“ in Kurs <a href={$a->courseurl}>{$a->coursename}</a>“';
+$string['enrolementstringstart'] = 'Auf Grundlage Ihres Ergebnisses im Test „{$a->testname}“ im Kurs „{$a->coursename}“ sind Sie fortan...';
 $string['followingcourses'] = 'eingeschrieben in folgenden Kurs bzw. folgende Kurse:<br>';
 $string['followinggroups'] = 'Mitglied in folgender Gruppe bzw. folgenden Gruppen:<br>';
 $string['enrolementstringstartforfeedback'] = 'Auf Grundlage Ihres Ergebnisses sind Sie fortan...<br>';
@@ -340,14 +340,14 @@ $string['removetestitem'] = 'Testitems entfernen';
 $string['testitems'] = 'Testitems';
 $string['questioncontextattempts'] = '# Testversuche im ausgewählten Einsatz-Kontext';
 
-$string['studentstats'] = 'Studierende';
+$string['studentstats'] = 'Nutzende';
 $string['notyetcalculated'] = 'Noch nicht berechnet';
 $string['notyetattempted'] = 'Ohne Versuch';
 
 // Email Templates.
 $string['notificationcatscalechange'] = 'Hallo {$a->firstname} {$a->lastname},
 Skalen wurden verändert auf der Moolde Plattform {$a->instancename}.
-Dieses e-Mail informiert Sie als CAT Manager* verantwortlich für dieses Skala. {$a->editorname} hat die folgenden Änderungen an der Skala "{$a->catscalename}" vorgenommen.":
+Dieses e-Mail informiert Sie als CAT Manager*in, verantwortlich für dieses Skala. {$a->editorname} hat die folgenden Änderungen an der Skala „{$a->catscalename}“ vorgenommen.:
     {$a->changedescription}
 Sie können den aktuellen Stand hier überprüfen. {$a->linkonscale}';
 
@@ -355,23 +355,23 @@ Sie können den aktuellen Stand hier überprüfen. {$a->linkonscale}';
 $string['statistics'] = "Statistik";
 $string['models'] = "Modelle";
 $string['previewquestion'] = "Fragen Vorschau";
-$string['personability'] = "Fähigkeits-Score";
-$string['personabilities'] = "Fähigkeits-Scores";
+$string['personability'] = "Fähigkeits-Wert";
+$string['personabilities'] = "Fähigkeits-Werte";
 $string['personabilitytitletab'] = "Ergebnis-Details";
 $string['feedback_details_heading'] = "Details zu Ihrem Ergebnis";
 $string['feedback_details_description'] = 'Die folgende Tabelle listet alle
-    Aspekte (Skalen) von {$a} auf, für die der Test ein verlässliches Ergebnis
+    Aspekte (Skalen) von „{$a}“ auf, für die der Test ein valides Ergebnis
     ermitteln konnte';
-$string['feedback_details_lowestskill'] = 'Die Skala {$a->name} wurde mit einem
-    persönlichen Fähigkeitswert {$a->value} (± {$a->se}) als Ihr größtes
+$string['feedback_details_lowestskill'] = 'Die Skala „<b>{$a->name}</b>“ wurde mit einem
+    persönlichen Fähigkeits-Wert {$a->value} (± {$a->se}) als Ihr größtes
     Defizit ermittelt.';
 $string['learningprogresstitle'] = "Lernfortschritt";
-$string['personabilitiesnodata'] = "Es konnte kein Fähigkeits-Score errechnet werden";
-$string['itemdifficulties'] = "Item difficulties";
-$string['itemdifficultiesnodata'] = "Es konnte keine Schwierigkeit berechnet werden.";
+$string['personabilitiesnodata'] = "Es konnte kein Fähigkeits-Wert errechnet werden";
+$string['itemdifficulties'] = "Frage-Schwierigkeiten";
+$string['itemdifficultiesnodata'] = "Es konnte keine Frage-Schwierigkeit berechnet werden.";
 $string['somethingwentwrong'] = 'Etwas ist schiefgelaufen. Melden Sie den Fehler ihrem Admin';
 $string['recalculationscheduled'] = 'Neuberechnung der Kontext-Paremeter wurde veranlasst';
-$string['scaledetailviewheading'] = 'Detailansicht von CAT-Skala {$a}';
+$string['scaledetailviewheading'] = 'Detailansicht der CAT-Skala „{$a}“';
 
 // Table.
 $string['label'] = "Kennzeichen";
@@ -385,9 +385,9 @@ $string['itemdifficulty'] = "Schwierigkeit des Elements";
 $string['likelihood'] = "Wahrscheinlichkeit";
 
 $string['difficulty'] = "Schwierigkeit";
-$string['discrimination'] = "Diskriminierung";
+$string['discrimination'] = "Trennschärfe";
 $string['lastattempttime'] = "Letzter Testversuch";
-$string['guessing'] = "Guessing";
+$string['guessing'] = "Rate-Parameter";
 
 $string['numberofanswers'] = "Antworten";
 $string['numberofusagesintests'] = "In verschiedenen Tests";
@@ -455,10 +455,10 @@ $string['attempts'] = 'Testversuche';
 $string['addquestion'] = 'Frage aus Fragenkatalog hinzufügen';
 $string['addtest'] = 'Bestehenden Test hinzufügen';
 $string['checklinking'] = 'Linking prüfen';
-$string['confirmdeletion'] = 'Sie sind dabei das folgende Element zu löschen: <br> "{$a->data}"';
+$string['confirmdeletion'] = 'Sie sind dabei das folgende Element zu löschen: <br> „{$a->data}“';
 $string['deletedatatitle'] = 'Löschen';
 $string['genericsubmit'] = 'Bestätigen';
-$string['confirmactivitychange'] = 'Sie sind dabei den Aktivitätsstatus des folgenden Elements zu ändern: <br> "{$a->data}"';
+$string['confirmactivitychange'] = 'Sie sind dabei den Aktivitätsstatus des folgenden Elements zu ändern: <br> „{$a->data}“';
 $string['toggleactivity'] = 'Aktivitätsstatus';
 $string['errorrecordnotfound'] = 'Fehler mit der Datenbankabfrage. Der Datensatz wurde nicht gefunden.';
 $string['trashbintitle'] = 'Element löschen';
@@ -485,20 +485,19 @@ $string['exceededmaxattempttime'] = "Die erlaubte Zeit für den Versuch wurde ü
 
 // Quiz Feedback.
 $string['attemptfeedbacknotavailable'] = "Kein Feedback verfügbar";
-$string['attemptfeedbacknotyetavailable'] = "Feedback wird angezeigt, sobald es verfügbar ist.";
-$string['allquestionsincorrect'] = "Genauer Fähigkeits-Score kann nicht ermittelt werden, da alle Fragen falsch beantwortet wurden.";
-$string['allquestionscorrect'] = "Genauer Fähigkeits-Score kann nicht ermittelt werden, da alle Fragen richtig beantwortet wurden.";
-$string['minquestionsnotreached'] = 'Es konnte kein Testergebnis ermittelt werden, da die Mindestanzahl an zu beantortenden Fragen nicht erreicht wurde.';
-$string['feedbackcomparetoaverage'] = '<p>Der Test misst Ihr Wissen und Können in {$a->quotedscale} in Form eines Fähigkeitswertes zwischen
-{$a->scale_min} und {$a->scale_max}. Je höher Ihr Fähigkeitswert ausfällt, desto besser ist Ihr Wissen und Ihr
+$string['attemptfeedbacknotyetavailable'] = "Das Feedback wird angezeigt, sobald der laufende Versuch beendet ist.";
+$string['allquestionsincorrect'] = "Ihr Fähigkeits-Wert kann nicht ermittelt werden, da alle Fragen falsch beantwortet wurden.";
+$string['allquestionscorrect'] = "Ihr Fähigkeits-Wert kann nicht ermittelt werden, da alle Fragen richtig beantwortet wurden.";
+$string['feedbackcomparetoaverage'] = '<p>Der Test misst Ihr Wissen und Können in „{$a->quotedscale}“ in Form eines Fähigkeits-Wertes zwischen
+{$a->scale_min} und {$a->scale_max}. Je höher Ihr Fähigkeits-Wert ausfällt, desto besser ist Ihr Wissen und Ihr
 Können in der Skala.</p>
-<p>Ihr erreichter Fähigkeitswert ist {$a->ability_global} (mit einem Standardfehler von ± {$a->se_global}). Der aktuelle
-durchschnittliche Fähigkeitswert aller Teilnehmenden an dem Test beträgt {$a->average_ability}. {$a->betterthan}</p>
+<p>Ihr erreichter Fähigkeits-Wert ist <b>{$a->ability_global}</b> (mit einem Standardfehler von ±{$a->se_global}). Der aktuelle
+durchschnittliche Fähigkeits-Wert aller Teilnehmenden an dem Test beträgt {$a->average_ability}. {$a->betterthan}</p>
 <p>Die folgende Graﬁk stellt Ihren Fähigkeitswert (obere Markierung) und den aktuellen
 Durchschnitt (untere Markierung) dar:</p>';
-$string['feedbackcomparison_betterthan'] = 'Mit Ihrem Ergebnis sind Sie momentan besser als {$a->quantile}% aller anderen Test-Teilnehmenden.';
+$string['feedbackcomparison_betterthan'] = 'Mit Ihrem Ergebnis sind Sie momentan <b>besser als {$a->quantile}% aller anderen Test-Teilnehmenden</b>.';
 $string['questionssummary'] = "Zusammenfassung";
-$string['currentability'] = 'Ihr Fähigkeitswert';
+$string['currentability'] = 'Ihr Fähigkeits-Wert';
 $string['currentabilityfellowstudents'] = 'Durchschnitt';
 $string['feedbackbarlegend'] = "Bedeutung der Farben";
 $string['teacherfeedback'] = "Feedback für Lehrende";
@@ -515,11 +514,11 @@ $string['selectcatcontext_help'] = 'Einsatz-Kontexte differenzieren die Daten hi
 $string['includepilotquestions_help'] = 'Im Pilotierungsmodus werden jedem Testversuch eine festzulegende Anzahl an Fragen beigemischt, deren Fragen-Parameter (z.B. Schwierigkeit, Trennschärfe) noch nicht bestimmt sind. Diese tragen nicht zum Test-Ergebnis bei, die durch die Bearbeitungen angefallenen Daten können jedoch durch eine*n CAT-Manager*in zu einem späteren Zeitpunkt zur Bestimmung der Fragen-Parameter statistisch ausgewertet und so der aktuelle Fragen-Pool fortlaufend erweitert werden. (empfohlen)';
 $string['catquiz_selectfirstquestion_help'] = 'Dieser Einstellung legt fest, mit welcher Frage ein Testversuch gestartet wird.';
 $string['numberoffeedbackoptionpersubscale'] = 'Anzahl der Fähigkeits-Stufen';
-$string['feedbacknumber'] = 'Feedback für Fähigkeits-Stufe "{$a}"';
+$string['feedbacknumber'] = 'Feedback für Fähigkeits-Stufe {$a}';
 $string['feedbackrange'] = 'Fähigkeits-Stufe {$a}';
 $string['hasability'] = 'Fähigkeit wurde berechnet';
 $string['responsesbyusercharttitle'] = 'Gesamtanzahl der gegebenen Antworten pro Person';
-$string['noresult'] = 'kein Fähigkeitswert ermittelt';
+$string['noresult'] = 'kein Fähigkeits-Wert ermittelt';
 $string['selected_scales_all_ranges_label'] = 'Anzahl der Teilnehmenden';
 $string['numberoffeedbackoptionpersubscale_help'] = 'Wählen Sie aus, in wievielen Fähigkeits-Stufen Sie Ihr Feedback differenzieren möchten. Mithilfe der Fähigkeits-Stufen können Sie in Abhängigkeit der ermittelten Fähigkeit für jede Skala Ihren Teilnehmenden unterschiedliche schriftliche Rückmeldungen erteilen, diese in unterschiedliche Kurse einschreiben oder diese unterschiedlichen Gruppen zuordnen.';
 $string['choosesubscaleforfeedback'] = 'Skala wählen';
@@ -534,11 +533,11 @@ $string['feedback_table_answerpartlycorrect'] = "Teilweise richtig";
 $string['parentscale'] = "Inhaltsbereich (Globalskala)";
 $string['seeitemsplayed'] = "Beantwortete Fragen anzeigen";
 $string['subfeedbackrange'] = '({$a->lowerlimit} bis {$a->upperlimit})';
-$string['greateststrenght:tooltiptitle'] = 'Ihre stärkste Skala {$a}';
-$string['lowestskill:tooltiptitle'] = 'Ihre schwächste Skala {$a}';
-$string['rootscale:tooltiptitle'] = 'Globalskala "{$a}"';
-$string['scaleselected'] = 'Skala "{$a}"';
-$string['abilityprofile'] = 'Fähigkeits-Score Profil in "{$a}"';
+$string['greateststrenght:tooltiptitle'] = 'Ihre stärkste Skala „{$a}„';
+$string['lowestskill:tooltiptitle'] = 'Ihre schwächste Skala „{$a}';
+$string['rootscale:tooltiptitle'] = 'Globalskala „{$a}“';
+$string['scaleselected'] = 'Skala „{$a}“';
+$string['abilityprofile'] = 'Fähigkeits-Wert in „{$a}“';
 $string['feedback_customscale_nofeedback'] = 'Es wurde kein Feedback für ihre Ergebnisse angegeben.';
 $string['noscalesfound'] = 'Es konnte zu keiner Skala ein valides Ergebnis ermittelt werden.';
 $string['nofeedback'] = 'Kein Feedback angegeben.';
@@ -559,29 +558,29 @@ $string['error:noscalestoreport'] = "Es konnte kein Feedback ermittelt werden, w
 
 // Chart in Feedback.
 $string['global_scale'] = 'Globalskala';
-$string['chartlegendabilityrelative'] = '{$a->difference} Unterschied zur Vergleichsskala (Fähigkeits-Score in dieser Skala: {$a->ability})';
+$string['chartlegendabilityrelative'] = '{$a->difference} Unterschied zur Vergleichsskala (Fähigkeits-Wert in dieser Skala: {$a->ability})';
 $string['detected_scales_reference'] = 'Vergleichsbasis';
 $string['detected_scales_scalename'] = 'Name der Skala';
-$string['detected_scales_ability'] = 'Fähigkeitswert';
+$string['detected_scales_ability'] = 'Fähigkeits-Wert';
 $string['detected_scales_number_questions'] = 'Anzahl Fragen';
-$string['personabilitycharttitle'] = 'Differenz Ihrer Fähigkeitswerte im Vergleich zu {$a}';
+$string['personabilitycharttitle'] = 'Differenz Ihrer Fähigkeits-Werte im Vergleich zu {$a}';
 $string['itemsplayed'] = 'ausgewertete Fragen:';
 $string['detected_scales_chart_description'] = 'Die folgende Grafik stellt die
-    Werte im Vergleich zu Ihrem allgemeinen Fähigkeitswert in {$a} dar. Durch
+    Werte im Vergleich zu Ihrem allgemeinen Fähigkeits-Wert in {$a} dar. Durch
     Anklicken des entsprechenden Balkens können Sie die Werte und Skalen-Namen
     einsehen.';
-$string['personabilityinscale'] = 'Fähigkeits-Score für Skala "{$a}"';
-$string['yourscorein'] = 'Ihre durchschnittlichen "{$a}"-Ergebnisse';
-$string['scoreofpeers'] = 'Mittelwert Ihrer Mit-Studierenden';
+$string['personabilityinscale'] = 'Fähigkeits-Wert für Skala „{$a}“';
+$string['yourscorein'] = 'Ihre durchschnittlichen „{$a}“-Ergebnisse';
+$string['scoreofpeers'] = 'Durchschnitt aller Ergebnisse';
 $string['abilityprofile'] = 'Aktuelle Ergebnisse in {$a}';
 $string['abilityprofile_title'] = 'Aktuelle Ergebnisse im Test';
 $string['numberofattempts'] = 'Anzahl der Testversuche';
-$string['attemptchartstitle'] = 'Anzahl und Ergebnisse der Testversuche für Skala "{$a}"';
-$string['labelforrelativepersonabilitychart'] = 'Relative Fähigkeit';
+$string['attemptchartstitle'] = 'Anzahl und Ergebnisse der Testversuche für Skala „{$a}“';
+$string['labelforrelativepersonabilitychart'] = 'Differenz';
 $string['nothingtocompare'] = 'Es sind nicht ausreichend valide Ergebnisse für einen Vergleich vorhanden.';
 $string['personabilityrangestring'] = '{$a->rangestart} - {$a->rangeend}';
 $string['testinfolabel'] = 'Testinformation';
-$string['scalescorechartlabel'] = '{$a}-Score';
+$string['scalescorechartlabel'] = 'Fähigkeits-Wert in „{$a}“';
 $string['chart_detectedscales_title'] = 'Aktuelle Detail-Ergebnisse (Top {$a})';
 
 // Check display line breaks etc.
@@ -593,21 +592,21 @@ $string['choosesubscaleforfeedback_text'] = '';
 $string['setfeedbackforscale'] = 'schriftliches Feedback';
 $string['setfeedbackforscale_help'] = 'Dieser Text wird den Testteilnehmenden nach Beendigung des Tests angezeigt, sofern das Ergebnis in die eingestellte Fähigkeits-Stufe fällt.';
 $string['setgrouprenrolmentforscale'] = 'Einschreibung in eine Gruppe';
-$string['groupenrolmenthelptext_help'] = 'Bitte geben Sie den/die genauen Namen existierender Gruppe/n ein (z.B.: "Gruppe1,Gruppe2" oder "Gruppe3").';
-$string['groupenrolmenthelptext'] = 'Bitte geben Sie den/die genauen Namen existierender Gruppe/n ein (z.B.: "Gruppe1,Gruppe2" oder "Gruppe3").';
+$string['groupenrolmenthelptext_help'] = 'Bitte geben Sie den/die genauen Namen existierender Gruppe/n ein (z.B.: „Gruppe1,Gruppe2“ oder „Gruppe3“).';
+$string['groupenrolmenthelptext'] = 'Bitte geben Sie den/die genauen Namen existierender Gruppe/n ein (z.B.: „Gruppe1,Gruppe2“ oder „Gruppe3“).';
 $string['courseselection'] = 'Kursauswahl';
 $string['setgrouprenrolmentforscale_help'] = 'In diese Gruppe des Kurses werden Testteilnehmende nach Beendigung des Tests eingeschrieben, sofern das Ergebnis in die eingestellte Fähigkeits-Stufe fällt. Falls Sie keine Einschreibung in eine Gruppe wünschen, lassen Sie dieses Feld bitte leer.';
 $string['setcourseenrolmentforscale'] = 'Einschreibung in einen Kurs';
 $string['setcourseenrolmentforscale_help'] = 'In diesen (externen) Kurs werden Testteilnehmende nach Beendigung des Tests eingeschrieben, sofern das Ergebnis in die eingestellte Fähigkeits-Stufe fällt. Sie können nur Kurse auswählen, zu denen Sie die Berechtung zur Einschreibung haben oder die zur Einschreibung durch einen CAT-Manager*in freigegeben wurden. Falls Sie keine Einschreibung in einen externen Kurs wünschen, lassen Sie dieses Feld bitte leer.';
 $string['setautonitificationonenrolmentforscale'] = 'Teilnehmende über eine Gruppen- oder Kurseinschreibung mittels Standardtext informieren.';
-$string['setautonitificationonenrolmentforscale_help'] = 'Teilnehmende erhalten zusätzlich zu deren schriftlichen Feedback folgenden Hinweis: "Sie wurden automatisch in die Gruppe <Gruppenname> / den Kurs <Kursname als Link> eingeschrieben."';
+$string['setautonitificationonenrolmentforscale_help'] = 'Teilnehmende erhalten zusätzlich zu deren schriftlichen Feedback folgenden Hinweis: „Sie wurden automatisch in die Gruppe <Gruppenname> / den Kurs <Kursname als Link> eingeschrieben."';
 $string['copysettingsforallsubscales'] = 'Gewählte Einstellungen für untergeordnete Skalen übernehmen';
 $string['quizgraphicalsummary'] = 'Quizverlauf';
-$string['score'] = 'Gewichteter Score';
+$string['score'] = 'Gewichteter Fähigkeits-Wert';
 $string['response'] = 'Antwort';
-$string['abilityintestedscale'] = 'Ability in der obersten Skala';
-$string['abilityintestedscale_before'] = 'Ability in der obersten Skala - davor';
-$string['abilityinglobalscale'] = 'Ability in der Global-Skala';
+$string['abilityintestedscale'] = 'Fähigkeits-Wert in der obersten Skala';
+$string['abilityintestedscale_before'] = 'Fähigkeits-Wert in der obersten Skala - davor';
+$string['abilityinglobalscale'] = 'Fähigkeits-Wert in der Global-Skala';
 $string['fisherinformation'] = 'Fisherinformation';
 $string['difficulty_next_easier'] = 'Nächstschwierigere Frage';
 $string['difficulty_next_more_difficult'] = 'Nächstleichtere Frage';
@@ -618,8 +617,8 @@ $string['reportscale'] = 'Skala für den Report der Ergebnisse berücksichtigen'
 $string['catcontext'] = 'Einsatz-Kontext';
 $string['totalnumberoftestitems'] = "Gesamtzahl Fragen";
 $string['numberoftestitemsused'] = "Anzahl getesteter Fragen";
-$string['personabilitybeforeattempt'] = "Fähigkeits-Score vor Testversuch";
-$string['personabilityafterattempt'] = "Fähigkeits-Score nach Testversuch";
+$string['personabilitybeforeattempt'] = "Fähigkeits-Wert vor Testversuch";
+$string['personabilityafterattempt'] = "Fähigkeits-Wert nach Testversuch";
 $string['instance'] = "Test";
 $string['teststrategy'] = 'Teststrategie';
 $string['starttime'] = "Beginn";
@@ -664,10 +663,10 @@ $string['scaleinformation'] = 'Die ID der Skala der die Frage zugeordnet werden 
 $string['scalenameinformation'] = 'Der Name der Skala der die Frage zugeordnet werden soll. Falls keine ID angegeben, wird Matching über Name vorgenommen.';
 $string['dataincomplete'] = 'Der Datensatz mit "componentid" {$a->id} ist unvollständig und konnte nicht gänzlich eingefügt werden. Überprüfen Sie das Feld "{$a->field}".';
 $string['modelinformation'] = 'Dieses Feld ist notwendig, um Fragen vollständig zu erfassen. Ist das Feld leer, kann die Frage lediglich einer Skala zugeordnet werden.';
-$string['parentscalenamesinformation'] = 'Präzisieren Sie hier die übergeordneten Skalen der Skala um eine eindeutige Zuordnung zu ermöglichen. Übergeordnete Skalen können beim Import angelegt werden. Starten sie mit dem Namen der höchsten Skala und fügen sie alle Kinder mit "|" (Vertikaler String Unicode U+007C - nicht zu verwechseln mit "/" Slash) getrennt hinzu. Vergessen Sie dabei nicht die Globalskala. Für den Import von Items in die Globalskala, geben Sie bitte "0" in diesem Feld an.';
-$string['statusactiveorinactive'] = 'Der Aktivitätsstatus. Geben Sie "1" an um sicher zu stellen, um den Datensatz von der Verwendung auszuschließen. Lassen Sie das Feld leer oder setzen "0", gilt der Datensatz als aktiv.';
-$string['minscalevalueinformation'] = 'Geben Sie die kleinstmögliche Personenfähigkeit der Skalen als negativen Dezimalwert an. Der Mittelwert ist null. Wert wird nur bei Erzeugung einer neuen Globalskala gesetzt und gilt für alle Sub-Skalen. Hierfür (mind.) im ersten Datensatz angeben. Werte in bestehenden Skalen können nicht via Import verändert werden. Möchten Sie die Werte einer bereits bestehenden Skala ändern, bitte auf das "Skalen"-Tab wechseln.';
-$string['maxscalevalueinformation'] = 'Geben Sie die größtmögliche Personenfähigkeit der Skalen als positiven Dezimalwert an. Der Mittelwert ist null. Wert wird nur bei Erzeugung einer neuen Globalskala gesetzt und gilt für alle Sub-Skalen. Hierfür (mind.) im ersten Datensatz angeben. Werte in bestehenden Skalen können nicht via Import verändert werden. Möchten Sie die Werte einer bereits bestehenden Skala ändern, bitte auf das "Skalen"-Tab wechseln.';
+$string['parentscalenamesinformation'] = 'Präzisieren Sie hier die übergeordneten Skalen der Skala um eine eindeutige Zuordnung zu ermöglichen. Übergeordnete Skalen können beim Import angelegt werden. Starten sie mit dem Namen der höchsten Skala und fügen sie alle Kinder mit „|“ (Vertikaler String Unicode U+007C - nicht zu verwechseln mit „/“ Slash) getrennt hinzu. Vergessen Sie dabei nicht die Globalskala. Für den Import von Items in die Globalskala, geben Sie bitte „0“ in diesem Feld an.';
+$string['statusactiveorinactive'] = 'Der Aktivitätsstatus. Geben Sie „1“ an um sicher zu stellen, um den Datensatz von der Verwendung auszuschließen. Lassen Sie das Feld leer oder setzen „0“, gilt der Datensatz als aktiv.';
+$string['minscalevalueinformation'] = 'Geben Sie die kleinstmögliche Personenfähigkeit der Skalen als negativen Dezimalwert an. Der Mittelwert ist null. Wert wird nur bei Erzeugung einer neuen Globalskala gesetzt und gilt für alle Sub-Skalen. Hierfür (mind.) im ersten Datensatz angeben. Werte in bestehenden Skalen können nicht via Import verändert werden. Möchten Sie die Werte einer bereits bestehenden Skala ändern, bitte auf das „Skalen“-Tab wechseln.';
+$string['maxscalevalueinformation'] = 'Geben Sie die größtmögliche Personenfähigkeit der Skalen als positiven Dezimalwert an. Der Mittelwert ist null. Wert wird nur bei Erzeugung einer neuen Globalskala gesetzt und gilt für alle Sub-Skalen. Hierfür (mind.) im ersten Datensatz angeben. Werte in bestehenden Skalen können nicht via Import verändert werden. Möchten Sie die Werte einer bereits bestehenden Skala ändern, bitte auf das „Skalen“-Tab wechseln.';
 
 // Testenvironments table.
 $string['notifyallteachers'] = 'Kursleiter der gewählten Kurse benachrichtigen';
@@ -686,7 +685,8 @@ $string['catquizstatistics_h1_single'] = 'Statistik zu Test {$a}';
 $string['catquizstatistics_h2_single'] = 'Die folgenden Daten beziehen sich auf den Test {$a->link}, in dem die Skala {$a->scale} verwendet wird.';
 $string['catquizstatistics_h1_scale'] = 'Statistik zu Skala {$a->scalename} in Kurs {$a->coursename}';
 $string['catquizstatistics_h2_scale'] = 'Die folgenden Daten beziehen sich auf die Tests {$a->linkedcourses} in Kurs {$a->coursename}, in denen die Skala {$a->scale} verwendet wird.';
-$string['catquiz_left_quote'] = '&bdquo;';
+$string['catquiz_left_quote'] = '„';
+$string['catquiz_right_quote'] = '“';
 $string['catquizstatistics_h1_global'] = 'Statistik zu Skala {$a} auf der gesamten moodle Instanz';
 $string['catquizstatistics_h2_global'] = 'Die folgenden Daten beziehen sich auf alle Nutzer, die auf dieser
     Moodle-Plattform an Tests teilgenommen haben, in denen die Skala {$a} verwendet wird.';
@@ -698,14 +698,14 @@ $string['catquizstatistics_numattemptsperperson_title'] = 'Testversuche pro Pers
 $string['catquizstatistics_overview'] = 'Überblick';
 $string['catquizstatistics_testusage'] = 'Testnutzung';
 $string['catquizstatistics_progress_peers_title'] = 'Durchschnitt';
-$string['catquizstatistics_progress_personal_title'] = 'Ihr Fähigkeitswert';
+$string['catquizstatistics_progress_personal_title'] = 'Ihr Fähigkeits-Wert';
 $string['catquizstatistics_numberofresponses'] = 'Anzahl der gegebenen Antworten';
 $string['catquizstatistics_exportcsv_heading'] = 'Export der Testversuche';
 $string['catquizstatistics_exportcsv_description'] = 'Hier können Sie als
     Nutzer mit Berechtigung zum Download eines Exports die Ergebnisse aller Versuche als CSV-Datei
     exportieren.';
 $string['catquizstatistics_nodataforcourse'] = 'Für den angegebenen Kurs können keine CAT Tests gefunden werden.';
-$string['catquizstatistics_askforparams'] = 'Bitte geben Sie einen "globalscale" oder "courseid" Parameter an';
+$string['catquizstatistics_askforparams'] = 'Bitte geben Sie einen „globalscale“ oder „courseid“ Parameter an';
 $string['catquizstatistics_scale_testid_conflict'] = 'Der Test zur angegebenen testid verwendet nicht die angegebene Skala';
 $string['catquizstatistics_scale_course_conflict'] = 'Die angegebene testid ist nicht im angegebenen Kurs enthalten.';
 
@@ -721,18 +721,18 @@ $string['breakinfo_backtotest'] = 'Zurück zum Test';
 // CAT Colors.
 $string['feedback_colorrange'] = 'Farbbereich auf einer Feedback-Skala';
 
-$string['color_1_name'] = 'Rot';
-$string['color_2_name'] = 'Schwarz';
-$string['color_3_name'] = 'Dunkelrot';
+$string['color_1_name'] = 'Schwarz';
+$string['color_2_name'] = 'Dunkelrot';
+$string['color_3_name'] = 'Rot';
 $string['color_4_name'] = 'Orange';
 $string['color_5_name'] = 'Gelb';
 $string['color_6_name'] = 'Hellgrün';
 $string['color_7_name'] = 'Dunkelgrün';
 $string['color_8_name'] = 'Weiß';
 
-$string['color_1_code'] = '#ff0000';
-$string['color_2_code'] = '#000000';
-$string['color_3_code'] = '#8b0000';
+$string['color_1_code'] = '#000000';
+$string['color_2_code'] = '#8b0000';
+$string['color_3_code'] = '#ff0000';
 $string['color_4_code'] = '#ffa500';
 $string['color_5_code'] = '#ffff00';
 $string['color_6_code'] = '#90ee90';
@@ -761,7 +761,7 @@ $string['cachedef_adaptivequizattempt'] = 'Ausführung eines Adaptive Quiz.';
 $string['cachedef_catcontexts'] = 'Contexte von catquiz';
 $string['cachedef_eventlogtable'] = 'Logs von Events';
 $string['cachedef_quizattempts'] = 'Ausführung eines Quiz';
-$string['cachedef_studentstatstable'] = 'Daten von Studierenden';
+$string['cachedef_studentstatstable'] = 'Daten von Nutzenden';
 $string['cachedef_testenvironments'] = 'Testumgebung';
 $string['cachedef_testitemstable'] = 'Daten zu Testitems in Tabelle';
 $string['cachedef_teststrategies'] = 'Teststrategien';

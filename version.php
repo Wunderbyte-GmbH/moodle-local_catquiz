@@ -26,7 +26,7 @@ defined('MOODLE_INTERNAL') || die();
 
 $plugin->component = 'local_catquiz';
 $plugin->release = '0.9.4-rc8';
-$plugin->version = 2024050200;
+$plugin->version = 2024072900;
 $plugin->requires = 2022041900;
 $plugin->maturity = MATURITY_ALPHA;
 $plugin->dependencies = [
