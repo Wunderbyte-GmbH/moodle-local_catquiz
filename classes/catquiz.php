@@ -62,53 +62,49 @@ class catquiz {
      * @return int|array
      */
     private static function get_global_scale(int|array $catscaleids, bool $assocarray = false) {
-      
-      global $DB;
-      
-      $where = '';
-      if (!empty($catscaleids) && $catscaleids[0] > 0) {
-        [$insql, $inparams] = $DB->get_in_or_equal($catscaleids);
-        $where = "WHERE scaleid $insql";
-      }
-      else {
-        // NOTE: If no $catscaleids are given, then return ALL associations
-        $assocarray = true;
-      }
+        global $DB;
+        $where = '';
+        if (!empty($catscaleids) && $catscaleids[0] > 0) {
+            [$insql, $inparams] = $DB->get_in_or_equal($catscaleids);
+            $where = "WHERE scaleid $insql";
+        }
+        else {
+            // NOTE: If no $catscaleids are given, then return ALL associations.
+            $assocarray = true;
+        }
 
-      $sql = "WITH RECURSIVE globalscale (scaleid, globalid) (
-              SELECT id, id
+        $sql = "WITH RECURSIVE globalscale (scaleid, globalid) (
+            SELECT id, id
                 FROM {local_catquiz_catscales}
                 WHERE parentid=0
-              UNION ALL
-              SELECT ccs.id, gs.globalid
+            UNION ALL
+            SELECT ccs.id, gs.globalid
                 FROM globalscale gs
                 LEFT JOIN {local_catquiz_catscales} as ccs ON ccs.parentid = gs.scaleid
-            )
-            SELECT scaleid, globalid
-              FROM globalscale
-              $where";
-      
-      if (is_int($catscaleids) && !($assocarray)) {
-        $sql_result = $DB->get_record_sql($sql, $inparams);
-        $result = intval($sql_result->globalid);
+        )
+        SELECT scaleid, globalid
+            FROM globalscale
+            $where";
+
+        if (is_int($catscaleids) && !($assocarray)) {
+            $sqlresult = $DB->get_record_sql($sql, $inparams);
+            $result = intval($sqlresult->globalid);
+        } else if (!($assocarray)) {
+            $sqlresult = $DB->get_records_sql($sql, $inparams);
+            $result = [];
+            foreach ($sqlresult as $record) {
+                $result[] = intval($record->globalid);
+            } else {
+                $sqlresult = $DB->get_records_sql($sql, $inparams);
+                $result = [];
+                foreach ($sqlresult as $record) {
+                    $result[intval($record->scaleid)] = intval($record->globalid);
+                }
+            }
       }
-      elseif (!($assocarray)) {
-        $sql_result = $DB->get_records_sql($sql, $inparams);
-        $result = [];
-        foreach ($sql_result as $record) {
-          $result[] = intval($record->globalid);
-        }
-      }
-      else {
-        $sql_result = $DB->get_records_sql($sql, $inparams);
-        $result = [];
-        foreach ($sql_result as $record) {
-          $result[intval($record->scaleid)] = intval($record->globalid);
-        }
-      }  
       return $result;
     }
-    
+
     /**
      * Start a new attempt for a user.
      *
@@ -207,8 +203,8 @@ class catquiz {
         // Start the params array.
         $params = [
             'contextid' => $contextid,
-        ]; 
-        
+        ];
+
         $wherearray['lcip.contextid'] = $contextid;
 
         // If we fetch only for a given user, we need to add this to the sql.
@@ -220,25 +216,25 @@ class catquiz {
 
         $insql = '';
         if (!empty($catscaleids) && $catscaleids[0] > 0) {
-            
+
             $globalscaleids = self::get_global_scale($catscaleids);
-            
+
             [$insql, $inparams] = $DB->get_in_or_equal($globalscaleids);
             $parentscales = $insql;
-            
+
             [$insql, $inparams] = $DB->get_in_or_equal($catscaleids, SQL_PARAMS_NAMED, 'incatscales');
             $params = array_merge($params, $inparams);
             $wherearray['lccs.id'] = $insql;
         }
-       
+
         $select = "-- Information about the question
             q.id, lci.componentid, qbe.idnumber as label, IFNULL (qbe.idnumber, qbe.id) idnumber, q.name, q.questiontext, q.qtype, qc.name as categoryname,
           -- Information about CAT scales, parameters and contexts
             lci.catscaleid catscaleid, lci.status testitemstatus, lci.componentname component, lci.id as itemid, lccs.name as catscalename, lcip.model, lcip.difficulty, lcip.discrimination, lcip.guessing, lcip.timecreated, lcip.timemodified, lcip.status,  lcip.contextid,
           -- Information about usage statisitcs
-            COALESCE(astat.numberattempts,0) attempts, COALESCE(astat.lastattempt,0) as lastattempttime, 
+            COALESCE(astat.numberattempts,0) attempts, COALESCE(astat.lastattempt,0) as lastattempttime,
             ustat.userid, COALESCE(ustat.numberattempts,0) userattempts, COALESCE(ustat.lastattempt,0) as userlastattempttime";
-                
+
         $from = "{local_catquiz_catscales} lccs
           -- Get all corresponding items of those scales, skip if not existent (INNER JOIN)
             JOIN {local_catquiz_items} lci ON lci.catscaleid=lccs.id AND lci.componentname='question'
@@ -260,7 +256,7 @@ class catquiz {
               JOIN {question_attempt_steps} qas ON qas.questionattemptid = qa.id AND qas.fraction IS NOT NULL
               GROUP BY lca.scaleid, lca.contextid, qa.questionid
             ) astat ON astat.contextid = lcip.contextid AND astat.questionid = q.id AND astat.scaleid $parentscales";
-    
+
         if (!empty($userid)) {
           $from .= "
             LEFT JOIN (SELECT lca.scaleid, lca.contextid, qa.questionid, lca.userid, COUNT(qa.id) numberattempts, MAX(qas.timecreated) as lastattempt
@@ -275,7 +271,7 @@ class catquiz {
           $from .= "
             LEFT JOIN (SELECT NULL userid, NULL numberattempts, NULL lastattempt) as ustat ON 1=1";
         }
-              
+
         $where = '1=1';
 
         $filter = '';
@@ -290,7 +286,7 @@ class catquiz {
 
         return [$select, $from, $where, $filter, $params];
     }
-    
+
     /**
      * Returns the sql to get all the questions wanted.
      *
@@ -307,9 +303,9 @@ class catquiz {
         array $wherearray = []
     ) {
         global $DB;
-        
+
         // TODO @DAVID: Re-Construct the SQL-Statemente as this contains all problematic patterns that has been fixed above as well
-      
+
         $contextfilter = $contextid === 0
             ? $DB->sql_like('ccc1.json', ':default')
             : "ccc1.id = :contextid";
@@ -704,22 +700,22 @@ private static function get_sql_for_stat_base_request(
         int $starttime = NULL,
         int $endtime = NULL
     ): array {
-              
+
         global $DB;
         [$unfinishedstatessql, $unfinishedstatesparams] = $DB->get_in_or_equal(
             self::get_unfinished_question_states(),
             SQL_PARAMS_NAMED,
             'unfinishedstates'
         );
-        
+
         $select = "ccc.*, COUNT(DISTINCT qas.id) attempts";
-        
+
         $from = "{local_catquiz_catcontext} ccc
           LEFT JOIN {local_catquiz_attempts} as lca ON ccc.id = lca.contextid
           LEFT JOIN {adaptivequiz_attempt} aqa ON lca.attemptid = aqa.id
           LEFT JOIN {question_attempts} qa ON qa.questionusageid = aqa.uniqueid
           LEFT JOIN {question_attempt_steps} qas ON qas.questionattemptid = qa.id AND NOT $unfinishedstatessql";
-          
+
         $where = !empty($testitemids) ? "qa.questionid IN (:testitemids)" : '1=1'; // @DAVID: Kein get_in_or_equal?
         $where .= !empty($contextids) ? ' AND ccc.id IN (:contextids)' : '';
         $where .= !empty($studentids) ? ' AND aqa.userid IN (:studentids)' : '';
@@ -978,9 +974,9 @@ $select = "
         array $filterarray = []) {
 
         // TODO: That way of determine the catcontext by the timestamp of an attempt_step is unreliable and will deliver also ANY attempt made outside catquiz as well (eg. the "standard"-adaptivequiz oder moodle quiz). It should be fixedAP by a proper way via the catquiz_attempt table
-        
+
         // @DAVID: Was ist der Unterschied zu get_sql_for_stat_base_request, aber ohne Parameter? Wofür erwartet die Funktion Parameter, wenn diese nicht verwendet werden?
-       
+
         $params = [];
         $where = [];
         $filter = '';
