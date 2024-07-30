@@ -65,6 +65,7 @@ class model_item_param_list_test extends advanced_testcase {
             'nameandtreeset' => [
                 'record' => [
                         'componentid' => 0,
+                        'itemid' => 0,
                         'status' => 4,
                         'qtype' => "Multiple-Choice",
                         'model' => "raschbirnbaum",
