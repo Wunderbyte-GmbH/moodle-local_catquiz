@@ -73,30 +73,30 @@ class model_person_param implements \ArrayAccess {
     /**
      * The CAT scale ID
      *
-     * @param int
+     * @var int
      */
     private int $catscaleid;
 
     /**
      * The time this parameter was created
      *
-     * @param ?int
+     * @var ?int
      */
     private ?int $timecreated;
 
     /**
      * The timestamp this parameter was last modified
      *
-     * @param ?int
+     * @var ?int
      */
     private ?int $timemodified;
 
     /**
      * The ID of the user
      *
-     * @var int
+     * @var string
      */
-    private int $userid;
+    private string $userid;
 
     /**
      * @var float ability
@@ -112,9 +112,10 @@ class model_person_param implements \ArrayAccess {
     /**
      * Instantiate parameter.
      *
-     * @param int $userid
+     * @param string $userid
+     * @param int $catscaleid
      */
-    public function __construct(int $userid, int $catscaleid) {
+    public function __construct(string $userid, int $catscaleid) {
         $this->userid = $userid;
         $this->catscaleid = $catscaleid;
         $this->params = ['ability'];
@@ -186,7 +187,7 @@ class model_person_param implements \ArrayAccess {
     /**
      * Return the user ID
      *
-     * @return int
+     * @return string
      */
     public function get_userid(): int {
         return $this->userid;
