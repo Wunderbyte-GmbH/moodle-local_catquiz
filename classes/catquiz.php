@@ -781,8 +781,8 @@ private static function get_sql_for_stat_base_request(
         $params = [];
         $filter = '';
 
-        // TODO: SQL vereinfachen!
-        // @DAVID: Werden die ehemaogen Angaben noch gebraucht?
+        // TODO: SQL vereinfachen.
+        // @DAVID: Werden die ehemaligen Angaben noch gebraucht?
 /*
 $select = "
             c.id,
@@ -1496,7 +1496,7 @@ $select = "
              FROM {local_catquiz_items} lci
              JOIN {local_catquiz_itemparams} lcip
                 ON lci.componentname = lcip.componentname
-                    AND lci.componentid = lcip.componentid
+                    AND lci.id = lcip.itemid
                     AND lcip.contextid = :contextid
                     AND lcip.model = :model
             WHERE lci.catscaleid $insql
