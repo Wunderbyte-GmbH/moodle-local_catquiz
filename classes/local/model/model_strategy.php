@@ -192,7 +192,7 @@ class model_strategy {
      * Starts the estimation process
      *
      * @param int $catscaleid
-     * @param model_person_param_list $initialabiltities
+     * @param model_person_param_list $initialabilities
      * @return array<model_item_param_list, model_person_param_list>
      */
     public function run_estimation(int $catscaleid, model_person_param_list $initialabilities): array {
