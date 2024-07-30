@@ -64,7 +64,7 @@ class catquiz {
      * @param bool $assocarray
      * @return int|array
      */
-    private static function get_global_scale(int|array $catscaleids, bool $assocarray = false) {
+    private static function get_global_scale($catscaleids, bool $assocarray = false) {
         global $DB;
         $where = '';
         if (!empty($catscaleids) && $catscaleids[0] > 0) {
