@@ -250,7 +250,7 @@ class catquiz {
         $from = "{local_catquiz_catscales} lccs
           -- Get all corresponding items of those scales, skip if not existent
           -- (INNER JOIN)
-            JOIN {local_catquiz_items} lci ON lci.catscaleid=lccs.id AND lci.componentname='question'
+            JOIN {local_catquiz_items} lci ON lci.catscaleid=lccs.id
 
           -- Get all the item parameter for the question for the given context(s),
           -- skip if not existent
@@ -357,7 +357,7 @@ class catquiz {
                 ON q.id=qv.questionid
                 JOIN {question_bank_entries} qbe ON qv.questionbankentryid=qbe.id
                 JOIN {question_categories} qc ON qc.id=qbe.questioncategoryid
-                LEFT JOIN {local_catquiz_items} lci ON lci.componentid = q.id AND lci.componentname='question'
+                LEFT JOIN {local_catquiz_items} lci ON lci.componentid = q.id
                 LEFT JOIN (
                     SELECT ccc1.id contextid, qa.questionid, COUNT(*) contextattempts
                     FROM $contextfrom
@@ -1521,8 +1521,7 @@ class catquiz {
             "SELECT lci.id as uniqueid, lcip.*
              FROM {local_catquiz_items} lci
              JOIN {local_catquiz_itemparams} lcip
-                ON lci.componentname = lcip.componentname
-                    AND lci.id = lcip.itemid
+                ON lci.id = lcip.itemid
                     AND lcip.contextid = :contextid
                     AND lcip.model = :model
             WHERE lci.catscaleid $insql
@@ -2301,7 +2300,7 @@ class catquiz {
                     ) s1
                     JOIN {local_catquiz_items} lci ON lci.componentname = 'question' AND s1.questionid = lci.componentid
                     -- Only select questions that have item params.
-                    JOIN {local_catquiz_itemparams} lcip ON lcip.componentname = 'question' AND s1.questionid = lcip.componentid
+                    JOIN {local_catquiz_itemparams} lcip ON lci.id = lcip.componentid
                     -- Make sure we only get responses from the quizzes in the given course.
                     JOIN {adaptivequiz_attempt} aa ON aa.uniqueid = s1.questionusageid
                     JOIN {adaptivequiz} a ON a.id = aa.instance
