@@ -70,8 +70,7 @@ class catquiz {
         if (!empty($catscaleids) && $catscaleids[0] > 0) {
             [$insql, $inparams] = $DB->get_in_or_equal($catscaleids);
             $where = "WHERE scaleid $insql";
-        }
-        else {
+        } else {
             // NOTE: If no $catscaleids are given, then return ALL associations.
             $assocarray = true;
         }
@@ -265,7 +264,8 @@ class catquiz {
 
           -- Get all information about the attempts in the scale(s)
           -- and context(s) in general and for specific user(s)
-            LEFT JOIN (SELECT lca.scaleid, lca.contextid, qa.questionid, COUNT(qa.id) numberattempts, MAX(qas.timecreated) as lastattempt
+            LEFT JOIN (SELECT lca.scaleid, lca.contextid, qa.questionid, COUNT(qa.id) numberattempts,
+              MAX(qas.timecreated) as lastattempt
               FROM {local_catquiz_attempts} lca
               JOIN {adaptivequiz_attempt} aqa ON lca.attemptid = aqa.id
               JOIN {question_attempts} qa ON qa.questionusageid = aqa.uniqueid
@@ -277,8 +277,8 @@ class catquiz {
                 AND astat.scaleid $parentscales";
 
         if (!empty($userid)) {
-            $from .= "
-              LEFT JOIN (SELECT lca.scaleid, lca.contextid, qa.questionid, lca.userid, COUNT(qa.id) numberattempts, MAX(qas.timecreated) as lastattempt
+            $from .= "LEFT JOIN (SELECT lca.scaleid, lca.contextid, qa.questionid, lca.userid,
+                COUNT(qa.id) numberattempts, MAX(qas.timecreated) as lastattempt
                 FROM {local_catquiz_attempts} lca
                 JOIN {adaptivequiz_attempt} aqa ON lca.attemptid = aqa.id
                 JOIN {question_attempts} qa ON qa.questionusageid = aqa.uniqueid
@@ -748,7 +748,7 @@ class catquiz {
           LEFT JOIN {question_attempts} qa ON qa.questionusageid = aqa.uniqueid
           LEFT JOIN {question_attempt_steps} qas ON qas.questionattemptid = qa.id AND NOT $unfinishedstatessql";
 
-        $where = !empty($testitemids) ? "qa.questionid IN (:testitemids)" : '1=1'; // @DAVID: Kein get_in_or_equal?
+        $where = !empty($testitemids) ? "qa.questionid IN (:testitemids)" : '1=1'; // FRAGE @DAVID: Kein get_in_or_equal?
         $where .= !empty($contextids) ? ' AND ccc.id IN (:contextids)' : '';
         $where .= !empty($studentids) ? ' AND aqa.userid IN (:studentids)' : '';
         $where .= ($starttime < 0) ? ' AND :starttime <= qas.timecreated' : '';
@@ -803,9 +803,10 @@ class catquiz {
         $filter = '';
 
         // TODO: SQL vereinfachen.
-        // @DAVID: Werden die ehemaligen Angaben noch gebraucht?
-/*
-$select = "
+        // FRAGE @DAVID: Werden die ehemaligen Angaben noch gebraucht?
+
+        /* Old code:
+        $select = "
             c.id,
             name,
             component,
@@ -839,7 +840,7 @@ $select = "
             WHERE r.shortname IN ('teacher', 'editingteacher')
             GROUP BY c.id
             ) s2 ON s2.courseid = ct.courseid";
-*/
+        */
 
         $select = " * ";
 
@@ -1005,9 +1006,14 @@ $select = "
     public static function return_sql_for_catcontexts(
         array $filterarray = []) {
 
-        // TODO: That way of determine the catcontext by the timestamp of an attempt_step is unreliable and will deliver also ANY attempt made outside catquiz as well (eg. the "standard"-adaptivequiz oder moodle quiz). It should be fixedAP by a proper way via the catquiz_attempt table
+        // TODO: That way of determine the catcontext by the timestamp of an attempt_step
+        // is unreliable and will deliver also ANY attempt made outside catquiz as well
+        // (eg. the "standard"-adaptivequiz oder moodle quiz). It should be fixed by
+        // a proper way via the catquiz_attempt table.
 
-        // @DAVID: Was ist der Unterschied zu get_sql_for_stat_base_request, aber ohne Parameter? Wofür erwartet die Funktion Parameter, wenn diese nicht verwendet werden?
+        // FRAGE @DAVID: Was ist der Unterschied zu get_sql_for_stat_base_request,
+        // aber ohne Parameter? Wofür erwartet die Funktion Parameter, wenn diese
+        // nicht verwendet werden?
 
         $params = [];
         $where = [];
