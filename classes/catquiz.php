@@ -94,15 +94,17 @@ class catquiz {
             $result = [];
             foreach ($sqlresult as $record) {
                 $result[] = intval($record->globalid);
-            } else {
-                $sqlresult = $DB->get_records_sql($sql, $inparams);
-                $result = [];
-                foreach ($sqlresult as $record) {
-                    $result[intval($record->scaleid)] = intval($record->globalid);
-                }
             }
-      }
-      return $result;
+        } else {
+            $sqlresult = $DB->get_records_sql($sql, $inparams);
+            $result = [];
+            foreach ($sqlresult as $record) {
+                $result[intval($record->scaleid)] = intval($record->globalid);
+            }
+
+        }
+
+        return $result;
     }
 
     /**
