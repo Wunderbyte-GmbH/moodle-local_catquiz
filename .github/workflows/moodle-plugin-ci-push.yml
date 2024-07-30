@@ -1,9 +1,7 @@
 name: Moodle Plugin CI Push
 
-on: 
-  push:
-    tags-ignore:
-      - '*'
+on: push
+
 jobs:
   test:
     runs-on: ubuntu-22.04
