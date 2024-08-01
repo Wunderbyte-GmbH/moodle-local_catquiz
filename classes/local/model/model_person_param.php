@@ -110,11 +110,6 @@ class model_person_param implements \ArrayAccess {
     private array $params;
 
     /**
-     * @var int $catscaleid
-     */
-    private int $catscaleid;
-
-    /**
      * Instantiate parameter.
      *
      * @param string $userid
