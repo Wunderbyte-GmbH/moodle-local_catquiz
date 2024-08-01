@@ -272,7 +272,6 @@ class model_item_param_list implements ArrayAccess, IteratorAggregate, Countable
             function ($param) use ($contextid) {
                 $record = [
                     'componentid' => $param->get_id(),
-                    'itemid' => 1,
                     // TODO: Find the id of the item in local_catquiz_items.
                     'componentname' => 'question',
                     'model' => $param->get_model_name(),
@@ -352,17 +351,14 @@ class model_item_param_list implements ArrayAccess, IteratorAggregate, Countable
 
         // Scale logic is in this function: get scale id and update in table.
         if ($label = $newrecord['label'] ?? false) {
-            $sql = "SELECT qv.questionid, qv.questionbankentryid AS qbeid, lci.id AS itemid
+            $sql = "SELECT qv.questionid, qv.questionbankentryid AS qbeid
             FROM {question_bank_entries} qbe
 
             JOIN {question_versions} qv
             ON qbe.id = qv.questionbankentryid
 
-            JOIN {question} q
-            ON qv.questionid = q.id
-
             LEFT JOIN {local_catquiz_items} lci
-            ON lci.componentid = q.id
+            ON lci.componentid = qv.questionid
 
             WHERE qbe.idnumber LIKE :label
             GROUP BY qv.questionid, qv.questionbankentryid";
@@ -385,7 +381,6 @@ class model_item_param_list implements ArrayAccess, IteratorAggregate, Countable
             $record = reset($records);
             unset($newrecord['label']);
             $newrecord['componentid'] = $record->questionid;
-            $newrecord['itemid'] = $record->itemid;
 
             // We call the same function again, now with the componentid and without the label id.
             $returnarray = self::save_or_update_testitem_in_db($newrecord);
@@ -536,7 +531,7 @@ class model_item_param_list implements ArrayAccess, IteratorAggregate, Countable
                     $recordforquery["lastupdated"] = time();
                 }
             }
-            $DB->insert_record('local_catquiz_items', $recordforquery);
+            $itemid = $DB->insert_record('local_catquiz_items', $recordforquery, true);
 
             // Trigger event.
             $event = testiteminscale_added::create([
@@ -554,6 +549,7 @@ class model_item_param_list implements ArrayAccess, IteratorAggregate, Countable
 
         // Assign corresponding context.
         self::assign_catcontext($newrecord);
+        $newrecord['itemid'] = $itemid;
         return $newrecord;
     }
 

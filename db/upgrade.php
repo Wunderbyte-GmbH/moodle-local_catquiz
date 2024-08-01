@@ -519,26 +519,35 @@ function xmldb_local_catquiz_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2024051401, 'local', 'catquiz');
     }
 
-    if ($oldversion < 2024072000) {
+    if ($oldversion < 2024080200) {
         // Define field itemid to be added to local_catquiz_itemparams.
         $table = new xmldb_table('local_catquiz_itemparams');
 
-        $field = new xmldb_field('itemid', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null, 0);
+        $field = new xmldb_field('itemid', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, 0, 0);
         // Conditionally launch add fields min scale value.
         if (!$dbman->field_exists($table, $field)) {
             $dbman->add_field($table, $field);
         }
 
         // Make sure the database has updated the itemid in the catquiz_itemparams table.
-        $sql = "
-          UPDATE {local_catquiz_itemparams}
-            SET itemid = (SELECT id
-              FROM {local_catquiz_items} lci
-              WHERE lci.componentid = componentid LIMIT 1);";
-        $update = $DB->execute($sql, []);
+        $sql = <<<SQL
+            WITH item_mapping AS (
+                SELECT item.id AS itemid, itemparam.id AS paramid
+                FROM {m_local_catquiz_items} item
+                JOIN {m_local_catquiz_itemparams itemparam ON // TODO
+                    item.componentid = itemparam.componentid
+                    AND item.componentname = 'question'
+                    AND itemparam.componentname = 'question'
+            )
+            UPDATE m_local_catquiz_itemparams
+            SET itemid = item_mapping.itemid
+            FROM item_mapping
+            WHERE id = item_mapping.paramid
+        SQL;
+        $DB->execute($sql);
 
         // Catquiz savepoint reached.
-        upgrade_plugin_savepoint(true, 2024072000, 'local', 'catquiz');
+        upgrade_plugin_savepoint(true, 2024080200, 'local', 'catquiz');
     }
 
     return true;
