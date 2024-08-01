@@ -73,7 +73,7 @@ class catquiz {
             $assocarray = true;
         }
 
-        $sql = "WITH RECURSIVE globalscale (scaleid, globalid) (
+        $sql = "WITH RECURSIVE globalscale (scaleid, globalid) AS (
             SELECT id, id
                 FROM {local_catquiz_catscales}
                 WHERE parentid=0
