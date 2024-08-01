@@ -519,11 +519,11 @@ function xmldb_local_catquiz_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2024051401, 'local', 'catquiz');
     }
 
-    if ($oldversion < 2024072000) {
+    if ($oldversion < 2024080100) {
         // Define field itemid to be added to local_catquiz_itemparams.
         $table = new xmldb_table('local_catquiz_itemparams');
 
-        $field = new xmldb_field('itemid', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null, 0);
+        $field = new xmldb_field('itemid', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, 0, 0);
         // Conditionally launch add fields min scale value.
         if (!$dbman->field_exists($table, $field)) {
             $dbman->add_field($table, $field);
@@ -535,10 +535,10 @@ function xmldb_local_catquiz_upgrade($oldversion) {
             SET itemid = (SELECT id
               FROM {local_catquiz_items} lci
               WHERE lci.componentid = componentid LIMIT 1);";
-        $update = $DB->execute($sql, []);
+        $update = $DB->execute($sql);
 
         // Catquiz savepoint reached.
-        upgrade_plugin_savepoint(true, 2024072000, 'local', 'catquiz');
+        upgrade_plugin_savepoint(true, 2024080100, 'local', 'catquiz');
     }
 
     return true;

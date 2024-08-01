@@ -60,7 +60,7 @@ class catquiz {
      *
      * @param int|array $catscaleids
      * @param bool $assocarray
-     * @return int|array
+     * @return array
      */
     private static function get_global_scale($catscaleids, bool $assocarray = false) {
         global $DB;
@@ -76,34 +76,35 @@ class catquiz {
         $sql = "WITH RECURSIVE globalscale (scaleid, globalid) AS (
             SELECT id, id
                 FROM {local_catquiz_catscales}
-                WHERE parentid=0
+                WHERE parentid = 0
             UNION ALL
-            SELECT ccs.id, gs.globalid
-                FROM globalscale gs
-                LEFT JOIN {local_catquiz_catscales} as ccs ON ccs.parentid = gs.scaleid
+            SELECT lcc.id, gs.globalid
+                FROM {local_catquiz_catscales} lcc
+                INNER JOIN globalscale gs ON lcc.parentid = gs.scaleid
         )
         SELECT scaleid, globalid
             FROM globalscale
             $where";
 
-        if (is_int($catscaleids) && !($assocarray)) {
+        if (is_int($catscaleids) && !$assocarray) {
             $sqlresult = $DB->get_record_sql($sql, $inparams);
-            $result = intval($sqlresult->globalid);
-        } else if (!($assocarray)) {
-            $sqlresult = $DB->get_records_sql($sql, $inparams);
-            $result = [];
-            foreach ($sqlresult as $record) {
-                $result[] = intval($record->globalid);
-            }
-        } else {
+            return [intval($sqlresult->globalid)];
+        }
+
+        if (!$assocarray) {
             $sqlresult = $DB->get_records_sql($sql, $inparams);
             $result = [];
             foreach ($sqlresult as $record) {
                 $result[intval($record->scaleid)] = intval($record->globalid);
             }
-
+            return $result;
         }
 
+        $sqlresult = $DB->get_records_sql($sql, $inparams);
+        $result = [];
+        foreach ($sqlresult as $record) {
+            $result[intval($record->scaleid)] = intval($record->globalid);
+        }
         return $result;
     }
 
@@ -212,8 +213,6 @@ class catquiz {
         // If we fetch only for a given user, we need to add this to the sql.
         if (!empty($userid)) {
             $params['userid'] = $userid;
-            [$insql, $inparams] = $DB->get_in_or_equal($userid);
-            $wherearray['ustat.userid'] = $insql;
         }
 
         $insql = '';
@@ -221,17 +220,18 @@ class catquiz {
 
             $globalscaleids = self::get_global_scale($catscaleids);
 
-            [$insql, $inparams] = $DB->get_in_or_equal($globalscaleids);
-            $parentscales = $insql;
+            [$parentscales1, $inparams1] = $DB->get_in_or_equal($globalscaleids, SQL_PARAMS_NAMED, 'inparentscales1');
+            [$parentscales2, $inparams2] = $DB->get_in_or_equal($globalscaleids, SQL_PARAMS_NAMED, 'inparentscales2');
+            $params = array_merge($params, $inparams1, $inparams2);
 
-            [$insql, $inparams] = $DB->get_in_or_equal($catscaleids, SQL_PARAMS_NAMED, 'incatscales');
+            [$incatscales, $inparams] = $DB->get_in_or_equal($catscaleids, SQL_PARAMS_NAMED, 'incatscales');
             $params = array_merge($params, $inparams);
-            $wherearray['lccs.id'] = $insql;
+            $wherecontains['lccs.id'] = $incatscales;
         }
 
         $select = "-- Information about the question
             q.id, lci.componentid, qbe.idnumber as label,
-            IFNULL (qbe.idnumber, qbe.id) idnumber, q.name,
+            COALESCE (qbe.idnumber, CAST(qbe.id AS CHAR)) idnumber, q.name, -- mysql specific expression
             q.questiontext, q.qtype, qc.name as categoryname,
           -- Information about CAT scales, parameters and contexts
             lci.catscaleid catscaleid, lci.status testitemstatus,
@@ -241,9 +241,9 @@ class catquiz {
             lcip.timemodified, lcip.status,  lcip.contextid,
           -- Information about usage statisitcs
             COALESCE(astat.numberattempts,0) attempts,
-            OALESCE(astat.lastattempt,0) as lastattempttime,
-            ustat.userid, COALESCE(ustat.numberattempts,0) userattempts,
-            COALESCE(ustat.lastattempt,0) as userlastattempttime";
+            COALESCE(astat.lastattempt,0) as lastattempttime,
+            ustat.userid, ustat.numberattempts userattempts,
+            ustat.lastattempt as userlastattempttime";
 
         $from = "{local_catquiz_catscales} lccs
           -- Get all corresponding items of those scales, skip if not existent
@@ -272,7 +272,7 @@ class catquiz {
               GROUP BY lca.scaleid, lca.contextid, qa.questionid
             ) astat
               ON astat.contextid = lcip.contextid AND astat.questionid = q.id
-                AND astat.scaleid $parentscales";
+                AND astat.scaleid $parentscales1";
 
         if (!empty($userid)) {
             $from .= "LEFT JOIN (SELECT lca.scaleid, lca.contextid, qa.questionid, lca.userid,
@@ -282,13 +282,13 @@ class catquiz {
                 JOIN {question_attempts} qa ON qa.questionusageid = aqa.uniqueid
                 JOIN {question_attempt_steps} qas
                   ON qas.questionattemptid = qa.id AND qas.fraction IS NOT NULL
-                GROUP BY lca.scaleid, lca.contextid, qa.questionusageid, lca.userid
+                GROUP BY lca.scaleid, lca.contextid, qa.questionid, lca.userid
               ) ustat
                 ON ustat.contextid = lcip.contextid AND ustat.questionid = q.id
-                  AND ustat.scaleid $parentscales";
+                  AND ustat.scaleid $parentscales2";
         } else {
             $from .= "
-              LEFT JOIN (SELECT NULL userid, NULL numberattempts, NULL lastattempt) as ustat
+              LEFT JOIN (SELECT 0 AS userid, 0 AS numberattempts, NULL AS lastattempt) as ustat
                 ON 1=1";
         }
 
@@ -297,7 +297,11 @@ class catquiz {
         $filter = '';
 
         foreach ($wherearray as $key => $value) {
-            $where .= ' AND ' . $DB->sql_equal($key, $value, false, false);
+            $where .= ' AND ' . $DB->sql_equal($key, $value);
+        }
+
+        foreach ($wherecontains as $key => $value) {
+            $where .= sprintf(' AND %s %s', $key, $value);
         }
 
         if ($orderby) {
@@ -1806,7 +1810,7 @@ class catquiz {
         $join = "";
         if ($enrolled && $courseid) {
             $with = <<<SQL
-                WITH EnrolledUsers (
+                WITH EnrolledUsers AS (
                     SELECT DISTINCT ue.userid
                     FROM {user_enrolments} ue
                     JOIN {enrol} e ON ue.enrolid = e.id AND e.courseid = :courseid2
@@ -1840,7 +1844,7 @@ class catquiz {
         if (!is_null($endtime)) {
             $sql .= " AND a.timecreated <= :endtime";
         }
-        $sql .= " ORDER BY a.endtimeC";
+        $sql .= " ORDER BY a.endtime";
         $params = [
             'userid' => $userid,
             'catscaleid' => $catscaleid,
