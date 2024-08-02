@@ -713,8 +713,6 @@ class catquiz {
      * @param array $testitemids
      * @param array $contextids
      * @param array $studentids
-     * @param int $starttime
-     * @param int $endtime
      *
      * @return array
      *
