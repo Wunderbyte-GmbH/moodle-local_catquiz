@@ -229,21 +229,36 @@ class catquiz {
             $wherecontains['lccs.id'] = $incatscales;
         }
 
-        $select = "-- Information about the question
-            q.id, lci.componentid, qbe.idnumber as label,
-            COALESCE (qbe.idnumber, CAST(qbe.id AS CHAR)) idnumber, q.name, -- mysql specific expression
-            q.questiontext, q.qtype, qc.name as categoryname,
-          -- Information about CAT scales, parameters and contexts
-            lci.catscaleid catscaleid, lci.status testitemstatus,
-            lci.componentname component, lci.id as itemid,
-            lccs.name as catscalename, lcip.model, lcip.difficulty,
-            lcip.discrimination, lcip.guessing, lcip.timecreated,
-            lcip.timemodified, lcip.status,  lcip.contextid,
-          -- Information about usage statisitcs
+        $select = <<<SQL
+            -- Information about the question
+            q.id,
+            lci.componentid,
+            qbe.idnumber as label,
+            COALESCE (qbe.idnumber, CAST(qbe.id AS CHAR)) as idnumber,
+            q.name,
+            q.questiontext,
+            q.qtype,
+            qc.name as categoryname,
+            -- Information about CAT scales, parameters and contexts
+            lci.catscaleid catscaleid,
+            lci.status testitemstatus,
+            lci.componentname component,
+            lci.id as itemid,
+            lccs.name as catscalename,
+            lcip.model,
+            lcip.difficulty,
+            lcip.discrimination,
+            lcip.guessing,
+            lcip.timecreated,
+            lcip.timemodified,
+            lcip.status,
+            lcip.contextid,
+            -- Information about usage statisitcs
             COALESCE(astat.numberattempts,0) attempts,
             COALESCE(astat.lastattempt,0) as lastattempttime,
             ustat.userid, ustat.numberattempts userattempts,
-            ustat.lastattempt as userlastattempttime";
+            ustat.lastattempt as userlastattempttime
+    SQL;
 
         $from = "{local_catquiz_catscales} lccs
           -- Get all corresponding items of those scales, skip if not existent
