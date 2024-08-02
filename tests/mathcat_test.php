@@ -38,7 +38,7 @@ use basic_testcase;
  * @covers \local_catquiz\mathcat
  *
  */
-class mathcat_test extends basic_testcase {
+final class mathcat_test extends basic_testcase {
 
 
     /**

@@ -40,7 +40,7 @@ use SebastianBergmann\RecursionContext\InvalidArgumentException;
  *
  * @covers \local_catquiz\teststrategy\feedback_helper
  */
-class feedback_helper_test extends advanced_testcase {
+final class feedback_helper_test extends advanced_testcase {
 
     /**
      * Test if correct string (label for chart) is returned correctly according to defined timerange and timestamp.

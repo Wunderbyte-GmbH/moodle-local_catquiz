@@ -38,7 +38,7 @@ use local_catquiz\teststrategy\preselect_task\strategyfastestscore;
  *
  * @covers \local_catquiz\teststrategy\preselect_task\strategyfastestscore
  */
-class strategyfastestscore_test extends basic_testcase {
+final class strategyfastestscore_test extends basic_testcase {
 
 
     /**

@@ -39,7 +39,7 @@ use local_catquiz\local\model\model_responses;
  *
  * @covers \catmodel_raschbirnbaum\raschbirnbaum
  */
-class raschbirnbaum_test extends TestCase {
+final class raschbirnbaum_test extends TestCase {
 
     /**
      * This test calls the get_log_jacobain function with the model and test its output with verified data.
