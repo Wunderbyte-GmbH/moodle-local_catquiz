@@ -80,7 +80,7 @@ class questiondetailview {
      * Check if we display a table or a detailview of a specific item.
      */
     public function renderdata() {
-        global $DB;
+        global $DB, $USER;
         if (empty($this->testitemid)) {
             return;
         }
@@ -91,8 +91,8 @@ class questiondetailview {
         list($select, $from, $where, , $params) = catquiz::return_sql_for_catscalequestions([$this->catscaleid],
                                                                                                     $catcontext,
                                                                                                     [],
-                                                                                                    $this->testitemid);
-        $idcheck = "id=:userid";
+                                                                                                    $USER->id);
+        $idcheck = "ustat.userid =:userid";
         $sql = "SELECT $select FROM $from WHERE $where AND $idcheck";
         $recordinarray = $DB->get_records_sql($sql, $params, IGNORE_MISSING);
 

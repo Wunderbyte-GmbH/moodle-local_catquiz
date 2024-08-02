@@ -722,11 +722,8 @@ class catquiz {
     private static function get_sql_for_stat_base_request(
         array $testitemids = [],
         array $contextids = [],
-        array $studentids = [],
-        int $starttime = -1,
-        int $endtime = -1
+        array $studentids = []
     ): array {
-
         global $DB;
         [$unfinishedstatessql, $unfinishedstatesparams] = $DB->get_in_or_equal(
             self::get_unfinished_question_states(),
@@ -734,20 +731,20 @@ class catquiz {
             'unfinishedstates'
         );
 
-        $select = "ccc.*, COUNT(DISTINCT qas.id) attempts";
+        // TODO: nochmal anschauen.
+        $select = '*';
+        $from = "{local_catquiz_catcontext} ccc1
+                JOIN {question_attempt_steps} qas
+                    ON ccc1.starttimestamp < qas.timecreated
+                    AND ccc1.endtimestamp > qas.timecreated
+                    AND qas.state NOT $unfinishedstatessql
 
-        $from = "{local_catquiz_catcontext} ccc
-          LEFT JOIN {local_catquiz_attempts} as lca ON ccc.id = lca.contextid
-          LEFT JOIN {adaptivequiz_attempt} aqa ON lca.attemptid = aqa.id
-          LEFT JOIN {question_attempts} qa ON qa.questionusageid = aqa.uniqueid
-          LEFT JOIN {question_attempt_steps} qas ON qas.questionattemptid = qa.id AND NOT $unfinishedstatessql";
-
-        $where = !empty($testitemids) ? "qa.questionid IN (:testitemids)" : '1=1'; // FRAGE @DAVID: Kein get_in_or_equal?
-        $where .= !empty($contextids) ? ' AND ccc.id IN (:contextids)' : '';
-        $where .= !empty($studentids) ? ' AND aqa.userid IN (:studentids)' : '';
-        $where .= ($starttime < 0) ? ' AND :starttime <= qas.timecreated' : '';
-        $where .= ($endtime < 0) ? ' AND :endtime >= qas.timecreated' : '';
-        $where .= "GROUP BY ccc.id";
+                JOIN {question_attempts} qa
+                    ON qas.questionattemptid = qa.id";
+        ;
+        $where = !empty($testitemids) ? 'qa.questionid IN (:testitemids)' : '1=1';
+        $where .= !empty($contextids) ? ' AND ccc1.id IN (:contextids)' : '';
+        $where .= !empty($studentids) ? ' AND userid IN (:studentids)' : '';
 
         $testitemidstring = sprintf("%s", implode(',', $testitemids));
         $contextidstring = sprintf("%s", implode(',', $contextids));
@@ -756,8 +753,7 @@ class catquiz {
         $params = self::set_optional_param([], 'testitemids', $testitemids, $testitemidstring);
         $params = self::set_optional_param($params, 'contextids', $contextids, $contextidstring);
         $params = self::set_optional_param($params, 'studentids', $studentids, $studentidstring);
-        $params = self::set_optional_param($params, 'starttime', $starttime, $starttime);
-        $params = self::set_optional_param($params, 'endtime', $endtime, $endtime);
+        $params = array_merge($params, $unfinishedstatesparams);
 
         return [$select, $from, $where, $params];
     }
@@ -799,6 +795,7 @@ class catquiz {
         // TODO: SQL vereinfachen.
         // FRAGE @DAVID: Werden die ehemaligen Angaben noch gebraucht?
 
+        // phpcs:disable
         /* Old code:
         $select = "
             c.id,
@@ -811,8 +808,6 @@ class catquiz {
             parentid,
             fullname,
             c.timemodified,
-            */
-            /* And it continues.
             c.timecreated,
             ct.catscaleid,
             numberofitems,
@@ -823,26 +818,21 @@ class catquiz {
         JOIN {course} c ON c.id = ct.courseid
         LEFT JOIN (SELECT catscaleid as itemcatscale, COUNT(*) numberofitems
            FROM {local_catquiz_items}
-           */
-            /* And it continues.
            GROUP BY catscaleid
         ) s1 ON ct.catscaleid = s1.itemcatscale
         LEFT JOIN (
             SELECT c.id courseid, " .
-            */
-            /* And it continues.
                 $DB->sql_group_concat($DB->sql_concat_join("' '", ['u.firstname', 'u.lastname']), ', ') . " teachers
             FROM {user} u
             JOIN {role_assignments} ra ON ra.userid = u.id
             JOIN {context} ct ON ct.id = ra.contextid
             JOIN {course} c ON c.id = ct.instanceid
             JOIN {role} r ON r.id = ra.roleid
-            */
-            /* And it continues.
             WHERE r.shortname IN ('teacher', 'editingteacher')
             GROUP BY c.id
             ) s2 ON s2.courseid = ct.courseid";
         */
+        // phpcs:enable
 
         $select = " * ";
 
@@ -1016,6 +1006,7 @@ class catquiz {
         // FRAGE @DAVID: Was ist der Unterschied zu get_sql_for_stat_base_request,
         // aber ohne Parameter? Wofür erwartet die Funktion Parameter, wenn diese
         // nicht verwendet werden?
+        // Evtl einfach weiterleiten an get_sql_for_stat_base_request.
 
         $params = [];
         $where = [];
@@ -2360,10 +2351,10 @@ class catquiz {
                         WHERE $where
                     ) s2
                     GROUP BY s2.userid, s2.ability
-                    ORDER BY attemptcountC
+                    ORDER BY attemptcount
                 ) s3
                 GROUP BY s3.userid
-                ORDER BY attemptsC";
+                ORDER BY attempts";
 
         return [$sql, $params];
     }
