@@ -885,16 +885,22 @@ class catquiz {
         $params = [];
         $filter = '';
 
-        $select = "lca.id id,
+        $select = "
+            *
+        ";
+
+        $from = "(
+            SELECT
+                lca.id AS id,
                 lca.attemptid as attemptid,
-                lca.timecreated timecreated,
-                lca.timemodified timemodified,
-                u.username username,
-                lcc.name catscale,
-                lccc.name catcontext,
-                c.fullname course,
-                lca.component component,
-                lct.name instance,
+                lca.timecreated AS timecreated,
+                lca.timemodified AS timemodified,
+                u.username AS username,
+                lcc.name AS catscale,
+                lccc.name AS catcontext,
+                c.fullname AS course,
+                lca.component AS component,
+                lct.name AS instance,
                 lca.teststrategy,
                 lca.status,
                 lca.total_number_of_testitems,
@@ -902,14 +908,15 @@ class catquiz {
                 lca.personability_before_attempt,
                 lca.personability_after_attempt,
                 lca.starttime,
-                lca.endtime";
-
-        $from = "{local_catquiz_attempts} lca
+                lca.endtime
+                FROM {local_catquiz_attempts} lca
                 JOIN {user} u ON lca.userid = u.id
                 JOIN {local_catquiz_catscales} lcc ON lca.scaleid = lcc.id
                 JOIN {local_catquiz_catcontext} lccc ON lca.contextid = lccc.id
                 JOIN {course} c ON lca.courseid = c.id
-                JOIN {local_catquiz_tests} lct ON lca.instanceid = lct.componentid";
+                JOIN {local_catquiz_tests} lct ON lca.instanceid = lct.componentid
+            ) as s1
+        ";
 
         return [$select, $from, "1=1", $filter, $params];
     }
