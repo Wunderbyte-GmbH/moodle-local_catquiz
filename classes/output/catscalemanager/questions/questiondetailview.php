@@ -90,10 +90,9 @@ class questiondetailview {
         // Get the record for the specific userid (fetched from optional param).
         list($select, $from, $where, , $params) = catquiz::return_sql_for_catscalequestions([$this->catscaleid],
                                                                                                     $catcontext,
-                                                                                                    [],
-                                                                                                    $USER->id);
-        $idcheck = "ustat.userid =:userid";
-        $sql = "SELECT $select FROM $from WHERE $where AND $idcheck";
+                                                                                                    []
+                                                                                                    );
+        $sql = "SELECT $select FROM $from WHERE $where";
         $recordinarray = $DB->get_records_sql($sql, $params, IGNORE_MISSING);
 
         if (empty($recordinarray)) {

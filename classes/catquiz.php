@@ -288,7 +288,7 @@ class catquiz {
                   AND ustat.scaleid $parentscales2";
         } else {
             $from .= "
-              LEFT JOIN (SELECT 0 AS userid, 0 AS numberattempts, NULL AS lastattempt) as ustat
+              LEFT JOIN (SELECT NULL AS userid, NULL AS numberattempts, NULL AS lastattempt) as ustat
                 ON 1=1";
         }
 
