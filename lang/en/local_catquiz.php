@@ -25,10 +25,6 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-global $CFG;
-
-require_once($CFG->dirroot . '/local/catquiz/lib.php');
-
 $string['pluginname'] = 'Adaptive Quiz - Advanced CAT Module';
 $string['catquiz'] = 'Catquiz';
 $string['subplugintype_catmodel'] = 'CAT model';
@@ -72,7 +68,13 @@ $string['firstquestionselectotherwise'] = ' ...otherwise: ';
 $string['includepilotquestions'] = 'Activate pilot mode';
 $string['standarderror'] = 'Standarderror';
 $string['tr_sd_ratio_name'] = 'Trusted region factor';
-$string['tr_sd_ratio_desc'] = 'Holds the factor that is multiplied with the standard error to define the trusted region.';
+$string['tr_sd_ratio_desc'] = 'The multiplier for the confidence interval is
+    the multiple of the standard deviation around the mean value by which a parameter
+    parameter estimate of a person or item difficulty is expected. If
+    the multiplier for the confidence interval is set too high, there is a
+    risk that the numerical algorithm will become unstable and provide unreliable
+    unreliable values when the data situation is difficult. The default value is a multiplier
+    of 3.0, which statistically includes 99.9 percent of all expected cases.';
 $string['minquestions_default_name'] = 'Default minimum questions per quiz attempt';
 $string['minquestions_default_desc'] = 'This value will be set by default but can be overwritten in the quiz settings.';
 $string['acceptedstandarderror'] = 'Accepted standarderror';

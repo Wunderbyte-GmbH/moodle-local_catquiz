@@ -46,7 +46,7 @@ use SebastianBergmann\RecursionContext\InvalidArgumentException;
  *
  * @covers \local_catquiz\catquiz
  */
-class catquiz_test extends advanced_testcase {
+final class catquiz_test extends advanced_testcase {
 
     /**
      * Tests the return value supposed to be a human readable information about course & group enrolment.

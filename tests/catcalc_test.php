@@ -50,7 +50,7 @@ require_once($CFG->dirroot . '/local/catquiz/tests/lib.php');
  * @covers \local_catquiz\catcalc
  *
  */
-class catcalc_test extends basic_testcase {
+final class catcalc_test extends basic_testcase {
     /**
      * Compares our results with the ones from the SimulatinoSteps radikaler CAT CSV
      *

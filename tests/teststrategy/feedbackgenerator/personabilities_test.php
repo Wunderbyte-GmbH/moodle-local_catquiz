@@ -43,7 +43,7 @@ use SebastianBergmann\RecursionContext\InvalidArgumentException;
  *
  * @covers \local_catquiz\teststrategy\feedbackgenerator\personabilities
  */
-class personabilities_test extends advanced_testcase {
+final class personabilities_test extends advanced_testcase {
 
     /**
      * Test that questions of subscales are removed as needed.

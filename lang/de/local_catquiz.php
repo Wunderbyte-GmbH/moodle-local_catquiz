@@ -25,9 +25,6 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-global $CFG;
-require_once($CFG->dirroot . '/local/catquiz/lib.php');
-
 $string['pluginname'] = 'Adaptive Quiz - Advanced CAT Module';
 $string['catquiz'] = 'Catquiz';
 $string['subplugintype_catmodel'] = 'CAT Modell';
@@ -77,8 +74,7 @@ $string['tr_sd_ratio_desc'] = 'Der Multiplikator für den Vertrauensbereich gibt
     der Multiplikator für den Vertrauensbereich zu hoch gewählt, besteht die
     Gefahr, dass der numerische Algorithmus instabil wird und bei schwieriger
     Datenlage unzuverlässige Werte liefert. Default-Wert ist ein Multiplikator
-    von 3.0, was statistisch 99,9 Prozent aller zu erwartenden Fälle mit
-    einschließt einschließt.';
+    von 3.0, was statistisch 99,9 Prozent aller zu erwartenden Fälle mit einschließt.';
 $string['minquestions_default_name'] = 'Standardwert für die Mindestanzahl an Fragen pro Versuch';
 $string['minquestions_default_desc'] = 'Dieser Wert wird standardmässig gesetzt, kann jedoch in den Quizsettings überschrieben werden';
 $string['acceptedstandarderror'] = 'akzeptierter Standardfehler';

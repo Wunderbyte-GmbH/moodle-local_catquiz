@@ -40,7 +40,7 @@ use local_catquiz\local\model\model_item_param_list;
  * @covers \local_catquiz\catscale
  *
  */
-class catscale_test extends basic_testcase {
+final class catscale_test extends basic_testcase {
 
     /**
      * Tests if the standarderror is calculated correctly
