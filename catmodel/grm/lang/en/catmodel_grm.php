@@ -15,7 +15,7 @@
 // along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
 
 /**
- * This file contains language strings for the 1plraschbirnbaum model catquiz plugin
+ * Plugin strings are defined here.
  *
  * @package     catmodel_grm
  * @category    string
