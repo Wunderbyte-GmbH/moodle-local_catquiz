@@ -42,7 +42,7 @@ $string['catscales:information'] = 'Define CAT scales: {$a->link}';
 $string['cattags'] = 'Manage course tags';
 $string['cattags:information'] = 'These tags identify courses that teachers can enroll students in, regardless of whether they are part of the course.';
 $string['choosetags'] = 'Choose tag(s)';
-$string['choosetags:disclaimer'] = 'Multiple selection with key "⌘ command" (apple) or "Ctrl" (windows, linux)';
+$string['choosetags:disclaimer'] = 'Multiple selection with key “⌘ command” (apple) or “Ctrl” (windows, linux)';
 $string['catscalesname_exists'] = 'The name is already being used';
 $string['cachedef_catscales'] = 'Caches the CAT scales of catquiz';
 $string['catcatscales'] = 'Selection subscales';
@@ -264,15 +264,15 @@ $string['deletedcatscale'] = "catscale that doesn't exist anymore";
 $string['attempt_completed'] = 'Attempt completed';
 $string['usertocourse_enroled'] = 'User enroled to course';
 $string['usertogroup_enroled'] = 'User enroled to group';
-$string['usertocourse_enroled_description'] = 'User with ID {$a->userid} was enroled to course <a href={$a->courseurl}>{$a->coursename}</a>';
-$string['usertogroup_enroled_description'] = 'User with ID {$a->userid} was enroled to group {$a->groupname} in course <a href={$a->courseurl}>{$a->coursename}</a>‚';
+$string['usertocourse_enroled_description'] = 'User with ID {$a->userid} was enroled to course “<a href="{$a->courseurl}">{$a->coursename}</a>”';
+$string['usertogroup_enroled_description'] = 'User with ID {$a->userid} was enroled to group “{$a->groupname}” in course “<a href="{$a->courseurl}">{$a->coursename}</a>”‚';
 $string['complete_attempt_description'] = 'Attempt with id {$a->attemptid} in CAT scale {$a->catscalelink} completed by user {$a->userid}.';
 $string['eventtime'] = 'Event time';
 $string['eventname'] = 'Event name';
 $string['testitem_imported'] = 'Testitem(s) imported';
 $string['imported_testitem_description'] = '{$a} testitems were imported.';
-$string['minscalevalueinformation'] = 'Enter the lowest possible person ability of this scale as a negative decimal value. The mean is zero. Will only be set when creating a new root scale and then applies to all sub-scales. To do so, define values (at least) in first dataset. Values in existing scales cannot be changed via import. If you want to change the values of an existing scale, please switch to the "Scales" tab.';
-$string['maxscalevalueinformation'] = 'Enter the highest possible person ability of this scale as a positive decimal value. The mean is zero. Will only be set when creating a new root scale and then applies to all sub-scales. To do so, define values (at least) in first dataset. Values in existing scales cannot be changed via import. If you want to change the values of an existing scale, please switch to the "Scales" tab.';
+$string['minscalevalueinformation'] = 'Enter the lowest possible person ability of this scale as a negative decimal value. The mean is zero. Will only be set when creating a new root scale and then applies to all sub-scales. To do so, define values (at least) in first dataset. Values in existing scales cannot be changed via import. If you want to change the values of an existing scale, please switch to the “Scales” tab.';
+$string['maxscalevalueinformation'] = 'Enter the highest possible person ability of this scale as a positive decimal value. The mean is zero. Will only be set when creating a new root scale and then applies to all sub-scales. To do so, define values (at least) in first dataset. Values in existing scales cannot be changed via import. If you want to change the values of an existing scale, please switch to the “Scales” tab.';
 $string['testitem_deleted'] = 'Testitem deleted';
 $string['testitem_deleted_description'] = 'Testitem with ID {$a->testitemid} deleted.';
 
@@ -281,19 +281,19 @@ $string['messageprovider:catscaleupdate'] = 'Notification of CAT scale update';
 $string['messageprovider:updatecatscale'] = 'Notification of CAT scale update';
 $string['catscaleupdatedtitle'] = 'A CAT scale was updated';
 $string['messageprovider:updatecatscale'] = 'Recieves notification on subscrition of catscale';
-$string['onegroupenroled'] = 'Because of your test results in "{$a->catscalename}", you are now enrolled in group "{$a->groupname}" in course <a href={$a->courseurl}>{$a->coursename}</a>.';
-$string['onecourseenroled'] = 'Because of your test results in "{$a->catscalename}", you are now enrolled in course <a href={$a->courseurl}>{$a->coursename}</a>.';
+$string['onegroupenroled'] = 'Because of your test results in “{$a->catscalename}”, you are now enrolled in group “{$a->groupname}” in course “<a href="{$a->courseurl}">{$a->coursename}</a>”.';
+$string['onecourseenroled'] = 'Because of your test results in “{$a->catscalename}”, you are now enrolled in course “<a href="{$a->courseurl}">{$a->coursename}</a>”.';
 $string['messageprovider:enrolmentfeedback'] = "Automatical enrolment to courses and groups.";
 $string['enrolmentmessagetitle'] = "Notification about new course / group enrolments";
 $string['courseenrolementstring'] = 'Because of your test results, you are now enroled in course(s) {$a}. Good luck with your studies.';
-$string['groupenrolementstring'] = '{$a->groupname} in course <a href={$a->courseurl}>{$a->coursename}</a>';
+$string['groupenrolementstring'] = '“{$a->groupname}” in course “<a href="{$a->courseurl}">{$a->coursename}</a>”';
 $string['enrolementstringstart'] = 'Based on your results in test {$a->testname} in course {$a->coursename} you are now...<br>';
 $string['followingcourses'] = 'subscribed in the following course(s):<br>';
 $string['followinggroups'] = 'member of the following group(s):<br>';
 $string['enrolementstringstartforfeedback'] = 'Based on your results you are now...<br>';
 $string['enrolementstringend'] = 'Good luck with your studies!';
 $string['feedback_tab_clicked'] = 'Click on feedback tab';
-$string['feedback_tab_clicked_description'] = 'User {$a->userid} clicked the "{$a->feedback_translated}" tab in {$a->attemptlink}';
+$string['feedback_tab_clicked_description'] = 'User {$a->userid} clicked the “{$a->feedback_translated}” tab in {$a->attemptlink}';
 
 // Access.php.
 $string['catquiz:canmanage'] = 'Is allowed to manage Catquiz plugin';
@@ -342,7 +342,7 @@ $string['studentstats'] = 'Students';
 // Email Templates.
 $string['notificationcatscalechange'] = 'Hello {$a->firstname} {$a->lastname},
 CAT scales have been changed on the Moodle platform {$a->instancename}.
-This email informs you as the CAT Manager* responsible for those CAT scales of these changes . {$a->editorname} made the following changes to the CAT scale "{$a->catscalename}":
+This email informs you as the CAT Manager* responsible for those CAT scales of these changes . {$a->editorname} made the following changes to the CAT scale “{$a->catscalename}”:
     {$a->changedescription}
 You can review the current state here: {$a->linkonscale}';
 
@@ -449,8 +449,8 @@ $string['attempts'] = 'Attempts';
 $string['addquestion'] = 'Add question from catalogue';
 $string['addtest'] = 'Add existing test';
 $string['checklinking'] = 'Check linking';
-$string['confirmdeletion'] = 'You are about to delete the following item: <br> "{$a->data}"';
-$string['confirmactivitychange'] = 'You are about to change the activity status of the following item: <br> "{$a->data}"';
+$string['confirmdeletion'] = 'You are about to delete the following item: <br> “{$a->data}”';
+$string['confirmactivitychange'] = 'You are about to change the activity status of the following item: <br> “{$a->data}”';
 $string['genericsubmit'] = 'Confirm';
 $string['deletedatatitle'] = 'Delete';
 $string['toggleactivity'] = 'Activity status';
@@ -494,7 +494,7 @@ $string['currentabilityfellowstudents'] = 'Average';
 $string['feedbackbarlegend'] = "Color code";
 $string['teacherfeedback'] = "Feedback for teachers";
 $string['catquiz_feedbackheader'] = "Feedback";
-$string['catquizfeedbackheader'] = 'Feedback for "{$a}"';
+$string['catquizfeedbackheader'] = 'Feedback for “{$a}”';
 $string['feedbacknumber'] = 'Feedback for range {$a}';
 $string['feedbackrange'] = 'Ability level {$a}';
 $string['hasability'] = 'Ability was calculated';
@@ -559,15 +559,15 @@ $string['itemsplayed'] = 'evaluated items';
 $string['detected_scales_chart_description'] = 'The following chart displays
     the values in comparison with your ability score in {$a}. Click the bar to
     see the scale name and value';
-$string['personabilityinscale'] = 'Ability score in scale "{$a}"';
-$string['yourscorein'] = 'Your average scores in "{$a}"';
+$string['personabilityinscale'] = 'Ability score in scale “{$a}”';
+$string['yourscorein'] = 'Your average scores in “{$a}”';
 $string['scoreofpeers'] = 'Average of your peers';
 $string['numberofattempts'] = 'Number of attempts';
 $string['abilityprofile'] = 'Ability score profile in {$a}';
 $string['abilityprofile_title'] = 'Ability score in test';
 $string['labelforrelativepersonabilitychart'] = 'Relative Ability';
 $string['nothingtocompare'] = 'There are not enough valid results available for a comparison.';
-$string['attemptchartstitle'] = 'Number and results of attempts in scale "{$a}"';
+$string['attemptchartstitle'] = 'Number and results of attempts in scale “{$a}”';
 $string['personabilityrangestring'] = '{$a->rangestart} - {$a->rangeend}';
 $string['testinfolabel'] = 'Test information';
 $string['scalescorechartlabel'] = '{$a}-Score';
@@ -583,8 +583,8 @@ $string['setfeedbackforscale'] = 'written feedback';
 // For setfeedbackforscale_help: Param =  <Name der Subskala>.
 $string['setfeedbackforscale_help'] = 'This text will be displayed to the test participants after completion of the test, provided the result for the subscale <subscale name> falls within the defined ability range.';
 $string['setgrouprenrolmentforscale'] = 'Enrol to a group';
-$string['groupenrolmenthelptext_help'] = 'Please enter exact name(s) of existing group like (i.e. "group1,group2" or "group3").';
-$string['groupenrolmenthelptext'] = 'Please enter exact name(s) of existing group like (i.e. "group1,group2" or "group3").';
+$string['groupenrolmenthelptext_help'] = 'Please enter exact name(s) of existing group like (i.e. “group1,group2” or “group3”).';
+$string['groupenrolmenthelptext'] = 'Please enter exact name(s) of existing group like (i.e. “group1,group2” or “group3”).';
 $string['courseselection'] = 'Select course';
 // For setgroupenrolmentforscale_help: Param =  <Name der Subskala>.
 $string['setgrouprenrolmentforscale_help'] = 'Test participants are enrolled in this group of the course after completing the test, provided the result falls within the set ability range. If you do not wish to be enrolled in a group, please leave this field blank.';
@@ -594,7 +594,7 @@ $string['setcourseenrolmentforscale_help'] = 'Test participants are enrolled in 
 $string['setautonitificationonenrolmentforscale'] = 'Inform participants about group or course enrollment using the standard text.';
 // Check Params for setautonitificationonenrolmentforscale_help text. Group and courselink.
 $string['setautonitificationonenrolmentforscale_help'] = '
-In addition to their written feedback, participants will receive the following note: "You have been automatically enrolled in the group <group name> / the course <course name as a link>."';
+In addition to their written feedback, participants will receive the following note: “You have been automatically enrolled in the group <group name> / the course <course name as a link>.”';
 $string['copysettingsforallsubscales'] = 'Apply values to given subscales';
 $string['quizgraphicalsummary'] = 'Quiz progress summary';
 $string['score'] = 'Weighted score';
@@ -628,7 +628,7 @@ $string['importcsv'] = 'Import CSV';
 $string['importsuccess'] = 'Import was successful. {$a} record(s) treated.';
 $string['importfailed'] = 'Import failed';
 $string['dateparseformat'] = 'Date parse format';
-$string['dateparseformat_help'] = 'Please, use date format like specified in CSV file. Help with <a href="http://php.net/manual/en/function.date.php">this</a> resource for options.';
+$string['dateparseformat_help'] = 'Please use the date format like specified in your CSV file (j.n.Y H:i:s). More information at <a href="http://php.net/manual/en/function.date.php">that resource</a>.';
 $string['defaultdateformat'] = 'j.n.Y H:i:s';
 $string['importcolumnsinfos'] = 'Informations about columns to be imported:';
 $string['mandatory'] = 'mandatory';
@@ -656,10 +656,10 @@ $string['nolabels'] = 'No column labels defined in settings object.';
 $string['checkdelimiter'] = 'Check if data is separated via the selected symbol.';
 $string['scaleinformation'] = 'The id of the CAT scale the item should be assigned to.';
 $string['scalenameinformation'] = 'The name of the CAT scale the item should be assigned to. If no catscale id given, matching is done via name.';
-$string['dataincomplete'] = 'Record with componentid {$a->id} is incomplete and could not be treated entirely. Check field "{$a->field}".';
+$string['dataincomplete'] = 'Record with componentid {$a->id} is incomplete and could not be treated entirely. Check field “{$a->field}”.';
 $string['modelinformation'] = 'This field is necessary to entirely treat the record. If it is empty, item can only be assigned to CAT scale.';
-$string['parentscalenamesinformation'] = 'To match the an item via the scalename, make sure to name all parent scales including root scale. For new - yet to be created - scales, you can enter parent scales for the defined scale. Start with the highest parent and separate all children with "|" (vertical line unicode U+007C - do not mistake for slash "/"). To enable import to parent scales, set "0" here.';
-$string['statusactiveorinactive'] = 'The activity status of the item. Set to "1" to make sure, item will not be used. Leave empty or set "0" for "active".';
+$string['parentscalenamesinformation'] = 'To match the an item via the scalename, make sure to name all parent scales including root scale. For new - yet to be created - scales, you can enter parent scales for the defined scale. Start with the highest parent and separate all children with “|” (vertical line unicode U+007C - do not mistake for slash “/”). To enable import to parent scales, set “0” here.';
+$string['statusactiveorinactive'] = 'The activity status of the item. Set to “1” to make sure, item will not be used. Leave empty or set “0” for “active”.';
 
 // Testenvironments table.
 $string['notifyallteachers'] = 'Notify all teachers';
@@ -690,13 +690,13 @@ $string['catquizstatistics_numattempts_title'] = 'Number of attempts';
 $string['catquizstatistics_numattemptsperperson_title'] = 'Attempts per person';
 $string['catquizstatistics_overview'] = 'Overview';
 $string['catquizstatistics_testusage'] = 'Testusage';
-$string['catquizstatistics_progress_peers_title'] = 'Average result of your peers in scale "{$a}"';
+$string['catquizstatistics_progress_peers_title'] = 'Average result of your peers in scale “{$a}”';
 $string['catquizstatistics_progress_personal_title'] = 'Your personal results for that scale';
 $string['catquizstatistics_numberofresponses'] = 'Number of responses';
 $string['catquizstatistics_exportcsv_heading'] = 'Export data of selected attempts as CSV';
 $string['catquizstatistics_exportcsv_description'] = 'As user with permission to download exports, here you can export results of all attempts as a CSV file';
 $string['catquizstatistics_nodataforcourse'] = 'There are no CAT tests for the given courseid';
-$string['catquizstatistics_askforparams'] = 'Please provide a "globalscale" or "courseid" parameter';
+$string['catquizstatistics_askforparams'] = 'Please provide a “globalscale” or “courseid” parameter';
 $string['catquizstatistics_scale_testid_conflict'] = 'The test for the given testid is not using the provided scale';
 $string['catquizstatistics_scale_course_conflict'] = 'The given testid is not part of the given course';
 
