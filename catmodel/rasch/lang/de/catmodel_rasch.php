@@ -1,5 +1,5 @@
 <?php
-// This file is part of Moodle - http://moodle.org/
+// This file is part of Moodle - https://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -12,21 +12,24 @@
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+// along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
 
 /**
  * This file contains language strings for the 1plraschbirnbaum model catquiz plugin
  *
- * @package catmodel_rasch
- * @copyright  2022 Georg Maißer <info@wunderbyte.at>
- * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @package     catmodel_rasch
+ * @category    string
+ * @copyright   2022 onwards Wunderbyte GmbH <info@wunderbyte.at>
+ * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+defined('MOODLE_INTERNAL') || die();
+
 $string['pluginname'] = '1PL Rasch Modell';
-$string['trusted_region_min'] = 'Trusted Region Minimum';
-$string['trusted_region_min_desc'] = 'Trusted Region Minimum';
-$string['trusted_region_max'] = 'Trusted Region Maximum';
-$string['trusted_region_max_desc'] = 'Trusted Region Maximum';
 $string['trusted_region_factor_sd_a'] = 'Trusted Region Factor SD a';
 $string['trusted_region_factor_sd_a_desc'] = 'Use x times of SD as range of trusted regions';
-$string['trusted_region_placement_b'] = "Placement of the discriminatory parameter";
+$string['trusted_region_max'] = 'Trusted Region Maximum';
+$string['trusted_region_max_desc'] = 'Trusted Region Maximum';
+$string['trusted_region_min'] = 'Trusted Region Minimum';
+$string['trusted_region_min_desc'] = 'Trusted Region Minimum';
+$string['trusted_region_placement_b'] = 'Placement of the discriminatory parameter';

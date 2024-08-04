@@ -1,5 +1,5 @@
 <?php
-// This file is part of Moodle - http://moodle.org/
+// This file is part of Moodle - https://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -12,32 +12,35 @@
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+// along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
 
 /**
  * This file contains language strings for the 1plraschbirnbaum model catquiz plugin
  *
- * @package catmodel_mixedraschbirnbaum
- * @copyright 2024 Georg Maißer <info@wunderbyte.at>
- * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @package     catmodel_mixedraschbirnbaum
+ * @category    string
+ * @copyright   2022 onwards Wunderbyte GmbH <info@wunderbyte.at>
+ * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+defined('MOODLE_INTERNAL') || die();
+
 $string['pluginname'] = '3PL mixed Rasch-Birnbaum model';
-$string['trusted_region_min_a'] = 'Trusted Region Minimum a';
-$string['trusted_region_min_a_desc'] = 'Trusted Region Minimum a';
-$string['trusted_region_max_a'] = 'Trusted Region Maximum a';
-$string['trusted_region_max_a_desc'] = 'Trusted Region Maximum a';
+$string['trusted_region_factor_max_b'] = 'Trusted Region Factor placement b';
+$string['trusted_region_factor_max_b_desc'] = 'Trusted Region Factor placement b';
 $string['trusted_region_factor_sd_a'] = 'Trusted Region Factor SD a';
 $string['trusted_region_factor_sd_a_desc'] = 'Use x times of SD as range of trusted regions';
-$string['trusted_region_placement_b'] = "Placement of the discriminatory parameter";
-$string['trusted_region_placement_b_desc'] = "Placement of the discriminatory parameter";
-$string['trusted_region_slope_b'] = "Slope of the discriminatory parameter";
-$string['trusted_region_slope_b_desc'] = "Slope of the discriminatory parameter";
-$string['trusted_region_factor_max_b'] = "Trusted Region Factor placement b";
-$string['trusted_region_factor_max_b_desc'] = "Trusted Region Factor placement b";
-$string['trusted_region_min_b'] = "Trusted region min b";
-$string['trusted_region_min_b_desc'] = "Trusted region min b";
-$string['trusted_region_max_b'] = "Trusted region max b";
-$string['trusted_region_max_b_desc'] = "Trusted region max b";
-$string['trusted_region_max_c'] = "Trusted region max c";
-$string['trusted_region_max_c_desc'] = "Trusted region max c";
+$string['trusted_region_max_a'] = 'Trusted Region Maximum a';
+$string['trusted_region_max_a_desc'] = 'Trusted Region Maximum a';
+$string['trusted_region_max_b'] = 'Trusted region max b';
+$string['trusted_region_max_b_desc'] = 'Trusted region max b';
+$string['trusted_region_max_c'] = 'Trusted region max c';
+$string['trusted_region_max_c_desc'] = 'Trusted region max c';
+$string['trusted_region_min_a'] = 'Trusted Region Minimum a';
+$string['trusted_region_min_a_desc'] = 'Trusted Region Minimum a';
+$string['trusted_region_min_b'] = 'Trusted region min b';
+$string['trusted_region_min_b_desc'] = 'Trusted region min b';
+$string['trusted_region_placement_b'] = 'Placement of the discriminatory parameter';
+$string['trusted_region_placement_b_desc'] = 'Placement of the discriminatory parameter';
+$string['trusted_region_slope_b'] = 'Slope of the discriminatory parameter';
+$string['trusted_region_slope_b_desc'] = 'Slope of the discriminatory parameter';
