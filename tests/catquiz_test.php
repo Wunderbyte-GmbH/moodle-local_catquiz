@@ -137,8 +137,8 @@ final class catquiz_test extends advanced_testcase {
                     ".
                     '</div><br>member of the following group(s):<br>'.
                     '<div> - “Gruppe 1” in course “<a href="http://10.111.0.2:8000/course/view.php?id=17">Kurs 1</a>”</div>'.
-                    '<div> - “Gruppe 2” in course “<a href="http://10.111.0.2:8000/course/view.php?id=17">Kurs 2</a>”</div>'.'
-                    <div> - “Gruppe 3” in course “<a href="http://10.111.0.2:8000/course/view.php?id=17">Kurs 2</a>”</div>'.
+                    '<div> - “Gruppe 2” in course “<a href="http://10.111.0.2:8000/course/view.php?id=17">Kurs 2</a>”</div>'.
+                    '<div> - “Gruppe 3” in course “<a href="http://10.111.0.2:8000/course/view.php?id=17">Kurs 2</a>”</div>'.
                     'Good luck with your studies!',
                     'messageforfeedback' => "Based on your results you are now...<br><br>"
                     . "subscribed in the following course(s):<br>"
@@ -273,7 +273,7 @@ final class catquiz_test extends advanced_testcase {
                     '<div> - “Gruppe 2” in course “<a href="http://10.111.0.2:8000/course/view.php?id=17">Kurs 2</a>”</div>'.
                     '<div> - “Gruppe 3” in course “<a href="http://10.111.0.2:8000/course/view.php?id=17">Kurs 3</a>”</div>'.
                     'Good luck with your studies!',
-                    'messageforfeedback' => 'Based on your results in test Testname in course Kurs 1 you are now...<br><br>'.
+                    'messageforfeedback' => 'Based on your results you are now...<br><br>'.
                     'member of the following group(s):<br>'.
                     '<div> - “Gruppe 1” in course “<a href="http://10.111.0.2:8000/course/view.php?id=17">Kurs 1</a>”</div>'.
                     '<div> - “Gruppe 2” in course “<a href="http://10.111.0.2:8000/course/view.php?id=17">Kurs 2</a>”</div>'.
