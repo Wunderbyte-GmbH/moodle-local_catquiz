@@ -24,22 +24,14 @@
 
 namespace local_catquiz;
 
-use core\check\result;
 use dml_exception;
 use local_catquiz\event\usertocourse_enroled;
 use local_catquiz\event\usertogroup_enroled;
 use local_catquiz\local\status;
 use local_catquiz\teststrategy\progress;
-use local_catquiz\event\attempt_completed;
-use local_catquiz\teststrategy\feedbacksettings;
 use moodle_exception;
 use moodle_url;
-use question_attempt;
-use question_attempt_pending_step;
-use question_bank;
 use question_engine;
-use question_finder;
-use question_state_gradedwrong;
 use stdClass;
 
 /**
