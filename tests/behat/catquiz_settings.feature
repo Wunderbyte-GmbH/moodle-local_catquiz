@@ -125,7 +125,7 @@ Feature: As a teacher I setup adaptive quiz with CATquiz Scales and Feedbacks.
       | C1     | adaptivecatquiz1 | catquiz  | Simulation | Infer lowest skill gap | startwitheasiestquestion    | 7                    | 0.4                       | 0.6                       | 3                       |
     And I am on the "adaptivecatquiz1" Activity page logged in as teacher1
     And I follow "Settings"
-    And I click on "Feedback for \"Simulation\"" "text"
+    And I click on "Feedback for “Simulation”" "text"
     Then I should see "-6" in the "//div[@data-name='feedback_scale_Simulation_range_1']//div[@id='fitem_id_lowest_limit']" "xpath_element"
     And the field "Upper limit" in the "//div[@data-name='feedback_scale_Simulation_range_1']" "xpath_element" matches value "-2"
     And the field "Lower limit" in the "//div[@data-name='feedback_scale_Simulation_range_2']" "xpath_element" matches value "-2"
@@ -283,9 +283,9 @@ Feature: As a teacher I setup adaptive quiz with CATquiz Scales and Feedbacks.
     And the field "Lower limit" in the "//div[@data-name='feedback_scale_Simulation_range_2']" "xpath_element" matches value "1"
     And I should not see "Feedback for range 3" in the "//div[contains(@aria-labelledby, 'catquiz_feedback_header_')]" "xpath_element"
     ## Check visibility of feedback form links for other catscales
-    And I should see "Feedback for \"SimA\"" in the "//div[contains(@aria-labelledby, 'catquiz_feedback_header_')]" "xpath_element"
-    And I should see "Feedback for \"SimB\"" in the "//div[contains(@aria-labelledby, 'catquiz_feedback_header_')]" "xpath_element"
-    And I should see "Feedback for \"SimC\"" in the "//div[contains(@aria-labelledby, 'catquiz_feedback_header_')]" "xpath_element"
+    And I should see "Feedback for “SimA”" in the "//div[contains(@aria-labelledby, 'catquiz_feedback_header_')]" "xpath_element"
+    And I should see "Feedback for “SimB”" in the "//div[contains(@aria-labelledby, 'catquiz_feedback_header_')]" "xpath_element"
+    And I should see "Feedback for “SimC”" in the "//div[contains(@aria-labelledby, 'catquiz_feedback_header_')]" "xpath_element"
     ## Save and verify feedback configuration
     And I click on "Save and display" "button"
     And I wait until the page is ready
