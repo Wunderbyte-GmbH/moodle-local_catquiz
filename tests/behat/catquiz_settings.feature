@@ -295,7 +295,7 @@ Feature: As a teacher I setup adaptive quiz with CATquiz Scales and Feedbacks.
     And I click on "Save and display" "button"
     And I follow "Settings"
     And I wait until the page is ready
-    Then I click on "Feedback for \"Simulation\"" "text"
+    Then I click on "Feedback for “Simulation”" "text"
     And I wait until the page is ready
     ## Range 2 - wb_colourpicker:
     ## -direct xpath access
