@@ -189,9 +189,11 @@ final class catquiz_test extends advanced_testcase {
                 'expected' => [
                     'messagetitle' => "Notification about new course / group enrolments",
                     'messagebody' => 'Because of your test results in “Skala 1”, '.
-                    'you are now enrolled in group “Gruppe 1” in course “<a href="http://10.111.0.2:8000/course/view.php?id=17">Kurs 1</a>”.',
+                    'you are now enrolled in group “Gruppe 1” '.
+                    'in course “<a href="http://10.111.0.2:8000/course/view.php?id=17">Kurs 1</a>”.',
                     'messageforfeedback' => 'Because of your test results in “Skala 1”, '.
-                    'you are now enrolled in group “Gruppe 1” in course “<a href="http://10.111.0.2:8000/course/view.php?id=17">Kurs 1</a>”.',
+                    'you are now enrolled in group “Gruppe 1” '.
+                    'in course “<a href="http://10.111.0.2:8000/course/view.php?id=17">Kurs 1</a>”.',
                 ],
             ],
             'onlycourses' => [
