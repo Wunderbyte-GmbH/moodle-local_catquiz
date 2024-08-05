@@ -208,7 +208,7 @@ class catquiz {
             'contextid' => $contextid,
         ];
 
-        $wherearray['lcip.contextid'] = $contextid;
+        $wherearray['lcipcontextid'] = $contextid;
 
         // If we fetch only for a given user, we need to add this to the sql.
         if (!empty($userid)) {
@@ -226,18 +226,20 @@ class catquiz {
 
             [$incatscales, $inparams] = $DB->get_in_or_equal($catscaleids, SQL_PARAMS_NAMED, 'incatscales');
             $params = array_merge($params, $inparams);
-            $wherecontains['lccs.id'] = $incatscales;
+            $wherecontains['lccscatscaleid'] = $incatscales;
         }
 
-        $select = <<<SQL
+        $select = "*";
+        $from = <<<SQL
+            ( SELECT
             -- Information about the question
             q.id,
             lci.componentid,
             qbe.idnumber as label,
             COALESCE (qbe.idnumber, CAST(qbe.id AS CHAR)) as idnumber,
-            q.name,
-            q.questiontext,
-            q.qtype,
+            q.name as questionname,
+            q.questiontext as questiontext,
+            q.qtype as qtype,
             qc.name as categoryname,
             -- Information about CAT scales, parameters and contexts
             lci.catscaleid catscaleid,
@@ -245,22 +247,23 @@ class catquiz {
             lci.componentname component,
             lci.id as itemid,
             lccs.name as catscalename,
-            lcip.model,
+            lccs.id as lccscatscaleid,
+            lcip.model as model,
             lcip.difficulty,
             lcip.discrimination,
             lcip.guessing,
             lcip.timecreated,
             lcip.timemodified,
             lcip.status,
-            lcip.contextid,
+            lcip.contextid AS lcipcontextid,
             -- Information about usage statisitcs
             COALESCE(astat.numberattempts,0) attempts,
-            COALESCE(astat.lastattempt,0) as lastattempttime,
+            COALESCE(astat.lastattempt,0) as astatlastattempttime,
             ustat.userid, ustat.numberattempts userattempts,
             ustat.lastattempt as userlastattempttime
     SQL;
 
-        $from = "{local_catquiz_catscales} lccs
+        $from .= " FROM {local_catquiz_catscales} lccs
           -- Get all corresponding items of those scales, skip if not existent
           -- (INNER JOIN)
             JOIN {local_catquiz_items} lci ON lci.catscaleid=lccs.id
@@ -300,11 +303,11 @@ class catquiz {
                 GROUP BY lca.scaleid, lca.contextid, qa.questionid, lca.userid
               ) ustat
                 ON ustat.contextid = lcip.contextid AND ustat.questionid = q.id
-                  AND ustat.scaleid $parentscales2";
+                  AND ustat.scaleid $parentscales2 ) s";
         } else {
             $from .= "
               LEFT JOIN (SELECT NULL AS userid, NULL AS numberattempts, NULL AS lastattempt) as ustat
-                ON 1=1";
+                ON 1=1 ) s";
         }
 
         $where = '1=1';

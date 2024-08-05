@@ -53,6 +53,7 @@ Feature: As an admin I perform import of catscales along with questions to check
     And I press "Save changes"
     And I click on "Questions" "link" in the "#region-main" "css_element"
     And I set the field "Scale" to "Mathematik"
+    And I wait "120" seconds
     And I should see "3 of 3 records found"
     And I wait "1" seconds
     ## And I set the field "Search" to "Rechenregel"

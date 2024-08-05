@@ -137,14 +137,14 @@ class questionsdisplay {
         $table->define_headers(array_values($columnsarray));
 
         $table->define_fulltextsearchcolumns([
-            'qbe.idnumber',
-            'lccs.name',
-            'qc.name',
-            'q.name',
+            'label',
+            'catscalename',
+            'categoryname',
+            'questionname',
             'questiontext',
             'qtype',
             'model',
-            'astat.lastattempt',
+            'astatlastattempttime',
         ]);
 
         $sortcolumns = $columnsarray;
