@@ -133,7 +133,8 @@ final class catquiz_test extends advanced_testcase {
                     . "subscribed in the following course(s):<br><div>"
                     . " - <a href=http://10.111.0.2:8000/course/view.php?id=17>Kurs 1</a>
                     </div><div> - <a href=http://10.111.0.2:8000/course/view.php?id=17>Kurs 2</a>
-                    </div><div> - <a href=http://10.111.0.2:8000/course/view.php?id=17>Kurs 3</a>".
+                    </div><div> - <a href=http://10.111.0.2:8000/course/view.php?id=17>Kurs 3</a>
+                    ".
                     '</div><br>member of the following group(s):<br>'.
                     '<div> - “Gruppe 1” in course “<a href="http://10.111.0.2:8000/course/view.php?id=17">Kurs 1</a>”</div>'.
                     '<div> - “Gruppe 2” in course “<a href="http://10.111.0.2:8000/course/view.php?id=17">Kurs 2</a>”</div>'.'
@@ -142,7 +143,8 @@ final class catquiz_test extends advanced_testcase {
                     . "subscribed in the following course(s):<br>"
                     . "<div> - <a href=http://10.111.0.2:8000/course/view.php?id=17>Kurs 1</a>
                     </div><div> - <a href=http://10.111.0.2:8000/course/view.php?id=17>Kurs 2</a>
-                    </div><div> - <a href=http://10.111.0.2:8000/course/view.php?id=17>Kurs 3</a>".
+                    </div><div> - <a href=http://10.111.0.2:8000/course/view.php?id=17>Kurs 3</a>
+                    ".
                     '</div><br>member of the following group(s):<br>'.
                     '<div> - “Gruppe 1” in course “<a href="http://10.111.0.2:8000/course/view.php?id=17">Kurs 1</a>”</div>'.
                     '<div> - “Gruppe 2” in course “<a href="http://10.111.0.2:8000/course/view.php?id=17">Kurs 2</a>”</div>'.
