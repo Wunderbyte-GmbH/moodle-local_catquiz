@@ -21,7 +21,7 @@
       <FIELDS>
         <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
         <FIELD NAME="parentid" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="id of the parent catscale, 0 if this is a top-level catscale"/>
-        <FIELD NAME="label" TYPE="char" LENGTH="255" NOTNULL="true" SEQUENCE="false" COMMENT="Unique catscale label, e.g. CAT-Math_V.01"/>
+        <FIELD NAME="label" TYPE="char" LENGTH="255" NOTNULL="true" SEQUENCE="false" COMMENT="Unique catscale label, e.g. CAT-Math_V.01"/> <!-- TODO: To be implemented and made UNIQUE -->
         <FIELD NAME="name" TYPE="char" LENGTH="255" NOTNULL="true" SEQUENCE="false" COMMENT="Unique catscale name, e.g. BASIC MATHEMATIC"/>
         <FIELD NAME="description" TYPE="text" NOTNULL="false" SEQUENCE="false" COMMENT="Description of the catscale"/>
         <FIELD NAME="contextid" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false" COMMENT="Context selected by default for this scale."/>
@@ -65,7 +65,7 @@
     <TABLE NAME="local_catquiz_tests" COMMENT="Handle tests for catquiz">
       <FIELDS>
         <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
-          <FIELD NAME="parentid" TYPE="int" LENGTH="10" NOTNULL="false" DEFAULT="0" SEQUENCE="false" COMMENT="A record from this table as parent."/>
+          <FIELD NAME="parentid" TYPE="int" LENGTH="10" NOTNULL="false" DEFAULT="0" SEQUENCE="false" COMMENT="A record from this table as parent."/>  <!-- TODO: To be decided and evtl. removed -->
           <FIELD NAME="componentid" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false" COMMENT="Corresponds to the instance id of a certain test component."/>
           <FIELD NAME="component" TYPE="char" LENGTH="255" NOTNULL="false" DEFAULT="" SEQUENCE="false" COMMENT="Name of plugin which uses this environment"/>
           <FIELD NAME="catscaleid" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false" COMMENT="ID from local catquiz catscales table"/>
@@ -92,7 +92,7 @@
     <TABLE NAME="local_catquiz_catcontext" COMMENT="The catcontext holds all the settings for a new calculation of item params or person abilities">
       <FIELDS>
         <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
-        <FIELD NAME="parentid" TYPE="int" LENGTH="10" NOTNULL="true" DEFAAULT ="0" SEQUENCE="false" COMMENT="id of the parent catcontext, 1 if this is the top-level (standard) catcontext"/>
+        <FIELD NAME="parentid" TYPE="int" LENGTH="10" NOTNULL="true" DEFAAULT ="0" SEQUENCE="false" COMMENT="id of the parent catcontext, 1 if this is the top-level (standard) catcontext"/>   <!-- TODO: To be decided and to be implemented -->
         <FIELD NAME="name" TYPE="char" LENGTH="255" NOTNULL="false" SEQUENCE="false" COMMENT="Name of the context."/>
         <FIELD NAME="description" TYPE="text" NOTNULL="false" SEQUENCE="false"/>
         <FIELD NAME="descriptionformat" TYPE="int" LENGTH="2" NOTNULL="false" SEQUENCE="false"/>
@@ -119,7 +119,7 @@
         <FIELD NAME="componentname" TYPE="char" LENGTH="255" NOTNULL="true" SEQUENCE="false" COMMENT="Name of the component the item belongs to. Usually this is qtype"/>
         <FIELD NAME="componentid" TYPE="int" LENGTH="10" NOTNULL="false" DEFAULT="0" SEQUENCE="false"/>
         <FIELD NAME="catscaleid" TYPE="int" LENGTH="10" NOTNULL="false" DEFAULT="0" SEQUENCE="false"/>
-        <FIELD NAME="contextid" TYPE="int" LENGTH="10" NOTNULL="false" DEFAULT="NULL" SEQUENCE="false"/>
+        <FIELD NAME="contextid" TYPE="int" LENGTH="10" NOTNULL="false" DEFAULT="NULL" SEQUENCE="false"/>   <!-- TODO: To be decided and to be implemented -->
         <FIELD NAME="activeparamid" TYPE="int" LENGTH="10" NOTNULL="false" DEFAULT="NULL" SEQUENCE="false"/>
         <FIELD NAME="lastupdated" TYPE="int" LENGTH="2" NOTNULL="false" SEQUENCE="false" COMMENT="The last time difficulty, etc. have been updated."/>
         <FIELD NAME="status" TYPE="int" LENGTH="2" NOTNULL="false" DEFAULT="0" SEQUENCE="false" COMMENT="in regard to catscale"/>
@@ -149,7 +149,7 @@
         <FIELD NAME="difficulty" TYPE="number" LENGTH="10" NOTNULL="false" DEFAULT="0" SEQUENCE="false" DECIMALS="4" COMMENT="overall difficulty of item"/>
         <FIELD NAME="discrimination" TYPE="number" LENGTH="10" NOTNULL="false" DEFAULT="0" SEQUENCE="false" DECIMALS="4" COMMENT="overall discriminatory o´power of item"/>
         <FIELD NAME="guessing" TYPE="number" LENGTH="10" NOTNULL="false" DEFAULT="0" SEQUENCE="false" DECIMALS="4" COMMENT="overall influence of guessing on probability of successful solution of item"/>
-        <FIELD NAME="json" TYPE="text" NOTNULL="false" SEQUENCE="false" COMMENT="values for item paramters"/>
+        <FIELD NAME="json" TYPE="text" NOTNULL="false" SEQUENCE="false" COMMENT="values for item paramters"/> <!-- TODO: To be implemented soon -->
         <FIELD NAME="status" TYPE="int" LENGTH="2" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
         <FIELD NAME="timecreated" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
         <FIELD NAME="timemodified" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
@@ -169,9 +169,9 @@
         <FIELD NAME="userid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="User id"/>
         <FIELD NAME="catscaleid" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
         <FIELD NAME="contextid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="Cat context"/>
-        <FIELD NAME="attemptid" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false" DECIMALS="4" COMMENT="id of attempt"/>
+        <FIELD NAME="attemptid" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false" DECIMALS="4" COMMENT="id of attempt"/>   <!-- TODO: To be decided and to be implemented -->
         <FIELD NAME="ability" TYPE="number" LENGTH="10" NOTNULL="true" SEQUENCE="false" DECIMALS="4" COMMENT="person ability in given catscale"/>
-        <FIELD NAME="standarderror" TYPE="number" LENGTH="10" NOTNULL="false" SEQUENCE="false" DECIMALS="4" COMMENT="standard error of measurement"/>
+        <FIELD NAME="standarderror" TYPE="number" LENGTH="10" NOTNULL="false" SEQUENCE="false" DECIMALS="4" COMMENT="standard error of measurement"/> <!-- TODO: To be implemented -->
         <FIELD NAME="status" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false" COMMENT="Status"/>
         <FIELD NAME="timecreated" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
         <FIELD NAME="timemodified" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
