@@ -589,7 +589,7 @@ function xmldb_local_catquiz_upgrade($oldversion) {
         $sql = "SELECT id
             FROM {local_catquiz_itemparams} lcip
             WHERE itemid = $itemid AND contextid = $contextid
-            ORDER BY status
+            ORDER BY status DESC
             LIMIT 1";
 
         foreach ($sqlresult as $row) {
