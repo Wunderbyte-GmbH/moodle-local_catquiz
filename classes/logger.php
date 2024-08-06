@@ -26,6 +26,7 @@
 
 namespace local_catquiz;
 
+use local_catquiz\logger_interface;
 use Monolog\Logger as MonologLogger;
 use Psr\Log\LoggerInterface;
 use local_catquiz\dummy_logger;
@@ -65,7 +66,7 @@ class logger {
     /**
      * Static property that holds the logger.
      *
-     * @var ?PsrLoggerInterface $logger
+     * @var ?LoggerInterface $logger
      */
     protected static ?LoggerInterface $logger = null;
 
@@ -76,10 +77,10 @@ class logger {
     }
 
     /**
-     * Returns a LoggerInterface
+     * Returns a logger implementing logger_interface
      *
      * If monolog is not enabled, it returns a dummy logger that does nothing.
-     * @return LoggerInterface
+     * @return logger_interface
      */
     public static function get() {
         global $CFG;
@@ -90,7 +91,7 @@ class logger {
         }
 
         // Monolog is configured, so we can expect that it is installed.
-        require_once('/var/www/html/local/catquiz/vendor/autoload.php');
+        require_once($CFG->dirroot . '/local/catquiz/vendor/autoload.php');
 
         if (self::$logger) {
             return self::$logger;

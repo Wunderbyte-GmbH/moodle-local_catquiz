@@ -125,7 +125,7 @@ The following steps are required to enable logging:
 - In the catquiz plugin directory, run `composer install` to install the monolog dependency:
 
 ```sh
-    MOODLE-ROOT-DIR/local/catquiz && php MOODLE-ROOT-DIR/composer.phar install
+    MOODLE-ROOT-DIR/local/catquiz && composer install
 ```
 - Create the folder where logs will be stored and set ownership to the webserver user:
 

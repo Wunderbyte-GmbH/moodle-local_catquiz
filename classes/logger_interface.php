@@ -14,41 +14,25 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
-/**
- * A null object that implements the logger_interface
- *
- * This is used as a fallback if no real logger is available.
- *
- * @package    local_catquiz
- * @copyright  2024 Wunderbyte GmbH
- * @author     David Bogner, et al.
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- */
-
 namespace local_catquiz;
 
 /**
- * Class dummy_logger
+ * This is a copy of the Psr\Log\LoggerInterface
  *
- * This is a null object that implements the logger_interface
- *
- * @package    local_catquiz
- * @copyright  2024 Wunderbyte GmbH <georg.maisser@wunderbyte.at>
- * @author     David Szkiba
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * It is included here because we can not know whether the real LoggerInterface
+ * is available when this interface is used.
  */
-class dummy_logger implements logger_interface {
+interface logger_interface {
 
     /**
      * System is unusable.
      *
      * @param string  $message
      * @param mixed[] $context
-     *
+
      * @return void
      */
-    public function emergency($message, array $context = []) {
-    }
+    public function emergency($message, array $context = array());
 
     /**
      * Action must be taken immediately.
@@ -61,8 +45,7 @@ class dummy_logger implements logger_interface {
      *
      * @return void
      */
-    public function alert($message, array $context = []) {
-    }
+    public function alert($message, array $context = array());
 
     /**
      * Critical conditions.
@@ -74,8 +57,7 @@ class dummy_logger implements logger_interface {
      *
      * @return void
      */
-    public function critical($message, array $context = []) {
-    }
+    public function critical($message, array $context = array());
 
     /**
      * Runtime errors that do not require immediate action but should typically
@@ -86,8 +68,7 @@ class dummy_logger implements logger_interface {
      *
      * @return void
      */
-    public function error($message, array $context = []) {
-    }
+    public function error($message, array $context = array());
 
     /**
      * Exceptional occurrences that are not errors.
@@ -100,8 +81,7 @@ class dummy_logger implements logger_interface {
      *
      * @return void
      */
-    public function warning($message, array $context = []) {
-    }
+    public function warning($message, array $context = array());
 
     /**
      * Normal but significant events.
@@ -111,8 +91,7 @@ class dummy_logger implements logger_interface {
      *
      * @return void
      */
-    public function notice($message, array $context = []) {
-    }
+    public function notice($message, array $context = array());
 
     /**
      * Interesting events.
@@ -124,8 +103,7 @@ class dummy_logger implements logger_interface {
      *
      * @return void
      */
-    public function info($message, array $context = []) {
-    }
+    public function info($message, array $context = array());
 
     /**
      * Detailed debug information.
@@ -135,8 +113,7 @@ class dummy_logger implements logger_interface {
      *
      * @return void
      */
-    public function debug($message, array $context = []) {
-    }
+    public function debug($message, array $context = array());
 
     /**
      * Logs with an arbitrary level.
@@ -149,6 +126,5 @@ class dummy_logger implements logger_interface {
      *
      * @throws \Psr\Log\InvalidArgumentException
      */
-    public function log($level, $message, array $context = []) {
-    }
+    public function log($level, $message, array $context = array());
 }
