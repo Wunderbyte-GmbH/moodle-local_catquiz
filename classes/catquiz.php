@@ -211,6 +211,7 @@ class catquiz {
 
         $insql = '';
         if (!empty($catscaleids) && $catscaleids[0] > 0) {
+
             $globalscaleids = self::get_global_scale($catscaleids);
 
             [$parentscales1, $inparams1] = $DB->get_in_or_equal($globalscaleids, SQL_PARAMS_NAMED, 'inparentscales1');
@@ -2202,7 +2203,6 @@ class catquiz {
                 continue;
             }
             $correct = 0;
-
             if (empty($questionsperscale)) {
                 continue;
             }
