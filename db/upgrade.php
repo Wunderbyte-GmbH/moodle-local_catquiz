@@ -524,30 +524,78 @@ function xmldb_local_catquiz_upgrade($oldversion) {
         $table = new xmldb_table('local_catquiz_itemparams');
 
         $field = new xmldb_field('itemid', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, 0, 0);
-        // Conditionally launch add fields min scale value.
+        // Conditionally launch add fields itemid value.
         if (!$dbman->field_exists($table, $field)) {
             $dbman->add_field($table, $field);
         }
 
         // Make sure the database has updated the itemid in the catquiz_itemparams table.
+
+        // SQL for MariaDB/MySQL, getestet
+        $sql = <<<SQL
+            UPDATE {local_catquiz_itemparams} lcip
+              JOIN {local_catquiz_items} lci ON lci.componentid = lcip.componentid
+                  AND lci.componentname = lcip.componentname
+              SET lcip.itemid = lci.id
+        SQL;
+
+        // SQL for PostGre.
         $sql = <<<SQL
             WITH item_mapping AS (
                 SELECT item.id AS itemid, itemparam.id AS paramid
-                FROM {m_local_catquiz_items} item
-                JOIN {m_local_catquiz_itemparams itemparam ON // TODO
+                FROM {local_catquiz_items} item
+                JOIN {local_catquiz_itemparams} itemparam ON
                     item.componentid = itemparam.componentid
-                    AND item.componentname = 'question'
-                    AND itemparam.componentname = 'question'
+                    AND item.componentname = itemparam.componentname
             )
-            UPDATE m_local_catquiz_itemparams
+            UPDATE {local_catquiz_itemparams}
             SET itemid = item_mapping.itemid
             FROM item_mapping
             WHERE id = item_mapping.paramid
         SQL;
+
         $DB->execute($sql);
 
         // Catquiz savepoint reached.
         upgrade_plugin_savepoint(true, 2024080200, 'local', 'catquiz');
+    }
+
+    if ($oldversion < 2024080600) {
+        // Define field activeparamid and contextid to be added to local_catquiz_items.
+        $table = new xmldb_table('local_catquiz_items');
+
+        $fields = [];
+        $fields[] = new xmldb_field('activeparamid', XMLDB_TYPE_INTEGER, '10');
+        $fields[] = new xmldb_field('contextid', XMLDB_TYPE_INTEGER, '10');
+
+        // Conditionally launch add fields min scale value.
+        foreach ($fields as $field) {
+            if (!$dbman->field_exists($table, $field)) {
+                $dbman->add_field($table, $field);
+            }
+        }
+
+        // Make sure the database has updated the itemid in the catquiz_itemparams table.
+        $sql = <<<SQL
+            WITH RECURSIVE globalscale (scaleid, globalid, contextid) AS (
+              SELECT id, id, contextid
+                FROM {local_catquiz_catscales}
+                WHERE parentid=0
+              UNION ALL
+                SELECT ccs.id, gs.globalid, gs.contextid
+                  FROM globalscale gs
+                  INNER JOIN {local_catquiz_catscales} as ccs ON ccs.parentid = gs.scaleid
+            )
+            SELECT gs.globalid as globalscale, GROUP_CONCAT(gs.scaleid SEPARATOR ',') as scales, gs.contextid as globalcontext, lcip.contextid as scalescontext
+              FROM globalscale gs
+              JOIN {local_catquiz_items} lci ON lci.catscaleid = gs.scaleid
+              JOIN {local_catquiz_itemparams} lcip ON lcip.itemid = lci.id
+            GROUP BY gs.globalid, lcip.contextid
+        SQL;
+        $DB->execute($sql);
+
+        // Catquiz savepoint reached.
+        upgrade_plugin_savepoint(true, 2024080600, 'local', 'catquiz');
     }
 
     return true;
