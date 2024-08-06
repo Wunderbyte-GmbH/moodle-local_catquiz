@@ -531,29 +531,21 @@ function xmldb_local_catquiz_upgrade($oldversion) {
         }
 
         // Make sure the database has updated the itemid in the catquiz_itemparams table.
-
-        // SQL for MariaDB/MySQL, getestet
         $sql = <<<SQL
-            UPDATE {local_catquiz_itemparams} lcip
+            SELECT lcip.id itemparamid, lci.id itemid
+              FROM {local_catquiz_itemparams} lcip
               JOIN {local_catquiz_items} lci ON lci.componentid = lcip.componentid
                   AND lci.componentname = lcip.componentname
-              SET lcip.itemid = lci.id
         SQL;
 
-        // SQL for PostGre.
-        $sql = <<<SQL
-            WITH item_mapping AS (
-                SELECT item.id AS itemid, itemparam.id AS paramid
-                FROM {local_catquiz_items} item
-                JOIN {local_catquiz_itemparams} itemparam ON
-                    item.componentid = itemparam.componentid
-                    AND item.componentname = itemparam.componentname
-            )
-            UPDATE {local_catquiz_itemparams}
-            SET itemid = item_mapping.itemid
-            FROM item_mapping
-            WHERE id = item_mapping.paramid
-        SQL;
+        $sqlresult = $DB->get_records_sql($sql);
+
+        foreach ($sqlresult as $row) {
+            $updaterecord = new stdclass;
+            $updaterecord->id = $row->itemparamid;
+            $updaterecord->itemid = $row->item;
+            $DB->update_record('local_catquiz_itemparams',$updaterecord);
+        }
 
         $DB->execute($sql);
 
