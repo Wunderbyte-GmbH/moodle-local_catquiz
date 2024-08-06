@@ -241,12 +241,17 @@ $string['enrolementstringstartforfeedback'] = 'Based on your results you are now
 $string['enrolled_courses'] = 'Enrolled courses';
 $string['enrolmentmessagetitle'] = 'Notification about new course / group enrolments';
 $string['error'] = 'An error occured';
-$string['error:fraction0'] = 'Because you answered all questions incorrectly, it is unfortunately not possible to provide valid feedback.';
-$string['error:fraction1'] = 'Congratulations! You answered all question correctly! Unfortunately, it is therefore not possible to provide valid feedback.';
-$string['error:nminscale'] = 'It is unfortunately not possible to provide valid feedback, because the quiz didn’t include enough questions.';
-$string['error:noscalestoreport'] = 'There is no feedback available because no tested scale was selected to be reported.';
+$string['error:fraction0'] = 'Unfortunately, we were unable to determine a valid result based on your answers. We would be pleased if you would try again.';
+$string['error:fraction1'] = 'Congratulations, you have answered all the questions correctly! That is really awesome!
+    However, due to this excellent performance, we were unable to determine a conclusive result.';
+$string['error:nminscale'] = 'Unfortunately, we were unable to determine a result as not enough questions were answered during the test attempt.
+    Please make sure you answer all the questions in your next attempt to get a correct result.';
+$string['error:noscalestoreport'] = 'Unfortunately, with the current number of questions asked in the areas tested,
+    we were unable to determine a reliable result. We recommend that you contact those responsible for the test
+    and ask them to increase the number of questions to be answered.';
 $string['error:rootonly'] = '';
-$string['error:semax'] = '';
+$string['error:semax'] = 'Unfortunately, we were unable to determine a result with the specified minimum accuracy in the areas tested.
+    We recommend that you contact those responsible for the test and ask them to increase the number of questions to be answered.';
 $string['error:semin'] = '';
 $string['errorfetchnextquestion'] = 'There was an error while selecting the next question';
 $string['errorhastobefloat'] = 'Has to be a decimal';

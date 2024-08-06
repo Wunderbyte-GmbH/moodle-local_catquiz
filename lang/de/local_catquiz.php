@@ -243,12 +243,18 @@ $string['enrolementstringstartforfeedback'] = 'Auf Grundlage Ihres Ergebnisses s
 $string['enrolled_courses'] = 'Eingeschriebene Kurse';
 $string['enrolmentmessagetitle'] = 'Benachrichtigung über neue Kurseinschreibung(en) / Gruppenmitgliedschaft(en)';
 $string['error'] = 'Es ist ein Fehler aufgetreten';
-$string['error:fraction0'] = 'Leider haben Sie alle Fragen falsch beantwortet. Deshalb kann leider kein valides Ergebnis ermittelt werden.';
-$string['error:fraction1'] = 'Sie haben alle Fragen richtig beantwortet! Toll! Leider konnte deshalb kein valides Ergebnis ermittelt werden.';
-$string['error:nminscale'] = 'Es konnte leider kein valides Ergebnis ermittelt werden, weil nicht genügend Fragen gespielt wurden.';
-$string['error:noscalestoreport'] = 'Es konnte kein Feedback ermittelt werden, weil kein getesteter Teilbereich für die Berechnung angegewählt wurde.';
+$string['error:fraction0'] = 'Leider konnten wir aufgrund Ihrer Antworten kein valides Ergebnis ermitteln.
+    Wir würden uns freuen, wenn Sie es erneut versuchen.';
+$string['error:fraction1'] = 'Herzlichen Glückwunsch, Sie haben alle Fragen richtig beantwortet! Das ist wirklich großartig!
+    Aufgrund dieser exzellenten Leistung konnte jedoch kein eindeutiges Ergebnis ermittelt werden.';
+$string['error:nminscale'] = 'Leider konnten wir kein Ergebnis ermitteln, da im Testversuch nicht genügend Fragen beantwortet wurden.
+    Bitte stellen Sie bei Ihrem nächsten Versuch sicher, alle Fragen zu beantworten, um ein vollständiges Ergebnis zu erhalten.';
+$string['error:noscalestoreport'] = 'Leider konnten wir mit der aktuellen Anzahl an gestellten Fragen in den getesteten Bereichen
+kein verlässliches Ergebnis ermitteln. Wir empfehlen Ihnen, sich an die Verantwortlichen für den Test zu wenden und zu bitten,
+die Anzahl der zu beantwortenden Fragen zu erhöhen.';
 $string['error:rootonly'] = '';
-$string['error:semax'] = '';
+$string['error:semax'] = 'Leider konnten wir in den getesteten Bereichen kein Ergebnis mit der vorgegebenen Mindestgenauigkeit ermitteln.
+    Wir empfehlen Ihnen, sich an die Verantwortlichen für den Test zu wenden und zu bitten, die Anzahl der zu beantwortenden Fragen zu erhöhen.';
 $string['error:semin'] = '';
 $string['errorfetchnextquestion'] = 'Es trat ein Fehler bei der Auswahl der nächsten Frage auf.';
 $string['errorhastobefloat'] = 'Muss ein Dezimalwert sein';
