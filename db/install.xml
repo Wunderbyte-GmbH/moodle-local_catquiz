@@ -8,8 +8,8 @@
       <FIELDS>
         <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
         <FIELD NAME="componentname" TYPE="char" LENGTH="255" NOTNULL="false" SEQUENCE="false" COMMENT="Component name settings are applicable"/>
-        <FIELD NAME="componentid" TYPE="int" LENGTH="10" NOTNULL="false" DEFAULT="0" SEQUENCE="false" COMMENT="Id of the instance of the component"/>
-        <FIELD NAME="adaptivemodel" TYPE="int" LENGTH="2" NOTNULL="false" DEFAULT="0" SEQUENCE="false"
+        <FIELD NAME="componentid" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false" COMMENT="Id of the instance of the component"/>
+        <FIELD NAME="adaptivemodel" TYPE="int" LENGTH="2" NOTNULL="false" SEQUENCE="false"
                COMMENT="Algorithm type used to calculate the next question displayed to user. If 0 the engine is inactive."/>
         <FIELD NAME="catscaleids" TYPE="char" LENGTH="255" NOTNULL="false" SEQUENCE="false" COMMENT="Comma separated ids of catscales to be used"/>
       </FIELDS>
@@ -21,7 +21,7 @@
       <FIELDS>
         <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
         <FIELD NAME="parentid" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="id of the parent catscale, 0 if this is a top-level catscale"/>
-        <FIELD NAME="label" TYPE="char" LENGTH="255" NOTNULL="false" SEQUENCE="false" COMMENT="Unique catscale label, e.g. CAT-Math_V.01"/> <!-- TODO: To be implemented and made UNIQUE -->
+        <FIELD NAME="label" TYPE="char" LENGTH="255" NOTNULL="true" DEFAULT = "" SEQUENCE="false" COMMENT="Unique catscale label, e.g. CAT-Math_V.01"/> <!-- TODO: To be implemented and made UNIQUE -->
         <FIELD NAME="name" TYPE="char" LENGTH="255" NOTNULL="false" SEQUENCE="false" COMMENT="Unique catscale name, e.g. BASIC MATHEMATIC"/>
         <FIELD NAME="description" TYPE="text" NOTNULL="false" SEQUENCE="false" COMMENT="Description of the catscale"/>
         <FIELD NAME="contextid" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false" COMMENT="Context selected by default for this scale."/>
@@ -139,7 +139,7 @@
     <TABLE NAME="local_catquiz_itemparams" COMMENT="Store cat item parameters">
       <FIELDS>
         <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
-        <FIELD NAME="itemid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="id of catquiz_items"/>
+        <FIELD NAME="itemid" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false" COMMENT="id of catquiz_items"/>
         <FIELD NAME="componentid" TYPE="int" LENGTH="10" NOTNULL="false" DEFAULT="0" SEQUENCE="false"/>
         <FIELD NAME="componentname" TYPE="char" LENGTH="255" NOTNULL="false" SEQUENCE="false" COMMENT="Name of the component the item belongs to. Usually this is qtype"/>
         <FIELD NAME="contextid" TYPE="int" LENGTH="10" NOTNULL="false" DEFAULT="0" SEQUENCE="false" COMMENT="References a cat context"/>
@@ -165,11 +165,11 @@
     <TABLE NAME="local_catquiz_personparams" COMMENT="Table to save person params dependent on contexts">
       <FIELDS>
         <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
-        <FIELD NAME="userid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="User id"/>
+        <FIELD NAME="userid" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT = "0" SEQUENCE="false" COMMENT="User id"/>
         <FIELD NAME="catscaleid" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
-        <FIELD NAME="contextid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="Cat context"/>
+        <FIELD NAME="contextid" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false" COMMENT="Cat context"/>
         <FIELD NAME="attemptid" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false" COMMENT="Identifies the attempt"/>   <!-- TODO: To be decided and to be implemented -->
-        <FIELD NAME="ability" TYPE="number" LENGTH="10" NOTNULL="true" SEQUENCE="false" DECIMALS="4" COMMENT="person ability in given catscale"/>
+        <FIELD NAME="ability" TYPE="number" LENGTH="10" NOTNULL="false" SEQUENCE="false" DECIMALS="4" COMMENT="person ability in given catscale"/>
         <FIELD NAME="standarderror" TYPE="number" LENGTH="10" NOTNULL="false" SEQUENCE="false" DECIMALS="4" COMMENT="standard error of measurement"/> <!-- TODO: To be implemented -->
         <FIELD NAME="status" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false" COMMENT="Status"/>
         <FIELD NAME="timecreated" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
