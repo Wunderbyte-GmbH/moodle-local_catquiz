@@ -24,9 +24,14 @@
 
 use local_catquiz\catquiz;
 use local_catquiz\catscale;
+use local_catquiz\logger;
 use local_catquiz\output\catscalemanager\managecatscaledashboard;
 
+
 require_once('../../config.php');
+global $CFG;
+
+logger::get()->info('We are here now');
 
 $catcontextid = optional_param('contextid', 0, PARAM_INT);
 $catscale = optional_param('scaleid', -1, PARAM_INT);

@@ -1,0 +1,6 @@
+{
+    "name": "wunderbyte/catquiz",
+    "require": {
+        "monolog/monolog": "^2.9"
+    }
+}

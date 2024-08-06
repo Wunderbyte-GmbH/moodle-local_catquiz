@@ -12,3 +12,6 @@ amd/node_modules
 .vscode/launch.json
 workspace.php
 workspace2.php
+
+/vendor/
+catquiz.log
