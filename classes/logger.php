@@ -112,7 +112,7 @@ class logger {
 
         if (!self::$logger) {
             self::$logger = new MonologLogger('catquiz');
-            $filename = '/var/www/html/local/catquiz/logs/testing.log';
+            $filename = $CFG->dirroot . self::LOGFILE;
             self::$logger->pushHandler(new RotatingFileHandler($filename, $maxfiles, $level));
         }
         return self::$logger;
