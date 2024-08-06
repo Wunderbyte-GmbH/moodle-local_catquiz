@@ -7,11 +7,11 @@
     <TABLE NAME="local_catquiz" COMMENT="Catquiz settings table">
       <FIELDS>
         <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
-        <FIELD NAME="componentname" TYPE="char" LENGTH="255" NOTNULL="true" SEQUENCE="false" COMMENT="Component name settings are applicable"/>
-        <FIELD NAME="componentid" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="Id of the instance of the component"/>
-        <FIELD NAME="adaptivemodel" TYPE="int" LENGTH="2" NOTNULL="true" DEFAULT="0" SEQUENCE="false"
+        <FIELD NAME="componentname" TYPE="char" LENGTH="255" NOTNULL="false" SEQUENCE="false" COMMENT="Component name settings are applicable"/>
+        <FIELD NAME="componentid" TYPE="int" LENGTH="10" NOTNULL="false" DEFAULT="0" SEQUENCE="false" COMMENT="Id of the instance of the component"/>
+        <FIELD NAME="adaptivemodel" TYPE="int" LENGTH="2" NOTNULL="false" DEFAULT="0" SEQUENCE="false"
                COMMENT="Algorithm type used to calculate the next question displayed to user. If 0 the engine is inactive."/>
-        <FIELD NAME="catscaleids" TYPE="char" LENGTH="255" NOTNULL="true" SEQUENCE="false" COMMENT="Comma separated ids of catscales to be used"/>
+        <FIELD NAME="catscaleids" TYPE="char" LENGTH="255" NOTNULL="false" SEQUENCE="false" COMMENT="Comma separated ids of catscales to be used"/>
       </FIELDS>
       <KEYS>
         <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
@@ -21,8 +21,8 @@
       <FIELDS>
         <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
         <FIELD NAME="parentid" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="id of the parent catscale, 0 if this is a top-level catscale"/>
-        <FIELD NAME="label" TYPE="char" LENGTH="255" NOTNULL="true" SEQUENCE="false" COMMENT="Unique catscale label, e.g. CAT-Math_V.01"/> <!-- TODO: To be implemented and made UNIQUE -->
-        <FIELD NAME="name" TYPE="char" LENGTH="255" NOTNULL="true" SEQUENCE="false" COMMENT="Unique catscale name, e.g. BASIC MATHEMATIC"/>
+        <FIELD NAME="label" TYPE="char" LENGTH="255" NOTNULL="false" SEQUENCE="false" COMMENT="Unique catscale label, e.g. CAT-Math_V.01"/> <!-- TODO: To be implemented and made UNIQUE -->
+        <FIELD NAME="name" TYPE="char" LENGTH="255" NOTNULL="false" SEQUENCE="false" COMMENT="Unique catscale name, e.g. BASIC MATHEMATIC"/>
         <FIELD NAME="description" TYPE="text" NOTNULL="false" SEQUENCE="false" COMMENT="Description of the catscale"/>
         <FIELD NAME="contextid" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false" COMMENT="Context selected by default for this scale."/>
         <FIELD NAME="minscalevalue" TYPE="number" LENGTH="10" NOTNULL="false" SEQUENCE="false" DECIMALS="2" COMMENT="min scale value"/>
@@ -114,7 +114,7 @@
     <TABLE NAME="local_catquiz_items" COMMENT="Catquiz items">
       <FIELDS>
         <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
-        <FIELD NAME="componentname" TYPE="char" LENGTH="255" NOTNULL="true" SEQUENCE="false" COMMENT="Name of the component the item belongs to. Usually this is qtype"/>
+        <FIELD NAME="componentname" TYPE="char" LENGTH="255" NOTNULL="false" SEQUENCE="false" COMMENT="Name of the component the item belongs to. Usually this is qtype"/>
         <FIELD NAME="componentid" TYPE="int" LENGTH="10" NOTNULL="false" DEFAULT="0" SEQUENCE="false"/>
         <FIELD NAME="catscaleid" TYPE="int" LENGTH="10" NOTNULL="false" DEFAULT="0" SEQUENCE="false"/>
         <FIELD NAME="contextid" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false"/>   <!-- TODO: To be decided and to be implemented -->
