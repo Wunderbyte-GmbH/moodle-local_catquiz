@@ -600,12 +600,12 @@ function xmldb_local_catquiz_upgrade($oldversion) {
                 ORDER BY status
                 LIMIt 1";
 
-            $lcip = $DB->get_record_sql($sql)
+            $lcip = $DB->get_record_sql($sql);
 
             $updaterecord = new stdclass;
             $updaterecord->id = $row->itemid;
             $updaterecord->contextid = $row->contextid;
-            $updaterecord->activeparamid = $row->id;
+            $updaterecord->activeparamid = $lcip->id;
             $DB->update_record('local_catquiz_items',$updaterecord);
         }
 
