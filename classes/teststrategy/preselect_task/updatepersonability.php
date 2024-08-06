@@ -37,6 +37,7 @@ use local_catquiz\local\model\model_responses;
 use local_catquiz\local\model\model_strategy;
 use local_catquiz\local\result;
 use local_catquiz\local\status;
+use local_catquiz\logger;
 use local_catquiz\teststrategy\preselect_task;
 use local_catquiz\teststrategy\progress;
 use local_catquiz\wb_middleware;
@@ -250,6 +251,7 @@ class updatepersonability extends preselect_task implements wb_middleware {
         }
 
         if (is_nan($updatedability)) {
+            logger::get()->error('Updated ability is NAN', $context);
             // In a production environment, we can use fallback values. However,
             // during development we want to see when we get unexpected values.
             if ($CFG->debug > 0) {

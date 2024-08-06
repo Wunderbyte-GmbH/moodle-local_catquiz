@@ -25,6 +25,7 @@ use local_catquiz\catquiz;
 use local_catquiz\catscale;
 use local_catquiz\feedback\feedbackclass;
 use local_catquiz\local\model\model_strategy;
+use local_catquiz\logger;
 use local_catquiz\teststrategy\feedback_helper;
 use local_catquiz\teststrategy\info;
 use moodle_url;
@@ -844,12 +845,12 @@ class catquizstatistics {
                     || ($level === self::COMPATIBILITY_LEVEL_DESCRIPTION && $qs->$textkey !== $rangetext)
                 ) {
                     $this->quizsettingcompatibility[$level] = false;
-                    if ($CFG->debug > 0) {
-                        echo sprintf(
+                    logger::get()->warning(
+                        sprintf(
                             "Quiz settings are not compatible: different range values [%f, %f] for test %d",
                             $qs->$startkey, $qs->$endkey, $testid
-                        );
-                    }
+                        )
+                    );
                     return false;
                 }
             }

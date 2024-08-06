@@ -28,6 +28,7 @@ use coding_exception;
 use context_course;
 use context_system;
 use local_catquiz\catscale;
+use local_catquiz\logger;
 use stdClass;
 use UnexpectedValueException;
 
@@ -308,9 +309,11 @@ abstract class feedbackgenerator {
         $expectedelements = ['heading', 'content'];
         foreach ($expectedelements as $elem) {
             if (!array_key_exists($elem, $feedback)) {
+                $message = 'Data returned by feedbackgenerator is missing the value for ' . $elem;
+                logger::get()->error($message, $feedback);
                 global $CFG;
                 if ($CFG->debug > 0) {
-                    throw new UnexpectedValueException('Data returned by feedbackgenerator is missing the value for ' . $elem);
+                    throw new UnexpectedValueException($message);
                 }
                 return false;
             }

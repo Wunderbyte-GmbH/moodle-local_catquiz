@@ -294,14 +294,10 @@ class feedbacksettings {
                     || !array_key_exists($scaleid, $feedbackdata['se'])
                 ) {
                     $feedbackdata['se'][$scaleid] = INF;
-                    if ($CFG->debug > 0) {
-                        var_dump($feedbackdata);
-                        var_dump($personabilities);
-                        logger::get()->critical(
-                            sprintf('No standarderror is set for scale %s', $scaleid),
-                            [$feedbackdata, $personabilities]
-                        );
-                    }
+                    logger::get()->critical(
+                        sprintf('No standarderror is set for scale %s', $scaleid),
+                        [$feedbackdata, $personabilities]
+                    );
                 }
                 $se = $feedbackdata['se'][$scaleid];
                 if ($se > $semax) {
