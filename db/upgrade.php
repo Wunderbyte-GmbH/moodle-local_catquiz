@@ -547,8 +547,6 @@ function xmldb_local_catquiz_upgrade($oldversion) {
             $DB->update_record('local_catquiz_itemparams',$updaterecord);
         }
 
-        $DB->execute($sql);
-
         // Catquiz savepoint reached.
         upgrade_plugin_savepoint(true, 2024080200, 'local', 'catquiz');
     }
@@ -561,11 +559,54 @@ function xmldb_local_catquiz_upgrade($oldversion) {
         $fields[] = new xmldb_field('activeparamid', XMLDB_TYPE_INTEGER, '10');
         $fields[] = new xmldb_field('contextid', XMLDB_TYPE_INTEGER, '10');
 
-        // Conditionally launch add fields min scale value.
+        // Conditionally launch add fields activeparamid and contextid.
         foreach ($fields as $field) {
             if (!$dbman->field_exists($table, $field)) {
                 $dbman->add_field($table, $field);
             }
+        }
+
+        // Make sure the database has updated the activeparamid and contextid in the catquiz_items table.
+        $sql = <<<SQL
+            WITH RECURSIVE globalscale (scaleid, globalid, contextid) AS (
+              SELECT id, id, contextid
+                FROM {local_catquiz_catscales}
+                WHERE parentid=0
+              UNION ALL
+              SELECT ccs.id, gs.globalid, gs.contextid
+                FROM globalscale gs
+                INNER JOIN mdl_local_catquiz_catscales as ccs ON ccs.parentid = gs.scaleid
+            )
+            SELECT lci.id as itemid, gs.contextid as contextid
+              FROM globalscale gs
+              JOIN {local_catquiz_items} lci ON lci.catscaleid = gs.scaleid
+              JOIN  lcip ON lcip.itemid = lci.id
+              ORDER BY gs.globalid, lcip.contextid
+        SQL;
+
+        $sqlresult = $DB->get_records_sql($sql);
+
+        $sql = "SELECT id
+            FROM {local_catquiz_itemparams} lcip
+            WHERE itemid = ".$row->itemid." AND contextid = ".$row->contextid."
+            ORDER BY status
+            LIMIt 1";
+
+        foreach ($sqlresult as $row) {
+
+            $sql = "SELECT id
+                FROM {local_catquiz_itemparams} lcip
+                WHERE itemid = ".$row->itemid." AND contextid = ".$row->contextid."
+                ORDER BY status
+                LIMIt 1";
+
+            $lcip = $DB->get_record_sql($sql)
+
+            $updaterecord = new stdclass;
+            $updaterecord->id = $row->itemid;
+            $updaterecord->contextid = $row->contextid;
+            $updaterecord->activeparamid = $row->id;
+            $DB->update_record('local_catquiz_items',$updaterecord);
         }
 
         $table = new xmldb_table('local_catquiz_catscales');
