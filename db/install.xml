@@ -158,6 +158,7 @@
       </KEYS>
       <INDEXES>
         <INDEX NAME="uniqueitemparam" UNIQUE="true" FIELDS="itemid,contextid,model"/>
+        <INDEX NAME="itemid" UNIQUE="false" FIELDS="itemid"/>
         <INDEX NAME="contextid" UNIQUE="false" FIELDS="contextid"/>
       </INDEXES>
     </TABLE>
