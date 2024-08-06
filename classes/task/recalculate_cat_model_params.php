@@ -25,6 +25,7 @@
 
 namespace local_catquiz\task;
 
+use local_catquiz\catcontext;
 use local_catquiz\catmodel_info;
 use local_catquiz\catquiz;
 
@@ -65,6 +66,11 @@ class recalculate_cat_model_params extends \core\task\scheduled_task {
                 'now1' => $now,
                 'now2' => $now,
             ]
+        );
+        // Convert to catcontext class.
+        $contexts = array_map(
+            fn ($record) => new catcontext($record),
+            $contexts
         );
         $catscales = catquiz::get_all_catscales();
         $cmi = new catmodel_info();

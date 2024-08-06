@@ -524,6 +524,7 @@ function xmldb_local_catquiz_upgrade($oldversion) {
         $table = new xmldb_table('local_catquiz_itemparams');
 
         $field = new xmldb_field('itemid', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, 0, 0);
+      
         // Conditionally launch add fields itemid value.
         if (!$dbman->field_exists($table, $field)) {
             $dbman->add_field($table, $field);
@@ -560,7 +561,7 @@ function xmldb_local_catquiz_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2024080200, 'local', 'catquiz');
     }
 
-    if ($oldversion < 2024080600) {
+    if ($oldversion < 2024080500) {
         // Define field activeparamid and contextid to be added to local_catquiz_items.
         $table = new xmldb_table('local_catquiz_items');
 
@@ -575,27 +576,8 @@ function xmldb_local_catquiz_upgrade($oldversion) {
             }
         }
 
-        // Make sure the database has updated the itemid in the catquiz_itemparams table.
-        $sql = <<<SQL
-            WITH RECURSIVE globalscale (scaleid, globalid, contextid) AS (
-              SELECT id, id, contextid
-                FROM {local_catquiz_catscales}
-                WHERE parentid=0
-              UNION ALL
-                SELECT ccs.id, gs.globalid, gs.contextid
-                  FROM globalscale gs
-                  INNER JOIN {local_catquiz_catscales} as ccs ON ccs.parentid = gs.scaleid
-            )
-            SELECT gs.globalid as globalscale, GROUP_CONCAT(gs.scaleid SEPARATOR ',') as scales, gs.contextid as globalcontext, lcip.contextid as scalescontext
-              FROM globalscale gs
-              JOIN {local_catquiz_items} lci ON lci.catscaleid = gs.scaleid
-              JOIN {local_catquiz_itemparams} lcip ON lcip.itemid = lci.id
-            GROUP BY gs.globalid, lcip.contextid
-        SQL;
-        $DB->execute($sql);
-
         // Catquiz savepoint reached.
-        upgrade_plugin_savepoint(true, 2024080600, 'local', 'catquiz');
+        upgrade_plugin_savepoint(true, 2024080500, 'local', 'catquiz');
     }
 
     return true;

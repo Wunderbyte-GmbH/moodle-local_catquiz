@@ -54,7 +54,7 @@ class model_person_ability_estimator_catcalc extends model_person_ability_estima
                     $itemresponse[$component],
                     $itemparamlist
                 );
-                $p = new model_person_param($userid);
+                $p = new model_person_param($userid, $catscaleid);
                 $p->set_ability($ability);
                 $personparamlist->add($p);
             }

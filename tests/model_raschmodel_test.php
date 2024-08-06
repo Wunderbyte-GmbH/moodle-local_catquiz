@@ -221,7 +221,7 @@ class model_raschmodel_test extends basic_testcase {
     private static function create_person_param_list(array $abilities): model_person_param_list {
         $personabilities = new model_person_param_list();
         foreach ($abilities as $id => $ability) {
-            $pp = (new model_person_param($id))
+            $pp = (new model_person_param($id, '1'))
                 ->set_ability($ability);
             $personabilities->add($pp);
         }

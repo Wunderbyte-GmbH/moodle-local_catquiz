@@ -126,15 +126,15 @@ class model_responses {
         // $data[QUESTIONID] -> [All responses to this question by different users].
         foreach ($personparamlist->get_person_params() as $pp) {
             $components = [];
-            if (!array_key_exists($pp->get_id(), $this->data)) {
+            if (!array_key_exists($pp->get_userid(), $this->data)) {
                 continue;
             }
-            $responsesbyuser = $this->data[$pp->get_id()];
+            $responsesbyuser = $this->data[$pp->get_userid()];
             $components = array_merge($components, $responsesbyuser);
             foreach (array_keys($components) as $component) {
-                $questionids = array_keys($this->data[$pp->get_id()][$component]);
+                $questionids = array_keys($this->data[$pp->get_userid()][$component]);
                 foreach ($questionids as $questionid) {
-                    $fraction = $this->data[$pp->get_id()][$component][$questionid]['fraction'];
+                    $fraction = $this->data[$pp->get_userid()][$component][$questionid]['fraction'];
                     $itemresponse[$questionid][] = new model_item_response(
                         $fraction, $pp
                     );

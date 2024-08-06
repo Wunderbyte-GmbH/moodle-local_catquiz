@@ -201,7 +201,7 @@ class graphicalsummary extends feedbackgenerator {
         $graphicalsummary = $existingdata['graphicalsummary_data'] ?? [];
         $new = [];
         $new['id'] = $lastquestion->id;
-        $new['questionname'] = $lastquestion->name;
+        $new['questionname'] = $lastquestion->label;
         $new['lastresponse'] = round($lastresponse['fraction'], self::PRECISION);
         $new['difficulty'] = $lastquestion->difficulty;
         $new['questionscale'] = $lastquestion->catscaleid;

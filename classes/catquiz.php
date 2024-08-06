@@ -24,7 +24,6 @@
 
 namespace local_catquiz;
 
-use core\check\result;
 use dml_exception;
 use local_catquiz\event\usertocourse_enroled;
 use local_catquiz\event\usertogroup_enroled;
@@ -32,12 +31,7 @@ use local_catquiz\local\status;
 use local_catquiz\teststrategy\progress;
 use moodle_exception;
 use moodle_url;
-use question_attempt;
-use question_attempt_pending_step;
-use question_bank;
 use question_engine;
-use question_finder;
-use question_state_gradedwrong;
 use stdClass;
 
 /**
@@ -217,7 +211,6 @@ class catquiz {
 
         $insql = '';
         if (!empty($catscaleids) && $catscaleids[0] > 0) {
-
             $globalscaleids = self::get_global_scale($catscaleids);
 
             [$parentscales1, $inparams1] = $DB->get_in_or_equal($globalscaleids, SQL_PARAMS_NAMED, 'inparentscales1');
@@ -231,7 +224,7 @@ class catquiz {
 
         $select = "*";
         $from = <<<SQL
-            ( SELECT
+        ( SELECT
             -- Information about the question
             q.id,
             lci.componentid,
@@ -261,9 +254,7 @@ class catquiz {
             COALESCE(astat.lastattempt,0) as astatlastattempttime,
             ustat.userid, ustat.numberattempts userattempts,
             ustat.lastattempt as userlastattempttime
-    SQL;
-
-        $from .= " FROM {local_catquiz_catscales} lccs
+          FROM {local_catquiz_catscales} lccs
           -- Get all corresponding items of those scales, skip if not existent
           -- (INNER JOIN)
             JOIN {local_catquiz_items} lci ON lci.catscaleid=lccs.id
@@ -290,24 +281,34 @@ class catquiz {
               GROUP BY lca.scaleid, lca.contextid, qa.questionid
             ) astat
               ON astat.contextid = lcip.contextid AND astat.questionid = q.id
-                AND astat.scaleid $parentscales1";
+                AND astat.scaleid $parentscales1
+        SQL;
 
         if (!empty($userid)) {
-            $from .= "LEFT JOIN (SELECT lca.scaleid, lca.contextid, qa.questionid, lca.userid,
-                COUNT(qa.id) numberattempts, MAX(qas.timecreated) as lastattempt
-                FROM {local_catquiz_attempts} lca
-                JOIN {adaptivequiz_attempt} aqa ON lca.attemptid = aqa.id
-                JOIN {question_attempts} qa ON qa.questionusageid = aqa.uniqueid
-                JOIN {question_attempt_steps} qas
-                  ON qas.questionattemptid = qa.id AND qas.fraction IS NOT NULL
-                GROUP BY lca.scaleid, lca.contextid, qa.questionid, lca.userid
-              ) ustat
-                ON ustat.contextid = lcip.contextid AND ustat.questionid = q.id
-                  AND ustat.scaleid $parentscales2 ) s";
+            $from .= <<<SQL
+                LEFT JOIN (
+                    SELECT
+                        lca.scaleid,
+                        lca.contextid,
+                        qa.questionid,
+                        lca.userid,
+                        COUNT(qa.id) numberattempts,
+                        MAX(qas.timecreated) as lastattempt
+                    FROM {local_catquiz_attempts} lca
+                      JOIN {adaptivequiz_attempt} aqa ON lca.attemptid = aqa.id
+                      JOIN {question_attempts} qa ON qa.questionusageid = aqa.uniqueid
+                      JOIN {question_attempt_steps} qas
+                        ON qas.questionattemptid = qa.id AND qas.fraction IS NOT NULL
+                    GROUP BY lca.scaleid, lca.contextid, qa.questionid, lca.userid
+                ) ustat
+                  ON ustat.contextid = lcip.contextid AND ustat.questionid = q.id
+                    AND ustat.scaleid $parentscales2 ) s
+            SQL;
         } else {
-            $from .= "
+            $from .= <<<SQL
               LEFT JOIN (SELECT NULL AS userid, NULL AS numberattempts, NULL AS lastattempt) as ustat
-                ON 1=1 ) s";
+                ON 1=1 ) s
+            SQL;
         }
 
         $where = '1=1';
@@ -561,9 +562,17 @@ class catquiz {
         );
         list (, $from, $where, $params) = self::get_sql_for_stat_base_request($testitemids, [$contextid], $userids);
 
-        $sql = "
-        SELECT " . $DB->sql_concat("qas.id", "'-'", "qas.userid", "'-'", "q.id", "'-'", "lci.id") .
-        " uniqueid, qas.id, qas.userid, qa.questionid, qas.fraction, qa.minfraction, qa.maxfraction, q.qtype, qas.timecreated
+        $sql = "SELECT "
+            . $DB->sql_concat("qas.id", "'-'", "qas.userid", "'-'", "q.id", "'-'", "lci.id") . " uniqueid,
+            qas.id,
+            qas.userid,
+            qa.questionid,
+            qas.state,
+            qas.fraction,
+            qa.minfraction,
+            qa.maxfraction,
+            q.qtype,
+            qas.timecreated
         FROM $from
         JOIN {question} q
             ON qa.questionid = q.id

@@ -110,18 +110,23 @@ class model_strategy {
     private array $olditemparams;
 
     /**
+     * The ID of the catscale
+     *
+     * @var int $catscaleid
+     */
+    private int $catscaleid;
+
+    /**
      * Model-specific instantiation can go here.
      *
      * @param model_responses $responses
      * @param array $options
-     * @param model_person_param_list|null $savedpersonabilities
      * @param array $olditemparams
      *
      */
     public function __construct(
         model_responses $responses,
         array $options = [],
-        ?model_person_param_list $savedpersonabilities = null,
         array $olditemparams = []
     ) {
         $this->responses = $responses;
@@ -129,18 +134,6 @@ class model_strategy {
         $this->abilityestimator = new model_person_ability_estimator_catcalc($this->responses);
         $this->set_options($options);
         $this->olditemparams = $olditemparams;
-
-        if ($savedpersonabilities === null || count($savedpersonabilities) === 0) {
-            $savedpersonabilities = $responses->get_initial_person_abilities();
-        } else if (count($savedpersonabilities) < count($initial = $responses->get_initial_person_abilities())) {
-            $newusers = array_diff(
-                array_keys($initial->get_person_params()),
-                array_keys($savedpersonabilities->get_person_params()));
-            foreach ($newusers as $userid) {
-                $savedpersonabilities->add(new model_person_param($userid));
-            }
-        }
-        $this->initialpersonabilities = $savedpersonabilities;
     }
 
     /**
@@ -199,10 +192,11 @@ class model_strategy {
      * Starts the estimation process
      *
      * @param int $catscaleid
+     * @param model_person_param_list $initialabilities
      * @return array<model_item_param_list, model_person_param_list>
      */
-    public function run_estimation(int $catscaleid): array {
-        $personabilities = $this->initialpersonabilities;
+    public function run_estimation(int $catscaleid, model_person_param_list $initialabilities): array {
+        $personabilities = $initialabilities;
 
         /** @var array<model_item_param_list> $itemdifficulties */
         $itemdifficulties = [];
@@ -365,6 +359,15 @@ class model_strategy {
         }
         $personabilities = model_person_param_list::load_from_db($contextid, $catscaleids);
         return [$estdifficulties, $personabilities];
+    }
+
+    /**
+     * Returns the responses
+     *
+     * @return \local_catquiz\local\model\model_responses
+     */
+    public function get_responses(): model_responses {
+        return $this->responses;
     }
 
     /**

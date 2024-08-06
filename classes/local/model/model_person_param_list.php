@@ -71,7 +71,7 @@ class model_person_param_list implements ArrayAccess, IteratorAggregate, Countab
 
         $personabilities = new model_person_param_list();
         foreach ($personrows as $r) {
-            $p = new model_person_param($r->userid);
+            $p = new model_person_param($r->userid, $r->catscaleid);
             $p->set_ability($r->ability);
             $personabilities->add($p);
         }
@@ -108,7 +108,7 @@ class model_person_param_list implements ArrayAccess, IteratorAggregate, Countab
      *
      */
     public function add(model_person_param $personparam) {
-        $this->personparams[$personparam->get_id()] = $personparam;
+        $this->personparams[] = $personparam;
         return $this;
     }
 
@@ -277,6 +277,23 @@ class model_person_param_list implements ArrayAccess, IteratorAggregate, Countab
 
         foreach ($updatedrecords as $r) {
             $DB->update_record('local_catquiz_personparams', $r, true);
+        }
+    }
+
+    /**
+     * If any of the given userids are missing, default parameters are added
+     *
+     * @param array $userids
+     * @param int $catscaleid
+     * @return void
+     */
+    public function add_missing_users(array $userids, int $catscaleid) {
+        $newusers = array_diff(
+            $userids,
+            array_keys($this->get_person_params())
+        );
+        foreach ($newusers as $userid) {
+            $this->add(new model_person_param($userid, $catscaleid));
         }
     }
 }
