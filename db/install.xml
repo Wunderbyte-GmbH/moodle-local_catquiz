@@ -32,7 +32,6 @@
       </FIELDS>
       <KEYS>
         <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
-        <KEY NAME="parentid" TYPE="foreign" FIELDS="parentid" REFTABLE="local_catquiz_catscales" REFFIELDS="id"/>
         <KEY NAME="contextid" TYPE="foreign" FIELDS="contextid" REFTABLE="local_catquiz_catcontext" REFFIELDS="id"/>
       </KEYS>
       <INDEXES>
@@ -106,7 +105,6 @@
       </FIELDS>
       <KEYS>
         <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
-        <KEY NAME="parentid" TYPE="foreign"  FIELDS="parentid" REFTABLE="local_catquiz_catcontext" REFFIELDS="id"/>
         <KEY NAME="usermodified" TYPE="foreign" FIELDS="usermodified" REFTABLE="user" REFFIELDS="id"/>
       </KEYS>
       <INDEXES>
