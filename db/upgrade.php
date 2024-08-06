@@ -544,7 +544,7 @@ function xmldb_local_catquiz_upgrade($oldversion) {
             $updaterecord = new stdclass;
             $updaterecord->id = $row->itemparamid;
             $updaterecord->itemid = $row->item;
-            $DB->update_record('local_catquiz_itemparams',$updaterecord);
+            $DB->update_record('local_catquiz_itemparams', $updaterecord);
         }
 
         // Catquiz savepoint reached.
@@ -606,7 +606,7 @@ function xmldb_local_catquiz_upgrade($oldversion) {
             $updaterecord->id = $row->itemid;
             $updaterecord->contextid = $row->contextid;
             $updaterecord->activeparamid = $lcip->id;
-            $DB->update_record('local_catquiz_items',$updaterecord);
+            $DB->update_record('local_catquiz_items', $updaterecord);
         }
 
         $table = new xmldb_table('local_catquiz_catscales');
