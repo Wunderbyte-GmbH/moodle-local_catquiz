@@ -109,6 +109,9 @@
         <KEY NAME="parentid" TYPE="foreign"  FIELDS="parentid" REFTABLE="local_catquiz_catcontext" REFFIELDS="id"/>
         <KEY NAME="usermodified" TYPE="foreign" FIELDS="usermodified" REFTABLE="user" REFFIELDS="id"/>
       </KEYS>
+      <INDEXES>
+        <INDEX NAME="parentid" UNIQUE="false" FIELDS="parentid"/>
+      </INDEXES>
     </TABLE>
     <TABLE NAME="local_catquiz_items" COMMENT="Catquiz items" NEXT="local_catquiz_subscriptions">
       <FIELDS>
