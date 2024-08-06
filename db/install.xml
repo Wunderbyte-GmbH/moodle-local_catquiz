@@ -144,9 +144,9 @@
         <FIELD NAME="componentname" TYPE="char" LENGTH="255" NOTNULL="false" SEQUENCE="false" COMMENT="Name of the component the item belongs to. Usually this is qtype"/>
         <FIELD NAME="contextid" TYPE="int" LENGTH="10" NOTNULL="false" DEFAULT="0" SEQUENCE="false" COMMENT="References a cat context"/>
         <FIELD NAME="model" TYPE="char" LENGTH="255" NOTNULL="false" SEQUENCE="false"/>
-        <FIELD NAME="difficulty" TYPE="number" LENGTH="10" NOTNULL="false" SEQUENCE="false" DECIMALS="4" COMMENT="overall difficulty of item"/>
-        <FIELD NAME="discrimination" TYPE="number" LENGTH="10" NOTNULL="false" SEQUENCE="false" DECIMALS="4" COMMENT="overall discriminatory o´power of item"/>
-        <FIELD NAME="guessing" TYPE="number" LENGTH="10" NOTNULL="false" SEQUENCE="false" DECIMALS="4" COMMENT="overall influence of guessing on probability of successful solution of item"/>
+        <FIELD NAME="difficulty" TYPE="number" LENGTH="10" NOTNULL="false" DEFAULT = "0" SEQUENCE="false" DECIMALS="4" COMMENT="overall difficulty of item"/>
+        <FIELD NAME="discrimination" TYPE="number" LENGTH="10" NOTNULL="false" DEFAULT = "0" SEQUENCE="false" DECIMALS="4" COMMENT="overall discriminatory o´power of item"/>
+        <FIELD NAME="guessing" TYPE="number" LENGTH="10" NOTNULL="false" DEFAULT = "0" SEQUENCE="false" DECIMALS="4" COMMENT="overall influence of guessing on probability of successful solution of item"/>
         <FIELD NAME="json" TYPE="text" NOTNULL="false" SEQUENCE="false" COMMENT="values for item paramters"/> <!-- TODO: To be implemented soon -->
         <FIELD NAME="status" TYPE="int" LENGTH="2" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
         <FIELD NAME="timecreated" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
