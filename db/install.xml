@@ -40,6 +40,7 @@
         <FIELD NAME="componentname" TYPE="char" LENGTH="255" NOTNULL="true" SEQUENCE="false" COMMENT="Name of the component the item belongs to. Usually this is qtype"/>
         <FIELD NAME="componentid" TYPE="int" LENGTH="10" NOTNULL="false" DEFAULT="0" SEQUENCE="false" />
         <FIELD NAME="catscaleid" TYPE="int" LENGTH="10" NOTNULL="false" DEFAULT="0" SEQUENCE="false" />
+        <FIELD NAME="activeparamid" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false" COMMENT="Holds the ID of the itemparams entry that represents this item"/>
         <FIELD NAME="lastupdated" TYPE="int" LENGTH="2" NOTNULL="false" SEQUENCE="false" COMMENT="The last time difficulty, etc. have been updated."/>
         <FIELD NAME="status" TYPE="int" LENGTH="2" NOTNULL="false" DEFAULT="0" SEQUENCE="false" COMMENT="in regard to catscale"/>
       </FIELDS>
