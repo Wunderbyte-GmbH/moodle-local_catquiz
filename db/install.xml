@@ -4,7 +4,7 @@
     xsi:noNamespaceSchemaLocation="../../../lib/xmldb/xmldb.xsd"
 >
   <TABLES>
-    <TABLE NAME="local_catquiz" COMMENT="Catquiz settings table" NEXT="local_catquiz_catscales">
+    <TABLE NAME="local_catquiz" COMMENT="Catquiz settings table">
       <FIELDS>
         <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
         <FIELD NAME="componentname" TYPE="char" LENGTH="255" NOTNULL="true" SEQUENCE="false" COMMENT="Component name settings are applicable"/>
@@ -17,7 +17,7 @@
         <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
       </KEYS>
     </TABLE>
-    <TABLE NAME="local_catquiz_catscales" COMMENT="Catquiz catscales table" NEXT="local_catquiz_items">
+    <TABLE NAME="local_catquiz_catscales" COMMENT="Catquiz catscales table">
       <FIELDS>
         <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
         <FIELD NAME="parentid" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="id of the parent catscale, 0 if this is a top-level catscale"/>
@@ -111,7 +111,7 @@
         <INDEX NAME="parentid" UNIQUE="false" FIELDS="parentid"/>
       </INDEXES>
     </TABLE>
-    <TABLE NAME="local_catquiz_items" COMMENT="Catquiz items" NEXT="local_catquiz_subscriptions">
+    <TABLE NAME="local_catquiz_items" COMMENT="Catquiz items">
       <FIELDS>
         <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
         <FIELD NAME="componentname" TYPE="char" LENGTH="255" NOTNULL="true" SEQUENCE="false" COMMENT="Name of the component the item belongs to. Usually this is qtype"/>
@@ -168,7 +168,7 @@
         <FIELD NAME="userid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="User id"/>
         <FIELD NAME="catscaleid" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
         <FIELD NAME="contextid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="Cat context"/>
-        <FIELD NAME="attemptid" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false" DECIMALS="4" COMMENT="id of attempt"/>   <!-- TODO: To be decided and to be implemented -->
+        <FIELD NAME="attemptid" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false" COMMENT="Identifies the attempt"/>   <!-- TODO: To be decided and to be implemented -->
         <FIELD NAME="ability" TYPE="number" LENGTH="10" NOTNULL="true" SEQUENCE="false" DECIMALS="4" COMMENT="person ability in given catscale"/>
         <FIELD NAME="standarderror" TYPE="number" LENGTH="10" NOTNULL="false" SEQUENCE="false" DECIMALS="4" COMMENT="standard error of measurement"/> <!-- TODO: To be implemented -->
         <FIELD NAME="status" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false" COMMENT="Status"/>
