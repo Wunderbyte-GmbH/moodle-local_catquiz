@@ -561,7 +561,8 @@ function xmldb_local_catquiz_upgrade($oldversion) {
         $fields[] = new xmldb_field('contextid', XMLDB_TYPE_INTEGER, '10');
         $keys[] = new xmldb_key('catscaleid', XMLDB_KEY_FOREIGN, 'catscaleid', 'local_catquiz_catscales', explode(',', 'id'));
         $keys[] = new xmldb_key('contextid', XMLDB_KEY_FOREIGN, 'contextid', 'local_catquiz_catcontext', explode(',', 'id'));
-        $keys[] = new xmldb_key('activeparamid', XMLDB_KEY_FOREIGN, 'activeparamid', 'local_catquiz_item_params', explode(',', 'id'));
+        $keys[] = new xmldb_key('activeparamid', XMLDB_KEY_FOREIGN,
+            'activeparamid', 'local_catquiz_item_params', explode(',', 'id'));
         $indexes[] = new xmldb_index('componentid', XMLDB_INDEX_NOTUNIQUE, explode(',', 'componentid'));
         $indexes[] = new xmldb_index('catscaleid', XMLDB_INDEX_NOTUNIQUE, explode(',', 'catscaleid'));
         $indexes[] = new xmldb_index('contextid', XMLDB_INDEX_NOTUNIQUE, explode(',', 'contextid'));
