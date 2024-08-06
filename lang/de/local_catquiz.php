@@ -243,7 +243,7 @@ $string['enrolementstringstartforfeedback'] = 'Auf Grundlage Ihres Ergebnisses s
 $string['enrolled_courses'] = 'Eingeschriebene Kurse';
 $string['enrolmentmessagetitle'] = 'Benachrichtigung über neue Kurseinschreibung(en) / Gruppenmitgliedschaft(en)';
 $string['error'] = 'Es ist ein Fehler aufgetreten';
-$string['error:fraction0'] = 'Leider konnten wir aufgrund Ihrer Antworten kein valides Ergebnis ermitteln.
+$string['error:fraction0'] = 'Leider konnten wir aufgrund Ihrer Antworten kein zuverlässiges Ergebnis ermitteln.
     Wir würden uns freuen, wenn Sie es erneut versuchen.';
 $string['error:fraction1'] = 'Herzlichen Glückwunsch, Sie haben alle Fragen richtig beantwortet! Das ist wirklich großartig!
     Aufgrund dieser exzellenten Leistung konnte jedoch kein eindeutiges Ergebnis ermittelt werden.';
@@ -275,7 +275,7 @@ $string['failedtoaddmultipleitems'] = '{$a->numadded} Fragen wurden erfolgreich 
 $string['feedback_colorrange'] = 'Farbbereich auf einer Feedback-Skala';
 $string['feedback_customscale_nofeedback'] = 'Es wurde kein Feedback für ihre Ergebnisse angegeben.';
 $string['feedback_details_description'] = 'Die folgende Tabelle listet alle
-    Aspekte (Skalen) von „{$a}“ auf, für die der Test ein valides Ergebnis
+    Aspekte (Skalen) von „{$a}“ auf, für die der Test ein zuverlässiges Ergebnis
     ermitteln konnte';
 $string['feedback_details_heading'] = 'Details zu Ihrem Ergebnis';
 $string['feedback_details_lowestskill'] = 'Die Skala „<b>{$a->name}</b>“ wurde mit einem
@@ -434,14 +434,15 @@ $string['nofeedback'] = 'Kein Feedback angegeben.';
 $string['nogapallowed'] = 'Keine Lücken in Personenfähigkeitsspanne erlaubt. Bitte beginnen setzen Sie als Mindestwert den Maximalwert des vorangegangenen Bereichs.';
 $string['noint'] = 'Bitte geben Sie eine Zahl ein';
 $string['nolabels'] = 'Keine Spaltennamen definiert.';
-$string['noparentsgiven'] = 'Die Skala {$a->catscalename} ist nicht eindeutig lokalisierbar, weil keine übergeordneten Skalen angegeben wurden. Entsprechender Datensatz nicht importiert/aktualisiert.';
+$string['noparentsgiven'] = 'Die Skala {$a->catscalename} ist nicht eindeutig zu identifizieren, weil keine übergeordneten Skalen angegeben wurden.
+    Die betroffenen Datensätze wurden nicht importiert/aktualisiert.';
 $string['norecordsfound'] = 'Keine Fragen in dieser Skala gefunden.';
 $string['noremainingquestions'] = 'Keine weiteren Fragen';
 $string['noresult'] = 'kein Fähigkeits-Wert ermittelt';
 $string['noscaleselected'] = 'Keine CAT-Skala gewählt.';
-$string['noscalesfound'] = 'Es konnte zu keiner Skala ein valides Ergebnis ermittelt werden.';
+$string['noscalesfound'] = 'Für keine Skala konnte ein zuverlässiges Ergebnis ermittelt werden.';
 $string['noselection'] = 'Keine Auswahl';
-$string['nothingtocompare'] = 'Es sind nicht ausreichend valide Ergebnisse für einen Vergleich vorhanden.';
+$string['nothingtocompare'] = 'Für einen Vergleich liegen noch nicht genügend Ergebnisse vor.';
 $string['notificationcatscalechange'] = 'Hallo {$a->firstname} {$a->lastname},
 Skalen wurden verändert auf der Moolde Plattform {$a->instancename}.
 Dieses e-Mail informiert Sie als CAT Manager*in, verantwortlich für dieses Skala. {$a->editorname} hat die folgenden Änderungen an der Skala „{$a->catscalename}“ vorgenommen.:
