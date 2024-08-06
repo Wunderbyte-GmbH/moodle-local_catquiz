@@ -588,23 +588,20 @@ function xmldb_local_catquiz_upgrade($oldversion) {
 
         $sql = "SELECT id
             FROM {local_catquiz_itemparams} lcip
-            WHERE itemid = ".$row->itemid." AND contextid = ".$row->contextid."
+            WHERE itemid = $itemid AND contextid = $contextid
             ORDER BY status
-            LIMIt 1";
+            LIMIT 1";
 
         foreach ($sqlresult as $row) {
 
-            $sql = "SELECT id
-                FROM {local_catquiz_itemparams} lcip
-                WHERE itemid = ".$row->itemid." AND contextid = ".$row->contextid."
-                ORDER BY status
-                LIMIt 1";
+            $itemid = $row->itemid;
+            $contextid = $row->contextid;
 
             $lcip = $DB->get_record_sql($sql);
 
             $updaterecord = new stdclass;
-            $updaterecord->id = $row->itemid;
-            $updaterecord->contextid = $row->contextid;
+            $updaterecord->id = $itemid;
+            $updaterecord->contextid = $contextid;
             $updaterecord->activeparamid = $lcip->id;
             $DB->update_record('local_catquiz_items', $updaterecord);
         }
