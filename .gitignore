@@ -14,4 +14,4 @@ workspace.php
 workspace2.php
 
 /vendor/
-catquiz.log
+logs/

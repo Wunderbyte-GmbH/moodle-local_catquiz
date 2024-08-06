@@ -31,7 +31,10 @@ use local_catquiz\output\catscalemanager\managecatscaledashboard;
 require_once('../../config.php');
 global $CFG;
 
-logger::get()->info('We are here now');
+$logger = logger::get();
+$logger->debug('Debug: We are here now');
+$logger->info('Info: We are here now');
+$logger->warning('This is a warning');
 
 $catcontextid = optional_param('contextid', 0, PARAM_INT);
 $catscale = optional_param('scaleid', -1, PARAM_INT);
@@ -76,6 +79,15 @@ $managecatscaledashboard = new managecatscaledashboard(
     $usesubs,
     $componentname);
 $data = $managecatscaledashboard->export_for_template($OUTPUT);
+$logger->error(
+    'And this is an error, with some data',
+    [
+        'testitemid' => $testitemid,
+        'catcontextid' => $catcontextid,
+        'catscale' => $catscale,
+        'usesubs' => $usesubs,
+    ]
+);
 echo $OUTPUT->render_from_template('local_catquiz/catscalemanager/managecatscaledashboard', $data);
 
 echo $OUTPUT->footer();

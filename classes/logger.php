@@ -27,9 +27,9 @@
 namespace local_catquiz;
 
 use Monolog\Logger as MonologLogger;
-use Monolog\Handler\StreamHandler;
 use Psr\Log\LoggerInterface;
 use local_catquiz\dummy_logger;
+use Monolog\Handler\RotatingFileHandler;
 
 /**
  * Class logger
@@ -40,10 +40,32 @@ use local_catquiz\dummy_logger;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class logger {
+
+    /**
+     * If no log level is given, this is used.
+     *
+     * @var string
+     */
+    const DEFAULT_LEVEL = MonologLogger::ERROR;
+
+    /**
+     * Path to the logfile relative to the CFG->dirroot.
+     *
+     * @var string
+     */
+    const LOGFILE = '/local/catquiz/logs/catquiz.log';
+
+    /**
+     * Maximum number of log files
+     *
+     * @var int
+     */
+    const MAX_FILES = 20;
+
     /**
      * Static property that holds the logger.
      *
-     * @var ?LoggerInterface $logger
+     * @var ?PsrLoggerInterface $logger
      */
     protected static ?LoggerInterface $logger = null;
 
@@ -54,18 +76,43 @@ class logger {
     }
 
     /**
-     * Returns a logger or null
-     * @return MonologLogger
+     * Returns a LoggerInterface
+     *
+     * If monolog is not enabled, it returns a dummy logger that does nothing.
+     * @return LoggerInterface
      */
     public static function get() {
         global $CFG;
-        if (!$CFG->monolog) {
+
+        // If monolog is not set in the config.php, return a dummy logger.
+        if (!property_exists($CFG, 'monolog') || !$CFG->monolog) {
             return new dummy_logger();
         }
+
+        // Monolog is configured, so we can expect that it is installed.
         require_once('/var/www/html/local/catquiz/vendor/autoload.php');
+
+        if (self::$logger) {
+            return self::$logger;
+        }
+
+        // Allow overriding the default log level.
+        $level = self::DEFAULT_LEVEL;
+        if (property_exists($CFG, 'monolog_level')
+            && in_array(strtoupper($CFG->monolog_level), array_keys(MonologLogger::getLevels()))) {
+            $level = strtoupper($CFG->monolog_level);
+        }
+
+        $maxfiles = self::MAX_FILES;
+        if (property_exists($CFG, 'monolog_max_files')
+            && is_int($CFG->monolog_max_files)) {
+            $maxfiles = intval($CFG->monolog_max_files);
+        }
+
         if (!self::$logger) {
             self::$logger = new MonologLogger('catquiz');
-            self::$logger->pushHandler(new StreamHandler($CFG->dirroot . '/local/catquiz/catquiz.log', MonologLogger::DEBUG));
+            $filename = '/var/www/html/local/catquiz/logs/testing.log';
+            self::$logger->pushHandler(new RotatingFileHandler($filename, $maxfiles, $level));
         }
         return self::$logger;
     }

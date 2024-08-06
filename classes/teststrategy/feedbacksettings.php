@@ -17,12 +17,11 @@
 namespace local_catquiz\teststrategy;
 
 use stdClass;
-use local_catquiz\catscale;
-use local_catquiz\feedback\feedbackclass;
-use local_catquiz\output\attemptfeedback;
+use local_catquiz\logger;
 
 defined('MOODLE_INTERNAL') || die();
 
+global $CFG;
 require_once($CFG->dirroot.'/user/lib.php');
 require_once($CFG->dirroot.'/local/catquiz/lib.php');
 
@@ -298,7 +297,10 @@ class feedbacksettings {
                     if ($CFG->debug > 0) {
                         var_dump($feedbackdata);
                         var_dump($personabilities);
-                        throw new \Exception(sprintf('No standarderror is set for scale %s', $scaleid));
+                        logger::get()->critical(
+                            sprintf('No standarderror is set for scale %s', $scaleid),
+                            [$feedbackdata, $personabilities]
+                        );
                     }
                 }
                 $se = $feedbackdata['se'][$scaleid];

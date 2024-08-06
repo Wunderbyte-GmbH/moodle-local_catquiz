@@ -15,7 +15,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * A logger that implements the LoggerInterface but does nothing
+ * A null object that implements the LoggerInterface
  *
  * This is used as a fallback if no real logger is available.
  *
@@ -27,19 +27,21 @@
 
 namespace local_catquiz;
 
-use Psr\Log\LoggerInterface as PsrLoggerInterface;
-
 /**
  * Class dummy_logger
  *
- * This is a copy of the LoggerInterface with empty function bodies.
+ * This is a null object that implements the Psr\Log\LoggerInterface.
+ *
+ * Note: Since this class is used as a fallback and we have no guarantee that
+ * the LoggerInterface is in the class path, we can not reference it here. This
+ * is why `implements LoggerInterface` is missing although it actually does implement it.
  *
  * @package    local_catquiz
  * @copyright  2024 Wunderbyte GmbH <georg.maisser@wunderbyte.at>
  * @author     David Szkiba
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class dummy_logger implements PsrLoggerInterface {
+class dummy_logger {
 
     /**
      * System is unusable.
@@ -49,7 +51,7 @@ class dummy_logger implements PsrLoggerInterface {
      *
      * @return void
      */
-    public function emergency($message, array $context = array()) {
+    public function emergency($message, array $context = []) {
     }
 
     /**
@@ -63,7 +65,7 @@ class dummy_logger implements PsrLoggerInterface {
      *
      * @return void
      */
-    public function alert($message, array $context = array()) {
+    public function alert($message, array $context = []) {
     }
 
     /**
@@ -76,7 +78,7 @@ class dummy_logger implements PsrLoggerInterface {
      *
      * @return void
      */
-    public function critical($message, array $context = array()) {
+    public function critical($message, array $context = []) {
     }
 
     /**
@@ -88,7 +90,7 @@ class dummy_logger implements PsrLoggerInterface {
      *
      * @return void
      */
-    public function error($message, array $context = array()) {
+    public function error($message, array $context = []) {
     }
 
     /**
@@ -102,7 +104,7 @@ class dummy_logger implements PsrLoggerInterface {
      *
      * @return void
      */
-    public function warning($message, array $context = array()) {
+    public function warning($message, array $context = []) {
     }
 
     /**
@@ -113,7 +115,7 @@ class dummy_logger implements PsrLoggerInterface {
      *
      * @return void
      */
-    public function notice($message, array $context = array()) {
+    public function notice($message, array $context = []) {
     }
 
     /**
@@ -126,7 +128,7 @@ class dummy_logger implements PsrLoggerInterface {
      *
      * @return void
      */
-    public function info($message, array $context = array()) {
+    public function info($message, array $context = []) {
     }
 
     /**
@@ -137,7 +139,7 @@ class dummy_logger implements PsrLoggerInterface {
      *
      * @return void
      */
-    public function debug($message, array $context = array()) {
+    public function debug($message, array $context = []) {
     }
 
     /**
@@ -151,6 +153,6 @@ class dummy_logger implements PsrLoggerInterface {
      *
      * @throws \Psr\Log\InvalidArgumentException
      */
-    public function log($level, $message, array $context = array()) {
+    public function log($level, $message, array $context = []) {
     }
 }

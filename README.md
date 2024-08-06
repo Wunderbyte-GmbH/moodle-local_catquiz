@@ -116,6 +116,30 @@ You can follow these steps to setup a quiz with sample data. This assumes that y
 4. You can check "Active pilot mode" to include questions without item parameters in the quiz. When value of 25 is used, on average 25% of the displayed questions will be pilot questions.
 5.  Additionally, you can choose what question the attempt should be started with, set a minimum and maximum number of questions per attempt (maybe for testing set the maximum to a low value like e.g. 8) and choose at which standard error the test should abort.
 
+## Logging
+
+Logging is not required but can be used to gather additional information.
+
+The following steps are required to enable logging:
+
+- In the catquiz plugin directory, run `composer install` to install the monolog dependency:
+
+```sh
+    MOODLE-ROOT-DIR/local/catquiz && php MOODLE-ROOT-DIR/composer.phar install
+```
+- Create the folder where logs will be stored and set ownership to the webserver user:
+
+```sh
+    mkdir MOODLE-ROOT-DIR/local/catquiz/logs && chown -R WEBSERVER-USER:WEBERVER-GROUP $_
+```
+
+- Add `$CFG->monolog = true` to your config.php
+
+- (Optional) Change the minimum log level via `$CFG->monolog_level='LOGLEVEL'`. Supported levels are
+`DEBUG`, `INFO`, `NOTICE`, `WARNING`, `ERROR`, `CRITICAL`, `ALERT`, and `EMERGENCY`. Default: `'ERROR'`.
+- (Optional) Change the maximum number of logfiles to keep by setting
+  `$CFG->monolog_max_files`. If set to 0, all files are kept. Default: `20`.
+
 ## License ##
 
 2024 Wunderbyte GmbH <info@wunderbyte.at>
