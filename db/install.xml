@@ -66,7 +66,7 @@
         <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
           <FIELD NAME="parentid" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false" COMMENT="A record from this table as parent."/>  <!-- TODO: To be decided and evtl. removed -->
           <FIELD NAME="componentid" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false" COMMENT="Corresponds to the instance id of a certain test component."/>
-          <FIELD NAME="component" TYPE="char" LENGTH="255" NOTNULL="false" DEFAULT="" SEQUENCE="false" COMMENT="Name of plugin which uses this environment"/>
+          <FIELD NAME="component" TYPE="char" LENGTH="255" NOTNULL="false" DEFAULT="" SEQUENCE="false" COMMENT="Name of plugin which uses this environment"/>  <!-- TODO: rename to comonentname! -->
           <FIELD NAME="catscaleid" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false" COMMENT="ID from local catquiz catscales table"/>
           <FIELD NAME="courseid" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false"/>
           <FIELD NAME="name" TYPE="char" LENGTH="255" NOTNULL="false" DEFAULT="0" SEQUENCE="false" COMMENT="Name of test environment"/>
@@ -83,7 +83,7 @@
         <KEY NAME="courseid" TYPE="foreign" FIELDS="courseid" REFTABLE="course" REFFIELDS="id"/>
       </KEYS>
       <INDEXES>
-        <INDEX NAME="component" UNIQUE="false" FIELDS="componentid,componentname"/>
+        <INDEX NAME="component" UNIQUE="false" FIELDS="componentid,component"/>
         <INDEX NAME="catscaleid" UNIQUE="false" FIELDS="catscaleid"/>
         <INDEX NAME="courseid" UNIQUE="false" FIELDS="courseid"/>
       </INDEXES>
