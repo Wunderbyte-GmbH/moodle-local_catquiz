@@ -466,6 +466,8 @@ class model_item_param_list implements ArrayAccess, IteratorAggregate, Countable
                 $id = $newrecord['id'];
             }
         }
+        // Ensure that the item points to the itemparam with the highest status.
+        catquiz::set_active_itemparam($newrecord['itemid']);
         cache_helper::purge_by_event('changesinitemparams');
         if (!empty($newrecord['warning'])) {
             return [
@@ -539,15 +541,26 @@ class model_item_param_list implements ArrayAccess, IteratorAggregate, Countable
         if (isset($newrecord['error'])) {
             return $newrecord;
         }
-        // See if the item already exists.
+
+        // Assign corresponding context.
+        self::assign_catcontext($newrecord);
+
+        // See if a new context was created. If so, duplicate the existing items for this scale and assign the new context.
+        $allscales = catscale::get_ancestors($newrecord['catscaleid']);
+        $globalscaleid = end($allscales);
+        $contextid = $newrecord['contextid'] ?? null;
+        if (!$contextid && $context = catcontext::get_instance($globalscaleid)) {
+            $contextid = $context->id;
+        }        // See if the item already exists.
         $scalerecord = $DB->get_record("local_catquiz_items", [
             'componentid' => $newrecord['componentid'],
             'catscaleid' => (string) $newrecord['catscaleid'],
+            'contextid' => $contextid,
         ]);
 
         // Check if item is in scale otherwise add it.
         if (!$scalerecord) {
-            $columnstoinclude = ['componentname', 'componentid', 'catscaleid', 'lastupdated'];
+            $columnstoinclude = ['componentname', 'componentid', 'catscaleid', 'lastupdated', 'contextid'];
             $recordforquery = $newrecord;
             foreach ($recordforquery as $key => $value) {
                 if (!in_array($key, $columnstoinclude, true)) {
@@ -576,9 +589,7 @@ class model_item_param_list implements ArrayAccess, IteratorAggregate, Countable
             $event->trigger();
         }
 
-        // Assign corresponding context.
-        self::assign_catcontext($newrecord);
-        $newrecord['itemid'] = $itemid;
+        $newrecord['itemid'] = $itemid ?? $scalerecord->id;
         return $newrecord;
     }
 

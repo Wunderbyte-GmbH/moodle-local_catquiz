@@ -41,6 +41,7 @@ use local_catquiz\data\dataapi;
 use local_catquiz\local\model\model_item_param_list;
 use local_catquiz\local\model\model_model;
 use local_catquiz\local\model\model_strategy;
+use local_catquiz\output\catscales;
 use moodle_exception;
 use moodle_url;
 use stdClass;
@@ -698,6 +699,38 @@ class catscale {
             $record->contextid = $contextid;
             unset($record->id);
             $DB->insert_record('local_catquiz_itemparams', $record);
+        }
+    }
+
+    /**
+     * This function duplicates all the records from the old context for the new context.
+     * @param int $scaleid
+     * @param int $oldcontextid
+     * @param int $contextid
+     * @return void
+     * @throws dml_exception
+     */
+    public static function duplicate_items_for_scale_with_new_contextid(int $scaleid, int $oldcontextid, int $contextid) {
+        global $DB;
+
+        // Make sure we don't do unnecessary work.
+        if ($oldcontextid == $contextid) {
+            return;
+        }
+
+        $sql = "SELECT lci.*
+                FROM {local_catquiz_items} lci
+                WHERE lci.catscaleid = :scaleid
+                AND lcip.contextid = :contextid";
+        $params['contextid'] = $oldcontextid;
+        $params['scaleid'] = $scaleid;
+
+        $records = $DB->get_records_sql($sql, $params);
+
+        foreach ($records as $record) {
+            $record->contextid = $contextid;
+            unset($record->id);
+            $DB->insert_record('local_catquiz_items', $record);
         }
     }
 

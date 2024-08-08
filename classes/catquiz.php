@@ -201,7 +201,6 @@ class catquiz {
         // Start the params array.
         $params = [
             'contextid' => $contextid,
-            'lcicontextid' => $contextid,
 
         ];
         $wherearray['lcipcontextid'] = $contextid;
@@ -260,7 +259,7 @@ class catquiz {
           FROM {local_catquiz_catscales} lccs
           -- Get all corresponding items of those scales, skip if not existent
           -- (INNER JOIN)
-            JOIN {local_catquiz_items} lci ON lci.catscaleid=lccs.id AND lci.contextid = :lcicontextid
+            JOIN {local_catquiz_items} lci ON lci.catscaleid=lccs.id
 
           -- Get all the item parameter for the question for the given context(s),
           -- skip if not existent
@@ -2440,6 +2439,45 @@ class catquiz {
             ORDER BY attemptid DESC";
         return [$sql, $params];
     }
+
+    /**
+     * Set the activeparamid field of the given item.
+     *
+     * Selects one of the itemparams associated with the given item and sets it
+     * in the activeparamsid DB column.
+     *
+     * @param int $itemid
+     * @param ?int $activeparamid
+     * @return void
+     */
+    public static function set_active_itemparam(int $itemid, ?int $activeparamid = null) {
+        global $DB;
+        $itemparams = $DB->get_records('local_catquiz_itemparams', ['itemid' => $itemid]);
+
+        // Check if the given paramid is in the list of available itemparams for this item.
+        if ($activeparamid && !in_array($activeparamid, array_map(fn ($ip) => $ip->id, $itemparams))) {
+            // TODO: Log an error once the logger is merged.
+            throw new InvalidArgumentException(
+                sprintf(
+                    'Given activeparamid %d does not belong to the given itemid %d'
+                )
+            );
+        }
+
+        // If no itemparamid is given, select the one with the highest status.
+        if (!$activeparamid) {
+            // Find the itemparam that should be selected.
+            $sortfun = function ($a, $b) {
+                return $a->status - $b->status;
+            };
+            usort($itemparams, $sortfun);
+            $activeparamid = $itemparams[0]->id;
+        }
+
+        $dataobject = (object) ['id' => $itemid, 'activeparamid' => $activeparamid];
+        $DB->update_record('local_catquiz_items', $dataobject);
+    }
+
 
     /**
      * Returns the state of questions that we will not consider as completed
