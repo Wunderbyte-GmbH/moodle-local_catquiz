@@ -134,6 +134,7 @@
         <INDEX NAME="catscaleid" UNIQUE="false" FIELDS="catscaleid"/>
         <INDEX NAME="contextid" UNIQUE="false" FIELDS="contextid"/>
         <INDEX NAME="activeparamid" UNIQUE="false" FIELDS="activeparamid"/>
+        <INDEX NAME="timestamps" UNIQUE="false" FIELDS="starttimestamp, endtimestamp"/>
       </INDEXES>
     </TABLE>
     <TABLE NAME="local_catquiz_itemparams" COMMENT="Store cat item parameters">

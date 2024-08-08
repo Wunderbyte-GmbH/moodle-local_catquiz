@@ -217,6 +217,26 @@ class model_person_param implements \ArrayAccess {
     }
 
     /**
+     * Get the catscale ID of this parameter
+     *
+     * @return int
+     */
+    public function get_catscaleid(): int {
+        return $this->catscaleid;
+    }
+
+    /**
+     * Set the catscale ID of this parameter
+     *
+     * @param int $catscaleid
+     * @return self
+     */
+    public function set_catscaleid(int $catscaleid): self {
+        $this->catscaleid = $catscaleid;
+        return $this;
+    }
+
+    /**
      * To array.
      *
      * @return array

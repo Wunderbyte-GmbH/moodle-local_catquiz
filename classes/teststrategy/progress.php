@@ -827,7 +827,25 @@ class progress implements JsonSerializable {
      * @return stdClass|bool
      */
     private function get_last_response_for_attempt() {
-        $response = catquiz::get_last_response_for_attempt($this->get_usage_id());
+        $cache = cache::make('local_catquiz', 'adaptivequizattempt');
+        $cachekey = sprintf(
+            'lastresponse_%d_%d',
+            $this->get_usage_id(),
+            $this->get_num_playedquestions()
+        );
+        if (!$response = $cache->get($cachekey)) {
+            $response = catquiz::get_last_response_for_attempt($this->get_usage_id());
+            $cache->set($cachekey, $response);
+            // Delete the cache entry for the previous number of questions answered.
+            if ($this->get_num_playedquestions() >= 1) {
+                $previouskey = sprintf(
+                    'lastresponse_%d_%d',
+                    $this->get_usage_id(),
+                    $this->get_num_playedquestions() - 1
+                );
+                $cache->delete($previouskey);
+            }
+        }
         if ($response && $response->state === 'gaveup') {
             $response->fraction = 0.0;
         }

@@ -38,7 +38,7 @@ use local_catquiz\local\model\model_responses;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  * @covers \catmodel_mixedraschbirnbaum\mixedraschbirnbaum
  */
-class mixedraschbirnbaum_test extends TestCase {
+final class mixedraschbirnbaum_test extends TestCase {
 
     /**
      * This test calls the get_log_jacobain function with the model and test its output with verified data.

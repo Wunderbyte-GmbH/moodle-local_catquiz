@@ -25,6 +25,8 @@
 namespace local_catquiz\local\model;
 use ArrayAccess;
 use ArrayIterator;
+use cache;
+use cache_helper;
 use coding_exception;
 use Countable;
 use ddl_exception;
@@ -74,6 +76,31 @@ class model_item_param_list implements ArrayAccess, IteratorAggregate, Countable
      */
     public function count(): int {
         return count($this->itemparams);
+    }
+
+    /**
+     * Returns an item parameter list for the given arguments.
+     *
+     * @param int $contextid
+     * @param string $modelname
+     * @param array $catscaleids
+     * @return model_item_param_list
+     * @throws coding_exception
+     */
+    public static function get(int $contextid, string $modelname, array $catscaleids = []): self {
+        // Try to get the item params from the cache.
+        $cache = cache::make('local_catquiz', 'catquiz_item_params');
+        $selectedscaleshash = hash('crc32', implode('_', $catscaleids));
+        $cachekey = sprintf('itemparams_%s_%s_%s', $contextid, $modelname, $selectedscaleshash);
+        if ($itemparamlist = $cache->get($cachekey)) {
+            return $itemparamlist;
+        }
+
+        if (!$itemparamlist = self::load_from_db($contextid, $modelname, $catscaleids)) {
+            return new model_item_param_list();
+        }
+        $cache->set($cachekey, $itemparamlist);
+        return $itemparamlist;
     }
 
     /**
@@ -325,6 +352,7 @@ class model_item_param_list implements ArrayAccess, IteratorAggregate, Countable
         foreach ($updatedrecords as $r) {
             $DB->update_record('local_catquiz_itemparams', $r, true);
         }
+        cache_helper::purge_by_event('changesinitemparams');
     }
 
     /**
@@ -438,6 +466,7 @@ class model_item_param_list implements ArrayAccess, IteratorAggregate, Countable
                 $id = $newrecord['id'];
             }
         }
+        cache_helper::purge_by_event('changesinitemparams');
         if (!empty($newrecord['warning'])) {
             return [
                 'success' => 2, // Update successfull with warning.

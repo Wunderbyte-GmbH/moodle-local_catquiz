@@ -41,7 +41,7 @@ use SebastianBergmann\RecursionContext\InvalidArgumentException;
  * @covers \local_catquiz\matrixcat
  *
  */
-class matrixcat_test extends basic_testcase {
+final class matrixcat_test extends basic_testcase {
 
 
     /**

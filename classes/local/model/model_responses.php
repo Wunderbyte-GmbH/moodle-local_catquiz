@@ -63,6 +63,11 @@ class model_responses {
     private array $excludedusers = [];
 
     /**
+     * @var ?model_person_param_list A list of person parameters
+     */
+    private ?model_person_param_list $personparams = null;
+
+    /**
      * Return array of item ids.
      *
      * @return array
@@ -312,9 +317,9 @@ class model_responses {
             ...catscale::get_subscale_ids($catscaleid),
         ];
         $itemparamlists = [];
-        $personparams = model_person_param_list::load_from_db($contextid, $catscaleids);
+        $personparams = $this->get_personparams($contextid, $catscaleids);
         foreach (array_keys($modelstrategy->get_installed_models()) as $model) {
-            $itemparamlists[$model] = model_item_param_list::load_from_db(
+            $itemparamlists[$model] = model_item_param_list::get(
                 $catscalecontext,
                 $model,
                 $catscaleids
@@ -334,5 +339,23 @@ class model_responses {
     private function removeuser(string $userid): void {
         unset($this->data[$userid]);
         $this->excludedusers[] = $userid;
+    }
+
+    /**
+     * Returns the person parameters for the stored responses
+     *
+     * @param int $contextid
+     * @param array $catscaleids
+     * @return model_person_param_list
+     */
+    private function get_personparams(int $contextid, array $catscaleids): model_person_param_list {
+        if (!$this->personparams) {
+            $this->personparams = model_person_param_list::load_from_db($contextid, [], $this->get_user_ids());
+        }
+        $filterfun = function (model_person_param $pp) use ($catscaleids) {
+            return in_array($pp->get_catscaleid(), $catscaleids);
+        };
+        $filtered = $this->personparams->filter($filterfun);
+        return $filtered;
     }
 }

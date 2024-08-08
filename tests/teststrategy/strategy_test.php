@@ -60,7 +60,7 @@ require_once($CFG->dirroot . '/local/catquiz/tests/lib.php');
  *
  * @covers \local_catquiz\teststrategy\strategy
  */
-class strategy_test extends advanced_testcase {
+final class strategy_test extends advanced_testcase {
 
     /**
      * @var int The ID of the 'Mathematik' scale that is created during import of the item params

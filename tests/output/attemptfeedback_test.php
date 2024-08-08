@@ -40,7 +40,7 @@ use SebastianBergmann\RecursionContext\InvalidArgumentException;
  *
  * @covers \local_catquiz\output\attemptfeedback
  */
-class attemptfeedback_test extends advanced_testcase {
+final class attemptfeedback_test extends advanced_testcase {
     /**
      * Checks if the attemptfeedback class returns the correct course enrolment data.
      *

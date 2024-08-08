@@ -17,12 +17,14 @@
 namespace local_catquiz\output;
 
 use cache;
+use cache_helper;
 use coding_exception;
 use context_system;
 use Exception;
 use dml_exception;
 use local_catquiz\catquiz;
 use local_catquiz\catscale;
+use local_catquiz\data\catscale_structure;
 use local_catquiz\event\attempt_completed;
 use local_catquiz\teststrategy\feedbackgenerator;
 use local_catquiz\teststrategy\feedbacksettings;
@@ -174,8 +176,21 @@ class attemptfeedback implements renderable, templatable {
             return;
         }
         $existingdata = $this->load_feedbackdata();
+        if (isset($newdata['catscaleid']) && !isset($existingdata['catscaleid'])) {
+            $existingdata['catscaleid'] = $newdata['catscaleid'];
+        }
+        $existingdata['attemptid'] = $progress->get_attemptid();
+        if (!isset($existingdata['quizsettings'])) {
+            $existingdata['quizsettings'] = $progress->get_quiz_settings();
+        }
+        if (!isset($existingdata['progress'])) {
+            $existingdata['progress'] = $progress;
+        }
         $generators = $this->get_feedback_generators();
         $updateddata = $this->load_data_from_generators($generators, $existingdata, $newdata);
+
+        $this->save_to_cache($updateddata);
+
         catquiz::save_attempt_to_db($updateddata);
     }
 
@@ -189,6 +204,25 @@ class attemptfeedback implements renderable, templatable {
      */
     public function load_feedbackdata(?string $feedbackdata = null, ?string $debugdata = null): array {
         global $DB;
+
+        // Try to get the attemptfeedback from the cache.
+        // For the same number of questions played, the data do not change.
+        $cache = cache::make('local_catquiz', 'adaptivequizattempt');
+        $cachekey = $this->get_feedback_cache_key();
+        if ($feedbackdata = $cache->get($cachekey)) {
+            if ($numplayed = $this->get_progress()->get_num_playedquestions() >= 1) {
+                // Release the cache for the last number of questions played.
+                $previouskey = sprintf(
+                    'feedbackdata_%d_%d',
+                    $this->attemptid,
+                    $numplayed - 1
+                );
+                $cache->delete($previouskey);
+            }
+
+            return $feedbackdata;
+        }
+
         if (!$feedbackdata) {
             $feedbackdata = json_decode(
                 $DB->get_field(
@@ -198,6 +232,12 @@ class attemptfeedback implements renderable, templatable {
                 ),
                 true
             );
+            if ($feedbackdata
+                && array_key_exists('primaryscale', $feedbackdata)
+                && is_array($feedbackdata['primaryscale'])
+            ) {
+                $feedbackdata['primaryscale'] = new catscale_structure($feedbackdata['primaryscale']);
+            }
         } else {
             $feedbackdata = json_decode($feedbackdata, true);
         }
@@ -207,12 +247,14 @@ class attemptfeedback implements renderable, templatable {
         }
 
         if (!get_config('local_catquiz', 'store_debug_info')) {
+            $this->save_to_cache($feedbackdata);
             return $feedbackdata;
         }
 
         // If this is an old version where feedbackdata are stored in the JSON column,
         // then just return it.
         if (array_key_exists('debuginfo', $feedbackdata)) {
+            $this->save_to_cache($feedbackdata);
             return $feedbackdata;
         }
 
@@ -223,12 +265,14 @@ class attemptfeedback implements renderable, templatable {
                 'debug_info',
                 ['attemptid' => $this->attemptid]
         )) {
+            $this->save_to_cache($feedbackdata);
             return $feedbackdata;
         }
 
         $debuginfo = json_decode( $debugdata, true) ?? [];
         $feedbackdata['debuginfo'] = $debuginfo;
 
+        $this->save_to_cache($feedbackdata);
         return $feedbackdata;
     }
 
@@ -326,17 +370,7 @@ class attemptfeedback implements renderable, templatable {
         $newdata['catscaleid'] = intval($this->get_quiz_settings()->catquiz_catscales);
         $catscales = catquiz::get_catscales([$newdata['catscaleid'], ...$progress->get_selected_subscales()]);
         // Remove unneeded data from the catscales array.
-        $newdata['catscales'] = array_map(
-            function ($cs) {
-                unset($cs->timecreated);
-                unset($cs->timemodified);
-                unset($cs->parentid);
-                unset($cs->contextid);
-                return $cs;
-            },
-            $catscales
-        );
-
+        $newdata['catscales'] = $catscales;
         return $newdata;
     }
 
@@ -586,5 +620,30 @@ class attemptfeedback implements renderable, templatable {
         }
 
         return $context;
+    }
+
+    /**
+     * Returns the cache key for the current progress state
+     *
+     * @return string
+     */
+    private function get_feedback_cache_key() {
+        return sprintf(
+            'feedbackdata_%d_%d',
+            $this->attemptid,
+            $this->get_progress()->get_num_playedquestions()
+        );
+    }
+
+    /**
+     * Update the feedback data in the cache
+     *
+     * @param array $data
+     * @return void
+     */
+    private function save_to_cache(array $data) {
+        $cache = cache::make('local_catquiz', 'adaptivequizattempt');
+        $cachekey = $this->get_feedback_cache_key();
+        $cache->set($cachekey, $data);
     }
 }

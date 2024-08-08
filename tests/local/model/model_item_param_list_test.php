@@ -35,7 +35,7 @@ use UnexpectedValueException;
  *
  * @covers \local_catquiz\local\model\model_item_param_list
  */
-class model_item_param_list_test extends advanced_testcase {
+final class model_item_param_list_test extends advanced_testcase {
     /**
      * Test import of files
      *

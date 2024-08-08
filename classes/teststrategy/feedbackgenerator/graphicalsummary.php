@@ -79,10 +79,10 @@ class graphicalsummary extends feedbackgenerator {
         // If this is a deficit strategy, display more info.
         $additionalinfo = false;
         if (array_key_exists('graphicalsummary_primaryscale', $feedbackdata)
-            && isset($feedbackdata['primaryscale']['name'])
+            && isset($feedbackdata['primaryscale']->name)
         ) {
             $primaryscale = reset ($feedbackdata['graphicalsummary_primaryscale']);
-            $quoteddeficitscale = feedback_helper::add_quotes($feedbackdata['primaryscale']['name']);
+            $quoteddeficitscale = feedback_helper::add_quotes($feedbackdata['primaryscale']->name);
             if ($primaryscale
                 && array_key_exists('primarybecause', $primaryscale)
                 && $primaryscale['primarybecause'] == 'lowestskill'
