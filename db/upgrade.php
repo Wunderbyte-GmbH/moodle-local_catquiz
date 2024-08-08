@@ -631,7 +631,7 @@ function xmldb_local_catquiz_upgrade($oldversion) {
         $fields[] = new xmldb_field('guessing', XMLDB_TYPE_NUMBER, '10,4');
         $fields[] = new xmldb_field('json', XMLDB_TYPE_TEXT, "medium");
         $keys[] = new xmldb_key('contextid', XMLDB_KEY_FOREIGN, ['contextid'], 'local_catquiz_catcontext', explode(',', 'id'));
-        $indexes[] = new xmldb_index('uniqueitemparam', XMLDB_INDEX_UNIQUE, explode(',', 'itemid,contextid,model'));
+        $indexes[] = new xmldb_index('uniqueitemparam', XMLDB_INDEX_NOTUNIQUE, explode(',', 'itemid,contextid,model'));
         $indexes[] = new xmldb_index('itemid', XMLDB_INDEX_NOTUNIQUE, explode(',', 'itemid'));
         $indexes[] = new xmldb_index('contextid', XMLDB_INDEX_NOTUNIQUE, explode(',', 'contextid'));
 
@@ -732,7 +732,7 @@ function xmldb_local_catquiz_upgrade($oldversion) {
         $indexes = [];
         $keys[] = new xmldb_key('usermodified', XMLDB_KEY_FOREIGN, ['usermodified'], 'user', explode(',', 'id'));
         $keys[] = new xmldb_key('itemid', XMLDB_KEY_FOREIGN, ['itemid'], 'local_catquiz_items', explode(',', 'id'));
-        $indexes[] = new xmldb_index('subscription', XMLDB_INDEX_UNIQUE , explode(',', 'userid,itemid,area'));;
+        $indexes[] = new xmldb_index('subscription', XMLDB_INDEX_NOTUNIQUE , explode(',', 'userid,itemid,area'));;
         $indexes[] = new xmldb_index('userid', XMLDB_INDEX_NOTUNIQUE, explode(',', 'userid'));;
         $indexes[] = new xmldb_index('itemid', XMLDB_INDEX_NOTUNIQUE, explode(',', 'itemid'));;
 
