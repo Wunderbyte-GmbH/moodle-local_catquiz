@@ -543,7 +543,7 @@ function xmldb_local_catquiz_upgrade($oldversion) {
         foreach ($sqlresult as $row) {
             $updaterecord = new stdclass;
             $updaterecord->id = $row->itemparamid;
-            $updaterecord->itemid = $row->item;
+            $updaterecord->itemid = $row->itemid;
             $DB->update_record('local_catquiz_itemparams', $updaterecord);
         }
 
