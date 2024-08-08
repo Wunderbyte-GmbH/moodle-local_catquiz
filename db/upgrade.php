@@ -524,27 +524,28 @@ function xmldb_local_catquiz_upgrade($oldversion) {
         $table = new xmldb_table('local_catquiz_itemparams');
 
         $field = new xmldb_field('itemid', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, 0, 0);
-        // Conditionally launch add fields min scale value.
+
+        // Conditionally launch add fields itemid value.
         if (!$dbman->field_exists($table, $field)) {
             $dbman->add_field($table, $field);
         }
 
         // Make sure the database has updated the itemid in the catquiz_itemparams table.
         $sql = <<<SQL
-            WITH item_mapping AS (
-                SELECT item.id AS itemid, itemparam.id AS paramid
-                FROM {m_local_catquiz_items} item
-                JOIN {m_local_catquiz_itemparams itemparam ON // TODO
-                    item.componentid = itemparam.componentid
-                    AND item.componentname = 'question'
-                    AND itemparam.componentname = 'question'
-            )
-            UPDATE m_local_catquiz_itemparams
-            SET itemid = item_mapping.itemid
-            FROM item_mapping
-            WHERE id = item_mapping.paramid
+            SELECT lcip.id itemparamid, lci.id itemid
+              FROM {local_catquiz_itemparams} lcip
+              JOIN {local_catquiz_items} lci ON lci.componentid = lcip.componentid
+                  AND lci.componentname = lcip.componentname
         SQL;
-        $DB->execute($sql);
+
+        $sqlresult = $DB->get_records_sql($sql);
+
+        foreach ($sqlresult as $row) {
+            $updaterecord = new stdclass;
+            $updaterecord->id = $row->itemparamid;
+            $updaterecord->itemid = $row->item;
+            $DB->update_record('local_catquiz_itemparams', $updaterecord);
+        }
 
         // Catquiz savepoint reached.
         upgrade_plugin_savepoint(true, 2024080200, 'local', 'catquiz');
@@ -552,13 +553,294 @@ function xmldb_local_catquiz_upgrade($oldversion) {
 
     if ($oldversion < 2024080500) {
 
-        // Define field activeparamid to be added to local_catquiz_items.
         $table = new xmldb_table('local_catquiz_items');
-        $field = new xmldb_field('activeparamid', XMLDB_TYPE_INTEGER, '10', null, null, null, null, 'catscaleid');
+        $fields = [];
+        $keys = [];
+        $indexes = [];
+        $fields[] = new xmldb_field('activeparamid', XMLDB_TYPE_INTEGER, '10');
+        $fields[] = new xmldb_field('contextid', XMLDB_TYPE_INTEGER, '10');
+        $keys[] = new xmldb_key('catscaleid', XMLDB_KEY_FOREIGN, 'catscaleid', 'local_catquiz_catscales', explode(',', 'id'));
+        $keys[] = new xmldb_key('contextid', XMLDB_KEY_FOREIGN, 'contextid', 'local_catquiz_catcontext', explode(',', 'id'));
+        $keys[] = new xmldb_key('activeparamid', XMLDB_KEY_FOREIGN,
+            'activeparamid', 'local_catquiz_item_params', explode(',', 'id'));
+        $indexes[] = new xmldb_index('componentid', XMLDB_INDEX_NOTUNIQUE, explode(',', 'componentid'));
+        $indexes[] = new xmldb_index('catscaleid', XMLDB_INDEX_NOTUNIQUE, explode(',', 'catscaleid'));
+        $indexes[] = new xmldb_index('contextid', XMLDB_INDEX_NOTUNIQUE, explode(',', 'contextid'));
+        $indexes[] = new xmldb_index('activeparamid', XMLDB_INDEX_NOTUNIQUE, explode(',', 'activeparamid'));
+        $indexes[] = new xmldb_index('catscaleid', XMLDB_INDEX_NOTUNIQUE, ['catscaleid']);
 
-        // Conditionally launch add field activeparamid.
-        if (!$dbman->field_exists($table, $field)) {
-            $dbman->add_field($table, $field);
+        // Conditionally launch add fields, keys and indexes.
+        foreach ($fields as $field) {
+            if (!$dbman->field_exists($table, $field)) {
+                $dbman->add_field($table, $field);
+            }
+        }
+        foreach ($keys as $key) {
+            if (!$dbman->key_exists($table, $key)) {
+                $dbman->add_key($table, $key);
+            }
+        }
+        foreach ($indexes as $index) {
+            if (!$dbman->index_exists($table, $index)) {
+                $dbman->add_index($table, $index);
+            }
+        }
+
+        // Make sure the database has updated the activeparamid and contextid in the catquiz_items table.
+        $sql = <<<SQL
+            WITH RECURSIVE globalscale (scaleid, globalid, contextid) AS (
+              SELECT id, id, contextid
+                FROM {local_catquiz_catscales}
+                WHERE parentid=0
+              UNION ALL
+              SELECT ccs.id, gs.globalid, gs.contextid
+                FROM globalscale gs
+                INNER JOIN mdl_local_catquiz_catscales as ccs ON ccs.parentid = gs.scaleid
+            )
+            SELECT lci.id as itemid, gs.contextid as contextid
+              FROM globalscale gs
+              JOIN {local_catquiz_items} lci ON lci.catscaleid = gs.scaleid
+              JOIN  lcip ON lcip.itemid = lci.id
+              ORDER BY gs.globalid, lcip.contextid
+        SQL;
+
+        $sqlresult = $DB->get_records_sql($sql);
+
+        $sql = "SELECT id
+            FROM {local_catquiz_itemparams} lcip
+            WHERE itemid = $itemid AND contextid = $contextid
+            ORDER BY status DESC
+            LIMIT 1";
+
+        foreach ($sqlresult as $row) {
+
+            $itemid = $row->itemid;
+            $contextid = $row->contextid;
+
+            $lcip = $DB->get_record_sql($sql);
+
+            $updaterecord = new stdclass;
+            $updaterecord->id = $itemid;
+            $updaterecord->contextid = $contextid;
+            $updaterecord->activeparamid = $lcip->id;
+            $DB->update_record('local_catquiz_items', $updaterecord);
+        }
+
+        $table = new xmldb_table('local_catquiz_item_params');
+        $fields = [];
+        $keys = [];
+        $indexes = [];
+        $fields[] = new xmldb_field('guessing', XMLDB_TYPE_NUMBER, '10,4');
+        $fields[] = new xmldb_field('json', XMLDB_TYPE_TEXT, "medium");
+        $keys[] = new xmldb_key('contextid', XMLDB_KEY_FOREIGN, 'contextid', 'local_catquiz_catcontext', explode(',', 'id'));
+        $indexes[] = new xmldb_index('uniqueitemparam', XMLDB_INDEX_UNIQUE, explode(',', 'itemid,contextid,model'));
+        $indexes[] = new xmldb_index('itemid', XMLDB_INDEX_NOTUNIQUE, explode(',', 'itemid'));
+        $indexes[] = new xmldb_index('contextid', XMLDB_INDEX_NOTUNIQUE, explode(',', 'contextid'));
+
+        // Conditionally launch add fields, keys and indexes.
+        foreach ($fields as $field) {
+            if (!$dbman->field_exists($table, $field)) {
+                $dbman->add_field($table, $field);
+            }
+        }
+        foreach ($keys as $key) {
+            if (!$dbman->key_exists($table, $key)) {
+                $dbman->add_key($table, $key);
+            }
+        }
+        foreach ($indexes as $index) {
+            if (!$dbman->index_exists($table, $index)) {
+                $dbman->add_index($table, $index);
+            }
+        }
+
+        $table = new xmldb_table('local_catquiz_catscales');
+        $fields = [];
+        $keys = [];
+        $indexes = [];
+        $fields[] = new xmldb_field('label', XMLDB_TYPE_CHAR, '255');
+        $keys[] = new xmldb_key('contextid', XMLDB_KEY_FOREIGN, 'contextid', 'local_catquiz_catcontext', explode(',', 'id'));
+        $indexes[] = new xmldb_index('parentid', XMLDB_INDEX_NOTUNIQUE, explode(',', 'parentid'));
+        $indexes[] = new xmldb_index('contextid', XMLDB_INDEX_NOTUNIQUE, explode(',', 'contextid'));
+
+        // Conditionally launch add fields, keys and indexes.
+        foreach ($fields as $field) {
+            if (!$dbman->field_exists($table, $field)) {
+                $dbman->add_field($table, $field);
+            }
+        }
+        foreach ($keys as $key) {
+            if (!$dbman->key_exists($table, $key)) {
+                $dbman->add_key($table, $key);
+            }
+        }
+        foreach ($indexes as $index) {
+            if (!$dbman->index_exists($table, $index)) {
+                $dbman->add_index($table, $index);
+            }
+        }
+
+        $table = new xmldb_table('local_catquiz_catcontext');
+        $fields = [];
+        $keys = [];
+        $indexes = [];
+        $fields[] = new xmldb_field('parentid', XMLDB_TYPE_INTEGER, '10');
+        $keys[] = new xmldb_key('usermodified', XMLDB_KEY_FOREIGN, 'usermodified', 'user', explode(',', 'id'));
+        $indexes[] = new xmldb_index('parentid', XMLDB_INDEX_NOTUNIQUE, explode(',', 'parentid'));
+
+        // Conditionally launch add fields, keys and indexes.
+        foreach ($fields as $field) {
+            if (!$dbman->field_exists($table, $field)) {
+                $dbman->add_field($table, $field);
+            }
+        }
+        foreach ($keys as $key) {
+            if (!$dbman->key_exists($table, $key)) {
+                $dbman->add_key($table, $key);
+            }
+        }
+        foreach ($indexes as $index) {
+            if (!$dbman->index_exists($table, $index)) {
+                $dbman->add_index($table, $index);
+            }
+        }
+
+        $table = new xmldb_table('local_catquiz_personparams');
+        $fields = [];
+        $keys = [];
+        $indexes = [];
+        $fields[] = new xmldb_field('attemptid', XMLDB_TYPE_INTEGER, '10');
+        $fields[] = new xmldb_field('standarderror', XMLDB_TYPE_NUMBER, '10,4');
+        $keys[] = new xmldb_key('userid', XMLDB_KEY_FOREIGN, 'userid', 'user', explode(',', 'id'));
+        $keys[] = new xmldb_key('catscaleid', XMLDB_KEY_FOREIGN, 'catscaleid', 'local_catquiz_catscales', explode(',', 'id'));
+        $keys[] = new xmldb_key('contextid', XMLDB_KEY_FOREIGN, 'contextid', 'local_catquiz_catcontext', explode(',', 'id'));
+        $keys[] = new xmldb_key('attemptid', XMLDB_KEY_FOREIGN, 'attemptid', 'local_catquiz_attempts', explode(',', 'id'));
+        $indexes[] = new xmldb_index('userid', XMLDB_INDEX_NOTUNIQUE, explode(',', 'userid'));;
+        $indexes[] = new xmldb_index('catscaleid', XMLDB_INDEX_NOTUNIQUE, explode(',', 'catscaleid'));;
+        $indexes[] = new xmldb_index('contextid', XMLDB_INDEX_NOTUNIQUE, explode(',', 'contextid'));;
+        $indexes[] = new xmldb_index('attemptid', XMLDB_INDEX_NOTUNIQUE, explode(',', 'attemptid'));;
+
+        // Conditionally launch add fields, keys and indexes.
+        foreach ($fields as $field) {
+            if (!$dbman->field_exists($table, $field)) {
+                $dbman->add_field($table, $field);
+            }
+        }
+        foreach ($keys as $key) {
+            if (!$dbman->key_exists($table, $key)) {
+                $dbman->add_key($table, $key);
+            }
+        }
+        foreach ($indexes as $index) {
+            if (!$dbman->index_exists($table, $index)) {
+                $dbman->add_index($table, $index);
+            }
+        }
+
+        $table = new xmldb_table('local_catquiz_subscriptions');
+        $keys = [];
+        $indexes = [];
+        $keys[] = new xmldb_key('usermodified', XMLDB_KEY_FOREIGN, 'usermodified', 'user', explode(',', 'id'));
+        $keys[] = new xmldb_key('itemid', XMLDB_KEY_FOREIGN, 'itemid', 'local_catquiz_items', explode(',', 'id'));
+        $indexes[] = new xmldb_index('subscription', XMLDB_INDEX_UNIQUE , explode(',', 'userid,itemid,area'));;
+        $indexes[] = new xmldb_index('userid', XMLDB_INDEX_NOTUNIQUE, explode(',', 'userid'));;
+        $indexes[] = new xmldb_index('itemid', XMLDB_INDEX_NOTUNIQUE, explode(',', 'itemid'));;
+
+        // Conditionally launch add fields, keys and indexes.
+        foreach ($keys as $key) {
+            if (!$dbman->key_exists($table, $key)) {
+                $dbman->add_key($table, $key);
+            }
+        }
+        foreach ($indexes as $index) {
+            if (!$dbman->index_exists($table, $index)) {
+                $dbman->add_index($table, $index);
+            }
+        }
+
+        $table = new xmldb_table('local_catquiz_tests');
+        $keys = [];
+        $indexes = [];
+        $keys[] = new xmldb_key('catscaleid', XMLDB_KEY_FOREIGN, 'catscaleid', 'local_catquiz_catscales', explode(',', 'id'));
+        $keys[] = new xmldb_key('courseid', XMLDB_KEY_FOREIGN, 'courseid', 'course', explode(',', 'id'));
+        $indexes[] = new xmldb_index('component', XMLDB_INDEX_NOTUNIQUE, explode(',', 'componentid,componentname'));;
+        $indexes[] = new xmldb_index('catscaleid', XMLDB_INDEX_NOTUNIQUE, explode(',', 'catscaleid'));;
+        $indexes[] = new xmldb_index('courseid', XMLDB_INDEX_NOTUNIQUE, explode(',', 'courseid'));;
+
+        // Conditionally launch add fields, keys and indexes.
+        foreach ($keys as $key) {
+            if (!$dbman->key_exists($table, $key)) {
+                $dbman->add_key($table, $key);
+            }
+        }
+        foreach ($indexes as $index) {
+            if (!$dbman->index_exists($table, $index)) {
+                $dbman->add_index($table, $index);
+            }
+        }
+
+        $table = new xmldb_table('local_catquiz_catcontext');
+        $keys = [];
+        $indexes = [];
+        $keys[] = new xmldb_key('usermodified', XMLDB_KEY_FOREIGN, 'usermodified', 'user', explode(',', 'id'));
+        $indexes[] = new xmldb_index('parentid', XMLDB_INDEX_NOTUNIQUE, explode(',', 'parentid'));
+
+        // Conditionally launch add fields, keys and indexes.
+        foreach ($keys as $key) {
+            if (!$dbman->key_exists($table, $key)) {
+                $dbman->add_key($table, $key);
+            }
+        }
+        foreach ($indexes as $index) {
+            if (!$dbman->index_exists($table, $index)) {
+                $dbman->add_index($table, $index);
+            }
+        }
+
+        $table = new xmldb_table('local_catquiz_attempts');
+        $keys = [];
+        $indexes = [];
+        $keys[] = new xmldb_key('userid', XMLDB_KEY_FOREIGN, 'userid', 'user', explode(',', 'id'));
+        $keys[] = new xmldb_key('catscaleid', XMLDB_KEY_FOREIGN, 'scaleid', 'local_catquiz_catscales', explode(',', 'id'));
+        $keys[] = new xmldb_key('contextid', XMLDB_KEY_FOREIGN, 'contextid', 'local_catquiz_catcontext', explode(',', 'id'));
+        $keys[] = new xmldb_key('courseid', XMLDB_KEY_FOREIGN, 'courseid', 'course', explode(',', 'id'));
+        $indexes[] = new xmldb_index('userid', XMLDB_INDEX_NOTUNIQUE, explode(',', 'userid'));;
+        $indexes[] = new xmldb_index('catscaleid', XMLDB_INDEX_NOTUNIQUE, explode(',', 'scaleid'));;
+        $indexes[] = new xmldb_index('contextid', XMLDB_INDEX_NOTUNIQUE, explode(',', 'contextid'));;
+        $indexes[] = new xmldb_index('courseid', XMLDB_INDEX_NOTUNIQUE, explode(',', 'courseid'));;
+        $indexes[] = new xmldb_index('attemptid', XMLDB_INDEX_NOTUNIQUE, explode(',', 'attemptid'));;
+        $indexes[] = new xmldb_index('instanceid', XMLDB_INDEX_NOTUNIQUE, explode(',', 'instanceid'));;
+
+        // Conditionally launch add fields, keys and indexes.
+        foreach ($keys as $key) {
+            if (!$dbman->key_exists($table, $key)) {
+                $dbman->add_key($table, $key);
+            }
+        }
+        foreach ($indexes as $index) {
+            if (!$dbman->index_exists($table, $index)) {
+                $dbman->add_index($table, $index);
+            }
+        }
+
+        $table = new xmldb_table('local_catquiz_progress');
+        $keys = [];
+        $indexes = [];
+        $keys[] = new xmldb_key('userid', XMLDB_KEY_FOREIGN, 'userid', 'user', explode(',', 'id'));
+        $keys[] = new xmldb_key('attemptid', XMLDB_KEY_FOREIGN, 'attemptid', 'local_catquiz_attempts', explode(',', 'id'));
+        $indexes[] = new xmldb_index('userid', XMLDB_INDEX_NOTUNIQUE, explode(',', 'userid'));;
+        $indexes[] = new xmldb_index('attemptid', XMLDB_INDEX_NOTUNIQUE, explode(',', 'attemptid'));;
+
+        // Conditionally launch add fields, keys and indexes.
+        foreach ($keys as $key) {
+            if (!$dbman->key_exists($table, $key)) {
+                $dbman->add_key($table, $key);
+            }
+        }
+        foreach ($indexes as $index) {
+            if (!$dbman->index_exists($table, $index)) {
+                $dbman->add_index($table, $index);
+            }
         }
 
         // Catquiz savepoint reached.
