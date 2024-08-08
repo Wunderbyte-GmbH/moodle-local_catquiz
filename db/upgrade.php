@@ -593,27 +593,27 @@ function xmldb_local_catquiz_upgrade($oldversion) {
               UNION ALL
               SELECT ccs.id, gs.globalid, gs.contextid
                 FROM globalscale gs
-                INNER JOIN mdl_local_catquiz_catscales as ccs ON ccs.parentid = gs.scaleid
+                INNER JOIN {mdllocal_catquiz_catscales} as ccs ON ccs.parentid = gs.scaleid
             )
             SELECT lci.id as itemid, gs.contextid as contextid
               FROM globalscale gs
               JOIN {local_catquiz_items} lci ON lci.catscaleid = gs.scaleid
-              JOIN  lcip ON lcip.itemid = lci.id
+              JOIN {local_catquiz_item_params} lcip ON lcip.itemid = lci.id
               ORDER BY gs.globalid, lcip.contextid
         SQL;
 
         $sqlresult = $DB->get_records_sql($sql);
 
-        $sql = "SELECT id
-            FROM {local_catquiz_itemparams} lcip
-            WHERE itemid = $itemid AND contextid = $contextid
-            ORDER BY status DESC
-            LIMIT 1";
-
         foreach ($sqlresult as $row) {
 
             $itemid = $row->itemid;
             $contextid = $row->contextid;
+
+            $sql = "SELECT id
+                FROM {local_catquiz_itemparams} lcip
+                WHERE itemid = $itemid AND contextid = $contextid
+                ORDER BY status DESC
+                LIMIT 1";
 
             $lcip = $DB->get_record_sql($sql);
 
