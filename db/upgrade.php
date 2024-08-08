@@ -551,7 +551,7 @@ function xmldb_local_catquiz_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2024080200, 'local', 'catquiz');
     }
 
-    if ($oldversion < 2024080500) {
+    if ($oldversion < 2024080800) {
 
         $table = new xmldb_table('local_catquiz_items');
         $fields = [];
@@ -844,7 +844,7 @@ function xmldb_local_catquiz_upgrade($oldversion) {
         }
 
         // Catquiz savepoint reached.
-        upgrade_plugin_savepoint(true, 2024080500, 'local', 'catquiz');
+        upgrade_plugin_savepoint(true, 2024080800, 'local', 'catquiz');
     }
 
     return true;
