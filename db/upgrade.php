@@ -576,9 +576,7 @@ function xmldb_local_catquiz_upgrade($oldversion) {
             }
         }
         foreach ($keys as $key) {
-            if (!$dbman->key_exists($table, $key)) {
-                $dbman->add_key($table, $key);
-            }
+            $dbman->add_key($table, $key);
         }
         foreach ($indexes as $index) {
             if (!$dbman->index_exists($table, $index)) {
@@ -644,9 +642,7 @@ function xmldb_local_catquiz_upgrade($oldversion) {
             }
         }
         foreach ($keys as $key) {
-            if (!$dbman->key_exists($table, $key)) {
-                $dbman->add_key($table, $key);
-            }
+            $dbman->add_key($table, $key);
         }
         foreach ($indexes as $index) {
             if (!$dbman->index_exists($table, $index)) {
@@ -670,9 +666,7 @@ function xmldb_local_catquiz_upgrade($oldversion) {
             }
         }
         foreach ($keys as $key) {
-            if (!$dbman->key_exists($table, $key)) {
-                $dbman->add_key($table, $key);
-            }
+            $dbman->add_key($table, $key);
         }
         foreach ($indexes as $index) {
             if (!$dbman->index_exists($table, $index)) {
@@ -695,9 +689,7 @@ function xmldb_local_catquiz_upgrade($oldversion) {
             }
         }
         foreach ($keys as $key) {
-            if (!$dbman->key_exists($table, $key)) {
-                $dbman->add_key($table, $key);
-            }
+            $dbman->add_key($table, $key);
         }
         foreach ($indexes as $index) {
             if (!$dbman->index_exists($table, $index)) {
@@ -727,9 +719,7 @@ function xmldb_local_catquiz_upgrade($oldversion) {
             }
         }
         foreach ($keys as $key) {
-            if (!$dbman->key_exists($table, $key)) {
-                $dbman->add_key($table, $key);
-            }
+            $dbman->add_key($table, $key);
         }
         foreach ($indexes as $index) {
             if (!$dbman->index_exists($table, $index)) {
@@ -748,9 +738,7 @@ function xmldb_local_catquiz_upgrade($oldversion) {
 
         // Conditionally launch add fields, keys and indexes.
         foreach ($keys as $key) {
-            if (!$dbman->key_exists($table, $key)) {
-                $dbman->add_key($table, $key);
-            }
+            $dbman->add_key($table, $key);
         }
         foreach ($indexes as $index) {
             if (!$dbman->index_exists($table, $index)) {
@@ -769,9 +757,7 @@ function xmldb_local_catquiz_upgrade($oldversion) {
 
         // Conditionally launch add fields, keys and indexes.
         foreach ($keys as $key) {
-            if (!$dbman->key_exists($table, $key)) {
-                $dbman->add_key($table, $key);
-            }
+            $dbman->add_key($table, $key);
         }
         foreach ($indexes as $index) {
             if (!$dbman->index_exists($table, $index)) {
@@ -787,9 +773,7 @@ function xmldb_local_catquiz_upgrade($oldversion) {
 
         // Conditionally launch add fields, keys and indexes.
         foreach ($keys as $key) {
-            if (!$dbman->key_exists($table, $key)) {
-                $dbman->add_key($table, $key);
-            }
+            $dbman->add_key($table, $key);
         }
         foreach ($indexes as $index) {
             if (!$dbman->index_exists($table, $index)) {
@@ -813,9 +797,7 @@ function xmldb_local_catquiz_upgrade($oldversion) {
 
         // Conditionally launch add fields, keys and indexes.
         foreach ($keys as $key) {
-            if (!$dbman->key_exists($table, $key)) {
-                $dbman->add_key($table, $key);
-            }
+            $dbman->add_key($table, $key);
         }
         foreach ($indexes as $index) {
             if (!$dbman->index_exists($table, $index)) {
@@ -833,9 +815,7 @@ function xmldb_local_catquiz_upgrade($oldversion) {
 
         // Conditionally launch add fields, keys and indexes.
         foreach ($keys as $key) {
-            if (!$dbman->key_exists($table, $key)) {
-                $dbman->add_key($table, $key);
-            }
+            $dbman->add_key($table, $key);
         }
         foreach ($indexes as $index) {
             if (!$dbman->index_exists($table, $index)) {
