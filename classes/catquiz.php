@@ -304,7 +304,7 @@ class catquiz {
                         ON qas.questionattemptid = qa.id AND qas.fraction IS NOT NULL
                     GROUP BY lca.scaleid, lca.contextid, qa.questionid, lca.userid
                 ) ustat
-                  ON ustat.contextid = lcip.contextid AND ustat.questionid = q.id
+                  ON ustat.userid = :userid AND ustat.contextid = lcip.contextid AND ustat.questionid = q.id
                     AND ustat.scaleid $parentscales2 ) s
             SQL;
         } else {
