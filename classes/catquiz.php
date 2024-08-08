@@ -201,8 +201,9 @@ class catquiz {
         // Start the params array.
         $params = [
             'contextid' => $contextid,
-        ];
+            'lcicontextid' => $contextid,
 
+        ];
         $wherearray['lcipcontextid'] = $contextid;
 
         // If we fetch only for a given user, we need to add this to the sql.
@@ -259,11 +260,11 @@ class catquiz {
           FROM {local_catquiz_catscales} lccs
           -- Get all corresponding items of those scales, skip if not existent
           -- (INNER JOIN)
-            JOIN {local_catquiz_items} lci ON lci.catscaleid=lccs.id
+            JOIN {local_catquiz_items} lci ON lci.catscaleid=lccs.id AND lci.contextid = :lcicontextid
 
           -- Get all the item parameter for the question for the given context(s),
           -- skip if not existent
-            JOIN {local_catquiz_itemparams} lcip ON lcip.itemid = lci.id
+            JOIN {local_catquiz_itemparams} lcip ON lcip.itemid = lci.id AND lci.activeparamid = lcip.id
 
           -- Get all information about the question from the questionbank itself
             JOIN {question} q ON q.id=lci.componentid
