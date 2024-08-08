@@ -595,11 +595,11 @@ function xmldb_local_catquiz_upgrade($oldversion) {
                 FROM globalscale gs
                 INNER JOIN {local_catquiz_catscales} as ccs ON ccs.parentid = gs.scaleid
             )
-            SELECT gs.scaleid, lci.id as itemid, gs.contextid as contextid
+            SELECT ROW_NUMBER() OVER (ORDER BY lci.id, gs.contextid), lci.id as itemid, gs.contextid as contextid
               FROM globalscale gs
               JOIN {local_catquiz_items} lci ON lci.catscaleid = gs.scaleid
               JOIN {local_catquiz_itemparams} lcip ON lcip.itemid = lci.id
-              ORDER BY gs.globalid, lcip.contextid
+              ORDER BY lci.id, lcip.contextid
         SQL;
 
         $sqlresult = $DB->get_records_sql($sql);
