@@ -707,10 +707,10 @@ function xmldb_local_catquiz_upgrade($oldversion) {
         $keys[] = new xmldb_key('catscaleid', XMLDB_KEY_FOREIGN, ['catscaleid'], 'local_catquiz_catscales', explode(',', 'id'));
         $keys[] = new xmldb_key('contextid', XMLDB_KEY_FOREIGN, ['contextid'], 'local_catquiz_catcontext', explode(',', 'id'));
         $keys[] = new xmldb_key('attemptid', XMLDB_KEY_FOREIGN, ['attemptid'], 'local_catquiz_attempts', explode(',', 'id'));
-        $indexes[] = new xmldb_index('userid', XMLDB_INDEX_NOTUNIQUE, explode(',', 'userid'));;
-        $indexes[] = new xmldb_index('catscaleid', XMLDB_INDEX_NOTUNIQUE, explode(',', 'catscaleid'));;
-        $indexes[] = new xmldb_index('contextid', XMLDB_INDEX_NOTUNIQUE, explode(',', 'contextid'));;
-        $indexes[] = new xmldb_index('attemptid', XMLDB_INDEX_NOTUNIQUE, explode(',', 'attemptid'));;
+        $indexes[] = new xmldb_index('userid', XMLDB_INDEX_NOTUNIQUE, explode(',', 'userid'));
+        $indexes[] = new xmldb_index('catscaleid', XMLDB_INDEX_NOTUNIQUE, explode(',', 'catscaleid'));
+        $indexes[] = new xmldb_index('contextid', XMLDB_INDEX_NOTUNIQUE, explode(',', 'contextid'));
+        $indexes[] = new xmldb_index('attemptid', XMLDB_INDEX_NOTUNIQUE, explode(',', 'attemptid'));
 
         // Conditionally launch add fields, keys and indexes.
         foreach ($fields as $field) {
@@ -732,9 +732,9 @@ function xmldb_local_catquiz_upgrade($oldversion) {
         $indexes = [];
         $keys[] = new xmldb_key('usermodified', XMLDB_KEY_FOREIGN, ['usermodified'], 'user', explode(',', 'id'));
         $keys[] = new xmldb_key('itemid', XMLDB_KEY_FOREIGN, ['itemid'], 'local_catquiz_items', explode(',', 'id'));
-        $indexes[] = new xmldb_index('subscription', XMLDB_INDEX_NOTUNIQUE , explode(',', 'userid,itemid,area'));;
-        $indexes[] = new xmldb_index('userid', XMLDB_INDEX_NOTUNIQUE, explode(',', 'userid'));;
-        $indexes[] = new xmldb_index('itemid', XMLDB_INDEX_NOTUNIQUE, explode(',', 'itemid'));;
+        $indexes[] = new xmldb_index('subscription', XMLDB_INDEX_NOTUNIQUE , explode(',', 'userid,itemid,area'));
+        $indexes[] = new xmldb_index('userid', XMLDB_INDEX_NOTUNIQUE, explode(',', 'userid'));
+        $indexes[] = new xmldb_index('itemid', XMLDB_INDEX_NOTUNIQUE, explode(',', 'itemid'));
 
         // Conditionally launch add fields, keys and indexes.
         foreach ($keys as $key) {
@@ -751,9 +751,9 @@ function xmldb_local_catquiz_upgrade($oldversion) {
         $indexes = [];
         $keys[] = new xmldb_key('catscaleid', XMLDB_KEY_FOREIGN, ['catscaleid'], 'local_catquiz_catscales', explode(',', 'id'));
         $keys[] = new xmldb_key('courseid', XMLDB_KEY_FOREIGN, ['courseid'], 'course', explode(',', 'id'));
-        $indexes[] = new xmldb_index('component', XMLDB_INDEX_NOTUNIQUE, explode(',', 'componentid,componentname'));;
-        $indexes[] = new xmldb_index('catscaleid', XMLDB_INDEX_NOTUNIQUE, explode(',', 'catscaleid'));;
-        $indexes[] = new xmldb_index('courseid', XMLDB_INDEX_NOTUNIQUE, explode(',', 'courseid'));;
+        $indexes[] = new xmldb_index('component', XMLDB_INDEX_NOTUNIQUE, explode(',', 'componentid,component'));
+        $indexes[] = new xmldb_index('catscaleid', XMLDB_INDEX_NOTUNIQUE, explode(',', 'catscaleid'));
+        $indexes[] = new xmldb_index('courseid', XMLDB_INDEX_NOTUNIQUE, explode(',', 'courseid'));
 
         // Conditionally launch add fields, keys and indexes.
         foreach ($keys as $key) {
@@ -788,12 +788,12 @@ function xmldb_local_catquiz_upgrade($oldversion) {
         $keys[] = new xmldb_key('catscaleid', XMLDB_KEY_FOREIGN, ['scaleid'], 'local_catquiz_catscales', explode(',', 'id'));
         $keys[] = new xmldb_key('contextid', XMLDB_KEY_FOREIGN, ['contextid'], 'local_catquiz_catcontext', explode(',', 'id'));
         $keys[] = new xmldb_key('courseid', XMLDB_KEY_FOREIGN, ['courseid'], 'course', explode(',', 'id'));
-        $indexes[] = new xmldb_index('userid', XMLDB_INDEX_NOTUNIQUE, explode(',', 'userid'));;
-        $indexes[] = new xmldb_index('catscaleid', XMLDB_INDEX_NOTUNIQUE, explode(',', 'scaleid'));;
-        $indexes[] = new xmldb_index('contextid', XMLDB_INDEX_NOTUNIQUE, explode(',', 'contextid'));;
-        $indexes[] = new xmldb_index('courseid', XMLDB_INDEX_NOTUNIQUE, explode(',', 'courseid'));;
-        $indexes[] = new xmldb_index('attemptid', XMLDB_INDEX_NOTUNIQUE, explode(',', 'attemptid'));;
-        $indexes[] = new xmldb_index('instanceid', XMLDB_INDEX_NOTUNIQUE, explode(',', 'instanceid'));;
+        $indexes[] = new xmldb_index('userid', XMLDB_INDEX_NOTUNIQUE, explode(',', 'userid'));
+        $indexes[] = new xmldb_index('catscaleid', XMLDB_INDEX_NOTUNIQUE, explode(',', 'scaleid'));
+        $indexes[] = new xmldb_index('contextid', XMLDB_INDEX_NOTUNIQUE, explode(',', 'contextid'));
+        $indexes[] = new xmldb_index('courseid', XMLDB_INDEX_NOTUNIQUE, explode(',', 'courseid'));
+        $indexes[] = new xmldb_index('attemptid', XMLDB_INDEX_NOTUNIQUE, explode(',', 'attemptid'));
+        $indexes[] = new xmldb_index('instanceid', XMLDB_INDEX_NOTUNIQUE, explode(',', 'instanceid'));
 
         // Conditionally launch add fields, keys and indexes.
         foreach ($keys as $key) {
@@ -810,8 +810,8 @@ function xmldb_local_catquiz_upgrade($oldversion) {
         $indexes = [];
         $keys[] = new xmldb_key('userid', XMLDB_KEY_FOREIGN, ['userid'], 'user', explode(',', 'id'));
         $keys[] = new xmldb_key('attemptid', XMLDB_KEY_FOREIGN, ['attemptid'], 'local_catquiz_attempts', explode(',', 'id'));
-        $indexes[] = new xmldb_index('userid', XMLDB_INDEX_NOTUNIQUE, explode(',', 'userid'));;
-        $indexes[] = new xmldb_index('attemptid', XMLDB_INDEX_NOTUNIQUE, explode(',', 'attemptid'));;
+        $indexes[] = new xmldb_index('userid', XMLDB_INDEX_NOTUNIQUE, explode(',', 'userid'));
+        $indexes[] = new xmldb_index('attemptid', XMLDB_INDEX_NOTUNIQUE, explode(',', 'attemptid'));
 
         // Conditionally launch add fields, keys and indexes.
         foreach ($keys as $key) {
