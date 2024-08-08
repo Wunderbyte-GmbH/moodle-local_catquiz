@@ -30,5 +30,5 @@ $plugin->version = 2024080800;
 $plugin->requires = 2022041900;
 $plugin->maturity = MATURITY_STABLE;
 $plugin->dependencies = [
-    'local_wunderbyte_table' => 2024040200,
+    'local_wunderbyte_table' => 2021040200,
 ];
