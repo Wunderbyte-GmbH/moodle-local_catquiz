@@ -24,12 +24,7 @@
 
 namespace local_catquiz\teststrategy\preselect_task;
 
-use local_catquiz\catscale;
-use local_catquiz\local\model\model_responses;
-use local_catquiz\local\result;
-use local_catquiz\teststrategy\preselect_task;
-use local_catquiz\teststrategy\progress;
-use local_catquiz\wb_middleware;
+use stdClass;
 
 /**
  * Add a score to each question and sort questions descending by score
@@ -38,101 +33,22 @@ use local_catquiz\wb_middleware;
  * @copyright 2024 Wunderbyte GmbH
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-final class strategystrengthscore extends preselect_task implements wb_middleware {
+class strategystrengthscore extends strategyscore {
 
-    /**
-     * @var progress
-     */
-    private progress $progress;
-
-    /**
-     * Run preselect task.
-     *
-     * @param array $context
-     * @param callable $next
-     *
-     * @return result
-     *
-     */
-    public function run(array &$context, callable $next): result {
-        $this->progress = $context['progress'];
-        $userresponses = $this->progress->get_user_responses();
-        $scalefractions = [];
-        $scalecount = [];
-
-        foreach ($this->progress->get_active_scales() as $scaleid) {
-            $played = $this->progress->get_playedquestions(true, $scaleid);
-            $scalecount[$scaleid] = count($played);
-            if ($scalecount[$scaleid] === 0) {
-                $scalefractions[$scaleid] = 0.5;
-            } else {
-                $scalefractions[$scaleid] = array_sum(
-                    array_map(
-                        fn ($q) => $userresponses[$q->id]['fraction'],
-                        $played
-                    )
-                ) / $scalecount[$scaleid];
-            }
-        }
-
-        foreach ($context['questions'] as $question) {
-            $affectedscales = [$question->catscaleid, ...catscale::get_ancestors($question->catscaleid)];
-            arsort($affectedscales); // Traverse from root to leave.
-
-            foreach ($affectedscales as $scaleid) {
-                if (! $this->progress->is_active_scale($scaleid)) {
-                    continue;
-                }
-
-                $scaleability = $this->progress->get_abilities()[$scaleid];
-                $myitems = (new model_responses())
-                    ->setdata([$context['userid'] => ['component' => $this->progress->get_user_responses()]])
-                    ->get_items_for_scale($scaleid, $context['contextid']);
-                $standarderrorplayed = catscale::get_standarderror($scaleability, $myitems, INF);
-                $testinfo = $standarderrorplayed === INF ? 0 : 1 / $standarderrorplayed ** 2;
-                $question->processterm = max(0.1, $testinfo) / max(1, $scalecount[$scaleid]);
-                $abilitydifference = ($scaleability - $this->progress->get_abilities()[$context['catscaleid']]);
-                $question->scaleterm = 1 / (1 + exp(-1 * $testinfo * $abilitydifference));
-                $question->itemterm = (1 / (
-                    1 + exp($testinfo * 2 * (0.5 - $scalefractions[$scaleid]) * ($question->difficulty - $scaleability))
-                )) ** max(1, $scalecount[$scaleid] - 3 + 1);
-
-                $score = $question->fisherinformation[$scaleid]
-                    * $question->processterm
-                    * $question->scaleterm
-                    * $question->itemterm;
-
-                if (! property_exists($question, 'score') || $score > $question->score) {
-                    $question->score = $score;
-                }
-            }
-        }
-
-        // In order to have predictable results, in case the values of two
-        // elements are exactly the same, sort by question ID.
-        $remainingquestions = array_filter($context['questions'], fn ($q) => property_exists($q, 'score'));
-        uasort($remainingquestions, function($q1, $q2) {
-            if (! ($q2->score === $q1->score)) {
-                return $q2->score <=> $q1->score;
-            }
-            return $q1->id <=> $q2->id;
-        });
-
-        $selectedquestion = reset($remainingquestions);
-        return result::ok($selectedquestion);
+    protected function get_question_scaleterm(float $testinfo, float $abilitydifference): float {
+        return 1 / (1 + exp(-1 * $testinfo * $abilitydifference));
     }
 
-    /**
-     * Get required context keys.
-     *
-     * @return array
-     *
-     */
-    public function get_required_context_keys(): array {
-        return [
-            'penalty_threshold',
-            'questions',
-            'progress',
-        ];
+    protected function get_question_itemterm(float $testinfo, float $fraction, $difficulty, $scaleability, $scalecount) {
+        return (1 / (
+            1 + exp($testinfo * 2 * (0.5 - $fraction) * ($difficulty - $scaleability))
+        )) ** $scalecount;
+    }
+
+    protected function get_score(stdClass $question, int $scaleid) {
+        return $question->fisherinformation[$scaleid]
+            * $question->processterm
+            * $question->scaleterm
+            * $question->itemterm;
     }
 }

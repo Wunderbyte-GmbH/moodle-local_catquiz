@@ -432,6 +432,12 @@ class info {
             "local_catquiz",
             'teststrategy\preselect_task'
         );
+        // Filter out abstract class.
+        $scoremodifiers = array_filter(
+            $scoremodifiers,
+            fn ($classname) => $classname !== 'local_catquiz\teststrategy\preselect_task\strategyscore',
+            ARRAY_FILTER_USE_KEY
+        );
         foreach (array_keys($scoremodifiers) as $classname) {
             $instances[$classname] = new $classname();
         }
