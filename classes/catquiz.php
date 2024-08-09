@@ -1033,30 +1033,15 @@ class catquiz {
     public static function return_sql_for_catcontexts(
         array $filterarray = []) {
 
-        // TODO: That way of determine the catcontext by the timestamp of an attempt_step
-        // is unreliable and will deliver also ANY attempt made outside catquiz as well
-        // (eg. the "standard"-adaptivequiz oder moodle quiz). It should be fixed by
-        // a proper way via the catquiz_attempt table.
-
-        // FRAGE @DAVID: Was ist der Unterschied zu get_sql_for_stat_base_request,
-        // aber ohne Parameter? Wofür erwartet die Funktion Parameter, wenn diese
-        // nicht verwendet werden?
-        // Evtl einfach weiterleiten an get_sql_for_stat_base_request.
-
         $params = [];
         $where = [];
         $filter = '';
-        $select = "ccc.*, s1.attempts";
-        $from = "{local_catquiz_catcontext} ccc
-                 LEFT JOIN (
-                        SELECT ccc1.id, COUNT(*) attempts
-                          FROM {local_catquiz_catcontext} ccc1
-                          JOIN {question_attempt_steps} qas
-                            ON ccc1.starttimestamp < qas.timecreated AND ccc1.endtimestamp > qas.timecreated
-                           AND qas.fraction IS NOT NULL
-                      GROUP BY ccc1.id
-                 ) s1
-                 ON s1.id = ccc.id";
+        $select = "*";
+        $from = "(SELECT ccc.*, COUNT(lca.id) attempts
+            FROM {local_catquiz_catcontext} ccc
+            LEFT JOIN {local_catquiz_attempts} lca ON lca.contextid = ccc.id
+            GROUP BY ccc.id
+            ) s1";
         $where = "1=1";
 
         return [$select, $from, $where, $filter, $params];
