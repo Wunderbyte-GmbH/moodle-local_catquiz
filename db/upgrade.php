@@ -823,6 +823,18 @@ function xmldb_local_catquiz_upgrade($oldversion) {
             }
         }
 
+        // Also add 'component' as index to the log table for improving performance
+        $table = new xmldb_table('logstore_standard_log');
+        $indexes = [];
+        $indexes[] = new xmldb_index('component', XMLDB_INDEX_NOTUNIQUE, explode(',', 'component'));
+
+        // Conditionally launch add fields, keys and indexes.
+        foreach ($indexes as $index) {
+            if (!$dbman->index_exists($table, $index)) {
+                $dbman->add_index($table, $index);
+            }
+        }
+
         // Catquiz savepoint reached.
         upgrade_plugin_savepoint(true, 2024080800, 'local', 'catquiz');
     }
