@@ -193,8 +193,6 @@
       <FIELDS>
         <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
         <FIELD NAME="userid" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
-        <FIELD NAME="timecreated" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
-        <FIELD NAME="timemodified" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
         <FIELD NAME="scaleid" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false" COMMENT="id of the catscale"/>
         <FIELD NAME="contextid" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false" COMMENT="id of the catcontext"/>
         <FIELD NAME="courseid" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false" COMMENT="id of the course"/>
@@ -211,6 +209,8 @@
         <FIELD NAME="endtime" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false" COMMENT="the moment the attempt was completed as unix timestamp"/>
         <FIELD NAME="json" TYPE="text" NOTNULL="false" SEQUENCE="false" COMMENT="all data concerning attempt including specific data parsed as json"/>
         <FIELD NAME="debug_info" TYPE="text" NOTNULL="false" SEQUENCE="false" COMMENT="Additional information about the attempt in JSON format"/>
+        <FIELD NAME="timecreated" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
+        <FIELD NAME="timemodified" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
       </FIELDS>
       <KEYS>
         <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
@@ -226,6 +226,8 @@
         <INDEX NAME="courseid" UNIQUE="false" FIELDS="courseid"/>
         <INDEX NAME="attemptid" UNIQUE="false" FIELDS="attemptid"/>
         <INDEX NAME="instanceid" UNIQUE="false" FIELDS="instanceid"/>
+        <INDEX NAME="endtime" UNIQUE="false" FIELDS="endtime"/>
+        <INDEX NAME="timecreated" UNIQUE="false" FIELDS="instanceid"/>
       </INDEXES>
     </TABLE>
     <TABLE NAME="local_catquiz_progress" COMMENT="Stores the progress of attempts that are not yet finished.">
