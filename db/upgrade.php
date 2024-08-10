@@ -833,6 +833,7 @@ function xmldb_local_catquiz_upgrade($oldversion) {
         $table = new xmldb_table('logstore_standard_log');
         $indexes = [];
         $indexes[] = new xmldb_index('component', XMLDB_INDEX_NOTUNIQUE, explode(',', 'component'));
+        $indexes[] = new xmldb_index('eventname', XMLDB_INDEX_NOTUNIQUE, explode(',', 'eventname'));
 
         // Conditionally launch add fields, keys and indexes.
         foreach ($indexes as $index) {
