@@ -96,6 +96,7 @@ class catscales implements renderable, templatable {
             // Transform object catscale_structur into array, which is needed here.
             $element = get_object_vars($catscaleitem);
 
+            // Walk only elements on the current node, meaning with the given parentid
             if ($element['parentid'] !== $parentid) { continue; }
 
             if ($subscribed = subscription::return_subscription_state($USER->id, 'catscale', $element['id'])) {
