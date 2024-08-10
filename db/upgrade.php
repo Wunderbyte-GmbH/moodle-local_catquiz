@@ -823,6 +823,12 @@ function xmldb_local_catquiz_upgrade($oldversion) {
             }
         }
 
+        // Catquiz savepoint reached.
+        upgrade_plugin_savepoint(true, 2024080800, 'local', 'catquiz');
+    }
+
+    if ($oldversion < 2024081200) {
+
         // Also add 'component' as index to the log table for improving performance
         $table = new xmldb_table('logstore_standard_log');
         $indexes = [];
@@ -836,7 +842,7 @@ function xmldb_local_catquiz_upgrade($oldversion) {
         }
 
         // Catquiz savepoint reached.
-        upgrade_plugin_savepoint(true, 2024080800, 'local', 'catquiz');
+        upgrade_plugin_savepoint(true, 2024081200, 'local', 'catquiz');
     }
 
     return true;
