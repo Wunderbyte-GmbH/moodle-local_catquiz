@@ -829,11 +829,23 @@ function xmldb_local_catquiz_upgrade($oldversion) {
 
     if ($oldversion < 2024081200) {
 
-        // Also add 'component' as index to the log table for improving performance
+        // Also add 'component' and 'eventname' as index to the log table for improving performance
         $table = new xmldb_table('logstore_standard_log');
         $indexes = [];
         $indexes[] = new xmldb_index('component', XMLDB_INDEX_NOTUNIQUE, explode(',', 'component'));
         $indexes[] = new xmldb_index('eventname', XMLDB_INDEX_NOTUNIQUE, explode(',', 'eventname'));
+
+        // Conditionally launch add fields, keys and indexes.
+        foreach ($indexes as $index) {
+            if (!$dbman->index_exists($table, $index)) {
+                $dbman->add_index($table, $index);
+            }
+        }
+
+        $table = new xmldb_table('local_catquiz_attempt');
+        $indexes = [];
+        $indexes[] = new xmldb_index('endtime', XMLDB_INDEX_NOTUNIQUE, explode(',', 'endtime'));
+        $indexes[] = new xmldb_index('timecreated', XMLDB_INDEX_NOTUNIQUE, explode(',', 'timecreated'));
 
         // Conditionally launch add fields, keys and indexes.
         foreach ($indexes as $index) {
