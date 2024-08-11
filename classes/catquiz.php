@@ -364,7 +364,7 @@ class catquiz {
                 questiontext,
                 qtype,
                 categoryname,
-                question as component,
+                'question' as component,
                 contextattempts as questioncontextattempts,
                 catscaleids";
         $from = "( SELECT q.id, qbe.idnumber, q.name, q.questiontext, q.qtype, qc.name as categoryname, s2.contextattempts," .
