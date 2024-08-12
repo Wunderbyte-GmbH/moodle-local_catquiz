@@ -390,7 +390,7 @@ class catquiz {
                 LEFT JOIN mdl_adaptivequiz_attempt aqa ON aqa.uniqueid = qa.questionusageid
                 LEFT JOIN mdl_local_catquiz_attempts lca ON lca.attemptid = aqa.id AND lca.contextid = lci.contextid
                 WHERE q.parent = 0
-                GROUP BY qbe.id, lci.contextid, lci.catscaleid) attemptcount
+                GROUP BY qbe.id, lci.contextid) attemptcount
               ON attemptcount.id = qbe.id WHERE q.parent = 0) s1";
 
         $where = " ( " . $DB->sql_like('catscaleids', ':catscaleid', false, false, true) . ' OR catscaleids IS NULL ) ';
