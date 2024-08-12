@@ -15,7 +15,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Class strategystrengthscore.
+ * Class strategyrelevantscore.
  *
  * @package local_catquiz
  * @copyright 2024 Wunderbyte GmbH
@@ -33,10 +33,10 @@ use stdClass;
  * @copyright 2024 Wunderbyte GmbH
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class strategystrengthscore extends strategyscore {
+class strategyrelevantscore extends strategyscore {
 
-    protected function get_question_scaleterm(float $testinfo, float $abilitydifference): float {
-        return 1 / (1 + exp(-1 * $testinfo * $abilitydifference));
+    protected function get_question_scaleterm(float $testinfo, float $abilitydifference) {
+        return 1;
     }
 
     protected function get_question_itemterm(
@@ -47,15 +47,17 @@ class strategystrengthscore extends strategyscore {
         $scalecount,
         $minattemptsperscale
     ) {
-        return (1 / (
-            1 + exp($testinfo * 2 * (0.5 - $fraction) * ($difficulty - $scaleability))
-        )) ** $scalecount;
+        return (
+            1 / (
+                1 + exp($testinfo * 2 * (0.5 - $fraction) * ($difficulty - $scaleability)))
+            ) ** max(1, $scalecount - $minattemptsperscale + 1);
     }
 
     protected function get_score(stdClass $question, int $scaleid) {
-        return $question->fisherinformation[$scaleid]
-            * $question->processterm
-            * $question->scaleterm
-            * $question->itemterm;
+                return $question->fisherinformation[$scaleid]
+                    * $question->processterm
+                    * $question->scaleterm
+                    * $question->itemterm
+                    * $question->lasttimeplayedpenaltyfactor;
     }
 }

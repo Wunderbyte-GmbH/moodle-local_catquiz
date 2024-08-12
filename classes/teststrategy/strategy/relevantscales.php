@@ -48,7 +48,7 @@ use local_catquiz\teststrategy\preselect_task\mayberemovescale;
 use local_catquiz\teststrategy\preselect_task\noremainingquestions;
 use local_catquiz\teststrategy\preselect_task\remove_uncalculated;
 use local_catquiz\teststrategy\preselect_task\removeplayedquestions;
-use local_catquiz\teststrategy\preselect_task\strategydeficitscore;
+use local_catquiz\teststrategy\preselect_task\strategyrelevantscore;
 use local_catquiz\teststrategy\preselect_task\updatepersonability;
 use local_catquiz\teststrategy\strategy;
 
@@ -103,7 +103,7 @@ class relevantscales extends strategy {
             noremainingquestions::class, // Cancel quiz attempt if no questions are left.
             filterbystandarderror::class,
             filterbytestinfo::class,
-            strategydeficitscore::class,
+            strategyrelevantscore::class,
         ];
     }
 

@@ -39,7 +39,14 @@ class strategydeficitscore extends strategyscore {
         return 1 / (1 + exp($testinfo * $abilitydifference));
     }
 
-    protected function get_question_itemterm(float $testinfo, float $fraction, $difficulty, $scaleability, $scalecount) {
+    protected function get_question_itemterm(
+        float $testinfo,
+        float $fraction,
+        $difficulty,
+        $scaleability,
+        $scalecount,
+        $minattemptsperscale
+    ) {
         return (1 / (
             1 + exp($testinfo * 2 * (0.5 - $fraction) * ($difficulty - $scaleability))
         )) ** $scalecount;
