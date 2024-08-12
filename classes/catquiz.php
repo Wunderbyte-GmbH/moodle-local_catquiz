@@ -350,51 +350,53 @@ class catquiz {
     ) {
         global $DB;
 
-        // TODO @DAVID: Re-Construct the SQL-Statemente as this contains all problematic patterns that has been fixed above as well.
+        if ($contextid === 0) {
+            $contextid = get_default_context_id();
+        }
 
-        $contextfilter = $contextid === 0
-            ? $DB->sql_like('ccc1.json', ':default')
-            : "ccc1.id = :contextid";
-
-        list(, $contextfrom, , ) = self::get_sql_for_stat_base_request();
         $params = [];
+
         $select = "id,
-                idnumber,
-                name,
-                questiontext,
-                qtype,
-                categoryname,
-                'question' as component,
-                contextattempts as questioncontextattempts,
-                catscaleids";
-        $from = "( SELECT q.id, qbe.idnumber, q.name, q.questiontext, q.qtype, qc.name as categoryname, s2.contextattempts," .
-             $DB->sql_group_concat($DB->sql_concat("'-'", 'lci.catscaleid', "'-'")) ." as catscaleids
-            FROM {question} q
-                JOIN (
-                    SELECT *
-                    FROM (
-                        SELECT *, ROW_NUMBER() OVER (PARTITION BY questionbankentryid ORDER BY version DESC) n
-                        FROM {question_versions}
-                    ) s2
-                    WHERE n = 1
-                ) qv
-                ON q.id=qv.questionid
-                JOIN {question_bank_entries} qbe ON qv.questionbankentryid=qbe.id
-                JOIN {question_categories} qc ON qc.id=qbe.questioncategoryid
-                LEFT JOIN {local_catquiz_items} lci ON lci.componentid = q.id
-                LEFT JOIN (
-                    SELECT ccc1.id contextid, qa.questionid, COUNT(*) contextattempts
-                    FROM $contextfrom
-                    WHERE $contextfilter
-                    GROUP BY ccc1.id, qa.questionid
-                ) s2 ON q.id = s2.questionid
-                GROUP BY q.id, qbe.idnumber, q.name, q.questiontext, q.qtype, qc.name, s2.contextattempts
-            ) as s1";
+            idnumber,
+            name,
+            questiontext,
+            qtype,
+            categoryname,
+            'question' as component,
+            questioncontextattempts,
+            catscaleids";
+        $from = "(SELECT q.id, qbe.idnumber, q.name, q.questiontext, q.qtype,
+            qc.name as categoryname, questioncontextattempts, catscaleids
+              FROM mdl_question_bank_entries qbe
+              JOIN mdl_question_categories qc ON qc.id=qbe.questioncategoryid
+            -- Determine the highest version of a question item by given qbank entry id
+              JOIN (SELECT questionbankentryid, MAX(version) maxversion
+                FROM mdl_question_versions
+                GROUP BY questionbankentryid
+                ORDER BY questionbankentryid ASC) maxqv
+              ON maxqv.questionbankentryid = qbe.id
+              JOIN mdl_question_versions qv ON qv.questionbankentryid = qbe.id AND qv.version = maxqv.maxversion
+              JOIN mdl_question q ON q.id = qv.questionid
+            -- Calculate how often a given question has been answered within a catquiz for a given catcontext
+              LEFT JOIN (SELECT qbe.id, lci.contextid contextid, COUNT(DISTINCT lca.id) questioncontextattempts,
+              ".$DB->sql_group_concat($DB->sql_concat("'-'", 'lci.catscaleid', "'-'"))." catscaleids
+                FROM mdl_question q
+                JOIN mdl_question_versions qv ON qv.questionid = q.id
+                JOIN mdl_question_bank_entries qbe ON qbe.id = qv.questionbankentryid
+                LEFT JOIN (SELECT sqa.id, sqa.questionid, sqa.questionusageid FROM mdl_question_attempts sqa
+                JOIN mdl_question_attempt_steps sqas ON sqas.questionattemptid = sqa.id AND sqas.fraction IS NOT NULL) qa
+                ON qa.questionid = q.id
+                JOIN mdl_local_catquiz_items lci ON lci.componentid = q.id AND lci.contextid = :contextid
+                LEFT JOIN mdl_adaptivequiz_attempt aqa ON aqa.uniqueid = qa.questionusageid
+                LEFT JOIN mdl_local_catquiz_attempts lca ON lca.attemptid = aqa.id AND lca.contextid = lci.contextid
+                WHERE q.parent = 0
+                GROUP BY qbe.id, lci.contextid, lci.catscaleid) attemptcount
+              ON attemptcount.id = qbe.id WHERE q.parent = 0) s1";
 
         $where = " ( " . $DB->sql_like('catscaleids', ':catscaleid', false, false, true) . ' OR catscaleids IS NULL ) ';
         $params['catscaleid'] = "%-$catscaleid-%";
         $params['contextid'] = $contextid;
-        $params['default'] = '%"default":true%';
+        $params['default'] = get_default_context_id();
         $filter = '';
 
         foreach ($wherearray as $key => $value) {
