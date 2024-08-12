@@ -356,15 +356,14 @@ class catquiz {
             ? $DB->sql_like('ccc1.json', ':default')
             : "ccc1.id = :contextid";
 
-        list(, $contextfrom, , ) = self::get_sql_for_stat_base_request();
-        $params = [];
+        list(, $contextfrom, , $params) = self::get_sql_for_stat_base_request();
         $select = "id,
                 idnumber,
                 name,
                 questiontext,
                 qtype,
                 categoryname,
-                question as component,
+                'question' as component,
                 contextattempts as questioncontextattempts,
                 catscaleids";
         $from = "( SELECT q.id, qbe.idnumber, q.name, q.questiontext, q.qtype, qc.name as categoryname, s2.contextattempts," .
