@@ -204,7 +204,7 @@ class questionsdisplay {
      *
      */
     private function render_addtestitems_table(int $catscaleid) {
-        $id = $catscaleid > -1 ? $catscaleid : 0;
+        $id = $catscaleid > 0 ? $catscaleid : 0;
 
         $catcontextid = empty($this->catcontextid) ? optional_param('contextid', 0, PARAM_INT) : $this->catcontextid;
 
