@@ -609,6 +609,8 @@ function xmldb_local_catquiz_upgrade($oldversion) {
             $itemid = $row->itemid;
             $contextid = $row->contextid;
 
+            if (!$itemid) { continue; }
+
             $sql = "SELECT id
                 FROM {local_catquiz_itemparams} lcip
                 WHERE itemid = $itemid AND contextid = $contextid
@@ -897,6 +899,8 @@ function xmldb_local_catquiz_upgrade($oldversion) {
 
         foreach ($sqlresult as $lcip) {
             if ($lcip->itemidold !== $lcip->itemidnew) {
+                if (!$lcip->id) { continue; }
+
                 $updaterecord = new stdclass;
                 $updaterecord->id = $lcip->id;
                 $updaterecord->itemid = $lcip->itemidnew;
@@ -913,6 +917,8 @@ function xmldb_local_catquiz_upgrade($oldversion) {
         $sqlresult = $DB->get_record_sql($sql);
 
         foreach ($sqlresult as $lci) {
+            if (!$lci->id) { continue; }
+
             $updaterecord = new stdclass;
             $updaterecord->id = $lci->id;
             $updaterecord->activeparamid = $lci->activeparamid;
