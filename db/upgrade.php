@@ -908,7 +908,7 @@ function xmldb_local_catquiz_upgrade($oldversion) {
         $sql = "SELECT lci.id id, lcip.id activeparamid
                 FROM {local_catquiz_items} lci
                   JOIN (SELECT itemid, MAX(status) status FROM {local_catquiz_itemparams} GROUP BY itemid) activestatus ON activestatus.itemid = lci.id
-                  JOIN {local_catquiz_itemparams} lcip ON lcip.itemid = lci.id AND lcip.contexid = lci.contextid AND lcip.status = activestatus.status";
+                  JOIN {local_catquiz_itemparams} lcip ON lcip.itemid = lci.id AND lcip.contextid = lci.contextid AND lcip.status = activestatus.status";
 
         $sqlresult = $DB->get_record_sql($sql);
 
