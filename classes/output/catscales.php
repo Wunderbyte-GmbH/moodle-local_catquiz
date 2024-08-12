@@ -105,16 +105,15 @@ class catscales implements renderable, templatable {
                 $element['subscribed'] = false;
             }
 
-            if ($element['parentid'] == $parentid) {
-                $children = $this->build_tree($elements, $element['id']);
-                if ($children) {
-                    $element['children'] = $children;
-                } else {
-                    // Add empty array. That is needed for mustache templated in order to avoid infinit loop.
-                    $element['children'] = [];
-                }
-                $branch[] = $element;
+            $children = $this->build_tree($elements, $element['id']);
+            if ($children) {
+                $element['children'] = $children;
+            } else {
+                // Add empty array. That is needed for mustache templated in order to avoid infinit loop.
+                $element['children'] = [];
             }
+            $branch[] = $element;
+
         }
         $this->branchitems[$parentid] = $branch;
         return $branch;
