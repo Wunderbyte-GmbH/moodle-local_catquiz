@@ -879,7 +879,7 @@ function xmldb_local_catquiz_upgrade($oldversion) {
 
             $lci = $DB->get_record_sql($sql);
 
-            if ($lci->contextid !== $lcip->contextid) {
+            if (($lci->contextid !== $lcip->contextid) && ($lcip->contextid)) {
 
                 $lci->contextid = $lcip->contextid;
                 $lci->lastupdated = $lcip->timemodified;
