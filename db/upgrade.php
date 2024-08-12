@@ -881,8 +881,8 @@ function xmldb_local_catquiz_upgrade($oldversion) {
 
             if ($lci->contextid !== $lcip->contextid) {
 
-                $lci->contextid = lcip->contextid;
-                $lci->lastupdated = lcip->timemodified;
+                $lci->contextid = $lcip->contextid;
+                $lci->lastupdated = $lcip->timemodified;
                 $DB->insert_record('local_catquiz_items', $lci);
             }
         }
