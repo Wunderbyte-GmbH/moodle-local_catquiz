@@ -832,8 +832,8 @@ function xmldb_local_catquiz_upgrade($oldversion) {
         // Also add 'component' and 'eventname' as index to the log table for improving performance
         $table = new xmldb_table('logstore_standard_log');
         $indexes = [];
-        $indexes[] = new xmldb_index('component', XMLDB_INDEX_NOTUNIQUE, explode(',', 'component'));
-        $indexes[] = new xmldb_index('eventname', XMLDB_INDEX_NOTUNIQUE, explode(',', 'eventname'));
+         $indexes[] = new xmldb_index('component', XMLDB_INDEX_NOTUNIQUE, ['component']);
+        $indexes[] = new xmldb_index('eventname', XMLDB_INDEX_NOTUNIQUE, ['eventname']);
 
         // Conditionally launch add fields, keys and indexes.
         foreach ($indexes as $index) {
@@ -844,8 +844,8 @@ function xmldb_local_catquiz_upgrade($oldversion) {
 
         $table = new xmldb_table('local_catquiz_attempt');
         $indexes = [];
-        $indexes[] = new xmldb_index('endtime', XMLDB_INDEX_NOTUNIQUE, explode(',', 'endtime'));
-        $indexes[] = new xmldb_index('timecreated', XMLDB_INDEX_NOTUNIQUE, explode(',', 'timecreated'));
+        $indexes[] = new xmldb_index('endtime', XMLDB_INDEX_NOTUNIQUE, ['endtime']);
+        $indexes[] = new xmldb_index('timecreated', XMLDB_INDEX_NOTUNIQUE, ['timecreated']);
 
         // Conditionally launch add fields, keys and indexes.
         foreach ($indexes as $index) {

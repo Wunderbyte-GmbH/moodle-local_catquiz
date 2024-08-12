@@ -78,6 +78,19 @@ function xmldb_local_catquiz_install() {
         }
     }
 
+    // Also add 'component' and 'eventname' as index to the log table for improving performance
+    $table = new xmldb_table('logstore_standard_log');
+    $indexes = [];
+    $indexes[] = new xmldb_index('component', XMLDB_INDEX_NOTUNIQUE, ['component']);
+    $indexes[] = new xmldb_index('eventname', XMLDB_INDEX_NOTUNIQUE, ['eventname']);
+
+    // Conditionally launch add fields, keys and indexes.
+    foreach ($indexes as $index) {
+        if (!$dbman->index_exists($table, $index)) {
+            $dbman->add_index($table, $index);
+        }
+    }
+
     // Make sure the database contains a default context.
     $defaultcontext = new catcontext();
     $defaultcontext->create_default_context();
