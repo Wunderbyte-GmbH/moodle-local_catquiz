@@ -396,7 +396,6 @@ class catquiz {
         $where = " ( " . $DB->sql_like('catscaleids', ':catscaleid', false, false, true) . ' OR catscaleids IS NULL ) ';
         $params['catscaleid'] = "%-$catscaleid-%";
         $params['contextid'] = $contextid;
-        $params['default'] = get_default_context_id();
         $filter = '';
 
         foreach ($wherearray as $key => $value) {
