@@ -832,7 +832,7 @@ function xmldb_local_catquiz_upgrade($oldversion) {
         // Also add 'component' and 'eventname' as index to the log table for improving performance
         $table = new xmldb_table('logstore_standard_log');
         $indexes = [];
-         $indexes[] = new xmldb_index('component', XMLDB_INDEX_NOTUNIQUE, ['component']);
+        $indexes[] = new xmldb_index('component', XMLDB_INDEX_NOTUNIQUE, ['component']);
         $indexes[] = new xmldb_index('eventname', XMLDB_INDEX_NOTUNIQUE, ['eventname']);
 
         // Conditionally launch add fields, keys and indexes.
@@ -858,5 +858,70 @@ function xmldb_local_catquiz_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2024081200, 'local', 'catquiz');
     }
 
+    if ($oldversion < 2024081300) {
+
+        // Adding all necessary duplicates for different catcontexts to catquiz_items table
+        // according to catquiz_itemparams and updating catquiz_item_params accordingly.
+
+        // Duplicating catquiz_items entrys if needed
+        $sql = "SELECT id, itemid, contextid, MAX(timemodified) timemodified
+            FROM {local_catquiz_itemparams}
+            GROUP BY itemid, contextid";
+
+        $sqlresult = $DB->get_records_sql($sql);
+
+        foreach ($sqlresult as $lcip) {
+
+            // Load catquiz_items infomation
+            $sql = "SELECT *
+                FROM {local_catquiz_items}
+                WHERE id = ".$lcip->itemid;
+
+            $lci = $DB->get_record_sql($sql);
+
+            if ($lci->contextid !== $lcip->contextid) {
+
+                $lci->contextid = lcip->contextid;
+                $lci->lastupdated = lcip->timemodified;
+                $DB->insert_record('local_catquiz_items', $lci);
+            }
+        }
+
+        // Set all catquiz_itemparams entrys if pointing correctly to.
+        $sql = "SELECT lcip.id id, lci1.id itemidold, lci2.id itemidnew
+            FROM {local_catquiz_itemparams} lcip
+            JOIN {local_catquiz_items} lci1 ON lci1.id = lcip.itemid
+            LEFT JOIN {local_catquiz_items} lci2 ON lci2.componentid = lci1.componentid
+              AND lci2.componentname = lci1.componentname AND lci2.contextid = lcip.contextid";
+
+        $sqlresult = $DB->get_records_sql($sql);
+
+        foreach ($sqlresult as $lcip) {
+            if ($lcip->itemidold !== $lcip->itemidnew) {
+                $updaterecord = new stdclass;
+                $updaterecord->id = $lcip->id;
+                $updaterecord->itemid = $lcip->itemidnew;
+                $DB->update_record('local_catquiz_itemparams', $updaterecord);
+            }
+        }
+
+        // Reset all active paramids in all new catquiz_items entries.
+        $sql = "SELECT lci.id id, lcip.id activeparamid
+                FROM {local_catquiz_items} lci
+                  JOIN (SELECT itemid, MAX(status) status FROM {local_catquiz_itemparams} GROUP BY itemid) activestatus ON activestatus.itemid = lci.id
+                  JOIN {local_catquiz_itemparams} lcip ON lcip.itemid = lci.id AND lcip.contexid = lci.contextid AND lcip.status = activestatus.status";
+
+        $sqlresult = $DB->get_record_sql($sql);
+
+        foreach ($sqlresult as $lci) {
+            $updaterecord = new stdclass;
+            $updaterecord->id = $lci->id;
+            $updaterecord->activeparamid = $lci->activeparamid;
+            $DB->update_record('local_catquiz_items', $updaterecord);
+        }
+
+        // Catquiz savepoint reached.
+        upgrade_plugin_savepoint(true, 2024081300, 'local', 'catquiz');
+    }
     return true;
 }
