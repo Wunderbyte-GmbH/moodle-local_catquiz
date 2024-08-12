@@ -842,7 +842,7 @@ function xmldb_local_catquiz_upgrade($oldversion) {
             }
         }
 
-        $table = new xmldb_table('local_catquiz_attempt');
+        $table = new xmldb_table('local_catquiz_attempts');
         $indexes = [];
         $indexes[] = new xmldb_index('endtime', XMLDB_INDEX_NOTUNIQUE, ['endtime']);
         $indexes[] = new xmldb_index('timecreated', XMLDB_INDEX_NOTUNIQUE, ['timecreated']);
