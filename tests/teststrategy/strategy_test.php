@@ -1069,6 +1069,60 @@ final class strategy_test extends advanced_testcase {
                     'SimC10' => 4.96,
                 ],
             ],
+            'Infer relevant scales P000000' => [
+                'strategy' => LOCAL_CATQUIZ_STRATEGY_RELSUBS,
+                'questions' => [
+                    [ 'label' => 'SIMB01-18', 'is_correct_response' => false, 'ability_before' => 0.02, 'ability_after' => 0.02],
+                    [ 'label' => 'SIMA06-15', 'is_correct_response' => false, 'ability_after' => -0.67],
+                    [ 'label' => 'SIMA02-02', 'is_correct_response' => false, 'ability_after' => -1.30],
+                    [ 'label' => 'SIMA02-19', 'is_correct_response' => false, 'ability_after' => -1.86],
+                    [ 'label' => 'SIMA02-17', 'is_correct_response' => false, 'ability_after' => -2.33],
+                    [ 'label' => 'SIMA06-02', 'is_correct_response' => false, 'ability_after' => -3.06],
+                    [ 'label' => 'SIMB02-00', 'is_correct_response' => false, 'ability_after' => -3.06],
+                    [ 'label' => 'SIMB01-17', 'is_correct_response' => false, 'ability_after' => -3.06],
+                    [ 'label' => 'SIMB01-12', 'is_correct_response' => false, 'ability_after' => -3.06],
+                    [ 'label' => 'SIMA02-04', 'is_correct_response' => false, 'ability_after' => -3.06],
+                    [ 'label' => 'SIMB02-02', 'is_correct_response' => false, 'ability_after' => -3.39],
+                    [ 'label' => 'SIMA01-13', 'is_correct_response' => true,  'ability_after' => -3.39],
+                    [ 'label' => 'SIMA01-16', 'is_correct_response' => true,  'ability_after' => -3.41],
+                    [ 'label' => 'SIMA01-19', 'is_correct_response' => false, 'ability_after' => -3.24],
+                    [ 'label' => 'SIMA01-06', 'is_correct_response' => true,  'ability_after' => -3.35],
+                    [ 'label' => 'SIMA03-13', 'is_correct_response' => true,  'ability_after' => -3.31],
+                    [ 'label' => 'SIMA03-03', 'is_correct_response' => true,  'ability_after' => -3.27],
+                    [ 'label' => 'SIMA03-16', 'is_correct_response' => true,  'ability_after' => -3.21],
+                    [ 'label' => 'SIMA05-00', 'is_correct_response' => false, 'ability_after' => -3.15],
+                    [ 'label' => 'SIMA05-07', 'is_correct_response' => false, 'ability_after' => -3.21],
+                    [ 'label' => 'SIMA05-15', 'is_correct_response' => false, 'ability_after' => -3.25],
+                    [ 'label' => 'SIMA01-07', 'is_correct_response' => false, 'ability_after' => -3.29],
+                    [ 'label' => 'SIMA01-12', 'is_correct_response' => false, 'ability_after' => -3.31],
+                    [ 'label' => 'SIMA01-14', 'is_correct_response' => true,  'ability_after' => -3.45],
+                    [ 'label' => 'SIMA03-19', 'is_correct_response' => true,  'ability_after' => -3.41],
+                    [ 'label' => 'FINISH',    'is_correct_response' => false, 'ability_after' => -3.38],
+                ],
+                'initial_ability' => 0.02,
+                'initial_se' => 2.97,
+                'settings' => [
+                    'pp_min_inc' => 0.1,
+                    'standarderror_min' => 0.25,
+                    'standarderror_max' => 0.5,
+                    'minquestionspersubscale' => 3,
+                ],
+                'final_abilities' => [
+                    'Simulation' => -3.38,
+                    'SimA' => -3.38,
+                    'SimA01' => -3.47,
+                    'SimA02' => -3.40,
+                    'SimA03' => -3.28,
+                    'SimA04' => -3.65,
+                    'SimA05' => -3.43,
+                    'SimA06' => -3.38,
+                    'SimA07' => -3.65, // Inherited from parent.
+                    'SimB' => -3.38,
+                    'SimB01' => -3.38,
+                    'SimB02' => -3.38,
+                    'SimC' => -4.19, // Inherited from parent.
+                ],
+            ],
             // phpcs:disable
             // 'Infer all subscales' => [
             // 'strategy' => LOCAL_CATQUIZ_STRATEGY_ALLSUBS,
@@ -1233,6 +1287,13 @@ final class strategy_test extends advanced_testcase {
         $jsondata->maxquestionsgroup->catquiz_minquestions = 0;
         $jsondata->maxquestionsscalegroup->catquiz_maxquestionspersubscale = $settings['maxquestionspersubscale'] ?? 10;
         $jsondata->maxquestionsscalegroup->catquiz_minquestionspersubscale = $settings['minquestionspersubscale'] ?? 1;
+
+        if (!empty($settings['standarderror_max'])) {
+            $jsondata->catquiz_standarderrorgroup->catquiz_standarderror_max = $settings['standarderror_max'];
+        }
+        if (!empty($settings['standarderror_min'])) {
+            $jsondata->catquiz_standarderrorgroup->catquiz_standarderror_min = $settings['standarderror_min'];
+        }
         $jsondata->catquiz_pp_min_inc = $settings['pp_min_inc'] ?? 0.01;
         if ($pilotratio = $settings['pilot_ratio'] ?? null) {
             $jsondata->catquiz_includepilotquestions = true;

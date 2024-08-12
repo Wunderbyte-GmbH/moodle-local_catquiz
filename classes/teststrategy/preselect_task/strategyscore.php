@@ -54,9 +54,17 @@ abstract class strategyscore extends preselect_task implements wb_middleware {
      * @param mixed $difficulty
      * @param mixed $scaleability
      * @param mixed $scalecount
+     * @param int $minattemptsperscale
      * @return mixed
      */
-    abstract protected function get_question_itemterm(float $testinfo, float $fraction, $difficulty, $scaleability, $scalecount);
+    abstract protected function get_question_itemterm(
+        float $testinfo,
+        float $fraction,
+        $difficulty,
+        $scaleability,
+        $scalecount,
+        int $minattemptsperscale
+    );
 
     /**
      * @param stdClass $question
@@ -64,10 +72,18 @@ abstract class strategyscore extends preselect_task implements wb_middleware {
      */
     abstract protected function get_score(stdClass $question, int $scaleid);
 
+    protected function get_scales(): array {
+        return $this->progress->get_active_scales();
+    }
+
+    protected function ignore_scale(int $scaleid): bool {
+        return !$this->progress->is_active_scale($scaleid);
+    }
+
     /**
      * @var progress
      */
-    private progress $progress;
+    protected progress $progress;
 
     /**
      * Run preselect task.
@@ -84,7 +100,7 @@ abstract class strategyscore extends preselect_task implements wb_middleware {
         $scalefractions = [];
         $scalecount = [];
 
-        foreach ($this->progress->get_active_scales() as $scaleid) {
+        foreach ($this->get_scales() as $scaleid) {
             $played = $this->progress->get_playedquestions(true, $scaleid);
             $scalecount[$scaleid] = count($played);
             if ($scalecount[$scaleid] === 0) {
@@ -101,10 +117,12 @@ abstract class strategyscore extends preselect_task implements wb_middleware {
 
         foreach ($context['questions'] as $question) {
             $affectedscales = [$question->catscaleid, ...catscale::get_ancestors($question->catscaleid)];
-            arsort($affectedscales); // Traverse from root to leave.
+            $affectedscales = array_reverse($affectedscales); // Traverse from root to leave.
 
             foreach ($affectedscales as $scaleid) {
-                if (! $this->progress->is_active_scale($scaleid)) {
+                if ($this->ignore_scale($scaleid)
+                    || !array_key_exists($scaleid, $this->progress->get_abilities())
+                ) {
                     continue;
                 }
 
@@ -122,13 +140,25 @@ abstract class strategyscore extends preselect_task implements wb_middleware {
                     $scalefractions[$scaleid],
                     $question->difficulty,
                     $scaleability,
-                    $scalecount[$scaleid]
+                    $scalecount[$scaleid],
+                    $context['min_attempts_per_scale']
                 );
 
                 $score = $this->get_score($question, $scaleid);
                 if (! property_exists($question, 'score') || $score > $question->score) {
                     $question->score = $score;
                 }
+                $this->print_debug_info(
+                    $scaleid,
+                    'SIMA02-19',
+                    $question,
+                    ['SIMA02-17', 'SIMA06-02'],
+                    $testinfo,
+                    $scaleability,
+                    $standarderrorplayed,
+                    $scalefractions[$scaleid],
+                    $context['min_attempts_per_scale']
+                );
             }
         }
 
@@ -143,6 +173,7 @@ abstract class strategyscore extends preselect_task implements wb_middleware {
         });
 
         $selectedquestion = reset($remainingquestions);
+
         return result::ok($selectedquestion);
     }
 
@@ -157,5 +188,46 @@ abstract class strategyscore extends preselect_task implements wb_middleware {
             'questions',
             'progress',
         ];
+    }
+
+    /**
+     * Helper function for debugging
+     *
+     * @param string $lastquestionlabel Only print if the last question has that label
+     * @param stdClass $question The current question
+     * @param array $debuglabels Only print output for questions with that label
+     * @param float $testinfo Testinfo for the selected question's scale
+     * @param float $scaleability Ability for the selected question's scale
+     */
+    private function print_debug_info(
+        int $scaleid,
+        string $lastquestionlabel,
+        stdClass $question,
+        array $debuglabels,
+        float $testinfo,
+        float $scaleability,
+        float $standarderror,
+        float $fraction,
+        int $minattemptsperscale
+    ) {
+        $lastq = $this->progress->get_last_question();
+        if ($lastq && $lastq->label === $lastquestionlabel) {
+            if (in_array($question->label, $debuglabels)) {
+                printf(
+                    "%d %s: testinfo: %f, ability: %f, processterm: %f - scaleterm: %f
+                     - itemterm: %f - standarderror: %f - fraction: %f - minattempts: %f\n",
+                    $scaleid,
+                    $question->label,
+                    $testinfo,
+                    $scaleability,
+                    $question->processterm,
+                    $question->scaleterm,
+                    $question->itemterm,
+                    $standarderror,
+                    $fraction,
+                    $minattemptsperscale
+                );
+            }
+        }
     }
 }
