@@ -28,7 +28,6 @@ use dml_exception;
 use coding_exception;
 use Exception;
 use local_catquiz\catcalc;
-use local_catquiz\catcontext;
 use local_catquiz\catquiz;
 use local_catquiz\catscale;
 use local_catquiz\local\model\model_item_param_list;
@@ -270,7 +269,6 @@ class updatepersonability extends preselect_task implements wb_middleware {
             $this->parentability = $updatedability;
             $this->parentse = catscale::get_standarderror($updatedability, $this->get_item_param_list($catscaleid));
         }
-
         $this->update_person_param($catscaleid, $updatedability);
 
         $context['prev_ability'][$catscaleid] = $context['person_ability'][$catscaleid];
