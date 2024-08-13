@@ -768,13 +768,12 @@ class catquiz {
             'unfinishedstates'
         );
 
-        // TODO: nochmal anschauen.
         $select = '*';
         $from = "{question_attempts} qa
                 JOIN {local_catquiz_items} lci ON lci.componentid = qa.questionid
                 JOIN {local_catquiz_catcontext} ccc ON lci.contextid = ccc.id
                 JOIN {adaptivequiz_attempt} aqa ON aqa.uniqueid = qa.questionusageid
-                JOIN {local_catquiz_attempts} lca ON lca.instanceid = aqa.id AND lca.contextid = lci.contextid
+                JOIN {local_catquiz_attempts} lca ON lca.attemptid = aqa.id AND lca.contextid = lci.contextid
                 JOIN {question_attempt_steps} qas ON qas.questionattemptid = qa.id AND qas.state NOT $unfinishedstatessql";
 
         $where = !empty($testitemids) ? 'qa.questionid IN (:testitemids)' : '1=1';
@@ -827,47 +826,6 @@ class catquiz {
         $params = [];
         $filter = '';
 
-        // TODO: SQL vereinfachen.
-        // FRAGE @DAVID: Werden die ehemaligen Angaben noch gebraucht?
-
-        // phpcs:disable
-        /* Old code:
-        $select = "
-            c.id,
-            name,
-            component,
-            c.visible,
-            availability,
-            c.lang,
-            status,
-            parentid,
-            fullname,
-            c.timemodified,
-            c.timecreated,
-            ct.catscaleid,
-            numberofitems,
-            teachers";
-
-        $from = "
-        {local_catquiz_tests} ct
-        JOIN {course} c ON c.id = ct.courseid
-        LEFT JOIN (SELECT catscaleid as itemcatscale, COUNT(*) numberofitems
-           FROM {local_catquiz_items}
-           GROUP BY catscaleid
-        ) s1 ON ct.catscaleid = s1.itemcatscale
-        LEFT JOIN (
-            SELECT c.id courseid, " .
-                $DB->sql_group_concat($DB->sql_concat_join("' '", ['u.firstname', 'u.lastname']), ', ') . " teachers
-            FROM {user} u
-            JOIN {role_assignments} ra ON ra.userid = u.id
-            JOIN {context} ct ON ct.id = ra.contextid
-            JOIN {course} c ON c.id = ct.instanceid
-            JOIN {role} r ON r.id = ra.roleid
-            WHERE r.shortname IN ('teacher', 'editingteacher')
-            GROUP BY c.id
-            ) s2 ON s2.courseid = ct.courseid";
-        */
-        // phpcs:enable
 
         $select = " * ";
 
@@ -888,15 +846,11 @@ class catquiz {
             (CASE WHEN componentid <> 0 THEN 1 ELSE 0 END) istest
         FROM {local_catquiz_tests} ct
         LEFT JOIN {course} c ON c.id = ct.courseid
-        LEFT JOIN {adaptivequiz} aq ON ct.componentid = aq.id
+        LEFT JOIN {adaptivequiz} aq ON ct.componentid = aq.id AND ct.component = 'mod_adaptivequiz'
         LEFT JOIN (
-            SELECT instance, COUNT(*) as users
-            FROM (
-                SELECT instance, userid
-                FROM {adaptivequiz_attempt} at
-                GROUP BY at.instance, at.userid
-            ) s4
-            GROUP BY s4.instance
+          SELECT instance, COUNT(DISTINCT userid) as users
+            FROM {adaptivequiz_attempt}
+          GROUP BY instance, userid
         ) s2 ON s2.instance = ct.componentid
         ) s3";
 
