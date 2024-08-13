@@ -113,11 +113,11 @@ class filterbytestinfo extends preselect_task implements wb_middleware {
                 $playeditems
             );
 
-            $enable = $testpotential > 1 / $this->context['se_max'] ** 2;
+            $enable = $testpotential + $testinformation > 1 / $this->context['se_max'] ** 2;
             $exclude = $testpotential + $testinformation <= 1 / $this->context['se_max'] ** 2
                 && count($this->progress->get_playedquestions(true, $scaleid)) >= $this->context['min_attempts_per_scale'];
             if ($exclude && $this->progress->is_active_scale($scaleid)) {
-                $this->progress->drop_scale($scaleid);
+                $this->progress->deactivate_scale($scaleid);
                 getenv('CATQUIZ_CREATE_TESTOUTPUT') && printf(
                     "%d: deact %s%s",
                     count($this->progress->get_playedquestions()),
@@ -126,13 +126,15 @@ class filterbytestinfo extends preselect_task implements wb_middleware {
                 );
                 continue;
             }
-            if ($enable && !$this->progress->is_active_scale($scaleid)) {
+            if ($enable  && !$this->progress->is_dropped_scale($scaleid) && !$this->progress->is_active_scale($scaleid)) {
                 // Enable the scale.
                 $this->progress->add_active_scale($scaleid);
                 getenv('CATQUIZ_CREATE_TESTOUTPUT') && printf(
-                    "%d: enact %s%s",
+                    "%d: enact %s (%f >= %f)%s",
                     count($this->progress->get_playedquestions()),
                     (catscale::return_catscale_object($scaleid))->name,
+                    $testpotential + $testinformation,
+                    1 / $this->context['se_max'] ** 2,
                     PHP_EOL
                 );
                 continue;

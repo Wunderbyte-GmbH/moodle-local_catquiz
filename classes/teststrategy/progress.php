@@ -107,6 +107,11 @@ class progress implements JsonSerializable {
     private array $activescales;
 
     /**
+     * @var array $droppedscales
+     */
+    private array $droppedscales;
+
+    /**
      * @var array $responses
      */
     private array $responses;
@@ -308,6 +313,7 @@ class progress implements JsonSerializable {
 
         $instance->breakend = $data->breakend;
         $instance->activescales = (array) $data->activescales;
+        $instance->droppedscales = $data->droppedscales ? (array) $data->droppedscales : [];
         $instance->responses = (array) $data->responses;
         foreach ($instance->responses as $id => $val) {
             $instance->responses[$id] = (array) $val;
@@ -372,6 +378,7 @@ class progress implements JsonSerializable {
         $instance->lastquestion = null;
         $instance->breakend = null;
         $instance->activescales = [];
+        $instance->droppedscales = [];
         $instance->responses = [];
         $instance->abilities = [];
         $instance->forcedbreakend = null;
@@ -399,6 +406,7 @@ class progress implements JsonSerializable {
             'lastquestion' => $this->lastquestion,
             'breakend' => $this->breakend,
             'activescales' => $this->activescales,
+            'droppedscales' => $this->droppedscales,
             'contextid' => $this->contextid,
             'responses' => $this->responses,
             'abilities' => $this->abilities,
@@ -671,17 +679,33 @@ class progress implements JsonSerializable {
     }
 
     /**
-     * Removes the given scaleid from the list of active scales
+     * Deactivates the given scaleid
      *
      * @param int $scaleid
      * @return $this
      */
-    public function drop_scale(int $scaleid) {
+    public function deactivate_scale(int $scaleid) {
         if (!in_array($scaleid, $this->activescales)) {
             return $this;
         }
         unset($this->activescales[array_search($scaleid, $this->activescales)]);
         return $this;
+    }
+
+    /**
+     * Permanently removes the given scaleid from the list of active scales
+     *
+     * @param int $scaleid
+     * @return $this
+     */
+    public function drop_scale(int $scaleid) {
+        $this->deactivate_scale($scaleid);
+        $this->droppedscales[$scaleid] = $scaleid;
+        return $this;
+    }
+
+    public function is_dropped_scale($scaleid) {
+        return array_key_exists($scaleid, $this->droppedscales);
     }
 
     /**

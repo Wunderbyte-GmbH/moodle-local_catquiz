@@ -150,9 +150,9 @@ abstract class strategyscore extends preselect_task implements wb_middleware {
                 }
                 $this->print_debug_info(
                     $scaleid,
-                    'SIMA02-19',
+                    'SIMC04-18',
                     $question,
-                    ['SIMA02-17', 'SIMA06-02'],
+                    ['SIMC04-02', 'SIMC07-14'],
                     $testinfo,
                     $scaleability,
                     $standarderrorplayed,
