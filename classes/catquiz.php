@@ -774,7 +774,7 @@ class catquiz {
                 JOIN {local_catquiz_items} lci ON lci.componentid = qa.questionid
                 JOIN {local_catquiz_catcontext} ccc ON lci.contextid = ccc.id
                 JOIN {adaptivequiz_attempt} aqa ON aqa.uniqueid = qa.questionusageid
-                JOIN {local_catquiz_attempts} lca ON lca.componentid = aqa.id AND lca.contextid = lci.contextid
+                JOIN {local_catquiz_attempts} lca ON lca.instanceid = aqa.id AND lca.contextid = lci.contextid
                 JOIN {question_attempt_steps} qas ON qas.questionattemptid = qa.id AND qas.state NOT $unfinishedstatessql";
 
         $where = !empty($testitemids) ? 'qa.questionid IN (:testitemids)' : '1=1';
