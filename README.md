@@ -1,7 +1,7 @@
-# Adaptive Quiz - Advanced CAT Module #
+# Adaptive Quiz: Advanced CAT Module #
 
 ## Short description ##
-The plugin local_catquiz implements full Computer Adaptive Testing (CAT) capabilities in Moodle. It enhances and compliments the [moodle activity adaptive quiz](https://moodle.org/plugins/mod_adaptivequiz) in terms of providing CAT item pool, CAT engine and advanced CAT test deployment. In CAT testings, test takers are presented only with questions that fall within their identified ability range, based on the answers they give. This is achieved by using common statistical models Item Response Theory (IRT) and allow for significant short testing times and more accurate results.
+The plugin local_catquiz implements full Computer Adaptive Testing (CAT) capabilities in Moodle. It enhances and compliments the [moodle activity adaptive quiz](https://moodle.org/plugins/mod_adaptivequiz) in terms of providing an elaborate CAT item pool, a complete CAT engine and advanced CAT test deployments. In CAT testing sessions, test takers are presented only with questions that fall within their identified ability range, based on the answers they give. This is achieved by using common statistical models Item Response Theory (IRT) and allow for significant short testing times and more accurate results.
 
 ## Detailed description ##
 The plugin can be used with all types of questions in Moodle that allow for automatic scoring (e.g. multiple choice or cloze text). The plugin supports the following common Item Response Theory (IRT) models:
