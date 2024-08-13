@@ -1,10 +1,10 @@
 # Adaptive Quiz - Advanced CAT Module #
 
 ## Short description ##
-The plugin local_catquiz implements full Computer Adaptive Testing (CAT) capabilities in Moodle. Using common one-dimensional Item Response Theory (IRT) models, test takers are presented only with questions that fall within their identified ability range, based on the answers they give.
+The plugin local_catquiz implements full Computer Adaptive Testing (CAT) capabilities in Moodle. It enhances and compliments the [moodle activity adaptive quiz](https://moodle.org/plugins/mod_adaptivequiz) in terms of providing CAT item pool, CAT engine and advanced CAT test deployment. In CAT testings, test takers are presented only with questions that fall within their identified ability range, based on the answers they give. This is achieved by using common statistical models Item Response Theory (IRT) and allow for significant short testing times and more accurate results.
 
 ## Detailed description ##
-The plugin can be used with all types of questions in Moodle that allow for automatic scoring (e.g. multiple choice or cloze text). The plugin provides different IRT models:
+The plugin can be used with all types of questions in Moodle that allow for automatic scoring (e.g. multiple choice or cloze text). The plugin supports the following common Item Response Theory (IRT) models:
 
 * dichotomous questions (only account for right or wrong answers)
     * Rasch-Model (1 parametric logistic model)
@@ -14,26 +14,27 @@ The plugin can be used with all types of questions in Moodle that allow for auto
     * Graded Response Model and Generalized Graded Response Model
     * further models will be realized in upcoming versions
 
-The plugin enables the creation, administration and modification of different scales on which measurements are taken. For this purpose, the plug-in creates a new role "CAT Manager", which is authorized to perform these administrative tasks.
+The plugin further enables the creation, administration and modification of different scales on which measurements are taken. For this purpose, the plug-in creates a new role "CAT Manager", which is authorized to perform these administrative tasks.
 
-Furthermore, the plugin allows to pursuit different test strategies:
+Finally, the plugin allows to pursuit different test strategies:
 
-* running a normal CAT
+* running a "standard" CAT test
 * adaptive diagnose for weakest/strongest ability in selected (sub-)scales
 * adaptive diagnose for all given (sub-)scales
-* run a classical test (ask all questions), but evaluate by using IRT
+* semi-classical diagnose for all given (sub-)scales
+* classical testing (ask all questions), but evaluation with IRT
 
 ### Dependencies
 
 For using this plugin, you are required to install the following plugins:
 
-* mod_adaptivequiz - the activity from which a CAT test can be started (vers 3.1 onwards). Please use the [wb-0.9.0-rc2 release in the wunderbyte fork](https://github.com/Wunderbyte-GmbH/moodle-mod_adaptivequiz/releases/tag/wb-0.9.0-rc2) until our changes are integrated into the [upstream plugin](https://github.com/vtos/moodle-mod_adaptivequiz) (in progress).
+* mod_adaptivequiz - the activity from which a CAT test can be started (vers 3.1 onwards). Please use the [wb-0.9.0-rc2 release in the wunderbyte fork](https://github.com/Wunderbyte-GmbH/moodle-mod_adaptivequiz/releases/tag/wb-0.9.0-rc2) until our changes are integrated into the [upstream plugin](https://moodle.org/plugins/mod_adaptivequiz) (in progress).
 * [adaptivequizcatmodel_catquiz](https://github.com/Wunderbyte-GmbH/moodle-adaptivequizcatmodel_catquiz/releases/tag/1.0.2) - which serves as a bridge between mod_adaptivequiz and local_adaptivequiz
-* [local_wunderbyte_table](https://github.com/Wunderbyte-GmbH/moodle-local_wunderbyte_table) - database and tables handling
+* [local_wunderbyte_table](https://moodle.org/plugins/local_wunderbyte_table)) - database and tables handling
 
 It is recommended to install the following plugins as well:
 
-* local_shortcodes - helps to render results at any point in your courses
+* [local_shortcodes](https://moodle.org/plugins/filter_shortcodes) - helps to render results at any point in your courses
 * local_adaptivelearningpaths - adds the possibility to define learning paths based on quiz and adaptive quiz results (to be released soon)
 
 ## Core concepts & Terminology ##
@@ -44,38 +45,38 @@ The plugin tries to present questions matching the ability of the student. To as
 * Models: model the charcteristics of an item by a specified set of parameters.
 * Scales: items are grouped in scales (and subscales) according to the construct they are measuring. For example you may have a parentscale "mathematics" that measures a general construct "mathematical abilities" with subscales "algebra" and "geometry" that contain items of the field of algebra or geometry each.
 * Contexts: allow you to reuse the same question within different time periods or usage frames without loosing or confusing its parameters and attempt data. This could be useful if e.g. the question is part of different quizzes or for managing data of different years.
-* Importer: imports items, params and scales from a csv file.
+* CSV Importer: imports items, params and scales from a csv file.
 
 ## CSV Importer ##
 * The csv importer accepts different formats of separators and encodings. Some columns are mandatory whereas others are optional. Find detailed descriptions of all columns on the same page, also the demo csv file can be found in: local/catquiz/classes/importer/demo.csv
 
 ## Contexts ##
 * When importing with the csv importer, and no context is defined, a new context is created automatically. It contains the items from the default context plus the newly imported items.
-If a context is specified when importing new items, the context of the corresponding root scale has to be changed (in the CAT Manager dashboard, Scales tab) so that these items are used.
-For items to be updated via importer, the context id should be defined to enable matching with existing items.
+* If a context is specified when importing new items, the context of the corresponding root scale has to be changed (in the CAT Manager dashboard, Scales tab) so that these items are used.
+* For items to be updated via importer, the context id should be defined to enable matching with existing items.
 
 ## Shortcodes ##
-* To use the shortcode functionality, use plugin filter_shortcodes: https://moodle.org/plugins/filter_shortcodes
+* To use the feedback and statistics functionality seamingly in your courses or anywhere you want to show them, use [plugin filter_shortcodes](https://moodle.org/plugins/filter_shortcodes)
 
 Shortcodes can be added in any text area and label via editor, e.g. in the course.
 
 1. To display feedbacks of the past quiz attempts use [catquizfeedback].
 
-The following parameters can be defined:
+Additionally, the following parameter can be added, like e.g. [catquizfeedback numberofattempts=3]
 
-* numberofattempts=3 // Defined the number of feedbacks displayed in collapsables. Starting with the newest.
+    * numberofattempts=3 // Defined the number of feedbacks displayed in collapsables. Starting with the newest.
 
 2. To display an overview table of all scales use [catscalesoverview].
 
 3. To display statistics for a group of attempts, use [catquizstatistics]
 
-The following parameters can be defined:
+Also, the following parameters can be defined, like e.g. [catquizfeedback testid=73 starttime=1723569996]:
 
-* globalscale // Display only attempts for this scale.
-* testid      // Display only attempts of the given test.
-* courseid    // Display only attempts of tests in the given course.
-* starttime   // Display only attempts that were started after this timestamp. Should be a unix timestamp.
-* endtime   // Display only attempts that were started before this timestamp. Should be a unix timestamp.
+    * globalscale // Display only attempts for this scale.
+    * testid      // Display only attempts of the given test.
+    * courseid    // Display only attempts of tests in the given course.
+    * starttime   // Display only attempts that were started after this timestamp. Should be a unix timestamp.
+    * endtime     // Display only attempts that were started before this timestamp. Should be a unix timestamp.
 
 ## Installing via uploaded ZIP file ##
 
