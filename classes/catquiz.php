@@ -349,6 +349,11 @@ class catquiz {
         array $wherearray = []
     ) {
         global $DB;
+        [$unfinishedstatessql, $unfinishedstatesparams] = $DB->get_in_or_equal(
+            self::get_unfinished_question_states(),
+            SQL_PARAMS_NAMED,
+            'unfinishedstates'
+        );
 
         if ($contextid === 0) {
             $contextid = get_default_context_id();
@@ -383,8 +388,10 @@ class catquiz {
                 FROM mdl_question q
                 JOIN mdl_question_versions qv ON qv.questionid = q.id
                 JOIN mdl_question_bank_entries qbe ON qbe.id = qv.questionbankentryid
-                LEFT JOIN (SELECT sqa.id, sqa.questionid, sqa.questionusageid FROM mdl_question_attempts sqa
-                JOIN mdl_question_attempt_steps sqas ON sqas.questionattemptid = sqa.id AND sqas.fraction IS NOT NULL) qa
+                LEFT JOIN (SELECT sqa.id, sqa.questionid, sqa.questionusageid
+                  FROM mdl_question_attempts sqa
+                  JOIN mdl_question_attempt_steps sqas ON sqas.questionattemptid = sqa.id
+                    AND sqas.status NOT $unfinishedstatessql) qa
                 ON qa.questionid = q.id
                 JOIN mdl_local_catquiz_items lci ON lci.componentid = q.id AND lci.contextid = :contextid
                 LEFT JOIN mdl_adaptivequiz_attempt aqa ON aqa.uniqueid = qa.questionusageid
@@ -396,6 +403,7 @@ class catquiz {
         $where = " ( " . $DB->sql_like('catscaleids', ':catscaleid', false, false, true) . ' OR catscaleids IS NULL ) ';
         $params['catscaleid'] = "%-$catscaleid-%";
         $params['contextid'] = $contextid;
+        $params = array_merge($params, $unfinishedstatesparams);
         $filter = '';
 
         foreach ($wherearray as $key => $value) {
@@ -762,17 +770,15 @@ class catquiz {
 
         // TODO: nochmal anschauen.
         $select = '*';
-        $from = "{local_catquiz_catcontext} ccc1
-                JOIN {question_attempt_steps} qas
-                    ON ccc1.starttimestamp < qas.timecreated
-                    AND ccc1.endtimestamp > qas.timecreated
-                    AND qas.state NOT $unfinishedstatessql
+        $from = "{question_attempts} qa
+                JOIN {local_catquiz_items} lci ON lci.componentid = qa.questionid
+                JOIN {local_catquiz_catcontext} ccc ON lci.contextid = ccc.id
+                JOIN {adaptivequiz_attempt} aqa ON aqa.uniqueid = qa.questionusageid
+                JOIN {local_catquiz_attempts} lca ON lca.componentid = aqa.id AND lca.contextid = lci.contextid
+                JOIN {question_attempt_steps} qas ON qas.questionattemptid = qa.id AND qas.state NOT $unfinishedstatessql";
 
-                JOIN {question_attempts} qa
-                    ON qas.questionattemptid = qa.id";
-        ;
         $where = !empty($testitemids) ? 'qa.questionid IN (:testitemids)' : '1=1';
-        $where .= !empty($contextids) ? ' AND ccc1.id IN (:contextids)' : '';
+        $where .= !empty($contextids) ? ' AND ccc.id IN (:contextids)' : '';
         $where .= !empty($studentids) ? ' AND userid IN (:studentids)' : '';
 
         $testitemidstring = sprintf("%s", implode(',', $testitemids));
@@ -2454,6 +2460,19 @@ class catquiz {
             'todo',
             'invalid',
             'complete',
+        ];
+    }
+
+    /**
+     * Returns the state of questions that we are considered to be successfully graded automatically
+     *
+     * @return array
+     */
+    private static function get_graded_question_states() {
+        return [
+            'gradedright',
+            'gradedwrong',
+            'gradedpartial',
         ];
     }
 }
