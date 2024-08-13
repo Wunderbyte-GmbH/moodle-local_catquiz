@@ -5,6 +5,7 @@ The plugin local_catquiz implements full Computer Adaptive Testing (CAT) capabil
 
 ## Detailed description ##
 The plugin can be used with all types of questions in Moodle that allow for automatic scoring (e.g. multiple choice or cloze text). The plugin provides different IRT models:
+
 * dichotomous questions (only account for right or wrong answers)
     * Rasch-Model (1 parametric logistic model)
     * 2PL-Rasch-Birnbaum
@@ -16,6 +17,7 @@ The plugin can be used with all types of questions in Moodle that allow for auto
 The plugin enables the creation, administration and modification of different scales on which measurements are taken. For this purpose, the plug-in creates a new role "CAT Manager", which is authorized to perform these administrative tasks.
 
 Furthermore, the plugin allows to pursuit different test strategies:
+
 * running a normal CAT
 * adaptive diagnose for weakest/strongest ability in selected (sub-)scales
 * adaptive diagnose for all given (sub-)scales
@@ -24,11 +26,13 @@ Furthermore, the plugin allows to pursuit different test strategies:
 ### Dependencies
 
 For using this plugin, you are required to install the following plugins:
+
 * mod_adaptivequiz - the activity from which a CAT test can be started (vers 3.1 onwards). Please use the [wb-0.9.0-rc2 release in the wunderbyte fork](https://github.com/Wunderbyte-GmbH/moodle-mod_adaptivequiz/releases/tag/wb-0.9.0-rc2) until our changes are integrated into the [upstream plugin](https://github.com/vtos/moodle-mod_adaptivequiz) (in progress).
-* [adaptivequizcatmodel_catquiz](https://github.com/Wunderbyte-GmbH/moodle-adaptivequizcatmodel_catquiz/releases/tag/1.0.0) - which serves as a bridge between mod_adaptivequiz and local_adaptivequiz
+* [adaptivequizcatmodel_catquiz](https://github.com/Wunderbyte-GmbH/moodle-adaptivequizcatmodel_catquiz/releases/tag/1.0.2) - which serves as a bridge between mod_adaptivequiz and local_adaptivequiz
 * [local_wunderbyte_table](https://github.com/Wunderbyte-GmbH/moodle-local_wunderbyte_table) - database and tables handling
 
 It is recommended to install the following plugins as well:
+
 * local_shortcodes - helps to render results at any point in your courses
 * local_adaptivelearningpaths - adds the possibility to define learning paths based on quiz and adaptive quiz results (to be released soon)
 
@@ -43,7 +47,7 @@ The plugin tries to present questions matching the ability of the student. To as
 * Importer: imports items, params and scales from a csv file.
 
 ## CSV Importer ##
-The csv importer accepts different formats of separators and encodings. Some columns are mandatory whereas others are optional. Find detailed descriptions of all columns on the same page, also the demo csv file can be found in: local/catquiz/classes/importer/demo.csv
+* The csv importer accepts different formats of separators and encodings. Some columns are mandatory whereas others are optional. Find detailed descriptions of all columns on the same page, also the demo csv file can be found in: local/catquiz/classes/importer/demo.csv
 
 ## Contexts ##
 * When importing with the csv importer, and no context is defined, a new context is created automatically. It contains the items from the default context plus the newly imported items.
@@ -51,13 +55,14 @@ If a context is specified when importing new items, the context of the correspon
 For items to be updated via importer, the context id should be defined to enable matching with existing items.
 
 ## Shortcodes ##
-To use the shortcode functionality, use plugin filter_shortcodes: https://moodle.org/plugins/filter_shortcodes
+* To use the shortcode functionality, use plugin filter_shortcodes: https://moodle.org/plugins/filter_shortcodes
 
 Shortcodes can be added in any text area and label via editor, e.g. in the course.
 
 1. To display feedbacks of the past quiz attempts use [catquizfeedback].
 
 The following parameters can be defined:
+
 * numberofattempts=3 // Defined the number of feedbacks displayed in collapsables. Starting with the newest.
 
 2. To display an overview table of all scales use [catscalesoverview].
@@ -75,11 +80,11 @@ The following parameters can be defined:
 ## Installing via uploaded ZIP file ##
 
 1. Make sure to install the dependencies as described in [dependencies](#dependencies)
-1. Log in to your Moodle site as an admin and go to _Site administration >
+2. Log in to your Moodle site as an admin and go to _Site administration >
    Plugins > Install plugins_.
-2. Upload the ZIP file with the plugin code. You should only be prompted to add
+3. Upload the ZIP file with the plugin code. You should only be prompted to add
    extra details if your plugin type is not automatically detected.
-3. Check the plugin validation report and finish the installation.
+4. Check the plugin validation report and finish the installation.
 
 ## Installing manually ##
 
