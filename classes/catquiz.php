@@ -349,52 +349,61 @@ class catquiz {
         array $wherearray = []
     ) {
         global $DB;
+        [$unfinishedstatessql, $unfinishedstatesparams] = $DB->get_in_or_equal(
+            self::get_unfinished_question_states(),
+            SQL_PARAMS_NAMED,
+            'unfinishedstates'
+        );
 
-        // TODO @DAVID: Re-Construct the SQL-Statemente as this contains all problematic patterns that has been fixed above as well.
+        if ($contextid === 0) {
+            $contextid = get_default_context_id();
+        }
 
-        $contextfilter = $contextid === 0
-            ? $DB->sql_like('ccc1.json', ':default')
-            : "ccc1.id = :contextid";
-
-        list(, $contextfrom, , ) = self::get_sql_for_stat_base_request();
         $params = [];
+
         $select = "id,
-                idnumber,
-                name,
-                questiontext,
-                qtype,
-                categoryname,
-                question as component,
-                contextattempts as questioncontextattempts,
-                catscaleids";
-        $from = "( SELECT q.id, qbe.idnumber, q.name, q.questiontext, q.qtype, qc.name as categoryname, s2.contextattempts," .
-             $DB->sql_group_concat($DB->sql_concat("'-'", 'lci.catscaleid', "'-'")) ." as catscaleids
-            FROM {question} q
-                JOIN (
-                    SELECT *
-                    FROM (
-                        SELECT *, ROW_NUMBER() OVER (PARTITION BY questionbankentryid ORDER BY version DESC) n
-                        FROM {question_versions}
-                    ) s2
-                    WHERE n = 1
-                ) qv
-                ON q.id=qv.questionid
-                JOIN {question_bank_entries} qbe ON qv.questionbankentryid=qbe.id
-                JOIN {question_categories} qc ON qc.id=qbe.questioncategoryid
-                LEFT JOIN {local_catquiz_items} lci ON lci.componentid = q.id
-                LEFT JOIN (
-                    SELECT ccc1.id contextid, qa.questionid, COUNT(*) contextattempts
-                    FROM $contextfrom
-                    WHERE $contextfilter
-                    GROUP BY ccc1.id, qa.questionid
-                ) s2 ON q.id = s2.questionid
-                GROUP BY q.id, qbe.idnumber, q.name, q.questiontext, q.qtype, qc.name, s2.contextattempts
-            ) as s1";
+            idnumber,
+            name,
+            questiontext,
+            qtype,
+            categoryname,
+            'question' as component,
+            questioncontextattempts,
+            catscaleids";
+        $from = "(SELECT q.id, qbe.idnumber, q.name, q.questiontext, q.qtype,
+            qc.name as categoryname, questioncontextattempts, catscaleids
+              FROM mdl_question_bank_entries qbe
+              JOIN mdl_question_categories qc ON qc.id=qbe.questioncategoryid
+            -- Determine the highest version of a question item by given qbank entry id
+              JOIN (SELECT questionbankentryid, MAX(version) maxversion
+                FROM mdl_question_versions
+                GROUP BY questionbankentryid
+                ORDER BY questionbankentryid ASC) maxqv
+              ON maxqv.questionbankentryid = qbe.id
+              JOIN mdl_question_versions qv ON qv.questionbankentryid = qbe.id AND qv.version = maxqv.maxversion
+              JOIN mdl_question q ON q.id = qv.questionid
+            -- Calculate how often a given question has been answered within a catquiz for a given catcontext
+              LEFT JOIN (SELECT qbe.id, lci.contextid contextid, COUNT(DISTINCT lca.id) questioncontextattempts,
+              ".$DB->sql_group_concat($DB->sql_concat("'-'", 'lci.catscaleid', "'-'"))." catscaleids
+                FROM mdl_question q
+                JOIN mdl_question_versions qv ON qv.questionid = q.id
+                JOIN mdl_question_bank_entries qbe ON qbe.id = qv.questionbankentryid
+                LEFT JOIN (SELECT sqa.id, sqa.questionid, sqa.questionusageid
+                  FROM mdl_question_attempts sqa
+                  JOIN mdl_question_attempt_steps sqas ON sqas.questionattemptid = sqa.id
+                    AND sqas.status NOT $unfinishedstatessql) qa
+                ON qa.questionid = q.id
+                JOIN mdl_local_catquiz_items lci ON lci.componentid = q.id AND lci.contextid = :contextid
+                LEFT JOIN mdl_adaptivequiz_attempt aqa ON aqa.uniqueid = qa.questionusageid
+                LEFT JOIN mdl_local_catquiz_attempts lca ON lca.attemptid = aqa.id AND lca.contextid = lci.contextid
+                WHERE q.parent = 0
+                GROUP BY qbe.id, lci.contextid) attemptcount
+              ON attemptcount.id = qbe.id WHERE q.parent = 0) s1";
 
         $where = " ( " . $DB->sql_like('catscaleids', ':catscaleid', false, false, true) . ' OR catscaleids IS NULL ) ';
         $params['catscaleid'] = "%-$catscaleid-%";
         $params['contextid'] = $contextid;
-        $params['default'] = '%"default":true%';
+        $params = array_merge($params, $unfinishedstatesparams);
         $filter = '';
 
         foreach ($wherearray as $key => $value) {
@@ -759,19 +768,16 @@ class catquiz {
             'unfinishedstates'
         );
 
-        // TODO: nochmal anschauen.
         $select = '*';
-        $from = "{local_catquiz_catcontext} ccc1
-                JOIN {question_attempt_steps} qas
-                    ON ccc1.starttimestamp < qas.timecreated
-                    AND ccc1.endtimestamp > qas.timecreated
-                    AND qas.state NOT $unfinishedstatessql
+        $from = "{question_attempts} qa
+                JOIN {local_catquiz_items} lci ON lci.componentid = qa.questionid
+                JOIN {local_catquiz_catcontext} ccc ON lci.contextid = ccc.id
+                JOIN {adaptivequiz_attempt} aqa ON aqa.uniqueid = qa.questionusageid
+                JOIN {local_catquiz_attempts} lca ON lca.attemptid = aqa.id AND lca.contextid = lci.contextid
+                JOIN {question_attempt_steps} qas ON qas.questionattemptid = qa.id AND qas.state NOT $unfinishedstatessql";
 
-                JOIN {question_attempts} qa
-                    ON qas.questionattemptid = qa.id";
-        ;
         $where = !empty($testitemids) ? 'qa.questionid IN (:testitemids)' : '1=1';
-        $where .= !empty($contextids) ? ' AND ccc1.id IN (:contextids)' : '';
+        $where .= !empty($contextids) ? ' AND ccc.id IN (:contextids)' : '';
         $where .= !empty($studentids) ? ' AND userid IN (:studentids)' : '';
 
         $testitemidstring = sprintf("%s", implode(',', $testitemids));
@@ -820,47 +826,6 @@ class catquiz {
         $params = [];
         $filter = '';
 
-        // TODO: SQL vereinfachen.
-        // FRAGE @DAVID: Werden die ehemaligen Angaben noch gebraucht?
-
-        // phpcs:disable
-        /* Old code:
-        $select = "
-            c.id,
-            name,
-            component,
-            c.visible,
-            availability,
-            c.lang,
-            status,
-            parentid,
-            fullname,
-            c.timemodified,
-            c.timecreated,
-            ct.catscaleid,
-            numberofitems,
-            teachers";
-
-        $from = "
-        {local_catquiz_tests} ct
-        JOIN {course} c ON c.id = ct.courseid
-        LEFT JOIN (SELECT catscaleid as itemcatscale, COUNT(*) numberofitems
-           FROM {local_catquiz_items}
-           GROUP BY catscaleid
-        ) s1 ON ct.catscaleid = s1.itemcatscale
-        LEFT JOIN (
-            SELECT c.id courseid, " .
-                $DB->sql_group_concat($DB->sql_concat_join("' '", ['u.firstname', 'u.lastname']), ', ') . " teachers
-            FROM {user} u
-            JOIN {role_assignments} ra ON ra.userid = u.id
-            JOIN {context} ct ON ct.id = ra.contextid
-            JOIN {course} c ON c.id = ct.instanceid
-            JOIN {role} r ON r.id = ra.roleid
-            WHERE r.shortname IN ('teacher', 'editingteacher')
-            GROUP BY c.id
-            ) s2 ON s2.courseid = ct.courseid";
-        */
-        // phpcs:enable
 
         $select = " * ";
 
@@ -881,15 +846,11 @@ class catquiz {
             (CASE WHEN componentid <> 0 THEN 1 ELSE 0 END) istest
         FROM {local_catquiz_tests} ct
         LEFT JOIN {course} c ON c.id = ct.courseid
-        LEFT JOIN {adaptivequiz} aq ON ct.componentid = aq.id
+        LEFT JOIN {adaptivequiz} aq ON ct.componentid = aq.id AND ct.component = 'mod_adaptivequiz'
         LEFT JOIN (
-            SELECT instance, COUNT(*) as users
-            FROM (
-                SELECT instance, userid
-                FROM {adaptivequiz_attempt} at
-                GROUP BY at.instance, at.userid
-            ) s4
-            GROUP BY s4.instance
+          SELECT instance, COUNT(DISTINCT userid) as users
+            FROM {adaptivequiz_attempt}
+          GROUP BY instance, userid
         ) s2 ON s2.instance = ct.componentid
         ) s3";
 
@@ -2453,6 +2414,19 @@ class catquiz {
             'todo',
             'invalid',
             'complete',
+        ];
+    }
+
+    /**
+     * Returns the state of questions that we are considered to be successfully graded automatically
+     *
+     * @return array
+     */
+    private static function get_graded_question_states() {
+        return [
+            'gradedright',
+            'gradedwrong',
+            'gradedpartial',
         ];
     }
 }

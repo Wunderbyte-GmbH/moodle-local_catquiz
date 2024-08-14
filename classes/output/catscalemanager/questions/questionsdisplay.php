@@ -204,7 +204,7 @@ class questionsdisplay {
      *
      */
     private function render_addtestitems_table(int $catscaleid) {
-        $id = $catscaleid > -1 ? $catscaleid : 0;
+        $id = $catscaleid > 0 ? $catscaleid : 0;
 
         $catcontextid = empty($this->catcontextid) ? optional_param('contextid', 0, PARAM_INT) : $this->catcontextid;
 
@@ -247,6 +247,10 @@ class questionsdisplay {
             'shortanswer' => get_string('pluginname', 'qtype_shortanswer'),
             'truefalse' => get_string('pluginname', 'qtype_truefalse'),
         ]);
+
+        // TODO: Der Filter muss dynamisch erzeugt werden: $sql_result->qtype => getstring('pluginname', 'qtype_'.$sql_result->qtype),
+        // @DAVID: Wie werden nur manuell gegradete Fragetypen (z.B. essay) ausgefiltert?
+
         $table->add_filter($standardfilter);
 
         $table->define_fulltextsearchcolumns(['idnumber', 'name', 'questiontext', 'qtype']);
