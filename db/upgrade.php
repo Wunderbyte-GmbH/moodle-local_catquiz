@@ -895,14 +895,14 @@ function xmldb_local_catquiz_upgrade($oldversion) {
         $sql = "SELECT lcip.id id, lci1.id itemidold, lci2.id itemidnew
             FROM {local_catquiz_itemparams} lcip
             JOIN {local_catquiz_items} lci1 ON lci1.id = lcip.itemid
-            LEFT JOIN {local_catquiz_items} lci2 ON lci2.componentid = lci1.componentid
+            JOIN {local_catquiz_items} lci2 ON lci2.componentid = lci1.componentid
               AND lci2.componentname = lci1.componentname AND lci2.contextid = lcip.contextid";
 
         $sqlresult = $DB->get_records_sql($sql);
 
         foreach ($sqlresult as $lcip) {
             if ($lcip->itemidold !== $lcip->itemidnew) {
-                if (!$lcip->id) {
+                if (!$lcip->id || !$lcip->itemidnew) {
                     continue;
                 }
 
