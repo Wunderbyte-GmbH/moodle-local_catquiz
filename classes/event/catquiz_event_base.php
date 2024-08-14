@@ -35,9 +35,12 @@ use stdClass;
 abstract class catquiz_event_base extends \core\event\base {
     /**
      * Returns the 'other' data as object
-     * @return stdClass
+     * @return ?stdClass
      */
-    protected function get_other_data(): stdClass {
+    protected function get_other_data(): ?stdClass {
+        if (!$this->data['other']) {
+            return null;
+        }
         if (is_array($this->data['other'])) {
             return (object) $this->data['other'];
         }
