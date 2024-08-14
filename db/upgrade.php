@@ -609,7 +609,9 @@ function xmldb_local_catquiz_upgrade($oldversion) {
             $itemid = $row->itemid;
             $contextid = $row->contextid;
 
-            if (!$itemid) { continue; }
+            if (!$itemid) {
+                continue;
+            }
 
             $sql = "SELECT id
                 FROM {local_catquiz_itemparams} lcip
@@ -831,7 +833,7 @@ function xmldb_local_catquiz_upgrade($oldversion) {
 
     if ($oldversion < 2024081200) {
 
-        // Also add 'component' and 'eventname' as index to the log table for improving performance
+        // Also add 'component' and 'eventname' as index to the log table for improving performance.
         $table = new xmldb_table('logstore_standard_log');
         $indexes = [];
         $indexes[] = new xmldb_index('component', XMLDB_INDEX_NOTUNIQUE, ['component']);
@@ -862,10 +864,11 @@ function xmldb_local_catquiz_upgrade($oldversion) {
 
     if ($oldversion < 2024081300) {
 
-        // Adding all necessary duplicates for different catcontexts to catquiz_items table
-        // according to catquiz_itemparams and updating catquiz_item_params accordingly.
+        /* Adding all necessary duplicates for different catcontexts to catquiz_items table
+         * according to catquiz_itemparams and updating catquiz_item_params accordingly.
+         */
 
-        // Duplicating catquiz_items entrys if needed
+        // Duplicating catquiz_items entrys if needed.
         $sql = "SELECT id, itemid, contextid, MAX(timemodified) timemodified
             FROM {local_catquiz_itemparams}
             GROUP BY itemid, contextid";
@@ -874,7 +877,7 @@ function xmldb_local_catquiz_upgrade($oldversion) {
 
         foreach ($sqlresult as $lcip) {
 
-            // Load catquiz_items infomation
+            // Load catquiz_items infomation.
             $sql = "SELECT *
                 FROM {local_catquiz_items}
                 WHERE id = ".$lcip->itemid;
@@ -899,7 +902,9 @@ function xmldb_local_catquiz_upgrade($oldversion) {
 
         foreach ($sqlresult as $lcip) {
             if ($lcip->itemidold !== $lcip->itemidnew) {
-                if (!$lcip->id) { continue; }
+                if (!$lcip->id) {
+                    continue;
+                }
 
                 $updaterecord = new stdclass;
                 $updaterecord->id = $lcip->id;
@@ -911,13 +916,21 @@ function xmldb_local_catquiz_upgrade($oldversion) {
         // Reset all active paramids in all new catquiz_items entries.
         $sql = "SELECT lci.id id, lcip.id activeparamid
                 FROM {local_catquiz_items} lci
-                  JOIN (SELECT itemid, MAX(status) status FROM {local_catquiz_itemparams} GROUP BY itemid) activestatus ON activestatus.itemid = lci.id
-                  JOIN {local_catquiz_itemparams} lcip ON lcip.itemid = lci.id AND lcip.contextid = lci.contextid AND lcip.status = activestatus.status";
+                  JOIN (
+                    SELECT itemid, MAX(status) status
+                    FROM {local_catquiz_itemparams} GROUP BY itemid
+                  ) activestatus ON activestatus.itemid = lci.id
+                  JOIN {local_catquiz_itemparams} lcip
+                    ON lcip.itemid = lci.id
+                    AND lcip.contextid = lci.contextid
+                    AND lcip.status = activestatus.status";
 
         $sqlresult = $DB->get_record_sql($sql);
 
         foreach ($sqlresult as $lci) {
-            if (!$lci->id) { continue; }
+            if (!$lci->id) {
+                continue;
+            }
 
             $updaterecord = new stdclass;
             $updaterecord->id = $lci->id;
