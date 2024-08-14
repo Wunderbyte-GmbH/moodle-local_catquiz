@@ -896,7 +896,8 @@ function xmldb_local_catquiz_upgrade($oldversion) {
             FROM {local_catquiz_itemparams} lcip
             JOIN {local_catquiz_items} lci1 ON lci1.id = lcip.itemid
             JOIN {local_catquiz_items} lci2 ON lci2.componentid = lci1.componentid
-              AND lci2.componentname = lci1.componentname AND lci2.contextid = lcip.contextid";
+              AND lci2.componentname = lci1.componentname AND lci2.contextid = lcip.contextid
+              AND lci2.id <> lci1.id";
 
         $sqlresult = $DB->get_records_sql($sql);
 
