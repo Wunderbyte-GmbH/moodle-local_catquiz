@@ -1008,6 +1008,11 @@ class catquiz_handler {
             'se_min' => $quizsettings->catquiz_standarderrorgroup->catquiz_standarderror_min,
             'pp_min_inc' => $quizsettings->catquiz_pp_min_inc ?? 0.01,
         ];
+
+        if (property_exists($quizsettings, 'fake_use_tr_factor')) {
+            $initialcontext['fake_use_tr_factor'] = $quizsettings->fake_use_tr_factor;
+        }
+
         return $contextcreator->load(
             [
                 'progress',

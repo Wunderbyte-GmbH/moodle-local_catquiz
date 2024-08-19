@@ -235,7 +235,7 @@ class updatepersonability extends preselect_task implements wb_middleware {
                 $this->parentse,
                 $this->get_min_ability_for_scale($catscaleid),
                 $this->get_max_ability_for_scale($catscaleid),
-                $this->ability_was_calculated($this->context['catscaleid'], false)
+                $this->use_tr_factor()
             );
         } catch (moodle_exception $e) {
             // If we get an excpetion, re-throw it with more information.
@@ -311,7 +311,7 @@ class updatepersonability extends preselect_task implements wb_middleware {
                     $this->parentse,
                     $this->get_min_ability_for_scale($catscaleid),
                     $this->get_max_ability_for_scale($catscaleid),
-                    $this->ability_was_calculated($this->context['catscaleid'])
+                    $this->use_tr_factor()
                 );
 
                 $this->progress->set_ability($ability, $scale);
@@ -569,5 +569,9 @@ class updatepersonability extends preselect_task implements wb_middleware {
         $catscaleclass = new catscale($catscaleid);
         $this->scaleabilityrange[$catscaleid] = $catscaleclass->get_ability_range();
         return $this->scaleabilityrange[$catscaleid]['maxscalevalue'];
+    }
+
+    protected function use_tr_factor(): bool {
+        return $this->ability_was_calculated($this->context['catscaleid'], false);
     }
 }
