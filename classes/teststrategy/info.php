@@ -173,6 +173,7 @@ class info {
                     LOCAL_CATQUIZ_STRATEGY_HIGHESTSUB,
                     LOCAL_CATQUIZ_STRATEGY_ALLSUBS,
                     LOCAL_CATQUIZ_STRATEGY_FASTEST,
+                    LOCAL_CATQUIZ_STRATEGY_RELSUBS,
                     ])) {
                 $strategyhasstandarderrorperscale[] = $ts->id;
             }
