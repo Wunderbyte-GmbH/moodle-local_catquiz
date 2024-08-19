@@ -441,6 +441,10 @@ class feedbacksettings {
         return $this->sortorder === LOCAL_CATQUIZ_SORTORDER_DESC;
     }
 
+    public function is_sorted_by_name() {
+        return $this->sortorder = LOCAL_CATQUIZ_SORTORDER_BY_NAME;
+    }
+
     /**
      * Set sort order to ascending
      *
@@ -448,6 +452,11 @@ class feedbacksettings {
      */
     public function set_sort_ascending() {
         $this->sortorder = LOCAL_CATQUIZ_SORTORDER_ASC;
+        return $this;
+    }
+
+    public function set_sort_by_name() {
+        $this->sortorder = LOCAL_CATQUIZ_SORTORDER_BY_NAME;
         return $this;
     }
 }

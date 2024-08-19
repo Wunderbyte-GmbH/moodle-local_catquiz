@@ -138,7 +138,7 @@ class relevantscales extends strategy {
      */
     public function apply_feedbacksettings(feedbacksettings $feedbacksettings) {
 
-        $this->feedbacksettings = $feedbacksettings->set_sort_ascending();
+        $this->feedbacksettings = $feedbacksettings->set_sort_by_name();
     }
 
     /**
@@ -158,46 +158,26 @@ class relevantscales extends strategy {
         int $catscaleid = 0,
         bool $feedbackonlyfordefinedscaleid = false
         ): array {
+        // If Fraction is 1 (all answers correct) or 0 (all answers wrong) mark abilities as estimated.
+        $estimated = $feedbacksettings->fraction == 1 || $feedbacksettings->fraction == 0;
+        $rootscaleid = $feedbackdata['catscaleid'];
 
-        // Fraction can not be 1 (all answers correct).
-        if ($feedbacksettings->fraction >= 1) {
-            $returnarray = [];
-            foreach ($personabilities as $scaleid => $array) {
-                $returnarray[$scaleid] = [
-                    'value' => $array['value'],
-                    'excluded' => true,
-                ];
-                $returnarray[$scaleid]['error']['fraction'] = [
-                    'fraction' => $feedbacksettings->fraction,
-                    'expected' => '< 1',
-                ];
-            }
-            return $returnarray;
-        }
         // Exclude scales that don't meet minimum of items required in quizsettings.
         $personabilities = $feedbacksettings->filter_nminscale($personabilities, $feedbackdata);
         // Exclude scales where standarderror is not in range.
         $personabilities = $feedbacksettings->filter_semax($personabilities, $feedbackdata);
 
-        if ($feedbackonlyfordefinedscaleid && !empty($catscaleid)) {
-            // Force selected scale. Will also be applied to excluded scales.
-            $relevantscale = $personabilities[$catscaleid];
-        } else {
-            $filterabilities = [];
-            foreach ($personabilities as $scaleid => $array) {
-                if (!isset($array['error']) && !isset($array['excluded'])) {
-                    $filterabilities[$scaleid] = $array['value'];
-                }
+        foreach ($personabilities as $scaleid => $abilitiesarray) {
+            $personabilities[$scaleid]['toreport'] = true;
+            if ($estimated) {
+                $personabilities[$scaleid]['estimated'] = true;
+                $personabilities[$scaleid]['fraction'] = $feedbacksettings->fraction;
             }
-            if (count($filterabilities) < 1) {
-                return $personabilities;
+            if ($scaleid == $rootscaleid) {
+                $personabilities[$scaleid]['primary'] = true;
             }
-            // In this strategy, the scale with lowest value is set primary.
-            $relevantscale = array_search(min($filterabilities), $filterabilities);
+
         }
-        $personabilities[$relevantscale]['primary'] = true;
-        $personabilities[$relevantscale]['toreport'] = true;
-        $personabilities[$relevantscale]['primarybecause'] = 'lowestskill';
 
         return $personabilities;
     }

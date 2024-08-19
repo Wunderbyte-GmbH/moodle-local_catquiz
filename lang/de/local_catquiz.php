@@ -353,6 +353,7 @@ $string['includetimelimit_help'] = 'Maximaldauer festlegen, die für die Durchf�
 $string['inferallsubscales'] = 'Alle untergeordneten Skalen bestimmen';
 $string['infergreateststrength'] = 'Größte Stärke diagnostizieren';
 $string['inferlowestskillgap'] = 'Unterste Kompetenzlücke diagnostizieren';
+$string['relevantscales'] = 'Skalen im Kompetenzbereich abprüfen';
 $string['instance'] = 'Test';
 $string['integratequestions'] = 'Fragen aus untergeordneten Skalen einbeziehen';
 $string['invisible'] = 'Unsichtbar';

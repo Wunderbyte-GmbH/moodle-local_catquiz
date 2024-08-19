@@ -993,7 +993,9 @@ class catquiz_handler {
             'skip_reason' => null,
             'userid' => $USER->id,
             'max_attempts_per_scale' => $maxquestionsperscale,
-            'min_attempts_per_scale' => $quizsettings->maxquestionsscalegroup->catquiz_minquestionspersubscale ?? 0,
+            'min_attempts_per_scale' => $quizsettings->maxquestionsscalegroup->catquiz_minquestionspersubscale
+                ? intval($quizsettings->maxquestionsscalegroup->catquiz_minquestionspersubscale)
+                : 0,
             'teststrategy' => $quizsettings->catquiz_selectteststrategy,
             'timestamp' => time(),
             'attemptid' => intval($attemptdata->id),

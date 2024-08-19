@@ -343,6 +343,7 @@ $string['includetimelimit_help'] = 'Define a maximum duration for an attempt to 
 $string['inferallsubscales'] = 'Infer all subscales';
 $string['infergreateststrength'] = 'Infer greatest strength';
 $string['inferlowestskillgap'] = 'Infer lowest skill gap';
+$string['relevantscales'] = 'Infer relevant subscales';
 $string['instance'] = 'Test';
 $string['integratequestions'] = 'Integrate questions from subscales';
 $string['invisible'] = 'Invisible';

@@ -45,7 +45,7 @@ class strategyrelevantscore extends strategyscore {
         $difficulty,
         $scaleability,
         $scalecount,
-        $minattemptsperscale
+        int $minattemptsperscale
     ) {
         return (
             1 / (

@@ -450,6 +450,8 @@ abstract class feedbackgenerator {
         // Sort the array and put primary scale first.
         if ($this->feedbacksettings->is_sorted_ascending()) {
             asort($personabilities);
+        } else if ($this->feedbacksettings->is_sorted_by_name()) {
+            uasort($personabilities, fn ($a, $b) => $a['name'] <=> $b['name']);
         } else {
             arsort($personabilities);
         }
