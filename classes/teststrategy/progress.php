@@ -704,6 +704,15 @@ class progress implements JsonSerializable {
         return $this;
     }
 
+    /**
+     * Shows if the given scale was dropped.
+     *
+     * In contrast to a deactivated scale, a dropped scale is removed
+     * permanently for the current quiz attempt.
+     *
+     * @param mixed $scaleid
+     * @return bool
+     */
     public function is_dropped_scale($scaleid) {
         return array_key_exists($scaleid, $this->droppedscales);
     }

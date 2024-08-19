@@ -571,6 +571,11 @@ class updatepersonability extends preselect_task implements wb_middleware {
         return $this->scaleabilityrange[$catscaleid]['maxscalevalue'];
     }
 
+    /**
+     * Use the trusted region factor
+     *
+     * @return bool
+     */
     protected function use_tr_factor(): bool {
         return $this->ability_was_calculated($this->context['catscaleid'], false);
     }

@@ -143,6 +143,11 @@ class updatepersonability_testing extends updatepersonability {
         return $this->context['fake_ability_was_calculated'] ?? parent::ability_was_calculated($catscaleid, $includelastresponse);
     }
 
+    /**
+     * Use the trusted region factor
+     *
+     * @return bool
+     */
     protected function use_tr_factor(): bool {
         return $this->context['fake_use_tr_factor'] ?? parent::use_tr_factor();
     }
