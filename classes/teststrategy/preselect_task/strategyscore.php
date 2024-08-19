@@ -42,6 +42,8 @@ use stdClass;
 abstract class strategyscore extends preselect_task implements wb_middleware {
 
     /**
+     * Returns the scale term
+     *
      * @param float $testinfo
      * @param float $abilitydifference
      * @return mixed
@@ -49,6 +51,8 @@ abstract class strategyscore extends preselect_task implements wb_middleware {
     abstract protected function get_question_scaleterm(float $testinfo, float $abilitydifference);
 
     /**
+     * Returns the item term
+     *
      * @param float $testinfo
      * @param float $fraction
      * @param mixed $difficulty
@@ -67,15 +71,28 @@ abstract class strategyscore extends preselect_task implements wb_middleware {
     );
 
     /**
+     * Returns the score for the given question and scaleid
+     *
      * @param stdClass $question
+     * @param int $scaleid
      * @return mixed
      */
     abstract protected function get_score(stdClass $question, int $scaleid);
 
+    /**
+     * Returns the active scales
+     *
+     * @return array
+     */
     protected function get_scales(): array {
         return $this->progress->get_active_scales();
     }
 
+    /**
+     * Checks if a scale should be ignored
+     *
+     * @return bool
+     */
     protected function ignore_scale(int $scaleid): bool {
         return !$this->progress->is_active_scale($scaleid);
     }
@@ -182,11 +199,15 @@ abstract class strategyscore extends preselect_task implements wb_middleware {
     /**
      * Helper function for debugging
      *
+     * @param int $scaleid
      * @param string $lastquestionlabel Only print if the last question has that label
      * @param stdClass $question The current question
      * @param array $debuglabels Only print output for questions with that label
      * @param float $testinfo Testinfo for the selected question's scale
      * @param float $scaleability Ability for the selected question's scale
+     * @param float $standarderror
+     * @param float $fraction
+     * @param int $minattemptsperscale
      */
     private function print_debug_info(
         int $scaleid,

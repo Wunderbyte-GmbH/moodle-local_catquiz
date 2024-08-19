@@ -35,10 +35,28 @@ use stdClass;
  */
 class strategydeficitscore extends strategyscore {
 
+    /**
+     * Returns the scale term
+     *
+     * @param float $testinfo
+     * @param float $abilitydifference
+     * @return mixed
+     */
     protected function get_question_scaleterm(float $testinfo, float $abilitydifference) {
         return 1 / (1 + exp($testinfo * $abilitydifference));
     }
 
+    /**
+     * Returns the item term
+     *
+     * @param float $testinfo
+     * @param float $fraction
+     * @param mixed $difficulty
+     * @param mixed $scaleability
+     * @param mixed $scalecount
+     * @param int $minattemptsperscale
+     * @return mixed
+     */
     protected function get_question_itemterm(
         float $testinfo,
         float $fraction,
@@ -52,6 +70,12 @@ class strategydeficitscore extends strategyscore {
         )) ** $scalecount;
     }
 
+    /**
+     * Returns the score for the given question and scaleid
+     *
+     * @param stdClass $question
+     * @return mixed
+     */
     protected function get_score(stdClass $question, int $scaleid) {
                 return $question->fisherinformation[$scaleid]
                     * $question->processterm

@@ -441,6 +441,11 @@ class feedbacksettings {
         return $this->sortorder === LOCAL_CATQUIZ_SORTORDER_DESC;
     }
 
+    /**
+     * Returns if scales are sorted by name
+     *
+     * @return bool
+     */
     public function is_sorted_by_name() {
         return $this->sortorder = LOCAL_CATQUIZ_SORTORDER_BY_NAME;
     }
@@ -455,6 +460,11 @@ class feedbacksettings {
         return $this;
     }
 
+    /**
+     * Sets the sortorder to sort by name
+     *
+     * @return self
+     */
     public function set_sort_by_name() {
         $this->sortorder = LOCAL_CATQUIZ_SORTORDER_BY_NAME;
         return $this;
