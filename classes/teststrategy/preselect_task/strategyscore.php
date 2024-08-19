@@ -148,17 +148,6 @@ abstract class strategyscore extends preselect_task implements wb_middleware {
                 if (! property_exists($question, 'score') || $score > $question->score) {
                     $question->score = $score;
                 }
-                $this->print_debug_info(
-                    $scaleid,
-                    'SIMC04-18',
-                    $question,
-                    ['SIMC04-02', 'SIMC07-14'],
-                    $testinfo,
-                    $scaleability,
-                    $standarderrorplayed,
-                    $scalefractions[$scaleid],
-                    $context['min_attempts_per_scale']
-                );
             }
         }
 
