@@ -31,6 +31,8 @@ use local_catquiz\catcontext;
 function xmldb_local_catquiz_install() {
     global $DB;
 
+    $dbman = $DB->get_manager();
+
     $role = $DB->get_record('role', ['shortname' => 'catquizmanager']);
     if (empty($role->id)) {
         $sql = "SELECT MAX(sortorder)+1 AS id FROM {role}";
@@ -78,7 +80,7 @@ function xmldb_local_catquiz_install() {
         }
     }
 
-    // Also add 'component' and 'eventname' as index to the log table for improving performance
+    // Also add 'component' and 'eventname' as index to the log table for improving performance.
     $table = new xmldb_table('logstore_standard_log');
     $indexes = [];
     $indexes[] = new xmldb_index('component', XMLDB_INDEX_NOTUNIQUE, ['component']);
