@@ -88,7 +88,7 @@ function xmldb_local_catquiz_install() {
 
     // Conditionally launch add fields, keys and indexes.
     foreach ($indexes as $index) {
-        if (!$dbman->index_exists($table, $index)) {
+        if ($dbman->table_exists($table) && !$dbman->index_exists($table, $index)) {
             $dbman->add_index($table, $index);
         }
     }
