@@ -1118,6 +1118,7 @@ final class strategy_test extends advanced_testcase {
                     'standarderror_min' => 0.25,
                     'standarderror_max' => 0.5,
                     'minquestionspersubscale' => 3,
+                    'fake_use_tr_factor' => false,
                 ],
                 'final_abilities' => [
                     'Simulation' => -3.21,
@@ -1208,6 +1209,7 @@ final class strategy_test extends advanced_testcase {
                     'standarderror_min' => 0.25,
                     'standarderror_max' => 0.5,
                     'minquestionspersubscale' => 3,
+                    'fake_use_tr_factor' => false,
                 ],
                 'final_abilities' => [
                     'Simulation' => 4.62,
@@ -1301,6 +1303,7 @@ final class strategy_test extends advanced_testcase {
                     'standarderror_min' => 0.25,
                     'standarderror_max' => 0.5,
                     'minquestionspersubscale' => 3,
+                    'fake_use_tr_factor' => false,
                 ],
                 'final_abilities' => [
                     'Simulation' => 3.4,
@@ -1355,6 +1358,7 @@ final class strategy_test extends advanced_testcase {
                     'standarderror_min' => 0.25,
                     'standarderror_max' => 0.5,
                     'minquestionspersubscale' => 3,
+                    'fake_use_tr_factor' => false,
                 ],
                 'final_abilities' => [
                     'Simulation' => -3.79,
@@ -1412,6 +1416,7 @@ final class strategy_test extends advanced_testcase {
                     'standarderror_min' => 0.25,
                     'standarderror_max' => 0.5,
                     'minquestionspersubscale' => 3,
+                    'fake_use_tr_factor' => false,
                 ],
                 'final_abilities' => [
                     'Simulation' => -4.92,
@@ -1596,6 +1601,10 @@ final class strategy_test extends advanced_testcase {
         if (!empty($settings['standarderror_min'])) {
             $jsondata->catquiz_standarderrorgroup->catquiz_standarderror_min = $settings['standarderror_min'];
         }
+        if (isset($settings['fake_use_tr_factor'])) {
+            $jsondata->fake_use_tr_factor = $settings['fake_use_tr_factor'];
+        }
+
         $jsondata->catquiz_pp_min_inc = $settings['pp_min_inc'] ?? 0.01;
         if ($pilotratio = $settings['pilot_ratio'] ?? null) {
             $jsondata->catquiz_includepilotquestions = true;

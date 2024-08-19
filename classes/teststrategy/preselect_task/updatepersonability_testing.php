@@ -142,4 +142,8 @@ class updatepersonability_testing extends updatepersonability {
     protected function ability_was_calculated(int $catscaleid, bool $includelastresponse = true) {
         return $this->context['fake_ability_was_calculated'] ?? parent::ability_was_calculated($catscaleid, $includelastresponse);
     }
+
+    protected function use_tr_factor(): bool {
+        return $this->context['fake_use_tr_factor'] ?? parent::use_tr_factor();
+    }
 }
