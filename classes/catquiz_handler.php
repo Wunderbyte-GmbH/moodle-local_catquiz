@@ -1023,6 +1023,7 @@ class catquiz_handler {
                 'questions',
                 'pilot_questions',
                 'se',
+                'initial_scales',
             ],
             $initialcontext
         );
