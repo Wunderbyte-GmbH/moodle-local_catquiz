@@ -354,6 +354,7 @@ $string['inferallsubscales'] = 'Alle untergeordneten Skalen bestimmen';
 $string['infergreateststrength'] = 'Größte Stärke diagnostizieren';
 $string['inferlowestskillgap'] = 'Unterste Kompetenzlücke diagnostizieren';
 $string['relevantscales'] = 'Skalen im Kompetenzbereich abprüfen';
+$string['allscales'] = 'Alle angegebenen Skalen abprüfen';
 $string['instance'] = 'Test';
 $string['integratequestions'] = 'Fragen aus untergeordneten Skalen einbeziehen';
 $string['invisible'] = 'Unsichtbar';
