@@ -65,7 +65,7 @@ class filterbytestinfo extends preselect_task implements wb_middleware {
             LOCAL_CATQUIZ_STRATEGY_LOWESTSUB,
             LOCAL_CATQUIZ_STRATEGY_HIGHESTSUB,
             LOCAL_CATQUIZ_STRATEGY_RELSUBS,
-            LOCAL_CATQUIZ_STRATEGY_ALLSCALES,
+            LOCAL_CATQUIZ_STRATEGY_ALLSUBS,
             ])) {
             return $next($context);
         }

@@ -344,7 +344,6 @@ $string['inferallsubscales'] = 'Infer all subscales';
 $string['infergreateststrength'] = 'Infer greatest strength';
 $string['inferlowestskillgap'] = 'Infer lowest skill gap';
 $string['relevantscales'] = 'Infer relevant subscales';
-$string['allscales'] = 'Infer all subscales';
 $string['instance'] = 'Test';
 $string['integratequestions'] = 'Integrate questions from subscales';
 $string['invisible'] = 'Invisible';
