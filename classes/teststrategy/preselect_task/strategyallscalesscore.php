@@ -15,7 +15,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Class strategydeficitscore.
+ * Class strategyallscalesscore.
  *
  * @package local_catquiz
  * @copyright 2024 Wunderbyte GmbH
@@ -27,13 +27,13 @@ namespace local_catquiz\teststrategy\preselect_task;
 use stdClass;
 
 /**
- * Add a score to each question and sort questions descending by score
+ * Calculates the question score when the allscales strategy is used.
  *
  * @package local_catquiz
  * @copyright 2024 Wunderbyte GmbH
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class strategydeficitscore extends strategyscore {
+class  strategyallscalesscore extends strategyscore {
 
     /**
      * Returns the scale term
@@ -43,7 +43,7 @@ class strategydeficitscore extends strategyscore {
      * @return mixed
      */
     protected function get_question_scaleterm(float $testinfo, float $abilitydifference) {
-        return 1 / (1 + exp($testinfo * $abilitydifference));
+        return 1;
     }
 
     /**
@@ -63,11 +63,12 @@ class strategydeficitscore extends strategyscore {
         $difficulty,
         $scaleability,
         $scalecount,
-        $minattemptsperscale
+        int $minattemptsperscale
     ) {
-        return (1 / (
-            1 + exp($testinfo * 2 * (0.5 - $fraction) * ($difficulty - $scaleability))
-        )) ** $scalecount;
+        return (
+            1 / (
+                1 + exp($testinfo * 2 * (0.5 - $fraction) * ($difficulty - $scaleability)))
+            ) ** max(1, $scalecount - $minattemptsperscale + 1);
     }
 
     /**
@@ -83,5 +84,20 @@ class strategydeficitscore extends strategyscore {
                     * $question->scaleterm
                     * $question->itemterm
                     * $question->lasttimeplayedpenaltyfactor;
+    }
+
+    /**
+     * Returns the ability for the given scale
+     *
+     * If there is no ability, it will return the ability of the root scale.
+     *
+     * @param int $scaleid
+     * @return ?float
+     */
+    protected function get_scale_ability(int $scaleid): ?float {
+        if ($ability = parent::get_scale_ability($scaleid)) {
+            return $ability;
+        }
+        return $this->progress->get_abilities()[$this->context['catscaleid']];
     }
 }

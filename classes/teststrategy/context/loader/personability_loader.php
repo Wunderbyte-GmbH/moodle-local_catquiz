@@ -156,7 +156,7 @@ class personability_loader implements contextloaderinterface {
      * Allows tests to override the default ability.
      * @return float
      */
-    private function get_default_ability() {
+    public static function get_default_ability() {
         return floatval(getenv('CATQUIZ_TESTING_ABILITY', true) ?: self::DEFAULT_ABILITY);
     }
 }

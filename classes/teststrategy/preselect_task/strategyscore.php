@@ -91,10 +91,24 @@ abstract class strategyscore extends preselect_task implements wb_middleware {
     /**
      * Checks if a scale should be ignored
      *
+     * @param int $scaleid
      * @return bool
      */
     protected function ignore_scale(int $scaleid): bool {
         return !$this->progress->is_active_scale($scaleid);
+    }
+
+    /**
+     * Return the ability for the given scale.
+     *
+     * @param int $scaleid
+     * @return ?float
+     */
+    protected function get_scale_ability(int $scaleid): ?float {
+        if (!array_key_exists($scaleid, $this->progress->get_abilities())) {
+            return null;
+        }
+        return $this->progress->get_abilities()[$scaleid];
     }
 
     /**
@@ -138,12 +152,11 @@ abstract class strategyscore extends preselect_task implements wb_middleware {
 
             foreach ($affectedscales as $scaleid) {
                 if ($this->ignore_scale($scaleid)
-                    || !array_key_exists($scaleid, $this->progress->get_abilities())
+                    || is_null($scaleability = $this->get_scale_ability($scaleid))
                 ) {
                     continue;
                 }
 
-                $scaleability = $this->progress->get_abilities()[$scaleid];
                 $myitems = (new model_responses())
                     ->setdata([$context['userid'] => ['component' => $this->progress->get_user_responses()]])
                     ->get_items_for_scale($scaleid, $context['contextid']);

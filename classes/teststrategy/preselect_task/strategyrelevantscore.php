@@ -75,6 +75,7 @@ class strategyrelevantscore extends strategyscore {
      * Returns the score for the given question and scaleid
      *
      * @param stdClass $question
+     * @param int $scaleid
      * @return mixed
      */
     protected function get_score(stdClass $question, int $scaleid) {
