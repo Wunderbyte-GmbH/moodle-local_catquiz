@@ -69,9 +69,6 @@ class filterbystandarderror extends preselect_task implements wb_middleware {
         $this->progress = $context['progress'];
 
         if ($this->progress->is_first_question()) {
-            // If this is the first question and the cache is not yet set, set the
-            // root scale active.
-            $this->progress->set_active_scales([$this->context['catscaleid']]);
             return $next($context);
         }
 
