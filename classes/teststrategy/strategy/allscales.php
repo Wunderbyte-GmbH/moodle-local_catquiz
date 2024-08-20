@@ -162,11 +162,6 @@ class allscales extends strategy {
         $estimated = $feedbacksettings->fraction == 1 || $feedbacksettings->fraction == 0;
         $rootscaleid = $feedbackdata['catscaleid'];
 
-        // Exclude scales that don't meet minimum of items required in quizsettings.
-        $personabilities = $feedbacksettings->filter_nminscale($personabilities, $feedbackdata);
-        // Exclude scales where standarderror is not in range.
-        $personabilities = $feedbacksettings->filter_semax($personabilities, $feedbackdata);
-
         foreach ($personabilities as $scaleid => $abilitiesarray) {
             $personabilities[$scaleid]['toreport'] = true;
             if ($estimated) {
