@@ -313,7 +313,7 @@ class progress implements JsonSerializable {
 
         $instance->breakend = $data->breakend;
         $instance->activescales = (array) $data->activescales;
-        $instance->droppedscales = $data->droppedscales ? (array) $data->droppedscales : [];
+        $instance->droppedscales = property_exists($data, 'droppedscales') ? (array) $data->droppedscales : [];
         $instance->responses = (array) $data->responses;
         foreach ($instance->responses as $id => $val) {
             $instance->responses[$id] = (array) $val;
