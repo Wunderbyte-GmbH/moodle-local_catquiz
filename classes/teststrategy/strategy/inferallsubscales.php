@@ -103,7 +103,7 @@ class inferallsubscales extends strategy {
             noremainingquestions::class, // Cancel quiz attempt if no questions are left.
             filterbystandarderror::class,
             filterbytestinfo::class,
-            inferallsubscalesscore::class
+            inferallsubscalesscore::class,
         ];
     }
 
