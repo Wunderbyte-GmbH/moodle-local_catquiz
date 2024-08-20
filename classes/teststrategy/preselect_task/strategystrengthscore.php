@@ -67,13 +67,14 @@ class strategystrengthscore extends strategyscore {
     ) {
         return (1 / (
             1 + exp($testinfo * 2 * (0.5 - $fraction) * ($difficulty - $scaleability))
-        )) ** $scalecount;
+        )) ** max(1, $scalecount - $minattemptsperscale + 1);
     }
 
     /**
      * Returns the score for the given question and scaleid
      *
      * @param stdClass $question
+     * @param int $scaleid
      * @return mixed
      */
     protected function get_score(stdClass $question, int $scaleid) {
