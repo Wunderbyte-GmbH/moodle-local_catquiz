@@ -869,7 +869,7 @@ function xmldb_local_catquiz_upgrade($oldversion) {
          */
 
         // Duplicating catquiz_items entrys if needed.
-        $sql = "SELECT id, itemid, contextid, MAX(timemodified) timemodified
+        $sql = "SELECT MAX(id), itemid, contextid, MAX(timemodified) timemodified
             FROM {local_catquiz_itemparams}
             GROUP BY itemid, contextid";
 
