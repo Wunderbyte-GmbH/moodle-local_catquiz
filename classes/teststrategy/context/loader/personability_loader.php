@@ -96,7 +96,7 @@ class personability_loader implements contextloaderinterface {
             // For the lowest skillgap teststrategy, we need at least the ability of the main scale.
             $this->progress->set_ability($personparams[$context['catscaleid']], $context['catscaleid']);
 
-            if ($context['teststrategy'] == LOCAL_CATQUIZ_STRATEGY_ALLSCALES) {
+            if ($context['teststrategy'] == LOCAL_CATQUIZ_STRATEGY_ALLSUBS) {
                 foreach ($personparams as $scaleid => $value) {
                     $this->progress->set_ability($value, $scaleid);
                 }

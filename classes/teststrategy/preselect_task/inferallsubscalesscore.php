@@ -15,7 +15,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Class strategyallscalesscore.
+ * Class inferallsubscalesscore.
  *
  * @package local_catquiz
  * @copyright 2024 Wunderbyte GmbH
@@ -27,13 +27,13 @@ namespace local_catquiz\teststrategy\preselect_task;
 use stdClass;
 
 /**
- * Calculates the question score when the allscales strategy is used.
+ * Calculates the question score when the inferallsubscales strategy is used.
  *
  * @package local_catquiz
  * @copyright 2024 Wunderbyte GmbH
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class  strategyallscalesscore extends strategyscore {
+class  inferallsubscalesscore extends strategyscore {
 
     /**
      * Returns the scale term

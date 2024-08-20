@@ -71,8 +71,8 @@ class initial_scales_loader implements contextloaderinterface {
         if ($progress->is_first_question()) {
             // By default, set the root scale active.
             $activescales = [$context['catscaleid']];
-            // For the allscales strategy, all scales are activated.
-            if ($context['teststrategy'] == LOCAL_CATQUIZ_STRATEGY_ALLSCALES) {
+            // For the inferallsubscales strategy, all scales are activated.
+            if ($context['teststrategy'] == LOCAL_CATQUIZ_STRATEGY_ALLSUBS) {
                 $activescales = $progress->get_selected_subscales();
             }
             $progress->set_active_scales($activescales);

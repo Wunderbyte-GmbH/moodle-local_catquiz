@@ -1431,7 +1431,7 @@ final class strategy_test extends advanced_testcase {
                 ],
             ],
             'Infer all scales P000001' => [
-                'strategy' => LOCAL_CATQUIZ_STRATEGY_ALLSCALES,
+                'strategy' => LOCAL_CATQUIZ_STRATEGY_ALLSUBS,
                 'questions' => [
                     ['label' => 'SIMB01-18', 'is_correct_response' => true, 'ability_before' => 0.02, 'ability_after' => 0.02],
                     ['label' => 'SIMB03-10', 'is_correct_response' => true, 'ability_after' => 0.76],
@@ -1567,7 +1567,7 @@ final class strategy_test extends advanced_testcase {
                 ],
             ],
             'Infer all scales P000642' => [
-                'strategy' => LOCAL_CATQUIZ_STRATEGY_ALLSCALES,
+                'strategy' => LOCAL_CATQUIZ_STRATEGY_ALLSUBS,
                 'questions' => [
                     ['label' => 'SIMB01-18', 'is_correct_response' => true, 'ability_before' => 0.02, 'ability_after' => 0.02],
                     ['label' => 'SIMB03-10', 'is_correct_response' => true, 'ability_after' => 0.76],
@@ -1702,7 +1702,7 @@ final class strategy_test extends advanced_testcase {
                 ],
             ],
             'Infer all scales P000407' => [
-                'strategy' => LOCAL_CATQUIZ_STRATEGY_ALLSCALES,
+                'strategy' => LOCAL_CATQUIZ_STRATEGY_ALLSUBS,
                 'questions' => [
                     ['label' => 'SIMB01-18', 'is_correct_response' => false, 'ability_before' => 0.02, 'ability_after' => 0.02],
                     ['label' => 'SIMA06-15', 'is_correct_response' => false, 'ability_after' => -0.67],
@@ -1818,7 +1818,7 @@ final class strategy_test extends advanced_testcase {
                 ],
             ],
             'Infer all scales P000184' => [
-                'strategy' => LOCAL_CATQUIZ_STRATEGY_ALLSCALES,
+                'strategy' => LOCAL_CATQUIZ_STRATEGY_ALLSUBS,
                 'questions' => [
                     ['label' => 'SIMB01-18', 'is_correct_response' => false, 'ability_before' => 0.02, 'ability_after' => 0.02],
                     ['label' => 'SIMA06-15', 'is_correct_response' => false, 'ability_after' => -0.67],

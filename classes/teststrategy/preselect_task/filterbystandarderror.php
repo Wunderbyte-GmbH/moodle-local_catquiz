@@ -170,7 +170,7 @@ class filterbystandarderror extends preselect_task implements wb_middleware {
      * @return array
      */
     private function get_scale_heirs($scaleid): array {
-        if ($this->context['teststrategy'] == LOCAL_CATQUIZ_STRATEGY_ALLSCALES) {
+        if ($this->context['teststrategy'] == LOCAL_CATQUIZ_STRATEGY_ALLSUBS) {
             return [];
         }
         // Subscales inherit values of parent when their ability wasn't calculated yet (is still the default ability).
