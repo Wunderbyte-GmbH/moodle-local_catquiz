@@ -237,10 +237,11 @@ abstract class strategyscore extends preselect_task implements wb_middleware {
         if ($lastq && $lastq->label === $lastquestionlabel) {
             if (in_array($question->label, $debuglabels)) {
                 printf(
-                    "%d %s: testinfo: %f, ability: %f, processterm: %f - scaleterm: %f
+                    "%d %s: score: %f, testinfo: %f, ability: %f, processterm: %f - scaleterm: %f
                      - itemterm: %f - standarderror: %f - fraction: %f - minattempts: %f\n",
                     $scaleid,
                     $question->label,
+                    $question->score,
                     $testinfo,
                     $scaleability,
                     $question->processterm,
