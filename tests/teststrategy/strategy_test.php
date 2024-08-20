@@ -222,7 +222,7 @@ final class strategy_test extends advanced_testcase {
     public static function strategy_returns_expected_questions_provider(): array {
         return [
             // The expected values for the radical CAT dataset are confirmed.
-            'radical CAT 1' => [
+            'radical CAT 1 normal mode' => [
                 'strategy' => LOCAL_CATQUIZ_STRATEGY_FASTEST,
                 'questions' => [
                     ['label' => 'SIMB01-18', 'is_correct_response' => false, 'ability_before' => 0.00, 'ability_after' => 0.00],
@@ -564,7 +564,7 @@ final class strategy_test extends advanced_testcase {
             //],
             */
             // phpcs:enable
-            'Infer lowest skillgap P000000' => [
+            'Infer lowest skillgap P000000 normal mode' => [
                 'strategy' => LOCAL_CATQUIZ_STRATEGY_LOWESTSUB,
                 'questions' => [
                     [ 'label' => 'SIMB01-18', 'is_correct_response' => false, 'ability_before' => 0.02, 'ability_after' => 0.02],
