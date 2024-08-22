@@ -1,5 +1,5 @@
 componentid;status;qtype;model;difficulty;discrimination;guessing;label;catscalename;parentscalenames;componentname
-0;4;Multiple-Choice;raschbirnbaum;-1.1;5.92;0.0000;SIMA01-00;SimA01;SimulationBeta|SimA;question
-0;4;Multiple-Choice;raschbirnbaum;-2.2;5.22;0.0000;SIMA01-01;SimA01;Simulation|SimABeta;question
-0;4;Multiple-Choice;raschbirnbaum;-3.3;0.99;0.0000;SIMA01-02;SimA01;Simulation|SimA;question
-0;4;Multiple-Choice;raschbirnbaum;-4.4;0.71;0.0000;SIMA01-03;SimA01;SimulationBeta|SimABeta;question
+0;4;Multiple-Choice;raschbirnbaum;-1.1;0.123;0.0000;SIMA01-00;SimA01;SimulationBeta|SimA;question
+0;4;Multiple-Choice;raschbirnbaum;-2.2;0.123;0.0000;SIMA01-01;SimA01;Simulation|SimABeta;question
+0;4;Multiple-Choice;raschbirnbaum;-3.3;0.123;0.0000;SIMA01-02;SimA01;Simulation|SimA;question
+0;4;Multiple-Choice;raschbirnbaum;-4.4;0.123;0.0000;SIMA01-03;SimA01;SimulationBeta|SimABeta;question

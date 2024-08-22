@@ -500,14 +500,23 @@ class model_item_param_list implements ArrayAccess, IteratorAggregate, Countable
                     WHERE name = :name";
             // Check if catscale with this name exisits.
             // Check if parentscales are given in newrecord and if they match with the path of the found scale.
-            $catscale = $DB->get_record_sql($sql, ['name' => $newrecord['catscalename']]);
-            if ($catscale != false && !empty($newrecord['parentscalenames'])) {
-                $ancestorsfoundscale = catscale::get_ancestors($catscale->id, 2);
-                $ancestorsnewrecord = explode('|', $newrecord['parentscalenames']);
-                $ancestorsnewrecord = array_reverse($ancestorsnewrecord);
-                if ($ancestorsfoundscale == $ancestorsnewrecord) {
+            $match = null;
+            $catscales = $DB->get_records_sql($sql, ['name' => $newrecord['catscalename']]);
+            if (array_key_exists('parentscalenames', $newrecord)) {
+                $ancestorsnewrecord = array_reverse(explode('|', $newrecord['parentscalenames']));
+                // Check if any of the matching scales also has a matching list of ancestors.
+                foreach ($catscales as $candidatescale) {
+                    $ancestorsfoundscale = catscale::get_ancestors($candidatescale->id, 2);
+                    if ($ancestorsfoundscale == $ancestorsnewrecord) {
+                        $match = $candidatescale;
+                        break;
+                    }
+                }
+            }
+            if (!empty($newrecord['parentscalenames'])) {
+                if ($match) {
                     // Same path, so we match.
-                    $catscaleid = $catscale->id;
+                    $catscaleid = $match->id;
                     $newrecord['catscaleid'] = $catscaleid;
 
                     if (empty($newrecord['catscaleid'])) {
@@ -636,6 +645,7 @@ class model_item_param_list implements ArrayAccess, IteratorAggregate, Countable
         $matching = true;
         // Store the records that were found to avoid duplications.
         $records = [];
+        $matchesparent = fn ($record, $parent) => !$parent || $record->parentid == $parent->id;
 
         foreach ($parents as $parent) {
 
@@ -646,10 +656,16 @@ class model_item_param_list implements ArrayAccess, IteratorAggregate, Countable
             ];
             // Case where no parents are given, we know we want to create new root scale.
             if ($parentsgiven) {
-                $record = $DB->get_record('local_catquiz_catscales', $searcharray);
+                $record = array_filter(
+                    $DB->get_records('local_catquiz_catscales', $searcharray),
+                    fn ($r) => $matchesparent($r, end($records))
+                );
+                // TODO: throw exception if multiple remain.
+                $record = end($record);
                 if ($record
                     && $matching
-                    && !in_array($record, $records)) {
+                    && !in_array($record, $records)
+                ) {
                     $catscaleid = $record->id;
                     $records[] = $record;
                     $newrecord['catscaleid'] = $catscaleid;
