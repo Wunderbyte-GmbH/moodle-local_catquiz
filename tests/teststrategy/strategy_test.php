@@ -123,7 +123,8 @@ final class strategy_test extends advanced_testcase {
             'initems'
         );
         $sql = <<<SQL
-            SELECT idnumber, * FROM {question_bank_entries} qbe
+            SELECT idnumber, catscaleid
+            FROM {question_bank_entries} qbe
             JOIN {question_versions} qv ON qbe.id = qv.questionbankentryid
             JOIN {local_catquiz_items} i ON qv.questionid = i.componentid
             JOIN {local_catquiz_itemparams} ip ON i.id = ip.itemid
