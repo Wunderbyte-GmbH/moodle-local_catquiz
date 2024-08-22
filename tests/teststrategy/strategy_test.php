@@ -106,7 +106,7 @@ final class strategy_test extends advanced_testcase {
      * Check if a second import updates saved items as expected
      *
      * @param string $filename
-     * @params array $expected
+     * @param array $expectedscales
      * @return void
      *
      * @dataProvider import_overrides_provider
