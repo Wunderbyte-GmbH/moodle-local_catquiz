@@ -101,38 +101,65 @@ final class strategy_test extends advanced_testcase {
         $this->assertNotEmpty($itemparams, 'No itemparams were imported');
     }
 
-    public function test_import_overrides() {
+
+    /**
+     * Check if a second import updates saved items as expected
+     *
+     * @param string $filename
+     * @params array $expected
+     * @return void
+     *
+     * @dataProvider import_overrides_provider
+     */
+    public function test_import_overrides(string $filename, array $expectedscales): void {
         // This is needed so that the responses to the questions are indeed saved to the database.
         $this->preventResetByRollback();
         global $DB;
-        $this->import_itemparams('simulation_beta.csv');
+        $this->import_itemparams($filename);
         // Get the items inserted by the simulation_beta file.
+        [$initems, $initemsparams] = $DB->get_in_or_equal(
+            array_keys($expectedscales),
+            SQL_PARAMS_NAMED,
+            'initems'
+        );
         $sql = <<<SQL
             SELECT idnumber, * FROM {question_bank_entries} qbe
             JOIN {question_versions} qv ON qbe.id = qv.questionbankentryid
             JOIN {local_catquiz_items} i ON qv.questionid = i.componentid
             JOIN {local_catquiz_itemparams} ip ON i.id = ip.itemid
-            WHERE qbe.idnumber IN ('SIMA01-00', 'SIMA01-01', 'SIMA01-02', 'SIMA01-03')
+            WHERE qbe.idnumber $initems
             ORDER BY timemodified DESC
             LIMIT 4
         SQL;
-        $addeditems = $DB->get_records_sql($sql, []);
-        $expected = [
-            'SIMA01-00' => ['SimA01', 'SimA', 'SimulationBeta'],
-            'SIMA01-01' => ['SimA01', 'SimABeta', 'Simulation'],
-            'SIMA01-02' => ['SimA01', 'SimA', 'Simulation'],
-            'SIMA01-03' => ['SimA01', 'SimABeta', 'SimulationBeta'],
-        ];
-        foreach ($expected as $label => $expectedscales) {
+        $addeditems = $DB->get_records_sql($sql, $initemsparams);
+        foreach ($expectedscales as $label => $expected) {
             $scalenames = array_map(
                 fn($id) => catscale::return_catscale_object($id)->name,
-                [$addeditems[$label]->catscaleid,
-                    ...catscale::get_ancestors($addeditems[$label]->catscaleid)
-                ]
+                [$addeditems[$label]->catscaleid, ...catscale::get_ancestors($addeditems[$label]->catscaleid)]
             );
-            $this->assertEquals($expectedscales, $scalenames);
+            $this->assertEquals($expected, $scalenames);
         }
     }
+
+    /**
+     * Data provider for test_import_overrides
+     *
+     * @return array
+     */
+    public static function import_overrides_provider(): array {
+        return [
+            'update with simulation_beta.csv' => [
+                'filename' => 'simulation_beta.csv',
+                'expected_scales' => [
+                    'SIMA01-00' => ['SimA01', 'SimA', 'SimulationBeta'],
+                    'SIMA01-01' => ['SimA01', 'SimABeta', 'Simulation'],
+                    'SIMA01-02' => ['SimA01', 'SimA', 'Simulation'],
+                    'SIMA01-03' => ['SimA01', 'SimABeta', 'SimulationBeta'],
+                ],
+            ],
+        ];
+    }
+
 
     /**
      * Check if a teststrategy returns the expected questions in the correct
