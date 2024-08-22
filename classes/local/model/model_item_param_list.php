@@ -660,7 +660,9 @@ class model_item_param_list implements ArrayAccess, IteratorAggregate, Countable
                     $DB->get_records('local_catquiz_catscales', $searcharray),
                     fn ($r) => $matchesparent($r, end($records))
                 );
-                // TODO: throw exception if multiple remain.
+                if (count($record) > 1) {
+                    throw new \Exception("Multiple matching parent scales found.");
+                }
                 $record = end($record);
                 if ($record
                     && $matching
