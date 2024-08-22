@@ -119,7 +119,7 @@ $string['catquizstatistics_exportcsv_description'] = 'Hier können Sie als
     exportieren.';
 $string['catquizstatistics_exportcsv_heading'] = 'Export der Testversuche';
 $string['catquizstatistics_h1_global'] = 'Statistik zu Skala „{$a}“ auf der gesamten moodle Instanz';
-$string['catquizstatistics_h1_scale'] = 'Statistik zu Skala „{$a->scalename}“ in Kurs „{$a->coursename}';
+$string['catquizstatistics_h1_scale'] = 'Statistik zu Skala „{$a->scalename}“ in Kurs „{$a->coursename}“';
 $string['catquizstatistics_h1_single'] = 'Statistik zu Test „{$a}“';
 $string['catquizstatistics_h2_global'] = 'Die folgenden Daten beziehen sich auf alle Nutzer, die auf dieser
     Moodle-Plattform an Tests teilgenommen haben, in denen die Skala „{$a}“ verwendet wird.';
