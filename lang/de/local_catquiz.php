@@ -118,16 +118,18 @@ $string['catquizstatistics_exportcsv_description'] = 'Hier können Sie als
     Nutzer mit Berechtigung zum Download eines Exports die Ergebnisse aller Versuche als CSV-Datei
     exportieren.';
 $string['catquizstatistics_exportcsv_heading'] = 'Export der Testversuche';
-$string['catquizstatistics_h1_global'] = 'Statistik zu Skala {$a} auf der gesamten moodle Instanz';
-$string['catquizstatistics_h1_scale'] = 'Statistik zu Skala {$a->scalename} in Kurs {$a->coursename}';
-$string['catquizstatistics_h1_single'] = 'Statistik zu Test {$a}';
+$string['catquizstatistics_h1_global'] = 'Statistik zu Skala „{$a}“ auf der gesamten moodle Instanz';
+$string['catquizstatistics_h1_scale'] = 'Statistik zu Skala „{$a->scalename}“ in Kurs „{$a->coursename}';
+$string['catquizstatistics_h1_single'] = 'Statistik zu Test „{$a}“';
 $string['catquizstatistics_h2_global'] = 'Die folgenden Daten beziehen sich auf alle Nutzer, die auf dieser
-    Moodle-Plattform an Tests teilgenommen haben, in denen die Skala {$a} verwendet wird.';
-$string['catquizstatistics_h2_scale'] = 'Die folgenden Daten beziehen sich auf die Tests {$a->linkedcourses} in Kurs {$a->coursename}, in denen die Skala {$a->scale} verwendet wird.';
-$string['catquizstatistics_h2_single'] = 'Die folgenden Daten beziehen sich auf den Test {$a->link}, in dem die Skala {$a->scale} verwendet wird.';
+    Moodle-Plattform an Tests teilgenommen haben, in denen die Skala „{$a}“ verwendet wird.';
+$string['catquizstatistics_h2_scale'] = 'Die folgenden Daten beziehen sich auf die Tests „{$a->linkedcourses}“ in Kurs „{$a->coursename}“,
+    in denen die Skala „{$a->scale}“ verwendet wird.';
+$string['catquizstatistics_h2_single'] = 'Die folgenden Daten beziehen sich auf den Test „{$a->link}“, in dem die Skala „{$a->scale}“
+    verwendet wird.';
 $string['catquizstatistics_nodataforcourse'] = 'Für den angegebenen Kurs können keine CAT Tests gefunden werden.';
 $string['catquizstatistics_numattempts_title'] = 'Anzahl an Testversuchen';
-$string['catquizstatistics_numattemptsperperson_title'] = 'Testversuche pro Person';
+$string['catquizstatistics_numattemptsperperson_title'] = 'Personen im Kurs und deren Anzahl an Testversuchen';
 $string['catquizstatistics_numberofresponses'] = 'Anzahl der gegebenen Antworten';
 $string['catquizstatistics_overview'] = 'Überblick';
 $string['catquizstatistics_progress_peers_title'] = 'Durchschnitt';
@@ -138,7 +140,7 @@ $string['catquizstatistics_testusage'] = 'Testnutzung';
 $string['catquizstatistics_timerange_both'] = 'Nur Daten von {$a->starttime} bis {$a->endtime} werden berücksichtigt.';
 $string['catquizstatistics_timerange_end'] = 'Nur Daten bis {$a->endtime} werden berücksichtigt.';
 $string['catquizstatistics_timerange_start'] = 'Nur Daten ab {$a->starttime} werden berücksichtigt.';
-$string['catquizstatisticsnodata'] = 'Für die angegebenen Paramter können keine Daten gefunden werden';
+$string['catquizstatisticsnodata'] = 'Aktuell liegen hierfür (noch) keine Daten vor.';
 $string['catscale'] = 'Skala';
 $string['catscale_created'] = 'Skala erzeugt';
 $string['catscale_updated'] = 'Skala aktualisert';
@@ -151,7 +153,7 @@ $string['catscalesname_exists'] = 'Der Name wird bereits verwendet';
 $string['catscaleupdatedtitle'] = 'Eine Skala wurde aktualisiert';
 $string['cattags'] = 'Kurs Tags verwalten';
 $string['cattags:information'] = 'Diese Tags kennzeichnen Kurse, zu denen Nutzende einschreiben können, unabhängig davon, ob sie Teil des Kurses sind.';
-$string['chart_detectedscales_title'] = 'Aktuelle Detail-Ergebnisse (Top {$a})';
+$string['chart_detectedscales_title'] = 'Die {$a} aktuell am häufigsten zurückgemeldeten Teilbereiche';
 $string['chartlegendabilityrelative'] = '{$a->difference} Unterschied zur Vergleichsskala (Fähigkeits-Wert in dieser Skala: {$a->ability})';
 $string['checkdelimiter'] = 'Überprüfen Sie die Spaltennamen durch das angegebene Zeichen getrennt sind.';
 $string['checkdelimiteroremptycontent'] = 'Überprüfen Sie ob Daten vorhanden und durch das angegebene Zeichen getrennt sind.';
@@ -263,24 +265,30 @@ $string['errorminscalevalue'] = 'Der Minimalwert muss kleiner sein als der Maxim
 $string['errornoitems'] = 'Für die angegebenen Settings kann das Quiz nicht ausgeführt werden. Bitte kontaktieren sie Ihren CAT Manager.';
 $string['errorrecordnotfound'] = 'Fehler mit der Datenbankabfrage. Der Datensatz wurde nicht gefunden.';
 $string['errorupperlimitvalue'] = 'Oberes Limit muss kleiner als unteres Limit sein.';
-$string['estimatedbecause:allanswerscorrect'] = 'Sie haben alle Fragen richtig beantwortet! Toll! Leider konnten deshalb Ihre Ergebnisse nicht zuverlässig errechnet werden und wurden geschätzt.';
-$string['estimatedbecause:allanswersincorrect'] = 'Leider haben Sie alle Fragen falsch beantwortet. Ihre Ergebnisse konnten deshalb nicht zuverlässig errechnet werden und wurden geschätzt.';
+$string['estimatedbecause:allanswerscorrect'] = 'Sie haben alle Fragen richtig beantwortet! Toll! Leider konnten deshalb Ihre Ergebnisse nicht
+    zuverlässig errechnet werden und wurden geschätzt.';
+$string['estimatedbecause:allanswersincorrect'] = 'Leider haben Sie alle Fragen falsch beantwortet. Ihre Ergebnisse konnten deshalb nicht zuverlässig
+    errechnet werden und wurden geschätzt.';
 $string['estimatedbecause:default'] = 'Ihre Ergebnisse konnten nicht zuverlässig errechnet werden und wurden geschätzt.';
 $string['eventname'] = 'Name des Ereignisses';
 $string['eventtime'] = 'Zeitpunkt des Ereignisses';
 $string['exceededmaxattempttime'] = 'Die erlaubte Zeit für den Versuch wurde überschritten';
-$string['executed_calculation_description'] = 'Es wurde eine Berechnung der Skala „{$a->catscalename}“ mit der ID {$a->catscaleid} im Kontext {$a->contextid} durchgeführt von {$a->user}. In folgenden Modellen wurden Fragen neu berechnet: {$a->updatedmodels}';
+$string['executed_calculation_description'] = 'Es wurde eine Berechnung der Skala „{$a->catscalename}“ mit der ID {$a->catscaleid} im Kontext 
+    {$a->contextid} durchgeführt von {$a->user}. In folgenden Modellen wurden Fragen neu berechnet: {$a->updatedmodels}';
 $string['eyeicontitle'] = 'Aktivieren/Deaktivieren';
 $string['failedtoaddmultipleitems'] = '{$a->numadded} Fragen wurden erfolgreich hinzugefügt, bei folgenden {$a->numfailed} Fragen traten Probleme auf: {$a->failedids}';
 $string['feedback_colorrange'] = 'Farbbereich auf einer Feedback-Skala';
 $string['feedback_customscale_nofeedback'] = 'Es wurde kein Feedback für ihre Ergebnisse angegeben.';
 $string['feedback_details_description'] = 'Die folgende Tabelle listet alle
-    Aspekte (Skalen) von „{$a}“ auf, für die der Test ein zuverlässiges Ergebnis
+    Teilbereiche (Skalen) von „{$a}“ auf, für die der Test ein zuverlässiges Ergebnis
     ermitteln konnte';
 $string['feedback_details_heading'] = 'Details zu Ihrem Ergebnis';
-$string['feedback_details_lowestskill'] = 'Die Skala „<b>{$a->name}</b>“ wurde mit einem
-    persönlichen Fähigkeits-Wert {$a->value} (± {$a->se}) als Ihr größtes
+$string['feedback_details_lowestskill'] = 'Teilbereich (Skala) „<b>{$a->name}</b>“ wurde mit einem
+    persönlichen Fähigkeits-Wert von {$a->value} (± {$a->se}) als Ihr größtes
     Defizit ermittelt.';
+$string['feedback_details_highestskill'] = 'Teilbereich (Skala) „<b>{$a->name}</b>“ wurde mit einem
+    persönlichen Fähigkeits-Wert von {$a->value} (± {$a->se}) als Ihre größte
+    Stärke ermittelt.';
 $string['feedback_tab_clicked'] = 'Klick auf Feedback Tab';
 $string['feedback_tab_clicked_description'] = 'Nutzer {$a->userid} hat auf Feedback {$a->feedback_translated} in {$a->attemptlink} geklickt';
 $string['feedback_table_answercorrect'] = 'Richtig';
