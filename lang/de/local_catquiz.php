@@ -273,7 +273,7 @@ $string['estimatedbecause:default'] = 'Ihre Ergebnisse konnten nicht zuverlässi
 $string['eventname'] = 'Name des Ereignisses';
 $string['eventtime'] = 'Zeitpunkt des Ereignisses';
 $string['exceededmaxattempttime'] = 'Die erlaubte Zeit für den Versuch wurde überschritten';
-$string['executed_calculation_description'] = 'Es wurde eine Berechnung der Skala „{$a->catscalename}“ mit der ID {$a->catscaleid} im Kontext 
+$string['executed_calculation_description'] = 'Es wurde eine Berechnung der Skala „{$a->catscalename}“ mit der ID {$a->catscaleid} im Kontext
     {$a->contextid} durchgeführt von {$a->user}. In folgenden Modellen wurden Fragen neu berechnet: {$a->updatedmodels}';
 $string['eyeicontitle'] = 'Aktivieren/Deaktivieren';
 $string['failedtoaddmultipleitems'] = '{$a->numadded} Fragen wurden erfolgreich hinzugefügt, bei folgenden {$a->numfailed} Fragen traten Probleme auf: {$a->failedids}';
@@ -454,7 +454,7 @@ $string['noselection'] = 'Keine Auswahl';
 $string['nothingtocompare'] = 'Für einen Vergleich liegen noch nicht genügend Ergebnisse vor.';
 $string['notificationcatscalechange'] = 'Hallo {$a->firstname} {$a->lastname},
 Skalen wurden verändert auf der Moolde Plattform {$a->instancename}.
-Dieses e-Mail informiert Sie als CAT Manager*in, verantwortlich für dieses Skala. {$a->editorname} hat die folgenden Änderungen an der Skala „{$a->catscalename}“ vorgenommen.:
+Diese e-Mail informiert Sie als CAT-Manager*in, verantwortlich für dieses Skala. {$a->editorname} hat die folgenden Änderungen an der Skala „{$a->catscalename}“ vorgenommen.:
     {$a->changedescription}
 Sie können den aktuellen Stand hier überprüfen. {$a->linkonscale}';
 $string['notifyallteachers'] = 'Kursleiter der gewählten Kurse benachrichtigen';
