@@ -105,6 +105,11 @@ final class strategy_test extends advanced_testcase {
     /**
      * Check if a second import updates saved items as expected
      *
+     * Items are already imported in the setUp() method.
+     * Here, we:
+     *   1. Import another, small file with item params to add/update item params.
+     *   2. Check that the values in the database match our expectations.
+     *
      * @param string $filename
      * @param array $expectedscales
      * @return void
@@ -112,16 +117,16 @@ final class strategy_test extends advanced_testcase {
      * @dataProvider import_overrides_provider
      */
     public function test_import_overrides(string $filename, array $expectedscales): void {
-        // This is needed so that the responses to the questions are indeed saved to the database.
-        $this->preventResetByRollback();
+        // 1. Import items.
         global $DB;
         $this->import_itemparams($filename);
-        // Get the items inserted by the simulation_beta file.
         [$initems, $initemsparams] = $DB->get_in_or_equal(
             array_keys($expectedscales),
             SQL_PARAMS_NAMED,
             'initems'
         );
+
+        // 2. Check the values in the database match our expectations.
         $sql = <<<SQL
             SELECT idnumber, catscaleid
             FROM {question_bank_entries} qbe
@@ -130,9 +135,12 @@ final class strategy_test extends advanced_testcase {
             JOIN {local_catquiz_itemparams} ip ON i.id = ip.itemid
             WHERE qbe.idnumber $initems
             ORDER BY timemodified DESC
-            LIMIT 4
+            LIMIT :itemlength
         SQL;
-        $addeditems = $DB->get_records_sql($sql, $initemsparams);
+        $addeditems = $DB->get_records_sql(
+            $sql,
+            array_merge($initemsparams, ['itemlength' => count($expectedscales)])
+        );
         foreach ($expectedscales as $label => $expected) {
             $scalenames = array_map(
                 fn($id) => catscale::return_catscale_object($id)->name,
