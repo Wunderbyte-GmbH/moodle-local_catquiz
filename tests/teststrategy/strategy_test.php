@@ -135,11 +135,12 @@ final class strategy_test extends advanced_testcase {
             JOIN {local_catquiz_itemparams} ip ON i.id = ip.itemid
             WHERE qbe.idnumber $initems
             ORDER BY timemodified DESC
-            LIMIT :itemlength
         SQL;
         $addeditems = $DB->get_records_sql(
             $sql,
-            array_merge($initemsparams, ['itemlength' => count($expectedscales)])
+            $initemsparams,
+            0,
+            count($expectedscales)
         );
         foreach ($expectedscales as $label => $expected) {
             $scalenames = array_map(
