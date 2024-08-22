@@ -926,7 +926,7 @@ function xmldb_local_catquiz_upgrade($oldversion) {
                     AND lcip.contextid = lci.contextid
                     AND lcip.status = activestatus.status";
 
-        $sqlresult = $DB->get_record_sql($sql);
+        $sqlresult = $DB->get_records_sql($sql);
 
         foreach ($sqlresult as $lci) {
             if (!$lci->id) {
