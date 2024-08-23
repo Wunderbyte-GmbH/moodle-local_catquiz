@@ -282,8 +282,8 @@ class comparetotestaverage extends feedbackgenerator {
             throw new \moodle_exception('error:minmaxrangeequal', 'local_catquiz');
         }
         $scalingfactor = 1 / ((float) $abilityrange['maxscalevalue'] - (float) $abilityrange['minscalevalue']) * 100;
-        $testaverageposition = $scalingfactor * ($middle - (float) $abilityrange['minscalevalue'] + $testaverageinrange);
-        $userabilityposition = $scalingfactor * ($middle - (float) $abilityrange['minscalevalue'] + $abilityinrange);
+        $testaverageposition = $scalingfactor * (-(float) $abilityrange['minscalevalue'] + $testaverageinrange);
+        $userabilityposition = $scalingfactor * (-(float) $abilityrange['minscalevalue'] + $abilityinrange);
         $betterthan = '';
         if (round($quantile, 0) >= self::MIN_BETTER_THAN_LIMIT) {
             $betterthan = get_string('feedbackcomparison_betterthan', 'local_catquiz', ['quantile' => round($quantile, 0)]);
