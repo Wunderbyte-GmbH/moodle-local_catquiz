@@ -278,6 +278,9 @@ class comparetotestaverage extends feedbackgenerator {
             $abilityrange['minscalevalue'],
             $abilityrange['maxscalevalue']);
 
+        if ($abilityrange['minscalevalue'] == $abilityrange['maxscalevalue']) {
+            throw new \moodle_exception('error:minmaxrangeequal', 'local_catquiz');
+        }
         $scalingfactor = 1 / ((float) $abilityrange['maxscalevalue'] - (float) $abilityrange['minscalevalue']) * 100;
         $testaverageposition = $scalingfactor * ($middle - (float) $abilityrange['minscalevalue'] + $testaverageinrange);
         $userabilityposition = $scalingfactor * ($middle - (float) $abilityrange['minscalevalue'] + $abilityinrange);
