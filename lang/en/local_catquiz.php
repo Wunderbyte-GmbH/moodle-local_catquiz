@@ -371,8 +371,7 @@ $string['learningprogress_description'] = 'How did your ability score change
     over time? Did you improve?<br/>The following chart displays the progress
     of your (general) ability score in {$a} in comparison to the average of all
     test attempts:';
-$string['learningprogress_title'] = 'Your progress';
-$string['learningprogresstitle'] = 'Progress';
+$string['learningprogresstitle'] = 'Your Progress';
 $string['likelihood'] = 'Likelihood';
 $string['local_catquiz_toggle_testitemstatus_message'] = 'Testitem status was updated';
 $string['logsafter'] = 'Logs after';

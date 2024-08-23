@@ -93,7 +93,6 @@ class learningprogress extends feedbackgenerator {
         $feedback = $OUTPUT->render_from_template(
         'local_catquiz/feedback/learningprogress',
             [
-            'title' => get_string('learningprogress_title', 'local_catquiz'),
             'description' => get_string(
                 'learningprogress_description',
                 'local_catquiz',
