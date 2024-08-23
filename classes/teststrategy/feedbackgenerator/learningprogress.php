@@ -408,7 +408,7 @@ class learningprogress extends feedbackgenerator {
 
         return [
             'chart' => $out,
-            'charttitle' => get_string('learningprogress_title', 'local_catquiz', feedback_helper::add_quotes($scalename)),
+            'charttitle' => get_string('learningprogresstitle', 'local_catquiz', feedback_helper::add_quotes($scalename)),
         ];
 
     }
