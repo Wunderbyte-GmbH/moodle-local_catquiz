@@ -244,7 +244,7 @@ $string['error'] = 'An error occured';
 $string['error:fraction0'] = 'Unfortunately, we were unable to determine a valid result based on your answers. We would be pleased if you would try again.';
 $string['error:fraction1'] = 'Congratulations, you have answered all the questions correctly! That is really awesome!
     However, due to this excellent performance, we were unable to determine a conclusive result.';
-$string[''error:minmaxrangeequal'] = 'There is an error in the database entry: The minimum and maximum scale limits are the same.
+$string['error:minmaxrangeequal'] = 'There is an error in the database entry: The minimum and maximum scale limits are the same.
     Please report this problem to the CAT Manager, specifying the test you are using and asking them to correct the information
     on the scale limits.';
 $string['error:nminscale'] = 'Unfortunately, we were unable to determine a result as not enough questions were answered during the test attempt.
