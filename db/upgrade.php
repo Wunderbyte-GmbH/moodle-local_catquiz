@@ -619,13 +619,13 @@ function xmldb_local_catquiz_upgrade($oldversion) {
                 ORDER BY status DESC
                 LIMIT 1";
 
-            $lcip = $DB->get_record_sql($sql);
-
-            $updaterecord = new stdclass;
-            $updaterecord->id = $itemid;
-            $updaterecord->contextid = $contextid;
-            $updaterecord->activeparamid = $lcip->id;
-            $DB->update_record('local_catquiz_items', $updaterecord);
+            if ($lcip = $DB->get_record_sql($sql)) {
+                $updaterecord = new stdclass;
+                $updaterecord->id = $itemid;
+                $updaterecord->contextid = $contextid;
+                $updaterecord->activeparamid = $lcip->id;
+                $DB->update_record('local_catquiz_items', $updaterecord);
+            }
         }
 
         $table = new xmldb_table('local_catquiz_itemparams');
