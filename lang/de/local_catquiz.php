@@ -390,8 +390,7 @@ $string['learningprogress_description'] = 'Wie hat sich Ihr Fähigkeits-Wert üb
     folgende Grafik zeigt Ihnen die Entwicklung Ihres (allgemeinen)
     Fähigkeits-Wertes in {$a} im Vergleich zum Durchschnittswert aller
     Testversuche:';
-$string['learningprogress_title'] = 'Ihr Lernfortschritt';
-$string['learningprogresstitle'] = 'Lernfortschritt';
+$string['learningprogresstitle'] = 'Ihr Lernfortschritt';
 $string['likelihood'] = 'Wahrscheinlichkeit';
 $string['local_catquiz_toggle_testitemstatus_message'] = 'Status des Elements wurde aktualisiert';
 $string['logsafter'] = 'Einträge vor';
