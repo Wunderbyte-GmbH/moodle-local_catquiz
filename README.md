@@ -28,11 +28,10 @@ Finally, the plugin allows to pursuit different test strategies:
 
 For using this plugin, you are required to install the following plugins:
 
-* mod_adaptivequiz - the activity from which a CAT test can be started (vers 3.1 onwards). Please use the [wb-0.9.0-rc2 release in the wunderbyte fork](https://github.com/Wunderbyte-GmbH/moodle-mod_adaptivequiz/releases/tag/wb-0.9.0-rc2) until our changes are integrated into the [upstream plugin](https://moodle.org/plugins/mod_adaptivequiz) (in progress).
-* [adaptivequizcatmodel_catquiz](https://github.com/Wunderbyte-GmbH/moodle-adaptivequizcatmodel_catquiz/releases/tag/1.0.2) - which serves as a bridge between mod_adaptivequiz and local_adaptivequiz
+* mod_adaptivequiz - the activity from which a CAT test can be started (vers 3.1 onwards). Please use the [the wunderbyte fork](https://github.com/Wunderbyte-GmbH/moodle-mod_adaptivequiz/tree/alise_adaptivequiz) until our changes are integrated into the [upstream plugin](https://moodle.org/plugins/mod_adaptivequiz) (in progress). This branch already includes the subplugin [adaptivequizcatmodel_catquiz](https://github.com/Wunderbyte-GmbH/moodle-adaptivequizcatmodel_catquiz/releases/tag/1.0.2), which serves as a bridge between mod_adaptivequiz and local_adaptivequiz
 * [local_wunderbyte_table](https://moodle.org/plugins/local_wunderbyte_table)) - database and tables handling
 
-It is recommended to install the following plugins as well:
+It is also recommended to install the following plugins as well:
 
 * [local_shortcodes](https://moodle.org/plugins/filter_shortcodes) - helps to render results at any point in your courses
 * local_adaptivelearningpaths - adds the possibility to define learning paths based on quiz and adaptive quiz results (to be released soon)
