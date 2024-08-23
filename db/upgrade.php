@@ -869,7 +869,7 @@ function xmldb_local_catquiz_upgrade($oldversion) {
          */
 
         // Duplicating catquiz_items entrys if needed.
-        $sql = "SELECT MAX(id), itemid, contextid, MAX(timemodified) timemodified
+        $sql = "SELECT MAX(id) id, itemid, contextid, MAX(timemodified) timemodified
             FROM {local_catquiz_itemparams}
             GROUP BY itemid, contextid";
 
@@ -882,7 +882,9 @@ function xmldb_local_catquiz_upgrade($oldversion) {
                 FROM {local_catquiz_items}
                 WHERE id = ".$lcip->itemid;
 
-            $lci = $DB->get_record_sql($sql);
+            if (!($lci = $DB->get_record_sql($sql))) {
+                continue;
+            }
 
             if (($lci->contextid !== $lcip->contextid) && ($lci->contextid)) {
 
@@ -915,7 +917,7 @@ function xmldb_local_catquiz_upgrade($oldversion) {
         }
 
         // Reset all active paramids in all new catquiz_items entries.
-        $sql = "SELECT lci.id id, lcip.id activeparamid
+        $sql = "SELECT lci.id id, MAX(lcip.id) activeparamid
                 FROM {local_catquiz_items} lci
                   JOIN (
                     SELECT itemid, MAX(status) status
@@ -924,7 +926,8 @@ function xmldb_local_catquiz_upgrade($oldversion) {
                   JOIN {local_catquiz_itemparams} lcip
                     ON lcip.itemid = lci.id
                     AND lcip.contextid = lci.contextid
-                    AND lcip.status = activestatus.status";
+                    AND lcip.status = activestatus.status
+                 GROUP BY lci.id";
 
         $sqlresult = $DB->get_records_sql($sql);
 
