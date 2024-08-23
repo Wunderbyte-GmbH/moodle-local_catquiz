@@ -1535,6 +1535,7 @@ class catquiz {
              FROM {local_catquiz_items} lci
              JOIN {local_catquiz_itemparams} lcip
                 ON lci.id = lcip.itemid
+                    AND lci.activeparamid = lcip.id
                     AND lcip.contextid = :contextid
                     AND lcip.model = :model
             WHERE lci.catscaleid $insql
