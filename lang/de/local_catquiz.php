@@ -249,7 +249,7 @@ $string['error:fraction0'] = 'Leider konnten wir aufgrund Ihrer Antworten kein z
     Wir würden uns freuen, wenn Sie es erneut versuchen.';
 $string['error:fraction1'] = 'Herzlichen Glückwunsch, Sie haben alle Fragen richtig beantwortet! Das ist wirklich großartig!
     Aufgrund dieser exzellenten Leistung konnte jedoch kein eindeutiges Ergebnis ermittelt werden.';
-$string[''error:minmaxrangeequal'] = 'Es liegt ein Fehler im Datenbankeintrag vor: Die minimalen und maximale Skalenbegrenzungen
+$string['error:minmaxrangeequal'] = 'Es liegt ein Fehler im Datenbankeintrag vor: Die minimalen und maximale Skalenbegrenzungen
     sind identisch. Bitte melden Sie das Problem unter Nennung des von Ihnen genutzten tests dem CAT-Manager mit der Bitte,
     die Angaben zur Skalen.Begrenzungen zu korrigieren.';
 $string['error:nminscale'] = 'Leider konnten wir kein Ergebnis ermitteln, da im Testversuch nicht genügend Fragen beantwortet wurden.
