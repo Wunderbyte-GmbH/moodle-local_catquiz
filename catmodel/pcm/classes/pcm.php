@@ -157,7 +157,7 @@ class pcm extends model_raschmodel {
      * @return array
      */
     public static function get_parameter_names(): array {
-        return ['intercept'];
+        return ['intercept', 'discrimination'];
 
     }
 

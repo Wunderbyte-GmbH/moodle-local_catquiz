@@ -26,6 +26,7 @@ namespace local_catquiz\local\model;
 
 use local_catquiz\catquiz;
 use local_catquiz\local\model\model_model;
+use MoodleQuickForm;
 use stdClass;
 
 defined('MOODLE_INTERNAL') || die();
@@ -388,6 +389,9 @@ class model_item_param {
     private function get_model_object() {
         if (!self::$models) {
                 self::$models = model_strategy::get_installed_models();
+                foreach (self::$models as $modelname => $modelclass) {
+                    self::$models[$modelname] = model_model::get_instance($modelname);
+                }
         }
         return self::$models[$this->modelname];
     }
@@ -403,5 +407,19 @@ class model_item_param {
             $value = $value < 0 ? self::MIN : self::MAX;
         }
         return $value;
+    }
+
+    public function add_form_fields(MoodleQuickForm $form, string $groupid): void {
+        $model = $this->get_model_object();
+        $model->definition_after_data_callback($form, $this, $groupid);
+    }
+
+    /**
+     * Returns parameters as flat array.
+     * 
+     * @return array
+     */
+    public function get_parameter_fields(): array {
+        return $this->get_model_object()->get_parameter_fields($this);
     }
 }
