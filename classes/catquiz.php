@@ -2495,6 +2495,19 @@ class catquiz {
         $DB->update_record('local_catquiz_items', $dataobject);
     }
 
+    /**
+     * Return the item param with the given id
+     *
+     * @param int $id
+     * @return ?stdClass
+     */
+    public static function get_item_param(int $id): ?stdClass {
+        global $DB;
+        if (!$record = $DB->get_record('local_catquiz_itemparams', ['id' => $id])) {
+            return null;
+        }
+        return $record;
+    }
 
     /**
      * Returns the state of questions that we will not consider as completed

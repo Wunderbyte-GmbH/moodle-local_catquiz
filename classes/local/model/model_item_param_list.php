@@ -135,13 +135,7 @@ class model_item_param_list implements ArrayAccess, IteratorAggregate, Countable
             if ($r->difficulty === "NaN") {
                 continue;
             }
-            $i = new model_item_param($r->componentid, $modelname, [], $r->status);
-            $parameternames = $models[$modelname]::get_parameter_names();
-            $params = [];
-            foreach ($parameternames as $paramname) {
-                $params[$paramname] = $r->$paramname;
-            }
-            $i->set_parameters($params);
+            $i = model_item_param::from_record($r);
             $itemparameters->add($i);
         }
 
@@ -769,14 +763,7 @@ class model_item_param_list implements ArrayAccess, IteratorAggregate, Countable
                 throw new UnexpectedValueException('Some property is missing from the given data');
             }
 
-            $i = new model_item_param($d->id, $d->model, [], $d->status);
-
-            $params = [];
-            foreach ($models[$d->model]::get_parameter_names() as $param) {
-                $params[$param] = $d->$param;
-            }
-            $i->set_parameters($params);
-
+            $i = model_item_param::from_record($d);
             $items->add($i);
         }
         return $items;

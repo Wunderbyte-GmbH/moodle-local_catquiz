@@ -26,6 +26,7 @@ namespace local_catquiz\local\model;
 
 use cache_helper;
 use Exception;
+use local_catquiz\catquiz;
 use stdClass;
 
 defined('MOODLE_INTERNAL') || die();
@@ -83,6 +84,8 @@ class model_item_param {
      */
     private string $id;
 
+    private static $models = [];
+
     /**
      * Set parameters for class instance.
      *
@@ -90,17 +93,41 @@ class model_item_param {
      * @param string $modelname
      * @param array $metadata
      * @param int $status
+     * @param ?stdClass $record Optional. If given, parameters are extracted from this object.
      *
      */
     public function __construct(
         string $id,
         string $modelname,
         array $metadata = [],
-        int $status = LOCAL_CATQUIZ_STATUS_NOT_CALCULATED) {
+        int $status = LOCAL_CATQUIZ_STATUS_NOT_CALCULATED,
+        ?stdClass $record = null) {
         $this->id = $id;
         $this->modelname = $modelname;
         $this->metadata = $metadata;
         $this->status = $status;
+
+        if (!$record) {
+            return;
+        }
+
+        if (!self::$models) {
+                self::$models = model_strategy::get_installed_models();
+        }
+
+        $params = self::$models[$modelname]::get_parameters_from_record($record);
+        $this->set_parameters($params);
+    }
+
+    /**
+     * Creates a new instance from a DB record
+     *
+     * @param stdClass $record
+     * @return self
+     */
+    public static function from_record(stdClass $record) {
+        $instance = new self($record->id, $record->model, [], $record->status, $record);
+        return $instance;
     }
 
     /**
@@ -282,5 +309,18 @@ class model_item_param {
             $dbrecord
         );
         cache_helper::purge_by_event('changesintestitems');
+    }
+
+    /**
+     * Get the item param with the given ID.
+     *
+     * @param int $id
+     * @return ?self
+     */
+    public static function get(int $id): ?self {
+        if (!$record = catquiz::get_item_param($id)) {
+            return null;
+        }
+        return self::from_record($record);
     }
 }

@@ -24,6 +24,8 @@
 
 namespace local_catquiz\local\model;
 
+use stdClass;
+
 /**
  * Abstract class for model classes.
  *
@@ -99,6 +101,14 @@ abstract class model_model {
      * @return string[]
      */
     abstract protected static function get_parameter_names(): array;
+
+    /**
+     * Returns the parameters as associative array, where the key is the parameter name.
+     *
+     * @param \stdClass $record
+     * @return array
+     */
+    abstract public static function get_parameters_from_record(stdClass $record): array;
 
     /**
      * Fisher info.
