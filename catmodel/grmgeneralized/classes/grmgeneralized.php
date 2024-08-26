@@ -22,6 +22,11 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+/*
+alt:
+$ip = ['difficulty' => 1.2, 'discrimination' => 0.8];
+$ip = ['difficulty' => ['0.333' => -0.25, '0.66' => 0.75, '1.00' => 1.2], 'discrimination' => 0.8]
+*/
 namespace catmodel_grmgeneralized;
 
 use local_catquiz\catcalc;
