@@ -28,6 +28,7 @@ use local_catquiz\catcalc;
 use local_catquiz\local\model\model_item_param_list;
 use local_catquiz\local\model\model_person_param_list;
 use local_catquiz\local\model\model_raschmodel;
+use stdClass;
 
 /**
  * Class mixedraschbirnbaum of catmodels.
@@ -36,6 +37,20 @@ use local_catquiz\local\model\model_raschmodel;
  * @license  http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class mixedraschbirnbaum extends model_raschmodel {
+
+    /**
+     * {@inheritDoc}
+     *
+     * @param stdClass $record
+     * @return array
+     */
+    public static function get_parameters_from_record(stdClass $record): array {
+        return [
+            'difficulty' => $record->difficulty,
+            'discrimination' => $record->discrimination,
+            'guessing' => $record->guessing,
+        ];
+    }
 
     /**
      * Returns the name of this model.

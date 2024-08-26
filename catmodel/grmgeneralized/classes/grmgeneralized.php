@@ -28,6 +28,7 @@ use local_catquiz\catcalc;
 use local_catquiz\local\model\model_item_param_list;
 use local_catquiz\local\model\model_person_param_list;
 use local_catquiz\local\model\model_raschmodel;
+use stdClass;
 
 /**
  * Class grmgeneralized of catmodels.
@@ -135,7 +136,13 @@ class grmgeneralized extends model_raschmodel {
      */
     public static function get_parameter_names(): array {
         return ['difficulty', 'discrimination'];
+    }
 
+    public static function get_parameters_from_record(stdClass $record): array {
+        return [
+            'difficulty' => json_decode($record->json, true),
+            'discrimination' => $record->discrimination,
+        ];
     }
 
     /**
