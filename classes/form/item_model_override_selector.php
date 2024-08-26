@@ -30,6 +30,7 @@ use local_catquiz\catquiz;
 use local_catquiz\event\testitemstatus_updated;
 use local_catquiz\local\model\model_strategy;
 use moodle_url;
+use MoodleQuickForm;
 use stdClass;
 
 /**
@@ -56,25 +57,72 @@ class item_model_override_selector extends dynamic_form {
 
         $mform = $this->_form;
         $data = (object) $this->_ajaxformdata;
+        $editmode = !empty($data->editing) && $data->editing != "false";
 
-        if (!empty($data->editing)) {
-            if ($data->editing == "false") {
-                $data->editing = false;
-            } else {
-                $data->editing = true;
-            }
-        }
         $mform->addElement('hidden', 'testitemid');
         $mform->setType('testitemid', PARAM_INT);
         $mform->addElement('hidden', 'contextid');
         $mform->setType('contextid', PARAM_INT);
         $mform->addElement('hidden', 'componentname');
         $mform->setType('componentname', PARAM_TEXT);
-        $mform->addElement('hidden', 'editing', $data->editing ?? false);
+        $mform->addElement('hidden', 'editing', $editmode);
         $mform->setType('editing', PARAM_BOOL);
+        $mform->registerNoSubmitButton('edititemparams');
 
+        if ($editmode) {
+            $this->render_edit_form($mform, $data);
+            return;
+        }
+
+        // If we are here, we are not in edit mode: just display the saved data.
         $models = model_strategy::get_installed_models();
 
+        foreach (array_keys($models) as $model) {
+            $paramnames = $models[$model]::get_parameter_names();
+            $group = [];
+            $id = sprintf('override_%s', $model);
+            $select = $mform->createElement(
+                'static',
+                sprintf('%s_select', $id),
+                get_string('pluginname', sprintf('catmodel_%s', $model))
+            );
+
+            $mform->addElement($select);
+            $group[] = $mform->createElement(
+                'static',
+                sprintf('override_%s_statuslabel', $model),
+                '',
+                get_string('status', 'core') . ":"
+            );
+            $group[] = $mform->createElement('static', sprintf('override_%s_status', $model), 'mylabel', 'status');
+            foreach ($paramnames as $paramname) {
+                $this->add_element_to_group($paramname, $id, $group, $mform, $editmode);
+            }
+            $mform->addGroup($group, $id, '');
+            $mform->hideIf($id, sprintf('override_%s_select', $model), 'in', [
+                LOCAL_CATQUIZ_STATUS_NOT_CALCULATED,
+                LOCAL_CATQUIZ_STATUS_EXCLUDED_MANUALLY,
+            ]);
+            $mform->disabledIf($id, sprintf('override_%s_select', $model), 'eq', LOCAL_CATQUIZ_STATUS_CALCULATED);
+        }
+
+        $mform->registerNoSubmitButton('edititemparams');
+        $mform->addElement('submit', 'edititemparams', get_string('edit'),
+            ['data-action' => 'edititemparams']);
+        $mform->disable_form_change_checker();
+    }
+
+    /**
+     * Adds form fields to edit the item parameters for the given question.
+     *
+     * The form is passed via reference.
+     *
+     * @param MoodleQuickForm $mform,
+     * @param stdClass $data
+     * @return void
+     */
+    private function render_edit_form(MoodleQuickForm &$mform, stdClass $data): void {
+        $models = model_strategy::get_installed_models();
         $options = [
             LOCAL_CATQUIZ_STATUS_NOT_CALCULATED => get_string('itemstatus_0', 'local_catquiz'),
             LOCAL_CATQUIZ_STATUS_CALCULATED => get_string('itemstatus_1', 'local_catquiz'),
@@ -87,34 +135,17 @@ class item_model_override_selector extends dynamic_form {
             $paramnames = $models[$model]::get_parameter_names();
             $group = [];
             $id = sprintf('override_%s', $model);
-            if (!empty($data->editing)) {
-                $select = $mform->createElement(
-                    'select',
-                    sprintf('%s_select', $id),
-                    get_string('pluginname', sprintf('catmodel_%s', $model)),
-                    $options,
-                    ['multiple' => false]
-                );
-            } else {
-                $select = $mform->createElement(
-                    'static',
-                    sprintf('%s_select', $id),
-                    get_string('pluginname', sprintf('catmodel_%s', $model))
-                );
-            }
-
+            $select = $mform->createElement(
+                'select',
+                sprintf('%s_select', $id),
+                get_string('pluginname', sprintf('catmodel_%s', $model)),
+                $options,
+                ['multiple' => false]
+            );
             $mform->addElement($select);
-            if (empty($data->editing)) {
-                $group[] = $mform->createElement(
-                    'static',
-                    sprintf('override_%s_statuslabel', $model),
-                    '',
-                    get_string('status', 'core').":"
-                );
-                $group[] = $mform->createElement('static', sprintf('override_%s_status', $model), 'mylabel', 'status');
-            }
+
             foreach ($paramnames as $paramname) {
-                $this->add_element_to_group($paramname, $id, $group, $mform, $data->editing ?? false);
+                $this->add_element_to_group($paramname, $id, $group, $mform, true);
             }
             $mform->addGroup($group, $id, '');
             $mform->hideIf($id, sprintf('override_%s_select', $model), 'in', [
@@ -124,19 +155,10 @@ class item_model_override_selector extends dynamic_form {
             $mform->disabledIf($id, sprintf('override_%s_select', $model), 'eq', LOCAL_CATQUIZ_STATUS_CALCULATED);
         }
 
-        if (!empty($data->editing)) {
-            $mform->registerNoSubmitButton('noedititemparams');
-            $mform->addElement('submit', 'noedititemparams', get_string('noedit', 'local_catquiz'),
-             ['data-action' => 'edititemparams']);
-
-            $this->add_action_buttons(false);
-        } else {
-            $mform->registerNoSubmitButton('edititemparams');
-            $mform->addElement('submit', 'edititemparams', get_string('edit'),
-             ['data-action' => 'edititemparams']);
-        }
-
-        $mform->disable_form_change_checker();
+        $mform->registerNoSubmitButton('noedititemparams');
+        $mform->addElement('submit', 'noedititemparams', get_string('noedit', 'local_catquiz'),
+            ['data-action' => 'edititemparams']);
+        $this->add_action_buttons(false);
     }
 
     /**
