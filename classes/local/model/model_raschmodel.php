@@ -25,6 +25,7 @@ namespace local_catquiz\local\model;
 
 use local_catquiz\catcalc_ability_estimator;
 use local_catquiz\catcalc_item_estimator;
+use MoodleQuickForm;
 
 /**
  * This class implements model raschmodel.
@@ -344,5 +345,27 @@ abstract class model_raschmodel extends model_model implements catcalc_item_esti
         }
 
         return $pp;
+    }
+
+    public function definition_after_data_callback(MoodleQuickForm &$mform, model_item_param $param, string $groupid): void {
+        $group = [];
+        $fields = $this->get_parameter_fields($param);
+        // difficulty 0.33: 0.24
+        foreach ($fields as $label => $val) {
+            $this->add_element_to_group($label, $groupid, $group, $mform);
+        }
+        $mform->addGroup($group, $groupid, '');
+    }
+
+    protected function add_element_to_group(string $name, string $id, array &$group, &$mform) {
+        //$label = $mform->createElement('static', sprintf('%s_%slabel', $id, $name), 'mylabel', '');
+        $value = $mform->createElement('text', sprintf('%s_%s', $id, $name), 'mylabel', '');
+        $value->setType(sprintf('%s_%s', $id, $name), PARAM_FLOAT);
+        //$group[] = $label;
+        $group[] = $value;
+    }
+
+    public function get_parameter_fields(model_item_param $param): array {
+        return $param->get_params_array();
     }
 }

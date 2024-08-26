@@ -252,6 +252,7 @@ $string['detected_scales_number_questions'] = 'Anzahl Fragen';
 $string['detected_scales_reference'] = 'Vergleichsbasis';
 $string['detected_scales_scalename'] = 'Name der Skala';
 $string['difficulty'] = 'Schwierigkeit';
+$string['difficulties'] = 'Schwierigkeiten';
 $string['difficulty_next_easier'] = 'Nächstschwierigere Frage';
 $string['difficulty_next_more_difficult'] = 'Nächstleichtere Frage';
 $string['disclaimer:numberoffeedbackchange'] = 'Änderungen erfordern möglicherweise eine Anpassung der Feedbacks.';

@@ -29,6 +29,7 @@ use local_catquiz\local\model\model_item_param;
 use local_catquiz\local\model\model_item_param_list;
 use local_catquiz\local\model\model_person_param_list;
 use local_catquiz\local\model\model_raschmodel;
+use MoodleQuickForm;
 use stdClass;
 
 /**
@@ -160,7 +161,7 @@ class grmgeneralized extends model_raschmodel {
      * @return array
      */
     public static function get_parameter_names(): array {
-        return ['difficulties', 'discrimination'];
+        return ['discrimination', 'difficulties'];
     }
 
     /**
@@ -584,5 +585,31 @@ class grmgeneralized extends model_raschmodel {
                     (exp($bs * $bp) + exp($bs * $ip['discrimination'])) ** 2, // Calculates d²/db².
             ],
         ];
+    }
+
+    public function definition_after_data_callback(MoodleQuickForm &$mform, model_item_param $param, string $groupid): void {
+        $group = [];
+        $parameters = $this->get_parameter_fields($param);
+        foreach (array_keys($parameters) as $fieldname) {
+            $group[] = $mform->createElement('text', $fieldname, $fieldname, '');
+        }
+        $mform->addGroup($group, $groupid, '');
+    }
+    protected function add_element_to_group(string $name, string $id, array &$group, &$mform) {
+        //$label = $mform->createElement('static', sprintf('%s_%slabel', $id, $name), 'mylabel', '');
+        $value = $mform->createElement('text', sprintf('%s_%s', $id, $name), 'mylabel', '');
+        $value->setType(sprintf('%s_%s', $id, $name), PARAM_FLOAT);
+        //$group[] = $label;
+        $group[] = $value;
+    }
+
+
+    public function get_parameter_fields(model_item_param $param): array {
+        $parameters = ['discrimination' => $param->get_params_array()['discrimination']];
+        foreach ($param->get_params_array()['difficulties'] as $frac => $val) {
+            $parameters['difficulty_'.$frac.'_fraction'] = $frac;
+            $parameters['difficulty_'.$frac.'_difficulty'] = $val;
+        }
+        return $parameters;
     }
 }

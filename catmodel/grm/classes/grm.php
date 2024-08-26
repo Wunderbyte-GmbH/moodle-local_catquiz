@@ -156,7 +156,7 @@ class grm extends model_raschmodel {
      * @return array
      */
     public static function get_parameter_names(): array {
-        return ['difficulty', 'discrimination'];
+        return ['discrimination', 'difficulties'];
 
     }
 

@@ -248,6 +248,7 @@ $string['detected_scales_chart_description'] = 'The following chart displays
 $string['detected_scales_number_questions'] = 'Played questions';
 $string['detected_scales_reference'] = 'Reference scale';
 $string['detected_scales_scalename'] = 'Scale';
+$string['difficulties'] = 'Difficulties';
 $string['difficulty'] = 'Difficulty';
 $string['difficulty_next_easier'] = 'Next more difficult question';
 $string['difficulty_next_more_difficult'] = 'Next easier question';

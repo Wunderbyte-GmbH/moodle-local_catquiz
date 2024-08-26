@@ -24,6 +24,7 @@
 
 namespace local_catquiz\local\model;
 
+use MoodleQuickForm;
 use stdClass;
 
 /**
@@ -159,4 +160,13 @@ abstract class model_model {
     public static function get_difficulty(array $parameters): float {
         return $parameters['difficulty'];
     }
+
+    /**
+     * Add model specific fields to override model parameters.
+     * 
+     * @param \MoodleQuickForm $mform
+     * @return void
+     */
+    abstract public function definition_after_data_callback(MoodleQuickForm &$mform, model_item_param $param, string $groupid): void;
+    abstract public function get_parameter_fields(model_item_param $param): array;
 }
