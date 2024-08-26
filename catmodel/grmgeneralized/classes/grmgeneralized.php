@@ -106,9 +106,10 @@ class grmgeneralized extends model_raschmodel {
     public static function convert_vector_to_ip(array $vector, $fractions): array {
 
         // TODO: This is very dirty and needs more attention on length / dimensionality.
+        $discrimination = array_pop($vector);
         return [
-            'difficulty' => array_combine($fractions, array_splice($vector, count($vector) - 1)),
-            'discrimination' => $vector[count($vector) - 1],
+            'difficulty' => array_combine($fractions, $vector),
+            'discrimination' => $discrimination,
         ];
     }
 
