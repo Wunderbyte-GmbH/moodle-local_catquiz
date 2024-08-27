@@ -2417,10 +2417,14 @@ class catquiz {
                 $join = <<<SQL
                     JOIN {user_enrolments} ue ON a.userid = ue.userid
                     JOIN {enrol} e ON ue.enrolid = e.id AND a.courseid = e.courseid
-                    JOIN {role} r ON e.roleid = r.id AND r.shortname = 'student'
+                    -- JOIN {role} r ON e.roleid = r.id AND r.shortname = 'student'
                 SQL;
             }
         }
+        if ($testid) {
+            $where .= " AND a.instanceid = :testid";
+        }
+
         $sql = "SELECT a.attemptid,
             a.userid,
             u.username,

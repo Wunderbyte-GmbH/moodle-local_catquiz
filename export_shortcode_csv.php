@@ -46,6 +46,9 @@ $filename = "export_testresults_scale_$scaleid";
 if ($courseid) {
     $filename .= "_course_$courseid";
 }
+if ($testid) {
+    $filename .= "_test_$testid";
+}
 if ($starttime) {
     $filename .= "_from_".userdate($starttime, get_string('strftimedatetime', 'core_langconfig'));
 }
