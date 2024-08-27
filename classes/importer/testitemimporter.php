@@ -244,7 +244,7 @@ class testitemimporter {
                 'mandatory' => false,
                 'format' => PARAM_TEXT,
                 'importinstruction' => get_string('jsoninformation', 'local_catquiz'),
-            ]
+            ],
             ];
         return $columnssequential;
     }
