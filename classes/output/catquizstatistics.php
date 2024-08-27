@@ -1154,9 +1154,37 @@ class catquizstatistics {
 
         $data = [];
         foreach ($DB->get_recordset_sql($sql, $params) as $r) {
+
+            // TODO: To be implemented: 'Ergebnis-Range', 'N global', 'frac global', 'N Ergebnisskala', 'frac Ergebnisskala'.
+            $additionalresults = json_decode($r->json);
+
+            $globalscale = $additionalresults->catscaleid;
+            $r->globalid = $globalscale;
+            $r->globalname = $additionalresults->catscales->$globalscale->name;
+            $r->globalpp = $additionalresults->personabilities->$globalscale;
+            $r->globalse = $additionalresults->se->$globalscale;
+            /*
+            $r->globaln = $additionalresults->n->$globalscale;
+            $r->globalf = $additionalresults->frac->$globalscale;
+            */
+
+            $primaryscale = $additionalresults->cprimaryscale;
+            $r->primaryid = $globalscale;
+            $r->primaryname = $additionalresults->catscales->$primaryscale->name;
+            $r->primarypp = $additionalresults->personabilities->$primaryscale;
+            $r->primaryse = $additionalresults->se->$primaryscale;
+            /*
+            $r->primaryn = $additionalresults->n->$primaryscale;
+            $r->primaryf = $additionalresults->frac->$primaryscale;
+            */
+
             unset($r->json);
             $r->starttime = userdate($r->starttime, get_string('strftimedatetime', 'core_langconfig'));
-            $r->endtime = userdate($r->endtime, get_string('strftimedatetime', 'core_langconfig'));
+            if (!$r->endtime || $r->endtime == 0) {
+                $r->endtime = '';
+            } else {
+                $r->endtime = userdate($r->endtime, get_string('strftimedatetime', 'core_langconfig'));
+            }
             $r->teststrategy = $this->get_teststrategy_name($r->teststrategy);
             $data[] = $r;
         }

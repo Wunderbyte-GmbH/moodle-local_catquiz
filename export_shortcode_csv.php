@@ -86,10 +86,24 @@ $exporttitle = [
     'Endzeit',
     'Strategie',
     'Anz. Fragen gesamt',
+    # 'Ergebnis-Range',
+    'Globalskala',
+    'PP global',
+    'SE global',
+    # 'N global',
+    # 'frac global',
+    'Ergebnis-Skala (je Strategie)',
+    'PP Ergebnisskala',
+    'SE Ergebnisskala',
+    # 'N Ergebnisskala',
+    # 'frac Ergebnisskala',
 ];
 $csvexport->add_data($exporttitle);
 
 foreach ($catquizstatistics->get_export_data() as $row) {
+
+    file_put_contents($CFG->dirroot.'/log-db/'.basename($_SERVER['SCRIPT_NAME'], '.php').'.log', var_export($row, true)."\n\n", FILE_APPEND);
+
     $csvexport->add_data(
         [
             $row->userid,
@@ -99,6 +113,21 @@ foreach ($catquizstatistics->get_export_data() as $row) {
             $row->endtime,
             $row->teststrategy,
             $row->number_of_testitems_used,
+            $row->globalname,
+            $row->globalpp,
+            $row->globalse,
+            /*
+            $row->globaln,
+            $row->globalf,
+            */
+            $row->primaryname,
+            $row->primarypp,
+            $row->primaryse,
+            /*
+            $row->primaryn,
+            $row->primaryf,
+            */
+
         ]
     );
 }
