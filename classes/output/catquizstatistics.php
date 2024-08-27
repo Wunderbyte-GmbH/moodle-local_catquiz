@@ -1165,20 +1165,24 @@ class catquizstatistics {
             $r->globalname = $additionalresults->catscales->$globalscale->name;
             $r->globalpp = $additionalresults->personabilities->$globalscale;
             $r->globalse = $additionalresults->se->$globalscale;
+            // phpcs:disable
             /*
             $r->globaln = $additionalresults->n->$globalscale;
             $r->globalf = $additionalresults->frac->$globalscale;
             */
+            // phpcs:enable
 
             $primaryscale = $additionalresults->cprimaryscale;
             $r->primaryid = $globalscale;
             $r->primaryname = $additionalresults->catscales->$primaryscale->name;
             $r->primarypp = $additionalresults->personabilities->$primaryscale;
             $r->primaryse = $additionalresults->se->$primaryscale;
+            // phpcs:disable
             /*
             $r->primaryn = $additionalresults->n->$primaryscale;
             $r->primaryf = $additionalresults->frac->$primaryscale;
             */
+            // phpcs:enable
 
             unset($r->json);
             $r->starttime = userdate($r->starttime, get_string('strftimedatetime', 'core_langconfig'));
