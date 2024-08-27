@@ -203,7 +203,7 @@ class model_item_param {
             'timemodified' => $this->timemodified,
             'itemid' => $this->itemid,
             'difficulty' => $this->parameters['difficulty'],
-            'discrimination' => $this->parameters['discrimination'],
+            'discrimination' => $this->parameters['discrimination'] ?? 0.0,
             'json' => $this->json,
         ];
         if ($this->id) {
