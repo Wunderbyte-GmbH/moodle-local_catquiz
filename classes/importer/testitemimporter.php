@@ -239,6 +239,12 @@ class testitemimporter {
                 'format' => PARAM_TEXT,
                 'importinstruction' => get_string('maxscalevalueinformation', 'local_catquiz'),
             ],
+            [
+                'name' => 'json',
+                'mandatory' => false,
+                'format' => PARAM_TEXT,
+                'importinstruction' => get_string('jsoninformation', 'local_catquiz'),
+            ]
             ];
         return $columnssequential;
     }

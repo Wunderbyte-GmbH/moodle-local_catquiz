@@ -362,6 +362,7 @@ $string['itemstatus_0'] = 'Not yet calculated';
 $string['itemstatus_1'] = 'Calculated';
 $string['itemstatus_4'] = 'Manually updated';
 $string['itemstatus_5'] = 'Manually confirmed';
+$string['jsoninformation'] = 'Additional information for the given model';
 $string['label'] = 'Label';
 $string['labelforrelativepersonabilitychart'] = 'Relative Ability';
 $string['labelidnotfound'] = 'Label “{$a}” not found.';
