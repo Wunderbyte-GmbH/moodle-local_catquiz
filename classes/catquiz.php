@@ -247,6 +247,7 @@ class catquiz {
             lcip.difficulty,
             lcip.discrimination,
             lcip.guessing,
+            lcip.json,
             lcip.timecreated,
             lcip.timemodified,
             lcip.status,
