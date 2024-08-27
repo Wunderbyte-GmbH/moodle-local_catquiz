@@ -65,7 +65,7 @@ class grmgeneralized extends model_raschmodel {
                 $frac[] = $fraction;
             }
         }
-        usort ($fraction);
+        sort($frac);
         return $frac;
     }
 
@@ -274,16 +274,16 @@ class grmgeneralized extends model_raschmodel {
 
         switch ($frac) {
             case 0.0:
+                $a = array_values($a);
                 return 1 - 1 / (1 + exp($b * ($a[0] - $ability)));
-                break;
             case $fractions[$kmax]:
+                $a = array_values($a);
                 return 1 / (1 + exp($b * ($a[$kmax] - $ability)));
-                break;
             default:
                 // Get corresponding category.
-                $k = array_search($frac, $ip['difficulty']);
+                $k = array_search($frac, array_keys($ip['difficulty']));
+                $a = array_values($a);
                 return 1 / (1 + exp($b * ($a[$k] - $ability))) - 1 / (1 + exp($b * ($a[$k + 1] - $ability)));
-                break;
         }
     }
 
@@ -322,12 +322,15 @@ class grmgeneralized extends model_raschmodel {
 
         switch ($frac) {
             case 0.0:
+                $a = array_values($a);
                 return -$b / (exp($b * ($a[0] - $ability)) + 1);
             case $fractions[$kmax]:
+                $a = array_values($a);
                 return ($b * exp($a[$kmax] * $b)) / (exp($a[$kmax] * $b) + exp($b * $ability));
             default:
                 // Get corresponding category.
                 $k = array_search($frac, $ip['difficulty']);
+                $a = array_values($a);
                 return ($b * (exp($b * ($a[$k] + $a[$k + 1] - 2 * $ability)) - 1))
                     / ((exp($b * ($a[$k] - $ability)) + 1) * (exp($b * ($a[$k + 1] - $ability)) + 1));
         }
@@ -354,21 +357,21 @@ class grmgeneralized extends model_raschmodel {
 
         switch ($frac) {
             case 0.0:
+                $a = array_values($a);
                 return -($b ** 2 * exp($b * ($a[0] - $ability))) / (exp($b * ($a[0] - $ability)) + 1) ** 2;
-                break;
             case $fractions[$kmax]:
+                $a = array_values($a);
                 return -($b ** 2 * exp($a[$kmax] * $b + $b * $ability)) / (exp($a[$kmax] * $b) + exp($b * $ability)) ** 2;
-                break;
             default:
                 // Get corresponding category.
-                $k = array_search($frac, $ip['difficulty']);
+                $k = array_search($frac, array_keys($ip['difficulty']));
+                $a = array_values($a);
                 return -(2 * $b ** 2 * exp($b * ($a[$k] + $a[$k + 1] - 2 * $ability)))
                     / ((exp($b * ($a[$k] - $ability)) + 1) * (exp($b * ($a[$k + 1] - $ability)) + 1))
                     + ($b ** 2 * exp($b * ($a[$k] - $ability)) * (exp($b * ($a[$k] + $a[$k + 1] - 2 * $ability)) - 1))
                     / ((exp($b * ($a[$k] - $ability)) + 1) ** 2 * (exp($b * ($a[$k + 1] - $ability)) + 1))
                     + ($b ** 2 * exp($b * ($a[$k + 1] - $ability)) * (exp($b * ($a[$k] + $a[$k + 1] - 2 * $ability)) - 1))
                     / ((exp($b * ($a[$k] - $ability)) + 1) * (exp($b * ($a[$k + 1] - $ability)) + 1) ** 2);
-                break;
         }
     }
 
@@ -443,7 +446,7 @@ class grmgeneralized extends model_raschmodel {
      */
     public static function item_information(array $pp, array $ip): float {
         $iif = self::category_information($pp, $ip, 0.0) * self::likelihood($pp, $ip, 0.0);
-        foreach ($ip['difficuölty'] as $f => $val) {
+        foreach ($ip['difficulty'] as $f => $val) {
             $iif += self::category_information($pp, $ip, $f) * self::likelihood($pp, $ip, $f);
         }
         return $iif;
