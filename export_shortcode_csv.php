@@ -43,16 +43,16 @@ $endtime = optional_param('endtime', 0, PARAM_INT) ?: null;
 $catquizstatistics = new catquizstatistics($courseid, $testid, $scaleid, $endtime, $starttime);
 
 $filename = "export_testresults_scale_$scaleid";
-if ($courseid) {
+if ($courseid != 0) {
     $filename .= "_course_$courseid";
 }
-if ($testid) {
+if ($testid != 0) {
     $filename .= "_test_$testid";
 }
-if ($starttime) {
+if ($starttime != 0) {
     $filename .= "_from_".userdate($starttime, get_string('strftimedatetime', 'core_langconfig'));
 }
-if ($endtime) {
+if ($endtime != 0) {
     $filename .= "_till_".userdate($endtime, get_string('strftimedatetime', 'core_langconfig'));
 }
 
