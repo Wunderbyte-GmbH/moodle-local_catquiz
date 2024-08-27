@@ -80,7 +80,6 @@ $exporttitle = [
 // -- [/] N Ergebnisskala,
 // -- [/] frac Ergebnisskala,
 // -- [?] JSON aller detektierten Ergebnisse
-// phpcs:enable
     'UserID',
     'UserName',
     'UserE-Mail',
@@ -89,18 +88,20 @@ $exporttitle = [
     'Test-ID',
     'Strategie',
     'Anz. Fragen gesamt',
-    # 'Ergebnis-Range',
+    // 'Ergebnis-Range',
     'Globalskala',
     'PP global',
     'SE global',
-    # 'N global',
+    // 'N global',
     # 'frac global',
     'Ergebnis-Skala (je Strategie)',
     'PP Ergebnisskala',
     'SE Ergebnisskala',
-    # 'N Ergebnisskala',
-    # 'frac Ergebnisskala',
+    // 'N Ergebnisskala',
+    // 'frac Ergebnisskala',
+// phpcs:enable
 ];
+
 $csvexport->add_data($exporttitle);
 
 foreach ($catquizstatistics->get_export_data() as $row) {
