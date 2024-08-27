@@ -140,6 +140,12 @@ class grmgeneralized extends model_raschmodel {
         return ['difficulty', 'discrimination'];
     }
 
+    /**
+     * {@inheritDoc}
+     *
+     * @param stdClass $record
+     * @return array
+     */
     public static function get_parameters_from_record(stdClass $record): array {
         return [
             'difficulty' => array_map(
@@ -171,7 +177,7 @@ class grmgeneralized extends model_raschmodel {
      * @return float
      */
     public static function get_difficulty(array $parameters): float {
-       return self::get_difficulty_aggregate((object) $parameters);
+        return self::get_difficulty_aggregate((object) $parameters);
     }
 
     /**
@@ -184,6 +190,12 @@ class grmgeneralized extends model_raschmodel {
         return $record->difficulty['1.00'];
     }
 
+    /**
+     * Checks if the paramters can be saved
+     *
+     * @param model_item_param $itemparam
+     * @return bool
+     */
     public static function is_valid(model_item_param $itemparam): bool {
         $params = $itemparam->get_params_array();
         if (is_nan($params['discrimination'])) {
