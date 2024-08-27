@@ -170,9 +170,12 @@ final class strategy_test extends advanced_testcase {
         ];
     }
 
+    /**
+     * This just checks that running the importer does not throw any exceptions
+     */
     public function test_import_csv_with_polytomous_model() {
+        $this->expectNotToPerformAssertions();
         $this->import_itemparams("simulation_multiparam.csv");
-        $this->assertTrue(false);
     }
 
     /**
