@@ -1185,12 +1185,15 @@ class catquizstatistics {
             // phpcs:enable
 
             unset($r->json);
-            $r->starttime = userdate($r->starttime, get_string('strftimedatetime', 'core_langconfig'));
             if (!$r->endtime || $r->endtime == 0) {
                 $r->endtime = '';
+                $r->timediff = '';
             } else {
+                $r->timediff = gmdate('H:i:s', $r->endtime - $r->starttime);
                 $r->endtime = userdate($r->endtime, get_string('strftimedatetime', 'core_langconfig'));
             }
+            $r->starttime = userdate($r->starttime, get_string('strftimedatetime', 'core_langconfig'));
+
             $r->teststrategy = $this->get_teststrategy_name($r->teststrategy);
 
             // TODO: Process all results.
