@@ -96,8 +96,8 @@ class filterbytestinfo extends preselect_task implements wb_middleware {
                 $this->progress->without_pilots()->get_playedquestions(true, $scaleid)
             );
             foreach ($remainingitems as $i) {
-                if (in_array($i->get_id(), $playeditems->get_item_ids())) {
-                    $remainingitems->offsetUnset($i->get_id());
+                if (in_array($i->get_componentid(), $playeditems->get_item_ids())) {
+                    $remainingitems->offsetUnset($i->get_componentid());
                 }
             }
 

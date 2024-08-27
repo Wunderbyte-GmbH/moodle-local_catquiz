@@ -24,9 +24,8 @@
 
 namespace local_catquiz\local\model;
 
-use cache_helper;
-use Exception;
 use local_catquiz\catquiz;
+use local_catquiz\local\model\model_model;
 use stdClass;
 
 defined('MOODLE_INTERNAL') || die();
@@ -58,6 +57,19 @@ class model_item_param {
     const MAX = 1000;
 
     /**
+     * The component name
+     *
+     * @var string
+     */
+    const COMPONENTNAME = 'question';
+
+    /**
+     * Holds installed model classes
+     * @var array<model_model>
+     */
+    private static array $models = [];
+
+    /**
      * @var array<float>
      */
     private array $parameters;
@@ -80,16 +92,59 @@ class model_item_param {
     private array $metadata;
 
     /**
-     * @var string $id The item id, e.g. question id
+     * The component id, e.g. question id
+     *
+     * @var string $componentid
      */
-    private string $id;
+    private string $componentid;
 
-    private static $models = [];
+    /**
+     * The item ID
+     *
+     * @var int $itemid
+     */
+    private $itemid;
+
+    /**
+     * The ID of the itemparam in the database.
+     *
+     * @var ?int $id
+     */
+    private ?int $id;
+
+    /**
+     * The contextid
+     *
+     * This should be set when the itemparam is saved.
+     * @var ?int $contextid
+     */
+    private ?int $contextid = null;
+
+    /**
+     * The time the item was created
+     *
+     * @var ?int $timecreated
+     */
+    private ?int $timecreated = null;
+
+    /**
+     * The time the item was modified
+     *
+     * @var ?int $timemodified
+     */
+    private ?int $timemodified = null;
+
+    /**
+     * Can hold additional item parameters
+     *
+     * @var ?string $json
+     */
+    private ?string $json = null;
 
     /**
      * Set parameters for class instance.
      *
-     * @param string $id
+     * @param string $componentid
      * @param string $modelname
      * @param array $metadata
      * @param int $status
@@ -97,12 +152,12 @@ class model_item_param {
      *
      */
     public function __construct(
-        string $id,
+        string $componentid,
         string $modelname,
         array $metadata = [],
         int $status = LOCAL_CATQUIZ_STATUS_NOT_CALCULATED,
         ?stdClass $record = null) {
-        $this->id = $id;
+        $this->componentid = $componentid;
         $this->modelname = $modelname;
         $this->metadata = $metadata;
         $this->status = $status;
@@ -111,12 +166,14 @@ class model_item_param {
             return;
         }
 
-        if (!self::$models) {
-                self::$models = model_strategy::get_installed_models();
-        }
-
-        $params = self::$models[$modelname]::get_parameters_from_record($record);
+        $params = $this->get_model_object()::get_parameters_from_record($record);
         $this->set_parameters($params);
+        $this->itemid = $record->itemid;
+        $this->id = $record->id ?? null;
+        $this->contextid = $record->contextid ?? null;
+        $this->timecreated = $record->timecreated ?? null;
+        $this->timemodified = $record->timemodified ?? null;
+        $this->json = $record->json ?? null;
     }
 
     /**
@@ -126,56 +183,115 @@ class model_item_param {
      * @return self
      */
     public static function from_record(stdClass $record) {
-        $instance = new self($record->id, $record->model, [], $record->status, $record);
+        $instance = new self($record->componentid, $record->model, [], $record->status, $record);
         return $instance;
+    }
+
+    /**
+     * Converts the instance to an object
+     *
+     * @return stdClass
+     */
+    public function to_record() {
+        $record = (object) [
+            'componentname' => self::COMPONENTNAME,
+            'componentid' => $this->componentid,
+            'contextid' => $this->contextid,
+            'model' => $this->modelname,
+            'status' => $this->status,
+            'timecreated' => $this->timecreated ?? time(),
+            'timemodified' => $this->timemodified,
+            'itemid' => $this->itemid,
+            'difficulty' => $this->parameters['difficulty'],
+            'discrimination' => $this->parameters['discrimination'],
+            'json' => $this->json,
+        ];
+        if ($this->id) {
+            $record->id = $this->id;
+        }
+
+        $record = $this->get_model_object()::add_parameters_to_record($record);
+
+        // Sanitize parameters
+        foreach (['difficulty', 'discrimination'] as $paramname) {
+            $record->$paramname = round($this->enforce_min_max_range($record->$paramname), 4);
+        }
+        return $record;
     }
 
     /**
      * Get params array
      *
      * @return array
-     *
      */
     public function get_params_array(): array {
         return $this->parameters;
     }
 
     /**
-     * Returns the item id (e.g. question id).
+     * Return the ID
+     *
+     * @return int
+     */
+    public function get_id(): int {
+        return $this->id;
+    }
+
+    /**
+     * Set the ID
+     *
+     * @param int $id
+     * @return self
+     */
+    public function set_id(int $id): self {
+        $this->id = $id;
+        return $this;
+    }
+
+    /**
+     * Return the ID of the associated item
+     *
+     * @return int
+     */
+    public function get_itemid(): int {
+        return $this->itemid;
+    }
+
+    /**
+     * Returns the component ID (e.g. question id).
      *
      * @return string
      */
-    public function get_id(): string {
-        return $this->id;
+    public function get_componentid(): string {
+        return $this->componentid;
     }
 
     /**
      * Return name of model.
      *
      * @return string
-     *
      */
     public function get_model_name(): string {
         return $this->modelname;
     }
 
     /**
-     * Return difficulty.
+     * Returns the difficulty as a single float value
+     *
+     * For some models (e.g. grmgeneralized), this is an aggregate, because there, the difficulty is represented as a float of
+     * values.
      *
      * @return float
-     *
      */
     public function get_difficulty(): float {
-        return $this->parameters['difficulty'];
+        return $this->get_model_object()::get_difficulty($this->parameters);
     }
 
     /**
      * Set parameters.
      *
      * @param array $parameters
-     *
      * @return self
-     *
      */
     public function set_parameters(array $parameters): self {
         $this->parameters = $parameters;
@@ -186,9 +302,7 @@ class model_item_param {
      * Set difficulty.
      *
      * @param float $difficulty
-     *
      * @return self
-     *
      */
     public function set_difficulty(float $difficulty): self {
         $this->parameters['difficulty'] = $difficulty;
@@ -196,38 +310,18 @@ class model_item_param {
     }
 
     /**
-     * Set metadata
-     *
-     * @param array $metadata
-     *
-     * @return self
-     *
-     */
-    public function set_metadata(array $metadata): self {
-        $this->metadata = $metadata;
-        return $this;
-    }
-
-    /**
-     * Return metadata.
-     *
-     * @return array
-     *
-     */
-    public function get_metadata(): array {
-        return $this->metadata;
-    }
-
-    /**
      * Set status.
      *
      * @param int $status
-     *
      * @return self
-     *
      */
     public function set_status(int $status): self {
         $this->status = $status;
+        return $this;
+    }
+
+    public function set_contextid(int $contextid): self {
+        $this->contextid = $contextid;
         return $this;
     }
 
@@ -235,7 +329,6 @@ class model_item_param {
      * Return status.
      *
      * @return int
-     *
      */
     public function get_status(): int {
         return $this->status;
@@ -252,5 +345,57 @@ class model_item_param {
             return null;
         }
         return self::from_record($record);
+    }
+
+    /**
+     * Checks if this itemparam can be saved to the database
+     *
+     * @return bool
+     */
+    public function is_valid(): bool {
+        // Let the model decide if this is a valid parameter.
+        return $this->get_model_object()::is_valid($this);
+    }
+
+    /**
+     * Saves the itemparam to the database.
+     *
+     * If it was already saved, it is updated. Otherwise, a new itemparam is inserted.
+     *
+     * @return self
+     */
+    public function save(): self {
+        $record = $this->to_record();
+        if ($this->id) {
+            catquiz::update_item_param($record);
+            return $this;
+        }
+        $this->id = catquiz::save_item_param($record);
+        return $this;
+    }
+
+    /**
+     * Returns the model class
+     *
+     * @return string
+     */
+    private function get_model_object() {
+        if (!self::$models) {
+                self::$models = model_strategy::get_installed_models();
+        }
+        return self::$models[$this->modelname];
+    }
+
+    /**
+     * Ensures that the given value is in a valid range
+     *
+     * @param float $value
+     * @return float
+     */
+    private function enforce_min_max_range(float $value) {
+        if (abs($value) > model_item_param::MAX) {
+            $value = $value < 0 ? model_item_param::MIN : model_item_param::MAX;
+        }
+        return $value;
     }
 }

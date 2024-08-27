@@ -2500,6 +2500,30 @@ class catquiz {
     }
 
     /**
+     * Save an item param
+     *
+     * @param stdClass $record The record to save
+     * @return int
+     */
+    public static function save_item_param(stdClass $record): int {
+        global $DB;
+        $id = $DB->insert_record('local_catquiz_itemparams', $record);
+        return $id;
+    }
+
+    /**
+     * Update an existing item param
+     *
+     * @param stdClass $record
+     * @return int
+     */
+    public static function update_item_param(stdClass $record): int {
+        global $DB;
+        $DB->update_record('local_catquiz_itemparams', $record);
+        return $record->id;
+    }
+
+    /**
      * Returns the state of questions that we will not consider as completed
      *
      * @return array

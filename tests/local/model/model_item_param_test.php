@@ -130,6 +130,34 @@ final class model_item_param_test extends advanced_testcase {
             ],
         ];
     }
+
+    /**
+     * Check if an item param can be saved to the database.
+     *
+     * @return void
+     */
+    public function test_write_item_param_to_db() {
+        $this->resetAfterTest();
+        $json = json_encode(['0.00' => 0.12, '0.33' => 0.35, '0.66' => 0.68, '1.00' => 0.83]);
+        $record = (object) [
+            'json' => $json,
+            'discrimination' => '1.2',
+            'itemid' => 1,
+            'contextid' => 1,
+            'timecreated' => time(),
+            'timemodified' => time(),
+        ];
+        $itemparam = new model_item_param(1, 'grmgeneralized', [], 4, $record);
+        $itemparam->save();
+
+        // Now read the saved parameter and make sure it equals the itemparam we just created.
+        $fromdb = model_item_param::get($itemparam->get_id());
+        $this->assertEquals($itemparam->get_status(), $fromdb->get_status());
+        $this->assertEquals($itemparam->get_componentid(), $fromdb->get_componentid());
+        $this->assertEquals($itemparam->get_params_array(), $fromdb->get_params_array());
+        $this->assertEquals($itemparam->get_difficulty(), $fromdb->get_difficulty());
+        $this->assertEquals($itemparam->get_itemid(), $fromdb->get_itemid());
+    }
 }
 
 
