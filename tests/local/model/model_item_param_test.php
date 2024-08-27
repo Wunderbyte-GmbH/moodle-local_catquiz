@@ -42,11 +42,11 @@ final class model_item_param_test extends advanced_testcase {
      * @dataProvider read_item_param_from_db_provider
      *
      * @param array $record
-     * @param array $expected
+     * @param array $parameters
      *
      * @group large
      */
-    public function test_read_item_param_from_db(array $record, $parameters) {
+    public function test_read_item_param_from_db(array $record, array $parameters) {
         global $DB;
         $this->resetAfterTest();
         // First insert an item param so that we can later read one.

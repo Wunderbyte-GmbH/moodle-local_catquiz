@@ -212,9 +212,9 @@ class model_item_param {
 
         $record = $this->get_model_object()::add_parameters_to_record($record);
 
-        // Sanitize parameters
+        // Sanitize parameters.
         foreach (['difficulty', 'discrimination'] as $paramname) {
-            $record->$paramname = round($this->enforce_min_max_range($record->$paramname), 4);
+            $record->$paramname = round($this->enforce_min_max_range(floatval($record->$paramname)), 4);
         }
         return $record;
     }
@@ -320,6 +320,12 @@ class model_item_param {
         return $this;
     }
 
+    /**
+     * Set the context ID
+     *
+     * @param int $contextid
+     * @return self
+     */
     public function set_contextid(int $contextid): self {
         $this->contextid = $contextid;
         return $this;
@@ -393,8 +399,8 @@ class model_item_param {
      * @return float
      */
     private function enforce_min_max_range(float $value) {
-        if (abs($value) > model_item_param::MAX) {
-            $value = $value < 0 ? model_item_param::MIN : model_item_param::MAX;
+        if (abs($value) > self::MAX) {
+            $value = $value < 0 ? self::MIN : self::MAX;
         }
         return $value;
     }

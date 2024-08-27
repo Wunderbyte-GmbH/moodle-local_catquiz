@@ -302,7 +302,6 @@ class model_item_param_list implements ArrayAccess, IteratorAggregate, Countable
         $updatedrecords = [];
         $newrecords = [];
         $now = time();
-        $models = model_strategy::get_installed_models();
         foreach ($records as $record) {
             $isexistingparam = array_key_exists($record['componentid'], $existingparams)
                 && array_key_exists($record['model'], $existingparams[$record['componentid']]);
@@ -430,7 +429,9 @@ class model_item_param_list implements ArrayAccess, IteratorAggregate, Countable
 
         $newrecord['status'] = !empty($newrecord['status']) ? $newrecord['status'] : LOCAL_CATQUIZ_STATUS_UPDATED_MANUALLY;
         $itemparam = model_item_param::from_record((object) $newrecord);
-        if ($record) { $itemparam->set_id($record->id);}
+        if ($record) {
+            $itemparam->set_id($record->id);
+        }
         $itemparam->save();
         // Ensure that the item points to the itemparam with the highest status.
         catquiz::set_active_itemparam($itemparam->get_itemid());
