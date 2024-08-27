@@ -170,6 +170,10 @@ final class strategy_test extends advanced_testcase {
         ];
     }
 
+    public function test_import_csv_with_polytomous_model() {
+        $this->import_itemparams("simulation_multiparam.csv");
+        $this->assertTrue(false);
+    }
 
     /**
      * Check if a teststrategy returns the expected questions in the correct

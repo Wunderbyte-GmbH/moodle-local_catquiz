@@ -407,6 +407,7 @@ $string['itemstatus_0'] = 'Noch nicht berechnet';
 $string['itemstatus_1'] = 'Berechnet';
 $string['itemstatus_4'] = 'Manuell gesetzt';
 $string['itemstatus_5'] = 'Manuell bestätigt';
+$string['jsoninformation'] = 'Zusätzliche, modell-spezifische Informationen';
 $string['label'] = 'Kennzeichen';
 $string['labelforrelativepersonabilitychart'] = 'Differenz';
 $string['labelidnotfound'] = 'Wert von Label „{$a}“ nicht gefunden.';
