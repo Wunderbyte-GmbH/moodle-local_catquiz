@@ -109,8 +109,7 @@ $csvexport->add_data($exporttitle);
 
 foreach ($catquizstatistics->get_export_data() as $row) {
 
-    file_put_contents($CFG->dirroot.'/log-db/'.basename($_SERVER['SCRIPT_NAME'], '.php').'.log', var_export($row, true)."\n\n", FILE_APPEND);
-
+    // phpcs:disable
     $csvexport->add_data(
         [
             $row->userid,
@@ -139,6 +138,7 @@ foreach ($catquizstatistics->get_export_data() as $row) {
             */
         ]
     );
+    // phpcs:enable
 }
 
 $csvexport->download_file ();
