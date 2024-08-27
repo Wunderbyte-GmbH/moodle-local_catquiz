@@ -1155,6 +1155,7 @@ class catquizstatistics {
         $data = [];
         foreach ($DB->get_recordset_sql($sql, $params) as $r) {
 
+            // phpcs:disable
             // TODO: To be implemented: 'Ergebnis-Range', 'N global', 'frac global', 'N Ergebnisskala', 'frac Ergebnisskala'.
             $additionalresults = json_decode($r->json);
 
@@ -1165,7 +1166,6 @@ class catquizstatistics {
             $r->globalname = $additionalresults->catscales->$globalscale->name;
             $r->globalpp = $additionalresults->personabilities->$globalscale;
             $r->globalse = $additionalresults->se->$globalscale;
-            // phpcs:disable
             /*
             $r->globaln = $additionalresults->n->$globalscale;
             $r->globalf = $additionalresults->frac->$globalscale;
