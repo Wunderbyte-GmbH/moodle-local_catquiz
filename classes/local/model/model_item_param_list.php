@@ -161,7 +161,7 @@ class model_item_param_list implements ArrayAccess, IteratorAggregate, Countable
      *
      */
     public function add(model_item_param $itemparam) {
-        $this->itemparams[$itemparam->get_id()] = $itemparam;
+        $this->itemparams[$itemparam->get_componentid()] = $itemparam;
         return $this;
     }
 
@@ -261,7 +261,7 @@ class model_item_param_list implements ArrayAccess, IteratorAggregate, Countable
     public function as_array(): array {
         $data = [];
         foreach ($this->itemparams as $i) {
-            $data[$i->get_id()] = $i;
+            $data[$i->get_componentid()] = $i;
         }
         return $data;
     }
@@ -289,26 +289,14 @@ class model_item_param_list implements ArrayAccess, IteratorAggregate, Countable
             $existingparams[$r->componentid][$r->model] = $r;
         };
 
+        // Do not save or update items that have a NAN as one of their parameter's values.
+        $validparams = array_filter(
+            $this->itemparams,
+            fn ($i) => $i->is_valid()
+        );
         $records = array_map(
-            function ($param) use ($contextid) {
-                $record = [
-                    'componentid' => $param->get_id(),
-                    // TODO: Find the id of the item in local_catquiz_items.
-                    'componentname' => 'question',
-                    'model' => $param->get_model_name(),
-                    'contextid' => $contextid,
-                    'status' => $param->get_status(),
-                ];
-                foreach ($param->get_params_array() as $paramname => $value) {
-                    if (abs($value) > model_item_param::MAX) {
-                        $value = $value < 0 ? model_item_param::MIN : model_item_param::MAX;
-                    }
-                    $record[$paramname] = $value;
-                }
-
-                return $record;
-            },
-            $this->itemparams
+            fn ($i) => $i->set_contextid($contextid)->to_record(),
+            $validparams
         );
 
         $updatedrecords = [];
@@ -316,14 +304,6 @@ class model_item_param_list implements ArrayAccess, IteratorAggregate, Countable
         $now = time();
         $models = model_strategy::get_installed_models();
         foreach ($records as $record) {
-            // Do not save or update items that have a NAN as one of their parameter's values.
-            $parameternames = $models[$record['model']]::get_parameter_names();
-            foreach ($parameternames as $parametername) {
-                if (is_nan($record[$parametername])) {
-                    continue;
-                }
-            }
-
             $isexistingparam = array_key_exists($record['componentid'], $existingparams)
                 && array_key_exists($record['model'], $existingparams[$record['componentid']]);
             // If record already exists, update it. Otherwise, insert a new record to the DB.
@@ -449,31 +429,23 @@ class model_item_param_list implements ArrayAccess, IteratorAggregate, Countable
         }
 
         $newrecord['status'] = !empty($newrecord['status']) ? $newrecord['status'] : LOCAL_CATQUIZ_STATUS_UPDATED_MANUALLY;
-        if (!$record) {
-            // Make sure the record to insert has no id.
-            unset($newrecord['id']);
-            $id = $DB->insert_record('local_catquiz_itemparams', $newrecord);
-
-        } else {
-            $newrecord['id'] = $record->id;
-            if ($DB->update_record('local_catquiz_itemparams', (object) $newrecord, true)) {
-                $id = $newrecord['id'];
-            }
-        }
+        $itemparam = model_item_param::from_record((object) $newrecord);
+        if ($record) { $itemparam->set_id($record->id);}
+        $itemparam->save();
         // Ensure that the item points to the itemparam with the highest status.
-        catquiz::set_active_itemparam($newrecord['itemid']);
+        catquiz::set_active_itemparam($itemparam->get_itemid());
         cache_helper::purge_by_event('changesinitemparams');
         if (!empty($newrecord['warning'])) {
             return [
                 'success' => 2, // Update successfull with warning.
                 'message' => $newrecord['warning'],
-                'recordid' => $id,
+                'recordid' => $itemparam->get_id(),
              ];
         } else {
             return [
                 'success' => 1, // Update successfully.
                 'message' => get_string('success', 'core'),
-                'recordid' => $id,
+                'recordid' => $itemparam->get_id(),
              ];
 
         }

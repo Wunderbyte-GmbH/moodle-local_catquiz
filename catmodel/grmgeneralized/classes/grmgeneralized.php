@@ -25,6 +25,7 @@
 namespace catmodel_grmgeneralized;
 
 use local_catquiz\catcalc;
+use local_catquiz\local\model\model_item_param;
 use local_catquiz\local\model\model_item_param_list;
 use local_catquiz\local\model\model_person_param_list;
 use local_catquiz\local\model\model_raschmodel;
@@ -141,9 +142,59 @@ class grmgeneralized extends model_raschmodel {
 
     public static function get_parameters_from_record(stdClass $record): array {
         return [
-            'difficulty' => json_decode($record->json, true),
-            'discrimination' => $record->discrimination,
+            'difficulty' => array_map(
+                fn($param) => round($param, 2),
+                json_decode($record->json, true)
+            ),
+            'discrimination' => round($record->discrimination, 2),
         ];
+    }
+
+    /**
+     * {@inheritDoc}
+     *
+     * This sets the difficulty as an aggregate value
+     *
+     * @param \stdClass $record
+     * @return \stdClass
+     */
+    public static function add_parameters_to_record(stdClass $record): stdClass {
+        $record->json = json_encode($record->difficulty);
+        $record->difficulty = self::get_difficulty_aggregate($record);
+        return $record;
+    }
+
+    /**
+     * {@inheritDoc}
+     *
+     * @param array $parameters
+     * @return float
+     */
+    public static function get_difficulty(array $parameters): float {
+       return self::get_difficulty_aggregate((object) $parameters);
+    }
+
+    /**
+     * Return a single float value for the difficulty.
+     *
+     * @param stdClass $record
+     * @return float
+     */
+    private static function get_difficulty_aggregate(stdClass $record) {
+        return $record->difficulty['1.00'];
+    }
+
+    public static function is_valid(model_item_param $itemparam): bool {
+        $params = $itemparam->get_params_array();
+        if (is_nan($params['discrimination'])) {
+            return true;
+        }
+        foreach ($params['difficulty'] as $d) {
+            if (is_nan($d)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     /**

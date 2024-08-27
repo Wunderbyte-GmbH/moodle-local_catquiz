@@ -240,7 +240,7 @@ class model_strategy {
     ) {
         foreach ($selecteddiffic as $selecteditem) {
             $model = $selecteditem->get_model_name();
-            $id = $selecteditem->get_id();
+            $id = $selecteditem->get_componentid();
             $calcdifficulties[$model][$id]->set_status($selecteditem->get_status());
         }
         return $calcdifficulties;

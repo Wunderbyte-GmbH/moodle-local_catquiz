@@ -296,7 +296,7 @@ class updatepersonability extends preselect_task implements wb_middleware {
                 // Remove all responses that are not in the item param list and check again.
                 $arrayresponsesforscale = [];
                 foreach ($itemparamlist as $item) {
-                    $arrayresponsesforscale[$item->get_id()] = $this->arrayresponses[$item->get_id()];
+                    $arrayresponsesforscale[$item->get_componentid()] = $this->arrayresponses[$item->get_componentid()];
                 }
                 $this->diverseanswers[$scale] = $this->has_sufficient_responses($arrayresponsesforscale);
                 if ($this->diverseanswers[$scale]) {

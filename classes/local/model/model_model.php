@@ -64,6 +64,16 @@ abstract class model_model {
     }
 
     /**
+     * Allows subclasses to overwrite the parameters.
+     *
+     * @param stdClass $record
+     * @return stdClass
+     */
+    public static function add_parameters_to_record(stdClass $record): stdClass {
+        return $record;
+    }
+
+    /**
      * Return the name of the current model
      *
      * @return string
@@ -137,4 +147,15 @@ abstract class model_model {
         model_person_param_list $personabilities,
         model_item_param $itemparams,
         model_responses $k): float;
+
+    /**
+     * Return the difficulty as a single float.
+     *
+     * Can be overwritten by models that need to convert an array of difficulties into a single value.
+     * @param array $parameters
+     * @return float
+     */
+    public static function get_difficulty(array $parameters): float {
+        return $parameters['difficulty'];
+    }
 }
