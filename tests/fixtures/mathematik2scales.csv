@@ -1,4 +1,4 @@
 componentid;componentname;contextid;model;difficulty;discrimination;label;catscalename;parentscalenames;minability;maxability
 0;question;1;rasch;-2.115459524;42.80468358;W_LE01_A04a;A03;Mathematik;-2;2
 0;question;1;rasch;0.046044157;0.520078979;W_LE01_A04c;A03;Mathematik;;
-0;question;1;rasch;-2.862355169;1.081402469;W_LE01_A04f;A02;Mathematik;;
+0;question;1;raschbirnbaum;-2.862355169;1.081402469;W_LE01_A04f;A02;Mathematik;;
