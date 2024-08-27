@@ -1158,6 +1158,8 @@ class catquizstatistics {
             // TODO: To be implemented: 'Ergebnis-Range', 'N global', 'frac global', 'N Ergebnisskala', 'frac Ergebnisskala'.
             $additionalresults = json_decode($r->json);
 
+            $r->testid = $additionalresults->testid;
+
             $globalscale = $additionalresults->catscaleid;
             $r->globalid = $globalscale;
             $r->globalname = $additionalresults->catscales->$globalscale->name;
@@ -1186,6 +1188,9 @@ class catquizstatistics {
                 $r->endtime = userdate($r->endtime, get_string('strftimedatetime', 'core_langconfig'));
             }
             $r->teststrategy = $this->get_teststrategy_name($r->teststrategy);
+
+            // TODO: Process all results.
+
             $data[] = $r;
         }
         return $data;

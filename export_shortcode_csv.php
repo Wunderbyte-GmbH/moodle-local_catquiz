@@ -42,16 +42,18 @@ $starttime = optional_param('starttime', 0, PARAM_INT) ?: null;
 $endtime = optional_param('endtime', 0, PARAM_INT) ?: null;
 $catquizstatistics = new catquizstatistics($courseid, $testid, $scaleid, $endtime, $starttime);
 
-$filename = "shortcode_export_scale_$scaleid";
+$filename = "export_testresults_scale_$scaleid";
 if ($courseid) {
-    $filename .= "_$courseid";
+    $filename .= "_course_$courseid";
 }
 if ($starttime) {
-    $filename .= "_$courseid";
+    $filename .= "_from_".userdate($starttime, get_string('strftimedatetime', 'core_langconfig'));
 }
 if ($endtime) {
-    $filename .= "_$courseid";
+    $filename .= "_till_".userdate($endtime, get_string('strftimedatetime', 'core_langconfig'));
 }
+
+$filename .= "_".userdate(time(), get_string('strftimedatetime', 'core_langconfig'));
 
 $downloadfilename = clean_filename ( $filename );
 $csvexport = new csv_export_writer ( 'semicolon' );
@@ -84,6 +86,7 @@ $exporttitle = [
     'UserE-Mail',
     'Startzeit',
     'Endzeit',
+    'Test-ID',
     'Strategie',
     'Anz. Fragen gesamt',
     # 'Ergebnis-Range',
@@ -111,6 +114,7 @@ foreach ($catquizstatistics->get_export_data() as $row) {
             $row->email,
             $row->starttime,
             $row->endtime,
+            $row->testid,
             $row->teststrategy,
             $row->number_of_testitems_used,
             $row->globalname,
@@ -126,8 +130,9 @@ foreach ($catquizstatistics->get_export_data() as $row) {
             /*
             $row->primaryn,
             $row->primaryf,
-            */
 
+            $row->allresults,
+            */
         ]
     );
 }
