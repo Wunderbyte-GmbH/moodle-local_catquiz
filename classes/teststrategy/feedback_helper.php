@@ -26,6 +26,7 @@ namespace local_catquiz\teststrategy;
 
 use local_catquiz\catscale;
 use local_catquiz\feedback\feedbackclass;
+use local_catquiz\local\model\model_item_param;
 use local_catquiz\local\model\model_model;
 use stdClass;
 
@@ -129,14 +130,12 @@ class feedback_helper {
             if (!$item->model) {
                 continue;
             }
+            $itemparam = model_item_param::from_record($item);
             $model = model_model::get_instance($item->model);
-            foreach ($model::get_parameter_names() as $paramname) {
-                $params[$paramname] = floatval($item->$paramname);
-            }
             foreach ($abilitysteps as $ability) {
                 $fisherinformation = $model->fisher_info(
                     ['ability' => $ability],
-                    $params
+                    $itemparam->get_params_array()
                 );
                 $stringkey = strval($ability);
 

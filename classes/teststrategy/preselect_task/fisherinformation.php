@@ -24,6 +24,7 @@
 
 namespace local_catquiz\teststrategy\preselect_task;
 
+use local_catquiz\local\model\model_item_param;
 use local_catquiz\local\model\model_model;
 use local_catquiz\local\model\model_strategy;
 use local_catquiz\local\result;
@@ -80,14 +81,12 @@ final class fisherinformation extends preselect_task implements wb_middleware {
      * @return ?float
      */
     public function get_fisherinformation(\stdClass $question, float $ability): ?float {
+        $itemparam = model_item_param::from_record($question);
         $model = model_model::get_instance($question->model);
-        foreach ($model::get_parameter_names() as $paramname) {
-            $params[$paramname] = floatval($question->$paramname);
-        }
 
         $fisherinformation = $model->fisher_info(
             ['ability' => $ability],
-            $params
+            $itemparam->get_params_array()
         );
         return $fisherinformation;
     }
