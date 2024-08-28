@@ -181,13 +181,19 @@ class comparetotestaverage extends feedbackgenerator {
 
         $output = "";
 
+        // Keys of the lowest and highest values in range...
+        // Since it's already defined via scale min max range, no more need to sanitize here.
+        $lowestlimitkey = "feedback_scaleid_limit_lower_" . $catscaleid . "_1";
+        $highestlimitkey = "feedback_scaleid_limit_upper_" . $catscaleid . "_" . $numberoffeedbackoptions;
+
+        $rangestart = (float) $quizsettings->$lowestlimitkey;
+        $rangeend = (float) $quizsettings->$highestlimitkey;
+
+        if (!($rangeend > $rangestart)) {
+            throw new \moodle_exception('error:minmaxrangeequal', 'local_catquiz');
+        }
+
         for ($i = 1; $i <= $numberoffeedbackoptions; $i++) {
-            // Keys of the lowest and highest values in range...
-            // Since it's already defined via scale min max range, no more need to sanitize here.
-            $lowestlimitkey = "feedback_scaleid_limit_lower_" . $catscaleid . "_1";
-            $highestlimitkey = "feedback_scaleid_limit_upper_" . $catscaleid . "_" . $numberoffeedbackoptions;
-            $rangestart = (float) $quizsettings->$lowestlimitkey;
-            $rangeend = (float) $quizsettings->$highestlimitkey;
 
             $lowerlimitkey = "feedback_scaleid_limit_lower_" . $catscaleid . "_" . $i;
             $upperlimitkey = "feedback_scaleid_limit_upper_" . $catscaleid . "_" . $i;
@@ -278,7 +284,7 @@ class comparetotestaverage extends feedbackgenerator {
             $abilityrange['minscalevalue'],
             $abilityrange['maxscalevalue']);
 
-        if ($abilityrange['minscalevalue'] == $abilityrange['maxscalevalue']) {
+        if (!($abilityrange['minscalevalue'] < $abilityrange['maxscalevalue'])) {
             throw new \moodle_exception('error:minmaxrangeequal', 'local_catquiz');
         }
         $scalingfactor = 1 / ((float) $abilityrange['maxscalevalue'] - (float) $abilityrange['minscalevalue']) * 100;
