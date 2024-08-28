@@ -245,6 +245,7 @@ $string['enrolementstringstartforfeedback'] = 'Auf Grundlage Ihres Ergebnisses s
 $string['enrolled_courses'] = 'Eingeschriebene Kurse';
 $string['enrolmentmessagetitle'] = 'Benachrichtigung über neue Kurseinschreibung(en) / Gruppenmitgliedschaft(en)';
 $string['error'] = 'Es ist ein Fehler aufgetreten';
+$string['error:missingcapabilityforcsvdownload'] = 'Ihnen fehlt die notwendige Berechtigung, die Informationen herunterzuladen: {$a}.';
 $string['error:fraction0'] = 'Leider konnten wir aufgrund Ihrer Antworten kein zuverlässiges Ergebnis ermitteln.
     Wir würden uns freuen, wenn Sie es erneut versuchen.';
 $string['error:fraction1'] = 'Herzlichen Glückwunsch, Sie haben alle Fragen richtig beantwortet! Das ist wirklich großartig!
