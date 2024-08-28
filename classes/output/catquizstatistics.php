@@ -1122,6 +1122,7 @@ class catquizstatistics {
         }
 
         $params = [
+            'cid' => $this->courseid,
             'scaleid' => $this->scaleid,
             'courseid' => $this->courseid,
             'testid' => $this->testid,

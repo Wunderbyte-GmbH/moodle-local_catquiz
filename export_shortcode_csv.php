@@ -28,18 +28,29 @@
 use local_catquiz\output\catquizstatistics;
 
 require_once('../../config.php');
-$context = \context_system::instance();
-$PAGE->set_context($context);
-require_login();
-require_capability('local/catquiz:canmanage', $context);
-require_once($CFG->dirroot . '/local/catquiz/lib.php');
-require_once($CFG->libdir . '/csvlib.class.php');
 
 $scaleid = required_param('scaleid', PARAM_INT);
+$cid = required_param('cid', PARAM_INT);
+
 $courseid = optional_param('courseid', 0, PARAM_INT) ?: null;
 $testid = optional_param('testid', 0, PARAM_INT) ?: null;
 $starttime = optional_param('starttime', 0, PARAM_INT) ?: null;
 $endtime = optional_param('endtime', 0, PARAM_INT) ?: null;
+
+require_login();
+
+$PAGE->set_context(context_course::instance($cid));
+
+if (!has_capability('local/catquiz:view_users_feedback', context_course::instance($cid)) &&
+    !has_capability('local/catquiz:canmanage', context_system::instance())) {
+
+    throw new \Exception(get_string('error:permissionforcsvdownload', 'local_catquiz','local/catquiz:view_users_feedback'), 404);
+    break;
+}
+
+require_once($CFG->dirroot . '/local/catquiz/lib.php');
+require_once($CFG->libdir . '/csvlib.class.php');
+
 $catquizstatistics = new catquizstatistics($courseid, $testid, $scaleid, $endtime, $starttime);
 
 $filename = "export_testresults_scale_$scaleid";
