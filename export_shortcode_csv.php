@@ -43,11 +43,10 @@ $PAGE->set_context(context_course::instance($cid));
 
 if (!has_capability('local/catquiz:view_users_feedback', context_course::instance($cid)) &&
     !has_capability('local/catquiz:canmanage', context_system::instance())) {
-    throw new \Exception(get_string($classname, 'local_catquiz','local/catquiz:view_users_feedback'));
+
+    throw new \Exception(get_string('error:permissionforcsvdownload', 'local_catquiz','local/catquiz:view_users_feedback'), 404);
     break;
 }
-
-
 
 require_once($CFG->dirroot . '/local/catquiz/lib.php');
 require_once($CFG->libdir . '/csvlib.class.php');
