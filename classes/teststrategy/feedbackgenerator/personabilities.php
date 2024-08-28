@@ -93,12 +93,27 @@ class personabilities extends feedbackgenerator {
                     'feedback_details_lowestskill',
                     'local_catquiz',
                     [
-                        'name' => feedback_helper::add_quotes($primaryscale['name']),
+                        'name' => $primaryscale['name'],
                         'value' => feedback_helper::localize_float($primaryscale['value']),
                         'se' => feedback_helper::localize_float($feedbackdata['se'][$primaryscaleid]),
                     ]
                 );
             }
+
+            if (array_key_exists('primarybecause', $primaryscale)
+                && $primaryscale['primarybecause'] === 'highestskill'
+            ) {
+                $scaleinfo = get_string(
+                    'feedback_details_highestskill',
+                    'local_catquiz',
+                    [
+                        'name' => $primaryscale['name'],
+                        'value' => feedback_helper::localize_float($primaryscale['value']),
+                        'se' => feedback_helper::localize_float($feedbackdata['se'][$primaryscaleid]),
+                    ]
+                );
+            }
+
         }
 
         $pseudoindex = 0;
@@ -121,7 +136,7 @@ class personabilities extends feedbackgenerator {
         $description = get_string(
             'feedback_details_description',
             'local_catquiz',
-            feedback_helper::add_quotes($globalscalename)
+            $globalscalename
         );
         $referencescale = [
             'name' => $globalscalename,
@@ -474,7 +489,7 @@ class personabilities extends feedbackgenerator {
             'charttitle' => get_string(
                 'personabilitycharttitle',
                 'local_catquiz',
-                feedback_helper::add_quotes($globalscalename)
+                $globalscalename
             ),
             'colorbar_legend' => [
                 'feedbackbarlegend' => feedback_helper::get_colorbarlegend($quizsettings, $quizsettings->catquiz_catscales),

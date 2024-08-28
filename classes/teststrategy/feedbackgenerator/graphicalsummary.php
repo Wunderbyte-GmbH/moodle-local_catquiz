@@ -74,7 +74,7 @@ class graphicalsummary extends feedbackgenerator {
         $data['description'] = get_string(
             'graphicalsummary_description',
             'local_catquiz',
-            feedback_helper::add_quotes($globalscalename)
+            $globalscalename
         );
         // If this is a deficit strategy, display more info.
         $additionalinfo = false;

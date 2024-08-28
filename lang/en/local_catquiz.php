@@ -28,7 +28,7 @@ defined('MOODLE_INTERNAL') || die();
 $string['abilityinglobalscale'] = 'Ability in global scale';
 $string['abilityintestedscale'] = 'Ability score in top-most parent scale';
 $string['abilityintestedscale_before'] = 'Ability score in top-most parent scale - before';
-$string['abilityprofile'] = 'Ability score profile in {$a}';
+$string['abilityprofile'] = 'Ability score profile in “{$a}”';
 $string['abilityprofile_title'] = 'Ability score in test';
 $string['abortpersonabilitynotchanged'] = 'Person parameter did not change';
 $string['acceptedstandarderror'] = 'Accepted standarderror';
@@ -103,7 +103,8 @@ $string['catquiz:subscribecatscales'] = 'Is allowed to subscribe to Catquiz CAT 
 $string['catquiz:view_teacher_feedback'] = 'Access teacher feedback';
 $string['catquiz:view_users_feedback'] = 'Access feedback from all users, not only current one.';
 $string['catquiz_feedbackheader'] = 'Feedback';
-$string['catquiz_left_quote'] = '&ldquo;';
+$string['catquiz_left_quote'] = '“';
+$string['catquiz_right_quote'] = '”';
 $string['catquiz_selectfirstquestion'] = 'Otherwise start';
 $string['catquiz_selectfirstquestion_help'] = 'During a test attempt, the algorithm decides based on this setting which criterion will be used to select the first question to be played.';
 $string['catquiz_selectteststrategy'] = 'Purpose of test';
@@ -319,10 +320,9 @@ $string['formminquestgreaterthan'] = 'Minimum must be less than maximum';
 $string['formmscalegreaterthantest'] = 'Per scale minimum must be less than per test maximum';
 $string['genericsubmit'] = 'Confirm';
 $string['global_scale'] = 'Global scale';
-$string['graphicalsummary_description'] = 'During an attempt your ability is recalculated after each response. The following chart shows how your estimated ability in {$a} changed';
-$string['graphicalsummary_description_lowest'] = 'Zusätzlich ist auch die
-    Entwicklung Ihres Fähigkeitswertes bezüglich der als Defizit
-    identifizierten Skala {$a} dargestellt:';
+$string['graphicalsummary_description'] = 'During an attempt your ability is recalculated after each response. The following chart shows how your estimated ability in “{$a}” changed';
+$string['graphicalsummary_description_lowest'] = 'In addition, the development of your ability score with regard to the scale,
+    which has been identified as a shortcoming:';
 $string['greateststrenght:tooltiptitle'] = 'your strongest scale {$a}';
 $string['groupenrolementstring'] = '“{$a->groupname}” in course “<a href="{$a->courseurl}">{$a->coursename}</a>”';
 $string['groupenrolmenthelptext'] = 'Please enter exact name(s) of existing group like (i.e. “group1,group2” or “group3”).';
@@ -363,13 +363,13 @@ $string['itemstatus_4'] = 'Manually updated';
 $string['itemstatus_5'] = 'Manually confirmed';
 $string['label'] = 'Label';
 $string['labelforrelativepersonabilitychart'] = 'Relative Ability';
-$string['labelidnotfound'] = 'Label {$a} not found.';
-$string['labelidnotunique'] = 'Label {$a} is not unique.';
+$string['labelidnotfound'] = 'Label “{$a}” not found.';
+$string['labelidnotunique'] = 'Label “{$a}” is not unique.';
 $string['lang'] = 'Language';
 $string['lastattempttime'] = 'Last attempt';
 $string['learningprogress_description'] = 'How did your ability score change
     over time? Did you improve?<br/>The following chart displays the progress
-    of your (general) ability score in {$a} in comparison to the average of all
+    of your (general) ability score in “{$a}” in comparison to the average of all
     test attempts:';
 $string['learningprogresstitle'] = 'Your Progress';
 $string['likelihood'] = 'Likelihood';
@@ -377,7 +377,7 @@ $string['local_catquiz_toggle_testitemstatus_message'] = 'Testitem status was up
 $string['logsafter'] = 'Logs after';
 $string['logsbefore'] = 'Logs before';
 $string['lowerlimit'] = 'Lower limit';
-$string['lowestskill:tooltiptitle'] = 'your lowest scale {$a}';
+$string['lowestskill:tooltiptitle'] = 'your lowest scale “{$a}”';
 $string['manage_catcontexts'] = 'Manage CAT contexts';
 $string['managecatcontexts'] = 'Manage CAT contexts';
 $string['managecatscale'] = 'Manage CAT scale';
@@ -480,7 +480,7 @@ $string['personabilitiesnodata'] = 'No ability scores were calculated';
 $string['personability'] = 'Ability score';
 $string['personabilityafterattempt'] = 'Ability score after attempt';
 $string['personabilitybeforeattempt'] = 'Ability score before attempt';
-$string['personabilitycharttitle'] = 'Relative ability score in subscales compared to {$a}';
+$string['personabilitycharttitle'] = 'Relative ability score in subscales compared to “{$a}”';
 $string['personabilityfeedbacktitle'] = 'Personability Profile';
 $string['personabilityinscale'] = 'Ability score in scale “{$a}”';
 $string['personabilityrangestring'] = '{$a->rangestart} - {$a->rangeend}';
@@ -492,7 +492,7 @@ $string['pleasecheckorcancel'] = 'Please confirm or cancel';
 $string['pleasechoose'] = 'please choose';
 $string['pluginname'] = 'Adaptive Quiz - Advanced CAT Module';
 $string['previewquestion'] = 'Preview question';
-$string['progress'] = 'Progress';
+$string['progress'] = 'Progress of your ability score in “{$a}”';
 $string['questioncategories'] = 'Question category';
 $string['questioncontextattempts'] = '# Attempts in selected context';
 $string['questionpreview'] = 'Question preview';
