@@ -404,7 +404,7 @@ class feedback_helper {
      */
     public static function add_quotes(string $string) {
         $leftquote = get_string('catquiz_left_quote', 'local_catquiz');
-        $rightquote = '&rdquo;';
+        $rightquote = get_string('catquiz_right_quote', 'local_catquiz');
         return sprintf('%s%s%s', $leftquote, $string, $rightquote);
     }
 

@@ -414,7 +414,7 @@ class catquizstatistics {
         $out = $OUTPUT->render_chart($chart, false);
         return [
             'chart' => $out,
-            'charttitle' => get_string('abilityprofile', 'local_catquiz', feedback_helper::add_quotes($scalename)),
+            'charttitle' => get_string('abilityprofile', 'local_catquiz', $scalename),
         ];
     }
 
@@ -558,7 +558,7 @@ class catquizstatistics {
         // Minimum 3 records required to display progress charts.
         if (count($records) < 3) {
             return [
-                'charttitle' => get_string('progress', 'local_catquiz', feedback_helper::add_quotes($scalename)),
+                'charttitle' => get_string('progress', 'local_catquiz', $scalename),
                 'chart' => $this->get_nodata_body(),
             ];
         }
@@ -579,7 +579,7 @@ class catquizstatistics {
 
         if (count($attemptsofpeers) < 3) {
             return [
-                'charttitle' => get_string('progress', 'local_catquiz', feedback_helper::add_quotes($scalename)),
+                'charttitle' => get_string('progress', 'local_catquiz', $scalename),
                 'chart' => $this->get_nodata_body(),
             ];
         }
@@ -591,7 +591,7 @@ class catquizstatistics {
                 [$beginningoftimerange, $this->endtime]);
 
         return [
-            'charttitle' => get_string('progress', 'local_catquiz', feedback_helper::add_quotes($scalename)),
+            'charttitle' => get_string('progress', 'local_catquiz', $scalename),
             'chart' => $progresscomparison,
         ];
     }
