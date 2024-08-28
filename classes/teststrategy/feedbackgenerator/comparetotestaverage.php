@@ -294,7 +294,7 @@ class comparetotestaverage extends feedbackgenerator {
             'local_catquiz',
             [
                 'betterthan' => $betterthan,
-                'quotedscale' => feedback_helper::add_quotes($catscale->name),
+                'quotedscale' => $catscale->name,
                 'ability_global' => feedback_helper::localize_float($abilityinrange),
                 'se_global' => feedback_helper::localize_float($newdata['se'][$catscaleid]),
                 'average_ability' => feedback_helper::localize_float($testaverageinrange),

@@ -28,7 +28,7 @@ defined('MOODLE_INTERNAL') || die();
 $string['abilityinglobalscale'] = 'Fähigkeits-Wert in der Global-Skala';
 $string['abilityintestedscale'] = 'Fähigkeits-Wert in der obersten Skala';
 $string['abilityintestedscale_before'] = 'Fähigkeits-Wert in der obersten Skala - davor';
-$string['abilityprofile'] = 'Aktuelle Ergebnisse in {$a}';
+$string['abilityprofile'] = 'Aktuelle Ergebnisse in „{$a}“';
 $string['abilityprofile_title'] = 'Aktuelle Ergebnisse im Test';
 $string['abortpersonabilitynotchanged'] = 'Personenparameter unverändert';
 $string['acceptedstandarderror'] = 'akzeptierter Standardfehler';
@@ -336,7 +336,7 @@ $string['genericsubmit'] = 'Bestätigen';
 $string['global_scale'] = 'Globalskala';
 $string['graphicalsummary_description'] = 'Während des Verlaufs des Testversuchs wird Ihrer Fähigkeits-Wert mit jeder Antwort neu
 berechnet und aktualisiert. Die folgende Grafik zeigt Ihnen, wie sich die Einschätzung
-Ihres Fähigkeits-Wertes in {$a} über den Verlauf des Testversuchs hinweg
+Ihres Fähigkeits-Wertes in „{$a}“ über den Verlauf des Testversuchs hinweg
 verändert hat.';
 $string['graphicalsummary_description_lowest'] = 'Zusätzlich ist auch die
     Entwicklung Ihres Fähigkeits-Wertes bezüglich der als Defizit
@@ -381,14 +381,14 @@ $string['itemstatus_4'] = 'Manuell gesetzt';
 $string['itemstatus_5'] = 'Manuell bestätigt';
 $string['label'] = 'Kennzeichen';
 $string['labelforrelativepersonabilitychart'] = 'Differenz';
-$string['labelidnotfound'] = 'Wert von Label {$a} nicht gefunden.';
-$string['labelidnotunique'] = 'Wert von Label {$a} muss einzigartig sein.';
+$string['labelidnotfound'] = 'Wert von Label „{$a}“ nicht gefunden.';
+$string['labelidnotunique'] = 'Wert von Label „{$a}“ muss einzigartig sein.';
 $string['lang'] = 'Sprache';
 $string['lastattempttime'] = 'Letzter Testversuch';
 $string['learningprogress_description'] = 'Wie hat sich Ihr Fähigkeits-Wert über
     die letzten Versuche hin entwickelt? Haben Sie sich verbessert?<br/> Die
     folgende Grafik zeigt Ihnen die Entwicklung Ihres (allgemeinen)
-    Fähigkeits-Wertes in {$a} im Vergleich zum Durchschnittswert aller
+    Fähigkeits-Wertes in „{$a}“ im Vergleich zum Durchschnittswert aller
     Testversuche:';
 $string['learningprogresstitle'] = 'Ihr Lernfortschritt';
 $string['likelihood'] = 'Wahrscheinlichkeit';
@@ -396,7 +396,7 @@ $string['local_catquiz_toggle_testitemstatus_message'] = 'Status des Elements wu
 $string['logsafter'] = 'Einträge vor';
 $string['logsbefore'] = 'Einträge nach';
 $string['lowerlimit'] = 'Unteres Limit';
-$string['lowestskill:tooltiptitle'] = 'Ihre schwächste Skala „{$a}';
+$string['lowestskill:tooltiptitle'] = 'Ihre schwächste Skala „{$a}“';
 $string['manage_catcontexts'] = 'Einsatz-Kontexte verwalten';
 $string['managecatcontexts'] = 'Einsatz-Kontexte verwalten';
 $string['managecatscale'] = 'Skalen verwalten';
@@ -499,7 +499,7 @@ $string['personabilitiesnodata'] = 'Es konnte kein Fähigkeits-Wert errechnet we
 $string['personability'] = 'Fähigkeits-Wert';
 $string['personabilityafterattempt'] = 'Fähigkeits-Wert nach Testversuch';
 $string['personabilitybeforeattempt'] = 'Fähigkeits-Wert vor Testversuch';
-$string['personabilitycharttitle'] = 'Differenz Ihrer Fähigkeits-Werte im Vergleich zu {$a}';
+$string['personabilitycharttitle'] = 'Differenz Ihrer Fähigkeits-Werte im Vergleich zu „{$a}“';
 $string['personabilityfeedbacktitle'] = 'Fähigkeitsprofil';
 $string['personabilityinscale'] = 'Fähigkeits-Wert für Skala „{$a}“';
 $string['personabilityrangestring'] = '{$a->rangestart} - {$a->rangeend}';
@@ -511,7 +511,7 @@ $string['pleasecheckorcancel'] = 'Bitte bestätigen oder abbrechen';
 $string['pleasechoose'] = 'bitte auswählen';
 $string['pluginname'] = 'Adaptive Quiz - Advanced CAT Module';
 $string['previewquestion'] = 'Fragen Vorschau';
-$string['progress'] = 'Entwicklung Fähigkeits-Wert in {$a}';
+$string['progress'] = 'Entwicklung Fähigkeits-Wert in „{$a}“';
 $string['questioncategories'] = 'Fragekategorien';
 $string['questioncontextattempts'] = '# Testversuche im ausgewählten Einsatz-Kontext';
 $string['questionpreview'] = 'Fragevorschau';
