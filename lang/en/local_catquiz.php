@@ -242,6 +242,7 @@ $string['enrolementstringstartforfeedback'] = 'Based on your results you are now
 $string['enrolled_courses'] = 'Enrolled courses';
 $string['enrolmentmessagetitle'] = 'Notification about new course / group enrolments';
 $string['error'] = 'An error occured';
+$string['error:permissionforcsvdownload'] = 'You do not have the necessary permission ({$a}) to download the requested information.';
 $string['error:fraction0'] = 'Unfortunately, we were unable to determine a valid result based on your answers. We would be pleased if you would try again.';
 $string['error:fraction1'] = 'Congratulations, you have answered all the questions correctly! That is really awesome!
     However, due to this excellent performance, we were unable to determine a conclusive result.';
