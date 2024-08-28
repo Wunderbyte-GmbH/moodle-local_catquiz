@@ -421,7 +421,7 @@ class shortcodes {
                     '/mod/adaptivequiz/view.php',
                     ['id' => $cm->id]
                 );
-                $link =  feedback_helper::add_quotes(sprintf('<a href="%s">%s</a>', $testurl->out(),$testname));
+                $link = feedback_helper::add_quotes(sprintf('<a href="%s">%s</a>', $testurl->out(), $testname));
                 return $link;
             }, $tests);
             $h1 = get_string('catquizstatistics_h1_scale', 'local_catquiz', (object) [
