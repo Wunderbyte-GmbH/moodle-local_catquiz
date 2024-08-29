@@ -1170,13 +1170,13 @@ class catquizstatistics {
             // TODO: To be implemented: 'Ergebnis-Range', 'N global', 'frac global', 'N Ergebnisskala', 'frac Ergebnisskala'.
             $additionalresults = json_decode($r->json);
 
-            $r->testid = $additionalresults->testid;
+            $r->testid = $additionalresults->testid ?? '';
 
             $globalscale = $additionalresults->catscaleid;
-            $r->globalid = $globalscale;
-            $r->globalname = $additionalresults->catscales->$globalscale->name;
-            $r->globalpp = $additionalresults->personabilities->$globalscale;
-            $r->globalse = $additionalresults->se->$globalscale;
+            $r->globalid = $globalscale ?? '';
+            $r->globalname = $globalscale ? $additionalresults->catscales->$globalscale->name : '';
+            $r->globalpp = $additionalresults->personabilities->$globalscale ?? '';
+            $r->globalse = $additionalresults->se->$globalscale ?? '';
             /*
             $r->globaln = $additionalresults->n->$globalscale;
             $r->globalf = $additionalresults->frac->$globalscale;
@@ -1184,10 +1184,11 @@ class catquizstatistics {
             // phpcs:enable
 
             $primaryscale = $additionalresults->primaryscale;
-            $r->primaryid = $globalscale;
-            $r->primaryname = $additionalresults->catscales->$primaryscale->name;
-            $r->primarypp = $additionalresults->personabilities->$primaryscale;
-            $r->primaryse = $additionalresults->se->$primaryscale;
+            $r->primaryid = $primaryscale ?? '';
+            $r->primaryname = $primaryscale ? $additionalresults->catscales->$primaryscale->name : '';
+            $r->primarypp = $additionalresults->personabilities->$primaryscale ?? '';
+            $r->primaryse = $additionalresults->se->$primaryscale ?? '';
+
             // phpcs:disable
             /*
             $r->primaryn = $additionalresults->n->$primaryscale;
