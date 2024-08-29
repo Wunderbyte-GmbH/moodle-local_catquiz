@@ -1149,8 +1149,9 @@ class catquizstatistics {
     public function get_export_data(): array {
         global $DB;
 
-        if (!has_capability('local/catquiz:canmanage', context_system::instance())) {
-            return [];
+        if (!has_capability('local/catquiz:canmanage', context_system::instance()) &&
+            !has_capability('local/catquiz:view_users_feedback', context_course::instance($this->courseid))) {
+            return '';
         }
 
         list ($sql, $params) = catquiz::get_sql_for_csv_export(
