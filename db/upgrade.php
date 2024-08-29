@@ -894,7 +894,8 @@ function xmldb_local_catquiz_upgrade($oldversion) {
         }
 
         // Set all catquiz_itemparams entrys if pointing correctly to.
-        $sql = "SELECT lcip.id id, lci1.id itemidold, lci2.id itemidnew
+        $sql = "SET @n = 0;
+          SELECT @n := @n+1 AS rownum, lcip.id id, lci1.id itemidold, lci2.id itemidnew
             FROM {local_catquiz_itemparams} lcip
             JOIN {local_catquiz_items} lci1 ON lci1.id = lcip.itemid
             JOIN {local_catquiz_items} lci2 ON lci2.componentid = lci1.componentid
