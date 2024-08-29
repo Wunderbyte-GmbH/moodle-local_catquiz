@@ -68,6 +68,10 @@ class attempt_completed extends catquiz_event_base {
         $data = $this->data;
         $other = $this->get_other_data();
 
+        if (!$other) {
+            return '';
+        }
+
         $catscaleid = $other->catscaleid;
         $linktoscale = catscale::get_link_to_catscale($catscaleid);
         $data['catscalelink'] = $linktoscale;
