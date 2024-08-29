@@ -1173,7 +1173,7 @@ class catquizstatistics {
             */
             // phpcs:enable
 
-            $primaryscale = $additionalresults->cprimaryscale;
+            $primaryscale = $additionalresults->primaryscale;
             $r->primaryid = $globalscale;
             $r->primaryname = $additionalresults->catscales->$primaryscale->name;
             $r->primarypp = $additionalresults->personabilities->$primaryscale;
