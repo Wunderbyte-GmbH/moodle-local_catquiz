@@ -1117,8 +1117,12 @@ class catquizstatistics {
             'local/catquiz:view_users_feedback',
             context_course::instance($this->courseid)
         );
+
         if (!$hasglobalaccess && !$haslocalaccess) {
-            return '';
+            return sprintf(
+                '<div class="alert alert-primary mt-1" role="alert">%s</div>',
+                get_string('error:permissionforcsvdownload', 'local_catquiz', 'local/catquiz:view_users_feedback')
+            );
         }
 
         $params = [
@@ -1129,7 +1133,8 @@ class catquizstatistics {
             'starttime' => $this->starttime,
             'endtime' => $this->endtime,
         ];
-        return (new moodle_url('/local/catquiz/export_shortcode_csv.php', $params))->out(false);
+        $url = (new moodle_url('/local/catquiz/export_shortcode_csv.php', $params))->out(false);
+        return sprintf('<a class="btn btn-info" style="margin: 1em 0" id="download-link" href="%s">%s</a>', $url, get_string('download', 'admin'));
     }
 
     /**
