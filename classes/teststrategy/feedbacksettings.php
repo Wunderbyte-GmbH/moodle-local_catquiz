@@ -17,9 +17,6 @@
 namespace local_catquiz\teststrategy;
 
 use stdClass;
-use local_catquiz\catscale;
-use local_catquiz\feedback\feedbackclass;
-use local_catquiz\output\attemptfeedback;
 
 defined('MOODLE_INTERNAL') || die();
 
@@ -109,7 +106,7 @@ class feedbacksettings {
     public ?float $fraction;
 
     /**
-     * Constructor for feedbackclass.
+     * Constructor for feedbacksettings.
      *
      * @param int $strategyid
      */
