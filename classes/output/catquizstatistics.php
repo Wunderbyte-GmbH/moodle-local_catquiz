@@ -1134,7 +1134,11 @@ class catquizstatistics {
             'endtime' => $this->endtime,
         ];
         $url = (new moodle_url('/local/catquiz/export_shortcode_csv.php', $params))->out(false);
-        return sprintf('<a class="btn btn-info" style="margin: 1em 0" id="download-link" href="%s">%s</a>', $url, get_string('download', 'admin'));
+        return sprintf(
+            '<a class="btn btn-info" style="margin: 1em 0" id="download-link" href="%s">%s</a>',
+            $url,
+            get_string('download', 'admin')
+        );
     }
 
     /**
