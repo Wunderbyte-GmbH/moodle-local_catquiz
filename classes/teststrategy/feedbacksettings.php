@@ -36,6 +36,13 @@ require_once($CFG->dirroot.'/local/catquiz/lib.php');
  */
 class feedbacksettings {
 
+    /**
+     * Used to mark a field as hidden.
+     *
+     * @var string
+     */
+    const FIELD_HIDDEN = 'hidden';
+
     /** The id of the teststrategy.
      * @var int
      */
@@ -221,11 +228,12 @@ class feedbacksettings {
      *
      * @param array $personabilities
      * @param array $feedbackdata
+     * @param bool $hide If given, the scale is not excluded but instead the value is marked as hidden.
      *
      * @return array
      *
      */
-    public function filter_nminscale(array $personabilities, array $feedbackdata): array {
+    public function filter_nminscale(array $personabilities, array $feedbackdata, bool $hide = false): array {
         $progress = progress::load(
             $feedbackdata['attemptid'],
             'mod_adaptivequiz',
@@ -240,7 +248,8 @@ class feedbacksettings {
                         'nminscaledefined' => $nminscale,
                         'nscalecurrent' => $ninscale,
                     ];
-                    $personabilities[$scaleid]['excluded'] = true;
+                    $action = $hide ? self::FIELD_HIDDEN : 'excluded';
+                    $personabilities[$scaleid][$action] = true;
                 }
             }
         }
@@ -252,11 +261,12 @@ class feedbacksettings {
      *
      * @param array $personabilities
      * @param array $feedbackdata
+     * @param bool $hide If given, the scale is not excluded but instead the value is marked as hidden.
      *
      * @return array
      *
      */
-    public function filter_nmintest(array $personabilities, array $feedbackdata): array {
+    public function filter_nmintest(array $personabilities, array $feedbackdata, bool $hide = false): array {
         $nmintest = $this->nmintest;
         if (!empty($nmintest)) {
             $nintest = $feedbackdata['progress']->get_num_playedquestions();
@@ -266,7 +276,8 @@ class feedbacksettings {
                         'nmintestdefined' => $nmintest,
                         'ntestcurrent' => $nintest,
                     ];
-                    $personabilities[$scaleid]['excluded'] = true;
+                    $action = $hide ? self::FIELD_HIDDEN : 'excluded';
+                    $personabilities[$scaleid][$action] = true;
                 }
             }
         }
@@ -277,11 +288,12 @@ class feedbacksettings {
      *
      * @param array $personabilities
      * @param array $feedbackdata
+     * @param bool $hide If given, the scale is not excluded but instead the value is marked as hidden.
      *
      * @return array
      *
      */
-    public function filter_semax(array $personabilities, array $feedbackdata): array {
+    public function filter_semax(array $personabilities, array $feedbackdata, bool $hide = false): array {
         global $CFG;
         if (!isset($this->semax)) {
             return $personabilities;
@@ -307,7 +319,8 @@ class feedbacksettings {
                         'semaxdefined' => $semax,
                         'securrent' => $se,
                     ];
-                    $personabilities[$scaleid]['excluded'] = true;
+                    $action = $hide ? self::FIELD_HIDDEN : 'excluded';
+                    $personabilities[$scaleid][$action] = true;
                 }
             }
         }

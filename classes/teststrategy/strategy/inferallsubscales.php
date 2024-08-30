@@ -162,6 +162,11 @@ class inferallsubscales extends strategy {
         $estimated = $feedbacksettings->fraction == 1 || $feedbacksettings->fraction == 0;
         $rootscaleid = $feedbackdata['catscaleid'];
 
+        // Display scales that do not meet the minimum requirements.
+        $feedbacksettings->displayscaleswithoutitemsplayed = true;
+        // Filter scales, but instead of excluding a scale, mark it as hidden.
+        $personabilities = $feedbacksettings->filter_nminscale($personabilities, $feedbackdata, true);
+        $personabilities = $feedbacksettings->filter_semax($personabilities, $feedbackdata, true);
         foreach ($personabilities as $scaleid => $abilitiesarray) {
             $personabilities[$scaleid]['toreport'] = true;
             if ($estimated) {

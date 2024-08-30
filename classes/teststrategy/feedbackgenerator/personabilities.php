@@ -149,12 +149,25 @@ class personabilities extends feedbackgenerator {
             'itemsplayed' => $this->get_progress()->get_num_playedquestions(),
         ];
 
+        // Create an abilityscore entry to be displayed in a table.
+        // If the scale is marked as hidden, the value is empty ('-'), otherwise it is Ability (± SE)
+        $abilities = array_map(
+            function ($abilityarray) {
+                $ishidden = array_key_exists('hidden', $abilityarray) && $abilityarray['hidden'];
+                $abilityarray['abilityscore'] = $ishidden
+                    ? '-'
+                    : sprintf('%.2f (±%.2f)', $abilityarray['ability'], $abilityarray['standarderror']);
+                return $abilityarray;
+            },
+            $feedbackdata['abilitieslist']
+        );
+
         $feedback = $OUTPUT->render_from_template(
         'local_catquiz/feedback/personabilities',
             [
             'feedback_details_description' => $description,
             'scale_info' => $scaleinfo,
-            'abilities' => $feedbackdata['abilitieslist'],
+            'abilities' => $abilities,
             'referencescale' => $referencescale,
             'chartdisplay' => $abilitieschart,
             'chart_description' => $chartdescription,
@@ -342,6 +355,7 @@ class personabilities extends feedbackgenerator {
         }
 
         return [
+            'hidden' => array_key_exists('hidden', $abilityarray) && $abilityarray['hidden'],
             'standarderror' => $standarderror,
             'ability' => $ability,
             'name' => $catscales[$catscaleid]->name,
