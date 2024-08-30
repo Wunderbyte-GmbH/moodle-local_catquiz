@@ -1151,7 +1151,7 @@ class catquizstatistics {
 
         if (!has_capability('local/catquiz:canmanage', context_system::instance()) &&
             !has_capability('local/catquiz:view_users_feedback', context_course::instance($this->courseid))) {
-            return '';
+            return [];
         }
 
         list ($sql, $params) = catquiz::get_sql_for_csv_export(
