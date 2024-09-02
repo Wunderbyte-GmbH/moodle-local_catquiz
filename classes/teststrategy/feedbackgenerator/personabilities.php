@@ -150,7 +150,7 @@ class personabilities extends feedbackgenerator {
         ];
 
         // Create an abilityscore entry to be displayed in a table.
-        // If the scale is marked as hidden, the value is empty ('-'), otherwise it is Ability (± SE)
+        // If the scale is marked as hidden, the value is empty ('-'), otherwise it is Ability (± SE).
         $abilities = array_map(
             function ($abilityarray) {
                 $ishidden = array_key_exists('hidden', $abilityarray) && $abilityarray['hidden'];
