@@ -46,6 +46,12 @@ class customscalefeedback extends feedbackgenerator {
     private $sortfun;
 
     /**
+     * Stores the testid
+     * @var ?int
+     */
+    private ?int $testid;
+
+    /**
      * Creates a new customscale feedback generator.
      *
      * @param feedbacksettings $feedbacksettings
@@ -73,6 +79,7 @@ class customscalefeedback extends feedbackgenerator {
      *
      */
     public function get_studentfeedback(array $data): array {
+        $this->testid = $data['testid'];
 
         if (!$data['customscalefeedback_abilities'] ?? false) {
             return [];
@@ -305,9 +312,17 @@ class customscalefeedback extends feedbackgenerator {
      * @return ?string
      */
     private function getfeedbackforrange(int $catscaleid, int $groupnumber, array $quizsettings): ?string {
-
+        $systemcontext = \context_system::instance();
         $quizsettingskey = 'feedbackeditor_scaleid_' . $catscaleid . '_' . $groupnumber;
-        return ((array) $quizsettings[$quizsettingskey])['text'];
+        $filearea = sprintf('feedback_files_%d_%d', $catscaleid, $groupnumber);
+        return file_rewrite_pluginfile_urls(
+            $quizsettings[$quizsettingskey],
+            'pluginfile.php',
+            $systemcontext->id,
+            'local_catquiz',
+            $filearea,
+            $this->testid
+        );
 
     }
 }
