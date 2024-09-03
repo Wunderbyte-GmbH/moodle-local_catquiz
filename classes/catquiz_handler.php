@@ -383,18 +383,6 @@ class catquiz_handler {
 
     }
 
-    public static function get_textfield_options() {
-        $context = context_system::instance();
-
-        return [
-            'trusttext' => true,
-            'subdirs' => true,
-            'context' => $context,
-            'maxfiles' => EDITOR_UNLIMITED_FILES,
-            'noclean' => true,
-        ];
-    }
-
     /**
      * Undocumented function
      *
