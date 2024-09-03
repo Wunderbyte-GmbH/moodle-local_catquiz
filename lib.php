@@ -152,7 +152,7 @@ function local_catquiz_coursemodule_standard_elements($fromform, $fields) {
  * @param bool $forcedownload
  * @param array $options
  */
-function local_catquiz_pluginfile($course, $birecordorcm, $context, $filearea, $args, $forcedownload, array $options = array()) {
+function local_catquiz_pluginfile($course, $birecordorcm, $context, $filearea, $args, $forcedownload, array $options = []) {
     $isfeedbackfile = strpos($filearea, 'feedback_files') === 0;
     if (!$isfeedbackfile) {
         send_file_not_found();
@@ -162,7 +162,7 @@ function local_catquiz_pluginfile($course, $birecordorcm, $context, $filearea, $
     $filename = array_pop($args);
     $filepath = '/';
     $itemid = intval($args[0]);
-    if (!$file = $fs->get_file($context->id, 'local_catquiz', $filearea, $itemid, $filepath, $filename) or $file->is_directory()) {
+    if ((!$file = $fs->get_file($context->id, 'local_catquiz', $filearea, $itemid, $filepath, $filename)) || $file->is_directory()) {
         send_file_not_found();
     }
     \core\session\manager::write_close();
