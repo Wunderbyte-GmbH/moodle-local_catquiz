@@ -159,11 +159,13 @@ class feedbackclass {
                 // This is the preparation for the header element (to be appended in the end) where we apply the distinction.
 
                 // If reload was triggered (ie via nosubmitbutton), data is set in submitvalues.
-                if (isset($data['feedbackeditor_scaleid_'  . $scale->id . '_' . $j])) {
-                    $feedback = $data['feedbackeditor_scaleid_'  . $scale->id . '_' . $j];
-                } else if (isset($defaultvalues['feedbackeditor_scaleid_'  . $scale->id . '_' . $j])) {
+                $editorfieldnameold = sprintf('feedbackeditor_scaleid_%s_%s', $scale->id, $j);
+                $editorfieldname = $editorfieldnameold . "_editor";
+                if (isset($data[$editorfieldnameold]) || isset($data[$editorfieldname])) {
+                    $feedback = $data[$editorfieldname] ?? $editorfieldnameold;
+                } else if (isset($defaultvalues[$editorfieldname]) || isset($defaultvalues[$editorfieldnameold])) {
                     // If values of form where saved before, and form is loaded, data is in defaultvalues.
-                    $feedback = $defaultvalues['feedbackeditor_scaleid_'  . $scale->id . '_' . $j];
+                    $feedback = $defaultvalues[$editorfieldname] ?? $defaultvalues[$editorfieldnameold];
                 }
                 // Check type and value.
                 if (!empty($feedback)) {
@@ -260,7 +262,7 @@ class feedbackclass {
                 // Rich text field for subfeedback.
                 $subelements[] = $mform->addElement(
                     'editor',
-                    'feedbackeditor_scaleid_' . $scale->id . '_' . $j,
+                    'feedbackeditor_scaleid_' . $scale->id . '_' . $j . '_editor',
                     get_string('feedback', 'core'),
                     ['rows' => 10],
                     [
