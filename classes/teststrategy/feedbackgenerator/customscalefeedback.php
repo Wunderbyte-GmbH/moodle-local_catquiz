@@ -315,8 +315,16 @@ class customscalefeedback extends feedbackgenerator {
         $systemcontext = \context_system::instance();
         $quizsettingskey = 'feedbackeditor_scaleid_' . $catscaleid . '_' . $groupnumber;
         $filearea = sprintf('feedback_files_%d_%d', $catscaleid, $groupnumber);
+
+        // To be compatible with the old format, check if content is an object and if so, extract the
+        // text from there.
+        $content = $quizsettings[$quizsettingskey];
+        if (is_object($content) && property_exists($content, 'text')) {
+            $content = $content->text;
+        }
+
         return file_rewrite_pluginfile_urls(
-            $quizsettings[$quizsettingskey],
+            $content,
             'pluginfile.php',
             $systemcontext->id,
             'local_catquiz',
