@@ -17,7 +17,7 @@
 /**
  * Plugin administration pages are defined here.
  *
- * @package     catmodel_pcm
+ * @package     catmodel_pcmgeneralized
  * @category    admin
  * @copyright   Wunderbyte Gmbh 2023 <info@wunderbyte.at>
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later

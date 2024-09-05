@@ -15,9 +15,9 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Class grmgeneralized.
+ * Class pcmgeneralized.
  *
- * @package    catmodel_grmgeneralized
+ * @package    catmodel_pcmgeneralized
  * @copyright  2024 Wunderbyte GmbH <georg.maisser@wunderbyte.at>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -32,7 +32,7 @@ use local_catquiz\local\model\model_raschmodel;
 /**
  * Class pcm of catmodels.
  *
- * @package    catmodel_grmgeneralized
+ * @package    catmodel_pcmgeneralized
  * @copyright  2023 Wunderbyte GmbH <georg.maisser@wunderbyte.at>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
