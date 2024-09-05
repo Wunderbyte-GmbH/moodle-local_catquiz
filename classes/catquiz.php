@@ -24,8 +24,10 @@
 
 namespace local_catquiz;
 
+use context_system;
 use dml_exception;
 use local_catquiz\data\dataapi;
+use local_catquiz\event\question_mark_last_failed;
 use local_catquiz\event\usertocourse_enroled;
 use local_catquiz\event\usertogroup_enroled;
 use local_catquiz\local\status;
@@ -2150,6 +2152,15 @@ class catquiz {
         global $DB;
         $quba = question_engine::load_questions_usage_by_activity($usageid);
         $slot = max($quba->get_slots());
+        $context = context_system::instance();
+        $event = question_mark_last_failed::create([
+            'other' => [
+                'usageid' => $usageid,
+                'slot' => $slot,
+            ],
+            'context' => $context,
+        ]);
+        $event->trigger();
 
         // Choose another valid but incorrect response.
         $correctresponse = $quba->get_correct_response($slot)['answer'];
