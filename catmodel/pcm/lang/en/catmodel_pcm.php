@@ -25,4 +25,20 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-$string['pluginname'] = '3PL graded response model';
+$string['pluginname'] = 'Partial Credit Model';
+$string['trusted_region_factor_max_b'] = 'Trusted Region Factor placement b';
+$string['trusted_region_factor_max_b_desc'] = 'Trusted Region Factor placement b';
+$string['trusted_region_factor_sd_a'] = 'Trusted Region Factor SD a';
+$string['trusted_region_factor_sd_a_desc'] = 'Use x times of SD as range of trusted regions';
+$string['trusted_region_max_a'] = 'Trusted Region Maximum a';
+$string['trusted_region_max_a_desc'] = 'Trusted Region Maximum a';
+$string['trusted_region_max_b'] = 'Trusted region max b';
+$string['trusted_region_max_b_desc'] = 'Trusted region max b';
+$string['trusted_region_min_a'] = 'Trusted Region Minimum a';
+$string['trusted_region_min_a_desc'] = 'Trusted Region Minimum a';
+$string['trusted_region_min_b'] = 'Trusted region min b';
+$string['trusted_region_min_b_desc'] = 'Trusted region min b';
+$string['trusted_region_placement_b'] = 'Placement of the discriminatory parameter';
+$string['trusted_region_placement_b_desc'] = 'Placement of the discriminatory parameter';
+$string['trusted_region_slope_b'] = 'Slope of the discriminatory parameter';
+$string['trusted_region_slope_b_desc'] = 'Slope of the discriminatory parameter';
