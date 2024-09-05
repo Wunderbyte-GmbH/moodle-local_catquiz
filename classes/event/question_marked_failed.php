@@ -30,7 +30,7 @@ namespace local_catquiz\event;
  * @copyright 2024 Georg Maißer
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class question_marked_failed extends catquiz_event_base {
+class question_mark_last_failed extends catquiz_event_base {
 
     /**
      * Init parameters.
@@ -48,7 +48,7 @@ class question_marked_failed extends catquiz_event_base {
      * @return string
      */
     public static function get_name() {
-        return 'question_marked_failed';
+        return 'question_mark_last_failed';
     }
 
     /**
@@ -61,7 +61,7 @@ class question_marked_failed extends catquiz_event_base {
         if (!$other = $this->get_other_data()) {
             return 'No other data';
         }
-        return sprintf('Question %s in attempt %d marked as failed for user %d', $other->questionid, $other->attemptid, $USER->id);
+        return sprintf('Question in usageid %d and slot %d marked as failed for user %d', $other->usageid, $other->slot, $USER->id);
     }
 
     public function get_url() {
