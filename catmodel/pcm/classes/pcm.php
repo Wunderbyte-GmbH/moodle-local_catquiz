@@ -28,6 +28,7 @@ use local_catquiz\catcalc;
 use local_catquiz\local\model\model_item_param_list;
 use local_catquiz\local\model\model_person_param_list;
 use local_catquiz\local\model\model_raschmodel;
+use stdClass;
 
 /**
  * Class pcm of catmodels.
@@ -37,6 +38,13 @@ use local_catquiz\local\model\model_raschmodel;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class pcm extends model_raschmodel {
+
+    public static function get_parameters_from_record(stdClass $record): array {
+        return [
+            'difficulty' => round($record->difficulty, 2),
+            'discrimination' => round($record->discrimination, 2),
+        ];
+    }
 
     /**
      * Returns the name of this model.

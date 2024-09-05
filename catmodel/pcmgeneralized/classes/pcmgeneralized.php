@@ -15,9 +15,9 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Class pcmgeneralized.
+ * Class grmgeneralized.
  *
- * @package    catmodel_pcmgeneralized
+ * @package    catmodel_grmgeneralized
  * @copyright  2024 Wunderbyte GmbH <georg.maisser@wunderbyte.at>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -28,15 +28,41 @@ use local_catquiz\catcalc;
 use local_catquiz\local\model\model_item_param_list;
 use local_catquiz\local\model\model_person_param_list;
 use local_catquiz\local\model\model_raschmodel;
+use stdClass;
 
 /**
  * Class pcm of catmodels.
+ * 
+ * Example data:
+ * 
+ *  'difficulty' => will be calculated from the intercept values
+ *  'discrimination' => 2.1,
+ * 'json' => {
+ *  intercept: [
+ *      '0.000' => 0.0,
+ *      '0.333' => 0.4,
+ * ]
+ * }
  *
- * @package    catmodel_pcmgeneralized
+ * @package    catmodel_grmgeneralized
  * @copyright  2023 Wunderbyte GmbH <georg.maisser@wunderbyte.at>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class pcmgeneralized extends model_raschmodel {
+
+    /**
+     * {@inheritDoc}
+     *
+     * @param stdClass $record
+     * @return array
+     */
+    public static function get_parameters_from_record(stdClass $record): array {
+        return [
+            'difficulty' => 0.0,
+            'discrimination' => round($record->discrimination, 2),
+            'intercept' => json_decode($record->json, true)['intercept']
+        ];
+    }
 
     /**
      * Returns the name of this model.
@@ -62,7 +88,7 @@ class pcmgeneralized extends model_raschmodel {
             $frac[] = $fraction;
         }
 
-        usort (array_unique($frac));
+        sort(array_unique($frac));
         return $frac;
     }
 
@@ -187,7 +213,7 @@ class pcmgeneralized extends model_raschmodel {
         $sum = 0;
 
         for ($k=1; $k<$kmax; $k++) {
-            $sum += $ip['intercept'][fractions[$k]];
+            $sum += $ip['intercept'][$fractions[$k]];
         }
         return $sum / $kmax;
     }
@@ -206,22 +232,22 @@ class pcmgeneralized extends model_raschmodel {
         $ability = $pp['ability'];
         $discrimination = $ip['discrimination'];
 
-        // Making sure, that the first intercept is 0, so that for k=0: 1=exp(0*pp - intercept).
-        $ip['intercept'][fractions[0]] = 0;
-
         $fractions = self::get_fractions($ip);
         $kmax = max(array_keys($fractions));
+
+        // Making sure, that the first intercept is 0, so that for k=0: 1=exp(0*pp - intercept).
+        $ip['intercept'][$fractions[0]] = 0;
 
         // Calculation the denominator of the formulae.
         $denominator = 0;
         $intercepts = 0;
         for ($k=0; $k<$kmax; $k++) {
-            $intercepts += $ip['intercept'][fractions[$k]];
+            $intercepts += $ip['intercept'][$fractions[$k]];
             $denominator += exp($k * $ability - $intercepts);
         }
 
         // Calculation the probability.
-        $k = get_category($frac, $fractions);
+        $k = self::get_category($frac, $fractions);
         return exp($discrimination * $k * $pp - $intercepts) / $denominator;
     }
 
@@ -250,11 +276,11 @@ class pcmgeneralized extends model_raschmodel {
     public static function log_likelihood_p(array $pp, array $ip, float $frac): float {
         $ability = $pp['ability'];
 
-        // Making sure, that the first intercept is 0, so that for k=0: 1=exp(0*pp - intercept).
-        $ip['intercept'][fractions[0]] = 0;
-
         $fractions = self::get_fractions($ip);
         $kmax = max(array_keys($fractions));
+
+        // Making sure, that the first intercept is 0, so that for k=0: 1=exp(0*pp - intercept).
+        $ip['intercept'][$fractions[0]] = 0;
 
         // Calculation the denominator of the formulae.
         $denominator = 0;
@@ -262,12 +288,12 @@ class pcmgeneralized extends model_raschmodel {
         $secondderivative = 0;
         $intercepts = 0;
         for ($k=0; $k<$kmax; $k++) {
-            $intercepts += $ip['intercept'][fractions[$k]];
+            $intercepts += $ip['intercept'][$fractions[$k]];
             $denominator += exp($k * $ability - $intercepts);
             $firstderivative += $k * exp($k * $ability - $intercepts);
             $secondderivative += $k ** 2 * exp($k * $ability - $intercepts);
         }
-        $k = get_category($frac, $fractions);
+        $k = self::get_category($frac, $fractions);
 
         return $k - $firstderivative / $denominator;
     }
@@ -283,11 +309,11 @@ class pcmgeneralized extends model_raschmodel {
     public static function log_likelihood_p_p(array $pp, array $ip, float $frac): float {
         $ability = $pp['ability'];
 
-        // Making sure, that the first intercept is 0, so that for k=0: 1=exp(0*pp - intercept).
-        $ip['intercept'][fractions[0]] = 0;
-
         $fractions = self::get_fractions($ip);
         $kmax = max(array_keys($fractions));
+
+        // Making sure, that the first intercept is 0, so that for k=0: 1=exp(0*pp - intercept).
+        $ip['intercept'][$fractions[0]] = 0;
 
         // Calculation the denominator of the formulae.
         $denominator = 0;
@@ -295,7 +321,7 @@ class pcmgeneralized extends model_raschmodel {
         $secondderivative = 0;
         $intercepts = 0;
         for ($k=0; $k<$kmax; $k++) {
-            $intercepts += $ip['intercept'][fractions[$k]];
+            $intercepts += $ip['intercept'][$fractions[$k]];
             $denominator += exp($k * $ability - $intercepts);
             $firstderivative += $k * exp($k * $ability - $intercepts);
             $secondderivative += $k ** 2 * exp($k * $ability - $intercepts);
