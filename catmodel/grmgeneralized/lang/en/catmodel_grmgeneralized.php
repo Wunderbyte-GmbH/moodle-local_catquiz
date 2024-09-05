@@ -25,7 +25,7 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-$string['pluginname'] = 'generalized Graded Response Model';
+$string['pluginname'] = 'Generalized Graded Response Model';
 $string['trusted_region_factor_max_b'] = 'Trusted Region Factor placement b';
 $string['trusted_region_factor_max_b_desc'] = 'Trusted Region Factor placement b';
 $string['trusted_region_factor_sd_a'] = 'Trusted Region Factor SD a';
