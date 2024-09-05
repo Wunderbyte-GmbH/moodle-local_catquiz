@@ -17,7 +17,7 @@
 /**
  * This file contains the version information for the 1plraschbirnbaum model catquiz plugin
  *
- * @package catmodel_pcm
+ * @package catmodel_pcmgeneralized
  * @copyright  2022 Georg Maißer <info@wunderbyte.at>
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -26,5 +26,5 @@ defined('MOODLE_INTERNAL') || die();
 
 $plugin->version   = 2022122000;
 $plugin->requires  = 2022041900;
-$plugin->component = 'catmodel_pcm';
+$plugin->component = 'catmodel_pcmgeneralized';
 
