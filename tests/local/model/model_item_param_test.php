@@ -128,6 +128,24 @@ final class model_item_param_test extends advanced_testcase {
                     ],
                 'parameters' => ['difficulty' => 1.03, 'discrimination' => 0.32, 'guessing' => 0.42],
             ],
+            'pcmgeneralized' => [
+                'record' => [
+                        'componentid' => 0,
+                        'componentname' => "question",
+                        'contextid' => 1,
+                        'model' => 'pcmgeneralized',
+                        'difficulty' => -4.45,
+                        'discrimination' => 5.92,
+                        'guessing' => 0,
+                        'status' => 4,
+                        'itemid' => 0,
+                        'json' => $json,
+                    ],
+                'parameters' => [
+                    'difficulty' => ['0.00' => 0.12, '0.33' => 0.35, '0.66' => 0.68, '1.00' => 0.83],
+                    'discrimination' => 5.92,
+                ],
+            ],
         ];
     }
 
