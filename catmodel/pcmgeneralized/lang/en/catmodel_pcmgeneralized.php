@@ -17,7 +17,7 @@
 /**
  * This file contains language strings for the 1plraschbirnbaum model catquiz plugin
  *
- * @package     catmodel_grmgeneralized
+ * @package     catmodel_pcm
  * @category    string
  * @copyright   2022 onwards Wunderbyte GmbH <info@wunderbyte.at>
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
@@ -25,7 +25,7 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-$string['pluginname'] = 'generalisiertes Graded Response Model';
+$string['pluginname'] = 'Generalized Partial Credit Model';
 $string['trusted_region_factor_max_b'] = 'Trusted Region Factor placement b';
 $string['trusted_region_factor_max_b_desc'] = 'Trusted Region Factor placement b';
 $string['trusted_region_factor_sd_a'] = 'Trusted Region Factor SD a';

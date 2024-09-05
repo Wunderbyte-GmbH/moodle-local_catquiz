@@ -22,7 +22,7 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-namespace catmodel_pcm;
+namespace catmodel_pcmgeneralized;
 
 use local_catquiz\catcalc;
 use local_catquiz\local\model\model_item_param_list;
@@ -36,7 +36,7 @@ use local_catquiz\local\model\model_raschmodel;
  * @copyright  2023 Wunderbyte GmbH <georg.maisser@wunderbyte.at>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class pcm extends model_raschmodel {
+class pcmgeneralized extends model_raschmodel {
 
     /**
      * Returns the name of this model.
@@ -44,7 +44,7 @@ class pcm extends model_raschmodel {
      * @return string
      */
     public function get_model_name(): string {
-        return 'pcm';
+        return 'pcmgeneralized';
     }
 
     // Definitions and Dimensions.
@@ -106,7 +106,8 @@ class pcm extends model_raschmodel {
 
         // TODO: This is very dirty and needs more attention on length / dimensionality.
         return [
-            'intercept' => array_combine($fractions, array_splice($vector, count($vector) - 1))
+            'intercept' => array_combine($fractions, array_splice($vector, count($vector) - 1)),
+            'discrimination' => $vector[count($vector) - 1]
         ];
     }
 
@@ -133,7 +134,7 @@ class pcm extends model_raschmodel {
      * @return array
      */
     public static function get_parameter_names(): array {
-        return ['intercept'];
+        return ['intercept', 'discrimination'];
 
     }
 
@@ -203,6 +204,7 @@ class pcm extends model_raschmodel {
      */
     public static function likelihood(array $pp, array $ip, float $frac): float {
         $ability = $pp['ability'];
+        $discrimination = $ip['discrimination'];
 
         // Making sure, that the first intercept is 0, so that for k=0: 1=exp(0*pp - intercept).
         $ip['intercept'][fractions[0]] = 0;
@@ -220,7 +222,7 @@ class pcm extends model_raschmodel {
 
         // Calculation the probability.
         $k = get_category($frac, $fractions);
-        return exp($k * $pp - $intercepts) / $denominator;
+        return exp($discrimination * $k * $pp - $intercepts) / $denominator;
     }
 
     // Calculate the LOG Likelihood and its derivatives.
