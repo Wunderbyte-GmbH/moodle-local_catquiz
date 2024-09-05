@@ -318,6 +318,9 @@ class customscalefeedback extends feedbackgenerator {
 
         // To be compatible with the old format, check if content is an object and if so, extract the
         // text from there.
+        if (!array_key_exists($quizsettingskey, $quizsettings)) {
+             $quizsettingskey .= '_editor';
+        }
         $content = $quizsettings[$quizsettingskey];
         if (is_object($content) && property_exists($content, 'text')) {
             $content = $content->text;
