@@ -72,6 +72,14 @@ final class model_item_param_test extends advanced_testcase {
                 '1.000' => 0.98,
             ]
         ]);
+        $pcmjson = json_encode([
+            'intercept' => [
+                '0.000' => 0.10,
+                '0.333' => 0.48,
+                '0.666' => 0.53,
+                '1.000' => 0.88,
+            ]
+        ]);
         return [
             'grmgeneralized' => [
                 'record' => [
@@ -155,6 +163,25 @@ final class model_item_param_test extends advanced_testcase {
                     'intercept' => ['0.000' => 0.0, '0.333' => 0.42, '0.666' => 0.57, '1.000' => 0.98],
                 ],
             ],
+            'pcm' => [
+                'record' => [
+                        'componentid' => 0,
+                        'componentname' => "question",
+                        'contextid' => 1,
+                        'model' => 'pcm',
+                        'difficulty' => 0.12,
+                        'discrimination' => 2.1,
+                        'guessing' => 0,
+                        'status' => 4,
+                        'itemid' => 0,
+                        'json' => $pcmjson,
+                    ],
+                'parameters' => [
+                    'difficulty' => 0.0,
+                    'discrimination' => 2.1,
+                    'intercept' => ['0.000' => 0.10, '0.333' => 0.48, '0.666' => 0.53, '1.000' => 0.88],
+                ],
+            ],
         ];
     }
 
@@ -192,6 +219,14 @@ final class model_item_param_test extends advanced_testcase {
                 '1.000' => 0.98,
             ]
         ]);
+        $pcmjson = json_encode([
+            'intercept' => [
+                '0.000' => 0.10,
+                '0.333' => 0.48,
+                '0.666' => 0.53,
+                '1.000' => 0.88,
+            ]
+        ]);
         $defaultrecord = [
             'discrimination' => '1.2',
             'contextid' => 1,
@@ -200,8 +235,10 @@ final class model_item_param_test extends advanced_testcase {
         ];
         $grmgeneralizedrecord = (object) array_merge($defaultrecord, ['itemid' => 1, 'json' => $grmgeneralizedjson]);
         $pcmgeneralizedrecord = (object) array_merge($defaultrecord, ['itemid' => 2, 'json' => $pcmgeneralizedjson]);
+        $pcmrecord = (object) array_merge($defaultrecord, ['itemid' => 3, 'json' => $pcmjson]);
         $grmgeneralizedparam = new model_item_param(1, 'grmgeneralized', [], 4, $grmgeneralizedrecord);
         $pcmgeneralizedparam = new model_item_param(1, 'pcmgeneralized', [], 4, $pcmgeneralizedrecord);
+        $pcmparam = new model_item_param(1, 'pcm', [], 4, $pcmrecord);
 
         return [
             'grmgeneralized' => [
@@ -209,7 +246,10 @@ final class model_item_param_test extends advanced_testcase {
             ],
             'pcmgeneralized' => [
                 'itemparam' => $pcmgeneralizedparam,
-            ]
+            ],
+            'pcm' => [
+                'itemparam' => $pcmparam,
+            ],
         ];
     }
 }

@@ -41,13 +41,18 @@ class pcm extends model_raschmodel {
 
     public static function get_parameters_from_record(stdClass $record): array {
         return [
-            'difficulty' => round($record->difficulty, 2),
+            'difficulty' => 0.0,
             'discrimination' => round($record->discrimination, 2),
+            'intercept' => json_decode($record->json, true)['intercept']
         ];
     }
 
     /**
      * Returns the name of this model.
+        return [
+            'difficulty' => round($record->difficulty, 2),
+            'discrimination' => round($record->discrimination, 2),
+        ];
      *
      * @return string
      */
@@ -70,7 +75,8 @@ class pcm extends model_raschmodel {
             $frac[] = $fraction;
         }
 
-        usort (array_unique($frac));
+        $frac = array_unique($frac);
+        sort($frac);
         return $frac;
     }
 
