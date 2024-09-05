@@ -26,9 +26,11 @@ namespace local_catquiz\teststrategy;
 
 use cache;
 use coding_exception;
+use context_system;
 use JsonSerializable;
 use local_catquiz\catquiz;
 use local_catquiz\catscale;
+use local_catquiz\event\question_marked_failed;
 use local_catquiz\testenvironment;
 use Random\RandomException;
 use stdClass;
@@ -198,6 +200,7 @@ class progress implements JsonSerializable {
      * @return progress
      */
     public static function load(int $attemptid, string $component, int $contextid, ?stdClass $quizsettings = null): self {
+        global $CFG;
         $instance = self::load_from_cache($attemptid)
             ?: self::load_from_db($attemptid)
             ?: self::create_new($attemptid, $component, $contextid, $quizsettings);
@@ -223,6 +226,17 @@ class progress implements JsonSerializable {
             $instance->gaveupquestions[] = $instance->lastquestion->id;
             $instance->mark_lastquestion_failed();
             $instance->hasnewresponse = true;
+
+            $context = context_system::instance();
+            $event = question_marked_failed::create([
+                'other' => [
+                    'attemptid' => $instance->attemptid,
+                    'questionid' => $instance->lastquestion->id
+                ],
+                'context' => $context,
+            ]);
+            $event->trigger();
+
             return $instance;
         }
 

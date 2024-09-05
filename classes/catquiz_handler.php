@@ -30,7 +30,10 @@ use cache_exception;
 use cache_helper;
 use cm_info;
 use coding_exception;
+use context_module;
 use context_system;
+use local_catquiz\event\questionselection_finished;
+use local_catquiz\event\questionselection_started;
 use local_catquiz\feedback\feedbackclass;
 use local_catquiz\local\model\model_strategy;
 use local_catquiz\output\attemptfeedback;
@@ -800,6 +803,12 @@ class catquiz_handler {
      * @return array
      */
     public static function fetch_question_id(int $cmid, string $component, stdClass $attemptdata): array {
+        $context = context_system::instance();
+        $event = questionselection_started::create([
+            'other' => ['attemptid' => $attemptdata->id],
+            'context' => $context,
+        ]);
+        $event->trigger();
 
         $data = (object)['componentid' => $cmid, 'component' => $component];
 
@@ -824,6 +833,14 @@ class catquiz_handler {
         }
 
         $question = $result->unwrap();
+        $event = questionselection_finished::create([
+            'other' => [
+                'attemptid' => $attemptdata->id,
+                'questionid' => $question->id,
+            ],
+            'context' => $context,
+        ]);
+        $event->trigger();
         return [$question->id, ""];
     }
 
