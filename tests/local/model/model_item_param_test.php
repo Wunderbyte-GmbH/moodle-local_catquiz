@@ -64,6 +64,14 @@ final class model_item_param_test extends advanced_testcase {
     public static function read_item_param_from_db_provider(): array {
 
         $json = json_encode(['0.00' => 0.12, '0.33' => 0.35, '0.66' => 0.68, '1.00' => 0.83]);
+        $pcmgeneralizedjson = json_encode([
+            'intercept' => [
+                '0.000' => 0.00,
+                '0.333' => 0.42,
+                '0.666' => 0.57,
+                '1.000' => 0.98,
+            ]
+        ]);
         return [
             'grmgeneralized' => [
                 'record' => [
@@ -134,16 +142,17 @@ final class model_item_param_test extends advanced_testcase {
                         'componentname' => "question",
                         'contextid' => 1,
                         'model' => 'pcmgeneralized',
-                        'difficulty' => -4.45,
-                        'discrimination' => 5.92,
+                        'difficulty' => 0.12,
+                        'discrimination' => 2.1,
                         'guessing' => 0,
                         'status' => 4,
                         'itemid' => 0,
-                        'json' => $json,
+                        'json' => $pcmgeneralizedjson,
                     ],
                 'parameters' => [
-                    'difficulty' => ['0.00' => 0.12, '0.33' => 0.35, '0.66' => 0.68, '1.00' => 0.83],
-                    'discrimination' => 5.92,
+                    'difficulty' => 0.0,
+                    'discrimination' => 2.1,
+                    'intercept' => ['0.000' => 0.0, '0.333' => 0.42, '0.666' => 0.57, '1.000' => 0.98],
                 ],
             ],
         ];
@@ -152,20 +161,11 @@ final class model_item_param_test extends advanced_testcase {
     /**
      * Check if an item param can be saved to the database.
      *
+     * @dataProvider write_item_param_to_db_provider
      * @return void
      */
-    public function test_write_item_param_to_db() {
+    public function test_write_item_param_to_db($itemparam) {
         $this->resetAfterTest();
-        $json = json_encode(['0.00' => 0.12, '0.33' => 0.35, '0.66' => 0.68, '1.00' => 0.83]);
-        $record = (object) [
-            'json' => $json,
-            'discrimination' => '1.2',
-            'itemid' => 1,
-            'contextid' => 1,
-            'timecreated' => time(),
-            'timemodified' => time(),
-        ];
-        $itemparam = new model_item_param(1, 'grmgeneralized', [], 4, $record);
         $itemparam->save();
 
         // Now read the saved parameter and make sure it equals the itemparam we just created.
@@ -175,6 +175,42 @@ final class model_item_param_test extends advanced_testcase {
         $this->assertEquals($itemparam->get_params_array(), $fromdb->get_params_array());
         $this->assertEquals($itemparam->get_difficulty(), $fromdb->get_difficulty());
         $this->assertEquals($itemparam->get_itemid(), $fromdb->get_itemid());
+    }
+
+    /**
+     * Provide data for the test_write_item_param_to_db test
+     * 
+     * @return array
+     */
+    public static function write_item_param_to_db_provider(): array {
+        $grmgeneralizedjson = json_encode(['0.00' => 0.12, '0.33' => 0.35, '0.66' => 0.68, '1.00' => 0.83]);
+        $pcmgeneralizedjson = json_encode([
+            'intercept' => [
+                '0.000' => 0.00,
+                '0.333' => 0.42,
+                '0.666' => 0.57,
+                '1.000' => 0.98,
+            ]
+        ]);
+        $defaultrecord = [
+            'discrimination' => '1.2',
+            'contextid' => 1,
+            'timecreated' => time(),
+            'timemodified' => time(),
+        ];
+        $grmgeneralizedrecord = (object) array_merge($defaultrecord, ['itemid' => 1, 'json' => $grmgeneralizedjson]);
+        $pcmgeneralizedrecord = (object) array_merge($defaultrecord, ['itemid' => 2, 'json' => $pcmgeneralizedjson]);
+        $grmgeneralizedparam = new model_item_param(1, 'grmgeneralized', [], 4, $grmgeneralizedrecord);
+        $pcmgeneralizedparam = new model_item_param(1, 'pcmgeneralized', [], 4, $pcmgeneralizedrecord);
+
+        return [
+            'grmgeneralized' => [
+                'itemparam' => $grmgeneralizedparam,
+            ],
+            'pcmgeneralized' => [
+                'itemparam' => $pcmgeneralizedparam,
+            ]
+        ];
     }
 }
 

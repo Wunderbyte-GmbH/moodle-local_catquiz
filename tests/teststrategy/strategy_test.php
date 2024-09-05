@@ -174,8 +174,8 @@ final class strategy_test extends advanced_testcase {
      * This just checks that running the importer does not throw any exceptions
      */
     public function test_import_csv_with_polytomous_model() {
-        $this->expectNotToPerformAssertions();
-        $this->import_itemparams("simulation_multiparam.csv");
+        $result = $this->import_itemparams("simulation_multiparam.csv");
+        $this->assertArrayNotHasKey('errors', $result, print_r($result['errors'], true));
     }
 
     /**
@@ -2218,9 +2218,9 @@ final class strategy_test extends advanced_testcase {
      *
      * @param string $filename The name of the itemparams file.
      *
-     * @return void
+     * @return array
      */
-    private function import_itemparams($filename) {
+    private function import_itemparams($filename): array {
         global $DB;
         $questions = $DB->get_records('question');
         if (! $questions) {
@@ -2228,7 +2228,7 @@ final class strategy_test extends advanced_testcase {
         }
         $importer = new testitemimporter();
         $content = file_get_contents(__DIR__ . '/../fixtures/' . $filename);
-        $importer->execute_testitems_csv_import(
+        $result = $importer->execute_testitems_csv_import(
                 (object) [
                     'delimiter_name' => 'semicolon',
                     'encoding' => null,
@@ -2236,6 +2236,7 @@ final class strategy_test extends advanced_testcase {
                 ],
                 $content
             );
+        return $result;
     }
 
     /**
