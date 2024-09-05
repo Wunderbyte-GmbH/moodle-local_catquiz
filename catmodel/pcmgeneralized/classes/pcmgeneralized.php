@@ -88,7 +88,8 @@ class pcmgeneralized extends model_raschmodel {
             $frac[] = $fraction;
         }
 
-        sort(array_unique($frac));
+        $frac = array_unique($frac);
+        sort($frac);
         return $frac;
     }
 
@@ -248,7 +249,7 @@ class pcmgeneralized extends model_raschmodel {
 
         // Calculation the probability.
         $k = self::get_category($frac, $fractions);
-        return exp($discrimination * $k * $pp - $intercepts) / $denominator;
+        return exp($discrimination * $k * $pp['ability'] - $intercepts) / $denominator;
     }
 
     // Calculate the LOG Likelihood and its derivatives.
@@ -401,7 +402,7 @@ class pcmgeneralized extends model_raschmodel {
      */
     public static function item_information(array $pp, array $ip): float {
         $iif = self::category_information($pp, $ip, 0.0) * self::likelihood($pp, $ip, 0.0);
-        foreach ($ip['difficuölty'] as $f => $val) {
+        foreach ($ip['intercept'] as $f => $val) {
             $iif += self::category_information($pp, $ip, $f) * self::likelihood($pp, $ip, $f);
         }
         return $iif;
