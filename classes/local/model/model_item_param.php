@@ -210,7 +210,7 @@ class model_item_param {
             $record->id = $this->id;
         }
 
-        $record = $this->get_model_object()::add_parameters_to_record($record);
+        $record = $this->get_model_object()::add_parameters_to_record($record, $this->get_params_array());
 
         // Sanitize parameters.
         foreach (['difficulty', 'discrimination'] as $paramname) {

@@ -210,9 +210,16 @@ final class model_item_param_test extends advanced_testcase {
      * @return array
      */
     public static function write_item_param_to_db_provider(): array {
-        $grmgeneralizedjson = json_encode(['0.00' => 0.12, '0.33' => 0.35, '0.66' => 0.68, '1.00' => 0.83]);
+        $grmgeneralizedjson = json_encode([
+            'difficulties' => [
+                '0.00' => 0.12,
+                '0.33' => 0.35,
+                '0.66' => 0.68,
+                '1.00' => 0.83,
+            ]
+        ]);
         $pcmgeneralizedjson = json_encode([
-            'intercept' => [
+            'intercepts' => [
                 '0.000' => 0.00,
                 '0.333' => 0.42,
                 '0.666' => 0.57,
@@ -220,7 +227,7 @@ final class model_item_param_test extends advanced_testcase {
             ]
         ]);
         $pcmjson = json_encode([
-            'intercept' => [
+            'intercepts' => [
                 '0.000' => 0.10,
                 '0.333' => 0.48,
                 '0.666' => 0.53,

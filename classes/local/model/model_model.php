@@ -67,9 +67,10 @@ abstract class model_model {
      * Allows subclasses to overwrite the parameters.
      *
      * @param stdClass $record
+     * @param array $parameters
      * @return stdClass
      */
-    public static function add_parameters_to_record(stdClass $record): stdClass {
+    public static function add_parameters_to_record(stdClass $record, array $parameters): stdClass {
         return $record;
     }
 
