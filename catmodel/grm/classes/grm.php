@@ -28,6 +28,7 @@ use local_catquiz\catcalc;
 use local_catquiz\local\model\model_item_param_list;
 use local_catquiz\local\model\model_person_param_list;
 use local_catquiz\local\model\model_raschmodel;
+use stdClass;
 
 /**
  * Class grmgeneralized of catmodels.
@@ -207,7 +208,7 @@ class grm extends model_raschmodel {
      * @return float
      *
      */
-    public function calculate_mean_difficulty(array $ip): float {
+    public static function calculate_mean_difficulty(array $ip): float {
 
         $fractions = self::get_fractions($ip);
         $kmax = max(array_keys($fractions));

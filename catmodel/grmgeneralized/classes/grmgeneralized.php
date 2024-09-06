@@ -52,14 +52,14 @@ class grmgeneralized extends model_raschmodel {
         $discrimination = round($record->discrimination, 3); // @DAVID: Rechnen wir nicht mit 3 Nachkommastellen?
 
         $meandifficulty = self::calculate_mean_difficulty([
-            'difficulty' => $difficulties,
+            'difficulties' => $difficulties,
             'discrimination' => $discrimination,
         ]);
 
         return [
-            // 'difficulty' => round($meandifficulty, 3), //@DAVID: Houston, we have a problem! :-)
+            'difficulty' => round($meandifficulty, 3),
             'discrimination' => $discrimination,
-            'difficulty' => $difficulties,
+            'difficulties' => $difficulties,
         ];
     }
 
@@ -166,22 +166,6 @@ class grmgeneralized extends model_raschmodel {
     /**
      * {@inheritDoc}
      *
-     * @param stdClass $record
-     * @return array
-     */
-    public static function get_parameters_from_record(stdClass $record): array {
-        return [
-            'difficulty' => array_map(
-                fn($param) => round($param, 2),
-                json_decode($record->json, true)
-            ),
-            'discrimination' => round($record->discrimination, 2),
-        ];
-    }
-
-    /**
-     * {@inheritDoc}
-     *
      * This sets the difficulty as an aggregate value
      *
      * @param \stdClass $record
@@ -282,13 +266,11 @@ class grmgeneralized extends model_raschmodel {
      * @return float
      *
      */
-    public function calculate_mean_difficulty(array $ip): float {
-
+    public static function calculate_mean_difficulty(array $ip): float {
         $fractions = self::get_fractions($ip);
         $kmax = max(array_keys($fractions));
-        $sum = 0;
 
-        return ($ip['difficulty'][$fractions[1]] + $ip['difficulty'][$fractions[$kmax]]) / 2;
+        return ($ip['difficulties'][$fractions[1]] + $ip['difficulties'][$fractions[$kmax]]) / 2;
     }
     // Calculate the Likelihood.
 

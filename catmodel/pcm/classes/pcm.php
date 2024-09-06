@@ -24,6 +24,7 @@
 
 namespace catmodel_pcm;
 
+use Exception;
 use local_catquiz\catcalc;
 use local_catquiz\local\model\model_item_param_list;
 use local_catquiz\local\model\model_person_param_list;
@@ -94,7 +95,7 @@ class pcm extends model_raschmodel {
      * @param float $frac
      * @param array $fractions
      *
-     * @return array of string
+     * @return int
      */
     public static function get_category(float $frac, array $fractions): int {
 
@@ -209,7 +210,7 @@ class pcm extends model_raschmodel {
      * @return float
      *
      */
-    public function calculate_mean_difficulty(array $ip): float {
+    public static function calculate_mean_difficulty(array $ip): float {
 
         $fractions = self::get_fractions($ip);
         $kmax = max(array_keys($fractions));
@@ -249,8 +250,8 @@ class pcm extends model_raschmodel {
         }
 
         // Calculation the probability.
-        $k = get_category($frac, $fractions);
-        return exp($k * $pp - $intercepts) / $denominator;
+        $k = self::get_category($frac, $fractions);
+        return exp($k * $pp['ability'] - $intercepts) / $denominator;
     }
 
     // Calculate the LOG Likelihood and its derivatives.
@@ -295,7 +296,7 @@ class pcm extends model_raschmodel {
             $firstderivative += $k * exp($k * $ability - $intercepts);
             $secondderivative += $k ** 2 * exp($k * $ability - $intercepts);
         }
-        $k = get_category($frac, $fractions);
+        $k = self::get_category($frac, $fractions);
 
         return $k - $firstderivative / $denominator;
     }
@@ -341,6 +342,7 @@ class pcm extends model_raschmodel {
      * @return array - jacobian vector
      */
     public static function get_log_jacobian(array $pp, array $ip, float $k): array {
+        throw new Exception("Not yet implemented");
     }
 
     /**
@@ -353,6 +355,7 @@ class pcm extends model_raschmodel {
      * @return array - hessian matrx
      */
     public static function get_log_hessian(array $pp, array $ip, float $itemresponse): array {
+        throw new Exception("Not yet implemented");
     }
 
 
