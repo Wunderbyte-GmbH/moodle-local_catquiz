@@ -39,7 +39,14 @@ use stdClass;
  */
 class pcm extends model_raschmodel {
 
+    /**
+     * Returns the the item parameter from a database record.
+     *
+     * @param sdtClass $record
+     * @return string
+     */
     public static function get_parameters_from_record(stdClass $record): array {
+        // Todo: Implement properly. Also in pcmgeneralized.
         return [
             'difficulty' => 0.0,
             'discrimination' => round($record->discrimination, 2),
@@ -49,10 +56,6 @@ class pcm extends model_raschmodel {
 
     /**
      * Returns the name of this model.
-        return [
-            'difficulty' => round($record->difficulty, 2),
-            'discrimination' => round($record->discrimination, 2),
-        ];
      *
      * @return string
      */
@@ -90,7 +93,7 @@ class pcm extends model_raschmodel {
      */
     public static function get_category(float $frac, array $fractions): int {
 
-        for ($k=0; $fractions[$k] < $frac; $k++);
+        for ($k = 0; $fractions[$k] < $frac; $k++);
 
         return $k;
     }
@@ -120,7 +123,7 @@ class pcm extends model_raschmodel {
 
         // TODO: This is very dirty and needs more attention on length / dimensionality.
         return [
-            'intercept' => array_combine($fractions, array_splice($vector, count($vector) - 1))
+            'intercept' => array_combine($fractions, array_splice($vector, count($vector) - 1)),
         ];
     }
 
@@ -193,13 +196,21 @@ class pcm extends model_raschmodel {
         return catcalc::estimate_item_params($itemresponse, $this);
     }
 
-    public function calculate_mean_difficulty (array $ip): array {
+    /**
+     * Calculate the mean difficulty
+     *
+     * @param array $ip
+     *
+     * @return float
+     *
+     */
+    public function calculate_mean_difficulty (array $ip): float {
 
         $fractions = self::get_fractions($ip);
         $kmax = max(array_keys($fractions));
         $sum = 0;
 
-        for ($k=1; $k<$kmax; $k++) {
+        for ($k = 1; $k < $kmax; $k++) {
             $sum += $ip['intercept'][fractions[$k]];
         }
         return $sum / $kmax;
@@ -227,7 +238,7 @@ class pcm extends model_raschmodel {
         // Calculation the denominator of the formulae.
         $denominator = 0;
         $intercepts = 0;
-        for ($k=0; $k<$kmax; $k++) {
+        for ($k = 0; $k < $kmax; $k++) {
             $intercepts += $ip['intercept'][fractions[$k]];
             $denominator += exp($k * $ability - $intercepts);
         }
@@ -273,7 +284,7 @@ class pcm extends model_raschmodel {
         $firstderivative = 0;
         $secondderivative = 0;
         $intercepts = 0;
-        for ($k=0; $k<$kmax; $k++) {
+        for ($k = 0; $k < $kmax; $k++) {
             $intercepts += $ip['intercept'][fractions[$k]];
             $denominator += exp($k * $ability - $intercepts);
             $firstderivative += $k * exp($k * $ability - $intercepts);
@@ -306,7 +317,7 @@ class pcm extends model_raschmodel {
         $firstderivative = 0;
         $secondderivative = 0;
         $intercepts = 0;
-        for ($k=0; $k<$kmax; $k++) {
+        for ($k = 0; $k < $kmax; $k++) {
             $intercepts += $ip['intercept'][fractions[$k]];
             $denominator += exp($k * $ability - $intercepts);
             $firstderivative += $k * exp($k * $ability - $intercepts);
