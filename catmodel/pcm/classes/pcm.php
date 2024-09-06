@@ -47,11 +47,16 @@ class pcm extends model_raschmodel {
      * @return array
      */
     public static function get_parameters_from_record(stdClass $record): array {
-        // Todo: Implement properly. Also in pcmgeneralized.
+
+        $intercepts = json_decode($record->json, true)['intercept'];
+
+        $meandifficulty = self::calculate_mean_difficulty([
+            'intercept' => $intercepts,
+        ]);
+
         return [
-            'difficulty' => 0.0,
-            'discrimination' => round($record->discrimination, 2),
-            'intercept' => json_decode($record->json, true)['intercept']
+            'difficulty' => round($meandifficulty, 3),
+            'intercept' => $intercepts,
         ];
     }
 
@@ -212,7 +217,7 @@ class pcm extends model_raschmodel {
         $sum = 0;
 
         for ($k = 1; $k < $kmax; $k++) {
-            $sum += $ip['intercept'][fractions[$k]];
+            $sum += $ip['intercept'][$fractions[$k]];
         }
         return $sum / $kmax;
     }
@@ -230,17 +235,17 @@ class pcm extends model_raschmodel {
     public static function likelihood(array $pp, array $ip, float $frac): float {
         $ability = $pp['ability'];
 
-        // Making sure, that the first intercept is 0, so that for k=0: 1=exp(0*pp - intercept).
-        $ip['intercept'][fractions[0]] = 0;
-
         $fractions = self::get_fractions($ip);
         $kmax = max(array_keys($fractions));
+
+        // Making sure, that the first intercept is 0, so that for k=0: 1=exp(0*pp - intercept).
+        $ip['intercept'][$fractions[0]] = 0;
 
         // Calculation the denominator of the formulae.
         $denominator = 0;
         $intercepts = 0;
         for ($k = 0; $k < $kmax; $k++) {
-            $intercepts += $ip['intercept'][fractions[$k]];
+            $intercepts += $ip['intercept'][$fractions[$k]];
             $denominator += exp($k * $ability - $intercepts);
         }
 
@@ -274,11 +279,11 @@ class pcm extends model_raschmodel {
     public static function log_likelihood_p(array $pp, array $ip, float $frac): float {
         $ability = $pp['ability'];
 
-        // Making sure, that the first intercept is 0, so that for k=0: 1=exp(0*pp - intercept).
-        $ip['intercept'][fractions[0]] = 0;
-
         $fractions = self::get_fractions($ip);
         $kmax = max(array_keys($fractions));
+
+        // Making sure, that the first intercept is 0, so that for k=0: 1=exp(0*pp - intercept).
+        $ip['intercept'][$fractions[0]] = 0;
 
         // Calculation the denominator of the formulae.
         $denominator = 0;
@@ -286,7 +291,7 @@ class pcm extends model_raschmodel {
         $secondderivative = 0;
         $intercepts = 0;
         for ($k = 0; $k < $kmax; $k++) {
-            $intercepts += $ip['intercept'][fractions[$k]];
+            $intercepts += $ip['intercept'][$fractions[$k]];
             $denominator += exp($k * $ability - $intercepts);
             $firstderivative += $k * exp($k * $ability - $intercepts);
             $secondderivative += $k ** 2 * exp($k * $ability - $intercepts);
@@ -307,11 +312,11 @@ class pcm extends model_raschmodel {
     public static function log_likelihood_p_p(array $pp, array $ip, float $frac): float {
         $ability = $pp['ability'];
 
-        // Making sure, that the first intercept is 0, so that for k=0: 1=exp(0*pp - intercept).
-        $ip['intercept'][fractions[0]] = 0;
-
         $fractions = self::get_fractions($ip);
         $kmax = max(array_keys($fractions));
+
+        // Making sure, that the first intercept is 0, so that for k=0: 1=exp(0*pp - intercept).
+        $ip['intercept'][$fractions[0]] = 0;
 
         // Calculation the denominator of the formulae.
         $denominator = 0;
@@ -319,7 +324,7 @@ class pcm extends model_raschmodel {
         $secondderivative = 0;
         $intercepts = 0;
         for ($k = 0; $k < $kmax; $k++) {
-            $intercepts += $ip['intercept'][fractions[$k]];
+            $intercepts += $ip['intercept'][$fractions[$k]];
             $denominator += exp($k * $ability - $intercepts);
             $firstderivative += $k * exp($k * $ability - $intercepts);
             $secondderivative += $k ** 2 * exp($k * $ability - $intercepts);
