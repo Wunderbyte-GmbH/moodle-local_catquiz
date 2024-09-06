@@ -41,6 +41,29 @@ use stdClass;
 class grmgeneralized extends model_raschmodel {
 
     /**
+     * {@inheritDoc}
+     *
+     * @param stdClass $record
+     * @return array
+     */
+    public static function get_parameters_from_record(stdClass $record): array {
+
+        $difficulties = json_decode($record->json, true)['difficulty'];
+        $discrimination = round($record->discrimination, 3); // @DAVID: Rechnen wir nicht mit 3 Nachkommastellen?
+
+        $meandifficulty = self::calculate_mean_difficulty([
+            'difficulty' => $difficulties,
+            'discrimination' => $discrimination,
+        ]);
+
+        return [
+            // 'difficulty' => round($meandifficulty, 3), //@DAVID: Houston, we have a problem! :-)
+            'discrimination' => $discrimination,
+            'difficulty' => $difficulties,
+        ];
+    }
+
+    /**
      * Returns the name of this model.
      *
      * @return string
@@ -251,6 +274,22 @@ class grmgeneralized extends model_raschmodel {
         return catcalc::estimate_item_params($itemresponse, $this);
     }
 
+    /**
+     * Calculate the mean difficulty
+     *
+     * @param array $ip
+     *
+     * @return float
+     *
+     */
+    public function calculate_mean_difficulty(array $ip): float {
+
+        $fractions = self::get_fractions($ip);
+        $kmax = max(array_keys($fractions));
+        $sum = 0;
+
+        return ($ip['difficulty'][$fractions[1]] + $ip['difficulty'][$fractions[$kmax]]) / 2;
+    }
     // Calculate the Likelihood.
 
     /**
