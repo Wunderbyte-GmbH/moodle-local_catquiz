@@ -215,7 +215,7 @@ class pcmgeneralized extends model_raschmodel {
      * @return float
      *
      */
-    public function calculate_mean_difficulty (array $ip): float {
+    public function calculate_mean_difficulty(array $ip): float {
 
         $fractions = self::get_fractions($ip);
         $kmax = max(array_keys($fractions));
