@@ -40,10 +40,11 @@ use stdClass;
 class pcm extends model_raschmodel {
 
     /**
-     * Returns the the item parameter from a database record.
+     * Returns the item parameter array from a database record.
      *
      * @param sdtClass $record
-     * @return string
+     *
+     * @return array
      */
     public static function get_parameters_from_record(stdClass $record): array {
         // Todo: Implement properly. Also in pcmgeneralized.
@@ -204,7 +205,7 @@ class pcm extends model_raschmodel {
      * @return float
      *
      */
-    public function calculate_mean_difficulty (array $ip): float {
+    public function calculate_mean_difficulty(array $ip): float {
 
         $fractions = self::get_fractions($ip);
         $kmax = max(array_keys($fractions));
