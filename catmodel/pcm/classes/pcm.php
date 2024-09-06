@@ -42,8 +42,7 @@ class pcm extends model_raschmodel {
     /**
      * Returns the item parameter array from a database record.
      *
-     * @param sdtClass $record
-     *
+     * @param stdClass $record
      * @return array
      */
     public static function get_parameters_from_record(stdClass $record): array {
