@@ -64,7 +64,13 @@ class question_mark_last_failed extends catquiz_event_base {
         return sprintf('Question in usageid %d and slot %d marked as failed for user %d', $other->usageid, $other->slot, $USER->id);
     }
 
+    /**
+     * Get url.
+     *
+     * @return object
+     */
     public function get_url() {
         return null;
     }
 }
+

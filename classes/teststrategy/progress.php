@@ -231,7 +231,7 @@ class progress implements JsonSerializable {
             $event = question_marked_failed::create([
                 'other' => [
                     'attemptid' => $instance->attemptid,
-                    'questionid' => $instance->lastquestion->id
+                    'questionid' => $instance->lastquestion->id,
                 ],
                 'context' => $context,
             ]);

@@ -64,7 +64,13 @@ class questionselection_started extends catquiz_event_base {
         return sprintf('Started the process of selecting a new question for user %d in attempt %d', $USER->id, $other->attemptid);
     }
 
+    /**
+     * Get url.
+     *
+     * @return object
+     */
     public function get_url() {
         return null;
     }
 }
+

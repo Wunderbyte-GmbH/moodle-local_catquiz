@@ -64,7 +64,13 @@ class questionselection_finished extends catquiz_event_base {
         return sprintf("Selected question %s for user %d in attempt %d", $other->questionid, $USER->id, $other->attemptid);
     }
 
+    /**
+     * Get url.
+     *
+     * @return object
+     */
     public function get_url() {
         return null;
     }
 }
+
