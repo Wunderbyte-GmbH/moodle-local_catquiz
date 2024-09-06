@@ -48,7 +48,7 @@ class pcm extends model_raschmodel {
      */
     public static function get_parameters_from_record(stdClass $record): array {
 
-        $intercepts = json_decode($record->json, true)['intercept'];
+        $intercepts = json_decode($record->json, true)['intercepts'];
 
         $meandifficulty = self::calculate_mean_difficulty([
             'intercept' => $intercepts,

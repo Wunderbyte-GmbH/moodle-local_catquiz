@@ -48,7 +48,7 @@ class grmgeneralized extends model_raschmodel {
      */
     public static function get_parameters_from_record(stdClass $record): array {
 
-        $difficulties = json_decode($record->json, true)['difficulty'];
+        $difficulties = json_decode($record->json, true)['difficulties'];
         $discrimination = round($record->discrimination, 3); // @DAVID: Rechnen wir nicht mit 3 Nachkommastellen?
 
         $meandifficulty = self::calculate_mean_difficulty([
@@ -83,7 +83,7 @@ class grmgeneralized extends model_raschmodel {
     public static function get_fractions(array $ip): array {
         $frac = [];
 
-        foreach ($ip['difficulty'] as $fraction => $val) {
+        foreach ($ip['difficulties'] as $fraction => $val) {
             if ($fraction > 0 && $fraction <= 1) {
                 $frac[] = $fraction;
             }
@@ -116,7 +116,7 @@ class grmgeneralized extends model_raschmodel {
     public static function convert_ip_to_vector(array $ip): array {
 
         // TODO: This is very dirty and needs more attention on length / dimensionality.
-        return array_merge($ip['difficulty'], [$ip['discrimination']]);
+        return array_merge($ip['difficulties'], [$ip['discrimination']]);
     }
 
     /**
@@ -132,7 +132,7 @@ class grmgeneralized extends model_raschmodel {
         // TODO: This is very dirty and needs more attention on length / dimensionality.
         $discrimination = array_pop($vector);
         return [
-            'difficulty' => array_combine($fractions, $vector),
+            'difficulties' => array_combine($fractions, $vector),
             'discrimination' => $discrimination,
         ];
     }
@@ -142,7 +142,7 @@ class grmgeneralized extends model_raschmodel {
      *
      * The parameters have the following structure.
      * [
-     *   'difficultiy': [fraction1: difficulty1, fraction2: difficulty2, ..., fractionk: difficultyk],
+     *   'difficulties': [fraction1: difficulty1, fraction2: difficulty2, ..., fractionk: difficultyk],
      *   'discrimination': discrimination
      * ]
      * @return array of string
@@ -160,7 +160,7 @@ class grmgeneralized extends model_raschmodel {
      * @return array
      */
     public static function get_parameter_names(): array {
-        return ['difficulty', 'discrimination'];
+        return ['difficulties', 'discrimination'];
     }
 
     /**
@@ -168,12 +168,13 @@ class grmgeneralized extends model_raschmodel {
      *
      * This sets the difficulty as an aggregate value
      *
-     * @param \stdClass $record
-     * @return \stdClass
+     * @param stdClass $record
+     * @param array $parameters
+     * @return stdClass
      */
-    public static function add_parameters_to_record(stdClass $record): stdClass {
-        $record->json = json_encode($record->difficulty);
-        $record->difficulty = self::get_difficulty_aggregate($record);
+    public static function add_parameters_to_record(stdClass $record, array $parameters): stdClass {
+        $record->json = json_encode(['difficulties' => $parameters['difficulties']]);
+        $record->difficulty = $record->difficulty ?? self::get_difficulty_aggregate((object) $parameters);
         return $record;
     }
 
@@ -194,7 +195,7 @@ class grmgeneralized extends model_raschmodel {
      * @return float
      */
     private static function get_difficulty_aggregate(stdClass $record) {
-        return $record->difficulty['1.00'];
+        return $record->difficulties['1.00'];
     }
 
     /**
