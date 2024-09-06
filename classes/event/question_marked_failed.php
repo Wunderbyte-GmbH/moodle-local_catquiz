@@ -30,7 +30,7 @@ namespace local_catquiz\event;
  * @copyright 2024 Georg Maißer
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class question_mark_last_failed extends catquiz_event_base {
+class question_marked_failed extends catquiz_event_base {
 
     /**
      * Init parameters.
