@@ -15,9 +15,9 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Class grmgeneralized.
+ * Class pcmgeneralized.
  *
- * @package    catmodel_grmgeneralized
+ * @package    catmodel_pcmgeneralized
  * @copyright  2024 Wunderbyte GmbH <georg.maisser@wunderbyte.at>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -32,9 +32,9 @@ use stdClass;
 
 /**
  * Class pcm of catmodels.
- * 
+ *
  * Example data:
- * 
+ *
  *  'difficulty' => will be calculated from the intercept values
  *  'discrimination' => 2.1,
  * 'json' => {
@@ -60,7 +60,7 @@ class pcmgeneralized extends model_raschmodel {
         return [
             'difficulty' => 0.0,
             'discrimination' => round($record->discrimination, 2),
-            'intercept' => json_decode($record->json, true)['intercept']
+            'intercept' => json_decode($record->json, true)['intercept'],
         ];
     }
 
@@ -103,7 +103,7 @@ class pcmgeneralized extends model_raschmodel {
      */
     public static function get_category(float $frac, array $fractions): int {
 
-        for ($k=0; $fractions[$k] < $frac; $k++);
+        for ($k = 0; $fractions[$k] < $frac; $k++);
 
         return $k;
     }
@@ -134,7 +134,7 @@ class pcmgeneralized extends model_raschmodel {
         // TODO: This is very dirty and needs more attention on length / dimensionality.
         return [
             'intercept' => array_combine($fractions, array_splice($vector, count($vector) - 1)),
-            'discrimination' => $vector[count($vector) - 1]
+            'discrimination' => $vector[count($vector) - 1],
         ];
     }
 
@@ -207,13 +207,21 @@ class pcmgeneralized extends model_raschmodel {
         return catcalc::estimate_item_params($itemresponse, $this);
     }
 
-    public function calculate_mean_difficulty (array $ip): array {
+    /**
+     * Calculate the mean difficulty
+     *
+     * @param array $ip
+     *
+     * @return float
+     *
+     */
+    public function calculate_mean_difficulty (array $ip): float {
 
         $fractions = self::get_fractions($ip);
         $kmax = max(array_keys($fractions));
         $sum = 0;
 
-        for ($k=1; $k<$kmax; $k++) {
+        for ($k = 1; $k < $kmax; $k++) {
             $sum += $ip['intercept'][$fractions[$k]];
         }
         return $sum / $kmax;
@@ -242,7 +250,7 @@ class pcmgeneralized extends model_raschmodel {
         // Calculation the denominator of the formulae.
         $denominator = 0;
         $intercepts = 0;
-        for ($k=0; $k<$kmax; $k++) {
+        for ($k = 0; $k < $kmax; $k++) {
             $intercepts += $ip['intercept'][$fractions[$k]];
             $denominator += exp($k * $ability - $intercepts);
         }
@@ -288,7 +296,7 @@ class pcmgeneralized extends model_raschmodel {
         $firstderivative = 0;
         $secondderivative = 0;
         $intercepts = 0;
-        for ($k=0; $k<$kmax; $k++) {
+        for ($k = 0; $k < $kmax; $k++) {
             $intercepts += $ip['intercept'][$fractions[$k]];
             $denominator += exp($k * $ability - $intercepts);
             $firstderivative += $k * exp($k * $ability - $intercepts);
@@ -321,7 +329,7 @@ class pcmgeneralized extends model_raschmodel {
         $firstderivative = 0;
         $secondderivative = 0;
         $intercepts = 0;
-        for ($k=0; $k<$kmax; $k++) {
+        for ($k = 0; $k < $kmax; $k++) {
             $intercepts += $ip['intercept'][$fractions[$k]];
             $denominator += exp($k * $ability - $intercepts);
             $firstderivative += $k * exp($k * $ability - $intercepts);

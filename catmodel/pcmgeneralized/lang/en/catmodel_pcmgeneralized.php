@@ -17,7 +17,7 @@
 /**
  * This file contains language strings for the 1plraschbirnbaum model catquiz plugin
  *
- * @package     catmodel_pcm
+ * @package     catmodel_pcmgeneralized
  * @category    string
  * @copyright   2022 onwards Wunderbyte GmbH <info@wunderbyte.at>
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
