@@ -687,7 +687,7 @@ class catscale {
         $sql = "SELECT lcip.*
                 FROM {local_catquiz_items} lci
                 JOIN {local_catquiz_itemparams} lcip
-                ON (lci.componentid = lcip.itemid)
+                ON (lci.id = lcip.itemid AND lci.contextid = lcip.contextid)
                 WHERE lci.catscaleid $inorequal
                 AND lcip.contextid=:contextid";
         $params['catscaleid'] = $scaleid;
