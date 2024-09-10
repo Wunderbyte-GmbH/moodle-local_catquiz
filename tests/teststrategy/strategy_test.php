@@ -175,7 +175,7 @@ final class strategy_test extends advanced_testcase {
      */
     public function test_import_csv_with_polytomous_model() {
         $result = $this->import_itemparams("simulation_multiparam.csv");
-        $this->assertEquals(0, count($result['errors']), print_r($result['errors'], true));
+        $this->assertEquals(0, count($result['errors']), implode(', ', $result['errors']));
     }
 
     /**

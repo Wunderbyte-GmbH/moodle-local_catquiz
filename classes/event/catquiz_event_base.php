@@ -49,4 +49,13 @@ abstract class catquiz_event_base extends \core\event\base {
         }
         return $this->data['other'];
     }
+
+    /**
+     * Get url.
+     *
+     * @return ?stdClass
+     */
+    public function get_url() {
+        return null;
+    }
 }
