@@ -48,14 +48,14 @@ class grm extends model_raschmodel {
     public static function get_parameters_from_record(stdClass $record): array {
 
         $difficulties = json_decode($record->json, true)['difficulties'];
-        $discrimination = round($record->discrimination, 3); // @DAVID: Rechnen wir nicht mit 3 Nachkommastellen?
+        $discrimination = round($record->discrimination, 3);
 
         $meandifficulty = self::calculate_mean_difficulty([
             'difficulties' => $difficulties,
         ]);
 
         return [
-            'difficulty' => round($meandifficulty, 3), //@DAVID: Houston, we have a problem! :-)
+            'difficulty' => round($meandifficulty, 3),
             'discrimination' => round($discrimination, 3),
             'difficulties' => $difficulties,
         ];

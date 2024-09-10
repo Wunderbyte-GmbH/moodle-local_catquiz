@@ -59,7 +59,7 @@ class pcmgeneralized extends model_raschmodel {
     public static function get_parameters_from_record(stdClass $record): array {
 
         $intercepts = json_decode($record->json, true)['intercepts'];
-        $discrimination = round($record->discrimination, 3); // @DAVID: Rechnen wir nicht mit 3 Nachkommastellen?
+        $discrimination = round($record->discrimination, 3);
 
         $meandifficulty = self::calculate_mean_difficulty([
             'intercept' => $intercepts,
