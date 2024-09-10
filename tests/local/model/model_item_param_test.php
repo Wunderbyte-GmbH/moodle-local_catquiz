@@ -63,9 +63,9 @@ final class model_item_param_test extends advanced_testcase {
      */
     public static function read_item_param_from_db_provider(): array {
 
-        $json = json_encode(['0.00' => 0.12, '0.33' => 0.35, '0.66' => 0.68, '1.00' => 0.83]);
+        $json = json_encode(['difficulties' => ['0.00' => 0.12, '0.33' => 0.35, '0.66' => 0.68, '1.00' => 0.83]]);
         $pcmgeneralizedjson = json_encode([
-            'intercept' => [
+            'intercepts' => [
                 '0.000' => 0.00,
                 '0.333' => 0.42,
                 '0.666' => 0.57,
@@ -73,7 +73,7 @@ final class model_item_param_test extends advanced_testcase {
             ]
         ]);
         $pcmjson = json_encode([
-            'intercept' => [
+            'intercepts' => [
                 '0.000' => 0.10,
                 '0.333' => 0.48,
                 '0.666' => 0.53,
@@ -95,8 +95,9 @@ final class model_item_param_test extends advanced_testcase {
                         'json' => $json,
                     ],
                 'parameters' => [
-                    'difficulty' => ['0.00' => 0.12, '0.33' => 0.35, '0.66' => 0.68, '1.00' => 0.83],
+                    'difficulties' => ['0.00' => 0.12, '0.33' => 0.35, '0.66' => 0.68, '1.00' => 0.83],
                     'discrimination' => 5.92,
+                    'difficulty' => 0.755,
                 ],
             ],
             'rasch' => [
@@ -158,7 +159,7 @@ final class model_item_param_test extends advanced_testcase {
                         'json' => $pcmgeneralizedjson,
                     ],
                 'parameters' => [
-                    'difficulty' => 0.0,
+                    'difficulty' => 0.33,
                     'discrimination' => 2.1,
                     'intercept' => ['0.000' => 0.0, '0.333' => 0.42, '0.666' => 0.57, '1.000' => 0.98],
                 ],
@@ -177,7 +178,7 @@ final class model_item_param_test extends advanced_testcase {
                         'json' => $pcmjson,
                     ],
                 'parameters' => [
-                    'difficulty' => 0.0,
+                    'difficulty' => 0.337,
                     'discrimination' => 2.1,
                     'intercept' => ['0.000' => 0.10, '0.333' => 0.48, '0.666' => 0.53, '1.000' => 0.88],
                 ],
@@ -206,7 +207,7 @@ final class model_item_param_test extends advanced_testcase {
 
     /**
      * Provide data for the test_write_item_param_to_db test
-     * 
+     *
      * @return array
      */
     public static function write_item_param_to_db_provider(): array {
