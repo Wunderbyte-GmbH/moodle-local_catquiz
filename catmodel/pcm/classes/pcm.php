@@ -57,6 +57,7 @@ class pcm extends model_raschmodel {
         return [
             'difficulty' => round($meandifficulty, 3),
             'intercept' => $intercepts,
+            'discrimination' => round($record->discrimination, 3),
         ];
     }
 
@@ -406,7 +407,8 @@ class pcm extends model_raschmodel {
      */
     public static function item_information(array $pp, array $ip): float {
         $iif = self::category_information($pp, $ip, 0.0) * self::likelihood($pp, $ip, 0.0);
-        foreach ($ip['difficuölty'] as $f => $val) {
+        // @Ralf hab ich von $ip['difficulty'] geändert.
+        foreach ($ip['intercept'] as $f => $val) {
             $iif += self::category_information($pp, $ip, $f) * self::likelihood($pp, $ip, $f);
         }
         return $iif;

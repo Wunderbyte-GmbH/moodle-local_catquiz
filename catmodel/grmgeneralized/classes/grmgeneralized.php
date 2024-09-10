@@ -271,6 +271,7 @@ class grmgeneralized extends model_raschmodel {
         $fractions = self::get_fractions($ip);
         $kmax = max(array_keys($fractions));
 
+        // @Ralf: stimmt das so? Bei fractions 0.00, 0.33, 0.66 und 1.0 berechnet das den Wert von (0.66 + 1.0)/ 2
         return ($ip['difficulties'][$fractions[1]] + $ip['difficulties'][$fractions[$kmax]]) / 2;
     }
     // Calculate the Likelihood.
@@ -286,7 +287,7 @@ class grmgeneralized extends model_raschmodel {
     public static function likelihood(array $pp, array $ip, float $frac): float {
         $ability = $pp['ability'];
 
-        $a = $ip['difficulty'];
+        $a = $ip['difficulties'];
         $b = $ip['discrimination'];
 
         // Make sure $frac is between 0.0 and 1.0.
@@ -303,7 +304,7 @@ class grmgeneralized extends model_raschmodel {
                 return 1 / (1 + exp($b * ($a[$kmax] - $ability)));
             default:
                 // Get corresponding category.
-                $k = array_search($frac, array_keys($ip['difficulty']));
+                $k = array_search($frac, array_keys($ip['difficulties']));
                 $a = array_values($a);
                 return 1 / (1 + exp($b * ($a[$k] - $ability))) - 1 / (1 + exp($b * ($a[$k + 1] - $ability)));
         }
@@ -334,7 +335,7 @@ class grmgeneralized extends model_raschmodel {
     public static function log_likelihood_p(array $pp, array $ip, float $frac): float {
         $ability = $pp['ability'];
 
-        $a = $ip['difficulty'];
+        $a = array_values($ip['difficulties']);
         $b = $ip['discrimination'];
 
         // Make sure $frac is between 0.0 and 1.0.
@@ -344,14 +345,13 @@ class grmgeneralized extends model_raschmodel {
 
         switch ($frac) {
             case 0.0:
-                $a = array_values($a);
                 return -$b / (exp($b * ($a[0] - $ability)) + 1);
             case $fractions[$kmax]:
                 $a = array_values($a);
                 return ($b * exp($a[$kmax] * $b)) / (exp($a[$kmax] * $b) + exp($b * $ability));
             default:
                 // Get corresponding category.
-                $k = array_search($frac, $ip['difficulty']);
+                $k = array_search($frac, $ip['difficulties']);
                 $a = array_values($a);
                 return ($b * (exp($b * ($a[$k] + $a[$k + 1] - 2 * $ability)) - 1))
                     / ((exp($b * ($a[$k] - $ability)) + 1) * (exp($b * ($a[$k + 1] - $ability)) + 1));
@@ -369,7 +369,7 @@ class grmgeneralized extends model_raschmodel {
     public static function log_likelihood_p_p(array $pp, array $ip, float $frac): float {
         $ability = $pp['ability'];
 
-        $a = $ip['difficulty'];
+        $a = $ip['difficulties'];
         $b = $ip['discrimination'];
 
         // Make sure $frac is between 0.0 and 1.0.
@@ -386,7 +386,7 @@ class grmgeneralized extends model_raschmodel {
                 return -($b ** 2 * exp($a[$kmax] * $b + $b * $ability)) / (exp($a[$kmax] * $b) + exp($b * $ability)) ** 2;
             default:
                 // Get corresponding category.
-                $k = array_search($frac, array_keys($ip['difficulty']));
+                $k = array_search($frac, array_keys($ip['difficulties']));
                 $a = array_values($a);
                 return -(2 * $b ** 2 * exp($b * ($a[$k] + $a[$k + 1] - 2 * $ability)))
                     / ((exp($b * ($a[$k] - $ability)) + 1) * (exp($b * ($a[$k + 1] - $ability)) + 1))
@@ -468,7 +468,7 @@ class grmgeneralized extends model_raschmodel {
      */
     public static function item_information(array $pp, array $ip): float {
         $iif = self::category_information($pp, $ip, 0.0) * self::likelihood($pp, $ip, 0.0);
-        foreach ($ip['difficulty'] as $f => $val) {
+        foreach ($ip['difficulties'] as $f => $val) {
             $iif += self::category_information($pp, $ip, $f) * self::likelihood($pp, $ip, $f);
         }
         return $iif;
