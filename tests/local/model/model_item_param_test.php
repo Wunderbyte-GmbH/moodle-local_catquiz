@@ -190,9 +190,11 @@ final class model_item_param_test extends advanced_testcase {
      * Check if an item param can be saved to the database.
      *
      * @dataProvider write_item_param_to_db_provider
+     *
+     * @param model_item_param $itemparam
      * @return void
      */
-    public function test_write_item_param_to_db($itemparam) {
+    public function test_write_item_param_to_db(model_item_param $itemparam) {
         $this->resetAfterTest();
         $itemparam->save();
 
@@ -233,7 +235,7 @@ final class model_item_param_test extends advanced_testcase {
                 '0.333' => 0.48,
                 '0.666' => 0.53,
                 '1.000' => 0.88,
-            ]
+            ],
         ]);
         $defaultrecord = [
             'discrimination' => '1.2',
