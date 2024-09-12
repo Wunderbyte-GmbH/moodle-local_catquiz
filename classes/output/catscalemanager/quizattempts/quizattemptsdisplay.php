@@ -17,6 +17,7 @@
 namespace local_catquiz\output\catscalemanager\quizattempts;
 
 use local_catquiz\catquiz;
+use local_catquiz\local\status;
 use local_catquiz\output\attemptfeedback;
 use local_catquiz\table\quizattempts_table;
 use local_catquiz\teststrategy\info;
@@ -91,6 +92,11 @@ class quizattemptsdisplay {
         $table->add_filter($standardfilter);
 
         $standardfilter = new standardfilter('status', get_string('status'));
+        $statusfilter = [];
+        foreach(status::get_all_ints() as $id) {
+            $statusfilter[$id] = status::to_string($id);
+        }
+        $standardfilter->add_options($statusfilter);
         $table->add_filter($standardfilter);
 
         $standardfilter = new standardfilter('instance', get_string('instance', 'local_catquiz'));
