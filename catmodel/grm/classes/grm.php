@@ -48,15 +48,15 @@ class grm extends model_raschmodel {
     public static function get_parameters_from_record(stdClass $record): array {
 
         $difficulties = json_decode($record->json, true)['difficulties'];
-        $discrimination = round($record->discrimination, 3);
+        $discrimination = round($record->discrimination, self::PRECISION);
 
         $meandifficulty = self::calculate_mean_difficulty([
             'difficulties' => $difficulties,
         ]);
 
         return [
-            'difficulty' => round($meandifficulty, 3),
-            'discrimination' => round($discrimination, 3),
+            'difficulty' => round($meandifficulty, self::PRECISION),
+            'discrimination' => round($discrimination, self::PRECISION),
             'difficulties' => $difficulties,
         ];
     }

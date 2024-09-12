@@ -35,6 +35,13 @@ use local_catquiz\catcalc_item_estimator;
 abstract class model_raschmodel extends model_model implements catcalc_item_estimator, catcalc_ability_estimator {
 
     /**
+     * @var int PRECISION
+     *
+     * The precision used for the item parameters.
+     */
+    public const PRECISION = 3;
+
+    /**
      * Likelihood 1pl.
      *
      * @param mixed $personability

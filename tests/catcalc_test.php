@@ -156,14 +156,19 @@ final class catcalc_test extends basic_testcase {
         $ability = catcalc::estimate_person_ability($responses, $items);
     }
 
-    public static function ability_can_be_calculated_with_all_models_provider($itemparam) {
+    /**
+     * Provider for test_ability_can_be_calculated_with_all_models
+     *
+     * @return array
+     */
+    public static function ability_can_be_calculated_with_all_models_provider(): array {
         $grmgeneralizedjson = json_encode([
             'difficulties' => [
                 '0.00' => 0.12,
                 '0.33' => 0.35,
                 '0.66' => 0.68,
                 '1.00' => 0.83,
-            ]
+            ],
         ]);
         $grmjson = json_encode([
             'difficulties' => [
@@ -171,7 +176,7 @@ final class catcalc_test extends basic_testcase {
                 '0.33' => 0.35,
                 '0.66' => 0.68,
                 '1.00' => 0.83,
-            ]
+            ],
         ]);
         $pcmgeneralizedjson = json_encode([
             'intercepts' => [
@@ -179,7 +184,7 @@ final class catcalc_test extends basic_testcase {
                 '0.333' => 0.42,
                 '0.666' => 0.57,
                 '1.000' => 0.98,
-            ]
+            ],
         ]);
         $pcmjson = json_encode([
             'intercepts' => [
@@ -187,7 +192,7 @@ final class catcalc_test extends basic_testcase {
                 '0.333' => 0.48,
                 '0.666' => 0.53,
                 '1.000' => 0.88,
-            ]
+            ],
         ]);
         $defaultrecord = [
             'discrimination' => '1.2',
