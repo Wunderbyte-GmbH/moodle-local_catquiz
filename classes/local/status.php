@@ -170,7 +170,7 @@ class status {
             return get_string(self::$reversemapping[$status], 'local_catquiz');
         }
         if (!$string = array_search($status, self::$mapping)) {
-           $string = 'undefined';
+            $string = 'undefined';
         }
         self::$reversemapping[$status] = $string;
         return get_string($string, 'local_catquiz');

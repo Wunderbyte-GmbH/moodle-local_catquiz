@@ -93,7 +93,7 @@ class quizattemptsdisplay {
 
         $standardfilter = new standardfilter('status', get_string('status'));
         $statusfilter = [];
-        foreach(status::get_all_ints() as $id) {
+        foreach (status::get_all_ints() as $id) {
             $statusfilter[$id] = status::to_string($id);
         }
         $standardfilter->add_options($statusfilter);
