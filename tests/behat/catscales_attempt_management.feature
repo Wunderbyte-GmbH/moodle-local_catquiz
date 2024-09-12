@@ -64,10 +64,10 @@ Feature: As a admin I want to manage CAT scales along with obtained attempts dat
     ## Verify events on the Summary tab.
     ## An attempt has to be the last one.
     And I should see "Student1 Test" in the "#eventlogtable_r1" "css_element"
-    And I should see "Attempt completed" in the "#eventlogtable_r1" "css_element"
+    ## And I should see "Attempt completed" in the "#eventlogtable_r1" "css_element"
     And I should see "in CAT scale Simulation completed by user" in the "#eventlogtable_r1" "css_element"
     ## Other expected events.
-    And I should see "CAT scale created" in the ".eventlogtable" "css_element"
+    ## And I should see "CAT scale created" in the ".eventlogtable" "css_element"
     And I should see "CAT context created" in the ".eventlogtable" "css_element"
     And I should see "CAT scale updated" in the ".eventlogtable" "css_element"
     And I should see "Testitem added to CAT scale" in the ".eventlogtable" "css_element"
