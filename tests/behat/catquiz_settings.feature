@@ -29,7 +29,7 @@ Feature: As a teacher I setup adaptive quiz with CATquiz Scales and Feedbacks.
   Scenario: CATquiz settings: teacher setup basic settings and student should access attempt
     Given I log in as "teacher1"
     And I am on "Course 1" course homepage with editing mode on
-    And I add a "Adaptive Quiz" to section "1"
+    And I add a "Adaptive Quiz" to section "1" using the activity chooser
     And I set the following fields to these values:
       | catmodel                                              | empty |
     And I wait until the page is ready
