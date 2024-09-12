@@ -41,7 +41,7 @@ class status {
      *
      * @var string
      */
-    const OK = 'ok';
+    const OK = 'statusok';
     /**
      * ERROR_GENERAL
      *
@@ -102,11 +102,19 @@ class status {
     const EXCEEDED_MAX_ATTEMPT_TIME = 'exceededmaxattempttime';
 
     /**
+     * An undefined status
+     *
+     * @var string
+     */
+    const STATUS_UNDEFINED = 'statusundefined';
+
+    /**
      * Stores the mapping of status string to integer value.
      *
      * @var array
      */
     private static array $mapping = [
+        self::STATUS_UNDEFINED => -1,
         self::OK => 0,
         self::ERROR_NO_REMAINING_QUESTIONS => 1,
         self::ERROR_TESTITEM_ALREADY_IN_RELATED_SCALE => 2,
@@ -117,6 +125,15 @@ class status {
         self::ERROR_NO_ITEMS => 7,
         self::EXCEEDED_MAX_ATTEMPT_TIME => 8,
     ];
+
+    /**
+     * Returns the available status values as integers.
+     *
+     * @return array
+     */
+    public static function get_all_ints(): array {
+        return array_values(self::$mapping);
+    }
 
     /**
      * Helper to store the reverse mapping of integer value to string.
