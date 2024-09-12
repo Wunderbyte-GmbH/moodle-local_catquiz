@@ -102,6 +102,32 @@ class status {
     const EXCEEDED_MAX_ATTEMPT_TIME = 'exceededmaxattempttime';
 
     /**
+     * Stores the mapping of status string to integer value.
+     *
+     * @var array
+     */
+    private static array $mapping = [
+        self::OK => 0,
+        self::ERROR_NO_REMAINING_QUESTIONS => 1,
+        self::ERROR_TESTITEM_ALREADY_IN_RELATED_SCALE => 2,
+        self::ERROR_FETCH_NEXT_QUESTION => 3,
+        self::ERROR_REACHED_MAXIMUM_QUESTIONS => 4,
+        self::ABORT_PERSONABILITY_NOT_CHANGED => 5,
+        self::ERROR_EMPTY_FIRST_QUESTION_LIST => 6,
+        self::ERROR_NO_ITEMS => 7,
+        self::EXCEEDED_MAX_ATTEMPT_TIME => 8,
+    ];
+
+    /**
+     * Helper to store the reverse mapping of integer value to string.
+     *
+     * This will be filled dynamically when it is used in the to_string method.
+     *
+     * @var array
+     */
+    private static array $reversemapping = [];
+
+    /**
      * Assigns each status an int value that can be saved in the attempts database table
      *
      * @param string $status
@@ -109,27 +135,27 @@ class status {
      * @return int
      */
     public static function to_int(string $status): int {
-        switch ($status) {
-            case self::OK:
-                return 0;
-            case self::ERROR_NO_REMAINING_QUESTIONS:
-                return 1;
-            case self::ERROR_TESTITEM_ALREADY_IN_RELATED_SCALE:
-                return 2;
-            case self::ERROR_FETCH_NEXT_QUESTION:
-                return 3;
-            case self::ERROR_REACHED_MAXIMUM_QUESTIONS:
-                return 4;
-            case self::ABORT_PERSONABILITY_NOT_CHANGED:
-                return 5;
-            case self::ERROR_EMPTY_FIRST_QUESTION_LIST:
-                return 6;
-            case self::ERROR_NO_ITEMS:
-                return 7;
-            case self::EXCEEDED_MAX_ATTEMPT_TIME:
-                return 8;
-            default:
-                return -1;
+        if (!array_key_exists($status, self::$mapping)) {
+            return -1;
         }
+        return self::$mapping[$status];
+    }
+
+    /**
+     * Returns the string for the status number.
+     *
+     * @param int $status
+     * @throws \moodle_exception
+     * @return string
+     */
+    public static function to_string(int $status): string {
+        if (array_key_exists($status, self::$reversemapping)) {
+            return get_string(self::$reversemapping[$status], 'local_catquiz');
+        }
+        if (!$string = array_search($status, self::$mapping)) {
+           $string = 'undefined';
+        }
+        self::$reversemapping[$status] = $string;
+        return get_string($string, 'local_catquiz');
     }
 }
