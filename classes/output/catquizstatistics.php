@@ -1129,7 +1129,7 @@ class catquizstatistics {
             'starttime' => $this->starttime,
             'endtime' => $this->endtime,
         ];
-        return (new moodle_url('/local/catquiz/export_shortcode_csv.php', $params))->out(false);
+        return (new moodle_url('/local/catquiz/export_statistics_csv.php', $params))->out(false);
     }
 
     /**
