@@ -847,18 +847,18 @@ class catquizstatistics {
                     || ($level === self::COMPATIBILITY_LEVEL_DESCRIPTION && $qs->$textkey !== $rangetext)
                 ) {
                     $this->quizsettingcompatibility[$level] = false;
-                    if ($CFG->debug > 0 && has_capability('local/catquiz:view_users_feedback', context_course::instance($this->courseid)))
-                    {
+                    if ($CFG->debug > 0 && has_capability('local/catquiz:view_users_feedback', context_course::instance($this->courseid))) {
                         if ($qs->$startkey !== $rangestart || $qs->$endkey !== $rangeend) {
                             echo sprintf(
-                                '<div class="alert alert-warning" role="alert">Quiz settings are not compatible: different range values [%f, %f] for test %d and range values [%f, %f] for test %d.</div>',
+                                '<div class="alert alert-warning" role="alert">Quiz settings are not compatible:
+                                different range values [%f, %f] for test %d and range values [%f, %f] for test %d.</div>',
                                 $rangestart, $rangeend, $qs->$startkey, $qs->$endkey, $basetestid, $testid
                             );
                         }
-                        if ($qs->$textkey !== $rangetext)
-                        {
+                        if ($qs->$textkey !== $rangetext) {
                             echo sprintf(
-                                '<div class="alert alert-warning" role="alert">Quiz settings are not compatible: different range descriptions for test %d and test %d in scale %d and range %d.</div>',
+                                '<div class="alert alert-warning" role="alert">Quiz settings are not compatible:
+                                different range descriptions for test %d and test %d in scale %d and range %d.</div>',
                                 $basetestid, $testid, $this->scaleid, $r
                             );
                         }
