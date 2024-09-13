@@ -217,7 +217,7 @@ class customscalefeedback extends feedbackgenerator {
             return $this->get_exclusion_reason_string($personabilities);
         }
         foreach ($personabilitiestoreport as $catscaleid => $personability) {
-            if (isset($personability['excluded']) && $personability['excluded']) {
+            if (!empty($personability['excluded']) || !empty($personability['hidden'])) {
                 continue;
             }
             $relevantscalesfound = true;
