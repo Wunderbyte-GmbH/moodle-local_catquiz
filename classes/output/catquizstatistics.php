@@ -827,6 +827,8 @@ class catquizstatistics {
         // If we are here, there are multiple tests and they all have the same
         // number of ranges. Now we need to check if the ranges have the same
         // limits and, depending on the $level, descriptions.
+
+        $this->quizsettingcompatibility[$level] = true;
         foreach (range(1, $lastranges) as $r) {
             $rangestart = null;
             $rangeend = null;
@@ -839,24 +841,33 @@ class catquizstatistics {
                     $rangestart = $qs->$startkey;
                     $rangeend = $qs->$endkey;
                     $rangetext = $qs->$textkey;
+                    $basetestid = $testid;
                 }
                 if ($qs->$startkey !== $rangestart || $qs->$endkey !== $rangeend
                     || ($level === self::COMPATIBILITY_LEVEL_DESCRIPTION && $qs->$textkey !== $rangetext)
                 ) {
                     $this->quizsettingcompatibility[$level] = false;
-                    if ($CFG->debug > 0) {
-                        echo sprintf(
-                            "Quiz settings are not compatible: different range values [%f, %f] for test %d",
-                            $qs->$startkey, $qs->$endkey, $testid
-                        );
+                    if ($CFG->debug > 0 && has_capability('local/catquiz:view_users_feedback', context_course::instance($this->courseid)))
+                    {
+                        if ($qs->$startkey !== $rangestart || $qs->$endkey !== $rangeend) {
+                            echo sprintf(
+                                '<div class="alert alert-warning" role="alert">Quiz settings are not compatible: different range values [%f, %f] for test %d and range values [%f, %f] for test %d.</div>',
+                                $rangestart, $rangeend, $qs->$startkey, $qs->$endkey, $basetestid, $testid
+                            );
+                        }
+                        if ($qs->$textkey !== $rangetext)
+                        {
+                            echo sprintf(
+                                '<div class="alert alert-warning" role="alert">Quiz settings are not compatible: different range descriptions for test %d and test %d in scale %d and range %d.</div>',
+                                $basetestid, $testid, $this->scaleid, $r
+                            );
+                        }
                     }
-                    return false;
                 }
             }
         }
 
-        $this->quizsettingcompatibility[$level] = true;
-        return true;
+        return $this->quizsettingcompatibility[$level];
     }
 
     /**
