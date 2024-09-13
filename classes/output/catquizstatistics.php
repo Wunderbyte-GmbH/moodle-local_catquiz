@@ -852,7 +852,7 @@ class catquizstatistics {
                             echo sprintf(
                                 '<div class="alert alert-warning" role="alert">Quiz settings are not compatible:
                                 different range values [%f, %f] for test %d and range values [%f, %f] for test %d.</div>',
-                                $rangestart, $rangeend, $qs->$startkey, $qs->$endkey, $basetestid, $testid
+                                $rangestart, $rangeend, $basetestid, $qs->$startkey, $qs->$endkey, $testid
                             );
                         }
                         if ($qs->$textkey !== $rangetext) {
