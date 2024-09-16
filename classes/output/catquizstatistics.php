@@ -848,7 +848,8 @@ class catquizstatistics {
                     || ($level === self::COMPATIBILITY_LEVEL_DESCRIPTION && trim($qs->$textkey) !== trim($rangetext))
                 ) {
                     $this->quizsettingcompatibility[$level] = false;
-                    if ($CFG->debug > 0 && has_capability('local/catquiz:view_users_feedback', context_course::instance($this->courseid))) {
+                    if ($CFG->debug > 0 && has_capability('local/catquiz:view_users_feedback',
+                        context_course::instance($this->courseid))) {
                         if (round($qs->$startkey, 3) !== round($rangestart, 3) || round($qs->$endkey, 3) !== round($rangeend, 3)) {
                             echo sprintf(
                                 '<div class="alert alert-warning" role="alert">Quiz settings are not compatible:
