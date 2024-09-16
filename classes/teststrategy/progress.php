@@ -29,7 +29,6 @@ use coding_exception;
 use JsonSerializable;
 use local_catquiz\catquiz;
 use local_catquiz\catscale;
-use local_catquiz\event\alise_debug_event;
 use local_catquiz\testenvironment;
 use Random\RandomException;
 use stdClass;
@@ -225,10 +224,6 @@ class progress implements JsonSerializable {
             $instance->mark_lastquestion_failed();
             $instance->hasnewresponse = true;
 
-            alise_debug_event::log(
-                $instance->get_attemptid(),
-                sprintf('Progress: User gave up last question')
-            );
             return $instance;
         }
 
@@ -249,10 +244,6 @@ class progress implements JsonSerializable {
             }
         }
 
-        alise_debug_event::log(
-            $instance->get_attemptid(),
-            sprintf('Progress: remove last played question')
-        );
         return $instance;
     }
 
