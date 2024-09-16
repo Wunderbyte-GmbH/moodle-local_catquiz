@@ -843,19 +843,20 @@ class catquizstatistics {
                     $rangetext = $qs->$textkey;
                     $basetestid = $testid;
                 }
-                if ($qs->$startkey !== $rangestart || $qs->$endkey !== $rangeend
-                    || ($level === self::COMPATIBILITY_LEVEL_DESCRIPTION && $qs->$textkey !== $rangetext)
+
+                if (round($qs->$startkey, 3) !== round($rangestart, 3) || round($qs->$endkey, 3) !== round($rangeend, 3)
+                    || ($level === self::COMPATIBILITY_LEVEL_DESCRIPTION && trim($qs->$textkey) !== trim($rangetext))
                 ) {
                     $this->quizsettingcompatibility[$level] = false;
                     if ($CFG->debug > 0 && has_capability('local/catquiz:view_users_feedback', context_course::instance($this->courseid))) {
-                        if ($qs->$startkey !== $rangestart || $qs->$endkey !== $rangeend) {
+                        if (round($qs->$startkey, 3) !== round($rangestart, 3) || round($qs->$endkey, 3) !== round($rangeend, 3)) {
                             echo sprintf(
                                 '<div class="alert alert-warning" role="alert">Quiz settings are not compatible:
                                 different range values [%f, %f] for test %d and range values [%f, %f] for test %d.</div>',
                                 $rangestart, $rangeend, $basetestid, $qs->$startkey, $qs->$endkey, $testid
                             );
                         }
-                        if ($qs->$textkey !== $rangetext) {
+                        if (trim($qs->$textkey) !== trim($rangetext)) {
                             echo sprintf(
                                 '<div class="alert alert-warning" role="alert">Quiz settings are not compatible:
                                 different range descriptions for test %d and test %d in scale %d and range %d.</div>',
@@ -1144,7 +1145,8 @@ class catquizstatistics {
             'starttime' => $this->starttime,
             'endtime' => $this->endtime,
         ];
-        $url = (new moodle_url('/local/catquiz/export_shortcode_csv.php', $params))->out(false);
+
+        $url = (new moodle_url('/local/catquiz/export_statistics_csv.php', $params))->out(false);
         return sprintf(
             '<a class="btn btn-info" style="margin: 1em 0" id="download-link" href="%s">%s</a>',
             $url,
