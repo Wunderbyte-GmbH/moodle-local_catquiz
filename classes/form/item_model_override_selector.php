@@ -28,6 +28,7 @@ use context_system;
 use core_form\dynamic_form;
 use local_catquiz\catquiz;
 use local_catquiz\event\testitemstatus_updated;
+use local_catquiz\local\model\model_item_param;
 use local_catquiz\local\model\model_item_param_list;
 use local_catquiz\local\model\model_strategy;
 use moodle_url;
@@ -543,12 +544,13 @@ class item_model_override_selector extends dynamic_form {
         }
         foreach (array_keys($models) as $model) {
             $field = sprintf('override_%s', $model);
-            if ($itemparamsbymodel->offsetExists($model)) {
-                $param = $itemparamsbymodel->offsetGet($model);
-                $data->$field = array_merge($data->$field, $param->get_parameter_fields());
-            } else {
-                // TODO $param->get_default_fields()
+            if (!$param = $itemparamsbymodel->offsetGet($model) ?? null) {
+                $param = new model_item_param($data->testitemid, $model);
+                $itemparamsbymodel->add($param, true);
             }
+            $data->$field = array_merge($data->$field, $param->get_parameter_fields());
+            $selectfield = sprintf('%s_select', $field);
+            $data->$selectfield = $param->get_status();
         }
         $data->itemparams = $itemparamsbymodel;
         $this->set_data($data);

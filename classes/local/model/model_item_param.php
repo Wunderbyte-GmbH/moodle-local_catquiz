@@ -71,9 +71,9 @@ class model_item_param {
     private static array $models = [];
 
     /**
-     * @var array<float>
+     * @var ?array<float>
      */
-    private array $parameters;
+    private ?array $parameters = null;
 
 
     /**
@@ -162,6 +162,7 @@ class model_item_param {
         $this->modelname = $modelname;
         $this->metadata = $metadata;
         $this->status = $status;
+        $this->parameters = null;
 
         if (!$record) {
             return;
@@ -223,9 +224,9 @@ class model_item_param {
     /**
      * Get params array
      *
-     * @return array
+     * @return ?array
      */
-    public function get_params_array(): array {
+    public function get_params_array(): ?array {
         return $this->parameters;
     }
 
@@ -384,7 +385,7 @@ class model_item_param {
     /**
      * Returns the model class
      *
-     * @return string
+     * @return model_model
      */
     private function get_model_object() {
         if (!self::$models) {
