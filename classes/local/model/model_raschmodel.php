@@ -359,13 +359,20 @@ abstract class model_raschmodel extends model_model implements catcalc_item_esti
 
     protected function add_element_to_group(string $name, string $id, array &$group, &$mform) {
         //$label = $mform->createElement('static', sprintf('%s_%slabel', $id, $name), 'mylabel', '');
-        $value = $mform->createElement('text', sprintf('%s_%s', $id, $name), 'mylabel', '');
-        $value->setType(sprintf('%s_%s', $id, $name), PARAM_FLOAT);
+        $value = $mform->createElement('text', $name, 'mylabel', '');
+        $value->setType($name, PARAM_FLOAT);
         //$group[] = $label;
         $group[] = $value;
     }
 
     public function get_parameter_fields(model_item_param $param): array {
-        return $param->get_params_array();
+        if (!$params = $param->get_params_array()) {
+            return $this->get_default_params();
+        }
+        return $params;
+    }
+
+    public function get_default_params(): array {
+        return ['difficulty' => 0.0, 'discrimination' => 0.0];
     }
 }
