@@ -134,13 +134,16 @@ class testitemdashboard implements renderable, templatable {
             $chart->add_series($series1);
             $chart->set_labels($labels);
             $chart->get_xaxis(0, true)->set_label(get_string('personability', 'local_catquiz'));
-
+            $status = get_string('status', 'core') . ': ' . get_string(sprintf('itemstatus_%d', $item->get_status()), 'local_catquiz');
         }
-        $body = html_writer::tag('div', $OUTPUT->render($chart), ['dir' => 'ltr']);
+        $heading = html_writer::tag('h3', get_string('pluginname', sprintf('catmodel_%s', $modelname)));
+        $chart = html_writer::tag('div', $OUTPUT->render($chart), ['dir' => 'ltr']);
 
         $returnarray[] = [
             'title' => get_string('likelihood', 'local_catquiz'),
-            'body' => $body,
+            'heading' => $heading,
+            'status' => $status,
+            'chart' => $chart,
         ];
 
         return $returnarray;
@@ -300,7 +303,7 @@ class testitemdashboard implements renderable, templatable {
             'statcards' => $this->get_testitems_stats_data(),
             'contextselector' => scaleandcontexselector::render_contextselector($this->contextid),
             'overridesforms' => $this->render_overrides_form(),
-            'itemstatus' => $this->get_itemstatus(),
+            //'itemstatus' => $this->get_itemstatus(),
         ];
         return $data;
     }

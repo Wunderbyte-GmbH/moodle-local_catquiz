@@ -170,7 +170,14 @@ abstract class model_model {
     abstract public function definition_after_data_callback(MoodleQuickForm &$mform, model_item_param $param, string $groupid): void;
     abstract public function get_parameter_fields(model_item_param $param): array;
 
+    abstract public function form_array_to_record(array $formarray): stdClass;
+
     abstract public function get_default_params(): array;
 
-    abstract public function form_array_to_record(array $formarray): stdClass;
+    /**
+     * Returns the parameters as flat array with the key being a translated label.
+     * @param \local_catquiz\local\model\model_item_param $param
+     * @return array
+     */
+    abstract public function get_static_param_array(model_item_param $param): array;
 }

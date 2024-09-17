@@ -26,6 +26,7 @@ use cache_helper;
 use context;
 use context_system;
 use core_form\dynamic_form;
+use dml_exception;
 use local_catquiz\catquiz;
 use local_catquiz\event\testitemstatus_updated;
 use local_catquiz\local\model\model_item_param;
@@ -61,6 +62,9 @@ class item_model_override_selector extends dynamic_form {
         $data = (object) $this->_ajaxformdata;
         $editmode = !empty($data->editing) && $data->editing != "false";
 
+        // Set only the most basic fields.
+        // Most of the form is rendered in the definition_after_data() methods.
+
         $mform->addElement('hidden', 'testitemid');
         $mform->setType('testitemid', PARAM_INT);
         $mform->addElement('hidden', 'contextid');
@@ -70,55 +74,77 @@ class item_model_override_selector extends dynamic_form {
         $mform->addElement('hidden', 'editing', $editmode);
         $mform->setType('editing', PARAM_BOOL);
         $mform->registerNoSubmitButton('edititemparams');
+        $mform->registerNoSubmitButton('noedititemparams');
 
-        if ($editmode) {
-            // $this->render_edit_form($mform, $data);
-            return;
-        }
-
-        // If we are here, we are not in edit mode: just display the saved data.
-        $models = model_strategy::get_installed_models();
-
-       // foreach (array_keys($models) as $model) {
-       //     $paramnames = $models[$model]::get_parameter_names();
-       //     $group = [];
-       //     $id = sprintf('override_%s', $model);
-       //     $select = $mform->createElement(
-       //         'static',
-       //         sprintf('%s_select', $id),
-       //         get_string('pluginname', sprintf('catmodel_%s', $model))
-       //     );
-
-       //     $mform->addElement($select);
-       //     $group[] = $mform->createElement(
-       //         'static',
-       //         sprintf('override_%s_statuslabel', $model),
-       //         '',
-       //         get_string('status', 'core') . ":"
-       //     );
-       //     $group[] = $mform->createElement('static', sprintf('override_%s_status', $model), 'mylabel', 'status');
-       //     foreach ($paramnames as $paramname) {
-       //         $this->add_element_to_group($paramname, $id, $group, $mform, $editmode);
-       //     }
-       //     $mform->addGroup($group, $id, '');
-       //     $mform->hideIf($id, sprintf('override_%s_select', $model), 'in', [
-       //         LOCAL_CATQUIZ_STATUS_NOT_CALCULATED,
-       //         LOCAL_CATQUIZ_STATUS_EXCLUDED_MANUALLY,
-       //     ]);
-       //     $mform->disabledIf($id, sprintf('override_%s_select', $model), 'eq', LOCAL_CATQUIZ_STATUS_CALCULATED);
-       // }
-
-        $mform->registerNoSubmitButton('edititemparams');
-        $mform->addElement('submit', 'edititemparams', get_string('edit'),
-            ['data-action' => 'edititemparams']);
-        $mform->disable_form_change_checker();
     }
 
     /**
      * Set up the form depending on current values.
      */
     public function definition_after_data() {
-        $this->render_edit_form($this->_form, (object) []);
+        $form = $this->_form;
+        $data = (object) $this->_ajaxformdata;
+        $editmode = !empty($data->editing) && $data->editing != "false";
+        if ($editmode) {
+            $this->render_edit_form($this->_form, (object) []);
+            return;
+        }
+
+
+        $item = $form->_defaultValues['item'];
+        foreach ($form->_defaultValues['itemparams'] as $model => $param) {
+            $class = "itemparam";
+            if ($param->get_id() === intval($item->activeparamid)) {
+                $class .= " activeparam";
+            }
+            $form->addElement('html', '<div class="'.$class.'">');
+            $form->addElement('html', '<h3>'.get_string('pluginname', sprintf('catmodel_%s', $param->get_model_name())).'</h3>');
+            $statusstring = get_string(sprintf('itemstatus_%d', $param->get_status()), 'local_catquiz');
+            $form->addElement('html', '<div><span class="label status">'.get_string('status', 'core').': </span><span class="value">'.$statusstring.'</span></div>');
+            foreach ($param->get_static_param_array($param) as $key => $val) {
+                $paramfield = sprintf('<div><span class="label">%s</span>: <span class="value">%s</span></div>', $key, $val);
+                $form->addElement('html', $paramfield);
+            }
+            $form->addElement('html', '</div>');
+        } 
+
+        $this->_form->registerNoSubmitButton('edititemparams');
+        $this->_form->addElement('submit', 'edititemparams', get_string('edit'),
+            ['data-action' => 'edititemparams']);
+        $this->_form->disable_form_change_checker();
+
+     //   // If we are here, we are not in edit mode: just display the saved data.
+     //   $models = model_strategy::get_installed_models();
+
+     //  foreach (array_keys($models) as $model) {
+     //      $paramnames = $models[$model]::get_parameter_names();
+     //      $group = [];
+     //      $id = sprintf('override_%s', $model);
+     //      $select = $mform->createElement(
+     //          'static',
+     //          sprintf('%s_name', $id),
+     //          get_string('pluginname', sprintf('catmodel_%s', $model))
+     //      );
+
+     //      $mform->addElement($select);
+     //      $group[] = $mform->createElement(
+     //          'static',
+     //          sprintf('override_%s_statuslabel', $model),
+     //          '',
+     //          get_string('status', 'core') . ":"
+     //      );
+     //      $group[] = $mform->createElement('static', sprintf('override_%s_status', $model), 'mylabel', 'status');
+     //      foreach ($paramnames as $paramname) {
+     //          $this->add_element_to_group($paramname, $id, $group, $mform, $editmode);
+     //      }
+     //      $mform->addGroup($group, $id, '');
+     //      $mform->hideIf($id, sprintf('override_%s_select', $model), 'in', [
+     //          LOCAL_CATQUIZ_STATUS_NOT_CALCULATED,
+     //          LOCAL_CATQUIZ_STATUS_EXCLUDED_MANUALLY,
+     //      ]);
+     //      $mform->disabledIf($id, sprintf('override_%s_select', $model), 'eq', LOCAL_CATQUIZ_STATUS_CALCULATED);
+     //  }
+
         // Check: are we here because the page was first loaded?
        // $modeldata = array_filter(
        //     $form->_defaultValues,
@@ -155,7 +181,7 @@ class item_model_override_selector extends dynamic_form {
             'select',
             'active_model',
             'Active model TODO translate',
-            array_keys($models),
+            array_combine(array_keys($models), array_map(fn($m) => get_string('pluginname', sprintf('catmodel_%s', $m)), array_keys($models))),
             ['multiple' => false]
         );
         $mform->addElement($selectactive);
@@ -186,6 +212,7 @@ class item_model_override_selector extends dynamic_form {
         $mform->addElement('submit', 'noedititemparams', get_string('noedit', 'local_catquiz'),
             ['data-action' => 'edititemparams']);
         $this->add_action_buttons(false);
+        $mform->disable_form_change_checker();
     }
 
     /**
@@ -233,7 +260,6 @@ class item_model_override_selector extends dynamic_form {
      * @return object
      */
     public function process_dynamic_submission(): object {
-        global $DB;
         $data = $this->get_data();
         if (!empty($data->editing)) {
             if ($data->editing == "false") {
@@ -243,9 +269,11 @@ class item_model_override_selector extends dynamic_form {
             }
         }
 
+        $selectedmodel = $data->active_model;
+        $modelparam = $this->_form->_defaultValues['itemparams']->offsetGet($selectedmodel);
+
         // Set data for each model in array.
         $formitemparams = [];
-        $models = model_strategy::get_installed_models();
         foreach ($this->_form->_defaultValues['itemparams'] as $model => $param) {
             $fieldname = sprintf('override_%s', $model);
             $rec = $param->form_array_to_record($data->$fieldname);
@@ -253,15 +281,36 @@ class item_model_override_selector extends dynamic_form {
             $rec->status = $data->$statusstring;
             $rec->componentid = $data->testitemid;
             $rec->model = $model;
+            $item = $this->_form->_defaultValues['item'];
+            $rec->itemid = $item->id;
+            $rec->contextid = $item->contextid;
+            $rec->componentname = $item->componentname;
             if ($param->get_id()) {
                 $defaultobj = $param->to_record();
                 $rec->id = $param->get_id();
                 $rec->timecreated = $defaultobj->timecreated;
-                $rec->contextid = $defaultobj->contextid;
-                $rec->componentname = $defaultobj->componentname;
-                $rec->itemid = $defaultobj->itemid;
             }
             $formitemparams[$model] = model_item_param::from_record($rec); //$obj;
+        }
+
+        // If one of the params changed status to 'manually confirmed', then we change the status of the other
+        // models that are also 'manually confirmed' back to the default status.
+        foreach ($formitemparams as $model => $param) {
+            $defaultParam = $this->_form->_defaultValues['itemparams']->offsetGet($model);
+            if ($param->get_status() == LOCAL_CATQUIZ_STATUS_CONFIRMED_MANUALLY
+            && $param->get_status() == $defaultParam->get_status()) {
+                continue;
+            }
+            // If we are here, the status was changed to manually confirmed for this model.
+            foreach ($formitemparams as $othermodel => $otherparam) {
+                if ($othermodel == $model) {
+                    continue;
+                }
+                if ($otherparam->get_status() != LOCAL_CATQUIZ_STATUS_CONFIRMED_MANUALLY) {
+                    continue;
+                }
+                $otherparam->set_status(LOCAL_CATQUIZ_STATUS_NOT_CALCULATED);
+            }
         }
 
         foreach ($formitemparams as $model => $param) {
@@ -270,9 +319,16 @@ class item_model_override_selector extends dynamic_form {
             if ($param->get_params_array() == $defaultParam->get_params_array()
                 && $param->get_status() == $defaultParam->get_status()
             ) {
+                if ($model == $selectedmodel) {
+                    $this->update_item_activeparam($param);
+                }
                 continue;
             }
             $param->save();
+
+            if ($model == $selectedmodel) {
+                $this->update_item_activeparam($param);
+            }
             // if (!array_key_exists($model, $saveditemparams)) {
             //     $toinsert[] = $param;
             //     continue;
@@ -480,6 +536,9 @@ class item_model_override_selector extends dynamic_form {
         if (empty($data->testitemid)) {
             $data->testitemid = required_param('id', PARAM_INT);
         }
+        if (empty($data->componentname)) {
+            $data->componentname = "question"; // TODO: fix required_param('component', PARAM_TEXT) ?: "question";
+        }
         // Get data from db.
         $itemparamsbymodel = $this->get_item_params($data->testitemid, $data->contextid);
         foreach (array_keys($models) as $model) {
@@ -551,6 +610,10 @@ class item_model_override_selector extends dynamic_form {
             // ]
             $data->$field = $dataarray;
         }
+        if (!isset($data->itemid)) {
+            $data->item = catquiz::get_item($data->contextid, $data->testitemid, $data->componentname);
+        }
+        $data->active_model = null;
         foreach (array_keys($models) as $model) {
             $field = sprintf('override_%s', $model);
             if (!$param = $itemparamsbymodel->offsetGet($model) ?? null) {
@@ -561,6 +624,9 @@ class item_model_override_selector extends dynamic_form {
             $data->$field = array_merge($data->$field, $param->get_parameter_fields());
             $selectfield = sprintf('%s_select', $field);
             $data->$selectfield = $param->get_status();
+            if ($param->get_id() == $data->item->activeparamid) {
+                $data->active_model = $param->get_model_name();
+            }
         }
         $data->itemparams = $itemparamsbymodel;
         $this->set_data($data);
@@ -605,20 +671,7 @@ class item_model_override_selector extends dynamic_form {
     public function validation($data, $files): array {
         $errors = [];
         $data = (array) $data;
-        $models = model_strategy::get_installed_models();
         $counter = [];
-
-        // // Make sure the selected active model actually CAN be selected.
-        // $activemodelname = $data['active_model'];
-        // $activemodelstatus = $data[sprintf('override_%s_select', $activemodelname)];
-        // if (in_array(
-        //     $activemodelstatus, [
-        //         LOCAL_CATQUIZ_STATUS_NOT_CALCULATED,
-        //         LOCAL_CATQUIZ_STATUS_EXCLUDED_MANUALLY,
-        //     ])
-        // ) {
-        //     $errors[] = 'TODO Translate invalid model selected';
-        // }
 
         foreach ($this->_form->_defaultValues['itemparams'] as $modelname => $param) {
             $modelparams = $param->get_parameter_fields();
@@ -683,5 +736,20 @@ class item_model_override_selector extends dynamic_form {
                 array_values($params)
             )
         );
+    }
+
+    /**
+     * Set the given parameter as the active item paramter for the item of the form.
+     *
+     * @param mixed $param
+     * @return void
+     * @throws dml_exception
+     */
+    private function update_item_activeparam($param) {
+        $item = $this->_form->_defaultValues['item'];
+        if ($param->get_id() && $item->activeparamid != $param->get_id()) {
+            $item->activeparamid = $param->get_id();
+            catquiz::update_item($item);
+        }
     }
 }

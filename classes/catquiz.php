@@ -2536,6 +2536,21 @@ class catquiz {
         return $record->id;
     }
 
+    public static function get_item(int $contextid, int $componentid, string $componentname): stdClass {
+        global $DB;
+        return $DB->get_record(
+            'local_catquiz_items',
+            ['contextid' => $contextid,
+            'componentid' => $componentid,
+            'componentname' => $componentname,
+        ]);
+    }
+
+    public static function update_item(stdClass $item): void {
+        global $DB;
+        $DB->update_record('local_catquiz_items', $item);
+    }
+
     /**
      * Returns the state of questions that we will not consider as completed
      *

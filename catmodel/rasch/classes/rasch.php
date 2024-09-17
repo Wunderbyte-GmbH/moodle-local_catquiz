@@ -434,4 +434,11 @@ class rasch extends model_raschmodel {
     public function get_default_params(): array {
         return ['difficulty' => 0.0];
     }
+
+    public function get_static_param_array(\local_catquiz\local\model\model_item_param $param): array {
+        $label = get_string('difficulty', 'local_catquiz');
+        return [
+            $label => $param->get_difficulty(),
+        ];
+    }
 }

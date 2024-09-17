@@ -347,6 +347,7 @@ $string['firstquestion_startnewtest'] = 'Beginne neuen Test';
 $string['firstquestionreuseexistingdata'] = 'mit Ergebnisdaten aus vorherigen Testversuchen';
 $string['firstquestionselectotherwise'] = '...ansonsten: ';
 $string['fisherinformation'] = 'Fisherinformation';
+$string['fraction'] = 'Fraction';
 $string['followingcourses'] = 'eingeschrieben in folgenden Kurs bzw. folgende Kurse:<br>';
 $string['followinggroups'] = 'Mitglied in folgender Gruppe bzw. folgenden Gruppen:<br>';
 $string['force'] = 'Erzwinge Werte';
