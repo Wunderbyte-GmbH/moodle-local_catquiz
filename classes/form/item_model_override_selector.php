@@ -246,18 +246,22 @@ class item_model_override_selector extends dynamic_form {
         // Set data for each model in array.
         $formitemparams = [];
         $models = model_strategy::get_installed_models();
-        foreach (array_keys($models) as $model) {
-            $modelparams = $models[$model]::get_parameter_names();
+        foreach ($this->_form->_defaultValues['itemparams'] as $model => $param) {
             $fieldname = sprintf('override_%s', $model);
-            $obj = new stdClass;
+            $rec = $param->form_array_to_record($data->$fieldname);
             $statusstring = sprintf('%s_select', $fieldname);
-            $obj->status = $data->$statusstring;
-            foreach (array_values($modelparams) as $modelparam) {
-                $obj = $this->generate_model_fields($modelparam, $fieldname, $obj, $data);
+            $rec->status = $data->$statusstring;
+            $rec->componentid = $data->testitemid;
+            $rec->model = $model;
+            if ($param->get_id()) {
+                $defaultobj = $param->to_record();
+                $rec->id = $param->get_id();
+                $rec->timecreated = $defaultobj->timecreated;
+                $rec->contextid = $defaultobj->contextid;
+                $rec->componentname = $defaultobj->componentname;
+                $rec->itemid = $defaultobj->itemid;
             }
-            if ($obj) {
-                $formitemparams[$model] = $obj;
-            }
+            $formitemparams[$model] = model_item_param::from_record($rec); //$obj;
         }
         $allformitems = $formitemparams;
         // Fetch record from db.
@@ -268,136 +272,151 @@ class item_model_override_selector extends dynamic_form {
 
         $toupdate = [];
         $toinsert = [];
-        foreach (array_keys($models) as $model) {
-            // Check if model already exists in db.
-            if (isset($saveditemparams[$model])) {
-                // Check for each model if there is a change.
-                foreach ($formitemparams[$model] as $key => $value) {
-                    if ( isset($saveditemparams[$model]) &&
-                        (property_exists($saveditemparams[$model], $key)
-                        && $saveditemparams[$model]->$key == $value)) {
-                        // If nothing is changed, we unset the values.
-                        unset($formitemparams[$model]->$key);
-                    }
-                    // Exisiting identical models need no further treatment.
-                    if (count((array)$formitemparams[$model]) == 0) {
-                        unset($formitemparams[$model]);
-                        continue;
-                    }
-                }
-            }
-            if (!isset($formitemparams[$model])) {
+        foreach ($formitemparams as $model => $param) {
+            // If the parameter was not changed, skip it.
+            $defaultParam = $this->_form->_defaultValues['itemparams']->offsetGet($model);
+            if ($param->get_params_array() == $defaultParam->get_params_array()
+                && $param->get_status() == $defaultParam->get_status()
+            ) {
                 continue;
             }
+            $param->save();
+            // if (!array_key_exists($model, $saveditemparams)) {
+            //     $toinsert[] = $param;
+            //     continue;
+            // }
+            // $dbparam = $saveditemparams[$model];
+            // // If the param did not change, remove it.
+            // if($dbparam->get_params_array() == $param->get_params_array()) {
+            //     unset($formitemparams[$model]);
+            // }
+            // Check if model already exists in db.
+            //if (isset($saveditemparams[$model])) {
+            //    // Check for each model if there is a change.
+            //    foreach ($formitemparams[$model] as $key => $value) {
+            //        if ( isset($saveditemparams[$model]) &&
+            //            (property_exists($saveditemparams[$model], $key)
+            //            && $saveditemparams[$model]->$key == $value)) {
+            //            // If nothing is changed, we unset the values.
+            //            unset($formitemparams[$model]->$key);
+            //        }
+            //        // Exisiting identical models need no further treatment.
+            //        if (count((array)$formitemparams[$model]) == 0) {
+            //            unset($formitemparams[$model]);
+            //            continue;
+            //        }
+            //    }
+            //}
             // If status is unchanged (and therefore deleted from the array)...
             // ...change must be within values, so we set the new status to manually updated.
-            if (!isset($formitemparams[$model]->status)) {
-                $formitemparams[$model]->status = LOCAL_CATQUIZ_STATUS_UPDATED_MANUALLY;
-            }
+            // TODO: maybe just add an error in the validation?
+            // if ($formitemparams[$model]->get_status() == $saveditemparams[$model]->get_status()) {
+            //     $formitemparams[$model]->set_status(LOCAL_CATQUIZ_STATUS_UPDATED_MANUALLY);
+            // }
 
             // If the model exists already in the db, we proceed with updating.
-            if (array_key_exists($model, $saveditemparams)) {
-                $update = [];
-                $update['id'] = $saveditemparams[$model]->id;
-                $this->update_item('status', $update, $formitemparams, $model);
-                $this->update_item('difficulty', $update, $formitemparams, $model);
-                $this->update_item('discrimination', $update, $formitemparams, $model);
-                $this->update_item('guessing', $update, $formitemparams, $model);
-                $toupdate[] = $update;
-                $status = $formitemparams[$model]->status;
-            } else {
-                foreach ($formitemparams[$model] as $key => $value) {
-                    // If all param fields are empty, no insert into db except for status manually excluded.
-                    if ($value === ""
-                        || ($key == "status" && $value != LOCAL_CATQUIZ_STATUS_EXCLUDED_MANUALLY)) {
-                        $empty = true;
-                    } else {
-                        $empty = false;
-                    }
-                }
-                if ($empty) {
-                    continue;
-                }
-                $status = ($formitemparams[$model]->status == LOCAL_CATQUIZ_STATUS_NOT_CALCULATED)
-                    ? LOCAL_CATQUIZ_STATUS_CONFIRMED_MANUALLY : $formitemparams[$model]->status;
-                // If it's new, we prepare the insert.
-                $toinsert[] = [
-                    'status' => $status,
-                    'model' => $model,
-                    'difficulty' => $formitemparams[$model]->difficulty ?? "",
-                    'discrimination' => $formitemparams[$model]->discrimination ?? "",
-                    'guessing' => $formitemparams[$model]->guessing ?? "",
-                ];
-            }
+            // if (array_key_exists($model, $saveditemparams)) {
+            //     $update = [];
+            //     $update['id'] = $saveditemparams[$model]->id;
+            //     $this->update_item('status', $update, $formitemparams, $model);
+            //     $this->update_item('difficulty', $update, $formitemparams, $model);
+            //     $this->update_item('discrimination', $update, $formitemparams, $model);
+            //     $this->update_item('guessing', $update, $formitemparams, $model);
+            //     $toupdate[] = $update;
+            //     $status = $formitemparams[$model]->status;
+            // } else {
+            //     foreach ($formitemparams[$model] as $key => $value) {
+            //         // If all param fields are empty, no insert into db except for status manually excluded.
+            //         if (!$value
+            //             || ($key == "status" && $value != LOCAL_CATQUIZ_STATUS_EXCLUDED_MANUALLY)) {
+            //             $empty = true;
+            //         } else {
+            //             $empty = false;
+            //         }
+            //     }
+            //     if ($empty) {
+            //         continue;
+            //     }
+            //     $status = ($formitemparams[$model]->status == LOCAL_CATQUIZ_STATUS_NOT_CALCULATED)
+            //         ? LOCAL_CATQUIZ_STATUS_CONFIRMED_MANUALLY : $formitemparams[$model]->status;
+            //     // If it's new, we prepare the insert.
+            //     $toinsert[] = [
+            //         'status' => $status,
+            //         'model' => $model,
+            //         'difficulty' => $formitemparams[$model]->difficulty ?? "",
+            //         'discrimination' => $formitemparams[$model]->discrimination ?? "",
+            //         'guessing' => $formitemparams[$model]->guessing ?? "",
+            //     ];
+            // }
 
             // There can only be one model with this status, so we have to make
             // sure all other models that have this status are set back to 0.
-            if (intval($status) === LOCAL_CATQUIZ_STATUS_CONFIRMED_MANUALLY) {
-                foreach (array_keys($models) as $m) {
-                    if ($m === $model) {
-                        // Do not check our current model.
-                        continue;
-                    }
-                    if (intval($allformitems[$m]->status) !== LOCAL_CATQUIZ_STATUS_CONFIRMED_MANUALLY) {
-                        // Ignore models with other status.
-                        continue;
-                    }
-                    // Reset back to 0.
-                    $defaultstatus = strval(LOCAL_CATQUIZ_STATUS_NOT_CALCULATED);
-                    $allformitems[$m]->status = $defaultstatus;
-                    $fieldname = sprintf('override_%s_select', $m);
-                    $data->{$fieldname} = $defaultstatus;
-                    $this->set_data($data);
-                    $toupdate[] = [
-                        'status' => $allformitems[$m]->status,
-                        'id' => $saveditemparams[$m]->id,
-                        'timemodified' => time(),
-                    ];
-                }
-            }
+            // if (intval($status) === LOCAL_CATQUIZ_STATUS_CONFIRMED_MANUALLY) {
+            //     foreach (array_keys($models) as $m) {
+            //         if ($m === $model) {
+            //             // Do not check our current model.
+            //             continue;
+            //         }
+            //         if (intval($allformitems[$m]->status) !== LOCAL_CATQUIZ_STATUS_CONFIRMED_MANUALLY) {
+            //             // Ignore models with other status.
+            //             continue;
+            //         }
+            //         // Reset back to 0.
+            //         $defaultstatus = strval(LOCAL_CATQUIZ_STATUS_NOT_CALCULATED);
+            //         $allformitems[$m]->status = $defaultstatus;
+            //         $fieldname = sprintf('override_%s_select', $m);
+            //         $data->{$fieldname} = $defaultstatus;
+            //         $this->set_data($data);
+            //         $toupdate[] = [
+            //             'status' => $allformitems[$m]->status,
+            //             'id' => $saveditemparams[$m]->id,
+            //             'timemodified' => time(),
+            //         ];
+            //     }
+            // }
         }
 
-        foreach ($toupdate as $updated) {
-            $DB->update_record(
-                'local_catquiz_itemparams',
-                (object) $updated
-            );
-            // Trigger status changed event.
-            $event = testitemstatus_updated::create([
-            'objectid' => $updated['id'],
-            'context' => context_system::instance(),
-            'other' => [
-                'status' => $updated['status'],
-                'testitemid' => $updated['id'],
-            ],
-            ]);
-            $event->trigger();
-            cache_helper::purge_by_event('changesintestitems');
-        }
+        //foreach ($toupdate as $updated) {
+        //    $DB->update_record(
+        //        'local_catquiz_itemparams',
+        //        (object) $updated
+        //    );
+        //    // Trigger status changed event.
+        //    $event = testitemstatus_updated::create([
+        //    'objectid' => $updated['id'],
+        //    'context' => context_system::instance(),
+        //    'other' => [
+        //        'status' => $updated['status'],
+        //        'testitemid' => $updated['id'],
+        //    ],
+        //    ]);
+        //    $event->trigger();
+        //    cache_helper::purge_by_event('changesintestitems');
+        //}
 
-        foreach ($toinsert as $new) {
-            $new['componentid'] = $data->testitemid;
-            $new['contextid'] = $data->contextid;
-            $new['componentname'] = $data->componentname ?: self::DEFAULT_COMPONENT_NAME;
-            $new['timecreated'] = time();
-            $new['timemodified'] = time();
-            $new['id'] = $DB->insert_record(
-                'local_catquiz_itemparams',
-                (object) $new,
-                true
-            );
+        //foreach ($toinsert as $new) {
+        //    $new['componentid'] = $data->testitemid;
+        //    $new['contextid'] = $data->contextid;
+        //    $new['componentname'] = $data->componentname ?: self::DEFAULT_COMPONENT_NAME;
+        //    $new['timecreated'] = time();
+        //    $new['timemodified'] = time();
+        //    $new['id'] = $DB->insert_record(
+        //        'local_catquiz_itemparams',
+        //        (object) $new,
+        //        true
+        //    );
 
-            // Trigger status changed event.
-            $event = testitemstatus_updated::create([
-            'objectid' => $new['id'],
-            'context' => context_system::instance(),
-            'other' => [
-                'status' => $new['status'],
-                'testitemid' => $new['id'],
-            ],
-            ]);
-            $event->trigger();
-        }
+        //    // Trigger status changed event.
+        //    $event = testitemstatus_updated::create([
+        //    'objectid' => $new['id'],
+        //    'context' => context_system::instance(),
+        //    'other' => [
+        //        'status' => $new['status'],
+        //        'testitemid' => $new['id'],
+        //    ],
+        //    ]);
+        //    $event->trigger();
+        //}
 
         return $data;
     }
@@ -418,9 +437,7 @@ class item_model_override_selector extends dynamic_form {
             return null;
         }
 
-        $param = sprintf('%s_'.$paramname, $fieldname);
-        $array = $data->$fieldname;
-        $obj->$paramname = $array[$param];
+        $obj->$paramname = $data->$fieldname[$paramname];
         return $obj;
     }
     /**
@@ -546,6 +563,7 @@ class item_model_override_selector extends dynamic_form {
             $field = sprintf('override_%s', $model);
             if (!$param = $itemparamsbymodel->offsetGet($model) ?? null) {
                 $param = new model_item_param($data->testitemid, $model);
+                $param->set_default_parameters();
                 $itemparamsbymodel->add($param, true);
             }
             $data->$field = array_merge($data->$field, $param->get_parameter_fields());
@@ -598,19 +616,17 @@ class item_model_override_selector extends dynamic_form {
         $models = model_strategy::get_installed_models();
         $counter = [];
 
-        // Make sure the selected active model actually CAN be selected.
-        $activemodelname = $data['active_model'];
-        $activemodelstatus = $data[sprintf('override_%s_select', $activemodelname)];
-        if (in_array(
-            $activemodelstatus, [
-                LOCAL_CATQUIZ_STATUS_NOT_CALCULATED,
-                LOCAL_CATQUIZ_STATUS_EXCLUDED_MANUALLY,
-            ])
-        ) {
-            $errors[] = 'TODO Translate invalid model selected';
-        }
-        foreach ($models as $modelname => $location) {
-            $modelparams = $location::get_parameter_names();
+        // // Make sure the selected active model actually CAN be selected.
+        // $activemodelname = $data['active_model'];
+        // $activemodelstatus = $data[sprintf('override_%s_select', $activemodelname)];
+        // if (in_array(
+        //     $activemodelstatus, [
+        //         LOCAL_CATQUIZ_STATUS_NOT_CALCULATED,
+        //         LOCAL_CATQUIZ_STATUS_EXCLUDED_MANUALLY,
+        //     ])
+        // ) {
+        //     $errors[] = 'TODO Translate invalid model selected';
+        // }
 
         foreach ($this->_form->_defaultValues['itemparams'] as $modelname => $param) {
             $modelparams = $param->get_parameter_fields();

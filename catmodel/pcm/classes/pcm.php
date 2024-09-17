@@ -26,6 +26,7 @@ namespace catmodel_pcm;
 
 use Exception;
 use local_catquiz\catcalc;
+use local_catquiz\local\model\model_item_param;
 use local_catquiz\local\model\model_item_param_list;
 use local_catquiz\local\model\model_person_param_list;
 use local_catquiz\local\model\model_raschmodel;
@@ -48,14 +49,14 @@ class pcm extends model_raschmodel {
      */
     public static function get_parameters_from_record(stdClass $record): array {
 
-        $intercepts = json_decode($record->json, true)['intercepts'];
+        $intercepts = json_decode($record->json, true)['intercept'];
 
-        $meandifficulty = self::calculate_mean_difficulty([
-            'intercept' => $intercepts,
-        ]);
+      //  $meandifficulty = self::calculate_mean_difficulty([
+      //      'intercept' => $intercepts,
+      //  ]);
 
         return [
-            'difficulty' => round($meandifficulty, self::PRECISION),
+       //     'difficulty' => round($meandifficulty, self::PRECISION),
             'intercept' => $intercepts,
             'discrimination' => round($record->discrimination, self::PRECISION),
         ];
@@ -523,6 +524,43 @@ class pcm extends model_raschmodel {
                 -($bs ** 2 * exp($bs * ($bp + $ip['discrimination']))) /
                     (exp($bs * $bp) + exp($bs * $ip['discrimination'])) ** 2, // Calculates d²/db².
             ],
+        ];
+    }
+
+    public function get_parameter_fields(model_item_param $param): array {
+        if (!$param->get_params_array()) {
+            return $this->get_default_params();
+        }
+        $parameters = ['discrimination' => $param->get_params_array()['discrimination']];
+        foreach ($param->get_params_array()['intercept'] as $frac => $val) {
+            $parameters['intercept_'.$frac.'_fraction'] = $frac;
+            $parameters['intercept_'.$frac.'_difficulty'] = $val;
+        }
+        return $parameters;
+    }
+
+    public function get_default_params(): array {
+        return [
+            'discrimination' => 0.0,
+            'intercept' => [
+                '0.00' => 0.0,
+                '0.50' => 0.5,
+                '1.00' => 1.0,
+            ]
+        ];
+    }
+
+    public function form_array_to_record(array $formarray): stdClass {
+        $diffarray = [];
+        foreach ($formarray as $key => $val) {
+            if (preg_match('/^intercept_(.*)_fraction/', $key, $matches)) {
+                $fraction = $matches[1];
+                $diffarray[$fraction] = $val;
+            }
+        }
+        return (object) [
+            'discrimination' => $formarray['discrimination'],
+            'json' => json_encode(['intercept' => $diffarray]),
         ];
     }
 }

@@ -2518,6 +2518,7 @@ class catquiz {
      */
     public static function save_item_param(stdClass $record): int {
         global $DB;
+        $record->timemodified = time();
         $id = $DB->insert_record('local_catquiz_itemparams', $record);
         return $id;
     }
@@ -2530,6 +2531,7 @@ class catquiz {
      */
     public static function update_item_param(stdClass $record): int {
         global $DB;
+        $record->timemodified = time();
         $DB->update_record('local_catquiz_itemparams', $record);
         return $record->id;
     }

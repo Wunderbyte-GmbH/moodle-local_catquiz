@@ -158,7 +158,7 @@ abstract class model_model {
      * @return float
      */
     public static function get_difficulty(array $parameters): float {
-        return $parameters['difficulty'];
+        return $parameters['difficulty'] ?? 0.0; // TODO: instead of ?? fallback, call $this->get_difficulty and let models override it.
     }
 
     /**
@@ -171,4 +171,6 @@ abstract class model_model {
     abstract public function get_parameter_fields(model_item_param $param): array;
 
     abstract public function get_default_params(): array;
+
+    abstract public function form_array_to_record(array $formarray): stdClass;
 }
