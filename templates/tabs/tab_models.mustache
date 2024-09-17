@@ -41,26 +41,16 @@
       {{{overridesforms}}}
     </div>
   </div>
-  <div class="card tab-model-status">
-    <div class="card-header">
-      {{#str}} status, core {{/str}}
-      <a href="javascript:void(0);" onclick="window.location.reload();"> <i class="fa fa-refresh float-right"></i> </a>
-    </div>
-    <div class="card-body" style="display: flex; justify-content: center; align-items: center; flex-direction: column;">
-    {{#itemstatus}}
-      <h3>{{status}}</h3>
-      {{#model}}<h4>{{model}}</h4>{{/model}}
-    {{/itemstatus}}
-    </div>
-  </div>
   {{#models}}
-    <div class="card">
+    <div class="card likelihood">
         <div class="card-header">
             {{title}}
             <a href="javascript:void(0);" onclick="window.location.reload();"> <i class="fa fa-refresh float-right"></i> </a>
         </div>
         <div class="card-body">
-          {{{body}}}
+          {{{heading}}}
+          {{status}}
+          {{{chart}}}
         </div>
     </div>
   {{/models}}

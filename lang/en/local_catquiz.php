@@ -347,6 +347,7 @@ $string['formelementwrongpercent'] = 'Input a number from 0 to 100';
 $string['formetimelimitnotprovided'] = 'Input at least one value of time limit';
 $string['formminquestgreaterthan'] = 'Minimum must be less than maximum';
 $string['formmscalegreaterthantest'] = 'Per scale minimum must be less than per test maximum';
+$string['fraction'] = 'Fraction';
 $string['genericsubmit'] = 'Confirm';
 $string['global_scale'] = 'Global scale';
 $string['graphicalsummary_description'] = 'During an attempt your ability is recalculated after each response. The following chart shows how your estimated ability in “{$a}” changed';

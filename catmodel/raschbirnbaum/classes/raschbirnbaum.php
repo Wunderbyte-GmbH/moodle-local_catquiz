@@ -497,4 +497,13 @@ class raschbirnbaum extends model_raschmodel {
             ],
         ];
     }
+
+    public function get_static_param_array(\local_catquiz\local\model\model_item_param $param): array {
+        $difflabel = get_string('difficulty', 'local_catquiz');
+        $disclabel = get_string('discrimination', 'local_catquiz');
+        return [
+            $difflabel => $param->get_difficulty(),
+            $disclabel => $param->get_params_array()['discrimination'],
+        ];
+    }
 }

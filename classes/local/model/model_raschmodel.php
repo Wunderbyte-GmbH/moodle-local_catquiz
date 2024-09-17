@@ -351,18 +351,20 @@ abstract class model_raschmodel extends model_model implements catcalc_item_esti
     public function definition_after_data_callback(MoodleQuickForm &$mform, model_item_param $param, string $groupid): void {
         $group = [];
         $fields = $this->get_parameter_fields($param);
-        // difficulty 0.33: 0.24
         foreach ($fields as $label => $val) {
             $this->add_element_to_group($label, $groupid, $group, $mform);
         }
-        $mform->addGroup($group, $groupid, '');
+        $mform->addGroup($group, $groupid, '', '<span class="break"></span>');
     }
 
     protected function add_element_to_group(string $name, string $id, array &$group, &$mform) {
-        //$label = $mform->createElement('static', sprintf('%s_%slabel', $id, $name), 'mylabel', '');
-        $value = $mform->createElement('text', $name, 'mylabel', '');
+        if (preg_match('/(.*)_(\d+)$/', $name, $matches)) {
+            $label = get_string($matches[1], 'local_catquiz') . ' ' . $matches[2];
+        } else {
+            $label = get_string($name, 'local_catquiz');
+        }
+        $value = $mform->createElement('text', $name, $label, ["class" => 'form-control param-input']);
         $value->setType($name, PARAM_FLOAT);
-        //$group[] = $label;
         $group[] = $value;
     }
 

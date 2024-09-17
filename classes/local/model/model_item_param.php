@@ -436,4 +436,17 @@ class model_item_param {
         $this->set_parameters($this->get_model_object()->get_default_params());
         return $this;
     }
+
+    public function set_item_id(int $itemid): self {
+        $this->itemid = $itemid;
+        return $this;
+    }
+
+    public function get_item_id(): ?int {
+        return $this->itemid;
+    }
+
+    public function get_static_param_array(): array {
+        return $this->get_model_object()->get_static_param_array($this);
+    }
 }

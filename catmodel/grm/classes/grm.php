@@ -27,6 +27,7 @@ namespace catmodel_grm;
 use local_catquiz\catcalc;
 use local_catquiz\local\model\model_item_param;
 use local_catquiz\local\model\model_item_param_list;
+use local_catquiz\local\model\model_multiparam;
 use local_catquiz\local\model\model_person_param_list;
 use local_catquiz\local\model\model_raschmodel;
 use stdClass;
@@ -38,7 +39,7 @@ use stdClass;
  * @copyright  2023 Wunderbyte GmbH <georg.maisser@wunderbyte.at>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class grm extends model_raschmodel {
+class grm extends model_multiparam {
 
     /**
      * {@inheritDoc}
@@ -521,17 +522,17 @@ class grm extends model_raschmodel {
         ];
     }
 
-    public function get_parameter_fields(model_item_param $param): array {
-        if (!$param->get_params_array()) {
-            return $this->get_default_params();
-        }
-        $parameters = ['discrimination' => $param->get_params_array()['discrimination']];
-        foreach ($param->get_params_array()['difficulties'] as $frac => $val) {
-            $parameters['difficulty_'.$frac.'_fraction'] = $frac;
-            $parameters['difficulty_'.$frac.'_difficulty'] = $val;
-        }
-        return $parameters;
-    }
+//    public function get_parameter_fields(model_item_param $param): array {
+//        if (!$param->get_params_array()) {
+//            return $this->get_default_params();
+//        }
+//        $parameters = ['discrimination' => $param->get_params_array()['discrimination']];
+//        foreach ($param->get_params_array()['difficulties'] as $frac => $val) {
+//            $parameters['difficulty_'.$frac.'_fraction'] = $frac;
+//            $parameters['difficulty_'.$frac.'_difficulty'] = $val;
+//        }
+//        return $parameters;
+//    }
 
     public function get_default_params(): array {
         return [
@@ -544,17 +545,7 @@ class grm extends model_raschmodel {
         ];
     }
 
-    public function form_array_to_record(array $formarray): stdClass {
-        $diffarray = [];
-        foreach ($formarray as $key => $val) {
-            if (preg_match('/^difficulty_(.*)_fraction/', $key, $matches)) {
-                $fraction = $matches[1];
-                $diffarray[$fraction] = $val;
-            }
-        }
-        return (object) [
-            'discrimination' => $formarray['discrimination'],
-            'json' => json_encode(['difficulties' => $diffarray]),
-        ];
+    protected function get_multi_param_name(): string {
+        return 'difficulties';
     }
 }
