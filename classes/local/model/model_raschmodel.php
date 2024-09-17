@@ -26,6 +26,7 @@ namespace local_catquiz\local\model;
 use local_catquiz\catcalc_ability_estimator;
 use local_catquiz\catcalc_item_estimator;
 use MoodleQuickForm;
+use stdClass;
 
 /**
  * This class implements model raschmodel.
@@ -374,5 +375,9 @@ abstract class model_raschmodel extends model_model implements catcalc_item_esti
 
     public function get_default_params(): array {
         return ['difficulty' => 0.0, 'discrimination' => 0.0];
+    }
+
+    public function form_array_to_record(array $formarray): stdClass {
+        return (object) $formarray;
     }
 }

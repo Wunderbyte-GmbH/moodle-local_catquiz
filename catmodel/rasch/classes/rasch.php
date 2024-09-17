@@ -430,4 +430,8 @@ class rasch extends model_raschmodel {
         // Calculate d/da d/da.
         return [[ -1 / ($as ** 2) ]];
     }
+
+    public function get_default_params(): array {
+        return ['difficulty' => 0.0];
+    }
 }

@@ -574,4 +574,12 @@ class mixedraschbirnbaum extends model_raschmodel {
             ],
         ];
     }
+
+    public function get_default_params(): array {
+        return [
+            'difficulty' => 0.0,
+            'discrimination' => 1.0,
+            'guessing' => 0.5,
+        ];
+    }
 }

@@ -52,13 +52,13 @@ class grmgeneralized extends model_raschmodel {
         $difficulties = json_decode($record->json, true)['difficulties'];
         $discrimination = round($record->discrimination, self::PRECISION);
 
-        $meandifficulty = self::calculate_mean_difficulty([
-            'difficulties' => $difficulties,
-            'discrimination' => $discrimination,
-        ]);
+       // $meandifficulty = self::calculate_mean_difficulty([
+       //     'difficulties' => $difficulties,
+       //     'discrimination' => $discrimination,
+       // ]);
 
         return [
-            'difficulty' => round($meandifficulty, self::PRECISION),
+        //    'difficulty' => round($meandifficulty, self::PRECISION),
             'discrimination' => $discrimination,
             'difficulties' => $difficulties,
         ];
@@ -595,14 +595,6 @@ class grmgeneralized extends model_raschmodel {
         }
         $mform->addGroup($group, $groupid, '');
     }
-    protected function add_element_to_group(string $name, string $id, array &$group, &$mform) {
-        //$label = $mform->createElement('static', sprintf('%s_%slabel', $id, $name), 'mylabel', '');
-        $value = $mform->createElement('text', sprintf('%s_%s', $id, $name), 'mylabel', '');
-        $value->setType(sprintf('%s_%s', $id, $name), PARAM_FLOAT);
-        //$group[] = $label;
-        $group[] = $value;
-    }
-
 
     public function get_parameter_fields(model_item_param $param): array {
         $parameters = ['discrimination' => $param->get_params_array()['discrimination']];
@@ -611,5 +603,24 @@ class grmgeneralized extends model_raschmodel {
             $parameters['difficulty_'.$frac.'_difficulty'] = $val;
         }
         return $parameters;
+    }
+
+    public function form_array_to_record(array $formarray): stdClass {
+        $diffarray = [];
+        $fractions = [];
+        foreach ($formarray as $key => $val) {
+            if (preg_match('/^difficulty_(.*)_fraction/', $key, $matches)) {
+                $fractions[] = $matches[1];
+            }
+        }
+
+        foreach ($fractions as $frac) {
+            $key = sprintf('difficulty_%s_difficulty', $frac);
+            $diffarray[$frac] = $formarray[$key];
+        }
+        return (object) [
+            'discrimination' => $formarray['discrimination'],
+            'json' => json_encode(['difficulties' => $diffarray]),
+        ];
     }
 }
