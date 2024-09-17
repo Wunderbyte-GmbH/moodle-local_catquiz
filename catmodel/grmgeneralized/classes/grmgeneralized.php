@@ -610,13 +610,14 @@ class grmgeneralized extends model_raschmodel {
         $fractions = [];
         foreach ($formarray as $key => $val) {
             if (preg_match('/^difficulty_(.*)_fraction/', $key, $matches)) {
-                $fractions[] = $matches[1];
+                $oldfrac = $matches[1];
+                $fractions[$oldfrac] = $val;
             }
         }
 
-        foreach ($fractions as $frac) {
-            $key = sprintf('difficulty_%s_difficulty', $frac);
-            $diffarray[$frac] = $formarray[$key];
+        foreach ($fractions as $oldfrac => $newfrac) {
+            $key = sprintf('difficulty_%s_difficulty', $oldfrac);
+            $diffarray[$newfrac] = $formarray[$key];
         }
         return (object) [
             'discrimination' => $formarray['discrimination'],
