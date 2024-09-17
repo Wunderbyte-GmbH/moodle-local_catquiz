@@ -611,6 +611,9 @@ class item_model_override_selector extends dynamic_form {
         }
         foreach ($models as $modelname => $location) {
             $modelparams = $location::get_parameter_names();
+
+        foreach ($this->_form->_defaultValues['itemparams'] as $modelname => $param) {
+            $modelparams = $param->get_parameter_fields();
             $field = sprintf('override_%s', $modelname);
             $selectkey = sprintf('%s_select', $field);
 
@@ -621,8 +624,8 @@ class item_model_override_selector extends dynamic_form {
 
                 $empty = true;
                 foreach ($data[$field] as $key => $value) {
-                    foreach (array_values($modelparams) as $param) {
-                        if (strpos($key, $param) == false || $value == "") {
+                    foreach (array_keys($modelparams) as $param) {
+                        if (strpos($key, $param) === false || $value === "") {
                             continue;
                         }
                         $empty = false;
@@ -632,6 +635,7 @@ class item_model_override_selector extends dynamic_form {
                     $errors[$field] = get_string("validateform:changevaluesorstatus", 'local_catquiz');
                 }
             }
+
             // There can only be 1 status confirmed manually.
             if ($data[$selectkey] == LOCAL_CATQUIZ_STATUS_CONFIRMED_MANUALLY) {
                 $counter[$field] = $selectkey;
