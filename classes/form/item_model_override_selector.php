@@ -263,15 +263,7 @@ class item_model_override_selector extends dynamic_form {
             }
             $formitemparams[$model] = model_item_param::from_record($rec); //$obj;
         }
-        $allformitems = $formitemparams;
-        // Fetch record from db.
-        $saveditemparams = $this->get_item_params(
-            $data->testitemid,
-            $data->contextid
-        );
 
-        $toupdate = [];
-        $toinsert = [];
         foreach ($formitemparams as $model => $param) {
             // If the parameter was not changed, skip it.
             $defaultParam = $this->_form->_defaultValues['itemparams']->offsetGet($model);
@@ -676,19 +668,6 @@ class item_model_override_selector extends dynamic_form {
      *
      */
     private function get_item_params($testitemid, $contextid) {
-   //     global $DB;
-
-   //     list($sql, $params) = catquiz::get_sql_for_item_params(
-   //         $testitemid,
-   //         $contextid
-   //     );
-   //     $itemparams = $DB->get_records_sql($sql, $params);
-   //     $itemparamsbymodel = [];
-   //     foreach ($itemparams as $itemparam) {
-   //         $itemparamsbymodel[$itemparam->model] = $itemparam;
-   //     }
-   //     return $itemparamsbymodel;
-
         return model_item_param_list::get_by_questionid($contextid, $testitemid);
     }
 
