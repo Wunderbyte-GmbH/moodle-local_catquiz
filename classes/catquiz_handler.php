@@ -316,6 +316,35 @@ class catquiz_handler {
             self::write_variables_to_post($formdefaultvalues);
         }
 
+        $context = context_system::instance();
+
+        $options = [
+            'trusttext' => true,
+            'subdirs' => true,
+            'context' => $context,
+            'maxfiles' => EDITOR_UNLIMITED_FILES,
+            'noclean' => true,
+        ];
+
+        foreach ($data as $property) {
+            if (is_array($property) || !preg_match('/^feedbackeditor_scaleid_(\d+)_(\d+)_editor/', $property, $matches)) {
+                continue;
+            }
+            $scaleid = intval($matches[1]);
+            $rangeid = intval($matches[2]);
+            $fieldname = sprintf('feedbackeditor_scaleid_%d_%d', $scaleid, $rangeid);
+            $filearea = sprintf('feedback_files_%d_%d', $scaleid, $rangeid);
+            $data = (object) file_prepare_standard_editor(
+                $data,
+                sprintf('feedbackeditor_scaleid_%d_%d', $scaleid, $rangeid),
+                $options,
+                $context,
+                'local_catquiz',
+                $filearea,
+                intval($test->id)
+            );
+        }
+
         $formdefaultvalues['choosetemplate'] = 0;
         $formdefaultvalues['testenvironment_addoredittemplate'] = 0;
     }
@@ -565,6 +594,35 @@ class catquiz_handler {
 
         $clone = clone($quizdata);
 
+        $context = context_system::instance();
+        $textfieldoptions = [
+            'trusttext' => true,
+            'subdirs' => true,
+            'maxfiles' => EDITOR_UNLIMITED_FILES,
+            'context' => $context,
+        ];
+
+        foreach ($clone as $property => $value) {
+            if (!preg_match('/^feedbackeditor_scaleid_(\d+)_(\d+)_editor/', $property, $matches)) {
+                continue;
+            }
+            if (!($value['text'] ?? false)) {
+                continue;
+            }
+            $scaleid = intval($matches[1]);
+            $rangeid = intval($matches[2]);
+            $fieldname = sprintf('feedbackeditor_scaleid_%d_%d', $scaleid, $rangeid);
+            $filearea = sprintf('feedback_files_%d_%d', $scaleid, $rangeid);
+            $clone = file_postupdate_standard_editor(
+                $clone,
+                $fieldname,
+                $textfieldoptions,
+                $context,
+                'local_catquiz',
+                $filearea,
+                $clone->id
+            );
+        }
         // We unset id & instance. We don't want to introduce confusion because of it.
         unset($clone->id);
         unset($clone->instance);
@@ -699,7 +757,11 @@ class catquiz_handler {
                     continue;
                 }
                 for ($j = 1; $j <= $nfeedbackoptions; $j++) {
-                    $keyname = $feedbackvaluekey . $scaleidofcopyvalue . '_' . $j;
+                    if ($feedbackvaluekey === 'feedbackeditor_scaleid_') {
+                        $keyname = $feedbackvaluekey . $scaleidofcopyvalue . '_' . $j . '_editor';
+                    } else {
+                        $keyname = $feedbackvaluekey . $scaleidofcopyvalue . '_' . $j;
+                    }
                     $standardvalues[$feedbackvaluekey][$j] = $values[$keyname] ?? null;
                 }
             }
@@ -724,6 +786,9 @@ class catquiz_handler {
                     }
                     for ($j = 1; $j <= $nfeedbackoptions; $j++) {
                         $subscalekey = $feedbackvaluekey . $subscaleid . '_' . $j;
+                        if ($feedbackvaluekey === 'feedbackeditor_scaleid_') {
+                            $subscalekey = sprintf('feedbackeditor_scaleid_%d_%d_editor', $subscaleid, $j);
+                        }
                         $values[$subscalekey] = $standardvalues[$feedbackvaluekey][$j];
                     }
                 }

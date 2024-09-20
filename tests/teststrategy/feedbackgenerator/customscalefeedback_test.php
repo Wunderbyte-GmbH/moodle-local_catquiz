@@ -96,6 +96,7 @@ final class customscalefeedback_test extends basic_testcase {
         return [
                 'lowestskillgap' => [
                     'feedbackdata' => [
+                        'testid' => 1,
                         'progress' => 'empty',
                         'attemptid' => '1',
                         'contextid' => '2',
@@ -135,6 +136,7 @@ final class customscalefeedback_test extends basic_testcase {
                 ],
                 'noscalestoreport' => [
                     'feedbackdata' => [
+                        'testid' => 1,
                         'progress' => 'empty',
                         'attemptid' => '1',
                         'contextid' => '2',
