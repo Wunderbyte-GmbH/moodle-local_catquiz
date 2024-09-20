@@ -123,7 +123,7 @@ $string['catquizstatistics_h1_scale'] = 'Statistik zu Skala „{$a->scalename}�
 $string['catquizstatistics_h1_single'] = 'Statistik zu Test „{$a}“';
 $string['catquizstatistics_h2_global'] = 'Die folgenden Daten beziehen sich auf alle Nutzer, die auf dieser
     Moodle-Plattform an Tests teilgenommen haben, in denen die Skala „{$a}“ verwendet wird.';
-$string['catquizstatistics_h2_scale'] = 'Die folgenden Daten beziehen sich auf die Tests „{$a->linkedcourses}“ in Kurs „{$a->coursename}“,
+$string['catquizstatistics_h2_scale'] = 'Die folgenden Daten beziehen sich auf die Tests „{$a->linkedcourses}“ im Kurs „{$a->coursename}“,
     in denen die Skala „{$a->scale}“ verwendet wird.';
 $string['catquizstatistics_h2_single'] = 'Die folgenden Daten beziehen sich auf den Test „{$a->link}“, in dem die Skala „{$a->scale}“
     verwendet wird.';
