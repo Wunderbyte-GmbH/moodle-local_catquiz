@@ -270,36 +270,38 @@ class debuginfo extends feedbackgenerator {
             }
             $personabilities[] = $catscales[$catscaleid]->name . ": " . $pp;
         }
-            $personabilities = '"' . implode(", ", $personabilities) . '"';
 
-            $questions = [];
-            $questionsperscale = [];
+        $personabilities = '"' . implode(", ", $personabilities) . '"';
 
-            $activescales = array_map(
-                fn ($scaleid) => $catscales[$scaleid]->name,
-                $this->get_progress()->get_active_scales()
-            );
-            $lastresponse = $this->get_progress()->get_last_response();
-            $debuginfo[] = [
-                'pluginversion' => get_config('local_catquiz')->version ?? self::NA,
-                'questionsattempted' => count($this->get_progress()->get_playedquestions()),
-                'timestamp' => time(),
-                'personabilities' => $personabilities,
-                'questions' => $questions,
-                'activescales' => '"' . implode(", ", $activescales) . '"',
-                'lastquestion' => (array) $newdata['lastquestion'],
-                'lastmiddleware' => $newdata['lastmiddleware'],
-                'lastresponse' => isset($lastresponse) ? $lastresponse['fraction'] : self::NA,
-                'numquestionsperscale' => '"'
-                    . implode(", ", array_map(fn ($entry) => $entry['name'].": ".$entry['num'], $questionsperscale)) . '"',
-                'state' => isset($lastresponse['state']) ? $lastresponse['state'] : self::NA,
-                'rightanswer' => isset($lastresponse['rightanswer']) ? trim($lastresponse['rightanswer']) : self::NA,
-                'responsesummary' => isset($lastresponse['responsesummary']) ? trim($lastresponse['responsesummary']) : self::NA,
-                'originalfraction' => isset($lastresponse['originalfraction']) ? $lastresponse['originalfraction'] : self::NA,
-                'fraction' => isset($lastresponse['fraction']) ? $lastresponse['fraction'] : self::NA,
-                'questionattemptid' => isset($lastresponse['questionattemptid']) ? $lastresponse['questionattemptid'] : self::NA,
-            ];
-            return ['debuginfo' => $debuginfo];
+        $questions = [];
+        $questionsperscale = [];
+
+        $activescales = array_map(
+            fn ($scaleid) => $catscales[$scaleid]->name,
+            $this->get_progress()->get_active_scales()
+        );
+        $lastresponse = $this->get_progress()->get_last_response();
+        $debuginfo[] = [
+            'pluginversion' => get_config('local_catquiz')->version ?? self::NA,
+            'questionsattempted' => count($this->get_progress()->get_playedquestions()),
+            'timestamp' => time(),
+            'personabilities' => $personabilities,
+            'questions' => $questions,
+            'activescales' => '"' . implode(", ", $activescales) . '"',
+            'lastquestion' => (array) $newdata['lastquestion'],
+            'lastmiddleware' => $newdata['lastmiddleware'],
+            'lastresponse' => isset($lastresponse) ? $lastresponse['fraction'] : self::NA,
+            'numquestionsperscale' => '"'
+                . implode(", ", array_map(fn ($entry) => $entry['name'].": ".$entry['num'], $questionsperscale)) . '"',
+            'state' => isset($lastresponse['state']) ? $lastresponse['state'] : self::NA,
+            'rightanswer' => isset($lastresponse['rightanswer']) ? trim($lastresponse['rightanswer']) : self::NA,
+            'responsesummary' => isset($lastresponse['responsesummary']) ? trim($lastresponse['responsesummary']) : self::NA,
+            'originalfraction' => isset($lastresponse['originalfraction']) ? $lastresponse['originalfraction'] : self::NA,
+            'fraction' => isset($lastresponse['fraction']) ? $lastresponse['fraction'] : self::NA,
+            'questionattemptid' => isset($lastresponse['questionattemptid']) ? $lastresponse['questionattemptid'] : self::NA,
+        ];
+
+        return ['debuginfo' => $debuginfo];
     }
 
     /**
