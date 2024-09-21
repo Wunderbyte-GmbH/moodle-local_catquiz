@@ -1167,6 +1167,7 @@ class catquizstatistics {
         $data = [];
         foreach ($DB->get_recordset_sql($sql, $params) as $r) {
 
+            $r->status = get_string('attemptstatus_'.$r->status, 'local_catquiz');
             // phpcs:disable
             // TODO: To be implemented: 'Ergebnis-Range', 'N global', 'frac global', 'N Ergebnisskala', 'frac Ergebnisskala'.
             $additionalresults = json_decode($r->json);
@@ -1203,9 +1204,9 @@ class catquizstatistics {
                 $r->timediff = '';
             } else {
                 $r->timediff = gmdate('H:i:s', $r->endtime - $r->starttime);
-                $r->endtime = userdate($r->endtime, get_string('strftimedatetime', 'core_langconfig'));
+                $r->endtime = date("Y-m-d H:i:s", $r->endtime);
             }
-            $r->starttime = userdate($r->starttime, get_string('strftimedatetime', 'core_langconfig'));
+            $r->starttime = date("Y-m-d H:i:s", $r->starttime);
 
             $r->teststrategy = $this->get_teststrategy_name($r->teststrategy);
 

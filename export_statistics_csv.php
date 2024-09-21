@@ -52,21 +52,19 @@ require_once($CFG->libdir . '/csvlib.class.php');
 
 $catquizstatistics = new catquizstatistics($courseid, $testid, $scaleid, $endtime, $starttime);
 
-$filename = "export_testresults_scale_$scaleid";
+$filename = date("Ymd Hi-")."export_attempts_scale_$scaleid";
 if ($courseid != 0) {
     $filename .= "_course_$courseid";
 }
 if ($testid != 0) {
     $filename .= "_test_$testid";
 }
-if ($starttime != 0) {
-    $filename .= "_from_".userdate($starttime, get_string('strftimedatetime', 'core_langconfig'));
+if ($starttime && $starttime != 0) {
+    $filename .= "_from_".date("Ymd Hi",$starttime);
 }
-if ($endtime != 0) {
-    $filename .= "_till_".userdate($endtime, get_string('strftimedatetime', 'core_langconfig'));
+if ($endtime && $endtime != 0) {
+    $filename .= "_till_".date("Ymd Hi",$endtime);
 }
-
-$filename .= "_".userdate(time(), get_string('strftimedatetime', 'core_langconfig'));
 
 $downloadfilename = clean_filename ( $filename );
 $csvexport = new csv_export_writer ( 'semicolon' );
@@ -79,8 +77,8 @@ $exporttitle = [
 // -- [x] UserE-Mail,
 // -- [x] Startzeit,
 // -- [x] Endzeit,
-// -- [/] Strategie,
-// -- [/] Status Testresult (Maximalanzahl Fragen erreicht, keine Fragen, SE unterschritten, Zeit überschritten etc.),
+// -- [X] Strategie,
+// -- [X] Status Testresult (Maximalanzahl Fragen erreicht, keine Fragen, SE unterschritten, Zeit überschritten etc.),
 // -- [x] Anz. Fragen gesamt (auch nicht-gewertete und Pilotierungsfragen),
 // -- [/] Ergebnis-Range,
 // -- [/] PP global,
@@ -88,7 +86,7 @@ $exporttitle = [
 // -- [/] N global,
 // -- [/] frac global,
 // -- [/] Ergebnis-Skala (je Strategie),
-// -- [/] PP Ergebnisskala,o
+// -- [/] PP Ergebnisskala,
 // -- [/] SE Ergebnisskala,
 // -- [/] N Ergebnisskala,
 // -- [/] frac Ergebnisskala,
@@ -120,6 +118,8 @@ $exporttitle = [
 
 $csvexport->add_data($exporttitle);
 
+$decsep = get_string('decsep', 'langconfig');
+
 foreach ($catquizstatistics->get_export_data() as $row) {
 
     // phpcs:disable
@@ -137,15 +137,15 @@ foreach ($catquizstatistics->get_export_data() as $row) {
             $row->teststrategy,
             $row->number_of_testitems_used,
             $row->globalname,
-            $row->globalpp,
-            $row->globalse,
+            str_replace('.', $decsep, (string) $row->globalpp),
+            str_replace('.', $decsep, (string) round((float) $row->globalse, 2)),
             /*
             $row->globaln,
             $row->globalf,
             */
             $row->primaryname,
-            $row->primarypp,
-            $row->primaryse,
+            str_replace('.', $decsep, (string) $row->primarypp),
+            str_replace('.', $decsep, (string) round((float) $row->primaryse, 2)),
             /*
             $row->primaryn,
             $row->primaryf,
