@@ -60,10 +60,10 @@ if ($testid != 0) {
     $filename .= "_test_$testid";
 }
 if ($starttime && $starttime != 0) {
-    $filename .= "_from_".date("Ymd Hi",$starttime);
+    $filename .= "_from_".date("Ymd Hi", $starttime);
 }
 if ($endtime && $endtime != 0) {
-    $filename .= "_till_".date("Ymd Hi",$endtime);
+    $filename .= "_till_".date("Ymd Hi", $endtime);
 }
 
 $downloadfilename = clean_filename ( $filename );
@@ -91,26 +91,26 @@ $exporttitle = [
 // -- [/] N Ergebnisskala,
 // -- [/] frac Ergebnisskala,
 // -- [?] JSON aller detektierten Ergebnisse
-    'UserID',
-    'UserName',
-    'UserE-Mail',
-    'Test-ID',
-    'Versuch-ID',
-    'Startzeit',
-    'Endzeit',
-    'Dauer',
-    'Status',
-    'Strategie',
-    'Anz. Fragen gesamt',
+    get_string('csvexportheader:userid', 'local_catquiz'),
+    get_string('csvexportheader:username', 'local_catquiz'),
+    get_string('csvexportheader:useremail', 'local_catquiz'),
+    get_string('csvexportheader:testid', 'local_catquiz'),
+    get_string('csvexportheader:attemptid', 'local_catquiz'),
+    get_string('csvexportheader:attemptstart', 'local_catquiz'),
+    get_string('csvexportheader:attemptend', 'local_catquiz'),
+    get_string('csvexportheader:attemptduration', 'local_catquiz'),
+    get_string('csvexportheader:attemptstatus', 'local_catquiz'),
+    get_string('csvexportheader:teststrategy', 'local_catquiz'),
+    get_string('csvexportheader:attemptquestionno', 'local_catquiz'),
     // 'Ergebnis-Range',
-    'Globalskala',
-    'PP global',
-    'SE global',
+    get_string('csvexportheader:resultscaleglobal', 'local_catquiz'),
+    get_string('csvexportheader:resultppglobal', 'local_catquiz'),
+    get_string('csvexportheader:resultseglobal', 'local_catquiz'),
     // 'N global',
     # 'frac global',
-    'Ergebnis-Skala (je Strategie)',
-    'PP Ergebnisskala',
-    'SE Ergebnisskala',
+    get_string('csvexportheader:resultscaledetail', 'local_catquiz'),
+    get_string('csvexportheader:resultppdetail', 'local_catquiz'),
+    get_string('csvexportheader:resultsedetail', 'local_catquiz'),
     // 'N Ergebnisskala',
     // 'frac Ergebnisskala',
 // phpcs:enable
