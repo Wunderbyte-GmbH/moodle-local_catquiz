@@ -142,7 +142,7 @@ class debuginfo extends feedbackgenerator {
                 'attemptid' => $attemptid,
                 'description' => $description,
                 'debuginfo_raw' => rawurlencode(nl2br(str_replace(" ", "&nbsp;", print_r($data, true)))),
-                'cfg->root' => $CFG->root,
+                'cfg->root' => $CFG->wwwroot,
                 'isteacher' => true, // has_capability('local/catquiz:view_users_feedback', $contextid),
                 'iscatmanager' => has_capability('local/catquiz:canmanage',
                     context_system::instance()),
