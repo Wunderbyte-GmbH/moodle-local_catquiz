@@ -94,8 +94,9 @@ class debuginfo extends feedbackgenerator {
      *
      */
     protected function get_teacherfeedback(array $data): array {
-        global $OUTPUT;
+        global $OUTPUT, $DB, $CFG;
 
+        // Note: Has to be redone as well.
         if (!get_config('local_catquiz', 'store_debug_info')) {
             return [];
         }
@@ -122,15 +123,29 @@ class debuginfo extends feedbackgenerator {
         $heading = implode(';', $this->columns).PHP_EOL;
         $csvstring = $heading . $csvstring;
 
+        $attemptid = $data['attemptid'];
+        $cid = 0;
+        $cid = $DB->get_record('local_catquiz_attempts', ['attemptid' => $attemptid], 'courseid');
+        $courseid = $cid->courseid;
+
+        // Geht irgendwie nicht: $context = context_course::instance($courseid)
+        $cid = $DB->get_record('context', ['contextlevel' => 50, 'instanceid' => $courseid], 'id');
+        $contextid = $cid->id;
+
         $descriptionheading = get_string('debuginfo_desc_title', 'local_catquiz', $this->get_progress()->get_attemptid());
         $description = get_string('debuginfo_desc', 'local_catquiz');
         $feedback = $OUTPUT->render_from_template(
-            'local_catquiz/feedback/debuginfo',
+            'local_catquiz/feedback/exportattempt',
             [
                 'data' => rawurlencode($csvstring),
-                'attemptid' => $data['debuginfo'][0]['attemptid'] ?? 'nan',
-                'description_heading' => $descriptionheading,
+                'cid' => $contextid,
+                'attemptid' => $attemptid,
                 'description' => $description,
+                'debuginfo_raw' => rawurlencode(nl2br(str_replace(" ", "&nbsp;", print_r($data, true)))),
+                'cfg->root' => $CFG->root,
+                'isteacher' => true, // has_capability('local/catquiz:view_users_feedback', $contextid),
+                'iscatmanager' => has_capability('local/catquiz:canmanage',
+                    context_system::instance()),
             ]
         );
 
@@ -248,9 +263,14 @@ class debuginfo extends feedbackgenerator {
      *
      */
     public function load_data(int $attemptid, array $existingdata, array $newdata): ?array {
+
+        $this->attemptid = $attemptid;
+
+        // Note: This has to be redone as well.
         if (!get_config('local_catquiz', 'store_debug_info')) {
             return null;
         }
+
         $teststrategy = $this->get_progress()->get_quiz_settings()->catquiz_selectteststrategy;
 
         $teststrategies = info::return_available_strategies();
@@ -301,6 +321,8 @@ class debuginfo extends feedbackgenerator {
             'questionattemptid' => isset($lastresponse['questionattemptid']) ? $lastresponse['questionattemptid'] : self::NA,
         ];
 
+        $debuginfo ['attemptid'] = $attemptid;
+
         return ['debuginfo' => $debuginfo];
     }
 
@@ -310,6 +332,22 @@ class debuginfo extends feedbackgenerator {
      * @return bool
      */
     protected function has_teacherfeedbackpermission(): bool {
+        return has_capability(
+            'local/catquiz:canmanage', context_system::instance()
+        );
+
+        GLOBAL $DB;
+
+        $cid = $DB->get_record('local_catquiz_attempts', ['attemptid' => $this->attemptid], 'courseid');
+        return has_capability('local/catquiz:view_users_feedback', context_course::instance($cid->courseid));
+    }
+
+    /**
+     * Overwrite the inherited method to allow access only to CAT managers.
+     *
+     * @return bool
+     */
+    protected function has_catmanagerpermission(): bool {
         return has_capability(
             'local/catquiz:canmanage', context_system::instance()
         );
