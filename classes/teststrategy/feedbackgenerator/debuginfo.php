@@ -123,12 +123,13 @@ class debuginfo extends feedbackgenerator {
         $heading = implode(';', $this->columns).PHP_EOL;
         $csvstring = $heading . $csvstring;
 
-        $attemptid = $data['attemptid'];
+        $lastkey = array_key_last($data['debuginfo']);
+        $attemptid = $data['debuginfo'][$lastkey]['attemptid'];
         $cid = 0;
         $cid = $DB->get_record('local_catquiz_attempts', ['attemptid' => $attemptid], 'courseid');
         $courseid = $cid->courseid;
 
-        // Geht irgendwie nicht: $context = context_course::instance($courseid)
+        // Geht irgendwie nicht: $context = context_course::instance($courseid) .
         $cid = $DB->get_record('context', ['contextlevel' => 50, 'instanceid' => $courseid], 'id');
         $contextid = $cid->id;
 
@@ -141,9 +142,9 @@ class debuginfo extends feedbackgenerator {
                 'cid' => $contextid,
                 'attemptid' => $attemptid,
                 'description' => $description,
-                'debuginfo_raw' => rawurlencode(nl2br(str_replace(" ", "&nbsp;", print_r($data, true)))),
+                'debuginfo_raw' => rawurlencode(nl2br(str_replace(" ", "&nbsp;", var_export($data, true)))),
                 'cfg->root' => $CFG->wwwroot,
-                'isteacher' => true, // has_capability('local/catquiz:view_users_feedback', $contextid),
+                'isteacher' => true, // Geht auch nicht: has_capability('local/catquiz:view_users_feedback', $contextid), !
                 'iscatmanager' => has_capability('local/catquiz:canmanage',
                     context_system::instance()),
             ]
@@ -303,6 +304,7 @@ class debuginfo extends feedbackgenerator {
         $lastresponse = $this->get_progress()->get_last_response();
         $debuginfo[] = [
             'pluginversion' => get_config('local_catquiz')->version ?? self::NA,
+            'attemptid' => $attemptid,
             'questionsattempted' => count($this->get_progress()->get_playedquestions()),
             'timestamp' => time(),
             'personabilities' => $personabilities,
@@ -320,8 +322,6 @@ class debuginfo extends feedbackgenerator {
             'fraction' => isset($lastresponse['fraction']) ? $lastresponse['fraction'] : self::NA,
             'questionattemptid' => isset($lastresponse['questionattemptid']) ? $lastresponse['questionattemptid'] : self::NA,
         ];
-
-        $debuginfo ['attemptid'] = $attemptid;
 
         return ['debuginfo' => $debuginfo];
     }
