@@ -123,8 +123,7 @@ class debuginfo extends feedbackgenerator {
         $heading = implode(';', $this->columns).PHP_EOL;
         $csvstring = $heading . $csvstring;
 
-        $lastkey = array_key_last($data['debuginfo']);
-        $attemptid = $data['debuginfo'][$lastkey]['attemptid'];
+        $attemptid = $data['attemptid'];
         $cid = 0;
         $cid = $DB->get_record('local_catquiz_attempts', ['attemptid' => $attemptid], 'courseid');
         $courseid = $cid->courseid;
@@ -264,8 +263,6 @@ class debuginfo extends feedbackgenerator {
      *
      */
     public function load_data(int $attemptid, array $existingdata, array $newdata): ?array {
-
-        $this->attemptid = $attemptid;
 
         // Note: This has to be redone as well.
         if (!get_config('local_catquiz', 'store_debug_info')) {
