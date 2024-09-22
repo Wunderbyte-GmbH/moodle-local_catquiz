@@ -1187,9 +1187,9 @@ class catquizstatistics {
 
             $r->testid = $additionalresults->testid ?? '';
 
-            $globalscale = $additionalresults->catscaleid;
+            $globalscale = $additionalresults->catscaleid ?? NULL;
             $r->globalid = $globalscale ?? '';
-            $r->globalname = $globalscale ? $additionalresults->catscales->$globalscale->name : '';
+            $r->globalname = $globalscale ?? $additionalresults->catscales->$globalscale->name : '';
             $r->globalpp = $additionalresults->personabilities->$globalscale ?? '';
             $r->globalse = $additionalresults->se->$globalscale ?? '';
             /*
@@ -1198,9 +1198,9 @@ class catquizstatistics {
             */
             // phpcs:enable
 
-            $primaryscale = $additionalresults->primaryscale->id;
+            $primaryscale = $additionalresults->primaryscale->id ?? NULL;
             $r->primaryid = $primaryscale ?? '';
-            $r->primaryname = $primaryscale ? $additionalresults->catscales->$primaryscale->name : '';
+            $r->primaryname = $primaryscale ?? $additionalresults->catscales->$primaryscale->name : '';
             $r->primarypp = $additionalresults->personabilities->$primaryscale ?? '';
             $r->primaryse = $additionalresults->se->$primaryscale ?? '';
 
