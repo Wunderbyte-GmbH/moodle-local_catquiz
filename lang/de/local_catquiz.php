@@ -133,7 +133,7 @@ $string['catquizstatistics_h1_scale'] = 'Statistik zu Skala „{$a->scalename}�
 $string['catquizstatistics_h1_single'] = 'Statistik zu Test „{$a}“';
 $string['catquizstatistics_h2_global'] = 'Die folgenden Daten beziehen sich auf alle Nutzer, die auf dieser
     Moodle-Plattform an Tests teilgenommen haben, in denen die Skala „{$a}“ verwendet wird.';
-$string['catquizstatistics_h2_scale'] = 'Die folgenden Daten beziehen sich auf die Tests „{$a->linkedcourses}“ in Kurs „{$a->coursename}“,
+$string['catquizstatistics_h2_scale'] = 'Die folgenden Daten beziehen sich auf die Tests „{$a->linkedcourses}“ im Kurs „{$a->coursename}“,
     in denen die Skala „{$a->scale}“ verwendet wird.';
 $string['catquizstatistics_h2_single'] = 'Die folgenden Daten beziehen sich auf den Test „{$a->link}“, in dem die Skala „{$a->scale}“
     verwendet wird.';
@@ -605,6 +605,8 @@ $string['startwithverydifficultquestion'] = 'mit einer sehr schweren Frage';
 $string['startwithveryeasyquestion'] = 'mit einer sehr leichten Frage';
 $string['statistics'] = 'Statistik';
 $string['statusactiveorinactive'] = 'Der Aktivitätsstatus. Geben Sie „1“ an um sicher zu stellen, um den Datensatz von der Verwendung auszuschließen. Lassen Sie das Feld leer oder setzen „0“, gilt der Datensatz als aktiv.';
+$string['statusok'] = 'Ok';
+$string['statusundefined'] = 'Undefinierter Status';
 $string['store_debug_info_desc'] = 'Wenn diese Option aktiviert ist, werden
     zusätzliche Daten gespeichert und als CSV Datei zur Verfügung gestellt.
     Dadurch steigt der benötigte Speicherplatz.';
