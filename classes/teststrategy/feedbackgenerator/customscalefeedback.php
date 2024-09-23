@@ -24,6 +24,7 @@
 
 namespace local_catquiz\teststrategy\feedbackgenerator;
 
+use context_module;
 use local_catquiz\teststrategy\feedback_helper;
 use local_catquiz\teststrategy\feedbackgenerator;
 use local_catquiz\teststrategy\feedbacksettings;
@@ -312,7 +313,8 @@ class customscalefeedback extends feedbackgenerator {
      * @return ?string
      */
     private function getfeedbackforrange(int $catscaleid, int $groupnumber, array $quizsettings): ?string {
-        $systemcontext = \context_system::instance();
+        $cm = get_coursemodule_from_instance('adaptivequiz', $this->testid);
+        $context = context_module::instance($cm->id);
         $quizsettingskey = 'feedbackeditor_scaleid_' . $catscaleid . '_' . $groupnumber;
         $filearea = sprintf('feedback_files_%d_%d', $catscaleid, $groupnumber);
 
@@ -329,7 +331,7 @@ class customscalefeedback extends feedbackgenerator {
         return file_rewrite_pluginfile_urls(
             $content,
             'pluginfile.php',
-            $systemcontext->id,
+            $context->id,
             'local_catquiz',
             $filearea,
             $this->testid

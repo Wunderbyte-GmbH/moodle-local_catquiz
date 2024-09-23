@@ -505,6 +505,7 @@ $string['personabilityfeedbacktitle'] = 'Fähigkeitsprofil';
 $string['personabilityinscale'] = 'Fähigkeits-Wert für Skala „{$a}“';
 $string['personabilityrangestring'] = '{$a->rangestart} - {$a->rangeend}';
 $string['personabilitytitletab'] = 'Ergebnis-Details';
+$string['picturesavewarning'] = 'Im Moment werden Bilder in Feedbacks nur gespeichert, wenn ein bestehendes Quiz upgedated wird';
 $string['pilot_questions'] = 'Pilotfragen';
 $string['pilotratio'] = 'Anteil zu pilotierender Fragen in %';
 $string['pilotratio_help'] = 'Anteil von noch zu pilotierender Fragen an der Gesamtfragezahl in einem Test-Versuch. Die Angabe 20% führt beispielsweise dazu, dass eine von fünf Fragen  eines Test-Versuches eine zu pilotierende Frage sein wird.';

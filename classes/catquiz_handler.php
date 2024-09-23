@@ -30,6 +30,7 @@ use cache_exception;
 use cache_helper;
 use cm_info;
 use coding_exception;
+use context_module;
 use context_system;
 use local_catquiz\feedback\feedbackclass;
 use local_catquiz\local\model\model_strategy;
@@ -590,11 +591,12 @@ class catquiz_handler {
      * @param stdClass $quizdata
      * @return void
      */
-    public static function add_or_update_instance_callback(stdClass $quizdata) {
+    public static function add_or_update_instance_callback(stdClass $quizdata, $form) {
 
         $clone = clone($quizdata);
 
-        $context = context_system::instance();
+        if ($cm = get_coursemodule_from_instance('adaptivequiz', intval($quizdata->id))) {
+        $context = context_module::instance($cm->id);
         $textfieldoptions = [
             'trusttext' => true,
             'subdirs' => true,
@@ -603,11 +605,11 @@ class catquiz_handler {
         ];
 
         foreach ($clone as $property => $value) {
-            if (!preg_match('/^feedbackeditor_scaleid_(\d+)_(\d+)_editor/', $property, $matches)) {
+            if (!preg_match('/^feedbackeditor_scaleid_(\d+)_(\d+)$/', $property, $matches)) {
                 continue;
             }
-            if (!($value['text'] ?? false)) {
-                continue;
+            if (!property_exists($clone, $property . '_editor')) {
+                $clone->{$property . '_editor'} = $clone->$property;
             }
             $scaleid = intval($matches[1]);
             $rangeid = intval($matches[2]);
@@ -622,7 +624,19 @@ class catquiz_handler {
                 $filearea,
                 $clone->id
             );
+            unset($clone->{$property.'_editor'});
+            file_save_draft_area_files(
+                $value['itemid'],
+                $context->id,
+                'local_catquiz',
+                $filearea,
+                $clone->id
+            );
         }
+    } else {
+        // Add warning: Pictures are saved only on update.
+    }
+
         // We unset id & instance. We don't want to introduce confusion because of it.
         unset($clone->id);
         unset($clone->instance);
@@ -759,6 +773,9 @@ class catquiz_handler {
                 for ($j = 1; $j <= $nfeedbackoptions; $j++) {
                     if ($feedbackvaluekey === 'feedbackeditor_scaleid_') {
                         $keyname = $feedbackvaluekey . $scaleidofcopyvalue . '_' . $j . '_editor';
+                        if (!array_key_exists($keyname, $values)) {
+                            $keyname = $feedbackvaluekey . $scaleidofcopyvalue . '_' . $j;
+                        }
                     } else {
                         $keyname = $feedbackvaluekey . $scaleidofcopyvalue . '_' . $j;
                     }
