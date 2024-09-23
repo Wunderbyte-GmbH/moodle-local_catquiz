@@ -143,7 +143,7 @@ class debuginfo extends feedbackgenerator {
                 'description' => $description,
                 'debuginfo_raw' => rawurlencode(nl2br(str_replace(" ", "&nbsp;", var_export($data, true)))),
                 'cfg->root' => $CFG->wwwroot,
-                'isteacher' => true, // Geht auch nicht: has_capability('local/catquiz:view_users_feedback', $contextid), !
+                'isteacher' => true, // Hier auf has_capability mit 'local/catquiz:view_users_feedback' und $contextid testen!
                 'iscatmanager' => has_capability('local/catquiz:canmanage',
                     context_system::instance()),
             ]
