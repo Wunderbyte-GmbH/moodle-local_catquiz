@@ -27,6 +27,8 @@ namespace local_catquiz;
 
 use cache;
 use cache_helper;
+use context_module;
+use context_system;
 use moodle_exception;
 use stdClass;
 
@@ -257,6 +259,17 @@ class testenvironment {
             return;
         }
 
+        $cm = get_coursemodule_from_instance('adaptivequiz', $this->componentid);
+        $context = context_module::instance($cm->id);
+        $options = [
+            'trusttext' => true,
+            'subdirs' => true,
+            'context' => $context,
+            'maxfiles' => EDITOR_UNLIMITED_FILES,
+            'noclean' => true,
+        ];
+
+
         foreach ($jsonobject as $key => $value) {
 
             // Never overwrite a few values.
@@ -288,6 +301,40 @@ class testenvironment {
                 'timemodified',
 
                 ])) {
+                continue;
+            }
+            if (preg_match('/^feedbackeditor_scaleid_(\d+)_(\d+)$/', $key, $matches)) {
+                // Fallback for old fields stored as array.
+                if (is_array($value) && array_key_exists('text', $value)) {
+                    $jsonobject[$key] = $value['text'];
+                }
+
+                $scaleid = intval($matches[1]);
+                $rangeid = intval($matches[2]);
+                $filearea = sprintf('feedback_files_%d_%d', $scaleid, $rangeid);
+                $jsonobject[$key.'format'] = 1;
+                $field = sprintf('feedbackeditor_scaleid_%d_%d', $scaleid, $rangeid);
+                // Returns an object. 
+                $data = (object) file_prepare_standard_editor(
+                    (object) $jsonobject,
+                    $field,
+                    $options,
+                    $context,
+                    'local_catquiz',
+                    $filearea,
+                    intval($this->componentid)
+                );
+                $formdefaultvalues[$key] = $data->$key;
+                $formdefaultvalues[$key.'_editor'] = $data->{$key.'_editor'};
+                $formdefaultvalues[$key.'format'] = $data->{$key.'format'};
+                $draftitemid = file_get_submitted_draft_itemid($field);
+                file_prepare_draft_area(
+                    $draftitemid,
+                    $context->id,
+                    'local_catquiz',
+                    $filearea,
+                    intval($this->componentid)
+                );
                 continue;
             }
 

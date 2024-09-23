@@ -513,6 +513,7 @@ $string['personabilityfeedbacktitle'] = 'Personability Profile';
 $string['personabilityinscale'] = 'Ability score in scale “{$a}”';
 $string['personabilityrangestring'] = '{$a->rangestart} - {$a->rangeend}';
 $string['personabilitytitletab'] = 'Details of results';
+$string['picturesavewarning'] = 'At the moment, pictures in feedbacks are only saved when an existing quiz is being edited';
 $string['pilot_questions'] = 'Pilot questions';
 $string['pilotratio'] = 'Proportion of questions to be piloted in %';
 $string['pilotratio_help'] = 'Proportion of questions still to be piloted in the total number of questions in a test attempt. For example, specifying 20% ​means that one out of five questions in a test experiment will be a question to be piloted';
