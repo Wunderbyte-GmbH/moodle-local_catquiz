@@ -960,7 +960,7 @@ UPDATE {local_catquiz_tests}
     '"(feedbackeditor_[^"]+)":\{"text":"(([^"\\\\]*(\\\\.[^"\\\\]*)*))"(,(?:"format":"[0-9]+","itemid":"[0-9]+")?)?\}',
     '"\\1":"\\2","\\1trust":false,"\\1format":"1"')
 ENDSQL;
-        } elseif ($DB->get_dbtype() === 'pgsql') {
+        } else if ($DB->get_dbtype() === 'pgsql') {
 
             $sql = <<<ENDSQL
 UPDATE {local_catquiz_tests}
@@ -976,9 +976,7 @@ ENDSQL;
             echo $OUTPUT->notification($errormessage, 'error');
         }
 
-        $DB->execute($sql_1);
-        $DB->execute($sql_2);
-        $DB->execute($sql_3);
+        $DB->execute($sql);
 
         // Catquiz savepoint reached.
         upgrade_plugin_savepoint(true, 2024092700, 'local', 'catquiz');
