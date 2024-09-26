@@ -269,7 +269,6 @@ class testenvironment {
             'noclean' => true,
         ];
 
-
         foreach ($jsonobject as $key => $value) {
 
             // Never overwrite a few values.
@@ -314,7 +313,6 @@ class testenvironment {
                 $filearea = sprintf('feedback_files_%d_%d', $scaleid, $rangeid);
                 $jsonobject[$key.'format'] = 1;
                 $field = sprintf('feedbackeditor_scaleid_%d_%d', $scaleid, $rangeid);
-                // Returns an object. 
                 $data = (object) file_prepare_standard_editor(
                     (object) $jsonobject,
                     $field,

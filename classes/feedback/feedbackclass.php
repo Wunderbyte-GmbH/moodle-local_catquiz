@@ -272,7 +272,6 @@ class feedbackclass {
                 $subelements[] = $element;
 
                 // Rich text field for subfeedback.
-                //$subelements[] = $mform->addElement(
                 $element = $mform->addElement(
                     'editor',
                     'feedbackeditor_scaleid_' . $scale->id . '_' . $j,

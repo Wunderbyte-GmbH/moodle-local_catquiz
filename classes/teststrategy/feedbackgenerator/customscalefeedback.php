@@ -313,8 +313,9 @@ class customscalefeedback extends feedbackgenerator {
      * @return ?string
      */
     private function getfeedbackforrange(int $catscaleid, int $groupnumber, array $quizsettings): ?string {
-        $cm = get_coursemodule_from_instance('adaptivequiz', $this->testid);
-        $context = context_module::instance($cm->id);
+        if ($cm = get_coursemodule_from_instance('adaptivequiz', $this->testid)) {
+            $context = context_module::instance($cm->id);
+        }
         $quizsettingskey = 'feedbackeditor_scaleid_' . $catscaleid . '_' . $groupnumber;
         $filearea = sprintf('feedback_files_%d_%d', $catscaleid, $groupnumber);
 
@@ -328,14 +329,17 @@ class customscalefeedback extends feedbackgenerator {
             $content = $content->text;
         }
 
-        return file_rewrite_pluginfile_urls(
-            $content,
-            'pluginfile.php',
-            $context->id,
-            'local_catquiz',
-            $filearea,
-            $this->testid
-        );
+        if ($cm) {
+            return file_rewrite_pluginfile_urls(
+                $content,
+                'pluginfile.php',
+                $context->id,
+                'local_catquiz',
+                $filearea,
+                $this->testid
+            );
+        }
 
+        return $content;
     }
 }
