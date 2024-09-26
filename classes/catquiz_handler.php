@@ -769,14 +769,7 @@ class catquiz_handler {
                     continue;
                 }
                 for ($j = 1; $j <= $nfeedbackoptions; $j++) {
-                    if ($feedbackvaluekey === 'feedbackeditor_scaleid_') {
-                        $keyname = $feedbackvaluekey . $scaleidofcopyvalue . '_' . $j . '_editor';
-                        if (!array_key_exists($keyname, $values)) {
-                            $keyname = $feedbackvaluekey . $scaleidofcopyvalue . '_' . $j;
-                        }
-                    } else {
-                        $keyname = $feedbackvaluekey . $scaleidofcopyvalue . '_' . $j;
-                    }
+                    $keyname = $feedbackvaluekey . $scaleidofcopyvalue . '_' . $j;
                     $standardvalues[$feedbackvaluekey][$j] = $values[$keyname] ?? null;
                 }
             }
@@ -801,9 +794,6 @@ class catquiz_handler {
                     }
                     for ($j = 1; $j <= $nfeedbackoptions; $j++) {
                         $subscalekey = $feedbackvaluekey . $subscaleid . '_' . $j;
-                        if ($feedbackvaluekey === 'feedbackeditor_scaleid_') {
-                            $subscalekey = sprintf('feedbackeditor_scaleid_%d_%d_editor', $subscaleid, $j);
-                        }
                         $values[$subscalekey] = $standardvalues[$feedbackvaluekey][$j];
                     }
                 }
