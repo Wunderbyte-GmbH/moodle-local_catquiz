@@ -953,25 +953,27 @@ function xmldb_local_catquiz_upgrade($oldversion) {
     if ($oldversion < 2024092700) {
 
         if ($DB->get_dbtype() === 'mysqli') {
-            // MySQL wird verwendet
+
             $sql = <<<ENDSQL
-                UPDATE {local_catquiz_tests}
-                    SET json = REGEXP_REPLACE(json,
-                    '"(feedbackeditor_scaleid_[0-9]+_[0-9]+)":\{"text":"(([^"\\\\]*(\\\\.[^"\\\\]*)*))"(,(?:"format":"[0-9]+","itemid":"[0-9]+")?)?\}',
-                    '"\\1":"\\2","\\1trust":false,"\\1format":"1"')
-            ENDSQL;
+UPDATE {local_catquiz_tests}
+    SET json = REGEXP_REPLACE(json,
+    '"(feedbackeditor_[^"]+)":\{"text":"(([^"\\\\]*(\\\\.[^"\\\\]*)*))"(,(?:"format":"[0-9]+","itemid":"[0-9]+")?)?\}',
+    '"\\1":"\\2","\\1trust":false,"\\1format":"1"')
+ENDSQL;
         } elseif ($DB->get_dbtype() === 'pgsql') {
+
             $sql = <<<ENDSQL
-                UPDATE {local_catquiz_tests}
-                    SET json = REGEXP_REPLACE(json,
-                    '"(feedbackeditor_scaleid_[0-9]+_[0-9]+)":\{"text":"(([^"\\\\]*(\\\\.[^"\\\\]*)*))"(,(?:"format":"[0-9]+","itemid":"[0-9]+")?)?\}',
-                    '"\\1":"\\2","\\1trust":false,"\\1format":"1"','g')
-            ENDSQL;
+UPDATE {local_catquiz_tests}
+    SET json = REGEXP_REPLACE(json,
+    '"(feedbackeditor_[^"]+)":\{"text":"(([^"\\\\]*(\\\\.[^"\\\\]*)*))"(,(?:"format":"[0-9]+","itemid":"[0-9]+")?)?\}',
+    '"\\1":"\\2","\\1trust":false,"\\1format":"1"','g')
+ENDSQL;
         } else {
             require_once($CFG->libdir . '/moodlelib.php');
-            $errorMessage = "DB type " . $DB->get_dbtype(). " does not support regular expressions for database operations.";
-            $errorMessage .= "You may uncomment line".(__LINE__+1)." in ".__FILE.__" in order to proceed, but you may lose all text feedbacks in catquiz tests.")";
-            echo $OUTPUT->notification($errorMessage, 'error');
+            $errormessage = "DB type " . $DB->get_dbtype(). " does not support regular expressions for database operations.";
+            $errormessage .= "You may comment out line".(__LINE__ + 1)." in ".__FILE.__" in order to proceed,
+                but you may lose all text feedbacks in catquiz tests.")";
+            echo $OUTPUT->notification($errormessage, 'error');
         }
 
         $DB->execute($sql_1);
