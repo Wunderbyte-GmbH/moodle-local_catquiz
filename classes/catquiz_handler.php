@@ -591,51 +591,49 @@ class catquiz_handler {
      * @param stdClass $quizdata
      * @return void
      */
-    public static function add_or_update_instance_callback(stdClass $quizdata, $form) {
+    public static function add_or_update_instance_callback(stdClass $quizdata) {
 
         $clone = clone($quizdata);
 
         if ($cm = get_coursemodule_from_instance('adaptivequiz', intval($quizdata->id))) {
-        $context = context_module::instance($cm->id);
-        $textfieldoptions = [
-            'trusttext' => true,
-            'subdirs' => true,
-            'maxfiles' => EDITOR_UNLIMITED_FILES,
-            'context' => $context,
-        ];
+            $context = context_module::instance($cm->id);
+            $textfieldoptions = [
+                'trusttext' => true,
+                'subdirs' => true,
+                'maxfiles' => EDITOR_UNLIMITED_FILES,
+                'context' => $context,
+            ];
 
-        foreach ($clone as $property => $value) {
-            if (!preg_match('/^feedbackeditor_scaleid_(\d+)_(\d+)$/', $property, $matches)) {
-                continue;
+            foreach ($clone as $property => $value) {
+                if (!preg_match('/^feedbackeditor_scaleid_(\d+)_(\d+)$/', $property, $matches)) {
+                    continue;
+                }
+                if (!property_exists($clone, $property . '_editor')) {
+                    $clone->{$property . '_editor'} = $clone->$property;
+                }
+                $scaleid = intval($matches[1]);
+                $rangeid = intval($matches[2]);
+                $fieldname = sprintf('feedbackeditor_scaleid_%d_%d', $scaleid, $rangeid);
+                $filearea = sprintf('feedback_files_%d_%d', $scaleid, $rangeid);
+                $clone = file_postupdate_standard_editor(
+                    $clone,
+                    $fieldname,
+                    $textfieldoptions,
+                    $context,
+                    'local_catquiz',
+                    $filearea,
+                    $clone->id
+                );
+                unset($clone->{$property . '_editor'});
+                file_save_draft_area_files(
+                    $value['itemid'],
+                    $context->id,
+                    'local_catquiz',
+                    $filearea,
+                    $clone->id
+                );
             }
-            if (!property_exists($clone, $property . '_editor')) {
-                $clone->{$property . '_editor'} = $clone->$property;
-            }
-            $scaleid = intval($matches[1]);
-            $rangeid = intval($matches[2]);
-            $fieldname = sprintf('feedbackeditor_scaleid_%d_%d', $scaleid, $rangeid);
-            $filearea = sprintf('feedback_files_%d_%d', $scaleid, $rangeid);
-            $clone = file_postupdate_standard_editor(
-                $clone,
-                $fieldname,
-                $textfieldoptions,
-                $context,
-                'local_catquiz',
-                $filearea,
-                $clone->id
-            );
-            unset($clone->{$property.'_editor'});
-            file_save_draft_area_files(
-                $value['itemid'],
-                $context->id,
-                'local_catquiz',
-                $filearea,
-                $clone->id
-            );
         }
-    } else {
-        // Add warning: Pictures are saved only on update.
-    }
 
         // We unset id & instance. We don't want to introduce confusion because of it.
         unset($clone->id);
