@@ -103,7 +103,8 @@ class feedbackclass {
         $mform->addHelpButton('numberoffeedbackoptionsselect', 'numberoffeedbackoptionpersubscale', 'local_catquiz');
         $elements[] = $element;
 
-        if (array_key_exists('instance', $data) && !$data['instance']) {
+        $instance = $data['instance'] ?? $defaultvalues['instance'] ?? "";
+        if (!$instance) {
             $picturewarning = get_string('picturesavewarning', 'local_catquiz');
             $element = $mform->createElement(
                 'html',
