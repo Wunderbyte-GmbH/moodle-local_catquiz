@@ -949,5 +949,28 @@ function xmldb_local_catquiz_upgrade($oldversion) {
         // Catquiz savepoint reached.
         upgrade_plugin_savepoint(true, 2024081300, 'local', 'catquiz');
     }
+
+    if ($oldversion < 2024092700) {
+
+        if ($DB->get_dbtype() === 'mysqli') {
+            // MySQL wird verwendet
+             $sql = "UPDATE {local_catquiz_tests}
+                SET json = REGEXP_REPLACE(json, '("feedbackeditor_scaleid_[0-9]+_[0-9]+"):\{"text":("([^"\\\\]*(\\\\.[^"\\\\]*)*)")(,(?:"format":"[0-9]+","itemid":"[0-9]+")?)?\}','\\1:\\2')";
+        } elseif ($DB->get_dbtype() === 'pgsql') {
+            // PostgreSQL wird verwendet
+            $sql = "UPDATE local_catquiz_rests
+                SET json = REGEXP_REPLACE(json, '("feedbackeditor_scaleid_[0-9]+_[0-9]+"):\{"text":("([^"\\\\]*(\\\\.[^"\\\\]*)*)")(,(?:"format":"[0-9]+","itemid":"[0-9]+")?)?\}', '\1:\2', 'g');
+        } else {
+            die ("DB type " . $DB->get_dbtype(). " does not support regular expressions for database operations. You may uncomment line".__LINE__." in ".__FILE.__" in order to proceed, but you may lose all text feedbacks in catquiz tests.")";
+        }
+
+        $sql = "UPDATE {local_catquiz_rests}
+        SET json = REGEXP_REPLACE(json, '("feedbackeditor_scaleid_[0-9]+_[0-9]+"):\{"text":("([^"\\\\]*(\\\\.[^"\\\\]*)*)")(,(?:"format":"[0-9]+","itemid":"[0-9]+")?)?\}','\\1:\\2')";
+
+        $DB->execute($sql);
+
+        // Catquiz savepoint reached.
+        upgrade_plugin_savepoint(true, 2024092700, 'local', 'catquiz');
+    }
     return true;
 }
