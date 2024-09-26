@@ -971,7 +971,7 @@ ENDSQL;
         } else {
             require_once($CFG->libdir . '/moodlelib.php');
             $errormessage = "DB type " . $DB->get_dbtype(). " does not support regular expressions for database operations.";
-            $errormessage .= "You may comment out line".(__LINE__ + 1)." in ".__FILE.__" in order to proceed,
+            $errormessage .= "You may comment out line".(__LINE__ + 1)." in ".__FILE__." in order to proceed,
                 but you may lose all text feedbacks in catquiz tests.";
             echo $OUTPUT->notification($errormessage, 'error');
         }
