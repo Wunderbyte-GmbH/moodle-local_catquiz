@@ -92,8 +92,10 @@ $exporttitle = [
 // -- [/] frac Ergebnisskala,
 // -- [?] JSON aller detektierten Ergebnisse
     get_string('csvexportheader:userid', 'local_catquiz'),
-    get_string('csvexportheader:username', 'local_catquiz'),
-    get_string('csvexportheader:useremail', 'local_catquiz'),
+    get_string('username', ''),
+    get_string('firstname', ''),
+    get_string('lastname', ''),
+    get_string('email', 'moodle'),
     get_string('csvexportheader:testid', 'local_catquiz'),
     get_string('csvexportheader:attemptid', 'local_catquiz'),
     get_string('csvexportheader:attemptstart', 'local_catquiz'),
@@ -127,6 +129,8 @@ foreach ($catquizstatistics->get_export_data() as $row) {
         [
             $row->userid,
             $row->username,
+            $row->firstname,
+            $row->lastname,
             $row->email,
             $row->testid,
             $row->attemptid,
