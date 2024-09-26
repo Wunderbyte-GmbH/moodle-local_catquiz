@@ -954,20 +954,29 @@ function xmldb_local_catquiz_upgrade($oldversion) {
 
         if ($DB->get_dbtype() === 'mysqli') {
             // MySQL wird verwendet
-             $sql = "UPDATE {local_catquiz_tests}
-                SET json = REGEXP_REPLACE(json, '("feedbackeditor_scaleid_[0-9]+_[0-9]+"):\{"text":("([^"\\\\]*(\\\\.[^"\\\\]*)*)")(,(?:"format":"[0-9]+","itemid":"[0-9]+")?)?\}','\\1:\\2')";
+            $sql = <<<ENDSQL
+                UPDATE {local_catquiz_tests}
+                    SET json = REGEXP_REPLACE(json,
+                    '"(feedbackeditor_scaleid_[0-9]+_[0-9]+)":\{"text":"(([^"\\\\]*(\\\\.[^"\\\\]*)*))"(,(?:"format":"[0-9]+","itemid":"[0-9]+")?)?\}',
+                    '"\\1":"\\2","\\1trust":false,"\\1format":"1"')
+            ENDSQL;
         } elseif ($DB->get_dbtype() === 'pgsql') {
-            // PostgreSQL wird verwendet
-            $sql = "UPDATE local_catquiz_rests
-                SET json = REGEXP_REPLACE(json, '("feedbackeditor_scaleid_[0-9]+_[0-9]+"):\{"text":("([^"\\\\]*(\\\\.[^"\\\\]*)*)")(,(?:"format":"[0-9]+","itemid":"[0-9]+")?)?\}', '\1:\2', 'g');
+            $sql = <<<ENDSQL
+                UPDATE {local_catquiz_tests}
+                    SET json = REGEXP_REPLACE(json,
+                    '"(feedbackeditor_scaleid_[0-9]+_[0-9]+)":\{"text":"(([^"\\\\]*(\\\\.[^"\\\\]*)*))"(,(?:"format":"[0-9]+","itemid":"[0-9]+")?)?\}',
+                    '"\\1":"\\2","\\1trust":false,"\\1format":"1"','g')
+            ENDSQL;
         } else {
-            die ("DB type " . $DB->get_dbtype(). " does not support regular expressions for database operations. You may uncomment line".__LINE__." in ".__FILE.__" in order to proceed, but you may lose all text feedbacks in catquiz tests.")";
+            require_once($CFG->libdir . '/moodlelib.php');
+            $errorMessage = "DB type " . $DB->get_dbtype(). " does not support regular expressions for database operations.";
+            $errorMessage .= "You may uncomment line".(__LINE__+1)." in ".__FILE.__" in order to proceed, but you may lose all text feedbacks in catquiz tests.")";
+            echo $OUTPUT->notification($errorMessage, 'error');
         }
 
-        $sql = "UPDATE {local_catquiz_rests}
-        SET json = REGEXP_REPLACE(json, '("feedbackeditor_scaleid_[0-9]+_[0-9]+"):\{"text":("([^"\\\\]*(\\\\.[^"\\\\]*)*)")(,(?:"format":"[0-9]+","itemid":"[0-9]+")?)?\}','\\1:\\2')";
-
-        $DB->execute($sql);
+        $DB->execute($sql_1);
+        $DB->execute($sql_2);
+        $DB->execute($sql_3);
 
         // Catquiz savepoint reached.
         upgrade_plugin_savepoint(true, 2024092700, 'local', 'catquiz');
