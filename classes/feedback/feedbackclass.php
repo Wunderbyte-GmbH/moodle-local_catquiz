@@ -105,10 +105,12 @@ class feedbackclass {
 
         if (array_key_exists('instance', $data) && !$data['instance']) {
             $picturewarning = get_string('picturesavewarning', 'local_catquiz');
-            $element = $mform->addElement(
+            $element = $mform->createElement(
                 'html',
                 '<div class="alert alert-warning" role="alert">'.$picturewarning.'</div>'
             );
+            $element->setName('picturesavewarning');
+            $mform->addElement($element);
             $elements[] = $element;
         }
 
