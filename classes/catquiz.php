@@ -2439,6 +2439,8 @@ class catquiz {
         $sql = "SELECT a.attemptid,
             a.userid,
             u.username,
+            u.firstname,
+            u.lastname,
             u.email,
             a.starttime,
             a.endtime,
