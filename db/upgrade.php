@@ -34,7 +34,7 @@ require_once(__DIR__.'/upgradelib.php');
  * @return bool
  */
 function xmldb_local_catquiz_upgrade($oldversion) {
-    global $DB;
+    global $DB, $CFG;
 
     $dbman = $DB->get_manager();
 
@@ -952,21 +952,21 @@ function xmldb_local_catquiz_upgrade($oldversion) {
 
     if ($oldversion < 2024092700) {
 
-        if ($DB->get_dbtype() === 'mysqli') {
+        if ($DB->get_dbfamily() === 'mysql') {
 
             $sql = <<<ENDSQL
 UPDATE {local_catquiz_tests}
     SET json = REGEXP_REPLACE(json,
-    '"(feedbackeditor_[^"]+)":\{"text":"(([^"\\\\]*(\\\\.[^"\\\\]*)*))"(,(?:"format":"[0-9]+","itemid":"[0-9]+")?)?\}',
-    '"\\1":"\\2","\\1trust":false,"\\1format":"1"')
+    :regexp,
+    :replace)
 ENDSQL;
-        } else if ($DB->get_dbtype() === 'pgsql') {
+        } else if ($DB->get_dbfamily() === 'postgres') {
 
             $sql = <<<ENDSQL
 UPDATE {local_catquiz_tests}
     SET json = REGEXP_REPLACE(json,
-    '"(feedbackeditor_[^"]+)":\{"text":"(([^"\\\\]*(\\\\.[^"\\\\]*)*))"(,(?:"format":"[0-9]+","itemid":"[0-9]+")?)?\}',
-    '"\\1":"\\2","\\1trust":false,"\\1format":"1"','g')
+    :regexp,
+    :replace,'g')
 ENDSQL;
         } else {
             require_once($CFG->libdir . '/moodlelib.php');
@@ -976,7 +976,11 @@ ENDSQL;
             echo $OUTPUT->notification($errormessage, 'error');
         }
 
-        $DB->execute($sql);
+        $DB->execute($sql,
+            ['regexp' =>
+            '\'"(feedbackeditor_[^"]+)":\{"text":"(([^"\\\\]*(\\\\.[^"\\\\]*)*))"(,(?:"format":"[0-9]+","itemid":"[0-9]+")?)?\}\'',
+            'replace' => '\'"\\1":"\\2","\\1trust":false,"\\1format":"1"\'',
+            ]);
 
         // Catquiz savepoint reached.
         upgrade_plugin_savepoint(true, 2024092700, 'local', 'catquiz');
