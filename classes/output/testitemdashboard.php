@@ -129,14 +129,15 @@ class testitemdashboard implements renderable, templatable {
                     get_string('pluginname', sprintf('catmodel_%s', $modelname)),
                     $difficulty
                 ),
-                array_values($likelihoods));
+                array_values($likelihoods)
+            );
             $labels = range(-5, 5, 0.5);
             $chart->add_series($series1);
             $chart->set_labels($labels);
             $chart->get_xaxis(0, true)->set_label(get_string('personability', 'local_catquiz'));
             $status = get_string('status', 'core') . ': ' . get_string(sprintf('itemstatus_%d', $item->get_status()), 'local_catquiz');
+            $heading = html_writer::tag('h3', get_string('pluginname', sprintf('catmodel_%s', $item->get_model_name())));
         }
-        $heading = html_writer::tag('h3', get_string('pluginname', sprintf('catmodel_%s', $modelname)));
         $chart = html_writer::tag('div', $OUTPUT->render($chart), ['dir' => 'ltr']);
 
         $returnarray[] = [
