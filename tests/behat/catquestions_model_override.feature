@@ -44,20 +44,20 @@ Feature: As an admin I perfrom model settings customizations over an imported of
       | 3PL mixed Rasch-Birnbaum model | Not yet calculated |
       | 1PL Rasch model                | Not yet calculated |
       | 2PL Rasch-Birnbaum model       | Manually updated   |
-      | override_raschbirnbaum[override_raschbirnbaum_difficulty]     | 1.3600 |
-      | override_raschbirnbaum[override_raschbirnbaum_discrimination] | 0.3100 |
-    And I should see "Manually updated" in the ".tab-model-status" "css_element"
-    And I should see "2PL Rasch-Birnbaum model" in the ".tab-model-status" "css_element"
+      | override_raschbirnbaum[difficulty]     | 1.3600 |
+      | override_raschbirnbaum[discrimination] | 0.3100 |
+    And I should see "Manually updated" in the ".card.likelihood" "css_element"
+    And I should see "2PL Rasch-Birnbaum model" in the ".card.likelihood" "css_element"
     ## Verify hidden elements in case of "Not yet calculated" settings
     And the "hidden" attribute of "//div[contains(@id, 'fgroup_id_override_mixedraschbirnbaum_')]" "xpath_element" should contain "true"
     And the "hidden" attribute of "//div[contains(@id, 'group_id_override_rasch_')]" "xpath_element" should contain "true"
     ## Verify of status update for the "2PL Rasch-Birnbaum" model
     And I set the field "2PL Rasch-Birnbaum model" to "Calculated"
-    And the "override_raschbirnbaum[override_raschbirnbaum_difficulty]" "field" should be disabled
-    And the "override_raschbirnbaum[override_raschbirnbaum_discrimination]" "field" should be disabled
+    And the "override_raschbirnbaum[difficulty]" "field" should be disabled
+    And the "override_raschbirnbaum[discrimination]" "field" should be disabled
     ## And I wait "31" seconds
     And I click on "Save changes" "button" in the "#lcq_model_override_form" "css_element"
     And I reload the page
     And I wait "1" seconds
-    And I should see "Calculated" in the ".tab-model-status" "css_element"
-    And I should see "2PL Rasch-Birnbaum model" in the ".tab-model-status" "css_element"
+    And I should see "Calculated" in the ".card.likelihood" "css_element"
+    And I should see "2PL Rasch-Birnbaum model" in the ".card.likelihood" "css_element"
