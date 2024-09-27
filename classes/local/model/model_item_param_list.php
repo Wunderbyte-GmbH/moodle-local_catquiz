@@ -169,8 +169,7 @@ class model_item_param_list implements ArrayAccess, IteratorAggregate, Countable
      * If none are found, it returns an empty list.
      *
      * @param int $contextid
-     * @param string $modelname
-     * @param array $catscaleids
+     * @param int $questionid
      *
      * @return self
      *

@@ -352,7 +352,7 @@ abstract class model_raschmodel extends model_model implements catcalc_item_esti
     /**
      * Definition after data callback
      *
-     * @param MoodleQuickForm &$mform
+     * @param MoodleQuickForm $mform
      * @param model_item_param $param
      * @param string $groupid
      * @return void
@@ -372,8 +372,8 @@ abstract class model_raschmodel extends model_model implements catcalc_item_esti
      *
      * @param string $name
      * @param string $id
-     * @param array &$group
-     * @param mixed &$mform
+     * @param array $group
+     * @param mixed $mform
      * @return void
      * @throws coding_exception
      */

@@ -168,7 +168,7 @@ abstract class model_model {
      * @return void
      */
     abstract public function definition_after_data_callback(
-        MoodleQuickForm &$mform,
+        MoodleQuickForm $mform,
         model_item_param $param,
         string $groupid
     ): void;

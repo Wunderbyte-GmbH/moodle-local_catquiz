@@ -125,6 +125,7 @@ class item_model_override_selector extends dynamic_form {
      *
      * @param MoodleQuickForm $mform,
      * @param stdClass $data
+     * @param stdClass $data
      * @return void
      */
     private function render_edit_form(MoodleQuickForm &$mform, stdClass $data): void {
