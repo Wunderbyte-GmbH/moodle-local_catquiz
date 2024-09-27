@@ -23,6 +23,7 @@
 
 namespace local_catquiz\local\model;
 
+use coding_exception;
 use local_catquiz\catcalc_ability_estimator;
 use local_catquiz\catcalc_item_estimator;
 use MoodleQuickForm;
@@ -35,6 +36,14 @@ use stdClass;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 abstract class model_multiparam extends model_raschmodel {
+
+    /**
+     * Get static param array
+     *
+     * @param model_item_param $param
+     * @return array
+     * @throws coding_exception
+     */
     public function get_static_param_array(\local_catquiz\local\model\model_item_param $param): array {
         $disclabel = get_string('discrimination', 'local_catquiz');
         $fractions = [];
@@ -50,12 +59,18 @@ abstract class model_multiparam extends model_raschmodel {
                 $fractions['Difficulty ' . $count] = $value;
             }
         }
-        return array_merge( 
+        return array_merge(
             [$disclabel => $param->get_params_array()['discrimination']],
             $fractions,
         );
     }
 
+    /**
+     * Get parameter fields
+     *
+     * @param model_item_param $param
+     * @return array
+     */
     public function get_parameter_fields(model_item_param $param): array {
         if (!$param->get_params_array()) {
             return $this->get_default_params();
@@ -64,12 +79,18 @@ abstract class model_multiparam extends model_raschmodel {
         $multiparam = $this->get_multi_param_name();
         $counter = 0;
         foreach ($param->get_params_array()[$multiparam] as $frac => $val) {
-            $parameters['fraction_'.++$counter] = $frac;
-            $parameters['difficulty_'.$counter] = $val;
+            $parameters['fraction_' . ++$counter] = $frac;
+            $parameters['difficulty_' . $counter] = $val;
         }
         return $parameters;
     }
 
+    /**
+     * Converts an form array to a record
+     *
+     * @param array $formarray
+     * @return stdClass
+     */
     public function form_array_to_record(array $formarray): stdClass {
         $diffarray = [];
         $multiparam = $this->get_multi_param_name();
@@ -89,5 +110,10 @@ abstract class model_multiparam extends model_raschmodel {
         ];
     }
 
+    /**
+     * Get multi param name
+     *
+     * @return string
+     */
     abstract protected function get_multi_param_name(): string;
 }

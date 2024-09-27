@@ -24,7 +24,9 @@
 
 namespace catmodel_raschbirnbaum;
 
+use coding_exception;
 use local_catquiz\catcalc;
+use local_catquiz\local\model\model_item_param;
 use local_catquiz\local\model\model_raschmodel;
 use stdClass;
 
@@ -498,7 +500,14 @@ class raschbirnbaum extends model_raschmodel {
         ];
     }
 
-    public function get_static_param_array(\local_catquiz\local\model\model_item_param $param): array {
+    /**
+     * Get static param array
+     *
+     * @param model_item_param $param
+     * @return array
+     * @throws coding_exception
+     */
+    public function get_static_param_array(model_item_param $param): array {
         $difflabel = get_string('difficulty', 'local_catquiz');
         $disclabel = get_string('discrimination', 'local_catquiz');
         return [

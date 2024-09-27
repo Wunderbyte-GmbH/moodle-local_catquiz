@@ -24,7 +24,9 @@
 
 namespace catmodel_mixedraschbirnbaum;
 
+use coding_exception;
 use local_catquiz\catcalc;
+use local_catquiz\local\model\model_item_param;
 use local_catquiz\local\model\model_item_param_list;
 use local_catquiz\local\model\model_person_param_list;
 use local_catquiz\local\model\model_raschmodel;
@@ -589,6 +591,11 @@ class mixedraschbirnbaum extends model_raschmodel {
         ];
     }
 
+    /**
+     * Get default params
+     *
+     * @return array
+     */
     public function get_default_params(): array {
         return [
             'difficulty' => 0.0,
@@ -597,7 +604,14 @@ class mixedraschbirnbaum extends model_raschmodel {
         ];
     }
 
-    public function get_static_param_array(\local_catquiz\local\model\model_item_param $param): array {
+    /**
+     * Get static param array
+     *
+     * @param model_item_param $param
+     * @return array
+     * @throws coding_exception
+     */
+    public function get_static_param_array(model_item_param $param): array {
         $difflabel = get_string('difficulty', 'local_catquiz');
         $disclabel = get_string('discrimination', 'local_catquiz');
         $guessinglabel = get_string('guessing', 'local_catquiz');

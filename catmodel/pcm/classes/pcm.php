@@ -52,12 +52,7 @@ class pcm extends model_multiparam {
 
         $intercepts = json_decode($record->json, true)['intercept'];
 
-      //  $meandifficulty = self::calculate_mean_difficulty([
-      //      'intercept' => $intercepts,
-      //  ]);
-
         return [
-       //     'difficulty' => round($meandifficulty, self::PRECISION),
             'intercept' => $intercepts,
             'discrimination' => round($record->discrimination, self::PRECISION),
         ];
@@ -528,18 +523,23 @@ class pcm extends model_multiparam {
         ];
     }
 
-//    public function get_parameter_fields(model_item_param $param): array {
-//        if (!$param->get_params_array()) {
-//            $params = $this->get_default_params();
-//        }
-//        $parameters = ['discrimination' => $params['discrimination']];
-//        foreach ($params['intercept'] as $frac => $val) {
-//            $parameters['fraction_'.$frac] = $frac;
-//            $parameters['difficulty_'.$frac] = $val;
-//        }
-//        return $parameters;
-//    }
+    /**
+     * Retrieve the name of the multiple parameter.
+     *
+     * This method returns the string 'intercept', which is used as
+     * the name of the multiple parameter in this context.
+     *
+     * @return string The name of the multiple parameter.
+     */
+    protected function get_multi_param_name(): string {
+        return 'intercept';
+    }
 
+    /**
+     * Get default params
+     *
+     * @return array
+     */
     public function get_default_params(): array {
         return [
             'discrimination' => 0.0,
@@ -547,11 +547,7 @@ class pcm extends model_multiparam {
                 '0.00' => 0.0,
                 '0.50' => 0.5,
                 '1.00' => 1.0,
-            ]
+            ],
         ];
-    }
-
-    protected function get_multi_param_name(): string {
-        return 'intercept';
     }
 }

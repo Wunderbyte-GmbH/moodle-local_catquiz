@@ -103,7 +103,14 @@ class model_item_param_list implements ArrayAccess, IteratorAggregate, Countable
         return $itemparamlist;
     }
 
-    public static function get_by_questionid(int $contextid, $questionid) {
+    /**
+     * Retrieve item parameters based on the context ID and question ID.
+     *
+     * @param int $contextid The context ID to search within.
+     * @param int $questionid The ID of the question for which to retrieve parameters.
+     * @return model_item_param_list The item parameters retrieved from the cache or database.
+     */
+    public static function get_by_questionid(int $contextid, $questionid): model_item_param_list {
         // Try to get the item params from the cache.
         $cache = cache::make('local_catquiz', 'catquiz_item_params');
         $cachekey = sprintf('params_%d_%d', $contextid, $questionid);
@@ -116,7 +123,6 @@ class model_item_param_list implements ArrayAccess, IteratorAggregate, Countable
         }
         $cache->set($cachekey, $itemparamlist);
         return $itemparamlist;
-
     }
 
     /**
