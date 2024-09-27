@@ -53,6 +53,20 @@ class mixedraschbirnbaum extends model_raschmodel {
     }
 
     /**
+     * Allows subclasses to overwrite the parameters.
+     *
+     * @param stdClass $record
+     * @param array $parameters
+     * @return stdClass
+     */
+    public static function add_parameters_to_record(stdClass $record, array $parameters): stdClass {
+        $record->difficulty = $parameters['difficulty'];
+        $record->discrimination = $parameters['discrimination'];
+        $record->guessing = $parameters['guessing'];
+        return $record;
+    }
+
+    /**
      * Returns the name of this model.
      *
      * @return string
