@@ -52,12 +52,7 @@ class grm extends model_multiparam {
         $difficulties = json_decode($record->json, true)['difficulties'];
         $discrimination = round($record->discrimination, self::PRECISION);
 
-        // $meandifficulty = self::calculate_mean_difficulty([
-        //     'difficulties' => $difficulties,
-        // ]);
-
         return [
-          //  'difficulty' => round($meandifficulty, self::PRECISION),
             'discrimination' => round($discrimination, self::PRECISION),
             'difficulties' => $difficulties,
         ];
@@ -522,18 +517,11 @@ class grm extends model_multiparam {
         ];
     }
 
-//    public function get_parameter_fields(model_item_param $param): array {
-//        if (!$param->get_params_array()) {
-//            return $this->get_default_params();
-//        }
-//        $parameters = ['discrimination' => $param->get_params_array()['discrimination']];
-//        foreach ($param->get_params_array()['difficulties'] as $frac => $val) {
-//            $parameters['difficulty_'.$frac.'_fraction'] = $frac;
-//            $parameters['difficulty_'.$frac.'_difficulty'] = $val;
-//        }
-//        return $parameters;
-//    }
-
+    /**
+     * Get default params
+     *
+     * @return array
+     */
     public function get_default_params(): array {
         return [
             'discrimination' => 1.0,
@@ -541,10 +529,15 @@ class grm extends model_multiparam {
                 '0.00' => 0.00,
                 '0.50' => 0.50,
                 '1.00' => 1.00,
-            ]
+            ],
         ];
     }
 
+    /**
+     * Get multi param name
+     *
+     * @return string
+     */
     protected function get_multi_param_name(): string {
         return 'difficulties';
     }

@@ -53,13 +53,7 @@ class grmgeneralized extends model_multiparam {
         $difficulties = json_decode($record->json, true)['difficulties'];
         $discrimination = round($record->discrimination, self::PRECISION);
 
-       // $meandifficulty = self::calculate_mean_difficulty([
-       //     'difficulties' => $difficulties,
-       //     'discrimination' => $discrimination,
-       // ]);
-
         return [
-        //    'difficulty' => round($meandifficulty, self::PRECISION),
             'discrimination' => $discrimination,
             'difficulties' => $difficulties,
         ];
@@ -588,6 +582,12 @@ class grmgeneralized extends model_multiparam {
         ];
     }
 
+    /**
+     * Get parameter fields
+     *
+     * @param model_item_param $param
+     * @return array
+     */
     public function get_parameter_fields(model_item_param $param): array {
         if (!$param->get_params_array()) {
             return $this->get_default_params();
@@ -595,12 +595,17 @@ class grmgeneralized extends model_multiparam {
         $parameters = ['discrimination' => $param->get_params_array()['discrimination']];
         $counter = 0;
         foreach ($param->get_params_array()['difficulties'] as $frac => $val) {
-            $parameters['fraction_'.++$counter] = $frac;
-            $parameters['difficulty_'.$counter] = $val;
+            $parameters['fraction_' . ++$counter] = $frac;
+            $parameters['difficulty_' . $counter] = $val;
         }
         return $parameters;
     }
 
+    /**
+     * Get default params
+     *
+     * @return array
+     */
     public function get_default_params(): array {
         return [
             'discrimination' => 1.0,
@@ -608,10 +613,15 @@ class grmgeneralized extends model_multiparam {
                 '0.00' => 0.00,
                 '0.50' => 0.50,
                 '1.00' => 1.00,
-            ]
+            ],
         ];
     }
 
+    /**
+     * Get multi param name
+     *
+     * @return string
+     */
     protected function get_multi_param_name(): string {
         return 'difficulties';
     }

@@ -63,13 +63,7 @@ class pcmgeneralized extends model_multiparam {
         $intercepts = json_decode($record->json, true)['intercept'];
         $discrimination = round($record->discrimination, self::PRECISION);
 
-        // $meandifficulty = self::calculate_mean_difficulty([
-        //     'intercept' => $intercepts,
-        //     'discrimination' => $discrimination,
-        // ]);
-
         return [
-          //  'difficulty' => round($meandifficulty, self::PRECISION),
             'discrimination' => $discrimination,
             'intercept' => $intercepts,
         ];
@@ -539,18 +533,11 @@ class pcmgeneralized extends model_multiparam {
         ];
     }
 
-//    public function get_parameter_fields(model_item_param $param): array {
-//        if (!$param->get_params_array()) {
-//            return $this->get_default_params();
-//        }
-//        $parameters = ['discrimination' => $param->get_params_array()['discrimination']];
-//        foreach ($param->get_params_array()['intercept'] as $frac => $val) {
-//            $parameters['intercept_'.$frac.'_fraction'] = $frac;
-//            $parameters['intercept_'.$frac.'_difficulty'] = $val;
-//        }
-//        return $parameters;
-//    }
-
+    /**
+     * Get default params
+     *
+     * @return array
+     */
     public function get_default_params(): array {
         return [
             'discrimination' => 1.0,
@@ -558,10 +545,15 @@ class pcmgeneralized extends model_multiparam {
                 '0.00' => 0.00,
                 '0.50' => 0.50,
                 '1.00' => 1.00,
-            ]
+            ],
         ];
     }
 
+    /**
+     * Get multi param name
+     *
+     * @return string
+     */
     protected function get_multi_param_name(): string {
         return 'intercept';
     }

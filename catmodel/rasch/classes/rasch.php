@@ -24,7 +24,9 @@
 
 namespace catmodel_rasch;
 
+use coding_exception;
 use local_catquiz\catcalc;
+use local_catquiz\local\model\model_item_param;
 use local_catquiz\local\model\model_item_param_list;
 use local_catquiz\local\model\model_person_param_list;
 use local_catquiz\local\model\model_raschmodel;
@@ -431,11 +433,23 @@ class rasch extends model_raschmodel {
         return [[ -1 / ($as ** 2) ]];
     }
 
+    /**
+     * Get default params
+     *
+     * @return array
+     */
     public function get_default_params(): array {
         return ['difficulty' => 0.0];
     }
 
-    public function get_static_param_array(\local_catquiz\local\model\model_item_param $param): array {
+    /**
+     * Get static param array
+     *
+     * @param model_item_param $param
+     * @return array
+     * @throws coding_exception
+     */
+    public function get_static_param_array(model_item_param $param): array {
         $label = get_string('difficulty', 'local_catquiz');
         return [
             $label => $param->get_difficulty(),
