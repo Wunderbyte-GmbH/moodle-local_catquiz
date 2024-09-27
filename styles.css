@@ -122,6 +122,13 @@ div[contenteditable="false"] {
     margin: 1em 0;
     padding: 1em;
     border-radius: 0.4em;
+    /*
+     * Select the second child of the parent (the first is a hidden div)
+     * and remove top border and margin to make it align with other cards.
+     */
+    &:nth-of-type(2){
+        margin-top: 0;
+    }
 }
 
 #lcq_model_override_form .activeparam {
