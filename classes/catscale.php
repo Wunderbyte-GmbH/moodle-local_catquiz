@@ -716,6 +716,10 @@ class catscale {
             $mapping[$oldid] = $newid;
         }
 
+        if (!$mapping) {
+            return;
+        }
+
         // For each new record that was pointed to as active param by a local_catquiz_items item, we duplicate that item
         // for the new context and update the active param to point to the duplicated item param.
         [$insql, $inparams] = $DB->get_in_or_equal(
