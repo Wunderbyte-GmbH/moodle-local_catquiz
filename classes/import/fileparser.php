@@ -58,11 +58,6 @@ class fileparser {
     /**
      * @var string
      */
-    protected $enclosure = '';
-
-    /**
-     * @var string
-     */
     protected $encoding = 'UTF-8';
 
     /**
@@ -152,7 +147,6 @@ class fileparser {
         }
 
         $this->delimiter = !empty($this->settings->delimiter) ? $this->settings->delimiter : 'comma';
-        $this->enclosure = !empty($this->settings->enclosure) ? $this->settings->enclosure : '"';
         $this->encoding = !empty($this->settings->encoding) ? $this->settings->encoding : 'utf-8';
     }
 
@@ -177,7 +171,8 @@ class fileparser {
 
         // TODO: Check if delimiter, enclosure and encoding is correctly set.
         // In $content, is the delimiter set?
-        $readcount = $cir->load_csv_content($content, $this->encoding, $this->delimiter, null, $this->enclosure);
+        // TODO: test
+        $readcount = $cir->load_csv_content($content, $this->encoding, $this->delimiter);
 
         if (empty($readcount)) {
             $this->errors[] = $cir->get_error();
@@ -213,6 +208,16 @@ class fileparser {
             if ($this->validate_data($csvrecord, $line)) {
                 $data = [];
                 foreach ($csvrecord as $columnname => $value) {
+                    // Convert some columns always to float values.
+                    if (in_array($columnname, ['difficulty', 'discrimination', 'guessing'])) {
+                        // Check if there's a comma and no dot, assuming comma is decimal separator.
+                        if (strpos($value, ',') !== false && strpos($value, '.') === false) {
+                            // Replace the comma with a dot.
+                            $value = str_replace(',', '.', $value);
+                        }
+                        $data[$columnname] = floatval($value);
+                        continue;
+                    }
                     $data[$columnname] = $value;
                 }
 
