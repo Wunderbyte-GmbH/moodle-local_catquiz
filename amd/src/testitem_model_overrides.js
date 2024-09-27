@@ -72,8 +72,6 @@ export const init = () => {
 
     dynamicForm.addEventListener(dynamicForm.events.FORM_SUBMITTED, (e) => {
 
-        // eslint-disable-next-line no-console
-        console.log("form submitted");
         e.preventDefault();
         let formcontainer = document.querySelector(
             SELECTORS.FORMCONTAINER);
@@ -86,8 +84,6 @@ export const init = () => {
             component: searchParams.get("component"),
             updateitem: true,
         });
-        // eslint-disable-next-line
-        //window.location.reload();
     });
 
     dynamicForm.addEventListener(dynamicForm.events.NOSUBMIT_BUTTON_PRESSED, (e) => {
