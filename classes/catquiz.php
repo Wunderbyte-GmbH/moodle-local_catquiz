@@ -1341,7 +1341,7 @@ class catquiz {
                 SQL_PARAMS_NAMED,
                 'incatscales'
             );
-            $where .= "AND catscaleid " . $inscalesql;
+            $where .= " AND catscaleid " . $inscalesql;
             $params = array_merge($params, $inscaleparams);
         }
 
