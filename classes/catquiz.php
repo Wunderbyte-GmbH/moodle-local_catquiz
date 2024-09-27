@@ -2428,9 +2428,19 @@ class catquiz {
             $where .= " AND a.instanceid = :testid";
         }
 
+        if ($starttime) {
+            $where .= " AND a.starttime >= :starttime";
+        }
+
+        if ($endtime) {
+            $where .= " AND a.starttime <= :endtime";
+        }
+
         $sql = "SELECT a.attemptid,
             a.userid,
             u.username,
+            u.firstname,
+            u.lastname,
             u.email,
             a.starttime,
             a.endtime,
