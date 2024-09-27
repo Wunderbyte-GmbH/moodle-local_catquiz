@@ -270,7 +270,6 @@ class item_model_override_selector extends dynamic_form {
         }
 
         $selectedmodel = $data->active_model;
-        $modelparam = $this->_form->_defaultValues['itemparams']->offsetGet($selectedmodel);
 
         // Set data for each model in array.
         $formitemparams = [];
@@ -291,26 +290,6 @@ class item_model_override_selector extends dynamic_form {
                 $rec->timecreated = $defaultobj->timecreated;
             }
             $formitemparams[$model] = model_item_param::from_record($rec); //$obj;
-        }
-
-        // If one of the params changed status to 'manually confirmed', then we change the status of the other
-        // models that are also 'manually confirmed' back to the default status.
-        foreach ($formitemparams as $model => $param) {
-            $defaultParam = $this->_form->_defaultValues['itemparams']->offsetGet($model);
-            if ($param->get_status() == LOCAL_CATQUIZ_STATUS_CONFIRMED_MANUALLY
-            && $param->get_status() == $defaultParam->get_status()) {
-                continue;
-            }
-            // If we are here, the status was changed to manually confirmed for this model.
-            foreach ($formitemparams as $othermodel => $otherparam) {
-                if ($othermodel == $model) {
-                    continue;
-                }
-                if ($otherparam->get_status() != LOCAL_CATQUIZ_STATUS_CONFIRMED_MANUALLY) {
-                    continue;
-                }
-                $otherparam->set_status(LOCAL_CATQUIZ_STATUS_NOT_CALCULATED);
-            }
         }
 
         foreach ($formitemparams as $model => $param) {
@@ -660,56 +639,6 @@ class item_model_override_selector extends dynamic_form {
         // We don't need it, as we only use it in modal.
         return new moodle_url('/');
     }
-
-    /**
-     * Validate form.
-     *
-     * @param stdClass $data
-     * @param array $files
-     * @return array $errors
-     */
-    public function validation($data, $files): array {
-        $errors = [];
-        $data = (array) $data;
-        $counter = [];
-
-        foreach ($this->_form->_defaultValues['itemparams'] as $modelname => $param) {
-            $modelparams = $param->get_parameter_fields();
-            $field = sprintf('override_%s', $modelname);
-            $selectkey = sprintf('%s_select', $field);
-
-            // Values can not be empty with certain status.
-            if ($data[$selectkey] == LOCAL_CATQUIZ_STATUS_CALCULATED
-                || $data[$selectkey] == LOCAL_CATQUIZ_STATUS_UPDATED_MANUALLY
-                || $data[$selectkey] == LOCAL_CATQUIZ_STATUS_CONFIRMED_MANUALLY) {
-
-                $empty = true;
-                foreach ($data[$field] as $key => $value) {
-                    foreach (array_keys($modelparams) as $param) {
-                        if (strpos($key, $param) === false || $value === "") {
-                            continue;
-                        }
-                        $empty = false;
-                    }
-                }
-                if ($empty) {
-                    $errors[$field] = get_string("validateform:changevaluesorstatus", 'local_catquiz');
-                }
-            }
-
-            // There can only be 1 status confirmed manually.
-            if ($data[$selectkey] == LOCAL_CATQUIZ_STATUS_CONFIRMED_MANUALLY) {
-                $counter[$field] = $selectkey;
-            }
-        }
-        if (count($counter) > 1) {
-            foreach ($counter as $field => $selectkey) {
-                $errors[$field] = get_string("validateform:onlyoneconfirmedstatusallowed", 'local_catquiz');
-            }
-        }
-        return $errors;
-    }
-
 
     /**
      * Get item params.
