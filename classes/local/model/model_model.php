@@ -164,11 +164,13 @@ abstract class model_model {
     /**
      * Add model specific fields to override model parameters.
      *
-     * @param \MoodleQuickForm $mform
+     * @param MoodleQuickForm $mform
+     * @param model_item_param $param
+     * @param string $groupid
      * @return void
      */
     abstract public function definition_after_data_callback(
-        MoodleQuickForm $mform,
+        MoodleQuickForm &$mform,
         model_item_param $param,
         string $groupid
     ): void;
