@@ -129,7 +129,7 @@ final class strategy_test extends advanced_testcase {
     public function test_import_overrides(string $filename, array $expectedscales): void {
         // 1. Import items.
         global $DB;
-        $this->import_itemparams($filename);
+        $result = $this->import_itemparams($filename);
         [$initems, $initemsparams] = $DB->get_in_or_equal(
             array_keys($expectedscales),
             SQL_PARAMS_NAMED,
@@ -159,6 +159,9 @@ final class strategy_test extends advanced_testcase {
             );
             $this->assertEquals($expected, $scalenames);
         }
+        
+        // Check that there are no errors.
+        $this->assertEquals(0, count($result['errors']), implode(', ', $result['errors']));
     }
 
     /**

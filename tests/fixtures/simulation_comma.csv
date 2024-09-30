@@ -1,2 +1,4 @@
 componentid,status,qtype,model,difficulty,discrimination,guessing,label,catscalename,parentscalenames,componentname
 0,4,Multiple-Choice,raschbirnbaum,"-3,321","0,123","0,1800",SIMA01-02,SimA01,Simulation|SimA,question
+0,4,Multiple-Choice,raschbirnbaum,"1.123","0,123","0,1800",SIMA01-03,SimA01,Simulation|SimA,question
+0,4,Multiple-Choice,raschbirnbaum,"11","0,123","0,1800",SIMA01-04,SimA01,Simulation|SimA,question
