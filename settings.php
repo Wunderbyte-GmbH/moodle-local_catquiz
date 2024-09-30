@@ -118,4 +118,13 @@ if ($hassiteconfig) {
             get_string('store_debug_info_name', 'local_catquiz'),
             get_string('store_debug_info_desc', 'local_catquiz'),
             0));
+
+    // Add a setting for the default maximum attempt duration.
+    $settings->add(new admin_setting_configtext(
+        'local_catquiz/maximum_attempt_duration_hours',
+        get_string('maxattemptduration', 'local_catquiz'),
+        get_string('maxattemptduration_desc', 'local_catquiz'),
+        24, // Default value
+        PARAM_INT // Expect integer type
+    )); 
 }

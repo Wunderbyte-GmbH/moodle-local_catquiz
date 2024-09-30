@@ -102,6 +102,13 @@ class status {
     const EXCEEDED_MAX_ATTEMPT_TIME = 'exceededmaxattempttime';
 
     /**
+     * Indicates that the attempt was closed automatically.
+     *
+     * @var string
+     */
+    const CLOSED_BY_TIMELIMIT = 'attemptclosedbytimelimit';
+
+    /**
      * An undefined status
      *
      * @var string
@@ -124,6 +131,7 @@ class status {
         self::ERROR_EMPTY_FIRST_QUESTION_LIST => 6,
         self::ERROR_NO_ITEMS => 7,
         self::EXCEEDED_MAX_ATTEMPT_TIME => 8,
+        self::CLOSED_BY_TIMELIMIT => 9,
     ];
 
     /**
