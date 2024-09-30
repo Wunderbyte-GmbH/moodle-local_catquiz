@@ -22,6 +22,7 @@
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+use local_catquiz\task\cancel_expired_attempts;
 use local_catquiz\task\recalculate_cat_model_params;
 
 defined('MOODLE_INTERNAL') || die();
@@ -32,6 +33,15 @@ $tasks = [
         'blocking' => 0,
         'minute' => 'R',
         'hour' => '0',
+        'day' => '*',
+        'dayofweek' => '*',
+        'month' => '*',
+    ],
+    [
+        'classname' => cancel_expired_attempts::class,
+        'blocking' => 0,
+        'minute' => '*/5', // Runs every 5 minutes.
+        'hour' => '*',
         'day' => '*',
         'dayofweek' => '*',
         'month' => '*',
