@@ -171,7 +171,6 @@ class fileparser {
 
         // TODO: Check if delimiter, enclosure and encoding is correctly set.
         // In $content, is the delimiter set?
-        // TODO: test
         $readcount = $cir->load_csv_content($content, $this->encoding, $this->delimiter);
 
         if (empty($readcount)) {
