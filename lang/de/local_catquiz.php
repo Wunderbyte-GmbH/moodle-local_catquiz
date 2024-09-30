@@ -34,6 +34,7 @@ $string['abortpersonabilitynotchanged'] = 'Personenparameter unverändert';
 $string['acceptedstandarderror'] = 'akzeptierter Standardfehler';
 $string['acceptedstandarderror_help'] = 'Sobald der Standardfehler einer Skala außerhalb dieser Werte fällt, wird sie nicht weiter getestet.';
 $string['action'] = 'Action';
+$string['activemodel'] = 'Ausgewähltes Modell';
 $string['activitystatussetactive'] = 'Die Frage ist jetzt aktiviert.';
 $string['activitystatussetinactive'] = 'Die Frage ist jetzt deaktiviert.';
 $string['add_testitem_to_scale'] = '{$a->testitemlink} wurde {$a->catscalelink} hinzugefügt.';

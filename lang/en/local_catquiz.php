@@ -34,6 +34,7 @@ $string['abortpersonabilitynotchanged'] = 'Person parameter did not change';
 $string['acceptedstandarderror'] = 'Accepted standarderror';
 $string['acceptedstandarderror_help'] = 'If the standard error for a scale is outside of this range, the scale will no longer be tested.';
 $string['action'] = 'Action';
+$string['activemodel'] = 'Active model';
 $string['activitystatussetactive'] = 'Testitem is now active.';
 $string['activitystatussetinactive'] = 'Testitem is now inactive.';
 $string['add_testitem_to_scale'] = '{$a->testitemlink} added to {$a->catscalelink}';
