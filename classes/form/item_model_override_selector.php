@@ -140,7 +140,7 @@ class item_model_override_selector extends dynamic_form {
         $selectactive = $mform->createElement(
             'select',
             'active_model',
-            'Active model TODO translate',
+            get_string('activemodel', 'local_catquiz'),
             array_combine(
                 array_keys($models), array_map(fn($m) => get_string('pluginname', sprintf('catmodel_%s', $m)), array_keys($models))
             ),
