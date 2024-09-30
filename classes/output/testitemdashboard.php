@@ -15,6 +15,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 namespace local_catquiz\output;
+use core\chart_axis;
 
 defined('MOODLE_INTERNAL') || die();
 
@@ -145,6 +146,9 @@ class testitemdashboard implements renderable, templatable {
                 get_string('pluginname', sprintf('catmodel_%s', $item->get_model_name()))
             );
         }
+        $yaxis = new chart_axis();
+        $yaxis->set_min(0);
+        $chart->set_yaxis($yaxis);
         $chart = html_writer::tag('div', $OUTPUT->render($chart), ['dir' => 'ltr']);
 
         $returnarray[] = [
