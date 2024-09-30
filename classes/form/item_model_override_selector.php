@@ -123,7 +123,7 @@ class item_model_override_selector extends dynamic_form {
      *
      * The form is passed via reference.
      *
-     * @param MoodleQuickForm $mform,
+     * @param MoodleQuickForm $mform
      * @param stdClass $data
      * @return void
      */
