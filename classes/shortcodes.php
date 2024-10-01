@@ -259,6 +259,7 @@ class shortcodes {
      * @throws Exception
      */
     private static function populate_arguments(array $args): array {
+        global $COURSE;
         if ($args['testid'] ?? null) {
             $cmid = $args['testid'];
             // The 'testid' is actually the cmid. But we want the id of our test instance.
@@ -276,7 +277,11 @@ class shortcodes {
         }
 
         $globalscale = $args['globalscale'] ?? null;
-        $courseid = optional_param('id', $args['courseid'] ?? 0, PARAM_INT);
+        $currentcourseid = 0;
+        if (isset($COURSE) && !empty($COURSE->id) && $COURSE->id > 1) {
+            $currentcourseid = $COURSE->id;
+        }
+        $courseid = $args['courseid'] ?? $currentcourseid;
         if (!$globalscale) {
             if ($courseid == 0) {
                 throw new Exception(get_string('catquizstatistics_askforparams', 'local_catquiz'));
