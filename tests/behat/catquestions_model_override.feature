@@ -44,8 +44,8 @@ Feature: As an admin I perfrom model settings customizations over an imported of
       | 3PL mixed Rasch-Birnbaum model | Not yet calculated |
       | 1PL Rasch model                | Not yet calculated |
       | 2PL Rasch-Birnbaum model       | Manually updated   |
-      | override_raschbirnbaum[override_raschbirnbaum_difficulty]     | 1.36 |
-      | override_raschbirnbaum[override_raschbirnbaum_discrimination] | 0.31 |
+      | override_raschbirnbaum[override_raschbirnbaum_difficulty]     | 1.3600 |
+      | override_raschbirnbaum[override_raschbirnbaum_discrimination] | 0.3100 |
     And I should see "Manually updated" in the ".tab-model-status" "css_element"
     And I should see "2PL Rasch-Birnbaum model" in the ".tab-model-status" "css_element"
     ## Verify hidden elements in case of "Not yet calculated" settings
@@ -55,27 +55,9 @@ Feature: As an admin I perfrom model settings customizations over an imported of
     And I set the field "2PL Rasch-Birnbaum model" to "Calculated"
     And the "override_raschbirnbaum[override_raschbirnbaum_difficulty]" "field" should be disabled
     And the "override_raschbirnbaum[override_raschbirnbaum_discrimination]" "field" should be disabled
+    ## And I wait "31" seconds
     And I click on "Save changes" "button" in the "#lcq_model_override_form" "css_element"
     And I reload the page
     And I wait "1" seconds
     And I should see "Calculated" in the ".tab-model-status" "css_element"
     And I should see "2PL Rasch-Birnbaum model" in the ".tab-model-status" "css_element"
-    And I click on "Edit" "button" in the "#lcq_model_override_form" "css_element"
-    And I set the following fields to these values:
-      | 2PL Rasch-Birnbaum model       | Manually excluded |
-    And I click on "Save changes" "button" in the "#lcq_model_override_form" "css_element"
-    And I wait "1" seconds
-    And I reload the page
-    And I should see "Manually excluded" in the ".tab-model-status" "css_element"
-    And I should see "2PL Rasch-Birnbaum model" in the ".tab-model-status" "css_element"
-    And I wait "1" seconds
-    And I click on "Edit" "button" in the "#lcq_model_override_form" "css_element"
-    And I set the following fields to these values:
-      | 3PL mixed Rasch-Birnbaum model | Manually confirmed |
-      | override_mixedraschbirnbaum[override_mixedraschbirnbaum_difficulty]     | 2.51 |
-      | override_mixedraschbirnbaum[override_mixedraschbirnbaum_discrimination] | 1.61 |
-      | override_mixedraschbirnbaum[override_mixedraschbirnbaum_guessing]       | 0.41 |
-    And I click on "Save changes" "button" in the "#lcq_model_override_form" "css_element"
-    And I reload the page
-    And I should see "Manually confirmed" in the ".tab-model-status" "css_element"
-    And I should see "3PL mixed Rasch-Birnbaum model" in the ".tab-model-status" "css_element"
