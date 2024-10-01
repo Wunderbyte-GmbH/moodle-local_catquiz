@@ -28,12 +28,6 @@ const SELECTORS = {
     ACTIVEMODELSELECT: '[name="active_model"]'
 };
 
-// eslint-disable-next-line no-console
-console.log(SELECTORS.ACTIVEMODELSELECT);
-// eslint-disable-next-line no-console
-console.log(SELECTORS.FORMCONTAINER);
-// eslint-disable-next-line no-console
-console.log(SELECTORS.MODELSTATUSSELECTS);
 const disabledStates = ["0", "-5"];
 
 /**
