@@ -118,9 +118,9 @@ class filterbytestinfo extends preselect_task implements wb_middleware {
             $exclude = $testpotential + $testinformation <= 1 / $this->context['se_max'] ** 2
                 && count($this->progress->get_playedquestions(true, $scaleid)) >= $this->context['min_attempts_per_scale'];
             if ($exclude && $this->progress->is_active_scale($scaleid)) {
-                $this->progress->deactivate_scale($scaleid);
+                $this->progress->deactivate_scale($scaleid, true);
                 getenv('CATQUIZ_CREATE_TESTOUTPUT') && printf(
-                    "%d: deact %s%s",
+                    "%d: [TI] deact %s%s",
                     count($this->progress->get_playedquestions()),
                     (catscale::return_catscale_object($scaleid))->name,
                     PHP_EOL
@@ -128,10 +128,16 @@ class filterbytestinfo extends preselect_task implements wb_middleware {
                 continue;
             }
             if ($enable  && !$this->progress->is_dropped_scale($scaleid) && !$this->progress->is_active_scale($scaleid)) {
+                // For allsubs, do not directly activate the scale but remove the lock so that it can be activated again
+                // if all scales have reached the minimum questions per scale.
+                if ($context['teststrategy'] === LOCAL_CATQUIZ_STRATEGY_ALLSUBS) {
+                    $this->progress->unlock_scale($scaleid);
+                    continue;
+                }
                 // Enable the scale.
-                $this->progress->add_active_scale($scaleid);
+                $this->progress->add_active_scale($scaleid, true);
                 getenv('CATQUIZ_CREATE_TESTOUTPUT') && printf(
-                    "%d: enact %s (%f >= %f)%s",
+                    "%d: [TI] enact %s (%f >= %f)%s",
                     count($this->progress->get_playedquestions()),
                     (catscale::return_catscale_object($scaleid))->name,
                     $testpotential + $testinformation,

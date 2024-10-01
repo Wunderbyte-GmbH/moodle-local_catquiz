@@ -112,6 +112,14 @@ class progress implements JsonSerializable {
     private array $droppedscales;
 
     /**
+     * If a scale is locked, it can not be activated or deactivated without
+     * using a `force` parameter.
+     *
+     * @var array
+     */
+    private array $lockedscales;
+
+    /**
      * @var array $responses
      */
     private array $responses;
@@ -321,6 +329,7 @@ class progress implements JsonSerializable {
         }
         $instance->abilities = (array) $data->abilities;
         $instance->forcedbreakend = intval($data->forcedbreakend) ?: null;
+        $instance->lockedscales = property_exists($data, 'lockedscales') ? (array) $data->lockedscales : [];
         $instance->usageid = $data->usageid;
         $instance->session = $data->session ?? null;
         $instance->excludedquestions = $data->excludedquestions ?? [];
@@ -383,6 +392,7 @@ class progress implements JsonSerializable {
         $instance->responses = [];
         $instance->abilities = [];
         $instance->forcedbreakend = null;
+        $instance->lockedscales = [];
         $instance->usageid = null;
         $instance->hasnewresponse = false;
         $instance->session = sesskey();
@@ -412,6 +422,7 @@ class progress implements JsonSerializable {
             'responses' => $this->responses,
             'abilities' => $this->abilities,
             'forcedbreakend' => $this->forcedbreakend,
+            'lockedscales' => $this->lockedscales,
             'usageid' => $this->usageid,
             'session' => $this->session,
             'excludedquestions' => $this->excludedquestions,
@@ -659,10 +670,19 @@ class progress implements JsonSerializable {
      * Adds the given scale to the list of active scales.
      *
      * @param int $scaleid The scale ID
+     * @param bool $force If set to true, also a locked scale will be set to active.
      * @return self
      */
-    public function add_active_scale(int $scaleid) {
-        if (! in_array($scaleid, $this->activescales)) {
+    public function add_active_scale(int $scaleid, bool $force = false) {
+        if ($this->is_dropped_scale($scaleid)) {
+            // Skip - a dropped scale can not be re-activated.
+            return $this;
+        }
+        if (
+            !in_array($scaleid, $this->activescales)
+            && (!array_key_exists($scaleid, $this->lockedscales) || $force)
+        ) {
+            unset($this->lockedscales[$scaleid]);
             $this->activescales[] = $scaleid;
         }
         return $this;
@@ -672,10 +692,13 @@ class progress implements JsonSerializable {
      * This will mark the given scales as active.
      *
      * @param array $scales
+     * @param bool $force If set to true, also a locked scale will be set to active.
      * @return $this
      */
-    public function set_active_scales(array $scales) {
-        $this->activescales = $scales;
+    public function set_active_scales(array $scales, bool $force = false) {
+        foreach ($scales as $scaleid) {
+            $this->add_active_scale($scaleid, $force);
+        }
         return $this;
     }
 
@@ -683,9 +706,13 @@ class progress implements JsonSerializable {
      * Deactivates the given scaleid
      *
      * @param int $scaleid
+     * @param bool $lock If true, the scale can only be re-activated with the 'force' parameter.
      * @return $this
      */
-    public function deactivate_scale(int $scaleid) {
+    public function deactivate_scale(int $scaleid, bool $lock = false) {
+        if ($lock) {
+            $this->lockedscales[$scaleid] = true;
+        }
         if (!in_array($scaleid, $this->activescales)) {
             return $this;
         }
@@ -716,6 +743,27 @@ class progress implements JsonSerializable {
      */
     public function is_dropped_scale($scaleid) {
         return array_key_exists($scaleid, $this->droppedscales);
+    }
+
+    /**
+     * Ensures that the scale with the given sclaeid is not locked.
+     *
+     * @param int $scaleid
+     * @return self
+     */
+    public function unlock_scale($scaleid): self {
+        unset($this->lockedscales[$scaleid]);
+        return $this;
+    }
+
+    /**
+     * Returns if the given scale is locked.
+     *
+     * @param int $scaleid
+     * @return bool
+     */
+    public function is_locked(int $scaleid): bool {
+        return array_key_exists($scaleid, $this->lockedscales);
     }
 
     /**
