@@ -21,9 +21,6 @@
  * @author David Szkiba <david.szkiba@wunderbyte.at>
  * @copyright  2023 Georg Maißer <info@wunderbyte.at>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- * @autor David Szkiba <david.szkiba@wunderbyte.at>
- * @copirignt 2023 Georg Maißer <info@wunderbyte.at>
- * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 namespace local_catquiz;
@@ -47,10 +44,21 @@ final class cancel_expired_attempts_test extends basic_testcase {
     /**
      * Test if the newton raphson multi stable function returns expected outputs.
      *
-     * @dataProvider attempt_expiration_is_detected_correctly_provider
+     * @param int $attemptcreated
+     * @param ?int $quizmaxtime
+     * @param int $defaultmaxtime
+     * @param int $now
+     * @param bool $expected
      * @return void
+     * @dataProvider attempt_expiration_is_detected_correctly_provider
      */
-    public function test_attempt_expiration_is_detected_correctly(int $attemptcreated, ?int $quizmaxtime, int $defaultmaxtime, int $now, bool $expected) {
+    public function test_attempt_expiration_is_detected_correctly(
+        int $attemptcreated,
+        ?int $quizmaxtime,
+        int $defaultmaxtime,
+        int $now,
+        bool $expected
+    ): void {
         $task = new cancel_expired_attempts();
         $shouldbecompleted = $task->exceeds_maxtime($attemptcreated, $quizmaxtime, $defaultmaxtime, $now);
         $this->assertEquals($expected, $shouldbecompleted);

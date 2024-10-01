@@ -34,6 +34,8 @@ use mod_adaptivequiz\local\attempt\attempt;
 use mod_adaptivequiz\local\attempt\attempt_state;
 use stdClass;
 
+defined('MOODLE_INTERNAL') || die();
+
 global $CFG;
 require_once("$CFG->dirroot/mod/adaptivequiz/locallib.php");
 
@@ -155,6 +157,7 @@ class cancel_expired_attempts extends \core\task\scheduled_task {
      * @param int $timecreated Timestamp when the attempt was created
      * @param ?int $quizmaxtime Maximum time specified by the quiz
      * @param int $defaultmaxtime Default maximum time
+     * @param int $now
      * @return bool
      */
     public function exceeds_maxtime(int $timecreated, ?int $quizmaxtime, int $defaultmaxtime, int $now): bool {
