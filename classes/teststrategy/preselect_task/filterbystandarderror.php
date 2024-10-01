@@ -96,7 +96,7 @@ class filterbystandarderror extends preselect_task implements wb_middleware {
 
             if ($drop) {
                 getenv('CATQUIZ_CREATE_TESTOUTPUT') && printf(
-                    "%d: drop %s%s",
+                    "%d: [SE] drop %s%s",
                     count($this->progress->get_playedquestions()),
                     (catscale::return_catscale_object($scaleid))->name, PHP_EOL
                 );
@@ -122,7 +122,7 @@ class filterbystandarderror extends preselect_task implements wb_middleware {
                         $inheritval
                     );
                     getenv('CATQUIZ_CREATE_TESTOUTPUT') && printf(
-                        "%d: inhere %s - pp: %.5f\n",
+                        "%d: [SE] inhere %s - pp: %.5f\n",
                         count($this->progress->get_playedquestions()),
                         (catscale::return_catscale_object($subscaleid))->name,
                         $inheritval

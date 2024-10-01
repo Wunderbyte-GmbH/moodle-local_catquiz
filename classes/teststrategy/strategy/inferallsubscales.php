@@ -37,6 +37,7 @@ use local_catquiz\teststrategy\preselect_task\addscalestandarderror;
 use local_catquiz\teststrategy\preselect_task\checkbreak;
 use local_catquiz\teststrategy\preselect_task\checkitemparams;
 use local_catquiz\teststrategy\preselect_task\checkpagereload;
+use local_catquiz\teststrategy\preselect_task\filterbyquestionsperscale;
 use local_catquiz\teststrategy\preselect_task\filterbystandarderror;
 use local_catquiz\teststrategy\preselect_task\filterbytestinfo;
 use local_catquiz\teststrategy\preselect_task\firstquestionselector;
@@ -103,6 +104,7 @@ class inferallsubscales extends strategy {
             noremainingquestions::class, // Cancel quiz attempt if no questions are left.
             filterbystandarderror::class,
             filterbytestinfo::class,
+            filterbyquestionsperscale::class, // Exclude scales that have the min questions until all scales have min questions.
             inferallsubscalesscore::class,
         ];
     }
