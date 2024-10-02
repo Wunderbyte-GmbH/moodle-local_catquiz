@@ -55,12 +55,12 @@ final class catquiz_test extends advanced_testcase {
      *
      * @param array $enrolementarray
      * @param array $expected
-     *
+     * @return void
      * @throws InvalidArgumentException
      * @throws ExpectationFailedException
      *
      */
-    public function test_create_strings_for_enrolement_notification(array $enrolementarray, array $expected) {
+    public function test_create_strings_for_enrolement_notification(array $enrolementarray, array $expected): void {
 
         $result = [];
         $result = catquiz::create_strings_for_enrolement_notification($enrolementarray);

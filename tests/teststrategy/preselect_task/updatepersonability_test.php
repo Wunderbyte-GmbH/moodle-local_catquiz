@@ -54,12 +54,12 @@ final class updatepersonability_test extends TestCase {
      * @param mixed $context
      * @param array $progressfakes
      *
-     * @return mixed
+     * @return void
      * @throws InvalidArgumentException
      * @throws ExpectationFailedException
      *
      */
-    public function test_ability_calculation_is_skipped_correctly($expected, $lastquestion, $context, $progressfakes) {
+    public function test_ability_calculation_is_skipped_correctly($expected, $lastquestion, $context, $progressfakes): void {
         // We can not add a stub in the provider, so we do it here.
         $progressstub = $this->createStub(progress::class);
         $progressstub->method('get_last_question')
@@ -157,7 +157,7 @@ final class updatepersonability_test extends TestCase {
      * @param bool $wascalculated
      * @param array $fakeabilities
      * @param ?float $abilitymainscale
-     *
+     * @return void
      * @dataProvider we_use_the_correct_initial_ability_provider
      */
     public function test_we_use_the_correct_initial_ability(
@@ -165,7 +165,7 @@ final class updatepersonability_test extends TestCase {
         bool $wascalculated,
         array $fakeabilities,
         ?float $abilitymainscale = null
-    ) {
+    ): void {
         /*
          * The updatepersonaiblity_testing class is a slightly modified version
          * of the updatepersonability class that makes testing easier.

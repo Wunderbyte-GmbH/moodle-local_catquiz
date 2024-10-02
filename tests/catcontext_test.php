@@ -46,7 +46,7 @@ final class catcontext_test extends basic_testcase {
      *
      * @return void
      */
-    public function test_default_context_is_installed() {
+    public function test_default_context_is_installed(): void {
         global $DB;
         $contexts = $DB->get_records('local_catquiz_catcontext');
         $this->assertGreaterThan(0, count($contexts));

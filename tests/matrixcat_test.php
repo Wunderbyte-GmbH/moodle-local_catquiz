@@ -51,7 +51,7 @@ final class matrixcat_test extends basic_testcase {
      * @throws InvalidArgumentException
      * @throws ExpectationFailedException
      */
-    public function test_build_callable_array() {
+    public function test_build_callable_array(): void {
         $fnarray = [fn ($x) => 1 * $x, fn ($x) => 2 * $x, fn ($x) => 3 * $x];
         $expected = [5, 10, 15];
         $callablearray = matrixcat::build_callable_array($fnarray);
@@ -70,12 +70,12 @@ final class matrixcat_test extends basic_testcase {
      * @param mixed|null $c
      * @param array $options
      *
-     * @return mixed
+     * @return void
      * @throws InvalidArgumentException
      * @throws ExpectationFailedException
      *
      */
-    public function test_multi_sum($expected, $a, $b = null, $c = null, $options = []) {
+    public function test_multi_sum($expected, $a, $b = null, $c = null, $options = []): void {
         if (array_key_exists('callable_arg', $options)) {
             $x = $options['callable_arg'];
             $this->assertSame($expected, matrixcat::multi_sum($a($x), $b($x)));

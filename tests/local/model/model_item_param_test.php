@@ -43,10 +43,10 @@ final class model_item_param_test extends advanced_testcase {
      *
      * @param array $record
      * @param array $parameters
-     *
+     * @return void
      * @group large
      */
-    public function test_read_item_param_from_db(array $record, array $parameters) {
+    public function test_read_item_param_from_db(array $record, array $parameters): void {
         global $DB;
         $this->resetAfterTest();
         // First insert an item param so that we can later read one.
@@ -191,7 +191,7 @@ final class model_item_param_test extends advanced_testcase {
      * @param model_item_param $itemparam
      * @return void
      */
-    public function test_write_item_param_to_db(model_item_param $itemparam) {
+    public function test_write_item_param_to_db(model_item_param $itemparam): void {
         $this->resetAfterTest();
         $itemparam->save();
 

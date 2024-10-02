@@ -57,7 +57,7 @@ final class attemptfeedback_test extends advanced_testcase {
         array $expected,
         array $feedbackdata,
         array $quizsettings
-    ) {
+    ): void {
         // We use a mock object so that we can work with the quiz settings and feedbackdata that we get from the data provider.
         // The rest of the attemptfeedback class is unchanged.
         $attemptfeedback = $this->getMockBuilder(attemptfeedback::class)
@@ -160,7 +160,7 @@ final class attemptfeedback_test extends advanced_testcase {
         array $expected,
         array $feedbackdata,
         array $quizsettings
-    ) {
+    ): void {
         // We use a mock object so that we can work with the quiz settings and feedbackdata that we get from the data provider.
         // The rest of the attemptfeedback class is unchanged.
         $attemptfeedback = $this->getMockBuilder(attemptfeedback::class)

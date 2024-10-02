@@ -57,7 +57,7 @@ final class customscalefeedback_test extends basic_testcase {
      * @throws ExpectationFailedException
      * @dataProvider get_studentfeedback_provider
      */
-    public function test_get_studentfeedback(array $feedbackdata, array $expected) {
+    public function test_get_studentfeedback(array $feedbackdata, array $expected): void {
 
         $feedbacksettings = new feedbacksettings(LOCAL_CATQUIZ_STRATEGY_LOWESTSUB);
 

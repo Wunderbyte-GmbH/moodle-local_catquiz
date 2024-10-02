@@ -49,7 +49,7 @@ final class personability_loader_test extends TestCase {
      * @throws InvalidArgumentException
      * @throws ExpectationFailedException
      */
-    public function test_personability_loader_works_as_expected() {
+    public function test_personability_loader_works_as_expected(): void {
         // This is almost the same class as the real personability_loader. It
         // just changes the part that retrieves the person abilities from the
         // database.
