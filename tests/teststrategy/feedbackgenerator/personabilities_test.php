@@ -65,7 +65,7 @@ final class personabilities_test extends advanced_testcase {
         array $expected,
         array $abilityrange,
         array $testitemsforcatscale,
-        array $fisherinfo) {
+        array $fisherinfo): void {
 
         $progressmock = $this->getMockBUilder(progress::class)
             ->onlyMethods([

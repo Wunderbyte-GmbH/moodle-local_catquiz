@@ -46,7 +46,7 @@ final class mathcat_test extends basic_testcase {
      *
      * @return void
      */
-    public function test_newton_raphson_multi_stable() {
+    public function test_newton_raphson_multi_stable(): void {
         $result = mathcat::newton_raphson_multi_stable(
             fn ($x) => [0],
             fn ($x) => [0],

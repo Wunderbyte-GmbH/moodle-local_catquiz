@@ -79,7 +79,7 @@ final class catcalc_test extends basic_testcase {
         float $mean,
         float $sd,
         string $personid
-    ) {
+    ): void {
         $ability = catcalc::estimate_person_ability($responses, $items, $startvalue, $mean, $sd);
         if (abs($ability) > 10.0) {
             $this->markTestSkipped('The ability is outside the trusted region.');
@@ -151,7 +151,7 @@ final class catcalc_test extends basic_testcase {
      *
      * @dataProvider ability_can_be_calculated_with_all_models_provider
      */
-    public function test_ability_can_be_calculated_with_all_models(model_item_param_list $items, array $responses) {
+    public function test_ability_can_be_calculated_with_all_models(model_item_param_list $items, array $responses): void {
         $this->doesNotPerformAssertions();
         $ability = catcalc::estimate_person_ability($responses, $items);
     }

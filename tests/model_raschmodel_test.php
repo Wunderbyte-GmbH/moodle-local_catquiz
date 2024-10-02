@@ -60,7 +60,7 @@ final class model_raschmodel_test extends basic_testcase {
      * @param model_responses $responses
      * @param callable $function
      *
-     * @return mixed
+     * @return void
      * @throws InvalidArgumentException
      * @throws ExpectationFailedException
      *
@@ -71,7 +71,7 @@ final class model_raschmodel_test extends basic_testcase {
         model_item_param $item,
         model_responses $responses,
         callable $function
-    ) {
+    ): void {
         $result = $function($personabilities, $item, $responses);
         $this->assertEquals($expected, sprintf("%.4f", $result));
     }

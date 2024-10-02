@@ -62,7 +62,7 @@ final class mayberemovescale_test extends basic_testcase {
         $expected,
         $attemptcontext,
         $played
-    ) {
+    ): void {
         $progressstub = $this->createStub(progress::class);
         $progressstub->method('get_playedquestions')
             ->willReturn(

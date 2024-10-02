@@ -58,7 +58,7 @@ final class feedback_helper_test extends advanced_testcase {
         int $timerange,
         int $timestamp,
         string $expected
-    ) {
+    ): void {
         $datestringlabel = feedback_helper::return_datestring_label($timerange, $timestamp);
         $this->assertEquals($expected, $datestringlabel);
     }
@@ -119,7 +119,7 @@ final class feedback_helper_test extends advanced_testcase {
         float $value,
         int $classwidth,
         int $expected
-    ) {
+    ): void {
         $this->assertEquals($expected, feedback_helper::get_histogram_bin($value, $classwidth));
     }
 

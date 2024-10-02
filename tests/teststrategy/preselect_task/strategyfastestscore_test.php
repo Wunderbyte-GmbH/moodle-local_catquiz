@@ -53,7 +53,7 @@ final class strategyfastestscore_test extends basic_testcase {
      */
     public function test_returns_expected_question_from_expected_catscale(
         array $context, $expected
-    ) {
+    ): void {
         $next = fn () => 'nevercalled';
         $result = (new strategyfastestscore())->run(
             $context,

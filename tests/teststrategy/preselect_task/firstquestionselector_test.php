@@ -57,7 +57,7 @@ final class firstquestionselector_test extends basic_testcase {
     public function test_median_ability_of_personparams_is_calculated_correctly(
         float $expected,
         array $personparams
-    ) {
+    ): void {
         $firstquestionselector = new firstquestionselector();
         $this->assertEquals(
             $expected,
