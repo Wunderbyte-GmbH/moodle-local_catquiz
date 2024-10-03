@@ -406,7 +406,7 @@ class model_strategy {
     private function create_installed_models(): array {
         /** @var array<model_model> $instances */
         $instances = [];
-        $ignorelist = ['mixedraschbirnbaum', 'grmgeneralized'];
+        $ignorelist = ['mixedraschbirnbaum', 'grmgeneralized', 'grm', 'pcmgeneralized', 'pcm'];
 
         foreach (self::get_installed_models() as $name => $classname) {
             if (in_array($name, $ignorelist)) {
