@@ -32,11 +32,11 @@ use local_catquiz\wb_middleware;
 
 /**
  * Includes or excludes scales based on the number of questions played
- * 
+ *
  * This is used in the "infer all subscales" strategy. To allow for evenly distributed selections of scales, we do the following:
  * - If a scale has the minimum number of questions per scale and there are other scales that do not have it, deactivate the scale.
  * - If all scales have the minimum number of questions per scale, re-activate all of them.
- * 
+ *
  * This step should be executed _before_ the "filterbytestinfo" task, so that it overrides it.
  *
  * @package local_catquiz

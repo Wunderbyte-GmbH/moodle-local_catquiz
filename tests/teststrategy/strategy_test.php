@@ -1887,8 +1887,8 @@ final class strategy_test extends advanced_testcase {
                     'fake_use_tr_factor' => false,
                 ],
                 'final_abilities' => [
-                    'Simulation' => -3.71, //
-                    'SimA' => -3.7, //
+                    'Simulation' => -3.71,
+                    'SimA' => -3.7,
                     'SimA01' => -3.6,
                     'SimA02' => -3.7,
                     'SimA03' => -3.79,
