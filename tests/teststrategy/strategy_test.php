@@ -2095,8 +2095,8 @@ final class strategy_test extends advanced_testcase {
         $initialabilities = loadpersonparams(
             $CFG->dirroot . '/local/catquiz/tests/fixtures/persons.csv', 'Gesamt'
         );
-        $strategy = new model_strategy($responses, [], $initialabilities);
-        $result = $strategy->run_estimation('12345');
+        $strategy = new model_strategy($responses, []);
+        $result = $strategy->run_estimation('1', $initialabilities);
         $this->assertEquals(true, false);
     }
 
