@@ -159,7 +159,7 @@ final class strategy_test extends advanced_testcase {
             );
             $this->assertEquals($expected, $scalenames);
         }
-        
+
         // Check that there are no errors.
         $this->assertEquals(0, count($result['errors']), implode(', ', $result['errors']));
     }
