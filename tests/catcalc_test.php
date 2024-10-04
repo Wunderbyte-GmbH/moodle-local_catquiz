@@ -179,7 +179,7 @@ final class catcalc_test extends basic_testcase {
             ],
         ]);
         $pcmgeneralizedjson = json_encode([
-            'intercept' => [
+            intercepts => [
                 '0.000' => 0.00,
                 '0.333' => 0.42,
                 '0.666' => 0.57,
@@ -187,7 +187,7 @@ final class catcalc_test extends basic_testcase {
             ],
         ]);
         $pcmjson = json_encode([
-            'intercept' => [
+            intercepts => [
                 '0.000' => 0.10,
                 '0.333' => 0.48,
                 '0.666' => 0.53,
