@@ -71,38 +71,6 @@ class grmgeneralized extends model_multiparam {
     // Definitions and Dimensions.
 
     /**
-     * Defines names if item parameter list
-     *
-     * @param array $ip
-     * @return array of string
-     */
-    public static function get_fractions(array $ip): array {
-        $frac = [];
-
-        foreach ($ip['difficulties'] as $fraction => $val) {
-            if ($fraction > 0 && $fraction <= 1) {
-                $frac[] = $fraction;
-            }
-        }
-        sort($frac);
-        return $frac;
-    }
-
-    /**
-     * Defines names if item parameter list
-     *
-     * @param float $frac
-     * @param array $fractions
-     *
-     * @return array of string
-     */
-    public static function get_category(float $frac, array $fractions): int {
-        // TODO: Auf die systemweit eingestellte Precission abrunden, mit Nullen auffüllen, auf nächst-klieinere fraction abrunden.
-
-        return $k = array_search($frac, $fractions);
-    }
-
-    /**
      * Goes modified to mathcat.php.
      *
      * @param array $ip
@@ -264,12 +232,33 @@ class grmgeneralized extends model_multiparam {
      *
      */
     public static function calculate_mean_difficulty(array $ip): float {
-        $fractions = self::get_fractions($ip);
+        $ip['difficulties'] = self::sanitize_fractions($ip['difficulties']);
+        $fractions = self::get_fractions($ip['difficulties']);
         $kmax = max(array_keys($fractions));
 
-        // Ralf: stimmt das so? Bei fractions 0.00, 0.33, 0.66 und 1.0 berechnet das den Wert von (0.66 + 1.0)/ 2.
         return ($ip['difficulties'][$fractions[1]] + $ip['difficulties'][$fractions[$kmax]]) / 2;
     }
+
+    /**
+     * Get all fractions out of parts of ip array
+     *
+     * @param array $array
+     * @return array of fractions as strings
+     */
+    protected static function get_fractions(array $array): array {
+        $frac = [];
+        $frac[0] = 0;
+
+        $a = self::sort_fractions($array);
+
+        foreach ($a as $fraction => $val) {
+            if ((float) $fraction > 0 && (float) $fraction <= 1) {
+                $frac[] = $fraction;
+            }
+        }
+        return $frac;
+    }
+
     // Calculate the Likelihood.
 
     /**
@@ -283,27 +272,80 @@ class grmgeneralized extends model_multiparam {
     public static function likelihood(array $pp, array $ip, float $frac): float {
         $ability = $pp['ability'];
 
-        $a = $ip['difficulties'];
+        $a = self::sort_fractions($ip['difficulties']);
         $b = $ip['discrimination'];
 
         // Make sure $frac is between 0.0 and 1.0.
         $frac = min(1.0, max(0.0, $frac));
-        $fractions = self::get_fractions($ip);
+        $fractions = self::get_fractions($a);
         $kmax = max(array_keys($fractions));
 
-        switch ($frac) {
-            case 0.0:
-                $a = array_values($a);
-                return 1 - 1 / (1 + exp($b * ($a[0] - $ability)));
-            case $fractions[$kmax]:
-                $a = array_values($a);
-                return 1 / (1 + exp($b * ($a[$kmax] - $ability)));
-            default:
-                // Get corresponding category.
-                $k = array_search($frac, array_keys($ip['difficulties']));
-                $a = array_values($a);
-                return 1 / (1 + exp($b * ($a[$k] - $ability))) - 1 / (1 + exp($b * ($a[$k + 1] - $ability)));
-        }
+        $k = self::get_key_by_fractions($frac, $a);
+
+        $result = ($k == 0) ? (1) : (1 / (1 + exp($b * ($a[$fractions[$k]] - $ability))));
+        $result -= ($k == $kmax) ? (0) : (1 / (1 + exp($b * ($a[$fractions[$k + 1]] - $ability))));
+
+        return $result;
+    }
+
+    /**
+     * Calculates the 1st derivate of the Likelihood
+     *
+     * @param array $pp - person ability parameter
+     * @param array $ip - item parameters ('difficulty', 'discrimination')
+     * @param float $frac - answer fraction (0 ... 1.0)
+     * @return float
+     */
+    protected static function likelihood_p(array $pp, array $ip, float $frac): float {
+        $ability = $pp['ability'];
+
+        $a = self::sort_fractions($ip['difficulties']);
+        $b = $ip['discrimination'];
+
+        // Make sure $frac is between 0.0 and 1.0.
+        $frac = min(1.0, max(0.0, $frac));
+        $fractions = self::get_fractions($a);
+        $kmax = max(array_keys($fractions));
+
+        $k = self::get_key_by_fractions($frac, $a);
+
+        $result = ($k == 0) ? (0) : ($b * exp($b * ($a[$fractions[$k]] - $ability)) /
+            (1 + exp($b * ($a[$fractions[$k]] - $ability))) ** 2);
+        $result -= ($k == $kmax) ? (0) : ($b * exp($b * ($a[$fractions[$k + 1]] - $ability)) /
+            (1 + exp($b * ($a[$fractions[$k + 1]] - $ability))) ** 2);
+
+        return $result;
+    }
+
+    /**
+     * Calculates the 2nd derivate of the Likelihood
+     *
+     * @param array $pp - person ability parameter
+     * @param array $ip - item parameters ('difficulty', 'discrimination')
+     * @param float $frac - answer fraction (0 ... 1.0)
+     * @return float
+     */
+    protected static function likelihood_p_p(array $pp, array $ip, float $frac): float {
+        $ability = $pp['ability'];
+
+        $a = self::sort_fractions($ip['difficulties']);
+        $b = $ip['discrimination'];
+
+        // Make sure $frac is between 0.0 and 1.0.
+        $frac = min(1.0, max(0.0, $frac));
+        $fractions = self::get_fractions($a);
+        $kmax = max(array_keys($fractions));
+
+        $k = self::get_key_by_fractions($frac, $a);
+
+        $result = ($k == 0) ? 0 : ($b ** 2 * exp($b * ($a[$fractions[$k]] - $ability)) *
+            (exp($b * ($a[$fractions[$k]] - $ability)) - 1) /
+            (1 + exp($b * ($a[$fractions[$k]] - $ability))) ** 3);
+        $result -= ($k == $kmax) ? (0) : ($b ** 2 * exp($b * ($a[$fractions[$k + 1]] - $ability)) *
+            (exp($b * ($a[$fractions[$k + 1]] - $ability)) - 1) /
+            (1 + exp($b * ($a[$fractions[$k + 1]] - $ability))) ** 3);
+
+        return $result;
     }
 
     // Calculate the LOG Likelihood and its derivatives.
@@ -329,29 +371,8 @@ class grmgeneralized extends model_multiparam {
      * @return float - 1st derivative of log likelihood with respect to $pp
      */
     public static function log_likelihood_p(array $pp, array $ip, float $frac): float {
-        $ability = $pp['ability'];
-
-        $a = array_values($ip['difficulties']);
-        $b = $ip['discrimination'];
-
-        // Make sure $frac is between 0.0 and 1.0.
-        $frac = min(1.0, max(0.0, $frac));
-        $fractions = self::get_fractions($ip);
-        $kmax = max(array_keys($fractions));
-
-        switch ($frac) {
-            case 0.0:
-                return -$b / (exp($b * ($a[0] - $ability)) + 1);
-            case $fractions[$kmax]:
-                $a = array_values($a);
-                return ($b * exp($a[$kmax] * $b)) / (exp($a[$kmax] * $b) + exp($b * $ability));
-            default:
-                // Get corresponding category.
-                $k = array_search($frac, $ip['difficulties']);
-                $a = array_values($a);
-                return ($b * (exp($b * ($a[$k] + $a[$k + 1] - 2 * $ability)) - 1))
-                    / ((exp($b * ($a[$k] - $ability)) + 1) * (exp($b * ($a[$k + 1] - $ability)) + 1));
-        }
+        // We do it the easy way by using the log'f(x) = f'(x)/f(x) method.
+        return self::likelihood_p($pp, $ip, $frac) / self::likelihood($pp, $ip, $frac);
     }
 
     /**
@@ -363,34 +384,9 @@ class grmgeneralized extends model_multiparam {
      * @return float - 2nd derivative of log likelihood with respect to $pp
      */
     public static function log_likelihood_p_p(array $pp, array $ip, float $frac): float {
-        $ability = $pp['ability'];
-
-        $a = $ip['difficulties'];
-        $b = $ip['discrimination'];
-
-        // Make sure $frac is between 0.0 and 1.0.
-        $frac = min(1.0, max(0.0, $frac));
-        $fractions = self::get_fractions($ip);
-        $kmax = max(array_keys($fractions));
-
-        switch ($frac) {
-            case 0.0:
-                $a = array_values($a);
-                return -($b ** 2 * exp($b * ($a[0] - $ability))) / (exp($b * ($a[0] - $ability)) + 1) ** 2;
-            case $fractions[$kmax]:
-                $a = array_values($a);
-                return -($b ** 2 * exp($a[$kmax] * $b + $b * $ability)) / (exp($a[$kmax] * $b) + exp($b * $ability)) ** 2;
-            default:
-                // Get corresponding category.
-                $k = array_search($frac, array_keys($ip['difficulties']));
-                $a = array_values($a);
-                return -(2 * $b ** 2 * exp($b * ($a[$k] + $a[$k + 1] - 2 * $ability)))
-                    / ((exp($b * ($a[$k] - $ability)) + 1) * (exp($b * ($a[$k + 1] - $ability)) + 1))
-                    + ($b ** 2 * exp($b * ($a[$k] - $ability)) * (exp($b * ($a[$k] + $a[$k + 1] - 2 * $ability)) - 1))
-                    / ((exp($b * ($a[$k] - $ability)) + 1) ** 2 * (exp($b * ($a[$k + 1] - $ability)) + 1))
-                    + ($b ** 2 * exp($b * ($a[$k + 1] - $ability)) * (exp($b * ($a[$k] + $a[$k + 1] - 2 * $ability)) - 1))
-                    / ((exp($b * ($a[$k] - $ability)) + 1) * (exp($b * ($a[$k + 1] - $ability)) + 1) ** 2);
-        }
+        // We do it the easy way by using the log''f(x) = (f(x)*f''(x)-f'(x)^2)/f(x)^2 method.
+        return (self::likelihood($pp, $ip, $frac) * self::likelihood_p_p($pp, $ip, $frac) -
+            self::likelihood_p($pp, $ip, $frac) ** 2) / self::likelihood($pp, $ip, $frac) ** 2;
     }
 
     /**

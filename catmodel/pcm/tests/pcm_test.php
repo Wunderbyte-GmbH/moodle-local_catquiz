@@ -17,12 +17,12 @@
 /**
  * Tests for core_message_inbound to test Variable Envelope Return Path functionality.
  *
- * @package    catmodel_grmgeneralized
+ * @package    catmodel_pcm
  * @copyright  2023 Georg Maißer <info@wunderbyte.at>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-namespace catmodel_grmgeneralized;
+namespace catmodel_pcm;
 
 use catmodel_rasch\rasch;
 use local_catquiz\local\model\model_model;
@@ -34,12 +34,12 @@ use local_catquiz\local\model\model_responses;
 /**
  * Tests for core_message_inbound to test Variable Envelope Return Path functionality.
  *
- * @package    catmodel_grmgeneralized
+ * @package    catmodel_pcm
  * @copyright  2023 Georg Maißer <info@wunderbyte.at>
  *
- * @covers \catmodel_grmgeneralized\grmgeneralized
+ * @covers \catmodel_pcm\pcm
  */
-final class grmgeneralized_test extends TestCase {
+final class pcm_test extends TestCase {
 
     /**
      * This test calls the get_log_jacobain function with the model and test its output with verified data.
@@ -88,7 +88,7 @@ final class grmgeneralized_test extends TestCase {
      * @return void
      */
     public function test_likelihood(array $pp, float $frac, array $ip, float $expected): void {
-        $result = grmgeneralized::likelihood($pp, $ip, $frac);
+        $result = pcm::likelihood($pp, $ip, $frac);
 
         // We only verify for four commas after the dot.
         $expected = (float)sprintf("%.6f", $expected);
@@ -107,7 +107,7 @@ final class grmgeneralized_test extends TestCase {
      * @return void
      */
     public function test_log_likelihood_p(array $pp, float $frac, array $ip, float $expected): void {
-        $result = grmgeneralized::log_likelihood_p($pp, $ip, $frac);
+        $result = pcm::log_likelihood_p($pp, $ip, $frac);
 
         // We only verify for four commas after the dot.
         $expected = (float)sprintf("%.6f", $expected);
@@ -126,7 +126,7 @@ final class grmgeneralized_test extends TestCase {
      * @return void
      */
     public function test_log_likelihood_p_p(array $pp, float $frac, array $ip, float $expected): void {
-        $result = grmgeneralized::log_likelihood_p_p($pp, $ip, $frac);
+        $result = pcm::log_likelihood_p_p($pp, $ip, $frac);
 
         // We only verify for four commas after the dot.
         $expected = (float)sprintf("%.6f", $expected);
@@ -187,29 +187,26 @@ final class grmgeneralized_test extends TestCase {
         $ability = [-3, -1.5, 1.5];
         $frac = [0, 0.5, 1];
         $parameter = [
-            ["discrimination" => 0.7,
-            "difficulties" => [
+            ["intercept" => [
                 "0.0" => 0,
                 "0.5" => -3.5,
                 "1.0" => -2.5,
             ]],
-            ["discrimination" => 2.0,
-            "difficulties" => [
+            ["intercept" => [
                 "0.0" => 0,
                 "0.5" => -1,
                 "1.0" => 1.5,
             ]],
-            ["discrimination" => 1.5,
-            "difficulties" => [
+            ["intercept" => [
                 "0.0" => 0,
                 "0.5" => 0.5,
                 "1.0" => 1.0,
             ]],
         ];
         $expected = [
-            [0.413382421, 0.173235158, 0.413382421],
-            [0.731058579, 0.266468798, 0.002472623],
-            [0.182425524, 0.138395777, 0.679178699],
+            [0.274068619, 0.451862762, 0.274068619],
+            [0.610975051, 0.370575101, 0.018449848],
+            [0.121951652, 0.331498960, 0.546549387],
         ];
 
         $providedarray = [];
@@ -236,29 +233,26 @@ final class grmgeneralized_test extends TestCase {
         $ability = [-3, -1.5, 1.5];
         $frac = [0, 0.5, 1];
         $parameter = [
-            ["discrimination" => 0.7,
-            "difficulties" => [
+            ["intercept" => [
                 "0.0" => 0,
                 "0.5" => -3.5,
                 "1.0" => -2.5,
             ]],
-            ["discrimination" => 2.0,
-            "difficulties" => [
+            ["intercept" => [
                 "0.0" => 0,
                 "0.5" => -1,
                 "1.0" => 1.5,
             ]],
-            ["discrimination" => 1.5,
-            "difficulties" => [
+            ["intercept" => [
                 "0.0" => 0,
                 "0.5" => 0.5,
                 "1.0" => 1.0,
             ]],
         ];
         $expected = [
-            [-0.410632305, 0.000000000, 0.410632305],
-            [-0.537882843, 1.457171911, 1.995054754],
-            [-1.226361714, -0.745129763, 0.481231951],
+            [-1, 0, 1],
+            [-0.407474797, 0.592525203, 1.592525203],
+            [-1.424597735, -0.424597735, 0.575402265],
         ];
 
         $providedarray = [];
@@ -285,29 +279,26 @@ final class grmgeneralized_test extends TestCase {
         $ability = [-3, -1.5, 1.5];
         $frac = [0, 0.5, 1];
         $parameter = [
-            ["discrimination" => 0.7,
-            "difficulties" => [
+            ["intercept" => [
                 "0.0" => 0,
                 "0.5" => -3.5,
                 "1.0" => -2.5,
             ]],
-            ["discrimination" => 2.0,
-            "difficulties" => [
+            ["intercept" => [
                 "0.0" => 0,
                 "0.5" => -1,
                 "1.0" => 1.5,
             ]],
-            ["discrimination" => 1.5,
-            "difficulties" => [
+            ["intercept" => [
                 "0.0" => 0,
                 "0.5" => 0.5,
                 "1.0" => 1.0,
             ]],
         ];
         $expected = [
-            [-0.118823724, -0.237647447, -0.118823724],
-            [-0.786447733, -0.79631377, -0.009866037],
-            [-0.335579517, -0.825843253, -0.490263736],
+            [-0.548137238, -0.548137238, -0.548137238],
+            [-0.278338783, -0.278338783, -0.278338783],
+            [-0.488217803, -0.488217803, -0.488217803],
         ];
 
         $providedarray = [];
@@ -345,9 +336,9 @@ final class grmgeneralized_test extends TestCase {
     /**
      * Get model.
      *
-     * @return grmgeneralized
+     * @return pcm
      */
-    private function getmodel(): grmgeneralized {
-        return model_model::get_instance('grmgeneralized');
+    private function getmodel(): pcm {
+        return model_model::get_instance('pcm');
     }
 }

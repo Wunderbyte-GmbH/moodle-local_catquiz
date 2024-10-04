@@ -276,7 +276,6 @@ $string['enrolementstringstartforfeedback'] = 'Auf Grundlage Ihres Ergebnisses s
 $string['enrolled_courses'] = 'Eingeschriebene Kurse';
 $string['enrolmentmessagetitle'] = 'Benachrichtigung über neue Kurseinschreibung(en) / Gruppenmitgliedschaft(en)';
 $string['error'] = 'Es ist ein Fehler aufgetreten';
-$string['error:permissionforcsvdownload'] = 'Ihnen fehlt die notwendige Berechtigung ({$a}), die gewünschte Informationen herunterzuladen.';
 $string['error:fraction0'] = 'Leider konnten wir aufgrund Ihrer Antworten kein zuverlässiges Ergebnis ermitteln.
     Wir würden uns freuen, wenn Sie es erneut versuchen.';
 $string['error:fraction1'] = 'Herzlichen Glückwunsch, Sie haben alle Fragen richtig beantwortet! Das ist wirklich großartig!
@@ -289,6 +288,7 @@ $string['error:nminscale'] = 'Leider konnten wir kein Ergebnis ermitteln, da im 
 $string['error:noscalestoreport'] = 'Leider konnten wir mit der aktuellen Anzahl an gestellten Fragen in den getesteten Bereichen
 kein verlässliches Ergebnis ermitteln. Wir empfehlen Ihnen, sich an die Verantwortlichen für den Test zu wenden und zu bitten,
 die Anzahl der zu beantwortenden Fragen zu erhöhen.';
+$string['error:permissionforcsvdownload'] = 'Ihnen fehlt die notwendige Berechtigung ({$a}), die gewünschte Informationen herunterzuladen.';
 $string['error:rootonly'] = '';
 $string['error:semax'] = 'Leider konnten wir in den getesteten Bereichen kein Ergebnis mit der vorgegebenen Mindestgenauigkeit ermitteln.
     Wir empfehlen Ihnen, sich an die Verantwortlichen für den Test zu wenden und zu bitten, die Anzahl der zu beantwortenden Fragen zu erhöhen.';
@@ -318,12 +318,12 @@ $string['feedback_details_description'] = 'Die folgende Tabelle listet alle
     Teilbereiche (Skalen) von „{$a}“ auf, für die der Test ein zuverlässiges Ergebnis
     ermitteln konnte';
 $string['feedback_details_heading'] = 'Details zu Ihrem Ergebnis';
-$string['feedback_details_lowestskill'] = 'Teilbereich (Skala) „<b>{$a->name}</b>“ wurde mit einem
-    persönlichen Fähigkeits-Wert von {$a->value} (± {$a->se}) als Ihr größtes
-    Defizit ermittelt.';
 $string['feedback_details_highestskill'] = 'Teilbereich (Skala) „<b>{$a->name}</b>“ wurde mit einem
     persönlichen Fähigkeits-Wert von {$a->value} (± {$a->se}) als Ihre größte
     Stärke ermittelt.';
+$string['feedback_details_lowestskill'] = 'Teilbereich (Skala) „<b>{$a->name}</b>“ wurde mit einem
+    persönlichen Fähigkeits-Wert von {$a->value} (± {$a->se}) als Ihr größtes
+    Defizit ermittelt.';
 $string['feedback_tab_clicked'] = 'Klick auf Feedback Tab';
 $string['feedback_tab_clicked_description'] = 'Nutzer {$a->userid} hat auf Feedback {$a->feedback_translated} in {$a->attemptlink} geklickt';
 $string['feedback_table_answercorrect'] = 'Richtig';
@@ -397,7 +397,6 @@ $string['includetimelimit_help'] = 'Maximaldauer festlegen, die für die Durchf�
 $string['inferallsubscales'] = 'Alle angegebenen Skalen abprüfen';
 $string['infergreateststrength'] = 'Größte Stärke diagnostizieren';
 $string['inferlowestskillgap'] = 'Unterste Kompetenzlücke diagnostizieren';
-$string['relevantscales'] = 'Skalen im Kompetenzbereich abprüfen';
 $string['instance'] = 'Test';
 $string['integratequestions'] = 'Fragen aus untergeordneten Skalen einbeziehen';
 $string['invisible'] = 'Unsichtbar';
@@ -562,6 +561,7 @@ $string['quizgraphicalsummary'] = 'Quizverlauf';
 $string['reachedmaximumquestions'] = 'Die Maximalanzahl an Testfragen wurde erreicht';
 $string['recalculationscheduled'] = 'Neuberechnung der Kontext-Paremeter wurde veranlasst';
 $string['recentevents'] = 'Letzte Bearbeitungen';
+$string['relevantscales'] = 'Skalen im Kompetenzbereich abprüfen';
 $string['removetestitem'] = 'Testitems entfernen';
 $string['removetestitembody'] = 'Wollen Sie folgende Testitems aus aktuellen Skale entfernen? <br> {$a->data}';
 $string['removetestitemsubmit'] = 'Entfernen';

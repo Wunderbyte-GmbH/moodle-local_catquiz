@@ -53,7 +53,7 @@ final class mayberemovescale_test extends basic_testcase {
      * @param mixed $attemptcontext
      * @param mixed $played
      *
-     * @return mixed
+     * @return void
      * @throws InvalidArgumentException
      * @throws ExpectationFailedException
      *

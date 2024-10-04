@@ -273,7 +273,6 @@ $string['enrolementstringstartforfeedback'] = 'Based on your results you are now
 $string['enrolled_courses'] = 'Enrolled courses';
 $string['enrolmentmessagetitle'] = 'Notification about new course / group enrolments';
 $string['error'] = 'An error occured';
-$string['error:permissionforcsvdownload'] = 'You do not have the necessary permission ({$a}) to download the requested information.';
 $string['error:fraction0'] = 'Unfortunately, we were unable to determine a valid result based on your answers. We would be pleased if you would try again.';
 $string['error:fraction1'] = 'Congratulations, you have answered all the questions correctly! That is really awesome!
     However, due to this excellent performance, we were unable to determine a conclusive result.';
@@ -285,6 +284,8 @@ $string['error:nminscale'] = 'Unfortunately, we were unable to determine a resul
 $string['error:noscalestoreport'] = 'Unfortunately, with the current number of questions asked in the areas tested,
     we were unable to determine a reliable result. We recommend that you contact those responsible for the test
     and ask them to increase the number of questions to be answered.';
+$string['error:permissionforcsvdownload'] = 'You do not have the necessary permission ({$a}) to download the requested information.';
+
 $string['error:rootonly'] = '';
 $string['error:semax'] = 'Unfortunately, we were unable to determine a result with the specified minimum accuracy in the areas tested.
     We recommend that you contact those responsible for the test and ask them to increase the number of questions to be answered.';
@@ -379,7 +380,6 @@ $string['includetimelimit_help'] = 'Define a maximum duration for an attempt to 
 $string['inferallsubscales'] = 'Infer all subscales';
 $string['infergreateststrength'] = 'Infer greatest strength';
 $string['inferlowestskillgap'] = 'Infer lowest skill gap';
-$string['relevantscales'] = 'Infer relevant subscales';
 $string['instance'] = 'Test';
 $string['integratequestions'] = 'Integrate questions from subscales';
 $string['invisible'] = 'Invisible';
@@ -543,6 +543,7 @@ $string['quizgraphicalsummary'] = 'Quiz progress summary';
 $string['reachedmaximumquestions'] = 'Reached maximum number of questions';
 $string['recalculationscheduled'] = 'Recalculation of the context parameters has been scheduled';
 $string['recentevents'] = 'Recent Events';
+$string['relevantscales'] = 'Infer relevant subscales';
 $string['removetestitem'] = 'Remove test items';
 $string['removetestitembody'] = 'Do you want to remove the following test items from the current CAT scale? <br> {$a->data}';
 $string['removetestitemsubmit'] = 'Remove';
