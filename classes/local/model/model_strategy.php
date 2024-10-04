@@ -59,7 +59,7 @@ class model_strategy {
      *
      * @var int
      */
-    const MAX_ITERATIONS = 4; // TODO: get value from DB?
+    const MAX_ITERATIONS = 2; // TODO: get value from DB?
 
     /**
      * @var model_responses Contains necessary data for estimation
@@ -116,9 +116,9 @@ class model_strategy {
      */
     private int $catscaleid;
 
-    /*
+    /**
      * Tracks the parameters calculated by iteration round and model.
-     * 
+     *
      * @var array<array<model_item_param_list>> $calculatedparams
      */
     private array $calculatedparams;
@@ -149,17 +149,17 @@ class model_strategy {
         $this->set_options($options);
         $this->olditemparams = $olditemparams;
 
-        if ($savedpersonabilities === null || count($savedpersonabilities) === 0) {
-            $savedpersonabilities = $responses->get_person_abilities();
-        } else if (count($savedpersonabilities) < count($initial = $responses->get_person_abilities())) {
-            $newusers = array_diff(
-                array_keys($initial->get_person_params()),
-                array_keys($savedpersonabilities->get_person_params()));
-            foreach ($newusers as $userid) {
-                $savedpersonabilities->add(new model_person_param($userid));
-            }
-        }
-        $this->initialpersonabilities = $savedpersonabilities;
+        // if ($savedpersonabilities === null || count($savedpersonabilities) === 0) {
+        //     $savedpersonabilities = $responses->get_person_abilities();
+        // } else if (count($savedpersonabilities) < count($initial = $responses->get_person_abilities())) {
+        //     $newusers = array_diff(
+        //         array_keys($initial->get_person_params()),
+        //         array_keys($savedpersonabilities->get_person_params()));
+        //     foreach ($newusers as $userid) {
+        //         $savedpersonabilities->add(new model_person_param($userid));
+        //     }
+        // }
+        // $this->initialpersonabilities = $savedpersonabilities;
 
         foreach (array_keys($this->models) as $model) {
             $this->set_calculated_progress($model, null);

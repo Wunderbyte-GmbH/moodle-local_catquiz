@@ -46,7 +46,7 @@ class model_item_response {
     /**
      * @var model_person_param personparams
      */
-    private model_person_param $personparams;
+    private ?model_person_param $personparams = null;
 
     /**
      * Set parameters for class instance.
@@ -56,7 +56,7 @@ class model_item_response {
      * @param model_person_param $personparams
      *
      */
-    public function __construct(string $itemid, float $response, model_person_param $personparams) {
+    public function __construct(string $itemid, float $response, ?model_person_param $personparams = null) {
         $this->itemid = $itemid;
         $this->response = $response;
         $this->personparams = $personparams;
@@ -85,9 +85,8 @@ class model_item_response {
      * Return ability.
      *
      * @return model_person_param
-     *
      */
-    public function get_personparams(): model_person_param {
+    public function get_personparams(): ?model_person_param {
         return $this->personparams;
     }
 }
