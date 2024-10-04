@@ -210,7 +210,7 @@ class grmgeneralized extends model_multiparam {
      * @return array
      *
      */
-    public function calculate_params($itemresponse): array {
+    public function calculate_params($itemresponse, ?model_item_param $startvalue = null): array {
         return catcalc::estimate_item_params($itemresponse, $this);
     }
 
