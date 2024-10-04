@@ -120,7 +120,7 @@ class pcm extends model_multiparam {
      * @return array
      */
     public static function get_parameter_names(): array {
-        return ['intercepts', 'discrimination'];
+        return ['intercepts', 'difficulty'];
 
     }
 
@@ -177,7 +177,7 @@ class pcm extends model_multiparam {
     public static function calculate_mean_difficulty(array $ip): float {
         $ip['intercepts'] = self::sanitize_fractions($ip['intercepts']);
         $fractions = self::get_fractions($ip['intercepts']);
-        $kmax = max(array_keys($fractions));
+        $kmax = count($fractions) - 1;
 
         return ($ip['intercepts'][$fractions[1]] + $ip['intercepts'][$fractions[$kmax]]) / 2;
     }
@@ -198,7 +198,7 @@ class pcm extends model_multiparam {
         $a = self::sanitize_fractions($ip['intercepts']);
 
         $fractions = self::get_fractions($a);
-        $kmax = max(array_keys($fractions));
+        $kmax = count($fractions) - 1;
 
         // Calculation the denominator of the formulae.
         $denominator = 0;
@@ -245,7 +245,7 @@ class pcm extends model_multiparam {
         $a = self::sanitize_fractions($ip['intercepts']);
 
         $fractions = self::get_fractions($a);
-        $kmax = max(array_keys($fractions));
+        $kmax = count($fractions) - 1;
 
         // Calculation the denominator of the formulae.
         $denominator = 0;
@@ -275,7 +275,7 @@ class pcm extends model_multiparam {
         $a = self::sanitize_fractions($ip['intercepts']);
 
         $fractions = self::get_fractions($a);
-        $kmax = max(array_keys($fractions));
+        $kmax = count($fractions) - 1;
 
         // Calculation the denominator of the formulae.
         $denominator = 0;

@@ -99,17 +99,6 @@ class grm extends model_multiparam {
     }
 
     /**
-     * Defines names if item parameter list
-     *
-     * The parameters have the following structure.
-     * [
-     *   'difficultiy': [fraction1: difficulty1, fraction2: difficulty2, ..., fractionk: difficultyk],
-     *   'discrimination': discrimination
-     * ]
-     * @return array of string
-     */
-
-    /**
      * Get parameter names
      *
      * This will have the following structure.
