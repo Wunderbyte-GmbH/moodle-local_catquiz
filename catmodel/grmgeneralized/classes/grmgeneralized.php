@@ -124,7 +124,7 @@ class grmgeneralized extends model_multiparam {
      * @return array
      */
     public static function get_parameter_names(): array {
-        return ['discrimination', 'difficulties'];
+        return ['discrimination', 'difficulties', 'difficulty'];
     }
 
     /**
