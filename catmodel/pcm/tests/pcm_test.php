@@ -187,17 +187,17 @@ final class pcm_test extends TestCase {
         $ability = [-3, -1.5, 1.5];
         $frac = [0, 0.5, 1];
         $parameter = [
-            ["intercept" => [
+            ["intercepts" => [
                 "0.0" => 0,
                 "0.5" => -3.5,
                 "1.0" => -2.5,
             ]],
-            ["intercept" => [
+            ["intercepts" => [
                 "0.0" => 0,
                 "0.5" => -1,
                 "1.0" => 1.5,
             ]],
-            ["intercept" => [
+            ["intercepts" => [
                 "0.0" => 0,
                 "0.5" => 0.5,
                 "1.0" => 1.0,
@@ -233,17 +233,17 @@ final class pcm_test extends TestCase {
         $ability = [-3, -1.5, 1.5];
         $frac = [0, 0.5, 1];
         $parameter = [
-            ["intercept" => [
+            ["intercepts" => [
                 "0.0" => 0,
                 "0.5" => -3.5,
                 "1.0" => -2.5,
             ]],
-            ["intercept" => [
+            ["intercepts" => [
                 "0.0" => 0,
                 "0.5" => -1,
                 "1.0" => 1.5,
             ]],
-            ["intercept" => [
+            ["intercepts" => [
                 "0.0" => 0,
                 "0.5" => 0.5,
                 "1.0" => 1.0,
@@ -279,17 +279,17 @@ final class pcm_test extends TestCase {
         $ability = [-3, -1.5, 1.5];
         $frac = [0, 0.5, 1];
         $parameter = [
-            ["intercept" => [
+            ["intercepts" => [
                 "0.0" => 0,
                 "0.5" => -3.5,
                 "1.0" => -2.5,
             ]],
-            ["intercept" => [
+            ["intercepts" => [
                 "0.0" => 0,
                 "0.5" => -1,
                 "1.0" => 1.5,
             ]],
-            ["intercept" => [
+            ["intercepts" => [
                 "0.0" => 0,
                 "0.5" => 0.5,
                 "1.0" => 1.0,

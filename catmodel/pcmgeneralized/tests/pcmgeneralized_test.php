@@ -188,19 +188,19 @@ final class pcmgeneralized_test extends TestCase {
         $frac = [0, 0.5, 1];
         $parameter = [
             ["discrimination" => 0.7,
-            "intercept" => [
+            "intercepts" => [
                 "0.0" => 0,
                 "0.5" => -3.5,
                 "1.0" => -2.5,
             ]],
             ["discrimination" => 2.0,
-            "intercept" => [
+            "intercepts" => [
                 "0.0" => 0,
                 "0.5" => -1,
                 "1.0" => 1.5,
             ]],
             ["discrimination" => 1.5,
-            "intercept" => [
+            "intercepts" => [
                 "0.0" => 0,
                 "0.5" => 0.5,
                 "1.0" => 1.0,
@@ -237,19 +237,19 @@ final class pcmgeneralized_test extends TestCase {
         $frac = [0, 0.5, 1];
         $parameter = [
             ["discrimination" => 0.7,
-            "intercept" => [
+            "intercepts" => [
                 "0.0" => 0,
                 "0.5" => -3.5,
                 "1.0" => -2.5,
             ]],
             ["discrimination" => 2.0,
-            "intercept" => [
+            "intercepts" => [
                 "0.0" => 0,
                 "0.5" => -1,
                 "1.0" => 1.5,
             ]],
             ["discrimination" => 1.5,
-            "intercept" => [
+            "intercepts" => [
                 "0.0" => 0,
                 "0.5" => 0.5,
                 "1.0" => 1.0,
@@ -286,19 +286,19 @@ final class pcmgeneralized_test extends TestCase {
         $frac = [0, 0.5, 1];
         $parameter = [
             ["discrimination" => 0.7,
-            "intercept" => [
+            "intercepts" => [
                 "0.0" => 0,
                 "0.5" => -3.5,
                 "1.0" => -2.5,
             ]],
             ["discrimination" => 2.0,
-            "intercept" => [
+            "intercepts" => [
                 "0.0" => 0,
                 "0.5" => -1,
                 "1.0" => 1.5,
             ]],
             ["discrimination" => 1.5,
-            "intercept" => [
+            "intercepts" => [
                 "0.0" => 0,
                 "0.5" => 0.5,
                 "1.0" => 1.0,
