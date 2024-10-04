@@ -294,6 +294,7 @@ final class catquiz_test extends advanced_testcase {
      * @param int $catscaleid
      * @param bool $isenrolled
      *
+     * @return void
      * @dataProvider user_is_enrolled_according_to_ability_and_scale_setting_provider
      */
     public function test_user_is_enrolled_according_to_ability_and_scale_settings(
@@ -301,7 +302,7 @@ final class catquiz_test extends advanced_testcase {
         array $personabilities,
         int $catscaleid,
         bool $isenrolled
-    ) {
+    ): void {
         global $USER;
         // This is necessary so that phpunit does not throw an error if the database is changed.
         $this->resetAfterTest();

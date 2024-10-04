@@ -54,7 +54,6 @@ class pcm extends model_multiparam {
 
         return [
             'intercept' => $intercepts,
-            'discrimination' => round($record->discrimination, self::PRECISION),
         ];
     }
 
@@ -68,39 +67,6 @@ class pcm extends model_multiparam {
     }
 
     // Definitions and Dimensions.
-
-    /**
-     * Defines names if item parameter list
-     *
-     * @param array $ip
-     * @return array of string
-     */
-    public static function get_fractions(array $ip): array {
-        $frac = [];
-
-        foreach ($ip['intercept'] as $fraction => $val) {
-            $frac[] = $fraction;
-        }
-
-        $frac = array_unique($frac);
-        sort($frac);
-        return $frac;
-    }
-
-    /**
-     * Defines names if item parameter list
-     *
-     * @param float $frac
-     * @param array $fractions
-     *
-     * @return int
-     */
-    public static function get_category(float $frac, array $fractions): int {
-
-        for ($k = 0; $fractions[$k] < $frac; $k++);
-
-        return $k;
-    }
 
     /**
      * Goes modified to mathcat.php.
@@ -209,15 +175,11 @@ class pcm extends model_multiparam {
      *
      */
     public static function calculate_mean_difficulty(array $ip): float {
-
-        $fractions = self::get_fractions($ip);
+        $ip['intercept'] = self::sanitize_fractions($ip['intercept']);
+        $fractions = self::get_fractions($ip['intercept']);
         $kmax = max(array_keys($fractions));
-        $sum = 0;
 
-        for ($k = 1; $k < $kmax; $k++) {
-            $sum += $ip['intercept'][$fractions[$k]];
-        }
-        return $sum / $kmax;
+        return ($ip['intercept'][$fractions[1]] + $ip['intercept'][$fractions[$kmax]]) / 2;
     }
 
     // Calculate the Likelihood.
@@ -233,23 +195,26 @@ class pcm extends model_multiparam {
     public static function likelihood(array $pp, array $ip, float $frac): float {
         $ability = $pp['ability'];
 
-        $fractions = self::get_fractions($ip);
-        $kmax = max(array_keys($fractions));
+        $a = self::sanitize_fractions($ip['intercept']);
 
-        // Making sure, that the first intercept is 0, so that for k=0: 1=exp(0*pp - intercept).
-        $ip['intercept'][$fractions[0]] = 0;
+        $fractions = self::get_fractions($a);
+        $kmax = max(array_keys($fractions));
 
         // Calculation the denominator of the formulae.
         $denominator = 0;
         $intercepts = 0;
-        for ($k = 0; $k < $kmax; $k++) {
-            $intercepts += $ip['intercept'][$fractions[$k]];
+        for ($k = 0; $k <= $kmax; $k++) {
+            $intercepts += ($k == 0) ? (0) : $a[$fractions[$k]];
             $denominator += exp($k * $ability - $intercepts);
         }
 
         // Calculation the probability.
-        $k = self::get_category($frac, $fractions);
-        return exp($k * $pp['ability'] - $intercepts) / $denominator;
+        $kfrac = self::get_key_by_fractions($frac, $a);
+        $intercepts = 0;
+        for ($k = 0; $k <= $kfrac; $k++) {
+            $intercepts += ($k == 0) ? (0) : ($a[$fractions[$k]]);
+        }
+        return exp($kfrac * $ability - $intercepts) / $denominator;
     }
 
     // Calculate the LOG Likelihood and its derivatives.
@@ -277,25 +242,22 @@ class pcm extends model_multiparam {
     public static function log_likelihood_p(array $pp, array $ip, float $frac): float {
         $ability = $pp['ability'];
 
-        $fractions = self::get_fractions($ip);
-        $kmax = max(array_keys($fractions));
+        $a = self::sanitize_fractions($ip['intercept']);
 
-        // Making sure, that the first intercept is 0, so that for k=0: 1=exp(0*pp - intercept).
-        $ip['intercept'][$fractions[0]] = 0;
+        $fractions = self::get_fractions($a);
+        $kmax = max(array_keys($fractions));
 
         // Calculation the denominator of the formulae.
         $denominator = 0;
         $firstderivative = 0;
-        $secondderivative = 0;
         $intercepts = 0;
-        for ($k = 0; $k < $kmax; $k++) {
-            $intercepts += $ip['intercept'][$fractions[$k]];
+        for ($k = 0; $k <= $kmax; $k++) {
+            $intercepts += ($k == 0) ? (0) : ($a[$fractions[$k]]);
             $denominator += exp($k * $ability - $intercepts);
             $firstderivative += $k * exp($k * $ability - $intercepts);
-            $secondderivative += $k ** 2 * exp($k * $ability - $intercepts);
         }
-        $k = self::get_category($frac, $fractions);
 
+        $k = self::get_key_by_fractions($frac, $a);
         return $k - $firstderivative / $denominator;
     }
 
@@ -310,19 +272,18 @@ class pcm extends model_multiparam {
     public static function log_likelihood_p_p(array $pp, array $ip, float $frac): float {
         $ability = $pp['ability'];
 
-        $fractions = self::get_fractions($ip);
-        $kmax = max(array_keys($fractions));
+        $a = self::sanitize_fractions($ip['intercept']);
 
-        // Making sure, that the first intercept is 0, so that for k=0: 1=exp(0*pp - intercept).
-        $ip['intercept'][$fractions[0]] = 0;
+        $fractions = self::get_fractions($a);
+        $kmax = max(array_keys($fractions));
 
         // Calculation the denominator of the formulae.
         $denominator = 0;
         $firstderivative = 0;
         $secondderivative = 0;
         $intercepts = 0;
-        for ($k = 0; $k < $kmax; $k++) {
-            $intercepts += $ip['intercept'][$fractions[$k]];
+        for ($k = 0; $k <= $kmax; $k++) {
+            $intercepts += ($k == 0) ? (0) : ($a[$fractions[$k]]);
             $denominator += exp($k * $ability - $intercepts);
             $firstderivative += $k * exp($k * $ability - $intercepts);
             $secondderivative += $k ** 2 * exp($k * $ability - $intercepts);
@@ -431,19 +392,6 @@ class pcm extends model_multiparam {
         $amin = floatval(get_config('catmodel_raschbirnbaumb', 'trusted_region_min_a'));
         $amax = floatval(get_config('catmodel_raschbirnbaumb', 'trusted_region_max_a'));
 
-        // Set values for disrciminatory parameter.
-        $b = $ip['discrimination'];
-
-        // Placement of the discriminatory parameter.
-        $bp = floatval(get_config('catmodel_raschbirnbaumb', 'trusted_region_placement_b'));
-        // Slope of the discriminatory parameter.
-        $bs = floatval(get_config('catmodel_raschbirnbaumb', 'trusted_region_slope_b'));
-        // Use x times of placement as maximal value of trusted region.
-        $btr = floatval(get_config('catmodel_raschbirnbaumb', 'trusted_region_factor_max_b'));
-
-        $bmin = floatval(get_config('catmodel_raschbirnbaumb', 'trusted_region_min_b'));
-        $bmax = floatval(get_config('catmodel_raschbirnbaumb', 'trusted_region_max_b'));
-
         // Test TR for difficulty.
         if ($a < max($am - ($atr * $as), $amin)) {
             $a = max($am - ($atr * $as), $amin);
@@ -453,16 +401,6 @@ class pcm extends model_multiparam {
         }
 
         $ip['difficulty'] = $a;
-
-        // Test TR for discriminatory.
-        if ($b < $bmin) {
-            $b = $bmin;
-        }
-        if ($b > min(($btr * $bp), $bmax)) {
-            $b = min(($btr * $bp), $bmax);
-        }
-
-        $ip['discrimination'] = $b;
 
         return $ip;
     }

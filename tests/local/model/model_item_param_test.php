@@ -187,8 +187,8 @@ final class model_item_param_test extends advanced_testcase {
      * Check if an item param can be saved to the database.
      *
      * @dataProvider write_item_param_to_db_provider
-     *
      * @param model_item_param $itemparam
+     *
      * @return void
      */
     public function test_write_item_param_to_db(model_item_param $itemparam): void {

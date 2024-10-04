@@ -2031,6 +2031,7 @@ final class strategy_test extends advanced_testcase {
      * @param int $strategy The test strategy to use
      * @param array $responsepattern The given responses
      * @param float $abilityafter The expected ability
+     *
      * @return void
      */
     public function test_given_responses_lead_to_expected_abilities(

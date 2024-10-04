@@ -164,18 +164,18 @@ final class catcalc_test extends basic_testcase {
     public static function ability_can_be_calculated_with_all_models_provider(): array {
         $grmgeneralizedjson = json_encode([
             'difficulties' => [
-                '0.00' => 0.12,
-                '0.33' => 0.35,
-                '0.66' => 0.68,
-                '1.00' => 0.83,
+                '0.000' => 0.12,
+                '0.333' => 0.35,
+                '0.666' => 0.68,
+                '1.000' => 0.83,
             ],
         ]);
         $grmjson = json_encode([
             'difficulties' => [
-                '0.00' => 0.12,
-                '0.33' => 0.35,
-                '0.66' => 0.68,
-                '1.00' => 0.83,
+                '0.000' => 0.12,
+                '0.333' => 0.35,
+                '0.666' => 0.68,
+                '1.000' => 0.83,
             ],
         ]);
         $pcmgeneralizedjson = json_encode([
@@ -205,6 +205,7 @@ final class catcalc_test extends basic_testcase {
         $grmrecord = (object) array_merge($defaultrecord, ['itemid' => 1, 'json' => $grmjson]);
         $pcmgeneralizedrecord = (object) array_merge($defaultrecord, ['itemid' => 1, 'json' => $pcmgeneralizedjson]);
         $pcmrecord = (object) array_merge($defaultrecord, ['itemid' => 1, 'json' => $pcmjson]);
+
         $grmgeneralizedparam = new model_item_param($itemid, 'grmgeneralized', [], 4, $grmgeneralizedrecord);
         $grmparam = new model_item_param($itemid, 'grm', [], 4, $grmrecord);
         $pcmgeneralizedparam = new model_item_param($itemid, 'pcmgeneralized', [], 4, $pcmgeneralizedrecord);

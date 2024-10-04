@@ -51,12 +51,12 @@ final class raschbirnbaum_test extends TestCase {
      * @param array $ip
      * @param array $expected
      *
-     * @return mixed
+     * @return void
      * @throws InvalidArgumentException
      * @throws ExpectationFailedException
      *
      */
-    public function test_get_log_jacobian(array $pp, float $k, array $ip, array $expected) {
+    public function test_get_log_jacobian(array $pp, float $k, array $ip, array $expected): void {
 
         $result = [];
         $result = raschbirnbaum::get_log_jacobian($pp, $ip, $k);
@@ -79,12 +79,12 @@ final class raschbirnbaum_test extends TestCase {
      * @param array $ip
      * @param array $expected
      *
-     * @return mixed
+     * @return void
      * @throws InvalidArgumentException
      * @throws ExpectationFailedException
      *
      */
-    public function test_get_log_hessian(array $pp, float $k, array $ip, array $expected) {
+    public function test_get_log_hessian(array $pp, float $k, array $ip, array $expected): void {
 
         $result = [];
         $resultmatrix = raschbirnbaum::get_log_hessian($pp, $ip, $k);
@@ -109,9 +109,10 @@ final class raschbirnbaum_test extends TestCase {
      * @param float $k
      * @param array $ip
      * @param float $expected
+     *
      * @return void
      */
-    public function test_log_likelihood_p(array $pp, float $k, array $ip, float $expected) {
+    public function test_log_likelihood_p(array $pp, float $k, array $ip, float $expected): void {
         $result = raschbirnbaum::log_likelihood_p($pp, $ip, $k);
 
         // We only verify for four commas after the dot.
@@ -128,9 +129,10 @@ final class raschbirnbaum_test extends TestCase {
      * @param float $k
      * @param array $ip
      * @param float $expected
+     *
      * @return void
      */
-    public function test_log_likelihood_p_p(array $pp, float $k, array $ip, float $expected) {
+    public function test_log_likelihood_p_p(array $pp, float $k, array $ip, float $expected): void {
         $result = raschbirnbaum::log_likelihood_p_p($pp, $ip, $k);
 
         // We only verify for four commas after the dot.
@@ -148,9 +150,16 @@ final class raschbirnbaum_test extends TestCase {
      * @param float $k
      * @param array $ip
      * @param array $expected
+     *
      * @return void
      */
-    public function test_least_mean_squares_1st_derivative_ip(int $n, array $pp, float $k, array $ip, array $expected) {
+    public function test_least_mean_squares_1st_derivative_ip(
+        int $n,
+        array $pp,
+        float $k,
+        array $ip,
+        array $expected
+    ): void {
 
         $result = $this->getmodel()->least_mean_squares_1st_derivative_ip($pp, $ip, $k, $n);
 
@@ -171,9 +180,16 @@ final class raschbirnbaum_test extends TestCase {
      * @param float $k
      * @param array $ip
      * @param array $expected
+     *
      * @return void
      */
-    public function test_least_mean_squares_2nd_derivative_ip(int $n, array $pp, float $k, array $ip, array $expected) {
+    public function test_least_mean_squares_2nd_derivative_ip(
+        int $n,
+        array $pp,
+        float $k,
+        array $ip,
+        array $expected
+    ): void {
 
         $resultmatrix = [];
         $result = $this->getmodel()->least_mean_squares_2nd_derivative_ip($pp, $ip, $k, $n);
@@ -194,6 +210,7 @@ final class raschbirnbaum_test extends TestCase {
 
     /**
      * Provider function for least_mean_squares_1st_derivative_ip
+     *
      * @return array
      */
     public static function least_mean_squares_1st_derivative_ip_provider(): array {

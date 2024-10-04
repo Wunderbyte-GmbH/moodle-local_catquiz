@@ -60,6 +60,95 @@ abstract class model_raschmodel extends model_model implements catcalc_item_esti
     }
 
     /**
+     * Helper class that gets the key of an ip-array by given fraction
+     *
+     * @param float $frac
+     * @param array $array (e.g. $ip['difficulties'])
+     *
+     * @return int
+     *
+     */
+    protected static function get_key_by_fractions(float $frac, array $array): int {
+        $n = 0;
+        foreach ($array as $key => $val) {
+            if ((float) $key < $frac) {
+                $n++;
+            } else {
+                return $n;
+            }
+        }
+        return $n;
+    }
+
+    /**
+     * Helper class that sort array with fractions as key
+     *
+     * @param array $array (e.g. $ip['difficulties'])
+     * @param int $precission
+     *
+     * @return array
+     *
+     */
+    protected static function sort_fractions(array $array, int $precission = self::PRECISION): array {
+        // Make sure the array is sanitized first.
+        $array = self::sanitize_fractions($array, $precission);
+
+        $tmpkey = [];
+        $tmpval = [];
+
+        foreach ($array as $key => $val) {
+            $tmpkey[] = (float) $key;
+            $tmpval[] = (float) $val;
+        }
+
+        asort($tmpkey);
+
+        $tmp = [];
+        foreach ($tmpkey as $arraykey => $frac) {
+            $key = (string) sprintf("%1.". $precission . "f", (float) $frac);
+            $tmp[$key] = $tmpval[$arraykey];
+        }
+
+        return $tmp;
+    }
+
+    /**
+     * Helper class that sanitizes an array with fractions as key
+     *
+     * @param array $array (e.g. $ip['difficulties'])
+     * @param int $precission
+     *
+     * @return array
+     *
+     */
+    protected static function sanitize_fractions(array $array, int $precission = self::PRECISION): array {
+        $tmp = [];
+
+        foreach ($array as $key => $val) {
+            $key = (string) sprintf("%1.". $precission . "f", (float) $key);
+            $tmp[$key] = (float) $val;
+        }
+
+        return $tmp;
+    }
+
+    /**
+     * Get all fractions out of parts of ip array
+     *
+     * @param array $array
+     * @return array of fractions as strings
+     */
+    protected static function get_fractions(array $array): array {
+        $a = self::sanitize_fractions($array);
+        $frac = [];
+
+        foreach ($a as $fraction => $val) {
+            $frac[] = $fraction;
+        }
+        return $frac;
+    }
+
+    /**
      * Gets information criteria
      *
      * @param string $criterion

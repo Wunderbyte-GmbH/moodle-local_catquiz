@@ -17,12 +17,12 @@
 /**
  * Tests for core_message_inbound to test Variable Envelope Return Path functionality.
  *
- * @package    catmodel_grmgeneralized
+ * @package    catmodel_pcmgeneralized
  * @copyright  2023 Georg Maißer <info@wunderbyte.at>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-namespace catmodel_grmgeneralized;
+namespace catmodel_pcmgeneralized;
 
 use catmodel_rasch\rasch;
 use local_catquiz\local\model\model_model;
@@ -34,12 +34,12 @@ use local_catquiz\local\model\model_responses;
 /**
  * Tests for core_message_inbound to test Variable Envelope Return Path functionality.
  *
- * @package    catmodel_grmgeneralized
+ * @package    catmodel_pcmgeneralized
  * @copyright  2023 Georg Maißer <info@wunderbyte.at>
  *
- * @covers \catmodel_grmgeneralized\grmgeneralized
+ * @covers \catmodel_pcmgeneralized\pcmgeneralized
  */
-final class grmgeneralized_test extends TestCase {
+final class pcmgeneralized_test extends TestCase {
 
     /**
      * This test calls the get_log_jacobain function with the model and test its output with verified data.
@@ -88,7 +88,7 @@ final class grmgeneralized_test extends TestCase {
      * @return void
      */
     public function test_likelihood(array $pp, float $frac, array $ip, float $expected): void {
-        $result = grmgeneralized::likelihood($pp, $ip, $frac);
+        $result = pcmgeneralized::likelihood($pp, $ip, $frac);
 
         // We only verify for four commas after the dot.
         $expected = (float)sprintf("%.6f", $expected);
@@ -107,7 +107,7 @@ final class grmgeneralized_test extends TestCase {
      * @return void
      */
     public function test_log_likelihood_p(array $pp, float $frac, array $ip, float $expected): void {
-        $result = grmgeneralized::log_likelihood_p($pp, $ip, $frac);
+        $result = pcmgeneralized::log_likelihood_p($pp, $ip, $frac);
 
         // We only verify for four commas after the dot.
         $expected = (float)sprintf("%.6f", $expected);
@@ -126,7 +126,7 @@ final class grmgeneralized_test extends TestCase {
      * @return void
      */
     public function test_log_likelihood_p_p(array $pp, float $frac, array $ip, float $expected): void {
-        $result = grmgeneralized::log_likelihood_p_p($pp, $ip, $frac);
+        $result = pcmgeneralized::log_likelihood_p_p($pp, $ip, $frac);
 
         // We only verify for four commas after the dot.
         $expected = (float)sprintf("%.6f", $expected);
@@ -183,33 +183,33 @@ final class grmgeneralized_test extends TestCase {
      * @return array
      */
     public static function likelihood_provider(): array {
-        $labels = ["testcase1", "testcase2", "testcase3"];
+        $labels = ["gpcm likelihood case1", "gpcm likelihood case2", "gpcm likelihood case3"];
         $ability = [-3, -1.5, 1.5];
         $frac = [0, 0.5, 1];
         $parameter = [
             ["discrimination" => 0.7,
-            "difficulties" => [
+            "intercept" => [
                 "0.0" => 0,
                 "0.5" => -3.5,
                 "1.0" => -2.5,
             ]],
             ["discrimination" => 2.0,
-            "difficulties" => [
+            "intercept" => [
                 "0.0" => 0,
                 "0.5" => -1,
                 "1.0" => 1.5,
             ]],
             ["discrimination" => 1.5,
-            "difficulties" => [
+            "intercept" => [
                 "0.0" => 0,
                 "0.5" => 0.5,
                 "1.0" => 1.0,
             ]],
         ];
         $expected = [
-            [0.413382421, 0.173235158, 0.413382421],
-            [0.731058579, 0.266468798, 0.002472623],
-            [0.182425524, 0.138395777, 0.679178699],
+            [0.292477404, 0.415045192, 0.292477404],
+            [0.292477404, 0.107596424, 0.000266705],
+            [0.292477404, 1.310792784, 2.774948345],
         ];
 
         $providedarray = [];
@@ -232,33 +232,33 @@ final class grmgeneralized_test extends TestCase {
      * @return array
      */
     public static function log_likelihood_p_provider(): array {
-        $labels = ["testcase1", "testcase2", "testcase3"];
+        $labels = ["gpcm d/dp log likelihood case1", "gpcm d/dp log likelihood case2", "gpcm d/dp log likelihood case3"];
         $ability = [-3, -1.5, 1.5];
         $frac = [0, 0.5, 1];
         $parameter = [
             ["discrimination" => 0.7,
-            "difficulties" => [
+            "intercept" => [
                 "0.0" => 0,
                 "0.5" => -3.5,
                 "1.0" => -2.5,
             ]],
             ["discrimination" => 2.0,
-            "difficulties" => [
+            "intercept" => [
                 "0.0" => 0,
                 "0.5" => -1,
                 "1.0" => 1.5,
             ]],
             ["discrimination" => 1.5,
-            "difficulties" => [
+            "intercept" => [
                 "0.0" => 0,
                 "0.5" => 0.5,
                 "1.0" => 1.0,
             ]],
         ];
         $expected = [
-            [-0.410632305, 0.000000000, 0.410632305],
-            [-0.537882843, 1.457171911, 1.995054754],
-            [-1.226361714, -0.745129763, 0.481231951],
+            [-0.700000000, 0.7000000000, 0.700000000],
+            [-0.540189288, 1.4598107120, 3.459810712],
+            [-2.350507206, -0.850507206, 0.649492794],
         ];
 
         $providedarray = [];
@@ -281,33 +281,33 @@ final class grmgeneralized_test extends TestCase {
      * @return array
      */
     public static function log_likelihood_p_p_provider(): array {
-        $labels = ["testcase1", "testcase2", "testcase3"];
+        $labels = ["gpcm d²/dp² log likelihood case1", "gpcm d²/dp² log likelihood case2", "gpcm d²/dp² log likelihood case3"];
         $ability = [-3, -1.5, 1.5];
         $frac = [0, 0.5, 1];
         $parameter = [
             ["discrimination" => 0.7,
-            "difficulties" => [
+            "intercept" => [
                 "0.0" => 0,
                 "0.5" => -3.5,
                 "1.0" => -2.5,
             ]],
             ["discrimination" => 2.0,
-            "difficulties" => [
+            "intercept" => [
                 "0.0" => 0,
                 "0.5" => -1,
                 "1.0" => 1.5,
             ]],
             ["discrimination" => 1.5,
-            "difficulties" => [
+            "intercept" => [
                 "0.0" => 0,
                 "0.5" => 0.5,
                 "1.0" => 1.0,
             ]],
         ];
         $expected = [
-            [-0.118823724, -0.237647447, -0.118823724],
-            [-0.786447733, -0.79631377, -0.009866037],
-            [-0.335579517, -0.825843253, -0.490263736],
+            [-0.286627856, -0.286627856, -0.286627856],
+            [-0.793903669, -0.793903669, -0.793903669],
+            [-0.853011052, -0.853011052, -0.853011052],
         ];
 
         $providedarray = [];
@@ -345,9 +345,9 @@ final class grmgeneralized_test extends TestCase {
     /**
      * Get model.
      *
-     * @return grmgeneralized
+     * @return pcmgeneralized
      */
-    private function getmodel(): grmgeneralized {
-        return model_model::get_instance('grmgeneralized');
+    private function getmodel(): pcmgeneralized {
+        return model_model::get_instance('pcmgeneralized');
     }
 }

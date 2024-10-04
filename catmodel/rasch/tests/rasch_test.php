@@ -51,12 +51,12 @@ final class rasch_test extends TestCase {
      * @param array $ip
      * @param float $expected
      *
-     * @return mixed
+     * @return void
      * @throws InvalidArgumentException
      * @throws ExpectationFailedException
      *
      */
-    public function test_get_log_jacobian(array $pp, float $k, array $ip, float $expected) {
+    public function test_get_log_jacobian(array $pp, float $k, array $ip, float $expected): void {
 
         $result = rasch::get_log_jacobian($pp, $ip, $k)[0];
 
@@ -77,12 +77,12 @@ final class rasch_test extends TestCase {
      * @param array $ip
      * @param float $expected
      *
-     * @return mixed
+     * @return void
      * @throws InvalidArgumentException
      * @throws ExpectationFailedException
      *
      */
-    public function test_get_log_hessian(array $pp, float $k, array $ip, float $expected) {
+    public function test_get_log_hessian(array $pp, float $k, array $ip, float $expected): void {
 
         $result = rasch::get_log_hessian($pp, $ip, $k)[0][0];
 
@@ -105,7 +105,7 @@ final class rasch_test extends TestCase {
      *
      * @return void
      */
-    public function test_log_likelihood_p(array $pp, float $k, array $ip, float $expected) {
+    public function test_log_likelihood_p(array $pp, float $k, array $ip, float $expected): void {
         $result = rasch::log_likelihood_p($pp, $ip, $k);
 
         // We only verify for four commas after the dot.
@@ -127,7 +127,7 @@ final class rasch_test extends TestCase {
      *
      * @return void
      */
-    public function test_log_likelihood_p_p(array $pp, float $k, array $ip, float $expected) {
+    public function test_log_likelihood_p_p(array $pp, float $k, array $ip, float $expected): void {
         $result = rasch::log_likelihood_p_p($pp, $ip, $k);
 
         // We only verify for four commas after the dot.
@@ -150,7 +150,7 @@ final class rasch_test extends TestCase {
      *
      * @return void
      */
-    public function test_least_mean_squares_1st_derivative_ip(int $n, array $pp, float $k, array $ip, float $expected) {
+    public function test_least_mean_squares_1st_derivative_ip(int $n, array $pp, float $k, array $ip, float $expected): void {
 
         $result = $this->getmodel()->least_mean_squares_1st_derivative_ip($pp, $ip, $k, $n);
 
@@ -175,7 +175,7 @@ final class rasch_test extends TestCase {
      *
      * @return void
      */
-    public function test_least_mean_squares_2nd_derivative_ip(int $n, array $pp, float $k, array $ip, float $expected) {
+    public function test_least_mean_squares_2nd_derivative_ip(int $n, array $pp, float $k, array $ip, float $expected): void {
 
         $result = $this->getmodel()->least_mean_squares_2nd_derivative_ip($pp, $ip, $k, $n);
 
