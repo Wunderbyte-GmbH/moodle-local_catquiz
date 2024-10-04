@@ -99,6 +99,24 @@ final class model_item_param_test extends advanced_testcase {
                     'discrimination' => 5.92,
                 ],
             ],
+            'grm' => [
+                'record' => [
+                        'componentid' => 0,
+                        'componentname' => "question",
+                        'contextid' => 1,
+                        'model' => 'grm',
+                        'difficulty' => -4.45,
+                        'discrimination' => 5.92,
+                        'guessing' => 0,
+                        'status' => 4,
+                        'itemid' => 0,
+                        'json' => $json,
+                    ],
+                'parameters' => [
+                    'difficulties' => ['0.00' => 0.12, '0.33' => 0.35, '0.66' => 0.68, '1.00' => 0.83],
+                    'difficulty' => 0.59,
+                ],
+            ],
             'rasch' => [
                 'record' => [
                         'componentid' => 0,
