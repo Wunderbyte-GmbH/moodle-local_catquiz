@@ -220,19 +220,13 @@ class model_responses {
      * @param string $personid
      * @param string $itemid
      * @param float $response
-     * @param ?float $ability
-     * @param string $component
+     * @param ?model_person_param $pp
      * @return void
      */
-    public function set(string $personid, string $itemid, float $response, ?float $ability = null, string $component = 'question') {
+    public function set(string $personid, string $itemid, float $response, ?model_person_param $personparam = null) {
         $oldresponse = 0.0;
         if (!empty($this->byitem[$itemid][$personid])) {
             $oldresponse = $this->byitem[$itemid][$personid]->get_response();
-        }
-
-        $personparam = new model_person_param($personid);
-        if ($ability) {
-            $personparam->set_ability($ability);
         }
 
         $newresponse = new model_item_response($itemid, $response, $personparam);
@@ -270,9 +264,10 @@ class model_responses {
      */
     public function get_person_abilities() {
         $personparamlist = new model_person_param_list();
-        foreach (array_keys($this->byperson) as $userid) {
-            $p = new model_person_param($userid);
-            $personparamlist->add($p);
+        foreach ($this->byperson as $userresponses) {
+            // All responses point to the same personparam. So we can just take the first one.
+            $pp = reset($userresponses)->get_personparams();
+            $personparamlist->add($pp);
         }
         return $personparamlist;
     }
@@ -281,7 +276,7 @@ class model_responses {
         // Iterates over all responses and their personparams to update the ability there. Note: the personparams in $this->byitem[]
         // are also updated because they reference the same personparam object.
         foreach ($pplist as $pp) {
-            foreach ($this->byperson[$pp->get_id()] as $itemresponse) {
+            foreach ($this->byperson[$pp->get_userid()] as $itemresponse) {
                 $itemresponse->get_personparams()->set_ability($pp->get_ability());
             }
         }
@@ -368,6 +363,7 @@ class model_responses {
         $this->sumbyperson[$personid] = array_sum(array_map(fn ($r) => $r->get_response(), $this->byperson[$personid]));
     }
 
+    /*
      * Returns the person parameters for the stored responses
      *
      * @param int $contextid
@@ -383,5 +379,14 @@ class model_responses {
         };
         $filtered = $this->personparams->filter($filterfun);
         return $filtered;
+    }
+
+    /**
+     * Returns the user IDs of the stored responses.
+     *
+     * @return array
+     */
+    private function get_user_ids(): array {
+        return array_keys($this->byperson);
     }
 }

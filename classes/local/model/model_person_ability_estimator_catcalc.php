@@ -45,14 +45,15 @@ class model_person_ability_estimator_catcalc extends model_person_ability_estima
      * @return model_person_param_list
      *
      */
-    public function get_person_abilities(model_item_param_list $itemparamlist, int $catscaleid): model_person_param_list {
+    public function get_person_abilities(model_item_param_list $itemparamlist): model_person_param_list {
+        $existingpersonparams = $this->responses->get_person_abilities();
         $personparamlist = new model_person_param_list();
         foreach ($this->responses->get_person_ids() as $personid) {
             $ability = catcalc::estimate_person_ability(
                 $this->responses->get_for_user($personid),
                 $itemparamlist
             );
-            $p = new model_person_param($personid, $catscaleid);
+            $p = $existingpersonparams[$personid];
             $p->set_ability($ability);
             $personparamlist->add($p);
         }

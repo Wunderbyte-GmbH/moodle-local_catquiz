@@ -70,7 +70,7 @@ function loadresponsesforperson($filename, $person = 0): array {
  * @param string $filename The file to load the responses from.
  * @return model_responses
  */
-function loadresponsesforitem(string $filename): model_responses {
+function loadresponsesforitem(string $filename, model_person_param_list $initialabilities): model_responses {
     global $CFG;
     if (($handle = fopen($filename, "r")) === false) {
         throw new UnexpectedValueException("Can not open file: " . $filename);
@@ -85,9 +85,10 @@ function loadresponsesforitem(string $filename): model_responses {
             $labels = array_slice($data, 1);
             continue;
         }
-        $personid = $data[0];
+        $personidstr = $data[0];
+        $personid = (int) substr($personidstr, 1);
         foreach (array_slice($data, 1) as $index => $response) {
-            $mr->set($personid, $labels[$index], $response);
+            $mr->set($personid, $labels[$index], $response, $initialabilities[$personid]);
         }
     }
     fclose($handle);
@@ -119,7 +120,8 @@ function loadpersonparams(string $filename, string $scale): model_person_param_l
             $labelindex = array_search($scale, $data);
             continue;
         }
-        $personid = $data[0];
+        $personidstr = $data[0];
+        $personid = (int) substr($personidstr, 1);
         $pp = (new model_person_param($personid, 1))->set_ability($data[$labelindex]);
         $personparams->add($pp);
     }
