@@ -54,6 +54,7 @@ class grmgeneralized extends model_multiparam {
         $discrimination = round($record->discrimination, self::PRECISION);
 
         return [
+            'difficulty' => self::calculate_mean_difficulty(['difficulties' => $difficulties]),
             'discrimination' => $discrimination,
             'difficulties' => $difficulties,
         ];

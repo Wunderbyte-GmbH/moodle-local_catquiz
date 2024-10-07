@@ -56,7 +56,7 @@ final class model_item_param_test extends advanced_testcase {
     }
 
     /**
-     * Provide Data for test of save_or_update_testitem_in_db.
+     * Provide Data for test of test_read_item_param_from_db.
      *
      * @return array
      *
@@ -97,6 +97,7 @@ final class model_item_param_test extends advanced_testcase {
                 'parameters' => [
                     'difficulties' => ['0.00' => 0.12, '0.33' => 0.35, '0.66' => 0.68, '1.00' => 0.83],
                     'discrimination' => 5.92,
+                    'difficulty' => 0.59,
                 ],
             ],
             'grm' => [
@@ -178,6 +179,7 @@ final class model_item_param_test extends advanced_testcase {
                 'parameters' => [
                     'discrimination' => 2.1,
                     'intercepts' => ['0.000' => 0.0, '0.333' => 0.42, '0.666' => 0.57, '1.000' => 0.98],
+                    'difficulty' => 0.7,
                 ],
             ],
             'pcm' => [
@@ -194,8 +196,8 @@ final class model_item_param_test extends advanced_testcase {
                         'json' => $pcmjson,
                     ],
                 'parameters' => [
-                    'difficulty' => 0.680,
                     'intercepts' => ['0.000' => 0.10, '0.333' => 0.48, '0.666' => 0.53, '1.000' => 0.88],
+                    'difficulty' => 0.68,
                 ],
             ],
         ];
@@ -237,7 +239,7 @@ final class model_item_param_test extends advanced_testcase {
             ],
         ]);
         $pcmgeneralizedjson = json_encode([
-            'intercept' => [
+            'intercepts' => [
                 '0.000' => 0.00,
                 '0.333' => 0.42,
                 '0.666' => 0.57,
@@ -245,7 +247,7 @@ final class model_item_param_test extends advanced_testcase {
             ],
         ]);
         $pcmjson = json_encode([
-            'intercept' => [
+            'intercepts' => [
                 '0.000' => 0.10,
                 '0.333' => 0.48,
                 '0.666' => 0.53,
