@@ -135,7 +135,7 @@ div[contenteditable="false"] {
     background-color: #d4edda;
 }
 
-#lcq_model_override_form .form-group .accesshide {
+#lcq_model_override_form .param-group .accesshide {
     position: static;
     left: 0;
     font: inherit;
@@ -145,26 +145,26 @@ div[contenteditable="false"] {
     margin: unset;
 }
 
-#lcq_model_override_form .form-group .break {
+#lcq_model_override_form .param-group .break {
     flex-basis: 100%;
     height: 0;
 }
 
-#lcq_model_override_form .form-group .param-input {
+#lcq_model_override_form .param-group .param-input {
     margin-left: auto;
     margin-right: 2em;
 }
 
-#lcq_model_override_form .form-group .align-items-start {
+#lcq_model_override_form .param-group .align-items-start {
     justify-content: center;
     align-content: center;
 }
 
-#lcq_model_override_form .form-group.femptylabel .col-form-label {
+#lcq_model_override_form .param-group.femptylabel .col-form-label {
     flex-basis: 10%;
 }
 
-#lcq_model_override_form .form-group .param-input {
+#lcq_model_override_form .param-group .param-input {
     margin: 0.5em 0;
     margin-left: auto;
 }
