@@ -399,6 +399,7 @@ $string['infergreateststrength'] = 'Größte Stärke diagnostizieren';
 $string['inferlowestskillgap'] = 'Unterste Kompetenzlücke diagnostizieren';
 $string['instance'] = 'Test';
 $string['integratequestions'] = 'Fragen aus untergeordneten Skalen einbeziehen';
+$string['intercepts'] = 'Intercepts';
 $string['invisible'] = 'Unsichtbar';
 $string['itemassignedtoparentorsubscale'] = 'Datensatz mit componentid {$a->componentid} ist bereits in einer über- oder untergeordneten Skala von {$a->newscalename} eingeschrieben und wird nicht importiert.';
 $string['itemassignedtosecondscale'] = 'Datensatz mit componentid {$a->componentid} ist bereits in Skala {$a->scalelink} eingeschrieben und nun zusätzlich in {$a->newscalename}.';

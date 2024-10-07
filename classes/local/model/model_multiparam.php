@@ -45,7 +45,6 @@ abstract class model_multiparam extends model_raschmodel {
      * @throws coding_exception
      */
     public function get_static_param_array(\local_catquiz\local\model\model_item_param $param): array {
-        $disclabel = get_string('discrimination', 'local_catquiz');
         $fractions = [];
         $count = 0;
         foreach ($this->get_parameter_fields($param) as $label => $value) {
@@ -59,6 +58,12 @@ abstract class model_multiparam extends model_raschmodel {
                 $fractions['Difficulty ' . $count] = $value;
             }
         }
+
+        if (!array_key_exists('discrimination', $param->get_params_array())) {
+            return $fractions;
+        }
+
+        $disclabel = get_string('discrimination', 'local_catquiz');
         return array_merge(
             [$disclabel => $param->get_params_array()['discrimination']],
             $fractions,
@@ -75,7 +80,11 @@ abstract class model_multiparam extends model_raschmodel {
         if (!$param->get_params_array()) {
             return $this->get_default_params();
         }
-        $parameters = ['discrimination' => $param->get_params_array()['discrimination']];
+        $paramsarray = $param->get_params_array();
+        $parameters = [];
+        if (array_key_exists('discrimination', $paramsarray)) {
+            $parameters = ['discrimination' => $paramsarray['discrimination']];
+        }
         $multiparam = $this->get_multi_param_name();
         $counter = 0;
         foreach ($param->get_params_array()[$multiparam] as $frac => $val) {
@@ -105,7 +114,7 @@ abstract class model_multiparam extends model_raschmodel {
         }
 
         return (object) [
-            'discrimination' => $formarray['discrimination'],
+            'discrimination' => $formarray['discrimination'] ?? 0,
             'json' => json_encode([$multiparam => $diffarray]),
         ];
     }

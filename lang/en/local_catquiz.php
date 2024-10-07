@@ -382,6 +382,7 @@ $string['infergreateststrength'] = 'Infer greatest strength';
 $string['inferlowestskillgap'] = 'Infer lowest skill gap';
 $string['instance'] = 'Test';
 $string['integratequestions'] = 'Integrate questions from subscales';
+$string['intercepts'] = 'Intercepts';
 $string['invisible'] = 'Invisible';
 $string['itemassignedtoparentorsubscale'] = 'Record with componentid {$a->componentid} is already assigned to a parent or child scale of {$a->newscalename} and was not imported.';
 $string['itemassignedtosecondscale'] = 'Record with componentid {$a->componentid} is already assigned to scale {$a->scalelink}, now also assigned to {$a->newscalename}.';
