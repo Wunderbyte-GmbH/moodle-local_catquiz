@@ -64,6 +64,7 @@ class pcmgeneralized extends model_multiparam {
         $discrimination = round($record->discrimination, self::PRECISION);
 
         return [
+            'difficulty' => round(self::calculate_mean_difficulty(['intercepts' => $intercepts]), self::PRECISION),
             'discrimination' => $discrimination,
             'intercepts' => $intercepts,
         ];

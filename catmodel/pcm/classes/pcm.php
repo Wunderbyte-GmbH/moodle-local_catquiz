@@ -54,6 +54,7 @@ class pcm extends model_multiparam {
 
         return [
             'intercepts' => $intercepts,
+            'difficulty' => round(self::calculate_mean_difficulty(['intercepts' => $intercepts]), self::PRECISION),
         ];
     }
 

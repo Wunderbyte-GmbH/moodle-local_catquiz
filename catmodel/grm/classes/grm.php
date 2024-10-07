@@ -50,11 +50,10 @@ class grm extends model_multiparam {
     public static function get_parameters_from_record(stdClass $record): array {
 
         $difficulties = json_decode($record->json, true)['difficulties'];
-        $discrimination = round($record->discrimination, self::PRECISION);
 
         return [
-            'discrimination' => round($discrimination, self::PRECISION),
             'difficulties' => $difficulties,
+            'difficulty' => self::calculate_mean_difficulty(['difficulties' => $difficulties]),
         ];
     }
 
@@ -103,14 +102,14 @@ class grm extends model_multiparam {
      *
      * This will have the following structure.
      * [
-     *   'difficultiy': [fraction1: difficulty1, fraction2: difficulty2, ..., fractionk: difficultyk],
-     *   'discrimination': discrimination
+     *   'difficulty': 1.23,
+     *   'difficulties': [fraction1: difficulty1, fraction2: difficulty2, ..., fractionk: difficultyk],
      * ]
      *
      * @return array
      */
     public static function get_parameter_names(): array {
-        return ['discrimination', 'difficulties'];
+        return ['difficulty', 'difficulties'];
 
     }
 
