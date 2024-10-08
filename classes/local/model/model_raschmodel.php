@@ -303,7 +303,7 @@ abstract class model_raschmodel extends model_model implements catcalc_item_esti
         model_person_param_list $personparams,
         ?model_item_param_list $startvalues = null): model_item_param_list {
         $estimateditemparams = new model_item_param_list();
-        $personids = array_keys($personparams->get_person_params());
+        $personids = $personparams->get_user_ids();
         foreach ($responses->limit_to_users($personids, true)->get_item_response() as $itemid => $itemresponse) {
             $parameters = $this->calculate_params($itemresponse, $startvalues[$itemid] ?? null);
             // Now create a new item difficulty object (param).
