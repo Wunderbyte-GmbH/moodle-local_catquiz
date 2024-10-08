@@ -184,8 +184,13 @@ class model_person_param_list implements ArrayAccess, IteratorAggregate, Countab
         return $this->personparams;
     }
 
-    public function get_ids(): array {
-        return array_keys($this->personparams);
+    /**
+     * Returns the user IDs.
+     * 
+     * @return array
+     */
+    public function get_user_ids(): array {
+        return array_map(fn ($pp) => $pp->get_userid(), $this->personparams);
     }
 
     /**
@@ -293,9 +298,10 @@ class model_person_param_list implements ArrayAccess, IteratorAggregate, Countab
      * @return void
      */
     public function add_missing_users(array $userids, int $catscaleid) {
+        $existingusers = $this->get_user_ids();
         $newusers = array_diff(
             $userids,
-            array_keys($this->get_person_params())
+            $existingusers
         );
         foreach ($newusers as $userid) {
             $this->add(new model_person_param($userid, $catscaleid));
