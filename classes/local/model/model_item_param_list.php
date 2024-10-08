@@ -880,7 +880,7 @@ class model_item_param_list implements ArrayAccess, IteratorAggregate, Countable
      * @param bool $header
      * @return array
      */
-    public function as_csv(bool $header = false): array {
+    public function as_csv(bool $header = false, int $precision = 3): array {
         if ($header) {
             $rows[] = implode(
                 ';',
@@ -891,7 +891,7 @@ class model_item_param_list implements ArrayAccess, IteratorAggregate, Countable
             );
         }
         foreach ($this->itemparams as $ip) {
-            $rows[] = implode(';', array_merge([$ip->get_id()], $ip->get_params_array(), [$ip->get_model_name()]));
+            $rows[] = implode(';', array_merge([$ip->get_componentid()], $ip->get_params_array(), [$ip->get_model_name()]));
         }
         return $rows;
     }

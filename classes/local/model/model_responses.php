@@ -285,7 +285,7 @@ class model_responses {
         return $personparamlist;
     }
 
-    public function set_person_abilities(model_person_param_list $pplist) {
+    public function set_person_abilities(model_person_param_list $pplist): self {
         // Iterates over all responses and their personparams to update the ability there. Note: the personparams in $this->byitem[]
         // are also updated because they reference the same personparam object.
         foreach ($pplist as $pp) {
@@ -293,6 +293,7 @@ class model_responses {
                 $itemresponse->get_personparams()->set_ability($pp->get_ability());
             }
         }
+        return $this;
     }
 
     /**
@@ -376,7 +377,7 @@ class model_responses {
         $this->sumbyperson[$personid] = array_sum(array_map(fn ($r) => $r->get_response(), $this->byperson[$personid]));
     }
 
-    /*
+    /**
      * Returns the person parameters for the stored responses
      *
      * @param int $contextid
@@ -399,7 +400,7 @@ class model_responses {
      *
      * @return array
      */
-    private function get_user_ids(): array {
+    public function get_user_ids(): array {
         return array_keys($this->byperson);
     }
 

@@ -307,11 +307,9 @@ abstract class model_raschmodel extends model_model implements catcalc_item_esti
         foreach ($responses->limit_to_users($personids, true)->get_item_response() as $itemid => $itemresponse) {
             $parameters = $this->calculate_params($itemresponse, $startvalues[$itemid] ?? null);
             // Now create a new item difficulty object (param).
-            $param = $this
-                ->create_item_param($itemid)
-                ->set_parameters($parameters)
+            $param = $starvalues[$itemid] ?? $this->create_item_param($itemid);
+            $param->set_parameters($parameters)
                 ->set_status(LOCAL_CATQUIZ_STATUS_CALCULATED);
-            // ... and append it to the list of calculated item difficulties
             $estimateditemparams->add($param);
         }
         return $estimateditemparams;
@@ -324,7 +322,7 @@ abstract class model_raschmodel extends model_model implements catcalc_item_esti
      * @param ?model_item_param $startvalue
      * @return array
      */
-    abstract protected function calculate_params($itemresponse, ?model_item_param $startvalue = null): array;
+    abstract public function calculate_params($itemresponse, ?model_item_param $startvalue = null): array;
 
     /**
      * Likelihood.
