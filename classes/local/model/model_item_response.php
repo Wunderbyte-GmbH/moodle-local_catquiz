@@ -56,7 +56,7 @@ class model_item_response {
      * @param model_person_param $personparams
      *
      */
-    public function __construct(string $itemid, float $response, model_person_param $personparams) {
+    public function __construct(string $itemid, float $response, model_person_param &$personparams) {
         $this->itemid = $itemid;
         $this->response = $response;
         $this->personparams = $personparams;

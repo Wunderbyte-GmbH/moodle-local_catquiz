@@ -105,10 +105,9 @@ class catmodel_info {
             return;
         }
         $strategy = $context->get_strategy($catscaleid);
-        $catscaleids = [$catscaleid, ...catscale::get_subscale_ids($catscaleid)];
-        $initialabilities = model_person_param_list::load_from_db($contextid, $catscaleids);
-        $userswithresponse = $strategy->get_responses()->get_user_ids();
-        $initialabilities->add_missing_users($userswithresponse, $catscaleid);
+        $initialabilities = model_person_param_list::load_from_db($contextid, [$catscaleid]);
+        $strategy->get_responses()->set_person_abilities($initialabilities);
+        //$initialabilities->add_missing_users($userswithresponse, $catscaleid);
         list($itemdifficulties, $personabilities) = $strategy->run_estimation();
         $updatedmodels = [];
         foreach ($itemdifficulties as $modelname => $itemparamlist) {
