@@ -206,10 +206,10 @@ class catcalc {
      * @param array $itemresponse
      * @param catcalc_item_estimator $model
      *
-     * @return mixed
+     * @return Closure
      *
      */
-    public static function build_itemparam_jacobian(array $itemresponse, catcalc_item_estimator $model): mixed {
+    public static function build_itemparam_jacobian(array $itemresponse, catcalc_item_estimator $model): Closure {
         // Define Jacobi vector (1st derivative) of the Log Likelihood.
         $funs = [];
 
