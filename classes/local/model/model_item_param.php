@@ -90,12 +90,6 @@ class model_item_param {
     private string $modelname;
 
     /**
-     * Models that create items are free to use this field to store some metadata
-     * @var array
-     */
-    private array $metadata;
-
-    /**
      * The component id, e.g. question id
      *
      * @var string $componentid
@@ -146,6 +140,13 @@ class model_item_param {
     private ?string $json = null;
 
     /**
+     * If changed, contains a history of previous values.
+     *
+     * @var array
+     */
+    private array $history;
+
+    /**
      * Set parameters for class instance.
      *
      * @param string $componentid
@@ -163,11 +164,11 @@ class model_item_param {
         ?stdClass $record = null) {
         $this->componentid = $componentid;
         $this->modelname = $modelname;
-        $this->metadata = $metadata;
         $this->status = $status;
         $this->parameters = null;
 
         if (!$record) {
+            $this->update_history('empty_constructor');
             return;
         }
 
@@ -179,6 +180,7 @@ class model_item_param {
         $this->timecreated = $record->timecreated ?? null;
         $this->timemodified = $record->timemodified ?? null;
         $this->json = $record->json ?? null;
+        $this->update_history('constructor with record');
     }
 
     /**
@@ -299,6 +301,7 @@ class model_item_param {
      * @return self
      */
     public function set_parameters(array $parameters): self {
+        $this->update_history('set_parameters');
         $this->parameters = $parameters;
         return $this;
     }
@@ -310,6 +313,7 @@ class model_item_param {
      * @return self
      */
     public function set_difficulty(float $difficulty): self {
+        $this->update_history('set_difficulty');
         $this->parameters['difficulty'] = $difficulty;
         return $this;
     }
@@ -321,6 +325,7 @@ class model_item_param {
      * @return self
      */
     public function set_status(int $status): self {
+        $this->update_history('set_status');
         $this->status = $status;
         return $this;
     }
@@ -451,6 +456,7 @@ class model_item_param {
      * @return model_item_param
      */
     public function set_default_parameters(): self {
+        $this->update_history('set_default_parameters');
         $this->set_parameters($this->get_model_object()->get_default_params());
         return $this;
     }
@@ -522,6 +528,21 @@ class model_item_param {
         $newparams = $this->get_model_object()->drop_param_at($this->get_params_array(), $index);
         $this->set_parameters($newparams);
         $this->json = $this->form_array_to_record($this->get_model_object()->get_parameter_fields($this))->json;
+        return $this;
+    }
+
+    /**
+     * Adds the current state to the history.
+     *
+     * @return self
+     */
+    private function update_history(string $action = 'unknown'): self {
+        $this->history[] = [
+            'status' => $this->status,
+            'parameters' => $this->parameters,
+            'timestamp' => time(),
+            'action' => $action,
+        ];
         return $this;
     }
 }
