@@ -110,6 +110,13 @@ class model_person_param implements \ArrayAccess {
     private array $params;
 
     /**
+     * Stores a history of abilities in case the object is modified.
+     *
+     * @var array
+     */
+    private array $history = [];
+
+    /**
      * Instantiate parameter.
      *
      * @param string $userid
@@ -212,6 +219,7 @@ class model_person_param implements \ArrayAccess {
      *
      */
     public function set_ability(float $ability): self {
+        $this->update_history();
         $this->ability = $ability;
         return $this;
     }
@@ -244,5 +252,18 @@ class model_person_param implements \ArrayAccess {
      */
     public function to_array(): array {
         return ['ability' => $this->ability];
+    }
+
+    /**
+     * Adds the current state to the history.
+     *
+     * @return self
+     */
+    private function update_history(string $action = 'unknown'): self {
+        $this->history[] = [
+            'ability' => $this->ability,
+            'timestamp' => time(),
+        ];
+        return $this;
     }
 }
