@@ -423,6 +423,8 @@ class raschbirnbaum extends model_raschmodel {
 
         $bmin = floatval(get_config('catmodel_raschbirnbaum', 'trusted_region_min_b'));
         $bmax = floatval(get_config('catmodel_raschbirnbaum', 'trusted_region_max_b'));
+        $bmin = -5.0;
+        $bmax = 5.0;
 
         // Test TR for difficulty.
         if ($a < max($am - ($atr * $as), $amin)) {

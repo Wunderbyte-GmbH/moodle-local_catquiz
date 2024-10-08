@@ -109,7 +109,7 @@ class catmodel_info {
         $initialabilities = model_person_param_list::load_from_db($contextid, $catscaleids);
         $userswithresponse = $strategy->get_responses()->get_user_ids();
         $initialabilities->add_missing_users($userswithresponse, $catscaleid);
-        list($itemdifficulties, $personabilities) = $strategy->run_estimation($catscaleid, $initialabilities);
+        list($itemdifficulties, $personabilities) = $strategy->run_estimation();
         $updatedmodels = [];
         foreach ($itemdifficulties as $modelname => $itemparamlist) {
             $itemcounter = 0;
