@@ -24,6 +24,7 @@
 
 namespace local_catquiz\local\model;
 
+use local_catquiz\catquiz;
 use local_catquiz\catscale;
 use local_catquiz\local\model\model_item_param_list;
 use local_catquiz\local\model\model_item_response;
@@ -90,6 +91,18 @@ class model_responses {
      */
     public function get_person_ids(): array {
         return array_keys($this->byperson);
+    }
+
+    /**
+     * Gets all the data from the given context ID.
+     * @param int $contextid
+     * @return \local_catquiz\local\model\model_responses
+     */
+    public static function create_for_context(int $contextid): self {
+        $mainscale = catquiz::get_main_scale($contextid);
+        $catscaleids = [$mainscale->id, ...catscale::get_subscale_ids($mainscale->id)];
+        $responsedata = self::getresponsedatafromdb($contextid, $catscaleids);
+        return self::create_from_array($responsedata);
     }
 
     /**
@@ -388,5 +401,90 @@ class model_responses {
      */
     private function get_user_ids(): array {
         return array_keys($this->byperson);
+    }
+
+    /**
+     * Create response from DB.
+     *
+     * @param int $contextid
+     * @param array $catscaleids
+     * @param int|null $testitemid
+     * @param int|null $userid
+     *
+     * @return array
+     *
+     */
+    private static function getresponsedatafromdb(
+        int $contextid,
+        array $catscaleids,
+        ?int $testitemid = null,
+        ?int $userid = null
+    ): array {
+        global $DB;
+
+        list($sql, $params) = catquiz::get_sql_for_model_input($contextid, $catscaleids, $testitemid, $userid);
+        $data = $DB->get_records_sql($sql, $params);
+        $inputdata = self::db_to_modelinput($data);
+        return $inputdata;
+    }
+
+    /**
+     * Returns data in the following format
+     *
+     * "1" => Array( //userid
+     *     "comp1" => Array( // component
+     *         "1" => Array( //questionid
+     *             "fraction" => 0,
+     *             "max_fraction" => 1,
+     *             "min_fraction" => 0,
+     *             "qtype" => "truefalse",
+     *             "timestamp" => 1646955326
+     *         ),
+     *         "2" => Array(
+     *             "fraction" => 0,
+     *             "max_fraction" => 1,
+     *             "min_fraction" => 0,
+     *             "qtype" => "truefalse",
+     *             "timestamp" => 1646955332
+     *         ),
+     *         "3" => Array(
+     *             "fraction" => 1,
+     *             "max_fraction" => 1,
+     *             "min_fraction" => 0,
+     *             "qtype" => "truefalse",
+     *             "timestamp" => 1646955338
+     *
+     * @param mixed $data
+     *
+     * @return array
+     */
+    private static function db_to_modelinput($data): array {
+        $modelinput = [];
+        // Check: use only most recent answer for each question.
+
+        foreach ($data as $row) {
+            if ($row->state === 'gaveup') {
+                $row->fraction = 0.0;
+            }
+            $entry = [
+                'fraction' => $row->fraction,
+                'id' => $row->id,
+            ];
+
+            if (!array_key_exists($row->userid, $modelinput)) {
+                $modelinput[$row->userid] = ["component" => []];
+            }
+
+            if (! array_key_exists($row->questionid, $modelinput[$row->userid]['component'])) {
+                $modelinput[$row->userid]['component'][$row->questionid] = $entry;
+                continue;
+            }
+
+            // If we are here, there is already an entry. Only update it if this answer is newer than the last one.
+            if ($row->id > $modelinput[$row->userid]['component'][$row->questionid]['id']) {
+                $modelinput[$row->userid]['component'][$row->questionid] = $entry;
+            }
+        }
+        return $modelinput;
     }
 }
