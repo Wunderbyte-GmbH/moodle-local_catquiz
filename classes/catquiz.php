@@ -1465,6 +1465,20 @@ class catquiz {
     }
 
     /**
+     * Returns the main CAT scale for the given context if it exists.
+     * 
+     * If it does not exist, returns null.
+     * 
+     * @param int $contextid
+     * @return ?stdClass
+     */
+    public static function get_main_scale(int $contextid): ?stdClass {
+        global $DB;
+
+        return $DB->get_record('local_catquiz_catscales', ['contextid' => $contextid]) ?: null;
+    }
+
+    /**
      * Returns all person params for the given testid
      * @param int $componentid The id of the adaptivequiz component
      * @return array
