@@ -46,7 +46,7 @@ class model_item_response {
     /**
      * @var model_person_param personparams
      */
-    private ?model_person_param $personparams = null;
+    private model_person_param $personparams;
 
     /**
      * Set parameters for class instance.
@@ -56,7 +56,7 @@ class model_item_response {
      * @param model_person_param $personparams
      *
      */
-    public function __construct(string $itemid, float $response, ?model_person_param $personparams = null) {
+    public function __construct(string $itemid, float $response, model_person_param $personparams) {
         $this->itemid = $itemid;
         $this->response = $response;
         $this->personparams = $personparams;
@@ -88,5 +88,16 @@ class model_item_response {
      */
     public function get_personparams(): ?model_person_param {
         return $this->personparams;
+    }
+
+    /**
+     * Sets the personparam to the given one.
+     *
+     * @param \local_catquiz\local\model\model_person_param $pp
+     * @return \local_catquiz\local\model\model_item_response
+     */
+    public function set_personparams(model_person_param $pp): self {
+        $this->personparams = $pp;
+        return $this;
     }
 }

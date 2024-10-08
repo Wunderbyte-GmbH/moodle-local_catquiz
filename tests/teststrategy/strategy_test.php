@@ -30,6 +30,8 @@ use context_course;
 use context_module;
 use core_question\local\bank\question_edit_contexts;
 use local_catquiz\importer\testitemimporter;
+use local_catquiz\local\model\model_item_param;
+use local_catquiz\local\model\model_model;
 use local_catquiz\teststrategy\strategy;
 use local_catquiz\local\model\model_strategy;
 use mod_adaptivequiz\local\attempt\attempt;
@@ -2087,7 +2089,6 @@ final class strategy_test extends advanced_testcase {
     }
 
     public function test_responses_lead_to_expected_item_parameters() {
-        // $this->markTestSkipped('At the moment it still takes too long to calculate the responses');
         global $CFG;
         $initialabilities = loadpersonparams(
             $CFG->dirroot . '/local/catquiz/tests/fixtures/persons.csv',
@@ -2097,13 +2098,24 @@ final class strategy_test extends advanced_testcase {
             $CFG->dirroot . '/local/catquiz/tests/fixtures/responses.1PL.csv',
             $initialabilities
         );
-        //$responses->set_person_abilities($initialabilities);
-       // $userlist = array_slice($responses->get_person_ids(), 0, 300);
-       // $responses->limit_to_users($userlist);
-        //$itemlist = array_slice($responses->get_item_ids(), 0, 70);
-        //$responses->limit_to_items($itemlist);
-        $strategy = new model_strategy($responses, [], []);
-        list($calculatedabilities, $calculateditemparams) = $strategy->run_estimation();
+        // $rasch = model_model::get_instance('rasch');
+        // $raschbirnbaum = model_model::get_instance('raschbirnbaum');
+        // $item = new model_item_param('A01-00', 'rasch');
+        // $itemresponse = $responses->get_item_response()['A01-00'];
+        // $newparams = $rasch->calculate_params($itemresponse);
+        // $item->set_parameters($newparams);
+        //$estimatedparams = [];
+        //$estimatedparams['rasch'] = $rasch->estimate_item_params($responses, $responses->get_person_abilities(), null);
+        //$estimatedparams['raschbirnbaum'] = $raschbirnbaum->estimate_item_params($responses, $responses->get_person_abilities(), null);
+        //foreach ($estimatedparams['rasch']->as_csv() as $line) {
+        //    mtrace($line);
+        //}
+        //foreach ($estimatedparams['raschbirnbaum']->as_csv() as $line) {
+        //    mtrace($line);
+        //}
+
+        $strategy = new model_strategy($responses);
+        [$calculatedabilities, $calculateditemparams] = $strategy->run_estimation();
         $this->assertEquals(true, false);
     }
 
