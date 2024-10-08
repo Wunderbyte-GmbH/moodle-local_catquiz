@@ -348,7 +348,7 @@ class model_strategy {
      *
      */
     public function get_params_from_db(int $contextid, int $catscaleid): array {
-        $models = $this->get_installed_models();
+        $models = self::get_installed_models();
         $catscaleids = [$catscaleid, ...catscale::get_subscale_ids($catscaleid)];
         foreach (array_keys($models) as $modelname) {
             $estdifficulties[$modelname] = model_item_param_list::load_from_db(
