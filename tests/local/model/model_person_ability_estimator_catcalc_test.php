@@ -69,7 +69,7 @@ final class model_person_ability_estimator_catcalc_test extends basic_testcase {
         // TODO: When we know the expected values, write them to a separate CSV
         // file and use the assertion to compare the expected and calculated
         // values.
-        return $this->assertTrue(true);
+        $this->assertTrue(true);
     }
     /**
      * Person_ability_estimation_returns_expected_values_provider.
