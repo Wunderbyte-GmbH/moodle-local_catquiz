@@ -150,9 +150,15 @@ class model_responses_test extends basic_testcase {
 
     public function test_personparam_can_be_updated() {
         $mr = new model_responses();
-        $mr->set('P1', 'A1', 1.0);
-        $mr->set_person_abilities((new model_person_param_list())->add((new model_person_param('P1'))->set_ability(1.2)));
-        $userresponse = $mr->get_for_user('P1')['A1'];
-        $this->assertEquals(1.2, $userresponse->get_personparams()->get_ability());
+        $mr->set(1, 'A1', 1.0);
+        $mr->set(1, 'A2', 0.0);
+        $mr->set(1, 'A3', 0.5);
+        $mr->set_person_abilities((new model_person_param_list())->add((new model_person_param(1, 1))->set_ability(1.2)));
+        $response1 = $mr->get_for_user(1)['A1'];
+        $response2 = $mr->get_for_user(1)['A2'];
+        $response3 = $mr->get_for_user(1)['A3'];
+        $this->assertEquals(1.2, $response1->get_personparams()->get_ability());
+        $this->assertEquals(1.2, $response2->get_personparams()->get_ability());
+        $this->assertEquals(1.2, $response3->get_personparams()->get_ability());
     }
 }

@@ -71,10 +71,18 @@ class model_responses {
      */
     private array $excludedusers = [];
 
+    ///**
+    // * @var ?model_person_param_list A list of person parameters
+    // */
+    //private ?model_person_param_list $personparams = null;
+
     /**
-     * @var ?model_person_param_list A list of person parameters
+     * For each user, we have exactly one personparameter.
+     *
+     * This array is indexed by userid.
+     * @var array
      */
-    private ?model_person_param_list $personparams = null;
+    private array $personparams = []; // TODO replace $personparams completely.
 
     /**
      * Return array of item ids.
@@ -102,7 +110,7 @@ class model_responses {
         $mainscale = catquiz::get_main_scale($contextid);
         $catscaleids = [$mainscale->id, ...catscale::get_subscale_ids($mainscale->id)];
         $responsedata = self::getresponsedatafromdb($contextid, $catscaleids);
-        return self::create_from_array($responsedata);
+        return self::create_from_array($responsedata, $mainscale->id);
     }
 
     /**
@@ -113,12 +121,12 @@ class model_responses {
      * @return self
      *
      */
-    public static function create_from_array(array $data): self {
+    public static function create_from_array(array $data, int $mainscale = 0): self {
         $object = new self();
         foreach ($data as $userid => $components) {
             foreach ($components as $component) {
                 foreach ($component as $componentid => $results) {
-                    $object->set($userid, $componentid, $results['fraction']);
+                    $object->set($userid, $componentid, $results['fraction'], null, $mainscale);
                 }
             }
         }
@@ -236,13 +244,21 @@ class model_responses {
      * @param ?model_person_param $pp
      * @return void
      */
-    public function set(string $personid, string $itemid, float $response, ?model_person_param $personparam = null) {
+    public function set(string $personid, string $itemid, float $response, ?model_person_param $personparam = null, int $catscaleid = 0) {
         $oldresponse = 0.0;
         if (!empty($this->byitem[$itemid][$personid])) {
             $oldresponse = $this->byitem[$itemid][$personid]->get_response();
         }
 
-        $newresponse = new model_item_response($itemid, $response, $personparam);
+        if (!$personparam) {
+            $personparam = new model_person_param($personid, $catscaleid);
+        }
+
+        if (!array_key_exists($personid, $this->personparams)) {
+            $this->personparams[$personid] = $personparam;
+        }
+
+        $newresponse = new model_item_response($itemid, $response, $this->personparams[$personid]);
         $this->byperson[$personid][$itemid] = $newresponse;
         $this->sumbyperson[$personid] = array_key_exists($personid, $this->sumbyperson)
             ? $this->sumbyperson[$personid] + ($response - $oldresponse)
@@ -286,12 +302,8 @@ class model_responses {
     }
 
     public function set_person_abilities(model_person_param_list $pplist): self {
-        // Iterates over all responses and their personparams to update the ability there. Note: the personparams in $this->byitem[]
-        // are also updated because they reference the same personparam object.
         foreach ($pplist as $pp) {
-            foreach ($this->byperson[$pp->get_userid()] as $itemresponse) {
-                $itemresponse->get_personparams()->set_ability($pp->get_ability());
-            }
+            $this->personparams[$pp->get_userid()]->set_ability($pp->get_ability());
         }
         return $this;
     }
@@ -391,8 +403,12 @@ class model_responses {
         $filterfun = function (model_person_param $pp) use ($catscaleids) {
             return in_array($pp->get_catscaleid(), $catscaleids);
         };
-        $filtered = $this->personparams->filter($filterfun);
-        return $filtered;
+        $result = new model_person_param_list();
+        $filtered = array_filter($this->personparams, $filterfun);
+        foreach ($filtered as $pp) {
+            $result->add($pp);
+        }
+        return $result;
     }
 
     /**
