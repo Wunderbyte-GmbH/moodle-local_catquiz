@@ -33,7 +33,7 @@ use moodle_url;
  * @copyright 2024 Wunderbyte <info@wunderbyte.at>
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class testitem_deleted extends \core\event\base {
+class testitem_deleted extends catquiz_event_base {
 
     /**
      * Init parameters.
@@ -65,9 +65,8 @@ class testitem_deleted extends \core\event\base {
      */
     public function get_description() {
         $data = $this->data;
-        $otherarray = json_decode($data['other']);
-        $stringdata = [];
-        $stringdata['catscaleid'] = $otherarray->catscaleid;
+        $other = $this->get_other_data();
+        $stringdata['catscaleid'] = $other->catscaleid;
         $stringdata['testitemid'] = $data['objectid'];
 
         return get_string('testitem_deleted_description', 'local_catquiz', $stringdata);

@@ -35,7 +35,7 @@ use moodle_url;
  * @copyright 2024 Wunderbyte <info@wunderbyte.at>
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class testiteminscale_updated extends \core\event\base {
+class testiteminscale_updated extends catquiz_event_base {
 
     /**
      * Init parameters.
@@ -67,25 +67,25 @@ class testiteminscale_updated extends \core\event\base {
      */
     public function get_description() {
         $data = $this->data;
-        $otherarray = json_decode($data['other']);
+        $other = $this->get_other_data();
         $testitemid = $data['objectid'];
 
-        if (!empty($otherarray->catscaleid) &&
-            !empty($otherarray->context) &&
-            !empty($otherarray->component)
+        if (!empty($other->catscaleid) &&
+            !empty($other->context) &&
+            !empty($other->component)
         ) {
             $linktotidetailview = catscale::get_link_to_testitem(
                 $testitemid,
-                $otherarray->catscaleid,
-                $otherarray->context,
-                $otherarray->component);
+                $other->catscaleid,
+                $other->context,
+                $other->component);
         } else {
             $linktotidetailview = get_string('testitem', 'local_catquiz', $testitemid);
         }
 
         $data['testitemlink'] = $linktotidetailview;
 
-        $catscaleid = $otherarray->catscaleid;
+        $catscaleid = $other->catscaleid;
         $linktoscale = catscale::get_link_to_catscale($catscaleid);
         $data['catscalelink'] = $linktoscale;
         return get_string('update_testitem_in_scale', 'local_catquiz', $data);
