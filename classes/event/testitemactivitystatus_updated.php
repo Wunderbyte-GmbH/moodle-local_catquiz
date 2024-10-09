@@ -39,7 +39,7 @@ require_once($CFG->dirroot . '/local/catquiz/lib.php');
  * @copyright 2024 Wunderbyte <info@wunderbyte.at>
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class testitemactivitystatus_updated extends \core\event\base {
+class testitemactivitystatus_updated extends catquiz_event_base {
 
     /**
      * Init parameters.
@@ -71,18 +71,18 @@ class testitemactivitystatus_updated extends \core\event\base {
      */
     public function get_description() {
         $data = $this->data;
-        $otherarray = json_decode($data['other']);
+        $other = $this->get_other_data();
 
-        if (!empty($otherarray->catscaleid) &&
+        if (!empty($other->catscaleid) &&
             !empty($data['objectid']) &&
-            !empty($otherarray->context) &&
-            !empty($otherarray->component)
+            !empty($other->context) &&
+            !empty($other->component)
         ) {
             $linktotidetailview = catscale::get_link_to_testitem(
                 $data['objectid'],
-                $otherarray->catscaleid,
-                $otherarray->context,
-                $otherarray->component);
+                $other->catscaleid,
+                $other->context,
+                $other->component);
         } else {
             $linktotidetailview = get_string('testitem', 'local_catquiz', $data['objectid']);
         }
@@ -93,9 +93,7 @@ class testitemactivitystatus_updated extends \core\event\base {
 
         $activitystring = "";
 
-        $data = $this->data;
-        $otherarray = json_decode($data['other']);
-        $activitystatus = $otherarray->activitystatus;
+        $activitystatus = $other->activitystatus;
         if (intval($activitystatus) == LOCAL_CATQUIZ_TESTITEM_STATUS_INACTIVE) {
             $activitystring = get_string('activitystatussetinactive', 'local_catquiz');
         } else if (intval($activitystatus) == LOCAL_CATQUIZ_TESTITEM_STATUS_ACTIVE) {
