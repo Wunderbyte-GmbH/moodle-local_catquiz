@@ -38,7 +38,7 @@ require_once($CFG->dirroot . '/local/catquiz/lib.php');
  * @copyright 2024 Wunderbyte <info@wunderbyte.at>
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class calculation_executed extends \core\event\base {
+class calculation_executed extends catquiz_event_base {
 
     /**
      * Init parameters.
@@ -69,9 +69,9 @@ class calculation_executed extends \core\event\base {
      */
     public function get_description() {
         $data = $this->data;
-        $otherarray = json_decode($data['other']);
+        $other = $this->get_other_data();
 
-        $catscaleid = $otherarray->catscaleid;
+        $catscaleid = $other->catscaleid;
         $catscale = catscale::return_catscale_object($catscaleid);
         $catscalename = $catscale->name ?? get_string('deletedcatscale', 'local_catquiz');
         $data['catscalename'] = $catscalename;
@@ -79,8 +79,8 @@ class calculation_executed extends \core\event\base {
         // Handle the counter for items updated
         // We get a json array from the event.
 
-        if (!empty($otherarray->updatedmodelsjson)) {
-            $updatedmodels = json_decode($otherarray->updatedmodelsjson);
+        if (!empty($other->updatedmodelsjson)) {
+            $updatedmodels = json_decode($other->updatedmodelsjson);
             $updatedmodelstring = '';
             foreach ($updatedmodels as $modelname => $questioncount) {
                 if (intval($questioncount) > 0) {
@@ -100,14 +100,14 @@ class calculation_executed extends \core\event\base {
         $data['updatedmodels'] = $updatedmodelstring ?? '';
 
         // Find the username corresponding to the ID for display.
-        if ($otherarray->userid != 0) {
-            $user = catquiz::get_user_by_id($otherarray->userid);
+        if ($other->userid != 0) {
+            $user = catquiz::get_user_by_id($other->userid);
             $data['user'] = $user->firstname . " " . $user->lastname;
         } else {
             $data['user'] = get_string('automaticallygeneratedbycron', 'local_catquiz');
         }
 
-        foreach ($otherarray as $key => $value) {
+        foreach ($other as $key => $value) {
             $data[$key] = $value;
         }
         return get_string('executed_calculation_description', 'local_catquiz', $data);
