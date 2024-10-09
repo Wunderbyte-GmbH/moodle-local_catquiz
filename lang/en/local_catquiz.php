@@ -392,6 +392,7 @@ $string['itemsplayed'] = 'evaluated items';
 $string['itemstatus_-5'] = 'Manually excluded';
 $string['itemstatus_0'] = 'Not yet calculated';
 $string['itemstatus_1'] = 'Calculated';
+$string['itemstatus_2'] = '';
 $string['itemstatus_4'] = 'Manually updated';
 $string['itemstatus_5'] = 'Manually confirmed';
 $string['jsoninformation'] = 'Additional information for the given model';

@@ -410,6 +410,7 @@ $string['itemsplayed'] = 'ausgewertete Fragen:';
 $string['itemstatus_-5'] = 'Manuell ausgeschlossen';
 $string['itemstatus_0'] = 'Noch nicht berechnet';
 $string['itemstatus_1'] = 'Berechnet';
+$string['itemstatus_2'] = '';
 $string['itemstatus_4'] = 'Manuell gesetzt';
 $string['itemstatus_5'] = 'Manuell bestätigt';
 $string['jsoninformation'] = 'Zusätzliche, modell-spezifische Informationen';
