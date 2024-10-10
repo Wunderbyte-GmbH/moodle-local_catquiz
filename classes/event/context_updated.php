@@ -34,7 +34,7 @@ use moodle_url;
  * @copyright 2024 Georg Maißer
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class context_updated extends \core\event\base {
+class context_updated extends catquiz_event_base {
 
     /**
      * Init parameters.
@@ -66,8 +66,8 @@ class context_updated extends \core\event\base {
      */
     public function get_description() {
         $data = $this->data;
-        $otherarray = json_decode($data['other']);
-        $contextnamelink = html_writer::link('local/catquiz/manage_catcontexts.php', $otherarray->contextname);
+        $other = $this->get_other_data();
+        $contextnamelink = html_writer::link('local/catquiz/manage_catcontexts.php', $other->contextname);
         return get_string('update_context_description', 'local_catquiz', $contextnamelink);
     }
 

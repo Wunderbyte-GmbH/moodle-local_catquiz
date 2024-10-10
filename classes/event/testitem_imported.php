@@ -32,7 +32,7 @@ use moodle_url;
  * @copyright 2024 Wunderbyte <info@wunderbyte.at>
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class testitem_imported extends \core\event\base {
+class testitem_imported extends catquiz_event_base {
 
     /**
      * Init parameters.
@@ -62,9 +62,9 @@ class testitem_imported extends \core\event\base {
      *
      */
     public function get_description() {
-        $data = $this->data;
-        $otherarray = json_decode($data['other']);
-        $itemcount = $otherarray->itemcount ?? 0;
+        // Data is not used: $data = $this->data.
+        $other = $this->get_other_data();
+        $itemcount = $other->itemcount ?? 0;
 
         return get_string('imported_testitem_description', 'local_catquiz', $itemcount);
     }
