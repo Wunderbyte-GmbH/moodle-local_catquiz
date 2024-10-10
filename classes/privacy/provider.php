@@ -189,9 +189,11 @@ class provider implements     \core_privacy\local\metadata\provider,
                     $progressdata[] = $progress->json;
                 }
                 $progress = (object) $progressdata;
+                $created = userdate($attempt->timecreated, get_string('strftimedatetime', 'core_langconfig'));
+                $modified = userdate($attempt->timemodified, get_string('strftimedatetime', 'core_langconfig'));
                 $data = [
-                        'timecreated' => $attempt->timecreated,
-                        'timemodified' => $attempt->timemodified,
+                        'timecreated' => $created,
+                        'timemodified' => $modified,
                         'data' => $attempt->json,
                         'progress' => $progress,
                 ];
@@ -272,29 +274,8 @@ class provider implements     \core_privacy\local\metadata\provider,
                 // System context, delete all data.
                 $DB->delete_records('local_catquiz_subscriptions');
                 break;
-            case CONTEXT_COURSE:
-                // Course context, delete data for all users in the course.
-                $users = get_enrolled_users($context);
-                $userids = array_map(function($u) {
-                    return $u->id;
-                }, $users);
-                $DB->delete_records_list('local_catquiz_subscriptions', 'userid', $userids);
-                break;
-            case CONTEXT_MODULE:
-                // Module context, delete data for all users in the module.
-                $users = get_enrolled_users($context);
-                break;
             default:
-                try {
-                    $users = get_enrolled_users($context);
-                    $userids = array_map(function($u) {
-                        return $u->id;
-                    }, $users);
-                    $DB->delete_records_list('local_catquiz_subscriptions', 'userid', $userids);
-                } catch (Exception $e) {
-                    // Do nothing.
-                    $error = $e;
-                }
+                // Other contexts, don't delete data related to that context.
                 break;
         }
 
