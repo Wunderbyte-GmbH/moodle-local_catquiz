@@ -22,11 +22,13 @@ global $CFG;
 require_once("$CFG->libdir/formslib.php");
 require_once($CFG->dirroot . "/local/catquiz/lib.php");
 
+use cache_helper;
 use context;
 use context_system;
 use core_form\dynamic_form;
 use dml_exception;
 use local_catquiz\catquiz;
+use local_catquiz\event\testitemstatus_updated;
 use local_catquiz\local\model\model_item_param;
 use local_catquiz\local\model\model_item_param_list;
 use local_catquiz\local\model\model_strategy;
@@ -239,6 +241,9 @@ class item_model_override_selector extends dynamic_form {
                 continue;
             }
             $param->save();
+            if ($param->get_status() !== $defaultparam->get_status()) {
+                $this->trigger_status_updated_event($param);
+            }
 
             if ($model == $selectedmodel) {
                 $this->update_item_activeparam($param);
@@ -432,5 +437,24 @@ class item_model_override_selector extends dynamic_form {
             $item->activeparamid = $param->get_id();
             catquiz::update_item($item);
         }
+    }
+
+    /**
+     * Trigger an event that the itemparam status changed
+     *
+     * @param model_item_param $param
+     * @return void
+     */
+    private function trigger_status_updated_event(model_item_param $param): void {
+        $event = testitemstatus_updated::create([
+            'objectid' => $param->get_id(),
+            'context' => context_system::instance(),
+            'other' => [
+                'status' => $param->get_status(),
+                'testitemid' => $param->get_id(),
+            ],
+        ]);
+        $event->trigger();
+        cache_helper::purge_by_event('changesintestitems');
     }
 }
