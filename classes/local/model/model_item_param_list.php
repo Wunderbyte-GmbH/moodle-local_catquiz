@@ -423,7 +423,8 @@ class model_item_param_list implements ArrayAccess, IteratorAggregate, Countable
             ON lci.componentid = qv.questionid
 
             WHERE qbe.idnumber LIKE :label
-            GROUP BY qv.questionid, qv.questionbankentryid";
+            GROUP BY qv.questionid, qv.questionbankentryid
+            ORDER BY qv.questionid ASC";
 
             // We check if we find entries.
             $records = $DB->get_records_sql($sql, ['label' => $label]);
@@ -434,10 +435,25 @@ class model_item_param_list implements ArrayAccess, IteratorAggregate, Countable
                     'message' => get_string('labelidnotfound', 'local_catquiz', $newrecord['label']),
                  ];
             } else if (count($records) > 1) {
-                return [
-                    'success' => 0, // Update not successful.
-                    'message' => get_string('labelidnotunique', 'local_catquiz', $newrecord['label']),
-                 ];
+                // If we are here, it means there exists more than one question version.
+                // We want to only assign the most recent version to the scale, so:
+                // 1. Ensure that the scale does not contain older items
+                // 2. Continue as if this was a new question (add it to the scale).
+
+                $new = array_pop($records);
+
+                // 1. Remove old question versions from scale:
+                foreach ($records as $r) {
+                    $catscale = $DB->get_record('local_catquiz_catscales', ['name' => $newrecord['catscalename']]);
+                    catscale::remove_testitem_from_scale($catscale->id, $r->questionid);
+                }
+
+                // 2. Continue with the most recent version of the question:
+                unset($newrecord['label']);
+                $newrecord['componentid'] = $new->questionid;
+                $newrecord['warning'] = 'Removed older question versions from scale';
+                $returnarray = self::save_or_update_testitem_in_db($newrecord);
+                return $returnarray;
             }
 
             $record = reset($records);
