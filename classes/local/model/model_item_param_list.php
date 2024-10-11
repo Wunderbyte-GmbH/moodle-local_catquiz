@@ -82,12 +82,12 @@ class model_item_param_list implements ArrayAccess, IteratorAggregate, Countable
      * Returns an item parameter list for the given arguments.
      *
      * @param int $contextid
-     * @param string $modelname
+     * @param ?string $modelname
      * @param array $catscaleids
      * @return model_item_param_list
      * @throws coding_exception
      */
-    public static function get(int $contextid, string $modelname, array $catscaleids = []): self {
+    public static function get(int $contextid, ?string $modelname = null, array $catscaleids = []): self {
         // Try to get the item params from the cache.
         $cache = cache::make('local_catquiz', 'catquiz_item_params');
         $selectedscaleshash = hash('crc32', implode('_', $catscaleids));
@@ -130,27 +130,14 @@ class model_item_param_list implements ArrayAccess, IteratorAggregate, Countable
      * If none are found, it returns an empty list.
      *
      * @param int $contextid
-     * @param string $modelname
+     * @param ?string $modelname
      * @param array $catscaleids
      *
      * @return self
      *
      */
-    public static function load_from_db(int $contextid, string $modelname, array $catscaleids = []): self {
-        global $DB;
-        $models = model_strategy::get_installed_models();
-
-        if ($catscaleids) {
-            $itemrows = catquiz::get_itemparams($contextid, $catscaleids, $modelname);
-        } else {
-            $itemrows = $DB->get_records(
-                'local_catquiz_itemparams',
-                [
-                    'contextid' => $contextid,
-                    'model' => $modelname,
-                ],
-            );
-        }
+    public static function load_from_db(int $contextid, ?string $modelname = null, array $catscaleids = []): self {
+        $itemrows = catquiz::get_itemparams($contextid, $catscaleids, $modelname);
         $itemparameters = new model_item_param_list();
         foreach ($itemrows as $r) {
             // Skip NaN values here.
@@ -527,7 +514,6 @@ class model_item_param_list implements ArrayAccess, IteratorAggregate, Countable
              ];
 
         }
-
     }
 
     /**
@@ -819,4 +805,18 @@ class model_item_param_list implements ArrayAccess, IteratorAggregate, Countable
         return $items;
     }
 
+    /**
+     * Filter the items to those that appear in the given responses object.
+     *
+     * @param model_responses $responses
+     * @return model_item_param_list
+     */
+    public function filter_for_responses(model_responses $responses): self {
+        foreach (array_keys($this->itemparams) as $itemid) {
+            if (!in_array($itemid, $responses->get_item_ids())) {
+                $this->offsetUnset($itemid);
+            }
+        }
+        return $this;
+    }
 }

@@ -285,19 +285,20 @@ class updatepersonability extends preselect_task implements wb_middleware {
             $scales = array_filter($scales, fn ($s) => !in_array($s, $this->scalestoupdate));
             foreach ($scales as $scale) {
                 // Exclude scales that have wrong and right answers.
-                $itemparamlist = $this->userresponses->get_items_for_scale(
-                    $scale,
-                    $context['contextid']
-                );
+                $itemparamlist = model_item_param_list::get(
+                    $context['contextid'],
+                    null,
+                    [$scale, ...catscale::get_subscale_ids($scale)]
+                )->filter_for_responses($this->userresponses); // Filter the list to the items for a response that was given.
                 if (count($itemparamlist) === 0) {
                     continue;
                 }
 
                 // Remove all responses that are not in the item param list and check again.
-                $arrayresponsesforscale = [];
-                foreach ($itemparamlist as $item) {
-                    $arrayresponsesforscale[$item->get_componentid()] = $this->arrayresponses[$item->get_componentid()];
-                }
+                $arrayresponsesforscale = array_filter(
+                    $this->arrayresponses,
+                    fn($k) => $itemparamlist->offsetExists($k['questionid'])
+                );
                 $this->diverseanswers[$scale] = $this->has_sufficient_responses($arrayresponsesforscale);
                 if ($this->diverseanswers[$scale]) {
                     continue;
@@ -363,7 +364,6 @@ class updatepersonability extends preselect_task implements wb_middleware {
      * Get item param list.
      *
      * @param mixed $catscaleid
-     *
      * @return model_item_param_list
      *
      */
@@ -372,23 +372,14 @@ class updatepersonability extends preselect_task implements wb_middleware {
             return $this->itemparamlists[$catscaleid];
         }
 
-        // We will update the person ability. Select the correct model for each item.
-        $modelstrategy = new model_strategy($this->userresponses);
         $catscalecontext = catscale::get_context_id($catscaleid);
         $catscaleids = [
             $catscaleid,
             ...catscale::get_subscale_ids($catscaleid),
         ];
-        $itemparamlists = [];
-        $personparams = model_person_param_list::load_from_db($catscalecontext, $catscaleids);
-        foreach (array_keys($modelstrategy->get_installed_models()) as $model) {
-            $itemparamlists[$model] = model_item_param_list::get(
-                $catscalecontext,
-                $model,
-                $catscaleids
-            );
-        }
-        $this->itemparamlists[$catscaleid] = $modelstrategy->select_item_model($itemparamlists, $personparams);
+        $itemparamlist = model_item_param_list::get($catscalecontext, null, $catscaleids)
+            ->filter_for_responses($this->userresponses);
+        $this->itemparamlists[$catscaleid] = $itemparamlist;
         return $this->itemparamlists[$catscaleid];
     }
 
