@@ -582,12 +582,12 @@ class mathcat {
 
                 // Handle all forbidden cases.
                 // TODO: throw error/warning: $key not in $data.
-                return null;
+                return [];
             }
         }
 
         // Handle any other cases, like strings or objects.
         // TODO: throw error/warning: not float or array, also give $data.
-        return null;
+        return [];
     }
 }
