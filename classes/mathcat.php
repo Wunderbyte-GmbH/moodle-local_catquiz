@@ -485,7 +485,7 @@ class mathcat {
      *
      * @return array - structure of the given array, needed for restoring by vector_to_array
      */
-    public static function array_to_vector($data, int &$n = null): array {
+    public static function array_to_vector(&$data, int &$n = null): array {
         // NOTE: The operation will be done directly on $data, so work with a copy!
 
         if (is_null($n)) {
@@ -509,7 +509,7 @@ class mathcat {
                     // Test if result is legid.
                     if (is_null($structuretmp)) {
                         // TODO: Here should be some error/warning handling be done.
-                        return null;
+                        return [];
                     }
 
                     // Perpare results.
@@ -525,7 +525,7 @@ class mathcat {
 
                     // Handle any other cases, like strings or objects.
                     // TODO: Throw error warning and exit with null.
-                    return null;
+                    return [];
                 }
             }
 
@@ -543,7 +543,7 @@ class mathcat {
 
         // Handle any other cases, like strings or objects.
         // TODO: throw error/warning: not float or array, also give $data.
-        return null;
+        return [];
     }
 
     /**
