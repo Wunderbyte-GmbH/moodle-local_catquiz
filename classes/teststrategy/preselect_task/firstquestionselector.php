@@ -333,20 +333,12 @@ class firstquestionselector extends preselect_task implements wb_middleware {
     private function get_items() {
         // Create item list.
         $catscaleids = [$this->context['catscaleid'], ...catscale::get_subscale_ids($this->context['catscaleid'])];
-        $responsedata = catcontext::getresponsedatafromdb($this->context['contextid'], $catscaleids);
-        $responses = (new model_responses())->setdata($responsedata);
-        $modelstrategy = new model_strategy($responses);
         $catscalecontext = catscale::get_context_id($this->context['catscaleid']);
-        $itemparamlists = [];
-        $personparams = model_person_param_list::load_from_db($catscalecontext, $catscaleids);
-        foreach (array_keys($modelstrategy->get_installed_models()) as $model) {
-            $itemparamlists[$model] = model_item_param_list::get(
-                $catscalecontext,
-                $model,
-                $catscaleids
-            );
-        }
-        $items = $modelstrategy->select_item_model($itemparamlists, $personparams);
+        $items = model_item_param_list::get(
+            $catscalecontext,
+            null,
+            $catscaleids
+        );
         return $items;
     }
 }

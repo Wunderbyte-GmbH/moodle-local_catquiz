@@ -1522,32 +1522,37 @@ class catquiz {
      *
      * @param int $contextid
      * @param array $catscaleids
-     * @param string $model
+     * @param ?string $model
      *
      * @return mixed
      *
      */
-    public static function get_itemparams(int $contextid, array $catscaleids, string $model) {
+    public static function get_itemparams(int $contextid, array $catscaleids = [], ?string $model = null) {
         global $DB;
-        [$insql, $inparams] = $DB->get_in_or_equal($catscaleids, SQL_PARAMS_NAMED, 'incatscales');
+        $where = "lcip.contextid = :contextid  ";
+        $params = ['contextid' => $contextid];
+        if ($catscaleids) {
+            [$insql, $inparams] = $DB->get_in_or_equal($catscaleids, SQL_PARAMS_NAMED, 'incatscales');
+            $where .= "AND lci.catscaleid " . $insql . " ";
+            $params = array_merge($params, $inparams);
+        }
+
+        if ($model) {
+            $where .= "AND lcip.model = :model ";
+            $params = array_merge($params, ['model' => $model]);
+        } else {
+            // If no model is given, link the itemparam via the activeparamid.
+            $where .= "AND lci.activeparamid = lcip.id ";
+        }
 
         return $DB->get_records_sql(
             "SELECT lci.id as uniqueid, lcip.*
              FROM {local_catquiz_items} lci
              JOIN {local_catquiz_itemparams} lcip
                 ON lci.id = lcip.itemid
-                    AND lci.activeparamid = lcip.id
-                    AND lcip.contextid = :contextid
-                    AND lcip.model = :model
-            WHERE lci.catscaleid $insql
+            WHERE $where
             ",
-            array_merge(
-                [
-                    'contextid' => $contextid,
-                    'model' => $model,
-                ],
-                $inparams
-            )
+           $params
         );
     }
 
