@@ -83,13 +83,17 @@ class shortcodes {
             $userid = $USER->id;
         }
 
-        $courseid = optional_param('id', 0, PARAM_INT);
+        $currentcourseid = 0;
+        if (isset($COURSE) && !empty($COURSE->id) && $COURSE->id > 1) {
+            $currentcourseid = $COURSE->id;
+        }
+        $courseid = $args['courseid'] ?? $currentcourseid;
         $records = catquiz::return_data_from_attemptstable(
             intval($args['numberofattempts'] ?? 1),
             intval($args['instanceid'] ?? 0),
-            intval($args['courseid'] ?? $courseid),
+            intval($courseid),
             intval($userid ?? -1)
-            );
+        );
         if (!$records) {
             return get_string('attemptfeedbacknotyetavailable', 'local_catquiz');
         }
