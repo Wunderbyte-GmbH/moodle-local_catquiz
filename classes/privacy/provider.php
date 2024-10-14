@@ -215,7 +215,7 @@ class provider implements     \core_privacy\local\metadata\provider,
         $personparams = $DB->get_records(
             'local_catquiz_personparams',
             [
-                'userid' => $userid
+                'userid' => $userid,
             ]);
         // Personparams we apply to context system.
         $data = (object) $personparams;
@@ -225,9 +225,11 @@ class provider implements     \core_privacy\local\metadata\provider,
 
     /**
      * Delete all user data for the given context.
+     * We keep records from local_catquiz_personparams and local_catquiz_attempts because they are needed for statistics...
+     * and do not contain personal identifiable information.
+     * We rely on moodle core User Account Anonymization in users table.
      *
      * @param approved_contextlist $context The context to delete data from.
-     * @param int $userid The user ID whose data to delete.
      */
     public static function delete_data_for_user(approved_contextlist $contextlist) {
         global $DB;
@@ -235,13 +237,13 @@ class provider implements     \core_privacy\local\metadata\provider,
         $userid = $contextlist->get_user()->id;
 
         $DB->delete_records('local_catquiz_subscriptions', ['userid' => $userid]);
-        // We keep records from local_catquiz_personparams and local_catquiz_attempts because they are needed for statistics...
-        // and do not contain personal identifiable information.
-        // We rely on moodle core User Account Anonymization in users table.
     }
 
     /**
      * Delete data for users.
+     * We keep records from local_catquiz_personparams and local_catquiz_attempts because they are needed for statistics...
+     * and do not contain personal identifiable information.
+     * We rely on moodle core User Account Anonymization in users table.
      *
      * @param \core_privacy\local\request\approved_userlist $userlist The list of users to delete data for.
      */
@@ -251,10 +253,6 @@ class provider implements     \core_privacy\local\metadata\provider,
         $userids = $userlist->get_userids();
 
         $DB->delete_records_list('local_catquiz_subscriptions', 'userid', $userids);
-
-        // We keep records from local_catquiz_personparams and local_catquiz_attempts because they are needed for statistics...
-        // and do not contain personal identifiable information.
-        // We rely on moodle core User Account Anonymization in users table.
     }
 
     /**

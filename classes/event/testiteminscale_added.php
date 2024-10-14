@@ -70,17 +70,17 @@ class testiteminscale_added extends catquiz_event_base {
 
         $catscaleid = $other->catscaleid ?? 0;
         $testitemid = $data['objectid'];
-        if (!empty($other->catscaleid) &&
+        if (!empty($catscaleid) &&
             !empty($other->context) &&
             !empty($other->component)
             ) {
-                $linktotidetailview = catscale::get_link_to_testitem(
-                    $testitemid,
-                    $other->catscaleid,
-                    $other->context,
-                    $other->component);
+            $linktotidetailview = catscale::get_link_to_testitem(
+                $testitemid,
+                $other->catscaleid,
+                $other->context,
+                $other->component);
         } else {
-                $linktotidetailview = get_string('testitem', 'local_catquiz', $testitemid);
+            $linktotidetailview = get_string('testitem', 'local_catquiz', $testitemid);
         }
         $data['testitemlink'] = $linktotidetailview;
 
