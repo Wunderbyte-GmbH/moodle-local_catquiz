@@ -92,35 +92,14 @@ class customscalefeedback extends feedbackgenerator {
             $data['catscales']
         );
         $firstelement = $data['customscalefeedback_abilities'][array_key_first($data['customscalefeedback_abilities'])];
-        if (!empty($firstelement['estimated'])) {
-            if (!isset($firstelement['fraction'])) {
-                $comment = get_string('estimatedbecause:default', 'local_catquiz');
-            } else {
-                switch ((int) $firstelement['fraction']) {
-                    case 1 :
-                        $comment = get_string('estimatedbecause:allanswerscorrect', 'local_catquiz');
-                        break;
-                    case 0 :
-                        if (count($this->get_progress()->get_playedquestions()) === 0) {
-                            $comment = get_string('error:nminscale', 'local_catquiz');
-                        } else {
-                            $comment = get_string('estimatedbecause:allanswersincorrect', 'local_catquiz');
-                        }
-                        break;
-                    default :
-                        $comment = get_string('estimatedbecause:default', 'local_catquiz');
-                        break;
-
-                }
-            }
-        }
+        $comment = $this->get_comment($firstelement);
 
         if (empty($customscalefeedback)) {
             return [];
         } else {
             return [
                 'heading' => $this->get_heading(),
-                'comment' => $comment ?? "",
+                'comment' => $comment,
                 'content' => $customscalefeedback,
             ];
         }
@@ -341,5 +320,34 @@ class customscalefeedback extends feedbackgenerator {
         }
 
         return $content;
+    }
+
+    /**
+     * Get the comment line for the feedback
+     *
+     * @param array $firstelement
+     * @return string
+     */
+    private function get_comment(array $firstelement): string {
+        if (empty($firstelement['estimated'])) {
+            return "";
+        }
+
+        if (count($this->get_progress()->get_playedquestions()) === 0) {
+            return "";
+        }
+
+        if (!isset($firstelement['fraction'])) {
+            return get_string('estimatedbecause:default', 'local_catquiz');
+        }
+
+        switch ((int) $firstelement['fraction']) {
+            case 1:
+                return get_string('estimatedbecause:allanswerscorrect', 'local_catquiz');
+            case 0:
+                return get_string('estimatedbecause:allanswersincorrect', 'local_catquiz');
+        }
+
+        return get_string('estimatedbecause:default', 'local_catquiz');
     }
 }
