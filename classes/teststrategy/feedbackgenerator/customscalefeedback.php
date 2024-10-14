@@ -99,18 +99,15 @@ class customscalefeedback extends feedbackgenerator {
             (array) $progress->get_quiz_settings(),
             $data['catscales']
         );
-        $firstelement = $data['customscalefeedback_abilities'][array_key_first($data['customscalefeedback_abilities'])];
-        $comment = $this->get_comment($firstelement);
 
         if (empty($customscalefeedback)) {
             return [];
-        } else {
-            return [
-                'heading' => $this->get_heading(),
-                'comment' => $comment,
-                'content' => $customscalefeedback,
-            ];
         }
+
+        return [
+            'heading' => $this->get_heading(),
+            'content' => $customscalefeedback,
+        ];
     }
 
     /**
@@ -338,34 +335,5 @@ class customscalefeedback extends feedbackgenerator {
         }
 
         return $content;
-    }
-
-    /**
-     * Get the comment line for the feedback
-     *
-     * @param array $firstelement
-     * @return string
-     */
-    private function get_comment(array $firstelement): string {
-        if (empty($firstelement['estimated'])) {
-            return "";
-        }
-
-        if (count($this->get_progress()->get_playedquestions()) === 0) {
-            return "";
-        }
-
-        if (!isset($firstelement['fraction'])) {
-            return get_string('estimatedbecause:default', 'local_catquiz');
-        }
-
-        switch ((int) $firstelement['fraction']) {
-            case 1:
-                return get_string('estimatedbecause:allanswerscorrect', 'local_catquiz');
-            case 0:
-                return get_string('estimatedbecause:allanswersincorrect', 'local_catquiz');
-        }
-
-        return get_string('estimatedbecause:default', 'local_catquiz');
     }
 }
