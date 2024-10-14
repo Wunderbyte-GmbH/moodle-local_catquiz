@@ -62,7 +62,6 @@ class testitem_imported extends catquiz_event_base {
      *
      */
     public function get_description() {
-        // Data is not used: $data = $this->data.
         $other = $this->get_other_data();
         $itemcount = $other->itemcount ?? 0;
 
