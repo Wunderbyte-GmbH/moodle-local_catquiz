@@ -449,11 +449,10 @@ class shortcodes {
                     'link' => $link,
                     'scale' => $scale->name,
                 ]);
-                $h2 .= ' ' . $timerangeaddition;
             }
             return [
                 'title' => $h1,
-                'description' => $h2,
+                'description' => sprintf('%s %s', $h2, $timerangeaddition),
             ];
         }
 
