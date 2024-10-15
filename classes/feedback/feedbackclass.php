@@ -200,16 +200,19 @@ class feedbackclass {
                 // For the lowest range (first range, min) value should be set statically to min of scale ability.
                 // Max (last range, max) is set to max of scale.
                 if ($j === 1) {
-                    $element = $mform->addElement(
+                    $static = $mform->addElement(
                         'static',
                         'lowest_limit',
                         get_string('lowerlimit', 'local_catquiz'),
                         $lowestability
-                        );
-                    $subelements[] = $mform->addElement(
+                    );
+                    $subelements[] = $static;
+                    $element = $mform->addElement(
                         'hidden',
-                        'feedback_scaleid_limit_lower_'. $scale->id . '_' . $j,
-                        $lowestability);
+                        'feedback_scaleid_limit_lower_' . $scale->id . '_' . $j,
+                        $lowestability
+                    );
+                    $element->setValue($lowestability);
                 } else {
                     $element = $mform->addElement(
                         'float',
@@ -236,16 +239,19 @@ class feedbackclass {
                 // If we get a value here, the overriding value is set in the set_data_after_definition function.
                 $subelements[] = $element;
                 if ($j === $nfeedbpersubscale) {
-                    $element = $mform->addElement(
+                    $static = $mform->addElement(
                         'static',
                         'highestvalue',
                         get_string('upperlimit', 'local_catquiz'),
                         $highestability
-                        );
-                    $subelements[] = $mform->addElement(
+                    );
+                    $subelements[] = $static;
+                    $element = $mform->addElement(
                         'hidden',
-                        'feedback_scaleid_limit_upper_'. $scale->id . '_' . $j,
-                        $highestability);
+                        'feedback_scaleid_limit_upper_' . $scale->id . '_' . $j,
+                        $highestability
+                    );
+                    $element->setValue($highestability);
                 } else {
                     $element = $mform->addElement(
                         'float',
