@@ -53,6 +53,13 @@ class customscalefeedback extends feedbackgenerator {
     private ?int $testid;
 
     /**
+     * Stores the main scale ID.
+     *
+     * @var int
+     */
+    private int $mainscale;
+
+    /**
      * Creates a new customscale feedback generator.
      *
      * @param feedbacksettings $feedbacksettings
@@ -81,6 +88,7 @@ class customscalefeedback extends feedbackgenerator {
      */
     public function get_studentfeedback(array $data): array {
         $this->testid = $data['testid'];
+        $this->mainscale = $data['catscaleid'];
 
         if (!$data['customscalefeedback_abilities'] ?? false) {
             return [];
@@ -255,9 +263,19 @@ class customscalefeedback extends feedbackgenerator {
             return get_string('nofeedback', 'local_catquiz');
         }
 
-        $text = "";
+        // Sort in the following way:
+        // 1. Main scale always comes first.
+        // 2. Other scales are sorted by name.
+        $mainscale = $scalefeedback[$this->mainscale] ?? null;
+        unset($scalefeedback[$this->mainscale]);
+        uksort($scalefeedback, fn ($a, $b) => $catscales[$a]->name <=> $catscales[$b]->name);
+        $sorted = $scalefeedback;
+        if ($mainscale) {
+            $sorted = [$mainscale, ...$scalefeedback];
+        }
 
-        foreach ($scalefeedback as $value) {
+        $text = "";
+        foreach ($sorted as $value) {
             $text .= $value . '<br/>';
         }
         return $text;
