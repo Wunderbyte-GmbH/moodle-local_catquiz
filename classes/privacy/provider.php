@@ -229,7 +229,7 @@ class provider implements     \core_privacy\local\metadata\provider,
      * and do not contain personal identifiable information.
      * We rely on moodle core User Account Anonymization in users table.
      *
-     * @param approved_contextlist $context The context to delete data from.
+     * @param approved_contextlist $contextlist The context to delete data from.
      */
     public static function delete_data_for_user(approved_contextlist $contextlist) {
         global $DB;
