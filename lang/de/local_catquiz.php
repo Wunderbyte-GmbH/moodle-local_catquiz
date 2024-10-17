@@ -613,6 +613,7 @@ $string['shortcodescatquizstatistics'] = 'Zeige Statistiken zu einem CAT Test an
 $string['shortcodescatscalesoverview'] = 'Zeige Übersicht zu CAT-Skalen an.';
 $string['shortcodeslistofquizattempts'] = 'Gibt eine Tabelle mit Testversuchen zurück.';
 $string['showlistofcatscalemanagers'] = 'Catscale Managers';
+$string['showquestion'] = 'Frage anzeigen';
 $string['somethingwentwrong'] = 'Etwas ist schiefgelaufen. Melden Sie den Fehler ihrem Admin';
 $string['standarderror'] = 'Standardfehler';
 $string['starttime'] = 'Beginn';

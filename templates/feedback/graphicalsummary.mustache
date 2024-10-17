@@ -39,4 +39,11 @@
 <h4>{{attemptchartstitle}}</h4>
 {{{attemptscounterchart}}}
 {{{attemptresultstackchart}}}
+<div id="spinner"></div>
 {{{table}}}
+
+{{#js}}
+    require(['local_catquiz/graphicalsummary'], function(init) {
+        init.init();
+    });
+{{/js}}

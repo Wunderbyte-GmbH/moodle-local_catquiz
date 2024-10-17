@@ -596,6 +596,7 @@ $string['shortcodescatquizstatistics'] = 'Display statistics for a CAT test';
 $string['shortcodescatscalesoverview'] = 'Display catscales overview.';
 $string['shortcodeslistofquizattempts'] = 'Returns a table of quiz attempts.';
 $string['showlistofcatscalemanagers'] = 'Show list of CAT scale managers';
+$string['showquestion'] = 'Show question';
 $string['somethingwentwrong'] = 'Something went wrong. Please contact your admin.';
 $string['standarderror'] = 'Standarderror';
 $string['starttime'] = 'Start';
