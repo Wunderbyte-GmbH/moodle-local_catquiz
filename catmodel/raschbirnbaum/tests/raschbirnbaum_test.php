@@ -24,12 +24,10 @@
 
 namespace catmodel_raschbirnbaum;
 
-use catmodel_rasch\rasch;
 use local_catquiz\local\model\model_model;
 use PHPUnit\Framework\ExpectationFailedException;
 use PHPUnit\Framework\TestCase;
 use SebastianBergmann\RecursionContext\InvalidArgumentException;
-use local_catquiz\local\model\model_responses;
 
 /**
  * Tests for core_message_inbound to test Variable Envelope Return Path functionality.

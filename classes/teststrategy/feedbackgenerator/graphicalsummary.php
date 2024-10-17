@@ -25,6 +25,7 @@
 namespace local_catquiz\teststrategy\feedbackgenerator;
 
 use html_table;
+use html_table_cell;
 use html_writer;
 use local_catquiz\catscale;
 use local_catquiz\teststrategy\feedback_helper;
@@ -297,9 +298,10 @@ class graphicalsummary extends feedbackgenerator {
      * Render a table with data that do not fit in the chart
      *
      * @param array $data The feedback data
+     * @param bool $viewquestion Adds links and modal to display questions.
      * @return ?string If all required data are present, the rendered HTML table.
      */
-    private function render_table($data): ?string {
+    private function render_table($data, $viewquestion = true): ?string {
         if (! array_key_exists('id', $data[0])) {
             return null;
         }
@@ -312,6 +314,11 @@ class graphicalsummary extends feedbackgenerator {
             get_string('catscale', 'local_catquiz'),
             get_string('personability', 'local_catquiz'),
         ];
+
+        if ($viewquestion) {
+            $table->head[] = get_string('showquestion', 'local_catquiz');
+
+        }
 
         $tabledata = [];
         foreach ($data as $index => $values) {
@@ -330,13 +337,23 @@ class graphicalsummary extends feedbackgenerator {
                     'local_catquiz'
                 );
             }
-            $tabledata[] = [
+
+            $newrow = [
                 $index + 1,
-                $values['questionname'],
+                sprintf('<span class="clickable" data-slot="%d">%s</span>', $index + 1, $values['questionname']),
                 $responsestring,
                 $values['questionscale_name'],
                 sprintf('%.2f', $values['personability_after']),
             ];
+
+            if ($viewquestion) {
+                $searchcol = new html_table_cell(
+                    sprintf('<i class="fa fa-search clickable questionbutton" data-slot="%d"></i>', $index + 1),
+                );
+                $searchcol->attributes = ['class' => 'questionbutton'];
+                $newrow[] = $searchcol;
+            }
+            $tabledata[] = $newrow;
         }
         $table->data = $tabledata;
         return html_writer::table($table);

@@ -28,7 +28,6 @@ use local_catquiz\local\model\model_model;
 use PHPUnit\Framework\ExpectationFailedException;
 use PHPUnit\Framework\TestCase;
 use SebastianBergmann\RecursionContext\InvalidArgumentException;
-use local_catquiz\local\model\model_responses;
 
 /**
  * Tests for core_message_inbound to test Variable Envelope Return Path functionality.
@@ -39,7 +38,6 @@ use local_catquiz\local\model\model_responses;
  * @covers \catmodel_mixedraschbirnbaum\mixedraschbirnbaum
  */
 final class mixedraschbirnbaum_test extends TestCase {
-
     /**
      * This test calls the get_log_jacobain function with the model and test its output with verified data.
      *

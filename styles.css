@@ -168,3 +168,7 @@ div[contenteditable="false"] {
     margin: 0.5em 0;
     margin-left: auto;
 }
+
+#feedbackcontent-graphicalsummary .questionbutton {
+    text-align: center;
+}

@@ -119,4 +119,10 @@ $functions = [
                 'type' => 'write',
                 'ajax' => 1,
         ],
+        'local_catquiz_render_question_with_response' => [
+                'classname' => 'local_catquiz\external\render_question_with_response',
+                'description' => 'Renders a question with a response',
+                'type' => 'read',
+                'ajax' => 1,
+        ],
 ];
