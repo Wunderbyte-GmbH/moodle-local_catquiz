@@ -62,7 +62,7 @@ class mathcat_test extends basic_testcase {
 	 * @param array
 	 * @return void
      */
-    public function test_conversion_of_array_to_vector($data): void {    
+    public function test_conversion_of_array_to_vector($data): void {
         $array = $data['old'];
         $structure = mathcat::array_to_vector($array);
         $this->assertEquals($structure, $data['structure']);
@@ -79,7 +79,7 @@ class mathcat_test extends basic_testcase {
     public static function conversion_of_array_to_vector_provider(): array {
         return [
             // Simple cases: int, float, linear indexed array, linear assoc array.
-            'int' => ['old' => [9], 'new' => [9.0], 'structure' => [0 => 0]], 
+            'int' => ['old' => [9], 'new' => [9.0], 'structure' => [0 => 0]],
             'float' => ['old' => [9.2], 'new' => [9.2], 'structure' => [0 => 0]],
             'linear indexed array' => ['old' => [7, 8, '9.3'], 'new' => [7.0, 8.0, 9.3], 'structure' => [0 => 0, 1 => 1, 2 => 2]],
             'linear assoc array' => ['old' => ['first' => 3, 'second' => -5, 'third' => 7.5],
@@ -149,7 +149,7 @@ class mathcat_test extends basic_testcase {
                 'new' => ['test' => 0.0, 'legid' => 3.0],
                 'structure' => ['test' => 0, 'legid' => 1],
             ],
-            
+
             'forbidden because of empty array' => ['old' => ['test' => []],
                 'new' => ['test' => []],
                 'structure' =>  ['test' => []],
