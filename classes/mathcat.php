@@ -480,7 +480,7 @@ class mathcat {
      *
      * @return array - structure of the given array, needed for restoring by vector_to_array
      */
-    public static function array_to_vector(&$data, int &$n = null): array {
+    public static function array_to_vector(&$data, int &$n = 0): array {
         // NOTE: The operation will be done directly on $data, so work with a copy!
 
         if (is_null($n)) {
