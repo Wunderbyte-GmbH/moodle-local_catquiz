@@ -46,7 +46,7 @@ class mathcat_test extends basic_testcase {
      *
      * @return void
      */
-    public function test_newton_raphson_multi_stable() {
+    public function test_newton_raphson_multi_stable(): void {
         $result = mathcat::newton_raphson_multi_stable(
             fn ($x) => [0],
             fn ($x) => [0],
@@ -58,11 +58,17 @@ class mathcat_test extends basic_testcase {
 
     /**
      * @dataProvider conversion_of_array_to_vector_provider
+	 *
+	 * @param array
+	 * @return void
      */
-    public function test_conversion_of_array_to_vector($data) {
-        $structure = mathcat::array_to_vector($data);
-        $data2 = mathcat::vector_to_array($data, $structure);
-        $this->assertEquals($data, $data2);
+    public function test_conversion_of_array_to_vector($data): void {    
+        $array = $data['old'];
+        $structure = mathcat::array_to_vector($array);
+        $this->assertEquals($structure, $data['structure']);
+
+        $array = mathcat::vector_to_array($array, $structure);
+        $this->assertEquals($data['new'], $array);
     }
 
     /**
@@ -73,36 +79,81 @@ class mathcat_test extends basic_testcase {
     public static function conversion_of_array_to_vector_provider(): array {
         return [
             // Simple cases: int, float, linear indexed array, linear assoc array.
-            'int' => [9],
-            'float' => [9.2],
-            'linear indexed array' => [[7, 8, "9.3"]],
-            'linear assoc array' => [['first' => 3, 'second' => -5, 'third' => 7.5]],
+            'int' => ['old' => [9], 'new' => [9.0], 'structure' => [0 => 0]], 
+            'float' => ['old' => [9.2], 'new' => [9.2], 'structure' => [0 => 0]],
+            'linear indexed array' => ['old' => [7, 8, '9.3'], 'new' => [7.0, 8.0, 9.3], 'structure' => [0 => 0, 1 => 1, 2 => 2]],
+            'linear assoc array' => ['old' => ['first' => 3, 'second' => -5, 'third' => 7.5],
+                'new' => ['first' => 3.0, 'second' => -5.0, 'third' => 7.5],
+                'structure' => ['first' => 0, 'second' => 1, 'third' => 2]],
 
             // Complex cases: nested array, modified and reordered array.
             'nested array' => [
-                [
-                    5,
-                    'stairways' => 20,
-                    'first floor' => [
+                'old' => [
+                    5, 'stairways' => 20, 'first floor' => [
                         'kitchen' => 6,
                         'dining' => 15,
-                        'wash room' => 4
+                        'wash room' => 4,
                     ],
                     'second foor' => [
                         'sleeping room' => 12,
                         'hobby room' => [
                             'TV corner' => 4.5,
-                            'karaoke box' => 5.3
-                        ]
+                            'karaoke box' => 5.3,
+                        ],
                     ],
                     'basement' => 25.7,
-                ]
+                ],
+                'new' => [
+                    5.0,
+                    'stairways' => 20.0,
+                    'first floor' => [
+                        'kitchen' => 6.0,
+                        'dining' => 15.0,
+                        'wash room' => 4.0,
+                    ],
+                    'second foor' => [
+                        'sleeping room' => 12.0,
+                        'hobby room' => [
+                            'TV corner' => 4.5,
+                            'karaoke box' => 5.3,
+                        ],
+                    ],
+                    'basement' => 25.7,
+                ],
+                'structure' => [
+                    0 => 0,
+                    'stairways' => 1,
+                    'first floor' => [
+                        'kitchen' => 2,
+                        'dining' => 3,
+                        'wash room' => 4,
+                    ],
+                    'second foor' => [
+                        'sleeping room' => 5,
+                        'hobby room' => [
+                            'TV corner' => 6,
+                            'karaoke box' => 7,
+                        ],
+                    ],
+                    'basement' => 8
+                ],
+
+            'modified and reordered' => [
+                'old' => [0, 'first' => 2, 'second' => [7, 9, 8], 'third' => 5],
+                'new' => [0 => 0.0, 'first' => 2.0, 'second' => [1 => 7.0, 3 => 9.0, 2 => 8.0], 'third' => 5.0],
+                'structure' => [0 => 0, 'first' => 1, 'second' => [1 => 2, 3 => 3, 2 => 4], 'third' => 5],
             ],
-            'modified and reordered' => [[0, 'first' => 2, 'second' => [1 => 7, 3 => 9, 2 => 8], 'third' => 5]],
 
             // Forbidden cases: strings in array, empty arrays.
-            'forbidden because of string' => [['test' => "test", 'legid' => 3]],
-            'forbidden because of empty array' => [['test' => []]],
+            'forbidden because of string' => ['old' => ['test' => 'test', 'legid' => 3],
+                'new' => ['test' => 0.0, 'legid' => 3.0],
+                'structure' => ['test' => 0, 'legid' => 1],
+            ],
+            
+            'forbidden because of empty array' => ['old' => ['test' => []],
+                'new' => ['test' => []],
+                'structure' =>  ['test' => []],
+            ],
         ];
     }
 }
