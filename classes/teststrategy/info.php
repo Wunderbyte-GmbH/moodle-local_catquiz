@@ -404,6 +404,37 @@ class info {
         $mform->setType('catquiz_maxtimeperitem', PARAM_INT);
         $mform->hideIf('catquiz_timelimitgroup', 'catquiz_includetimelimit', 'neq', 1);
 
+
+        $elements[] = $mform->addElement(
+            'advcheckbox',
+            'catquiz_showquestion',
+            get_string('questionfeedbackshow', 'local_catquiz')
+        );
+        $feedbackgroup = [
+            $mform->createElement(
+                'advcheckbox',
+                'catquiz_showquestionresponse',
+                get_string('questionfeedbackshowresponse', 'local_catquiz')
+            ),
+            $mform->createElement(
+                'advcheckbox',
+                'catquiz_showquestioncorrectresponse',
+                get_string('questionfeedbackshowcorrectresponse', 'local_catquiz')
+            ),
+            $mform->createElement(
+                'advcheckbox',
+                'catquiz_showquestionfeedback',
+                get_string('questionfeedbackshowfeedback', 'local_catquiz')
+            ),
+        ];
+        $elements[] = $mform->addGroup(
+            $feedbackgroup,
+            'catquiz_questionfeedbacksettings',
+            get_string('questionfeedbacksettings', 'local_catquiz')
+        );
+        $mform->hideIf('catquiz_questionfeedbacksettings', 'catquiz_showquestion', 'neq', 1);
+
+
         feedbackclass::instance_form_definition($mform, $elements);
     }
 
