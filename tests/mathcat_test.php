@@ -38,7 +38,7 @@ use basic_testcase;
  * @covers \local_catquiz\mathcat
  *
  */
-class mathcat_test extends basic_testcase {
+final class mathcat_test extends basic_testcase {
 
 
     /**
@@ -59,7 +59,7 @@ class mathcat_test extends basic_testcase {
     /**
      * Test if array_to_vector and vector_to_array work as expected
      *
-     * @param array
+     * @param array $data
      * @return void
      */
     public function test_conversion_of_array_to_vector($data): void {
