@@ -38,7 +38,7 @@ use basic_testcase;
  * @covers \local_catquiz\mathcat
  *
  */
-final class mathcat_test extends basic_testcase {
+class mathcat_test extends basic_testcase {
 
 
     /**
@@ -46,7 +46,7 @@ final class mathcat_test extends basic_testcase {
      *
      * @return void
      */
-    public function test_newton_raphson_multi_stable(): void {
+    public function test_newton_raphson_multi_stable() {
         $result = mathcat::newton_raphson_multi_stable(
             fn ($x) => [0],
             fn ($x) => [0],
@@ -54,5 +54,55 @@ final class mathcat_test extends basic_testcase {
         );
         $expected = ['difficulty' => 0];
         $this->assertEquals($expected, $result);
+    }
+
+    /**
+     * @dataProvider conversion_of_array_to_vector_provider
+     */
+    public function test_conversion_of_array_to_vector($data) {
+        $structure = mathcat::array_to_vector($data);
+        $data2 = mathcat::vector_to_array($data, $structure);
+        $this->assertEquals($data, $data2);
+    }
+
+    /**
+     * Data provider
+     *
+     * @return array
+     */
+    public static function conversion_of_array_to_vector_provider(): array {
+        return [
+            // Simple cases: int, float, linear indexed array, linear assoc array.
+            'int' => [9],
+            'float' => [9.2],
+            'linear indexed array' => [[7, 8, "9.3"]],
+            'linear assoc array' => [['first' => 3, 'second' => -5, 'third' => 7.5]],
+
+            // Complex cases: nested array, modified and reordered array.
+            'nested array' => [
+                [
+                    5,
+                    'stairways' => 20,
+                    'first floor' => [
+                        'kitchen' => 6,
+                        'dining' => 15,
+                        'wash room' => 4
+                    ],
+                    'second foor' => [
+                        'sleeping room' => 12,
+                        'hobby room' => [
+                            'TV corner' => 4.5,
+                            'karaoke box' => 5.3
+                        ]
+                    ],
+                    'basement' => 25.7,
+                ]
+            ],
+            'modified and reordered' => [[0, 'first' => 2, 'second' => [1 => 7, 3 => 9, 2 => 8], 'third' => 5]],
+
+            // Forbidden cases: strings in array, empty arrays.
+            'forbidden because of string' => [['test' => "test", 'legid' => 3]],
+            'forbidden because of empty array' => [['test' => []]],
+        ];
     }
 }
