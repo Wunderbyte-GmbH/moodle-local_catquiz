@@ -57,10 +57,10 @@ class mathcat_test extends basic_testcase {
     }
 
     /**
-     * @dataProvider conversion_of_array_to_vector_provider
-	 *
-	 * @param array
-	 * @return void
+     * Test if array_to_vector and vector_to_array work as expected
+     *
+     * @param array
+     * @return void
      */
     public function test_conversion_of_array_to_vector($data): void {
         $array = $data['old'];
@@ -135,8 +135,9 @@ class mathcat_test extends basic_testcase {
                             'karaoke box' => 7,
                         ],
                     ],
-                    'basement' => 8
+                    'basement' => 8,
                 ],
+            ],
 
             'modified and reordered' => [
                 'old' => [0, 'first' => 2, 'second' => [7, 9, 8], 'third' => 5],
@@ -145,14 +146,16 @@ class mathcat_test extends basic_testcase {
             ],
 
             // Forbidden cases: strings in array, empty arrays.
-            'forbidden because of string' => ['old' => ['test' => 'test', 'legid' => 3],
+            'forbidden because of string' => [
+                'old' => ['test' => 'test', 'legid' => 3],
                 'new' => ['test' => 0.0, 'legid' => 3.0],
                 'structure' => ['test' => 0, 'legid' => 1],
             ],
 
-            'forbidden because of empty array' => ['old' => ['test' => []],
+            'forbidden because of empty array' => [
+                'old' => ['test' => []],
                 'new' => ['test' => []],
-                'structure' =>  ['test' => []],
+                'structure' => ['test' => []],
             ],
         ];
     }
