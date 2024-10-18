@@ -30,15 +30,14 @@ import {addIconToContainerWithPromise} from 'core/loadingicon';
  */
 export const init = async () => {
     const urlParams = new URLSearchParams(window.location.search);
-    const attemptid = urlParams.get('attempt');
-    const instanceid = urlParams.get('instance');
+    const attemptid = urlParams.get('attempt') ?? urlParams.get('attemptid');
     const rows = document.querySelectorAll('tr>td>.clickable');
     rows.forEach(row => {
         row.addEventListener('click', async function() {
             // Show loader icon until we have the question.
             let iconPromise = addIconToContainerWithPromise(row);
             const slot = this.getAttribute('data-slot');
-            const questiondata = await fetchQuestionData(slot, attemptid, instanceid);
+            const questiondata = await fetchQuestionData(slot, attemptid);
             // Hide the loader icon by resolving it.
             iconPromise.resolve();
             const modal = await ModalFactory.create({
@@ -53,16 +52,14 @@ export const init = async () => {
 /**
  * @param {integer} slot Question slot
  * @param {integer} attemptid The attempt ID
- * @param {integer} instanceid The instance ID
  * @return string
  */
-const fetchQuestionData = async (slot, attemptid, instanceid) => {
+const fetchQuestionData = async (slot, attemptid) => {
     let data = await Ajax.call([{
         methodname: 'local_catquiz_render_question_with_response',
         args: {
             slot: slot,
             attemptid: attemptid,
-            instanceid: instanceid,
         }
     }])[0];
     return {

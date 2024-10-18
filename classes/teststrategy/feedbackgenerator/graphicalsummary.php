@@ -65,7 +65,13 @@ class graphicalsummary extends feedbackgenerator {
             );
         }
         if (isset($feedbackdata['graphicalsummary_data'])) {
-            $table = $this->render_table($feedbackdata['graphicalsummary_data']);
+            $showquestions = boolval(
+                $this
+                    ->get_progress()
+                    ->get_quiz_settings()
+                    ->catquiz_showquestion
+            );
+            $table = $this->render_table($feedbackdata['graphicalsummary_data'], $showquestions);
         }
         $globalscale = catscale::return_catscale_object($this->get_progress()->get_quiz_settings()->catquiz_catscales);
         $globalscalename = $globalscale->name;

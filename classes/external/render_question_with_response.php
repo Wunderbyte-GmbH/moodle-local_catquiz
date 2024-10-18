@@ -32,6 +32,8 @@ use core_external\external_function_parameters;
 use external_api;
 use external_value;
 use external_single_structure;
+use local_catquiz\catquiz_test;
+use local_catquiz\testenvironment;
 use qbank_previewquestion\question_preview_options;
 use question_bank;
 use question_display_options;
@@ -61,7 +63,6 @@ class render_question_with_response extends external_api {
         return new external_function_parameters([
             'slot'  => new external_value(PARAM_INT, 'Slot'),
             'attemptid'  => new external_value(PARAM_INT, 'Attempt ID'),
-            'instanceid'  => new external_value(PARAM_INT, 'Instance ID'),
             ]
         );
     }
@@ -71,19 +72,17 @@ class render_question_with_response extends external_api {
      *
      * @param int $slot
      * @param int $attemptid
-     * @param int $instanceid
      * @param string $label
      *
      * @return array
      */
-    public static function execute(int $slot, int $attemptid, int $instanceid): array {
+    public static function execute(int $slot, int $attemptid): array {
         self::validate_parameters(self::execute_parameters(), [
             'slot' => $slot,
             'attemptid' => $attemptid,
-            'instanceid' => $instanceid,
         ]);
 
-        $questionhtml = self::render_question($slot, $attemptid, $instanceid);
+        $questionhtml = self::render_question($slot, $attemptid);
 
         return [
             'questionhtml' => $questionhtml['body'],
@@ -101,20 +100,41 @@ class render_question_with_response extends external_api {
         ]);
     }
 
-    private static function render_question(int $slot, int $attemptid, int $instanceid): array {
+    private static function render_question(int $slot, int $attemptid): array {
         global $DB, $PAGE;
+        $attempt = $DB->get_record('adaptivequiz_attempt', ['id' => $attemptid]);
+        $instanceid = $attempt->instance;
         require_login();
         $cm = get_coursemodule_from_instance('adaptivequiz', $instanceid);
         $context = context_module::instance($cm->id);
         $PAGE->set_context($context);
         // Get the question attempt.
-        $uniqueid = $DB->get_field('adaptivequiz_attempt', 'uniqueid', ['id' => $attemptid]);
+        $uniqueid = $attempt->uniqueid;
         $quba = question_engine::load_questions_usage_by_activity($uniqueid);
+
+        // Get the question settings for this quiz.
+        $data = (object)['componentid' => $instanceid, 'component' => 'mod_adaptivequiz'];
+        $testenvironment = new testenvironment($data);
+        $testsettings = $testenvironment->return_settings();
 
         // Render the question.
         $displayoptions = new question_display_options();
         $displayoptions->readonly = true; // Set to false if you want the question to be interactive.
         $displayoptions->marks = question_display_options::MARK_AND_MAX;
+        // Show an indicator if the given response was correct or wrong.
+        $showresponse = boolval($testsettings->catquiz_questionfeedbacksettings->catquiz_showquestionresponse)
+            ? question_display_options::VISIBLE
+            : question_display_options::HIDDEN;
+        $showrightanswer = boolval($testsettings->catquiz_questionfeedbacksettings->catquiz_showquestioncorrectresponse)
+            ? question_display_options::VISIBLE
+            : question_display_options::HIDDEN;
+        $showfeedback = boolval($testsettings->catquiz_questionfeedbacksettings->catquiz_showquestionfeedback)
+            ? question_display_options::VISIBLE
+            : question_display_options::HIDDEN;
+        $displayoptions->correctness = $showresponse;
+        $displayoptions->rightanswer = $showrightanswer;
+        $displayoptions->generalfeedback = $showfeedback;
+        $displayoptions->feedback = $showfeedback;
 
         $html = $quba->render_question($slot, $displayoptions);
 
