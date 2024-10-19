@@ -65,7 +65,7 @@ final class mathcat_test extends basic_testcase {
      * @return void
      */
     public function test_conversion_of_array_to_vector($given, $expected, $structure): void {
-        $array = $old;
+        $array = $given;
         $arraystructure = mathcat::array_to_vector($array);
         $this->assertEquals($arraystructure, $structure);
 
@@ -78,7 +78,7 @@ final class mathcat_test extends basic_testcase {
      *
      * @return array
      */
-    public static function conversion_of_array_to_vector_provider(): array {
+    public static function conversionofarraytovectorprovider(): array {
         return [
             // Simple cases: int, float, linear indexed array, linear assoc array.
             'int' => ['given' => [9], 'expected' => [9.0], 'structure' => [0 => 0]],
