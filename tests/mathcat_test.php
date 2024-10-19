@@ -59,6 +59,8 @@ final class mathcat_test extends basic_testcase {
     /**
      * Test if array_to_vector and vector_to_array work as expected
      *
+     * @dataProvider conversion_of_array_to_vector_provider
+     *
      * @param array $given
      * @param array $expected
      * @param array $structure
@@ -78,7 +80,7 @@ final class mathcat_test extends basic_testcase {
      *
      * @return array
      */
-    public static function conversionofarraytovectorprovider(): array {
+    public static function conversion_of_array_to_vector_provider(): array {
         return [
             // Simple cases: int, float, linear indexed array, linear assoc array.
             'int' => ['given' => [9], 'expected' => [9.0], 'structure' => [0 => 0]],
