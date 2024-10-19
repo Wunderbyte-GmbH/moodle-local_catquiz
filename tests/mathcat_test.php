@@ -62,13 +62,13 @@ final class mathcat_test extends basic_testcase {
      * @param array $data
      * @return void
      */
-    public function test_conversion_of_array_to_vector($data): void {
-        $array = $data['old'];
-        $structure = mathcat::array_to_vector($array);
-        $this->assertEquals($structure, $data['structure']);
+    public function test_conversion_of_array_to_vector($given, $expected, $structure): void {
+        $array = $old;
+        $arraystructure = mathcat::array_to_vector($array);
+        $this->assertEquals($arraystructure, $structure]);
 
-        $array = mathcat::vector_to_array($array, $structure);
-        $this->assertEquals($data['new'], $array);
+        $array = mathcat::vector_to_array($array, $arraystructure);
+        $this->assertEquals($expected, $array);
     }
 
     /**
@@ -79,16 +79,16 @@ final class mathcat_test extends basic_testcase {
     public static function conversion_of_array_to_vector_provider(): array {
         return [
             // Simple cases: int, float, linear indexed array, linear assoc array.
-            'int' => ['old' => [9], 'new' => [9.0], 'structure' => [0 => 0]],
-            'float' => ['old' => [9.2], 'new' => [9.2], 'structure' => [0 => 0]],
-            'linear indexed array' => ['old' => [7, 8, '9.3'], 'new' => [7.0, 8.0, 9.3], 'structure' => [0 => 0, 1 => 1, 2 => 2]],
-            'linear assoc array' => ['old' => ['first' => 3, 'second' => -5, 'third' => 7.5],
-                'new' => ['first' => 3.0, 'second' => -5.0, 'third' => 7.5],
+            'int' => ['given' => [9], 'expected' => [9.0], 'structure' => [0 => 0]],
+            'float' => ['given' => [9.2], 'expected' => [9.2], 'structure' => [0 => 0]],
+            'linear indexed array' => ['given' => [7, 8, '9.3'], 'expected' => [7.0, 8.0, 9.3], 'structure' => [0 => 0, 1 => 1, 2 => 2]],
+            'linear assoc array' => ['given' => ['first' => 3, 'second' => -5, 'third' => 7.5],
+                'expected' => ['first' => 3.0, 'second' => -5.0, 'third' => 7.5],
                 'structure' => ['first' => 0, 'second' => 1, 'third' => 2]],
 
             // Complex cases: nested array, modified and reordered array.
             'nested array' => [
-                'old' => [
+                'given' => [
                     5, 'stairways' => 20, 'first floor' => [
                         'kitchen' => 6,
                         'dining' => 15,
@@ -103,7 +103,7 @@ final class mathcat_test extends basic_testcase {
                     ],
                     'basement' => 25.7,
                 ],
-                'new' => [
+                'expected' => [
                     5.0,
                     'stairways' => 20.0,
                     'first floor' => [
@@ -140,21 +140,21 @@ final class mathcat_test extends basic_testcase {
             ],
 
             'modified and reordered' => [
-                'old' => [0, 'first' => 2, 'second' => [7, 9, 8], 'third' => 5],
-                'new' => [0 => 0.0, 'first' => 2.0, 'second' => [1 => 7.0, 3 => 9.0, 2 => 8.0], 'third' => 5.0],
+                'given' => [0, 'first' => 2, 'second' => [7, 9, 8], 'third' => 5],
+                'expected' => [0 => 0.0, 'first' => 2.0, 'second' => [1 => 7.0, 3 => 9.0, 2 => 8.0], 'third' => 5.0],
                 'structure' => [0 => 0, 'first' => 1, 'second' => [1 => 2, 3 => 3, 2 => 4], 'third' => 5],
             ],
 
             // Forbidden cases: strings in array, empty arrays.
             'forbidden because of string' => [
-                'old' => ['test' => 'test', 'legid' => 3],
-                'new' => ['test' => 0.0, 'legid' => 3.0],
+                'given' => ['test' => 'test', 'legid' => 3],
+                'expected' => ['test' => 0.0, 'legid' => 3.0],
                 'structure' => ['test' => 0, 'legid' => 1],
             ],
 
             'forbidden because of empty array' => [
-                'old' => ['test' => []],
-                'new' => ['test' => []],
+                'given' => ['test' => []],
+                'expected' => ['test' => []],
                 'structure' => ['test' => []],
             ],
         ];
