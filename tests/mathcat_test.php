@@ -149,7 +149,7 @@ final class mathcat_test extends basic_testcase {
 
             'modified and reordered' => [
                 'given' => [0, 'first' => 2, 'second' => [7, 9, 8], 'third' => 5],
-                'expected' => [0 => 0.0, 'first' => 2.0, 'second' => [0 => 7.0, 2 => 9.0, 1 => 8.0], 'third' => 5.0],
+                'expected' => [0 => 0.0, 'first' => 2.0, 'second' => [0 => 7.0, 1 => 9.0, 2 => 8.0], 'third' => 5.0],
                 'structure' => [0 => 0, 'first' => 1, 'second' => [0 => 2, 1 => 3, 2 => 4], 'third' => 5],
             ],
 
