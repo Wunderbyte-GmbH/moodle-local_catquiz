@@ -65,7 +65,7 @@ final class mathcat_test extends basic_testcase {
     public function test_conversion_of_array_to_vector($given, $expected, $structure): void {
         $array = $old;
         $arraystructure = mathcat::array_to_vector($array);
-        $this->assertEquals($arraystructure, $structure]);
+        $this->assertEquals($arraystructure, $structure);
 
         $array = mathcat::vector_to_array($array, $arraystructure);
         $this->assertEquals($expected, $array);
@@ -81,7 +81,11 @@ final class mathcat_test extends basic_testcase {
             // Simple cases: int, float, linear indexed array, linear assoc array.
             'int' => ['given' => [9], 'expected' => [9.0], 'structure' => [0 => 0]],
             'float' => ['given' => [9.2], 'expected' => [9.2], 'structure' => [0 => 0]],
-            'linear indexed array' => ['given' => [7, 8, '9.3'], 'expected' => [7.0, 8.0, 9.3], 'structure' => [0 => 0, 1 => 1, 2 => 2]],
+            'linear indexed array' => [
+                'given' => [7, 8, '9.3'],
+                'expected' => [7.0, 8.0, 9.3],
+                'structure' => [0 => 0, 1 => 1, 2 => 2],
+            ],
             'linear assoc array' => ['given' => ['first' => 3, 'second' => -5, 'third' => 7.5],
                 'expected' => ['first' => 3.0, 'second' => -5.0, 'third' => 7.5],
                 'structure' => ['first' => 0, 'second' => 1, 'third' => 2]],
