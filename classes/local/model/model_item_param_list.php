@@ -351,16 +351,16 @@ class model_item_param_list implements ArrayAccess, IteratorAggregate, Countable
         $newrecords = [];
         $now = time();
         foreach ($records as $record) {
-            $isexistingparam = array_key_exists($record['componentid'], $existingparams)
-                && array_key_exists($record['model'], $existingparams[$record['componentid']]);
+            $isexistingparam = array_key_exists($record->componentid, $existingparams)
+                && array_key_exists($record->model, $existingparams[$record->componentid]);
             // If record already exists, update it. Otherwise, insert a new record to the DB.
             if ($isexistingparam) {
-                $record['id'] = $existingparams[$record['componentid']][$record['model']]->id;
-                $record['timemodified'] = $now;
+                $record->id = $existingparams[$record->componentid][$record->model]->id;
+                $record->timemodified = $now;
                 $updatedrecords[] = $record;
             } else {
-                $record['timecreated'] = $now;
-                $record['timemodified'] = $now;
+                $record->timecreated = $now;
+                $record->timemodified = $now;
                 $newrecords[] = $record;
             }
         }
