@@ -344,9 +344,18 @@ class graphicalsummary extends feedbackgenerator {
                 );
             }
 
+            $questionname = $viewquestion
+                ? sprintf(
+                    '<span class="clickable" data-name="%s" data-attemptid="%d" data-slot="%d">%s</span>',
+                    $values['questionname'],
+                    $this->get_progress()->get_attemptid(),
+                    $index + 1,
+                    $values['questionname']
+                )
+                : $values['questionname'];
             $newrow = [
                 $index + 1,
-                sprintf('<span class="clickable" data-slot="%d">%s</span>', $index + 1, $values['questionname']),
+                $questionname,
                 $responsestring,
                 $values['questionscale_name'],
                 sprintf('%.2f', $values['personability_after']),
@@ -354,7 +363,12 @@ class graphicalsummary extends feedbackgenerator {
 
             if ($viewquestion) {
                 $searchcol = new html_table_cell(
-                    sprintf('<i class="fa fa-search clickable questionbutton" data-slot="%d"></i>', $index + 1),
+                    sprintf(
+                        '<i class="fa fa-search clickable questionbutton" data-name="%s" data-attemptid = "%d" data-slot="%d"></i>',
+                        $values['questionname'],
+                        $this->get_progress()->get_attemptid(),
+                        $index + 1
+                    ),
                 );
                 $searchcol->attributes = ['class' => 'questionbutton'];
                 $newrow[] = $searchcol;

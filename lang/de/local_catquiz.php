@@ -560,6 +560,7 @@ $string['privacy:metadata:local_catquiz_subscriptions:userid'] = 'Die ID des Ben
 $string['progress'] = 'Entwicklung Fähigkeits-Wert in „{$a}“';
 $string['questioncategories'] = 'Fragekategorien';
 $string['questioncontextattempts'] = '# Testversuche im ausgewählten Einsatz-Kontext';
+$string['questionfeedbackdisabled'] = 'Rückmeldung zu gegebener Antwort ist deaktiviert';
 $string['questionfeedbacksettings'] = 'Einstellungen zu Frage-Rückmeldungen';
 $string['questionfeedbackshow'] = 'Rückmeldung über gegebene Antworten anzeigen';
 $string['questionfeedbackshowcorrectresponse'] = 'Korrekte Antwort anzeigen';
