@@ -26,18 +26,22 @@ declare(strict_types=1);
 
 namespace local_catquiz\external;
 
+use coding_exception;
 use context_module;
 use context_system;
 use core_external\external_function_parameters;
+use dml_exception;
 use external_api;
 use external_value;
 use external_single_structure;
 use local_catquiz\catquiz_test;
 use local_catquiz\testenvironment;
+use moodle_exception;
 use qbank_previewquestion\question_preview_options;
 use question_bank;
 use question_display_options;
 use question_engine;
+use require_login_exception;
 
 defined('MOODLE_INTERNAL') || die();
 
@@ -63,8 +67,7 @@ class render_question_with_response extends external_api {
         return new external_function_parameters([
             'slot'  => new external_value(PARAM_INT, 'Slot'),
             'attemptid'  => new external_value(PARAM_INT, 'Attempt ID'),
-            ]
-        );
+        ]);
     }
 
     /**
@@ -72,7 +75,6 @@ class render_question_with_response extends external_api {
      *
      * @param int $slot
      * @param int $attemptid
-     * @param string $label
      *
      * @return array
      */
@@ -100,6 +102,17 @@ class render_question_with_response extends external_api {
         ]);
     }
 
+    /**
+     * Returns an array with the rendered question HTML.
+     *
+     * @param int $slot
+     * @param int $attemptid
+     * @return array
+     * @throws dml_exception
+     * @throws coding_exception
+     * @throws require_login_exception
+     * @throws moodle_exception
+     */
     private static function render_question(int $slot, int $attemptid): array {
         global $DB, $PAGE;
         $attempt = $DB->get_record('adaptivequiz_attempt', ['id' => $attemptid]);
