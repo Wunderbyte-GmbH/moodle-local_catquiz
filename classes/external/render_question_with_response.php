@@ -104,6 +104,14 @@ class render_question_with_response extends external_api {
         global $DB, $PAGE;
         $attempt = $DB->get_record('adaptivequiz_attempt', ['id' => $attemptid]);
         $instanceid = $attempt->instance;
+        // Get the question settings for this quiz.
+        $data = (object)['componentid' => $instanceid, 'component' => 'mod_adaptivequiz'];
+        $testenvironment = new testenvironment($data);
+        $testsettings = $testenvironment->return_settings();
+        if (!$testsettings->catquiz_showquestion) {
+            return ['body' => get_string('questionfeedbackdisabled', 'local_catquiz')];
+        }
+
         require_login();
         $cm = get_coursemodule_from_instance('adaptivequiz', $instanceid);
         $context = context_module::instance($cm->id);
@@ -111,11 +119,6 @@ class render_question_with_response extends external_api {
         // Get the question attempt.
         $uniqueid = $attempt->uniqueid;
         $quba = question_engine::load_questions_usage_by_activity($uniqueid);
-
-        // Get the question settings for this quiz.
-        $data = (object)['componentid' => $instanceid, 'component' => 'mod_adaptivequiz'];
-        $testenvironment = new testenvironment($data);
-        $testsettings = $testenvironment->return_settings();
 
         // Render the question.
         $displayoptions = new question_display_options();

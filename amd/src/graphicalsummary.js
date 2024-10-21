@@ -29,19 +29,23 @@ import {addIconToContainerWithPromise} from 'core/loadingicon';
  * Add event listeners.
  */
 export const init = async () => {
-    const urlParams = new URLSearchParams(window.location.search);
-    const attemptid = urlParams.get('attempt') ?? urlParams.get('attemptid');
     const rows = document.querySelectorAll('tr>td>.clickable');
     rows.forEach(row => {
+        if (row.initialized) {
+            return;
+        }
+        row.initialized = true;
         row.addEventListener('click', async function() {
             // Show loader icon until we have the question.
             let iconPromise = addIconToContainerWithPromise(row);
+            const attemptid = this.getAttribute('data-attemptid');
             const slot = this.getAttribute('data-slot');
+            const name = this.getAttribute('data-name');
             const questiondata = await fetchQuestionData(slot, attemptid);
             // Hide the loader icon by resolving it.
             iconPromise.resolve();
             const modal = await ModalFactory.create({
-                title: questiondata.title,
+                title: name,
                 body: questiondata.questionhtml,
             });
             modal.show();
@@ -64,6 +68,5 @@ const fetchQuestionData = async (slot, attemptid) => {
     }])[0];
     return {
         questionhtml: data.questionhtml,
-        title: 'This is the title',
     };
 };

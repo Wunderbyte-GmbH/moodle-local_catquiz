@@ -542,6 +542,7 @@ $string['privacy:metadata:local_catquiz_subscriptions:userid'] = 'The ID of the 
 $string['progress'] = 'Progress of your ability score in “{$a}”';
 $string['questioncategories'] = 'Question category';
 $string['questioncontextattempts'] = '# Attempts in selected context';
+$string['questionfeedbackdisabled'] = 'Feedback for given responses is disabled';
 $string['questionfeedbacksettings'] = 'Feedback settings for given responses';
 $string['questionfeedbackshow'] = 'Show feedback for given responses';
 $string['questionfeedbackshowcorrectresponse'] = 'Display correct response';
