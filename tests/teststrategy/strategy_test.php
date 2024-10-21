@@ -32,6 +32,7 @@ use core_question\local\bank\question_edit_contexts;
 use local_catquiz\importer\testitemimporter;
 use local_catquiz\local\model\model_item_param;
 use local_catquiz\local\model\model_model;
+use local_catquiz\local\model\model_person_param_list;
 use local_catquiz\teststrategy\strategy;
 use local_catquiz\local\model\model_strategy;
 use mod_adaptivequiz\local\attempt\attempt;
@@ -2098,15 +2099,6 @@ final class strategy_test extends advanced_testcase {
             $CFG->dirroot . '/local/catquiz/tests/fixtures/responses.1PL.csv',
             $initialabilities
         );
-        // $rasch = model_model::get_instance('rasch');
-        // $raschbirnbaum = model_model::get_instance('raschbirnbaum');
-        // $item = new model_item_param('A01-00', 'rasch');
-        // $itemresponse = $responses->get_item_response()['A01-00'];
-        // $newparams = $rasch->calculate_params($itemresponse);
-        // $item->set_parameters($newparams);
-        //$estimatedparams = [];
-        //$estimatedparams['rasch'] = $rasch->estimate_item_params($responses, $responses->get_person_abilities(), null);
-        //$estimatedparams['raschbirnbaum'] = $raschbirnbaum->estimate_item_params($responses, $responses->get_person_abilities(), null);
         //foreach ($estimatedparams['rasch']->as_csv() as $line) {
         //    mtrace($line);
         //}
@@ -2115,7 +2107,9 @@ final class strategy_test extends advanced_testcase {
         //}
 
         $strategy = new model_strategy($responses);
-        [$calculatedabilities, $calculateditemparams] = $strategy->run_estimation();
+        [$calculateditemparams, $calculatedabilities] = $strategy->run_estimation();
+        $this->writeModelParamsToCSV($calculateditemparams);
+        $this->writePersonParamsToCSV($calculatedabilities);
         $this->assertEquals(true, false);
     }
 
@@ -2301,5 +2295,57 @@ final class strategy_test extends advanced_testcase {
         $qformat->set_display_progress(false);
 
         return $qformat;
+    }
+
+    /**
+     * Summary of writeModelParamsToCSV
+     * @param array<model_item_param_list> $calculateditemparams
+     * @return array
+     */
+    protected function writeModelParamsToCSV(array $calculateditemparams): array
+    {
+        $outputFiles = [];
+        $testOutputDir = sys_get_temp_dir() . '/test_output_' . uniqid();
+        mkdir($testOutputDir);
+
+        $datetime = date('Y-m-d_H-i-s');
+
+        foreach ($calculateditemparams as $modelname => $modelparams) {
+            $filename = $testOutputDir . '/' . $modelname . '_' . $datetime . '.csv';
+            // Open the file for writing
+            $file = fopen($filename, 'w');
+
+            foreach($modelparams->as_csv() as $row) {
+                fwrite($file, $row . PHP_EOL); // Append a newline after each row.
+            }
+            fclose($file);
+            $outputFiles[$modelname] = $filename;
+        }
+
+        return $outputFiles;
+    }
+
+    /**
+     * Summary of writePersonParamsToCSV
+     * @param array<model_person_param_list> $calculatedabilities
+     * @return string
+     */
+    protected function writePersonParamsToCSV(model_person_param_list $calculatedabilities): string
+    {
+        $testOutputDir = sys_get_temp_dir() . '/test_output_' . uniqid();
+        mkdir($testOutputDir);
+
+        $datetime = date('Y-m-d_H-i-s');
+
+        $filename = $testOutputDir . '/abilities_' . $datetime . '.csv';
+        // Open the file for writing
+        $file = fopen($filename, 'w');
+
+        foreach ($calculatedabilities as $personid => $ability) {
+            $row = sprintf("P%06d;%.2f", $personid, $ability->get_ability());
+            fwrite($file, $row . PHP_EOL); // Append a newline after each row.
+        }
+        fclose($file);
+        return $filename;
     }
 }
