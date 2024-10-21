@@ -27,6 +27,7 @@ use coding_exception;
 use Exception;
 use local_catquiz\catcalc_ability_estimator;
 use local_catquiz\catcalc_item_estimator;
+use moodle_exception;
 use MoodleQuickForm;
 use stdClass;
 
@@ -304,7 +305,11 @@ abstract class model_raschmodel extends model_model implements catcalc_item_esti
         ?model_item_param_list $startvalues = null): model_item_param_list {
         $estimateditemparams = new model_item_param_list();
         $personids = $personparams->get_user_ids();
-        foreach ($responses->limit_to_users($personids, true)->get_item_response() as $itemid => $itemresponse) {
+        $filteredresponses = $responses->limit_to_users($personids, true)->get_item_response();
+        if (!$filteredresponses) {
+            throw new moodle_exception('noresponsestoestimate', 'local_catquiz');
+        }
+        foreach ($filteredresponses as $itemid => $itemresponse) {
             $parameters = $this->calculate_params($itemresponse, $startvalues[$itemid] ?? null);
             // Now create a new item difficulty object (param).
             $param = $starvalues[$itemid] ?? $this->create_item_param($itemid);

@@ -173,7 +173,11 @@ class model_responses {
             $this->recalculate_item_sum($itemid);
 
             // Remove items that have no responses for the limited list of users.
-            if ($this->sumbyitem[$itemid] == 0.0) {
+            // or only correct responses.
+            if (
+                $this->sumbyitem[$itemid] == 0.0
+                || $this->sumbyitem[$itemid] == count($this->byitem[$itemid])
+            ) {
                 unset($this->byitem[$itemid]);
                 unset($this->sumbyitem[$itemid]);
             }

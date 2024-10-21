@@ -25,7 +25,11 @@
 namespace local_catquiz\data;
 
 use cache;
+use coding_exception;
 use context_system;
+use InvalidArgumentException;
+use dml_exception;
+use ddl_exception;
 use local_catquiz\catcontext;
 use local_catquiz\catquiz;
 use local_catquiz\catscale;
@@ -134,6 +138,47 @@ class dataapi {
         $catscale->contextid = $context->id;
         $catscale->timemodified = time();
         self::update_catscale($catscale);
+
+        return $context;
+    }
+
+    /**
+     * Creates a new "updatedparams" context for the given scale
+     *
+     * @param stdClass $catscale
+     * @return catcontext
+     * @throws InvalidArgumentException
+     * @throws dml_exception
+     * @throws coding_exception
+     * @throws ddl_exception
+     */
+    public static function create_new_context_for_updated_parameters(stdClass $catscale): catcontext {
+        global $DB;
+        $defaultcontext = catquiz::get_default_context_object();
+        $timestring = userdate(time(), get_string('strftimedatetimeshort', 'core_langconfig'));
+        $usertime = str_replace(' ', '', $timestring);
+
+        $data = new stdClass();
+        $data->name = get_string('updatedparamscontext', 'local_catquiz', [
+            'scalename' => $catscale->name,
+            'usertime' => $usertime,
+            ]);
+        $data->starttimestamp = $defaultcontext->starttimestamp;
+        $data->endtimestamp = $defaultcontext->endtimestamp;
+        $data->description = get_string(
+            'updatedparamscontextdesc',
+            'local_catquiz',
+            $catscale->name
+        );
+
+        $context = new catcontext($data);
+        $context->save_or_update($data);
+        catcontext::store_context_as_singleton($context, $catscale->id);
+
+        // Duplicate all the items from the previous context, so that we do not lose items that
+        // can not be calculated due to missing responses.
+        $oldcontextid = $DB->get_field('local_catquiz_catscales', 'contextid', ['id' => $catscale->id]);
+        catscale::duplicate_testitemparams_for_scale_with_new_contextid($catscale->id, $oldcontextid, $context->id);
 
         return $context;
     }
