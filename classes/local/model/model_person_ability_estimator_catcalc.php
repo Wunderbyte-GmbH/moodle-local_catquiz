@@ -53,8 +53,10 @@ class model_person_ability_estimator_catcalc extends model_person_ability_estima
                 $this->responses->get_for_user($personid),
                 $itemparamlist
             );
-            $p = $existingpersonparams[$personid];
-            $p->set_ability($ability);
+            $p = $existingpersonparams
+                ->get_for_user($personid)
+                ->first()
+                ->set_ability($ability);
             $personparamlist->add($p);
         }
         return $personparamlist;

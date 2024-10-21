@@ -213,7 +213,7 @@ class model_item_param {
             'discrimination' => $this->parameters['discrimination'] ?? 0.0,
             'json' => $this->json,
         ];
-        if ($this->id) {
+        if (isset($this->id)) {
             $record->id = $this->id;
         }
 

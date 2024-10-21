@@ -52,35 +52,14 @@ class recalculate_cat_model_params extends \core\task\scheduled_task {
      * @return void
      */
     public function execute() {
-        global $DB;
-
-        $now = time();
-        // Get all contexts.
-        $contexts = $DB->get_records_sql(
-            <<<SQL
-                SELECT * FROM {local_catquiz_catcontext} cc
-                WHERE starttimestamp <= :now1 AND endtimestamp >= :now2
-                ;
-            SQL,
-            [
-                'now1' => $now,
-                'now2' => $now,
-            ]
-        );
-        // Convert to catcontext class.
-        $contexts = array_map(
-            fn ($record) => new catcontext($record),
-            $contexts
-        );
-        $catscales = catquiz::get_all_catscales();
+        $mainscales = catquiz::get_all_scales_for_active_contexts();
         $cmi = new catmodel_info();
-        foreach ($contexts as $context) {
-            foreach ($catscales as $catscale) {
-                if (! $cmi->needs_update($context, $catscale->id)) {
-                    continue;
-                }
-                $cmi->update_params($context->id, $catscale->id);
+        foreach ($mainscales as $scale) {
+            $context = catcontext::get_instance($scale->id);
+            if (!$cmi->needs_update($context, $scale->id)) {
+                continue;
             }
+            $cmi->update_params($context->id, $scale->id);
         }
     }
 }

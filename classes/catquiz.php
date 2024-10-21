@@ -2586,6 +2586,27 @@ class catquiz {
         $DB->update_record('local_catquiz_items', $item);
     }
 
+    public static function get_all_scales_for_active_contexts(): array {
+        global $DB;
+        $now = time();
+        // Get all contexts.
+        $contexts = $DB->get_records_sql(
+            <<<SQL
+                SELECT * FROM {local_catquiz_catscales} s
+                JOIN {local_catquiz_catcontext} cc ON s.contextid = cc.id
+                WHERE s.contextid IS NOT NULL
+                  AND cc.starttimestamp <= :now1 AND cc.endtimestamp >= :now2
+                ;
+            SQL,
+            [
+                'now1' => $now,
+                'now2' => $now,
+            ]
+        );
+        return $contexts;
+
+    }
+
     /**
      * Returns the state of questions that we will not consider as completed
      *

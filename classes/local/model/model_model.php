@@ -76,6 +76,18 @@ abstract class model_model {
     }
 
     /**
+     * Indicates if the itemparam is valid for the given model.
+     *
+     * Defaults to true but can be overwritten by subclasses.
+     *
+     * @param model_item_param $itemparam
+     * @return bool
+     */
+    public static function is_valid(model_item_param $itemparam): bool {
+        return true;
+    }
+
+    /**
      * Return the name of the current model
      *
      * @return string

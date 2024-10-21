@@ -255,7 +255,7 @@ class model_person_param_list implements ArrayAccess, IteratorAggregate, Countab
                     $param->set_ability($updatedability);
                 }
                 return [
-                    'userid' => $param->get_id(),
+                    'userid' => $param->get_userid(),
                     'ability' => $param->get_ability(),
                     'contextid' => $contextid,
                     'catscaleid' => $catscaleid,
@@ -309,6 +309,16 @@ class model_person_param_list implements ArrayAccess, IteratorAggregate, Countab
     }
 
     /**
+     * Returns the list filtered to the given user ID.
+     *
+     * @param int $userid
+     * @return self
+     */
+    public function get_for_user(int $userid): self {
+        return $this->filter(fn ($pp) => $pp->get_userid() === $userid);
+    }
+
+    /**
      * Filter the person params with the given function
      *
      * The function is called with each person param. If it returns true, the value is kept.
@@ -325,5 +335,14 @@ class model_person_param_list implements ArrayAccess, IteratorAggregate, Countab
             $filtered->add($pp);
         }
         return $filtered;
+    }
+
+    /**
+     * Returns the first element in the list of personparams.
+     *
+     * @return model_person_param
+     */
+    public function first(): model_person_param {
+        return reset($this->personparams);
     }
 }
