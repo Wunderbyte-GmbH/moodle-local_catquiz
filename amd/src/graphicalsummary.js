@@ -28,7 +28,7 @@ import {addIconToContainerWithPromise} from 'core/loadingicon';
 /**
  * Add event listeners.
  */
-export const init = async () => {
+export const init = async() => {
     const rows = document.querySelectorAll('tr>td>.clickable');
     rows.forEach(row => {
         if (row.initialized) {
@@ -58,7 +58,7 @@ export const init = async () => {
  * @param {integer} attemptid The attempt ID
  * @return string
  */
-const fetchQuestionData = async (slot, attemptid) => {
+const fetchQuestionData = async(slot, attemptid) => {
     let data = await Ajax.call([{
         methodname: 'local_catquiz_render_question_with_response',
         args: {
