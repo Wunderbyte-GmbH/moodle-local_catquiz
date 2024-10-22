@@ -55,4 +55,116 @@ final class mathcat_test extends basic_testcase {
         $expected = ['difficulty' => 0];
         $this->assertEquals($expected, $result);
     }
+
+    /**
+     * Test if array_to_vector and vector_to_array work as expected
+     *
+     * @dataProvider conversion_of_array_to_vector_provider
+     *
+     * @param array $given
+     * @param array $expected
+     * @param array $structure
+     * @return void
+     */
+    public function test_conversion_of_array_to_vector($given, $expected, $structure): void {
+        $array = $given;
+        $arraystructure = mathcat::array_to_vector($array);
+        $this->assertEquals($arraystructure, $structure);
+
+        $array = mathcat::vector_to_array($array, $arraystructure);
+        $this->assertEquals($expected, $array);
+    }
+
+    /**
+     * Data provider
+     *
+     * @return array
+     */
+    public static function conversion_of_array_to_vector_provider(): array {
+        return [
+            // Simple cases: int, float, linear indexed array, linear assoc array.
+            'int' => ['given' => [9], 'expected' => [9.0], 'structure' => [0 => 0]],
+            'float' => ['given' => [9.2], 'expected' => [9.2], 'structure' => [0 => 0]],
+            'linear indexed array' => [
+                'given' => [7, 8, '9.3'],
+                'expected' => [7.0, 8.0, 9.3],
+                'structure' => [0 => 0, 1 => 1, 2 => 2],
+            ],
+            'linear assoc array' => ['given' => ['first' => 3, 'second' => -5, 'third' => 7.5],
+                'expected' => ['first' => 3.0, 'second' => -5.0, 'third' => 7.5],
+                'structure' => ['first' => 0, 'second' => 1, 'third' => 2]],
+
+            // Complex cases: nested array, modified and reordered array.
+            'nested array' => [
+                'given' => [
+                    5, 'stairways' => 20, 'first floor' => [
+                        'kitchen' => 6,
+                        'dining' => 15,
+                        'wash room' => 4,
+                    ],
+                    'second foor' => [
+                        'sleeping room' => 12,
+                        'hobby room' => [
+                            'TV corner' => 4.5,
+                            'karaoke box' => 5.3,
+                        ],
+                    ],
+                    'basement' => 25.7,
+                ],
+                'expected' => [
+                    5.0,
+                    'stairways' => 20.0,
+                    'first floor' => [
+                        'kitchen' => 6.0,
+                        'dining' => 15.0,
+                        'wash room' => 4.0,
+                    ],
+                    'second foor' => [
+                        'sleeping room' => 12.0,
+                        'hobby room' => [
+                            'TV corner' => 4.5,
+                            'karaoke box' => 5.3,
+                        ],
+                    ],
+                    'basement' => 25.7,
+                ],
+                'structure' => [
+                    0 => 0,
+                    'stairways' => 1,
+                    'first floor' => [
+                        'kitchen' => 2,
+                        'dining' => 3,
+                        'wash room' => 4,
+                    ],
+                    'second foor' => [
+                        'sleeping room' => 5,
+                        'hobby room' => [
+                            'TV corner' => 6,
+                            'karaoke box' => 7,
+                        ],
+                    ],
+                    'basement' => 8,
+                ],
+            ],
+
+            'modified and reordered' => [
+                'given' => [0, 'first' => 2, 'second' => [0 => 7, 2 => 8, 1 => 9], 'third' => 5],
+                'expected' => [0 => 0.0, 'first' => 2.0, 'second' => [0 => 7.0, 1 => 9.0, 2 => 8.0], 'third' => 5.0],
+                'structure' => [0 => 0, 'first' => 1, 'second' => [0 => 2, 1 => 4, 2 => 3], 'third' => 5],
+            ],
+
+            // Forbidden cases: strings in array, empty arrays.
+            'forbidden because of string' => [
+                'given' => ['test' => 'test', 'legid' => 3],
+                'expected' => ['test' => 0.0, 'legid' => 3.0],
+                'structure' => ['test' => 0, 'legid' => 1],
+            ],
+
+            'forbidden because of empty array' => [
+                'given' => ['test' => []],
+                'expected' => ['test' => []],
+                'structure' => ['test' => []],
+            ],
+        ];
+    }
 }
