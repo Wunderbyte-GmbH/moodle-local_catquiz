@@ -144,7 +144,7 @@ class model_strategy {
         array $olditemparams = []
     ) {
         $this->responses = $responses;
-        $this->models = $this->create_installed_models();
+        $this->models = model_sorter::sort($this->create_installed_models());
         $this->abilityestimator = new model_person_ability_estimator_catcalc($this->responses);
         $this->set_options($options);
         $this->olditemparams = $olditemparams;
@@ -421,7 +421,7 @@ class model_strategy {
     private function create_installed_models(): array {
         /** @var array<model_model> $instances */
         $instances = [];
-        $ignorelist = ['mixedraschbirnbaum', 'grmgeneralized', 'grm', 'pcmgeneralized', 'pcm'];
+        $ignorelist = ['grmgeneralized', 'grm', 'pcmgeneralized', 'pcm'];
 
         foreach (self::get_installed_models() as $name => $classname) {
             if (in_array($name, $ignorelist)) {
