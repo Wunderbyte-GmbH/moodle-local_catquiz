@@ -240,31 +240,56 @@ class model_strategy {
                 $modelstart = microtime(true);
                 $itemdifficulties[$name] = $model
                     ->estimate_item_params($this->responses, $personabilities, $startvalues);
-                mtrace(
-                    sprintf(
-                        'Updating %d item params with model %s took %fs',
-                        count($itemdifficulties[$name]),
-                        $name,
-                        microtime(true) - $modelstart
-                    )
-                );
+                if (getenv('CATQUIZ_CREATE_TESTOUTPUT')) {
+                    mtrace(
+                        sprintf(
+                            'Updating %d item params with model %s took %fs',
+                            count($itemdifficulties[$name]),
+                            $name,
+                            microtime(true) - $modelstart
+                        )
+                    );
+                }
                 $this->set_calculated_progress($name, $itemdifficulties[$name]);
             }
 
-            // Keep track of calculated item parameters
-
+            // Keep track of calculated item parameters.
             $selectstart = microtime(true);
             $filtereddiffi = $this->select_item_model($itemdifficulties, $personabilities); // Maybe slow.
-            mtrace(sprintf('Selection process of best items took %fs in iteration %d', microtime(true) - $selectstart, $this->iterations + 1));
+            if (getenv('CATQUIZ_CREATE_TESTOUTPUT')) {
+                mtrace(
+                    sprintf(
+                        'Selection process of best items took %fs in iteration %d',
+                        microtime(true) - $selectstart,
+                        $this->iterations + 1
+                    )
+                );
+            }
             $abilitystart = microtime(true);
             $personabilities = $this
                 ->abilityestimator
                 ->get_person_abilities($filtereddiffi);
-            mtrace(sprintf('Updating person abilities took %fs in iteration %d', microtime(true) - $abilitystart, $this->iterations + 1));
+            if (getenv('CATQUIZ_CREATE_TESTOUTPUT')) {
+                mtrace(
+                    sprintf(
+                        'Updating person abilities took %fs in iteration %d',
+                        microtime(true) - $abilitystart,
+                        $this->iterations + 1
+                    )
+                );
+            }
             $this->set_calculated_abilities_progress($personabilities);
             $this->responses->set_person_abilities($personabilities);
             $this->iterations++;
-            mtrace(sprintf('Updating item paramters in iteration %d took %fs', $this->iterations, microtime(true) - $iterationstart));
+            if (getenv('CATQUIZ_CREATE_TESTOUTPUT')) {
+                mtrace(
+                    sprintf(
+                        'Updating item paramters in iteration %d took %fs',
+                        $this->iterations,
+                        microtime(true) - $iterationstart
+                    )
+                );
+            }
         }
 
         $itemdiffiwstatus = $this->set_status(
@@ -411,6 +436,17 @@ class model_strategy {
                 $models[$name] = $classname;
         }
         return $models;
+    }
+
+    /**
+     * Sets the max-iterations value.
+     *
+     * @param int $maxiterations
+     * @return self
+     */
+    public function set_max_iterations(int $maxiterations): self {
+        $this->maxiterations = $maxiterations;
+        return $this;
     }
 
     /**
