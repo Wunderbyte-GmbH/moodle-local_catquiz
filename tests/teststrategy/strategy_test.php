@@ -2089,6 +2089,10 @@ final class strategy_test extends advanced_testcase {
         ];
     }
 
+    /**
+     * Calculates updated item parameters and abilities and compares the results to expected values.
+     * @return void
+     */
     public function test_responses_lead_to_expected_item_parameters() {
         global $CFG;
         $initialabilities = loadpersonparams(
@@ -2099,18 +2103,76 @@ final class strategy_test extends advanced_testcase {
             $CFG->dirroot . '/local/catquiz/tests/fixtures/responses.1PL.csv',
             $initialabilities
         );
-        //foreach ($estimatedparams['rasch']->as_csv() as $line) {
-        //    mtrace($line);
-        //}
-        //foreach ($estimatedparams['raschbirnbaum']->as_csv() as $line) {
-        //    mtrace($line);
-        //}
 
         $strategy = new model_strategy($responses);
         [$calculateditemparams, $calculatedabilities] = $strategy->run_estimation();
-        $this->writeModelParamsToCSV($calculateditemparams);
-        $this->writePersonParamsToCSV($calculatedabilities);
-        $this->assertEquals(true, false);
+        // If desired, write CSV files with the calculated parameters.
+        if (getenv('CATQUIZ_CREATE_TESTOUTPUT')) {
+            $this->writeModelParamsToCSV($calculateditemparams);
+            $this->writePersonParamsToCSV($calculatedabilities);
+        }
+        $expected = $this->get_expected_responses_data();
+        foreach ($expected as $model => $expectedparams) {
+            foreach ($expectedparams as $ep) {
+                $itemid = array_shift($ep);
+                $calculated = $calculateditemparams[$model][$itemid];
+                $calculatedparams = $calculated->get_params_array();
+                foreach ($calculatedparams as $paramname => $paramvalue) {
+                    $this->assertEqualsWithDelta(
+                        $ep[$paramname],
+                        $paramvalue,
+                        0.001,
+                        sprintf("Values for model %s and item param %s do not match", $model, $itemid) 
+                    );
+                }
+            }
+        }
+    }
+
+    /**
+     * Returns the expected item parameters by model for the V1 dataset.
+     *
+     * @return array
+     */
+    public static function get_expected_responses_data(): array {
+        $rasch = [
+            ['itemid' => 'A01-01', 'difficulty' => -4.5984],
+            ['itemid' => 'A01-00', 'difficulty' => -4.5380],
+            ['itemid' => 'A03-00', 'difficulty' => -4.5380],
+            ['itemid' => 'A05-03', 'difficulty' => -2.5043],
+            ['itemid' => 'C03-19', 'difficulty' => 0.0011],
+            ['itemid' => 'B02-06', 'difficulty' => 2.4571],
+            ['itemid' => 'C09-17', 'difficulty' => 4.9609],
+            ['itemid' => 'C08-11', 'difficulty' => 5.0350],
+            ['itemid' => 'C08-16', 'difficulty' => 5.0857],
+        ];
+        $raschbirnbaum = [
+            ['itemid' => 'A01-00', 'difficulty' => -4.6761, 'discrimination' => 0.8988],
+            ['itemid' => 'A03-00', 'difficulty' => -4.6646, 'discrimination' => 0.9062],
+            ['itemid' => 'A03-01', 'difficulty' => -4.6563, 'discrimination' => 0.8854],
+            ['itemid' => 'A05-03', 'difficulty' => -2.5065, 'discrimination' => 0.9962],
+            ['itemid' => 'C03-19', 'difficulty' => 0.0011, 'discrimination' => 1.0312],
+            ['itemid' => 'B04-18', 'difficulty' => 2.4765, 'discrimination' => 0.9531],
+            ['itemid' => 'C08-16', 'difficulty' => 4.8775, 'discrimination' => 1.2102],
+            ['itemid' => 'C08-09', 'difficulty' => 4.8782, 'discrimination' => 1.0501],
+            ['itemid' => 'C08-11', 'difficulty' => 5.1824, 'discrimination' => 0.8999],
+        ];
+        $mixedraschbirnbaum = [
+            ['itemid' => 'A01-00', 'difficulty' => -5.0225, 'discrimination' => 0.8663, 'guessing' => 0.0000],
+            ['itemid' => 'A03-00', 'difficulty' => -4.8619, 'discrimination' => 0.8781, 'guessing' => 0.0000],
+            ['itemid' => 'A01-01', 'difficulty' => -4.5472, 'discrimination' => 1.0007, 'guessing' => 0.0273],
+            ['itemid' => 'A05-01', 'difficulty' => -2.4748, 'discrimination' => 0.8908, 'guessing' => 0.0000],
+            ['itemid' => 'C03-11', 'difficulty' => 0.0042, 'discrimination' => 0.8613, 'guessing' => 0.0000],
+            ['itemid' => 'B04-00', 'difficulty' => 2.4891, 'discrimination' => 0.8368, 'guessing' => 0.0000],
+            ['itemid' => 'C08-07', 'difficulty' => 4.8333, 'discrimination' => 0.9272, 'guessing' => 0.0004],
+            ['itemid' => 'C08-16', 'difficulty' => 4.8921, 'discrimination' => 1.1309, 'guessing' => 0.0000],
+            ['itemid' => 'C08-11', 'difficulty' => 5.1451, 'discrimination' => 0.9745, 'guessing' => 0.0032],
+        ];
+        return [
+            'rasch' => $rasch,
+            'raschbirnbaum' => $raschbirnbaum,
+            'mixedraschbirnbaum' => $mixedraschbirnbaum,
+        ];
     }
 
     /**
