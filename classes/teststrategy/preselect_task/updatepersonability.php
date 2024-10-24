@@ -310,7 +310,7 @@ class updatepersonability extends preselect_task implements wb_middleware {
                 // Remove all responses that are not in the item param list and check again.
                 $arrayresponsesforscale = array_filter(
                     $this->arrayresponses,
-                    fn($k) => $itemparamlist->offsetExists($k['questionid'])
+                    fn($k) => $itemparamlist->offsetExists($k->get_id())
                 );
                 $this->diverseanswers[$scale] = $this->has_sufficient_responses($arrayresponsesforscale);
                 if ($this->diverseanswers[$scale]) {
