@@ -2100,7 +2100,7 @@ final class strategy_test extends advanced_testcase {
             'Gesamt'
         );
         $responses = loadresponsesforitem(
-            $CFG->dirroot . '/local/catquiz/tests/fixtures/responses.1PL.csv',
+            $CFG->dirroot . '/local/catquiz/tests/fixtures/responses.3PL.csv',
             $initialabilities
         );
 
