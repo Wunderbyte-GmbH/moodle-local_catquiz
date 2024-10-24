@@ -430,15 +430,16 @@ class model_item_param_list implements ArrayAccess, IteratorAggregate, Countable
                 $new = array_pop($records);
 
                 // 1. Remove old question versions from scale:
-                foreach ($records as $r) {
-                    $catscale = $DB->get_record('local_catquiz_catscales', ['name' => $newrecord['catscalename']]);
-                    catscale::remove_testitem_from_scale($catscale->id, $r->questionid);
+                if ($catscale = $DB->get_record('local_catquiz_catscales', ['name' => $newrecord['catscalename']])) {
+                    foreach ($records as $r) {
+                        catscale::remove_testitem_from_scale($catscale->id, $r->questionid);
+                    }
+                    $newrecord['warning'] = 'Removed older question versions from scale';
                 }
 
                 // 2. Continue with the most recent version of the question:
                 unset($newrecord['label']);
                 $newrecord['componentid'] = $new->questionid;
-                $newrecord['warning'] = 'Removed older question versions from scale';
                 $returnarray = self::save_or_update_testitem_in_db($newrecord);
                 return $returnarray;
             }
