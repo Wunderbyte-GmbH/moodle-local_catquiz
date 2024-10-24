@@ -34,7 +34,7 @@ if ($hassiteconfig) {
                 $componentname . '/trusted_region_min_a',
                 get_string('trusted_region_min_a', $componentname),
                 get_string('trusted_region_min_a_desc', $componentname),
-                -10.0,
+                -5.0,
                 PARAM_FLOAT,
                 2
             )
@@ -44,7 +44,7 @@ if ($hassiteconfig) {
                 $componentname . '/trusted_region_max_a',
                 get_string('trusted_region_max_a', $componentname),
                 get_string('trusted_region_max_a_desc', $componentname),
-                10.0,
+                5.0,
                 PARAM_FLOAT,
                 2
             )
