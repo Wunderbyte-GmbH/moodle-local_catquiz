@@ -50,6 +50,12 @@ require_once("$CFG->dirroot/mod/adaptivequiz/locallib.php");
 class cancel_expired_attempts extends \core\task\scheduled_task {
 
     /**
+     * Allow some extra time before closing an expired attempt.
+     * @var float
+     */
+    const BUFFER_TIME_FACTOR = 1.5;
+
+    /**
      * Holds adaptivequiz records as stdClass entires.
      *
      * @var array
@@ -110,6 +116,7 @@ class cancel_expired_attempts extends \core\task\scheduled_task {
                 || !$settings->catquiz_timelimitgroup
             ) {
                 $this->maxtimepertest[$tr->componentid] = null;
+                continue;
             }
 
             // The max time per attempt can be given in minutes or hours. We convert it to seconds to
@@ -168,7 +175,7 @@ class cancel_expired_attempts extends \core\task\scheduled_task {
         if ($maxtime === 0) {
             return false;
         }
-        return $now - $timecreated > $maxtime;
+        return $now - $timecreated > ($maxtime * self::BUFFER_TIME_FACTOR);
     }
 
     /**
