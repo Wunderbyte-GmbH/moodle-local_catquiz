@@ -85,6 +85,13 @@ class model_responses {
     private array $personparams = []; // TODO replace $personparams completely.
 
     /**
+     * Caches the responses object limited to a set of users.
+     *
+     * @var array
+     */
+    private $userlimitcache = [];
+
+    /**
      * Return array of item ids.
      *
      * @return array
@@ -159,6 +166,16 @@ class model_responses {
      * @return self
      */
     public function limit_to_users(array $personids, bool $clone = false): self {
+        // Create a cache key from the personids.
+        $cachekey = md5(serialize($personids));
+
+        if (isset($this->userlimitcache[$cachekey])) {
+            if ($clone) {
+                return clone $this->userlimitcache[$cachekey];
+            }
+            return $this->userlimitcache[$cachekey];
+        }
+
         // Instead of modifying the existing object, create a copy and modify that.
         if ($clone) {
             $copy = clone($this);
@@ -182,6 +199,10 @@ class model_responses {
                 unset($this->sumbyitem[$itemid]);
             }
         }
+
+        // Store the result in cache.
+        $this->userlimitcache[$cachekey] = $this;
+
         return $this;
     }
 
