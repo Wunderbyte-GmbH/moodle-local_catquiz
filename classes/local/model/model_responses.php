@@ -182,11 +182,14 @@ class model_responses {
             return $copy->limit_to_users($personids);
         }
 
-        $this->byperson = array_filter($this->byperson, fn ($pid) => in_array($pid, $personids), ARRAY_FILTER_USE_KEY);
-        $this->sumbyperson = array_filter($this->sumbyperson, fn ($pid) => in_array($pid, $personids), ARRAY_FILTER_USE_KEY);
+        // Convert personids array to hash map for O(1) lookup.
+        $personidsmap = array_flip($personids);
+
+        $this->byperson = array_intersect_key($this->byperson, $personidsmap);
+        $this->sumbyperson = array_intersect_key($this->sumbyperson, $personidsmap);
 
         foreach ($this->byitem as $itemid => $responses) {
-            $this->byitem[$itemid] = array_filter($responses, fn ($pid) => in_array($pid, $personids), ARRAY_FILTER_USE_KEY);
+            $this->byitem[$itemid] = array_intersect_key($responses, $personidsmap);
             $this->recalculate_item_sum($itemid);
 
             // Remove items that have no responses for the limited list of users.
