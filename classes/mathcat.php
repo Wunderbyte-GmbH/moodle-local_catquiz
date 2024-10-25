@@ -483,12 +483,6 @@ class mathcat {
     public static function array_to_vector(&$data, int &$n = 0): array {
         // NOTE: The operation will be done directly on $data, so work with a copy!
 
-        if (is_null($n)) {
-
-            // If there is no $n given, create one for having an adress to work with.
-            $n = 0;
-        }
-
         if (is_array($data)) {
 
             // Handle all arrays given.
