@@ -69,7 +69,7 @@ final class mathcat_test extends basic_testcase {
     public function test_conversion_of_array_to_vector($given, $expected, $structure): void {
         $array = $given;
         $arraystructure = mathcat::array_to_vector($array);
-        $this->assertEquals($arraystructure, $structure);
+        $this->assertEquals($structure, $arraystructure);
 
         $array = mathcat::vector_to_array($array, $arraystructure);
         $this->assertEquals($expected, $array);
