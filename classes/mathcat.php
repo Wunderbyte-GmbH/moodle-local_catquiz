@@ -504,7 +504,7 @@ class mathcat {
                     // Perpare results.
                     $structure[$key] = $structuretmp;
                     $datatmp = array_merge($datatmp, $val);
-                } else if (is_float($val)) {
+                } else if (is_numeric($val)) {
 
                     // Give back part of the array and structure, also increment $n.
                     $datatmp[$n] = floatval($val);
@@ -521,7 +521,7 @@ class mathcat {
             // Overwrite $data and return $structure.
             $data = $datatmp;
             return $structure;
-        } else if (is_float($data)) {
+        } else if (is_numeric($data)) {
 
             // Handle the case that something like a float is given instead.
             $structure = $n;
