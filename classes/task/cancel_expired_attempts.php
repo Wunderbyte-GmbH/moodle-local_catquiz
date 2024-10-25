@@ -183,7 +183,10 @@ class cancel_expired_attempts extends \core\task\scheduled_task {
         $quizmaxtime = $this->maxtimepertest[$record->instance];
 
         // If the maximum attempt time is set to 0, it means it has no limit.
-        if (intval($quizmaxtime) === 0) {
+        if ($quizmaxtime === 0) {
+            return false;
+        }
+        if ($this->defaultmaxtime === 0) {
             return false;
         }
         $maxtime = max($quizmaxtime * self::BUFFER_TIME_FACTOR, $this->defaultmaxtime);
