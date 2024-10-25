@@ -23,7 +23,7 @@
 import Ajax from 'core/ajax';
 import ModalFactory from 'core/modal_factory';
 import {addIconToContainerWithPromise} from 'core/loadingicon';
-
+import {typeset} from 'filter_mathjaxloader/loader';
 
 /**
  * Add event listeners.
@@ -49,6 +49,7 @@ export const init = async() => {
                 body: questiondata.questionhtml,
             });
             modal.show();
+            typeset(modal.getRoot()[0]);
         });
     });
 };
