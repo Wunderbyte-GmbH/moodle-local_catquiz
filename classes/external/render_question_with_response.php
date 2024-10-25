@@ -152,7 +152,7 @@ class render_question_with_response extends external_api {
         $displayoptions->generalfeedback = $showfeedback;
         $displayoptions->feedback = $showfeedback;
 
-        $html = $quba->render_question($slot, $displayoptions);
+        $html = format_text($quba->render_question($slot, $displayoptions));
 
         return [
             'body' => $html,
