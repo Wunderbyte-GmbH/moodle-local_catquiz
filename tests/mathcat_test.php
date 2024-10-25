@@ -156,14 +156,14 @@ final class mathcat_test extends basic_testcase {
             // Forbidden cases: strings in array, empty arrays.
             'forbidden because of string' => [
                 'given' => ['test' => 'test', 'legid' => 3],
-                'expected' => ['test' => 0.0, 'legid' => 3.0],
-                'structure' => ['test' => 0, 'legid' => 1],
+                'expected' => [],
+                'structure' => [],
             ],
 
             'forbidden because of empty array' => [
                 'given' => ['test' => []],
-                'expected' => ['test' => []],
-                'structure' => ['test' => []],
+                'expected' => [],
+                'structure' => [],
             ],
         ];
     }
