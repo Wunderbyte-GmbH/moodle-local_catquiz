@@ -483,14 +483,14 @@ class mathcat {
     public static function array_to_vector(&$data, int &$n = 0): array {
         // NOTE: The operation will be done directly on $data, so work with a copy!
 
-        if (is_array($data) && count($data)>0) {
+        if (is_array($data) && count($data) > 0) {
 
             // Handle all arrays given.
             $datatmp = [];
             $structure = [];
             foreach ($data as $key => $val) {
 
-                if (is_array($val) && count($val)>0) {
+                if (is_array($val) && count($val) > 0) {
 
                     // Analyse further recursively.
                     $structuretmp = self::array_to_vector($val, $n);
