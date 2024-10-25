@@ -510,7 +510,7 @@ class mathcat {
                     // Perpare results.
                     $structure[$key] = $structuretmp;
                     $datatmp = array_merge($datatmp, $val);
-                } else if (is_float(floatval($val))) {
+                } else if (is_float($val)) {
 
                     // Give back part of the array and structure, also increment $n.
                     $datatmp[$n] = floatval($val);
@@ -527,7 +527,7 @@ class mathcat {
             // Overwrite $data and return $structure.
             $data = $datatmp;
             return $structure;
-        } else if (is_float(floatval($data))) {
+        } else if (is_float($data)) {
 
             // Handle the case that something like a float is given instead.
             $structure = $n;
@@ -536,8 +536,7 @@ class mathcat {
             return $structure;
         }
 
-        // Handle any other cases, like strings or objects.
-        // TODO: throw error/warning: not float or array, also give $data.
+        debugging('not float or array given in method array_to_vector', DEBUG_DEVELOPER);
         return [];
     }
 
@@ -575,14 +574,12 @@ class mathcat {
                 return $data[$structure];
             } else {
 
-                // Handle all forbidden cases.
-                // TODO: throw error/warning: $key not in $data.
+                debugging('given structure array does not match vector in vector_to_array', DEBUG_DEVELOPER);
                 return [];
             }
         }
 
-        // Handle any other cases, like strings or objects.
-        // TODO: throw error/warning: not float or array, also give $data.
+        debugging('corrupted structure array given in vector_to_array', DEBUG_DEVELOPER);
         return [];
     }
 }
