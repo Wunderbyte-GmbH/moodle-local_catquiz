@@ -57,17 +57,28 @@ class cancel_expired_attempts extends \core\task\scheduled_task {
 
     /**
      * Holds adaptivequiz records as stdClass entires.
-     *
      * @var array
      */
     private array $quizzes = [];
 
     /**
      * Holds the local_catquiz_tests of open attempts.
-     *
      * @var array
      */
     private array $maxtimepertest = [];
+
+    /**
+     * Current timestamp
+     * @var int
+     */
+    private int $currenttime;
+
+    /**
+     * Default maximum time for attempts
+     * @var int
+     */
+    private int $defaultmaxtime;
+
     /**
      * Returns task name.
      * @return string
@@ -85,7 +96,8 @@ class cancel_expired_attempts extends \core\task\scheduled_task {
         global $DB;
         mtrace("Running cancel_expired_attempts task.");
 
-        // Get all catquiz attempts that are still in progress.
+        $this->initialize();
+
         $sql = <<<SQL
         SELECT aa.*
         FROM {adaptivequiz} a
@@ -100,56 +112,22 @@ class cancel_expired_attempts extends \core\task\scheduled_task {
             return;
         }
 
-        // Get all local_catquiz_tests records that are used by open attempts.
-        $openinstances = array_unique(
-            array_map(
-                fn($r) => $r->instance,
-                $records
-            )
-        );
-        // For each test, get the maximum time per attempt setting.
-        foreach ($DB->get_records_list('local_catquiz_tests', 'componentid', $openinstances) as $tr) {
-            $settings = json_decode($tr->json);
-            // If this setting is not given, it is not limited on the quiz level.
-            if (
-                !property_exists($settings, 'catquiz_timelimitgroup')
-                || !$settings->catquiz_timelimitgroup
-            ) {
-                $this->maxtimepertest[$tr->componentid] = null;
-                continue;
-            }
-
-            // The max time per attempt can be given in minutes or hours. We convert it to seconds to
-            // compare it to the current time.
-            $maxtimeperattempt = $settings->catquiz_timelimitgroup->catquiz_maxtimeperattempt * 60;
-            if ($settings->catquiz_timelimitgroup->catquiz_timeselect_attempt == 'h') {
-                $maxtimeperattempt *= 60;
-            }
-            $this->maxtimepertest[$tr->componentid] = $maxtimeperattempt;
-        }
-
-        // For each record, check if the attempt is running longer than the default maximum time or the
-        // maximum time defined by the quiz. If so, mark it as completed with the exceeded threshold state.
-        $now = time();
-        $defaultmaxtime = 60 * 60 * get_config('local_catquiz', 'maximum_attempt_duration_hours');
         $completed = 0;
         $statusmessage = get_string('attemptclosedbytimelimit', 'local_catquiz');
         foreach ($records as $record) {
-            // If it is set on a quiz setting basis and not triggered, ignore the default setting.
-            $quizmaxtime = $this->maxtimepertest[$record->instance];
-            $exceedsmaxtime = $this->exceeds_maxtime($record->timecreated, $quizmaxtime, $defaultmaxtime, $now);
-            if ($exceedsmaxtime) {
-                $attempt = attempt::get_by_id($record->id);
-                $quiz = $this->get_adaptivequiz($record->instance);
-                $cm = get_coursemodule_from_instance('adaptivequiz', $record->instance);
-                $context = context_module::instance($cm->id);
-                $attempt->complete($quiz, $context, $statusmessage, $now);
-                catquiz::set_final_attempt_status($record->id, status::CLOSED_BY_TIMELIMIT);
-                cache_helper::purge_by_event('changesinquizattempts');
-                $completed++;
+            if (!$this->exceeds_maxtime($record)) {
+                continue;
             }
+            $attempt = attempt::get_by_id($record->id);
+            $quiz = $this->get_adaptivequiz($record->instance);
+            $cm = get_coursemodule_from_instance('adaptivequiz', $record->instance);
+            $context = context_module::instance($cm->id);
+            $attempt->complete($quiz, $context, $statusmessage, $this->currenttime);
+            catquiz::set_final_attempt_status($record->id, status::CLOSED_BY_TIMELIMIT);
+            cache_helper::purge_by_event('changesinquizattempts');
+            $completed++;
         }
-        $duration = time() - $now;
+        $duration = time() - $this->currenttime;
         mtrace(sprintf(
             'Processed %d open attempts in %d seconds and marked %d as completed',
             count($records),
@@ -159,23 +137,57 @@ class cancel_expired_attempts extends \core\task\scheduled_task {
     }
 
     /**
+     * Initialize the task properties
+     */
+    private function initialize() {
+        $this->currenttime = time();
+        $this->defaultmaxtime = 60 * 60 * get_config('local_catquiz', 'maximum_attempt_duration_hours');
+        $this->load_max_times_per_test();
+    }
+
+    /**
+     * Load maximum times for all tests
+     */
+    private function load_max_times_per_test() {
+        global $DB;
+
+        $records = $DB->get_records('adaptivequiz', ['catmodel' => 'catquiz']);
+        $openinstances = array_map(fn($r) => $r->id, $records);
+
+        foreach ($DB->get_records_list('local_catquiz_tests', 'componentid', $openinstances) as $tr) {
+            $settings = json_decode($tr->json);
+            if (
+                !property_exists($settings, 'catquiz_timelimitgroup')
+                || !$settings->catquiz_timelimitgroup
+            ) {
+                $this->maxtimepertest[$tr->componentid] = null;
+                continue;
+            }
+
+            $maxtimeperattempt = $settings->catquiz_timelimitgroup->catquiz_maxtimeperattempt * 60;
+            if ($settings->catquiz_timelimitgroup->catquiz_timeselect_attempt == 'h') {
+                $maxtimeperattempt *= 60;
+            }
+            $this->maxtimepertest[$tr->componentid] = $maxtimeperattempt;
+        }
+    }
+
+
+    /**
      * Checks whether the given attempt exceeds the max attempt time
      *
-     * @param int $timecreated Timestamp when the attempt was created
-     * @param ?int $quizmaxtime Maximum time specified by the quiz
-     * @param int $defaultmaxtime Default maximum time
-     * @param int $now
+     * @param stdClass $record The attempt record
      * @return bool
      */
-    public function exceeds_maxtime(int $timecreated, ?int $quizmaxtime, int $defaultmaxtime, int $now): bool {
-        // Get the timeout that should be used.
-        // If a timeout is set per quiz, use this. If not, fall back to the global default.
-        $maxtime = $quizmaxtime ?? $defaultmaxtime;
-        // The value 0 is treated as "no limit".
-        if ($maxtime === 0) {
+    public function exceeds_maxtime(stdClass $record): bool {
+        $quizmaxtime = $this->maxtimepertest[$record->instance];
+
+        // If the maximum attempt time is set to 0, it means it has no limit.
+        if (intval($quizmaxtime) === 0) {
             return false;
         }
-        return $now - $timecreated > ($maxtime * self::BUFFER_TIME_FACTOR);
+        $maxtime = max($quizmaxtime * self::BUFFER_TIME_FACTOR, $this->defaultmaxtime);
+        return $this->currenttime - $record->timecreated > $maxtime;
     }
 
     /**
