@@ -78,6 +78,7 @@ final class testitemimporter_test extends advanced_testcase {
     private stdClass $course;
 
     public function setUp(): void {
+        parent::setUp();
         $this->import('simulation.xml', 'simulation.csv');
     }
 

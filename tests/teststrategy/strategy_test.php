@@ -88,6 +88,7 @@ final class strategy_test extends advanced_testcase {
      * @return void
      */
     public function setUp(): void {
+        parent::setUp();
         $this->import('simulation.xml', 'simulation.csv');
         // Needed to simulate question answers.
 
