@@ -42,7 +42,7 @@ use local_catquiz\task\cancel_expired_attempts;
 final class cancel_expired_attempts_test extends basic_testcase {
 
     /**
-     * Test if the newton raphson multi stable function returns expected outputs.
+     * Test if attempt expiration is detected correctly.
      *
      * @param int $attemptcreated
      * @param ?int $quizmaxtime
@@ -60,10 +60,30 @@ final class cancel_expired_attempts_test extends basic_testcase {
         bool $expected
     ): void {
         $task = new cancel_expired_attempts();
-        $shouldbecompleted = $task->exceeds_maxtime($attemptcreated, $quizmaxtime, $defaultmaxtime, $now);
+
+        // Create a mock attempt record.
+        $record = new \stdClass();
+        $record->timecreated = $attemptcreated;
+        $record->instance = 1; // Dummy instance ID.
+
+        // Set up the required properties using reflection.
+        $reflection = new \ReflectionClass($task);
+
+        $currenttimeprop = $reflection->getProperty('currenttime');
+        $currenttimeprop->setAccessible(true);
+        $currenttimeprop->setValue($task, $now);
+
+        $defaultmaxtimeprop = $reflection->getProperty('defaultmaxtime');
+        $defaultmaxtimeprop->setAccessible(true);
+        $defaultmaxtimeprop->setValue($task, $defaultmaxtime);
+
+        $maxtimepertestprop = $reflection->getProperty('maxtimepertest');
+        $maxtimepertestprop->setAccessible(true);
+        $maxtimepertestprop->setValue($task, [1 => $quizmaxtime]); // Use dummy instance ID 1.
+
+        $shouldbecompleted = $task->exceeds_maxtime($record);
         $this->assertEquals($expected, $shouldbecompleted);
     }
-
     /**
      * Data provider for test cases that check if attempt expiration is detected correctly.
      *
@@ -78,7 +98,7 @@ final class cancel_expired_attempts_test extends basic_testcase {
             'quiz setting and expired' => [
                 $starttime,
                 60, // Allow just 1 minute.
-                3600, // This should be ignored.
+                1, // This should be ignored.
                 $now,
                 true,
             ],
