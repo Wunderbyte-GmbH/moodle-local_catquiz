@@ -237,9 +237,11 @@ class item_model_override_selector extends dynamic_form {
         if (!empty($data->temporaryfields)) {
             $tempfields = json_decode($data->temporaryfields);
             foreach ($tempfields as $model => $values) {
-               $param = $formitemparams[$model];
-               $param->add_new_param($values);
-               $param->save();
+                $param = $formitemparams[$model];
+                foreach ($values as $newparam) {
+                    $param->add_new_param($newparam);
+                }
+                $param->save();
             }
         }
 
