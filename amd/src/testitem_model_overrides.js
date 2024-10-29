@@ -55,6 +55,24 @@ const syncSelectedState = (model) => {
         });
 };
 
+const collectNewParamData = (addedParamIds) => {
+    console.log("Getting field values for added parameters");
+    let finalData = {};
+    addedParamIds.forEach(newParam => {
+        const model = newParam.model;
+        finalData[model] = finalData[model] || [];
+        const ids = newParam.ids;
+        const params = {};
+        ids.forEach(id => {
+            const element = document.getElementById(id);
+            const value = element.value;
+            params[id] = value;
+        });
+        finalData[model].push(params)
+    });
+    return finalData;
+}
+
 /**
  * Add event listener to the form
  */
@@ -94,20 +112,29 @@ export const init = () => {
         console.log(e);
         // Construct the new input fields.
         const lastBreak = e.detail.parentElement.parentElement.previousElementSibling;
+        const paramGroup = e.detail.closest('.param-group');
+        // Get the current highest number from existing fraction/difficulty inputs
+        const existingInputs = paramGroup.querySelectorAll('input[type^="fraction_"], input[type^="difficulty_"]');
+        const currentMax = Math.max(...Array.from(existingInputs)
+            .map(input => parseInt(input.getAttribute('type').split('_')[1] || '0'))
+        );
+        const newNumber = currentMax + 1;
 
         const newFractionLabel = document.createElement('label');
-        newFractionLabel.textContent = 'Fraction X';
-        newFractionLabel.setAttribute('for', 'fraction_x');
+        newFractionLabel.textContent = `Fraction ${newNumber}`;
+        newFractionLabel.setAttribute('for', `fraction_${newNumber}`);
         const newFractionInput = document.createElement('input');
         newFractionInput.className = 'form-control param-input';
-        newFractionInput.id = 'fraction_x';
+        newFractionInput.id = `fraction_${newNumber}`;
+        newFractionInput.setAttribute('type', `fraction_${newNumber}`);
 
         const newDifficultyLabel = document.createElement('label');
-        newDifficultyLabel.textContent = 'Difficulty X';
-        newDifficultyLabel.setAttribute('for', 'difficulty_x');
+        newDifficultyLabel.textContent = `Difficulty ${newNumber}`;
+        newDifficultyLabel.setAttribute('for', `difficulty_${newNumber}`);
         const newDifficultyInput = document.createElement('input');
         newDifficultyInput.className = 'form-control param-input';
-        newDifficultyInput.id = 'difficulty_x';
+        newDifficultyInput.id = `difficulty_${newNumber}`;
+        newDifficultyInput.setAttribute('type', `difficulty_${newNumber}`);
 
         lastBreak.insertAdjacentElement('afterend', newDifficultyInput);
         lastBreak.insertAdjacentElement('afterend', newDifficultyLabel);
@@ -119,23 +146,22 @@ export const init = () => {
         // can collect them easily when the form is submitted.
         const tempFieldsInput = document.querySelector(SELECTORS.TEMP_FIELDS_INPUT);
         let tempids = JSON.parse(tempFieldsInput.value);
-        tempids.push('difficulty_x')
-        tempids.push('fraction_x')
+        const tempData = {
+            model: e.detail.dataset.model,
+            ids: [newDifficultyInput.getAttribute('id'), newFractionInput.getAttribute('id')]
+        }
+        tempids.push(tempData);
         tempFieldsInput.value = JSON.stringify(tempids);
     }
 
     dynamicForm.addEventListener(dynamicForm.events.SUBMIT_BUTTON_PRESSED, (e) => {
         console.log('Submit button pressed');
         const tempFieldsInput = document.querySelector(SELECTORS.TEMP_FIELDS_INPUT);
+        const addedParamIds = JSON.parse(tempFieldsInput.value);
+        console.log(addedParamIds);
+        const newParamData = collectNewParamData(addedParamIds);
         // TODO: Replace with working code.
-        tempFieldsInput.value = JSON.stringify(
-            {
-                grm: {
-                    difficulty_x: 1.2,
-                    fraction_x: 3.4
-                }
-            }
-        );
+        tempFieldsInput.value = JSON.stringify(newParamData);
     });
 
     dynamicForm.addEventListener(dynamicForm.events.FORM_SUBMITTED, (e) => {
