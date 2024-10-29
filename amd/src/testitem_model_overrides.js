@@ -25,7 +25,8 @@ const SELECTORS = {
     FORMCONTAINER: '#lcq_model_override_form',
     NOEDITBUTTON: '[name="noedititemparams"]',
     MODELSTATUSSELECTS: '#lcq_model_override_form .custom-select[name^="override_"]',
-    ACTIVEMODELSELECT: '[name="active_model"]'
+    ACTIVEMODELSELECT: '[name="active_model"]',
+    TEMP_FIELDS_INPUT: '[name="temporaryfields"]'
 };
 
 const disabledStates = ["0", "-5"];
@@ -73,6 +74,7 @@ export const init = () => {
             contextid: searchParams.get("contextid"),
             scaleid: searchParams.get("scaleid"),
             component: searchParams.get("component"),
+            updateitem: true
         }).then(
             // Now that the model fields were added, we can add listeners to them.
             (result) => {
@@ -86,8 +88,58 @@ export const init = () => {
         ).catch(err => err);
     }
 
-    dynamicForm.addEventListener(dynamicForm.events.FORM_SUBMITTED, (e) => {
+    const addItemParams = (e) => {
+        const searchParams = new URLSearchParams(window.location.search);
+        console.log('In add item params');
+        console.log(e);
+        // Construct the new input fields.
+        const lastBreak = e.detail.parentElement.parentElement.previousElementSibling;
 
+        const newFractionLabel = document.createElement('label');
+        newFractionLabel.textContent = 'Fraction X';
+        newFractionLabel.setAttribute('for', 'fraction_x');
+        const newFractionInput = document.createElement('input');
+        newFractionInput.className = 'form-control param-input';
+        newFractionInput.id = 'fraction_x';
+
+        const newDifficultyLabel = document.createElement('label');
+        newDifficultyLabel.textContent = 'Difficulty X';
+        newDifficultyLabel.setAttribute('for', 'difficulty_x');
+        const newDifficultyInput = document.createElement('input');
+        newDifficultyInput.className = 'form-control param-input';
+        newDifficultyInput.id = 'difficulty_x';
+
+        lastBreak.insertAdjacentElement('afterend', newDifficultyInput);
+        lastBreak.insertAdjacentElement('afterend', newDifficultyLabel);
+        lastBreak.insertAdjacentElement('afterend', newFractionInput);
+        lastBreak.insertAdjacentElement('afterend', newFractionLabel);
+
+
+        // Add the IDs of newly added fields to the tempFieldsInput, so that we
+        // can collect them easily when the form is submitted.
+        const tempFieldsInput = document.querySelector(SELECTORS.TEMP_FIELDS_INPUT);
+        let tempids = JSON.parse(tempFieldsInput.value);
+        tempids.push('difficulty_x')
+        tempids.push('fraction_x')
+        tempFieldsInput.value = JSON.stringify(tempids);
+    }
+
+    dynamicForm.addEventListener(dynamicForm.events.SUBMIT_BUTTON_PRESSED, (e) => {
+        console.log('Submit button pressed');
+        const tempFieldsInput = document.querySelector(SELECTORS.TEMP_FIELDS_INPUT);
+        // TODO: Replace with working code.
+        tempFieldsInput.value = JSON.stringify(
+            {
+                grm: {
+                    difficulty_x: 1.2,
+                    fraction_x: 3.4
+                }
+            }
+        );
+    });
+
+    dynamicForm.addEventListener(dynamicForm.events.FORM_SUBMITTED, (e) => {
+        console.log('Form submitted');
         e.preventDefault();
         let formcontainer = document.querySelector(
             SELECTORS.FORMCONTAINER);
@@ -113,8 +165,11 @@ export const init = () => {
             case 'noedititemparams':
                 switchEditMode(false);
                 break;
+            case 'override_grm[additemparams]':
+                addItemParams(e);
+                break;
             default:
-                console.log("Unknown no-submit action")
+                console.log(`Unknown no-submit action: ${e.detail.name}`)
         }
     });
 };

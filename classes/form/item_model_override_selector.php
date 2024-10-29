@@ -75,7 +75,10 @@ class item_model_override_selector extends dynamic_form {
         $mform->setType('editing', PARAM_BOOL);
         $mform->registerNoSubmitButton('edititemparams');
         $mform->registerNoSubmitButton('noedititemparams');
-
+        $mform->registerNoSubmitButton('additemparams');
+        // Hidden field to store temporary fields data.
+        $mform->addElement('hidden', 'temporaryfields', '[]');
+        $mform->setType('temporaryfields', PARAM_RAW);
     }
 
     /**
@@ -198,6 +201,7 @@ class item_model_override_selector extends dynamic_form {
      */
     public function process_dynamic_submission(): object {
         $data = $this->get_data();
+
         if (!empty($data->editing)) {
             if ($data->editing == "false") {
                 $data->editing = false;
@@ -227,6 +231,16 @@ class item_model_override_selector extends dynamic_form {
                 $rec->timecreated = $defaultobj->timecreated;
             }
             $formitemparams[$model] = model_item_param::from_record($rec);
+        }
+
+         // Handle adding new field request.
+        if (!empty($data->temporaryfields)) {
+            $tempfields = json_decode($data->temporaryfields);
+            foreach ($tempfields as $model => $values) {
+               $param = $formitemparams[$model];
+               $param->add_new_param($values);
+               $param->save();
+            }
         }
 
         foreach ($formitemparams as $model => $param) {
