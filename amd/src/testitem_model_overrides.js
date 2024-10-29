@@ -64,6 +64,28 @@ export const init = () => {
         'local_catquiz\\form\\item_model_override_selector'
     );
 
+    const switchEditMode = (targetModeIsEditing) => {
+        console.log(`Switching edit mode to: ${targetModeIsEditing}`);
+        const searchParams = new URLSearchParams(window.location.search);
+        dynamicForm.load({
+            editing: targetModeIsEditing,
+            testitemid: searchParams.get("id"),
+            contextid: searchParams.get("contextid"),
+            scaleid: searchParams.get("scaleid"),
+            component: searchParams.get("component"),
+        }).then(
+            // Now that the model fields were added, we can add listeners to them.
+            (result) => {
+                const modelSelectors = document.querySelectorAll(SELECTORS.MODELSTATUSSELECTS);
+                modelSelectors.forEach(model => {
+                    syncSelectedState(model);
+                    model.addEventListener('change', (e) => syncSelectedState(e.target));
+            });
+                return result;
+            }
+        ).catch(err => err);
+    }
+
     dynamicForm.addEventListener(dynamicForm.events.FORM_SUBMITTED, (e) => {
 
         e.preventDefault();
@@ -84,24 +106,15 @@ export const init = () => {
         let formcontainer = document.querySelector(
             SELECTORS.FORMCONTAINER);
         e.preventDefault();
-        const searchParams = new URLSearchParams(window.location.search);
-
-        dynamicForm.load({
-            editing: formcontainer.querySelector(SELECTORS.NOEDITBUTTON) ? false : true,
-            testitemid: searchParams.get("id"),
-            contextid: searchParams.get("contextid"),
-            scaleid: searchParams.get("scaleid"),
-            component: searchParams.get("component"),
-        }).then(
-            // Now that the model fields were added, we can add listeners to them.
-            (result) => {
-                const modelSelectors = document.querySelectorAll(SELECTORS.MODELSTATUSSELECTS);
-                modelSelectors.forEach(model => {
-                    syncSelectedState(model);
-                    model.addEventListener('change', (e) => syncSelectedState(e.target));
-            });
-                return result;
-            }
-        ).catch(err => err);
+        switch (e.detail.name) {
+            case 'edititemparams':
+                switchEditMode(true);
+                break;
+            case 'noedititemparams':
+                switchEditMode(false);
+                break;
+            default:
+                console.log("Unknown no-submit action")
+        }
     });
 };
