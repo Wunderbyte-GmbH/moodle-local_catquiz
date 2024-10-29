@@ -483,4 +483,11 @@ class model_item_param {
     public function get_static_param_array(): array {
         return $this->get_model_object()->get_static_param_array($this);
     }
+
+    public function add_new_param(stdClass $params): self {
+        $newparams = $this->get_model_object()->add_new_param($this->get_params_array(), $params);
+        $this->set_parameters($newparams);
+        $this->json = $this->form_array_to_record($this->get_model_object()->get_parameter_fields($this))->json;
+        return $this;
+    }
 }

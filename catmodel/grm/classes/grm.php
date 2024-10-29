@@ -530,4 +530,14 @@ class grm extends model_multiparam {
     protected function get_multi_param_name(): string {
         return 'difficulties';
     }
+
+    public function add_new_param(array $existingparams, stdClass $new): array {
+        $newdifficulties = array_merge(
+            $existingparams['difficulties'],
+            [strval($new->fraction_x) => $new->difficulty_x]
+        );
+        $newparams['difficulties'] = $newdifficulties;
+        $newparams['difficulty'] = self::calculate_mean_difficulty($newparams);
+        return $newparams;
+    }
 }
