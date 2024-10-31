@@ -172,3 +172,41 @@ div[contenteditable="false"] {
 #feedbackcontent-graphicalsummary .questionbutton {
     text-align: center;
 }
+
+#lcq_model_override_form .param-group .felement > .w-100 > .d-flex {
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    gap: 1em;
+    align-items: center;
+}
+
+#lcq_model_override_form .param-group .accesshide {
+    grid-column: 1;
+    flex-shrink: 0;
+    margin-right: 0;
+}
+
+#lcq_model_override_form .param-group .param-input {
+    grid-column: 2;
+    width: auto;
+    margin: 0.5em 0;
+}
+
+#lcq_model_override_form .param-group .btn-danger {
+    grid-column: 3;
+    grid-row: span 2;
+    align-self: center;
+    height: auto;
+    margin: 0;
+}
+
+/* Hide every third break to group pairs */
+#lcq_model_override_form .param-group .break:nth-child(6n) {
+    display: block;
+    width: 100%;
+}
+
+/* Hide breaks between label-input pairs */
+#lcq_model_override_form .param-group .break:nth-child(6n-3) {
+    display: none;
+}

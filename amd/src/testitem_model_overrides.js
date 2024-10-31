@@ -73,6 +73,97 @@ const collectNewParamData = (addedParamIds) => {
     return finalData;
 }
 
+function restructureFormElements() {
+    // Find all .align-items-center containers
+    const containers = document.querySelectorAll('#lcq_model_override_form .param-group .align-items-center');
+    
+    containers.forEach(container => {
+        // Check if this container has a fraction input
+        const fractionInput = container.querySelector('input[type^="fraction_"]');
+        if (!fractionInput) return; // Skip if no fraction input found
+        
+        // Find the model name from the Add button
+        const addButton = container.querySelector('[data-action="additemparams"]');
+        const modelName = addButton?.getAttribute('data-model') || '';
+        
+        const elements = Array.from(container.children);
+        
+        // Create new array to store restructured elements
+        const restructured = [];
+        // Keep track of how many pairs we've processed for data-param-num
+        let pairCounter = 0;
+        
+        // Process elements sequentially
+        for (let i = 0; i < elements.length; i++) {
+            const currentElement = elements[i];
+            
+            // Check if this is the Add button container
+            if (currentElement.querySelector('[data-action="additemparams"]')) {
+                restructured.push(currentElement.cloneNode(true));
+                continue;
+            }
+            
+            // Check if this is the start of a fraction input group
+            if (currentElement.tagName === 'LABEL' && 
+                elements[i + 1]?.tagName === 'INPUT' && 
+                elements[i + 1].getAttribute('type')?.startsWith('fraction_')) {
+                
+                // Find the corresponding difficulty elements
+                const nextLabel = elements[i + 3];
+                const nextInput = elements[i + 4];
+                
+                if (nextInput?.getAttribute('type')?.startsWith('difficulty_')) {
+                    // Create pair wrapper
+                    const pairDiv = document.createElement('div');
+                    pairDiv.className = 'param-pair';
+                    
+                    // Create fraction wrapper
+                    const wrapper1 = document.createElement('div');
+                    wrapper1.className = 'input-wrapper';
+                    wrapper1.appendChild(currentElement.cloneNode(true));
+                    wrapper1.appendChild(elements[i + 1].cloneNode(true));
+                    
+                    // Create difficulty wrapper
+                    const wrapper2 = document.createElement('div');
+                    wrapper2.className = 'input-wrapper';
+                    wrapper2.appendChild(nextLabel.cloneNode(true));
+                    wrapper2.appendChild(nextInput.cloneNode(true));
+                    
+                    // Create delete button with data attributes
+                    const deleteBtn = document.createElement('button');
+                    deleteBtn.className = 'btn btn-danger param-delete';
+                    deleteBtn.textContent = 'Delete';
+                    deleteBtn.setAttribute('data-param-num', pairCounter);
+                    deleteBtn.setAttribute('data-param-model', modelName);
+                    deleteBtn.onclick = function() {
+                        // Add your delete logic here
+                        pairDiv.remove();
+                    };
+                    
+                    // Assemble the pair
+                    pairDiv.appendChild(wrapper1);
+                    pairDiv.appendChild(wrapper2);
+                    pairDiv.appendChild(deleteBtn);
+                    
+                    restructured.push(pairDiv);
+                    
+                    // Skip the elements we just processed
+                    i += 4;
+                    // Increment pair counter
+                    pairCounter++;
+                }
+            } else if (currentElement.classList.contains('break')) {
+                // Keep break elements
+                restructured.push(currentElement.cloneNode(true));
+            }
+        }
+        
+        // Clear and repopulate the container
+        container.innerHTML = '';
+        restructured.forEach(element => container.appendChild(element));
+    });
+}
+
 /**
  * Add event listener to the form
  */
@@ -101,6 +192,8 @@ export const init = () => {
                     syncSelectedState(model);
                     model.addEventListener('change', (e) => syncSelectedState(e.target));
             });
+                // Add delete buttons etc.
+                restructureFormElements();
                 return result;
             }
         ).catch(err => err);
