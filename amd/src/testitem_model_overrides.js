@@ -20,6 +20,7 @@
  */
 
 import DynamicForm from 'core_form/dynamicform';
+import {watchForm} from 'core_form/changechecker';
 
 const SELECTORS = {
     FORMCONTAINER: '#lcq_model_override_form',
@@ -198,6 +199,21 @@ function restructureFormElements() {
     });
 }
 
+const updateModelDisabledStates = (element) => {
+    console.log("State changed:");
+    const model = element.id.match(/id_override_(.*)_select/)[1];
+    const disabled = element.value == 1;
+    // Find the corresponding input fields
+    const inputElements = document.querySelectorAll(`input[name^="override_${model}["]`);
+    inputElements.forEach(e => {
+        if (disabled) {
+            e.setAttribute('disabled', 'disabled');
+        } else {
+            e.removeAttribute('disabled');
+        }
+    });
+};
+
 /**
  * Add event listener to the form
  */
@@ -225,13 +241,14 @@ export const init = () => {
                 modelSelectors.forEach(model => {
                     syncSelectedState(model);
                     model.addEventListener('change', (e) => syncSelectedState(e.target));
+                    model.addEventListener('change', e => updateModelDisabledStates(e.target));
             });
                 // Add delete buttons etc.
                 restructureFormElements();
                 return result;
             }
         ).catch(err => err);
-    }
+    };
 
     const addItemParams = (e) => {
         const searchParams = new URLSearchParams(window.location.search);
@@ -263,48 +280,42 @@ export const init = () => {
         newDifficultyInput.id = `difficulty_${newNumber}`;
         newDifficultyInput.setAttribute('type', `difficulty_${newNumber}`);
 
-            const pairDiv = document.createElement('div');
-            pairDiv.className = 'param-pair';
+        const pairDiv = document.createElement('div');
+        pairDiv.className = 'param-pair';
 
-            // Create fraction wrapper
-            const wrapperDifficulty = document.createElement('div');
-            wrapperDifficulty.className = 'input-wrapper';
-            wrapperDifficulty.appendChild(newDifficultyLabel);
-            wrapperDifficulty.appendChild(newDifficultyInput);
+        // Create fraction wrapper
+        const wrapperDifficulty = document.createElement('div');
+        wrapperDifficulty.className = 'input-wrapper';
+        wrapperDifficulty.appendChild(newDifficultyLabel);
+        wrapperDifficulty.appendChild(newDifficultyInput);
 
-            // Create difficulty wrapper
-            const wrapperFraction = document.createElement('div');
-            wrapperFraction.className = 'input-wrapper';
-            wrapperFraction.appendChild(newFractionLabel);
-            wrapperFraction.appendChild(newFractionInput);
+        // Create difficulty wrapper
+        const wrapperFraction = document.createElement('div');
+        wrapperFraction.className = 'input-wrapper';
+        wrapperFraction.appendChild(newFractionLabel);
+        wrapperFraction.appendChild(newFractionInput);
 
-            // Create delete button with data attributes
-            const deleteBtn = document.createElement('button');
-            deleteBtn.className = 'btn btn-danger param-delete';
-            deleteBtn.textContent = 'Delete';
-            deleteBtn.setAttribute('data-param-num', currentMax);
-            deleteBtn.setAttribute('data-param-model', e.detail.dataset.model);
-            deleteBtn.onclick = function() {
-                const model = this.dataset.model;
-                const paramNum = this.dataset.paramNum;
+        // Create delete button with data attributes
+        const deleteBtn = document.createElement('button');
+        deleteBtn.className = 'btn btn-danger param-delete';
+        deleteBtn.textContent = 'Delete';
+        deleteBtn.setAttribute('data-param-num', currentMax);
+        deleteBtn.setAttribute('data-param-model', e.detail.dataset.model);
+        deleteBtn.onclick = function() {
+            const model = this.dataset.model;
+            const paramNum = this.dataset.paramNum;
 
-                deleteParameters(model, paramNum);
-                // Remove the input elements.
-                pairDiv.remove();
-            };
+            deleteParameters(model, paramNum);
+            // Remove the input elements.
+            pairDiv.remove();
+        };
 
-            // Assemble the pair
-            pairDiv.appendChild(wrapperFraction);
-            pairDiv.appendChild(wrapperDifficulty);
-            pairDiv.appendChild(deleteBtn);
+        // Assemble the pair
+        pairDiv.appendChild(wrapperFraction);
+        pairDiv.appendChild(wrapperDifficulty);
+        pairDiv.appendChild(deleteBtn);
 
         lastBreak.insertAdjacentElement('afterend', pairDiv);
-
-        // lastBreak.insertAdjacentElement('afterend', newDifficultyInput);
-        // lastBreak.insertAdjacentElement('afterend', newDifficultyLabel);
-        // lastBreak.insertAdjacentElement('afterend', newFractionInput);
-        // lastBreak.insertAdjacentElement('afterend', newFractionLabel);
-
 
         // Add the IDs of newly added fields to the tempFieldsInput, so that we
         // can collect them easily when the form is submitted.
@@ -317,7 +328,7 @@ export const init = () => {
         };
         tempids.push(tempData);
         tempFieldsInput.value = JSON.stringify(tempids);
-    }
+    };
 
     dynamicForm.addEventListener(dynamicForm.events.SUBMIT_BUTTON_PRESSED, (e) => {
         console.log('Submit button pressed');
@@ -342,13 +353,18 @@ export const init = () => {
             scaleid: searchParams.get("scaleid"),
             component: searchParams.get("component"),
             updateitem: true,
-        });
+        }).then(result => {
+            const modelSelectors = document.querySelectorAll(SELECTORS.MODELSTATUSSELECTS);
+            modelSelectors.forEach(selector => {
+            });
+            return result;
+        }).catch(err => console.log(err));
     });
 
     dynamicForm.addEventListener(dynamicForm.events.NOSUBMIT_BUTTON_PRESSED, (e) => {
         e.preventDefault();
         const action = e.detail.dataset.action;
-        const targetModeIsEditing = e.detail.name = 'edititemparams';
+        const targetModeIsEditing = e.detail.name == 'edititemparams';
         switch (action) {
             case 'edititemparams':
                 switchEditMode(targetModeIsEditing);
@@ -361,5 +377,4 @@ export const init = () => {
         }
 
     });
-
 };
