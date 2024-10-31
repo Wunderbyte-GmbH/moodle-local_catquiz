@@ -125,4 +125,13 @@ abstract class model_multiparam extends model_raschmodel {
      * @return string
      */
     abstract protected function get_multi_param_name(): string;
+
+    /**
+     * All multiparam models support editing parameters.
+     *
+     * @return bool
+     */
+    public function supports_parameter_edits(): bool {
+        return true;
+    }
 }

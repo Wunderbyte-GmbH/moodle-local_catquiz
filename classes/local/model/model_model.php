@@ -208,4 +208,14 @@ abstract class model_model {
     abstract public function add_new_param(array $existingparams, stdClass $newparam): array;
 
     abstract public function drop_param_at(array $existingparams, int $index): array;
+
+    /**
+     * Indicates if this model can add or remove parameters.
+     *
+     * For example, GRM can add a new (fraction, difficulty) pair.
+     * @return bool
+     */
+    public function supports_parameter_edits(): bool {
+        return false;
+    }
 }

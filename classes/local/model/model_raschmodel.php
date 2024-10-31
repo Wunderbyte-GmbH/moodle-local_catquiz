@@ -453,19 +453,21 @@ abstract class model_raschmodel extends model_model implements catcalc_item_esti
         foreach ($fields as $label => $val) {
             $this->add_element_to_group($label, $groupid, $group, $mform);
         }
-        $addparamsbutton = $mform->createElement(
-            'submit',
-            'additemparams',
-            get_string('add'),
-            [
-                'name' => 'additemparam',
-                'value' => $param->get_model_name(),
-                'data-action' => 'additemparams',
-                'data-model' => $param->get_model_name(),
-                'data-fields' => "fraction;difficulty", // Field names separated by semicolon.
-            ]
-        );
-        $group[] = $addparamsbutton;
+        if ($this->supports_parameter_edits()) {
+            $addparamsbutton = $mform->createElement(
+                'submit',
+                'additemparams',
+                get_string('add'),
+                [
+                    'name' => 'additemparam',
+                    'value' => $param->get_model_name(),
+                    'data-action' => 'additemparams',
+                    'data-model' => $param->get_model_name(),
+                    'data-fields' => "fraction;difficulty", // Field names separated by semicolon.
+                ]
+            );
+            $group[] = $addparamsbutton;
+        }
         $mform->addGroup($group, $groupid, '', '<span class="break"></span>', true, ['class' => 'param-group']);
     }
 

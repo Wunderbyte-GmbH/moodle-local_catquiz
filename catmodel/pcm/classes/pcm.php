@@ -528,4 +528,5 @@ class pcm extends model_multiparam {
         $newparams['difficulty'] = self::calculate_mean_difficulty($newparams);
         return $newparams;
     }
+
 }
