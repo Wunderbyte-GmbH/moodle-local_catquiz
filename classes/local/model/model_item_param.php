@@ -490,4 +490,11 @@ class model_item_param {
         $this->json = $this->form_array_to_record($this->get_model_object()->get_parameter_fields($this))->json;
         return $this;
     }
+
+    public function drop_field_at(int $index): self {
+        $newparams = $this->get_model_object()->drop_param_at($this->get_params_array(), $index);
+        $this->set_parameters($newparams);
+        $this->json = $this->form_array_to_record($this->get_model_object()->get_parameter_fields($this))->json;
+        return $this;
+    }
 }

@@ -622,4 +622,43 @@ class grmgeneralized extends model_multiparam {
     protected function get_multi_param_name(): string {
         return 'difficulties';
     }
+
+    /**
+     * Adds a new combination of itemparams
+     *
+     * @param array $existingparams
+     * @param \stdClass $new
+     * @return array
+     */
+    public function add_new_param(array $existingparams, stdClass $new): array {
+        $num = count($existingparams['difficulties']) + 1;
+        $difficultyprop = sprintf('difficulty_%d', $num);
+        $fractionprop = sprintf('fraction_%d', $num);
+        $newdifficulties = $existingparams['difficulties'] + [$new->$fractionprop => $new->$difficultyprop];
+        $newparams['difficulties'] = $newdifficulties;
+        $newparams['difficulty'] = self::calculate_mean_difficulty($newparams);
+        return $newparams;
+    }
+
+    /**
+     * Drops the itemparams at the given index
+     *
+     * @param array $existingparams
+     * @param int $index
+     * @return array
+     */
+    public function drop_param_at(array $existingparams, int $index): array {
+        $counter = 0;
+        $newdifficulties = array_filter(
+            $existingparams['difficulties'],
+            function ($v) use (&$counter, $index) {
+                $match = $counter == $index;
+                $counter++;
+                return !$match;
+            }
+        );
+        $newparams['difficulties'] = $newdifficulties;
+        $newparams['difficulty'] = self::calculate_mean_difficulty($newparams);
+        return $newparams;
+    }
 }

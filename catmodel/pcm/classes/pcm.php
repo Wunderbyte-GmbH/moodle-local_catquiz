@@ -489,4 +489,43 @@ class pcm extends model_multiparam {
             ],
         ];
     }
+
+    /**
+     * Adds a new combination of itemparams
+     *
+     * @param array $existingparams
+     * @param \stdClass $new
+     * @return array
+     */
+    public function add_new_param(array $existingparams, stdClass $new): array {
+        $num = count($existingparams['intercepts']) + 1;
+        $difficultyprop = sprintf('difficulty_%d', $num);
+        $fractionprop = sprintf('fraction_%d', $num);
+        $newintercepts = $existingparams['intercepts'] + [$new->$fractionprop => $new->$difficultyprop];
+        $newparams['intercepts'] = $newintercepts;
+        $newparams['difficulty'] = self::calculate_mean_difficulty($newparams);
+        return $newparams;
+    }
+
+    /**
+     * Drops the itemparams at the given index
+     *
+     * @param array $existingparams
+     * @param int $index
+     * @return array
+     */
+    public function drop_param_at(array $existingparams, int $index): array {
+        $counter = 0;
+        $newintercepts = array_filter(
+            $existingparams['intercepts'],
+            function ($v) use (&$counter, $index) {
+                $match = $counter == $index;
+                $counter++;
+                return !$match;
+            }
+        );
+        $newparams['intercepts'] = $newintercepts;
+        $newparams['difficulty'] = self::calculate_mean_difficulty($newparams);
+        return $newparams;
+    }
 }

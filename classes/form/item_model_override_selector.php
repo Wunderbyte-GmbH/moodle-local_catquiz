@@ -76,9 +76,12 @@ class item_model_override_selector extends dynamic_form {
         $mform->registerNoSubmitButton('edititemparams');
         $mform->registerNoSubmitButton('noedititemparams');
         $mform->registerNoSubmitButton('additemparams');
-        // Hidden field to store temporary fields data.
+        // Hidden field to store temporary fields data for new params.
         $mform->addElement('hidden', 'temporaryfields', '[]');
         $mform->setType('temporaryfields', PARAM_RAW);
+        // Hidden field to store temporary fields data for deleted params.
+        $mform->addElement('hidden', 'deletedparams', '[]');
+        $mform->setType('deletedparams', PARAM_RAW);
     }
 
     /**
@@ -233,7 +236,7 @@ class item_model_override_selector extends dynamic_form {
             $formitemparams[$model] = model_item_param::from_record($rec);
         }
 
-         // Handle adding new field request.
+         // Handle adding new param fields.
         if (!empty($data->temporaryfields)) {
             $tempfields = json_decode($data->temporaryfields);
             foreach ($tempfields as $model => $values) {
@@ -241,6 +244,26 @@ class item_model_override_selector extends dynamic_form {
                 foreach ($values as $newparam) {
                     $param->add_new_param($newparam);
                 }
+                $param->save();
+            }
+        }
+
+         // Handle deleting param fields.
+        if (!empty($data->deletedparams)) {
+            /* Deletedparams will be converted to an array with the following structure:
+             * [
+             *   {
+             *     model: "grm",
+             *     index: "3"
+             *   }, ...
+             * ]
+             */
+            $deletedparams = json_decode($data->deletedparams);
+            foreach ($deletedparams as $paramfield) {
+                $model = $paramfield->model;
+                $index = $paramfield->index;
+                $param = $formitemparams[$model];
+                $param->drop_field_at($index);
                 $param->save();
             }
         }
