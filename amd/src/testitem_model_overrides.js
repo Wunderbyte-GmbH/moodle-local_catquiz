@@ -26,7 +26,8 @@ const SELECTORS = {
     NOEDITBUTTON: '[name="noedititemparams"]',
     MODELSTATUSSELECTS: '#lcq_model_override_form .custom-select[name^="override_"]',
     ACTIVEMODELSELECT: '[name="active_model"]',
-    TEMP_FIELDS_INPUT: '[name="temporaryfields"]'
+    TEMP_FIELDS_INPUT: '[name="temporaryfields"]',
+    DELETED_PARAMS_FIELD: '[name="deletedparams"]'
 };
 
 const disabledStates = ["0", "-5"];
@@ -73,80 +74,113 @@ const collectNewParamData = (addedParamIds) => {
     return finalData;
 }
 
+const deleteParameters = (model, index) => {
+    // First, check if this is found in the tempinput data. If so, just remove it from there.
+    const tempFieldsInput = document.querySelector(SELECTORS.TEMP_FIELDS_INPUT);
+    let tempids = JSON.parse(tempFieldsInput.value);
+    let filtered = tempids.filter((newparams) => {
+        return newparams.model != model && newparams.index != index;
+    });
+    tempFieldsInput.value = JSON.stringify(filtered);
+    // If the parameter was found, it means we do not have to delete it on the server side.
+    // It was temporarily added but not yet saved. So we can return here.
+    if (filtered.length != tempids.length) {
+        return;
+    }
+
+    // If we are here, the parameter should be deleted on the server side.
+    const deletedParamsField = document.querySelector(SELECTORS.DELETED_PARAMS_FIELD);
+    let deletedParams = JSON.parse(deletedParamsField.value);
+    const deleteParam = {
+        model: model,
+        index: index
+    };
+    deletedParams.push(deleteParam);
+    deletedParamsField.value = JSON.stringify(deletedParams);
+};
+
+/**
+ * This adds delete buttons to multiparam models.
+ * While at it, it also restructures the HTML a bit by adding some wrapper elements to facilitate styling.
+ */
 function restructureFormElements() {
     // Find all .align-items-center containers
     const containers = document.querySelectorAll('#lcq_model_override_form .param-group .align-items-center');
-    
+
     containers.forEach(container => {
         // Check if this container has a fraction input
         const fractionInput = container.querySelector('input[type^="fraction_"]');
         if (!fractionInput) return; // Skip if no fraction input found
-        
+
         // Find the model name from the Add button
         const addButton = container.querySelector('[data-action="additemparams"]');
         const modelName = addButton?.getAttribute('data-model') || '';
-        
+
         const elements = Array.from(container.children);
-        
+
         // Create new array to store restructured elements
         const restructured = [];
         // Keep track of how many pairs we've processed for data-param-num
         let pairCounter = 0;
-        
+
         // Process elements sequentially
         for (let i = 0; i < elements.length; i++) {
             const currentElement = elements[i];
-            
+
             // Check if this is the Add button container
             if (currentElement.querySelector('[data-action="additemparams"]')) {
                 restructured.push(currentElement.cloneNode(true));
                 continue;
             }
-            
+
             // Check if this is the start of a fraction input group
             if (currentElement.tagName === 'LABEL' && 
                 elements[i + 1]?.tagName === 'INPUT' && 
                 elements[i + 1].getAttribute('type')?.startsWith('fraction_')) {
-                
+
                 // Find the corresponding difficulty elements
                 const nextLabel = elements[i + 3];
                 const nextInput = elements[i + 4];
-                
+
                 if (nextInput?.getAttribute('type')?.startsWith('difficulty_')) {
                     // Create pair wrapper
                     const pairDiv = document.createElement('div');
                     pairDiv.className = 'param-pair';
-                    
+
                     // Create fraction wrapper
                     const wrapper1 = document.createElement('div');
                     wrapper1.className = 'input-wrapper';
                     wrapper1.appendChild(currentElement.cloneNode(true));
                     wrapper1.appendChild(elements[i + 1].cloneNode(true));
-                    
+
                     // Create difficulty wrapper
                     const wrapper2 = document.createElement('div');
                     wrapper2.className = 'input-wrapper';
                     wrapper2.appendChild(nextLabel.cloneNode(true));
                     wrapper2.appendChild(nextInput.cloneNode(true));
-                    
+
                     // Create delete button with data attributes
                     const deleteBtn = document.createElement('button');
                     deleteBtn.className = 'btn btn-danger param-delete';
                     deleteBtn.textContent = 'Delete';
                     deleteBtn.setAttribute('data-param-num', pairCounter);
-                    deleteBtn.setAttribute('data-param-model', modelName);
+                    deleteBtn.setAttribute('data-model', modelName);
                     deleteBtn.onclick = function() {
-                        // Add your delete logic here
+                        const model = this.dataset.model;
+                        const paramNum = this.dataset.paramNum;
+
+                        deleteParameters(model, paramNum);
+                        // Remove the input elements.
                         pairDiv.remove();
                     };
-                    
+
                     // Assemble the pair
                     pairDiv.appendChild(wrapper1);
                     pairDiv.appendChild(wrapper2);
                     pairDiv.appendChild(deleteBtn);
-                    
+
                     restructured.push(pairDiv);
-                    
+
                     // Skip the elements we just processed
                     i += 4;
                     // Increment pair counter
@@ -157,7 +191,7 @@ function restructureFormElements() {
                 restructured.push(currentElement.cloneNode(true));
             }
         }
-        
+
         // Clear and repopulate the container
         container.innerHTML = '';
         restructured.forEach(element => container.appendChild(element));
@@ -229,10 +263,47 @@ export const init = () => {
         newDifficultyInput.id = `difficulty_${newNumber}`;
         newDifficultyInput.setAttribute('type', `difficulty_${newNumber}`);
 
-        lastBreak.insertAdjacentElement('afterend', newDifficultyInput);
-        lastBreak.insertAdjacentElement('afterend', newDifficultyLabel);
-        lastBreak.insertAdjacentElement('afterend', newFractionInput);
-        lastBreak.insertAdjacentElement('afterend', newFractionLabel);
+            const pairDiv = document.createElement('div');
+            pairDiv.className = 'param-pair';
+
+            // Create fraction wrapper
+            const wrapperDifficulty = document.createElement('div');
+            wrapperDifficulty.className = 'input-wrapper';
+            wrapperDifficulty.appendChild(newDifficultyLabel);
+            wrapperDifficulty.appendChild(newDifficultyInput);
+
+            // Create difficulty wrapper
+            const wrapperFraction = document.createElement('div');
+            wrapperFraction.className = 'input-wrapper';
+            wrapperFraction.appendChild(newFractionLabel);
+            wrapperFraction.appendChild(newFractionInput);
+
+            // Create delete button with data attributes
+            const deleteBtn = document.createElement('button');
+            deleteBtn.className = 'btn btn-danger param-delete';
+            deleteBtn.textContent = 'Delete';
+            deleteBtn.setAttribute('data-param-num', currentMax);
+            deleteBtn.setAttribute('data-param-model', e.detail.dataset.model);
+            deleteBtn.onclick = function() {
+                const model = this.dataset.model;
+                const paramNum = this.dataset.paramNum;
+
+                deleteParameters(model, paramNum);
+                // Remove the input elements.
+                pairDiv.remove();
+            };
+
+            // Assemble the pair
+            pairDiv.appendChild(wrapperFraction);
+            pairDiv.appendChild(wrapperDifficulty);
+            pairDiv.appendChild(deleteBtn);
+
+        lastBreak.insertAdjacentElement('afterend', pairDiv);
+
+        // lastBreak.insertAdjacentElement('afterend', newDifficultyInput);
+        // lastBreak.insertAdjacentElement('afterend', newDifficultyLabel);
+        // lastBreak.insertAdjacentElement('afterend', newFractionInput);
+        // lastBreak.insertAdjacentElement('afterend', newFractionLabel);
 
 
         // Add the IDs of newly added fields to the tempFieldsInput, so that we
@@ -241,8 +312,9 @@ export const init = () => {
         let tempids = JSON.parse(tempFieldsInput.value);
         const tempData = {
             model: e.detail.dataset.model,
-            ids: [newDifficultyInput.getAttribute('id'), newFractionInput.getAttribute('id')]
-        }
+            ids: [newDifficultyInput.getAttribute('id'), newFractionInput.getAttribute('id')],
+            index: currentMax, // This is 0-based, so lower than newNumber.
+        };
         tempids.push(tempData);
         tempFieldsInput.value = JSON.stringify(tempids);
     }
@@ -274,21 +346,20 @@ export const init = () => {
     });
 
     dynamicForm.addEventListener(dynamicForm.events.NOSUBMIT_BUTTON_PRESSED, (e) => {
-        let formcontainer = document.querySelector(
-            SELECTORS.FORMCONTAINER);
         e.preventDefault();
-        switch (e.detail.name) {
+        const action = e.detail.dataset.action;
+        const targetModeIsEditing = e.detail.name = 'edititemparams';
+        switch (action) {
             case 'edititemparams':
-                switchEditMode(true);
+                switchEditMode(targetModeIsEditing);
                 break;
-            case 'noedititemparams':
-                switchEditMode(false);
-                break;
-            case 'override_grm[additemparams]':
+            case 'additemparams':
                 addItemParams(e);
                 break;
             default:
-                console.log(`Unknown no-submit action: ${e.detail.name}`)
+                console.log(`Unknown no-submit action: ${action}`)
         }
+
     });
+
 };

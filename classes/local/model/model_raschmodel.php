@@ -524,4 +524,8 @@ abstract class model_raschmodel extends model_model implements catcalc_item_esti
     public function add_new_param(array $existingparams, stdClass $newparam): array {
         throw new \Exception("Not implemented for this class");
     }
+
+    public function drop_param_at(array $existingparams, int $index): array {
+        throw new \Exception("Not implemented for this class");
+    }
 }

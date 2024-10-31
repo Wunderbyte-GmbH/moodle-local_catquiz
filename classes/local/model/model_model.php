@@ -206,4 +206,6 @@ abstract class model_model {
     abstract public function get_static_param_array(model_item_param $param): array;
 
     abstract public function add_new_param(array $existingparams, stdClass $newparam): array;
+
+    abstract public function drop_param_at(array $existingparams, int $index): array;
 }
