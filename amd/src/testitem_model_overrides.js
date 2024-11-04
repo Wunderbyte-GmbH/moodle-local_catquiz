@@ -20,6 +20,7 @@
  */
 
 import DynamicForm from 'core_form/dynamicform';
+import {get_string as getString} from 'core/str';
 
 const SELECTORS = {
     FORMCONTAINER: '#lcq_model_override_form',
@@ -106,7 +107,7 @@ function restructureFormElements() {
     // Find all .align-items-center containers
     const containers = document.querySelectorAll('#lcq_model_override_form .param-group .align-items-center');
 
-    containers.forEach(container => {
+    containers.forEach(async container => {
         // Check if this container has a fraction input
         const fractionInput = container.querySelector('input[type^="fraction_"]');
         if (!fractionInput) {
@@ -164,6 +165,11 @@ function restructureFormElements() {
                     const deleteBtn = document.createElement('button');
                     deleteBtn.className = 'btn btn-danger param-delete';
                     deleteBtn.textContent = 'Delete';
+                    try {
+                        deleteBtn.textContent = await getString('delete');
+                    } catch (error) {
+                        // We already have a fallback, nothing to do here.
+                    }
                     deleteBtn.setAttribute('data-param-num', pairCounter);
                     deleteBtn.setAttribute('data-model', modelName);
                     deleteBtn.onclick = function() {
@@ -261,37 +267,36 @@ export const init = () => {
             .map(input => parseInt(input.getAttribute('type').split('_')[1] || '0'))
         );
         const newNumber = currentMax + 1;
-
-        const newFractionLabel = document.createElement('label');
-        newFractionLabel.textContent = `Fraction ${newNumber}`;
-        newFractionLabel.setAttribute('for', `fraction_${newNumber}`);
-        const newFractionInput = document.createElement('input');
-        newFractionInput.className = 'form-control param-input';
-        newFractionInput.id = `fraction_${newNumber}`;
-        newFractionInput.setAttribute('type', `fraction_${newNumber}`);
-
-        const newDifficultyLabel = document.createElement('label');
-        newDifficultyLabel.textContent = `Difficulty ${newNumber}`;
-        newDifficultyLabel.setAttribute('for', `difficulty_${newNumber}`);
-        const newDifficultyInput = document.createElement('input');
-        newDifficultyInput.className = 'form-control param-input';
-        newDifficultyInput.id = `difficulty_${newNumber}`;
-        newDifficultyInput.setAttribute('type', `difficulty_${newNumber}`);
-
         const pairDiv = document.createElement('div');
         pairDiv.className = 'param-pair';
 
-        // Create fraction wrapper
-        const wrapperDifficulty = document.createElement('div');
-        wrapperDifficulty.className = 'input-wrapper';
-        wrapperDifficulty.appendChild(newDifficultyLabel);
-        wrapperDifficulty.appendChild(newDifficultyInput);
+        // The fielddata describe the fields to add: "internalname1:Translated;internalname2:Translated".
+        // For example: "difficulty:Schwierigkeit;fraction:Fraction".
+        const fielddata = e.detail.dataset.fields.split(';');
+        let newIds = [];
+        fielddata.forEach(field => {
+            const fieldarr = field.split(':');
+            const internalName = fieldarr[0];
+            const label = fieldarr[1];
 
-        // Create difficulty wrapper
-        const wrapperFraction = document.createElement('div');
-        wrapperFraction.className = 'input-wrapper';
-        wrapperFraction.appendChild(newFractionLabel);
-        wrapperFraction.appendChild(newFractionInput);
+            const newLabel = document.createElement('label');
+            newLabel.textContent = `${label} ${newNumber}`;
+            newLabel.setAttribute('for', `${internalName}_${newNumber}`);
+
+            const newInput = document.createElement('input');
+            newInput.className = 'form-control param-input';
+            newInput.id = `${internalName}_${newNumber}`;
+            newInput.setAttribute('type', `${internalName}_${newNumber}`);
+
+            // Create wrapper.
+            const wrapper = document.createElement('div');
+            wrapper.className = 'input-wrapper';
+            wrapper.appendChild(newLabel);
+            wrapper.appendChild(newInput);
+
+            pairDiv.appendChild(wrapper);
+            newIds.push(newInput.id);
+        });
 
         // Create delete button with data attributes
         const deleteBtn = document.createElement('button');
@@ -309,8 +314,6 @@ export const init = () => {
         };
 
         // Assemble the pair
-        pairDiv.appendChild(wrapperFraction);
-        pairDiv.appendChild(wrapperDifficulty);
         pairDiv.appendChild(deleteBtn);
 
         lastBreak.insertAdjacentElement('afterend', pairDiv);
@@ -325,7 +328,7 @@ export const init = () => {
         let tempids = JSON.parse(tempFieldsInput.value);
         const tempData = {
             model: e.detail.dataset.model,
-            ids: [newDifficultyInput.getAttribute('id'), newFractionInput.getAttribute('id')],
+            ids: newIds,
             index: currentMax, // This is 0-based, so lower than newNumber.
         };
         tempids.push(tempData);
@@ -336,7 +339,6 @@ export const init = () => {
         const tempFieldsInput = document.querySelector(SELECTORS.TEMP_FIELDS_INPUT);
         const addedParamIds = JSON.parse(tempFieldsInput.value);
         const newParamData = collectNewParamData(addedParamIds);
-        // TODO: Replace with working code.
         tempFieldsInput.value = JSON.stringify(newParamData);
     });
 

@@ -450,6 +450,18 @@ abstract class model_raschmodel extends model_model implements catcalc_item_esti
     public function definition_after_data_callback(MoodleQuickForm &$mform, model_item_param $param, string $groupid): void {
         $group = [];
         $fields = $this->get_parameter_fields($param);
+        $newfields = ['fraction', 'difficulty'];
+        $newfielddata = implode(
+            ';',
+            array_map(
+                fn ($fieldname) => sprintf(
+                    '%s:%s',
+                    $fieldname,
+                    get_string($fieldname, 'local_catquiz')
+                ),
+                $newfields
+            )
+        );
         foreach ($fields as $label => $val) {
             $this->add_element_to_group($label, $groupid, $group, $mform);
         }
@@ -463,7 +475,7 @@ abstract class model_raschmodel extends model_model implements catcalc_item_esti
                     'value' => $param->get_model_name(),
                     'data-action' => 'additemparams',
                     'data-model' => $param->get_model_name(),
-                    'data-fields' => "fraction;difficulty", // Field names separated by semicolon.
+                    'data-fields' => $newfielddata,
                 ]
             );
             $group[] = $addparamsbutton;
