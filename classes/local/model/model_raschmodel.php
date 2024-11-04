@@ -24,6 +24,7 @@
 namespace local_catquiz\local\model;
 
 use coding_exception;
+use Exception;
 use local_catquiz\catcalc_ability_estimator;
 use local_catquiz\catcalc_item_estimator;
 use MoodleQuickForm;
@@ -535,11 +536,35 @@ abstract class model_raschmodel extends model_model implements catcalc_item_esti
         return (object) $formarray;
     }
 
+    /**
+     * Allows extending the itemparam with new fields.
+     *
+     * This is used for multiparameter models and allows to add a new
+     * [fraction:difficulty] or [intercept:difficulty] entry.
+     *
+     * @param array $existingparams
+     * @param stdClass $newparam
+     * @return array
+     * @throws Exception
+     */
     public function add_new_param(array $existingparams, stdClass $newparam): array {
-        throw new \Exception("Not implemented for this class");
+        throw new Exception("Not implemented for this class");
     }
 
+    /**
+     * Allows removal of a parameter value.
+     *
+     * This is used for multiparameter models and allows removing a
+     * [fraction:difficulty] or [intercept:difficulty] pair of the entry.
+     * The value to be removed is identified by a 0-based index of the
+     * respective multiparam array.
+     *
+     * @param array $existingparams
+     * @param int $index
+     * @throws \Exception
+     * @return array
+     */
     public function drop_param_at(array $existingparams, int $index): array {
-        throw new \Exception("Not implemented for this class");
+        throw new Exception("Not implemented for this class");
     }
 }

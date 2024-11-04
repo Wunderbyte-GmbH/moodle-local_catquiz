@@ -484,6 +484,25 @@ class model_item_param {
         return $this->get_model_object()->get_static_param_array($this);
     }
 
+    /**
+     * Allows extending the itemparam with new fields.
+     *
+     * This is used for multiparameter models and allows to add a new
+     * [fraction:difficulty] or [intercept:difficulty] entry.
+     *
+     * The new parameters are passed as object - the specific format depends on the model subclass.
+     * For example, the grm model expects the $newparam object to have the following form if the `difficulties` array
+     * already has 2 parameters:
+     * (object) [
+     *   'fraction_2' => 2.00,
+     *   'difficulty_2' => 1.40,
+     * ]
+     * The value 2 is used there because the number is 0-based. Please check the respective submodel for details.
+     *
+     * @param stdClass $params
+     * @return self
+     * @throws \Exception
+     */
     public function add_new_param(stdClass $params): self {
         $newparams = $this->get_model_object()->add_new_param($this->get_params_array(), $params);
         $this->set_parameters($newparams);
@@ -491,6 +510,14 @@ class model_item_param {
         return $this;
     }
 
+    /**
+     * Drops the multiparam entry at the given index.
+     *
+     * This is used for multiparameter models and implemented in the respective submodel class.
+     *
+     * @param int $index
+     * @return \local_catquiz\local\model\model_item_param
+     */
     public function drop_field_at(int $index): self {
         $newparams = $this->get_model_object()->drop_param_at($this->get_params_array(), $index);
         $this->set_parameters($newparams);
