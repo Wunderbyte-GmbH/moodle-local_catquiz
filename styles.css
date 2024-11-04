@@ -205,8 +205,3 @@ div[contenteditable="false"] {
     display: block;
     width: 100%;
 }
-
-/* Hide breaks between label-input pairs */
-#lcq_model_override_form .param-group .break:nth-child(6n-3) {
-    display: none;
-}

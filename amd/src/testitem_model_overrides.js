@@ -320,6 +320,10 @@ export const init = () => {
 
         lastBreak.insertAdjacentElement('afterend', pairDiv);
 
+        const newBreak = document.createElement('span');
+        newBreak.className = "break new-break";
+        pairDiv.insertAdjacentElement('afterend', newBreak);
+
         // Add the IDs of newly added fields to the tempFieldsInput, so that we
         // can collect them easily when the form is submitted.
         const tempFieldsInput = document.querySelector(SELECTORS.TEMP_FIELDS_INPUT);
