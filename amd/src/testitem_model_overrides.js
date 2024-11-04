@@ -57,6 +57,16 @@ const syncSelectedState = (model) => {
         });
 };
 
+/**
+ * Add values of newly added parameters to a hidden field.
+ *
+ * When new parameters are added, we store their IDs.
+ * This function is called just before we submit the form. It collects the values of those
+ * newly added fields and returns them.
+ *
+ * @param {Array} addedParamIds Array of objects containing model and parameter IDs to be collected.
+ * @return {Object} Object containing collected parameter values grouped by model.
+ */
 const collectNewParamData = (addedParamIds) => {
     let finalData = {};
     addedParamIds.forEach(newParam => {
@@ -74,6 +84,16 @@ const collectNewParamData = (addedParamIds) => {
     return finalData;
 };
 
+/**
+ * Deletes parameter values for the given model at the given index.
+ *
+ * If the params were newly added, they are removed from the hidden field that tracks new params.
+ * Otherwise, we store information in a hidden field so that the parameters are deleted on the server
+ * side once the form is submitted.
+ *
+ * @param {string} model The model identifier.
+ * @param {number} index The index of the parameter set to delete.
+ */
 const deleteParameters = (model, index) => {
     // First, check if this is found in the tempinput data. If so, just remove it from there.
     const tempFieldsInput = document.querySelector(SELECTORS.TEMP_FIELDS_INPUT);
@@ -87,7 +107,6 @@ const deleteParameters = (model, index) => {
     if (filtered.length != tempids.length) {
         return;
     }
-
     // If we are here, the parameter should be deleted on the server side.
     const deletedParamsField = document.querySelector(SELECTORS.DELETED_PARAMS_FIELD);
     let deletedParams = JSON.parse(deletedParamsField.value);
@@ -104,64 +123,79 @@ const deleteParameters = (model, index) => {
  * While at it, it also restructures the HTML a bit by adding some wrapper elements to facilitate styling.
  */
 function restructureFormElements() {
-    // Find all .align-items-center containers
+    // Find all .align-items-center containers.
     const containers = document.querySelectorAll('#lcq_model_override_form .param-group .align-items-center');
 
     containers.forEach(async container => {
-        // Check if this container has a fraction input
-        const fractionInput = container.querySelector('input[type^="fraction_"]');
-        if (!fractionInput) {
-            return; // Skip if no fraction input found
+        // Find the Add button and get model data.
+        const addButton = container.querySelector('[data-action="additemparams"]');
+        if (!addButton) {
+            return; // Skip if no add button found.
         }
 
-        // Find the model name from the Add button
-        const addButton = container.querySelector('[data-action="additemparams"]');
-        const modelName = addButton?.getAttribute('data-model') || '';
+        const modelName = addButton.getAttribute('data-model') || '';
+        // Parse field data into array of field names.
+        const fielddata = addButton.dataset.fields.split(';');
+        const modelFields = fielddata.map(fd => fd.split(':')[0]);
 
+        if (modelFields.length === 0) {
+            return; // Skip if no fields defined.
+        }
+
+        // Create new array to store restructured elements.
+        const restructured = [];
+        let pairCounter = 0;
         const elements = Array.from(container.children);
 
-        // Create new array to store restructured elements
-        const restructured = [];
-        // Keep track of how many pairs we've processed for data-param-num
-        let pairCounter = 0;
-
-        // Process elements sequentially
+        // Process elements sequentially.
         for (let i = 0; i < elements.length; i++) {
             const currentElement = elements[i];
 
-            // Check if this is the Add button container
+            // Preserve Add button.
             if (currentElement.querySelector('[data-action="additemparams"]')) {
                 restructured.push(currentElement.cloneNode(true));
                 continue;
             }
 
-            // Check if this is the start of a fraction input group
+            // Check if this is the start of an input group (first field's label).
             if (currentElement.tagName === 'LABEL' &&
                 elements[i + 1]?.tagName === 'INPUT' &&
-                elements[i + 1].getAttribute('type')?.startsWith('fraction_')) {
+                elements[i + 1].getAttribute('type')?.startsWith(`${modelFields[0]}`)) {
 
-                // Find the corresponding difficulty elements
-                const nextLabel = elements[i + 3];
-                const nextInput = elements[i + 4];
+                // Create wrapper for the parameter group.
+                const paramDiv = document.createElement('div');
+                paramDiv.className = 'param-pair';
 
-                if (nextInput?.getAttribute('type')?.startsWith('difficulty_')) {
-                    // Create pair wrapper
-                    const pairDiv = document.createElement('div');
-                    pairDiv.className = 'param-pair';
+                let isValidGroup = true;
+                let currentIndex = i;
 
-                    // Create fraction wrapper
-                    const wrapper1 = document.createElement('div');
-                    wrapper1.className = 'input-wrapper';
-                    wrapper1.appendChild(currentElement.cloneNode(true));
-                    wrapper1.appendChild(elements[i + 1].cloneNode(true));
+                // Create wrappers for each field in modelFields.
+                for (const field of modelFields) {
+                    const label = elements[currentIndex];
+                    const input = elements[currentIndex + 1];
+                    const breakElement = elements[currentIndex + 2];
 
-                    // Create difficulty wrapper
-                    const wrapper2 = document.createElement('div');
-                    wrapper2.className = 'input-wrapper';
-                    wrapper2.appendChild(nextLabel.cloneNode(true));
-                    wrapper2.appendChild(nextInput.cloneNode(true));
+                    // Validate the field group.
+                    if (!label?.tagName === 'LABEL' ||
+                        !input?.tagName === 'INPUT' ||
+                        !input?.getAttribute('type')?.startsWith(field)) {
+                        isValidGroup = false;
+                        break;
+                    }
 
-                    // Create delete button with data attributes
+                    // Create and populate wrapper for this field.
+                    const wrapper = document.createElement('div');
+                    wrapper.className = 'input-wrapper';
+                    wrapper.appendChild(label.cloneNode(true));
+                    wrapper.appendChild(input.cloneNode(true));
+                    paramDiv.appendChild(wrapper);
+
+                    // Move index past current field group.
+                    currentIndex += breakElement?.classList.contains('break') ? 3 : 2;
+                }
+
+                if (isValidGroup) {
+                    // Create delete button.
                     const deleteBtn = document.createElement('button');
                     deleteBtn.className = 'btn btn-danger param-delete';
                     deleteBtn.textContent = 'Delete';
@@ -173,33 +207,24 @@ function restructureFormElements() {
                     deleteBtn.setAttribute('data-param-num', pairCounter);
                     deleteBtn.setAttribute('data-model', modelName);
                     deleteBtn.onclick = function() {
-                        const model = this.dataset.model;
-                        const paramNum = this.dataset.paramNum;
-
-                        deleteParameters(model, paramNum);
-                        // Remove the input elements.
-                        pairDiv.remove();
+                        deleteParameters(this.dataset.model, this.dataset.paramNum);
+                        paramDiv.remove();
                     };
 
-                    // Assemble the pair
-                    pairDiv.appendChild(wrapper1);
-                    pairDiv.appendChild(wrapper2);
-                    pairDiv.appendChild(deleteBtn);
+                    paramDiv.appendChild(deleteBtn);
+                    restructured.push(paramDiv);
 
-                    restructured.push(pairDiv);
-
-                    // Skip the elements we just processed
-                    i += 4;
-                    // Increment pair counter
+                    // Skip processed elements.
+                    i = currentIndex - 1;
                     pairCounter++;
                 }
             } else if (currentElement.classList.contains('break')) {
-                // Keep break elements
+                // Preserve break elements.
                 restructured.push(currentElement.cloneNode(true));
             }
         }
 
-        // Clear and repopulate the container
+        // Clear and repopulate the container.
         container.innerHTML = '';
         restructured.forEach(element => container.appendChild(element));
     });
