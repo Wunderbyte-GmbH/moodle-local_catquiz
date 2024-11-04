@@ -20,7 +20,6 @@
  */
 
 import DynamicForm from 'core_form/dynamicform';
-import {watchForm} from 'core_form/changechecker';
 
 const SELECTORS = {
     FORMCONTAINER: '#lcq_model_override_form',
@@ -58,7 +57,6 @@ const syncSelectedState = (model) => {
 };
 
 const collectNewParamData = (addedParamIds) => {
-    console.log("Getting field values for added parameters");
     let finalData = {};
     addedParamIds.forEach(newParam => {
         const model = newParam.model;
@@ -70,10 +68,10 @@ const collectNewParamData = (addedParamIds) => {
             const value = element.value;
             params[id] = value;
         });
-        finalData[model].push(params)
+        finalData[model].push(params);
     });
     return finalData;
-}
+};
 
 const deleteParameters = (model, index) => {
     // First, check if this is found in the tempinput data. If so, just remove it from there.
@@ -111,7 +109,9 @@ function restructureFormElements() {
     containers.forEach(container => {
         // Check if this container has a fraction input
         const fractionInput = container.querySelector('input[type^="fraction_"]');
-        if (!fractionInput) return; // Skip if no fraction input found
+        if (!fractionInput) {
+            return; // Skip if no fraction input found
+        }
 
         // Find the model name from the Add button
         const addButton = container.querySelector('[data-action="additemparams"]');
@@ -135,8 +135,8 @@ function restructureFormElements() {
             }
 
             // Check if this is the start of a fraction input group
-            if (currentElement.tagName === 'LABEL' && 
-                elements[i + 1]?.tagName === 'INPUT' && 
+            if (currentElement.tagName === 'LABEL' &&
+                elements[i + 1]?.tagName === 'INPUT' &&
                 elements[i + 1].getAttribute('type')?.startsWith('fraction_')) {
 
                 // Find the corresponding difficulty elements
@@ -200,13 +200,12 @@ function restructureFormElements() {
 }
 
 const updateModelDisabledStates = (element) => {
-    console.log("State changed:");
     const model = element.id.match(/id_override_(.*)_select/)[1];
     const disabled = element.value == 1;
     // Find the corresponding input fields
     const inputElements = document.querySelectorAll(`input[name^="override_${model}["]`);
     const deleteButtons = document.querySelectorAll(`button[data-model="${model}"]`);
-    const addButton = document.querySelector(`input[value="Add"][data-model="${model}"]`)
+    const addButton = document.querySelector(`input[value="Add"][data-model="${model}"]`);
     const toUpdate = [...inputElements, ...deleteButtons, addButton];
     toUpdate.forEach(e => {
         if (disabled) {
@@ -228,7 +227,6 @@ export const init = () => {
     );
 
     const switchEditMode = (targetModeIsEditing) => {
-        console.log(`Switching edit mode to: ${targetModeIsEditing}`);
         const searchParams = new URLSearchParams(window.location.search);
         dynamicForm.load({
             editing: targetModeIsEditing,
@@ -254,9 +252,6 @@ export const init = () => {
     };
 
     const addItemParams = (e) => {
-        const searchParams = new URLSearchParams(window.location.search);
-        console.log('In add item params');
-        console.log(e);
         // Construct the new input fields.
         const lastBreak = e.detail.parentElement.parentElement.previousElementSibling;
         const paramGroup = e.detail.closest('.param-group');
@@ -337,18 +332,15 @@ export const init = () => {
         tempFieldsInput.value = JSON.stringify(tempids);
     };
 
-    dynamicForm.addEventListener(dynamicForm.events.SUBMIT_BUTTON_PRESSED, (e) => {
-        console.log('Submit button pressed');
+    dynamicForm.addEventListener(dynamicForm.events.SUBMIT_BUTTON_PRESSED, () => {
         const tempFieldsInput = document.querySelector(SELECTORS.TEMP_FIELDS_INPUT);
         const addedParamIds = JSON.parse(tempFieldsInput.value);
-        console.log(addedParamIds);
         const newParamData = collectNewParamData(addedParamIds);
         // TODO: Replace with working code.
         tempFieldsInput.value = JSON.stringify(newParamData);
     });
 
     dynamicForm.addEventListener(dynamicForm.events.FORM_SUBMITTED, (e) => {
-        console.log('Form submitted');
         e.preventDefault();
         let formcontainer = document.querySelector(
             SELECTORS.FORMCONTAINER);
@@ -361,11 +353,8 @@ export const init = () => {
             component: searchParams.get("component"),
             updateitem: true,
         }).then(result => {
-            const modelSelectors = document.querySelectorAll(SELECTORS.MODELSTATUSSELECTS);
-            modelSelectors.forEach(selector => {
-            });
             return result;
-        }).catch(err => console.log(err));
+        }).catch(err => err);
     });
 
     dynamicForm.addEventListener(dynamicForm.events.NOSUBMIT_BUTTON_PRESSED, (e) => {
@@ -380,7 +369,8 @@ export const init = () => {
                 addItemParams(e);
                 break;
             default:
-                console.log(`Unknown no-submit action: ${action}`)
+                // eslint-disable-next-line no-console
+                console.error(`Unknown no-submit action: ${action}`);
         }
 
     });
