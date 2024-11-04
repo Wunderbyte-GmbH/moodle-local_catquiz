@@ -205,7 +205,10 @@ const updateModelDisabledStates = (element) => {
     const disabled = element.value == 1;
     // Find the corresponding input fields
     const inputElements = document.querySelectorAll(`input[name^="override_${model}["]`);
-    inputElements.forEach(e => {
+    const deleteButtons = document.querySelectorAll(`button[data-model="${model}"]`);
+    const addButton = document.querySelector(`input[value="Add"][data-model="${model}"]`)
+    const toUpdate = [...inputElements, ...deleteButtons, addButton];
+    toUpdate.forEach(e => {
         if (disabled) {
             e.setAttribute('disabled', 'disabled');
         } else {
