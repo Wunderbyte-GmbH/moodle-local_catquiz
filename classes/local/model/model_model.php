@@ -205,8 +205,32 @@ abstract class model_model {
      */
     abstract public function get_static_param_array(model_item_param $param): array;
 
+    /**
+     * Allows extending the itemparam with new fields.
+     *
+     * This is used for multiparameter models and allows to add a new
+     * [fraction:difficulty] or [intercept:difficulty] entry.
+     *
+     * @param array $existingparams
+     * @param stdClass $newparam
+     * @return array
+     * @throws Exception
+     */
     abstract public function add_new_param(array $existingparams, stdClass $newparam): array;
 
+    /**
+     * Allows removal of a parameter value.
+     *
+     * This is used for multiparameter models and allows removing a
+     * [fraction:difficulty] or [intercept:difficulty] pair of the entry.
+     * The value to be removed is identified by a 0-based index of the
+     * respective multiparam array.
+     *
+     * @param array $existingparams
+     * @param int $index
+     * @throws \Exception
+     * @return array
+     */
     abstract public function drop_param_at(array $existingparams, int $index): array;
 
     /**
