@@ -41,7 +41,7 @@ final class lasttimeplayedpenalty extends preselect_task implements wb_middlewar
     /**
      * This is used as factor in the exp function
      *
-     * The value of 4.6 (ln(99)) should ensure that after 10% of the penalty
+     * The value of ln(99) / 0.9 should ensure that after 10% of the penalty
      * timerange has passed, the resulting probability exceeds 0.01.
      *
      * Assuming a timerange of 10 days, the weight factor will be as follows:
@@ -51,7 +51,12 @@ final class lasttimeplayedpenalty extends preselect_task implements wb_middlewar
      *
      * @see https://github.com/Wunderbyte-GmbH/moodle-local_catquiz/issues/424#issuecomment-2092820159
      */
-    const EXP_FACTOR = 4.6;
+    const EXP_FACTOR = 5.1056887223718;
+
+    /**
+     * Factor for getting unix timestamp (seconds) in days.
+     */
+    const SECONDS_TO_DAYS = 1 / (60 * 60 * 24);
 
     /**
      * Run preselect task.
@@ -98,6 +103,10 @@ final class lasttimeplayedpenalty extends preselect_task implements wb_middlewar
      */
     public function get_penalty_factor($question, int $currenttime, float $penaltytimerange): float {
         $lastplayed = $question->userlastattempttime;
-        return 1 / (1 + exp(self::EXP_FACTOR * (1 - ($currenttime - $lastplayed) / $penaltytimerange)));
+
+        // Do all calculations in days.
+        $timedifference = ($lastplayed - $currenttime) * self::SECONDS_TO_DAYS;
+
+        return 1 / (1 + exp(self::EXP_FACTOR / ($penaltytimerange) * ($timedifference + $penaltytimerange)));
     }
 }
