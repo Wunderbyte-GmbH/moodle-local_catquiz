@@ -130,6 +130,13 @@ class updatepersonability extends preselect_task implements wb_middleware {
     private ?float $meanability = null;
 
     /**
+     * Stores the responses array with the last response flipped.
+     *
+     * @var array
+     */
+    private array $flippedresponses;
+
+    /**
      * Helper function to set the context.
      *
      * Used for setting the context in tests.
@@ -593,7 +600,7 @@ class updatepersonability extends preselect_task implements wb_middleware {
             return $originalability;
         }
 
-        $flippedresponses = $this->flip_last_response($responses);
+        $flippedresponses = $this->get_flipped_last_response();
         $alternativeability = catcalc::estimate_person_ability(
             $flippedresponses,
             $this->get_item_param_list($scaleid),
@@ -616,17 +623,20 @@ class updatepersonability extends preselect_task implements wb_middleware {
     }
 
     /**
-     * Takes an "arrayresponses" array and flips the last question.
+     * Returns the responses array with the last response flipped.
      *
      * @return array
      */
-    private function flip_last_response(array $arrayresponses): array {
+    private function get_flipped_last_response(): array {
+        if (isset($this->flippedresponses)) {
+            return $this->flippedresponses;
+        }
         $lastquestion = $this->progress->get_last_question();
-        $flippedresponses = $this->arrayresponses;
-        $frac = floatval($flippedresponses[$lastquestion->id]['fraction']);
+        $this->flippedresponses = $this->arrayresponses;
+        $frac = floatval($this->flippedresponses[$lastquestion->id]['fraction']);
         $flipped = abs(1 - $frac);
-        $flippedresponses[$lastquestion->id]['fraction'] = $flipped;
-        return $flippedresponses;
+        $this->flippedresponses[$lastquestion->id]['fraction'] = $flipped;
+        return $this->flippedresponses;
     }
 
     /**
