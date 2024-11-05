@@ -46,10 +46,11 @@ export const init = async() => {
             iconPromise.resolve();
             const modal = await ModalFactory.create({
                 title: name,
-                body: questiondata.questionhtml,
+                body: '<div data-id="modalbodyquestion"></div>', //questiondata.questionhtml,
             });
-            modal.show();
-            typeset(modal.getRoot()[0]);
+            await modal.show();
+            const element = document.querySelector('[data-id="modalbodyquestion"]');
+            Templates.appendNodeContents(element, questiondata.questionhtml, questiondata.javascript);
         });
     });
 };
@@ -69,5 +70,6 @@ const fetchQuestionData = async(slot, attemptid) => {
     }])[0];
     return {
         questionhtml: data.questionhtml,
+        javascript: data.javascript,
     };
 };
