@@ -237,6 +237,8 @@ class updatepersonability extends preselect_task implements wb_middleware {
                 $this->get_max_ability_for_scale($catscaleid),
                 $this->use_tr_factor()
             );
+
+            $updatedability = $this->maybe_change_to_alternative_ability($catscaleid, $this->arrayresponses, $updatedability, $startvalue);
         } catch (moodle_exception $e) {
             // If we get an excpetion, re-throw it with more information.
             $message = sprintf(
@@ -313,6 +315,13 @@ class updatepersonability extends preselect_task implements wb_middleware {
                     $this->get_min_ability_for_scale($catscaleid),
                     $this->get_max_ability_for_scale($catscaleid),
                     $this->use_tr_factor()
+                );
+
+                $ability = $this->maybe_change_to_alternative_ability(
+                    $scale,
+                    $arrayresponsesforscale,
+                    $ability,
+                    $startvalue
                 );
 
                 $this->progress->set_ability($ability, $scale);
@@ -569,5 +578,72 @@ class updatepersonability extends preselect_task implements wb_middleware {
      */
     protected function use_tr_factor(): bool {
         return $this->ability_was_calculated($this->context['catscaleid'], false);
+    }
+
+    /**
+     * If the ability calculated with a flipped last response is
+     * @param int $scaleid
+     * @param array $responses
+     * @param mixed $originalability
+     * @param mixed $startvalue
+     * @return mixed
+     */
+    private function maybe_change_to_alternative_ability(int $scaleid, array $responses, $originalability, $startvalue): ?float {
+        if (!$this->should_calculate_alternative($scaleid)) {
+            return $originalability;
+        }
+
+        $flippedresponses = $this->flip_last_response($responses);
+        $alternativeability = catcalc::estimate_person_ability(
+            $flippedresponses,
+            $this->get_item_param_list($scaleid),
+            $startvalue,
+            $this->parentability,
+            $this->parentse,
+            $this->get_min_ability_for_scale($scaleid),
+            $this->get_max_ability_for_scale($scaleid),
+            $this->use_tr_factor()
+        );
+        // If both the real updated ability and the ability calculated
+        // with the flipped last response differ from the parent ability
+        // in the same direction, then take the value calculated by the
+        // flipped response as this should be closer to the parent.
+        if (($alternativeability <=> $originalability) == ($originalability <=> $this->parentability)) {
+            return $alternativeability;
+        }
+
+        return $originalability;
+    }
+
+    /**
+     * Takes an "arrayresponses" array and flips the last question.
+     *
+     * @return array
+     */
+    private function flip_last_response(array $arrayresponses): array {
+        $lastquestion = $this->progress->get_last_question();
+        $flippedresponses = $this->arrayresponses;
+        $frac = floatval($flippedresponses[$lastquestion->id]['fraction']);
+        $flipped = abs(1 - $frac);
+        $flippedresponses[$lastquestion->id]['fraction'] = $flipped;
+        return $flippedresponses;
+    }
+
+    /**
+     * Indicates if we should also calculate with the last response flipped.
+     *
+     * @return bool
+     */
+    private function should_calculate_alternative(int $scaleid): bool {
+        $questions = $this->progress->get_playedquestions(true, $scaleid);
+        if (count($questions) < 3) {
+            return false;
+        }
+        $fraction = array_sum(array_map(fn ($q) => floatval($this->arrayresponses[$q->id]['fraction']), $questions)) / count($questions);
+        if (round($fraction, 0) != round($fraction, 6)) {
+            return false;
+        }
+
+        return true;
     }
 }
