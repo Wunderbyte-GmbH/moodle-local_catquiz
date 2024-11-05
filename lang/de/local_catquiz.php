@@ -459,6 +459,7 @@ $string['minabilityscalevalue'] = 'Minimale Personenfähigkeit:';
 $string['minabilityscalevalue_help'] = 'Geben Sie die kleinstmögliche Personenfähigkeit dieser Skala als negativen Dezimalwert an. Der Mittelwert ist null.';
 $string['minquestions_default_desc'] = 'Dieser Wert wird standardmässig gesetzt, kann jedoch in den Quizsettings überschrieben werden';
 $string['minquestions_default_name'] = 'Standardwert für die Mindestanzahl an Fragen pro Versuch';
+$string['minquestionsnotreached'] = 'Es kann kein Ergebnis berechnet werden, da die Mindestanzahl an Fragen nicht erreicht worden ist';
 $string['minquestionspersubscale'] = 'min. Frageanzahl pro Skala';
 $string['minquestionspersubscale_help'] = 'Eine Skala wird frühestens dann ausgeschlossen, wenn die Minimalanzahl an Fragen aus dieser Skala angezeigt wurden.';
 $string['minscalevalue'] = 'Minimalwert';
