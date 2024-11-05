@@ -55,6 +55,16 @@ class pcmgeneralized extends model_multiparam {
     /**
      * {@inheritDoc}
      *
+     * @param array $parameters
+     * @return float
+     */
+    public static function get_difficulty(array $parameters): float {
+        return self::calculate_mean_difficulty($parameters);
+    }
+
+    /**
+     * {@inheritDoc}
+     *
      * @param stdClass $record
      * @return array
      */

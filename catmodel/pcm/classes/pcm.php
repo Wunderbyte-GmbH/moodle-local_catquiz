@@ -43,6 +43,16 @@ use stdClass;
 class pcm extends model_multiparam {
 
     /**
+     * {@inheritDoc}
+     *
+     * @param array $parameters
+     * @return float
+     */
+    public static function get_difficulty(array $parameters): float {
+        return self::calculate_mean_difficulty($parameters);
+    }
+
+    /**
      * Returns the item parameter array from a database record.
      *
      * @param stdClass $record
