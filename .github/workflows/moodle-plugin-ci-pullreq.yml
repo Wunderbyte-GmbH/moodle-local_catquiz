@@ -1,11 +1,15 @@
 name: Moodle Plugin CI Pull Request
 
-on: 
+on:
   push:
     tags:
       - '[0-9]+' # Date tags
       - '[0-9]+.[0-9]+.[0-9]+' # Version tags
   pull_request:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
 
 jobs:
   test:
