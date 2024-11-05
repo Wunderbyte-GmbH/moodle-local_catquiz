@@ -106,7 +106,8 @@ final class lasttimeplayedpenalty extends preselect_task implements wb_middlewar
 
         // Do all calculations in days.
         $timedifference = ($lastplayed - $currenttime) * self::SECONDS_TO_DAYS;
-
+        $penaltytimerange = $penaltytimerange * self::SECONDS_TO_DAYS;
+        
         return 1 / (1 + exp(self::EXP_FACTOR / $penaltytimerange * ($timedifference + $penaltytimerange)));
     }
 }
