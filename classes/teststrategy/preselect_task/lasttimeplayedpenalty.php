@@ -98,8 +98,6 @@ final class lasttimeplayedpenalty extends preselect_task implements wb_middlewar
      */
     public function get_penalty_factor($question, int $currenttime, float $penaltytimerange): float {
         $lastplayed = $question->userlastattempttime;
-
-        // Do all calculations in days.
         $timedifference = ($lastplayed - $currenttime);
 
         return 1 / (1 + exp(self::EXP_FACTOR / $penaltytimerange * ($timedifference + $penaltytimerange)));
