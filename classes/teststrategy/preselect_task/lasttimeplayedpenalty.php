@@ -54,11 +54,6 @@ final class lasttimeplayedpenalty extends preselect_task implements wb_middlewar
     const EXP_FACTOR = 5.1056887223718;
 
     /**
-     * Factor for getting unix timestamp (seconds) in days.
-     */
-    const SECONDS_TO_DAYS = 1 / (60 * 60 * 24);
-
-    /**
      * Run preselect task.
      *
      * @param array $context
