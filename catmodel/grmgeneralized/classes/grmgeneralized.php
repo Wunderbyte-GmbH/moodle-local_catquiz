@@ -139,7 +139,7 @@ class grmgeneralized extends model_multiparam {
      */
     public static function add_parameters_to_record(stdClass $record, array $parameters): stdClass {
         $record->json = json_encode(['difficulties' => $parameters['difficulties']]);
-        $record->difficulty = $record->difficulty ?? self::get_difficulty_aggregate((object) $parameters);
+        $record->difficulty = $record->difficulty ?? self::calculate_mean_difficulty($parameters);
         return $record;
     }
 
@@ -150,17 +150,7 @@ class grmgeneralized extends model_multiparam {
      * @return float
      */
     public static function get_difficulty(array $parameters): float {
-        return self::get_difficulty_aggregate((object) $parameters);
-    }
-
-    /**
-     * Return a single float value for the difficulty.
-     *
-     * @param stdClass $record
-     * @return float
-     */
-    private static function get_difficulty_aggregate(stdClass $record) {
-        return $record->difficulties['1.00'];
+        return self::calculate_mean_difficulty($parameters);
     }
 
     /**

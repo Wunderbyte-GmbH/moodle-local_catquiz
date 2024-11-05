@@ -155,6 +155,16 @@ class grm extends model_multiparam {
     }
 
     /**
+     * {@inheritDoc}
+     *
+     * @param array $parameters
+     * @return float
+     */
+    public static function get_difficulty(array $parameters): float {
+        return self::calculate_mean_difficulty($parameters);
+    }
+
+    /**
      * Calculate the mean difficulty
      *
      * @param array $ip
