@@ -245,7 +245,12 @@ class updatepersonability extends preselect_task implements wb_middleware {
                 $this->use_tr_factor()
             );
 
-            $updatedability = $this->maybe_change_to_alternative_ability($catscaleid, $this->arrayresponses, $updatedability, $startvalue);
+            $updatedability = $this->maybe_change_to_alternative_ability(
+                $catscaleid,
+                $this->arrayresponses,
+                $updatedability,
+                $startvalue
+            );
         } catch (moodle_exception $e) {
             // If we get an excpetion, re-throw it with more information.
             $message = sprintf(
@@ -588,7 +593,12 @@ class updatepersonability extends preselect_task implements wb_middleware {
     }
 
     /**
-     * If the ability calculated with a flipped last response is
+     * Calculates the ability again with the last response flipped and returns
+     * either the original value or the one calcualted with the flipped
+     * response, whichever is "better".
+     *
+     * Better is defined here as more far from the parent's ability value.
+     *
      * @param int $scaleid
      * @param array $responses
      * @param mixed $originalability
@@ -642,14 +652,17 @@ class updatepersonability extends preselect_task implements wb_middleware {
     /**
      * Indicates if we should also calculate with the last response flipped.
      *
+     * @param int $scaleid
      * @return bool
      */
     private function should_calculate_alternative(int $scaleid): bool {
         $questions = $this->progress->get_playedquestions(true, $scaleid);
-        if (count($questions) < 3) {
+        if (!$questions || count($questions) < 3) {
             return false;
         }
-        $fraction = array_sum(array_map(fn ($q) => floatval($this->arrayresponses[$q->id]['fraction']), $questions)) / count($questions);
+        $fraction = array_sum(
+            array_map(fn ($q) => floatval($this->arrayresponses[$q->id]['fraction']), $questions)
+        ) / count($questions);
         if (round($fraction, 0) != round($fraction, 6)) {
             return false;
         }
