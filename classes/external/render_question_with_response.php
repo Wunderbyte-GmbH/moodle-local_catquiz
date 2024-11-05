@@ -79,15 +79,22 @@ class render_question_with_response extends external_api {
      * @return array
      */
     public static function execute(int $slot, int $attemptid): array {
+        global $PAGE, $OUTPUT;
         self::validate_parameters(self::execute_parameters(), [
             'slot' => $slot,
             'attemptid' => $attemptid,
         ]);
 
+        $PAGE->set_context(context_system::instance());
+        // Hack alert: Forcing bootstrap_renderer to initiate moodle page.
+        $OUTPUT->header();
+        $PAGE->start_collecting_javascript_requirements();
         $questionhtml = self::render_question($slot, $attemptid);
+        $jsfooter = $PAGE->requires->get_end_code();
 
         return [
             'questionhtml' => $questionhtml['body'],
+            'javascript' => $jsfooter,
         ];
     }
 
@@ -99,6 +106,7 @@ class render_question_with_response extends external_api {
     public static function execute_returns(): external_single_structure {
         return new external_single_structure([
             'questionhtml' => new external_value(PARAM_RAW, 'The rendered question HTML'),
+            'javascript' => new external_value(PARAM_RAW, 'The rendered question javascript'),
         ]);
     }
 
