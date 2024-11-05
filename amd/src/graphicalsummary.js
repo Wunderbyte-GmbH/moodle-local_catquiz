@@ -23,7 +23,7 @@
 import Ajax from 'core/ajax';
 import ModalFactory from 'core/modal_factory';
 import {addIconToContainerWithPromise} from 'core/loadingicon';
-import {typeset} from 'filter_mathjaxloader/loader';
+import Templates from 'core/templates';
 
 /**
  * Add event listeners.
