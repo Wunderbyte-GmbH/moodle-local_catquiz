@@ -326,7 +326,7 @@ final class catquiz_test extends advanced_testcase {
         $groupstoenrol = [];
         if ($isenrolled) {
             $coursestoenrol = [$catscaleid => ['show_message' => true, 'range' => 1, 'course_ids' => [$course->id]]];
-            $groupstoenrol = [$catscaleid => [$group->id]];
+            $groupstoenrol = [$catscaleid => [$group->name]];
         }
         // This is the function we want to test. After this call, the user should be added to the given group and enrolled to the
         // given course depending on the person ability of the user.
