@@ -1993,7 +1993,10 @@ class catquiz {
                 $groupsofcourse = groups_get_all_groups($courseid);
                 foreach ($groupsofcourse as $existinggroup) {
                     foreach ($groupstoenrol[$catscaleid] as $newgroup) {
-                        if ($existinggroup->id == $newgroup) {
+                        if ($existinggroup->name == $newgroup) {
+                            if (groups_is_member($existinggroup->id, $userid)) {
+                                continue;
+                            }
                             $groupmember = groups_add_member($existinggroup->id, $userid);
                             if ($groupmember) {
                                 $data = [];
