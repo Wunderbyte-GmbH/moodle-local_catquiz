@@ -69,7 +69,7 @@ class graphicalsummary extends feedbackgenerator {
                 $this
                     ->get_progress()
                     ->get_quiz_settings()
-                    ->catquiz_showquestion
+                    ->catquiz_showquestion ?? false
             );
             $table = $this->render_table($feedbackdata['graphicalsummary_data'], $showquestions);
         }
