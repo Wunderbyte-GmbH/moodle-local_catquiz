@@ -46,7 +46,7 @@ export const init = async() => {
             iconPromise.resolve();
             const modal = await ModalFactory.create({
                 title: name,
-                body: '<div data-id="modalbodyquestion"></div>', //questiondata.questionhtml,
+                body: '<div data-id="modalbodyquestion"></div>',
             });
             await modal.show();
             const element = document.querySelector('[data-id="modalbodyquestion"]');
