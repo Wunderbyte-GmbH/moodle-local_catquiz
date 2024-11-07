@@ -272,7 +272,7 @@ class personabilities extends feedbackgenerator {
             return [];
         }
         $abilitieslist = [];
-        $selectedscaleid = $this->get_primary_scale($existingdata, $newdata)->id;
+        $selectedscaleid = $this->get_primary_scale($existingdata, $newdata)->id ?? null;
         foreach ($personabilities as $catscaleid => $abilityarray) {
             $abilitieslist[] = $this->generate_data_for_scale(
                     $abilitieslist,
@@ -297,7 +297,7 @@ class personabilities extends feedbackgenerator {
      *
      * @param array $data
      * @param int $catscaleid
-     * @param int $selectedscaleid
+     * @param ?int $selectedscaleid
      * @param array $abilityarray
      * @param array $catscales
      * @param array $newdata
@@ -307,7 +307,7 @@ class personabilities extends feedbackgenerator {
     private function generate_data_for_scale(
         array &$data,
         int $catscaleid,
-        int $selectedscaleid,
+        ?int $selectedscaleid,
         array $abilityarray,
         array $catscales,
         array $newdata
@@ -457,6 +457,7 @@ class personabilities extends feedbackgenerator {
                 'charttitle' => '',
             ];
         }
+        $primarycatscaleid = null;
         foreach ($personabilities as $id => $pa) {
             if (isset($pa['primary']) && $pa['primary']) {
                 $primarycatscaleid = intval($id);
@@ -469,7 +470,7 @@ class personabilities extends feedbackgenerator {
         $chart = new chart_bar();
         $chart->set_horizontal(true);
         $this->apply_sorting($personabilities, $primarycatscaleid);
-        foreach ($personabilities as $abilityarray) {
+        foreach ($personabilities as $scaleid => $abilityarray) {
             $subscaleability = (float) $abilityarray['value'];
             $subscalename = $abilityarray['name'];
             $difference = round($subscaleability - $primaryability, 2);
@@ -487,7 +488,7 @@ class personabilities extends feedbackgenerator {
             $colorvalue = $this->feedbackhelper->get_color_for_personability(
                 $quizsettings,
                 floatval($subscaleability),
-                intval($primarycatscaleid)
+                intval($scaleid)
             );
             $series->set_colors([0 => $colorvalue]);
             $chart->add_series($series);
