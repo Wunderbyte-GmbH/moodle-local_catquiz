@@ -587,6 +587,7 @@ $string['removetestitembody'] = 'Wollen Sie folgende Testitems aus aktuellen Ska
 $string['removetestitemsubmit'] = 'Entfernen';
 $string['removetestitemtitle'] = 'Testitems von Skalen entfernen';
 $string['reportscale'] = 'Skala für den Report der Ergebnisse berücksichtigen';
+$string['requesttimeout'] = 'Zeitüberschreitung beim Verbindungsaufbau';
 $string['response'] = 'Antwort';
 $string['responsesbyusercharttitle'] = 'Gesamtanzahl der gegebenen Antworten pro Person';
 $string['rootscale:tooltiptitle'] = 'Globalskala „{$a}“';

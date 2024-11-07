@@ -19,7 +19,7 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-import DynamicForm from 'core_form/dynamicform';
+import CatquizDynamicForm from './catquiz_dynamic_form';
 import {showNotification} from 'local_catquiz/notifications';
 import {get_string as getString} from 'core/str';
 
@@ -35,7 +35,7 @@ export const init = () => {
     const formContainer = document.querySelector(SELECTORS.FORMCONTAINER);
 
     // Initialize the form - pass the container element and the form class name.
-    const dynamicForm = new DynamicForm(formContainer,
+    const dynamicForm = new CatquizDynamicForm(formContainer,
         'local_catquiz\\form\\csvimport'
     );
 

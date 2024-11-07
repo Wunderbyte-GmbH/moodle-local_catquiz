@@ -568,6 +568,7 @@ $string['removetestitembody'] = 'Do you want to remove the following test items 
 $string['removetestitemsubmit'] = 'Remove';
 $string['removetestitemtitle'] = 'Remove test item from CAT scale';
 $string['reportscale'] = 'Include scale for report';
+$string['requesttimeout'] = 'The connection request timed out before it could complete';
 $string['response'] = 'Response';
 $string['responsesbyusercharttitle'] = 'Total number of responses per person';
 $string['rootscale:tooltiptitle'] = 'root scale {$a}';
