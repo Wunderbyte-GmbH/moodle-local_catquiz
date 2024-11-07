@@ -442,11 +442,13 @@ abstract class feedbackgenerator {
     /**
      * Sort personabilites array according to feedbacksettings.
      *
-     * @param array $personabilities
-     * @param int $selectedscaleid
+     * If $selectedscaleid is provided, ordering will be ignored for this one
+     * and it will always be placed at the top.
      *
+     * @param array $personabilities
+     * @param ?int $selectedscaleid
      */
-    protected function apply_sorting(array &$personabilities, int $selectedscaleid) {
+    protected function apply_sorting(array &$personabilities, ?int $selectedscaleid) {
         // Sort the array and put primary scale first.
         if ($this->feedbacksettings->is_sorted_ascending()) {
             asort($personabilities);
@@ -456,7 +458,12 @@ abstract class feedbackgenerator {
             arsort($personabilities);
         }
 
-        // Put selected element first.
+        // If no selected scale was provided, just return.
+        if (!$selectedscaleid) {
+            return;
+        }
+
+        // If it was provided, place the selected scale at the top.
         $value = $personabilities[$selectedscaleid];
         unset($personabilities[$selectedscaleid]);
         $personabilities = [$selectedscaleid => $value] + $personabilities;
