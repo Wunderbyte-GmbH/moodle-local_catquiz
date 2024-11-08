@@ -299,9 +299,11 @@ class feedback_helper {
                 [
                     'q' => $date,
                     'y' => $year,
-                ]);
+                ]
+            );
         } else if ($timerange === LOCAL_CATQUIZ_TIMERANGE_MONTH) {
-            return get_string('stringdate:month:' . $date, 'local_catquiz');
+            $year = userdate($timestamp, '%y');
+            return get_string('stringdate:month:' . $date, 'local_catquiz', ['y' => $year]);
         } else {
             return get_string('stringdate:' . $stringfordate, 'local_catquiz', $date);
         }

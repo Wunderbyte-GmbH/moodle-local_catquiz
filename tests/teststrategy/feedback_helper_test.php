@@ -87,7 +87,7 @@ final class feedback_helper_test extends advanced_testcase {
             'month' => [
                 'timerange' => LOCAL_CATQUIZ_TIMERANGE_MONTH,
                 'timestamp' => 1714030970,
-                'expected' => "April",
+                'expected' => "April 24",
                 ],
             'quarter1' => [
                 'timerange' => LOCAL_CATQUIZ_TIMERANGE_QUARTEROFYEAR,
