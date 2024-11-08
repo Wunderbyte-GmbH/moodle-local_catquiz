@@ -58,11 +58,12 @@ class submit_responses extends external_api {
         return new external_function_parameters([
             'responses' => new external_multiple_structure(
                 new external_single_structure([
-                    'questionid' => new external_value(PARAM_INT, 'The ID of the question'),
-                    'response' => new external_value(PARAM_RAW, 'The response data'),
-                    'timestamp' => new external_value(PARAM_INT, 'Unix timestamp of the response'),
+                    'questionhash' => new external_value(PARAM_TEXT, 'Hash of the question'),
+                    'fraction' => new external_value(PARAM_TEXT, 'Response fraction value'),
+                    'remoteuserid' => new external_value(PARAM_INT, 'User ID from remote instance'),
+                    'timestamp' => new external_value(PARAM_TEXT, 'Unix timestamp of the response')
                 ])
-            ),
+            )
         ]);
     }
 
@@ -77,11 +78,11 @@ class submit_responses extends external_api {
             'message' => new external_value(PARAM_TEXT, 'Status message'),
             'responses' => new external_multiple_structure(
                 new external_single_structure([
-                    'questionid' => new external_value(PARAM_INT, 'The ID of the question'),
+                    'questionhash' => new external_value(PARAM_TEXT, 'Hash of the question'),
                     'status' => new external_value(PARAM_BOOL, 'Individual response status'),
-                    'message' => new external_value(PARAM_TEXT, 'Individual response message'),
+                    'message' => new external_value(PARAM_TEXT, 'Individual response message')
                 ])
-            ),
+            )
         ]);
     }
 
@@ -92,9 +93,6 @@ class submit_responses extends external_api {
      * @return array The status and processed responses
      */
     public static function execute($responses) {
-        // The $USER is the local user for whom the token was created.
-        global $USER, $DB;
-
         // Parameter validation.
         $params = self::validate_parameters(self::execute_parameters(), ['responses' => $responses]);
 
@@ -107,32 +105,43 @@ class submit_responses extends external_api {
 
         $results = [];
         $overallstatus = true;
+        $sourceurl = self::get_remote_source_url();
 
         foreach ($params['responses'] as $response) {
             try {
-                // Validate that the question exists.
-                if (!$DB->record_exists('question', ['id' => $response['questionid']])) {
-                    throw new invalid_parameter_exception('Invalid question ID: ' . $response['questionid']);
+                // Basic validation of the fraction value.
+                if (!is_numeric($response['fraction'])) {
+                    throw new invalid_parameter_exception('Invalid fraction value for question ' . $response['questionhash']);
                 }
 
-                // Here you would process and store the response.
-                // This is a placeholder for your actual response processing logic.
-                $status = self::process_response($response);
+                // Basic validation of the timestamp.
+                if (!is_numeric($response['timestamp'])) {
+                    throw new invalid_parameter_exception('Invalid timestamp for question ' . $response['questionhash']);
+                }
+
+                // Store the response using the response handler.
+                $success = \local_catquiz\remote\response\response_handler::store_response(
+                    $response['questionhash'],
+                    $response['fraction'],
+                    $response['remoteuserid'],
+                    $sourceurl
+                );
 
                 $results[] = [
-                    'questionid' => $response['questionid'],
-                    'status' => $status,
-                    'message' => $status ? 'Success' : 'Failed to process response',
+                    'questionhash' => $response['questionhash'],
+                    'status' => $success,
+                    'message' => $success ? 'Success' : 'Failed to store response'
                 ];
 
-                if (!$status) {
+                if (!$success) {
                     $overallstatus = false;
                 }
+
             } catch (\Exception $e) {
                 $results[] = [
-                    'questionid' => $response['questionid'],
+                    'questionhash' => $response['questionhash'],
                     'status' => false,
-                    'message' => $e->getMessage(),
+                    'message' => $e->getMessage()
                 ];
                 $overallstatus = false;
             }
@@ -141,35 +150,18 @@ class submit_responses extends external_api {
         return [
             'status' => $overallstatus,
             'message' => $overallstatus ? 'All responses processed successfully' : 'Some responses failed',
-            'responses' => $results,
+            'responses' => $results
         ];
     }
 
     /**
-     * Process a single response.
+     * Get the source URL of the remote instance.
      *
-     * @param array $response The response data
-     * @return bool Success status
+     * @return string The source URL
      */
-    private static function process_response($response) {
-        global $DB, $USER;
-
-        try {
-            // Add your response processing logic here.
-            // This is where you would store the response in your plugin's tables.
-            // For example:
-            $record = new \stdClass();
-            $record->questionid = $response['questionid'];
-            $record->response = $response['response'];
-            $record->timestamp = $response['timestamp'];
-            $record->userid = $USER->id;
-
-            // Insert into your responses table.
-            // $DB->insert_record('local_catquiz_responses', $record);
-
-            return true;
-        } catch (\Exception $e) {
-            return false;
-        }
+    private static function get_remote_source_url() {
+        global $CFG;
+        // This should be the URL that uniquely identifies this Moodle instance.
+        return $CFG->wwwroot;
     }
 }
