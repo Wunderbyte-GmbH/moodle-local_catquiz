@@ -28,15 +28,13 @@ namespace local_catquiz\teststrategy\feedbackgenerator;
 use core\chart_bar;
 use core\chart_series;
 use local_catquiz\catscale;
-use local_catquiz\data\catscale_structure;
 use local_catquiz\teststrategy\feedbackgenerator;
-use local_catquiz\local\model\model_strategy;
 use local_catquiz\teststrategy\feedback_helper;
 
 defined('MOODLE_INTERNAL') || die();
 
 global $CFG;
-require_once($CFG->dirroot.'/local/catquiz/lib.php');
+require_once($CFG->dirroot . '/local/catquiz/lib.php');
 
 /**
  * Returns rendered person abilities.
@@ -86,7 +84,8 @@ class personabilities extends feedbackgenerator {
             : false;
         if ($primaryscaleid && array_key_exists($primaryscaleid, $feedbackdata['personabilities_abilities'])) {
             $primaryscale = $feedbackdata['personabilities_abilities'][$primaryscaleid];
-            if (array_key_exists('primarybecause', $primaryscale)
+            if (
+                array_key_exists('primarybecause', $primaryscale)
                 && $primaryscale['primarybecause'] === 'lowestskill'
             ) {
                 $scaleinfo = get_string(
@@ -100,7 +99,8 @@ class personabilities extends feedbackgenerator {
                 );
             }
 
-            if (array_key_exists('primarybecause', $primaryscale)
+            if (
+                array_key_exists('primarybecause', $primaryscale)
                 && $primaryscale['primarybecause'] === 'highestskill'
             ) {
                 $scaleinfo = get_string(
@@ -113,7 +113,6 @@ class personabilities extends feedbackgenerator {
                     ]
                 );
             }
-
         }
 
         $pseudoindex = 0;
@@ -163,14 +162,14 @@ class personabilities extends feedbackgenerator {
         );
 
         $feedback = $OUTPUT->render_from_template(
-        'local_catquiz/feedback/personabilities',
+            'local_catquiz/feedback/personabilities',
             [
-            'feedback_details_description' => $description,
-            'scale_info' => $scaleinfo,
-            'abilities' => $abilities,
-            'referencescale' => $referencescale,
-            'chartdisplay' => $abilitieschart,
-            'chart_description' => $chartdescription,
+                'feedback_details_description' => $description,
+                'scale_info' => $scaleinfo,
+                'abilities' => $abilities,
+                'referencescale' => $referencescale,
+                'chartdisplay' => $abilitieschart,
+                'chart_description' => $chartdescription,
             ]
         );
 
@@ -275,13 +274,13 @@ class personabilities extends feedbackgenerator {
         $selectedscaleid = $this->get_primary_scale($existingdata, $newdata)->id ?? null;
         foreach ($personabilities as $catscaleid => $abilityarray) {
             $abilitieslist[] = $this->generate_data_for_scale(
-                    $abilitieslist,
-                    $catscaleid,
-                    $selectedscaleid,
-                    $abilityarray,
-                    $catscales,
-                    $newdata
-                );
+                $abilitieslist,
+                $catscaleid,
+                $selectedscaleid,
+                $abilityarray,
+                $catscales,
+                $newdata
+            );
         }
 
         return [
@@ -332,7 +331,6 @@ class personabilities extends feedbackgenerator {
                     $catscales[$catscaleid]->name
                 ) ?? $catscales[$catscaleid]->name;
             };
-
         } else {
             $isselectedscale = false;
             $tooltiptitle = $catscales[$catscaleid]->name;
@@ -341,9 +339,11 @@ class personabilities extends feedbackgenerator {
         // ...and parentscale and primaryscale.
         if ($questionsinscale = $this->get_progress()->get_playedquestions(true, $catscaleid)) {
             $numberofitems = ['itemsplayed' => count($questionsinscale)];
-        } else if ($this->feedbacksettings->displayscaleswithoutitemsplayed
+        } else if (
+            $this->feedbacksettings->displayscaleswithoutitemsplayed
             || $catscaleid == $selectedscaleid
-            || $catscales[$catscaleid]->parentid == 0) {
+            || $catscales[$catscaleid]->parentid == 0
+        ) {
             $numberofitems = ['noplayed' => 0];
         } else if ($catscaleid != $selectedscaleid) {
             $numberofitems = "";
@@ -365,7 +365,6 @@ class personabilities extends feedbackgenerator {
             'tooltiptitle' => $tooltiptitle,
             'is_global' => $catscaleid == $this->get_progress()->get_quiz_settings()->catquiz_catscales,
         ];
-
     }
 
     /**
@@ -382,53 +381,6 @@ class personabilities extends feedbackgenerator {
         $catscale = new catscale($catscaleid);
         // Prepare data for test information line.
         return $catscale->get_testitems($contextid, $includesubscales);
-    }
-
-    /**
-     * Round float to steps as defined.
-     *
-     * @param float $number
-     * @param float $step
-     * @param float $interval
-     *
-     * @return float
-     */
-    private function round_to_customsteps(float $number, float $step, float $interval): float {
-        $roundedvalue = round($number / $step) * $step;
-
-        // Exclude rounding to steps defined in $interval.
-        if ($roundedvalue - floor($roundedvalue) == $interval) {
-            $roundedvalue = floor($roundedvalue) + $step;
-        }
-
-        return $roundedvalue;
-    }
-
-    /**
-     * Scale values of testinfo (sum of fisherinfos) for better display in chart.
-     *
-     * @param array $fisherinfos
-     * @param array $attemptscounter
-     *
-     * @return array
-     */
-    private function scalevalues($fisherinfos, $attemptscounter) {
-        // Find the maximum values in arrays.
-        $maxattempts = max($attemptscounter);
-        $maxfisherinfo = max($fisherinfos);
-
-        // Avoid division by zero.
-        if ($maxfisherinfo == 0 || $maxattempts == 0) {
-            return $fisherinfos;
-        }
-
-        $scalingfactor = $maxattempts / $maxfisherinfo;
-
-        // Scale the values in $fisherinfos based on the scaling factor.
-        foreach ($fisherinfos as &$value) {
-            $value *= $scalingfactor;
-        }
-        return $fisherinfos;
     }
 
     /**
@@ -482,7 +434,8 @@ class personabilities extends feedbackgenerator {
                 [
                     'ability' => strval($subscaleability),
                     'difference' => strval($difference),
-                ]);
+                ]
+            );
             $series->set_labels([0 => $stringforchartlegend]);
 
             $colorvalue = $this->feedbackhelper->get_color_for_personability(
