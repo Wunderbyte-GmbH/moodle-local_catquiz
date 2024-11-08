@@ -35,9 +35,17 @@ $services = [
                 ],
                 'restrictedusers' => 0,
                 'shortname' => 'local_catquiz_external',
-                'downloadfiles' => 1,    // Allow file downloads.
-                'uploadfiles'  => 1,      // Allow file uploads.
+                'downloadfiles' => 1, // Allow file downloads.
+                'uploadfiles'  => 1, // Allow file uploads.
                 'enabled' => 1,
+        ],
+        'CatQuiz Response Service' => [
+            'functions' => ['local_catquiz_submit_catquiz_responses'],
+            'restrictedusers' => 0, // Allow all users.
+            'enabled' => 1,
+            'shortname' => 'local_catquiz_response',
+            'downloadfiles' => 0,
+            'uploadfiles' => 0,
         ],
 ];
 
@@ -124,5 +132,15 @@ $functions = [
                 'description' => 'Renders a question with a response',
                 'type' => 'read',
                 'ajax' => 1,
+        ],
+        // Allows other instances to share their response data.
+        'local_catquiz_submit_catquiz_responses' => [
+            'classname' => 'local_catquiz\\external\\submit_responses',
+            'methodname' => 'execute',
+            'classpath' => 'local/catquiz/classes/external/submit_responses.php',
+            'description' => 'Submit responses for CatQuiz.',
+            'type' => 'write',
+            'capabilities' => 'local/catquiz:submit_responses',
+            'ajax' => true,
         ],
 ];
