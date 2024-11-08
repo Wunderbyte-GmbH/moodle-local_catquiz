@@ -279,7 +279,6 @@ class feedback_helper {
                 break;
             case LOCAL_CATQUIZ_TIMERANGE_MONTH:
                 $dateformat = '%m';
-                $stringfordate = 'month';
                 break;
             case LOCAL_CATQUIZ_TIMERANGE_QUARTEROFYEAR:
                 $dateformat = '%m';
@@ -303,7 +302,7 @@ class feedback_helper {
             );
         } else if ($timerange === LOCAL_CATQUIZ_TIMERANGE_MONTH) {
             $year = userdate($timestamp, '%y');
-            return get_string('stringdate:month:' . $date, 'local_catquiz', ['y' => $year]);
+            return get_string('statistics_month_' . $date, 'local_catquiz', ['y' => $year]);
         } else {
             return get_string('stringdate:' . $stringfordate, 'local_catquiz', $date);
         }
