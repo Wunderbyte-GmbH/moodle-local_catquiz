@@ -16,35 +16,32 @@
 
 namespace local_catquiz\remote\response;
 
-defined('MOODLE_INTERNAL') || die();
-
 use local_catquiz\remote\hash\question_hasher;
 
 /**
  * Handles storage and processing of remote responses.
  *
  * @package    local_catquiz
- * @copyright  2024 Wunderbyte GmbH <info@wunderbyte.at>
+ * @copyright  2024 Wunderbyte GmbH
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class response_handler {
-
     /**
      * Store a response from a remote instance.
      *
      * @param string $questionhash The question hash
-     * @param string $response The response data
+     * @param string $fraction The response fraction
      * @param int $remoteuserid The user ID from remote instance
      * @param string $sourceurl The source URL
      * @return bool Success status
      */
-    public static function store_response($questionhash, $response, $remoteuserid, $sourceurl) {
+    public static function store_response($questionhash, $fraction, $remoteuserid, $sourceurl) {
         global $DB;
 
         $record = new \stdClass();
         $record->questionhash = $questionhash;
+        $record->response = $fraction; // We store the fraction in the response field.
         $record->remoteuserid = $remoteuserid;
-        $record->response = $response;
         $record->sourceurl = $sourceurl;
         $record->timecreated = time();
 
