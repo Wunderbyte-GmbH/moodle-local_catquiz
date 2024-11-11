@@ -174,17 +174,17 @@ class updatepersonability extends preselect_task implements wb_middleware {
             return $next($context);
         }
 
-        if (!empty($this->progress->get_last_question()->is_pilot)) {
-            $context['skip_reason'] = 'pilotquestion';
-            return $next($context);
-        }
-
         $this->userresponses = model_responses::create_from_array(
             [$context['userid'] => ['component' => $this->progress->get_user_responses()]]
         );
         $context['lastresponse'] = $this->userresponses->get_last_response($context['userid']);
 
-        $this->arrayresponses = $this->userresponses->get_for_user($context['userid']);
+        if (!empty($this->progress->get_last_question()->is_pilot)) {
+            $context['skip_reason'] = 'pilotquestion';
+            return $next($context);
+        }
+
+        $this->arrayresponses = reset(($this->userresponses->as_array())[$context['userid']]);
 
         $this->parentability = $this->get_initial_ability();
         $this->initialse = $this->set_initial_standarderror();
@@ -375,7 +375,7 @@ class updatepersonability extends preselect_task implements wb_middleware {
         }
         $first = $arrayresponses[array_key_first($arrayresponses)];
         foreach ($arrayresponses as $ur) {
-            if ($ur->get_response() !== $first->get_response()) {
+            if ($ur['fraction'] !== $first['fraction']) {
                 return true;
             }
         }
@@ -482,9 +482,9 @@ class updatepersonability extends preselect_task implements wb_middleware {
             ? $this->context['person_ability'][$this->context['catscaleid']]
             : $this->meanability;
 
-        $lastquestionid = $this->userresponses->get_last_response($this->context['userid']);
+        $lastquestionid = $this->userresponses->get_last_response($this->context['userid'])['questionid'];
         $items = clone ($this->get_item_param_list($this->context['catscaleid']));
-        $items->offsetUnset($lastquestionid->get_id());
+        $items->offsetUnset($lastquestionid);
 
         return catscale::get_standarderror(
             $ability,
@@ -509,7 +509,7 @@ class updatepersonability extends preselect_task implements wb_middleware {
         }
         $items = $this->get_item_param_list($catscaleid)->as_array();
         if (!$includelastresponse) {
-            unset($items[$lastresponse->get_id()]);
+            unset($items[$lastresponse['questionid']]);
         }
 
         // Only keep responses for the current scale.
