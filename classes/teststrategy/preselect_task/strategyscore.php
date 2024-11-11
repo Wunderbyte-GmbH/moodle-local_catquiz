@@ -151,14 +151,14 @@ abstract class strategyscore extends preselect_task implements wb_middleware {
             $affectedscales = array_reverse($affectedscales); // Traverse from root to leave.
 
             foreach ($affectedscales as $scaleid) {
-                if ($this->ignore_scale($scaleid)
+                if (
+                    $this->ignore_scale($scaleid)
                     || is_null($scaleability = $this->get_scale_ability($scaleid))
                 ) {
                     continue;
                 }
 
                 $myitems = (model_responses::create_from_array([$context['userid'] => ['component' => $this->progress->get_user_responses()]]))
-                    //->setdata([$context['userid'] => ['component' => $this->progress->get_user_responses()]])
                     ->get_items_for_scale($scaleid, $context['contextid']);
                 $standarderrorplayed = catscale::get_standarderror($scaleability, $myitems, INF);
                 $testinfo = $standarderrorplayed === INF ? 0 : 1 / $standarderrorplayed ** 2;

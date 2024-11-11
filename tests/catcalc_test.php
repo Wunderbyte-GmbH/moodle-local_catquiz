@@ -146,6 +146,13 @@ final class catcalc_test extends basic_testcase {
         return $data;
     }
 
+    /**
+     * Test the function to build item params
+     *
+     * @return void
+     * @throws InvalidArgumentException
+     * @throws ExpectationFailedException
+     */
     public function test_build_item_param_jacobian() {
         $itemresponse = [];
         $mr = new model_responses();
