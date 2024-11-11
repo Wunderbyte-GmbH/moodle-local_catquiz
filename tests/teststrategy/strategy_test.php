@@ -2122,7 +2122,7 @@ final class strategy_test extends advanced_testcase {
                         $ep[$paramname],
                         $paramvalue,
                         0.001,
-                        sprintf("Values for model %s and item param %s do not match", $model, $itemid) 
+                        sprintf("Values for model %s and item param %s do not match", $model, $itemid)
                     );
                 }
             }
@@ -2136,37 +2136,37 @@ final class strategy_test extends advanced_testcase {
      */
     public static function get_expected_responses_data(): array {
         $rasch = [
-            ['itemid' => 'A01-01', 'difficulty' => -4.5984],
-            ['itemid' => 'A01-00', 'difficulty' => -4.5380],
-            ['itemid' => 'A03-00', 'difficulty' => -4.5380],
-            ['itemid' => 'A05-03', 'difficulty' => -2.5043],
-            ['itemid' => 'C03-19', 'difficulty' => 0.0011],
-            ['itemid' => 'B02-06', 'difficulty' => 2.4571],
-            ['itemid' => 'C09-17', 'difficulty' => 4.9609],
-            ['itemid' => 'C08-11', 'difficulty' => 5.0350],
-            ['itemid' => 'C08-16', 'difficulty' => 5.0857],
+            ['itemid' => 'A01-00', 'difficulty' => -5.000],
+            ['itemid' => 'A01-01', 'difficulty' => -5.000],
+            ['itemid' => 'A03-00', 'difficulty' => -5.00],
+            ['itemid' => 'A05-03', 'difficulty' => -3.440],
+            ['itemid' => 'C03-19', 'difficulty' => -0.268],
+            ['itemid' => 'B02-06', 'difficulty' => -0.127],
+            ['itemid' => 'C09-17', 'difficulty' => 1.628],
+            ['itemid' => 'C08-11', 'difficulty' => 1.521],
+            ['itemid' => 'C08-16', 'difficulty' => 1.913],
         ];
         $raschbirnbaum = [
-            ['itemid' => 'A01-00', 'difficulty' => -4.6761, 'discrimination' => 0.8988],
-            ['itemid' => 'A03-00', 'difficulty' => -4.6646, 'discrimination' => 0.9062],
-            ['itemid' => 'A03-01', 'difficulty' => -4.6563, 'discrimination' => 0.8854],
-            ['itemid' => 'A05-03', 'difficulty' => -2.5065, 'discrimination' => 0.9962],
-            ['itemid' => 'C03-19', 'difficulty' => 0.0011, 'discrimination' => 1.0312],
-            ['itemid' => 'B04-18', 'difficulty' => 2.4765, 'discrimination' => 0.9531],
-            ['itemid' => 'C08-16', 'difficulty' => 4.8775, 'discrimination' => 1.2102],
-            ['itemid' => 'C08-09', 'difficulty' => 4.8782, 'discrimination' => 1.0501],
-            ['itemid' => 'C08-11', 'difficulty' => 5.1824, 'discrimination' => 0.8999],
+            ['itemid' => 'A01-00', 'difficulty' => -4.343, 'discrimination' => 6],
+            ['itemid' => 'A03-00', 'difficulty' => -4.378, 'discrimination' => 4.068],
+            ['itemid' => 'A03-01', 'difficulty' => -4.219, 'discrimination' => 1.920],
+            ['itemid' => 'A05-03', 'difficulty' => -3.210, 'discrimination' => 1.533],
+            ['itemid' => 'C03-19', 'difficulty' => -0.406, 'discrimination' => 0.533],
+            ['itemid' => 'B04-18', 'difficulty' => 0.892, 'discrimination' => 0.330],
+            ['itemid' => 'C08-16', 'difficulty' => 5, 'discrimination' => 0.197],
+            ['itemid' => 'C08-09', 'difficulty' => 5, 'discrimination' => 0.255],
+            ['itemid' => 'C08-11', 'difficulty' => 5, 'discrimination' => 0.156],
         ];
         $mixedraschbirnbaum = [
-            ['itemid' => 'A01-00', 'difficulty' => -5.0225, 'discrimination' => 0.8663, 'guessing' => 0.0000],
-            ['itemid' => 'A03-00', 'difficulty' => -4.8619, 'discrimination' => 0.8781, 'guessing' => 0.0000],
-            ['itemid' => 'A01-01', 'difficulty' => -4.5472, 'discrimination' => 1.0007, 'guessing' => 0.0273],
-            ['itemid' => 'A05-01', 'difficulty' => -2.4748, 'discrimination' => 0.8908, 'guessing' => 0.0000],
-            ['itemid' => 'C03-11', 'difficulty' => 0.0042, 'discrimination' => 0.8613, 'guessing' => 0.0000],
-            ['itemid' => 'B04-00', 'difficulty' => 2.4891, 'discrimination' => 0.8368, 'guessing' => 0.0000],
-            ['itemid' => 'C08-07', 'difficulty' => 4.8333, 'discrimination' => 0.9272, 'guessing' => 0.0004],
-            ['itemid' => 'C08-16', 'difficulty' => 4.8921, 'discrimination' => 1.1309, 'guessing' => 0.0000],
-            ['itemid' => 'C08-11', 'difficulty' => 5.1451, 'discrimination' => 0.9745, 'guessing' => 0.0032],
+            ['itemid' => 'A01-00', 'difficulty' => -4.455, 'discrimination' => 6, 'guessing' => 0.0000],
+            ['itemid' => 'A03-00', 'difficulty' => -4.217, 'discrimination' => 6, 'guessing' => 0.155],
+            ['itemid' => 'A01-01', 'difficulty' => -4.364, 'discrimination' => 6, 'guessing' => 0.252],
+            ['itemid' => 'A05-01', 'difficulty' => -4.182, 'discrimination' => 0.323, 'guessing' => 0.000],
+            ['itemid' => 'C03-11', 'difficulty' => 0.629, 'discrimination' => 5.068, 'guessing' => 0.244],
+            ['itemid' => 'B04-00', 'difficulty' => 3.005, 'discrimination' => 0.342, 'guessing' => 0.0000],
+            ['itemid' => 'C08-07', 'difficulty' => 4.959, 'discrimination' => 1.821, 'guessing' => 0.156],
+            ['itemid' => 'C08-16', 'difficulty' => 4.873, 'discrimination' => 3.108, 'guessing' => 0.218],
+            ['itemid' => 'C08-11', 'difficulty' => 5.000, 'discrimination' => 6.000, 'guessing' => 0.272],
         ];
         return [
             'rasch' => $rasch,
