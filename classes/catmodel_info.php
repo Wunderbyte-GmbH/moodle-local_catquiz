@@ -113,7 +113,7 @@ class catmodel_info {
         $initialabilities = model_person_param_list::load_from_db($contextid, [$catscaleid]);
         $strategy->get_responses()->set_person_abilities($initialabilities);
         try {
-        [$itemdifficulties, $personabilities] = $strategy->run_estimation();
+            [$itemdifficulties, $personabilities] = $strategy->run_estimation();
         } catch (moodle_exception $e) {
             $errorcode = 'noresponsestoestimate';
             // Only handle our own exception.
@@ -142,7 +142,7 @@ class catmodel_info {
             $itemparamlist->save_to_db($newcontext->id);
             $personabilities->save_to_db($newcontext->id, $catscaleid);
             $itemcounter += count($itemparamlist->itemparams);
-            $model = get_string('pluginname', 'catmodel_'.$modelname);
+            $model = get_string('pluginname', 'catmodel_' . $modelname);
             $updatedmodels[$model] = $itemcounter;
         }
 
