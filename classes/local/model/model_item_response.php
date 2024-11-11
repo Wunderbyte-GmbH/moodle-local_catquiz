@@ -82,6 +82,17 @@ class model_item_response {
     }
 
     /**
+     * Sets the response value
+     *
+     * @param float $val
+     * @return model_item_response
+     */
+    public function set_response(float $val): self {
+        $this->response = $val;
+        return $this;
+    }
+
+    /**
      * Return ability.
      *
      * @return model_person_param

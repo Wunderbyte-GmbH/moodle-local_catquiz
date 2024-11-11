@@ -184,7 +184,7 @@ class updatepersonability extends preselect_task implements wb_middleware {
             return $next($context);
         }
 
-        $this->arrayresponses = reset(($this->userresponses->as_array())[$context['userid']]);
+        $this->arrayresponses = $this->userresponses->get_for_user($context['userid']);
 
         $this->parentability = $this->get_initial_ability();
         $this->initialse = $this->set_initial_standarderror();
@@ -375,7 +375,7 @@ class updatepersonability extends preselect_task implements wb_middleware {
         }
         $first = $arrayresponses[array_key_first($arrayresponses)];
         foreach ($arrayresponses as $ur) {
-            if ($ur['fraction'] !== $first['fraction']) {
+            if ($ur->get_response() !== $first->get_response()) {
                 return true;
             }
         }
@@ -438,7 +438,7 @@ class updatepersonability extends preselect_task implements wb_middleware {
      *
      */
     public function fallback_ability_update($catscaleid) {
-        $fraction = $this->userresponses->get_last_response($this->context['userid'])['fraction'];
+        $fraction = $this->userresponses->get_last_response($this->context['userid'])->get_response();
         $max = ($fraction < 0.5)
             ? -5 * (1 - $fraction)
             : 5 * $fraction;
@@ -482,9 +482,9 @@ class updatepersonability extends preselect_task implements wb_middleware {
             ? $this->context['person_ability'][$this->context['catscaleid']]
             : $this->meanability;
 
-        $lastquestionid = $this->userresponses->get_last_response($this->context['userid'])['questionid'];
+        $lastquestion = $this->userresponses->get_last_response($this->context['userid']);
         $items = clone ($this->get_item_param_list($this->context['catscaleid']));
-        $items->offsetUnset($lastquestionid);
+        $items->offsetUnset($lastquestion->get_id());
 
         return catscale::get_standarderror(
             $ability,
@@ -509,7 +509,7 @@ class updatepersonability extends preselect_task implements wb_middleware {
         }
         $items = $this->get_item_param_list($catscaleid)->as_array();
         if (!$includelastresponse) {
-            unset($items[$lastresponse['questionid']]);
+            unset($items[$lastresponse->get_id()]);
         }
 
         // Only keep responses for the current scale.
@@ -644,9 +644,9 @@ class updatepersonability extends preselect_task implements wb_middleware {
         }
         $lastquestion = $this->progress->get_last_question();
         $this->flippedresponses = $this->arrayresponses;
-        $frac = floatval($this->flippedresponses[$lastquestion->id]['fraction']);
+        $frac = floatval($this->flippedresponses[$lastquestion->id]->get_response());
         $flipped = abs(1 - $frac);
-        $this->flippedresponses[$lastquestion->id]['fraction'] = $flipped;
+        $this->flippedresponses[$lastquestion->id]->set_response($flipped);
         return $this->flippedresponses;
     }
 
@@ -662,7 +662,7 @@ class updatepersonability extends preselect_task implements wb_middleware {
             return false;
         }
         $fraction = array_sum(
-            array_map(fn ($q) => floatval($this->arrayresponses[$q->id]['fraction']), $questions)
+            array_map(fn ($q) => floatval($this->arrayresponses[$q->id]->get_response()), $questions)
         ) / count($questions);
         if (round($fraction, 0) != round($fraction, 6)) {
             return false;
