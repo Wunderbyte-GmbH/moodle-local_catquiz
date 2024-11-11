@@ -259,15 +259,17 @@ class testenvironment {
             return;
         }
 
-        $cm = get_coursemodule_from_instance('adaptivequiz', $this->componentid);
-        $context = context_module::instance($cm->id);
-        $options = [
-            'trusttext' => true,
-            'subdirs' => true,
-            'context' => $context,
-            'maxfiles' => EDITOR_UNLIMITED_FILES,
-            'noclean' => true,
-        ];
+        $options = [];
+        if ($cm = get_coursemodule_from_instance('adaptivequiz', $this->componentid)) {
+            $context = context_module::instance($cm->id);
+            $options = [
+                'trusttext' => true,
+                'subdirs' => true,
+                'context' => $context,
+                'maxfiles' => EDITOR_UNLIMITED_FILES,
+                'noclean' => true,
+            ];
+        }
 
         foreach ($jsonobject as $key => $value) {
 
@@ -313,15 +315,17 @@ class testenvironment {
                 $filearea = sprintf('feedback_files_%d_%d', $scaleid, $rangeid);
                 $jsonobject[$key.'format'] = 1;
                 $field = sprintf('feedbackeditor_scaleid_%d_%d', $scaleid, $rangeid);
-                $data = (object) file_prepare_standard_editor(
-                    (object) $jsonobject,
-                    $field,
-                    $options,
-                    $context,
-                    'local_catquiz',
-                    $filearea,
-                    intval($this->componentid)
-                );
+                if ($options) {
+                    $data = (object) file_prepare_standard_editor(
+                        (object) $jsonobject,
+                        $field,
+                        $options,
+                        $context,
+                        'local_catquiz',
+                        $filearea,
+                        intval($this->componentid)
+                    );
+                }
                 $formdefaultvalues[$key] = $data->$key;
                 $formdefaultvalues[$key.'_editor'] = $data->{$key.'_editor'};
                 $formdefaultvalues[$key.'format'] = $data->{$key.'format'};
