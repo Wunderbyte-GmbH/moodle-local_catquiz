@@ -32,6 +32,7 @@ use Exception;
 use local_catquiz\local\model\model_item_param;
 use local_catquiz\local\model\model_item_param_list;
 use local_catquiz\local\model\model_item_response;
+use local_catquiz\local\model\model_model;
 use local_catquiz\local\model\model_person_param;
 use local_catquiz\local\model\model_responses;
 use moodle_exception;
@@ -155,8 +156,7 @@ final class catcalc_test extends basic_testcase {
      */
     public function test_build_item_param_jacobian(): void {
         $itemresponse = [];
-        $mr = new model_responses();
-        $model = new raschbirnbaum($mr, 'raschbirnbaum');
+        $model = model_model::get_instance('raschbirnbaum');
         $this->assertEquals(fn () => 'b', catcalc::build_itemparam_jacobian($itemresponse, $model));
     }
 
@@ -229,8 +229,9 @@ final class catcalc_test extends basic_testcase {
         $pcmgeneralizedparam = new model_item_param($itemid, 'pcmgeneralized', [], 4, $pcmgeneralizedrecord);
         $pcmparam = new model_item_param($itemid, 'pcm', [], 4, $pcmrecord);
 
+        $resp = new model_item_response($itemid, 1.0, new model_person_param('1', 1));
         $responses = [
-            $itemid => ['fraction' => 1.0],
+            $itemid => $resp,
         ];
 
         return [
@@ -334,12 +335,12 @@ final class catcalc_test extends basic_testcase {
                     $items = clone($steps[$person][$step - 1]['items']);
                     $items->add($item);
                     $responses = $steps[$person][$step - 1]['responses'];
-                    $responses[$itemid] = new model_item_response($itemid, floatval($fraction), new model_person_param($person));
+                    $responses[$itemid] = new model_item_response($itemid, floatval($fraction), new model_person_param($person, 1));
                     $startvalue = $steps[$person][$step - 1]['expected_ability'];
                 } else {
                     $items = (new model_item_param_list())->add($item);
                     $responses = [
-                        $itemid => new model_item_response($itemid, floatval($fraction), new model_person_param($person)),
+                        $itemid => new model_item_response($itemid, floatval($fraction), new model_person_param($person, 1)),
                     ];
                     $startvalue = $mean;
                 }

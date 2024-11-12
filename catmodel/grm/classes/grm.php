@@ -146,7 +146,7 @@ class grm extends model_multiparam {
      * Estimate item parameters
      *
      * @param mixed $itemresponse
-     * @param ?model_item_param $starvalue
+     * @param ?model_item_param $startvalue
      *
      * @return array
      *

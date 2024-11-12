@@ -128,6 +128,9 @@ class model_responses {
         foreach ($data as $userid => $components) {
             foreach ($components as $component) {
                 foreach ($component as $componentid => $results) {
+                    if (!$results) {
+                        continue;
+                    }
                     $object->set($userid, $componentid, $results['fraction'], null, $mainscale);
                 }
             }

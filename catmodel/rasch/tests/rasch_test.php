@@ -49,8 +49,10 @@ final class rasch_test extends TestCase {
      *
      * @param array $itemresponse
      * @param array $expected
+     *
+     * @return void
      */
-    public function test_calculate_params_returns_expected_values($itemresponse, array $expected) {
+    public function test_calculate_params_returns_expected_values($itemresponse, array $expected): void {
         $raschbirnbaum = $this->getmodel();
         $result = $raschbirnbaum->calculate_params($itemresponse);
         $this->assertEqualsWithDelta($expected['difficulty'], $result['difficulty'], 0.0001);
@@ -63,7 +65,7 @@ final class rasch_test extends TestCase {
     public static function calculate_params_returns_expected_values_provider(): array {
         return [
                 [
-                    'itemresponse' => [new model_item_response('Item1', 0.3, (new model_person_param(1))->set_ability(0.2))],
+                    'itemresponse' => [new model_item_response('Item1', 0.3, (new model_person_param('1', 1))->set_ability(0.2))],
                     'expected' => ['difficulty' => 5.5],
                 ],
         ];

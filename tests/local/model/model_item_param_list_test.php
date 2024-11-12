@@ -107,7 +107,7 @@ final class model_item_param_list_test extends advanced_testcase {
         $rows = $ipl->as_csv(true);
 
         $this->assertEquals('difficulty;guessing;discrimination;model', $rows[0]);
-        $this->assertEquals('1.2;2.3;3.4;mixedraschbirnbaum', $rows[1]);
+        $this->assertEquals('A01;1.2;2.3;3.4;mixedraschbirnbaum', $rows[1]);
 
         $ipl2 = new model_item_param_list();
         $ipl2->add(
@@ -119,6 +119,6 @@ final class model_item_param_list_test extends advanced_testcase {
         $rows = $ipl2->as_csv(true);
 
         $this->assertEquals('difficulty;model', $rows[0]);
-        $this->assertEquals('1.8;rasch', $rows[1]);
+        $this->assertEquals('A01;1.8;rasch', $rows[1]);
     }
 }

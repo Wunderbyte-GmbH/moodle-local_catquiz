@@ -184,9 +184,8 @@ class pcmgeneralized extends model_multiparam {
      * @param ?model_item_param $startvalue
      *
      * @return array
-     *
      */
-    public function calculate_params($itemresponse, ?model_item_param $starvalue = null): array {
+    public function calculate_params($itemresponse, ?model_item_param $startvalue = null): array {
         return catcalc::estimate_item_params($itemresponse, $this);
     }
 
