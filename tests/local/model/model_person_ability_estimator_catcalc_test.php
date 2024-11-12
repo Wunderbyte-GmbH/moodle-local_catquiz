@@ -39,7 +39,6 @@ use UnexpectedValueException;
  * @covers \local_catquiz\local\model\model_person_ability_estimator_catcalc
  */
 final class model_person_ability_estimator_catcalc_test extends basic_testcase {
-
     /**
      * Function test_person_ability_estimation_returns_expected_values.
      *

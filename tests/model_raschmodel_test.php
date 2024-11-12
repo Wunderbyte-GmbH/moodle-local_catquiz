@@ -48,7 +48,6 @@ use SebastianBergmann\RecursionContext\InvalidArgumentException;
  * @covers \local_catquiz\local\model\model_raschmodel
  */
 final class model_raschmodel_test extends basic_testcase {
-
     /**
      * Test if the information criteria functions return the expected values.
      *
@@ -108,7 +107,8 @@ final class model_raschmodel_test extends basic_testcase {
                         ],
                     ],
                 ],
-            ]);
+            ]
+        );
             $rasch = model_model::get_instance('rasch');
             $raschbirnbaum = model_model::get_instance('raschbirnbaum');
 

@@ -39,7 +39,6 @@ use PHPUnit\Framework\TestCase;
  * @covers \local_catquiz\teststrategy\preselect_task\lasttimeplayedpenalty
  */
 final class lasttimeplayedpenalty_test extends TestCase {
-
     /**
      * @var int
      *
@@ -97,4 +96,3 @@ final class lasttimeplayedpenalty_test extends TestCase {
         ];
     }
 }
-

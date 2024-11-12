@@ -42,8 +42,6 @@ use SebastianBergmann\RecursionContext\InvalidArgumentException;
  *
  */
 final class matrixcat_test extends basic_testcase {
-
-
     /**
      * Test if callable arrays are built properly.
      *

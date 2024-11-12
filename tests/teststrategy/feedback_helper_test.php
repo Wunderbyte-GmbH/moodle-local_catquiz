@@ -36,12 +36,11 @@ use SebastianBergmann\RecursionContext\InvalidArgumentException;
  * @package    local_catquiz
  * @author     Magdalena Holczik
  * @copyright  2024 Wunderbyte GmbH <info@wunderbyte.at>
- * @license    http =>//www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  *
  * @covers \local_catquiz\teststrategy\feedback_helper
  */
 final class feedback_helper_test extends advanced_testcase {
-
     /**
      * Test if correct string (label for chart) is returned correctly according to defined timerange and timestamp.
      *

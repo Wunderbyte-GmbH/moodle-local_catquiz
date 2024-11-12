@@ -41,7 +41,6 @@ use PHPUnit\Framework\ExpectationFailedException;
  * @covers \local_catquiz\teststrategy\preselect_task\firstquestionselector
  */
 final class firstquestionselector_test extends basic_testcase {
-
     /**
      * Test median ability of personparams is calculated correctly provider.
      *

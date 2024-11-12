@@ -20,7 +20,7 @@
  * @package    local_catquiz
  * @author     Magdalena Holczik
  * @copyright  2023 onwards Georg Maißer <info@wunderbyte.at>
- * @license    http =>//www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 namespace local_catquiz;
@@ -45,7 +45,6 @@ use SebastianBergmann\RecursionContext\InvalidArgumentException;
  * @covers \local_catquiz\teststrategy\feedbackgenerator\personabilities
  */
 final class personabilities_test extends advanced_testcase {
-
     /**
      * Test that questions of subscales are removed as needed.
      *
@@ -65,7 +64,8 @@ final class personabilities_test extends advanced_testcase {
         array $expected,
         array $abilityrange,
         array $testitemsforcatscale,
-        array $fisherinfo): void {
+        array $fisherinfo
+    ): void {
 
         $progressmock = $this->getMockBUilder(progress::class)
             ->onlyMethods([
@@ -905,7 +905,6 @@ final class personabilities_test extends advanced_testcase {
                 "status" => "4",
             ],
         ];
-
     }
 
     /**
@@ -1639,5 +1638,4 @@ final class personabilities_test extends advanced_testcase {
             "showabilitymeasure" => 0,
         ];
     }
-
 }

@@ -30,7 +30,6 @@ require_once(__DIR__ . '/../../../../lib/behat/behat_base.php');
  * @package local_catquiz
  */
 class behat_catquiz extends behat_base {
-
     /**
      * Fill specified HTMLQuickForm element by its number under goven xpath with a value.
      * @When /^I fill in the "([^"]*)" element number "([^"]*)" with the dynamic identifier "([^"]*)" with "([^"]*)"$/
@@ -100,5 +99,4 @@ class behat_catquiz extends behat_base {
             }
         }
     }
-
 }

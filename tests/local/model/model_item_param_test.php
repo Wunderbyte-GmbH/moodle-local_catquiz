@@ -280,5 +280,3 @@ final class model_item_param_test extends advanced_testcase {
         ];
     }
 }
-
-

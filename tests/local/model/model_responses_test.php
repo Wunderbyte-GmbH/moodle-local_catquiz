@@ -35,8 +35,7 @@ use PHPUnit\Framework\ExpectationFailedException;
  * @package local_catquiz
  * @covers \local_catquiz\local\model\model_item_param_list
  */
-class model_responses_test extends basic_testcase {
-
+final class model_responses_test extends basic_testcase {
     /**
      * Tests if reducing the model_responses to items or persons works as expected
      *
@@ -57,7 +56,7 @@ class model_responses_test extends basic_testcase {
         ?array $items,
         array $expectedusers,
         array $expecteditems
-    ) {
+    ): void {
         $mr = new model_responses();
         foreach ($indata as $id) {
             $mr->set($id[0], $id[1], $id[2]);
@@ -137,7 +136,7 @@ class model_responses_test extends basic_testcase {
         ];
     }
 
-    public function test_setting_values_works_as_expected() {
+    public function test_setting_values_works_as_expected(): array {
         $mr = new model_responses();
         $mr->set('P1', 'A1', 1.0);
         // Now update the response for P1. Sums should be changed.
@@ -149,7 +148,7 @@ class model_responses_test extends basic_testcase {
         $this->assertEquals(2 / 3, $mr->get_item_fraction('A1'));
     }
 
-    public function test_personparam_can_be_updated() {
+    public function test_personparam_can_be_updated(): void {
         $mr = new model_responses();
         $mr->set(1, 'A1', 1.0);
         $mr->set(1, 'A2', 0.0);

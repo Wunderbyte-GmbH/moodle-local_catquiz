@@ -45,7 +45,6 @@ use UnexpectedValueException;
  * @covers \local_catquiz\teststrategy\preselect_task\customscalefeedback
  */
 final class customscalefeedback_test extends basic_testcase {
-
     /**
      * Test that questions of subscales are removed as needed.
      *

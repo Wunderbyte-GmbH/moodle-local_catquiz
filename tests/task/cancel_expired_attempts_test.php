@@ -40,7 +40,6 @@ use local_catquiz\task\cancel_expired_attempts;
  *
  */
 final class cancel_expired_attempts_test extends basic_testcase {
-
     /**
      * Test if attempt expiration is detected correctly.
      *
