@@ -71,18 +71,12 @@ class model_responses {
      */
     private array $excludedusers = [];
 
-    ///**
-    // * @var ?model_person_param_list A list of person parameters
-    // */
-    //private ?model_person_param_list $personparams = null;
-
     /**
      * For each user, we have exactly one personparameter.
      *
-     * This array is indexed by userid.
-     * @var array
+     * @var array $personparams This array is indexed by userid.
      */
-    private array $personparams = []; // TODO replace $personparams completely.
+    private array $personparams = [];
 
     /**
      * Caches the responses object limited to a set of users.
@@ -124,6 +118,7 @@ class model_responses {
      * Create from array.
      *
      * @param array $data
+     * @param int $mainscale
      *
      * @return self
      *
@@ -269,10 +264,17 @@ class model_responses {
      * @param string $personid
      * @param string $itemid
      * @param float $response
-     * @param ?model_person_param $pp
+     * @param ?model_person_param $personparam
+     * @param int $catscaleid
      * @return void
      */
-    public function set(string $personid, string $itemid, float $response, ?model_person_param $personparam = null, int $catscaleid = 0) {
+    public function set(
+        string $personid,
+        string $itemid,
+        float $response,
+        ?model_person_param $personparam = null,
+        int $catscaleid = 0
+    ) {
         $oldresponse = 0.0;
         if (!empty($this->byitem[$itemid][$personid])) {
             $oldresponse = $this->byitem[$itemid][$personid]->get_response();
@@ -329,6 +331,12 @@ class model_responses {
         return $personparamlist;
     }
 
+    /**
+     * Set person abilities from the given list
+     *
+     * @param model_person_param_list $pplist
+     * @return model_responses
+     */
     public function set_person_abilities(model_person_param_list $pplist): self {
         foreach ($pplist as $pp) {
             $this->personparams[$pp->get_userid()]->set_ability($pp->get_ability());
@@ -359,7 +367,8 @@ class model_responses {
      * @return ?mixed
      */
     public function get_last_response(int $userid) {
-        if (! array_key_exists($userid, $this->byperson)
+        if (
+            !array_key_exists($userid, $this->byperson)
         ) {
             return null;
         }

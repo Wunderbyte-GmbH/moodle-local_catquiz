@@ -37,15 +37,16 @@ use PHPUnit\Framework\ExpectationFailedException;
  */
 class model_responses_test extends basic_testcase {
 
-    public function test_A_model_response_instance_can_be_created_for_contextid(): void {
-
-    }
-
     /**
      * Tests if reducing the model_responses to items or persons works as expected
      *
      * @dataProvider filtering_values_works_as_expected_provider
      *
+     * @param array $indata
+     * @param ?array $users
+     * @param ?array $items
+     * @param array $expectedsuers
+     * @param array $expecteditems
      * @return void
      * @throws InvalidArgumentException
      * @throws ExpectationFailedException

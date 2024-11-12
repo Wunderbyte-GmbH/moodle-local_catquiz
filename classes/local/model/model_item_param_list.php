@@ -553,14 +553,29 @@ class model_item_param_list implements ArrayAccess, IteratorAggregate, Countable
         return null;
     }
 
+    /**
+     * Return IDs of item params that are confirmed
+     *
+     * @return array
+     */
     public function confirmed(): array {
-        $ids = array_map(
-            fn ($ip) => $ip->get_status() > LOCAL_CATQUIZ_STATUS_CALCULATED,
-            $this->itemparams
+        $ids = array_filter(
+            array_map(
+                fn ($ip) => $ip->get_id(),
+                $this->itemparams
+            ),
+            fn ($id) => $this->itemparams[$id]->get_status() > LOCAL_CATQUIZ_STATUS_CALCULATED
         );
         return $ids;
     }
 
+    /**
+     * Return the stored item params without the ones identified by the given IDs.
+     *
+     * @param array $itemids
+     * @param bool $clone
+     * @return model_item_param_list
+     */
     public function without(array $itemids, bool $clone = true): self {
         if ($clone) {
             $obj = clone($this);
@@ -570,6 +585,13 @@ class model_item_param_list implements ArrayAccess, IteratorAggregate, Countable
         return $this;
     }
 
+    /**
+     * Only keep itemparams that are associated with the given component IDs.
+     *
+     * @param array $itemids
+     * @param bool $clone
+     * @return model_item_param_list
+     */
     public function filter_by_componentids(array $itemids, bool $clone = true): self {
         if ($clone) {
             $obj = clone $this;
@@ -615,9 +637,11 @@ class model_item_param_list implements ArrayAccess, IteratorAggregate, Countable
                     if (empty($newrecord['catscaleid'])) {
                         throw new moodle_exception('nocatscaleid', 'local_catquiz');
                     }
-                    if (catscale::is_assigned_to_parent_scale($catscaleid, $newrecord['componentid'])
-                    || catscale::is_assigned_to_subscale($catscaleid, $newrecord['componentid'])) {
-                        $infodata = new stdClass;
+                    if (
+                        catscale::is_assigned_to_parent_scale($catscaleid, $newrecord['componentid'])
+                        || catscale::is_assigned_to_subscale($catscaleid, $newrecord['componentid'])
+                    ) {
+                        $infodata = new stdClass();
                         $infodata->newscalename = catscale::get_link_to_catscale($newrecord['catscaleid']);
                         $infodata->componentid = $newrecord['componentid'];
                         $newrecord['error'] = get_string('itemassignedtoparentorsubscale', 'local_catquiz', $infodata);
@@ -626,7 +650,6 @@ class model_item_param_list implements ArrayAccess, IteratorAggregate, Countable
                 } else {
                     // If at this point, the scale is still empty, we need to create and use it.
                     self::create_scales_for_new_record($newrecord);
-
                 }
             } else if ($newrecord['parentscalenames'] == "0") {
                 // To enable import to parent scales, set 'parentscalenames' to "0".
@@ -741,7 +764,6 @@ class model_item_param_list implements ArrayAccess, IteratorAggregate, Countable
         $matchesparent = fn ($record, $parent) => !$parent || $record->parentid == $parent->id;
 
         foreach ($parents as $parent) {
-
             // Check if the scale exists.
             // We also need to look at the parentids.
             $searcharray = [
@@ -887,6 +909,7 @@ class model_item_param_list implements ArrayAccess, IteratorAggregate, Countable
      * Returns the item params as CSV rows
      *
      * @param bool $header
+     * @param int $precision
      * @return array
      */
     public function as_csv(bool $header = false, int $precision = 3): array {

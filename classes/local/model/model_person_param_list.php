@@ -186,7 +186,7 @@ class model_person_param_list implements ArrayAccess, IteratorAggregate, Countab
 
     /**
      * Returns the user IDs.
-     * 
+     *
      * @return array
      */
     public function get_user_ids(): array {

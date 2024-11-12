@@ -68,6 +68,7 @@ function loadresponsesforperson($filename, $person = 0): array {
  * Parses a CSV and returns a model_response object for the given item.
  *
  * @param string $filename The file to load the responses from.
+ * @param model_person_param_list $initialabilities
  * @return model_responses
  */
 function loadresponsesforitem(string $filename, model_person_param_list $initialabilities): model_responses {

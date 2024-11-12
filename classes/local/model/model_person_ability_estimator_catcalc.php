@@ -35,15 +35,11 @@ use local_catquiz\local\model\model_item_param_list;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class model_person_ability_estimator_catcalc extends model_person_ability_estimator {
-
     /**
      * Get person abilities.
      *
      * @param model_item_param_list $itemparamlist
-     * @param int $catscaleid
-     *
      * @return model_person_param_list
-     *
      */
     public function get_person_abilities(model_item_param_list $itemparamlist): model_person_param_list {
         $existingpersonparams = $this->responses->get_person_abilities();

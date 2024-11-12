@@ -259,7 +259,7 @@ class model_person_param implements \ArrayAccess {
      *
      * @return self
      */
-    private function update_history(string $action = 'unknown'): self {
+    private function update_history(): self {
         $this->history[] = [
             'ability' => $this->ability,
             'timestamp' => time(),

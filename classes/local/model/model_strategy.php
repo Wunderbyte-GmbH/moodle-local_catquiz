@@ -29,6 +29,7 @@ defined('MOODLE_INTERNAL') || die();
 require_once($CFG->dirroot . '/local/catquiz/lib.php');
 
 use core_plugin_manager;
+use Exception;
 use local_catquiz\catscale;
 use local_catquiz\local\model\model_item_param_list;
 use MoodleQuickForm;
@@ -125,7 +126,7 @@ class model_strategy {
 
     /**
      * Tracks the abilites calculated by iteration round.
-     * 
+     *
      * @var array<model_person_param_list>
      */
     private array $calculatedabilities;
@@ -148,18 +149,6 @@ class model_strategy {
         $this->abilityestimator = new model_person_ability_estimator_catcalc($this->responses);
         $this->set_options($options);
         $this->olditemparams = $olditemparams;
-
-        // if ($savedpersonabilities === null || count($savedpersonabilities) === 0) {
-        //     $savedpersonabilities = $responses->get_person_abilities();
-        // } else if (count($savedpersonabilities) < count($initial = $responses->get_person_abilities())) {
-        //     $newusers = array_diff(
-        //         array_keys($initial->get_person_params()),
-        //         array_keys($savedpersonabilities->get_person_params()));
-        //     foreach ($newusers as $userid) {
-        //         $savedpersonabilities->add(new model_person_param($userid));
-        //     }
-        // }
-        // $this->initialpersonabilities = $savedpersonabilities;
 
         foreach (array_keys($this->models) as $model) {
             $this->set_calculated_progress($model, null);
@@ -293,7 +282,8 @@ class model_strategy {
         }
 
         $itemdiffiwstatus = $this->set_status(
-            $itemdifficulties, // TODO: merge again with oldparams that are manually confirmed and set the correct status for each model
+            // TODO: merge again with oldparams that are manually confirmed and set the correct status for each model.
+            $itemdifficulties,
             $filtereddiffi
         );
 
@@ -333,7 +323,8 @@ class model_strategy {
      */
     public function select_item_model(
         array $itemdifflists,
-        model_person_param_list $personabilities): model_item_param_list {
+        model_person_param_list $personabilities
+    ): model_item_param_list {
         $newitemdifficulties = new model_item_param_list();
         $itemids = $this->responses->get_item_ids();
         // TODO set via settings.
@@ -497,14 +488,34 @@ class model_strategy {
         return $item;
     }
 
+    /**
+     * Save the progress of the calculation
+     *
+     * @param string $modelname
+     * @param null|model_item_param_list $itemparams
+     * @return void
+     */
     private function set_calculated_progress(string $modelname, ?model_item_param_list $itemparams) {
         $this->calculatedparams[$modelname][$this->iterations] = $itemparams;
     }
 
+    /**
+     * Get the last value calculated for the given model
+     *
+     * @param string $modelname
+     * @return null|model_item_param_list
+     */
     private function get_last_calculated_for_model(string $modelname): ?model_item_param_list {
         return end($this->calculatedparams[$modelname]) ?? null;
     }
 
+    /**
+     * Gets the startvalue for the specified model
+     *
+     * @param string $modelname
+     * @return null|model_item_param_list
+     * @throws Exception
+     */
     private function get_startvalues_for_model(string $modelname): ?model_item_param_list {
         switch ($modelname) {
             case 'rasch':
@@ -516,19 +527,17 @@ class model_strategy {
                 return $this->get_last_calculated_for_model('mixedraschbirnbaum')
                     ?? $this->get_last_calculated_for_model('raschbirnbaum');
             default:
-                throw new \Exception ("Unknown model $modelname");
+                throw new \Exception("Unknown model $modelname");
         }
     }
 
+    /**
+     * Set the progress of ability calculation
+     *
+     * @param model_person_param_list $abilities
+     * @return void
+     */
     private function set_calculated_abilities_progress(model_person_param_list $abilities) {
         $this->calculatedabilities[$this->iterations] = $abilities;
-    }
-
-    private function get_param_progress(string $modelname, string $itemid): array {
-        return array_map(fn ($paramlist) => $paramlist->offsetGet($itemid)->get_params_array(), $this->calculatedparams[$modelname]);
-    }
-
-    private function get_ability_progress(string $personid): array {
-        return array_map(fn ($paramlist) => $paramlist->offsetGet($personid)->get_ability(), $this->calculatedabilities);
     }
 }

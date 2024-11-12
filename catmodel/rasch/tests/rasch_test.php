@@ -56,6 +56,10 @@ final class rasch_test extends TestCase {
         $this->assertEqualsWithDelta($expected['difficulty'], $result['difficulty'], 0.0001);
     }
 
+    /**
+     * Test that parameters are calculated correctly
+     * @return array
+     */
     public static function calculate_params_returns_expected_values_provider(): array {
         return [
                 [

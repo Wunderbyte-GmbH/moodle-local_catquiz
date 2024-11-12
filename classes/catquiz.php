@@ -1466,9 +1466,9 @@ class catquiz {
 
     /**
      * Returns the main CAT scale for the given context if it exists.
-     * 
+     *
      * If it does not exist, returns null.
-     * 
+     *
      * @param int $contextid
      * @return ?stdClass
      */
@@ -2586,6 +2586,12 @@ class catquiz {
         $DB->update_record('local_catquiz_items', $item);
     }
 
+    /**
+     * Returns all scales for the active contexts
+     *
+     * @return array
+     * @throws dml_exception
+     */
     public static function get_all_scales_for_active_contexts(): array {
         global $DB;
         $now = time();
@@ -2604,7 +2610,6 @@ class catquiz {
             ]
         );
         return $contexts;
-
     }
 
     /**
