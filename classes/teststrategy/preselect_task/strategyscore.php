@@ -25,6 +25,7 @@
 namespace local_catquiz\teststrategy\preselect_task;
 
 use local_catquiz\catscale;
+use local_catquiz\local\model\model_item_param_list;
 use local_catquiz\local\model\model_responses;
 use local_catquiz\local\result;
 use local_catquiz\teststrategy\preselect_task;
@@ -158,9 +159,13 @@ abstract class strategyscore extends preselect_task implements wb_middleware {
                     continue;
                 }
 
-                $myitems = (model_responses::create_from_array([$context['userid'] => ['component' => $this->progress->get_user_responses()]]))
-                    ->get_items_for_scale($scaleid, $context['contextid']);
-                $standarderrorplayed = catscale::get_standarderror($scaleability, $myitems, INF);
+                $scaleitems = model_item_param_list::get(
+                    $context['contextid'],
+                    null,
+                    [$scaleid, ...catscale::get_subscale_ids($scaleid)]
+                )
+                    ->filter_by_componentids(array_keys($this->progress->get_playedquestions()));
+                $standarderrorplayed = catscale::get_standarderror($scaleability, $scaleitems, INF);
                 $testinfo = $standarderrorplayed === INF ? 0 : 1 / $standarderrorplayed ** 2;
                 $question->processterm = max(0.1, $testinfo) / max(1, $scalecount[$scaleid]);
                 $abilitydifference = ($scaleability - $this->progress->get_abilities()[$context['catscaleid']]);
