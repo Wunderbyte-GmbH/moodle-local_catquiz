@@ -169,6 +169,7 @@ class pcm extends model_multiparam {
      * Estimate item parameters
      *
      * @param mixed $itemresponse
+     * @param ?model_item_param $startvalue
      *
      * @return array
      *

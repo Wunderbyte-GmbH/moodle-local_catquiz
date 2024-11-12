@@ -2108,8 +2108,8 @@ final class strategy_test extends advanced_testcase {
         [$calculateditemparams, $calculatedabilities] = $strategy->run_estimation();
         // If desired, write CSV files with the calculated parameters.
         if (getenv('CATQUIZ_CREATE_TESTOUTPUT')) {
-            $this->writeModelParamsToCSV($calculateditemparams);
-            $this->writePersonParamsToCSV($calculatedabilities);
+            $this->write_model_params_to_csv($calculateditemparams);
+            $this->write_person_params_to_csv($calculatedabilities);
         }
         $expected = $this->get_expected_responses_data();
         foreach ($expected as $model => $expectedparams) {
@@ -2361,45 +2361,43 @@ final class strategy_test extends advanced_testcase {
 
     /**
      * Summary of writeModelParamsToCSV
-     * @param array<model_item_param_list> $calculateditemparams
+     * @param array $calculateditemparams
      * @return array
      */
-    protected function writeModelParamsToCSV(array $calculateditemparams): array
-    {
-        $outputFiles = [];
-        $testOutputDir = sys_get_temp_dir() . '/test_output_' . uniqid();
-        mkdir($testOutputDir);
+    protected function write_model_params_to_csv(array $calculateditemparams): array {
+        $outputfiles = [];
+        $testoutputdir = sys_get_temp_dir() . '/test_output_' . uniqid();
+        mkdir($testoutputdir);
 
         $datetime = date('Y-m-d_H-i-s');
 
         foreach ($calculateditemparams as $modelname => $modelparams) {
-            $filename = $testOutputDir . '/' . $modelname . '_' . $datetime . '.csv';
+            $filename = $testoutputdir . '/' . $modelname . '_' . $datetime . '.csv';
             // Open the file for writing
             $file = fopen($filename, 'w');
 
-            foreach($modelparams->as_csv() as $row) {
+            foreach ($modelparams->as_csv() as $row) {
                 fwrite($file, $row . PHP_EOL); // Append a newline after each row.
             }
             fclose($file);
-            $outputFiles[$modelname] = $filename;
+            $outputfiles[$modelname] = $filename;
         }
 
-        return $outputFiles;
+        return $outputfiles;
     }
 
     /**
      * Summary of writePersonParamsToCSV
-     * @param array<model_person_param_list> $calculatedabilities
+     * @param model_person_param_list $calculatedabilities
      * @return string
      */
-    protected function writePersonParamsToCSV(model_person_param_list $calculatedabilities): string
-    {
-        $testOutputDir = sys_get_temp_dir() . '/test_output_' . uniqid();
-        mkdir($testOutputDir);
+    protected function write_person_params_to_csv(model_person_param_list $calculatedabilities): string {
+        $testoutputdir = sys_get_temp_dir() . '/test_output_' . uniqid();
+        mkdir($testoutputdir);
 
         $datetime = date('Y-m-d_H-i-s');
 
-        $filename = $testOutputDir . '/abilities_' . $datetime . '.csv';
+        $filename = $testoutputdir . '/abilities_' . $datetime . '.csv';
         // Open the file for writing
         $file = fopen($filename, 'w');
 

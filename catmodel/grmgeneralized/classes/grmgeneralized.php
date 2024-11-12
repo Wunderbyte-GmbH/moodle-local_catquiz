@@ -206,6 +206,7 @@ class grmgeneralized extends model_multiparam {
      * Estimate item parameters
      *
      * @param mixed $itemresponse
+     * @param ?model_person_param $starvalue
      *
      * @return array
      *

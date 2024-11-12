@@ -534,6 +534,8 @@ class model_item_param {
     /**
      * Adds the current state to the history.
      *
+     * @param string $action
+     *
      * @return self
      */
     private function update_history(string $action = 'unknown'): self {
