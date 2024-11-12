@@ -140,7 +140,16 @@ $functions = [
             'classpath' => 'local/catquiz/classes/external/submit_responses.php',
             'description' => 'Submit responses for CatQuiz.',
             'type' => 'write',
-            'capabilities' => 'local/catquiz:submit_responses',
+            // Should we require a capability? E.g. 'capabilities' => 'local/catquiz:submit_responses'?
+            'ajax' => true,
+        ],
+        // Allows other instances to receive item parameters.
+        'local_catquiz_fetch_item_parameters' => [
+            'classname' => 'local_catquiz\\external\\fetch_item_parameters',
+            'methodname' => 'execute',
+            'classpath' => 'local/catquiz/classes/external/fetch_item_parameters.php',
+            'description' => 'Fetch item parameters.',
+            'type' => 'read',
             'ajax' => true,
         ],
 ];

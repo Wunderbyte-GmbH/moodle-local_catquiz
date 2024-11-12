@@ -985,5 +985,58 @@ ENDSQL;
         // Catquiz savepoint reached.
         upgrade_plugin_savepoint(true, 2024092700, 'local', 'catquiz');
     }
+
+    if ($oldversion < 2024110802) {
+        // Define table local_catquiz_question_hashmap.
+        $table = new xmldb_table('local_catquiz_question_hashmap');
+
+        // Add fields.
+        $table->add_field('id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, XMLDB_SEQUENCE, null);
+        $table->add_field('questionid', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null);
+        $table->add_field('questionhash', XMLDB_TYPE_CHAR, '64', null, XMLDB_NOTNULL, null, null);
+        $table->add_field('hashdata', XMLDB_TYPE_TEXT, null, null, XMLDB_NOTNULL, null, null);
+        $table->add_field('timecreated', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0');
+        $table->add_field('timemodified', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0');
+
+        // Add keys.
+        $table->add_key('primary', XMLDB_KEY_PRIMARY, ['id']);
+        $table->add_key('questionid', XMLDB_KEY_FOREIGN, ['questionid'], 'question', ['id']);
+
+        // Add indexes.
+        $table->add_index('questionhash', XMLDB_INDEX_NOTUNIQUE, ['questionhash']);
+
+        // Create the table.
+        if (!$dbman->table_exists($table)) {
+            $dbman->create_table($table);
+        }
+
+        // Define table local_catquiz_remote_responses.
+        $table = new xmldb_table('local_catquiz_remote_responses');
+
+        // Add fields.
+        $table->add_field('id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, XMLDB_SEQUENCE, null);
+        $table->add_field('questionhash', XMLDB_TYPE_CHAR, '64', null, XMLDB_NOTNULL, null, null);
+        $table->add_field('remoteuserid', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null);
+        $table->add_field('response', XMLDB_TYPE_TEXT, null, null, XMLDB_NOTNULL, null, null);
+        $table->add_field('sourceurl', XMLDB_TYPE_CHAR, '255', null, XMLDB_NOTNULL, null, null);
+        $table->add_field('timecreated', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0');
+        $table->add_field('timeprocessed', XMLDB_TYPE_INTEGER, '10', null, null, null, null);
+        $table->add_field('processinginfo', XMLDB_TYPE_TEXT, null, null, null, null, null);
+
+        // Add keys.
+        $table->add_key('primary', XMLDB_KEY_PRIMARY, ['id']);
+
+        // Add indexes.
+        $table->add_index('questionhash_sourceurl', XMLDB_INDEX_NOTUNIQUE, ['questionhash', 'sourceurl']);
+        $table->add_index('timeprocessed', XMLDB_INDEX_NOTUNIQUE, ['timeprocessed']);
+
+        // Create the table.
+        if (!$dbman->table_exists($table)) {
+            $dbman->create_table($table);
+        }
+
+        upgrade_plugin_savepoint(true, 2024110802, 'local', 'catquiz');
+    }
+
     return true;
 }
