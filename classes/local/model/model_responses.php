@@ -29,6 +29,7 @@ use local_catquiz\catscale;
 use local_catquiz\local\model\model_item_param_list;
 use local_catquiz\local\model\model_item_response;
 use local_catquiz\local\model\model_person_param_list;
+use stdClass;
 
 /**
  * Contains information about a performed quiz or test
@@ -52,6 +53,11 @@ class model_responses {
     private array $byitem = [];
 
     /**
+     * @var array $byattempt holds the responses indexed by attempt ID
+     */
+    private array $byattempt = [];
+
+    /**
      * @var array $sumbyperson Sum of responses indexed by person IDs.
      */
     private array $sumbyperson = [];
@@ -62,6 +68,11 @@ class model_responses {
     private $sumbyitem = [];
 
     /**
+     * @var array $sumbyattempt Sum of responses indexed by attempt ID.
+     */
+    private $sumbyattempt = [];
+
+    /**
      * @var array $excludeditems Componentids of items that can not be calculated.
      */
     private array $excludeditems = [];
@@ -70,6 +81,12 @@ class model_responses {
      * @var array $excludedusers Userids of users for which no ability can be calculated.
      */
     private array $excludedusers = [];
+
+
+    /**
+     * @var array $excludedattempts Attempt IDs of attempts for which no ability can be calculated.
+     */
+    private array $excludedattempts = [];
 
     /**
      * For each user, we have exactly one personparameter.
@@ -124,14 +141,15 @@ class model_responses {
      *
      */
     public static function create_from_array(array $data, int $mainscale = 0): self {
+        /** @var model_responses */
         $object = new self();
-        foreach ($data as $userid => $components) {
+        foreach ($data as $attemptid => $components) {
             foreach ($components as $component) {
                 foreach ($component as $componentid => $results) {
                     if (!$results) {
                         continue;
                     }
-                    $object->set($userid, $componentid, $results['fraction'], null, $mainscale);
+                    $object->set($attemptid, $componentid, $results['fraction'], null, $mainscale, $results['userid']);
                 }
             }
         }
@@ -262,9 +280,9 @@ class model_responses {
     }
 
     /**
-     * Add a new user response
+     * Add a new response
      *
-     * @param string $personid
+     * @param string $attemptid
      * @param string $itemid
      * @param float $response
      * @param ?model_person_param $personparam
@@ -272,40 +290,54 @@ class model_responses {
      * @return void
      */
     public function set(
-        string $personid,
+        string $attemptid,
         string $itemid,
         float $response,
         ?model_person_param $personparam = null,
-        int $catscaleid = 0
+        int $catscaleid = 0,
+        ?string $userid = null
     ) {
         $oldresponse = 0.0;
-        if (!empty($this->byitem[$itemid][$personid])) {
-            $oldresponse = $this->byitem[$itemid][$personid]->get_response();
+        if (!empty($this->byitem[$itemid][$attemptid])) {
+            $oldresponse = $this->byitem[$itemid][$attemptid]->get_response();
         }
 
         if (!$personparam) {
-            $personparam = new model_person_param($personid, $catscaleid);
+            $personparam = new model_person_param($userid, $catscaleid);
         }
 
-        if (!array_key_exists($personid, $this->personparams)) {
-            $this->personparams[$personid] = $personparam;
+        if (!array_key_exists($userid, $this->personparams)) {
+            $this->personparams[$userid] = $personparam;
         }
 
-        $newresponse = new model_item_response($itemid, $response, $this->personparams[$personid]);
-        $this->byperson[$personid][$itemid] = $newresponse;
-        $this->sumbyperson[$personid] = array_key_exists($personid, $this->sumbyperson)
-            ? $this->sumbyperson[$personid] + ($response - $oldresponse)
+        $newresponse = new model_item_response($itemid, $response, $this->personparams[$userid]);
+        $this->byperson[$userid][$itemid] = $newresponse;
+        $this->sumbyperson[$userid] = array_key_exists($userid, $this->sumbyperson)
+            ? $this->sumbyperson[$userid] + ($response - $oldresponse)
             : $response;
-        $this->byitem[$itemid][$personid] = $newresponse;
+        $this->byattempt[$attemptid][$itemid] = $newresponse;
+        $this->sumbyattempt[$attemptid] = array_key_exists($attemptid, $this->sumbyattempt)
+            ? $this->sumbyattempt[$attemptid] + ($response - $oldresponse)
+            : $response;
+        $this->byitem[$itemid][$attemptid] = $newresponse;
         $this->sumbyitem[$itemid] = array_key_exists($itemid, $this->sumbyitem)
             ? $this->sumbyitem[$itemid] + ($response - $oldresponse)
             : $response;
+
         // If the user has only correct or incorrect answers and is not excluded -> exclude.
-        $excludeuser = $this->sumbyperson[$personid] == 0 || $this->sumbyperson[$personid] == count($this->byperson[$personid]);
+        $excludeuser = $this->sumbyperson[$userid] == 0 || $this->sumbyperson[$userid] == count($this->byperson[$userid]);
         if ($excludeuser) {
-            $this->excludedusers[$personid] = true;
+            $this->excludedusers[$userid] = true;
         } else {
-            unset($this->excludedusers[$personid]);
+            unset($this->excludedusers[$userid]);
+        }
+
+        // If the attempt has only correct or incorrect answers and is not excluded -> exclude.
+        $excludeattempt = $this->sumbyattempt[$attemptid] == 0 || $this->sumbyattempt[$attemptid] == count($this->byattempt[$attemptid]);
+        if ($excludeattempt) {
+            $this->excludedattempts[$attemptid] = true;
+        } else {
+            unset($this->excludedattempts[$attemptid]);
         }
 
         // If the item has only correct or incorrect answers and is not excluded -> exclude.
@@ -364,19 +396,19 @@ class model_responses {
     }
 
     /**
-     * Returns the last response of the given user.
+     * Returns the last response of the given attempt.
      *
-     * @param int $userid
+     * @param int $attemptid
      * @return ?mixed
      */
-    public function get_last_response(int $userid) {
+    public function get_last_response(int $attemptid) {
         if (
-            !array_key_exists($userid, $this->byperson)
+            !array_key_exists($attemptid, $this->byattempt)
         ) {
             return null;
         }
 
-        return $this->byperson[$userid][array_key_last($this->byperson[$userid])];
+        return $this->byattempt[$attemptid][array_key_last($this->byattempt[$attemptid])];
     }
 
     /**
@@ -488,14 +520,15 @@ class model_responses {
     /**
      * Returns data in the following format
      *
-     * "1" => Array( //userid
+     * "1" => Array( // Attemptid
      *     "comp1" => Array( // component
      *         "1" => Array( //questionid
      *             "fraction" => 0,
      *             "max_fraction" => 1,
      *             "min_fraction" => 0,
      *             "qtype" => "truefalse",
-     *             "timestamp" => 1646955326
+     *             "timestamp" => 1646955326,
+     *             "userid" => 2,
      *         ),
      *         "2" => Array(
      *             "fraction" => 0,
@@ -503,6 +536,7 @@ class model_responses {
      *             "min_fraction" => 0,
      *             "qtype" => "truefalse",
      *             "timestamp" => 1646955332
+     *             "userid" => 2,
      *         ),
      *         "3" => Array(
      *             "fraction" => 1,
@@ -510,6 +544,7 @@ class model_responses {
      *             "min_fraction" => 0,
      *             "qtype" => "truefalse",
      *             "timestamp" => 1646955338
+     *             "userid" => 2,
      *
      * @param mixed $data
      *
@@ -526,22 +561,49 @@ class model_responses {
             $entry = [
                 'fraction' => $row->fraction,
                 'id' => $row->id,
+                'userid' => $row->userid,
+                'attemptid' => $row->attemptid,
             ];
 
-            if (!array_key_exists($row->userid, $modelinput)) {
-                $modelinput[$row->userid] = ["component" => []];
+            if (!array_key_exists($row->attemptid, $modelinput)) {
+                $modelinput[$row->attemptid] = ["component" => []];
             }
 
-            if (! array_key_exists($row->questionid, $modelinput[$row->userid]['component'])) {
-                $modelinput[$row->userid]['component'][$row->questionid] = $entry;
+            if (! array_key_exists($row->questionid, $modelinput[$row->attemptid]['component'])) {
+                $modelinput[$row->attemptid]['component'][$row->questionid] = $entry;
                 continue;
             }
 
             // If we are here, there is already an entry. Only update it if this answer is newer than the last one.
-            if ($row->id > $modelinput[$row->userid]['component'][$row->questionid]['id']) {
-                $modelinput[$row->userid]['component'][$row->questionid] = $entry;
+            if ($row->id > $modelinput[$row->attemptid]['component'][$row->questionid]['id']) {
+                $modelinput[$row->attemptid]['component'][$row->questionid] = $entry;
             }
         }
         return $modelinput;
+    }
+
+    /**
+     * Returns the object in a format that can be transferred
+     *
+     * @return stdClass
+     */
+    public function export_for_transfer(): stdClass {
+        return (object) [
+        'byperson' => $this->byperson,
+        'byitem' => $this->byitem,
+        'byattempt' => $this->byattempt,
+        'sumbyperson' => $this->sumbyperson,
+        'sumbyitem' => $this->sumbyitem,
+        'sumbyattempt' => $this->sumbyattempt,
+        'excludeditems' => $this->excludeditems,
+        'excludedusers' => $this->excludedusers,
+        'excludedattempts' => $this->excludedattempts,
+        'personparams' => $this->personparams,
+        ];
+    }
+
+    public static function create_from_transfer(stdClass $transferdata): self {
+        // TODO: reconstruct
+        return new self();
     }
 }

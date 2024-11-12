@@ -549,11 +549,12 @@ class catquiz {
      * @param array $catscaleids
      * @param ?int $testitemid
      * @param ?int $userid
+     * @param bool $joinitems
      *
      * @return array
      *
      */
-    public static function get_sql_for_model_input($contextid, array $catscaleids, ?int $testitemid, ?int $userid) {
+    public static function get_sql_for_model_input($contextid, array $catscaleids, ?int $testitemid, ?int $userid, bool $joinitems = false) {
         global $DB;
         $testitemids = $testitemid ? [$testitemid] : [];
         $userids = $userid ? [$userid] : [];
@@ -564,8 +565,18 @@ class catquiz {
         );
         list (, $from, $where, $params) = self::get_sql_for_stat_base_request($testitemids, [$contextid], $userids);
 
-        $sql = "SELECT "
-            . $DB->sql_concat("qas.id", "'-'", "qas.userid", "'-'", "q.id", "'-'", "lci.id") . " uniqueid,
+        $joinitemssql = "";
+        if ($joinitems) {
+            $joinitemssql = <<<SQL
+                JOIN {local_catquiz_items} lci
+                    ON q.id = lci.componentid
+                    AND lci.catscaleid $insql
+            SQL;
+        }
+
+        $selectlci = $joinitems ? "lci.id" : "'-'";
+        $select = $DB->sql_concat("qas.id", "'-'", "qas.userid", "'-'", "q.id", "'-'", $selectlci);
+        $sql = "SELECT $select uniqueid,
             qas.id,
             qas.userid,
             qa.questionid,
@@ -574,13 +585,12 @@ class catquiz {
             qa.minfraction,
             qa.maxfraction,
             q.qtype,
-            qas.timecreated
+            qas.timecreated,
+            qa.questionusageid attemptid
         FROM $from
         JOIN {question} q
             ON qa.questionid = q.id
-        JOIN {local_catquiz_items} lci
-            ON q.id = lci.componentid
-            AND lci.catscaleid $insql
+        $joinitemssql
         WHERE $where
         ";
 

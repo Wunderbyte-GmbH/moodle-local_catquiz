@@ -22,6 +22,7 @@ use local_catquiz\remote\hash\question_hasher;
 use curl;
 use local_catquiz\catcontext;
 use local_catquiz\catscale;
+use local_catquiz\local\model\model_responses;
 
 /**
  * Handles submission of responses to central instance.
@@ -79,7 +80,7 @@ class response_submitter {
 
         // Prepare the data for submission.
         $responses = [];
-        foreach ($responsedata as $userid => $components) {
+        foreach ($responsedata as $attemptid => $components) {
             foreach ($components as $component => $userresponses) {
                 foreach ($userresponses as $qid => $response) {
                     // Generate hash for the question.
@@ -159,8 +160,10 @@ class response_submitter {
      * @return array Array of response objects
      */
     private function get_response_data() {
+        global $DB;
         $catscaleids = [$this->scaleid, ...catscale::get_subscale_ids($this->scaleid)];
-        $responsedata = catcontext::getresponsedatafromdb($this->contextid, $catscaleids);
+        $contextid = $DB->get_field('local_catquiz_catscales', 'contextid', ['id' => $this->scaleid]);
+        $responsedata = model_responses::create_for_context($contextid);
         // This is a placeholder - you'll provide the actual implementation.
         // The expected return format should be an array of objects with:
         // - questionid
