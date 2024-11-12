@@ -570,6 +570,15 @@ class model_item_param_list implements ArrayAccess, IteratorAggregate, Countable
         return $this;
     }
 
+    public function filter_by_componentids(array $itemids, bool $clone = true): self {
+        if ($clone) {
+            $obj = clone $this;
+            return $obj->filter_by_componentids($itemids, false);
+        }
+        $this->itemparams = array_filter($this->itemparams, fn ($ip) => in_array($ip->get_componentid(), $itemids));
+        return $this;
+    }
+
     /**
      * Gets scaleid and updates scaleid of record.
      * @param array $newrecord
