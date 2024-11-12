@@ -311,10 +311,10 @@ class model_person_param_list implements ArrayAccess, IteratorAggregate, Countab
     /**
      * Returns the list filtered to the given user ID.
      *
-     * @param int $userid
+     * @param string $userid
      * @return self
      */
-    public function get_for_user(int $userid): self {
+    public function get_for_user(string $userid): self {
         return $this->filter(fn ($pp) => $pp->get_userid() === $userid);
     }
 

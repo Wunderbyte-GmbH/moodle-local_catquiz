@@ -196,7 +196,7 @@ class model_person_param implements \ArrayAccess {
      *
      * @return string
      */
-    public function get_userid(): int {
+    public function get_userid(): string {
         return $this->userid;
     }
 

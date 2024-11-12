@@ -44,8 +44,9 @@ final class model_responses_test extends basic_testcase {
      * @param array $indata
      * @param ?array $users
      * @param ?array $items
-     * @param array $expectedsuers
+     * @param array $expectedusers
      * @param array $expecteditems
+     *
      * @return void
      * @throws InvalidArgumentException
      * @throws ExpectationFailedException
@@ -81,10 +82,10 @@ final class model_responses_test extends basic_testcase {
             'limit persons' => [
                 'in_data' => [
                     ['P1', 'A1', 1.0],
-                    ['P1', 'A2', 1.0],
+                    ['P1', 'A2', 0.0],
                     ['P1', 'A3', 1.0],
-                    ['P2', 'A1', 1.0],
-                    ['P2', 'A2', 1.0],
+                    ['P2', 'A1', 0.0],
+                    ['P2', 'A2', 0.0],
                     ['P2', 'A3', 1.0],
                     ['P3', 'A1', 1.0],
                     ['P3', 'A2', 1.0],
@@ -92,10 +93,11 @@ final class model_responses_test extends basic_testcase {
                 ],
                 'limit_to_users' => [
                     'P1',
+                    'P2',
                 ],
                 'limit_to_items' => null,
-                'expected_users' => ['P1'],
-                'expected_items' => ['A1', 'A2', 'A3'],
+                'expected_users' => ['P1', 'P2'],
+                'expected_items' => ['A1'],
             ],
             'limit items' => [
                 'in_data' => [
@@ -124,8 +126,8 @@ final class model_responses_test extends basic_testcase {
                     ['P2', 'A1', 1.0],
                     ['P2', 'A2', 1.0],
                     ['P2', 'A3', 1.0],
-                    ['P3', 'A1', 1.0],
-                    ['P3', 'A2', 1.0],
+                    ['P3', 'A1', 0.0],
+                    ['P3', 'A2', 2.0],
                     ['P3', 'A3', 1.0],
                 ],
                 'limit_to_users' => ['P1', 'P3'],
@@ -136,7 +138,7 @@ final class model_responses_test extends basic_testcase {
         ];
     }
 
-    public function test_setting_values_works_as_expected(): array {
+    public function test_setting_values_works_as_expected(): void {
         $mr = new model_responses();
         $mr->set('P1', 'A1', 1.0);
         // Now update the response for P1. Sums should be changed.
