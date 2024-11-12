@@ -178,9 +178,9 @@ class updatepersonability extends preselect_task {
         }
 
         $this->userresponses = model_responses::create_from_array(
-            [$context['userid'] => ['component' => $this->progress->get_user_responses()]]
+            [$context['attemptid'] => ['component' => $this->progress->get_user_responses()]]
         );
-        $context['lastresponse'] = $this->userresponses->get_last_response($context['userid']);
+        $context['lastresponse'] = $this->userresponses->get_last_response($context['attemptid']);
 
         if (!empty($this->progress->get_last_question()->is_pilot)) {
             $context['skip_reason'] = 'pilotquestion';
@@ -427,7 +427,7 @@ class updatepersonability extends preselect_task {
      *
      */
     public function fallback_ability_update($catscaleid) {
-        $fraction = $this->userresponses->get_last_response($this->context['userid'])->get_response();
+        $fraction = $this->userresponses->get_last_response($this->context['attemptid'])->get_response();
         $max = ($fraction < 0.5)
             ? -5 * (1 - $fraction)
             : 5 * $fraction;
@@ -471,7 +471,7 @@ class updatepersonability extends preselect_task {
             ? $this->context['person_ability'][$this->context['catscaleid']]
             : $this->meanability;
 
-        $lastquestion = $this->userresponses->get_last_response($this->context['userid']);
+        $lastquestion = $this->userresponses->get_last_response($this->context['attemptid']);
         $items = clone ($this->get_item_param_list($this->context['catscaleid']));
         $items->offsetUnset($lastquestion->get_id());
 
@@ -493,7 +493,7 @@ class updatepersonability extends preselect_task {
      */
     protected function ability_was_calculated(int $catscaleid, bool $includelastresponse = true) {
         // If we have not at least one previous response, the ability was not calculated.
-        if (!$lastresponse = $this->userresponses->get_last_response($this->context['userid'])) {
+        if (!$lastresponse = $this->userresponses->get_last_response($this->context['attemptid'])) {
             return false;
         }
         $items = $this->get_item_param_list($catscaleid)->as_array();
