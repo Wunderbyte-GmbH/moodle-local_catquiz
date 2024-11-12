@@ -249,5 +249,41 @@
         <INDEX NAME="attemptid" UNIQUE="false" FIELDS="attemptid"/>
       </INDEXES>
     </TABLE>
+    <TABLE NAME="local_catquiz_question_hashmap" COMMENT="Maps questions between instances using hashes">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
+        <FIELD NAME="questionid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="Local question ID"/>
+        <FIELD NAME="questionhash" TYPE="char" LENGTH="64" NOTNULL="true" SEQUENCE="false" COMMENT="SHA256 hash of question content"/>
+        <FIELD NAME="hashdata" TYPE="text" NOTNULL="true" SEQUENCE="false" COMMENT="Serialized data used for hash generation"/>
+        <FIELD NAME="timecreated" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
+        <FIELD NAME="timemodified" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+        <KEY NAME="questionid" TYPE="foreign" FIELDS="questionid" REFTABLE="question" REFFIELDS="id"/>
+      </KEYS>
+      <INDEXES>
+        <INDEX NAME="questionhash" UNIQUE="false" FIELDS="questionhash"/>
+      </INDEXES>
+    </TABLE>
+    <TABLE NAME="local_catquiz_remote_responses" COMMENT="Stores responses from remote instances">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
+        <FIELD NAME="questionhash" TYPE="char" LENGTH="64" NOTNULL="true" SEQUENCE="false" COMMENT="Matches questionhash in question_hashmap"/>
+        <FIELD NAME="remoteuserid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="User ID from remote instance"/>
+        <FIELD NAME="response" TYPE="text" NOTNULL="true" SEQUENCE="false" COMMENT="The actual response data"/>
+        <FIELD NAME="sourceurl" TYPE="char" LENGTH="255" NOTNULL="true" SEQUENCE="false" COMMENT="URL of the remote instance"/>
+        <FIELD NAME="timecreated" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
+        <FIELD NAME="timeprocessed" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false" COMMENT="Time when response was processed"/>
+        <FIELD NAME="processinginfo" TYPE="text" NOTNULL="false" SEQUENCE="false" COMMENT="JSON with processing details/errors"/>
+      </FIELDS>
+      <KEYS>
+          <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+      </KEYS>
+      <INDEXES>
+        <INDEX NAME="questionhash_sourceurl" UNIQUE="false" FIELDS="questionhash, sourceurl"/>
+        <INDEX NAME="timeprocessed" UNIQUE="false" FIELDS="timeprocessed"/>
+      </INDEXES>
+    </TABLE>
   </TABLES>
 </XMLDB>
