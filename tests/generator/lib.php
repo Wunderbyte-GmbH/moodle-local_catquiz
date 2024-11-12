@@ -32,7 +32,6 @@ require_once($CFG->dirroot . '/question/format/xml/format.php');
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class local_catquiz_generator extends testing_module_generator {
-
     /**
      * Create course questions by importing from Moodle XML file.
      *

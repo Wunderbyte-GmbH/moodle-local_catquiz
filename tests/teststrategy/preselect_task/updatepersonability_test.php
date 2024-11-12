@@ -43,7 +43,6 @@ use SebastianBergmann\RecursionContext\InvalidArgumentException;
  * @covers \local_catquiz\teststrategy\preselect_task\updatepersonability
  */
 final class updatepersonability_test extends TestCase {
-
     /**
      * Tests that the ability is not updated in cases where it should not be updated.
      *
@@ -223,5 +222,4 @@ final class updatepersonability_test extends TestCase {
             ],
         ];
     }
-
 }

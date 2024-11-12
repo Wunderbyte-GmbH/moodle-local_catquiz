@@ -96,14 +96,14 @@ final class model_item_param_list_test extends advanced_testcase {
      * @throws InvalidArgumentException
      * @throws ExpectationFailedException
      */
-    public function test_can_be_printed_as_csv() {
+    public function test_can_be_printed_as_csv(): void {
         $ipl = new model_item_param_list();
         $ipl->add(
             (new model_item_param('A01', 'mixedraschbirnbaum'))
                 ->set_parameters(
                     ['difficulty' => 1.2, 'guessing' => 2.3, 'discrimination' => 3.4]
-                    )
-                );
+                )
+        );
         $rows = $ipl->as_csv(true);
 
         $this->assertEquals('difficulty;guessing;discrimination;model', $rows[0]);
@@ -114,13 +114,11 @@ final class model_item_param_list_test extends advanced_testcase {
             (new model_item_param('A01', 'rasch'))
                 ->set_parameters(
                     ['difficulty' => 1.8]
-                    )
-                );
+                )
+        );
         $rows = $ipl2->as_csv(true);
 
         $this->assertEquals('difficulty;model', $rows[0]);
         $this->assertEquals('1.8;rasch', $rows[1]);
     }
 }
-
-

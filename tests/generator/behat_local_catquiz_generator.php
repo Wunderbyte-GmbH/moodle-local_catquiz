@@ -25,7 +25,6 @@ use local_catquiz\teststrategy\info;
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class behat_local_catquiz_generator extends behat_generator_base {
-
     /**
      * Get a list of the entities that Behat can create using the generator step.
      *
@@ -97,7 +96,6 @@ class behat_local_catquiz_generator extends behat_generator_base {
 
         $strategies = info::return_available_strategies();
         foreach ($strategies as $strategy) {
-
             if (isset($strategy->id) && $strategy->get_description() == $cateststrategyname) {
                 return $strategy->id;
             }

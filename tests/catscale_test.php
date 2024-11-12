@@ -41,7 +41,6 @@ use local_catquiz\local\model\model_item_param_list;
  *
  */
 final class catscale_test extends basic_testcase {
-
     /**
      * Tests if the standarderror is calculated correctly
      *
@@ -196,7 +195,9 @@ final class catscale_test extends basic_testcase {
             }
             $tmp = array_filter(
                 $scale,
-                fn($label) => ! in_array($label, ['A06-15']), ARRAY_FILTER_USE_KEY);
+                fn($label) => ! in_array($label, ['A06-15']),
+                ARRAY_FILTER_USE_KEY
+            );
             foreach ($tmp as $key => $value) {
                 $remaining2[$key] = $value;
             }
@@ -209,7 +210,9 @@ final class catscale_test extends basic_testcase {
             }
             $tmp = array_filter(
                 $scale,
-                fn($label) => ! in_array($label, ['B01-18', 'B02-02', 'B01-17', 'B01-12', 'B02-02']), ARRAY_FILTER_USE_KEY);
+                fn($label) => ! in_array($label, ['B01-18', 'B02-02', 'B01-17', 'B01-12', 'B02-02']),
+                ARRAY_FILTER_USE_KEY
+            );
             foreach ($tmp as $key => $value) {
                 $remaining4[$key] = $value;
             }
@@ -330,7 +333,7 @@ final class catscale_test extends basic_testcase {
                             'difficulty' => $params['a'],
                             'discrimination' => $params['b'],
                         ])
-            );
+                );
         }
         return $items;
     }

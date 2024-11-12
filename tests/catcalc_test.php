@@ -153,7 +153,7 @@ final class catcalc_test extends basic_testcase {
      * @throws InvalidArgumentException
      * @throws ExpectationFailedException
      */
-    public function test_build_item_param_jacobian() {
+    public function test_build_item_param_jacobian(): void {
         $itemresponse = [];
         $mr = new model_responses();
         $model = new raschbirnbaum($mr, 'raschbirnbaum');
@@ -309,9 +309,10 @@ final class catcalc_test extends basic_testcase {
             }
 
             if ($inpersonrange) {
-                if ($data[0] === '' && $data[1] === ''
-                || $data[0] === $person && $data[1] !== '' && $data[2] === ''
-                || $data[0] === $person && ! is_numeric($data[1])
+                if (
+                    $data[0] === '' && $data[1] === ''
+                    || $data[0] === $person && $data[1] !== '' && $data[2] === ''
+                    || $data[0] === $person && ! is_numeric($data[1])
                 ) {
                     $inpersonrange = false;
                     $person = '';

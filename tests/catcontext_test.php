@@ -39,8 +39,6 @@ use basic_testcase;
  *
  */
 final class catcontext_test extends basic_testcase {
-
-
     /**
      * Test if there is a default CAT context.
      *

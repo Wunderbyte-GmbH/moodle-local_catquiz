@@ -43,7 +43,6 @@ use SebastianBergmann\RecursionContext\InvalidArgumentException;
  * @covers \local_catquiz\teststrategy\preselect_task\mayberemovescale
  */
 final class mayberemovescale_test extends basic_testcase {
-
     /**
      * Test that questions of subscales are removed as needed.
      *

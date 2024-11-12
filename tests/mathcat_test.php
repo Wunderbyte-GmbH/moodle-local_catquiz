@@ -39,8 +39,6 @@ use basic_testcase;
  *
  */
 final class mathcat_test extends basic_testcase {
-
-
     /**
      * Test if the newton raphson multi stable function returns expected outputs.
      *

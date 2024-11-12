@@ -66,7 +66,6 @@ require_once($CFG->dirroot . '/local/catquiz/tests/lib.php');
  *
  */
 final class testitemimporter_test extends advanced_testcase {
-
     /**
      * @var An instance of an adaptive quiz
      */
@@ -91,13 +90,13 @@ final class testitemimporter_test extends advanced_testcase {
         $importer = new testitemimporter();
         $content = file_get_contents(__DIR__ . '/../fixtures/simulation_comma.csv');
         $result = $importer->execute_testitems_csv_import(
-                (object) [
+            (object) [
                     'delimiter_name' => 'comma',
                     'dateparseformat' => null,
                     'encoding' => null,
                 ],
-                $content
-            );
+            $content
+        );
         // Check that there are no errors.
         $this->assertEquals(0, count($result['errors']), implode(', ', $result['errors']));
     }
@@ -153,13 +152,13 @@ final class testitemimporter_test extends advanced_testcase {
         $importer = new testitemimporter();
         $content = file_get_contents(__DIR__ . '/../fixtures/' . $filename);
         $result = $importer->execute_testitems_csv_import(
-                (object) [
+            (object) [
                     'delimiter_name' => 'semicolon',
                     'encoding' => null,
                     'dateparseformat' => null,
                 ],
-                $content
-            );
+            $content
+        );
         return $result;
     }
 
