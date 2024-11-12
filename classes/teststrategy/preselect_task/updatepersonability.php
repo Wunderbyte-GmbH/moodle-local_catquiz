@@ -646,7 +646,9 @@ class updatepersonability extends preselect_task implements wb_middleware {
         $this->flippedresponses = $this->arrayresponses;
         $frac = floatval($this->flippedresponses[$lastquestion->id]->get_response());
         $flipped = abs(1 - $frac);
-        $this->flippedresponses[$lastquestion->id]->set_response($flipped);
+        $flippedlastquestion = clone $this->flippedresponses[$lastquestion->id];
+        $flippedlastquestion->set_response($flipped);
+        $this->flippedresponses[$lastquestion->id] = $flippedlastquestion;
         return $this->flippedresponses;
     }
 
