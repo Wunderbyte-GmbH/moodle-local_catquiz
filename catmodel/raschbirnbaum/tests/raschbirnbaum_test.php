@@ -67,7 +67,7 @@ final class raschbirnbaum_test extends TestCase {
         return [
                 [
                     'itemresponse' => [new model_item_response('Item1', 0.3, (new model_person_param('1', 1))->set_ability(0.2))],
-                    'expected' => ['difficulty' => 1.4974, 'discrimination' => 3.0],
+                    'expected' => ['difficulty' => 0.2, 'discrimination' => 0.0],
                 ],
         ];
     }

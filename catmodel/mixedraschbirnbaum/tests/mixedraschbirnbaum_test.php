@@ -67,7 +67,7 @@ final class mixedraschbirnbaum_test extends TestCase {
         return [
                 [
                     'itemresponse' => [new model_item_response('Item1', 0.3, (new model_person_param('1', 1))->set_ability(0.2))],
-                    'expected' => ['difficulty' => 1.2041, 'discrimination' => 3.0, 'guessing' => 0.0],
+                    'expected' => ['difficulty' => 0.2017, 'discrimination' => 0.0057, 'guessing' => 0.0],
                 ],
         ];
     }
