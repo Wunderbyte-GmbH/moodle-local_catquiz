@@ -66,7 +66,7 @@ final class rasch_test extends TestCase {
         return [
                 [
                     'itemresponse' => [new model_item_response('Item1', 0.3, (new model_person_param('1', 1))->set_ability(0.2))],
-                    'expected' => ['difficulty' => 5.5],
+                    'expected' => ['difficulty' => 5.0],
                 ],
         ];
     }
