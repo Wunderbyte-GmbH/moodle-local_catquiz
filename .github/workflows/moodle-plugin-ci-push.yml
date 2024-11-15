@@ -67,6 +67,8 @@ jobs:
           nvm install node
           echo $(pwd)
           echo $(ls -la $HOME)
+          echo $(which npm)
+          echo $(which npm) >> $GITHUB_PATH
       - name: Install moodle-plugin-ci
         run: |
           moodle-plugin-ci add-plugin --branch main Wunderbyte-GmbH/moodle-local_wunderbyte_table
