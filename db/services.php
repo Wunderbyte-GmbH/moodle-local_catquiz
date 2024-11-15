@@ -40,12 +40,15 @@ $services = [
                 'enabled' => 1,
         ],
         'CatQuiz Response Service' => [
-            'functions' => ['local_catquiz_submit_catquiz_responses'],
-            'restrictedusers' => 0, // Allow all users.
-            'enabled' => 1,
-            'shortname' => 'local_catquiz_response',
-            'downloadfiles' => 0,
-            'uploadfiles' => 0,
+                'functions' => [
+                        'local_catquiz_submit_catquiz_responses',
+                        'local_catquiz_fetch_item_parameters',
+                ],
+                'restrictedusers' => 0, // Allow all users.
+                'enabled' => 1,
+                'shortname' => 'local_catquiz_response',
+                'downloadfiles' => 0,
+                'uploadfiles' => 0,
         ],
 ];
 

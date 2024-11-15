@@ -15,16 +15,12 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * This class contains a list of webservice functions related to the catquiz Module by Wunderbyte.
+ * External service for fetching calculated item parameters.
  *
  * @package    local_catquiz
- * @copyright  2023 Wunderbyte GmbH
- * @author     David Szkiba
+ * @copyright  2024 Wunderbyte GmbH
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-
-
-declare(strict_types=1);
 
 namespace local_catquiz\external;
 
@@ -38,32 +34,45 @@ use core_external\external_function_parameters;
 use core_external\external_multiple_structure;
 use core_external\external_single_structure;
 use core_external\external_value;
-use invalid_parameter_exception;
+use local_catquiz\catscale;
+use local_catquiz\local\model\model_item_param;
+use local_catquiz\remote\hash\question_hasher;
+use moodle_exception;
 
 /**
- * External service for fetching item parameters.
+ * External service implementation for fetching item parameters.
  *
  * @package    local_catquiz
  * @copyright  2024 Wunderbyte GmbH
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class fetch_item_parameters extends external_api {
-
     /**
      * Returns description of method parameters.
      *
      * @return external_function_parameters
      */
     public static function execute_parameters() {
-        return new external_function_parameters([
-            'responses' => new external_multiple_structure(
-                new external_single_structure([
-                    'questionid' => new external_value(PARAM_INT, 'The ID of the question'),
-                    'response' => new external_value(PARAM_RAW, 'The response data'),
-                    'timestamp' => new external_value(PARAM_INT, 'Unix timestamp of the response'),
-                ])
-            ),
-        ]);
+        return new external_function_parameters(
+            [
+                'scalelabel' => new external_value(
+                    PARAM_TEXT,
+                    'Label of the CAT scale to fetch parameters for'
+                ),
+                'questionhashes' => new external_multiple_structure(
+                    new external_value(PARAM_TEXT, 'Hash of the question'),
+                    'Optional array of question hashes to filter by',
+                    VALUE_DEFAULT,
+                    []
+                ),
+                'models' => new external_multiple_structure(
+                    new external_value(PARAM_TEXT, 'Name of the model'),
+                    'Optional array of model names to filter by',
+                    VALUE_DEFAULT,
+                    []
+                ),
+            ]
+        );
     }
 
     /**
@@ -72,104 +81,114 @@ class fetch_item_parameters extends external_api {
      * @return external_single_structure
      */
     public static function execute_returns() {
-        return new external_single_structure([
-            'status' => new external_value(PARAM_BOOL, 'Status of the submission'),
-            'message' => new external_value(PARAM_TEXT, 'Status message'),
-            'responses' => new external_multiple_structure(
-                new external_single_structure([
-                    'questionid' => new external_value(PARAM_INT, 'The ID of the question'),
-                    'status' => new external_value(PARAM_BOOL, 'Individual response status'),
-                    'message' => new external_value(PARAM_TEXT, 'Individual response message'),
-                ])
-            ),
-        ]);
+        return new external_single_structure(
+            [
+                'status' => new external_value(PARAM_BOOL, 'Status of the request'),
+                'message' => new external_value(PARAM_TEXT, 'Status message'),
+                'contextid' => new external_value(PARAM_INT, 'Context ID the parameters were fetched from'),
+                'parameters' => new external_multiple_structure(
+                    new external_single_structure([
+                        'questionhash' => new external_value(PARAM_TEXT, 'Hash of the question'),
+                        'model' => new external_value(PARAM_TEXT, 'Name of the model'),
+                        'difficulty' => new external_value(PARAM_FLOAT, 'Item difficulty parameter'),
+                        'discrimination' => new external_value(PARAM_FLOAT, 'Item discrimination parameter', VALUE_DEFAULT, 0.0),
+                        'status' => new external_value(PARAM_INT, 'Status of the parameter'),
+                        'json' => new external_value(PARAM_RAW, 'Additional parameters as JSON', VALUE_DEFAULT, null),
+                    ])
+                ),
+            ]
+        );
     }
 
     /**
-     * Submit responses for CatQuiz.
+     * Fetch item parameters for a given CAT scale.
      *
-     * @param array $responses The array of response data
-     * @return array The status and processed responses
+     * @param string $scalelabel The label of the CAT scale
+     * @param array $questionhashes Optional array of question hashes to filter by
+     * @param array $models Optional array of model names to filter by
+     * @return array The status and retrieved parameters
      */
-    public static function execute($responses) {
-        // The $USER is the local user for whom the token was created.
-        global $USER, $DB;
+    public static function execute($scalelabel, $questionhashes = [], $models = []) {
+        global $DB;
 
         // Parameter validation.
-        $params = self::validate_parameters(self::execute_parameters(), ['responses' => $responses]);
+        $params = self::validate_parameters(self::execute_parameters(), [
+            'scalelabel' => $scalelabel,
+            'questionhashes' => $questionhashes,
+            'models' => $models,
+        ]);
 
         // Context validation.
-        $context = context_system::instance();
-        self::validate_context($context);
-
-        // TODO: should we do an additional capability check?
-        // Something like: require_capability('local/catquiz:submit_responses', $context); ?
-
-        $results = [];
-        $overallstatus = true;
-
-        foreach ($params['responses'] as $response) {
-            try {
-                // Validate that the question exists.
-                if (!$DB->record_exists('question', ['id' => $response['questionid']])) {
-                    throw new invalid_parameter_exception('Invalid question ID: ' . $response['questionid']);
-                }
-
-                // Here you would process and store the response.
-                // This is a placeholder for your actual response processing logic.
-                $status = self::process_response($response);
-
-                $results[] = [
-                    'questionid' => $response['questionid'],
-                    'status' => $status,
-                    'message' => $status ? 'Success' : 'Failed to process response',
-                ];
-
-                if (!$status) {
-                    $overallstatus = false;
-                }
-            } catch (\Exception $e) {
-                $results[] = [
-                    'questionid' => $response['questionid'],
-                    'status' => false,
-                    'message' => $e->getMessage(),
-                ];
-                $overallstatus = false;
-            }
-        }
-
-        return [
-            'status' => $overallstatus,
-            'message' => $overallstatus ? 'All responses processed successfully' : 'Some responses failed',
-            'responses' => $results,
-        ];
-    }
-
-    /**
-     * Process a single response.
-     *
-     * @param array $response The response data
-     * @return bool Success status
-     */
-    private static function process_response($response) {
-        global $DB, $USER;
+        $systemcontext = context_system::instance();
+        self::validate_context($systemcontext);
 
         try {
-            // Add your response processing logic here.
-            // This is where you would store the response in your plugin's tables.
-            // For example:
-            $record = new \stdClass();
-            $record->questionid = $response['questionid'];
-            $record->response = $response['response'];
-            $record->timestamp = $response['timestamp'];
-            $record->userid = $USER->id;
+            // Get the scale from its label.
+            $scale = $DB->get_record('local_catquiz_catscales', ['label' => $scalelabel], '*', MUST_EXIST);
 
-            // Insert into your responses table.
-            // $DB->insert_record('local_catquiz_responses', $record);
+            // Get the latest context for this scale.
+            $contextid = catscale::get_context_id($scale->id);
+            if (!$contextid) {
+                throw new moodle_exception('nocontextfound', 'local_catquiz');
+            }
 
-            return true;
+            // Get all questions assigned to this scale.
+            $sql = "SELECT lci.*, lcip.*
+                    FROM {local_catquiz_items} lci
+                    JOIN {local_catquiz_itemparams} lcip ON lci.activeparamid = lcip.id
+                    WHERE lci.catscaleid = :scaleid
+                    AND lcip.contextid = :contextid";
+            $records = $DB->get_records_sql($sql, ['scaleid' => $scale->id, 'contextid' => $contextid]);
+
+            $results = [];
+            foreach ($records as $record) {
+                // Generate hash for this question.
+                try {
+                    $hash = question_hasher::generate_hash($record->componentid);
+                } catch (\Exception $e) {
+                    debugging(
+                        'Error generating hash for question ' . $record->componentid . ': ' . $e->getMessage(),
+                        DEBUG_DEVELOPER
+                    );
+                    continue;
+                }
+
+                // Skip if we're filtering by hashes and this isn't one we want.
+                if (!empty($questionhashes) && !in_array($hash, $questionhashes)) {
+                    continue;
+                }
+
+                // Skip if we're filtering by model and this isn't one we want.
+                if (!empty($models) && !in_array($record->model, $models)) {
+                    continue;
+                }
+
+                // Create item param object to handle parameter extraction.
+                $itemparam = model_item_param::from_record($record);
+                $paramarray = $itemparam->get_params_array();
+
+                $results[] = [
+                    'questionhash' => $hash,
+                    'model' => $itemparam->get_model_name(),
+                    'difficulty' => $paramarray['difficulty'] ?? 0.0,
+                    'discrimination' => $paramarray['discrimination'] ?? 0.0,
+                    'status' => $itemparam->get_status(),
+                    'json' => $itemparam->to_record()->json,
+                ];
+            }
+            return [
+                'status' => true,
+                'message' => 'Parameters retrieved successfully',
+                'contextid' => $contextid,
+                'parameters' => $results,
+            ];
         } catch (\Exception $e) {
-            return false;
+            return [
+                'status' => false,
+                'message' => $e->getMessage(),
+                'contextid' => 0,
+                'parameters' => [],
+            ];
         }
     }
 }
