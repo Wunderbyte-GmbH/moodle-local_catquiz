@@ -43,7 +43,7 @@ $scalelabel = 'simulation';
 
 $scale = $DB->get_record('local_catquiz_catscales', ['label' => $scalelabel], '*', MUST_EXIST);
 if (!$scale) {
-   throw new moodle_exception('scalelabelnotfound', 'local_catquiz', '', $scalelabel);
+    throw new moodle_exception('scalelabelnotfound', 'local_catquiz', '', $scalelabel);
 }
 
 // Prepare the web service call.
@@ -61,7 +61,7 @@ $CFG->curlsecurityblockedhosts = '';
 $curl = new \curl();
 $curl->setopt([
     'CURLOPT_SSL_VERIFYPEER' => false,
-    'CURLOPT_SSL_VERIFYHOST' => false
+    'CURLOPT_SSL_VERIFYHOST' => false,
 ]);
 $response = $curl->post($serverurl, $params);
 unset($CFG->curlsecurityblockedhosts);
@@ -86,6 +86,25 @@ foreach ($scalerecords as $s) {
     $scalemapping[$s->label] = $s->id;
 }
 
+// Get all questions assigned to this scale or its subscales.
+$sql = "SELECT DISTINCT q.id
+        FROM {local_catquiz_items} lci
+        JOIN {question} q ON q.id = lci.componentid
+        WHERE lci.catscaleid $inscalesql";
+
+$questions = $DB->get_records_sql($sql, $inscaleparams);
+$hashmap = [];
+
+// Generate and store hashes for all questions.
+foreach ($questions as $question) {
+    try {
+        $hash = \local_catquiz\remote\hash\question_hasher::generate_hash($question->id);
+        $hashmap[$hash] = $question->id;
+    } catch (\Exception $e) {
+        debugging('Error generating hash for question ' . $question->id . ': ' . $e->getMessage(), DEBUG_DEVELOPER);
+    }
+}
+
 if (!$result) {
     echo html_writer::tag('div', 'Invalid response from server: ' . $response, ['class' => 'alert alert-danger']);
 } else if (!empty($result->exception)) {
@@ -105,9 +124,9 @@ if (!$result) {
     $errors = 0;
 
     foreach ($result->parameters as $param) {
-        // Get the local question ID from hash.
-        $questionid = \local_catquiz\remote\hash\question_hasher::get_questionid_from_hash($param->questionhash);
+        $questionid = $hashmap[$param->questionhash] ?? null;
         if (!$questionid) {
+            debugging('No matching question found for hash: ' . $param->questionhash, DEBUG_DEVELOPER);
             $errors++;
             continue;
         }
@@ -150,12 +169,14 @@ if (!$result) {
 
     // Show simple success/error message.
     if ($stored > 0) {
-        echo html_writer::tag('div',
+        echo html_writer::tag(
+            'div',
             "Successfully stored $stored parameters" . ($errors ? " ($errors errors)" : ''),
             ['class' => 'alert alert-success']
         );
     } else {
-        echo html_writer::tag('div',
+        echo html_writer::tag(
+            'div',
             'No parameters were stored' . ($errors ? " ($errors errors)" : ''),
             ['class' => 'alert alert-warning']
         );

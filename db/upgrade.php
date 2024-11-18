@@ -989,7 +989,7 @@ ENDSQL;
     // This is a bit unconventional. The table already exists with old, long
     // names on a moodle instance that supports longer table names but can't be
     // created on a different instance that has stricter naming rules.
-    if ($oldversion < 2024110802) {
+    if ($oldversion < 2024111804) {
         // Check if old table exists first.
         if ($dbman->table_exists('local_catquiz_question_hashmap')) {
             // Rename the table.
@@ -1054,7 +1054,7 @@ ENDSQL;
             }
         }
 
-        upgrade_plugin_savepoint(true, 2024110802, 'local', 'catquiz');
+        upgrade_plugin_savepoint(true, 2024111804, 'local', 'catquiz');
     }
 
 

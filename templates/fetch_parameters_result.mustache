@@ -1,0 +1,71 @@
+{{!
+    @template local_catquiz/fetch_parameters_result
+
+    Template to display parameter fetch results.
+
+    Example context (json):
+    {
+        "status": true,
+        "message": "Successfully stored 10 parameters",
+        "duration": 2.34,
+        "synced": 10,
+        "errors": 1,
+        "hasWarnings": true,
+        "warnings": [
+            {
+                "message": "Missing scale label",
+                "count": 42,
+                "items": ["question1", "question2", ...],
+                "index": [1, 2, 3],
+                "multipleItems": true
+            }
+        ]
+    }
+}}
+<div class="fetch-parameters-result">
+    <div class="alert alert-{{#status}}success{{/status}}{{^status}}danger{{/status}}">
+        {{{message}}}
+    </div>
+
+    <table class="table">
+        <tbody>
+            <tr>
+                <th scope="row">{{#str}}parameterssynced, local_catquiz{{/str}}</th>
+                <td>{{synced}}</td>
+            </tr>
+            <tr>
+                <th scope="row">{{#str}}duration, local_catquiz{{/str}}</th>
+                <td>{{duration}}s</td>
+            </tr>
+            <tr>
+                <th scope="row">{{#str}}errors, local_catquiz{{/str}}</th>
+                <td>{{errors}}</td>
+            </tr>
+        </tbody>
+    </table>
+
+    {{#hasWarnings}}
+    <div class="warnings mt-3">
+        <h5>{{#str}}warnings, local_catquiz{{/str}}</h5>
+        <div class="alert alert-warning">
+            <ul class="mb-0">
+                {{#warnings}}
+                <li>
+                    <strong>{{message}}:</strong> {{count}} {{#str}}occurrences, local_catquiz{{/str}}
+                    <button class="btn btn-link p-0 ml-2 text-warning" data-toggle="collapse" data-target="#items-{{index}}">
+                        <i class="fa fa-info-circle"></i>
+                    </button>
+                    <div class="collapse" id="items-{{index}}">
+                        <small class="text-muted">
+                            {{#items}}
+                            {{.}}{{#multipleItems}}{{^@last}}, {{/@last}}{{/multipleItems}}
+                            {{/items}}
+                        </small>
+                    </div>
+                </li>
+                {{/warnings}}
+            </ul>
+        </div>
+    </div>
+    {{/hasWarnings}}
+</div>
