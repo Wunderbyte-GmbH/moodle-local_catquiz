@@ -21,4 +21,4 @@ jobs:
 
       - name: Make API Request to ERPNext
         run: |
-          curl -X POST -H "Content-Type: application/json" -H "Authorization: ${{ secrets.WEBHOOK_TOKEN }}" -d @payload.json https://erp.wunderbyte.at/api/resource/Task
+          curl --fail -X POST -H "Content-Type: application/json" -H "Authorization: ${{ secrets.WEBHOOK_TOKEN }}" -d @payload.json https://erp.wunderbyte.at/api/resource/Task
