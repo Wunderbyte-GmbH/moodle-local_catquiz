@@ -104,10 +104,19 @@ class dataapi {
      *
      * @param int $scaleid
      * @param string $scalename
+     * @param string $source Optional: provide details about the source
+     * @param bool $duplicate Optional: Duplicate an existing old context if it exists
+     * @param bool $setdefault Optional: Set the new context as the default for the given scale
      *
      * @return catcontext
      */
-    public static function create_new_context_for_scale(int $scaleid, string $scalename = "") {
+    public static function create_new_context_for_scale(
+        int $scaleid,
+        string $scalename = "",
+        $source = "",
+        $duplicate = true,
+        $setdefault = true
+    ) {
         global $DB;
 
         $defaultcontext = catquiz::get_default_context_object();
@@ -122,14 +131,22 @@ class dataapi {
         $data->starttimestamp = $defaultcontext->starttimestamp;
         $data->endtimestamp = $defaultcontext->endtimestamp;
         $data->description = get_string('autocontextdescription', 'local_catquiz', $scalename);
+        if ($source) {
+            $data->description .= sprintf(' [%s]', $source);
+        }
 
         $context = new catcontext($data);
         $context->save_or_update($data);
         catcontext::store_context_as_singleton($context, $scaleid);
 
         // If there is already an old context, we duplicate all the items.
-        if ($oldcontextid = $DB->get_field('local_catquiz_catscales', 'contextid', ['id' => $scaleid])) {
+        if ($duplicate && $oldcontextid = $DB->get_field('local_catquiz_catscales', 'contextid', ['id' => $scaleid])) {
             catscale::duplicate_testitemparams_for_scale_with_new_contextid($scaleid, $oldcontextid, $context->id);
+        }
+
+        // If we should not modify the scale, we can return.
+        if (!$setdefault) {
+            return $context;
         }
 
         // We set the new context as a default context in the catscale.
