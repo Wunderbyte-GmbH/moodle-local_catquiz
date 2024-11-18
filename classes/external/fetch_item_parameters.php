@@ -94,6 +94,7 @@ class fetch_item_parameters extends external_api {
                         'discrimination' => new external_value(PARAM_FLOAT, 'Item discrimination parameter', VALUE_DEFAULT, 0.0),
                         'status' => new external_value(PARAM_INT, 'Status of the parameter'),
                         'json' => new external_value(PARAM_RAW, 'Additional parameters as JSON', VALUE_DEFAULT, null),
+                        'scalelabel' => new external_value(PARAM_RAW, 'The label of the assigned catscale', VALUE_DEFAULT, null),
                     ])
                 ),
             ]
@@ -125,7 +126,8 @@ class fetch_item_parameters extends external_api {
         try {
             // Get the scale from its label.
             $scale = $DB->get_record('local_catquiz_catscales', ['label' => $scalelabel], '*', MUST_EXIST);
-
+            // Get all relevant scale IDs (parent scale and subscales)
+            $catscaleids = [$scale->id, ...catscale::get_subscale_ids($scale->id)];
             // Get the latest context for this scale.
             $contextid = catscale::get_context_id($scale->id);
             if (!$contextid) {
@@ -133,12 +135,17 @@ class fetch_item_parameters extends external_api {
             }
 
             // Get all questions assigned to this scale.
-            $sql = "SELECT lci.*, lcip.*
-                    FROM {local_catquiz_items} lci
-                    JOIN {local_catquiz_itemparams} lcip ON lci.activeparamid = lcip.id
-                    WHERE lci.catscaleid = :scaleid
-                    AND lcip.contextid = :contextid";
-            $records = $DB->get_records_sql($sql, ['scaleid' => $scale->id, 'contextid' => $contextid]);
+            [$inscalesql, $inscaleparams] = $DB->get_in_or_equal($catscaleids, SQL_PARAMS_NAMED, 'scaleid');
+
+            $sql = "SELECT lci.*, lcip.*, lcs.label scalelabel
+            FROM {local_catquiz_items} lci
+            JOIN {local_catquiz_itemparams} lcip ON lci.id = lcip.itemid
+            JOIN {local_catquiz_catscales} lcs ON lci.catscaleid = lcs.id
+            WHERE lci.catscaleid $inscalesql
+            AND lcip.contextid = :contextid";
+
+            $params = array_merge($inscaleparams, ['contextid' => $contextid]);
+            $records = $DB->get_records_sql($sql, $params);
 
             $results = [];
             foreach ($records as $record) {
@@ -174,6 +181,7 @@ class fetch_item_parameters extends external_api {
                     'discrimination' => $paramarray['discrimination'] ?? 0.0,
                     'status' => $itemparam->get_status(),
                     'json' => $itemparam->to_record()->json,
+                    'scalelabel' => $record->scalelabel,
                 ];
             }
             return [
