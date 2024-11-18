@@ -50,6 +50,14 @@ $services = [
                 'downloadfiles' => 0,
                 'uploadfiles' => 0,
         ],
+        'CatQuiz Parameter Service' => [
+                'functions' => ['local_catquiz_client_fetch_parameters'],
+                'restrictedusers' => 0,
+                'enabled' => 1,
+                'shortname' => 'local_catquiz_parameter',
+                'downloadfiles' => 0,
+                'uploadfiles' => 0,
+        ],
 ];
 
 
@@ -154,5 +162,13 @@ $functions = [
             'description' => 'Fetch item parameters.',
             'type' => 'read',
             'ajax' => true,
+        ],
+        'local_catquiz_client_fetch_parameters' => [
+                'classname' => 'local_catquiz\\external\\client_fetch_parameters',
+                'methodname' => 'execute',
+                'description' => 'Fetch item parameters from central instance',
+                'type' => 'write',
+                'capabilities' => 'moodle/site:config',
+                'ajax' => true,
         ],
 ];
