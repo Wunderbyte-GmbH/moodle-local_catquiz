@@ -46,7 +46,7 @@ class response_handler {
         $record->timecreated = time();
 
         try {
-            $DB->insert_record('local_catquiz_remote_responses', $record);
+            $DB->insert_record('local_catquiz_rresponses', $record);
             return true;
         } catch (\Exception $e) {
             debugging('Error storing remote response: ' . $e->getMessage(), DEBUG_DEVELOPER);
@@ -63,7 +63,7 @@ class response_handler {
     public static function process_responses($batchsize = 100) {
         global $DB;
 
-        $responses = $DB->get_records('local_catquiz_remote_responses',
+        $responses = $DB->get_records('local_catquiz_rresponses',
             ['timeprocessed' => null],
             'timecreated ASC',
             '*',
@@ -103,7 +103,7 @@ class response_handler {
         global $DB;
         $response->timeprocessed = time();
         $response->processinginfo = json_encode(['status' => 'success']);
-        $DB->update_record('local_catquiz_remote_responses', $response);
+        $DB->update_record('local_catquiz_rresponses', $response);
     }
 
     /**
@@ -116,6 +116,6 @@ class response_handler {
         global $DB;
         $response->timeprocessed = time();
         $response->processinginfo = json_encode(['status' => 'error', 'message' => $error]);
-        $DB->update_record('local_catquiz_remote_responses', $response);
+        $DB->update_record('local_catquiz_rresponses', $response);
     }
 }

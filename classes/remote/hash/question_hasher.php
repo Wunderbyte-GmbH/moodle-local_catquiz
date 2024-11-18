@@ -20,7 +20,7 @@ defined('MOODLE_INTERNAL') || die();
 
 /**
  * Handles question hash generation and verification.
- * 
+ *
  * Idea: Include model name and scale in calculation of hash.
  *
  * @package    local_catquiz
@@ -75,11 +75,11 @@ class question_hasher {
         $record->timemodified = $record->timecreated;
 
         // Store or update hash mapping.
-        if ($existing = $DB->get_record('local_catquiz_question_hashmap', ['questionid' => $questionid])) {
+        if ($existing = $DB->get_record('local_catquiz_qhashmap', ['questionid' => $questionid])) {
             $record->id = $existing->id;
-            $DB->update_record('local_catquiz_question_hashmap', $record);
+            $DB->update_record('local_catquiz_qhashmap', $record);
         } else {
-            $DB->insert_record('local_catquiz_question_hashmap', $record);
+            $DB->insert_record('local_catquiz_qhashmap', $record);
         }
 
         return $record->questionhash;
@@ -94,7 +94,7 @@ class question_hasher {
     public static function get_questionid_from_hash($hash) {
         global $DB;
 
-        if ($record = $DB->get_record('local_catquiz_question_hashmap', ['questionhash' => $hash])) {
+        if ($record = $DB->get_record('local_catquiz_qhashmap', ['questionhash' => $hash])) {
             return $record->questionid;
         }
         return null;
@@ -109,7 +109,7 @@ class question_hasher {
     public static function verify_hash($questionid) {
         global $DB;
 
-        $currenthash = $DB->get_record('local_catquiz_question_hashmap', ['questionid' => $questionid]);
+        $currenthash = $DB->get_record('local_catquiz_qhashmap', ['questionid' => $questionid]);
         if (!$currenthash) {
             return true; // No hash exists yet.
         }
