@@ -130,10 +130,6 @@ class fetch_item_parameters extends external_api {
             $catscaleids = [$scale->id, ...catscale::get_subscale_ids($scale->id)];
             // Get the latest context for this scale.
             $contextid = catscale::get_context_id($scale->id);
-            if (!$contextid) {
-                throw new moodle_exception('nocontextfound', 'local_catquiz');
-            }
-
             // Get all questions assigned to this scale.
             [$inscalesql, $inscaleparams] = $DB->get_in_or_equal($catscaleids, SQL_PARAMS_NAMED, 'scaleid');
 

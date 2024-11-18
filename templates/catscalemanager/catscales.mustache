@@ -34,12 +34,18 @@
         <div>
             {{> local_catquiz/tabs/tab_statistics}}
             {{{modelbutton}}}
+            {{{syncbutton}}}
         </div>
         {{#js}}
             require(['local_catquiz/testitemdashboard/backtoscaleviewbutton'], function(init) {
                 init.init();
             require(['local_catquiz/calculatescales'], function(init) {
                 init.init();
+            });
+            require(['local_catquiz/syncscale'], function(init) {
+                init.init({
+                    centralHost: '{{centralhost}}'
+                });
             });
             });
         {{/js}}
