@@ -27,6 +27,7 @@ require_once($CFG->libdir . '/filelib.php');  // This includes the curl class.
 require_login();
 require_capability('moodle/site:config', context_system::instance());
 
+use local_catquiz\catscale;
 use local_catquiz\local\model\model_item_param;
 
 // Basic page setup.
@@ -40,13 +41,18 @@ $centralurl = 'https://192.168.56.6';
 $wstoken = '2f36a8dc27525b97a93e50186035d49e';
 $scalelabel = 'simulation';
 
+$scale = $DB->get_record('local_catquiz_catscales', ['label' => $scalelabel], '*', MUST_EXIST);
+if (!$scale) {
+   throw new moodle_exception('scalelabelnotfound', 'local_catquiz', '', $scalelabel);
+}
+
 // Prepare the web service call.
 $serverurl = rtrim($centralurl, '/') . '/webservice/rest/server.php';
 $params = [
     'wstoken' => $wstoken,
     'wsfunction' => 'local_catquiz_fetch_item_parameters',
     'moodlewsrestformat' => 'json',
-    'scalelabel' => $scalelabel
+    'scalelabel' => $scalelabel,
 ];
 
 $CFG->curlsecurityblockedhosts = '';
@@ -63,6 +69,24 @@ $result = json_decode($response);
 
 echo $OUTPUT->header();
 
+// Create a mapping of catscale labels to IDs.
+$scalemapping = [];
+
+$catscaleids = [$scale->id, ...catscale::get_subscale_ids($scale->id)];
+[$inscalesql, $inscaleparams] = $DB->get_in_or_equal($catscaleids, SQL_PARAMS_NAMED, 'scaleid');
+
+$sql = <<<SQL
+    SELECT *
+    FROM {local_catquiz_catscales} lcs
+    WHERE lcs.id $inscalesql
+    SQL;
+
+$params = array_merge($inscaleparams, ['contextid' => $contextid]);
+$scalerecords = $DB->get_records_sql($sql, $params);
+foreach ($scalerecords as $s) {
+    $scalemapping[$s->label] = $s->id;
+}
+
 if (!$result) {
     echo html_writer::tag('div', 'Invalid response from server: ' . $response, ['class' => 'alert alert-danger']);
 } else if (!empty($result->exception)) {
@@ -70,10 +94,17 @@ if (!$result) {
 } else if (!$result->status) {
     echo html_writer::tag('div', 'Error: ' . $result->message, ['class' => 'alert alert-danger']);
 } else {
+    $source = "Fetch from " . parse_url($centralurl, PHP_URL_HOST);
+    $newcontext = \local_catquiz\data\dataapi::create_new_context_for_scale(
+        $scale->id,
+        $scale->name,
+        $source,
+        false
+    );
     // Store the received parameters.
     $stored = 0;
     $errors = 0;
-    
+
     foreach ($result->parameters as $param) {
         // Get the local question ID from hash.
         $questionid = \local_catquiz\remote\hash\question_hasher::get_questionid_from_hash($param->questionhash);
@@ -82,16 +113,30 @@ if (!$result) {
             continue;
         }
 
+        if (!$param->scalelabel) {
+            $errors++;
+            continue;
+        }
+
+        $itemrecord = new stdClass();
+        $itemrecord->componentid = $questionid;
+        $itemrecord->componentname = 'question';
+        $itemrecord->catscaleid = $scalemapping[$param->scalelabel ?? 'unmapped'];
+        $itemrecord->contextid = $newcontext->id;
+        $itemrecord->status = LOCAL_CATQUIZ_TESTITEM_STATUS_ACTIVE;  // Or whatever default status you want.
+        $itemid = $DB->insert_record('local_catquiz_items', $itemrecord);
+
         // Create and save the item parameter.
         $record = (object)[
+            'itemid' => $itemid,
             'componentid' => $questionid,
             'componentname' => 'question',
             'model' => $param->model,
-            'contextid' => $result->contextid,
+            'contextid' => $newcontext->id,
             'difficulty' => $param->difficulty,
             'discrimination' => $param->discrimination,
             'status' => $param->status,
-            'json' => $param->json
+            'json' => $param->json,
         ];
 
         try {
@@ -106,12 +151,12 @@ if (!$result) {
 
     // Show simple success/error message.
     if ($stored > 0) {
-        echo html_writer::tag('div', 
+        echo html_writer::tag('div',
             "Successfully stored $stored parameters" . ($errors ? " ($errors errors)" : ''),
             ['class' => 'alert alert-success']
         );
     } else {
-        echo html_writer::tag('div', 
+        echo html_writer::tag('div',
             'No parameters were stored' . ($errors ? " ($errors errors)" : ''),
             ['class' => 'alert alert-warning']
         );

@@ -20,6 +20,8 @@ defined('MOODLE_INTERNAL') || die();
 
 /**
  * Handles question hash generation and verification.
+ * 
+ * Idea: Include model name and scale in calculation of hash.
  *
  * @package    local_catquiz
  * @copyright  2024 Wunderbyte GmbH <info@wunderbyte.at>
