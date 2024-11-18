@@ -81,8 +81,7 @@ $sql = <<<SQL
     WHERE lcs.id $inscalesql
     SQL;
 
-$params = array_merge($inscaleparams, ['contextid' => $contextid]);
-$scalerecords = $DB->get_records_sql($sql, $params);
+$scalerecords = $DB->get_records_sql($sql, $inscaleparams);
 foreach ($scalerecords as $s) {
     $scalemapping[$s->label] = $s->id;
 }
