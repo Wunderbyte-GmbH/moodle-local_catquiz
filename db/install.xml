@@ -249,7 +249,7 @@
         <INDEX NAME="attemptid" UNIQUE="false" FIELDS="attemptid"/>
       </INDEXES>
     </TABLE>
-    <TABLE NAME="local_catquiz_question_hashmap" COMMENT="Maps questions between instances using hashes">
+    <TABLE NAME="local_catquiz_qhashmap" COMMENT="Maps questions between instances using hashes">
       <FIELDS>
         <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
         <FIELD NAME="questionid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="Local question ID"/>
@@ -266,7 +266,7 @@
         <INDEX NAME="questionhash" UNIQUE="false" FIELDS="questionhash"/>
       </INDEXES>
     </TABLE>
-    <TABLE NAME="local_catquiz_remote_responses" COMMENT="Stores responses from remote instances">
+    <TABLE NAME="local_catquiz_rresponses" COMMENT="Stores responses from remote instances">
       <FIELDS>
         <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
         <FIELD NAME="questionhash" TYPE="char" LENGTH="64" NOTNULL="true" SEQUENCE="false" COMMENT="Matches questionhash in question_hashmap"/>
