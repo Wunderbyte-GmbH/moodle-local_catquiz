@@ -21,4 +21,20 @@ jobs:
 
       - name: Make API Request to ERPNext
         run: |
-          curl -X POST -H "Content-Type: application/json" -H "Authorization: ${{ secrets.WEBHOOK_TOKEN }}" -d @payload.json https://erp.wunderbyte.at/api/resource/Task
+          response=$(curl -X POST \
+            -H "Content-Type: application/json" \
+            -H "Authorization: ${{ secrets.WEBHOOK_TOKEN }}" \
+            -d @payload.json \
+            -w "\n%{http_code}" \
+            https://erp.wunderbyte.at/api/resource/Task)
+
+          http_code=$(echo "$response" | tail -n1)
+          body=$(echo "$response" | sed '$d')
+
+          echo "Response body: $body"
+          echo "Status code: $http_code"
+
+          if [ "$http_code" -lt 200 ] || [ "$http_code" -ge 300 ]; then
+            echo "API call failed with status code $http_code"
+            exit 1
+          fi
