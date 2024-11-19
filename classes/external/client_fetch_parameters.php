@@ -26,6 +26,7 @@ use external_function_parameters;
 use external_single_structure;
 use external_value;
 use external_multiple_structure;
+use local_catquiz\catcontext;
 use local_catquiz\catscale;
 use local_catquiz\data\dataapi;
 use local_catquiz\local\model\model_item_param;
@@ -226,13 +227,28 @@ class client_fetch_parameters extends external_api {
             }
 
             try {
-                $itemrecord = new \stdClass();
-                $itemrecord->componentid = $questionid;
-                $itemrecord->componentname = 'question';
-                $itemrecord->catscaleid = $scalemapping[$param->scalelabel];
-                $itemrecord->contextid = $newcontext->id;
-                $itemrecord->status = LOCAL_CATQUIZ_TESTITEM_STATUS_ACTIVE;
-                $itemid = $DB->insert_record('local_catquiz_items', $itemrecord);
+                // If there is no entry yet for the given scale and component: insert with new contextid.
+                // Otherwise: update with new contextid.
+                $existing = $DB->get_record(
+                    'local_catquiz_items',
+                    ['componentid' => $questionid, 'catscaleid' => $scalemapping[$param->scalelabel]]
+                );
+
+                if ($existing) {
+                    $itemrecord = $existing;
+                    $itemrecord->contextid = $newcontext->id;
+                    $itemid = $existing->id;
+                    $DB->update_record('local_catquiz_items', $itemrecord);
+                } else {
+                    $itemrecord = new \stdClass();
+                    $itemrecord->componentid = $questionid;
+                    $itemrecord->componentname = 'question';
+                    $itemrecord->catscaleid = $scalemapping[$param->scalelabel];
+                    $itemrecord->contextid = $newcontext->id;
+                    $itemrecord->status = LOCAL_CATQUIZ_TESTITEM_STATUS_ACTIVE;
+                    $itemid = $DB->insert_record('local_catquiz_items', $itemrecord);
+                    // TODO: How to set the active model?
+                }
 
                 // Create and save the item parameter.
                 $record = (object)[
