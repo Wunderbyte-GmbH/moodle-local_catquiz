@@ -30,6 +30,7 @@ use local_catquiz\catcontext;
 use local_catquiz\data\dataapi;
 use local_catquiz\event\calculation_executed;
 use local_catquiz\event\calculation_skipped;
+use local_catquiz\local\model\model_strategy;
 use local_catquiz\task\adhoc_recalculate_cat_model_params;
 use local_catquiz\local\model\model_item_param_list;
 use local_catquiz\local\model\model_person_param_list;
