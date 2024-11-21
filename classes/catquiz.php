@@ -2663,4 +2663,66 @@ class catquiz {
             'complete',
         ];
     }
+
+    /**
+     * Move items from one context to another.
+     *
+     * For each item in the old context:
+     * 1. If there are item parameters in the new context, use the one with the highest status
+     * 2. Otherwise copy the active parameter from the old context
+     * 3. Update the item with the new context id and active parameter id
+     *
+     * @param int $newcontextid The ID of the context to move items to
+     * @param int $oldcontextid The ID of the context to move items from
+     * @return void
+     */
+    public function move_items_to_new_context(int $newcontextid, int $oldcontextid): void {
+        global $DB;
+
+        $oldactiveparams = [];
+        $oldparams = $DB->get_records('local_catquiz_itemparams', ['contextid' => $oldcontextid]);
+        foreach ($oldparams as $op) {
+            $oldactiveparams[$op->id] = $op;
+        }
+
+        // For each itemparam in the new context, get the one with the highest `status` value. If there a multiple, pick the first
+        // one.
+        $activeparams = [];
+        $itemparams = $DB->get_records(
+            'local_catquiz_itemparams',
+            ['contextid' => $newcontextid],
+            'componentid, id, componentid, status'
+        );
+        foreach ($itemparams as $ip) {
+            if (
+                !array_key_exists($ip->componentid, $activeparams)
+                || $activeparams[$ip->componentid]->status <= $ip->status
+            ) {
+                $activeparams[$ip->componentid] = $ip;
+            }
+        }
+
+        // Get all items of the old context so that we can update them.
+        // They all get the new contextid.
+        $items = $DB->get_records('local_catquiz_items', ['contextid' => $oldcontextid]);
+        foreach ($items as $item) {
+            $item->contextid = $newcontextid;
+            if (array_key_exists($item->componentid, $activeparams)) {
+                $ip = $activeparams[$item->componentid];
+                $item->activeparamid = $ip->id;
+                $ip->itemid = $item->id;
+                $DB->update_record('local_catquiz_itemparams', $ip);
+            } else {
+                // Otherwise: Should we copy the param from the previous context?
+                $copiedparam = $oldactiveparams[$item->activeparamid];
+                $copiedparam->contextid = $newcontextid;
+                $now = time();
+                $copiedparam->timecreated = $now;
+                $copiedparam->timemodified = $now;
+                $copiedparamid = $DB->insert_record('local_catquiz_itemparams', $copiedparam, true);
+                $item->activeparamid = $copiedparamid;
+            }
+            $DB->update_record('local_catquiz_items', $item);
+        }
+    }
 }
