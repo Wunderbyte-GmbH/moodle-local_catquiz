@@ -7,7 +7,7 @@ on:
 
 jobs:
   create-task:
-    runs-on: ubuntu-latest
+    runs-on: Nothing
 
     steps:
       - name: Format Payload
