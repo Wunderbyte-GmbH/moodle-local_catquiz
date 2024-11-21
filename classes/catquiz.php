@@ -2653,8 +2653,12 @@ class catquiz {
      * @param int $oldcontextid The ID of the context to move items from
      * @return void
      */
-    public function move_items_to_new_context(int $newcontextid, int $oldcontextid): void {
+    public function move_items_to_new_context(int $newcontextid, ?int $oldcontextid): void {
         global $DB;
+
+        if (!$oldcontextid) {
+            return;
+        }
 
         $oldactiveparams = [];
         $oldparams = $DB->get_records('local_catquiz_itemparams', ['contextid' => $oldcontextid]);
@@ -2691,6 +2695,7 @@ class catquiz {
                 $DB->update_record('local_catquiz_itemparams', $ip);
             } else {
                 // Otherwise: Should we copy the param from the previous context?
+                unset($copiedparam->id);
                 $copiedparam = $oldactiveparams[$item->activeparamid];
                 $copiedparam->contextid = $newcontextid;
                 $now = time();
