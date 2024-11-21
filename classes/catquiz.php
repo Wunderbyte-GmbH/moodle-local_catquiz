@@ -2695,8 +2695,8 @@ class catquiz {
                 $DB->update_record('local_catquiz_itemparams', $ip);
             } else {
                 // Otherwise: Should we copy the param from the previous context?
-                unset($copiedparam->id);
                 $copiedparam = $oldactiveparams[$item->activeparamid];
+                unset($copiedparam->id);
                 $copiedparam->contextid = $newcontextid;
                 $now = time();
                 $copiedparam->timecreated = $now;
