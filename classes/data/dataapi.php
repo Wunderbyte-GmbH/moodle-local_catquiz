@@ -368,6 +368,13 @@ class dataapi {
             throw new moodle_exception('noidset', 'local_catquiz');
         }
 
+        $oldrecord = $DB->get_record('local_catquiz_catscales', ['id' => $catscale->id]);
+        // If the context of the scale was changed, we have to update the active item params.
+        if ($oldrecord->contextid != $catscale->contextid) {
+            $repo = new catquiz();
+            $repo->move_items_to_new_context($catscale->contextid, $oldrecord->contextid);
+        }
+
         $result = $DB->update_record('local_catquiz_catscales', $catscale);
 
         $context = context_system::instance();
