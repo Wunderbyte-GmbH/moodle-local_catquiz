@@ -98,7 +98,7 @@ const fetchParameters = async(centralHost) => {
             title: await getString('fetchparamheading', 'local_catquiz', centralHost),
             body: `<div class="text-center"><i class="fa fa-spinner fa-spin fa-2x"></i><p>${fetchMessage}</p></div>`,
             removeOnClose: true,
-            type: ModalFactory.types.DEFAULT
+            large: true
         });
         modal.show();
 
