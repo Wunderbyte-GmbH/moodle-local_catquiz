@@ -160,6 +160,7 @@ $string['catscaleidnotmatching'] = 'Scale with id {$a->catscaleid} was not found
 $string['catscales'] = 'Define catquiz CAT scales';
 $string['catscales:information'] = 'Define CAT scales: {$a->link}';
 $string['catscalesheading'] = 'CAT scales';
+$string['catscaleslabel_exists'] = 'The label (lowercase name) is already being used';
 $string['catscalesname_exists'] = 'The name is already being used';
 $string['catscaleupdatedtitle'] = 'A CAT scale was updated';
 $string['cattags'] = 'Manage course tags';

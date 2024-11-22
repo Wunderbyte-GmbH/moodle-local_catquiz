@@ -229,7 +229,8 @@ final class catcalc_test extends basic_testcase {
         $pcmgeneralizedparam = new model_item_param($itemid, 'pcmgeneralized', [], 4, $pcmgeneralizedrecord);
         $pcmparam = new model_item_param($itemid, 'pcm', [], 4, $pcmrecord);
 
-        $resp = new model_item_response($itemid, 1.0, new model_person_param('1', 1));
+        $personparam = new model_person_param('1', 1);
+        $resp = new model_item_response($itemid, 1.0, $personparam);
         $responses = [
             $itemid => $resp,
         ];
