@@ -1057,6 +1057,5 @@ ENDSQL;
         upgrade_plugin_savepoint(true, 2024111804, 'local', 'catquiz');
     }
 
-
     return true;
 }

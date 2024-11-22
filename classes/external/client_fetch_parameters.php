@@ -241,13 +241,13 @@ class client_fetch_parameters extends external_api {
                 // If there is no entry yet for the given scale and component:
                 // insert with new contextid. Otherwise: update with new
                 // contextid.
-                $existing = $repo->get_item_with_params(
+                $localparam = $repo->get_item_with_params(
                     $questionid,
                     $param->model,
                     $currentcontext
                 );
 
-                if (!$existing) {
+                if (!$localparam) {
                     // Insert only once per questionid.
                     if (!self::item_exists($questionid)) {
                         $itemrecord = new \stdClass();
@@ -266,15 +266,16 @@ class client_fetch_parameters extends external_api {
                 }
 
                 // If it did not change, we can skip it.
-                $changed = $param->difficulty != $existing->difficulty
-                    || $param->discrimination != $existing->discrimination
-                    || $param->json != $existing->json
-                    || $param->status != $existing->status;
+                $changed = !$localparam // This is a new model param we do not have locally.
+                    || !self::check_float_equal($param->difficulty, $localparam->difficulty)
+                    || !self::check_float_equal($param->discrimination, $localparam->discrimination)
+                    || $param->json != $localparam->json
+                    || $param->status != $localparam->status;
 
                 if (!$changed) {
                     continue;
                 }
-                $changedparams[] = ['old' => $existing, 'new' => $param];
+                $changedparams[] = ['old' => $localparam, 'new' => $param];
 
                 // If we are here, at least one parameter changed and we will
                 // later have to commit the transaction.
@@ -352,5 +353,18 @@ class client_fetch_parameters extends external_api {
 
         self::$existingitems[$questionid] = $existsforquestion;
         return $existsforquestion;
+    }
+
+    /**
+     * Checks if two float numbers are equal within a given precision.
+     *
+     * @param float $num1 First number to compare
+     * @param float $num2 Second number to compare
+     * @param int $precision Number of decimal places to check (default: 4)
+     *
+     * @return bool True if numbers are equal within precision, false otherwise
+     */
+    private static function check_float_equal(float $num1, float $num2, int $precision = 4) {
+        return abs($num1 - $num2) < pow(10, -1 * $precision);
     }
 }
