@@ -164,6 +164,7 @@ $string['catscaleidnotmatching'] = 'Skalen-ID {$a->catscaleid} wurde nicht in Da
 $string['catscales'] = 'CAT-Skalen verwalten';
 $string['catscales:information'] = 'Verwalte CAT-Skalen: {$a->link}';
 $string['catscalesheading'] = 'Skalen';
+$string['catscaleslabel_exists'] = 'Das Label wird bereits verwendet';
 $string['catscalesname_exists'] = 'Der Name wird bereits verwendet';
 $string['catscaleupdatedtitle'] = 'Eine CAT-Skala wurde aktualisiert';
 $string['cattags'] = 'Kurs Tags verwalten';

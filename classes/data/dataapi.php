@@ -411,6 +411,22 @@ class dataapi {
     }
 
     /**
+     * Check if label of catscale already exsists - must be unique
+     *
+     * @param string $label catscale label
+     *
+     * @return bool true if label already exists, false if not
+     */
+    public static function label_exists(string $label): bool {
+        global $DB;
+        if ($DB->record_exists('local_catquiz_catscales', ['label' => $label])) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    /**
      * Get catscale by ID
      * @param int $id catscale id
      * @return ?object

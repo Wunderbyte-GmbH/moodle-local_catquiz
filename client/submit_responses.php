@@ -27,7 +27,6 @@ require_once($CFG->libdir . '/adminlib.php');
 
 // Basic security checks.
 require_login();
-// require_capability('local/catquiz:submit_responses', context_system::instance());
 
 // Setup page.
 $PAGE->set_context(context_system::instance());
