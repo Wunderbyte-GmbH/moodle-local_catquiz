@@ -68,6 +68,9 @@ class catscale_structure {
     /** @var ?int $depth */
     public ?int $depth = null;
 
+    /** @var string $label Internal identifier that is also used for syncing */
+    public string $label;
+
     /**
      * Constructor for a single catscale data object.
      *
@@ -86,6 +89,7 @@ class catscale_structure {
             $this->timemodified = $data['timemodified'] ?? 0;
             $this->timecreated = $data['timecreated'] ?? 0;
             $this->name = $data['name'];
+            $this->label = $data['label'] ?? strtolower($data['name']);
             $this->description = $data['description'] ?? '';
 
             if (array_key_exists('parentid', $data) && $data['parentid'] == 0) {
