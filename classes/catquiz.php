@@ -2590,9 +2590,40 @@ class catquiz {
     }
 
     /**
+     * Retrieve an item together with its parameters.
+     *
+     * @param int $componentid The ID of the component.
+     * @param string $model The model of the item parameter
+     * @param int $contextid The context of the item parameter.
+     *
+     * @return ?stdClassThe record object retrieved from the database or null if not found.
+     */
+    public function get_item_with_params(int $componentid, string $model, int $contextid): ?stdClass {
+        global $DB;
+
+        $sql = <<<SQL
+                SELECT *
+                FROM {local_catquiz_items} i
+                JOIN {local_catquiz_itemparams} ip ON ip.itemid = i.id
+                    AND ip.contextid = :contextid
+                WHERE i.componentid = :componentid
+                    AND ip.model = :model
+SQL;
+        return $DB->get_record_sql(
+            $sql,
+            [
+                'componentid' => $componentid,
+                'model' => $model,
+                'contextid' => $contextid,
+            ]
+        ) ?: null;
+    }
+
+    /**
      * Update an item record in the 'local_catquiz_items' table.
      *
      * @param stdClass $item The item object containing the updated data.
+     *
      * @return void
      */
     public static function update_item(stdClass $item): void {
@@ -2668,13 +2699,22 @@ class catquiz {
 
         // For each itemparam in the new context, get the one with the highest `status` value. If there a multiple, pick the first
         // one.
+        // Problem: as it is now, we always select one of the new params.
+        // What if a param was not changed and should still be the active one?
+        // If "rasch" exists in both the old and new context, we ALWAYS take the new one.
+        // BUT: we want to include e.g. "raschbirnbaum" if it exists just in the old context.
         $activeparams = [];
-        $itemparams = $DB->get_records(
-            'local_catquiz_itemparams',
-            ['contextid' => $newcontextid],
-            'componentid, id, componentid, status'
-        );
-        foreach ($itemparams as $ip) {
+        $tocopy = [];
+        $toupdate = [];
+        $transaction = $DB->start_delegated_transaction();
+        $mergedparams = $this->merge_params($oldcontextid, $newcontextid);
+        foreach ($mergedparams as $ip) {
+            // Mark parameters we want to keep from the previous copy as 'to copy'.
+            if ($ip->contextid == $oldcontextid) {
+                $tocopy[$ip->componentid][] = $ip;
+            } else {
+                $toupdate[$ip->componentid][] = $ip;
+            }
             if (
                 !array_key_exists($ip->componentid, $activeparams)
                 || $activeparams[$ip->componentid]->status <= $ip->status
@@ -2688,13 +2728,23 @@ class catquiz {
         $items = $DB->get_records('local_catquiz_items', ['contextid' => $oldcontextid]);
         foreach ($items as $item) {
             $item->contextid = $newcontextid;
-            if (array_key_exists($item->componentid, $activeparams)) {
-                $ip = $activeparams[$item->componentid];
-                $item->activeparamid = $ip->id;
-                $ip->itemid = $item->id;
-                $DB->update_record('local_catquiz_itemparams', $ip);
+            // If we have no item param for this item, skip it.
+            if (!array_key_exists($item->componentid, $activeparams)) {
+                continue;
+            }
+            $activeparam = $activeparams[$item->componentid];
+            $activemodel = null;
+
+            // Update the activeparam property.
+            // If it is a newly synced param, make them point to each other.
+            if ($activeparam->contextid == $newcontextid) {
+                $item->activeparamid = $activeparam->id;
+                $activeparam->itemid = $item->id;
+                $DB->update_record('local_catquiz_itemparams', $activeparam);
+                $activemodel = $activeparam->model;
             } else {
                 // Otherwise: Should we copy the param from the previous context?
+                // This could be more than one, or?
                 $copiedparam = $oldactiveparams[$item->activeparamid];
                 unset($copiedparam->id);
                 $copiedparam->contextid = $newcontextid;
@@ -2703,8 +2753,82 @@ class catquiz {
                 $copiedparam->timemodified = $now;
                 $copiedparamid = $DB->insert_record('local_catquiz_itemparams', $copiedparam, true);
                 $item->activeparamid = $copiedparamid;
+                $activemodel = $copiedparam->model;
             }
             $DB->update_record('local_catquiz_items', $item);
+
+            // Now we copy the old non-active params.
+            foreach ($tocopy[$item->componentid] as $old) {
+                // Skip the parameter that has already been copied.
+                if ($old->model == $activemodel) {
+                    continue;
+                }
+                $now = time();
+                $copied = $old;
+                $copied->timecreated = $now;
+                $copied->timemodified = $now;
+                $copied->contextid = $newcontextid;
+                $DB->insert_record('local_catquiz_itemparams', $copied);
+            }
+
+            // And now we set the correct itemid for the new, non-active params.
+            foreach ($toupdate[$item->componentid] as $upd) {
+                if ($upd->model == $activemodel) {
+                    continue;
+                }
+                $upd->itemid = $item->id;
+                $upd->timemodified = time();
+                $DB->update_record('local_catquiz_itemparams', $upd);
+            }
         }
+        $DB->commit_delegated_transaction($transaction);
+    }
+
+    /**
+     * Merges item parameters from two contexts.
+     *
+     * When a parameter exists in both contexts for the same itemid/model combination,
+     * the parameter from the new context is chosen. When it exists in only one context,
+     * it is included in the result. There can be at most one parameter per (itemid, model, contextid)
+     * combination.
+     *
+     * @param int $oldcontextid The ID of the old context
+     * @param int $newcontextid The ID of the new context
+     *
+     * @return array Array of merged item parameters
+     */
+    public function merge_params(int $oldcontextid, int $newcontextid): array {
+        global $DB;
+
+        // First get all parameters from both contexts.
+        [$contextsql, $contextparams] = $DB->get_in_or_equal(
+            [$oldcontextid, $newcontextid],
+            SQL_PARAMS_NAMED
+        );
+
+        $params = $DB->get_records_select(
+            'local_catquiz_itemparams',
+            "contextid $contextsql",
+            $contextparams
+        );
+
+        // Group parameters by itemid and model.
+        $grouped = [];
+        foreach ($params as $param) {
+            $key = "{$param->componentid}_{$param->model}";
+
+            // If key doesn't exist, add this param.
+            if (!isset($grouped[$key])) {
+                $grouped[$key] = $param;
+                continue;
+            }
+
+            // If param is from new context, it always wins.
+            if ($param->contextid == $newcontextid) {
+                $grouped[$key] = $param;
+            }
+        }
+
+        return array_values($grouped);
     }
 }

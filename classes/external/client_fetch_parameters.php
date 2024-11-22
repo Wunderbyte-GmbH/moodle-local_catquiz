@@ -27,6 +27,7 @@ use external_single_structure;
 use external_value;
 use external_multiple_structure;
 use local_catquiz\catcontext;
+use local_catquiz\catquiz;
 use local_catquiz\catscale;
 use local_catquiz\data\dataapi;
 use local_catquiz\local\model\model_item_param;
@@ -40,6 +41,12 @@ use local_catquiz\remote\hash\question_hasher;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class client_fetch_parameters extends external_api {
+
+    /**
+     * Internal helper to check if an item exists already in the new context.
+     * @var array
+     */
+    private static array $existingitems = [];
 
     /**
      * Returns description of method parameters.
@@ -91,6 +98,8 @@ class client_fetch_parameters extends external_api {
         $warnings = [];
         $stored = 0;
         $errors = 0;
+        $newparams = [];
+        $changedparams = [];
 
         $scale = $DB->get_record('local_catquiz_catscales', ['id' => $params['scaleid']], '*', MUST_EXIST);
         if (!$scale) {
@@ -99,6 +108,7 @@ class client_fetch_parameters extends external_api {
         if (!$scale->label) {
             throw new \moodle_exception('scalehasnolabel', 'local_catquiz', '', $params['scaleid']);
         }
+        $currentcontext = catscale::get_context_id($scale->id);
 
         // Create a mapping of catscale labels to IDs.
         $scalemapping = [];
@@ -192,6 +202,10 @@ class client_fetch_parameters extends external_api {
             false
         );
 
+        $repo = new catquiz();
+        $haschanged = false;
+        $transaction = $DB->start_delegated_transaction();
+
         // Store the received parameters.
         foreach ($result->parameters as $param) {
             $questionid = $hashmap[$param->questionhash] ?? null;
@@ -200,7 +214,6 @@ class client_fetch_parameters extends external_api {
                     'item' => $param->questionhash,
                     'warning' => get_string('noquestionhashmatch', 'local_catquiz'),
                 ];
-                $errors++;
                 continue;
             }
 
@@ -209,7 +222,6 @@ class client_fetch_parameters extends external_api {
                     'item' => $param->questionhash,
                     'warning' => 'Missing scale label',
                 ];
-                $errors++;
                 continue;
             }
 
@@ -222,33 +234,51 @@ class client_fetch_parameters extends external_api {
                         (object) ['remotelabel' => $param->scalelabel]
                     ),
                 ];
-                $errors++;
                 continue;
             }
 
             try {
-                // If there is no entry yet for the given scale and component: insert with new contextid.
-                // Otherwise: update with new contextid.
-                $existing = $DB->get_record(
-                    'local_catquiz_items',
-                    ['componentid' => $questionid, 'catscaleid' => $scalemapping[$param->scalelabel]]
+                // If there is no entry yet for the given scale and component:
+                // insert with new contextid. Otherwise: update with new
+                // contextid.
+                $existing = $repo->get_item_with_params(
+                    $questionid,
+                    $param->model,
+                    $currentcontext
                 );
 
-                if ($existing) {
-                    $itemrecord = $existing;
-                    $itemrecord->contextid = $newcontext->id;
-                    $itemid = $existing->id;
-                    $DB->update_record('local_catquiz_items', $itemrecord);
-                } else {
-                    $itemrecord = new \stdClass();
-                    $itemrecord->componentid = $questionid;
-                    $itemrecord->componentname = 'question';
-                    $itemrecord->catscaleid = $scalemapping[$param->scalelabel];
-                    $itemrecord->contextid = $newcontext->id;
-                    $itemrecord->status = LOCAL_CATQUIZ_TESTITEM_STATUS_ACTIVE;
-                    $itemid = $DB->insert_record('local_catquiz_items', $itemrecord);
-                    // TODO: How to set the active model?
+                if (!$existing) {
+                    // Insert only once per questionid.
+                    if (!self::item_exists($questionid)) {
+                        $itemrecord = new \stdClass();
+                        $itemrecord->componentid = $questionid;
+                        $itemrecord->componentname = 'question';
+                        $itemrecord->catscaleid = $scalemapping[$param->scalelabel];
+                        $itemrecord->contextid = $newcontext->id;
+                        $itemrecord->status = LOCAL_CATQUIZ_TESTITEM_STATUS_ACTIVE;
+                        $itemid = $DB->insert_record(
+                            'local_catquiz_items',
+                            $itemrecord
+                        );
+                        self::$existingitems[$questionid] = true;
+                    }
+                    $newparams[] = ['item' => $itemrecord, 'param' => $param];
                 }
+
+                // If it did not change, we can skip it.
+                $changed = $param->difficulty != $existing->difficulty
+                    || $param->discrimination != $existing->discrimination
+                    || $param->json != $existing->json
+                    || $param->status != $existing->status;
+
+                if (!$changed) {
+                    continue;
+                }
+                $changedparams[] = ['old' => $existing, 'new' => $param];
+
+                // If we are here, at least one parameter changed and we will
+                // later have to commit the transaction.
+                $haschanged = true;
 
                 // Create and save the item parameter.
                 $record = (object)[
@@ -276,17 +306,51 @@ class client_fetch_parameters extends external_api {
             }
         }
 
+        // Only if we synced at least one parameter, commit the transaction to
+        // create a new context and update the item parameters.
+        if ($haschanged) {
+            $DB->commit_delegated_transaction($transaction);
+        }
+
         $duration = microtime(true) - $starttime;
 
         return [
-            'status' => $stored > 0,
+            'status' => $errors == 0,
             'message' => $stored > 0
-                ? get_string('fetchsuccess', 'local_catquiz', (object) ['num' => $stored, 'contextname' => $newcontext->name])
-                : get_string('fetchempty', 'local_catquiz'),
+            ? get_string(
+                'fetchsuccess',
+                'local_catquiz',
+                (object) ['num' => $stored, 'contextname' => $newcontext->name]
+            )
+            : get_string('fetchempty', 'local_catquiz'),
             'duration' => round($duration, 2),
             'synced' => $stored,
             'errors' => $errors,
             'warnings' => $warnings,
         ];
+    }
+
+    /**
+     * Internal helper to check if there is an item for that question
+     *
+     * @param int $questionid The questionid
+     *
+     * @return bool
+     */
+    private static function item_exists(int $questionid) {
+        global $DB;
+        if (array_key_exists($questionid, self::$existingitems)) {
+            return true;
+        }
+        // Insert only once per questionid.
+        $existsforquestion = $DB->record_exists(
+            'local_catquiz_items',
+            [
+                'componentid' => $questionid,
+            ]
+        );
+
+        self::$existingitems[$questionid] = $existsforquestion;
+        return $existsforquestion;
     }
 }
