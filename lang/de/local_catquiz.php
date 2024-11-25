@@ -287,7 +287,6 @@ $string['enrolementstringstartforfeedback'] = 'Auf Grundlage Ihres Ergebnisses s
 $string['enrolled_courses'] = 'Eingeschriebene Kurse';
 $string['enrolmentmessagetitle'] = 'Benachrichtigung über neue Kurseinschreibung(en) / Gruppenmitgliedschaft(en)';
 $string['error'] = 'Es ist ein Fehler aufgetreten';
-$string['errors'] = 'Fehler';
 $string['error:fraction0'] = 'Leider konnten wir aufgrund Ihrer Antworten kein zuverlässiges Ergebnis ermitteln.
     Wir würden uns freuen, wenn Sie es erneut versuchen.';
 $string['error:fraction1'] = 'Herzlichen Glückwunsch, Sie haben alle Fragen richtig beantwortet! Das ist wirklich großartig!
@@ -311,6 +310,7 @@ $string['errorhastobeint'] = 'Muss eine Ganzzahl sein';
 $string['errorminscalevalue'] = 'Der Minimalwert muss kleiner sein als der Maximalwert der Skala';
 $string['errornoitems'] = 'Für die angegebenen Settings kann das Quiz nicht ausgeführt werden. Bitte kontaktieren sie Ihren CAT Manager.';
 $string['errorrecordnotfound'] = 'Fehler mit der Datenbankabfrage. Der Datensatz wurde nicht gefunden.';
+$string['errors'] = 'Fehler';
 $string['errorupperlimitvalue'] = 'Oberes Limit muss kleiner als unteres Limit sein.';
 $string['estimatedbecause:allanswerscorrect'] = 'Sie haben alle Fragen richtig beantwortet! Toll! Leider konnten deshalb Ihre Ergebnisse nicht
     zuverlässig errechnet werden und wurden geschätzt.';
