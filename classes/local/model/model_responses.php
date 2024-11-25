@@ -149,7 +149,7 @@ class model_responses {
                     if (!$results) {
                         continue;
                     }
-                    $object->set($attemptid, $componentid, $results['fraction'], null, $mainscale, $results['userid']);
+                    $object->set($attemptid, $componentid, $results['fraction'], null, $mainscale);
                 }
             }
         }
@@ -294,8 +294,7 @@ class model_responses {
         string $itemid,
         float $response,
         ?model_person_param $personparam = null,
-        int $catscaleid = 0,
-        ?string $userid = null
+        int $catscaleid = 0
     ) {
         $oldresponse = 0.0;
         if (!empty($this->byitem[$itemid][$attemptid])) {
@@ -303,17 +302,17 @@ class model_responses {
         }
 
         if (!$personparam) {
-            $personparam = new model_person_param($userid, $catscaleid);
+            $personparam = new model_person_param($attemptid, $catscaleid);
         }
 
-        if (!array_key_exists($userid, $this->personparams)) {
-            $this->personparams[$userid] = $personparam;
+        if (!array_key_exists($attemptid, $this->personparams)) {
+            $this->personparams[$attemptid] = $personparam;
         }
 
-        $newresponse = new model_item_response($itemid, $response, $this->personparams[$userid]);
-        $this->byperson[$userid][$itemid] = $newresponse;
-        $this->sumbyperson[$userid] = array_key_exists($userid, $this->sumbyperson)
-            ? $this->sumbyperson[$userid] + ($response - $oldresponse)
+        $newresponse = new model_item_response($itemid, $response, $this->personparams[$attemptid]);
+        $this->byperson[$attemptid][$itemid] = $newresponse;
+        $this->sumbyperson[$attemptid] = array_key_exists($attemptid, $this->sumbyperson)
+            ? $this->sumbyperson[$attemptid] + ($response - $oldresponse)
             : $response;
         $this->byattempt[$attemptid][$itemid] = $newresponse;
         $this->sumbyattempt[$attemptid] = array_key_exists($attemptid, $this->sumbyattempt)
@@ -325,11 +324,11 @@ class model_responses {
             : $response;
 
         // If the user has only correct or incorrect answers and is not excluded -> exclude.
-        $excludeuser = $this->sumbyperson[$userid] == 0 || $this->sumbyperson[$userid] == count($this->byperson[$userid]);
+        $excludeuser = $this->sumbyperson[$attemptid] == 0 || $this->sumbyperson[$attemptid] == count($this->byperson[$attemptid]);
         if ($excludeuser) {
-            $this->excludedusers[$userid] = true;
+            $this->excludedusers[$attemptid] = true;
         } else {
-            unset($this->excludedusers[$userid]);
+            unset($this->excludedusers[$attemptid]);
         }
 
         // If the attempt has only correct or incorrect answers and is not excluded -> exclude.
