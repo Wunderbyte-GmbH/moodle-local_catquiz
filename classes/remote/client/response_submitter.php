@@ -16,8 +16,6 @@
 
 namespace local_catquiz\remote\client;
 
-defined('MOODLE_INTERNAL') || die();
-
 use local_catquiz\remote\hash\question_hasher;
 use curl;
 use local_catquiz\catcontext;

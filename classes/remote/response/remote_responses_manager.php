@@ -21,6 +21,11 @@ use stdClass;
 
 /**
  * Manages response data from remote instances.
+ *
+ * @package    local_catquiz
+ * @copyright  2024 Wunderbyte GmbH
+ * @author     David Szkiba
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class remote_responses_manager {
     /** @var string Table name for storing ID mappings. */
@@ -28,17 +33,18 @@ class remote_responses_manager {
 
     /**
      * Import and transform response data from remote instance.
+     *
      * @param stdClass $remotedata Data from remote instance
      * @param string $remotehostid Identifier of the remote host
      * @return model_responses
      */
     public function import_responses(stdClass $remotedata, string $remotehostid): model_responses {
-        // First, ensure we have mappings for all IDs
+        // First, ensure we have mappings for all IDs.
         $useridmappings = $this->ensure_user_mappings($remotedata->byperson, $remotehostid);
         $itemidmappings = $this->ensure_item_mappings($remotedata->byitem, $remotehostid);
         $attemptidmappings = $this->ensure_attempt_mappings($remotedata->byattempt, $remotehostid);
 
-        // Transform the data using our mappings
+        // Transform the data using our mappings.
         $transformeddata = $this->transform_data($remotedata, $useridmappings, $itemidmappings, $attemptidmappings);
 
         return model_responses::create_from_transfer($transformeddata);
@@ -46,6 +52,7 @@ class remote_responses_manager {
 
     /**
      * When sending results back, convert local IDs back to remote IDs.
+     *
      * @param model_responses $responses Local responses
      * @param string $remotehostid Remote host identifier
      * @return stdClass Data with original remote IDs
@@ -53,12 +60,12 @@ class remote_responses_manager {
     public function prepare_for_return(model_responses $responses, string $remotehostid): stdClass {
         $data = $responses->export_for_transfer();
 
-        // Fetch reverse mappings
+        // Fetch reverse mappings.
         $useridmappings = $this->get_reverse_mappings('user', $remotehostid);
         $itemidmappings = $this->get_reverse_mappings('item', $remotehostid);
         $attemptidmappings = $this->get_reverse_mappings('attempt', $remotehostid);
 
-        // Transform back to original IDs
+        // Transform back to original IDs.
         return $this->transform_data($data, $useridmappings, $itemidmappings, $attemptidmappings);
     }
 
@@ -82,7 +89,7 @@ class remote_responses_manager {
             if ($existing) {
                 $mappings[$remoteuserid] = $existing->localid;
             } else {
-                // Create new local user or map to existing one
+                // Create new local user or map to existing one.
                 $localid = $this->create_or_map_user($remoteuserid);
                 $DB->insert_record(self::MAPPING_TABLE, [
                     'remoteid' => $remoteuserid,
