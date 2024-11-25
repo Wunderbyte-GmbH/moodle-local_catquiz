@@ -187,7 +187,7 @@ class updatepersonability extends preselect_task {
             return result::ok($context);
         }
 
-        $this->arrayresponses = $this->userresponses->get_for_user($context['userid']);
+        $this->arrayresponses = $this->userresponses->get_for_user($context['attemptid']);
 
         $this->parentability = $this->get_initial_ability();
         $this->initialse = $this->set_initial_standarderror();
