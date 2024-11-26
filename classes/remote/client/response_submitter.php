@@ -19,7 +19,9 @@ namespace local_catquiz\remote\client;
 use local_catquiz\remote\hash\question_hasher;
 use curl;
 use local_catquiz\catcontext;
+use local_catquiz\catquiz;
 use local_catquiz\catscale;
+use local_catquiz\local\model\model_person_param_list;
 use local_catquiz\local\model\model_responses;
 
 /**
@@ -47,15 +49,16 @@ class response_submitter {
      *
      * @param string $centralhost The central host URL
      * @param string $token The web service token
-     * @param int $scaleid The scale that will be synchronized
+     * @param string $scalelabel The label of the scale that will be synchronized
      * @param ?int $contextid The context to use. If left out, will be the context used by the scale.
      * @return self
      */
-    public function __construct(string $centralhost, string $token, int $scaleid, ?int $contextid = null) {
+    public function __construct(string $centralhost, string $token, string $scalelabel, ?int $contextid = null) {
+        global $DB;
         $this->centralhost = rtrim($centralhost, '/');
         $this->token = $token;
-        $this->scaleid = $scaleid;
-        $this->contextid = $contextid ?? catscale::return_catscale_object($scaleid)->contextid;
+        $this->scaleid = $DB->get_record('local_catquiz_catscales', ['label' => $scalelabel], 'id')->id;
+        $this->contextid = $contextid ?? catscale::return_catscale_object($this->scaleid)->contextid;
     }
 
     /**
@@ -95,8 +98,8 @@ class response_submitter {
                     $responses[] = [
                         'questionhash' => $hash,
                         'fraction' => $response['fraction'],
-                        'remoteuserid' => $userid,
-                        'timestamp' => $response['timestamp'],
+                        'attemptid' => $attemptid,
+                        'ability' => $response['ability']
                     ];
                 }
             }
@@ -161,16 +164,23 @@ class response_submitter {
      * @return array Array of response objects
      */
     private function get_response_data() {
-        global $DB;
+        global $CFG, $DB;
         $catscaleids = [$this->scaleid, ...catscale::get_subscale_ids($this->scaleid)];
-        $contextid = $DB->get_field('local_catquiz_catscales', 'contextid', ['id' => $this->scaleid]);
-        $responsedata = model_responses::create_for_context($contextid);
-        // This is a placeholder - you'll provide the actual implementation.
-        // The expected return format should be an array of objects with:
-        // - questionid
-        // - response (the actual response data)
-        // - userid
-        // - timecreated
-        return $responsedata;
+        // TODO: Should the user be able to select a context to submit responses? Should it be the context of the selected scale?
+        $contextid = 20;
+        [$sql, $params] = catquiz::get_sql_for_model_input($contextid, $catscaleids, null, null, false, $this->scaleid);
+        $data = $DB->get_records_sql($sql, $params);
+        $instancename = parse_url($CFG->wwwroot, PHP_URL_HOST);
+        $counter = 0;
+        foreach ($data as $uniqueid => $response) {
+            $data[$counter++] = [
+                'questionhash' => question_hasher::generate_hash($response->questionid),
+                'attemptid' => crc32($instancename . $response->attemptid),
+                'ability' => $response->ability,
+                'fraction' => $response->fraction,
+            ];
+            unset($data[$uniqueid]);
+        }
+        return $response;
     }
 }
