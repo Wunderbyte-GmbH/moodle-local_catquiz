@@ -141,9 +141,9 @@ if ($hassiteconfig) {
         PARAM_ALPHANUM
     ));
     $settings->add(new admin_setting_configtext(
-        'local_catquiz/central_scale',
-        get_string('central_scale', 'local_catquiz'),
-        get_string('central_scale_desc', 'local_catquiz'),
+        'local_catquiz/sync_scale',
+        get_string('sync_scale', 'local_catquiz'),
+        get_string('sync_scale_desc', 'local_catquiz'),
         PARAM_INT
     ));
 }
