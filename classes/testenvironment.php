@@ -644,4 +644,13 @@ class testenvironment {
         $cache->set($hashedkey, $numquestions);
         return $numquestions;
     }
+
+    /**
+     * Retrieves the context ID.
+     *
+     * @return int|null The context ID or null if not set.
+     */
+    public function get_contextid() {
+        return $this->contextid;
+    }
 }
