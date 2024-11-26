@@ -54,7 +54,7 @@ class client_fetch_parameters extends external_api {
      */
     public static function execute_parameters() {
         return new external_function_parameters([
-            'scaleid' => new external_value(PARAM_INT, 'ID of the scale to sync')
+            'scaleid' => new external_value(PARAM_INT, 'ID of the scale to sync'),
         ]);
     }
 
@@ -74,16 +74,17 @@ class client_fetch_parameters extends external_api {
                     'item' => new external_value(PARAM_TEXT, 'Item identifier'),
                     'warning' => new external_value(PARAM_TEXT, 'Warning message'),
                 ])
-            )
+            ),
         ]);
     }
 
     /**
      * Fetch and store item parameters from central instance.
-     * @param int $scalelabel Label of the scale to sync
+     * @param int $scaleid ID of the scale to sync
+     *
      * @return array Status and result information
      */
-    public static function execute(string $scaleid) {
+    public static function execute(int $scaleid) {
         global $DB, $CFG;
 
         // Parameter validation.

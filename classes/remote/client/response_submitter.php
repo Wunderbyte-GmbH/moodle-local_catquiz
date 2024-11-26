@@ -85,7 +85,10 @@ class response_submitter {
                     try {
                         $hash = question_hasher::generate_hash($qid);
                     } catch (\Exception $e) {
-                        debugging('Error generating hash for question ' . $response->questionid . ': ' . $e->getMessage(), DEBUG_DEVELOPER);
+                        debugging(
+                            'Error generating hash for question ' . $response->questionid . ': ' . $e->getMessage(),
+                            DEBUG_DEVELOPER
+                        );
                         continue;
                     }
 

@@ -16,8 +16,6 @@
 
 namespace local_catquiz\remote\hash;
 
-defined('MOODLE_INTERNAL') || die();
-
 /**
  * Handles question hash generation and verification.
  *

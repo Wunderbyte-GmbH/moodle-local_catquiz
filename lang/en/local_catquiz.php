@@ -168,6 +168,7 @@ $string['cattags'] = 'Manage course tags';
 $string['cattags:information'] = 'These tags identify courses that teachers can enroll students in, regardless of whether they are part of the course.';
 $string['central_host'] = 'Compute instance';
 $string['central_host_desc'] = 'The host that will perform parameter calculations. E.g. https://www.example.com';
+$string['syncbutton'] = 'Fetch item parameters'
 $string['sync_scale'] = 'Label of the CAT scale to sync';
 $string['sync_scale_desc'] = 'TODO: autocomplate - now string. Parameters of this scale will be synced with the compute instance';
 $string['central_token'] = 'Token to access compute instance';

@@ -61,9 +61,9 @@ class submit_responses extends external_api {
                     'questionhash' => new external_value(PARAM_TEXT, 'Hash of the question'),
                     'fraction' => new external_value(PARAM_TEXT, 'Response fraction value'),
                     'remoteuserid' => new external_value(PARAM_INT, 'User ID from remote instance'),
-                    'timestamp' => new external_value(PARAM_TEXT, 'Unix timestamp of the response')
+                    'timestamp' => new external_value(PARAM_TEXT, 'Unix timestamp of the response'),
                 ])
-            )
+            ),
         ]);
     }
 
@@ -80,9 +80,9 @@ class submit_responses extends external_api {
                 new external_single_structure([
                     'questionhash' => new external_value(PARAM_TEXT, 'Hash of the question'),
                     'status' => new external_value(PARAM_BOOL, 'Individual response status'),
-                    'message' => new external_value(PARAM_TEXT, 'Individual response message')
+                    'message' => new external_value(PARAM_TEXT, 'Individual response message'),
                 ])
-            )
+            ),
         ]);
     }
 
@@ -130,7 +130,7 @@ class submit_responses extends external_api {
                 $results[] = [
                     'questionhash' => $response['questionhash'],
                     'status' => $success,
-                    'message' => $success ? 'Success' : 'Failed to store response'
+                    'message' => $success ? 'Success' : 'Failed to store response',
                 ];
 
                 if (!$success) {
@@ -141,7 +141,7 @@ class submit_responses extends external_api {
                 $results[] = [
                     'questionhash' => $response['questionhash'],
                     'status' => false,
-                    'message' => $e->getMessage()
+                    'message' => $e->getMessage(),
                 ];
                 $overallstatus = false;
             }
@@ -150,7 +150,7 @@ class submit_responses extends external_api {
         return [
             'status' => $overallstatus,
             'message' => $overallstatus ? 'All responses processed successfully' : 'Some responses failed',
-            'responses' => $results
+            'responses' => $results,
         ];
     }
 
