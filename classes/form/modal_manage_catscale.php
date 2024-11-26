@@ -202,7 +202,7 @@ class modal_manage_catscale extends dynamic_form {
             $errors['name'] = get_string('catscalesname_exists', 'local_catquiz');
         }
 
-        if ($data['id'] === 0 && dataapi::label_exists($data['label'])) {
+        if ($data['id'] === 0 && array_key_exists('label', $data) && dataapi::label_exists($data['label'])) {
             $errors['label'] = get_string('catscaleslabel_exists', 'local_catquiz');
         }
 
