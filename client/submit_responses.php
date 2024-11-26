@@ -56,7 +56,18 @@ if (optional_param('action', '', PARAM_ALPHA) === 'submit') {
     $result = $submission->submit_responses();
 
     if ($result->success) {
-        echo $OUTPUT->notification(get_string('submission_success', 'local_catquiz', $result->processed), 'success');
+        echo $OUTPUT->notification(
+            get_string(
+                'submission_success',
+                'local_catquiz',
+                (object)[
+                    'total' => $result->processed,
+                    'added' => $result->added,
+                    'skipped' => $result->skipped,
+                ]
+            ),
+            'success'
+        );
     } else {
         echo $OUTPUT->notification(get_string('submission_error', 'local_catquiz', $result->error), 'error');
     }

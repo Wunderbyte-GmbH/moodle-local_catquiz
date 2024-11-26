@@ -271,7 +271,7 @@
       <FIELDS>
         <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
         <FIELD NAME="questionhash" TYPE="char" LENGTH="64" NOTNULL="true" SEQUENCE="false" COMMENT="Matches questionhash in question_hashmap"/>
-        <FIELD NAME="remoteuserid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="User ID from remote instance"/>
+        <FIELD NAME="attempthash" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="CRC32 hash of source instance and attemptid"/>
         <FIELD NAME="response" TYPE="text" NOTNULL="true" SEQUENCE="false" COMMENT="The actual response data"/>
         <FIELD NAME="sourceurl" TYPE="char" LENGTH="255" NOTNULL="true" SEQUENCE="false" COMMENT="URL of the remote instance"/>
         <FIELD NAME="timecreated" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
