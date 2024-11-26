@@ -411,9 +411,15 @@ class testenvironment {
         $record->status = $this->status ?? $record->status;
         $record->parentid = $this->parentid ?? $record->parentid ?? 0;
         $record->courseid = $this->courseid ?? $record->courseid;
-        $record->contextid = $this->contextid
-            ?? $record->contextid
-            ?? $DB->get_field('local_catquiz_catscales', 'contextid', ['id' => $record->catscaleid]);
+
+        // Set the contextid only if this is a new test OR the scale was changed.
+        // New test: $record->contextid is empty. Scale changed: $record->contextid != $this->contextid.
+        if (
+            !$record->contextid
+            || ($this->catscaleid && $record->catscaleid && $this->catscaleid != $record->catscaleid)
+        ) {
+            $record->contextid = $DB->get_field('local_catquiz_catscales', 'contextid', ['id' => $record->catscaleid]);
+        }
 
         $now = time();
 
