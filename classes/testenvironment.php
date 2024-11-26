@@ -146,6 +146,13 @@ class testenvironment {
     private int $courseid;
 
     /**
+     * The context ID that was assigned to the scale when the test was created.
+     *
+     * @var ?int $contextid
+     */
+    private ?int $contextid;
+
+    /**
      * Testenvironment constructor.
      * @param stdClass $newrecord
      */
@@ -182,6 +189,7 @@ class testenvironment {
         $this->status = $record->status ?? LOCAL_CATQUIZ_STATUS_TEST_ACTIVE;
         $this->parentid = $record->parentid ?? 0;
         $this->courseid = $record->courseid ?? 0;
+        $this->contextid = $record->contextid ?? null;
     }
 
     /**
@@ -387,6 +395,7 @@ class testenvironment {
      *
      */
     private function update_object(stdClass &$record) {
+        global $DB;
 
         // If we have the record, we update everything, if there are new values. if not, we leave the old ones.
         $record->componentid = $this->componentid ?? $record->componentid;
@@ -402,6 +411,9 @@ class testenvironment {
         $record->status = $this->status ?? $record->status;
         $record->parentid = $this->parentid ?? $record->parentid ?? 0;
         $record->courseid = $this->courseid ?? $record->courseid;
+        $record->contextid = $this->contextid
+            ?? $record->contextid
+            ?? $DB->get_field('local_catquiz_catscales', 'contextid', ['id' => $record->catscaleid]);
 
         $now = time();
 
