@@ -685,6 +685,7 @@ $string['task_recalculate_cat_model_params'] = 'Recalculate CAT parameters';
 $string['teacherfeedback'] = 'Feedback for teachers';
 $string['templatetype'] = 'Template';
 $string['test'] = 'Test Subscription';
+$string['testcontext'] = 'Context of this test';
 $string['testinfolabel'] = 'Test information';
 $string['testitem'] = 'Testitem with id {$a}';
 $string['testitem_deleted'] = 'Testitem deleted';

@@ -71,7 +71,7 @@ class catquiz_handler {
      */
     public static function instance_form_definition(MoodleQuickForm &$mform) {
 
-        global $PAGE;
+        global $DB, $PAGE;
 
         $elements = [];
 
@@ -127,6 +127,17 @@ class catquiz_handler {
         $elements[] = $mform->addElement('header', 'catquiz_header',
                 get_string('catquizsettings', 'local_catquiz'));
         $mform->setExpanded('catquiz_header');
+
+        if ($selectedcontext = optional_param('contextid', 0, PARAM_INT)) {
+            if ($name = $DB->get_field('local_catquiz_catcontext', 'name', ['id' => $selectedcontext])) {
+                $elements[] = $mform->addElement(
+                    'static',
+                    'selectedcontext',
+                    get_string('testcontext', 'local_catquiz'),
+                    $name
+                );
+            }
+        }
 
         // Question categories or tags to use for this quiz.
 
@@ -295,6 +306,7 @@ class catquiz_handler {
             // Pass on the values as stdClass.
             $test = new testenvironment($cattest);
             $test->apply_jsonsaved_values($formdefaultvalues);
+            $_POST['contextid'] = $test->get_contextid() ?? 0;
 
             self::write_variables_to_post($formdefaultvalues);
 

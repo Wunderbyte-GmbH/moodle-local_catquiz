@@ -703,6 +703,7 @@ $string['task_recalculate_cat_model_params'] = 'CAT Parameter neu berechnen';
 $string['teacherfeedback'] = 'Feedback für Lehrende';
 $string['templatetype'] = 'Template';
 $string['test'] = 'Teste Abos';
+$string['testcontext'] = 'CAT Kontext von diesem Test';
 $string['testinfolabel'] = 'Testinformation';
 $string['testitem'] = 'Frage mit ID {$a}';
 $string['testitem_deleted'] = 'Frage gelöscht';
