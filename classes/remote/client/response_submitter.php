@@ -71,54 +71,25 @@ class response_submitter {
 
         // Get the response data.
 
-        $responsedata = $this->get_response_data();
-        if (empty($responsedata)) {
+        $responses = $this->get_response_data();
+        if (empty($responses)) {
             return (object)[
                 'success' => false,
                 'error' => 'No responses to submit',
             ];
         }
 
-        // Prepare the data for submission.
-        $responses = [];
-        foreach ($responsedata as $attemptid => $components) {
-            foreach ($components as $component => $userresponses) {
-                foreach ($userresponses as $qid => $response) {
-                    // Generate hash for the question.
-                    try {
-                        $hash = question_hasher::generate_hash($qid);
-                    } catch (\Exception $e) {
-                        debugging(
-                            'Error generating hash for question ' . $response->questionid . ': ' . $e->getMessage(),
-                            DEBUG_DEVELOPER
-                        );
-                        continue;
-                    }
-
-                    $responses[] = [
-                        'questionhash' => $hash,
-                        'fraction' => $response['fraction'],
-                        'attemptid' => $attemptid,
-                        'ability' => $response['ability']
-                    ];
-                }
-            }
-        }
-
-        if (empty($responses)) {
-            return (object)[
-                'success' => false,
-                'error' => 'No valid responses to submit',
-            ];
-        }
-
         // Prepare the web service call.
+        // Just for testing
+        $this->centralhost = 'https://192.168.56.6';
+        $this->token = 'ce911aa8a7c13889223178b7f728bec6';
+
         $serverurl = $this->centralhost . '/webservice/rest/server.php';
         $params = [
             'wstoken' => $this->token,
             'wsfunction' => 'local_catquiz_submit_catquiz_responses',
             'moodlewsrestformat' => 'json',
-            'responses' => $responses,
+            'jsondata' => json_encode($responses),
         ];
 
         // Make the web service call.
@@ -147,6 +118,9 @@ class response_submitter {
             return (object)[
                 'success' => true,
                 'processed' => count($responses),
+                'added' => $result->added,
+                'skipped' => $result->skipped,
+                'errors' => $result->errors,
             ];
         } catch (\Exception $e) {
             debugging('Error submitting responses: ' . $e->getMessage(), DEBUG_DEVELOPER);
@@ -177,10 +151,11 @@ class response_submitter {
                 'questionhash' => question_hasher::generate_hash($response->questionid),
                 'attemptid' => crc32($instancename . $response->attemptid),
                 'ability' => $response->ability,
-                'fraction' => $response->fraction,
+                // TODO: get confirmation: Should 'gaveup' questions have a fraction of 0?
+                'fraction' => $response->fraction ?? 0,
             ];
             unset($data[$uniqueid]);
         }
-        return $response;
+        return $data;
     }
 }

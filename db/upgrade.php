@@ -1098,5 +1098,18 @@ ENDSQL;
         upgrade_plugin_savepoint(true, 2024112601, 'local', 'catquiz');
     }
 
+    if ($oldversion < 2024112800) {
+        // Rename field remoteuserid on table local_catquiz_rresponses to attempthash.
+        $table = new xmldb_table('local_catquiz_rresponses');
+        $field = new xmldb_field('remoteuserid');
+        $field->set_attributes(XMLDB_TYPE_INTEGER, 10);
+
+        // Launch rename field attempthash.
+        $dbman->rename_field($table, $field, 'attempthash');
+
+        // Catquiz savepoint reached.
+        upgrade_plugin_savepoint(true, 2024112800, 'local', 'catquiz');
+    }
+
     return true;
 }
