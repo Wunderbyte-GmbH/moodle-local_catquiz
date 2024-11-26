@@ -1954,7 +1954,7 @@ class catquiz {
         int $catscaleid,
         int $userid
         ): array {
-        global $DB;
+        global $DB, $COURSE;
 
         try {
             $catscale = catscale::return_catscale_object($catscaleid);
@@ -1968,6 +1968,7 @@ class catquiz {
         foreach ($coursestoenrol as $catscaleid => $data) {
             $message = $data['show_message'] ?? false;
             $courseids = $data['course_ids'] ?? [];
+            array_push($courseids, $COURSE->id);
             foreach ($courseids as $courseid) {
                 $context = \context_course::instance($courseid);
                 $course = get_course($courseid);
