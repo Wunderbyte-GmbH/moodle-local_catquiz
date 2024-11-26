@@ -39,6 +39,8 @@ use core_external\external_multiple_structure;
 use core_external\external_single_structure;
 use core_external\external_value;
 use invalid_parameter_exception;
+use local_catquiz\remote\response\response_handler;
+use UnexpectedValueException;
 
 /**
  * External service for submitting CatQuiz responses.
@@ -56,14 +58,7 @@ class submit_responses extends external_api {
      */
     public static function execute_parameters() {
         return new external_function_parameters([
-            'responses' => new external_multiple_structure(
-                new external_single_structure([
-                    'questionhash' => new external_value(PARAM_TEXT, 'Hash of the question'),
-                    'fraction' => new external_value(PARAM_TEXT, 'Response fraction value'),
-                    'remoteuserid' => new external_value(PARAM_INT, 'User ID from remote instance'),
-                    'timestamp' => new external_value(PARAM_TEXT, 'Unix timestamp of the response'),
-                ])
-            ),
+            'jsondata' => new external_value(PARAM_RAW, 'JSON encoded array of response data'),
         ]);
     }
 
@@ -76,11 +71,13 @@ class submit_responses extends external_api {
         return new external_single_structure([
             'status' => new external_value(PARAM_BOOL, 'Status of the submission'),
             'message' => new external_value(PARAM_TEXT, 'Status message'),
-            'responses' => new external_multiple_structure(
+            'added' => new external_value(PARAM_INT, 'Responses that were newly added'),
+            'skipped' => new external_value(PARAM_INT, 'Responses that were skipped because they were already present'),
+            'errors' => new external_multiple_structure(
                 new external_single_structure([
                     'questionhash' => new external_value(PARAM_TEXT, 'Hash of the question'),
-                    'status' => new external_value(PARAM_BOOL, 'Individual response status'),
-                    'message' => new external_value(PARAM_TEXT, 'Individual response message'),
+                    'attempthash' => new external_value(PARAM_INT, 'The attempt hash'),
+                    'message' => new external_value(PARAM_TEXT, 'Message that describes the error'),
                 ])
             ),
         ]);
@@ -89,12 +86,26 @@ class submit_responses extends external_api {
     /**
      * Submit responses for CatQuiz.
      *
-     * @param array $responses The array of response data
+     * @param string $jsondata The response data as json-encoded string
      * @return array The status and processed responses
      */
-    public static function execute($responses) {
+    public static function execute($jsondata) {
         // Parameter validation.
-        $params = self::validate_parameters(self::execute_parameters(), ['responses' => $responses]);
+        // Decode the JSON string into an array.
+        $decodeddata = json_decode($jsondata, true);
+
+        if (json_last_error() !== JSON_ERROR_NONE) {
+            throw new invalid_parameter_exception('Invalid JSON data provided: ' . json_last_error_msg());
+        }
+
+        // Validate each response has required fields.
+        foreach ($decodeddata as $response) {
+            if (!isset($response['questionhash'], $response['attemptid'], $response['fraction'], $response['ability'])) {
+                throw new invalid_parameter_exception('Each response must contain questionhash, attemptid, fraction and ability');
+            }
+        }
+
+        $responsedata = $decodeddata;
 
         // Context validation.
         $context = context_system::instance();
@@ -103,11 +114,13 @@ class submit_responses extends external_api {
         // TODO: should we do an additional capability check?
         // Something like: require_capability('local/catquiz:submit_responses', $context); ?
 
-        $results = [];
+        $errors = [];
         $overallstatus = true;
         $sourceurl = self::get_remote_source_url();
+        $stored = 0;
+        $skipped = 0;
 
-        foreach ($params['responses'] as $response) {
+        foreach ($responsedata as $response) {
             try {
                 // Basic validation of the fraction value.
                 if (!is_numeric($response['fraction'])) {
@@ -120,27 +133,39 @@ class submit_responses extends external_api {
                 }
 
                 // Store the response using the response handler.
-                $success = \local_catquiz\remote\response\response_handler::store_response(
+                $res = \local_catquiz\remote\response\response_handler::store_response(
                     $response['questionhash'],
                     $response['fraction'],
                     $response['attemptid'],
                     $sourceurl
                 );
+                $success = $res != response_handler::RESPONSE_ERROR;
 
-                $results[] = [
-                    'questionhash' => $response['questionhash'],
-                    'status' => $success,
-                    'message' => $success ? 'Success' : 'Failed to store response',
-                ];
-
+                switch ($res) {
+                    case response_handler::RESPONSE_ERROR:
+                        $errors[] = [
+                            'questionhash' => $response['questionhash'],
+                            'attempthash' => $response['attemptid'],
+                            'message' => 'Response error',
+                        ];
+                        break;
+                    case response_handler::RESPONSE_STORED:
+                        $stored++;
+                        break;
+                    case response_handler::RESPONSE_EXISTS:
+                        $skipped++;
+                        break;
+                    default:
+                        throw new UnexpectedValueException(sprintf('Unexpected return code %s from store_response', $res));
+                }
                 if (!$success) {
                     $overallstatus = false;
                 }
 
             } catch (\Exception $e) {
-                $results[] = [
+                $errors[] = [
                     'questionhash' => $response['questionhash'],
-                    'status' => false,
+                    'attempthash' => $response['attemptid'],
                     'message' => $e->getMessage(),
                 ];
                 $overallstatus = false;
@@ -150,7 +175,9 @@ class submit_responses extends external_api {
         return [
             'status' => $overallstatus,
             'message' => $overallstatus ? 'All responses processed successfully' : 'Some responses failed',
-            'responses' => $results,
+            'added' => $stored,
+            'skipped' => $skipped,
+            'errors' => $errors,
         ];
     }
 

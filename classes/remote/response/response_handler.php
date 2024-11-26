@@ -26,31 +26,48 @@ use local_catquiz\remote\hash\question_hasher;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class response_handler {
+    /** @var int Response was successfully stored */
+    const RESPONSE_STORED = 1;
+    /** @var int Response already existed */
+    const RESPONSE_EXISTS = 2;
+    /** @var int Error storing response */
+    const RESPONSE_ERROR = 0;
     /**
      * Store a response from a remote instance.
      *
      * @param string $questionhash The question hash
      * @param string $fraction The response fraction
-     * @param int $remoteuserid The user ID from remote instance
+     * @param int $attempthash The hashed attemptid
      * @param string $sourceurl The source URL
      * @return bool Success status
      */
-    public static function store_response($questionhash, $fraction, $remoteuserid, $sourceurl) {
+    public static function store_response($questionhash, $fraction, $attempthash, $sourceurl) {
         global $DB;
 
-        $record = new \stdClass();
-        $record->questionhash = $questionhash;
-        $record->response = $fraction; // We store the fraction in the response field.
-        $record->remoteuserid = $remoteuserid;
-        $record->sourceurl = $sourceurl;
-        $record->timecreated = time();
-
         try {
+            // Check if response already exists
+            $existing = $DB->get_record('local_catquiz_rresponses', [
+                'questionhash' => $questionhash,
+                'attempthash' => $attempthash,
+                'sourceurl' => $sourceurl,
+            ]);
+
+            if ($existing) {
+                return self::RESPONSE_EXISTS;
+            }
+
+            $record = new \stdClass();
+            $record->questionhash = $questionhash;
+            $record->response = $fraction; // We store the fraction in the response field.
+            $record->attempthash = $attempthash;
+            $record->sourceurl = $sourceurl;
+            $record->timecreated = time();
+
             $DB->insert_record('local_catquiz_rresponses', $record);
-            return true;
+            return self::RESPONSE_STORED;
         } catch (\Exception $e) {
             debugging('Error storing remote response: ' . $e->getMessage(), DEBUG_DEVELOPER);
-            return false;
+            return self::RESPONSE_ERROR;
         }
     }
 
@@ -63,12 +80,14 @@ class response_handler {
     public static function process_responses($batchsize = 100) {
         global $DB;
 
-        $responses = $DB->get_records('local_catquiz_rresponses',
+        $responses = $DB->get_records(
+            'local_catquiz_rresponses',
             ['timeprocessed' => null],
             'timecreated ASC',
             '*',
             0,
-            $batchsize);
+            $batchsize
+        );
 
         $results = ['processed' => 0, 'errors' => 0];
 
