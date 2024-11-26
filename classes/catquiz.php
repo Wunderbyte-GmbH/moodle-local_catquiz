@@ -554,7 +554,13 @@ class catquiz {
      * @return array
      *
      */
-    public static function get_sql_for_model_input($contextid, array $catscaleids, ?int $testitemid, ?int $userid, bool $joinitems = false) {
+    public static function get_sql_for_model_input(
+        $contextid,
+        array $catscaleids,
+        ?int $testitemid,
+        ?int $userid,
+        bool $joinitems = false
+    ) {
         global $DB;
         $testitemids = $testitemid ? [$testitemid] : [];
         $userids = $userid ? [$userid] : [];
@@ -2705,18 +2711,19 @@ SQL;
         ];
     }
 
-    /**
-     * Move items from one context to another.
-     *
-     * For each item in the old context:
-     * 1. If there are item parameters in the new context, use the one with the highest status
-     * 2. Otherwise copy the active parameter from the old context
-     * 3. Update the item with the new context id and active parameter id
-     *
-     * @param int $newcontextid The ID of the context to move items to
-     * @param int $oldcontextid The ID of the context to move items from
-     * @return void
-     */
+        /**
+         * Create items in a new context.
+         *
+         * For each item parameter in the new context:
+         * 1. Get the corresponding item from either context
+         * 2. If an item is in active use in the old context, create a new item (copy).
+         * 3. Otherwise update the existing item with new context and active parameter
+         * 4. Update all parameters to point to the correct item
+         *
+         * @param int $newcontextid The ID of the context to create items in
+         * @param ?int $oldcontextid The ID of the old context, if any
+         * @return void
+         */
     public function create_items_in_new_context(int $newcontextid, ?int $oldcontextid): void {
         global $DB;
 

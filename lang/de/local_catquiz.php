@@ -170,6 +170,7 @@ $string['cattags'] = 'Kurs Tags verwalten';
 $string['cattags:information'] = 'Diese Tags kennzeichnen Kurse, zu denen Nutzende einschreiben können, unabhängig davon, ob sie Teil des Kurses sind.';
 $string['central_host'] = 'Host der zentralen Berechnungsinstanz';
 $string['central_host_desc'] = 'Z.B. https://www.example.com';
+$string['syncbutton'] = 'Parameter abrufen';
 $string['sync_scale'] = 'Label der zu synchronisierenden CAT Skala';
 $string['sync_scale_desc'] = 'TODO: autocomplate - now string. Parameter dieser Skala werden mit der zentralen Berechnungsinstanz synchronisiert.';
 $string['central_token'] = 'Token zum Zugriff auf die zentrale Berechnungsinstanz';

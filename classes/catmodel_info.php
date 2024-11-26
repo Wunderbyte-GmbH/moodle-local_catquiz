@@ -66,11 +66,6 @@ class catmodel_info {
             $this->trigger_parameter_calculation($contextid, $catscaleid);
         }
 
-        //// Return the data that are currently saved in the DB.
-        //$context = catcontext::load_from_db($contextid);
-        //$strategy = $context->get_strategy($catscaleid);
-        //return $strategy->get_params_from_db($contextid, $catscaleid);
-
         $models = model_strategy::get_installed_models();
         $catscaleids = [$catscaleid, ...catscale::get_subscale_ids($catscaleid)];
         foreach (array_keys($models) as $modelname) {
