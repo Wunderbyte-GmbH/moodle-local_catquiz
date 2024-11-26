@@ -2655,7 +2655,6 @@ SQL;
     }
 
     /**
-     * TODO: Update this to use a separate contextid field in the tests table.
      * Check if a context is actively used by any test.
      *
      * @param int $contextid The context ID to check
@@ -2664,27 +2663,7 @@ SQL;
      */
     public static function is_active_context(int $contextid): bool {
         global $DB;
-
-        // Get all tests and their catscales from json.
-        $tests = $DB->get_records('local_catquiz_tests');
-
-        foreach ($tests as $test) {
-            $settings = json_decode($test->json);
-            if (!$settings || empty($settings->catquiz_catscales)) {
-                continue;
-            }
-
-            // Get the catscale ID from the test settings.
-            $catscaleid = intval($settings->catquiz_catscales);
-
-            // Check if this catscale uses the given context.
-            $scale = $DB->get_record('local_catquiz_catscales', ['id' => $catscaleid]);
-            if ($scale && $scale->contextid == $contextid) {
-                return true;
-            }
-        }
-
-        return false;
+        return $DB->record_exists('local_catquiz_tests', ['contextid' => $contextid]);
     }
 
     /**

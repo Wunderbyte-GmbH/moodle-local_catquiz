@@ -1057,5 +1057,46 @@ ENDSQL;
         upgrade_plugin_savepoint(true, 2024111804, 'local', 'catquiz');
     }
 
+    if ($oldversion < 2024112601) {
+        // Define field contextid to be added to local_catquiz_tests.
+        $table = new xmldb_table('local_catquiz_tests');
+        $field = new xmldb_field('contextid', XMLDB_TYPE_INTEGER, '10', null, null, null, null, 'catscaleid');
+
+        // Conditionally launch add field contextid.
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        // For each existing test, set the contextid that corresponds to the main scale of that test.
+        $tests = $DB->get_records('local_catquiz_tests');
+
+        foreach ($tests as $test) {
+            if (empty($test->json)) {
+                continue;
+            }
+
+            $testconfig = json_decode($test->json);
+            if (!$testconfig || !isset($testconfig->catquiz_catscales)) {
+                continue;
+            }
+
+            $scaleid = $testconfig->catquiz_catscales;
+            if (!$scaleid) {
+                continue;
+            }
+
+            // Get the contextid from the catscales table.
+            if ($scale = $DB->get_record('local_catquiz_catscales', ['id' => $scaleid])) {
+                if (!empty($scale->contextid)) {
+                    $test->contextid = $scale->contextid;
+                    $DB->update_record('local_catquiz_tests', $test);
+                }
+            }
+        }
+
+        // Catquiz savepoint reached.
+        upgrade_plugin_savepoint(true, 2024112601, 'local', 'catquiz');
+    }
+
     return true;
 }
