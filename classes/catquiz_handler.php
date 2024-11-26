@@ -891,7 +891,7 @@ class catquiz_handler {
         $cache = cache::make('local_catquiz', 'adaptivequizattempt');
         $cache->set('quizsettings', $quizsettings);
 
-        $catcontext = catscale::get_context_id($quizsettings->catquiz_catscales);
+        $catcontext = $testenvironment->get_contextid();
         $tsinfo = new info();
         $teststrategy = $tsinfo
             ->return_active_strategy($quizsettings->catquiz_selectteststrategy)
