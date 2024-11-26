@@ -126,7 +126,7 @@ class fetch_item_parameters extends external_api {
         try {
             // Get the scale from its label.
             $scale = $DB->get_record('local_catquiz_catscales', ['label' => $scalelabel], '*', MUST_EXIST);
-            // Get all relevant scale IDs (parent scale and subscales)
+            // Get all relevant scale IDs (parent scale and subscales).
             $catscaleids = [$scale->id, ...catscale::get_subscale_ids($scale->id)];
             // Get the latest context for this scale.
             $contextid = catscale::get_context_id($scale->id);

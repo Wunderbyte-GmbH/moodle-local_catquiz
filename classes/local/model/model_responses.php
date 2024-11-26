@@ -141,7 +141,6 @@ class model_responses {
      *
      */
     public static function create_from_array(array $data, int $mainscale = 0): self {
-        /** @var model_responses */
         $object = new self();
         foreach ($data as $attemptid => $components) {
             foreach ($components as $component) {
@@ -332,7 +331,8 @@ class model_responses {
         }
 
         // If the attempt has only correct or incorrect answers and is not excluded -> exclude.
-        $excludeattempt = $this->sumbyattempt[$attemptid] == 0 || $this->sumbyattempt[$attemptid] == count($this->byattempt[$attemptid]);
+        $excludeattempt = $this->sumbyattempt[$attemptid] == 0
+            || $this->sumbyattempt[$attemptid] == count($this->byattempt[$attemptid]);
         if ($excludeattempt) {
             $this->excludedattempts[$attemptid] = true;
         } else {
@@ -602,7 +602,7 @@ class model_responses {
     }
 
     public static function create_from_transfer(stdClass $transferdata): self {
-        // TODO: reconstruct
+        // TODO: reconstruct!
         return new self();
     }
 }

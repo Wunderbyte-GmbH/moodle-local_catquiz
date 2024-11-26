@@ -198,13 +198,10 @@ class catscaledashboard {
     /**
      * Renders sync button
      *
-     * @param mixed $contextid
-     *
      * @return string
-     *
      */
     private function render_syncbutton() {
-        $buttontitle = 'Sync'; // TODO: get_string('calculate', 'local_catquiz');.
+        $buttontitle = get_string('syncbutton', 'local_catquiz');
         return sprintf('<button class="btn btn-primary" type="button" id="sync_button">%s</button>', $buttontitle);
     }
 
@@ -219,7 +216,7 @@ class catscaledashboard {
     public function export_scaledetails(\renderer_base $output): array {
 
         $cm = new catmodel_info;
-        list($itemdifficulties, $personabilities) = $cm->get_context_parameters(
+        [$itemdifficulties, $personabilities] = $cm->get_context_parameters(
             $this->catcontextid,
             $this->catscaleid,
             $this->triggercalculation
