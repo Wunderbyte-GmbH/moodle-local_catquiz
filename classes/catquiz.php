@@ -1954,7 +1954,7 @@ class catquiz {
         int $catscaleid,
         int $userid
         ): array {
-        global $DB;
+        global $DB, $COURSE;
 
         try {
             $catscale = catscale::return_catscale_object($catscaleid);
@@ -1968,6 +1968,7 @@ class catquiz {
         foreach ($coursestoenrol as $catscaleid => $data) {
             $message = $data['show_message'] ?? false;
             $courseids = $data['course_ids'] ?? [];
+            array_push($courseids, $COURSE->id);
             foreach ($courseids as $courseid) {
                 $context = \context_course::instance($courseid);
                 $course = get_course($courseid);
@@ -1980,7 +1981,7 @@ class catquiz {
                 $coursedata['courseurl'] = $url->out() ?? "";
                 $coursedata['catscalename'] = $catscale->name ?? "";
 
-                if (!is_enrolled($context, $userid) && !empty($course)) {
+                if (!is_enrolled($context, $userid) && !empty($course) && ($courseid != $COURSE->id)) {
                     if (enrol_try_internal_enrol($courseid, $userid, $rolestudent->id)) {
                         $enrolementarray['course'][] = $coursedata;
                         self::course_enrolment_event($coursedata, $userid);
