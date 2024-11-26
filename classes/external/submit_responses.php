@@ -114,16 +114,16 @@ class submit_responses extends external_api {
                     throw new invalid_parameter_exception('Invalid fraction value for question ' . $response['questionhash']);
                 }
 
-                // Basic validation of the timestamp.
-                if (!is_numeric($response['timestamp'])) {
-                    throw new invalid_parameter_exception('Invalid timestamp for question ' . $response['questionhash']);
+                // Basic validation of the attemptid.
+                if (!is_numeric($response['attemptid'])) {
+                    throw new invalid_parameter_exception('Invalid attemptid for question ' . $response['questionhash']);
                 }
 
                 // Store the response using the response handler.
                 $success = \local_catquiz\remote\response\response_handler::store_response(
                     $response['questionhash'],
                     $response['fraction'],
-                    $response['remoteuserid'],
+                    $response['attemptid'],
                     $sourceurl
                 );
 

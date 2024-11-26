@@ -549,7 +549,8 @@ class catquiz {
      * @param array $catscaleids
      * @param ?int $testitemid
      * @param ?int $userid
-     * @param bool $joinitems
+     * @param bool $joinitems Join items
+     * @param int $joinability If given, join the ability of the scale with the given ID.
      *
      * @return array
      *
@@ -559,7 +560,8 @@ class catquiz {
         array $catscaleids,
         ?int $testitemid,
         ?int $userid,
-        bool $joinitems = false
+        bool $joinitems = false,
+        int $joinability = 0
     ) {
         global $DB;
         $testitemids = $testitemid ? [$testitemid] : [];
@@ -580,6 +582,19 @@ class catquiz {
             SQL;
         }
 
+        $joinabilitysql = "";
+        $abilityparams = [];
+        $selectability = "";
+        if ($joinability) {
+            $selectability = ", lcp.ability ability";
+            $abilityparams = ['scaleability' => $joinability];
+            $joinabilitysql = <<<SQL
+                JOIN {local_catquiz_personparams} lcp
+                    ON lcp.userid = qas.userid
+                    AND lcp.catscaleid = :scaleability
+            SQL;
+        }
+
         $selectlci = $joinitems ? "lci.id" : "'-'";
         $select = $DB->sql_concat("qas.id", "'-'", "qas.userid", "'-'", "q.id", "'-'", $selectlci);
         $sql = "SELECT $select uniqueid,
@@ -593,14 +608,16 @@ class catquiz {
             q.qtype,
             qas.timecreated,
             qa.questionusageid attemptid
+            $selectability
         FROM $from
         JOIN {question} q
             ON qa.questionid = q.id
         $joinitemssql
+        $joinabilitysql
         WHERE $where
         ";
 
-        return [$sql, array_merge($inparams, $params)];
+        return [$sql, array_merge($inparams, $params, $abilityparams)];
     }
 
     /**
