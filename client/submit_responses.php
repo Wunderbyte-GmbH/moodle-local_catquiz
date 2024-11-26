@@ -51,7 +51,7 @@ if (optional_param('action', '', PARAM_ALPHA) === 'submit') {
     $submission = new \local_catquiz\remote\client\response_submitter(
         $config->central_host,
         $config->central_token,
-        $config->central_scale
+        $config->sync_scale
     );
     $result = $submission->submit_responses();
 
