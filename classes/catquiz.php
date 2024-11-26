@@ -2632,6 +2632,39 @@ SQL;
     }
 
     /**
+     * TODO: Update this to use a separate contextid field in the tests table.
+     * Check if a context is actively used by any test.
+     *
+     * @param int $contextid The context ID to check
+     *
+     * @return bool True if the context is used by any test, false otherwise
+     */
+    public static function is_active_context(int $contextid): bool {
+        global $DB;
+
+        // Get all tests and their catscales from json.
+        $tests = $DB->get_records('local_catquiz_tests');
+
+        foreach ($tests as $test) {
+            $settings = json_decode($test->json);
+            if (!$settings || empty($settings->catquiz_catscales)) {
+                continue;
+            }
+
+            // Get the catscale ID from the test settings.
+            $catscaleid = intval($settings->catquiz_catscales);
+
+            // Check if this catscale uses the given context.
+            $scale = $DB->get_record('local_catquiz_catscales', ['id' => $catscaleid]);
+            if ($scale && $scale->contextid == $contextid) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
      * Returns all scales for the active contexts
      *
      * @return array
@@ -2684,101 +2717,66 @@ SQL;
      * @param int $oldcontextid The ID of the context to move items from
      * @return void
      */
-    public function move_items_to_new_context(int $newcontextid, ?int $oldcontextid): void {
+    public function create_items_in_new_context(int $newcontextid, ?int $oldcontextid): void {
         global $DB;
 
-        if (!$oldcontextid) {
-            return;
+        // Decide if we should just replace existing items with the new contextid or create new items.
+        $createnew = false;
+        if (!$oldcontextid || $this->is_active_context($oldcontextid)) {
+            $createnew = true;
         }
 
-        $oldactiveparams = [];
-        $oldparams = $DB->get_records('local_catquiz_itemparams', ['contextid' => $oldcontextid]);
-        foreach ($oldparams as $op) {
-            $oldactiveparams[$op->id] = $op;
+        $qid2item = [];
+        [$insql, $inparams] = $DB->get_in_or_equal([$oldcontextid, $newcontextid], SQL_PARAMS_NAMED, 'contextid');
+        foreach ($DB->get_records_select('local_catquiz_items', "contextid $insql", $inparams) as $i) {
+            $qid2item[$i->componentid] = $i;
         }
 
-        // For each itemparam in the new context, get the one with the highest `status` value. If there a multiple, pick the first
-        // one.
-        // Problem: as it is now, we always select one of the new params.
-        // What if a param was not changed and should still be the active one?
-        // If "rasch" exists in both the old and new context, we ALWAYS take the new one.
-        // BUT: we want to include e.g. "raschbirnbaum" if it exists just in the old context.
-        $activeparams = [];
-        $tocopy = [];
-        $toupdate = [];
+        $activeparam = [];
         $transaction = $DB->start_delegated_transaction();
-        $mergedparams = $this->merge_params($oldcontextid, $newcontextid);
-        foreach ($mergedparams as $ip) {
-            // Mark parameters we want to keep from the previous copy as 'to copy'.
-            if ($ip->contextid == $oldcontextid) {
-                $tocopy[$ip->componentid][] = $ip;
-            } else {
-                $toupdate[$ip->componentid][] = $ip;
+        $newparams = $DB->get_records('local_catquiz_itemparams', ['contextid' => $newcontextid]);
+        $qid2params = [];
+        foreach ($newparams as $np) {
+            $qid2params[$np->componentid][] = $np;
+        }
+
+        $tosave = [];
+
+        foreach ($newparams as $ip) {
+            $questionid = $ip->componentid;
+            $item = $qid2item[$questionid];
+
+            if ($createnew && $item->contextid == $oldcontextid) {
+                unset($item->id);
             }
+
+            // For each itemparam in the new context, get the one with the
+            // highest `status` value. If there a multiple, pick the first one.
             if (
-                !array_key_exists($ip->componentid, $activeparams)
-                || $activeparams[$ip->componentid]->status <= $ip->status
+                !array_key_exists($questionid, $activeparam)
+                || $ip->status > $activeparam[$questionid]->status
             ) {
-                $activeparams[$ip->componentid] = $ip;
+                $activeparam[$questionid] = $ip;
+                $item->activeparamid = $ip->id;
+                $tosave[$questionid] = $item;
             }
         }
 
-        // Get all items of the old context so that we can update them.
-        // They all get the new contextid.
-        $items = $DB->get_records('local_catquiz_items', ['contextid' => $oldcontextid]);
-        foreach ($items as $item) {
-            $item->contextid = $newcontextid;
-            // If we have no item param for this item, skip it.
-            if (!array_key_exists($item->componentid, $activeparams)) {
-                continue;
-            }
-            $activeparam = $activeparams[$item->componentid];
-            $activemodel = null;
-
-            // Update the activeparam property.
-            // If it is a newly synced param, make them point to each other.
-            if ($activeparam->contextid == $newcontextid) {
-                $item->activeparamid = $activeparam->id;
-                $activeparam->itemid = $item->id;
-                $DB->update_record('local_catquiz_itemparams', $activeparam);
-                $activemodel = $activeparam->model;
+        foreach ($tosave as $questionid => $item) {
+            if ($createnew && $item->contextid == $oldcontextid) {
+                $item->contextid = $newcontextid;
+                $itemid = $DB->insert_record('local_catquiz_items', $item, true);
             } else {
-                // Otherwise: Should we copy the param from the previous context?
-                // This could be more than one, or?
-                $copiedparam = $oldactiveparams[$item->activeparamid];
-                unset($copiedparam->id);
-                $copiedparam->contextid = $newcontextid;
-                $now = time();
-                $copiedparam->timecreated = $now;
-                $copiedparam->timemodified = $now;
-                $copiedparamid = $DB->insert_record('local_catquiz_itemparams', $copiedparam, true);
-                $item->activeparamid = $copiedparamid;
-                $activemodel = $copiedparam->model;
+                // This item is already in the database because it was 1)
+                // inserted when itemparams were fetched or 2) it existed
+                // already and will be udpated.
+                $item->contextid = $newcontextid;
+                $DB->update_record('local_catquiz_items', $item);
+                $itemid = $item->id;
             }
-            $DB->update_record('local_catquiz_items', $item);
-
-            // Now we copy the old non-active params.
-            foreach ($tocopy[$item->componentid] as $old) {
-                // Skip the parameter that has already been copied.
-                if ($old->model == $activemodel) {
-                    continue;
-                }
-                $now = time();
-                $copied = $old;
-                $copied->timecreated = $now;
-                $copied->timemodified = $now;
-                $copied->contextid = $newcontextid;
-                $DB->insert_record('local_catquiz_itemparams', $copied);
-            }
-
-            // And now we set the correct itemid for the new, non-active params.
-            foreach ($toupdate[$item->componentid] as $upd) {
-                if ($upd->model == $activemodel) {
-                    continue;
-                }
-                $upd->itemid = $item->id;
-                $upd->timemodified = time();
-                $DB->update_record('local_catquiz_itemparams', $upd);
+            foreach ($qid2params[$questionid] as $p) {
+                $p->itemid = $itemid;
+                $DB->update_record('local_catquiz_itemparams', $p, true);
             }
         }
         $DB->commit_delegated_transaction($transaction);

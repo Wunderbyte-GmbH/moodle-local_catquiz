@@ -372,7 +372,7 @@ class dataapi {
         // If the context of the scale was changed, we have to update the active item params.
         if ($oldrecord->contextid != $catscale->contextid) {
             $repo = new catquiz();
-            $repo->move_items_to_new_context($catscale->contextid, $oldrecord->contextid);
+            $repo->create_items_in_new_context($catscale->contextid, $oldrecord->contextid);
         }
 
         $result = $DB->update_record('local_catquiz_catscales', $catscale);
