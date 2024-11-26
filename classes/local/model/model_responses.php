@@ -103,6 +103,13 @@ class model_responses {
     private $userlimitcache = [];
 
     /**
+     * Keeps a mapping of userids to attempt IDs.
+     *
+     * @var array
+     */
+    private $userattempts = [];
+
+    /**
      * Return array of item ids.
      *
      * @return array
@@ -149,6 +156,7 @@ class model_responses {
                         continue;
                     }
                     $object->set($attemptid, $componentid, $results['fraction'], null, $mainscale);
+                    $object->map_attempt($results['userid'], $attemptid);
                 }
             }
         }
@@ -369,11 +377,18 @@ class model_responses {
      * Set person abilities from the given list
      *
      * @param model_person_param_list $pplist
+     * @param bool $byattempt If set to true, index the stored person params by attemptid instead of userid.
      * @return model_responses
      */
-    public function set_person_abilities(model_person_param_list $pplist): self {
+    public function set_person_abilities(model_person_param_list $pplist, bool $byattempt = false): self {
         foreach ($pplist as $pp) {
-            $this->personparams[$pp->get_userid()]->set_ability($pp->get_ability());
+            if ($byattempt) {
+                foreach ($this->userattempts[$pp->get_userid()] as $attemptid) {
+                    $this->personparams[$attemptid]->set_ability($pp->get_ability());
+                }
+            } else {
+                $this->personparams[$pp->get_userid()]->set_ability($pp->get_ability());
+            }
         }
         return $this;
     }
@@ -514,6 +529,16 @@ class model_responses {
         $data = $DB->get_records_sql($sql, $params);
         $inputdata = self::db_to_modelinput($data);
         return $inputdata;
+    }
+
+    private function map_attempt(int $userid, int $attemptid): self {
+        if (!array_key_exists($userid, $this->userattempts)) {
+            $this->userattempts[$userid] = [$attemptid => $attemptid];
+            return $this;
+        }
+
+        $this->userattempts[$userid][$attemptid] = $attemptid;
+        return $this;
     }
 
     /**
