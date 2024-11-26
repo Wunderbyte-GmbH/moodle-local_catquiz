@@ -96,7 +96,6 @@ class client_fetch_parameters extends external_api {
 
         $starttime = microtime(true);
         $warnings = [];
-        $stored = 0;
         $errors = 0;
         $newparams = [];
         $changedparams = [];
@@ -194,6 +193,7 @@ class client_fetch_parameters extends external_api {
         }
 
         $source = "Fetch from " . parse_url($centralurl, PHP_URL_HOST);
+        $transaction = $DB->start_delegated_transaction();
         $newcontext = dataapi::create_new_context_for_scale(
             $scale->id,
             $scale->name,
@@ -204,7 +204,7 @@ class client_fetch_parameters extends external_api {
 
         $repo = new catquiz();
         $haschanged = false;
-        $transaction = $DB->start_delegated_transaction();
+        $stored = 0;
 
         // Store the received parameters.
         foreach ($result->parameters as $param) {
@@ -272,14 +272,9 @@ class client_fetch_parameters extends external_api {
                     || $param->json != $localparam->json
                     || $param->status != $localparam->status;
 
-                if (!$changed) {
-                    continue;
+                if ($changed) {
+                    $changedparams[] = ['old' => $localparam ?? null, 'new' => $param];
                 }
-                $changedparams[] = ['old' => $localparam, 'new' => $param];
-
-                // If we are here, at least one parameter changed and we will
-                // later have to commit the transaction.
-                $haschanged = true;
 
                 // Create and save the item parameter.
                 $record = (object)[
@@ -309,7 +304,8 @@ class client_fetch_parameters extends external_api {
 
         // Only if we synced at least one parameter, commit the transaction to
         // create a new context and update the item parameters.
-        if ($haschanged) {
+        $countchanged = count($changedparams);
+        if (count($changedparams) > 0) {
             $DB->commit_delegated_transaction($transaction);
         }
 
@@ -317,7 +313,7 @@ class client_fetch_parameters extends external_api {
 
         return [
             'status' => $errors == 0,
-            'message' => $stored > 0
+            'message' => $countchanged > 0
             ? get_string(
                 'fetchsuccess',
                 'local_catquiz',
@@ -325,7 +321,7 @@ class client_fetch_parameters extends external_api {
             )
             : get_string('fetchempty', 'local_catquiz'),
             'duration' => round($duration, 2),
-            'synced' => $stored,
+            'synced' => $countchanged,
             'errors' => $errors,
             'warnings' => $warnings,
         ];
