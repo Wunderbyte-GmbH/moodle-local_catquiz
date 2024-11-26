@@ -1981,7 +1981,7 @@ class catquiz {
                 $coursedata['courseurl'] = $url->out() ?? "";
                 $coursedata['catscalename'] = $catscale->name ?? "";
 
-                if (!is_enrolled($context, $userid) && !empty($course)) {
+                if (!is_enrolled($context, $userid) && !empty($course) && ($courseid !== $COURSE->id)) {
                     if (enrol_try_internal_enrol($courseid, $userid, $rolestudent->id)) {
                         $enrolementarray['course'][] = $coursedata;
                         self::course_enrolment_event($coursedata, $userid);
