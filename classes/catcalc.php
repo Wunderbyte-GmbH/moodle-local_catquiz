@@ -126,7 +126,7 @@ class catcalc {
                 throw new \Exception(sprintf("The given model %s can not be used with the catcalc class", $item->get_model_name()));
             }
 
-            $jfuns[] = fn ($pp) => $model::log_likelihood_p($pp, $itemparams, $qresponse->get_response());
+            $jfuns[] = fn($pp) => $model::log_likelihood_p($pp, $itemparams, $qresponse->get_response());
             $hfuns[] = fn($pp) => $model::log_likelihood_p_p($pp, $itemparams, $qresponse->get_response());
         }
 
