@@ -264,7 +264,7 @@
         <KEY NAME="questionid" TYPE="foreign" FIELDS="questionid" REFTABLE="question" REFFIELDS="id"/>
       </KEYS>
       <INDEXES>
-        <INDEX NAME="questionhash" UNIQUE="false" FIELDS="questionhash"/>
+        <INDEX NAME="questionhash" UNIQUE="true" FIELDS="questionhash"/>
       </INDEXES>
     </TABLE>
     <TABLE NAME="local_catquiz_rresponses" COMMENT="Stores responses from remote instances">
@@ -284,6 +284,7 @@
       <INDEXES>
         <INDEX NAME="questionhash_sourceurl" UNIQUE="false" FIELDS="questionhash, sourceurl"/>
         <INDEX NAME="timeprocessed" UNIQUE="false" FIELDS="timeprocessed"/>
+        <INDEX NAME="questionhash" UNIQUE="true" FIELDS="questionhash"/>
       </INDEXES>
     </TABLE>
   </TABLES>
