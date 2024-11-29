@@ -22,6 +22,9 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+use local_catquiz\catscale;
+use local_catquiz\data\dataapi;
+use local_catquiz\event\calculation_executed;
 use local_catquiz\local\model\model_responses;
 use local_catquiz\local\model\model_strategy;
 
@@ -51,10 +54,41 @@ echo $OUTPUT->header();
 
 if (optional_param('action', '', PARAM_ALPHA) === 'submit') {
     $catscaleid = 51;
+    $catscale = catscale::return_catscale_object($catscaleid);
     try {
         $modelresponses = model_responses::create_from_remote_responses($catscaleid);
         $strategy = new model_strategy($modelresponses);
-        [$itemdiffs, $personabilities] = $strategy->run_estimation();
+        [$itemdifficulties, $personabilities] = $strategy->run_estimation();
+        $newcontext = dataapi::create_new_context_for_updated_parameters($catscale);
+        $updatedmodels = [];
+        foreach ($itemdifficulties as $modelname => $itemparamlist) {
+            $itemcounter = 0;
+            /** @var model_item_param_list $itemparamlist */
+            $itemparamlist
+                ->use_hashes()
+                ->convert_hashes_to_ids()
+                ->save_to_db($newcontext->id);
+            $itemcounter += count($itemparamlist->itemparams);
+            $model = get_string('pluginname', 'catmodel_' . $modelname);
+            $updatedmodels[$model] = $itemcounter;
+        }
+
+        $catscale->contextid = $newcontext->id;
+        dataapi::update_catscale($catscale);
+
+        $updatedmodelsjson = json_encode($updatedmodels);
+        // Trigger event.
+        $event = calculation_executed::create([
+            'context' => \context_system::instance(),
+            'userid' => $userid,
+            'other' => [
+                'catscaleid' => $catscaleid,
+                'contextid' => $contextid,
+                'userid' => $userid,
+                'updatedmodelsjson' => $updatedmodelsjson,
+            ],
+        ]);
+        $event->trigger();
 
         echo $OUTPUT->notification(
             'Created model_responses',
