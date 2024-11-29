@@ -481,7 +481,7 @@ class updatepersonability extends preselect_task implements wb_middleware {
         $abilitywascalculated = $this->ability_was_calculated($this->context['catscaleid'], false);
         // If we can not calculate or estimate the standard error, return a default value.
         if (!$abilitywascalculated) {
-            return calculate_sd_from_past_attempts();
+            return $this->calculate_sd_from_past_attempts();
         }
 
         // If possible, use the calculated ability. Otherwise, use the estimated one.
