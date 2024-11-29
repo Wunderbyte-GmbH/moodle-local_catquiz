@@ -274,6 +274,16 @@ class model_item_param {
     }
 
     /**
+     * Sets the component ID (e.g. question id).
+     *
+     * @return self
+     */
+    public function set_componentid(string $componentid): self {
+        $this->componentid = $componentid;
+        return $this;
+    }
+
+    /**
      * Return name of model.
      *
      * @return string
