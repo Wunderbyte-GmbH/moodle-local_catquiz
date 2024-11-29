@@ -233,6 +233,105 @@ class model_responses {
     }
 
     /**
+     * Reduce the responses so that there are no attempts with
+     * all-wrong/all-correct and no items with all-wrong/all-correct answers.
+     *
+     * This is an iterative pruning procedure:
+     * - Removing an attempt and all its associated responses can affect all associated questions.
+     * - Removing a question can affect all associated attempts.
+     *
+     * Therefore, pruning is done in an iterative manner until we reach a stable state.
+     *
+     * @return self
+     */
+    public function prune(): self {
+        $changes = true;
+
+        while ($changes) {
+            $changes = false;
+
+            // First check all attempts.
+            $attemptstoremove = array_keys($this->excludedattempts);
+            if (!empty($attemptstoremove)) {
+                $changes = true;
+                // Remove these attempts from all our data structures.
+                foreach ($attemptstoremove as $attemptid) {
+                    // Remove from byattempt and sumbyattempt.
+                    unset($this->byattempt[$attemptid]);
+                    unset($this->sumbyattempt[$attemptid]);
+                    unset($this->excludedattempts[$attemptid]);
+
+                    // Remove from byperson and sumbyperson.
+                    unset($this->byperson[$attemptid]);
+                    unset($this->sumbyperson[$attemptid]);
+
+                    // For each item this attempt had a response for, update the item sums.
+                    foreach ($this->byitem as $itemid => &$responses) {
+                        if (isset($responses[$attemptid])) {
+                            unset($responses[$attemptid]);
+                            $this->recalculate_item_sum($itemid);
+
+                            // Check if this item now needs to be excluded.
+                            if (
+                                empty($responses) ||
+                                $this->sumbyitem[$itemid] == 0 ||
+                                $this->sumbyitem[$itemid] == count($responses)
+                            ) {
+                                $this->excludeditems[$itemid] = true;
+                            }
+                        }
+                    }
+                }
+            }
+
+            // Then check all items.
+            $itemstoremove = array_keys($this->excludeditems);
+            if (!empty($itemstoremove)) {
+                $changes = true;
+                // Remove these items from all our data structures.
+                foreach ($itemstoremove as $itemid) {
+                    // Remove from byitem and sumbyitem.
+                    unset($this->byitem[$itemid]);
+                    unset($this->sumbyitem[$itemid]);
+                    unset($this->excludeditems[$itemid]);
+
+                    // For each attempt/person that had this item, update their sums.
+                    foreach ($this->byattempt as $attemptid => &$responses) {
+                        if (isset($responses[$itemid])) {
+                            unset($responses[$itemid]);
+                            // If an attempt now has all correct/incorrect answers, mark it for exclusion.
+                            if (!empty($responses)) {
+                                $sum = array_sum(array_map(fn($r) => $r->get_response(), $responses));
+                                if ($sum == 0 || $sum == count($responses)) {
+                                    $this->excludedattempts[$attemptid] = true;
+                                }
+                            }
+                        }
+                    }
+
+                    // Do the same for byperson.
+                    foreach ($this->byperson as $personid => &$responses) {
+                        if (isset($responses[$itemid])) {
+                            unset($responses[$itemid]);
+                            if (!empty($responses)) {
+                                $this->recalculate_person_sum($personid);
+                                if (
+                                    $this->sumbyperson[$personid] == 0 ||
+                                    $this->sumbyperson[$personid] == count($responses)
+                                ) {
+                                    $this->excludedusers[$personid] = true;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        return $this;
+    }
+
+    /**
      * Remove responses from items that are not in the given list
      *
      * @param array $itemids Array of item IDs.
