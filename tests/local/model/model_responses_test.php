@@ -25,7 +25,7 @@
 
 namespace local_catquiz\local\model;
 
-use basic_testcase;
+use advanced_testcase;
 use SebastianBergmann\RecursionContext\InvalidArgumentException;
 use PHPUnit\Framework\ExpectationFailedException;
 
@@ -35,7 +35,7 @@ use PHPUnit\Framework\ExpectationFailedException;
  * @package local_catquiz
  * @covers \local_catquiz\local\model\model_item_param_list
  */
-final class model_responses_test extends basic_testcase {
+final class model_responses_test extends advanced_testcase {
     /**
      * Tests if reducing the model_responses to items or persons works as expected
      *
@@ -162,5 +162,55 @@ final class model_responses_test extends basic_testcase {
         $this->assertEquals(1.2, $response1->get_personparams()->get_ability());
         $this->assertEquals(1.2, $response2->get_personparams()->get_ability());
         $this->assertEquals(1.2, $response3->get_personparams()->get_ability());
+    }
+
+    /**
+     * Test creating responses from remote responses table
+     */
+    public function test_create_from_remote_responses() {
+                global $DB;
+                $this->resetAfterTest(true);
+
+                // Create some test data.
+                $testdata = [
+                    [
+                        'questionhash' => 'q1hash',
+                        'attempthash' => '4082047844',
+                        'response' => 1.0,
+                    ],
+                    [
+                        'questionhash' => 'q2hash',
+                        'attempthash' => '4082047844',
+                        'response' => 0.0,
+                    ],
+                    [
+                        'questionhash' => 'q1hash',
+                        'attempthash' => '1831571143',
+                        'response' => 0.5,
+                    ],
+                ];
+
+                // Insert test data into remote responses table.
+                foreach ($testdata as $data) {
+                    $DB->insert_record('local_catquiz_rresponses', $data);
+                }
+
+                // Test the method.
+                $responses = model_responses::create_from_remote_responses();
+
+                // Verify the responses were loaded correctly.
+                $this->assertEquals(1.0, $responses->get_item_response_for_person('q1hash', '4082047844'));
+                $this->assertEquals(0.0, $responses->get_item_response_for_person('q2hash', '4082047844'));
+                $this->assertEquals(0.5, $responses->get_item_response_for_person('q1hash', '1831571143'));
+
+                // Test item IDs are correct.
+                $expecteditemids = ['q1hash', 'q2hash'];
+                $actualitemids = $responses->get_item_ids();
+                $this->assertEquals(sort($expecteditemids), sort($actualitemids));
+
+                // Test person IDs are correct.
+                $expectedpersonids = ['4082047844', '1831571143'];
+                $actualpersonids = $responses->get_person_ids();
+                $this->assertEquals(sort($expectedpersonids), sort($actualpersonids));
     }
 }
