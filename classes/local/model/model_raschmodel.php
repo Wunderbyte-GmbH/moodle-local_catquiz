@@ -305,7 +305,7 @@ abstract class model_raschmodel extends model_model implements catcalc_item_esti
         ?model_item_param_list $startvalues = null): model_item_param_list {
         $estimateditemparams = new model_item_param_list();
         $personids = $personparams->get_user_ids();
-        $filteredresponses = $responses->limit_to_users($personids, true)->get_item_response();
+        $filteredresponses = $responses->prune()->get_item_response();
         if (!$filteredresponses) {
             throw new moodle_exception('noresponsestoestimate', 'local_catquiz');
         }

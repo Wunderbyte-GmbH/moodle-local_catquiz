@@ -213,4 +213,108 @@ final class model_responses_test extends advanced_testcase {
                 $actualpersonids = $responses->get_person_ids();
                 $this->assertEquals(sort($expectedpersonids), sort($actualpersonids));
     }
+
+    /**
+     * Test that prune() correctly removes attempts and items with all correct/incorrect responses.
+     *
+     * Test data matrix (1.0 = correct, 0.0 = incorrect):
+     *
+     *            item1  item2  item3  item4  item5  item6  item7
+     * attempt1    1.0    0.0    1.0    -      -      -      -    (keep: mixed)
+     * attempt2    1.0    1.0     -     -      -      -      -    (remove: all correct)
+     * attempt3    0.0    0.0     -     -      -      -      -    (remove: all incorrect)
+     * attempt4     -      -      -    1.0    0.0     -      -    (keep: mixed)
+     * attempt5     -      -      -     -      -     1.0    0.0
+     * attempt6     -      -      -     -      -     1.0    0.0
+     * attempt7    0.0    1.0     -    0.0    1.0    1.0    0.0
+     *             mix    mix    1.0   mix    mix   1.0    0.0
+     *            (keep) (keep)       (keep) (keep) (rem)  (rem)
+     *
+     * @return void
+     */
+    public function test_prune(): void {
+        $this->resetAfterTest();
+
+        // Create a model_responses object with test data.
+        $responses = new model_responses();
+
+        // Set up test data.
+        // 1. Attempt with mixed responses (should be kept).
+        $responses->set('attempt1', 'item1', 1.0);
+        $responses->set('attempt1', 'item2', 0.0);
+        $responses->set('attempt1', 'item3', 1.0);
+
+        // 2. Attempt with all correct responses (should be removed).
+        $responses->set('attempt2', 'item1', 1.0);
+        $responses->set('attempt2', 'item2', 1.0);
+
+        // 3. Attempt with all incorrect responses (should be removed).
+        $responses->set('attempt3', 'item1', 0.0);
+        $responses->set('attempt3', 'item2', 0.0);
+
+        // 4. Another attempt with mixed responses (should be kept).
+        $responses->set('attempt4', 'item4', 1.0);
+        $responses->set('attempt4', 'item5', 0.0);
+
+        // 5. Item with all correct responses across attempts (should be removed).
+        $responses->set('attempt5', 'item6', 1.0);
+        $responses->set('attempt6', 'item6', 1.0);
+
+        // 6. Item with all incorrect responses across attempts (should be removed).
+        $responses->set('attempt5', 'item7', 0.0);
+        $responses->set('attempt6', 'item7', 0.0);
+
+        // 7. Attempt with mixed responses so that items 1 and 2 are kept even after attempts 2 and 3 were removed.
+        $responses->set('attempt7', 'item1', 0.0);
+        $responses->set('attempt7', 'item2', 1.0);
+        $responses->set('attempt7', 'item4', 0.0);
+        $responses->set('attempt7', 'item5', 1.0);
+
+        // Execute the prune operation.
+        $pruned = $responses->prune();
+
+        // Verify attempts with uniform responses are removed.
+        $this->assertNull(
+            $pruned->get_for_user('attempt2'),
+            'The attempt with all correct responses was not properly removed during pruning'
+        );
+        $this->assertNull(
+            $pruned->get_for_user('attempt3'),
+            'The attempt with all incorrect responses was not properly removed during pruning'
+        );
+
+        // Verify attempts with mixed responses are retained.
+        $this->assertNotNull(
+            $pruned->get_for_user('attempt1'),
+            'The attempt with mixed responses was incorrectly removed during pruning'
+        );
+        $this->assertNotNull(
+            $pruned->get_for_user('attempt4'),
+            'The attempt with mixed responses was incorrectly removed during pruning'
+        );
+
+        // Verify items with uniform responses are removed.
+        $this->assertNotContains(
+            'item6',
+            $pruned->get_item_ids(),
+            'The item with all correct responses was not properly removed during pruning'
+        );
+        $this->assertNotContains(
+            'item7',
+            $pruned->get_item_ids(),
+            'The item with all incorrect responses was not properly removed during pruning'
+        );
+
+        // Verify items with mixed responses are retained.
+        $this->assertContains(
+            'item1',
+            $pruned->get_item_ids(),
+            'The item with mixed responses was incorrectly removed during pruning'
+        );
+        $this->assertContains(
+            'item2',
+            $pruned->get_item_ids(),
+            'The item with mixed responses was incorrectly removed during pruning'
+        );
+    }
 }
