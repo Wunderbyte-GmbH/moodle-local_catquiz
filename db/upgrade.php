@@ -1111,19 +1111,19 @@ ENDSQL;
         upgrade_plugin_savepoint(true, 2024112800, 'local', 'catquiz');
     }
 
-    if ($oldversion < 2024112801) {
-
+    if ($oldversion < 2024112803) {
         // Define index questionhash (unique) to be added to local_catquiz_rresponses.
         $table = new xmldb_table('local_catquiz_rresponses');
-        $index = new xmldb_index('questionhash', XMLDB_INDEX_UNIQUE, ['questionhash']);
+        $index = new xmldb_index('questionhash', XMLDB_INDEX_NOTUNIQUE, ['questionhash']);
 
-        // Conditionally launch add index questionhash.
-        if (!$dbman->index_exists($table, $index)) {
-            $dbman->add_index($table, $index);
+        if ($dbman->index_exists($table, $index)) {
+            $dbman->drop_index($table, $index);
         }
 
+        $dbman->add_index($table, $index);
+
         // Catquiz savepoint reached.
-        upgrade_plugin_savepoint(true, 2024112801, 'local', 'catquiz');
+        upgrade_plugin_savepoint(true, 2024112803, 'local', 'catquiz');
     }
 
     return true;
