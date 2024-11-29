@@ -130,6 +130,13 @@ class updatepersonability extends preselect_task implements wb_middleware {
     private ?float $meanability = null;
 
     /**
+     * Stores the standard deviation of ability in case it is calculated
+     *
+     * @var ?float
+     */
+    private ?float $sdability = null;
+
+    /**
      * Stores the responses array with the last response flipped.
      *
      * @var array
@@ -473,8 +480,8 @@ class updatepersonability extends preselect_task implements wb_middleware {
     protected function set_initial_standarderror() {
         $abilitywascalculated = $this->ability_was_calculated($this->context['catscaleid'], false);
         // If we can not calculate or estimate the standard error, return a default value.
-        if (!$abilitywascalculated && !$this->meanability) {
-            return 1.0;
+        if (!$abilitywascalculated) {
+            return calculate_sd_from_past_attempts();
         }
 
         // If possible, use the calculated ability. Otherwise, use the estimated one.
@@ -539,6 +546,28 @@ class updatepersonability extends preselect_task implements wb_middleware {
         $mean = $sum / count($existingabilities);
         $this->meanability = $mean;
         return $mean;
+    }
+
+    /**
+     * Calculates Standard Deviation from past attempts.
+     * @return ?float
+     */
+    private function calculate_sd_from_past_attempts() {
+        $existingabilities = $this->get_existing_personparams();
+
+        if (count($existingabilities) < self::NUM_ESTIMATION_THRESHOLD) {
+            return 1.0;
+        } else {
+            $mean = $this->meanability ?? calculate_mean_from_past_attempts() ?? 0.0;
+        }
+
+        $sum = 0.0;
+        foreach ($existingabilities as $pp) {
+            $sum += floatval(($pp->ability - $mean) ** 2);
+        }
+        $sd = sqrt($sum / count($existingabilities));
+        $this->sdability = $sd;
+        return $sd;
     }
 
     /**
