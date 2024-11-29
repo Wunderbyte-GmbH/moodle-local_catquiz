@@ -39,6 +39,7 @@ use core_external\external_multiple_structure;
 use core_external\external_single_structure;
 use core_external\external_value;
 use invalid_parameter_exception;
+use local_catquiz\event\responses_added;
 use local_catquiz\remote\response\response_handler;
 use UnexpectedValueException;
 
@@ -90,6 +91,8 @@ class submit_responses extends external_api {
      * @return array The status and processed responses
      */
     public static function execute($jsondata) {
+        global $USER;
+
         // Parameter validation.
         // Decode the JSON string into an array.
         $decodeddata = json_decode($jsondata, true);
@@ -161,7 +164,6 @@ class submit_responses extends external_api {
                 if (!$success) {
                     $overallstatus = false;
                 }
-
             } catch (\Exception $e) {
                 $errors[] = [
                     'questionhash' => $response['questionhash'],
@@ -171,6 +173,19 @@ class submit_responses extends external_api {
                 $overallstatus = false;
             }
         }
+
+            // Trigger event.
+        $event = responses_added::create([
+            'context' => context_system::instance(),
+            'userid' => $USER->id,
+            'other' => [
+                'sourceurl' => $sourceurl,
+                'added' => $stored,
+                'skipped' => $skipped,
+                'errors' => count($errors),
+            ],
+        ]);
+        $event->trigger();
 
         return [
             'status' => $overallstatus,

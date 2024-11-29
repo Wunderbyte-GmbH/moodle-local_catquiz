@@ -592,6 +592,12 @@ $string['reportscale'] = 'Include scale for report';
 $string['requesttimeout'] = 'The connection request timed out before it could complete';
 $string['response'] = 'Response';
 $string['responsesbyusercharttitle'] = 'Total number of responses per person';
+$string['responses_added'] = 'New responses were submitted';
+$string['responses_added_desc'] = '{$a->sourceurl} submitted new responses. {$a->added} new responses were added, {$a->skipped} '
+    . 'were skipped and {$a->errors} errors occured';
+$string['responses_submitted'] = 'New responses were shared';
+$string['responses_submitted_desc'] = 'New responses were shared with central compute instance {$a->centralhost}. {$a->added} new '
+    . 'responses were added, {$a->skipped} were skipped and {$a->errors} errors occured';
 $string['rootscale:tooltiptitle'] = 'root scale {$a}';
 $string['scaledetailviewheading'] = 'Detailview of catscale {$a}';
 $string['scalehasnolabel'] = 'Scale has no label';

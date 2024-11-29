@@ -16,13 +16,12 @@
 
 namespace local_catquiz\remote\client;
 
+use context_system;
 use local_catquiz\remote\hash\question_hasher;
 use curl;
-use local_catquiz\catcontext;
 use local_catquiz\catquiz;
 use local_catquiz\catscale;
-use local_catquiz\local\model\model_person_param_list;
-use local_catquiz\local\model\model_responses;
+use local_catquiz\event\responses_submitted;
 
 /**
  * Handles submission of responses to central instance.
@@ -67,7 +66,7 @@ class response_submitter {
      * @return \stdClass Result object with success status and details
      */
     public function submit_responses() {
-        global $CFG;
+        global $USER;
 
         // Get the response data.
 
@@ -114,6 +113,19 @@ class response_submitter {
                     'error' => $result->message,
                 ];
             }
+
+            // Trigger event.
+            $event = responses_submitted::create([
+                'context' => context_system::instance(),
+                'userid' => $USER->id,
+                'other' => [
+                    'centralhost' => $this->centralhost,
+                    'added' => $result->added,
+                    'skipped' => $result->skipped,
+                    'errors' => count($result->errors),
+                ],
+            ]);
+            $event->trigger();
 
             return (object)[
                 'success' => true,
