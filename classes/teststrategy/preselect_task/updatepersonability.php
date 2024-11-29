@@ -557,9 +557,9 @@ class updatepersonability extends preselect_task implements wb_middleware {
 
         if (count($existingabilities) < self::NUM_ESTIMATION_THRESHOLD) {
             return 1.0;
-        } else {
-            $mean = $this->meanability ?? calculate_mean_from_past_attempts() ?? 0.0;
         }
+
+        $mean = $this->meanability ?? calculate_mean_from_past_attempts() ?? 0.0;
 
         $sum = 0.0;
         foreach ($existingabilities as $pp) {
