@@ -610,6 +610,12 @@ $string['reportscale'] = 'Skala für den Report der Ergebnisse berücksichtigen'
 $string['requesttimeout'] = 'Zeitüberschreitung beim Verbindungsaufbau';
 $string['response'] = 'Antwort';
 $string['responsesbyusercharttitle'] = 'Gesamtanzahl der gegebenen Antworten pro Person';
+$string['responses_added'] = 'Es wurden neue Antworten hinzugefügt';
+$string['responses_added_desc'] = '{$a->sourceurl} hat neue Antworten hinzugefügt. {$a->added} neue Antworten wurden hinzugefügt, '
+    . '{$a->skipped} waren bereits vorhanden und es sind {$a->errors} Fehler aufgetreten';
+$string['responses_submitted'] = 'Neue Antworten geteilt';
+$string['responses_submitted_desc'] = 'Es wurden neue Antworten mit der zentralen Berechnungsinstanz {$a->centralhost} geteilt. {$a->added} neue Antworten wurden hinzugefügt, '
+    . '{$a->skipped} waren bereits vorhanden und es sind {$a->errors} Fehler aufgetreten';
 $string['rootscale:tooltiptitle'] = 'Globalskala „{$a}“';
 $string['scaledetailviewheading'] = 'Detailansicht der CAT-Skala „{$a}“';
 $string['scalehasnolabel'] = 'Skala hat kein Label';
