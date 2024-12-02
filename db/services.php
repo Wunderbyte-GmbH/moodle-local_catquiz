@@ -43,6 +43,7 @@ $services = [
                 'functions' => [
                         'local_catquiz_submit_catquiz_responses',
                         'local_catquiz_fetch_item_parameters',
+                        'local_catquiz_recalculate_remote',
                 ],
                 'restrictedusers' => 0, // Allow all users.
                 'enabled' => 1,
@@ -167,6 +168,14 @@ $functions = [
                 'classname' => 'local_catquiz\\external\\client_fetch_parameters',
                 'methodname' => 'execute',
                 'description' => 'Fetch item parameters from central instance',
+                'type' => 'write',
+                'capabilities' => 'moodle/site:config',
+                'ajax' => true,
+        ],
+        'local_catquiz_recalculate_remote' => [
+                'classname' => 'local_catquiz\\external\\recalculate_remote',
+                'methodname' => 'execute',
+                'description' => 'Enqueue an adhoc task to recalculate the parameters based on submitted responses',
                 'type' => 'write',
                 'capabilities' => 'moodle/site:config',
                 'ajax' => true,

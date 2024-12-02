@@ -46,4 +46,14 @@ $tasks = [
         'dayofweek' => '*',
         'month' => '*',
     ],
+    [
+        'classname' => 'local_catquiz\task\recalculate_remote_item_parameters',
+        'blocking' => 0,
+        'minute' => '0',
+        'hour' => '3',
+        'day' => '1',
+        'month' => '*',
+        'dayofweek' => '*',
+        'disabled' => 0,
+    ],
 ];
