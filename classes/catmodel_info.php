@@ -117,7 +117,20 @@ class catmodel_info {
 
         $context = catcontext::load_from_db($contextid);
         $catscale = catscale::return_catscale_object($catscaleid);
-        $strategy = $context->get_strategy($catscaleid);
+        if (!$strategy = $context->get_strategy($catscaleid)) {
+            // Trigger event.
+            $event = calculation_skipped::create([
+                'context' => \context_system::instance(),
+                'userid' => $userid,
+                'other' => [
+                    'catscaleid' => $catscaleid,
+                    'contextid' => $contextid,
+                    'reason' => get_string($errorcode, 'local_catquiz'),
+                ],
+            ]);
+            $event->trigger();
+            return;
+        }
         $initialabilities = model_person_param_list::load_from_db($contextid, [$catscaleid]);
         $strategy->get_responses()->set_person_abilities($initialabilities);
         try {
