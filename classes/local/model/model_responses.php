@@ -129,10 +129,12 @@ class model_responses {
     /**
      * Gets all the data from the given context ID.
      * @param int $contextid
-     * @return \local_catquiz\local\model\model_responses
+     * @return ?model_responses
      */
-    public static function create_for_context(int $contextid): self {
-        $mainscale = catquiz::get_main_scale($contextid);
+    public static function create_for_context(int $contextid): ?self {
+        if (!$mainscale = catquiz::get_main_scale($contextid)) {
+            return null;
+        }
         $catscaleids = [$mainscale->id, ...catscale::get_subscale_ids($mainscale->id)];
         $responsedata = self::getresponsedatafromdb($contextid, $catscaleids);
         return self::create_from_array($responsedata, $mainscale->id);
