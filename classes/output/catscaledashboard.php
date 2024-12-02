@@ -190,6 +190,16 @@ class catscaledashboard {
     }
 
     /**
+     * Renders button to trigger calculation via submitted responses
+     *
+     * @return string
+     */
+    private function render_remotecalc_button() {
+        $buttontitle = get_string('remotecalcbutton', 'local_catquiz');
+        return sprintf('<button class="btn btn-primary" type="button" id="recalculate_remote">%s</button>', $buttontitle);
+    }
+
+    /**
      * Exports for template.
      *
      * @param \renderer_base $output
@@ -220,6 +230,7 @@ class catscaledashboard {
             'personabilities' => $this->render_personabilities($personabilities),
             'modelbutton' => $this->render_modelbutton($this->catcontextid),
             'syncbutton' => $this->render_syncbutton(),
+            'remotecalcbutton' => $this->render_remotecalc_button(),
             'centralhost' => get_config('local_catquiz', 'central_host'),
         ];
     }
