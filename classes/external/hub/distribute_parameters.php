@@ -22,7 +22,7 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-namespace local_catquiz\external;
+namespace local_catquiz\external\hub;
 
 defined('MOODLE_INTERNAL') || die();
 
@@ -46,7 +46,7 @@ use moodle_exception;
  * @copyright  2024 Wunderbyte GmbH
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class fetch_item_parameters extends external_api {
+class distribute_parameters extends external_api {
     /**
      * Returns description of method parameters.
      *
