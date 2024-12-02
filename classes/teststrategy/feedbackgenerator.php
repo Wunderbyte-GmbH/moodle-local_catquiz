@@ -396,6 +396,7 @@ abstract class feedbackgenerator {
         );
 
         $personabilities = [];
+        $selectedscaleid = null;
         // Ability range is the same for all scales with same root scale.
         $abiltiyrange = $this->feedbackhelper->get_ability_range(array_key_first($catscales));
         foreach ($personabilitiesfeedbackeditor as $catscale => $personability) {
