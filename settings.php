@@ -146,4 +146,11 @@ if ($hassiteconfig) {
         get_string('sync_scale_desc', 'local_catquiz'),
         PARAM_INT
     ));
+    $settings->add(new admin_setting_configtextarea(
+        'local_catquiz/central_scale_labels',
+        get_string('central_scale_labels', 'local_catquiz'),
+        get_string('central_scale_labels_desc', 'local_catquiz'),
+        '', // Default value.
+        PARAM_TEXT
+    ));
 }

@@ -2809,50 +2809,72 @@ SQL;
     }
 
     /**
-     * Merges item parameters from two contexts.
-     *
-     * When a parameter exists in both contexts for the same itemid/model combination,
-     * the parameter from the new context is chosen. When it exists in only one context,
-     * it is included in the result. There can be at most one parameter per (itemid, model, contextid)
-     * combination.
-     *
-     * @param int $oldcontextid The ID of the old context
-     * @param int $newcontextid The ID of the new context
-     *
-     * @return array Array of merged item parameters
+     * Get scales by their labels.
+     * @param array $labels Array of scale labels
+     * @return array Array of scale objects
      */
-    public function merge_params(int $oldcontextid, int $newcontextid): array {
+    public function get_scales_by_labels(array $labels) {
         global $DB;
 
-        // First get all parameters from both contexts.
-        [$contextsql, $contextparams] = $DB->get_in_or_equal(
-            [$oldcontextid, $newcontextid],
-            SQL_PARAMS_NAMED
-        );
-
-        $params = $DB->get_records_select(
-            'local_catquiz_itemparams',
-            "contextid $contextsql",
-            $contextparams
-        );
-
-        // Group parameters by itemid and model.
-        $grouped = [];
-        foreach ($params as $param) {
-            $key = "{$param->componentid}_{$param->model}";
-
-            // If key doesn't exist, add this param.
-            if (!isset($grouped[$key])) {
-                $grouped[$key] = $param;
-                continue;
-            }
-
-            // If param is from new context, it always wins.
-            if ($param->contextid == $newcontextid) {
-                $grouped[$key] = $param;
-            }
+        if (empty($labels)) {
+            return [];
         }
 
-        return array_values($grouped);
+        [$insql, $params] = $DB->get_in_or_equal($labels);
+        return $DB->get_records_select('local_catquiz_catscales', "label $insql", $params);
+    }
+
+    /**
+     * Count unprocessed remote responses for a scale and its subscales.
+     *
+     * @param array $catscaleids Array of scale IDs (main scale and subscales)
+     * @param int $contextid The context ID
+     * @return int Number of unprocessed responses
+     */
+    public function count_unprocessed_remote_responses(array $catscaleids, int $contextid): int {
+        global $DB;
+
+        [$insql, $params] = $DB->get_in_or_equal($catscaleids, SQL_PARAMS_NAMED, 'incatscales');
+        $params['contextid'] = $contextid;
+
+        $sql = "SELECT COUNT(*)
+            FROM {local_catquiz_rresponses} rr
+            JOIN {local_catquiz_qhashmap} qh ON rr.questionhash = qh.questionhash
+            JOIN {local_catquiz_items} lci ON lci.componentid = qh.questionid
+            WHERE lci.catscaleid $insql
+            AND lci.contextid = :contextid
+            AND rr.timeprocessed IS NULL";
+
+        return $DB->count_records_sql($sql, $params);
+    }
+
+    /**
+     * Mark remote responses as processed for a scale and its subscales.
+     *
+     * @param array $catscaleids Array of scale IDs (main scale and subscales)
+     * @param int $contextid The context ID where the responses were processed
+     * @return void
+     */
+    public function mark_remote_responses_processed(array $catscaleids, int $contextid): void {
+        global $DB;
+
+        [$insql, $params] = $DB->get_in_or_equal($catscaleids, SQL_PARAMS_NAMED, 'incatscales');
+        $params['contextid'] = $contextid;
+        $params['now'] = time();
+        $params['info'] = json_encode(['status' => 'success', 'contextid' => $contextid]);
+
+        $DB->execute(
+            "UPDATE {local_catquiz_rresponses}
+            SET timeprocessed = :now, processinginfo = :info
+            WHERE questionhash IN (
+                SELECT qh.questionhash
+                FROM {local_catquiz_qhashmap} qh
+                JOIN {local_catquiz_items} lci ON lci.componentid = qh.questionid
+                WHERE lci.catscaleid $insql
+                AND lci.contextid = :contextid
+        )
+        AND timeprocessed IS NULL",
+            $params
+        );
     }
 }
