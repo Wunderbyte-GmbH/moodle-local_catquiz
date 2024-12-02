@@ -104,7 +104,7 @@ const fetchParameters = async(centralHost) => {
 
         // Call webservice.
         const result = await Ajax.call([{
-            methodname: 'local_catquiz_client_fetch_parameters',
+            methodname: 'local_catquiz_node_fetch_parameters',
             args: {
                 scaleid: scaleid
             }

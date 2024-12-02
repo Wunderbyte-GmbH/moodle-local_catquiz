@@ -26,7 +26,7 @@
 
 declare(strict_types=1);
 
-namespace local_catquiz\external;
+namespace local_catquiz\external\hub;
 
 defined('MOODLE_INTERNAL') || die();
 
@@ -44,13 +44,13 @@ use local_catquiz\remote\response\response_handler;
 use UnexpectedValueException;
 
 /**
- * External service for submitting CatQuiz responses.
+ * External service for collecting responses.
  *
  * @package    local_catquiz
  * @copyright  2024 Wunderbyte GmbH
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class submit_responses extends external_api {
+class collect_responses extends external_api {
 
     /**
      * Returns description of method parameters.

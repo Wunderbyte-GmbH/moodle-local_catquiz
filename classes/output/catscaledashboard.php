@@ -215,6 +215,16 @@ class catscaledashboard {
         return sprintf('<button class="btn btn-primary" type="button" id="recalculate_remote">%s</button>', $buttontitle);
     }
 
+    private function render_submitresponses_button() {
+        // Only render the button for root scales that have no parent scale.
+        if ($this->catscale->parent ?? false) {
+            return '';
+        }
+
+        $buttontitle = get_string('remotesubmitbutton', 'local_catquiz');
+        return sprintf('<button class="btn btn-primary" type="button" id="submit_responses_remote">%s</button>', $buttontitle);
+    }
+
     /**
      * Exports for template.
      *
@@ -247,6 +257,7 @@ class catscaledashboard {
             'modelbutton' => $this->render_modelbutton($this->catcontextid),
             'syncbutton' => $this->render_syncbutton(),
             'remotecalcbutton' => $this->render_remotecalc_button(),
+            'submitresponsesbutton' => $this->render_submitresponses_button(),
             'centralhost' => get_config('local_catquiz', 'central_host'),
         ];
     }

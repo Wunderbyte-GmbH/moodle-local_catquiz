@@ -16,6 +16,10 @@
 
 namespace local_catquiz\remote\client;
 
+defined('MOODLE_INTERNAL') || die();
+
+require_once($CFG->libdir . '/filelib.php');
+
 use context_system;
 use local_catquiz\remote\hash\question_hasher;
 use curl;
@@ -79,21 +83,17 @@ class response_submitter {
         }
 
         // Prepare the web service call.
-        // Just for testing
-        $this->centralhost = 'https://192.168.56.6';
-        $this->token = 'ce911aa8a7c13889223178b7f728bec6';
-
         $serverurl = $this->centralhost . '/webservice/rest/server.php';
         $params = [
             'wstoken' => $this->token,
-            'wsfunction' => 'local_catquiz_submit_catquiz_responses',
+            'wsfunction' => 'local_catquiz_hub_collect_responses',
             'moodlewsrestformat' => 'json',
             'jsondata' => json_encode($responses),
         ];
 
         // Make the web service call.
         $curl = new curl();
-        $curl->setopt(['CURLOPT_SSL_VERIFYPEER' => false, 'CURLOPT_SSL_VERIFYHOST' => false]);
+        // $curl->setopt(['CURLOPT_SSL_VERIFYPEER' => false, 'CURLOPT_SSL_VERIFYHOST' => false]);
 
         try {
             $response = $curl->post($serverurl, $params);
@@ -103,7 +103,7 @@ class response_submitter {
                 debugging('Invalid JSON response from server: ' . $response, DEBUG_DEVELOPER);
                 return (object)[
                     'success' => false,
-                    'error' => 'Invalid response from server',
+                    'error' => sprintf('Invalid response from server: %s', $response),
                 ];
             }
 
@@ -152,9 +152,14 @@ class response_submitter {
     private function get_response_data() {
         global $CFG, $DB;
         $catscaleids = [$this->scaleid, ...catscale::get_subscale_ids($this->scaleid)];
-        // TODO: Should the user be able to select a context to submit responses? Should it be the context of the selected scale?
-        $contextid = 20;
-        [$sql, $params] = catquiz::get_sql_for_model_input($contextid, $catscaleids, null, null, false, $this->scaleid);
+        [$sql, $params] = catquiz::get_sql_for_model_input(
+            $this->contextid,
+            $catscaleids,
+            null,
+            null,
+            false,
+            $this->scaleid
+        );
         $data = $DB->get_records_sql($sql, $params);
         $instancename = parse_url($CFG->wwwroot, PHP_URL_HOST);
         $counter = 0;
