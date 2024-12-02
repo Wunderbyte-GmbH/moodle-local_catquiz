@@ -56,4 +56,13 @@ $tasks = [
         'dayofweek' => '*',
         'disabled' => 0,
     ],
+    [
+        'classname' => 'local_catquiz\task\scheduled_submit_responses',
+        'blocking' => 0,
+        'minute' => '0',    // At the top of the hour.
+        'hour' => '3',      // Run daily at 3 AM.
+        'day' => '*',
+        'month' => '*',
+        'dayofweek' => '*',
+    ],
 ];

@@ -22,7 +22,7 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-namespace local_catquiz\external;
+namespace local_catquiz\external\hub;
 
 use external_api;
 use external_function_parameters;
@@ -38,7 +38,7 @@ require_once($CFG->libdir . '/externallib.php');
 /**
  * External API class for recalculating remote item parameters.
  */
-class recalculate_remote extends external_api {
+class enqueue_parameter_recalculation extends external_api {
     /**
      * Returns description of method parameters.
      *

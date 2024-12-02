@@ -39,11 +39,11 @@ $services = [
                 'uploadfiles'  => 1, // Allow file uploads.
                 'enabled' => 1,
         ],
-        'CatQuiz Response Service' => [
+        'CatQuiz Hub Service' => [
                 'functions' => [
-                        'local_catquiz_submit_catquiz_responses',
-                        'local_catquiz_fetch_item_parameters',
-                        'local_catquiz_recalculate_remote',
+                        'local_catquiz_hub_collect_responses',
+                        'local_catquiz_hub_distribute_parameters',
+                        'local_catquiz_hub_enqueue_parameter_recalculation',
                 ],
                 'restrictedusers' => 0, // Allow all users.
                 'enabled' => 1,
@@ -51,8 +51,11 @@ $services = [
                 'downloadfiles' => 0,
                 'uploadfiles' => 0,
         ],
-        'CatQuiz Parameter Service' => [
-                'functions' => ['local_catquiz_client_fetch_parameters'],
+        'CatQuiz Node Service' => [
+                'functions' => [
+                        'local_catquiz_node_fetch_parameters',
+                        'local_catquiz_node_submit_responses',
+                ],
                 'restrictedusers' => 0,
                 'enabled' => 1,
                 'shortname' => 'local_catquiz_parameter',
@@ -164,20 +167,28 @@ $functions = [
             'type' => 'read',
             'ajax' => true,
         ],
-        'local_catquiz_client_fetch_parameters' => [
-                'classname' => 'local_catquiz\\external\\client_fetch_parameters',
+        'local_catquiz_node_fetch_parameters' => [
+                'classname' => 'local_catquiz\\external\\node\\fetch_parameters',
                 'methodname' => 'execute',
                 'description' => 'Fetch item parameters from central instance',
                 'type' => 'write',
                 'capabilities' => 'moodle/site:config',
                 'ajax' => true,
         ],
-        'local_catquiz_recalculate_remote' => [
-                'classname' => 'local_catquiz\\external\\recalculate_remote',
+        'local_catquiz_hub_enqueue_parameter_recalculation' => [
+                'classname' => 'local_catquiz\\external\\hub\\enqueue_parameter_recalculation',
                 'methodname' => 'execute',
                 'description' => 'Enqueue an adhoc task to recalculate the parameters based on submitted responses',
                 'type' => 'write',
                 'capabilities' => 'moodle/site:config',
                 'ajax' => true,
+        ],
+        'local_catquiz_node_submit_responses' => [
+            'classname' => 'local_catquiz\\external\\node\\submit_responses',
+            'methodname' => 'execute',
+            'description' => 'Submit responses for a given scale ID from a node.',
+            'type' => 'write',
+            'capabilities' => 'moodle/site:config',
+            'ajax' => true,
         ],
 ];

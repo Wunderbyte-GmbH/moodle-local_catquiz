@@ -14,7 +14,7 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
-namespace local_catquiz\external;
+namespace local_catquiz\external\node;
 
 defined('MOODLE_INTERNAL') || die();
 
@@ -40,7 +40,7 @@ use local_catquiz\remote\hash\question_hasher;
  * @copyright  2024 Wunderbyte GmbH
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class client_fetch_parameters extends external_api {
+class fetch_parameters extends external_api {
 
     /**
      * Internal helper to check if an item exists already in the new context.
