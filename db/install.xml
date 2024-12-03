@@ -284,7 +284,7 @@
       <INDEXES>
         <INDEX NAME="questionhash_sourceurl" UNIQUE="false" FIELDS="questionhash, sourceurl"/>
         <INDEX NAME="timeprocessed" UNIQUE="false" FIELDS="timeprocessed"/>
-        <INDEX NAME="questionhash" UNIQUE="true" FIELDS="questionhash"/>
+        <INDEX NAME="questionhash" UNIQUE="false" FIELDS="questionhash"/>
       </INDEXES>
     </TABLE>
   </TABLES>
