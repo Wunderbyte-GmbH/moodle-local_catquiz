@@ -209,6 +209,11 @@ class catscaledashboard {
         return sprintf('<button class="btn btn-primary" type="button" id="recalculate_remote">%s</button>', $buttontitle);
     }
 
+    /**
+     * Renders button to share responses with central instance
+     *
+     * @return string
+     */
     private function render_submitresponses_button() {
         // Only render the button for root scales that have no parent scale.
         if (!$this->is_root_scale()) {
@@ -219,6 +224,11 @@ class catscaledashboard {
         return sprintf('<button class="btn btn-primary" type="button" id="submit_responses_remote">%s</button>', $buttontitle);
     }
 
+    /**
+     * Shows if the current scale is a root scale
+     *
+     * @return bool
+     */
     private function is_root_scale() {
         return ($this->catscale->parentid ?? NULL)  === "0";
     }
