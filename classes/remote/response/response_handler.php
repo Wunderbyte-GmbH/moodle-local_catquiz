@@ -45,7 +45,7 @@ class response_handler {
         global $DB;
 
         try {
-            // Check if response already exists
+            // Check if response already exists.
             $existing = $DB->get_record('local_catquiz_rresponses', [
                 'questionhash' => $questionhash,
                 'attempthash' => $attempthash,

@@ -276,6 +276,8 @@ class model_item_param {
     /**
      * Sets the component ID (e.g. question id).
      *
+     * @param string $componentid
+     *
      * @return self
      */
     public function set_componentid(string $componentid): self {
