@@ -632,6 +632,12 @@ class model_responses {
         return $inputdata;
     }
 
+    /**
+     * Maps attempts to users
+     *
+     * @param int $userid
+     * @param int $attemptid
+     */
     private function map_attempt(int $userid, int $attemptid): self {
         if (!array_key_exists($userid, $this->userattempts)) {
             $this->userattempts[$userid] = [$attemptid => $attemptid];
@@ -731,6 +737,8 @@ class model_responses {
      * Creates a model_responses object from the remote responses table
      *
      * @param int $mainscale The main scale ID
+     * @param ?int $contextid
+     *
      * @return self
      */
     public static function create_from_remote_responses(int $mainscale, ?int $contextid = null): self {
