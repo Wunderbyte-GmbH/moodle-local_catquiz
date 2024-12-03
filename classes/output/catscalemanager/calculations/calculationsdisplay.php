@@ -41,6 +41,10 @@ class calculationsdisplay {
 
     }
 
+    public function render_remote_calculation_config() {
+        return "test";
+    }
+
     /**
      * Render event log table.
      * @return ?string
@@ -106,6 +110,7 @@ class calculationsdisplay {
     public function export_data_array(): array {
 
         $data = [
+            'remoteconfig' => $this->render_remote_calculation_config(),
             'table' => $this->render_calculations_log_table(),
         ];
         return $data;

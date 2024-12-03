@@ -272,6 +272,7 @@ class catscaledashboard {
             'syncbutton' => $this->render_syncbutton(),
             'remotecalcbutton' => $this->render_remotecalc_button(),
             'submitresponsesbutton' => $this->render_submitresponses_button(),
+            'is_root' => $this->is_root_scale(),
             'centralhost' => get_config('local_catquiz', 'central_host'),
         ];
     }
