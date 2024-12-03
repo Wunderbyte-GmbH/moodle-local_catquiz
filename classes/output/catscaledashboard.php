@@ -201,6 +201,11 @@ class catscaledashboard {
      * @return string
      */
     private function render_syncbutton() {
+        // Only render the button for root scales that have no parent scale.
+        if (!$this->is_root_scale()) {
+            return '';
+        }
+
         $buttontitle = get_string('syncbutton', 'local_catquiz');
         return sprintf('<button class="btn btn-primary" type="button" id="sync_button">%s</button>', $buttontitle);
     }
@@ -211,18 +216,27 @@ class catscaledashboard {
      * @return string
      */
     private function render_remotecalc_button() {
+        // Only render the button for root scales that have no parent scale.
+        if (!$this->is_root_scale()) {
+            return '';
+        }
+
         $buttontitle = get_string('remotecalcbutton', 'local_catquiz');
         return sprintf('<button class="btn btn-primary" type="button" id="recalculate_remote">%s</button>', $buttontitle);
     }
 
     private function render_submitresponses_button() {
         // Only render the button for root scales that have no parent scale.
-        if ($this->catscale->parent ?: false) {
+        if (!$this->is_root_scale()) {
             return '';
         }
 
         $buttontitle = get_string('remotesubmitbutton', 'local_catquiz');
         return sprintf('<button class="btn btn-primary" type="button" id="submit_responses_remote">%s</button>', $buttontitle);
+    }
+
+    private function is_root_scale() {
+        return ($this->catscale->parentid ?? NULL)  === "0";
     }
 
     /**
