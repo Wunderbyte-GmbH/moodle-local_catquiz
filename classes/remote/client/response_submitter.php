@@ -77,8 +77,8 @@ class response_submitter {
         $responses = $this->get_response_data();
         if (empty($responses)) {
             return (object)[
-                'success' => false,
-                'error' => 'No responses to submit',
+                'success' => true,
+                'message' => get_string('nonewresponses', 'local_catquiz'),
             ];
         }
 
