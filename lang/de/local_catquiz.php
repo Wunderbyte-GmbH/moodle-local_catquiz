@@ -607,6 +607,7 @@ $string['recalculationscheduled'] = 'Neuberechnung der Kontext-Paremeter wurde v
 $string['recentevents'] = 'Letzte Bearbeitungen';
 $string['relevantscales'] = 'Skalen im Kompetenzbereich abprüfen';
 $string['remotecalcbutton'] = 'Mit zugesendeten Daten neu berechnen';
+$string['remotesubmitbutton'] = 'Neue Antworten mit Hub teilen';
 $string['removetestitem'] = 'Testitems entfernen';
 $string['removetestitembody'] = 'Wollen Sie folgende Testitems aus aktuellen Skale entfernen? <br> {$a->data}';
 $string['removetestitemsubmit'] = 'Entfernen';

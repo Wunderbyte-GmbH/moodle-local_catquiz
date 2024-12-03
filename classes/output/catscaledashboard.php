@@ -217,7 +217,7 @@ class catscaledashboard {
 
     private function render_submitresponses_button() {
         // Only render the button for root scales that have no parent scale.
-        if ($this->catscale->parent ?? false) {
+        if ($this->catscale->parent ?: false) {
             return '';
         }
 

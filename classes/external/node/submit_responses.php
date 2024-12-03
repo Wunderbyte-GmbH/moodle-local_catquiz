@@ -80,7 +80,7 @@ class submit_responses extends external_api {
 
         if ($result->success) {
             return [
-                'message' => get_string(
+                'message' => $result->message ?? get_string(
                     'submission_success',
                     'local_catquiz',
                     (object)[
