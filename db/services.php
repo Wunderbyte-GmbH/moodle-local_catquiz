@@ -41,24 +41,20 @@ $services = [
         ],
         'CatQuiz Hub Service' => [
                 'functions' => [
+                        // Endpoint on hub if node submits responses.
                         'local_catquiz_hub_collect_responses',
+                        // Endpoint on hub if node wants to fetch.
                         'local_catquiz_hub_distribute_parameters',
+                        // Endpoint on hub to enqueue param calculation.
                         'local_catquiz_hub_enqueue_parameter_recalculation',
+                        // Endpoint on node to fetch parameters from hub.
+                        'local_catquiz_node_fetch_parameters',
+                        // Endpoint on node to submit parameters to hub.
+                        'local_catquiz_node_submit_responses',
                 ],
                 'restrictedusers' => 0, // Allow all users.
                 'enabled' => 1,
-                'shortname' => 'local_catquiz_response',
-                'downloadfiles' => 0,
-                'uploadfiles' => 0,
-        ],
-        'CatQuiz Node Service' => [
-                'functions' => [
-                        'local_catquiz_node_fetch_parameters',
-                        'local_catquiz_node_submit_responses',
-                ],
-                'restrictedusers' => 0,
-                'enabled' => 1,
-                'shortname' => 'local_catquiz_parameter',
+                'shortname' => 'local_catquiz_hub_service',
                 'downloadfiles' => 0,
                 'uploadfiles' => 0,
         ],
