@@ -1112,7 +1112,7 @@ ENDSQL;
     }
 
     if ($oldversion < 2024112803) {
-        // Define index questionhash (unique) to be added to local_catquiz_rresponses.
+        // Define index questionhash (notunique) to be added to local_catquiz_rresponses.
         $table = new xmldb_table('local_catquiz_rresponses');
         $index = new xmldb_index('questionhash', XMLDB_INDEX_NOTUNIQUE, ['questionhash']);
 
