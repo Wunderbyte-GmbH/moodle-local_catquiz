@@ -144,7 +144,7 @@ class fetch_parameters extends external_api {
         $serverurl = rtrim($centralurl, '/') . '/webservice/rest/server.php';
         $wsparams = [
             'wstoken' => $wstoken,
-            'wsfunction' => 'local_catquiz_fetch_item_parameters',
+            'wsfunction' => 'local_catquiz_hub_distribute_parameters',
             'moodlewsrestformat' => 'json',
             'scalelabel' => $scale->label,
         ];

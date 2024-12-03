@@ -154,22 +154,21 @@ $functions = [
             // Should we require a capability? E.g. 'capabilities' => 'local/catquiz:submit_responses'?
             'ajax' => true,
         ],
-        // Allows other instances to receive item parameters.
-        'local_catquiz_fetch_item_parameters' => [
-            'classname' => 'local_catquiz\\external\\fetch_item_parameters',
+        'local_catquiz_hub_collect_responses' => [
+            'classname' => 'local_catquiz\\external\\hub\\collect_responses',
             'methodname' => 'execute',
-            'classpath' => 'local/catquiz/classes/external/fetch_item_parameters.php',
-            'description' => 'Fetch item parameters.',
-            'type' => 'read',
+            'description' => 'Collects new responses from a node',
+            'type' => 'write',
+            'capabilities' => 'moodle/site:config',
             'ajax' => true,
         ],
-        'local_catquiz_node_fetch_parameters' => [
-                'classname' => 'local_catquiz\\external\\node\\fetch_parameters',
-                'methodname' => 'execute',
-                'description' => 'Fetch item parameters from central instance',
-                'type' => 'write',
-                'capabilities' => 'moodle/site:config',
-                'ajax' => true,
+        'local_catquiz_hub_distribute_parameters' => [
+            'classname' => 'local_catquiz\\external\\hub\\distribute_parameters',
+            'methodname' => 'execute',
+            'description' => 'Allows nodes to fetch item parameters',
+            'type' => 'write',
+            'capabilities' => 'moodle/site:config',
+            'ajax' => true,
         ],
         'local_catquiz_hub_enqueue_parameter_recalculation' => [
                 'classname' => 'local_catquiz\\external\\hub\\enqueue_parameter_recalculation',
@@ -186,5 +185,13 @@ $functions = [
             'type' => 'write',
             'capabilities' => 'moodle/site:config',
             'ajax' => true,
+        ],
+        'local_catquiz_node_fetch_parameters' => [
+                'classname' => 'local_catquiz\\external\\node\\fetch_parameters',
+                'methodname' => 'execute',
+                'description' => 'Fetch item parameters from central instance',
+                'type' => 'write',
+                'capabilities' => 'moodle/site:config',
+                'ajax' => true,
         ],
 ];
