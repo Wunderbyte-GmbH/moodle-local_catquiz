@@ -415,7 +415,8 @@ class testenvironment {
         // Set the contextid only if this is a new test OR the scale was changed.
         // New test: $record->contextid is empty. Scale changed: $record->contextid != $this->contextid.
         if (
-            !$record->contextid
+            !property_exists($record, 'contextid')
+            || !$record->contextid
             || ($this->catscaleid && $record->catscaleid && $this->catscaleid != $record->catscaleid)
         ) {
             $record->contextid = $DB->get_field('local_catquiz_catscales', 'contextid', ['id' => $record->catscaleid]);
