@@ -32,11 +32,62 @@
             <button class='btn {{class}}' type={{type}} data-id="backtoscaleview">{{label}}</button>
         {{/backtoscaleslink}}
         <div>
-            {{> local_catquiz/tabs/tab_statistics}}
-            {{{modelbutton}}}
-            {{{syncbutton}}}
-            {{{remotecalcbutton}}}
-            {{{submitresponsesbutton}}}
+        {{> local_catquiz/tabs/tab_statistics}}
+
+        {{#is_root}}
+            <div class="card mb-3">
+                {{! Local calculation section }}
+                <div class="card-header">
+                    <h5>
+                        <button class="btn btn-link" type="button" data-toggle="collapse" data-target="#localCalc">
+                            {{#str}}localcalculations, local_catquiz{{/str}}
+                        </button>
+                    </h2>
+                    <div id="localCalc" class="accordion-collapse collapse show">
+                        <div class="accordion-body">
+                            <p class="mb-2">{{#str}}localcalculationshelp, local_catquiz{{/str}}</p>
+                            {{{modelbutton}}}
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card mb-3">
+                {{! Local calculation section }}
+                <div class="card-header">
+                    <h5 class="accordion-header">
+                        <button class="btn btn-link" type="button" data-toggle="collapse" data-target="#syncActions">
+                            {{#str}}syncactions, local_catquiz{{/str}}
+                        </button>
+                    </h5>
+                    <div id="syncActions" class="accordion-collapse collapse show">
+                        <div class="accordion-body">
+                            <p class="mb-2">{{#str}}syncactionshelp, local_catquiz{{/str}}</p>
+                            {{{syncbutton}}}
+                            {{{submitresponsesbutton}}}
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="card mb-3">
+                {{! Local calculation section }}
+                <div class="card-header">
+                    <h5 class="accordion-header">
+                        <button class="btn btn-link" data-toggle="collapse" data-target="#hubActions">
+                            {{#str}}hubactions, local_catquiz{{/str}}
+                        </button>
+                    </h5>
+                    <div id="hubActions" class="accordion-collapse collapse show">
+                        <div class="accordion-body">
+                            <p class="mb-2">{{#str}}hubactionshelp, local_catquiz{{/str}}</p>
+                            {{{remotecalcbutton}}}
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        {{/is_root}}
         </div>
         {{#js}}
             require(['local_catquiz/testitemdashboard/backtoscaleviewbutton'], function(init) {
