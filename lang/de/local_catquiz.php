@@ -629,6 +629,7 @@ $string['responses_submitted'] = 'Neue Antworten geteilt';
 $string['responses_submitted_desc'] = 'Es wurden neue Antworten mit der zentralen Berechnungsinstanz {$a->centralhost} geteilt. {$a->added} neue Antworten wurden hinzugefügt, '
     . '{$a->skipped} waren bereits vorhanden und es sind {$a->errors} Fehler aufgetreten';
 $string['rootscale:tooltiptitle'] = 'Globalskala „{$a}“';
+$string['saveconfig'] = 'Konfiguration speicher';
 $string['scaledetailviewheading'] = 'Detailansicht der CAT-Skala „{$a}“';
 $string['scalehasnolabel'] = 'Skala hat kein Label';
 $string['scaleiddisplay'] = ' (ID: {$a})';

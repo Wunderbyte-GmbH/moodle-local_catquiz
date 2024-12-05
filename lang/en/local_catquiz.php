@@ -610,6 +610,7 @@ $string['responses_submitted'] = 'New responses were shared';
 $string['responses_submitted_desc'] = 'New responses were shared with central compute instance {$a->centralhost}. {$a->added} new '
     . 'responses were added, {$a->skipped} were skipped and {$a->errors} errors occured';
 $string['rootscale:tooltiptitle'] = 'root scale {$a}';
+$string['saveconfig'] = 'Save configuration';
 $string['scaledetailviewheading'] = 'Detailview of catscale {$a}';
 $string['scalehasnolabel'] = 'Scale has no label';
 $string['scaleiddisplay'] = ' (ID: {$a})';

@@ -225,8 +225,6 @@ final class model_responses_test extends basic_testcase {
      * @return void
      */
     public function test_prune(): void {
-        $this->resetAfterTest();
-
         // Create a model_responses object with test data.
         $responses = new model_responses();
 
