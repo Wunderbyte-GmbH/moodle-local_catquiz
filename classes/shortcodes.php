@@ -209,7 +209,14 @@ class shortcodes {
         $endtime = $args['endtime'] ?? null;
         $starttime = $args['starttime'] ?? null;
 
-        $heading = self::get_heading($courseid, $globalscale, $testid, $starttime, $endtime);
+        try {
+            $heading = self::get_heading($courseid, $globalscale, $testid, $starttime, $endtime);
+        } catch (\Exception $e) {
+            return $OUTPUT->render_from_template(
+                'local_catquiz/catscaleshortcodes/catscalestatistics',
+                ['error' => $e->getMessage()]
+            );
+        }
 
         try {
             $catquizstatistics = new catquizstatistics($courseid, $testid, $globalscale, $endtime, $starttime);

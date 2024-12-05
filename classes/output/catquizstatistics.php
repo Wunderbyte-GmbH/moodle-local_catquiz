@@ -27,6 +27,7 @@ use local_catquiz\feedback\feedbackclass;
 use local_catquiz\local\model\model_strategy;
 use local_catquiz\teststrategy\feedback_helper;
 use local_catquiz\teststrategy\info;
+use LogicException;
 use moodle_url;
 use stdClass;
 
@@ -1099,15 +1100,21 @@ class catquizstatistics {
             $out .= $table;
         }
 
-        $colorbarlegend = false;
-        if ($this->get_quizsettings()) {
-            $legend = feedback_helper::get_colorbarlegend(
-                    $this->get_quizsettings(),
+        if ($qs = $this->get_quizsettings()) {
+            try {
+                $legend = feedback_helper::get_colorbarlegend(
+                    $qs,
                     $this->scaleid,
                     $this->check_quizsettings_are_compatible(self::COMPATIBILITY_LEVEL_DESCRIPTION),
                     true
                 );
-            $colorbarlegend = ['feedbackbarlegend' => $legend];
+                $colorbarlegend = ['feedbackbarlegend' => $legend];
+            } catch (LogicException $e) {
+                // We should have better validation for valid quiz settings.
+                // Until then, if the quizsettings don't have a range for the
+                // given scale, we don't show the legend.
+                $colorbarlegend = false;
+            }
         }
         return [
             'colorbarlegend' => $colorbarlegend,

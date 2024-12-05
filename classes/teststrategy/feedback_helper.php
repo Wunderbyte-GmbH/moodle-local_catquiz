@@ -28,6 +28,7 @@ use local_catquiz\catscale;
 use local_catquiz\feedback\feedbackclass;
 use local_catquiz\local\model\model_item_param;
 use local_catquiz\local\model\model_model;
+use LogicException;
 use stdClass;
 
 /**
@@ -432,6 +433,17 @@ class feedback_helper {
             $feedbacktextkey = 'feedbacklegend_scaleid_' . $catscaleid . '_' . $j;
             $lowerlimitkey = "feedback_scaleid_limit_lower_" . $catscaleid . "_" . $j;
             $upperlimitkey = "feedback_scaleid_limit_upper_" . $catscaleid . "_" . $j;
+
+            // It would probably be a good idea to define a class for $quizsettings.
+            // That way, we could more easily check if settings are valid or include a given CAT scale.
+            if (
+                !isset($quizsettings->$upperlimitkey)
+                || !isset($quizsettings->$lowerlimitkey)
+            ) {
+                throw new LogicException(
+                    'Trying to get feedback ranges for a CAT scale that is not configured in the given quizsettings'
+                );
+            }
 
             $feedbackrangestring = get_string(
                 'subfeedbackrange',
