@@ -230,7 +230,7 @@ class catscaledashboard {
      * @return bool
      */
     private function is_root_scale() {
-        return ($this->catscale->parentid ?? NULL)  === "0";
+        return ($this->catscale->parentid ?? null) === "0";
     }
 
     /**
