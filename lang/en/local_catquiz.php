@@ -241,6 +241,8 @@ $string['debuginfo_desc'] = 'As a user with permission to export attempts, you c
 $string['debuginfo_desc_title'] = 'Export attempt # {$a}';
 $string['defaultcontext'] = 'New default context for scale';
 $string['defaultcontextdescription'] = 'Includes all test items';
+$string['defaultcontextmissing'] = 'The default context is missing from the database. Please make sure the installation process '
+    . 'completed successfully.';
 $string['defaultcontextname'] = 'Default CAT context';
 $string['defaultdateformat'] = 'j.n.Y H:i:s';
 $string['deletedatatitle'] = 'Delete';
