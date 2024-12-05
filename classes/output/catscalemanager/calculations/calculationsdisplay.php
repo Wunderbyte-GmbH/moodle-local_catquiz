@@ -49,7 +49,6 @@ class calculationsdisplay {
      * @return void
      */
     public function render_remote_calculation_config() {
-        /** @var dynamic_form */
         $form = new remote_settings_form();
         return html_writer::div($form->render(), '', ['id' => 'remote_settings_form']);
     }

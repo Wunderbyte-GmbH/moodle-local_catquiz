@@ -46,8 +46,6 @@ class remote_settings_form extends dynamic_form {
         $mform->setType('central_token', PARAM_TEXT);
         $mform->addHelpButton('central_token', 'central_token', 'local_catquiz');
 
-        $mform->addElement('hidden', 'returnurl', '');
-
         $this->add_action_buttons(true);
 
         // Load initial data.
