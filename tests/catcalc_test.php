@@ -336,12 +336,14 @@ final class catcalc_test extends basic_testcase {
                     $items = clone($steps[$person][$step - 1]['items']);
                     $items->add($item);
                     $responses = $steps[$person][$step - 1]['responses'];
-                    $responses[$itemid] = new model_item_response($itemid, floatval($fraction), new model_person_param($person, 1));
+                    $pp = new model_person_param($person, 1);
+                    $responses[$itemid] = new model_item_response($itemid, floatval($fraction), $pp);
                     $startvalue = $steps[$person][$step - 1]['expected_ability'];
                 } else {
                     $items = (new model_item_param_list())->add($item);
+                    $pp = new model_person_param($person, 1);
                     $responses = [
-                        $itemid => new model_item_response($itemid, floatval($fraction), new model_person_param($person, 1)),
+                        $itemid => new model_item_response($itemid, floatval($fraction), $pp),
                     ];
                     $startvalue = $mean;
                 }
