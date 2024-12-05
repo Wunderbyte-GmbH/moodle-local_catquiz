@@ -61,7 +61,8 @@ class remote_item_parameter_calculator {
             }
 
             mtrace("Found $newresponses new responses - starting recalculation...");
-            $modelresponses = model_responses::create_from_remote_responses($scale->id, $scale->contextid);
+            $responses = (new catquiz())->get_remote_responses($scale->id, $scale->contextid);
+            $modelresponses = model_responses::create_from_remote_responses($responses, $scale->id);
             if (empty($modelresponses->get_item_ids())) {
                 mtrace("No responses could be created for scale {$scale->id} - skipping.");
                 return false;

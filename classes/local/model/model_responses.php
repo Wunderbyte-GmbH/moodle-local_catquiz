@@ -705,41 +705,22 @@ class model_responses {
     /**
      * Creates a model_responses object from the remote responses table
      *
-     * @param int $mainscale The main scale ID
-     * @param ?int $contextid
+     * @param array $remoteresponses Array of remote responses data
+     * @param int $scaleid A personparam will be created for an ability in that scale.
      *
      * @return self
      */
-    public static function create_from_remote_responses(int $mainscale, ?int $contextid = null): self {
-        global $DB;
-
+    public static function create_from_remote_responses(array $remoteresponses, int $scaleid): self {
         $object = new self();
 
-        if (!$contextid) {
-            $contextid = catscale::get_context_id($mainscale);
-        }
-        $subscales = catscale::get_subscale_ids($mainscale);
-        $selectedscales = [$mainscale, ...$subscales];
-        [$insql, $inparams] = $DB->get_in_or_equal($selectedscales, SQL_PARAMS_NAMED, 'selectedscales');
-
-        $sql = "SELECT rr.id, rr.questionhash, attempthash, response
-                FROM {local_catquiz_rresponses} rr
-                JOIN {local_catquiz_qhashmap} qh ON rr.questionhash = qh.questionhash
-                JOIN {local_catquiz_items} lci ON lci.componentid = qh.questionid AND lci.catscaleid $insql
-                AND lci.contextid = :contextid";
-
-        $params = array_merge(['contextid' => $contextid], $inparams);
-
-        $records = $DB->get_records_sql($sql, $params);
-
-        foreach ($records as $record) {
-            // Use questionhash as itemid and attempthash as attemptid
+        foreach ($remoteresponses as $record) {
+            // Use questionhash as itemid and attempthash as attemptid.
             $object->set(
                 $record->attempthash,
                 $record->questionhash,
                 (float)$record->response,
-                null, // Personparam.
-                $mainscale
+                null, // Empty personparam.
+                $scaleid
             );
         }
 

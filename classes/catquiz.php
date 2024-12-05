@@ -2877,4 +2877,33 @@ SQL;
             $params
         );
     }
+
+    /**
+     * Get remote responses for a main scale and its subscales in a given context.
+     *
+     * @param int $mainscale The ID of the main scale
+     * @param ?int $contextid Optional context ID. If not provided, will be determined from main scale
+     * @return array Array of response records containing id, questionhash, attempthash and response
+     */
+    public function get_remote_responses(int $mainscale, ?int $contextid): array {
+        global $DB;
+
+        if (!$contextid) {
+            $contextid = catscale::get_context_id($mainscale);
+        }
+        $subscales = catscale::get_subscale_ids($mainscale);
+        $selectedscales = [$mainscale, ...$subscales];
+        [$insql, $inparams] = $DB->get_in_or_equal($selectedscales, SQL_PARAMS_NAMED, 'selectedscales');
+
+        $sql = "SELECT rr.id, rr.questionhash, attempthash, response
+            FROM {local_catquiz_rresponses} rr
+            JOIN {local_catquiz_qhashmap} qh ON rr.questionhash = qh.questionhash
+            JOIN {local_catquiz_items} lci ON lci.componentid = qh.questionid AND lci.catscaleid $insql
+            AND lci.contextid = :contextid";
+
+        $params = array_merge(['contextid' => $contextid], $inparams);
+
+        $records = $DB->get_records_sql($sql, $params);
+        return $records;
+    }
 }
