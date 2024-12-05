@@ -25,7 +25,7 @@
 
 namespace local_catquiz\local\model;
 
-use advanced_testcase;
+use basic_testcase;
 use SebastianBergmann\RecursionContext\InvalidArgumentException;
 use PHPUnit\Framework\ExpectationFailedException;
 
@@ -35,7 +35,7 @@ use PHPUnit\Framework\ExpectationFailedException;
  * @package local_catquiz
  * @covers \local_catquiz\local\model\model_item_param_list
  */
-final class model_responses_test extends advanced_testcase {
+final class model_responses_test extends basic_testcase {
     /**
      * Tests if reducing the model_responses to items or persons works as expected
      *
@@ -168,35 +168,27 @@ final class model_responses_test extends advanced_testcase {
      * Test creating responses from remote responses table
      */
     public function test_create_from_remote_responses() {
-                global $DB;
-                $this->resetAfterTest(true);
-
                 // Create some test data.
                 $testdata = [
-                    [
+                    (object) [
                         'questionhash' => 'q1hash',
                         'attempthash' => '4082047844',
                         'response' => 1.0,
                     ],
-                    [
+                    (object) [
                         'questionhash' => 'q2hash',
                         'attempthash' => '4082047844',
                         'response' => 0.0,
                     ],
-                    [
+                    (object) [
                         'questionhash' => 'q1hash',
                         'attempthash' => '1831571143',
                         'response' => 0.5,
                     ],
                 ];
 
-                // Insert test data into remote responses table.
-                foreach ($testdata as $data) {
-                    $DB->insert_record('local_catquiz_rresponses', $data);
-                }
-
                 // Test the method.
-                $responses = model_responses::create_from_remote_responses();
+                $responses = model_responses::create_from_remote_responses($testdata, 0);
 
                 // Verify the responses were loaded correctly.
                 $this->assertEquals(1.0, $responses->get_item_response_for_person('q1hash', '4082047844'));
