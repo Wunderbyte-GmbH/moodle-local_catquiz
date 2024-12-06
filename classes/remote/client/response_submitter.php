@@ -48,7 +48,7 @@ class response_submitter {
     private int $contextid;
 
     /**
-     * Constructor.
+     * Create a new response submitter with the given settings.
      *
      * @param string $centralhost The central host URL
      * @param string $token The web service token
