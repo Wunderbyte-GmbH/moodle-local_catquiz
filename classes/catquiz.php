@@ -1015,8 +1015,16 @@ class catquiz {
             $sql .= " WHERE " . implode(' AND ', $wherearray);
         }
 
-        $sql .= " ORDER BY timemodified DESC
-        LIMIT " . $numberofrecords;
+        $sql .= " ORDER BY timemodified DESC";
+
+        // We treat both INF as 0 as infinite value here, because intval(INF) is
+        // converted to 0.
+        if (
+            !is_infinite($numberofrecords)
+            && $numberofrecords !== 0
+        ) {
+            $sql .= " LIMIT " . $numberofrecords;
+        }
 
         return [$sql, $params];
     }
