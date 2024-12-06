@@ -31,6 +31,7 @@ require_once($CFG->libdir . '/adminlib.php');
 $courseid = optional_param('courseid', 0, PARAM_INT);
 $instanceid = optional_param('instanceid', 0, PARAM_INT);
 $numberofattempts = optional_param('numberofattempts', INF, PARAM_INT);
+$attemptid = optional_param('attemptid', 0, PARAM_INT);
 
 // Set up the page.
 $context = context_system::instance();
@@ -47,6 +48,7 @@ $page = new feedback_page([
     'courseid' => $courseid,
     'instanceid' => $instanceid,
     'numberofattempts' => $numberofattempts,
+    'attemptid' => $attemptid,
 ]);
 
 echo $OUTPUT->header();
