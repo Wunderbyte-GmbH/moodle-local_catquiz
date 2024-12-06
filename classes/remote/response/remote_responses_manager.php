@@ -124,6 +124,4 @@ class remote_responses_manager {
         }
         return $mappings;
     }
-
-    // ... similar methods for item and attempt mappings ...
 }
