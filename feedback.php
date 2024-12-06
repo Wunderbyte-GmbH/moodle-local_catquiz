@@ -30,7 +30,7 @@ require_once($CFG->libdir . '/adminlib.php');
 // Get URL parameters.
 $courseid = optional_param('courseid', 0, PARAM_INT);
 $instanceid = optional_param('instanceid', 0, PARAM_INT);
-$numberofattempts = optional_param('numberofattempts', 1, PARAM_INT);
+$numberofattempts = optional_param('numberofattempts', INF, PARAM_INT);
 
 // Set up the page.
 $context = context_system::instance();
