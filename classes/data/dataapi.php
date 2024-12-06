@@ -419,11 +419,7 @@ class dataapi {
      */
     public static function label_exists(string $label): bool {
         global $DB;
-        if ($DB->record_exists('local_catquiz_catscales', ['label' => $label])) {
-            return true;
-        } else {
-            return false;
-        }
+        return $DB->record_exists('local_catquiz_catscales', ['label' => $label]);
     }
 
     /**
