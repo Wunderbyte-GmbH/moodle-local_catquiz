@@ -128,15 +128,15 @@ class catquiz_handler {
                 get_string('catquizsettings', 'local_catquiz'));
         $mform->setExpanded('catquiz_header');
 
-        if ($selectedcontext = optional_param('contextid', 0, PARAM_INT)) {
-            if ($name = $DB->get_field('local_catquiz_catcontext', 'name', ['id' => $selectedcontext])) {
-                $elements[] = $mform->addElement(
-                    'static',
-                    'selectedcontext',
-                    get_string('testcontext', 'local_catquiz'),
-                    $name
-                );
-            }
+        $selectedcontext = optional_param('contextid', 0, PARAM_INT);
+        $name = $DB->get_field('local_catquiz_catcontext', 'name', ['id' => $selectedcontext]);
+        if ($name) {
+            $elements[] = $mform->addElement(
+                'static',
+                'selectedcontext',
+                get_string('testcontext', 'local_catquiz'),
+                $name
+            );
         }
 
         // Question categories or tags to use for this quiz.
