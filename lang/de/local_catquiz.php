@@ -243,6 +243,8 @@ $string['debuginfo_desc'] = 'Hier können Sie als Nutzer mit Berechtigung zum Do
 $string['debuginfo_desc_title'] = 'Export des Testversuchs Nr. {$a}';
 $string['defaultcontext'] = 'Neuer Standard Einsatz-Kontext für Skala';
 $string['defaultcontextdescription'] = 'Beinhaltet alle Testitems';
+$string['defaultcontextmissing'] = 'Es konnte kein Standard Kontext in der Datenbank gefunden werden. Bitte gehen Sie sicher, dass '
+    . 'der Installationsprozess erfolgreich abgeschlossen wurde.';
 $string['defaultcontextname'] = 'Standard Kontext';
 $string['defaultdateformat'] = 'j.n.Y H:i:s';
 $string['deletedatatitle'] = 'Löschen';

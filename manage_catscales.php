@@ -22,6 +22,7 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+use core\notification;
 use local_catquiz\catquiz;
 use local_catquiz\catscale;
 use local_catquiz\output\catscalemanager\managecatscaledashboard;
@@ -39,9 +40,6 @@ $componentname = optional_param('component', 'question', PARAM_TEXT);
 
 if ($catscale != -1 && empty($catcontextid)) {
     $catcontextid = catscale::get_context_id($catscale);
-}
-if (empty($catcontextid)) {
-    $catcontextid = catquiz::get_default_context_id();
 }
 
 if ($catscale != -1) {
@@ -62,6 +60,16 @@ $PAGE->set_title($title);
 $PAGE->set_heading($title);
 
 echo $OUTPUT->header();
+
+if (empty($catcontextid)) {
+    try {
+        $catcontextid = catquiz::get_default_context_id();
+    } catch (dml_missing_record_exception $e) {
+        notification::warning(get_string('defaultcontextmissing', 'local_catquiz'));
+        echo $OUTPUT->footer();
+        return;
+    }
+}
 
 $managecatscaledashboard = new managecatscaledashboard(
     $testitemid,

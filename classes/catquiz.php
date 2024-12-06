@@ -956,6 +956,7 @@ class catquiz {
      * @param int $numberofrecords
      * @param int $instanceid
      * @param int $courseid
+     * @param int $attemptid Optional attemptid.
      * @param int $userid
      *
      * @return mixed
@@ -965,11 +966,18 @@ class catquiz {
         int $numberofrecords = 1,
         int $instanceid = 0,
         int $courseid = 0,
+        int $attemptid = 0,
         int $userid = -1) {
 
         global $DB;
 
-        $sqlarray = self::return_sql_for_attemptid_contextid_json($numberofrecords, $instanceid, $courseid, $userid);
+        $sqlarray = self::return_sql_for_attemptid_contextid_json(
+            $numberofrecords,
+            $instanceid,
+            $courseid,
+            $attemptid,
+            $userid
+        );
 
         $recordsarray = $DB->get_records_sql($sqlarray[0], $sqlarray[1]);
 
@@ -981,6 +989,7 @@ class catquiz {
      * @param int $numberofrecords
      * @param int $instanceid
      * @param int $courseid
+     * @param int $attemptid
      * @param int $userid
      * @return array
      */
@@ -988,6 +997,7 @@ class catquiz {
         int $numberofrecords = 1,
         int $instanceid = 0,
         int $courseid = 0,
+        int $attemptid = 0,
         int $userid = -1): array {
 
         $sql = "SELECT
@@ -1011,12 +1021,25 @@ class catquiz {
             $params['userid'] = $userid;
         }
 
+        if ($attemptid !== 0) {
+            $wherearray[] = ' attemptid = :attemptid ';
+            $params['attemptid'] = $attemptid;
+        }
+
         if (count($wherearray) > 0) {
             $sql .= " WHERE " . implode(' AND ', $wherearray);
         }
 
-        $sql .= " ORDER BY timemodified DESC
-        LIMIT " . $numberofrecords;
+        $sql .= " ORDER BY timemodified DESC";
+
+        // We treat both INF as 0 as infinite value here, because intval(INF) is
+        // converted to 0.
+        if (
+            !is_infinite($numberofrecords)
+            && $numberofrecords !== 0
+        ) {
+            $sql .= " LIMIT " . $numberofrecords;
+        }
 
         return [$sql, $params];
     }
