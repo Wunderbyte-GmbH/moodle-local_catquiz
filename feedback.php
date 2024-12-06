@@ -37,8 +37,8 @@ $attemptid = optional_param('attemptid', 0, PARAM_INT);
 $context = context_system::instance();
 $PAGE->set_context($context);
 $PAGE->set_url(new moodle_url('/local/catquiz/feedback.php'));
-$PAGE->set_title(get_string('feedback', 'local_catquiz'));
-$PAGE->set_heading(get_string('feedback', 'local_catquiz'));
+$PAGE->set_title(get_string('catquiz_feedbackheader', 'local_catquiz'));
+$PAGE->set_heading(get_string('catquiz_feedbackheader', 'local_catquiz'));
 
 require_login();
 
