@@ -16,8 +16,10 @@
 
 namespace local_catquiz\output\catscalemanager\calculations;
 
+use core_form\dynamic_form;
 use html_writer;
 use local_catquiz\catquiz;
+use local_catquiz\form\remote_settings_form;
 use local_catquiz\table\event_log_table;
 use local_wunderbyte_table\filters\types\datepicker;
 use local_wunderbyte_table\filters\types\standardfilter;
@@ -39,6 +41,16 @@ class calculationsdisplay {
      */
     public function __construct() {
 
+    }
+
+    /**
+     * Renders the remote calculation configuration form.
+     *
+     * @return void
+     */
+    public function render_remote_calculation_config() {
+        $form = new remote_settings_form();
+        return html_writer::div($form->render(), '', ['id' => 'remote_settings_form']);
     }
 
     /**
@@ -106,6 +118,7 @@ class calculationsdisplay {
     public function export_data_array(): array {
 
         $data = [
+            'remoteconfig' => $this->render_remote_calculation_config(),
             'table' => $this->render_calculations_log_table(),
         ];
         return $data;

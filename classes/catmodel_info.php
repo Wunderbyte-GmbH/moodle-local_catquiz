@@ -30,6 +30,7 @@ use local_catquiz\catcontext;
 use local_catquiz\data\dataapi;
 use local_catquiz\event\calculation_executed;
 use local_catquiz\event\calculation_skipped;
+use local_catquiz\local\model\model_strategy;
 use local_catquiz\task\adhoc_recalculate_cat_model_params;
 use local_catquiz\task\recalculate_cat_model_params;
 use local_catquiz\local\model\model_item_param_list;
@@ -65,10 +66,17 @@ class catmodel_info {
             $this->trigger_parameter_calculation($contextid, $catscaleid);
         }
 
-        // Return the data that are currently saved in the DB.
-        $context = catcontext::load_from_db($contextid);
-        $strategy = $context->get_strategy($catscaleid);
-        return $strategy->get_params_from_db($contextid, $catscaleid);
+        $models = model_strategy::get_installed_models();
+        $catscaleids = [$catscaleid, ...catscale::get_subscale_ids($catscaleid)];
+        foreach (array_keys($models) as $modelname) {
+            $estdifficulties[$modelname] = model_item_param_list::load_from_db(
+                $contextid,
+                $modelname,
+                $catscaleids
+            );
+        }
+        $personabilities = model_person_param_list::load_from_db($contextid, $catscaleids);
+        return [$estdifficulties, $personabilities];
     }
 
     /**
@@ -109,7 +117,20 @@ class catmodel_info {
 
         $context = catcontext::load_from_db($contextid);
         $catscale = catscale::return_catscale_object($catscaleid);
-        $strategy = $context->get_strategy($catscaleid);
+        if (!$strategy = $context->get_strategy($catscaleid)) {
+            // Trigger event.
+            $event = calculation_skipped::create([
+                'context' => \context_system::instance(),
+                'userid' => $userid,
+                'other' => [
+                    'catscaleid' => $catscaleid,
+                    'contextid' => $contextid,
+                    'reason' => get_string($errorcode, 'local_catquiz'),
+                ],
+            ]);
+            $event->trigger();
+            return;
+        }
         $initialabilities = model_person_param_list::load_from_db($contextid, [$catscaleid]);
         $strategy->get_responses()->set_person_abilities($initialabilities);
         try {

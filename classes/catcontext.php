@@ -322,11 +322,13 @@ class catcontext {
      *
      * @param int $catscaleid
      *
-     * @return model_strategy
+     * @return ?model_strategy
      *
      */
-    public function get_strategy(int $catscaleid): model_strategy {
-        $responses = model_responses::create_for_context($this->id);
+    public function get_strategy(int $catscaleid): ?model_strategy {
+        if (!$responses = model_responses::create_for_context($this->id)) {
+            return null;
+        }
         $options = json_decode($this->json, true) ?? [];
         $installedmodels = model_strategy::get_installed_models();
         $olditemparams = [];
