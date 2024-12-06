@@ -24,11 +24,15 @@
 
 namespace local_catquiz\teststrategy;
 
+use context_course;
+use local_catquiz\catquiz;
 use local_catquiz\catscale;
 use local_catquiz\feedback\feedbackclass;
 use local_catquiz\local\model\model_item_param;
 use local_catquiz\local\model\model_model;
+use local_catquiz\output\attemptfeedback;
 use LogicException;
+use moodle_database;
 use stdClass;
 
 /**
@@ -46,6 +50,109 @@ class feedback_helper {
      * @var int
      */
     const PRECISION = 2;
+
+    /**
+     * Get feedback data for attempts
+     *
+     * @param array $args Arguments containing courseid, numberofattempts, instanceid.
+     * @param context_course $context Current course context.
+     * @param stdClass $USER Global user object.
+     * @param stdClass $COURSE Global course object
+     * @param moodle_database $DB Global DB object
+     * @param stdClass $CFG Global config object
+     * @return array Feedback data structure or error message
+     */
+    public static function get_feedback_data(
+        array $args,
+        context_course $context,
+        stdClass $USER,
+        stdClass $COURSE,
+        moodle_database $DB,
+        stdClass $CFG
+    ) {
+        // Check capability.
+        $capability = has_capability('local/catquiz:view_users_feedback', $context);
+        $userid = !$capability ? $USER->id : null;
+
+        // Get course ID.
+        $currentcourseid = 0;
+        if (isset($COURSE) && !empty($COURSE->id) && $COURSE->id > 1) {
+            $currentcourseid = $COURSE->id;
+        }
+        $courseid = $args['courseid'] ?? $currentcourseid;
+
+        // Get attempt records.
+        $records = catquiz::return_data_from_attemptstable(
+            intval($args['numberofattempts'] ?? 1),
+            intval($args['instanceid'] ?? 0),
+            intval($courseid),
+            intval($userid ?? -1)
+        );
+
+        if (!$records) {
+            return ['error' => get_string('attemptfeedbacknotyetavailable', 'local_catquiz')];
+        }
+
+        $output = [
+            'attempt' => [],
+        ];
+
+        foreach ($records as $record) {
+            if (!$attemptdata = json_decode($record->json)) {
+                if ($CFG->debug > 0) {
+                    throw new \moodle_exception(sprintf('Can not read attempt data of attempt %d', $record->attemptid));
+                } else {
+                    continue;
+                }
+            }
+            $strategyid = $attemptdata->teststrategy;
+            $feedbacksettings = new feedbacksettings($strategyid);
+
+            $attemptfeedback = new attemptfeedback($record->attemptid, $record->contextid, $feedbacksettings);
+            try {
+                $feedback = $attemptfeedback->get_feedback_for_attempt($record->json, $record->debug_info) ?? "";
+            } catch (\Throwable $t) {
+                $feedback = get_string('attemptfeedbacknotavailable', 'local_catquiz');
+            }
+
+            $timestamp = !empty($record->endtime) ? intval($record->endtime) : intval($record->timemodified);
+            $timeofattempt = userdate($timestamp, get_string('strftimedatetime', 'core_langconfig'));
+
+            if ($record->userid == $USER->id) {
+                $headerstring = get_string(
+                    'ownfeedbacksheader',
+                    'local_catquiz',
+                    $timeofattempt
+                );
+            } else if (isset($record->userid)) {
+                $userrecord = $DB->get_record('user', ['id' => $record->userid], 'firstname, lastname', IGNORE_MISSING);
+
+                $headerstring = get_string(
+                    'userfeedbacksheader',
+                    'local_catquiz',
+                    [
+                        'attemptid' => $record->attemptid,
+                        'time' => $timeofattempt,
+                        'firstname' => $userrecord->firstname,
+                        'lastname' => $userrecord->lastname,
+                        'userid' => $record->userid,
+                    ]
+                );
+            } else {
+                $headerstring = "";
+            }
+
+            $data = [
+                'feedback' => $feedback,
+                'header' => $headerstring,
+                'attemptid' => $record->attemptid,
+                'active' => empty($output['attempt']) ? true : false,
+            ];
+            $output['attempt'][] = $data;
+        }
+
+        return $output;
+    }
 
     /**
      * Write information about colorgradient for colorbar.
