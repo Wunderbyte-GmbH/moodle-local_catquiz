@@ -80,12 +80,14 @@ class feedback_helper {
             $currentcourseid = $COURSE->id;
         }
         $courseid = $args['courseid'] ?? $currentcourseid;
+        $attemptid = $args['attemptid'] ?? 0;
 
         // Get attempt records.
         $records = catquiz::return_data_from_attemptstable(
             intval($args['numberofattempts'] ?? 1),
             intval($args['instanceid'] ?? 0),
             intval($courseid),
+            intval($attemptid),
             intval($userid ?? -1)
         );
 
