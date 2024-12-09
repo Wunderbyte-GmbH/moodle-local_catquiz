@@ -71,7 +71,7 @@ class catquiz_handler {
      */
     public static function instance_form_definition(MoodleQuickForm &$mform) {
 
-        global $PAGE;
+        global $DB, $PAGE;
 
         $elements = [];
 
@@ -127,6 +127,17 @@ class catquiz_handler {
         $elements[] = $mform->addElement('header', 'catquiz_header',
                 get_string('catquizsettings', 'local_catquiz'));
         $mform->setExpanded('catquiz_header');
+
+        $selectedcontext = optional_param('contextid', 0, PARAM_INT);
+        $name = $DB->get_field('local_catquiz_catcontext', 'name', ['id' => $selectedcontext]);
+        if ($name) {
+            $elements[] = $mform->addElement(
+                'static',
+                'selectedcontext',
+                get_string('testcontext', 'local_catquiz'),
+                $name
+            );
+        }
 
         // Question categories or tags to use for this quiz.
 
@@ -295,6 +306,7 @@ class catquiz_handler {
             // Pass on the values as stdClass.
             $test = new testenvironment($cattest);
             $test->apply_jsonsaved_values($formdefaultvalues);
+            $_POST['contextid'] = $test->get_contextid() ?? 0;
 
             self::write_variables_to_post($formdefaultvalues);
 
@@ -879,7 +891,7 @@ class catquiz_handler {
         $cache = cache::make('local_catquiz', 'adaptivequizattempt');
         $cache->set('quizsettings', $quizsettings);
 
-        $catcontext = catscale::get_context_id($quizsettings->catquiz_catscales);
+        $catcontext = $testenvironment->get_contextid();
         $tsinfo = new info();
         $teststrategy = $tsinfo
             ->return_active_strategy($quizsettings->catquiz_selectteststrategy)

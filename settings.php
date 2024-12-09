@@ -127,4 +127,30 @@ if ($hassiteconfig) {
         24, // Default value.
         PARAM_INT // Expect integer type.
     ));
+    $settings->add(new admin_setting_configtext(
+        'local_catquiz/central_host',
+        get_string('central_host', 'local_catquiz'),
+        get_string('central_host_desc', 'local_catquiz'),
+        PARAM_URL
+    ));
+
+    $settings->add(new admin_setting_configtext(
+        'local_catquiz/central_token',
+        get_string('central_token', 'local_catquiz'),
+        get_string('central_token_desc', 'local_catquiz'),
+        PARAM_ALPHANUM
+    ));
+    $settings->add(new admin_setting_configtext(
+        'local_catquiz/sync_scale',
+        get_string('sync_scale', 'local_catquiz'),
+        get_string('sync_scale_desc', 'local_catquiz'),
+        PARAM_INT
+    ));
+    $settings->add(new admin_setting_configtextarea(
+        'local_catquiz/central_scale_labels',
+        get_string('central_scale_labels', 'local_catquiz'),
+        get_string('central_scale_labels_desc', 'local_catquiz'),
+        '', // Default value.
+        PARAM_TEXT
+    ));
 }

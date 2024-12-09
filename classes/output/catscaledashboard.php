@@ -180,6 +180,60 @@ class catscaledashboard {
     }
 
     /**
+     * Renders sync button
+     *
+     * @return string
+     */
+    private function render_syncbutton() {
+        // Only render the button for root scales that have no parent scale.
+        if (!$this->is_root_scale()) {
+            return '';
+        }
+
+        $buttontitle = get_string('syncbutton', 'local_catquiz');
+        return sprintf('<button class="btn btn-primary" type="button" id="sync_button">%s</button>', $buttontitle);
+    }
+
+    /**
+     * Renders button to trigger calculation via submitted responses
+     *
+     * @return string
+     */
+    private function render_remotecalc_button() {
+        // Only render the button for root scales that have no parent scale.
+        if (!$this->is_root_scale()) {
+            return '';
+        }
+
+        $buttontitle = get_string('remotecalcbutton', 'local_catquiz');
+        return sprintf('<button class="btn btn-primary" type="button" id="recalculate_remote">%s</button>', $buttontitle);
+    }
+
+    /**
+     * Renders button to share responses with central instance
+     *
+     * @return string
+     */
+    private function render_submitresponses_button() {
+        // Only render the button for root scales that have no parent scale.
+        if (!$this->is_root_scale()) {
+            return '';
+        }
+
+        $buttontitle = get_string('remotesubmitbutton', 'local_catquiz');
+        return sprintf('<button class="btn btn-primary" type="button" id="submit_responses_remote">%s</button>', $buttontitle);
+    }
+
+    /**
+     * Shows if the current scale is a root scale
+     *
+     * @return bool
+     */
+    private function is_root_scale() {
+        return ($this->catscale->parentid ?? null) === "0";
+    }
+
+    /**
      * Exports for template.
      *
      * @param \renderer_base $output
@@ -190,7 +244,7 @@ class catscaledashboard {
     public function export_scaledetails(\renderer_base $output): array {
 
         $cm = new catmodel_info;
-        list($itemdifficulties, $personabilities) = $cm->get_context_parameters(
+        [$itemdifficulties, $personabilities] = $cm->get_context_parameters(
             $this->catcontextid,
             $this->catscaleid,
             $this->triggercalculation
@@ -209,6 +263,11 @@ class catscaledashboard {
             'itemdifficulties' => $this->render_itemdifficulties($itemdifficulties),
             'personabilities' => $this->render_personabilities($personabilities),
             'modelbutton' => $this->render_modelbutton($this->catcontextid),
+            'syncbutton' => $this->render_syncbutton(),
+            'remotecalcbutton' => $this->render_remotecalc_button(),
+            'submitresponsesbutton' => $this->render_submitresponses_button(),
+            'is_root' => $this->is_root_scale(),
+            'centralhost' => get_config('local_catquiz', 'central_host'),
         ];
     }
 }
