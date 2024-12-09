@@ -32,43 +32,7 @@
 }}
 
 <div class="catscales-dashboard grid">
-  <div class="card">
-      <div class="card-header">
-      {{#personabilities}}
-        {{#str}} personability, local_catquiz {{/str}}
-      {{/personabilities}}
-      {{^personabilities}}
-        {{#str}} personabilitiesnodata, local_catquiz {{/str}}
-      {{/personabilities}}
-      </div>
-      <div class="card-body">
-        {{{personabilities}}}
-      </div>
-  </div>
-  {{#itemdifficulties}}
-  <div class="card">
-      <div class="card-header">
-        {{#str}} itemdifficulties, local_catquiz {{/str}} ({{modelname}})
-      </div>
-      <div class="card-body">
-        {{{chart}}}
-      </div>
-  </div>
-  {{/itemdifficulties}}
-  {{^itemdifficulties}}
-  <div class="card">
-      <div class="card-header">
-        {{#str}} itemdifficultiesnodata, local_catquiz {{/str}}
-      </div>
-      <div class="card-body">
-        {{{chart}}}
-      </div>
-  </div>
-  {{/itemdifficulties}}
 </div>
 
 {{#js}}
-  require(['local_catquiz/testitemdashboard/backtoscaleviewbutton'], function(init) {
-      init.init();
-  });
 {{/js}}
