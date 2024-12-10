@@ -49,6 +49,11 @@ class calculationsdisplay {
      * @return void
      */
     public function render_remote_calculation_config() {
+        $show = get_config('local_catquiz', 'enable_sync_as_client');
+        if (!$show) {
+            return '';
+        }
+
         $form = new remote_settings_form();
         return html_writer::div($form->render(), '', ['id' => 'remote_settings_form']);
     }

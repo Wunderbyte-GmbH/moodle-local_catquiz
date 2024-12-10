@@ -268,6 +268,8 @@ class catscaledashboard {
             'submitresponsesbutton' => $this->render_submitresponses_button(),
             'is_root' => $this->is_root_scale(),
             'centralhost' => get_config('local_catquiz', 'central_host'),
+            'sync_as_node_enabled' => get_config('local_catquiz', 'enable_sync_as_node'),
+            'sync_as_hub_enabled' => get_config('local_catquiz', 'enable_sync_as_hub'),
         ];
     }
 }
