@@ -204,7 +204,7 @@ class model_person_param_list implements ArrayAccess, IteratorAggregate, Countab
     public function get_values($sorted = false): array {
         $data = array_map(
             function (model_person_param $param) {
-                return $param->to_array();
+                return $param->to_array()['ability'];
             },
             $this->personparams
         );
