@@ -202,6 +202,10 @@ class modal_manage_catscale extends dynamic_form {
             $errors['name'] = get_string('catscalesname_exists', 'local_catquiz');
         }
 
+        if ($data['id'] === 0 && array_key_exists('label', $data) && dataapi::label_exists($data['label'])) {
+            $errors['label'] = get_string('catscaleslabel_exists', 'local_catquiz');
+        }
+
         if (isset($data["catquiz_minscalevalue"]) && (float) $data["catquiz_minscalevalue"] >= 0) {
             $errors["catquiz_minscalevalue"] = get_string(
                 'formelementnegativefloatwithdefault',

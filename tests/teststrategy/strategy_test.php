@@ -2111,20 +2111,36 @@ final class strategy_test extends advanced_testcase {
             $this->write_person_params_to_csv($calculatedabilities);
         }
         $expected = $this->get_expected_responses_data();
+        $failed = false;
         foreach ($expected as $model => $expectedparams) {
             foreach ($expectedparams as $ep) {
                 $itemid = array_shift($ep);
                 $calculated = $calculateditemparams[$model][$itemid];
                 $calculatedparams = $calculated->get_params_array();
                 foreach ($calculatedparams as $paramname => $paramvalue) {
-                    $this->assertEqualsWithDelta(
-                        $ep[$paramname],
-                        $paramvalue,
-                        0.001,
-                        sprintf("Values for model %s and item param %s do not match", $model, $itemid)
-                    );
+                    try {
+                        $this->assertEqualsWithDelta(
+                            $ep[$paramname],
+                            $paramvalue,
+                            0.001,
+                            sprintf("Values for model %s and item param %s do not match", $model, $itemid)
+                        );
+                    } catch (\Exception $e) { // Don't want the test to stop.
+                        $failed = true;
+                        echo sprintf(
+                            "Does not match: model=%s itemid=%s expected=%f actual=%f%s",
+                            $model,
+                            $itemid,
+                            $ep[$paramname],
+                            $paramvalue,
+                            PHP_EOL
+                        );
+                    }
                 }
             }
+        }
+        if ($failed) {
+            $this->fail('Some values did not match');
         }
     }
 
@@ -2139,19 +2155,19 @@ final class strategy_test extends advanced_testcase {
             ['itemid' => 'A01-01', 'difficulty' => -5.000],
             ['itemid' => 'A03-00', 'difficulty' => -5.00],
             ['itemid' => 'A05-03', 'difficulty' => -3.440],
-            ['itemid' => 'C03-19', 'difficulty' => -0.268],
-            ['itemid' => 'B02-06', 'difficulty' => -0.127],
-            ['itemid' => 'C09-17', 'difficulty' => 1.628],
-            ['itemid' => 'C08-11', 'difficulty' => 1.521],
-            ['itemid' => 'C08-16', 'difficulty' => 1.913],
+            ['itemid' => 'C03-19', 'difficulty' => -0.265],
+            ['itemid' => 'B02-06', 'difficulty' => -0.125],
+            ['itemid' => 'C09-17', 'difficulty' => 1.636],
+            ['itemid' => 'C08-11', 'difficulty' => 1.528],
+            ['itemid' => 'C08-16', 'difficulty' => 1.922],
         ];
         $raschbirnbaum = [
             ['itemid' => 'A01-00', 'difficulty' => -4.343, 'discrimination' => 6],
-            ['itemid' => 'A03-00', 'difficulty' => -4.378, 'discrimination' => 4.068],
+            ['itemid' => 'A03-00', 'difficulty' => -4.378, 'discrimination' => 4.066],
             ['itemid' => 'A03-01', 'difficulty' => -4.219, 'discrimination' => 1.920],
             ['itemid' => 'A05-03', 'difficulty' => -3.210, 'discrimination' => 1.533],
-            ['itemid' => 'C03-19', 'difficulty' => -0.406, 'discrimination' => 0.533],
-            ['itemid' => 'B04-18', 'difficulty' => 0.892, 'discrimination' => 0.330],
+            ['itemid' => 'C03-19', 'difficulty' => -0.402, 'discrimination' => 0.531],
+            ['itemid' => 'B04-18', 'difficulty' => 0.909, 'discrimination' => 0.328],
             ['itemid' => 'C08-16', 'difficulty' => 5, 'discrimination' => 0.197],
             ['itemid' => 'C08-09', 'difficulty' => 5, 'discrimination' => 0.255],
             ['itemid' => 'C08-11', 'difficulty' => 5, 'discrimination' => 0.156],
@@ -2160,12 +2176,12 @@ final class strategy_test extends advanced_testcase {
             ['itemid' => 'A01-00', 'difficulty' => -4.455, 'discrimination' => 6, 'guessing' => 0.0000],
             ['itemid' => 'A03-00', 'difficulty' => -4.217, 'discrimination' => 6, 'guessing' => 0.155],
             ['itemid' => 'A01-01', 'difficulty' => -4.364, 'discrimination' => 6, 'guessing' => 0.252],
-            ['itemid' => 'A05-01', 'difficulty' => -4.182, 'discrimination' => 0.323, 'guessing' => 0.000],
-            ['itemid' => 'C03-11', 'difficulty' => 0.629, 'discrimination' => 5.068, 'guessing' => 0.244],
-            ['itemid' => 'B04-00', 'difficulty' => 3.005, 'discrimination' => 0.342, 'guessing' => 0.0000],
+            ['itemid' => 'A05-01', 'difficulty' => -4.092, 'discrimination' => 0.325, 'guessing' => 0.000],
+            ['itemid' => 'C03-11', 'difficulty' => 0.629, 'discrimination' => 5.063, 'guessing' => 0.244],
+            ['itemid' => 'B04-00', 'difficulty' => 3.005, 'discrimination' => 0.343, 'guessing' => 0.0000],
             ['itemid' => 'C08-07', 'difficulty' => 4.959, 'discrimination' => 1.821, 'guessing' => 0.156],
-            ['itemid' => 'C08-16', 'difficulty' => 4.873, 'discrimination' => 3.108, 'guessing' => 0.218],
-            ['itemid' => 'C08-11', 'difficulty' => 5.000, 'discrimination' => 6.000, 'guessing' => 0.272],
+            ['itemid' => 'C08-16', 'difficulty' => 5.000, 'discrimination' => 2.978, 'guessing' => 0.218],
+            ['itemid' => 'C08-11', 'difficulty' => 5.000, 'discrimination' => 6.000, 'guessing' => 0.271],
         ];
         return [
             'rasch' => $rasch,

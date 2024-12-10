@@ -110,6 +110,7 @@ final class updatepersonability_test extends TestCase {
                     'contextid' => 1,
                     'catscaleid' => 1,
                     'userid' => $USER->id,
+                    'attemptid' => 123,
                     // Can be null here, because for pilot questions the ability will not be updated.
                     'fake_response_data' => [$USER->id => []],
                 ],
@@ -125,6 +126,7 @@ final class updatepersonability_test extends TestCase {
                         2 => 0.77,
                     ],
                     'contextid' => 1,
+                    'attemptid' => 123,
                     'catscaleid' => 1,
                     'userid' => $USER->id,
                     'questions' => [

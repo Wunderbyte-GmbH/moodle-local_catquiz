@@ -985,5 +985,146 @@ ENDSQL;
         // Catquiz savepoint reached.
         upgrade_plugin_savepoint(true, 2024092700, 'local', 'catquiz');
     }
+
+    // This is a bit unconventional. The table already exists with old, long
+    // names on a moodle instance that supports longer table names but can't be
+    // created on a different instance that has stricter naming rules.
+    if ($oldversion < 2024111804) {
+        // Check if old table exists first.
+        if ($dbman->table_exists('local_catquiz_question_hashmap')) {
+            // Rename the table.
+            $dbman->rename_table(
+                new xmldb_table('local_catquiz_question_hashmap'),
+                'local_catquiz_qhashmap'
+            );
+        } else {
+            // Define table local_catquiz_qhashmap.
+            $table = new xmldb_table('local_catquiz_qhashmap');
+
+            // Add fields.
+            $table->add_field('id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, XMLDB_SEQUENCE, null);
+            $table->add_field('questionid', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null);
+            $table->add_field('questionhash', XMLDB_TYPE_CHAR, '64', null, XMLDB_NOTNULL, null, null);
+            $table->add_field('hashdata', XMLDB_TYPE_TEXT, null, null, XMLDB_NOTNULL, null, null);
+            $table->add_field('timecreated', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0');
+            $table->add_field('timemodified', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0');
+
+            // Add keys.
+            $table->add_key('primary', XMLDB_KEY_PRIMARY, ['id']);
+            $table->add_key('questionid', XMLDB_KEY_FOREIGN, ['questionid'], 'question', ['id']);
+
+            // Add indexes.
+            $table->add_index('questionhash', XMLDB_INDEX_NOTUNIQUE, ['questionhash']);
+
+            // Create the table.
+            if (!$dbman->table_exists($table)) {
+                $dbman->create_table($table);
+            }
+        }
+
+        if ($dbman->table_exists('local_catquiz_remote_responses')) {
+            $dbman->rename_table(
+                new xmldb_table('local_catquiz_remote_responses'),
+                'local_catquiz_rresponses'
+            );
+        } else {
+            // Define table local_catquiz_rresponses.
+            $table = new xmldb_table('local_catquiz_rresponses');
+
+            // Add fields.
+            $table->add_field('id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, XMLDB_SEQUENCE, null);
+            $table->add_field('questionhash', XMLDB_TYPE_CHAR, '64', null, XMLDB_NOTNULL, null, null);
+            $table->add_field('remoteuserid', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null);
+            $table->add_field('response', XMLDB_TYPE_TEXT, null, null, XMLDB_NOTNULL, null, null);
+            $table->add_field('sourceurl', XMLDB_TYPE_CHAR, '255', null, XMLDB_NOTNULL, null, null);
+            $table->add_field('timecreated', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0');
+            $table->add_field('timeprocessed', XMLDB_TYPE_INTEGER, '10', null, null, null, null);
+            $table->add_field('processinginfo', XMLDB_TYPE_TEXT, null, null, null, null, null);
+
+            // Add keys.
+            $table->add_key('primary', XMLDB_KEY_PRIMARY, ['id']);
+
+            // Add indexes.
+            $table->add_index('questionhash_sourceurl', XMLDB_INDEX_NOTUNIQUE, ['questionhash', 'sourceurl']);
+            $table->add_index('timeprocessed', XMLDB_INDEX_NOTUNIQUE, ['timeprocessed']);
+
+            // Create the table.
+            if (!$dbman->table_exists($table)) {
+                $dbman->create_table($table);
+            }
+        }
+
+        upgrade_plugin_savepoint(true, 2024111804, 'local', 'catquiz');
+    }
+
+    if ($oldversion < 2024112601) {
+        // Define field contextid to be added to local_catquiz_tests.
+        $table = new xmldb_table('local_catquiz_tests');
+        $field = new xmldb_field('contextid', XMLDB_TYPE_INTEGER, '10', null, null, null, null, 'catscaleid');
+
+        // Conditionally launch add field contextid.
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        // For each existing test, set the contextid that corresponds to the main scale of that test.
+        $tests = $DB->get_records('local_catquiz_tests');
+
+        foreach ($tests as $test) {
+            if (empty($test->json)) {
+                continue;
+            }
+
+            $testconfig = json_decode($test->json);
+            if (!$testconfig || !isset($testconfig->catquiz_catscales)) {
+                continue;
+            }
+
+            $scaleid = $testconfig->catquiz_catscales;
+            if (!$scaleid) {
+                continue;
+            }
+
+            // Get the contextid from the catscales table.
+            if ($scale = $DB->get_record('local_catquiz_catscales', ['id' => $scaleid])) {
+                if (!empty($scale->contextid)) {
+                    $test->contextid = $scale->contextid;
+                    $DB->update_record('local_catquiz_tests', $test);
+                }
+            }
+        }
+
+        // Catquiz savepoint reached.
+        upgrade_plugin_savepoint(true, 2024112601, 'local', 'catquiz');
+    }
+
+    if ($oldversion < 2024112800) {
+        // Rename field remoteuserid on table local_catquiz_rresponses to attempthash.
+        $table = new xmldb_table('local_catquiz_rresponses');
+        $field = new xmldb_field('remoteuserid');
+        $field->set_attributes(XMLDB_TYPE_INTEGER, 10);
+
+        // Launch rename field attempthash.
+        $dbman->rename_field($table, $field, 'attempthash');
+
+        // Catquiz savepoint reached.
+        upgrade_plugin_savepoint(true, 2024112800, 'local', 'catquiz');
+    }
+
+    if ($oldversion < 2024112803) {
+        // Define index questionhash (notunique) to be added to local_catquiz_rresponses.
+        $table = new xmldb_table('local_catquiz_rresponses');
+        $index = new xmldb_index('questionhash', XMLDB_INDEX_NOTUNIQUE, ['questionhash']);
+
+        if ($dbman->index_exists($table, $index)) {
+            $dbman->drop_index($table, $index);
+        }
+
+        $dbman->add_index($table, $index);
+
+        // Catquiz savepoint reached.
+        upgrade_plugin_savepoint(true, 2024112803, 'local', 'catquiz');
+    }
+
     return true;
 }

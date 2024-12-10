@@ -141,7 +141,7 @@ class cancel_expired_attempts extends \core\task\scheduled_task {
      */
     private function initialize() {
         $this->currenttime = time();
-        $this->defaultmaxtime = 60 * 60 * get_config('local_catquiz', 'maximum_attempt_duration_hours');
+        $this->defaultmaxtime = 60 * 60 * intval(get_config('local_catquiz', 'maximum_attempt_duration_hours'));
         $this->load_max_times_per_test();
     }
 
