@@ -118,7 +118,10 @@ class catscaledashboard {
     private function render_personabilities(model_person_param_list $personparams) {
         global $OUTPUT;
 
-        $data = $personparams->get_values(true);
+        $data = array_map(
+            fn ($pp) => $pp['ability'],
+            $personparams->get_values(true)
+        );
         if (empty($data)) {
             return "";
         }
