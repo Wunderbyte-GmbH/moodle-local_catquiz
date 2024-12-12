@@ -122,6 +122,7 @@ export function listenToSelect(element, location, paramname) {
                 searchParams.set(paramname, response[paramname]);
             }
             searchParams.delete('contextid');
+            searchParams.delete('id');
             window.location.search = searchParams.toString();
 
         });
