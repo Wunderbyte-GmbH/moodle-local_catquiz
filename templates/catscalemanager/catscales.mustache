@@ -35,14 +35,6 @@
             {{> local_catquiz/tabs/tab_statistics}}
             {{{modelbutton}}}
         </div>
-        {{#js}}
-            require(['local_catquiz/testitemdashboard/backtoscaleviewbutton'], function(init) {
-                init.init();
-            require(['local_catquiz/calculatescales'], function(init) {
-                init.init();
-            });
-            });
-        {{/js}}
     {{/scaledetailview}}
     {{^scaledetailview}}
         <div class="grid">
