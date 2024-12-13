@@ -146,6 +146,12 @@ class testenvironment {
     private int $courseid;
 
     /**
+     * Keeps track of form fields that were removed.
+     * @var array
+     */
+    private array $removedformfields = [];
+
+    /**
      * Testenvironment constructor.
      * @param stdClass $newrecord
      */
@@ -271,6 +277,28 @@ class testenvironment {
             ];
         }
 
+        $updatescales = $formdefaultvalues['catquiz_catscales'] != $jsonobject->catquiz_catscales;
+        if ($updatescales) {
+            $clearfields = [
+                'catquiz_subscalecheckbox_',
+                'feedback_scaleid_limit_',
+                'feedbackeditor_scaleid_',
+                'enrolment_message_checkbox_',
+                'catquiz_courses_',
+                'catquiz_group_',
+                'feedbacklegend_scaleid_',
+                'wb_colourpicker_',
+                'catquiz_scalereportcheckbox_',
+            ];
+            foreach ($formdefaultvalues as $key => $val) {
+                foreach ($clearfields as $field) {
+                    if (preg_match("/^$field/", $key)) {
+                        $this->remove_field_from_form($formdefaultvalues, $key);
+                    }
+                }
+            }
+        }
+
         foreach ($jsonobject as $key => $value) {
 
             // Never overwrite a few values.
@@ -305,6 +333,11 @@ class testenvironment {
                 continue;
             }
             if (preg_match('/^feedbackeditor_scaleid_(\d+)_(\d+)$/', $key, $matches)) {
+                // If the form is reloaded from a template, set the text from the json.
+                if (!$cm && is_string($value) && is_array($formdefaultvalues[$key])) {
+                    $formdefaultvalues[$key]['text'] = $value;
+                    continue;
+                }
                 // Fallback for old fields stored as array.
                 if (is_array($value) && array_key_exists('text', $value)) {
                     $jsonobject[$key] = $value['text'];
@@ -612,5 +645,15 @@ class testenvironment {
         $numquestions = $DB->count_records_select('local_catquiz_items', "catscaleid $insql", $inparams);
         $cache->set($hashedkey, $numquestions);
         return $numquestions;
+    }
+
+    private function remove_field_from_form(array &$formdefaultvalues, string $fieldname): self {
+        unset($formdefaultvalues[$fieldname]);
+        $this->removedformfields[] = $fieldname;
+        return $this;
+    }
+
+    public function get_removed_form_fields(): array {
+        return $this->removedformfields;
     }
 }
