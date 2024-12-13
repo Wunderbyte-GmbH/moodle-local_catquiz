@@ -206,8 +206,8 @@ class catscaledashboard {
             'contextselector' => scaleandcontexselector::render_contextselector($this->catcontextid),
             'backtoscaleslink' => $backbutton,
             'scaledetailviewheading' => get_string('scaledetailviewheading', 'local_catquiz', $this->catscale->name),
-            'itemdifficulties' => $this->render_itemdifficulties($itemdifficulties),
-            'personabilities' => $this->render_personabilities($personabilities),
+            //'itemdifficulties' => $this->render_itemdifficulties($itemdifficulties),
+            //'personabilities' => $this->render_personabilities($personabilities),
             'modelbutton' => $this->render_modelbutton($this->catcontextid),
         ];
     }
