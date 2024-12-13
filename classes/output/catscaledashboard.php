@@ -212,8 +212,8 @@ class catscaledashboard {
             // Rendering the chart causes JS timeouts for big scales. Commenting out until we have a proper fix.
             // phpcs:disable
             // 'itemdifficulties' => $this->render_itemdifficulties($itemdifficulties),
+            // 'personabilities' => $this->render_personabilities($personabilities),
             // phpcs:enable
-            'personabilities' => $this->render_personabilities($personabilities),
             'modelbutton' => $this->render_modelbutton($this->catcontextid),
         ];
     }
