@@ -209,7 +209,10 @@ class catscaledashboard {
             'contextselector' => scaleandcontexselector::render_contextselector($this->catcontextid),
             'backtoscaleslink' => $backbutton,
             'scaledetailviewheading' => get_string('scaledetailviewheading', 'local_catquiz', $this->catscale->name),
-            'itemdifficulties' => $this->render_itemdifficulties($itemdifficulties),
+            // Rendering the chart causes JS timeouts for big scales. Commenting out until we have a proper fix.
+            // phpcs:disable
+            // 'itemdifficulties' => $this->render_itemdifficulties($itemdifficulties),
+            // phpcs:enable
             'personabilities' => $this->render_personabilities($personabilities),
             'modelbutton' => $this->render_modelbutton($this->catcontextid),
         ];
