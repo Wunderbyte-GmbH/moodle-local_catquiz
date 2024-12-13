@@ -158,16 +158,14 @@ class catquiz_handler {
         if (!empty($selectedparentscale)) {
             $element = $mform->getElement('catquiz_catscales');
             $element->setValue($selectedparentscale);
-            $subscales = \local_catquiz\data\dataapi::get_catscale_and_children($selectedparentscale, true);
 
-            self::generate_subscale_checkboxes($subscales, $elements, $mform);
         } else {
             $selectedparentscale = reset($parentcatscales)->id ?? 0;
             $_POST['catquiz_catscales'] = $selectedparentscale;
-            $subscales = \local_catquiz\data\dataapi::get_catscale_and_children($selectedparentscale, true);
 
-            self::generate_subscale_checkboxes($subscales, $elements, $mform);
         }
+        $subscales = \local_catquiz\data\dataapi::get_catscale_and_children($selectedparentscale, true);
+        self::generate_subscale_checkboxes($subscales, $elements, $mform);
 
         // Button to attach JavaScript to reload the form.
         $mform->registerNoSubmitButton('submitcatscaleoption');
