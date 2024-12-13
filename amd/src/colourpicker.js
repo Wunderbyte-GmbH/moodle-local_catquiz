@@ -22,6 +22,7 @@
  */
 
 import Templates from 'core/templates';
+import {get_string as getString} from 'core/str';
 
 const SELECTORS = {
     SELECTCOLOURPICKER: 'select[name^="wb_colourpicker_"]',
@@ -51,19 +52,25 @@ export const init = () => {
  *
  * @param {mixed} selectcolor
  */
-function addClickListener(selectcolor) {
-    const colours = [...selectcolor.querySelectorAll('option')].map(el => {
+async function addClickListener(selectcolor) {
+    const colours = await Promise.all([...selectcolor.querySelectorAll('option')].map(async el => {
 
         const colour = el.value;
+        let colourname = el.textContent;
+        try {
+            colourname = await getString('color_' + el.value + '_name', 'local_catquiz');
+        } catch (err) {
+            // Nothing to do: we already have a default value.
+        }
 
         return {
             colour,
-            colourname: el.textContent,
+            colourname,
             colourvalue: el.innerHTML,
             selected: selectcolor.value == el.value,
             id: selectcolor.name
         };
-    });
+    }));
 
     const colourobject = colours.filter(e => e.selected).pop();
 
@@ -83,7 +90,7 @@ function addClickListener(selectcolor) {
 
         colours.forEach(el => {
             el.addEventListener('click', e => {
-                colourselectnotify.innerHTML = e.target.dataset.colour;
+                colourselectnotify.innerHTML = e.target.dataset.colourname;
 
                 colours.forEach(el => el.classList.remove('selected'));
                 e.target.classList.add('selected');
