@@ -30,9 +30,6 @@ $capabilities = [
         'local/catquiz:canmanage' => [
             'captype' => 'write',
             'contextlevel' => CONTEXT_SYSTEM,
-            'archetypes' => [
-                'manager' => CAP_ALLOW,
-            ],
         ],
         'local/catquiz:subscribecatscales' => [
             'captype' => 'read',
