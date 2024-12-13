@@ -305,6 +305,11 @@ class testenvironment {
                 continue;
             }
             if (preg_match('/^feedbackeditor_scaleid_(\d+)_(\d+)$/', $key, $matches)) {
+                // If the form is reloaded from a template, set the text from the json.
+                if (!$cm && is_string($value) && is_array($formdefaultvalues[$key])) {
+                    $formdefaultvalues[$key]['text'] = $value;
+                    continue;
+                }
                 // Fallback for old fields stored as array.
                 if (is_array($value) && array_key_exists('text', $value)) {
                     $jsonobject[$key] = $value['text'];
