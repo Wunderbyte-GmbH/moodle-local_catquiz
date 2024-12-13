@@ -82,12 +82,3 @@
     {{>local_catquiz/importer/importerdatainfodisplay}}
   </div>
 </div>
-
-{{#js}}
-    require(['local_catquiz/csvimport'], function(init) {
-      init.init();
-  });
-  require(['local_catquiz/scaleandcontextselector'], function(init) {
-    init.init();
-  });
-{{/js}}
