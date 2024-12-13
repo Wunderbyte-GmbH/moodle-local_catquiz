@@ -153,21 +153,29 @@ class catquiz_handler {
         // ... after this function has finished execution. submitted form.
         // But the submitted via post, so we can access the variable via the superglobal $POST.
 
-        $selectedparentscale = optional_param('catquiz_catscales', 0, PARAM_INT);
+        if ($chosentemplate = optional_param('choosetemplate', 0, PARAM_INT)) {
+            // Get parent scale ID from template.
+            $cattest = (object)[
+                'id' => $chosentemplate,
+                'component' => 'mod_adaptivequiz',
+            ];
+
+            // Pass on the values as stdClass.
+            $test = new testenvironment($cattest);
+            $selectedparentscale = $test->return_as_array()['catscaleid'];
+        } else {
+            $selectedparentscale = optional_param('catquiz_catscales', 0, PARAM_INT);
+        }
 
         if (!empty($selectedparentscale)) {
             $element = $mform->getElement('catquiz_catscales');
             $element->setValue($selectedparentscale);
-            $subscales = \local_catquiz\data\dataapi::get_catscale_and_children($selectedparentscale, true);
-
-            self::generate_subscale_checkboxes($subscales, $elements, $mform);
         } else {
             $selectedparentscale = reset($parentcatscales)->id ?? 0;
             $_POST['catquiz_catscales'] = $selectedparentscale;
-            $subscales = \local_catquiz\data\dataapi::get_catscale_and_children($selectedparentscale, true);
-
-            self::generate_subscale_checkboxes($subscales, $elements, $mform);
         }
+        $subscales = \local_catquiz\data\dataapi::get_catscale_and_children($selectedparentscale, true);
+        self::generate_subscale_checkboxes($subscales, $elements, $mform);
 
         // Button to attach JavaScript to reload the form.
         $mform->registerNoSubmitButton('submitcatscaleoption');
@@ -840,6 +848,12 @@ class catquiz_handler {
             $igonorevalues = [];
         }
 
+    //    foreach ($test->get_removed_form_fields() as $field) {
+    //        if ($mform->elementExists($field)) {
+    // //           $mform->removeElement($field);
+    //        }
+    //    }
+
         foreach ($values as $k => $v) {
 
             if (isset($overridevalues[$k])) {
@@ -855,6 +869,18 @@ class catquiz_handler {
                 $element->setValue($v);
                 if ($test->status_force() && $k !== 'choosetemplate') {
                     $element->freeze();
+                }
+            } else {
+                if (preg_match("/^catquiz_subscalecheckbox_/", $k)) {
+                    $mform->addElement(
+                        'advcheckbox',
+                        $k,
+                        $k,
+                        null,
+                        [],
+                        [0, 1]
+                    );
+                    $mform->setDefault($k, $v);
                 }
             }
         }
