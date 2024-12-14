@@ -39,7 +39,7 @@ function xmldb_local_catquiz_install() {
         $max = $DB->get_record_sql($sql, []);
 
         $role = (object) [
-            'name' => 'catquiz Manager',
+            'name' => 'CAT Manager',
             'shortname' => 'catquizmanager',
             'description' => get_string('catquizroledescription', 'local_catquiz'),
             'sortorder' => $max->id,
