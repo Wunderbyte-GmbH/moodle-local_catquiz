@@ -120,14 +120,14 @@ $string['catquiz_feedbackheader'] = 'Feedback';
 $string['catquiz_left_quote'] = '„';
 $string['catquiz_right_quote'] = '“';
 $string['catquiz_selectfirstquestion'] = 'ansonsten beginne ...';
-$string['catquiz_selectfirstquestion_help'] = 'Dieser Einstellung legt fest, mit welcher Frage ein Testversuch gestartet wird.';
+$string['catquiz_selectfirstquestion_help'] = 'Diese Einstellung legt fest, mit welcher Frage ein Testversuch gestartet wird.';
 $string['catquiz_selectteststrategy'] = 'Testzweck';
 $string['catquiz_teststrategyheader'] = 'CAT-Einstellungen';
 $string['catquizfeedback'] = 'Zeigt eine Übersicht zu den letzten Testversuchen.';
 $string['catquizfeedbackheader'] = 'Feedback für Skala „{$a}“';
-$string['catquizroledescription'] = 'Catquiz VerwalterIn';
+$string['catquizroledescription'] = 'CAT-Manager/innen haben Zugriff auf das Backend zum Verwalten von CAT-Skalen und haben Einblick in instanzweite Statistiken.';
 $string['catquizsettings'] = 'Test-Inhalt und Einsatz-Kontext';
-$string['catquizstatistics_askforparams'] = 'Bitte geben Sie einen „globalscale“ oder „courseid“ Parameter an';
+$string['catquizstatistics_askforparams'] = 'Bitte geben Sie die Parameter „globalscale“ oder „courseid“ an';
 $string['catquizstatistics_exportcsv_description'] = 'Hier können Sie als
     Nutzer mit Berechtigung zum Download eines Exports die Ergebnisse aller Versuche als CSV-Datei
     exportieren.';
