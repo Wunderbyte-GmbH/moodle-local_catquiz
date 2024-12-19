@@ -38,6 +38,11 @@ use renderable;
  */
 class catscaledashboard {
 
+    /**
+     * Sets the maximum number of values used for the chart.
+     * @var int
+     */
+    public const CHART_MAX_NUM = 100;
 
     /** @var int of catscaleid */
     public int $catscaleid = 0;
@@ -96,6 +101,9 @@ class catscaledashboard {
                 continue;
             }
 
+            // To keep the time required to render the chart reasonable, do not
+            // display more values than required.
+            $data = $this->filter_values($data);
             $chart = new \core\chart_line();
             $series = new \core\chart_series('Series 1 (Line)', array_values($data));
             $chart->set_smooth(true); // Calling set_smooth() passing true as parameter, will display smooth lines.
@@ -125,6 +133,11 @@ class catscaledashboard {
         if (empty($data)) {
             return "";
         }
+
+        // To keep the time required to render the chart reasonable, do not
+        // display more values than required.
+        $data = $this->filter_values($data);
+
         $chart = new \core\chart_line();
         $series = new \core\chart_series('Series 1 (Line)', array_values($data));
         $chart->set_smooth(true); // Calling set_smooth() passing true as parameter, will display smooth lines.
@@ -209,12 +222,35 @@ class catscaledashboard {
             'contextselector' => scaleandcontexselector::render_contextselector($this->catcontextid),
             'backtoscaleslink' => $backbutton,
             'scaledetailviewheading' => get_string('scaledetailviewheading', 'local_catquiz', $this->catscale->name),
-            // Rendering the chart causes JS timeouts for big scales. Commenting out until we have a proper fix.
-            // phpcs:disable
-            // 'itemdifficulties' => $this->render_itemdifficulties($itemdifficulties),
-            // 'personabilities' => $this->render_personabilities($personabilities),
-            // phpcs:enable
+            'itemdifficulties' => $this->render_itemdifficulties($itemdifficulties),
+            'personabilities' => $this->render_personabilities($personabilities),
             'modelbutton' => $this->render_modelbutton($this->catcontextid),
         ];
+    }
+
+    /**
+     * If the given array contains more values than allowed, values are removed.
+     *
+     * This is used to remove values from the arrays of the ability and item difficulty charts if they contain too many.
+     *
+     * @param array $values
+     * @param int $max
+     * @return array
+     */
+    private function filter_values(array $values, int $max = self::CHART_MAX_NUM): array {
+        if (count($values) <= $max) {
+            return $values;
+        }
+
+        // Show every Nth value.
+        $showeveryn = round(count($values) / $max);
+        $i = 0;
+        foreach (array_keys($values) as $key) {
+            if ($i % $showeveryn != 0) {
+                unset($values[$key]);
+            }
+            $i++;
+        }
+        return $values;
     }
 }
