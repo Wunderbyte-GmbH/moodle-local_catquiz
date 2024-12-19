@@ -309,6 +309,7 @@ class catquiz_handler {
             // Pass on the values as stdClas.
             $test = new testenvironment($cattest);
             $test->apply_jsonsaved_values($formdefaultvalues);
+            // Hier
 
             self::write_variables_to_post($formdefaultvalues);
         }
