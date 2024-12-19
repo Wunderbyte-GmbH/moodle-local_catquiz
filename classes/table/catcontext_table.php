@@ -29,6 +29,7 @@ defined('MOODLE_INTERNAL') || die();
 global $CFG;
 
 use cache_helper;
+use local_catquiz\catcontext;
 use local_catquiz\testenvironment;
 use local_wunderbyte_table\wunderbyte_table;
 use stdClass;
@@ -191,7 +192,7 @@ class catcontext_table extends wunderbyte_table {
      */
     public function action_deleteitem(int $id, string $data): array {
 
-        if (testenvironment::delete_testenvironment($id)) {
+        if (catcontext::delete($id)) {
             $success = 1;
             $message = get_string('success');
         } else {
@@ -199,7 +200,7 @@ class catcontext_table extends wunderbyte_table {
             $message = get_string('error');
         }
 
-        cache_helper::purge_by_event('changesintestenvironments');
+        cache_helper::purge_by_event('changesincatcontexts');
 
         return [
             'success' => $success,
