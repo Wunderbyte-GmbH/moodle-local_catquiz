@@ -26,6 +26,7 @@
 namespace local_catquiz;
 
 use cache_helper;
+use dml_exception;
 use local_catquiz\event\context_created;
 use local_catquiz\event\context_updated;
 use local_catquiz\local\model\model_item_param_list;
@@ -382,5 +383,24 @@ class catcontext {
      */
     public function gettimecalculated(): int {
         return $this->timecalculated;
+    }
+
+    /**
+     * Delete a CAT context.
+     *
+     * @param int $id
+     *
+     * @return bool
+     *
+     */
+    public static function delete(int $id) {
+        global $DB;
+
+        try {
+            $DB->delete_records('local_catquiz_catcontext', ['id' => $id]);
+            return true;
+        } catch (dml_exception $e) {
+            return false;
+        }
     }
 }
