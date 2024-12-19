@@ -158,11 +158,9 @@ class catquiz_handler {
         if (!empty($selectedparentscale)) {
             $element = $mform->getElement('catquiz_catscales');
             $element->setValue($selectedparentscale);
-
         } else {
             $selectedparentscale = reset($parentcatscales)->id ?? 0;
             $_POST['catquiz_catscales'] = $selectedparentscale;
-
         }
         $subscales = \local_catquiz\data\dataapi::get_catscale_and_children($selectedparentscale, true);
         self::generate_subscale_checkboxes($subscales, $elements, $mform);
@@ -838,6 +836,12 @@ class catquiz_handler {
             $igonorevalues = [];
         }
 
+    //    foreach ($test->get_removed_form_fields() as $field) {
+    //        if ($mform->elementExists($field)) {
+    // //           $mform->removeElement($field);
+    //        }
+    //    }
+
         foreach ($values as $k => $v) {
 
             if (isset($overridevalues[$k])) {
@@ -853,6 +857,18 @@ class catquiz_handler {
                 $element->setValue($v);
                 if ($test->status_force() && $k !== 'choosetemplate') {
                     $element->freeze();
+                }
+            } else {
+                if (preg_match("/^catquiz_subscalecheckbox_/", $k)) {
+                    $mform->addElement(
+                        'advcheckbox',
+                        $k,
+                        $k,
+                        null,
+                        [],
+                        [0, 1]
+                    );
+                    $mform->setDefault($k, $v);
                 }
             }
         }
