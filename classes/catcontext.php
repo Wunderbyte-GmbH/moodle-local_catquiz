@@ -26,12 +26,14 @@
 namespace local_catquiz;
 
 use cache_helper;
+use dml_exception;
 use local_catquiz\event\context_created;
 use local_catquiz\event\context_updated;
 use local_catquiz\local\model\model_item_param_list;
 use local_catquiz\local\model\model_person_param_list;
 use local_catquiz\local\model\model_responses;
 use local_catquiz\local\model\model_strategy;
+use moodle_exception;
 use stdClass;
 
 defined('MOODLE_INTERNAL') || die();
@@ -382,5 +384,29 @@ class catcontext {
      */
     public function gettimecalculated(): int {
         return $this->timecalculated;
+    }
+
+    /**
+     * Delete a CAT context.
+     *
+     * @param int $id
+     *
+     * @return bool
+     * @throws moodle_exception
+     */
+    public static function delete(int $id) {
+        global $DB;
+
+        // The default context should never be deleted.
+        $defaultcontextid = catquiz::get_default_context_id();
+        if ($id == $defaultcontextid) {
+            throw new moodle_exception('cannotdeletedefaultcontext', 'local_catquiz');
+        }
+
+        try {
+            $DB->delete_records('local_catquiz_catcontext', ['id' => $id]);
+        } catch (dml_exception $e) {
+            throw new moodle_exception('error');
+        }
     }
 }
