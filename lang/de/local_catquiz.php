@@ -98,6 +98,7 @@ $string['callbackfunctionnotapplied'] = 'Callback Funktion konnte nicht angewand
 $string['callbackfunctionnotdefined'] = 'Callback Funktion nicht definiert.';
 $string['canbesetto0iflabelgiven'] = 'Kann 0 sein, wenn Abgleich über Label stattfindet.';
 $string['cancelexpiredattempts'] = 'Abgelaufene Versuche schließen';
+$string['cannotdeletedefaultcontext'] = 'Der Default CAT Kontext kann nicht gelöscht werden';
 $string['cannotdeletescalewithchildren'] = 'Skalen mit Unterskalen können nicht gelöscht werden.';
 $string['catcatscaleprime'] = 'Inhaltsbereich (Globalskala)';
 $string['catcatscaleprime_help'] = 'Wählen Sie den für Sie relevanten Inhaltsbereich aus. Inhaltsbereche werden als CAT-Skala durch eine*n CAT-Manager*in angelegt und verwaltet. Falls Sie eigene Inhalts- und Unterbereiche wünschen, wenden Sie sich bitte an den oder die CAT-Manager*in oder den bzw. die Adminstrator*in Ihrer Moodle-Instanz.';

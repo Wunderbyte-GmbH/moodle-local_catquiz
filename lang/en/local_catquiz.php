@@ -98,6 +98,7 @@ $string['callbackfunctionnotapplied'] = 'Callback function could not be applied.
 $string['callbackfunctionnotdefined'] = 'Callback function is not defined.';
 $string['canbesetto0iflabelgiven'] = 'Can be 0 if matching of testitem is via label.';
 $string['cancelexpiredattempts'] = 'Cancel attempts exceeding maximum time';
+$string['cannotdeletedefaultcontext'] = 'Cannot delete default CAT context';
 $string['cannotdeletescalewithchildren'] = 'Cannot delete CAT scale with children';
 $string['catcatscaleprime'] = 'Content/Scale';
 $string['catcatscaleprime_help'] = 'Select the content area that is relevant to you. Content areas are created and managed as a so-called scale by a CAT manager. If you would like your own content and sub-areas, please contact the CAT manager or the administrator of your Moodle instance.';
