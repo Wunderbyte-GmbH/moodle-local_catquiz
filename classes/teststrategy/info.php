@@ -27,6 +27,7 @@ namespace local_catquiz\teststrategy;
 use cache;
 use core_component;
 use local_catquiz\feedback\feedbackclass;
+use local_catquiz\testenvironment;
 use local_catquiz\teststrategy\context\contextcreator;
 use local_catquiz\teststrategy\preselect_task\firstquestionselector;
 use MoodleQuickForm;
@@ -144,9 +145,10 @@ class info {
      *
      * @param MoodleQuickForm $mform
      * @param array $elements
+     * @param ?testenvironment $template
      * @return void
      */
-    public static function instance_form_definition(MoodleQuickForm &$mform, array &$elements) {
+    public static function instance_form_definition(MoodleQuickForm &$mform, array &$elements, ?testenvironment $template) {
 
         $data = $mform->getSubmitValues();
         $defaultvalues = $mform->_defaultValues;
@@ -433,7 +435,7 @@ class info {
         );
         $mform->hideIf('catquiz_questionfeedbacksettings', 'catquiz_showquestion', 'neq', 1);
 
-        feedbackclass::instance_form_definition($mform, $elements);
+        feedbackclass::instance_form_definition($mform, $elements, $template);
     }
 
     /**
