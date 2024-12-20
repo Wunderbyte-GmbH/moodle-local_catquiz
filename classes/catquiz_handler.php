@@ -95,6 +95,10 @@ class catquiz_handler {
 
         $mform->setType('choosetemplate', PARAM_INT);
 
+        // Add a hidden element to store which button was clicked
+        $elements[] = $mform->addElement('hidden', 'triggered_button', '');
+        $mform->setType('triggered_button', PARAM_ALPHANUMEXT);
+
         $context = context_system::instance();
 
         if (has_capability('local/catquiz:manage_testenvironments', $context)) {

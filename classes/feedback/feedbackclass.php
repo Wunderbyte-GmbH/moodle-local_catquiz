@@ -203,7 +203,7 @@ class feedbackclass {
                 }
 
                 if (isset($feedbacktext) && strlen($feedbacktext) > 0) {
-                    $nfeedbacksgiven ++;
+                    $nfeedbacksgiven++;
                 }
 
                 // Header for Subfeedback.
