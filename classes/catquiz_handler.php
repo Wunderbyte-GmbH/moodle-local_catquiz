@@ -95,6 +95,10 @@ class catquiz_handler {
 
         $mform->setType('choosetemplate', PARAM_INT);
 
+        // Add a hidden element to store which button was clicked
+        $elements[] = $mform->addElement('hidden', 'triggered_button', '');
+        $mform->setType('triggered_button', PARAM_ALPHANUMEXT);
+
         $context = context_system::instance();
 
         if (has_capability('local/catquiz:manage_testenvironments', $context)) {
@@ -153,7 +157,9 @@ class catquiz_handler {
         // ... after this function has finished execution. submitted form.
         // But the submitted via post, so we can access the variable via the superglobal $POST.
 
-        if ($chosentemplate = optional_param('choosetemplate', 0, PARAM_INT)) {
+        $reloadtemplate = optional_param('reloadtemplate', true, PARAM_BOOL);
+        $template = null;
+        if ($reloadtemplate && $chosentemplate = optional_param('choosetemplate', 0, PARAM_INT)) {
             // Get parent scale ID from template.
             $cattest = (object)[
                 'id' => $chosentemplate,
@@ -161,8 +167,8 @@ class catquiz_handler {
             ];
 
             // Pass on the values as stdClass.
-            $test = new testenvironment($cattest);
-            $selectedparentscale = $test->return_as_array()['catscaleid'];
+            $template = new testenvironment($cattest);
+            $selectedparentscale = $template->return_as_array()['catscaleid'];
         } else {
             $selectedparentscale = optional_param('catquiz_catscales', 0, PARAM_INT);
         }
@@ -189,7 +195,7 @@ class catquiz_handler {
         $mform->addHelpButton('catquiz_passinglevel', 'passinglevel', 'local_catquiz');
         $mform->setType('catquiz_passinglevel', PARAM_INT);
 
-        info::instance_form_definition($mform, $elements);
+        info::instance_form_definition($mform, $elements, $template);
 
         return $elements;
     }

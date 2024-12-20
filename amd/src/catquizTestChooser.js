@@ -67,8 +67,8 @@ export const init = () => {
 
             switch (e.target.dataset.onChangeAction) {
                 case 'reloadTestForm':
+                    document.getElementsByName('triggered_button')[0].value = 'reloadTestForm';
                     clickNoSubmitButton(e.target, SELECTORS.CATTESTSUBMIT);
-                    clickNoSubmitButton(e.target, SELECTORS.CATSCALESUBMIT);
                     break;
                 case 'reloadFormFromScaleSelect':
                     clickNoSubmitButton(e.target, SELECTORS.CATSCALESUBMIT);
