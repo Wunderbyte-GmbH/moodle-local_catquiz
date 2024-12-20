@@ -153,7 +153,19 @@ class catquiz_handler {
         // ... after this function has finished execution. submitted form.
         // But the submitted via post, so we can access the variable via the superglobal $POST.
 
-        $selectedparentscale = optional_param('catquiz_catscales', 0, PARAM_INT);
+        if ($chosentemplate = optional_param('choosetemplate', 0, PARAM_INT)) {
+            // Get parent scale ID from template.
+            $cattest = (object)[
+                'id' => $chosentemplate,
+                'component' => 'mod_adaptivequiz',
+            ];
+
+            // Pass on the values as stdClass.
+            $test = new testenvironment($cattest);
+            $selectedparentscale = $test->return_as_array()['catscaleid'];
+        } else {
+            $selectedparentscale = optional_param('catquiz_catscales', 0, PARAM_INT);
+        }
 
         if (!empty($selectedparentscale)) {
             $element = $mform->getElement('catquiz_catscales');
