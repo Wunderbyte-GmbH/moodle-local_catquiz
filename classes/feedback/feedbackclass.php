@@ -25,6 +25,7 @@
 namespace local_catquiz\feedback;
 
 use local_catquiz\data\dataapi;
+use local_catquiz\testenvironment;
 use MoodleQuickForm;
 use stdClass;
 
@@ -41,16 +42,23 @@ class feedbackclass {
      * Add Form elements to form.
      * @param MoodleQuickForm $mform
      * @param array $elements
+     * @param ?testenvironment $template
+     *
      * @return void
      */
-    public static function instance_form_definition(MoodleQuickForm &$mform, array &$elements) {
+    public static function instance_form_definition(MoodleQuickForm &$mform, array &$elements, ?testenvironment $template) {
 
         global $CFG, $PAGE, $OUTPUT;
 
         require_once($CFG->libdir .'/datalib.php');
 
-        // Get all Values from the form.
-        $data = $mform->getSubmitValues();
+        // If the user just selected a template, get the values from there.
+        if ($template) {
+            $data = (array) $template->return_settings();
+        } else {
+            // Otherwise: Get all values from the existing form.
+            $data = $mform->getSubmitValues();
+        }
         $defaultvalues = $mform->_defaultValues;
 
         // phpcs:ignore
@@ -65,6 +73,9 @@ class feedbackclass {
         ];
 
         $selectedparentscale = optional_param('catquiz_catscales', 0, PARAM_INT);
+        if ($template) {
+            $selectedparentscale = $template->return_as_array()['catscaleid'];
+        }
 
         if (!empty($selectedparentscale)) {
             $scales = dataapi::get_catscale_and_children($selectedparentscale, true);
@@ -185,11 +196,14 @@ class feedbackclass {
                     if (is_array($feedback)) {
                         $feedbacktext = $feedback['text'];
                     }
+                    if (is_object($feedback)) {
+                        $feedbacktext = $feedback->text;
+                    }
                     $feedbacktext = strip_tags($feedbacktext ?? '');
                 }
 
                 if (isset($feedbacktext) && strlen($feedbacktext) > 0) {
-                    $nfeedbacksgiven ++;
+                    $nfeedbacksgiven++;
                 }
 
                 // Header for Subfeedback.
