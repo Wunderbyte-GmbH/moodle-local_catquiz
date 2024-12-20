@@ -33,6 +33,7 @@ use local_catquiz\local\model\model_item_param_list;
 use local_catquiz\local\model\model_person_param_list;
 use local_catquiz\local\model\model_responses;
 use local_catquiz\local\model\model_strategy;
+use moodle_exception;
 use stdClass;
 
 defined('MOODLE_INTERNAL') || die();
@@ -391,16 +392,21 @@ class catcontext {
      * @param int $id
      *
      * @return bool
-     *
+     * @throws moodle_exception
      */
     public static function delete(int $id) {
         global $DB;
 
+        // The default context should never be deleted.
+        $defaultcontextid = catquiz::get_default_context_id();
+        if ($id == $defaultcontextid) {
+            throw new moodle_exception('cannotdeletedefaultcontext', 'local_catquiz');
+        }
+
         try {
             $DB->delete_records('local_catquiz_catcontext', ['id' => $id]);
-            return true;
         } catch (dml_exception $e) {
-            return false;
+            throw new moodle_exception('error');
         }
     }
 }
