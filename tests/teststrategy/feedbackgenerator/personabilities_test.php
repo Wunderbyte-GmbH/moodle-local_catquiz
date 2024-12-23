@@ -950,7 +950,6 @@ final class personabilities_test extends advanced_testcase {
             "catquiz_subscalecheckbox_293" => "1",
             "catquiz_subscalecheckbox_294" => "1",
             "catquiz_subscalecheckbox_295" => "1",
-            "catquiz_passinglevel" => "",
             "catquiz_selectteststrategy" => "4",
             "catquiz_includepilotquestions" => "0",
             "catquiz_selectfirstquestion" => "startwitheasiestquestion",

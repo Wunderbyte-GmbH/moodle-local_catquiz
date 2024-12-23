@@ -191,10 +191,6 @@ class catquiz_handler {
             'data-action' => 'submitCatScale',
         ]);
 
-        $elements[] = $mform->addElement('text', 'catquiz_passinglevel', get_string('passinglevel', 'local_catquiz'));
-        $mform->addHelpButton('catquiz_passinglevel', 'passinglevel', 'local_catquiz');
-        $mform->setType('catquiz_passinglevel', PARAM_INT);
-
         info::instance_form_definition($mform, $elements, $template);
 
         return $elements;
@@ -426,11 +422,6 @@ class catquiz_handler {
 
         self::check_if_positive_int($errors, $data, "catquiz_maxtimeperattempt", 'catquiz_timelimitgroup');
         self::check_if_positive_int($errors, $data, "catquiz_maxtimeperitem", 'catquiz_timelimitgroup');
-
-        // Validate higher and lower values.
-        if (0 > (int) $data['catquiz_passinglevel'] || 100 < (int) $data['catquiz_passinglevel']) {
-            $errors['catquiz_passinglevel'] = get_string('formelementwrongpercent', 'local_catquiz');
-        }
 
         if (isset($data['catquiz_pilotratio'])) {
             if (0 > (int) $data['catquiz_pilotratio'] || 100 < (int) $data['catquiz_pilotratio']) {
