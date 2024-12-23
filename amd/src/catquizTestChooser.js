@@ -64,6 +64,8 @@ export const init = () => {
                 submitbutton.classList.remove('hidden');
                 return;
             }
+            let triggeredButtonField = document.getElementsByName('triggered_button')[0];
+            triggeredButtonField.value = '';
 
             switch (e.target.dataset.onChangeAction) {
                 case 'reloadTestForm':
