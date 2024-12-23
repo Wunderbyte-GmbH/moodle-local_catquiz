@@ -271,18 +271,9 @@ class testenvironment {
             ];
         }
 
-        $updatescales = $formdefaultvalues['catquiz_catscales'] ?? null != $jsonobject['catquiz_catscales'];
-        if ($updatescales) {
+        if (($formdefaultvalues['triggered_button'] ?? null) === "reloadTestForm") {
             $clearfields = [
                 'catquiz_subscalecheckbox_',
-                'feedback_scaleid_limit_',
-                'feedbackeditor_scaleid_',
-                'enrolment_message_checkbox_',
-                'catquiz_courses_',
-                'catquiz_group_',
-                'feedbacklegend_scaleid_',
-                'wb_colourpicker_',
-                'catquiz_scalereportcheckbox_',
             ];
             foreach ($formdefaultvalues as $key => $val) {
                 foreach ($clearfields as $field) {
@@ -296,7 +287,8 @@ class testenvironment {
         foreach ($jsonobject as $key => $value) {
 
             // Never overwrite a few values.
-            if (in_array($key, [
+            if (
+                in_array($key, [
                 'id',
                 'instance',
                 'name',
@@ -322,8 +314,8 @@ class testenvironment {
                 'conditionfieldgroup',
                 'downloadcontent',
                 'timemodified',
-
-                ])) {
+                ])
+            ) {
                 continue;
             }
             if (preg_match('/^feedbackeditor_scaleid_(\d+)_(\d+)$/', $key, $matches)) {
@@ -340,7 +332,7 @@ class testenvironment {
                 $scaleid = intval($matches[1]);
                 $rangeid = intval($matches[2]);
                 $filearea = sprintf('feedback_files_%d_%d', $scaleid, $rangeid);
-                $jsonobject[$key.'format'] = 1;
+                $jsonobject[$key . 'format'] = 1;
                 $field = sprintf('feedbackeditor_scaleid_%d_%d', $scaleid, $rangeid);
                 if ($options) {
                     $data = (object) file_prepare_standard_editor(
@@ -352,19 +344,19 @@ class testenvironment {
                         $filearea,
                         intval($this->componentid)
                     );
+                    $formdefaultvalues[$key] = $data->$key;
+                    $formdefaultvalues[$key . '_editor'] = $data->{$key . '_editor'};
+                    $formdefaultvalues[$key . 'format'] = $data->{$key . 'format'};
+                    $draftitemid = file_get_submitted_draft_itemid($field);
+                    file_prepare_draft_area(
+                        $draftitemid,
+                        $context->id,
+                        'local_catquiz',
+                        $filearea,
+                        intval($this->componentid)
+                    );
+                    continue;
                 }
-                $formdefaultvalues[$key] = $data->$key;
-                $formdefaultvalues[$key.'_editor'] = $data->{$key.'_editor'};
-                $formdefaultvalues[$key.'format'] = $data->{$key.'format'};
-                $draftitemid = file_get_submitted_draft_itemid($field);
-                file_prepare_draft_area(
-                    $draftitemid,
-                    $context->id,
-                    'local_catquiz',
-                    $filearea,
-                    intval($this->componentid)
-                );
-                continue;
             }
 
             $formdefaultvalues[$key] = $value;
