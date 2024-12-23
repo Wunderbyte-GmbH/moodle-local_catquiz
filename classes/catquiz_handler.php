@@ -95,7 +95,7 @@ class catquiz_handler {
 
         $mform->setType('choosetemplate', PARAM_INT);
 
-        // Add a hidden element to store which button was clicked
+        // Add a hidden element to store which button was clicked.
         $elements[] = $mform->addElement('hidden', 'triggered_button', '');
         $mform->setType('triggered_button', PARAM_ALPHANUMEXT);
 
@@ -853,12 +853,6 @@ class catquiz_handler {
             $overridevalues = [];
             $igonorevalues = [];
         }
-
-    //    foreach ($test->get_removed_form_fields() as $field) {
-    //        if ($mform->elementExists($field)) {
-    // //           $mform->removeElement($field);
-    //        }
-    //    }
 
         foreach ($values as $k => $v) {
 
