@@ -146,12 +146,6 @@ class testenvironment {
     private int $courseid;
 
     /**
-     * Keeps track of form fields that were removed.
-     * @var array
-     */
-    private array $removedformfields = [];
-
-    /**
      * Testenvironment constructor.
      * @param stdClass $newrecord
      */
@@ -277,7 +271,7 @@ class testenvironment {
             ];
         }
 
-        $updatescales = $formdefaultvalues['catquiz_catscales'] != $jsonobject->catquiz_catscales;
+        $updatescales = $formdefaultvalues['catquiz_catscales'] ?? null != $jsonobject['catquiz_catscales'];
         if ($updatescales) {
             $clearfields = [
                 'catquiz_subscalecheckbox_',
@@ -293,7 +287,7 @@ class testenvironment {
             foreach ($formdefaultvalues as $key => $val) {
                 foreach ($clearfields as $field) {
                     if (preg_match("/^$field/", $key)) {
-                        $this->remove_field_from_form($formdefaultvalues, $key);
+                        unset($formdefaultvalues[$key]);
                     }
                 }
             }
@@ -645,15 +639,5 @@ class testenvironment {
         $numquestions = $DB->count_records_select('local_catquiz_items', "catscaleid $insql", $inparams);
         $cache->set($hashedkey, $numquestions);
         return $numquestions;
-    }
-
-    private function remove_field_from_form(array &$formdefaultvalues, string $fieldname): self {
-        unset($formdefaultvalues[$fieldname]);
-        $this->removedformfields[] = $fieldname;
-        return $this;
-    }
-
-    public function get_removed_form_fields(): array {
-        return $this->removedformfields;
     }
 }
