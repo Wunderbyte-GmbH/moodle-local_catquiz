@@ -36,7 +36,6 @@ use local_catquiz\teststrategy\feedbackgenerator\questionssummary;
 use local_catquiz\teststrategy\feedbacksettings;
 use local_catquiz\teststrategy\preselect_task\addscalestandarderror;
 use local_catquiz\teststrategy\preselect_task\checkbreak;
-use local_catquiz\teststrategy\preselect_task\checkitemparams;
 use local_catquiz\teststrategy\preselect_task\checkpagereload;
 use local_catquiz\teststrategy\preselect_task\filterbystandarderror;
 use local_catquiz\teststrategy\preselect_task\filterbytestinfo;
@@ -92,7 +91,6 @@ class infergreateststrength extends strategy {
      */
     public function get_preselecttasks(): array {
         return [
-            checkitemparams::class,
             checkbreak::class,
             updatepersonability::class,
             firstquestionselector::class, // If this is the first question of this attempt, return it here.

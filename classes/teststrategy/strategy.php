@@ -28,8 +28,9 @@ use cache;
 use coding_exception;
 use Exception;
 use dml_exception;
-use local_catquiz\catquiz;
 use local_catquiz\catscale;
+use local_catquiz\local\model\model_item_param_list;
+use local_catquiz\local\model\model_strategy;
 use local_catquiz\local\result;
 use local_catquiz\local\status;
 use local_catquiz\output\attemptfeedback;
@@ -38,7 +39,6 @@ use local_catquiz\teststrategy\preselect_task;
 use local_catquiz\teststrategy\progress;
 use local_catquiz\wb_middleware_runner;
 use moodle_exception;
-use stdClass;
 
 /**
  * Base class for test strategies.
@@ -84,6 +84,18 @@ abstract class strategy {
     protected progress $progress;
 
     /**
+     * These data provide the context for the selection of the next question.
+     *
+     * In a previous implementation, this object was passed between middlewares
+     * and allowed them to decide what to do.
+     * It would be good to refactor this in such a way that the different
+     * elements of this array become class properties of this (strategy) class.
+     *
+     * @var array
+     */
+    protected array $context;
+
+    /**
      * Instantioate parameters.
      */
     public function __construct() {
@@ -125,6 +137,7 @@ abstract class strategy {
      *
      */
     public function return_next_testitem(array $context) {
+        $this->context = $context;
         $cache = cache::make('local_catquiz', 'adaptivequizattempt');
         $maxtime = $context['progress']->get_starttime() + $context['max_attempttime_in_sec'];
         if (time() > $maxtime) {
@@ -135,6 +148,12 @@ abstract class strategy {
             $cache->set('endtime', $maxtime);
             $cache->set('catquizerror', status::EXCEEDED_MAX_ATTEMPT_TIME);
             return result::err(status::EXCEEDED_MAX_ATTEMPT_TIME);
+        }
+
+        try {
+            $this->check_item_params();
+        } catch (Exception $e) {
+            return result::err($e->getMessage());
         }
 
         foreach ($this->get_preselecttasks() as $modifier) {
@@ -288,4 +307,35 @@ abstract class strategy {
         int $catscaleid = 0,
         bool $feedbackonlyfordefinedscaleid = false
     ): array;
+
+    /**
+     * Checks if there are item params for the given combination of scale and context
+     */
+    protected function check_item_params() {
+        $selectedscales = [$this->context['catscaleid'], ...$this->context['progress']->get_selected_subscales()];
+        foreach ($selectedscales as $catscaleid) {
+            $catscalecontext = catscale::get_context_id($catscaleid);
+            $catscaleids = [
+                $catscaleid,
+                ...catscale::get_subscale_ids($catscaleid),
+            ];
+            $itemparamlists = [];
+            foreach (array_keys(model_strategy::get_installed_models()) as $model) {
+                $itemparamlists[$model] = model_item_param_list::get(
+                    $catscalecontext,
+                    $model,
+                    $catscaleids
+                )->count();
+            }
+            if (array_sum($itemparamlists) === 0) {
+                $this->context['progress']->drop_scale($catscaleid);
+                unset($selectedscales[array_search($catscaleid, $selectedscales)]);
+            }
+        }
+
+        // If there are no active scales left, show a message that the quiz can not be started.
+        if (!$selectedscales) {
+                throw new Exception(status::ERROR_NO_ITEMS);
+        }
+    }
 }
