@@ -28,7 +28,6 @@
         "catquiz_maxtimeperitem": "300",
         "catquiz_timeselect_item": "sec"
     },
-    "catquiz_passinglevel": "",
     "catquiz_selectfirstquestion": "startwithcurrentability",
     "catquiz_selectteststrategy": "5",
     "choosetemplate": "0",

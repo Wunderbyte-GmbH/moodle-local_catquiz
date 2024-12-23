@@ -146,7 +146,6 @@ Feature: As a teacher I setup adaptive quiz with CATquiz Scales and Feedbacks.
     And I set the following fields to these values:
       | catmodel                                   | Catquiz CAT model                |
       | Select CAT scale                           | Simulation                       |
-      | Passing level in %                         | 500                              |
       | Purpose of test                            | Infer lowest skill gap           |
       | Activate pilot mode                        | 1                                |
       | Proportion of questions to be piloted in % | 20                               |
@@ -165,15 +164,12 @@ Feature: As a teacher I setup adaptive quiz with CATquiz Scales and Feedbacks.
       | catquiz_standarderrorgroup[catquiz_standarderror_max] | 2    |
     When I click on "Save and display" "button"
     ## Errors validation 1: invalid numbers or min > max or no values
-    Then I should see "Input a number from 0 to 100" in the "#fitem_id_catquiz_passinglevel" "css_element"
-    And I should see "Minimum must be less than maximum" in the "#fgroup_id_maxquestionsgroup" "css_element"
+    Then I should see "Minimum must be less than maximum" in the "#fgroup_id_maxquestionsgroup" "css_element"
     And I should see "Minimum must be less than maximum" in the "#fgroup_id_maxquestionsscalegroup" "css_element"
     And I should see "Input at least one value of time limit" in the "#fgroup_id_catquiz_timelimitgroup" "css_element"
     ## Errors validation 1: SE min must be positive
     And I should see "Input a positive number" in the "#fgroup_id_catquiz_standarderrorgroup" "css_element"
     And I set the following fields to these values:
-      ## Fix errors
-      | Passing level in %                                      | 50 |
       ## Intentional error - empty catquiz_standarderror_min
       | catquiz_standarderrorgroup[catquiz_standarderror_min] |  |
       ## Intentional error catquiz_minquestionspersubscale > catquiz_maxquestions
@@ -220,7 +216,6 @@ Feature: As a teacher I setup adaptive quiz with CATquiz Scales and Feedbacks.
     And the following fields match these values:
       | catmodel                                   | Catquiz CAT model         |
       | Select CAT scale                           | Simulation                |
-      | Passing level in %                         | 50                        |
       | Purpose of test                            | Infer lowest skill gap    |
       | Activate pilot mode                        | 1                         |
       | Proportion of questions to be piloted in % | 20                        |
