@@ -157,7 +157,7 @@ class catquiz_handler {
         // ... after this function has finished execution. submitted form.
         // But the submitted via post, so we can access the variable via the superglobal $POST.
 
-        $reloadtemplate = optional_param('reloadtemplate', true, PARAM_BOOL);
+        $reloadtemplate = ($mform->getSubmitValues()['triggered_button'] ?? null) === "reloadTestForm";
         $template = null;
         if ($reloadtemplate && $chosentemplate = optional_param('choosetemplate', 0, PARAM_INT)) {
             // Get parent scale ID from template.
@@ -609,45 +609,7 @@ class catquiz_handler {
 
         $clone = clone($quizdata);
 
-        if ($cm = get_coursemodule_from_instance('adaptivequiz', intval($quizdata->id))) {
-            $context = context_module::instance($cm->id);
-            $textfieldoptions = [
-                'trusttext' => true,
-                'subdirs' => true,
-                'maxfiles' => EDITOR_UNLIMITED_FILES,
-                'context' => $context,
-            ];
-
-            foreach ($clone as $property => $value) {
-                if (!preg_match('/^feedbackeditor_scaleid_(\d+)_(\d+)$/', $property, $matches)) {
-                    continue;
-                }
-                if (!property_exists($clone, $property . '_editor')) {
-                    $clone->{$property . '_editor'} = $clone->$property;
-                }
-                $scaleid = intval($matches[1]);
-                $rangeid = intval($matches[2]);
-                $fieldname = sprintf('feedbackeditor_scaleid_%d_%d', $scaleid, $rangeid);
-                $filearea = sprintf('feedback_files_%d_%d', $scaleid, $rangeid);
-                $clone = file_postupdate_standard_editor(
-                    $clone,
-                    $fieldname,
-                    $textfieldoptions,
-                    $context,
-                    'local_catquiz',
-                    $filearea,
-                    $clone->id
-                );
-                unset($clone->{$property . '_editor'});
-                file_save_draft_area_files(
-                    $value['itemid'],
-                    $context->id,
-                    'local_catquiz',
-                    $filearea,
-                    $clone->id
-                );
-            }
-        }
+        $clone = self::prepare_editor_fields($quizdata->id, $clone);
 
         // We unset id & instance. We don't want to introduce confusion because of it.
         unset($clone->id);
@@ -657,6 +619,7 @@ class catquiz_handler {
 
         // If there is a new template name.
         if (!empty($quizdata->testenvironment_addoredittemplate) && !empty($quizdata->testenvironment_name)) {
+            $clone = self::prepare_editor_fields($quizdata->choosetemplate, $clone);
 
             // If we have a template name, we first check if we come from an existing template.
             // Create stdClass with all the values.
@@ -1143,5 +1106,57 @@ class catquiz_handler {
             default:
                 return $time;
         }
+    }
+
+    /**
+     * Prepares editor fields.
+     *
+     * @param int $componentid The ID of the quiz component being processed
+     * @param stdClass $clone The object containing the form data to be processed
+     * @return stdClass The processed object with updated editor fields
+     */
+    private static function prepare_editor_fields(int $componentid, stdClass $clone): stdClass {
+        if (!$cm = get_coursemodule_from_instance('adaptivequiz', intval($componentid))) {
+            return $clone;
+        }
+        $context = context_module::instance($cm->id);
+        $textfieldoptions = [
+            'trusttext' => true,
+            'subdirs' => true,
+            'maxfiles' => EDITOR_UNLIMITED_FILES,
+            'context' => $context,
+        ];
+
+        foreach ($clone as $property => $value) {
+            if (!preg_match('/^feedbackeditor_scaleid_(\d+)_(\d+)$/', $property, $matches)) {
+                continue;
+            }
+            if (!property_exists($clone, $property . '_editor')) {
+                $clone->{$property . '_editor'} = $clone->$property;
+            }
+            $scaleid = intval($matches[1]);
+            $rangeid = intval($matches[2]);
+            $fieldname = sprintf('feedbackeditor_scaleid_%d_%d', $scaleid, $rangeid);
+            $filearea = sprintf('feedback_files_%d_%d', $scaleid, $rangeid);
+            $clone = file_postupdate_standard_editor(
+                $clone,
+                $fieldname,
+                $textfieldoptions,
+                $context,
+                'local_catquiz',
+                $filearea,
+                $clone->id
+            );
+            unset($clone->{$property . '_editor'});
+            file_save_draft_area_files(
+                $value['itemid'],
+                $context->id,
+                'local_catquiz',
+                $filearea,
+                $clone->id
+            );
+        }
+
+        return $clone;
     }
 }
