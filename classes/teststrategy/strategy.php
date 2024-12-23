@@ -28,6 +28,7 @@ use cache;
 use coding_exception;
 use Exception;
 use dml_exception;
+use local_catquiz\catquiz;
 use local_catquiz\catscale;
 use local_catquiz\local\model\model_item_param_list;
 use local_catquiz\local\model\model_strategy;
@@ -36,6 +37,20 @@ use local_catquiz\local\status;
 use local_catquiz\output\attemptfeedback;
 use local_catquiz\teststrategy\info;
 use local_catquiz\teststrategy\preselect_task;
+use local_catquiz\teststrategy\preselect_task\addscalestandarderror;
+use local_catquiz\teststrategy\preselect_task\filterbyquestionsperscale;
+use local_catquiz\teststrategy\preselect_task\filterbystandarderror;
+use local_catquiz\teststrategy\preselect_task\filterbytestinfo;
+use local_catquiz\teststrategy\preselect_task\firstquestionselector;
+use local_catquiz\teststrategy\preselect_task\fisherinformation;
+use local_catquiz\teststrategy\preselect_task\lasttimeplayedpenalty;
+use local_catquiz\teststrategy\preselect_task\maximumquestionscheck;
+use local_catquiz\teststrategy\preselect_task\maybe_return_pilot;
+use local_catquiz\teststrategy\preselect_task\mayberemovescale;
+use local_catquiz\teststrategy\preselect_task\noremainingquestions;
+use local_catquiz\teststrategy\preselect_task\remove_uncalculated;
+use local_catquiz\teststrategy\preselect_task\removeplayedquestions;
+use local_catquiz\teststrategy\preselect_task\updatepersonability;
 use local_catquiz\teststrategy\progress;
 use local_catquiz\wb_middleware_runner;
 use moodle_exception;
@@ -399,5 +414,173 @@ abstract class strategy {
         // do anything here because it is not possible to grade a response as
         // wrong in hindsight.
         return result::ok();
+    }
+
+    /**
+     * Checks if we have a new response. If not, presents the previous question again.
+     */
+    protected function check_page_reload(): result {
+        $this->progress = $this->context['progress'];
+        if (
+            ($this->progress->is_first_question() && !$this->progress->get_last_question())
+            || $this->progress->has_new_response()
+            || $this->progress->get_force_new_question()
+        ) {
+            return result::ok(null);
+        }
+
+        return result::ok($this->progress->get_last_question());
+    }
+
+    /**
+     * Update the person ability of the user taking the quiz.
+     */
+    protected function update_personability(): result {
+        $updateabilitytask = new updatepersonability();
+        $result = $updateabilitytask->run($this->context, fn ($context) => result::ok($context));
+        return $result;
+    }
+
+    /**
+     * Add scale standarderror
+     *
+     * Now, this is just a wrapper to call the respective pre-select task.
+     */
+    protected function add_scale_standarderror(): result {
+        $addscalestderrtask = new addscalestandarderror();
+        $result = $addscalestderrtask->run($this->context, fn ($context) => result::ok($context));
+        return $result;
+    }
+
+    /**
+     * Maximum questions check
+     *
+     * Now, this is just a wrapper to call the respective pre-select task.
+     */
+    protected function maximumquestionscheck(): result {
+        $maximumquestionscheck = new maximumquestionscheck();
+        $result = $maximumquestionscheck->run($this->context, fn ($context) => result::ok($context));
+        return $result;
+    }
+
+    /**
+     * Remove played questions
+     *
+     * Now, this is just a wrapper to call the respective pre-select task.
+     */
+    protected function removeplayedquestions(): result {
+        $removeplayedquestions = new removeplayedquestions();
+        $result = $removeplayedquestions->run($this->context, fn ($context) => result::ok($context));
+        return $result;
+    }
+
+    /**
+     * Check for no remaining questions
+     *
+     * Now, this is just a wrapper to call the respective pre-select task.
+     */
+    protected function noremainingquestions(): result {
+        $noremainingquestions = new noremainingquestions();
+        $result = $noremainingquestions->run($this->context, fn ($context) => result::ok($context));
+        return $result;
+    }
+
+    /**
+     * Check if scales should be removed.
+     *
+     * Now, this is just a wrapper to call the respective pre-select task.
+     */
+    protected function mayberemovescale(): result {
+        $mayberemovescale = new mayberemovescale();
+        $result = $mayberemovescale->run($this->context, fn ($context) => result::ok($context));
+        return $result;
+    }
+
+    /**
+     * Calculate Fisher information
+     *
+     * Now, this is just a wrapper to call the respective pre-select task.
+     */
+    protected function fisherinformation(): result {
+        $fisherinformation = new fisherinformation();
+        $result = $fisherinformation->run($this->context, fn ($context) => result::ok($context));
+        return $result;
+    }
+
+    /**
+     * Maybe return a pilot question
+     *
+     * Now, this is just a wrapper to call the respective pre-select task.
+     */
+    protected function maybereturnpilot(): result {
+        $maybereturnpilot = new maybe_return_pilot();
+        $result = $maybereturnpilot->run($this->context, fn ($context) => result::ok($context));
+        return $result;
+    }
+
+    /**
+     * First question selector
+     *
+     * Now, this is just a wrapper to call the respective pre-select task.
+     */
+    protected function first_question_selector(): result {
+        $firstquestionselector = new firstquestionselector();
+        $result = $firstquestionselector->run($this->context, fn ($context) => result::ok($context));
+        return $result;
+    }
+
+    /**
+     * Adds last-time-played penalty
+     *
+     * Now, this is just a wrapper to call the respective pre-select task.
+     */
+    protected function last_time_played_penalty(): result {
+        $lasttimeplayedpenalty = new lasttimeplayedpenalty();
+        $result = $lasttimeplayedpenalty->run($this->context, fn ($context) => result::ok($context));
+        return $result;
+    }
+
+    /**
+     * Removes questions for which no item parameters were calculated yet
+     *
+     * Now, this is just a wrapper to call the respective pre-select task.
+     */
+    protected function remove_uncalculated(): result {
+        $removeuncalculated = new remove_uncalculated();
+        $result = $removeuncalculated->run($this->context, fn ($context) => result::ok($context));
+        return $result;
+    }
+
+    /**
+     * Filter by standarderror
+     *
+     * Now, this is just a wrapper to call the respective pre-select task.
+     */
+    protected function filterbystandarderror(): result {
+        $filterbystandarderror = new filterbystandarderror();
+        $result = $filterbystandarderror->run($this->context, fn ($context) => result::ok($context));
+        return $result;
+    }
+
+    /**
+     * Filter by test info
+     *
+     * Now, this is just a wrapper to call the respective pre-select task.
+     */
+    protected function filterbytestinfo(): result {
+        $filterbytestinfo = new filterbytestinfo();
+        $result = $filterbytestinfo->run($this->context, fn ($context) => result::ok($context));
+        return $result;
+    }
+
+    /**
+     * Filter by questions per scale
+     *
+     * Now, this is just a wrapper to call the respective pre-select task.
+     */
+    protected function filterbyquestionsperscale(): result {
+        $filterbyquestionsperscale = new filterbyquestionsperscale();
+        $result = $filterbyquestionsperscale->run($this->context, fn ($context) => result::ok($context));
+        return $result;
     }
 }
