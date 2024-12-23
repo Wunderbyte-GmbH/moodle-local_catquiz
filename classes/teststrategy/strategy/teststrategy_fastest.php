@@ -34,7 +34,6 @@ use local_catquiz\teststrategy\feedbackgenerator\personabilities;
 use local_catquiz\teststrategy\feedbackgenerator\questionssummary;
 use local_catquiz\teststrategy\feedbacksettings;
 use local_catquiz\teststrategy\preselect_task\addscalestandarderror;
-use local_catquiz\teststrategy\preselect_task\checkbreak;
 use local_catquiz\teststrategy\preselect_task\checkpagereload;
 use local_catquiz\teststrategy\preselect_task\filterbystandarderror;
 use local_catquiz\teststrategy\preselect_task\firstquestionselector;
@@ -80,7 +79,6 @@ class teststrategy_fastest extends strategy {
      */
     public function get_preselecttasks(): array {
         return [
-            checkbreak::class,
             checkpagereload::class,
             firstquestionselector::class,
             updatepersonability::class,

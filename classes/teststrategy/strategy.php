@@ -39,6 +39,7 @@ use local_catquiz\teststrategy\preselect_task;
 use local_catquiz\teststrategy\progress;
 use local_catquiz\wb_middleware_runner;
 use moodle_exception;
+use moodle_url;
 
 /**
  * Base class for test strategies.
@@ -154,6 +155,13 @@ abstract class strategy {
             $this->check_item_params();
         } catch (Exception $e) {
             return result::err($e->getMessage());
+        }
+
+        // If checkbreak returns a value other than null, it is the question
+        // that we should display again after a page reload.
+        $checkbreakres = $this->check_break();
+        if ($checkbreakres->unwrap()) {
+            return $checkbreakres;
         }
 
         foreach ($this->get_preselecttasks() as $modifier) {
@@ -337,5 +345,59 @@ abstract class strategy {
         if (!$selectedscales) {
                 throw new Exception(status::ERROR_NO_ITEMS);
         }
+    }
+
+    /**
+     * Checks if it took the user too long to answer the last question.
+     *
+     * If so, the user is forced to take a break and redirected to a page that shows
+     * that information.
+     */
+    protected function check_break(): result {
+        $this->progress = $this->context['progress'];
+        $now = time();
+        $lastquestion = $this->progress->get_last_question();
+
+        $lastquestionreturntime = $lastquestion->userlastattempttime ?? false;
+        if (!$lastquestionreturntime || $now - $lastquestionreturntime <= $this->context['max_itemtime_in_sec']) {
+            if (!$this->progress->page_was_reloaded()) {
+                return result::ok();
+            }
+            return result::ok($lastquestion);
+        }
+
+        // If we are at this point, it means the maximum time was exceeded.
+        // If the session is not the same as when the quiz was started, ignore
+        // that last question and present a new one.
+        if (!$this->progress->check_session()) {
+            $this->progress->set_current_session()
+                ->exclude_question($lastquestion->id)
+                ->force_new_question()
+                ->set_ignore_last_response(true);
+            unset($this->context['questions'][$lastquestion->id]);
+            return result::ok();
+        }
+
+        // If the session is the same, mark the last question as failed if the page was reloaded.
+        if ($this->progress->page_was_reloaded()) {
+            catquiz::mark_last_question_failed($this->progress->get_usage_id());
+            $this->progress
+                ->add_playedquestion($lastquestion)
+                ->mark_lastquestion_failed()
+                ->save();
+            redirect(
+                new moodle_url(
+                    '/mod/adaptivequiz/attempt.php',
+                    [
+                        'cmid' => required_param('cmid', PARAM_INT),
+                    ]
+                )
+            );
+        }
+
+        // If the page was NOT reloaded but the timeout was exceeded, we can not
+        // do anything here because it is not possible to grade a response as
+        // wrong in hindsight.
+        return result::ok();
     }
 }
