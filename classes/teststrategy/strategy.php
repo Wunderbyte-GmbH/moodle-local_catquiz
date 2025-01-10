@@ -200,8 +200,7 @@ abstract class strategy {
             $middlewares[] = $this->scoremodifiers[$modifier];
         }
 
-        $result = wb_middleware_runner::run($middlewares, $context);
-        $this->progress = $context['progress'];
+        $result = wb_middleware_runner::run($middlewares, $this->context);
         $this->progress->save();
 
         $this->update_attemptfeedback($context);
