@@ -51,6 +51,7 @@ use local_catquiz\teststrategy\preselect_task\noremainingquestions;
 use local_catquiz\teststrategy\preselect_task\remove_uncalculated;
 use local_catquiz\teststrategy\preselect_task\removeplayedquestions;
 use local_catquiz\teststrategy\preselect_task\updatepersonability;
+use local_catquiz\teststrategy\preselect_task\updatepersonability_testing;
 use local_catquiz\teststrategy\progress;
 use local_catquiz\wb_middleware_runner;
 use moodle_exception;
@@ -200,6 +201,13 @@ abstract class strategy {
             }
             $this->context = $val;
         }
+
+        // Core methods called in every strategy.
+        $res = $this->update_personability();
+        if ($res->iserr()) {
+            return $res;
+        }
+        $context = $res->unwrap();
 
         foreach ($this->get_preselecttasks() as $modifier) {
             // When this is called for running tests, check if there is a
@@ -480,6 +488,10 @@ abstract class strategy {
      */
     protected function update_personability(): result {
         $updateabilitytask = new updatepersonability();
+        // When this is called for running tests, use the testing class.
+        if (getenv('USE_TESTING_CLASS_FOR')) {
+            $updateabilitytask = new updatepersonability_testing();
+        }
         $result = $updateabilitytask->run($this->context, fn ($context) => result::ok($context));
         return $result;
     }

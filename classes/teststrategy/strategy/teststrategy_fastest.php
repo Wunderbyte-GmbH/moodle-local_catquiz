@@ -79,7 +79,6 @@ class teststrategy_fastest extends strategy {
      */
     public function get_preselecttasks(): array {
         return [
-            updatepersonability::class,
             fisherinformation::class,
             addscalestandarderror::class,
             maximumquestionscheck::class,

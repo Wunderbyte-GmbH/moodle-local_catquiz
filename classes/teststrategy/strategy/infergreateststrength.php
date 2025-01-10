@@ -90,7 +90,6 @@ class infergreateststrength extends strategy {
      */
     public function get_preselecttasks(): array {
         return [
-            updatepersonability::class,
             firstquestionselector::class, // If this is the first question of this attempt, return it here.
             addscalestandarderror::class,
             maximumquestionscheck::class, // Cancel quiz attempt if we reached maximum of questions.
