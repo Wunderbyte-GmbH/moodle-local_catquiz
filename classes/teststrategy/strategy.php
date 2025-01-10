@@ -187,20 +187,20 @@ abstract class strategy {
             }
         }
 
-        if ($this->pre_check_first_question_selector()) {
-            $res = $this->first_question_selector();
-            if ($res->iserr()) {
-                return $res;
-            }
-            $val = $res->unwrap();
-            // If the result contains a single object, this is the question to be returned.
-            // Othewise, it contains the updated $context array with the ability and standarderror set in such a way, that the
-            // teststrategy will return the correct question (e.g. the question corresponding to mean ability of all students).
-            if (is_object($val)) {
-                return $res;
-            }
-            $this->context = $val;
-        }
+        //if ($this->pre_check_first_question_selector()) {
+        //    $res = $this->first_question_selector();
+        //    if ($res->iserr()) {
+        //        return $res;
+        //    }
+        //    $val = $res->unwrap();
+        //    // If the result contains a single object, this is the question to be returned.
+        //    // Othewise, it contains the updated $context array with the ability and standarderror set in such a way, that the
+        //    // teststrategy will return the correct question (e.g. the question corresponding to mean ability of all students).
+        //    if (is_object($val)) {
+        //        return $res;
+        //    }
+        //    $this->context = $val;
+        //}
 
         // Core methods called in every strategy.
         $res = $this->update_personability();
@@ -208,6 +208,19 @@ abstract class strategy {
             return $res;
         }
         $context = $res->unwrap();
+
+        $res = $this->first_question_selector();
+        if ($res->iserr()) {
+            return $res;
+        }
+        $val = $res->unwrap();
+        // If the result contains a single object, this is the question to be returned.
+        // Othewise, it contains the updated $context array with the ability and standarderror set in such a way, that the
+        // teststrategy will return the correct question (e.g. the question corresponding to mean ability of all students).
+        if (is_object($val)) {
+            return $res;
+        }
+        $this->context = $val;
 
         foreach ($this->get_preselecttasks() as $modifier) {
             // When this is called for running tests, check if there is a
