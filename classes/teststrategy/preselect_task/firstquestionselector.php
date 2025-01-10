@@ -94,6 +94,7 @@ class firstquestionselector extends preselect_task implements wb_middleware {
      */
     public function run(array &$context, callable $next): result {
         $this->progress = $context['progress'];
+        $this->context = $context;
         // Don't do anything if this is not the first question of the current attempt.
         if (!$this->progress->is_first_question()) {
             return $next($context);

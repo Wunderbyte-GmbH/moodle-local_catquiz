@@ -179,6 +179,28 @@ abstract class strategy {
             return $checkbreakres;
         }
 
+        if ($this->pre_check_page_reload()) {
+            $res = $this->check_page_reload();
+            if ($res->unwrap()) {
+                return $res;
+            }
+        }
+
+        if ($this->pre_check_first_question_selector()) {
+            $res = $this->first_question_selector();
+            if ($res->iserr()) {
+                return $res;
+            }
+            $val = $res->unwrap();
+            // If the result contains a single object, this is the question to be returned.
+            // Othewise, it contains the updated $context array with the ability and standarderror set in such a way, that the
+            // teststrategy will return the correct question (e.g. the question corresponding to mean ability of all students).
+            if (is_object($val)) {
+                return $res;
+            }
+            $this->context = $val;
+        }
+
         foreach ($this->get_preselecttasks() as $modifier) {
             // When this is called for running tests, check if there is a
             // X_testing class and if so, use that one.
@@ -228,6 +250,28 @@ abstract class strategy {
             $context['progress']->get_selected_subscales()
         );
         return result::ok($selectedquestion);
+    }
+
+    /**
+     * If true, the check page reload is called before updating the ability.
+     *
+     * Quickfix, could probabily be removed.
+     *
+     * @return bool
+     */
+    protected function pre_check_page_reload(): bool {
+        return false;
+    }
+
+    /**
+     * If true, the first question selector is called before updating the ability.
+     *
+     * Quickfix, could probabily be removed.
+     *
+     * @return bool
+     */
+    protected function pre_check_first_question_selector(): bool {
+        return false;
     }
 
     /**
@@ -524,8 +568,7 @@ abstract class strategy {
      */
     protected function first_question_selector(): result {
         $firstquestionselector = new firstquestionselector();
-        $result = $firstquestionselector->run($this->context, fn ($context) => result::ok($context));
-        return $result;
+        return $firstquestionselector->run($this->context, fn ($context) => result::ok($context));
     }
 
     /**

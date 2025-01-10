@@ -79,8 +79,6 @@ class teststrategy_fastest extends strategy {
      */
     public function get_preselecttasks(): array {
         return [
-            checkpagereload::class,
-            firstquestionselector::class,
             updatepersonability::class,
             fisherinformation::class,
             addscalestandarderror::class,
@@ -94,6 +92,28 @@ class teststrategy_fastest extends strategy {
             filterbystandarderror::class,
             strategyfastestscore::class,
         ];
+    }
+
+    /**
+     * If true, the check page reload is called before updating the ability.
+     *
+     * Quickfix, could probabily be removed.
+     *
+     * @return bool
+     */
+    protected function pre_check_page_reload(): bool {
+        return true;
+    }
+
+    /**
+     * If true, the first question selector is called before updating the ability.
+     *
+     * Quickfix, could probabily be removed.
+     *
+     * @return bool
+     */
+    protected function pre_check_first_question_selector(): bool {
+        return true;
     }
 
     /**

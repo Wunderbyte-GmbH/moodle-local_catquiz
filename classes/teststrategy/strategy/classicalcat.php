@@ -75,7 +75,6 @@ class classicalcat extends strategy {
      */
     public function get_preselecttasks(): array {
         return [
-            checkpagereload::class,
             updatepersonability::class,
             addscalestandarderror::class,
             maximumquestionscheck::class,
@@ -87,6 +86,18 @@ class classicalcat extends strategy {
             strategyclassicscore::class,
         ];
     }
+
+    /**
+     * If true, the check page reload is called before updating the ability.
+     *
+     * Quickfix, could probabily be removed.
+     *
+     * @return bool
+     */
+    protected function pre_check_page_reload(): bool {
+        return false;
+    }
+
     /**
      * Returns feedback generators.
      *
