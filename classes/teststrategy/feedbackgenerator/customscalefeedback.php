@@ -247,7 +247,7 @@ class customscalefeedback extends feedbackgenerator {
         uksort($scalefeedback, function ($a, $b) use ($catscales) {
             $a = (object) $catscales[$a];
             $b = (object) $catscales[$b];
-            return $catscales[$a]->name <=> $catscales[$b]->name;
+            return $catscales[$a->id]->name <=> $catscales[$b->id]->name;
         });
         $sorted = $scalefeedback;
         if ($mainscale) {
