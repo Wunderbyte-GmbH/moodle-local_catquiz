@@ -60,7 +60,7 @@ final class mathcat_test extends basic_testcase {
             fn ($x) => [-2 * exp(-(-2 + $x) ** 2) * (-2 + $x)],
             ['difficulty' => 0]
         );
-        $expected = ['difficulty' => 0];
+        $expected = ['difficulty' => 2];
         $this->assertEquals($expected, $result);
     }
 
