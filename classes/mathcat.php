@@ -404,13 +404,14 @@ class mathcat {
         callable $fnderivative,
         array $parameterstart,
         int $precission = 2,
-        int $maxiterations = 20,
+        int $maxiterations = 50,
         ?callable $fntrfilter = null,
         ?callable $fntrfunction = null,
         ?callable $fntrderivative = null): array {
 
         // Set initial values.
         $parameter = $parameterstart;
+        $parameterstructure = self::array_to_vector($parameter);
         // Note: Please check for yourself...
         // ... that the order of your parameters in your array corresponds to the order of $fn_function!
         $parameternames = array_keys($parameterstart);
@@ -424,8 +425,8 @@ class mathcat {
             $mxparameter = $mxparameter->transpose();
 
             // Calculate the function and derivative values from  $fn_function and $fn_derivative at point $parameter.
-            $valfunction = $fnfunction($parameter);
-            $valderivative = $fnderivative($parameter);
+            $valfunction = $fnfunction(self::vector_to_array($parameter, $parameterstructure));
+            $valderivative = $fnderivative(self::vector_to_array($parameter, $parameterstructure));
 
             $mxgradient = new matrix($valderivative);
 
@@ -433,23 +434,23 @@ class mathcat {
             do {
                 $mxdelta = $mxgradient->multiply($steplength / $gradientlength);
                 $mxparameternew = $mxparameter->add($mxdelta);
-                $parameternew = array_combine($parameternames, $mxparameternew->transpose())[0];
+                $parameternew = $mxparameternew->transpose()[0];
 
-                $valfunctionnew = $fnfunction($parameternew);
+                $valfunctionnew = $fnfunction(self::vector_to_array($parameternew, $parameterstructure));
                 if ($valfunctionnew - $valfunction <= 0) {
                     $steplength /= 2; // Cut steptlength to half.
                 }
-            } while ($valfunctionnew - $valfunction <= 0);
+            } while (($valfunctionnew - $valfunction <= 0) && ($steplength > 10 ** (-$precission)));
 
             $parameter = $parameternew;
 
             // Test if precisiion criteria for stopping iterations has been reached.
             if ($steplength < 10 ** (-$precission)) {
-                return $parameter;
+                return self::vector_to_array($parameter, $parameterstructure);
             }
         }
         // Return the concurrent solution even the precission criteria hasn't been met.
-        return $parameter;
+        return self::vector_to_array($parameter, $parameterstructure);
     }
 
     // Deprecated, falls bfgs nicht genutzt wird.
