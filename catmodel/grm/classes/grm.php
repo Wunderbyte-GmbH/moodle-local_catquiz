@@ -406,7 +406,7 @@ class grm extends model_multiparam {
 
         // Calculate 2nd derivates for difficulties a(k) and a(k+1) and discrimination.
         $a = ($k > 0) ? $difficulties[$fractions[$k]] : 0;
-        $daa = ($k > 0)  ? (exp($a - $p) * (-1 + exp($a - $p))) /
+        $daa = ($k > 0) ? (exp($a - $p) * (-1 + exp($a - $p))) /
             (1 + exp($a - $p)) ** 3 : 0;
         $result[$k][$k] = $daa / $likelihood - $derivative1st[$k] ** 2;
 

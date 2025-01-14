@@ -404,7 +404,7 @@ class grmgeneralized extends model_multiparam {
 
         // Create a k+1-Vector.
         $result = [];
-        for ($k= 0; $k < $kmax + 1; $k ++) {
+        for ($k = 0; $k < $kmax + 1; $k ++) {
             $result[$k] = 0;
         }
 
@@ -429,7 +429,7 @@ class grmgeneralized extends model_multiparam {
             $a = $difficulties[$fractions[$k + 1]];
             $db -= ($p - $a) * exp($b * ($a - $p)) / (1 + exp($b * ($a - $p))) ** 2;
         }
-        $result[$kmax+1] = $db / $likelihood;
+        $result[$kmax + 1] = $db / $likelihood;
 
         return $result;
     }
