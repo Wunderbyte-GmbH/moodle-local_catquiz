@@ -333,7 +333,7 @@ class grm extends model_multiparam {
      *
      * @param array $pp - person ability parameter ('ability')
      * @param array $ip - item parameters ('difficulty', 'discrimination')
-     * @param float $frac - answer category (0 ... 1.0)
+     * @param float $frac - answer category (0 .. 1.0)
      * @return array - jacobian vector
      */
     public static function get_log_jacobian(array $pp, array $ip, float $frac): array {
@@ -375,7 +375,7 @@ class grm extends model_multiparam {
      *
      * @param array $pp - person ability parameter ('ability')
      * @param array $ip - item parameters ('difficulty', 'discrimination')
-     * @param float $frac - answer category (0 ... 1.0)
+     * @param float $frac - answer category (0 .. 1.0)
      *
      * @return array - hessian matrx
      */
@@ -420,7 +420,6 @@ class grm extends model_multiparam {
 
         return $result;
     }
-
 
     /**
      * Calculate Item and Category-Information.
