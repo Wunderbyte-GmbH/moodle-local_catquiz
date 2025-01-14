@@ -412,9 +412,6 @@ class mathcat {
         // Set initial values.
         $parameter = $parameterstart;
         $parameterstructure = self::array_to_vector($parameter);
-        // Note: Please check for yourself...
-        // ... that the order of your parameters in your array corresponds to the order of $fn_function!
-        $parameternames = array_keys($parameterstart);
         $steplength = 1;
 
         // Begin with numerical iteration.
@@ -422,7 +419,6 @@ class mathcat {
 
             // DAVID: Sollte serialisiert werden für den Fall genesteter Arrays.
             $mxparameter = new matrix($parameter);
-            $mxparameter = $mxparameter->transpose();
 
             // Calculate the function and derivative values from  $fn_function and $fn_derivative at point $parameter.
             $valfunction = $fnfunction(self::vector_to_array($parameter, $parameterstructure));
@@ -434,7 +430,7 @@ class mathcat {
             do {
                 $mxdelta = $mxgradient->multiply($steplength / $gradientlength);
                 $mxparameternew = $mxparameter->add($mxdelta);
-                $parameternew = $mxparameternew->transpose()[0];
+                $parameternew = (array) $mxparameternew[0];
 
                 $valfunctionnew = $fnfunction(self::vector_to_array($parameternew, $parameterstructure));
                 if ($valfunctionnew - $valfunction <= 0) {
@@ -494,7 +490,7 @@ class mathcat {
     }
 
     /**
-     * REturns compose plus (functions).
+     * Returns compose plus (functions).
      *
      * @param mixed $function1
      * @param mixed $function2
