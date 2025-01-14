@@ -278,7 +278,7 @@ class mathcat {
         callable $fnderivative,
         array $parameterstart,
         int $precission = 6,
-        int $maxiterations = 500,
+        int $maxiterations = 100,
         ?callable $fntrfilter = null,
         ?callable $fntrfunction = null,
         ?callable $fntrderivative = null): array {
@@ -377,6 +377,74 @@ class mathcat {
             }
             // Test if precisiion criteria for stopping iterations has been reached.
             if ($mxdelta->max_absolute_element() < 10 ** (-$precission)) {
+                return $parameter;
+            }
+        }
+        // Return the concurrent solution even the precission criteria hasn't been met.
+        return $parameter;
+    }
+
+    /**
+     * Performs the Gradient Ascent approach for determine the maximum of a function
+     *
+     * @param callable $fnfunction - Function to be calculated on with parameter $parameter
+     * @param callable $fnderivative - Derivative of $fn_function with parameter $parameter
+     * @param array $parameterstart - Parameter-set to start with (should be near zero point)
+     * @param int $precission - Accuracy to how many decimal places
+     * @param int $maxiterations - Maximum number of iterations
+     * @param callable|null $fntrfilter - Parameter-check for trusted Region
+     * @param callable|null $fntrfunction - Trusted Region modelling function
+     * @param callable|null $fntrderivative - Deriavative of $fn_trusted_regions_function
+     *
+     * @return array
+     *
+     */
+    public static function gradient_ascent(
+        callable $fnfunction,
+        callable $fnderivative,
+        array $parameterstart,
+        int $precission = 2,
+        int $maxiterations = 20,
+        ?callable $fntrfilter = null,
+        ?callable $fntrfunction = null,
+        ?callable $fntrderivative = null): array {
+
+        // Set initial values.
+        $parameter = $parameterstart;
+        // Note: Please check for yourself...
+        // ... that the order of your parameters in your array corresponds to the order of $fn_function!
+        $parameternames = array_keys($parameterstart);
+        $steplength = 1;
+
+        // Begin with numerical iteration.
+        for ($i = 0; $i < $maxiterations; $i++) {
+
+            // DAVID: Sollte serialisiert werden für den Fall genesteter Arrays.
+            $mxparameter = new matrix($parameter);
+            $mxparameter = $mxparameter->transpose();
+
+            // Calculate the function and derivative values from  $fn_function and $fn_derivative at point $parameter.
+            $valfunction = $fnfunction($parameter);
+            $valderivative = $fnderivative($parameter);
+
+            $mxgradient = new matrix($valderivative);
+
+            $gradientlength = $mxgradient->rooted_summed_squares();
+            do {
+                $mxdelta = $mxgradient->multiply($steplength / $gradientlength);
+                $mxparameternew = $mxparameter->add($mxdelta);
+                $parameternew = array_combine($parameternames, $mxparameternew->transpose())[0];
+
+                $valfunctionnew = $fnfunction($parameternew);
+                if ($valfunctionnew - $valfunction <= 0) {
+                    $steplength /= 2; // Cut steptlength to half.
+                }
+            } while ($valfunctionnew - $valfunction <= 0);
+
+            $parameter = $parameternew;
+
+            // Test if precisiion criteria for stopping iterations has been reached.
+            if ($steplength < 10 ** (-$precission)) {
                 return $parameter;
             }
         }
