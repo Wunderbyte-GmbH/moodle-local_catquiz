@@ -54,6 +54,16 @@ final class mathcat_test extends basic_testcase {
         $this->assertEquals($expected, $result);
     }
 
+    public function test_gradient_ascention(): void {
+        $result = mathcat::gradient_ascent(
+            fn ($x) => [exp(-($x - 2) ** 2)],
+            fn ($x) => [-2 * exp(-(-2 + $x) ** 2) * (-2 + $x)],
+            ['difficulty' => 0]
+        );
+        $expected = ['difficulty' => 0];
+        $this->assertEquals($expected, $result);
+    }
+
     /**
      * Test if array_to_vector and vector_to_array work as expected
      *
