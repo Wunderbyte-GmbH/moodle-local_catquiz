@@ -390,6 +390,48 @@ class grmgeneralized extends model_multiparam {
      * @return array - jacobian vector
      */
     public static function get_log_jacobian(array $pp, array $ip, float $k): array {
+
+        $p = $pp['ability'];
+
+        $difficulties = self::sort_fractions($ip['difficulties']);
+        $b = $ip['discrimination'];
+
+        // Make sure $frac is between 0.0 and 1.0.
+        $frac = min(1.0, max(0.0, $frac));
+        $fractions = self::get_fractions($difficulties);
+        $kmax = max(array_keys($fractions));
+
+        $k = self::get_key_by_fractions($frac, $a);
+
+        // Create a k+1-Vector.
+        $result = [];
+        for ($k==0; $k < $kmax + 1; $k ++) {
+            $result[$k] = 0;
+        }
+
+        $likelihood = self::likelihood($pp, $ip, $frac);
+
+        // Calculate 1st derivates for difficulties a(k) and a(k+1).
+        $a = ($k > 0) ? $difficulties[$fractions[$k] : 0;
+        $da = ($k > 0) ? - $b * exp($b * ($a - $p)) / (1 + exp($b * ($a - $p))) ** 2 : 0;
+
+        $result[$k] = $da / $likelihood;
+
+        $a = ($k < $kmax) ? $difficulties[$fractions[$k + 1] : 0;
+        $da = ($k > 0) ? $b * exp($b * ($a - $p)) / (1 + exp($b * ($a - $p))) ** 2 : 0;
+
+        $result[$ + 1] = $da / $likelihood;
+
+        // Calculate 1st derivate for discrimination.
+        $a = ($k > 0) ? $difficulties[$fractions[$k] : 0;
+        $db = ($k > 0) ? ($p - $a) * exp($b * ($a - $p)) / (1 + exp($b * ($a - $p))) ** 2 : 0;
+
+        $a = ($k < $kmax0) ? $difficulties[$fractions[$k + 1] : 0;
+        $db -= ($k < $kmax) ? ($p - $a) * exp($b * ($a - $p)) / (1 + exp($b * ($a - $p))) ** 2 : 0;
+
+        $result[$kmax+1] = $db / $likelihood;
+
+        return $result;
     }
 
     /**
@@ -402,6 +444,60 @@ class grmgeneralized extends model_multiparam {
      * @return array - hessian matrx
      */
     public static function get_log_hessian(array $pp, array $ip, float $itemresponse): array {
+
+        $p = $pp['ability'];
+
+        $difficulties = self::sort_fractions($ip['difficulties']);
+        $b = $ip['discrimination'];
+
+        // Make sure $frac is between 0.0 and 1.0.
+        $frac = min(1.0, max(0.0, $frac));
+        $fractions = self::get_fractions($difficulties);
+        $kmax = max(array_keys($fractions));
+
+        $k = self::get_key_by_fractions($frac, $a);
+
+        // Create a k+1 x k+1-Matrix.
+        $result = [];
+        for ($i==0; $i < $kmax + 1; $i ++) {
+            $result[$i] = [];
+            for ($j==0; $j < $kmax + 1; $j ++) {
+                $result[$i][$j] = 0;
+            }
+        }
+
+        $likelihood = self::likelihood($pp, $ip, $frac);
+        $derivate1st = self::get_log_jacobian($pp, $ip, $frac);
+
+        // Calculate 2nd derivates for difficulties a(k) and a(k+1) and discrimination.
+        $a = ($k > 0) ? $difficulties[$fractions[$k] : 0;
+        $daa = ($b ** 2 * exp($b * ($a - $p)) * (-1 + exp($b * ($a - $p)))) /
+            (1 + exp($b * ($a - $p))) ** 3;
+        $result[$k][$k] = $daa / $likelihood - $derivative1st[$k] ** 2;
+
+        $dab = (exp($b * ($a - $p)) * (-1 + $a * $b * (-1 + exp($b * ($a - $p))) + $b * $p
+                    - exp($b * ($a - $p)) * (1 + $b * $p))) / (1 + exp($b * ($a - $p))) ** 3;
+        $result[$k][$kmax + 1] = $dab / $likelihood - $derivative1st[$k] * $derivative1st[$kmax + 1];
+        $result[$kmax + 1][$k] = $result[$k][$kmax + 1];
+
+        $dbb = (exp($b * ($a - $p)) * (-1 + exp($b * ($a - $p))) * ($a - $p) ** 2) /
+            (1 + exp($b * ($a - $p))) ** 3;
+
+        $a = ($k < $kmax) ? $difficulties[$fractions[$k + 1] : 0;
+        $daa = -($b ** 2 * exp($b * ($a - $p)) * (-1 + exp($b * ($a - $p)))) /
+            (1 + exp($b * ($a - $p))) ** 3;
+        $result[$k + 1][$k + 1] = $daa / $likelihood - $derivative1st[$k + 1] ** 2;
+
+        $dab = -(exp($b * ($a - $p)) * (-1 + $a * $b * (-1 + exp($b * ($a - $p))) + $b * $p
+                - exp($b * ($a - $p)) * (1 + $b * $p))) / (1 + exp($b * ($a - $p))) ** 3;
+        $result[$k + 1][$kmax + 1] = $dab / $likelihood - $derivative1st[$k + 1] * $derivative1st[$kmax + 1];
+        $result[$kmax + 1][$k + 1] = $result[$k + 1][$kmax + 1];
+
+        $dbb -= (exp($b * ($a - $p)) * (-1 + exp($b * ($a - $p))) * ($a - $p) ** 2) /
+            (1 + exp($b * ($a - $p))) ** 3;
+        $result[$kmax + 1][$kmax + 1] = $dbb / $likelihood - $derivative1st[$kmax + 1][$kmax + 1];
+
+        return $result;
     }
 
 
