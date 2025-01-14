@@ -281,7 +281,7 @@ class grmgeneralized extends model_multiparam {
     }
 
     /**
-     * Calculates the 1st derivate of the Likelihood
+     * Calculates the 1st derivative of the Likelihood
      *
      * @param array $pp - person ability parameter
      * @param array $ip - item parameters ('difficulty', 'discrimination')
@@ -310,7 +310,7 @@ class grmgeneralized extends model_multiparam {
     }
 
     /**
-     * Calculates the 2nd derivate of the Likelihood
+     * Calculates the 2nd derivative of the Likelihood
      *
      * @param array $pp - person ability parameter
      * @param array $ip - item parameters ('difficulty', 'discrimination')
@@ -386,13 +386,12 @@ class grmgeneralized extends model_multiparam {
      *
      * @param array $pp - person ability parameter ('ability')
      * @param array $ip - item parameters ('difficulty', 'discrimination')
-     * @param float $k - answer category (0 or 1.0)
+     * @param float $frac - answer category (0 .. 1.0)
      * @return array - jacobian vector
      */
-    public static function get_log_jacobian(array $pp, array $ip, float $k): array {
+    public static function get_log_jacobian(array $pp, array $ip, float $frac): array {
 
         $p = $pp['ability'];
-
         $difficulties = self::sort_fractions($ip['difficulties']);
         $b = $ip['discrimination'];
 
@@ -401,34 +400,35 @@ class grmgeneralized extends model_multiparam {
         $fractions = self::get_fractions($difficulties);
         $kmax = max(array_keys($fractions));
 
-        $k = self::get_key_by_fractions($frac, $a);
+        $k = self::get_key_by_fractions($frac, $difficulties);
 
         // Create a k+1-Vector.
         $result = [];
-        for ($k==0; $k < $kmax + 1; $k ++) {
+        for ($k= 0; $k < $kmax + 1; $k ++) {
             $result[$k] = 0;
         }
 
         $likelihood = self::likelihood($pp, $ip, $frac);
 
-        // Calculate 1st derivates for difficulties a(k) and a(k+1).
-        $a = ($k > 0) ? $difficulties[$fractions[$k] : 0;
+        // Calculate 1st derivatives for difficulties a(k) and a(k+1).
+        $a = ($k > 0) ? $difficulties[$fractions[$k]] : 0;
         $da = ($k > 0) ? - $b * exp($b * ($a - $p)) / (1 + exp($b * ($a - $p))) ** 2 : 0;
-
         $result[$k] = $da / $likelihood;
 
-        $a = ($k < $kmax) ? $difficulties[$fractions[$k + 1] : 0;
-        $da = ($k > 0) ? $b * exp($b * ($a - $p)) / (1 + exp($b * ($a - $p))) ** 2 : 0;
+        if ($k < $kmax) {
+            $a = $difficulties[$fractions[$k + 1]];
+            $da = $b * exp($b * ($a - $p)) / (1 + exp($b * ($a - $p))) ** 2;
+            $result[$k + 1] = $da / $likelihood;
+        }
 
-        $result[$ + 1] = $da / $likelihood;
-
-        // Calculate 1st derivate for discrimination.
-        $a = ($k > 0) ? $difficulties[$fractions[$k] : 0;
+        // Calculate 1st derivative for discrimination.
+        $a = ($k > 0) ? $difficulties[$fractions[$k]] : 0;
         $db = ($k > 0) ? ($p - $a) * exp($b * ($a - $p)) / (1 + exp($b * ($a - $p))) ** 2 : 0;
 
-        $a = ($k < $kmax0) ? $difficulties[$fractions[$k + 1] : 0;
-        $db -= ($k < $kmax) ? ($p - $a) * exp($b * ($a - $p)) / (1 + exp($b * ($a - $p))) ** 2 : 0;
-
+        if ($k < $kmax) {
+            $a = $difficulties[$fractions[$k + 1]];
+            $db -= ($p - $a) * exp($b * ($a - $p)) / (1 + exp($b * ($a - $p))) ** 2;
+        }
         $result[$kmax+1] = $db / $likelihood;
 
         return $result;
@@ -439,14 +439,13 @@ class grmgeneralized extends model_multiparam {
      *
      * @param array $pp - person ability parameter ('ability')
      * @param array $ip - item parameters ('difficulty', 'discrimination')
-     * @param float $itemresponse - answer category (0 or 1.0)
+     * @param float $frac - answer category (0 .. 1.0)
      *
-     * @return array - hessian matrx
+     * @return array - hessian matrix
      */
-    public static function get_log_hessian(array $pp, array $ip, float $itemresponse): array {
+    public static function get_log_hessian(array $pp, array $ip, float $frac): array {
 
         $p = $pp['ability'];
-
         $difficulties = self::sort_fractions($ip['difficulties']);
         $b = $ip['discrimination'];
 
@@ -455,46 +454,49 @@ class grmgeneralized extends model_multiparam {
         $fractions = self::get_fractions($difficulties);
         $kmax = max(array_keys($fractions));
 
-        $k = self::get_key_by_fractions($frac, $a);
+        $k = self::get_key_by_fractions($frac, $difficulties);
 
         // Create a k+1 x k+1-Matrix.
         $result = [];
-        for ($i==0; $i < $kmax + 1; $i ++) {
+        for ($i = 0; $i < $kmax + 1; $i ++) {
             $result[$i] = [];
-            for ($j==0; $j < $kmax + 1; $j ++) {
+            for ($j = 0; $j < $kmax + 1; $j ++) {
                 $result[$i][$j] = 0;
             }
         }
 
         $likelihood = self::likelihood($pp, $ip, $frac);
-        $derivate1st = self::get_log_jacobian($pp, $ip, $frac);
+        $derivative1st = self::get_log_jacobian($pp, $ip, $frac);
 
-        // Calculate 2nd derivates for difficulties a(k) and a(k+1) and discrimination.
-        $a = ($k > 0) ? $difficulties[$fractions[$k] : 0;
-        $daa = ($b ** 2 * exp($b * ($a - $p)) * (-1 + exp($b * ($a - $p)))) /
-            (1 + exp($b * ($a - $p))) ** 3;
+        // Calculate 2nd derivatives for difficulties a(k) and a(k+1) and discrimination.
+        $a = ($k > 0) ? $difficulties[$fractions[$k]] : 0;
+        $daa = ($k > 0) ? ($b ** 2 * exp($b * ($a - $p)) * (-1 + exp($b * ($a - $p)))) /
+            (1 + exp($b * ($a - $p))) ** 3 : 0;
         $result[$k][$k] = $daa / $likelihood - $derivative1st[$k] ** 2;
 
-        $dab = (exp($b * ($a - $p)) * (-1 + $a * $b * (-1 + exp($b * ($a - $p))) + $b * $p
-                    - exp($b * ($a - $p)) * (1 + $b * $p))) / (1 + exp($b * ($a - $p))) ** 3;
+        $dab = ($k > 0) ? (exp($b * ($a - $p)) * (-1 + $a * $b * (-1 + exp($b * ($a - $p))) + $b * $p
+            - exp($b * ($a - $p)) * (1 + $b * $p))) / (1 + exp($b * ($a - $p))) ** 3 : 0;
         $result[$k][$kmax + 1] = $dab / $likelihood - $derivative1st[$k] * $derivative1st[$kmax + 1];
         $result[$kmax + 1][$k] = $result[$k][$kmax + 1];
 
-        $dbb = (exp($b * ($a - $p)) * (-1 + exp($b * ($a - $p))) * ($a - $p) ** 2) /
-            (1 + exp($b * ($a - $p))) ** 3;
+        $dbb = ($k > 0) ? (exp($b * ($a - $p)) * (-1 + exp($b * ($a - $p))) * ($a - $p) ** 2) /
+            (1 + exp($b * ($a - $p))) ** 3 : 0;
 
-        $a = ($k < $kmax) ? $difficulties[$fractions[$k + 1] : 0;
-        $daa = -($b ** 2 * exp($b * ($a - $p)) * (-1 + exp($b * ($a - $p)))) /
-            (1 + exp($b * ($a - $p))) ** 3;
-        $result[$k + 1][$k + 1] = $daa / $likelihood - $derivative1st[$k + 1] ** 2;
+        if ($k < $kmax) {
+            $a = $difficulties[$fractions[$k + 1]];
+            $daa = -($b ** 2 * exp($b * ($a - $p)) * (-1 + exp($b * ($a - $p)))) /
+                (1 + exp($b * ($a - $p))) ** 3;
+            $result[$k + 1][$k + 1] = $daa / $likelihood - $derivative1st[$k + 1] ** 2;
 
-        $dab = -(exp($b * ($a - $p)) * (-1 + $a * $b * (-1 + exp($b * ($a - $p))) + $b * $p
-                - exp($b * ($a - $p)) * (1 + $b * $p))) / (1 + exp($b * ($a - $p))) ** 3;
-        $result[$k + 1][$kmax + 1] = $dab / $likelihood - $derivative1st[$k + 1] * $derivative1st[$kmax + 1];
-        $result[$kmax + 1][$k + 1] = $result[$k + 1][$kmax + 1];
+            $dab = -(exp($b * ($a - $p)) * (-1 + $a * $b * (-1 + exp($b * ($a - $p))) + $b * $p
+                        - exp($b * ($a - $p)) * (1 + $b * $p))) / (1 + exp($b * ($a - $p))) ** 3;
+            $result[$k + 1][$kmax + 1] = $dab / $likelihood - $derivative1st[$k + 1] * $derivative1st[$kmax + 1];
+            $result[$kmax + 1][$k + 1] = $result[$k + 1][$kmax + 1];
 
-        $dbb -= (exp($b * ($a - $p)) * (-1 + exp($b * ($a - $p))) * ($a - $p) ** 2) /
-            (1 + exp($b * ($a - $p))) ** 3;
+            $dbb -= (exp($b * ($a - $p)) * (-1 + exp($b * ($a - $p))) * ($a - $p) ** 2) /
+                (1 + exp($b * ($a - $p))) ** 3;
+        }
+
         $result[$kmax + 1][$kmax + 1] = $dbb / $likelihood - $derivative1st[$kmax + 1][$kmax + 1];
 
         return $result;
@@ -519,7 +521,7 @@ class grmgeneralized extends model_multiparam {
      * @param array $ip
      *
      * @return float
-     * TOOO: renam fisher_info into item_information, until than this acts as an alias.
+     * TOOO: rename fisher_info into item_information, until than this acts as an alias.
      */
     public function fisher_info(array $pp, array $ip): float {
         return self::item_information($pp, $ip);
