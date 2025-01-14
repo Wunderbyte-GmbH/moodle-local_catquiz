@@ -333,10 +333,41 @@ class grm extends model_multiparam {
      *
      * @param array $pp - person ability parameter ('ability')
      * @param array $ip - item parameters ('difficulty', 'discrimination')
-     * @param float $k - answer category (0 or 1.0)
+     * @param float $frac - answer category (0 ... 1.0)
      * @return array - jacobian vector
      */
-    public static function get_log_jacobian(array $pp, array $ip, float $k): array {
+    public static function get_log_jacobian(array $pp, array $ip, float $frac): array {
+
+        $p = $pp['ability'];
+        $difficulties = self::sort_fractions($ip['difficulties']);
+
+        // Make sure $frac is between 0.0 and 1.0.
+        $frac = min(1.0, max(0.0, $frac));
+        $fractions = self::get_fractions($difficulties);
+        $kmax = max(array_keys($fractions));
+
+        $k = self::get_key_by_fractions($frac, $difficulties);
+
+        // Create a k-Vector.
+        $result = [];
+        for ($k = 0; $k < $kmax; $k ++) {
+            $result[$k] = 0;
+        }
+
+        $likelihood = self::likelihood($pp, $ip, $frac);
+
+        // Calculate 1st derivates for difficulties a(k) and a(k+1).
+        $a = ($k > 0) ? $difficulties[$fractions[$k]] : 0;
+        $da = ($k > 0) ? - exp($a - $p) / (1 + exp($a - $p)) ** 2 : 0;
+        $result[$k] = $da / $likelihood;
+
+        if ($k < $kmax) {
+            $a = $difficulties[$fractions[$k + 1]];
+            $da = exp($a - $p) / (1 + exp($a - $p)) ** 2;
+            $result[$k + 1] = $da / $likelihood;
+        }
+
+        return $result;
     }
 
     /**
@@ -344,11 +375,50 @@ class grm extends model_multiparam {
      *
      * @param array $pp - person ability parameter ('ability')
      * @param array $ip - item parameters ('difficulty', 'discrimination')
-     * @param float $itemresponse - answer category (0 or 1.0)
+     * @param float $frac - answer category (0 ... 1.0)
      *
      * @return array - hessian matrx
      */
-    public static function get_log_hessian(array $pp, array $ip, float $itemresponse): array {
+    public static function get_log_hessian(array $pp, array $ip, float $frac): array {
+
+        $p = $pp['ability'];
+
+        $difficulties = self::sort_fractions($ip['difficulties']);
+
+        // Make sure $frac is between 0.0 and 1.0.
+        $frac = min(1.0, max(0.0, $frac));
+        $fractions = self::get_fractions($difficulties);
+        $kmax = max(array_keys($fractions));
+
+        $k = self::get_key_by_fractions($frac, $difficulties);
+
+        // Create a k+1 x k+1-Matrix.
+        $result = [];
+        for ($i = 0; $i < $kmax + 1; $i ++) {
+            $result[$i] = [];
+            for ($j = 0; $j < $kmax + 1; $j ++) {
+                $result[$i][$j] = 0;
+            }
+        }
+
+        $likelihood = self::likelihood($pp, $ip, $frac);
+        $derivative1st = self::get_log_jacobian($pp, $ip, $frac);
+
+        // Calculate 2nd derivates for difficulties a(k) and a(k+1) and discrimination.
+        $a = ($k > 0) ? $difficulties[$fractions[$k]] : 0;
+        $daa = ($k > 0)  ? (exp($a - $p) * (-1 + exp($a - $p))) /
+            (1 + exp($a - $p)) ** 3 : 0;
+        $result[$k][$k] = $daa / $likelihood - $derivative1st[$k] ** 2;
+
+        if ($k < $kmax) {
+            $a = $difficulties[$fractions[$k + 1]];
+
+            $daa = -(exp($a - $p)) * (-1 + exp($a - $p)) /
+                (1 + exp($a - $p)) ** 3;
+            $result[$k + 1][$k + 1] = $daa / $likelihood - $derivative1st[$k + 1] ** 2;
+        }
+
+        return $result;
     }
 
 
