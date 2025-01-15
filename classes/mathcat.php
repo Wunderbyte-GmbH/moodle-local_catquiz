@@ -444,7 +444,10 @@ class mathcat {
                         true), DEBUG_DEVELOPER);
 
                 $valfunctionnew = $fnfunction(self::vector_to_array($parameternew, $parameterstructure));
-                if ($valfunctionnew - $valfunction <= 0) {
+                debugging('valfunction: '.print_r($valfunction, true), DEBUG_DEVELOPER);
+                debugging('valfunctionnew: '.print_r($valfunctionnew, true), DEBUG_DEVELOPER);
+
+                if (($valfunctionnew - $valfunction) <= 0) {
                     $steplength /= 2; // Cut steptlength to half.
                 }
             } while (($valfunctionnew - $valfunction <= 0) && ($steplength > 10 ** (-$precission)));
