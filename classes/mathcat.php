@@ -392,9 +392,9 @@ class mathcat {
      * @param array $parameterstart - Parameter-set to start with (should be near zero point)
      * @param int $precission - Accuracy to how many decimal places
      * @param int $maxiterations - Maximum number of iterations
-     * @param callable|null $fntrfilter - Parameter-check for trusted Region
-     * @param callable|null $fntrfunction - Trusted Region modelling function
-     * @param callable|null $fntrderivative - Deriavative of $fn_trusted_regions_function
+     * @param callable|null $fnparameterrestrictions - Parameter-check for trusted Region
+     * @param callable|null $fneapestimator - EAP-Estimator (bell curve) function
+     * @param callable|null $fneapestimatorderivative1st - Deriavative of $fneapestimator
      *
      * @return array
      *
