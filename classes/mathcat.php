@@ -425,9 +425,15 @@ class mathcat {
             $valderivative = $fnderivative(self::vector_to_array($parameter, $parameterstructure));
 
             $mxgradient = new matrix($valderivative);
-
             $gradientlength = $mxgradient->rooted_summed_squares();
+
+            if ($gradientlength === 0.0) {
+                // There is nothing to climb on anymore. Quit the job.
+                return self::vector_to_array($parameter, $parameterstructure);
+            }
+
             do {
+                // Climb when function value rises, cut steplength to half and try again otherwise.
                 $mxdelta = $mxgradient->multiply($steplength / $gradientlength);
                 $mxparameternew = $mxparameter->add($mxdelta);
                 $parameternew = (array) $mxparameternew;
