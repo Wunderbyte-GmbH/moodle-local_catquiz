@@ -438,14 +438,7 @@ class mathcat {
                 $mxparameternew = $mxparameter->add($mxdelta);
                 $parameternew = (array) $mxparameternew;
                 $parameternew = $parameternew[0];
-                debugging('mxparameternew: '.print_r($mxparameternew, true), DEBUG_DEVELOPER);
-                debugging('parameternew: '.print_r($parameternew, true), DEBUG_DEVELOPER);
-                debugging('parameternew rebuilt: '.print_r(self::vector_to_array($parameternew, $parameterstructure),
-                        true), DEBUG_DEVELOPER);
-
                 $valfunctionnew = $fnfunction(self::vector_to_array($parameternew, $parameterstructure));
-                debugging('valfunction: '.print_r($valfunction, true), DEBUG_DEVELOPER);
-                debugging('valfunctionnew: '.print_r($valfunctionnew, true), DEBUG_DEVELOPER);
 
                 if ($valfunctionnew - $valfunction <= 0) {
                     $steplength /= 2; // Cut steptlength to half.
