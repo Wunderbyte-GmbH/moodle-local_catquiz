@@ -414,20 +414,19 @@ class mathcat {
         $parameterstructure = self::array_to_vector($parameter);
         $steplength = 1;
 
+        // Calculate the function values from $fn_function for current $parameter.
+        $valfunction = $fnfunction(self::vector_to_array($parameter, $parameterstructure));
+
         // Begin with numerical iteration.
         for ($i = 0; $i < $maxiterations; $i++) {
 
-            // DAVID: Sollte serialisiert werden für den Fall genesteter Arrays.
             $mxparameter = new matrix($parameter);
 
-            // Calculate the function and derivative values from  $fn_function and $fn_derivative at point $parameter.
-            $valfunction = $fnfunction(self::vector_to_array($parameter, $parameterstructure));
+            // Calculate the derivative values from $fn_derivative for current $parameter.
             $valderivative = $fnderivative(self::vector_to_array($parameter, $parameterstructure));
 
             $mxgradient = new matrix($valderivative);
             $gradientlength = $mxgradient->rooted_summed_squares();
-            debugging('parameter: '. print_r(self::vector_to_array($parameter, $parameterstructure), true), DEBUG_DEVELOPER);
-            debugging('Gradient: '. print_r($mxgradient, true), DEBUG_DEVELOPER);
 
             if ($gradientlength == 0.0) {
                 // There is nothing to climb on anymore. Quit the job.
@@ -440,10 +439,7 @@ class mathcat {
                 $mxparameternew = $mxparameter->add($mxdelta);
                 $parameternew = (array) $mxparameternew;
                 $parameternew = $parameternew[0];
-                debugging('parameternew: '. print_r($parameternew, true), DEBUG_DEVELOPER);
-                debugging('parameternew rebuilt: '. print_r(self::vector_to_array($parameternew, $parameterstructure), true), DEBUG_DEVELOPER);
                 $valfunctionnew = $fnfunction(self::vector_to_array($parameternew, $parameterstructure));
-                debugging('$valfunctionnew: '. print_r($valfunctionnew, true), DEBUG_DEVELOPER);
 
                 if ($valfunctionnew - $valfunction <= 0) {
                     $steplength /= 2; // Cut steptlength to half.
@@ -451,6 +447,7 @@ class mathcat {
             } while ($valfunctionnew - $valfunction <= 0 && $steplength > 10 ** (-$precission));
 
             $parameter = $parameternew;
+            $valfunction = $valfunctionnew;
 
             // Test if precisiion criteria for stopping iterations has been reached.
             if ($steplength < 10 ** (-$precission)) {
