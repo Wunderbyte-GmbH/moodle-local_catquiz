@@ -457,7 +457,7 @@ class mathcat {
             } else {
                 // Cut step length to half and try again.
 
-                while ($valfunctionnew <= $valfunction 0 && $steplength > 10 ** (-$precission)) {
+                while ($valfunctionnew <= $valfunction && $steplength > 10 ** (-$precission)) {
                     $valfunction = $valfunctionnew;
                     $steplength /= 2;
 
