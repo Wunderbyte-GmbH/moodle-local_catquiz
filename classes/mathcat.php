@@ -440,6 +440,7 @@ class mathcat {
                 $parameternew = (array) $mxparameternew;
                 $parameternew = $parameternew[0];
                 $valfunctionnew = $fnfunction(self::vector_to_array($parameternew, $parameterstructure));
+                debugging('Parameter: '.print_r($parameternew, true), DEBUG_DEVELOPER);
 
                 if ($valfunctionnew - $valfunction <= 0) {
                     $steplength /= 2; // Cut steptlength to half.
