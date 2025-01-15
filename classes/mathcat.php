@@ -438,6 +438,10 @@ class mathcat {
                 $mxparameternew = $mxparameter->add($mxdelta);
                 $parameternew = (array) $mxparameternew;
                 $parameternew = $parameternew[0];
+                debugging('mxparameternew: '.print_r($mxparameternew, true), DEBUG_DEVELOPER);
+                debugging('parameternew: '.print_r($parameternew, true), DEBUG_DEVELOPER);
+                debugging('parameternew rebuilt: '.print_r(self::vector_to_array($parameternew, $parameterstructure),
+                        true), DEBUG_DEVELOPER);
 
                 $valfunctionnew = $fnfunction(self::vector_to_array($parameternew, $parameterstructure));
                 if ($valfunctionnew - $valfunction <= 0) {
