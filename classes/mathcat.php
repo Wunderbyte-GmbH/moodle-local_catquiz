@@ -428,24 +428,44 @@ class mathcat {
             $mxgradient = new matrix($valderivative);
             $gradientlength = $mxgradient->rooted_summed_squares();
 
+            debugging ('Iteration i: '.$i.' 
+            Position: '.print_r($parameter, true).' 
+            Gradient: '.print_r($mxgradient, true).' 
+            Length: '.$gradientlength.' 
+            Step Length: '.$steplength, DEBUG_DEVELOPER);
             if ($gradientlength == 0.0) {
                 // There is nothing to climb on anymore. Quit the job.
                 return self::vector_to_array($parameter, $parameterstructure);
             }
 
-            do {
-                // Climb when function value rises, cut steplength to half and try again otherwise.
-                $mxdelta = $mxgradient->multiply($steplength / $gradientlength);
-                $mxparameternew = $mxparameter->add($mxdelta);
-                $parameternew = (array) $mxparameternew;
-                $parameternew = $parameternew[0];
-                $valfunctionnew = $fnfunction(self::vector_to_array($parameternew, $parameterstructure));
-                debugging('Parameter: '.print_r($parameternew, true), DEBUG_DEVELOPER);
+            $mxparameternew = $mxparameter->add($mxgradient->multiply($steplength / $gradientlength));
+            $parameternew = ((array) $mxparameternew)[0];
+            $valfunctionnew = $fnfunction(self::vector_to_array($parameternew, $parameterstructure));
 
-                if ($valfunctionnew - $valfunction <= 0) {
-                    $steplength /= 2; // Cut steptlength to half.
+            // Perform adaptive line search for step length.
+            if ($valfunctionnew > $valfunction) {
+                // Double step length.
+
+                while ($valfunctionnew > $valfunction) {
+                    $valfunction = $valfunctionnew;
+                    $steplength *= 2;
+
+                    $mxparameternew = $mxparameter->add($mxgradient->multiply($steplength / $gradientlength));
+                    $parameternew = ((array) $mxparameternew)[0];
+                    $valfunctionnew = $fnfunction(self::vector_to_array($parameternew, $parameterstructure));
                 }
-            } while ($valfunctionnew - $valfunction <= 0 && $steplength > 10 ** (-$precission));
+            } else {
+                // Cut step length to half and try again.
+
+                while ($valfunctionnew <= $valfunction 0 && $steplength > 10 ** (-$precission)) {
+                    $valfunction = $valfunctionnew;
+                    $steplength /= 2;
+
+                    $mxparameternew = $mxparameter->add($mxgradient->multiply($steplength / $gradientlength));
+                    $parameternew = ((array)$mxparameternew)[0];
+                    $valfunctionnew = $fnfunction(self::vector_to_array($parameternew, $parameterstructure));
+                }
+            }
 
             $parameter = $parameternew;
             $valfunction = $valfunctionnew;
