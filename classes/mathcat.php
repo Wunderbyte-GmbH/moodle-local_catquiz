@@ -426,8 +426,10 @@ class mathcat {
 
             $mxgradient = new matrix($valderivative);
             $gradientlength = $mxgradient->rooted_summed_squares();
+            debugging('parameter: '. print_r(self::vector_to_array($parameter, $parameterstructure), true), DEBUG_DEVELOPER);
+            debugging('Gradient: '. print_r($mxgradient, true), DEBUG_DEVELOPER);
 
-            if ($gradientlength === 0.0) {
+            if ($gradientlength == 0.0) {
                 // There is nothing to climb on anymore. Quit the job.
                 return self::vector_to_array($parameter, $parameterstructure);
             }
@@ -438,7 +440,10 @@ class mathcat {
                 $mxparameternew = $mxparameter->add($mxdelta);
                 $parameternew = (array) $mxparameternew;
                 $parameternew = $parameternew[0];
+                debugging('parameternew: '. print_r($parameternew, true), DEBUG_DEVELOPER);
+                debugging('parameternew rebuilt: '. print_r(self::vector_to_array($parameternew, $parameterstructure), true), DEBUG_DEVELOPER);
                 $valfunctionnew = $fnfunction(self::vector_to_array($parameternew, $parameterstructure));
+                debugging('$valfunctionnew: '. print_r($valfunctionnew, true), DEBUG_DEVELOPER);
 
                 if ($valfunctionnew - $valfunction <= 0) {
                     $steplength /= 2; // Cut steptlength to half.
