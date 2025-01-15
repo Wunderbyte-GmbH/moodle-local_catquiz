@@ -405,9 +405,9 @@ class mathcat {
         array $parameterstart,
         int $precission = 2,
         int $maxiterations = 50,
-        ?callable $fntrfilter = null,
-        ?callable $fntrfunction = null,
-        ?callable $fntrderivative = null): array {
+        ?callable $fnparameterrestrictions = null,
+        ?callable $fneapestimator = null,
+        ?callable $fneapestimatorderivative1st = null): array {
 
         // Set initial values.
         $parameter = $parameterstart;
@@ -447,10 +447,10 @@ class mathcat {
                 debugging('valfunction: '.print_r($valfunction, true), DEBUG_DEVELOPER);
                 debugging('valfunctionnew: '.print_r($valfunctionnew, true), DEBUG_DEVELOPER);
 
-                if (($valfunctionnew - $valfunction) <= 0) {
+                if ($valfunctionnew - $valfunction <= 0) {
                     $steplength /= 2; // Cut steptlength to half.
                 }
-            } while (($valfunctionnew - $valfunction <= 0) && ($steplength > 10 ** (-$precission)));
+            } while ($valfunctionnew - $valfunction <= 0 && $steplength > 10 ** (-$precission));
 
             $parameter = $parameternew;
 
