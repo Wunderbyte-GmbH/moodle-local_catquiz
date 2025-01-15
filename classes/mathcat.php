@@ -430,7 +430,7 @@ class mathcat {
             do {
                 $mxdelta = $mxgradient->multiply($steplength / $gradientlength);
                 $mxparameternew = $mxparameter->add($mxdelta);
-                $parameternew = (array) $mxparameternew[0];
+                $parameternew = (array) $mxparameternew;
 
                 $valfunctionnew = $fnfunction(self::vector_to_array($parameternew, $parameterstructure));
                 if ($valfunctionnew - $valfunction <= 0) {
