@@ -57,7 +57,7 @@ final class mathcat_test extends basic_testcase {
     public function test_gradient_ascent(): void {
         $result = mathcat::gradient_ascent(
             fn ($x) => exp(-($x['x'] - 2) ** 2) * (-$x['y'] ** 2),
-            fn ($x) => [-2 * exp(-($x['x'] - 2) ** 2) * ($x['x'] - 2) ** (-$x['y'] ** 2),
+            fn ($x) => [-2 * exp(-($x['x'] - 2) ** 2) * ($x['x'] - 2) * (-$x['y'] ** 2),
                 exp(-($x['x'] - 2) ** 2) * (-2 * $x['y']),
                 0],
             ['x' => -pi(), 'y' => 1.5, 'z' => -1.5]
