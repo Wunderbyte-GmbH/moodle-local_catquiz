@@ -58,7 +58,7 @@ final class mathcat_test extends basic_testcase {
         $result = mathcat::gradient_ascent(
             fn ($x) => [exp(-($x['difficulty'] - 2) ** 2)],
             fn ($x) => [-2 * exp(-($x['difficulty'] - 2) ** 2) * ($x['difficulty'] - 2)],
-            ['difficulty' => 0]
+            ['difficulty' => -pi()]
         );
         $expected = ['difficulty' => 2];
         $this->assertEquals($expected, $result);
