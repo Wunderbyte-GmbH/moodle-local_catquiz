@@ -448,17 +448,20 @@ class mathcat {
 
                 while ($valfunctionnew > $valfunction) {
                     $valfunction = $valfunctionnew;
+                    $parameter = $parameternew;
                     $steplength *= 2;
 
                     $mxparameternew = $mxparameter->add($mxgradient->multiply($steplength / $gradientlength));
                     $parameternew = ((array) $mxparameternew)[0];
                     $valfunctionnew = $fnfunction(self::vector_to_array($parameternew, $parameterstructure));
                 }
+                $steplength /= 2;
             } else {
                 // Cut step length to half and try again.
 
                 while ($valfunctionnew <= $valfunction && $steplength > 10 ** (-$precission)) {
                     $valfunction = $valfunctionnew;
+                    $parameter = $parameternew;
                     $steplength /= 2;
 
                     $mxparameternew = $mxparameter->add($mxgradient->multiply($steplength / $gradientlength));
@@ -466,9 +469,6 @@ class mathcat {
                     $valfunctionnew = $fnfunction(self::vector_to_array($parameternew, $parameterstructure));
                 }
             }
-
-            $parameter = $parameternew;
-            $valfunction = $valfunctionnew;
 
             // Test if precisiion criteria for stopping iterations has been reached.
             if ($steplength < 10 ** (-$precission)) {
