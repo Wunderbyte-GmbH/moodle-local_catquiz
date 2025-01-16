@@ -447,6 +447,7 @@ class mathcat {
                 // Double step length.
 
                 while ($valfunctionnew > $valfunction) {
+                    $valfunction = $valfunctionnew;
                     $parameter = $parameternew;
                     $steplength *= 2;
 
@@ -454,7 +455,6 @@ class mathcat {
                     $parameternew = ((array) $mxparameternew)[0];
                     $valfunctionnew = $fnfunction(self::vector_to_array($parameternew, $parameterstructure));
                 }
-                $valfunction = $valfunctionnew;
                 $steplength /= 2;
             } else {
                 // Cut step length to half and try again.
@@ -467,6 +467,7 @@ class mathcat {
                     $parameternew = ((array)$mxparameternew)[0];
                     $valfunctionnew = $fnfunction(self::vector_to_array($parameternew, $parameterstructure));
                 }
+                $parameter = $parameternew;
                 $valfunction = $valfunctionnew;
             }
 
