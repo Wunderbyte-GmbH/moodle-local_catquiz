@@ -229,7 +229,8 @@ final class catcalc_test extends basic_testcase {
         $pcmgeneralizedparam = new model_item_param($itemid, 'pcmgeneralized', [], 4, $pcmgeneralizedrecord);
         $pcmparam = new model_item_param($itemid, 'pcm', [], 4, $pcmrecord);
 
-        $resp = new model_item_response($itemid, 1.0, new model_person_param('1', 1));
+        $pp = new model_person_param('1', 1);
+        $resp = new model_item_response($itemid, 1.0, $pp);
         $responses = [
             $itemid => $resp,
         ];
@@ -335,12 +336,14 @@ final class catcalc_test extends basic_testcase {
                     $items = clone($steps[$person][$step - 1]['items']);
                     $items->add($item);
                     $responses = $steps[$person][$step - 1]['responses'];
-                    $responses[$itemid] = new model_item_response($itemid, floatval($fraction), new model_person_param($person, 1));
+                    $pp = new model_person_param($person, 1);
+                    $responses[$itemid] = new model_item_response($itemid, floatval($fraction), $pp);
                     $startvalue = $steps[$person][$step - 1]['expected_ability'];
                 } else {
                     $items = (new model_item_param_list())->add($item);
+                    $pp = new model_person_param($person, 1);
                     $responses = [
-                        $itemid => new model_item_response($itemid, floatval($fraction), new model_person_param($person, 1)),
+                        $itemid => new model_item_response($itemid, floatval($fraction), $pp),
                     ];
                     $startvalue = $mean;
                 }
