@@ -88,14 +88,13 @@ abstract class strategy {
     public int $catcontextid;
 
     /**
-     * @var array<preselect_task>
-     */
-    public array $scoremodifiers;
-
-    /**
      * @var progress
      */
     protected progress $progress;
+
+    private cache $cache;
+
+    private $result;
 
     /**
      * These data provide the context for the selection of the next question.
@@ -115,8 +114,7 @@ abstract class strategy {
     public function __construct() {
         global $CFG;
         require_once($CFG->dirroot . '/local/catquiz/lib.php');
-
-        $this->scoremodifiers = info::get_score_modifiers();
+        $this->cache = cache::make('local_catquiz', 'adaptivequizattempt');
     }
 
     /**
@@ -160,15 +158,14 @@ abstract class strategy {
      */
     public function return_next_testitem(array $context) {
         $this->context = $context;
-        $cache = cache::make('local_catquiz', 'adaptivequizattempt');
         $maxtime = $context['progress']->get_starttime() + $context['max_attempttime_in_sec'];
         if (time() > $maxtime) {
             // The 'endtime' holds the last timepoint that is relevant for the
             // result. So if a student tries to answer a question after the
             // time limit, this value is set to the time limit (starttime + max
             // attempt time).
-            $cache->set('endtime', $maxtime);
-            $cache->set('catquizerror', status::EXCEEDED_MAX_ATTEMPT_TIME);
+            $this->cache->set('endtime', $maxtime);
+            $this->cache->set('catquizerror', status::EXCEEDED_MAX_ATTEMPT_TIME);
             return result::err(status::EXCEEDED_MAX_ATTEMPT_TIME);
         }
 
@@ -193,20 +190,10 @@ abstract class strategy {
         }
 
         // Core methods called in every strategy.
-        $res = $this->update_personability();
-        if ($res->iserr()) {
-            $cache->set('endtime', time());
-            $cache->set('catquizerror', $res->get_status());
-            return $res;
-        }
-        $context = $res->unwrap();
+        $res = $this->update_personability()
+            ->and_then(fn () => $this->first_question_selector())
+            ->or_else(fn ($res) => $this->after_error($res));
 
-        $res = $this->first_question_selector();
-        if ($res->iserr()) {
-            $cache->set('endtime', time());
-            $cache->set('catquizerror', $res->get_status());
-            return $res;
-        }
         $val = $res->unwrap();
         // If the result contains a single object, this is the question to be returned.
         // Othewise, it contains the updated $context array with the ability and standarderror set in such a way, that the
@@ -214,39 +201,18 @@ abstract class strategy {
         if (is_object($val)) {
             return $res;
         }
-        $this->context = $val;
 
-        $res = $this->add_scale_standarderror();
-        if ($res->iserr()) {
-            $cache->set('endtime', time());
-            $cache->set('catquizerror', $res->get_status());
-            return $res;
+        try {
+            $this->add_scale_standarderror()
+                ->and_then(fn () => $this->maximumquestionscheck())
+                ->and_then(fn () => $this->removeplayedquestions())
+                ->and_then(fn () => $this->noremainingquestions())
+                ->and_then(fn () => $this->fisherinformation())
+                ->or_else(fn($res) => $this->after_error($res))
+                ->expect();
+        } catch (Exception $e) {
+            return $this->result;
         }
-        $this->context = $res->unwrap();
-
-        $res = $this->maximumquestionscheck();
-        if ($res->iserr()) {
-            $cache->set('endtime', time());
-            $cache->set('catquizerror', $res->get_status());
-            return $res;
-        }
-
-        $res = $this->removeplayedquestions();
-        if ($res->iserr()) {
-            $cache->set('endtime', time());
-            $cache->set('catquizerror', $res->get_status());
-            return $res;
-        }
-        $this->context = $res->unwrap();
-
-        $res = $this->noremainingquestions();
-        if ($res->iserr()) {
-            $cache->set('endtime', time());
-            $cache->set('catquizerror', $res->get_status());
-            return $res;
-        }
-
-        $this->context = $this->fisherinformation()->unwrap();
 
         $res = $this->maybereturnpilot();
         $val = $res->unwrap();
@@ -254,35 +220,33 @@ abstract class strategy {
         if (is_object($val)) {
             return $res;
         }
-        $this->context = $val;
 
-        $this->context = $this->remove_uncalculated()->unwrap();
-
-        $this->context = $this->mayberemovescale()->unwrap();
-
-        $this->context = $this->last_time_played_penalty()->unwrap();
-
-        $res = $this->filterbystandarderror();
-        if ($res->iserr()) {
-            $cache->set('endtime', time());
-            $cache->set('catquizerror', $res->get_status());
-            return $res;
+        try {
+            $this->remove_uncalculated()
+                ->and_then(fn() => $this->mayberemovescale())
+                ->and_then(fn() => $this->last_time_played_penalty())
+                ->and_then(fn() => $this->filterbystandarderror())
+                ->or_else(fn($res) => $this->after_error($res))
+                ->expect();
+        } catch (Exception $e) {
+            return $this->result;
         }
 
-        $this->context = $this->filterbytestinfo()->unwrap();
-
-        $this->context = $this->filterbyquestionsperscale()->unwrap();
-
-        $result = $this->select_question();
-
-        $this->progress->save();
-
-        $this->update_attemptfeedback($context);
-
-        if ($result->iserr()) {
-            $cache->set('endtime', time());
-            $cache->set('catquizerror', $result->get_status());
-            return $result;
+        try {
+            $result = $this->filterbytestinfo()
+                ->and_then(fn() => $this->filterbyquestionsperscale())
+                ->and_then(fn() => $this->select_question())
+                ->and_then(
+                    function ($res) {
+                        $this->progress->save();
+                        $this->update_attemptfeedback($this->context);
+                        return $res;
+                    }
+                )
+                ->or_else(fn ($res) => $this->after_error($res))
+                ->expect();
+        } catch (Exception $e) {
+            return $this->result;
         }
 
         $selectedquestion = $result->unwrap();
@@ -302,6 +266,15 @@ abstract class strategy {
             $context['progress']->get_selected_subscales()
         );
         return result::ok($selectedquestion);
+    }
+
+    private function after_error($result) {
+        $this->progress->save();
+        $this->update_attemptfeedback($this->context);
+        $this->cache->set('endtime', time());
+        $this->cache->set('catquizerror', $result->get_status());
+        $this->result = $result;
+        return $result;
     }
 
     /**

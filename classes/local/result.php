@@ -24,6 +24,7 @@
 
 namespace local_catquiz\local;
 
+use Exception;
 use local_catquiz\local\status;
 
 /**
@@ -34,8 +35,7 @@ use local_catquiz\local\status;
  * @copyright  2023 Wunderbyte GmbH <georg.maisser@wunderbyte.at>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class result {
-
+abstract class result {
     /**
      * @var string status
      */
@@ -63,11 +63,11 @@ class result {
      * @param string $status
      * @param mixed|null $value
      *
-     * @return result
+     * @return none
      *
      */
     public static function err(string $status = status::ERROR_GENERAL, $value = null) {
-        return new result($value, $status);
+        return new none($value, $status);
     }
 
     /**
@@ -75,12 +75,21 @@ class result {
      *
      * @param mixed|null $value
      *
-     * @return result
+     * @return some
      *
      */
     public static function ok($value = null) {
-        return new result($value, status::OK);
+        return new some($value, status::OK);
     }
+
+    abstract public function and_then(callable $op): result;
+
+    abstract public function or_else(callable $op): result;
+
+    /**
+     * @throws Exception
+     */
+    abstract public function expect();
 
     /**
      * Returns status.
