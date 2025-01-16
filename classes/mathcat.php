@@ -468,6 +468,7 @@ class mathcat {
                     $parameternew = ((array)$mxparameternew)[0];
                     $valfunctionnew = $fnfunction(self::vector_to_array($parameternew, $parameterstructure));
                 }
+                $steplength *= 2;
             }
 
             // Test if precisiion criteria for stopping iterations has been reached.

@@ -60,7 +60,8 @@ final class mathcat_test extends basic_testcase {
             fn ($x) => [2 * exp(-($x['x'] - 2) ** 2) * (2 - $x['x']),
                 2 - 2 * $x['y'],
                 0],
-            ['x' => -pi(), 'y' => 1.66, 'z' => -1.5]
+            ['x' => -pi(), 'y' => 1.66, 'z' => -1.5],
+            6
         );
         $expected = ['x' => 2.0146573464271933, 'y' => 1.00, 'z' => -1.5];
         $this->assertEquals($expected, $result);
