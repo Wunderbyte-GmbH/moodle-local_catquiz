@@ -447,7 +447,6 @@ class mathcat {
                 // Double step length.
 
                 while ($valfunctionnew > $valfunction) {
-                    $valfunction = $valfunctionnew;
                     $parameter = $parameternew;
                     $steplength *= 2;
 
@@ -455,12 +454,12 @@ class mathcat {
                     $parameternew = ((array) $mxparameternew)[0];
                     $valfunctionnew = $fnfunction(self::vector_to_array($parameternew, $parameterstructure));
                 }
+                $valfunction = $valfunctionnew;
                 $steplength /= 2;
             } else {
                 // Cut step length to half and try again.
 
                 while ($valfunctionnew <= $valfunction && $steplength > 10 ** (-$precission)) {
-                    $valfunction = $valfunctionnew;
                     $parameter = $parameternew;
                     $steplength /= 2;
 
@@ -468,6 +467,7 @@ class mathcat {
                     $parameternew = ((array)$mxparameternew)[0];
                     $valfunctionnew = $fnfunction(self::vector_to_array($parameternew, $parameterstructure));
                 }
+                $valfunction = $valfunctionnew;
             }
 
             // Test if precisiion criteria for stopping iterations has been reached.
