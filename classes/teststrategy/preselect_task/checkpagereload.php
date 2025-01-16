@@ -27,7 +27,6 @@ namespace local_catquiz\teststrategy\preselect_task;
 use local_catquiz\local\result;
 use local_catquiz\teststrategy\preselect_task;
 use local_catquiz\teststrategy\progress;
-use local_catquiz\wb_middleware;
 
 /**
  * Checks if we have a new response. If not, presents the previous question again.
@@ -36,7 +35,7 @@ use local_catquiz\wb_middleware;
  * @copyright 2024 Wunderbyte GmbH
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-final class checkpagereload extends preselect_task implements wb_middleware {
+final class checkpagereload extends preselect_task {
 
     /**
      * @var progress $progress

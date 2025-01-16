@@ -32,7 +32,6 @@ use local_catquiz\local\status;
 use local_catquiz\teststrategy\context\loader\personability_loader;
 use local_catquiz\teststrategy\preselect_task;
 use local_catquiz\teststrategy\progress;
-use local_catquiz\wb_middleware;
 use UnexpectedValueException;
 
 /**
@@ -44,7 +43,7 @@ use UnexpectedValueException;
  * @copyright 2024 Wunderbyte GmbH
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class filterbystandarderror extends preselect_task implements wb_middleware {
+class filterbystandarderror extends preselect_task {
 
     /**
      * @var progress
@@ -66,6 +65,7 @@ class filterbystandarderror extends preselect_task implements wb_middleware {
      *
      */
     public function run(array &$context, callable $next): result {
+        $this->context = $context;
         $this->next = $next;
         $this->progress = $context['progress'];
 

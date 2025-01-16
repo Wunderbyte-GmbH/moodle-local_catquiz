@@ -31,14 +31,11 @@ use local_catquiz\catcalc;
 use local_catquiz\catquiz;
 use local_catquiz\catscale;
 use local_catquiz\local\model\model_item_param_list;
-use local_catquiz\local\model\model_person_param_list;
 use local_catquiz\local\model\model_responses;
-use local_catquiz\local\model\model_strategy;
 use local_catquiz\local\result;
 use local_catquiz\local\status;
 use local_catquiz\teststrategy\preselect_task;
 use local_catquiz\teststrategy\progress;
-use local_catquiz\wb_middleware;
 use moodle_exception;
 
 /**
@@ -48,7 +45,7 @@ use moodle_exception;
  * @copyright 2024 Wunderbyte GmbH
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class updatepersonability extends preselect_task implements wb_middleware {
+class updatepersonability extends preselect_task {
 
     /**
      * Threshold for calculating a mean ability

@@ -34,21 +34,8 @@ use local_catquiz\teststrategy\feedbackgenerator\personabilities;
 use local_catquiz\teststrategy\feedbackgenerator\pilotquestions;
 use local_catquiz\teststrategy\feedbackgenerator\questionssummary;
 use local_catquiz\teststrategy\feedbacksettings;
-use local_catquiz\teststrategy\preselect_task\addscalestandarderror;
-use local_catquiz\teststrategy\preselect_task\checkpagereload;
-use local_catquiz\teststrategy\preselect_task\filterbystandarderror;
-use local_catquiz\teststrategy\preselect_task\filterbytestinfo;
-use local_catquiz\teststrategy\preselect_task\firstquestionselector;
-use local_catquiz\teststrategy\preselect_task\fisherinformation;
-use local_catquiz\teststrategy\preselect_task\lasttimeplayedpenalty;
-use local_catquiz\teststrategy\preselect_task\maximumquestionscheck;
-use local_catquiz\teststrategy\preselect_task\mayberemovescale;
-use local_catquiz\teststrategy\preselect_task\maybe_return_pilot;
-use local_catquiz\teststrategy\preselect_task\noremainingquestions;
-use local_catquiz\teststrategy\preselect_task\remove_uncalculated;
-use local_catquiz\teststrategy\preselect_task\removeplayedquestions;
+use local_catquiz\teststrategy\preselect_task;
 use local_catquiz\teststrategy\preselect_task\strategystrengthscore;
-use local_catquiz\teststrategy\preselect_task\updatepersonability;
 use local_catquiz\teststrategy\strategy;
 
 defined('MOODLE_INTERNAL') || die();
@@ -64,7 +51,6 @@ require_once($CFG->dirroot . '/local/catquiz/lib.php');
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class infergreateststrength extends strategy {
-
     /**
      * Hide until tested.
      */
@@ -83,29 +69,12 @@ class infergreateststrength extends strategy {
     public feedbacksettings $feedbacksettings;
 
     /**
-     * Returns required score modifiers.
+     * Return the next question
      *
-     * @return array
-     *
+     * @return preselect_task
      */
-    public function get_preselecttasks(): array {
-        return [
-            firstquestionselector::class, // If this is the first question of this attempt, return it here.
-            addscalestandarderror::class,
-            maximumquestionscheck::class, // Cancel quiz attempt if we reached maximum of questions.
-            checkpagereload::class, // This must be after maximumquestionscheck, so that the quiz ends.
-            removeplayedquestions::class,
-            noremainingquestions::class,
-            fisherinformation::class, // Add the fisher information to each question.
-            lasttimeplayedpenalty::class,
-            mayberemovescale::class, // Remove questions from excluded subscales.
-            maybe_return_pilot::class,
-            remove_uncalculated::class, // Remove items that do not have item parameters.
-            noremainingquestions::class, // Cancel quiz attempt if no questions are left.
-            filterbystandarderror::class,
-            filterbytestinfo::class,
-            strategystrengthscore::class,
-        ];
+    public function get_selector(): preselect_task {
+        return new strategystrengthscore();
     }
 
     /**
@@ -157,7 +126,7 @@ class infergreateststrength extends strategy {
         array $feedbackdata,
         int $catscaleid = 0,
         bool $feedbackonlyfordefinedscaleid = false
-        ): array {
+    ): array {
         // Fraction can not be 1 (all answers correct).
         if ($feedbacksettings->fraction <= 0) {
             $returnarray = [];

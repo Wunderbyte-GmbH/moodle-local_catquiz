@@ -24,12 +24,10 @@
 
 namespace local_catquiz\teststrategy\preselect_task;
 
-use local_catquiz\catcontext;
 use local_catquiz\local\result;
 use local_catquiz\local\status;
 use local_catquiz\teststrategy\preselect_task;
 use local_catquiz\teststrategy\progress;
-use local_catquiz\wb_middleware;
 
 /**
  * Test strategy maximumquestionscheck.
@@ -38,7 +36,7 @@ use local_catquiz\wb_middleware;
  * @copyright 2024 Wunderbyte GmbH
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-final class maximumquestionscheck extends preselect_task implements wb_middleware {
+final class maximumquestionscheck extends preselect_task {
 
     /**
      * @var progress $progress
@@ -59,10 +57,7 @@ final class maximumquestionscheck extends preselect_task implements wb_middlewar
 
         $maxquestions = $context['maximumquestions'];
         if (($maxquestions != -1) && ($context['questionsattempted'] >= $maxquestions)) {
-            // Update the person ability and then end the quiz.
-            $next = fn () => result::err(status::ERROR_REACHED_MAXIMUM_QUESTIONS);
-            $updatepersonability = new updatepersonability();
-            return $updatepersonability->process($context, $next);
+            return result::err(status::ERROR_REACHED_MAXIMUM_QUESTIONS);
         }
 
         return $next($context);

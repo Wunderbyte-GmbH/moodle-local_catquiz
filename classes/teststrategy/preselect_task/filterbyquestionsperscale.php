@@ -28,7 +28,6 @@ use local_catquiz\catscale;
 use local_catquiz\local\result;
 use local_catquiz\teststrategy\preselect_task;
 use local_catquiz\teststrategy\progress;
-use local_catquiz\wb_middleware;
 
 /**
  * Includes or excludes scales based on the number of questions played
@@ -43,7 +42,7 @@ use local_catquiz\wb_middleware;
  * @copyright 2024 Wunderbyte GmbH
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class filterbyquestionsperscale extends preselect_task implements wb_middleware {
+class filterbyquestionsperscale extends preselect_task {
 
     /**
      * @var progress

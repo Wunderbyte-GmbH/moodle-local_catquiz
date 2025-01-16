@@ -26,7 +26,6 @@ namespace local_catquiz\teststrategy\preselect_task;
 
 use local_catquiz\local\result;
 use local_catquiz\teststrategy\preselect_task;
-use local_catquiz\wb_middleware;
 
 /**
  * Removes questions for which no item parameters were calculated yet
@@ -35,7 +34,7 @@ use local_catquiz\wb_middleware;
  * @copyright 2024 Wunderbyte GmbH
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-final class remove_uncalculated extends preselect_task implements wb_middleware {
+final class remove_uncalculated extends preselect_task {
 
     /**
      * Run preselect task.
@@ -51,7 +50,12 @@ final class remove_uncalculated extends preselect_task implements wb_middleware 
             $context['questions'],
             fn($item) => !is_null($item->model)
         );
-        return $next($context);
+        // After removing questions, check if we still  have some.
+        $noremainingquestions = new noremainingquestions();
+        return $noremainingquestions->run(
+            $context,
+            fn ($context) => result::ok($context)
+        );
     }
 
     /**

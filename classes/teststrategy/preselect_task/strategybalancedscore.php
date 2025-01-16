@@ -26,7 +26,6 @@ namespace local_catquiz\teststrategy\preselect_task;
 
 use local_catquiz\local\result;
 use local_catquiz\teststrategy\preselect_task;
-use local_catquiz\wb_middleware;
 
 /**
  * Add a score to each question and sort questions descending by score
@@ -35,7 +34,7 @@ use local_catquiz\wb_middleware;
  * @copyright 2024 Wunderbyte GmbH
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-final class strategybalancedscore extends preselect_task implements wb_middleware {
+final class strategybalancedscore extends preselect_task {
 
     /**
      * Run preselect task.

@@ -38,7 +38,6 @@ use local_catquiz\output\attemptfeedback;
 use local_catquiz\teststrategy\info;
 use local_catquiz\teststrategy\preselect_task;
 use local_catquiz\teststrategy\preselect_task\addscalestandarderror;
-use local_catquiz\teststrategy\preselect_task\filterbyquestionsperscale;
 use local_catquiz\teststrategy\preselect_task\filterbystandarderror;
 use local_catquiz\teststrategy\preselect_task\filterbytestinfo;
 use local_catquiz\teststrategy\preselect_task\firstquestionselector;
@@ -46,6 +45,7 @@ use local_catquiz\teststrategy\preselect_task\fisherinformation;
 use local_catquiz\teststrategy\preselect_task\lasttimeplayedpenalty;
 use local_catquiz\teststrategy\preselect_task\maximumquestionscheck;
 use local_catquiz\teststrategy\preselect_task\maybe_return_pilot;
+use local_catquiz\teststrategy\preselect_task\maybe_return_pilot_testing;
 use local_catquiz\teststrategy\preselect_task\mayberemovescale;
 use local_catquiz\teststrategy\preselect_task\noremainingquestions;
 use local_catquiz\teststrategy\preselect_task\remove_uncalculated;
@@ -53,8 +53,6 @@ use local_catquiz\teststrategy\preselect_task\removeplayedquestions;
 use local_catquiz\teststrategy\preselect_task\updatepersonability;
 use local_catquiz\teststrategy\preselect_task\updatepersonability_testing;
 use local_catquiz\teststrategy\progress;
-use local_catquiz\wb_middleware_runner;
-use moodle_exception;
 use moodle_url;
 
 /**
@@ -65,7 +63,6 @@ use moodle_url;
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 abstract class strategy {
-
     /**
      * This can be overwritten by strategies to make them unavailable.
      */
@@ -123,13 +120,21 @@ abstract class strategy {
     }
 
     /**
-     * Returns an array of score modifier classes
+     * Returns the class that will select the next question.
      *
-     * The classes will be called in the given order to calculate the score of a question
-     *
-     * @return array
+     * @return preselect_task
      */
-    abstract public function get_preselecttasks(): array;
+    abstract public function get_selector(): preselect_task;
+
+    /**
+     * Returns the actual question or an error.
+     *
+     * @return result
+     */
+    public function select_question(): result {
+        $selector = $this->get_selector();
+        return $selector->run($this->context, fn ($c) => 'never_called');
+    }
 
     /**
      * Returns the translated description of this strategy
@@ -190,12 +195,16 @@ abstract class strategy {
         // Core methods called in every strategy.
         $res = $this->update_personability();
         if ($res->iserr()) {
+            $cache->set('endtime', time());
+            $cache->set('catquizerror', $res->get_status());
             return $res;
         }
         $context = $res->unwrap();
 
         $res = $this->first_question_selector();
         if ($res->iserr()) {
+            $cache->set('endtime', time());
+            $cache->set('catquizerror', $res->get_status());
             return $res;
         }
         $val = $res->unwrap();
@@ -207,33 +216,70 @@ abstract class strategy {
         }
         $this->context = $val;
 
-        foreach ($this->get_preselecttasks() as $modifier) {
-            // When this is called for running tests, check if there is a
-            // X_testing class and if so, use that one.
-            if (in_array($modifier, explode(',', getenv('USE_TESTING_CLASS_FOR')))) {
-                $testingclass = sprintf('%s_testing', $modifier);
-                if (array_key_exists($testingclass, $this->scoremodifiers)) {
-                    $middlewares[] = $this->scoremodifiers[$testingclass];
-                    continue;
-                }
-            }
-            if (!array_key_exists($modifier, $this->scoremodifiers)) {
-                throw new moodle_exception(
-                    sprintf(
-                        'Strategy requires a score modifier that is not available: %s',
-                        $modifier
-                    )
-                );
-            }
-            $middlewares[] = $this->scoremodifiers[$modifier];
+        $res = $this->add_scale_standarderror();
+        if ($res->iserr()) {
+            $cache->set('endtime', time());
+            $cache->set('catquizerror', $res->get_status());
+            return $res;
+        }
+        $this->context = $res->unwrap();
+
+        $res = $this->maximumquestionscheck();
+        if ($res->iserr()) {
+            $cache->set('endtime', time());
+            $cache->set('catquizerror', $res->get_status());
+            return $res;
         }
 
-        $result = wb_middleware_runner::run($middlewares, $this->context);
+        $res = $this->removeplayedquestions();
+        if ($res->iserr()) {
+            $cache->set('endtime', time());
+            $cache->set('catquizerror', $res->get_status());
+            return $res;
+        }
+        $this->context = $res->unwrap();
+
+        $res = $this->noremainingquestions();
+        if ($res->iserr()) {
+            $cache->set('endtime', time());
+            $cache->set('catquizerror', $res->get_status());
+            return $res;
+        }
+
+        $this->context = $this->fisherinformation()->unwrap();
+
+        $res = $this->maybereturnpilot();
+        $val = $res->unwrap();
+        // If the value is an object, it is the pilot question that should be returned.
+        if (is_object($val)) {
+            return $res;
+        }
+        $this->context = $val;
+
+        $this->context = $this->remove_uncalculated()->unwrap();
+
+        $this->context = $this->mayberemovescale()->unwrap();
+
+        $this->context = $this->last_time_played_penalty()->unwrap();
+
+        $res = $this->filterbystandarderror();
+        if ($res->iserr()) {
+            $cache->set('endtime', time());
+            $cache->set('catquizerror', $res->get_status());
+            return $res;
+        }
+
+        $this->context = $this->filterbytestinfo()->unwrap();
+
+        $this->context = $this->filterbyquestionsperscale()->unwrap();
+
+        $result = $this->select_question();
+
         $this->progress->save();
 
         $this->update_attemptfeedback($context);
 
-        if ($result->isErr()) {
+        if ($result->iserr()) {
             $cache->set('endtime', time());
             $cache->set('catquizerror', $result->get_status());
             return $result;
@@ -266,7 +312,7 @@ abstract class strategy {
      * @return bool
      */
     protected function pre_check_page_reload(): bool {
-        return false;
+        return true;
     }
 
     /**
@@ -567,6 +613,9 @@ abstract class strategy {
      */
     protected function maybereturnpilot(): result {
         $maybereturnpilot = new maybe_return_pilot();
+        if (getenv('USE_TESTING_CLASS_FOR')) {
+            $maybereturnpilot = new maybe_return_pilot_testing();
+        }
         $result = $maybereturnpilot->run($this->context, fn ($context) => result::ok($context));
         return $result;
     }
@@ -603,6 +652,11 @@ abstract class strategy {
         return $result;
     }
 
+    protected function remove_played(): result {
+        $result = (new removeplayedquestions())->run($this->context, fn ($context) => result::ok($context));
+        return $result;
+    }
+
     /**
      * Filter by standarderror
      *
@@ -628,11 +682,11 @@ abstract class strategy {
     /**
      * Filter by questions per scale
      *
-     * Now, this is just a wrapper to call the respective pre-select task.
+     * By default does nothing
+     *
+     * @return result
      */
     protected function filterbyquestionsperscale(): result {
-        $filterbyquestionsperscale = new filterbyquestionsperscale();
-        $result = $filterbyquestionsperscale->run($this->context, fn ($context) => result::ok($context));
-        return $result;
+        return result::ok($this->context);
     }
 }

@@ -26,11 +26,9 @@ namespace local_catquiz\teststrategy\preselect_task;
 
 use local_catquiz\catscale;
 use local_catquiz\local\model\model_item_param_list;
-use local_catquiz\local\model\model_responses;
 use local_catquiz\local\result;
 use local_catquiz\teststrategy\preselect_task;
 use local_catquiz\teststrategy\progress;
-use local_catquiz\wb_middleware;
 use stdClass;
 
 /**
@@ -40,7 +38,7 @@ use stdClass;
  * @copyright 2024 Wunderbyte GmbH
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-abstract class strategyscore extends preselect_task implements wb_middleware {
+abstract class strategyscore extends preselect_task {
     /**
      * Returns the scale term
      *
@@ -126,6 +124,7 @@ abstract class strategyscore extends preselect_task implements wb_middleware {
      *
      */
     public function run(array &$context, callable $next): result {
+        $this->context = $context;
         $this->progress = $context['progress'];
         $userresponses = $this->progress->get_user_responses();
         $scalefractions = [];

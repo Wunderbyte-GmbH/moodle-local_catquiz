@@ -24,10 +24,8 @@
 
 namespace local_catquiz\teststrategy\preselect_task;
 
-use cache;
 use local_catquiz\local\result;
 use local_catquiz\teststrategy\preselect_task;
-use local_catquiz\wb_middleware;
 
 /**
  * Randomly returns a pilot question according to the `pilot_ratio` parameter
@@ -36,7 +34,7 @@ use local_catquiz\wb_middleware;
  * @copyright 2024 Wunderbyte GmbH
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class maybe_return_pilot extends preselect_task implements wb_middleware {
+class maybe_return_pilot extends preselect_task {
 
     /**
      * Run preselect task.
@@ -48,6 +46,7 @@ class maybe_return_pilot extends preselect_task implements wb_middleware {
      *
      */
     public function run(array &$context, callable $next): result {
+        $this->context = $context;
         if ($context['pilot_ratio'] === 0) {
             return $next($context);
         }

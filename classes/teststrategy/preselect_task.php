@@ -26,7 +26,6 @@ namespace local_catquiz\teststrategy;
 
 use local_catquiz\local\result;
 use local_catquiz\local\status;
-use local_catquiz\wb_middleware;
 
 /**
  * Base class for a pre-select task.
@@ -43,7 +42,7 @@ use local_catquiz\wb_middleware;
  * @copyright 2024 Wunderbyte GmbH
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-abstract class preselect_task implements wb_middleware {
+abstract class preselect_task {
 
     /**
      *

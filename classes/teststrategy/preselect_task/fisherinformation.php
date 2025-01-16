@@ -26,10 +26,8 @@ namespace local_catquiz\teststrategy\preselect_task;
 
 use local_catquiz\local\model\model_item_param;
 use local_catquiz\local\model\model_model;
-use local_catquiz\local\model\model_strategy;
 use local_catquiz\local\result;
 use local_catquiz\teststrategy\preselect_task;
-use local_catquiz\wb_middleware;
 
 /**
  * Test strategy fisherinformation.
@@ -38,7 +36,7 @@ use local_catquiz\wb_middleware;
  * @copyright 2024 Wunderbyte GmbH
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-final class fisherinformation extends preselect_task implements wb_middleware {
+final class fisherinformation extends preselect_task {
 
     /**
      * Run preselect task.

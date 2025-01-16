@@ -24,29 +24,17 @@
 
 namespace local_catquiz\teststrategy\strategy;
 
+use local_catquiz\local\result;
 use local_catquiz\teststrategy\feedback_helper;
 use local_catquiz\teststrategy\feedbackgenerator\comparetotestaverage;
 use local_catquiz\teststrategy\feedbackgenerator\customscalefeedback;
 use local_catquiz\teststrategy\feedbackgenerator\debuginfo;
 use local_catquiz\teststrategy\feedbackgenerator\graphicalsummary;
 use local_catquiz\teststrategy\feedbackgenerator\learningprogress;
-use local_catquiz\teststrategy\feedbackgenerator\personabilities;
 use local_catquiz\teststrategy\feedbackgenerator\questionssummary;
 use local_catquiz\teststrategy\feedbacksettings;
-use local_catquiz\teststrategy\preselect_task\addscalestandarderror;
-use local_catquiz\teststrategy\preselect_task\checkpagereload;
-use local_catquiz\teststrategy\preselect_task\filterbystandarderror;
-use local_catquiz\teststrategy\preselect_task\firstquestionselector;
-use local_catquiz\teststrategy\preselect_task\fisherinformation;
-use local_catquiz\teststrategy\preselect_task\lasttimeplayedpenalty;
-use local_catquiz\teststrategy\preselect_task\maximumquestionscheck;
-use local_catquiz\teststrategy\preselect_task\mayberemovescale;
-use local_catquiz\teststrategy\preselect_task\maybe_return_pilot;
-use local_catquiz\teststrategy\preselect_task\noremainingquestions;
-use local_catquiz\teststrategy\preselect_task\remove_uncalculated;
-use local_catquiz\teststrategy\preselect_task\removeplayedquestions;
+use local_catquiz\teststrategy\preselect_task;
 use local_catquiz\teststrategy\preselect_task\strategyfastestscore;
-use local_catquiz\teststrategy\preselect_task\updatepersonability;
 use local_catquiz\teststrategy\strategy;
 
 /**
@@ -70,27 +58,13 @@ class teststrategy_fastest extends strategy {
      */
     public feedbacksettings $feedbacksettings;
 
-
     /**
-     * Returns required score modifiers.
+     * Return the next question
      *
-     * @return array
-     *
+     * @return preselect_task
      */
-    public function get_preselecttasks(): array {
-        return [
-            fisherinformation::class,
-            addscalestandarderror::class,
-            maximumquestionscheck::class,
-            removeplayedquestions::class,
-            maybe_return_pilot::class,
-            remove_uncalculated::class,
-            noremainingquestions::class,
-            mayberemovescale::class,
-            lasttimeplayedpenalty::class,
-            filterbystandarderror::class,
-            strategyfastestscore::class,
-        ];
+    public function get_selector(): preselect_task {
+        return new strategyfastestscore();
     }
 
     /**
@@ -205,5 +179,14 @@ class teststrategy_fastest extends strategy {
             }
         }
         return $newabilities;
+    }
+
+    /**
+     * In this strategy, we do not need to calculate this.
+     *
+     * @return result
+     */
+    protected function filterbytestinfo(): result {
+        return result::ok($this->context);
     }
 }
