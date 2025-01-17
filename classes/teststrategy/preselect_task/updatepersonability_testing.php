@@ -39,7 +39,6 @@ use local_catquiz\teststrategy\preselect_task\updatepersonability;
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class updatepersonability_testing extends updatepersonability {
-
     /**
      * Update person param.
      *

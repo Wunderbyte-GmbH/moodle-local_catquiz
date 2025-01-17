@@ -55,7 +55,6 @@ abstract class preselect_task {
      * Otherwise, call $next($context) to let the next middleware do its work.
      *
      * @param array $context The input that can be modified
-     * @param callable $next Callable that calls the next middleware
      * @return result
      */
     abstract public function run(array &$context): result;

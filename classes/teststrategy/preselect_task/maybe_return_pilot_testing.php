@@ -32,7 +32,6 @@ namespace local_catquiz\teststrategy\preselect_task;
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 final class maybe_return_pilot_testing extends maybe_return_pilot {
-
     /**
      * This value is used to return a pilot question.
      */

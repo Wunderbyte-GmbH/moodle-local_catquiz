@@ -32,7 +32,6 @@ namespace local_catquiz\teststrategy\preselect_task;
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 final class firstquestionselector_testing extends firstquestionselector {
-
     /**
      * Gets personparams for adaptivequiz test.
      *

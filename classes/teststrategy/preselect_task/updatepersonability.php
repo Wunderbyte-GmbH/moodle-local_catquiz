@@ -156,7 +156,6 @@ class updatepersonability extends preselect_task {
      * Run preselect task.
      *
      * @param array $context
-     * @param callable $next
      *
      * @return result
      *

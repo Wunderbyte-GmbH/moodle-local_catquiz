@@ -53,7 +53,6 @@ class filterbystandarderror extends preselect_task {
      * Run method.
      *
      * @param array $context
-     * @param callable $next
      *
      * @return result
      *

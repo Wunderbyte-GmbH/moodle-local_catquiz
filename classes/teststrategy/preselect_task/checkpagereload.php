@@ -45,7 +45,6 @@ final class checkpagereload extends preselect_task {
      * Run.
      *
      * @param array $context
-     * @param callable $next
      *
      * @return result
      *
