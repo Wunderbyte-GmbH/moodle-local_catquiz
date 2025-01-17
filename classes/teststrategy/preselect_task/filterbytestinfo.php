@@ -40,7 +40,6 @@ use local_catquiz\teststrategy\progress;
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class filterbytestinfo extends preselect_task {
-
     /**
      * @var progress
      */
@@ -55,17 +54,18 @@ class filterbytestinfo extends preselect_task {
      * @return result
      *
      */
-    public function run(array &$context, callable $next): result {
+    public function run(array &$context): result {
         $this->context = $context;
         $this->progress = $context['progress'];
 
-        if (!in_array($context['teststrategy'], [ // TODO: use something like strategy::supports_dynamic_scales()!
+        if (!in_array($context['teststrategy'], [
             LOCAL_CATQUIZ_STRATEGY_LOWESTSUB,
             LOCAL_CATQUIZ_STRATEGY_HIGHESTSUB,
             LOCAL_CATQUIZ_STRATEGY_RELSUBS,
             LOCAL_CATQUIZ_STRATEGY_ALLSUBS,
-            ])) {
-            return $next($context);
+            ])
+        ) {
+            return result::ok($context);
         }
 
         foreach ($this->progress->get_abilities() as $scaleid => $ability) {
@@ -146,7 +146,7 @@ class filterbytestinfo extends preselect_task {
             }
         }
 
-        return $next($context);
+        return result::ok($context);
     }
 
     /**

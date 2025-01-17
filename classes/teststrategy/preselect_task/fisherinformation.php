@@ -37,7 +37,6 @@ use local_catquiz\teststrategy\preselect_task;
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 final class fisherinformation extends preselect_task {
-
     /**
      * Run preselect task.
      *
@@ -47,7 +46,7 @@ final class fisherinformation extends preselect_task {
      * @return result
      *
      */
-    public function run(array &$context, callable $next): result {
+    public function run(array &$context): result {
         foreach ($context['questions'] as $item) {
             // Just skip questions where we can not calculate the fisher information.
             if (!array_key_exists($item->model, $context['installed_models'])) {
@@ -67,7 +66,7 @@ final class fisherinformation extends preselect_task {
         }
 
         $context['has_fisherinformation'] = true;
-        return $next($context);
+        return result::ok($context);
     }
 
     /**

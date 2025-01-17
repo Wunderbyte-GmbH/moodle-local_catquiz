@@ -61,14 +61,14 @@ final class lasttimeplayedpenalty extends preselect_task {
      * @return result
      *
      */
-    public function run(array &$context, callable $next): result {
+    public function run(array &$context): result {
         $now = time();
-        $context['questions'] = array_map(function($q) use ($now, $context) {
+        $context['questions'] = array_map(function ($q) use ($now, $context) {
             $q->lasttimeplayedpenaltyfactor = $this->get_penalty_factor($q, $now, $context['penalty_threshold']);
             return $q;
         }, $context['questions']);
 
-        return $next($context);
+        return result::ok($context);
     }
 
     /**

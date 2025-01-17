@@ -34,7 +34,6 @@ use stdClass;
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class strategyrelevantscore extends strategyscore {
-
     /**
      * Returns the scale term
      *

@@ -33,8 +33,7 @@ use stdClass;
  * @copyright 2024 Wunderbyte GmbH
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class  inferallsubscalesscore extends strategyscore {
-
+class inferallsubscalesscore extends strategyscore {
     /**
      * Returns the scale term
      *

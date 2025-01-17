@@ -35,7 +35,6 @@ use local_catquiz\local\model\model_strategy;
 use local_catquiz\local\result;
 use local_catquiz\local\status;
 use local_catquiz\output\attemptfeedback;
-use local_catquiz\teststrategy\info;
 use local_catquiz\teststrategy\preselect_task;
 use local_catquiz\teststrategy\preselect_task\addscalestandarderror;
 use local_catquiz\teststrategy\preselect_task\filterbystandarderror;
@@ -68,7 +67,6 @@ abstract class strategy {
      */
     public const ACTIVE = true;
 
-
     /**
      *
      * @var int $id // strategy id defined in lib.
@@ -92,8 +90,14 @@ abstract class strategy {
      */
     protected progress $progress;
 
+    /**
+     * @var cache $cache
+     */
     private cache $cache;
 
+    /**
+     * @var result $result
+     */
     private $result;
 
     /**
@@ -153,10 +157,9 @@ abstract class strategy {
      *
      * @param array $context
      *
-     * @return mixed
-     *
+     * @return result
      */
-    public function return_next_testitem(array $context) {
+    public function return_next_testitem(array $context): result {
         $this->context = $context;
         $maxtime = $context['progress']->get_starttime() + $context['max_attempttime_in_sec'];
         if (time() > $maxtime) {
@@ -182,11 +185,9 @@ abstract class strategy {
             return $checkbreakres;
         }
 
-        if ($this->pre_check_page_reload()) {
-            $res = $this->check_page_reload();
-            if ($res->unwrap()) {
-                return $res;
-            }
+        $res = $this->check_page_reload();
+        if ($res->unwrap()) {
+            return $res;
         }
 
         // Core methods called in every strategy.
@@ -222,18 +223,13 @@ abstract class strategy {
         }
 
         try {
-            $this->remove_uncalculated()
+            $selectedquestion = $this->remove_uncalculated()
                 ->and_then(fn() => $this->mayberemovescale())
                 ->and_then(fn() => $this->last_time_played_penalty())
                 ->and_then(fn() => $this->filterbystandarderror())
                 ->or_else(fn($res) => $this->after_error($res))
-                ->expect();
-        } catch (Exception $e) {
-            return $this->result;
-        }
-
-        try {
-            $result = $this->filterbytestinfo()
+                ->expect()
+                ->and_then(fn() => $this->filterbytestinfo())
                 ->and_then(fn() => $this->filterbyquestionsperscale())
                 ->and_then(fn() => $this->select_question())
                 ->and_then(
@@ -244,12 +240,12 @@ abstract class strategy {
                     }
                 )
                 ->or_else(fn ($res) => $this->after_error($res))
-                ->expect();
+                ->expect()
+                ->unwrap();
         } catch (Exception $e) {
             return $this->result;
         }
 
-        $selectedquestion = $result->unwrap();
         if (!$selectedquestion) {
             return result::err();
         }
@@ -268,6 +264,11 @@ abstract class strategy {
         return result::ok($selectedquestion);
     }
 
+    /**
+     * Executes steps that are always performed after an error
+     *
+     * @return result
+     */
     private function after_error($result) {
         $this->progress->save();
         $this->update_attemptfeedback($this->context);
@@ -275,17 +276,6 @@ abstract class strategy {
         $this->cache->set('catquizerror', $result->get_status());
         $this->result = $result;
         return $result;
-    }
-
-    /**
-     * If true, the check page reload is called before updating the ability.
-     *
-     * Quickfix, could probabily be removed.
-     *
-     * @return bool
-     */
-    protected function pre_check_page_reload(): bool {
-        return true;
     }
 
     /**
@@ -303,7 +293,9 @@ abstract class strategy {
      * Helper method to update attempt feedback data
      *
      * @param mixed $context
+     *
      * @return void
+     *
      * @throws coding_exception
      * @throws Exception
      * @throws dml_exception
@@ -334,6 +326,7 @@ abstract class strategy {
      *
      * @param int  $catscaleid
      * @param bool $includesubscales
+     *
      * @return array
      */
     public function get_all_available_testitems(int $catscaleid, bool $includesubscales = false): array {
@@ -341,12 +334,13 @@ abstract class strategy {
         $catscale = new catscale($catscaleid);
 
         return $catscale->get_testitems($this->catcontextid, $includesubscales);
-
     }
 
     /**
      * Set catscale id.
+     *
      * @param int $scaleid
+     *
      * @return self
      */
     public function set_scale(int $scaleid) {
@@ -356,7 +350,9 @@ abstract class strategy {
 
     /**
      * Set the CAT context id
+     *
      * @param int $catcontextid
+     *
      * @return $this
      */
     public function set_catcontextid(int $catcontextid) {
@@ -366,16 +362,17 @@ abstract class strategy {
 
     /**
      * Get feedback generators.
-     * @param feedbacksettings|null $feedbacksettings
-     * @return array
      *
+     * @param feedbacksettings|null $feedbacksettings
+     *
+     * @return array
      */
     abstract public function get_feedbackgenerators(?feedbacksettings $feedbacksettings): array;
 
     /**
      * Check defined settings and apply specific settings strategy.
-     * @param feedbacksettings $feedbacksettings
      *
+     * @param feedbacksettings $feedbacksettings
      */
     abstract public function apply_feedbacksettings(feedbacksettings $feedbacksettings);
 
@@ -435,6 +432,8 @@ abstract class strategy {
      *
      * If so, the user is forced to take a break and redirected to a page that shows
      * that information.
+     *
+     * @return result
      */
     protected function check_break(): result {
         $this->progress = $this->context['progress'];
@@ -486,6 +485,8 @@ abstract class strategy {
 
     /**
      * Checks if we have a new response. If not, presents the previous question again.
+     *
+     * @return result
      */
     protected function check_page_reload(): result {
         $this->progress = $this->context['progress'];
@@ -502,6 +503,8 @@ abstract class strategy {
 
     /**
      * Update the person ability of the user taking the quiz.
+     *
+     * @return result
      */
     protected function update_personability(): result {
         $updateabilitytask = new updatepersonability();
@@ -509,125 +512,139 @@ abstract class strategy {
         if (getenv('USE_TESTING_CLASS_FOR')) {
             $updateabilitytask = new updatepersonability_testing();
         }
-        $result = $updateabilitytask->run($this->context, fn ($context) => result::ok($context));
-        return $result;
+        return $updateabilitytask->run($this->context);
     }
 
     /**
      * Add scale standarderror
      *
      * Now, this is just a wrapper to call the respective pre-select task.
+     *
+     * @return result
      */
     protected function add_scale_standarderror(): result {
         $addscalestderrtask = new addscalestandarderror();
-        $result = $addscalestderrtask->run($this->context, fn ($context) => result::ok($context));
-        return $result;
+        return $addscalestderrtask->run($this->context);
     }
 
     /**
      * Maximum questions check
      *
      * Now, this is just a wrapper to call the respective pre-select task.
+     *
+     * @return result
      */
     protected function maximumquestionscheck(): result {
         $maximumquestionscheck = new maximumquestionscheck();
-        $result = $maximumquestionscheck->run($this->context, fn ($context) => result::ok($context));
-        return $result;
+        return $maximumquestionscheck->run($this->context);
     }
 
     /**
      * Remove played questions
      *
      * Now, this is just a wrapper to call the respective pre-select task.
+     *
+     * @return result
      */
     protected function removeplayedquestions(): result {
         $removeplayedquestions = new removeplayedquestions();
-        $result = $removeplayedquestions->run($this->context, fn ($context) => result::ok($context));
-        return $result;
+        return $removeplayedquestions->run($this->context);
     }
 
     /**
      * Check for no remaining questions
      *
      * Now, this is just a wrapper to call the respective pre-select task.
+     *
+     * @return result
      */
     protected function noremainingquestions(): result {
         $noremainingquestions = new noremainingquestions();
-        $result = $noremainingquestions->run($this->context, fn ($context) => result::ok($context));
-        return $result;
+        return $noremainingquestions->run($this->context);
     }
 
     /**
      * Check if scales should be removed.
      *
      * Now, this is just a wrapper to call the respective pre-select task.
+     *
+     * @return result
      */
     protected function mayberemovescale(): result {
         $mayberemovescale = new mayberemovescale();
-        $result = $mayberemovescale->run($this->context, fn ($context) => result::ok($context));
-        return $result;
+        return $mayberemovescale->run($this->context);
     }
 
     /**
      * Calculate Fisher information
      *
      * Now, this is just a wrapper to call the respective pre-select task.
+     *
+     * @return result
      */
     protected function fisherinformation(): result {
         $fisherinformation = new fisherinformation();
-        $result = $fisherinformation->run($this->context, fn ($context) => result::ok($context));
-        return $result;
+        return $fisherinformation->run($this->context);
     }
 
     /**
      * Maybe return a pilot question
      *
      * Now, this is just a wrapper to call the respective pre-select task.
+     *
+     * @return result
      */
     protected function maybereturnpilot(): result {
         $maybereturnpilot = new maybe_return_pilot();
         if (getenv('USE_TESTING_CLASS_FOR')) {
             $maybereturnpilot = new maybe_return_pilot_testing();
         }
-        $result = $maybereturnpilot->run($this->context, fn ($context) => result::ok($context));
-        return $result;
+        return $maybereturnpilot->run($this->context);
     }
 
     /**
      * First question selector
      *
      * Now, this is just a wrapper to call the respective pre-select task.
+     *
+     * @return result
      */
     protected function first_question_selector(): result {
         $firstquestionselector = new firstquestionselector();
-        return $firstquestionselector->run($this->context, fn ($context) => result::ok($context));
+        return $firstquestionselector->run($this->context);
     }
 
     /**
      * Adds last-time-played penalty
      *
      * Now, this is just a wrapper to call the respective pre-select task.
+     *
+     * @return result
      */
     protected function last_time_played_penalty(): result {
         $lasttimeplayedpenalty = new lasttimeplayedpenalty();
-        $result = $lasttimeplayedpenalty->run($this->context, fn ($context) => result::ok($context));
-        return $result;
+        return $lasttimeplayedpenalty->run($this->context);
     }
 
     /**
      * Removes questions for which no item parameters were calculated yet
      *
      * Now, this is just a wrapper to call the respective pre-select task.
+     *
+     * @return result
      */
     protected function remove_uncalculated(): result {
         $removeuncalculated = new remove_uncalculated();
-        $result = $removeuncalculated->run($this->context, fn ($context) => result::ok($context));
-        return $result;
+        return $removeuncalculated->run($this->context);
     }
 
+    /**
+     * Removes played questions from the context
+     *
+     * @return result
+     */
     protected function remove_played(): result {
-        $result = (new removeplayedquestions())->run($this->context, fn ($context) => result::ok($context));
-        return $result;
+        return (new removeplayedquestions())->run($this->context);
     }
 
     /**
@@ -637,8 +654,7 @@ abstract class strategy {
      */
     protected function filterbystandarderror(): result {
         $filterbystandarderror = new filterbystandarderror();
-        $result = $filterbystandarderror->run($this->context, fn ($context) => result::ok($context));
-        return $result;
+        return $filterbystandarderror->run($this->context);
     }
 
     /**
@@ -648,8 +664,7 @@ abstract class strategy {
      */
     protected function filterbytestinfo(): result {
         $filterbytestinfo = new filterbytestinfo();
-        $result = $filterbytestinfo->run($this->context, fn ($context) => result::ok($context));
-        return $result;
+        return $filterbytestinfo->run($this->context);
     }
 
     /**

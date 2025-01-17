@@ -123,7 +123,7 @@ abstract class strategyscore extends preselect_task {
      * @return result
      *
      */
-    public function run(array &$context, callable $next): result {
+    public function run(array &$context): result {
         $this->context = $context;
         $this->progress = $context['progress'];
         $userresponses = $this->progress->get_user_responses();

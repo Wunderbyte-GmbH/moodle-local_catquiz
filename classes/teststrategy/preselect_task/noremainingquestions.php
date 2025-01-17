@@ -36,7 +36,6 @@ use local_catquiz\teststrategy\preselect_task;
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 final class noremainingquestions extends preselect_task {
-
     /**
      * Run preselect task.
      *
@@ -46,15 +45,15 @@ final class noremainingquestions extends preselect_task {
      * @return result
      *
      */
-    public function run(array &$context, callable $next): result {
+    public function run(array &$context): result {
         if (
             count($context['questions']) === 0
             && empty($context['pilot_questions'])
-            ) {
+        ) {
                 return result::err(status::ERROR_NO_REMAINING_QUESTIONS);
         }
 
-        return $next($context);
+        return result::ok($context);
     }
 
     /**

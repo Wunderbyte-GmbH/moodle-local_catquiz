@@ -46,7 +46,6 @@ use moodle_exception;
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class updatepersonability extends preselect_task {
-
     /**
      * Threshold for calculating a mean ability
      *
@@ -162,7 +161,7 @@ class updatepersonability extends preselect_task {
      * @return result
      *
      */
-    public function run(array &$context, callable $next): result {
+    public function run(array &$context): result {
         $this->progress = $context['progress'];
         $this->context = $context;
 
@@ -176,7 +175,7 @@ class updatepersonability extends preselect_task {
             )
         ) {
             $context['skip_reason'] = 'lastquestionnull';
-            return $next($context);
+            return result::ok($context);
         }
 
         $this->userresponses = model_responses::create_from_array(
@@ -186,7 +185,7 @@ class updatepersonability extends preselect_task {
 
         if (!empty($this->progress->get_last_question()->is_pilot)) {
             $context['skip_reason'] = 'pilotquestion';
-            return $next($context);
+            return result::ok($context);
         }
 
         $this->arrayresponses = $this->userresponses->get_for_user($context['userid']);
@@ -215,7 +214,7 @@ class updatepersonability extends preselect_task {
             }
         }
 
-        return $next($context);
+        return result::ok($context);
     }
 
     /**

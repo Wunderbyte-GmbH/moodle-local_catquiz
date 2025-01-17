@@ -36,7 +36,6 @@ use local_catquiz\teststrategy\progress;
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 final class mayberemovescale extends preselect_task {
-
     /**
      * @var progress
      */
@@ -51,15 +50,15 @@ final class mayberemovescale extends preselect_task {
      * @return result
      *
      */
-    public function run(array &$context, callable $next): result {
+    public function run(array &$context): result {
         $this->progress = $context['progress'];
         $played = $this->progress->get_playedquestions(true);
         if (count($played) === 0) {
-            return $next($context);
+            return result::ok($context);
         }
 
         if ($context['max_attempts_per_scale'] == -1) {
-            return $next($context);
+            return result::ok($context);
         }
 
         foreach ($played as $catscaleid => $questions) {
@@ -71,7 +70,7 @@ final class mayberemovescale extends preselect_task {
             }
         }
 
-        return $next($context);
+        return result::ok($context);
     }
 
     /**

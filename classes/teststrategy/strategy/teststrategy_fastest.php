@@ -45,7 +45,6 @@ use local_catquiz\teststrategy\strategy;
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class teststrategy_fastest extends strategy {
-
     /**
      *
      * @var int $id // strategy id defined in lib.
@@ -65,17 +64,6 @@ class teststrategy_fastest extends strategy {
      */
     public function get_selector(): preselect_task {
         return new strategyfastestscore();
-    }
-
-    /**
-     * If true, the check page reload is called before updating the ability.
-     *
-     * Quickfix, could probabily be removed.
-     *
-     * @return bool
-     */
-    protected function pre_check_page_reload(): bool {
-        return true;
     }
 
     /**

@@ -35,7 +35,6 @@ use local_catquiz\teststrategy\preselect_task;
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class maybe_return_pilot extends preselect_task {
-
     /**
      * Run preselect task.
      *
@@ -45,27 +44,27 @@ class maybe_return_pilot extends preselect_task {
      * @return result
      *
      */
-    public function run(array &$context, callable $next): result {
+    public function run(array &$context): result {
         $this->context = $context;
         if ($context['pilot_ratio'] === 0) {
-            return $next($context);
+            return result::ok($context);
         }
 
         // TODO: Replace with check: if fraction in current attempt is 0 or 1, skip.
         if ($this->context['progress']->is_first_question()) {
-            return $next($context);
+            return result::ok($context);
         }
 
         $pilotquestions = array_filter($context['questions'], fn($q) => $q->is_pilot);
         $nonpilotquestions = array_udiff($context['questions'], $pilotquestions, fn($a, $b) => $a->id - $b->id);
         // If there are no pilot questions, then return a random productive question.
         if (count($pilotquestions) === 0) {
-            return $next($context);
+            return result::ok($context);
         }
 
         // If there are only pilot questions, then return a random pilot question.
         if (count($nonpilotquestions) === 0) {
-            return $next($context);
+            return result::ok($context);
         }
 
         if ($this->should_return_pilot()) {
@@ -73,15 +72,14 @@ class maybe_return_pilot extends preselect_task {
             $addattemptstask = new numberofgeneralattempts();
             $lasttimeplayedpenaltytask = new lasttimeplayedpenalty();
             $scoretask = new strategybalancedscore();
-            return $addattemptstask->run(
-                $context, fn($context) => $lasttimeplayedpenaltytask->run(
-                    $context, fn($context) => $scoretask->run($context, fn () => 'nevercalled')
-                    )
-            );
+            return $addattemptstask
+                ->run($context)
+                ->and_then(fn() => $lasttimeplayedpenaltytask->run($context))
+                ->and_then(fn() => $scoretask->run($context));
         } else {
             $context['questions'] = $nonpilotquestions;
+            return result::ok($context);
         }
-        return $next($context);
     }
 
     /**

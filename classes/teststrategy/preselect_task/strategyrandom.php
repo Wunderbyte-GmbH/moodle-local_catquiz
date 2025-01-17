@@ -35,7 +35,6 @@ use local_catquiz\teststrategy\preselect_task;
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 final class strategyrandom extends preselect_task {
-
     /**
      * Run preselect task.
      *
@@ -45,7 +44,7 @@ final class strategyrandom extends preselect_task {
      * @return result
      *
      */
-    public function run(array &$context, callable $next): result {
+    public function run(array &$context): result {
         shuffle($context['questions']);
         return result::ok(reset($context['questions']));
     }

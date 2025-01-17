@@ -36,7 +36,6 @@ use local_catquiz\teststrategy\progress;
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 final class removeplayedquestions extends preselect_task {
-
     /**
      * @var progress
      */
@@ -51,11 +50,11 @@ final class removeplayedquestions extends preselect_task {
      * @return result
      *
      */
-    public function run(array &$context, callable $next): result {
+    public function run(array &$context): result {
         $this->progress = $context['progress'];
         $playedquestions = $this->progress->get_playedquestions();
         if (! $playedquestions) {
-            return $next($context);
+            return result::ok($context);
         }
         foreach (array_keys($playedquestions) as $qid) {
             if (array_key_exists($qid, $context['questions'])) {
@@ -63,7 +62,7 @@ final class removeplayedquestions extends preselect_task {
             }
         }
 
-        return $next($context);
+        return result::ok($context);
     }
 
     /**

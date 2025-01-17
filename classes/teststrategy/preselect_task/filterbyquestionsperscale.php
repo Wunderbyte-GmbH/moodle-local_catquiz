@@ -58,11 +58,11 @@ class filterbyquestionsperscale extends preselect_task {
      * @return result
      *
      */
-    public function run(array &$context, callable $next): result {
+    public function run(array &$context): result {
         $this->progress = $context['progress'];
 
         if (!in_array($context['teststrategy'], [LOCAL_CATQUIZ_STRATEGY_ALLSUBS])) {
-            return $next($context);
+            return result::ok($context);
         }
 
         $minquestionsperscale = $context['min_attempts_per_scale'];
@@ -88,7 +88,7 @@ class filterbyquestionsperscale extends preselect_task {
                     PHP_EOL
                 );
             }
-            return $next($context);
+            return result::ok($context);
         }
 
         // If we are here, not all scales have the minimum questions.
@@ -104,7 +104,7 @@ class filterbyquestionsperscale extends preselect_task {
                 );
             }
         }
-        return $next($context);
+        return result::ok($context);
     }
 
     /**

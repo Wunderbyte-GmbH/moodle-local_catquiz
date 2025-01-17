@@ -58,11 +58,11 @@ class addscalestandarderror extends preselect_task {
      * @return result
      *
      */
-    public function run(array &$context, callable $next): result {
+    public function run(array &$context): result {
         $this->progress = $context['progress'];
         $responses = $this->progress->get_user_responses();
         if (! $responses) {
-            return $next($context);
+            return result::ok($context);
         }
 
         $userresponses = model_responses::create_from_array([$context['userid'] => ['component' => $responses]]);
@@ -72,7 +72,7 @@ class addscalestandarderror extends preselect_task {
             $context['se'][$catscaleid] = $se;
         }
 
-        return $next($context);
+        return result::ok($context);
     }
 
     /**

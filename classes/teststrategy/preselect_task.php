@@ -89,7 +89,7 @@ abstract class preselect_task {
      * @param callable $next Callable that calls the next middleware
      * @return result
      */
-    abstract public function run(array &$context, callable $next): result;
+    abstract public function run(array &$context): result;
 
     /**
      * If a middleware requires a specific key to be available in the $context

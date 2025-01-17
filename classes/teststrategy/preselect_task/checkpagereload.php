@@ -36,7 +36,6 @@ use local_catquiz\teststrategy\progress;
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 final class checkpagereload extends preselect_task {
-
     /**
      * @var progress $progress
      */
@@ -51,13 +50,14 @@ final class checkpagereload extends preselect_task {
      * @return result
      *
      */
-    public function run(array &$context, callable $next): result {
+    public function run(array &$context): result {
         $this->progress = $context['progress'];
-        if (($this->progress->is_first_question() && !$this->progress->get_last_question())
+        if (
+            ($this->progress->is_first_question() && !$this->progress->get_last_question())
             || $this->progress->has_new_response()
             || $this->progress->get_force_new_question()
         ) {
-            return $next($context);
+            return result::ok($context);
         }
 
         return result::ok($this->progress->get_last_question());

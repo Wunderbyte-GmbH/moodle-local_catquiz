@@ -15,36 +15,45 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Сlass status.
+ * Сlass success.
  *
  * @package    local_catquiz
- * @copyright  2023 Wunderbyte GmbH <georg.maisser@wunderbyte.at>
+ * @copyright  2025 Wunderbyte GmbH <georg.maisser@wunderbyte.at>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 namespace local_catquiz\local;
 
-use local_catquiz\local\status;
-
 /**
- * Provides methods to obtain results.
- *
+ * Overrides abstract methods from result
  *
  * @package    local_catquiz
- * @copyright  2023 Wunderbyte GmbH <georg.maisser@wunderbyte.at>
+ * @copyright  2025 Wunderbyte GmbH <georg.maisser@wunderbyte.at>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class some extends result {
-
+class success extends result {
+    /**
+     * Calls the given callable
+     *
+     * @return result
+     */
     public function and_then(callable $op): result {
         return $op($this);
     }
 
+    /**
+     * Just returns the current result
+     *
+     * @return result
+     */
     public function or_else(callable $op): result {
         return $this;
     }
 
-    public function expect() {
+    /**
+     * Just returns the current result
+     */
+    public function expect(): result {
         return $this;
     }
 }

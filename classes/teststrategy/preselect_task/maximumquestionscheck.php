@@ -37,12 +37,6 @@ use local_catquiz\teststrategy\progress;
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 final class maximumquestionscheck extends preselect_task {
-
-    /**
-     * @var progress $progress
-     */
-    private progress $progress;
-
     /**
      * Run preselect task.
      *
@@ -52,15 +46,13 @@ final class maximumquestionscheck extends preselect_task {
      * @return result
      *
      */
-    public function run(array &$context, callable $next): result {
-        $this->progress = $context['progress'];
-
+    public function run(array &$context): result {
         $maxquestions = $context['maximumquestions'];
         if (($maxquestions != -1) && ($context['questionsattempted'] >= $maxquestions)) {
             return result::err(status::ERROR_REACHED_MAXIMUM_QUESTIONS);
         }
 
-        return $next($context);
+        return result::ok($context);
     }
 
     /**

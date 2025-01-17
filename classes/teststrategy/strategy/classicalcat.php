@@ -69,17 +69,6 @@ class classicalcat extends strategy {
     }
 
     /**
-     * If true, the check page reload is called before updating the ability.
-     *
-     * Quickfix, could probabily be removed.
-     *
-     * @return bool
-     */
-    protected function pre_check_page_reload(): bool {
-        return false;
-    }
-
-    /**
      * Returns feedback generators.
      *
      * @param feedbacksettings|null $feedbacksettings

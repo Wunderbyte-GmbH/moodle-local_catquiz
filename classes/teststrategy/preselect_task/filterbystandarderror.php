@@ -44,16 +44,10 @@ use UnexpectedValueException;
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class filterbystandarderror extends preselect_task {
-
     /**
      * @var progress
      */
     private progress $progress;
-
-    /**
-     * @var callable $next
-     */
-    private $next;
 
     /**
      * Run method.
@@ -64,21 +58,20 @@ class filterbystandarderror extends preselect_task {
      * @return result
      *
      */
-    public function run(array &$context, callable $next): result {
+    public function run(array &$context): result {
         $this->context = $context;
-        $this->next = $next;
         $this->progress = $context['progress'];
 
         if ($this->progress->is_first_question()) {
-            return $next($context);
+            return result::ok($context);
         }
 
         if (!$this->progress->has_new_response()) {
-            return $next($context);
+            return result::ok($context);
         }
 
         if ($this->progress->get_last_question()->is_pilot) {
-            return $next($context);
+            return result::ok($context);
         }
 
         $lastquestion = $this->progress->get_last_question();
@@ -98,7 +91,8 @@ class filterbystandarderror extends preselect_task {
                 getenv('CATQUIZ_CREATE_TESTOUTPUT') && printf(
                     "%d: [SE] drop %s%s",
                     count($this->progress->get_playedquestions()),
-                    (catscale::return_catscale_object($scaleid))->name, PHP_EOL
+                    (catscale::return_catscale_object($scaleid))->name,
+                    PHP_EOL
                 );
                 $this->progress->drop_scale($scaleid);
                 $inheritscales = $this->get_scale_heirs($scaleid);
@@ -144,7 +138,7 @@ class filterbystandarderror extends preselect_task {
             }
         }
 
-        return $next($context);
+        return result::ok($context);
     }
 
     /**
@@ -210,7 +204,7 @@ class filterbystandarderror extends preselect_task {
         if ($drop) {
             return result::err(status::ERROR_NO_REMAINING_QUESTIONS);
         }
-        return ($this->next)($this->context);
+        return result::ok($this->context);
     }
 
     /**

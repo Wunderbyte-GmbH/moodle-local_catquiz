@@ -35,7 +35,6 @@ use local_catquiz\teststrategy\preselect_task;
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 final class strategybalancedscore extends preselect_task {
-
     /**
      * Run preselect task.
      *
@@ -45,7 +44,7 @@ final class strategybalancedscore extends preselect_task {
      * @return result
      *
      */
-    public function run(array &$context, callable $next): result {
+    public function run(array &$context): result {
         foreach ($context['questions'] as $question) {
             // If no question has any attempt yet, they all get the same score of 0.
             if ($context['generalnumberofattempts_max'] === 0) {
@@ -59,7 +58,7 @@ final class strategybalancedscore extends preselect_task {
 
         // In order to have predictable results, in case the values of two
         // elements are exactly the same, sort by question ID.
-        uasort($context['questions'], function($q1, $q2) {
+        uasort($context['questions'], function ($q1, $q2) {
             if (! ($q2->score === $q1->score)) {
                 return $q2->score <=> $q1->score;
             }

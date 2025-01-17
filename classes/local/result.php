@@ -15,10 +15,10 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Сlass status.
+ * Сlass result.
  *
  * @package    local_catquiz
- * @copyright  2023 Wunderbyte GmbH <georg.maisser@wunderbyte.at>
+ * @copyright  2025 Wunderbyte GmbH <georg.maisser@wunderbyte.at>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
@@ -30,9 +30,8 @@ use local_catquiz\local\status;
 /**
  * Provides methods to obtain results.
  *
- *
  * @package    local_catquiz
- * @copyright  2023 Wunderbyte GmbH <georg.maisser@wunderbyte.at>
+ * @copyright  2025 Wunderbyte GmbH <georg.maisser@wunderbyte.at>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 abstract class result {
@@ -63,11 +62,10 @@ abstract class result {
      * @param string $status
      * @param mixed|null $value
      *
-     * @return none
-     *
+     * @return fail
      */
-    public static function err(string $status = status::ERROR_GENERAL, $value = null) {
-        return new none($value, $status);
+    public static function err(string $status = status::ERROR_GENERAL, $value = null): fail {
+        return new fail($value, $status);
     }
 
     /**
@@ -75,21 +73,32 @@ abstract class result {
      *
      * @param mixed|null $value
      *
-     * @return some
-     *
+     * @return success
      */
-    public static function ok($value = null) {
-        return new some($value, status::OK);
+    public static function ok($value = null): success {
+        return new success($value, status::OK);
     }
 
+    /**
+     * Calls the given callable if successful
+     *
+     * @return result
+     */
     abstract public function and_then(callable $op): result;
 
+    /**
+     * Calls the given callable if not successful
+     *
+     * @return result
+     */
     abstract public function or_else(callable $op): result;
 
     /**
+     * Throws an exception if not successful
+     *
      * @throws Exception
      */
-    abstract public function expect();
+    abstract public function expect(): result;
 
     /**
      * Returns status.

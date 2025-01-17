@@ -41,7 +41,6 @@ use moodle_exception;
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class firstquestionselector extends preselect_task {
-
     /**
      * @var int
      */
@@ -87,17 +86,17 @@ class firstquestionselector extends preselect_task {
      * @return result
      *
      */
-    public function run(array &$context, callable $next): result {
+    public function run(array &$context): result {
         $this->progress = $context['progress'];
         $this->context = $context;
         // Don't do anything if this is not the first question of the current attempt.
         if (!$this->progress->is_first_question()) {
-            return $next($context);
+            return result::ok($context);
         }
 
         // In the classic test, we do not change how the first question is selected.
         if ($context['teststrategy'] == LOCAL_CATQUIZ_STRATEGY_CLASSIC) {
-            return $next($context);
+            return result::ok($context);
         }
 
         if ($context['questions_ordered_by'] !== 'difficulty') {
@@ -117,7 +116,7 @@ class firstquestionselector extends preselect_task {
         if ($context['firstquestion_use_existing_data']) {
             // We already have a person param for this user, so use it.
             if ($this->has_ability()) {
-                return $next($context);
+                return result::ok($context);
             }
         }
 
@@ -129,7 +128,7 @@ class firstquestionselector extends preselect_task {
             $context['person_ability'][$this->context['catscaleid']] = $startability;
             $context['progress']->set_ability($startability, $context['catscaleid']);
             $context['se'][$this->context['catscaleid']] = 1.0;
-            return $next($context);
+            return result::ok($context);
         }
 
         $items = $this->get_items();
@@ -140,7 +139,7 @@ class firstquestionselector extends preselect_task {
             $se
         );
         $context['se'][$this->context['catscaleid']] = $se;
-        return $next($context);
+        return result::ok($context);
     }
 
     /**

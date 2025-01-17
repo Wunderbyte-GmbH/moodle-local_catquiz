@@ -38,7 +38,6 @@ use local_catquiz\teststrategy\preselect_task;
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class numberofgeneralattempts extends preselect_task {
-
     /**
      * Run preselect task.
      *
@@ -48,7 +47,7 @@ class numberofgeneralattempts extends preselect_task {
      * @return result
      *
      */
-    public function run(array &$context, callable $next): result {
+    public function run(array &$context): result {
         $records = $this->getquestionswithattemptscount($context);
 
         $maxattempts = 0;
@@ -61,7 +60,7 @@ class numberofgeneralattempts extends preselect_task {
         }
         $context['generalnumberofattempts_max'] = $maxattempts;
 
-        return $next($context);
+        return result::ok($context);
     }
 
     /**
