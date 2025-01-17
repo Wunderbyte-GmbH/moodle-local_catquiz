@@ -25,7 +25,6 @@
 namespace local_catquiz\teststrategy;
 
 use local_catquiz\local\result;
-use local_catquiz\local\status;
 
 /**
  * Base class for a pre-select task.
@@ -43,41 +42,11 @@ use local_catquiz\local\status;
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 abstract class preselect_task {
-
     /**
      *
      * @var array|null $context
      */
     protected ?array $context;
-
-    /**
-     * The next task
-     *
-     * @var callable
-     */
-    protected $nexttask;
-
-    /**
-     * Process test strategy
-     *
-     * @param array $context
-     * @param callable $nexttask
-     *
-     * @return result
-     *
-     */
-    public function process(array &$context, callable $nexttask): result {
-        foreach ($this->get_required_context_keys() as $key) {
-            if (!array_key_exists($key, $context)) {
-                return result::err(status::ERROR_FETCH_NEXT_QUESTION);
-            }
-        }
-
-        $context['lastmiddleware'] = str_replace(__NAMESPACE__ . '\\preselect_task\\', '', get_class($this));
-        $this->context = $context;
-        $this->nexttask = $nexttask;
-        return $this->run($context, $nexttask);
-    }
 
     /**
      * This is the function in which the $context can be modified.
@@ -90,12 +59,4 @@ abstract class preselect_task {
      * @return result
      */
     abstract public function run(array &$context): result;
-
-    /**
-     * If a middleware requires a specific key to be available in the $context
-     * input array, it can be specified here.
-     *
-     * @return array
-     */
-    abstract public function get_required_context_keys(): array;
 }

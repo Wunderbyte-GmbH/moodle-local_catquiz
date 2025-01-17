@@ -200,19 +200,6 @@ abstract class strategyscore extends preselect_task {
     }
 
     /**
-     * Get required context keys.
-     *
-     * @return array
-     *
-     */
-    public function get_required_context_keys(): array {
-        return [
-            'questions',
-            'progress',
-        ];
-    }
-
-    /**
      * Helper function for debugging
      *
      * @param int $scaleid

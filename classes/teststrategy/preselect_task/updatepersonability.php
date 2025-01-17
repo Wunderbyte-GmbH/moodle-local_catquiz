@@ -348,20 +348,6 @@ class updatepersonability extends preselect_task {
     }
 
     /**
-     * Get required context keys.
-     *
-     * @return array
-     *
-     */
-    public function get_required_context_keys(): array {
-        return [
-            'contextid',
-            'catscaleid',
-            'progress',
-        ];
-    }
-
-    /**
      * TODO: move this to model_response
      *
      * Test if we can calculate an ability with the given responses.

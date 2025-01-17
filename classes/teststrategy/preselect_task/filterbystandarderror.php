@@ -142,22 +142,6 @@ class filterbystandarderror extends preselect_task {
     }
 
     /**
-     * Get required context keys.
-     *
-     * @return array
-     *
-     */
-    public function get_required_context_keys(): array {
-        return [
-            'questions',
-            'progress',
-            'se_max',
-            'progress',
-            'pp_min_inc',
-        ];
-    }
-
-    /**
      * Returns the list of scales that should inherit from the given scale.
      *
      * @param int $scaleid

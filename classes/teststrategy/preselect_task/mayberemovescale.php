@@ -72,18 +72,4 @@ final class mayberemovescale extends preselect_task {
 
         return result::ok($context);
     }
-
-    /**
-     * Get required context keys.
-     *
-     * @return array
-     *
-     */
-    public function get_required_context_keys(): array {
-        return [
-            'questions',
-            'max_attempts_per_scale',
-            'progress',
-        ];
-    }
 }

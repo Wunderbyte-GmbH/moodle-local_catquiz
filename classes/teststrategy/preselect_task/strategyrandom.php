@@ -48,16 +48,4 @@ final class strategyrandom extends preselect_task {
         shuffle($context['questions']);
         return result::ok(reset($context['questions']));
     }
-
-    /**
-     * Get required context keys
-     *
-     * @return array
-     *
-     */
-    public function get_required_context_keys(): array {
-        return [
-            'questions',
-        ];
-    }
 }

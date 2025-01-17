@@ -72,19 +72,6 @@ final class lasttimeplayedpenalty extends preselect_task {
     }
 
     /**
-     * Get required context keys.
-     *
-     * @return array
-     *
-     */
-    public function get_required_context_keys(): array {
-        return [
-            'questions',
-            'penalty_threshold',
-        ];
-    }
-
-    /**
      * Calculates the penalty factor for the given question according to the time it was last played.
      *
      * For performance reasons, $now is passed as parameter

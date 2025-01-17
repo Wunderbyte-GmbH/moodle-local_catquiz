@@ -64,18 +64,6 @@ class numberofgeneralattempts extends preselect_task {
     }
 
     /**
-     * Get required context keys.
-     *
-     * @return array
-     *
-     */
-    public function get_required_context_keys(): array {
-        return [
-            'questions',
-        ];
-    }
-
-    /**
      * Can be overwritten in the _testing class to prevent access to the DB.
      * @param mixed $context
      * @return array

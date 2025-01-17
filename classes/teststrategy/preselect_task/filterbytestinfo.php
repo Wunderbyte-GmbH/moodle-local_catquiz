@@ -148,20 +148,4 @@ class filterbytestinfo extends preselect_task {
 
         return result::ok($context);
     }
-
-    /**
-     * Get required context keys.
-     *
-     * @return array
-     *
-     */
-    public function get_required_context_keys(): array {
-        return [
-            'questions',
-            'progress',
-            'se_max',
-            'progress',
-            'pp_min_inc',
-        ];
-    }
 }

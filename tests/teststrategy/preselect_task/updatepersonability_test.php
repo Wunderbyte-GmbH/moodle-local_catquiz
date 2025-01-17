@@ -74,12 +74,11 @@ final class updatepersonability_test extends TestCase {
 
         $context['progress'] = $progressstub;
 
-        $returncontext = fn($context) => result::ok($context);
         // The updatepersonaiblitytesting class is a slightly modified version
         // of the updatepersonability class that just overrides parts that load
         // data from the DB or cache.
         $updatepersonability = new updatepersonability_testing();
-        $result = $updatepersonability->process($context, $returncontext);
+        $result = $updatepersonability->run($context);
         $this->assertEquals($expected, $result->unwrap()['skip_reason']);
     }
 

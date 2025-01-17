@@ -143,21 +143,6 @@ class firstquestionselector extends preselect_task {
     }
 
     /**
-     * Get required context keys.
-     *
-     * @return array
-     *
-     */
-    public function get_required_context_keys(): array {
-        return [
-            'selectfirstquestion',
-            'questions_ordered_by',
-            'testid',
-            'progress',
-        ];
-    }
-
-    /**
      * Returns the median ability of the given person parameters.
      *
      * @param array $personparams

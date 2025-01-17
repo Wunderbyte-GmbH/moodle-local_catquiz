@@ -51,16 +51,4 @@ final class strategyclassicscore extends preselect_task {
 
         return result::ok(reset($context['questions']));
     }
-
-    /**
-     * Get required context keys.
-     *
-     * @return array
-     *
-     */
-    public function get_required_context_keys(): array {
-        return [
-            'questions',
-        ];
-    }
 }

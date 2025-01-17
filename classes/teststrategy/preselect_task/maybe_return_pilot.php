@@ -93,17 +93,4 @@ class maybe_return_pilot extends preselect_task {
         $shouldreturnpilot = $rand <= $this->context['pilot_ratio'];
         return $shouldreturnpilot;
     }
-
-    /**
-     * Get required context keys.
-     *
-     * @return array
-     *
-     */
-    public function get_required_context_keys(): array {
-        return [
-            'pilot_ratio',
-            'questions',
-        ];
-    }
 }

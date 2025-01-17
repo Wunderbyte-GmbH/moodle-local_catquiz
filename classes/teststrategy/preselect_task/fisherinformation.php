@@ -87,19 +87,4 @@ final class fisherinformation extends preselect_task {
         );
         return $fisherinformation;
     }
-
-    /**
-     * Get required context keys
-     *
-     * @return array
-     *
-     */
-    public function get_required_context_keys(): array {
-        return [
-            'installed_models',
-            'person_ability',
-            'questions',
-            'original_questions',
-        ];
-    }
 }

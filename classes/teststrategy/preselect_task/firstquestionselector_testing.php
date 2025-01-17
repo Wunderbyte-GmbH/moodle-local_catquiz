@@ -44,14 +44,4 @@ final class firstquestionselector_testing extends firstquestionselector {
     protected function get_personparams_for_adaptivequiz_test(array $context) {
         return $context['fake_personparams_for_test'];
     }
-
-    /**
-     * Get required context keys.
-     *
-     * @return array
-     *
-     */
-    public function get_required_context_keys(): array {
-        return parent::get_required_context_keys()[] = ['fake_personparams_for_test'];
-    }
 }
