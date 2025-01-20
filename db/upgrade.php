@@ -989,7 +989,7 @@ ENDSQL;
     // This is a bit unconventional. The table already exists with old, long
     // names on a moodle instance that supports longer table names but can't be
     // created on a different instance that has stricter naming rules.
-    if ($oldversion < 2024111804) {
+    if ($oldversion < 2025012001) {
         // Check if old table exists first.
         if ($dbman->table_exists('local_catquiz_question_hashmap')) {
             // Rename the table.
@@ -1054,10 +1054,10 @@ ENDSQL;
             }
         }
 
-        upgrade_plugin_savepoint(true, 2024111804, 'local', 'catquiz');
+        upgrade_plugin_savepoint(true, 2025012001, 'local', 'catquiz');
     }
 
-    if ($oldversion < 2024112601) {
+    if ($oldversion < 2025012002) {
         // Define field contextid to be added to local_catquiz_tests.
         $table = new xmldb_table('local_catquiz_tests');
         $field = new xmldb_field('contextid', XMLDB_TYPE_INTEGER, '10', null, null, null, null, 'catscaleid');
@@ -1095,23 +1095,25 @@ ENDSQL;
         }
 
         // Catquiz savepoint reached.
-        upgrade_plugin_savepoint(true, 2024112601, 'local', 'catquiz');
+        upgrade_plugin_savepoint(true, 2025012002, 'local', 'catquiz');
     }
 
-    if ($oldversion < 2024112800) {
+    if ($oldversion < 2025012003) {
         // Rename field remoteuserid on table local_catquiz_rresponses to attempthash.
         $table = new xmldb_table('local_catquiz_rresponses');
         $field = new xmldb_field('remoteuserid');
         $field->set_attributes(XMLDB_TYPE_INTEGER, 10);
 
         // Launch rename field attempthash.
-        $dbman->rename_field($table, $field, 'attempthash');
+        if (!$dbman->field_exists($table, 'attempthash')) {
+            $dbman->rename_field($table, $field, 'attempthash');
+        }
 
         // Catquiz savepoint reached.
-        upgrade_plugin_savepoint(true, 2024112800, 'local', 'catquiz');
+        upgrade_plugin_savepoint(true, 2025012003, 'local', 'catquiz');
     }
 
-    if ($oldversion < 2024112803) {
+    if ($oldversion < 2025012004) {
         // Define index questionhash (notunique) to be added to local_catquiz_rresponses.
         $table = new xmldb_table('local_catquiz_rresponses');
         $index = new xmldb_index('questionhash', XMLDB_INDEX_NOTUNIQUE, ['questionhash']);
@@ -1123,7 +1125,7 @@ ENDSQL;
         $dbman->add_index($table, $index);
 
         // Catquiz savepoint reached.
-        upgrade_plugin_savepoint(true, 2024112803, 'local', 'catquiz');
+        upgrade_plugin_savepoint(true, 2025012004, 'local', 'catquiz');
     }
 
     return true;
