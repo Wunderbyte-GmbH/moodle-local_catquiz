@@ -131,7 +131,8 @@ if ($hassiteconfig) {
         'local_catquiz/central_host',
         get_string('central_host', 'local_catquiz'),
         get_string('central_host_desc', 'local_catquiz'),
-        PARAM_URL
+        '',
+        PARAM_TEXT
     ));
 
     $settings->add(new admin_setting_configtext(
