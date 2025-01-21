@@ -31,12 +31,11 @@ use local_catquiz\data\dataapi;
 use local_catquiz\event\calculation_executed;
 use local_catquiz\event\calculation_skipped;
 use local_catquiz\task\adhoc_recalculate_cat_model_params;
-use local_catquiz\task\recalculate_cat_model_params;
 use local_catquiz\local\model\model_item_param_list;
 use local_catquiz\local\model\model_person_param_list;
 use local_catquiz\local\model\model_strategy;
+use local_catquiz\local\model\model_strategy_factory;
 use moodle_exception;
-use moodle_url;
 
 /**
  * Entities Class to display list of entity records.
@@ -105,9 +104,8 @@ class catmodel_info {
             $userid = $USER->id;
         }
 
-        $context = catcontext::load_from_db($contextid);
         $catscale = catscale::return_catscale_object($catscaleid);
-        $strategy = $context->get_strategy($catscaleid);
+        $strategy = model_strategy_factory::create_for_scale($catscaleid, $contextid);
         $initialabilities = model_person_param_list::load_from_db($contextid, [$catscaleid]);
         $strategy->get_responses()->set_person_abilities($initialabilities);
         try {
@@ -158,7 +156,8 @@ class catmodel_info {
         ]);
         $event->trigger();
 
-        $context->save_or_update((object)['timecalculated' => time()]);
+        catcontext::load_from_db($contextid)
+            ->save_or_update((object)['timecalculated' => time()]);
     }
 
     /**

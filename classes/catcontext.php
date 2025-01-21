@@ -320,26 +320,6 @@ class catcontext {
     }
 
     /**
-     * Get_strategy.
-     *
-     * @param int $catscaleid
-     *
-     * @return model_strategy
-     *
-     */
-    public function get_strategy(int $catscaleid): model_strategy {
-        $responses = model_responses::create_for_context($this->id);
-        $options = json_decode($this->json, true) ?? [];
-        $installedmodels = model_strategy::get_installed_models();
-        $olditemparams = [];
-        $catscaleids = [$catscaleid, ...catscale::get_subscale_ids($catscaleid)];
-        foreach (array_keys($installedmodels) as $model) {
-            $olditemparams[$model] = model_item_param_list::load_from_db($this->id, $model, $catscaleids);
-        }
-        return new model_strategy($responses, $options, $olditemparams);
-    }
-
-    /**
      * Add a default context that contains all test items.
      *
      * @return void
@@ -408,5 +388,15 @@ class catcontext {
         } catch (dml_exception $e) {
             throw new moodle_exception('error');
         }
+    }
+
+    /**
+     * Returns the options stored in the json field
+     *
+     * @return array
+     */
+    public function get_options(): array {
+        $options = json_decode($this->json, true) ?? [];
+        return $options;
     }
 }
