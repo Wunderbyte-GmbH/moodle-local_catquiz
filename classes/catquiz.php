@@ -2906,4 +2906,34 @@ SQL;
         $records = $DB->get_records_sql($sql, $params);
         return $records;
     }
+
+    /**
+     * Get the last synced context ID for a given CAT scale.
+     *
+     * @param int $catscaleid The ID of the CAT scale to check
+     * @return ?int The context ID of the last sync, or null if never synced
+     */
+    public function get_last_synced_context_id(int $catscaleid): ?int {
+        global $DB;
+
+        $sql = <<<SQL
+            SELECT contextid
+            FROM {local_catquiz_sync_event}
+            WHERE catscaleid = :catscaleid
+            ORDER BY id DESC
+            LIMIT 1
+        SQL;
+
+        $params = ['catscaleid' => $catscaleid];
+        if (!$record = $DB->get_record_sql($sql, $params)) {
+            return null;
+        }
+        return $record->contextid;
+    }
+
+    public function save_sync_event(stdClass $data): void {
+        global $DB;
+
+        $DB->insert_record('local_catquiz_sync_event', $data);
+    }
 }

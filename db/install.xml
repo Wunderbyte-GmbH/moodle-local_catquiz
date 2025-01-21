@@ -264,7 +264,7 @@
         <KEY NAME="questionid" TYPE="foreign" FIELDS="questionid" REFTABLE="question" REFFIELDS="id"/>
       </KEYS>
       <INDEXES>
-        <INDEX NAME="questionhash" UNIQUE="true" FIELDS="questionhash"/>
+        <INDEX NAME="questionhash" UNIQUE="false" FIELDS="questionhash"/>
       </INDEXES>
     </TABLE>
     <TABLE NAME="local_catquiz_rresponses" COMMENT="Stores responses from remote instances">
@@ -286,6 +286,22 @@
         <INDEX NAME="timeprocessed" UNIQUE="false" FIELDS="timeprocessed"/>
         <INDEX NAME="questionhash" UNIQUE="false" FIELDS="questionhash"/>
       </INDEXES>
+    </TABLE>
+    <TABLE NAME="local_catquiz_sync_event" COMMENT="Lists events where item parameters were fetched froma central instance">
+        <FIELDS>
+            <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
+            <FIELD NAME="contextid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="The context that was created for the new parameters"/>
+            <FIELD NAME="catscaleid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="The CAT scale ID"/>
+            <FIELD NAME="num_fetched_params" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="The number of fetched items"/>
+            <FIELD NAME="userid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="The user that triggered the fetch event"/>
+        </FIELDS>
+        <KEYS>
+            <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+        </KEYS>
+        <INDEXES>
+            <INDEX NAME="catscaleid" UNIQUE="false" FIELDS="catscaleid"/>
+            <INDEX NAME="userid" UNIQUE="false" FIELDS="userid"/>
+        </INDEXES>
     </TABLE>
   </TABLES>
 </XMLDB>

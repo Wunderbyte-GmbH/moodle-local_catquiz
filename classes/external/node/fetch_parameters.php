@@ -21,6 +21,7 @@ defined('MOODLE_INTERNAL') || die();
 require_once($CFG->libdir . '/externallib.php');
 require_once($CFG->libdir . '/filelib.php');
 
+use dml_write_exception;
 use external_api;
 use external_function_parameters;
 use external_single_structure;
@@ -31,6 +32,7 @@ use local_catquiz\catquiz;
 use local_catquiz\catscale;
 use local_catquiz\data\dataapi;
 use local_catquiz\local\model\model_item_param;
+use local_catquiz\local\sync_event;
 use local_catquiz\remote\hash\question_hasher;
 
 /**
@@ -86,6 +88,7 @@ class fetch_parameters extends external_api {
      */
     public static function execute(int $scaleid) {
         global $DB, $CFG;
+        $repo = new catquiz();
 
         // Parameter validation.
         $params = self::validate_parameters(self::execute_parameters(), [
@@ -108,7 +111,11 @@ class fetch_parameters extends external_api {
         if (!$scale->label) {
             throw new \moodle_exception('scalehasnolabel', 'local_catquiz', '', $params['scaleid']);
         }
-        $currentcontext = catscale::get_context_id($scale->id);
+        $targetcontext = $repo->get_last_synced_context_id($scale->id);
+        $activecontext = catscale::get_context_id($scale->id);
+        if (!$targetcontext) {
+            $targetcontext = catscale::get_context_id($scale->id);
+        }
 
         // Create a mapping of catscale labels to IDs.
         $scalemapping = [];
@@ -130,13 +137,35 @@ class fetch_parameters extends external_api {
         $questions = $DB->get_records_sql($sql, $inscaleparams);
         $hashmap = [];
 
+        $duplicates = question_hasher::find_duplicates($questions);
+
         // Generate and store hashes for all questions.
         foreach ($questions as $question) {
             try {
                 $hash = question_hasher::generate_hash($question->id);
                 $hashmap[$hash] = $question->id;
+            } catch (dml_write_exception $e) {
+                $error = 'Error generating hash for question ' . $question->id . ': ' . $e->error;
+                debugging($error, DEBUG_DEVELOPER);
+                return [
+                    'status' => false,
+                    'message' => $e->error,
+                    'duration' => 0,
+                    'synced' => 0,
+                    'errors' => 1,
+                    'warnings' => [],
+                ];
             } catch (\Exception $e) {
-                debugging('Error generating hash for question ' . $question->id . ': ' . $e->getMessage(), DEBUG_DEVELOPER);
+                $error = 'Error generating hash for question ' . $question->id . ': ' . $e->getMessage();
+                debugging($error, DEBUG_DEVELOPER);
+                return [
+                    'status' => false,
+                    'message' => $error,
+                    'duration' => 0,
+                    'synced' => 0,
+                    'errors' => 1,
+                    'warnings' => [],
+                ];
             }
         }
 
@@ -203,7 +232,6 @@ class fetch_parameters extends external_api {
             false
         );
 
-        $repo = new catquiz();
         $haschanged = false;
         $stored = 0;
 
@@ -242,10 +270,11 @@ class fetch_parameters extends external_api {
                 // If there is no entry yet for the given scale and component:
                 // insert with new contextid. Otherwise: update with new
                 // contextid.
+                // Returns NULL even if we have already the new param
                 $localparam = $repo->get_item_with_params(
                     $questionid,
                     $param->model,
-                    $currentcontext
+                    $activecontext
                 );
 
                 if (!$localparam) {
@@ -308,6 +337,13 @@ class fetch_parameters extends external_api {
         $countchanged = count($changedparams);
         if (count($changedparams) > 0) {
             $DB->commit_delegated_transaction($transaction);
+
+            $syncevent = new sync_event(
+                $newcontext->id,
+                $scale->id,
+                $countchanged
+            );
+            $syncevent->save();
         }
 
         $duration = microtime(true) - $starttime;

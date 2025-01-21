@@ -1128,5 +1128,32 @@ ENDSQL;
         upgrade_plugin_savepoint(true, 2025012004, 'local', 'catquiz');
     }
 
+    if ($oldversion < 2025012100) {
+        // Define table local_catquiz_sync_event to be created.
+        $table = new xmldb_table('local_catquiz_sync_event');
+
+        // Adding fields to table local_catquiz_sync_event.
+        $table->add_field('id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, XMLDB_SEQUENCE, null);
+        $table->add_field('contextid', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null);
+        $table->add_field('catscaleid', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null);
+        $table->add_field('num_fetched_params', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null);
+        $table->add_field('userid', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null);
+
+        // Adding keys to table local_catquiz_sync_event.
+        $table->add_key('primary', XMLDB_KEY_PRIMARY, ['id']);
+
+        // Adding indexes to table local_catquiz_sync_event.
+        $table->add_index('catscaleid', XMLDB_INDEX_NOTUNIQUE, ['catscaleid']);
+        $table->add_index('userid', XMLDB_INDEX_NOTUNIQUE, ['userid']);
+
+        // Conditionally launch create table for local_catquiz_sync_event.
+        if (!$dbman->table_exists($table)) {
+            $dbman->create_table($table);
+        }
+
+        // Catquiz savepoint reached.
+        upgrade_plugin_savepoint(true, 2025012100, 'local', 'catquiz');
+    }
+
     return true;
 }
